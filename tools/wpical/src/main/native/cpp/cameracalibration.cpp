@@ -7,6 +7,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -16,6 +17,8 @@
 #include <opencv2/objdetect/aruco_board.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
+
+#include "wpi/util/mutex.hpp"
 
 static bool filter(std::vector<cv::Point2f> charucoCorners,
                    std::vector<int> charucoIds, std::vector<int> markerIds,
@@ -28,13 +31,13 @@ static bool filter(std::vector<cv::Point2f> charucoCorners,
     return false;
   }
 
-  for (int i = 0; i < charucoIds.size(); i++) {
+  for (size_t i = 0; i < charucoIds.size(); i++) {
     if (charucoIds.at(i) > (boardWidth - 1) * (boardHeight - 1) - 1) {
       return false;
     }
   }
 
-  for (int i = 0; i < markerIds.size(); i++) {
+  for (size_t i = 0; i < markerIds.size(); i++) {
     if (markerIds.at(i) > ((boardWidth * boardHeight) / 2) - 1) {
       return false;
     }
@@ -77,6 +80,7 @@ class Data {
    */
   std::optional<cv::Mat> GetFrame();
 
+  std::atomic_bool m_isFinished;
   std::optional<CameraModel> cameraModel;
   std::queue<cv::Mat> queue;
   wpi::util::mutex mutex;
@@ -136,6 +140,7 @@ class Worker {
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_1000);
   cv::aruco::CharucoBoard m_charucoBoard;
   cv::aruco::CharucoDetector m_charucoDetector;
+  std::thread m_thread;
 };
 
 Worker::Worker(std::shared_ptr<Data> data, float squareWidth, float markerWidth,
@@ -145,22 +150,22 @@ Worker::Worker(std::shared_ptr<Data> data, float squareWidth, float markerWidth,
       m_squareWidth(squareWidth * 0.0254),
       m_charucoBoard(cv::Size(boardWidth, boardHeight), squareWidth * 0.0254,
                      markerWidth * 0.0254, m_arucoDict),
-      m_charucoDetector(m_charucoBoard) {
-  std::thread([this, data] {
-    while (!m_isDone) {
-      std::optional<cv::Mat> mat = data->GetFrame();
-      if (mat) {
-        ProcessNextImage(*mat);
-        ++m_framesProcessed;
-      } else {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      }
-    }
-  }).detach();
-}
+      m_charucoDetector(m_charucoBoard),
+      m_thread([this, data] {
+        while (!m_isDone) {
+          std::optional<cv::Mat> mat = data->GetFrame();
+          if (mat) {
+            ProcessNextImage(*mat);
+            ++m_framesProcessed;
+          } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+          }
+        }
+      }) {}
 
 Worker::~Worker() {
   Stop();
+  m_thread.join();
 }
 
 void Worker::ProcessNextImage(cv::Mat image) {
@@ -187,14 +192,14 @@ void Worker::ProcessNextImage(cv::Mat image) {
   m_charucoBoard.matchImagePoints(charucoCorners, charucoIds, objPoints,
                                   imgPoints);
 
-  for (int i = 0; i < charucoIds.size(); i++) {
+  for (size_t i = 0; i < charucoIds.size(); i++) {
     int id = charucoIds.at(i);
     points[id].x = imgPoints.at(i).x;
     points[id].y = imgPoints.at(i).y;
     points[id].z = 1.0f;
   }
 
-  for (int i = 0; i < points.size(); i++) {
+  for (size_t i = 0; i < points.size(); i++) {
     if (points[i].z != 1.0f) {
       points[i].x = -1.0f;
       points[i].y = -1.0f;
@@ -232,17 +237,17 @@ CameraCalibrator::CameraCalibrator(size_t numWorkers, double squareWidth,
     cv::Size frameShape{
         static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH)),
         static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT))};
-    while (capture.grab() && !m_isFinished) {
+    while (capture.grab() && !state->m_isFinished) {
       cv::Mat frame;
       capture.retrieve(frame);
       cv::Mat frameGray;
       cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
       state->AddFrame(std::move(frameGray));
     }
-    while (TotalFramesProcessed() < TotalFrames() && !m_isFinished) {
+    while (!state->m_isFinished && TotalFramesProcessed() < TotalFrames()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    if (m_isFinished) {
+    if (state->m_isFinished) {
       state->cameraModel = std::nullopt;
       return;
     }
@@ -256,14 +261,14 @@ CameraCalibrator::CameraCalibrator(size_t numWorkers, double squareWidth,
                               data.second.end());
     }
     if (allObservationBoards.empty()) {
-      m_isFinished = true;
+      state->m_isFinished = true;
       return;
     }
     auto result = mrcal_main(allObservationBoards, allFramesRtToref,
                              cv::Size(boardWidth - 1, boardHeight - 1),
                              squareWidth * 0.0254, frameShape, 1000);
     state->cameraModel = MrcalResultToCameraModel(*result);
-    m_isFinished = true;
+    state->m_isFinished = true;
   }).detach();
 }
 
@@ -272,7 +277,7 @@ CameraCalibrator::~CameraCalibrator() {
 }
 
 bool CameraCalibrator::IsFinished() {
-  return m_isFinished;
+  return m_state->m_isFinished;
 }
 
 std::optional<CameraModel> CameraCalibrator::GetCameraModel() {
@@ -292,7 +297,7 @@ int CameraCalibrator::TotalFrames() {
 }
 
 void CameraCalibrator::Stop() {
-  m_isFinished = true;
+  m_state->m_isFinished = true;
   for (auto& workers : m_workers) {
     workers->Stop();
   }

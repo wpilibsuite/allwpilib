@@ -1,0 +1,38 @@
+name: 'Setup Bazel Cache'
+description: 'Configures the Bazel remote cache. Prefers WPI bazel-remote (R/W), falls back to BuildBuddy, then readonly WPI cache.'
+
+inputs:
+  bazel_remote_username:
+    description: 'WPI Bazel remote cache username'
+  bazel_remote_password:
+    description: 'WPI Bazel remote cache password'
+  bazel_remote_url:
+    description: 'WPI Bazel remote cache base URL (no credentials or protocol, e.g. gitlib-bazel.wpi.edu)'
+    default: 'gitlib-bazel.wpi.edu'
+  buildbuddy_token:
+    description: 'BuildBuddy API token'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve Bazel cache configuration
+      env:
+        CACHE_USER: ${{ inputs.bazel_remote_username }}
+        CACHE_PASS: ${{ inputs.bazel_remote_password }}
+        REMOTE_URL: ${{ inputs.bazel_remote_url }}
+        BB_TOKEN: ${{ inputs.buildbuddy_token }}
+      shell: bash
+      run: |
+        if [ -n "${CACHE_USER}" ] && [ -n "${CACHE_PASS}" ]; then
+          echo "WPI bazel-remote credentials detected; configuring R/W access"
+          echo "build:remote_cache --remote_cache=grpcs://${CACHE_USER}:${CACHE_PASS}@${REMOTE_URL}" > bazel_auth.rc
+          echo "build:ci --config=remote_cache" >> bazel_auth.rc
+        elif [ -n "${BB_TOKEN}" ]; then
+          echo "BuildBuddy token detected; configuring BuildBuddy cache"
+          echo "build:build_buddy --remote_header=x-buildbuddy-api-key=${BB_TOKEN}" > bazel_auth.rc
+          echo "build:ci --config=build_buddy" >> bazel_auth.rc
+        else
+          echo "No cache credentials detected; falling back to readonly WPI cache"
+          echo "build:ci --config=remote_cache" > bazel_auth.rc
+          echo "build:ci --config=remote_cache_readonly" >> bazel_auth.rc
+        fi

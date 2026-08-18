@@ -4,18 +4,20 @@
 
 #include "wpi/commands2/sysid/SysIdRoutine.hpp"
 
+#include <algorithm>
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/commands2/Subsystem.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/DataLogManager.hpp"
 #include "wpi/system/Timer.hpp"
 #include "wpi/units/math.hpp"
 
-#define EXPECT_NEAR_UNITS(val1, val2, eps) \
-  EXPECT_LE(wpi::units::math::abs(val1 - val2), eps)
+#define CHECK_NEAR_UNITS(val1, val2, eps) \
+  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
 
 enum StateTest {
   Invalid,
@@ -28,8 +30,15 @@ enum StateTest {
   DoneWithRecordState
 };
 
-class SysIdRoutineTest : public ::testing::Test {
- protected:
+class SysIdRoutineTest {
+ public:
+  SysIdRoutineTest() { wpi::sim::PauseTiming(); }
+
+  ~SysIdRoutineTest() {
+    wpi::sim::ResumeTiming();
+    wpi::DataLogManager::Stop();
+  }
+
   std::vector<StateTest> currentStateList{};
   std::vector<wpi::units::volt_t> sentVoltages{};
   wpi::cmd::Subsystem m_subsystem{};
@@ -91,28 +100,16 @@ class SysIdRoutineTest : public ::testing::Test {
     command.get()->Execute();
     command.get()->End(true);
   }
-
-  void SetUp() override {
-    wpi::sim::PauseTiming();
-    wpi::cmd::CommandPtr m_quasistaticForward{
-        m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kForward)};
-    wpi::cmd::CommandPtr m_quasistaticReverse{
-        m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kReverse)};
-    wpi::cmd::CommandPtr m_dynamicForward{
-        m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::kForward)};
-    wpi::cmd::CommandPtr m_dynamicReverse{
-        m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::kReverse)};
-  }
-
-  void TearDown() override { wpi::sim::ResumeTiming(); }
 };
 
-TEST_F(SysIdRoutineTest, RecordStateBookendsMotorLogging) {
+TEST_CASE_METHOD(SysIdRoutineTest,
+                 "SysIdRoutineTest RecordStateBookendsMotorLogging",
+                 "[commandsv2][command]") {
   RunCommand(std::move(m_quasistaticForward));
   std::vector<StateTest> expectedOrder{
       StateTest::InDrive, StateTest::InLog, StateTest::InRecordStateQf,
       StateTest::InDrive, StateTest::DoneWithRecordState};
-  EXPECT_TRUE(expectedOrder == currentStateList);
+  CHECK(expectedOrder == currentStateList);
   currentStateList.clear();
   sentVoltages.clear();
 
@@ -120,68 +117,71 @@ TEST_F(SysIdRoutineTest, RecordStateBookendsMotorLogging) {
       StateTest::InDrive, StateTest::InLog, StateTest::InRecordStateDf,
       StateTest::InDrive, StateTest::DoneWithRecordState};
   RunCommand(std::move(m_dynamicForward));
-  EXPECT_TRUE(expectedOrder == currentStateList);
+  CHECK(expectedOrder == currentStateList);
   currentStateList.clear();
   sentVoltages.clear();
 }
 
-TEST_F(SysIdRoutineTest, DeclareCorrectState) {
+TEST_CASE_METHOD(SysIdRoutineTest, "SysIdRoutineTest DeclareCorrectState",
+                 "[commandsv2][command]") {
   RunCommand(std::move(m_quasistaticForward));
-  EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
-                        StateTest::InRecordStateQf) != currentStateList.end());
+  CHECK(std::find(currentStateList.begin(), currentStateList.end(),
+                  StateTest::InRecordStateQf) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_quasistaticReverse));
-  EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
-                        StateTest::InRecordStateQr) != currentStateList.end());
+  CHECK(std::find(currentStateList.begin(), currentStateList.end(),
+                  StateTest::InRecordStateQr) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicForward));
-  EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
-                        StateTest::InRecordStateDf) != currentStateList.end());
+  CHECK(std::find(currentStateList.begin(), currentStateList.end(),
+                  StateTest::InRecordStateDf) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicReverse));
-  EXPECT_TRUE(std::find(currentStateList.begin(), currentStateList.end(),
-                        StateTest::InRecordStateDr) != currentStateList.end());
+  CHECK(std::find(currentStateList.begin(), currentStateList.end(),
+                  StateTest::InRecordStateDr) != currentStateList.end());
   currentStateList.clear();
   sentVoltages.clear();
 }
 
-TEST_F(SysIdRoutineTest, OutputCorrectVoltage) {
+TEST_CASE_METHOD(SysIdRoutineTest, "SysIdRoutineTest OutputCorrectVoltage",
+                 "[commandsv2][command]") {
   RunCommand(std::move(m_quasistaticForward));
   std::vector<wpi::units::volt_t> expectedVoltages{1_V, 0_V};
-  EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
-  EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_quasistaticReverse));
   expectedVoltages = std::vector<wpi::units::volt_t>{-1_V, 0_V};
-  EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
-  EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicForward));
   expectedVoltages = std::vector<wpi::units::volt_t>{7_V, 0_V};
-  EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
-  EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicReverse));
   expectedVoltages = std::vector<wpi::units::volt_t>{-7_V, 0_V};
-  EXPECT_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
-  EXPECT_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
+  CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 }
 
-TEST_F(SysIdRoutineTest, EmptyLogFunc) {
+TEST_CASE_METHOD(SysIdRoutineTest, "SysIdRoutineTest EmptyLogFunc",
+                 "[commandsv2][command]") {
   RunCommand(std::move(m_emptyRoutineForward));
   SUCCEED();
 }

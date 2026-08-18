@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.elevatorprofiledpid;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.ProfiledPIDController;
@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
   private static double kV = 1.3;
 
   private final Joystick joystick = new Joystick(1);
-  private final Encoder encoder = new Encoder(1, 2);
+  private final Encoder encoder = new Encoder(2, 3);
   private final PWMSparkMax motor = new PWMSparkMax(1);
 
   // Create a PID controller whose setpoint's change is subject to maximum

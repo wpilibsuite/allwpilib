@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.expansionhub;
 
+import java.util.OptionalInt;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
@@ -20,6 +21,9 @@ public class ExpansionHub implements AutoCloseable {
     private int m_reservedServoMask;
     private final Object m_reserveLock = new Object();
 
+    private final OptionalInt[] followerConfiguration = new OptionalInt[4];
+    private final int[] followerVisited = new int[4];
+
     private final BooleanSubscriber m_hubConnectedSubscriber;
 
     DataStore(int usbId) {
@@ -30,6 +34,10 @@ public class ExpansionHub implements AutoCloseable {
 
       m_hubConnectedSubscriber =
           systemServer.getBooleanTopic("/rhsp/" + usbId + "/connected").subscribe(false);
+
+      for (int i = 0; i < followerConfiguration.length; i++) {
+        followerConfiguration[i] = OptionalInt.empty();
+      }
 
       // Wait up to half a second for connected to come up, using a poll loop to
       // ensure we don't block.
@@ -150,6 +158,7 @@ public class ExpansionHub implements AutoCloseable {
   void unreserveMotor(int channel) {
     int mask = 1 << channel;
     synchronized (m_dataStore.m_reserveLock) {
+      m_dataStore.followerConfiguration[channel] = OptionalInt.empty();
       m_dataStore.m_reservedMotorMask &= ~mask;
     }
   }
@@ -201,6 +210,56 @@ public class ExpansionHub implements AutoCloseable {
    */
   public boolean isHubConnected() {
     return m_dataStore.m_hubConnectedSubscriber.get(false);
+  }
+
+  private String getFollowerStringCycle(int baseChannel, int[] followerVisited) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(baseChannel);
+    int current = baseChannel;
+    while (followerVisited[current] != baseChannel) {
+      current = followerVisited[current];
+      sb.append(" -> ").append(current);
+    }
+    sb.append(" -> ").append(followerVisited[current]);
+    return sb.toString();
+  }
+
+  private void validateRootFollower(int baseChannel, int channel, int[] followerVisited) {
+    if (followerVisited[channel] != -1) {
+      throw new IllegalStateException(
+          "Follower cycle detected on hub "
+              + m_dataStore.m_usbId
+              + ": "
+              + getFollowerStringCycle(baseChannel, followerVisited));
+    }
+    OptionalInt leader = m_dataStore.followerConfiguration[channel];
+    if (leader.isEmpty()) {
+      return;
+    }
+    followerVisited[channel] = leader.getAsInt();
+    validateRootFollower(baseChannel, leader.getAsInt(), followerVisited);
+  }
+
+  private void validateFollowerConfiguration() {
+    for (int i = 0; i < m_dataStore.followerConfiguration.length; i++) {
+      for (int j = 0; j < m_dataStore.followerVisited.length; j++) {
+        m_dataStore.followerVisited[j] = -1;
+      }
+      validateRootFollower(i, i, m_dataStore.followerVisited);
+    }
+  }
+
+  void addFollower(int leaderChannel, int followerChannel) {
+    synchronized (m_dataStore.m_reserveLock) {
+      m_dataStore.followerConfiguration[followerChannel] = OptionalInt.of(leaderChannel);
+      validateFollowerConfiguration();
+    }
+  }
+
+  void removeFollower(int followerChannel) {
+    synchronized (m_dataStore.m_reserveLock) {
+      m_dataStore.followerConfiguration[followerChannel] = OptionalInt.empty();
+    }
   }
 
   /**

@@ -36,7 +36,8 @@ import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.StructPublisher;
-import org.wpilib.system.Timer;
+import org.wpilib.util.Alert;
+import org.wpilib.util.AlertException;
 import org.wpilib.util.Color;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
@@ -132,9 +133,6 @@ public final class DriverStationBackend {
     }
   }
 
-  private static final double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-  private static double m_nextMessageTime;
-
   private static String opModeToString(long id) {
     if (id == 0) {
       return "";
@@ -152,7 +150,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "FMSInfo";
+    private static final String kSmartDashboardType = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -161,20 +159,22 @@ public final class DriverStationBackend {
     final IntegerPublisher matchType;
     final BooleanPublisher alliance;
     final IntegerPublisher station;
+    final IntegerPublisher allianceStation;
     final StructPublisher<ControlWord> controlWord;
     final StringPublisher opMode;
-    boolean oldIsRedAlliance = true;
-    int oldStationNumber = 1;
     String oldEventName = "";
     String oldGameData = "";
     int oldMatchNumber;
     int oldReplayNumber;
     int oldMatchType;
+    boolean oldIsRedAlliance = true;
+    int oldStationNumber = 1;
+    int oldAllianceStation = 0;
     final ControlWord oldControlWord = new ControlWord();
     final ControlWord currentControlWord = new ControlWord();
 
     MatchDataSender() {
-      var table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      var table = NetworkTableInstance.getDefault().getTable("DriverStation");
       table
           .getStringTopic(".type")
           .publishEx(
@@ -194,6 +194,8 @@ public final class DriverStationBackend {
       alliance.set(true);
       station = table.getIntegerTopic("StationNumber").publish();
       station.set(1);
+      allianceStation = table.getIntegerTopic("AllianceStationID").publish();
+      allianceStation.set(0);
       controlWord = table.getStructTopic("ControlWord", ControlWord.struct).publish();
       controlWord.set(oldControlWord);
       opMode = table.getStringTopic("OpMode").publish();
@@ -207,7 +209,8 @@ public final class DriverStationBackend {
           switch (allianceID) {
             case BLUE_1, RED_1 -> 1;
             case BLUE_2, RED_2 -> 2;
-            case BLUE_3, RED_3, UNKNOWN -> 3;
+            case BLUE_3, RED_3 -> 3;
+            case UNKNOWN -> 0;
           };
       final boolean isRedAlliance =
           switch (allianceID) {
@@ -239,6 +242,10 @@ public final class DriverStationBackend {
       if (oldStationNumber != stationNumber) {
         station.set(stationNumber);
         oldStationNumber = stationNumber;
+      }
+      if (oldAllianceStation != allianceID.ordinal()) {
+        allianceStation.set(allianceID.ordinal());
+        oldAllianceStation = allianceID.ordinal();
       }
       if (!oldEventName.equals(currentEventName)) {
         eventName.set(currentEventName);
@@ -462,7 +469,259 @@ public final class DriverStationBackend {
 
   private static final ReentrantLock m_cacheDataMutex = new ReentrantLock();
 
-  private static boolean m_silenceJoystickWarning;
+  private enum JoystickResourceAlert {
+    BUTTON("ButtonUnavailable", "Button"),
+    AXIS("AxisUnavailable", "axis"),
+    POV("POVUnavailable", "POV");
+
+    final String idSuffix;
+    final String label;
+
+    JoystickResourceAlert(String idSuffix, String label) {
+      this.idSuffix = idSuffix;
+      this.label = label;
+    }
+
+    boolean isAvailable(int stick, int resource) {
+      return switch (this) {
+        case BUTTON -> (getStickButtonsAvailable(stick) & (1L << resource)) != 0;
+        case AXIS -> (getStickAxesAvailable(stick) & (1 << resource)) != 0;
+        case POV -> (getStickPOVsAvailable(stick) & (1 << resource)) != 0;
+      };
+    }
+
+    String getText(int stick, int resource) {
+      return "Joystick " + label + " " + resource + " on port " + stick + " not available";
+    }
+  }
+
+  private static final JoystickResourceAlert[] JOYSTICK_RESOURCE_ALERTS =
+      JoystickResourceAlert.values();
+
+  private static final class JoystickAlertState {
+    Alert alert;
+    boolean active;
+  }
+
+  private static final class JoystickAlerts {
+    final int stick;
+    final String connectionText;
+    final JoystickAlertState connectionAlert = new JoystickAlertState();
+    final JoystickAlertState[] resourceAlerts =
+        new JoystickAlertState[JOYSTICK_RESOURCE_ALERTS.length];
+    final JoystickAlertState touchpadFingerAlert = new JoystickAlertState();
+    final int[] resourceAlertValues = new int[JOYSTICK_RESOURCE_ALERTS.length];
+    int touchpadFingerAlertTouchpad;
+    int touchpadFingerAlertFinger;
+    boolean initialized;
+
+    JoystickAlerts(int stick) {
+      this.stick = stick;
+      connectionText =
+          "Joystick on port " + stick + " not available, check if controller is plugged in";
+      for (int i = 0; i < resourceAlerts.length; i++) {
+        resourceAlerts[i] = new JoystickAlertState();
+      }
+      initializeAlerts();
+    }
+
+    boolean initializeAlerts() {
+      closeAlerts();
+
+      Alert newConnectionAlert = null;
+      Alert[] newResourceAlerts = new Alert[JOYSTICK_RESOURCE_ALERTS.length];
+      Alert newTouchpadFingerAlert = null;
+
+      try {
+        newConnectionAlert =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + "Disconnected",
+                connectionText,
+                Alert.Level.HIGH);
+        for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+          newResourceAlerts[resourceAlert.ordinal()] =
+              new Alert(
+                  "DriverStation",
+                  "joystick" + stick + resourceAlert.idSuffix,
+                  "",
+                  Alert.Level.MEDIUM);
+        }
+        newTouchpadFingerAlert =
+            new Alert(
+                "DriverStation",
+                "joystick" + stick + "TouchpadFingerUnavailable",
+                "",
+                Alert.Level.MEDIUM);
+      } catch (AlertException ex) {
+        closeAlert(newConnectionAlert);
+        for (Alert alert : newResourceAlerts) {
+          closeAlert(alert);
+        }
+        closeAlert(newTouchpadFingerAlert);
+        initialized = false;
+        return false;
+      }
+
+      connectionAlert.alert = newConnectionAlert;
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        resourceAlerts[resourceAlert.ordinal()].alert = newResourceAlerts[resourceAlert.ordinal()];
+      }
+      touchpadFingerAlert.alert = newTouchpadFingerAlert;
+      initialized = true;
+      return true;
+    }
+
+    void closeAlerts() {
+      closeAlert(connectionAlert);
+      for (JoystickAlertState alertState : resourceAlerts) {
+        closeAlert(alertState);
+      }
+      closeAlert(touchpadFingerAlert);
+      initialized = false;
+    }
+
+    static void closeAlert(JoystickAlertState alertState) {
+      closeAlert(alertState.alert);
+      alertState.alert = null;
+      alertState.active = false;
+    }
+
+    static void closeAlert(Alert alert) {
+      if (alert == null) {
+        return;
+      }
+
+      try {
+        alert.close();
+      } catch (AlertException ex) {
+        // Ignore stale handles while cleaning up a failed initialization attempt.
+      }
+    }
+
+    boolean prepareForReport() {
+      if (isJoystickConnected(stick)) {
+        setAlert(connectionAlert, false, connectionText, true);
+        return true;
+      }
+
+      clearResourceAlerts();
+      setAlert(connectionAlert, true, connectionText, true);
+      return false;
+    }
+
+    void refresh() {
+      if (!isJoystickConnected(stick)) {
+        clearResourceAlerts();
+        return;
+      }
+
+      if (connectionAlert.active) {
+        setAlert(connectionAlert, false, connectionText, true);
+      }
+
+      for (JoystickResourceAlert resourceAlert : JOYSTICK_RESOURCE_ALERTS) {
+        refreshResourceAlert(resourceAlert);
+      }
+
+      if (touchpadFingerAlert.active
+          && getStickTouchpadFingerAvailable(
+              stick, touchpadFingerAlertTouchpad, touchpadFingerAlertFinger)) {
+        setAlert(touchpadFingerAlert, false);
+      }
+    }
+
+    void clearAllAlerts() {
+      setAlert(connectionAlert, false, connectionText, true);
+      clearResourceAlerts();
+    }
+
+    void clearResourceAlerts() {
+      for (JoystickAlertState alertState : resourceAlerts) {
+        setAlert(alertState, false);
+      }
+      setAlert(touchpadFingerAlert, false);
+    }
+
+    void refreshResourceAlert(JoystickResourceAlert resourceAlert) {
+      int alertIndex = resourceAlert.ordinal();
+      JoystickAlertState alertState = resourceAlerts[alertIndex];
+      if (alertState.active && resourceAlert.isAvailable(stick, resourceAlertValues[alertIndex])) {
+        setAlert(alertState, false);
+      }
+    }
+
+    void reportResourceWarning(JoystickResourceAlert resourceAlert, int resource) {
+      int alertIndex = resourceAlert.ordinal();
+      resourceAlertValues[alertIndex] = resource;
+      setAlert(resourceAlerts[alertIndex], true, resourceAlert.getText(stick, resource), false);
+    }
+
+    void reportTouchpadFingerWarning(int touchpad, int finger) {
+      String text =
+          "Joystick touchpad finger "
+              + finger
+              + " on touchpad "
+              + touchpad
+              + " on port "
+              + stick
+              + " not available";
+      touchpadFingerAlertTouchpad = touchpad;
+      touchpadFingerAlertFinger = finger;
+      setAlert(touchpadFingerAlert, true, text, false);
+    }
+
+    boolean applyAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (alertState.alert == null) {
+        return false;
+      }
+
+      try {
+        if (active && !text.isEmpty()) {
+          alertState.alert.setText(text);
+        }
+        alertState.alert.set(active);
+        return !active || !verifyActive || alertState.alert.get();
+      } catch (AlertException ex) {
+        return false;
+      }
+    }
+
+    boolean setAlert(JoystickAlertState alertState, boolean active) {
+      return setAlert(alertState, active, "", false);
+    }
+
+    boolean setAlert(
+        JoystickAlertState alertState, boolean active, String text, boolean verifyActive) {
+      if (!active && !alertState.active) {
+        return true;
+      }
+
+      if (active && !initialized && !initializeAlerts()) {
+        return false;
+      }
+
+      if (!applyAlert(alertState, active, text, verifyActive)) {
+        if (!active) {
+          alertState.active = false;
+          return true;
+        }
+        if (!initializeAlerts()) {
+          return false;
+        }
+        if (!applyAlert(alertState, active, text, verifyActive)) {
+          return false;
+        }
+      }
+      alertState.active = active;
+      return true;
+    }
+  }
+
+  private static final ReentrantLock m_joystickAlertMutex = new ReentrantLock();
+  private static boolean m_silenceJoystickAlerts;
+  private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
 
   private static boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
@@ -477,7 +736,7 @@ public final class DriverStationBackend {
   private DriverStationBackend() {}
 
   static {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     for (int i = 0; i < JOYSTICK_PORTS; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
@@ -571,8 +830,45 @@ public final class DriverStationBackend {
         }
       }
     }
-    DriverStationJNI.sendError(
-        isError, code, false, error, locString, traceString.toString(), true);
+    DriverStationJNI.sendError(isError, code, error, locString, traceString.toString(), true);
+  }
+
+  /**
+   * Report crash to Driver Station. Appends provided stack trace to crash message.
+   *
+   * @param error The error message
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportCrash(String error, StackTraceElement[] stackTrace) {
+    reportCrashImpl(error, stackTrace, 0);
+  }
+
+  private static void reportCrashImpl(
+      String error, StackTraceElement[] stackTrace, int stackTraceFirst) {
+    String locString;
+    if (stackTrace.length >= stackTraceFirst + 1) {
+      locString = stackTrace[stackTraceFirst].toString();
+    } else {
+      locString = "";
+    }
+    StringBuilder traceString = new StringBuilder();
+    boolean haveLoc = false;
+    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString.append("\tat ").append(loc).append('\n');
+      // get first user function
+      if (!haveLoc && !loc.startsWith("org.wpilib")) {
+        locString = loc;
+        haveLoc = true;
+      }
+    }
+    DriverStationJNI.sendProgramCrash(error, locString, traceString.toString());
+    // Sleep to ensure message is sent before crash
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**
@@ -601,8 +897,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -666,8 +961,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -703,8 +997,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick, "Joystick Button " + button + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.BUTTON, button);
     return false;
   }
 
@@ -735,7 +1028,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick axis " + axis + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.AXIS, axis);
     return 0.0;
   }
 
@@ -773,15 +1066,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(
-        stick,
-        "Joystick touchpad finger "
-            + finger
-            + " on touchpad "
-            + touchpad
-            + " on port "
-            + stick
-            + " not available");
+    reportJoystickTouchpadFingerWarning(stick, touchpad, finger);
     return new TouchpadFinger(false, 0.0f, 0.0f);
   }
 
@@ -877,7 +1162,7 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
-    reportJoystickWarning(stick, "Joystick POV " + pov + " on port " + stick + " not available");
+    reportJoystickResourceWarning(stick, JoystickResourceAlert.POV, pov);
     return POVDirection.CENTER;
   }
 
@@ -1658,24 +1943,36 @@ public final class DriverStationBackend {
   }
 
   /**
-   * Allows the user to specify whether they want joystick connection warnings to be printed to the
-   * console. This setting is ignored when the FMS is connected -- warnings will always be on in
-   * that scenario.
+   * Allows the user to specify whether they want joystick connection alerts to be shown. This
+   * setting is ignored when the FMS is connected -- alerts will always be on in that scenario.
    *
-   * @param silence Whether warning messages should be silenced.
+   * @param silence Whether joystick connection alerts should be silenced.
    */
-  public static void silenceJoystickConnectionWarning(boolean silence) {
-    m_silenceJoystickWarning = silence;
+  public static void silenceJoystickConnectionAlert(boolean silence) {
+    m_joystickAlertMutex.lock();
+    try {
+      m_silenceJoystickAlerts = silence;
+      if (silence && !isFMSAttached()) {
+        clearJoystickAlertsLocked();
+      }
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
   }
 
   /**
-   * Returns whether joystick connection warnings are silenced. This will always return false when
+   * Returns whether joystick connection alerts are silenced. This will always return false when
    * connected to the FMS.
    *
-   * @return Whether joystick connection warnings are silenced.
+   * @return Whether joystick connection alerts are silenced.
    */
-  public static boolean isJoystickConnectionWarningSilenced() {
-    return !isFMSAttached() && m_silenceJoystickWarning;
+  public static boolean isJoystickConnectionAlertSilenced() {
+    m_joystickAlertMutex.lock();
+    try {
+      return !isFMSAttached() && m_silenceJoystickAlerts;
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
   }
 
   /**
@@ -1792,6 +2089,8 @@ public final class DriverStationBackend {
       m_cacheDataMutex.unlock();
     }
 
+    clearJoystickAlerts();
+
     m_refreshEvents.wakeup();
 
     m_matchDataSender.sendMatchData();
@@ -1818,25 +2117,74 @@ public final class DriverStationBackend {
     m_refreshEvents.remove(handle);
   }
 
-  /**
-   * Reports errors related to joystick availability. Throttles the errors so that they don't
-   * overwhelm the DS.
-   *
-   * @param stick The joystick port.
-   * @param message The message to report if the joystick is connected.
-   */
-  private static void reportJoystickWarning(int stick, String message) {
-    if (isFMSAttached() || !m_silenceJoystickWarning) {
-      double currentTime = Timer.getTimestamp();
-      if (currentTime > m_nextMessageTime) {
-        if (isJoystickConnected(stick)) {
-          reportWarning(message, false);
-        } else {
-          reportWarning(
-              "Joystick on port " + stick + " not available, check if controller is plugged in",
-              false);
+  private static JoystickAlerts getJoystickAlertsLocked(int stick) {
+    JoystickAlerts alerts = m_joystickAlerts[stick];
+    if (alerts == null) {
+      alerts = new JoystickAlerts(stick);
+      m_joystickAlerts[stick] = alerts;
+    }
+    return alerts;
+  }
+
+  private static void reportJoystickResourceWarning(
+      int stick, JoystickResourceAlert resourceAlert, int resource) {
+    m_joystickAlertMutex.lock();
+    try {
+      if (!isFMSAttached() && m_silenceJoystickAlerts) {
+        return;
+      }
+
+      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
+      if (!alerts.prepareForReport()) {
+        return;
+      }
+
+      alerts.reportResourceWarning(resourceAlert, resource);
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void reportJoystickTouchpadFingerWarning(int stick, int touchpad, int finger) {
+    m_joystickAlertMutex.lock();
+    try {
+      if (!isFMSAttached() && m_silenceJoystickAlerts) {
+        return;
+      }
+
+      JoystickAlerts alerts = getJoystickAlertsLocked(stick);
+      if (!alerts.prepareForReport()) {
+        return;
+      }
+
+      alerts.reportTouchpadFingerWarning(touchpad, finger);
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void clearJoystickAlerts() {
+    m_joystickAlertMutex.lock();
+    try {
+      clearJoystickAlertsLocked();
+    } finally {
+      m_joystickAlertMutex.unlock();
+    }
+  }
+
+  private static void clearJoystickAlertsLocked() {
+    if (!isFMSAttached() && m_silenceJoystickAlerts) {
+      for (JoystickAlerts alerts : m_joystickAlerts) {
+        if (alerts != null) {
+          alerts.clearAllAlerts();
         }
-        m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+      }
+      return;
+    }
+
+    for (JoystickAlerts alerts : m_joystickAlerts) {
+      if (alerts != null) {
+        alerts.refresh();
       }
     }
   }

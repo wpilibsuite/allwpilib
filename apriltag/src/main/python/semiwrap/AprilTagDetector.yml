@@ -32,7 +32,7 @@ classes:
         // We are going to move the detection result into this shared_ptr
         // so that python can keep it alive. We don't expose the result directly
         // to the user because we'd have to pretend it's a list, and that would
-        // be annoying. 
+        // be annoying.
         std::shared_ptr<AprilTagDetector::Results> c_result;
         {
           py::gil_scoped_release unlock;

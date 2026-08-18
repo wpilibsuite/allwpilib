@@ -50,7 +50,7 @@ class SysIdRoutineTest {
 
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
     m_mechanism = mock(Mechanism.class);
     m_sysidRoutine =

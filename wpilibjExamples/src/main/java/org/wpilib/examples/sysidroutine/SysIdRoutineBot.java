@@ -45,39 +45,39 @@ public class SysIdRoutineBot {
     // Using bumpers as a modifier and combining it with the buttons so that we can have both sets
     // of bindings at once
     driverController
-        .southFace()
+        .faceDown()
         .and(driverController.rightBumper())
         .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     driverController
-        .eastFace()
+        .faceRight()
         .and(driverController.rightBumper())
         .whileTrue(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     driverController
-        .westFace()
+        .faceLeft()
         .and(driverController.rightBumper())
         .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     driverController
-        .northFace()
+        .faceUp()
         .and(driverController.rightBumper())
         .whileTrue(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Control the shooter wheel with the left trigger
-    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTriggerAxis));
+    shooter.setDefaultCommand(shooter.runShooter(driverController::getLeftTrigger));
 
     driverController
-        .southFace()
+        .faceDown()
         .and(driverController.leftBumper())
         .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     driverController
-        .eastFace()
+        .faceRight()
         .and(driverController.leftBumper())
         .whileTrue(shooter.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     driverController
-        .westFace()
+        .faceLeft()
         .and(driverController.leftBumper())
         .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kForward));
     driverController
-        .northFace()
+        .faceUp()
         .and(driverController.leftBumper())
         .whileTrue(shooter.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }

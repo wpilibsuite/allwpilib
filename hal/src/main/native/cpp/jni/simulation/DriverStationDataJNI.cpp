@@ -658,8 +658,9 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setSendError
     HALSIM_SetSendError(nullptr);
   } else {
     HALSIM_SetSendError([](HAL_Bool isError, int32_t errorCode,
-                           HAL_Bool isLVCode, const char* details,
-                           const char* location, const char* callStack,
+                           const struct WPI_String* details,
+                           const struct WPI_String* location,
+                           const struct WPI_String* callStack,
                            HAL_Bool printMsg) { return 0; });
   }
 }
@@ -676,7 +677,7 @@ Java_org_wpilib_hardware_hal_simulation_DriverStationDataJNI_setSendConsoleLine
   if (shouldSend) {
     HALSIM_SetSendConsoleLine(nullptr);
   } else {
-    HALSIM_SetSendConsoleLine([](const char* line) { return 0; });
+    HALSIM_SetSendConsoleLine([](const struct WPI_String* line) { return 0; });
   }
 }
 

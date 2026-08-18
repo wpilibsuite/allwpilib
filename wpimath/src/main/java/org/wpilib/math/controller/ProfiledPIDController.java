@@ -73,6 +73,8 @@ public class ProfiledPIDController implements Sendable {
    *
    * <p>Sets the proportional, integral, and differential coefficients.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be &gt;= 0.
    * @param Ki The integral coefficient. Must be &gt;= 0.
    * @param Kd The differential coefficient. Must be &gt;= 0.
@@ -84,6 +86,8 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Sets the proportional coefficient of the PID controller gain.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param Kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double Kp) {
@@ -93,6 +97,8 @@ public class ProfiledPIDController implements Sendable {
   /**
    * Sets the integral coefficient of the PID controller gain.
    *
+   * <p>This setter is intended for online tuning.
+   *
    * @param Ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double Ki) {
@@ -101,6 +107,8 @@ public class ProfiledPIDController implements Sendable {
 
   /**
    * Sets the differential coefficient of the PID controller gain.
+   *
+   * <p>This setter is intended for online tuning.
    *
    * @param Kd The differential coefficient. Must be &gt;= 0.
    */

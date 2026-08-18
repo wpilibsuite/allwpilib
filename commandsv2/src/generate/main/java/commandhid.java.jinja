@@ -18,8 +18,9 @@ import org.wpilib.event.EventLoop;
  * @see {{ ConsoleName }}Controller
  */
 @SuppressWarnings("MethodName")
-public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
-  private final {{ ConsoleName }}Controller m_hid;
+public class Command{{ ConsoleName }}Controller {
+  private final CommandGenericHID m_hid;
+  private final {{ ConsoleName }}Controller m_controller;
 
   /**
    * Construct an instance of a controller.
@@ -27,18 +28,26 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public Command{{ ConsoleName }}Controller(int port) {
-    super(port);
-    m_hid = new {{ ConsoleName }}Controller(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new {{ ConsoleName }}Controller(m_hid.getHID());
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public {{ ConsoleName }}Controller getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying {{ ConsoleName }}Controller object.
+   *
+   * @return the wrapped {{ ConsoleName }}Controller object
+   */
+  public {{ ConsoleName }}Controller get{{ ConsoleName }}Controller() {
+    return m_controller;
   }
 {% for button in buttons %}
   /**
@@ -60,7 +69,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger {{ button.name }}(EventLoop loop) {
-    return button({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return m_hid.button({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, loop);
   }
 {% endfor -%}
 {% for trigger in triggers -%}
@@ -76,7 +85,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return m_hid.axisGreaterThan({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
   }
 
   /**
@@ -112,7 +121,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double get{{ stick.NameParts|map("capitalize")|join }}() {
-    return m_hid.get{{ stick.NameParts|map("capitalize")|join }}();
+    return m_controller.get{{ stick.NameParts|map("capitalize")|join }}();
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -123,7 +132,7 @@ public class Command{{ ConsoleName }}Controller extends CommandGenericHID {
    * @return The axis value.
    */
   public double get{{ capitalize_first(trigger.name) }}Axis() {
-    return m_hid.get{{ capitalize_first(trigger.name) }}Axis();
+    return m_controller.get{{ capitalize_first(trigger.name) }}Axis();
   }
 {% endfor -%}
 }

@@ -4,11 +4,17 @@
 
 #pragma once
 
+#include <cmath>
 #include <cstddef>
 #include <vector>
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/spline/CubicHermiteSpline.hpp"
 #include "wpi/math/spline/QuinticHermiteSpline.hpp"
+#include "wpi/math/spline/Spline.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 

@@ -5,18 +5,15 @@
 #include "wpi/glass/networktables/NTField2D.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/util/Endian.hpp"
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StringExtras.hpp"
 
@@ -117,10 +114,10 @@ NTField2DModel::NTField2DModel(std::string_view path)
 
 NTField2DModel::NTField2DModel(wpi::nt::NetworkTableInstance inst,
                                std::string_view path)
-    : m_path{fmt::format("{}/", path)},
+    : m_path{std::format("{}/", path)},
       m_inst{inst},
       m_tableSub{inst, {{m_path}}, {.periodic = 0.05, .sendAll = true}},
-      m_nameTopic{inst.GetTopic(fmt::format("{}/.name", path))},
+      m_nameTopic{inst.GetTopic(std::format("{}/.name", path))},
       m_poller{inst} {
   m_poller.AddListener(m_tableSub, wpi::nt::EventFlags::TOPIC |
                                        wpi::nt::EventFlags::VALUE_ALL |
@@ -183,7 +180,7 @@ bool NTField2DModel::IsReadOnly() {
 }
 
 FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
-  auto fullName = fmt::format("{}{}", m_path, name);
+  auto fullName = std::format("{}{}", m_path, name);
   auto [it, match] = Find(fullName);
   if (!match) {
     it = m_objects.emplace(it,
@@ -194,7 +191,7 @@ FieldObjectModel* NTField2DModel::AddFieldObject(std::string_view name) {
 }
 
 void NTField2DModel::RemoveFieldObject(std::string_view name) {
-  auto [it, match] = Find(fmt::format("{}{}", m_path, name));
+  auto [it, match] = Find(std::format("{}{}", m_path, name));
   if (match) {
     m_objects.erase(it);
   }

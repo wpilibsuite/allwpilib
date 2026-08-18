@@ -35,10 +35,10 @@ RobotContainer::RobotContainer() {
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // Grab the hatch when the 'East Face' button is pressed.
-  driverController.EastFace().OnTrue(hatch.GrabHatchCommand());
-  // Release the hatch when the 'West Face' button is pressed.
-  driverController.WestFace().OnTrue(hatch.ReleaseHatchCommand());
+  // Grab the hatch when the 'Face Right' button is pressed.
+  driverController.FaceRight().OnTrue(hatch.GrabHatchCommand());
+  // Release the hatch when the 'Face Left' button is pressed.
+  driverController.FaceLeft().OnTrue(hatch.ReleaseHatchCommand());
   // While holding Right Bumper, drive at half velocity
   driverController.RightBumper()
       .OnTrue(wpi::cmd::RunOnce([this] { drive.SetMaxOutput(0.5); }, {}))

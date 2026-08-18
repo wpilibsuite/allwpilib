@@ -24,20 +24,16 @@ classes:
                 default: wpi::Encoder::EncodingType::X4
       Get:
       Reset:
-      GetPeriod:
-      SetMaxPeriod:
       GetStopped:
       GetDirection:
       GetRaw:
       GetEncodingScale:
       GetDistance:
       GetRate:
-      SetMinRate:
+      SetRateWindow:
       SetDistancePerPulse:
       GetDistancePerPulse:
       SetReverseDirection:
-      SetSamplesToAverage:
-      GetSamplesToAverage:
       SetSimDevice:
       GetFPGAIndex:
       InitSendable:

@@ -7,7 +7,15 @@ macro(
     namespace
     outputFiles
 )
-    file(GLOB inputFiles ${inputDir}/*)
+    if(${ARGC} GREATER 5)
+        set(inputFiles)
+        foreach(pattern ${ARGN})
+            file(GLOB_RECURSE patternFiles CONFIGURE_DEPENDS ${inputDir}/${pattern})
+            list(APPEND inputFiles ${patternFiles})
+        endforeach()
+    else()
+        file(GLOB inputFiles ${inputDir}/*)
+    endif()
     set(${outputFiles})
     foreach(input ${inputFiles})
         get_filename_component(inputBase ${input} NAME)

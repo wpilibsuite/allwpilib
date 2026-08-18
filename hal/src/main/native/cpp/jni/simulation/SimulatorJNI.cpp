@@ -4,7 +4,6 @@
 
 #include "SimulatorJNI.hpp"
 
-#include "AlertDataJNI.hpp"
 #include "BufferCallbackStore.hpp"
 #include "CallbackStore.hpp"
 #include "ConstBufferCallbackStore.hpp"
@@ -79,9 +78,6 @@ jint SimOnLoad(JavaVM* vm, void* reserved) {
   InitializeBufferStore();
   InitializeConstBufferStore();
   InitializeOpModeOptionsStore();
-  if (!InitializeAlertDataJNI(env)) {
-    return JNI_ERR;
-  }
   if (!InitializeSimDeviceDataJNI(env)) {
     return JNI_ERR;
   }
@@ -99,7 +95,6 @@ void SimOnUnload(JavaVM* vm, void* reserved) {
   bufferCallbackCls.free(env);
   constBufferCallbackCls.free(env);
   biConsumerCls.free(env);
-  FreeAlertDataJNI(env);
   FreeSimDeviceDataJNI(env);
   jvm = nullptr;
 }
@@ -141,13 +136,13 @@ Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_setRuntimeType
 /*
  * Class:     org_wpilib_hardware_hal_simulation_SimulatorJNI
  * Method:    waitForProgramStart
- * Signature: ()V
+ * Signature: (Z)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_hardware_hal_simulation_SimulatorJNI_waitForProgramStart
-  (JNIEnv*, jclass)
+  (JNIEnv*, jclass, jboolean waitForFirstNotifier)
 {
-  HALSIM_WaitForProgramStart();
+  HALSIM_WaitForProgramStart(waitForFirstNotifier);
 }
 
 /*

@@ -1,0 +1,15 @@
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
+classes:
+  wpi::math::DifferentialTrajectory:
+    force_no_trampoline: true
+    methods:
+      DifferentialTrajectory:
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
+      Interpolate:

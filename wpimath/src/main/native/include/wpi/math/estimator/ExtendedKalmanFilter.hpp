@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <format>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -109,26 +111,26 @@ class ExtendedKalmanFilter {
       } else if (P.error() == DAREError::QNotSymmetric ||
                  P.error() == DAREError::QNotPositiveSemidefinite) {
         std::string msg =
-            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+            std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::RNotSymmetric ||
                  P.error() == DAREError::RNotPositiveDefinite) {
         std::string msg =
-            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+            std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ABNotStabilizable) {
-        std::string msg = fmt::format(
+        std::string msg = std::format(
             "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
             to_string(P.error()), discA, C);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ACNotDetectable) {
-        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+        std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                       to_string(P.error()), discA, discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
@@ -194,26 +196,26 @@ class ExtendedKalmanFilter {
       } else if (P.error() == DAREError::QNotSymmetric ||
                  P.error() == DAREError::QNotPositiveSemidefinite) {
         std::string msg =
-            fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+            std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::RNotSymmetric ||
                  P.error() == DAREError::RNotPositiveDefinite) {
         std::string msg =
-            fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+            std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ABNotStabilizable) {
-        std::string msg = fmt::format(
+        std::string msg = std::format(
             "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
             to_string(P.error()), discA, C);
 
         wpi::math::MathSharedStore::ReportError(msg);
         throw std::invalid_argument(msg);
       } else if (P.error() == DAREError::ACNotDetectable) {
-        std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+        std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                       to_string(P.error()), discA, discQ);
 
         wpi::math::MathSharedStore::ReportError(msg);
@@ -299,7 +301,7 @@ class ExtendedKalmanFilter {
 
     m_xHat = RK4(m_f, m_xHat, u, dt);
 
-    // Pₖ₊₁⁻ = APₖ⁻Aᵀ + Q
+    // Pₖ₊₁⁻ = AₖPₖ⁻Aₖᵀ + Qₖ
     m_P = discA * m_P * discA.transpose() + discQ;
 
     m_dt = dt;
@@ -386,30 +388,21 @@ class ExtendedKalmanFilter {
         NumericalJacobianX<Rows, States, Inputs>(h, m_xHat, u);
     const Matrixd<Rows, Rows> discR = DiscretizeR<Rows>(R, m_dt);
 
+    // Sₖ₊₁ = Cₖ₊₁Pₖ₊₁⁻Cₖ₊₁ᵀ + Rₖ₊₁
     Matrixd<Rows, Rows> S = C * m_P * C.transpose() + discR;
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
+    // Kₖ₊₁ = Pₖ₊₁⁻Cₖ₊₁ᵀSₖ₊₁⁻¹
+    // K = PCᵀ / S
+    // K = (Sᵀ \ CPᵀ)ᵀ
+    // K = (S \ CP)ᵀ because S and P are symmetric
     //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    //
-    // Drop the transposes on symmetric matrices S and P.
-    //
-    // K = (S.solve(CP))ᵀ
+    // [1] wpimath/docs/LinalgIdentities.md
     Matrixd<States, Rows> K = S.ldlt().solve(C * m_P).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     m_xHat = addFuncX(m_xHat, K * residualFuncY(y, h(m_xHat, u)));
 
-    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Pₖ₊₁⁺ = (I − Kₖ₊₁Cₖ₊₁)Pₖ₊₁⁻(I − Kₖ₊₁Cₖ₊₁)ᵀ + Kₖ₊₁Rₖ₊₁Kₖ₊₁ᵀ
     // Use Joseph form for numerical stability
     m_P = (StateMatrix::Identity() - K * C) * m_P *
               (StateMatrix::Identity() - K * C).transpose() +

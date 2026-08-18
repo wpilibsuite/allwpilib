@@ -9,7 +9,9 @@
 
 #include <opencv2/core/core.hpp>
 
+#ifdef __linux__
 #include "default_init_allocator.hpp"
+#endif
 #include "wpi/util/PixelFormat.hpp"
 
 namespace wpi::cs {

@@ -335,7 +335,10 @@ class DataLogReader {
     return m_buf ? m_buf->GetBufferIdentifier() : "Invalid";
   }
 
-  /** Returns iterator to first record. */
+  /**
+   * Returns iterator to first record. Incomplete trailing record bytes after a
+   * valid record quietly terminate iteration.
+   */
   iterator begin() const;
 
   /** Returns end iterator. */
@@ -359,9 +362,8 @@ inline DataLogIterator& DataLogIterator::operator++() {
 inline DataLogIterator::reference DataLogIterator::operator*() const {
   if (!m_valid) {
     size_t pos = m_pos;
-    if (m_reader->GetRecord(&pos, &m_value)) {
-      m_valid = true;
-    }
+    m_value = DataLogRecord{};
+    m_valid = m_reader->GetRecord(&pos, &m_value);
   }
   return m_value;
 }

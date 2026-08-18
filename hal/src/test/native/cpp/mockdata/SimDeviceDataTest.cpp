@@ -4,21 +4,21 @@
 
 #include "wpi/hal/simulation/SimDeviceData.h"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/SimDevice.h"
 
 namespace wpi::hal {
 
-TEST(SimDeviceSimTest, Enabled) {
-  ASSERT_TRUE(HALSIM_IsSimDeviceEnabled("foo"));
+TEST_CASE("SimDeviceSimTest Enabled", "[hal][mockdata]") {
+  REQUIRE(HALSIM_IsSimDeviceEnabled("foo"));
   HALSIM_SetSimDeviceEnabled("f", false);
   HALSIM_SetSimDeviceEnabled("foob", true);
-  ASSERT_FALSE(HALSIM_IsSimDeviceEnabled("foo"));
-  ASSERT_TRUE(HALSIM_IsSimDeviceEnabled("foobar"));
-  ASSERT_TRUE(HALSIM_IsSimDeviceEnabled("bar"));
+  REQUIRE_FALSE(HALSIM_IsSimDeviceEnabled("foo"));
+  REQUIRE(HALSIM_IsSimDeviceEnabled("foobar"));
+  REQUIRE(HALSIM_IsSimDeviceEnabled("bar"));
 
-  ASSERT_EQ(HAL_CreateSimDevice("foo"), 0);
+  REQUIRE(HAL_CreateSimDevice("foo") == 0);
 }
 
 }  // namespace wpi::hal

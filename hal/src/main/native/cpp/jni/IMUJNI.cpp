@@ -4,9 +4,8 @@
 
 #include <jni.h>
 
+#include <format>
 #include <string_view>
-
-#include <fmt/format.h>
 
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_IMUJNI.h"
@@ -20,7 +19,7 @@ void assertArraySize(JNIEnv* env, jarray array, int minimumSize,
   jsize actualSize = env->GetArrayLength(array);
   if (actualSize < minimumSize) {
     ThrowIllegalArgumentException(
-        env, fmt::format("{} array too small: expected at least {}, got {}",
+        env, std::format("{} array too small: expected at least {}, got {}",
                          arrayName, minimumSize, actualSize));
   }
 }

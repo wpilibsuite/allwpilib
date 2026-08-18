@@ -8,11 +8,11 @@ import pytest
 from .. import RobotBase
 from ..simulation import (
     DriverStationSim,
-    stepTiming,
-    stepTimingAsync,
-    getProgramStarted,
+    step_timing,
+    step_timing_async,
+    get_program_started,
 )
-from hal._wpiHal import _RobotMode as RobotMode
+from hal import RobotMode
 
 
 class RobotTestController:
@@ -39,11 +39,11 @@ class RobotTestController:
             assert robot is not None  # shouldn't happen...
 
             try:
-                robot.startCompetition()
+                robot.start_competition()
                 assert self._robot_finished
             finally:
-                # always call endCompetition or python hangs
-                robot.endCompetition()
+                # always call end_competition or python hangs
+                robot.end_competition()
                 del robot
 
     @contextlib.contextmanager
@@ -68,9 +68,9 @@ class RobotTestController:
             # make sure the thread didn't die
             assert self._cond.wait_for(lambda: self._robot_started, timeout=1)
 
-        # This is the same thing that waitForProgramStart does
+        # This is the same thing that wait_for_program_start does
         for _ in range(1000):
-            if getProgramStarted():
+            if get_program_started():
                 break
             time.sleep(0.001)
         else:
@@ -81,7 +81,7 @@ class RobotTestController:
             yield
         finally:
             self._robot_finished = True
-            robot.endCompetition()
+            robot.end_competition()
 
             if isinstance(self._reraise.exception, RuntimeError):
                 if str(self._reraise.exception).startswith(
@@ -100,7 +100,7 @@ class RobotTestController:
                         raise RuntimeError(msg) from e
 
         # Increment time by 1 second to ensure that any notifiers fire
-        stepTimingAsync(1.0)
+        step_timing_async(1.0)
 
         # the robot thread should exit quickly
         th.join(timeout=1)
@@ -145,17 +145,17 @@ class RobotTestController:
 
         assert seconds > 0
 
-        DriverStationSim.setDsAttached(True)
-        DriverStationSim.setRobotMode(
+        DriverStationSim.set_ds_attached(True)
+        DriverStationSim.set_robot_mode(
             RobotMode.AUTONOMOUS if autonomous else RobotMode.TELEOPERATED
         )
-        DriverStationSim.setEnabled(enabled)
+        DriverStationSim.set_enabled(enabled)
 
         tm = 0.0
 
         while tm < seconds + 0.01:
-            DriverStationSim.notifyNewData()
-            stepTiming(0.2)
+            DriverStationSim.notify_new_data()
+            step_timing(0.2)
             if assert_alive:
                 assert self.robot_is_alive
             tm += 0.2

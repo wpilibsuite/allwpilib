@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
+#include <format>
 #include <utility>
 
 #include "wpi/hal/Ports.h"
@@ -15,7 +16,7 @@
 
 using namespace wpi;
 
-DoubleSolenoid::DoubleSolenoid(int busId, int module,
+DoubleSolenoid::DoubleSolenoid(CANBus busId, int module,
                                PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
@@ -50,14 +51,14 @@ DoubleSolenoid::DoubleSolenoid(int busId, int module,
   }
 
   m_module->ReportUsage(
-      fmt::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
+      std::format("Solenoid[{},{}]", m_forwardChannel, m_reverseChannel),
       "DoubleSolenoid");
 
   wpi::util::SendableRegistry::Add(
       this, "DoubleSolenoid", m_module->GetModuleNumber(), m_forwardChannel);
 }
 
-DoubleSolenoid::DoubleSolenoid(int busId, PneumaticsModuleType moduleType,
+DoubleSolenoid::DoubleSolenoid(CANBus busId, PneumaticsModuleType moduleType,
                                int forwardChannel, int reverseChannel)
     : DoubleSolenoid{busId, PneumaticsBase::GetDefaultForType(moduleType),
                      moduleType, forwardChannel, reverseChannel} {}

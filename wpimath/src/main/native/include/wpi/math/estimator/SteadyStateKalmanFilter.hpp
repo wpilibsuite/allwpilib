@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <format>
 #include <stdexcept>
 #include <string>
 
@@ -87,7 +88,7 @@ class SteadyStateKalmanFilter {
     const auto& C = plant.C();
 
     if (!IsDetectable<States, Outputs>(discA, C)) {
-      std::string msg = fmt::format(
+      std::string msg = std::format(
           "The system passed to the Kalman filter is undetectable!\n\n"
           "A =\n{}\nC =\n{}\n",
           discA, C);
@@ -101,46 +102,36 @@ class SteadyStateKalmanFilter {
       // S = CPCᵀ + R
       Matrixd<Outputs, Outputs> S = C * P.value() * C.transpose() + discR;
 
-      // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-      // efficiently.
-      //
       // K = PCᵀS⁻¹
-      // KS = PCᵀ
-      // (KS)ᵀ = (PCᵀ)ᵀ
-      // SᵀKᵀ = CPᵀ
+      // K = PCᵀ / S
+      // K = (Sᵀ \ CPᵀ)ᵀ
+      // K = (S \ CP)ᵀ because S and P are symmetric
       //
-      // The solution of Ax = b can be found via x = A.solve(b).
-      //
-      // Kᵀ = Sᵀ.solve(CPᵀ)
-      // K = (Sᵀ.solve(CPᵀ))ᵀ
-      //
-      // Drop the transposes on symmetric matrices S and P.
-      //
-      // K = (S.solve(CP))ᵀ
+      // [1] wpimath/docs/LinalgIdentities.md
       m_K = S.ldlt().solve(C * P.value()).transpose();
     } else if (P.error() == DAREError::QNotSymmetric ||
                P.error() == DAREError::QNotPositiveSemidefinite) {
       std::string msg =
-          fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+          std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::RNotSymmetric ||
                P.error() == DAREError::RNotPositiveDefinite) {
       std::string msg =
-          fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+          std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::ABNotStabilizable) {
-      std::string msg = fmt::format(
+      std::string msg = std::format(
           "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
           to_string(P.error()), discA, C);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::ACNotDetectable) {
-      std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+      std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                     to_string(P.error()), discA, discQ);
 
       wpi::math::MathSharedStore::ReportError(msg);

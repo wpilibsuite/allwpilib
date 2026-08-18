@@ -9,11 +9,11 @@ class JoystickButton(Trigger):
     A Button that gets its state from a :class:`wpilib.GenericHID`.
     """
 
-    def __init__(self, joystick: GenericHID, buttonNumber: int):
+    def __init__(self, joystick: GenericHID, button_number: int):
         """
         Creates a joystick button for triggering commands.
 
         :param joystick: The GenericHID object that has the button (e.g. Joystick, KinectStick, etc)
-        :param buttonNumber: The button number (see :func:`wpilib.GenericHID.getRawButton`
+        :param button_number: The button number (see :func:`wpilib.GenericHID.get_raw_button`
         """
-        super().__init__(lambda: joystick.getRawButton(buttonNumber))
+        super().__init__(lambda: joystick.get_raw_button(button_number))

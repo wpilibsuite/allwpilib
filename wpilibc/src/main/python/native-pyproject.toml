@@ -15,6 +15,7 @@ requires = [
 name = "robotpy-native-wpilib"
 version = "0.0.0"
 description = "WPILib Robotics Library"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 
 dependencies = [

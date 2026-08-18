@@ -37,21 +37,21 @@ class SysIdRoutine(SysIdRoutineLog):
     class Config:
         """Hardware-independent configuration for a SysId test routine.
 
-        :param rampRate:    The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
+        :param ramp_rate:    The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
                             per second if left null.
-        :param stepVoltage: The step voltage output used for dynamic test routines. Defaults to 7
+        :param step_voltage: The step voltage output used for dynamic test routines. Defaults to 7
                             volts if left null.
         :param timeout:     Safety timeout for the test routine commands. Defaults to 10 seconds if left
                             null.
-        :param recordState: Optional handle for recording test state in a third-party logging
+        :param record_state: Optional handle for recording test state in a third-party logging
                             solution. If provided, the test routine state will be passed to this callback instead of
                             logged in WPILog.
         """
 
-        rampRate: volts_per_second = 1.0
-        stepVoltage: volts = 7.0
+        ramp_rate: volts_per_second = 1.0
+        step_voltage: volts = 7.0
         timeout: seconds = 10.0
-        recordState: Optional[Callable[[State], None]] = None
+        record_state: Optional[Callable[[State], None]] = None
 
     @dataclass
     class Mechanism:
@@ -63,7 +63,7 @@ class SysIdRoutine(SysIdRoutineLog):
         :param drive:     Sends the SysId-specified drive signal to the mechanism motors during test
                           routines.
         :param log:       Returns measured data of the mechanism motors during test routines. To return
-                          data, call `motor(string motorName)` on the supplied `SysIdRoutineLog` instance, and then
+                          data, call `motor(name)` on the supplied `SysIdRoutineLog` instance, and then
                           call one or more of the chainable logging handles (e.g. `voltage`) on the returned
                           `MotorLog`. Multiple motors can be logged in a single callback by calling `motor`
                           multiple times.
@@ -81,13 +81,13 @@ class SysIdRoutine(SysIdRoutineLog):
 
         def __post_init__(self):
             if self.name is None:
-                self.name = self.subsystem.getName()
+                self.name = self.subsystem.get_name()
 
     class Direction(Enum):
         """Motor direction for a SysId test."""
 
-        kForward = 1
-        kReverse = -1
+        FORWARD = 1
+        REVERSE = -1
 
     def __init__(self, config: Config, mechanism: Mechanism):
         """Create a new SysId characterization routine.
@@ -98,8 +98,8 @@ class SysIdRoutine(SysIdRoutineLog):
         super().__init__(mechanism.name)
         self.config = config
         self.mechanism = mechanism
-        self.outputVolts = 0.0
-        self.logState = config.recordState or self.recordState
+        self.output_volts = 0.0
+        self.log_state = config.record_state or self.record_state
 
     def quasistatic(self, direction: Direction) -> Command:
         """Returns a command to run a quasistatic test in the specified direction.
@@ -114,28 +114,28 @@ class SysIdRoutine(SysIdRoutineLog):
         """
 
         timer = Timer()
-        if direction == self.Direction.kForward:
+        if direction == self.Direction.FORWARD:
             state = State.QUASISTATIC_FORWARD
         else:
             state = State.QUASISTATIC_REVERSE
 
         def execute():
-            self.outputVolts = direction.value * timer.get() * self.config.rampRate
-            self.mechanism.drive(self.outputVolts)
+            self.output_volts = direction.value * timer.get() * self.config.ramp_rate
+            self.mechanism.drive(self.output_volts)
             self.mechanism.log(self)
-            self.logState(state)
+            self.log_state(state)
 
         def end(interrupted: bool):
             self.mechanism.drive(0.0)
-            self.logState(State.NONE)
+            self.log_state(State.NONE)
             timer.stop()
 
         return (
-            self.mechanism.subsystem.runOnce(timer.restart)
-            .andThen(self.mechanism.subsystem.run(execute))
-            .finallyDo(end)
-            .withName(f"sysid-{state}-{self.mechanism.name}")
-            .withTimeout(self.config.timeout)
+            self.mechanism.subsystem.run_once(timer.restart)
+            .and_then(self.mechanism.subsystem.run(execute))
+            .finally_do(end)
+            .with_name(f"sysid-{state}-{self.mechanism.name}")
+            .with_timeout(self.config.timeout)
         )
 
     def dynamic(self, direction: Direction) -> Command:
@@ -150,27 +150,27 @@ class SysIdRoutine(SysIdRoutineLog):
         :returns: A command to run the test.
         """
 
-        if direction == self.Direction.kForward:
+        if direction == self.Direction.FORWARD:
             state = State.DYNAMIC_FORWARD
         else:
             state = State.DYNAMIC_REVERSE
 
         def command():
-            self.outputVolts = direction.value * self.config.stepVoltage
+            self.output_volts = direction.value * self.config.step_voltage
 
         def execute():
-            self.mechanism.drive(self.outputVolts)
+            self.mechanism.drive(self.output_volts)
             self.mechanism.log(self)
-            self.logState(state)
+            self.log_state(state)
 
         def end(interrupted: bool):
             self.mechanism.drive(0.0)
-            self.logState(State.NONE)
+            self.log_state(State.NONE)
 
         return (
-            self.mechanism.subsystem.runOnce(command)
-            .andThen(self.mechanism.subsystem.run(execute))
-            .finallyDo(end)
-            .withName(f"sysid-{state}-{self.mechanism.name}")
-            .withTimeout(self.config.timeout)
+            self.mechanism.subsystem.run_once(command)
+            .and_then(self.mechanism.subsystem.run(execute))
+            .finally_do(end)
+            .with_name(f"sysid-{state}-{self.mechanism.name}")
+            .with_timeout(self.config.timeout)
         )

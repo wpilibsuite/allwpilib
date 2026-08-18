@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <Eigen/Core>
+
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/spline/Spline.hpp"
 #include "wpi/util/SymbolExports.hpp"

@@ -4,9 +4,8 @@
 
 #include "wpi/hardware/motor/PWMMotorController.hpp"
 
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/sendable/SendableBuilder.hpp"
@@ -66,7 +65,7 @@ void PWMMotorController::StopMotor() {
 }
 
 std::string PWMMotorController::GetDescription() const {
-  return fmt::format("PWM {}", GetChannel());
+  return std::format("PWM {}", GetChannel());
 }
 
 int PWMMotorController::GetChannel() const {

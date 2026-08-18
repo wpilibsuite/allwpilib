@@ -5,9 +5,9 @@
 package org.wpilib.examples.tankdrivegamepad;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**

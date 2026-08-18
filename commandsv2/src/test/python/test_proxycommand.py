@@ -9,30 +9,30 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_proxyCommandSchedule(scheduler: commands2.CommandScheduler):
+def test_proxy_command_schedule(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     start_spying_on(command1)
 
-    scheduleCommand = commands2.ProxyCommand(command1)
+    schedule_command = commands2.ProxyCommand(command1)
 
-    scheduler.schedule(scheduleCommand)
+    scheduler.schedule(schedule_command)
 
     verify(command1).schedule()
 
 
-def test_proxyCommandEnd(scheduler: commands2.CommandScheduler):
+def test_proxy_command_end(scheduler: commands2.CommandScheduler):
     cond = OOBoolean()
 
     command = commands2.WaitUntilCommand(cond)
 
-    scheduleCommand = commands2.ProxyCommand(command)
+    schedule_command = commands2.ProxyCommand(command)
 
-    scheduler.schedule(scheduleCommand)
+    scheduler.schedule(schedule_command)
     scheduler.run()
 
-    assert scheduler.isScheduled(scheduleCommand)
+    assert scheduler.is_scheduled(schedule_command)
 
     cond.set(True)
     scheduler.run()
     scheduler.run()
-    assert not scheduler.isScheduled(scheduleCommand)
+    assert not scheduler.is_scheduled(schedule_command)

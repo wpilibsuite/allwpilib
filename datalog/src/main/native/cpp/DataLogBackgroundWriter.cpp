@@ -17,12 +17,12 @@
 
 #endif
 
+#include <chrono>
+#include <format>
 #include <random>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/fs.hpp"
@@ -37,13 +37,13 @@ static std::string FormatBytesSize(uintmax_t value) {
   static constexpr uintmax_t kMiB = kKiB * 1024;
   static constexpr uintmax_t kGiB = kMiB * 1024;
   if (value >= kGiB) {
-    return fmt::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
+    return std::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
   } else if (value >= kMiB) {
-    return fmt::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
+    return std::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
   } else if (value >= kKiB) {
-    return fmt::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+    return std::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
   } else {
-    return fmt::format("{} B", value);
+    return std::format("{} B", value);
   }
 }
 
@@ -60,7 +60,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(wpi::util::Logger& msglog,
                                                  double period,
                                                  std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
-      m_period{period},
+      m_period{period < 0.0 ? 0.0 : period},
       m_newFilename{filename},
       m_thread{[this, dir = std::string{dir}] { WriterThreadMain(dir); }} {}
 
@@ -75,7 +75,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(
     std::function<void(std::span<const uint8_t> data)> write, double period,
     std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
-      m_period{period},
+      m_period{period < 0.0 ? 0.0 : period},
       m_thread{[this, write = std::move(write)] {
         WriterThreadMain(std::move(write));
       }} {}
@@ -84,9 +84,10 @@ DataLogBackgroundWriter::~DataLogBackgroundWriter() {
   {
     std::scoped_lock lock{m_mutex};
     m_shutdown = true;
+    m_wakeup = true;
     m_doFlush = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
   m_thread.join();
 }
 
@@ -94,16 +95,18 @@ void DataLogBackgroundWriter::SetFilename(std::string_view filename) {
   {
     std::scoped_lock lock{m_mutex};
     m_newFilename = filename;
+    m_wakeup = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 void DataLogBackgroundWriter::Flush() {
   {
     std::scoped_lock lock{m_mutex};
+    m_wakeup = true;
     m_doFlush = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 void DataLogBackgroundWriter::Pause() {
@@ -128,8 +131,9 @@ void DataLogBackgroundWriter::Stop() {
     std::scoped_lock lock{m_mutex};
     m_state = kStopped;
     m_newFilename.clear();
+    m_wakeup = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
@@ -199,7 +203,7 @@ struct DataLogBackgroundWriter::WriterThreadState {
 
   void IncrementFilename() {
     fs::path basePath{baseFilename};
-    filename = fmt::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
+    filename = std::format("{}.{}{}", basePath.stem().string(), ++segmentCount,
                            basePath.extension().string());
     path = dirPath / filename;
   }
@@ -299,11 +303,11 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 
   std::unique_lock lock{m_mutex};
   do {
-    bool doFlush = false;
-    auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
-    if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
-      doFlush = true;
-    }
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
+    bool doFlush = timedOut || m_doFlush;
+    m_wakeup = false;
+    m_doFlush = false;
 
     if (m_state == kStopped) {
       state.Close();
@@ -367,10 +371,12 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       state.SetFilename(newFilename);
     }
 
-    if (doFlush || m_doFlush) {
-      // flush to file
-      m_doFlush = false;
+    if (doFlush) {
+      // Never acquire the base DataLog mutex while holding m_mutex. Append
+      // paths acquire them in the opposite order when BufferHalfFull() runs.
+      lock.unlock();
       DataLog::FlushBufs(&toWrite);
+      lock.lock();
       if (toWrite.empty()) {
         continue;
       }
@@ -418,7 +424,9 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       }
 
       // release buffers back to free list
+      lock.unlock();
       ReleaseBufs(&toWrite);
+      lock.lock();
     }
   } while (!m_shutdown);
 }
@@ -433,16 +441,18 @@ void DataLogBackgroundWriter::WriterThreadMain(
 
   std::unique_lock lock{m_mutex};
   do {
-    bool doFlush = false;
-    auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
-    if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
-      doFlush = true;
-    }
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
+    bool doFlush = timedOut || m_doFlush;
+    m_wakeup = false;
+    m_doFlush = false;
 
-    if (doFlush || m_doFlush) {
-      // flush to file
-      m_doFlush = false;
+    if (doFlush) {
+      // Never acquire the base DataLog mutex while holding m_mutex. Append
+      // paths acquire them in the opposite order when BufferHalfFull() runs.
+      lock.unlock();
       DataLog::FlushBufs(&toWrite);
+      lock.lock();
       if (toWrite.empty()) {
         continue;
       }
@@ -457,7 +467,9 @@ void DataLogBackgroundWriter::WriterThreadMain(
       lock.lock();
 
       // release buffers back to free list
+      lock.unlock();
       ReleaseBufs(&toWrite);
+      lock.lock();
     }
   } while (!m_shutdown);
 

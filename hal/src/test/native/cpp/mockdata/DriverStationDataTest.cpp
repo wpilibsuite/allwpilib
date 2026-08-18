@@ -6,14 +6,15 @@
 
 #include <cstring>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/hal/DriverStation.h"
 #include "wpi/util/StringExtras.hpp"
 
 namespace wpi::hal {
 
-TEST(DriverStationTest, Joystick) {
+TEST_CASE("DriverStationTest Joystick", "[hal][mockdata]") {
   HAL_JoystickAxes axes;
   HAL_JoystickPOVs povs;
   HAL_JoystickButtons buttons;
@@ -24,18 +25,18 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickPOVs(joystickNum, &povs);
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
-    EXPECT_EQ(0, axes.available);
+    CHECK(0 == axes.available);
     for (int i = 0; i < HAL_MAX_JOYSTICK_AXES; ++i) {
-      EXPECT_EQ(0, axes.axes[i]);
+      CHECK(0 == axes.axes[i]);
     }
 
-    EXPECT_EQ(0, povs.available);
+    CHECK(0 == povs.available);
     for (int i = 0; i < HAL_MAX_JOYSTICK_POVS; ++i) {
-      EXPECT_EQ(0, povs.povs[i]);
+      CHECK(0 == povs.povs[i]);
     }
 
-    EXPECT_EQ(0llu, buttons.available);
-    EXPECT_EQ(0llu, buttons.buttons);
+    CHECK(0llu == buttons.available);
+    CHECK(0llu == buttons.buttons);
   }
 
   HAL_JoystickAxes set_axes;
@@ -72,26 +73,28 @@ TEST(DriverStationTest, Joystick) {
   HAL_GetJoystickPOVs(joystickUnderTest, &povs);
   HAL_GetJoystickButtons(joystickUnderTest, &buttons);
 
-  EXPECT_EQ(0x1F, axes.available);
-  EXPECT_NEAR(0.000, axes.axes[0], 0.000001);
-  EXPECT_NEAR(0.125, axes.axes[1], 0.000001);
-  EXPECT_NEAR(0.250, axes.axes[2], 0.000001);
-  EXPECT_NEAR(0.375, axes.axes[3], 0.000001);
-  EXPECT_NEAR(0.500, axes.axes[4], 0.000001);
-  EXPECT_NEAR(0, axes.axes[5], 0.000001);  // Should not have been set, still 0
-  EXPECT_NEAR(0, axes.axes[6], 0.000001);  // Should not have been set, still 0
+  CHECK(0x1F == axes.available);
+  CHECK(axes.axes[0] == Catch::Approx(0.000).margin(0.000001));
+  CHECK(axes.axes[1] == Catch::Approx(0.125).margin(0.000001));
+  CHECK(axes.axes[2] == Catch::Approx(0.250).margin(0.000001));
+  CHECK(axes.axes[3] == Catch::Approx(0.375).margin(0.000001));
+  CHECK(axes.axes[4] == Catch::Approx(0.500).margin(0.000001));
+  CHECK(axes.axes[5] == Catch::Approx(0).margin(
+                            0.000001));  // Should not have been set, still 0
+  CHECK(axes.axes[6] == Catch::Approx(0).margin(
+                            0.000001));  // Should not have been set, still 0
 
-  EXPECT_EQ(0x7, povs.available);
-  EXPECT_EQ(HAL_JOYSTICK_POV_UP, povs.povs[0]);
-  EXPECT_EQ(HAL_JOYSTICK_POV_RIGHT, povs.povs[1]);
-  EXPECT_EQ(HAL_JOYSTICK_POV_DOWN, povs.povs[2]);
-  EXPECT_EQ(0, povs.povs[3]);  // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[4]);  // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[5]);  // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[6]);  // Should not have been set, still 0
+  CHECK(0x7 == povs.available);
+  CHECK(HAL_JOYSTICK_POV_UP == povs.povs[0]);
+  CHECK(HAL_JOYSTICK_POV_RIGHT == povs.povs[1]);
+  CHECK(HAL_JOYSTICK_POV_DOWN == povs.povs[2]);
+  CHECK(0 == povs.povs[3]);  // Should not have been set, still 0
+  CHECK(0 == povs.povs[4]);  // Should not have been set, still 0
+  CHECK(0 == povs.povs[5]);  // Should not have been set, still 0
+  CHECK(0 == povs.povs[6]);  // Should not have been set, still 0
 
-  EXPECT_EQ(0xFFllu, buttons.available);
-  EXPECT_EQ(0xDEADBEEFllu, buttons.buttons);
+  CHECK(0xFFllu == buttons.available);
+  CHECK(0xDEADBEEFllu == buttons.buttons);
 
   // Reset
   HALSIM_ResetDriverStationData();
@@ -103,22 +106,22 @@ TEST(DriverStationTest, Joystick) {
     HAL_GetJoystickPOVs(joystickNum, &povs);
     HAL_GetJoystickButtons(joystickNum, &buttons);
 
-    EXPECT_EQ(0, axes.available);
+    CHECK(0 == axes.available);
     for (int i = 0; i < HAL_MAX_JOYSTICK_AXES; ++i) {
-      EXPECT_EQ(0, axes.axes[i]);
+      CHECK(0 == axes.axes[i]);
     }
 
-    EXPECT_EQ(0, povs.available);
+    CHECK(0 == povs.available);
     for (int i = 0; i < HAL_MAX_JOYSTICK_POVS; ++i) {
-      EXPECT_EQ(0, povs.povs[i]);
+      CHECK(0 == povs.povs[i]);
     }
 
-    EXPECT_EQ(0llu, buttons.available);
-    EXPECT_EQ(0llu, buttons.buttons);
+    CHECK(0llu == buttons.available);
+    CHECK(0llu == buttons.buttons);
   }
 }
 
-TEST(DriverStationTest, EventInfo) {
+TEST_CASE("DriverStationTest EventInfo", "[hal][mockdata]") {
   constexpr std::string_view eventName = "UnitTest";
   HAL_MatchInfo info;
   wpi::util::format_to_n_c_str(info.eventName, sizeof(info.eventName),
@@ -133,10 +136,10 @@ TEST(DriverStationTest, EventInfo) {
   HAL_MatchInfo dataBack;
   HAL_GetMatchInfo(&dataBack);
 
-  EXPECT_EQ(eventName, dataBack.eventName);
-  EXPECT_EQ(5, dataBack.matchNumber);
-  EXPECT_EQ(HAL_MatchType::HAL_MATCH_TYPE_QUALIFICATION, dataBack.matchType);
-  EXPECT_EQ(42, dataBack.replayNumber);
+  CHECK(eventName == dataBack.eventName);
+  CHECK(5 == dataBack.matchNumber);
+  CHECK(HAL_MatchType::HAL_MATCH_TYPE_QUALIFICATION == dataBack.matchType);
+  CHECK(42 == dataBack.replayNumber);
 }
 
 }  // namespace wpi::hal

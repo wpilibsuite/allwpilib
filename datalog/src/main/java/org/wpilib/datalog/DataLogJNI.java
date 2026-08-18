@@ -231,16 +231,17 @@ public class DataLogJNI {
    * @param timestamp Time stamp (may be 0 to indicate now)
    */
   static void appendRaw(long impl, int entry, ByteBuffer data, int start, int len, long timestamp) {
+    if (start < 0) {
+      throw new IndexOutOfBoundsException("start must be >= 0");
+    }
+    if (len < 0) {
+      throw new IndexOutOfBoundsException("len must be >= 0");
+    }
+    int capacity = data.capacity();
+    if (start > capacity || len > capacity - start) {
+      throw new IndexOutOfBoundsException("start + len must be within buffer capacity");
+    }
     if (data.isDirect()) {
-      if (start < 0) {
-        throw new IndexOutOfBoundsException("start must be >= 0");
-      }
-      if (len < 0) {
-        throw new IndexOutOfBoundsException("len must be >= 0");
-      }
-      if ((start + len) > data.capacity()) {
-        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
-      }
       appendRawBuffer(impl, entry, data, start, len, timestamp);
     } else if (data.hasArray()) {
       appendRaw(impl, entry, data.array(), data.arrayOffset() + start, len, timestamp);
@@ -249,7 +250,7 @@ public class DataLogJNI {
     }
   }
 
-  private static native void appendRawBuffer(
+  static native void appendRawBuffer(
       long impl, int entry, ByteBuffer data, int start, int len, long timestamp);
 
   /**

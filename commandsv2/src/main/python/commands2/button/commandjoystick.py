@@ -8,12 +8,13 @@ from .commandgenerichid import CommandGenericHID
 from .trigger import Trigger
 
 
-class CommandJoystick(CommandGenericHID):
+class CommandJoystick:
     """
     A version of :class:`wpilib.Joystick` with :class:`.Trigger` factories for command-based.
     """
 
-    _hid: Joystick
+    _hid: CommandGenericHID
+    _joystick: Joystick
 
     def __init__(self, port: int):
         """
@@ -22,126 +23,137 @@ class CommandJoystick(CommandGenericHID):
         :param port: The port index on the Driver Station that the controller is plugged into.
         """
 
-        super().__init__(port)
-        self._hid = Joystick(port)
+        self._hid = CommandGenericHID.get_command_generic_hid(port)
+        self._joystick = Joystick(self._hid.get_hid())
 
-    def getHID(self) -> Joystick:
+    def __getattr__(self, name: str):
+        return getattr(self._hid, name)
+
+    def get_hid(self) -> CommandGenericHID:
         """
-        Get the underlying GenericHID object.
+        Get the underlying CommandGenericHID object.
 
-        :returns: the wrapped GenericHID object
+        :returns: the wrapped CommandGenericHID object
         """
         return self._hid
+
+    def get_joystick(self) -> Joystick:
+        """
+        Get the underlying Joystick object.
+
+        :returns: the wrapped Joystick object
+        """
+        return self._joystick
 
     def trigger(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the trigger button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the trigger button's digital signal attached to the
             given loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getTrigger())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._joystick.get_trigger())
 
     def top(self, loop: Optional[EventLoop] = None) -> Trigger:
         """
         Constructs an event instance around the top button's digital signal.
 
         :param loop: the event loop instance to attach the event to, defaults
-                     to :func:`commands2.CommandScheduler.getDefaultButtonLoop`
+                     to :func:`commands2.CommandScheduler.get_default_button_loop`
 
         :returns: an event instance representing the top button's digital signal attached to the given
                   loop.
         """
         if loop is None:
-            loop = CommandScheduler.getInstance().getDefaultButtonLoop()
-        return Trigger(loop, lambda: self._hid.getTop())
+            loop = CommandScheduler.get_instance().get_default_button_loop()
+        return Trigger(loop, lambda: self._joystick.get_top())
 
-    def setXChannel(self, channel: int):
+    def set_x_channel(self, channel: int):
         """
         Set the channel associated with the X axis.
 
         :param channel: The channel to set the axis to.
         """
-        self._hid.setXChannel(channel)
+        self._joystick.set_x_channel(channel)
 
-    def setYChannel(self, channel: int):
+    def set_y_channel(self, channel: int):
         """
         Set the channel associated with the Y axis.
 
         :param channel: The channel to set the axis to.
         """
-        self._hid.setYChannel(channel)
+        self._joystick.set_y_channel(channel)
 
-    def setZChannel(self, channel: int):
+    def set_z_channel(self, channel: int):
         """
         Set the channel associated with the Z axis.
 
         :param channel: The channel to set the axis to.
         """
-        self._hid.setZChannel(channel)
+        self._joystick.set_z_channel(channel)
 
-    def setThrottleChannel(self, channel: int):
+    def set_throttle_channel(self, channel: int):
         """
         Set the channel associated with the throttle axis.
 
         :param channel: The channel to set the axis to.
         """
-        self._hid.setThrottleChannel(channel)
+        self._joystick.set_throttle_channel(channel)
 
-    def setTwistChannel(self, channel: int):
+    def set_twist_channel(self, channel: int):
         """
         Set the channel associated with the twist axis.
 
         :param channel: The channel to set the axis to.
         """
-        self._hid.setTwistChannel(channel)
+        self._joystick.set_twist_channel(channel)
 
-    def getXChannel(self) -> int:
+    def get_x_channel(self) -> int:
         """
         Get the channel currently associated with the X axis.
 
         :returns: The channel for the axis.
         """
-        return self._hid.getXChannel()
+        return self._joystick.get_x_channel()
 
-    def getYChannel(self) -> int:
+    def get_y_channel(self) -> int:
         """
         Get the channel currently associated with the Y axis.
 
         :returns: The channel for the axis.
         """
-        return self._hid.getYChannel()
+        return self._joystick.get_y_channel()
 
-    def getZChannel(self) -> int:
+    def get_z_channel(self) -> int:
         """
         Get the channel currently associated with the Z axis.
 
         :returns: The channel for the axis.
         """
-        return self._hid.getZChannel()
+        return self._joystick.get_z_channel()
 
-    def getTwistChannel(self) -> int:
+    def get_twist_channel(self) -> int:
         """
         Get the channel currently associated with the twist axis.
 
         :returns: The channel for the axis.
         """
-        return self._hid.getTwistChannel()
+        return self._joystick.get_twist_channel()
 
-    def getThrottleChannel(self) -> int:
+    def get_throttle_channel(self) -> int:
         """
         Get the channel currently associated with the throttle axis.
 
         :returns: The channel for the axis.
         """
-        return self._hid.getThrottleChannel()
+        return self._joystick.get_throttle_channel()
 
-    def getX(self) -> float:
+    def get_x(self) -> float:
         """
         Get the x position of the HID.
 
@@ -150,9 +162,9 @@ class CommandJoystick(CommandGenericHID):
 
         :returns: the x position
         """
-        return self._hid.getX()
+        return self._joystick.get_x()
 
-    def getY(self) -> float:
+    def get_y(self) -> float:
         """
         Get the y position of the HID.
 
@@ -161,44 +173,44 @@ class CommandJoystick(CommandGenericHID):
 
         :returns: the y position
         """
-        return self._hid.getY()
+        return self._joystick.get_y()
 
-    def getZ(self) -> float:
+    def get_z(self) -> float:
         """
         Get the z position of the HID.
 
         :returns: the z position
         """
-        return self._hid.getZ()
+        return self._joystick.get_z()
 
-    def getTwist(self) -> float:
+    def get_twist(self) -> float:
         """
         Get the twist value of the current joystick. This depends on the mapping of the joystick
         connected to the current port.
 
         :returns: The Twist value of the joystick.
         """
-        return self._hid.getTwist()
+        return self._joystick.get_twist()
 
-    def getThrottle(self) -> float:
+    def get_throttle(self) -> float:
         """
         Get the throttle value of the current joystick. This depends on the mapping of the joystick
         connected to the current port.
 
         :returns: The Throttle value of the joystick.
         """
-        return self._hid.getThrottle()
+        return self._joystick.get_throttle()
 
-    def getMagnitude(self) -> float:
+    def get_magnitude(self) -> float:
         """
         Get the magnitude of the vector formed by the joystick's current position relative to its
         origin.
 
         :returns: The magnitude of the direction vector
         """
-        return self._hid.getMagnitude()
+        return self._joystick.get_magnitude()
 
-    def getDirectionRadians(self) -> float:
+    def get_direction_radians(self) -> float:
         """
         Get the direction of the vector formed by the joystick and its origin in radians. 0 is forward
         and clockwise is positive. (Straight right is π/2.)
@@ -213,13 +225,13 @@ class CommandJoystick(CommandGenericHID):
         #
         # It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
         # so that 0 radians is forward.
-        return self._hid.getDirectionRadians()
+        return self._joystick.get_direction_radians()
 
-    def getDirectionDegrees(self) -> float:
+    def get_direction_degrees(self) -> float:
         """
         Get the direction of the vector formed by the joystick and its origin in degrees. 0 is forward
         and clockwise is positive. (Straight right is 90.)
 
         :returns: The direction of the vector in degrees
         """
-        return self._hid.getDirectionDegrees()
+        return self._joystick.get_direction_degrees()

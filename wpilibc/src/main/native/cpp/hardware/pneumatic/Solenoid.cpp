@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
+#include <format>
 #include <utility>
 
 #include "wpi/system/Errors.hpp"
@@ -14,7 +15,7 @@
 
 using namespace wpi;
 
-Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
+Solenoid::Solenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
                    int channel)
     : m_module{PneumaticsBase::GetForType(busId, module, moduleType)},
       m_channel{channel} {
@@ -29,12 +30,12 @@ Solenoid::Solenoid(int busId, int module, PneumaticsModuleType moduleType,
                            m_channel);
   }
 
-  m_module->ReportUsage(fmt::format("Solenoid[{}]", m_channel), "Solenoid");
+  m_module->ReportUsage(std::format("Solenoid[{}]", m_channel), "Solenoid");
   wpi::util::SendableRegistry::Add(this, "Solenoid",
                                    m_module->GetModuleNumber(), m_channel);
 }
 
-Solenoid::Solenoid(int busId, PneumaticsModuleType moduleType, int channel)
+Solenoid::Solenoid(CANBus busId, PneumaticsModuleType moduleType, int channel)
     : Solenoid{busId, PneumaticsBase::GetDefaultForType(moduleType), moduleType,
                channel} {}
 

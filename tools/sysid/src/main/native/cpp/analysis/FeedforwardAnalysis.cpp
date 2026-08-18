@@ -7,16 +7,16 @@
 #include <array>
 #include <bitset>
 #include <cmath>
+#include <format>
 #include <string>
 #include <vector>
 
 #include <Eigen/Eigenvalues>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
 
 #include "wpi/sysid/analysis/OLS.hpp"
 #include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 namespace sysid {
 
@@ -154,8 +154,8 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
       }
     }
 
-    std::string error = fmt::format("Insufficient samples to compute {}.\n\n",
-                                    fmt::join(badGainsList, ", "));
+    std::string error = std::format("Insufficient samples to compute {}.\n\n",
+                                    wpi::util::join(badGainsList, ", "));
 
     // If all gains are bad, the robot may not have moved
     if (badGains.all()) {

@@ -17,5 +17,5 @@ class PrintCommand(InstantCommand):
         """
         super().__init__(lambda: print(message))
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         return True

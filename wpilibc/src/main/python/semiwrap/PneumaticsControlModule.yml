@@ -9,8 +9,8 @@ classes:
     methods:
       PneumaticsControlModule:
         overloads:
-          int:
-          int, int:
+          CANBus:
+          CANBus, int:
       GetCompressor:
       DisableCompressor:
       EnableCompressorDigital:

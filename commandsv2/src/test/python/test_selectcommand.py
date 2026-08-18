@@ -16,7 +16,7 @@ class TestSelectCommandComposition(MultiCompositionTestBase):
         return commands2.SelectCommand(dict(enumerate(members)), lambda: 0)
 
 
-def test_selectCommand(scheduler: commands2.CommandScheduler):
+def test_select_command(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
     command3 = commands2.Command()
@@ -25,13 +25,13 @@ def test_selectCommand(scheduler: commands2.CommandScheduler):
     start_spying_on(command2)
     start_spying_on(command3)
 
-    command1.isFinished = lambda: True
+    command1.is_finished = lambda: True
 
-    selectCommand = commands2.SelectCommand(
+    select_command = commands2.SelectCommand(
         {"one": command1, "two": command2, "three": command3}, lambda: "one"
     )
 
-    scheduler.schedule(selectCommand)
+    scheduler.schedule(select_command)
     scheduler.run()
 
     verify(command1).initialize()
@@ -47,7 +47,7 @@ def test_selectCommand(scheduler: commands2.CommandScheduler):
     verify(command3, never()).end(False)
 
 
-def test_selectCommandInvalidKey(scheduler: commands2.CommandScheduler):
+def test_select_command_invalid_key(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
     command2 = commands2.Command()
     command3 = commands2.Command()
@@ -56,37 +56,37 @@ def test_selectCommandInvalidKey(scheduler: commands2.CommandScheduler):
     start_spying_on(command2)
     start_spying_on(command3)
 
-    command1.isFinished = lambda: True
+    command1.is_finished = lambda: True
 
-    selectCommand = commands2.SelectCommand(
+    select_command = commands2.SelectCommand(
         {"one": command1, "two": command2, "three": command3}, lambda: "four"
     )
 
-    scheduler.schedule(selectCommand)
+    scheduler.schedule(select_command)
 
 
-def test_selectCommandRequirement(scheduler: commands2.CommandScheduler):
+def test_select_command_requirement(scheduler: commands2.CommandScheduler):
     system1 = commands2.Subsystem()
     system2 = commands2.Subsystem()
     system3 = commands2.Subsystem()
     system4 = commands2.Subsystem()
 
     command1 = commands2.Command()
-    command1.addRequirements(system1, system2)
+    command1.add_requirements(system1, system2)
     command2 = commands2.Command()
-    command2.addRequirements(system3)
+    command2.add_requirements(system3)
     command3 = commands2.Command()
-    command3.addRequirements(system3, system4)
+    command3.add_requirements(system3, system4)
 
     start_spying_on(command1)
     start_spying_on(command2)
     start_spying_on(command3)
 
-    selectCommand = commands2.SelectCommand(
+    select_command = commands2.SelectCommand(
         {"one": command1, "two": command2, "three": command3}, lambda: "one"
     )
 
-    scheduler.schedule(selectCommand)
+    scheduler.schedule(select_command)
     scheduler.schedule(commands2.InstantCommand(lambda: None, system3))
 
     verify(command1).end(interrupted=True)

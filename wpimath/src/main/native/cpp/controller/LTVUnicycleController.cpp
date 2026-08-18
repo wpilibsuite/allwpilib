@@ -4,9 +4,15 @@
 
 #include "wpi/math/controller/LTVUnicycleController.hpp"
 
+#include <Eigen/Core>
+
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/system/Discretization.hpp"
+#include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 

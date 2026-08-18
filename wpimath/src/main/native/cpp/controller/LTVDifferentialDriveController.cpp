@@ -6,9 +6,17 @@
 
 #include <cmath>
 
+#include <Eigen/Core>
+
+#include "wpi/math/controller/DifferentialDriveWheelVoltages.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/DARE.hpp"
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 using namespace wpi::math;
 

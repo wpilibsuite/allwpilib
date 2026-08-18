@@ -27,9 +27,9 @@ class RepeatCommand(Command):
         """
         super().__init__()
         self._command = command
-        CommandScheduler.getInstance().registerComposedCommands([command])
-        self.requirements.update(command.getRequirements())
-        self.setName(f"Repeat({command.getName()})")
+        CommandScheduler.get_instance().register_composed_commands([command])
+        self.requirements.update(command.get_requirements())
+        self.set_name(f"Repeat({command.get_name()})")
 
     def initialize(self):
         self._ended = False
@@ -42,12 +42,12 @@ class RepeatCommand(Command):
 
         self._command.execute()
 
-        if self._command.isFinished():
+        if self._command.is_finished():
             # restart command
             self._command.end(False)
             self._ended = True
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         return False
 
     def end(self, interrupted: bool):
@@ -57,12 +57,12 @@ class RepeatCommand(Command):
             self._command.end(interrupted)
             self._ended = True
 
-    def runsWhenDisabled(self) -> bool:
-        return self._command.runsWhenDisabled()
+    def runs_when_disabled(self) -> bool:
+        return self._command.runs_when_disabled()
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
-        return self._command.getInterruptionBehavior()
+    def get_interruption_behavior(self) -> InterruptionBehavior:
+        return self._command.get_interruption_behavior()
 
-    def initSendable(self, builder: SendableBuilder) -> None:
-        super().initSendable(builder)
-        builder.addStringProperty("command", self._command.getName, lambda _: None)
+    def init_sendable(self, builder: SendableBuilder) -> None:
+        super().init_sendable(builder)
+        builder.add_string_property("command", self._command.get_name, lambda _: None)

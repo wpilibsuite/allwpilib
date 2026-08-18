@@ -4,7 +4,7 @@
 
 #include "UsbCameraProperty.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "ComPtr.hpp"
 
@@ -13,7 +13,7 @@ using namespace wpi::cs;
 UsbCameraProperty::UsbCameraProperty(std::string_view name_,
                                      tagVideoProcAmpProperty tag, bool autoProp,
                                      IAMVideoProcAmp* pProcAmp, bool* isValid)
-    : PropertyImpl{autoProp ? fmt::format("{}_auto", name_) : name_} {
+    : PropertyImpl{autoProp ? std::format("{}_auto", name_) : name_} {
   this->tagVideoProc = tag;
   this->isControlProperty = false;
   this->isAutoProp = autoProp;
@@ -79,7 +79,7 @@ UsbCameraProperty::UsbCameraProperty(std::string_view name_,
                                      tagCameraControlProperty tag,
                                      bool autoProp, IAMCameraControl* pProcAmp,
                                      bool* isValid)
-    : PropertyImpl{autoProp ? fmt::format("{}_auto", name_) : name_} {
+    : PropertyImpl{autoProp ? std::format("{}_auto", name_) : name_} {
   this->tagCameraControl = tag;
   this->isControlProperty = true;
   this->isAutoProp = autoProp;

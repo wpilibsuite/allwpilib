@@ -28,7 +28,7 @@ class SendableHelper {
   __attribute__((no_sanitize("vptr")))
 #endif
   constexpr SendableHelper(SendableHelper&& rhs) {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       // it is safe to call Move() multiple times with the same rhs
       SendableRegistry::Move(static_cast<Derived*>(this),
                              static_cast<Derived*>(&rhs));
@@ -40,7 +40,7 @@ class SendableHelper {
   __attribute__((no_sanitize("vptr")))
 #endif
   constexpr SendableHelper& operator=(SendableHelper&& rhs) {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       // it is safe to call Move() multiple times with the same rhs
       SendableRegistry::Move(static_cast<Derived*>(this),
                              static_cast<Derived*>(&rhs));
@@ -52,7 +52,7 @@ class SendableHelper {
   constexpr SendableHelper() = default;
 
   constexpr ~SendableHelper() {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       // it is safe to call Remove() multiple times with the same object
       SendableRegistry::Remove(static_cast<Derived*>(this));
     }

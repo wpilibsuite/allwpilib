@@ -10,13 +10,13 @@
 #include <string>
 #include <vector>
 
-#include "wpi/driverstation/Alert.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Alert.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -138,6 +138,9 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Add a callback to run at a specific period.
    *
+   * This callback will be registered with the framework immediately when this
+   * method is called and will begin executing as soon as it is registered.
+   *
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
@@ -162,34 +165,46 @@ class OpModeRobotBase : public RobotBase {
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color
    * @param backgroundColor background color
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group,
-                        std::string_view description,
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
                         const wpi::util::Color& textColor,
-                        const wpi::util::Color& backgroundColor);
+                        const wpi::util::Color& backgroundColor,
+                        OpModeFactory factory);
 
   /**
    * Adds an operating mode option using a factory function that creates the
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group = {},
-                        std::string_view description = {});
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
+                        OpModeFactory factory);
+
+  /**
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param factory factory function
+   */
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        OpModeFactory factory);
 
   /**
    * Removes an operating mode option. It's necessary to call PublishOpModes()
@@ -217,6 +232,18 @@ class OpModeRobotBase : public RobotBase {
    */
   void LoopFunc();
 
+  /**
+   * Starts the current OpMode, registering its periodic callback and calling
+   * Start(). Does nothing if there is no current OpMode or it is already
+   * started.
+   */
+  void StartCurrentOpMode();
+
+  /**
+   * Ends the current OpMode, cleaning up callbacks and resetting state.
+   */
+  void EndCurrentOpMode();
+
  private:
   struct OpModeData {
     std::string name;
@@ -230,7 +257,7 @@ class OpModeRobotBase : public RobotBase {
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
   std::chrono::microseconds m_startTime;
-  Alert m_loopOverrunAlert;
+  wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
 
   // OpMode lifecycle state
@@ -238,6 +265,7 @@ class OpModeRobotBase : public RobotBase {
   bool m_calledDriverStationConnected = false;
   bool m_lastEnabledState = false;
   std::shared_ptr<OpMode> m_currentOpMode;
+  std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
       m_activeOpModeCallbacks;
   std::optional<wpi::internal::PeriodicPriorityQueue::Callback>
@@ -295,11 +323,11 @@ class OpModeRobot : public OpModeRobotBase {
                  const wpi::util::Color& backgroundColor) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
       AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description, textColor, backgroundColor);
+          mode, name, group, description, textColor, backgroundColor,
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description, textColor, backgroundColor);
+      AddOpModeFactory(mode, name, group, description, textColor,
+                       backgroundColor, [] { return std::make_unique<T>(); });
     }
   }
 
@@ -320,12 +348,12 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view group = {},
                  std::string_view description = {}) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description);
+      AddOpModeFactory(mode, name, group, description, [this] {
+        return std::make_unique<T>(*static_cast<Derived*>(this));
+      });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description);
+      AddOpModeFactory(mode, name, group, description,
+                       [] { return std::make_unique<T>(); });
     }
   }
 };

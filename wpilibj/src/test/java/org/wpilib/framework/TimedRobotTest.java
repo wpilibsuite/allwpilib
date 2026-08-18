@@ -12,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
+import org.wpilib.util.WPIUtilJNI;
 
 class TimedRobotTest {
   static final double kPeriod = 0.02;
@@ -128,6 +130,37 @@ class TimedRobotTest {
   @AfterEach
   void cleanup() {
     SimHooks.resumeTiming();
+  }
+
+  @Test
+  void robotNameTest() {
+    // Simulated stack trace from a robot crash
+    StackTraceElement[] elements = {
+      new StackTraceElement("org.wpilib.framework.TimedRobot", "<init>", null, 1),
+      new StackTraceElement("org.wpilib.framework.TimedRobotTest$MockRobot", "<init>", null, 1),
+      new StackTraceElement(
+          "jdk.internal.reflect.DirectConstructorHandleAccessor", "newInstance", null, 1),
+      new StackTraceElement("java.lang.reflect.Constructor", "newInstanceWithCaller", null, 1),
+      new StackTraceElement("java.lang.reflect.Constructor", "newInstance", null, 1),
+      new StackTraceElement("org.wpilib.util.ConstructorMatch", "newInstance", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "constructRobot", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "runRobot", null, 1),
+      new StackTraceElement("org.wpilib.framework.RobotBase", "lambda$startRobot$0", null, 1),
+      new StackTraceElement("java.lang.Thread", "run", null, 1)
+    };
+    assertEquals("org.wpilib.framework.TimedRobotTest$MockRobot", MockRobot.getRobotName(elements));
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void constructorPublishesProgramStartTime() {
+    try (var sub =
+            NetworkTableInstance.getDefault()
+                .getIntegerTopic("/Robot/ProgramStartTime")
+                .subscribe(-1);
+        var robot = new MockRobot()) {
+      assertEquals(WPIUtilJNI.getProgramStartTime(), sub.get(-1));
+    }
   }
 
   @Test

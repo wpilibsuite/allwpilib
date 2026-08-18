@@ -10,7 +10,8 @@
 
 #include <imgui.h>
 
-extern "C" struct GLFWwindow;
+struct SDL_Window;
+union SDL_Event;
 
 namespace wpi::gui {
 
@@ -41,14 +42,43 @@ Context* GetCurrentContext();
 void SetCurrentContext(Context* context);
 
 /**
+ * Renderer selection policy.
+ */
+enum class RendererPreference {
+  /**
+   * Require SDL GPU rendering. Initialization fails if SDL GPU is unavailable.
+   */
+  REQUIRE_3D,
+
+  /**
+   * Prefer SDL GPU rendering, but fall back to the SDL 2D renderer if SDL GPU
+   * is unavailable.
+   */
+  PREFER_3D,
+
+  /**
+   * Prefer the SDL 2D renderer. SDL GPU rendering is not attempted unless
+   * forced with WPIGUI_FORCE_RENDERER.
+   */
+  PREFER_2D,
+};
+
+/**
  * Initializes the GUI.
+ *
+ * To override renderer selection, set the WPIGUI_FORCE_RENDERER environment
+ * variable to 2d or 3d.
+ * To enable SDL GPU debug mode, set the WPIGUI_SDL_GPU_DEBUG environment
+ * variable to a value other than 0, false, off, or no.
  *
  * @param title main application window title
  * @param width main application window width
  * @param height main application window height
+ * @param rendererPreference renderer selection policy
  * @param configFlags ImGui configuration flags
  */
 bool Initialize(const char* title, int width, int height,
+                RendererPreference rendererPreference,
                 ImGuiConfigFlags configFlags = ImGuiConfigFlags_None);
 
 /**
@@ -65,7 +95,7 @@ void Exit();
 
 /**
  * Adds initializer to GUI.  The passed function is called once, immediately
- * after the GUI (both GLFW and Dear ImGui) are initialized in Initialize().
+ * after the GUI (both SDL and Dear ImGui) are initialized in Initialize().
  * To have any effect, must be called prior to Initialize().
  *
  * @param initialize initialization function
@@ -82,6 +112,14 @@ void AddInit(std::function<void()> initialize);
 void AddWindowScaler(std::function<void(float scale)> windowScaler);
 
 /**
+ * Adds shutdown handler to GUI.  The passed function is called once during GUI
+ * shutdown before renderer, window, and SDL resources are destroyed.
+ *
+ * @param shutdown shutdown function
+ */
+void AddExit(std::function<void()> shutdown);
+
+/**
  * Adds per-frame executor to GUI.  The passed function is called on each
  * Dear ImGui frame prior to any of the late execute functions.
  *
@@ -96,6 +134,15 @@ void AddEarlyExecute(std::function<void()> execute);
  * @param execute frame execution function
  */
 void AddLateExecute(std::function<void()> execute);
+
+/**
+ * Adds an SDL event handler to GUI. The passed function is called for each
+ * SDL event before Dear ImGui processes it. To have any effect, must be called
+ * prior to Main().
+ *
+ * @param handler event handler function
+ */
+void AddEventHandler(std::function<void(SDL_Event& event)> handler);
 
 /**
  * Customizes save/load behavior.
@@ -128,9 +175,9 @@ void ConfigureCustomSaveSettings(std::function<void()> load,
                                  std::function<void(bool exiting)> save);
 
 /**
- * Gets GLFW window handle.
+ * Gets SDL window handle.
  */
-GLFWwindow* GetSystemWindow();
+SDL_Window* GetSystemWindow();
 
 /**
  * Adds an application icon.  Multiple icons (of different sizes) may be
@@ -159,7 +206,7 @@ void AddDefaultFont(
     std::function<ImFont*(ImGuiIO& io, float size, const ImFontConfig* cfg)>
         makeFont);
 
-enum Style { kStyleClassic = 0, kStyleDark, kStyleLight, kStyleDeepDark };
+enum class Style { CLASSIC = 0, DARK, LIGHT, DEEP_DARK };
 
 /**
  * Sets the ImGui style.  Using this function makes this setting persistent.
@@ -206,9 +253,15 @@ void ConfigurePlatformSaveFile(const std::string& name);
 void EmitViewMenu();
 
 /**
+ * Emits renderer information, including the SDL renderer backend when using
+ * the 2D renderer.
+ */
+void EmitRendererInfo();
+
+/**
  * Pixel formats for texture pixel data.
  */
-enum PixelFormat { kPixelRGBA, kPixelBGRA };
+enum class PixelFormat { RGBA, BGRA };
 
 /**
  * Creates a texture from pixel data.
@@ -433,7 +486,7 @@ class Texture {
 
  private:
   ImTextureID m_texture = ImTextureID_Invalid;
-  PixelFormat m_format = kPixelRGBA;
+  PixelFormat m_format = PixelFormat::RGBA;
   int m_width = 0;
   int m_height = 0;
 };

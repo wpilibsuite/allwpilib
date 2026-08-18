@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Constants.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
 class Intake {
@@ -17,7 +17,7 @@ class Intake {
 
  private:
   wpi::PWMSparkMax motor{IntakeConstants::kMotorPort};
-  wpi::DoubleSolenoid piston{0, wpi::PneumaticsModuleType::CTRE_PCM,
-                             IntakeConstants::kPistonFwdChannel,
-                             IntakeConstants::kPistonRevChannel};
+  wpi::DoubleSolenoid piston{
+      wpi::CANBus::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
+      IntakeConstants::kPistonFwdChannel, IntakeConstants::kPistonRevChannel};
 };

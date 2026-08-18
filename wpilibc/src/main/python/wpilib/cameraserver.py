@@ -56,7 +56,7 @@ class CameraServer:
         cls._launched = True
         from ._wpilib import RobotBase
 
-        if RobotBase.isSimulation():
+        if RobotBase.is_simulation():
             logger.info("Would launch CameraServer with vision_py=%s", vision_py)
             cls._alive = True
         else:
@@ -72,12 +72,12 @@ class CameraServer:
             # who do not. cscore handle values indicate type with bits 24-30
 
             if vision_py:
-                hal.reportUsage("RobotPy/CameraServer", vision_py)
+                hal.report_usage("RobotPy/CameraServer", vision_py)
                 if not vision_py.startswith("/"):
                     vision_py = "/home/systemcore/py/" + vision_py
                 args.append(vision_py)
             else:
-                hal.reportUsage("RobotPy/CameraServer", "")
+                hal.report_usage("RobotPy/CameraServer", "")
 
             # We open a pipe to it so that when this process exits, it dies
             proc = subprocess.Popen(

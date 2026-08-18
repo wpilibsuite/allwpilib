@@ -8,11 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Seconds;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
+import org.wpilib.system.RobotController;
 
 class TriggerTest extends CommandTestBase {
   @Test
@@ -632,6 +635,199 @@ class TriggerTest extends CommandTestBase {
     assertFalse(m_scheduler.isRunning(outerCommand));
 
     // The trigger should have unbound itself during the last run() call.
+  }
+
+  @Test
+  void multiPress() {
+    var currentTimeMicros = new AtomicLong(1000000); // Start at 1s
+    RobotController.setTimeSource(currentTimeMicros::get);
+
+    var signal = new AtomicBoolean(false);
+    var baseTrigger = new Trigger(m_scheduler, signal::get);
+    var multiPressTrigger = baseTrigger.multiPress(3, Seconds.of(1));
+
+    m_scheduler.run();
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire initially");
+
+    // First press at 1.1s
+    currentTimeMicros.set(1100000);
+    signal.set(true);
+    m_scheduler.run();
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 1 press");
+
+    signal.set(false);
+    m_scheduler.run();
+
+    // Second press at 1.2s
+    currentTimeMicros.set(1200000);
+    signal.set(true);
+    m_scheduler.run();
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 2 presses");
+
+    signal.set(false);
+    m_scheduler.run();
+
+    // Third press at 1.3s
+    currentTimeMicros.set(1300000);
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(multiPressTrigger.getAsBoolean(), "Should fire after 3 presses");
+
+    signal.set(false);
+    m_scheduler.run();
+
+    // Fourth press at 2.0s (First press at 1.1s should be NOT yet expired, so 1.1s, 1.2s, 1.3s,
+    // 2.0s ->
+    // 4 presses)
+    currentTimeMicros.set(2000000);
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(
+        multiPressTrigger.getAsBoolean(),
+        "Should still fire as there are 4 presses within last 1s");
+
+    signal.set(false);
+    m_scheduler.run();
+
+    // Wait until 2.2s. Press at 1.1s is expired (exactly 1.1s elapsed).
+    // Remaining: 1.2s, 1.3s, 2.0s -> 3 presses.
+    currentTimeMicros.set(2200000);
+    m_scheduler.run();
+    assertTrue(
+        multiPressTrigger.getAsBoolean(),
+        "Should still fire as there are 3 presses within last 1s");
+
+    // Wait until 2.4s. Presses at 1.2s and 1.3s are definitely expired. Only 2.0s remains.
+    currentTimeMicros.set(2400000);
+    m_scheduler.run();
+    assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after presses expire");
+  }
+
+  @Test
+  void multiPressZeroDuration() {
+    var trigger = new Trigger(m_scheduler, () -> true);
+    var zeroDuration = trigger.multiPress(1, Seconds.of(0));
+    m_scheduler.run();
+    assertFalse(zeroDuration.getAsBoolean(), "Zero duration multiPress should always be false");
+  }
+
+  @Test
+  void multiPressNegativeDuration() {
+    var trigger = new Trigger(m_scheduler, () -> true);
+    var negativeDuration = trigger.multiPress(1, Seconds.of(-1));
+    m_scheduler.run();
+    assertFalse(
+        negativeDuration.getAsBoolean(), "Negative duration multiPress should always be false");
+  }
+
+  @Test
+  void multiPressZeroPressCount() {
+    var trigger = new Trigger(m_scheduler, () -> true);
+    var zeroPressCount = trigger.multiPress(0, Seconds.of(1));
+    m_scheduler.run();
+    assertTrue(zeroPressCount.getAsBoolean(), "Zero press count multiPress should always be true");
+  }
+
+  @Test
+  void multiPressNegativePressCount() {
+    var trigger = new Trigger(m_scheduler, () -> true);
+    var negativePressCount = trigger.multiPress(-1, Seconds.of(1));
+    m_scheduler.run();
+    assertTrue(
+        negativePressCount.getAsBoolean(), "Negative press count multiPress should always be true");
+  }
+
+  @Test
+  void retryWhileTrueLongRunningCanceled() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    trigger.retryWhileTrue(command);
+
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be running when signal is true");
+
+    signal.set(false);
+    m_scheduler.run();
+    assertFalse(
+        m_scheduler.isRunning(command), "Command should be canceled when signal goes false");
+  }
+
+  @Test
+  void retryWhileTrueLongRunningRestarted() {
+    var signal = new AtomicBoolean(true);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    trigger.retryWhileTrue(command);
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be running initially");
+
+    m_scheduler.cancel(command);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be restarted in next cycle");
+  }
+
+  @Test
+  void retryWhileTrueOneShotRestarted() {
+    var signal = new AtomicBoolean(true);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var counter = new AtomicLong(0);
+    var oneshot = Command.noRequirements(_ -> counter.incrementAndGet()).named("One Shot");
+    trigger.retryWhileTrue(oneshot);
+
+    m_scheduler.run();
+    assertEquals(1, counter.get(), "Command should have run once");
+
+    m_scheduler.run();
+    assertEquals(2, counter.get(), "Command should have run twice");
+  }
+
+  @Test
+  void retryWhileFalseLongRunningCanceled() {
+    var signal = new AtomicBoolean(true);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    trigger.retryWhileFalse(command);
+
+    signal.set(false);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be running when signal is false");
+
+    signal.set(true);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(command), "Command should be canceled when signal goes true");
+  }
+
+  @Test
+  void retryWhileFalseLongRunningRestarted() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    trigger.retryWhileFalse(command);
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be running initially");
+
+    m_scheduler.cancel(command);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should be restarted in next cycle");
+  }
+
+  @Test
+  void retryWhileFalseOneShotRestarted() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var counter = new AtomicLong(0);
+    var oneshot = Command.noRequirements(_ -> counter.incrementAndGet()).named("One Shot");
+    trigger.retryWhileFalse(oneshot);
+
+    m_scheduler.run();
+    assertEquals(1, counter.get(), "Command should have run once");
+
+    m_scheduler.run();
+    assertEquals(2, counter.get(), "Command should have run twice");
   }
 
   private BooleanSupplier flickering(AtomicBoolean signal) {

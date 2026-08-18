@@ -5,11 +5,12 @@
 #include "wpi/glass/Context.hpp"
 
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
@@ -27,6 +28,46 @@
 using namespace wpi::glass;
 
 Context* wpi::glass::gContext;
+
+static constexpr std::string_view TIMESTAMP_DISPLAY_MODE_KEY =
+    "timestampDisplayMode";
+
+static TimestampDisplayMode TimestampDisplayModeFromString(
+    std::string_view mode) {
+  if (mode == TIMESTAMP_DISPLAY_MODE_LOCAL || mode == "actual") {
+    return TimestampDisplayMode::LOCAL;
+  }
+  if (mode == TIMESTAMP_DISPLAY_MODE_SERVER) {
+    return TimestampDisplayMode::SERVER;
+  }
+  return TimestampDisplayMode::SERVER_ZERO_START;
+}
+
+static uint64_t GetTimestampDisplayStartTime(Context* ctx) {
+  if (ctx->timestampDisplayStartTimeOverride) {
+    return ctx->timestampDisplayStartTime;
+  }
+  return wpi::util::GetProgramStartTime();
+}
+
+static int64_t GetTimestampDisplayOffset(Context* ctx) {
+  switch (ctx->timestampDisplayMode) {
+    case TimestampDisplayMode::LOCAL:
+      return 0;
+    case TimestampDisplayMode::SERVER:
+      return ctx->timestampDisplayServerTimeOffset
+                 ? -*ctx->timestampDisplayServerTimeOffset
+                 : 0;
+    case TimestampDisplayMode::SERVER_ZERO_START:
+      if (ctx->timestampDisplayServerStartTime) {
+        return *ctx->timestampDisplayServerStartTime -
+               ctx->timestampDisplayServerTimeOffset.value_or(0);
+      }
+      return static_cast<int64_t>(GetTimestampDisplayStartTime(ctx));
+    default:
+      return 0;
+  }
+}
 
 static void WorkspaceResetImpl() {
   // call reset functions
@@ -167,10 +208,10 @@ static bool LoadStorageImpl(Context* ctx, std::string_view dir,
     std::string filename;
     auto& rootName = root.first;
     if (rootName.empty()) {
-      filename = (fs::path{dir} / fmt::format("{}.json", name)).string();
+      filename = (fs::path{dir} / std::format("{}.json", name)).string();
     } else {
       filename =
-          (fs::path{dir} / fmt::format("{}-{}.json", name, rootName)).string();
+          (fs::path{dir} / std::format("{}-{}.json", name, rootName)).string();
     }
     if (!LoadStorageRootImpl(ctx, filename, rootName)) {
       rv = false;
@@ -249,7 +290,7 @@ bool SaveWindowStorageImpl(const std::string& filename) {
                    ec.message().c_str());
     return false;
   }
-  WindowToJson().marshal(os, true, 2);
+  WindowToJson().marshal(os, true);
   os << '\n';
   return true;
 }
@@ -263,7 +304,7 @@ static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                    ec.message().c_str());
     return false;
   }
-  storage.ToJson().marshal(os, true, 2);
+  storage.ToJson().marshal(os, true);
   os << '\n';
   return true;
 }
@@ -280,27 +321,27 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 
   // handle erasing save files on exit if requested
   if (exiting && wpi::gui::gContext->resetOnExit) {
-    fs::remove(dirPath / fmt::format("{}-window.json", name), ec);
+    fs::remove(dirPath / std::format("{}-window.json", name), ec);
     for (auto&& root : ctx->storageRoots) {
       auto& rootName = root.first;
       if (rootName.empty()) {
-        fs::remove(dirPath / fmt::format("{}.json", name), ec);
+        fs::remove(dirPath / std::format("{}.json", name), ec);
       } else {
-        fs::remove(dirPath / fmt::format("{}-{}.json", name, rootName), ec);
+        fs::remove(dirPath / std::format("{}-{}.json", name, rootName), ec);
       }
     }
   }
 
   bool rv = SaveWindowStorageImpl(
-      (dirPath / fmt::format("{}-window.json", name)).string());
+      (dirPath / std::format("{}-window.json", name)).string());
 
   for (auto&& root : ctx->storageRoots) {
     auto& rootName = root.first;
     std::string filename;
     if (rootName.empty()) {
-      filename = (dirPath / fmt::format("{}.json", name)).string();
+      filename = (dirPath / std::format("{}.json", name)).string();
     } else {
-      filename = (dirPath / fmt::format("{}-{}.json", name, rootName)).string();
+      filename = (dirPath / std::format("{}-{}.json", name, rootName)).string();
     }
     if (!SaveStorageRootImpl(ctx, filename, root.second)) {
       rv = false;
@@ -311,15 +352,22 @@ static bool SaveStorageImpl(Context* ctx, std::string_view dir,
 
 Context::Context()
     : sourceNameStorage{
-          storageRoots.try_emplace("").first->second.GetChild("sourceNames")} {
+          storageRoots.try_emplace("").first->second.GetChild("sourceNames")},
+      timestampDisplayModeStorage{storageRoots[""].GetString(
+          TIMESTAMP_DISPLAY_MODE_KEY,
+          TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START)} {
   storageStack.emplace_back(&storageRoots[""]);
+  workspaceInit.emplace_back([this] {
+    timestampDisplayMode =
+        TimestampDisplayModeFromString(timestampDisplayModeStorage);
+  });
 
   // override ImGui ini saving
   wpi::gui::ConfigureCustomSaveSettings(
       [this] { LoadStorageImpl(this, storageLoadDir, storageName); },
       [this] {
         LoadWindowStorageImpl((fs::path{storageLoadDir} /
-                               fmt::format("{}-window.json", storageName))
+                               std::format("{}-window.json", storageName))
                                   .string());
       },
       [this](bool exiting) {
@@ -357,12 +405,39 @@ void wpi::glass::SetCurrentContext(Context* ctx) {
   gContext = ctx;
 }
 
-void wpi::glass::ResetTime() {
-  gContext->zeroTime = wpi::util::Now();
+uint64_t wpi::glass::GetZeroTime() {
+  return GetTimestampDisplayStartTime(gContext);
 }
 
-uint64_t wpi::glass::GetZeroTime() {
-  return gContext->zeroTime;
+int64_t wpi::glass::GetTimestampDisplayOffset() {
+  return ::GetTimestampDisplayOffset(gContext);
+}
+
+double wpi::glass::TimestampToDisplayTime(uint64_t time) {
+  return (static_cast<double>(time) -
+          static_cast<double>(GetTimestampDisplayOffset())) *
+         1.0e-6;
+}
+
+double wpi::glass::TimestampToDisplayTime(int64_t time) {
+  return (static_cast<double>(time) -
+          static_cast<double>(GetTimestampDisplayOffset())) *
+         1.0e-6;
+}
+
+double wpi::glass::ServerTimestampToDisplayTime(int64_t time) {
+  if (gContext->timestampDisplayMode ==
+      TimestampDisplayMode::SERVER_ZERO_START) {
+    if (gContext->timestampDisplayServerStartTime) {
+      time -= *gContext->timestampDisplayServerStartTime;
+    } else {
+      if (gContext->timestampDisplayServerTimeOffset) {
+        time -= *gContext->timestampDisplayServerTimeOffset;
+      }
+      time -= static_cast<int64_t>(GetTimestampDisplayStartTime(gContext));
+    }
+  }
+  return static_cast<double>(time) * 1.0e-6;
 }
 
 void wpi::glass::WorkspaceReset() {
@@ -406,7 +481,7 @@ bool wpi::glass::LoadStorage(std::string_view dir) {
   SetStorageDir(dir);
   WorkspaceResetImpl();
   LoadWindowStorageImpl((fs::path{gContext->storageLoadDir} /
-                         fmt::format("{}-window.json", gContext->storageName))
+                         std::format("{}-window.json", gContext->storageName))
                             .string());
   return LoadStorageImpl(gContext, dir, gContext->storageName);
 }

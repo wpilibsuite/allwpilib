@@ -7,6 +7,7 @@
 #include "CounterInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
+#include "wpi/hal/Errors.h"
 #include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/LimitedHandleResource.hpp"
 
@@ -35,17 +36,24 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {}
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  if (windowMilliseconds < 5 || windowMilliseconds > 255) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  *status = 0;
+}
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {}
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0;
 }
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0.0;
 }
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status) {}
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
-  return false;
+  return HAL_GetCounterRate(counterHandle, status) == 0.0;
 }
 }  // extern "C"

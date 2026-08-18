@@ -16,9 +16,8 @@ def _convert_validation_error(
     locs = []
     msgs = []
 
-    e: typing.Optional[BaseException] = ve
+    e: BaseException | None = ve
     while e is not None:
-
         if isinstance(e, errors.WrongFieldError):
             locs.append(f".{e.wrong_field}")
         elif isinstance(e, errors.WrongListItemError):
@@ -29,14 +28,13 @@ def _convert_validation_error(
         e = e.__cause__
 
     loc = "".join(locs)
-    if loc.startswith("."):
-        loc = loc[1:]
+    loc = loc.removeprefix(".")
     msg = "\n  ".join(msgs)
     vmsg = f"{fname}: {prefix}{loc}:\n  {msg}"
     return ValidationError(vmsg)
 
 
-def parse_input(value: typing.Any, spec: typing.Type[T], fname, prefix: str) -> T:
+def parse_input(value: typing.Any, spec: type[T], fname, prefix: str) -> T:
     try:
         return validobj.validation.parse_input(value, spec)
     except errors.ValidationError as ve:

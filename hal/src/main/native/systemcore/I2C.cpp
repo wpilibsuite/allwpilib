@@ -11,8 +11,7 @@
 #include <unistd.h>
 
 #include <cstring>
-
-#include <fmt/format.h>
+#include <format>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -60,7 +59,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
     int err = errno;
     *status = MakeError(
         HAL_NO_AVAILABLE_RESOURCES,
-        fmt::format("Failed to open onboard i2c bus: {}", std::strerror(err)));
+        std::format("Failed to open onboard i2c bus: {}", std::strerror(err)));
     wpi::util::print("Failed to open onboard i2c bus: {}\n",
                      std::strerror(err));
     handle = -1;

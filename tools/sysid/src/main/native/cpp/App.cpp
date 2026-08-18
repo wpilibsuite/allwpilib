@@ -88,7 +88,7 @@ void Application(std::string_view saveDir) {
       lvl = "DEBUG: ";
     }
     std::string filename = std::filesystem::path{file}.filename().string();
-    gLog.Append(fmt::format("{}{} ({}:{})\n", lvl, msg, filename, line));
+    gLog.Append(std::format("{}{} ({}:{})\n", lvl, msg, filename, line));
 #ifndef NDEBUG
     wpi::util::print(stderr, "{}{} ({}:{})\n", lvl, msg, filename, line);
 #endif
@@ -193,6 +193,7 @@ void Application(std::string_view saveDir) {
       ImGui::Text("SysId: System Identification for Robot Mechanisms");
       ImGui::Separator();
       ImGui::Text("v%s", GetWPILibVersion());
+      gui::EmitRendererInfo();
       ImGui::Separator();
       ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
       if (ImGui::Button("Close")) {
@@ -203,7 +204,7 @@ void Application(std::string_view saveDir) {
   });
 
   gui::Initialize("System Identification", sysid::kAppWindowSize.x,
-                  sysid::kAppWindowSize.y);
+                  sysid::kAppWindowSize.y, gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   wpi::glass::DestroyContext();

@@ -1,0 +1,419 @@
+[
+  {
+    "ClassName": "Xbox",
+    "HIDType": "XBOX_ONE",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "leftTrigger": 4,
+      "rightTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "b": 1,
+      "x": 2,
+      "y": 3,
+      "view": 4,
+      "xbox": 5,
+      "menu": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "leftBumper": 9,
+      "rightBumper": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "DualSense",
+    "HIDType": "PS5",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "L2": 4,
+      "R2": 5
+    },
+    "buttons": {
+      "cross": 0,
+      "circle": 1,
+      "square": 2,
+      "triangle": 3,
+      "create": 4,
+      "PS": 5,
+      "options": 6,
+      "L3": 7,
+      "R3": 8,
+      "L1": 9,
+      "R1": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "microphone": 15,
+      "touchpad": 20
+    },
+    "touchpads": 1,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": true
+    }
+  },
+  {
+    "ClassName": "DualSenseEdge",
+    "HIDType": "PS5",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "L2": 4,
+      "R2": 5
+    },
+    "buttons": {
+      "cross": 0,
+      "circle": 1,
+      "square": 2,
+      "triangle": 3,
+      "create": 4,
+      "PS": 5,
+      "options": 6,
+      "L3": 7,
+      "R3": 8,
+      "L1": 9,
+      "R1": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "microphone": 15,
+      "rightPaddle1": 16,
+      "leftPaddle1": 17,
+      "touchpad": 20,
+      "leftFunction": 21,
+      "rightFunction": 22
+    },
+    "touchpads": 1,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": true,
+      "monoLed": false,
+      "rgbLed": true
+    }
+  },
+  {
+    "ClassName": "DualShock4",
+    "HIDType": "PS4",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "L2": 4,
+      "R2": 5
+    },
+    "buttons": {
+      "cross": 0,
+      "circle": 1,
+      "square": 2,
+      "triangle": 3,
+      "share": 4,
+      "PS": 5,
+      "options": 6,
+      "L3": 7,
+      "R3": 8,
+      "L1": 9,
+      "R1": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "touchpad": 20
+    },
+    "touchpads": 1,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": true
+    }
+  },
+  {
+    "ClassName": "Switch2Pro",
+    "HIDType": "SWITCH_PRO",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "ZL": 4,
+      "ZR": 5
+    },
+    "buttons": {
+      "b": 0,
+      "a": 1,
+      "y": 2,
+      "x": 3,
+      "minus": 4,
+      "home": 5,
+      "plus": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "L": 9,
+      "R": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "capture": 15,
+      "GR": 16,
+      "GL": 17,
+      "C": 21
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "Switch2GC",
+    "HIDType": "SWITCH_PRO",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "CStickX": 2,
+      "CStickY": 3,
+      "LTrigger": 4,
+      "RTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "x": 1,
+      "b": 2,
+      "y": 3,
+      "home": 5,
+      "start": 6,
+      "ZL": 9,
+      "Z": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "capture": 15,
+      "C": 21,
+      "L": 22,
+      "R": 23
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "GameCube",
+    "HIDType": "GAMECUBE",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "CStickX": 2,
+      "CStickY": 3,
+      "LTrigger": 4,
+      "RTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "x": 1,
+      "b": 2,
+      "y": 3,
+      "start": 6,
+      "Z": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "L": 22,
+      "R": 23
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": false,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "SwitchPro",
+    "HIDType": "SWITCH_PRO",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "ZL": 4,
+      "ZR": 5
+    },
+    "buttons": {
+      "b": 0,
+      "a": 1,
+      "y": 2,
+      "x": 3,
+      "minus": 4,
+      "home": 5,
+      "plus": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "L": 9,
+      "R": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "capture": 15
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": true,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "SwitchN64",
+    "HIDType": "SWITCH_PRO",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "ZAxis": 4,
+      "ZR": 5
+    },
+    "buttons": {
+      "a": 0,
+      "b": 1,
+      "CLeft": 3,
+      "CUp": 4,
+      "capture": 15,
+      "home": 5,
+      "start": 6,
+      "CDown": 2,
+      "L": 9,
+      "R": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "CRight": 21
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": false,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "Steam",
+    "HIDType": "STEAM",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "leftTrigger": 4,
+      "rightTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "b": 1,
+      "x": 2,
+      "y": 3,
+      "menu": 4,
+      "steam": 5,
+      "view": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "leftBumper": 9,
+      "rightBumper": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14,
+      "QAM": 15,
+      "rightPaddle1": 16,
+      "leftPaddle1": 17,
+      "rightPaddle2": 18,
+      "leftPaddle2": 19,
+      "leftTouchpad": 20,
+      "rightTouchpad": 21,
+      "leftStickTouch": 22,
+      "rightStickTouch": 23,
+      "leftGripTouch": 24,
+      "rightGripTouch": 25
+    },
+    "touchpads": 2,
+    "supports": {
+      "rumble": true,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  },
+  {
+    "ClassName": "LogitechF310",
+    "HIDType": "XBOX_360",
+    "axes": {
+      "leftX": 0,
+      "leftY": 1,
+      "rightX": 2,
+      "rightY": 3,
+      "leftTrigger": 4,
+      "rightTrigger": 5
+    },
+    "buttons": {
+      "a": 0,
+      "b": 1,
+      "x": 2,
+      "y": 3,
+      "back": 4,
+      "logitech": 5,
+      "start": 6,
+      "leftStick": 7,
+      "rightStick": 8,
+      "leftBumper": 9,
+      "rightBumper": 10,
+      "dpadUp": 11,
+      "dpadDown": 12,
+      "dpadLeft": 13,
+      "dpadRight": 14
+    },
+    "touchpads": 0,
+    "supports": {
+      "rumble": false,
+      "triggerRumble": false,
+      "monoLed": false,
+      "rgbLed": false
+    }
+  }
+]

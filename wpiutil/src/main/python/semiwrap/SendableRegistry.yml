@@ -49,6 +49,7 @@ classes:
         ignore: true
       GetUniqueId:
       GetSendable:
+      IsPublished:
       Publish:
       Update:
       EnsureInitialized:

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <format>
 #include <stdexcept>
 #include <string>
 
@@ -17,6 +18,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -90,26 +92,26 @@ class KalmanFilter {
     } else if (P.error() == DAREError::QNotSymmetric ||
                P.error() == DAREError::QNotPositiveSemidefinite) {
       std::string msg =
-          fmt::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
+          std::format("{}\n\nQ =\n{}\n", to_string(P.error()), discQ);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::RNotSymmetric ||
                P.error() == DAREError::RNotPositiveDefinite) {
       std::string msg =
-          fmt::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
+          std::format("{}\n\nR =\n{}\n", to_string(P.error()), discR);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::ABNotStabilizable) {
-      std::string msg = fmt::format(
+      std::string msg = std::format(
           "The (A, C) pair is not detectable.\n\nA =\n{}\nC =\n{}\n",
           to_string(P.error()), discA, C);
 
       wpi::math::MathSharedStore::ReportError(msg);
       throw std::invalid_argument(msg);
     } else if (P.error() == DAREError::ACNotDetectable) {
-      std::string msg = fmt::format("{}\n\nA =\n{}\nQ =\n{}\n",
+      std::string msg = std::format("{}\n\nA =\n{}\nQ =\n{}\n",
                                     to_string(P.error()), discA, discQ);
 
       wpi::math::MathSharedStore::ReportError(msg);
@@ -221,30 +223,21 @@ class KalmanFilter {
 
     const Matrixd<Outputs, Outputs> discR = DiscretizeR<Outputs>(R, m_dt);
 
+    // Sₖ₊₁ = CPₖ₊₁⁻Cᵀ + Rₖ₊₁
     Matrixd<Outputs, Outputs> S = C * m_P * C.transpose() + discR;
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
+    // Kₖ₊₁ = Pₖ₊₁⁻CᵀSₖ₊₁⁻¹
+    // K = PCᵀ / S
+    // K = (Sᵀ \ CPᵀ)ᵀ
+    // K = (S \ CP)ᵀ because S and P are symmetric
     //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    //
-    // Drop the transposes on symmetric matrices S and P.
-    //
-    // K = (S.solve(CP))ᵀ
+    // [1] wpimath/docs/LinalgIdentities.md
     Matrixd<States, Outputs> K = S.ldlt().solve(C * m_P).transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat += K * (y - (C * m_xHat + D * u));
 
-    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Pₖ₊₁⁺ = (I − Kₖ₊₁C)Pₖ₊₁⁻(I − Kₖ₊₁C)ᵀ + Kₖ₊₁Rₖ₊₁Kₖ₊₁ᵀ
     // Use Joseph form for numerical stability
     m_P = (StateMatrix::Identity() - K * C) * m_P *
               (StateMatrix::Identity() - K * C).transpose() +

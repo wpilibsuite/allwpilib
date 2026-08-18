@@ -4,7 +4,7 @@
 
 #include "wpi/hal/AddressableLED.h"
 
-#include <fmt/format.h>
+#include <format>
 
 #include "DigitalInternal.hpp"
 #include "HALInitializer.hpp"
@@ -28,7 +28,7 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
   if (channel < 0 || channel >= kNumAddressableLEDs) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for AddressableLED", 0,
-                                       kNumAddressableLEDs, channel);
+                                       kNumAddressableLEDs - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -73,7 +73,7 @@ void HAL_SetAddressableLEDStart(HAL_AddressableLEDHandle handle, int32_t start,
   if (start > HAL_ADDRESSABLE_LED_MAX_LEN || start < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format(
+        std::format(
             "LED start must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, start));
     return;
@@ -92,7 +92,7 @@ void HAL_SetAddressableLEDLength(HAL_AddressableLEDHandle handle,
   if (length > HAL_ADDRESSABLE_LED_MAX_LEN || length < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format(
+        std::format(
             "LED length must be less than or equal to {}. {} was requested",
             HAL_ADDRESSABLE_LED_MAX_LEN, length));
     return;

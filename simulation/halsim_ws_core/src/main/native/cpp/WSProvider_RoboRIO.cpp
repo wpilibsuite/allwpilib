@@ -4,7 +4,6 @@
 
 #include "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp"
 
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/RoboRioData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \

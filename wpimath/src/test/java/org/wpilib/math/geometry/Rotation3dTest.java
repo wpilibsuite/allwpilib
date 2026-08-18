@@ -298,6 +298,27 @@ class Rotation3dTest {
   }
 
   @Test
+  void testIntegrate() {
+    var rot = new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0));
+
+    var integrated1 = rot.integrate(0.0, 0.0, Units.degreesToRadians(20.0), 1.0);
+    var expected1 = new Rotation3d(0.0, 0.0, Units.degreesToRadians(110.0));
+    assertEquals(expected1, integrated1);
+
+    var integrated2 = rot.integrate(0.0, Units.degreesToRadians(20.0), 0.0, 1.0);
+    var expected2 = new Rotation3d(0.0, Units.degreesToRadians(20.0), Units.degreesToRadians(90.0));
+    assertEquals(expected2, integrated2);
+
+    var integrated3 =
+        rot.integrate(0.0, Units.degreesToRadians(20.0), Units.degreesToRadians(20.0), 1.0);
+    var expected3 =
+        new Rotation3d(
+            new Quaternion(
+                0.5635121137168105, -0.12216409746525868, 0.1221640974652587, 0.8078403086473278));
+    assertEquals(expected3, integrated3);
+  }
+
+  @Test
   void testEquality() {
     final var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 

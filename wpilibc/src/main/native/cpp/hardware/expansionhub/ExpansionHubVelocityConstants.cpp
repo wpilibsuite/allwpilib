@@ -4,7 +4,8 @@
 
 #include "wpi/hardware/expansionhub/ExpansionHubVelocityConstants.hpp"
 
-#include "fmt/core.h"
+#include <format>
+
 #include "wpi/system/SystemServer.hpp"
 
 using namespace wpi;
@@ -20,37 +21,37 @@ ExpansionHubVelocityConstants::ExpansionHubVelocityConstants(int hubNumber,
 
   m_pPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kp",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/kp",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_iPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ki",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/ki",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_dPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kd",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/kd",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_sPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ks",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/ks",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_vPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/kv",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/kv",
                                       hubNumber, motorNumber))
           .Publish(options);
 
   m_aPublisher =
       systemServer
-          .GetDoubleTopic(fmt::format("/rhsp/{}/motor{}/constants/velocity/ka",
+          .GetDoubleTopic(std::format("/rhsp/{}/motor{}/constants/velocity/ka",
                                       hubNumber, motorNumber))
           .Publish(options);
 }

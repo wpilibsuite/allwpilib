@@ -4,8 +4,6 @@
 
 #include "wpi/hal/PowerDistribution.h"
 
-#include <fmt/format.h>
-
 #include "CANAPIInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"

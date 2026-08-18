@@ -5,14 +5,19 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <random>
+#include <span>
 #include <utility>
 #include <vector>
+
+#include <Eigen/Core>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/optimization/SimulatedAnnealing.hpp"
+#include "wpi/units/math.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {

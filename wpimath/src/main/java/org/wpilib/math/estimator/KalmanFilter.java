@@ -219,30 +219,21 @@ public class KalmanFilter<States extends Num, Inputs extends Num, Outputs extend
 
     final var discR = Discretization.discretizeR(R, m_dt);
 
+    // Sₖ₊₁ = CPₖ₊₁⁻Cᵀ + Rₖ₊₁
     final var S = C.times(m_P).times(C.transpose()).plus(discR);
 
-    // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
-    // efficiently.
+    // Kₖ₊₁ = Pₖ₊₁⁻CᵀSₖ₊₁⁻¹
+    // K = PCᵀ / S
+    // K = (Sᵀ \ CPᵀ)ᵀ
+    // K = (S \ CP)ᵀ because S and P are symmetric
     //
-    // K = PCᵀS⁻¹
-    // KS = PCᵀ
-    // (KS)ᵀ = (PCᵀ)ᵀ
-    // SᵀKᵀ = CPᵀ
-    //
-    // The solution of Ax = b can be found via x = A.solve(b).
-    //
-    // Kᵀ = Sᵀ.solve(CPᵀ)
-    // K = (Sᵀ.solve(CPᵀ))ᵀ
-    //
-    // Drop the transposes on symmetric matrices S and P.
-    //
-    // K = (S.solve(CP))ᵀ
+    // [1] wpimath/docs/LinalgIdentities.md
     final Matrix<States, Outputs> K = S.solve(C.times(m_P)).transpose();
 
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + Kₖ₊₁(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
     m_xHat = m_xHat.plus(K.times(y.minus(C.times(m_xHat).plus(D.times(u)))));
 
-    // Pₖ₊₁⁺ = (I−Kₖ₊₁C)Pₖ₊₁⁻(I−Kₖ₊₁C)ᵀ + Kₖ₊₁RKₖ₊₁ᵀ
+    // Pₖ₊₁⁺ = (I − Kₖ₊₁C)Pₖ₊₁⁻(I − Kₖ₊₁C)ᵀ + Kₖ₊₁Rₖ₊₁Kₖ₊₁ᵀ
     // Use Joseph form for numerical stability
     m_P =
         Matrix.eye(m_states)

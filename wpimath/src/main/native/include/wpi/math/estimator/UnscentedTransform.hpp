@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <cmath>
 #include <functional>
 #include <tuple>
 
+#include <Eigen/Cholesky>
+#include <Eigen/Core>
 #include <Eigen/QR>
 
 #include "wpi/math/linalg/EigenCore.hpp"

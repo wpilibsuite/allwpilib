@@ -117,6 +117,7 @@ class MecanumDrive : public RobotDriveBase,
    *     Counterclockwise is positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement
    *     field-oriented controls.
+   * @Common This is one of the commonly used methods for this class
    */
   void DriveCartesian(double xVelocity, double yVelocity, double zRotation,
                       wpi::math::Rotation2d gyroAngle = 0_rad);
@@ -132,6 +133,7 @@ class MecanumDrive : public RobotDriveBase,
    * @param angle The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *     Counterclockwise is positive.
+   * @Common This is one of the commonly used methods for this class
    */
   void DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                   double zRotation);
@@ -156,6 +158,9 @@ class MecanumDrive : public RobotDriveBase,
       double xVelocity, double yVelocity, double zRotation,
       wpi::math::Rotation2d gyroAngle = 0_rad);
 
+  /**
+   * @Common This is one of the commonly used methods for this class
+   */
   void StopMotor() override;
   std::string GetDescription() const override;
 

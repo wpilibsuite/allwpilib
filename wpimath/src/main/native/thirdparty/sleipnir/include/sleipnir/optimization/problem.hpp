@@ -15,7 +15,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <fmt/chrono.h>
 #include <gch/small_vector.hpp>
 
 #include "sleipnir/autodiff/expression_type.hpp"
@@ -31,13 +30,13 @@
 #include "sleipnir/optimization/solver/options.hpp"
 #include "sleipnir/optimization/solver/sqp.hpp"
 #include "sleipnir/optimization/solver/util/bounds.hpp"
+#include "sleipnir/optimization/solver/util/problem_scaling.hpp"
 #include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/print.hpp"
 #include "sleipnir/util/print_diagnostics.hpp"
 #include "sleipnir/util/profiler.hpp"
 #include "sleipnir/util/spy.hpp"
 #include "sleipnir/util/symbol_exports.hpp"
-#include "sleipnir/util/to_underlying.hpp"
 
 namespace slp {
 
@@ -97,7 +96,7 @@ class Problem {
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
         m_decision_variables.emplace_back();
-        vars(row, col) = m_decision_variables.back();
+        vars[row, col] = m_decision_variables.back();
       }
     }
 
@@ -113,7 +112,7 @@ class Problem {
   /// Decision variables have an initial value of zero.
   ///
   /// @param rows Number of matrix rows.
-  /// @return A symmetric matrix of decision varaibles in the optimization
+  /// @return A symmetric matrix of decision variables in the optimization
   ///     problem.
   [[nodiscard]]
   VariableMatrix<Scalar> symmetric_decision_variable(int rows) {
@@ -132,8 +131,8 @@ class Problem {
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col <= row; ++col) {
         m_decision_variables.emplace_back();
-        vars(row, col) = m_decision_variables.back();
-        vars(col, row) = m_decision_variables.back();
+        vars[row, col] = m_decision_variables.back();
+        vars[col, row] = m_decision_variables.back();
       }
     }
 
@@ -377,20 +376,26 @@ class Problem {
       }
 #endif
 
+      // Automatically scale the cost. The problem scaling procedure is
+      // described in more detail in docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value()};
+
       NewtonMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return H.value();
-          }};
+            return scaling.f * H.value();
+          },
+          scaling};
 
       // Invoke Newton solver
       status =
@@ -465,35 +470,42 @@ class Problem {
       }
 #endif
 
+      // Automatically scale the cost and constraints. The problem scaling
+      // procedure is described in more detail in
+      // docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value(), A_e.value()};
+
       SQPMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           num_equality_constraints,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            return H_f.value() + H_c.value();
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            return scaling.f * H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
             return H_c.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_e_ad.value();
+            return scaling.c_e.cwiseProduct(c_e_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_e.value();
-          }};
+            return scaling.c_e.asDiagonal() * A_e.value();
+          },
+          scaling};
 
       // Invoke SQP solver
       status = sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
@@ -597,48 +609,55 @@ class Problem {
       project_onto_bounds(x, bounds);
 #endif
 
+      // Automatically scale the cost and constraints. The problem scaling
+      // procedure is described in more detail in
+      // docs/algorithms.md#problem-scaling.
+      x_ad.set_value(x);
+      const ProblemScaling<Scalar> scaling{g.value(), A_e.value(), A_i.value()};
+
       InteriorPointMatrixCallbacks<Scalar> matrix_callbacks{
           num_decision_variables,
           num_equality_constraints,
           num_inequality_constraints,
           [&](const DenseVector& x) -> Scalar {
             x_ad.set_value(x);
-            return f.value();
+            return scaling.f * f.value();
           },
           [&](const DenseVector& x) -> SparseVector {
             x_ad.set_value(x);
-            return g.value();
+            return scaling.f * g.value();
           },
           [&](const DenseVector& x, const DenseVector& y,
               const DenseVector& z) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            z_ad.set_value(z);
-            return H_f.value() + H_c.value();
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            z_ad.set_value(scaling.c_i.cwiseProduct(z));
+            return scaling.f * H_f.value() + H_c.value();
           },
           [&](const DenseVector& x, const DenseVector& y,
               const DenseVector& z) -> SparseMatrix {
             x_ad.set_value(x);
-            y_ad.set_value(y);
-            z_ad.set_value(z);
+            y_ad.set_value(scaling.c_e.cwiseProduct(y));
+            z_ad.set_value(scaling.c_i.cwiseProduct(z));
             return H_c.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_e_ad.value();
+            return scaling.c_e.cwiseProduct(c_e_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_e.value();
+            return scaling.c_e.asDiagonal() * A_e.value();
           },
           [&](const DenseVector& x) -> DenseVector {
             x_ad.set_value(x);
-            return c_i_ad.value();
+            return scaling.c_i.cwiseProduct(c_i_ad.value());
           },
           [&](const DenseVector& x) -> SparseMatrix {
             x_ad.set_value(x);
-            return A_i.value();
-          }};
+            return scaling.c_i.asDiagonal() * A_i.value();
+          },
+          scaling};
 
       // Invoke interior-point method solver
       status =
@@ -753,11 +772,11 @@ class Problem {
     // Print problem structure
     slp::println("\nProblem structure:");
     slp::println("  ↳ {} cost function",
-                 types[slp::to_underlying(cost_function_type())]);
+                 types[std::to_underlying(cost_function_type())]);
     slp::println("  ↳ {} equality constraints",
-                 types[slp::to_underlying(equality_constraint_type())]);
+                 types[std::to_underlying(equality_constraint_type())]);
     slp::println("  ↳ {} inequality constraints",
-                 types[slp::to_underlying(inequality_constraint_type())]);
+                 types[std::to_underlying(inequality_constraint_type())]);
 
     if (m_decision_variables.size() == 1) {
       slp::print("\n1 decision variable\n");
@@ -769,13 +788,11 @@ class Problem {
         [](const gch::small_vector<Variable<Scalar>>& constraints) {
           std::array<size_t, 5> counts{};
           for (const auto& constraint : constraints) {
-            ++counts[slp::to_underlying(constraint.type())];
+            ++counts[std::to_underlying(constraint.type())];
           }
-          for (size_t i = 0; i < counts.size(); ++i) {
-            constexpr std::array names{"empty", "constant", "linear",
-                                       "quadratic", "nonlinear"};
-            const auto& count = counts[i];
-            const auto& name = names[i];
+          for (const auto& [count, name] :
+               std::views::zip(counts, std::array{"empty", "constant", "linear",
+                                                  "quadratic", "nonlinear"})) {
             if (count > 0) {
               slp::println("  ↳ {} {}", count, name);
             }

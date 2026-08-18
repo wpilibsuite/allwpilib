@@ -17,7 +17,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    */
   @SuppressWarnings("this-escape")
   public NiDsXboxControllerSim(NiDsXboxController joystick) {
-    super(joystick);
+    super(joystick.getHID());
     setAxesMaximumIndex(6);
     setButtonsMaximumIndex(10);
     setPOVsMaximumIndex(1);

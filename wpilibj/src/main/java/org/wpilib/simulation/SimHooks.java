@@ -20,9 +20,18 @@ public final class SimHooks {
     SimulatorJNI.setRuntimeType(type);
   }
 
-  /** Waits until the user program has started. */
+  /** Waits until the user program has started and the first notifier alarm has been armed. */
   public static void waitForProgramStart() {
-    SimulatorJNI.waitForProgramStart();
+    waitForProgramStart(true);
+  }
+
+  /**
+   * Waits until the user program has started.
+   *
+   * @param waitForFirstNotifier wait for the first notifier alarm to be armed
+   */
+  public static void waitForProgramStart(boolean waitForFirstNotifier) {
+    SimulatorJNI.waitForProgramStart(waitForFirstNotifier);
   }
 
   /**

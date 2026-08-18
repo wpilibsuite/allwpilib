@@ -3,7 +3,9 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <concepts>
+#include <cstddef>
 #include <initializer_list>
 #include <iterator>
 #include <span>
@@ -11,9 +13,11 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <Eigen/LU>
 #include <Eigen/QR>
 #include <gch/small_vector.hpp>
 
+#include "sleipnir/autodiff/expression_graph.hpp"
 #include "sleipnir/autodiff/sleipnir_base.hpp"
 #include "sleipnir/autodiff/slice.hpp"
 #include "sleipnir/autodiff/variable.hpp"
@@ -204,7 +208,7 @@ class VariableMatrix : public SleipnirBase {
     m_storage.reserve(rows() * cols());
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        m_storage.emplace_back(values(row, col));
+        m_storage.emplace_back(values[row, col]);
       }
     }
   }
@@ -218,7 +222,7 @@ class VariableMatrix : public SleipnirBase {
     m_storage.reserve(rows() * cols());
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        m_storage.emplace_back(values(row, col));
+        m_storage.emplace_back(values[row, col]);
       }
     }
   }
@@ -262,7 +266,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < values.rows(); ++row) {
       for (int col = 0; col < values.cols(); ++col) {
-        (*this)(row, col) = values(row, col);
+        (*this)[row, col] = values(row, col);
       }
     }
 
@@ -278,7 +282,7 @@ class VariableMatrix : public SleipnirBase {
   VariableMatrix& operator=(ScalarLike auto value) {
     slp_assert(rows() == 1 && cols() == 1);
 
-    (*this)(0, 0) = value;
+    (*this)[0, 0] = value;
 
     return *this;
   }
@@ -293,7 +297,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < values.rows(); ++row) {
       for (int col = 0; col < values.cols(); ++col) {
-        (*this)(row, col).set_value(values(row, col));
+        (*this)[row, col].set_value(values(row, col));
       }
     }
   }
@@ -303,7 +307,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param row The row.
   /// @param col The column.
   /// @return The element at the given row and column.
-  Variable<Scalar>& operator()(int row, int col) {
+  Variable<Scalar>& operator[](int row, int col) {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
@@ -314,7 +318,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param row The row.
   /// @param col The column.
   /// @return The element at the given row and column.
-  const Variable<Scalar>& operator()(int row, int col) const {
+  const Variable<Scalar>& operator[](int row, int col) const {
     slp_assert(row >= 0 && row < rows());
     slp_assert(col >= 0 && col < cols());
     return m_storage[row * cols() + col];
@@ -377,7 +381,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param row_slice The row slice.
   /// @param col_slice The column slice.
   /// @return A slice of the variable matrix.
-  VariableBlock<VariableMatrix> operator()(Slice row_slice, Slice col_slice) {
+  VariableBlock<VariableMatrix> operator[](Slice row_slice, Slice col_slice) {
     int row_slice_length = row_slice.adjust(rows());
     int col_slice_length = col_slice.adjust(cols());
     return VariableBlock{*this, std::move(row_slice), row_slice_length,
@@ -389,7 +393,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param row_slice The row slice.
   /// @param col_slice The column slice.
   /// @return A slice of the variable matrix.
-  const VariableBlock<const VariableMatrix> operator()(Slice row_slice,
+  const VariableBlock<const VariableMatrix> operator[](Slice row_slice,
                                                        Slice col_slice) const {
     int row_slice_length = row_slice.adjust(rows());
     int col_slice_length = col_slice.adjust(cols());
@@ -407,7 +411,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param col_slice The column slice.
   /// @param col_slice_length The column slice length.
   /// @return A slice of the variable matrix.
-  VariableBlock<VariableMatrix> operator()(Slice row_slice,
+  VariableBlock<VariableMatrix> operator[](Slice row_slice,
                                            int row_slice_length,
                                            Slice col_slice,
                                            int col_slice_length) {
@@ -425,7 +429,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param col_slice The column slice.
   /// @param col_slice_length The column slice length.
   /// @return A slice of the variable matrix.
-  const VariableBlock<const VariableMatrix> operator()(
+  const VariableBlock<const VariableMatrix> operator[](
       Slice row_slice, int row_slice_length, Slice col_slice,
       int col_slice_length) const {
     return VariableBlock{*this, std::move(row_slice), row_slice_length,
@@ -503,17 +507,13 @@ class VariableMatrix : public SleipnirBase {
 
     VariableMatrix<Scalar> result(detail::empty, lhs.rows(), rhs.cols());
 
-#if __GNUC__ >= 12
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     for (int i = 0; i < lhs.rows(); ++i) {
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < lhs.cols(); ++k) {
-          sum += lhs(i, k) * rhs(k, j);
+          sum += lhs(i, k) * rhs[k, j];
         }
-        result(i, j) = sum;
+        result[i, j] = sum;
       }
     }
 
@@ -534,9 +534,9 @@ class VariableMatrix : public SleipnirBase {
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < lhs.cols(); ++k) {
-          sum += lhs(i, k) * rhs(k, j);
+          sum += lhs[i, k] * rhs(k, j);
         }
-        result(i, j) = sum;
+        result[i, j] = sum;
       }
     }
 
@@ -557,14 +557,11 @@ class VariableMatrix : public SleipnirBase {
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < lhs.cols(); ++k) {
-          sum += lhs(i, k) * rhs(k, j);
+          sum += lhs[i, k] * rhs[k, j];
         }
-        result(i, j) = sum;
+        result[i, j] = sum;
       }
     }
-#if __GNUC__ >= 12
-#pragma GCC diagnostic pop
-#endif
 
     return result;
   }
@@ -580,7 +577,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) * rhs;
+        result[row, col] = lhs(row, col) * rhs;
       }
     }
 
@@ -597,7 +594,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) * rhs;
+        result[row, col] = lhs[row, col] * rhs;
       }
     }
 
@@ -615,7 +612,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = rhs(row, col) * lhs;
+        result[row, col] = rhs(row, col) * lhs;
       }
     }
 
@@ -632,7 +629,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = rhs(row, col) * lhs;
+        result[row, col] = rhs[row, col] * lhs;
       }
     }
 
@@ -647,12 +644,17 @@ class VariableMatrix : public SleipnirBase {
     slp_assert(cols() == rhs.rows() && cols() == rhs.cols());
 
     for (int i = 0; i < rows(); ++i) {
+      VariableMatrix lhs_old_row = row(i);
       for (int j = 0; j < rhs.cols(); ++j) {
         Variable sum{Scalar(0)};
         for (int k = 0; k < cols(); ++k) {
-          sum += (*this)(i, k) * rhs(k, j);
+          if constexpr (EigenMatrixLike<decltype(rhs)>) {
+            sum += lhs_old_row[k] * rhs(k, j);
+          } else {
+            sum += lhs_old_row[k] * rhs[k, j];
+          }
         }
-        (*this)(i, j) = sum;
+        (*this)[i, j] = sum;
       }
     }
 
@@ -665,8 +667,8 @@ class VariableMatrix : public SleipnirBase {
   /// @return Result of multiplication.
   VariableMatrix& operator*=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
-      for (int col = 0; col < rhs.cols(); ++col) {
-        (*this)(row, col) *= rhs;
+      for (int col = 0; col < cols(); ++col) {
+        (*this)[row, col] *= rhs;
       }
     }
 
@@ -685,7 +687,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) / rhs;
+        result[row, col] = lhs(row, col) / rhs;
       }
     }
 
@@ -704,7 +706,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) / rhs;
+        result[row, col] = lhs[row, col] / rhs;
       }
     }
 
@@ -723,7 +725,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) / rhs;
+        result[row, col] = lhs[row, col] / rhs;
       }
     }
 
@@ -737,7 +739,7 @@ class VariableMatrix : public SleipnirBase {
   VariableMatrix& operator/=(const ScalarLike auto& rhs) {
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        (*this)(row, col) /= rhs;
+        (*this)[row, col] /= rhs;
       }
     }
 
@@ -757,7 +759,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) + rhs(row, col);
+        result[row, col] = lhs(row, col) + rhs[row, col];
       }
     }
 
@@ -777,7 +779,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) + rhs(row, col);
+        result[row, col] = lhs[row, col] + rhs(row, col);
       }
     }
 
@@ -797,7 +799,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) + rhs(row, col);
+        result[row, col] = lhs[row, col] + rhs[row, col];
       }
     }
 
@@ -813,7 +815,11 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        (*this)(row, col) += rhs(row, col);
+        if constexpr (EigenMatrixLike<decltype(rhs)>) {
+          (*this)[row, col] += rhs(row, col);
+        } else {
+          (*this)[row, col] += rhs[row, col];
+        }
       }
     }
 
@@ -829,7 +835,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        (*this)(row, col) += rhs;
+        (*this)[row, col] += rhs;
       }
     }
 
@@ -849,7 +855,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) - rhs(row, col);
+        result[row, col] = lhs(row, col) - rhs[row, col];
       }
     }
 
@@ -869,7 +875,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) - rhs(row, col);
+        result[row, col] = lhs[row, col] - rhs(row, col);
       }
     }
 
@@ -889,7 +895,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = lhs(row, col) - rhs(row, col);
+        result[row, col] = lhs[row, col] - rhs[row, col];
       }
     }
 
@@ -905,7 +911,11 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        (*this)(row, col) -= rhs(row, col);
+        if constexpr (EigenMatrixLike<decltype(rhs)>) {
+          (*this)[row, col] -= rhs(row, col);
+        } else {
+          (*this)[row, col] -= rhs[row, col];
+        }
       }
     }
 
@@ -921,7 +931,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        (*this)(row, col) -= rhs;
+        (*this)[row, col] -= rhs;
       }
     }
 
@@ -937,7 +947,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < result.rows(); ++row) {
       for (int col = 0; col < result.cols(); ++col) {
-        result(row, col) = -lhs(row, col);
+        result[row, col] = -lhs[row, col];
       }
     }
 
@@ -948,7 +958,7 @@ class VariableMatrix : public SleipnirBase {
   // NOLINTNEXTLINE (google-explicit-constructor)
   operator Variable<Scalar>() const {
     slp_assert(rows() == 1 && cols() == 1);
-    return (*this)(0, 0);
+    return (*this)[0, 0];
   }
 
   /// Returns the transpose of the variable matrix.
@@ -959,7 +969,7 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        result(col, row) = (*this)(row, col);
+        result[col, row] = (*this)[row, col];
       }
     }
 
@@ -981,7 +991,7 @@ class VariableMatrix : public SleipnirBase {
   /// @param row The row of the element to return.
   /// @param col The column of the element to return.
   /// @return An element of the variable matrix.
-  Scalar value(int row, int col) { return (*this)(row, col).value(); }
+  Scalar value(int row, int col) { return (*this)[row, col].value(); }
 
   /// Returns an element of the variable matrix.
   ///
@@ -1005,6 +1015,23 @@ class VariableMatrix : public SleipnirBase {
     return result;
   }
 
+  /// Converts the VariableMatrix to an Eigen matrix.
+  ///
+  /// @return Eigen matrix.
+  Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic> to_eigen()
+      const {
+    Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic> result{
+        rows(), cols()};
+
+    for (int row = 0; row < rows(); ++row) {
+      for (int col = 0; col < cols(); ++col) {
+        result(row, col) = (*this)[row, col];
+      }
+    }
+
+    return result;
+  }
+
   /// Transforms the matrix coefficient-wise with an unary operator.
   ///
   /// @param unary_op The unary operator to use for the transform operation.
@@ -1016,11 +1043,98 @@ class VariableMatrix : public SleipnirBase {
 
     for (int row = 0; row < rows(); ++row) {
       for (int col = 0; col < cols(); ++col) {
-        result(row, col) = unary_op((*this)(row, col));
+        result[row, col] = unary_op((*this)[row, col]);
       }
     }
 
     return result;
+  }
+
+  /// Returns the matrix exponential.
+  ///
+  /// @return The matrix exponential.
+  VariableMatrix<Scalar> exp() const {
+    slp_assert(rows() == cols());
+
+    // Coefficients for (13, 13) Padé approximant of exp(A) are from the
+    // following program:
+    //
+    // #!/usr/bin/env python
+    //
+    // import mpmath as mp
+    //
+    // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+    // mp.mp.prec = 113  # quad precision
+    //
+    // L = 13
+    // M = 13
+    // p, q = mp.pade(mp.taylor(mp.exp, 0, L + M), L, M)
+    //
+    // print("constexpr std::array p{")
+    // for k, p_k in enumerate(p):
+    //     print(f"Scalar({p_k}L){',' if k < len(p) - 1 else '};'}")
+    // print("constexpr std::array q{")
+    // for k, q_k in enumerate(q):
+    //     print(f"Scalar({q_k}L){',' if k < len(q) - 1 else '};'}")
+    constexpr size_t NUM_COEFFS = 14;
+    constexpr std::array p{Scalar(1.0L),
+                           Scalar(0.499999999999999999999987615564159L),
+                           Scalar(0.119999999999999999999993719796468L),
+                           Scalar(0.0183333333333333333333318078905823L),
+                           Scalar(0.00199275362318840579710121408775205L),
+                           Scalar(0.00016304347826086956521736560868541L),
+                           Scalar(1.03519668737060041407846479512981e-05L),
+                           Scalar(5.17598343685300207039205144279119e-07L),
+                           Scalar(2.04315135665250081725989398668247e-08L),
+                           Scalar(6.30602270571759511499920806570486e-10L),
+                           Scalar(1.48377004840414002705850442238441e-11L),
+                           Scalar(2.52915349159796595521307855480881e-13L),
+                           Scalar(2.81017054621996217245857568431558e-15L),
+                           Scalar(1.54404975067030888596595580141692e-17L)};
+    constexpr std::array q{Scalar(1.0L),
+                           Scalar(-0.500000000000000000000012384435841L),
+                           Scalar(0.120000000000000000000006104232309L),
+                           Scalar(-0.0183333333333333333333347707904729L),
+                           Scalar(0.00199275362318840579710166350137732L),
+                           Scalar(-0.000163043478260869565217413851346892L),
+                           Scalar(1.03519668737060041407885187519331e-05L),
+                           Scalar(-5.17598343685300207039443859549262e-07L),
+                           Scalar(2.04315135665250081726103781506842e-08L),
+                           Scalar(-6.30602270571759511500345035969254e-10L),
+                           Scalar(1.48377004840414002705969744674248e-11L),
+                           Scalar(-2.52915349159796595521550648156349e-13L),
+                           Scalar(2.81017054621996217246180850207342e-15L),
+                           Scalar(-1.54404975067030888596810607146175e-17L)};
+    static_assert(p.size() == NUM_COEFFS);
+    static_assert(q.size() == NUM_COEFFS);
+
+    //     13
+    // P = Σ pₖAᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖAᵏ
+    //    k=0
+    VariableMatrix<Scalar> P{
+        Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(rows(), p[0])
+            .asDiagonal()};
+    VariableMatrix<Scalar> Q{
+        Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(rows(), q[0])
+            .asDiagonal()};
+    auto A_pow = *this;
+    for (size_t k = 1; k < NUM_COEFFS; ++k) {
+      P += p[k] * A_pow;
+      Q += q[k] * A_pow;
+      A_pow *= *this;
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as exp(A)Q ≈ P, so:
+    //
+    //   exp(A) ≈ P / Q
+    //   exp(A) ≈ (Qᵀ \ Pᵀ)ᵀ
+    return VariableMatrix<Scalar>{
+        Q.T().to_eigen().lu().solve(P.T().to_eigen()).transpose()};
   }
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -1141,12 +1255,12 @@ class VariableMatrix : public SleipnirBase {
   /// Returns const begin iterator.
   ///
   /// @return Const begin iterator.
-  const_iterator cbegin() const { return const_iterator{m_storage.begin()}; }
+  const_iterator cbegin() const { return const_iterator{m_storage.cbegin()}; }
 
   /// Returns const end iterator.
   ///
   /// @return Const end iterator.
-  const_iterator cend() const { return const_iterator{m_storage.end()}; }
+  const_iterator cend() const { return const_iterator{m_storage.cend()}; }
 
   /// Returns reverse begin iterator.
   ///
@@ -1191,11 +1305,27 @@ class VariableMatrix : public SleipnirBase {
   /// @return Number of elements in matrix.
   size_t size() const { return m_storage.size(); }
 
-  /// Returns a variable matrix filled with zeroes.
+  /// Returns an identity variable matrix.
+  ///
+  /// @param rows The number of matrix rows.
+  /// @return An identity variable matrix.
+  static VariableMatrix<Scalar> identity(int rows) {
+    VariableMatrix<Scalar> result{detail::empty, rows, rows};
+
+    for (int row = 0; row < rows; ++row) {
+      for (int col = 0; col < rows; ++col) {
+        result[row, col] = row == col ? Scalar(1) : Scalar(0);
+      }
+    }
+
+    return result;
+  }
+
+  /// Returns a variable matrix filled with zeros.
   ///
   /// @param rows The number of matrix rows.
   /// @param cols The number of matrix columns.
-  /// @return A variable matrix filled with zeroes.
+  /// @return A variable matrix filled with zeros.
   static VariableMatrix<Scalar> zero(int rows, int cols) {
     VariableMatrix<Scalar> result{detail::empty, rows, cols};
 
@@ -1269,7 +1399,7 @@ VariableMatrix<Scalar> cwise_reduce(
 
   for (int row = 0; row < lhs.rows(); ++row) {
     for (int col = 0; col < lhs.cols(); ++col) {
-      result(row, col) = binary_op(lhs(row, col), rhs(row, col));
+      result[row, col] = binary_op(lhs[row, col], rhs[row, col]);
     }
   }
 
@@ -1402,17 +1532,17 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
 
   if (A.rows() == 1 && A.cols() == 1) {
     // Compute optimal inverse instead of using Eigen's general solver
-    return B(0, 0) / A(0, 0);
+    return B[0, 0] / A[0, 0];
   } else if (A.rows() == 2 && A.cols() == 2) {
     // Compute optimal inverse instead of using Eigen's general solver
     //
     // [a  b]⁻¹  ___1___ [ d  −b]
     // [c  d]  = ad − bc [−c   a]
 
-    const auto& a = A(0, 0);
-    const auto& b = A(0, 1);
-    const auto& c = A(1, 0);
-    const auto& d = A(1, 1);
+    const auto& a = A[0, 0];
+    const auto& b = A[0, 1];
+    const auto& c = A[1, 0];
+    const auto& d = A[1, 1];
 
     VariableMatrix adj_A{{d, -b}, {-c, a}};
     auto det_A = a * d - b * c;
@@ -1429,15 +1559,15 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
     //
     // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%7D%2C+%7Bd%2C+e%2C+f%7D%2C+%7Bg%2C+h%2C+i%7D%7D
 
-    const auto& a = A(0, 0);
-    const auto& b = A(0, 1);
-    const auto& c = A(0, 2);
-    const auto& d = A(1, 0);
-    const auto& e = A(1, 1);
-    const auto& f = A(1, 2);
-    const auto& g = A(2, 0);
-    const auto& h = A(2, 1);
-    const auto& i = A(2, 2);
+    const auto& a = A[0, 0];
+    const auto& b = A[0, 1];
+    const auto& c = A[0, 2];
+    const auto& d = A[1, 0];
+    const auto& e = A[1, 1];
+    const auto& f = A[1, 2];
+    const auto& g = A[2, 0];
+    const auto& h = A[2, 1];
+    const auto& i = A[2, 2];
 
     auto ae = a * e;
     auto af = a * f;
@@ -1477,22 +1607,22 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
     //
     // https://www.wolframalpha.com/input?i=inverse+%7B%7Ba%2C+b%2C+c%2C+d%7D%2C+%7Be%2C+f%2C+g%2C+h%7D%2C+%7Bi%2C+j%2C+k%2C+l%7D%2C+%7Bm%2C+n%2C+o%2C+p%7D%7D
 
-    const auto& a = A(0, 0);
-    const auto& b = A(0, 1);
-    const auto& c = A(0, 2);
-    const auto& d = A(0, 3);
-    const auto& e = A(1, 0);
-    const auto& f = A(1, 1);
-    const auto& g = A(1, 2);
-    const auto& h = A(1, 3);
-    const auto& i = A(2, 0);
-    const auto& j = A(2, 1);
-    const auto& k = A(2, 2);
-    const auto& l = A(2, 3);
-    const auto& m = A(3, 0);
-    const auto& n = A(3, 1);
-    const auto& o = A(3, 2);
-    const auto& p = A(3, 3);
+    const auto& a = A[0, 0];
+    const auto& b = A[0, 1];
+    const auto& c = A[0, 2];
+    const auto& d = A[0, 3];
+    const auto& e = A[1, 0];
+    const auto& f = A[1, 1];
+    const auto& g = A[1, 2];
+    const auto& h = A[1, 3];
+    const auto& i = A[2, 0];
+    const auto& j = A[2, 1];
+    const auto& k = A[2, 2];
+    const auto& l = A[2, 3];
+    const auto& m = A[3, 0];
+    const auto& n = A[3, 1];
+    const auto& o = A[3, 2];
+    const auto& p = A[3, 3];
 
     auto afk = a * f * k;
     auto afl = a * f * l;
@@ -1617,35 +1747,79 @@ VariableMatrix<Scalar> solve(const VariableMatrix<Scalar>& A,
     auto det_A = a * adj_A00 + b * adj_A10 + c * adj_A20 + d * adj_A30;
     return adj_A / det_A * B;
   } else {
-    using MatrixXv =
-        Eigen::Matrix<Variable<Scalar>, Eigen::Dynamic, Eigen::Dynamic>;
-
-    MatrixXv eigen_A{A.rows(), A.cols()};
-    for (int row = 0; row < A.rows(); ++row) {
-      for (int col = 0; col < A.cols(); ++col) {
-        eigen_A(row, col) = A(row, col);
-      }
-    }
-
-    MatrixXv eigen_B{B.rows(), B.cols()};
-    for (int row = 0; row < B.rows(); ++row) {
-      for (int col = 0; col < B.cols(); ++col) {
-        eigen_B(row, col) = B(row, col);
-      }
-    }
-
-    MatrixXv eigen_X = eigen_A.householderQr().solve(eigen_B);
-
-    VariableMatrix<Scalar> X{detail::empty, A.cols(), B.cols()};
-    for (int row = 0; row < X.rows(); ++row) {
-      for (int col = 0; col < X.cols(); ++col) {
-        X(row, col) = eigen_X(row, col);
-      }
-    }
-
-    return X;
+    return VariableMatrix<Scalar>{
+        A.to_eigen().householderQr().solve(B.to_eigen())};
   }
 }
+
+namespace detail {
+
+/// Returns the variable's gradient tree.
+///
+/// This function lazily allocates variables, so elements of the returned
+/// VariableMatrix will be empty if the corresponding element of wrt had no
+/// adjoint. Ensure Variable::expr isn't nullptr before calling member
+/// functions.
+///
+/// @tparam Scalar Scalar type.
+/// @param top_list Topologically sorted graph from parent to child.
+/// @param wrt Variables with respect to which to compute the gradient.
+/// @return The variable's gradient tree.
+template <typename Scalar>
+VariableMatrix<Scalar> gradient_tree(const ExpressionGraph<Scalar>& top_list,
+                                     const VariableMatrix<Scalar>& wrt) {
+  slp_assert(wrt.cols() == 1);
+
+  // Read docs/algorithms.md#Reverse_accumulation_automatic_differentiation
+  // for background on reverse accumulation automatic differentiation.
+
+  if (top_list.empty()) {
+    return VariableMatrix<Scalar>{detail::empty, wrt.rows(), 1};
+  }
+
+  // Set root node's adjoint to 1 since df/df is 1
+  top_list[0]->adjoint_expr = constant_ptr(Scalar(1));
+
+  // df/dx = (df/dy)(dy/dx). The adjoint of x is equal to the adjoint of y
+  // multiplied by dy/dx. If there are multiple "paths" from the root node to
+  // variable; the variable's adjoint is the sum of each path's adjoint
+  // contribution.
+  for (auto& node : top_list) {
+    auto& lhs = node->args[0];
+    auto& rhs = node->args[1];
+
+    if (lhs != nullptr) {
+      if (rhs != nullptr) {
+        // Binary operator
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs);
+        rhs->adjoint_expr += node->grad_expr_r(lhs, rhs);
+      } else {
+        // Unary operator
+        lhs->adjoint_expr += node->grad_expr_l(lhs, rhs);
+      }
+    }
+  }
+
+  // Move gradient tree to return value
+  VariableMatrix<Scalar> grad{detail::empty, wrt.rows(), 1};
+  for (int row = 0; row < grad.rows(); ++row) {
+    grad[row] = Variable{std::move(wrt[row].expr->adjoint_expr)};
+  }
+
+  // Unlink adjoints to avoid circular references between them and their
+  // parent expressions. This ensures all expressions are returned to the free
+  // list.
+  for (auto& node : top_list) {
+    node->adjoint_expr = nullptr;
+  }
+
+  return grad;
+}
+
+}  // namespace detail
+
+extern template class EXPORT_TEMPLATE_DECLARE(SLEIPNIR_DLLEXPORT)
+VariableMatrix<double>;
 
 extern template SLEIPNIR_DLLEXPORT VariableMatrix<double> solve(
     const VariableMatrix<double>& A, const VariableMatrix<double>& B);

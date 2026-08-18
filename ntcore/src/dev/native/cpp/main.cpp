@@ -8,20 +8,20 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <format>
 #include <limits>
 #include <numeric>
 #include <random>
+#include <span>
 #include <string_view>
 #include <thread>
 #include <vector>
-
-#include <fmt/format.h>
-#include <fmt/ranges.h>
 
 #include "wpi/nt/DoubleArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/ntcore_c.h"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/Synchronization.hpp"
 #include "wpi/util/print.hpp"
 
@@ -73,10 +73,12 @@ void PrintTimes(std::vector<int64_t>& times) {
 
   wpi::util::print("min: {} max: {}, mean: {}, stdev: {}\n", min, max, mean,
                    stdev);
-  wpi::util::print("min 10: {}\n",
-                   fmt::join(times.begin(), times.begin() + 10, ","));
-  wpi::util::print("max 10: {}\n",
-                   fmt::join(times.end() - 10, times.end(), ","));
+  wpi::util::print(
+      "min 10: {}\n",
+      wpi::util::join(std::span{times.begin(), times.begin() + 10}, ","));
+  wpi::util::print(
+      "max 10: {}\n",
+      wpi::util::join(std::span{times.end() - 10, times.end()}, ","));
 }
 
 // benchmark
@@ -168,7 +170,7 @@ void bench2() {
   for (int i = 0; i < 1000; ++i) {
     pubs[i] = wpi::nt::GetEntry(
         wpi::nt::GetTopic(
-            server, fmt::format("/some/long/name/with/lots/of/slashes/{}", i)),
+            server, std::format("/some/long/name/with/lots/of/slashes/{}", i)),
         NT_DOUBLE_ARRAY, "double[]");
   }
 
@@ -257,7 +259,7 @@ void stress() {
         NT_Publisher pub[30];
         for (int i = 0; i < 30; ++i) {
           pub[i] = wpi::nt::Publish(
-              wpi::nt::GetTopic(server, fmt::format("{}_{}", count, i)),
+              wpi::nt::GetTopic(server, std::format("{}_{}", count, i)),
               NT_DOUBLE, "double", {});
         }
 
@@ -333,7 +335,7 @@ void stress2() {
   }
 
   std::this_thread::sleep_for(10s);
-  fmt::print("isDone: {}", isDone.load());
+  wpi::util::print("isDone: {}", isDone.load());
 }
 
 void latency() {

@@ -4,7 +4,7 @@
 
 #if defined(__APPLE__)
 
-#include "wpi/net/MulticastServiceResolver.h"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
 #include <netinet/in.h>
 #include <poll.h>
@@ -94,6 +94,7 @@ void ServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags,
         resolveState->pImpl->ResolveStates.begin(),
         resolveState->pImpl->ResolveStates.end(),
         [resolveState](auto& a) { return a.get() == resolveState; }));
+    return;
   }
 
   resolveState->data.port = ntohs(port);

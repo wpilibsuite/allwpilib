@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include "wpi/driverstation/NiDsPS5Controller.hpp"
-
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/driverstation/NiDsPS5Controller.hpp"
 
 namespace wpi::cmd {
 /**
@@ -19,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::NiDsPS5Controller
  */
-class CommandNiDsPS5Controller : public CommandGenericHID {
+class CommandNiDsPS5Controller {
  public:
   /**
    * Construct an instance of a controller.
@@ -30,11 +29,18 @@ class CommandNiDsPS5Controller : public CommandGenericHID {
   explicit CommandNiDsPS5Controller(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::NiDsPS5Controller& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying NiDsPS5Controller object.
+   *
+   * @return the wrapped NiDsPS5Controller object
+   */
+  wpi::NiDsPS5Controller& GetNiDsPS5Controller();
 
   /**
    * Constructs a Trigger instance around the square button's
@@ -249,6 +255,7 @@ class CommandNiDsPS5Controller : public CommandGenericHID {
   double GetR2Axis() const;
 
  private:
-  wpi::NiDsPS5Controller m_hid;
+  CommandGenericHID* m_hid;
+  wpi::NiDsPS5Controller m_controller;
 };
 }  // namespace wpi::cmd

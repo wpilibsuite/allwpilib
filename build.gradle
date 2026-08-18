@@ -35,8 +35,8 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 allprojects {
     repositories {
         maven {
-        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
-    }
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
     }
     wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
@@ -66,6 +66,55 @@ if (project.hasProperty("publishVersion")) {
 }
 
 wpilibVersioning.version.finalizeValue()
+
+def mrclibVersionConfiguration = configurations.create('mrclibVersion') {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+dependencies {
+    add(mrclibVersionConfiguration.name, 'org.wpilib.mrclib:mrclib-cpp:+:windowsx86-64@zip')
+}
+
+tasks.register('updateMrclibVersion') {
+    description = 'Updates the version catalog to the latest available mrclib version'
+    group = 'WPILib'
+
+    doLast {
+        def resolvedArtifacts = mrclibVersionConfiguration.resolvedConfiguration.resolvedArtifacts
+        if (resolvedArtifacts.size() != 1) {
+            throw new GradleException("Expected one mrclib artifact, but resolved ${resolvedArtifacts.size()}")
+        }
+        def resolvedArtifact = resolvedArtifacts.iterator().next()
+        def latestVersion = resolvedArtifact.moduleVersion.id.version
+        def versionCatalog = file('gradle/libs.versions.toml')
+        def versionCatalogText = versionCatalog.getText('UTF-8')
+        def mrclibVersionRegex = ~/(?m)^mrclib\s*=\s*"[^"]*"\s*$/
+
+        if (!mrclibVersionRegex.matcher(versionCatalogText).find()) {
+            throw new GradleException("Could not find the mrclib version in ${versionCatalog}")
+        }
+
+        versionCatalog.setText(
+            mrclibVersionRegex.matcher(versionCatalogText).replaceFirst("mrclib = \"${latestVersion}\""),
+            'UTF-8'
+        )
+        logger.lifecycle("Updated mrclib to ${latestVersion}")
+
+        def pythonCommand = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+            ? ['python']
+            : ['python3']
+        def integrityHelper = file('shared/bazel/thirdparty/integrity_helper.py')
+
+        logger.lifecycle('Updating third-party integrity hashes')
+        providers.exec {
+            workingDir(rootDir)
+            commandLine(pythonCommand + [integrityHelper.absolutePath])
+        }.result.get()
+    }
+}
 
 def outputsFolder = file("$buildDir/allOutputs")
 
@@ -112,6 +161,18 @@ ext.makeZipBaseName = { group, artifactId ->
     return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
 }
 
+def versionCatalogZip = tasks.register('versionCatalogZip', Zip) {
+    description = 'Packages the dependency version catalog for publication'
+    group = 'Build'
+
+    archiveBaseName = makeZipBaseName('org.wpilib', 'wpilib-versions')
+    archiveVersion = ''
+    destinationDirectory = outputsFolder
+    from "$rootDir/gradle/libs.versions.toml"
+}
+
+copyAllOutputs.dependsOn versionCatalogZip
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
@@ -122,40 +183,37 @@ subprojects {
         subproj.apply plugin: MultiBuilds
     }
 
-    plugins.withType(JavaPlugin) {
-        java {
-            sourceCompatibility = 25
-            targetCompatibility = 25
-        }
-    }
-
     apply from: "${rootDir}/shared/java/javastyle.gradle"
 
-    // Disables doclint in java 8.
-    if (JavaVersion.current().isJava8Compatible()) {
-        tasks.withType(Javadoc) {
-            if (project.name != "docs") {
-                options.addStringOption('Xdoclint:none', '-quiet')
-            }
-        }
+    tasks.withType(JavaCompile).configureEach {
+        options.release = 25
+        options.encoding = "UTF-8"
+        options.compilerArgs = [
+            "-Werror",
+            "-XDstringConcat=inline",
+            "-Xlint:all",
+            // ignore AutoCloseable warnings
+            "-Xlint:-try",
+            // ignore missing serialVersionUID warnings
+            "-Xlint:-serial",
+            // ignore unclaimed annotation warning from annotation processing
+            "-Xlint:-processing",
+        ]
     }
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs.add '-XDstringConcat=inline'
-        options.encoding = 'UTF-8'
-    }
-
     // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         options.addStringOption("charset", "utf-8")
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
         options.addBooleanOption("-no-fonts", true)
         options.addStringOption("-add-stylesheet", "${rootDir}/docs/javadoc.css")
+        if (project.name != "docs") {
+            options.addBooleanOption('Xdoclint:none', true)
+        }
     }
 
     // Sign outputs with Developer ID
-    tasks.withType(AbstractLinkTask) { task ->
+    tasks.withType(AbstractLinkTask).configureEach { task ->
         task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
 
         if (project.hasProperty("developerID")) {
@@ -178,13 +236,6 @@ subprojects {
                 }
             }
         }
-    }
-
-    tasks.withType(AbstractArchiveTask).configureEach {
-        // Use file timestamps from the file system
-        preserveFileTimestamps = true
-        // Use permissions from the file system
-        useFileSystemPermissions()
     }
 }
 

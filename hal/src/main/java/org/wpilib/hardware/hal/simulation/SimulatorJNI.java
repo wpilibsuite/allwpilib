@@ -11,7 +11,7 @@ import org.wpilib.hardware.hal.JNIWrapper;
 public class SimulatorJNI extends JNIWrapper {
   public static native void setRuntimeType(int type);
 
-  public static native void waitForProgramStart();
+  public static native void waitForProgramStart(boolean waitForFirstNotifier);
 
   public static native void setProgramStarted(boolean started);
 

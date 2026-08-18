@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 import org.wpilib.annotation.NoDiscard;
 
 /**
@@ -65,6 +66,18 @@ public class ParallelGroupBuilder {
   }
 
   /**
+   * Adds a command to the group. The command must complete for the group to exit.
+   *
+   * @param command The command to add to the group
+   * @return The builder object, for chaining
+   */
+  // Note: this primarily exists so users can cleanly chain .alongWith calls to build a
+  //       parallel group, eg `fooCommand().alongWith(barCommand()).alongWith(bazCommand())`
+  public ParallelGroupBuilder alongWith(Command command) {
+    return requiring(command);
+  }
+
+  /**
    * Adds an end condition to the command group. If this condition is met before all required
    * commands have completed, the group will exit early. If multiple end conditions are added (e.g.
    * {@code .until(() -> conditionA()).until(() -> conditionB())}), then the last end condition
@@ -87,6 +100,12 @@ public class ParallelGroupBuilder {
    * @return The built group
    */
   public ParallelGroup named(String name) {
+    return named(name, false);
+  }
+
+  private ParallelGroup named(String name, boolean useAutomaticName) {
+    requireNonNullParam(name, "name", "ParallelGroupBuilder.named");
+
     var group = new ParallelGroup(name, m_requiredCommands, m_optionalCommands);
     if (m_endCondition == null) {
       // No custom end condition, return the group as is
@@ -94,9 +113,10 @@ public class ParallelGroupBuilder {
     }
 
     // We have a custom end condition, so we need to wrap the group in a race
-    return new ParallelGroupBuilder()
-        .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"))
-        .named(group.name());
+    var out =
+        new ParallelGroupBuilder()
+            .optional(group, Command.waitUntil(m_endCondition).named("Until Condition"));
+    return useAutomaticName ? out.withAutomaticName() : out.named(name);
   }
 
   /**
@@ -105,6 +125,25 @@ public class ParallelGroupBuilder {
    * @return The built group
    */
   public ParallelGroup withAutomaticName() {
-    return named(null);
+    // eg "(CommandA & CommandB & CommandC)"
+    String required =
+        m_requiredCommands.stream().map(Command::name).collect(Collectors.joining(" & ", "(", ")"));
+
+    // eg "(CommandA | CommandB | CommandC)"
+    String optional =
+        m_optionalCommands.stream().map(Command::name).collect(Collectors.joining(" | ", "(", ")"));
+
+    if (m_requiredCommands.isEmpty()) {
+      // No required commands, pure race
+      return named(optional, true);
+    } else if (m_optionalCommands.isEmpty()) {
+      // Everything required
+      return named(required, true);
+    } else {
+      // Some form of deadline
+      // eg "[(CommandA & CommandB) * (CommandX | CommandY | ...)]"
+      String name = "[%s * %s]".formatted(required, optional);
+      return named(name, true);
+    }
   }
 }

@@ -9,8 +9,6 @@
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/util.hpp"
-#include "wpi/util/Endian.hpp"
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
 

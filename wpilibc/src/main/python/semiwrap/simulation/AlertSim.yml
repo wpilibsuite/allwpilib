@@ -7,8 +7,8 @@ classes:
       ResetData:
   wpi::sim::AlertSim::AlertInfo:
     attributes:
-      handle:
       group:
+      id:
       text:
       activeStartTime:
       level:
@@ -20,7 +20,7 @@ classes:
       .def_property(
         "level",
         [](const AlertInfo& self) { return self.level; },
-        [](AlertInfo& self, wpi::Alert::Level level) { self.level = level; },
+        [](AlertInfo& self, wpi::util::Alert::Level level) { self.level = level; },
         py::return_value_policy::copy,
         py::doc("The level of the alert (HIGH, MEDIUM, or LOW).")
       );

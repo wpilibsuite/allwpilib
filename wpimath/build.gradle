@@ -5,6 +5,7 @@ ext {
     groupId = 'org.wpilib.wpimath'
 
     nativeName = 'wpimath'
+    nativeTestSuiteName = "${nativeName}Test"
     devMain = 'org.wpilib.math.DevMain'
 
     splitSetup = {
@@ -16,7 +17,6 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/fmt/include',
                             'src/main/native/thirdparty/sleipnir/include',
                             'src/main/native/thirdparty/sleipnir/src'
                 }

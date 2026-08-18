@@ -1,3 +1,6 @@
+extra_includes:
+- wpystruct.h
+
 classes:
   wpi::math::DifferentialDriveWheelPositions:
     attributes:
@@ -6,3 +9,6 @@ classes:
     methods:
       operator==:
       Interpolate:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DifferentialDriveWheelPositions>(cls_DifferentialDriveWheelPositions);

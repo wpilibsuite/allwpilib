@@ -1,0 +1,45 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpihal==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-native-ntcore==0.0.0",
+]
+
+[project]
+name = "robotpy-native-halsim-gui"
+version = "0.0.0"
+description = "WPILib HALSim GUI native library"
+requires-python = ">=3.11"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpihal==0.0.0",
+    "robotpy-native-wpimath==0.0.0",
+    "robotpy-native-ntcore==0.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "halsim_gui"
+group_id = "org.wpilib.halsim"
+repo_url = ""
+version = "0.0.0"
+use_headers = true
+
+extract_to = "src/native/halsim_gui"
+libs = ["halsim_gui"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/halsim_gui/robotpy-native-halsim-gui.pc"
+name = "halsim_gui"
+
+includedir = "src/native/halsim_gui/include"
+libdir = "src/native/halsim_gui/lib"
+shared_libraries = ["halsim_gui"]
+requires = ["robotpy-native-wpihal", "robotpy-native-wpimath", "robotpy-native-ntcore"]

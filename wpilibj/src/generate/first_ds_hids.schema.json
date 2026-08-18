@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://raw.githubusercontent.com/wpilibsuite/allwpilib/main/wpilibj/src/generate/first_ds_hids.schema.json",
+  "title": "A schema for defining FIRST Driver Station HIDs with JSON",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "ClassName",
+      "HIDType",
+      "axes",
+      "buttons",
+      "touchpads",
+      "supports"
+    ],
+    "properties": {
+      "ClassName": {
+        "description": "The class name prefix before Controller",
+        "type": "string"
+      },
+      "HIDType": {
+        "description": "The GenericHID HIDType enum value",
+        "type": "string"
+      },
+      "axes": {
+        "description": "A map of axis method stems to DS axis indexes",
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "buttons": {
+        "description": "A map of button method stems to DS button indexes",
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "touchpads": {
+        "description": "The number of touchpads supported by the controller",
+        "type": "integer",
+        "minimum": 0
+      },
+      "supports": {
+        "type": "object",
+        "required": [
+          "rumble",
+          "triggerRumble",
+          "monoLed",
+          "rgbLed"
+        ],
+        "properties": {
+          "rumble": {
+            "type": "boolean"
+          },
+          "triggerRumble": {
+            "type": "boolean"
+          },
+          "monoLed": {
+            "type": "boolean"
+          },
+          "rgbLed": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

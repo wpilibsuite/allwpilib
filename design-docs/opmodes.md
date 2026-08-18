@@ -153,18 +153,16 @@ The `OpModeRobot` class is the base class for the user's `Robot` class.  It exte
 ```java
 public abstract class OpModeRobot extends RobotBase {
   // OpMode registration methods
-  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
+  public void addOpMode(RobotMode mode, String name, String group, String description,
+      Color textColor, Color backgroundColor, Supplier<OpMode> factory) {...}
 
   // add a particular opmode class (Java only)
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
-  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
+  public void addOpMode(RobotMode mode, String name, String group, String description,
+      Color textColor, Color backgroundColor, Class<? extends OpMode> cls) {...}
+  private void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
 
   // add all annotated opmodes in a package and nested packages
-  public void addAnnotatedOpModeClasses(Package pkg) {...}
+  private void addAnnotatedOpModeClasses(Package pkg) {...}
 
   public void removeOpMode(RobotMode mode, String name) {...}
   public void publishOpModes() {...}
@@ -215,8 +213,8 @@ The lifecycle of an opmode is:
 - When operator selects opmode on DS, a new opmode object is constructed
 - While selected and disabled, `disabledPeriodic()` is called
 - On disabled → enabled transition, `start()` is called once
-- While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates
-- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused
+- While enabled, `periodic()` is called at `OpModeRobot#getPeriod()`, and additional callbacks from `getCallbacks()` are run at their own configured rates (note: callbacks from `getCallbacks()` are registered immediately when the OpMode is constructed and begin executing as soon as they are registered; to restrict execution to only when enabled, callbacks should include an enabled check)
+- If robot disables or a different opmode is selected while enabled, `end()` is called then `close()` is called (Java), or the object is destroyed (C++/Python); the object is not reused. Note: selecting a different opmode while enabled automatically disables the robot first.
 - If a different opmode is selected while disabled, only `close()` is called (Java), or the object is destroyed (C++); the object is not reused
 
 Following `close()` being called (Java)/the opmode being destroyed (C++), a *new* opmode object is constructed based on the DS teleop/auto/utility/match selector and selected opmode.  In teleop/auto/utility, the drop-down selection will be the same as before the previous enable, so the same opmode class is constructed again.  In match (or when FMS-connected), only the selected auto opmode object is initially constructed; once auto completes, the selected teleop opmode object is constructed.  Thus only zero or one opmode objects will ever be "alive" at any given time.
@@ -258,6 +256,7 @@ public abstract class PeriodicOpMode implements OpMode {
   public Set<PeriodicPriorityQueue.Callback> getCallbacks() {...}
 
   // additional periodic callbacks with custom rates/offsets
+  // callbacks are registered immediately and begin executing as soon as registered
   public final void addPeriodic(Runnable callback, double period) {...}
   public final void addPeriodic(Runnable callback, double period, double offset) {...}
 }

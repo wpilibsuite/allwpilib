@@ -4,7 +4,7 @@
 
 #include "wpi/math/linalg/struct/VectorStruct.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../StructTestBase.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
@@ -17,8 +17,8 @@ struct VectorStructTestData {
   inline static const Type kTestData{1.1, 1.2};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData, data);
+    CHECK(testData == data);
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Vector, StructTest, VectorStructTestData);
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(Vector, StructTest, VectorStructTestData);

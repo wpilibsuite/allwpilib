@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 
-#include "wpi/halsim/ws_core/WSBaseProvider.hpp"
+#include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
 #include "wpi/halsim/ws_core/WSProviderContainer.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/net/uv/Async.hpp"

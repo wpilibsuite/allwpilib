@@ -1,0 +1,77 @@
+ext {
+    nativeName = 'drivers'
+    devMain = 'org.wpilib.drivers.DevMain'
+}
+
+evaluationDependsOn(':hal')
+evaluationDependsOn(':ntcore')
+evaluationDependsOn(':wpilibc')
+evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':wpimath')
+
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
+
+dependencies {
+    implementation project(':hal')
+    api project(':wpilibj')
+    api project(':wpimath')
+    api project(':wpiunits')
+    api project(':wpiutil')
+}
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+
+nativeUtils.exportsConfigs {
+    drivers {
+    }
+}
+
+model {
+    components {
+        "${nativeName}Base" {
+            it.sources.cpp {
+                source {
+                    srcDirs 'src/generated/main/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/generated/main/native/include'
+                }
+            }
+        }
+        "${nativeName}" {
+            it.sources.cpp.exportedHeaders {
+                srcDirs 'src/generated/main/native/include'
+            }
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+            }
+            lib project: ':hal', library: 'hal', linkage: 'shared'
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+
+            if (it.component.name == "${nativeName}Dev") {
+                project(':ntcore').addNtcoreJniDependency(it)
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
+                lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
+            }
+        }
+    }
+}

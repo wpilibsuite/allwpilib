@@ -29,12 +29,12 @@ classes:
             ignore: true
       MaxVelocity:
     inline_code: |
-      .def_static("fromStateSpace", [](Input_t maxInput, A_t a, B_t b) {
+      .def_static("from_state_space", [](Input_t maxInput, A_t a, B_t b) {
           return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, a, b);
-        }, py::arg("maxInput"), py::arg("a"), py::arg("b"))
-      .def_static("fromCharacteristics", [](Input_t maxInput, kV_t kv, kA_t ka) {
+        }, py::arg("max_input"), py::arg("a"), py::arg("b"))
+      .def_static("from_characteristics", [](Input_t maxInput, kV_t kv, kA_t ka) {
           return typename wpi::math::ExponentialProfile<Distance, Input>::Constraints(maxInput, kv, ka);
-        }, py::arg("maxInput"), py::arg("kV"), py::arg("kA"))
+        }, py::arg("max_input"), py::arg("k_v"), py::arg("k_a"))
 
   wpi::math::ExponentialProfile::State:
     force_no_default_constructor: true
@@ -53,7 +53,7 @@ classes:
       IsFinished:
 
 templates:
-  ExponentialProfileMeterVolts:
+  ExponentialProfile:
     qualname: wpi::math::ExponentialProfile
     params:
     - wpi::units::meter

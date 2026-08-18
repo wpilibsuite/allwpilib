@@ -24,6 +24,10 @@ namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
 
+namespace wpi {
+class GenericHID;
+}  // namespace wpi
+
 namespace wpi::util {
 class Color;
 }  // namespace wpi::util
@@ -40,6 +44,22 @@ class DriverStationBackend final {
  public:
   /// Number of Joystick ports.
   static constexpr int JOYSTICK_PORTS = 6;
+
+  /**
+   * Constructs a GenericHID for the given port.
+   *
+   * @param port The port index on the Driver Station.
+   * @return The GenericHID object for the given port.
+   */
+  static GenericHID ConstructGenericHID(int port);
+
+  /**
+   * Resets cached DriverStation HID wrapper objects.
+   *
+   * This is intended for test cleanup only. Any existing references to cached
+   * GenericHID or Gamepad objects become invalid after this call.
+   */
+  static void ResetCachedHIDData();
 
   /**
    * The state of one joystick button. Button indexes begin at 0.
@@ -564,21 +584,21 @@ class DriverStationBackend final {
   static void RemoveRefreshedDataEventHandle(WPI_EventHandle handle);
 
   /**
-   * Allows the user to specify whether they want joystick connection warnings
-   * to be printed to the console. This setting is ignored when the FMS is
-   * connected -- warnings will always be on in that scenario.
+   * Allows the user to specify whether they want joystick connection alerts to
+   * be shown. This setting is ignored when the FMS is connected -- alerts will
+   * always be on in that scenario.
    *
-   * @param silence Whether warning messages should be silenced.
+   * @param silence Whether joystick connection alerts should be silenced.
    */
-  static void SilenceJoystickConnectionWarning(bool silence);
+  static void SilenceJoystickConnectionAlert(bool silence);
 
   /**
-   * Returns whether joystick connection warnings are silenced. This will
+   * Returns whether joystick connection alerts are silenced. This will
    * always return false when connected to the FMS.
    *
-   * @return Whether joystick connection warnings are silenced.
+   * @return Whether joystick connection alerts are silenced.
    */
-  static bool IsJoystickConnectionWarningSilenced();
+  static bool IsJoystickConnectionAlertSilenced();
 
   /**
    * Starts logging DriverStation data to data log. Repeated calls are ignored.

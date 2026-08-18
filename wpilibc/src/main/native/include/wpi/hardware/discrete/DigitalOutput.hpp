@@ -5,8 +5,8 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -42,6 +42,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * Set the value of a digital output to either one (true) or zero (false).
    *
    * @param value 1 (true) for high, 0 (false) for disabled
+   * @Common This is one of the commonly used methods for this class
    */
   void Set(bool value);
 
@@ -64,6 +65,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * specified in seconds. Maximum of 65535 microseconds.
    *
    * @param pulseLength The pulse length in seconds
+   * @Common This is one of the commonly used methods for this class
    */
   void Pulse(wpi::units::second_t pulseLength);
 
@@ -142,8 +144,8 @@ class DigitalOutput : public wpi::util::Sendable,
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
-  wpi::hal::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
+  wpi::util::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
+  wpi::util::Handle<HAL_DigitalPWMHandle> m_pwmGenerator;
 };
 
 }  // namespace wpi

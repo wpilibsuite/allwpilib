@@ -4,6 +4,7 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 
+#include "wpi/units/angle.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Rotation2d& rotation) {

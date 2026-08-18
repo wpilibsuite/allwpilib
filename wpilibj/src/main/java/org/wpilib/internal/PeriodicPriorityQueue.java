@@ -6,6 +6,7 @@ package org.wpilib.internal;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.system.RobotController;
 import org.wpilib.util.WPIUtilJNI;
@@ -220,6 +221,9 @@ public class PeriodicPriorityQueue {
    * when execution is delayed.
    */
   public static class Callback implements Comparable<Callback> {
+    /** Source of unique callback ids. */
+    private static final AtomicLong s_nextId = new AtomicLong(1);
+
     /** The function to execute when the callback fires. */
     public final Runnable func;
 
@@ -228,6 +232,12 @@ public class PeriodicPriorityQueue {
 
     /** The next scheduled execution time in monotonic timestamp microseconds. */
     public long expirationTime;
+
+    /**
+     * The unique id for this callback to allow callbacks to be tracked and removed from the queue
+     * throughout robot operation.
+     */
+    public final long id;
 
     /**
      * Construct a callback container.
@@ -245,6 +255,7 @@ public class PeriodicPriorityQueue {
               + offset
               + (1 + (RobotController.getMonotonicTime() - startTime - offset) / this.period)
                   * this.period;
+      this.id = s_nextId.getAndIncrement();
     }
 
     /**
@@ -271,24 +282,24 @@ public class PeriodicPriorityQueue {
     }
 
     /**
-     * Compares callbacks based on expiration time for equality.
+     * Compares callbacks based on their stable identity.
      *
      * @param rhs The object to compare against.
-     * @return true if rhs is a Callback with the same expiration time.
+     * @return true if rhs is the same Callback (same id).
      */
     @Override
     public boolean equals(Object rhs) {
-      return rhs instanceof Callback callback && expirationTime == callback.expirationTime;
+      return rhs instanceof Callback callback && id == callback.id;
     }
 
     /**
-     * Returns a hash code based on the expiration time.
+     * Returns a hash code based on the stable identity.
      *
      * @return hash code for this callback.
      */
     @Override
     public int hashCode() {
-      return Long.hashCode(expirationTime);
+      return Long.hashCode(id);
     }
 
     /**
@@ -304,7 +315,8 @@ public class PeriodicPriorityQueue {
     public int compareTo(Callback rhs) {
       // Elements with sooner expiration times are sorted as lesser. The head of
       // Java's PriorityQueue is the least element.
-      return Long.compare(expirationTime, rhs.expirationTime);
+      int expTimeDiff = Long.compare(expirationTime, rhs.expirationTime);
+      return expTimeDiff != 0 ? expTimeDiff : Long.compare(id, rhs.id);
     }
   }
 }

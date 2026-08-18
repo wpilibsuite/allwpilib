@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTCommandScheduler.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -19,13 +18,13 @@ NTCommandSchedulerModel::NTCommandSchedulerModel(std::string_view path)
 NTCommandSchedulerModel::NTCommandSchedulerModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_commands{inst.GetStringArrayTopic(fmt::format("{}/Names", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_commands{inst.GetStringArrayTopic(std::format("{}/Names", path))
                      .Subscribe({})},
       m_ids{
-          inst.GetIntegerArrayTopic(fmt::format("{}/Ids", path)).Subscribe({})},
+          inst.GetIntegerArrayTopic(std::format("{}/Ids", path)).Subscribe({})},
       m_cancel{
-          inst.GetIntegerArrayTopic(fmt::format("{}/Cancel", path)).Publish()},
+          inst.GetIntegerArrayTopic(std::format("{}/Cancel", path)).Publish()},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTCommandSchedulerModel::CancelCommand(size_t index) {

@@ -16,8 +16,9 @@ import org.wpilib.event.EventLoop;
  * @see NiDsXboxController
  */
 @SuppressWarnings("MethodName")
-public class CommandNiDsXboxController extends CommandGenericHID {
-  private final NiDsXboxController m_hid;
+public class CommandNiDsXboxController {
+  private final CommandGenericHID m_hid;
+  private final NiDsXboxController m_controller;
 
   /**
    * Construct an instance of a controller.
@@ -25,18 +26,26 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandNiDsXboxController(int port) {
-    super(port);
-    m_hid = new NiDsXboxController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new NiDsXboxController(m_hid.getHID());
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public NiDsXboxController getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying NiDsXboxController object.
+   *
+   * @return the wrapped NiDsXboxController object
+   */
+  public NiDsXboxController getNiDsXboxController() {
+    return m_controller;
   }
 
   /**
@@ -58,7 +67,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(NiDsXboxController.Button.kA.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kA.value, loop);
   }
 
   /**
@@ -80,7 +89,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(NiDsXboxController.Button.kB.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kB.value, loop);
   }
 
   /**
@@ -102,7 +111,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(NiDsXboxController.Button.kX.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kX.value, loop);
   }
 
   /**
@@ -124,7 +133,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(NiDsXboxController.Button.kY.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kY.value, loop);
   }
 
   /**
@@ -146,7 +155,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(NiDsXboxController.Button.kLeftBumper.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -168,7 +177,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(NiDsXboxController.Button.kRightBumper.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kRightBumper.value, loop);
   }
 
   /**
@@ -190,7 +199,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger back(EventLoop loop) {
-    return button(NiDsXboxController.Button.kBack.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kBack.value, loop);
   }
 
   /**
@@ -212,7 +221,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return button(NiDsXboxController.Button.kStart.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kStart.value, loop);
   }
 
   /**
@@ -234,7 +243,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(NiDsXboxController.Button.kLeftStick.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kLeftStick.value, loop);
   }
 
   /**
@@ -256,7 +265,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(NiDsXboxController.Button.kRightStick.value, loop);
+    return m_hid.button(NiDsXboxController.Button.kRightStick.value, loop);
   }
 
   /**
@@ -270,7 +279,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(NiDsXboxController.Axis.kLeftTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(NiDsXboxController.Axis.kLeftTrigger.value, threshold, loop);
   }
 
   /**
@@ -309,7 +318,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(NiDsXboxController.Axis.kRightTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(NiDsXboxController.Axis.kRightTrigger.value, threshold, loop);
   }
 
   /**
@@ -343,7 +352,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getLeftX();
+    return m_controller.getLeftX();
   }
 
   /**
@@ -352,7 +361,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRightX();
+    return m_controller.getRightX();
   }
 
   /**
@@ -361,7 +370,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getLeftY();
+    return m_controller.getLeftY();
   }
 
   /**
@@ -370,7 +379,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRightY();
+    return m_controller.getRightY();
   }
 
   /**
@@ -380,7 +389,7 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return m_hid.getLeftTriggerAxis();
+    return m_controller.getLeftTriggerAxis();
   }
 
   /**
@@ -390,6 +399,6 @@ public class CommandNiDsXboxController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return m_hid.getRightTriggerAxis();
+    return m_controller.getRightTriggerAxis();
   }
 }

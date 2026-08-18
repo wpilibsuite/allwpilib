@@ -27,16 +27,24 @@
 #include <catch2/internal/catch_platform.hpp>
 #include <catch2/catch_user_config.hpp>
 
-#ifdef __cplusplus
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#  define CATCH_CPP17_OR_GREATER
+#endif
 
-#  if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
-#    define CATCH_CPP17_OR_GREATER
-#  endif
+#if (__cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+#  define CATCH_CPP20_OR_GREATER
+#endif
 
-#  if (__cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
-#    define CATCH_CPP20_OR_GREATER
-#  endif
-
+// Matchers are only constexpr-able in C++20
+#if defined( CATCH_CPP20_OR_GREATER ) && \
+    defined( __cpp_constexpr_dynamic_alloc ) && \
+    __cpp_constexpr_dynamic_alloc >= 201907L && \
+    /* GCC < 13 define the feature macro, but compiler bugs stop us from using it */ \
+    ( !defined( __GNUC__ ) || __GNUC__ >= 13 || defined(__clang__) )
+#    define CATCH_INTERNAL_CONSTEXPR_MATCHERS_ENABLED
+#    define CATCH_DESTRUCTOR_CONSTEXPR constexpr
+#else
+#    define CATCH_DESTRUCTOR_CONSTEXPR
 #endif
 
 // Only GCC compiler should be used in this block, so other compilers trying to

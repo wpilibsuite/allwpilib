@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
       // Drive forwards half speed, make sure to turn input squaring off
       robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
-      robotDrive.stopMotor(); // stop robot
+      robotDrive.arcadeDrive(0.0, 0.0, false); // stop robot
     }
   }
 

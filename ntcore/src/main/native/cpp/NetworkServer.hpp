@@ -16,7 +16,7 @@
 #include "net/Message.hpp"
 #include "server/ServerImpl.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Idle.hpp"
 #include "wpi/net/uv/Timer.hpp"

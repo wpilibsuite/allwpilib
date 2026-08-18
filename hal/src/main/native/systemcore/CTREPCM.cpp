@@ -4,16 +4,26 @@
 
 #include "wpi/hal/CTREPCM.h"
 
+#include <stdint.h>
+
+#include <algorithm>
+#include <cstring>
+#include <format>
+#include <mutex>
 #include <string>
 
-#include <fmt/format.h>
-
+#include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
+#include "mrclib/PcmTokenizer.h"
 #include "wpi/hal/CANAPI.h"
+#include "wpi/hal/CANAPITypes.h"
 #include "wpi/hal/ErrorHandling.hpp"
 #include "wpi/hal/Errors.h"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/hal/handles/IndexedHandleResource.hpp"
+#include "wpi/util/mutex.hpp"
 
 using namespace wpi::hal;
 
@@ -125,6 +135,8 @@ union PcmDebug {
 
 namespace {
 struct PCM {
+  uint8_t busId;
+  uint8_t deviceId;
   HAL_CANHandle canHandle;
   wpi::util::mutex lock;
   std::string previousAllocation;
@@ -164,13 +176,47 @@ void InitializeCTREPCM() {
 #define READ_SOL_FAULTS(failureValue) \
   READ_PACKET(PcmStatusFault, StatusSolFaults, failureValue)
 
+static MRC_Status MRC_CALLCONV MrcTokenizeCallback(void* userData,
+                                                   uint8_t* receivedBytes) {
+  auto pcm = static_cast<PCM*>(userData);
+  HAL_CANReceiveMessage message;
+  std::memset(&message, 0, sizeof(message));
+  int32_t receiveStatus = 0;
+
+  HAL_ReadCANPacketLatest(pcm->canHandle, Status1, &message, &receiveStatus);
+
+  // Unconditionally copy the received bytes into the buffer, even if the read
+  // failed. The data is already 0'd
+  std::memcpy(receivedBytes, message.message.data, 8);
+
+  return receiveStatus == 0 ? MRC_STATUS_SUCCESS : MRC_STATUS_NO_TOKEN;
+}
+
+static int32_t PrepareControl1ForSend(void* param, HAL_CANMessage* message) {
+  auto pcm = static_cast<PCM*>(param);
+
+  MRC_Status mrcStatus = MRC_PCM_Tokenize(
+      pcm->busId, pcm->deviceId, message->data, MrcTokenizeCallback, pcm);
+
+  if (mrcStatus == MRC_STATUS_DO_NOT_SEND) {
+    return HAL_ERR_CANSessionMux_NotAllowed;
+  } else if (mrcStatus == MRC_STATUS_NO_TOKEN) {
+    return HAL_WARN_CANSessionMux_NoToken;
+  } else if (mrcStatus != MRC_STATUS_SUCCESS) {
+    // This case means a buffer error.
+    return HAL_ERR_CANSessionMux_InvalidBuffer;
+  }
+  return 0;
+}
+
 static void SendControl(PCM* pcm, int32_t* status) {
   HAL_CANMessage message;
   std::memset(&message, 0, sizeof(message));
   message.dataSize = 8;
   std::memcpy(message.data, pcm->control.data, 8);
-  HAL_WriteCANPacketRepeating(pcm->canHandle, Control1, &message, SendPeriod,
-                              status);
+  WriteCANPacketRepeatingWithCallback(pcm->canHandle, Control1, &message,
+                                      SendPeriod, PrepareControl1ForSend, pcm,
+                                      status);
 }
 
 extern "C" {
@@ -199,10 +245,12 @@ HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
   std::memset(&pcm->control, 0, sizeof(pcm->control));
 
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
+  pcm->busId = busId;
+  pcm->deviceId = module;
 
   // Enable closed loop control
   HAL_SetCTREPCMClosedLoopControl(handle, true, status);
-  if (*status != 0) {
+  if (*status != 0 && *status != HAL_WARN_CANSessionMux_NoToken) {
     HAL_FreeCTREPCM(handle);
     return HAL_INVALID_HANDLE;
   }
@@ -355,7 +403,7 @@ void HAL_FireCTREPCMOneShot(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 
@@ -386,7 +434,7 @@ void HAL_SetCTREPCMOneShotDuration(HAL_CTREPCMHandle handle, int32_t index,
   if (index > 7 || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
-        fmt::format("Only [0-7] are valid index values. Requested {}", index));
+        std::format("Only [0-7] are valid index values. Requested {}", index));
     return;
   }
 

@@ -1,12 +1,23 @@
 extra_includes:
 - wpi/util/sendable/SendableBuilder.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::NiDsStadiaController:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<NiDsStadiaController>
     methods:
       NiDsStadiaController:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
       GetRightX:
       GetLeftY:
@@ -71,6 +82,12 @@ classes:
       GetRightBumperButton:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetRumble:
       InitSendable:
   wpi::NiDsStadiaController::Button:
     attributes:

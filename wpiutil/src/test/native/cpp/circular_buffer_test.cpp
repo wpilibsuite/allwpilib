@@ -6,7 +6,11 @@
 
 #include <array>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 static const std::array<double, 10> values = {
     {751.848, 766.366, 342.657, 234.252, 716.126, 132.344, 445.697, 22.727,
@@ -18,7 +22,7 @@ static const std::array<double, 8> pushFrontOut = {
 static const std::array<double, 8> pushBackOut = {
     {342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913}};
 
-TEST(CircularBufferTest, PushFront) {
+TEST_CASE("CircularBufferTest PushFront", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
@@ -26,11 +30,11 @@ TEST(CircularBufferTest, PushFront) {
   }
 
   for (size_t i = 0; i < pushFrontOut.size(); ++i) {
-    EXPECT_EQ(pushFrontOut[i], queue[i]);
+    CHECK(pushFrontOut[i] == queue[i]);
   }
 }
 
-TEST(CircularBufferTest, PushBack) {
+TEST_CASE("CircularBufferTest PushBack", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
@@ -38,11 +42,11 @@ TEST(CircularBufferTest, PushBack) {
   }
 
   for (size_t i = 0; i < pushBackOut.size(); ++i) {
-    EXPECT_EQ(pushBackOut[i], queue[i]);
+    CHECK(pushBackOut[i] == queue[i]);
   }
 }
 
-TEST(CircularBufferTest, EmplaceFront) {
+TEST_CASE("CircularBufferTest EmplaceFront", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
@@ -50,11 +54,11 @@ TEST(CircularBufferTest, EmplaceFront) {
   }
 
   for (size_t i = 0; i < pushFrontOut.size(); ++i) {
-    EXPECT_EQ(pushFrontOut[i], queue[i]);
+    CHECK(pushFrontOut[i] == queue[i]);
   }
 }
 
-TEST(CircularBufferTest, EmplaceBack) {
+TEST_CASE("CircularBufferTest EmplaceBack", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(8);
 
   for (auto& value : values) {
@@ -62,11 +66,11 @@ TEST(CircularBufferTest, EmplaceBack) {
   }
 
   for (size_t i = 0; i < pushBackOut.size(); ++i) {
-    EXPECT_EQ(pushBackOut[i], queue[i]);
+    CHECK(pushBackOut[i] == queue[i]);
   }
 }
 
-TEST(CircularBufferTest, PushPop) {
+TEST_CASE("CircularBufferTest PushPop", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(3);
 
   // Insert three elements into the buffer
@@ -74,9 +78,9 @@ TEST(CircularBufferTest, PushPop) {
   queue.push_back(2.0);
   queue.push_back(3.0);
 
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
-  EXPECT_EQ(3.0, queue[2]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
 
   /*
    * The buffer is full now, so pushing subsequent elements will overwrite the
@@ -86,30 +90,30 @@ TEST(CircularBufferTest, PushPop) {
   queue.push_back(4.0);  // Overwrite 1 with 4
 
   // The buffer now contains 2, 3 and 4
-  EXPECT_EQ(2.0, queue[0]);
-  EXPECT_EQ(3.0, queue[1]);
-  EXPECT_EQ(4.0, queue[2]);
+  CHECK(2.0 == queue[0]);
+  CHECK(3.0 == queue[1]);
+  CHECK(4.0 == queue[2]);
 
   queue.push_back(5.0);  // Overwrite 2 with 5
 
   // The buffer now contains 3, 4 and 5
-  EXPECT_EQ(3.0, queue[0]);
-  EXPECT_EQ(4.0, queue[1]);
-  EXPECT_EQ(5.0, queue[2]);
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
+  CHECK(5.0 == queue[2]);
 
-  EXPECT_EQ(5.0, queue.pop_back());  // 5 is removed
+  CHECK(5.0 == queue.pop_back());  // 5 is removed
 
   // The buffer now contains 3 and 4
-  EXPECT_EQ(3.0, queue[0]);
-  EXPECT_EQ(4.0, queue[1]);
+  CHECK(3.0 == queue[0]);
+  CHECK(4.0 == queue[1]);
 
-  EXPECT_EQ(3.0, queue.pop_front());  // 3 is removed
+  CHECK(3.0 == queue.pop_front());  // 3 is removed
 
   // Leaving only one element with value == 4
-  EXPECT_EQ(4.0, queue[0]);
+  CHECK(4.0 == queue[0]);
 }
 
-TEST(CircularBufferTest, Reset) {
+TEST_CASE("CircularBufferTest Reset", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(5);
 
   for (size_t i = 1; i < 6; ++i) {
@@ -118,10 +122,10 @@ TEST(CircularBufferTest, Reset) {
 
   queue.reset();
 
-  EXPECT_EQ(queue.size(), size_t{0});
+  CHECK(queue.size() == size_t{0});
 }
 
-TEST(CircularBufferTest, Resize) {
+TEST_CASE("CircularBufferTest Resize", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(5);
 
   /* Buffer contains {1, 2, 3, _, _}
@@ -132,12 +136,12 @@ TEST(CircularBufferTest, Resize) {
   queue.push_back(3.0);
 
   queue.resize(2);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -151,12 +155,12 @@ TEST(CircularBufferTest, Resize) {
   queue.pop_front();
 
   queue.resize(2);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -172,12 +176,12 @@ TEST(CircularBufferTest, Resize) {
   queue.pop_front();
 
   queue.resize(2);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -189,12 +193,12 @@ TEST(CircularBufferTest, Resize) {
   queue.push_front(1.0);
 
   queue.resize(2);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.reset();
 
@@ -206,28 +210,28 @@ TEST(CircularBufferTest, Resize) {
   queue.push_front(1.0);
 
   queue.resize(2);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   queue.resize(5);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
 
   // Test push_back() after resize
   queue.push_back(3.0);
-  EXPECT_EQ(1.0, queue[0]);
-  EXPECT_EQ(2.0, queue[1]);
-  EXPECT_EQ(3.0, queue[2]);
+  CHECK(1.0 == queue[0]);
+  CHECK(2.0 == queue[1]);
+  CHECK(3.0 == queue[2]);
 
   // Test push_front() after resize
   queue.push_front(4.0);
-  EXPECT_EQ(4.0, queue[0]);
-  EXPECT_EQ(1.0, queue[1]);
-  EXPECT_EQ(2.0, queue[2]);
-  EXPECT_EQ(3.0, queue[3]);
+  CHECK(4.0 == queue[0]);
+  CHECK(1.0 == queue[1]);
+  CHECK(2.0 == queue[2]);
+  CHECK(3.0 == queue[3]);
 }
 
-TEST(CircularBufferTest, Iterator) {
+TEST_CASE("CircularBufferTest Iterator", "[wpiutil]") {
   wpi::util::circular_buffer<double> queue(3);
 
   queue.push_back(1.0);
@@ -241,28 +245,28 @@ TEST(CircularBufferTest, Iterator) {
   // iterator
   int i = 0;
   for (auto& elem : queue) {
-    EXPECT_EQ(values[i], elem);
+    CHECK(values[i] == elem);
     ++i;
   }
 
   // const_iterator
   i = 0;
   for (const auto& elem : queue) {
-    EXPECT_EQ(values[i], elem);
+    CHECK(values[i] == elem);
     ++i;
   }
 
   // reverse_iterator
   i = 2;
   for (auto it = queue.rbegin(); it != queue.rend(); ++it) {
-    EXPECT_EQ(values[i], *it);
+    CHECK(values[i] == *it);
     --i;
   }
 
   // const_reverse_iterator
   i = 2;
   for (auto it = queue.crbegin(); it != queue.crend(); ++it) {
-    EXPECT_EQ(values[i], *it);
+    CHECK(values[i] == *it);
     --i;
   }
 }

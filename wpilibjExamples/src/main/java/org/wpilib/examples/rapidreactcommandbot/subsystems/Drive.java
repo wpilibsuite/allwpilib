@@ -8,11 +8,11 @@ import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.NotLogged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.DriveConstants;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
@@ -117,7 +117,7 @@ public class Drive extends SubsystemBase {
         // End command when we've traveled the specified distance
         .until(() -> Math.max(leftEncoder.getDistance(), rightEncoder.getDistance()) >= distance)
         // Stop the drive when the command ends
-        .finallyDo(interrupted -> drive.stopMotor());
+        .finallyDo(interrupted -> drive.arcadeDrive(0, 0));
   }
 
   /**

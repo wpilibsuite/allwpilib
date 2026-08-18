@@ -4,9 +4,9 @@
 
 #include <numbers>
 
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/ElevatorFeedforward.hpp"
 #include "wpi/math/controller/ProfiledPIDController.hpp"
@@ -50,7 +50,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr auto kV = 1.3_V / 1_mps;
 
   wpi::Joystick joystick{1};
-  wpi::Encoder encoder{1, 2};
+  wpi::Encoder encoder{2, 3};
   wpi::PWMSparkMax motor{1};
 
   // Create a PID controller whose setpoint's change is subject to maximum

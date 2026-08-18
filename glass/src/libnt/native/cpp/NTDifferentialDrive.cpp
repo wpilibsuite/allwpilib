@@ -4,12 +4,11 @@
 
 #include "wpi/glass/networktables/NTDifferentialDrive.hpp"
 
+#include <format>
 #include <utility>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
-#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -21,18 +20,18 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
 NTDifferentialDriveModel::NTDifferentialDriveModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
+      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
+      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
                          .Subscribe(false)},
       m_lPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Left Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Left Motor Velocity", path))
               .GetEntry(0)},
       m_rPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Right Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Right Motor Velocity", path))
               .GetEntry(0)},
       m_nameValue{wpi::util::rsplit(path, '/').second},
-      m_lPercentData{fmt::format("NTDiffDriveL:{}", path)},
-      m_rPercentData{fmt::format("NTDiffDriveR:{}", path)} {
+      m_lPercentData{std::format("NTDiffDriveL:{}", path)},
+      m_rPercentData{std::format("NTDiffDriveR:{}", path)} {
   m_wheels.emplace_back("L % Output", &m_lPercentData,
                         [this](auto value) { m_lPercent.Set(value); });
 

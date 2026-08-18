@@ -4,22 +4,24 @@
 
 #include "wpi/event/EventLoop.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/system/Errors.hpp"
 
 using namespace wpi;
 
-TEST(EventLoopTest, ConcurrentModification) {
+TEST_CASE("EventLoopTest ConcurrentModification", "[wpilibc][event]") {
   EventLoop loop;
 
-  loop.Bind([&loop] { ASSERT_THROW(loop.Bind([] {}), wpi::RuntimeError); });
+  loop.Bind(
+      [&loop] { REQUIRE_THROWS_AS(loop.Bind([] {}), wpi::RuntimeError); });
 
   loop.Poll();
 
   loop.Clear();
 
-  loop.Bind([&loop] { ASSERT_THROW(loop.Clear(), wpi::RuntimeError); });
+  loop.Bind([&loop] { REQUIRE_THROWS_AS(loop.Clear(), wpi::RuntimeError); });
 
   loop.Poll();
 }

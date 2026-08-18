@@ -9,12 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 
@@ -27,45 +26,36 @@ class DifferentialDriveVoltageConstraintTest {
     double maxVoltage = 10;
     var constraint = new DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage);
 
-    Trajectory trajectory =
-        TrajectoryGeneratorTest.getTrajectory(Collections.singletonList(constraint));
+    Trajectory<DrivetrainSplineSample> trajectory =
+        DrivetrainSplineTrajectoryGenerator.generate(
+            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
+            new TrajectoryConfig(1, 1).addConstraint(constraint));
 
-    var duration = trajectory.getTotalTime();
-    var t = 0.0;
-    var dt = 0.02;
+    final double dt = 0.02;
+    for (double t = 0.0; t < trajectory.duration; t += dt) {
+      var point = trajectory.sampleAt(t);
 
-    while (t < duration) {
-      var point = trajectory.sample(t);
-      var chassisVelocities =
-          new ChassisVelocities(point.velocity, 0, point.velocity * point.curvature);
-      var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
+      var differentialSample = new DifferentialSample(point, kinematics);
+      var left = differentialSample.leftVelocity;
+      var right = differentialSample.rightVelocity;
 
-      t += dt;
-      var acceleration = point.acceleration;
+      var acceleration = point.forwardAcceleration();
 
       // Not really a strictly-correct test as we're using the chassis accel instead of the
       // wheel accel, but much easier than doing it "properly" and a reasonable check anyway
       assertAll(
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelVelocities.left, wheelVelocities.left + dt * acceleration)
-                      <= maxVoltage + 0.05),
+                  feedforward.calculate(left, left + acceleration * dt) <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelVelocities.left, wheelVelocities.left + dt * acceleration)
-                      >= -maxVoltage - 0.05),
+                  feedforward.calculate(left, left + acceleration * dt) >= -maxVoltage - 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelVelocities.right, wheelVelocities.right + dt * acceleration)
-                      <= maxVoltage + 0.05),
+                  feedforward.calculate(right, right + acceleration * dt) <= maxVoltage + 0.05),
           () ->
               assertTrue(
-                  feedforward.calculate(
-                          wheelVelocities.right, wheelVelocities.right + dt * acceleration)
-                      >= -maxVoltage - 0.05));
+                  feedforward.calculate(right, right + acceleration * dt) >= -maxVoltage - 0.05));
     }
   }
 
@@ -83,7 +73,7 @@ class DifferentialDriveVoltageConstraintTest {
     // Radius of curvature should be ~1 meter.
     assertDoesNotThrow(
         () ->
-            TrajectoryGenerator.generateTrajectory(
+            DrivetrainSplineTrajectoryGenerator.generate(
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
                 new ArrayList<>(),
                 new Pose2d(0, 1, Rotation2d.kPi),
@@ -91,7 +81,7 @@ class DifferentialDriveVoltageConstraintTest {
 
     assertDoesNotThrow(
         () ->
-            TrajectoryGenerator.generateTrajectory(
+            DrivetrainSplineTrajectoryGenerator.generate(
                 new Pose2d(0, 1, Rotation2d.kPi),
                 new ArrayList<>(),
                 new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),

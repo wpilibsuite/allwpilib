@@ -1,5 +1,10 @@
+extra_includes:
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/event/BooleanEvent.hpp
+
 classes:
   wpi::Gamepad:
+    force_no_trampoline: true
     ignored_bases:
     - wpi::util::SendableHelper<Gamepad>
     enums:
@@ -7,36 +12,51 @@ classes:
       Axis:
     methods:
       Gamepad:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetRightX:
+      SetRightXDeadband:
       GetRightY:
-      GetLeftTriggerAxis:
+      SetRightYDeadband:
+      GetLeftTrigger:
+      SetLeftTriggerDeadband:
       LeftTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetRightTriggerAxis:
+      GetRightTrigger:
+      SetRightTriggerDeadband:
       RightTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetSouthFaceButton:
-      GetSouthFaceButtonPressed:
-      GetSouthFaceButtonReleased:
-      SouthFace:
-      GetEastFaceButton:
-      GetEastFaceButtonPressed:
-      GetEastFaceButtonReleased:
-      EastFace:
-      GetWestFaceButton:
-      GetWestFaceButtonPressed:
-      GetWestFaceButtonReleased:
-      WestFace:
-      GetNorthFaceButton:
-      GetNorthFaceButtonPressed:
-      GetNorthFaceButtonReleased:
-      NorthFace:
+      GetFaceDownButton:
+      GetFaceDownButtonPressed:
+      GetFaceDownButtonReleased:
+      FaceDown:
+      GetFaceRightButton:
+      GetFaceRightButtonPressed:
+      GetFaceRightButtonReleased:
+      FaceRight:
+      GetFaceLeftButton:
+      GetFaceLeftButtonPressed:
+      GetFaceLeftButtonReleased:
+      FaceLeft:
+      GetFaceUpButton:
+      GetFaceUpButtonPressed:
+      GetFaceUpButtonReleased:
+      FaceUp:
       GetBackButton:
       GetBackButtonPressed:
       GetBackButtonReleased:
@@ -133,4 +153,15 @@ classes:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
+      GetAxesAvailable:
+      GetButtonsAvailable:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetLeds:
+      SetRumble:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
       InitSendable:

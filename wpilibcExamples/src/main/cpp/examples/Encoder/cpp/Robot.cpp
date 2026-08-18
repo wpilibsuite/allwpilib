@@ -30,25 +30,12 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    /* Defines the number of samples to average when determining the rate.
-     * On a quadrature encoder, values range from 1-255; larger values result in
-     * smoother but potentially less accurate rates than lower values.
-     */
-    encoder.SetSamplesToAverage(5);
-
     /* Defines how far the mechanism attached to the encoder moves per pulse. In
      * this case, we assume that a 360 count encoder is directly attached to a 3
      * inch diameter (1.5inch radius) wheel, and that we want to measure
      * distance in inches.
      */
     encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
-
-    /* Defines the lowest rate at which the encoder will not be considered
-     * stopped, for the purposes of the GetStopped() method. Units are in
-     * distance / second, where distance refers to the units of distance that
-     * you are using, in this case inches.
-     */
-    encoder.SetMinRate(1.0);
   }
 
   void TeleopPeriodic() override {
@@ -64,7 +51,7 @@ class Robot : public wpi::TimedRobot {
    * The Encoder object is constructed with 4 parameters, the last two being
    * optional.
    *
-   * The first two parameters (1, 2 in this case) refer to the ports on the
+   * The first two parameters (2, 3 in this case) refer to the ports on the
    * roboRIO which the encoder uses. Because a quadrature encoder has two signal
    * wires, the signal from two DIO ports on the roboRIO are used.
    *
@@ -76,7 +63,7 @@ class Robot : public wpi::TimedRobot {
    * and defaults to X4. Faster (X4) encoding gives greater positional
    * precision but more noise in the rate.
    */
-  wpi::Encoder encoder{1, 2, false, wpi::Encoder::EncodingType::X4};
+  wpi::Encoder encoder{2, 3, false, wpi::Encoder::EncodingType::X4};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

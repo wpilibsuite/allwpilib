@@ -1,11 +1,74 @@
 # THIS FILE IS AUTO GENERATED
 
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
-load("//shared/bazel/rules/robotpy:pybind_rules.bzl", "create_pybind_library", "robotpy_library")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library", "robotpy_library")
 load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_modinit_hpp", "gen_pkgconf", "resolve_casters", "run_header_gen")
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+        "--name-transform-default",
+        "snake_case",
+        "--name-transform-enum-value",
+        "CAPS_CASE",
+        "--name-transform-known-word",
+        "3V3",
+        "--name-transform-known-word",
+        "5V",
+        "--name-transform-known-word",
+        "CAN",
+        "--name-transform-known-word",
+        "CPU",
+        "--name-transform-known-word",
+        "DS",
+        "--name-transform-known-word",
+        "FMS",
+        "--name-transform-known-word",
+        "FPGA",
+        "--name-transform-known-word",
+        "HAL",
+        "--name-transform-known-word",
+        "HTTP",
+        "--name-transform-known-word",
+        "I2C",
+        "--name-transform-known-word",
+        "IMU",
+        "--name-transform-known-word",
+        "JNI",
+        "--name-transform-known-word",
+        "JSON",
+        "--name-transform-known-word",
+        "mDNS",
+        "--name-transform-known-word",
+        "NT",
+        "--name-transform-known-word",
+        "OpMode",
+        "--name-transform-known-word",
+        "PCM",
+        "--name-transform-known-word",
+        "PDH",
+        "--name-transform-known-word",
+        "PDP",
+        "--name-transform-known-word",
+        "PID",
+        "--name-transform-known-word",
+        "POVs",
+        "--name-transform-known-word",
+        "PWM",
+        "--name-transform-known-word",
+        "RIO",
+        "--name-transform-known-word",
+        "SPI",
+        "--name-transform-known-word",
+        "URI",
+        "--name-transform-known-word",
+        "URL",
+        "--name-transform-known-word",
+        "USB",
+        "--name-transform-known-word",
+        "VIn",
+    ]
+
     XRP_HEADER_GEN = [
         struct(
             class_name = "XRPGyro",
@@ -116,6 +179,7 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
             "//xrpVendordep:robotpy-native-xrp.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -154,7 +218,7 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -178,7 +242,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/xrp/**"], exclude = ["src/main/python/xrp/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/xrp/**"], exclude = ["src/main/python/xrp/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -190,6 +254,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     robotpy_library(
         name = name,
+        distribution = "robotpy-xrp",
         srcs = native.glob(["src/main/python/xrp/**/*.py"]) + [
             "src/main/python/xrp/_init__xrp.py",
             "{}.generate_version".format(name),
@@ -210,6 +275,7 @@ def define_pybind_library(name, pkgcfgs = []):
         project_urls = None,
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-xrp==0.0.0", "wpilib==0.0.0"],
+        python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["xrp = xrp"],
             "robotpy_cli.2027": ["run-xrp = xrp.cli:RunXrp"],
@@ -221,7 +287,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
@@ -239,7 +305,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//xrpVendordep:robotpy-native-xrp.copy_headers",
         ],
         package_root_file = "src/main/python/xrp/__init__.py",

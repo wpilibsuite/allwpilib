@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.geometry.Rectangle2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.shape.Rectangle2d;
 import org.wpilib.math.trajectory.constraint.MaxVelocityConstraint;
 import org.wpilib.math.trajectory.constraint.RectangularRegionConstraint;
 import org.wpilib.math.util.Units;
@@ -24,16 +24,16 @@ class RectangularRegionConstraintTest {
             new Translation2d(Units.feetToMeters(5.0), Units.feetToMeters(27.0)));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new RectangularRegionConstraint(
                     rectangle, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
-    for (var point : trajectory.getStates()) {
+    for (var point : trajectory.samples) {
       if (rectangle.contains(point.pose.getTranslation())) {
-        assertTrue(Math.abs(point.velocity) < maxVelocity + 0.05);
-      } else if (Math.abs(point.velocity) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.forwardVelocity()) < maxVelocity + 0.05);
+      } else if (Math.abs(point.forwardVelocity()) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }

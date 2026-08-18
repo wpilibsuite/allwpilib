@@ -7,7 +7,7 @@
 #include <string>
 
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpiutil.npb.h"
+#include "wpiutil_test.npb.h"
 
 struct TestProtoInner {
   std::string msg;

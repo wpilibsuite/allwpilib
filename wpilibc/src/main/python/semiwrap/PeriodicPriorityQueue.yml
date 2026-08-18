@@ -22,6 +22,7 @@ classes:
       func:
       period:
       expirationTime:
+      id:
     methods:
       Callback:
         overloads:

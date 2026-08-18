@@ -4,6 +4,7 @@
 
 #include "wpi/math/random/Normal.hpp"
 
+#include <cstddef>
 #include <random>
 #include <span>
 

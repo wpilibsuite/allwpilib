@@ -1,4 +1,5 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_plugin.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -19,6 +20,12 @@ exports_files([
     "LICENSE.md",
     "ThirdPartyNotices.txt",
 ])
+
+alias(
+    name = "generation",
+    actual = "//shared:generation",
+    visibility = ["//visibility:public"],
+)
 
 pkg_files(
     name = "license_pkg_files",
@@ -44,12 +51,19 @@ alias(
     name = "quickbuf_protoc",
     actual = select({
         "@platforms//os:windows": "@quickbuffer_protoc_windows//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
-        "@rules_bzlmodrio_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
+        "@wpilib_toolchains//conditions:osx_aarch64": "@quickbuffer_protoc_osx_aarch64//file",
+        "@wpilib_toolchains//conditions:osx_x86_64": "@quickbuffer_protoc_osx_x86-64//file",
+        "@wpilib_toolchains//constraints/combined:is_linux": "@quickbuffer_protoc_linux//file",
     }),
     tags = ["pregeneration"],
     visibility = ["//visibility:public"],
+)
+
+buildifier(
+    name = "buildifier.fix",
+    lint_mode = "fix",
+    lint_warnings = ["all"],
+    mode = "fix",
 )
 
 java_binary(
@@ -62,14 +76,13 @@ java_binary(
 write_source_files(
     name = "write_pregenerated_files",
     additional_update_targets = [
-        "//hal:write_hal",
         "//ntcore:write_ntcore",
         "//wpilibc:write_wpilibc",
-        "//wpilibcExamples:write_example_project_list",
         "//wpilibj:write_wpilibj",
-        "//wpilibjExamples:write_example_project_list",
         "//commandsv2:write_wpilib_new_commands",
         "//commandsv3:write_commandsv3",
+        "//drivers:write_drivers",
+        "//fields:write_fields",
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
@@ -93,9 +106,13 @@ publish_all(
         "//cscore:cscorejnicvstatic-cpp_publish.publish",
         "//datalog:datalog-cpp_publish.publish",
         "//datalog:datalog-java_publish.publish",
+        "//drivers:drivers-cpp_publish.publish",
+        "//drivers:drivers-java_publish.publish",
         "//docs:wpilibj_publish.publish",
         "//epilogue-processor:processor-java_publish.publish",
         "//epilogue-runtime:epilogue-java_publish.publish",
+        "//fields:field-images-java_publish.publish",
+        "//fields:fieldimages-cpp_publish.publish",
         "//fields:fields-cpp_publish.publish",
         "//fields:fields-java_publish.publish",
         "//glass:glass-cpp_publish.publish",
@@ -116,7 +133,6 @@ publish_all(
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish.publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish.publish",
         "//thirdparty/catch2:catch2-cpp_publish.publish",
-        "//thirdparty/googletest:googletest-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
         "//tools/datalogtool:datalogtool_publish.publish",
         "//tools/outlineviewer:outlineviewer_publish.publish",
@@ -155,6 +171,8 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-native-apriltag-generator.generate_build_info",
         "//datalog:robotpy-native-datalog-generator.generate_build_info",
+        "//drivers:robotpy-native-wpilib-drivers-generator.generate_build_info",
+        "//fields:robotpy-native-fields-generator.generate_build_info",
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
@@ -176,6 +194,8 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-generator.generate_build_info",
         "//datalog:robotpy-datalog-generator.generate_build_info",
+        "//drivers:wpilib-drivers-generator.generate_build_info",
+        "//fields:robotpy-fields-generator.generate_build_info",
         "//hal:robotpy-hal-generator.generate_build_info",
         "//ntcore:pyntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-romi-generator.generate_build_info",
@@ -198,6 +218,8 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:write_robotpy-apriltag-update-yaml",
         "//datalog:write_robotpy-wpilog-update-yaml",
+        "//drivers:write_wpilib-drivers-update-yaml",
+        "//fields:write_robotpy-fields-update-yaml",
         "//hal:write_robotpy-hal-update-yaml",
         "//ntcore:write_pyntcore-update-yaml",
         "//romiVendordep:write_robotpy-romi-update-yaml",
@@ -221,6 +243,8 @@ write_source_files(
     additional_update_targets = [
         "//apriltag:robotpy-apriltag-create-imports",
         "//datalog:robotpy-wpilog-create-imports",
+        "//drivers:wpilib-drivers-create-imports",
+        "//fields:robotpy-fields-create-imports",
         "//hal:robotpy-hal-create-imports",
         "//ntcore:pyntcore-create-imports",
         "//romiVendordep:robotpy-romi-create-imports",
@@ -270,6 +294,8 @@ filegroup(
     srcs = [
         "//apriltag:robotpy-apriltag.generated_files",
         "//datalog:robotpy-wpilog.generated_files",
+        "//drivers:wpilib-drivers.generated_files",
+        "//fields:robotpy-fields.generated_files",
         "//hal:robotpy-hal.generated_files",
         "//ntcore:pyntcore.generated_files",
         "//wpilibc:robotpy-wpilib.generated_files",

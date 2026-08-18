@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
+#include <memory>
 #include <string_view>
 #include <thread>
 
@@ -52,9 +54,13 @@ class FileLogger {
 
  private:
 #ifdef __linux__
+  void Stop();
+
   int m_fileHandle = -1;
   int m_inotifyHandle = -1;
   int m_inotifyWatchHandle = -1;
+  std::shared_ptr<std::atomic<bool>> m_running =
+      std::make_shared<std::atomic<bool>>(true);
   std::thread m_thread;
 #endif
 };

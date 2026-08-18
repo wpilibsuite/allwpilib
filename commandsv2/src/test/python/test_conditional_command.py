@@ -9,17 +9,17 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_conditionalCommand(scheduler: commands2.CommandScheduler):
+def test_conditional_command(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()
-    command1.isFinished = lambda: True
+    command1.is_finished = lambda: True
     command2 = commands2.Command()
 
     start_spying_on(command1)
     start_spying_on(command2)
 
-    conditionalCommand = commands2.ConditionalCommand(command1, command2, lambda: True)
+    conditional_command = commands2.ConditionalCommand(command1, command2, lambda: True)
 
-    scheduler.schedule(conditionalCommand)
+    scheduler.schedule(conditional_command)
     scheduler.run()
 
     verify(command1).initialize()
@@ -31,25 +31,25 @@ def test_conditionalCommand(scheduler: commands2.CommandScheduler):
     verify(command2, never()).end(False)
 
 
-def test_conditionalCommandRequirement(scheduler: commands2.CommandScheduler):
+def test_conditional_command_requirement(scheduler: commands2.CommandScheduler):
     system1 = commands2.Subsystem()
     system2 = commands2.Subsystem()
     system3 = commands2.Subsystem()
 
     command1 = commands2.Command()
-    command1.addRequirements(system1, system2)
+    command1.add_requirements(system1, system2)
     command2 = commands2.Command()
-    command2.addRequirements(system3)
+    command2.add_requirements(system3)
 
     start_spying_on(command1)
     start_spying_on(command2)
 
-    conditionalCommand = commands2.ConditionalCommand(command1, command2, lambda: True)
+    conditional_command = commands2.ConditionalCommand(command1, command2, lambda: True)
 
-    scheduler.schedule(conditionalCommand)
+    scheduler.schedule(conditional_command)
     scheduler.schedule(commands2.InstantCommand(lambda: None, system3))
 
-    assert not scheduler.isScheduled(conditionalCommand)
+    assert not scheduler.is_scheduled(conditional_command)
 
     assert command1.end.called_with(True)
     assert not command2.end.called_with(True)

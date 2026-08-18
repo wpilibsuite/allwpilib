@@ -29,15 +29,15 @@ classes:
 
 inline_code: |-
   cls_Ellipse2d
-    .def_static("fromFeet", [](const Pose2d& center, wpi::units::foot_t xSemiAxis, wpi::units::foot_t ySemiAxis) {
+    .def_static("from_feet", [](const Pose2d& center, wpi::units::foot_t xSemiAxis, wpi::units::foot_t ySemiAxis) {
       return std::make_unique<Ellipse2d>(center, xSemiAxis, ySemiAxis);
-    }, py::arg("center"), py::arg("xSemiAxis"), py::arg("ySemiAxis"))
-    .def_property_readonly("xsemiaxis", &Ellipse2d::XSemiAxis)
-    .def_property_readonly("ysemiaxis", &Ellipse2d::YSemiAxis)
-    .def_property_readonly("xsemiaxis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
+    }, py::arg("center"), py::arg("x_semi_axis"), py::arg("y_semi_axis"))
+    .def_property_readonly("x_semi_axis", &Ellipse2d::XSemiAxis)
+    .def_property_readonly("y_semi_axis", &Ellipse2d::YSemiAxis)
+    .def_property_readonly("x_semi_axis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
       return self.XSemiAxis();
     })
-    .def_property_readonly("ysemiaxis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
+    .def_property_readonly("y_semi_axis_feet", [](Ellipse2d &self) -> wpi::units::foot_t {
       return self.YSemiAxis();
     })
     .def("__repr__", py::overload_cast<const Ellipse2d&>(&rpy::toString));

@@ -5,9 +5,9 @@
 package org.wpilib.examples.gettingstarted;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Gamepad;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.system.Timer;
 import org.wpilib.util.sendable.SendableRegistry;
 
@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
       // Drive forwards half velocity, make sure to turn input squaring off
       robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
-      robotDrive.stopMotor(); // stop robot
+      robotDrive.arcadeDrive(0.0, 0.0, false); // stop robot
     }
   }
 

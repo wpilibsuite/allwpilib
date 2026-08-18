@@ -38,10 +38,10 @@ static std::string DebugBinary(std::span<const uint8_t> val) {
     val = val.subspan(0, 30);
   }
   for (auto ch : val) {
-    stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+    stros << std::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
   }
   if (limited != 0) {
-    stros << fmt::format("... (total {})", limited);
+    stros << std::format("... (total {})", limited);
   }
   return str;
 #else
@@ -162,7 +162,7 @@ WebSocket::WebSocket(uv::Stream& stream, bool server, const private_init&)
   // Connect closed and error signals to ourselves
   m_stream.closed.connect([this]() { SetClosed(1006, "handle closed"); });
   m_stream.error.connect([this](uv::Error err) {
-    Terminate(1006, fmt::format("stream error: {}", err.name()));
+    Terminate(1006, std::format("stream error: {}", err.name()));
   });
 
   // Start reading
@@ -520,6 +520,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
           m_frameSize = (static_cast<uint16_t>(m_header[2]) << 8) |
                         static_cast<uint16_t>(m_header[3]);
         } else if (len == 127) {
+          // RFC 6455 limits payload lengths to 63 bits.
+          if ((m_header[2] & 0x80) != 0) {
+            return Fail(1002, "invalid 64-bit payload length");
+          }
           m_frameSize = (static_cast<uint64_t>(m_header[2]) << 56) |
                         (static_cast<uint64_t>(m_header[3]) << 48) |
                         (static_cast<uint64_t>(m_header[4]) << 40) |
@@ -534,8 +538,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
         // limit maximum size
         bool control = (m_header[0] & FLAG_CONTROL) != 0;
-        if (((control ? m_controlPayload.size() : m_payload.size()) +
-             m_frameSize) > m_maxMessageSize) {
+        size_t accumulatedSize =
+            control ? m_controlPayload.size() : m_payload.size();
+        if (accumulatedSize > m_maxMessageSize ||
+            m_frameSize > m_maxMessageSize - accumulatedSize) {
           return Fail(1009, "message too large");
         }
       }
@@ -655,7 +661,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             if (m_state != State::CLOSING) {
               SendClose(code, reason);
             }
-            SetClosed(code, fmt::format("remote close: {}", reason));
+            SetClosed(code, std::format("remote close: {}", reason));
             // If we're the server, shutdown the connection.
             if (m_server) {
               Shutdown();
@@ -692,7 +698,7 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
             pong(m_controlPayload);
             break;
           default:
-            return Fail(1002, fmt::format("invalid message opcode {}",
+            return Fail(1002, std::format("invalid message opcode {}",
                                           static_cast<unsigned int>(opcode)));
         }
 
@@ -729,7 +735,7 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
     wpi::util::raw_svector_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
-        stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+        stros << std::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
       }
     }
 #endif
@@ -740,7 +746,7 @@ static void VerboseDebug(const WebSocket::Frame& frame) {
     wpi::util::raw_svector_ostream stros{str};
     for (auto&& d : frame.data) {
       for (auto ch : d.data()) {
-        stros << fmt::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
+        stros << std::format("{:02x},", static_cast<unsigned int>(ch) & 0xff);
       }
     }
 #endif

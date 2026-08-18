@@ -26,6 +26,7 @@ public class PubSubOptions {
         case PubSubOption.ExcludePublisherHandle e -> excludePublisher = e.publisher();
         case PubSubOption.ExcludeSelf s -> excludeSelf = s.enabled();
         case PubSubOption.Hidden h -> hidden = h.enabled();
+        case PubSubOption.DisableSignal s -> disableSignal = s.disabled();
       }
     }
   }
@@ -41,7 +42,8 @@ public class PubSubOptions {
       boolean disableRemote,
       boolean disableLocal,
       boolean excludeSelf,
-      boolean hidden) {
+      boolean hidden,
+      boolean disableSignal) {
     this.pollStorage = pollStorage;
     this.periodic = periodic;
     this.excludePublisher = excludePublisher;
@@ -53,6 +55,7 @@ public class PubSubOptions {
     this.disableLocal = disableLocal;
     this.excludeSelf = excludeSelf;
     this.hidden = hidden;
+    this.disableSignal = disableSignal;
   }
 
   /** Default value of periodic. */
@@ -114,4 +117,7 @@ public class PubSubOptions {
    * this one, and the subscription will not appear in metatopics.
    */
   public boolean hidden;
+
+  /** For subscriptions, don't signal the local handle when value updates are queued. */
+  public boolean disableSignal;
 }

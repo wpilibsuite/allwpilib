@@ -6,8 +6,6 @@
 
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/cs/VideoSink.hpp"
 #include "wpi/util/json.hpp"
 

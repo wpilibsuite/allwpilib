@@ -4,6 +4,8 @@
 
 #include "wpi/math/geometry/Pose3d.hpp"
 
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json, const Pose3d& pose) {

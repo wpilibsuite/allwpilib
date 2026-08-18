@@ -9,88 +9,108 @@
 using namespace wpi::cmd;
 
 CommandNiDsPS4Controller::CommandNiDsPS4Controller(int port)
-    : CommandGenericHID(port), m_hid{wpi::NiDsPS4Controller(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
 
-wpi::NiDsPS4Controller& CommandNiDsPS4Controller::GetHID() {
-  return m_hid;
+CommandGenericHID& CommandNiDsPS4Controller::GetHID() {
+  return *m_hid;
+}
+
+wpi::NiDsPS4Controller&
+CommandNiDsPS4Controller::GetNiDsPS4Controller() {
+  return m_controller;
 }
 
 Trigger CommandNiDsPS4Controller::Square(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kSquare, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kSquare, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Cross(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kCross, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kCross, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Circle(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kCircle, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kCircle, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Triangle(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kTriangle, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kTriangle, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L1(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kL1, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kL1, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R1(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kR1, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kR1, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L2(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kL2, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kL2, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R2(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kR2, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kR2, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Share(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kShare, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kShare, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Options(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kOptions, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kOptions, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L3(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kL3, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kL3, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R3(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kR3, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kR3, loop);
 }
 
 Trigger CommandNiDsPS4Controller::PS(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kPS, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kPS, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Touchpad(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsPS4Controller::Button::kTouchpad, loop);
+  return m_hid->Button(
+      wpi::NiDsPS4Controller::Button::kTouchpad, loop);
 }
 
 double CommandNiDsPS4Controller::GetLeftX() const {
-  return m_hid.GetLeftX();
+  return m_controller.GetLeftX();
 }
 
 double CommandNiDsPS4Controller::GetLeftY() const {
-  return m_hid.GetLeftY();
+  return m_controller.GetLeftY();
 }
 
 double CommandNiDsPS4Controller::GetRightX() const {
-  return m_hid.GetRightX();
+  return m_controller.GetRightX();
 }
 
 double CommandNiDsPS4Controller::GetRightY() const {
-  return m_hid.GetRightY();
+  return m_controller.GetRightY();
 }
 
 double CommandNiDsPS4Controller::GetL2Axis() const {
-  return m_hid.GetL2Axis();
+  return m_controller.GetL2Axis();
 }
 
 double CommandNiDsPS4Controller::GetR2Axis() const {
-  return m_hid.GetR2Axis();
+  return m_controller.GetR2Axis();
 }

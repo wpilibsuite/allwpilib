@@ -26,22 +26,18 @@ class EncoderModel : public Model {
 
   virtual DoubleSource* GetDistancePerPulseData() = 0;
   virtual IntegerSource* GetCountData() = 0;
-  virtual DoubleSource* GetPeriodData() = 0;
   virtual BooleanSource* GetDirectionData() = 0;
   virtual DoubleSource* GetDistanceData() = 0;
   virtual DoubleSource* GetRateData() = 0;
 
-  virtual double GetMaxPeriod() = 0;
   virtual bool GetReverseDirection() = 0;
 
   virtual void SetDistancePerPulse(double val) = 0;
   virtual void SetCount(int val) = 0;
-  virtual void SetPeriod(double val) = 0;
   virtual void SetDirection(bool val) = 0;
   virtual void SetDistance(double val) = 0;
   virtual void SetRate(double val) = 0;
 
-  virtual void SetMaxPeriod(double val) = 0;
   virtual void SetReverseDirection(bool val) = 0;
 };
 

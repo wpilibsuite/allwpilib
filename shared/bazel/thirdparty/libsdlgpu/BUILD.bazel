@@ -1,0 +1,68 @@
+load("@rules_cc//cc:defs.bzl", "cc_import")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_import(
+    name = "libsdlgpu",
+    linkopts = select({
+        "@platforms//os:linux": [
+            "-ldl",
+            "-lpthread",
+            "-lrt",
+            "-lm",
+        ],
+        "@platforms//os:osx": [
+            "-Wl,-framework,AppKit",
+            "-Wl,-framework,ApplicationServices",
+            "-Wl,-framework,AudioToolbox",
+            "-Wl,-framework,Carbon",
+            "-Wl,-framework,CoreAudio",
+            "-Wl,-framework,CoreFoundation",
+            "-Wl,-framework,CoreGraphics",
+            "-Wl,-framework,CoreHaptics",
+            "-Wl,-framework,CoreServices",
+            "-Wl,-framework,CoreVideo",
+            "-Wl,-framework,ForceFeedback",
+            "-Wl,-framework,Foundation",
+            "-Wl,-framework,GameController",
+            "-Wl,-framework,IOKit",
+            "-Wl,-framework,Metal",
+            "-Wl,-framework,QuartzCore",
+            "-Wl,-framework,UniformTypeIdentifiers",
+        ],
+        "@platforms//os:windows": [
+            "-DEFAULTLIB:Gdi32.lib",
+            "-DEFAULTLIB:User32.lib",
+            "-DEFAULTLIB:Shell32.lib",
+            "-DEFAULTLIB:Advapi32.lib",
+            "-DEFAULTLIB:Cfgmgr32.lib",
+            "-DEFAULTLIB:Imm32.lib",
+            "-DEFAULTLIB:Ole32.lib",
+            "-DEFAULTLIB:Oleaut32.lib",
+            "-DEFAULTLIB:Setupapi.lib",
+            "-DEFAULTLIB:Version.lib",
+            "-DEFAULTLIB:Winmm.lib",
+            "-DEFAULTLIB:Dwmapi.lib",
+            "-DEFAULTLIB:dxgi.lib",
+            "-DEFAULTLIB:dxguid.lib",
+            "-DEFAULTLIB:d3d11.lib",
+            "-DEFAULTLIB:d3d12.lib",
+            "-DEFAULTLIB:d3dcompiler.lib",
+        ],
+    }),
+    static_library = select({
+        "@wpilib_toolchains//conditions:linux_x86_64": "@libsdlgpu_linuxx86-64static//:static_libs",
+        "@wpilib_toolchains//conditions:linux_x86_64_debug": "@libsdlgpu_linuxx86-64staticdebug//:static_libs",
+        "@wpilib_toolchains//conditions:osx": "@libsdlgpu_osxuniversalstatic//:static_libs",
+        "@wpilib_toolchains//conditions:osx_debug": "@libsdlgpu_osxuniversalstaticdebug//:static_libs",
+        "@wpilib_toolchains//conditions:windows_arm64": "@libsdlgpu_windowsarm64static//:static_libs",
+        "@wpilib_toolchains//conditions:windows_arm64_debug": "@libsdlgpu_windowsarm64staticdebug//:static_libs",
+        "@wpilib_toolchains//conditions:windows_x86_64": "@libsdlgpu_windowsx86-64static//:static_libs",
+        "@wpilib_toolchains//conditions:windows_x86_64_debug": "@libsdlgpu_windowsx86-64staticdebug//:static_libs",
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "@libsdlgpu_linuxarm64static//:static_libs",
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64_debug": "@libsdlgpu_linuxarm64staticdebug//:static_libs",
+    }),
+    deps = [
+        "@libsdlgpu_headers//:headers",
+    ],
+)

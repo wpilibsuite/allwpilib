@@ -4,9 +4,9 @@
 
 #include "wpi/glass/hardware/Encoder.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/glass/Context.hpp"
@@ -24,9 +24,6 @@ void EncoderModel::SetName(std::string_view name) {
     if (auto count = GetCountData()) {
       count->SetName("");
     }
-    if (auto period = GetPeriodData()) {
-      period->SetName("");
-    }
     if (auto direction = GetDirectionData()) {
       direction->SetName("");
     }
@@ -38,22 +35,19 @@ void EncoderModel::SetName(std::string_view name) {
     }
   } else {
     if (auto distancePerPulse = GetDistancePerPulseData()) {
-      distancePerPulse->SetName(fmt::format("{} Distance/Count", name));
+      distancePerPulse->SetName(std::format("{} Distance/Count", name));
     }
     if (auto count = GetCountData()) {
-      count->SetName(fmt::format("{} Count", name));
-    }
-    if (auto period = GetPeriodData()) {
-      period->SetName(fmt::format("{} Period", name));
+      count->SetName(std::format("{} Count", name));
     }
     if (auto direction = GetDirectionData()) {
-      direction->SetName(fmt::format("{} Direction", name));
+      direction->SetName(std::format("{} Direction", name));
     }
     if (auto distance = GetDistanceData()) {
-      distance->SetName(fmt::format("{} Distance", name));
+      distance->SetName(std::format("{} Distance", name));
     }
     if (auto rate = GetRateData()) {
-      rate->SetName(fmt::format("{} Rate", name));
+      rate->SetName(std::format("{} Rate", name));
     }
   }
 }
@@ -112,20 +106,6 @@ void wpi::glass::DisplayEncoder(EncoderModel* model) {
     ImGui::SameLine();
     ImGui::Selectable("Count");
     countData->EmitDrag();
-  }
-
-  // max period
-  {
-    double maxPeriod = model->GetMaxPeriod();
-    ImGui::LabelText("Max Period", "%.6f", maxPeriod);
-  }
-
-  // period
-  if (auto periodData = model->GetPeriodData()) {
-    double value = periodData->GetValue();
-    if (periodData->InputDouble("Period", &value, 0, 0, "%.6g")) {
-      model->SetPeriod(value);
-    }
   }
 
   // reverse direction

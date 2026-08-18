@@ -11,6 +11,7 @@ requires = [
 name = "robotpy-native-datalog"
 version = "0.0.0"
 description = "WPILib Utility Library"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 
 dependencies = [

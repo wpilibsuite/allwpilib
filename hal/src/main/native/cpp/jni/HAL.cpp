@@ -11,31 +11,25 @@
 #endif
 
 #include <cassert>
-#include <cstring>
-
-#include <fmt/format.h>
 
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_HAL.h"
-#include "wpi/hal/DriverStation.h"
 #include "wpi/hal/Main.h"
-#include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;
-using namespace wpi::util::java;
 
 extern "C" {
 
 /*
  * Class:     org_wpilib_hardware_hal_HAL
  * Method:    initialize
- * Signature: (II)Z
+ * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
 Java_org_wpilib_hardware_hal_HAL_initialize
-  (JNIEnv*, jclass, jint timeout, jint mode)
+  (JNIEnv*, jclass)
 {
-  return HAL_Initialize(timeout, mode);
+  return HAL_Initialize();
 }
 
 /*

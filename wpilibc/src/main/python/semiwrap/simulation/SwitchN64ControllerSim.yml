@@ -1,0 +1,32 @@
+extra_includes:
+- wpi/driverstation/SwitchN64Controller.hpp
+
+classes:
+  wpi::sim::SwitchN64ControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::SwitchN64Controller
+    methods:
+      SwitchN64ControllerSim:
+        overloads:
+          const SwitchN64Controller&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetZAxis:
+      SetZR:
+      SetAButton:
+      SetBButton:
+      SetCLeftButton:
+      SetCUpButton:
+      SetCaptureButton:
+      SetHomeButton:
+      SetStartButton:
+      SetCDownButton:
+      SetLButton:
+      SetRButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetCRightButton:

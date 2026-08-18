@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -48,6 +48,7 @@ class AnalogInput : public wpi::util::Sendable,
    * GetVoltage() to get the analog value in calibrated units.
    *
    * @return A sample straight from this channel.
+   * @Common This is one of the commonly used methods for this class
    */
   int GetValue() const;
 
@@ -78,7 +79,7 @@ class AnalogInput : public wpi::util::Sendable,
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
+  wpi::util::Handle<HAL_AnalogInputHandle, HAL_FreeAnalogInputPort> m_port;
 };
 
 }  // namespace wpi

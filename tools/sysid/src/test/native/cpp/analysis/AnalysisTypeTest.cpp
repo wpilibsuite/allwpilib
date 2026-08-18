@@ -4,11 +4,11 @@
 
 #include "wpi/sysid/analysis/AnalysisType.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(AnalysisTypeTest, FromName) {
-  EXPECT_EQ(sysid::analysis::kElevator, sysid::analysis::FromName("Elevator"));
-  EXPECT_EQ(sysid::analysis::kArm, sysid::analysis::FromName("Arm"));
-  EXPECT_EQ(sysid::analysis::kSimple, sysid::analysis::FromName("Simple"));
-  EXPECT_EQ(sysid::analysis::kSimple, sysid::analysis::FromName("Random"));
+TEST_CASE("AnalysisTypeTest FromName", "[sysid]") {
+  CHECK(sysid::analysis::kElevator == sysid::analysis::FromName("Elevator"));
+  CHECK(sysid::analysis::kArm == sysid::analysis::FromName("Arm"));
+  CHECK(sysid::analysis::kSimple == sysid::analysis::FromName("Simple"));
+  CHECK(sysid::analysis::kSimple == sysid::analysis::FromName("Random"));
 }

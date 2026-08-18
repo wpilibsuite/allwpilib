@@ -5,8 +5,10 @@
 #include "subsystems/Storage.hpp"
 
 Storage::Storage() {
-  SetDefaultCommand(
-      RunOnce([this] { motor.Disable(); }).AndThen([] {}).WithName("Idle"));
+  SetDefaultCommand(RunOnce([this] {
+                      motor.SetThrottle(0.0);
+                    }).AndThen([] {
+                      }).WithName("Idle"));
 }
 
 wpi::cmd::CommandPtr Storage::RunCommand() {

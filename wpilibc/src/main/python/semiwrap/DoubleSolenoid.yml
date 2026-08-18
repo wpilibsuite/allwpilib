@@ -10,8 +10,8 @@ classes:
     methods:
       DoubleSolenoid:
         overloads:
-          int, PneumaticsModuleType, int, int:
-          int, int, PneumaticsModuleType, int, int:
+          CANBus, PneumaticsModuleType, int, int:
+          CANBus, int, PneumaticsModuleType, int, int:
       Set:
       Get:
       Toggle:

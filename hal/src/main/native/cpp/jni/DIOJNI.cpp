@@ -9,9 +9,6 @@
 #include "HALUtil.hpp"
 #include "org_wpilib_hardware_hal_DIOJNI.h"
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/PWM.h"
-#include "wpi/hal/Ports.h"
-#include "wpi/hal/handles/HandlesInternal.hpp"
 #include "wpi/util/jni_util.hpp"
 
 using namespace wpi::hal;

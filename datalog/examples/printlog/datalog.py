@@ -5,11 +5,11 @@
 
 import array
 import struct
-from typing import List, SupportsBytes
+from typing import SupportsBytes
 
 import msgpack
 
-__all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"]
+__all__ = ["DataLogReader", "DataLogRecord", "MetadataRecordData", "StartRecordData"]
 
 floatStruct = struct.Struct("<f")
 doubleStruct = struct.Struct("<d")
@@ -133,7 +133,7 @@ class DataLogRecord:
     def getMsgPack(self):
         return msgpack.unpackb(self.data)
 
-    def getBooleanArray(self) -> List[bool]:
+    def getBooleanArray(self) -> list[bool]:
         return [x != 0 for x in self.data]
 
     def getIntegerArray(self) -> array.array:
@@ -157,7 +157,7 @@ class DataLogRecord:
         arr.frombytes(self.data)
         return arr
 
-    def getStringArray(self) -> List[str]:
+    def getStringArray(self) -> list[str]:
         size = int.from_bytes(self.data[:4], byteorder="little", signed=False)
         if size > ((len(self.data) - 4) / 4):
             raise TypeError("not a string array")
@@ -321,8 +321,8 @@ if __name__ == "__main__":
                 try:
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
-                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)
-                        print("  {:%Y-%m-%d %H:%M:%S.%f}".format(dt))
+                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)  # noqa: DTZ006
+                        print(f"  {dt:%Y-%m-%d %H:%M:%S.%f}")
                         continue
 
                     if entry.type == "double":

@@ -47,13 +47,11 @@ public abstract class ElementHandler {
    * @return the logged datatype
    */
   protected TypeMirror dataType(Element element) {
-    if (element instanceof VariableElement field) {
-      return field.asType();
-    } else if (element instanceof ExecutableElement method) {
-      return method.getReturnType();
-    } else {
-      throw new IllegalStateException("Unexpected" + element.getClass().getName());
-    }
+    return switch (element) {
+      case VariableElement field -> field.asType();
+      case ExecutableElement method -> method.getReturnType();
+      default -> throw new IllegalStateException("Unexpected" + element.getClass().getName());
+    };
   }
 
   /**
@@ -118,13 +116,11 @@ public abstract class ElementHandler {
    * @return the generated access snippet
    */
   public String elementAccess(Element element, TypeElement loggedClass) {
-    if (element instanceof VariableElement field) {
-      return fieldAccess(field, loggedClass);
-    } else if (element instanceof ExecutableElement method) {
-      return methodAccess(method);
-    } else {
-      throw new IllegalStateException("Unexpected" + element.getClass().getName());
-    }
+    return switch (element) {
+      case VariableElement field -> fieldAccess(field, loggedClass);
+      case ExecutableElement method -> methodAccess(method);
+      default -> throw new IllegalStateException("Unexpected" + element.getClass().getName());
+    };
   }
 
   private static String fieldAccess(VariableElement field, TypeElement loggedClass) {

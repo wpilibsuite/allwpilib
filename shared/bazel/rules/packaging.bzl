@@ -1,3 +1,4 @@
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")

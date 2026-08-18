@@ -15,12 +15,13 @@
 
 #include "mrcal_wrapper.h"
 
-
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <algorithm>
-#include <chrono>
 #include <cstdio>
+#include <memory>
+#include <opencv2/calib3d.hpp>
 #include <random>
 #include <span>
 #include <stdexcept>
@@ -28,36 +29,17 @@
 
 using namespace cv;
 
-class CholmodCtx {
-public:
-  cholmod_common Common, *cc;
-  CholmodCtx() {
-    cc = &Common;
-    cholmod_l_start(cc);
-  }
-
-  ~CholmodCtx() { cholmod_l_finish(cc); }
-};
-static CholmodCtx cctx;
-
 #define BARF(...) std::fprintf(stderr, __VA_ARGS__)
-
-// forward declarations for functions borrowed from mrcal-pywrap
-static mrcal_problem_selections_t construct_problem_selections(
-    int do_optimize_intrinsics_core, int do_optimize_intrinsics_distortions,
-    int do_optimize_extrinsics, int do_optimize_frames,
-    int do_optimize_calobject_warp, int do_apply_regularization,
-    int do_apply_outlier_rejection, int Ncameras_intrinsics,
-    int Ncameras_extrinsics, int Nframes, int Nobservations_board);
 
 bool lensmodel_one_validate_args(mrcal_lensmodel_t *mrcal_lensmodel,
                                  std::vector<double> intrinsics,
                                  bool do_check_layout);
 
-mrcal_point3_t* observations_point = nullptr;
-mrcal_pose_t*
-    extrinsics_rt_fromref = nullptr; // Always zero for single camera, it seems?
-mrcal_point3_t* points = nullptr;     // Seems to always to be None for single camera?
+mrcal_point3_t *observations_point = nullptr;
+mrcal_pose_t *extrinsics_rt_fromref =
+    nullptr; // Always zero for single camera, it seems?
+mrcal_point3_t *points =
+    nullptr; // Seems to always to be None for single camera?
 
 static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // List, depth is ordered array observation[N frames, object_height,
@@ -90,7 +72,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   // TODO set sizes and populate
   int imagersize[] = {cameraRes.width, cameraRes.height};
 
-  mrcal_calobject_warp_t calobject_warp = {0, 0};
+  mrcal_calobject_warp_t calobject_warp{.x2 = 0, .y2 = 0};
 
   // int Nobservations_point_triangulated = 0; // no clue what this is
 
@@ -105,7 +87,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   // Frame index, camera number, (camera number)-1???
   for (int i = 0; i < Nobservations_board; i++) {
     indices_frame_camintrinsics_camextrinsics.push_back(
-        {static_cast<double>(i), 0, -1});
+        {.x = static_cast<double>(i), .y = 0, .z = -1});
   }
 
   // Pool is the raw observation backing array
@@ -114,14 +96,15 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
 
   // Copy from board/point pool above, using some code borrowed from
   // mrcal-pywrap
-  std::vector<mrcal_observation_board_t> observations_board_data(Nobservations_board);
+  std::vector<mrcal_observation_board_t> observations_board_data(
+      Nobservations_board);
   auto c_observations_board = observations_board_data.data();
   // Try to make sure we don't accidentally make a zero-length array or
   // something stupid
-  std::vector<mrcal_observation_point_t>
-      observations_point_data(std::max(Nobservations_point, 1));
-  mrcal_observation_point_t*
-      c_observations_point = observations_point_data.data();
+  std::vector<mrcal_observation_point_t> observations_point_data(
+      std::max(Nobservations_point, 1));
+  mrcal_observation_point_t *c_observations_point =
+      observations_point_data.data();
 
   for (int i_observation = 0; i_observation < Nobservations_board;
        i_observation++) {
@@ -153,8 +136,6 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   int Ncameras_extrinsics = 0; // Seems to always be zero for single camera
   int Nframes =
       frames_rt_toref.size(); // Number of pictures of the object we've got
-  mrcal_observation_point_triangulated_t *observations_point_triangulated = NULL;
-  //     NULL;
 
   if (!lensmodel_one_validate_args(&mrcal_lensmodel, intrinsics, false)) {
     auto ret = std::make_unique<mrcal_result>();
@@ -162,14 +143,9 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
     return ret;
   }
 
-  int Nstate = mrcal_num_states(
-      Ncameras_intrinsics, Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
-      Nobservations_board, problem_selections, &mrcal_lensmodel);
-
   int Nmeasurements = mrcal_num_measurements(
-      Nobservations_board, Nobservations_point,
-      observations_point_triangulated,
-      0, // hard-coded to 0
+      Nobservations_board, Nobservations_point, NULL,
+      0, // We don't use these, so pass nulls
       calibration_object_width_n, calibration_object_height_n,
       Ncameras_intrinsics, Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
       problem_selections, &mrcal_lensmodel);
@@ -177,10 +153,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   // OK, now we should have everything ready! Just some final setup and then
   // call optimize
 
-  // Residuals
-  std::vector<double> b_packed_final(Nstate);
-  auto c_b_packed_final = b_packed_final.data();
-
+  // state vector
   std::vector<double> x_final(Nmeasurements);
   auto c_x_final = x_final.data();
 
@@ -193,9 +166,6 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
 
   // in
   int *c_imagersizes = imagersize;
-  auto point_min_range = -1.0, point_max_range = -1.0;
-  mrcal_problem_constants_t problem_constants = {
-      .point_min_range = point_min_range, .point_max_range = point_max_range};
   int verbose = 0;
 
   auto stats = mrcal_optimize(
@@ -203,10 +173,9 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
       c_extrinsics, c_frames, c_points, c_calobject_warp, Ncameras_intrinsics,
       Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
       c_observations_board, c_observations_point, Nobservations_board,
-      Nobservations_point,
-      observations_point_triangulated, -1,
-      c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel, c_imagersizes,
-      problem_selections, &problem_constants, calibration_object_spacing,
+      Nobservations_point, NULL, -1, // We don't use these, so pass nulls
+      c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel,
+      c_imagersizes, problem_selections, NULL, calibration_object_spacing,
       calibration_object_width_n, calibration_object_height_n, verbose, false);
 
   std::vector<double> residuals = {c_x_final, c_x_final + Nmeasurements};
@@ -309,7 +278,7 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
   double cy = (imagerSize.height / 2.0) - 0.5;
 
   vector<Point3f> objectPoints;
-  vector<Point2d> imagePoints;
+  vector<mrcal_point2_t> mrcal_imagepts;
 
   // Fill in object/image points
   for (int i = 0; i < boardSize.height; i++) {
@@ -317,26 +286,23 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
       auto &corner = c_observations_board_pool[i * boardSize.width + j];
       // weight<0 means ignored -- filter these out
       if (corner.z >= 0) {
-        imagePoints.emplace_back(corner.x, corner.y);
-        objectPoints.push_back(Point3f(j * squareSize, i * squareSize, 0));
+        mrcal_imagepts.emplace_back(
+            mrcal_point2_t{.x = corner.x, .y = corner.y});
+        objectPoints.emplace_back(j * squareSize, i * squareSize, 0);
       }
     }
   }
 
+  vector<Point2d> imagePoints(mrcal_imagepts.size());
   {
     // convert from stereographic to pinhole to match python
-    std::vector<mrcal_point2_t> mrcal_imagepts(imagePoints.size());
-    std::transform(
-        imagePoints.begin(), imagePoints.end(), mrcal_imagepts.begin(),
-        [](const auto &pt) { return mrcal_point2_t{.x = pt.x, .y = pt.y}; });
-
     mrcal_lensmodel_t model{.type = MRCAL_LENSMODEL_STEREOGRAPHIC};
-    std::vector<mrcal_point3_t> out(imagePoints.size());
+    std::vector<mrcal_point3_t> out(mrcal_imagepts.size());
     const double intrinsics[] = {fx, fy, cx, cy};
     bool ret = mrcal_unproject(out.data(), mrcal_imagepts.data(),
                                mrcal_imagepts.size(), &model, intrinsics);
     if (!ret) {
-      std::cerr << "couldn't unproject!" << std::endl;
+      BARF("couldn't unproject!");
     }
     model = {.type = MRCAL_LENSMODEL_PINHOLE};
     mrcal_project(mrcal_imagepts.data(), NULL, NULL, out.data(), out.size(),
@@ -348,29 +314,16 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t *c_observations_board_pool,
   }
 
   // Initial guess at intrinsics
-  Mat cameraMatrix = (Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
+  Mat cameraMatrix{{3, 3}, {fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0}};
   Mat distCoeffs = Mat(4, 1, CV_64FC1, Scalar(0));
 
   Mat_<double> rvec, tvec;
-  vector<Point3f> objectPoints3;
-  for (auto a : objectPoints)
-    objectPoints3.push_back(Point3f(a.x, a.y, 0));
 
-  // for (auto& o : objectPoints) std::cout << o << std::endl;
-  // for (auto& i : imagePoints) std::cout << i << std::endl;
-  // std::cout << "cam mat\n" << cameraMatrix << std::endl;
-  // std::cout << "distortion: " << distCoeffs << std::endl;
-
-  solvePnP(objectPoints3, imagePoints, cameraMatrix, distCoeffs, rvec, tvec,
+  solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec,
            false, SOLVEPNP_ITERATIVE);
 
   return mrcal_pose_t{.r = {.x = rvec(0), .y = rvec(1), .z = rvec(2)},
                       .t = {.x = tvec(0), .y = tvec(1), .z = tvec(2)}};
-}
-
-mrcal_result::~mrcal_result() {
-  // cholmod_l_free_sparse(&Jt, cctx.cc);
-  return;
 }
 
 // Code taken from mrcal, license:
@@ -385,7 +338,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // List, depth is ordered array observation[N frames, object_height,
     // object_width] = [x,y, weight] weight<0 means ignored)
     std::span<mrcal_point3_t> observations_board,
-    // RT transform from camera to object
+    // [in, out] RT transform from camera to object
     std::span<mrcal_pose_t> frames_rt_toref,
     // Chessboard size, in corners (not squares)
     Size calobjectSize, double calibration_object_spacing,
@@ -401,7 +354,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
     std::vector<double> intrinsics = {focal_length_guess, focal_length_guess,
                                       cx, cy};
 
-    std::cout << "Initial solve (geometry only)" << std::endl;
+    std::printf("Initial solve (geometry only)\n");
 
     mrcal_problem_selections_t options = construct_problem_selections(
         {.do_optimize_intrinsics_core = false,
@@ -423,9 +376,8 @@ std::unique_ptr<mrcal_result> mrcal_main(
   }
 
   {
-    std::cout
-        << "Initial solve (geometry and LENSMODEL_STEREOGRAPHIC core only)"
-        << std::endl;
+    std::printf(
+        "Initial solve (geometry and LENSMODEL_STEREOGRAPHIC core only)\n");
     mrcal_problem_selections_t options = construct_problem_selections(
         {.do_optimize_intrinsics_core = true,
          .do_optimize_intrinsics_distortions = true,
@@ -477,9 +429,8 @@ std::unique_ptr<mrcal_result> mrcal_main(
     std::copy(seedDistortions.begin(), seedDistortions.end(),
               intrinsics.begin() + result->intrinsics.size());
 
-    std::cout
-        << "Optimizing everything except board warp from seeded intrinsics"
-        << std::endl;
+    std::printf(
+        "Optimizing everything except board warp from seeded intrinsics\n");
     mrcal_problem_selections_t options = construct_problem_selections(
         {.do_optimize_intrinsics_core = true,
          .do_optimize_intrinsics_distortions = true,
@@ -496,7 +447,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
   }
 
   {
-    std::cout << "Final, full solve" << std::endl;
+    std::printf("Final, full solve\n");
     mrcal_problem_selections_t options = construct_problem_selections(
         {.do_optimize_intrinsics_core = true,
          .do_optimize_intrinsics_distortions = true,
@@ -518,7 +469,7 @@ std::unique_ptr<mrcal_result> mrcal_main(
   return result;
 }
 
-bool undistort_mrcal(const cv::Mat *src, cv::Mat *dst, const cv::Mat *cameraMat,
+bool undistort_mrcal(cv::Mat *dst, const cv::Mat *cameraMat,
                      const cv::Mat *distCoeffs, CameraLensModel lensModel,
                      // Extra stuff for splined stereographic models
                      uint16_t order, uint16_t Nx, uint16_t Ny,
@@ -549,20 +500,20 @@ bool undistort_mrcal(const cv::Mat *src, cv::Mat *dst, const cv::Mat *cameraMat,
     mrcal_lensmodel.LENSMODEL_SPLINED_STEREOGRAPHIC__config.Ny = Ny;
     break;
   default:
-    std::cerr << "Unknown lensmodel\n";
+    BARF("Unknown lensmodel\n");
     return false;
   }
 
-  if (!(dst->cols == 2 && dst->cols == 2)) {
-    std::cerr << "Bad input array size\n";
+  if (dst->cols != 2) {
+    BARF("Bad input array size\n");
     return false;
   }
-  if (!(dst->type() == CV_64FC2 && dst->type() == CV_64FC2)) {
-    std::cerr << "Bad input type -- need CV_64F\n";
+  if (dst->type() != CV_64FC2) {
+    BARF("Bad input type -- need CV_64F\n");
     return false;
   }
-  if (!(dst->isContinuous() && dst->isContinuous())) {
-    std::cerr << "Bad input array -- need continuous\n";
+  if (!dst->isContinuous()) {
+    BARF("Bad input array -- need continuous\n");
     return false;
   }
 

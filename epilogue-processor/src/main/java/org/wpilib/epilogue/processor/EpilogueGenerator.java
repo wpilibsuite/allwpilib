@@ -38,12 +38,16 @@ public class EpilogueGenerator {
    *
    * @param loggerClassNames the names of the generated logger classes. Each of these will be
    *     instantiated in a public static field on the Epilogue class.
-   * @param mainRobotClasses the main robot classes. May be empty. Used to generate a {@code bind()}
-   *     method to add a callback hook to a TimedRobot to log itself.
+   * @param mainRobotClasses the main robot classes. May be empty. Used to generate a {@code
+   *     update()} method for an easy entry point.
+   * @param timedRobotClasses the main robot classes that extend from TimedRobot. Used to generate a
+   *     {@code bind()} method to add a callback hook to a TimedRobot to log itself.
    */
   @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
   public void writeEpilogueFile(
-      List<String> loggerClassNames, Collection<TypeElement> mainRobotClasses) {
+      List<String> loggerClassNames,
+      Collection<TypeElement> mainRobotClasses,
+      Collection<TypeElement> timedRobotClasses) {
     try {
       var centralStore =
           m_processingEnv.getFiler().createSourceFile("org.wpilib.epilogue.Epilogue");
@@ -56,30 +60,6 @@ public class EpilogueGenerator {
         out.println();
 
         out.println("import org.wpilib.hardware.hal.HAL;");
-        out.println();
-
-        loggerClassNames.stream()
-            .sorted()
-            .forEach(
-                name -> {
-                  if (!name.contains(".")) {
-                    // Logger is in the global namespace, don't need to import
-                    return;
-                  }
-
-                  out.println("import " + name + ";");
-                });
-        m_customLoggers.values().stream()
-            .distinct()
-            .forEach(
-                loggerType -> {
-                  var name = loggerType.asElement().toString();
-                  if (!name.contains(".")) {
-                    // Logger is in the global namespace, don't need to import
-                    return;
-                  }
-                  out.println("import " + name + ";");
-                });
         out.println();
 
         out.println("public final class Epilogue {");
@@ -136,56 +116,57 @@ public class EpilogueGenerator {
             """
                 .stripTrailing());
 
-        // Only generate a binding if the robot class is a TimedRobot
-        if (!mainRobotClasses.isEmpty()) {
-          for (TypeElement mainRobotClass : mainRobotClasses) {
-            String robotClassName = mainRobotClass.getQualifiedName().toString();
+        for (TypeElement mainRobotClass : mainRobotClasses) {
+          String robotClassName = mainRobotClass.getQualifiedName().toString();
 
-            out.println();
-            out.print(
-                """
-                  /**
-                   * Updates Epilogue. This must be called periodically in order for Epilogue to record
-                   * new values. Alternatively, {@code bind()} can be used to update at an offset from
-                   * the main robot loop.
-                   */
-                """);
-            out.println("  public static void update(" + robotClassName + " robot) {");
-            out.println("    long start = System.nanoTime();");
-            out.println(
-                "    "
-                    + StringUtils.loggerFieldName(mainRobotClass)
-                    + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
-            out.println(
-                "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
-            out.println("  }");
+          out.println();
+          out.print(
+              """
+                /**
+                 * Updates Epilogue. This must be called periodically in order for Epilogue to record
+                 * new values. Alternatively, {@code bind()} can be used to update at an offset from
+                 * the main robot loop.
+                 */
+              """);
+          out.println("  public static void update(" + robotClassName + " robot) {");
+          out.println("    long start = System.nanoTime();");
+          out.println(
+              "    "
+                  + StringUtils.loggerFieldName(mainRobotClass)
+                  + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
+          out.println(
+              "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
+          out.println("  }");
+        }
 
-            out.println();
-            out.print(
-                """
-                  /**
-                   * Binds Epilogue updates to a timed robot's update period. Log calls will be made at the
-                   * same update rate as the robot's loop function, but will be offset by a full phase
-                   * (for example, a 20ms update rate but 10ms offset from the main loop invocation) to
-                   * help avoid high CPU loads. However, this does mean that any logged data that reads
-                   * directly from sensors will be slightly different from data used in the main robot
-                   * loop.
-                   */
-                """);
-            out.println("  public static void bind(" + robotClassName + " robot) {");
-            out.println("    if (config.loggingPeriod == null) {");
-            out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
-            out.println("    }");
-            out.println("    if (config.loggingPeriodOffset == null) {");
-            out.println("      config.loggingPeriodOffset = config.loggingPeriod.div(2);");
-            out.println("    }");
-            out.println();
-            out.println("    robot.addPeriodic(() -> {");
-            out.println("      update(robot);");
-            out.println(
-                "    }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
-            out.println("  }");
-          }
+        for (TypeElement timedRobotClass : timedRobotClasses) {
+          String robotClassName = timedRobotClass.getQualifiedName().toString();
+
+          out.println();
+          out.print(
+              """
+                /**
+                 * Binds Epilogue updates to a timed robot's update period. Log calls will be made at the
+                 * same update rate as the robot's loop function, but will be offset by a full phase
+                 * (for example, a 20ms update rate but 10ms offset from the main loop invocation) to
+                 * help avoid high CPU loads. However, this does mean that any logged data that reads
+                 * directly from sensors will be slightly different from data used in the main robot
+                 * loop.
+                 */
+              """);
+          out.println("  public static void bind(" + robotClassName + " robot) {");
+          out.println("    if (config.loggingPeriod == null) {");
+          out.println("      config.loggingPeriod = Seconds.of(robot.getPeriod());");
+          out.println("    }");
+          out.println("    if (config.loggingPeriodOffset == null) {");
+          out.println("      config.loggingPeriodOffset = config.loggingPeriod.div(2);");
+          out.println("    }");
+          out.println();
+          out.println("    robot.addPeriodic(() -> {");
+          out.println("      update(robot);");
+          out.println(
+              "    }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));");
+          out.println("  }");
         }
 
         out.println("}");

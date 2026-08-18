@@ -5,7 +5,8 @@
 #include "wpi/hal/SystemServer.h"
 
 #include "SystemServerInternal.hpp"
-#include "mrc/NtNetComm.h"
+
+#define ROBOT_SYSTEM_SERVER_NT_PORT 6810
 
 namespace wpi::hal {
 

@@ -205,60 +205,36 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return multiplier.times(baseUnitMagnitude());
     }
 
-    if (multiplier instanceof Acceleration<?> acceleration) {
-      return times(acceleration);
-    } else if (multiplier instanceof Angle angle) {
-      return times(angle);
-    } else if (multiplier instanceof AngularAcceleration angularAcceleration) {
-      return times(angularAcceleration);
-    } else if (multiplier instanceof AngularMomentum angularMomentum) {
-      return times(angularMomentum);
-    } else if (multiplier instanceof AngularVelocity angularVelocity) {
-      return times(angularVelocity);
-    } else if (multiplier instanceof Current current) {
-      return times(current);
-    } else if (multiplier instanceof Dimensionless dimensionless) {
+    return switch (multiplier) {
+      case Acceleration<?> acceleration -> times(acceleration);
+      case Angle angle -> times(angle);
+      case AngularAcceleration angularAcceleration -> times(angularAcceleration);
+      case AngularMomentum angularMomentum -> times(angularMomentum);
+      case AngularVelocity angularVelocity -> times(angularVelocity);
+      case Current current -> times(current);
       // n.b. this case should already be covered
-      return times(dimensionless);
-    } else if (multiplier instanceof Distance distance) {
-      return times(distance);
-    } else if (multiplier instanceof Energy energy) {
-      return times(energy);
-    } else if (multiplier instanceof Force force) {
-      return times(force);
-    } else if (multiplier instanceof Frequency frequency) {
-      return times(frequency);
-    } else if (multiplier instanceof LinearAcceleration linearAcceleration) {
-      return times(linearAcceleration);
-    } else if (multiplier instanceof LinearVelocity linearVelocity) {
-      return times(linearVelocity);
-    } else if (multiplier instanceof Mass mass) {
-      return times(mass);
-    } else if (multiplier instanceof MomentOfInertia momentOfInertia) {
-      return times(momentOfInertia);
-    } else if (multiplier instanceof Mult<?, ?> mult) {
-      return times(mult);
-    } else if (multiplier instanceof Per<?, ?> per) {
-      return times(per);
-    } else if (multiplier instanceof Power power) {
-      return times(power);
-    } else if (multiplier instanceof Temperature temperature) {
-      return times(temperature);
-    } else if (multiplier instanceof Time time) {
-      return times(time);
-    } else if (multiplier instanceof Torque torque) {
-      return times(torque);
-    } else if (multiplier instanceof Velocity<?> velocity) {
-      return times(velocity);
-    } else if (multiplier instanceof Voltage voltage) {
-      return times(voltage);
-    } else if (multiplier instanceof Resistance resistance) {
-      return times(resistance);
-    } else {
+      case Dimensionless dimensionless -> times(dimensionless);
+      case Distance distance -> times(distance);
+      case Energy energy -> times(energy);
+      case Force force -> times(force);
+      case Frequency frequency -> times(frequency);
+      case LinearAcceleration linearAcceleration -> times(linearAcceleration);
+      case LinearVelocity linearVelocity -> times(linearVelocity);
+      case Mass mass -> times(mass);
+      case MomentOfInertia momentOfInertia -> times(momentOfInertia);
+      case Mult<?, ?> mult -> times(mult);
+      case Per<?, ?> per -> times(per);
+      case Power power -> times(power);
+      case Temperature temperature -> times(temperature);
+      case Time time -> times(time);
+      case Torque torque -> times(torque);
+      case Velocity<?> velocity -> times(velocity);
+      case Voltage voltage -> times(voltage);
+      case Resistance resistance -> times(resistance);
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
-      return MultUnit.combine(unit(), multiplier.unit()).ofBaseUnits(baseUnitResult);
-    }
+      default -> MultUnit.combine(unit(), multiplier.unit()).ofBaseUnits(baseUnitResult);
+    };
   }
 
   /**
@@ -653,60 +629,36 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       return VelocityUnit.combine(unit(), time).ofBaseUnits(baseUnitResult);
     }
 
-    if (divisor instanceof Acceleration<?> acceleration) {
-      return div(acceleration);
-    } else if (divisor instanceof Angle angle) {
-      return div(angle);
-    } else if (divisor instanceof AngularAcceleration angularAcceleration) {
-      return div(angularAcceleration);
-    } else if (divisor instanceof AngularMomentum angularMomentum) {
-      return div(angularMomentum);
-    } else if (divisor instanceof AngularVelocity angularVelocity) {
-      return div(angularVelocity);
-    } else if (divisor instanceof Current current) {
-      return div(current);
-    } else if (divisor instanceof Dimensionless dimensionless) {
+    return switch (divisor) {
+      case Acceleration<?> acceleration -> div(acceleration);
+      case Angle angle -> div(angle);
+      case AngularAcceleration angularAcceleration -> div(angularAcceleration);
+      case AngularMomentum angularMomentum -> div(angularMomentum);
+      case AngularVelocity angularVelocity -> div(angularVelocity);
+      case Current current -> div(current);
       // n.b. this case should already be covered
-      return div(dimensionless);
-    } else if (divisor instanceof Distance distance) {
-      return div(distance);
-    } else if (divisor instanceof Energy energy) {
-      return div(energy);
-    } else if (divisor instanceof Force force) {
-      return div(force);
-    } else if (divisor instanceof Frequency frequency) {
-      return div(frequency);
-    } else if (divisor instanceof LinearAcceleration linearAcceleration) {
-      return div(linearAcceleration);
-    } else if (divisor instanceof LinearVelocity linearVelocity) {
-      return div(linearVelocity);
-    } else if (divisor instanceof Mass mass) {
-      return div(mass);
-    } else if (divisor instanceof MomentOfInertia momentOfInertia) {
-      return div(momentOfInertia);
-    } else if (divisor instanceof Mult<?, ?> mult) {
-      return div(mult);
-    } else if (divisor instanceof Per<?, ?> per) {
-      return div(per);
-    } else if (divisor instanceof Power power) {
-      return div(power);
-    } else if (divisor instanceof Temperature temperature) {
-      return div(temperature);
-    } else if (divisor instanceof Time time) {
-      return div(time);
-    } else if (divisor instanceof Torque torque) {
-      return div(torque);
-    } else if (divisor instanceof Velocity<?> velocity) {
-      return div(velocity);
-    } else if (divisor instanceof Voltage voltage) {
-      return div(voltage);
-    } else if (divisor instanceof Resistance resistance) {
-      return div(resistance);
-    } else {
+      case Dimensionless dimensionless -> div(dimensionless);
+      case Distance distance -> div(distance);
+      case Energy energy -> div(energy);
+      case Force force -> div(force);
+      case Frequency frequency -> div(frequency);
+      case LinearAcceleration linearAcceleration -> div(linearAcceleration);
+      case LinearVelocity linearVelocity -> div(linearVelocity);
+      case Mass mass -> div(mass);
+      case MomentOfInertia momentOfInertia -> div(momentOfInertia);
+      case Mult<?, ?> mult -> div(mult);
+      case Per<?, ?> per -> div(per);
+      case Power power -> div(power);
+      case Temperature temperature -> div(temperature);
+      case Time time -> div(time);
+      case Torque torque -> div(torque);
+      case Velocity<?> velocity -> div(velocity);
+      case Voltage voltage -> div(voltage);
+      case Resistance resistance -> div(resistance);
       // Dimensional analysis fallthrough or a generic input measure type
       // Do a basic unit multiplication
-      return PerUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitResult);
-    }
+      default -> PerUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitResult);
+    };
   }
 
   /**

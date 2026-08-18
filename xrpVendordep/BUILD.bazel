@@ -76,7 +76,7 @@ cc_test(
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
         ":xrpVendordep",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -118,6 +118,7 @@ define_native_wrapper(
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",

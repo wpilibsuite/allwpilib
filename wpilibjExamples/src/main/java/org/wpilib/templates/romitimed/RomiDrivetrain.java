@@ -5,7 +5,7 @@
 package org.wpilib.templates.romitimed;
 
 import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.motor.Spark;
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 
 public class RomiDrivetrain {

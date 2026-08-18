@@ -11,7 +11,7 @@ import org.wpilib.math.filter.LinearFilter;
 import org.wpilib.smartdashboard.SmartDashboard;
 
 /**
- * Accelerometer filtering snippets for frc-docs.
+ * Accelerometer filtering snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 public class Robot extends TimedRobot {

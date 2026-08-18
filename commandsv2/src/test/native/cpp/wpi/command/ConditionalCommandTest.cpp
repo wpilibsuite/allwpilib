@@ -14,15 +14,17 @@
 using namespace wpi::cmd;
 class ConditionalCommandTest : public CommandTestBase {};
 
-TEST_F(ConditionalCommandTest, ConditionalCommandSchedule) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest ConditionalCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> mock = std::make_unique<MockCommand>();
   MockCommand* mockptr = mock.get();
 
-  EXPECT_CALL(*mock, Initialize());
-  EXPECT_CALL(*mock, Execute()).Times(2);
-  EXPECT_CALL(*mock, End(false));
+  mock->ExpectInitialize(1);
+  mock->ExpectExecute(2);
+  mock->ExpectEnd(false, 1);
 
   ConditionalCommand conditional(
       std::move(mock), std::make_unique<InstantCommand>(), [] { return true; });
@@ -32,10 +34,12 @@ TEST_F(ConditionalCommandTest, ConditionalCommandSchedule) {
   mockptr->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&conditional));
+  CHECK_FALSE(scheduler.IsScheduled(&conditional));
 }
 
-TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest ConditionalCommandRequirement",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -52,69 +56,82 @@ TEST_F(ConditionalCommandTest, ConditionalCommandRequirement) {
   scheduler.Schedule(&conditional);
   scheduler.Schedule(&command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command3));
-  EXPECT_FALSE(scheduler.IsScheduled(&conditional));
+  CHECK(scheduler.IsScheduled(&command3));
+  CHECK_FALSE(scheduler.IsScheduled(&conditional));
 }
 
-TEST_F(ConditionalCommandTest, AllTrue) {
+TEST_CASE_METHOD(ConditionalCommandTest, "ConditionalCommandTest AllTrue",
+                 "[commandsv2][command]") {
   auto command = Either(Idle().IgnoringDisable(true),
                         Idle().IgnoringDisable(true), [] { return true; });
-  EXPECT_EQ(true, command.get()->RunsWhenDisabled());
+  CHECK(true == command.get()->RunsWhenDisabled());
 }
 
-TEST_F(ConditionalCommandTest, AllFalse) {
+TEST_CASE_METHOD(ConditionalCommandTest, "ConditionalCommandTest AllFalse",
+                 "[commandsv2][command]") {
   auto command = Either(Idle().IgnoringDisable(false),
                         Idle().IgnoringDisable(false), [] { return true; });
-  EXPECT_EQ(false, command.get()->RunsWhenDisabled());
+  CHECK(false == command.get()->RunsWhenDisabled());
 }
 
-TEST_F(ConditionalCommandTest, OneTrueOneFalse) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest OneTrueOneFalse",
+                 "[commandsv2][command]") {
   auto command = Either(Idle().IgnoringDisable(true),
                         Idle().IgnoringDisable(false), [] { return true; });
-  EXPECT_EQ(false, command.get()->RunsWhenDisabled());
+  CHECK(false == command.get()->RunsWhenDisabled());
 }
 
-TEST_F(ConditionalCommandTest, TwoFalseOneTrue) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest TwoFalseOneTrue",
+                 "[commandsv2][command]") {
   auto command = Either(Idle().IgnoringDisable(false),
                         Idle().IgnoringDisable(true), [] { return true; });
-  EXPECT_EQ(false, command.get()->RunsWhenDisabled());
+  CHECK(false == command.get()->RunsWhenDisabled());
 }
 
-TEST_F(ConditionalCommandTest, AllCancelSelf) {
+TEST_CASE_METHOD(ConditionalCommandTest, "ConditionalCommandTest AllCancelSelf",
+                 "[commandsv2][command]") {
   auto command = Either(
       Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
       Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
       [] { return true; });
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
-            command.get()->GetInterruptionBehavior());
+  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+        command.get()->GetInterruptionBehavior());
 }
 
-TEST_F(ConditionalCommandTest, AllCancelIncoming) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest AllCancelIncoming",
+                 "[commandsv2][command]") {
   auto command = Either(Idle().WithInterruptBehavior(
                             Command::InterruptionBehavior::kCancelIncoming),
                         Idle().WithInterruptBehavior(
                             Command::InterruptionBehavior::kCancelIncoming),
                         [] { return false; });
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelIncoming,
-            command.get()->GetInterruptionBehavior());
+  CHECK(Command::InterruptionBehavior::kCancelIncoming ==
+        command.get()->GetInterruptionBehavior());
 }
 
-TEST_F(ConditionalCommandTest, OneCancelSelfOneIncoming) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest OneCancelSelfOneIncoming",
+                 "[commandsv2][command]") {
   auto command = Either(
       Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
       Idle().WithInterruptBehavior(
           Command::InterruptionBehavior::kCancelIncoming),
       [] { return false; });
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
-            command.get()->GetInterruptionBehavior());
+  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+        command.get()->GetInterruptionBehavior());
 }
 
-TEST_F(ConditionalCommandTest, OneCancelIncomingOneSelf) {
+TEST_CASE_METHOD(ConditionalCommandTest,
+                 "ConditionalCommandTest OneCancelIncomingOneSelf",
+                 "[commandsv2][command]") {
   auto command = Either(
       Idle().WithInterruptBehavior(
           Command::InterruptionBehavior::kCancelIncoming),
       Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
       [] { return false; });
-  EXPECT_EQ(Command::InterruptionBehavior::kCancelSelf,
-            command.get()->GetInterruptionBehavior());
+  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+        command.get()->GetInterruptionBehavior());
 }

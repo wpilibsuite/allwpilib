@@ -397,14 +397,18 @@ public class DataLogRecord {
   public String[] getStringArray() {
     ByteBuffer buf = getRawBuffer();
     try {
-      int size = buf.getInt();
+      long size = Integer.toUnsignedLong(buf.getInt());
       // sanity check size
       if (size > (buf.remaining() / 4)) {
         throw new InputMismatchException("invalid size");
       }
-      String[] arr = new String[size];
-      for (int i = 0; i < size; i++) {
+      int checkedSize = (int) size;
+      String[] arr = new String[checkedSize];
+      for (int i = 0; i < checkedSize; i++) {
         arr[i] = readInnerString(buf);
+      }
+      if (buf.hasRemaining()) {
+        throw new InputMismatchException("unexpected trailing data");
       }
       return arr;
     } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
@@ -413,13 +417,17 @@ public class DataLogRecord {
   }
 
   private String readInnerString(ByteBuffer buf) {
-    int size = buf.getInt();
-    if (size > buf.remaining()) {
-      throw new InputMismatchException("invalid string size");
+    try {
+      long size = Integer.toUnsignedLong(buf.getInt());
+      if (size > buf.remaining()) {
+        throw new InputMismatchException("invalid string size");
+      }
+      byte[] arr = new byte[(int) size];
+      buf.get(arr);
+      return new String(arr, StandardCharsets.UTF_8);
+    } catch (BufferUnderflowException | IndexOutOfBoundsException ex) {
+      throw new InputMismatchException();
     }
-    byte[] arr = new byte[size];
-    buf.get(arr);
-    return new String(arr, StandardCharsets.UTF_8);
   }
 
   private final int m_entry;

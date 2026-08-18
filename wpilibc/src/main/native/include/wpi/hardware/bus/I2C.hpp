@@ -8,7 +8,7 @@
 
 #include "wpi/hal/I2C.h"
 #include "wpi/hal/I2CTypes.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -154,7 +154,7 @@ class I2C {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  wpi::hal::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_PORT_INVALID> m_port;
+  wpi::util::Handle<HAL_I2CPort, HAL_CloseI2C, HAL_I2C_PORT_INVALID> m_port;
   int m_deviceAddress;
 };
 

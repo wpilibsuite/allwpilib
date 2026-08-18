@@ -6,7 +6,7 @@ package org.wpilib.examples.romireference.subsystems;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.motor.Spark;
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.romi.RomiGyro;
 import org.wpilib.util.sendable.SendableRegistry;

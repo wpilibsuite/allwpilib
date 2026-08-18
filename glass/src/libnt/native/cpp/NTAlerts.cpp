@@ -4,9 +4,8 @@
 
 #include "wpi/glass/networktables/NTAlerts.hpp"
 
+#include <format>
 #include <utility>
-
-#include <fmt/format.h>
 
 using namespace wpi::glass;
 
@@ -16,11 +15,11 @@ NTAlertsModel::NTAlertsModel(std::string_view path)
 NTAlertsModel::NTAlertsModel(wpi::nt::NetworkTableInstance inst,
                              std::string_view path)
     : m_inst{inst},
-      m_infos{m_inst.GetStringArrayTopic(fmt::format("{}/infos", path))
+      m_infos{m_inst.GetStringArrayTopic(std::format("{}/infos", path))
                   .Subscribe({})},
-      m_warnings{m_inst.GetStringArrayTopic(fmt::format("{}/warnings", path))
+      m_warnings{m_inst.GetStringArrayTopic(std::format("{}/warnings", path))
                      .Subscribe({})},
-      m_errors{m_inst.GetStringArrayTopic(fmt::format("{}/errors", path))
+      m_errors{m_inst.GetStringArrayTopic(std::format("{}/errors", path))
                    .Subscribe({})} {}
 
 void NTAlertsModel::Update() {

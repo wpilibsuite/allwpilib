@@ -11,8 +11,8 @@ classes:
     methods:
       Compressor:
         overloads:
-          int, PneumaticsModuleType:
-          int, int, PneumaticsModuleType:
+          CANBus, PneumaticsModuleType:
+          CANBus, int, PneumaticsModuleType:
       IsEnabled:
       GetPressureSwitchValue:
       GetCurrent:

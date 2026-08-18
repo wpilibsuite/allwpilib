@@ -9,10 +9,10 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_notifierCommandScheduler(scheduler: commands2.CommandScheduler):
+def test_notifier_command_scheduler(scheduler: commands2.CommandScheduler):
     with ManualSimTime() as sim:
         counter = OOInteger(0)
-        command = commands2.NotifierCommand(counter.incrementAndGet, 0.01)
+        command = commands2.NotifierCommand(counter.increment_and_get, 0.01)
 
         scheduler.schedule(command)
         for i in range(5):

@@ -3,54 +3,54 @@ import wpimath_test
 
 
 def test_units_attributes():
-    assert wpimath_test.SomeClass.s_constant == 2
-    assert wpimath_test.SomeClass.ms_constant1 == 20  # the unit is ms, not seconds
-    assert wpimath_test.SomeClass.ms_constant2 == 0.050
-    assert wpimath_test.SomeClass.ms_constant3 == 200
+    assert wpimath_test.SomeClass.S_CONSTANT == 2
+    assert wpimath_test.SomeClass.MS_CONSTANT1 == 20  # the unit is ms, not seconds
+    assert wpimath_test.SomeClass.MS_CONSTANT2 == 0.050
+    assert wpimath_test.SomeClass.MS_CONSTANT3 == 200
 
 
 def test_units_check_default_by_name1():
     sc = wpimath_test.SomeClass()
 
-    assert sc.checkDefaultByName1(0.020) == True
-    assert sc.checkDefaultByName1() == True
+    assert sc.check_default_by_name1(0.020) == True
+    assert sc.check_default_by_name1() == True
 
     with pytest.raises(RuntimeError):
-        sc.checkDefaultByName1(100)
+        sc.check_default_by_name1(100)
 
 
 def test_units_check_default_by_name2():
     sc = wpimath_test.SomeClass()
 
-    assert sc.checkDefaultByName2(0.050) == True
-    assert sc.checkDefaultByName2() == True
+    assert sc.check_default_by_name2(0.050) == True
+    assert sc.check_default_by_name2() == True
 
     with pytest.raises(RuntimeError):
-        sc.checkDefaultByName2(100)
+        sc.check_default_by_name2(100)
 
 
 def test_units_check_default_by_num1():
     sc = wpimath_test.SomeClass()
 
-    assert sc.checkDefaultByNum1(0.050) == True
-    assert sc.checkDefaultByNum1() == True
+    assert sc.check_default_by_num1(0.050) == True
+    assert sc.check_default_by_num1() == True
 
     with pytest.raises(RuntimeError):
-        sc.checkDefaultByNum1(100)
+        sc.check_default_by_num1(100)
 
 
 def test_units_check_default_by_num2():
     sc = wpimath_test.SomeClass()
 
-    assert sc.checkDefaultByNum2(0.050) == True
-    assert sc.checkDefaultByNum2() == True
+    assert sc.check_default_by_num2(0.050) == True
+    assert sc.check_default_by_num2() == True
 
     with pytest.raises(RuntimeError):
-        sc.checkDefaultByNum2(100)
+        sc.check_default_by_num2(100)
 
 
 def test_units_ft():
-    assert wpimath_test.SomeClass.five_ft == 5.0
+    assert wpimath_test.SomeClass.FIVE_FT == 5.0
 
 
 def test_units_ft2m():

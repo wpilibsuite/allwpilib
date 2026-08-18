@@ -6,8 +6,10 @@
 
 #include <sys/types.h>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/util/Color.hpp"
@@ -16,14 +18,16 @@
 inline constexpr auto kPeriod = 20_ms;
 
 namespace {
-class OpModeRobotTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class OpModeRobotTest {
+ public:
+  OpModeRobotTest() {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
+    wpi::sim::DriverStationSim::ResetData();
+    wpi::RobotState::ClearOpModes();
   }
 
-  void TearDown() override {
+  ~OpModeRobotTest() {
     wpi::sim::ResumeTiming();
     wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
   }
@@ -64,18 +68,18 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
 
   MockRobot() = default;
 
-  void DriverStationConnected() override { m_driverStationConnectedCount++; }
+  void DriverStationConnected() { m_driverStationConnectedCount++; }
 
-  void NonePeriodic() override { m_nonePeriodicCount++; }
+  void NonePeriodic() { m_nonePeriodicCount++; }
 
-  void RobotPeriodic() override { m_robotPeriodicCount++; }
+  void RobotPeriodic() { m_robotPeriodicCount++; }
 };
 }  // namespace
 
 static_assert(wpi::ConstructibleOpMode<MockOpMode, MockRobot>);
 static_assert(wpi::ConstructibleOpMode<OneArgOpMode, MockRobot>);
 
-TEST_F(OpModeRobotTest, AddOpMode) {
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest AddOpMode", "[wpilibc]") {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::AUTONOMOUS, "NoArgOpMode-Auto",
@@ -92,7 +96,7 @@ TEST_F(OpModeRobotTest, AddOpMode) {
   MyMockRobot robot;
 
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
-  ASSERT_EQ(options.size(), 4u);
+  REQUIRE(options.size() == 4u);
   int indexes[4] = {-1, -1, -1, -1};
   for (size_t i = 0; i < options.size(); ++i) {
     auto name = wpi::util::to_string_view(&options[i].name);
@@ -108,35 +112,35 @@ TEST_F(OpModeRobotTest, AddOpMode) {
   }
 
   int i = indexes[0];
-  ASSERT_NE(i, -1);
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].group), "Group");
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].description), "Description");
-  EXPECT_EQ(options[i].textColor, 0xffffff);
-  EXPECT_EQ(options[i].backgroundColor, 0x000000);
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "Group");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "Description");
+  CHECK(options[i].textColor == 0xffffff);
+  CHECK(options[i].backgroundColor == 0x000000);
 
   i = indexes[1];
-  ASSERT_NE(i, -1);
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].group), "Group");
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].description), "Description");
-  EXPECT_EQ(options[i].textColor, 0xffffff);
-  EXPECT_EQ(options[i].backgroundColor, 0x000000);
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "Group");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "Description");
+  CHECK(options[i].textColor == 0xffffff);
+  CHECK(options[i].backgroundColor == 0x000000);
 
   i = indexes[2];
-  ASSERT_NE(i, -1);
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].group), "");
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].description), "");
-  EXPECT_EQ(options[i].textColor, -1);
-  EXPECT_EQ(options[i].backgroundColor, -1);
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "");
+  CHECK(options[i].textColor == -1);
+  CHECK(options[i].backgroundColor == -1);
 
   i = indexes[3];
-  ASSERT_NE(i, -1);
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].group), "");
-  EXPECT_EQ(wpi::util::to_string_view(&options[i].description), "");
-  EXPECT_EQ(options[i].textColor, -1);
-  EXPECT_EQ(options[i].backgroundColor, -1);
+  REQUIRE(i != -1);
+  CHECK(wpi::util::to_string_view(&options[i].group) == "");
+  CHECK(wpi::util::to_string_view(&options[i].description) == "");
+  CHECK(options[i].textColor == -1);
+  CHECK(options[i].backgroundColor == -1);
 }
 
-TEST_F(OpModeRobotTest, ClearOpModes) {
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest ClearOpModes", "[wpilibc]") {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
@@ -148,10 +152,10 @@ TEST_F(OpModeRobotTest, ClearOpModes) {
 
   robot.ClearOpModes();
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
-  EXPECT_TRUE(options.empty());
+  CHECK(options.empty());
 }
 
-TEST_F(OpModeRobotTest, RemoveOpMode) {
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RemoveOpMode", "[wpilibc]") {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
@@ -164,11 +168,11 @@ TEST_F(OpModeRobotTest, RemoveOpMode) {
   robot.RemoveOpMode(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
   robot.PublishOpModes();
   auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
-  ASSERT_EQ(options.size(), 1u);
-  EXPECT_EQ(wpi::util::to_string_view(&options[0].name), "OneArgOpMode");
+  REQUIRE(options.size() == 1u);
+  CHECK(wpi::util::to_string_view(&options[0].name) == "OneArgOpMode");
 }
 
-TEST_F(OpModeRobotTest, NonePeriodic) {
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest NonePeriodic", "[wpilibc]") {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "NoArgOpMode");
@@ -183,13 +187,14 @@ TEST_F(OpModeRobotTest, NonePeriodic) {
 
   // Time step to get periodic calls on 20 ms robot loop
   wpi::sim::StepTiming(110_ms);
-  EXPECT_EQ(robot.m_nonePeriodicCount.load(), 5u);
+  CHECK(robot.m_nonePeriodicCount.load() == 5u);
 
   robot.EndCompetition();
   robotThread.join();
 }
 
-TEST_F(OpModeRobotTest, RobotPeriodic) {
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RobotPeriodic",
+                 "[wpilibc]") {
   struct MyMockRobot : public MockRobot {
     MyMockRobot() {
       AddOpMode<MockOpMode>(wpi::RobotMode::TELEOPERATED, "TestOpMode");
@@ -202,15 +207,15 @@ TEST_F(OpModeRobotTest, RobotPeriodic) {
   wpi::sim::WaitForProgramStart();
 
   // RobotPeriodic should be called regardless of state
-  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 0u);
+  CHECK(robot.m_robotPeriodicCount.load() == 0u);
 
   // Step timing to allow callbacks to execute
   wpi::sim::StepTiming(kPeriod);
-  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 1u);
+  CHECK(robot.m_robotPeriodicCount.load() == 1u);
 
   // Additional time steps should continue calling RobotPeriodic
   wpi::sim::StepTiming(kPeriod);
-  EXPECT_EQ(robot.m_robotPeriodicCount.load(), 2u);
+  CHECK(robot.m_robotPeriodicCount.load() == 2u);
 
   robot.EndCompetition();
   robotThread.join();

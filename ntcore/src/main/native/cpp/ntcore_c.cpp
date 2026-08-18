@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <cassert>
+#include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <string_view>
@@ -116,6 +117,9 @@ static void DisposeEvent(NT_Event* event) {
 
 static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   PubSubOptions out;
+  if (!in) {
+    return out;
+  }
   out.pollStorage = in->pollStorage;
   out.periodic = in->periodic;
   out.excludePublisher = in->excludePublisher;
@@ -127,6 +131,10 @@ static PubSubOptions ConvertToCpp(const NT_PubSubOptions* in) {
   out.disableLocal = in->disableLocal;
   out.excludeSelf = in->excludeSelf;
   out.hidden = in->hidden;
+  if (in->structSize >=
+      offsetof(NT_PubSubOptions, disableSignal) + sizeof(in->disableSignal)) {
+    out.disableSignal = in->disableSignal;
+  }
   return out;
 }
 
@@ -272,6 +280,14 @@ NT_Topic NT_GetTopic(NT_Inst inst, const struct WPI_String* name) {
 
 void NT_GetTopicName(NT_Topic topic, struct WPI_String* name) {
   wpi::nt::ConvertToC(wpi::nt::GetTopicName(topic), name);
+}
+
+void* NT_GetTopicUserData(NT_Topic topic) {
+  return wpi::nt::GetTopicUserData(topic);
+}
+
+void NT_SetTopicUserData(NT_Topic topic, void* userData) {
+  wpi::nt::SetTopicUserData(topic, userData);
 }
 
 NT_Type NT_GetTopicType(NT_Topic topic) {
@@ -562,8 +578,39 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
   wpi::nt::SetServer(inst, servers);
 }
 
-void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
-  wpi::nt::SetServerTeam(inst, team, port);
+void NT_SetServerTeam(NT_Inst inst, const struct WPI_String* team,
+                      unsigned int port) {
+  wpi::nt::SetServerTeam(inst, wpi::util::to_string_view(team), port);
+}
+
+void NT_SetServerFixed(NT_Inst inst, const struct WPI_String* team,
+                       unsigned int port) {
+  wpi::nt::SetServerFixed(inst, wpi::util::to_string_view(team), port);
+}
+
+void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name) {
+  wpi::nt::SetServerMdns(inst, wpi::util::to_string_view(service_name));
+}
+
+void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
+                           size_t count, const struct WPI_String* server_names,
+                           const unsigned int* ports) {
+  NT_SetServerMdnsMultiPort(inst, service_name, 0, count, server_names, ports);
+}
+
+void NT_SetServerMdnsMultiPort(NT_Inst inst,
+                               const struct WPI_String* service_name,
+                               unsigned int mdns_port, size_t count,
+                               const struct WPI_String* server_names,
+                               const unsigned int* ports) {
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
+  servers.reserve(count);
+  for (size_t i = 0; i < count; ++i) {
+    servers.emplace_back(
+        std::pair{wpi::util::to_string_view(&server_names[i]), ports[i]});
+  }
+  wpi::nt::SetServerMdns(inst, wpi::util::to_string_view(service_name),
+                         mdns_port, servers);
 }
 
 void NT_Disconnect(NT_Inst inst) {

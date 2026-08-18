@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
@@ -14,11 +14,15 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -39,11 +43,13 @@ py_binary(
     srcs = ["generate_topics.py"],
     data = [":templates"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 write_source_files(
@@ -168,7 +174,7 @@ wpilib_jni_java_library(
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     maven_artifact_name = "ntcore-java",
     maven_group_id = "org.wpilib.ntcore",
-    native_libs = [":ntcorejni"],
+    native_libs = [":shared/ntcorejni"],
     visibility = ["//visibility:public"],
     deps = [
         "//datalog:datalog-java",
@@ -191,7 +197,7 @@ cc_test(
     ],
     deps = [
         ":ntcore",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "//wpiutil:wpiutil-testlib",
     ],
 )
@@ -232,6 +238,7 @@ package_default_jni_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-ntcore-generator",
+    generated_include_target = "//ntcore:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -271,6 +278,7 @@ ntcore_extension(
 
 define_pybind_library(
     name = "pyntcore",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 

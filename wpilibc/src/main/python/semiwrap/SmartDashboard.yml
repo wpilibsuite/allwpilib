@@ -168,4 +168,4 @@ inline_code: |-
       rpy::destroySmartDashboardData();
   });
   m.add_object("_sd_cleanup", cleanup);
-  m.def("_clearSmartDashboardData", &rpy::clearSmartDashboardData);
+  m.def("_clear_smart_dashboard_data", &rpy::clearSmartDashboardData);

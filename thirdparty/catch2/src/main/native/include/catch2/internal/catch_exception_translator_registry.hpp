@@ -15,7 +15,7 @@
 
 namespace Catch {
 
-    class ExceptionTranslatorRegistry : public IExceptionTranslatorRegistry {
+    class ExceptionTranslatorRegistry final : public IExceptionTranslatorRegistry {
     public:
         ~ExceptionTranslatorRegistry() override;
         void registerTranslator( Detail::unique_ptr<IExceptionTranslator>&& translator );

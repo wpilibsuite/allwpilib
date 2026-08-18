@@ -7,6 +7,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+#include "sleipnir/optimization/solver/util/problem_scaling.hpp"
+
 namespace slp {
 
 /// Matrix callbacks for the interior-point method solver.
@@ -76,6 +78,8 @@ struct InteriorPointMatrixCallbacks {
   ///
   /// L(x, y, z) = f(x) − yᵀcₑ(x) − zᵀcᵢ(x)
   ///
+  /// Only the lower triangle is used.
+  ///
   /// <table>
   ///   <tr>
   ///     <th>Variable</th>
@@ -108,6 +112,8 @@ struct InteriorPointMatrixCallbacks {
       H;
 
   /// Constraint part of Lagrangian Hessian ∇ₓₓ²(−yᵀcₑ(x) − zᵀcᵢ(x)) getter.
+  ///
+  /// Only the lower triangle is used.
   ///
   /// <table>
   ///   <tr>
@@ -237,6 +243,10 @@ struct InteriorPointMatrixCallbacks {
   ///   </tr>
   /// </table>
   std::function<SparseMatrix(const DenseVector& x)> A_i;
+
+  /// Automatic problem scaling factors. Used to scale the cost, constraints,
+  /// and tolerance inside the interior-point solver.
+  ProblemScaling<Scalar> scaling;
 };
 
 }  // namespace slp

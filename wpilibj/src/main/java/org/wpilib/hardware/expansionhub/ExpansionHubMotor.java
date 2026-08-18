@@ -21,11 +21,27 @@ import org.wpilib.units.measure.Voltage;
 
 /** This class controls a specific motor and encoder hooked up to an ExpansionHub. */
 public class ExpansionHubMotor implements AutoCloseable {
+  /** The direction to follow a leader motor in when using the follow method. */
+  public enum FollowDirection {
+    /** Follow the leader motor in the same direction. */
+    Aligned,
+    /** Follow the leader motor in the opposite direction. */
+    Opposed
+  }
+
   private static final int kPercentageMode = 0;
   private static final int kVoltageMode = 1;
   private static final int kPositionMode = 2;
   private static final int kVelocityMode = 3;
   private static final int kFollowerMode = 4;
+
+  /** Neutral mode applied when the motor output is commanded to 0. */
+  public enum NeutralMode {
+    /** Allow the motor to coast when output is zero. */
+    COAST,
+    /** Actively brake the motor when output is zero. */
+    BRAKE
+  }
 
   private ExpansionHub m_hub;
   private final int m_channel;
@@ -49,7 +65,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   private final ExpansionHubPositionConstants m_positionPidConstants;
 
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a motor at the requested channel on a specific USB port.
    *
    * @param usbId The USB port ID the hub is connected to
    * @param channel The motor channel
@@ -207,12 +223,13 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets if the motor should float or brake when 0 is commanded. Defaults to false.
+   * Sets if the motor should brake or coast when 0 is commanded. Defaults to BRAKE mode.
    *
-   * @param floatOn0 True to float when commanded 0, false to brake
+   * @param mode Neutral mode to apply when output is zero.
    */
-  public void setFloatOn0(boolean floatOn0) {
-    m_floatOn0Publisher.set(floatOn0);
+  public void setNeutralMode(NeutralMode mode) {
+    requireNonNullParam(mode, "mode", "setNeutralMode");
+    m_floatOn0Publisher.set(mode == NeutralMode.COAST);
   }
 
   /**
@@ -299,13 +316,31 @@ public class ExpansionHubMotor implements AutoCloseable {
    * of both motors will be the same.
    *
    * @param leader The motor to follow
+   * @param direction The direction to follow the leader
    */
-  public void follow(ExpansionHubMotor leader) {
+  public void follow(ExpansionHubMotor leader, FollowDirection direction) {
     requireNonNullParam(leader, "leader", "follow");
     if (leader.m_hub.getUsbId() != this.m_hub.getUsbId()) {
       throw new IllegalArgumentException("Leader motor must be on the same hub as the follower");
     }
+    if (leader.m_channel == this.m_channel) {
+      throw new IllegalArgumentException("Cannot follow self");
+    }
+    m_hub.addFollower(leader.m_channel, this.m_channel);
+    setEnabled(true);
     m_modePublisher.set(kFollowerMode);
-    m_setpointPublisher.set(leader.m_channel);
+    if (direction == FollowDirection.Opposed) {
+      m_setpointPublisher.set(leader.m_channel + 4);
+    } else {
+      m_setpointPublisher.set(leader.m_channel);
+    }
+  }
+
+  /** Stops following the currently set leader motor. */
+  public void unfollow() {
+    m_hub.removeFollower(this.m_channel);
+    setEnabled(false);
+    m_modePublisher.set(kPercentageMode);
+    m_setpointPublisher.set(0);
   }
 }

@@ -5,11 +5,10 @@
 #include "ServerClient4Base.hpp"
 
 #include <algorithm>
+#include <format>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <fmt/ranges.h>
 
 #include "Log.hpp"
 #include "server/ServerImpl.hpp"
@@ -23,6 +22,10 @@ void ServerClient4Base::ClientPublish(int pubuid, std::string_view name,
                                       const wpi::util::json& properties,
                                       const PubSubOptionsImpl& options) {
   DEBUG3("ClientPublish({}, {}, {}, {})", m_id, name, pubuid, typeStr);
+  if (m_id != 0 && !name.empty() && name.front() == '$') {
+    WARN("client {} publish of reserved topic '{}' ignored", m_id, name);
+    return;
+  }
   auto topic = m_storage.CreateTopic(this, name, typeStr, properties);
 
   // create publisher
@@ -87,11 +90,26 @@ void ServerClient4Base::ClientSetProperties(std::string_view name,
   m_storage.SetProperties(nullptr, topic, update);
 }
 
+// FIXME: Remove when GCC 15 is available and pass span directly with no
+// parentheses
+static std::string join(std::span<const std::string> values) {
+  std::string ret;
+  bool isFirst = true;
+  for (auto value : values) {
+    if (isFirst) {
+      isFirst = false;
+      ret += std::format("\"{}\"", value);
+    } else {
+      ret += std::format(", \"{}\"", value);
+    }
+  }
+  return ret;
+}
+
 void ServerClient4Base::ClientSubscribe(int subuid,
                                         std::span<const std::string> topicNames,
                                         const PubSubOptionsImpl& options) {
-  DEBUG4("ClientSubscribe({}, ({}), {})", m_id, fmt::join(topicNames, ","),
-         subuid);
+  DEBUG4("ClientSubscribe({}, ({}), {})", m_id, join(topicNames), subuid);
   auto& sub = m_subscribers[subuid];
   bool replace = false;
   if (sub) {
@@ -137,7 +155,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
       added = true;
     }
 
-    if (added ^ removed) {
+    if (added || removed) {
       UpdatePeriod(tcdIt->second, topic);
       m_storage.UpdateMetaTopicSub(topic);
     }

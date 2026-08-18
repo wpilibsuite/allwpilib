@@ -72,9 +72,9 @@ inline void BM_CartPole(benchmark::State& state) {
 
     // Initial guess
     for (int k = 0; k < N + 1; ++k) {
-      X(0, k).set_value(
+      X[0, k].set_value(
           std::lerp(x_initial[0], x_final[0], static_cast<double>(k) / N));
-      X(1, k).set_value(
+      X[1, k].set_value(
           std::lerp(x_initial[1], x_final[1], static_cast<double>(k) / N));
     }
 

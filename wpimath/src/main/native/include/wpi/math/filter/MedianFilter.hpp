@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <vector>
 
 #include "wpi/util/Algorithm.hpp"

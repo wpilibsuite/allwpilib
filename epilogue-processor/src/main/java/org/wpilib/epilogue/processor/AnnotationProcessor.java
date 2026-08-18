@@ -382,9 +382,12 @@ public class AnnotationProcessor extends AbstractProcessor {
 
     List<String> loggerClassNames = new ArrayList<>();
     var mainRobotClasses = new ArrayList<TypeElement>();
+    var timedRobotClasses = new ArrayList<TypeElement>();
 
     // Used to check for a main robot class
     var robotBaseClass =
+        processingEnv.getElementUtils().getTypeElement("org.wpilib.framework.RobotBase").asType();
+    var timedRobotClass =
         processingEnv.getElementUtils().getTypeElement("org.wpilib.framework.TimedRobot").asType();
 
     boolean validFields = validateFields(annotatedElements);
@@ -403,6 +406,9 @@ public class AnnotationProcessor extends AbstractProcessor {
         if (processingEnv.getTypeUtils().isAssignable(clazz.getSuperclass(), robotBaseClass)) {
           mainRobotClasses.add(clazz);
         }
+        if (processingEnv.getTypeUtils().isAssignable(clazz.getSuperclass(), timedRobotClass)) {
+          timedRobotClasses.add(clazz);
+        }
 
         loggerClassNames.add(StringUtils.loggerClassName(clazz));
       } catch (IOException e) {
@@ -417,8 +423,10 @@ public class AnnotationProcessor extends AbstractProcessor {
     }
 
     // Sort alphabetically
-    mainRobotClasses.sort(Comparator.comparing(c -> c.getSimpleName().toString()));
-    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses);
+    loggerClassNames.sort(Comparator.naturalOrder());
+    mainRobotClasses.sort(Comparator.comparing(TypeElement::toString));
+    timedRobotClasses.sort(Comparator.comparing(TypeElement::toString));
+    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses, timedRobotClasses);
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {

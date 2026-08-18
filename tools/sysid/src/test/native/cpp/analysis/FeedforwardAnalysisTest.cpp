@@ -9,8 +9,12 @@
 #include <bitset>
 #include <cmath>
 #include <span>
+#include <sstream>
+#include <string>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_message.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 #include "wpi/sysid/analysis/AnalysisType.hpp"
@@ -113,30 +117,35 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
 }
 
 /**
- * Asserts success if the gains contain NaNs or are too far from their expected
+ * Returns true if the gains contain NaNs or are too far from their expected
  * values.
  *
  * @param expectedGains The expected feedforward gains.
  * @param actualGains The calculated feedforward gains.
  * @param tolerances The tolerances for the coefficient comparisons.
  */
-testing::AssertionResult FitIsBad(std::span<const double> expectedGains,
-                                  std::span<const double> actualGains,
-                                  std::span<const double> tolerances) {
+bool FitIsBad(std::span<const double> expectedGains,
+              std::span<const double> actualGains,
+              std::span<const double> tolerances) {
   // Check for NaN
   for (const auto& coeff : actualGains) {
     if (std::isnan(coeff)) {
-      return testing::AssertionSuccess();
+      return true;
     }
   }
 
   for (size_t i = 0; i < expectedGains.size(); ++i) {
     if (std::abs(expectedGains[i] - actualGains[i]) >= tolerances[i]) {
-      return testing::AssertionSuccess();
+      return true;
     }
   }
 
-  auto result = testing::AssertionFailure();
+  return false;
+}
+
+std::string DescribeFit(std::span<const double> expectedGains,
+                        std::span<const double> actualGains) {
+  std::ostringstream result;
 
   result << "\n";
   for (size_t i = 0; i < expectedGains.size(); ++i) {
@@ -158,7 +167,7 @@ testing::AssertionResult FitIsBad(std::span<const double> expectedGains,
     result << "  diff " << std::abs(expectedGains[i] - actualGains[i]) << "\n";
   }
 
-  return result;
+  return result.str();
 }
 
 /**
@@ -173,12 +182,13 @@ void ExpectArrayNear(std::span<const double> expected,
                      std::span<const double> tolerances) {
   // Check size
   const size_t size = expected.size();
-  EXPECT_EQ(size, actual.size());
-  EXPECT_EQ(size, tolerances.size());
+  REQUIRE(size == actual.size());
+  REQUIRE(size == tolerances.size());
 
   // Check elements
   for (size_t i = 0; i < size; ++i) {
-    EXPECT_NEAR(expected[i], actual[i], tolerances[i]) << "where i = " << i;
+    UNSCOPED_INFO("i = " << i);
+    CHECK(expected[i] == Catch::Approx(actual[i]).margin(tolerances[i]));
   }
 }
 
@@ -205,14 +215,18 @@ void RunTests(Model& model, const sysid::AnalysisType& type,
       // doesn't match
       auto ff = sysid::CalculateFeedforwardGains(CollectData(model, movements),
                                                  type, false);
-      EXPECT_TRUE(FitIsBad(expectedGains, ff.coeffs, tolerances));
+      bool fitIsBad = FitIsBad(expectedGains, ff.coeffs, tolerances);
+      if (!fitIsBad) {
+        UNSCOPED_INFO(DescribeFit(expectedGains, ff.coeffs));
+      }
+      CHECK(fitIsBad);
     }
   }
 }
 
 }  // namespace
 
-TEST(FeedforwardAnalysisTest, Arm) {
+TEST_CASE("FeedforwardAnalysisTest Arm", "[sysid]") {
   {
     constexpr double Ks = 1.01;
     constexpr double Kv = 3.060;
@@ -242,7 +256,7 @@ TEST(FeedforwardAnalysisTest, Arm) {
   }
 }
 
-TEST(FeedforwardAnalysisTest, Elevator) {
+TEST_CASE("FeedforwardAnalysisTest Elevator", "[sysid]") {
   {
     constexpr double Ks = 1.01;
     constexpr double Kv = 3.060;
@@ -268,7 +282,7 @@ TEST(FeedforwardAnalysisTest, Elevator) {
   }
 }
 
-TEST(FeedforwardAnalysisTest, Simple) {
+TEST_CASE("FeedforwardAnalysisTest Simple", "[sysid]") {
   {
     constexpr double Ks = 1.01;
     constexpr double Kv = 3.060;

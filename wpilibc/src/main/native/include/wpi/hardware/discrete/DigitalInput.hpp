@@ -5,7 +5,7 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/Types.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -41,6 +41,8 @@ class DigitalInput : public wpi::util::Sendable,
    * Get the value from a digital input channel.
    *
    * Retrieve the value of a single digital input channel from the FPGA.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   bool Get() const;
 
@@ -60,7 +62,7 @@ class DigitalInput : public wpi::util::Sendable,
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
+  wpi::util::Handle<HAL_DigitalHandle, HAL_FreeDIOPort> m_handle;
 };
 
 }  // namespace wpi

@@ -19,6 +19,34 @@ public class UsageReportingJNI extends JNIWrapper {
    */
   public static native void report(String resource, String data);
 
+  /**
+   * Publishes a version for a device on a CAN bus.
+   *
+   * @param busId bus containing the device
+   * @param deviceId device identifier
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static native int publishCanVersion(int busId, int deviceId, String name, String version);
+
+  /**
+   * Publishes a version without a bus or device identifier.
+   *
+   * @param name version name
+   * @param version version string
+   * @return status of the operation
+   */
+  public static native int publishVersion(String name, String version);
+
+  /**
+   * Publishes the WPILib version.
+   *
+   * @param version WPILib version string
+   * @return status of the operation
+   */
+  public static native int publishWpilibVersion(String version);
+
   /** Utility class. */
   private UsageReportingJNI() {}
 }

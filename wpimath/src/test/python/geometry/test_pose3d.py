@@ -13,17 +13,17 @@ from wpimath import (
     Translation3d,
     Quaternion,
 )
-from wpimath.units import feetToMeters
+from wpimath.units import feet_to_meters
 
 
 def test_rotate_by():
     x = 1
     y = 2
-    initial = Pose3d(x, y, 0, Rotation3d.fromDegrees(0, 0, 45))
+    initial = Pose3d(x, y, 0, Rotation3d.from_degrees(0, 0, 45))
 
     yaw = math.radians(5)
-    rotation = Rotation3d.fromDegrees(0, 0, math.degrees(yaw))
-    rotated = initial.rotateBy(rotation)
+    rotation = Rotation3d.from_degrees(0, 0, math.degrees(yaw))
+    rotated = initial.rotate_by(rotation)
 
     # Translation is rotated by CCW rotation matrix
     c = math.cos(yaw)
@@ -37,27 +37,27 @@ def test_rotate_by():
 
 
 def test_test_transform_by_rotations():
-    k_epsilon = 1e-9
+    kEpsilon = 1e-9
 
     initial_pose = Pose3d(x=0, y=0, z=0, rotation=Rotation3d())
-    transform1 = Transform3d(Translation3d(), Rotation3d.fromDegrees(90, 45, 0))
-    transform2 = Transform3d(Translation3d(), Rotation3d.fromDegrees(-90, 0, 0))
-    transform3 = Transform3d(Translation3d(), Rotation3d.fromDegrees(0, -45, 0))
+    transform1 = Transform3d(Translation3d(), Rotation3d.from_degrees(90, 45, 0))
+    transform2 = Transform3d(Translation3d(), Rotation3d.from_degrees(-90, 0, 0))
+    transform3 = Transform3d(Translation3d(), Rotation3d.from_degrees(0, -45, 0))
 
     final_pose = (
-        initial_pose.transformBy(transform1)
-        .transformBy(transform2)
-        .transformBy(transform3)
+        initial_pose.transform_by(transform1)
+        .transform_by(transform2)
+        .transform_by(transform3)
     )
 
     assert final_pose.rotation().x == pytest.approx(
-        initial_pose.rotation().x, abs=k_epsilon
+        initial_pose.rotation().x, abs=kEpsilon
     )
     assert final_pose.rotation().y == pytest.approx(
-        initial_pose.rotation().y, abs=k_epsilon
+        initial_pose.rotation().y, abs=kEpsilon
     )
     assert final_pose.rotation().z == pytest.approx(
-        initial_pose.rotation().z, abs=k_epsilon
+        initial_pose.rotation().z, abs=kEpsilon
     )
 
 
@@ -82,7 +82,7 @@ def test_relative_to():
     initial = Pose3d(x=0, y=0, z=0, rotation=Rotation3d(z_axis, math.radians(45)))
     final = Pose3d(x=5, y=5, z=0, rotation=Rotation3d(z_axis, math.radians(45)))
 
-    final_relative_to_initial = final.relativeTo(initial)
+    final_relative_to_initial = final.relative_to(initial)
 
     assert final_relative_to_initial.x == pytest.approx(5.0 * math.sqrt(2.0))
     assert final_relative_to_initial.y == pytest.approx(0.0)
@@ -93,7 +93,7 @@ def test_rotate_around():
     initial = Pose3d(x=5, y=0, z=0, rotation=Rotation3d())
     point = Translation3d(x=0, y=0, z=0)
 
-    rotated = initial.rotateAround(point, Rotation3d.fromDegrees(0, 0, 180))
+    rotated = initial.rotate_around(point, Rotation3d.from_degrees(0, 0, 180))
 
     assert rotated.x == pytest.approx(-5.0, abs=1e-9)
     assert rotated.y == pytest.approx(0.0, abs=1e-9)
@@ -113,7 +113,7 @@ def test_inequality():
 
     a = Pose3d(x=0, y=5, z=0, rotation=Rotation3d(z_axis, math.radians(43)))
     b = Pose3d(
-        x=0, y=feetToMeters(5), z=0, rotation=Rotation3d(z_axis, math.radians(43))
+        x=0, y=feet_to_meters(5), z=0, rotation=Rotation3d(z_axis, math.radians(43))
     )
     assert a != b
 
@@ -132,17 +132,17 @@ def test_minus():
 
 
 def test_to_matrix():
-    before = Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(10, 20, 30))
-    after = Pose3d.fromMatrix(before.toMatrix())
+    before = Pose3d(x=1, y=2, z=3, rotation=Rotation3d.from_degrees(10, 20, 30))
+    after = Pose3d.from_matrix(before.to_matrix())
 
     assert before == after
 
 
 def test_to_pose2d():
-    pose = Pose3d(x=1, y=2, z=3, rotation=Rotation3d.fromDegrees(20, 30, 40))
-    expected = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(40))
+    pose = Pose3d(x=1, y=2, z=3, rotation=Rotation3d.from_degrees(20, 30, 40))
+    expected = Pose2d(x=1, y=2, rotation=Rotation2d.from_degrees(40))
 
-    assert expected == pose.toPose2d()
+    assert expected == pose.to_pose2d()
 
 
 def test_complex_twists():
@@ -224,17 +224,17 @@ def test_complex_twists():
         assert start_exp.x == pytest.approx(end.x, abs=eps)
         assert start_exp.y == pytest.approx(end.y, abs=eps)
         assert start_exp.z == pytest.approx(end.z, abs=eps)
-        assert start_exp.rotation().getQuaternion().w == pytest.approx(
-            end.rotation().getQuaternion().w, abs=eps
+        assert start_exp.rotation().get_quaternion().w == pytest.approx(
+            end.rotation().get_quaternion().w, abs=eps
         )
-        assert start_exp.rotation().getQuaternion().x == pytest.approx(
-            end.rotation().getQuaternion().x, abs=eps
+        assert start_exp.rotation().get_quaternion().x == pytest.approx(
+            end.rotation().get_quaternion().x, abs=eps
         )
-        assert start_exp.rotation().getQuaternion().y == pytest.approx(
-            end.rotation().getQuaternion().y, abs=eps
+        assert start_exp.rotation().get_quaternion().y == pytest.approx(
+            end.rotation().get_quaternion().y, abs=eps
         )
-        assert start_exp.rotation().getQuaternion().z == pytest.approx(
-            end.rotation().getQuaternion().z, abs=eps
+        assert start_exp.rotation().get_quaternion().z == pytest.approx(
+            end.rotation().get_quaternion().z, abs=eps
         )
 
 
@@ -319,10 +319,10 @@ def test_nearest():
     translation = Translation3d(x=1, y=0, z=0)
 
     pose_a = Pose3d(translation, Rotation3d())  # No rotation
-    pose_b = Pose3d(translation, Rotation3d.fromDegrees(30, 0, 0))
-    pose_c = Pose3d(translation, Rotation3d.fromDegrees(0, 45, 0))
-    pose_d = Pose3d(translation, Rotation3d.fromDegrees(0, 0, 90))
-    pose_e = Pose3d(translation, Rotation3d.fromDegrees(180, 0, 0))
+    pose_b = Pose3d(translation, Rotation3d.from_degrees(30, 0, 0))
+    pose_c = Pose3d(translation, Rotation3d.from_degrees(0, 45, 0))
+    pose_d = Pose3d(translation, Rotation3d.from_degrees(0, 0, 90))
+    pose_e = Pose3d(translation, Rotation3d.from_degrees(180, 0, 0))
 
     result1 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d()).nearest(
         [pose_a, pose_b, pose_d]
@@ -331,41 +331,41 @@ def test_nearest():
     assert result1.rotation().y == pytest.approx(pose_a.rotation().y)
     assert result1.rotation().z == pytest.approx(pose_a.rotation().z)
 
-    result2 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(25, 0, 0)).nearest(
+    result2 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.from_degrees(25, 0, 0)).nearest(
         [pose_b, pose_c, pose_d]
     )
     assert result2.rotation().x == pytest.approx(pose_b.rotation().x)
     assert result2.rotation().y == pytest.approx(pose_b.rotation().y)
     assert result2.rotation().z == pytest.approx(pose_b.rotation().z)
 
-    result3 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(0, 50, 0)).nearest(
+    result3 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.from_degrees(0, 50, 0)).nearest(
         [pose_b, pose_c, pose_d]
     )
     assert result3.rotation().x == pytest.approx(pose_c.rotation().x)
     assert result3.rotation().y == pytest.approx(pose_c.rotation().y)
     assert result3.rotation().z == pytest.approx(pose_c.rotation().z)
 
-    result4 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(0, 0, 85)).nearest(
+    result4 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.from_degrees(0, 0, 85)).nearest(
         [pose_a, pose_c, pose_d]
     )
     assert result4.rotation().x == pytest.approx(pose_d.rotation().x)
     assert result4.rotation().y == pytest.approx(pose_d.rotation().y)
     assert result4.rotation().z == pytest.approx(pose_d.rotation().z)
 
-    result5 = Pose3d(x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(170, 0, 0)).nearest(
-        [pose_a, pose_d, pose_e]
-    )
+    result5 = Pose3d(
+        x=0, y=0, z=0, rotation=Rotation3d.from_degrees(170, 0, 0)
+    ).nearest([pose_a, pose_d, pose_e])
     assert result5.rotation().x == pytest.approx(pose_e.rotation().x)
     assert result5.rotation().y == pytest.approx(pose_e.rotation().y)
     assert result5.rotation().z == pytest.approx(pose_e.rotation().z)
 
     # Test with complex 3D rotations (combining roll, pitch, yaw)
-    complex_pose1 = Pose3d(translation, Rotation3d.fromDegrees(45, 30, 60))
-    complex_pose2 = Pose3d(translation, Rotation3d.fromDegrees(90, 45, 90))
-    complex_pose3 = Pose3d(translation, Rotation3d.fromDegrees(10, 15, 20))
+    complex_pose1 = Pose3d(translation, Rotation3d.from_degrees(45, 30, 60))
+    complex_pose2 = Pose3d(translation, Rotation3d.from_degrees(90, 45, 90))
+    complex_pose3 = Pose3d(translation, Rotation3d.from_degrees(10, 15, 20))
 
     complex_result = Pose3d(
-        x=0, y=0, z=0, rotation=Rotation3d.fromDegrees(5, 10, 15)
+        x=0, y=0, z=0, rotation=Rotation3d.from_degrees(5, 10, 15)
     ).nearest([complex_pose1, complex_pose2, complex_pose3])
     assert complex_result.rotation().x == pytest.approx(complex_pose3.rotation().x)
     assert complex_result.rotation().y == pytest.approx(complex_pose3.rotation().y)

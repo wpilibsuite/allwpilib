@@ -7,8 +7,8 @@
 #include <string_view>
 
 #include "wpi/hal/SerialPort.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -253,7 +253,7 @@ class SerialPort {
   void Reset();
 
  private:
-  wpi::hal::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
+  wpi::util::Handle<HAL_SerialPortHandle, HAL_CloseSerial> m_portHandle;
 };
 
 }  // namespace wpi

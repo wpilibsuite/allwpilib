@@ -39,11 +39,11 @@ void RobotContainer::ConfigureButtonBindings() {
   // NOTE: since we're binding a CommandPtr, command ownership here is moved to
   // the scheduler thus, no memory leaks!
 
-  // Grab the hatch when the 'South Face' button is pressed.
-  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::SOUTH_FACE)
+  // Grab the hatch when the 'Face Down' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_DOWN)
       .OnTrue(GrabHatch(&hatch).ToPtr());
-  // Release the hatch when the 'East Face' button is pressed.
-  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::EAST_FACE)
+  // Release the hatch when the 'Face Right' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_RIGHT)
       .OnTrue(ReleaseHatch(&hatch).ToPtr());
   // While holding the bumper button, drive at half velocity
   wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::RIGHT_BUMPER)

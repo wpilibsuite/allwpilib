@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "wpi/hal/Types.h"
+#include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
@@ -46,7 +47,7 @@ class DoubleSolenoid : public wpi::util::Sendable,
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(int busId, int module, PneumaticsModuleType moduleType,
+  DoubleSolenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
 
   /**
@@ -58,8 +59,8 @@ class DoubleSolenoid : public wpi::util::Sendable,
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(int busId, PneumaticsModuleType moduleType, int forwardChannel,
-                 int reverseChannel);
+  DoubleSolenoid(CANBus busId, PneumaticsModuleType moduleType,
+                 int forwardChannel, int reverseChannel);
 
   ~DoubleSolenoid() override;
 

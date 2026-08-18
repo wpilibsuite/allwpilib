@@ -6,12 +6,14 @@
 
 #include <stdint.h>
 
+#include <deque>
+#include <functional>
 #include <span>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
-#include "gmock/gmock.h"
 #include "net/WireConnection.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
@@ -19,11 +21,57 @@ namespace wpi::nt::net {
 
 class MockWireConnection : public WireConnection {
  public:
-  MOCK_METHOD(unsigned int, GetVersion, (), (const, override));
+  struct SendPingCall {
+    uint64_t time;
 
-  MOCK_METHOD(void, SendPing, (uint64_t time), (override));
+    bool operator==(const SendPingCall&) const = default;
+  };
 
-  MOCK_METHOD(bool, Ready, (), (const, override));
+  struct ReadyCall {
+    bool operator==(const ReadyCall&) const = default;
+  };
+
+  struct WriteTextCall {
+    std::string contents;
+
+    bool operator==(const WriteTextCall&) const = default;
+  };
+
+  struct WriteBinaryCall {
+    std::vector<uint8_t> contents;
+
+    bool operator==(const WriteBinaryCall&) const = default;
+  };
+
+  struct FlushCall {
+    bool operator==(const FlushCall&) const = default;
+  };
+
+  struct GetLastReceivedTimeCall {
+    bool operator==(const GetLastReceivedTimeCall&) const = default;
+  };
+
+  using Call =
+      std::variant<SendPingCall, ReadyCall, WriteTextCall, WriteBinaryCall,
+                   FlushCall, GetLastReceivedTimeCall>;
+
+  unsigned int GetVersion() const override { return version; }
+
+  void SendPing(uint64_t time) override {
+    sendPingCalls.emplace_back(time);
+    calls.emplace_back(SendPingCall{time});
+  }
+
+  bool Ready() const override {
+    ++readyCalls;
+    calls.emplace_back(ReadyCall{});
+    if (!readyReturns.empty()) {
+      bool rv = readyReturns.front();
+      readyReturns.pop_front();
+      return rv;
+    }
+    return defaultReady;
+  }
 
   int WriteText(wpi::util::function_ref<void(wpi::util::raw_ostream& os)>
                     writer) override {
@@ -55,21 +103,101 @@ class MockWireConnection : public WireConnection {
     DoSendBinary(binary);
   }
 
-  MOCK_METHOD(int, DoWriteText, (std::string_view contents));
-  MOCK_METHOD(int, DoWriteBinary, (std::span<const uint8_t> contents));
+  int DoWriteText(std::string_view contents) {
+    writeTextCalls.emplace_back(contents);
+    calls.emplace_back(WriteTextCall{writeTextCalls.back()});
+    if (onWriteText) {
+      return onWriteText(contents);
+    }
+    if (!writeTextReturns.empty()) {
+      int rv = writeTextReturns.front();
+      writeTextReturns.pop_front();
+      return rv;
+    }
+    return defaultWriteTextReturn;
+  }
 
-  MOCK_METHOD(void, DoSendText, (std::string_view contents));
-  MOCK_METHOD(void, DoSendBinary, (std::span<const uint8_t> contents));
+  int DoWriteBinary(std::span<const uint8_t> contents) {
+    writeBinaryCalls.emplace_back(contents.begin(), contents.end());
+    calls.emplace_back(WriteBinaryCall{writeBinaryCalls.back()});
+    if (onWriteBinary) {
+      return onWriteBinary(contents);
+    }
+    if (!writeBinaryReturns.empty()) {
+      int rv = writeBinaryReturns.front();
+      writeBinaryReturns.pop_front();
+      return rv;
+    }
+    return defaultWriteBinaryReturn;
+  }
 
-  MOCK_METHOD(int, Flush, (), (override));
+  void DoSendText(std::string_view contents) {
+    sendTextCalls.emplace_back(contents);
+  }
 
-  MOCK_METHOD(uint64_t, GetLastFlushTime, (), (const, override));
-  MOCK_METHOD(uint64_t, GetLastReceivedTime, (), (const, override));
+  void DoSendBinary(std::span<const uint8_t> contents) {
+    sendBinaryCalls.emplace_back(contents.begin(), contents.end());
+  }
 
-  MOCK_METHOD(void, StopRead, (), (override));
-  MOCK_METHOD(void, StartRead, (), (override));
+  int Flush() override {
+    ++flushCalls;
+    calls.emplace_back(FlushCall{});
+    if (!flushReturns.empty()) {
+      int rv = flushReturns.front();
+      flushReturns.pop_front();
+      return rv;
+    }
+    return defaultFlushReturn;
+  }
 
-  MOCK_METHOD(void, Disconnect, (std::string_view reason), (override));
+  uint64_t GetLastFlushTime() const override { return lastFlushTime; }
+
+  uint64_t GetLastReceivedTime() const override {
+    ++lastReceivedTimeCalls;
+    calls.emplace_back(GetLastReceivedTimeCall{});
+    if (!lastReceivedTimeReturns.empty()) {
+      uint64_t rv = lastReceivedTimeReturns.front();
+      lastReceivedTimeReturns.pop_front();
+      return rv;
+    }
+    return defaultLastReceivedTime;
+  }
+
+  void StopRead() override { ++stopReadCalls; }
+
+  void StartRead() override { ++startReadCalls; }
+
+  void Disconnect(std::string_view reason) override {
+    disconnectCalls.emplace_back(reason);
+  }
+
+  unsigned int version = 0x0401;
+  mutable std::deque<bool> readyReturns;
+  bool defaultReady = true;
+  std::deque<int> writeTextReturns;
+  int defaultWriteTextReturn = 0;
+  std::deque<int> writeBinaryReturns;
+  int defaultWriteBinaryReturn = 0;
+  std::deque<int> flushReturns;
+  int defaultFlushReturn = 0;
+  uint64_t lastFlushTime = 0;
+  mutable std::deque<uint64_t> lastReceivedTimeReturns;
+  uint64_t defaultLastReceivedTime = 0;
+  std::function<int(std::string_view)> onWriteText;
+  std::function<int(std::span<const uint8_t>)> onWriteBinary;
+
+  std::vector<uint64_t> sendPingCalls;
+  mutable int readyCalls = 0;
+  std::vector<std::string> writeTextCalls;
+  std::vector<std::vector<uint8_t>> writeBinaryCalls;
+  mutable std::vector<Call> calls;
+  std::vector<std::string> sendTextCalls;
+  std::vector<std::vector<uint8_t>> sendBinaryCalls;
+  int flushCalls = 0;
+  mutable int lastReceivedTimeCalls = 0;
+  int stopReadCalls = 0;
+  int startReadCalls = 0;
+  std::vector<std::string> disconnectCalls;
 };
 
 }  // namespace wpi::nt::net

@@ -19,7 +19,7 @@ else:
     entry_points = importlib.metadata.entry_points
 
 
-from .report_error import reportError, reportErrorInternal
+from .report_error import report_error, report_error_internal
 
 
 def _log_versions(robotpy_version: typing.Optional[str]):
@@ -28,7 +28,7 @@ def _log_versions(robotpy_version: typing.Optional[str]):
 
     import logging
 
-    data = wpilib.deployinfo.getDeployData()
+    data = wpilib.deployinfo.get_deploy_data()
     if data:
         logger = logging.getLogger("deploy-info")
         logger.info(
@@ -51,7 +51,7 @@ def _log_versions(robotpy_version: typing.Optional[str]):
 
     logger.info("WPILib version %s", wpilib.__version__)
 
-    if wpilib.RobotBase.isSimulation():
+    if wpilib.RobotBase.is_simulation():
         logger.info("Running with simulated HAL.")
 
         # check to see if we're on a RoboRIO
@@ -81,7 +81,7 @@ class RobotStarter:
     def __init__(self):
         self.logger = logging.getLogger("robotpy")
         self.robot = None
-        self.suppressExitWarning = False
+        self.suppress_exit_warning = False
         self._robotpy_version = None
 
     @property
@@ -100,32 +100,32 @@ class RobotStarter:
         _log_versions(self.robotpy_version)
 
         retval = False
-        if hal.hasMain():
+        if hal.has_main():
             rval = [False]
 
             def _start():
                 try:
                     rval[0] = self.start(robot_cls)
                 finally:
-                    hal.exitMain()
+                    hal.exit_main()
 
             th = threading.Thread(target=_start, name="RobotThread", daemon=True)
             th.start()
             try:
-                hal.runMain()
+                hal.run_main()
             except KeyboardInterrupt:
                 self.logger.exception(
                     "THIS IS NOT AN ERROR: The user hit CTRL-C to kill the robot"
                 )
                 self.logger.info("Exiting because of keyboard interrupt")
 
-            self.suppressExitWarning = True
+            self.suppress_exit_warning = True
             robot = self.robot
             if robot:
                 try:
-                    robot.endCompetition()
+                    robot.end_competition()
                 except:
-                    self.logger.warning("endCompetition raised an exception")
+                    self.logger.warning("end_competition raised an exception")
 
             th.join(1)
             if th.is_alive():
@@ -136,10 +136,10 @@ class RobotStarter:
 
         from wpilib import RobotBase
 
-        if RobotBase.isSimulation():
+        if RobotBase.is_simulation():
             import wpilib.simulation
 
-            wpilib.simulation._simulation._resetMotorSafety()
+            wpilib.simulation._simulation._reset_motor_safety()
 
         return retval
 
@@ -147,7 +147,7 @@ class RobotStarter:
         try:
             return self._start(robot_cls)
         except:
-            reportErrorInternal(
+            report_error_internal(
                 "The robot program quit unexpectedly. This is usually due to a code error.\n"
                 "The above stacktrace can help determine where the error occurred.\n",
                 True,
@@ -155,50 +155,53 @@ class RobotStarter:
             return False
 
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
-        hal.reportUsage("Language", "Python")
+        hal.report_usage("Language", "Python")
+        hal.publish_wpilib_version(f"{wpilib.__version__} (Python)")
 
-        isSimulation = wpilib.RobotBase.isSimulation()
+        is_simulation = wpilib.RobotBase.is_simulation()
 
         # hack: initialize networktables before creating the robot
         #       class, otherwise our logger doesn't get created
         import ntcore
 
-        inst = ntcore.NetworkTableInstance.getDefault()
+        inst = ntcore.NetworkTableInstance.get_default()
 
         # subscribe to "" to force persistent values to progagate to local
-        msub = ntcore.MultiSubscriber(inst, [""])
+        msub = ntcore.MultiSubscriber(
+            inst, [""], ntcore.PubSubOptions(disable_signal=True)
+        )
 
-        if not isSimulation:
-            inst.startServer("/home/systemcore/networktables.json", "", "robot")
+        if not is_simulation:
+            inst.start_server("/home/systemcore/networktables.json", "", "robot")
         else:
-            inst.startServer("networktables.json", "", "robot")
+            inst.start_server("networktables.json", "", "robot")
 
         # wait for the NT server to actually start
         for i in range(100):
             if (
-                inst.getNetworkMode()
-                & ntcore.NetworkTableInstance.NetworkMode.kNetModeStarting
+                inst.get_network_mode()
+                & ntcore.NetworkTableInstance.NetworkMode.STARTING.value
             ) == 0:
                 break
             # real sleep since we're waiting for the server, not simulated sleep
             time.sleep(0.010)
         else:
-            reportErrorInternal(
-                "timed out while waiting for NT server to start", isWarning=True
+            report_error_internal(
+                "timed out while waiting for NT server to start", is_warning=True
             )
 
         wpilib.SmartDashboard.init()
 
-        # Call DriverStationBackend.refreshData() to kick things off
-        wpilib.DriverStationBackend.refreshData()
+        # Call DriverStationBackend.refresh_data() to kick things off
+        wpilib.DriverStationBackend.refresh_data()
 
         try:
             self.robot = robot_cls()
         except:
-            reportError(
+            report_error(
                 f"Unhandled exception instantiating robot {robot_cls.__name__}", True
             )
-            reportErrorInternal(f"Could not instantiate robot {robot_cls.__name__}!")
+            report_error_internal(f"Could not instantiate robot {robot_cls.__name__}!")
             raise
 
         # TODO: Add a check to see if the user forgot to call super().__init__()
@@ -209,7 +212,7 @@ class RobotStarter:
         #     return False
 
         try:
-            self.robot.startCompetition()
+            self.robot.start_competition()
         except KeyboardInterrupt:
             self.robot = None
             self.logger.exception(
@@ -220,14 +223,16 @@ class RobotStarter:
         except:
             self.robot = None
 
-            reportError("Unhandled exception", True)
+            report_error("Unhandled exception", True)
             raise
         else:
             self.robot = None
-            if self.suppressExitWarning:
+            if self.suppress_exit_warning:
                 self.logger.info("Robot code exited")
                 return True
             else:
-                # startCompetition never returns unless exception occurs....
-                reportError("Unexpected return from startCompetition() method.", False)
+                # start_competition never returns unless exception occurs....
+                report_error(
+                    "Unexpected return from start_competition() method.", False
+                )
                 return False

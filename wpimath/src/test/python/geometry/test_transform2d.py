@@ -5,14 +5,14 @@ from wpimath import Rotation2d, Transform2d, Translation2d, Pose2d
 
 
 def test_to_matrix():
-    before = Transform2d(x=1, y=2, rotation=Rotation2d.fromDegrees(20))
-    after = Transform2d.fromMatrix(before.toMatrix())
+    before = Transform2d(x=1, y=2, rotation=Rotation2d.from_degrees(20))
+    after = Transform2d.from_matrix(before.to_matrix())
     assert before == after
 
 
 def test_inverse():
-    initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
-    transform = Transform2d(Translation2d(x=5, y=0), Rotation2d.fromDegrees(5))
+    initial = Pose2d(x=1, y=2, rotation=Rotation2d.from_degrees(45))
+    transform = Transform2d(Translation2d(x=5, y=0), Rotation2d.from_degrees(5))
 
     transformed = initial + transform
     untransformed = transformed + transform.inverse()
@@ -20,12 +20,12 @@ def test_inverse():
 
 
 def test_composition():
-    initial = Pose2d(x=1, y=2, rotation=Rotation2d.fromDegrees(45))
+    initial = Pose2d(x=1, y=2, rotation=Rotation2d.from_degrees(45))
     transform1 = Transform2d(
-        Translation2d(x=5, y=0), rotation=Rotation2d.fromDegrees(5)
+        Translation2d(x=5, y=0), rotation=Rotation2d.from_degrees(5)
     )
     transform2 = Transform2d(
-        Translation2d(x=0, y=2), rotation=Rotation2d.fromDegrees(5)
+        Translation2d(x=0, y=2), rotation=Rotation2d.from_degrees(5)
     )
 
     transformed_separate = initial + transform1 + transform2

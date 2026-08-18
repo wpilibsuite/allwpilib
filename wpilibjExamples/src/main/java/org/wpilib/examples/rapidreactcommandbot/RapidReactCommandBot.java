@@ -59,14 +59,14 @@ public class RapidReactCommandBot {
         drive.arcadeDriveCommand(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
-    // Deploy the intake with the west face button
-    driverController.westFace().onTrue(intake.intakeCommand());
-    // Retract the intake with the north face button
-    driverController.northFace().onTrue(intake.retractCommand());
+    // Deploy the intake with the left face button
+    driverController.faceLeft().onTrue(intake.intakeCommand());
+    // Retract the intake with the up face button
+    driverController.faceUp().onTrue(intake.retractCommand());
 
-    // Fire the shooter with the south face button
+    // Fire the shooter with the down face button
     driverController
-        .southFace()
+        .faceDown()
         .onTrue(
             parallel(shooter.shootCommand(ShooterConstants.kShooterTargetRPS), storage.runCommand())
                 // Since we composed this inline we should give it a name

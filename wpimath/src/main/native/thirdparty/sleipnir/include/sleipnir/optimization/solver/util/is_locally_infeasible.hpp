@@ -12,10 +12,8 @@ namespace slp {
 /// Returns true if the problem's equality constraints are locally infeasible.
 ///
 /// @tparam Scalar Scalar type.
-/// @param A_e The problem's equality constraint Jacobian Aₑ(x) evaluated at the
-///     current iterate.
-/// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
-///     iterate.
+/// @param A_e Equality constraint Jacobian Aₑ(x).
+/// @param c_e Equality constraints cₑ(x).
 template <typename Scalar>
 bool is_equality_locally_infeasible(
     const Eigen::SparseMatrix<Scalar>& A_e,
@@ -33,10 +31,8 @@ bool is_equality_locally_infeasible(
 /// Returns true if the problem's inequality constraints are locally infeasible.
 ///
 /// @tparam Scalar Scalar type.
-/// @param A_i The problem's inequality constraint Jacobian Aᵢ(x) evaluated at
-///     the current iterate.
-/// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
-///     current iterate.
+/// @param A_i Inequality constraint Jacobian Aᵢ(x).
+/// @param c_i Inequality constraints cᵢ(x).
 template <typename Scalar>
 bool is_inequality_locally_infeasible(
     const Eigen::SparseMatrix<Scalar>& A_i,

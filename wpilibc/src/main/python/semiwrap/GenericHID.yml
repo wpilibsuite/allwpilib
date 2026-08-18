@@ -1,16 +1,15 @@
 extra_includes:
-- wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::GenericHID:
+    force_no_trampoline: true
     enums:
       RumbleType:
       SupportedOutputs:
         arithmetic: true
       HIDType:
     methods:
-      GenericHID:
       GetRawButton:
       GetRawButtonPressed:
       GetRawButtonReleased:
@@ -47,6 +46,12 @@ classes:
       GetButtonsAvailable:
       GetTouchpadFingerAvailable:
       GetTouchpadFinger:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
 inline_code: |
   cls_GenericHID
     .def("__repr__", [](py::handle self) {

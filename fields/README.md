@@ -1,6 +1,6 @@
 # fields
 
-The library where FIRST field images and their metadata are stored for use by other programs.
+The library where FIRST field metadata and optional field images are stored for use by other programs.
 
 ## Adding new field images
 
@@ -10,40 +10,51 @@ Field images, if stored in PNG format, should be compressed with [oxipng](https:
 
 ### Adding the JSON
 
-A JSON file with the same name should also be placed in the same location, with 6 fields:
+A JSON file should also be placed in `src/main/native/resources/org/wpilib/fields/<program>`, with required standard fields and optional `field-image` and `field-tags` fields:
 
-- `game`, which should be the name of the game
-- `field-image`, which contains the path of the field image relative to the directory containing the JSON file
-- `field-corners`, an object that contains the two fields `top-left` and `bottom-right`, which are pairs of XY coordinates specifying the boundaries of the field in pixels
-- `field-size`, which is a pair of lengths in the X and Y axes, respectively
-- `field-unit`, the unit for `field-size` (always "foot")
+- `name`, the full human-readable field name, including the season and program
+- `season`, the season year or year range
+- `game`, the game name without the season or program
+- `field-dimensions`, an object with `length` and `width` fields measured in meters
 - `program`, which is either `ftc` or `frc`
+- `field-image`, an optional object with `path`, `top`, `left`, `bottom`, and `right` fields. `path` is relative to the directory containing the JSON file, and the other fields specify the boundaries of the field in image pixels.
+- `field-tags`, an optional list of field tag metadata for official built-in layouts
 
-X is 0 at the left edge and increases to the right, and Y is 0 at the top edge and increases going down.
+For fields with images, X is 0 at the left edge and increases to the right, and Y is 0 at the top edge and increases going down. The field image must be oriented so that the field length runs along the horizontal left/right axis and the field width runs along the vertical top/bottom axis. In other words, `field-dimensions.length` corresponds to the distance between `field-image.left` and `field-image.right`, while `field-dimensions.width` corresponds to the distance between `field-image.top` and `field-image.bottom`.
 
-### Java updates
+Multiple field JSON files may refer to the same `field-image.path` when variants share the same image but have different metadata, such as different official field dimensions.
 
-Add a new enum value to `src/main/java/org/wpilib/fields/Fields.java`. The enum value will be the path to the field JSON relative to the base resource directory stored in the enum.
+The generated built-in Java and C++ field APIs expose the image path as a resource path relative to `/org/wpilib/fields/`, such as `frc/2024-crescendo.png`, so consumers can correlate field metadata with the separate image resources without reparsing JSON.
 
-### C++ updates
+If a field needs a non-default generated selector name, a fixed ordering entry, or to become the default field, update `src/generate/fields.json`. The generated Java and C++ source text is defined by the Jinja templates under `src/generate/main`.
 
-Create a new header in `src/main/native/include/wpi/fields/<progam>` called `YEAR-gamename.hpp`, and fill in this template with the year and game name.
+### Pregeneration
 
-```c++
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+After adding or updating field JSON, run:
 
-#pragma once
-
-#include <string_view>
-
-namespace wpi::fields {
-std::string_view GetResource_<YEAR>_<gamename>_json();
-std::string_view GetResource_<YEAR>_<gamename>_png();
-}  // namespace wpi::fields
+```bash
+bazel run //fields:write_fields
 ```
 
-For FTC, `<YEAR>` should have the dash replaced with an underscore.
+Alternatively, the generator can be run directly from the repository root:
 
-Finally, add the new field to the to the list of fields in `src/main/native/cpp/fields.cpp`, including the newly added header and using the functions inside.
+```bash
+python fields/generate_fields.py
+```
+
+The direct Python path requires Jinja2 in the active Python environment. This updates the pregenerated Java enum and C++ registries in `src/generated`. The generated source exposes the standard JSON fields directly while retaining access to the embedded raw JSON resources for any additional data.
+
+## Adding AprilTag layouts
+
+Built-in AprilTag layouts live in the `field-tags` list of the matching field JSON file. The `field-dimensions` values are measured in meters and should match the dimensions used by the official layout.
+
+For layouts sourced from official field layout CSVs:
+
+1. Add or update the CSV in `src/generate/resources/org/wpilib/fields/apriltag`.
+2. Run `python fields/convert_apriltag_layouts.py`.
+3. Update the field JSON dimensions:
+    1. Length is in meters from alliance wall to alliance wall.
+    2. Width is in meters from inside guardrail plastic to plastic.
+4. Run the fields pregenerator.
+
+For fields with multiple official layouts, such as 2025 and 2026, add one field JSON per variant. The variant JSON files can share the same `field-image` while exposing separate `field-tags` and dimensions.

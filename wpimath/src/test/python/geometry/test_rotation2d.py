@@ -26,57 +26,57 @@ def test_radians_to_degrees(radians: float, degrees: float):
     ],
 )
 def test_degrees_to_radians(degrees: float, radians: float):
-    rot = Rotation2d.fromDegrees(degrees)
+    rot = Rotation2d.from_degrees(degrees)
     assert math.isclose(radians, rot.radians())
 
 
 def test_rotate_by_from_zero() -> None:
     zero = Rotation2d()
-    rotated = zero + Rotation2d.fromDegrees(90)
+    rotated = zero + Rotation2d.from_degrees(90)
 
     assert math.isclose(math.pi / 2, rotated.radians())
     assert math.isclose(90.0, rotated.degrees())
 
 
 def test_rotate_by_non_zero() -> None:
-    rot = Rotation2d.fromDegrees(90.0)
-    rot += Rotation2d.fromDegrees(30.0)
+    rot = Rotation2d.from_degrees(90.0)
+    rot += Rotation2d.from_degrees(30.0)
 
     assert math.isclose(120.0, rot.degrees())
 
 
 def test_minus() -> None:
-    rot1 = Rotation2d.fromDegrees(70)
-    rot2 = Rotation2d.fromDegrees(30)
+    rot1 = Rotation2d.from_degrees(70)
+    rot2 = Rotation2d.from_degrees(30)
 
     assert math.isclose(40.0, (rot1 - rot2).degrees())
 
 
 def test_unary_minus() -> None:
-    rot = Rotation2d.fromDegrees(20)
+    rot = Rotation2d.from_degrees(20)
     assert math.isclose(-20.0, (-rot).degrees())
 
 
 def test_multiply():
-    rot = Rotation2d.fromDegrees(10)
+    rot = Rotation2d.from_degrees(10)
 
     assert (rot * 3.0).degrees() == pytest.approx(30.0)
     assert (rot * 41.0).degrees() == pytest.approx(50.0)
 
 
 def test_equality() -> None:
-    rot1 = Rotation2d.fromDegrees(43.0)
-    rot2 = Rotation2d.fromDegrees(43.0)
+    rot1 = Rotation2d.from_degrees(43.0)
+    rot2 = Rotation2d.from_degrees(43.0)
     assert rot1 == rot2
 
-    rot1 = Rotation2d.fromDegrees(-180.0)
-    rot2 = Rotation2d.fromDegrees(180.0)
+    rot1 = Rotation2d.from_degrees(-180.0)
+    rot2 = Rotation2d.from_degrees(180.0)
     assert rot1 == rot2
 
 
 def test_inequality() -> None:
-    rot1 = Rotation2d.fromDegrees(43.0)
-    rot2 = Rotation2d.fromDegrees(43.5)
+    rot1 = Rotation2d.from_degrees(43.0)
+    rot2 = Rotation2d.from_degrees(43.5)
     assert rot1 != rot2
 
 
@@ -84,6 +84,6 @@ def test_inequality() -> None:
     importlib.util.find_spec("numpy") is None, reason="numpy is not available"
 )
 def test_to_matrix() -> None:
-    before = Rotation2d.fromDegrees(20.0)
-    after = Rotation2d.fromMatrix(before.toMatrix())
+    before = Rotation2d.from_degrees(20.0)
+    after = Rotation2d.from_matrix(before.to_matrix())
     assert before == after

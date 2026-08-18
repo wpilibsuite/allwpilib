@@ -5,6 +5,7 @@
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
 namespace pybind11 {
@@ -68,6 +69,11 @@ template <>
 struct handle_type_name<wpi::units::unit_t<
     wpi::units::compound_unit<volt_seconds, wpi::units::inverse<wpi::units::radian>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_radian");
+};
+template <>
+struct handle_type_name<wpi::units::unit_t<
+    wpi::units::compound_unit<wpi::units::meters_per_second, wpi::units::inverse<wpi::units::radian>>>> {
+  static constexpr auto name = _("wpimath.units.meters_per_second_per_radian");
 };
 template <>
 struct handle_type_name<wpi::units::unit_t<wpi::units::compound_unit<

@@ -9,8 +9,8 @@ class MySendable(wpiutil.Sendable):
         wpiutil.SendableRegistry.add(self, "Test", 1)
         self.value = 0
 
-    def initSendable(self, builder: wpiutil.SendableBuilder):
-        builder.addDoubleProperty("key", self._get, self._set)
+    def init_sendable(self, builder: wpiutil.SendableBuilder):
+        builder.add_double_property("key", self._get, self._set)
 
     def _set(self, value: float):
         self.value = value
@@ -22,7 +22,7 @@ class MySendable(wpiutil.Sendable):
 def test_custom_sendable():
     ms = MySendable()
 
-    uid = wpiutil.SendableRegistry.getUniqueId(ms)
+    uid = wpiutil.SendableRegistry.get_unique_id(ms)
     keys = {}
 
     module.publish(uid, keys)

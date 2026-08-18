@@ -6,9 +6,10 @@
 
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-TEST(SingleJointedArmTest, Disabled) {
+TEST_CASE("SingleJointedArmTest Disabled", "[wpilibc][simulation]") {
   wpi::sim::SingleJointedArmSim sim(wpi::math::DCMotor::Vex775Pro(2), 300,
                                     3_kg_sq_m, 30_in, -180_deg, 0_deg, true,
                                     90_deg);
@@ -20,15 +21,16 @@ TEST(SingleJointedArmTest, Disabled) {
   }
 
   // The arm should swing down.
-  EXPECT_NEAR(sim.GetAngle().value(), -std::numbers::pi / 2, 0.01);
+  CHECK_THAT(sim.GetAngle().value(),
+             Catch::Matchers::WithinAbs(-std::numbers::pi / 2, 0.01));
 }
 
-TEST(SingleJointedArmTest, InitialState) {
+TEST_CASE("SingleJointedArmTest InitialState", "[wpilibc][simulation]") {
   constexpr auto startingAngle = 45_deg;
   wpi::sim::SingleJointedArmSim sim(wpi::math::DCMotor::KrakenX60(2), 125,
                                     3_kg_sq_m, 30_in, 0_deg, 90_deg, true,
                                     startingAngle);
 
-  EXPECT_EQ(startingAngle, sim.GetAngle());
-  EXPECT_DOUBLE_EQ(0, sim.GetVelocity().value());
+  CHECK(startingAngle == sim.GetAngle());
+  CHECK_THAT(0, Catch::Matchers::WithinULP(sim.GetVelocity().value(), 4));
 }

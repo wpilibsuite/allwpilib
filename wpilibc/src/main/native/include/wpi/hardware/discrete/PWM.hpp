@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #include "wpi/hal/PWM.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Handle.hpp"
 #include "wpi/util/sendable/Sendable.hpp"
 #include "wpi/util/sendable/SendableHelper.hpp"
 
@@ -50,6 +50,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
    * Write a microsecond value to a PWM channel.
    *
    * @param time Microsecond PWM value. Range 0 - 4096.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetPulseTime(wpi::units::microsecond_t time);
 
@@ -90,7 +91,7 @@ class PWM : public wpi::util::Sendable, public wpi::util::SendableHelper<PWM> {
 
  private:
   int m_channel;
-  wpi::hal::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_handle;
+  wpi::util::Handle<HAL_DigitalHandle, HAL_FreePWMPort> m_handle;
 };
 
 }  // namespace wpi

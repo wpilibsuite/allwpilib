@@ -17,24 +17,16 @@ classes:
       RegisterCountCallback:
       GetCount:
       SetCount:
-      RegisterPeriodCallback:
-      GetPeriod:
-      SetPeriod:
+      RegisterRateCallback:
       RegisterResetCallback:
       GetReset:
       SetReset:
-      RegisterMaxPeriodCallback:
-      GetMaxPeriod:
-      SetMaxPeriod:
       RegisterDirectionCallback:
       GetDirection:
       SetDirection:
       RegisterReverseDirectionCallback:
       GetReverseDirection:
       SetReverseDirection:
-      RegisterSamplesToAverageCallback:
-      GetSamplesToAverage:
-      SetSamplesToAverage:
       RegisterDistancePerPulseCallback:
       GetDistancePerPulse:
       SetDistancePerPulse:

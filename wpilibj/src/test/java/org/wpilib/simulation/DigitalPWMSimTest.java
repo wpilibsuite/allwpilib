@@ -42,7 +42,7 @@ class DigitalPWMSimTest {
 
   @Test
   void setPinTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DigitalOutput output = new DigitalOutput(0)) {
       DigitalPWMSim sim = new DigitalPWMSim(output);

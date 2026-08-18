@@ -1,0 +1,34 @@
+nativeUtils {
+    nativeDependencyContainer {
+        mrclibHeaders(getNativeDependencyTypeClass('WPIHeaderOnlyMavenDependency')) {
+            groupId = "org.wpilib.mrclib"
+            artifactId = "mrclib-cpp"
+            headerClassifier = "headers"
+            ext = "zip"
+            version = libs.versions.mrclib
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+        }
+        mrclib(getNativeDependencyTypeClass('WPISharedMavenDependency')) {
+            groupId = "org.wpilib.mrclib"
+            artifactId = "mrclib-cpp"
+            headerClassifier = "headers"
+            ext = "zip"
+            version = libs.versions.mrclib
+            skipAtRuntimePlatforms.add(nativeUtils.wpi.platforms.systemcore)
+            targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
+            noDebugSplit = true
+        }
+        // This is commented out for Thad to be able to develop easier.
+        // mrclib(getNativeDependencyTypeClass('WPIOnDiskDependency')) {
+        //     headers = project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\shipped\\mrclib\\include")
+        //     buildDependencies = [
+        //         "$nativeUtils.wpi.platforms.systemcore": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\buildmrc\\bin\\libMrcLib.so")],
+        //         "$nativeUtils.wpi.platforms.windowsx64": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\build\\bin\\MrcLib.lib")],
+        //     ]
+        //     runtimeDependencies = [
+        //         "$nativeUtils.wpi.platforms.systemcore": [],
+        //         "$nativeUtils.wpi.platforms.windowsx64": [project.file("C:\\Users\\thadh\\Documents\\GitHub\\thadhouse\\mrccomm\\build\\bin\\MrcLib.dll")],
+        //     ]
+        // }
+    }
+}

@@ -4,11 +4,10 @@
 
 #include "wpi/util/sendable/SendableRegistry.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -29,11 +28,11 @@ struct Component {
   wpi::util::SmallVector<std::shared_ptr<void>, 2> data;
 
   void SetName(std::string_view moduleType, int channel) {
-    name = fmt::format("{}[{}]", moduleType, channel);
+    name = std::format("{}[{}]", moduleType, channel);
   }
 
   void SetName(std::string_view moduleType, int moduleNumber, int channel) {
-    name = fmt::format("{}[{},{}]", moduleType, moduleNumber, channel);
+    name = std::format("{}[{},{}]", moduleType, moduleNumber, channel);
   }
 };
 
@@ -321,6 +320,19 @@ Sendable* SendableRegistry::GetSendable(UID uid) {
     return nullptr;
   }
   return inst.components[uid - 1]->sendable;
+}
+
+bool SendableRegistry::IsPublished(UID uid) {
+  auto& inst = GetInstance();
+  if (uid == 0) {
+    return false;
+  }
+  std::scoped_lock lock(inst.mutex);
+  if ((uid - 1) >= inst.components.size() || !inst.components[uid - 1]) {
+    return false;
+  }
+  auto& builder = inst.components[uid - 1]->builder;
+  return builder && builder->IsPublished();
 }
 
 void SendableRegistry::Publish(UID sendableUid,

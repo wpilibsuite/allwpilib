@@ -11,10 +11,13 @@
 #include <utility>
 
 #include <Eigen/Core>
+#include <gcem.hpp>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::util {

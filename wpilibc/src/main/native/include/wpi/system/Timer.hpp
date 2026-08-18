@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "wpi/units/time.hpp"
 
 namespace wpi {
@@ -24,6 +26,7 @@ void Wait(wpi::units::second_t seconds);
  * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
+ * @Common This is one of the commonly used methods for this class
  */
 wpi::units::second_t GetSystemTime();
 
@@ -39,7 +42,8 @@ class Timer {
    * Create a new timer object.
    *
    * Create a new timer object and reset the time to zero. The timer is
-   * initially not running and must be started.
+   * initially not running and must be started. Consider using
+   * CreateStarted() if the timer is used immediately after creation.
    */
   Timer();
 
@@ -56,6 +60,7 @@ class Timer {
    * the clock is not running, then return the time when it was last stopped.
    *
    * @return Current time value for this timer in seconds
+   * @Common This is one of the commonly used methods for this class
    */
   wpi::units::second_t Get() const;
 
@@ -64,6 +69,8 @@ class Timer {
    *
    * Make the timer startTime the current time so new requests will be relative
    * to now.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Reset();
 
@@ -73,6 +80,8 @@ class Timer {
    * Just set the running flag to true indicating that all time requests should
    * be relative to the system clock. Note that this method is a no-op if the
    * timer is already running.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Start();
 
@@ -81,6 +90,8 @@ class Timer {
    * resetting the accumulated time, then starting the timer again. If you
    * want an event to periodically reoccur at some time interval from the
    * start time, consider using AdvanceIfElapsed() instead.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Restart();
 
@@ -90,6 +101,8 @@ class Timer {
    * This computes the time as of now and clears the running flag, causing all
    * subsequent time requests to be read from the accumulated time rather than
    * looking at the system clock.
+   *
+   * @Common This is one of the commonly used methods for this class
    */
   void Stop();
 
@@ -117,6 +130,19 @@ class Timer {
    * @return true if running.
    */
   bool IsRunning() const;
+
+  /**
+   * Creates a new timer that begins started.
+   *
+   * <p>This is equivalent to
+   * <pre>
+   *   wpi::Timer timer;
+   *   timer.Start();
+   * </pre>
+   *
+   * @return A new started timer.
+   */
+  static wpi::Timer CreateStarted();
 
   /**
    * Return the clock time in seconds. By default, the time is the time returned
@@ -158,8 +184,11 @@ class Timer {
   static wpi::units::second_t GetMatchTime();
 
  private:
-  wpi::units::second_t m_startTime = 0_s;
-  wpi::units::second_t m_accumulatedTime = 0_s;
+  double GetMicroseconds() const;
+
+  std::chrono::microseconds m_startTime{0};
+  double m_startTimeRemainderUs = 0.0;
+  double m_accumulatedTimeUs = 0.0;
   bool m_running = false;
 };
 

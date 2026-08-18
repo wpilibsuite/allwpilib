@@ -9,84 +9,105 @@
 using namespace wpi::cmd;
 
 CommandNiDsStadiaController::CommandNiDsStadiaController(int port)
-    : CommandGenericHID(port), m_hid{wpi::NiDsStadiaController(port)} {}
+    : m_hid{&CommandGenericHID::GetCommandGenericHID(port)},
+      m_controller{m_hid->GetHID()} {}
 
-wpi::NiDsStadiaController& CommandNiDsStadiaController::GetHID() {
-  return m_hid;
+CommandGenericHID& CommandNiDsStadiaController::GetHID() {
+  return *m_hid;
+}
+
+wpi::NiDsStadiaController&
+CommandNiDsStadiaController::GetNiDsStadiaController() {
+  return m_controller;
 }
 
 Trigger CommandNiDsStadiaController::A(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kA, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kA, loop);
 }
 
 Trigger CommandNiDsStadiaController::B(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kB, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kB, loop);
 }
 
 Trigger CommandNiDsStadiaController::X(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kX, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kX, loop);
 }
 
 Trigger CommandNiDsStadiaController::Y(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kY, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kY, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftBumper(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kLeftBumper, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kLeftBumper, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightBumper(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kRightBumper, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kRightBumper, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftStick(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kLeftStick, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kLeftStick, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightStick(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kRightStick, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kRightStick, loop);
 }
 
 Trigger CommandNiDsStadiaController::Ellipses(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kEllipses, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kEllipses, loop);
 }
 
 Trigger CommandNiDsStadiaController::Hamburger(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kHamburger, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kHamburger, loop);
 }
 
 Trigger CommandNiDsStadiaController::Stadia(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kStadia, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kStadia, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightTrigger(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kRightTrigger, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kRightTrigger, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftTrigger(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kLeftTrigger, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kLeftTrigger, loop);
 }
 
 Trigger CommandNiDsStadiaController::Google(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kGoogle, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kGoogle, loop);
 }
 
 Trigger CommandNiDsStadiaController::Frame(wpi::EventLoop* loop) const {
-  return Button(wpi::NiDsStadiaController::Button::kFrame, loop);
+  return m_hid->Button(
+      wpi::NiDsStadiaController::Button::kFrame, loop);
 }
 
 double CommandNiDsStadiaController::GetLeftX() const {
-  return m_hid.GetLeftX();
+  return m_controller.GetLeftX();
 }
 
 double CommandNiDsStadiaController::GetRightX() const {
-  return m_hid.GetRightX();
+  return m_controller.GetRightX();
 }
 
 double CommandNiDsStadiaController::GetLeftY() const {
-  return m_hid.GetLeftY();
+  return m_controller.GetLeftY();
 }
 
 double CommandNiDsStadiaController::GetRightY() const {
-  return m_hid.GetRightY();
+  return m_controller.GetRightY();
 }

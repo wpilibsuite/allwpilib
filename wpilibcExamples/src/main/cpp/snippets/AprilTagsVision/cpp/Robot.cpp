@@ -3,12 +3,12 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstdio>
+#include <format>
 #include <span>
 #include <string>
 #include <thread>
 #include <vector>
 
-#include <fmt/format.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/types.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -35,6 +35,7 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
+    wpi::CameraServer::Initialize();
     // We need to run our vision program in a separate thread. If not, our robot
     // program will not run.
 #if defined(__linux__) || defined(_WIN32)
@@ -146,7 +147,7 @@ class Robot : public wpi::TimedRobot {
 
         // put pose into NT
         wpi::math::Rotation3d rotation = pose.Rotation();
-        tagsTable->GetEntry(fmt::format("pose_{}", detection->GetId()))
+        tagsTable->GetEntry(std::format("pose_{}", detection->GetId()))
             .SetDoubleArray(
                 {{ pose.X().value(),
                    pose.Y().value(),

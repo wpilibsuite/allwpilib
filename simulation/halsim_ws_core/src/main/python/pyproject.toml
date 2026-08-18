@@ -9,6 +9,7 @@ requires = [
 name = "robotpy-halsim-ws"
 version = "0.0.0"
 description = "WPILib simulator websim Extensions"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

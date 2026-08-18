@@ -4,14 +4,19 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/trajectory/TestTrajectory.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DifferentialSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/math/trajectory/constraint/DifferentialDriveVoltageConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -19,7 +24,7 @@
 
 using namespace wpi::math;
 
-TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
+TEST_CASE("DifferentialDriveVoltageConstraintTest Constraint", "[wpimath]") {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
   SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
                                                         3_V / 1_mps_sq};
@@ -30,38 +35,35 @@ TEST(DifferentialDriveVoltageConstraintTest, Constraint) {
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
-  wpi::units::second_t time = 0_s;
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t duration = trajectory.TotalTime();
+  constexpr wpi::units::second_t dt = 20_ms;
+  for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
+    auto point = trajectory.SampleAt(t);
 
-  while (time < duration) {
-    const Trajectory::State point = trajectory.Sample(time);
-    time += dt;
+    DifferentialSample differentialSample{point, kinematics};
+    auto left = differentialSample.leftVelocity;
+    auto right = differentialSample.rightVelocity;
 
-    const ChassisVelocities chassisVelocities{point.velocity, 0_mps,
-                                              point.velocity * point.curvature};
+    auto acceleration = point.ForwardAcceleration();
 
-    auto [left, right] = kinematics.ToWheelVelocities(chassisVelocities);
-    auto acceleration = point.acceleration;
     // Not really a strictly-correct test as we're using the chassis accel
     // instead of the wheel accel, but much easier than doing it "properly" and
     // a reasonable check anyway
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(left, left + acceleration * dt) >
-                -maxVoltage - 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right,
+    CHECK(feedforward.Calculate(left, left + acceleration * dt) <
+          maxVoltage + 0.05_V);
+    CHECK(feedforward.Calculate(left, left + acceleration * dt) >
+          -maxVoltage - 0.05_V);
+    CHECK(feedforward.Calculate(right,
 
-                                      right + acceleration * dt) <
-                maxVoltage + 0.05_V);
-    EXPECT_TRUE(feedforward.Calculate(right, right + acceleration * dt) >
-                -maxVoltage - 0.05_V);
+                                right + acceleration * dt) <
+          maxVoltage + 0.05_V);
+    CHECK(feedforward.Calculate(right, right + acceleration * dt) >
+          -maxVoltage - 0.05_V);
   }
 }
 
-TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
+TEST_CASE("DifferentialDriveVoltageConstraintTest HighCurvature", "[wpimath]") {
   SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
                                                         3_V / 1_mps_sq};
   // Large trackwidth - need to test with radius of curvature less than half of
@@ -73,13 +75,13 @@ TEST(DifferentialDriveVoltageConstraintTest, HighCurvature) {
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  CHECK_NOTHROW(DrivetrainSplineTrajectoryGenerator::Generate(
       Pose2d{1_m, 0_m, 90_deg}, std::vector<Translation2d>{},
       Pose2d{0_m, 1_m, 180_deg}, config));
 
   config.SetReversed(true);
 
-  EXPECT_NO_FATAL_FAILURE(TrajectoryGenerator::GenerateTrajectory(
+  CHECK_NOTHROW(DrivetrainSplineTrajectoryGenerator::Generate(
       Pose2d{0_m, 1_m, 180_deg}, std::vector<Translation2d>{},
       Pose2d{1_m, 0_m, 90_deg}, config));
 }

@@ -5,10 +5,10 @@
 package org.wpilib.examples.mecanumdrive;
 
 import org.wpilib.drive.MecanumDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**

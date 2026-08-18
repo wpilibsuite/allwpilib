@@ -193,7 +193,7 @@ namespace Catch {
     void formatReconstructedExpression( std::ostream &os, std::string const& lhs, StringRef op, std::string const& rhs );
 
     template<typename LhsT, typename RhsT>
-    class BinaryExpr  : public ITransientExpression {
+    class BinaryExpr final : public ITransientExpression {
         LhsT m_lhs;
         StringRef m_op;
         RhsT m_rhs;
@@ -269,7 +269,7 @@ namespace Catch {
     };
 
     template<typename LhsT>
-    class UnaryExpr : public ITransientExpression {
+    class UnaryExpr final : public ITransientExpression {
         LhsT m_lhs;
 
         void streamReconstructedExpression( std::ostream &os ) const override {

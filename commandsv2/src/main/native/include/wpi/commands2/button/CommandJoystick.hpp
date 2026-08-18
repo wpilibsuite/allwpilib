@@ -15,7 +15,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Joystick
  */
-class CommandJoystick : public CommandGenericHID {
+class CommandJoystick {
  public:
   /**
    * Construct an instance of a controller.
@@ -26,11 +26,18 @@ class CommandJoystick : public CommandGenericHID {
   explicit CommandJoystick(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::Joystick& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying Joystick object.
+   *
+   * @return the wrapped Joystick object
+   */
+  wpi::Joystick& GetJoystick();
 
   /**
    * Constructs an event instance around the trigger button's digital signal.
@@ -72,6 +79,7 @@ class CommandJoystick : public CommandGenericHID {
   wpi::units::radian_t GetDirection() const;
 
  private:
-  wpi::Joystick m_hid;
+  CommandGenericHID* m_hid;
+  wpi::Joystick m_joystick;
 };
 }  // namespace wpi::cmd

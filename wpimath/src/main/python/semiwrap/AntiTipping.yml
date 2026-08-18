@@ -1,0 +1,11 @@
+classes:
+  wpi::math::AntiTipping:
+    methods:
+      AntiTipping:
+      SetP:
+      GetP:
+      SetTippingThreshold:
+      GetTippingThreshold:
+      SetMaxCorrectionSpeed:
+      GetMaxCorrectionSpeed:
+      Calculate:

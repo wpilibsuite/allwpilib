@@ -100,6 +100,8 @@ struct LocalTopic {
   VectorSet<LocalEntry*> entries;
   VectorSet<NT_Listener> listeners;
 
+  void* userData{nullptr};
+
  private:
   // update flags from properties
   void RefreshFlags();

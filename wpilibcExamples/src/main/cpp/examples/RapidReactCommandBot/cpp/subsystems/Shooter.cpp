@@ -12,8 +12,8 @@ Shooter::Shooter() {
       ShooterConstants::kEncoderDistancePerPulse);
 
   SetDefaultCommand(RunOnce([this] {
-                      shooterMotor.Disable();
-                      feederMotor.Disable();
+                      shooterMotor.SetThrottle(0.0);
+                      feederMotor.SetThrottle(0.0);
                     })
                         .AndThen(Run([] {}))
                         .WithName("Idle"));

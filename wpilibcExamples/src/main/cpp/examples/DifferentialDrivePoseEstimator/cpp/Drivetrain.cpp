@@ -10,6 +10,7 @@
 #include "wpi/math/util/ComputerVisionUtil.hpp"
 #include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/system/Timer.hpp"
 
 Drivetrain::Drivetrain() {
   leftLeader.AddFollower(leftFollower);

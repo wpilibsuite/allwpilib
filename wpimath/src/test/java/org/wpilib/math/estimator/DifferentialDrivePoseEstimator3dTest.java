@@ -24,9 +24,10 @@ import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.trajectory.DrivetrainSplineSample;
+import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.Trajectory;
 import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 
 class DifferentialDrivePoseEstimator3dTest {
   private static final double kEpsilon = 1e-9;
@@ -37,7 +38,6 @@ class DifferentialDrivePoseEstimator3dTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,
@@ -45,7 +45,7 @@ class DifferentialDrivePoseEstimator3dTest {
             VecBuilder.fill(0.02, 0.02, 0.02, 0.01),
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -58,9 +58,9 @@ class DifferentialDrivePoseEstimator3dTest {
         kinematics,
         estimator,
         trajectory,
-        state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
+        state -> state.velocity.toRobotRelative(state.pose.getRotation()),
         state -> state.pose,
-        trajectory.getInitialPose(),
+        trajectory.start().pose,
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
         0.02,
         0.1,
@@ -74,7 +74,6 @@ class DifferentialDrivePoseEstimator3dTest {
 
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,
@@ -83,7 +82,7 @@ class DifferentialDrivePoseEstimator3dTest {
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1));
 
     var trajectory =
-        TrajectoryGenerator.generateTrajectory(
+        DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
                 new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
@@ -99,7 +98,8 @@ class DifferentialDrivePoseEstimator3dTest {
 
         var initial_pose =
             trajectory
-                .getInitialPose()
+                .start()
+                .pose
                 .plus(
                     new Transform2d(
                         new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
@@ -109,7 +109,7 @@ class DifferentialDrivePoseEstimator3dTest {
             kinematics,
             estimator,
             trajectory,
-            state -> new ChassisVelocities(state.velocity, 0, state.velocity * state.curvature),
+            state -> state.velocity.toRobotRelative(state.pose.getRotation()),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -124,9 +124,9 @@ class DifferentialDrivePoseEstimator3dTest {
   void testFollowTrajectory(
       final DifferentialDriveKinematics kinematics,
       final DifferentialDrivePoseEstimator3d estimator,
-      final Trajectory trajectory,
-      final Function<Trajectory.State, ChassisVelocities> chassisVelocitiesGenerator,
-      final Function<Trajectory.State, Pose2d> visionMeasurementGenerator,
+      final Trajectory<DrivetrainSplineSample> trajectory,
+      final Function<DrivetrainSplineSample, ChassisVelocities> chassisVelocitiesGenerator,
+      final Function<DrivetrainSplineSample, Pose2d> visionMeasurementGenerator,
       final Pose2d startingPose,
       final Pose2d endingPose,
       final double dt,
@@ -147,8 +147,8 @@ class DifferentialDrivePoseEstimator3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.getTotalTime()) {
-      var groundTruthState = trajectory.sample(t);
+    while (t <= trajectory.duration) {
+      var groundTruthState = trajectory.sampleAt(t);
 
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
       // last vision measurement
@@ -186,7 +186,7 @@ class DifferentialDrivePoseEstimator3dTest {
                       .pose
                       .getRotation()
                       .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                      .minus(trajectory.getInitialPose().getRotation())),
+                      .minus(trajectory.start().pose.getRotation())),
               leftDistance,
               rightDistance);
 
@@ -214,7 +214,7 @@ class DifferentialDrivePoseEstimator3dTest {
         "Incorrect Final Theta");
 
     if (checkError) {
-      assertEquals(0.0, errorSum / (trajectory.getTotalTime() / dt), 0.07, "Incorrect mean error");
+      assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }
@@ -225,11 +225,8 @@ class DifferentialDrivePoseEstimator3dTest {
     // is that all measurements affect the estimated pose. The alternative result is that only one
     // vision measurement affects the outcome. If that were the case, after 1000 measurements, the
     // estimated pose would converge to that measurement.
-    var kinematics = new DifferentialDriveKinematics(1);
-
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,
@@ -272,10 +269,8 @@ class DifferentialDrivePoseEstimator3dTest {
 
   @Test
   void testDiscardsStaleVisionMeasurements() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,
@@ -326,10 +321,8 @@ class DifferentialDrivePoseEstimator3dTest {
 
   @Test
   void testSampleAt() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,
@@ -376,10 +369,8 @@ class DifferentialDrivePoseEstimator3dTest {
 
   @Test
   void testReset() {
-    var kinematics = new DifferentialDriveKinematics(1);
     var estimator =
         new DifferentialDrivePoseEstimator3d(
-            kinematics,
             Rotation3d.kZero,
             0,
             0,

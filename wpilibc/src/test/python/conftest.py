@@ -3,7 +3,7 @@ import logging
 import pytest
 import ntcore
 import wpilib
-from wpilib.simulation._simulation import _resetWpilibSimulationData
+from wpilib.simulation._simulation import _reset_wpilib_simulation_data
 
 pytest_plugins = "pytester"
 
@@ -18,16 +18,16 @@ def wpilib_state():
     try:
         yield None
     finally:
-        _resetWpilibSimulationData()
+        _reset_wpilib_simulation_data()
 
 
 @pytest.fixture(scope="function")
 def nt(cfg_logging, wpilib_state):
-    instance = ntcore.NetworkTableInstance.getDefault()
-    instance.startLocal()
+    instance = ntcore.NetworkTableInstance.get_default()
+    instance.start_local()
 
     try:
         yield instance
     finally:
-        instance.stopLocal()
+        instance.stop_local()
         instance._reset()

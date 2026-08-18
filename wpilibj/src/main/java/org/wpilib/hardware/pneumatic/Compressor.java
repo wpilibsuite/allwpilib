@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.util.sendable.Sendable;
 import org.wpilib.util.sendable.SendableBuilder;
@@ -32,7 +33,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param moduleType The module type to use.
    */
   @SuppressWarnings("this-escape")
-  public Compressor(int busId, int module, PneumaticsModuleType moduleType) {
+  public Compressor(CANBus busId, int module, PneumaticsModuleType moduleType) {
     m_module = PneumaticsBase.getForType(busId, module, moduleType);
     m_moduleType = moduleType;
 
@@ -53,7 +54,7 @@ public class Compressor implements Sendable, AutoCloseable {
    * @param busId The bus ID
    * @param moduleType The module type to use.
    */
-  public Compressor(int busId, PneumaticsModuleType moduleType) {
+  public Compressor(CANBus busId, PneumaticsModuleType moduleType) {
     this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType);
   }
 

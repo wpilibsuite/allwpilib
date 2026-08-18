@@ -4,16 +4,13 @@
 
 #include "wpi/sysid/analysis/AnalysisManager.hpp"
 
-#include <cmath>
+#include <format>
 #include <limits>
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "wpi/sysid/analysis/FeedforwardAnalysis.hpp"
 #include "wpi/sysid/analysis/FilteringUtils.hpp"
-#include "wpi/units/angle.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
@@ -95,8 +92,8 @@ static void CopyRawData(wpi::util::StringMap<MotorData>* dataset) {
     auto& motorData = it.second;
 
     if (!wpi::util::contains(key, "raw")) {
-      data[fmt::format("raw-{}", key)] = motorData;
-      data[fmt::format("original-raw-{}", key)] = motorData;
+      data[std::format("raw-{}", key)] = motorData;
+      data[std::format("original-raw-{}", key)] = motorData;
     }
   }
 }
@@ -135,17 +132,17 @@ void AnalysisManager::PrepareGeneralData() {
     // Ensure data has at least two samples in it or linear interpolation within
     // ConvertToPrepared() will fail
     if (run.voltage.size() < 2) {
-      throw sysid::InvalidDataError(fmt::format(
+      throw sysid::InvalidDataError(std::format(
           "{} data has {} voltage samples and at least 2 are required.", key,
           run.voltage.size()));
     }
     if (run.position.size() < 2) {
-      throw sysid::InvalidDataError(fmt::format(
+      throw sysid::InvalidDataError(std::format(
           "{} data has {} position samples and at least 2 are required.", key,
           run.position.size()));
     }
     if (run.velocity.size() < 2) {
-      throw sysid::InvalidDataError(fmt::format(
+      throw sysid::InvalidDataError(std::format(
           "{} data has {} velocity samples and at least 2 are required.", key,
           run.velocity.size()));
     }
@@ -226,7 +223,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
       .gain = Ks, .descriptor = "Voltage needed to overcome static friction."};
   if (Ks < 0) {
     KsGain.isValidGain = false;
-    KsGain.errorMessage = fmt::format(
+    KsGain.errorMessage = std::format(
         "Calculated Ks gain of: {0:.3f} is erroneous! Ks should be >= 0.", Ks);
   }
 
@@ -239,7 +236,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
           "friction."};
   if (Kv < 0) {
     KvGain.isValidGain = false;
-    KvGain.errorMessage = fmt::format(
+    KvGain.errorMessage = std::format(
         "Calculated Kv gain of: {0:.3f} is erroneous! Kv should be >= 0.", Kv);
   }
 
@@ -250,7 +247,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
           "Voltage needed to induce a given acceleration in the motor shaft."};
   if (Ka <= 0) {
     KaGain.isValidGain = false;
-    KaGain.errorMessage = fmt::format(
+    KaGain.errorMessage = std::format(
         "Calculated Ka gain of: {0:.3f} is erroneous! Ka should be > 0.", Ka);
   }
 
@@ -265,7 +262,7 @@ AnalysisManager::FeedforwardGains AnalysisManager::CalculateFeedforward() {
         Kg, "Voltage needed to counteract the force of gravity."};
     if (Kg < 0) {
       KgGain.isValidGain = false;
-      KgGain.errorMessage = fmt::format(
+      KgGain.errorMessage = std::format(
           "Calculated Kg gain of: {0:.3f} is erroneous! Kg should be >= 0.",
           Ka);
     }

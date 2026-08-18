@@ -4,6 +4,7 @@
 
 package org.wpilib.hardware.power;
 
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PowerDistributionFaults;
 import org.wpilib.hardware.hal.PowerDistributionJNI;
@@ -47,8 +48,8 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param moduleType Module type (CTRE or REV).
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(int busId, int module, ModuleType moduleType) {
-    m_handle = PowerDistributionJNI.initialize(busId, module, moduleType.value);
+  public PowerDistribution(CANBus busId, int module, ModuleType moduleType) {
+    m_handle = PowerDistributionJNI.initialize(busId.value, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.CTRE) {
@@ -67,9 +68,10 @@ public class PowerDistribution implements Sendable, AutoCloseable {
    * @param busId The bus ID
    */
   @SuppressWarnings("this-escape")
-  public PowerDistribution(int busId) {
+  public PowerDistribution(CANBus busId) {
     m_handle =
-        PowerDistributionJNI.initialize(busId, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+        PowerDistributionJNI.initialize(
+            busId.value, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {

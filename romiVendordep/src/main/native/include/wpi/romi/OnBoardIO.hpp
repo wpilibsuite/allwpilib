@@ -66,6 +66,11 @@ class OnBoardIO {
    */
   void SetYellowLed(bool value);
 
+  /**
+   * Allocates a PWM output.
+   */
+  static void AllocatePWM(int channel);
+
  private:
   wpi::DigitalInput m_buttonA{0};
   wpi::DigitalOutput m_yellowLed{3};

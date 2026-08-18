@@ -4,6 +4,8 @@
 
 #include "wpi/simulation/SendableChooserSim.hpp"
 
+#include <format>
+
 using namespace wpi::sim;
 
 SendableChooserSim::SendableChooserSim(std::string_view path)
@@ -13,7 +15,7 @@ SendableChooserSim::SendableChooserSim(wpi::nt::NetworkTableInstance inst,
                                        std::string_view path) {
   if constexpr (RobotBase::IsSimulation()) {
     m_publisher =
-        inst.GetStringTopic(fmt::format("{}{}", path, "selected")).Publish();
+        inst.GetStringTopic(std::format("{}{}", path, "selected")).Publish();
   }
 }
 

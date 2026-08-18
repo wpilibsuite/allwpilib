@@ -4,14 +4,9 @@
 
 #include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
 
-#include <algorithm>
-#include <atomic>
 #include <string_view>
 
-#include "wpi/hal/Extensions.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/MockHooks.h"
-#include "wpi/util/raw_ostream.hpp"
 
 namespace wpilibws {
 

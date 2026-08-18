@@ -24,13 +24,13 @@ void RapidReactCommandBot::ConfigureBindings() {
       [this] { return -driverController.GetLeftY(); },
       [this] { return -driverController.GetRightX(); }));
 
-  // Deploy the intake with the West Face button
-  driverController.WestFace().OnTrue(intake.IntakeCommand());
-  // Retract the intake with the North Face button
-  driverController.NorthFace().OnTrue(intake.RetractCommand());
+  // Deploy the intake with the Face Left button
+  driverController.FaceLeft().OnTrue(intake.IntakeCommand());
+  // Retract the intake with the Face Up button
+  driverController.FaceUp().OnTrue(intake.RetractCommand());
 
-  // Fire the shooter with the South Face button
-  driverController.SouthFace().OnTrue(
+  // Fire the shooter with the Face Down button
+  driverController.FaceDown().OnTrue(
       wpi::cmd::Parallel(shooter.ShootCommand(ShooterConstants::kShooterTarget),
                          storage.RunCommand())
           // Since we composed this inline we should give it a name

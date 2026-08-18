@@ -8,6 +8,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "basic-geometry.h"
 
 // All of these return (0,0,0) if the rays are parallel or divergent, or if the
@@ -130,6 +135,10 @@ mrcal_triangulate_leecivera_wmid2(// outputs
 // computing an SVD, which is far slower than what the rest of these functions
 // do
 
+// No derr_dv0. Because normally I have v0 = unproject(q0), which doesn't depend
+// on any extrinsics-only optimization quantities. I normally compute rt01 and
+// then v1 = rotate(rt01,v1local) and I'd pass v1 and rt01[3:] to this function.
+// So I need gradients for v1 and t01 only.
 double
 _mrcal_triangulated_error(// outputs
                           mrcal_point3_t* _derr_dv1,
@@ -151,3 +160,7 @@ _mrcal_triangulate_leecivera_mid2_is_convergent(// inputs
                                                 const mrcal_point3_t* _v0,
                                                 const mrcal_point3_t* _v1,
                                                 const mrcal_point3_t* _t01);
+
+#ifdef __cplusplus
+}
+#endif

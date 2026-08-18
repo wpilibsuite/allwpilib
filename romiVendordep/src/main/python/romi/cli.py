@@ -104,14 +104,14 @@ class RunRomi:
                 print("robotpy-halsim-gui is not installed!", file=sys.stderr)
                 return False
             else:
-                halsim_gui.loadExtension()
+                halsim_gui.load_extension()
 
         cwd = os.getcwd()
 
         for name, module in self.simexts.items():
             if getattr(options, name.replace("-", "_"), False):
                 try:
-                    module.loadExtension()
+                    module.load_extension()
                 except Exception:
                     print(f"Error loading {name}!", file=sys.stderr)
                     raise

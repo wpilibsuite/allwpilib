@@ -6,81 +6,36 @@ package org.wpilib.examples.hatchbotcmdv3.commands;
 
 import org.wpilib.command3.Command;
 import org.wpilib.examples.hatchbotcmdv3.Constants.AutoConstants;
-import org.wpilib.examples.hatchbotcmdv3.subsystems.DriveSubsystem;
-import org.wpilib.examples.hatchbotcmdv3.subsystems.HatchSubsystem;
+import org.wpilib.examples.hatchbotcmdv3.mechanisms.DriveMechanism;
+import org.wpilib.examples.hatchbotcmdv3.mechanisms.HatchMechanism;
 
 /** Container for auto command factories. */
 public final class Autos {
-  /** A simple auto routine that drives forward a specified distance, and then stops. */
-  public static Command simpleAuto(DriveSubsystem drive) {
-    return drive
-        .run(
-            coro -> {
-              drive.resetEncoders();
-              while (drive.getAverageEncoderDistance() >= AutoConstants.kAutoDriveDistanceInches) {
-                drive.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0);
-                coro.yield();
-              }
-              drive.arcadeDrive(0, 0);
-            })
-        .whenCanceled(
-            () -> {
-              drive.arcadeDrive(0, 0);
-            })
-        .named("Simple Auto");
+  /** A simple auto routine that drives forward a specified distance and then stops. */
+  public static Command simpleAuto(DriveMechanism drive) {
+    return drive.driveDistance(
+        AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed);
   }
 
   /** A complex auto routine that drives forward, drops a hatch, and then drives backward. */
-  public static Command complexAuto(DriveSubsystem driveSubsystem, HatchSubsystem hatchSubsystem) {
+  public static Command complexAuto(DriveMechanism driveMechanism, HatchMechanism hatchMechanism) {
     // NOTE: requirement behavior.
     // To require each mechanism for while it's active, replace `requiring` with `noRequirements`.
-    return Command.requiring(driveSubsystem, hatchSubsystem)
+    return Command.requiring(driveMechanism, hatchMechanism)
         .executing(
             coro -> {
               // Drive forward up to the front of the cargo ship
               coro.await(
-                  driveSubsystem
-                      .run(
-                          coro2 -> {
-                            // Reset encoders on command start
-                            driveSubsystem.resetEncoders();
-                            // End the command when the robot's driven distance exceeds the desired
-                            // value
-                            while (driveSubsystem.getAverageEncoderDistance()
-                                >= AutoConstants.kAutoDriveDistanceInches) {
-                              // Drive forward while the command is executing
-                              driveSubsystem.arcadeDrive(AutoConstants.kAutoDriveSpeed, 0);
-                              coro2.yield();
-                            }
-                            // Stop driving at the end of the command
-                            driveSubsystem.arcadeDrive(0, 0);
-                          })
-                      .whenCanceled(() -> driveSubsystem.arcadeDrive(0, 0))
-                      .named("Part 1"));
+                  driveMechanism.driveDistance(
+                      AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed));
 
               // Release the hatch
-              coro.await(hatchSubsystem.releaseHatchCommand());
+              coro.await(hatchMechanism.releaseHatchCommand());
 
               // Drive backward the specified distance
               coro.await(
-                  driveSubsystem
-                      .run(
-                          coro2 -> {
-                            // Reset encoders on command start
-                            driveSubsystem.resetEncoders();
-                            // End the command when the robot's driven distance exceeds the desired
-                            // value
-                            while (driveSubsystem.getAverageEncoderDistance()
-                                >= AutoConstants.kAutoDriveDistanceInches) {
-                              // Drive backward while the command is executing
-                              driveSubsystem.arcadeDrive(-AutoConstants.kAutoDriveSpeed, 0);
-                              coro2.yield();
-                            }
-                            // Stop driving at the end of the command
-                            driveSubsystem.arcadeDrive(0, 0);
-                          })
-                      .whenCanceled(() -> driveSubsystem.arcadeDrive(0, 0))
-                      .named("Part 3"));
+                  driveMechanism.driveDistance(
+                      AutoConstants.kAutoBackupDistanceInches, AutoConstants.kAutoDriveSpeed));
             })
         .named("Complex Auto");
   }

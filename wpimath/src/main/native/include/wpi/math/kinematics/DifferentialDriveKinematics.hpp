@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
@@ -14,8 +12,10 @@
 #include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/math/kinematics/Kinematics.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -42,7 +42,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
    */
   constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
       : trackwidth(trackwidth) {
-    if (!std::is_constant_evaluated()) {
+    if !consteval {
       wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
                                               "");
     }

@@ -16,8 +16,9 @@ import org.wpilib.event.EventLoop;
  * @see NiDsStadiaController
  */
 @SuppressWarnings("MethodName")
-public class CommandNiDsStadiaController extends CommandGenericHID {
-  private final NiDsStadiaController m_hid;
+public class CommandNiDsStadiaController {
+  private final CommandGenericHID m_hid;
+  private final NiDsStadiaController m_controller;
 
   /**
    * Construct an instance of a controller.
@@ -25,18 +26,26 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * @param port The port index on the Driver Station that the controller is plugged into.
    */
   public CommandNiDsStadiaController(int port) {
-    super(port);
-    m_hid = new NiDsStadiaController(port);
+    m_hid = CommandGenericHID.getCommandGenericHID(port);
+    m_controller = new NiDsStadiaController(m_hid.getHID());
   }
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  @Override
-  public NiDsStadiaController getHID() {
+  public CommandGenericHID getHID() {
     return m_hid;
+  }
+
+  /**
+   * Get the underlying NiDsStadiaController object.
+   *
+   * @return the wrapped NiDsStadiaController object
+   */
+  public NiDsStadiaController getNiDsStadiaController() {
+    return m_controller;
   }
 
   /**
@@ -58,7 +67,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kA.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kA.value, loop);
   }
 
   /**
@@ -80,7 +89,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kB.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kB.value, loop);
   }
 
   /**
@@ -102,7 +111,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kX.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kX.value, loop);
   }
 
   /**
@@ -124,7 +133,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kY.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kY.value, loop);
   }
 
   /**
@@ -146,7 +155,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kLeftBumper.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kLeftBumper.value, loop);
   }
 
   /**
@@ -168,7 +177,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kRightBumper.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kRightBumper.value, loop);
   }
 
   /**
@@ -190,7 +199,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kLeftStick.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kLeftStick.value, loop);
   }
 
   /**
@@ -212,7 +221,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kRightStick.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kRightStick.value, loop);
   }
 
   /**
@@ -234,7 +243,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger ellipses(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kEllipses.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kEllipses.value, loop);
   }
 
   /**
@@ -256,7 +265,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger hamburger(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kHamburger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kHamburger.value, loop);
   }
 
   /**
@@ -278,7 +287,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger stadia(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kStadia.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kStadia.value, loop);
   }
 
   /**
@@ -300,7 +309,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger rightTrigger(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kRightTrigger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kRightTrigger.value, loop);
   }
 
   /**
@@ -322,7 +331,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger leftTrigger(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kLeftTrigger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kLeftTrigger.value, loop);
   }
 
   /**
@@ -344,7 +353,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger google(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kGoogle.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kGoogle.value, loop);
   }
 
   /**
@@ -366,7 +375,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    *     to the given loop.
    */
   public Trigger frame(EventLoop loop) {
-    return button(NiDsStadiaController.Button.kFrame.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.kFrame.value, loop);
   }
 
   /**
@@ -375,7 +384,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getLeftX();
+    return m_controller.getLeftX();
   }
 
   /**
@@ -384,7 +393,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRightX();
+    return m_controller.getRightX();
   }
 
   /**
@@ -393,7 +402,7 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getLeftY();
+    return m_controller.getLeftY();
   }
 
   /**
@@ -402,6 +411,6 @@ public class CommandNiDsStadiaController extends CommandGenericHID {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRightY();
+    return m_controller.getRightY();
   }
 }

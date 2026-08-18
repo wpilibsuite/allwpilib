@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <cmath>
 #include <functional>
 #include <numbers>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/units/angle.hpp"
 
 namespace wpi::math {
 

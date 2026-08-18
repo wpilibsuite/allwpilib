@@ -8,8 +8,6 @@
 #include <string>
 #include <thread>
 
-#include <fmt/format.h>
-
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "rev/PDHFrames.h"

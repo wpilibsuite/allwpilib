@@ -6,10 +6,12 @@
 
 #pragma once
 
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include <string>
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
+#include "wpi/util/sendable/Sendable.hpp"
+#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -25,9 +27,10 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class NiDsStadiaController : public GenericHID,
-                                    public wpi::util::Sendable,
-                                    public wpi::util::SendableHelper<NiDsStadiaController> {
+class NiDsStadiaController
+    : public HIDDevice,
+      public wpi::util::Sendable,
+      public wpi::util::SendableHelper<NiDsStadiaController> {
  public:
   /**
    * Construct an instance of a controller.
@@ -39,10 +42,31 @@ class NiDsStadiaController : public GenericHID,
    */
   explicit NiDsStadiaController(int port);
 
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  explicit NiDsStadiaController(GenericHID& hid);
+
   ~NiDsStadiaController() override = default;
 
   NiDsStadiaController(NiDsStadiaController&&) = default;
   NiDsStadiaController& operator=(NiDsStadiaController&&) = default;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const override;
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.
@@ -583,7 +607,56 @@ class NiDsStadiaController : public GenericHID,
     static constexpr int kRightY = 4;
   };
 
+  /**
+   * Get if the controller is connected.
+   *
+   * @return true if the controller is connected
+   */
+  bool IsConnected() const;
+
+  /**
+   * Get the type of the controller.
+   *
+   * @return the type of the controller.
+   */
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs of the controller.
+   *
+   * @return the supported outputs of the controller.
+   */
+  GenericHID::SupportedOutputs GetSupportedOutputs() const;
+
+  /**
+   * Get the name of the controller.
+   *
+   * @return the name of the controller.
+   */
+  std::string GetName() const;
+
+  /**
+   * Get the port number of the controller.
+   *
+   * @return The port number of the controller.
+   */
+  int GetPort() const;
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(GenericHID::RumbleType type, double value);
+
   void InitSendable(wpi::util::SendableBuilder& builder) override;
+
+ private:
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

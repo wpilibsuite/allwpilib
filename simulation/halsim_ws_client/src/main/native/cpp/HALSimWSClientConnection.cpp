@@ -5,9 +5,8 @@
 #include "wpi/halsim/ws_client/HALSimWSClientConnection.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
-
-#include <fmt/format.h>
 
 #include "wpi/halsim/ws_client/HALSimWS.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
@@ -23,7 +22,7 @@ void HALSimWSClientConnection::Initialize() {
 
   auto ws = wpi::net::WebSocket::CreateClient(
       *m_stream, m_client->GetTargetUri(),
-      fmt::format("{}:{}", m_client->GetTargetHost(),
+      std::format("{}:{}", m_client->GetTargetHost(),
                   m_client->GetTargetPort()));
 
   ws->SetData(self);
@@ -50,7 +49,7 @@ void HALSimWSClientConnection::Initialize() {
 
     auto j = wpi::util::json::parse(msg);
     if (!j) {
-      auto err = fmt::format("JSON parse failed: {}", j.error());
+      auto err = std::format("JSON parse failed: {}", j.error());
       wpi::util::print(stderr, "{}\n", err);
       m_websocket->Fail(1003, err);
       return;

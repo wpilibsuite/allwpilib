@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 /**
- * Gets the roboRIO input voltage.
+ * Gets the Systemcore input voltage.
  *
  * @param[out] status the error code, or 0 for success
  * @return the input voltage (volts)
@@ -73,23 +73,16 @@ void HAL_SetUserRailEnabled3V3(HAL_Bool enabled, int32_t* status);
 void HAL_ResetUserCurrentFaults(int32_t* status);
 
 /**
- * Get the current brownout voltage setting.
+ * Set the voltages where the Systemcore will enter and recover from brownout.
  *
- * @param[out] status the error code, or 0 for success
- * @return The brownout voltage
- */
-double HAL_GetBrownoutVoltage(int32_t* status);
-
-/**
- * Set the voltage the roboRIO will brownout and disable all outputs.
- *
- * Note that this only does anything on the roboRIO 2.
- * On the roboRIO it is a no-op.
- *
- * @param[in] voltage The brownout voltage
+ * @param[in] brownoutVoltage the voltage where the Systemcore will enter
+ *                            brownout
+ * @param[in] recoveryVoltage the voltage where the Systemcore will recover
+ *                            from brownout
  * @param[out] status the error code, or 0 for success
  */
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status);
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status);
 
 /**
  * Get the current CPU temperature in degrees Celsius

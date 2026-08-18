@@ -7,6 +7,7 @@
 #include <ctime>
 #include <memory>
 
+#include "CANInternal.hpp"
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
 #include "wpi/hal/CAN.h"
@@ -50,6 +51,37 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   createdId |= (storage->deviceId & 0x3F);
   return createdId;
 }
+
+namespace {
+void WriteCANPacketRepeatingImpl(HAL_CANHandle handle, int32_t apiId,
+                                 const HAL_CANMessage* message,
+                                 int32_t repeatMs,
+                                 CANPeriodicSendCallback callback, void* param,
+                                 int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  auto id = CreateCANId(can.get(), apiId);
+
+  std::scoped_lock lock(can->periodicSendsMutex);
+  SendCANMessageWithPeriodicCallback(can->busId, id, message, repeatMs,
+                                     callback, param, status);
+  can->periodicSends[apiId] = repeatMs;
+}
+}  // namespace
+
+namespace wpi::hal {
+void WriteCANPacketRepeatingWithCallback(HAL_CANHandle handle, int32_t apiId,
+                                         const HAL_CANMessage* message,
+                                         int32_t repeatMs,
+                                         CANPeriodicSendCallback callback,
+                                         void* param, int32_t* status) {
+  WriteCANPacketRepeatingImpl(handle, apiId, message, repeatMs, callback, param,
+                              status);
+}
+}  // namespace wpi::hal
 
 extern "C" {
 
@@ -117,16 +149,8 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, int32_t apiId,
 void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                  const struct HAL_CANMessage* message,
                                  int32_t repeatMs, int32_t* status) {
-  auto can = canHandles->Get(handle);
-  if (!can) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  auto id = CreateCANId(can.get(), apiId);
-
-  std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, repeatMs, status);
-  can->periodicSends[apiId] = repeatMs;
+  WriteCANPacketRepeatingImpl(handle, apiId, message, repeatMs, nullptr,
+                              nullptr, status);
 }
 
 void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t apiId,

@@ -4,6 +4,8 @@
 
 #include "ClientImpl.hpp"
 
+#include <cmath>
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <optional>
@@ -11,14 +13,13 @@
 #include <utility>
 #include <variant>
 
-#include <fmt/format.h>
-
 #include "Log.hpp"
 #include "Message.hpp"
 #include "WireConnection.hpp"
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi::nt;
@@ -58,8 +59,13 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     int id;
     Value value;
     std::string error;
-    if (!WireDecodeBinary(&data, &id, &value, &error,
-                          -m_outgoing.GetTimeOffset())) {
+    int64_t localTimeOffset;
+    if (wpi::util::SubOverflow(int64_t{0}, m_outgoing.GetTimeOffset(),
+                               localTimeOffset)) {
+      ERR("time offset is out of range");
+      break;
+    }
+    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset)) {
       ERR("binary decode error: {}", error);
       break;  // FIXME
     }
@@ -79,10 +85,24 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
           m_pongTimeMs = curTimeMs;
         }
         int64_t now = wpi::util::Now();
-        int64_t rtt2 = (now - value.GetInteger()) / 2;
+        int64_t rtt;
+        if (wpi::util::SubOverflow(now, value.GetInteger(), rtt) || rtt < 0) {
+          WARN("RTT ping response has invalid timestamp values");
+          continue;
+        }
+        int64_t rtt2 = rtt / 2;
         if (rtt2 < m_rtt2Us) {
-          m_rtt2Us = rtt2;
-          int64_t serverTimeOffsetUs = value.server_time() + rtt2 - now;
+          int64_t serverTimeAtResponse;
+          int64_t serverTimeOffsetUs;
+          if (wpi::util::AddOverflow(value.server_time(), rtt2,
+                                     serverTimeAtResponse) ||
+              wpi::util::SubOverflow(serverTimeAtResponse, now,
+                                     serverTimeOffsetUs) ||
+              serverTimeOffsetUs == std::numeric_limits<int64_t>::min()) {
+            WARN("RTT ping response has invalid timestamp values");
+            continue;
+          }
+          m_rtt2Us = static_cast<uint32_t>(rtt2);
           DEBUG3("Time offset: {}", serverTimeOffsetUs);
           m_outgoing.SetTimeOffset(serverTimeOffsetUs);
           m_haveTimeOffset = true;

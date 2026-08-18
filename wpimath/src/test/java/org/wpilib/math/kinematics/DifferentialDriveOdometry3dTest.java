@@ -28,10 +28,10 @@ class DifferentialDriveOdometry3dTest {
             new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
     var pose = odometry.getPose();
     assertAll(
-        () -> assertEquals(pose.getX(), 1.0, kEpsilon),
-        () -> assertEquals(pose.getY(), 2.0, kEpsilon),
-        () -> assertEquals(pose.getZ(), 0.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().toRotation2d().getDegrees(), 45.0, kEpsilon));
+        () -> assertEquals(1.0, pose.getX(), kEpsilon),
+        () -> assertEquals(2.0, pose.getY(), kEpsilon),
+        () -> assertEquals(0.0, pose.getZ(), kEpsilon),
+        () -> assertEquals(45.0, pose.getRotation().toRotation2d().getDegrees(), kEpsilon));
   }
 
   @Test
@@ -41,10 +41,10 @@ class DifferentialDriveOdometry3dTest {
         m_odometry.update(new Rotation3d(0, 0, Units.degreesToRadians(135.0)), 0.0, 5 * Math.PI);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getY(), 5.0, kEpsilon),
-        () -> assertEquals(pose.getZ(), 0.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().toRotation2d().getDegrees(), 90.0, kEpsilon));
+        () -> assertEquals(5.0, pose.getX(), kEpsilon),
+        () -> assertEquals(5.0, pose.getY(), kEpsilon),
+        () -> assertEquals(0.0, pose.getZ(), kEpsilon),
+        () -> assertEquals(90.0, pose.getRotation().toRotation2d().getDegrees(), kEpsilon));
   }
 
   @Test
@@ -57,11 +57,11 @@ class DifferentialDriveOdometry3dTest {
     var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), 0, 0);
 
     assertAll(
-        () -> assertEquals(pose.getX(), 0.0, kEpsilon),
-        () -> assertEquals(pose.getY(), 0.0, kEpsilon),
-        () -> assertEquals(pose.getZ(), 0.0, kEpsilon),
-        () -> assertEquals(pose.getRotation().getX(), Units.degreesToRadians(0), kEpsilon),
-        () -> assertEquals(pose.getRotation().getY(), Units.degreesToRadians(5), kEpsilon),
-        () -> assertEquals(pose.getRotation().getZ(), Units.degreesToRadians(90), kEpsilon));
+        () -> assertEquals(0.0, pose.getX(), kEpsilon),
+        () -> assertEquals(0.0, pose.getY(), kEpsilon),
+        () -> assertEquals(0.0, pose.getZ(), kEpsilon),
+        () -> assertEquals(Units.degreesToRadians(0), pose.getRotation().getX(), kEpsilon),
+        () -> assertEquals(Units.degreesToRadians(5), pose.getRotation().getY(), kEpsilon),
+        () -> assertEquals(Units.degreesToRadians(90), pose.getRotation().getZ(), kEpsilon));
   }
 }

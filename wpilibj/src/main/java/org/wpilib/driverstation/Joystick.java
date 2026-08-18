@@ -4,6 +4,7 @@
 
 package org.wpilib.driverstation;
 
+import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
@@ -15,7 +16,7 @@ import org.wpilib.hardware.hal.HAL;
  * requested the most recent value is returned. There is a single class instance for each joystick
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class Joystick extends GenericHID {
+public class Joystick implements HIDDevice {
   /** Default X axis channel. */
   public static final byte kDefaultXChannel = 0;
 
@@ -69,21 +70,41 @@ public class Joystick extends GenericHID {
 
   private final byte[] m_axes = new byte[AxisType.values().length];
 
+  private final GenericHID m_hid;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
+  }
+
   /**
    * Construct an instance of a joystick.
    *
    * @param port The port index on the Driver Station that the joystick is plugged into.
    */
   public Joystick(final int port) {
-    super(port);
+    this(DriverStation.getGenericHID(port));
+  }
 
+  /**
+   * Construct an instance of a joystick with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this joystick.
+   */
+  public Joystick(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
     m_axes[AxisType.kX.value] = kDefaultXChannel;
     m_axes[AxisType.kY.value] = kDefaultYChannel;
     m_axes[AxisType.kZ.value] = kDefaultZChannel;
     m_axes[AxisType.kTwist.value] = kDefaultTwistChannel;
     m_axes[AxisType.kThrottle.value] = kDefaultThrottleChannel;
 
-    HAL.reportUsage("HID", port, "Joystick");
+    HAL.reportUsage("HID", hid.getPort(), "Joystick");
   }
 
   /**
@@ -177,13 +198,81 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Get the button value (starting at button 1).
+   *
+   * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
+   * each button. The appropriate button is returned as a boolean value.
+   *
+   * @param button The button number to be read (starting at 1)
+   * @return The state of the button
+   */
+  public boolean getRawButton(int button) {
+    return m_hid.getRawButton(button);
+  }
+
+  /**
+   * Whether the button was pressed since the last check. Button indexes begin at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getRawButtonPressed(int button) {
+    return m_hid.getRawButtonPressed(button);
+  }
+
+  /**
+   * Whether the button was released since the last check. Button indexes begin at 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getRawButtonReleased(int button) {
+    return m_hid.getRawButtonReleased(button);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read, starting at 0.
+   * @return The value of the axis.
+   */
+  public double getRawAxis(int axis) {
+    return m_hid.getRawAxis(axis);
+  }
+
+  /**
+   * Get the angle in degrees of a POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * upper-left is 315).
+   *
+   * @param pov The index of the POV to read, starting at 0.
+   * @return the angle of the POV
+   */
+  public POVDirection getPOV(int pov) {
+    return m_hid.getPOV(pov);
+  }
+
+  /**
+   * Get the angle in degrees of the default POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (e.g. right is 90,
+   * upper-left is 315).
+   *
+   * @return the angle of the POV
+   */
+  public POVDirection getPOV() {
+    return m_hid.getPOV();
+  }
+
+  /**
    * Get the X value of the joystick. This depends on the mapping of the joystick connected to the
    * current port. On most joysticks, positive is to the right.
    *
    * @return The X value of the joystick.
    */
   public final double getX() {
-    return getRawAxis(m_axes[AxisType.kX.value]);
+    return m_hid.getRawAxis(m_axes[AxisType.kX.value]);
   }
 
   /**
@@ -193,7 +282,7 @@ public class Joystick extends GenericHID {
    * @return The Y value of the joystick.
    */
   public final double getY() {
-    return getRawAxis(m_axes[AxisType.kY.value]);
+    return m_hid.getRawAxis(m_axes[AxisType.kY.value]);
   }
 
   /**
@@ -202,7 +291,7 @@ public class Joystick extends GenericHID {
    * @return the z position
    */
   public final double getZ() {
-    return getRawAxis(m_axes[AxisType.kZ.value]);
+    return m_hid.getRawAxis(m_axes[AxisType.kZ.value]);
   }
 
   /**
@@ -212,7 +301,7 @@ public class Joystick extends GenericHID {
    * @return The Twist value of the joystick.
    */
   public final double getTwist() {
-    return getRawAxis(m_axes[AxisType.kTwist.value]);
+    return m_hid.getRawAxis(m_axes[AxisType.kTwist.value]);
   }
 
   /**
@@ -222,7 +311,7 @@ public class Joystick extends GenericHID {
    * @return The Throttle value of the joystick.
    */
   public final double getThrottle() {
-    return getRawAxis(m_axes[AxisType.kThrottle.value]);
+    return m_hid.getRawAxis(m_axes[AxisType.kThrottle.value]);
   }
 
   /**
@@ -231,7 +320,7 @@ public class Joystick extends GenericHID {
    * @return The state of the trigger.
    */
   public boolean getTrigger() {
-    return getRawButton(ButtonType.kTrigger.value);
+    return m_hid.getRawButton(ButtonType.kTrigger.value);
   }
 
   /**
@@ -240,7 +329,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTriggerPressed() {
-    return getRawButtonPressed(ButtonType.kTrigger.value);
+    return m_hid.getRawButtonPressed(ButtonType.kTrigger.value);
   }
 
   /**
@@ -249,7 +338,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getTriggerReleased() {
-    return getRawButtonReleased(ButtonType.kTrigger.value);
+    return m_hid.getRawButtonReleased(ButtonType.kTrigger.value);
   }
 
   /**
@@ -260,7 +349,7 @@ public class Joystick extends GenericHID {
    *     given loop.
    */
   public BooleanEvent trigger(EventLoop loop) {
-    return button(ButtonType.kTrigger.value, loop);
+    return m_hid.button(ButtonType.kTrigger.value, loop);
   }
 
   /**
@@ -269,7 +358,7 @@ public class Joystick extends GenericHID {
    * @return The state of the top button.
    */
   public boolean getTop() {
-    return getRawButton(ButtonType.kTop.value);
+    return m_hid.getRawButton(ButtonType.kTop.value);
   }
 
   /**
@@ -278,7 +367,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTopPressed() {
-    return getRawButtonPressed(ButtonType.kTop.value);
+    return m_hid.getRawButtonPressed(ButtonType.kTop.value);
   }
 
   /**
@@ -287,7 +376,7 @@ public class Joystick extends GenericHID {
    * @return Whether the button was released since the last check.
    */
   public boolean getTopReleased() {
-    return getRawButtonReleased(ButtonType.kTop.value);
+    return m_hid.getRawButtonReleased(ButtonType.kTop.value);
   }
 
   /**
@@ -298,7 +387,7 @@ public class Joystick extends GenericHID {
    *     loop.
    */
   public BooleanEvent top(EventLoop loop) {
-    return button(ButtonType.kTop.value, loop);
+    return m_hid.button(ButtonType.kTop.value, loop);
   }
 
   /**
