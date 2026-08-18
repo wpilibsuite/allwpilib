@@ -75,7 +75,7 @@ class StringPrefixMapTest {
     Map.Entry<String, String> entry;
     do {
       entry = iterator.next();
-    } while (!entry.getKey().equals("/Iterator"));
+    } while (!"/Iterator".equals(entry.getKey()));
     iterator.remove();
     assertPrefixRemoved(map, "/Iterator");
 
@@ -129,7 +129,7 @@ class StringPrefixMapTest {
     String value;
     do {
       value = iterator.next();
-    } while (!value.equals("iterator"));
+    } while (!"iterator".equals(value));
     iterator.remove();
     assertPrefixRemoved(map, "/Iterator");
 

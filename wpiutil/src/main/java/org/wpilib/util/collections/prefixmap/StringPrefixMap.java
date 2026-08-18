@@ -117,10 +117,7 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public boolean containsKey(Object key) {
-    if (key instanceof String) {
-      return m_allPrefixes.containsKey(storedKey((String) key));
-    }
-    return false;
+    return key instanceof String && m_allPrefixes.containsKey(storedKey((String) key));
   }
 
   @Override
@@ -140,10 +137,7 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) {
-      return true;
-    }
-    return m_allPrefixes.equals(obj);
+    return obj == this || m_allPrefixes.equals(obj);
   }
 
   @Override
@@ -307,10 +301,7 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
     @Override
     public boolean remove(Object key) {
-      if (key instanceof String) {
-        return StringPrefixMap.this.remove((String) key) != null;
-      }
-      return false;
+      return key instanceof String && StringPrefixMap.this.remove((String) key) != null;
     }
 
     @Override

@@ -75,7 +75,7 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
       if (child == null) {
         return null;
       }
-      if (node == this || node.m_theValue != null || node.m_childNodes.size() > 1) {
+      if (node.m_charIndex == 0 || node.m_theValue != null || node.m_childNodes.size() > 1) {
         pruneParent = node;
         pruneChar = myChar;
       }
@@ -228,5 +228,9 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
   public void clear() {
     m_childNodes = null;
     m_theValue = null;
+  }
+
+  boolean hasChildNodes() {
+    return m_childNodes != null;
   }
 }
