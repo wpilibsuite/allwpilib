@@ -36,43 +36,47 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
 
   @Override
   public V add(PrimitiveIterator.OfInt prefix, V value) {
-    V previousValue = m_theValue;
-    if (!prefix.hasNext()) {
-      m_theValue = value;
-      return previousValue;
+    StringPrefixTrie<V> node = this;
+    while (prefix.hasNext()) {
+      int myChar = prefix.nextInt();
+
+      if (node.m_childNodes == null) {
+        node.m_childNodes = new TreeMap<>();
+      }
+
+      StringPrefixTrie<V> child = node.m_childNodes.get(myChar);
+      if (child == null) {
+        child = new StringPrefixTrie<>(node.m_charIndex + 1);
+        node.m_childNodes.put(myChar, child);
+      }
+      node = child;
     }
 
-    int myChar = prefix.nextInt();
-
-    if (m_childNodes == null) {
-      m_childNodes = new TreeMap<>();
-    }
-
-    PrefixTrie<V> child =
-        m_childNodes.computeIfAbsent(myChar, c -> new StringPrefixTrie<>(m_charIndex + 1));
-    previousValue = child.add(prefix, value);
+    V previousValue = node.m_theValue;
+    node.m_theValue = value;
     return previousValue;
   }
 
   @Override
   public V remove(PrimitiveIterator.OfInt prefix) {
-    if (!prefix.hasNext()) {
-      V previousValue = m_theValue;
-      m_theValue = null;
-      return previousValue;
+    StringPrefixTrie<V> node = this;
+    while (prefix.hasNext()) {
+      if (node.m_childNodes == null) {
+        return null;
+      }
+
+      int myChar = prefix.nextInt();
+
+      StringPrefixTrie<V> child = node.m_childNodes.get(myChar);
+      if (child == null) {
+        return null;
+      }
+      node = child;
     }
 
-    if (m_childNodes == null) {
-      return null;
-    }
-
-    int myChar = prefix.nextInt(); // This will give us the ASCII value of the char
-
-    PrefixTrie<V> child = m_childNodes.get(myChar);
-    if (child == null) {
-      return null;
-    }
-    return child.remove(prefix);
+    V previousValue = node.m_theValue;
+    node.m_theValue = null;
+    return previousValue;
   }
 
   // ==============================================================
@@ -80,22 +84,22 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
 
   @Override
   public V get(PrimitiveIterator.OfInt prefix) {
-    if (!prefix.hasNext()) {
-      return m_theValue;
+    StringPrefixTrie<V> node = this;
+    while (prefix.hasNext()) {
+      if (node.m_childNodes == null) {
+        return null;
+      }
+
+      int myChar = prefix.nextInt();
+
+      StringPrefixTrie<V> child = node.m_childNodes.get(myChar);
+      if (child == null) {
+        return null;
+      }
+      node = child;
     }
 
-    if (m_childNodes == null) {
-      return null;
-    }
-
-    int myChar = prefix.nextInt();
-
-    PrefixTrie<V> child = m_childNodes.get(myChar);
-    if (child == null) {
-      return null;
-    }
-
-    return child.get(prefix);
+    return node.m_theValue;
   }
 
   // ==============================================================
@@ -103,18 +107,20 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
 
   @Override
   public V getShortestMatch(PrimitiveIterator.OfInt input) {
-    if (m_theValue != null || !input.hasNext() || m_childNodes == null) {
-      return m_theValue;
+    StringPrefixTrie<V> node = this;
+    while (true) {
+      if (node.m_theValue != null || !input.hasNext() || node.m_childNodes == null) {
+        return node.m_theValue;
+      }
+
+      int myChar = input.nextInt();
+
+      StringPrefixTrie<V> child = node.m_childNodes.get(myChar);
+      if (child == null) {
+        return null;
+      }
+      node = child;
     }
-
-    int myChar = input.nextInt();
-
-    PrefixTrie<V> child = m_childNodes.get(myChar);
-    if (child == null) {
-      return null;
-    }
-
-    return child.getShortestMatch(input);
   }
 
   // ==============================================================
@@ -122,19 +128,23 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
 
   @Override
   public V getLongestMatch(PrimitiveIterator.OfInt input) {
-    if (!input.hasNext() || m_childNodes == null) {
-      return m_theValue;
+    StringPrefixTrie<V> node = this;
+    V returnValue = node.m_theValue;
+    while (input.hasNext() && node.m_childNodes != null) {
+      int myChar = input.nextInt();
+
+      StringPrefixTrie<V> child = node.m_childNodes.get(myChar);
+      if (child == null) {
+        return returnValue;
+      }
+
+      node = child;
+      if (node.m_theValue != null) {
+        returnValue = node.m_theValue;
+      }
     }
 
-    int myChar = input.nextInt();
-
-    PrefixTrie<V> child = m_childNodes.get(myChar);
-    if (child == null) {
-      return m_theValue;
-    }
-
-    V returnValue = child.getLongestMatch(input);
-    return (returnValue == null) ? m_theValue : returnValue;
+    return returnValue;
   }
 
   // ==============================================================
@@ -167,32 +177,29 @@ class StringPrefixTrie<V> implements PrefixTrie<V> {
     }
 
     private V getM_next() {
-      if (m_node == null) {
-        return null;
+      while (m_node != null) {
+        V theValue = m_node.m_theValue;
+
+        // Are we at the last possible one for the given input?
+        if (!m_input.hasNext() || m_node.m_childNodes == null) {
+          m_node = null;
+          return theValue;
+        }
+
+        int myChar = m_input.nextInt();
+
+        StringPrefixTrie<V> child = m_node.m_childNodes.get(myChar);
+        if (child == null) {
+          m_node = null; // No more children, so this is where it ends.
+          return theValue;
+        }
+
+        m_node = child;
+        if (theValue != null) {
+          return theValue;
+        }
       }
-
-      V theValue = m_node.m_theValue;
-
-      // Are we at the last possible one for the given input?
-      if (!m_input.hasNext() || m_node.m_childNodes == null) {
-        m_node = null;
-        return theValue;
-      }
-
-      // Find the next
-      int myChar = m_input.nextInt(); // This will give us the ASCII value of the char
-
-      StringPrefixTrie<V> child = m_node.m_childNodes.get(myChar);
-      if (child == null) {
-        m_node = null; // No more children, so this is where it ends.
-        return theValue;
-      }
-
-      m_node = child;
-      if (theValue == null) {
-        return getM_next();
-      }
-      return theValue;
+      return null;
     }
   }
 
