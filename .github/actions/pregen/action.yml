@@ -5,7 +5,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7
       with:
         python-version: '3.12'
     - name: Install jinja and protobuf
@@ -26,24 +26,21 @@ runs:
     - name: Regenerate imgui
       run: |
         ./thirdparty/imgui_suite/generate_fonts.sh
-        ./thirdparty/imgui_suite/generate_gl3w.py
       shell: bash
 
     - name: Regenerate HIDs
       run: |
         ./wpilibc/generate_hids.py
         ./wpilibj/generate_hids.py
-        ./wpilibNewCommands/generate_hids.py
+        ./commandsv2/generate_hids.py
       shell: bash
 
     - name: Regenerate PWM motor controllers
-      run: |
-        ./wpilibc/generate_pwm_motor_controllers.py
-        ./wpilibj/generate_pwm_motor_controllers.py
+      run: python ./drivers/generate_pwm_motor_controllers.py
       shell: bash
 
     - name: Regenerate mrcal minimath
-      run: ./wpical/generate_mrcal.py
+      run: ./tools/wpical/generate_mrcal.py
       shell: bash
 
     - name: Regenerate wpimath
@@ -56,6 +53,10 @@ runs:
     - name: Regenerate Commands v3
       run: |
         ./commandsv3/generate_files.py --quickbuf_plugin protoc-gen-quickbuf-1.3.3-linux-x86_64.exe
+      shell: bash
+
+    - name: Regenerate fields
+      run: python fields/generate_fields.py
       shell: bash
 
     - name: Regenerate wpiunits

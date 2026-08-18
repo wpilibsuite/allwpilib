@@ -2,7 +2,7 @@ extra_includes:
 - pybind11_typing.h
 
 classes:
-  frc::AprilTagDetector:
+  wpi::apriltag::AprilTagDetector:
     methods:
       AprilTagDetector:
       SetConfig:
@@ -32,7 +32,7 @@ classes:
         // We are going to move the detection result into this shared_ptr
         // so that python can keep it alive. We don't expose the result directly
         // to the user because we'd have to pretend it's a list, and that would
-        // be annoying. 
+        // be annoying.
         std::shared_ptr<AprilTagDetector::Results> c_result;
         {
           py::gil_scoped_release unlock;
@@ -59,7 +59,10 @@ classes:
           :return: list of results
         )doc"
       )
-  frc::AprilTagDetector::Config:
+      .def("close", [](AprilTagDetector &self) {
+        self = AprilTagDetector();
+      }, py::doc("Frees all resources associated with this detector"))
+  wpi::apriltag::AprilTagDetector::Config:
     attributes:
       numThreads:
       quadDecimate:
@@ -69,7 +72,7 @@ classes:
       debug:
     methods:
       operator==:
-  frc::AprilTagDetector::QuadThresholdParameters:
+  wpi::apriltag::AprilTagDetector::QuadThresholdParameters:
     attributes:
       minClusterPixels:
       maxNumMaxima:
@@ -79,7 +82,7 @@ classes:
       deglitch:
     methods:
       operator==:
-  frc::AprilTagDetector::Results:
+  wpi::apriltag::AprilTagDetector::Results:
     rename: _Results
     ignored_bases:
     - std::span<const AprilTagDetection* const>

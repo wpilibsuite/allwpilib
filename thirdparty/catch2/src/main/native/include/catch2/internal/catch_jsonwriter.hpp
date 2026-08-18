@@ -8,6 +8,7 @@
 #ifndef CATCH_JSONWRITER_HPP_INCLUDED
 #define CATCH_JSONWRITER_HPP_INCLUDED
 
+#include <catch2/internal/catch_lifetimebound.hpp>
 #include <catch2/internal/catch_reusable_string_stream.hpp>
 #include <catch2/internal/catch_stringref.hpp>
 
@@ -27,8 +28,8 @@ namespace Catch {
 
     class JsonValueWriter {
     public:
-        JsonValueWriter( std::ostream& os );
-        JsonValueWriter( std::ostream& os, std::uint64_t indent_level );
+        JsonValueWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND );
+        JsonValueWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level );
 
         JsonObjectWriter writeObject() &&;
         JsonArrayWriter writeArray() &&;
@@ -38,10 +39,18 @@ namespace Catch {
             writeImpl( value, !std::is_arithmetic<T>::value );
         }
         void write( StringRef value ) &&;
+        void write( float value ) &&;
+        void write( double value ) &&;
         void write( bool value ) &&;
 
     private:
         void writeImpl( StringRef value, bool quote );
+
+        // Helper to deal with non-finite floating point values, which
+        // are not standard JSON, but we use JS/Python/etc. approach of
+        // emitting `NaN`, `Infinity`, `-Infinity` as number(like).
+        template <typename T>
+        void writeFloatingPoint( T value );
 
         // Without this SFINAE, this overload is a better match
         // for `std::string`, `char const*`, `char const[N]` args.
@@ -62,8 +71,8 @@ namespace Catch {
 
     class JsonObjectWriter {
     public:
-        JsonObjectWriter( std::ostream& os );
-        JsonObjectWriter( std::ostream& os, std::uint64_t indent_level );
+        JsonObjectWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND );
+        JsonObjectWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level );
 
         JsonObjectWriter( JsonObjectWriter&& source ) noexcept;
         JsonObjectWriter& operator=( JsonObjectWriter&& source ) = delete;
@@ -81,8 +90,8 @@ namespace Catch {
 
     class JsonArrayWriter {
     public:
-        JsonArrayWriter( std::ostream& os );
-        JsonArrayWriter( std::ostream& os, std::uint64_t indent_level );
+        JsonArrayWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND );
+        JsonArrayWriter( std::ostream& os CATCH_ATTR_LIFETIMEBOUND, std::uint64_t indent_level );
 
         JsonArrayWriter( JsonArrayWriter&& source ) noexcept;
         JsonArrayWriter& operator=( JsonArrayWriter&& source ) = delete;

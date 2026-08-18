@@ -1,10 +1,31 @@
+extra_includes:
+- wpi/util/Color.hpp
+
 classes:
-  frc::RobotState:
-    nodelete: true
+  wpi::RobotState:
     methods:
-      IsDisabled:
       IsEnabled:
+      IsDisabled:
       IsEStopped:
-      IsTeleop:
+      GetRobotMode:
       IsAutonomous:
-      IsTest:
+      IsAutonomousEnabled:
+      IsTeleop:
+      IsTeleopEnabled:
+      IsUtility:
+      IsUtilityEnabled:
+      AddOpMode:
+        overloads:
+          RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
+          RobotMode, std::string_view, std::string_view, std::string_view:
+      RemoveOpMode:
+      PublishOpModes:
+      ClearOpModes:
+      GetOpModeId:
+      GetOpMode:
+      IsOpMode:
+        overloads:
+          int64_t:
+          std::string_view:
+      IsDSAttached:
+      IsFMSAttached:

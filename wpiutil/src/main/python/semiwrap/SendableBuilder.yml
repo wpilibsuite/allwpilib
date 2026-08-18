@@ -1,5 +1,5 @@
 classes:
-  wpi::SendableBuilder:
+  wpi::util::SendableBuilder:
     enums:
       BackendKind:
     methods:

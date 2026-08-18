@@ -1,25 +1,15 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::AnalogInput:
+  wpi::AnalogInput:
     ignored_bases:
-    - wpi::SendableHelper<AnalogInput>
+    - wpi::util::SendableHelper<AnalogInput>
     methods:
       AnalogInput:
       GetValue:
-      GetAverageValue:
       GetVoltage:
-      GetAverageVoltage:
       GetChannel:
-      SetAverageBits:
-      GetAverageBits:
-      SetOversampleBits:
-      GetOversampleBits:
-      GetLSBWeight:
-      GetOffset:
-      SetSampleRate:
-      GetSampleRate:
       SetSimDevice:
       InitSendable:
 

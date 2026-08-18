@@ -2,7 +2,7 @@ extra_includes:
 - src/nt_type_caster.h
 
 classes:
-  nt::GenericSubscriber:
+  wpi::nt::GenericSubscriber:
     methods:
       GenericSubscriber:
         overloads:
@@ -24,7 +24,7 @@ classes:
       GetStringArray:
       ReadQueue:
       GetTopic:
-  nt::GenericPublisher:
+  wpi::nt::GenericPublisher:
     methods:
       GenericPublisher:
         overloads:
@@ -60,7 +60,7 @@ classes:
       SetDefaultDoubleArray:
       SetDefaultStringArray:
       GetTopic:
-  nt::GenericEntry:
+  wpi::nt::GenericEntry:
     methods:
       GenericEntry:
         overloads:

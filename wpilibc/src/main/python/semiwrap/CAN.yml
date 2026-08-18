@@ -1,13 +1,13 @@
 classes:
-  frc::CAN:
+  wpi::CAN:
     attributes:
-      kTeamManufacturer:
-      kTeamDeviceType:
+      TEAM_MANUFACTURER:
+      TEAM_DEVICE_TYPE:
     methods:
       CAN:
         overloads:
-          int, int:
-          int, int, int, int:
+          CANBus, int:
+          CANBus, int, int, int:
       WritePacket:
       WritePacketNoError:
       WritePacketRepeating:

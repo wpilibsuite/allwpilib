@@ -94,11 +94,6 @@ namespace Catch {
         void benchmarkEnded( BenchmarkStats<> const& stats ) override;
         void benchmarkFailed( StringRef error ) override;
 
-        void pushScopedMessage( MessageInfo const& message ) override;
-        void popScopedMessage( MessageInfo const& message ) override;
-
-        void emplaceUnscopedMessage( MessageBuilder&& builder ) override;
-
         std::string getCurrentTestName() const override;
 
         const AssertionResult* getLastResult() const override;
@@ -106,8 +101,6 @@ namespace Catch {
         void exceptionEarlyReported() override;
 
         void handleFatalErrorCondition( StringRef message ) override;
-
-        bool lastAssertionPassed() override;
 
     public:
         // !TBD We need to do this another way!
@@ -130,7 +123,7 @@ namespace Catch {
                     ITransientExpression const *expr,
                     bool negated );
 
-        void populateReaction( AssertionReaction& reaction, bool has_normal_disposition );
+        void populateReaction( AssertionReaction& reaction, bool has_normal_disposition ) const;
 
         // Creates dummy info for unexpected exceptions/fatal errors,
         // where we do not have the access to one, but we still need

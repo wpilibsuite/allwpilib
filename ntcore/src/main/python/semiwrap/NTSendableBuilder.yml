@@ -1,9 +1,9 @@
 classes:
-  nt::NTSendableBuilder:
+  wpi::nt::NTSendableBuilder:
     force_type_casters:
     - std::function
     typealias:
-    - BackendKind = wpi::SendableBuilder::BackendKind
+    - BackendKind = wpi::util::SendableBuilder::BackendKind
     methods:
       SetUpdateTable:
         cpp_code: |

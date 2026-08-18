@@ -2,16 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/REVPHSim.h"
+#include "wpi/simulation/REVPHSim.hpp"
 
 #include <memory>
 
-#include <hal/simulation/REVPHData.h>
+#include "wpi/hal/simulation/REVPHData.h"
+#include "wpi/util/SensorUtil.hpp"
 
-#include "frc/SensorUtil.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 REVPHSim::REVPHSim() : PneumaticsBaseSim{SensorUtil::GetDefaultREVPHModule()} {}
 

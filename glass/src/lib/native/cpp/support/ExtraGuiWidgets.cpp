@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -10,12 +10,12 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/DenseMap.h>
 
-#include "glass/DataSource.h"
-#include "glass/support/ExpressionParser.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/support/ExpressionParser.hpp"
+#include "wpi/util/DenseMap.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
 void DrawLEDSources(const int* values, BooleanSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
@@ -228,7 +228,7 @@ struct InputExprState {
   char inputBuffer[kBufferSize];
 };
 
-static wpi::DenseMap<int, InputExprState> exprStates;
+static wpi::util::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
 static char previewBuffer[kBufferSize];
 
@@ -267,7 +267,7 @@ bool InputExpr(const char* label, V* v, const char* format,
     }
 
     // Attempt to parse current value
-    auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
+    auto result = wpi::glass::expression::TryParseExpr<V>(state.inputBuffer);
     if (result) {
       *v = result.value();
     } else if (active) {
@@ -289,4 +289,4 @@ template bool InputExpr(const char*, int64_t*, const char*,
 template bool InputExpr(const char*, float*, const char*, ImGuiInputTextFlags);
 template bool InputExpr(const char*, double*, const char*, ImGuiInputTextFlags);
 
-}  // namespace glass
+}  // namespace wpi::glass

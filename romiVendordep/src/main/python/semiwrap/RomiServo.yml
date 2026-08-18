@@ -1,0 +1,6 @@
+classes:
+  wpi::romi::RomiServo:
+    methods:
+      RomiServo:
+      SetAngle:
+      GetAngle:

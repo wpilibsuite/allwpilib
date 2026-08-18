@@ -1,0 +1,15 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+S(ChannelIndexOutOfRange, -45, "Allocating channel that is out of range")
+S(ResourceAlreadyAllocated, -3, "Attempted to reuse an allocated resource")
+S(NullParameter, -5, "A pointer parameter to a method is nullptr")
+S(Timeout, -6, "A timeout has been exceeded")
+S(ParameterOutOfRange, -28, "A parameter is out of range")
+S(SmartDashboardMissingKey, -44, "SmartDashboard data does not exist")
+S(CommandIllegalUse, -50, "Illegal use of Command")
+S(CameraServerError, -90, "CameraServer error")
+S(InvalidParameter, -100, "Invalid parameter value")
+S(AssertionFailure, -110, "Assertion failed")
+S(Error, -111, "Error")

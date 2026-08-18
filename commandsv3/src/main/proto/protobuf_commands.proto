@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package wpi.proto;
 
-option java_package = "org.wpilib.commands3.proto";
+option java_package = "org.wpilib.command3.proto";
 
 /*
 Or use the generate_files.py script:

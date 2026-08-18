@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "callback_helpers/TestCallbackHelpers.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
 
-#include <fmt/format.h>
+#include <format>
 
-namespace frc::sim {
+namespace wpi::sim {
 
 void BooleanCallback::HandleCallback(std::string_view name,
                                      const HAL_Value* value) {
@@ -14,7 +14,7 @@ void BooleanCallback::HandleCallback(std::string_view name,
     throw std::invalid_argument("Null value");
   }
   if (value->type != HAL_BOOLEAN) {
-    throw std::invalid_argument(fmt::format("Wrong type '{}' for boolean",
+    throw std::invalid_argument(std::format("Wrong type '{}' for boolean",
                                             static_cast<int>(value->type))
                                     .c_str());
   }
@@ -29,7 +29,7 @@ void EnumCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_ENUM) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for enum", static_cast<int>(value->type))
+        std::format("Wrong type '{}' for enum", static_cast<int>(value->type))
             .c_str());
   }
 
@@ -43,7 +43,7 @@ void IntCallback::HandleCallback(std::string_view name,
     throw std::invalid_argument("Null value");
   }
   if (value->type != HAL_INT) {
-    throw std::invalid_argument(fmt::format("Wrong type '{}' for integer",
+    throw std::invalid_argument(std::format("Wrong type '{}' for integer",
                                             static_cast<int>(value->type))
                                     .c_str());
   }
@@ -59,7 +59,7 @@ void LongCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_LONG) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for long", static_cast<int>(value->type))
+        std::format("Wrong type '{}' for long", static_cast<int>(value->type))
             .c_str());
   }
 
@@ -74,7 +74,7 @@ void DoubleCallback::HandleCallback(std::string_view name,
   }
   if (value->type != HAL_DOUBLE) {
     throw std::invalid_argument(
-        fmt::format("Wrong type '{}' for double", static_cast<int>(value->type))
+        std::format("Wrong type '{}' for double", static_cast<int>(value->type))
             .c_str());
   }
 
@@ -82,4 +82,4 @@ void DoubleCallback::HandleCallback(std::string_view name,
   m_lastValue = value->data.v_double;
 }
 
-}  // namespace frc::sim
+}  // namespace wpi::sim

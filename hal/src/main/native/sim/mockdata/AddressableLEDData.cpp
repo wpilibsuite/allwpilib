@@ -2,25 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <algorithm>
 #include <cstring>
 
-#include "../PortsInternal.h"
-#include "AddressableLEDDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "AddressableLEDDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAddressableLEDData() {
   static AddressableLEDData sad[kNumAddressableLEDs];
-  ::hal::SimAddressableLEDData = sad;
+  ::wpi::hal::SimAddressableLEDData = sad;
   static AddressableLEDDataBuffer buf;
-  ::hal::SimAddressableLEDDataBuffer = &buf;
+  ::wpi::hal::SimAddressableLEDDataBuffer = &buf;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-AddressableLEDData* hal::SimAddressableLEDData;
-AddressableLEDDataBuffer* hal::SimAddressableLEDDataBuffer;
+AddressableLEDData* wpi::hal::SimAddressableLEDData;
+AddressableLEDDataBuffer* wpi::hal::SimAddressableLEDDataBuffer;
 
 void AddressableLEDData::ResetData() {
   initialized.Reset(false);
@@ -30,8 +29,8 @@ void AddressableLEDData::ResetData() {
 
 void AddressableLEDDataBuffer::SetData(int32_t start, int32_t len,
                                        const HAL_AddressableLEDData* d) {
-  if ((start + len) > HAL_kAddressableLEDMaxLength) {
-    len = HAL_kAddressableLEDMaxLength - start;
+  if ((start + len) > HAL_ADDRESSABLE_LED_MAX_LEN) {
+    len = HAL_ADDRESSABLE_LED_MAX_LEN - start;
   }
   if (len <= 0) {
     return;
@@ -45,8 +44,8 @@ void AddressableLEDDataBuffer::SetData(int32_t start, int32_t len,
 
 int32_t AddressableLEDDataBuffer::GetData(int32_t start, int32_t len,
                                           HAL_AddressableLEDData* d) {
-  if ((start + len) > HAL_kAddressableLEDMaxLength) {
-    len = HAL_kAddressableLEDMaxLength - start;
+  if ((start + len) > HAL_ADDRESSABLE_LED_MAX_LEN) {
+    len = HAL_ADDRESSABLE_LED_MAX_LEN - start;
   }
   if (len <= 0) {
     return 0;

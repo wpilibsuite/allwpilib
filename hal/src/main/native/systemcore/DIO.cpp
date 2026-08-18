@@ -2,64 +2,56 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/DIO.h"
+#include "wpi/hal/DIO.h"
 
 #include <cmath>
 #include <cstdio>
 #include <thread>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "SmartIo.h"
-#include "hal/Errors.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDIO() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (channel < 0 || channel >= kNumSmartIo) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for DIO", 0,
+                                       kNumSmartIo - 1, channel);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_DigitalHandle handle;
+  auto resource = smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, "DIO");
 
-  auto port =
-      smartIoHandles->Allocate(channel, HAL_HandleEnum::DIO, &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                           port->previousAllocation);
-    } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for DIO", 0,
-                                       kNumSmartIo, channel);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status = port->InitializeMode(input ? SmartIoMode::DigitalInput
-                                       : SmartIoMode::DigitalOutput);
+  *status = port->InitializeMode(
+      input ? MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput
+            : MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput);
   if (*status != 0) {
     smartIoHandles->Free(handle, HAL_HandleEnum::DIO);
-    return HAL_kInvalidHandle;
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -80,9 +72,9 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
   smartIoHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);
@@ -97,7 +89,7 @@ void HAL_SetDIOSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
   *status = HAL_HANDLE_ERROR;
-  return HAL_kInvalidHandle;
+  return HAL_INVALID_HANDLE;
 }
 
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator) {}
@@ -167,12 +159,12 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   }
 
   switch (port->currentMode) {
-    case SmartIoMode::DigitalInput:
+    case MRC_SmartIOMode::MRC_SmartIOMode_DigitalInput:
       return true;
-    case SmartIoMode::DigitalOutput:
+    case MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput:
       return false;
     default:
-      *status = INCOMPATIBLE_STATE;
+      *status = HAL_INCOMPATIBLE_STATE;
       return false;
   }
 }

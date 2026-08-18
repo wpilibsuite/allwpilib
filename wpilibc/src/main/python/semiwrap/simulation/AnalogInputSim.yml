@@ -1,8 +1,8 @@
 extra_includes:
-- frc/AnalogInput.h
+- wpi/hardware/discrete/AnalogInput.hpp
 
 classes:
-  frc::sim::AnalogInputSim:
+  wpi::sim::AnalogInputSim:
     force_type_casters:
     - std::function
     methods:
@@ -13,12 +13,6 @@ classes:
       RegisterInitializedCallback:
       GetInitialized:
       SetInitialized:
-      RegisterAverageBitsCallback:
-      GetAverageBits:
-      SetAverageBits:
-      RegisterOversampleBitsCallback:
-      GetOversampleBits:
-      SetOversampleBits:
       RegisterVoltageCallback:
       GetVoltage:
       SetVoltage:

@@ -2,9 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/Logger.h"
+#include "wpi/util/Logger.hpp"
 
-using namespace wpi;
+#include <format>
+#include <iterator>
+#include <vector>
+
+using namespace wpi::util;
 
 void Logger::DoLog(unsigned int level, const char* file, unsigned int line,
                    const char* msg) {
@@ -15,12 +19,12 @@ void Logger::DoLog(unsigned int level, const char* file, unsigned int line,
 }
 
 void Logger::LogV(unsigned int level, const char* file, unsigned int line,
-                  fmt::string_view format, fmt::format_args args) {
+                  std::string_view format, std::format_args args) {
   if (!m_func || level < m_min_level) {
     return;
   }
-  fmt::memory_buffer out;
-  fmt::vformat_to(fmt::appender{out}, format, args);
+  std::vector<char> out;
+  std::vformat_to(std::back_inserter(out), format, args);
   out.push_back('\0');
   m_func(level, file, line, out.data());
 }

@@ -1,13 +1,9 @@
-defaults:
-  subpackage: interfaces
-
 classes:
-  frc::MotorController:
+  wpi::MotorController:
     methods:
-      Set:
+      SetThrottle:
       SetVoltage:
-      Get:
+      GetThrottle:
       SetInverted:
       GetInverted:
       Disable:
-      StopMotor:

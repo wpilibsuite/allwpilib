@@ -2,66 +2,53 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Counter.h"
+#include "wpi/hal/Counter.h"
 
 #include <cstdio>
-#include <limits>
-#include <memory>
 #include <thread>
 
-#include <fmt/format.h>
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "SmartIo.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
+#include "wpi/hal/monotonic_clock.hpp"
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "SmartIo.h"
-#include "hal/HAL.h"
-#include "hal/cpp/fpga_clock.h"
-#include "hal/handles/LimitedHandleResource.h"
+using namespace wpi::hal;
 
-using namespace hal;
-
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCounter() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
-  if (channel == InvalidHandleIndex || channel >= kNumSmartIo) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
-                                     kNumSmartIo, channel);
-    return HAL_kInvalidHandle;
+  wpi::hal::init::CheckInit();
+  if (channel == INVALID_HANDLE_INDEX || channel >= kNumSmartIo) {
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for Counter", 0,
+                                       kNumSmartIo - 1, channel);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_CounterHandle handle;
+  auto resource =
+      smartIoHandles->Allocate(channel, HAL_HandleEnum::COUNTER, "Counter");
 
-  auto port = smartIoHandles->Allocate(channel, HAL_HandleEnum::Counter,
-                                       &handle, status);
-
-  if (*status != 0) {
-    if (port) {
-      hal::SetLastErrorPreviouslyAllocated(status, "SmartIo", channel,
-                                           port->previousAllocation);
-    } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for Counter", 0,
-                                       kNumSmartIo, channel);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, port] = *resource;
   port->channel = channel;
 
-  *status =
-      port->InitializeMode(risingEdge ? SmartIoMode::SingleCounterRising
-                                      : SmartIoMode::SingleCounterFalling);
+  *status = port->InitializeMode(
+      risingEdge ? MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterRising
+                 : MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterFalling);
   if (*status != 0) {
-    smartIoHandles->Free(handle, HAL_HandleEnum::Counter);
-    return HAL_kInvalidHandle;
+    smartIoHandles->Free(handle, HAL_HandleEnum::COUNTER);
+    return HAL_INVALID_HANDLE;
   }
 
   port->previousAllocation = allocationLocation ? allocationLocation : "";
@@ -70,17 +57,17 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 }
 
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
-  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::Counter);
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {
     return;
   }
 
-  smartIoHandles->Free(counterHandle, HAL_HandleEnum::Counter);
+  smartIoHandles->Free(counterHandle, HAL_HandleEnum::COUNTER);
 
   // Wait for no other object to hold this handle.
-  auto start = hal::fpga_clock::now();
+  auto start = wpi::hal::monotonic_clock::now();
   while (port.use_count() != 1) {
-    auto current = hal::fpga_clock::now();
+    auto current = wpi::hal::monotonic_clock::now();
     if (start + std::chrono::seconds(1) < current) {
       std::puts("DIO handle free timeout");
       std::fflush(stdout);
@@ -92,55 +79,74 @@ void HAL_FreeCounter(HAL_CounterHandle counterHandle) {
 
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->SwitchCounterEdge(risingEdge);
+}
+
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->SetRateWindow(windowMilliseconds);
 }
 
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
-  // TODO
-  return;
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  *status = port->ResetCounter();
 }
 
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
-  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::Counter);
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return false;
+    return 0;
   }
 
   int32_t ret = 0;
   *status = port->GetCounter(&ret);
   return ret;
-  return 0;
 }
 
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return 0;
-}
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
 
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  int32_t rate = 0;
+  *status = port->GetCounterRate(&rate);
+  return rate;
 }
 
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
+  auto port = smartIoHandles->Get(counterHandle, HAL_HandleEnum::COUNTER);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return false;
+  }
 
-HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
-                                 int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return false;
-}
-
-void HAL_SetCounterDirection(HAL_CounterHandle counterHandle, HAL_Bool countUp,
-                             int32_t* status) {
-  *status = HAL_HANDLE_ERROR;
-  return;
+  int32_t rate = 0;
+  *status = port->GetCounterRate(&rate);
+  if (*status != 0) {
+    return false;
+  }
+  return rate == 0;
 }
 
 }  // extern "C"

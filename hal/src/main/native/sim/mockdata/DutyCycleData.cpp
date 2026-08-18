@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "../PortsInternal.h"
-#include "DutyCycleDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "DutyCycleDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDutyCycleData() {
   static DutyCycleData sed[kNumDutyCycles];
-  ::hal::SimDutyCycleData = sed;
+  ::wpi::hal::SimDutyCycleData = sed;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DutyCycleData* hal::SimDutyCycleData;
+DutyCycleData* wpi::hal::SimDutyCycleData;
 
 void DutyCycleData::ResetData() {
   initialized.Reset(false);

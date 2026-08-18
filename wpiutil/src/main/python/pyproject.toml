@@ -1,23 +1,24 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.1.7",
-    "hatch-meson~=0.1.0b2",
+    "semiwrap~=0.6.1",
+    "hatch-meson~=0.1.2",
     "hatch-robotpy~=0.2.1",
     "hatchling",
-    "robotpy-native-wpiutil==2027.0.0a2",
+    "robotpy-native-wpiutil==0.0.0",
 ]
 
 [project]
 name = "robotpy-wpiutil"
-version = "2027.0.0a2"
-description = "Binary wrapper for FRC WPIUtil library"
+version = "0.0.0"
+description = "Binary wrapper for WPILib utilities library"
+requires-python = ">=3.11"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
-    "robotpy-native-wpiutil==2027.0.0a2",
+    "robotpy-native-wpiutil==0.0.0",
 ]
 
 [project.urls]
@@ -45,7 +46,6 @@ update_init = [
 scan_headers_ignore = [
     "debugging.hpp",
     "debugging/*",
-    "fmt/*",
     "google/*",
     "wpi/*",
     "wpystruct_fns.h",
@@ -53,7 +53,14 @@ scan_headers_ignore = [
     "pb_common.h",
     "pb_decode.h",
     "pb_encode.h",
+    "upb/*",
+    "utf8_range.h",
 ]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
 
 [tool.semiwrap.extension_modules."wpiutil._wpiutil"]
 name = "wpiutil"
@@ -65,15 +72,21 @@ depends = ["wpiutil-casters"]
 
 [tool.semiwrap.extension_modules."wpiutil._wpiutil".headers]
 # wpi
-StackTrace = "wpi/StackTrace.h"
-Synchronization = "wpi/Synchronization.h"
-RawFrame = "wpi/RawFrame.h"
+Color = "wpi/util/Color.hpp"
+Color8Bit = "wpi/util/Color8Bit.hpp"
+StackTrace = "wpi/util/StackTrace.hpp"
+Synchronization = "wpi/util/Synchronization.hpp"
+PixelFormat = "wpi/util/PixelFormat.hpp"
+RawFrame_c = "wpi/util/RawFrame.h"
+RawFrame = "wpi/util/RawFrame.hpp"
+Timestamp = "wpi/util/timestamp.hpp"
+Alert = "wpi/util/Alert.hpp"
 
 # wpi/sendable
-Sendable = "wpi/sendable/Sendable.h"
-SendableBuilder = "wpi/sendable/SendableBuilder.h"
-#SendableHelper = "wpi/sendable/SendableHelper.h"
-SendableRegistry = "wpi/sendable/SendableRegistry.h"
+Sendable = "wpi/util/sendable/Sendable.hpp"
+SendableBuilder = "wpi/util/sendable/SendableBuilder.hpp"
+#SendableHelper = "wpi/util/sendable/SendableHelper.hpp"
+SendableRegistry = "wpi/util/sendable/SendableRegistry.hpp"
 
 WPyStruct = "src/wpistruct/wpystruct_fns.h"
 
@@ -86,11 +99,11 @@ includedir = [
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_array_type_caster.h"
-types = ["wpi::array"]
+types = ["wpi::util::array"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_json_type_caster.h"
-types = ["wpi::json"]
+types = ["wpi::util::json"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_span_type_caster.h"
@@ -98,23 +111,27 @@ types = ["std::span"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallset_type_caster.h"
-types = ["wpi::SmallSet"]
+types = ["wpi::util::SmallSet"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallvector_type_caster.h"
-types = ["wpi::SmallVector"]
+types = ["wpi::util::SmallVector"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_smallvectorimpl_type_caster.h"
-types = ["wpi::SmallVectorImpl"]
+types = ["wpi::util::SmallVectorImpl"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_string_map_caster.h"
-types = ["wpi::StringMap"]
+types = ["wpi::util::StringMap"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpi_ct_string_type_caster.h"
-types = ["wpi::ct_string"]
+types = ["wpi::util::ct_string"]
+
+[[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
+header = "wpi_string_type_caster.h"
+types = ["WPI_String"]
 
 [[tool.semiwrap.export_type_casters.wpiutil-casters.headers]]
 header = "wpystruct.h"

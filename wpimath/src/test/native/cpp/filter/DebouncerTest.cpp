@@ -2,76 +2,83 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
-#include <wpi/timestamp.h>
+#include "wpi/math/filter/Debouncer.hpp"
 
-#include "frc/filter/Debouncer.h"
-#include "units/time.h"
+#include <stdint.h>
 
-static units::second_t now = 0_s;
+#include <catch2/catch_test_macros.hpp>
 
-class DebouncerTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-    WPI_SetNowImpl([] { return units::microsecond_t{now}.to<uint64_t>(); });
+#include "wpi/units/time.hpp"
+#include "wpi/util/timestamp.h"
+
+static wpi::units::second_t now = 0_s;
+
+class DebouncerTest {
+ public:
+  DebouncerTest() {
+    WPI_SetNowImpl(
+        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
   }
 
-  void TearDown() override { WPI_SetNowImpl(nullptr); }
+  ~DebouncerTest() { WPI_SetNowImpl(nullptr); }
 };
 
-TEST_F(DebouncerTest, DebounceRising) {
-  frc::Debouncer debouncer{20_ms};
+TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceRising", "[wpimath]") {
+  wpi::math::Debouncer debouncer{20_ms};
 
   debouncer.Calculate(false);
-  EXPECT_FALSE(debouncer.Calculate(true));
+  CHECK_FALSE(debouncer.Calculate(true));
 
   now += 1_s;
 
-  EXPECT_TRUE(debouncer.Calculate(true));
+  CHECK(debouncer.Calculate(true));
 }
 
-TEST_F(DebouncerTest, DebounceFalling) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kFalling};
+TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceFalling", "[wpimath]") {
+  wpi::math::Debouncer debouncer{20_ms,
+                                 wpi::math::Debouncer::DebounceType::kFalling};
 
   debouncer.Calculate(true);
-  EXPECT_TRUE(debouncer.Calculate(false));
+  CHECK(debouncer.Calculate(false));
 
   now += 1_s;
 
-  EXPECT_FALSE(debouncer.Calculate(false));
+  CHECK_FALSE(debouncer.Calculate(false));
 }
 
-TEST_F(DebouncerTest, DebounceBoth) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceBoth", "[wpimath]") {
+  wpi::math::Debouncer debouncer{20_ms,
+                                 wpi::math::Debouncer::DebounceType::kBoth};
 
   debouncer.Calculate(false);
-  EXPECT_FALSE(debouncer.Calculate(true));
+  CHECK_FALSE(debouncer.Calculate(true));
 
   now += 1_s;
 
-  EXPECT_TRUE(debouncer.Calculate(true));
-  EXPECT_TRUE(debouncer.Calculate(false));
+  CHECK(debouncer.Calculate(true));
+  CHECK(debouncer.Calculate(false));
 
   now += 1_s;
 
-  EXPECT_FALSE(debouncer.Calculate(false));
+  CHECK_FALSE(debouncer.Calculate(false));
 }
 
-TEST_F(DebouncerTest, DebounceParams) {
-  frc::Debouncer debouncer{20_ms, frc::Debouncer::DebounceType::kBoth};
+TEST_CASE_METHOD(DebouncerTest, "DebouncerTest DebounceParams", "[wpimath]") {
+  wpi::math::Debouncer debouncer{20_ms,
+                                 wpi::math::Debouncer::DebounceType::kBoth};
 
-  EXPECT_TRUE(debouncer.GetDebounceTime() == 20_ms);
-  EXPECT_TRUE(debouncer.GetDebounceType() ==
-              frc::Debouncer::DebounceType::kBoth);
+  CHECK(debouncer.GetDebounceTime() == 20_ms);
+  CHECK(debouncer.GetDebounceType() ==
+        wpi::math::Debouncer::DebounceType::kBoth);
 
   debouncer.SetDebounceTime(100_ms);
 
-  EXPECT_TRUE(debouncer.GetDebounceTime() == 100_ms);
+  CHECK(debouncer.GetDebounceTime() == 100_ms);
 
-  debouncer.SetDebounceType(frc::Debouncer::DebounceType::kFalling);
+  debouncer.SetDebounceType(wpi::math::Debouncer::DebounceType::kFalling);
 
-  EXPECT_TRUE(debouncer.GetDebounceType() ==
-              frc::Debouncer::DebounceType::kFalling);
+  CHECK(debouncer.GetDebounceType() ==
+        wpi::math::Debouncer::DebounceType::kFalling);
 
-  EXPECT_TRUE(debouncer.Calculate(false));
+  CHECK(debouncer.Calculate(false));
 }

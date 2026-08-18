@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/EncoderData.h"
 
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
@@ -30,23 +30,15 @@ HAL_SimDeviceHandle HALSIM_GetEncoderSimDevice(int32_t index) {
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(int32_t, Count, 0)
-DEFINE_CAPI(double, Period, 0)
+DEFINE_CAPI(double, Rate, 0)
 DEFINE_CAPI(HAL_Bool, Reset, false)
-DEFINE_CAPI(double, MaxPeriod, 0)
 DEFINE_CAPI(HAL_Bool, Direction, false)
 DEFINE_CAPI(HAL_Bool, ReverseDirection, false)
-DEFINE_CAPI(int32_t, SamplesToAverage, 0)
 DEFINE_CAPI(double, DistancePerPulse, 0)
 
 void HALSIM_SetEncoderDistance(int32_t index, double distance) {}
 
 double HALSIM_GetEncoderDistance(int32_t index) {
-  return 0;
-}
-
-void HALSIM_SetEncoderRate(int32_t index, double rate) {}
-
-double HALSIM_GetEncoderRate(int32_t index) {
   return 0;
 }
 

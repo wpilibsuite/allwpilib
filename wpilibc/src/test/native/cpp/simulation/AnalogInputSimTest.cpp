@@ -2,18 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/AnalogInputSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/AnalogInputSim.hpp"
 
-#include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/AnalogInput.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hal/HAL.h"
+#include "wpi/hardware/discrete/AnalogInput.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
-TEST(AnalogInputSimTest, SetInitialized) {
-  HAL_Initialize(500, 0);
+TEST_CASE("AnalogInputSimTest SetInitialized", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   AnalogInputSim sim{5};
   BooleanCallback callback;
@@ -21,13 +22,13 @@ TEST(AnalogInputSimTest, SetInitialized) {
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
   AnalogInput input{5};
 
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(AnalogInputSimTest, SetVoltage) {
-  HAL_Initialize(500, 0);
+TEST_CASE("AnalogInputSimTest SetVoltage", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   AnalogInputSim sim{5};
   DoubleCallback callback;
@@ -36,60 +37,31 @@ TEST(AnalogInputSimTest, SetVoltage) {
   AnalogInput input{5};
 
   for (int i = 0; i < 50; ++i) {
+    UNSCOPED_INFO("i = " << i);
     double voltage = i * .1;
 
     callback.Reset();
 
     sim.SetVoltage(0);
-    EXPECT_NEAR(sim.GetVoltage(), 0, 0.001) << " on " << i;
-    EXPECT_NEAR(input.GetVoltage(), 0, 0.001) << " on " << i;
+    CHECK_THAT(sim.GetVoltage(), Catch::Matchers::WithinAbs(0, 0.001));
+    CHECK_THAT(input.GetVoltage(), Catch::Matchers::WithinAbs(0, 0.001));
     // 0 -> 0 isn't a change, so callback not called
     if (i > 2) {
-      EXPECT_TRUE(callback.WasTriggered()) << " on " << i;
-      EXPECT_EQ(0, callback.GetLastValue()) << " on " << i;
+      CHECK(callback.WasTriggered());
+      CHECK(0 == callback.GetLastValue());
     }
 
     callback.Reset();
     sim.SetVoltage(voltage);
-    EXPECT_NEAR(sim.GetVoltage(), voltage, 0.001) << " on " << i;
-    EXPECT_NEAR(input.GetVoltage(), voltage, 0.001) << " on " << i;
+    CHECK_THAT(sim.GetVoltage(), Catch::Matchers::WithinAbs(voltage, 0.001));
+    CHECK_THAT(input.GetVoltage(), Catch::Matchers::WithinAbs(voltage, 0.001));
 
     // 0 -> 0 isn't a change, so callback not called
     if (i != 0) {
-      EXPECT_TRUE(callback.WasTriggered()) << " on " << i;
-      EXPECT_EQ(voltage, callback.GetLastValue()) << " on " << i;
+      CHECK(callback.WasTriggered());
+      CHECK(voltage == callback.GetLastValue());
     }
   }
 }
 
-TEST(AnalogInputSimTest, SetOverSampleBits) {
-  HAL_Initialize(500, 0);
-  AnalogInput input{5};
-  AnalogInputSim sim(input);
-
-  IntCallback callback;
-  auto cb = sim.RegisterOversampleBitsCallback(callback.GetCallback(), false);
-
-  input.SetOversampleBits(3504);
-  EXPECT_EQ(3504, sim.GetOversampleBits());
-  EXPECT_EQ(3504, input.GetOversampleBits());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, callback.GetLastValue());
-}
-
-TEST(AnalogInputSimTest, SetAverageBits) {
-  HAL_Initialize(500, 0);
-  AnalogInput input{5};
-  AnalogInputSim sim(input);
-
-  IntCallback callback;
-  auto cb = sim.RegisterAverageBitsCallback(callback.GetCallback(), false);
-
-  input.SetAverageBits(3504);
-  EXPECT_EQ(3504, sim.GetAverageBits());
-  EXPECT_EQ(3504, input.GetAverageBits());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(3504, callback.GetLastValue());
-}
-
-}  // namespace frc::sim
+}  // namespace wpi::sim

@@ -2,38 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/CTREPCMSim.h"  // NOLINT(build/include_order)
+#include "wpi/simulation/CTREPCMSim.hpp"
 
-#include <gtest/gtest.h>
-#include <hal/HAL.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "callback_helpers/TestCallbackHelpers.h"
-#include "frc/DoubleSolenoid.h"
-#include "frc/PneumaticsControlModule.h"
+#include "callback_helpers/TestCallbackHelpers.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/hardware/pneumatic/PneumaticsControlModule.hpp"
 
-namespace frc::sim {
+namespace wpi::sim {
 
-TEST(CTREPCMSimTest, InitializedCallback) {
+TEST_CASE("CTREPCMSimTest InitializedCallback", "[wpilibc][simulation]") {
   CTREPCMSim sim;
 
   sim.ResetData();
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticsControlModule pcm{0};
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTest, SolenoidOutput) {
-  PneumaticsControlModule pcm{0};
+TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{0, frc::PneumaticsModuleType::CTREPCM, 3, 4};
+  DoubleSolenoid doubleSolenoid{CANBus::CAN_S0,
+                                wpi::PneumaticsModuleType::CTRE_PCM, 3, 4};
 
   BooleanCallback callback3;
   BooleanCallback callback4;
@@ -44,60 +45,60 @@ TEST(CTREPCMSimTest, SolenoidOutput) {
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kReverse);
-  EXPECT_FALSE(callback3.WasTriggered());
-  EXPECT_FALSE(callback3.GetLastValue());
-  EXPECT_TRUE(callback4.WasTriggered());
-  EXPECT_TRUE(callback4.GetLastValue());
-  EXPECT_FALSE(sim.GetSolenoidOutput(3));
-  EXPECT_TRUE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00010000, pcm.GetSolenoids());
-  EXPECT_EQ(0b00010000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::REVERSE);
+  CHECK_FALSE(callback3.WasTriggered());
+  CHECK_FALSE(callback3.GetLastValue());
+  CHECK(callback4.WasTriggered());
+  CHECK(callback4.GetLastValue());
+  CHECK_FALSE(sim.GetSolenoidOutput(3));
+  CHECK(sim.GetSolenoidOutput(4));
+  CHECK(0b00010000 == pcm.GetSolenoids());
+  CHECK(0b00010000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kForward);
-  EXPECT_TRUE(callback3.WasTriggered());
-  EXPECT_TRUE(callback3.GetLastValue());
-  EXPECT_TRUE(callback4.WasTriggered());
-  EXPECT_FALSE(callback4.GetLastValue());
-  EXPECT_TRUE(sim.GetSolenoidOutput(3));
-  EXPECT_FALSE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00001000, pcm.GetSolenoids());
-  EXPECT_EQ(0b00001000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::FORWARD);
+  CHECK(callback3.WasTriggered());
+  CHECK(callback3.GetLastValue());
+  CHECK(callback4.WasTriggered());
+  CHECK_FALSE(callback4.GetLastValue());
+  CHECK(sim.GetSolenoidOutput(3));
+  CHECK_FALSE(sim.GetSolenoidOutput(4));
+  CHECK(0b00001000 == pcm.GetSolenoids());
+  CHECK(0b00001000 == sim.GetAllSolenoidOutputs());
 
   callback3.Reset();
   callback4.Reset();
-  doubleSolenoid.Set(DoubleSolenoid::kOff);
-  EXPECT_TRUE(callback3.WasTriggered());
-  EXPECT_FALSE(callback3.GetLastValue());
-  EXPECT_FALSE(callback4.WasTriggered());
-  EXPECT_FALSE(callback4.GetLastValue());
-  EXPECT_FALSE(sim.GetSolenoidOutput(3));
-  EXPECT_FALSE(sim.GetSolenoidOutput(4));
-  EXPECT_EQ(0b00000000, pcm.GetSolenoids());
-  EXPECT_EQ(0b00000000, sim.GetAllSolenoidOutputs());
+  doubleSolenoid.Set(DoubleSolenoid::OFF);
+  CHECK(callback3.WasTriggered());
+  CHECK_FALSE(callback3.GetLastValue());
+  CHECK_FALSE(callback4.WasTriggered());
+  CHECK_FALSE(callback4.GetLastValue());
+  CHECK_FALSE(sim.GetSolenoidOutput(3));
+  CHECK_FALSE(sim.GetSolenoidOutput(4));
+  CHECK(0b00000000 == pcm.GetSolenoids());
+  CHECK(0b00000000 == sim.GetAllSolenoidOutputs());
 }
 
-TEST(CTREPCMSimTest, SetCompressorOn) {
-  PneumaticsControlModule pcm{0};
+TEST_CASE("CTREPCMSimTest SetCompressorOn", "[wpilibc][simulation]") {
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
   BooleanCallback callback;
   auto cb = sim.RegisterCompressorOnCallback(callback.GetCallback(), false);
 
-  EXPECT_FALSE(pcm.GetCompressor());
-  EXPECT_FALSE(pcm.GetCompressor());
+  CHECK_FALSE(pcm.GetCompressor());
+  CHECK_FALSE(pcm.GetCompressor());
   sim.SetCompressorOn(true);
-  EXPECT_TRUE(sim.GetCompressorOn());
-  EXPECT_TRUE(pcm.GetCompressor());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetCompressorOn());
+  CHECK(pcm.GetCompressor());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTest, SetEnableDigital) {
-  PneumaticsControlModule pcm{0};
+TEST_CASE("CTREPCMSimTest SetEnableDigital", "[wpilibc][simulation]") {
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -106,34 +107,34 @@ TEST(CTREPCMSimTest, SetEnableDigital) {
       sim.RegisterClosedLoopEnabledCallback(callback.GetCallback(), false);
 
   pcm.DisableCompressor();
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Disabled);
+  CHECK(pcm.GetCompressorConfigType() == CompressorConfigType::DISABLED);
 
   pcm.EnableCompressorDigital();
-  EXPECT_TRUE(sim.GetClosedLoopEnabled());
-  EXPECT_EQ(pcm.GetCompressorConfigType(), CompressorConfigType::Digital);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetClosedLoopEnabled());
+  CHECK(pcm.GetCompressorConfigType() == CompressorConfigType::DIGITAL);
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTest, SetPressureSwitchEnabled) {
-  PneumaticsControlModule pcm{0};
+TEST_CASE("CTREPCMSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
   BooleanCallback callback;
   auto cb = sim.RegisterPressureSwitchCallback(callback.GetCallback(), false);
 
-  EXPECT_FALSE(pcm.GetPressureSwitch());
+  CHECK_FALSE(pcm.GetPressureSwitch());
 
   sim.SetPressureSwitch(true);
-  EXPECT_TRUE(sim.GetPressureSwitch());
-  EXPECT_TRUE(pcm.GetPressureSwitch());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(sim.GetPressureSwitch());
+  CHECK(pcm.GetPressureSwitch());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(CTREPCMSimTest, SetCompressorCurrent) {
-  PneumaticsControlModule pcm{0};
+TEST_CASE("CTREPCMSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
+  PneumaticsControlModule pcm{CANBus::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -142,9 +143,9 @@ TEST(CTREPCMSimTest, SetCompressorCurrent) {
       sim.RegisterCompressorCurrentCallback(callback.GetCallback(), false);
 
   sim.SetCompressorCurrent(35.04);
-  EXPECT_EQ(35.04, sim.GetCompressorCurrent());
-  EXPECT_EQ(35.04_A, pcm.GetCompressorCurrent());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(35.04, callback.GetLastValue());
+  CHECK(35.04 == sim.GetCompressorCurrent());
+  CHECK(35.04_A == pcm.GetCompressorCurrent());
+  CHECK(callback.WasTriggered());
+  CHECK(35.04 == callback.GetLastValue());
 }
-}  // namespace frc::sim
+}  // namespace wpi::sim

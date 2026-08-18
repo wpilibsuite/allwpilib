@@ -1,25 +1,28 @@
+#pragma once
+
+#include <format>
 
 #include <semiwrap.h>
-#include <networktables/NetworkTableValue.h>
-#include <networktables/NetworkTableType.h>
-#include <fmt/format.h>
+
+#include "wpi/nt/NetworkTableType.hpp"
+#include "wpi/nt/NetworkTableValue.hpp"
 
 namespace pyntcore {
 
-const char * nttype2str(NT_Type type);
+const char* nttype2str(NT_Type type);
 
-py::object ntvalue2py(const nt::Value &ntvalue);
+py::object ntvalue2py(const wpi::nt::Value& ntvalue);
 
-nt::Value py2ntvalue(py::handle h);
+wpi::nt::Value py2ntvalue(py::handle h);
 
-py::function valueFactoryByType(nt::NetworkTableType type);
+py::function valueFactoryByType(wpi::nt::NetworkTableType type);
 
-inline void ensure_value_is(NT_Type expected, nt::Value *v) {
-    if (v->type() != expected) {
-        throw py::value_error(fmt::format(
-            "Value type is {}, not {}", nttype2str(v->type()), nttype2str(expected)
-        ));
-    }
+inline void ensure_value_is(NT_Type expected, wpi::nt::Value* v) {
+  if (v->type() != expected) {
+    throw py::value_error(std::format("Value type is {}, not {}",
+                                      nttype2str(v->type()),
+                                      nttype2str(expected)));
+  }
 }
 
-};
+}  // namespace pyntcore

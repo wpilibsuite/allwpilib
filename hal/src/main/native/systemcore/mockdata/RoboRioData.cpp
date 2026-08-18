@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/RoboRioData.h"
+#include "wpi/hal/simulation/RoboRioData.h"
 
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetRoboRioData(void) {}
@@ -18,6 +18,7 @@ DEFINE_CAPI(double, UserCurrent3V3, 0)
 DEFINE_CAPI(HAL_Bool, UserActive3V3, false)
 DEFINE_CAPI(int32_t, UserFaults3V3, 0)
 DEFINE_CAPI(double, BrownoutVoltage, 6.75)
+DEFINE_CAPI(double, BrownoutRecoveryVoltage, 7.25)
 DEFINE_CAPI(double, CPUTemp, 45.0)
 DEFINE_CAPI(int32_t, TeamNumber, 0)
 

@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/PWMSim.h"
+#include "wpi/simulation/PWMSim.hpp"
 
 #include <memory>
 
-#include <hal/simulation/PWMData.h>
+#include "wpi/hal/simulation/PWMData.h"
+#include "wpi/hardware/discrete/PWM.hpp"
+#include "wpi/hardware/motor/PWMMotorController.hpp"
 
-#include "frc/PWM.h"
-#include "frc/motorcontrol/PWMMotorController.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 PWMSim::PWMSim(const PWM& pwm) : m_index{pwm.GetChannel()} {}
 

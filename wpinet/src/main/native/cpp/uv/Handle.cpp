@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Handle.h"
+#include "wpi/net/uv/Handle.hpp"
 
-using namespace wpi::uv;
+using namespace wpi::net::uv;
 
 Handle::~Handle() noexcept {
   if (!m_closed && m_uv_handle->type != UV_UNKNOWN_HANDLE) {

@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -8,15 +8,6 @@ ext {
     includeWpiutil = true
     pluginName = 'halsim_xrp'
 }
-
-apply plugin: 'google-test-test-suite'
-
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${pluginName}Test"] = []
-apply from: "${rootDir}/shared/googletest.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
@@ -30,6 +21,7 @@ model {
 
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
         }
     }

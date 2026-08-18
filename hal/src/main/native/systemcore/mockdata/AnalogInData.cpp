@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/AnalogInData.h"
 
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetAnalogInData(int32_t index) {}
@@ -17,8 +17,6 @@ HAL_SimDeviceHandle HALSIM_GetAnalogInSimDevice(int32_t index) {
   HAL_SIMDATAVALUE_STUB_CAPI(TYPE, HALSIM, AnalogIn##CAPINAME, RETURN)
 
 DEFINE_CAPI(HAL_Bool, Initialized, false)
-DEFINE_CAPI(int32_t, AverageBits, 0)
-DEFINE_CAPI(int32_t, OversampleBits, 0)
 DEFINE_CAPI(double, Voltage, 0)
 
 void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,

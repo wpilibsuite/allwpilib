@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NetworkTablesSettings.h"
+#include "wpi/glass/networktables/NetworkTablesSettings.hpp"
 
 #include <optional>
 #include <string_view>
@@ -11,13 +11,13 @@
 
 #include <imgui.h>
 #include <imgui_stdlib.h>
-#include <ntcore_cpp.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 void NetworkTablesSettings::Thread::Main() {
   while (m_active) {
@@ -30,6 +30,7 @@ void NetworkTablesSettings::Thread::Main() {
 
     // clear restart flag
     m_restart = false;
+    bool reconnect = std::exchange(m_reconnect, false);
 
     int mode;
     bool dsClient;
@@ -41,46 +42,50 @@ void NetworkTablesSettings::Thread::Main() {
       // release lock while stopping to avoid blocking GUI
       lock.unlock();
 
-      // if just changing servers in client mode, no need to stop and restart
-      unsigned int curMode = nt::GetNetworkMode(m_inst);
-      if ((mode == 0 || mode == 2) ||
+      // Changing servers can be done in place unless a reconnect was requested.
+      unsigned int curMode = wpi::nt::GetNetworkMode(m_inst);
+      if (reconnect || (mode == 0 || mode == 2) ||
           (mode == 1 && (curMode & NT_NET_MODE_CLIENT) == 0)) {
-        nt::StopClient(m_inst);
-        nt::StopServer(m_inst);
-        nt::StopLocal(m_inst);
+        wpi::nt::StopClient(m_inst);
+        wpi::nt::StopServer(m_inst);
+        wpi::nt::StopLocal(m_inst);
       }
 
       if ((m_mode == 0 || m_mode == 2) || !dsClient) {
-        nt::StopDSClient(m_inst);
+        wpi::nt::StopDSClient(m_inst);
       }
 
       lock.lock();
     } while (mode != m_mode || dsClient != m_dsClient);
 
     if (m_mode == 1) {
-      std::string_view serverTeam{m_serverTeam};
+      std::string_view serverTeam{wpi::util::trim(m_serverTeam)};
       std::optional<unsigned int> team;
       if (m_mode == 1) {
-        nt::StartClient(m_inst, m_clientName);
+        wpi::nt::StartClient(m_inst, m_clientName);
       }
 
-      if (!wpi::contains(serverTeam, '.') &&
-          (team = wpi::parse_integer<unsigned int>(serverTeam, 10))) {
-        nt::SetServerTeam(m_inst, team.value(), m_port);
+      if (!wpi::util::contains(serverTeam, '.') &&
+          (team = wpi::util::parse_integer<unsigned int>(serverTeam, 10))) {
+        if (m_requireTeamNumberMatch) {
+          wpi::nt::SetServerTeam(m_inst, serverTeam, m_port);
+        } else {
+          wpi::nt::SetServerFixed(m_inst, serverTeam, m_port);
+        }
       } else {
         std::vector<std::pair<std::string_view, unsigned int>> servers;
-        wpi::split(serverTeam, ',', -1, false, [&](auto serverName) {
+        wpi::util::split(serverTeam, ',', -1, false, [&](auto serverName) {
           servers.emplace_back(serverName, m_port);
         });
-        nt::SetServer(m_inst, servers);
+        wpi::nt::SetServer(m_inst, servers);
       }
 
       if (m_dsClient) {
-        nt::StartDSClient(m_inst, m_port);
+        wpi::nt::StartDSClient(m_inst, m_port);
       }
-    } else if (m_mode == 3) {
-      nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
-                      m_port);
+    } else if (m_mode == 2) {
+      wpi::nt::StartServer(m_inst, m_iniName.c_str(), m_listenAddress.c_str(),
+                           "", m_port);
     }
   }
 }
@@ -94,7 +99,9 @@ NetworkTablesSettings::NetworkTablesSettings(std::string_view clientName,
       m_listenAddress{storage.GetString("listenAddress")},
       m_clientName{storage.GetString("clientName", clientName)},
       m_port{storage.GetInt("port", NT_DEFAULT_PORT)},
-      m_dsClient{storage.GetBool("dsClient", true)} {
+      m_dsClient{storage.GetBool("dsClient", true)},
+      m_requireTeamNumberMatch{
+          storage.GetBool("requireTeamNumberMatch", false)} {
   m_thread.Start(inst);
 }
 
@@ -107,6 +114,7 @@ void NetworkTablesSettings::Update() {
   // do actual operation on thread
   auto thr = m_thread.GetThread();
   thr->m_restart = true;
+  thr->m_reconnect |= std::exchange(m_reconnect, false);
   thr->m_mode = m_mode.GetValue();
   thr->m_iniName = m_persistentFilename;
   thr->m_serverTeam = m_serverTeam;
@@ -114,6 +122,7 @@ void NetworkTablesSettings::Update() {
   thr->m_clientName = m_clientName;
   thr->m_port = m_port;
   thr->m_dsClient = m_dsClient;
+  thr->m_requireTeamNumberMatch = m_requireTeamNumberMatch;
   thr->m_cond.notify_one();
 }
 
@@ -124,6 +133,8 @@ static void LimitPortRange(int* port) {
     *port = 65535;
   }
 }
+
+static constexpr int kSystemServerPort = 6810;
 
 bool NetworkTablesSettings::Display() {
   m_mode.Combo("Mode", m_serverOption ? 3 : 2);
@@ -143,6 +154,10 @@ bool NetworkTablesSettings::Display() {
       if (ImGui::SmallButton("Default")) {
         m_port = NT_DEFAULT_PORT;
       }
+      ImGui::SameLine();
+      if (ImGui::SmallButton("System Server")) {
+        m_port = kSystemServerPort;
+      }
       ImGui::InputText("Network Identity", &m_clientName);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip(
@@ -152,6 +167,12 @@ bool NetworkTablesSettings::Display() {
       ImGui::Checkbox("Get Address from DS", &m_dsClient);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
         ImGui::SetTooltip("Attempt to fetch server IP from Driver Station");
+      }
+      ImGui::Checkbox("Require Team Number Match", &m_requireTeamNumberMatch);
+      if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+        ImGui::SetTooltip(
+            "When Team/IP is a team number, require matching the team-specific "
+            "robot address instead of using fixed robot addresses.");
       }
       break;
     case 2:
@@ -180,6 +201,13 @@ bool NetworkTablesSettings::Display() {
       break;
   }
   if (ImGui::Button("Apply")) {
+    m_reconnect = false;
+    m_restart = true;
+    return true;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Apply and Reconnect")) {
+    m_reconnect = true;
     m_restart = true;
     return true;
   }

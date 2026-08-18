@@ -4,18 +4,19 @@
 
 #include <string>
 
-#include "RoboRioDataInternal.h"
+#include "RoboRioDataInternal.hpp"
+#include "wpi/util/string.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeRoboRioData() {
   static RoboRioData srrd;
-  ::hal::SimRoboRioData = &srrd;
+  ::wpi::hal::SimRoboRioData = &srrd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-RoboRioData* hal::SimRoboRioData;
+RoboRioData* wpi::hal::SimRoboRioData;
 void RoboRioData::ResetData() {
   vInVoltage.Reset(12.0);
   userVoltage3V3.Reset(3.3);
@@ -23,6 +24,7 @@ void RoboRioData::ResetData() {
   userActive3V3.Reset(true);
   userFaults3V3.Reset(0);
   brownoutVoltage.Reset(6.75);
+  brownoutRecoveryVoltage.Reset(7.25);
   cpuTemp.Reset(45.0);
   teamNumber.Reset(0);
   m_serialNumber = "";
@@ -106,6 +108,7 @@ DEFINE_CAPI(double, UserCurrent3V3, userCurrent3V3)
 DEFINE_CAPI(HAL_Bool, UserActive3V3, userActive3V3)
 DEFINE_CAPI(int32_t, UserFaults3V3, userFaults3V3)
 DEFINE_CAPI(double, BrownoutVoltage, brownoutVoltage)
+DEFINE_CAPI(double, BrownoutRecoveryVoltage, brownoutRecoveryVoltage)
 DEFINE_CAPI(double, CPUTemp, cpuTemp)
 DEFINE_CAPI(int32_t, TeamNumber, teamNumber)
 
@@ -121,7 +124,7 @@ void HALSIM_GetRoboRioSerialNumber(struct WPI_String* serialNumber) {
   SimRoboRioData->GetSerialNumber(serialNumber);
 }
 void HALSIM_SetRoboRioSerialNumber(const struct WPI_String* serialNumber) {
-  SimRoboRioData->SetSerialNumber(wpi::to_string_view(serialNumber));
+  SimRoboRioData->SetSerialNumber(wpi::util::to_string_view(serialNumber));
 }
 
 int32_t HALSIM_RegisterRoboRioCommentsCallback(
@@ -136,7 +139,7 @@ void HALSIM_GetRoboRioComments(struct WPI_String* comments) {
   SimRoboRioData->GetComments(comments);
 }
 void HALSIM_SetRoboRioComments(const struct WPI_String* comments) {
-  SimRoboRioData->SetComments(wpi::to_string_view(comments));
+  SimRoboRioData->SetComments(wpi::util::to_string_view(comments));
 }
 
 void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
@@ -153,6 +156,7 @@ void HALSIM_RegisterRoboRioAllCallbacks(HAL_NotifyCallback callback,
   REGISTER(userActive3V3);
   REGISTER(userFaults3V3);
   REGISTER(brownoutVoltage);
+  REGISTER(brownoutRecoveryVoltage);
   REGISTER(cpuTemp);
 }
 }  // extern "C"

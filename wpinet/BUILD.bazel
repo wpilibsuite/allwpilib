@@ -5,8 +5,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_jni_project")
-load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpinet:robotpy_native_build_info.bzl", "define_native_wrapper")
@@ -20,6 +19,38 @@ filegroup(
         "src/main/native/thirdparty/tcpsockets/include/**/*",
     ]),
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "ada-headers",
+    hdrs = glob([
+        "src/main/native/thirdparty/ada/include/**/*.h",
+    ]),
+    includes = ["src/main/native/thirdparty/ada/src"],
+    strip_include_prefix = "src/main/native/thirdparty/ada/include",
+)
+
+cc_library(
+    name = "ada",
+    srcs = ["src/main/native/thirdparty/ada/src/ada.cpp"],
+    hdrs = glob([
+        "src/main/native/thirdparty/ada/src/**/*.cpp",
+    ]),
+    strip_include_prefix = "src/main/native/thirdparty/ada/src",
+    visibility = ["//wpinet:__subpackages__"],
+    deps = [":ada-headers"],
+)
+
+pkg_files(
+    name = "thirdparty-ada-hdr-pkg",
+    srcs = glob(["src/main/native/thirdparty/ada/include/**"]),
+    strip_prefix = "src/main/native/thirdparty/ada/include",
+)
+
+pkg_files(
+    name = "thirdparty-ada-src-pkg",
+    srcs = glob(["src/main/native/thirdparty/ada/src/**"]),
+    strip_prefix = "src/main/native/thirdparty/ada/src",
 )
 
 WIN_UV_SRCS = glob([
@@ -78,13 +109,13 @@ cc_library(
 filegroup(
     name = "libuv-srcs",
     srcs = select({
-               "@rules_bzlmodrio_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
+               "@wpilib_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
                "//conditions:default": [],
            }) +
            select({
                "@platforms//os:osx": MAC_UV_SRCS,
                "@platforms//os:windows": WIN_UV_SRCS,
-               "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
+               "@wpilib_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
            }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
     visibility = ["//wpinet:__subpackages__"],
 )
@@ -102,31 +133,30 @@ pkg_files(
 )
 
 third_party_cc_lib_helper(
+    name = "llhttp",
+    include_root = "src/main/native/thirdparty/llhttp/include",
+    src_root = "src/main/native/thirdparty/llhttp/src",
+)
+
+third_party_cc_lib_helper(
     name = "tcpsockets",
     include_root = "src/main/native/thirdparty/tcpsockets/include",
     src_root = "src/main/native/thirdparty/tcpsockets/cpp",
 )
 
-generate_resources(
-    name = "generate-resources",
-    namespace = "wpi",
-    prefix = "WPI",
-    resource_files = glob(["src/main/native/resources/*"]),
-)
-
 filegroup(
     name = "native-srcs",
-    srcs = ["generate-resources"] + select({
+    srcs = select({
         "@platforms//os:osx": glob(["src/main/native/macOS/*"]),
         "@platforms//os:windows": glob(["src/main/native/windows/*"]),
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
+        "@wpilib_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
     }),
 )
 
 cc_library(
     name = "private_includes",
     hdrs = glob([
-        "src/main/native/cpp/*.h",
+        "src/main/native/cpp/*.hpp",
     ]),
     strip_include_prefix = "src/main/native/cpp",
 )
@@ -140,7 +170,17 @@ wpilib_cc_library(
         ":libuv-srcs",
     ] + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
-    extra_hdr_pkg_files = [":thirdparty-libuv-hdr-pkg"],
+    copts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [
+            "-Wno-error=pedantic",
+            "-Wno-error=format",
+        ],
+    }),
+    extra_hdr_pkg_files = [
+        ":thirdparty-ada-hdr-pkg",
+        ":thirdparty-libuv-hdr-pkg",
+    ],
     extra_src_pkg_files = [
         ":wpinet-java-jni-hdrs-pkg",
     ],
@@ -155,10 +195,12 @@ wpilib_cc_library(
     }),
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [
+        ":llhttp",
         ":tcpsockets",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":ada",
         ":libuv-headers",
         ":private_includes",
         "//wpiutil",
@@ -191,7 +233,7 @@ wpilib_jni_cc_library(
     name = "wpinetjni",
     srcs = glob([
         "src/main/native/cpp/jni/**",
-        "src/main/native/cpp/**/*.h",
+        "src/main/native/cpp/**/*.hpp",
     ]),
     java_dep = ":wpinet-java",
     visibility = ["//visibility:public"],
@@ -216,8 +258,8 @@ wpilib_jni_java_library(
     name = "wpinet-java",
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "wpinet-java",
-    maven_group_id = "edu.wpi.first.wpinet",
-    native_libs = [":wpinetjni"],
+    maven_group_id = "org.wpilib.wpinet",
+    native_libs = [":shared/wpinetjni"],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil:wpiutil-java",
@@ -229,12 +271,12 @@ cc_test(
     size = "small",
     srcs = glob([
         "src/test/native/**/*.cpp",
-        "src/test/native/**/*.h",
+        "src/test/native/**/*.hpp",
     ]),
     tags = ["no-asan"],
     deps = [
         ":wpinet",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
         "//wpiutil:wpiutil-testlib",
     ],
 )
@@ -257,8 +299,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-java",
-    srcs = ["src/dev/java/edu/wpi/first/net/DevMain.java"],
-    main_class = "edu.wpi.first.net.DevMain",
+    srcs = ["src/dev/java/org/wpilib/net/DevMain.java"],
+    main_class = "org.wpilib.net.DevMain",
     deps = [
         ":wpinet-java",
         "//wpiutil:wpiutil-java",
@@ -269,7 +311,7 @@ cc_binary(
     name = "netconsoleServer",
     srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
     linkopts = select({
-        "@rules_bzlmodrio_toolchains//constraints/combined:is_linux": ["-lutil"],
+        "@wpilib_toolchains//constraints/combined:is_linux": ["-lutil"],
         "//conditions:default": [],
     }),
     deps = [
@@ -313,7 +355,9 @@ generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpinet-generator",
     pyproject_toml = "src/main/python/native-pyproject.toml",
     third_party_dirs = [
+        "ada",
         "libuv",
+        "llhttp",
         "tcpsockets",
     ],
 )
@@ -358,8 +402,8 @@ robotpy_py_test(
     ],
 )
 
-package_minimal_jni_project(
+package_default_jni_project(
     name = "wpinet",
     maven_artifact_name = "wpinet-cpp",
-    maven_group_id = "edu.wpi.first.wpinet",
+    maven_group_id = "org.wpilib.wpinet",
 )

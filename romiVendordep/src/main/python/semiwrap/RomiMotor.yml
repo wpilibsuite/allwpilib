@@ -1,4 +1,11 @@
 classes:
-  frc::RomiMotor:
+  wpi::romi::RomiMotor:
     methods:
       RomiMotor:
+      SetThrottle:
+      GetThrottle:
+      SetInverted:
+      GetInverted:
+      Disable:
+      StopMotor:
+      GetDescription:

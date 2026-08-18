@@ -81,6 +81,23 @@ static bool checkreturn buf_read(pb_istream_t *stream, pb_byte_t *buf, size_t co
     return true;
 }
 
+const pb_byte_t* pb_claim_rest_of_buffer(pb_istream_t *stream, size_t *size)
+{
+#ifndef PB_BUFFER_ONLY
+    if (stream->callback != buf_read) {
+        return NULL;
+    }
+#endif
+
+    const pb_byte_t *source = (const pb_byte_t*)stream->state;
+    if (size != NULL) {
+        *size = stream->bytes_left;
+    }
+    stream->state = (pb_byte_t*)stream->state + stream->bytes_left;
+    stream->bytes_left = 0;
+    return source;
+}
+
 bool checkreturn pb_read(pb_istream_t *stream, pb_byte_t *buf, size_t count)
 {
     if (count == 0)

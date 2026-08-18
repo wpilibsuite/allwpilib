@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/support/EnumSetting.h"
+#include "wpi/glass/support/EnumSetting.hpp"
 
 #include <string>
 
 #include <imgui.h>
 
-using namespace glass;
+using namespace wpi::glass;
 
 EnumSetting::EnumSetting(std::string& str, int defaultValue,
                          std::initializer_list<const char*> choices)

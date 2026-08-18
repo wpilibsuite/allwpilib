@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:packaging.bzl", "package_minimal_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
+load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
 cc_library(
     name = "headers",
@@ -13,8 +14,7 @@ wpilib_cc_library(
     srcs = glob(["src/main/native/cpp/**"]),
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -32,8 +32,7 @@ wpilib_cc_library(
     ],
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -73,7 +72,7 @@ wpilib_cc_static_library(
 
 cc_library(
     name = "test_headers",
-    srcs = glob(["src/test/native/include/*.h"]),
+    srcs = glob(["src/test/native/include/*.hpp"]),
     includes = ["src/test/native/include"],
     strip_include_prefix = "src/test/native/include",
 )
@@ -88,7 +87,7 @@ cc_test(
     deps = [
         ":halsim_ws_server",
         ":test_headers",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -100,8 +99,9 @@ cc_binary(
     ],
 )
 
-package_minimal_cc_project(
+package_default_cc_project(
     name = "halsim_ws_server",
+    architectures = host_architectures,
     maven_artifact_name = "halsim_ws_server",
-    maven_group_id = "edu.wpi.first.halsim",
+    maven_group_id = "org.wpilib.halsim",
 )

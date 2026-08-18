@@ -2,37 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/ADXL345_I2C.h>
-#include <frc/AnalogInput.h>
-#include <frc/I2C.h>
-#include <frc/TimedRobot.h>
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/accelerometer/ADXL345_I2C.hpp"
+#include "wpi/hardware/bus/I2C.hpp"
 
 /**
- * ADXL346, 362 Accelerometer snippets for frc-docs.
+ * ADXL346, 362 Accelerometer snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {}
 
   void TeleopPeriodic() override {
     // Gets the current acceleration in the X axis
-    m_accelerometer.GetX();
+    accelerometer.GetX();
     // Gets the current acceleration in the Y axis
-    m_accelerometer.GetY();
+    accelerometer.GetY();
     // Gets the current acceleration in the Z axis
-    m_accelerometer.GetZ();
+    accelerometer.GetZ();
   }
 
  private:
-  // Creates an ADXL345 accelerometer object on the MXP I2C port
-  // with a measurement range from -8 to 8 G's
-  frc::ADXL345_I2C m_accelerometer{frc::I2C::Port::kPort0,
-                                   frc::ADXL345_I2C::Range::kRange_8G};
+  // Creates an ADXL345 accelerometer object with a measurement range from -8 to
+  // 8 G's
+  wpi::ADXL345_I2C accelerometer{wpi::I2C::Port::PORT_0, 8};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

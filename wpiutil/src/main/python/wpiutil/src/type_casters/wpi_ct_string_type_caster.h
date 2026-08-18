@@ -3,14 +3,14 @@
 
 #include <pybind11/pybind11.h>
 
-#include <wpi/ct_string.h>
+#include "wpi/util/ct_string.hpp"
 
 namespace pybind11 {
 namespace detail {
 
 template <typename CharT, typename Traits, size_t N>
-struct type_caster<wpi::ct_string<CharT, Traits, N>> {
-    using str_type = wpi::ct_string<CharT, Traits, N>;
+struct type_caster<wpi::util::ct_string<CharT, Traits, N>> {
+    using str_type = wpi::util::ct_string<CharT, Traits, N>;
     PYBIND11_TYPE_CASTER(str_type, const_name(PYBIND11_STRING_NAME));
 
     // TODO
@@ -54,8 +54,8 @@ struct type_caster<wpi::ct_string<CharT, Traits, N>> {
 };
 
 // template <typename Char, typename Traits, size_t N>
-// struct type_caster<wpi::ct_string<Char, Traits, N>>
-//     : string_caster<wpi::ct_string<Char, Traits, N>, false> {};
+// struct type_caster<wpi::util::ct_string<Char, Traits, N>>
+//     : string_caster<wpi::util::ct_string<Char, Traits, N>, false> {};
 
 } // namespace detail
 } // namespace pybind11

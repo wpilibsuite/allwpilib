@@ -71,10 +71,10 @@ publish_all = rule(
 )
 
 host_architectures = {
-    "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
-    "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
-    "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
-    "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
+    "@allwpilib//shared/bazel:linux_x86_64": "linux-x86-64",
+    "@allwpilib//shared/bazel:osx": "osxuniversal",
+    "@allwpilib//shared/bazel:windows_arm64": "windows-arm64",
+    "@allwpilib//shared/bazel:windows_x86_64": "windows-x86-64",
 }
 
 # Unfortunately, rules_jvm_external really wants each of the classifier
@@ -87,11 +87,11 @@ def architectures_pkg_zip(
         **kwargs):
     if architectures == None:
         architectures = {
-            "@rules_bzlmodrio_toolchains//platforms/linux_x86_64": "linux-x86-64",
-            "@rules_bzlmodrio_toolchains//platforms/osx": "osxuniversal",
-            "@rules_bzlmodrio_toolchains//platforms/systemcore": "systemcore",
-            "@rules_bzlmodrio_toolchains//platforms/windows_arm64": "windows-arm64",
-            "@rules_bzlmodrio_toolchains//platforms/windows_x86_64": "windows-x86-64",
+            "@allwpilib//shared/bazel:linux_x86_64": "linux-x86-64",
+            "@allwpilib//shared/bazel:osx": "osxuniversal",
+            "@allwpilib//shared/bazel:systemcore": "systemcore",
+            "@allwpilib//shared/bazel:windows_arm64": "windows-arm64",
+            "@allwpilib//shared/bazel:windows_x86_64": "windows-x86-64",
         }
 
     architectures_target_compatible_with = {
@@ -122,12 +122,11 @@ def architectures_pkg_zip(
 
 def platform_prefix(t):
     return select({
-        "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:osx": "osx/universal/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
-        "@rules_bzlmodrio_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": "linux/roborio/" + t,
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
+        "@wpilib_toolchains//conditions:linux_x86_64": "linux/x86-64/" + t,
+        "@wpilib_toolchains//conditions:osx": "osx/universal/" + t,
+        "@wpilib_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
+        "@wpilib_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
     })
 
 def _wpilib_maven_export_impl(

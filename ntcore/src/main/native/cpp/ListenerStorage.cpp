@@ -2,29 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ListenerStorage.h"
+#include "ListenerStorage.hpp"
 
 #include <algorithm>
 #include <utility>
 #include <vector>
 
-#include <wpi/SmallVector.h>
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/util/SmallVector.hpp"
 
-#include "ntcore_c.h"
-
-using namespace nt;
+using namespace wpi::nt;
 
 void ListenerStorage::Thread::Main() {
   while (m_active) {
     WPI_Handle signaledBuf[3];
-    auto signaled = wpi::WaitForObjects(
+    auto signaled = wpi::util::WaitForObjects(
         {m_poller, m_stopEvent.GetHandle(), m_waitQueueWakeup.GetHandle()},
         signaledBuf);
     if (signaled.empty() || !m_active) {
       return;
     }
     // call all the way back out to the C++ API to ensure valid handle
-    auto events = nt::ReadListenerQueue(m_poller);
+    auto events = wpi::nt::ReadListenerQueue(m_poller);
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
@@ -62,11 +61,11 @@ void ListenerStorage::Activate(NT_Listener listenerHandle, unsigned int mask,
       m_valueListeners.Add(listener);
     }
     // detect the higher log bits too; see LoggerImpl
-    if ((deltaMask & NT_EVENT_LOGMESSAGE) != 0 ||
+    if ((deltaMask & NT_EVENT_LOG_MESSAGE) != 0 ||
         (deltaMask & 0x1ff0000) != 0) {
       m_logListeners.Add(listener);
     }
-    if ((deltaMask & NT_EVENT_TIMESYNC) != 0) {
+    if ((deltaMask & NT_EVENT_TIME_SYNC) != 0) {
       m_timeSyncListeners.Add(listener);
     }
   }
@@ -300,7 +299,7 @@ ListenerStorage::DestroyListenerPoller(NT_ListenerPoller pollerHandle) {
   std::scoped_lock lock{m_mutex};
   if (auto poller = m_pollers.Remove(pollerHandle)) {
     // ensure all listeners that use this poller are removed
-    wpi::SmallVector<NT_Listener, 16> toRemove;
+    wpi::util::SmallVector<NT_Listener, 16> toRemove;
     for (auto&& listener : m_listeners) {
       if (listener->poller == poller.get()) {
         toRemove.emplace_back(listener->handle);
@@ -342,19 +341,21 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
     }
   }
   bool timedOut;
-  wpi::WaitForObject(h, timeout, &timedOut);
+  wpi::util::WaitForObject(h, timeout, &timedOut);
   return !timedOut;
 }
 
 void ListenerStorage::Reset() {
-  std::scoped_lock lock{m_mutex};
-  m_pollers.clear();
-  m_listeners.clear();
-  m_connListeners.clear();
-  m_topicListeners.clear();
-  m_valueListeners.clear();
-  m_logListeners.clear();
-  m_timeSyncListeners.clear();
+  {
+    std::scoped_lock lock{m_mutex};
+    m_pollers.clear();
+    m_listeners.clear();
+    m_connListeners.clear();
+    m_topicListeners.clear();
+    m_valueListeners.clear();
+    m_logListeners.clear();
+    m_timeSyncListeners.clear();
+  }
   m_thread.Join();
 }
 
@@ -379,11 +380,11 @@ ListenerStorage::DoRemoveListeners(std::span<const NT_Listener> handles) {
       if ((listener->eventMask & NT_EVENT_VALUE_ALL) != 0) {
         m_valueListeners.Remove(listener.get());
       }
-      if ((listener->eventMask & NT_EVENT_LOGMESSAGE) != 0 ||
+      if ((listener->eventMask & NT_EVENT_LOG_MESSAGE) != 0 ||
           (listener->eventMask & 0x1ff0000) != 0) {
         m_logListeners.Remove(listener.get());
       }
-      if ((listener->eventMask & NT_EVENT_TIMESYNC) != 0) {
+      if ((listener->eventMask & NT_EVENT_TIME_SYNC) != 0) {
         m_timeSyncListeners.Remove(listener.get());
       }
     }

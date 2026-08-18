@@ -143,7 +143,7 @@ def copy_upstream_src(wpilib_root: Path):
         "COPYING.BSD",
         "COPYING.MINPACK",
         "COPYING.MPL2",
-        "WORKSPACE",
+        "MODULE.bazel",
     ]:
         shutil.copyfile(
             f,
@@ -154,7 +154,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "eigen"
     url = "https://gitlab.com/libeigen/eigen.git"
-    tag = "5.0.0"
+    tag = "5.0.1"
 
     eigen = Lib(name, url, tag, copy_upstream_src)
     eigen.main()

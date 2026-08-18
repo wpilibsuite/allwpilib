@@ -1,6 +1,6 @@
-import edu.wpi.first.deployutils.deploy.target.RemoteTarget
-import edu.wpi.first.deployutils.deploy.target.location.SshDeployLocation
-import edu.wpi.first.deployutils.deploy.artifact.*
+import org.wpilib.deployutils.deploy.target.RemoteTarget
+import org.wpilib.deployutils.deploy.target.location.SshDeployLocation
+import org.wpilib.deployutils.deploy.artifact.*
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -10,8 +10,8 @@ plugins {
     id 'visual-studio'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.DeployUtils'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.DeployUtils'
 
 apply from: "${rootDir}/shared/config.gradle"
 
@@ -29,10 +29,11 @@ ext {
     skipDev = true
 }
 
+apply from: "${rootDir}/shared/libmrclib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
-    mainClass = 'frc.robot.Main'
+    mainClass = 'wpilib.robot.Main'
 }
 
 apply plugin: 'com.gradleup.shadow'
@@ -44,6 +45,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':drivers')
     implementation project(':wpilibj')
     implementation project(':wpimath')
     implementation project(':hal')
@@ -52,11 +54,24 @@ dependencies {
     implementation project(':ntcore')
     implementation project(':cscore')
     implementation project(':cameraserver')
-    implementation project(':wpilibNewCommands')
+    implementation project(':commandsv2')
+    implementation project(':commandsv3')
     implementation project(':apriltag')
     implementation project(':wpiunits')
     implementation project(':epilogue-runtime')
     annotationProcessor project(':epilogue-processor')
+    annotationProcessor project(':javacPlugin')
+}
+
+tasks.withType(JavaExec).configureEach {
+    // Commands v3 needs reflective access to the continuation classes
+    jvmArgs += [
+        '--add-opens',
+        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        '--add-opens',
+        'java.base/java.lang=ALL-UNNAMED',
+        "--enable-native-access=ALL-UNNAMED",
+    ]
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
@@ -64,6 +79,7 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
 }
 
 def simProjects = ['halsim_gui']
+def projectJarTask = jar
 
 deploy {
     targets {
@@ -78,7 +94,7 @@ deploy {
                     ipv6 = false
                 }
                 usb(SshDeployLocation) {
-                    address = "172.28.0.1"
+                    address = "172.26.0.1"
                     user = 'systemcore'
                     password = 'systemcore'
                     ipv6 = false
@@ -93,17 +109,17 @@ deploy {
                 all {
                     postdeploy << { ctx ->
                         ctx.execute("sync")
-                        ctx.execute("sudo ldconfig /home/systemcore/frc/third-party/lib")
+                        ctx.execute("sudo ldconfig /home/systemcore/wpilib/third-party/lib")
                     }
                 }
 
                 developerRobotCpp(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/developerRobotCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCpp\"")
                         ctx.execute('chmod +x developerRobotCpp')
@@ -111,9 +127,9 @@ deploy {
                 }
 
                 developerRobotCppStatic(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/frc/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/developerRobotCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/developerRobotCppStatic\"")
                         ctx.execute('chmod +x developerRobotCppStatic')
@@ -121,16 +137,19 @@ deploy {
                 }
 
                 developerRobotCppJava(NativeExecutableArtifact) {
-                    libraryDirectory = '/home/systemcore/frc/third-party/lib'
+                    libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     def excludes = getLibraryFilter().getExcludes()
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                 }
 
-                developerRobotJava(JavaArtifact) {
-                    jarTask = shadowJar
+                developerRobotJava(JavaClasspathArtifact) {
+                    it.directory = "wpilib/allwpilibclasspath"
+                    it.deleteOldFiles = true
+                    it.setJar(projectJarTask)
+                    it.setConfiguration(configurations.runtimeClasspath)
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/frc/third-party/lib -jar /home/systemcore/developerRobot-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib --add-opens java.base/jdk.internal.vm=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -cp \"/home/systemcore/wpilib/allwpilibclasspath/*\" wpilib.robot.Main' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
@@ -198,7 +217,8 @@ model {
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'shared'
+                lib project: ':commandsv2', library: 'commandsv2', linkage: 'shared'
+                lib project: ':drivers', library: 'drivers', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -207,8 +227,9 @@ model {
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
-                project(':hal').addHalJniDependency(binary)
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
@@ -243,12 +264,14 @@ model {
                     }
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
-                lib project: ':wpilibNewCommands', library: 'wpilibNewCommands', linkage: 'static'
+                lib project: ':commandsv2', library: 'commandsv2', linkage: 'static'
+                lib project: ':drivers', library: 'drivers', linkage: 'static'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
-                project(':hal').addHalDependency(binary, 'static')
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
@@ -308,7 +331,7 @@ model {
             }
         }
 
-        installSystemCore(Task) {
+        installSystemcore(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCpp') {
                     dependsOn it.tasks.install
@@ -316,7 +339,7 @@ model {
             }
         }
 
-        installSystemCoreStatic(Task) {
+        installSystemcoreStatic(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore && it.component.name == 'developerRobotCppStatic') {
                     dependsOn it.tasks.install

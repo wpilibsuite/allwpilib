@@ -1,0 +1,8 @@
+classes:
+  wpi::OpMode:
+    methods:
+      DisabledPeriodic:
+      Start:
+      Periodic:
+      End:
+      GetCallbacks:

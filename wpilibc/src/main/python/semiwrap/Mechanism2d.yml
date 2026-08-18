@@ -1,10 +1,10 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::Mechanism2d:
+  wpi::Mechanism2d:
     ignored_bases:
-    - wpi::SendableHelper<Mechanism2d>
+    - wpi::util::SendableHelper<Mechanism2d>
     methods:
       Mechanism2d:
       GetRoot:

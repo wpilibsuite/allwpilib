@@ -23,7 +23,7 @@ def wpilib_objc_library(
     """
     copts = copts or []
     if is_cpp:
-        copts.append("-std=c++20")
+        copts.append("-std=c++23")
     if include_arc:
         copts += ["-fobjc-weak", "-fobjc-arc"]
 

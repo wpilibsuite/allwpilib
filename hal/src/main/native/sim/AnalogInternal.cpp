@@ -2,21 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "AnalogInternal.h"
+#include "AnalogInternal.hpp"
 
-#include "PortsInternal.h"
-#include "hal/handles/IndexedHandleResource.h"
+#include "PortsInternal.hpp"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
-namespace hal {
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>* analogInputHandles;
-}  // namespace hal
+namespace wpi::hal {
+IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
+                      kNumAnalogInputs, HAL_HandleEnum::ANALOG_INPUT>*
+    analogInputHandles;
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeAnalogInternal() {
-  static IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+  static IndexedHandleResource<HAL_AnalogInputHandle, wpi::hal::AnalogPort,
+                               kNumAnalogInputs, HAL_HandleEnum::ANALOG_INPUT>
       aiH;
   analogInputHandles = &aiH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init

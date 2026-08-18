@@ -1,6 +1,7 @@
 extra_includes:
 - sim_value_cb.h
 - pybind11/functional.h
+- wpi/hal/SimDevice.hpp
 
 strip_prefixes:
 - HALSIM_
@@ -26,7 +27,7 @@ functions:
       param:
         ignore: true
     cpp_code: |
-      [](hal::SimDevice &simdevice, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+      [](wpi::hal::SimDevice &simdevice, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
         auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimDeviceCreatedCallback);
         auto uid = HALSIM_RegisterSimValueCreatedCallback(simdevice, cb.get(),
           [](const char* name, void* param,
@@ -47,7 +48,7 @@ functions:
       param:
         ignore: true
     cpp_code: |
-      [](hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+      [](wpi::hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
         auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimValueChangedCallback);
         auto uid = HALSIM_RegisterSimValueChangedCallback(simvalue, cb.get(),
           [](const char* name, void* param,
@@ -68,7 +69,7 @@ functions:
       param:
         ignore: true
     cpp_code: |
-      [](hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
+      [](wpi::hal::SimValue &simvalue, std::function<void(const char *, HAL_SimValueHandle, HAL_SimValueDirection, HAL_Value)> fn, bool initialNotify) -> std::unique_ptr<SimValueCB> {
         auto cb = std::make_unique<SimValueCB>(fn, HALSIM_CancelSimValueResetCallback);
         auto uid = HALSIM_RegisterSimValueChangedCallback(simvalue, cb.get(),
           [](const char* name, void* param,

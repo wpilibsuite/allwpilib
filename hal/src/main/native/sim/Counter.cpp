@@ -2,50 +2,58 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Counter.h"
+#include "wpi/hal/Counter.h"
 
-#include "CounterInternal.h"
-#include "HALInitializer.h"
-#include "PortsInternal.h"
-#include "hal/handles/HandlesInternal.h"
-#include "hal/handles/LimitedHandleResource.h"
+#include "CounterInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/HandlesInternal.hpp"
+#include "wpi/hal/handles/LimitedHandleResource.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                      HAL_HandleEnum::Counter>* counterHandles;
-}  // namespace hal
+                      HAL_HandleEnum::COUNTER>* counterHandles;
+}  // namespace wpi::hal
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCounter() {
   static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                               HAL_HandleEnum::Counter>
+                               HAL_HandleEnum::COUNTER>
       cH;
   counterHandles = &cH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
   return 0;
 }
 void HAL_FreeCounter(HAL_CounterHandle counterHandle) {}
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status) {}
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status) {
+  if (windowMilliseconds < 5 || windowMilliseconds > 255) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  *status = 0;
+}
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status) {}
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0;
 }
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status) {
   return 0.0;
 }
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status) {}
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status) {
-  return false;
+  return HAL_GetCounterRate(counterHandle, status) == 0.0;
 }
 }  // extern "C"

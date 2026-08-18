@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/simulation/REVPHData.h"
+#include "wpi/hal/simulation/REVPHData.h"
 
-#include "hal/simulation/SimDataValue.h"
+#include "wpi/hal/simulation/SimDataValue.hpp"
 
 extern "C" {
 void HALSIM_ResetREVPHData(int32_t index) {}
@@ -16,7 +16,7 @@ HAL_SIMDATAVALUE_STUB_CAPI_CHANNEL(HAL_Bool, HALSIM, REVPHSolenoidOutput, false)
 DEFINE_CAPI(HAL_Bool, Initialized, false)
 DEFINE_CAPI(HAL_Bool, CompressorOn, false)
 DEFINE_CAPI(HAL_REVPHCompressorConfigType, CompressorConfigType,
-            HAL_REVPHCompressorConfigType_kDisabled)
+            HAL_REVPH_COMPRESSOR_CONFIG_DISABLED)
 DEFINE_CAPI(HAL_Bool, PressureSwitch, false)
 DEFINE_CAPI(double, CompressorCurrent, 0)
 

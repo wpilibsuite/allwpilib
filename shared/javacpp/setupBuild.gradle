@@ -1,7 +1,7 @@
 apply plugin: 'cpp'
 apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
@@ -9,20 +9,15 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
+def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
 
-staticGtestConfigs["${nativeName}Test"] = []
-
-apply from: "${rootDir}/shared/googletest.gradle"
 apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
@@ -104,7 +99,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c

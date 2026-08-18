@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_DIO.h"
+#include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/DIOData.h>
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/DIOData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                         \
   HALSIM_RegisterDIO##halsim##Callback(                                  \
       m_channel,                                                         \
       [](const char* name, void* param, const struct HAL_Value* value) { \
         static_cast<HALSimWSProviderDIO*>(param)->ProcessHalCallback(    \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});    \
+            wpi::util::json::object(                                     \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));   \
       },                                                                 \
       this, true)
 
@@ -50,10 +51,9 @@ void HALSimWSProviderDIO::DoCancelCallbacks() {
   m_inputCbKey = 0;
 }
 
-void HALSimWSProviderDIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
-  if ((it = json.find("<>value")) != json.end()) {
-    HALSIM_SetDIOValue(m_channel, static_cast<bool>(it.value()));
+void HALSimWSProviderDIO::OnNetValueChanged(const wpi::util::json& json) {
+  if (auto val = json.lookup("<>value"); val && val->is_bool()) {
+    HALSIM_SetDIOValue(m_channel, val->get_bool());
   }
 }
 

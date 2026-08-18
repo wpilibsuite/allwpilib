@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/datalog/DataLogReaderThread.h"
+#include "wpi/datalog/DataLogReaderThread.hpp"
 
 #include <string>
 #include <utility>
 
-#include <wpi/StringExtras.h>
-#include <wpi/print.h>
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
 
 using namespace wpi::log;
 
@@ -17,10 +17,16 @@ DataLogReaderThread::~DataLogReaderThread() {
     m_active = false;
     m_thread.join();
   }
+  if (m_protoPool) {
+    upb_DefPool_Free(m_protoPool);
+  }
+  if (m_arena) {
+    upb_Arena_Free(m_arena);
+  }
 }
 
 void DataLogReaderThread::ReadMain() {
-  wpi::SmallDenseMap<
+  wpi::util::SmallDenseMap<
       int, std::pair<DataLogReaderEntry*, std::span<const uint8_t>>, 8>
       schemaEntries;
 
@@ -34,24 +40,26 @@ void DataLogReaderThread::ReadMain() {
     if (record.IsStart()) {
       DataLogReaderEntry data;
       if (record.GetStartData(&data)) {
-        std::scoped_lock lock{m_mutex};
-        auto& entryPtr = m_entriesById[data.entry];
-        if (entryPtr) {
-          wpi::print("...DUPLICATE entry ID, overriding\n");
-        }
-        auto [it, isNew] = m_entriesByName.emplace(data.name, data);
-        if (isNew) {
-          it->second.ranges.emplace_back(recordIt, recordEnd);
-        }
-        entryPtr = &it->second;
-        if (data.type == "structschema" ||
-            data.type == "proto:FileDescriptorProto") {
-          schemaEntries.try_emplace(data.entry, entryPtr,
-                                    std::span<const uint8_t>{});
+        {
+          std::scoped_lock lock{m_mutex};
+          auto& entryPtr = m_entriesById[data.entry];
+          if (entryPtr) {
+            wpi::util::print("...DUPLICATE entry ID, overriding\n");
+          }
+          auto [it, isNew] = m_entriesByName.emplace(data.name, data);
+          if (isNew) {
+            it->second.ranges.emplace_back(recordIt, recordEnd);
+          }
+          entryPtr = &it->second;
+          if (data.type == "structschema" ||
+              data.type == "proto:FileDescriptorProto") {
+            schemaEntries.try_emplace(data.entry, entryPtr,
+                                      std::span<const uint8_t>{});
+          }
         }
         sigEntryAdded(data);
       } else {
-        wpi::print("Start(INVALID)\n");
+        wpi::util::print("Start(INVALID)\n");
       }
     } else if (record.IsFinish()) {
       int entry;
@@ -59,13 +67,13 @@ void DataLogReaderThread::ReadMain() {
         std::scoped_lock lock{m_mutex};
         auto it = m_entriesById.find(entry);
         if (it == m_entriesById.end()) {
-          wpi::print("...ID not found\n");
+          wpi::util::print("...ID not found\n");
         } else {
           it->second->ranges.back().m_end = recordIt;
           m_entriesById.erase(it);
         }
       } else {
-        wpi::print("Finish(INVALID)\n");
+        wpi::util::print("Finish(INVALID)\n");
       }
     } else if (record.IsSetMetadata()) {
       wpi::log::MetadataRecordData data;
@@ -73,15 +81,15 @@ void DataLogReaderThread::ReadMain() {
         std::scoped_lock lock{m_mutex};
         auto it = m_entriesById.find(data.entry);
         if (it == m_entriesById.end()) {
-          wpi::print("...ID not found\n");
+          wpi::util::print("...ID not found\n");
         } else {
           it->second->metadata = data.metadata;
         }
       } else {
-        wpi::print("SetMetadata(INVALID)\n");
+        wpi::util::print("SetMetadata(INVALID)\n");
       }
     } else if (record.IsControl()) {
-      wpi::print("Unrecognized control record\n");
+      wpi::util::print("Unrecognized control record\n");
     } else {
       auto it = schemaEntries.find(record.GetEntry());
       if (it != schemaEntries.end()) {
@@ -97,30 +105,38 @@ void DataLogReaderThread::ReadMain() {
     if (data.empty()) {
       continue;
     }
-    if (auto strippedName = wpi::remove_prefix(name, "NT:")) {
+    if (auto strippedName = wpi::util::remove_prefix(name, "NT:")) {
       name = *strippedName;
     }
-    if (auto typeStr = wpi::remove_prefix(name, "/.schema/struct:")) {
+    if (auto typeStr = wpi::util::remove_prefix(name, "/.schema/struct:")) {
       std::string_view schema{reinterpret_cast<const char*>(data.data()),
                               data.size()};
       std::string err;
       auto desc = m_structDb.Add(*typeStr, schema, &err);
       if (!desc) {
-        wpi::print("could not decode struct '{}' schema '{}': {}\n", name,
-                   schema, err);
+        wpi::util::print("could not decode struct '{}' schema '{}': {}\n", name,
+                         schema, err);
       }
-    } else if (auto filename = wpi::remove_prefix(name, "/.schema/proto:")) {
+    } else if (auto filename =
+                   wpi::util::remove_prefix(name, "/.schema/proto:")) {
       // protobuf descriptor handling
+      if (!m_protoPool || !m_arena) {
+        wpi::util::print("could not allocate protobuf schema resources\n");
+        continue;
+      }
+      auto* descriptor = google_protobuf_FileDescriptorProto_parse(
+          reinterpret_cast<const char*>(data.data()), data.size(), m_arena);
+      if (!descriptor) {
+        wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
+                         *filename);
+        continue;
+      }
       upb_Status status;
-      status.ok = true;
-      upb_DefPool_AddFile(
-          m_protoPool,
-          google_protobuf_FileDescriptorProto_parse(
-              reinterpret_cast<const char*>(data.data()), data.size(), m_arena),
-          &status);
-      if (!status.ok) {
-        wpi::print("could not decode protobuf '{}' filename '{}'\n", name,
-                   *filename);
+      upb_Status_Clear(&status);
+      upb_DefPool_AddFile(m_protoPool, descriptor, &status);
+      if (!upb_Status_IsOk(&status)) {
+        wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
+                         *filename);
       }
     }
   }

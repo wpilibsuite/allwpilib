@@ -31,13 +31,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/util/Signal.h"
+// clang-format on
 
 #include <type_traits>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-using namespace wpi::sig::trait;
+using namespace wpi::util::sig::trait;
 
 namespace {
 
@@ -114,9 +120,9 @@ static_assert(is_callable_v<t, o8>, "");
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
-TEST(SignalTest, FunctionTraits) {
+TEST_CASE("SignalTest FunctionTraits", "[wpiutil][sigslot]") {
   auto l1 = [](int, char, float) {};
   auto l2 = [&](int, char, float) mutable {};
   auto l3 = [&](auto...) mutable {};
@@ -129,4 +135,4 @@ TEST(SignalTest, FunctionTraits) {
   f2(0, '0', 0.0);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

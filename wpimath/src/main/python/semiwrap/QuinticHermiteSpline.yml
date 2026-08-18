@@ -1,0 +1,15 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::QuinticHermiteSpline:
+    force_no_trampoline: true
+    methods:
+      QuinticHermiteSpline:
+      Coefficients:
+        ignore: true
+      GetInitialControlVector:
+      GetFinalControlVector:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::QuinticHermiteSpline>(cls_QuinticHermiteSpline);

@@ -1,8 +1,6 @@
 classes:
-  frc::XRPServo:
+  wpi::xrp::XRPServo:
     methods:
       XRPServo:
       SetAngle:
       GetAngle:
-      SetPosition:
-      GetPosition:

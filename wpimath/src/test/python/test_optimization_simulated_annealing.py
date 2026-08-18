@@ -5,7 +5,7 @@
 import math
 import random
 
-from wpimath.optimization import SimulatedAnnealing
+from wpimath import SimulatedAnnealing
 
 
 def clamp(v, minval, maxval):

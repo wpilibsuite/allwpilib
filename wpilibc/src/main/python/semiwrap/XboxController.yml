@@ -1,36 +1,47 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
-- frc/DriverStation.h
-- frc/event/BooleanEvent.h
+- wpi/util/sendable/SendableBuilder.hpp
+- wpi/driverstation/internal/DriverStationBackend.hpp
+- wpi/event/BooleanEvent.hpp
 
 classes:
-  frc::XboxController:
+  wpi::XboxController:
+    force_no_trampoline: true
     ignored_bases:
-    - wpi::SendableHelper<XboxController>
+    - wpi::util::SendableHelper<XboxController>
+    enums:
+      Button:
+      Axis:
+    attributes:
+      TOUCHPAD_COUNT:
+      SUPPORTS_RUMBLE:
+      SUPPORTS_TRIGGER_RUMBLE:
+      SUPPORTS_MONO_LED:
+      SUPPORTS_RGB_LED:
+      SUPPORTED_OUTPUTS:
     methods:
       XboxController:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+      GetPort:
+      IsConnected:
       GetLeftX:
-      GetRightX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
+      GetRightX:
+      SetRightXDeadband:
       GetRightY:
-      GetLeftTriggerAxis:
-      GetRightTriggerAxis:
-      GetLeftBumper:
-      GetRightBumper:
-      GetLeftBumperPressed:
-      GetRightBumperPressed:
-      GetLeftBumperReleased:
-      GetRightBumperReleased:
-      LeftBumper:
-      RightBumper:
-      GetLeftStickButton:
-      GetRightStickButton:
-      GetLeftStickButtonPressed:
-      GetRightStickButtonPressed:
-      GetLeftStickButtonReleased:
-      GetRightStickButtonReleased:
-      LeftStick:
-      RightStick:
+      SetRightYDeadband:
+      GetAxis:
+      AxisLessThan:
+      AxisGreaterThan:
       GetAButton:
       GetAButtonPressed:
       GetAButtonReleased:
@@ -47,46 +58,59 @@ classes:
       GetYButtonPressed:
       GetYButtonReleased:
       Y:
-      GetBackButton:
-      GetBackButtonPressed:
-      GetBackButtonReleased:
-      Back:
-      GetStartButton:
-      GetStartButtonPressed:
-      GetStartButtonReleased:
-      Start:
-      LeftTrigger:
-        overloads:
-          double, EventLoop* [const]:
-          EventLoop* [const]:
-      RightTrigger:
-        overloads:
-          double, EventLoop* [const]:
-          EventLoop* [const]:
+      GetViewButton:
+      GetViewButtonPressed:
+      GetViewButtonReleased:
+      View:
+      GetXboxButton:
+      GetXboxButtonPressed:
+      GetXboxButtonReleased:
+      Xbox:
+      GetMenuButton:
+      GetMenuButtonPressed:
+      GetMenuButtonReleased:
+      Menu:
+      GetLeftStickButton:
+      GetLeftStickButtonPressed:
+      GetLeftStickButtonReleased:
+      LeftStick:
+      GetRightStickButton:
+      GetRightStickButtonPressed:
+      GetRightStickButtonReleased:
+      RightStick:
       GetLeftBumperButton:
       GetLeftBumperButtonPressed:
       GetLeftBumperButtonReleased:
+      LeftBumper:
       GetRightBumperButton:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
+      RightBumper:
+      GetDpadUpButton:
+      GetDpadUpButtonPressed:
+      GetDpadUpButtonReleased:
+      DpadUp:
+      GetDpadDownButton:
+      GetDpadDownButtonPressed:
+      GetDpadDownButtonReleased:
+      DpadDown:
+      GetDpadLeftButton:
+      GetDpadLeftButtonPressed:
+      GetDpadLeftButtonReleased:
+      DpadLeft:
+      GetDpadRightButton:
+      GetDpadRightButtonPressed:
+      GetDpadRightButtonReleased:
+      DpadRight:
+      GetButton:
+      GetButtonPressed:
+      GetButtonReleased:
+      ButtonEvent:
+        rename: button
+      SetLeds:
+      SetRumble:
       InitSendable:
-  frc::XboxController::Button:
-    attributes:
-      kLeftBumper:
-      kRightBumper:
-      kLeftStick:
-      kRightStick:
-      kA:
-      kB:
-      kX:
-      kY:
-      kBack:
-      kStart:
-  frc::XboxController::Axis:
-    attributes:
-      kLeftX:
-      kRightX:
-      kLeftY:
-      kRightY:
-      kLeftTrigger:
-      kRightTrigger:
+      GetLeftTrigger:
+      SetLeftTriggerDeadband:
+      GetRightTrigger:
+      SetRightTriggerDeadband:

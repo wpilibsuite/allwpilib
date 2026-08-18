@@ -143,7 +143,15 @@ namespace Catch {
     }
 
     void defaultListListeners( std::ostream& out,
-                               std::vector<ListenerDescription> const& descriptions ) {
+                               std::vector<ListenerDescription> const& descriptions,
+                               Verbosity verbosity ) {
+        if ( verbosity == Verbosity::Quiet ) {
+            for ( auto const& desc : descriptions ) {
+                out << desc.name << '\n';
+            }
+            return;
+        }
+
         out << "Registered listeners:\n";
 
         if(descriptions.empty()) {
@@ -176,7 +184,14 @@ namespace Catch {
 
     void defaultListTags( std::ostream& out,
                           std::vector<TagInfo> const& tags,
-                          bool isFiltered ) {
+                          bool isFiltered,
+                          Verbosity verbosity ) {
+        if (verbosity == Verbosity::Quiet) {
+            for (auto const& tagCount : tags) {
+                out << tagCount.all() << '\n';
+            }
+            return;
+        }
         if ( isFiltered ) {
             out << "Tags for matching test cases:\n";
         } else {
@@ -184,7 +199,7 @@ namespace Catch {
         }
 
         // minimum whitespace to pad tag counts, possibly overwritten below
-        size_t maxTagCountLen = 2;
+        int maxTagCountLen = 2;
 
         // determine necessary padding for tag count column
         if ( ! tags.empty() ) {
@@ -195,11 +210,11 @@ namespace Catch {
                                       return lhs.count < rhs.count;
                                   } )
                     ->count;
-            
+
             // more padding necessary for 3+ digits
             if (maxTagCount >= 100) {
                 auto numDigits = 1 + std::floor( std::log10( maxTagCount ) );
-                maxTagCountLen = static_cast<size_t>( numDigits );
+                maxTagCountLen = static_cast<int>( numDigits );
             }
         }
 

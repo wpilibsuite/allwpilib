@@ -1,9 +1,9 @@
 classes:
-  frc::XRPMotor:
+  wpi::xrp::XRPMotor:
     methods:
       XRPMotor:
-      Set:
-      Get:
+      SetThrottle:
+      GetThrottle:
       SetInverted:
       GetInverted:
       Disable:

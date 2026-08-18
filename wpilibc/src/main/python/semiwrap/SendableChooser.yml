@@ -2,7 +2,7 @@ extra_includes:
 - gilsafe_object.h
 
 classes:
-  frc::SendableChooser:
+  wpi::SendableChooser:
     template_params:
     - T
     methods:
@@ -12,7 +12,7 @@ classes:
       GetSelected:
         # weirdness because return type
         cpp_code: |
-          [](frc::SendableChooser<T> * __that) -> py::object {
+          [](wpi::SendableChooser<T> * __that) -> py::object {
             auto v = __that->GetSelected();
             if (!v) {
               return py::none();
@@ -22,7 +22,7 @@ classes:
       OnChange:
         # more weirdness
         cpp_code: |
-          [](frc::SendableChooser<T> *self, std::function<void(T)> fn) {
+          [](wpi::SendableChooser<T> *self, std::function<void(T)> fn) {
             self->OnChange([fn](T v) {
               py::gil_scoped_acquire lock;
               if (v) {
@@ -37,6 +37,6 @@ classes:
 
 templates:
   SendableChooser:
-    qualname: frc::SendableChooser
+    qualname: wpi::SendableChooser
     params:
     - semiwrap::gilsafe_object

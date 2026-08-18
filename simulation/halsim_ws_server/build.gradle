@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -11,13 +11,7 @@ ext {
 
 apply plugin: 'google-test-test-suite'
 
-
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${pluginName}Test"] = []
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
 
@@ -49,14 +43,17 @@ model {
                 return
             }
 
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
         }
 
         withType(GoogleTestTestSuiteBinarySpec) {
-            project(':hal').addHalDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib library: pluginName, linkage: 'shared'
         }

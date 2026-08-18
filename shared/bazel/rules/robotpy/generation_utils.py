@@ -11,11 +11,23 @@ def fixup_root_package_name(name):
         return "romiVendordep"
     if name == "pyntcore":
         return "ntcore"
+    if name == "halsim-ws":
+        return "simulation/halsim_ws_core"
+    if name == "halsim_gui":
+        return "simulation/halsim_gui"
+    if name == "wpimath_test":
+        return "wpimath"
+    if name == "robotpy_apriltag":
+        return "apriltag"
+    if name == "wpilib_drivers":
+        return "drivers"
+    if name == "robotpy_fields":
+        return "fields"
     return name
 
 
 def fixup_native_lib_name(name):
-    return name
+    return name.replace("_", "-")
 
 
 def fixup_shared_lib_name(name):

@@ -2,55 +2,41 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Power.h"
+#include "wpi/hal/Power.h"
 
-#include <memory>
+#include <cmath>
 
-#include <networktables/DoubleTopic.h>
+#include "HALInitializer.hpp"
+#include "SystemServerInternal.hpp"
+#include "mrclib/Systemcore.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/nt/DoubleTopic.hpp"
 
-#include "HALInitializer.h"
-#include "SystemServerInternal.h"
-#include "hal/Errors.h"
-#include "mrc/NtNetComm.h"
+using namespace wpi::hal;
 
-using namespace hal;
-
-namespace hal {
+namespace wpi::hal {
 
 static void initializePower(int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 }
 
-}  // namespace hal
+}  // namespace wpi::hal
 
-namespace {
-struct SystemServerPower {
-  nt::NetworkTableInstance ntInst;
-
-  nt::DoubleSubscriber batterySubscriber;
-
-  explicit SystemServerPower(nt::NetworkTableInstance inst) {
-    ntInst = inst;
-
-    batterySubscriber =
-        ntInst.GetDoubleTopic(ROBOT_BATTERY_VOLTAGE_PATH).Subscribe(0.0);
-  }
-};
-}  // namespace
-
-static ::SystemServerPower* systemServerPower;
-
-namespace hal::init {
-void InitializePower() {
-  systemServerPower = new ::SystemServerPower{hal::GetSystemServer()};
-}
-}  // namespace hal::init
+namespace wpi::hal::init {
+void InitializePower() {}
+}  // namespace wpi::hal::init
 
 extern "C" {
 
 double HAL_GetVinVoltage(int32_t* status) {
-  initializePower(status);
-  return systemServerPower->batterySubscriber.Get();
+  float voltage = 0;
+  MRC_Status mrcStatus = MRC_Systemcore_GetBatteryVoltage(&voltage);
+  if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+    return 0;
+  }
+  *status = HAL_SUCCESS;
+  return voltage;
 }
 
 double HAL_GetUserVoltage3V3(int32_t* status) {
@@ -90,16 +76,43 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
   return;
 }
 
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
+  constexpr double kMillivoltsPerVolt = 1000.0;
+  constexpr double kBrownoutVoltageMin =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV / kMillivoltsPerVolt;
+  constexpr double kBrownoutVoltageMax =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV / kMillivoltsPerVolt;
+  constexpr double kRecoveryVoltageMax =
+      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV / kMillivoltsPerVolt;
+  if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
+      brownoutVoltage < kBrownoutVoltageMin ||
+      brownoutVoltage > kBrownoutVoltageMax ||
+      recoveryVoltage < kBrownoutVoltageMin ||
+      recoveryVoltage > kRecoveryVoltageMax) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
-double HAL_GetBrownoutVoltage(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto brownoutMillivolts = std::lround(brownoutVoltage * kMillivoltsPerVolt);
+  auto recoveryMillivolts = std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  if (recoveryMillivolts <
+      brownoutMillivolts +
+          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  MRC_Status mrcStatus = MRC_Systemcore_SetBrownoutVoltages(brownoutMillivolts,
+                                                            recoveryMillivolts);
+  if (mrcStatus == MRC_STATUS_PARAMETER_OUT_OF_RANGE) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+  } else if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+  } else {
+    *status = HAL_SUCCESS;
+  }
 }
 
 double HAL_GetCPUTemp(int32_t* status) {

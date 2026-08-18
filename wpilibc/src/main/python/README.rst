@@ -1,7 +1,7 @@
 RobotPy WPILib
 ==============
 
-Python version of WPILib - the standard library used for programming FRC
+Python version of WPILib - the standard library used for programming FIRST
 robots.
 
 Installation

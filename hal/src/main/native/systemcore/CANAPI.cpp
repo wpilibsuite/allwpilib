@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CANAPI.h"
+#include "wpi/hal/CANAPI.h"
 
 #include <ctime>
 #include <memory>
 
-#include <wpi/DenseMap.h>
-#include <wpi/mutex.h>
-#include <wpi/timestamp.h>
+#include "CANInternal.hpp"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "wpi/hal/CAN.h"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
+#include "wpi/util/DenseMap.hpp"
+#include "wpi/util/mutex.hpp"
+#include "wpi/util/timestamp.hpp"
 
-#include "HALInitializer.h"
-#include "PortsInternal.h"
-#include "hal/CAN.h"
-#include "hal/Errors.h"
-#include "hal/handles/UnlimitedHandleResource.h"
-
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct CANStorage {
@@ -25,23 +25,23 @@ struct CANStorage {
   HAL_CANDeviceType deviceType;
   int32_t busId;
   uint8_t deviceId;
-  wpi::mutex periodicSendsMutex;
-  wpi::SmallDenseMap<int32_t, int32_t> periodicSends;
-  wpi::mutex receivesMutex;
-  wpi::SmallDenseMap<int32_t, HAL_CANReceiveMessage> receives;
+  wpi::util::mutex periodicSendsMutex;
+  wpi::util::SmallDenseMap<int32_t, int32_t> periodicSends;
+  wpi::util::mutex receivesMutex;
+  wpi::util::SmallDenseMap<int32_t, HAL_CANReceiveMessage> receives;
 };
 }  // namespace
 
 static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>*
     canHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCANAPI() {
   static UnlimitedHandleResource<HAL_CANHandle, CANStorage, HAL_HandleEnum::CAN>
       cH;
   canHandles = &cH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   int32_t createdId = 0;
@@ -52,25 +52,56 @@ static int32_t CreateCANId(CANStorage* storage, int32_t apiId) {
   return createdId;
 }
 
+namespace {
+void WriteCANPacketRepeatingImpl(HAL_CANHandle handle, int32_t apiId,
+                                 const HAL_CANMessage* message,
+                                 int32_t repeatMs,
+                                 CANPeriodicSendCallback callback, void* param,
+                                 int32_t* status) {
+  auto can = canHandles->Get(handle);
+  if (!can) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  auto id = CreateCANId(can.get(), apiId);
+
+  std::scoped_lock lock(can->periodicSendsMutex);
+  SendCANMessageWithPeriodicCallback(can->busId, id, message, repeatMs,
+                                     callback, param, status);
+  can->periodicSends[apiId] = repeatMs;
+}
+}  // namespace
+
+namespace wpi::hal {
+void WriteCANPacketRepeatingWithCallback(HAL_CANHandle handle, int32_t apiId,
+                                         const HAL_CANMessage* message,
+                                         int32_t repeatMs,
+                                         CANPeriodicSendCallback callback,
+                                         void* param, int32_t* status) {
+  WriteCANPacketRepeatingImpl(handle, apiId, message, repeatMs, callback, param,
+                              status);
+}
+}  // namespace wpi::hal
+
 extern "C" {
 
 HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
                                 int32_t deviceId, HAL_CANDeviceType deviceType,
                                 int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
-  if (busId < 0 || busId > hal::kNumCanBuses) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_kInvalidHandle;
+  if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
   }
 
   auto can = std::make_shared<CANStorage>();
 
   auto handle = canHandles->Allocate(can);
 
-  if (handle == HAL_kInvalidHandle) {
-    *status = NO_AVAILABLE_RESOURCES;
-    return HAL_kInvalidHandle;
+  if (handle == HAL_INVALID_HANDLE) {
+    *status = HAL_NO_AVAILABLE_RESOURCES;
+    return HAL_INVALID_HANDLE;
   }
 
   can->busId = busId;
@@ -118,16 +149,8 @@ void HAL_WriteCANPacket(HAL_CANHandle handle, int32_t apiId,
 void HAL_WriteCANPacketRepeating(HAL_CANHandle handle, int32_t apiId,
                                  const struct HAL_CANMessage* message,
                                  int32_t repeatMs, int32_t* status) {
-  auto can = canHandles->Get(handle);
-  if (!can) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  auto id = CreateCANId(can.get(), apiId);
-
-  std::scoped_lock lock(can->periodicSendsMutex);
-  HAL_CAN_SendMessage(can->busId, id, message, repeatMs, status);
-  can->periodicSends[apiId] = repeatMs;
+  WriteCANPacketRepeatingImpl(handle, apiId, message, repeatMs, nullptr,
+                              nullptr, status);
 }
 
 void HAL_WriteCANRTRFrame(HAL_CANHandle handle, int32_t apiId,
@@ -232,7 +255,7 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = wpi::Now();
+      uint64_t now = wpi::util::Now();
       if (now - i->second.timeStamp >
           (static_cast<uint64_t>(timeoutMs) * 1000)) {
         // Timeout, return bad status

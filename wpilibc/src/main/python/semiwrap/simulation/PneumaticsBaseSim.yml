@@ -1,7 +1,7 @@
 classes:
-  frc::sim::PneumaticsBaseSim:
+  wpi::sim::PneumaticsBaseSim:
     typealias:
-    - frc::PneumaticsBase
+    - wpi::PneumaticsBase
     attributes:
       m_index:
     force_type_casters:

@@ -4,14 +4,17 @@
 # Warning level
 common:windows --repo_env="BAZEL_COPTS=/W3:/WX"
 
+# /d2prunedbinfo removes unused debug info from PDBs, which saves space in wpimath PDBs
+# See https://devblogs.microsoft.com/cppblog/linker-throughput-improvement-in-visual-studio-2019/#debug-info-pruning
+# and https://github.com/wpilibsuite/allwpilib/pull/9195
 # C++ options
-common:windows --repo_env="BAZEL_CXXOPTS=/EHsc:/FS:/Zc%:inline:/wd4244:/wd4267:/wd4146:/wd4996:/Zc%:throwingNew:/D_CRT_SECURE_NO_WARNINGS:/std%:c++20:/permissive-:/utf-8:/bigobj:/Zc%:__cplusplus:/Zc%:preprocessor:/wd5105"
+common:windows --repo_env="BAZEL_CXXOPTS=/EHsc:/FS:/Zc%:inline:/wd4244:/wd4267:/wd4146:/wd4996:/Zc%:throwingNew:/D_CRT_SECURE_NO_WARNINGS:/std%:c++23preview:/permissive-:/utf-8:/bigobj:/Zc%:__cplusplus:/Zc%:preprocessor:/wd5105:/d2prunedbinfo"
 
 # Remove "/D_WIN32_WINNT=0x0601"
 common:windows --repo_env="BAZEL_WIN32_WINNT="
 
 # C Only
-common:windows --repo_env="BAZEL_CONLYOPTS=/FS:/Zc%:inline:/D_CRT_SECURE_NO_WARNINGS"
+common:windows --repo_env="BAZEL_CONLYOPTS=/FS:/Zc%:inline:/D_CRT_SECURE_NO_WARNINGS:/d2prunedbinfo"
 
 ################################
 # Standard Windows Flags
@@ -21,12 +24,13 @@ build:windows --repo_env="BAZEL_LINKOPTS=/DEPENDENTLOADFLAG%:0x1100"
 ################################
 # ARM Windows Flags
 ################################
-build:windows_arm --platforms="@rules_bzlmodrio_toolchains//platforms/windows_arm64" --platform_suffix=winarm64
+build:windows_arm --platforms="@allwpilib//shared/bazel:windows_arm64" --platform_suffix=winarm64
 
-# Ignore duplicate inline statment in tools
+# Ignore duplicate inline statement in tools
 build:windows --host_copt=/wd4141
 # Ignore utf8 warning in tools
 build:windows --host_copt=/wd4715
 
 # Disable the C++17 feature in the windows compiler
 build:windows --features=-default_cpp_std --host_features=-default_cpp_std
+build:windows --host_platform=//shared/bazel:windows_host

@@ -194,8 +194,8 @@ def third_party_cc_lib_helper(
     """
     Helper for src / headers pairs that aren't directly compiled, but rather pulled into a bigger library.
 
-    Due to allwpilibs directory structure of includes and sources living next to eachother, it often is required
-    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extermely
+    Due to allwpilib's directory structure of includes and sources living next to eachother, it often is required
+    to make a header shim to deal with the include path, and a filegroup of the sources. This pattern is extremely
     common for the thirdparty libraries that live beneath certain libraries.
 
     This will produce a library shim with the include path stripped, a filegroup of sources, and packages that can be
@@ -205,7 +205,7 @@ def third_party_cc_lib_helper(
         include_root: The package relative path to the header files. This will be used to glob the files and strip the include prefix
         src_root: Optional. The package relative path to the source files.
         src_excludes: Optional. Used to exclude files from the src_root glob
-        visibilty: The visibility of header shim / source files / package files
+        visibility: The visibility of header shim / source files / package files
     """
     cc_library(
         name = name + "-headers",
@@ -222,6 +222,7 @@ def third_party_cc_lib_helper(
         name = name + "-hdrs-pkg",
         srcs = native.glob([include_root + "/**"]),
         strip_prefix = include_root,
+        visibility = visibility,
     )
 
     if src_root:
@@ -252,6 +253,7 @@ def wpilib_cc_library(
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,
         linkopts = None,
+        visibility = None,
         **kwargs):
     """
     This function is used to ease the creation of a cc_library with publishing given the standard allwpilib directory structure.
@@ -284,6 +286,7 @@ def wpilib_cc_library(
         hdrs = hdrs,
         deps = [lib + "-headers" for lib in third_party_libraries + third_party_header_only_libraries],
         strip_include_prefix = strip_include_prefix,
+        visibility = visibility,
         **kwargs
     )
 
@@ -295,6 +298,7 @@ def wpilib_cc_library(
         deps = deps + [lib + "-headers" for lib in third_party_libraries + third_party_header_only_libraries],
         strip_include_prefix = strip_include_prefix,
         linkopts = linkopts,
+        visibility = visibility,
         **kwargs
     )
 
@@ -314,8 +318,9 @@ def wpilib_cc_library(
     if hdrs_pkg_root:
         pkg_files(
             name = name + "-hdrs-pkg",
-            srcs = native.glob([hdrs_pkg_root + "/**"]),
+            srcs = native.glob([hdrs_pkg_root + "/**"], allow_empty = True),
             strip_prefix = hdrs_pkg_root,
+            visibility = visibility,
         )
 
         pkg_zip(
@@ -352,7 +357,7 @@ def wpilib_cc_shared_library(
                       libfood.so, otherwise produce libfoo.so.  This matches the
                       wpilib convention for debug library naming.  JNI libraries
                       though want to be loaded with the same name for all builds,
-                      which necesitates turning this off.
+                      which necessitates turning this off.
       win_def_file: The .def file used to specify symbols used in linking on
                     Windows.  This is selected automatically such that it is
                     only used on Windows.
@@ -436,8 +441,8 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "@rules_bzlmodrio_toolchains//conditions:linux_arm64": False,
-            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": True,
+            "@wpilib_toolchains//conditions:linux_arm64": False,
+            "@wpilib_toolchains//conditions:linux_x86_64": True,
             "//conditions:default": True,
         }),
         use_debug_name = select({
@@ -450,13 +455,13 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "@wpilib_toolchains//conditions:osx": [universal_name],
             "//conditions:default": [
                 ":" + name + "-symbolsplit",
             ],
         }),
         strip_prefix = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "@wpilib_toolchains//conditions:osx": "universal",
             "//conditions:default": None,
         }),
         visibility = visibility,
@@ -510,9 +515,9 @@ def _cc_static_library_impl(ctx):
     This is a modified version of built in cc_static_library implementation
     https://github.com/bazelbuild/bazel/blob/8.2.1/src/main/starlark/builtins_bzl/common/cc/experimental_cc_static_library.bzl
 
-    The built in version amalgamates all of the transative dependency objects into a single shared library. However, we do not want our
-    static libraries to only have the symbols related to the objects for this library, and not anything transative. In order to do this,
-    we add the option to specify transative static_libraries. The rule then filters out the objects that are defines in the other static
+    The built in version amalgamates all of the transitive dependency objects into a single shared library. However, we do not want our
+    static libraries to only have the symbols related to the objects for this library, and not anything transitive. In order to do this,
+    we add the option to specify transitive static_libraries. The rule then filters out the objects that are defines in the other static
     libraries.
     """
     deps = ctx.attr.deps
@@ -711,7 +716,8 @@ def _generate_def_windows_impl(ctx):
                     break
 
         if def_parser != None:
-            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, ctx.label.name)
+            dll_name = ctx.attr.dll_name if ctx.attr.dll_name else ctx.label.name
+            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, dll_name)
 
         win_def_file = [generated_def_file]
 
@@ -730,6 +736,10 @@ _generate_def_windows = rule(
 List of all static libraries to not duplicate .o files from.
 """,
         ),
+        "dll_name": attr.string(
+            default = "",
+            doc = "Override the LIBRARY name in the generated .def file.  Defaults to the rule name.",
+        ),
         "filters": attr.string_list(),
         "_def_parser": attr.label(default = "@bazel_tools//tools/def_parser:def_parser", allow_single_file = True, cfg = "exec"),
     } | CC_TOOLCHAIN_ATTRS,
@@ -737,11 +747,15 @@ List of all static libraries to not duplicate .o files from.
     fragments = ["cpp"],
 )
 
-def generate_def_windows(name, deps = None, **kwargs):
+def generate_def_windows(name, deps = None, dll_name = "", **kwargs):
     """Generates a .def file for linking a windows .dll for the provided cc_library and filters
 
     Args:
       deps: A list of cc_libraries to export symbols from.
+      dll_name: Override the LIBRARY directive in the generated .def file.  If
+                not specified, the rule's own name is used.  Set this to the
+                base name of the output DLL (without .dll extension) so that
+                the LIBRARY directive matches the DLL filename at runtime.
       filters: All object files in the provided cc_libraries (but not their
                dependencies) are checked against this list.  If a string in
                this list appears inside the name of the object file, it is
@@ -750,6 +764,7 @@ def generate_def_windows(name, deps = None, **kwargs):
     _generate_def_windows(
         name = name,
         deps = deps,
+        dll_name = dll_name,
         target_compatible_with = ["@platforms//os:windows"],
         **kwargs
     )

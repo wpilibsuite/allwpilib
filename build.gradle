@@ -1,4 +1,4 @@
-import edu.wpi.first.toolchain.*
+import org.wpilib.toolchain.*
 
 buildscript {
     repositories {
@@ -10,17 +10,23 @@ buildscript {
 
 plugins {
     id 'base'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2023.0.1'
-    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2025.0'
-    id 'edu.wpi.first.NativeUtils' apply false
-    id 'edu.wpi.first.GradleJni' version '1.2.0'
-    id 'edu.wpi.first.GradleVsCode'
     id 'idea'
     id 'visual-studio'
-    id 'net.ltgt.errorprone' version '4.3.0' apply false
-    id 'com.gradleup.shadow' version '9.1.0' apply false
-    id 'com.diffplug.spotless' version '8.0.0' apply false
-    id 'com.github.spotbugs' version '6.4.2' apply false
+
+    alias(libs.plugins.wpilib.versioning)
+    alias(libs.plugins.wpilib.repositories)
+    // NativeUtils and GradleVsCode are on the classpath for buildSrc, which doesn't carry version information.
+    // We're forced to use the string-based syntax here instead.
+    id 'org.wpilib.NativeUtils' apply false
+    id 'org.wpilib.GradleVsCode' apply false
+    // alias(libs.plugins.wpilib.native.utils) apply false
+    // alias(libs.plugins.wpilib.gradle.vscode)
+    alias(libs.plugins.wpilib.gradle.jni)
+
+    alias(libs.plugins.build.shadow) apply false
+    alias(libs.plugins.lint.errorprone) apply false
+    alias(libs.plugins.lint.spotbugs) apply false
+    alias(libs.plugins.lint.spotless) apply false
 }
 
 wpilibVersioning.buildServerMode = project.hasProperty('buildServer')
@@ -29,14 +35,17 @@ wpilibVersioning.releaseMode = project.hasProperty('releaseMode')
 allprojects {
     repositories {
         maven {
-        url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
-    }
+            url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
+        }
     }
     wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
         wpilibRepositories.addAllDevelopmentRepositories(it)
+    }
+    tasks.withType(AbstractTestTask).configureEach {
+        failOnNoDiscoveredTests = false
     }
 }
 
@@ -57,6 +66,55 @@ if (project.hasProperty("publishVersion")) {
 }
 
 wpilibVersioning.version.finalizeValue()
+
+def mrclibVersionConfiguration = configurations.create('mrclibVersion') {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+}
+
+dependencies {
+    add(mrclibVersionConfiguration.name, 'org.wpilib.mrclib:mrclib-cpp:+:windowsx86-64@zip')
+}
+
+tasks.register('updateMrclibVersion') {
+    description = 'Updates the version catalog to the latest available mrclib version'
+    group = 'WPILib'
+
+    doLast {
+        def resolvedArtifacts = mrclibVersionConfiguration.resolvedConfiguration.resolvedArtifacts
+        if (resolvedArtifacts.size() != 1) {
+            throw new GradleException("Expected one mrclib artifact, but resolved ${resolvedArtifacts.size()}")
+        }
+        def resolvedArtifact = resolvedArtifacts.iterator().next()
+        def latestVersion = resolvedArtifact.moduleVersion.id.version
+        def versionCatalog = file('gradle/libs.versions.toml')
+        def versionCatalogText = versionCatalog.getText('UTF-8')
+        def mrclibVersionRegex = ~/(?m)^mrclib\s*=\s*"[^"]*"\s*$/
+
+        if (!mrclibVersionRegex.matcher(versionCatalogText).find()) {
+            throw new GradleException("Could not find the mrclib version in ${versionCatalog}")
+        }
+
+        versionCatalog.setText(
+            mrclibVersionRegex.matcher(versionCatalogText).replaceFirst("mrclib = \"${latestVersion}\""),
+            'UTF-8'
+        )
+        logger.lifecycle("Updated mrclib to ${latestVersion}")
+
+        def pythonCommand = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
+            ? ['python']
+            : ['python3']
+        def integrityHelper = file('shared/bazel/thirdparty/integrity_helper.py')
+
+        logger.lifecycle('Updating third-party integrity hashes')
+        providers.exec {
+            workingDir(rootDir)
+            commandLine(pythonCommand + [integrityHelper.absolutePath])
+        }.result.get()
+    }
+}
 
 def outputsFolder = file("$buildDir/allOutputs")
 
@@ -99,6 +157,22 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
+ext.makeZipBaseName = { group, artifactId ->
+    return "_GROUP_${group.replace(".", "_")}_ID_${artifactId}_CLS"
+}
+
+def versionCatalogZip = tasks.register('versionCatalogZip', Zip) {
+    description = 'Packages the dependency version catalog for publication'
+    group = 'Build'
+
+    archiveBaseName = makeZipBaseName('org.wpilib', 'wpilib-versions')
+    archiveVersion = ''
+    destinationDirectory = outputsFolder
+    from "$rootDir/gradle/libs.versions.toml"
+}
+
+copyAllOutputs.dependsOn versionCatalogZip
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
@@ -109,38 +183,37 @@ subprojects {
         subproj.apply plugin: MultiBuilds
     }
 
-    plugins.withType(JavaPlugin) {
-        java {
-            sourceCompatibility = 21
-            targetCompatibility = 21
-        }
-    }
-
     apply from: "${rootDir}/shared/java/javastyle.gradle"
 
-    // Disables doclint in java 8.
-    if (JavaVersion.current().isJava8Compatible()) {
-        tasks.withType(Javadoc) {
-            if (project.name != "docs") {
-                options.addStringOption('Xdoclint:none', '-quiet')
-            }
-        }
+    tasks.withType(JavaCompile).configureEach {
+        options.release = 25
+        options.encoding = "UTF-8"
+        options.compilerArgs = [
+            "-Werror",
+            "-XDstringConcat=inline",
+            "-Xlint:all",
+            // ignore AutoCloseable warnings
+            "-Xlint:-try",
+            // ignore missing serialVersionUID warnings
+            "-Xlint:-serial",
+            // ignore unclaimed annotation warning from annotation processing
+            "-Xlint:-processing",
+        ]
     }
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs.add '-XDstringConcat=inline'
-        options.encoding = 'UTF-8'
-    }
-
-    // Enables UTF-8 support in Javadoc
-    tasks.withType(Javadoc) {
+    // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles
+    tasks.withType(Javadoc).configureEach {
         options.addStringOption("charset", "utf-8")
         options.addStringOption("docencoding", "utf-8")
         options.addStringOption("encoding", "utf-8")
+        options.addBooleanOption("-no-fonts", true)
+        options.addStringOption("-add-stylesheet", "${rootDir}/docs/javadoc.css")
+        if (project.name != "docs") {
+            options.addBooleanOption('Xdoclint:none', true)
+        }
     }
 
     // Sign outputs with Developer ID
-    tasks.withType(AbstractLinkTask) { task ->
+    tasks.withType(AbstractLinkTask).configureEach { task ->
         task.inputs.property "HasDeveloperId", project.hasProperty("developerID")
 
         if (project.hasProperty("developerID")) {
@@ -150,16 +223,16 @@ subprojects {
                 doLast {
                     // Get path to binary.
                     String path = task.getLinkedFile().getAsFile().get().getAbsolutePath()
-                    exec {
-                        workingDir rootDir
+                    providers.exec {
+                        setWorkingDir(rootDir)
                         def args = [
                             "sh",
                             "-c",
                             "codesign --force --strict --timestamp --options=runtime " +
                             "--verbose -s ${project.findProperty("developerID")} ${path}"
                         ]
-                        commandLine args
-                    }
+                        commandLine(args)
+                    }.result.get()
                 }
             }
         }
@@ -171,5 +244,5 @@ ext.getCurrentArch = {
 }
 
 wrapper {
-    gradleVersion = '8.14.3'
+    gradleVersion = '9.4.1'
 }

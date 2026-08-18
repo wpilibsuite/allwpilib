@@ -2,50 +2,49 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/hal/UsageReporting.h"
+
 #include <stdint.h>
 
-#include <fmt/format.h>
-#include <networktables/NetworkTableInstance.h>
-#include <networktables/StringTopic.h>
-#include <wpi/StringMap.h>
-#include <wpi/string.h>
-
-#include "SystemServerInternal.h"
+#include "mrclib/Reporting.h"
 
 namespace {
-struct SystemServerUsageReporting {
-  nt::NetworkTableInstance ntInst;
-  wpi::StringMap<nt::StringPublisher> publishers;
-
-  explicit SystemServerUsageReporting(nt::NetworkTableInstance inst)
-      : ntInst{inst} {}
-};
-
+MRC_String ToMrcString(const WPI_String* wpiString) {
+  if (wpiString == nullptr) {
+    return MRC_String{nullptr, 0};
+  }
+  return MRC_String{wpiString->str, wpiString->len};
+}
 }  // namespace
-
-static ::SystemServerUsageReporting* systemServerUsage;
 
 extern "C" {
 
-int32_t HAL_ReportUsage(const struct WPI_String* resource,
-                        const struct WPI_String* data) {
-  auto resourceStr = wpi::to_string_view(resource);
-  auto& publisher = systemServerUsage->publishers[resourceStr];
-  if (!publisher) {
-    publisher =
-        systemServerUsage->ntInst
-            .GetStringTopic(fmt::format("/UsageReporting/{}", resourceStr))
-            .Publish();
-  }
-  publisher.Set(wpi::to_string_view(data));
+void HAL_ReportUsage(const struct WPI_String* resource,
+                     const struct WPI_String* data) {
+  MRC_String mrcResource = ToMrcString(resource);
+  MRC_String mrcData = ToMrcString(data);
+  MRC_Reporting_ReportUsage(&mrcResource, &mrcData);
+}
 
-  return 0;
+int32_t HAL_PublishCanVersion(uint8_t busId, uint32_t deviceId,
+                              const struct WPI_String* name,
+                              const struct WPI_String* version) {
+  MRC_String mrcName = ToMrcString(name);
+  MRC_String mrcVersion = ToMrcString(version);
+  return MRC_Reporting_PublishCanVersion(busId, deviceId, &mrcName,
+                                         &mrcVersion);
+}
+
+int32_t HAL_PublishVersion(const struct WPI_String* name,
+                           const struct WPI_String* version) {
+  MRC_String mrcName = ToMrcString(name);
+  MRC_String mrcVersion = ToMrcString(version);
+  return MRC_Reporting_PublishVersion(&mrcName, &mrcVersion);
+}
+
+int32_t HAL_PublishWpilibVersion(const struct WPI_String* version) {
+  MRC_String mrcVersion = ToMrcString(version);
+  return MRC_Reporting_PublishWpilibVersion(&mrcVersion);
 }
 
 }  // extern "C"
-
-namespace hal::init {
-void InitializeUsageReporting() {
-  systemServerUsage = new ::SystemServerUsageReporting{hal::GetSystemServer()};
-}
-}  // namespace hal::init

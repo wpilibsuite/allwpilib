@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:20:16 -0700
+Subject: [PATCH 13/25] Use wpi StringMap
+
+---
+ json.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/json.h b/json.h
+index 2a4c009e4b3cf7f1ccac8b09986853ccd3540f9d..662a3f2f68a04dc4e7faf5e4bd5a984ffd3705a9 100644
+--- a/json.h
++++ b/json.h
+@@ -16,17 +16,19 @@
+ // limitations under the License.
+ 
+ #pragma once
+-#include <map>
++
+ #include <string>
+ #include <vector>
+ 
++#include "wpi/util/StringMap.hpp"
++
+ namespace wpi::util {
+ 
+ class json
+ {
+   public:
+     using array_t = std::vector<json>;
+-    using object_t = std::map<std::string, json>;
++    using object_t = wpi::util::StringMap<json>;
+ 
+     enum class Type
+     {

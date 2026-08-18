@@ -2,22 +2,24 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/hardware/range/SharpIR.hpp"
 
-#include "frc/SharpIR.h"
-#include "frc/simulation/SharpIRSim.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-using namespace frc;
+#include "wpi/simulation/SharpIRSim.hpp"
 
-TEST(SharpIRTest, SimDevices) {
+using namespace wpi;
+
+TEST_CASE("SharpIRTest SimDevices", "[wpilibc]") {
   SharpIR s = SharpIR::GP2Y0A02YK0F(1);
   SharpIRSim sim(s);
 
-  EXPECT_EQ(0.2, s.GetRange().value());
+  CHECK(0.2 == s.GetRange().value());
 
   sim.SetRange(30_cm);
-  EXPECT_EQ(0.3, s.GetRange().value());
+  CHECK(0.3 == s.GetRange().value());
 
   sim.SetRange(300_cm);
-  EXPECT_EQ(1.5, s.GetRange().value());
+  CHECK(1.5 == s.GetRange().value());
 }

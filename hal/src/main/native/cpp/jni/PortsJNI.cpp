@@ -6,20 +6,17 @@
 
 #include <cassert>
 
-#include "HALUtil.h"
-#include "edu_wpi_first_hal_PortsJNI.h"
-#include "hal/Ports.h"
-
-using namespace hal;
+#include "org_wpilib_hardware_hal_PortsJNI.h"
+#include "wpi/hal/Ports.h"
 
 extern "C" {
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumCanBuses
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCanBuses
+Java_org_wpilib_hardware_hal_PortsJNI_getNumCanBuses
   (JNIEnv*, jclass)
 {
   jint value = HAL_GetNumCanBuses();
@@ -27,103 +24,25 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCanBuses
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumAnalogInputs
+ * Class:     org_wpilib_hardware_hal_PortsJNI
+ * Method:    getNumSmartIo
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumAnalogInputs
+Java_org_wpilib_hardware_hal_PortsJNI_getNumSmartIo
   (JNIEnv* env, jclass)
 {
-  jint value = HAL_GetNumAnalogInputs();
+  jint value = HAL_GetNumSmartIo();
   return value;
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumCounters
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCounters
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumCounters();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumDigitalChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumDigitalChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumDigitalChannels();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumPWMChannels
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumPWMChannels
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumPWMChannels();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumDigitalPWMOutputs
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumDigitalPWMOutputs
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumDigitalPWMOutputs();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumEncoders
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumEncoders
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumEncoders();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
- * Method:    getNumInterrupts
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumInterrupts
-  (JNIEnv* env, jclass)
-{
-  jint value = HAL_GetNumInterrupts();
-  return value;
-}
-
-/*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumCTREPCMModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCTREPCMModules
+Java_org_wpilib_hardware_hal_PortsJNI_getNumCTREPCMModules
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumCTREPCMModules();
@@ -131,12 +50,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCTREPCMModules
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumCTRESolenoidChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCTRESolenoidChannels
+Java_org_wpilib_hardware_hal_PortsJNI_getNumCTRESolenoidChannels
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumCTRESolenoidChannels();
@@ -144,12 +63,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCTRESolenoidChannels
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumCTREPDPModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPModules
+Java_org_wpilib_hardware_hal_PortsJNI_getNumCTREPDPModules
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumCTREPDPModules();
@@ -157,12 +76,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPModules
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumCTREPDPChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPChannels
+Java_org_wpilib_hardware_hal_PortsJNI_getNumCTREPDPChannels
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumCTREPDPChannels();
@@ -170,12 +89,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumCTREPDPChannels
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumREVPDHModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHModules
+Java_org_wpilib_hardware_hal_PortsJNI_getNumREVPDHModules
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumREVPDHModules();
@@ -183,12 +102,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHModules
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumREVPDHChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHChannels
+Java_org_wpilib_hardware_hal_PortsJNI_getNumREVPDHChannels
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumREVPDHChannels();
@@ -196,12 +115,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumREVPDHChannels
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumREVPHModules
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumREVPHModules
+Java_org_wpilib_hardware_hal_PortsJNI_getNumREVPHModules
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumREVPHModules();
@@ -209,12 +128,12 @@ Java_edu_wpi_first_hal_PortsJNI_getNumREVPHModules
 }
 
 /*
- * Class:     edu_wpi_first_hal_PortsJNI
+ * Class:     org_wpilib_hardware_hal_PortsJNI
  * Method:    getNumREVPHChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_PortsJNI_getNumREVPHChannels
+Java_org_wpilib_hardware_hal_PortsJNI_getNumREVPHChannels
   (JNIEnv* env, jclass)
 {
   jint value = HAL_GetNumREVPHChannels();

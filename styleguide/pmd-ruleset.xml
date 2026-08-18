@@ -12,10 +12,10 @@
   <exclude-pattern>.*/Timestamped.*\.java</exclude-pattern>
   <exclude-pattern>.*/units/measure/.*\.java</exclude-pattern>
 
-  <exclude-pattern>.*/*IntegrationTests.*</exclude-pattern>
+  <exclude-pattern>.*/*Examples.*</exclude-pattern>
   <exclude-pattern>.*/*JNI.*</exclude-pattern>
   <exclude-pattern>.*/math/proto.*</exclude-pattern>
-  <exclude-pattern>.*/commands3/proto.*</exclude-pattern>
+  <exclude-pattern>.*/command3/proto.*</exclude-pattern>
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="AccessorClassGeneration" />
@@ -29,6 +29,7 @@
     <exclude name="LooseCoupling" />
     <exclude name="NonExhaustiveSwitch" />
     <exclude name="PreserveStackTrace" />
+    <exclude name="RelianceOnDefaultCharset" />
     <exclude name="ReplaceHashtableWithMap" />
     <exclude name="ReplaceVectorWithList" />
     <exclude name="SystemPrintln" />
@@ -53,6 +54,7 @@
   </rule>
 
   <rule ref="category/java/design.xml">
+    <exclude name="AvoidDeeplyNestedIfStmts" />
     <exclude name="AvoidThrowingNewInstanceOfSameException" />
     <exclude name="AvoidThrowingRawExceptionTypes" />
     <exclude name="CognitiveComplexity" />
@@ -68,11 +70,13 @@
     <exclude name="LoosePackageCoupling" />
     <exclude name="NPathComplexity" />
     <exclude name="NcssCount" />
+    <exclude name="PublicMemberInNonPublicType" />
     <exclude name="TooManyFields" />
     <exclude name="TooManyMethods" />
   </rule>
 
   <rule ref="category/java/errorprone.xml">
+    <exclude name="AssignmentInOperand" />
     <exclude name="AssignmentToNonFinalStatic" />
     <exclude name="AvoidCatchingThrowable" />
     <exclude name="AvoidDuplicateLiterals" />
@@ -138,5 +142,23 @@
                 }
             ]]>
     </example>
+  </rule>
+  <rule name="PublicFieldNamingConvention"
+        language="java"
+        message="Public fields must follow lowerCamelCase."
+        class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+    <description>
+
+    </description>
+    <priority>3</priority>
+    <properties>
+      <property name="xpath">
+        <value>
+  <![CDATA[
+  //ClassDeclaration[not(matches(@PackageName, "org.wpilib.math"))]/ClassBody/FieldDeclaration[@Visibility = 'public' and @Static = false()]/VariableDeclarator[not(matches(@Name, "^[a-z][a-zA-Z0-9]*$"))]
+  ]]>
+        </value>
+      </property>
+    </properties>
   </rule>
 </ruleset>

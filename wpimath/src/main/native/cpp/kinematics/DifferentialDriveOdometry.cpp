@@ -2,16 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/kinematics/DifferentialDriveOdometry.h"
+#include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
 
-#include "wpimath/MathShared.h"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
+#include "wpi/math/kinematics/Odometry.hpp"
+#include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 DifferentialDriveOdometry::DifferentialDriveOdometry(
-    const Rotation2d& gyroAngle, units::meter_t leftDistance,
-    units::meter_t rightDistance, const Pose2d& initialPose)
-    : Odometry(m_kinematicsImpl, gyroAngle, {leftDistance, rightDistance},
-               initialPose) {
+    const Rotation2d& gyroAngle, wpi::units::meter_t leftDistance,
+    wpi::units::meter_t rightDistance, const Pose2d& initialPose)
+    : Odometry(DifferentialDriveKinematics{1_m}, gyroAngle,
+               {leftDistance, rightDistance}, initialPose) {
   wpi::math::MathSharedStore::ReportUsage("DifferentialDriveOdometry", "");
 }

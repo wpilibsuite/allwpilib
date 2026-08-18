@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Mon, 6 Apr 2026 17:49:08 -0700
+Subject: [PATCH 25/25] Make bool constructor safe
+
+---
+ json.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/json.h b/json.h
+index ca7d76d837c9e0bdfb92e7c1b7bfd24cc8cb5ae2..cd9c52ba855c28bc4fd7316195bead50a709e184 100644
+--- a/json.h
++++ b/json.h
+@@ -167,7 +167,7 @@ class json
+     {
+     }
+ 
+-    constexpr json(bool value) : type_(Type::Bool), bool_value(value)
++    constexpr json(std::same_as<bool> auto value) : type_(Type::Bool), bool_value(value)
+     {
+     }
+ 

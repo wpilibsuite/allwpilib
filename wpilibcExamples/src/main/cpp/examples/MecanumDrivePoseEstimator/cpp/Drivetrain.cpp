@@ -2,71 +2,75 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Drivetrain.h"
+#include "Drivetrain.hpp"
 
-#include <frc/Timer.h>
+#include "ExampleGlobalMeasurementSensor.hpp"
+#include "wpi/system/Timer.hpp"
 
-#include "ExampleGlobalMeasurementSensor.h"
-
-frc::MecanumDriveWheelSpeeds Drivetrain::GetCurrentState() const {
-  return {units::meters_per_second_t{m_frontLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_frontRightEncoder.GetRate()},
-          units::meters_per_second_t{m_backLeftEncoder.GetRate()},
-          units::meters_per_second_t{m_backRightEncoder.GetRate()}};
+wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances()
+    const {
+  return {wpi::units::meter_t{frontLeftEncoder.GetDistance()},
+          wpi::units::meter_t{frontRightEncoder.GetDistance()},
+          wpi::units::meter_t{backLeftEncoder.GetDistance()},
+          wpi::units::meter_t{backRightEncoder.GetDistance()}};
 }
 
-frc::MecanumDriveWheelPositions Drivetrain::GetCurrentDistances() const {
-  return {units::meter_t{m_frontLeftEncoder.GetDistance()},
-          units::meter_t{m_frontRightEncoder.GetDistance()},
-          units::meter_t{m_backLeftEncoder.GetDistance()},
-          units::meter_t{m_backRightEncoder.GetDistance()}};
+wpi::math::MecanumDriveWheelVelocities Drivetrain::GetCurrentWheelVelocities()
+    const {
+  return {wpi::units::meters_per_second_t{frontLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{frontRightEncoder.GetRate()},
+          wpi::units::meters_per_second_t{backLeftEncoder.GetRate()},
+          wpi::units::meters_per_second_t{backRightEncoder.GetRate()}};
 }
 
-void Drivetrain::SetSpeeds(const frc::MecanumDriveWheelSpeeds& wheelSpeeds) {
-  std::function<void(units::meters_per_second_t, const frc::Encoder&,
-                     frc::PIDController&, frc::PWMSparkMax&)>
-      calcAndSetSpeeds = [&m_feedforward = m_feedforward](
-                             units::meters_per_second_t speed,
-                             const auto& encoder, auto& controller,
-                             auto& motor) {
-        auto feedforward = m_feedforward.Calculate(speed);
-        double output = controller.Calculate(encoder.GetRate(), speed.value());
-        motor.SetVoltage(units::volt_t{output} + feedforward);
-      };
+void Drivetrain::SetVelocities(
+    const wpi::math::MecanumDriveWheelVelocities& wheelVelocities) {
+  std::function<void(wpi::units::meters_per_second_t, const wpi::Encoder&,
+                     wpi::math::PIDController&, wpi::PWMSparkMax&)>
+      calcAndSetVelocities =
+          [&feedforward = feedforward](wpi::units::meters_per_second_t velocity,
+                                       const auto& encoder, auto& controller,
+                                       auto& motor) {
+            auto ff = feedforward.Calculate(velocity);
+            double output =
+                controller.Calculate(encoder.GetRate(), velocity.value());
+            motor.SetVoltage(wpi::units::volt_t{output} + ff);
+          };
 
-  calcAndSetSpeeds(wheelSpeeds.frontLeft, m_frontLeftEncoder,
-                   m_frontLeftPIDController, m_frontLeftMotor);
-  calcAndSetSpeeds(wheelSpeeds.frontRight, m_frontRightEncoder,
-                   m_frontRightPIDController, m_frontRightMotor);
-  calcAndSetSpeeds(wheelSpeeds.rearLeft, m_backLeftEncoder,
-                   m_backLeftPIDController, m_backLeftMotor);
-  calcAndSetSpeeds(wheelSpeeds.rearRight, m_backRightEncoder,
-                   m_backRightPIDController, m_backRightMotor);
+  calcAndSetVelocities(wheelVelocities.frontLeft, frontLeftEncoder,
+                       frontLeftPIDController, frontLeftMotor);
+  calcAndSetVelocities(wheelVelocities.frontRight, frontRightEncoder,
+                       frontRightPIDController, frontRightMotor);
+  calcAndSetVelocities(wheelVelocities.rearLeft, backLeftEncoder,
+                       backLeftPIDController, backLeftMotor);
+  calcAndSetVelocities(wheelVelocities.rearRight, backRightEncoder,
+                       backRightPIDController, backRightMotor);
 }
 
-void Drivetrain::Drive(units::meters_per_second_t xSpeed,
-                       units::meters_per_second_t ySpeed,
-                       units::radians_per_second_t rot, bool fieldRelative,
-                       units::second_t period) {
-  frc::ChassisSpeeds chassisSpeeds{xSpeed, ySpeed, rot};
+void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
+                       wpi::units::meters_per_second_t yVelocity,
+                       wpi::units::radians_per_second_t rot, bool fieldRelative,
+                       wpi::units::second_t period) {
+  wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
   if (fieldRelative) {
-    chassisSpeeds = chassisSpeeds.ToRobotRelative(
-        m_poseEstimator.GetEstimatedPosition().Rotation());
+    chassisVelocities = chassisVelocities.ToRobotRelative(
+        poseEstimator.GetEstimatedPosition().Rotation());
   }
-  SetSpeeds(m_kinematics.ToWheelSpeeds(chassisSpeeds.Discretize(period))
-                .Desaturate(kMaxSpeed));
+  SetVelocities(
+      kinematics.ToWheelVelocities(chassisVelocities.Discretize(period))
+          .Desaturate(kMaxVelocity));
 }
 
 void Drivetrain::UpdateOdometry() {
-  m_poseEstimator.Update(
-      m_imu.GetRotation2d(),
-      GetCurrentDistances());  // TODO(Ryan): fixup when sim implemented
+  poseEstimator.Update(
+      imu.GetRotation2d(),
+      GetCurrentWheelDistances());  // TODO(Ryan): fixup when sim implemented
 
   // Also apply vision measurements. We use 0.3 seconds in the past as an
   // example -- on a real robot, this must be calculated based either on latency
   // or timestamps.
-  m_poseEstimator.AddVisionMeasurement(
+  poseEstimator.AddVisionMeasurement(
       ExampleGlobalMeasurementSensor::GetEstimatedGlobalPose(
-          m_poseEstimator.GetEstimatedPosition()),
-      frc::Timer::GetTimestamp() - 0.3_s);
+          poseEstimator.GetEstimatedPosition()),
+      wpi::Timer::GetTimestamp() - 0.3_s);
 }

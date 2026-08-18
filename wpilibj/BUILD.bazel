@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -12,22 +12,26 @@ py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
+    name = "generate_first_ds_hids",
+    srcs = ["generate_first_ds_hids.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -35,13 +39,12 @@ py_binary(
     srcs = ["generate_wpilibj.py"],
     main = "generate_wpilibj.py",
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [
+        ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -51,6 +54,7 @@ generate_wpilibj(
 
 write_source_files(
     name = "write_wpilibj",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpilibj",
     },
@@ -78,11 +82,9 @@ wpilib_java_library(
     ] + glob(["src/main/java/**/*.java"]),
     extra_source_pkgs = ["generated_version_files"],
     maven_artifact_name = "wpilibj-java",
-    maven_group_id = "edu.wpi.first.wpilibj",
+    maven_group_id = "org.wpilib.wpilibj",
     visibility = ["//visibility:public"],
     deps = [
-        "//cameraserver:cameraserver-java",
-        "//cscore:cscore-java",
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
@@ -90,8 +92,7 @@ wpilib_java_library(
         "//wpinet:wpinet-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:org_ejml_ejml_java9module",
     ],
 )
 
@@ -105,7 +106,10 @@ pkg_files(
 
 wpilib_java_junit5_test(
     name = "wpilibj-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
+    srcs = glob([
+        "src/generated/test/java/**/*.java",
+        "src/test/java/**/*.java",
+    ]),
     resource_strip_prefix = "wpilibj/src/test/resources",
     resources = glob(["src/test/resources/**"]),
     deps = [
@@ -127,8 +131,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/wpilibj/DevMain.java"],
-    main_class = "edu.wpi.first.wpilibj.DevMain",
+    srcs = ["src/dev/java/org/wpilib/DevMain.java"],
+    main_class = "org.wpilib.DevMain",
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
@@ -140,16 +144,10 @@ java_binary(
 filegroup(
     name = "hid_schema",
     srcs = [
+        "src/generate/first_ds_hids.json",
+        "src/generate/first_ds_hids.schema.json",
         "src/generate/hids.json",
         "src/generate/hids.schema.json",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "pwm_schema",
-    srcs = [
-        "src/generate/pwm_motor_controllers.json",
     ],
     visibility = ["//visibility:public"],
 )
@@ -158,7 +156,6 @@ filegroup(
     name = "templates",
     srcs = glob(["src/generate/**/*.jinja"]) + [
         ":hid_schema",
-        ":pwm_schema",
     ],
     visibility = ["//visibility:public"],
 )

@@ -1,7 +1,0 @@
-extra_includes:
-- wpi/sendable/SendableBuilder.h
-
-classes:
-  frc::SD540:
-    methods:
-      SD540:

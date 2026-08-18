@@ -1,32 +1,28 @@
 classes:
-  frc::IterativeRobotBase:
+  wpi::IterativeRobotBase:
     methods:
-      RobotInit:
       DriverStationConnected:
       DisabledInit:
       AutonomousInit:
       TeleopInit:
-      TestInit:
+      UtilityInit:
       RobotPeriodic:
       DisabledPeriodic:
       AutonomousPeriodic:
       TeleopPeriodic:
-      TestPeriodic:
+      UtilityPeriodic:
       IterativeRobotBase:
         overloads:
           double:
             ignore: true
-          units::second_t:
+          wpi::units::second_t:
       LoopFunc:
       SimulationInit:
-        internal: true
       SimulationPeriodic:
-        internal: true
       DisabledExit:
       AutonomousExit:
       TeleopExit:
-      TestExit:
-      SetNetworkTablesFlushEnabled:
+      UtilityExit:
       GetPeriod:
       PrintWatchdogEpochs:
     doc: |
@@ -39,7 +35,8 @@ classes:
       This class provides the following functions which are called by the main
       loop, StartCompetition(), at the appropriate times:
 
-      RobotInit() -- provide for initialization at robot power-on
+      DriverStationConnected() -- provide for initialization the first time the DS
+      is connected
 
       Init() functions -- each of the following functions is called once when the
       appropriate mode is entered:
@@ -47,7 +44,7 @@ classes:
       - DisabledInit() -- called each and every time disabled is entered from another mode
       - AutonomousInit() -- called each and every time autonomous is entered from another mode
       - TeleopInit() -- called each and every time teleop is entered from another mode
-      - TestInit() -- called each and every time test is entered from another mode
+      - UtilityInit() -- called each and every time utility is entered from another mode
 
       Periodic() functions -- each of these functions is called on an interval:
 
@@ -55,7 +52,7 @@ classes:
       - DisabledPeriodic()
       - AutonomousPeriodic()
       - TeleopPeriodic()
-      - TestPeriodic()
+      - UtilityPeriodic()
 
       Exit() functions -- each of the following functions is called once when the
       appropriate mode is exited:
@@ -63,4 +60,4 @@ classes:
       - DisabledExit() -- called each and every time disabled is exited
       - AutonomousExit() -- called each and every time autonomous is exited
       - TeleopExit() -- called each and every time teleop is exited
-      - TestExit() -- called each and every time test is exited
+      - UtilityExit() -- called each and every time utility is exited

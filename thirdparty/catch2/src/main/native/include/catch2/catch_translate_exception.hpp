@@ -22,7 +22,7 @@ namespace Catch {
 
     class ExceptionTranslatorRegistrar {
         template<typename T>
-        class ExceptionTranslator : public IExceptionTranslator {
+        class ExceptionTranslator final : public IExceptionTranslator {
         public:
 
             constexpr ExceptionTranslator( std::string(*translateFunction)( T const& ) )
@@ -41,6 +41,8 @@ namespace Catch {
                     return m_translateFunction( ex );
                 }
 #else
+                (void)it;
+                (void)itEnd;
                 return "You should never get here!";
 #endif
             }

@@ -3,62 +3,46 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <jni.h>
+#include <stdint.h>
 
 #include <cassert>
 
-#include "HALUtil.h"
-#include "edu_wpi_first_hal_ThreadsJNI.h"
-#include "hal/Threads.h"
+#include "HALUtil.hpp"
+#include "org_wpilib_hardware_hal_ThreadsJNI.h"
+#include "wpi/hal/Threads.h"
 
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
+
 /*
- * Class:     edu_wpi_first_hal_ThreadsJNI
+ * Class:     org_wpilib_hardware_hal_ThreadsJNI
  * Method:    getCurrentThreadPriority
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadPriority
+Java_org_wpilib_hardware_hal_ThreadsJNI_getCurrentThreadPriority
   (JNIEnv* env, jclass)
 {
-  int32_t status = 0;
-  HAL_Bool isRT = false;
-  auto ret = HAL_GetCurrentThreadPriority(&isRT, &status);
+  int32_t priority = 0;
+  HAL_Status status = HAL_GetCurrentThreadPriority(&priority);
   CheckStatus(env, status);
-  return static_cast<jint>(ret);
+  return static_cast<jint>(priority);
 }
 
 /*
- * Class:     edu_wpi_first_hal_ThreadsJNI
- * Method:    getCurrentThreadIsRealTime
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_getCurrentThreadIsRealTime
-  (JNIEnv* env, jclass)
-{
-  int32_t status = 0;
-  HAL_Bool isRT = false;
-  HAL_GetCurrentThreadPriority(&isRT, &status);
-  CheckStatus(env, status);
-  return static_cast<jboolean>(isRT);
-}
-
-/*
- * Class:     edu_wpi_first_hal_ThreadsJNI
+ * Class:     org_wpilib_hardware_hal_ThreadsJNI
  * Method:    setCurrentThreadPriority
- * Signature: (ZI)Z
+ * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_ThreadsJNI_setCurrentThreadPriority
-  (JNIEnv* env, jclass, jboolean realTime, jint priority)
+Java_org_wpilib_hardware_hal_ThreadsJNI_setCurrentThreadPriority
+  (JNIEnv* env, jclass, jint priority)
 {
-  int32_t status = 0;
-  auto ret = HAL_SetCurrentThreadPriority(
-      static_cast<HAL_Bool>(realTime), static_cast<int32_t>(priority), &status);
+  HAL_Status status =
+      HAL_SetCurrentThreadPriority(static_cast<int32_t>(priority));
   CheckStatus(env, status, false);
-  return static_cast<jboolean>(ret);
+  return static_cast<jboolean>(status);
 }
 
 }  // extern "C"

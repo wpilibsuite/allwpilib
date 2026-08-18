@@ -13,13 +13,13 @@
 #include <type_traits>
 #include <utility>
 
-#include <hal/Types.h>
-#include <units/time.h>
-#include <wpi/mutex.h>
-
 #include <semiwrap.h>
 
-namespace frc {
+#include "wpi/hal/Types.h"
+#include "wpi/units/time.hpp"
+#include "wpi/util/mutex.hpp"
+
+namespace wpi {
 
 class PyNotifier {
  public:
@@ -42,8 +42,8 @@ class PyNotifier {
    */
   virtual ~PyNotifier();
 
-  PyNotifier(PyNotifier &&rhs);
-  PyNotifier &operator=(PyNotifier &&rhs);
+  PyNotifier(PyNotifier&& rhs);
+  PyNotifier& operator=(PyNotifier&& rhs);
 
   /**
    * Sets the name of the notifier.  Used for debugging purposes only.
@@ -66,7 +66,7 @@ class PyNotifier {
    *
    * @param delay Amount of time to wait before the handler is called.
    */
-  void StartSingle(units::second_t delay);
+  void StartSingle(wpi::units::second_t delay);
 
   /**
    * Register for periodic event notification.
@@ -78,7 +78,7 @@ class PyNotifier {
    * @param period Period to call the handler starting one period
    *               after the call to this method.
    */
-  void StartPeriodic(units::second_t period);
+  void StartPeriodic(wpi::units::second_t period);
 
   /**
    * Stop timer events from occurring.
@@ -92,55 +92,27 @@ class PyNotifier {
   void Stop();
 
   /**
-   * Sets the HAL notifier thread priority.
+   * Gets the overrun count.
    *
-   * The HAL notifier thread is responsible for managing the FPGA's notifier
-   * interrupt and waking up user's Notifiers when it's their time to run.
-   * Giving the HAL notifier thread real-time priority helps ensure the user's
-   * real-time Notifiers, if any, are notified to run in a timely manner.
+   * An overrun occurs when a notifier's alarm is not serviced before the next
+   * scheduled alarm time.
    *
-   * @param realTime Set to true to set a real-time priority, false for standard
-   *                 priority.
-   * @param priority Priority to set the thread to. For real-time, this is 1-99
-   *                 with 99 being highest. For non-real-time, this is forced to
-   *                 0. See "man 7 sched" for more details.
-   * @return         True on success.
+   * @return overrun count
    */
-  static bool SetHALThreadPriority(bool realTime, int32_t priority);
+  int32_t GetOverrun() const;
 
-private:
-  /**
-   * Update the HAL alarm time.
-   *
-   * @param triggerTime the time at which the next alarm will be triggered
-   */
-  void UpdateAlarm(uint64_t triggerTime);
-
-  /**
-   * Update the HAL alarm time based on m_expirationTime.
-   */
-  void UpdateAlarm();
-
+ private:
   // The thread waiting on the HAL alarm
   py::object m_thread;
 
   // Held while updating process information
-  wpi::mutex m_processMutex;
+  wpi::util::mutex m_processMutex;
 
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
   // Address of the handler
   std::function<void()> m_handler;
-
-  // The absolute expiration time
-  units::second_t m_expirationTime = 0_s;
-
-  // The relative time (either periodic or single)
-  units::second_t m_period = 0_s;
-
-  // True if this is a periodic event
-  bool m_periodic = false;
 };
 
-} // namespace frc
+}  // namespace wpi

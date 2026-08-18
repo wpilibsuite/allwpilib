@@ -2,15 +2,12 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/drive/RobotDriveBase.h"
+#include "wpi/drive/RobotDriveBase.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 
-#include "frc/motorcontrol/MotorController.h"
-
-using namespace frc;
+using namespace wpi;
 
 RobotDriveBase::RobotDriveBase() {
   SetSafetyEnabled(true);
@@ -28,17 +25,17 @@ void RobotDriveBase::FeedWatchdog() {
   Feed();
 }
 
-void RobotDriveBase::Desaturate(std::span<double> wheelSpeeds) {
-  double maxMagnitude = std::abs(wheelSpeeds[0]);
-  for (size_t i = 1; i < wheelSpeeds.size(); i++) {
-    double temp = std::abs(wheelSpeeds[i]);
+void RobotDriveBase::Desaturate(std::span<double> wheelVelocities) {
+  double maxMagnitude = std::abs(wheelVelocities[0]);
+  for (size_t i = 1; i < wheelVelocities.size(); i++) {
+    double temp = std::abs(wheelVelocities[i]);
     if (maxMagnitude < temp) {
       maxMagnitude = temp;
     }
   }
   if (maxMagnitude > 1.0) {
-    for (size_t i = 0; i < wheelSpeeds.size(); i++) {
-      wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
+    for (size_t i = 0; i < wheelVelocities.size(); i++) {
+      wheelVelocities[i] = wheelVelocities[i] / maxMagnitude;
     }
   }
 }

@@ -144,7 +144,8 @@ def header_to_dat(
         generation_includes = [],
         header_to_dat_deps = [],
         extra_defines = [],
-        deps = []):
+        deps = [],
+        name_transforms = []):
     """
     Sugar wrapper for the semiwrap.cmd.header2dat tool
     """
@@ -159,12 +160,14 @@ def header_to_dat(
         cmd += " -I " + inc
     for d in extra_defines:
         cmd += " -D '" + d + "'"
+    for t in name_transforms:
+        cmd += " '" + t + "' "
     cmd += " " + header_location
 
     cmd += " " + include_root
     cmd += _location_helper(RESOLVE_CASTERS_DIR + casters_pickle)
     cmd += " $(OUTS)"
-    cmd += " bogus c++20 ccache c++ -- -std=c++20"  # TODO(pj) Does it matter what these values are?
+    cmd += " bogus c++23 ccache c++ -- -std=c++23"  # TODO(pj) Does it matter what these values are?
 
     native.genrule(
         name = name + "." + class_name,
@@ -266,7 +269,7 @@ def gen_modinit_hpp(
         target_compatible_with = robotpy_compatibility_select(),
     )
 
-def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, deps = [], generation_defines = [], local_native_libraries = [], header_to_dat_deps = [], yml_prefix = "src/main/python/"):
+def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, deps = [], generation_defines = [], local_native_libraries = [], header_to_dat_deps = [], name_transforms = [], yml_prefix = "src/main/python/"):
     generation_includes = []
     header_to_dat_deps = list(header_to_dat_deps)
 
@@ -286,6 +289,7 @@ def run_header_gen(name, casters_pickle, trampoline_subpath, header_gen_config, 
             generation_includes = generation_includes,
             extra_defines = generation_defines,
             header_to_dat_deps = header_to_dat_deps,
+            name_transforms = name_transforms,
         )
 
     generated_cc_files = []

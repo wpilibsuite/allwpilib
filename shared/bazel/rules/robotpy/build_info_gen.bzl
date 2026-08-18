@@ -1,16 +1,36 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
-def generate_robotpy_native_wrapper_build_info(name, pyproject_toml, third_party_dirs = []):
+def generate_robotpy_native_wrapper_build_info(
+        name,
+        pyproject_toml,
+        third_party_dirs = [],
+        native_srcs_root = "src/main/native/",
+        generated_include_target = None,
+        generated_include_root = "src/generated/main/native/include"):
     """
     This function will generate the bazel file necessary to declare a library that wraps a standard allwpilib library.
 
     Params:
         pyproject_toml - Path to the native library wrappers definition file
-        third_party_dirs - Any directories under src/main/native/thirdparty that should be used by semiwrap
+        third_party_dirs - Any directories under <native_srcs_root>thirdparty that should be used by semiwrap
+        native_srcs_root - Package-relative prefix under which the native cpp/include/thirdparty
+            directories live, relative to wherever this macro is invoked from
+        generated_include_target - Optional label pointing at a public filegroup exposing that project's
+            generated headers
+        generated_include_root - Package-relative prefix to strip from generated_include_target's sources
+            so they land correctly under the wheel's include root. Defaults to the standard generated
+            include directory; override when generated_include_target's sources live elsewhere (e.g.
+            wpimath's generated protobuf headers live under src/generated/main/native/cpp).
     """
     cmd = "$(location //shared/bazel/rules/robotpy:generate_native_build_file) --output_file=$(OUTS)"
     cmd += " --project_cfg=$(location " + pyproject_toml + ")"
+    if native_srcs_root:
+        cmd += " --native_srcs_root=" + native_srcs_root
+    cmd += " --package_name=" + native.package_name()
+    if generated_include_target:
+        cmd += " --generated_include_target=" + generated_include_target
+        cmd += " --generated_include_root=" + generated_include_root
     if third_party_dirs:
         cmd += " --third_party_dirs "
         for d in third_party_dirs:
@@ -34,6 +54,7 @@ def generate_robotpy_native_wrapper_build_info(name, pyproject_toml, third_party
         suggested_update_target = "//:write_robotpy_generated_native_files",
         tags = ["robotpy"],
         target_compatible_with = robotpy_compatibility_select(),
+        diff_args = ["-u"],
     )
 
 def generate_robotpy_pybind_build_info(
@@ -91,4 +112,5 @@ def generate_robotpy_pybind_build_info(
         visibility = ["//visibility:public"],
         tags = ["robotpy"],
         target_compatible_with = robotpy_compatibility_select(),
+        diff_args = ["-u"],
     )

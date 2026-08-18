@@ -1,4 +1,4 @@
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore')) {
+if (project.hasProperty('onlylinuxsystemcore')) {
     return;
 }
 
@@ -11,14 +11,10 @@ ext {
 
 apply plugin: 'google-test-test-suite'
 
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${pluginName}Test"] = []
-apply from: "${rootDir}/shared/googletest.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 model {
     testSuites {
@@ -42,12 +38,17 @@ model {
     }
     binaries {
         all {
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'halMrc', linkage: 'static'
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'halMrc', linkage: 'static'
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'

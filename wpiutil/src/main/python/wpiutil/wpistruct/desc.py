@@ -33,16 +33,16 @@ class StructDescriptor(typing.NamedTuple):
     pack: typing.Callable[[typing.Any], bytes]
 
     #: A function that converts the type to bytes
-    packInto: typing.Callable[[typing.Any, Buffer], None]
+    pack_into: typing.Callable[[typing.Any, Buffer], None]
 
     #: A function that converts bytes to an instance
     unpack: typing.Callable[[Buffer], typing.Any]
 
     #: A function that updates the given instance using the deserialized bytes
     #: .. not supported
-    # unpackInto: typing.Callable[[typing.Any, Buffer], None]
+    # unpack_into: typing.Callable[[typing.Any, Buffer], None]
 
-    #: If this contains nested structs, calls wpiutil.wpistruct.forEachNested for each
-    forEachNested: typing.Optional[
+    #: If this contains nested structs, calls wpiutil.wpistruct.for_each_nested for each
+    for_each_nested: typing.Optional[
         typing.Callable[[typing.Callable[[str, str], None]], None]
     ]

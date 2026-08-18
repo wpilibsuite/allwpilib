@@ -1,70 +1,70 @@
 #pragma once
 
-#include <units/illuminance.h>
+#include "wpi/units/illuminance.hpp"
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<units::lux_t> {
+template <> struct handle_type_name<wpi::units::lux_t> {
   static constexpr auto name = _("wpimath.units.luxes");
 };
 
-template <> struct handle_type_name<units::luxes> {
+template <> struct handle_type_name<wpi::units::luxes> {
   static constexpr auto name = _("wpimath.units.luxes");
 };
 
-template <> struct handle_type_name<units::nanolux_t> {
+template <> struct handle_type_name<wpi::units::nanolux_t> {
   static constexpr auto name = _("wpimath.units.nanoluxes");
 };
 
-template <> struct handle_type_name<units::nanoluxes> {
+template <> struct handle_type_name<wpi::units::nanoluxes> {
   static constexpr auto name = _("wpimath.units.nanoluxes");
 };
 
-template <> struct handle_type_name<units::microlux_t> {
+template <> struct handle_type_name<wpi::units::microlux_t> {
   static constexpr auto name = _("wpimath.units.microluxes");
 };
 
-template <> struct handle_type_name<units::microluxes> {
+template <> struct handle_type_name<wpi::units::microluxes> {
   static constexpr auto name = _("wpimath.units.microluxes");
 };
 
-template <> struct handle_type_name<units::millilux_t> {
+template <> struct handle_type_name<wpi::units::millilux_t> {
   static constexpr auto name = _("wpimath.units.milliluxes");
 };
 
-template <> struct handle_type_name<units::milliluxes> {
+template <> struct handle_type_name<wpi::units::milliluxes> {
   static constexpr auto name = _("wpimath.units.milliluxes");
 };
 
-template <> struct handle_type_name<units::kilolux_t> {
+template <> struct handle_type_name<wpi::units::kilolux_t> {
   static constexpr auto name = _("wpimath.units.kiloluxes");
 };
 
-template <> struct handle_type_name<units::kiloluxes> {
+template <> struct handle_type_name<wpi::units::kiloluxes> {
   static constexpr auto name = _("wpimath.units.kiloluxes");
 };
 
-template <> struct handle_type_name<units::footcandle_t> {
+template <> struct handle_type_name<wpi::units::footcandle_t> {
   static constexpr auto name = _("wpimath.units.footcandles");
 };
 
-template <> struct handle_type_name<units::footcandles> {
+template <> struct handle_type_name<wpi::units::footcandles> {
   static constexpr auto name = _("wpimath.units.footcandles");
 };
 
-template <> struct handle_type_name<units::lumens_per_square_inch_t> {
+template <> struct handle_type_name<wpi::units::lumens_per_square_inch_t> {
   static constexpr auto name = _("wpimath.units.lumens_per_square_inch");
 };
 
-template <> struct handle_type_name<units::lumens_per_square_inch> {
+template <> struct handle_type_name<wpi::units::lumens_per_square_inch> {
   static constexpr auto name = _("wpimath.units.lumens_per_square_inch");
 };
 
-template <> struct handle_type_name<units::phot_t> {
+template <> struct handle_type_name<wpi::units::phot_t> {
   static constexpr auto name = _("wpimath.units.phots");
 };
 
-template <> struct handle_type_name<units::phots> {
+template <> struct handle_type_name<wpi::units::phots> {
   static constexpr auto name = _("wpimath.units.phots");
 };
 

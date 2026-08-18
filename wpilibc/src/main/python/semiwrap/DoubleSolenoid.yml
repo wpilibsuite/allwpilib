@@ -1,17 +1,17 @@
 extra_includes:
-- wpi/sendable/SendableBuilder.h
+- wpi/util/sendable/SendableBuilder.hpp
 
 classes:
-  frc::DoubleSolenoid:
+  wpi::DoubleSolenoid:
     ignored_bases:
-    - wpi::SendableHelper<DoubleSolenoid>
+    - wpi::util::SendableHelper<DoubleSolenoid>
     enums:
       Value:
     methods:
       DoubleSolenoid:
         overloads:
-          int, PneumaticsModuleType, int, int:
-          int, int, PneumaticsModuleType, int, int:
+          CANBus, PneumaticsModuleType, int, int:
+          CANBus, int, PneumaticsModuleType, int, int:
       Set:
       Get:
       Toggle:

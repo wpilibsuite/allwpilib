@@ -8,8 +8,9 @@ requires = [
 
 [project]
 name = "robotpy-native-wpiutil"
-version = "2027.0.0a2"
+version = "0.0.0"
 description = "WPILib Utility Library"
+requires-python = ">=3.11"
 license = "BSD-3-Clause"
 
 dependencies = [
@@ -21,9 +22,9 @@ packages = ["src/native"]
 
 [[tool.hatch.build.hooks.robotpy.maven_lib_download]]
 artifact_id = "wpiutil-cpp"
-group_id = "edu.wpi.first.wpiutil"
-repo_url = "https://frcmaven.wpi.edu/artifactory/release-2027"
-version = "2027.0.0-alpha-2"
+group_id = "org.wpilib.wpiutil"
+repo_url = ""
+version = "0.0.0"
 
 extract_to = "src/native/wpiutil"
 libs = ["wpiutil"]
@@ -36,7 +37,21 @@ includedir = "src/native/wpiutil/include"
 libdir = "src/native/wpiutil/lib"
 shared_libraries = ["wpiutil"]
 
-enable_if = "platform_system != 'Windows'"
+enable_if = "platform_system != 'Windows' and platform_machine != 'aarch64'"
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpiutil/robotpy-native-wpiutil.pc"
+name = "wpiutil"
+
+includedir = "src/native/wpiutil/include"
+libdir = "src/native/wpiutil/lib"
+shared_libraries = ["wpiutil"]
+
+# abi warnings are obnoxious on arm
+extra_cflags = "-Wno-psabi"
+
+enable_if = "platform_system != 'Windows' and platform_machine == 'aarch64'"
+
 
 [[tool.hatch.build.hooks.nativelib.pcfile]]
 pcfile = "src/native/wpiutil/robotpy-native-wpiutil.pc"

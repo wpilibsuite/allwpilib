@@ -4,35 +4,35 @@
 
 #include <jni.h>
 
-#include <wpi/jni_util.h>
+#include "org_wpilib_math_jni_Transform3dJNI.h"
+#include "wpi/math/geometry/Quaternion.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Transform3d.hpp"
+#include "wpi/math/geometry/Twist3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/util/jni_util.hpp"
 
-#include "edu_wpi_first_math_jni_Transform3dJNI.h"
-#include "frc/geometry/Quaternion.h"
-#include "frc/geometry/Rotation3d.h"
-#include "frc/geometry/Transform3d.h"
-#include "frc/geometry/Twist3d.h"
-#include "units/angle.h"
-#include "units/length.h"
-
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_Transform3dJNI
+ * Class:     org_wpilib_math_jni_Transform3dJNI
  * Method:    log
  * Signature: (DDDDDDD)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_edu_wpi_first_math_jni_Transform3dJNI_log
+Java_org_wpilib_math_jni_Transform3dJNI_log
   (JNIEnv* env, jclass, jdouble relX, jdouble relY, jdouble relZ, jdouble relQw,
    jdouble relQx, jdouble relQy, jdouble relQz)
 {
-  frc::Transform3d transform3d{
-      units::meter_t{relX}, units::meter_t{relY}, units::meter_t{relZ},
-      frc::Rotation3d{frc::Quaternion{relQw, relQx, relQy, relQz}}};
+  wpi::math::Transform3d transform3d{
+      wpi::units::meter_t{relX}, wpi::units::meter_t{relY},
+      wpi::units::meter_t{relZ},
+      wpi::math::Rotation3d{wpi::math::Quaternion{relQw, relQx, relQy, relQz}}};
 
-  frc::Twist3d result = transform3d.Log();
+  wpi::math::Twist3d result = transform3d.Log();
 
   return MakeJDoubleArray(
       env, {{result.dx.value(), result.dy.value(), result.dz.value(),

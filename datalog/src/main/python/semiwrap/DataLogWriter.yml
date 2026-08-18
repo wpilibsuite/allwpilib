@@ -1,5 +1,13 @@
 classes:
   wpi::log::DataLogWriter:
+    inline_code: |
+      .def("__enter__", [](DataLogWriter *self) {
+        return self;
+      })
+      .def("__exit__", [](DataLogWriter &self, py::args args) {
+        py::gil_scoped_release release;
+        self.Stop();
+      })
     methods:
       DataLogWriter:
         overloads:
@@ -16,11 +24,11 @@ classes:
             param_override:
               ec:
                 ignore: true
-          wpi::Logger&, std::string_view, std::error_code&, std::string_view:
+          wpi::util::Logger&, std::string_view, std::error_code&, std::string_view:
             ignore: true
-          std::unique_ptr<wpi::raw_ostream>, std::string_view:
+          std::unique_ptr<wpi::util::raw_ostream>, std::string_view:
             ignore: true
-          wpi::Logger&, std::unique_ptr<wpi::raw_ostream>, std::string_view:
+          wpi::util::Logger&, std::unique_ptr<wpi::util::raw_ostream>, std::string_view:
             ignore: true
       Flush:
       Stop:

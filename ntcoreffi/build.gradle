@@ -6,7 +6,7 @@ plugins {
     id 'maven-publish'
 }
 
-apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'org.wpilib.NativeUtils'
 
 apply from: '../shared/config.gradle'
 
@@ -68,7 +68,7 @@ model {
                     binary.buildable = false
                     return
                 }
-                binary.tasks.withType(AbstractNativeSourceCompileTask) {
+                binary.tasks.withType(AbstractNativeSourceCompileTask).configureEach {
                     it.dependsOn generateSymbols
                 }
                 project(':ntcore').addNtcoreDependency(binary, 'static')
@@ -81,8 +81,8 @@ model {
 
 def nativeName = 'ntcoreffi'
 def baseArtifactId = nativeName
-def artifactGroupId = "edu.wpi.first.${nativeName}"
-def zipBaseName = "_GROUP_edu_wpi_first_${nativeName}_ID_${nativeName}-cpp_CLS"
+def artifactGroupId = "org.wpilib.${nativeName}"
+def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 def outputsFolder = file("$project.buildDir/outputs")
 
 evaluationDependsOn(':ntcore')

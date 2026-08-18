@@ -23,15 +23,15 @@ namespace wpi {
  * The data file will be saved to a USB flash drive in a folder named "logs" if
  * one is attached, or to /home/systemcore/logs otherwise.
  *
- * Log files are initially named "FRC_TBD_{random}.wpilog" until the DS
+ * Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS
  * connects. After the DS connects, the log file is renamed to
- * "FRC_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC). If the FMS is
+ * "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is UTC). If the FMS is
  * connected and provides a match number, the log file is renamed to
- * "FRC_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
+ * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
- * On startup, all existing FRC_TBD log files are deleted. If there is less than
- * 50 MB of free space on the target storage, FRC_ log files are deleted (oldest
- * to newest) until there is 50 MB free OR there are 10 files remaining.
+ * On startup, all existing WPILIB_TBD log files are deleted. If there is less
+ * than 50 MB of free space on the target storage, WPILIB_ log files are deleted
+ * (oldest to newest) until there is 50 MB free OR there are 10 files remaining.
  *
  * By default, all NetworkTables value changes are stored to the data log.
  */
@@ -118,7 +118,8 @@ struct WPI_DataLog;
  * @param period time between automatic flushes to disk, in seconds;
  *               this is a time/storage tradeoff
  */
-void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename, double period);
+void DLM_Start(const struct WPI_String* dir, const struct WPI_String* filename,
+               double period);
 
 /**
  * Stop data log manager.
@@ -157,11 +158,10 @@ void DLM_GetLogDir(struct WPI_String* value);
  */
 void DLM_LogNetworkTables(int enabled);
 
-
-  /**
-   * Enable or disable logging of the console output. Defaults to enabled.
-   * @param enabled  true to enable, false to disable
-   */
+/**
+ * Enable or disable logging of the console output. Defaults to enabled.
+ * @param enabled  true to enable, false to disable
+ */
 void DLM_LogConsoleOutput(int enabled);
 
 /**

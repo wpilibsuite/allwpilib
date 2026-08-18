@@ -1,5 +1,5 @@
 classes:
-  frc::MechanismLigament2d:
+  wpi::MechanismLigament2d:
     methods:
       MechanismLigament2d:
         ignore: true

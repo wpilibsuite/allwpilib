@@ -6,9 +6,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "CountCopyAndMove.h"
+#include "CountCopyAndMove.hpp"
 
-using namespace wpi;
+using namespace wpi::util;
 
 int CountCopyAndMove::DefaultConstructions = 0;
 int CountCopyAndMove::ValueConstructions = 0;

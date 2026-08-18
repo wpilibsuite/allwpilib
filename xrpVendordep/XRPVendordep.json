@@ -3,12 +3,12 @@
   "name": "XRP-Vendordep",
   "version": "1.0.0",
   "uuid": "1571a1a5-ed3f-4f07-b7eb-b2beb17394e0",
-  "frcYear": "2027_alpha1",
+  "wpilibYear": "2027_alpha5",
   "mavenUrls": [],
   "jsonUrl": "",
   "javaDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
+      "groupId": "org.wpilib.xrpVendordep",
       "artifactId": "xrpVendordep-java",
       "version": "wpilib"
     }
@@ -16,7 +16,7 @@
   "jniDependencies": [],
   "cppDependencies": [
     {
-      "groupId": "edu.wpi.first.xrpVendordep",
+      "groupId": "org.wpilib.xrpVendordep",
       "artifactId": "xrpVendordep-cpp",
       "version": "wpilib",
       "libName": "xrpVendordep",

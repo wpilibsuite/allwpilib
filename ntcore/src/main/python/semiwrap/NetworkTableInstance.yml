@@ -1,36 +1,37 @@
 extra_includes:
-- networktables/BooleanArrayTopic.h
-- networktables/BooleanTopic.h
-- networktables/DoubleArrayTopic.h
-- networktables/DoubleTopic.h
-- networktables/FloatArrayTopic.h
-- networktables/FloatTopic.h
-- networktables/IntegerArrayTopic.h
-- networktables/IntegerTopic.h
-- networktables/MultiSubscriber.h
-- networktables/RawTopic.h
-- networktables/StringArrayTopic.h
-- networktables/StringTopic.h
-- networktables/StructArrayTopic.h
-- networktables/StructTopic.h
-- networktables/Topic.h
+- wpi/nt/BooleanArrayTopic.hpp
+- wpi/nt/BooleanTopic.hpp
+- wpi/nt/DoubleArrayTopic.hpp
+- wpi/nt/DoubleTopic.hpp
+- wpi/nt/FloatArrayTopic.hpp
+- wpi/nt/FloatTopic.hpp
+- wpi/nt/IntegerArrayTopic.hpp
+- wpi/nt/IntegerTopic.hpp
+- wpi/nt/MultiSubscriber.hpp
+- wpi/nt/RawTopic.hpp
+- wpi/nt/StringArrayTopic.hpp
+- wpi/nt/StringTopic.hpp
+- wpi/nt/StructArrayTopic.hpp
+- wpi/nt/StructTopic.hpp
+- wpi/nt/Topic.hpp
 - src/py2value.h
 - src/nt_instance.h
-- wpi/datalog/DataLog.h
+- wpi/datalog/DataLog.hpp
 - wpystruct.h
 
 classes:
-  nt::NetworkTableInstance:
+  wpi::nt::NetworkTableInstance:
     force_type_casters:
     - std::function
     attributes:
-      kDefaultPort:
+      DEFAULT_PORT:
     enums:
       NetworkMode:
         arithmetic: true
         inline_code: |
-          .value("kNetModeStarting", (nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
+          .value("STARTING", (wpi::nt::NetworkTableInstance::NetworkMode)NT_NET_MODE_STARTING)
       LogLevel:
+        value_prefix: LEVEL_
     methods:
       NetworkTableInstance:
         overloads:
@@ -117,11 +118,11 @@ classes:
       StopLocal:
       StartServer:
         cpp_code: |
-          [](NetworkTableInstance * self, std::string_view persist_filename,  const char* listen_address,
-             unsigned int port) {
+          [](NetworkTableInstance * self, std::string_view persist_filename,  std::string_view listen_address,
+             std::string_view mdns_service, unsigned int port) {
             pyntcore::onInstanceStart(self);
             py::gil_scoped_release release;
-            self->StartServer(persist_filename, listen_address, port);
+            self->StartServer(persist_filename, listen_address, mdns_service, port);
           }
       StopServer:
       StopClient:
@@ -131,6 +132,14 @@ classes:
           std::span<const std::pair<std::string_view, unsigned int>>:
           std::span<const std::string_view>, unsigned int:
       SetServerTeam:
+      SetServerFixed:
+      SetServerMdns:
+        overloads:
+          std::string_view:
+          std::string_view, std::string_view, unsigned int:
+          std::string_view, std::span<const std::pair<std::string_view, unsigned int>>:
+          std::string_view, unsigned int, std::span<const std::pair<std::string_view, unsigned int>>:
+          std::string_view, std::span<const std::string_view>, unsigned int:
       Disconnect:
       StartDSClient:
       StopDSClient:
@@ -156,12 +165,12 @@ classes:
       operator==:
       StartClient:
     inline_code: |
-      .def("configPythonLogging", [](NetworkTableInstance * self, 
-        NetworkTableInstance::LogLevel minLevel, NetworkTableInstance::LogLevel maxLevel, py::str logName) {
-          py::module::import("ntcore._logutil").attr("_config_logging")(self, minLevel, maxLevel, logName);
+      .def("config_python_logging", [](NetworkTableInstance * self,
+        NetworkTableInstance::LogLevel min_level, NetworkTableInstance::LogLevel max_level, py::str log_name) {
+          py::module::import("ntcore._logutil").attr("_config_logging")(self, min_level, max_level, log_name);
         }, py::kw_only(),
-          py::arg("min") = NetworkTableInstance::LogLevel::kLogInfo,
-          py::arg("max") = NetworkTableInstance::LogLevel::kLogCritical,
+          py::arg("min") = NetworkTableInstance::LogLevel::LEVEL_INFO,
+          py::arg("max") = NetworkTableInstance::LogLevel::LEVEL_CRITICAL,
           py::arg("name") = "nt",
         py::doc("Configure python logging for this instance.\n"
                 "\n"
@@ -175,7 +184,7 @@ classes:
         pyntcore::onInstancePreReset(self);
         {
           py::gil_scoped_release release;
-          nt::ResetInstance(self->GetHandle());
+          wpi::nt::ResetInstance(self->GetHandle());
         }
         pyntcore::onInstancePostReset(self);
       })

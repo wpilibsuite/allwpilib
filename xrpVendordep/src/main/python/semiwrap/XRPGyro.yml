@@ -1,5 +1,5 @@
 classes:
-  frc::XRPGyro:
+  wpi::xrp::XRPGyro:
     methods:
       XRPGyro:
       GetAngle:

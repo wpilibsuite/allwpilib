@@ -10,13 +10,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "wpi/SmallVector.h"
-#include "wpi/MemAlloc.h"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/MemAlloc.hpp"
 #include <cstdint>
 #ifdef LLVM_ENABLE_EXCEPTIONS
 #include <stdexcept>
 #endif
-using namespace wpi;
+using namespace wpi::util;
 
 // Check that no bytes are wasted and everything is well-aligned.
 namespace {
@@ -114,7 +114,7 @@ static size_t getNewCapacity(size_t MinSize, size_t TSize, size_t OldCapacity) {
 /// situation does occur.
 static void *replaceAllocation(void *NewElts, size_t TSize, size_t NewCapacity,
                                size_t VSize = 0) {
-  void *NewEltsReplace = wpi::safe_malloc(NewCapacity * TSize);
+  void *NewEltsReplace = wpi::util::safe_malloc(NewCapacity * TSize);
   if (VSize)
     memcpy(NewEltsReplace, NewElts, VSize * TSize);
   free(NewElts);
@@ -128,7 +128,7 @@ void *SmallVectorBase::mallocForGrow(void *FirstEl, size_t MinSize,
   NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
   // Even if capacity is not 0 now, if the vector was originally created with
   // capacity 0, it's possible for the malloc to return FirstEl.
-  void *NewElts = wpi::safe_malloc(NewCapacity * TSize);
+  void *NewElts = wpi::util::safe_malloc(NewCapacity * TSize);
   if (NewElts == FirstEl)
     NewElts = replaceAllocation(NewElts, TSize, NewCapacity);
   return NewElts;
@@ -140,7 +140,7 @@ void SmallVectorBase::grow_pod(void *FirstEl, size_t MinSize,
   size_t NewCapacity = getNewCapacity(MinSize, TSize, this->capacity());
   void *NewElts;
   if (BeginX == FirstEl) {
-    NewElts = wpi::safe_malloc(NewCapacity * TSize);
+    NewElts = wpi::util::safe_malloc(NewCapacity * TSize);
     if (NewElts == FirstEl)
       NewElts = replaceAllocation(NewElts, TSize, NewCapacity);
 
@@ -148,7 +148,7 @@ void SmallVectorBase::grow_pod(void *FirstEl, size_t MinSize,
     memcpy(NewElts, this->BeginX, size() * TSize);
   } else {
     // If this wasn't grown from the inline copy, grow the allocated space.
-    NewElts = wpi::safe_realloc(this->BeginX, NewCapacity * TSize);
+    NewElts = wpi::util::safe_realloc(this->BeginX, NewCapacity * TSize);
     if (NewElts == FirstEl)
       NewElts = replaceAllocation(NewElts, TSize, NewCapacity, size());
   }

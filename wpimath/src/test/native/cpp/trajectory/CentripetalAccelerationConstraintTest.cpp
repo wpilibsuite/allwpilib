@@ -2,42 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <memory>
-#include <vector>
+#include "wpi/math/trajectory/constraint/CentripetalAccelerationConstraint.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "frc/trajectory/constraint/CentripetalAccelerationConstraint.h"
-#include "frc/trajectory/constraint/TrajectoryConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/math.h"
-#include "units/velocity.h"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-TEST(CentripetalAccelerationConstraintTest, Constraint) {
+TEST_CASE("CentripetalAccelerationConstraintTest Constraint", "[wpimath]") {
   const auto maxCentripetalAcceleration = 7_fps_sq;
 
   auto config = TrajectoryConfig(12_fps, 12_fps_sq);
   config.AddConstraint(
       CentripetalAccelerationConstraint(maxCentripetalAcceleration));
 
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
-  units::second_t time = 0_s;
-  units::second_t dt = 20_ms;
-  units::second_t duration = trajectory.TotalTime();
-
-  while (time < duration) {
-    const Trajectory::State point = trajectory.Sample(time);
-    time += dt;
-
+  for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
+    auto point = trajectory.SampleAt(t);
     auto centripetalAcceleration =
-        units::math::pow<2>(point.velocity) * point.curvature / 1_rad;
+        wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature /
+        1_rad;
 
-    EXPECT_TRUE(centripetalAcceleration <
-                maxCentripetalAcceleration + 0.05_mps_sq);
+    CHECK(centripetalAcceleration < maxCentripetalAcceleration + 0.05_mps_sq);
   }
 }

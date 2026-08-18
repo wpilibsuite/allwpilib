@@ -1,16 +1,17 @@
+import org.gradle.internal.jvm.Jvm
+import org.wpilib.jni.JniSystemDependencySet
+
 apply from: "${rootDir}/shared/resources.gradle"
 
 apply plugin: 'c'
 ext {
     noWpiutil = true
-    skipJniSymbols = [
-        'Java_edu_wpi_first_util_CombinedRuntimeLoader_setDllDirectory'
-    ]
     baseId = 'wpiutil'
-    groupId = 'edu.wpi.first.wpiutil'
+    groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
-    devMain = 'edu.wpi.first.util.DevMain'
+    nativeTestSuiteName = "${nativeName}Test"
+    devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
     splitSetup = {
@@ -27,22 +28,22 @@ ext {
                     srcDirs 'src/main/native/thirdparty/debugging/include'
                 }
             }
-            fmtlibCpp(CppSourceSet) {
+            doubleConversionCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/thirdparty/fmtlib/src'
+                    srcDirs 'src/main/native/thirdparty/double-conversion/src'
                     include '*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/fmtlib/include'
+                    srcDirs 'src/main/native/thirdparty/double-conversion/include'
                 }
             }
             jsonCpp(CppSourceSet) {
                 source {
-                    srcDirs 'src/main/native/thirdparty/json/cpp'
-                    include '*.cpp'
+                    srcDirs 'src/main/native/thirdparty/json/src'
+                    include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/thirdparty/json/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/double-conversion/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/json/include'
                 }
             }
             llvmCpp(CppSourceSet) {
@@ -51,7 +52,7 @@ ext {
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llvm/include'
                 }
             }
             mpackCpp(CppSourceSet) {
@@ -109,7 +110,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -123,33 +124,7 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
-                        include '**/*.h'
-                    }
-                }
-            }
-        } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
-            it.sources {
-                wpiutilmacOSCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/macOS'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
-                        include '**/*.h'
-                    }
-                }
-            }
-        } else {
-            it.sources {
-                wpiutilLinuxCpp(CppSourceSet) {
-                    source {
-                        srcDirs 'src/main/native/linux'
-                        include '**/*.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include'
                         include '**/*.h'
                     }
                 }
@@ -175,8 +150,7 @@ cppHeadersZip {
     def thirdpartyIncDirs = [
         'src/main/native/thirdparty/argparse/include',
         'src/main/native/thirdparty/debugging/include',
-        'src/main/native/thirdparty/expected/include',
-        'src/main/native/thirdparty/fmtlib/include',
+        'src/main/native/thirdparty/double-conversion/include',
         'src/main/native/thirdparty/json/include',
         'src/main/native/thirdparty/llvm/include',
         'src/main/native/thirdparty/mpack/include',
@@ -197,10 +171,10 @@ cppSourcesZip {
     from('src/main/native/thirdparty/debugging/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/fmtlib/src') {
+    from('src/main/native/thirdparty/double-conversion/src') {
         into '/'
     }
-    from('src/main/native/thirdparty/json/cpp') {
+    from('src/main/native/thirdparty/json/src') {
         into '/'
     }
     from('src/main/native/thirdparty/llvm/cpp') {
@@ -225,34 +199,12 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/expected/include', 'src/main/native/thirdparty/fmtlib/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/double-conversion/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
     }
     testSuites {
-        "${nativeName}Catch2Test"(GoogleTestTestSuiteSpec) {
-            for(NativeComponentSpec c : $.components) {
-                if (c.name == nativeName) {
-                    testing c
-                    break
-                }
-            }
-            sources {
-                cpp {
-                    source {
-                        srcDirs 'src/test/native/cpp'
-                        include '**/TestCatch2.cpp', '**/catch2main.cpp'
-                    }
-                    exportedHeaders {
-                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
-                    }
-                }
-            }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-            }
-        }
         withType(GoogleTestTestSuiteSpec) {
             sources {
                 protobufGenCpp(CppSourceSet) {
@@ -272,11 +224,28 @@ model {
             }
         }
     }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            def jniIncludeDir = new File(Jvm.current().javaHome, 'include')
+            def jniHeaderLocations = [jniIncludeDir.toString()]
+            [
+                'darwin',
+                'linux',
+                'win32',
+                'freebsd'
+            ].each {
+                def platformIncludeDir = new File(jniIncludeDir, it)
+                if (platformIncludeDir.exists()) {
+                    jniHeaderLocations << platformIncludeDir.toString()
+                }
+            }
+            lib(new JniSystemDependencySet(jniHeaderLocations, project))
+        }
+    }
 }
 
 dependencies {
-    api "com.fasterxml.jackson.core:jackson-annotations:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-core:2.19.2"
-    api "com.fasterxml.jackson.core:jackson-databind:2.19.2"
-    api 'us.hebi.quickbuf:quickbuf-runtime:1.4'
+    annotationProcessor libs.avaje.jsonb.generator
+    api libs.avaje.jsonb
+    api libs.quickbuf.runtime
 }

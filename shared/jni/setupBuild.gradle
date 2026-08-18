@@ -1,8 +1,8 @@
 apply plugin: 'cpp'
 apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'edu.wpi.first.GradleJni'
+apply plugin: 'org.wpilib.NativeUtils'
+apply plugin: 'org.wpilib.GradleJni'
 apply plugin: SingleNativeBuild
 apply plugin: ExtraTasks
 
@@ -10,7 +10,7 @@ apply from: "${rootDir}/shared/config.gradle"
 
 ext {
     baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+    groupId = "org.wpilib.${nativeName}"
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"
@@ -24,13 +24,8 @@ dependencies {
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
+def nativeTestSuiteName = project.findProperty('nativeTestSuiteName') ?: "${nativeName}Test"
 
-staticGtestConfigs["${nativeName}Test"] = []
-
-apply from: "${rootDir}/shared/googletest.gradle"
 apply from: "${rootDir}/shared/catch2.gradle"
 
 model {
@@ -48,6 +43,9 @@ model {
                         }
                         include '**/*.cpp', '**/*.cc'
                         exclude '**/jni/**/*.cpp'
+                        if (project.hasProperty('nativeCppSourceExcludes')) {
+                            nativeCppSourceExcludes.each { exclude it }
+                        }
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include', "$buildDir/generated/source/proto/main/cpp"
@@ -112,7 +110,6 @@ model {
             enableCheckTask !project.hasProperty('skipJniCheck')
             javaCompileTasks << compileJava
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.systemcore)
-            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm32)
             jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.linuxarm64)
             sources {
                 cpp {
@@ -195,7 +192,7 @@ model {
         }
     }
     testSuites {
-        "${nativeName}Test"(GoogleTestTestSuiteSpec) {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
             for(NativeComponentSpec c : $.components) {
                 if (c.name == nativeName) {
                     testing c
@@ -207,7 +204,6 @@ model {
                     source {
                         srcDirs 'src/test/native/cpp'
                         include '**/*.cpp'
-                        exclude '**/TestCatch2.cpp', '**/catch2main.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include', 'src/main/native/cpp', "$buildDir/generated/source/proto/main/cpp"

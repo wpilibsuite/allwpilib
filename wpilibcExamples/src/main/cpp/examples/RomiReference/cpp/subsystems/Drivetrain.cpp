@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "subsystems/Drivetrain.h"
+#include "subsystems/Drivetrain.hpp"
 
 #include <numbers>
 
-#include "Constants.h"
+#include "Constants.hpp"
 
 using namespace DriveConstants;
 
@@ -15,18 +15,18 @@ using namespace DriveConstants;
 // The Romi has onboard encoders that are hardcoded
 // to use DIO pins 4/5 and 6/7 for the left and right
 Drivetrain::Drivetrain() {
-  wpi::SendableRegistry::AddChild(&m_drive, &m_leftMotor);
-  wpi::SendableRegistry::AddChild(&m_drive, &m_rightMotor);
+  wpi::util::SendableRegistry::AddChild(&drive, &leftMotor);
+  wpi::util::SendableRegistry::AddChild(&drive, &rightMotor);
 
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.
-  m_rightMotor.SetInverted(true);
+  rightMotor.SetInverted(true);
 
-  m_leftEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
-                                    kCountsPerRevolution);
-  m_rightEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
-                                     kCountsPerRevolution);
+  leftEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
+                                  kCountsPerRevolution);
+  rightEncoder.SetDistancePerPulse(std::numbers::pi * kWheelDiameter.value() /
+                                   kCountsPerRevolution);
   ResetEncoders();
 }
 
@@ -34,47 +34,47 @@ void Drivetrain::Periodic() {
   // This method will be called once per scheduler run.
 }
 
-void Drivetrain::ArcadeDrive(double xaxisSpeed, double zaxisRotate) {
-  m_drive.ArcadeDrive(xaxisSpeed, zaxisRotate);
+void Drivetrain::ArcadeDrive(double xaxisVelocity, double zaxisRotate) {
+  drive.ArcadeDrive(xaxisVelocity, zaxisRotate);
 }
 
 void Drivetrain::ResetEncoders() {
-  m_leftEncoder.Reset();
-  m_rightEncoder.Reset();
+  leftEncoder.Reset();
+  rightEncoder.Reset();
 }
 
 int Drivetrain::GetLeftEncoderCount() {
-  return m_leftEncoder.Get();
+  return leftEncoder.Get();
 }
 
 int Drivetrain::GetRightEncoderCount() {
-  return m_rightEncoder.Get();
+  return rightEncoder.Get();
 }
 
-units::meter_t Drivetrain::GetLeftDistance() {
-  return units::meter_t{m_leftEncoder.GetDistance()};
+wpi::units::meter_t Drivetrain::GetLeftDistance() {
+  return wpi::units::meter_t{leftEncoder.GetDistance()};
 }
 
-units::meter_t Drivetrain::GetRightDistance() {
-  return units::meter_t{m_rightEncoder.GetDistance()};
+wpi::units::meter_t Drivetrain::GetRightDistance() {
+  return wpi::units::meter_t{rightEncoder.GetDistance()};
 }
 
-units::meter_t Drivetrain::GetAverageDistance() {
+wpi::units::meter_t Drivetrain::GetAverageDistance() {
   return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }
 
-units::radian_t Drivetrain::GetGyroAngleX() {
-  return m_gyro.GetAngleX();
+wpi::units::radian_t Drivetrain::GetGyroAngleX() {
+  return gyro.GetAngleX();
 }
 
-units::radian_t Drivetrain::GetGyroAngleY() {
-  return m_gyro.GetAngleY();
+wpi::units::radian_t Drivetrain::GetGyroAngleY() {
+  return gyro.GetAngleY();
 }
 
-units::radian_t Drivetrain::GetGyroAngleZ() {
-  return m_gyro.GetAngleZ();
+wpi::units::radian_t Drivetrain::GetGyroAngleZ() {
+  return gyro.GetAngleZ();
 }
 
 void Drivetrain::ResetGyro() {
-  m_gyro.Reset();
+  gyro.Reset();
 }

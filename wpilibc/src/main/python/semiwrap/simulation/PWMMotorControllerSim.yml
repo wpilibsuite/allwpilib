@@ -1,8 +1,8 @@
 classes:
-  frc::sim::PWMMotorControllerSim:
+  wpi::sim::PWMMotorControllerSim:
     methods:
       PWMMotorControllerSim:
         overloads:
           const PWMMotorController&:
           int:
-      GetSpeed:
+      GetThrottle:

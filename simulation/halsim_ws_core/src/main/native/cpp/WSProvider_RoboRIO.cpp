@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WSProvider_RoboRIO.h"
+#include "wpi/halsim/ws_core/WSProvider_RoboRIO.hpp"
 
-#include <hal/Ports.h>
-#include <hal/simulation/RoboRioData.h>
+#include "wpi/hal/simulation/RoboRioData.h"
 
 #define REGISTER(halsim, jsonid, ctype, haltype)                          \
   HALSIM_RegisterRoboRio##halsim##Callback(                               \
       [](const char* name, void* param, const struct HAL_Value* value) {  \
         static_cast<HALSimWSProviderRoboRIO*>(param)->ProcessHalCallback( \
-            {{jsonid, static_cast<ctype>(value->data.v_##haltype)}});     \
+            wpi::util::json::object(                                      \
+                jsonid, static_cast<ctype>(value->data.v_##haltype)));    \
       },                                                                  \
       this, true)
 
@@ -53,23 +53,21 @@ void HALSimWSProviderRoboRIO::DoCancelCallbacks() {
   m_3v3VoltageCbKey = 0;
 }
 
-void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::json& json) {
-  wpi::json::const_iterator it;
-  if ((it = json.find(">vin_voltage")) != json.end()) {
-    HALSIM_SetRoboRioVInVoltage(it.value());
+void HALSimWSProviderRoboRIO::OnNetValueChanged(const wpi::util::json& json) {
+  if (auto val = json.lookup(">vin_voltage"); val && val->is_number()) {
+    HALSIM_SetRoboRioVInVoltage(val->get_number());
   }
-
-  if ((it = json.find(">3v3_voltage")) != json.end()) {
-    HALSIM_SetRoboRioUserVoltage3V3(it.value());
+  if (auto val = json.lookup(">3v3_voltage"); val && val->is_number()) {
+    HALSIM_SetRoboRioUserVoltage3V3(val->get_number());
   }
-  if ((it = json.find(">3v3_current")) != json.end()) {
-    HALSIM_SetRoboRioUserCurrent3V3(it.value());
+  if (auto val = json.lookup(">3v3_current"); val && val->is_number()) {
+    HALSIM_SetRoboRioUserCurrent3V3(val->get_number());
   }
-  if ((it = json.find(">3v3_active")) != json.end()) {
-    HALSIM_SetRoboRioUserActive3V3(static_cast<bool>(it.value()));
+  if (auto val = json.lookup(">3v3_active"); val && val->is_bool()) {
+    HALSIM_SetRoboRioUserActive3V3(val->get_bool());
   }
-  if ((it = json.find(">3v3_faults")) != json.end()) {
-    HALSIM_SetRoboRioUserFaults3V3(it.value());
+  if (auto val = json.lookup(">3v3_faults"); val && val->is_number()) {
+    HALSIM_SetRoboRioUserFaults3V3(val->get_number());
   }
 }
 

@@ -1,7 +1,0 @@
-extra_includes:
-- wpi/sendable/SendableBuilder.h
-
-classes:
-  frc::DMC60:
-    methods:
-      DMC60:

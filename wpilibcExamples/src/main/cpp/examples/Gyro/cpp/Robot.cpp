@@ -4,38 +4,38 @@
 
 #include <cmath>
 
-#include <frc/Joystick.h>
-#include <frc/OnboardIMU.h>
-#include <frc/TimedRobot.h>
-#include <frc/drive/DifferentialDrive.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
+#include "wpi/driverstation/Joystick.hpp"
+#include "wpi/framework/TimedRobot.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
  * robot drive straight. This program uses a joystick to drive forwards and
  * backwards while the gyro is used for direction keeping.
  */
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    m_right.SetInverted(true);
+    right.SetInverted(true);
 
-    wpi::SendableRegistry::AddChild(&m_drive, &m_left);
-    wpi::SendableRegistry::AddChild(&m_drive, &m_right);
+    wpi::util::SendableRegistry::AddChild(&drive, &left);
+    wpi::util::SendableRegistry::AddChild(&drive, &right);
   }
 
   /**
-   * The motor speed is set from the joystick while the DifferentialDrive
+   * The motor velocity is set from the joystick while the DifferentialDrive
    * turning value is assigned from the error between the setpoint and the gyro
    * angle.
    */
   void TeleopPeriodic() override {
     double turningValue =
-        (kAngleSetpoint - m_imu.GetRotation2d().Degrees().value()) * kP;
-    m_drive.ArcadeDrive(-m_joystick.GetY(), -turningValue);
+        (kAngleSetpoint - imu.GetRotation2d().Degrees().value()) * kP;
+    drive.ArcadeDrive(-joystick.GetY(), -turningValue);
   }
 
  private:
@@ -44,21 +44,22 @@ class Robot : public frc::TimedRobot {
 
   static constexpr int kLeftMotorPort = 0;
   static constexpr int kRightMotorPort = 1;
-  static constexpr frc::OnboardIMU::MountOrientation kIMUMountOrientation =
-      frc::OnboardIMU::kFlat;
+  static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
+      wpi::OnboardIMU::FLAT;
   static constexpr int kJoystickPort = 0;
 
-  frc::PWMSparkMax m_left{kLeftMotorPort};
-  frc::PWMSparkMax m_right{kRightMotorPort};
-  frc::DifferentialDrive m_drive{[&](double output) { m_left.Set(output); },
-                                 [&](double output) { m_right.Set(output); }};
+  wpi::PWMSparkMax left{kLeftMotorPort};
+  wpi::PWMSparkMax right{kRightMotorPort};
+  wpi::DifferentialDrive drive{
+      [&](double output) { left.SetThrottle(output); },
+      [&](double output) { right.SetThrottle(output); }};
 
-  frc::OnboardIMU m_imu{kIMUMountOrientation};
-  frc::Joystick m_joystick{kJoystickPort};
+  wpi::OnboardIMU imu{kIMUMountOrientation};
+  wpi::Joystick joystick{kJoystickPort};
 };
 
-#ifndef RUNNING_FRC_TESTS
+#ifndef RUNNING_WPILIB_TESTS
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }
 #endif

@@ -2,44 +2,50 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/DoubleSolenoid.h>
-#include <frc/simulation/DoubleSolenoidSim.h>
-#include <frc/simulation/PWMMotorControllerSim.h>
-#include <gtest/gtest.h>
+#include "subsystems/Intake.hpp"
 
-#include "Constants.h"
-#include "subsystems/Intake.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-class IntakeTest : public testing::Test {
- protected:
+#include "Constants.hpp"
+#include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
+#include "wpi/simulation/DoubleSolenoidSim.hpp"
+#include "wpi/simulation/PWMMotorControllerSim.hpp"
+
+class IntakeTest {
+ public:
   Intake intake;  // create our intake
-  frc::sim::PWMMotorControllerSim simMotor{
+  wpi::sim::PWMMotorControllerSim simMotor{
       IntakeConstants::kMotorPort};  // create our simulation PWM
-  frc::sim::DoubleSolenoidSim simPiston{
-      frc::PneumaticsModuleType::CTREPCM, IntakeConstants::kPistonFwdChannel,
+  wpi::sim::DoubleSolenoidSim simPiston{
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
       IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
 };
 
-TEST_F(IntakeTest, DoesntWorkWhenClosed) {
+TEST_CASE_METHOD(IntakeTest, "IntakeTest doesnt work when closed",
+                 "[wpilibcExamples][examples][unitTest]") {
   intake.Retract();      // close the intake
   intake.Activate(0.5);  // try to activate the motor
-  EXPECT_DOUBLE_EQ(
-      0.0,
-      simMotor.GetSpeed());  // make sure that the value set to the motor is 0
+  CHECK_THAT(simMotor.GetThrottle(),
+             Catch::Matchers::WithinULP(0.0, 4));  // make sure that the value
+                                                   // set to the motor is 0
 }
 
-TEST_F(IntakeTest, WorksWhenOpen) {
+TEST_CASE_METHOD(IntakeTest, "IntakeTest works when open",
+                 "[wpilibcExamples][examples][unitTest]") {
   intake.Deploy();
   intake.Activate(0.5);
-  EXPECT_DOUBLE_EQ(0.5, simMotor.GetSpeed());
+  CHECK_THAT(simMotor.GetThrottle(), Catch::Matchers::WithinULP(0.5, 4));
 }
 
-TEST_F(IntakeTest, Retract) {
+TEST_CASE_METHOD(IntakeTest, "IntakeTest retract",
+                 "[wpilibcExamples][examples][unitTest]") {
   intake.Retract();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kReverse, simPiston.Get());
+  CHECK(wpi::DoubleSolenoid::Value::REVERSE == simPiston.Get());
 }
 
-TEST_F(IntakeTest, Deploy) {
+TEST_CASE_METHOD(IntakeTest, "IntakeTest deploy",
+                 "[wpilibcExamples][examples][unitTest]") {
   intake.Deploy();
-  EXPECT_EQ(frc::DoubleSolenoid::Value::kForward, simPiston.Get());
+  CHECK(wpi::DoubleSolenoid::Value::FORWARD == simPiston.Get());
 }

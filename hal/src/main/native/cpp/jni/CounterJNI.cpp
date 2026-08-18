@@ -6,28 +6,26 @@
 
 #include <cassert>
 
-#include <wpi/jni_util.h>
+#include "HALUtil.hpp"
+#include "org_wpilib_hardware_hal_CounterJNI.h"
+#include "wpi/hal/Counter.h"
+#include "wpi/util/jni_util.hpp"
 
-#include "HALUtil.h"
-#include "edu_wpi_first_hal_CounterJNI.h"
-#include "hal/Counter.h"
-#include "hal/Errors.h"
-
-using namespace hal;
+using namespace wpi::hal;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    initializeCounter
  * Signature: (IZ)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CounterJNI_initializeCounter
+Java_org_wpilib_hardware_hal_CounterJNI_initializeCounter
   (JNIEnv* env, jclass, jint channel, jboolean risingEdge)
 {
   int32_t status = 0;
-  auto stack = wpi::java::GetJavaStackTrace(env, "edu.wpi.first");
+  auto stack = wpi::util::java::GetJavaStackTrace(env, "org.wpilib");
   auto counter =
       HAL_InitializeCounter(channel, risingEdge, stack.c_str(), &status);
   CheckStatusForceThrow(env, status);
@@ -35,26 +33,26 @@ Java_edu_wpi_first_hal_CounterJNI_initializeCounter
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    freeCounter
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_freeCounter
+Java_org_wpilib_hardware_hal_CounterJNI_freeCounter
   (JNIEnv* env, jclass, jint id)
 {
-  if (id != HAL_kInvalidHandle) {
+  if (id != HAL_INVALID_HANDLE) {
     HAL_FreeCounter((HAL_CounterHandle)id);
   }
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    setCounterEdgeConfiguration
  * Signature: (IZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterEdgeConfiguration
+Java_org_wpilib_hardware_hal_CounterJNI_setCounterEdgeConfiguration
   (JNIEnv* env, jclass, jint id, jboolean valueRise)
 {
   int32_t status = 0;
@@ -63,12 +61,26 @@ Java_edu_wpi_first_hal_CounterJNI_setCounterEdgeConfiguration
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
+ * Method:    setCounterRateWindow
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_hardware_hal_CounterJNI_setCounterRateWindow
+  (JNIEnv* env, jclass, jint id, jint windowMilliseconds)
+{
+  int32_t status = 0;
+  HAL_SetCounterRateWindow((HAL_CounterHandle)id, windowMilliseconds, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    resetCounter
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_resetCounter
+Java_org_wpilib_hardware_hal_CounterJNI_resetCounter
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -77,12 +89,12 @@ Java_edu_wpi_first_hal_CounterJNI_resetCounter
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    getCounter
  * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_hal_CounterJNI_getCounter
+Java_org_wpilib_hardware_hal_CounterJNI_getCounter
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
@@ -92,41 +104,27 @@ Java_edu_wpi_first_hal_CounterJNI_getCounter
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
- * Method:    getCounterPeriod
+ * Class:     org_wpilib_hardware_hal_CounterJNI
+ * Method:    getCounterRate
  * Signature: (I)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_hal_CounterJNI_getCounterPeriod
+Java_org_wpilib_hardware_hal_CounterJNI_getCounterRate
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;
-  jdouble returnValue = HAL_GetCounterPeriod((HAL_CounterHandle)id, &status);
+  jdouble returnValue = HAL_GetCounterRate((HAL_CounterHandle)id, &status);
   CheckStatus(env, status);
   return returnValue;
 }
 
 /*
- * Class:     edu_wpi_first_hal_CounterJNI
- * Method:    setCounterMaxPeriod
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_hal_CounterJNI_setCounterMaxPeriod
-  (JNIEnv* env, jclass, jint id, jdouble value)
-{
-  int32_t status = 0;
-  HAL_SetCounterMaxPeriod((HAL_CounterHandle)id, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_first_hal_CounterJNI
+ * Class:     org_wpilib_hardware_hal_CounterJNI
  * Method:    getCounterStopped
  * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_hal_CounterJNI_getCounterStopped
+Java_org_wpilib_hardware_hal_CounterJNI_getCounterStopped
   (JNIEnv* env, jclass, jint id)
 {
   int32_t status = 0;

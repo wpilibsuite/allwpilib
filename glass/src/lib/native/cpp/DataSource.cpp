@@ -2,26 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
-#include "glass/ContextInternal.h"
+#include "wpi/glass/ContextInternal.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-wpi::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
+wpi::util::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
 
-std::string glass::MakeSourceId(std::string_view id, int index) {
-  return fmt::format("{}[{}]", id, index);
+std::string wpi::glass::MakeSourceId(std::string_view id, int index) {
+  return std::format("{}[{}]", id, index);
 }
 
-std::string glass::MakeSourceId(std::string_view id, int index, int index2) {
-  return fmt::format("{}[{},{}]", id, index, index2);
+std::string wpi::glass::MakeSourceId(std::string_view id, int index,
+                                     int index2) {
+  return std::format("{}[{},{}]", id, index, index2);
 }
 
 DataSource::~DataSource() {

@@ -1,5 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -8,7 +8,18 @@ load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_c
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "pkg_files_headers")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpimath:generate.bzl", "generate_wpimath")
+load("//wpimath:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//wpimath:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpimath_extension")
+load("//wpimath:robotpy_pybind_test_info.bzl", "wpimath_test_extension", define_test_pybind_library = "define_pybind_library")
+
+filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/cpp/wpimath/protobuf/*.h"]),
+    visibility = ["//visibility:public"],
+)
 
 filegroup(
     name = "doxygen-files",
@@ -17,7 +28,7 @@ filegroup(
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/gcem/include/**/*",
         "src/main/native/thirdparty/sleipnir/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -35,10 +46,13 @@ py_binary(
     name = "generate_nanopb",
     srcs = ["generate_nanopb.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -46,21 +60,25 @@ py_binary(
     srcs = ["generate_numbers.py"],
     data = [":templates"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
     name = "generate_quickbuf",
     srcs = ["generate_quickbuf.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -68,8 +86,7 @@ py_binary(
     srcs = ["generate_wpimath.py"],
     main = "generate_wpimath.py",
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     deps = [
@@ -86,6 +103,7 @@ generate_wpimath(
 
 write_source_files(
     name = "write_wpimath",
+    diff_args = ["-u"],
     files = {
         "src/generated": ":generate_wpimath",
     },
@@ -130,7 +148,7 @@ cc_library(
 
 pkg_files(
     name = "protobuf_hdr_pkg",
-    srcs = glob(["src/generated/main/native/cpp/wpimath/protobuf/*.npb.h"]),
+    srcs = [":generated-native-include-files"],
     strip_prefix = "src/generated/main/native/cpp/",
 )
 
@@ -173,6 +191,7 @@ wpilib_cc_library(
 
 generate_def_windows(
     name = "wpimath_def",
+    dll_name = "wpimath",
     filters = [
         ".pb.obj",
         ".npb.obj",
@@ -231,21 +250,26 @@ wpilib_cc_shared_library(
 wpilib_jni_java_library(
     name = "wpimath-java",
     srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
+    exported_plugins = ["//javacPlugin:plugin"],
+    javacopts = [
+        "-Xep:UnicodeInCode:OFF",
+    ],
     maven_artifact_name = "wpimath-java",
-    maven_group_id = "edu.wpi.first.wpimath",
-    native_libs = [":wpimathjni"],
+    maven_group_id = "org.wpilib.wpimath",
+    native_libs = [":shared/wpimathjni"],
+    plugins = [
+        "//:avaje_jsonb_generator",
+    ],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//wpiannotations",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_ddense",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -260,10 +284,10 @@ cc_library(
 
 cc_test(
     name = "wpimath-cpp-test",
-    size = "small",
+    size = "medium",
     srcs = glob([
         "src/test/native/cpp/**/*.cpp",
-        "src/test/native/cpp/**/*.h",
+        "src/test/native/cpp/**/*.hpp",
     ]),
     tags = [
         "no-raspi",
@@ -271,7 +295,7 @@ cc_test(
     deps = [
         ":test_headers",
         ":wpimath",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -282,8 +306,8 @@ wpilib_java_junit5_test(
         ":wpimath-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
-        "@maven//:org_ejml_ejml_core",
-        "@maven//:org_ejml_ejml_simple",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:org_ejml_ejml_java9module",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
@@ -298,8 +322,8 @@ cc_binary(
 
 java_binary(
     name = "DevMain-Java",
-    srcs = ["src/dev/java/edu/wpi/first/math/DevMain.java"],
-    main_class = "edu.wpi.first.math.DevMain",
+    srcs = ["src/dev/java/org/wpilib/math/DevMain.java"],
+    main_class = "org.wpilib.math.DevMain",
     deps = [
         ":wpimath-java",
     ],
@@ -307,9 +331,9 @@ java_binary(
 
 py_binary(
     name = "ExponentialProfileModel",
-    srcs = ["algorithms/ExponentialProfileModel.py"],
+    srcs = ["docs/ExponentialProfile/ExponentialProfileModel.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
 )
@@ -317,5 +341,97 @@ py_binary(
 package_default_jni_project(
     name = "wpimath",
     maven_artifact_name = "wpimath-cpp",
-    maven_group_id = "edu.wpi.first.wpimath",
+    maven_group_id = "org.wpilib.wpimath",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-wpimath-generator",
+    generated_include_root = "src/generated/main/native/cpp",
+    generated_include_target = "//wpimath:generated-native-include-files",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+    third_party_dirs = [
+        "gcem",
+        "sleipnir",
+    ],
+)
+
+define_native_wrapper(
+    name = "robotpy-native-wpimath",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-wpimath-generator",
+    additional_srcs = [":robotpy-native-wpimath.copy_headers"],
+    package_root_file = "src/main/python/wpimath/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/**/*.yml"]),
+)
+
+publish_library_casters()
+
+wpimath_extension(
+    srcs = ["src/main/python/wpimath/src/wpimath.cpp"],
+    extra_hdrs = glob(["src/main/python/wpimath/_impl/src/**/*.h"]),
+)
+
+define_pybind_library(
+    name = "robotpy-wpimath",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-wpimath_test-generator",
+    additional_srcs = ["src/test/python/cpp/wpimath_test/include/module.h"],
+    generated_file_name = "robotpy_pybind_test_info.bzl",
+    package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
+    pkgcfgs = [
+        "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+        "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+        "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+        "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+    ],
+    pyproject_toml = "src/test/python/cpp/pyproject.toml",
+    stripped_include_prefix = "src/test/python/cpp",
+    yaml_files = glob(["src/test/python/cpp/semiwrap/**/*.yml"]),
+    yml_prefix = "src/test/python/cpp/",
+)
+
+wpimath_test_extension(
+    srcs = glob(["src/test/python/cpp/wpimath_test/src/*.cpp"]),
+    extra_hdrs = ["src/test/python/cpp/wpimath_test/include/module.h"],
+    header_to_dat_deps = ["src/test/python/cpp/wpimath_test/include/module.h"],
+    includes = ["src/test/python/cpp/wpimath_test/include"],
+)
+
+define_test_pybind_library(
+    name = "robotpy-wpimath-test",
+    extra_pybind_hdrs = glob(["src/test/python/cpp/**/*.h"]),
+    pkgcfgs = [
+        "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+        "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+        "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+        "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+    ],
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(
+        ["src/test/python/**/*.py"],
+        exclude = ["src/test/python/cpp/**"],
+    ),
+    deps = [
+        ":robotpy-wpimath",
+        ":robotpy-wpimath-test",
+        requirement("numpy"),
+        requirement("pytest"),
+    ],
 )

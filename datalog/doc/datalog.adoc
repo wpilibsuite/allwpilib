@@ -10,11 +10,11 @@ A simple binary logging format designed for high speed logging of timestamped da
 [[motivation]]
 == Motivation
 
-FRC robots generate a lot of real-time data of various data types (most typically numeric values, but also strings and more complex data such as camera images). While there is good support in the WPILib software ecosystem for real-time display of this data on dashboards (via NetworkTables), there is no current standard for logging of timestamped data values for offline analysis. In the absence of a standard, teams have developed various ad-hoc solutions, including CSV files.
+FIRST robots generate a lot of real-time data of various data types (most typically numeric values, but also strings and more complex data such as camera images). While there is good support in the WPILib software ecosystem for real-time display of this data on dashboards (via NetworkTables), there is no current standard for logging of timestamped data values for offline analysis. In the absence of a standard, teams have developed various ad-hoc solutions, including CSV files.
 
 Similar to how the NetworkTables standard protocol enabled ecosystem development of multiple dashboards, it is expected that a standard format for data logging, in combination with built-in library support for easy on-robot logging of robot data, will facilitate ecosystem development of offline data analysis tools.
 
-Standard logging facilities currently available (e.g. in Java) are generally designed for string messages, not for binary data. As a binary format, this will be faster with less overhead for the typical data (e.g. numbers) coming from a robot in real time (at least dozens, if not hundreds, of data points every ~20 ms). String formatting is significantly more expensive than just copying the binary number, and is more difficult to read back into analysis tools. Latency of the actual logging to the main program is also critical in the FRC application. WPILib also needs a common logging format and implementation across both C++ and Java.
+Standard logging facilities currently available (e.g. in Java) are generally designed for string messages, not for binary data. As a binary format, this will be faster with less overhead for the typical data (e.g. numbers) coming from a robot in real time (at least dozens, if not hundreds, of data points every ~20 ms). String formatting is significantly more expensive than just copying the binary number, and is more difficult to read back into analysis tools. Latency of the actual logging to the main program is also critical in the FIRST application. WPILib also needs a common logging format and implementation across both C++ and Java.
 
 [[references]]
 == References
@@ -35,7 +35,7 @@ Entry ID:: An unsigned 4-byte ID by which records in the log refer to an Entry, 
 Record:: Storage of a single timestamped data item in the log. A record consists of the entry ID, the data length, a 64-bit integer timestamp, and the data contents.
 
 [[def-timestamp]]
-Timestamp:: 64-bit integer microseconds. The zero time is not specified by the data format, but on an FRC robot is typically the time the robot program started.
+Timestamp:: 64-bit integer microseconds. The zero time is not specified by the data format, but on an FIRST robot is typically the time the robot program started.
 
 [[design]]
 == Design

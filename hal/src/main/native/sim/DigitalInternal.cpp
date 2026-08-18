@@ -2,14 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "DigitalInternal.h"
+#include "DigitalInternal.hpp"
 
-#include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/DigitalHandleResource.h"
-#include "hal/handles/HandlesInternal.h"
+#include "PortsInternal.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/DigitalHandleResource.hpp"
+#include "wpi/hal/handles/HandlesInternal.hpp"
 
-namespace hal {
+namespace wpi::hal {
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>*
@@ -45,4 +45,4 @@ int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status) {
 
   return digital->channel;
 }
-}  // namespace hal
+}  // namespace wpi::hal

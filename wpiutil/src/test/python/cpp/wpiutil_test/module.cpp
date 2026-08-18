@@ -9,20 +9,23 @@
 #include <wpi_string_map_caster.h>
 #include <wpi_json_type_caster.h>
 #include <wpi_ct_string_type_caster.h>
+#include <wpi_string_type_caster.h>
 
 #include <limits>
 #include <functional>
+#include <string>
+#include <vector>
 
 #include <pybind11/functional.h>
 
 /*
 array tests
 */
-wpi::array<int, 4> load_array_int(wpi::array<int, 4> data) {
+wpi::util::array<int, 4> load_array_int(wpi::util::array<int, 4> data) {
     return data;
 }
 
-wpi::array<int, 1> load_array_int1(wpi::array<int, 1> data) {
+wpi::util::array<int, 1> load_array_int1(wpi::util::array<int, 1> data) {
     return data;
 }
 
@@ -84,12 +87,12 @@ void modify_span_buffer(std::span<uint8_t> ref) {
 SmallSet tests
 */
 
-wpi::SmallSet<int, 4> load_smallset_int(wpi::SmallSet<int, 4> ref) {
+wpi::util::SmallSet<int, 4> load_smallset_int(wpi::util::SmallSet<int, 4> ref) {
     return ref;
 }
 
-wpi::SmallSet<int, 4> cast_smallset() {
-    static wpi::SmallSet<int, 4> set;
+wpi::util::SmallSet<int, 4> cast_smallset() {
+    static wpi::util::SmallSet<int, 4> set;
     set.insert(1);
     set.insert(2);
     set.insert(3);
@@ -101,12 +104,12 @@ wpi::SmallSet<int, 4> cast_smallset() {
 SmallVector tests
 */
 
-wpi::SmallVector<int, 4> load_smallvec_int(wpi::SmallVector<int, 4> ref) {
+wpi::util::SmallVector<int, 4> load_smallvec_int(wpi::util::SmallVector<int, 4> ref) {
     return ref;
 }
 
-wpi::SmallVector<int, 4> cast_smallvec() {
-    static wpi::SmallVector<int, 4> set;
+wpi::util::SmallVector<int, 4> cast_smallvec() {
+    static wpi::util::SmallVector<int, 4> set;
     set.append({1, 2, 3, 4});
     return set;
 }
@@ -117,44 +120,66 @@ SmallVectorImpl tests
 .. seems like references are the only useful things to do with them
 */
 
-wpi::SmallVectorImpl<int>&  load_smallvecimpl_int(wpi::SmallVectorImpl<int>& ref) {
-    static wpi::SmallVector<int, 4> set(ref.begin(), ref.end());
+wpi::util::SmallVectorImpl<int>&  load_smallvecimpl_int(wpi::util::SmallVectorImpl<int>& ref) {
+    static wpi::util::SmallVector<int, 4> set(ref.begin(), ref.end());
     return set;
 }
 
 /*
 StringMap tests
 */
-wpi::StringMap<int> load_stringmap_int(wpi::StringMap<int> ref) {
+wpi::util::StringMap<int> load_stringmap_int(wpi::util::StringMap<int> ref) {
     return ref;
 }
 
-wpi::StringMap<int> cast_stringmap() {
-    static wpi::StringMap<int> m;
+wpi::util::StringMap<int> cast_stringmap() {
+    static wpi::util::StringMap<int> m;
     m["one"] = 1;
     m["two"] = 2;
     return m;
 }
 
 /* JSON tests */
-wpi::json cast_json_arg(const wpi::json &j) {
+wpi::util::json cast_json_arg(const wpi::util::json &j) {
     return j;
 }
 
-wpi::json cast_json_val(std::function<wpi::json()> fn) {
+wpi::util::json cast_json_val(std::function<wpi::util::json()> fn) {
     return fn();
 }
 
 constexpr auto const_string() {
-    return wpi::ct_string<char, std::char_traits<char>, 3>{{'#', '1', '2'}};
+    return wpi::util::ct_string<char, std::char_traits<char>, 3>{{'#', '1', '2'}};
 }
 
 void sendable_test(py::module &m);
 void struct_test(py::module &m);
 
+/* WPI_String tests */
+struct StructWithWPI_String {
+    int x;
+    WPI_String str;
+};
+
+WPI_String load_wpi_string(WPI_String str) {
+    return str;
+}
+
+WPI_String cast_wpi_string() {
+    WPI_String str = wpi::util::make_string("Hello WPI_String!");
+    return str;
+}
+
+StructWithWPI_String cast_struct_with_wpi_string() {
+    StructWithWPI_String output{
+        .x = 3504,
+        .str = wpi::util::make_string("I'm in a struct!")
+    };
+
+    return output;
+}
 
 PYBIND11_MODULE(module, m) {
-
     sendable_test(m);
     struct_test(m);
 
@@ -185,11 +210,20 @@ PYBIND11_MODULE(module, m) {
     m.def("load_stringmap_int", &load_stringmap_int);
     m.def("cast_stringmap", &cast_stringmap);
     // JSON
-    m.def("cast_json_arg", &cast_json_arg); 
+    m.def("cast_json_arg", &cast_json_arg);
     m.def("cast_json_val", &cast_json_val);
     m.attr("max_uint64") = std::numeric_limits<uint64_t>::max();
     m.attr("max_int64") = std::numeric_limits<int64_t>::max();
     m.attr("min_int64") = std::numeric_limits<int64_t>::min();
     // ct_string
     m.def("const_string", &const_string);
+
+    // WPI_String
+    m.def("load_wpi_string", &load_wpi_string);
+    m.def("cast_wpi_string", &cast_wpi_string);
+
+    py::class_<StructWithWPI_String> structWithWpiStringCls(m, "StructWithWPI_String");
+    structWithWpiStringCls.def_readwrite("x", &StructWithWPI_String::x);
+    structWithWpiStringCls.def_readonly("str", &StructWithWPI_String::str);
+    m.def("cast_struct_with_wpi_string", &cast_struct_with_wpi_string);
 };
