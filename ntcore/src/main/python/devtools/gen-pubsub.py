@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import sphinxify
 from cxxheaderparser.simple import parse_string

@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
 """Reproducibility script for the BiquadFilter test golden values.
 
 Run this script (requires scipy + numpy) to print every scipy-derived
