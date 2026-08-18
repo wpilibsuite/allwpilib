@@ -22,6 +22,7 @@ filegroup(
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
         "src/main/native/thirdparty/double-conversion/include/**/*",
+        "src/main/native/thirdparty/htrie/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
         "src/main/native/thirdparty/llvm/include/**/*",
         "src/main/native/thirdparty/mpack/include/**/*",
