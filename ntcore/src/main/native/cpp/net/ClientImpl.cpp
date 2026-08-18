@@ -4,7 +4,6 @@
 
 #include "ClientImpl.hpp"
 
-#include <cmath>
 #include <limits>
 #include <memory>
 #include <numeric>
@@ -194,7 +193,7 @@ void ClientImpl::Publish(int32_t pubuid, std::string_view name,
     publisher = std::make_unique<PublisherData>();
   }
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
+  publisher->periodMs = PubSubOptionsImpl::RoundPeriodicMs(options.periodicMs);
   if (publisher->periodMs < kMinPeriodMs) {
     publisher->periodMs = kMinPeriodMs;
   }

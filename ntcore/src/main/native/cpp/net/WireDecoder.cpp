@@ -5,8 +5,10 @@
 #include "WireDecoder.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <concepts>
 #include <format>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -245,8 +247,15 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
                 error = "periodic value must be a number";
                 goto err;
               }
+              if (!std::isfinite(val) || val < 0 ||
+                  val > static_cast<double>(
+                            std::numeric_limits<unsigned int>::max()) /
+                            1000.0) {
+                error = "periodic value out of range";
+                goto err;
+              }
               options.periodic = val;
-              options.periodicMs = val * 1000;
+              options.periodicMs = static_cast<unsigned int>(val * 1000.0);
             }
 
             // send all changes
