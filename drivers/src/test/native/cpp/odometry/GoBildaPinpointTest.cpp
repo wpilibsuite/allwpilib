@@ -570,8 +570,6 @@ TEST_CASE_METHOD(
     PinpointTestFixture,
     "GoBildaPinpoint reestablishes pose baseline after omitted bulk samples",
     "[drivers][gobilda-pinpoint]") {
-  using wpi::units::meters<>;
-
   SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
   pinpoint.SetBulkReadScope({Register::DEVICE_STATUS});
@@ -582,8 +580,8 @@ TEST_CASE_METHOD(
       Register::BULK_READ,
       Concat(EncodeFloat(1000.0f), EncodeFloat(2000.0f), EncodeFloat(0.5f)));
   auto pose = pinpoint.GetPose();
-  CHECK(pose.X() == meter_t{1.0});
-  CHECK(pose.Y() == meter_t{2.0});
+  CHECK(pose.X() == 1.0_m);
+  CHECK(pose.Y() == 2.0_m);
 
   SetRegister(Register::BULK_READ, EncodeInt(1));
   pinpoint.Update();
@@ -592,8 +590,8 @@ TEST_CASE_METHOD(
       Register::BULK_READ,
       Concat(EncodeFloat(7000.0f), EncodeFloat(8000.0f), EncodeFloat(1.0f)));
   pose = pinpoint.GetPose();
-  CHECK(pose.X() == meter_t{7.0});
-  CHECK(pose.Y() == meter_t{8.0});
+  CHECK(pose.X() == 7.0_m);
+  CHECK(pose.Y() == 8.0_m);
   CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.0));
   CHECK(pinpoint.GetFailureCount() == 0);
 
@@ -601,8 +599,8 @@ TEST_CASE_METHOD(
       Register::BULK_READ,
       Concat(EncodeFloat(13000.0f), EncodeFloat(8000.0f), EncodeFloat(1.0f)));
   pose = pinpoint.GetPose();
-  CHECK(pose.X() == meter_t{7.0});
-  CHECK(pose.Y() == meter_t{8.0});
+  CHECK(pose.X() == 7.0_m);
+  CHECK(pose.Y() == 8.0_m);
   CHECK(pose.Rotation().Radians().value() == Catch::Approx(1.0));
   CHECK(pinpoint.GetLastFailureReason() ==
         wpi::GoBildaPinpoint::FailureReason::CHANGE_TOO_LARGE);
@@ -611,17 +609,14 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(PinpointTestFixture,
                  "GoBildaPinpoint pose writes reset local validation baselines",
                  "[drivers][gobilda-pinpoint]") {
-  using wpi::units::meters<>;
-  using wpi::units::radians<>;
-
   SetRegister(Register::DEVICE_VERSION, EncodeInt(2));
   SetRegister(Register::BULK_READ,
               FixedBulkData(1, 1000, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
   pinpoint.Update();
 
-  pinpoint.SetPose(wpi::math::Pose2d{meter_t{7.0}, meter_t{-7.0},
-                                     wpi::math::Rotation2d{radian_t{1.0}}});
+  pinpoint.SetPose(
+      wpi::math::Pose2d{7.0_m, -7.0_m, wpi::math::Rotation2d{1.0_rad}});
   SetRegister(
       Register::BULK_READ,
       FixedBulkData(1, 1000, 0, 0, 7000.0f, -7000.0f, 1.0f, 0.0f, 0.0f, 0.0f));
@@ -629,9 +624,9 @@ TEST_CASE_METHOD(PinpointTestFixture,
   CHECK(pinpoint.GetXPosition().value() == Catch::Approx(7.0));
   CHECK(pinpoint.GetYPosition().value() == Catch::Approx(-7.0));
 
-  pinpoint.SetXPosition(meter_t{-7.0});
-  pinpoint.SetYPosition(meter_t{7.0});
-  pinpoint.SetHeading(radian_t{130.0});
+  pinpoint.SetXPosition(-7.0_m);
+  pinpoint.SetYPosition(7.0_m);
+  pinpoint.SetHeading(130.0_rad);
   SetRegister(Register::BULK_READ,
               FixedBulkData(1, 1000, 0, 0, -7000.0f, 7000.0f, 130.0f, 0.0f,
                             0.0f, 0.0f));
@@ -801,10 +796,10 @@ TEST_CASE_METHOD(PinpointTestFixture,
                   std::invalid_argument);
 
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
-  CHECK_THROWS_AS(pinpoint.SetOffsets(
-                      wpi::units::meters<>{1.0},
-                      wpi::units::meters<>{std::numeric_limits<double>::max()}),
-                  std::invalid_argument);
+  CHECK_THROWS_AS(
+      pinpoint.SetOffsets(
+          1.0_m, wpi::units::meters<>{std::numeric_limits<double>::max()}),
+      std::invalid_argument);
   CHECK(m_writes.empty());
   CHECK_THROWS_AS(pinpoint.SetEncoderResolution(0.0), std::invalid_argument);
   CHECK_THROWS_AS(
@@ -817,15 +812,15 @@ TEST_CASE_METHOD(PinpointTestFixture,
                  "[drivers][gobilda-pinpoint]") {
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
 
-  CHECK_THROWS_AS(pinpoint.SetPose(wpi::math::Pose2d{
-                      wpi::units::meters<>{1.0},
-                      wpi::units::meters<>{std::numeric_limits<double>::max()},
-                      wpi::math::Rotation2d{}}),
-                  std::invalid_argument);
+  CHECK_THROWS_AS(
+      pinpoint.SetPose(wpi::math::Pose2d{
+          1.0_m, wpi::units::meters<>{std::numeric_limits<double>::max()},
+          wpi::math::Rotation2d{}}),
+      std::invalid_argument);
   CHECK(m_writes.empty());
 
   CHECK_THROWS_AS(pinpoint.SetPose(wpi::math::Pose2d{
-                      wpi::units::meters<>{1.0}, wpi::units::meters<>{2.0},
+                      1.0_m, 2.0_m,
                       wpi::math::Rotation2d{wpi::units::radians<>{
                           std::numeric_limits<double>::quiet_NaN()}}}),
                   std::invalid_argument);
