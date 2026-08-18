@@ -164,23 +164,23 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     call one or more of the chainable logging handles (e.g. `voltage`) on the returned
      *     `MotorLog`. Multiple motors can be logged in a single callback by calling `motor`
      *     multiple times.
-     * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
+     * @param mechanism The mechanism containing the motor(s) that is (or are) being characterized.
      *     Will be declared as a requirement for the returned test commands.
      * @param name The name of the mechanism being tested. Will be appended to the log entry title
      *     for the routine's test state, e.g. "sysid-test-state-mechanism". Defaults to the name of
-     *     the subsystem if left null.
+     *     the mechanism if left null.
      */
     public SysIdMechanism(
-        Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism subsystem, String name) {
+        Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism mechanism, String name) {
       this.drive = drive;
       this.log = log != null ? log : l -> {};
-      mechanism = subsystem;
-      this.name = name != null ? name : subsystem.getName();
+      this.mechanism = mechanism;
+      this.name = name != null ? name : mechanism.getName();
     }
 
     /**
-     * Create a new mechanism specification for a SysId routine. Defaults the mechanism name to the
-     * subsystem name.
+     * Create a new mechanism specification for a SysId routine. The name of the routine is
+     * generated based on the name of the given mechanism.
      *
      * @param drive Sends the SysId-specified drive signal to the mechanism motors during test
      *     routines.
@@ -189,14 +189,14 @@ public class SysIdRoutine extends SysIdRoutineLog {
      *     call one or more of the chainable logging handles (e.g. `voltage`) on the returned
      *     `MotorLog`. Multiple motors can be logged in a single callback by calling `motor`
      *     multiple times.
-     * @param subsystem The subsystem containing the motor(s) that is (or are) being characterized.
-     *     Will be declared as a requirement for the returned test commands. The subsystem's `name`
+     * @param mechanism The mechanism containing the motor(s) that is (or are) being characterized.
+     *     Will be declared as a requirement for the returned test commands. The mechanism's `name`
      *     will be appended to the log entry title for the routine's test state, e.g.
-     *     "sysid-test-state-subsystem".
+     *     "sysid-test-state-mechanism".
      */
     public SysIdMechanism(
-        Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism subsystem) {
-      this(drive, log, subsystem, null);
+        Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism mechanism) {
+      this(drive, log, mechanism, null);
     }
   }
 
