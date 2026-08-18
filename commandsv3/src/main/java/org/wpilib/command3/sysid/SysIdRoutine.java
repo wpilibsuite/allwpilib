@@ -226,8 +226,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
         };
     State state =
         switch (direction) {
-          case FORWARD -> State.DYNAMIC_FORWARD;
-          case REVERSE -> State.DYNAMIC_REVERSE;
+          case FORWARD -> State.QUASISTATIC_FORWARD;
+          case REVERSE -> State.QUASISTATIC_REVERSE;
         };
 
     return m_mechanism
