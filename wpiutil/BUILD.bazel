@@ -336,6 +336,7 @@ generate_robotpy_native_wrapper_build_info(
         "argparse",
         "debugging",
         "double-conversion",
+        "htrie",
         "json",
         "llvm",
         "mpack",
