@@ -6,6 +6,7 @@ package org.wpilib.util.collections.prefixmap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -85,5 +86,29 @@ class StringPrefixMapTest {
     assertEquals("value", map.get("/Telemetry"));
     assertEquals("value", map.getLongestMatch("/Telemetry/value"));
     assertEquals(Set.of(Map.entry("/Telemetry", "value")), map.entrySet());
+  }
+
+  @Test
+  void equalityUsesMapSemantics() {
+    var prefixMap = new StringPrefixMap<String>();
+    prefixMap.put("/Telemetry", "value");
+    prefixMap.put("/Robot", "data");
+
+    var equalPrefixMap = new StringPrefixMap<String>();
+    equalPrefixMap.put("/Robot", "data");
+    equalPrefixMap.put("/Telemetry", "value");
+
+    var equalMap = Map.of("/Telemetry", "value", "/Robot", "data");
+
+    assertEquals(equalPrefixMap, prefixMap);
+    assertEquals(prefixMap, equalPrefixMap);
+    assertEquals(prefixMap.hashCode(), equalPrefixMap.hashCode());
+
+    assertEquals(equalMap, prefixMap);
+    assertEquals(prefixMap, equalMap);
+    assertEquals(equalMap.hashCode(), prefixMap.hashCode());
+
+    assertNotEquals(prefixMap, Map.of("/Telemetry", "value"));
+    assertNotEquals(prefixMap, "value");
   }
 }

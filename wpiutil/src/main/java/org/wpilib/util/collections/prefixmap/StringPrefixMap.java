@@ -129,4 +129,17 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
   public Collection<V> values() {
     return m_allPrefixesView.values();
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
+    return m_allPrefixes.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return m_allPrefixes.hashCode();
+  }
 }
