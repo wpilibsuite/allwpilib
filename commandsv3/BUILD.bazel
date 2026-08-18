@@ -93,6 +93,7 @@ wpilib_java_junit5_test(
         "//wpimath:wpimath-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:org_mockito_mockito_core",
         "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
