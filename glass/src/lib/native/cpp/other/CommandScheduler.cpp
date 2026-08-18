@@ -33,7 +33,8 @@ void wpi::glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
       ImGui::PopID();
     }
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Scheduler");
     ImGui::PopStyleColor();
   }
