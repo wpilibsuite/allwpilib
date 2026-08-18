@@ -16,8 +16,9 @@
 
 package org.wpilib.util.collections.prefixmap;
 
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -35,14 +36,18 @@ import org.wpilib.util.collections.PrefixMap;
 public class StringPrefixMap<V> implements PrefixMap<V> {
   private final PrefixTrie<V> m_prefixTrie;
   private final TreeMap<String, V> m_allPrefixes;
-  private final Map<String, V> m_allPrefixesView;
+  private final Set<Map.Entry<String, V>> m_entrySet;
+  private final Set<String> m_keySet;
+  private final Collection<V> m_values;
 
   /** Constructor. */
   @SuppressWarnings("this-escape")
   public StringPrefixMap() {
     m_prefixTrie = new StringPrefixTrie<>();
     m_allPrefixes = new TreeMap<>();
-    m_allPrefixesView = Collections.unmodifiableMap(m_allPrefixes);
+    m_entrySet = new EntrySet();
+    m_keySet = new KeySet();
+    m_values = new Values();
   }
 
   @Override
@@ -107,12 +112,15 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public Set<Map.Entry<String, V>> entrySet() {
-    return m_allPrefixesView.entrySet();
+    return m_entrySet;
   }
 
   @Override
   public boolean containsKey(Object key) {
-    return m_allPrefixes.containsKey(storedKey((String) key));
+    if (key instanceof String) {
+      return m_allPrefixes.containsKey(storedKey((String) key));
+    }
+    return false;
   }
 
   @Override
@@ -122,12 +130,12 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
 
   @Override
   public Set<String> keySet() {
-    return m_allPrefixesView.keySet();
+    return m_keySet;
   }
 
   @Override
   public Collection<V> values() {
-    return m_allPrefixesView.values();
+    return m_values;
   }
 
   @Override
@@ -141,5 +149,195 @@ public class StringPrefixMap<V> implements PrefixMap<V> {
   @Override
   public int hashCode() {
     return m_allPrefixes.hashCode();
+  }
+
+  private abstract class BackingIterator<T> implements Iterator<T> {
+    private final Iterator<Map.Entry<String, V>> m_iterator = m_allPrefixes.entrySet().iterator();
+    private Map.Entry<String, V> m_current;
+
+    @Override
+    public boolean hasNext() {
+      return m_iterator.hasNext();
+    }
+
+    protected Map.Entry<String, V> nextEntry() {
+      m_current = m_iterator.next();
+      return m_current;
+    }
+
+    @Override
+    public void remove() {
+      if (m_current == null) {
+        throw new IllegalStateException();
+      }
+      String key = m_current.getKey();
+      m_iterator.remove();
+      m_prefixTrie.remove(key);
+      m_current = null;
+    }
+  }
+
+  private final class EntryIterator extends BackingIterator<Map.Entry<String, V>> {
+    @Override
+    public Map.Entry<String, V> next() {
+      return new PrefixEntry(nextEntry());
+    }
+  }
+
+  private final class KeyIterator extends BackingIterator<String> {
+    @Override
+    public String next() {
+      return nextEntry().getKey();
+    }
+  }
+
+  private final class ValueIterator extends BackingIterator<V> {
+    @Override
+    public V next() {
+      return nextEntry().getValue();
+    }
+  }
+
+  private final class PrefixEntry implements Map.Entry<String, V> {
+    private final Map.Entry<String, V> m_entry;
+
+    PrefixEntry(Map.Entry<String, V> entry) {
+      m_entry = entry;
+    }
+
+    @Override
+    public String getKey() {
+      return m_entry.getKey();
+    }
+
+    @Override
+    public V getValue() {
+      return m_entry.getValue();
+    }
+
+    @Override
+    public V setValue(V value) {
+      Objects.requireNonNull(value, "The value may not be null");
+      m_prefixTrie.add(getKey(), value);
+      return m_entry.setValue(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof Map.Entry<?, ?>)) {
+        return false;
+      }
+      Map.Entry<?, ?> other = (Map.Entry<?, ?>) obj;
+      return Objects.equals(getKey(), other.getKey())
+          && Objects.equals(getValue(), other.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
+    }
+  }
+
+  private final class EntrySet extends AbstractSet<Map.Entry<String, V>> {
+    @Override
+    public Iterator<Map.Entry<String, V>> iterator() {
+      return new EntryIterator();
+    }
+
+    @Override
+    public int size() {
+      return StringPrefixMap.this.size();
+    }
+
+    @Override
+    public boolean contains(Object obj) {
+      if (!(obj instanceof Map.Entry<?, ?>)) {
+        return false;
+      }
+      Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
+      Object key = entry.getKey();
+      if (!(key instanceof String)) {
+        return false;
+      }
+      String prefix = storedKey((String) key);
+      return m_allPrefixes.containsKey(prefix)
+          && Objects.equals(m_allPrefixes.get(prefix), entry.getValue());
+    }
+
+    @Override
+    public boolean remove(Object obj) {
+      if (!(obj instanceof Map.Entry<?, ?>)) {
+        return false;
+      }
+      Map.Entry<?, ?> entry = (Map.Entry<?, ?>) obj;
+      Object key = entry.getKey();
+      if (!(key instanceof String)) {
+        return false;
+      }
+      String prefix = storedKey((String) key);
+      if (!m_allPrefixes.containsKey(prefix)
+          || !Objects.equals(m_allPrefixes.get(prefix), entry.getValue())) {
+        return false;
+      }
+      StringPrefixMap.this.remove(prefix);
+      return true;
+    }
+
+    @Override
+    public void clear() {
+      StringPrefixMap.this.clear();
+    }
+  }
+
+  private final class KeySet extends AbstractSet<String> {
+    @Override
+    public Iterator<String> iterator() {
+      return new KeyIterator();
+    }
+
+    @Override
+    public int size() {
+      return StringPrefixMap.this.size();
+    }
+
+    @Override
+    public boolean contains(Object key) {
+      return StringPrefixMap.this.containsKey(key);
+    }
+
+    @Override
+    public boolean remove(Object key) {
+      if (key instanceof String) {
+        return StringPrefixMap.this.remove((String) key) != null;
+      }
+      return false;
+    }
+
+    @Override
+    public void clear() {
+      StringPrefixMap.this.clear();
+    }
+  }
+
+  private final class Values extends AbstractCollection<V> {
+    @Override
+    public Iterator<V> iterator() {
+      return new ValueIterator();
+    }
+
+    @Override
+    public int size() {
+      return StringPrefixMap.this.size();
+    }
+
+    @Override
+    public boolean contains(Object value) {
+      return StringPrefixMap.this.containsValue(value);
+    }
+
+    @Override
+    public void clear() {
+      StringPrefixMap.this.clear();
+    }
   }
 }

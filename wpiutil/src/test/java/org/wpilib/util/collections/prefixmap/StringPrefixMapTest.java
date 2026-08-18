@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -66,26 +65,89 @@ class StringPrefixMapTest {
   }
 
   @Test
-  void mapViewsAreUnmodifiable() {
+  void entrySetViewMutationsUpdateTrie() {
     var map = new StringPrefixMap<String>();
-    map.put("/Telemetry", "value");
+    map.put("/Iterator", "iterator");
+    map.put("/Remove", "remove");
+    map.put("/SetValue", "old");
 
-    var entryIterator = map.entrySet().iterator();
-    var entry = entryIterator.next();
-    assertThrows(UnsupportedOperationException.class, () -> entry.setValue("new"));
-    assertThrows(UnsupportedOperationException.class, entryIterator::remove);
+    var iterator = map.entrySet().iterator();
+    Map.Entry<String, String> entry;
+    do {
+      entry = iterator.next();
+    } while (!entry.getKey().equals("/Iterator"));
+    iterator.remove();
+    assertPrefixRemoved(map, "/Iterator");
 
-    var keyIterator = map.keySet().iterator();
-    keyIterator.next();
-    assertThrows(UnsupportedOperationException.class, keyIterator::remove);
+    assertTrue(map.entrySet().remove(Map.entry("/Remove", "remove")));
+    assertPrefixRemoved(map, "/Remove");
 
-    var valueIterator = map.values().iterator();
-    valueIterator.next();
-    assertThrows(UnsupportedOperationException.class, valueIterator::remove);
+    entry = findEntry(map, "/SetValue");
+    assertEquals("old", entry.setValue("new"));
+    assertPrefixValue(map, "/SetValue", "new");
 
-    assertEquals("value", map.get("/Telemetry"));
-    assertEquals("value", map.getLongestMatch("/Telemetry/value"));
-    assertEquals(Set.of(Map.entry("/Telemetry", "value")), map.entrySet());
+    map.entrySet().clear();
+    assertTrue(map.isEmpty());
+    assertPrefixRemoved(map, "/SetValue");
+  }
+
+  @Test
+  void keySetViewRemovalsUpdateTrie() {
+    var map = new StringPrefixMap<String>();
+    map.put("/Remove", "remove");
+    map.put("/RemoveAll", "removeAll");
+    map.put("/Retain", "retain");
+    map.put("/Clear", "clear");
+
+    assertTrue(map.keySet().remove("/Remove"));
+    assertPrefixRemoved(map, "/Remove");
+
+    assertTrue(map.keySet().removeAll(Set.of("/RemoveAll")));
+    assertPrefixRemoved(map, "/RemoveAll");
+
+    assertTrue(map.keySet().retainAll(Set.of("/Retain")));
+    assertPrefixValue(map, "/Retain", "retain");
+    assertPrefixRemoved(map, "/Clear");
+
+    map.put("/Clear", "clear");
+    map.keySet().clear();
+    assertTrue(map.isEmpty());
+    assertPrefixRemoved(map, "/Retain");
+    assertPrefixRemoved(map, "/Clear");
+  }
+
+  @Test
+  void valuesViewRemovalsUpdateTrie() {
+    var map = new StringPrefixMap<String>();
+    map.put("/Iterator", "iterator");
+    map.put("/Remove", "remove");
+    map.put("/RemoveAll", "removeAll");
+    map.put("/Retain", "retain");
+    map.put("/Clear", "clear");
+
+    var iterator = map.values().iterator();
+    String value;
+    do {
+      value = iterator.next();
+    } while (!value.equals("iterator"));
+    iterator.remove();
+    assertPrefixRemoved(map, "/Iterator");
+
+    assertTrue(map.values().remove("remove"));
+    assertPrefixRemoved(map, "/Remove");
+
+    assertTrue(map.values().removeAll(Set.of("removeAll")));
+    assertPrefixRemoved(map, "/RemoveAll");
+
+    assertTrue(map.values().retainAll(Set.of("retain")));
+    assertPrefixValue(map, "/Retain", "retain");
+    assertPrefixRemoved(map, "/Clear");
+
+    map.put("/Clear", "clear");
+    map.values().clear();
+    assertTrue(map.isEmpty());
+    assertPrefixRemoved(map, "/Retain");
+    assertPrefixRemoved(map, "/Clear");
   }
 
   @Test
@@ -136,5 +198,26 @@ class StringPrefixMapTest {
     assertNull(map.getShortestMatch(longInput));
     assertNull(map.getLongestMatch(longInput));
     assertFalse(map.getAllMatches(longInput).hasNext());
+  }
+
+  private static Map.Entry<String, String> findEntry(StringPrefixMap<String> map, String prefix) {
+    for (var entry : map.entrySet()) {
+      if (entry.getKey().equals(prefix)) {
+        return entry;
+      }
+    }
+    throw new AssertionError("Could not find " + prefix);
+  }
+
+  private static void assertPrefixValue(StringPrefixMap<String> map, String prefix, String value) {
+    assertEquals(value, map.get(prefix));
+    assertEquals(value, map.getLongestMatch(prefix + "/child"));
+    assertTrue(map.containsKey(prefix));
+  }
+
+  private static void assertPrefixRemoved(StringPrefixMap<String> map, String prefix) {
+    assertNull(map.get(prefix));
+    assertNull(map.getLongestMatch(prefix + "/child"));
+    assertFalse(map.containsKey(prefix));
   }
 }
