@@ -4,20 +4,20 @@
 
 package org.wpilib.commands3.sysid;
 
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.util.ErrorMessages.requireNonNullParam;
+import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Seconds;
+import static org.wpilib.units.Units.Volts;
+import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import java.util.function.Consumer;
-import org.wpilib.commands3.Command;
-import org.wpilib.commands3.Mechanism;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
+import org.wpilib.sysid.SysIdRoutineLog;
+import org.wpilib.system.Timer;
+import org.wpilib.units.VoltageUnit;
+import org.wpilib.units.measure.Time;
+import org.wpilib.units.measure.Velocity;
+import org.wpilib.units.measure.Voltage;
 
 /**
  * A SysId characterization routine for a single mechanism. Mechanisms may have multiple motors.
@@ -226,8 +226,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
         };
     State state =
         switch (direction) {
-          case kForward -> State.kDynamicForward;
-          case kReverse -> State.kDynamicReverse;
+          case kForward -> State.DYNAMIC_FORWARD;
+          case kReverse -> State.DYNAMIC_REVERSE;
         };
 
     return m_mechanism
@@ -244,12 +244,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 co.yield();
               }
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .whenCanceled(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .named("sysid-" + state.toString() + "-" + m_mechanism.m_name);
   }
@@ -272,8 +272,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
         };
     State state =
         switch (direction) {
-          case kForward -> State.kDynamicForward;
-          case kReverse -> State.kDynamicReverse;
+          case kForward -> State.DYNAMIC_FORWARD;
+          case kReverse -> State.DYNAMIC_REVERSE;
         };
 
     return m_mechanism
@@ -291,12 +291,12 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 co.yield();
               }
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .whenCanceled(
             () -> {
               m_mechanism.m_drive.accept(Volts.of(0));
-              m_recordState.accept(State.kNone);
+              m_recordState.accept(State.NONE);
             })
         .named("sysid-" + state + "-" + m_mechanism.m_name);
   }
