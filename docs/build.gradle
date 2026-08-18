@@ -118,6 +118,9 @@ doxygen.sourceSets.main {
         // mpack
         exclude 'wpi/util/mpack.h'
 
+        // hat-trie internal helpers
+        exclude 'wpi/util/array-hash/**'
+
         // units
         exclude 'wpi/units/**'
     }

@@ -103,6 +103,8 @@ doxygen(
         "*/uv/**",
         # mpack
         "*/wpi/util/mpack.h",
+        # hat-trie internal helpers
+        "*/wpi/util/array-hash/**",
         # units
         "*/wpi/units/**",
     ],
