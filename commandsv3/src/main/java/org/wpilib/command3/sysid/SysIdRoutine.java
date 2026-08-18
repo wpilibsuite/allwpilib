@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.wpilib.commands3.sysid;
+package org.wpilib.command3.sysid;
 
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Seconds;
@@ -49,25 +49,25 @@ public class SysIdRoutine extends SysIdRoutineLog {
    * @param mechanism Hardware interface for the SysId routine.
    */
   public SysIdRoutine(Config config, SysIdMechanism mechanism) {
-    super(mechanism.m_name);
+    super(mechanism.name);
     m_config = config;
     m_mechanism = mechanism;
-    m_recordState = config.m_recordState != null ? config.m_recordState : this::recordState;
+    m_recordState = config.recordState != null ? config.recordState : this::recordState;
   }
 
   /** Hardware-independent configuration for a SysId test routine. */
   public static class Config {
     /** The voltage ramp rate used for quasistatic test routines. */
-    final Velocity<VoltageUnit> m_rampRate;
+    public final Velocity<VoltageUnit> rampRate;
 
     /** The step voltage output used for dynamic test routines. */
-    final Voltage m_stepVoltage;
+    public final Voltage stepVoltage;
 
     /** Safety timeout for the test routine commands. */
-    final Time m_timeout;
+    public final Time timeout;
 
     /** Optional handle for recording test state in a third-party logging solution. */
-    final Consumer<State> m_recordState;
+    public final Consumer<State> recordState;
 
     /** Default voltage ramp rate used in quasistatic test routines, set to 1 volt per second. */
     public static final Velocity<VoltageUnit> DEFAULT_RAMP_RATE = Volts.of(1).per(Second);
@@ -97,10 +97,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
       requireNonNullParam(rampRate, "rampRate", "SysIdRoutine.Config");
       requireNonNullParam(stepVoltage, "stepVoltage", "SysIdRoutine.Config");
       requireNonNullParam(timeout, "timeout", "SysIdRoutine.Config");
-      m_rampRate = rampRate;
-      m_stepVoltage = stepVoltage;
-      m_timeout = timeout;
-      m_recordState = recordState;
+      this.rampRate = rampRate;
+      this.stepVoltage = stepVoltage;
+      this.timeout = timeout;
+      this.recordState = recordState;
     }
 
     /**
@@ -140,19 +140,19 @@ public class SysIdRoutine extends SysIdRoutineLog {
    */
   public static class SysIdMechanism {
     /** Sends the SysId-specified drive signal to the mechanism motors during test routines. */
-    final Consumer<? super Voltage> m_drive;
+    public final Consumer<? super Voltage> drive;
 
     /**
      * Returns measured data (voltages, positions, velocities) of the mechanism motors during test
      * routines.
      */
-    final Consumer<SysIdRoutineLog> m_log;
+    public final Consumer<SysIdRoutineLog> log;
 
-    /** The subsystem containing the motor(s) that is (or are) being characterized. */
-    final Mechanism m_subsystem;
+    /** The mechanism containing the motor(s) that is (or are) being characterized. */
+    public final Mechanism mechanism;
 
     /** The name of the mechanism being tested. */
-    final String m_name;
+    public final String name;
 
     /**
      * Create a new mechanism specification for a SysId routine.
@@ -172,10 +172,10 @@ public class SysIdRoutine extends SysIdRoutineLog {
      */
     public SysIdMechanism(
         Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism subsystem, String name) {
-      m_drive = drive;
-      m_log = log != null ? log : l -> {};
-      m_subsystem = subsystem;
-      m_name = name != null ? name : subsystem.getName();
+      this.drive = drive;
+      this.log = log != null ? log : l -> {};
+      mechanism = subsystem;
+      this.name = name != null ? name : subsystem.getName();
     }
 
     /**
@@ -203,9 +203,9 @@ public class SysIdRoutine extends SysIdRoutineLog {
   /** Motor direction for a SysId test. */
   public enum Direction {
     /** Forward. */
-    kForward,
+    FORWARD,
     /** Reverse. */
-    kReverse
+    REVERSE
   }
 
   /**
@@ -221,37 +221,37 @@ public class SysIdRoutine extends SysIdRoutineLog {
   public Command quasistatic(Direction direction) {
     double outputSign =
         switch (direction) {
-          case kForward -> 1.0;
-          case kReverse -> -1.0;
+          case FORWARD -> 1.0;
+          case REVERSE -> -1.0;
         };
     State state =
         switch (direction) {
-          case kForward -> State.DYNAMIC_FORWARD;
-          case kReverse -> State.DYNAMIC_REVERSE;
+          case FORWARD -> State.DYNAMIC_FORWARD;
+          case REVERSE -> State.DYNAMIC_REVERSE;
         };
 
     return m_mechanism
-        .m_subsystem
+        .mechanism
         .run(
             co -> {
               Timer timer = new Timer();
               timer.start();
-              while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
-                m_mechanism.m_drive.accept(
-                    (Voltage) m_config.m_rampRate.times(Seconds.of(timer.get() * outputSign)));
-                m_mechanism.m_log.accept(this);
+              while (!timer.hasElapsed(m_config.timeout.in(Seconds))) {
+                m_mechanism.drive.accept(
+                    (Voltage) m_config.rampRate.times(Seconds.of(timer.get() * outputSign)));
+                m_mechanism.log.accept(this);
                 m_recordState.accept(state);
                 co.yield();
               }
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
         .whenCanceled(
             () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
-        .named("sysid-" + state.toString() + "-" + m_mechanism.m_name);
+        .named("sysid-" + state.toString() + "-" + m_mechanism.name);
   }
 
   /**
@@ -267,37 +267,37 @@ public class SysIdRoutine extends SysIdRoutineLog {
   public Command dynamic(Direction direction) {
     double outputSign =
         switch (direction) {
-          case kForward -> 1.0;
-          case kReverse -> -1.0;
+          case FORWARD -> 1.0;
+          case REVERSE -> -1.0;
         };
     State state =
         switch (direction) {
-          case kForward -> State.DYNAMIC_FORWARD;
-          case kReverse -> State.DYNAMIC_REVERSE;
+          case FORWARD -> State.DYNAMIC_FORWARD;
+          case REVERSE -> State.DYNAMIC_REVERSE;
         };
 
     return m_mechanism
-        .m_subsystem
+        .mechanism
         .run(
             co -> {
-              Voltage output = m_config.m_stepVoltage.times(outputSign);
+              Voltage output = m_config.stepVoltage.times(outputSign);
               Timer timer = new Timer();
               timer.start();
 
-              while (!timer.hasElapsed(m_config.m_timeout.in(Seconds))) {
-                m_mechanism.m_drive.accept(output);
-                m_mechanism.m_log.accept(this);
+              while (!timer.hasElapsed(m_config.timeout.in(Seconds))) {
+                m_mechanism.drive.accept(output);
+                m_mechanism.log.accept(this);
                 m_recordState.accept(state);
                 co.yield();
               }
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
         .whenCanceled(
             () -> {
-              m_mechanism.m_drive.accept(Volts.of(0));
+              m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
-        .named("sysid-" + state + "-" + m_mechanism.m_name);
+        .named("sysid-" + state + "-" + m_mechanism.name);
   }
 }
