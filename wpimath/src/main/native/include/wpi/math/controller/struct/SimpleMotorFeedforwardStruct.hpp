@@ -13,9 +13,8 @@
 // wpi::math::SimpleMotorFeedforward<wpi::units::radians_>
 
 template <class Distance>
-  requires wpi::units::length_unit<Distance> ||
-           wpi::units::angle_unit<Distance> ||
-           wpi::units::dimensionless_unit<Distance>
+  requires wpi::units::Length<Distance> || wpi::units::Angle<Distance> ||
+           wpi::units::Dimensionless<Distance>
 struct wpi::util::Struct<wpi::math::SimpleMotorFeedforward<Distance>> {
   static constexpr std::string_view GetTypeName() {
     return "SimpleMotorFeedforward";

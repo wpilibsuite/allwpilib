@@ -38,7 +38,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
    *
    * @param value The value of the angle.
    */
-  constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
+  constexpr Rotation2d(wpi::units::Angle auto value)  // NOLINT
       : m_cos{gcem::cos(wpi::units::radians<>(value).value())},
         m_sin{gcem::sin(wpi::units::radians<>(value).value())} {}
 
