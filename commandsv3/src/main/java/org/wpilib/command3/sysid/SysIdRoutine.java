@@ -250,7 +250,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
               m_mechanism.drive.accept(Volts.of(0));
               m_recordState.accept(State.NONE);
             })
-        .named("sysid-" + state.toString() + "-" + m_mechanism.name);
+        .named("sysid-" + state + "-" + m_mechanism.name);
   }
 
   /**
