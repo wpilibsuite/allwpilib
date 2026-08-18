@@ -56,7 +56,7 @@
 #include <string_view>
 #endif
 
-#ifdef WPI_DEBUG
+#ifdef WPI_HTRIE_DEBUG
 #define tsl_ah_assert(expr) assert(expr)
 #else
 #define tsl_ah_assert(expr) (static_cast<void>(0))

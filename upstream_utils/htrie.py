@@ -38,6 +38,7 @@ def copy_upstream_src(wpilib_root: Path):
         content = content.replace("tsl::", "wpi::util::")
 
         # Fix include guards and other #defines
+        content = content.replace("TSL_DEBUG", "WPI_HTRIE_DEBUG")
         content = content.replace("TSL_", "WPI_")
 
         # Handle move from .h -> .hpp
