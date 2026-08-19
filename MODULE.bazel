@@ -57,6 +57,8 @@ use_repo(pip, "allwpilib_pip_deps")
 
 bazel_dep(name = "rules_jvm_external", version = "6.8")
 
+register_toolchains("//:java_toolchain_definition")
+
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",

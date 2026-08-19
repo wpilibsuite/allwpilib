@@ -1,3 +1,4 @@
+load("@rules_java//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_python//python:defs.bzl", "py_test")
 load(":build_java_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
@@ -30,6 +31,20 @@ example_test_folders = first_level_folders(
 snippet_test_folders = first_level_folders(
     glob(["src/test/java/org/wpilib/snippets/*/**/*.java"]),
     "src/test/java/org/wpilib/snippets/",
+)
+
+java_package_configuration(
+    name = "toolchain_config",
+    javacopts = [
+        "-Xlint:-this-escape",
+    ],
+    packages = [":packages"],
+    visibility = ["//visibility:public"],
+)
+
+package_group(
+    name = "packages",
+    packages = ["//wpilibjExamples/..."],
 )
 
 halsim_deps = [

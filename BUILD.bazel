@@ -2,10 +2,46 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_plugin.bzl", "java_plugin")
+load("@rules_java//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
+load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+
+default_java_toolchain(
+    name = "java_toolchain",
+    java_runtime = "@rules_java//toolchains:remotejdk_25",
+    package_configuration = [
+        ":allwpilib_toolchain_config",
+        "//wpilibjExamples:toolchain_config",
+    ],
+    source_version = "25",
+    target_version = "25",
+)
+
+java_package_configuration(
+    name = "allwpilib_toolchain_config",
+    javacopts = [
+        "-Werror",
+        "-XDstringConcat=inline",
+        "-Xlint:all",
+        # ignore AutoCloseable warnings
+        "-Xlint:-try",
+        # ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
+        # ignore unclaimed annotation warning from annotation processing
+        "-Xlint:-processing",
+    ],
+    # Apply our flags to just our repository. Otherwise, Bazel will compile its
+    # tools with our flags, and not all of them are warning-free.
+    packages = ["allwpilib_packages"],
+)
+
+package_group(
+    name = "allwpilib_packages",
+    packages = ["//..."],
+)
 
 java_plugin(
     name = "avaje_jsonb_generator",
