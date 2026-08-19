@@ -13,15 +13,15 @@ classes:
     inline_code: |
       .def(
         py::init<
-          wpi::units::meter_t, wpi::math::Rotation2d
+          wpi::units::meters<>, wpi::math::Rotation2d
         >(),
         py::arg("distance") = 0, py::arg("angle") = wpi::math::Rotation2d()
       )
       .def_property("distance_ft",
-        [](SwerveModulePosition * self) -> wpi::units::foot_t {
+        [](SwerveModulePosition * self) -> wpi::units::feet<> {
           return self->distance;
         },
-        [](SwerveModulePosition * self, wpi::units::foot_t distance) {
+        [](SwerveModulePosition * self, wpi::units::feet<> distance) {
           self->distance = distance;
         }
       )

@@ -82,7 +82,7 @@ class RobotController {
    *
    * @return The battery voltage in Volts.
    */
-  static wpi::units::volt_t GetBatteryVoltage();
+  static wpi::units::volts<> GetBatteryVoltage();
 
   /**
    * Check if the FPGA outputs are enabled.
@@ -181,15 +181,15 @@ class RobotController {
    * @param recoveryVoltage the voltage where the robot will recover from
    *                        brownout
    */
-  static void SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
-                                  wpi::units::volt_t recoveryVoltage);
+  static void SetBrownoutVoltages(wpi::units::volts<> brownoutVoltage,
+                                  wpi::units::volts<> recoveryVoltage);
 
   /**
    * Get the current CPU temperature.
    *
    * @return current CPU temperature
    */
-  static wpi::units::celsius_t GetCPUTemp();
+  static wpi::units::celsius<> GetCPUTemp();
 
   /**
    * Get the current status of the CAN bus.

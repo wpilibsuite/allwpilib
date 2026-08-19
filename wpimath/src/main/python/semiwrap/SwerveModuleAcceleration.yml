@@ -5,7 +5,7 @@ classes:
   wpi::math::SwerveModuleAcceleration:
     force_no_default_constructor: true
     force_type_casters:
-    - wpi::units::meters_per_second_squared
+    - wpi::units::meters_per_second_squared_
     attributes:
       acceleration:
       angle:
@@ -23,18 +23,18 @@ inline_code: |
   cls_SwerveModuleAcceleration
     .def(
       py::init<
-        wpi::units::meters_per_second_squared_t, wpi::math::Rotation2d
+        wpi::units::meters_per_second_squared<>, wpi::math::Rotation2d
       >(),
       py::arg("acceleration") = 0, py::arg("angle") = wpi::math::Rotation2d()
     )
-    .def_static("from_fps", [](wpi::units::feet_per_second_squared_t acceleration, wpi::math::Rotation2d angle){
+    .def_static("from_fps", [](wpi::units::feet_per_second_squared<> acceleration, wpi::math::Rotation2d angle){
       return SwerveModuleAcceleration{acceleration, angle};
     }, py::arg("acceleration") = 0, py::arg("angle") = wpi::math::Rotation2d())
     .def_property("acceleration_fpss",
-      [](SwerveModuleAcceleration * self) -> wpi::units::feet_per_second_squared_t {
+      [](SwerveModuleAcceleration * self) -> wpi::units::feet_per_second_squared<> {
         return self->acceleration;
       },
-      [](SwerveModuleAcceleration * self, wpi::units::feet_per_second_squared_t acceleration) {
+      [](SwerveModuleAcceleration * self, wpi::units::feet_per_second_squared<> acceleration) {
         self->acceleration = acceleration;
       }
     )

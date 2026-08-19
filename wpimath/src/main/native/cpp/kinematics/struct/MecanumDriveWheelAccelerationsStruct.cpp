@@ -15,13 +15,13 @@ wpi::util::Struct<wpi::math::MecanumDriveWheelAccelerations>::Unpack(
   constexpr size_t kRearLeftOff = kFrontRightOff + 8;
   constexpr size_t kRearRightOff = kRearLeftOff + 8;
   return wpi::math::MecanumDriveWheelAccelerations{
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kFrontLeftOff>(data)},
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kFrontRightOff>(data)},
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kRearLeftOff>(data)},
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kRearRightOff>(data)},
   };
 }

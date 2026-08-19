@@ -17,8 +17,8 @@ classes:
       ToTwist2d:
       Discretize:
         overloads:
-          wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t, wpi::units::second_t:
-          const ChassisVelocities&, wpi::units::second_t:
+          wpi::units::meters_per_second<>, wpi::units::meters_per_second<>, wpi::units::radians_per_second<>, wpi::units::seconds<>:
+          const ChassisVelocities&, wpi::units::seconds<>:
       operator+:
       operator-:
         overloads:
@@ -34,35 +34,35 @@ inline_code: |
   cls_ChassisVelocities
     .def(
       py::init<
-        wpi::units::meters_per_second_t, wpi::units::meters_per_second_t,
-        wpi::units::radians_per_second_t
+        wpi::units::meters_per_second<>, wpi::units::meters_per_second<>,
+        wpi::units::radians_per_second<>
       >(),
       py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0
     )
-    .def_static("from_feet", [](wpi::units::feet_per_second_t vx, wpi::units::feet_per_second_t vy, wpi::units::radians_per_second_t omega){
+    .def_static("from_feet", [](wpi::units::feet_per_second<> vx, wpi::units::feet_per_second<> vy, wpi::units::radians_per_second<> omega){
       return ChassisVelocities{vx, vy, omega};
     }, py::arg("vx") = 0, py::arg("vy") = 0, py::arg("omega") = 0)
     .def_property("vx_fps",
-      [](ChassisVelocities * self) -> wpi::units::feet_per_second_t {
+      [](ChassisVelocities * self) -> wpi::units::feet_per_second<> {
         return self->vx;
       },
-      [](ChassisVelocities * self, wpi::units::feet_per_second_t vx) {
+      [](ChassisVelocities * self, wpi::units::feet_per_second<> vx) {
         self->vx = vx;
       }
     )
     .def_property("vy_fps",
-      [](ChassisVelocities * self) -> wpi::units::feet_per_second_t {
+      [](ChassisVelocities * self) -> wpi::units::feet_per_second<> {
         return self->vy;
       },
-      [](ChassisVelocities * self, wpi::units::feet_per_second_t vy) {
+      [](ChassisVelocities * self, wpi::units::feet_per_second<> vy) {
         self->vy = vy;
       }
     )
     .def_property("omega_dps",
-      [](ChassisVelocities * self) -> wpi::units::degrees_per_second_t {
+      [](ChassisVelocities * self) -> wpi::units::degrees_per_second<> {
         return self->omega;
       },
-      [](ChassisVelocities * self, wpi::units::degrees_per_second_t omega) {
+      [](ChassisVelocities * self, wpi::units::degrees_per_second<> omega) {
         self->omega = omega;
       }
     )

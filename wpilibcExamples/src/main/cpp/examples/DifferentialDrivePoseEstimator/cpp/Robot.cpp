@@ -39,8 +39,9 @@ class Robot : public wpi::TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  wpi::math::SlewRateLimiter<wpi::units::scalar> velocityLimiter{3 / 1_s};
-  wpi::math::SlewRateLimiter<wpi::units::scalar> rotLimiter{3 / 1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> velocityLimiter{3 /
+                                                                         1_s};
+  wpi::math::SlewRateLimiter<wpi::units::dimensionless_> rotLimiter{3 / 1_s};
 
   Drivetrain drive;
 };

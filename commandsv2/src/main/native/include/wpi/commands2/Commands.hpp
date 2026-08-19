@@ -98,7 +98,7 @@ CommandPtr Print(std::string_view msg);
  *
  * @param duration after how long the command finishes
  */
-CommandPtr Wait(wpi::units::second_t duration);
+CommandPtr Wait(wpi::units::seconds<> duration);
 
 /**
  * Constructs a command that does nothing, finishing once a condition becomes

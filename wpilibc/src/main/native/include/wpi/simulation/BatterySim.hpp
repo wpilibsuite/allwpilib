@@ -31,9 +31,9 @@ class BatterySim {
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(
-      wpi::units::volt_t nominalVoltage, wpi::units::ohm_t resistance,
-      std::span<const wpi::units::ampere_t> currents) {
+  static wpi::units::volts<> Calculate(
+      wpi::units::volts<> nominalVoltage, wpi::units::ohms<> resistance,
+      std::span<const wpi::units::amperes<>> currents) {
     return std::max(0_V, nominalVoltage - std::accumulate(currents.begin(),
                                                           currents.end(), 0_A) *
                                               resistance);
@@ -51,9 +51,9 @@ class BatterySim {
    * @param currents       The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(
-      wpi::units::volt_t nominalVoltage, wpi::units::ohm_t resistance,
-      std::initializer_list<wpi::units::ampere_t> currents) {
+  static wpi::units::volts<> Calculate(
+      wpi::units::volts<> nominalVoltage, wpi::units::ohms<> resistance,
+      std::initializer_list<wpi::units::amperes<>> currents) {
     return std::max(0_V, nominalVoltage - std::accumulate(currents.begin(),
                                                           currents.end(), 0_A) *
                                               resistance);
@@ -69,8 +69,8 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(
-      std::span<const wpi::units::ampere_t> currents) {
+  static wpi::units::volts<> Calculate(
+      std::span<const wpi::units::amperes<>> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 
@@ -84,8 +84,8 @@ class BatterySim {
    * @param currents The currents drawn from the battery.
    * @return The battery's voltage under load.
    */
-  static wpi::units::volt_t Calculate(
-      std::initializer_list<wpi::units::ampere_t> currents) {
+  static wpi::units::volts<> Calculate(
+      std::initializer_list<wpi::units::amperes<>> currents) {
     return Calculate(12_V, 0.02_Ohm, currents);
   }
 };

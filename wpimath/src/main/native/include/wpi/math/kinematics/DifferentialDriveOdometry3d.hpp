@@ -43,8 +43,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param initialPose The starting position of the robot on the field.
    */
   explicit DifferentialDriveOdometry3d(const Rotation3d& gyroAngle,
-                                       wpi::units::meter_t leftDistance,
-                                       wpi::units::meter_t rightDistance,
+                                       wpi::units::meters<> leftDistance,
+                                       wpi::units::meters<> rightDistance,
                                        const Pose3d& initialPose = Pose3d{});
 
   /**
@@ -63,8 +63,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @param rightDistance The distance traveled by the right encoder.
    */
   void ResetPosition(const Rotation3d& gyroAngle,
-                     wpi::units::meter_t leftDistance,
-                     wpi::units::meter_t rightDistance, const Pose3d& pose) {
+                     wpi::units::meters<> leftDistance,
+                     wpi::units::meters<> rightDistance, const Pose3d& pose) {
     Odometry3d::ResetPosition(gyroAngle, {leftDistance, rightDistance}, pose);
   }
 
@@ -79,8 +79,8 @@ class WPILIB_DLLEXPORT DifferentialDriveOdometry3d
    * @return The new pose of the robot.
    */
   const Pose3d& Update(const Rotation3d& gyroAngle,
-                       wpi::units::meter_t leftDistance,
-                       wpi::units::meter_t rightDistance) {
+                       wpi::units::meters<> leftDistance,
+                       wpi::units::meters<> rightDistance) {
     return Odometry3d::Update(gyroAngle, {leftDistance, rightDistance});
   }
 };

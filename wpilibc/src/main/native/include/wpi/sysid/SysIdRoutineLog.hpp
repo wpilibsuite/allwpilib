@@ -64,7 +64,7 @@ class SysIdRoutineLog {
      * @param voltage The voltage to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& voltage(wpi::units::volt_t voltage) {
+    MotorLog& voltage(wpi::units::volts<> voltage) {
       return value("voltage", voltage.value(), voltage.name());
     }
 
@@ -74,7 +74,7 @@ class SysIdRoutineLog {
      * @param position The linear position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(wpi::units::meter_t position) {
+    MotorLog& position(wpi::units::meters<> position) {
       return value("position", position.value(), position.name());
     }
 
@@ -84,7 +84,7 @@ class SysIdRoutineLog {
      * @param position The angular position to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& position(wpi::units::turn_t position) {
+    MotorLog& position(wpi::units::turns<> position) {
       return value("position", position.value(), position.name());
     }
 
@@ -94,7 +94,7 @@ class SysIdRoutineLog {
      * @param velocity The linear velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(wpi::units::meters_per_second_t velocity) {
+    MotorLog& velocity(wpi::units::meters_per_second<> velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -104,7 +104,7 @@ class SysIdRoutineLog {
      * @param velocity The angular velocity to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& velocity(wpi::units::turns_per_second_t velocity) {
+    MotorLog& velocity(wpi::units::turns_per_second<> velocity) {
       return value("velocity", velocity.value(), velocity.name());
     }
 
@@ -117,7 +117,7 @@ class SysIdRoutineLog {
      * @return The motor log (for call chaining).
      */
     MotorLog& acceleration(
-        wpi::units::meters_per_second_squared_t acceleration) {
+        wpi::units::meters_per_second_squared<> acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -130,7 +130,7 @@ class SysIdRoutineLog {
      * @return The motor log (for call chaining).
      */
     MotorLog& acceleration(
-        wpi::units::turns_per_second_squared_t acceleration) {
+        wpi::units::turns_per_second_squared<> acceleration) {
       return value("acceleration", acceleration.value(), acceleration.name());
     }
 
@@ -142,7 +142,7 @@ class SysIdRoutineLog {
      * @param current The current to record.
      * @return The motor log (for call chaining).
      */
-    MotorLog& current(wpi::units::ampere_t current) {
+    MotorLog& current(wpi::units::amperes<> current) {
       return value("current", current.value(), current.name());
     }
 

@@ -54,9 +54,9 @@ class Robot : public wpi::TimedRobot {
         .IfHigh([&shooter = shooter, &controller = controller, &ff = ff,
                  &encoder = shooterEncoder] {
           shooter.SetVoltage(
-              wpi::units::volt_t{controller.Calculate(encoder.GetRate(),
-                                                      SHOT_VELOCITY.value())} +
-              ff.Calculate(wpi::units::radians_per_second_t{SHOT_VELOCITY}));
+              wpi::units::volts<>{controller.Calculate(encoder.GetRate(),
+                                                       SHOT_VELOCITY.value())} +
+              ff.Calculate(wpi::units::radians_per_second<>{SHOT_VELOCITY}));
         });
     // if not, stop
     (!shootTrigger).IfHigh([&shooter = shooter] { shooter.SetThrottle(0.0); });
@@ -84,8 +84,8 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax shooter{0};
   wpi::Encoder shooterEncoder{0, 1};
   wpi::math::PIDController controller{0.3, 0, 0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> ff{0.1_V,
-                                                            0.065_V / 1_rpm};
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> ff{0.1_V,
+                                                             0.065_V / 1_rpm};
 
   wpi::PWMSparkMax kicker{1};
 

@@ -111,16 +111,16 @@ void PneumaticsControlModule::EnableCompressorDigital() {
 }
 
 void PneumaticsControlModule::EnableCompressorAnalog(
-    wpi::units::pounds_per_square_inch_t minPressure,
-    wpi::units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch<> minPressure,
+    wpi::units::pounds_per_square_inch<> maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 }
 
 void PneumaticsControlModule::EnableCompressorHybrid(
-    wpi::units::pounds_per_square_inch_t minPressure,
-    wpi::units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch<> minPressure,
+    wpi::units::pounds_per_square_inch<> maxPressure) {
   int32_t status = 0;
   HAL_SetCTREPCMClosedLoopControl(m_handle, true, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
@@ -141,11 +141,11 @@ bool PneumaticsControlModule::GetPressureSwitch() const {
   return result;
 }
 
-wpi::units::ampere_t PneumaticsControlModule::GetCompressorCurrent() const {
+wpi::units::amperes<> PneumaticsControlModule::GetCompressorCurrent() const {
   int32_t status = 0;
   auto result = HAL_GetCTREPCMCompressorCurrent(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
-  return wpi::units::ampere_t{result};
+  return wpi::units::amperes<>{result};
 }
 
 bool PneumaticsControlModule::GetCompressorCurrentTooHighFault() const {
@@ -237,9 +237,9 @@ void PneumaticsControlModule::FireOneShot(int index) {
 }
 
 void PneumaticsControlModule::SetOneShotDuration(
-    int index, wpi::units::second_t duration) {
+    int index, wpi::units::seconds<> duration) {
   int32_t status = 0;
-  wpi::units::millisecond_t millis = duration;
+  wpi::units::milliseconds<> millis = duration;
   HAL_SetCTREPCMOneShotDuration(m_handle, index, millis.to<int32_t>(), &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 }
@@ -277,12 +277,12 @@ void PneumaticsControlModule::UnreserveCompressor() {
   m_dataStore->m_compressorReserved = false;
 }
 
-wpi::units::volt_t PneumaticsControlModule::GetAnalogVoltage(
+wpi::units::volts<> PneumaticsControlModule::GetAnalogVoltage(
     int channel) const {
   return 0_V;
 }
 
-wpi::units::pounds_per_square_inch_t PneumaticsControlModule::GetPressure(
+wpi::units::pounds_per_square_inch<> PneumaticsControlModule::GetPressure(
     int channel) const {
   return 0_psi;
 }

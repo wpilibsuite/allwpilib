@@ -62,9 +62,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         0,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{-0.0035306},
-                wpi::units::meter_t{7.578928199999999},
-                wpi::units::meter_t{0.8858503999999999},
+                wpi::units::meters<>{-0.0035306},
+                wpi::units::meters<>{7.578928199999999},
+                wpi::units::meters<>{0.8858503999999999},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -78,9 +78,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{3.2327088},
-                wpi::units::meter_t{5.486654},
-                wpi::units::meter_t{1.7254728},
+                wpi::units::meters<>{3.2327088},
+                wpi::units::meters<>{5.486654},
+                wpi::units::meters<>{1.7254728},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -94,9 +94,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{3.067812},
-                wpi::units::meter_t{5.3305202},
-                wpi::units::meter_t{1.3762228},
+                wpi::units::meters<>{3.067812},
+                wpi::units::meters<>{5.3305202},
+                wpi::units::meters<>{1.3762228},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -110,9 +110,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0039878},
-                wpi::units::meter_t{5.058536999999999},
-                wpi::units::meter_t{0.80645},
+                wpi::units::meters<>{0.0039878},
+                wpi::units::meters<>{5.058536999999999},
+                wpi::units::meters<>{0.80645},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -126,9 +126,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0039878},
-                wpi::units::meter_t{3.5124898},
-                wpi::units::meter_t{0.80645},
+                wpi::units::meters<>{0.0039878},
+                wpi::units::meters<>{3.5124898},
+                wpi::units::meters<>{0.80645},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -142,9 +142,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.12110719999999998},
-                wpi::units::meter_t{1.7178274},
-                wpi::units::meter_t{0.8906002000000001},
+                wpi::units::meters<>{0.12110719999999998},
+                wpi::units::meters<>{1.7178274},
+                wpi::units::meters<>{0.8906002000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9196502204050923,
@@ -158,9 +158,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.8733027999999999},
-                wpi::units::meter_t{0.9412985999999999},
-                wpi::units::meter_t{0.8906002000000001},
+                wpi::units::meters<>{0.8733027999999999},
+                wpi::units::meters<>{0.9412985999999999},
+                wpi::units::meters<>{0.8906002000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9196502204050923,
@@ -174,9 +174,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.6150844},
-                wpi::units::meter_t{0.15725139999999999},
-                wpi::units::meter_t{0.8906002000000001},
+                wpi::units::meters<>{1.6150844},
+                wpi::units::meters<>{0.15725139999999999},
+                wpi::units::meters<>{0.8906002000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9196502204050923,
@@ -190,9 +190,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.4627306},
-                wpi::units::meter_t{0.6506718},
-                wpi::units::meter_t{0.8858503999999999},
+                wpi::units::meters<>{16.4627306},
+                wpi::units::meters<>{0.6506718},
+                wpi::units::meters<>{0.8858503999999999},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -206,9 +206,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.2350002},
-                wpi::units::meter_t{2.743454},
-                wpi::units::meter_t{1.7254728},
+                wpi::units::meters<>{13.2350002},
+                wpi::units::meters<>{2.743454},
+                wpi::units::meters<>{1.7254728},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -222,9 +222,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.391388000000001},
-                wpi::units::meter_t{2.8998418},
-                wpi::units::meter_t{1.3762228},
+                wpi::units::meters<>{13.391388000000001},
+                wpi::units::meters<>{2.8998418},
+                wpi::units::meters<>{1.3762228},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -238,9 +238,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.4552122},
-                wpi::units::meter_t{3.1755079999999998},
-                wpi::units::meter_t{0.80645},
+                wpi::units::meters<>{16.4552122},
+                wpi::units::meters<>{3.1755079999999998},
+                wpi::units::meters<>{0.80645},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -254,9 +254,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.4552122},
-                wpi::units::meter_t{4.7171356},
-                wpi::units::meter_t{0.80645},
+                wpi::units::meters<>{16.4552122},
+                wpi::units::meters<>{4.7171356},
+                wpi::units::meters<>{0.80645},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -270,9 +270,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.3350194},
-                wpi::units::meter_t{6.5149729999999995},
-                wpi::units::meter_t{0.8937752},
+                wpi::units::meters<>{16.3350194},
+                wpi::units::meters<>{6.5149729999999995},
+                wpi::units::meters<>{0.8937752},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.37298778257580906,
@@ -286,9 +286,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{15.5904946},
-                wpi::units::meter_t{7.292695599999999},
-                wpi::units::meter_t{0.8906002000000001},
+                wpi::units::meters<>{15.5904946},
+                wpi::units::meters<>{7.292695599999999},
+                wpi::units::meters<>{0.8906002000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.37298778257580906,
@@ -302,9 +302,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         17,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{14.847188999999998},
-                wpi::units::meter_t{8.0691228},
-                wpi::units::meter_t{0.8906002000000001},
+                wpi::units::meters<>{14.847188999999998},
+                wpi::units::meters<>{8.0691228},
+                wpi::units::meters<>{0.8906002000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.37298778257580906,
@@ -318,9 +318,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         40,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{7.874127},
-                wpi::units::meter_t{4.9131728},
-                wpi::units::meter_t{0.7032752},
+                wpi::units::meters<>{7.874127},
+                wpi::units::meters<>{4.9131728},
+                wpi::units::meters<>{0.7032752},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5446390350150271,
@@ -334,9 +334,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         41,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{7.4312271999999995},
-                wpi::units::meter_t{3.759327},
-                wpi::units::meter_t{0.7032752},
+                wpi::units::meters<>{7.4312271999999995},
+                wpi::units::meters<>{3.759327},
+                wpi::units::meters<>{0.7032752},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.20791169081775934,
@@ -350,9 +350,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         42,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.585073},
-                wpi::units::meter_t{3.3164272},
-                wpi::units::meter_t{0.7032752},
+                wpi::units::meters<>{8.585073},
+                wpi::units::meters<>{3.3164272},
+                wpi::units::meters<>{0.7032752},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.838670567945424,
@@ -366,9 +366,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         43,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{9.0279728},
-                wpi::units::meter_t{4.470273},
-                wpi::units::meter_t{0.7032752},
+                wpi::units::meters<>{9.0279728},
+                wpi::units::meters<>{4.470273},
+                wpi::units::meters<>{0.7032752},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9781476007338057,
@@ -382,9 +382,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         50,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{7.6790296},
-                wpi::units::meter_t{4.3261534},
-                wpi::units::meter_t{2.4177244},
+                wpi::units::meters<>{7.6790296},
+                wpi::units::meters<>{4.3261534},
+                wpi::units::meters<>{2.4177244},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.17729273396782605,
@@ -398,9 +398,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         51,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.0182466},
-                wpi::units::meter_t{3.5642296},
-                wpi::units::meter_t{2.4177244},
+                wpi::units::meters<>{8.0182466},
+                wpi::units::meters<>{3.5642296},
+                wpi::units::meters<>{2.4177244},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.5510435465842192,
@@ -414,9 +414,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         52,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.7801704},
-                wpi::units::meter_t{3.9034466},
-                wpi::units::meter_t{2.4177244},
+                wpi::units::meters<>{8.7801704},
+                wpi::units::meters<>{3.9034466},
+                wpi::units::meters<>{2.4177244},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.9565859910053994,
@@ -430,9 +430,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2022_RAPID_REACT[] = {
         53,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.4409534},
-                wpi::units::meter_t{4.6653704},
-                wpi::units::meter_t{2.4177244},
+                wpi::units::meters<>{8.4409534},
+                wpi::units::meters<>{4.6653704},
+                wpi::units::meters<>{2.4177244},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8017733354717241,
@@ -449,9 +449,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{15.513558},
-                wpi::units::meter_t{1.071626},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{15.513558},
+                wpi::units::meters<>{1.071626},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.0,
@@ -465,9 +465,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{15.513558},
-                wpi::units::meter_t{2.748026},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{15.513558},
+                wpi::units::meters<>{2.748026},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.0,
@@ -481,9 +481,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{15.513558},
-                wpi::units::meter_t{4.424426},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{15.513558},
+                wpi::units::meters<>{4.424426},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.0,
@@ -497,9 +497,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.178784},
-                wpi::units::meter_t{6.749796},
-                wpi::units::meter_t{0.695452},
+                wpi::units::meters<>{16.178784},
+                wpi::units::meters<>{6.749796},
+                wpi::units::meters<>{0.695452},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.0,
@@ -513,9 +513,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.36195},
-                wpi::units::meter_t{6.749796},
-                wpi::units::meter_t{0.695452},
+                wpi::units::meters<>{0.36195},
+                wpi::units::meters<>{6.749796},
+                wpi::units::meters<>{0.695452},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -529,9 +529,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.02743},
-                wpi::units::meter_t{4.424426},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{1.02743},
+                wpi::units::meters<>{4.424426},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -545,9 +545,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.02743},
-                wpi::units::meter_t{2.748026},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{1.02743},
+                wpi::units::meters<>{2.748026},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -561,9 +561,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2023_CHARGED_UP[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.02743},
-                wpi::units::meter_t{1.071626},
-                wpi::units::meter_t{0.462788},
+                wpi::units::meters<>{1.02743},
+                wpi::units::meters<>{1.071626},
+                wpi::units::meters<>{0.462788},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -580,9 +580,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{15.079471999999997},
-                wpi::units::meter_t{0.24587199999999998},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{15.079471999999997},
+                wpi::units::meters<>{0.24587199999999998},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -596,9 +596,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.185134},
-                wpi::units::meter_t{0.883666},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{16.185134},
+                wpi::units::meters<>{0.883666},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -612,9 +612,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.579342},
-                wpi::units::meter_t{4.982717999999999},
-                wpi::units::meter_t{1.4511020000000001},
+                wpi::units::meters<>{16.579342},
+                wpi::units::meters<>{4.982717999999999},
+                wpi::units::meters<>{1.4511020000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -628,9 +628,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.579342},
-                wpi::units::meter_t{5.547867999999999},
-                wpi::units::meter_t{1.4511020000000001},
+                wpi::units::meters<>{16.579342},
+                wpi::units::meters<>{5.547867999999999},
+                wpi::units::meters<>{1.4511020000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -644,9 +644,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{14.700757999999999},
-                wpi::units::meter_t{8.2042},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{14.700757999999999},
+                wpi::units::meters<>{8.2042},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -660,9 +660,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.8415},
-                wpi::units::meter_t{8.2042},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{1.8415},
+                wpi::units::meters<>{8.2042},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -676,9 +676,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{-0.038099999999999995},
-                wpi::units::meter_t{5.547867999999999},
-                wpi::units::meter_t{1.4511020000000001},
+                wpi::units::meters<>{-0.038099999999999995},
+                wpi::units::meters<>{5.547867999999999},
+                wpi::units::meters<>{1.4511020000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -692,9 +692,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{-0.038099999999999995},
-                wpi::units::meter_t{4.982717999999999},
-                wpi::units::meter_t{1.4511020000000001},
+                wpi::units::meters<>{-0.038099999999999995},
+                wpi::units::meters<>{4.982717999999999},
+                wpi::units::meters<>{1.4511020000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -708,9 +708,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         9,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.356108},
-                wpi::units::meter_t{0.883666},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{0.356108},
+                wpi::units::meters<>{0.883666},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -724,9 +724,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{1.4615159999999998},
-                wpi::units::meter_t{0.24587199999999998},
-                wpi::units::meter_t{1.355852},
+                wpi::units::meters<>{1.4615159999999998},
+                wpi::units::meters<>{0.24587199999999998},
+                wpi::units::meters<>{1.355852},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -740,9 +740,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.904726},
-                wpi::units::meter_t{3.7132259999999997},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{11.904726},
+                wpi::units::meters<>{3.7132259999999997},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8660254037844387,
@@ -756,9 +756,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.904726},
-                wpi::units::meter_t{4.49834},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{11.904726},
+                wpi::units::meters<>{4.49834},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -772,9 +772,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.220196},
-                wpi::units::meter_t{4.105148},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{11.220196},
+                wpi::units::meters<>{4.105148},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -788,9 +788,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.320792},
-                wpi::units::meter_t{4.105148},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{5.320792},
+                wpi::units::meters<>{4.105148},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -804,9 +804,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.641342},
-                wpi::units::meter_t{4.49834},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{4.641342},
+                wpi::units::meters<>{4.49834},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -820,9 +820,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2024_CRESCENDO[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.641342},
-                wpi::units::meter_t{3.7132259999999997},
-                wpi::units::meter_t{1.3208},
+                wpi::units::meters<>{4.641342},
+                wpi::units::meters<>{3.7132259999999997},
+                wpi::units::meters<>{1.3208},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.4999999999999998,
@@ -839,9 +839,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.697198},
-                wpi::units::meter_t{0.65532},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{16.697198},
+                wpi::units::meters<>{0.65532},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.4539904997395468,
@@ -855,9 +855,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.697198},
-                wpi::units::meter_t{7.3964799999999995},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{16.697198},
+                wpi::units::meters<>{7.3964799999999995},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.45399049973954675,
@@ -871,9 +871,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.560809999999998},
-                wpi::units::meter_t{8.05561},
-                wpi::units::meter_t{1.30175},
+                wpi::units::meters<>{11.560809999999998},
+                wpi::units::meters<>{8.05561},
+                wpi::units::meters<>{1.30175},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -887,9 +887,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{9.276079999999999},
-                wpi::units::meter_t{6.137656},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{9.276079999999999},
+                wpi::units::meters<>{6.137656},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9659258262890683,
@@ -903,9 +903,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{9.276079999999999},
-                wpi::units::meter_t{1.914906},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{9.276079999999999},
+                wpi::units::meters<>{1.914906},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9659258262890683,
@@ -919,9 +919,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.474446},
-                wpi::units::meter_t{3.3063179999999996},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.474446},
+                wpi::units::meters<>{3.3063179999999996},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8660254037844387,
@@ -935,9 +935,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.890498},
-                wpi::units::meter_t{4.0259},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.890498},
+                wpi::units::meters<>{4.0259},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -951,9 +951,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.474446},
-                wpi::units::meter_t{4.745482},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.474446},
+                wpi::units::meters<>{4.745482},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -967,9 +967,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         9,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.643358},
-                wpi::units::meter_t{4.745482},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.643358},
+                wpi::units::meters<>{4.745482},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -983,9 +983,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.227305999999999},
-                wpi::units::meter_t{4.0259},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.227305999999999},
+                wpi::units::meters<>{4.0259},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -999,9 +999,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.643358},
-                wpi::units::meter_t{3.3063179999999996},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.643358},
+                wpi::units::meters<>{3.3063179999999996},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.4999999999999998,
@@ -1015,9 +1015,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.851154},
-                wpi::units::meter_t{0.65532},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{0.851154},
+                wpi::units::meters<>{0.65532},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8910065241883679,
@@ -1031,9 +1031,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.851154},
-                wpi::units::meter_t{7.3964799999999995},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{0.851154},
+                wpi::units::meters<>{7.3964799999999995},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8910065241883678,
@@ -1047,9 +1047,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.272272},
-                wpi::units::meter_t{6.137656},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{8.272272},
+                wpi::units::meters<>{6.137656},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 5.914589856893349e-17,
@@ -1063,9 +1063,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.272272},
-                wpi::units::meter_t{1.914906},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{8.272272},
+                wpi::units::meters<>{1.914906},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 5.914589856893349e-17,
@@ -1079,9 +1079,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.9875419999999995},
-                wpi::units::meter_t{-0.0038099999999999996},
-                wpi::units::meter_t{1.30175},
+                wpi::units::meters<>{5.9875419999999995},
+                wpi::units::meters<>{-0.0038099999999999996},
+                wpi::units::meters<>{1.30175},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1095,9 +1095,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         17,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.073905999999999},
-                wpi::units::meter_t{3.3063179999999996},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.073905999999999},
+                wpi::units::meters<>{3.3063179999999996},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.4999999999999998,
@@ -1111,9 +1111,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         18,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{3.6576},
-                wpi::units::meter_t{4.0259},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{3.6576},
+                wpi::units::meters<>{4.0259},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1127,9 +1127,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         19,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.073905999999999},
-                wpi::units::meter_t{4.745482},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.073905999999999},
+                wpi::units::meters<>{4.745482},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -1143,9 +1143,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         20,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.904739999999999},
-                wpi::units::meter_t{4.745482},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.904739999999999},
+                wpi::units::meters<>{4.745482},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -1159,9 +1159,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         21,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.321046},
-                wpi::units::meter_t{4.0259},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{5.321046},
+                wpi::units::meters<>{4.0259},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1175,9 +1175,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_WELDED[] = {
         22,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.904739999999999},
-                wpi::units::meter_t{3.3063179999999996},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.904739999999999},
+                wpi::units::meters<>{3.3063179999999996},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8660254037844387,
@@ -1194,9 +1194,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.687292},
-                wpi::units::meter_t{0.628142},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{16.687292},
+                wpi::units::meters<>{0.628142},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.4539904997395468,
@@ -1210,9 +1210,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.687292},
-                wpi::units::meter_t{7.414259999999999},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{16.687292},
+                wpi::units::meters<>{7.414259999999999},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.45399049973954675,
@@ -1226,9 +1226,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.49096},
-                wpi::units::meter_t{8.031733999999998},
-                wpi::units::meter_t{1.30175},
+                wpi::units::meters<>{11.49096},
+                wpi::units::meters<>{8.031733999999998},
+                wpi::units::meters<>{1.30175},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -1242,9 +1242,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{9.276079999999999},
-                wpi::units::meter_t{6.132575999999999},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{9.276079999999999},
+                wpi::units::meters<>{6.132575999999999},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9659258262890683,
@@ -1258,9 +1258,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{9.276079999999999},
-                wpi::units::meter_t{1.9098259999999998},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{9.276079999999999},
+                wpi::units::meters<>{1.9098259999999998},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.9659258262890683,
@@ -1274,9 +1274,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.474446},
-                wpi::units::meter_t{3.3012379999999997},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.474446},
+                wpi::units::meters<>{3.3012379999999997},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8660254037844387,
@@ -1290,9 +1290,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.890498},
-                wpi::units::meter_t{4.0208200000000005},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.890498},
+                wpi::units::meters<>{4.0208200000000005},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1306,9 +1306,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{13.474446},
-                wpi::units::meter_t{4.740402},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{13.474446},
+                wpi::units::meters<>{4.740402},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -1322,9 +1322,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         9,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.643358},
-                wpi::units::meter_t{4.740402},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.643358},
+                wpi::units::meters<>{4.740402},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -1338,9 +1338,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.227305999999999},
-                wpi::units::meter_t{4.0208200000000005},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.227305999999999},
+                wpi::units::meters<>{4.0208200000000005},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1354,9 +1354,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.643358},
-                wpi::units::meter_t{3.3012379999999997},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{12.643358},
+                wpi::units::meters<>{3.3012379999999997},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.4999999999999998,
@@ -1370,9 +1370,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.8613139999999999},
-                wpi::units::meter_t{0.628142},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{0.8613139999999999},
+                wpi::units::meters<>{0.628142},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8910065241883679,
@@ -1386,9 +1386,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.8613139999999999},
-                wpi::units::meter_t{7.414259999999999},
-                wpi::units::meter_t{1.4859},
+                wpi::units::meters<>{0.8613139999999999},
+                wpi::units::meters<>{7.414259999999999},
+                wpi::units::meters<>{1.4859},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8910065241883678,
@@ -1402,9 +1402,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.272272},
-                wpi::units::meter_t{6.132575999999999},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{8.272272},
+                wpi::units::meters<>{6.132575999999999},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 5.914589856893349e-17,
@@ -1418,9 +1418,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{8.272272},
-                wpi::units::meter_t{1.9098259999999998},
-                wpi::units::meter_t{1.8679160000000001},
+                wpi::units::meters<>{8.272272},
+                wpi::units::meters<>{1.9098259999999998},
+                wpi::units::meters<>{1.8679160000000001},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 5.914589856893349e-17,
@@ -1434,9 +1434,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{6.057646},
-                wpi::units::meter_t{0.010667999999999999},
-                wpi::units::meter_t{1.30175},
+                wpi::units::meters<>{6.057646},
+                wpi::units::meters<>{0.010667999999999999},
+                wpi::units::meters<>{1.30175},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1450,9 +1450,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         17,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.073905999999999},
-                wpi::units::meter_t{3.3012379999999997},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.073905999999999},
+                wpi::units::meters<>{3.3012379999999997},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.4999999999999998,
@@ -1466,9 +1466,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         18,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{3.6576},
-                wpi::units::meter_t{4.0208200000000005},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{3.6576},
+                wpi::units::meters<>{4.0208200000000005},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1482,9 +1482,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         19,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.073905999999999},
-                wpi::units::meter_t{4.740402},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.073905999999999},
+                wpi::units::meters<>{4.740402},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.5000000000000001,
@@ -1498,9 +1498,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         20,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.904739999999999},
-                wpi::units::meter_t{4.740402},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.904739999999999},
+                wpi::units::meters<>{4.740402},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.8660254037844387,
@@ -1514,9 +1514,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         21,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.321046},
-                wpi::units::meter_t{4.0208200000000005},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{5.321046},
+                wpi::units::meters<>{4.0208200000000005},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1530,9 +1530,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2025_REEFSCAPE_ANDY_MARK[] = {
         22,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.904739999999999},
-                wpi::units::meter_t{3.3012379999999997},
-                wpi::units::meter_t{0.308102},
+                wpi::units::meters<>{4.904739999999999},
+                wpi::units::meters<>{3.3012379999999997},
+                wpi::units::meters<>{0.308102},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.8660254037844387,
@@ -1549,9 +1549,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.8779798},
-                wpi::units::meter_t{7.4247756},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.8779798},
+                wpi::units::meters<>{7.4247756},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1565,9 +1565,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9154194},
-                wpi::units::meter_t{4.638039999999999},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.9154194},
+                wpi::units::meters<>{4.638039999999999},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1581,9 +1581,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.3118646},
-                wpi::units::meter_t{4.3902376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.3118646},
+                wpi::units::meters<>{4.3902376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1597,9 +1597,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.3118646},
-                wpi::units::meter_t{4.0346376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.3118646},
+                wpi::units::meters<>{4.0346376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1613,9 +1613,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9154194},
-                wpi::units::meter_t{3.4312351999999997},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.9154194},
+                wpi::units::meters<>{3.4312351999999997},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -1629,9 +1629,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.8779798},
-                wpi::units::meter_t{0.6444996},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.8779798},
+                wpi::units::meters<>{0.6444996},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1645,9 +1645,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9528844},
-                wpi::units::meter_t{0.6444996},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.9528844},
+                wpi::units::meters<>{0.6444996},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1661,9 +1661,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.2710194},
-                wpi::units::meter_t{3.4312351999999997},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.2710194},
+                wpi::units::meters<>{3.4312351999999997},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -1677,9 +1677,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         9,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.519177399999998},
-                wpi::units::meter_t{3.6790375999999996},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.519177399999998},
+                wpi::units::meters<>{3.6790375999999996},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1693,9 +1693,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.519177399999998},
-                wpi::units::meter_t{4.0346376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.519177399999998},
+                wpi::units::meters<>{4.0346376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1709,9 +1709,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.2710194},
-                wpi::units::meter_t{4.638039999999999},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.2710194},
+                wpi::units::meters<>{4.638039999999999},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1725,9 +1725,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9528844},
-                wpi::units::meter_t{7.4247756},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.9528844},
+                wpi::units::meters<>{7.4247756},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1741,9 +1741,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.5333172},
-                wpi::units::meter_t{7.4033126},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.5333172},
+                wpi::units::meters<>{7.4033126},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1757,9 +1757,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.5333172},
-                wpi::units::meter_t{6.9715126},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.5333172},
+                wpi::units::meters<>{6.9715126},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1773,9 +1773,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.5329616},
-                wpi::units::meter_t{4.3235626},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.5329616},
+                wpi::units::meters<>{4.3235626},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1789,9 +1789,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.5329616},
-                wpi::units::meter_t{3.8917626},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.5329616},
+                wpi::units::meters<>{3.8917626},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1805,9 +1805,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         17,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6630844},
-                wpi::units::meter_t{0.6444996},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.6630844},
+                wpi::units::meters<>{0.6444996},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1821,9 +1821,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         18,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6256194},
-                wpi::units::meter_t{3.4312351999999997},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.6256194},
+                wpi::units::meters<>{3.4312351999999997},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -1837,9 +1837,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         19,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.229174199999999},
-                wpi::units::meter_t{3.6790375999999996},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{5.229174199999999},
+                wpi::units::meters<>{3.6790375999999996},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1853,9 +1853,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         20,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.229174199999999},
-                wpi::units::meter_t{4.0346376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{5.229174199999999},
+                wpi::units::meters<>{4.0346376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1869,9 +1869,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         21,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6256194},
-                wpi::units::meter_t{4.638039999999999},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.6256194},
+                wpi::units::meters<>{4.638039999999999},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1885,9 +1885,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         22,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6630844},
-                wpi::units::meter_t{7.4247756},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.6630844},
+                wpi::units::meters<>{7.4247756},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -1901,9 +1901,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         23,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.5881798},
-                wpi::units::meter_t{7.4247756},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.5881798},
+                wpi::units::meters<>{7.4247756},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1917,9 +1917,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         24,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.2700194},
-                wpi::units::meter_t{4.638039999999999},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.2700194},
+                wpi::units::meters<>{4.638039999999999},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -1933,9 +1933,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         25,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.0218614},
-                wpi::units::meter_t{4.3902376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.0218614},
+                wpi::units::meters<>{4.3902376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1949,9 +1949,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         26,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.0218614},
-                wpi::units::meter_t{4.0346376},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.0218614},
+                wpi::units::meters<>{4.0346376},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1965,9 +1965,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         27,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.2700194},
-                wpi::units::meter_t{3.4312351999999997},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.2700194},
+                wpi::units::meters<>{3.4312351999999997},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -1981,9 +1981,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         28,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.5881798},
-                wpi::units::meter_t{0.6444996},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.5881798},
+                wpi::units::meters<>{0.6444996},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -1997,9 +1997,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         29,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0077469999999999995},
-                wpi::units::meter_t{0.6659626},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0077469999999999995},
+                wpi::units::meters<>{0.6659626},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2013,9 +2013,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         30,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0077469999999999995},
-                wpi::units::meter_t{1.0977626},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0077469999999999995},
+                wpi::units::meters<>{1.0977626},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2029,9 +2029,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         31,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0080772},
-                wpi::units::meter_t{3.7457125999999996},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0080772},
+                wpi::units::meters<>{3.7457125999999996},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2045,9 +2045,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_WELDED[] = {
         32,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0080772},
-                wpi::units::meter_t{4.1775126},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0080772},
+                wpi::units::meters<>{4.1775126},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2064,9 +2064,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         1,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.863959},
-                wpi::units::meter_t{7.411491399999999},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.863959},
+                wpi::units::meters<>{7.411491399999999},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2080,9 +2080,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         2,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9013986},
-                wpi::units::meter_t{4.6247558},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.9013986},
+                wpi::units::meters<>{4.6247558},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -2096,9 +2096,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         3,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.2978438},
-                wpi::units::meter_t{4.3769534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.2978438},
+                wpi::units::meters<>{4.3769534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2112,9 +2112,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         4,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.2978438},
-                wpi::units::meter_t{4.0213534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.2978438},
+                wpi::units::meters<>{4.0213534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2128,9 +2128,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         5,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9013986},
-                wpi::units::meter_t{3.417951},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{11.9013986},
+                wpi::units::meters<>{3.417951},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -2144,9 +2144,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         6,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.863959},
-                wpi::units::meter_t{0.6312154},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.863959},
+                wpi::units::meters<>{0.6312154},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2160,9 +2160,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         7,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9388636},
-                wpi::units::meter_t{0.6312154},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.9388636},
+                wpi::units::meters<>{0.6312154},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2176,9 +2176,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         8,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.2569986},
-                wpi::units::meter_t{3.417951},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.2569986},
+                wpi::units::meters<>{3.417951},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -2192,9 +2192,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         9,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.5051566},
-                wpi::units::meter_t{3.6657534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.5051566},
+                wpi::units::meters<>{3.6657534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2208,9 +2208,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         10,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.5051566},
-                wpi::units::meter_t{4.0213534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.5051566},
+                wpi::units::meters<>{4.0213534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2224,9 +2224,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         11,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{12.2569986},
-                wpi::units::meter_t{4.6247558},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{12.2569986},
+                wpi::units::meters<>{4.6247558},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -2240,9 +2240,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         12,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{11.9388636},
-                wpi::units::meter_t{7.411491399999999},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{11.9388636},
+                wpi::units::meters<>{7.411491399999999},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2256,9 +2256,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         13,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.499332},
-                wpi::units::meter_t{7.391907999999999},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.499332},
+                wpi::units::meters<>{7.391907999999999},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2272,9 +2272,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         14,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.499332},
-                wpi::units::meter_t{6.960107999999999},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.499332},
+                wpi::units::meters<>{6.960107999999999},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2288,9 +2288,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         15,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.4989764},
-                wpi::units::meter_t{4.3124882},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.4989764},
+                wpi::units::meters<>{4.3124882},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2304,9 +2304,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         16,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{16.4989764},
-                wpi::units::meter_t{3.8806881999999994},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{16.4989764},
+                wpi::units::meters<>{3.8806881999999994},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2320,9 +2320,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         17,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6490636},
-                wpi::units::meter_t{0.6312154},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.6490636},
+                wpi::units::meters<>{0.6312154},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2336,9 +2336,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         18,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6115986},
-                wpi::units::meter_t{3.417951},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.6115986},
+                wpi::units::meters<>{3.417951},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -2352,9 +2352,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         19,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.2151534},
-                wpi::units::meter_t{3.6657534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{5.2151534},
+                wpi::units::meters<>{3.6657534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2368,9 +2368,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         20,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{5.2151534},
-                wpi::units::meter_t{4.0213534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{5.2151534},
+                wpi::units::meters<>{4.0213534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2384,9 +2384,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         21,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6115986},
-                wpi::units::meter_t{4.6247558},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.6115986},
+                wpi::units::meters<>{4.6247558},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -2400,9 +2400,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         22,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.6490636},
-                wpi::units::meter_t{7.411491399999999},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.6490636},
+                wpi::units::meters<>{7.411491399999999},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2416,9 +2416,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         23,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.574159},
-                wpi::units::meter_t{7.411491399999999},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.574159},
+                wpi::units::meters<>{7.411491399999999},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2432,9 +2432,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         24,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.2559986},
-                wpi::units::meter_t{4.6247558},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.2559986},
+                wpi::units::meters<>{4.6247558},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 0.7071067811865476,
@@ -2448,9 +2448,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         25,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.007866},
-                wpi::units::meter_t{4.3769534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.007866},
+                wpi::units::meters<>{4.3769534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2464,9 +2464,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         26,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.007866},
-                wpi::units::meter_t{4.0213534},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.007866},
+                wpi::units::meters<>{4.0213534},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2480,9 +2480,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         27,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.2559986},
-                wpi::units::meter_t{3.417951},
-                wpi::units::meter_t{1.12395},
+                wpi::units::meters<>{4.2559986},
+                wpi::units::meters<>{3.417951},
+                wpi::units::meters<>{1.12395},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 -0.7071067811865475,
@@ -2496,9 +2496,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         28,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{4.574159},
-                wpi::units::meter_t{0.6312154},
-                wpi::units::meter_t{0.889},
+                wpi::units::meters<>{4.574159},
+                wpi::units::meters<>{0.6312154},
+                wpi::units::meters<>{0.889},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 6.123233995736766e-17,
@@ -2512,9 +2512,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         29,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0136906},
-                wpi::units::meter_t{0.6507734},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0136906},
+                wpi::units::meters<>{0.6507734},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2528,9 +2528,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         30,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0136906},
-                wpi::units::meter_t{1.0825734},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0136906},
+                wpi::units::meters<>{1.0825734},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2544,9 +2544,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         31,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0140462},
-                wpi::units::meter_t{3.7301932},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0140462},
+                wpi::units::meters<>{3.7301932},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2560,9 +2560,9 @@ static constexpr FieldTag FIELD_TAGS_FRC_2026_REBUILT_ANDY_MARK[] = {
         32,
         wpi::math::Pose3d{
             wpi::math::Translation3d{
-                wpi::units::meter_t{0.0140462},
-                wpi::units::meter_t{4.1619931999999995},
-                wpi::units::meter_t{0.55245},
+                wpi::units::meters<>{0.0140462},
+                wpi::units::meters<>{4.1619931999999995},
+                wpi::units::meters<>{0.55245},
             },
             wpi::math::Rotation3d{wpi::math::Quaternion{
                 1.0,
@@ -2926,8 +2926,8 @@ Field GetField(FieldId field) {
     result.m_image.emplace(data.fieldImage, data.top, data.left,
                            data.bottom, data.right);
   }
-  result.m_fieldLength = wpi::units::meter_t{data.length};
-  result.m_fieldWidth = wpi::units::meter_t{data.width};
+  result.m_fieldLength = wpi::units::meters<>{data.length};
+  result.m_fieldWidth = wpi::units::meters<>{data.width};
   result.m_program = data.program;
   result.m_resourceFile = data.resourceFile;
   result.m_hasTags = data.hasTags;

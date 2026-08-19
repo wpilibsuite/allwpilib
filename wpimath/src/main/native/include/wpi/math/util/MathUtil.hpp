@@ -17,7 +17,6 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -36,13 +35,13 @@ namespace wpi::math {
  * @return The value after the deadband is applied.
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
   T magnitude;
   if constexpr (std::is_arithmetic_v<T>) {
     magnitude = gcem::abs(value);
   } else {
-    magnitude = wpi::units::math::abs(value);
+    magnitude = wpi::units::abs(value);
   }
 
   if (magnitude < deadband) {
@@ -108,7 +107,7 @@ constexpr T ApplyDeadband(T value, T deadband, T maxMagnitude = T{1.0}) {
  * @return The value after the deadband is applied.
  */
 template <typename T, int N>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
                                   T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
@@ -144,7 +143,7 @@ Eigen::Vector<T, N> ApplyDeadband(const Eigen::Vector<T, N>& value, T deadband,
  * range.
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 constexpr T CopyDirectionPow(T value, double exponent,
                              T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
@@ -152,9 +151,8 @@ constexpr T CopyDirectionPow(T value, double exponent,
         gcem::pow(gcem::abs(value) / maxMagnitude, exponent) * maxMagnitude,
         value);
   } else {
-    return wpi::units::math::copysign(
-        gcem::pow((wpi::units::math::abs(value) / maxMagnitude).value(),
-                  exponent) *
+    return wpi::units::copysign(
+        gcem::pow((wpi::units::abs(value) / maxMagnitude).value(), exponent) *
             maxMagnitude,
         value);
   }
@@ -179,7 +177,7 @@ constexpr T CopyDirectionPow(T value, double exponent,
  * the input range.
  */
 template <typename T, int N>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 Eigen::Vector<T, N> CopyDirectionPow(const Eigen::Vector<T, N>& value,
                                      double exponent, T maxMagnitude = T{1.0}) {
   if constexpr (std::is_arithmetic_v<T>) {
@@ -229,12 +227,12 @@ constexpr T InputModulus(T input, T minimumInput, T maximumInput) {
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 constexpr bool IsNear(T expected, T actual, T tolerance) {
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(expected - actual) < tolerance;
   } else {
-    return wpi::units::math::abs(expected - actual) < tolerance;
+    return wpi::units::abs(expected - actual) < tolerance;
   }
 }
 
@@ -258,7 +256,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance) {
  * @return Whether or not the actual value is within the allowed tolerance
  */
 template <typename T>
-  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_t_v<T>
+  requires std::is_arithmetic_v<T> || wpi::units::traits::is_unit_v<T>
 constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   T errorBound = (max - min) / 2.0;
   T error =
@@ -267,7 +265,7 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
   if constexpr (std::is_arithmetic_v<T>) {
     return std::abs(error) < tolerance;
   } else {
-    return wpi::units::math::abs(error) < tolerance;
+    return wpi::units::abs(error) < tolerance;
   }
 }
 
@@ -277,10 +275,10 @@ constexpr bool IsNear(T expected, T actual, T tolerance, T min, T max) {
  * @param angle Angle to wrap.
  */
 WPILIB_DLLEXPORT
-constexpr wpi::units::radian_t AngleModulus(wpi::units::radian_t angle) {
-  return InputModulus<wpi::units::radian_t>(
-      angle, wpi::units::radian_t{-std::numbers::pi},
-      wpi::units::radian_t{std::numbers::pi});
+constexpr wpi::units::radians<> AngleModulus(wpi::units::radians<> angle) {
+  return InputModulus<wpi::units::radians<>>(
+      angle, wpi::units::radians<>{-std::numbers::pi},
+      wpi::units::radians<>{std::numbers::pi});
 }
 
 // floorDiv and floorMod algorithms taken from Java
@@ -332,14 +330,14 @@ constexpr std::signed_integral auto FloorMod(std::signed_integral auto x,
  */
 constexpr Translation2d SlewRateLimit(
     const Translation2d& current, const Translation2d& next,
-    wpi::units::second_t dt, wpi::units::meters_per_second_t maxVelocity) {
+    wpi::units::seconds<> dt, wpi::units::meters_per_second<> maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);
     return next;
   }
   Translation2d diff = next - current;
-  wpi::units::meter_t dist = diff.Norm();
+  wpi::units::meters<> dist = diff.Norm();
   if (dist < 1e-9_m) {
     return next;
   }
@@ -361,14 +359,14 @@ constexpr Translation2d SlewRateLimit(
  */
 constexpr Translation3d SlewRateLimit(
     const Translation3d& current, const Translation3d& next,
-    wpi::units::second_t dt, wpi::units::meters_per_second_t maxVelocity) {
+    wpi::units::seconds<> dt, wpi::units::meters_per_second<> maxVelocity) {
   if (maxVelocity < 0_mps) {
     wpi::math::MathSharedStore::ReportError(
         "maxVelocity must be a non-negative number, got {}!", maxVelocity);
     return next;
   }
   Translation3d diff = next - current;
-  wpi::units::meter_t dist = diff.Norm();
+  wpi::units::meters<> dist = diff.Norm();
   if (dist < 1e-9_m) {
     return next;
   }

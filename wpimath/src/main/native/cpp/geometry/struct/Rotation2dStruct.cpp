@@ -12,7 +12,7 @@ using StructType = wpi::util::Struct<wpi::math::Rotation2d>;
 
 wpi::math::Rotation2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Rotation2d{
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kValueOff>(data)},
+      wpi::units::radians<>{wpi::util::UnpackStruct<double, kValueOff>(data)},
   };
 }
 

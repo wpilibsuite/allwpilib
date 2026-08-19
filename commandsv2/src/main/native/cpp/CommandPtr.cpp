@@ -132,7 +132,7 @@ CommandPtr CommandPtr::BeforeStarting(CommandPtr&& before) && {
   return std::move(*this);
 }
 
-CommandPtr CommandPtr::WithTimeout(wpi::units::second_t duration) && {
+CommandPtr CommandPtr::WithTimeout(wpi::units::seconds<> duration) && {
   AssertValid();
   std::vector<std::unique_ptr<Command>> temp;
   temp.emplace_back(std::move(m_ptr));

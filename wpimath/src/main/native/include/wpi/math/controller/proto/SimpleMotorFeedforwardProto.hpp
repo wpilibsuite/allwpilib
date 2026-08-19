@@ -11,8 +11,8 @@
 #include "wpimath/protobuf/controller.npb.h"
 
 // Everything is converted into units for
-// wpi::math::SimpleMotorFeedforward<wpi::units::meters> or
-// wpi::math::SimpleMotorFeedforward<wpi::units::radians>
+// wpi::math::SimpleMotorFeedforward<wpi::units::meters_> or
+// wpi::math::SimpleMotorFeedforward<wpi::units::radians_>
 
 template <class Distance>
   requires wpi::units::length_unit<Distance> ||
@@ -27,9 +27,8 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
 
   static std::optional<wpi::math::SimpleMotorFeedforward<Distance>> Unpack(
       InputStream& stream) {
-    using BaseUnit =
-        wpi::units::unit<std::ratio<1>,
-                         wpi::units::traits::base_unit_of<Distance>>;
+    using BaseUnit = wpi::units::conversion_factor<
+        std::ratio<1>, wpi::units::traits::dimension_of_t<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg;
     if (!stream.Decode(msg)) {
@@ -37,28 +36,25 @@ struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
     }
 
     return wpi::math::SimpleMotorFeedforward<Distance>{
-        wpi::units::volt_t{msg.ks},
-        wpi::units::unit_t<typename BaseFeedforward::kv_unit>{msg.kv},
-        wpi::units::unit_t<typename BaseFeedforward::ka_unit>{msg.ka},
-        wpi::units::second_t{msg.dt},
+        wpi::units::volts<>{msg.ks},
+        wpi::units::unit<typename BaseFeedforward::kv_unit>{msg.kv},
+        wpi::units::unit<typename BaseFeedforward::ka_unit>{msg.ka},
+        wpi::units::seconds<>{msg.dt},
     };
   }
 
   static bool Pack(OutputStream& stream,
                    const wpi::math::SimpleMotorFeedforward<Distance>& value) {
-    using BaseUnit =
-        wpi::units::unit<std::ratio<1>,
-                         wpi::units::traits::base_unit_of<Distance>>;
+    using BaseUnit = wpi::units::conversion_factor<
+        std::ratio<1>, wpi::units::traits::dimension_of_t<Distance>>;
     using BaseFeedforward = wpi::math::SimpleMotorFeedforward<BaseUnit>;
     wpi_proto_ProtobufSimpleMotorFeedforward msg{
         .ks = value.GetKs().value(),
-        .kv =
-            wpi::units::unit_t<typename BaseFeedforward::kv_unit>{value.GetKv()}
-                .value(),
-        .ka =
-            wpi::units::unit_t<typename BaseFeedforward::ka_unit>{value.GetKa()}
-                .value(),
-        .dt = wpi::units::second_t{value.GetDt()}.value(),
+        .kv = wpi::units::unit<typename BaseFeedforward::kv_unit>{value.GetKv()}
+                  .value(),
+        .ka = wpi::units::unit<typename BaseFeedforward::ka_unit>{value.GetKa()}
+                  .value(),
+        .dt = wpi::units::seconds<>{value.GetDt()}.value(),
     };
     return stream.Encode(msg);
   }

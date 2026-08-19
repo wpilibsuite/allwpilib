@@ -20,7 +20,7 @@ class Arm : public wpi::cmd::SubsystemBase {
    *
    * @param angle the commanded angle
    */
-  void SetAngle(wpi::units::radian_t angle);
+  void SetAngle(wpi::units::radians<> angle);
 
  private:
   wpi::xrp::XRPServo armServo{4};

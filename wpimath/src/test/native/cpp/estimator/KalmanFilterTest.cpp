@@ -15,7 +15,7 @@
 #include "wpi/units/time.hpp"
 
 TEST_CASE("KalmanFilterTest SwerveStationary", "[wpimath]") {
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
   // y = [x, y, θ]ᵀ
@@ -49,7 +49,7 @@ TEST_CASE("KalmanFilterTest SwerveStationary", "[wpimath]") {
 }
 
 TEST_CASE("KalmanFilterTest SwerveBadInitialPose", "[wpimath]") {
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
   // y = [x, y, θ]ᵀ
@@ -88,7 +88,7 @@ TEST_CASE("KalmanFilterTest SwerveBadInitialPose", "[wpimath]") {
 }
 
 TEST_CASE("KalmanFilterTest SwerveMovingOverTrajectory", "[wpimath]") {
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   // Swerve drive with x = [x, y, θ, v_x, v_y, ω]ᵀ, u = [a_x, a_y, α]ᵀ,
   // y = [x, y, θ]ᵀ
@@ -110,11 +110,11 @@ TEST_CASE("KalmanFilterTest SwerveMovingOverTrajectory", "[wpimath]") {
 
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       {wpi::math::Pose2d{0_m, 0_m, 0_rad}, wpi::math::Pose2d{5_m, 5_m, 0_rad}},
-      wpi::math::TrajectoryConfig{2_mps, 2_mps_sq});
+      wpi::math::TrajectoryConfig{2_mps, 2_mps2});
 
   Eigen::Vector3d lastVelocity{0.0, 0.0, 0.0};
 
-  for (wpi::units::second_t t = 0_s; t < trajectory.Duration(); t += dt) {
+  for (wpi::units::seconds<> t = 0_s; t < trajectory.Duration(); t += dt) {
     auto sample = trajectory.SampleAt(t);
 
     Eigen::Vector3d y{sample.pose.Translation().X().value(),

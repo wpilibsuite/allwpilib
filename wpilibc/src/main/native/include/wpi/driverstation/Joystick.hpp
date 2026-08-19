@@ -330,7 +330,7 @@ class Joystick : public HIDDevice {
    *
    * @return The direction of the vector.
    */
-  wpi::units::radian_t GetDirection() const;
+  wpi::units::radians<> GetDirection() const;
 
  private:
   enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };

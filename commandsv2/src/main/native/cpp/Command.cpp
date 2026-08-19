@@ -65,7 +65,7 @@ void Command::SetSubsystem(std::string_view subsystem) {
   m_subsystem = subsystem;
 }
 
-CommandPtr Command::WithTimeout(wpi::units::second_t duration) && {
+CommandPtr Command::WithTimeout(wpi::units::seconds<> duration) && {
   return std::move(*this).ToPtr().WithTimeout(duration);
 }
 

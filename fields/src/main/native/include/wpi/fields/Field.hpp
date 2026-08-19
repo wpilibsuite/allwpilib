@@ -70,8 +70,8 @@ class WPILIB_DLLEXPORT Field final {
    * @param tags Field tag metadata.
    */
   Field(std::string_view name, std::string_view season, std::string_view game,
-        std::optional<FieldImage> image, wpi::units::meter_t fieldLength,
-        wpi::units::meter_t fieldWidth, std::string_view program,
+        std::optional<FieldImage> image, wpi::units::meters<> fieldLength,
+        wpi::units::meters<> fieldWidth, std::string_view program,
         std::vector<FieldTag> tags = {});
 
   Field(const Field& other);
@@ -122,14 +122,14 @@ class WPILIB_DLLEXPORT Field final {
    *
    * @return Length.
    */
-  wpi::units::meter_t GetLength() const;
+  wpi::units::meters<> GetLength() const;
 
   /**
    * Gets the width.
    *
    * @return Width.
    */
-  wpi::units::meter_t GetWidth() const;
+  wpi::units::meters<> GetWidth() const;
 
   /**
    * Returns the FIRST program.
@@ -227,8 +227,8 @@ class WPILIB_DLLEXPORT Field final {
   std::string m_season;
   std::string m_game;
   std::optional<FieldImage> m_image;
-  wpi::units::meter_t m_fieldLength;
-  wpi::units::meter_t m_fieldWidth;
+  wpi::units::meters<> m_fieldLength;
+  wpi::units::meters<> m_fieldWidth;
   std::string m_program;
   std::string m_resourceFile;
   bool m_hasTags = false;

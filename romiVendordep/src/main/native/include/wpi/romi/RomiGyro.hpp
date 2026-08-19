@@ -36,7 +36,7 @@ class RomiGyro : public wpi::telemetry::TelemetryLoggable {
    *
    * @return The current heading of the robot.
    */
-  wpi::units::radian_t GetAngle() const;
+  wpi::units::radians<> GetAngle() const;
 
   /**
    * Return the rate of rotation of the gyro
@@ -45,49 +45,49 @@ class RomiGyro : public wpi::telemetry::TelemetryLoggable {
    *
    * @return The current rate.
    */
-  wpi::units::radians_per_second_t GetRate() const;
+  wpi::units::radians_per_second<> GetRate() const;
 
   /**
    * Get the rate of turn in around the X-axis.
    *
    * @return Rate of turn.
    */
-  wpi::units::radians_per_second_t GetRateX() const;
+  wpi::units::radians_per_second<> GetRateX() const;
 
   /**
    * Get the rate of turn in around the Y-axis.
    *
    * @return Rate of turn.
    */
-  wpi::units::radians_per_second_t GetRateY() const;
+  wpi::units::radians_per_second<> GetRateY() const;
 
   /**
    * Get the rate of turn around the Z-axis.
    *
    * @return Rate of turn.
    */
-  wpi::units::radians_per_second_t GetRateZ() const;
+  wpi::units::radians_per_second<> GetRateZ() const;
 
   /**
    * Get the currently reported angle around the X-axis.
    *
    * @return Current angle around X-axis.
    */
-  wpi::units::radian_t GetAngleX() const;
+  wpi::units::radians<> GetAngleX() const;
 
   /**
    * Get the currently reported angle around the Y-axis.
    *
    * @return Current angle around Y-axis.
    */
-  wpi::units::radian_t GetAngleY() const;
+  wpi::units::radians<> GetAngleY() const;
 
   /**
    * Get the currently reported angle around the Z-axis.
    *
    * @return Current angle around Z-axis.
    */
-  wpi::units::radian_t GetAngleZ() const;
+  wpi::units::radians<> GetAngleZ() const;
 
   /**
    * Resets the gyro

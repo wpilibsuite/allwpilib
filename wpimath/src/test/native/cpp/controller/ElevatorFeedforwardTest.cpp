@@ -27,7 +27,7 @@ TEST_CASE("ElevatorFeedforwardTest Calculate", "[wpimath]") {
 
   wpi::math::Matrixd<1, 1> A{-Kv.value() / Ka.value()};
   wpi::math::Matrixd<1, 1> B{1.0 / Ka.value()};
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
   wpi::math::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
 
   wpi::math::Vectord<1> r{2.0};

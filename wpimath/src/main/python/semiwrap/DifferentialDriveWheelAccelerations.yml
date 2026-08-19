@@ -5,7 +5,7 @@ classes:
   wpi::math::DifferentialDriveWheelAccelerations:
     force_no_default_constructor: true
     force_type_casters:
-    - wpi::units::meters_per_second_squared
+    - wpi::units::meters_per_second_squared_
     attributes:
       left:
       right:
@@ -22,25 +22,25 @@ classes:
 inline_code: |
   cls_DifferentialDriveWheelAccelerations
     .def(
-      py::init<wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t>(),
+      py::init<wpi::units::meters_per_second_squared<>, wpi::units::meters_per_second_squared<>>(),
       py::arg("left") = 0, py::arg("right") = 0
     )
-    .def_static("from_fps", [](wpi::units::feet_per_second_squared_t left, wpi::units::feet_per_second_squared_t right){
+    .def_static("from_fps", [](wpi::units::feet_per_second_squared<> left, wpi::units::feet_per_second_squared<> right){
       return DifferentialDriveWheelAccelerations{left, right};
     }, py::arg("left"), py::arg("right"))
     .def_property("left_fpss",
-      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared<> {
         return self->left;
       },
-      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared_t left) {
+      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared<> left) {
         self->left = left;
       }
     )
     .def_property("right_fpss",
-      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared_t {
+      [](DifferentialDriveWheelAccelerations * self) -> wpi::units::feet_per_second_squared<> {
         return self->right;
       },
-      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared_t right) {
+      [](DifferentialDriveWheelAccelerations * self, wpi::units::feet_per_second_squared<> right) {
         self->right = right;
       }
     )

@@ -10,7 +10,7 @@ extra_includes:
 
 inline_code: |
   cls_DifferentialDriveWheelVoltages
-    .def(py::init<wpi::units::volt_t, wpi::units::volt_t>(),
+    .def(py::init<wpi::units::volts<>, wpi::units::volts<>>(),
       py::arg("left") = 0, py::arg("right") = 0)
     .def("__repr__", [](const DifferentialDriveWheelVoltages *self) {
       return "DifferentialDriveWheelVoltages("

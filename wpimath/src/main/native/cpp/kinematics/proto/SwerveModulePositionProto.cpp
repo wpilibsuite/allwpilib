@@ -25,7 +25,7 @@ std::optional<wpi::math::SwerveModulePosition> wpi::util::Protobuf<
   }
 
   return wpi::math::SwerveModulePosition{
-      wpi::units::meter_t{msg.distance},
+      wpi::units::meters<>{msg.distance},
       iangle[0],
   };
 }

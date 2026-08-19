@@ -19,62 +19,62 @@ classes:
 inline_code: |-
   cls_Twist3d
     .def(
-      py::init<wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t,
-               wpi::units::radian_t, wpi::units::radian_t, wpi::units::radian_t>(),
+      py::init<wpi::units::meters<>, wpi::units::meters<>, wpi::units::meters<>,
+               wpi::units::radians<>, wpi::units::radians<>, wpi::units::radians<>>(),
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dz") = 0,
       py::arg("rx") = 0, py::arg("ry") = 0, py::arg("rz") = 0)
     .def_static("from_feet", [](
-      wpi::units::foot_t dx, wpi::units::foot_t dy, wpi::units::foot_t dz,
-      wpi::units::radian_t rx, wpi::units::radian_t ry, wpi::units::radian_t rz){
+      wpi::units::feet<> dx, wpi::units::feet<> dy, wpi::units::feet<> dz,
+      wpi::units::radians<> rx, wpi::units::radians<> ry, wpi::units::radians<> rz){
       return Twist3d{dx, dy, dz, rx, ry, rz};
     },
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dz") = 0,
       py::arg("rx") = 0, py::arg("ry") = 0, py::arg("rz") = 0)
     .def_property("dx_feet",
-      [](Twist3d * self) -> wpi::units::foot_t {
+      [](Twist3d * self) -> wpi::units::feet<> {
         return self->dx;
       },
-      [](Twist3d * self, wpi::units::foot_t dx) {
+      [](Twist3d * self, wpi::units::feet<> dx) {
         self->dx = dx;
       }
     )
     .def_property("dy_feet",
-      [](Twist3d * self) -> wpi::units::foot_t {
+      [](Twist3d * self) -> wpi::units::feet<> {
         return self->dy;
       },
-      [](Twist3d * self, wpi::units::foot_t dy) {
+      [](Twist3d * self, wpi::units::feet<> dy) {
         self->dy = dy;
       }
     )
     .def_property("dz_feet",
-      [](Twist3d * self) -> wpi::units::foot_t {
+      [](Twist3d * self) -> wpi::units::feet<> {
         return self->dz;
       },
-      [](Twist3d * self, wpi::units::foot_t dz) {
+      [](Twist3d * self, wpi::units::feet<> dz) {
         self->dz = dz;
       }
     )
     .def_property("rx_degrees",
-      [](Twist3d * self) -> wpi::units::degree_t {
+      [](Twist3d * self) -> wpi::units::degrees<> {
         return self->rx;
       },
-      [](Twist3d * self, wpi::units::degree_t rx) {
+      [](Twist3d * self, wpi::units::degrees<> rx) {
         self->rx = rx;
       }
     )
     .def_property("ry_degrees",
-      [](Twist3d * self) -> wpi::units::degree_t {
+      [](Twist3d * self) -> wpi::units::degrees<> {
         return self->ry;
       },
-      [](Twist3d * self, wpi::units::degree_t ry) {
+      [](Twist3d * self, wpi::units::degrees<> ry) {
         self->ry = ry;
       }
     )
     .def_property("rz_degrees",
-      [](Twist3d * self) -> wpi::units::degree_t {
+      [](Twist3d * self) -> wpi::units::degrees<> {
         return self->rz;
       },
-      [](Twist3d * self, wpi::units::degree_t rz) {
+      [](Twist3d * self, wpi::units::degrees<> rz) {
         self->rz = rz;
       }
     )

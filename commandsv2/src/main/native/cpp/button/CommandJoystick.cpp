@@ -30,7 +30,7 @@ double CommandJoystick::GetMagnitude() const {
   return m_joystick.GetMagnitude();
 }
 
-wpi::units::radian_t CommandJoystick::GetDirection() const {
+wpi::units::radians<> CommandJoystick::GetDirection() const {
   // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
   // A positive rotation around the X axis moves the joystick right, and a
   // positive rotation around the Y axis moves the joystick backward. When

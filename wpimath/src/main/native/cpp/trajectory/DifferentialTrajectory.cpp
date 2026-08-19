@@ -32,7 +32,7 @@ using namespace wpi::math;
 DifferentialSample DifferentialTrajectory::Interpolate(
     const DifferentialSample& start, const DifferentialSample& end,
     double t) const {
-  wpi::units::second_t interpTime = wpi::util::Lerp(start.time, end.time, t);
+  wpi::units::seconds<> interpTime = wpi::util::Lerp(start.time, end.time, t);
   auto interpDt = interpTime - start.time;
 
   // The integration state holds wheel velocities (vₗ, vᵣ), which are
@@ -102,23 +102,23 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   auto alpha =
       wpi::util::Lerp(start.acceleration.alpha, end.acceleration.alpha, t);
 
-  Rotation2d heading{wpi::units::radian_t{theta}};
+  Rotation2d heading{wpi::units::radians<>{theta}};
 
   // Reconstruct the field-relative velocity from robot-relative forward
   // velocity.
   ChassisVelocities fieldVelocity = ChassisVelocities{
-      wpi::units::meters_per_second_t{vx}, 0_mps,
-      wpi::units::radians_per_second_t{
+      wpi::units::meters_per_second<>{vx}, 0_mps,
+      wpi::units::radians_per_second<>{
           omega}}.ToFieldRelative(heading);
 
   return {interpTime,
-          Pose2d{wpi::units::meter_t{x}, wpi::units::meter_t{y}, heading},
+          Pose2d{wpi::units::meters<>{x}, wpi::units::meters<>{y}, heading},
           fieldVelocity,
-          ChassisAccelerations{wpi::units::meters_per_second_squared_t{ax},
-                               wpi::units::meters_per_second_squared_t{ay},
-                               wpi::units::radians_per_second_squared_t{alpha}},
-          wpi::units::meters_per_second_t{vl},
-          wpi::units::meters_per_second_t{vr}};
+          ChassisAccelerations{wpi::units::meters_per_second_squared<>{ax},
+                               wpi::units::meters_per_second_squared<>{ay},
+                               wpi::units::radians_per_second_squared<>{alpha}},
+          wpi::units::meters_per_second<>{vl},
+          wpi::units::meters_per_second<>{vr}};
 }
 
 DifferentialTrajectory DifferentialTrajectory::TransformBy(

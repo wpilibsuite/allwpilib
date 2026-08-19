@@ -19,7 +19,7 @@ classes:
       End:
       SampleAt:
         overloads:
-          wpi::units::second_t [const]:
+          wpi::units::seconds<> [const]:
           double [const]:
       RelativeSamples:
       ConcatenateSamples:

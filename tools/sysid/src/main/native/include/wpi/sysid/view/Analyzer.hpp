@@ -221,7 +221,7 @@ class Analyzer : public wpi::glass::View {
   double m_accelRMSE;
   double m_Kp;
   double m_Kd;
-  wpi::units::millisecond_t m_timescale;
+  wpi::units::milliseconds<> m_timescale;
   bool m_timescaleValid = false;
 
   // Units

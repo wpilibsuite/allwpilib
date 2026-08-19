@@ -45,10 +45,10 @@ MecanumDriveWheelVelocities MecanumDriveKinematics::ToWheelVelocities(
   Eigen::Vector4d wheelsVector = m_inverseKinematics * chassisVelocitiesVector;
 
   MecanumDriveWheelVelocities wheelVelocities;
-  wheelVelocities.frontLeft = wpi::units::meters_per_second_t{wheelsVector(0)};
-  wheelVelocities.frontRight = wpi::units::meters_per_second_t{wheelsVector(1)};
-  wheelVelocities.rearLeft = wpi::units::meters_per_second_t{wheelsVector(2)};
-  wheelVelocities.rearRight = wpi::units::meters_per_second_t{wheelsVector(3)};
+  wheelVelocities.frontLeft = wpi::units::meters_per_second<>{wheelsVector(0)};
+  wheelVelocities.frontRight = wpi::units::meters_per_second<>{wheelsVector(1)};
+  wheelVelocities.rearLeft = wpi::units::meters_per_second<>{wheelsVector(2)};
+  wheelVelocities.rearRight = wpi::units::meters_per_second<>{wheelsVector(3)};
   return wheelVelocities;
 }
 
@@ -62,9 +62,9 @@ ChassisVelocities MecanumDriveKinematics::ToChassisVelocities(
       m_forwardKinematics.solve(wheelVelocitiesVector);
 
   return {
-      wpi::units::meters_per_second_t{chassisVelocitiesVector(0)},  // NOLINT
-      wpi::units::meters_per_second_t{chassisVelocitiesVector(1)},
-      wpi::units::radians_per_second_t{chassisVelocitiesVector(2)}};
+      wpi::units::meters_per_second<>{chassisVelocitiesVector(0)},  // NOLINT
+      wpi::units::meters_per_second<>{chassisVelocitiesVector(1)},
+      wpi::units::radians_per_second<>{chassisVelocitiesVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
@@ -78,9 +78,9 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {wpi::units::meter_t{twistVector(0)},
-          wpi::units::meter_t{twistVector(1)},
-          wpi::units::radian_t{twistVector(2)}};
+  return {wpi::units::meters<>{twistVector(0)},
+          wpi::units::meters<>{twistVector(1)},
+          wpi::units::radians<>{twistVector(2)}};
 }
 
 Twist2d MecanumDriveKinematics::ToTwist2d(
@@ -91,9 +91,9 @@ Twist2d MecanumDriveKinematics::ToTwist2d(
 
   Eigen::Vector3d twistVector = m_forwardKinematics.solve(wheelDeltasVector);
 
-  return {wpi::units::meter_t{twistVector(0)},
-          wpi::units::meter_t{twistVector(1)},
-          wpi::units::radian_t{twistVector(2)}};
+  return {wpi::units::meters<>{twistVector(0)},
+          wpi::units::meters<>{twistVector(1)},
+          wpi::units::radians<>{twistVector(2)}};
 }
 
 void MecanumDriveKinematics::SetInverseKinematics(Translation2d fl,
@@ -118,9 +118,9 @@ ChassisAccelerations MecanumDriveKinematics::ToChassisAccelerations(
       m_forwardKinematics.solve(wheelAccelerationsVector);
 
   return {
-      wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(0)},
-      wpi::units::meters_per_second_squared_t{chassisAccelerationsVector(1)},
-      wpi::units::radians_per_second_squared_t{chassisAccelerationsVector(2)}};
+      wpi::units::meters_per_second_squared<>{chassisAccelerationsVector(0)},
+      wpi::units::meters_per_second_squared<>{chassisAccelerationsVector(1)},
+      wpi::units::radians_per_second_squared<>{chassisAccelerationsVector(2)}};
 }
 
 MecanumDriveWheelAccelerations MecanumDriveKinematics::ToWheelAccelerations(
@@ -147,12 +147,12 @@ MecanumDriveWheelAccelerations MecanumDriveKinematics::ToWheelAccelerations(
 
   MecanumDriveWheelAccelerations wheelAccelerations;
   wheelAccelerations.frontLeft =
-      wpi::units::meters_per_second_squared_t{wheelsVector(0)};
+      wpi::units::meters_per_second_squared<>{wheelsVector(0)};
   wheelAccelerations.frontRight =
-      wpi::units::meters_per_second_squared_t{wheelsVector(1)};
+      wpi::units::meters_per_second_squared<>{wheelsVector(1)};
   wheelAccelerations.rearLeft =
-      wpi::units::meters_per_second_squared_t{wheelsVector(2)};
+      wpi::units::meters_per_second_squared<>{wheelsVector(2)};
   wheelAccelerations.rearRight =
-      wpi::units::meters_per_second_squared_t{wheelsVector(3)};
+      wpi::units::meters_per_second_squared<>{wheelsVector(3)};
   return wheelAccelerations;
 }

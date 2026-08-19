@@ -21,25 +21,25 @@ classes:
 inline_code: |
   cls_DifferentialDriveWheelVelocities
     .def(
-      py::init<wpi::units::meters_per_second_t, wpi::units::meters_per_second_t>(),
+      py::init<wpi::units::meters_per_second<>, wpi::units::meters_per_second<>>(),
       py::arg("left") = 0, py::arg("right") = 0
     )
-    .def_static("from_feet", [](wpi::units::feet_per_second_t left, wpi::units::feet_per_second_t right){
+    .def_static("from_feet", [](wpi::units::feet_per_second<> left, wpi::units::feet_per_second<> right){
       return DifferentialDriveWheelVelocities{left, right};
     }, py::arg("left"), py::arg("right"))
     .def_property("left_fps",
-      [](DifferentialDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
+      [](DifferentialDriveWheelVelocities * self) -> wpi::units::feet_per_second<> {
         return self->left;
       },
-      [](DifferentialDriveWheelVelocities * self, wpi::units::feet_per_second_t left) {
+      [](DifferentialDriveWheelVelocities * self, wpi::units::feet_per_second<> left) {
         self->left = left;
       }
     )
     .def_property("right_fps",
-      [](DifferentialDriveWheelVelocities * self) -> wpi::units::feet_per_second_t {
+      [](DifferentialDriveWheelVelocities * self) -> wpi::units::feet_per_second<> {
         return self->right;
       },
-      [](DifferentialDriveWheelVelocities * self, wpi::units::feet_per_second_t right) {
+      [](DifferentialDriveWheelVelocities * self, wpi::units::feet_per_second<> right) {
         self->right = right;
       }
     )

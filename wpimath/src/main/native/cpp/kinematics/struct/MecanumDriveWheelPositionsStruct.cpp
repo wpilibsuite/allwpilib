@@ -16,11 +16,13 @@ using StructType = wpi::util::Struct<wpi::math::MecanumDriveWheelPositions>;
 wpi::math::MecanumDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
   return wpi::math::MecanumDriveWheelPositions{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kFrontLeftOff>(data)},
-      wpi::units::meter_t{
+      wpi::units::meters<>{
+          wpi::util::UnpackStruct<double, kFrontLeftOff>(data)},
+      wpi::units::meters<>{
           wpi::util::UnpackStruct<double, kFrontRightOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kRearLeftOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kRearRightOff>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, kRearLeftOff>(data)},
+      wpi::units::meters<>{
+          wpi::util::UnpackStruct<double, kRearRightOff>(data)},
   };
 }
 

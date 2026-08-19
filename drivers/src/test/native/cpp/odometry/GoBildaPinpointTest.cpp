@@ -570,7 +570,7 @@ TEST_CASE_METHOD(
     PinpointTestFixture,
     "GoBildaPinpoint reestablishes pose baseline after omitted bulk samples",
     "[drivers][gobilda-pinpoint]") {
-  using wpi::units::meter_t;
+  using wpi::units::meters<>;
 
   SetRegister(Register::DEVICE_VERSION, EncodeInt(3));
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
@@ -611,8 +611,8 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(PinpointTestFixture,
                  "GoBildaPinpoint pose writes reset local validation baselines",
                  "[drivers][gobilda-pinpoint]") {
-  using wpi::units::meter_t;
-  using wpi::units::radian_t;
+  using wpi::units::meters<>;
+  using wpi::units::radians<>;
 
   SetRegister(Register::DEVICE_VERSION, EncodeInt(2));
   SetRegister(Register::BULK_READ,
@@ -802,8 +802,8 @@ TEST_CASE_METHOD(PinpointTestFixture,
 
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
   CHECK_THROWS_AS(pinpoint.SetOffsets(
-                      wpi::units::meter_t{1.0},
-                      wpi::units::meter_t{std::numeric_limits<double>::max()}),
+                      wpi::units::meters<>{1.0},
+                      wpi::units::meters<>{std::numeric_limits<double>::max()}),
                   std::invalid_argument);
   CHECK(m_writes.empty());
   CHECK_THROWS_AS(pinpoint.SetEncoderResolution(0.0), std::invalid_argument);
@@ -818,15 +818,15 @@ TEST_CASE_METHOD(PinpointTestFixture,
   wpi::GoBildaPinpoint pinpoint{wpi::I2C::Port::PORT_0};
 
   CHECK_THROWS_AS(pinpoint.SetPose(wpi::math::Pose2d{
-                      wpi::units::meter_t{1.0},
-                      wpi::units::meter_t{std::numeric_limits<double>::max()},
+                      wpi::units::meters<>{1.0},
+                      wpi::units::meters<>{std::numeric_limits<double>::max()},
                       wpi::math::Rotation2d{}}),
                   std::invalid_argument);
   CHECK(m_writes.empty());
 
   CHECK_THROWS_AS(pinpoint.SetPose(wpi::math::Pose2d{
-                      wpi::units::meter_t{1.0}, wpi::units::meter_t{2.0},
-                      wpi::math::Rotation2d{wpi::units::radian_t{
+                      wpi::units::meters<>{1.0}, wpi::units::meters<>{2.0},
+                      wpi::math::Rotation2d{wpi::units::radians<>{
                           std::numeric_limits<double>::quiet_NaN()}}}),
                   std::invalid_argument);
   CHECK(m_writes.empty());

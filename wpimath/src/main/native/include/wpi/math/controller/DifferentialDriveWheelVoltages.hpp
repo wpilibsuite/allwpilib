@@ -13,10 +13,10 @@ namespace wpi::math {
  */
 struct DifferentialDriveWheelVoltages {
   /// Left wheel voltage.
-  wpi::units::volt_t left = 0_V;
+  wpi::units::volts<> left = 0_V;
 
   /// Right wheel voltage.
-  wpi::units::volt_t right = 0_V;
+  wpi::units::volts<> right = 0_V;
 };
 
 }  // namespace wpi::math

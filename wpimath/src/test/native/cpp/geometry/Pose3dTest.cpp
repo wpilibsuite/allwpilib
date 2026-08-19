@@ -24,7 +24,7 @@ TEST_CASE("Pose3dTest RotateBy", "[wpimath]") {
   constexpr auto y = 2_m;
   const Pose3d initial{x, y, 0_m, Rotation3d{0_deg, 0_deg, 45_deg}};
 
-  constexpr wpi::units::radian_t yaw = 5_deg;
+  constexpr wpi::units::radians<> yaw = 5_deg;
   const Rotation3d rotation{0_deg, 0_deg, yaw};
   const auto rotated = initial.RotateBy(rotation);
 
@@ -75,7 +75,7 @@ TEST_CASE("Pose3dTest TransformBy", "[wpimath]") {
   CHECK_DOUBLE_EQ(1.0 + 5.0 / std::sqrt(2.0), transformed.X().value());
   CHECK_DOUBLE_EQ(2.0 + 5.0 / std::sqrt(2.0), transformed.Y().value());
   CHECK_DOUBLE_EQ(transformed.Rotation().Z().value(),
-                  wpi::units::radian_t{50_deg}.value());
+                  wpi::units::radians<>{50_deg}.value());
 }
 
 TEST_CASE("Pose3dTest RelativeTo", "[wpimath]") {
@@ -100,7 +100,7 @@ TEST_CASE("Pose3dTest RotateAround", "[wpimath]") {
 
   CHECK_NEAR(-5.0, rotated.X().value(), 1e-9);
   CHECK_NEAR(0.0, rotated.Y().value(), 1e-9);
-  CHECK_NEAR(wpi::units::radian_t{180_deg}.value(),
+  CHECK_NEAR(wpi::units::radians<>{180_deg}.value(),
              rotated.Rotation().Z().value(), 1e-9);
 }
 

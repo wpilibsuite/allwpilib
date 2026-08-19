@@ -106,7 +106,7 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest RotationInverseKinematics",
                  "[wpimath]") {
   ChassisVelocities velocities{
-      0_mps, 0_mps, wpi::units::radians_per_second_t{2 * std::numbers::pi}};
+      0_mps, 0_mps, wpi::units::radians_per_second<>{2 * std::numbers::pi}};
   auto moduleVelocities = kinematics.ToWheelVelocities(velocities);
 
   CHECK_NEAR(-150.79644737, moduleVelocities.frontLeft.value(), 0.1);
@@ -289,7 +289,7 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
 TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest StraightLineInverseAccelerations",
                  "[wpimath]") {
-  ChassisAccelerations accelerations{5_mps_sq, 0_mps_sq, 0_rad_per_s_sq};
+  ChassisAccelerations accelerations{5_mps2, 0_mps2, 0_rad_per_s_sq};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   CHECK_NEAR(5.0, wheelAccelerations.frontLeft.value(), 0.1);
@@ -301,8 +301,8 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
 TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest StraightLineForwardAccelerations",
                  "[wpimath]") {
-  MecanumDriveWheelAccelerations wheelAccelerations{3.536_mps_sq, 3.536_mps_sq,
-                                                    3.536_mps_sq, 3.536_mps_sq};
+  MecanumDriveWheelAccelerations wheelAccelerations{3.536_mps2, 3.536_mps2,
+                                                    3.536_mps2, 3.536_mps2};
   auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -314,7 +314,7 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
 TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest StrafeInverseAccelerations",
                  "[wpimath]") {
-  ChassisAccelerations accelerations{0_mps_sq, 4_mps_sq, 0_rad_per_s_sq};
+  ChassisAccelerations accelerations{0_mps2, 4_mps2, 0_rad_per_s_sq};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   CHECK_NEAR(-4.0, wheelAccelerations.frontLeft.value(), 0.1);
@@ -327,7 +327,7 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest StrafeForwardAccelerations",
                  "[wpimath]") {
   MecanumDriveWheelAccelerations wheelAccelerations{
-      -2.828427_mps_sq, 2.828427_mps_sq, 2.828427_mps_sq, -2.828427_mps_sq};
+      -2.828427_mps2, 2.828427_mps2, 2.828427_mps2, -2.828427_mps2};
   auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -340,8 +340,8 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest RotationInverseAccelerations",
                  "[wpimath]") {
   ChassisAccelerations accelerations{
-      0_mps_sq, 0_mps_sq,
-      wpi::units::radians_per_second_squared_t{2 * std::numbers::pi}};
+      0_mps2, 0_mps2,
+      wpi::units::radians_per_second_squared<>{2 * std::numbers::pi}};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   CHECK_NEAR(-150.79645, wheelAccelerations.frontLeft.value(), 0.1);
@@ -354,7 +354,7 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
                  "MecanumDriveKinematicsTest RotationForwardAccelerations",
                  "[wpimath]") {
   MecanumDriveWheelAccelerations wheelAccelerations{
-      -150.79645_mps_sq, 150.79645_mps_sq, -150.79645_mps_sq, 150.79645_mps_sq};
+      -150.79645_mps2, 150.79645_mps2, -150.79645_mps2, 150.79645_mps2};
   auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -367,7 +367,7 @@ TEST_CASE_METHOD(
     MecanumDriveKinematicsTest,
     "MecanumDriveKinematicsTest MixedTranslationRotationInverseAccelerations",
     "[wpimath]") {
-  ChassisAccelerations accelerations{2_mps_sq, 3_mps_sq, 1_rad_per_s_sq};
+  ChassisAccelerations accelerations{2_mps2, 3_mps2, 1_rad_per_s_sq};
   auto wheelAccelerations = kinematics.ToWheelAccelerations(accelerations);
 
   CHECK_NEAR(-25.0, wheelAccelerations.frontLeft.value(), 0.1);
@@ -380,8 +380,8 @@ TEST_CASE_METHOD(
     MecanumDriveKinematicsTest,
     "MecanumDriveKinematicsTest MixedTranslationRotationForwardAccelerations",
     "[wpimath]") {
-  MecanumDriveWheelAccelerations wheelAccelerations{
-      -17.677670_mps_sq, 20.51_mps_sq, -13.44_mps_sq, 16.26_mps_sq};
+  MecanumDriveWheelAccelerations wheelAccelerations{-17.677670_mps2, 20.51_mps2,
+                                                    -13.44_mps2, 16.26_mps2};
   auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -394,7 +394,7 @@ TEST_CASE_METHOD(
     MecanumDriveKinematicsTest,
     "MecanumDriveKinematicsTest OffCenterRotationInverseAccelerations",
     "[wpimath]") {
-  ChassisAccelerations accelerations{0_mps_sq, 0_mps_sq, 1_rad_per_s_sq};
+  ChassisAccelerations accelerations{0_mps2, 0_mps2, 1_rad_per_s_sq};
   auto wheelAccelerations =
       kinematics.ToWheelAccelerations(accelerations, m_fl);
 

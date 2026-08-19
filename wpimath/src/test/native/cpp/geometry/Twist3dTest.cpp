@@ -48,7 +48,7 @@ TEST_CASE("Twist3dTest QuarterCircle", "[wpimath]") {
                               0_m,
                               0_rad,
                               0_rad,
-                              wpi::units::radian_t{std::numbers::pi / 2.0}};
+                              wpi::units::radians<>{std::numbers::pi / 2.0}};
   const auto quarterCircleTransform = quarterCircle.Exp();
 
   Transform3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
@@ -81,7 +81,7 @@ TEST_CASE("Twist3dTest Pose3dLogX", "[wpimath]") {
 
   const auto twist = (end - start).Log();
 
-  Twist3d expected{0_m,   wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{0_m,   wpi::units::meters<>{5.0 / 2.0 * std::numbers::pi},
                    0_m,   90_deg,
                    0_deg, 0_deg};
   CHECK(expected == twist);
@@ -98,7 +98,7 @@ TEST_CASE("Twist3dTest Pose3dLogY", "[wpimath]") {
   const auto twist = (end - start).Log();
 
   Twist3d expected{
-      0_m,   0_m,    wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
+      0_m,   0_m,    wpi::units::meters<>{5.0 / 2.0 * std::numbers::pi},
       0_deg, 90_deg, 0_deg};
   CHECK(expected == twist);
 
@@ -113,7 +113,7 @@ TEST_CASE("Twist3dTest Pose3dLogZ", "[wpimath]") {
 
   const auto twist = (end - start).Log();
 
-  Twist3d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{wpi::units::meters<>{5.0 / 2.0 * std::numbers::pi},
                    0_m,
                    0_m,
                    0_deg,

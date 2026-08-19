@@ -52,7 +52,7 @@ void Field2d::SetRobotPose(const wpi::math::Pose2d& pose) {
   GetRobotObject()->SetPose(pose);
 }
 
-void Field2d::SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y,
+void Field2d::SetRobotPose(wpi::units::meters<> x, wpi::units::meters<> y,
                            wpi::math::Rotation2d rotation) {
   GetRobotObject()->SetPose(x, y, rotation);
 }

@@ -24,11 +24,11 @@ classes:
       DifferentialSample:
         overloads:
           "":
-          ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
+          ? wpi::units::seconds<>, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, wpi::units::meters_per_second<>, wpi::units::meters_per_second<>
           :
-          ? wpi::units::second_t, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, const DifferentialDriveKinematics&
+          ? wpi::units::seconds<>, const Pose2d&, const ChassisVelocities&, const ChassisAccelerations&, const DifferentialDriveKinematics&
           :
-          const HolonomicSample&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t:
+          const HolonomicSample&, wpi::units::meters_per_second<>, wpi::units::meters_per_second<>:
           const HolonomicSample&, const DifferentialDriveKinematics&:
           const DrivetrainSplineSample&, const DifferentialDriveKinematics&:
       Transform:

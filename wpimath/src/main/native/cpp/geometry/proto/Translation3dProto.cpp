@@ -14,9 +14,9 @@ wpi::util::Protobuf<wpi::math::Translation3d>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Translation3d{
-      wpi::units::meter_t{msg.x},
-      wpi::units::meter_t{msg.y},
-      wpi::units::meter_t{msg.z},
+      wpi::units::meters<>{msg.x},
+      wpi::units::meters<>{msg.y},
+      wpi::units::meters<>{msg.z},
   };
 }
 

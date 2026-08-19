@@ -38,49 +38,49 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
    *
    * @param velocity The new velocity
    */
-  void SetVelocity(wpi::units::radians_per_second_t velocity);
+  void SetVelocity(wpi::units::radians_per_second<> velocity);
 
   /**
    * Returns the flywheel's velocity.
    *
    * @return The flywheel's velocity.
    */
-  wpi::units::radians_per_second_t GetAngularVelocity() const;
+  wpi::units::radians_per_second<> GetAngularVelocity() const;
 
   /**
    * Returns the flywheel's acceleration.
    *
    * @return The flywheel's acceleration
    */
-  wpi::units::radians_per_second_squared_t GetAngularAcceleration() const;
+  wpi::units::radians_per_second_squared<> GetAngularAcceleration() const;
 
   /**
    * Returns the flywheel's torque.
    *
    * @return The flywheel's torque
    */
-  wpi::units::newton_meter_t GetTorque() const;
+  wpi::units::newton_meters<> GetTorque() const;
 
   /**
    * Returns the flywheel's current draw.
    *
    * @return The flywheel's current draw.
    */
-  wpi::units::ampere_t GetCurrentDraw() const;
+  wpi::units::amperes<> GetCurrentDraw() const;
 
   /**
    * Gets the input voltage for the flywheel.
    *
    * @return The flywheel input voltage.
    */
-  wpi::units::volt_t GetInputVoltage() const;
+  wpi::units::volts<> GetInputVoltage() const;
 
   /**
    * Sets the input voltage for the flywheel.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(wpi::units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volts<> voltage);
 
   /**
    * Returns the gearbox.
@@ -95,11 +95,11 @@ class FlywheelSim : public LinearSystemSim<1, 1, 1> {
   /**
    * Returns the moment of inertia
    */
-  wpi::units::kilogram_square_meter_t J() const { return m_j; }
+  wpi::units::kilogram_square_meters<> J() const { return m_j; }
 
  private:
   wpi::math::DCMotor m_gearbox;
   double m_gearing;
-  wpi::units::kilogram_square_meter_t m_j;
+  wpi::units::kilogram_square_meters<> m_j;
 };
 }  // namespace wpi::sim

@@ -36,15 +36,13 @@ template <class Distance>
 class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
                               public wpi::tunables::ComplexTunable {
  public:
-  using Distance_t = wpi::units::unit_t<Distance>;
-  using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Velocity_t = wpi::units::unit_t<Velocity>;
-  using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+  using Distance_t = wpi::units::unit<Distance>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity_t = wpi::units::unit<Velocity>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration_t = wpi::units::unit<Acceleration>;
   using State = typename TrapezoidProfile<Distance>::State;
   using Constraints = typename TrapezoidProfile<Distance>::Constraints;
 
@@ -62,7 +60,7 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
    */
   constexpr ProfiledPIDController(double Kp, double Ki, double Kd,
                                   Constraints constraints,
-                                  wpi::units::second_t period = 20_ms)
+                                  wpi::units::seconds<> period = 20_ms)
       : m_controller{Kp, Ki, Kd, period},
         m_constraints{constraints},
         m_profile{m_constraints} {
@@ -169,7 +167,7 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
    *
    * @return The period of the controller.
    */
-  constexpr wpi::units::second_t GetPeriod() const {
+  constexpr wpi::units::seconds<> GetPeriod() const {
     return m_controller.GetPeriod();
   }
 

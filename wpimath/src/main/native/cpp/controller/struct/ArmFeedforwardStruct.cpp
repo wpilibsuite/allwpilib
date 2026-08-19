@@ -15,11 +15,11 @@ using StructType = wpi::util::Struct<wpi::math::ArmFeedforward>;
 
 wpi::math::ArmFeedforward StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::ArmFeedforward{
-      wpi::units::volt_t{wpi::util::UnpackStruct<double, kKsOff>(data)},
-      wpi::units::volt_t{wpi::util::UnpackStruct<double, kKgOff>(data)},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{
+      wpi::units::volts<>{wpi::util::UnpackStruct<double, kKsOff>(data)},
+      wpi::units::volts<>{wpi::util::UnpackStruct<double, kKgOff>(data)},
+      wpi::units::unit<wpi::math::ArmFeedforward::kv_unit>{
           wpi::util::UnpackStruct<double, kKvOff>(data)},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{
+      wpi::units::unit<wpi::math::ArmFeedforward::ka_unit>{
           wpi::util::UnpackStruct<double, kKaOff>(data)},
   };
 }

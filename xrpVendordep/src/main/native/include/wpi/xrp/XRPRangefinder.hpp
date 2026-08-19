@@ -23,7 +23,7 @@ class XRPRangefinder {
    *
    * @return distance in meters
    */
-  wpi::units::meter_t GetDistance() const;
+  wpi::units::meters<> GetDistance() const;
 
  private:
   wpi::AnalogInput m_rangefinder{2};

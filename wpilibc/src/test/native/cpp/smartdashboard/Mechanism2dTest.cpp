@@ -93,7 +93,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
   wpi::Mechanism2d mechanism{5, 10};
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
   wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
-      "ligament", 3, wpi::units::degree_t{90}, 1,
+      "ligament", 3, wpi::units::degrees<>{90}, 1,
       wpi::util::Color8Bit{255, 255, 255});
   wpi::telemetry::Log("mechanism", mechanism);
   {
@@ -114,7 +114,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
     mock->Clear();
   }
 
-  ligament->SetAngle(wpi::units::degree_t{45});
+  ligament->SetAngle(wpi::units::degrees<>{45});
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);

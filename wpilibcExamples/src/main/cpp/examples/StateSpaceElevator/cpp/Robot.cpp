@@ -29,11 +29,11 @@ class Robot : public wpi::TimedRobot {
   static constexpr int kEncoderBChannel = 1;
   static constexpr int kJoystickPort = 0;
 
-  static constexpr wpi::units::meter_t kRaisedPosition = 2_ft;
-  static constexpr wpi::units::meter_t kLoweredPosition = 0_ft;
+  static constexpr wpi::units::meters<> kRaisedPosition = 2_ft;
+  static constexpr wpi::units::meters<> kLoweredPosition = 0_ft;
 
-  static constexpr wpi::units::meter_t kDrumRadius = 0.75_in;
-  static constexpr wpi::units::kilogram_t kCarriageMass = 4.5_kg;
+  static constexpr wpi::units::meters<> kDrumRadius = 0.75_in;
+  static constexpr wpi::units::kilograms<> kCarriageMass = 4.5_kg;
   static constexpr double kGearRatio = 6.0;
 
   // The plant holds a state-space model of our elevator. This system has the
@@ -50,8 +50,8 @@ class Robot : public wpi::TimedRobot {
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<2, 1, 1> observer{
       elevatorPlant,
-      {wpi::units::meter_t{2_in}.value(),
-       wpi::units::meters_per_second_t{40_in / 1_s}
+      {wpi::units::meters<>{2_in}.value(),
+       wpi::units::meters_per_second<>{40_in / 1_s}
            .value()},  // How accurate we think our model is
       {0.001},         // How accurate we think our encoder position
       // data is. In this case we very highly trust our encoder position
@@ -64,8 +64,8 @@ class Robot : public wpi::TimedRobot {
       // qelms. State error tolerance, in meters and meters per second.
       // Decrease this to more heavily penalize state excursion, or make the
       // controller behave more aggressively.
-      {wpi::units::meter_t{1_in}.value(),
-       wpi::units::meters_per_second_t{10_in / 1_s}.value()},
+      {wpi::units::meters<>{1_in}.value(),
+       wpi::units::meters_per_second<>{10_in / 1_s}.value()},
       // relms. Control effort (voltage) tolerance. Decrease this to more
       // heavily penalize control effort, or make the controller less
       // aggressive. 12 is a good starting point because that is the
@@ -86,9 +86,9 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax motor{kMotorPort};
   wpi::Gamepad joystick{kJoystickPort};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{{3_fps, 6_fps_sq}};
+  wpi::math::TrapezoidProfile<wpi::units::meters_> profile{{3_fps, 6_fps2}};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State lastProfiledReference;
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State lastProfiledReference;
 
  public:
   Robot() {
@@ -102,14 +102,14 @@ class Robot : public wpi::TimedRobot {
     loop.Reset(wpi::math::Vectord<2>{encoder.GetDistance(), encoder.GetRate()});
 
     lastProfiledReference = {
-        wpi::units::meter_t{encoder.GetDistance()},
-        wpi::units::meters_per_second_t{encoder.GetRate()}};
+        wpi::units::meters<>{encoder.GetDistance()},
+        wpi::units::meters_per_second<>{encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
     // Sets the target height of our elevator. This is similar to setting the
     // setpoint of a PID controller.
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State goal;
     if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {kRaisedPosition, 0_fps};
@@ -134,7 +134,7 @@ class Robot : public wpi::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
+    motor.SetVoltage(wpi::units::volts<>{loop.U(0)});
   }
 };
 

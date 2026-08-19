@@ -16,10 +16,10 @@ wpi::util::Protobuf<wpi::math::ArmFeedforward>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::ArmFeedforward{
-      wpi::units::volt_t{msg.ks},
-      wpi::units::volt_t{msg.kg},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::kv_unit>{msg.kv},
-      wpi::units::unit_t<wpi::math::ArmFeedforward::ka_unit>{msg.ka},
+      wpi::units::volts<>{msg.ks},
+      wpi::units::volts<>{msg.kg},
+      wpi::units::unit<wpi::math::ArmFeedforward::kv_unit>{msg.kv},
+      wpi::units::unit<wpi::math::ArmFeedforward::ka_unit>{msg.ka},
   };
 }
 

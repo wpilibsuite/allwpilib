@@ -66,7 +66,7 @@ class PyNotifier {
    *
    * @param delay Amount of time to wait before the handler is called.
    */
-  void StartSingle(wpi::units::second_t delay);
+  void StartSingle(wpi::units::seconds<> delay);
 
   /**
    * Register for periodic event notification.
@@ -78,7 +78,7 @@ class PyNotifier {
    * @param period Period to call the handler starting one period
    *               after the call to this method.
    */
-  void StartPeriodic(wpi::units::second_t period);
+  void StartPeriodic(wpi::units::seconds<> period);
 
   /**
    * Stop timer events from occurring.

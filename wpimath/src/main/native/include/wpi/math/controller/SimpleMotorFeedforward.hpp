@@ -26,16 +26,16 @@ template <class Distance>
            wpi::units::dimensionless_unit<Distance>
 class SimpleMotorFeedforward {
  public:
-  using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using kv_unit = wpi::units::compound_unit<wpi::units::volts,
-                                            wpi::units::inverse<Velocity>>;
-  using ka_unit = wpi::units::compound_unit<wpi::units::volts,
-                                            wpi::units::inverse<Acceleration>>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using kv_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Velocity>>;
+  using ka_unit =
+      wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                             wpi::units::inverse<Acceleration>>;
 
   /**
    * Creates a new SimpleMotorFeedforward with the specified gains.
@@ -49,20 +49,20 @@ class SimpleMotorFeedforward {
    * @throws IllegalArgumentException for period &le; zero.
    */
   constexpr SimpleMotorFeedforward(
-      wpi::units::volt_t kS, wpi::units::unit_t<kv_unit> kV,
-      wpi::units::unit_t<ka_unit> kA = wpi::units::unit_t<ka_unit>(0),
-      wpi::units::second_t dt = 20_ms)
+      wpi::units::volts<> kS, wpi::units::unit<kv_unit> kV,
+      wpi::units::unit<ka_unit> kA = wpi::units::unit<ka_unit>(0),
+      wpi::units::seconds<> dt = 20_ms)
       : kS(kS), kV(kV), kA(kA), m_dt(dt) {
     if (kV.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kV must be a non-negative number, got {}!", kV.value());
-      this->kV = wpi::units::unit_t<kv_unit>{0};
+      this->kV = wpi::units::unit<kv_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kV defaulted to 0.");
     }
     if (kA.value() < 0) {
       wpi::math::MathSharedStore::ReportError(
           "kA must be a non-negative number, got {}!", kA.value());
-      this->kA = wpi::units::unit_t<ka_unit>{0};
+      this->kA = wpi::units::unit<ka_unit>{0};
       wpi::math::MathSharedStore::ReportWarning("kA defaulted to 0.");
     }
     if (dt <= 0_ms) {
@@ -81,8 +81,8 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity reference.
    * @return The computed feedforward, in volts.
    */
-  constexpr wpi::units::volt_t Calculate(
-      wpi::units::unit_t<Velocity> velocity) const {
+  constexpr wpi::units::volts<> Calculate(
+      wpi::units::unit<Velocity> velocity) const {
     return Calculate(velocity, velocity);
   }
 
@@ -96,9 +96,9 @@ class SimpleMotorFeedforward {
    * @param nextVelocity    The next velocity reference.
    * @return The computed feedforward, in volts.
    */
-  constexpr wpi::units::volt_t Calculate(
-      wpi::units::unit_t<Velocity> currentVelocity,
-      wpi::units::unit_t<Velocity> nextVelocity) const {
+  constexpr wpi::units::volts<> Calculate(
+      wpi::units::unit<Velocity> currentVelocity,
+      wpi::units::unit<Velocity> nextVelocity) const {
     // See wpimath/docs/SimpleMotorFeedforward.md for derivation
     if (kA < decltype(kA)(1e-9)) {
       return kS * wpi::util::sgn(nextVelocity) + kV * nextVelocity;
@@ -108,7 +108,7 @@ class SimpleMotorFeedforward {
       double A_d = gcem::exp(A * m_dt.value());
       double B_d = A > -1e-9 ? B * m_dt.value() : 1.0 / A * (A_d - 1.0) * B;
       return kS * wpi::util::sgn(currentVelocity) +
-             wpi::units::volt_t{
+             wpi::units::volts<>{
                  1.0 / B_d *
                  (nextVelocity.value() - A_d * currentVelocity.value())};
     }
@@ -128,9 +128,9 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration of the motor.
    * @return The maximum possible velocity at the given acceleration.
    */
-  constexpr wpi::units::unit_t<Velocity> MaxAchievableVelocity(
-      wpi::units::volt_t maxVoltage,
-      wpi::units::unit_t<Acceleration> acceleration) const {
+  constexpr wpi::units::unit<Velocity> MaxAchievableVelocity(
+      wpi::units::volts<> maxVoltage,
+      wpi::units::unit<Acceleration> acceleration) const {
     // Assume max velocity is positive
     return (maxVoltage - kS - kA * acceleration) / kV;
   }
@@ -146,9 +146,9 @@ class SimpleMotorFeedforward {
    * @param acceleration The acceleration of the motor.
    * @return The minimum possible velocity at the given acceleration.
    */
-  constexpr wpi::units::unit_t<Velocity> MinAchievableVelocity(
-      wpi::units::volt_t maxVoltage,
-      wpi::units::unit_t<Acceleration> acceleration) const {
+  constexpr wpi::units::unit<Velocity> MinAchievableVelocity(
+      wpi::units::volts<> maxVoltage,
+      wpi::units::unit<Acceleration> acceleration) const {
     // Assume min velocity is positive, ks flips sign
     return (-maxVoltage + kS - kA * acceleration) / kV;
   }
@@ -164,9 +164,9 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity of the motor.
    * @return The maximum possible acceleration at the given velocity.
    */
-  constexpr wpi::units::unit_t<Acceleration> MaxAchievableAcceleration(
-      wpi::units::volt_t maxVoltage,
-      wpi::units::unit_t<Velocity> velocity) const {
+  constexpr wpi::units::unit<Acceleration> MaxAchievableAcceleration(
+      wpi::units::volts<> maxVoltage,
+      wpi::units::unit<Velocity> velocity) const {
     return (maxVoltage - kS * wpi::util::sgn(velocity) - kV * velocity) / kA;
   }
 
@@ -181,9 +181,9 @@ class SimpleMotorFeedforward {
    * @param velocity The velocity of the motor.
    * @return The minimum possible acceleration at the given velocity.
    */
-  constexpr wpi::units::unit_t<Acceleration> MinAchievableAcceleration(
-      wpi::units::volt_t maxVoltage,
-      wpi::units::unit_t<Velocity> velocity) const {
+  constexpr wpi::units::unit<Acceleration> MinAchievableAcceleration(
+      wpi::units::volts<> maxVoltage,
+      wpi::units::unit<Velocity> velocity) const {
     return MaxAchievableAcceleration(-maxVoltage, velocity);
   }
 
@@ -196,7 +196,7 @@ class SimpleMotorFeedforward {
    *
    * @param kS The static gain.
    */
-  constexpr void SetKs(wpi::units::volt_t kS) { this->kS = kS; }
+  constexpr void SetKs(wpi::units::volts<> kS) { this->kS = kS; }
 
   /**
    * Sets the velocity gain.
@@ -207,7 +207,7 @@ class SimpleMotorFeedforward {
    *
    * @param kV The velocity gain.
    */
-  constexpr void SetKv(wpi::units::unit_t<kv_unit> kV) { this->kV = kV; }
+  constexpr void SetKv(wpi::units::unit<kv_unit> kV) { this->kV = kV; }
 
   /**
    * Sets the acceleration gain.
@@ -218,48 +218,48 @@ class SimpleMotorFeedforward {
    *
    * @param kA The acceleration gain.
    */
-  constexpr void SetKa(wpi::units::unit_t<ka_unit> kA) { this->kA = kA; }
+  constexpr void SetKa(wpi::units::unit<ka_unit> kA) { this->kA = kA; }
 
   /**
    * Returns the static gain.
    *
    * @return The static gain.
    */
-  constexpr wpi::units::volt_t GetKs() const { return kS; }
+  constexpr wpi::units::volts<> GetKs() const { return kS; }
 
   /**
    * Returns the velocity gain.
    *
    * @return The velocity gain.
    */
-  constexpr wpi::units::unit_t<kv_unit> GetKv() const { return kV; }
+  constexpr wpi::units::unit<kv_unit> GetKv() const { return kV; }
 
   /**
    * Returns the acceleration gain.
    *
    * @return The acceleration gain.
    */
-  constexpr wpi::units::unit_t<ka_unit> GetKa() const { return kA; }
+  constexpr wpi::units::unit<ka_unit> GetKa() const { return kA; }
 
   /**
    * Returns the period.
    *
    * @return The period.
    */
-  constexpr wpi::units::second_t GetDt() const { return m_dt; }
+  constexpr wpi::units::seconds<> GetDt() const { return m_dt; }
 
  private:
   /** The static gain. */
-  wpi::units::volt_t kS;
+  wpi::units::volts<> kS;
 
   /** The velocity gain. */
-  wpi::units::unit_t<kv_unit> kV;
+  wpi::units::unit<kv_unit> kV;
 
   /** The acceleration gain. */
-  wpi::units::unit_t<ka_unit> kA;
+  wpi::units::unit<ka_unit> kA;
 
   /** The period. */
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 };
 
 }  // namespace wpi::math

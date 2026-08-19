@@ -3,15 +3,15 @@ classes:
     methods:
       Watchdog:
         overloads:
-          wpi::units::second_t, std::function<void ()>:
-          wpi::units::second_t, Callable&&, Arg&&, Args&&...:
+          wpi::units::seconds<>, std::function<void ()>:
+          wpi::units::seconds<>, Callable&&, Arg&&, Args&&...:
             ignore: true
       GetTime:
       SetTimeout:
         overloads:
           double:
             ignore: true
-          wpi::units::second_t:
+          wpi::units::seconds<>:
       GetTimeout:
       IsExpired:
       AddEpoch:

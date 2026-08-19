@@ -8,18 +8,18 @@
 
 wpi::math::MecanumDriveWheelPositions Drivetrain::GetCurrentWheelDistances()
     const {
-  return {wpi::units::meter_t{frontLeftEncoder.GetDistance()},
-          wpi::units::meter_t{frontRightEncoder.GetDistance()},
-          wpi::units::meter_t{backLeftEncoder.GetDistance()},
-          wpi::units::meter_t{backRightEncoder.GetDistance()}};
+  return {wpi::units::meters<>{frontLeftEncoder.GetDistance()},
+          wpi::units::meters<>{frontRightEncoder.GetDistance()},
+          wpi::units::meters<>{backLeftEncoder.GetDistance()},
+          wpi::units::meters<>{backRightEncoder.GetDistance()}};
 }
 
 wpi::math::MecanumDriveWheelVelocities Drivetrain::GetCurrentWheelVelocities()
     const {
-  return {wpi::units::meters_per_second_t{frontLeftEncoder.GetRate()},
-          wpi::units::meters_per_second_t{frontRightEncoder.GetRate()},
-          wpi::units::meters_per_second_t{backLeftEncoder.GetRate()},
-          wpi::units::meters_per_second_t{backRightEncoder.GetRate()}};
+  return {wpi::units::meters_per_second<>{frontLeftEncoder.GetRate()},
+          wpi::units::meters_per_second<>{frontRightEncoder.GetRate()},
+          wpi::units::meters_per_second<>{backLeftEncoder.GetRate()},
+          wpi::units::meters_per_second<>{backRightEncoder.GetRate()}};
 }
 
 void Drivetrain::SetVelocities(
@@ -42,20 +42,20 @@ void Drivetrain::SetVelocities(
   const double backRightOutput = backRightPIDController.Calculate(
       backRightEncoder.GetRate(), wheelVelocities.rearRight.value());
 
-  frontLeftMotor.SetVoltage(wpi::units::volt_t{frontLeftOutput} +
+  frontLeftMotor.SetVoltage(wpi::units::volts<>{frontLeftOutput} +
                             frontLeftFeedforward);
-  frontRightMotor.SetVoltage(wpi::units::volt_t{frontRightOutput} +
+  frontRightMotor.SetVoltage(wpi::units::volts<>{frontRightOutput} +
                              frontRightFeedforward);
-  backLeftMotor.SetVoltage(wpi::units::volt_t{backLeftOutput} +
+  backLeftMotor.SetVoltage(wpi::units::volts<>{backLeftOutput} +
                            backLeftFeedforward);
-  backRightMotor.SetVoltage(wpi::units::volt_t{backRightOutput} +
+  backRightMotor.SetVoltage(wpi::units::volts<>{backRightOutput} +
                             backRightFeedforward);
 }
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
-                       wpi::units::meters_per_second_t yVelocity,
-                       wpi::units::radians_per_second_t rot, bool fieldRelative,
-                       wpi::units::second_t period) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xVelocity,
+                       wpi::units::meters_per_second<> yVelocity,
+                       wpi::units::radians_per_second<> rot, bool fieldRelative,
+                       wpi::units::seconds<> period) {
   wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
   if (fieldRelative) {
     chassisVelocities = chassisVelocities.ToRobotRelative(imu.GetRotation2d());

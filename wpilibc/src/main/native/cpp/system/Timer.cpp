@@ -14,16 +14,16 @@
 
 namespace wpi {
 
-void Wait(wpi::units::second_t seconds) {
+void Wait(wpi::units::seconds<> seconds) {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds.value()));
 }
 
-wpi::units::second_t GetSystemTime() {
+wpi::units::seconds<> GetSystemTime() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::system_clock;
 
-  return wpi::units::second_t{
+  return wpi::units::seconds<>{
       duration_cast<duration<double>>(system_clock::now().time_since_epoch())
           .count()};
 }
@@ -45,8 +45,8 @@ Timer::Timer() {
   Reset();
 }
 
-wpi::units::second_t Timer::Get() const {
-  return wpi::units::microsecond_t{GetMicroseconds()};
+wpi::units::seconds<> Timer::Get() const {
+  return wpi::units::microseconds<>{GetMicroseconds()};
 }
 
 double Timer::GetMicroseconds() const {
@@ -88,12 +88,12 @@ void Timer::Stop() {
   }
 }
 
-bool Timer::HasElapsed(wpi::units::second_t period) const {
-  return GetMicroseconds() >= wpi::units::microsecond_t{period}.value();
+bool Timer::HasElapsed(wpi::units::seconds<> period) const {
+  return GetMicroseconds() >= wpi::units::microseconds<>{period}.value();
 }
 
-bool Timer::AdvanceIfElapsed(wpi::units::second_t period) {
-  double periodUs = wpi::units::microsecond_t{period}.value();
+bool Timer::AdvanceIfElapsed(wpi::units::seconds<> period) {
+  double periodUs = wpi::units::microseconds<>{period}.value();
 
   if (GetMicroseconds() >= periodUs) {
     // Advance the start time by the period.
@@ -118,15 +118,15 @@ Timer Timer::CreateStarted() {
   return timer;
 }
 
-wpi::units::second_t Timer::GetTimestamp() {
+wpi::units::seconds<> Timer::GetTimestamp() {
   return GetTimestampMicroseconds();
 }
 
-wpi::units::second_t Timer::GetMonotonicTimestamp() {
+wpi::units::seconds<> Timer::GetMonotonicTimestamp() {
   return std::chrono::microseconds{
       static_cast<int64_t>(wpi::RobotController::GetMonotonicTime())};
 }
 
-wpi::units::second_t Timer::GetMatchTime() {
+wpi::units::seconds<> Timer::GetMatchTime() {
   return wpi::MatchState::GetMatchTime();
 }

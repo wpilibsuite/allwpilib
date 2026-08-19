@@ -15,10 +15,10 @@ TEST_CASE("Tachometer SetRateWindow", "[wpilibc][counter]") {
 
   wpi::Tachometer tachometer(0, wpi::EdgeConfiguration::RISING_EDGE);
 
-  CHECK_NOTHROW(tachometer.SetRateWindow(wpi::units::millisecond_t{5}));
-  CHECK_NOTHROW(tachometer.SetRateWindow(wpi::units::millisecond_t{255}));
-  CHECK_THROWS(tachometer.SetRateWindow(wpi::units::millisecond_t{4}));
-  CHECK_THROWS(tachometer.SetRateWindow(wpi::units::millisecond_t{256}));
+  CHECK_NOTHROW(tachometer.SetRateWindow(wpi::units::milliseconds<>{5}));
+  CHECK_NOTHROW(tachometer.SetRateWindow(wpi::units::milliseconds<>{255}));
+  CHECK_THROWS(tachometer.SetRateWindow(wpi::units::milliseconds<>{4}));
+  CHECK_THROWS(tachometer.SetRateWindow(wpi::units::milliseconds<>{256}));
 }
 
 TEST_CASE("Tachometer stopped state matches rate", "[wpilibc][counter]") {

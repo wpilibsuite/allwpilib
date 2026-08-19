@@ -13,7 +13,7 @@ wpi::util::Struct<wpi::math::SwerveModuleAcceleration>::Unpack(
   constexpr size_t kAccelerationOff = 0;
   constexpr size_t kAngleOff = kAccelerationOff + 8;
   return wpi::math::SwerveModuleAcceleration{
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kAccelerationOff>(data)},
       wpi::util::UnpackStruct<wpi::math::Rotation2d, kAngleOff>(data)};
 }

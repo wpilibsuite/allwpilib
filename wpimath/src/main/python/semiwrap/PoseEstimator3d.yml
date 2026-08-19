@@ -28,8 +28,8 @@ classes:
       SampleAt:
       AddVisionMeasurement:
         overloads:
-          const Pose3d&, wpi::units::second_t:
-          const Pose3d&, wpi::units::second_t, const wpi::util::array<double, 4>&:
+          const Pose3d&, wpi::units::seconds<>:
+          const Pose3d&, wpi::units::seconds<>, const wpi::util::array<double, 4>&:
       Update:
       UpdateWithTime:
 

@@ -121,9 +121,9 @@ class WPILIB_DLLEXPORT Odometry3d {
     Twist3d twist{twist2d.dx,
                   twist2d.dy,
                   0_m,
-                  wpi::units::radian_t{angle_difference(0)},
-                  wpi::units::radian_t{angle_difference(1)},
-                  wpi::units::radian_t{angle_difference(2)}};
+                  wpi::units::radians<>{angle_difference(0)},
+                  wpi::units::radians<>{angle_difference(1)},
+                  wpi::units::radians<>{angle_difference(2)}};
 
     m_pose = m_pose + twist.Exp();
 

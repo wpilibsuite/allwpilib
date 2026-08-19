@@ -14,9 +14,9 @@ wpi::util::Protobuf<wpi::math::Twist2d>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Twist2d{
-      wpi::units::meter_t{msg.dx},
-      wpi::units::meter_t{msg.dy},
-      wpi::units::radian_t{msg.dtheta},
+      wpi::units::meters<>{msg.dx},
+      wpi::units::meters<>{msg.dy},
+      wpi::units::radians<>{msg.dtheta},
   };
 }
 

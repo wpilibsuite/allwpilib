@@ -16,8 +16,8 @@ SimpleMotorSim::SimpleMotorSim(double Ks, double Kv, double Ka,
   Reset(initialPosition, initialVelocity);
 }
 
-void SimpleMotorSim::Update(wpi::units::volt_t voltage,
-                            wpi::units::second_t dt) {
+void SimpleMotorSim::Update(wpi::units::volts<> voltage,
+                            wpi::units::seconds<> dt) {
   Eigen::Vector<double, 1> u{voltage.value()};
 
   // Given dx/dt = Ax + Bu + c sgn(x),
@@ -37,7 +37,7 @@ double SimpleMotorSim::GetVelocity() const {
   return m_x(1);
 }
 
-double SimpleMotorSim::GetAcceleration(wpi::units::volt_t voltage) const {
+double SimpleMotorSim::GetAcceleration(wpi::units::volts<> voltage) const {
   Eigen::Vector<double, 1> u{voltage.value()};
   return (m_A * m_x + m_B * u + m_c * wpi::util::sgn(GetVelocity()))(1);
 }

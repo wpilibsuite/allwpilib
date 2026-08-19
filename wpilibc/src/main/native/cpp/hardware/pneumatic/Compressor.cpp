@@ -40,15 +40,15 @@ bool Compressor::GetPressureSwitchValue() const {
   return m_module->GetPressureSwitch();
 }
 
-wpi::units::ampere_t Compressor::GetCurrent() const {
+wpi::units::amperes<> Compressor::GetCurrent() const {
   return m_module->GetCompressorCurrent();
 }
 
-wpi::units::volt_t Compressor::GetAnalogVoltage() const {
+wpi::units::volts<> Compressor::GetAnalogVoltage() const {
   return m_module->GetAnalogVoltage(0);
 }
 
-wpi::units::pounds_per_square_inch_t Compressor::GetPressure() const {
+wpi::units::pounds_per_square_inch<> Compressor::GetPressure() const {
   return m_module->GetPressure(0);
 }
 
@@ -61,14 +61,14 @@ void Compressor::EnableDigital() {
 }
 
 void Compressor::EnableAnalog(
-    wpi::units::pounds_per_square_inch_t minPressure,
-    wpi::units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch<> minPressure,
+    wpi::units::pounds_per_square_inch<> maxPressure) {
   m_module->EnableCompressorAnalog(minPressure, maxPressure);
 }
 
 void Compressor::EnableHybrid(
-    wpi::units::pounds_per_square_inch_t minPressure,
-    wpi::units::pounds_per_square_inch_t maxPressure) {
+    wpi::units::pounds_per_square_inch<> minPressure,
+    wpi::units::pounds_per_square_inch<> maxPressure) {
   m_module->EnableCompressorHybrid(minPressure, maxPressure);
 }
 

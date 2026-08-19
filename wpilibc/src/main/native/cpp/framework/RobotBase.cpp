@@ -84,8 +84,8 @@ class WPILibMathShared : public wpi::math::MathShared {
     HAL_ReportUsage(resource, data);
   }
 
-  wpi::units::second_t GetTimestamp() override {
-    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
+  wpi::units::seconds<> GetTimestamp() override {
+    return wpi::units::seconds<>{wpi::util::Now() * 1.0e-6};
   }
 };
 }  // namespace

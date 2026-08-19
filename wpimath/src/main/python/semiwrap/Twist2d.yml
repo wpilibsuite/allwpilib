@@ -16,33 +16,33 @@ classes:
 inline_code: |
   cls_Twist2d
     .def(
-      py::init<wpi::units::meter_t, wpi::units::meter_t, wpi::units::radian_t>(),
+      py::init<wpi::units::meters<>, wpi::units::meters<>, wpi::units::radians<>>(),
       py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0
     )
-    .def_static("from_feet", [](wpi::units::foot_t dx, wpi::units::foot_t dy, wpi::units::radian_t dtheta){
+    .def_static("from_feet", [](wpi::units::feet<> dx, wpi::units::feet<> dy, wpi::units::radians<> dtheta){
       return Twist2d{dx, dy, dtheta};
     }, py::arg("dx") = 0, py::arg("dy") = 0, py::arg("dtheta") = 0)
     .def_property("dx_feet",
-      [](Twist2d * self) -> wpi::units::foot_t {
+      [](Twist2d * self) -> wpi::units::feet<> {
         return self->dx;
       },
-      [](Twist2d * self, wpi::units::foot_t dx) {
+      [](Twist2d * self, wpi::units::feet<> dx) {
         self->dx = dx;
       }
     )
     .def_property("dy_feet",
-      [](Twist2d * self) -> wpi::units::foot_t {
+      [](Twist2d * self) -> wpi::units::feet<> {
         return self->dy;
       },
-      [](Twist2d * self, wpi::units::foot_t dy) {
+      [](Twist2d * self, wpi::units::feet<> dy) {
         self->dy = dy;
       }
     )
     .def_property("dtheta_degrees",
-      [](Twist2d * self) -> wpi::units::degree_t {
+      [](Twist2d * self) -> wpi::units::degrees<> {
         return self->dtheta;
       },
-      [](Twist2d * self, wpi::units::degree_t dtheta) {
+      [](Twist2d * self, wpi::units::degrees<> dtheta) {
         self->dtheta = dtheta;
       }
     )

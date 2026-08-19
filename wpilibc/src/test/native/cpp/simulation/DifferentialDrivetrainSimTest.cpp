@@ -17,7 +17,6 @@
 #include "wpi/math/trajectory/constraint/DifferentialDriveKinematicsConstraint.hpp"
 #include "wpi/simulation/RoboRioSim.hpp"
 #include "wpi/units/current.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 TEST_CASE("DifferentialDrivetrainSimTest Convergence",
@@ -43,7 +42,7 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
   // Ground truth.
   wpi::math::Vectord<7> groundTruthX = wpi::math::Vectord<7>::Zero();
 
-  wpi::math::TrajectoryConfig config{1_mps, 1_mps_sq};
+  wpi::math::TrajectoryConfig config{1_mps, 1_mps2};
   config.AddConstraint(
       wpi::math::DifferentialDriveKinematicsConstraint(kinematics, 1_mps));
 
@@ -60,8 +59,8 @@ TEST_CASE("DifferentialDrivetrainSimTest Convergence",
     auto clampedVoltages = sim.ClampInput(voltages);
 
     // Sim periodic code.
-    sim.SetInputs(wpi::units::volt_t{clampedVoltages(0, 0)},
-                  wpi::units::volt_t{clampedVoltages(1, 0)});
+    sim.SetInputs(wpi::units::volts<>{clampedVoltages(0, 0)},
+                  wpi::units::volts<>{clampedVoltages(1, 0)});
     sim.Update(20_ms);
 
     // Update ground truth.
@@ -125,5 +124,5 @@ TEST_CASE("DifferentialDrivetrainSimTest ModelStability",
     sim.Update(20_ms);
   }
 
-  CHECK(wpi::units::math::abs(sim.GetPose().Translation().Norm()) < 100_m);
+  CHECK(wpi::units::abs(sim.GetPose().Translation().Norm()) < 100_m);
 }

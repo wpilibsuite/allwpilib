@@ -20,7 +20,7 @@ class UnitNetworkTablesTest {
 TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest Publish",
                  "[wpilibc]") {
   auto topic =
-      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+      wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   pub.Set(2_m);
   REQUIRE(topic.GetProperty("unit") == "meter");
@@ -30,7 +30,7 @@ TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest Publish",
 TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest SubscribeDouble",
                  "[wpilibc]") {
   auto topic =
-      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+      wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   auto sub = inst.GetDoubleTopic("meterTest").Subscribe(0);
   REQUIRE(sub.Get() == 0);
@@ -42,7 +42,7 @@ TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest SubscribeDouble",
 TEST_CASE_METHOD(UnitNetworkTablesTest, "UnitNetworkTablesTest SubscribeUnit",
                  "[wpilibc]") {
   auto topic =
-      wpi::nt::UnitTopic<wpi::units::meter_t>{inst.GetTopic("meterTest")};
+      wpi::nt::UnitTopic<wpi::units::meters<>>{inst.GetTopic("meterTest")};
   auto pub = topic.Publish();
   auto sub = topic.Subscribe(0_m);
   REQUIRE(sub.Get() == 0_m);

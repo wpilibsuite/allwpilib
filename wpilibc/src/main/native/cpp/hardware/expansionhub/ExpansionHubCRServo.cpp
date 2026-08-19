@@ -66,7 +66,7 @@ void ExpansionHubCRServo::SetThrottle(double value) {
   SetPulseWidth(rawValue);
 }
 
-void ExpansionHubCRServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
+void ExpansionHubCRServo::SetPulseWidth(wpi::units::microseconds<> pulseWidth) {
   SetEnabled(true);
   m_pulseWidthPublisher.Set(pulseWidth.value());
 }
@@ -76,16 +76,17 @@ void ExpansionHubCRServo::SetEnabled(bool enabled) {
 }
 
 void ExpansionHubCRServo::SetFramePeriod(
-    wpi::units::microsecond_t framePeriod) {
+    wpi::units::microseconds<> framePeriod) {
   m_framePeriodPublisher.Set(framePeriod.value());
 }
 
-wpi::units::microsecond_t ExpansionHubCRServo::GetFullRangeScaleFactor() const {
+wpi::units::microseconds<> ExpansionHubCRServo::GetFullRangeScaleFactor()
+    const {
   return m_maxPwm - m_minPwm;
 }
 
-void ExpansionHubCRServo::SetPWMRange(wpi::units::microsecond_t minPwm,
-                                      wpi::units::microsecond_t maxPwm) {
+void ExpansionHubCRServo::SetPWMRange(wpi::units::microseconds<> minPwm,
+                                      wpi::units::microseconds<> maxPwm) {
   if (maxPwm <= minPwm) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
                            "Max PWM must be greater than Min PWM");

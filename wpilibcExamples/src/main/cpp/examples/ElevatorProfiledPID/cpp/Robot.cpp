@@ -19,7 +19,7 @@
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t kDt = 20_ms;
+  static constexpr wpi::units::seconds<> kDt = 20_ms;
 
   Robot() {
     encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
@@ -33,20 +33,20 @@ class Robot : public wpi::TimedRobot {
     }
 
     // Run controller and update motor output
-    motor.SetVoltage(wpi::units::volt_t{controller.Calculate(
-                         wpi::units::meter_t{encoder.GetDistance()})} +
+    motor.SetVoltage(wpi::units::volts<>{controller.Calculate(
+                         wpi::units::meters<>{encoder.GetDistance()})} +
                      feedforward.Calculate(controller.GetSetpoint().velocity));
   }
 
  private:
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity = 1.75_mps;
-  static constexpr wpi::units::meters_per_second_squared_t kMaxAcceleration =
-      0.75_mps_sq;
+  static constexpr wpi::units::meters_per_second<> kMaxVelocity = 1.75_mps;
+  static constexpr wpi::units::meters_per_second_squared<> kMaxAcceleration =
+      0.75_mps2;
   static constexpr double kP = 1.3;
   static constexpr double kI = 0.0;
   static constexpr double kD = 0.7;
-  static constexpr wpi::units::volt_t kS = 1.1_V;
-  static constexpr wpi::units::volt_t kG = 1.2_V;
+  static constexpr wpi::units::volts<> kS = 1.1_V;
+  static constexpr wpi::units::volts<> kG = 1.2_V;
   static constexpr auto kV = 1.3_V / 1_mps;
 
   wpi::Joystick joystick{1};
@@ -55,9 +55,9 @@ class Robot : public wpi::TimedRobot {
 
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::Constraints constraints{
       kMaxVelocity, kMaxAcceleration};
-  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
+  wpi::math::ProfiledPIDController<wpi::units::meters_> controller{
       kP, kI, kD, constraints, kDt};
   wpi::math::ElevatorFeedforward feedforward{kS, kG, kV};
 };

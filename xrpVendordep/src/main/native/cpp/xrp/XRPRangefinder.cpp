@@ -6,6 +6,6 @@
 
 using namespace wpi::xrp;
 
-wpi::units::meter_t XRPRangefinder::GetDistance() const {
-  return wpi::units::meter_t{m_rangefinder.GetVoltage() / 5.0 * 4.0};
+wpi::units::meters<> XRPRangefinder::GetDistance() const {
+  return wpi::units::meters<>{m_rangefinder.GetVoltage() / 5.0 * 4.0};
 }

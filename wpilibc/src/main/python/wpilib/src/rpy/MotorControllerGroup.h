@@ -25,7 +25,7 @@ class PyMotorControllerGroup : public MotorController,
   PyMotorControllerGroup& operator=(PyMotorControllerGroup&&) = default;
 
   void SetThrottle(double throttle) override;
-  void SetVoltage(wpi::units::volt_t voltage) override;
+  void SetVoltage(wpi::units::volts<> voltage) override;
   double GetThrottle() const override;
   void SetInverted(bool isInverted) override;
   bool GetInverted() const override;

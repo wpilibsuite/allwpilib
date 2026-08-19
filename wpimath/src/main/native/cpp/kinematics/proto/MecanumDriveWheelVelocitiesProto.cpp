@@ -14,10 +14,10 @@ std::optional<wpi::math::MecanumDriveWheelVelocities> wpi::util::Protobuf<
   }
 
   return wpi::math::MecanumDriveWheelVelocities{
-      wpi::units::meters_per_second_t{msg.front_left},
-      wpi::units::meters_per_second_t{msg.front_right},
-      wpi::units::meters_per_second_t{msg.rear_left},
-      wpi::units::meters_per_second_t{msg.rear_right},
+      wpi::units::meters_per_second<>{msg.front_left},
+      wpi::units::meters_per_second<>{msg.front_right},
+      wpi::units::meters_per_second<>{msg.rear_left},
+      wpi::units::meters_per_second<>{msg.rear_right},
   };
 }
 

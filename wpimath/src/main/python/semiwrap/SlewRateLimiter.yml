@@ -3,8 +3,8 @@ classes:
     template_params:
     - Unit
     typealias:
-    - Unit_t = wpi::units::unit_t<Unit>
-    - Rate = wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>
+    - Unit_t = wpi::units::unit<Unit>
+    - Rate = wpi::units::compound_conversion_factor<Unit, wpi::units::inverse<wpi::units::seconds_>>
     methods:
       SlewRateLimiter:
         overloads:
@@ -22,4 +22,4 @@ templates:
   SlewRateLimiter:
     qualname: wpi::math::SlewRateLimiter
     params:
-    - wpi::units::dimensionless::scalar
+    - wpi::units::dimensionless_

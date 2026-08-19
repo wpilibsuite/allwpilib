@@ -21,7 +21,7 @@ namespace wpi::math {
 class TrajectorySample {
  public:
   /** The time of the sample relative to the trajectory start. */
-  wpi::units::second_t time{0.0};
+  wpi::units::seconds<> time{0.0};
 
   /** Constructs a default TrajectorySample with all zero values. */
   constexpr TrajectorySample() = default;
@@ -33,7 +33,8 @@ class TrajectorySample {
    *
    * @param time The time of the sample relative to the trajectory start.
    */
-  explicit constexpr TrajectorySample(wpi::units::second_t time) : time{time} {}
+  explicit constexpr TrajectorySample(wpi::units::seconds<> time)
+      : time{time} {}
 
   /**
    * Checks equality between this TrajectorySample and another.

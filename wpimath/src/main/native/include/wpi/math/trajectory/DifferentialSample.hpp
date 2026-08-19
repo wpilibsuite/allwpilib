@@ -28,12 +28,12 @@ class DifferentialSample : public HolonomicSample {
   /**
    * The left wheel velocity at this sample.
    */
-  wpi::units::meters_per_second_t leftVelocity{0_mps};
+  wpi::units::meters_per_second<> leftVelocity{0_mps};
 
   /**
    * The right wheel velocity at this sample.
    */
-  wpi::units::meters_per_second_t rightVelocity{0_mps};
+  wpi::units::meters_per_second<> rightVelocity{0_mps};
 
   /** Constructs a default DifferentialSample with all zero values. */
   constexpr DifferentialSample() = default;
@@ -50,11 +50,11 @@ class DifferentialSample : public HolonomicSample {
    * @param leftVelocity The left wheel velocity at this sample.
    * @param rightVelocity The right wheel velocity at this sample.
    */
-  constexpr DifferentialSample(wpi::units::second_t time, const Pose2d& pose,
+  constexpr DifferentialSample(wpi::units::seconds<> time, const Pose2d& pose,
                                const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
-                               wpi::units::meters_per_second_t leftVelocity,
-                               wpi::units::meters_per_second_t rightVelocity)
+                               wpi::units::meters_per_second<> leftVelocity,
+                               wpi::units::meters_per_second<> rightVelocity)
       : HolonomicSample{time, pose, velocity, acceleration},
         leftVelocity{leftVelocity},
         rightVelocity{rightVelocity} {}
@@ -70,7 +70,7 @@ class DifferentialSample : public HolonomicSample {
    *                     reference frame).
    * @param kinematics The kinematics of the drivetrain.
    */
-  constexpr DifferentialSample(wpi::units::second_t time, const Pose2d& pose,
+  constexpr DifferentialSample(wpi::units::seconds<> time, const Pose2d& pose,
                                const ChassisVelocities& velocity,
                                const ChassisAccelerations& acceleration,
                                const DifferentialDriveKinematics& kinematics)
@@ -90,8 +90,8 @@ class DifferentialSample : public HolonomicSample {
    * @param rightVelocity The right wheel velocity at this sample.
    */
   constexpr DifferentialSample(const HolonomicSample& sample,
-                               wpi::units::meters_per_second_t leftVelocity,
-                               wpi::units::meters_per_second_t rightVelocity)
+                               wpi::units::meters_per_second<> leftVelocity,
+                               wpi::units::meters_per_second<> rightVelocity)
       : DifferentialSample{sample.time,         sample.pose,  sample.velocity,
                            sample.acceleration, leftVelocity, rightVelocity} {}
 

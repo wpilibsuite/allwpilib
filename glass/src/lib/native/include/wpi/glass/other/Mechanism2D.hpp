@@ -31,7 +31,7 @@ class MechanismObjectModel : public MechanismObjectGroup {
   // line accessors
   virtual double GetWeight() const = 0;
   virtual wpi::math::Rotation2d GetAngle() const = 0;
-  virtual wpi::units::meter_t GetLength() const = 0;
+  virtual wpi::units::meters<> GetLength() const = 0;
 };
 
 class MechanismRootModel : public MechanismObjectGroup {

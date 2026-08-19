@@ -7,8 +7,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/units/math.hpp"
-
 #define CHECK_DOUBLE_EQ(a, b)                                    \
   CHECK_THAT(                                                    \
       static_cast<double>(::wpi::math::test::AssertionValue(a)), \
@@ -36,8 +34,8 @@
 
 #define CHECK_UNITS_EQ(a, b) CHECK(((a) == (b)))
 
-#define CHECK_UNITS_NEAR(a, b, tolerance)                       \
-  CHECK_NEAR((::wpi::units::math::abs((a) - (b))).value(), 0.0, \
+#define CHECK_UNITS_NEAR(a, b, tolerance)                 \
+  CHECK_NEAR((::wpi::units::abs((a) - (b))).value(), 0.0, \
              ::wpi::math::test::AssertionValue(tolerance))
 
 namespace wpi::math::test {

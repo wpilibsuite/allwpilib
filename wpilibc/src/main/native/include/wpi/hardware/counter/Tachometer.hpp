@@ -50,14 +50,14 @@ class Tachometer : public wpi::telemetry::TelemetryLoggable {
    * @param window The rate calculation window. Valid values are 5 ms through
    *               255 ms. The default is 50 ms.
    */
-  void SetRateWindow(wpi::units::millisecond_t window);
+  void SetRateWindow(wpi::units::milliseconds<> window);
 
   /**
    * Gets the tachometer frequency.
    *
    * @return Current frequency.
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Gets the number of edges per revolution.
@@ -81,7 +81,7 @@ class Tachometer : public wpi::telemetry::TelemetryLoggable {
    * @return Current RPS.
    * @Common This is one of the commonly used methods for this class
    */
-  wpi::units::turns_per_second_t GetRevolutionsPerSecond() const;
+  wpi::units::turns_per_second<> GetRevolutionsPerSecond() const;
 
   /**
    * Gets the current tachometer revolutions per minute.
@@ -91,7 +91,7 @@ class Tachometer : public wpi::telemetry::TelemetryLoggable {
    * @return Current RPM.
    * @Common This is one of the commonly used methods for this class
    */
-  wpi::units::revolutions_per_minute_t GetRevolutionsPerMinute() const;
+  wpi::units::revolutions_per_minute<> GetRevolutionsPerMinute() const;
 
   /**
    * Gets if the tachometer is stopped.

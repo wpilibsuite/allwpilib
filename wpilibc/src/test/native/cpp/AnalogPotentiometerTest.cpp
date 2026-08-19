@@ -91,7 +91,7 @@ TEST_CASE("AnalogPotentiometerTest WithModifiedBatteryVoltage", "[wpilibc]") {
   CHECK(90 == pot.Get());
 
   // Simulate a lower battery voltage
-  RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{2.5});
+  RoboRioSim::SetUserVoltage3V3(wpi::units::volts<>{2.5});
 
   sim.SetVoltage(2.5);
   CHECK(270.0 == pot.Get());

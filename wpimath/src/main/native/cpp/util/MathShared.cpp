@@ -23,8 +23,8 @@ class DefaultMathShared : public MathShared {
   void ReportWarningV(std::string_view format, std::format_args args) override {
   }
   void ReportUsage(std::string_view resource, std::string_view data) override {}
-  wpi::units::second_t GetTimestamp() override {
-    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
+  wpi::units::seconds<> GetTimestamp() override {
+    return wpi::units::seconds<>{wpi::util::Now() * 1.0e-6};
   }
 };
 }  // namespace

@@ -18,7 +18,7 @@
 #include "wpi/units/time.hpp"
 
 #define CHECK_NEAR_UNITS(val1, val2, eps) \
-  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
+  CHECK(wpi::units::abs(val1 - val2) <= eps)
 
 TEST_CASE("ElevatorSimTest StateSpaceSim", "[wpilibc][simulation]") {
   wpi::sim::ElevatorSim sim(wpi::math::DCMotor::Vex775Pro(4), 14.67, 8_kg,
@@ -100,7 +100,7 @@ TEST_CASE("ElevatorSimTest Stability", "[wpilibc][simulation]") {
       wpi::math::Models::ElevatorFromPhysicalConstants(
           wpi::math::DCMotor::Vex775Pro(4), 4_kg, 0.5_in, 100)
           .Slice(0);
-  CHECK_NEAR_UNITS(wpi::units::meter_t{system.CalculateX(
+  CHECK_NEAR_UNITS(wpi::units::meters<>{system.CalculateX(
                        wpi::math::Vectord<2>{0.0, 0.0},
                        wpi::math::Vectord<1>{12.0}, 20_ms * 50)(0)},
                    sim.GetPosition(), 1_cm);

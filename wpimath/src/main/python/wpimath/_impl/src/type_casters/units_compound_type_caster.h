@@ -12,87 +12,87 @@ namespace pybind11 {
 namespace detail {
 
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<wpi::units::radian, wpi::units::inverse<wpi::units::meter>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<wpi::units::radians_, wpi::units::inverse<wpi::units::meters_>>>> {
   static constexpr auto name = _("wpimath.units.radians_per_meter");
 };
 
 template <>
-struct handle_type_name<wpi::units::unit_t<wpi::units::compound_unit<
-    wpi::units::radians_per_second, wpi::units::inverse<wpi::units::volt>>>> {
+struct handle_type_name<wpi::units::unit<wpi::units::compound_conversion_factor<
+    wpi::units::radians_per_second_, wpi::units::inverse<wpi::units::volts_>>>> {
   static constexpr auto name = _("wpimath.units.radians_per_second_per_volt");
 };
 
 template <>
-struct handle_type_name<wpi::units::unit_t<wpi::units::inverse<wpi::units::seconds>>> {
+struct handle_type_name<wpi::units::unit<wpi::units::inverse<wpi::units::seconds_>>> {
   static constexpr auto name = _("wpimath.units.units_per_second");
 };
 
 template <>
 struct handle_type_name<
-    wpi::units::unit_t<wpi::units::inverse<wpi::units::squared<wpi::units::seconds>>>> {
+    wpi::units::unit<wpi::units::inverse<wpi::units::squared<wpi::units::seconds_>>>> {
   static constexpr auto name = _("wpimath.units.units_per_second_squared");
 };
 
-using volt_seconds = wpi::units::compound_unit<wpi::units::volts, wpi::units::seconds>;
-using volt_seconds_squared = wpi::units::compound_unit<volt_seconds, wpi::units::seconds>;
+using volt_seconds = wpi::units::compound_conversion_factor<wpi::units::volts_, wpi::units::seconds_>;
+using volt_seconds_squared = wpi::units::compound_conversion_factor<volt_seconds, wpi::units::seconds_>;
 
-template <> struct handle_type_name<wpi::units::unit_t<volt_seconds>> {
+template <> struct handle_type_name<wpi::units::unit<volt_seconds>> {
   static constexpr auto name = _("wpimath.units.volt_seconds");
 };
 
-template <> struct handle_type_name<wpi::units::unit_t<volt_seconds_squared>> {
+template <> struct handle_type_name<wpi::units::unit<volt_seconds_squared>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared");
 };
 
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<volt_seconds, wpi::units::inverse<wpi::units::meter>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::meters_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_meter");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<volt_seconds_squared, wpi::units::inverse<wpi::units::meter>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<volt_seconds_squared, wpi::units::inverse<wpi::units::meters_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_meter");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<volt_seconds, wpi::units::inverse<wpi::units::feet>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::feet_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_feet");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<volt_seconds_squared, wpi::units::inverse<wpi::units::feet>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<volt_seconds_squared, wpi::units::inverse<wpi::units::feet_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_feet");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<volt_seconds, wpi::units::inverse<wpi::units::radian>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<volt_seconds, wpi::units::inverse<wpi::units::radians_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_per_radian");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<wpi::units::meters_per_second, wpi::units::inverse<wpi::units::radian>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<wpi::units::meters_per_second_, wpi::units::inverse<wpi::units::radians_>>>> {
   static constexpr auto name = _("wpimath.units.meters_per_second_per_radian");
 };
 template <>
-struct handle_type_name<wpi::units::unit_t<wpi::units::compound_unit<
-    volt_seconds_squared, wpi::units::inverse<wpi::units::radian>>>> {
+struct handle_type_name<wpi::units::unit<wpi::units::compound_conversion_factor<
+    volt_seconds_squared, wpi::units::inverse<wpi::units::radians_>>>> {
   static constexpr auto name = _("wpimath.units.volt_seconds_squared_per_radian");
 };
 
-using unit_seconds = wpi::units::compound_unit<wpi::units::dimensionless::scalar, wpi::units::seconds>;
-using unit_seconds_squared = wpi::units::compound_unit<unit_seconds, wpi::units::seconds>;
+using unit_seconds = wpi::units::compound_conversion_factor<wpi::units::dimensionless_, wpi::units::seconds_>;
+using unit_seconds_squared = wpi::units::compound_conversion_factor<unit_seconds, wpi::units::seconds_>;
 
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<unit_seconds_squared, wpi::units::inverse<wpi::units::dimensionless::scalar>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<unit_seconds_squared, wpi::units::inverse<wpi::units::dimensionless_>>>> {
   static constexpr auto name = _("wpimath.units.unit_seconds_squared_per_unit");
 };
 
 template <>
-struct handle_type_name<wpi::units::unit_t<
-    wpi::units::compound_unit<wpi::units::meters_per_second_squared, wpi::units::inverse<wpi::units::volts>>>> {
+struct handle_type_name<wpi::units::unit<
+    wpi::units::compound_conversion_factor<wpi::units::meters_per_second_squared_, wpi::units::inverse<wpi::units::volts_>>>> {
   static constexpr auto name = _("wpimath.units.meters_per_second_squared_per_volt");
 };
 

@@ -37,13 +37,13 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
     /**
      * The minimum acceleration.
      */
-    wpi::units::meters_per_second_squared_t minAcceleration{
+    wpi::units::meters_per_second_squared<> minAcceleration{
         -std::numeric_limits<double>::max()};
 
     /**
      * The maximum acceleration.
      */
-    wpi::units::meters_per_second_squared_t maxAcceleration{
+    wpi::units::meters_per_second_squared<> maxAcceleration{
         std::numeric_limits<double>::max()};
   };
 
@@ -57,9 +57,9 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    *
    * @return The absolute maximum velocity.
    */
-  constexpr virtual wpi::units::meters_per_second_t MaxVelocity(
+  constexpr virtual wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const = 0;
+      wpi::units::meters_per_second<> velocity) const = 0;
 
   /**
    * Returns the minimum and maximum allowable acceleration for the trajectory
@@ -73,6 +73,6 @@ class WPILIB_DLLEXPORT TrajectoryConstraint {
    */
   constexpr virtual MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const = 0;
+      wpi::units::meters_per_second<> velocity) const = 0;
 };
 }  // namespace wpi::math

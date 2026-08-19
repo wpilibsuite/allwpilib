@@ -17,7 +17,6 @@
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/optimization/SimulatedAnnealing.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -142,7 +141,7 @@ class TravelingSalesman {
   // Default cost is distance between poses
   std::function<double(const Pose2d&, const Pose2d&)> m_cost =
       [](const Pose2d& a, const Pose2d& b) -> double {
-    return wpi::units::math::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
+    return wpi::units::hypot(a.X() - b.X(), a.Y() - b.Y()).value();
   };
 
   /**

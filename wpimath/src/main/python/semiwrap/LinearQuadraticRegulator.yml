@@ -6,12 +6,12 @@ classes:
     methods:
       LinearQuadraticRegulator:
         overloads:
-          const LinearSystem<States, Inputs, Outputs>&, const StateArray&, const InputArray&, wpi::units::second_t:
+          const LinearSystem<States, Inputs, Outputs>&, const StateArray&, const InputArray&, wpi::units::seconds<>:
             ignore: true
-          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const StateArray&, const InputArray&, wpi::units::second_t:
-          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, wpi::units::second_t
+          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const StateArray&, const InputArray&, wpi::units::seconds<>:
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, wpi::units::seconds<>
           :
-          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, const Matrixd<States, Inputs>&, wpi::units::second_t
+          ? const Matrixd<States, States>&, const Matrixd<States, Inputs>&, const Matrixd<States, States>&, const Matrixd<Inputs, Inputs>&, const Matrixd<States, Inputs>&, wpi::units::seconds<>
           :
       K:
         overloads:
@@ -38,9 +38,9 @@ classes:
         - ['2']
     template_inline_code: |
       cls_LinearQuadraticRegulator
-        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 1>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::second_t>())
-        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 2>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::second_t>())
-        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 3>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::second_t>());
+        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 1>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::seconds<>>())
+        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 2>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::seconds<>>())
+        .def(py::init<const wpi::math::LinearSystem<States, Inputs, 3>&, const wpi::util::array<double, States>&, const wpi::util::array<double, Inputs>&, wpi::units::seconds<>>());
 
 templates:
   LinearQuadraticRegulator_1_1:

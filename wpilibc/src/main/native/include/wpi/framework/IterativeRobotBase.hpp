@@ -190,7 +190,7 @@ class IterativeRobotBase : public RobotBase {
   /**
    * Gets time period between calls to Periodic() functions.
    */
-  wpi::units::second_t GetPeriod() const;
+  wpi::units::seconds<> GetPeriod() const;
 
   /**
    * Prints list of epochs added so far and their times.
@@ -202,7 +202,7 @@ class IterativeRobotBase : public RobotBase {
    *
    * @param period Period.
    */
-  explicit IterativeRobotBase(wpi::units::second_t period);
+  explicit IterativeRobotBase(wpi::units::seconds<> period);
 
   ~IterativeRobotBase() override = default;
 
@@ -217,7 +217,7 @@ class IterativeRobotBase : public RobotBase {
 
  private:
   int m_lastMode = -1;
-  wpi::units::second_t m_period;
+  wpi::units::seconds<> m_period;
   Watchdog m_watchdog;
   bool m_calledDsConnected = false;
 

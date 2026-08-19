@@ -23,7 +23,7 @@ class WPILIB_DLLEXPORT AprilTagPoseEstimator {
     bool operator==(const Config&) const = default;
 
     /** The tag size. */
-    wpi::units::meter_t tagSize;
+    wpi::units::meters<> tagSize;
 
     /** Camera horizontal focal length, in pixels. */
     double fx;

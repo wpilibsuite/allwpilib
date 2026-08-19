@@ -34,7 +34,7 @@ class Robot : public wpi::TimedRobot {
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
     elevator->SetLength(kElevatorMinimumLength + elevatorEncoder.GetDistance());
-    wrist->SetAngle(wpi::units::degree_t{wristPotentiometer.Get()});
+    wrist->SetAngle(wpi::units::degrees<>{wristPotentiometer.Get()});
 
     // publish to telemetry
     wpi::telemetry::Log("Mech2d", mech);

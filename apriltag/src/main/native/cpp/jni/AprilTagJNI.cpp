@@ -161,7 +161,7 @@ static AprilTagDetector::QuadThresholdParameters FromJavaDetectorQTP(
   return {
       FIELD(int, Int, minClusterPixels),
       FIELD(int, Int, maxNumMaxima),
-      .criticalAngle = wpi::units::radian_t{static_cast<double>(
+      .criticalAngle = wpi::units::radians<>{static_cast<double>(
           env->GetDoubleField(jparams, criticalAngleField))},
       FIELD(float, Float, maxLineFitMSE),
       FIELD(int, Int, minWhiteBlackDiff),
@@ -517,7 +517,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseHomography
   }
 
   AprilTagPoseEstimator estimator(
-      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+      {wpi::units::meters<>{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.EstimateHomography(harr));
 }
 
@@ -554,7 +554,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePoseOrthogonalIteration
   }
 
   AprilTagPoseEstimator estimator(
-      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+      {wpi::units::meters<>{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env,
                      estimator.EstimateOrthogonalIteration(harr, carr, nIters));
 }
@@ -592,7 +592,7 @@ Java_org_wpilib_vision_apriltag_jni_AprilTagJNI_estimatePose
   }
 
   AprilTagPoseEstimator estimator(
-      {wpi::units::meter_t{tagSize}, fx, fy, cx, cy});
+      {wpi::units::meters<>{tagSize}, fx, fy, cx, cy});
   return MakeJObject(env, estimator.Estimate(harr, carr));
 }
 

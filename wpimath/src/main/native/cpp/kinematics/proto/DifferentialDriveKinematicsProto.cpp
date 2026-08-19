@@ -14,7 +14,7 @@ std::optional<wpi::math::DifferentialDriveKinematics> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialDriveKinematics{
-      wpi::units::meter_t{msg.trackwidth},
+      wpi::units::meters<>{msg.trackwidth},
   };
 }
 

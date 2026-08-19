@@ -20,7 +20,7 @@ namespace wpi::math {
  * @param discA Storage for discrete system matrix.
  */
 template <int States>
-void DiscretizeA(const Matrixd<States, States>& contA, wpi::units::second_t dt,
+void DiscretizeA(const Matrixd<States, States>& contA, wpi::units::seconds<> dt,
                  Matrixd<States, States>* discA) {
   // A_d = eᴬᵀ
   *discA = (contA * dt.value()).exp();
@@ -39,8 +39,8 @@ void DiscretizeA(const Matrixd<States, States>& contA, wpi::units::second_t dt,
  */
 template <int States, int Inputs>
 void DiscretizeAB(const Matrixd<States, States>& contA,
-                  const Matrixd<States, Inputs>& contB, wpi::units::second_t dt,
-                  Matrixd<States, States>* discA,
+                  const Matrixd<States, Inputs>& contB,
+                  wpi::units::seconds<> dt, Matrixd<States, States>* discA,
                   Matrixd<States, Inputs>* discB) {
   // M = [A  B]
   //     [0  0]
@@ -69,8 +69,8 @@ void DiscretizeAB(const Matrixd<States, States>& contA,
  */
 template <int States>
 void DiscretizeAQ(const Matrixd<States, States>& contA,
-                  const Matrixd<States, States>& contQ, wpi::units::second_t dt,
-                  Matrixd<States, States>* discA,
+                  const Matrixd<States, States>& contQ,
+                  wpi::units::seconds<> dt, Matrixd<States, States>* discA,
                   Matrixd<States, States>* discQ) {
   // Make continuous Q symmetric if it isn't already
   Matrixd<States, States> Q = (contQ + contQ.transpose()) / 2.0;
@@ -111,7 +111,7 @@ void DiscretizeAQ(const Matrixd<States, States>& contA,
  */
 template <int Outputs>
 Matrixd<Outputs, Outputs> DiscretizeR(const Matrixd<Outputs, Outputs>& R,
-                                      wpi::units::second_t dt) {
+                                      wpi::units::seconds<> dt) {
   // R_d = 1/T R
   return R / dt.value();
 }

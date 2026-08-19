@@ -4,8 +4,6 @@
 
 #include "commands/DriveDistance.hpp"
 
-#include "wpi/units/math.hpp"
-
 void DriveDistance::Initialize() {
   drive->ArcadeDrive(0, 0);
   drive->ResetEncoders();
@@ -20,5 +18,5 @@ void DriveDistance::End(bool interrupted) {
 }
 
 bool DriveDistance::IsFinished() {
-  return wpi::units::math::abs(drive->GetAverageDistance()) >= distance;
+  return wpi::units::abs(drive->GetAverageDistance()) >= distance;
 }

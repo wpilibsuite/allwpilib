@@ -13,7 +13,7 @@ wpi::util::Protobuf<wpi::math::TrajectorySample>::Unpack(InputStream& stream) {
     return {};
   }
 
-  return wpi::math::TrajectorySample{wpi::units::second_t{msg.time}};
+  return wpi::math::TrajectorySample{wpi::units::seconds<>{msg.time}};
 }
 
 bool wpi::util::Protobuf<wpi::math::TrajectorySample>::Pack(

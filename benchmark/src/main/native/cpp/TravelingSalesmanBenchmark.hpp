@@ -22,7 +22,7 @@ static constexpr int iterations = 100;
 inline void BM_TravelingSalesman_Transform(benchmark::State& state) {
   wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
     auto transform = pose2 - pose1;
-    return wpi::units::math::hypot(transform.X(), transform.Y()).value();
+    return wpi::units::hypot(transform.X(), transform.Y()).value();
   }};
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {
@@ -33,7 +33,7 @@ inline void BM_TravelingSalesman_Transform(benchmark::State& state) {
 inline void BM_TravelingSalesman_Twist(benchmark::State& state) {
   wpi::math::TravelingSalesman traveler{[](auto pose1, auto pose2) {
     auto twist = (pose2 - pose1).Log();
-    return wpi::units::math::hypot(twist.dx, twist.dy).value();
+    return wpi::units::hypot(twist.dx, twist.dy).value();
   }};
   // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
   for (auto _ : state) {

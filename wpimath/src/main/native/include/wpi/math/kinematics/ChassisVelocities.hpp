@@ -35,17 +35,17 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
   /**
    * Velocity along the x-axis. (Fwd is +)
    */
-  wpi::units::meters_per_second_t vx = 0_mps;
+  wpi::units::meters_per_second<> vx = 0_mps;
 
   /**
    * Velocity along the y-axis. (Left is +)
    */
-  wpi::units::meters_per_second_t vy = 0_mps;
+  wpi::units::meters_per_second<> vy = 0_mps;
 
   /**
    * Represents the angular velocity of the robot frame. (CCW is +)
    */
-  wpi::units::radians_per_second_t omega = 0_rad_per_s;
+  wpi::units::radians_per_second<> omega = 0_rad_per_s;
 
   /**
    * Creates a Twist2d from ChassisVelocities.
@@ -54,7 +54,7 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
    *
    * @return Twist2d.
    */
-  constexpr Twist2d ToTwist2d(wpi::units::second_t dt) const {
+  constexpr Twist2d ToTwist2d(wpi::units::seconds<> dt) const {
     return Twist2d{vx * dt, vy * dt, omega * dt};
   }
 
@@ -78,7 +78,7 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
    *     for.
    * @return Discretized ChassisVelocities.
    */
-  constexpr ChassisVelocities Discretize(wpi::units::second_t dt) const {
+  constexpr ChassisVelocities Discretize(wpi::units::seconds<> dt) const {
     // Construct the desired pose after a timestep, relative to the current
     // pose. The desired pose has decoupled translation and rotation.
     Transform2d desiredTransform{vx * dt, vy * dt, omega * dt};
@@ -105,11 +105,11 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
   constexpr ChassisVelocities ToRobotRelative(
       const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
-    auto rotated = Translation2d{wpi::units::meter_t{vx.value()},
-                                 wpi::units::meter_t{vy.value()}}
+    auto rotated = Translation2d{wpi::units::meters<>{vx.value()},
+                                 wpi::units::meters<>{vy.value()}}
                        .RotateBy(-robotAngle);
-    return {wpi::units::meters_per_second_t{rotated.X().value()},
-            wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {wpi::units::meters_per_second<>{rotated.X().value()},
+            wpi::units::meters_per_second<>{rotated.Y().value()}, omega};
   }
 
   /**
@@ -126,11 +126,11 @@ struct WPILIB_DLLEXPORT ChassisVelocities {
   constexpr ChassisVelocities ToFieldRelative(
       const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
-    auto rotated = Translation2d{wpi::units::meter_t{vx.value()},
-                                 wpi::units::meter_t{vy.value()}}
+    auto rotated = Translation2d{wpi::units::meters<>{vx.value()},
+                                 wpi::units::meters<>{vy.value()}}
                        .RotateBy(robotAngle);
-    return {wpi::units::meters_per_second_t{rotated.X().value()},
-            wpi::units::meters_per_second_t{rotated.Y().value()}, omega};
+    return {wpi::units::meters_per_second<>{rotated.X().value()},
+            wpi::units::meters_per_second<>{rotated.Y().value()}, omega};
   }
 
   /**

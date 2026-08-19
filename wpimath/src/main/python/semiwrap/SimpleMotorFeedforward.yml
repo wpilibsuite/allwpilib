@@ -1,10 +1,10 @@
 classes:
   wpi::math::SimpleMotorFeedforward:
     force_type_casters:
-    - wpi::units::meters_per_second
-    - wpi::units::meters_per_second_squared
-    - wpi::units::radians_per_second
-    - wpi::units::radians_per_second_squared
+    - wpi::units::meters_per_second_
+    - wpi::units::meters_per_second_squared_
+    - wpi::units::radians_per_second_
+    - wpi::units::radians_per_second_squared_
     typealias:
     - typename wpi::math::SimpleMotorFeedforward<Distance>::Velocity
     - typename wpi::math::SimpleMotorFeedforward<Distance>::Acceleration
@@ -16,11 +16,11 @@ classes:
       SimpleMotorFeedforward:
         overloads:
           '':
-          wpi::units::volt_t, wpi::units::unit_t<kv_unit>, wpi::units::unit_t<ka_unit>:
+          wpi::units::volts<>, wpi::units::unit<kv_unit>, wpi::units::unit<ka_unit>:
       Calculate:
         overloads:
-          wpi::units::unit_t<Velocity> [const]:
-          wpi::units::unit_t<Velocity>, wpi::units::unit_t<Velocity> [const]:
+          wpi::units::unit<Velocity> [const]:
+          wpi::units::unit<Velocity>, wpi::units::unit<Velocity> [const]:
       MaxAchievableVelocity:
       MinAchievableVelocity:
       MaxAchievableAcceleration:
@@ -37,10 +37,10 @@ templates:
   SimpleMotorFeedforward:
     qualname: wpi::math::SimpleMotorFeedforward
     params:
-    - wpi::units::dimensionless::scalar
+    - wpi::units::dimensionless_
 
   # needed for DifferentialDriveVoltageConstraint
   SimpleMotorFeedforwardMeters:
     qualname: wpi::math::SimpleMotorFeedforward
     params:
-    - wpi::units::meter
+    - wpi::units::meters_

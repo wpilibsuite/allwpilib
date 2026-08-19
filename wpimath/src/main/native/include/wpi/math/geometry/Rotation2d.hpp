@@ -39,8 +39,10 @@ class WPILIB_DLLEXPORT Rotation2d final {
    * @param value The value of the angle.
    */
   constexpr Rotation2d(wpi::units::angle_unit auto value)  // NOLINT
-      : m_cos{gcem::cos(value.template convert<wpi::units::radian>().value())},
-        m_sin{gcem::sin(value.template convert<wpi::units::radian>().value())} {
+      : m_cos{
+            gcem::cos(value.template convert<wpi::units::radians_>().value())},
+        m_sin{
+            gcem::sin(value.template convert<wpi::units::radians_>().value())} {
   }
 
   /**
@@ -110,7 +112,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
    * π.
    *
    * For example, <code>Rotation2d{30_deg} + Rotation2d{60_deg}</code> equals
-   * <code>Rotation2d{wpi::units::radian_t{std::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{wpi::units::radians<>{std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to add.
    *
@@ -124,7 +126,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
    * Returns this rotation relative to another rotation.
    *
    * For example, <code>Rotation2d{10_deg} - Rotation2d{100_deg}</code> equals
-   * <code>Rotation2d{wpi::units::radian_t{-std::numbers::pi/2.0}}</code>
+   * <code>Rotation2d{wpi::units::radians<>{-std::numbers::pi/2.0}}</code>
    *
    * @param other The rotation to subtract.
    *
@@ -219,8 +221,8 @@ class WPILIB_DLLEXPORT Rotation2d final {
    *
    * @return The radian value of the rotation constrained within [-π, π].
    */
-  constexpr wpi::units::radian_t Radians() const {
-    return wpi::units::radian_t{gcem::atan2(m_sin, m_cos)};
+  constexpr wpi::units::radians<> Radians() const {
+    return wpi::units::radians<>{gcem::atan2(m_sin, m_cos)};
   }
 
   /**
@@ -228,7 +230,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
    *
    * @return The degree value of the rotation constrained within [-180, 180].
    */
-  constexpr wpi::units::degree_t Degrees() const { return Radians(); }
+  constexpr wpi::units::degrees<> Degrees() const { return Radians(); }
 
   /**
    * Returns the cosine of the rotation.

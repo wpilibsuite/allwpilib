@@ -4,7 +4,7 @@ functions:
 classes:
   wpi::math::ProfiledPIDController:
     force_type_casters:
-    - wpi::units::radians_per_second
+    - wpi::units::radians_per_second_
     template_params:
     - Distance
     typealias:
@@ -69,10 +69,10 @@ templates:
   ProfiledPIDController:
     qualname: wpi::math::ProfiledPIDController
     params:
-    - wpi::units::dimensionless::scalar
+    - wpi::units::dimensionless_
 
   # needed for HolonomicDriveController
   ProfiledPIDControllerRadians:
     qualname: wpi::math::ProfiledPIDController
     params:
-    - wpi::units::radian
+    - wpi::units::radians_
