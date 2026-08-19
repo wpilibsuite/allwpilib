@@ -407,6 +407,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "TwoDeadWheelPoseEstimator",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator", "wpi__math__TwoDeadWheelPoseEstimator.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelPoseEstimator3d",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator3d", "wpi__math__TwoDeadWheelPoseEstimator3d.hpp"),
+            ],
+        ),
+        struct(
             class_name = "BiquadFilter",
             yml_file = "semiwrap/BiquadFilter.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -905,6 +925,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::math::SwerveModuleAcceleration", "wpi__math__SwerveModuleAcceleration.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelOdometry",
+            yml_file = "semiwrap/TwoDeadWheelOdometry.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry", "wpi__math__TwoDeadWheelOdometry.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelOdometry3d",
+            yml_file = "semiwrap/TwoDeadWheelOdometry3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry3d", "wpi__math__TwoDeadWheelOdometry3d.hpp"),
             ],
         ),
         struct(
