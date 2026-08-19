@@ -38,7 +38,7 @@
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

@@ -30,7 +30,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"

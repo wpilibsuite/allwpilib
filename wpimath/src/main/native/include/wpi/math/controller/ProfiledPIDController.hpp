@@ -18,7 +18,7 @@
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableTable.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 

@@ -13,7 +13,7 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/area.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SymbolExports.hpp"
 

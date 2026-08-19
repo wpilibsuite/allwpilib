@@ -17,7 +17,7 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/MathExtras.hpp"
 

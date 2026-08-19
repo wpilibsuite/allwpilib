@@ -9,7 +9,7 @@
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/velocity.hpp"
 
 static constexpr double kTolerance = 1e-6;

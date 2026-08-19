@@ -21,7 +21,7 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
