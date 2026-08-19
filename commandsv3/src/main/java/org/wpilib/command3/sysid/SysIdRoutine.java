@@ -173,7 +173,7 @@ public class SysIdRoutine extends SysIdRoutineLog {
     public SysIdMechanism(
         Consumer<Voltage> drive, Consumer<SysIdRoutineLog> log, Mechanism mechanism, String name) {
       this.drive = drive;
-      this.log = log != null ? log : _;
+      this.log = log != null ? log : _ -> {};
       this.mechanism = mechanism;
       this.name = name != null ? name : mechanism.getName();
     }
