@@ -15,6 +15,7 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/units/angle.hpp"
+#include "wpi/units/concentration.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
@@ -132,6 +133,22 @@ TEST_CASE("MathUtilTest ApplyDeadband2dUnits", "[wpimath]") {
       wpi::math::ApplyDeadband(
           Eigen::Vector<wpi::units::meters_per_second<>, 2>{0_mps, 0_mps},
           0.02_mps, 2.5_mps));
+}
+
+TEST_CASE("MathUtilTest ApplyDeadband2dDimensionlessUnits", "[wpimath]") {
+  CHECK_EIGEN_EQ((Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 25_pct}),
+                 wpi::math::ApplyDeadband(
+                     Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 25_pct},
+                     2_pct, 25_pct));
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{10_pct, 0_pct}),
+      wpi::math::ApplyDeadband(
+          Eigen::Vector<wpi::units::percent<>, 2>{10_pct, 0_pct}, 2_pct));
+
+  CHECK_EIGEN_EQ((Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 0_pct}),
+                 wpi::math::ApplyDeadband(
+                     Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 0_pct},
+                     2_pct, 25_pct));
 }
 
 TEST_CASE("MathUtilTest CopyDirectionPow", "[wpimath]") {
@@ -287,6 +304,40 @@ TEST_CASE("MathUtilTest CopyDirectionPow2dUnits", "[wpimath]") {
       wpi::math::CopyDirectionPow(
           Eigen::Vector<wpi::units::meters_per_second<>, 2>{-5_mps, 0_mps}, 2.0,
           5_mps));
+}
+
+TEST_CASE("MathUtilTest CopyDirectionPow2dDimensionlessUnits", "[wpimath]") {
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{100_pct, 0_pct}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::percent<>, 2>{100_pct, 0_pct}, 2.0));
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{-100_pct, 0_pct}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::percent<>, 2>{-100_pct, 0_pct}, 2.0));
+
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 0_pct}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::percent<>, 2>{0_pct, 0_pct}, 2.0, 5_pct));
+
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{5_pct, 0_pct}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::percent<>, 2>{5_pct, 0_pct}, 2.0, 5_pct));
+  CHECK_EIGEN_EQ(
+      (Eigen::Vector<wpi::units::percent<>, 2>{-5_pct, 0_pct}),
+      wpi::math::CopyDirectionPow(
+          Eigen::Vector<wpi::units::percent<>, 2>{-5_pct, 0_pct}, 2.0, 5_pct));
+
+  CHECK_EIGEN_EQ((Eigen::Vector<wpi::units::percent<>, 2>{25_pct, 0_pct}),
+                 wpi::math::CopyDirectionPow(
+                     Eigen::Vector<wpi::units::percent<>, 2>{50_pct, 0_pct},
+                     2.0, 100_pct));
+  CHECK_EIGEN_EQ((Eigen::Vector<wpi::units::percent<>, 2>{-25_pct, 0_pct}),
+                 wpi::math::CopyDirectionPow(
+                     Eigen::Vector<wpi::units::percent<>, 2>{-50_pct, 0_pct},
+                     2.0, 100_pct));
 }
 
 TEST_CASE("MathUtilTest InputModulus", "[wpimath]") {
