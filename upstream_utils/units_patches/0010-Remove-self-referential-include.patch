@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 19 Aug 2026 19:20:28 -0400
+Subject: [PATCH 10/10] Remove self-referential include
+
+---
+ include/units/core.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index ead02e8eb658210ebf73fd1433510715291c25cf..9d537e036a130938b8206102641f47fb6383d910 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -55,7 +55,6 @@
+ //	INCLUDES
+ //--------------------
+ 
+-#include "core.h"
+ #include <chrono>
+ #include <cmath>
+ #include <concepts>

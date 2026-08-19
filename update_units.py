@@ -11,17 +11,14 @@ from pathlib import Path
 def process_file(content: str) -> str:
     # Update includes
     content = re.sub(
-        r'#include "wpi/units/([^.]+)\.hpp"', r"#include <wpi/units/\1.h>", content
-    )
-    content = re.sub(
-        r"#include <wpi/units/([^.]+)\.hpp>", r"#include <wpi/units/\1.h>", content
+        r"#include <wpi/units/([^.]+)\.hpp>", r'#include "wpi/units/\1.hpp"', content
     )
     content = content.replace(
-        "#include <wpi/units/base.h>", "#include <wpi/units/core.h>"
+        "#include <wpi/units/base.h>", '#include "wpi/units/core.hpp"'
     )
-    content = content.replace("#include <wpi/units/constants.h>\n", "")
-    content = content.replace("#include <wpi/units/dimensionless.h>\n", "")
-    content = content.replace("#include <wpi/units/math.h>\n", "")
+    content = content.replace('#include "wpi/units/constants.hpp"\n', "")
+    content = content.replace('#include "wpi/units/dimensionless.hpp"\n', "")
+    content = content.replace('#include "wpi/units/math.hpp"\n', "")
 
     # Update math
     content = content.replace("units::math", "units")
