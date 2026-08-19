@@ -91,6 +91,7 @@ scan_headers_ignore = [
     "type_casters/*",
     "unsupported/*",
     "wpi/units/*",
+    "wpi/units.hpp",
     "wpimath/protobuf/*",
 
     "wpi/math/util/MathShared.hpp",
