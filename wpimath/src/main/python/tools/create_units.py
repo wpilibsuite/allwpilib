@@ -7,7 +7,6 @@ import re
 import subprocess
 import sys
 
-
 for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
     if f.name == "core.h":
         continue
@@ -74,9 +73,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
                 if name == "pounds":
                     code_name = f.stem + "::" + name
                     py_name = name + "_" + f.stem
-                s = (
-                    inspect.cleandoc(
-                        f"""
+                s = inspect.cleandoc(f"""
 
                     template <> struct handle_type_name<wpi::units::{code_name}<>> {{
                       static constexpr auto name = _("wpimath.units.{py_name}");
@@ -86,10 +83,7 @@ for f in sorted(pathlib.Path(sys.argv[1]).glob("*.h")):
                       static constexpr auto name = _("wpimath.units.{py_name}");
                     }};
 
-                """
-                    )
-                    + "\n"
-                )
+                """) + "\n"
                 if name == "foot_pounds" and f.name == "torque.h":
                     # Comment out non-blank lines
                     s = re.sub(r"(?:(?<=\n)|^)([^\n])", r"// \1", s)
