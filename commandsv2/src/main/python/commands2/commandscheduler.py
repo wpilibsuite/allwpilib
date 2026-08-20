@@ -98,11 +98,6 @@ class CommandScheduler(Sendable):
         self._interrupt_actions: List[Callable[[Command, Optional[Command]], None]] = []
         self._finish_actions: List[Callable[[Command], None]] = []
 
-        self._in_run_loop = False
-        self._to_schedule: Dict[Command, None] = {}
-        self._to_cancel: Dict[Command, Optional[Command]] = {}
-        self._ending_commands: Set[Command] = set()
-
         self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
         hal.report_usage("CommandScheduler", "")
@@ -175,10 +170,6 @@ class CommandScheduler(Sendable):
             report_warning("Tried to schedule a null command!", True)
             return
 
-        if self._in_run_loop:
-            self._to_schedule[command] = None
-            return
-
         self.require_not_composed(command)
 
         # Do nothing if the scheduler is disabled, the robot is disabled and the command
@@ -247,11 +238,15 @@ class CommandScheduler(Sendable):
         loop_cache.poll()
         self._watchdog.add_epoch("buttons.run()")
 
-        self._in_run_loop = True
         is_disabled = RobotState.is_disabled()
 
         # Run scheduled commands, remove finished commands.
         for command in self._scheduled_commands.copy():
+            if not self.is_scheduled(command):
+                # skip as the normal scheduledCommands was modified
+                # and that command was canceled
+                continue
+
             if is_disabled and not command.runs_when_disabled():
                 self._cancel(command, None)
                 continue
@@ -261,27 +256,13 @@ class CommandScheduler(Sendable):
                 action(command)
             self._watchdog.add_epoch(f"{command.get_name()}.execute()")
             if command.is_finished():
-                self._ending_commands.add(command)
+                self._scheduled_commands.pop(command)
                 command.end(False)
                 for action in self._finish_actions:
                     action(command)
-                self._ending_commands.remove(command)
-                self._scheduled_commands.pop(command)
                 for requirement in command.get_requirements():
                     self._requirements.pop(requirement)
                 self._watchdog.add_epoch(f"{command.get_name()}.end(False)")
-
-        self._in_run_loop = False
-
-        # Schedule/cancel commands from queues populated during loop
-        for command in self._to_schedule:
-            self._schedule(command)
-
-        for command, interruptor in self._to_cancel.items():
-            self._cancel(command, interruptor)
-
-        self._to_schedule.clear()
-        self._to_cancel.clear()
 
         # Add default commands for un-required registered subsystems.
         for subsystem, scommand in self._subsystems.items():
@@ -417,23 +398,14 @@ class CommandScheduler(Sendable):
             report_warning("Tried to cancel a null command", True)
             return
 
-        if command in self._ending_commands:
-            return
-
-        if self._in_run_loop:
-            self._to_cancel[command] = interruptor
-            return
-
         if not self.is_scheduled(command):
             return
 
-        self._ending_commands.add(command)
+        self._scheduled_commands.pop(command)
         command.end(True)
         for action in self._interrupt_actions:
             action(command, interruptor)
 
-        self._ending_commands.remove(command)
-        self._scheduled_commands.pop(command)
         for requirement in command.get_requirements():
             del self._requirements[requirement]
         self._watchdog.add_epoch(f"{command.get_name()}.end(true)")
