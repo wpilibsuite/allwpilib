@@ -306,6 +306,18 @@ struct RemovableMemberComplex : public ComplexTunable {
   void MarkGainChanged() { SetChildTunableChanged("gain"); }
 };
 
+struct ChangedParentMemberComplex : public ComplexTunable {
+  int32_t gain = 1;
+
+  void PublishTunable(TunableTable&) override {}
+
+  void PublishGain(TunableTable& table) {
+    table.Publish("gain", this, &ChangedParentMemberComplex::gain);
+  }
+
+  void MarkChanged() { SetTunableChanged(); }
+};
+
 struct DynamicComplex : public ComplexTunable {
   TunableDouble initial{1.0};
   TunableDouble dynamic{2.0};
@@ -1054,6 +1066,33 @@ TEST_CASE_METHOD(TunableTest,
   CHECK_FALSE(TunableRegistry::GetTunable(*gainUid));
   CHECK_FALSE(TunableRegistry::GetTunable(*pointUid));
   CHECK_NOTHROW(TunableRegistry::Update());
+}
+
+TEST_CASE_METHOD(
+    TunableTest,
+    "TunableTest DestroyingChangedComplexUnregistersLaterMemberWrapper",
+    "[tunable]") {
+  std::optional<uint32_t> parentUid;
+  std::optional<uint32_t> gainUid;
+  {
+    ChangedParentMemberComplex complex;
+    Tunables::Publish("changedParent", complex);
+    parentUid = backend->GetUid("/changedParent");
+    REQUIRE(parentUid);
+
+    complex.MarkChanged();
+    REQUIRE(TunableRegistry::GetTunable(*parentUid).IsChanged());
+
+    auto table = Tunables::GetTable("changedParent");
+    complex.PublishGain(table);
+    gainUid = backend->GetUid("/changedParent/gain");
+    REQUIRE(gainUid);
+  }
+
+  CHECK_FALSE(backend->GetUid("/changedParent"));
+  CHECK_FALSE(backend->GetUid("/changedParent/gain"));
+  CHECK_FALSE(TunableRegistry::GetTunable(*parentUid));
+  CHECK_FALSE(TunableRegistry::GetTunable(*gainUid));
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest TunablesGetTableFacade",

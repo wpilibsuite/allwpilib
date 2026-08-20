@@ -579,6 +579,7 @@ bool TunableRegistry::Publish(
     tunable->m_uid =
         RegisterTunable(tunable, nullptr, detail::TunableTypeValue::COMPLEX);
   }
+  uint32_t parentUid = tunable->m_uid & detail::TunableBase::UID_MASK;
 
   TunableConfig memberConfig;
   const TunableConfig* config;
@@ -594,13 +595,13 @@ bool TunableRegistry::Publish(
     config = info.config;
     type = info.type;
   }
+  uint32_t memberUid = member->m_uid & detail::TunableBase::UID_MASK;
 
-  std::string childName =
-      GetChildName(tunable->m_uid & detail::TunableBase::UID_MASK, path);
+  std::string childName = GetChildName(parentUid, path);
   {
     std::scoped_lock lock{inst.tunablesMutex};
-    auto parentIt = inst.tunables.find(tunable->m_uid);
-    auto childIt = inst.tunables.find(member->m_uid);
+    auto parentIt = inst.tunables.find(parentUid);
+    auto childIt = inst.tunables.find(memberUid);
     if (parentIt != inst.tunables.end() && childIt != inst.tunables.end()) {
       auto& child = *childIt->second;
       if (!child.config) {
@@ -614,7 +615,6 @@ bool TunableRegistry::Publish(
     }
   }
 
-  auto memberUid = member->m_uid;
   auto memberPtr = member.get();
   if (!backend->Publish(path, memberUid, *memberPtr, config, type)) {
     UnregisterTunable(memberUid);
@@ -629,7 +629,7 @@ bool TunableRegistry::Publish(
     }
   }
 
-  AddComplexChildPath(memberUid & detail::TunableBase::UID_MASK, path);
+  AddComplexChildPath(memberUid, path);
   return true;
 }
 
