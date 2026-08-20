@@ -393,10 +393,18 @@ Example usage for autonomous selection:
 
 ```java
 Selectable<Command> autoChooser = new Selectable<>();
-autoChooser.add("Drive Straight", new DriveStraightCommand(robot));
+autoChooser.addDefault("Drive Straight", new DriveStraightCommand(robot));
 autoChooser.add("Score Preload", new ScorePreloadCommand(robot));
-autoChooser.setDefault("Drive Straight");
+autoChooser.onChange(command -> System.out.println("Auto selected: " + command.getName()));
 Tunables.publish("auto", autoChooser);
+```
+
+The selected value is read from robot code at the point of use:
+
+```java
+public Command getAutonomousCommand() {
+  return autoChooser.getSelected();
+}
 ```
 
 ## Thread Safety and Secondary Threads
@@ -537,28 +545,55 @@ Warning handlers installed with `setReportWarning()` must not throw.
 The most common use case: declaring tunable constants at the point of use with no additional boilerplate.
 
 ```java
-public class DriveSubsystem {
-  // Stored internally; dashboard can read and write this value
-  private final TunableDouble kP = Tunables.addDouble("drive/kP", 0.05);
-  private final TunableDouble kI = Tunables.addDouble("drive/kI", 0.0);
-  private final TunableDouble kD = Tunables.addDouble("drive/kD", 0.001);
+public class IntakeSubsystem {
+  // Stored internally; dashboard can read and write these values
+  private final TunableDouble intakeSpeed =
+      Tunables.addDouble("intake/speed", 0.65);
+  private final TunableDouble outtakeSpeed =
+      Tunables.addDouble("intake/outtakeSpeed", -0.5);
 
-  public void periodic() {
-    pid.setP(kP.get());
-    pid.setI(kI.get());
-    pid.setD(kD.get());
-    velocity.set(encoder.getRate());
+  public void intake() {
+    motor.set(intakeSpeed.get());
+  }
+
+  public void outtake() {
+    motor.set(outtakeSpeed.get());
   }
 }
 ```
 
 ### Tunable backed by an existing field (getter/setter)
 
-When the value already lives in another object, use the getter/setter form. The `ALWAYS_GET` option is applied automatically. If the owning object marks the tunable changed after local writes, pass `GET_ON_CHANGE` to avoid polling every update cycle.
+When the value already lives in subsystem state or another object, use the getter/setter form. The `ALWAYS_GET` option is applied automatically. If the owning object marks the tunable changed after local writes, pass `GET_ON_CHANGE` to avoid polling every update cycle.
 
 ```java
-private final TunableDouble kPLink = Tunables.getTable("shooter")
-    .publishDouble("kP", pid::getP, pid::setP);
+private final TunableDouble maxOutputLink = Tunables.getTable("drive")
+    .publishDouble("maxOutput", this::getMaxOutput, this::setMaxOutput);
+```
+
+This is useful when existing subsystem state should remain the source of truth, or when the setter should validate and clamp dashboard input:
+
+```java
+public final class DriveSubsystem extends SubsystemBase {
+  private double m_maxOutput = 0.8;
+
+  public DriveSubsystem() {
+    Tunables.getTable("drive")
+        .publishDouble("maxOutput", this::getMaxOutput, this::setMaxOutput);
+  }
+
+  public void arcadeDrive(double forward, double rotation) {
+    m_drive.arcadeDrive(forward * m_maxOutput, rotation * m_maxOutput);
+  }
+
+  public double getMaxOutput() {
+    return m_maxOutput;
+  }
+
+  public void setMaxOutput(double value) {
+    m_maxOutput = MathUtil.clamp(value, 0.0, 1.0);
+  }
+}
 ```
 
 ### onTune callback
@@ -566,17 +601,17 @@ private final TunableDouble kPLink = Tunables.getTable("shooter")
 React immediately when a value is changed from the dashboard.
 
 ```java
-private final TunableDouble tolerance;
+private final TunableDouble deadband;
 
-public ShooterSubsystem() {
-  tolerance = TunableDouble.createConfig(
+public DriveSubsystem() {
+  deadband = TunableDouble.createConfig(
       0.02,
-      TunableConfig.of(TunableOption.onTune(this::applyTolerance)));
-  Tunables.publish("shooter/tolerance", tolerance);
+      TunableConfig.of(TunableOption.onTune(this::applyDeadband)));
+  Tunables.publish("drive/deadband", deadband);
 }
 
-private void applyTolerance() {
-  pid.setTolerance(tolerance.get());
+private void applyDeadband() {
+  m_drive.setDeadband(deadband.get());
 }
 ```
 
@@ -588,6 +623,32 @@ Types implementing `StructSerializable` are automatically detected; no extra cod
 // Pose2d implements StructSerializable; struct serializer is found automatically
 private final Tunable<Pose2d> targetPose = Tunables.addValue("drive/targetPose", new Pose2d());
 ```
+
+### Tunable Field2d dashboard edits
+
+`Field2d` implements `ComplexTunable`, so it can be published through `Tunables` when dashboard edits should flow back into robot code. Publish it once, then read edited object poses from the same `Field2d` instance during the robot loop.
+
+```java
+public final class Robot extends TimedRobot {
+  private final Field2d m_field = new Field2d();
+  private final FieldObject2d m_target = m_field.getObject("Target");
+  private Pose2d m_driveTargetPose = Pose2d.kZero;
+
+  @Override
+  public void robotInit() {
+    Tunables.publish("Field", m_field);
+  }
+
+  @Override
+  public void robotPeriodic() {
+    m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+    m_driveTargetPose = m_target.getPose();
+  }
+}
+```
+
+Use `Tunables.publish("Field", m_field)` when the dashboard should be able to move field objects and robot code should observe those edits.
 
 ### ComplexTunable implementation
 
@@ -607,6 +668,10 @@ public class TunablePIDController implements ComplexTunable {
     return "PIDController";
   }
 
+  public double calculate(double measurement, double setpoint) {
+    return m_pid.calculate(measurement, setpoint);
+  }
+
   @Override
   public void publishTunable(TunableTable table) {
     m_kP = table.publishDouble("kP", m_pid::getP, m_pid::setP);
@@ -619,10 +684,20 @@ public class TunablePIDController implements ComplexTunable {
 Registration at the use site:
 
 ```java
-private final TunablePIDController armPID = new TunablePIDController(1.0, 0.0, 0.1);
+public final class ArmSubsystem extends SubsystemBase {
+  private final TunablePIDController m_armPid =
+      new TunablePIDController(1.0, 0.0, 0.1);
 
-public RobotContainer() {
-  Tunables.publish("arm/pid", armPID);
+  public ArmSubsystem() {
+    Tunables.publish("arm/pid", m_armPid);
+  }
+
+  @Override
+  public void periodic() {
+    double output =
+        m_armPid.calculate(m_encoder.getDistance(), m_goalRadians);
+    m_motor.setVoltage(output);
+  }
 }
 ```
 
@@ -639,6 +714,68 @@ TunableDouble pivotAccel = pivot.publishDouble("maxAccel", () -> pivotAccel, v -
 
 This publishes to normalized paths `/arm/pivot/maxSpeed` and `/arm/pivot/maxAccel`, which the default robot backend places under `/Tunables` in NetworkTables.
 
+### Autonomous command selection
+
+Use `Selectable<Command>` for the same autonomous-chooser workflow teams previously used with `SendableChooser`.
+
+```java
+public final class RobotContainer {
+  private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final Selectable<Command> m_autoChooser = new Selectable<>();
+  private String m_selectedAutoName = "Leave Community";
+
+  public RobotContainer() {
+    m_autoChooser.addDefault("Leave Community", new DriveDistance(m_drive, 3.0));
+    m_autoChooser.add("Score And Leave", new ScoreAndLeave(m_drive));
+    m_autoChooser.add("Do Nothing", Commands.none());
+    m_autoChooser.onChange(command -> m_selectedAutoName = command.getName());
+
+    Tunables.publish("Auto", m_autoChooser);
+  }
+
+  public Command getAutonomousCommand() {
+    return m_autoChooser.getSelected();
+  }
+}
+```
+
+The selectable publishes `/Auto/default`, `/Auto/options`, and `/Auto/selected` under the Tunable backend's prefix. A dashboard changes only the selected option name; robot code still owns the actual command objects.
+
+### Mode or configuration selection
+
+`Selectable` is not limited to commands. It can hold enums, records, subsystem modes, or immutable configuration objects.
+
+```java
+enum DriveMode {
+  FIELD_RELATIVE,
+  ROBOT_RELATIVE,
+  PRECISION
+}
+
+public final class DriveSubsystem extends SubsystemBase {
+  private final Selectable<DriveMode> m_driveMode = new Selectable<>();
+  private DriveMode m_currentMode = DriveMode.FIELD_RELATIVE;
+
+  public DriveSubsystem() {
+    m_driveMode.addDefault("Field Relative", DriveMode.FIELD_RELATIVE);
+    m_driveMode.add("Robot Relative", DriveMode.ROBOT_RELATIVE);
+    m_driveMode.add("Precision", DriveMode.PRECISION);
+    m_driveMode.onChange(this::setDriveMode);
+
+    Tunables.publish("Drive/mode", m_driveMode);
+  }
+
+  @Override
+  public void periodic() {
+    setDriveMode(m_driveMode.getSelected());
+  }
+
+  private void setDriveMode(DriveMode mode) {
+    m_currentMode = mode;
+  }
+}
+```
+
 ## Unit Testing with MockTunableBackend
 
 ```java
@@ -651,17 +788,17 @@ void setUp() {
 }
 
 @Test
-void testKpPublished() {
+void testMaxOutputPublished() {
   new DriveSubsystem();
-  assertEquals(0.05, backend.getDouble("/drive/kP"), 1e-9);
+  assertEquals(0.8, backend.getDouble("/drive/maxOutput"), 1e-9);
 }
 
 @Test
-void testKpTunable() {
+void testMaxOutputTunable() {
   var drive = new DriveSubsystem();
-  backend.setDouble("/drive/kP", 0.1);
+  backend.setDouble("/drive/maxOutput", 0.5);
   TunableRegistry.update();
-  assertEquals(0.1, drive.getPID().getP(), 1e-9);
+  assertEquals(0.5, drive.getMaxOutput(), 1e-9);
 }
 ```
 
@@ -671,8 +808,176 @@ Key differences from 2026:
 
 - `SmartDashboard.putNumber("key", value)` / `SmartDashboard.getNumber("key", default)` called every loop is replaced with a single `Tunables.addDouble("key", initialValue)` declaration that returns a `TunableDouble`. Read it with `tunable.get()` and write it with `tunable.set(value)` (or let the dashboard write it).
 - `NetworkTableEntry` / `DoublePublisher` / `DoubleSubscriber` boilerplate is replaced by the same `TunableDouble` pattern; the NT backend handles the underlying NT entry lifecycle.
-- `SendableChooser<T>` is replaced by `Selectable<T>`. The API is similar: `add(name, object)`, `setDefault(name)`, `getSelected()`.
+- `SendableChooser<T>` is replaced by `Selectable<T>`. The API is similar: `add(name, object)`, `addDefault(name, object)`, `getSelected()`.
 - The `Sendable` interface and `SmartDashboard.putData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `ComplexTunable` and register via `Tunables.publish()`.
+
+## SmartDashboard Tuning to Tunable
+
+Use Tunable when the dashboard is allowed to change the value and robot code reads that value back.
+
+**Was (WPILib 2026):**
+
+```java
+private double m_intakeSpeed = 0.65;
+
+public void robotPeriodic() {
+  SmartDashboard.putNumber("Intake/speed", m_intakeSpeed);
+  m_intakeSpeed =
+      SmartDashboard.getNumber("Intake/speed", m_intakeSpeed);
+  m_intakeMotor.set(m_intakeSpeed);
+}
+```
+
+**Is (Tunable):**
+
+```java
+private final TunableDouble m_intakeSpeed =
+    Tunables.addDouble("Intake/speed", 0.65);
+
+public void robotPeriodic() {
+  m_intakeMotor.set(m_intakeSpeed.get());
+}
+```
+
+Getter/setter-backed tunables are a closer match when existing robot code already owns the value or validates assignments:
+
+**Was (WPILib 2026):**
+
+```java
+public void robotInit() {
+  SmartDashboard.putNumber(
+      "Drive/maxOutput", m_drive.getMaxOutput());
+}
+
+public void robotPeriodic() {
+  double maxOutput = SmartDashboard.getNumber(
+      "Drive/maxOutput", m_drive.getMaxOutput());
+  m_drive.setMaxOutput(maxOutput);
+}
+```
+
+**Is (Tunable getter/setter):**
+
+```java
+public void robotInit() {
+  Tunables.publishDouble(
+      "Drive/maxOutput",
+      m_drive::getMaxOutput,
+      m_drive::setMaxOutput);
+}
+```
+
+## Editable Field2d to Tunable
+
+**Was (WPILib 2026):**
+
+```java
+private final Field2d m_field = new Field2d();
+private final FieldObject2d m_target = m_field.getObject("Target");
+private Pose2d m_driveTargetPose = Pose2d.kZero;
+
+public void robotInit() {
+  SmartDashboard.putData("Field", m_field);
+}
+
+public void robotPeriodic() {
+  m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+  m_driveTargetPose = m_target.getPose();
+}
+```
+
+**Is (Tunable):**
+
+```java
+private final Field2d m_field = new Field2d();
+private final FieldObject2d m_target = m_field.getObject("Target");
+private Pose2d m_driveTargetPose = Pose2d.kZero;
+
+public void robotInit() {
+  Tunables.publish("Field", m_field);
+}
+
+public void robotPeriodic() {
+  m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+  m_driveTargetPose = m_target.getPose();
+}
+```
+
+## SendableChooser to Selectable
+
+`Selectable` publishes the chooser data through the Tunable backend and returns the selected robot-owned object from `getSelected()`.
+
+**Was (WPILib 2026):**
+
+```java
+private final SendableChooser<Command> m_autoChooser =
+    new SendableChooser<>();
+
+public RobotContainer() {
+  m_autoChooser.setDefaultOption(
+      "Leave Community", new DriveDistance(m_drive, 3.0));
+  m_autoChooser.addOption("Score And Leave", new ScoreAndLeave(m_drive));
+  SmartDashboard.putData("Auto", m_autoChooser);
+}
+
+public Command getAutonomousCommand() {
+  return m_autoChooser.getSelected();
+}
+```
+
+**Is (Selectable):**
+
+```java
+private final Selectable<Command> m_autoChooser =
+    new Selectable<>();
+
+public RobotContainer() {
+  m_autoChooser.addDefault(
+      "Leave Community", new DriveDistance(m_drive, 3.0));
+  m_autoChooser.add("Score And Leave", new ScoreAndLeave(m_drive));
+  Tunables.publish("Auto", m_autoChooser);
+}
+
+public Command getAutonomousCommand() {
+  return m_autoChooser.getSelected();
+}
+```
+
+The same pattern works for non-command options:
+
+**Was (WPILib 2026):**
+
+```java
+private final SendableChooser<String> m_driveModeChooser =
+    new SendableChooser<>();
+
+public RobotContainer() {
+  m_driveModeChooser.setDefaultOption("Field Relative", "field");
+  m_driveModeChooser.addOption("Robot Relative", "robot");
+  SmartDashboard.putData("Drive Mode", m_driveModeChooser);
+}
+
+public void teleopPeriodic() {
+  m_drive.setMode(m_driveModeChooser.getSelected());
+}
+```
+
+**Is (Selectable):**
+
+```java
+private final Selectable<DriveMode> m_driveMode =
+    new Selectable<>();
+
+public RobotContainer() {
+  m_driveMode.addDefault("Field Relative", DriveMode.FIELD_RELATIVE);
+  m_driveMode.add("Robot Relative", DriveMode.ROBOT_RELATIVE);
+  Tunables.publish("Drive/mode", m_driveMode);
+}
+
+public void teleopPeriodic() {
+  m_drive.setMode(m_driveMode.getSelected());
+}
+```
 
 # Drawbacks
 

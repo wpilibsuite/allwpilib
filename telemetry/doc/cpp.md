@@ -443,6 +443,117 @@ Custom `wpi::TelemetryBackend` and `wpi::TelemetryEntry` implementations must su
 
 The C++ mock backend protects writes, but `GetActions()`, `GetLastAction()`, and `GetSchema()` expose references or pointers whose lifetime is not protected after the method returns. Quiesce logging before inspecting or retaining those results; copying values with `GetLastValue<T>()` avoids retaining an internal value.
 
+## C++ Migration from WPILib 2026
+
+For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::Telemetry`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::Tunable` instead.
+
+### SmartDashboard Output to Telemetry
+
+**Was (WPILib 2026):**
+
+```cpp
+void RobotPeriodic() {
+  frc::SmartDashboard::PutNumber("Drive/leftVelocity",
+                                 m_leftEncoder.GetRate());
+  frc::SmartDashboard::PutNumber("Drive/rightVelocity",
+                                 m_rightEncoder.GetRate());
+  frc::SmartDashboard::PutBoolean("Drive/ready", AtSpeed());
+}
+```
+
+**Is (Telemetry):**
+
+```cpp
+wpi::TelemetryTable& m_driveTelemetry = wpi::Telemetry::GetTable("Drive");
+
+void RobotPeriodic() {
+  m_driveTelemetry.Log("leftVelocity", m_leftEncoder.GetRate());
+  m_driveTelemetry.Log("rightVelocity", m_rightEncoder.GetRate());
+  m_driveTelemetry.Log("ready", AtSpeed());
+}
+```
+
+### Structured Dashboard Values
+
+**Was (WPILib 2026):**
+
+```cpp
+void RobotPeriodic() {
+  auto pose = m_poseEstimator.GetEstimatedPosition();
+  std::array<double, 3> robotPose{
+      pose.X().value(),
+      pose.Y().value(),
+      pose.Rotation().Radians().value(),
+  };
+  frc::SmartDashboard::PutNumberArray("RobotPose", robotPose);
+}
+```
+
+**Is (Telemetry):**
+
+```cpp
+void RobotPeriodic() {
+  wpi::Telemetry::Log("RobotPose", m_poseEstimator.GetEstimatedPosition());
+}
+```
+
+### Complex Sendable Values
+
+For objects that were previously published once with `frc::SmartDashboard::PutData()`, log the object periodically instead. This keeps the dashboard value refreshed through the Telemetry backend.
+
+**Was (WPILib 2026):**
+
+```cpp
+frc::Field2d m_field;
+
+void RobotInit() {
+  frc::SmartDashboard::PutData("Field", &m_field);
+}
+
+void RobotPeriodic() {
+  m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
+}
+```
+
+**Is (Telemetry):**
+
+```cpp
+wpi::Field2d m_field;
+
+void RobotPeriodic() {
+  m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
+  wpi::Telemetry::Log("Field", m_field);
+}
+```
+
+### SmartDashboard Tuning to Tunable
+
+If the old code used `GetNumber()` or another `Get*()` call to let dashboard changes feed back into robot behavior, migrate that value to the Tunable API instead of Telemetry.
+
+**Was (WPILib 2026):**
+
+```cpp
+double m_intakeSpeed = 0.65;
+
+void RobotPeriodic() {
+  frc::SmartDashboard::PutNumber("Intake/speed", m_intakeSpeed);
+  m_intakeSpeed =
+      frc::SmartDashboard::GetNumber("Intake/speed", m_intakeSpeed);
+  m_intakeMotor.Set(m_intakeSpeed);
+}
+```
+
+**Is (Tunable):**
+
+```cpp
+wpi::TunableDouble m_intakeSpeed =
+    wpi::Tunables::Add<double>("Intake/speed", 0.65);
+
+void RobotPeriodic() {
+  m_intakeMotor.Set(m_intakeSpeed.Get());
+}
+```
+
 ## Advanced: User-Facing Registry APIs
 
 Most robot code does not need `wpi::TelemetryRegistry`, but advanced C++ users may interact with it in a few cases:

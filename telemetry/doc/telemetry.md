@@ -216,6 +216,25 @@ Telemetry.log("targetPose", pose, Pose2d.struct);
 Telemetry.log("detectedTag", tagDetection, AprilTagDetection.proto);
 ```
 
+Robot-periodic status logging:
+
+```java
+public final class Robot extends TimedRobot {
+  private final DriveSubsystem m_drive = new DriveSubsystem();
+  private final TelemetryTable m_robotTelemetry = Telemetry.getTable("Robot");
+
+  @Override
+  public void robotPeriodic() {
+    m_robotTelemetry.log("batteryVoltage", RobotController.getBatteryVoltage());
+    m_robotTelemetry.log("enabled", DriverStation.isEnabled());
+    m_robotTelemetry.log("matchTime", Timer.getMatchTime());
+
+    Telemetry.log("drivePose", m_drive.getPose());
+    Telemetry.log("driveState", m_drive.getState().name());
+  }
+}
+```
+
 ### TelemetryTable
 
 `TelemetryTable` is the core abstraction behind the static facade. It represents a single path and provides hierarchical logging operations.
@@ -313,6 +332,23 @@ TelemetryTable odometry = estimator.getTable("Odometry");
 
 vision.log("tagCount", visibleTags.size());
 odometry.log("pose", currentPose);
+```
+
+Publishing arrays and collections with explicit element types:
+
+```java
+TelemetryTable drive = Telemetry.getTable("Drive");
+
+drive.log(
+    "moduleSpeedsMetersPerSecond",
+    new double[] {
+      frontLeft.getDriveVelocity(),
+      frontRight.getDriveVelocity(),
+      backLeft.getDriveVelocity(),
+      backRight.getDriveVelocity()
+    });
+drive.log("activeFaults", activeFaultNames, String.class);
+drive.log("plannedPath", plannedPoses, Pose2d.struct);
 ```
 
 ### TelemetryLoggable
@@ -663,6 +699,28 @@ Additionally, a `Struct` or `Protobuf` serializer can be specified explicitly fo
 telemetry.log("complexObject", complexObject, complexObjectStruct);
 ```
 
+### Pattern 5: Robot-loop diagnostics
+
+Use a root or subsystem table for values that make sense to update every loop, such as electrical health, control state, and the latest pose estimate.
+
+```java
+public final class DriveSubsystem extends SubsystemBase {
+  private final TelemetryTable m_telemetry = Telemetry.getTable("Drive");
+
+  @Override
+  public void periodic() {
+    m_telemetry.log("leftPositionMeters", m_leftEncoder.getDistance());
+    m_telemetry.log("rightPositionMeters", m_rightEncoder.getDistance());
+    m_telemetry.log("leftVelocityMetersPerSecond", m_leftEncoder.getRate());
+    m_telemetry.log("rightVelocityMetersPerSecond", m_rightEncoder.getRate());
+    m_telemetry.log("estimatedPose", m_poseEstimator.getEstimatedPosition());
+    m_telemetry.log("closedLoop", m_closedLoopEnabled);
+  }
+}
+```
+
+This keeps the dashboard path stable (`/Drive/...`) while keeping the telemetry calls next to the subsystem state they describe.
+
 ## Error Handling and Warnings
 
 The API prefers warnings over silent failure when a caller does something inconsistent or unsupported.
@@ -692,6 +750,121 @@ For more advanced cases, teams may still prefer to use NetworkTables or DataLog 
 - when a dashboard already expects a transport-specific schema
 
 The Telemetry API should be viewed as a convenience layer and object-modeling layer, not a replacement for every transport-specific feature.
+
+# Migration from WPILib 2026
+
+For values that were only displayed with `SmartDashboard.put*()`, use `Telemetry`. For values that were displayed and then read back with `SmartDashboard.get*()` so the dashboard could change robot behavior, use `Tunable` instead.
+
+## SmartDashboard Output to Telemetry
+
+**Was (WPILib 2026):**
+
+```java
+public void robotPeriodic() {
+  SmartDashboard.putNumber(
+      "Drive/leftVelocity", m_leftEncoder.getRate());
+  SmartDashboard.putNumber(
+      "Drive/rightVelocity", m_rightEncoder.getRate());
+  SmartDashboard.putBoolean("Drive/ready", atSpeed());
+}
+```
+
+**Is (Telemetry):**
+
+```java
+private final TelemetryTable m_driveTelemetry =
+    Telemetry.getTable("Drive");
+
+public void robotPeriodic() {
+  m_driveTelemetry.log("leftVelocity", m_leftEncoder.getRate());
+  m_driveTelemetry.log("rightVelocity", m_rightEncoder.getRate());
+  m_driveTelemetry.log("ready", atSpeed());
+}
+```
+
+## Structured Dashboard Values
+
+**Was (WPILib 2026):**
+
+```java
+public void robotPeriodic() {
+  Pose2d pose = m_poseEstimator.getEstimatedPosition();
+  SmartDashboard.putNumberArray(
+      "RobotPose",
+      new double[] {
+        pose.getX(),
+        pose.getY(),
+        pose.getRotation().getRadians()
+      });
+}
+```
+
+**Is (Telemetry):**
+
+```java
+public void robotPeriodic() {
+  Telemetry.log(
+      "RobotPose",
+      m_poseEstimator.getEstimatedPosition());
+}
+```
+
+## Complex Sendable Values
+
+For objects that were previously published once with `SmartDashboard.putData()`, log the object periodically instead. This keeps the dashboard value refreshed through the Telemetry backend.
+
+**Was (WPILib 2026):**
+
+```java
+private final Field2d m_field = new Field2d();
+
+public void robotInit() {
+  SmartDashboard.putData("Field", m_field);
+}
+
+public void robotPeriodic() {
+  m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+}
+```
+
+**Is (Telemetry):**
+
+```java
+private final Field2d m_field = new Field2d();
+
+public void robotPeriodic() {
+  m_field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+  Telemetry.log("Field", m_field);
+}
+```
+
+## SmartDashboard Tuning to Tunable
+
+If the old code used `getNumber()` or another `get*()` call to let dashboard changes feed back into robot behavior, migrate that value to the Tunable API instead of Telemetry.
+
+**Was (WPILib 2026):**
+
+```java
+private double m_intakeSpeed = 0.65;
+
+public void robotPeriodic() {
+  SmartDashboard.putNumber("Intake/speed", m_intakeSpeed);
+  m_intakeSpeed =
+      SmartDashboard.getNumber("Intake/speed", m_intakeSpeed);
+  m_intakeMotor.set(m_intakeSpeed);
+}
+```
+
+**Is (Tunable):**
+
+```java
+private final TunableDouble m_intakeSpeed =
+    Tunables.addDouble("Intake/speed", 0.65);
+
+public void robotPeriodic() {
+  m_intakeMotor.set(m_intakeSpeed.get());
+}
+```
 
 # Drawbacks
 

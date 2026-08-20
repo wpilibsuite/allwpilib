@@ -207,6 +207,143 @@ For frequent cross-thread exchange, use `queue.SimpleQueue`, a lock-protected im
 
 Callbacks run on the thread that calls `TunableRegistry.update()`, normally the main robot thread. Concurrent update calls serialize, but calling `update()` from a worker causes Python callbacks to run there and is not a substitute for synchronization.
 
+## Python Migration from WPILib 2026
+
+Key differences from 2026:
+
+- `wpilib.SmartDashboard.putNumber("key", value)` / `wpilib.SmartDashboard.getNumber("key", default)` called every loop is replaced with a single `tunable.Tunables.add_double("key", initial_value)` declaration that returns a `tunable.Tunable`. Read it with `get()` and write it with `set()`.
+- Direct NetworkTables entry/topic boilerplate is replaced by the same `tunable.Tunable` pattern; the backend handles the underlying NT entry lifecycle.
+- `wpilib.SendableChooser` is replaced by `tunable.Selectable`. The API is similar: `add(name, object)`, `add_default(name, object)`, `get_selected()`.
+- The `Sendable` interface and `wpilib.SmartDashboard.putData()` are not part of the Tunable API; objects that previously implemented `Sendable` should implement `tunable.ComplexTunable` or use a WPILib object that already does, then register via `tunable.Tunables.publish()`.
+
+### SmartDashboard Tuning to Tunable
+
+Use Tunable when the dashboard is allowed to change the value and robot code reads that value back.
+
+**Was (WPILib 2026):**
+
+```py
+def robotInit(self) -> None:
+    self.intake_speed = 0.65
+
+def robotPeriodic(self) -> None:
+    wpilib.SmartDashboard.putNumber("Intake/speed", self.intake_speed)
+    self.intake_speed = wpilib.SmartDashboard.getNumber(
+        "Intake/speed", self.intake_speed
+    )
+    self.intake_motor.set(self.intake_speed)
+```
+
+**Is (Tunable):**
+
+```py
+def robotInit(self) -> None:
+    self.intake_speed = tunable.Tunables.add_double("Intake/speed", 0.65)
+
+def robotPeriodic(self) -> None:
+    self.intake_motor.set(self.intake_speed.get())
+```
+
+Getter/setter-backed tunables are a closer match when existing robot code already owns the value or validates assignments:
+
+**Was (WPILib 2026):**
+
+```py
+def robotInit(self) -> None:
+    wpilib.SmartDashboard.putNumber(
+        "Drive/maxOutput", self.drive.get_max_output()
+    )
+
+def robotPeriodic(self) -> None:
+    max_output = wpilib.SmartDashboard.getNumber(
+        "Drive/maxOutput", self.drive.get_max_output()
+    )
+    self.drive.set_max_output(max_output)
+```
+
+**Is (Tunable getter/setter):**
+
+```py
+def robotInit(self) -> None:
+    tunable.Tunables.get_table().publish_double(
+        "Drive/maxOutput",
+        self.drive.get_max_output,
+        self.drive.set_max_output,
+    )
+```
+
+### Editable Field2d to Tunable
+
+**Was (WPILib 2026):**
+
+```py
+def robotInit(self) -> None:
+    self.field = wpilib.Field2d()
+    self.target = self.field.getObject("Target")
+    self.drive_target_pose = Pose2d()
+    wpilib.SmartDashboard.putData("Field", self.field)
+
+def robotPeriodic(self) -> None:
+    self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
+    self.drive_target_pose = self.target.getPose()
+```
+
+**Is (Tunable):**
+
+```py
+def robotInit(self) -> None:
+    self.field = wpilib.Field2d()
+    self.target = self.field.getObject("Target")
+    self.drive_target_pose = Pose2d()
+    tunable.Tunables.publish("Field", self.field)
+
+def robotPeriodic(self) -> None:
+    self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
+    self.drive_target_pose = self.target.getPose()
+```
+
+### SendableChooser to Selectable
+
+`tunable.Selectable` publishes the chooser data through the Tunable backend and returns the selected robot-owned object from `get_selected()`.
+
+**Was (WPILib 2026):**
+
+```py
+class DriveMode(Enum):
+    FIELD_RELATIVE = 1
+    ROBOT_RELATIVE = 2
+
+def robotInit(self) -> None:
+    self.drive_mode_chooser = wpilib.SendableChooser()
+    self.drive_mode_chooser.setDefaultOption(
+        "Field Relative", DriveMode.FIELD_RELATIVE
+    )
+    self.drive_mode_chooser.addOption(
+        "Robot Relative", DriveMode.ROBOT_RELATIVE
+    )
+    wpilib.SmartDashboard.putData("Drive Mode", self.drive_mode_chooser)
+
+def teleopPeriodic(self) -> None:
+    self.drive.set_mode(self.drive_mode_chooser.getSelected())
+```
+
+**Is (Selectable):**
+
+```py
+class DriveMode(Enum):
+    FIELD_RELATIVE = 1
+    ROBOT_RELATIVE = 2
+
+def robotInit(self) -> None:
+    self.drive_mode = tunable.Selectable[DriveMode]()
+    self.drive_mode.add_default("Field Relative", DriveMode.FIELD_RELATIVE)
+    self.drive_mode.add("Robot Relative", DriveMode.ROBOT_RELATIVE)
+    tunable.Tunables.publish("Drive/mode", self.drive_mode)
+
+def teleopPeriodic(self) -> None:
+    self.drive.set_mode(self.drive_mode.get_selected())
+```
+
 ## Python Backend and Test APIs
 
 Python exposes `TunableRegistry.set_report_warning(func_or_none)`, `report_warning(msg)`, `register_backend(prefix, backend)`, `get_backend(path)`, `get_table(path)`, `normalize_name(path)`, `update()`, `with_update_mutex(func)`, and `reset()`. Custom warning callbacks must not raise.

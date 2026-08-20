@@ -99,6 +99,113 @@ The GIL does not make a changing application object into a coherent multi-field 
 
 Custom backends and entries must accept concurrent entry creation, schema operations, logging, metadata updates, and removal. They must also copy mutable or borrowed input before retaining it beyond the call. The mock backend's `get_actions()` result is best treated as test-only live state; stop or synchronize concurrent logging before iterating it.
 
+## Python Migration from WPILib 2026
+
+For values that were only displayed with `wpilib.SmartDashboard.put*()`, use `telemetry.Telemetry`. For values that were displayed and then read back with `wpilib.SmartDashboard.get*()` so the dashboard could change robot behavior, use `tunable.Tunable` instead.
+
+### SmartDashboard Output to Telemetry
+
+**Was (WPILib 2026):**
+
+```py
+def robotPeriodic(self) -> None:
+    wpilib.SmartDashboard.putNumber(
+        "Drive/leftVelocity", self.left_encoder.getRate()
+    )
+    wpilib.SmartDashboard.putNumber(
+        "Drive/rightVelocity", self.right_encoder.getRate()
+    )
+    wpilib.SmartDashboard.putBoolean("Drive/ready", self.at_speed())
+```
+
+**Is (Telemetry):**
+
+```py
+def robotInit(self) -> None:
+    self.drive_telemetry = telemetry.Telemetry.get_table("Drive")
+
+def robotPeriodic(self) -> None:
+    self.drive_telemetry.log("leftVelocity", self.left_encoder.getRate())
+    self.drive_telemetry.log("rightVelocity", self.right_encoder.getRate())
+    self.drive_telemetry.log("ready", self.at_speed())
+```
+
+### Structured Dashboard Values
+
+**Was (WPILib 2026):**
+
+```py
+def robotPeriodic(self) -> None:
+    pose = self.pose_estimator.getEstimatedPosition()
+    wpilib.SmartDashboard.putNumberArray(
+        "RobotPose",
+        [pose.x, pose.y, pose.rotation().radians()],
+    )
+```
+
+**Is (Telemetry):**
+
+```py
+def robotPeriodic(self) -> None:
+    telemetry.Telemetry.log(
+        "RobotPose", self.pose_estimator.getEstimatedPosition()
+    )
+```
+
+### Complex Sendable Values
+
+For objects that were previously published once with `wpilib.SmartDashboard.putData()`, log the object periodically instead. This keeps the dashboard value refreshed through the Telemetry backend.
+
+**Was (WPILib 2026):**
+
+```py
+def robotInit(self) -> None:
+    self.field = wpilib.Field2d()
+    wpilib.SmartDashboard.putData("Field", self.field)
+
+def robotPeriodic(self) -> None:
+    self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
+```
+
+**Is (Telemetry):**
+
+```py
+def robotInit(self) -> None:
+    self.field = wpilib.Field2d()
+
+def robotPeriodic(self) -> None:
+    self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
+    telemetry.Telemetry.log("Field", self.field)
+```
+
+### SmartDashboard Tuning to Tunable
+
+If the old code used `getNumber()` or another `get*()` call to let dashboard changes feed back into robot behavior, migrate that value to the Tunable API instead of Telemetry.
+
+**Was (WPILib 2026):**
+
+```py
+def robotInit(self) -> None:
+    self.intake_speed = 0.65
+
+def robotPeriodic(self) -> None:
+    wpilib.SmartDashboard.putNumber("Intake/speed", self.intake_speed)
+    self.intake_speed = wpilib.SmartDashboard.getNumber(
+        "Intake/speed", self.intake_speed
+    )
+    self.intake_motor.set(self.intake_speed)
+```
+
+**Is (Tunable):**
+
+```py
+def robotInit(self) -> None:
+    self.intake_speed = tunable.Tunables.add_double("Intake/speed", 0.65)
+
+def robotPeriodic(self) -> None:
+    self.intake_motor.set(self.intake_speed.get())
+```
+
 ## Python Backend and Test APIs
 
 Python exposes `TelemetryRegistry.set_report_warning(func_or_none)`, `report_warning(path, msg)`, `register_backend(prefix, backend)`, `get_backend(path)`, `get_entry(path)`, `get_table(path)`, and `reset()`. Paths are normalized before backend lookup. Custom warning callbacks must not raise.

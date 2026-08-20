@@ -400,9 +400,164 @@ EXPECT_NEAR(drive.GetPID().GetP(), 0.1, 1e-9);
 
 `Get*()` methods read the current published value for primitive and vector tunables. `Set*()` methods queue remote writes and apply during `TunableRegistry::Update()`. The mock backend methods use C++ type names such as `GetBool()`/`SetBool()`, `GetInt32()`/`SetInt32()`, `GetInt64()`/`SetInt64()`, `GetFloat()`/`SetFloat()`, `GetDouble()`/`SetDouble()`, `GetString()`/`SetString()`, `GetRaw()`/`SetRaw()`, and corresponding vector getters/setters. Struct tunables can be read with `GetStructData()`, `GetStruct<T>()`, or `GetStructVector<T>()`; Protobuf tunables can be read with `GetProtobufData()` or `GetProtobuf<T>()`. `SetStruct()`/`SetStructVector()` and `SetProtobuf()` queue serialized remote writes.
 
-## C++ Migration Notes
+## C++ Migration from WPILib 2026
 
-- Replace direct NT entry/topic boilerplate with `wpi::Tunable<T>` values and `wpi::Tunables` publishing once an appropriate backend is registered.
-- For chooser use cases, replace `SendableChooser` patterns with `wpi::Selectable<T>`.
-- For composite objects, implement `wpi::ComplexTunable` and make member values `wpi::Tunable<T>` or publish non-tunable members with `table.Publish("name", this, &Class::member)`.
-- Expect template-based diagnostics for unsupported custom types; provide `CustomTunable<T>` or serialization traits where needed.
+Key differences from 2026:
+
+- `frc::SmartDashboard::PutNumber("key", value)` / `frc::SmartDashboard::GetNumber("key", default)` called every loop is replaced with a single `wpi::Tunables::Add<double>("key", initialValue)` declaration that returns a `wpi::TunableDouble`. Read it with `Get()` or implicit conversion and write it with assignment or `Set()`.
+- Direct NetworkTables entry/topic boilerplate is replaced by the same `wpi::Tunable<T>` pattern; the backend handles the underlying NT entry lifecycle.
+- `frc::SendableChooser<T>` is replaced by `wpi::Selectable<T>`. The API is similar: `Add(name, object)`, `AddDefault(name, object)`, `GetSelected()`.
+- The `Sendable` interface and `frc::SmartDashboard::PutData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `wpi::ComplexTunable` and register via `wpi::Tunables::Publish()`.
+
+### SmartDashboard Tuning to Tunable
+
+Use Tunable when the dashboard is allowed to change the value and robot code reads that value back.
+
+**Was (WPILib 2026):**
+
+```cpp
+double m_intakeSpeed = 0.65;
+
+void RobotPeriodic() {
+  frc::SmartDashboard::PutNumber("Intake/speed", m_intakeSpeed);
+  m_intakeSpeed =
+      frc::SmartDashboard::GetNumber("Intake/speed", m_intakeSpeed);
+  m_intakeMotor.Set(m_intakeSpeed);
+}
+```
+
+**Is (Tunable):**
+
+```cpp
+wpi::TunableDouble m_intakeSpeed =
+    wpi::Tunables::Add<double>("Intake/speed", 0.65);
+
+void RobotPeriodic() {
+  m_intakeMotor.Set(m_intakeSpeed.Get());
+}
+```
+
+For plain fields that already live in a subsystem, publish them from a `ComplexTunable` instead of manually writing and reading a dashboard key every loop.
+
+**Was (WPILib 2026):**
+
+```cpp
+class DriveSubsystem {
+ public:
+  double GetMaxOutput() const { return m_maxOutput; }
+
+  void SetMaxOutput(double value) {
+    m_maxOutput = value;
+  }
+
+ private:
+  double m_maxOutput = 0.8;
+};
+
+void RobotPeriodic() {
+  frc::SmartDashboard::PutNumber("Drive/maxOutput",
+                                 m_drive.GetMaxOutput());
+  m_drive.SetMaxOutput(frc::SmartDashboard::GetNumber(
+      "Drive/maxOutput", m_drive.GetMaxOutput()));
+}
+```
+
+**Is (ComplexTunable member):**
+
+```cpp
+class DriveSubsystem : public wpi::ComplexTunable {
+ public:
+  double GetMaxOutput() const { return m_maxOutput; }
+
+  void PublishTunable(wpi::TunableTable& table) override {
+    table.Publish("maxOutput", this, &DriveSubsystem::m_maxOutput);
+  }
+
+ private:
+  double m_maxOutput = 0.8;
+};
+
+void RobotInit() {
+  wpi::Tunables::Publish("Drive", m_drive);
+}
+```
+
+### Editable Field2d to Tunable
+
+**Was (WPILib 2026):**
+
+```cpp
+frc::Field2d m_field;
+frc::FieldObject2d* m_target = m_field.GetObject("Target");
+wpi::math::Pose2d m_driveTargetPose;
+
+void RobotInit() {
+  frc::SmartDashboard::PutData("Field", &m_field);
+}
+
+void RobotPeriodic() {
+  m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
+  m_driveTargetPose = m_target->GetPose();
+}
+```
+
+**Is (Tunable):**
+
+```cpp
+wpi::Field2d m_field;
+wpi::FieldObject2d* m_target = m_field.GetObject("Target");
+wpi::math::Pose2d m_driveTargetPose;
+
+void RobotInit() {
+  wpi::Tunables::Publish("Field", m_field);
+}
+
+void RobotPeriodic() {
+  m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
+  m_driveTargetPose = m_target->GetPose();
+}
+```
+
+### SendableChooser to Selectable
+
+`wpi::Selectable<T>` publishes the chooser data through the Tunable backend and returns the selected robot-owned object from `GetSelected()`.
+
+**Was (WPILib 2026):**
+
+```cpp
+enum class DriveMode { kFieldRelative, kRobotRelative };
+
+frc::SendableChooser<DriveMode> m_driveModeChooser;
+
+void RobotInit() {
+  m_driveModeChooser.SetDefaultOption("Field Relative",
+                                      DriveMode::kFieldRelative);
+  m_driveModeChooser.AddOption("Robot Relative",
+                               DriveMode::kRobotRelative);
+  frc::SmartDashboard::PutData("Drive Mode", &m_driveModeChooser);
+}
+
+void TeleopPeriodic() {
+  m_drive.SetMode(m_driveModeChooser.GetSelected());
+}
+```
+
+**Is (Selectable):**
+
+```cpp
+enum class DriveMode { kFieldRelative, kRobotRelative };
+
+wpi::Selectable<DriveMode> m_driveMode;
+
+void RobotInit() {
+  m_driveMode.AddDefault("Field Relative", DriveMode::kFieldRelative);
+  m_driveMode.Add("Robot Relative", DriveMode::kRobotRelative);
+  wpi::Tunables::Publish("Drive/mode", m_driveMode);
+}
+
+void TeleopPeriodic() {
+  m_drive.SetMode(m_driveMode.GetSelected());
+}
+```
+
+For composite objects that are not built into WPILib, implement `wpi::ComplexTunable` and make member values `wpi::Tunable<T>` or publish non-tunable members with `table.Publish("name", this, &Class::member)`. Expect template-based diagnostics for unsupported custom types; provide `CustomTunable<T>` or serialization traits where needed.
