@@ -229,6 +229,7 @@ static_assert(wpi::tunables::detail::CustomTunableType<CustomType>);
 class InspectableDoubleTunable : public wpi::tunables::TunableDouble {
  public:
   using wpi::tunables::TunableDouble::TunableDouble;
+  using wpi::tunables::TunableDouble::operator=;
 
   uint32_t GetUid() const { return GetTunableUid(); }
 };
@@ -650,6 +651,26 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MutateMarksTunablesChanged",
   CHECK(vector.Get() == (std::vector<int32_t>{1, 2, 3}));
   CHECK(integerInfo.IsChanged());
   CHECK(vectorInfo.IsChanged());
+}
+
+TEST_CASE_METHOD(TunableTest, "TunableTest SameScalarAssignmentDoesNotDirty",
+                 "[tunable]") {
+  InspectableDoubleTunable value{1.0};
+  wpi::tunables::Publish("value", value);
+
+  auto info = wpi::tunables::TunableRegistry::GetTunable(value.GetUid());
+  REQUIRE(info);
+  CHECK_FALSE(info.IsChanged());
+
+  value = 1.0;
+  info = wpi::tunables::TunableRegistry::GetTunable(value.GetUid());
+  REQUIRE(info);
+  CHECK_FALSE(info.IsChanged());
+
+  value = 2.0;
+  info = wpi::tunables::TunableRegistry::GetTunable(value.GetUid());
+  REQUIRE(info);
+  CHECK(info.IsChanged());
 }
 
 TEST_CASE_METHOD(

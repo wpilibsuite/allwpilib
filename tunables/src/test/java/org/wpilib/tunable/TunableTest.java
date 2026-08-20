@@ -433,6 +433,64 @@ class TunableTest {
   }
 
   @Test
+  void testStoredPrimitiveSameValueSetDoesNotDirty() {
+    final TunableBoolean bool = TunableBoolean.create(true);
+    final TunableInt integer = TunableInt.create(1);
+    final TunableLong longValue = TunableLong.create(2L);
+    final TunableFloat floatValue = TunableFloat.create(3.0f);
+    final TunableDouble doubleValue = TunableDouble.create(4.0);
+
+    bool.set(true);
+    integer.set(1);
+    longValue.set(2L);
+    floatValue.set(3.0f);
+    doubleValue.set(4.0);
+
+    assertFalse(bool.hasChanged());
+    assertFalse(integer.hasChanged());
+    assertFalse(longValue.hasChanged());
+    assertFalse(floatValue.hasChanged());
+    assertFalse(doubleValue.hasChanged());
+
+    bool.set(false);
+    integer.set(10);
+    longValue.set(20L);
+    floatValue.set(30.0f);
+    doubleValue.set(40.0);
+
+    assertTrue(bool.hasChanged());
+    assertTrue(integer.hasChanged());
+    assertTrue(longValue.hasChanged());
+    assertTrue(floatValue.hasChanged());
+    assertTrue(doubleValue.hasChanged());
+  }
+
+  @Test
+  void testGetterSetterPrimitiveSameValueSetDoesNotDirty() {
+    final double[] value = {1.0};
+    final AtomicInteger setterCalls = new AtomicInteger();
+    final TunableDouble tunable =
+        TunableDouble.create(
+            () -> value[0],
+            newValue -> {
+              setterCalls.incrementAndGet();
+              value[0] = newValue;
+            });
+
+    tunable.set(1.0);
+
+    assertEquals(1, setterCalls.get());
+    assertEquals(1.0, value[0]);
+    assertFalse(tunable.hasChanged());
+
+    tunable.set(2.0);
+
+    assertEquals(2, setterCalls.get());
+    assertEquals(2.0, value[0]);
+    assertTrue(tunable.hasChanged());
+  }
+
+  @Test
   void testTunableTablePublishStoredTunablesAndComplex() {
     TunableTable table = Tunables.getTable("table");
     final Tunable<StructThing> generic = Tunable.create(new StructThing(1));

@@ -62,6 +62,9 @@ public abstract class TunableInt extends TunableBase implements IntSupplier, Int
     return new TunableInt(config, true) {
       @Override
       public void set(int value) {
+        if (m_value == value) {
+          return;
+        }
         m_value = value;
         markChanged();
       }
@@ -95,10 +98,13 @@ public abstract class TunableInt extends TunableBase implements IntSupplier, Int
     return new TunableInt(config, true) {
       @Override
       public void set(int value) {
+        boolean changed = getter.getAsInt() != value;
         if (setter != null) {
           setter.accept(value);
         }
-        markChanged();
+        if (changed) {
+          markChanged();
+        }
       }
 
       @Override

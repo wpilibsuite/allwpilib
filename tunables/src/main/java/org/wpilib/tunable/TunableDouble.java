@@ -62,6 +62,9 @@ public abstract class TunableDouble extends TunableBase implements DoubleSupplie
     return new TunableDouble(config, true) {
       @Override
       public void set(double value) {
+        if (Double.compare(m_value, value) == 0) {
+          return;
+        }
         m_value = value;
         markChanged();
       }
@@ -95,10 +98,13 @@ public abstract class TunableDouble extends TunableBase implements DoubleSupplie
     return new TunableDouble(config, true) {
       @Override
       public void set(double value) {
+        boolean changed = Double.compare(getter.getAsDouble(), value) != 0;
         if (setter != null) {
           setter.accept(value);
         }
-        markChanged();
+        if (changed) {
+          markChanged();
+        }
       }
 
       @Override

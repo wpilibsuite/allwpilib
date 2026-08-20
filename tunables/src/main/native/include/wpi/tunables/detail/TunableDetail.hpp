@@ -56,6 +56,9 @@ class TunableValueBase : public detail::TunableBase {
   constexpr const T& Get() const { return m_value; }
 
   constexpr void Set(T value) {
+    if (m_value == value) {
+      return;
+    }
     m_value = std::move(value);
     SetTunableChanged();
   }

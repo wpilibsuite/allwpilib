@@ -62,6 +62,9 @@ public abstract class TunableLong extends TunableBase implements LongSupplier, L
     return new TunableLong(config, true) {
       @Override
       public void set(long value) {
+        if (m_value == value) {
+          return;
+        }
         m_value = value;
         markChanged();
       }
@@ -95,10 +98,13 @@ public abstract class TunableLong extends TunableBase implements LongSupplier, L
     return new TunableLong(config, true) {
       @Override
       public void set(long value) {
+        boolean changed = getter.getAsLong() != value;
         if (setter != null) {
           setter.accept(value);
         }
-        markChanged();
+        if (changed) {
+          markChanged();
+        }
       }
 
       @Override

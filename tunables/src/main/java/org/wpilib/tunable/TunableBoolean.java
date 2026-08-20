@@ -63,6 +63,9 @@ public abstract class TunableBoolean extends TunableBase
     return new TunableBoolean(config, true) {
       @Override
       public void set(boolean value) {
+        if (m_value == value) {
+          return;
+        }
         m_value = value;
         markChanged();
       }
@@ -96,10 +99,13 @@ public abstract class TunableBoolean extends TunableBase
     return new TunableBoolean(config, true) {
       @Override
       public void set(boolean value) {
+        boolean changed = getter.getAsBoolean() != value;
         if (setter != null) {
           setter.accept(value);
         }
-        markChanged();
+        if (changed) {
+          markChanged();
+        }
       }
 
       @Override

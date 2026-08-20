@@ -62,6 +62,9 @@ public abstract class TunableFloat extends TunableBase implements FloatSupplier,
     return new TunableFloat(config, true) {
       @Override
       public void set(float value) {
+        if (Float.compare(m_value, value) == 0) {
+          return;
+        }
         m_value = value;
         markChanged();
       }
@@ -95,10 +98,13 @@ public abstract class TunableFloat extends TunableBase implements FloatSupplier,
     return new TunableFloat(config, true) {
       @Override
       public void set(float value) {
+        boolean changed = Float.compare(getter.getAsFloat(), value) != 0;
         if (setter != null) {
           setter.accept(value);
         }
-        markChanged();
+        if (changed) {
+          markChanged();
+        }
       }
 
       @Override
