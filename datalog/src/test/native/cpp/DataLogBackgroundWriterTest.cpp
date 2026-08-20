@@ -7,11 +7,15 @@
 #include <chrono>
 #include <future>
 #include <memory>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+
+#include "wpi/datalog/DataLogReader.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
 
 namespace {
 
@@ -37,6 +41,45 @@ struct AutomaticOutputState {
 };
 
 }  // namespace
+
+TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
+          "[datalog][background-writer]") {
+  std::string extraHeader(1024 * 1024, 'x');
+  std::vector<uint8_t> output;
+  std::promise<void> headerWrittenPromise;
+  auto headerWritten = headerWrittenPromise.get_future();
+  bool headerWasWritten = false;
+  int entry;
+  {
+    wpi::log::DataLogBackgroundWriter writer{
+        [&](std::span<const uint8_t> data) {
+          output.insert(output.end(), data.begin(), data.end());
+          if (!headerWasWritten && output.size() >= extraHeader.size() + 12) {
+            headerWasWritten = true;
+            headerWrittenPromise.set_value();
+          }
+        },
+        30.0, extraHeader};
+
+    REQUIRE(headerWritten.wait_for(std::chrono::seconds{2}) ==
+            std::future_status::ready);
+    entry = writer.Start("integer", "int64", {}, 1);
+    writer.AppendInteger(entry, 42, 2);
+  }
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(output, "large-header")};
+  REQUIRE(reader.IsValid());
+  bool found = false;
+  for (const auto& record : reader) {
+    int64_t value;
+    if (record.GetEntry() == entry && record.GetInteger(&value) &&
+        value == 42) {
+      found = true;
+    }
+  }
+  CHECK(found);
+}
 
 TEST_CASE("DataLogBackgroundWriterTest ConcurrentDrainDoesNotDeadlock",
           "[datalog][background-writer]") {
