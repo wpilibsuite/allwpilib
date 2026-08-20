@@ -72,7 +72,7 @@ class WPILIB_DLLEXPORT TelemetryLoggable {
 
  public:
   /**
-   * Logs the object to a {@link TelemetryTable}.
+   * Logs the object to a @ref wpi::telemetry::TelemetryTable.
    *
    * @param table telemetry table
    */
