@@ -20,7 +20,7 @@ target_include_directories(
 wpilib_target_warnings(wpilibc)
 target_link_libraries(
     wpilibc
-    PUBLIC hal telemetry tunable ntcore wpimath datalog
+    PUBLIC hal telemetry tunables ntcore wpimath datalog
 )
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
