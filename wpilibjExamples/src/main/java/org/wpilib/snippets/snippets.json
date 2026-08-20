@@ -366,6 +366,10 @@
       "Joystick"
     ],
     "foldername": "mecanumdrive",
+    "gradlebase": "java",
+    "robotclass": "Robot"
+  },
+  {
     "name": "Controls Tutorial Examples",
     "description": "Demonstrates various control mechanisms: Flywheel (Bang-Bang and PIDF), Turret Position PIDF, Vertical Arm Position PIDF, and Elevator PIDF with motion profiling.",
     "tags": [

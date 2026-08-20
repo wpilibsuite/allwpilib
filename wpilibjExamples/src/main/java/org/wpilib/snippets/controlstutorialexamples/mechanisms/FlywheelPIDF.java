@@ -4,7 +4,7 @@
 
 package org.wpilib.snippets.controlstutorialexamples.mechanisms;
 
-import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
