@@ -171,8 +171,7 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
     SmartDashboard.putNumber(
         "VerticalArmPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(actualPosition));
     SmartDashboard.putNumber(
-        "VerticalArmPositionPIDF/DesiredPosition_degrees",
-        Units.radiansToDegrees(desiredPosition));
+        "VerticalArmPositionPIDF/DesiredPosition_degrees", Units.radiansToDegrees(desiredPosition));
   }
 
   /**
