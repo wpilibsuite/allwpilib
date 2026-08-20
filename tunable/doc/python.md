@@ -182,6 +182,31 @@ tunable.Tunables.publish("auto", chooser)
 
 `get_selected()` returns the selected value, falling back to the default, or `None` if neither name maps to a current option. Removing an option clears the default only if that option was the default; it does not change the selected option name.
 
+## Thread Safety and Secondary Threads
+
+Python `Tunable`, `ComplexTunable`, and `Selectable` objects are not internally thread-safe. `TunableRegistry.update()` releases the GIL while it waits for and enters the native update, and reacquires it when Python getters, setters, complex updates, and callbacks run. The GIL is therefore not a replacement for tunable synchronization.
+
+Use `TunableRegistry.with_update_mutex(func)` for occasional direct access from a secondary thread. When choosing this model, every competing access, including access from the main robot loop, must use it:
+
+```py
+gain_result: list[float] = []
+
+def update_gain() -> None:
+    drive_gain.set(0.08)
+    gain_result.append(drive_gain.get())
+
+tunable.TunableRegistry.with_update_mutex(update_gain)
+gain_copy = gain_result[0]
+```
+
+`with_update_mutex()` returns `None`, so copy results into caller-owned state inside the function. A mutable object returned by `get()` or `mutate()` must not be modified after leaving the critical section unless all competing access is still synchronized.
+
+The binding releases the GIL while waiting for the update mutex, which avoids making the GIL itself part of that wait. The supplied function runs with both the GIL and update mutex held. Keep it short, and avoid waiting for I/O or another thread. Python `Lock` objects and other application locks can still deadlock if `update()` holds the update mutex and waits for an application lock while a worker holds that application lock and waits for `with_update_mutex()`.
+
+For frequent cross-thread exchange, use `queue.SimpleQueue`, a lock-protected immutable snapshot, or another thread-safe application handoff and have the worker avoid direct access to the tunable. Getter/setter-backed `publish_*()` methods can bridge such state during the main-loop update. Their getter and setter run under the update mutex, but the backing state must still be safe for the worker. `always_get=True` and `mutable=False` affect polling and remote writes, not thread safety.
+
+Callbacks run on the thread that calls `TunableRegistry.update()`, normally the main robot thread. Concurrent update calls serialize, but calling `update()` from a worker causes Python callbacks to run there and is not a substitute for synchronization.
+
 ## Python Backend and Test APIs
 
 Python exposes `TunableRegistry.set_report_warning(func_or_none)`, `report_warning(msg)`, `register_backend(prefix, backend)`, `get_backend(path)`, `get_table(path)`, `normalize_name(path)`, `update()`, `with_update_mutex(func)`, and `reset()`. Custom warning callbacks must not raise.

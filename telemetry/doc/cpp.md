@@ -431,6 +431,18 @@ drive.Log("leftVelocity", leftVelocity);
 
 Property values are strings. When the backend expects JSON-formatted property values, callers are responsible for passing a valid JSON string representation.
 
+## Thread Safety
+
+`wpi::Telemetry` and `wpi::TelemetryTable` may be used from the main robot loop and secondary user threads at the same time when they route to WPILib-provided backends. There is no periodic update call or main-thread affinity. Concurrent calls to the same path are serialized where required by the backend, but their output order is unspecified.
+
+The values passed through `std::span`, `std::string_view`, references, serializers, and ADL hooks remain owned by the caller. They must stay alive and must not be modified concurrently for the duration of the call. A backend must copy any non-owning data it wants to retain after the call returns.
+
+`LogTo()` and `wpi::TelemetryLoggable::LogTo()` can issue several table calls and are not atomic as a group. For a coherent multi-field sample, make an immutable copy of the application state and log that copy. Do not rely on a table mutex to protect the object being inspected.
+
+Custom `wpi::TelemetryBackend` and `wpi::TelemetryEntry` implementations must support concurrent calls. In particular, `GetEntry()`, schema operations, entry logging and metadata methods, and `RemoveEntry()` can overlap during logging or backend rerouting. A previously returned entry may still be in use when its path is removed. The WPILib-provided backends satisfy this contract.
+
+The C++ mock backend protects writes, but `GetActions()`, `GetLastAction()`, and `GetSchema()` expose references or pointers whose lifetime is not protected after the method returns. Quiesce logging before inspecting or retaining those results; copying values with `GetLastValue<T>()` avoids retaining an internal value.
+
 ## Advanced: User-Facing Registry APIs
 
 Most robot code does not need `wpi::TelemetryRegistry`, but advanced C++ users may interact with it in a few cases:

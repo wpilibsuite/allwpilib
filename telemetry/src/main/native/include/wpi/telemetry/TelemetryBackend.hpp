@@ -14,7 +14,13 @@ namespace wpi {
 
 class TelemetryEntry;
 
-/** Interface for telemetry backends. */
+/**
+ * Interface for telemetry backends.
+ *
+ * Implementations registered with TelemetryRegistry must be thread-safe.
+ * Backend and entry methods may be called concurrently, and entry removal may
+ * overlap a call already in progress on a previously returned entry.
+ */
 class TelemetryBackend {
  public:
   TelemetryBackend() = default;

@@ -399,6 +399,51 @@ autoChooser.setDefault("Drive Straight");
 Tunables.publish("auto", autoChooser);
 ```
 
+## Thread Safety and Secondary Threads
+
+Tunable values, `ComplexTunable` implementations, and `Selectable` are not internally thread-safe. The normal usage model is to access them only from the main robot thread. `RobotBase` calls `TunableRegistry.update()` once per loop; that call applies remote writes, refreshes complex or getter-backed values, updates backends, resets change flags, and runs `onTune` callbacks while holding the registry's recursive update mutex.
+
+The mutex is held only for `update()` and registry operations. It is not held around the rest of the robot loop, including user `periodic()` methods. Consequently, wrapping only a worker-thread access does not make a tunable safe if main-loop code accesses the same object without synchronization.
+
+For occasional direct access from a secondary thread, use the registry update mutex. When choosing this model, every competing access must use the mutex. This includes reads, writes, in-place mutation, `Selectable` changes, and access to state used by a getter, setter, `updateTunable()`, or callback unless that state provides its own safe handoff. Batch related operations in one short critical section:
+
+```java
+final double[] result = new double[1];
+
+TunableRegistry.withUpdateMutex(
+    () -> {
+      driveGain.set(0.08);
+      result[0] = driveGain.get();
+    });
+```
+
+Main-loop code that reads `driveGain` must use `withUpdateMutex()` as well. The method returns `void`, so a value that must leave the critical section should be copied into caller-owned storage as shown above. Do not allow a mutable object returned by `get()` or `mutate()` to escape the critical section and then modify it without synchronization.
+
+The update mutex is global and is held while backend work, getters, setters, complex updates, and callbacks run. Code under the mutex should not wait for I/O, join another thread, or do other lengthy work. Be careful with application locks: if `update()` calls a getter or callback that waits for an application lock while another thread holds that lock and waits for the update mutex, the program deadlocks. Either always acquire the update mutex first or use a handoff design that does not nest the locks.
+
+For values exchanged frequently with a worker thread, prefer thread-safe application state instead of taking the global update mutex in the worker hot path:
+
+- Store a scalar in an atomic, or store a compound configuration as one immutable snapshot in an atomic reference. A getter/setter-backed tunable can exchange that snapshot during `update()`.
+
+- Queue worker-originated changes for the main loop to apply, and publish main-loop changes back to workers through an atomic or immutable snapshot. This keeps callbacks on the main thread and introduces at most one loop of handoff latency.
+
+For example, Java can back a published value with an atomic immutable snapshot and have worker code use the snapshot rather than the `TunableDouble` itself:
+
+```java
+record DriveConfig(double kP) {}
+
+AtomicReference<DriveConfig> driveConfig =
+    new AtomicReference<>(new DriveConfig(0.05));
+Tunables.publishDouble(
+    "drive/kP",
+    () -> driveConfig.get().kP(),
+    value -> driveConfig.set(new DriveConfig(value)));
+```
+
+The getter and setter are invoked during `update()` while the update mutex is held, but any state they access must still provide its own safe handoff, as `AtomicReference` does here. A worker reads all fields from one `driveConfig.get()` result. `Polling.ALWAYS_GET` only controls when a backend reads a value, and `isMutable=false` only rejects remote writes; neither option provides thread safety.
+
+Callbacks run on the thread that calls `TunableRegistry.update()`, normally the main robot thread. Calling `update()` from a worker is not a substitute for synchronizing tunable access: concurrent updates serialize, but callbacks then run on whichever thread performed that update.
+
 ## Backend Overview / Key Features
 
 Backends implement `TunableBackend`. Publishing a frontend tunable normalizes its path and registers it with the backend selected by `TunableRegistry`. `TunableRegistry.update()` calls each registered backend so remote writes can be applied, local values can be published, changed flags can be reset, complex tunables can update, and `onTune` callbacks can run after the update cycle has finished applying writes.

@@ -91,6 +91,14 @@ telemetry.Telemetry.log("drive", DriveSnapshot(3.2, 3.1))
 
 As in C++ and Java, table-valued objects are skipped when their target entry is discarded unless a more specific descendant backend can receive values under the child table.
 
+## Thread Safety
+
+Telemetry logging may be called from secondary Python threads as well as the main robot loop when using WPILib-provided backends. It does not depend on an `update()` call. The order of concurrent writes to the same path is unspecified, and the several calls made by `log_to()` are not one atomic snapshot.
+
+The GIL does not make a changing application object into a coherent multi-field sample. Copy the fields to an immutable snapshot, or use the lock that protects the application state, before logging. Mutable values such as `bytearray`, `memoryview`, lists, and WPIStruct objects must not be changed by other Python or native code while `log()` or `log_to()` is reading them.
+
+Custom backends and entries must accept concurrent entry creation, schema operations, logging, metadata updates, and removal. They must also copy mutable or borrowed input before retaining it beyond the call. The mock backend's `get_actions()` result is best treated as test-only live state; stop or synchronize concurrent logging before iterating it.
+
 ## Python Backend and Test APIs
 
 Python exposes `TelemetryRegistry.set_report_warning(func_or_none)`, `report_warning(path, msg)`, `register_backend(prefix, backend)`, `get_backend(path)`, `get_entry(path)`, `get_table(path)`, and `reset()`. Paths are normalized before backend lookup. Custom warning callbacks must not raise.

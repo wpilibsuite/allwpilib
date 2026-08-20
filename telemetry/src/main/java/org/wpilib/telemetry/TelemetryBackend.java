@@ -4,7 +4,13 @@
 
 package org.wpilib.telemetry;
 
-/** Interface for telemetry backends. */
+/**
+ * Interface for telemetry backends.
+ *
+ * <p>Implementations registered with {@link TelemetryRegistry} must be thread-safe. Backend and
+ * entry methods may be called concurrently, and entry removal or backend closure may overlap a call
+ * already in progress on a previously returned entry.
+ */
 public interface TelemetryBackend extends AutoCloseable {
   /**
    * Create an entry for the given path.

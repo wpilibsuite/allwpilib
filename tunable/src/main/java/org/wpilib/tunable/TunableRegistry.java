@@ -683,6 +683,11 @@ public final class TunableRegistry {
    * thread-safe, this is designed to allow external synchronization for tunables used in secondary
    * threads outside of the robot main loop.
    *
+   * <p>Every competing access, including main-loop access, must use this method or another safe
+   * handoff. The update mutex is held while backends and user callbacks run, so the function should
+   * be short and must not allow a mutable tunable value to escape and be accessed after the
+   * function completes.
+   *
    * @param func function to execute
    */
   public static void withUpdateMutex(Runnable func) {

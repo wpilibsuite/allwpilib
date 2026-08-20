@@ -33,7 +33,7 @@ class TelemetryRegistry final {
   /**
    * Set function used for reporting warning messages (e.g. type mismatches).
    *
-   * The reporting function must not throw.
+   * The reporting function may be called concurrently and must not throw.
    *
    * @param func reporting function; pass nullptr to use default
    */

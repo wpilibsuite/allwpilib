@@ -165,6 +165,12 @@ class TunableRegistry final {
    * synchronization for tunables used in secondary threads outside of the robot
    * main loop.
    *
+   * Every competing access, including main-loop access, must use this mutex or
+   * another safe handoff. The mutex is held while backends and user callbacks
+   * run, so critical sections should be short. References returned by a
+   * tunable must not be used after releasing the mutex if another thread can
+   * access the value.
+   *
    * Note the returned mutex is recursive, so registry operations invoked from
    * an update callback on the same thread can re-enter it. It still does not
    * make tunable objects themselves thread-safe.

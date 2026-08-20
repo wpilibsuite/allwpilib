@@ -14,6 +14,9 @@ import org.wpilib.util.struct.Struct;
  * <p>Implementations must not throw from logging, metadata, or discard-checking methods.
  * Recoverable failures should be reported through {@link TelemetryRegistry#reportWarning(String,
  * String)} and skipped.
+ *
+ * <p>Methods on the same entry may be called concurrently. Implementations must copy mutable input
+ * they retain after a method returns.
  */
 public interface TelemetryEntry {
   /**

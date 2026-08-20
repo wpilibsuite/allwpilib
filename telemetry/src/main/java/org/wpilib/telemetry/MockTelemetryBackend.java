@@ -12,7 +12,12 @@ import java.util.Map;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
 
-/** A telemetry backend that saves logged data to an array for unit testing purposes. */
+/**
+ * A telemetry backend that saves logged data to an array for unit testing purposes.
+ *
+ * <p>Logging is thread-safe, but callers must quiesce or externally synchronize logging while
+ * inspecting live results returned by this class.
+ */
 public class MockTelemetryBackend implements TelemetryBackend {
   /** Constructor. */
   public MockTelemetryBackend() {}

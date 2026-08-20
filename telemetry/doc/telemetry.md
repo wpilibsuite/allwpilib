@@ -421,6 +421,26 @@ Telemetry.log("batteryVoltage", RobotController.getMeasureBatteryVoltage());
 
 That call logs a numeric value at `/batteryVoltage` and attaches the unit as entry metadata, rather than creating `/batteryVoltage/` as a table.
 
+## Thread Safety and Concurrent Logging
+
+The Telemetry frontend and the WPILib-provided NetworkTables, DataLog, discard, and multi backends support concurrent logging. Robot code may call `Telemetry.log()` or methods on a shared `TelemetryTable` from secondary user threads; Telemetry has no `update()` method and does not require calls to run on the main robot thread.
+
+The thread-safety boundary is an individual logging or metadata call:
+
+- Calls from different threads may complete in either order. Concurrent calls to the same path are safe, but the resulting value order is unspecified.
+
+- Logging a `TelemetryLoggable` is a sequence of independent table operations, not an atomic snapshot. A consumer can observe some new fields and some old fields while the object is being logged. If the fields must be mutually consistent, the caller should copy the source state into an immutable snapshot before logging it, or hold the application's state lock while reading all of the fields.
+
+- Telemetry protects its own tables, entry caches, and registry state; it does not protect objects owned by robot code. The caller must prevent an array, collection, serialized object, or object read by `logTo()` from being mutated concurrently while Telemetry reads it. Backends consume values during the logging call; a custom backend that keeps mutable or non-owning input for later use must copy it first.
+
+- A path has one value type, and a table has one optional table type. If threads race to establish incompatible types, one type wins and the other value is skipped with a warning. Establish names, table types, properties, and duplicate-preservation settings during initialization when practical. Table type publication and the member logs performed by `logTo()` are separate operations, so consumers must also tolerate a newly appearing table being only partially populated.
+
+The registry remains usable while logging, including during backend replacement, but it does not serialize calls into a backend. A custom `TelemetryBackend` and each `TelemetryEntry` it returns must therefore be thread-safe: entry creation, schema publication, metadata changes, logging, removal, and backend lifecycle operations may overlap. An entry already obtained by a logging thread may receive a final call while another thread reroutes or removes its path. Backend implementations should use fine-grained synchronization so unrelated telemetry paths do not contend on one global lock.
+
+Registered type handlers and warning handlers can likewise be invoked concurrently by logging threads. They must protect any shared state and must not throw.
+
+`MockTelemetryBackend` synchronizes recording, but its inspection APIs may return live collections, references, or pointers. Tests should stop or otherwise synchronize logging before iterating those results or retaining returned references.
+
 ## Backend Overview / Key Features
 
 Backends implement `TelemetryBackend`. The backend's required factory method is `getEntry(String path)`, which returns a `TelemetryEntry` for a normalized full telemetry path. Backend entry creation, entry logging, metadata updates, discard checks, entry removal, and schema publication must not throw; recoverable failures should be reported as telemetry warnings and skipped, or represented with a discard entry. Backends may also override `removeEntry(String path)` so the registry can retire stale cached entries when backend routing changes. `TelemetryBackend` extends `AutoCloseable`, so `TelemetryRegistry.reset()` closes registered Java backends. Composite backends can override `ownsBackend()` to report child backends they close themselves.

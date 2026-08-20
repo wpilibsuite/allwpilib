@@ -19,6 +19,9 @@ namespace wpi {
  * Implementations must not throw from logging, metadata, or discard-checking
  * methods. Recoverable failures should be reported through
  * TelemetryRegistry::ReportWarning() and skipped.
+ *
+ * Methods on the same entry may be called concurrently. Implementations must
+ * copy spans and string views they retain after a method returns.
  */
 class TelemetryEntry {
  public:

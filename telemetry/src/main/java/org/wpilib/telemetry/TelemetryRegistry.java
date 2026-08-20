@@ -107,7 +107,7 @@ public final class TelemetryRegistry {
   /**
    * Set function used for reporting warning messages (e.g. type mismatches).
    *
-   * <p>The reporting function must not throw.
+   * <p>The reporting function may be called concurrently and must not throw.
    *
    * @param func reporting function; parameters are path and message; pass null to use default
    */

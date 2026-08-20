@@ -258,6 +258,29 @@ class Selectable final : public wpi::detail::SelectableBase {
 
 `Selectable<T>` requires `T` to be copy-constructible and default-initializable. If `T` is `std::shared_ptr<U>`, `GetSelected()` returns `std::weak_ptr<U>`. If no selected or default option exists, it returns a value-initialized `CopyType`.
 
+## Thread Safety and Secondary Threads
+
+Tunable objects, complex tunables, and `wpi::Selectable<T>` are not internally thread-safe. The default model is single-threaded access from the main robot loop. `wpi::TunableRegistry::Update()` holds one recursive update mutex while it updates complex tunables and backends, resets changes, and invokes callbacks, but the framework does not hold that mutex around user `Periodic()` methods.
+
+Occasional secondary-thread access is supported by locking `wpi::TunableRegistry::GetUpdateMutex()`. Every thread that might compete for the same tunable or its callback-backed state must use the same mutex, including the main robot thread:
+
+```cpp
+double gainCopy;
+{
+  std::scoped_lock lock{wpi::TunableRegistry::GetUpdateMutex()};
+  driveGain.Set(0.08);
+  gainCopy = driveGain.Get();
+}
+```
+
+For a string, vector, struct, or custom type, copy the value while the lock is held. `Get()` and `Mutate()` can return references; the lock no longer protects a reference after it is released. Moving or destroying a published C++ tunable also changes registry-held raw pointers and must not race with `Update()` or another access. Keep published tunables at a stable lifetime, or perform move and destruction under the update mutex once concurrent updates have started.
+
+Keep critical sections short. The mutex is global and `Update()` holds it across backend work, custom getters/setters, complex updates, and callbacks, so contention can delay both the worker and the robot loop. Do not wait for I/O or another thread while holding it. If these functions also acquire application locks, use a consistent order with the update mutex to avoid deadlock.
+
+For a high-rate worker, use `std::atomic` for scalar handoff, an atomic immutable snapshot such as `std::atomic<std::shared_ptr<const Config>>` for compound state, or a queue consumed by the main loop. Have the worker access that handoff rather than the `wpi::Tunable` itself. Apply queued worker changes to the tunable on the main thread and publish tuned values back through the atomic snapshot. This avoids a global registry lock in the worker hot path at the cost of up to one robot-loop iteration of latency.
+
+Polling and mutability options do not change this contract. `ALWAYS_GET` controls backend polling and `isMutable = false` prevents remote writes; neither synchronizes the value. Callbacks run on the thread that invokes `Update()`, normally the main robot thread. Concurrent `Update()` calls serialize, but calling it from a worker changes callback thread affinity and is not a replacement for a safe handoff.
+
 ## C++ Usage Examples
 
 ### Simple tunable constants

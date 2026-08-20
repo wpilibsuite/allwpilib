@@ -21,7 +21,9 @@ namespace wpi {
 
 /**
  * A telemetry backend that saves logged data to an array for unit testing
- * purposes.
+ * purposes. Logging is thread-safe, but callers must quiesce or externally
+ * synchronize logging while inspecting references or pointers returned by
+ * this class.
  */
 class MockTelemetryBackend : public TelemetryBackend {
  public:

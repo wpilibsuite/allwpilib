@@ -1813,16 +1813,20 @@ void wpi::InitTunablePython(py::module_& m) {
                     py::gil_scoped_release release;
                     TunableRegistry::Update();
                   })
-      .def_static("with_update_mutex",
-                  [](py::function func) {
-                    std::unique_lock lock{TunableRegistry::GetUpdateMutex(),
-                                          std::defer_lock};
-                    {
-                      py::gil_scoped_release release;
-                      lock.lock();
-                    }
-                    func();
-                  })
+      .def_static(
+          "with_update_mutex",
+          [](py::function func) {
+            std::unique_lock lock{TunableRegistry::GetUpdateMutex(),
+                                  std::defer_lock};
+            {
+              py::gil_scoped_release release;
+              lock.lock();
+            }
+            func();
+          },
+          py::arg("func"),
+          "Run a short function while holding the registry update "
+          "mutex; every competing tunable access must participate.")
       .def_static("reset", [] {
         ClearValues();
         {
