@@ -188,3 +188,27 @@ double CommandXboxController::GetLeftTrigger() const {
 double CommandXboxController::GetRightTrigger() const {
   return m_controller->GetRightTrigger();
 }
+
+CommandPtr CommandXboxController::RumbleLeft(const double value) const {
+  return m_hid->RumbleLeft(value);
+}
+
+CommandPtr CommandXboxController::RumbleRight(const double value) const {
+  return m_hid->RumbleRight(value);
+}
+
+CommandPtr CommandXboxController::RumbleBoth(const double value) const {
+  return m_hid->RumbleBoth(value);
+}
+
+CommandPtr CommandXboxController::RumbleLeftTrigger(const double value) const {
+  return m_hid->RumbleLeftTrigger(value);
+}
+
+CommandPtr CommandXboxController::RumbleRightTrigger(const double value) const {
+  return m_hid->RumbleRightTrigger(value);
+}
+
+CommandPtr CommandXboxController::RumbleTriggers(const double value) const {
+  return m_hid->RumbleTriggers(value);
+}
