@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,6 +98,24 @@ class TelemetryTableTest {
 
     private final CountDownLatch m_enteredLogTo;
     private final CountDownLatch m_releaseLogTo;
+  }
+
+  private static final class RegisteringTelemetryBackend extends MockTelemetryBackend {
+    RegisteringTelemetryBackend(TelemetryBackend replacement) {
+      m_replacement = replacement;
+    }
+
+    @Override
+    public TelemetryEntry getEntry(String path) {
+      if ("/rerouted/.type".equals(TelemetryRegistry.normalizeName(path))
+          && m_registered.compareAndSet(false, true)) {
+        TelemetryRegistry.registerBackend("", m_replacement);
+      }
+      return super.getEntry(path);
+    }
+
+    private final TelemetryBackend m_replacement;
+    private final AtomicBoolean m_registered = new AtomicBoolean();
   }
 
   private static final class BlockingDiscardTelemetryBackend implements TelemetryBackend {
@@ -1670,5 +1689,21 @@ class TelemetryTableTest {
     assertFalse(table.setType("B"));
     assertEquals("A", table.getType());
     assertEquals(1, m_warnings.size());
+  }
+
+  @Test
+  void testSetTypeRejectsMismatchAfterBackendResetDuringTypePublication() {
+    MockTelemetryBackend replacement = new MockTelemetryBackend();
+    TelemetryRegistry.registerBackend("", new RegisteringTelemetryBackend(replacement));
+    TelemetryTable table = Telemetry.getTable("rerouted");
+
+    assertTrue(table.setType("FirstType"));
+    assertFalse(table.setType("OtherType"));
+    assertEquals("FirstType", table.getType());
+    assertEquals(
+        new MockTelemetryBackend.LogStringValue("FirstType", "string"),
+        replacement.getLastValue("/rerouted/.type", MockTelemetryBackend.LogStringValue.class));
+    assertEquals(1, m_warnings.size());
+    assertTrue(m_warnings.get(0).contains("table type mismatch"));
   }
 }

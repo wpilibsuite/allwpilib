@@ -19,24 +19,38 @@ std::string_view TelemetryTable::GetPath() const {
 }
 
 bool TelemetryTable::SetType(std::string_view typeString) {
-  std::string expectedType;
-  {
-    std::scoped_lock lock{m_mutex};
-    if (!m_type.empty()) {
-      if (m_type == typeString) {
-        return true;
+  for (;;) {
+    std::string expectedType;
+    uint64_t resetGeneration = 0;
+    {
+      std::scoped_lock lock{m_mutex};
+      if (!m_type.empty()) {
+        if (m_type == typeString) {
+          return true;
+        }
+        expectedType = m_type;
+      } else {
+        m_type = typeString;
+        resetGeneration = m_resetGeneration;
       }
-      expectedType = m_type;
-    } else {
-      m_type = typeString;
     }
+    if (!expectedType.empty()) {
+      TypeMismatch(expectedType, typeString);
+      return false;
+    }
+
+    auto entry = GetEntry(".type");
+    {
+      std::scoped_lock lock{m_mutex};
+      if (m_resetGeneration != resetGeneration || m_type != typeString) {
+        continue;
+      }
+    }
+    if (!entry->IsDiscard()) {
+      entry->LogString(typeString, "string");
+    }
+    return true;
   }
-  if (!expectedType.empty()) {
-    TypeMismatch(expectedType, typeString);
-    return false;
-  }
-  Log(".type", typeString);
-  return true;
 }
 
 std::string TelemetryTable::GetType() const {

@@ -130,6 +130,26 @@ class CountingSchemaBackend : public wpi::telemetry::MockTelemetryBackend {
   std::atomic_int m_schemaAdds{0};
 };
 
+class RegisteringTelemetryBackend
+    : public wpi::telemetry::MockTelemetryBackend {
+ public:
+  explicit RegisteringTelemetryBackend(
+      std::shared_ptr<wpi::telemetry::MockTelemetryBackend> replacement)
+      : m_replacement{std::move(replacement)} {}
+
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
+      std::string_view path) override {
+    if (path == "/rerouted/.type" && !m_registered.exchange(true)) {
+      wpi::telemetry::TelemetryRegistry::RegisterBackend("", m_replacement);
+    }
+    return wpi::telemetry::MockTelemetryBackend::GetEntry(path);
+  }
+
+ private:
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> m_replacement;
+  std::atomic_bool m_registered{false};
+};
+
 struct Formattable {
   int value = 0;
 };
@@ -901,6 +921,30 @@ TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest ResetClearsTableTypes",
   auto typeValue =
       Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/test/.type");
   REQUIRE(typeValue.value == "TestStructLoggableType");
+}
+
+TEST_CASE_METHOD(TelemetryTableTest,
+                 "TelemetryTableTest "
+                 "SetTypeRejectsMismatchAfterBackendResetDuringTypePublication",
+                 "[telemetry]") {
+  auto replacement = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<telemetrytest::RegisteringTelemetryBackend>(
+              replacement));
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/rerouted/");
+
+  REQUIRE(table.SetType("FirstType"));
+  CHECK_FALSE(table.SetType("OtherType"));
+  CHECK(table.GetType() == "FirstType");
+  auto typeValue =
+      replacement
+          ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+              "/rerouted/.type");
+  REQUIRE(typeValue.has_value());
+  CHECK(typeValue->value == "FirstType");
+  CHECK(typeValue->typeString == "string");
+  REQUIRE(warnings.size() == 1u);
+  CHECK(warnings[0].second.find("table type mismatch") != std::string::npos);
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,

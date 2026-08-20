@@ -195,6 +195,11 @@ public final class TelemetryRegistry {
         Collections.newSetFromMap(new IdentityHashMap<>());
     Set<TelemetryBackend> displacedBackends = Collections.newSetFromMap(new IdentityHashMap<>());
     synchronized (s_backends) {
+      // Reset table generations before backend routing changes become visible.
+      for (var table : s_tables.values()) {
+        table.reset();
+      }
+
       TelemetryBackend oldBackend = s_backends.put(normalizedPrefix, backend);
       if (oldBackend != null) {
         displacedBackends.add(oldBackend);
@@ -214,11 +219,6 @@ public final class TelemetryRegistry {
       }
     }
     removeBackendsSharingOwnershipWith(displacedBackends, registeredBackends);
-
-    // reset cached entries in tables
-    for (var table : s_tables.values()) {
-      table.reset();
-    }
 
     try {
       for (var entry : removedEntries) {
@@ -365,6 +365,11 @@ public final class TelemetryRegistry {
       s_typeHandlers.clear();
     }
     synchronized (s_backends) {
+      // Reset table generations before backend routing changes become visible.
+      for (var table : s_tables.values()) {
+        table.reset();
+      }
+
       for (var entry : s_entryBackends.entrySet()) {
         removedEntries.add(new RemovedEntry(entry.getValue(), entry.getKey()));
       }
@@ -379,11 +384,6 @@ public final class TelemetryRegistry {
     }
     closeBackends(backends, Collections.emptySet());
     s_entryMetadata.clear();
-
-    // reset cached entries in tables
-    for (var table : s_tables.values()) {
-      table.reset();
-    }
   }
 
   static String normalizeTableName(String path) {

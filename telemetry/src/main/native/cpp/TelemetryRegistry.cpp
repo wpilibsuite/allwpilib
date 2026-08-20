@@ -197,6 +197,11 @@ void TelemetryRegistry::RegisterBackend(
   std::vector<RemovedEntry> removedEntries;
   {
     std::scoped_lock lock{inst.mutex};
+    // Reset table generations before backend routing changes become visible.
+    for (auto& table : inst.tables) {
+      table.second.Reset();
+    }
+
     inst.backends[prefix] = std::move(backend);
 
     for (auto it = inst.entryBackends.begin();
@@ -209,11 +214,6 @@ void TelemetryRegistry::RegisterBackend(
       } else {
         ++it;
       }
-    }
-
-    // reset cached entries in tables
-    for (auto& table : inst.tables) {
-      table.second.Reset();
     }
   }
 
@@ -376,13 +376,13 @@ void TelemetryRegistry::Reset() {
   {
     std::scoped_lock lock{inst.mutex};
 
-    for (const auto& [path, backend] : inst.entryBackends) {
-      removedEntries.push_back({backend, path});
-    }
-
-    // reset cached entries in tables
+    // Reset table generations before backend routing changes become visible.
     for (auto& table : inst.tables) {
       table.second.Reset();
+    }
+
+    for (const auto& [path, backend] : inst.entryBackends) {
+      removedEntries.push_back({backend, path});
     }
 
     // clear backends

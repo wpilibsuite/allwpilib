@@ -88,10 +88,10 @@ public final class TelemetryTable {
 
   /** Clears the table's cached entries. */
   void reset() {
-    m_tableAliasesMap.clear();
-    m_tablesMap.clear();
-    m_entriesMap.clear();
     synchronized (this) {
+      m_tableAliasesMap.clear();
+      m_tablesMap.clear();
+      m_entriesMap.clear();
       m_type = null;
       m_hasNonDiscardDescendant = null;
       m_resetGeneration.incrementAndGet();
@@ -116,23 +116,44 @@ public final class TelemetryTable {
    * @return False if type mismatch.
    */
   public boolean setType(String typeString) {
-    synchronized (this) {
-      if (m_type != null) {
-        if (m_type.equals(typeString)) {
-          return true;
+    for (; ; ) {
+      String expectedType = null;
+      long resetGeneration;
+      synchronized (this) {
+        if (m_type != null) {
+          if (m_type.equals(typeString)) {
+            return true;
+          }
+          expectedType = m_type;
+          resetGeneration = -1;
+        } else {
+          m_type = typeString;
+          resetGeneration = m_resetGeneration.get();
         }
-        typeMismatch(typeString);
+      }
+      if (expectedType != null) {
+        typeMismatch(expectedType, typeString);
         return false;
       }
-      m_type = typeString;
+
+      TelemetryEntry entry = getEntry(".type");
+      boolean publishType;
+      synchronized (this) {
+        publishType =
+            m_resetGeneration.get() == resetGeneration && Objects.equals(typeString, m_type);
+      }
+      if (publishType) {
+        if (!entry.isDiscard()) {
+          entry.logString(typeString, "string");
+        }
+        return true;
+      }
     }
-    log(".type", typeString);
-    return true;
   }
 
-  private void typeMismatch(String typeString) {
+  private void typeMismatch(String expectedType, String typeString) {
     TelemetryRegistry.reportWarning(
-        m_path, "table type mismatch, expected '" + getType() + "', got '" + typeString + "'");
+        m_path, "table type mismatch, expected '" + expectedType + "', got '" + typeString + "'");
   }
 
   /**
