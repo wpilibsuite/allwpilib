@@ -236,6 +236,13 @@ class ComplexTunable : public wpi::tunables::detail::TunableBase {
 
 The protected child helpers mirror the Java `ComplexTunable` helpers: they can publish, remove, or mark a child changed under every currently published path for the complex object. `PublishTunable()` should still publish the complete current child set so migration and full republish operations can recreate it. `PublishTunable()` and `UpdateTunable()` must not throw; if they do, registry and backend state is not guaranteed to be restored.
 
+Child values can be represented in two ways:
+
+- Use an embedded `wpi::tunables::Tunable<T>` member when the child is a tunable setting in its own right. Local assignments to the child go through the `Tunable` object, so dirty tracking is direct and does not require a registry child-name lookup. Stored scalar tunables also skip dirtying when the assigned value compares equal to the current value.
+- Use a plain member variable and publish it with `table.Publish("name", this, &Class::member)` when the value already belongs to the object as normal state, when callbacks must rebuild derived state, or when the value is better modeled as state that can also be tuned. Remote writes update the plain member through a generated member wrapper. Local writes to the plain member do not automatically dirty the child; call `SetChildTunableChanged("name")` after a real value change, or use an `AlwaysGet()` config when backend polling should observe the member during `TunableRegistry::Update()`. Avoid calling `SetChildTunableChanged()` unconditionally from hot loop code; compare first.
+
+Move behavior follows the chosen representation. Embedded `Tunable<T>` children own their own registrations, so defaulted move operations are usually the right choice when every child is an ordinary member tunable. Plain-member children have no child object to move; the registry-owned wrapper refers back to the `ComplexTunable` parent. If a plain-member complex tunable is movable, explicitly define move operations that invoke the `ComplexTunable` move operation and move or copy the plain state. If the object has dynamic child registrations or other state that cannot be safely transferred, delete move operations instead.
+
 ### `wpi::tunables::Selectable<T>`
 
 Chooser-style complex tunable:
@@ -319,7 +326,7 @@ wpi::tunables::Publish("drive/targetPose", targetPose);
 
 ### Complex tunable with `Tunable` member variables
 
-If the member is already a `Tunable` object, publish it by reference.
+If the member is already a `Tunable` object, publish it by reference. This is the simplest choice for local settings that may be assigned from robot code; the child `Tunable` marks itself dirty directly.
 
 ```cpp
 class TunablePIDController : public wpi::tunables::ComplexTunable {
@@ -327,10 +334,18 @@ class TunablePIDController : public wpi::tunables::ComplexTunable {
   TunablePIDController(double p, double i, double d)
       : m_kP{p}, m_kI{i}, m_kD{d} {}
 
+  TunablePIDController(TunablePIDController&&) = default;
+  TunablePIDController& operator=(TunablePIDController&&) = default;
+
   void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("kP", m_kP);
     table.Publish("kI", m_kI);
     table.Publish("kD", m_kD);
+  }
+
+  void SetP(double p) {
+    // TunableDouble compares and marks itself changed when the value differs.
+    m_kP = p;
   }
 
  private:
@@ -345,7 +360,7 @@ wpi::tunables::Publish("arm/pid", armPID);
 
 ### Complex tunable with plain member variables
 
-If the member is a plain field rather than a `Tunable`, publish it using the pointer-to-member overload.
+If the member is a plain field rather than a `Tunable`, publish it using the pointer-to-member overload. This is useful when the field is part of the object's normal state or when a tuned value needs a callback to rebuild dependent state.
 
 ```cpp
 class TunablePIDController : public wpi::tunables::ComplexTunable {
@@ -353,10 +368,34 @@ class TunablePIDController : public wpi::tunables::ComplexTunable {
   TunablePIDController(double p, double i, double d)
       : m_kP{p}, m_kI{i}, m_kD{d} {}
 
+  TunablePIDController(TunablePIDController&& other)
+      : wpi::tunables::ComplexTunable{std::move(other)},
+        m_kP{other.m_kP},
+        m_kI{other.m_kI},
+        m_kD{other.m_kD} {}
+
+  TunablePIDController& operator=(TunablePIDController&& other) {
+    if (this != &other) {
+      wpi::tunables::ComplexTunable::operator=(std::move(other));
+      m_kP = other.m_kP;
+      m_kI = other.m_kI;
+      m_kD = other.m_kD;
+    }
+    return *this;
+  }
+
   void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("kP", this, &TunablePIDController::m_kP);
     table.Publish("kI", this, &TunablePIDController::m_kI);
     table.Publish("kD", this, &TunablePIDController::m_kD);
+  }
+
+  void SetP(double p) {
+    if (m_kP == p) {
+      return;
+    }
+    m_kP = p;
+    SetChildTunableChanged("kP");
   }
 
  private:
