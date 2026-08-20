@@ -57,7 +57,7 @@ TEST_CASE_METHOD(PIDTelemetryTest, "PIDInputOutputTest LogsTelemetry",
   controller.SetIZone(5.0);
   controller.Calculate(7.0, 10.0);
 
-  wpi::telemetry::Telemetry::Log("pid", controller);
+  wpi::telemetry::Log("pid", controller);
 
   CHECK(Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/pid/.type")
             .value == "PIDController");

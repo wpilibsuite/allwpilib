@@ -20,33 +20,33 @@ class Robot : public wpi::TimedRobot {
     // The PDP returns the current in increments of 0.125A.
     // At low currents the current readings tend to be less accurate.
     double current7 = pdp.GetCurrent(7);
-    wpi::telemetry::Telemetry::Log("Current Channel 7", current7);
+    wpi::telemetry::Log("Current Channel 7", current7);
 
     // Get the voltage going into the PDP, in Volts.
     // The PDP returns the voltage in increments of 0.05 Volts.
     double voltage = pdp.GetVoltage();
-    wpi::telemetry::Telemetry::Log("Voltage", voltage);
+    wpi::telemetry::Log("Voltage", voltage);
 
     // Retrieves the temperature of the PDP, in degrees Celsius.
     double temperatureCelsius = pdp.GetTemperature();
-    wpi::telemetry::Telemetry::Log("Temperature", temperatureCelsius);
+    wpi::telemetry::Log("Temperature", temperatureCelsius);
 
     // Get the total current of all channels.
     double totalCurrent = pdp.GetTotalCurrent();
-    wpi::telemetry::Telemetry::Log("Total Current", totalCurrent);
+    wpi::telemetry::Log("Total Current", totalCurrent);
 
     // Get the total power of all channels.
     // Power is the bus voltage multiplied by the current with the units Watts.
     double totalPower = pdp.GetTotalPower();
-    wpi::telemetry::Telemetry::Log("Total Power", totalPower);
+    wpi::telemetry::Log("Total Power", totalPower);
 
     // Get the total energy of all channels.
     // Energy is the power summed over time with units Joules.
     double totalEnergy = pdp.GetTotalEnergy();
-    wpi::telemetry::Telemetry::Log("Total Energy", totalEnergy);
+    wpi::telemetry::Log("Total Energy", totalEnergy);
 
     // Put the PDP itself to the dashboard
-    wpi::telemetry::Telemetry::Log("PDP", pdp);
+    wpi::telemetry::Log("PDP", pdp);
   }
 
  private:

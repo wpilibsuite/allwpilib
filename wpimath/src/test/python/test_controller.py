@@ -32,7 +32,7 @@ def test_pid_controller_logs_telemetry(telemetry_backend):
     controller.set_i_zone(5.0)
     controller.calculate(7.0, 10.0)
 
-    telemetry.Telemetry.log("pid", controller)
+    telemetry.log("pid", controller)
 
     assert telemetry_backend.get_last_value("/pid/.type") == "PIDController"
     assert telemetry_backend.get_last_value("/pid/p") == pytest.approx(0.5)
@@ -46,7 +46,7 @@ def test_pid_controller_logs_telemetry(telemetry_backend):
 
 def test_pid_controller_tuned_setpoint_updates_setpoint_state(tunable_backend):
     controller = PIDController(0.5, 0.0, 0.0)
-    tunable.Tunables.publish("pid", controller)
+    tunable.publish("pid", controller)
 
     assert controller.at_setpoint() is False
 

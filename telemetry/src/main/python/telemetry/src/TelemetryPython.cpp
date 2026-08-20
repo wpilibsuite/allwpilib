@@ -548,26 +548,25 @@ void wpi::InitTelemetryPython(py::module_& m) {
            py::kw_only(), py::arg("element_type") = py::none(),
            py::arg("type_string") = "", kLogDoc);
 
-  py::class_<wpi::telemetry::Telemetry>(m, "Telemetry")
-      .def_static(
-          "get_table",
-          [](std::string_view name) {
-            auto& root = wpi::telemetry::Telemetry::GetTable();
-            return PyTelemetryTable{name.empty() ? root : root.GetTable(name)};
-          },
-          py::arg("name") = "")
-      .def_static(
-          "log",
-          [](std::string_view name, py::object value, py::object elementType,
-             std::string_view typeString) {
-            PyTelemetryTable{wpi::telemetry::Telemetry::GetTable()}.Log(
-                name, value, std::move(elementType), typeString);
-          },
-          py::arg("name"), py::arg("value"), py::kw_only(),
-          py::arg("element_type") = py::none(), py::arg("type_string") = "",
-          kLogDoc)
-      .def_static("keep_duplicates", &wpi::telemetry::Telemetry::KeepDuplicates)
-      .def_static("set_property", &wpi::telemetry::Telemetry::SetProperty);
+  m.def(
+      "get_table",
+      [](std::string_view name) {
+        auto& root = wpi::telemetry::GetTable();
+        return PyTelemetryTable{name.empty() ? root : root.GetTable(name)};
+      },
+      py::arg("name") = "");
+  m.def(
+      "log",
+      [](std::string_view name, py::object value, py::object elementType,
+         std::string_view typeString) {
+        PyTelemetryTable{wpi::telemetry::GetTable()}.Log(
+            name, value, std::move(elementType), typeString);
+      },
+      py::arg("name"), py::arg("value"), py::kw_only(),
+      py::arg("element_type") = py::none(), py::arg("type_string") = "",
+      kLogDoc);
+  m.def("keep_duplicates", &wpi::telemetry::KeepDuplicates);
+  m.def("set_property", &wpi::telemetry::SetProperty);
 
   py::class_<wpi::telemetry::TelemetryRegistry>(m, "TelemetryRegistry")
       .def_static(

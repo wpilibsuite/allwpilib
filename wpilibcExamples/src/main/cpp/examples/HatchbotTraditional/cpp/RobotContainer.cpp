@@ -20,7 +20,7 @@ RobotContainer::RobotContainer() {
   chooser.Add("Complex Auto", &complexAuto);
 
   // Put the chooser on the dashboard
-  wpi::tunable::Tunables::Publish("Autonomous", chooser);
+  wpi::tunable::Publish("Autonomous", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -55,6 +55,6 @@ wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
 
 void RobotContainer::UpdateTelemetry() const {
   // Put subsystems to dashboard.
-  wpi::telemetry::Telemetry::Log("Drivetrain", drive);
-  wpi::telemetry::Telemetry::Log("HatchSubsystem", hatch);
+  wpi::telemetry::Log("Drivetrain", drive);
+  wpi::telemetry::Log("HatchSubsystem", hatch);
 }

@@ -34,7 +34,7 @@ class Robot : public wpi::TimedRobot {
    * robot mode.
    */
   void RobotPeriodic() override {
-    wpi::telemetry::Telemetry::Log("Encoder", encoder.GetDistance());
+    wpi::telemetry::Log("Encoder", encoder.GetDistance());
   }
 
   Robot() {

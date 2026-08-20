@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpiutil
@@ -54,7 +55,7 @@ class MyRobot(wpilib.TimedRobot):
         self.wrist.set_angle(self.wrist_pot.get())
 
         # post the mechanism to the dashboard
-        wpilib.Telemetry.log("Mech2d", self.mech)
+        telemetry.log("Mech2d", self.mech)
 
     def teleop_periodic(self):
         self.elevator_motor.set_throttle(self.joystick.get_raw_axis(0))

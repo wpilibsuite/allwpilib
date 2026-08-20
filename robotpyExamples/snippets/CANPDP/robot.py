@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 
 
@@ -24,33 +25,33 @@ class MyRobot(wpilib.TimedRobot):
 
     def robot_periodic(self):
         # Put the PDP itself to the dashboard
-        wpilib.Telemetry.log("PDP", self.pdp)
+        telemetry.log("PDP", self.pdp)
 
         # Get the current going through channel 7, in Amperes.
         # The PDP returns the current in increments of 0.125A.
         # At low currents the current readings tend to be less accurate.
         current7 = self.pdp.get_current(7)
-        wpilib.Telemetry.log("Current Channel 7", current7)
+        telemetry.log("Current Channel 7", current7)
 
         # Get the voltage going into the PDP, in Volts.
         # The PDP returns the voltage in increments of 0.05 Volts.
         voltage = self.pdp.get_voltage()
-        wpilib.Telemetry.log("Voltage", voltage)
+        telemetry.log("Voltage", voltage)
 
         # Retrieves the temperature of the PDP, in degrees Celsius.
         temperature_celsius = self.pdp.get_temperature()
-        wpilib.Telemetry.log("Temperature", temperature_celsius)
+        telemetry.log("Temperature", temperature_celsius)
 
         # Get the total current of all channels.
         total_current = self.pdp.get_total_current()
-        wpilib.Telemetry.log("Total Current", total_current)
+        telemetry.log("Total Current", total_current)
 
         # Get the total power of all channels.
         # Power is the bus voltage multiplied by the current with the units Watts.
         total_power = self.pdp.get_total_power()
-        wpilib.Telemetry.log("Total Power", total_power)
+        telemetry.log("Total Power", total_power)
 
         # Get the total energy of all channels.
         # Energy is the power summed over time with units Joules.
         total_energy = self.pdp.get_total_energy()
-        wpilib.Telemetry.log("Total Energy", total_energy)
+        telemetry.log("Total Energy", total_energy)

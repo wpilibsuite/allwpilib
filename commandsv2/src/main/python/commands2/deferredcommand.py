@@ -1,7 +1,7 @@
 # validated: 2024-01-24 DS 192a28af4731 DeferredCommand.java
 from typing import Callable
 
-from wpilib import TelemetryTable
+from telemetry import TelemetryTable
 
 from .command import Command
 from .commandscheduler import CommandScheduler

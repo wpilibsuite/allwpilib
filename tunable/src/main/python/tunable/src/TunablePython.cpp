@@ -1725,74 +1725,59 @@ void wpi::InitTunablePython(py::module_& m) {
           py::arg("properties") = py::none(), py::arg("type_string") = "")
       .def("remove", &PyTunableTable::Remove);
 
-  py::class_<wpi::tunable::Tunables>(m, "Tunables")
-      .def_static(
-          "get_table",
-          [](std::string_view name) {
-            return PyTunableTable{name.empty()
-                                      ? wpi::tunable::Tunables::GetTable()
-                                      : wpi::tunable::Tunables::GetTable(name),
-                                  nullptr};
-          },
-          py::arg("name") = "")
-      .def_static("publish",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{wpi::tunable::Tunables::GetTable(),
-                                          nullptr}
-                        .Publish(name, value);
-                  })
-      .def_static(
-          "add",
-          [](std::string_view name, py::object value, py::object valueType,
-             py::object elementType, bool robust, bool isMutable,
-             py::object onTune, py::object properties, std::string typeString) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), std::move(valueType),
-                     std::move(elementType), robust, isMutable,
-                     std::move(onTune), std::move(properties),
-                     std::move(typeString));
-          },
-          py::arg("name"), py::arg("value"), py::kw_only(),
-          py::arg("value_type") = py::none(),
-          py::arg("element_type") = py::none(), py::arg("robust") = false,
-          py::arg("mutable") = true, py::arg("on_tune") = py::none(),
-          py::arg("properties") = py::none(), py::arg("type_string") = "")
-      .def_static(
-          "add_boolean",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), BuiltinType("bool"), py::none(),
-                     false, true, py::none(), py::none(), "");
-          })
-      .def_static(
-          "add_int",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), BuiltinType("int"), py::none(),
-                     false, true, py::none(), py::none(), "");
-          })
-      .def_static(
-          "add_long",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), BuiltinType("int"), py::none(),
-                     false, true, py::none(), py::none(), "");
-          })
-      .def_static(
-          "add_float",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), BuiltinType("float"), py::none(),
-                     false, true, py::none(), py::none(), "");
-          })
-      .def_static(
-          "add_double",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
-                .Add(name, std::move(value), BuiltinType("float"), py::none(),
-                     false, true, py::none(), py::none(), "");
-          })
-      .def_static("remove", &RemoveRootValue);
+  m.def(
+      "get_table",
+      [](std::string_view name) {
+        return PyTunableTable{name.empty() ? wpi::tunable::GetTable()
+                                           : wpi::tunable::GetTable(name),
+                              nullptr};
+      },
+      py::arg("name") = "");
+  m.def("publish", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Publish(name,
+                                                                     value);
+  });
+  m.def(
+      "add",
+      [](std::string_view name, py::object value, py::object valueType,
+         py::object elementType, bool robust, bool isMutable, py::object onTune,
+         py::object properties, std::string typeString) {
+        return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+            name, std::move(value), std::move(valueType),
+            std::move(elementType), robust, isMutable, std::move(onTune),
+            std::move(properties), std::move(typeString));
+      },
+      py::arg("name"), py::arg("value"), py::kw_only(),
+      py::arg("value_type") = py::none(), py::arg("element_type") = py::none(),
+      py::arg("robust") = false, py::arg("mutable") = true,
+      py::arg("on_tune") = py::none(), py::arg("properties") = py::none(),
+      py::arg("type_string") = "");
+  m.def("add_boolean", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+        name, std::move(value), BuiltinType("bool"), py::none(), false, true,
+        py::none(), py::none(), "");
+  });
+  m.def("add_int", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+        name, std::move(value), BuiltinType("int"), py::none(), false, true,
+        py::none(), py::none(), "");
+  });
+  m.def("add_long", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+        name, std::move(value), BuiltinType("int"), py::none(), false, true,
+        py::none(), py::none(), "");
+  });
+  m.def("add_float", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+        name, std::move(value), BuiltinType("float"), py::none(), false, true,
+        py::none(), py::none(), "");
+  });
+  m.def("add_double", [](std::string_view name, py::object value) {
+    return PyTunableTable{wpi::tunable::GetTable(), nullptr}.Add(
+        name, std::move(value), BuiltinType("float"), py::none(), false, true,
+        py::none(), py::none(), "");
+  });
+  m.def("remove", &RemoveRootValue);
 
   py::class_<wpi::tunable::TunableRegistry>(m, "TunableRegistry")
       .def_static("set_report_warning",
@@ -1826,8 +1811,7 @@ void wpi::InitTunablePython(py::module_& m) {
       .def_static(
           "get_table",
           [](std::string_view path) {
-            return PyTunableTable{wpi::tunable::Tunables::GetTable(path),
-                                  nullptr};
+            return PyTunableTable{wpi::tunable::GetTable(path), nullptr};
           },
           py::arg("path"))
       .def_static(

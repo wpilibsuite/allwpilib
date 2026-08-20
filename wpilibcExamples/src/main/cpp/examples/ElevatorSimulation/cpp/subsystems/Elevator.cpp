@@ -34,9 +34,9 @@ void Elevator::UpdateTelemetry() {
 
   // Put Mechanism 2d to telemetry
   // To view the Elevator visualization, select Network Tables ->
-  // wpi::telemetry::Telemetry
+  // Telemetry
   // -> Elevator Sim
-  wpi::telemetry::Telemetry::Log("Elevator Sim", mech2d);
+  wpi::telemetry::Log("Elevator Sim", mech2d);
 }
 
 void Elevator::ReachGoal(wpi::units::meter_t goal) {

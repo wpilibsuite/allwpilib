@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 
 
@@ -23,5 +24,5 @@ class MyRobot(wpilib.TimedRobot):
         # 1 is fully on, 0 is fully off
         output = self.duty_cycle.get_output()
 
-        wpilib.Telemetry.log("Frequency", frequency)
-        wpilib.Telemetry.log("Duty Cycle", output)
+        telemetry.log("Frequency", frequency)
+        telemetry.log("Duty Cycle", output)

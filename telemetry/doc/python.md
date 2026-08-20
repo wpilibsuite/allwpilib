@@ -9,7 +9,7 @@ This file describes the Python telemetry API exposed by the `telemetry` package.
 
 The primary entry points are:
 
-- `telemetry.Telemetry` for root-level logging
+- `telemetry.log()` and related root-level functions for root-level logging
 - `telemetry.TelemetryTable` for grouped logging under a normalized path
 - `telemetry.TelemetryLoggable` or any object with a `log_to(table)` method for table-valued objects
 - `telemetry.TelemetryRegistry` for backend registration, warning hooks, and test setup
@@ -17,19 +17,19 @@ The primary entry points are:
 ```py
 import telemetry
 
-telemetry.Telemetry.log("batteryVoltage", 12.4)
-telemetry.Telemetry.log("enabled", True)
+telemetry.log("batteryVoltage", 12.4)
+telemetry.log("enabled", True)
 
-drive = telemetry.Telemetry.get_table("drive")
+drive = telemetry.get_table("drive")
 drive.log("leftVelocity", 3.2)
 drive.log("rightVelocity", 3.1)
 ```
 
-`Telemetry.get_table()` returns the root table, and `Telemetry.get_table("drive")` returns a `TelemetryTable` with path `/drive/`. `TelemetryTable.path` exposes that normalized path. Tables also expose `get_table()`, `set_type()`, `get_type()`, `has_type()`, `keep_duplicates()`, `set_property()`, and `log()`.
+`telemetry.get_table()` returns the root table, and `telemetry.get_table("drive")` returns a `TelemetryTable` with path `/drive/`. `TelemetryTable.path` exposes that normalized path. Tables also expose `get_table()`, `set_type()`, `get_type()`, `has_type()`, `keep_duplicates()`, `set_property()`, and `log()`.
 
 ## Python Value Dispatch
 
-`Telemetry.log(name, value, *, element_type=None, type_string="")` and `TelemetryTable.log(name, value, *, element_type=None, type_string="")` support:
+`telemetry.log(name, value, *, element_type=None, type_string="")` and `TelemetryTable.log(name, value, *, element_type=None, type_string="")` support:
 
 - `bool`, `int`, `float`, and `str` scalars
 - `bytes`, `bytearray`, and `memoryview` as raw bytes
@@ -61,10 +61,10 @@ class TelemetryPoint:
     x: wpistruct.double
     y: wpistruct.int32
 
-telemetry.Telemetry.log("rawFrame", bytearray(b"abc"), type_string="image/custom")
-telemetry.Telemetry.log("wheelSpeeds", [1.0, 2.5], element_type=float)
-telemetry.Telemetry.log("point", TelemetryPoint(1.5, 2))
-telemetry.Telemetry.log("points", [TelemetryPoint(1.0, 2)], element_type=TelemetryPoint)
+telemetry.log("rawFrame", bytearray(b"abc"), type_string="image/custom")
+telemetry.log("wheelSpeeds", [1.0, 2.5], element_type=float)
+telemetry.log("point", TelemetryPoint(1.5, 2))
+telemetry.log("points", [TelemetryPoint(1.0, 2)], element_type=TelemetryPoint)
 ```
 
 If an unsupported scalar object does not provide `log_to()`, the Python frontend logs `str(value)` as a string when the selected entry is not discarded.
@@ -86,7 +86,7 @@ class DriveSnapshot(telemetry.TelemetryLoggable):
         table.log("leftMetersPerSecond", self.left)
         table.log("rightMetersPerSecond", self.right)
 
-telemetry.Telemetry.log("drive", DriveSnapshot(3.2, 3.1))
+telemetry.log("drive", DriveSnapshot(3.2, 3.1))
 ```
 
 As in C++ and Java, table-valued objects are skipped when their target entry is discarded unless a more specific descendant backend can receive values under the child table.
@@ -101,7 +101,7 @@ Custom backends and entries must accept concurrent entry creation, schema operat
 
 ## Python Migration from WPILib 2026
 
-For values that were only displayed with `wpilib.SmartDashboard.put*()`, use `telemetry.Telemetry`. For values that were displayed and then read back with `wpilib.SmartDashboard.get*()` so the dashboard could change robot behavior, use `tunable.Tunable` instead.
+For values that were only displayed with `wpilib.SmartDashboard.put*()`, use `telemetry.log()`. For values that were displayed and then read back with `wpilib.SmartDashboard.get*()` so the dashboard could change robot behavior, use `tunable.Tunable` instead.
 
 ### SmartDashboard Output to Telemetry
 
@@ -122,7 +122,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotInit(self) -> None:
-    self.drive_telemetry = telemetry.Telemetry.get_table("Drive")
+    self.drive_telemetry = telemetry.get_table("Drive")
 
 def robotPeriodic(self) -> None:
     self.drive_telemetry.log("leftVelocity", self.left_encoder.getRate())
@@ -147,7 +147,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotPeriodic(self) -> None:
-    telemetry.Telemetry.log(
+    telemetry.log(
         "RobotPose", self.pose_estimator.getEstimatedPosition()
     )
 ```
@@ -175,7 +175,7 @@ def robotInit(self) -> None:
 
 def robotPeriodic(self) -> None:
     self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
-    telemetry.Telemetry.log("Field", self.field)
+    telemetry.log("Field", self.field)
 ```
 
 ### SmartDashboard Tuning to Tunable
@@ -200,7 +200,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotInit(self) -> None:
-    self.intake_speed = tunable.Tunables.add_double("Intake/speed", 0.65)
+    self.intake_speed = tunable.add_double("Intake/speed", 0.65)
 
 def robotPeriodic(self) -> None:
     self.intake_motor.set(self.intake_speed.get())
@@ -221,6 +221,6 @@ backend = telemetry.MockTelemetryBackend()
 telemetry.TelemetryRegistry.reset()
 telemetry.TelemetryRegistry.register_backend("", backend)
 
-telemetry.Telemetry.log("enabled", True)
+telemetry.log("enabled", True)
 assert backend.get_last_value("/enabled") is True
 ```

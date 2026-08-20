@@ -176,7 +176,7 @@ TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest TunableCancel",
   CommandScheduler scheduler = GetScheduler();
   auto backend = std::make_shared<wpi::tunable::MockTunableBackend>();
   wpi::tunable::TunableRegistry::RegisterBackend("", backend);
-  wpi::tunable::Tunables::Publish("Scheduler", scheduler);
+  wpi::tunable::Publish("Scheduler", scheduler);
 
   auto namesUid = backend->GetUid("/Scheduler/Names");
   CHECK(namesUid);
@@ -234,7 +234,7 @@ TEST_CASE_METHOD(CommandScheduleTest,
   wpi::tunable::TunableRegistry::RegisterBackend(
       "", std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
               ntState.inst, "/Tunables"));
-  wpi::tunable::Tunables::Publish("Scheduler", scheduler);
+  wpi::tunable::Publish("Scheduler", scheduler);
 
   auto valueSub =
       ntState.inst.GetIntegerArrayTopic("/Tunables/Scheduler/Cancel/value")

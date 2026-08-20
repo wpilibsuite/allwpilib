@@ -59,5 +59,5 @@ void Drivetrain::SimulationPeriodic() {
 void Drivetrain::Periodic() {
   UpdateOdometry();
   fieldSim.SetRobotPose(odometry.GetPose());
-  wpi::telemetry::Telemetry::Log("Field", fieldSim);
+  wpi::telemetry::Log("Field", fieldSim);
 }

@@ -38,7 +38,7 @@ TEST_CASE_METHOD(Field2dTest,
                  "Field2dTest DashboardEditsRobotPoseThroughTunable",
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
-  wpi::tunable::Tunables::Publish("field", field);
+  wpi::tunable::Publish("field", field);
 
   wpi::math::Pose2d pose{1_m, 2_m, 30_deg};
   mock->SetStructVector<wpi::math::Pose2d>("/field/Robot", std::vector{pose});
@@ -52,7 +52,7 @@ TEST_CASE_METHOD(Field2dTest,
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
   wpi::FieldObject2d* existing = field.GetObject("target");
-  wpi::tunable::Tunables::Publish("field", field);
+  wpi::tunable::Publish("field", field);
 
   wpi::math::Pose2d first{1_m, 2_m, 30_deg};
   wpi::math::Pose2d second{3_m, 4_m, 60_deg};
@@ -71,7 +71,7 @@ TEST_CASE_METHOD(Field2dTest,
                  "Field2dTest DashboardEditsObjectCreatedAfterTunablePublish",
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
-  wpi::tunable::Tunables::Publish("field", field);
+  wpi::tunable::Publish("field", field);
   wpi::FieldObject2d* late = field.GetObject("target");
 
   wpi::math::Pose2d pose{1_m, 2_m, 30_deg};
@@ -89,7 +89,7 @@ TEST_CASE_METHOD(Field2dTest,
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
   field.GetObject("stale");
-  wpi::tunable::Tunables::Publish("field", field);
+  wpi::tunable::Publish("field", field);
 
   {
     wpi::Field2d replacement;

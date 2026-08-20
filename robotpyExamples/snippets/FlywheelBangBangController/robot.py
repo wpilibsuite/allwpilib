@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
+import tunable
 import wpilib
 import wpilib_drivers
 import math
@@ -71,10 +73,10 @@ class MyRobot(wpilib.TimedRobot):
         self.flywheel_sim = wpilib.simulation.FlywheelSim(self.plant, self.gearbox)
         self.encoder_sim = wpilib.simulation.EncoderSim(self.encoder)
 
-        wpilib.Tunables.publish("BangBang Controller", self.bang_bang_controler)
+        tunable.publish("BangBang Controller", self.bang_bang_controler)
 
     def robot_periodic(self) -> None:
-        wpilib.Telemetry.log("BangBang Controller", self.bang_bang_controler)
+        telemetry.log("BangBang Controller", self.bang_bang_controler)
 
     def teleop_periodic(self) -> None:
         """Controls flywheel to a set velocity (RPM) controlled by a joystick."""

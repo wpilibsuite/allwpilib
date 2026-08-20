@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS f29a7d2e501b WaitCommand.java
 from __future__ import annotations
 
-from wpilib import TelemetryTable, Timer
+from telemetry import TelemetryTable
+from wpilib import Timer
 from wpimath import units
 
 from .command import Command

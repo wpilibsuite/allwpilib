@@ -23,8 +23,8 @@ class Robot : public wpi::TimedRobot {
     prevXAccel = xAccel;
     prevYAccel = yAccel;
 
-    wpi::telemetry::Telemetry::Log("X Jerk", xJerk);
-    wpi::telemetry::Telemetry::Log("Y Jerk", yJerk);
+    wpi::telemetry::Log("X Jerk", xJerk);
+    wpi::telemetry::Log("Y Jerk", yJerk);
   }
 
  private:

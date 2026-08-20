@@ -148,7 +148,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
   wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   Controller controller{0.0, 0.0, 0.0, {1_rad_per_s, 1_rad_per_s_sq}};
-  wpi::tunable::Tunables::Publish("profiled", controller);
+  wpi::tunable::Publish("profiled", controller);
 
   auto constraintsUid = backend->GetUid("/profiled/constraints");
   REQUIRE(constraintsUid.has_value());
@@ -186,7 +186,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedGoalUpdatesGoal", "[wpimath]") {
   wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   Controller controller{0.0, 0.0, 0.0, {1_rad_per_s, 1_rad_per_s_sq}};
-  wpi::tunable::Tunables::Publish("profiled", controller);
+  wpi::tunable::Publish("profiled", controller);
 
   auto goalUid = backend->GetUid("/profiled/goal");
   REQUIRE(goalUid.has_value());

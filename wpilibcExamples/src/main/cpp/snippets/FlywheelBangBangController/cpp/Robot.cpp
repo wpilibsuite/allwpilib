@@ -41,12 +41,12 @@ class Robot : public wpi::TimedRobot {
     flywheelMotor.SetVoltage(bangOutput +
                              0.9 * feedforward.Calculate(setpoint));
 
-    wpi::telemetry::Telemetry::Log("BangBangController", bangBangController);
+    wpi::telemetry::Log("BangBangController", bangBangController);
   }
 
   Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
-    wpi::tunable::Tunables::Publish("BangBangController", bangBangController);
+    wpi::tunable::Publish("BangBangController", bangBangController);
   }
 
   /**

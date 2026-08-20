@@ -26,7 +26,7 @@ class CommandTunableButtonTest : public CommandTestBase {
     m_backend = std::make_shared<wpi::tunable::MockTunableBackend>();
     wpi::tunable::TunableRegistry::RegisterBackend("", m_backend);
     m_command = StartEnd([this] { m_schedule++; }, [this] { m_cancel++; });
-    wpi::tunable::Tunables::Publish("command", *m_command->get());
+    wpi::tunable::Publish("command", *m_command->get());
   }
 
   ~CommandTunableButtonTest() override {
@@ -173,7 +173,7 @@ TEST_CASE_METHOD(
   wpi::tunable::TunableRegistry::RegisterBackend(
       "", std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
               ntState.inst, "/Tunables"));
-  wpi::tunable::Tunables::Publish("command", command);
+  wpi::tunable::Publish("command", command);
 
   auto name =
       ntState.inst.GetStringTopic("/Tunables/command/name").Subscribe("");

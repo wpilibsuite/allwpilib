@@ -33,7 +33,7 @@ def test_networktables_lifecycle_matches_glass_run_cancel(
             lambda: False,
         )
         command.set_name("Glass Label")
-        tunable.Tunables.publish("command", command)
+        tunable.publish("command", command)
 
         name = nt_instance.get_string_topic("/Tunables/command/name").subscribe("")
         assert (

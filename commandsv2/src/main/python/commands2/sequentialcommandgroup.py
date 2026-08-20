@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import List
 
-from wpilib import TelemetryTable
+from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler

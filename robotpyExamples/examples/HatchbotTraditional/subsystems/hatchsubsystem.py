@@ -4,6 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 import commands2
 
@@ -27,7 +28,7 @@ class HatchSubsystem(commands2.Subsystem):
         """Releases the hatch"""
         self.hatch_solenoid.set(wpilib.DoubleSolenoid.Value.REVERSE)
 
-    def log_to(self, table: wpilib.TelemetryTable) -> None:
+    def log_to(self, table: telemetry.TelemetryTable) -> None:
         super().log_to(table)
         table.log(
             "extended",

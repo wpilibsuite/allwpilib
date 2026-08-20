@@ -194,14 +194,14 @@ TEST_CASE_METHOD(
   auto inst = wpi::nt::NetworkTableInstance::GetDefault();
   MockRobot robot;
 
-  wpi::telemetry::Telemetry::Log("telemetryDouble", 2.5);
+  wpi::telemetry::Log("telemetryDouble", 2.5);
 
   auto telemetrySub =
       inst.GetDoubleTopic("/Telemetry/telemetryDouble").Subscribe(0.0);
   CHECK(telemetrySub.Get() == 2.5);
 
   wpi::tunable::TunableDouble tunable{1.0};
-  wpi::tunable::Tunables::Publish("tunableDouble", tunable);
+  wpi::tunable::Publish("tunableDouble", tunable);
 
   auto tunableSub =
       inst.GetDoubleTopic("/Tunables/tunableDouble").Subscribe(0.0);

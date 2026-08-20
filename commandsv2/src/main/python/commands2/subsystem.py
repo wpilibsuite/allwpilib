@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .command import Command
     from .commandscheduler import CommandScheduler
 
-from wpilib import TelemetryLoggable, TelemetryTable
+from telemetry import TelemetryLoggable, TelemetryTable
 
 
 class Subsystem(TelemetryLoggable):

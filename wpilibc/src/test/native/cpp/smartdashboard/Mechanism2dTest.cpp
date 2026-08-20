@@ -32,7 +32,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
                  "[wpilibc][smartdashboard]") {
   wpi::Mechanism2d mechanism{5, 10};
 
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto actions = mock->GetActions();
     REQUIRE(actions.size() == 3u);
@@ -52,7 +52,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
   }
 
   mechanism.SetBackgroundColor({255, 255, 255});
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto color = mock->GetLastValue<
         wpi::telemetry::MockTelemetryBackend::LogStringValue>(
@@ -66,7 +66,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Root",
                  "[wpilibc][smartdashboard]") {
   wpi::Mechanism2d mechanism{5, 10};
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto pos =
         mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
@@ -77,7 +77,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Root",
     mock->Clear();
   }
   root->SetPosition(2, 4);
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto pos =
         mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
@@ -95,7 +95,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
   wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
       "ligament", 3, wpi::units::degree_t{90}, 1,
       wpi::util::Color8Bit{255, 255, 255});
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
     REQUIRE(angle);
@@ -118,7 +118,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);
-  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Log("mechanism", mechanism);
   {
     auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
     REQUIRE(angle);

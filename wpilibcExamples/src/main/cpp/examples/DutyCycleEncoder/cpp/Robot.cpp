@@ -59,10 +59,10 @@ class Robot : public wpi::TimedRobot {
     double shiftedOutput = wpi::math::InputModulus(output, 0 - percentOfRange,
                                                    fullRange - percentOfRange);
 
-    wpi::telemetry::Telemetry::Log("Connected", connected);
-    wpi::telemetry::Telemetry::Log("Frequency", frequency);
-    wpi::telemetry::Telemetry::Log("Output", output);
-    wpi::telemetry::Telemetry::Log("ShiftedOutput", shiftedOutput);
+    wpi::telemetry::Log("Connected", connected);
+    wpi::telemetry::Log("Frequency", frequency);
+    wpi::telemetry::Log("Output", output);
+    wpi::telemetry::Log("ShiftedOutput", shiftedOutput);
   }
 };
 

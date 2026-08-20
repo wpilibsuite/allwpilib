@@ -30,7 +30,7 @@ TEST_CASE("PIDToleranceTest TunedSetpointUpdatesSetpointState", "[wpimath]") {
   wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   wpi::math::PIDController controller{0.5, 0.0, 0.0};
-  wpi::tunable::Tunables::Publish("pid", controller);
+  wpi::tunable::Publish("pid", controller);
 
   CHECK_FALSE(controller.AtSetpoint());
 

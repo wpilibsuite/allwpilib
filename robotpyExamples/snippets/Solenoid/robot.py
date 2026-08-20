@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 
 SOLENOID_BUTTON = 1
@@ -58,16 +59,14 @@ class MyRobot(wpilib.TimedRobot):
         # Get the pressure (in PSI) from the analog sensor connected to the PH.
         # This function is supported only on the PH!
         # On a PCM, this function will return 0.
-        wpilib.Telemetry.log("PH Pressure [PSI]", self.compressor.get_pressure())
+        telemetry.log("PH Pressure [PSI]", self.compressor.get_pressure())
         # Get compressor current draw.
-        wpilib.Telemetry.log("Compressor Current", self.compressor.get_current())
+        telemetry.log("Compressor Current", self.compressor.get_current())
         # Get whether the compressor is active.
-        wpilib.Telemetry.log("Compressor Active", self.compressor.is_enabled())
+        telemetry.log("Compressor Active", self.compressor.is_enabled())
         # Get the digital pressure switch connected to the PCM/PH.
         # The switch is open when the pressure is over ~120 PSI.
-        wpilib.Telemetry.log(
-            "Pressure Switch", self.compressor.get_pressure_switch_value()
-        )
+        telemetry.log("Pressure Switch", self.compressor.get_pressure_switch_value())
 
         # The output of get_raw_button is true/false depending on whether
         # the button is pressed; set takes a boolean for whether
@@ -114,6 +113,6 @@ class MyRobot(wpilib.TimedRobot):
                     self.compressor.enable_hybrid(70, 120)
 
         # Publish elements to dashboard.
-        wpilib.Telemetry.log("Single Solenoid", self.solenoid)
-        wpilib.Telemetry.log("Double Solenoid", self.double_solenoid)
-        wpilib.Telemetry.log("Compressor", self.compressor)
+        telemetry.log("Single Solenoid", self.solenoid)
+        telemetry.log("Double Solenoid", self.double_solenoid)
+        telemetry.log("Compressor", self.compressor)

@@ -62,7 +62,7 @@ def test_robot_loop_refreshes_getter_backed_tunables():
     tunable.TunableRegistry.reset()
     try:
         tunable.TunableRegistry.register_backend("", backend)
-        tunable.Tunables.get_table().publish_int(
+        tunable.get_table().publish_int(
             "getter",
             lambda: value[0],
             lambda tuned: value.__setitem__(0, tuned),

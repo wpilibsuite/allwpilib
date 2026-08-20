@@ -12,7 +12,7 @@ def test_romigyro_logs_with_native_telemetry_table():
     telemetry.TelemetryRegistry.register_backend("", backend)
 
     try:
-        telemetry.Telemetry.log("gyro", romi.RomiGyro())
+        telemetry.log("gyro", romi.RomiGyro())
 
         assert backend.get_last_value("/gyro/.type") == "Romi Gyro"
         assert backend.get_last_value("/gyro/rate x") == 0.0

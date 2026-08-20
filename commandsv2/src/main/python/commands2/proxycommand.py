@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS 192a28af4731 ProxyCommand.java
 from __future__ import annotations
 
-from wpilib import TelemetryTable
+from telemetry import TelemetryTable
 
 from .command import Command
 

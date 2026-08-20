@@ -6,11 +6,14 @@ from ._telemetry import (
     DiscardTelemetryBackend,
     MockTelemetryBackend,
     MultiTelemetryBackend,
-    Telemetry,
     TelemetryBackend,
     TelemetryEntry,
     TelemetryRegistry,
     TelemetryTable,
+    get_table,
+    keep_duplicates,
+    log,
+    set_property,
 )
 
 
@@ -30,12 +33,15 @@ __all__ = [
     "DiscardTelemetryBackend",
     "MockTelemetryBackend",
     "MultiTelemetryBackend",
-    "Telemetry",
     "TelemetryBackend",
     "TelemetryEntry",
     "TelemetryLoggable",
     "TelemetryRegistry",
     "TelemetryTable",
+    "get_table",
+    "keep_duplicates",
+    "log",
+    "set_property",
 ]
 
 try:

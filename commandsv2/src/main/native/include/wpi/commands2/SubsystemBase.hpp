@@ -40,7 +40,7 @@ class SubsystemBase : public Subsystem,
 
  protected:
   /**
-   * Constructor.  wpi::telemetry::Telemetry/log name defaults to the classname.
+   * Constructor. Telemetry log name defaults to the classname.
    */
   SubsystemBase();
   /**

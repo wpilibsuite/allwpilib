@@ -10,7 +10,7 @@ This file describes the Python tunable API exposed by the `tunable` package. It 
 The primary entry points are:
 
 - `tunable.Tunable`, a Python value wrapper with `get()` and `set()`
-- `tunable.Tunables`, the root table facade
+- root-level functions such as `tunable.add()` and `tunable.publish()`
 - `tunable.TunableTable`, a hierarchical publisher
 - `tunable.ComplexTunable`, a Python ABC for objects that publish child tunables
 - `tunable.Selectable`, a pure-Python chooser-style complex tunable
@@ -19,11 +19,11 @@ The primary entry points are:
 ```py
 import tunable
 
-k_p = tunable.Tunables.add_double("drive/kP", 0.05)
+k_p = tunable.add_double("drive/kP", 0.05)
 k_p.set(0.07)
 value = k_p.get()
 
-drive = tunable.Tunables.get_table("drive")
+drive = tunable.get_table("drive")
 max_speed = drive.add_double("maxSpeed", 3.0)
 ```
 
@@ -104,28 +104,28 @@ table.remove(name)
 
 The typed `publish_*` helpers accept the same `robust`, `mutable`, `properties`, and `type_string` keyword options as `publish_value()`.
 
-`table.publish()` and `tunable.Tunables.publish()` return `True` when the backend accepts the publication and `False` when it rejects it, such as for a duplicate path.
+`table.publish()` and `tunable.publish()` return `True` when the backend accepts the publication and `False` when it rejects it, such as for a duplicate path.
 
 Getter-backed `publish_*()` methods call the getter once when published, refresh the cached native tunable before each top-level `TunableRegistry.update()`, and call the setter when a remote write is applied. These getter and setter callables must not raise. If the setter clamps or canonicalizes the request, the getter is read again before a robust backend echoes the tuned value in that same update. Refreshes compare the getter result against the cached native value and only mark it changed when the value differs, so unchanged values use the backend's normal dirty-tracking path instead of `ALWAYS_GET` polling.
 
-`Tunables` mirrors the root-level subset:
+The root-level functions mirror the root-level subset:
 
 ```py
-tunable.Tunables.get_table(name="")
-tunable.Tunables.publish(name, value) -> bool
-tunable.Tunables.add(name, value, *, value_type=None, element_type=None,
+tunable.get_table(name="")
+tunable.publish(name, value) -> bool
+tunable.add(name, value, *, value_type=None, element_type=None,
                      robust=False, mutable=True, on_tune=None,
                      properties=None, type_string="")
-tunable.Tunables.add_boolean(name, value)
-tunable.Tunables.add_int(name, value)
-tunable.Tunables.add_long(name, value)
-tunable.Tunables.add_float(name, value)
-tunable.Tunables.add_double(name, value)
-tunable.Tunables.remove(name)
+tunable.add_boolean(name, value)
+tunable.add_int(name, value)
+tunable.add_long(name, value)
+tunable.add_float(name, value)
+tunable.add_double(name, value)
+tunable.remove(name)
 tunable.TunableRegistry.remove(name_or_value)
 ```
 
-Use `Tunables.get_table().publish_*()` for root-level getter/setter-backed values.
+Use `tunable.get_table().publish_*()` for root-level getter/setter-backed values.
 
 `TunableRegistry.remove()` accepts a path string or a Python tunable/complex object. When an object
 is passed, every root-level publication retained for that object is removed.
@@ -149,7 +149,7 @@ class TunablePID(tunable.ComplexTunable):
         table.publish("kI", self.k_i)
         table.publish("kD", self.k_d)
 
-tunable.Tunables.publish("drive/pid", TunablePID())
+tunable.publish("drive/pid", TunablePID())
 ```
 
 The Python adapter retains child `Tunable` and complex objects published from `publish_tunable()` so they stay alive after publication. Removing a complex parent removes retained child values and descendant backend entries.
@@ -177,7 +177,7 @@ chooser = tunable.Selectable[int]()
 chooser.add("one", 1)
 chooser.add_default("two", 2)
 chooser.on_change(lambda value: print(value))
-tunable.Tunables.publish("auto", chooser)
+tunable.publish("auto", chooser)
 ```
 
 `get_selected()` returns the selected value, falling back to the default, or `None` if neither name maps to a current option. Removing an option clears the default only if that option was the default; it does not change the selected option name.
@@ -211,10 +211,10 @@ Callbacks run on the thread that calls `TunableRegistry.update()`, normally the 
 
 Key differences from 2026:
 
-- `wpilib.SmartDashboard.putNumber("key", value)` / `wpilib.SmartDashboard.getNumber("key", default)` called every loop is replaced with a single `tunable.Tunables.add_double("key", initial_value)` declaration that returns a `tunable.Tunable`. Read it with `get()` and write it with `set()`.
+- `wpilib.SmartDashboard.putNumber("key", value)` / `wpilib.SmartDashboard.getNumber("key", default)` called every loop is replaced with a single `tunable.add_double("key", initial_value)` declaration that returns a `tunable.Tunable`. Read it with `get()` and write it with `set()`.
 - Direct NetworkTables entry/topic boilerplate is replaced by the same `tunable.Tunable` pattern; the backend handles the underlying NT entry lifecycle.
 - `wpilib.SendableChooser` is replaced by `tunable.Selectable`. The API is similar: `add(name, object)`, `add_default(name, object)`, `get_selected()`.
-- The `Sendable` interface and `wpilib.SmartDashboard.putData()` are not part of the Tunable API; objects that previously implemented `Sendable` should implement `tunable.ComplexTunable` or use a WPILib object that already does, then register via `tunable.Tunables.publish()`.
+- The `Sendable` interface and `wpilib.SmartDashboard.putData()` are not part of the Tunable API; objects that previously implemented `Sendable` should implement `tunable.ComplexTunable` or use a WPILib object that already does, then register via `tunable.publish()`.
 
 ### SmartDashboard Tuning to Tunable
 
@@ -238,7 +238,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotInit(self) -> None:
-    self.intake_speed = tunable.Tunables.add_double("Intake/speed", 0.65)
+    self.intake_speed = tunable.add_double("Intake/speed", 0.65)
 
 def robotPeriodic(self) -> None:
     self.intake_motor.set(self.intake_speed.get())
@@ -265,7 +265,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotInit(self) -> None:
-    tunable.Tunables.get_table().publish_double(
+    tunable.get_table().publish_double(
         "Drive/maxOutput",
         self.drive.get_max_output,
         self.drive.set_max_output,
@@ -295,7 +295,7 @@ def robotInit(self) -> None:
     self.field = wpilib.Field2d()
     self.target = self.field.getObject("Target")
     self.drive_target_pose = Pose2d()
-    tunable.Tunables.publish("Field", self.field)
+    tunable.publish("Field", self.field)
 
 def robotPeriodic(self) -> None:
     self.field.setRobotPose(self.pose_estimator.getEstimatedPosition())
@@ -338,7 +338,7 @@ def robotInit(self) -> None:
     self.drive_mode = tunable.Selectable[DriveMode]()
     self.drive_mode.add_default("Field Relative", DriveMode.FIELD_RELATIVE)
     self.drive_mode.add("Robot Relative", DriveMode.ROBOT_RELATIVE)
-    tunable.Tunables.publish("Drive/mode", self.drive_mode)
+    tunable.publish("Drive/mode", self.drive_mode)
 
 def teleopPeriodic(self) -> None:
     self.drive.set_mode(self.drive_mode.get_selected())
@@ -357,7 +357,7 @@ backend = tunable.MockTunableBackend()
 tunable.TunableRegistry.reset()
 tunable.TunableRegistry.register_backend("", backend)
 
-gain = tunable.Tunables.add_double("drive/kP", 0.05)
+gain = tunable.add_double("drive/kP", 0.05)
 backend.set_double("/drive/kP", 0.1)
 tunable.TunableRegistry.update()
 assert gain.get() == 0.1

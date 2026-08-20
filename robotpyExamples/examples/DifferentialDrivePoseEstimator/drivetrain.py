@@ -8,6 +8,7 @@ import math
 
 import ntcore
 import robotpy_fields
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -268,5 +269,5 @@ class Drivetrain:
             self.pose_estimator.get_estimated_position()
         )
 
-        wpilib.Telemetry.log("Field", self.field_sim)
-        wpilib.Telemetry.log("FieldEstimation", self.field_approximation)
+        telemetry.log("Field", self.field_sim)
+        telemetry.log("FieldEstimation", self.field_approximation)

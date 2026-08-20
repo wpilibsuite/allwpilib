@@ -21,7 +21,7 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
 
   chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
   chooser.Add(kAutoNameCustom, kAutoNameCustom);
-  wpi::tunable::Tunables::Publish("Auto Modes", chooser);
+  wpi::tunable::Publish("Auto Modes", chooser);
 }
 
 /**

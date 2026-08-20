@@ -102,10 +102,10 @@ def test_python_backend_subclass_receives_logs():
     telemetry.TelemetryRegistry.register_backend("", backend)
 
     try:
-        telemetry.Telemetry.keep_duplicates("value")
-        telemetry.Telemetry.set_property("value", "unit", '"m/s"')
-        telemetry.Telemetry.log("value", 2.5)
-        telemetry.Telemetry.log("point", TelemetryPoint(1.0, 2))
+        telemetry.keep_duplicates("value")
+        telemetry.set_property("value", "unit", '"m/s"')
+        telemetry.log("value", 2.5)
+        telemetry.log("point", TelemetryPoint(1.0, 2))
     finally:
         telemetry.TelemetryRegistry.reset()
 
@@ -131,7 +131,7 @@ def test_telemetry_logs_python_object(backend):
         def get_telemetry_type(self) -> str:
             return "TestValue"
 
-    telemetry.Telemetry.log("PythonValue", Value())
+    telemetry.log("PythonValue", Value())
 
     assert backend.get_last_action("/PythonValue/.type") == {
         "path": "/PythonValue/.type",
@@ -155,7 +155,7 @@ def test_python_log_to_type_error_is_not_retried(backend):
     value = Value()
 
     with pytest.raises(TypeError, match="user log_to failure"):
-        telemetry.Telemetry.log("PythonValue", value)
+        telemetry.log("PythonValue", value)
 
     assert value.calls == 1
     actions = [
@@ -183,7 +183,7 @@ def test_python_log_to_descriptor_is_read_once(backend):
 
     value = Value()
 
-    telemetry.Telemetry.log("PythonValue", value)
+    telemetry.log("PythonValue", value)
 
     assert value.log_to_attr_calls == 1
     assert backend.get_last_value("/PythonValue/value") == 3
@@ -199,7 +199,7 @@ def test_python_log_to_lookup_error_is_reported(backend):
             raise AssertionError("__str__ should not run")
 
     with pytest.raises(RuntimeError, match="log_to lookup failure"):
-        telemetry.Telemetry.log("PythonValue", Value())
+        telemetry.log("PythonValue", Value())
 
     assert backend.get_actions() == []
 
@@ -219,7 +219,7 @@ def test_python_get_telemetry_type_descriptor_is_read_once(backend):
 
     value = Value()
 
-    telemetry.Telemetry.log("PythonValue", value)
+    telemetry.log("PythonValue", value)
 
     assert value.type_attr_calls == 1
     assert backend.get_last_value("/PythonValue/.type") == "TestValue"
@@ -236,27 +236,27 @@ def test_python_get_telemetry_type_lookup_error_is_reported(backend):
             table.log("value", 3)
 
     with pytest.raises(RuntimeError, match="get_telemetry_type lookup failure"):
-        telemetry.Telemetry.log("PythonValue", Value())
+        telemetry.log("PythonValue", Value())
 
     assert backend.get_actions() == []
 
 
 def test_log_docstrings_document_sequence_element_type():
-    for doc in (telemetry.Telemetry.log.__doc__, telemetry.TelemetryTable.log.__doc__):
+    for doc in (telemetry.log.__doc__, telemetry.TelemetryTable.log.__doc__):
         assert "Sequences must pass an explicit element_type" in doc
         assert "WPIStruct class" in doc
 
 
 def test_telemetry_logs_python_types(backend):
-    telemetry.Telemetry.log("flag", True)
-    telemetry.Telemetry.log("count", 3)
-    telemetry.Telemetry.log("ratio", 0.25)
-    telemetry.Telemetry.log("label", "ready")
-    telemetry.Telemetry.log("raw", bytearray(b"abc"), type_string="custom")
-    telemetry.Telemetry.log("ints", [1, 2, 3], element_type=int)
-    telemetry.Telemetry.log("mixed", [1, 2.5], element_type=float)
-    telemetry.Telemetry.log("strings", ["a", "b"], element_type=str)
-    telemetry.Telemetry.log("fallback", [{"x": 1}], element_type=object)
+    telemetry.log("flag", True)
+    telemetry.log("count", 3)
+    telemetry.log("ratio", 0.25)
+    telemetry.log("label", "ready")
+    telemetry.log("raw", bytearray(b"abc"), type_string="custom")
+    telemetry.log("ints", [1, 2, 3], element_type=int)
+    telemetry.log("mixed", [1, 2.5], element_type=float)
+    telemetry.log("strings", ["a", "b"], element_type=str)
+    telemetry.log("fallback", [{"x": 1}], element_type=object)
 
     assert backend.get_last_action("/flag")["kind"] == "boolean"
     assert backend.get_last_value("/count") == 3
@@ -276,40 +276,40 @@ def test_telemetry_logs_python_types(backend):
 
 def test_sequence_without_element_type_raises(backend):
     with pytest.raises(TypeError, match="element type must be specified"):
-        telemetry.Telemetry.log("empty", [])
+        telemetry.log("empty", [])
 
     with pytest.raises(TypeError, match="element type must be specified"):
-        telemetry.Telemetry.log("values", [1.25])
+        telemetry.log("values", [1.25])
 
     with pytest.raises(TypeError, match="element type must be specified"):
-        telemetry.Telemetry.log("points", [TelemetryPoint(1.0, 2)])
+        telemetry.log("points", [TelemetryPoint(1.0, 2)])
 
     assert backend.get_actions() == []
 
 
 def test_sequence_with_string_element_type_raises(backend):
     with pytest.raises(TypeError, match="element_type must be a Python type"):
-        telemetry.Telemetry.log("values", [1.25], element_type="double[]")
+        telemetry.log("values", [1.25], element_type="double[]")
 
     assert backend.get_actions() == []
 
 
 def test_sequence_element_type_mismatch_raises(backend):
     with pytest.raises(TypeError, match="string telemetry arrays require str values"):
-        telemetry.Telemetry.log("values", [object()], element_type=str)
+        telemetry.log("values", [object()], element_type=str)
 
     assert backend.get_actions() == []
 
 
 def test_empty_sequence_with_element_type_logs_typed_empty(backend):
-    telemetry.Telemetry.log("values", [], element_type=float)
+    telemetry.log("values", [], element_type=float)
 
     assert backend.get_last_action("/values")["kind"] == "double[]"
     assert backend.get_last_value("/values") == []
 
 
 def test_table_helpers(backend):
-    table = telemetry.Telemetry.get_table("drive")
+    table = telemetry.get_table("drive")
 
     assert table.path == "/drive/"
     table.keep_duplicates("speed")
@@ -330,8 +330,8 @@ def test_multi_backend_fans_out():
         "", telemetry.MultiTelemetryBackend([first, second])
     )
     try:
-        telemetry.Telemetry.log("value", 7)
-        telemetry.Telemetry.log("label", "ready")
+        telemetry.log("value", 7)
+        telemetry.log("label", "ready")
 
         assert first.get_last_value("/value") == 7
         assert second.get_last_value("/value") == 7
@@ -365,7 +365,7 @@ def test_table_type_mismatch_reports_warning(backend):
         lambda path, msg: warnings.append((path, msg))
     )
 
-    table = telemetry.Telemetry.get_table("typed")
+    table = telemetry.get_table("typed")
 
     assert table.set_type("TestType") is True
     assert table.set_type("TestType") is True
@@ -378,7 +378,7 @@ def test_table_type_mismatch_reports_warning(backend):
 
 
 def test_backend_prefix_selection_and_cache_reset(backend):
-    table = telemetry.Telemetry.get_table("drive")
+    table = telemetry.get_table("drive")
     table.log("speed", 1.0)
     assert backend.get_last_value("/drive/speed") == pytest.approx(1.0)
 
@@ -407,7 +407,7 @@ def test_get_backend_normalizes_path(backend):
 def test_struct_logging_registers_schema_and_raw_bytes(backend):
     point = TelemetryPoint(1.5, 2)
 
-    telemetry.Telemetry.log("point", point)
+    telemetry.log("point", point)
 
     assert backend.get_schema("struct:TelemetryPoint") == {
         "type": "structschema",
@@ -425,7 +425,7 @@ def test_struct_logging_registers_schema_and_raw_bytes(backend):
 def test_struct_array_logging_registers_schema_and_raw_bytes(backend):
     points = [TelemetryPoint(1.0, 2), TelemetryPoint(3.0, 4)]
 
-    telemetry.Telemetry.log("points", points, element_type=TelemetryPoint)
+    telemetry.log("points", points, element_type=TelemetryPoint)
 
     assert backend.get_schema("struct:TelemetryPoint")["schema_string"] == (
         "double x; int32 y"
@@ -441,7 +441,7 @@ def test_struct_array_logging_registers_schema_and_raw_bytes(backend):
 def test_empty_struct_array_with_element_type_logs_schema_and_empty_raw_bytes(
     backend,
 ):
-    telemetry.Telemetry.log("points", [], element_type=TelemetryPoint)
+    telemetry.log("points", [], element_type=TelemetryPoint)
 
     assert backend.get_schema("struct:TelemetryPoint")["schema_string"] == (
         "double x; int32 y"
@@ -456,7 +456,7 @@ def test_empty_struct_array_with_element_type_logs_schema_and_empty_raw_bytes(
 
 def test_struct_array_element_type_mismatch_raises(backend):
     with pytest.raises(TypeError, match="specified WPIStruct type"):
-        telemetry.Telemetry.log("points", [object()], element_type=TelemetryPoint)
+        telemetry.log("points", [object()], element_type=TelemetryPoint)
 
     assert backend.get_actions() == []
 
@@ -465,7 +465,7 @@ def test_struct_schema_uses_matching_backend(backend):
     drive_backend = telemetry.MockTelemetryBackend()
     telemetry.TelemetryRegistry.register_backend("/drive", drive_backend)
 
-    telemetry.Telemetry.get_table("drive").log("point", TelemetryPoint(1.0, 2))
+    telemetry.get_table("drive").log("point", TelemetryPoint(1.0, 2))
 
     assert backend.get_schema("struct:TelemetryPoint") is None
     assert drive_backend.get_schema("struct:TelemetryPoint") is not None
@@ -491,7 +491,7 @@ def test_multi_backend_fans_out_struct_schema_and_loggable_metadata():
             return "TypedValue"
 
     try:
-        telemetry.Telemetry.log("value", Value())
+        telemetry.log("value", Value())
 
         assert first.get_last_value("/value/.type") == "TypedValue"
         assert second.get_last_value("/value/.type") == "TypedValue"
@@ -520,7 +520,7 @@ def test_discard_parent_expands_python_object_for_non_discard_descendant():
             table.log("speed", 4.5)
 
     try:
-        telemetry.Telemetry.log("robot", RobotSpeed())
+        telemetry.log("robot", RobotSpeed())
 
         assert speed_backend.get_last_value("/robot/speed") == pytest.approx(4.5)
     finally:
@@ -539,7 +539,7 @@ def test_discard_backend_skips_telemetry_work_and_cache_resets(backend):
     telemetry.TelemetryRegistry.register_backend(
         "/discard", telemetry.DiscardTelemetryBackend()
     )
-    table = telemetry.Telemetry.get_table("discard")
+    table = telemetry.get_table("discard")
 
     table.log("value", ThrowingLoggable())
     table.log("text", ThrowingStr())

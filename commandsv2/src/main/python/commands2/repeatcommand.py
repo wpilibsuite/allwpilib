@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS 6e58db398d63 RepeatCommand.java
 from __future__ import annotations
 
-from wpilib import TelemetryTable
+from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler

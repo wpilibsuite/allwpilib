@@ -53,25 +53,41 @@ class DashboardSelectable:
         self._selected_publisher.set_string(value)
 
 
-def make_selectable() -> wpilib.Selectable[int]:
-    chooser = wpilib.Selectable()
+def make_selectable() -> tunable.Selectable[int]:
+    chooser = tunable.Selectable()
     chooser.add_default("one", 1)
     chooser.add("two", 2)
     return chooser
 
 
 def test_telemetry_tunable_flat_namespace():
-    assert wpilib.Telemetry is telemetry.Telemetry
-    assert wpilib.TelemetryRegistry is telemetry.TelemetryRegistry
-    assert wpilib.Tunables is tunable.Tunables
-    assert wpilib.Selectable is tunable.Selectable
+    for name in (
+        "ComplexTunable",
+        "DiscardTelemetryBackend",
+        "MockTelemetryBackend",
+        "MockTunableBackend",
+        "MultiTelemetryBackend",
+        "Selectable",
+        "Telemetry",
+        "TelemetryBackend",
+        "TelemetryEntry",
+        "TelemetryLoggable",
+        "TelemetryRegistry",
+        "TelemetryTable",
+        "Tunable",
+        "TunableBackend",
+        "TunableRegistry",
+        "TunableTable",
+        "Tunables",
+    ):
+        assert not hasattr(wpilib, name)
 
 
 def test_register_networktables_telemetry_backend(nt):
     telemetry.TelemetryRegistry.reset()
-    wpilib.TelemetryRegistry.register_networktables_backend()
+    telemetry.TelemetryRegistry.register_networktables_backend()
 
-    telemetry.Telemetry.log("helperTelemetry", 2.5)
+    telemetry.log("helperTelemetry", 2.5)
 
     assert nt.get_entry("/Telemetry/helperTelemetry").get_double(0.0) == pytest.approx(
         2.5
@@ -80,10 +96,10 @@ def test_register_networktables_telemetry_backend(nt):
 
 def test_register_networktables_tunable_backend(nt):
     tunable.TunableRegistry.reset()
-    wpilib.TunableRegistry.register_networktables_backend()
+    tunable.TunableRegistry.register_networktables_backend()
 
-    value = wpilib.Tunable(1.0)
-    wpilib.Tunables.publish("helperTunable", value)
+    value = tunable.Tunable(1.0)
+    tunable.publish("helperTunable", value)
 
     entry = nt.get_entry("/Tunables/helperTunable")
     assert entry.get_double(0.0) == pytest.approx(1.0)
@@ -98,7 +114,7 @@ def test_register_networktables_tunable_backend(nt):
 def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
     value = [1.0]
 
-    wpilib.Tunables.get_table().publish_double(
+    tunable.get_table().publish_double(
         "clamped",
         lambda: value[0],
         lambda requested: value.__setitem__(0, min(requested, 5.0)),
@@ -119,7 +135,7 @@ def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
 
 
 def test_selectable():
-    chooser = wpilib.Selectable()
+    chooser = tunable.Selectable()
     assert chooser.get_selected() is None
 
     chooser.add_default("option", True)
@@ -128,7 +144,7 @@ def test_selectable():
 
 def test_selectable_dashboard_connects_after_publish(nt):
     chooser = make_selectable()
-    wpilib.Tunables.publish("auto", chooser)
+    tunable.publish("auto", chooser)
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         assert dashboard.exists()
@@ -153,7 +169,7 @@ def test_selectable_dashboard_connects_before_publish(nt):
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         chooser = make_selectable()
-        wpilib.Tunables.publish("auto", chooser)
+        tunable.publish("auto", chooser)
 
         assert dashboard.exists()
         assert dashboard.get_default() == "one"
@@ -176,7 +192,7 @@ def test_selectable_retains_dashboard_selection_after_republish(nt):
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         first_chooser = make_selectable()
-        wpilib.Tunables.publish("auto", first_chooser)
+        tunable.publish("auto", first_chooser)
 
         dashboard.set_selected("two")
         nt.flush()
@@ -192,7 +208,7 @@ def test_selectable_retains_dashboard_selection_after_republish(nt):
         )
 
         second_chooser = make_selectable()
-        wpilib.Tunables.publish("auto", second_chooser)
+        tunable.publish("auto", second_chooser)
         tunable.TunableRegistry.update()
 
         assert dashboard.get_selected() == "two"
@@ -230,7 +246,7 @@ def test_motorcontrollergroup_logs_with_native_telemetry_table():
     try:
         group.set_throttle(0.5)
         readback = group.get_throttle()
-        telemetry.Telemetry.log("motorGroup", group)
+        telemetry.log("motorGroup", group)
 
         assert backend.get_last_value("/motorGroup/.type") == "Motor Controller"
         assert backend.get_last_value("/motorGroup/Value") == pytest.approx(readback)

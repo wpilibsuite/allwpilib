@@ -21,7 +21,8 @@ if TYPE_CHECKING:
     from .conditionalcommand import ConditionalCommand
     from .wrappercommand import WrapperCommand
 
-from wpilib import ComplexTunable, TelemetryLoggable, TelemetryTable, TunableTable
+from telemetry import TelemetryLoggable, TelemetryTable
+from tunable import ComplexTunable, TunableTable
 
 
 class InterruptionBehavior(Enum):

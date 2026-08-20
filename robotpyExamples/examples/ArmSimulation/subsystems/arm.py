@@ -4,6 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -94,7 +95,7 @@ class Arm:
         )
 
         # Publish the Mechanism2d visualization through telemetry.
-        wpilib.Telemetry.log("Arm Sim", self.mech2d)
+        telemetry.log("Arm Sim", self.mech2d)
 
     def load_preferences(self) -> None:
         # Read Preferences for Arm setpoint and kP on entering Teleop

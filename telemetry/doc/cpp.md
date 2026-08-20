@@ -5,7 +5,7 @@ This file describes the C++ Telemetry API as it is used from C++ robot code. The
 - For the shared Telemetry design and Java-facing API, see [Telemetry design](telemetry.md).
 - For Python-specific behavior, see [Python API](python.md).
 
-- the main entry points are static functions on `wpi::telemetry::Telemetry` and member functions on `wpi::telemetry::TelemetryTable`
+- the main entry points are namespace functions in `wpi::telemetry` and member functions on `wpi::telemetry::TelemetryTable`
 
 - generic logging is template-based rather than overload-plus-reflection based
 
@@ -17,7 +17,7 @@ This file describes the C++ Telemetry API as it is used from C++ robot code. The
 
 For most robot code, a C++ user interacts with three pieces:
 
-- `wpi::telemetry::Telemetry` for simple one-line publishing
+- `wpi::telemetry::Log()` for simple one-line publishing
 
 - `wpi::telemetry::TelemetryTable` for grouping related values under a table path
 
@@ -25,64 +25,38 @@ For most robot code, a C++ user interacts with three pieces:
 
 The API is header-driven and highly generic. In many cases there is no need to manually choose between primitive, string, struct, or protobuf logging. Instead, the correct path is selected by the template constraints on `TelemetryTable::Log()`.
 
-## `wpi::telemetry::Telemetry`
+## `wpi::telemetry` Root Functions
 
-`wpi::telemetry::Telemetry` is the top-level convenience facade. It forwards to the root telemetry table.
+The namespace-level functions in `wpi::telemetry` are the top-level convenience API. They forward to the root telemetry table.
 
 ```cpp
-class Telemetry final {
- public:
-  static wpi::telemetry::TelemetryTable& GetTable();
-  static wpi::telemetry::TelemetryTable& GetTable(std::string_view name);
+wpi::telemetry::TelemetryTable& GetTable();
+wpi::telemetry::TelemetryTable& GetTable(std::string_view name);
 
-  static void KeepDuplicates(std::string_view name);
-  static void SetProperty(std::string_view name, std::string_view key,
-                          std::string_view value);
+void KeepDuplicates(std::string_view name);
+void SetProperty(std::string_view name, std::string_view key,
+                 std::string_view value);
 
-  template <typename T, typename... I>
-  static void Log(std::string_view name, const T& value, I... info);
+template <typename T, typename... I>
+void Log(std::string_view name, const T& value, I... info);
 
-  template <typename T, typename... I>
-  static void Log(std::string_view name, std::span<const T> value, I... info);
+template <typename T, typename... I>
+void Log(std::string_view name, std::span<const T> value, I... info);
 
-  static void Log(std::string_view name, bool value);
-  static void Log(std::string_view name, int8_t value);
-  static void Log(std::string_view name, int16_t value);
-  static void Log(std::string_view name, int32_t value);
-  static void Log(std::string_view name, int64_t value);
-  static void Log(std::string_view name, float value);
-  static void Log(std::string_view name, double value);
-  static void Log(std::string_view name, std::string_view value);
-  static void Log(std::string_view name, std::string_view value,
-                  std::string_view typeString);
-
-  static void Log(std::string_view name, std::span<const bool> value);
-  static void Log(std::string_view name, std::initializer_list<bool> value);
-  static void Log(std::string_view name, std::span<const int16_t> value);
-  static void Log(std::string_view name, std::initializer_list<int16_t> value);
-  static void Log(std::string_view name, std::span<const int32_t> value);
-  static void Log(std::string_view name, std::initializer_list<int32_t> value);
-  static void Log(std::string_view name, std::span<const int64_t> value);
-  static void Log(std::string_view name, std::initializer_list<int64_t> value);
-  static void Log(std::string_view name, std::span<const float> value);
-  static void Log(std::string_view name, std::initializer_list<float> value);
-  static void Log(std::string_view name, std::span<const double> value);
-  static void Log(std::string_view name, std::initializer_list<double> value);
-  static void Log(std::string_view name, std::span<const std::string> value);
-  static void Log(std::string_view name,
-                  std::span<const std::string_view> value);
-  static void Log(std::string_view name, std::span<const uint8_t> value);
-  static void Log(std::string_view name, std::span<const uint8_t> value,
-                  std::string_view typeString);
-};
+void Log(std::string_view name, bool value);
+void Log(std::string_view name, int64_t value);
+void Log(std::string_view name, double value);
+void Log(std::string_view name, std::string_view value);
+void Log(std::string_view name, std::span<const uint8_t> value,
+         std::string_view typeString);
 ```
 
 Typical usage:
 
 ```cpp
-wpi::telemetry::Telemetry::Log("batteryVoltage", wpi::RobotController::GetBatteryVoltage());
-wpi::telemetry::Telemetry::Log("enabled", wpi::DriverStation::IsEnabled());
-wpi::telemetry::Telemetry::Log("state", std::string_view{"Ready"});
+wpi::telemetry::Log("batteryVoltage", wpi::RobotController::GetBatteryVoltage());
+wpi::telemetry::Log("enabled", wpi::DriverStation::IsEnabled());
+wpi::telemetry::Log("state", std::string_view{"Ready"});
 ```
 
 Using the root facade is appropriate when:
@@ -162,7 +136,7 @@ class Shooter {
   }
 
  private:
-  wpi::telemetry::TelemetryTable& m_telemetry = wpi::telemetry::Telemetry::GetTable("Shooter");
+  wpi::telemetry::TelemetryTable& m_telemetry = wpi::telemetry::GetTable("Shooter");
   wpi::Encoder m_encoder{0, 1};
   units::volt_t m_lastVoltage = 0_V;
 };
@@ -171,7 +145,7 @@ class Shooter {
 Nested tables are used when the hierarchy itself is meaningful:
 
 ```cpp
-auto& estimator = wpi::telemetry::Telemetry::GetTable("PoseEstimator");
+auto& estimator = wpi::telemetry::GetTable("PoseEstimator");
 auto& vision = estimator.GetTable("Vision");
 auto& odometry = estimator.GetTable("Odometry");
 
@@ -182,7 +156,7 @@ odometry.Log("pose", estimatedPose);
 `SetType()` is used when the table represents a known structured kind of object and consumers should interpret that table consistently:
 
 ```cpp
-auto& mechanism = wpi::telemetry::Telemetry::GetTable("ArmMechanism");
+auto& mechanism = wpi::telemetry::GetTable("ArmMechanism");
 if (mechanism.SetType("Mechanism2d")) {
   mechanism.Log("layout", mechanismJson, "json");
 }
@@ -226,9 +200,9 @@ Primitive arrays:
 
 ```cpp
 std::array<double, 3> wheelSpeeds{left, right, average};
-wpi::telemetry::Telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
+wpi::telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
 
-auto& table = wpi::telemetry::Telemetry::GetTable("Drive");
+auto& table = wpi::telemetry::GetTable("Drive");
 table.Log("setpoints", {1.0, 2.0, 3.0});
 ```
 
@@ -236,21 +210,21 @@ String arrays:
 
 ```cpp
 std::array<std::string_view, 3> states{"Idle", "Aiming", "Shooting"};
-wpi::telemetry::Telemetry::Log("availableStates", std::span{states});
+wpi::telemetry::Log("availableStates", std::span{states});
 ```
 
 Raw bytes with a custom type string:
 
 ```cpp
 std::span<const uint8_t> packet = GetSerializedFrame();
-wpi::telemetry::Telemetry::Log("cameraFrame", packet, "image/jpeg");
+wpi::telemetry::Log("cameraFrame", packet, "image/jpeg");
 ```
 
 For arrays of custom objects, the most natural path is usually a `std::span<const T>` where `T` is struct-serializable. Struct arrays are encoded as raw bytes after schema registration. Spans of string-formattable element types can fall back to string arrays; unsupported element types fail at compile time.
 
 ```cpp
 std::array<wpi::Pose2d, 2> poses{startPose, goalPose};
-wpi::telemetry::Telemetry::Log("waypoints", std::span{poses});
+wpi::telemetry::Log("waypoints", std::span{poses});
 ```
 
 ## Logging Structured Types with `Struct` and `Protobuf`
@@ -261,14 +235,14 @@ Example with a struct-serializable type:
 
 ```cpp
 wpi::Pose2d pose = estimator.GetEstimatedPosition();
-wpi::telemetry::Telemetry::Log("estimatedPose", pose);
+wpi::telemetry::Log("estimatedPose", pose);
 ```
 
 Example with a protobuf-serializable type:
 
 ```cpp
 MyProtoCompatibleType message = BuildMessage();
-wpi::telemetry::Telemetry::Log("visionResult", message);
+wpi::telemetry::Log("visionResult", message);
 ```
 
 When logging those values, the telemetry layer ensures the corresponding schema is registered with the selected backend and then emits the encoded bytes through `LogRaw()`.
@@ -314,7 +288,7 @@ Logging it is just:
 
 ```cpp
 DriveSnapshot snapshot{m_drive.GetWheelSpeeds(), m_drive.GetPose(), m_drive.IsClosedLoop()};
-wpi::telemetry::Telemetry::Log("drive", snapshot);
+wpi::telemetry::Log("drive", snapshot);
 ```
 
 That call creates or reuses a `/drive/` child table, checks the table type if one is provided, and then lets the object populate entries under that table.
@@ -355,7 +329,7 @@ Usage:
 
 ```cpp
 example::VisionMeasurement measurement{pose, timestamp, tagCount};
-wpi::telemetry::Telemetry::Log("latestVision", measurement);
+wpi::telemetry::Log("latestVision", measurement);
 ```
 
 ### Pattern 2: Value-style logging via `LogValueTo()`
@@ -385,7 +359,7 @@ Usage:
 
 ```cpp
 example::RgbColor color{255, 128, 0};
-wpi::telemetry::Telemetry::Log("ledColor", color);
+wpi::telemetry::Log("ledColor", color);
 ```
 
 ### Pattern 3: Class member functions without inheritance
@@ -408,22 +382,22 @@ class SuperstructureSnapshot {
 };
 ```
 
-Because the required member functions exist, `wpi::telemetry::Telemetry::Log("superstructure", snapshot);` works without additional glue.
+Because the required member functions exist, `wpi::telemetry::Log("superstructure", snapshot);` works without additional glue.
 
 ## Duplicate Preservation and Properties
 
 The C++ API exposes the same per-entry controls as the Java facade, but in C++ spelling.
 
 ```cpp
-wpi::telemetry::Telemetry::KeepDuplicates("loopOverrunCount");
-wpi::telemetry::Telemetry::SetProperty("loopOverrunCount", "unit", "\"count\"");
-wpi::telemetry::Telemetry::Log("loopOverrunCount", overrunCount);
+wpi::telemetry::KeepDuplicates("loopOverrunCount");
+wpi::telemetry::SetProperty("loopOverrunCount", "unit", "\"count\"");
+wpi::telemetry::Log("loopOverrunCount", overrunCount);
 ```
 
 Or from a table:
 
 ```cpp
-auto& drive = wpi::telemetry::Telemetry::GetTable("Drive");
+auto& drive = wpi::telemetry::GetTable("Drive");
 drive.KeepDuplicates("leftVelocity");
 drive.SetProperty("leftVelocity", "unit", "\"m/s\"");
 drive.Log("leftVelocity", leftVelocity);
@@ -433,7 +407,7 @@ Property values are strings. When the backend expects JSON-formatted property va
 
 ## Thread Safety
 
-`wpi::telemetry::Telemetry` and `wpi::telemetry::TelemetryTable` may be used from the main robot loop and secondary user threads at the same time when they route to WPILib-provided backends. There is no periodic update call or main-thread affinity. Concurrent calls to the same path are serialized where required by the backend, but their output order is unspecified.
+The namespace functions in `wpi::telemetry` and `wpi::telemetry::TelemetryTable` may be used from the main robot loop and secondary user threads at the same time when they route to WPILib-provided backends. There is no periodic update call or main-thread affinity. Concurrent calls to the same path are serialized where required by the backend, but their output order is unspecified.
 
 The values passed through `std::span`, `std::string_view`, references, serializers, and ADL hooks remain owned by the caller. They must stay alive and must not be modified concurrently for the duration of the call. A backend must copy any non-owning data it wants to retain after the call returns.
 
@@ -445,7 +419,7 @@ The C++ mock backend protects writes, but `GetActions()`, `GetLastAction()`, and
 
 ## C++ Migration from WPILib 2026
 
-For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::telemetry::Telemetry`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::tunable::Tunable` instead.
+For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::telemetry::Log()` or a `wpi::telemetry::TelemetryTable`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::tunable::Tunable` instead.
 
 ### SmartDashboard Output to Telemetry
 
@@ -464,7 +438,7 @@ void RobotPeriodic() {
 **Is (Telemetry):**
 
 ```cpp
-wpi::telemetry::TelemetryTable& m_driveTelemetry = wpi::telemetry::Telemetry::GetTable("Drive");
+wpi::telemetry::TelemetryTable& m_driveTelemetry = wpi::telemetry::GetTable("Drive");
 
 void RobotPeriodic() {
   m_driveTelemetry.Log("leftVelocity", m_leftEncoder.GetRate());
@@ -493,7 +467,7 @@ void RobotPeriodic() {
 
 ```cpp
 void RobotPeriodic() {
-  wpi::telemetry::Telemetry::Log("RobotPose", m_poseEstimator.GetEstimatedPosition());
+  wpi::telemetry::Log("RobotPose", m_poseEstimator.GetEstimatedPosition());
 }
 ```
 
@@ -522,7 +496,7 @@ wpi::Field2d m_field;
 
 void RobotPeriodic() {
   m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
-  wpi::telemetry::Telemetry::Log("Field", m_field);
+  wpi::telemetry::Log("Field", m_field);
 }
 ```
 
@@ -547,7 +521,7 @@ void RobotPeriodic() {
 
 ```cpp
 wpi::tunable::TunableDouble m_intakeSpeed =
-    wpi::tunable::Tunables::Add<double>("Intake/speed", 0.65);
+    wpi::tunable::Add<double>("Intake/speed", 0.65);
 
 void RobotPeriodic() {
   m_intakeMotor.Set(m_intakeSpeed.Get());
@@ -671,7 +645,7 @@ class TelemetryBackend {
 
 ## Typical C++ Usage Guidance
 
-- Use `wpi::telemetry::Telemetry::Log()` for isolated values.
+- Use `wpi::telemetry::Log()` for isolated values.
 
 - Hold a `wpi::telemetry::TelemetryTable&` in subsystem code when publishing related values every loop.
 

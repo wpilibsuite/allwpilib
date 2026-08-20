@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 
 import math
@@ -37,5 +38,5 @@ class MyRobot(wpilib.TimedRobot):
         self.encoder.set_distance_per_pulse(1.0 / 360.0 * 2.0 * math.pi * 1.5)
 
     def teleop_periodic(self):
-        wpilib.Telemetry.log("Encoder Distance", self.encoder.get_distance())
-        wpilib.Telemetry.log("Encoder Rate", self.encoder.get_rate())
+        telemetry.log("Encoder Distance", self.encoder.get_distance())
+        telemetry.log("Encoder Rate", self.encoder.get_rate())

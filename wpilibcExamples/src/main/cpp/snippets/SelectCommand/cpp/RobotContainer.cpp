@@ -13,7 +13,7 @@ RobotContainer::RobotContainer() {
   chooser.Add("TWO", CommandSelector::TWO);
   chooser.Add("THREE", CommandSelector::THREE);
 
-  wpi::tunable::Tunables::Publish("Auto Chooser", chooser);
+  wpi::tunable::Publish("Auto Chooser", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();

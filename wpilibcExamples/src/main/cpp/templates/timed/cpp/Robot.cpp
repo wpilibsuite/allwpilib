@@ -10,7 +10,7 @@
 Robot::Robot() {
   chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
   chooser.Add(kAutoNameCustom, kAutoNameCustom);
-  wpi::tunable::Tunables::Publish("Auto Modes", chooser);
+  wpi::tunable::Publish("Auto Modes", chooser);
 }
 
 /**

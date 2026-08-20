@@ -10,7 +10,15 @@ from ._tunable import (
     TunableBackend,
     TunableRegistry,
     TunableTable,
-    Tunables,
+    add,
+    add_boolean,
+    add_double,
+    add_float,
+    add_int,
+    add_long,
+    get_table,
+    publish,
+    remove,
 )
 
 
@@ -114,7 +122,15 @@ __all__ = [
     "TunableBackend",
     "TunableRegistry",
     "TunableTable",
-    "Tunables",
+    "add",
+    "add_boolean",
+    "add_double",
+    "add_float",
+    "add_int",
+    "add_long",
+    "get_table",
+    "publish",
+    "remove",
 ]
 
 try:

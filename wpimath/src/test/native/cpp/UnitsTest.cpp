@@ -3439,7 +3439,7 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 
 TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {
   wpi::tunable::Tunable<foot_t> distance{6_ft};
-  wpi::tunable::Tunables::Publish("distance", distance);
+  wpi::tunable::Publish("distance", distance);
   auto distanceUid = mock->GetUid("/distance");
   REQUIRE(distanceUid);
   auto distanceInfo = wpi::tunable::TunableRegistry::GetTunable(*distanceUid);
@@ -3452,7 +3452,7 @@ TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {
   CHECK(distance.Get() == 2_m);
 
   UnitComplexTunable complex;
-  wpi::tunable::Tunables::Publish("complex", complex);
+  wpi::tunable::Publish("complex", complex);
   auto memberUid = mock->GetUid("/complex/distance");
   REQUIRE(memberUid);
   auto memberInfo = wpi::tunable::TunableRegistry::GetTunable(*memberUid);

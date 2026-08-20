@@ -229,16 +229,16 @@ class DataLogTelemetryBackendTest {
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest LogsScalarDataTypes",
                  "[wpilibc][telemetry]") {
-  wpi::telemetry::Telemetry::Log("boolean", true);
-  wpi::telemetry::Telemetry::Log("byte", int8_t{2});
-  wpi::telemetry::Telemetry::Log("short", int16_t{3});
-  wpi::telemetry::Telemetry::Log("int", int32_t{4});
-  wpi::telemetry::Telemetry::Log("long", int64_t{5});
-  wpi::telemetry::Telemetry::Log("float", 6.25f);
-  wpi::telemetry::Telemetry::Log("double", 7.5);
-  wpi::telemetry::Telemetry::Log("string", "ready");
-  wpi::telemetry::Telemetry::Log("json", std::string_view{"{\"ok\":true}"},
-                                 std::string_view{"json"});
+  wpi::telemetry::Log("boolean", true);
+  wpi::telemetry::Log("byte", int8_t{2});
+  wpi::telemetry::Log("short", int16_t{3});
+  wpi::telemetry::Log("int", int32_t{4});
+  wpi::telemetry::Log("long", int64_t{5});
+  wpi::telemetry::Log("float", 6.25f);
+  wpi::telemetry::Log("double", 7.5);
+  wpi::telemetry::Log("string", "ready");
+  wpi::telemetry::Log("json", std::string_view{"{\"ok\":true}"},
+                      std::string_view{"json"});
 
   auto snapshot = ReadSnapshot();
 
@@ -276,17 +276,17 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
   const uint8_t rawValues[] = {11, 12, 13};
   const uint8_t customRawValues[] = {14, 15};
 
-  wpi::telemetry::Telemetry::Log("booleans", boolValues);
-  wpi::telemetry::Telemetry::Log("shorts", shortValues);
-  wpi::telemetry::Telemetry::Log("ints", intValues);
-  wpi::telemetry::Telemetry::Log("longs", longValues);
-  wpi::telemetry::Telemetry::Log("floats", floatValues);
-  wpi::telemetry::Telemetry::Log("doubles", doubleValues);
-  wpi::telemetry::Telemetry::Log("strings", stringValues);
-  wpi::telemetry::Telemetry::Log("stringViews", stringViewValues);
-  wpi::telemetry::Telemetry::Log("raw", rawValues);
-  wpi::telemetry::Telemetry::Log(
-      "customRaw", std::span<const uint8_t>{customRawValues}, "custom");
+  wpi::telemetry::Log("booleans", boolValues);
+  wpi::telemetry::Log("shorts", shortValues);
+  wpi::telemetry::Log("ints", intValues);
+  wpi::telemetry::Log("longs", longValues);
+  wpi::telemetry::Log("floats", floatValues);
+  wpi::telemetry::Log("doubles", doubleValues);
+  wpi::telemetry::Log("strings", stringValues);
+  wpi::telemetry::Log("stringViews", stringViewValues);
+  wpi::telemetry::Log("raw", rawValues);
+  wpi::telemetry::Log("customRaw", std::span<const uint8_t>{customRawValues},
+                      "custom");
 
   auto snapshot = ReadSnapshot();
 
@@ -333,13 +333,11 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
       wpi::util::GetStructTypeString<wpi::math::Translation2d>()}};
   const std::string protoType = msg.GetTypeString();
 
-  wpi::telemetry::Telemetry::Log("translation", value);
-  wpi::telemetry::Telemetry::Log(
-      "translations",
-      std::span<const wpi::math::Translation2d>{array.data(), array.size()});
-  wpi::telemetry::Telemetry::Log(
-      "translationProto", value,
-      wpi::util::ProtobufMessage<wpi::math::Translation2d>{});
+  wpi::telemetry::Log("translation", value);
+  wpi::telemetry::Log("translations", std::span<const wpi::math::Translation2d>{
+                                          array.data(), array.size()});
+  wpi::telemetry::Log("translationProto", value,
+                      wpi::util::ProtobufMessage<wpi::math::Translation2d>{});
 
   auto snapshot = ReadSnapshot();
 
@@ -363,10 +361,10 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest AppliesTelemetryProperties",
                  "[wpilibc][telemetry]") {
-  wpi::telemetry::Telemetry::SetProperty("speed", "min", "0");
-  wpi::telemetry::Telemetry::SetProperty("speed", "unit", "\"m/s\"");
-  wpi::telemetry::Telemetry::Log("speed", 4.0);
-  wpi::telemetry::Telemetry::SetProperty("speed", "max", "10");
+  wpi::telemetry::SetProperty("speed", "min", "0");
+  wpi::telemetry::SetProperty("speed", "unit", "\"m/s\"");
+  wpi::telemetry::Log("speed", 4.0);
+  wpi::telemetry::SetProperty("speed", "max", "10");
 
   auto snapshot = ReadSnapshot();
   const auto& speed = Entry(snapshot, "speed");
@@ -384,11 +382,11 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest HonorsKeepDuplicates",
                  "[wpilibc][telemetry]") {
-  wpi::telemetry::Telemetry::Log("normal", int64_t{1});
-  wpi::telemetry::Telemetry::Log("normal", int64_t{1});
-  wpi::telemetry::Telemetry::KeepDuplicates("duplicates");
-  wpi::telemetry::Telemetry::Log("duplicates", int64_t{2});
-  wpi::telemetry::Telemetry::Log("duplicates", int64_t{2});
+  wpi::telemetry::Log("normal", int64_t{1});
+  wpi::telemetry::Log("normal", int64_t{1});
+  wpi::telemetry::KeepDuplicates("duplicates");
+  wpi::telemetry::Log("duplicates", int64_t{2});
+  wpi::telemetry::Log("duplicates", int64_t{2});
 
   auto snapshot = ReadSnapshot();
 
@@ -424,12 +422,12 @@ TEST_CASE_METHOD(
         warnings.emplace_back(path);
         if (!nested) {
           nested = true;
-          wpi::telemetry::Telemetry::Log("value", "again");
+          wpi::telemetry::Log("value", "again");
         }
       });
 
-  wpi::telemetry::Telemetry::Log("value", int64_t{1});
-  wpi::telemetry::Telemetry::Log("value", true);
+  wpi::telemetry::Log("value", int64_t{1});
+  wpi::telemetry::Log("value", true);
 
   CHECK((std::vector<std::string>{"/Telemetry/value", "/Telemetry/value"}) ==
         warnings);

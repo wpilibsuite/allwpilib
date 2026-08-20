@@ -8,6 +8,7 @@ This file documents the C++ API as a C++ user would consume it.
 ## C++ Overview
 
 - The primary value type is `wpi::tunable::Tunable<T>`.
+- Root-level helper functions live directly in `wpi::tunable`.
 - For common primitive and container types, aliases are provided (`wpi::tunable::TunableBool`, `wpi::tunable::TunableInt32`, `wpi::tunable::TunableInt64`, `wpi::tunable::TunableFloat`, `wpi::tunable::TunableDouble`, `wpi::tunable::TunableString`, `wpi::tunable::TunableRaw`, and vector aliases).
 - Values are typically read/written using assignment and implicit conversion operators.
 - Complex object publishing uses `wpi::tunable::ComplexTunable` plus `wpi::tunable::TunableTable`.
@@ -78,43 +79,40 @@ The callback receives the tuned object and the move-tracked parent pointer. Do n
 
 `onRemoteSet` runs after a backend applies a remote value but before the backend publishes any resulting value. It is mainly for language bindings and adapter code that must reconcile getter/setter-backed values before a robust backend echoes the tune; normal user notifications should use `onTune`. `onRemoteSet` callbacks must not throw.
 
-### `wpi::tunable::Tunables`
+### `wpi::tunable` Root Functions
 
-Root-level helper entry point. The root facade mirrors the hierarchical
-publishing surface of `wpi::tunable::TunableTable`, except it does not expose
+Root-level helper functions mirror the hierarchical publishing surface of
+`wpi::tunable::TunableTable`, except they do not expose
 `TunableTable::GetPath()`.
 
 ```cpp
-class Tunables final {
- public:
-  static wpi::tunable::TunableTable GetTable();
-  static wpi::tunable::TunableTable GetTable(std::string_view name);
+wpi::tunable::TunableTable GetTable();
+wpi::tunable::TunableTable GetTable(std::string_view name);
 
-  template <typename T, typename... Args>
-  static wpi::tunable::Tunable<T> Add(std::string_view name, Args&&... params);
+template <typename T, typename... Args>
+wpi::tunable::Tunable<T> Add(std::string_view name, Args&&... params);
 
-  template <std::derived_from<wpi::tunable::ComplexTunable> T, typename... Args>
-  static T AddComplex(std::string_view name, Args&&... args);
+template <std::derived_from<wpi::tunable::ComplexTunable> T, typename... Args>
+T AddComplex(std::string_view name, Args&&... args);
 
-  static bool Publish(std::string_view name, wpi::tunable::detail::TunableBase& tunable);
-  static bool Publish(std::string_view name, wpi::tunable::ComplexTunable& tunable);
+bool Publish(std::string_view name, wpi::tunable::detail::TunableBase& tunable);
+bool Publish(std::string_view name, wpi::tunable::ComplexTunable& tunable);
 
-  template <typename T, typename... I>
-    requires wpi::tunable::detail::IsCustomTunable<T, I...>
-  static bool Publish(std::string_view name, wpi::tunable::Tunable<T, I...>& tunable);
+template <typename T, typename... I>
+  requires wpi::tunable::detail::IsCustomTunable<T, I...>
+bool Publish(std::string_view name, wpi::tunable::Tunable<T, I...>& tunable);
 
-  static bool Publish(std::string_view name, wpi::tunable::ComplexTunable* tunable,
-                      std::unique_ptr<wpi::tunable::detail::TunableMemberBase> member);
+bool Publish(std::string_view name, wpi::tunable::ComplexTunable* tunable,
+             std::unique_ptr<wpi::tunable::detail::TunableMemberBase> member);
 
-  template <typename T, std::derived_from<wpi::tunable::ComplexTunable> Class, typename... I>
-  static bool Publish(std::string_view name, Class* tunable, T Class::*member, I&&... info);
+template <typename T, std::derived_from<wpi::tunable::ComplexTunable> Class, typename... I>
+bool Publish(std::string_view name, Class* tunable, T Class::*member, I&&... info);
 
-  template <typename T, std::derived_from<wpi::tunable::ComplexTunable> Class, typename... I>
-  static bool Publish(std::string_view name, Class* tunable, T Class::*member,
-                      const wpi::tunable::TunableConfig& config, I&&... info);
+template <typename T, std::derived_from<wpi::tunable::ComplexTunable> Class, typename... I>
+bool Publish(std::string_view name, Class* tunable, T Class::*member,
+             const wpi::tunable::TunableConfig& config, I&&... info);
 
-  static void Remove(std::string_view name);
-};
+void Remove(std::string_view name);
 ```
 
 `GetTable(name)`, `Publish()`, and `Remove()` delegate through the root table, so
@@ -288,9 +286,9 @@ Polling and mutability options do not change this contract. `ALWAYS_GET` control
 ```cpp
 class DriveSubsystem {
  public:
-  wpi::tunable::TunableDouble kP = wpi::tunable::Tunables::Add<double>("drive/kP", 0.05);
-  wpi::tunable::TunableDouble kI = wpi::tunable::Tunables::Add<double>("drive/kI", 0.0);
-  wpi::tunable::TunableDouble kD = wpi::tunable::Tunables::Add<double>("drive/kD", 0.001);
+  wpi::tunable::TunableDouble kP = wpi::tunable::Add<double>("drive/kP", 0.05);
+  wpi::tunable::TunableDouble kI = wpi::tunable::Add<double>("drive/kI", 0.0);
+  wpi::tunable::TunableDouble kD = wpi::tunable::Add<double>("drive/kD", 0.001);
 
   void Periodic() {
     pid.SetP(kP);
@@ -309,14 +307,14 @@ config.properties["min"] = 0;
 config.properties["max"] = 1;
 
 wpi::tunable::TunableDouble tolerance{0.02, config};
-wpi::tunable::Tunables::Publish("shooter/tolerance", tolerance);
+wpi::tunable::Publish("shooter/tolerance", tolerance);
 ```
 
 ### Struct-serializable type
 
 ```cpp
 wpi::tunable::Tunable<wpi::Pose2d> targetPose{wpi::Pose2d{}};
-wpi::tunable::Tunables::Publish("drive/targetPose", targetPose);
+wpi::tunable::Publish("drive/targetPose", targetPose);
 ```
 
 ### Complex tunable with `Tunable` member variables
@@ -342,7 +340,7 @@ class TunablePIDController : public wpi::tunable::ComplexTunable {
 };
 
 TunablePIDController armPID{1.0, 0.0, 0.1};
-wpi::tunable::Tunables::Publish("arm/pid", armPID);
+wpi::tunable::Publish("arm/pid", armPID);
 ```
 
 ### Complex tunable with plain member variables
@@ -368,13 +366,13 @@ class TunablePIDController : public wpi::tunable::ComplexTunable {
 };
 
 TunablePIDController armPID{1.0, 0.0, 0.1};
-wpi::tunable::Tunables::Publish("arm/pid", armPID);
+wpi::tunable::Publish("arm/pid", armPID);
 ```
 
 ### Hierarchical tables
 
 ```cpp
-wpi::tunable::TunableTable arm = wpi::tunable::Tunables::GetTable("arm");
+wpi::tunable::TunableTable arm = wpi::tunable::GetTable("arm");
 wpi::tunable::TunableTable pivot = arm.GetTable("pivot");
 
 wpi::tunable::TunableDouble pivotSpeed{2.0};
@@ -404,10 +402,10 @@ EXPECT_NEAR(drive.GetPID().GetP(), 0.1, 1e-9);
 
 Key differences from 2026:
 
-- `frc::SmartDashboard::PutNumber("key", value)` / `frc::SmartDashboard::GetNumber("key", default)` called every loop is replaced with a single `wpi::tunable::Tunables::Add<double>("key", initialValue)` declaration that returns a `wpi::tunable::TunableDouble`. Read it with `Get()` or implicit conversion and write it with assignment or `Set()`.
+- `frc::SmartDashboard::PutNumber("key", value)` / `frc::SmartDashboard::GetNumber("key", default)` called every loop is replaced with a single `wpi::tunable::Add<double>("key", initialValue)` declaration that returns a `wpi::tunable::TunableDouble`. Read it with `Get()` or implicit conversion and write it with assignment or `Set()`.
 - Direct NetworkTables entry/topic boilerplate is replaced by the same `wpi::tunable::Tunable<T>` pattern; the backend handles the underlying NT entry lifecycle.
 - `frc::SendableChooser<T>` is replaced by `wpi::tunable::Selectable<T>`. The API is similar: `Add(name, object)`, `AddDefault(name, object)`, `GetSelected()`.
-- The `Sendable` interface and `frc::SmartDashboard::PutData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `wpi::tunable::ComplexTunable` and register via `wpi::tunable::Tunables::Publish()`.
+- The `Sendable` interface and `frc::SmartDashboard::PutData()` are not part of the Tunable API; subsystems and mechanisms that previously implemented `Sendable` should implement `wpi::tunable::ComplexTunable` and register via `wpi::tunable::Publish()`.
 
 ### SmartDashboard Tuning to Tunable
 
@@ -430,7 +428,7 @@ void RobotPeriodic() {
 
 ```cpp
 wpi::tunable::TunableDouble m_intakeSpeed =
-    wpi::tunable::Tunables::Add<double>("Intake/speed", 0.65);
+    wpi::tunable::Add<double>("Intake/speed", 0.65);
 
 void RobotPeriodic() {
   m_intakeMotor.Set(m_intakeSpeed.Get());
@@ -478,7 +476,7 @@ class DriveSubsystem : public wpi::tunable::ComplexTunable {
 };
 
 void RobotInit() {
-  wpi::tunable::Tunables::Publish("Drive", m_drive);
+  wpi::tunable::Publish("Drive", m_drive);
 }
 ```
 
@@ -509,7 +507,7 @@ wpi::FieldObject2d* m_target = m_field.GetObject("Target");
 wpi::math::Pose2d m_driveTargetPose;
 
 void RobotInit() {
-  wpi::tunable::Tunables::Publish("Field", m_field);
+  wpi::tunable::Publish("Field", m_field);
 }
 
 void RobotPeriodic() {
@@ -552,7 +550,7 @@ wpi::tunable::Selectable<DriveMode> m_driveMode;
 void RobotInit() {
   m_driveMode.AddDefault("Field Relative", DriveMode::kFieldRelative);
   m_driveMode.Add("Robot Relative", DriveMode::kRobotRelative);
-  wpi::tunable::Tunables::Publish("Drive/mode", m_driveMode);
+  wpi::tunable::Publish("Drive/mode", m_driveMode);
 }
 
 void TeleopPeriodic() {

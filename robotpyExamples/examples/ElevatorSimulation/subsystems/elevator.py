@@ -4,6 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -107,4 +108,4 @@ class Elevator:
 
         # Publish the Mechanism2d visualization through telemetry.
         # To view the Elevator visualization, select Network Tables -> Telemetry -> Elevator Sim
-        wpilib.Telemetry.log("Elevator Sim", self.mech2d)
+        telemetry.log("Elevator Sim", self.mech2d)

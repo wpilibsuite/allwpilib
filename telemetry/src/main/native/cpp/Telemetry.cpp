@@ -6,11 +6,11 @@
 
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 
-using namespace wpi;
-using namespace wpi::telemetry;
+namespace wpi::telemetry {
 
-wpi::telemetry::TelemetryTable& Telemetry::GetTable() {
-  static wpi::telemetry::TelemetryTable& root =
-      wpi::telemetry::TelemetryRegistry::GetTable("");
+TelemetryTable& GetTable() {
+  static TelemetryTable& root = TelemetryRegistry::GetTable("");
   return root;
 }
+
+}  // namespace wpi::telemetry

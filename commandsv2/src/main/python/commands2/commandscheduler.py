@@ -7,19 +7,15 @@ import traceback
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 
 import hal
+from telemetry import TelemetryLoggable, TelemetryTable
 from typing_extensions import Self
+from tunable import ComplexTunable, Tunable, TunableRegistry, TunableTable
 from wpilib import (
     RobotState,
     EventLoop,
     RobotBase,
     TimedRobot,
     Watchdog,
-    ComplexTunable,
-    TelemetryLoggable,
-    TelemetryTable,
-    Tunable,
-    TunableRegistry,
-    TunableTable,
     report_warning,
 )
 

@@ -54,13 +54,13 @@ def test_tunable_type_selectors_use_python_types():
 
 
 def test_backend_updates_tunable(backend):
-    value = tunable.Tunables.add("value", 1)
+    value = tunable.add("value", 1)
 
     backend.set_int64("/value", 3)
     tunable.TunableRegistry.update()
 
     assert value.get() == 3
-    tunable.Tunables.remove("value")
+    tunable.remove("value")
 
 
 def test_report_warning_allows_reentry(backend):
@@ -120,15 +120,15 @@ run_waiting_call(tunable.TunableRegistry.update)
 
 
 def test_primitive_and_array_tunables_update_from_backend(backend):
-    boolean = tunable.Tunables.add("boolean", True)
-    integer = tunable.Tunables.add("integer", 1)
-    double = tunable.Tunables.add("double", 2.0)
-    string = tunable.Tunables.add("string", "start")
-    raw = tunable.Tunables.add("raw", b"abc")
-    booleans = tunable.Tunables.add("booleans", [True, False])
-    integers = tunable.Tunables.add("integers", [1, 2])
-    doubles = tunable.Tunables.add("doubles", [1.0, 2])
-    strings = tunable.Tunables.add("strings", ["a", "b"])
+    boolean = tunable.add("boolean", True)
+    integer = tunable.add("integer", 1)
+    double = tunable.add("double", 2.0)
+    string = tunable.add("string", "start")
+    raw = tunable.add("raw", b"abc")
+    booleans = tunable.add("booleans", [True, False])
+    integers = tunable.add("integers", [1, 2])
+    doubles = tunable.add("doubles", [1.0, 2])
+    strings = tunable.add("strings", ["a", "b"])
 
     backend.set_bool("/boolean", False)
     backend.set_int64("/integer", 10)
@@ -153,11 +153,11 @@ def test_primitive_and_array_tunables_update_from_backend(backend):
 
 
 def test_mutate_updates_stored_primitive_array_tunables(backend):
-    raw = tunable.Tunables.add("raw", b"abc")
-    booleans = tunable.Tunables.add("booleans", [True, False])
-    integers = tunable.Tunables.add("integers", [1, 2])
-    doubles = tunable.Tunables.add("doubles", [1.0, 2.0])
-    strings = tunable.Tunables.add("strings", ["a", "b"])
+    raw = tunable.add("raw", b"abc")
+    booleans = tunable.add("booleans", [True, False])
+    integers = tunable.add("integers", [1, 2])
+    doubles = tunable.add("doubles", [1.0, 2.0])
+    strings = tunable.add("strings", ["a", "b"])
 
     raw_values = raw.mutate()
     raw_values[0] = ord("z")
@@ -186,7 +186,7 @@ def test_mutate_updates_stored_primitive_array_tunables(backend):
 def test_publish_value_uses_getter(backend):
     value = [1]
 
-    published = tunable.Tunables.get_table().publish_int(
+    published = tunable.get_table().publish_int(
         "getter", lambda: value[0], lambda tuned: value.__setitem__(0, tuned)
     )
 
@@ -204,13 +204,13 @@ def test_publish_value_uses_getter(backend):
     backend.set_int64("/getter", 6)
     tunable.TunableRegistry.update()
     assert value[0] == 6
-    tunable.Tunables.remove("getter")
+    tunable.remove("getter")
 
 
 def test_publish_value_remote_setter_updates_cached_value_before_echo(backend):
     value = [1]
 
-    tunable.Tunables.get_table().publish_int(
+    tunable.get_table().publish_int(
         "clamped",
         lambda: value[0],
         lambda tuned: value.__setitem__(0, min(tuned, 5)),
@@ -221,7 +221,7 @@ def test_publish_value_remote_setter_updates_cached_value_before_echo(backend):
 
     assert value[0] == 5
     assert backend.get_value("/clamped") == 5
-    tunable.Tunables.remove("clamped")
+    tunable.remove("clamped")
 
 
 def test_publish_value_getter_can_mutate_top_level_storage_during_refresh(backend):
@@ -231,11 +231,11 @@ def test_publish_value_getter_can_mutate_top_level_storage_during_refresh(backen
         state["calls"] += 1
         if state["armed"]:
             for i in range(32):
-                tunable.Tunables.add_int(f"added{i}", i)
-            tunable.Tunables.remove("value")
+                tunable.add_int(f"added{i}", i)
+            tunable.remove("value")
         return state["calls"]
 
-    tunable.Tunables.get_table().publish_int("value", get_value, lambda _value: None)
+    tunable.get_table().publish_int("value", get_value, lambda _value: None)
     assert state["calls"] == 1
 
     state["armed"] = True
@@ -253,7 +253,7 @@ def test_publish_value_getter_can_mutate_top_level_storage_during_refresh(backen
 def test_table_remove_cleans_published_value_storage(backend):
     calls = []
     value = [1]
-    table = tunable.Tunables.get_table("child")
+    table = tunable.get_table("child")
 
     table.publish_int(
         "getter",
@@ -283,7 +283,7 @@ def test_table_remove_cleans_normalized_published_value_storage(backend):
         def set(self, value: int) -> None:
             self.value = value
 
-    table = tunable.Tunables.get_table("child")
+    table = tunable.get_table("child")
     value = GetterBackedValue()
     ref = weakref.ref(value)
 
@@ -305,22 +305,22 @@ def test_duplicate_publication_preserves_retained_original(backend):
     warnings = []
     tunable.TunableRegistry.set_report_warning(warnings.append)
 
-    tunable.Tunables.add("duplicate", 1)
+    tunable.add("duplicate", 1)
     original_uid = backend.get_uid("/duplicate")
     assert original_uid is not None
 
-    tunable.Tunables.add("duplicate", 2)
+    tunable.add("duplicate", 2)
     assert backend.get_uid("/duplicate") == original_uid
     assert backend.get_value("/duplicate") == 1
 
-    assert tunable.Tunables.publish("published", tunable.Tunable(3)) is True
+    assert tunable.publish("published", tunable.Tunable(3)) is True
     assert backend.get_value("/published") == 3
 
-    assert tunable.Tunables.publish("duplicate", tunable.Tunable(4)) is False
+    assert tunable.publish("duplicate", tunable.Tunable(4)) is False
     assert backend.get_uid("/duplicate") == original_uid
     assert backend.get_value("/duplicate") == 1
 
-    table = tunable.Tunables.get_table("child")
+    table = tunable.get_table("child")
     assert table.publish("value", tunable.Tunable(5)) is True
     assert table.publish("value", tunable.Tunable(6)) is False
     assert backend.get_value("/child/value") == 5
@@ -330,10 +330,8 @@ def test_duplicate_publication_preserves_retained_original(backend):
 
 def test_config_immutable_and_on_tune(backend):
     calls = []
-    mutable = tunable.Tunables.add(
-        "mutable", 0, on_tune=lambda value: calls.append(value)
-    )
-    immutable = tunable.Tunables.add(
+    mutable = tunable.add("mutable", 0, on_tune=lambda value: calls.append(value))
+    immutable = tunable.add(
         "immutable",
         5,
         mutable=False,
@@ -356,15 +354,13 @@ def test_table_paths_route_migrate_and_remove(backend):
     child_backend = tunable.MockTunableBackend()
     tunable.TunableRegistry.register_backend("/child", child_backend)
 
-    assert tunable.Tunables.get_table().path == "/"
-    assert tunable.Tunables.get_table("drive").path == "/drive/"
-    assert tunable.Tunables.get_table("drive").get_table("left").path == (
-        "/drive/left/"
-    )
+    assert tunable.get_table().path == "/"
+    assert tunable.get_table("drive").path == "/drive/"
+    assert tunable.get_table("drive").get_table("left").path == ("/drive/left/")
     assert tunable.TunableRegistry.normalize_name("///drive//left") == "/drive/left"
 
-    root = tunable.Tunables.add("root", 1.0)
-    child = tunable.Tunables.add("child/value", 2.0)
+    root = tunable.add("root", 1.0)
+    child = tunable.add("child/value", 2.0)
 
     assert backend.get_value("/root") == pytest.approx(1.0)
     assert child_backend.get_value("/child/value") == pytest.approx(2.0)
@@ -377,7 +373,7 @@ def test_table_paths_route_migrate_and_remove(backend):
     assert root.get() == pytest.approx(3.0)
     assert child.get() == pytest.approx(4.0)
 
-    tunable.Tunables.remove("child/value")
+    tunable.remove("child/value")
     assert child_backend.get_uid("/child/value") is None
 
 
@@ -396,8 +392,8 @@ def test_get_backend_normalizes_path(backend):
 
 
 def test_register_backend_migrates_existing_tunables(backend):
-    root = tunable.Tunables.add("root", 1.0)
-    child = tunable.Tunables.add("child/value", 2.0)
+    root = tunable.add("root", 1.0)
+    child = tunable.add("child/value", 2.0)
 
     child_backend = tunable.MockTunableBackend()
     tunable.TunableRegistry.register_backend("/child", child_backend)
@@ -415,7 +411,7 @@ def test_register_backend_migrates_existing_tunables(backend):
 
 
 def test_register_backend_replacement_migrates_existing_tunables(backend):
-    value = tunable.Tunables.add("value", 1.0)
+    value = tunable.add("value", 1.0)
     replacement_backend = tunable.MockTunableBackend()
 
     tunable.TunableRegistry.register_backend("", replacement_backend)
@@ -434,11 +430,11 @@ def test_publish_retains_complex_tunable(backend):
     value.add_default("option", True)
     ref = weakref.ref(value)
 
-    tunable.Tunables.publish("selectable", value)
+    tunable.publish("selectable", value)
     del value
 
     assert bool(ref) is True
-    tunable.Tunables.remove("selectable")
+    tunable.remove("selectable")
 
 
 def test_complex_tunable_publishes_members_and_updates(backend):
@@ -458,7 +454,7 @@ def test_complex_tunable_publishes_members_and_updates(backend):
             return "UpdatingComplex"
 
     value = UpdatingComplex()
-    tunable.Tunables.publish("complex", value)
+    tunable.publish("complex", value)
 
     assert backend.get_value("/complex/value") == 0
 
@@ -483,8 +479,8 @@ def test_remove_complex_tunable_removes_members(backend):
             self.update_count += 1
 
     value = RemovedComplex()
-    tunable.Tunables.publish("complex", value)
-    tunable.Tunables.remove("complex")
+    tunable.publish("complex", value)
+    tunable.remove("complex")
     tunable.TunableRegistry.update()
 
     assert value.value.get() == 1
@@ -506,8 +502,8 @@ def test_registry_remove_complex_tunable_by_object(backend):
             self.update_count += 1
 
     value = RemovedComplex()
-    tunable.Tunables.publish("first", value)
-    tunable.Tunables.publish("second", value)
+    tunable.publish("first", value)
+    tunable.publish("second", value)
 
     tunable.TunableRegistry.remove(value)
     tunable.TunableRegistry.update()
@@ -520,7 +516,7 @@ def test_registry_remove_complex_tunable_by_object(backend):
 
 
 def test_registry_remove_path_string(backend):
-    tunable.Tunables.add("value", 1)
+    tunable.add("value", 1)
 
     tunable.TunableRegistry.remove("value")
 
@@ -535,7 +531,7 @@ def test_table_remove_releases_complex_tunable(backend):
         def publish_tunable(self, table: tunable.TunableTable) -> None:
             table.publish("value", self.value)
 
-    table = tunable.Tunables.get_table("child")
+    table = tunable.get_table("child")
     value = RemovedComplex()
     ref = weakref.ref(value)
 
@@ -569,10 +565,10 @@ def test_remove_normalized_complex_tunable_releases_storage(backend):
     value = RemovedComplex()
     ref = weakref.ref(value)
 
-    tunable.Tunables.publish("child//complex", value)
+    tunable.publish("child//complex", value)
     assert value.calls == 1
 
-    tunable.Tunables.remove("child/complex")
+    tunable.remove("child/complex")
     value.value = 2
     tunable.TunableRegistry.update()
 
@@ -611,7 +607,7 @@ def test_complex_table_remove_releases_published_value_child(backend):
     child = value.child
     ref = weakref.ref(child)
 
-    tunable.Tunables.publish("complex", value)
+    tunable.publish("complex", value)
     assert calls == [1]
 
     assert value.table is not None
@@ -660,7 +656,7 @@ def test_complex_table_remove_releases_nested_complex_child(backend):
     child = value.child
     ref = weakref.ref(child)
 
-    tunable.Tunables.publish("complex", value)
+    tunable.publish("complex", value)
     assert calls == [1]
 
     assert value.table is not None
@@ -688,7 +684,7 @@ def test_register_backend_migrates_complex_tunable(backend):
             self.update_count += 1
 
     value = MigratedComplex()
-    tunable.Tunables.publish("child/complex", value)
+    tunable.publish("child/complex", value)
 
     child_backend = tunable.MockTunableBackend()
     tunable.TunableRegistry.register_backend("/child", child_backend)
@@ -722,7 +718,7 @@ def test_migrated_complex_publish_value_refreshes_once(backend):
             self.value = value
 
     value = MigratedComplex()
-    tunable.Tunables.publish("child/complex", value)
+    tunable.publish("child/complex", value)
 
     child_backend = tunable.MockTunableBackend()
     tunable.TunableRegistry.register_backend("/child", child_backend)
@@ -749,7 +745,7 @@ def test_more_specific_child_backend_keeps_migrated_complex_child(backend):
     tunable.TunableRegistry.register_backend("/child/complex/value", leaf_backend)
 
     value = MigratedComplex()
-    tunable.Tunables.publish("child/complex", value)
+    tunable.publish("child/complex", value)
 
     child_backend = tunable.MockTunableBackend()
     tunable.TunableRegistry.register_backend("/child", child_backend)
@@ -783,7 +779,7 @@ def test_complex_tunable_publish_descriptor_is_reused_for_initial_publish(backen
 
     value = DescriptorComplex()
 
-    tunable.Tunables.publish("descriptor", value)
+    tunable.publish("descriptor", value)
 
     assert value.lookup_count == 1
     assert value.publish_count == 1
@@ -798,14 +794,14 @@ def test_complex_tunable_publish_lookup_error_is_reported(backend):
             raise AttributeError(name)
 
     with pytest.raises(RuntimeError, match="broken descriptor"):
-        tunable.Tunables.publish("brokenLookup", BrokenLookup())
+        tunable.publish("brokenLookup", BrokenLookup())
 
     assert backend.get_uid("/brokenLookup") is None
 
 
 def test_struct_tunable_and_struct_array_update_from_backend(backend):
-    point = tunable.Tunables.add("point", TunablePoint(1, 2))
-    points = tunable.Tunables.add("points", [TunablePoint(1, 2), TunablePoint(3, 4)])
+    point = tunable.add("point", TunablePoint(1, 2))
+    points = tunable.add("points", [TunablePoint(1, 2), TunablePoint(3, 4)])
 
     assert backend.get_value("/point") == wpistruct.pack(TunablePoint(1, 2))
     assert backend.get_value("/points") == wpistruct.pack_array(
@@ -821,8 +817,8 @@ def test_struct_tunable_and_struct_array_update_from_backend(backend):
 
 
 def test_mutate_marks_struct_tunables_changed(backend):
-    point = tunable.Tunables.add("point", TunablePoint(1, 2))
-    points = tunable.Tunables.add("points", [TunablePoint(3, 4)])
+    point = tunable.add("point", TunablePoint(1, 2))
+    points = tunable.add("points", [TunablePoint(3, 4)])
 
     point.mutate().a = 5
     points.mutate()[0].a = 6
@@ -834,10 +830,10 @@ def test_mutate_marks_struct_tunables_changed(backend):
 
 def test_empty_tunable_array_requires_element_type(backend):
     with pytest.raises(TypeError, match="empty tunable sequences require element_type"):
-        tunable.Tunables.add("untyped", [])
+        tunable.add("untyped", [])
 
-    doubles = tunable.Tunables.add("doubles", [], element_type=float)
-    points = tunable.Tunables.add("points", [], element_type=TunablePoint)
+    doubles = tunable.add("doubles", [], element_type=float)
+    points = tunable.add("points", [], element_type=TunablePoint)
 
     assert doubles.get() == []
     assert backend.get_value("/doubles") == []
@@ -846,7 +842,7 @@ def test_empty_tunable_array_requires_element_type(backend):
 
 
 def test_struct_array_tunable_can_be_cleared(backend):
-    points = tunable.Tunables.add("points", [TunablePoint(1, 2)])
+    points = tunable.add("points", [TunablePoint(1, 2)])
 
     points.set([])
 
@@ -857,7 +853,7 @@ def test_struct_array_tunable_can_be_cleared(backend):
 def test_struct_array_publish_value_can_refresh_to_empty_sequence(backend):
     points = [[TunablePoint(1, 2)]]
 
-    tunable.Tunables.get_table().publish_value(
+    tunable.get_table().publish_value(
         "points", lambda: points[0], lambda tuned: points.__setitem__(0, tuned)
     )
     points[0] = []
@@ -870,7 +866,7 @@ def test_struct_array_publish_value_can_refresh_to_empty_sequence(backend):
 def test_struct_publish_value_refreshes_in_place_mutation(backend):
     point = TunablePoint(1, 2)
 
-    tunable.Tunables.get_table().publish_value("point", lambda: point, lambda _: None)
+    tunable.get_table().publish_value("point", lambda: point, lambda _: None)
     point.a = 3
 
     tunable.TunableRegistry.update()
@@ -890,7 +886,7 @@ def test_complex_tunable_direct_struct_publish_value(backend):
             self.point = value
 
     value = DirectStructComplex()
-    tunable.Tunables.publish("directStruct", value)
+    tunable.publish("directStruct", value)
 
     backend.set_struct("/directStruct/point", TunablePoint(3, 4))
     tunable.TunableRegistry.update()
@@ -910,7 +906,7 @@ def test_complex_tunable_direct_publish_value_refreshes_before_update(backend):
             self.value = value
 
     value = DirectGetterComplex()
-    tunable.Tunables.publish("directGetter", value)
+    tunable.publish("directGetter", value)
 
     value.value = 4
     tunable.TunableRegistry.update()
@@ -937,15 +933,15 @@ def test_complex_tunable_getter_can_mutate_top_level_storage_during_refresh(
         def _get_value(self) -> int:
             self.calls += 1
             if self.armed:
-                tunable.Tunables.publish("addedComplex", EmptyComplex())
-                tunable.Tunables.remove("complex")
+                tunable.publish("addedComplex", EmptyComplex())
+                tunable.remove("complex")
             return self.value
 
         def _set_value(self, value: int) -> None:
             self.value = value
 
     value = MutatingComplex()
-    tunable.Tunables.publish("complex", value)
+    tunable.publish("complex", value)
     assert value.calls == 1
 
     value.armed = True
@@ -970,7 +966,7 @@ def test_complex_tunable_wrapped_struct_member(backend):
             table.publish("point", self.point)
 
     value = WrappedStructComplex()
-    tunable.Tunables.publish("wrappedStruct", value)
+    tunable.publish("wrappedStruct", value)
 
     backend.set_struct("/wrappedStruct/point", TunablePoint(5, 6))
     tunable.TunableRegistry.update()
@@ -995,12 +991,12 @@ def test_selectable_returns_selected(
     chooser.add_default("0", 0)
     name = f"ReturnsSelectedChooser{value}"
 
-    tunable.Tunables.publish(name, chooser)
+    tunable.publish(name, chooser)
     backend.set_string(f"/{name}/selected", str(value))
     tunable.TunableRegistry.update()
 
     assert value == chooser.get_selected()
-    tunable.Tunables.remove(name)
+    tunable.remove(name)
 
 
 def test_selectable_default_is_returned_on_no_select(
@@ -1017,12 +1013,12 @@ def test_selectable_default_is_returned_on_unknown_select(
     chooser.add_default("one", 1)
     chooser.add("two", 2)
 
-    tunable.Tunables.publish("UnknownDefaultChooser", chooser)
+    tunable.publish("UnknownDefaultChooser", chooser)
     backend.set_string("/UnknownDefaultChooser/selected", "missing")
     tunable.TunableRegistry.update()
 
     assert chooser.get_selected() == 1
-    tunable.Tunables.remove("UnknownDefaultChooser")
+    tunable.remove("UnknownDefaultChooser")
 
 
 def test_selectable_default_constructable_is_returned_on_no_select_and_no_default(
@@ -1041,12 +1037,12 @@ def test_selectable_change_listener(
         current_val[0] = val
 
     chooser.on_change(on_change)
-    tunable.Tunables.publish("ChangeListenerChooser", chooser)
+    tunable.publish("ChangeListenerChooser", chooser)
     backend.set_string("/ChangeListenerChooser/selected", "3")
     tunable.TunableRegistry.update()
 
     assert 3 == current_val[0]
-    tunable.Tunables.remove("ChangeListenerChooser")
+    tunable.remove("ChangeListenerChooser")
 
 
 def test_selectable_change_listener_uses_default_when_selection_is_unknown(
@@ -1058,12 +1054,12 @@ def test_selectable_change_listener_uses_default_when_selection_is_unknown(
     current_val = [0]
     chooser.on_change(lambda value: current_val.__setitem__(0, value))
 
-    tunable.Tunables.publish("ChangeListenerUnknownDefaultChooser", chooser)
+    tunable.publish("ChangeListenerUnknownDefaultChooser", chooser)
     backend.set_string("/ChangeListenerUnknownDefaultChooser/selected", "missing")
     tunable.TunableRegistry.update()
 
     assert current_val[0] == 1
-    tunable.Tunables.remove("ChangeListenerUnknownDefaultChooser")
+    tunable.remove("ChangeListenerUnknownDefaultChooser")
 
 
 def test_selectable_publishes_metadata_and_ignores_remote_metadata_writes(
@@ -1076,7 +1072,7 @@ def test_selectable_publishes_metadata_and_ignores_remote_metadata_writes(
     assert chooser.get_tunable_type() == "Selectable"
     assert chooser.get_selected() == 2
 
-    tunable.Tunables.publish("MetadataChooser", chooser)
+    tunable.publish("MetadataChooser", chooser)
 
     assert backend.get_value("/MetadataChooser/default") == "two"
     assert backend.get_value("/MetadataChooser/options") == ["one", "two"]
@@ -1090,7 +1086,7 @@ def test_selectable_publishes_metadata_and_ignores_remote_metadata_writes(
     assert backend.get_value("/MetadataChooser/default") == "two"
     assert backend.get_value("/MetadataChooser/options") == ["one", "two"]
     assert chooser.get_selected() == 1
-    tunable.Tunables.remove("MetadataChooser")
+    tunable.remove("MetadataChooser")
 
 
 def test_selectable_listener_is_not_called_for_unknown_selection(
@@ -1101,13 +1097,13 @@ def test_selectable_listener_is_not_called_for_unknown_selection(
     current_val = [0]
     chooser.on_change(lambda value: current_val.__setitem__(0, value))
 
-    tunable.Tunables.publish("UnknownSelectionChooser", chooser)
+    tunable.publish("UnknownSelectionChooser", chooser)
     backend.set_string("/UnknownSelectionChooser/selected", "missing")
     tunable.TunableRegistry.update()
 
     assert current_val[0] == 0
     assert chooser.get_selected() is None
-    tunable.Tunables.remove("UnknownSelectionChooser")
+    tunable.remove("UnknownSelectionChooser")
 
 
 def test_selectable_listener_replacement_uses_latest_listener(
@@ -1120,13 +1116,13 @@ def test_selectable_listener_replacement_uses_latest_listener(
     chooser.on_change(lambda value: first.__setitem__(0, value))
     chooser.on_change(lambda value: second.__setitem__(0, value))
 
-    tunable.Tunables.publish("ListenerReplacementChooser", chooser)
+    tunable.publish("ListenerReplacementChooser", chooser)
     backend.set_string("/ListenerReplacementChooser/selected", "one")
     tunable.TunableRegistry.update()
 
     assert first[0] == 0
     assert second[0] == 1
-    tunable.Tunables.remove("ListenerReplacementChooser")
+    tunable.remove("ListenerReplacementChooser")
 
 
 def test_selectable_duplicate_option_and_clear(
@@ -1136,7 +1132,7 @@ def test_selectable_duplicate_option_and_clear(
     chooser.add("mode", 1)
     chooser.add("mode", 2)
 
-    tunable.Tunables.publish("DuplicateChooser", chooser)
+    tunable.publish("DuplicateChooser", chooser)
     assert backend.get_value("/DuplicateChooser/options") == ["mode"]
 
     backend.set_string("/DuplicateChooser/selected", "mode")
@@ -1150,7 +1146,7 @@ def test_selectable_duplicate_option_and_clear(
 
     chooser.add("mode", 22)
     assert chooser.get_selected() == 22
-    tunable.Tunables.remove("DuplicateChooser")
+    tunable.remove("DuplicateChooser")
 
 
 def test_selectable_remove_option(
@@ -1161,7 +1157,7 @@ def test_selectable_remove_option(
     chooser.add("two", 2)
     chooser.add("three", 3)
 
-    tunable.Tunables.publish("RemoveChooser", chooser)
+    tunable.publish("RemoveChooser", chooser)
     backend.set_string("/RemoveChooser/selected", "two")
     tunable.TunableRegistry.update()
 
@@ -1181,4 +1177,4 @@ def test_selectable_remove_option(
     chooser.remove("missing")
     assert backend.get_value("/RemoveChooser/options") == ["three", "two"]
     assert chooser.get_selected() == 22
-    tunable.Tunables.remove("RemoveChooser")
+    tunable.remove("RemoveChooser")

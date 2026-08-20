@@ -68,7 +68,7 @@ TEST_CASE_METHOD(UnitsTunableTest,
   TunableRegistry::RegisterBackend("/recording", recordingBackend);
 
   UnitMemberComplex complex;
-  Tunables::Publish("unit", complex);
+  Publish("unit", complex);
   auto uid = backend->GetUid("/unit/distance");
   REQUIRE(uid);
 

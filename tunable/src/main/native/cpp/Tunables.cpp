@@ -9,30 +9,31 @@
 
 #include "wpi/tunable/TunableTable.hpp"
 
-using namespace wpi;
-using namespace wpi::tunable;
+namespace wpi::tunable {
 
-TunableTable Tunables::GetTable() {
+TunableTable GetTable() {
   return TunableTable{"/"};
 }
 
-TunableTable Tunables::GetTable(std::string_view name) {
+TunableTable GetTable(std::string_view name) {
   return GetTable().GetTable(name);
 }
 
-bool Tunables::Publish(std::string_view name, detail::TunableBase& tunable) {
+bool Publish(std::string_view name, detail::TunableBase& tunable) {
   return GetTable().Publish(name, tunable);
 }
 
-bool Tunables::Publish(std::string_view name, ComplexTunable& tunable) {
+bool Publish(std::string_view name, ComplexTunable& tunable) {
   return GetTable().Publish(name, tunable);
 }
 
-bool Tunables::Publish(std::string_view name, ComplexTunable* tunable,
-                       std::unique_ptr<detail::TunableMemberBase> member) {
+bool Publish(std::string_view name, ComplexTunable* tunable,
+             std::unique_ptr<detail::TunableMemberBase> member) {
   return GetTable().Publish(name, tunable, std::move(member));
 }
 
-void Tunables::Remove(std::string_view name) {
+void Remove(std::string_view name) {
   GetTable().Remove(name);
 }
+
+}  // namespace wpi::tunable

@@ -6,6 +6,7 @@
 
 import math
 
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -167,4 +168,4 @@ class Drivetrain:
         self.update_odometry()
         self.field_sim.set_robot_pose(self.odometry.get_pose())
 
-        wpilib.Telemetry.log("Field", self.field_sim)
+        telemetry.log("Field", self.field_sim)

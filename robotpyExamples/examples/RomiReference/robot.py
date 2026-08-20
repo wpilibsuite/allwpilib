@@ -40,6 +40,7 @@
 
 import typing
 
+import telemetry
 import wpilib
 import commands2
 
@@ -67,7 +68,7 @@ class MyRobot(commands2.TimedCommandRobot):
 
     def robot_periodic(self) -> None:
         super().robot_periodic()
-        wpilib.Telemetry.log("", self.container)
+        telemetry.log("", self.container)
 
     def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
