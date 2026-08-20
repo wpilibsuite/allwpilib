@@ -7,7 +7,7 @@ requires = [
     "hatchling",
     "robotpy-native-wpimath==0.0.0",
     "robotpy-telemetry==0.0.0",
-    "robotpy-tunable==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
     # "numpy", # broken in raspbian CI
 ]
@@ -24,7 +24,7 @@ license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpimath==0.0.0",
     "robotpy-telemetry==0.0.0",
-    "robotpy-tunable==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
 ]
 
@@ -1458,7 +1458,7 @@ types = [
 name = "wpimath"
 wraps = ["robotpy-native-wpimath"]
 includes = ["wpimath/_impl/src"]
-depends = ["telemetry", "tunable", "wpiutil", "wpimath-casters"]
+depends = ["telemetry", "tunables", "wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
 # wpi/math/util

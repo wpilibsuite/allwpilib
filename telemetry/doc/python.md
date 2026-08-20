@@ -101,7 +101,7 @@ Custom backends and entries must accept concurrent entry creation, schema operat
 
 ## Python Migration from WPILib 2026
 
-For values that were only displayed with `wpilib.SmartDashboard.put*()`, use `telemetry.log()`. For values that were displayed and then read back with `wpilib.SmartDashboard.get*()` so the dashboard could change robot behavior, use `tunable.Tunable` instead.
+For values that were only displayed with `wpilib.SmartDashboard.put*()`, use `telemetry.log()`. For values that were displayed and then read back with `wpilib.SmartDashboard.get*()` so the dashboard could change robot behavior, use `tunables.Tunable` instead.
 
 ### SmartDashboard Output to Telemetry
 
@@ -200,7 +200,7 @@ def robotPeriodic(self) -> None:
 
 ```py
 def robotInit(self) -> None:
-    self.intake_speed = tunable.add_double("Intake/speed", 0.65)
+    self.intake_speed = tunables.add_double("Intake/speed", 0.65)
 
 def robotPeriodic(self) -> None:
     self.intake_motor.set(self.intake_speed.get())

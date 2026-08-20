@@ -1,14 +1,14 @@
 import commands2
-import tunable
+import tunables
 import wpilib
 
 
 def test_networktables_lifecycle_matches_glass_run_cancel(
     scheduler: commands2.CommandScheduler, nt_instance
 ):
-    tunable.TunableRegistry.reset()
+    tunables.TunableRegistry.reset()
     try:
-        tunable.TunableRegistry.register_backend(
+        tunables.TunableRegistry.register_backend(
             "",
             wpilib.NetworkTablesTunableBackend(nt_instance, "/Tunables"),
         )
@@ -33,7 +33,7 @@ def test_networktables_lifecycle_matches_glass_run_cancel(
             lambda: False,
         )
         command.set_name("Glass Label")
-        tunable.publish("command", command)
+        tunables.publish("command", command)
 
         name = nt_instance.get_string_topic("/Tunables/command/name").subscribe("")
         assert (
@@ -54,7 +54,7 @@ def test_networktables_lifecycle_matches_glass_run_cancel(
 
         running.set(True)
         nt_instance.flush()
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert scheduler.is_scheduled(command)
         assert running.get() is True
@@ -67,16 +67,16 @@ def test_networktables_lifecycle_matches_glass_run_cancel(
 
         scheduler.run()
         assert counts["execute"] == 1
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
         assert running.get() is True
 
         command.set_name("Updated Label")
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
         assert name.get() == "Updated Label"
 
         running.set(False)
         nt_instance.flush()
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert not scheduler.is_scheduled(command)
         assert running.get() is False
@@ -89,7 +89,7 @@ def test_networktables_lifecycle_matches_glass_run_cancel(
 
         scheduler.run()
         assert counts["execute"] == 1
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
         assert running.get() is False
     finally:
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()

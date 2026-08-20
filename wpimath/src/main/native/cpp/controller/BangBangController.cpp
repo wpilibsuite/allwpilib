@@ -5,7 +5,7 @@
 #include "wpi/math/controller/BangBangController.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/tunable/TunableTable.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 
 using namespace wpi::math;
 
@@ -21,7 +21,7 @@ std::string_view BangBangController::GetTelemetryType() const {
   return "BangBangController";
 }
 
-void BangBangController::PublishTunable(wpi::tunable::TunableTable& table) {
+void BangBangController::PublishTunable(wpi::tunables::TunableTable& table) {
   table.Publish("tolerance", m_tolerance);
   table.Publish("setpoint", m_setpoint);
 }

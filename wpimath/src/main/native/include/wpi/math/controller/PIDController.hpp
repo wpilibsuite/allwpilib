@@ -14,8 +14,8 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/Tunable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -25,7 +25,7 @@ namespace wpi::math {
  * Implements a PID control loop.
  */
 class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
-                                       public wpi::tunable::ComplexTunable {
+                                       public wpi::tunables::ComplexTunable {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -386,22 +386,22 @@ class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
 
   std::string_view GetTelemetryType() const override;
 
-  void PublishTunable(wpi::tunable::TunableTable& table) override;
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
 
   std::string_view GetTunableType() const override;
 
  private:
   // Factor for "proportional" control
-  wpi::tunable::Tunable<double> m_Kp;
+  wpi::tunables::Tunable<double> m_Kp;
 
   // Factor for "integral" control
-  wpi::tunable::Tunable<double> m_Ki;
+  wpi::tunables::Tunable<double> m_Ki;
 
   // Factor for "derivative" control
-  wpi::tunable::Tunable<double> m_Kd;
+  wpi::tunables::Tunable<double> m_Kd;
 
   // The error range where "integral" control applies
-  wpi::tunable::Tunable<double> m_iZone{
+  wpi::tunables::Tunable<double> m_iZone{
       std::numeric_limits<double>::infinity()};
 
   // The period (in seconds) of the control loop running this controller

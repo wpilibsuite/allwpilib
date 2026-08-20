@@ -1,7 +1,7 @@
 import threading
 
 import pytest
-import tunable
+import tunables
 
 from wpilib import TimedRobot
 from wpilib.simulation import (
@@ -94,14 +94,14 @@ class MockRobot(TimedRobot):
 
 def test_robot_loop_refreshes_getter_backed_tunables():
     robot = MockRobot()
-    backend = tunable.MockTunableBackend()
+    backend = tunables.MockTunableBackend()
     value = [1]
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
 
-    tunable.TunableRegistry.reset()
+    tunables.TunableRegistry.reset()
     try:
-        tunable.TunableRegistry.register_backend("", backend)
-        tunable.get_table().publish_int(
+        tunables.TunableRegistry.register_backend("", backend)
+        tunables.get_table().publish_int(
             "getter",
             lambda: value[0],
             lambda tuned: value.__setitem__(0, tuned),
@@ -119,7 +119,7 @@ def test_robot_loop_refreshes_getter_backed_tunables():
         robot.end_competition()
         if robot_thread.is_alive():
             robot_thread.join()
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
 
 
 def test_disabled_mode():

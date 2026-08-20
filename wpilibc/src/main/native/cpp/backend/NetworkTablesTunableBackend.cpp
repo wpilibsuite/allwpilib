@@ -23,19 +23,19 @@
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/detail/TunableBase.hpp"
-#include "wpi/tunable/detail/TunableDetail.hpp"
-#include "wpi/tunable/detail/TunableMember.hpp"
-#include "wpi/tunable/detail/TunableTypeValue.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/detail/TunableBase.hpp"
+#include "wpi/tunables/detail/TunableDetail.hpp"
+#include "wpi/tunables/detail/TunableMember.hpp"
+#include "wpi/tunables/detail/TunableTypeValue.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi;
 using namespace wpi::backend;
-using namespace wpi::tunable;
+using namespace wpi::tunables;
 
 namespace {
 

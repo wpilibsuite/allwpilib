@@ -22,9 +22,9 @@
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
-#include "wpi/tunable/Tunable.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
@@ -36,7 +36,7 @@ class TimedRobotTest {
  public:
   TimedRobotTest() {
     wpi::telemetry::TelemetryRegistry::Reset();
-    wpi::tunable::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
     wpi::sim::AlertSim::ResetData();
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
@@ -44,7 +44,7 @@ class TimedRobotTest {
 
   ~TimedRobotTest() {
     wpi::telemetry::TelemetryRegistry::Reset();
-    wpi::tunable::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
     wpi::sim::AlertSim::ResetData();
     wpi::sim::ResumeTiming();
     wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
@@ -200,8 +200,8 @@ TEST_CASE_METHOD(
       inst.GetDoubleTopic("/Telemetry/telemetryDouble").Subscribe(0.0);
   CHECK(telemetrySub.Get() == 2.5);
 
-  wpi::tunable::TunableDouble tunable{1.0};
-  wpi::tunable::Publish("tunableDouble", tunable);
+  wpi::tunables::TunableDouble tunable{1.0};
+  wpi::tunables::Publish("tunableDouble", tunable);
 
   auto tunableSub =
       inst.GetDoubleTopic("/Tunables/tunableDouble").Subscribe(0.0);
@@ -209,7 +209,7 @@ TEST_CASE_METHOD(
 
   auto tunablePub = inst.GetDoubleTopic("/Tunables/tunableDouble").Publish();
   tunablePub.Set(3.5);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 3.5);
 }
@@ -222,7 +222,7 @@ TEST_CASE_METHOD(TimedRobotTest,
 
     wpi::telemetry::TelemetryRegistry::ReportWarning("/bad",
                                                      "telemetry test warning");
-    wpi::tunable::TunableRegistry::ReportWarning("tunable test warning");
+    wpi::tunables::TunableRegistry::ReportWarning("tunable test warning");
 
     auto alerts = wpi::sim::AlertSim::GetActive();
     CHECK(alerts.size() == 2);

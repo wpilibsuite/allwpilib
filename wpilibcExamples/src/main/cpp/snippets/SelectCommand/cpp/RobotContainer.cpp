@@ -4,7 +4,7 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -13,7 +13,7 @@ RobotContainer::RobotContainer() {
   chooser.Add("TWO", CommandSelector::TWO);
   chooser.Add("THREE", CommandSelector::THREE);
 
-  wpi::tunable::Publish("Auto Chooser", chooser);
+  wpi::tunables::Publish("Auto Chooser", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();

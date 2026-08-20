@@ -3,7 +3,7 @@ import logging
 import pytest
 import ntcore
 import telemetry
-import tunable
+import tunables
 import wpilib
 from wpilib.simulation._simulation import _reset_wpilib_simulation_data
 
@@ -32,8 +32,8 @@ def nt(cfg_logging, wpilib_state):
         "",
         wpilib.NetworkTablesTelemetryBackend(instance, "/Telemetry"),
     )
-    tunable.TunableRegistry.reset()
-    tunable.TunableRegistry.register_backend(
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend(
         "",
         wpilib.NetworkTablesTunableBackend(instance, "/Tunables"),
     )
@@ -42,6 +42,6 @@ def nt(cfg_logging, wpilib_state):
         yield instance
     finally:
         telemetry.TelemetryRegistry.reset()
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
         instance.stop_local()
         instance._reset()

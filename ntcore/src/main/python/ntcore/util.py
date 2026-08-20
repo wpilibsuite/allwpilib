@@ -160,7 +160,7 @@ def ntproperty(
 
 class SelectableControl:
     """
-    Interacts with a :class:`tunable.Selectable`
+    Interacts with a :class:`tunables.Selectable`
     object over NetworkTables.
     """
 

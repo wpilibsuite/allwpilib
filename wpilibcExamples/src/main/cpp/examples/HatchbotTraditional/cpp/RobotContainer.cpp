@@ -10,7 +10,7 @@
 #include "commands/ReleaseHatch.hpp"
 #include "wpi/commands2/button/GamepadButton.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -20,7 +20,7 @@ RobotContainer::RobotContainer() {
   chooser.Add("Complex Auto", &complexAuto);
 
   // Put the chooser on the dashboard
-  wpi::tunable::Publish("Autonomous", chooser);
+  wpi::tunables::Publish("Autonomous", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();

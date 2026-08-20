@@ -10,8 +10,8 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableTable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/util/Demangle.hpp"
 #include "wpi/util/StackTrace.hpp"
 
@@ -210,17 +210,17 @@ std::string_view Command::GetTelemetryType() const {
   return "Command";
 }
 
-void Command::PublishTunable(wpi::tunable::TunableTable& table) {
+void Command::PublishTunable(wpi::tunables::TunableTable& table) {
   table.Publish(
       "name", this, &Command::m_name,
-      wpi::tunable::TunableConfig{
+      wpi::tunables::TunableConfig{
           .isMutable = false,
-          .polling = wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE});
+          .polling = wpi::tunables::TunableConfig::Polling::GET_ON_CHANGE});
   table.Publish(
       "running", this, &Command::m_running,
-      wpi::tunable::TunableConfig{
+      wpi::tunables::TunableConfig{
           .onTune =
-              [](TunableBase&, wpi::tunable::ComplexTunable* self) {
+              [](TunableBase&, wpi::tunables::ComplexTunable* self) {
                 if (auto command = static_cast<Command*>(self)) {
                   bool isScheduled = command->IsScheduled();
                   if (command->m_running && !isScheduled) {
@@ -231,7 +231,7 @@ void Command::PublishTunable(wpi::tunable::TunableTable& table) {
                 }
               },
           .parent = this,
-          .polling = wpi::tunable::TunableConfig::Polling::ALWAYS_GET});
+          .polling = wpi::tunables::TunableConfig::Polling::ALWAYS_GET});
 }
 
 void Command::UpdateTunable() const {

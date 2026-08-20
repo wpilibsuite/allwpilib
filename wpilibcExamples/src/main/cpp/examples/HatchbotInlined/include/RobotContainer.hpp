@@ -11,7 +11,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/Commands.hpp"
 #include "wpi/commands2/button/CommandGamepad.hpp"
-#include "wpi/tunable/Selectable.hpp"
+#include "wpi/tunables/Selectable.hpp"
 
 namespace ac = AutoConstants;
 
@@ -47,7 +47,7 @@ class RobotContainer {
   wpi::cmd::CommandPtr complexAuto = autos::ComplexAuto(&drive, &hatch);
 
   // The chooser for the autonomous routines
-  wpi::tunable::Selectable<wpi::cmd::Command*> chooser;
+  wpi::tunables::Selectable<wpi::cmd::Command*> chooser;
 
   void ConfigureButtonBindings();
 };

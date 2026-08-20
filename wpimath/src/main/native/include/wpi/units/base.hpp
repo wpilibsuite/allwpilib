@@ -3458,7 +3458,7 @@ namespace wpi::units {
 		}
 	}
 
-#if (__has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)) || (__has_include(<wpi/tunable/Tunable.hpp>) && !defined(UNIT_LIB_DISABLE_TUNABLE))
+#if (__has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)) || (__has_include(<wpi/tunables/Tunable.hpp>) && !defined(UNIT_LIB_DISABLE_TUNABLE))
 namespace detail {
 template <bool b>
 constexpr auto only_if(const auto& s) {

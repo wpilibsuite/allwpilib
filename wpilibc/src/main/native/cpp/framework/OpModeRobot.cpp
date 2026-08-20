@@ -22,7 +22,7 @@
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/print.hpp"
 
@@ -164,7 +164,7 @@ void OpModeRobotBase::LoopFunc() {
   // Always observe user program state
   HAL_ObserveUserProgram(word.GetValue());
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {

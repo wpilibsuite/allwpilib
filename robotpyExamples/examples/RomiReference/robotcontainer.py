@@ -9,7 +9,7 @@ import typing
 import commands2
 import commands2.button
 import telemetry
-import tunable
+import tunables
 import wpilib
 import romi
 
@@ -39,7 +39,7 @@ class RobotContainer:
         self.controller = wpilib.Joystick(0)
 
         # Create a tunable selector for autonomous routines.
-        self.chooser = tunable.Selectable()
+        self.chooser = tunables.Selectable()
 
         # NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
         # that is specified when launching the wpilib-ws server on the Romi raspberry pi.
@@ -77,7 +77,7 @@ class RobotContainer:
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
         self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
-        tunable.publish("Autonomous", self.chooser)
+        tunables.publish("Autonomous", self.chooser)
 
     def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
         return self.chooser.get_selected()

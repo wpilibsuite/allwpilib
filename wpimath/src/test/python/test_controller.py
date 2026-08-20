@@ -1,7 +1,7 @@
 import pytest
 
 import telemetry
-import tunable
+import tunables
 from wpimath import PIDController
 
 
@@ -18,13 +18,13 @@ def telemetry_backend():
 
 @pytest.fixture
 def tunable_backend():
-    tunable.TunableRegistry.reset()
-    backend = tunable.MockTunableBackend()
-    tunable.TunableRegistry.register_backend("", backend)
+    tunables.TunableRegistry.reset()
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.register_backend("", backend)
     try:
         yield backend
     finally:
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
 
 
 def test_pid_controller_logs_telemetry(telemetry_backend):
@@ -46,12 +46,12 @@ def test_pid_controller_logs_telemetry(telemetry_backend):
 
 def test_pid_controller_tuned_setpoint_updates_setpoint_state(tunable_backend):
     controller = PIDController(0.5, 0.0, 0.0)
-    tunable.publish("pid", controller)
+    tunables.publish("pid", controller)
 
     assert controller.at_setpoint() is False
 
     tunable_backend.set_double("/pid/setpoint", 50.0)
-    tunable.TunableRegistry.update()
+    tunables.TunableRegistry.update()
 
     assert controller.get_setpoint() == pytest.approx(50.0)
     assert controller.get_error() == pytest.approx(50.0)

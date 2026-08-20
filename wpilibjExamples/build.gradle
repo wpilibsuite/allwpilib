@@ -26,7 +26,7 @@ dependencies {
     implementation project(':commandsv2')
     implementation project(':commandsv3')
     implementation project(':telemetry')
-    implementation project(':tunable')
+    implementation project(':tunables')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
@@ -141,7 +141,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-                lib project: ':tunable', library: 'tunable', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
 
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {

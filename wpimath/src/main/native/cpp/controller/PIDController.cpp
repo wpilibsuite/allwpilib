@@ -5,8 +5,8 @@
 #include "wpi/math/controller/PIDController.hpp"
 
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableTable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 
 using namespace wpi::math;
 
@@ -27,14 +27,14 @@ std::string_view PIDController::GetTelemetryType() const {
   return "PIDController";
 }
 
-void PIDController::PublishTunable(wpi::tunable::TunableTable& table) {
+void PIDController::PublishTunable(wpi::tunables::TunableTable& table) {
   table.Publish("p", m_Kp);
   table.Publish("i", m_Ki);
   table.Publish("d", m_Kd);
   table.Publish("izone", m_iZone);
-  auto setpointConfig = wpi::tunable::TunableConfig::GetOnChange();
-  setpointConfig.onTune = [](wpi::tunable::detail::TunableBase&,
-                             wpi::tunable::ComplexTunable* self) {
+  auto setpointConfig = wpi::tunables::TunableConfig::GetOnChange();
+  setpointConfig.onTune = [](wpi::tunables::detail::TunableBase&,
+                             wpi::tunables::ComplexTunable* self) {
     if (auto controller = static_cast<PIDController*>(self)) {
       controller->SetSetpoint(controller->GetSetpoint());
     }

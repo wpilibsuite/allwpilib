@@ -419,7 +419,7 @@ The C++ mock backend protects writes, but `GetActions()`, `GetLastAction()`, and
 
 ## C++ Migration from WPILib 2026
 
-For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::telemetry::Log()` or a `wpi::telemetry::TelemetryTable`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::tunable::Tunable` instead.
+For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::telemetry::Log()` or a `wpi::telemetry::TelemetryTable`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::tunables::Tunable` instead.
 
 ### SmartDashboard Output to Telemetry
 
@@ -520,8 +520,8 @@ void RobotPeriodic() {
 **Is (Tunable):**
 
 ```cpp
-wpi::tunable::TunableDouble m_intakeSpeed =
-    wpi::tunable::Add<double>("Intake/speed", 0.65);
+wpi::tunables::TunableDouble m_intakeSpeed =
+    wpi::tunables::Add<double>("Intake/speed", 0.65);
 
 void RobotPeriodic() {
   m_intakeMotor.Set(m_intakeSpeed.Get());

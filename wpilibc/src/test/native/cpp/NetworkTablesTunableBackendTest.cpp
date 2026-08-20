@@ -22,13 +22,13 @@
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StructArrayTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/Selectable.hpp"
-#include "wpi/tunable/Tunable.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/TunableTable.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Selectable.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
@@ -60,7 +60,7 @@ struct wpi::util::Struct<ThrowingPackStruct> {
   static void Pack(std::span<uint8_t> data, ThrowingPackStruct value) {
     if (ThrowingPackStructState::removeDuringPack) {
       ThrowingPackStructState::removeDuringPack = false;
-      wpi::tunable::Remove("removeMe");
+      wpi::tunables::Remove("removeMe");
     }
     if (ThrowingPackStructState::throwDuringPack) {
       throw std::runtime_error{"broken pack"};
@@ -71,35 +71,35 @@ struct wpi::util::Struct<ThrowingPackStruct> {
 
 namespace {
 
-class MutatingComplexTunable final : public wpi::tunable::ComplexTunable {
+class MutatingComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
-  explicit MutatingComplexTunable(wpi::tunable::TunableDouble& published)
+  explicit MutatingComplexTunable(wpi::tunables::TunableDouble& published)
       : m_published{published} {}
 
   std::string_view GetTunableType() const override { return "Mutating"; }
 
-  void PublishTunable(wpi::tunable::TunableTable&) override {}
+  void PublishTunable(wpi::tunables::TunableTable&) override {}
 
   void UpdateTunable() const override {
     if (m_updates++ != 0) {
       return;
     }
-    wpi::tunable::Remove("removeMe");
-    wpi::tunable::Publish("publishedFromComplex", m_published);
+    wpi::tunables::Remove("removeMe");
+    wpi::tunables::Publish("publishedFromComplex", m_published);
   }
 
   int GetUpdates() const { return m_updates; }
 
  private:
-  wpi::tunable::TunableDouble& m_published;
+  wpi::tunables::TunableDouble& m_published;
   mutable int m_updates = 0;
 };
 
-class CountingComplexTunable final : public wpi::tunable::ComplexTunable {
+class CountingComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
   std::string_view GetTunableType() const override { return "Counting"; }
 
-  void PublishTunable(wpi::tunable::TunableTable&) override {}
+  void PublishTunable(wpi::tunables::TunableTable&) override {}
 
   void UpdateTunable() const override { ++m_updates; }
 
@@ -109,21 +109,21 @@ class CountingComplexTunable final : public wpi::tunable::ComplexTunable {
   mutable int m_updates = 0;
 };
 
-class StructMemberComplexTunable final : public wpi::tunable::ComplexTunable {
+class StructMemberComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
-  explicit StructMemberComplexTunable(const wpi::tunable::TunableConfig& config)
+  explicit StructMemberComplexTunable(const wpi::tunables::TunableConfig& config)
       : m_config{config} {}
 
   std::string_view GetTunableType() const override { return "StructMember"; }
 
-  void PublishTunable(wpi::tunable::TunableTable& table) override {
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("member", this, &StructMemberComplexTunable::value, m_config);
   }
 
   ThrowingPackStruct value{1};
 
  private:
-  wpi::tunable::TunableConfig m_config;
+  wpi::tunables::TunableConfig m_config;
 };
 
 class DashboardSelectable {
@@ -166,7 +166,7 @@ class DashboardSelectable {
   wpi::nt::GenericSubscriber m_options;
 };
 
-void ConfigureSelectable(wpi::tunable::Selectable<int>& chooser) {
+void ConfigureSelectable(wpi::tunables::Selectable<int>& chooser) {
   chooser.AddDefault("one", 1);
   chooser.Add("two", 2);
 }
@@ -190,14 +190,14 @@ class NetworkTablesTunableBackendTest {
       : inst{wpi::nt::NetworkTableInstance::Create()},
         backend{std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
             inst, "/Tunables")} {
-    wpi::tunable::TunableRegistry::Reset();
-    wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
-    wpi::tunable::TunableRegistry::RegisterBackend("", backend);
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::SetReportWarning(nullptr);
+    wpi::tunables::TunableRegistry::RegisterBackend("", backend);
   }
 
   ~NetworkTablesTunableBackendTest() {
-    wpi::tunable::TunableRegistry::Reset();
-    wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::SetReportWarning(nullptr);
     wpi::nt::NetworkTableInstance::Destroy(inst);
   }
 
@@ -206,15 +206,15 @@ class NetworkTablesTunableBackendTest {
 
  protected:
   void RestartRobotBackend() {
-    wpi::tunable::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
     backend.reset();
     backend = std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
         inst, "/Tunables");
-    wpi::tunable::TunableRegistry::RegisterBackend("", backend);
+    wpi::tunables::TunableRegistry::RegisterBackend("", backend);
   }
 
-  static wpi::tunable::TunableConfig RobustConfig() {
-    wpi::tunable::TunableConfig config;
+  static wpi::tunables::TunableConfig RobustConfig() {
+    wpi::tunables::TunableConfig config;
     config.robust = true;
     return config;
   }
@@ -271,19 +271,19 @@ TEST_CASE_METHOD(
     "NetworkTablesTunableBackendTest PublishesAndTunesScalarDataTypes",
     "[wpilibc][tunable]") {
   auto config = RobustConfig();
-  wpi::tunable::TunableBool boolean{true, config};
-  wpi::tunable::TunableInt32 intValue{1, config};
-  wpi::tunable::TunableInt64 longValue{2, config};
-  wpi::tunable::TunableFloat floatValue{3.25f, config};
-  wpi::tunable::TunableDouble doubleValue{4.5, config};
-  wpi::tunable::TunableString stringValue{"ready", config};
+  wpi::tunables::TunableBool boolean{true, config};
+  wpi::tunables::TunableInt32 intValue{1, config};
+  wpi::tunables::TunableInt64 longValue{2, config};
+  wpi::tunables::TunableFloat floatValue{3.25f, config};
+  wpi::tunables::TunableDouble doubleValue{4.5, config};
+  wpi::tunables::TunableString stringValue{"ready", config};
 
-  wpi::tunable::Publish("boolean", boolean);
-  wpi::tunable::Publish("int", intValue);
-  wpi::tunable::Publish("long", longValue);
-  wpi::tunable::Publish("float", floatValue);
-  wpi::tunable::Publish("double", doubleValue);
-  wpi::tunable::Publish("string", stringValue);
+  wpi::tunables::Publish("boolean", boolean);
+  wpi::tunables::Publish("int", intValue);
+  wpi::tunables::Publish("long", longValue);
+  wpi::tunables::Publish("float", floatValue);
+  wpi::tunables::Publish("double", doubleValue);
+  wpi::tunables::Publish("string", stringValue);
 
   CHECK(Value("boolean").GetBoolean(false));
   CHECK(1 == Value("int").GetInteger(0));
@@ -305,7 +305,7 @@ TEST_CASE_METHOD(
   doublePub.SetDouble(14.75);
   stringPub.SetString("tuned");
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK_FALSE(boolean.Get());
   CHECK(11 == intValue.Get());
@@ -320,25 +320,25 @@ TEST_CASE_METHOD(
     "NetworkTablesTunableBackendTest PublishesAndTunesArrayAndRawDataTypes",
     "[wpilibc][tunable]") {
   auto config = RobustConfig();
-  wpi::tunable::TunableRaw raw{std::vector<uint8_t>{1, 2}, config};
-  wpi::tunable::TunableBoolVector booleans{std::vector<bool>{true, false},
+  wpi::tunables::TunableRaw raw{std::vector<uint8_t>{1, 2}, config};
+  wpi::tunables::TunableBoolVector booleans{std::vector<bool>{true, false},
                                            config};
-  wpi::tunable::TunableInt32Vector ints{std::vector<int32_t>{3, 4}, config};
-  wpi::tunable::TunableInt64Vector longs{std::vector<int64_t>{5, 6}, config};
-  wpi::tunable::TunableFloatVector floats{std::vector<float>{7.25f, 8.5f},
+  wpi::tunables::TunableInt32Vector ints{std::vector<int32_t>{3, 4}, config};
+  wpi::tunables::TunableInt64Vector longs{std::vector<int64_t>{5, 6}, config};
+  wpi::tunables::TunableFloatVector floats{std::vector<float>{7.25f, 8.5f},
                                           config};
-  wpi::tunable::TunableDoubleVector doubles{std::vector<double>{9.25, 10.5},
+  wpi::tunables::TunableDoubleVector doubles{std::vector<double>{9.25, 10.5},
                                             config};
-  wpi::tunable::Tunable<std::vector<std::string>> strings{
+  wpi::tunables::Tunable<std::vector<std::string>> strings{
       std::vector<std::string>{"a", "b"}, config};
 
-  wpi::tunable::Publish("raw", raw);
-  wpi::tunable::Publish("booleans", booleans);
-  wpi::tunable::Publish("ints", ints);
-  wpi::tunable::Publish("longs", longs);
-  wpi::tunable::Publish("floats", floats);
-  wpi::tunable::Publish("doubles", doubles);
-  wpi::tunable::Publish("strings", strings);
+  wpi::tunables::Publish("raw", raw);
+  wpi::tunables::Publish("booleans", booleans);
+  wpi::tunables::Publish("ints", ints);
+  wpi::tunables::Publish("longs", longs);
+  wpi::tunables::Publish("floats", floats);
+  wpi::tunables::Publish("doubles", doubles);
+  wpi::tunables::Publish("strings", strings);
 
   CHECK((std::vector<uint8_t>{1, 2}) == Value("raw").GetRaw({}));
   CHECK((std::vector<int>{1, 0}) == Value("booleans").GetBooleanArray({}));
@@ -365,7 +365,7 @@ TEST_CASE_METHOD(
   doublesPub.SetDoubleArray(std::vector<double>{29.25, 30.5});
   stringsPub.SetStringArray(std::vector<std::string>{"c", "d"});
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK((std::vector<uint8_t>{21, 22}) == raw.Get());
   CHECK((std::vector<bool>{false, true}) == booleans.Get());
@@ -379,16 +379,16 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest PublishesAndTunesDouble",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableConfig config;
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("foo", value);
+  wpi::tunables::TunableConfig config;
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("foo", value);
 
   auto sub = inst.GetDoubleTopic("/Tunables/foo").Subscribe(0.0);
   CHECK(sub.Get() == 1.0);
 
   auto pub = inst.GetDoubleTopic("/Tunables/foo").Publish();
   pub.Set(2.0);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(value.Get() == 2.0);
 }
@@ -397,15 +397,15 @@ TEST_CASE_METHOD(
     NetworkTablesTunableBackendTest,
     "NetworkTablesTunableBackendTest TunablesWithoutConfigAreMutable",
     "[wpilibc][tunable]") {
-  wpi::tunable::TunableDouble value{1.0};
-  wpi::tunable::Publish("foo", value);
+  wpi::tunables::TunableDouble value{1.0};
+  wpi::tunables::Publish("foo", value);
 
   auto sub = inst.GetDoubleTopic("/Tunables/foo").Subscribe(0.0);
   CHECK(sub.Get() == 1.0);
 
   auto pub = inst.GetDoubleTopic("/Tunables/foo").Publish();
   pub.Set(2.0);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(value.Get() == 2.0);
 }
@@ -413,17 +413,17 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest PublishesRobustDouble",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("foo", value);
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("foo", value);
 
   auto sub = inst.GetDoubleTopic("/Tunables/foo/value").Subscribe(0.0);
   CHECK(sub.Get() == 1.0);
 
   auto pub = inst.GetDoubleTopic("/Tunables/foo/tune").Publish();
   pub.Set(2.0);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(value.Get() == 2.0);
   CHECK(sub.Get() == 2.0);
@@ -433,26 +433,26 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "SelectablePublishesOptionChangesAfterPublish",
                  "[wpilibc][tunable]") {
-  wpi::tunable::Selectable<int> chooser;
+  wpi::tunables::Selectable<int> chooser;
   chooser.Add("one", 1);
-  wpi::tunable::Publish("chooser", chooser);
+  wpi::tunables::Publish("chooser", chooser);
 
   auto sub =
       inst.GetStringArrayTopic("/Tunables/chooser/options").Subscribe({});
   CHECK((std::vector<std::string>{"one"}) == sub.Get());
 
   chooser.Add("two", 2);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK((std::vector<std::string>{"one", "two"}) == sub.Get());
 
   chooser.Add("one", 11);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK((std::vector<std::string>{"two", "one"}) == sub.Get());
 
   chooser.Clear();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK((std::vector<std::string>{}) == sub.Get());
 }
@@ -461,9 +461,9 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "SelectableDashboardConnectsAfterPublish",
                  "[wpilibc][tunable]") {
-  wpi::tunable::Selectable<int> chooser;
+  wpi::tunables::Selectable<int> chooser;
   ConfigureSelectable(chooser);
-  wpi::tunable::Publish("auto", chooser);
+  wpi::tunables::Publish("auto", chooser);
 
   DashboardSelectable dashboard{inst, "/Tunables/auto"};
 
@@ -476,7 +476,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
 
   dashboard.SetSelected("two");
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK("two" == dashboard.GetSelected());
   CHECK("two" == dashboard.GetActive());
@@ -488,10 +488,10 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "SelectableDashboardConnectsBeforePublish",
                  "[wpilibc][tunable]") {
   DashboardSelectable dashboard{inst, "/Tunables/auto"};
-  wpi::tunable::Selectable<int> chooser;
+  wpi::tunables::Selectable<int> chooser;
   ConfigureSelectable(chooser);
 
-  wpi::tunable::Publish("auto", chooser);
+  wpi::tunables::Publish("auto", chooser);
 
   CHECK(dashboard.Exists());
   CHECK("one" == dashboard.GetDefault());
@@ -501,7 +501,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
 
   dashboard.SetSelected("two");
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK("two" == dashboard.GetSelected());
   CHECK("two" == dashboard.GetActive());
@@ -514,13 +514,13 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "[wpilibc][tunable]") {
   DashboardSelectable dashboard{inst, "/Tunables/auto"};
   {
-    wpi::tunable::Selectable<int> chooser;
+    wpi::tunables::Selectable<int> chooser;
     ConfigureSelectable(chooser);
-    wpi::tunable::Publish("auto", chooser);
+    wpi::tunables::Publish("auto", chooser);
 
     dashboard.SetSelected("two");
     inst.Flush();
-    wpi::tunable::TunableRegistry::Update();
+    wpi::tunables::TunableRegistry::Update();
 
     CHECK("two" == dashboard.GetSelected());
     CHECK("two" == dashboard.GetActive());
@@ -529,10 +529,10 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
     RestartRobotBackend();
   }
 
-  wpi::tunable::Selectable<int> chooser;
+  wpi::tunables::Selectable<int> chooser;
   ConfigureSelectable(chooser);
-  wpi::tunable::Publish("auto", chooser);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::Publish("auto", chooser);
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK("two" == dashboard.GetSelected());
   CHECK("two" == dashboard.GetActive());
@@ -544,10 +544,10 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "[wpilibc][tunable]") {
   const wpi::math::Translation2d initial{1.25_m, 2.5_m};
   const wpi::math::Translation2d tuned{3.75_m, 4.5_m};
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  wpi::tunable::Tunable<wpi::math::Translation2d> value{config, initial};
-  wpi::tunable::Publish("translation", value);
+  wpi::tunables::Tunable<wpi::math::Translation2d> value{config, initial};
+  wpi::tunables::Publish("translation", value);
 
   auto sub = inst.GetStructTopic<wpi::math::Translation2d>(
                      "/Tunables/translation/value")
@@ -561,7 +561,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  .Publish();
   pub.Set(tuned);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(tuned.X() == value.Get().X());
   CHECK(tuned.Y() == value.Get().Y());
@@ -575,13 +575,13 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "IgnoresInvalidStructTunePayloads",
                  "[wpilibc][tunable]") {
   const wpi::math::Translation2d initial{1.25_m, 2.5_m};
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
   int calls = 0;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::Tunable<wpi::math::Translation2d> value{config, initial};
-  wpi::tunable::Publish("translation", value);
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::Tunable<wpi::math::Translation2d> value{config, initial};
+  wpi::tunables::Publish("translation", value);
 
   auto sub = inst.GetStructTopic<wpi::math::Translation2d>(
                      "/Tunables/translation/value")
@@ -598,7 +598,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
 
   pub.SetRaw(std::vector<uint8_t>{1, 2, 3});
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(initial.X() == value.Get().X());
   CHECK(initial.Y() == value.Get().Y());
@@ -607,7 +607,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
       wpi::util::GetStructSize<wpi::math::Translation2d>() + 1);
   pub.SetRaw(oversized);
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(initial.X() == value.Get().X());
   CHECK(initial.Y() == value.Get().Y());
@@ -621,14 +621,14 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "[wpilibc][tunable]") {
   const std::vector<wpi::math::Translation2d> initial{{1.25_m, 2.5_m},
                                                       {3.5_m, 4.75_m}};
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
   int calls = 0;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::Tunable<std::vector<wpi::math::Translation2d>> value{config,
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::Tunable<std::vector<wpi::math::Translation2d>> value{config,
                                                                      initial};
-  wpi::tunable::Publish("translations", value);
+  wpi::tunables::Publish("translations", value);
 
   auto sub = inst.GetStructArrayTopic<wpi::math::Translation2d>(
                      "/Tunables/translations/value")
@@ -654,7 +654,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
       wpi::util::GetStructSize<wpi::math::Translation2d>() + 1);
   pub.SetRaw(partial);
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   REQUIRE(initial.size() == value.Get().size());
   CHECK(initial[0].X() == value.Get()[0].X());
@@ -670,11 +670,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "[wpilibc][tunable]") {
   const wpi::math::Translation2d initial{5.25_m, 6.5_m};
   const wpi::math::Translation2d tuned{7.75_m, 8.5_m};
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  wpi::tunable::detail::TunableProtobuf<wpi::math::Translation2d> value{
+  wpi::tunables::detail::TunableProtobuf<wpi::math::Translation2d> value{
       config, initial};
-  wpi::tunable::Publish("translation", value);
+  wpi::tunables::Publish("translation", value);
 
   auto sub = inst.GetProtobufTopic<wpi::math::Translation2d>(
                      "/Tunables/translation/value")
@@ -688,7 +688,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  .Publish();
   pub.Set(tuned);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(tuned.X() == value.Get().X());
   CHECK(tuned.Y() == value.Get().Y());
@@ -703,11 +703,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "[wpilibc][tunable]") {
   const wpi::math::Translation2d initial{5.25_m, 6.5_m};
   const wpi::math::Translation2d zero;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  wpi::tunable::detail::TunableProtobuf<wpi::math::Translation2d> value{
+  wpi::tunables::detail::TunableProtobuf<wpi::math::Translation2d> value{
       config, initial};
-  wpi::tunable::Publish("defaultTranslation", value);
+  wpi::tunables::Publish("defaultTranslation", value);
 
   auto sub = inst.GetProtobufTopic<wpi::math::Translation2d>(
                      "/Tunables/defaultTranslation/value")
@@ -717,7 +717,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  .Publish();
   pub.Set(zero);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(zero.X() == value.Get().X());
   CHECK(zero.Y() == value.Get().Y());
@@ -733,13 +733,13 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   const wpi::math::Translation2d initial{5.25_m, 6.5_m};
   const wpi::math::Translation2d partial{9.25_m, 10.5_m};
   int calls = 0;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::detail::TunableProtobuf<wpi::math::Translation2d> value{
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::detail::TunableProtobuf<wpi::math::Translation2d> value{
       config, initial};
-  wpi::tunable::Publish("malformedTranslation", value);
+  wpi::tunables::Publish("malformedTranslation", value);
 
   auto sub = inst.GetProtobufTopic<wpi::math::Translation2d>(
                      "/Tunables/malformedTranslation/value")
@@ -758,11 +758,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   auto pub = inst.GetTopic("/Tunables/malformedTranslation/tune")
                  .GenericPublish(message.GetTypeString());
   std::vector<std::string> warnings;
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [&](std::string_view msg) { warnings.emplace_back(msg); });
   pub.SetRaw(malformed);
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(initial.X() == value.Get().X());
   CHECK(initial.Y() == value.Get().Y());
@@ -776,16 +776,16 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest AppliesBackendConfigOptions",
                  "[wpilibc][tunable]") {
   int calls = 0;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
   config.typeString = "json";
   config.properties = wpi::util::json::object();
   config.properties["min"] = 0;
   config.properties["max"] = 10;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::TunableString value{"1", config};
-  wpi::tunable::Publish("configured", value);
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::TunableString value{"1", config};
+  wpi::tunables::Publish("configured", value);
 
   auto topic = inst.GetTopic("/Tunables/configured/value");
   CHECK("json" == topic.GetTypeString());
@@ -800,17 +800,17 @@ TEST_CASE_METHOD(
     "NetworkTablesTunableBackendTest OnTuneRunsForMutableRemoteUpdates",
     "[wpilibc][tunable]") {
   int calls = 0;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("mutable", value);
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("mutable", value);
 
   auto pub = Tune("mutable", "double");
   pub.SetDouble(2.0);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(2.0 == value.Get());
   CHECK(1 == calls);
@@ -820,18 +820,18 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "RemoteSetCallbackCanCanonicalizeRobustEcho",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableDouble* valuePtr = nullptr;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableDouble* valuePtr = nullptr;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  config.onRemoteSet = [&](wpi::tunable::detail::TunableBase&,
-                           wpi::tunable::ComplexTunable*) {
+  config.onRemoteSet = [&](wpi::tunables::detail::TunableBase&,
+                           wpi::tunables::ComplexTunable*) {
     if (valuePtr->Get() > 5.0) {
       valuePtr->Set(5.0);
     }
   };
-  wpi::tunable::TunableDouble value{1.0, config};
+  wpi::tunables::TunableDouble value{1.0, config};
   valuePtr = &value;
-  wpi::tunable::Publish("clamped", value);
+  wpi::tunables::Publish("clamped", value);
 
   auto sub = inst.GetDoubleTopic("/Tunables/clamped/value").Subscribe(0.0);
   CHECK(1.0 == sub.Get());
@@ -839,7 +839,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   auto pub = Tune("clamped", "double");
   pub.SetDouble(10.0);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(5.0 == value.Get());
   CHECK(5.0 == sub.Get());
@@ -851,20 +851,20 @@ TEST_CASE_METHOD(
     "[wpilibc][tunable]") {
   auto standaloneConfig = RobustConfig();
   int standaloneCalls = 0;
-  standaloneConfig.onTune = [&](wpi::tunable::detail::TunableBase&,
-                                wpi::tunable::ComplexTunable*) {
+  standaloneConfig.onTune = [&](wpi::tunables::detail::TunableBase&,
+                                wpi::tunables::ComplexTunable*) {
     ++standaloneCalls;
   };
-  wpi::tunable::Tunable<ThrowingPackStruct> throwing{standaloneConfig,
+  wpi::tunables::Tunable<ThrowingPackStruct> throwing{standaloneConfig,
                                                      ThrowingPackStruct{1}};
-  wpi::tunable::Publish("throwing", throwing);
+  wpi::tunables::Publish("throwing", throwing);
 
   auto memberConfig = RobustConfig();
   int memberCalls = 0;
-  memberConfig.onTune = [&](wpi::tunable::detail::TunableBase&,
-                            wpi::tunable::ComplexTunable*) { ++memberCalls; };
+  memberConfig.onTune = [&](wpi::tunables::detail::TunableBase&,
+                            wpi::tunables::ComplexTunable*) { ++memberCalls; };
   StructMemberComplexTunable complex{memberConfig};
-  wpi::tunable::Publish("complex", complex);
+  wpi::tunables::Publish("complex", complex);
 
   auto throwingPub =
       inst.GetStructTopic<ThrowingPackStruct>("/Tunables/throwing/tune")
@@ -873,13 +873,13 @@ TEST_CASE_METHOD(
       inst.GetStructTopic<ThrowingPackStruct>("/Tunables/complex/member/tune")
           .Publish();
   std::vector<std::string> warnings;
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [&](std::string_view msg) { warnings.emplace_back(msg); });
 
   ThrowingPackStructState::throwDuringUnpack = true;
   throwingPub.Set({2});
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(1 == throwing.Get().value);
   CHECK(0 == standaloneCalls);
@@ -889,7 +889,7 @@ TEST_CASE_METHOD(
   ThrowingPackStructState::throwDuringUnpack = true;
   memberPub.Set({3});
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(1 == complex.value.value);
   CHECK(0 == memberCalls);
@@ -899,7 +899,7 @@ TEST_CASE_METHOD(
   throwingPub.Set({4});
   memberPub.Set({5});
   inst.Flush();
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 
   CHECK(4 == throwing.Get().value);
   CHECK(5 == complex.value.value);
@@ -913,28 +913,28 @@ TEST_CASE_METHOD(
     "NetworkTablesTunableBackendTest OnTuneCanPublishAndRemoveTunables",
     "[wpilibc][tunable]") {
   bool callbackRan = false;
-  wpi::tunable::TunableDouble published{3.0};
-  wpi::tunable::TunableDouble removeMe{4.0};
-  wpi::tunable::Publish("removeMe", removeMe);
+  wpi::tunables::TunableDouble published{3.0};
+  wpi::tunables::TunableDouble removeMe{4.0};
+  wpi::tunables::Publish("removeMe", removeMe);
 
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) {
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) {
     if (callbackRan) {
       return;
     }
     callbackRan = true;
-    wpi::tunable::Remove("removeMe");
-    wpi::tunable::Publish("publishedFromOnTune", published);
+    wpi::tunables::Remove("removeMe");
+    wpi::tunables::Publish("publishedFromOnTune", published);
   };
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("mutable", value);
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("mutable", value);
 
   auto pub = Tune("mutable", "double");
   pub.SetDouble(2.0);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(callbackRan);
   CHECK(2.0 == value.Get());
@@ -942,8 +942,8 @@ TEST_CASE_METHOD(
                    .Subscribe(0.0)
                    .Get());
 
-  wpi::tunable::TunableDouble replacement{5.0};
-  CHECK_NOTHROW(wpi::tunable::Publish("removeMe", replacement));
+  wpi::tunables::TunableDouble replacement{5.0};
+  CHECK_NOTHROW(wpi::tunables::Publish("removeMe", replacement));
   CHECK(5.0 == inst.GetDoubleTopic("/Tunables/removeMe").Subscribe(0.0).Get());
 }
 
@@ -951,21 +951,21 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "FailureDuringNetworkUpdateAppliesDeferredErases",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableDouble removeMe{4.0};
-  wpi::tunable::Publish("removeMe", removeMe);
-  wpi::tunable::Tunable<ThrowingPackStruct> throwingStruct{
+  wpi::tunables::TunableDouble removeMe{4.0};
+  wpi::tunables::Publish("removeMe", removeMe);
+  wpi::tunables::Tunable<ThrowingPackStruct> throwingStruct{
       ThrowingPackStruct{1}};
-  wpi::tunable::Publish("throwingStruct", throwingStruct);
+  wpi::tunables::Publish("throwingStruct", throwingStruct);
 
   ThrowingPackStructState::removeDuringPack = true;
   ThrowingPackStructState::throwDuringPack = true;
   throwingStruct.Set({2});
 
   std::vector<std::string> warnings;
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [&](std::string_view msg) { warnings.emplace_back(msg); });
 
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
   ThrowingPackStructState::throwDuringPack = false;
   CHECK(HasWarning(warnings, "NetworkTables tunable backend update failed",
                    "broken pack"));
@@ -976,24 +976,24 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   CHECK(0u == wpi::backend::NetworkTablesTunableBackendTestAccess::
                   GetDeferredEraseCount(*backend));
 
-  wpi::tunable::TunableDouble replacement{5.0};
-  CHECK_NOTHROW(wpi::tunable::Publish("removeMe", replacement));
+  wpi::tunables::TunableDouble replacement{5.0};
+  CHECK_NOTHROW(wpi::tunables::Publish("removeMe", replacement));
 }
 
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "InitialNetworkUpdateFailureRollsBackEntry",
                  "[wpilibc][tunable]") {
-  auto config = wpi::tunable::TunableConfig::AlwaysGet();
-  wpi::tunable::Tunable<ThrowingPackStruct> throwingStruct{
+  auto config = wpi::tunables::TunableConfig::AlwaysGet();
+  wpi::tunables::Tunable<ThrowingPackStruct> throwingStruct{
       config, ThrowingPackStruct{1}};
 
   std::vector<std::string> warnings;
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [&](std::string_view msg) { warnings.emplace_back(msg); });
 
   ThrowingPackStructState::throwDuringPack = true;
-  CHECK_NOTHROW(wpi::tunable::Publish("throwingStruct", throwingStruct));
+  CHECK_NOTHROW(wpi::tunables::Publish("throwingStruct", throwingStruct));
   ThrowingPackStructState::throwDuringPack = false;
   CHECK(HasWarning(warnings, "/Tunables/throwingStruct",
                    "failed during initial publish"));
@@ -1007,7 +1007,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   CHECK(0u == wpi::backend::NetworkTablesTunableBackendTestAccess::
                   GetAlwaysGetEntryCount(*backend));
 
-  CHECK_NOTHROW(wpi::tunable::Publish("throwingStruct", throwingStruct));
+  CHECK_NOTHROW(wpi::tunables::Publish("throwingStruct", throwingStruct));
 
   CHECK(1u ==
         wpi::backend::NetworkTablesTunableBackendTestAccess::GetEntryCount(
@@ -1023,19 +1023,19 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "ComplexUpdateCanPublishAndRemoveTunables",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableDouble published{3.0};
-  wpi::tunable::TunableDouble removeMe{4.0};
-  wpi::tunable::Publish("removeMe", removeMe);
+  wpi::tunables::TunableDouble published{3.0};
+  wpi::tunables::TunableDouble removeMe{4.0};
+  wpi::tunables::Publish("removeMe", removeMe);
 
   MutatingComplexTunable complex{published};
-  wpi::tunable::Publish("complex", complex);
+  wpi::tunables::Publish("complex", complex);
   CountingComplexTunable after;
-  wpi::tunable::Publish("z", after);
+  wpi::tunables::Publish("z", after);
 
   CHECK(true ==
         inst.GetTopic("/Tunables/complex/.type").GetProperty("mutable"));
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(1 == complex.GetUpdates());
   CHECK(1 == after.GetUpdates());
@@ -1043,8 +1043,8 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                    .Subscribe(0.0)
                    .Get());
 
-  wpi::tunable::TunableDouble replacement{5.0};
-  CHECK_NOTHROW(wpi::tunable::Publish("removeMe", replacement));
+  wpi::tunables::TunableDouble replacement{5.0};
+  CHECK_NOTHROW(wpi::tunables::Publish("removeMe", replacement));
   CHECK(5.0 == inst.GetDoubleTopic("/Tunables/removeMe").Subscribe(0.0).Get());
 }
 
@@ -1053,23 +1053,23 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NonRobustTunablesDoNotTuneFromLocalPublishes",
                  "[wpilibc][tunable]") {
   int calls = 0;
-  wpi::tunable::TunableConfig config;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("localPublish", value);
+  wpi::tunables::TunableConfig config;
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("localPublish", value);
 
   CHECK(true == inst.GetTopic("/Tunables/localPublish").GetProperty("mutable"));
 
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(0 == calls);
 
   value = 2.0;
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   auto sub = inst.GetDoubleTopic("/Tunables/localPublish").Subscribe(0.0);
   CHECK(2.0 == value.Get());
@@ -1081,13 +1081,13 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "ProgrammaticChangesQueueDirtyEntries",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableDouble changed{1.0};
-  wpi::tunable::TunableDouble unchanged{2.0};
-  auto alwaysGetConfig = wpi::tunable::TunableConfig::AlwaysGet();
-  wpi::tunable::TunableDouble alwaysGet{3.0, alwaysGetConfig};
-  wpi::tunable::Publish("changed", changed);
-  wpi::tunable::Publish("unchanged", unchanged);
-  wpi::tunable::Publish("alwaysGet", alwaysGet);
+  wpi::tunables::TunableDouble changed{1.0};
+  wpi::tunables::TunableDouble unchanged{2.0};
+  auto alwaysGetConfig = wpi::tunables::TunableConfig::AlwaysGet();
+  wpi::tunables::TunableDouble alwaysGet{3.0, alwaysGetConfig};
+  wpi::tunables::Publish("changed", changed);
+  wpi::tunables::Publish("unchanged", unchanged);
+  wpi::tunables::Publish("alwaysGet", alwaysGet);
 
   CHECK(0u ==
         wpi::backend::NetworkTablesTunableBackendTestAccess::GetDirtyEntryCount(
@@ -1103,7 +1103,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
         wpi::backend::NetworkTablesTunableBackendTestAccess::GetDirtyEntryCount(
             *backend));
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(0u ==
         wpi::backend::NetworkTablesTunableBackendTestAccess::GetDirtyEntryCount(
@@ -1117,11 +1117,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "FailureDuringDirtyNetworkUpdateClearsDirtyEntries",
                  "[wpilibc][tunable]") {
-  wpi::tunable::Tunable<ThrowingPackStruct> throwingStruct{
+  wpi::tunables::Tunable<ThrowingPackStruct> throwingStruct{
       ThrowingPackStruct{1}};
-  wpi::tunable::TunableDouble after{2.0};
-  wpi::tunable::Publish("throwingStruct", throwingStruct);
-  wpi::tunable::Publish("after", after);
+  wpi::tunables::TunableDouble after{2.0};
+  wpi::tunables::Publish("throwingStruct", throwingStruct);
+  wpi::tunables::Publish("after", after);
 
   throwingStruct.Set({3});
   after.Set(4.0);
@@ -1130,11 +1130,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
             *backend));
 
   std::vector<std::string> warnings;
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [&](std::string_view msg) { warnings.emplace_back(msg); });
 
   ThrowingPackStructState::throwDuringPack = true;
-  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
   ThrowingPackStructState::throwDuringPack = false;
   CHECK(HasWarning(warnings, "NetworkTables tunable backend update failed",
                    "broken pack"));
@@ -1154,12 +1154,12 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   auto childBackend =
       std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
           inst, "/ChildTunables");
-  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
-  wpi::tunable::TunableConfig config = RobustConfig();
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("sharedA", value);
-  wpi::tunable::Publish("sharedB", value);
-  wpi::tunable::Publish("child/shared", value);
+  wpi::tunables::TunableRegistry::RegisterBackend("/child", childBackend);
+  wpi::tunables::TunableConfig config = RobustConfig();
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("sharedA", value);
+  wpi::tunables::Publish("sharedB", value);
+  wpi::tunables::Publish("child/shared", value);
 
   CHECK(1.0 ==
         inst.GetDoubleTopic("/Tunables/sharedA/value").Subscribe(0.0).Get());
@@ -1172,7 +1172,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                     .GetProperty("mutable"));
 
   value = 2.0;
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(2.0 ==
         inst.GetDoubleTopic("/Tunables/sharedA/value").Subscribe(0.0).Get());
@@ -1187,16 +1187,16 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "BackendMigrationUsesPathBoundaries",
                  "[wpilibc][tunable]") {
-  wpi::tunable::TunableConfig config = RobustConfig();
-  wpi::tunable::TunableDouble child{1.0, config};
-  wpi::tunable::TunableDouble children{2.0, config};
-  wpi::tunable::Publish("child/value", child);
-  wpi::tunable::Publish("children/value", children);
+  wpi::tunables::TunableConfig config = RobustConfig();
+  wpi::tunables::TunableDouble child{1.0, config};
+  wpi::tunables::TunableDouble children{2.0, config};
+  wpi::tunables::Publish("child/value", child);
+  wpi::tunables::Publish("children/value", children);
 
   auto childBackend =
       std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
           inst, "/ChildTunables");
-  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
+  wpi::tunables::TunableRegistry::RegisterBackend("/child", childBackend);
 
   CHECK(1.0 == inst.GetDoubleTopic("/ChildTunables/child/value/value")
                    .Subscribe(0.0)
@@ -1210,13 +1210,13 @@ TEST_CASE_METHOD(
     "NetworkTablesTunableBackendTest ImmutableTunablesIgnoreRemoteUpdates",
     "[wpilibc][tunable]") {
   int calls = 0;
-  wpi::tunable::TunableConfig config;
+  wpi::tunables::TunableConfig config;
   config.robust = true;
   config.isMutable = false;
-  config.onTune = [&](wpi::tunable::detail::TunableBase&,
-                      wpi::tunable::ComplexTunable*) { ++calls; };
-  wpi::tunable::TunableDouble value{1.0, config};
-  wpi::tunable::Publish("immutable", value);
+  config.onTune = [&](wpi::tunables::detail::TunableBase&,
+                      wpi::tunables::ComplexTunable*) { ++calls; };
+  wpi::tunables::TunableDouble value{1.0, config};
+  wpi::tunables::Publish("immutable", value);
 
   CHECK(false ==
         inst.GetTopic("/Tunables/immutable/value").GetProperty("mutable"));
@@ -1224,7 +1224,7 @@ TEST_CASE_METHOD(
   auto pub = Tune("immutable", "double");
   pub.SetDouble(2.0);
   inst.Flush();
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(1.0 == value.Get());
   CHECK(0 == calls);

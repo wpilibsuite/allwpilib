@@ -25,12 +25,12 @@
 #include "wpi/telemetry/MockTelemetryBackend.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/MockTunableBackend.hpp"
-#include "wpi/tunable/Tunable.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/TunableTable.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/MockTunableBackend.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -171,11 +171,11 @@ class UnitTelemetry {
       std::make_shared<wpi::telemetry::MockTelemetryBackend>();
 };
 
-class UnitComplexTunable final : public wpi::tunable::ComplexTunable {
+class UnitComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
   std::string_view GetTunableType() const override { return "UnitComplex"; }
 
-  void PublishTunable(wpi::tunable::TunableTable& table) override {
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("distance", this, &UnitComplexTunable::distance);
   }
 
@@ -185,14 +185,14 @@ class UnitComplexTunable final : public wpi::tunable::ComplexTunable {
 class UnitTunable {
  public:
   UnitTunable() {
-    wpi::tunable::TunableRegistry::Reset();
-    wpi::tunable::TunableRegistry::RegisterBackend("", mock);
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::RegisterBackend("", mock);
   }
 
-  ~UnitTunable() { wpi::tunable::TunableRegistry::Reset(); }
+  ~UnitTunable() { wpi::tunables::TunableRegistry::Reset(); }
 
-  std::shared_ptr<wpi::tunable::MockTunableBackend> mock =
-      std::make_shared<wpi::tunable::MockTunableBackend>();
+  std::shared_ptr<wpi::tunables::MockTunableBackend> mock =
+      std::make_shared<wpi::tunables::MockTunableBackend>();
 };
 }  // namespace
 
@@ -3438,29 +3438,29 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 }
 
 TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {
-  wpi::tunable::Tunable<foot_t> distance{6_ft};
-  wpi::tunable::Publish("distance", distance);
+  wpi::tunables::Tunable<foot_t> distance{6_ft};
+  wpi::tunables::Publish("distance", distance);
   auto distanceUid = mock->GetUid("/distance");
   REQUIRE(distanceUid);
-  auto distanceInfo = wpi::tunable::TunableRegistry::GetTunable(*distanceUid);
+  auto distanceInfo = wpi::tunables::TunableRegistry::GetTunable(*distanceUid);
   REQUIRE(distanceInfo.config);
   CHECK(distanceInfo.config->properties.at("unit") == "m");
 
   mock->SetDouble("/distance", 2.0);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(distance.Get() == 2_m);
 
   UnitComplexTunable complex;
-  wpi::tunable::Publish("complex", complex);
+  wpi::tunables::Publish("complex", complex);
   auto memberUid = mock->GetUid("/complex/distance");
   REQUIRE(memberUid);
-  auto memberInfo = wpi::tunable::TunableRegistry::GetTunable(*memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
   REQUIRE(memberInfo.config);
   CHECK(memberInfo.config->properties.at("unit") == "m");
 
   mock->SetDouble("/complex/distance", 3.0);
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CHECK(complex.distance == 3_m);
 }

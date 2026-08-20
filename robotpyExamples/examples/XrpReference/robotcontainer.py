@@ -8,7 +8,7 @@ import typing
 
 import commands2
 import commands2.button
-import tunable
+import tunables
 import wpilib
 import xrp
 
@@ -38,7 +38,7 @@ class RobotContainer:
         self.controller = wpilib.Joystick(0)
 
         # Create a tunable selector for autonomous routines.
-        self.chooser = tunable.Selectable()
+        self.chooser = tunables.Selectable()
 
         self._configure_button_bindings()
 
@@ -81,7 +81,7 @@ class RobotContainer:
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
         self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
-        tunable.publish("Autonomous", self.chooser)
+        tunables.publish("Autonomous", self.chooser)
 
     def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
         return self.chooser.get_selected()

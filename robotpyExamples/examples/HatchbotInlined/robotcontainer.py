@@ -5,7 +5,7 @@
 #
 
 import telemetry
-import tunable
+import tunables
 import wpilib
 
 import commands2
@@ -66,14 +66,14 @@ class RobotContainer:
         )
 
         # Chooser
-        self.chooser = tunable.Selectable()
+        self.chooser = tunables.Selectable()
 
         # Add commands to the autonomous command chooser
         self.chooser.add_default("Simple Auto", self.simple_auto)
         self.chooser.add("Complex Auto", self.complex_auto)
 
         # Put the chooser on the dashboard
-        tunable.publish("Autonomous", self.chooser)
+        tunables.publish("Autonomous", self.chooser)
 
     def configure_button_bindings(self):
         """

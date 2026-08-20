@@ -381,7 +381,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         ValuePublisher<T> valuePublisher,
         ValueReader<T> valueReader) {
       super(path, tunable.getConfig(), typeString);
-      m_tunable = tunable;
+      m_tunables = tunable;
       m_valuePublisher = valuePublisher;
       m_valueReader = valueReader;
       updateNetwork();
@@ -389,7 +389,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public void updateNetwork() {
-      T value = m_tunable.get();
+      T value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
       } else if (shouldPublishValue(!m_hasLastValue || !value.equals(m_lastValue))) {
@@ -401,11 +401,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(m_valueReader.read(value));
+      m_tunables.set(m_valueReader.read(value));
       return true;
     }
 
-    private final Tunable<T> m_tunable;
+    private final Tunable<T> m_tunables;
     private final ValuePublisher<T> m_valuePublisher;
     private final ValueReader<T> m_valueReader;
     private T m_lastValue;
@@ -415,13 +415,13 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final class TunableRawEntry extends TunableValueEntry {
     TunableRawEntry(String path, Tunable<byte[]> tunable) {
       super(path, tunable.getConfig(), "raw");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      byte[] value = m_tunable.get();
+      byte[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -434,24 +434,24 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getRaw());
+      m_tunables.set(value.getRaw());
       return true;
     }
 
-    private final Tunable<byte[]> m_tunable;
+    private final Tunable<byte[]> m_tunables;
     private byte[] m_lastValue;
   }
 
   private final class TunableBooleanArrayEntry extends TunableValueEntry {
     TunableBooleanArrayEntry(String path, Tunable<boolean[]> tunable) {
       super(path, tunable.getConfig(), "boolean[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      boolean[] value = m_tunable.get();
+      boolean[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -464,24 +464,24 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getBooleanArray());
+      m_tunables.set(value.getBooleanArray());
       return true;
     }
 
-    private final Tunable<boolean[]> m_tunable;
+    private final Tunable<boolean[]> m_tunables;
     private boolean[] m_lastValue;
   }
 
   private final class TunableIntArrayEntry extends TunableValueEntry {
     TunableIntArrayEntry(String path, Tunable<int[]> tunable) {
       super(path, tunable.getConfig(), "int[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      int[] value = m_tunable.get();
+      int[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -494,7 +494,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(fromLongArray(value.getIntegerArray()));
+      m_tunables.set(fromLongArray(value.getIntegerArray()));
       return true;
     }
 
@@ -516,19 +516,19 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private int[] m_lastValue;
-    private final Tunable<int[]> m_tunable;
+    private final Tunable<int[]> m_tunables;
   }
 
   private final class TunableLongArrayEntry extends TunableValueEntry {
     TunableLongArrayEntry(String path, Tunable<long[]> tunable) {
       super(path, tunable.getConfig(), "int[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      long[] value = m_tunable.get();
+      long[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -541,24 +541,24 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getIntegerArray());
+      m_tunables.set(value.getIntegerArray());
       return true;
     }
 
-    private final Tunable<long[]> m_tunable;
+    private final Tunable<long[]> m_tunables;
     private long[] m_lastValue;
   }
 
   private final class TunableFloatArrayEntry extends TunableValueEntry {
     TunableFloatArrayEntry(String path, Tunable<float[]> tunable) {
       super(path, tunable.getConfig(), "float[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      float[] value = m_tunable.get();
+      float[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -571,24 +571,24 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getFloatArray());
+      m_tunables.set(value.getFloatArray());
       return true;
     }
 
-    private final Tunable<float[]> m_tunable;
+    private final Tunable<float[]> m_tunables;
     private float[] m_lastValue;
   }
 
   private final class TunableDoubleArrayEntry extends TunableValueEntry {
     TunableDoubleArrayEntry(String path, Tunable<double[]> tunable) {
       super(path, tunable.getConfig(), "double[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      double[] value = m_tunable.get();
+      double[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -601,24 +601,24 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getDoubleArray());
+      m_tunables.set(value.getDoubleArray());
       return true;
     }
 
-    private final Tunable<double[]> m_tunable;
+    private final Tunable<double[]> m_tunables;
     private double[] m_lastValue;
   }
 
   private final class TunableStringArrayEntry extends TunableValueEntry {
     TunableStringArrayEntry(String path, Tunable<String[]> tunable) {
       super(path, tunable.getConfig(), "string[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       updateNetwork();
     }
 
     @Override
     public void updateNetwork() {
-      String[] value = m_tunable.get();
+      String[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
         return;
@@ -631,18 +631,18 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public boolean doUpdateTunable(NetworkTableValue value) {
-      m_tunable.set(value.getStringArray());
+      m_tunables.set(value.getStringArray());
       return true;
     }
 
-    private final Tunable<String[]> m_tunable;
+    private final Tunable<String[]> m_tunables;
     private String[] m_lastValue;
   }
 
   private final class TunableStructEntry<T> extends TunableValueEntry {
     TunableStructEntry(String path, Tunable.TunableStruct<T> tunable) {
       super(path, tunable.getConfig(), tunable.getStruct().getTypeString());
-      m_tunable = tunable;
+      m_tunables = tunable;
       m_buf = StructBuffer.create(tunable.getStruct());
       updateNetwork();
     }
@@ -650,7 +650,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     @Override
     public void updateNetwork() {
-      T value = m_tunable.get();
+      T value = m_tunables.get();
       try {
         synchronized (m_buf) {
           if (!m_schemaPublished) {
@@ -674,7 +674,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     public boolean doUpdateTunable(NetworkTableValue value) {
       byte[] data = value.getRaw();
       if (data.length == 0) {
-        m_tunable.set(null);
+        m_tunables.set(null);
         return true;
       }
       if (data.length != m_buf.getStruct().getSize()) {
@@ -694,11 +694,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         reportWarning("rejected struct tune payload", e);
         return false;
       }
-      m_tunable.set(tunedValue);
+      m_tunables.set(tunedValue);
       return true;
     }
 
-    private final Tunable.TunableStruct<T> m_tunable;
+    private final Tunable.TunableStruct<T> m_tunables;
     private final StructBuffer<T> m_buf;
     private boolean m_schemaPublished;
   }
@@ -706,7 +706,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final class TunableStructArrayEntry<T> extends TunableValueEntry {
     TunableStructArrayEntry(String path, Tunable.TunableStructArray<T> tunable) {
       super(path, tunable.getConfig(), tunable.getStruct().getTypeString() + "[]");
-      m_tunable = tunable;
+      m_tunables = tunable;
       m_buf = StructBuffer.create(tunable.getStruct());
       updateNetwork();
     }
@@ -714,7 +714,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     @Override
     public void updateNetwork() {
-      T[] value = m_tunable.get();
+      T[] value = m_tunables.get();
       if (value == null) {
         if (m_hasPublishedValue) {
           reportWarning("null struct array value was not published; previous value retained");
@@ -758,11 +758,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         reportWarning("rejected struct array tune payload", e);
         return false;
       }
-      m_tunable.set(tunedValue);
+      m_tunables.set(tunedValue);
       return true;
     }
 
-    private final Tunable.TunableStructArray<T> m_tunable;
+    private final Tunable.TunableStructArray<T> m_tunables;
     private final StructBuffer<T> m_buf;
     private boolean m_schemaPublished;
     private boolean m_hasPublishedValue;
@@ -771,7 +771,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final class TunableProtobufEntry<T> extends TunableValueEntry {
     TunableProtobufEntry(String path, Tunable.TunableProtobuf<T> tunable) {
       super(path, tunable.getConfig(), tunable.getProtobuf().getTypeString());
-      m_tunable = tunable;
+      m_tunables = tunable;
       m_buf = ProtobufBuffer.create(tunable.getProtobuf());
       updateNetwork();
     }
@@ -779,7 +779,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     @SuppressWarnings("PMD.AvoidCatchingGenericException")
     @Override
     public void updateNetwork() {
-      T value = m_tunable.get();
+      T value = m_tunables.get();
       if (value == null) {
         if (m_hasPublishedValue) {
           reportWarning("null protobuf value was not published; previous value retained");
@@ -819,11 +819,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         reportWarning("rejected protobuf tune payload", e);
         return false;
       }
-      m_tunable.set(tunedValue);
+      m_tunables.set(tunedValue);
       return true;
     }
 
-    private final Tunable.TunableProtobuf<T> m_tunable;
+    private final Tunable.TunableProtobuf<T> m_tunables;
     private final ProtobufBuffer<T, ?> m_buf;
     private boolean m_schemaPublished;
     private boolean m_hasPublishedValue;
@@ -831,8 +831,8 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class ComplexTunableEntry implements TunableEntry {
     ComplexTunableEntry(String path, ComplexTunable tunable) {
-      m_tunable = tunable;
-      String type = m_tunable.getTunableType();
+      m_tunables = tunable;
+      String type = m_tunables.getTunableType();
       if (type == null) {
         m_typePublisher = null;
       } else {
@@ -851,10 +851,10 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     @Override
     public void updateNetwork() {
-      TunableRegistry.updateComplexIfNeeded(m_tunable);
+      TunableRegistry.updateComplexIfNeeded(m_tunables);
     }
 
-    private final ComplexTunable m_tunable;
+    private final ComplexTunable m_tunables;
     private final StringPublisher m_typePublisher;
   }
 

@@ -150,7 +150,7 @@ def fields_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         local_native_libraries = [
             "//fields:robotpy-native-fields.copy_headers",
             "//telemetry:robotpy-native-telemetry.copy_headers",
-            "//tunable:robotpy-native-tunable.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -264,7 +264,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//fields:robotpy-native-fields.copy_headers",
             "//telemetry:robotpy-native-telemetry.copy_headers",
-            "//tunable:robotpy-native-tunable.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],

@@ -6,7 +6,7 @@ ext {
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':telemetry')
-evaluationDependsOn(':tunable')
+evaluationDependsOn(':tunables')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -17,7 +17,7 @@ apply from: "${rootDir}/shared/libmrclib.gradle"
 dependencies {
     implementation project(':hal')
     implementation project(':telemetry')
-    implementation project(':tunable')
+    implementation project(':tunables')
     api project(':wpilibj')
     api project(':wpimath')
     api project(':wpiunits')
@@ -62,7 +62,7 @@ model {
             }
             lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-            lib project: ':tunable', library: 'tunable', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

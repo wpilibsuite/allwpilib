@@ -16,7 +16,7 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':commandsv2')
 evaluationDependsOn(':telemetry')
-evaluationDependsOn(':tunable')
+evaluationDependsOn(':tunables')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -51,7 +51,7 @@ cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
 cppProjectZips.add(project(':telemetry').cppHeadersZip)
-cppProjectZips.add(project(':tunable').cppHeadersZip)
+cppProjectZips.add(project(':tunables').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
@@ -184,7 +184,7 @@ def javaDocProjects = [
     project(':hal'),
     project(':ntcore'),
     project(':telemetry'),
-    project(':tunable'),
+    project(':tunables'),
     project(':wpiannotations'),
     project(':commandsv2'),
     project(':wpilibj'),

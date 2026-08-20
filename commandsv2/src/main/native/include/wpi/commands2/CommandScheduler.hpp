@@ -19,7 +19,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::cmd {
@@ -37,7 +37,7 @@ class Subsystem;
  * This class is provided by the Commands v2 VendorDep
  */
 class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
-                               public wpi::tunable::ComplexTunable {
+                               public wpi::tunables::ComplexTunable {
  public:
   /**
    * Returns the Scheduler instance.
@@ -471,7 +471,7 @@ class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
-  void PublishTunable(wpi::tunable::TunableTable& table) override;
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
   void UpdateTunable() const override;
   std::string_view GetTunableType() const override;
 

@@ -14,10 +14,10 @@
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/Tunable.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableTable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -34,7 +34,7 @@ int IncrementAndGetProfiledPIDControllerInstances();
  */
 template <class Distance>
 class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
-                              public wpi::tunable::ComplexTunable {
+                              public wpi::tunables::ComplexTunable {
  public:
   using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
@@ -459,11 +459,11 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
     return "ProfiledPIDController";
   }
 
-  void PublishTunable(wpi::tunable::TunableTable& table) override {
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("controller", m_controller);
-    auto constraintsConfig = wpi::tunable::TunableConfig::GetOnChange();
-    constraintsConfig.onTune = [](wpi::tunable::detail::TunableBase&,
-                                  wpi::tunable::ComplexTunable* self) {
+    auto constraintsConfig = wpi::tunables::TunableConfig::GetOnChange();
+    constraintsConfig.onTune = [](wpi::tunables::detail::TunableBase&,
+                                  wpi::tunables::ComplexTunable* self) {
       if (auto controller = static_cast<ProfiledPIDController*>(self)) {
         controller->SetConstraints(controller->GetConstraints());
       }
@@ -471,9 +471,9 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
     constraintsConfig.parent = this;
     table.Publish("constraints", this, &ProfiledPIDController::m_constraints,
                   constraintsConfig);
-    auto goalConfig = wpi::tunable::TunableConfig::GetOnChange();
-    goalConfig.onTune = [](wpi::tunable::detail::TunableBase&,
-                           wpi::tunable::ComplexTunable* self) {
+    auto goalConfig = wpi::tunables::TunableConfig::GetOnChange();
+    goalConfig.onTune = [](wpi::tunables::detail::TunableBase&,
+                           wpi::tunables::ComplexTunable* self) {
       if (auto controller = static_cast<ProfiledPIDController*>(self)) {
         controller->SetGoal(FromBaseGoalPosition(controller->m_goalPosition));
       }

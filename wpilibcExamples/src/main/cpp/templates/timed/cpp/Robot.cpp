@@ -4,13 +4,13 @@
 
 #include "Robot.hpp"
 
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/util/print.hpp"
 
 Robot::Robot() {
   chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
   chooser.Add(kAutoNameCustom, kAutoNameCustom);
-  wpi::tunable::Publish("Auto Modes", chooser);
+  wpi::tunables::Publish("Auto Modes", chooser);
 }
 
 /**
@@ -32,7 +32,7 @@ void Robot::RobotPeriodic() {}
  *
  * You can add additional auto modes by adding additional comparisons to the
  * if-else structure below with additional strings. If using
- * wpi::tunable::Selectable make sure to add them to the chooser code above as
+ * wpi::tunables::Selectable make sure to add them to the chooser code above as
  * well.
  */
 void Robot::AutonomousInit() {

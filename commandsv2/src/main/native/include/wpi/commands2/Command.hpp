@@ -11,8 +11,8 @@
 #include "wpi/commands2/Requirements.hpp"
 #include "wpi/commands2/Subsystem.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/Tunable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SmallSet.hpp"
 
@@ -37,7 +37,7 @@ namespace wpi::cmd {
  * @see CommandHelper
  */
 class Command : public wpi::telemetry::TelemetryLoggable,
-                public wpi::tunable::ComplexTunable {
+                public wpi::tunables::ComplexTunable {
  public:
   ~Command() override;
 
@@ -467,7 +467,7 @@ class Command : public wpi::telemetry::TelemetryLoggable,
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
-  void PublishTunable(wpi::tunable::TunableTable& table) override;
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
   void UpdateTunable() const override;
   std::string_view GetTunableType() const override;
 

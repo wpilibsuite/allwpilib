@@ -2,7 +2,7 @@ import re
 
 import pytest
 import telemetry
-import tunable
+import tunables
 import wpilib
 import wpilib.simulation
 
@@ -53,8 +53,8 @@ class DashboardSelectable:
         self._selected_publisher.set_string(value)
 
 
-def make_selectable() -> tunable.Selectable[int]:
-    chooser = tunable.Selectable()
+def make_selectable() -> tunables.Selectable[int]:
+    chooser = tunables.Selectable()
     chooser.add_default("one", 1)
     chooser.add("two", 2)
     return chooser
@@ -95,18 +95,18 @@ def test_register_networktables_telemetry_backend(nt):
 
 
 def test_register_networktables_tunable_backend(nt):
-    tunable.TunableRegistry.reset()
-    tunable.TunableRegistry.register_networktables_backend()
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_networktables_backend()
 
-    value = tunable.Tunable(1.0)
-    tunable.publish("helperTunable", value)
+    value = tunables.Tunable(1.0)
+    tunables.publish("helperTunable", value)
 
     entry = nt.get_entry("/Tunables/helperTunable")
     assert entry.get_double(0.0) == pytest.approx(1.0)
 
     entry.set_double(3.5)
     nt.flush()
-    tunable.TunableRegistry.update()
+    tunables.TunableRegistry.update()
 
     assert value.get() == pytest.approx(3.5)
 
@@ -114,7 +114,7 @@ def test_register_networktables_tunable_backend(nt):
 def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
     value = [1.0]
 
-    tunable.get_table().publish_double(
+    tunables.get_table().publish_double(
         "clamped",
         lambda: value[0],
         lambda requested: value.__setitem__(0, min(requested, 5.0)),
@@ -127,7 +127,7 @@ def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
 
     tune_entry.set_double(10.0)
     nt.flush()
-    tunable.TunableRegistry.update()
+    tunables.TunableRegistry.update()
     nt.flush()
 
     assert value[0] == pytest.approx(5.0)
@@ -135,7 +135,7 @@ def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
 
 
 def test_selectable():
-    chooser = tunable.Selectable()
+    chooser = tunables.Selectable()
     assert chooser.get_selected() is None
 
     chooser.add_default("option", True)
@@ -144,7 +144,7 @@ def test_selectable():
 
 def test_selectable_dashboard_connects_after_publish(nt):
     chooser = make_selectable()
-    tunable.publish("auto", chooser)
+    tunables.publish("auto", chooser)
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         assert dashboard.exists()
@@ -156,7 +156,7 @@ def test_selectable_dashboard_connects_after_publish(nt):
 
         dashboard.set_selected("two")
         nt.flush()
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert dashboard.get_selected() == "two"
         assert dashboard.get_active() == "two"
@@ -169,7 +169,7 @@ def test_selectable_dashboard_connects_before_publish(nt):
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         chooser = make_selectable()
-        tunable.publish("auto", chooser)
+        tunables.publish("auto", chooser)
 
         assert dashboard.exists()
         assert dashboard.get_default() == "one"
@@ -179,7 +179,7 @@ def test_selectable_dashboard_connects_before_publish(nt):
 
         dashboard.set_selected("two")
         nt.flush()
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert dashboard.get_selected() == "two"
         assert dashboard.get_active() == "two"
@@ -192,24 +192,24 @@ def test_selectable_retains_dashboard_selection_after_republish(nt):
     dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         first_chooser = make_selectable()
-        tunable.publish("auto", first_chooser)
+        tunables.publish("auto", first_chooser)
 
         dashboard.set_selected("two")
         nt.flush()
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert dashboard.get_selected() == "two"
         assert dashboard.get_active() == "two"
         assert first_chooser.get_selected() == 2
 
-        tunable.TunableRegistry.reset()
-        tunable.TunableRegistry.register_backend(
+        tunables.TunableRegistry.reset()
+        tunables.TunableRegistry.register_backend(
             "", wpilib.NetworkTablesTunableBackend(nt, "/Tunables")
         )
 
         second_chooser = make_selectable()
-        tunable.publish("auto", second_chooser)
-        tunable.TunableRegistry.update()
+        tunables.publish("auto", second_chooser)
+        tunables.TunableRegistry.update()
 
         assert dashboard.get_selected() == "two"
         assert dashboard.get_active() == "two"

@@ -7,7 +7,7 @@ requires = [
     "hatchling",
     "robotpy-native-wpilib==0.0.0",
     "robotpy-telemetry==0.0.0",
-    "robotpy-tunable==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
@@ -26,7 +26,7 @@ license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpilib==0.0.0",
     "robotpy-telemetry==0.0.0",
-    "robotpy-tunable==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
     "robotpy-wpimath==0.0.0",
     "robotpy-hal==0.0.0",
@@ -90,7 +90,7 @@ known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I
 name = "wpilib"
 wraps = ["robotpy-native-wpilib"]
 depends = [
-    "wpihal", "wpiutil", "ntcore", "wpimath", "telemetry", "tunable"
+    "wpihal", "wpiutil", "ntcore", "wpimath", "telemetry", "tunables"
 ]
 includes = ["wpilib/src"]
 

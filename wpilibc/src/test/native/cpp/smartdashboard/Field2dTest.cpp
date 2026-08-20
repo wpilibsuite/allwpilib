@@ -10,21 +10,21 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/tunable/MockTunableBackend.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/MockTunableBackend.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/angle.hpp"
 
 struct Field2dTest {
   Field2dTest() {
-    wpi::tunable::TunableRegistry::Reset();
-    wpi::tunable::TunableRegistry::RegisterBackend("", mock);
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::RegisterBackend("", mock);
   }
 
-  ~Field2dTest() { wpi::tunable::TunableRegistry::Reset(); }
+  ~Field2dTest() { wpi::tunables::TunableRegistry::Reset(); }
 
-  std::shared_ptr<wpi::tunable::MockTunableBackend> mock =
-      std::make_shared<wpi::tunable::MockTunableBackend>();
+  std::shared_ptr<wpi::tunables::MockTunableBackend> mock =
+      std::make_shared<wpi::tunables::MockTunableBackend>();
 };
 
 static void CheckPose(const wpi::math::Pose2d& actual,
@@ -38,11 +38,11 @@ TEST_CASE_METHOD(Field2dTest,
                  "Field2dTest DashboardEditsRobotPoseThroughTunable",
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
-  wpi::tunable::Publish("field", field);
+  wpi::tunables::Publish("field", field);
 
   wpi::math::Pose2d pose{1_m, 2_m, 30_deg};
   mock->SetStructVector<wpi::math::Pose2d>("/field/Robot", std::vector{pose});
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   CheckPose(field.GetRobotPose(), pose);
 }
@@ -52,14 +52,14 @@ TEST_CASE_METHOD(Field2dTest,
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
   wpi::FieldObject2d* existing = field.GetObject("target");
-  wpi::tunable::Publish("field", field);
+  wpi::tunables::Publish("field", field);
 
   wpi::math::Pose2d first{1_m, 2_m, 30_deg};
   wpi::math::Pose2d second{3_m, 4_m, 60_deg};
 
   mock->SetStructVector<wpi::math::Pose2d>("/field/target",
                                            std::vector{first, second});
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   auto existingPoses = existing->GetPoses();
   REQUIRE(existingPoses.size() == 2u);
@@ -71,12 +71,12 @@ TEST_CASE_METHOD(Field2dTest,
                  "Field2dTest DashboardEditsObjectCreatedAfterTunablePublish",
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
-  wpi::tunable::Publish("field", field);
+  wpi::tunables::Publish("field", field);
   wpi::FieldObject2d* late = field.GetObject("target");
 
   wpi::math::Pose2d pose{1_m, 2_m, 30_deg};
   mock->SetStructVector<wpi::math::Pose2d>("/field/target", std::vector{pose});
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   auto latePoses = late->GetPoses();
   REQUIRE(latePoses.size() == 1u);
@@ -89,7 +89,7 @@ TEST_CASE_METHOD(Field2dTest,
                  "[wpilibc][smartdashboard]") {
   wpi::Field2d field;
   field.GetObject("stale");
-  wpi::tunable::Publish("field", field);
+  wpi::tunables::Publish("field", field);
 
   {
     wpi::Field2d replacement;
@@ -114,7 +114,7 @@ TEST_CASE_METHOD(Field2dTest,
   wpi::math::Pose2d editedPose{5_m, 6_m, 90_deg};
   mock->SetStructVector<wpi::math::Pose2d>("/field/target",
                                            std::vector{editedPose});
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
   auto movedTargetPoses = field.GetObject("target")->GetPoses();
   REQUIRE(movedTargetPoses.size() == 1u);

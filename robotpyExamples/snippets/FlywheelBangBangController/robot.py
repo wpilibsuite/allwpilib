@@ -6,7 +6,7 @@
 #
 
 import telemetry
-import tunable
+import tunables
 import wpilib
 import wpilib_drivers
 import math
@@ -73,7 +73,7 @@ class MyRobot(wpilib.TimedRobot):
         self.flywheel_sim = wpilib.simulation.FlywheelSim(self.plant, self.gearbox)
         self.encoder_sim = wpilib.simulation.EncoderSim(self.encoder)
 
-        tunable.publish("BangBang Controller", self.bang_bang_controler)
+        tunables.publish("BangBang Controller", self.bang_bang_controler)
 
     def robot_periodic(self) -> None:
         telemetry.log("BangBang Controller", self.bang_bang_controler)

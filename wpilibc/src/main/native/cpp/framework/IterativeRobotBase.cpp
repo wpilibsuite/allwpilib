@@ -10,7 +10,7 @@
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi;
@@ -155,7 +155,7 @@ void IterativeRobotBase::LoopFunc() {
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {

@@ -13,7 +13,7 @@
 #include "wpi/simulation/FlywheelSim.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
 
 /**
@@ -46,7 +46,7 @@ class Robot : public wpi::TimedRobot {
 
   Robot() {
     // Add bang-bang controller to SmartDashboard and networktables.
-    wpi::tunable::Publish("BangBangController", bangBangController);
+    wpi::tunables::Publish("BangBangController", bangBangController);
   }
 
   /**

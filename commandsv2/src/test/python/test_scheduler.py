@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 import pytest
 import telemetry
-import tunable
+import tunables
 import wpilib
 
 
@@ -158,59 +158,59 @@ def test_scheduler_logs_names_and_ids(scheduler: commands2.CommandScheduler):
 def test_scheduler_tunable_publishes_names_ids_and_cancel(
     scheduler: commands2.CommandScheduler,
 ):
-    backend = tunable.MockTunableBackend()
-    tunable.TunableRegistry.reset()
-    tunable.TunableRegistry.register_backend("", backend)
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend("", backend)
     command = commands2.WaitCommand(10).with_name("WaitForIt")
 
     try:
         scheduler.schedule(command)
-        tunable.publish("scheduler", scheduler)
+        tunables.publish("scheduler", scheduler)
 
         assert backend.get_value("/scheduler/Names") == ["WaitForIt"]
         assert backend.get_value("/scheduler/Ids") == [id(command)]
         assert backend.get_value("/scheduler/Cancel") == []
 
         scheduler.cancel(command)
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert backend.get_value("/scheduler/Names") == []
         assert backend.get_value("/scheduler/Ids") == []
 
         scheduler.schedule(command)
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert backend.get_value("/scheduler/Names") == ["WaitForIt"]
         assert backend.get_value("/scheduler/Ids") == [id(command)]
 
         backend.set_int64_vector("/scheduler/Cancel", [id(command)])
-        tunable.TunableRegistry.update()
+        tunables.TunableRegistry.update()
 
         assert not scheduler.is_scheduled(command)
     finally:
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
 
 
 def test_reset_instance_removes_scheduler_tunable_publications(
     scheduler: commands2.CommandScheduler,
 ):
-    backend = tunable.MockTunableBackend()
-    tunable.TunableRegistry.reset()
-    tunable.TunableRegistry.register_backend("", backend)
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend("", backend)
 
     try:
         command = commands2.WaitCommand(10).with_name("OldCommand")
         scheduler.schedule(command)
-        tunable.publish("scheduler", scheduler)
+        tunables.publish("scheduler", scheduler)
 
         commands2.CommandScheduler.reset_instance()
         replacement = commands2.CommandScheduler.get_instance()
-        tunable.publish("scheduler", replacement)
-        tunable.TunableRegistry.update()
+        tunables.publish("scheduler", replacement)
+        tunables.TunableRegistry.update()
 
         assert backend.get_value("/scheduler/Names") == []
         assert backend.get_value("/scheduler/Ids") == []
         assert backend.get_value("/scheduler/Cancel") == []
     finally:
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
         commands2.CommandScheduler.reset_instance()

@@ -1317,7 +1317,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
     gen_libinit(
         name = "wpimath.gen_lib_init",
         output_file = "src/main/python/wpimath/_init__wpimath.py",
-        modules = ["native.wpimath._init_robotpy_native_wpimath", "telemetry._init__telemetry", "tunable._init__tunable", "wpiutil._init__wpiutil"],
+        modules = ["native.wpimath._init_robotpy_native_wpimath", "telemetry._init__telemetry", "tunables._init__tunables", "wpiutil._init__wpiutil"],
     )
 
     gen_pkgconf(
@@ -1346,7 +1346,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//telemetry:robotpy-native-telemetry.copy_headers",
-            "//tunable:robotpy-native-tunable.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1364,8 +1364,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ":wpimath.trampoline_hdrs",
             "//telemetry:telemetry",
             "//telemetry:telemetry_pybind_library",
-            "//tunable:tunable",
-            "//tunable:tunable_pybind_library",
+            "//tunables:tunables",
+            "//tunables:tunables_pybind_library",
             "//wpimath:wpimath",
             "//wpimath:wpimath-casters",
             "//wpiutil:wpiutil",
@@ -1373,7 +1373,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         ],
         dynamic_deps = [
             "//telemetry:shared/telemetry",
-            "//tunable:shared/tunable",
+            "//tunables:shared/tunables",
             "//wpimath:shared/wpimath",
             "//wpiutil:shared/wpiutil",
         ],
@@ -1464,7 +1464,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         imports = ["src/main/python"],
         deps = [
             "//telemetry:robotpy-telemetry",
-            "//tunable:robotpy-tunable",
+            "//tunables:robotpy-tunables",
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
@@ -1472,7 +1472,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         summary = "Binary wrapper for WPILib Math library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunable==0.0.0", "robotpy-wpiutil==0.0.0"],
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0"],
         python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
@@ -1485,7 +1485,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         yaml_output_directory = "src/main/python/semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//telemetry:robotpy-native-telemetry.copy_headers",
-            "//tunable:robotpy-native-tunable.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],

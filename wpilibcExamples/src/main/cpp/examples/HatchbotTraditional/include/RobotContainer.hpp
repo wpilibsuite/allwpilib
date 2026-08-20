@@ -12,7 +12,7 @@
 #include "subsystems/HatchSubsystem.hpp"
 #include "wpi/commands2/Command.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
-#include "wpi/tunable/Selectable.hpp"
+#include "wpi/tunables/Selectable.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -42,7 +42,7 @@ class RobotContainer {
   ComplexAuto complexAuto{&drive, &hatch};
 
   // The chooser for the autonomous routines
-  wpi::tunable::Selectable<wpi::cmd::Command*> chooser;
+  wpi::tunables::Selectable<wpi::cmd::Command*> chooser;
 
   // The driver's controller
   wpi::Gamepad driverController{OIConstants::kDriverControllerPort};

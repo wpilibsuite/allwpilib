@@ -95,7 +95,7 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-                lib project: ':tunable', library: 'tunable', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
             }
             sources {
                 cpp {
@@ -131,7 +131,7 @@ model {
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-                    lib project: ':tunable', library: 'tunable', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     if (binary.targetPlatform.name == getCurrentArch()) {
                         simModules.each {
                             lib project: ":simulation:$it", library: it, linkage: 'shared'
@@ -184,7 +184,7 @@ model {
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-                    lib project: ':tunable', library: 'tunable', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 }
                 sources {
                     cpp {
@@ -220,7 +220,7 @@ model {
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-                    lib project: ':tunable', library: 'tunable', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     if (binary.targetPlatform.name == getCurrentArch()) {
                         simModules.each {
                             lib project: ":simulation:$it", library: it, linkage: 'shared'
@@ -342,7 +342,7 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-            lib project: ':tunable', library: 'tunable', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
 
             it.cppCompiler.define('RUNNING_WPILIB_TESTS')

@@ -6,7 +6,7 @@
 
 #include "commands/TeleopArcadeDrive.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Configure the button bindings
@@ -26,7 +26,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Setup chooser options.
   chooser.AddDefault("Auto Routine Distance", &autoDistance);
   chooser.Add("Auto Routine Time", &autoTime);
-  wpi::tunable::Publish("Auto Selector", chooser);
+  wpi::tunables::Publish("Auto Selector", chooser);
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

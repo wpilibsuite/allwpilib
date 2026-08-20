@@ -7,7 +7,7 @@
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
-#include "wpi/tunable/Selectable.hpp"
+#include "wpi/tunables/Selectable.hpp"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -27,8 +27,8 @@ class RobotContainer {
   enum CommandSelector { ONE, TWO, THREE };
 
   // An example of how command selector may be used with
-  // wpi::tunable::Selectable
-  wpi::tunable::Selectable<CommandSelector> chooser;
+  // wpi::tunables::Selectable
+  wpi::tunables::Selectable<CommandSelector> chooser;
 
   // The robot's subsystems and commands are defined here...
 

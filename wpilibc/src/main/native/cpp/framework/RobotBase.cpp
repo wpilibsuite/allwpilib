@@ -29,7 +29,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/WPILibVersion.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/Alert.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -212,7 +212,7 @@ RobotBase::RobotBase() {
           PrintDefaultTelemetryWarning(path, msg);
         }
       });
-  wpi::tunable::TunableRegistry::SetReportWarning(
+  wpi::tunables::TunableRegistry::SetReportWarning(
       [warningReporter](std::string_view msg) {
         if (auto reporter = warningReporter.lock()) {
           reporter->ReportTunable(msg);
@@ -224,7 +224,7 @@ RobotBase::RobotBase() {
   wpi::telemetry::TelemetryRegistry::RegisterBackend(
       "", std::make_shared<backend::NetworkTablesTelemetryBackend>(
               inst, "/Telemetry"));
-  wpi::tunable::TunableRegistry::RegisterBackend(
+  wpi::tunables::TunableRegistry::RegisterBackend(
       "", std::make_shared<backend::NetworkTablesTunableBackend>(inst,
                                                                  "/Tunables"));
 

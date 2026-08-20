@@ -66,7 +66,7 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//telemetry:shared/telemetry",
-        "//tunable:shared/tunable",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//datalog:shared/datalog",
         "//ntcore:shared/ntcore",

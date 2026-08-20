@@ -66,7 +66,7 @@ include 'tools:wpical'
 include 'datalog'
 include 'drivers'
 include 'telemetry'
-include 'tunable'
+include 'tunables'
 
 buildCache {
     def cred = {

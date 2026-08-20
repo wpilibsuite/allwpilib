@@ -10,7 +10,7 @@ evaluationDependsOn(":wpimath")
 evaluationDependsOn(":wpilibc")
 evaluationDependsOn(":wpilibj")
 evaluationDependsOn(":telemetry")
-evaluationDependsOn(":tunable")
+evaluationDependsOn(":tunables")
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
 apply from: "${rootDir}/shared/libmrclib.gradle"
@@ -23,7 +23,7 @@ dependencies {
     implementation project(":wpimath")
     implementation project(":wpilibj")
     implementation project(":telemetry")
-    implementation project(":tunable")
+    implementation project(":tunables")
 }
 
 nativeUtils.exportsConfigs {
@@ -46,7 +46,7 @@ model {
             }
             lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
-            lib project: ':tunable', library: 'tunable', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

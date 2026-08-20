@@ -14,11 +14,11 @@
 #include "wpi/commands2/RunCommand.hpp"
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/tunable/MockTunableBackend.hpp"
-#include "wpi/tunable/TunableConfig.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/Tunables.hpp"
-#include "wpi/tunable/detail/TunableMember.hpp"
+#include "wpi/tunables/MockTunableBackend.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/Tunables.hpp"
+#include "wpi/tunables/detail/TunableMember.hpp"
 
 using namespace wpi::cmd;
 class CommandScheduleTest : public CommandTestBase {};
@@ -26,7 +26,7 @@ class CommandScheduleTest : public CommandTestBase {};
 class NetworkTablesTunableTestState {
  public:
   ~NetworkTablesTunableTestState() {
-    wpi::tunable::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
     wpi::nt::NetworkTableInstance::Destroy(inst);
   }
 
@@ -174,35 +174,35 @@ TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest NotScheduledCancel",
 TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest TunableCancel",
                  "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
-  auto backend = std::make_shared<wpi::tunable::MockTunableBackend>();
-  wpi::tunable::TunableRegistry::RegisterBackend("", backend);
-  wpi::tunable::Publish("Scheduler", scheduler);
+  auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
+  wpi::tunables::TunableRegistry::RegisterBackend("", backend);
+  wpi::tunables::Publish("Scheduler", scheduler);
 
   auto namesUid = backend->GetUid("/Scheduler/Names");
   CHECK(namesUid);
-  auto namesInfo = wpi::tunable::TunableRegistry::GetTunable(*namesUid);
+  auto namesInfo = wpi::tunables::TunableRegistry::GetTunable(*namesUid);
   REQUIRE(namesInfo);
   REQUIRE(namesInfo.config);
   CHECK_FALSE(namesInfo.config->isMutable);
   CHECK(namesInfo.config->polling ==
-        wpi::tunable::TunableConfig::Polling::ALWAYS_GET);
+        wpi::tunables::TunableConfig::Polling::ALWAYS_GET);
 
   auto idsUid = backend->GetUid("/Scheduler/Ids");
   REQUIRE(idsUid);
-  auto idsInfo = wpi::tunable::TunableRegistry::GetTunable(*idsUid);
+  auto idsInfo = wpi::tunables::TunableRegistry::GetTunable(*idsUid);
   REQUIRE(idsInfo);
   REQUIRE(idsInfo.config);
   CHECK_FALSE(idsInfo.config->isMutable);
   CHECK(idsInfo.config->polling ==
-        wpi::tunable::TunableConfig::Polling::ALWAYS_GET);
+        wpi::tunables::TunableConfig::Polling::ALWAYS_GET);
 
   MockCommand command;
   scheduler.Schedule(&command);
   scheduler.Run();
   CHECK(scheduler.IsScheduled(&command));
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
 
-  const auto& names = static_cast<wpi::tunable::detail::TunableMemberValueBase<
+  const auto& names = static_cast<wpi::tunables::detail::TunableMemberValueBase<
       std::vector<std::string>>*>(namesInfo.tunable)
                           ->Get(namesInfo.config->parent);
   REQUIRE(1U == names.size());
@@ -210,7 +210,7 @@ TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest TunableCancel",
 
   const auto& ids =
       static_cast<
-          wpi::tunable::detail::TunableMemberValueBase<std::vector<int64_t>>*>(
+          wpi::tunables::detail::TunableMemberValueBase<std::vector<int64_t>>*>(
           idsInfo.tunable)
           ->Get(idsInfo.config->parent);
   REQUIRE(1U == ids.size());
@@ -220,10 +220,10 @@ TEST_CASE_METHOD(CommandScheduleTest, "CommandScheduleTest TunableCancel",
   backend->SetInt64Vector(
       "/Scheduler/Cancel",
       std::span<const int64_t>{{static_cast<int64_t>(ptrTmp)}});
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   scheduler.Run();
   CHECK_FALSE(scheduler.IsScheduled(&command));
-  wpi::tunable::TunableRegistry::Reset();
+  wpi::tunables::TunableRegistry::Reset();
 }
 
 TEST_CASE_METHOD(CommandScheduleTest,
@@ -231,10 +231,10 @@ TEST_CASE_METHOD(CommandScheduleTest,
                  "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   NetworkTablesTunableTestState ntState;
-  wpi::tunable::TunableRegistry::RegisterBackend(
+  wpi::tunables::TunableRegistry::RegisterBackend(
       "", std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
               ntState.inst, "/Tunables"));
-  wpi::tunable::Publish("Scheduler", scheduler);
+  wpi::tunables::Publish("Scheduler", scheduler);
 
   auto valueSub =
       ntState.inst.GetIntegerArrayTopic("/Tunables/Scheduler/Cancel/value")
@@ -254,9 +254,9 @@ TEST_CASE_METHOD(CommandScheduleTest,
       .Set(cancelIds);
   ntState.inst.Flush();
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   CHECK_FALSE(scheduler.IsScheduled(&command));
 
-  wpi::tunable::TunableRegistry::Update();
+  wpi::tunables::TunableRegistry::Update();
   CHECK((std::vector<int64_t>{}) == valueSub.Get());
 }

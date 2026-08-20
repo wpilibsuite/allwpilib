@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 import hal
 from telemetry import TelemetryLoggable, TelemetryTable
 from typing_extensions import Self
-from tunable import ComplexTunable, Tunable, TunableRegistry, TunableTable
+from tunables import ComplexTunable, Tunable, TunableRegistry, TunableTable
 from wpilib import (
     RobotState,
     EventLoop,
@@ -634,7 +634,7 @@ class CommandScheduler(TelemetryLoggable, ComplexTunable):
     def get_telemetry_type(self) -> str:
         return "Scheduler"
 
-    def publish_tunable(self, table: TunableTable) -> None:
+    def publish_tunables(self, table: TunableTable) -> None:
         table.publish(
             "Names",
             Tunable(

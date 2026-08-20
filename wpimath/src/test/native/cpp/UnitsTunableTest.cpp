@@ -9,17 +9,17 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/MockTunableBackend.hpp"
-#include "wpi/tunable/TunableBackend.hpp"
-#include "wpi/tunable/TunableRegistry.hpp"
-#include "wpi/tunable/TunableTable.hpp"
-#include "wpi/tunable/Tunables.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/MockTunableBackend.hpp"
+#include "wpi/tunables/TunableBackend.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/tunable.hpp"
 
 using namespace wpi;
-using namespace wpi::tunable;
+using namespace wpi::tunables;
 
 namespace {
 class RecordingDirtyBackend : public TunableBackend {

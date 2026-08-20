@@ -1,0 +1,141 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load("//tunables:robotpy_native_build_info.bzl", "define_native_wrapper")
+load("//tunables:robotpy_pybind_build_info.bzl", "define_pybind_library", "tunables_extension")
+
+wpilib_cc_library(
+    name = "tunables",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = [
+        "src/main/native/include",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil",
+    ],
+)
+
+wpilib_java_library(
+    name = "tunables-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "tunables-java",
+    maven_group_id = "org.wpilib.tunables",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+cc_test(
+    name = "tunables-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/**/*.cpp"]),
+    tags = [
+        "exclusive",
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        ":tunables",
+        "//thirdparty/catch2",
+        "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/tunables",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunables",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/tunables",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunables",
+    ],
+)
+
+package_default_cc_project(
+    name = "tunables",
+    maven_artifact_name = "tunables-cpp",
+    maven_group_id = "org.wpilib.tunables",
+)
+
+wpilib_java_junit5_test(
+    name = "tunables-java-test",
+    srcs = glob(["src/test/java/**/*.java"]),
+    tags = ["exclusive"],
+    deps = [
+        ":tunables-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-tunables-generator",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-tunables",
+    pyproject_toml = "src/main/python/native-pyproject.toml",
+)
+
+PYBIND_PKGCFG_DEPS = [
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-tunables-generator",
+    additional_srcs = [":robotpy-native-tunables.copy_headers"],
+    package_root_file = "src/main/python/tunables/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
+)
+
+tunables_extension(
+    srcs = glob(["src/main/python/tunables/src/**/*.cpp"]),
+    extra_hdrs = glob(["src/main/python/tunables/src/**/*.h"]),
+    includes = [
+        "src/main/python/tunables",
+        "src/main/python/tunables/src",
+    ],
+)
+
+define_pybind_library(
+    name = "robotpy-tunables",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "python_tests",
+    srcs = glob(["src/test/python/**/*.py"]),
+    tags = ["exclusive"],
+    deps = [
+        ":robotpy-tunables",
+        "//wpiutil:robotpy-wpiutil",
+        requirement("pytest"),
+    ],
+)

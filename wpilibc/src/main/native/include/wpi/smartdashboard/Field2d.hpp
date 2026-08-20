@@ -12,8 +12,8 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/smartdashboard/FieldObject2d.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
-#include "wpi/tunable/ComplexTunable.hpp"
-#include "wpi/tunable/TunableTable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/mutex.hpp"
 
@@ -38,7 +38,7 @@ namespace wpi {
  * also have multiple poses (which will show the object at multiple locations).
  */
 class Field2d : public wpi::telemetry::TelemetryLoggable,
-                public wpi::tunable::ComplexTunable {
+                public wpi::tunables::ComplexTunable {
  public:
   using Entry = size_t;
 
@@ -99,9 +99,9 @@ class Field2d : public wpi::telemetry::TelemetryLoggable,
   /**
    * Publishes field objects to a tunable table.
    *
-   * @param table wpi::tunable::Tunable table.
+   * @param table wpi::tunables::Tunable table.
    */
-  void PublishTunable(wpi::tunable::TunableTable& table) override;
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
 
  private:
   bool IsTunablePublished() const;

@@ -13,7 +13,7 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/tunable/Tunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -114,7 +114,7 @@ class FieldObject2d {
 
  private:
   class PosesTunable
-      : public wpi::tunable::Tunable<std::vector<wpi::math::Pose2d>> {
+      : public wpi::tunables::Tunable<std::vector<wpi::math::Pose2d>> {
    public:
     explicit PosesTunable(wpi::util::mutex& mutex);
     PosesTunable(wpi::util::mutex& mutex, PosesTunable&& rhs);
@@ -125,7 +125,7 @@ class FieldObject2d {
     void Set(std::vector<wpi::math::Pose2d> poses);
 
    private:
-    using Base = wpi::tunable::Tunable<std::vector<wpi::math::Pose2d>>;
+    using Base = wpi::tunables::Tunable<std::vector<wpi::math::Pose2d>>;
 
     size_t GetStructSize() const override;
     bool UnpackStruct(std::span<const uint8_t> data) override;

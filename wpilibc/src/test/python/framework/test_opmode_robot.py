@@ -1,6 +1,6 @@
 import pytest
 import threading
-import tunable
+import tunables
 from wpilib import simulation as wsim
 from wpilib.opmoderobot import OpModeRobot
 from wpilib import OpMode, RobotState
@@ -55,14 +55,14 @@ class MockRobot(OpModeRobot):
 
 def test_robot_loop_refreshes_getter_backed_tunables():
     robot = MockRobot()
-    backend = tunable.MockTunableBackend()
+    backend = tunables.MockTunableBackend()
     value = [1]
     robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
 
-    tunable.TunableRegistry.reset()
+    tunables.TunableRegistry.reset()
     try:
-        tunable.TunableRegistry.register_backend("", backend)
-        tunable.get_table().publish_int(
+        tunables.TunableRegistry.register_backend("", backend)
+        tunables.get_table().publish_int(
             "getter",
             lambda: value[0],
             lambda tuned: value.__setitem__(0, tuned),
@@ -80,7 +80,7 @@ def test_robot_loop_refreshes_getter_backed_tunables():
         robot.end_competition()
         if robot_thread.is_alive():
             robot_thread.join()
-        tunable.TunableRegistry.reset()
+        tunables.TunableRegistry.reset()
 
 
 @pytest.fixture(autouse=True)

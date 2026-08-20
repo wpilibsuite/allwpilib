@@ -277,12 +277,12 @@ set(FILENAME_DEP_REPLACE "get_filename_component(SELF_DIR \"$\{CMAKE_CURRENT_LIS
 set(SELF_DIR "$\{SELF_DIR\}")
 set(WPIUTIL_DEP_REPLACE "find_dependency(wpiutil)")
 set(TELEMETRY_DEP_REPLACE "find_dependency(telemetry)")
-set(TUNABLE_DEP_REPLACE "find_dependency(tunable)")
+set(TUNABLE_DEP_REPLACE "find_dependency(tunables)")
 
 add_subdirectory(wpiutil)
 
 add_subdirectory(telemetry)
-add_subdirectory(tunable)
+add_subdirectory(tunables)
 if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
     set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
     add_subdirectory(datalog)
