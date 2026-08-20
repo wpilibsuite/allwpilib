@@ -94,6 +94,7 @@ class TunableMemberValue : public wpi::detail::TunableMemberValueBase<double> {
 
   void Set(ComplexTunable* obj, double value) override {
     m_ptr.Get(obj) = unit_t<BaseUnits, T, NonLinearScale>{value};
+    this->SetTunableChanged();
   }
 
  private:
