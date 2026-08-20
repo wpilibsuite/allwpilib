@@ -112,14 +112,13 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     public void close() {
-      DataLogEntry entry;
       synchronized (this) {
-        entry = m_entry;
+        DataLogEntry entry = m_entry;
         m_entry = null;
         m_closed = true;
-      }
-      if (entry != null) {
-        entry.finish();
+        if (entry != null) {
+          entry.finish();
+        }
       }
     }
 
@@ -129,7 +128,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void keepDuplicates() {
+    public synchronized void keepDuplicates() {
       if (!m_closed) {
         m_keepDuplicates = true;
       }
@@ -171,7 +170,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private synchronized <T> StructLogEntry<T> initStruct(Struct<T> struct) {
+    private <T> StructLogEntry<T> initStruct(Struct<T> struct) {
       if (m_closed) {
         return null;
       }
@@ -194,23 +193,29 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public <T> void logStruct(T value, Struct<? super T> struct) {
+      boolean typeMismatch = false;
       try {
-        StructLogEntry<? super T> entry = initStruct(struct);
-        if (entry != null) {
-          if (m_keepDuplicates) {
-            entry.append(value);
-          } else {
-            entry.update(value);
+        synchronized (this) {
+          StructLogEntry<? super T> entry = initStruct(struct);
+          if (entry != null) {
+            if (m_keepDuplicates) {
+              entry.append(value);
+            } else {
+              entry.update(value);
+            }
+          } else if (!m_closed) {
+            typeMismatch = true;
           }
-        } else if (!m_closed) {
-          TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        }
+        if (typeMismatch) {
+          reportTypeMismatch();
         }
       } catch (RuntimeException e) {
         reportWarning("failed to publish struct value", e);
       }
     }
 
-    private synchronized <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
+    private <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
       if (m_closed) {
         return null;
       }
@@ -233,23 +238,29 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+      boolean typeMismatch = false;
       try {
-        ProtobufLogEntry<? super T> entry = initProtobuf(proto);
-        if (entry != null) {
-          if (m_keepDuplicates) {
-            entry.append(value);
-          } else {
-            entry.update(value);
+        synchronized (this) {
+          ProtobufLogEntry<? super T> entry = initProtobuf(proto);
+          if (entry != null) {
+            if (m_keepDuplicates) {
+              entry.append(value);
+            } else {
+              entry.update(value);
+            }
+          } else if (!m_closed) {
+            typeMismatch = true;
           }
-        } else if (!m_closed) {
-          TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        }
+        if (typeMismatch) {
+          reportTypeMismatch();
         }
       } catch (RuntimeException e) {
         reportWarning("failed to publish protobuf value", e);
       }
     }
 
-    private synchronized <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
+    private <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
       if (m_closed) {
         return null;
       }
@@ -273,16 +284,22 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+      boolean typeMismatch = false;
       try {
-        StructArrayLogEntry<? super T> entry = initStructArray(struct);
-        if (entry != null) {
-          if (m_keepDuplicates) {
-            entry.append(value);
-          } else {
-            entry.update(value);
+        synchronized (this) {
+          StructArrayLogEntry<? super T> entry = initStructArray(struct);
+          if (entry != null) {
+            if (m_keepDuplicates) {
+              entry.append(value);
+            } else {
+              entry.update(value);
+            }
+          } else if (!m_closed) {
+            typeMismatch = true;
           }
-        } else if (!m_closed) {
-          TelemetryRegistry.reportWarning(m_path, "type mismatch");
+        }
+        if (typeMismatch) {
+          reportTypeMismatch();
         }
       } catch (RuntimeException e) {
         reportWarning("failed to publish struct array value", e);
@@ -295,180 +312,188 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
           m_path, exceptionMessage == null ? msg : msg + ": " + exceptionMessage);
     }
 
+    private void reportTypeMismatch() {
+      TelemetryRegistry.reportWarning(m_path, "type mismatch");
+    }
+
     @Override
     public void logBoolean(boolean value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new BooleanLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case BooleanLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new BooleanLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case BooleanLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logLong(long value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new IntegerLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case IntegerLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new IntegerLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case IntegerLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logFloat(float value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new FloatLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case FloatLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new FloatLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case FloatLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logDouble(double value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new DoubleLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case DoubleLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new DoubleLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case DoubleLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logString(String value, String typeString) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          m_typeString = typeString;
+          entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case StringLogEntry e when m_typeString.equals(typeString) -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            m_typeString = typeString;
-            entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      String curTypeString = m_typeString;
-
-      switch (entry) {
-        case StringLogEntry e when curTypeString.equals(typeString) -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logBooleanArray(boolean[] value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case BooleanArrayLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case BooleanArrayLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
@@ -484,30 +509,31 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logLongArray(long[] value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case IntegerArrayLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case IntegerArrayLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
@@ -529,120 +555,122 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void logFloatArray(float[] value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case FloatArrayLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case FloatArrayLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logDoubleArray(double[] value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case DoubleArrayLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case DoubleArrayLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logStringArray(String[] value) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          entry = new StringArrayLogEntry(m_log, m_path, m_properties);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case StringArrayLogEntry e -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            entry = new StringArrayLogEntry(m_log, m_path, m_properties);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      switch (entry) {
-        case StringArrayLogEntry e -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
 
     @Override
     public void logRaw(byte[] value, String typeString) {
-      DataLogEntry entry = m_entry;
-      if (entry == null) {
-        synchronized (this) {
-          if (m_closed) {
-            return;
+      boolean typeMismatch = false;
+      synchronized (this) {
+        if (m_closed) {
+          return;
+        }
+
+        DataLogEntry entry = m_entry;
+        if (entry == null) {
+          m_typeString = typeString;
+          entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
+          m_entry = entry;
+        }
+
+        switch (entry) {
+          case RawLogEntry e when m_typeString.equals(typeString) -> {
+            if (m_keepDuplicates) {
+              e.append(value);
+            } else {
+              e.update(value);
+            }
           }
-          // double-check
-          entry = m_entry;
-          if (entry == null) {
-            m_typeString = typeString;
-            entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
-            m_entry = entry;
-          }
+          default -> typeMismatch = true;
         }
       }
-
-      String curTypeString = m_typeString;
-
-      switch (entry) {
-        case RawLogEntry e when curTypeString.equals(typeString) -> {
-          if (m_keepDuplicates) {
-            e.append(value);
-          } else {
-            e.update(value);
-          }
-        }
-        default -> TelemetryRegistry.reportWarning(m_path, "type mismatch");
+      if (typeMismatch) {
+        reportTypeMismatch();
       }
     }
   }
