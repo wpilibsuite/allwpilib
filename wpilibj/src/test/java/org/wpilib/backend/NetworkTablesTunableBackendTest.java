@@ -358,6 +358,92 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void nullBasicValuesWarnWhenPreviousNetworkValueIsRetained() {
+    Tunable<Boolean> booleanValue = Tunable.createConfig(true, robust());
+    Tunable<Integer> intValue = Tunable.createConfig(1, robust());
+    Tunable<Long> longValue = Tunable.createConfig(2L, robust());
+    Tunable<Float> floatValue = Tunable.createConfig(3.25f, robust());
+    Tunable<Double> doubleValue = Tunable.createConfig(4.5, robust());
+    Tunable<String> stringValue = Tunable.createConfig("ready", robust());
+    Tunable<byte[]> rawValue = Tunable.createConfig(new byte[] {5, 6}, robust());
+    Tunable<boolean[]> booleanArray = Tunable.createConfig(new boolean[] {true, false}, robust());
+    Tunable<int[]> intArray = Tunable.createConfig(new int[] {7, 8}, robust());
+    Tunable<long[]> longArray = Tunable.createConfig(new long[] {9L, 10L}, robust());
+    Tunable<float[]> floatArray = Tunable.createConfig(new float[] {11.25f, 12.5f}, robust());
+    Tunable<double[]> doubleArray = Tunable.createConfig(new double[] {13.25, 14.5}, robust());
+    Tunable<String[]> stringArray = Tunable.createConfig(new String[] {"a", "b"}, robust());
+
+    Tunables.publish("nullBooleanAfterValue", booleanValue);
+    Tunables.publish("nullIntAfterValue", intValue);
+    Tunables.publish("nullLongAfterValue", longValue);
+    Tunables.publish("nullFloatAfterValue", floatValue);
+    Tunables.publish("nullDoubleAfterValue", doubleValue);
+    Tunables.publish("nullStringAfterValue", stringValue);
+    Tunables.publish("nullRawAfterValue", rawValue);
+    Tunables.publish("nullBooleansAfterValue", booleanArray);
+    Tunables.publish("nullIntsAfterValue", intArray);
+    Tunables.publish("nullLongsAfterValue", longArray);
+    Tunables.publish("nullFloatsAfterValue", floatArray);
+    Tunables.publish("nullDoublesAfterValue", doubleArray);
+    Tunables.publish("nullStringsAfterValue", stringArray);
+
+    List<String> warnings = new ArrayList<>();
+    TunableRegistry.setReportWarning(warnings::add);
+
+    booleanValue.set(null);
+    intValue.set(null);
+    longValue.set(null);
+    floatValue.set(null);
+    doubleValue.set(null);
+    stringValue.set(null);
+    rawValue.set(null);
+    booleanArray.set(null);
+    intArray.set(null);
+    longArray.set(null);
+    floatArray.set(null);
+    doubleArray.set(null);
+    stringArray.set(null);
+    TunableRegistry.update();
+
+    assertEquals(13, warnings.size());
+    assertWarning(warnings, "/Tunables/nullBooleanAfterValue", "null boolean value");
+    assertWarning(warnings, "/Tunables/nullIntAfterValue", "null int value");
+    assertWarning(warnings, "/Tunables/nullLongAfterValue", "null int value");
+    assertWarning(warnings, "/Tunables/nullFloatAfterValue", "null float value");
+    assertWarning(warnings, "/Tunables/nullDoubleAfterValue", "null double value");
+    assertWarning(warnings, "/Tunables/nullStringAfterValue", "null string value");
+    assertWarning(warnings, "/Tunables/nullRawAfterValue", "null raw value");
+    assertWarning(warnings, "/Tunables/nullBooleansAfterValue", "null boolean array value");
+    assertWarning(warnings, "/Tunables/nullIntsAfterValue", "null int array value");
+    assertWarning(warnings, "/Tunables/nullLongsAfterValue", "null long array value");
+    assertWarning(warnings, "/Tunables/nullFloatsAfterValue", "null float array value");
+    assertWarning(warnings, "/Tunables/nullDoublesAfterValue", "null double array value");
+    assertWarning(warnings, "/Tunables/nullStringsAfterValue", "null string array value");
+    assertTrue(warnings.stream().allMatch(warning -> warning.contains("previous value retained")));
+
+    assertTrue(value("nullBooleanAfterValue").getBoolean(false));
+    assertEquals(1, value("nullIntAfterValue").getInteger(0));
+    assertEquals(2L, value("nullLongAfterValue").getInteger(0));
+    assertEquals(3.25f, value("nullFloatAfterValue").getFloat(0.0f));
+    assertEquals(4.5, value("nullDoubleAfterValue").getDouble(0.0));
+    assertEquals("ready", value("nullStringAfterValue").getString(""));
+    assertArrayEquals(new byte[] {5, 6}, value("nullRawAfterValue").getRaw(new byte[] {}));
+    assertArrayEquals(
+        new boolean[] {true, false},
+        value("nullBooleansAfterValue").getBooleanArray(new boolean[] {}));
+    assertArrayEquals(
+        new long[] {7L, 8L}, value("nullIntsAfterValue").getIntegerArray(new long[] {}));
+    assertArrayEquals(
+        new long[] {9L, 10L}, value("nullLongsAfterValue").getIntegerArray(new long[] {}));
+    assertArrayEquals(
+        new float[] {11.25f, 12.5f}, value("nullFloatsAfterValue").getFloatArray(new float[] {}));
+    assertArrayEquals(
+        new double[] {13.25, 14.5}, value("nullDoublesAfterValue").getDoubleArray(new double[] {}));
+    assertArrayEquals(
+        new String[] {"a", "b"}, value("nullStringsAfterValue").getStringArray(new String[] {}));
+  }
+
+  @Test
   void publishesAndTunesStruct() {
     Translation2d initial = new Translation2d(1.25, 2.5);
     Translation2d tuned = new Translation2d(3.75, 4.5);

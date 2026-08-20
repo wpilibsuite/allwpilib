@@ -201,6 +201,13 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       reportWarning(msg + ": " + e);
     }
 
+    protected void reportNullValueRetained(String valueDescription, boolean hasPublishedValue) {
+      if (hasPublishedValue) {
+        reportWarning(
+            "null " + valueDescription + " value was not published; previous value retained");
+      }
+    }
+
     protected final String m_path;
     protected final GenericPublisher m_publisher;
     protected final GenericSubscriber m_subscriber;
@@ -382,6 +389,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         ValueReader<T> valueReader) {
       super(path, tunable.getConfig(), typeString);
       m_tunables = tunable;
+      m_valueDescription = typeString;
       m_valuePublisher = valuePublisher;
       m_valueReader = valueReader;
       updateNetwork();
@@ -392,6 +400,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       T value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained(m_valueDescription, m_hasLastValue);
       } else if (shouldPublishValue(!m_hasLastValue || !value.equals(m_lastValue))) {
         m_lastValue = value;
         m_hasLastValue = true;
@@ -406,6 +415,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     private final Tunable<T> m_tunables;
+    private final String m_valueDescription;
     private final ValuePublisher<T> m_valuePublisher;
     private final ValueReader<T> m_valueReader;
     private T m_lastValue;
@@ -424,6 +434,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       byte[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("raw", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -454,6 +465,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       boolean[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("boolean array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -484,6 +496,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       int[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("int array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -531,6 +544,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       long[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("long array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -561,6 +575,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       float[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("float array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -591,6 +606,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       double[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("double array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
@@ -621,6 +637,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       String[] value = m_tunables.get();
       if (value == null) {
         shouldPublishValue(false);
+        reportNullValueRetained("string array", m_lastValue != null);
         return;
       }
       if (shouldPublishValue(!Arrays.equals(value, m_lastValue))) {
