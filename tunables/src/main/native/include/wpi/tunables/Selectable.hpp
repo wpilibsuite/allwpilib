@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "wpi/tunables/ComplexTunable.hpp"
-#include "wpi/tunables/Tunable.hpp"
 #include "wpi/util/StringMap.hpp"
 
 namespace wpi::tunables {
@@ -35,9 +34,9 @@ class SelectableBase : public wpi::tunables::ComplexTunable {
  protected:
   virtual void Changed(std::string_view val) = 0;
 
-  wpi::tunables::Tunable<std::string> m_defaultChoice;
-  wpi::tunables::Tunable<std::vector<std::string>> m_options;
-  wpi::tunables::Tunable<std::string> m_selected;
+  std::string m_defaultChoice;
+  std::vector<std::string> m_options;
+  std::string m_selected;
 };
 }  // namespace detail
 
@@ -69,11 +68,10 @@ class Selectable final : public detail::SelectableBase {
         return selectedIt;
       }
     }
-    std::string_view defaultChoice = m_defaultChoice.Get();
-    if (defaultChoice.empty()) {
+    if (m_defaultChoice.empty()) {
       return m_map.end();
     }
-    return m_map.find(defaultChoice);
+    return m_map.find(m_defaultChoice);
   }
 
  public:
@@ -107,11 +105,12 @@ class Selectable final : public detail::SelectableBase {
    */
   void Add(std::string_view name, T object) {
     if (!m_map.insert_or_assign(name, std::move(object)).second) {
-      std::erase_if(m_options.Mutate(), [name](const std::string& option) {
+      std::erase_if(m_options, [name](const std::string& option) {
         return option == name;
       });
     }
-    m_options.Mutate().emplace_back(name);
+    m_options.emplace_back(name);
+    SetChildTunableChanged("options");
   }
 
   /**
@@ -137,11 +136,13 @@ class Selectable final : public detail::SelectableBase {
     if (m_map.erase(name) == 0) {
       return;
     }
-    std::erase_if(m_options.Mutate(),
+    std::erase_if(m_options,
                   [name](const std::string& option) { return option == name; });
-    if (m_defaultChoice.Get() == name) {
+    if (m_defaultChoice == name) {
       m_defaultChoice = "";
+      SetChildTunableChanged("default");
     }
+    SetChildTunableChanged("options");
   }
 
   /**
@@ -149,7 +150,10 @@ class Selectable final : public detail::SelectableBase {
    *
    * @param name   the name of the option
    */
-  void SetDefault(std::string_view name) { m_defaultChoice = name; }
+  void SetDefault(std::string_view name) {
+    m_defaultChoice = name;
+    SetChildTunableChanged("default");
+  }
 
   /**
    * Clears the list of options and resets the default. Does not change the
@@ -158,8 +162,10 @@ class Selectable final : public detail::SelectableBase {
    */
   void Clear() {
     m_map.clear();
-    m_options.Mutate().clear();
+    m_options.clear();
     m_defaultChoice = "";
+    SetChildTunableChanged("default");
+    SetChildTunableChanged("options");
   }
 
   /**
@@ -174,7 +180,7 @@ class Selectable final : public detail::SelectableBase {
    * @return The option selected
    */
   CopyType GetSelected() const {
-    auto it = FindSelectedOrDefault(m_selected.Get());
+    auto it = FindSelectedOrDefault(m_selected);
     if (it == m_map.end()) {
       return CopyType{};
     }

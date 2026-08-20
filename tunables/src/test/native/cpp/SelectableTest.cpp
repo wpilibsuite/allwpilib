@@ -210,6 +210,33 @@ TEST_CASE_METHOD(
 }
 
 TEST_CASE_METHOD(SelectableFixture,
+                 "SelectableTest "
+                 "PublishedMoveAssignToUnpublishedDestinationTransfersEntries",
+                 "[tunable][selectable]") {
+  wpi::tunables::Selectable<int> destination;
+  int currentVal = 0;
+
+  {
+    wpi::tunables::Selectable<int> source;
+    source.Add("one", 1);
+    source.OnChange([&](int val) { currentVal = val; });
+
+    wpi::tunables::Publish("MoveAssignUnpublishedSourceChooser", source);
+    REQUIRE(backend->GetUid("/MoveAssignUnpublishedSourceChooser/selected"));
+
+    destination = std::move(source);
+  }
+
+  REQUIRE(backend->GetUid("/MoveAssignUnpublishedSourceChooser/selected"));
+
+  backend->SetString("/MoveAssignUnpublishedSourceChooser/selected", "one");
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(destination.GetSelected() == 1);
+  CHECK(currentVal == 1);
+}
+
+TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest ListenerIsNotCalledForUnknownSelection",
                  "[tunable][selectable]") {
   wpi::tunables::Selectable<int> chooser;

@@ -6,6 +6,7 @@
 
 #include <string>
 
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableTable.hpp"
 
@@ -16,27 +17,23 @@ static constexpr const char* kDefault = "default";
 static constexpr const char* kOptions = "options";
 static constexpr const char* kSelected = "selected";
 
-detail::SelectableBase::SelectableBase()
-    : m_defaultChoice{TunableConfig{.isMutable = false}},
-      m_options{TunableConfig{.isMutable = false}},
-      m_selected{TunableConfig{
-          .robust = true,
-          .onTune =
-              [](TunableBase& tunable, ComplexTunable* self) {
-                if (auto selectable = static_cast<SelectableBase*>(self)) {
-                  auto& selected =
-                      static_cast<wpi::tunables::Tunable<std::string>&>(
-                          tunable);
-                  selectable->Changed(selected.Get());
-                }
-              },
-          .parent = this}} {}
+detail::SelectableBase::SelectableBase() = default;
 
 void detail::SelectableBase::PublishTunable(
     wpi::tunables::TunableTable& table) {
-  table.Publish(kDefault, m_defaultChoice);
-  table.Publish(kOptions, m_options);
-  table.Publish(kSelected, m_selected);
+  table.Publish(kDefault, this, &SelectableBase::m_defaultChoice,
+                TunableConfig{.isMutable = false});
+  table.Publish(kOptions, this, &SelectableBase::m_options,
+                TunableConfig{.isMutable = false});
+  table.Publish(
+      kSelected, this, &SelectableBase::m_selected,
+      TunableConfig{.robust = true,
+                    .onTune = [](detail::TunableBase&, ComplexTunable* self) {
+                      if (auto selectable =
+                              static_cast<SelectableBase*>(self)) {
+                        selectable->Changed(selectable->m_selected);
+                      }
+                    }});
 }
 
 std::string_view detail::SelectableBase::GetTunableType() const {
