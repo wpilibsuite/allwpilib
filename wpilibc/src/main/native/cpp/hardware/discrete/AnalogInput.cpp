@@ -47,7 +47,7 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }
 
-void AnalogInput::LogTo(wpi::TelemetryTable& table) const {
+void AnalogInput::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", GetVoltage());
 }
 

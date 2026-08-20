@@ -35,16 +35,16 @@ namespace {
 class TimedRobotTest {
  public:
   TimedRobotTest() {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TunableRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::tunable::TunableRegistry::Reset();
     wpi::sim::AlertSim::ResetData();
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
   }
 
   ~TimedRobotTest() {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TunableRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::tunable::TunableRegistry::Reset();
     wpi::sim::AlertSim::ResetData();
     wpi::sim::ResumeTiming();
     wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
@@ -194,14 +194,14 @@ TEST_CASE_METHOD(
   auto inst = wpi::nt::NetworkTableInstance::GetDefault();
   MockRobot robot;
 
-  wpi::Telemetry::Log("telemetryDouble", 2.5);
+  wpi::telemetry::Telemetry::Log("telemetryDouble", 2.5);
 
   auto telemetrySub =
       inst.GetDoubleTopic("/Telemetry/telemetryDouble").Subscribe(0.0);
   CHECK(telemetrySub.Get() == 2.5);
 
-  wpi::TunableDouble tunable{1.0};
-  wpi::Tunables::Publish("tunableDouble", tunable);
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("tunableDouble", tunable);
 
   auto tunableSub =
       inst.GetDoubleTopic("/Tunables/tunableDouble").Subscribe(0.0);
@@ -209,7 +209,7 @@ TEST_CASE_METHOD(
 
   auto tunablePub = inst.GetDoubleTopic("/Tunables/tunableDouble").Publish();
   tunablePub.Set(3.5);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 3.5);
 }
@@ -220,8 +220,9 @@ TEST_CASE_METHOD(TimedRobotTest,
   {
     MockRobot robot;
 
-    wpi::TelemetryRegistry::ReportWarning("/bad", "telemetry test warning");
-    wpi::TunableRegistry::ReportWarning("tunable test warning");
+    wpi::telemetry::TelemetryRegistry::ReportWarning("/bad",
+                                                     "telemetry test warning");
+    wpi::tunable::TunableRegistry::ReportWarning("tunable test warning");
 
     auto alerts = wpi::sim::AlertSim::GetActive();
     CHECK(alerts.size() == 2);

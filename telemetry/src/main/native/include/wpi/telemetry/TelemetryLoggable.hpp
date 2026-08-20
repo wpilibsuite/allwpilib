@@ -9,7 +9,7 @@
 
 #include "wpi/util/SymbolExports.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 class TelemetryTable;
 
@@ -98,7 +98,7 @@ template <typename T>
   requires requires(const T& value, TelemetryTable& table) {
     { value.LogTo(table) };
   }
-inline void LogTo(wpi::TelemetryTable& table, const T& value) {
+inline void LogTo(wpi::telemetry::TelemetryTable& table, const T& value) {
   value.LogTo(table);
 }
 
@@ -112,4 +112,4 @@ constexpr std::string_view GetTelemetryTypeName(const T& value) {
 
 static_assert(SupportsTelemetryWithTypeName<TelemetryLoggable>);
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

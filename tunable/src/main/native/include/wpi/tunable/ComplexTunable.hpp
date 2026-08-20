@@ -10,7 +10,7 @@
 #include "wpi/tunable/detail/TunableBase.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 class TunableTable;
 
@@ -127,4 +127,4 @@ class WPILIB_DLLEXPORT ComplexTunable : public detail::TunableBase {
   virtual ~ComplexTunable() = default;
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

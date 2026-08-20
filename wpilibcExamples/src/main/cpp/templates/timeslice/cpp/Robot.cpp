@@ -21,7 +21,7 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
 
   chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
   chooser.Add(kAutoNameCustom, kAutoNameCustom);
-  wpi::Tunables::Publish("Auto Modes", chooser);
+  wpi::tunable::Tunables::Publish("Auto Modes", chooser);
 }
 
 /**
@@ -42,8 +42,9 @@ void Robot::RobotPeriodic() {}
  * auto name from the text box below the Gyro.
  *
  * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using Selectable
- * make sure to add them to the chooser code above as well.
+ * if-else structure below with additional strings. If using
+ * wpi::tunable::Selectable make sure to add them to the chooser code above as
+ * well.
  */
 void Robot::AutonomousInit() {
   autoSelected = chooser.GetSelected();

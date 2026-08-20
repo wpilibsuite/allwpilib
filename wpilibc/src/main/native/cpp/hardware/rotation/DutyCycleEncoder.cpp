@@ -153,7 +153,7 @@ int DutyCycleEncoder::GetSourceChannel() const {
   return m_dutyCycle->GetSourceChannel();
 }
 
-void DutyCycleEncoder::LogTo(wpi::TelemetryTable& table) const {
+void DutyCycleEncoder::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Position", Get());
   table.Log("Is Connected", IsConnected());
 }

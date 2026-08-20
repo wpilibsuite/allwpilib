@@ -37,7 +37,8 @@ namespace wpi {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
+class Field2d : public wpi::telemetry::TelemetryLoggable,
+                public wpi::tunable::ComplexTunable {
  public:
   using Entry = size_t;
 
@@ -84,7 +85,7 @@ class Field2d : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
    */
   FieldObject2d* GetRobotObject();
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 
@@ -98,9 +99,9 @@ class Field2d : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
   /**
    * Publishes field objects to a tunable table.
    *
-   * @param table Tunable table.
+   * @param table wpi::tunable::Tunable table.
    */
-  void PublishTunable(wpi::TunableTable& table) override;
+  void PublishTunable(wpi::tunable::TunableTable& table) override;
 
  private:
   bool IsTunablePublished() const;

@@ -23,24 +23,26 @@ class CommandTunableButtonTest : public CommandTestBase {
   CommandTunableButtonTest() {
     m_schedule = 0;
     m_cancel = 0;
-    m_backend = std::make_shared<wpi::MockTunableBackend>();
-    wpi::TunableRegistry::RegisterBackend("", m_backend);
+    m_backend = std::make_shared<wpi::tunable::MockTunableBackend>();
+    wpi::tunable::TunableRegistry::RegisterBackend("", m_backend);
     m_command = StartEnd([this] { m_schedule++; }, [this] { m_cancel++; });
-    wpi::Tunables::Publish("command", *m_command->get());
+    wpi::tunable::Tunables::Publish("command", *m_command->get());
   }
 
-  ~CommandTunableButtonTest() override { wpi::TunableRegistry::Reset(); }
+  ~CommandTunableButtonTest() override {
+    wpi::tunable::TunableRegistry::Reset();
+  }
 
   int m_schedule;
   int m_cancel;
-  std::shared_ptr<wpi::MockTunableBackend> m_backend;
+  std::shared_ptr<wpi::tunable::MockTunableBackend> m_backend;
   std::optional<CommandPtr> m_command;
 };
 
 class NetworkTablesTunableTestState {
  public:
   ~NetworkTablesTunableTestState() {
-    wpi::TunableRegistry::Reset();
+    wpi::tunable::TunableRegistry::Reset();
     wpi::nt::NetworkTableInstance::Destroy(inst);
   }
 
@@ -57,7 +59,7 @@ TEST_CASE_METHOD(CommandTunableButtonTest,
   CHECK(0 == m_cancel);
 
   m_backend->SetBool("/command/running", true);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   GetScheduler().Run();
   CHECK(m_command->IsScheduled());
   CHECK(1 == m_schedule);
@@ -71,26 +73,28 @@ TEST_CASE_METHOD(
   auto uid = m_backend->GetUid("/command/running");
   REQUIRE(uid);
 
-  auto info = wpi::TunableRegistry::GetTunable(*uid);
+  auto info = wpi::tunable::TunableRegistry::GetTunable(*uid);
   REQUIRE(info);
   REQUIRE(info.config != nullptr);
-  CHECK(info.config->polling == wpi::TunableConfig::Polling::ALWAYS_GET);
+  CHECK(info.config->polling ==
+        wpi::tunable::TunableConfig::Polling::ALWAYS_GET);
 }
 
 TEST_CASE_METHOD(CommandTunableButtonTest,
                  "CommandTunableButtonTest nameTunablePublishesCommandName",
                  "[commandsv2][command]") {
   m_command->get()->SetName("Renamed Command");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   auto uid = m_backend->GetUid("/command/name");
   REQUIRE(uid);
 
-  auto info = wpi::TunableRegistry::GetTunable(*uid);
+  auto info = wpi::tunable::TunableRegistry::GetTunable(*uid);
   REQUIRE(info);
   REQUIRE(info.config != nullptr);
   CHECK_FALSE(info.config->isMutable);
-  CHECK(info.config->polling == wpi::TunableConfig::Polling::GET_ON_CHANGE);
+  CHECK(info.config->polling ==
+        wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE);
   CHECK("Renamed Command" == m_backend->GetString("/command/name"));
 }
 
@@ -105,7 +109,7 @@ TEST_CASE_METHOD(CommandTunableButtonTest,
   CHECK(0 == m_cancel);
 
   m_backend->SetBool("/command/running", true);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   GetScheduler().Run();
   CHECK(m_command->IsScheduled());
   CHECK(1 == m_schedule);
@@ -122,7 +126,7 @@ TEST_CASE_METHOD(CommandTunableButtonTest,
   CHECK(0 == m_cancel);
 
   m_backend->SetBool("/command/running", false);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   GetScheduler().Run();
   CHECK_FALSE(m_command->IsScheduled());
   CHECK(0 == m_schedule);
@@ -140,7 +144,7 @@ TEST_CASE_METHOD(CommandTunableButtonTest,
   CHECK(0 == m_cancel);
 
   m_backend->SetBool("/command/running", false);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   GetScheduler().Run();
   CHECK_FALSE(m_command->IsScheduled());
   CHECK(1 == m_schedule);
@@ -166,10 +170,10 @@ TEST_CASE_METHOD(
                             [] { return false; }};
   command.SetName("Glass Label");
   NetworkTablesTunableTestState ntState;
-  wpi::TunableRegistry::RegisterBackend(
+  wpi::tunable::TunableRegistry::RegisterBackend(
       "", std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
               ntState.inst, "/Tunables"));
-  wpi::Tunables::Publish("command", command);
+  wpi::tunable::Tunables::Publish("command", command);
 
   auto name =
       ntState.inst.GetStringTopic("/Tunables/command/name").Subscribe("");
@@ -186,7 +190,7 @@ TEST_CASE_METHOD(
 
   running.Set(true);
   ntState.inst.Flush();
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(command.IsScheduled());
   CHECK(running.Get());
@@ -197,16 +201,16 @@ TEST_CASE_METHOD(
 
   CommandScheduler::GetInstance().Run();
   CHECK(1 == executeCount);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(running.Get());
 
   command.SetName("Updated Label");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK("Updated Label" == name.Get());
 
   running.Set(false);
   ntState.inst.Flush();
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK_FALSE(command.IsScheduled());
   CHECK_FALSE(running.Get());
@@ -217,6 +221,6 @@ TEST_CASE_METHOD(
 
   CommandScheduler::GetInstance().Run();
   CHECK(1 == executeCount);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK_FALSE(running.Get());
 }

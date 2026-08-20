@@ -21,7 +21,7 @@ namespace wpi {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public wpi::TelemetryLoggable {
+class DoubleSolenoid : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Possible values for a DoubleSolenoid.
@@ -124,7 +124,7 @@ class DoubleSolenoid : public wpi::TelemetryLoggable {
    */
   bool IsRevSolenoidDisabled() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

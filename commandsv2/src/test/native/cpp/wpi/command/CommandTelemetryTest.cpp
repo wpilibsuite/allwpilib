@@ -13,14 +13,16 @@ using namespace wpi::cmd;
 class CommandTelemetryTest : public CommandTestBase {
  protected:
   CommandTelemetryTest() {
-    wpi::TelemetryRegistry::Reset();
-    m_backend = std::make_shared<wpi::MockTelemetryBackend>();
-    wpi::TelemetryRegistry::RegisterBackend("", m_backend);
+    wpi::telemetry::TelemetryRegistry::Reset();
+    m_backend = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", m_backend);
   }
 
-  ~CommandTelemetryTest() override { wpi::TelemetryRegistry::Reset(); }
+  ~CommandTelemetryTest() override {
+    wpi::telemetry::TelemetryRegistry::Reset();
+  }
 
-  std::shared_ptr<wpi::MockTelemetryBackend> m_backend;
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> m_backend;
 };
 
 TEST_CASE_METHOD(CommandTelemetryTest,
@@ -29,11 +31,12 @@ TEST_CASE_METHOD(CommandTelemetryTest,
   MockCommand command;
   command.SetName("renamed");
 
-  command.LogTo(wpi::TelemetryRegistry::GetTable("command"));
+  command.LogTo(wpi::telemetry::TelemetryRegistry::GetTable("command"));
 
   auto name =
-      m_backend->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
-          "/command/name");
+      m_backend
+          ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+              "/command/name");
   REQUIRE(name);
   CHECK(name->value == "renamed");
   CHECK(m_backend->GetLastAction("/command/.name") == nullptr);

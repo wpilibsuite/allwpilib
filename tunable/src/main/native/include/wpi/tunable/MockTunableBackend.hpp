@@ -23,7 +23,7 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 /** A mock tunable backend for testing. */
 class MockTunableBackend : public TunableBackend {
@@ -554,4 +554,4 @@ class MockTunableBackend : public TunableBackend {
   std::vector<Action> m_actions;
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace wpi::detail {
+namespace wpi::tunable::detail {
 enum class TunableTypeValue {
   UNKNOWN = 0,
   BOOLEAN = 1,
@@ -40,4 +40,4 @@ enum class TunableTypeValue {
   MEMBER_PROTOBUF = 31,
   MEMBER_COMPLEX = 32,
 };
-}  // namespace wpi::detail
+}  // namespace wpi::tunable::detail

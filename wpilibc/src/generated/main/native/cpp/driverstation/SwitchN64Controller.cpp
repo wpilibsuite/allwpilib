@@ -369,7 +369,7 @@ std::string_view SwitchN64Controller::GetTelemetryType() const {
   return "HID:SwitchN64";
 }
 
-void SwitchN64Controller::LogTo(wpi::TelemetryTable& table) const {
+void SwitchN64Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("ZAxis", GetZAxis());

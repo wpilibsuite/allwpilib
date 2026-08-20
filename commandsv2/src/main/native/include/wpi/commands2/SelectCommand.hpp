@@ -118,7 +118,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
     return m_interruptBehavior;
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     Command::LogTo(table);
 
     table.Log("selected", m_selectedCommand ? m_selectedCommand->GetName()

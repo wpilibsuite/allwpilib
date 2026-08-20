@@ -2,7 +2,7 @@ extra_includes:
 - wpi/tunable/TunableTable.hpp
 
 classes:
-  wpi::ComplexTunable:
+  wpi::tunable::ComplexTunable:
     ignored_bases:
     - detail::TunableBase  # TODO(telemetry PR)
     methods:

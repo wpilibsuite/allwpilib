@@ -10,7 +10,7 @@
 #include <span>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::telemetry {
 
 class TelemetryEntry;
 
@@ -105,4 +105,4 @@ class TelemetryBackend {
                          std::string_view schema) = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

@@ -14,7 +14,7 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 class TelemetryBackend;
 class TelemetryEntry;
@@ -200,4 +200,4 @@ class TelemetryRegistry final {
   static bool HasNonDiscardDescendant(std::string_view tablePath);
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

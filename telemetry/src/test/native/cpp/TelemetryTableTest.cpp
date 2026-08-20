@@ -37,7 +37,7 @@ struct TestStructADL {
   double y = 0;
 };
 
-void LogTo(wpi::TelemetryTable& table, const TestStructADL& value) {
+void LogTo(wpi::telemetry::TelemetryTable& table, const TestStructADL& value) {
   table.Log("x", value.x);
   table.Log("y", value.y);
 }
@@ -51,18 +51,19 @@ std::string_view GetTelemetryTypeName(const TestStructADLType&) {
   return "TestStructADLType";
 }
 
-void LogTo(wpi::TelemetryTable& table, const TestStructADLType& value) {
+void LogTo(wpi::telemetry::TelemetryTable& table,
+           const TestStructADLType& value) {
   table.Log("x", value.x);
   table.Log("y", value.y);
 }
 
-struct TestStructLoggable : public wpi::TelemetryLoggable {
+struct TestStructLoggable : public wpi::telemetry::TelemetryLoggable {
   double x = 0;
   double y = 0;
 
   TestStructLoggable(double x_, double y_) : x{x_}, y{y_} {}
 
-  void LogTo(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     table.Log("x", x);
     table.Log("y", y);
   }
@@ -76,7 +77,7 @@ struct TestStructLoggableType : public TestStructLoggable {
   }
 };
 
-struct BlockingTypedLoggable : public wpi::TelemetryLoggable {
+struct BlockingTypedLoggable : public wpi::telemetry::TelemetryLoggable {
   BlockingTypedLoggable(std::promise<void>* entered,
                         std::shared_future<void> release)
       : enteredLogTo{entered}, releaseLogTo{std::move(release)} {}
@@ -88,7 +89,7 @@ struct BlockingTypedLoggable : public wpi::TelemetryLoggable {
     return "BlockingTypedLoggable";
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     enteredLogTo->set_value();
     releaseLogTo.wait();
     table.Log("x", 1.0);
@@ -99,7 +100,7 @@ struct ValueStyle {
   double value = 0;
 };
 
-void LogValueTo(wpi::TelemetryTable& table, std::string_view name,
+void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view name,
                 const ValueStyle& value) {
   table.Log(name, value.value);
 }
@@ -109,20 +110,20 @@ struct StructPoint {
   int32_t y = 0;
 };
 
-class CountingSchemaBackend : public wpi::MockTelemetryBackend {
+class CountingSchemaBackend : public wpi::telemetry::MockTelemetryBackend {
  public:
   int GetSchemaAddCount() const { return m_schemaAdds.load(); }
 
   void AddSchema(std::string_view schemaName, std::string_view type,
                  std::span<const uint8_t> schema) override {
     ++m_schemaAdds;
-    MockTelemetryBackend::AddSchema(schemaName, type, schema);
+    wpi::telemetry::MockTelemetryBackend::AddSchema(schemaName, type, schema);
   }
 
   void AddSchema(std::string_view schemaName, std::string_view type,
                  std::string_view schema) override {
     ++m_schemaAdds;
-    MockTelemetryBackend::AddSchema(schemaName, type, schema);
+    wpi::telemetry::MockTelemetryBackend::AddSchema(schemaName, type, schema);
   }
 
  private:
@@ -135,19 +136,19 @@ struct Formattable {
 
 struct ThrowingFormattable {};
 
-struct ThrowingLoggable : public wpi::TelemetryLoggable {
-  void LogTo(wpi::TelemetryTable& table) const override {
+struct ThrowingLoggable : public wpi::telemetry::TelemetryLoggable {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     (void)table;
     throw std::logic_error{"LogTo should not run"};
   }
 };
 
-struct RobotSpeed : public wpi::TelemetryLoggable {
+struct RobotSpeed : public wpi::telemetry::TelemetryLoggable {
   explicit RobotSpeed(double speed_) : speed{speed_} {}
 
   double speed = 0.0;
 
-  void LogTo(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     table.Log("speed", speed);
   }
 };
@@ -164,14 +165,14 @@ struct BlockingBackendState {
   std::atomic_int logs{0};
 };
 
-class BlockingTelemetryBackend : public wpi::TelemetryBackend {
+class BlockingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
  public:
   explicit BlockingTelemetryBackend(std::shared_ptr<BlockingBackendState> state)
       : m_state{std::move(state)}, m_entry{std::make_shared<Entry>(*m_state)} {}
 
   ~BlockingTelemetryBackend() override { m_state->destroyed.store(true); }
 
-  std::shared_ptr<wpi::TelemetryEntry> GetEntry(
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
       std::string_view path) override {
     (void)path;
     return m_entry;
@@ -197,7 +198,7 @@ class BlockingTelemetryBackend : public wpi::TelemetryBackend {
   }
 
  private:
-  class Entry : public wpi::TelemetryEntry {
+  class Entry : public wpi::telemetry::TelemetryEntry {
    public:
     explicit Entry(BlockingBackendState& state) : m_state{state} {}
 
@@ -268,9 +269,9 @@ class BlockingTelemetryBackend : public wpi::TelemetryBackend {
   std::shared_ptr<Entry> m_entry;
 };
 
-class GenerationTelemetryBackend : public wpi::TelemetryBackend {
+class GenerationTelemetryBackend : public wpi::telemetry::TelemetryBackend {
  public:
-  std::shared_ptr<wpi::TelemetryEntry> GetEntry(
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
       std::string_view path) override {
     auto it = m_entries.find(path);
     if (it != m_entries.end()) {
@@ -311,7 +312,7 @@ class GenerationTelemetryBackend : public wpi::TelemetryBackend {
   const std::vector<int>& GetLogGenerations() const { return m_logGenerations; }
 
  private:
-  class Entry : public wpi::TelemetryEntry {
+  class Entry : public wpi::telemetry::TelemetryEntry {
    public:
     Entry(GenerationTelemetryBackend& backend, int generation)
         : m_backend{backend}, m_generation{generation} {}
@@ -378,9 +379,9 @@ class GenerationTelemetryBackend : public wpi::TelemetryBackend {
   std::vector<int> m_logGenerations;
 };
 
-class ClosingTelemetryBackend : public wpi::TelemetryBackend {
+class ClosingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
  public:
-  std::shared_ptr<wpi::TelemetryEntry> GetEntry(
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
       std::string_view path) override {
     auto it = m_entries.find(path);
     if (it != m_entries.end()) {
@@ -425,7 +426,7 @@ class ClosingTelemetryBackend : public wpi::TelemetryBackend {
   int GetRemoves() const { return m_removes.load(); }
 
  private:
-  class Entry : public wpi::TelemetryEntry {
+  class Entry : public wpi::telemetry::TelemetryEntry {
    public:
     explicit Entry(ClosingTelemetryBackend& backend) : m_backend{backend} {}
 
@@ -540,17 +541,17 @@ struct std::formatter<telemetrytest::ThrowingFormattable>
 struct TelemetryTableTest {
   TelemetryTableTest() {
     warnings.clear();
-    wpi::TelemetryRegistry::Reset();
-    wpi::TelemetryRegistry::SetReportWarning(
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::SetReportWarning(
         [this](std::string_view path, std::string_view msg) {
           warnings.emplace_back(path, msg);
         });
-    wpi::TelemetryRegistry::RegisterBackend("", mock);
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
   }
 
   ~TelemetryTableTest() {
-    wpi::TelemetryRegistry::SetReportWarning(nullptr);
-    wpi::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::SetReportWarning(nullptr);
+    wpi::telemetry::TelemetryRegistry::Reset();
   }
 
   template <typename T>
@@ -568,36 +569,36 @@ struct TelemetryTableTest {
     return *value;
   }
 
-  std::shared_ptr<wpi::MockTelemetryBackend> mock =
-      std::make_shared<wpi::MockTelemetryBackend>();
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> mock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
   std::vector<std::pair<std::string, std::string>> warnings;
 };
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest TablePathNormalizationAndCaching",
                  "[telemetry]") {
-  auto& root = wpi::TelemetryRegistry::GetTable("");
-  auto& drive = wpi::TelemetryRegistry::GetTable("drive");
+  auto& root = wpi::telemetry::TelemetryRegistry::GetTable("");
+  auto& drive = wpi::telemetry::TelemetryRegistry::GetTable("drive");
   REQUIRE(root.GetPath() == "/");
   REQUIRE(drive.GetPath() == "/drive/");
-  REQUIRE(&drive == &wpi::TelemetryRegistry::GetTable("/drive/"));
-  REQUIRE(&drive == &wpi::Telemetry::GetTable("drive"));
+  REQUIRE(&drive == &wpi::telemetry::TelemetryRegistry::GetTable("/drive/"));
+  REQUIRE(&drive == &wpi::telemetry::Telemetry::GetTable("drive"));
   REQUIRE(&drive.GetTable("left") ==
-          &wpi::TelemetryRegistry::GetTable("/drive/left/"));
+          &wpi::telemetry::TelemetryRegistry::GetTable("/drive/left/"));
   REQUIRE(&drive.GetTable("left") == &drive.GetTable("/left"));
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest TableEntryPathsAreNormalized",
                  "[telemetry]") {
-  wpi::Telemetry::Log("/value", 1.0);
-  wpi::Telemetry::Log("value", 2.0);
+  wpi::telemetry::Telemetry::Log("/value", 1.0);
+  wpi::telemetry::Telemetry::Log("value", 2.0);
 
-  auto& drive = wpi::Telemetry::GetTable("drive");
+  auto& drive = wpi::telemetry::Telemetry::GetTable("drive");
   drive.KeepDuplicates("/speed");
   drive.SetProperty("//speed", "unit", "\"m/s\"");
   drive.Log("/speed", 3.0);
-  wpi::Telemetry::GetTable("drive//").Log("speed", 4.0);
+  wpi::telemetry::Telemetry::GetTable("drive//").Log("speed", 4.0);
 
   REQUIRE(mock->GetLastValue<double>("/value") == 2.0);
   REQUIRE(mock->GetLastValue<double>("//value") == 2.0);
@@ -605,13 +606,14 @@ TEST_CASE_METHOD(TelemetryTableTest,
   bool sawProperty = false;
   for (const auto& action : mock->GetActions()) {
     REQUIRE(action.path.find("//") == std::string::npos);
-    if (std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
+    if (std::holds_alternative<
+            wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
             action.value)) {
       REQUIRE(action.path == "/drive/speed");
       sawKeepDuplicates = true;
     }
     if (auto property =
-            std::get_if<wpi::MockTelemetryBackend::SetPropertyValue>(
+            std::get_if<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
                 &action.value)) {
       REQUIRE(action.path == "/drive/speed");
       REQUIRE(property->key == "unit");
@@ -659,18 +661,20 @@ TEST_CASE_METHOD(TelemetryTableTest,
                  "[telemetry]") {
   std::vector<std::pair<std::string, std::string>> reportedWarnings;
   bool nested = false;
-  wpi::TelemetryRegistry::SetReportWarning(
+  wpi::telemetry::TelemetryRegistry::SetReportWarning(
       [&](std::string_view path, std::string_view msg) {
         reportedWarnings.emplace_back(path, msg);
-        auto reportWarning = wpi::TelemetryRegistry::GetReportWarning();
-        wpi::TelemetryRegistry::SetReportWarning(reportWarning);
+        auto reportWarning =
+            wpi::telemetry::TelemetryRegistry::GetReportWarning();
+        wpi::telemetry::TelemetryRegistry::SetReportWarning(reportWarning);
         if (!nested) {
           nested = true;
-          wpi::TelemetryRegistry::ReportWarning("/nested", "nested warning");
+          wpi::telemetry::TelemetryRegistry::ReportWarning("/nested",
+                                                           "nested warning");
         }
       });
 
-  wpi::TelemetryRegistry::ReportWarning("/outer", "outer warning");
+  wpi::telemetry::TelemetryRegistry::ReportWarning("/outer", "outer warning");
 
   REQUIRE(reportedWarnings.size() == 2u);
   CHECK(reportedWarnings[0].first == "/outer");
@@ -682,10 +686,10 @@ TEST_CASE_METHOD(TelemetryTableTest,
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest TypeMismatchWarningAllowsTableReentry",
                  "[telemetry]") {
-  auto& table = wpi::TelemetryRegistry::GetTable("/reentry/");
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/reentry/");
   REQUIRE(table.SetType("ExpectedType"));
 
-  wpi::TelemetryRegistry::SetReportWarning(
+  wpi::telemetry::TelemetryRegistry::SetReportWarning(
       [&](std::string_view path, std::string_view msg) {
         warnings.emplace_back(path, msg);
         CHECK(table.GetType() == "ExpectedType");
@@ -702,24 +706,25 @@ TEST_CASE_METHOD(TelemetryTableTest,
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest FacadeMetadataAndPrimitiveLogging",
                  "[telemetry]") {
-  wpi::Telemetry::KeepDuplicates("loops");
-  wpi::Telemetry::SetProperty("loops", "unit", "\"count\"");
-  wpi::Telemetry::Log("enabled", true);
-  wpi::Telemetry::Log("short", int16_t{2});
-  wpi::Telemetry::Log("int", int32_t{3});
-  wpi::Telemetry::Log("long", int64_t{4});
-  wpi::Telemetry::Log("float", 5.0f);
-  wpi::Telemetry::Log("double", 6.0);
-  wpi::Telemetry::Log("state", std::string_view{"ready"});
-  wpi::Telemetry::Log("json", std::string_view{"{\"ok\":true}"},
-                      std::string_view{"json"});
+  wpi::telemetry::Telemetry::KeepDuplicates("loops");
+  wpi::telemetry::Telemetry::SetProperty("loops", "unit", "\"count\"");
+  wpi::telemetry::Telemetry::Log("enabled", true);
+  wpi::telemetry::Telemetry::Log("short", int16_t{2});
+  wpi::telemetry::Telemetry::Log("int", int32_t{3});
+  wpi::telemetry::Telemetry::Log("long", int64_t{4});
+  wpi::telemetry::Telemetry::Log("float", 5.0f);
+  wpi::telemetry::Telemetry::Log("double", 6.0);
+  wpi::telemetry::Telemetry::Log("state", std::string_view{"ready"});
+  wpi::telemetry::Telemetry::Log("json", std::string_view{"{\"ok\":true}"},
+                                 std::string_view{"json"});
 
   REQUIRE(mock->GetActions()[0].path == "/loops");
-  REQUIRE(
-      std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
-          mock->GetActions()[0].value));
-  auto property = std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
-      mock->GetActions()[1].value);
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+      mock->GetActions()[0].value));
+  auto property =
+      std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          mock->GetActions()[1].value);
   REQUIRE(property.key == "unit");
   REQUIRE(property.value == "\"count\"");
   REQUIRE(Last<bool>("/enabled") == true);
@@ -729,10 +734,12 @@ TEST_CASE_METHOD(TelemetryTableTest,
   REQUIRE(Last<float>("/float") == 5.0f);
   REQUIRE(Last<double>("/double") == 6.0);
 
-  auto state = Last<wpi::MockTelemetryBackend::LogStringValue>("/state");
+  auto state =
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/state");
   REQUIRE(state.value == "ready");
   REQUIRE(state.typeString == "string");
-  auto json = Last<wpi::MockTelemetryBackend::LogStringValue>("/json");
+  auto json =
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/json");
   REQUIRE(json.value == "{\"ok\":true}");
   REQUIRE(json.typeString == "json");
 }
@@ -748,21 +755,22 @@ TEST_CASE_METHOD(TelemetryTableTest,
   std::array<std::string_view, 2> strings{"a", "b"};
   std::array<uint8_t, 2> raw{11, 12};
 
-  wpi::Telemetry::Log("bools", std::span<const bool>{bools});
-  wpi::Telemetry::Log("shorts", std::span<const int16_t>{shorts});
-  wpi::Telemetry::Log("ints", std::span<const int32_t>{ints});
-  wpi::Telemetry::Log("longs", std::span<const int64_t>{longs});
-  wpi::Telemetry::Log("floats", std::span<const float>{floats});
-  wpi::Telemetry::Log("doubles", std::span<const double>{doubles});
-  wpi::Telemetry::Log("strings", std::span<const std::string_view>{strings});
-  wpi::Telemetry::Log("raw", std::span<const uint8_t>{raw},
-                      std::string_view{"bytes"});
-  wpi::Telemetry::Log("initializerBools", {true, false});
-  wpi::Telemetry::Log("initializerShorts", {int16_t{1}, int16_t{2}});
-  wpi::Telemetry::Log("initializerInts", {int32_t{3}, int32_t{4}});
-  wpi::Telemetry::Log("initializerLongs", {int64_t{5}, int64_t{6}});
-  wpi::Telemetry::Log("initializerFloats", {7.0f, 8.0f});
-  wpi::Telemetry::Log("initializerDoubles", {9.0, 10.0});
+  wpi::telemetry::Telemetry::Log("bools", std::span<const bool>{bools});
+  wpi::telemetry::Telemetry::Log("shorts", std::span<const int16_t>{shorts});
+  wpi::telemetry::Telemetry::Log("ints", std::span<const int32_t>{ints});
+  wpi::telemetry::Telemetry::Log("longs", std::span<const int64_t>{longs});
+  wpi::telemetry::Telemetry::Log("floats", std::span<const float>{floats});
+  wpi::telemetry::Telemetry::Log("doubles", std::span<const double>{doubles});
+  wpi::telemetry::Telemetry::Log("strings",
+                                 std::span<const std::string_view>{strings});
+  wpi::telemetry::Telemetry::Log("raw", std::span<const uint8_t>{raw},
+                                 std::string_view{"bytes"});
+  wpi::telemetry::Telemetry::Log("initializerBools", {true, false});
+  wpi::telemetry::Telemetry::Log("initializerShorts", {int16_t{1}, int16_t{2}});
+  wpi::telemetry::Telemetry::Log("initializerInts", {int32_t{3}, int32_t{4}});
+  wpi::telemetry::Telemetry::Log("initializerLongs", {int64_t{5}, int64_t{6}});
+  wpi::telemetry::Telemetry::Log("initializerFloats", {7.0f, 8.0f});
+  wpi::telemetry::Telemetry::Log("initializerDoubles", {9.0, 10.0});
 
   bools[0] = false;
   shorts[0] = 99;
@@ -774,8 +782,8 @@ TEST_CASE_METHOD(TelemetryTableTest,
   raw[0] = 99;
 
   REQUIRE(
-      Last<wpi::MockTelemetryBackend::LogBooleanArrayValue>("/bools").value ==
-      (std::vector<int>{1, 0}));
+      Last<wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue>("/bools")
+          .value == (std::vector<int>{1, 0}));
   REQUIRE(Last<std::vector<int16_t>>("/shorts") ==
           (std::vector<int16_t>{1, 2}));
   REQUIRE(Last<std::vector<int32_t>>("/ints") == (std::vector<int32_t>{3, 4}));
@@ -786,12 +794,13 @@ TEST_CASE_METHOD(TelemetryTableTest,
           (std::vector<double>{9.0, 10.0}));
   REQUIRE(Last<std::vector<std::string>>("/strings") ==
           (std::vector<std::string>{"a", "b"}));
-  auto rawValue = Last<wpi::MockTelemetryBackend::LogRawValue>("/raw");
+  auto rawValue =
+      Last<wpi::telemetry::MockTelemetryBackend::LogRawValue>("/raw");
   REQUIRE(rawValue.value == (std::vector<uint8_t>{11, 12}));
   REQUIRE(rawValue.typeString == "bytes");
-  REQUIRE(
-      Last<wpi::MockTelemetryBackend::LogBooleanArrayValue>("/initializerBools")
-          .value == (std::vector<int>{1, 0}));
+  REQUIRE(Last<wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue>(
+              "/initializerBools")
+              .value == (std::vector<int>{1, 0}));
   REQUIRE(Last<std::vector<int16_t>>("/initializerShorts") ==
           (std::vector<int16_t>{1, 2}));
   REQUIRE(Last<std::vector<int32_t>>("/initializerInts") ==
@@ -806,7 +815,7 @@ TEST_CASE_METHOD(TelemetryTableTest,
 
 TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest GenericDispatch",
                  "[telemetry]") {
-  auto& table = wpi::Telemetry::GetTable();
+  auto& table = wpi::telemetry::Telemetry::GetTable();
   table.Log("boolValue", true);
   table.Log("integralValue", int64_t{7});
   table.Log("floatingValue", 1.25);
@@ -824,26 +833,26 @@ TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest GenericDispatch",
   REQUIRE(Last<int64_t>("/integralValue") == 7);
   REQUIRE(Last<double>("/floatingValue") == 1.25);
   REQUIRE(
-      Last<wpi::MockTelemetryBackend::LogStringValue>("/stringValue").value ==
-      "hello");
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/stringValue")
+          .value == "hello");
   REQUIRE(Last<std::vector<int32_t>>("/boundedArray") ==
           (std::vector<int32_t>{1, 2}));
   REQUIRE(Last<std::vector<int64_t>>("/int8Array") ==
           (std::vector<int64_t>{-1, 2}));
   REQUIRE(Last<std::vector<int64_t>>("/unsignedArray") ==
           (std::vector<int64_t>{3, 4}));
-  REQUIRE(Last<wpi::MockTelemetryBackend::LogRawValue>("/rawArray").value ==
-          (std::vector<uint8_t>{5, 6}));
+  REQUIRE(Last<wpi::telemetry::MockTelemetryBackend::LogRawValue>("/rawArray")
+              .value == (std::vector<uint8_t>{5, 6}));
   REQUIRE(
-      Last<wpi::MockTelemetryBackend::LogStringValue>("/formattable").value ==
-      "42");
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/formattable")
+          .value == "42");
   REQUIRE(Last<std::vector<std::string>>("/formattableArray") ==
           (std::vector<std::string>{"1", "2"}));
 }
 
 TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest LoggableAndADLObjects",
                  "[telemetry]") {
-  auto& table = wpi::TelemetryRegistry::GetTable("/");
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
   table.Log("adl", telemetrytest::TestStructADL{1, 2});
   REQUIRE(Last<double>("/adl/x") == 1);
   REQUIRE(Last<double>("/adl/y") == 2);
@@ -859,14 +868,14 @@ TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest LoggableAndADLObjects",
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest TypedLoggableAndMismatchWarnings",
                  "[telemetry]") {
-  auto& table = wpi::TelemetryRegistry::GetTable("/");
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
   table.Log("test", telemetrytest::TestStructLoggableType{1, 2});
   REQUIRE(table.GetTable("test").GetType() == "TestStructLoggableType");
   REQUIRE(table.GetTable("test").HasType());
   table.Log("test", telemetrytest::TestStructLoggableType{3, 4});
 
   auto typeValue =
-      Last<wpi::MockTelemetryBackend::LogStringValue>("/test/.type");
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/test/.type");
   REQUIRE(typeValue.value == "TestStructLoggableType");
 
   table.Log("adlTyped", telemetrytest::TestStructADLType{5, 6});
@@ -880,25 +889,25 @@ TEST_CASE_METHOD(TelemetryTableTest,
 
 TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest ResetClearsTableTypes",
                  "[telemetry]") {
-  auto& table = wpi::TelemetryRegistry::GetTable("/");
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
   table.Log("test", telemetrytest::TestStructLoggableType{1, 2});
   REQUIRE(table.GetTable("test").GetType() == "TestStructLoggableType");
   mock->Clear();
 
-  wpi::TelemetryRegistry::Reset();
-  wpi::TelemetryRegistry::RegisterBackend("", mock);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
 
-  auto& resetTable = wpi::TelemetryRegistry::GetTable("/");
+  auto& resetTable = wpi::telemetry::TelemetryRegistry::GetTable("/");
   resetTable.Log("test", telemetrytest::TestStructLoggableType{3, 4});
   auto typeValue =
-      Last<wpi::MockTelemetryBackend::LogStringValue>("/test/.type");
+      Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/test/.type");
   REQUIRE(typeValue.value == "TestStructLoggableType");
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest TypedLoggableSetsTypeBeforeLoggingFields",
                  "[telemetry]") {
-  auto& table = wpi::TelemetryRegistry::GetTable("/");
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
   std::promise<void> enteredLogTo;
   auto enteredFuture = enteredLogTo.get_future();
   std::promise<void> releaseLogTo;
@@ -925,14 +934,14 @@ TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest StructLoggingRegistersSchemaAndLogsRawBytes",
     "[telemetry]") {
-  wpi::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
+  wpi::telemetry::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
 
   auto* schema = mock->GetSchema("struct:telemetrytest.StructPoint");
   REQUIRE(schema != nullptr);
   REQUIRE(schema->type == "structschema");
   REQUIRE(schema->schemaString == "double x; int32 y");
 
-  auto raw = Last<wpi::MockTelemetryBackend::LogRawValue>("/point");
+  auto raw = Last<wpi::telemetry::MockTelemetryBackend::LogRawValue>("/point");
   REQUIRE(raw.typeString == "struct:telemetrytest.StructPoint");
   REQUIRE(raw.value.size() == 12u);
   auto unpacked = wpi::util::UnpackStruct<telemetrytest::StructPoint>(
@@ -945,15 +954,15 @@ TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest StructSchemaRegistrationIsCachedPerEntry",
                  "[telemetry]") {
   auto countingMock = std::make_shared<telemetrytest::CountingSchemaBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("", countingMock);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", countingMock);
 
-  wpi::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
+  wpi::telemetry::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
   REQUIRE(countingMock->GetSchemaAddCount() == 1);
 
-  wpi::Telemetry::Log("point", telemetrytest::StructPoint{3.0, 4});
+  wpi::telemetry::Telemetry::Log("point", telemetrytest::StructPoint{3.0, 4});
   REQUIRE(countingMock->GetSchemaAddCount() == 1);
 
-  wpi::Telemetry::Log("other", telemetrytest::StructPoint{5.0, 6});
+  wpi::telemetry::Telemetry::Log("other", telemetrytest::StructPoint{5.0, 6});
   REQUIRE(countingMock->GetSchemaAddCount() == 2);
 }
 
@@ -962,12 +971,13 @@ TEST_CASE_METHOD(
     "TelemetryTableTest StructArrayLoggingRegistersSchemaAndLogsRawBytes",
     "[telemetry]") {
   std::array<telemetrytest::StructPoint, 2> points{{{1.0, 2}, {3.0, 4}}};
-  wpi::Telemetry::Log("points", std::span<const telemetrytest::StructPoint>{
-                                    points.data(), points.size()});
+  wpi::telemetry::Telemetry::Log(
+      "points", std::span<const telemetrytest::StructPoint>{points.data(),
+                                                            points.size()});
 
   auto* schema = mock->GetSchema("struct:telemetrytest.StructPoint");
   REQUIRE(schema != nullptr);
-  auto raw = Last<wpi::MockTelemetryBackend::LogRawValue>("/points");
+  auto raw = Last<wpi::telemetry::MockTelemetryBackend::LogRawValue>("/points");
   REQUIRE(raw.typeString == "struct:telemetrytest.StructPoint[]");
   REQUIRE(raw.value.size() == 24u);
   auto first = wpi::util::UnpackStruct<telemetrytest::StructPoint>(
@@ -983,102 +993,111 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest StructSchemaUsesQualifiedTablePathBackend",
                  "[telemetry]") {
-  auto driveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("/drive", driveMock);
+  auto driveMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/drive", driveMock);
 
-  wpi::Telemetry::GetTable("drive").Log("point",
-                                        telemetrytest::StructPoint{1.0, 2});
+  wpi::telemetry::Telemetry::GetTable("drive").Log(
+      "point", telemetrytest::StructPoint{1.0, 2});
 
   REQUIRE(mock->GetSchema("struct:telemetrytest.StructPoint") == nullptr);
   REQUIRE(driveMock->GetSchema("struct:telemetrytest.StructPoint") != nullptr);
   REQUIRE_FALSE(
-      mock->GetLastValue<wpi::MockTelemetryBackend::LogRawValue>("/drive/point")
+      mock->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogRawValue>(
+              "/drive/point")
           .has_value());
-  REQUIRE(
-      driveMock
-          ->GetLastValue<wpi::MockTelemetryBackend::LogRawValue>("/drive/point")
-          .has_value());
+  REQUIRE(driveMock
+              ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogRawValue>(
+                  "/drive/point")
+              .has_value());
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest BackendPrefixSelectionAndCacheReset",
                  "[telemetry]") {
-  wpi::Telemetry::KeepDuplicates("drive/speed");
-  wpi::Telemetry::SetProperty("drive/speed", "unit", "\"m/s\"");
-  auto& drive = wpi::Telemetry::GetTable("drive");
+  wpi::telemetry::Telemetry::KeepDuplicates("drive/speed");
+  wpi::telemetry::Telemetry::SetProperty("drive/speed", "unit", "\"m/s\"");
+  auto& drive = wpi::telemetry::Telemetry::GetTable("drive");
   drive.Log("speed", 1.0);
   REQUIRE(Last<double>("/drive/speed") == 1.0);
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "/arm", std::make_shared<wpi::MockTelemetryBackend>());
-  auto driveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("/drive", driveMock);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/arm", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
+  auto driveMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/drive", driveMock);
   drive.Log("speed", 2.0);
 
   REQUIRE_FALSE(mock->GetLastValue<double>("/drive/speed").has_value());
-  REQUIRE(
-      std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
-          driveMock->GetActions()[0].value));
-  auto property = std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
-      driveMock->GetActions()[1].value);
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+      driveMock->GetActions()[0].value));
+  auto property =
+      std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          driveMock->GetActions()[1].value);
   REQUIRE(property.key == "unit");
   REQUIRE(property.value == "\"m/s\"");
   auto value = driveMock->GetLastValue<double>("/drive/speed");
   REQUIRE(value.has_value());
   REQUIRE(*value == 2.0);
 
-  wpi::TelemetryRegistry::Reset();
-  auto resetMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("", resetMock);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  auto resetMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", resetMock);
   drive.Log("speed", 3.0);
 
   auto resetValue = resetMock->GetLastValue<double>("/drive/speed");
   REQUIRE(resetValue.has_value());
   REQUIRE(*resetValue == 3.0);
   for (const auto& action : resetMock->GetActions()) {
-    REQUIRE_FALSE(
-        std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
-            action.value));
-    REQUIRE_FALSE(
-        std::holds_alternative<wpi::MockTelemetryBackend::SetPropertyValue>(
-            action.value));
+    REQUIRE_FALSE(std::holds_alternative<
+                  wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+        action.value));
+    REQUIRE_FALSE(std::holds_alternative<
+                  wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+        action.value));
   }
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest GetBackendNormalizesPath", "[telemetry]") {
-  auto driveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("/drive", driveMock);
+  auto driveMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/drive", driveMock);
 
-  REQUIRE(wpi::TelemetryRegistry::GetBackend("drive/speed") == driveMock);
-  REQUIRE(wpi::TelemetryRegistry::GetBackend("//drive//speed") == driveMock);
-  REQUIRE(wpi::TelemetryRegistry::GetBackend("driver/speed") == mock);
+  REQUIRE(wpi::telemetry::TelemetryRegistry::GetBackend("drive/speed") ==
+          driveMock);
+  REQUIRE(wpi::telemetry::TelemetryRegistry::GetBackend("//drive//speed") ==
+          driveMock);
+  REQUIRE(wpi::telemetry::TelemetryRegistry::GetBackend("driver/speed") ==
+          mock);
 
-  wpi::TelemetryRegistry::Reset();
-  auto relativeDriveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("drive", relativeDriveMock);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  auto relativeDriveMock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("drive",
+                                                     relativeDriveMock);
 
-  REQUIRE(wpi::TelemetryRegistry::GetBackend("drive/speed") ==
+  REQUIRE(wpi::telemetry::TelemetryRegistry::GetBackend("drive/speed") ==
           relativeDriveMock);
 
-  wpi::TelemetryRegistry::Reset();
-  auto repeatedSlashDriveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("//drive", repeatedSlashDriveMock);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  auto repeatedSlashDriveMock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("//drive",
+                                                     repeatedSlashDriveMock);
 
-  REQUIRE(wpi::TelemetryRegistry::GetBackend("drive/speed") ==
+  REQUIRE(wpi::telemetry::TelemetryRegistry::GetBackend("drive/speed") ==
           repeatedSlashDriveMock);
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest BackendPrefixRoutingUsesPathBoundaries",
                  "[telemetry]") {
-  wpi::Telemetry::Log("drive/speed", 1.0);
-  wpi::Telemetry::Log("driver/speed", 2.0);
+  wpi::telemetry::Telemetry::Log("drive/speed", 1.0);
+  wpi::telemetry::Telemetry::Log("driver/speed", 2.0);
 
-  auto driveMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("/drive", driveMock);
-  wpi::Telemetry::Log("drive/speed", 3.0);
-  wpi::Telemetry::Log("driver/speed", 4.0);
+  auto driveMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/drive", driveMock);
+  wpi::telemetry::Telemetry::Log("drive/speed", 3.0);
+  wpi::telemetry::Telemetry::Log("driver/speed", 4.0);
 
   auto driveValue = driveMock->GetLastValue<double>("/drive/speed");
   REQUIRE(driveValue.has_value());
@@ -1093,10 +1112,10 @@ TEST_CASE_METHOD(TelemetryTableTest,
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest MissingBackendWarnsAndUsesDiscardBackend",
                  "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::Reset();
 
-  auto backend = wpi::TelemetryRegistry::GetBackend("missing");
-  wpi::Telemetry::Log("missing", 1.0);
+  auto backend = wpi::telemetry::TelemetryRegistry::GetBackend("missing");
+  wpi::telemetry::Telemetry::Log("missing", 1.0);
 
   CHECK(backend->GetEntry("/missing")->IsDiscard());
   bool foundWarning = false;
@@ -1112,18 +1131,18 @@ TEST_CASE_METHOD(TelemetryTableTest,
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest ReplacingBackendReleasesOrphanedBackend",
                  "[telemetry]") {
-  std::weak_ptr<wpi::MockTelemetryBackend> oldBackend;
+  std::weak_ptr<wpi::telemetry::MockTelemetryBackend> oldBackend;
   {
-    auto backend = std::make_shared<wpi::MockTelemetryBackend>();
+    auto backend = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
     oldBackend = backend;
-    wpi::TelemetryRegistry::RegisterBackend("", backend);
-    wpi::Telemetry::Log("replace/value", 1.0);
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
+    wpi::telemetry::Telemetry::Log("replace/value", 1.0);
   }
 
   REQUIRE_FALSE(oldBackend.expired());
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MockTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 
   REQUIRE(oldBackend.expired());
 }
@@ -1132,21 +1151,21 @@ TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest ReplacingPrefixRetainsBackendRegisteredElsewhere",
     "[telemetry]") {
-  std::weak_ptr<wpi::MockTelemetryBackend> oldBackend;
+  std::weak_ptr<wpi::telemetry::MockTelemetryBackend> oldBackend;
   {
-    auto backend = std::make_shared<wpi::MockTelemetryBackend>();
+    auto backend = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
     oldBackend = backend;
-    wpi::TelemetryRegistry::RegisterBackend("", backend);
-    wpi::TelemetryRegistry::RegisterBackend("/drive", backend);
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("/drive", backend);
   }
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "/drive", std::make_shared<wpi::MockTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/drive", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 
   REQUIRE_FALSE(oldBackend.expired());
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MockTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 
   REQUIRE(oldBackend.expired());
 }
@@ -1154,15 +1173,15 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest MultiTelemetryBackendFansOut",
                  "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
-  auto first = std::make_shared<wpi::MockTelemetryBackend>();
-  auto second = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend(
-      "",
-      std::make_shared<wpi::MultiTelemetryBackend>(
-          std::vector<std::shared_ptr<wpi::TelemetryBackend>>{first, second}));
+  wpi::telemetry::TelemetryRegistry::Reset();
+  auto first = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  auto second = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MultiTelemetryBackend>(
+              std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>{
+                  first, second}));
 
-  auto& table = wpi::Telemetry::GetTable("multi");
+  auto& table = wpi::telemetry::Telemetry::GetTable("multi");
   table.KeepDuplicates("speed");
   table.SetProperty("speed", "unit", "\"m/s\"");
   table.Log("speed", 4.5);
@@ -1171,26 +1190,29 @@ TEST_CASE_METHOD(TelemetryTableTest,
   REQUIRE(first->GetLastValue<double>("/multi/speed") == 4.5);
   REQUIRE(second->GetLastValue<double>("/multi/speed") == 4.5);
   auto firstType =
-      first->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+      first->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogStringValue>(
           "/multi/gyro/.type");
   auto secondType =
-      second->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
-          "/multi/gyro/.type");
+      second
+          ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+              "/multi/gyro/.type");
   REQUIRE(firstType.has_value());
   REQUIRE(secondType.has_value());
   REQUIRE(firstType->value == "TestStructLoggableType");
   REQUIRE(secondType->value == "TestStructLoggableType");
 
-  REQUIRE(
-      std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
-          first->GetActions()[0].value));
-  REQUIRE(
-      std::holds_alternative<wpi::MockTelemetryBackend::KeepDuplicatesValue>(
-          second->GetActions()[0].value));
-  auto firstProperty = std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
-      first->GetActions()[1].value);
-  auto secondProperty = std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
-      second->GetActions()[1].value);
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+      first->GetActions()[0].value));
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+      second->GetActions()[0].value));
+  auto firstProperty =
+      std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          first->GetActions()[1].value);
+  auto secondProperty =
+      std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          second->GetActions()[1].value);
   REQUIRE(firstProperty.key == "unit");
   REQUIRE(firstProperty.value == "\"m/s\"");
   REQUIRE(secondProperty.key == "unit");
@@ -1201,17 +1223,17 @@ TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest MultiTelemetryBackendRecreatesEntriesAfterRemove",
     "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::Reset();
   auto child = std::make_shared<telemetrytest::GenerationTelemetryBackend>();
-  auto multi = std::make_shared<wpi::MultiTelemetryBackend>(
-      std::vector<std::shared_ptr<wpi::TelemetryBackend>>{child});
-  wpi::TelemetryRegistry::RegisterBackend("", multi);
+  auto multi = std::make_shared<wpi::telemetry::MultiTelemetryBackend>(
+      std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>{child});
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", multi);
 
-  wpi::Telemetry::Log("rerouted", 1.0);
-  wpi::TelemetryRegistry::RegisterBackend(
-      "/rerouted", std::make_shared<wpi::DiscardTelemetryBackend>());
-  wpi::TelemetryRegistry::RegisterBackend("/rerouted", multi);
-  wpi::Telemetry::Log("rerouted", 2.0);
+  wpi::telemetry::Telemetry::Log("rerouted", 1.0);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/rerouted", std::make_shared<wpi::telemetry::DiscardTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/rerouted", multi);
+  wpi::telemetry::Telemetry::Log("rerouted", 2.0);
 
   std::vector<int> expected{1, 2};
   REQUIRE(child->GetLogGenerations() == expected);
@@ -1222,8 +1244,8 @@ TEST_CASE_METHOD(
     "TelemetryTableTest MultiTelemetryBackendRemovedEntrySkipsStaleEntry",
     "[telemetry]") {
   auto child = std::make_shared<telemetrytest::GenerationTelemetryBackend>();
-  auto multi = std::make_shared<wpi::MultiTelemetryBackend>(
-      std::vector<std::shared_ptr<wpi::TelemetryBackend>>{child});
+  auto multi = std::make_shared<wpi::telemetry::MultiTelemetryBackend>(
+      std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>{child});
   auto staleEntry = multi->GetEntry("/stale");
 
   multi->RemoveEntry("/stale");
@@ -1237,21 +1259,26 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest MultiTelemetryBackendForwardsSchemas",
                  "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
-  auto first = std::make_shared<wpi::MockTelemetryBackend>();
-  auto second = std::make_shared<wpi::MockTelemetryBackend>();
-  auto multi = std::make_shared<wpi::MultiTelemetryBackend>(
-      std::vector<std::shared_ptr<wpi::TelemetryBackend>>{first, second});
-  wpi::TelemetryRegistry::RegisterBackend("", multi);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  auto first = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  auto second = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  auto multi = std::make_shared<wpi::telemetry::MultiTelemetryBackend>(
+      std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>{first,
+                                                                     second});
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", multi);
 
-  wpi::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
+  wpi::telemetry::Telemetry::Log("point", telemetrytest::StructPoint{1.0, 2});
 
   REQUIRE(multi->HasSchema("struct:telemetrytest.StructPoint"));
   REQUIRE(first->GetSchema("struct:telemetrytest.StructPoint") != nullptr);
   REQUIRE(second->GetSchema("struct:telemetrytest.StructPoint") != nullptr);
-  REQUIRE(first->GetLastValue<wpi::MockTelemetryBackend::LogRawValue>("/point")
+  REQUIRE(first
+              ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogRawValue>(
+                  "/point")
               .has_value());
-  REQUIRE(second->GetLastValue<wpi::MockTelemetryBackend::LogRawValue>("/point")
+  REQUIRE(second
+              ->GetLastValue<wpi::telemetry::MockTelemetryBackend::LogRawValue>(
+                  "/point")
               .has_value());
 }
 
@@ -1259,34 +1286,37 @@ TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest MultiTelemetryBackendAllDiscardSkipsTelemetryWork",
     "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MultiTelemetryBackend>(
-              std::vector<std::shared_ptr<wpi::TelemetryBackend>>{
-                  std::make_shared<wpi::DiscardTelemetryBackend>(),
-                  std::make_shared<wpi::DiscardTelemetryBackend>()}));
+  wpi::telemetry::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "",
+      std::make_shared<wpi::telemetry::MultiTelemetryBackend>(
+          std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>{
+              std::make_shared<wpi::telemetry::DiscardTelemetryBackend>(),
+              std::make_shared<wpi::telemetry::DiscardTelemetryBackend>()}));
 
-  wpi::Telemetry::Log("formattable", telemetrytest::ThrowingFormattable{});
-  wpi::Telemetry::Log("loggable", telemetrytest::ThrowingLoggable{});
+  wpi::telemetry::Telemetry::Log("formattable",
+                                 telemetrytest::ThrowingFormattable{});
+  wpi::telemetry::Telemetry::Log("loggable", telemetrytest::ThrowingLoggable{});
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MultiTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MultiTelemetryBackend>());
 
-  wpi::Telemetry::Log("formattable", telemetrytest::ThrowingFormattable{});
-  wpi::Telemetry::Log("loggable", telemetrytest::ThrowingLoggable{});
+  wpi::telemetry::Telemetry::Log("formattable",
+                                 telemetrytest::ThrowingFormattable{});
+  wpi::telemetry::Telemetry::Log("loggable", telemetrytest::ThrowingLoggable{});
 }
 
 TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest DiscardParentExpandsLoggableForNonDiscardDescendant",
     "[telemetry]") {
-  wpi::TelemetryRegistry::Reset();
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::DiscardTelemetryBackend>());
-  auto speedMock = std::make_shared<wpi::MockTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("/robot/speed", speedMock);
+  wpi::telemetry::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::DiscardTelemetryBackend>());
+  auto speedMock = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/robot/speed", speedMock);
 
-  wpi::Telemetry::Log("robot", telemetrytest::RobotSpeed{4.5});
+  wpi::telemetry::Telemetry::Log("robot", telemetrytest::RobotSpeed{4.5});
 
   auto value = speedMock->GetLastValue<double>("/robot/speed");
   REQUIRE(value.has_value());
@@ -1300,8 +1330,8 @@ TEST_CASE_METHOD(
   auto state = std::make_shared<telemetrytest::BlockingBackendState>();
   auto oldBackend =
       std::make_shared<telemetrytest::BlockingTelemetryBackend>(state);
-  wpi::TelemetryRegistry::RegisterBackend("", oldBackend);
-  auto& table = wpi::Telemetry::GetTable();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", oldBackend);
+  auto& table = wpi::telemetry::Telemetry::GetTable();
   table.Log("blocked", 1.0);
   REQUIRE(state->logs.load() == 1);
 
@@ -1311,8 +1341,8 @@ TEST_CASE_METHOD(
   std::thread loggingThread{[&] { table.Log("blocked", 2.0); }};
   enteredFuture.wait();
 
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MockTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
   CHECK_FALSE(state->destroyed.load());
 
   state->releaseLog.set_value();
@@ -1328,15 +1358,15 @@ TEST_CASE_METHOD(
   auto state = std::make_shared<telemetrytest::BlockingBackendState>();
   auto oldBackend =
       std::make_shared<telemetrytest::BlockingTelemetryBackend>(state);
-  wpi::TelemetryRegistry::RegisterBackend("", oldBackend);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", oldBackend);
 
-  auto entry = wpi::TelemetryRegistry::GetEntry("direct");
+  auto entry = wpi::telemetry::TelemetryRegistry::GetEntry("direct");
   entry->LogDouble(1.0);
   REQUIRE(state->logs.load() == 1);
 
   oldBackend.reset();
-  wpi::TelemetryRegistry::RegisterBackend(
-      "", std::make_shared<wpi::MockTelemetryBackend>());
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 
   CHECK_FALSE(state->destroyed.load());
   entry->LogDouble(2.0);
@@ -1350,13 +1380,13 @@ TEST_CASE_METHOD(TelemetryTableTest,
                  "TelemetryTableTest ResetRemovesTrackedEntriesFromBackends",
                  "[telemetry]") {
   auto backend = std::make_shared<telemetrytest::ClosingTelemetryBackend>();
-  wpi::TelemetryRegistry::RegisterBackend("", backend);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
 
-  auto entry = wpi::TelemetryRegistry::GetEntry("direct");
+  auto entry = wpi::telemetry::TelemetryRegistry::GetEntry("direct");
   entry->LogDouble(1.0);
   REQUIRE(backend->GetLogs() == 1);
 
-  wpi::TelemetryRegistry::Reset();
+  wpi::telemetry::TelemetryRegistry::Reset();
 
   CHECK(backend->GetRemoves() == 1);
   entry->LogDouble(2.0);
@@ -1367,9 +1397,9 @@ TEST_CASE_METHOD(
     TelemetryTableTest,
     "TelemetryTableTest DiscardBackendSkipsTelemetryWorkAndCacheResets",
     "[telemetry]") {
-  wpi::TelemetryRegistry::RegisterBackend(
-      "/discard", std::make_shared<wpi::DiscardTelemetryBackend>());
-  auto& discard = wpi::Telemetry::GetTable("discard");
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/discard", std::make_shared<wpi::telemetry::DiscardTelemetryBackend>());
+  auto& discard = wpi::telemetry::Telemetry::GetTable("discard");
 
   discard.KeepDuplicates("dups");
   discard.SetProperty("prop", "unit", "\"count\"");
@@ -1385,7 +1415,7 @@ TEST_CASE_METHOD(
 
   REQUIRE(mock->GetActions().empty());
 
-  wpi::TelemetryRegistry::RegisterBackend("/discard", mock);
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/discard", mock);
   discard.Log("primitive", 2.0);
 
   auto value = mock->GetLastValue<double>("/discard/primitive");

@@ -14,6 +14,7 @@
 #include "wpi/telemetry/TelemetryEntry.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 namespace {
 void ValidateBackends(

@@ -17,7 +17,7 @@ namespace wpi {
  * <p>PWM input signals are specified with a frequency and a ratio of high to
  * low in that frequency. These can be attached to any SmartIO.
  */
-class DutyCycle : public wpi::TelemetryLoggable {
+class DutyCycle : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a DutyCycle input from a smartio channel.
@@ -64,7 +64,7 @@ class DutyCycle : public wpi::TelemetryLoggable {
    */
   int GetSourceChannel() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

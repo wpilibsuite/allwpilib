@@ -17,9 +17,10 @@ namespace wpi::cmd {
  *
  * This class is provided by the Commands v2 VendorDep
  */
-class SubsystemBase : public Subsystem, public wpi::TelemetryLoggable {
+class SubsystemBase : public Subsystem,
+                      public wpi::telemetry::TelemetryLoggable {
  public:
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 
@@ -39,7 +40,7 @@ class SubsystemBase : public Subsystem, public wpi::TelemetryLoggable {
 
  protected:
   /**
-   * Constructor.  Telemetry/log name defaults to the classname.
+   * Constructor.  wpi::telemetry::Telemetry/log name defaults to the classname.
    */
   SubsystemBase();
   /**

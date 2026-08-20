@@ -18,29 +18,31 @@
 
 class SelectableFixture {
  public:
-  SelectableFixture() { wpi::TunableRegistry::RegisterBackend("", backend); }
+  SelectableFixture() {
+    wpi::tunable::TunableRegistry::RegisterBackend("", backend);
+  }
 
-  ~SelectableFixture() { wpi::TunableRegistry::Reset(); }
+  ~SelectableFixture() { wpi::tunable::TunableRegistry::Reset(); }
 
-  std::shared_ptr<wpi::MockTunableBackend> backend =
-      std::make_shared<wpi::MockTunableBackend>();
+  std::shared_ptr<wpi::tunable::MockTunableBackend> backend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
 };
 
 TEST_CASE_METHOD(SelectableFixture, "SelectableTest ReturnsSelected",
                  "[tunable][selectable]") {
   for (int param = 0; param <= 3; ++param) {
-    wpi::Selectable<int> chooser;
+    wpi::tunable::Selectable<int> chooser;
     for (int i = 1; i <= 3; i++) {
       chooser.Add(std::to_string(i), i);
     }
     chooser.AddDefault("0", 0);
 
-    wpi::Tunables::Publish(std::format("ReturnsSelectedChooser{}", param),
-                           chooser);
-    wpi::TunableRegistry::Update();
+    wpi::tunable::Tunables::Publish(
+        std::format("ReturnsSelectedChooser{}", param), chooser);
+    wpi::tunable::TunableRegistry::Update();
     backend->SetString(std::format("/ReturnsSelectedChooser{}/selected", param),
                        std::to_string(param));
-    wpi::TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
     CHECK(chooser.GetSelected() == param);
   }
 }
@@ -48,7 +50,7 @@ TEST_CASE_METHOD(SelectableFixture, "SelectableTest ReturnsSelected",
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest PublishesEntriesAndMetadata",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("one", 1);
   chooser.AddDefault("two", 2);
 
@@ -56,14 +58,14 @@ TEST_CASE_METHOD(SelectableFixture,
 
   CHECK(chooser.GetSelected() == 2);
 
-  wpi::Tunables::Publish("MetadataChooser", chooser);
+  wpi::tunable::Tunables::Publish("MetadataChooser", chooser);
   CHECK(backend->GetString("/MetadataChooser/default") == "two");
   CHECK(backend->GetStringVector("/MetadataChooser/options") ==
         (std::vector<std::string>{"one", "two"}));
   CHECK(backend->GetString("/MetadataChooser/selected") == "");
 
   backend->SetString("/MetadataChooser/selected", "one");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(backend->GetString("/MetadataChooser/selected") == "one");
   CHECK(chooser.GetSelected() == 1);
@@ -71,7 +73,7 @@ TEST_CASE_METHOD(SelectableFixture,
 
 TEST_CASE("SelectableTest DefaultIsReturnedOnNoSelect",
           "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
 
   for (int i = 1; i <= 3; i++) {
     chooser.Add(std::to_string(i), i);
@@ -85,20 +87,20 @@ TEST_CASE("SelectableTest DefaultIsReturnedOnNoSelect",
 
 TEST_CASE_METHOD(SelectableFixture, "SelectableTest DefaultIsReturnedOnUnknown",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.AddDefault("one", 1);
   chooser.Add("two", 2);
 
-  wpi::Tunables::Publish("UnknownDefaultChooser", chooser);
+  wpi::tunable::Tunables::Publish("UnknownDefaultChooser", chooser);
   backend->SetString("/UnknownDefaultChooser/selected", "missing");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(chooser.GetSelected() == 1);
 }
 
 TEST_CASE("SelectableTest DefaultConstructableIsReturnedOnNoSelectAndNoDefault",
           "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
 
   for (int i = 1; i <= 3; i++) {
     chooser.Add(std::to_string(i), i);
@@ -109,17 +111,17 @@ TEST_CASE("SelectableTest DefaultConstructableIsReturnedOnNoSelectAndNoDefault",
 
 TEST_CASE_METHOD(SelectableFixture, "SelectableTest ChangeListener",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   for (int i = 1; i <= 3; i++) {
     chooser.Add(std::to_string(i), i);
   }
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  wpi::Tunables::Publish("ChangeListenerChooser", chooser);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::Tunables::Publish("ChangeListenerChooser", chooser);
+  wpi::tunable::TunableRegistry::Update();
   backend->SetString("/ChangeListenerChooser/selected", "3");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(currentVal == 3);
 }
@@ -127,28 +129,28 @@ TEST_CASE_METHOD(SelectableFixture, "SelectableTest ChangeListener",
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest ChangeListenerUsesDefaultWhenSelectionCleared",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.AddDefault("one", 1);
   chooser.Add("two", 2);
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  wpi::Tunables::Publish("ChangeListenerDefaultChooser", chooser);
+  wpi::tunable::Tunables::Publish("ChangeListenerDefaultChooser", chooser);
   backend->SetString("/ChangeListenerDefaultChooser/selected", "two");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(chooser.GetSelected() == 2);
   CHECK(currentVal == 2);
 
   backend->SetString("/ChangeListenerDefaultChooser/selected", "");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(chooser.GetSelected() == 1);
   CHECK(currentVal == 1);
 
   currentVal = 0;
   backend->SetString("/ChangeListenerDefaultChooser/selected", "missing");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(chooser.GetSelected() == 1);
   CHECK(currentVal == 1);
@@ -157,16 +159,16 @@ TEST_CASE_METHOD(SelectableFixture,
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest MoveConstructRebindsChangeListener",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("one", 1);
   chooser.Add("two", 2);
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  wpi::Selectable<int> movedChooser{std::move(chooser)};
-  wpi::Tunables::Publish("MoveConstructChooser", movedChooser);
+  wpi::tunable::Selectable<int> movedChooser{std::move(chooser)};
+  wpi::tunable::Tunables::Publish("MoveConstructChooser", movedChooser);
   backend->SetString("/MoveConstructChooser/selected", "two");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(movedChooser.GetSelected() == 2);
   CHECK(currentVal == 2);
@@ -176,16 +178,16 @@ TEST_CASE_METHOD(
     SelectableFixture,
     "SelectableTest PublishedMoveAssignTransfersEntriesAndChangeListener",
     "[tunable][selectable]") {
-  wpi::Selectable<int> source;
+  wpi::tunable::Selectable<int> source;
   source.Add("one", 1);
   int currentVal = 0;
   source.OnChange([&](int val) { currentVal = val; });
 
-  wpi::Selectable<int> destination;
+  wpi::tunable::Selectable<int> destination;
   destination.Add("old", 2);
 
-  wpi::Tunables::Publish("MoveAssignSourceChooser", source);
-  wpi::Tunables::Publish("MoveAssignDestinationChooser", destination);
+  wpi::tunable::Tunables::Publish("MoveAssignSourceChooser", source);
+  wpi::tunable::Tunables::Publish("MoveAssignDestinationChooser", destination);
   auto sourceSelectedUid = backend->GetUid("/MoveAssignSourceChooser/selected");
   auto destinationSelectedUid =
       backend->GetUid("/MoveAssignDestinationChooser/selected");
@@ -197,10 +199,11 @@ TEST_CASE_METHOD(
   CHECK(backend->GetUid("/MoveAssignSourceChooser/selected") ==
         sourceSelectedUid);
   CHECK_FALSE(backend->GetUid("/MoveAssignDestinationChooser/selected"));
-  CHECK_FALSE(wpi::TunableRegistry::GetTunable(*destinationSelectedUid));
+  CHECK_FALSE(
+      wpi::tunable::TunableRegistry::GetTunable(*destinationSelectedUid));
 
   backend->SetString("/MoveAssignSourceChooser/selected", "one");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(destination.GetSelected() == 1);
   CHECK(currentVal == 1);
@@ -209,14 +212,14 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest ListenerIsNotCalledForUnknownSelection",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("one", 1);
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
-  wpi::Tunables::Publish("UnknownSelectionChooser", chooser);
+  wpi::tunable::Tunables::Publish("UnknownSelectionChooser", chooser);
   backend->SetString("/UnknownSelectionChooser/selected", "missing");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(currentVal == 0);
   CHECK(chooser.GetSelected() == 0);
@@ -225,16 +228,16 @@ TEST_CASE_METHOD(SelectableFixture,
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest ListenerReplacementUsesLatestListener",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("one", 1);
   int first = 0;
   int second = 0;
   chooser.OnChange([&](int val) { first = val; });
   chooser.OnChange([&](int val) { second = val; });
 
-  wpi::Tunables::Publish("ListenerReplacementChooser", chooser);
+  wpi::tunable::Tunables::Publish("ListenerReplacementChooser", chooser);
   backend->SetString("/ListenerReplacementChooser/selected", "one");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(first == 0);
   CHECK(second == 1);
@@ -244,13 +247,13 @@ TEST_CASE_METHOD(
     SelectableFixture,
     "SelectableTest DuplicateOptionReplacesValueWithoutDuplicatingOptions",
     "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("mode", 1);
   chooser.Add("mode", 2);
 
-  wpi::Tunables::Publish("DuplicateChooser", chooser);
+  wpi::tunable::Tunables::Publish("DuplicateChooser", chooser);
   backend->SetString("/DuplicateChooser/selected", "mode");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(chooser.GetSelected() == 2);
   CHECK(backend->GetStringVector("/DuplicateChooser/options") ==
@@ -259,7 +262,7 @@ TEST_CASE_METHOD(
 
 TEST_CASE("SelectableTest RemoveClearsDefaultWhenRemoved",
           "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.AddDefault("one", 1);
 
   chooser.Remove("one");
@@ -271,12 +274,12 @@ TEST_CASE("SelectableTest RemoveClearsDefaultWhenRemoved",
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest RemovePreservesSelectedNameUntilReadded",
                  "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.Add("one", 1);
   chooser.Add("two", 2);
-  wpi::Tunables::Publish("RemoveChooser", chooser);
+  wpi::tunable::Tunables::Publish("RemoveChooser", chooser);
   backend->SetString("/RemoveChooser/selected", "two");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   chooser.Remove("two");
   CHECK(chooser.GetSelected() == 0);
@@ -298,12 +301,12 @@ TEST_CASE_METHOD(
     SelectableFixture,
     "SelectableTest ClearResetsOptionsAndDefaultButPreservesSelectionName",
     "[tunable][selectable]") {
-  wpi::Selectable<int> chooser;
+  wpi::tunable::Selectable<int> chooser;
   chooser.AddDefault("one", 1);
   chooser.Add("two", 2);
-  wpi::Tunables::Publish("ClearChooser", chooser);
+  wpi::tunable::Tunables::Publish("ClearChooser", chooser);
   backend->SetString("/ClearChooser/selected", "two");
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   chooser.Clear();
   CHECK(chooser.GetSelected() == 0);
@@ -319,7 +322,7 @@ TEST_CASE_METHOD(
 TEST_CASE("SelectableTest SharedPtrSelectionReturnsWeakPtr",
           "[tunable][selectable]") {
   auto selected = std::make_shared<int>(5);
-  wpi::Selectable<std::shared_ptr<int>> chooser;
+  wpi::tunable::Selectable<std::shared_ptr<int>> chooser;
   chooser.Add("selected", selected);
 
   auto weakSelected = chooser.GetSelected();

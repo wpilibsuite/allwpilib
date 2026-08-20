@@ -14,7 +14,7 @@
 #include "wpi/tunable/Tunable.hpp"
 #include "wpi/tunable/TunableTable.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 class ComplexTunable;
 
@@ -161,4 +161,4 @@ class Tunables final {
   static void Remove(std::string_view name);
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

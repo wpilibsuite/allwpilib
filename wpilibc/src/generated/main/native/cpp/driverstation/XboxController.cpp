@@ -387,7 +387,7 @@ std::string_view XboxController::GetTelemetryType() const {
   return "HID:Xbox";
 }
 
-void XboxController::LogTo(wpi::TelemetryTable& table) const {
+void XboxController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

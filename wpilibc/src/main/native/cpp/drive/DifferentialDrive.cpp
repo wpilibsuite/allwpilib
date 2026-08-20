@@ -177,7 +177,7 @@ std::string DifferentialDrive::GetDescription() const {
   return "DifferentialDrive";
 }
 
-void DifferentialDrive::LogTo(wpi::TelemetryTable& table) const {
+void DifferentialDrive::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Left Motor Velocity", m_leftOutput);
   table.Log("Right Motor Velocity", m_rightOutput);
 }

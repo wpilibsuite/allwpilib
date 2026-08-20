@@ -387,7 +387,7 @@ std::string_view LogitechF310Controller::GetTelemetryType() const {
   return "HID:LogitechF310";
 }
 
-void LogitechF310Controller::LogTo(wpi::TelemetryTable& table) const {
+void LogitechF310Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

@@ -227,7 +227,7 @@ namespace wpi::units
 /**
  * @def			UNIT_ADD_TELEMETRY(namespaceName,nameSingular, abbreviation)
  * @brief		Macro for generating the boiler-plate code needed for telemetry for a new unit.
- * @details		The macro generates the code to insert units into a TelemetryTable
+ * @details		The macro generates the code to insert units into a wpi::telemetry::TelemetryTable
  * @param		namespaceName namespace in which the new units will be encapsulated.
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		abbrev - abbreviated unit name, e.g. 'm'
@@ -237,7 +237,7 @@ namespace wpi::units
   #define UNIT_ADD_TELEMETRY(namespaceName, nameSingular, abbrev)\
   namespace namespaceName\
   {\
-	  inline void LogValueTo(wpi::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
+	  inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view name, const nameSingular ## _t& value)\
 	  {\
 			table.SetProperty(name, "unit", "\"" #abbrev "\"");\
 			table.Log(name, value());\
@@ -3505,7 +3505,7 @@ consteval auto ComplexAbbrev() {
 
 #if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
 template<class Units, typename T, template<typename> class NonLinearScale>
-inline void LogValueTo(wpi::TelemetryTable& table, std::string_view n, const unit_t<Units, T, NonLinearScale>& value)
+inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view n, const unit_t<Units, T, NonLinearScale>& value)
 {
 	using namespace wpi::util::literals;
 	auto unitJson =

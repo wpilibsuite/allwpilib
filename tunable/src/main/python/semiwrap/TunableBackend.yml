@@ -1,5 +1,5 @@
 classes:
-  wpi::TunableBackend:
+  wpi::tunable::TunableBackend:
     force_no_default_constructor: true
     force_no_trampoline: true
     methods:
@@ -12,7 +12,7 @@ classes:
       UnregisterTunable:
       Update:
       Retire:
-  wpi::TunableBackend::PublishedTunable:
+  wpi::tunable::TunableBackend::PublishedTunable:
     attributes:
       path:
       uid:

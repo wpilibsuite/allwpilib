@@ -28,7 +28,7 @@ namespace wpi {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public wpi::TelemetryLoggable {
+class Compressor : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a compressor for a specified module and type.
@@ -169,7 +169,7 @@ class Compressor : public wpi::TelemetryLoggable {
    */
   CompressorConfigType GetConfigType() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

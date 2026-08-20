@@ -13,7 +13,7 @@
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 struct TunableConfig;
 class TunableRegistry;
@@ -22,8 +22,8 @@ namespace detail {
 
 /** The base class for tunables. */
 class WPILIB_DLLEXPORT TunableBase {
-  friend class wpi::TunableRegistry;
-  friend struct wpi::TunableRegistry::TunableInfo;
+  friend class wpi::tunable::TunableRegistry;
+  friend struct wpi::tunable::TunableRegistry::TunableInfo;
 
  protected:
   struct ForceTunableRegister {};
@@ -129,4 +129,4 @@ class TunableMemberBase : public TunableBase {
 };
 
 }  // namespace detail
-}  // namespace wpi
+}  // namespace wpi::tunable

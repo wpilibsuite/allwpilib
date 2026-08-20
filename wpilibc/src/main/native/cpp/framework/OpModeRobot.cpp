@@ -164,7 +164,7 @@ void OpModeRobotBase::LoopFunc() {
   // Always observe user program state
   HAL_ObserveUserProgram(word.GetValue());
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {

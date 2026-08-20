@@ -10,7 +10,7 @@
 
 #include "wpi/util/json.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 class ComplexTunable;
 
@@ -118,4 +118,4 @@ struct TunableConfig {
   Polling polling = Polling::DEFAULT;
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

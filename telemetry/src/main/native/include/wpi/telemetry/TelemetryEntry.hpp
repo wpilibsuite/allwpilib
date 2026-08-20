@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 
-namespace wpi {
+namespace wpi::telemetry {
 
 /**
  * Interface for individual telemetry entries. Intended for use by backends;
@@ -182,4 +182,4 @@ class TelemetryEntry {
                       std::string_view typeString) = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

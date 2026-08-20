@@ -75,7 +75,7 @@ bool Tachometer::GetStopped() const {
   return stopped;
 }
 
-void Tachometer::LogTo(wpi::TelemetryTable& table) const {
+void Tachometer::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("RPM", GetRevolutionsPerMinute());
 }
 

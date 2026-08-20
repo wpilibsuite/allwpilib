@@ -27,7 +27,7 @@ namespace wpi {
  *
  * @see Mechanism2d.
  */
-class MechanismObject2d : public wpi::TelemetryLoggable {
+class MechanismObject2d : public wpi::telemetry::TelemetryLoggable {
   friend class Mechanism2d;
 
  protected:
@@ -67,7 +67,7 @@ class MechanismObject2d : public wpi::TelemetryLoggable {
     return static_cast<T*>(obj.get());
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   std::string m_name;

@@ -26,7 +26,7 @@ namespace wpi {
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public CounterBase, public wpi::TelemetryLoggable {
+class Encoder : public CounterBase, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Encoder constructor.
@@ -181,7 +181,7 @@ class Encoder : public CounterBase, public wpi::TelemetryLoggable {
 
   int GetFPGAIndex() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

@@ -26,15 +26,15 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 class TelemetryBackend;
 class TelemetryEntry;
 class TelemetryTable;
 
-namespace telemetry::python {
+namespace python {
 class PyTelemetryTable;
-}  // namespace telemetry::python
+}  // namespace python
 
 namespace impl {
 template <typename T>
@@ -66,7 +66,7 @@ concept IsSpanConvertible =
  */
 class TelemetryTable final {
   friend class TelemetryRegistry;
-  friend class telemetry::python::PyTelemetryTable;
+  friend class python::PyTelemetryTable;
   struct private_init {};
 
   /**
@@ -712,4 +712,4 @@ class TelemetryTable final {
   uint64_t m_resetGeneration = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

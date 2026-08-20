@@ -25,7 +25,7 @@ namespace wpi {
  */
 class PWMMotorController : public MotorController,
                            public MotorSafety,
-                           public wpi::TelemetryLoggable {
+                           public wpi::telemetry::TelemetryLoggable {
  public:
   PWMMotorController(PWMMotorController&&) = default;
   PWMMotorController& operator=(PWMMotorController&&) = default;
@@ -83,7 +83,7 @@ class PWMMotorController : public MotorController,
         std::make_unique<std::decay_t<T>>(std::forward<T>(follower)));
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

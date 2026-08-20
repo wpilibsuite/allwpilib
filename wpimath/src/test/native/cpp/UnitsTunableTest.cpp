@@ -19,6 +19,7 @@
 #include "wpi/units/tunable.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 namespace {
 class RecordingDirtyBackend : public TunableBackend {

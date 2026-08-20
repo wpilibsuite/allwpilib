@@ -109,13 +109,13 @@ class NetworkTablesTelemetryBackendTest {
       : inst{wpi::nt::NetworkTableInstance::Create()},
         backend{std::make_shared<wpi::backend::NetworkTablesTelemetryBackend>(
             inst, "/Telemetry")} {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TelemetryRegistry::RegisterBackend("", backend);
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
   }
 
   ~NetworkTablesTelemetryBackendTest() {
-    wpi::TelemetryRegistry::SetReportWarning(nullptr);
-    wpi::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::SetReportWarning(nullptr);
+    wpi::telemetry::TelemetryRegistry::Reset();
     wpi::nt::NetworkTableInstance::Destroy(inst);
   }
 
@@ -136,16 +136,16 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
   auto stringValue = inst.GetTopic("/Telemetry/string").GenericSubscribe();
   auto json = inst.GetTopic("/Telemetry/json").GenericSubscribe();
 
-  wpi::Telemetry::Log("boolean", true);
-  wpi::Telemetry::Log("byte", int8_t{2});
-  wpi::Telemetry::Log("short", int16_t{3});
-  wpi::Telemetry::Log("int", int32_t{4});
-  wpi::Telemetry::Log("long", int64_t{5});
-  wpi::Telemetry::Log("float", 6.25f);
-  wpi::Telemetry::Log("double", 7.5);
-  wpi::Telemetry::Log("string", "ready");
-  wpi::Telemetry::Log("json", std::string_view{"{\"ok\":true}"},
-                      std::string_view{"json"});
+  wpi::telemetry::Telemetry::Log("boolean", true);
+  wpi::telemetry::Telemetry::Log("byte", int8_t{2});
+  wpi::telemetry::Telemetry::Log("short", int16_t{3});
+  wpi::telemetry::Telemetry::Log("int", int32_t{4});
+  wpi::telemetry::Telemetry::Log("long", int64_t{5});
+  wpi::telemetry::Telemetry::Log("float", 6.25f);
+  wpi::telemetry::Telemetry::Log("double", 7.5);
+  wpi::telemetry::Telemetry::Log("string", "ready");
+  wpi::telemetry::Telemetry::Log("json", std::string_view{"{\"ok\":true}"},
+                                 std::string_view{"json"});
 
   CHECK(boolean.GetBoolean(false));
   CHECK(2 == byte.GetInteger(0));
@@ -184,17 +184,17 @@ TEST_CASE_METHOD(
   const uint8_t rawValues[] = {11, 12, 13};
   const uint8_t customRawValues[] = {14, 15};
 
-  wpi::Telemetry::Log("booleans", boolValues);
-  wpi::Telemetry::Log("shorts", shortValues);
-  wpi::Telemetry::Log("ints", intValues);
-  wpi::Telemetry::Log("longs", longValues);
-  wpi::Telemetry::Log("floats", floatValues);
-  wpi::Telemetry::Log("doubles", doubleValues);
-  wpi::Telemetry::Log("strings", stringValues);
-  wpi::Telemetry::Log("stringViews", stringViewValues);
-  wpi::Telemetry::Log("raw", rawValues);
-  wpi::Telemetry::Log("customRaw", std::span<const uint8_t>{customRawValues},
-                      "custom");
+  wpi::telemetry::Telemetry::Log("booleans", boolValues);
+  wpi::telemetry::Telemetry::Log("shorts", shortValues);
+  wpi::telemetry::Telemetry::Log("ints", intValues);
+  wpi::telemetry::Telemetry::Log("longs", longValues);
+  wpi::telemetry::Telemetry::Log("floats", floatValues);
+  wpi::telemetry::Telemetry::Log("doubles", doubleValues);
+  wpi::telemetry::Telemetry::Log("strings", stringValues);
+  wpi::telemetry::Telemetry::Log("stringViews", stringViewValues);
+  wpi::telemetry::Telemetry::Log("raw", rawValues);
+  wpi::telemetry::Telemetry::Log(
+      "customRaw", std::span<const uint8_t>{customRawValues}, "custom");
 
   auto customRaw = inst.GetTopic("/Telemetry/customRaw").GenericSubscribe();
   CHECK((std::vector<int>{1, 0}) == booleans.GetBooleanArray({}));
@@ -218,7 +218,7 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
       inst.GetStructTopic<wpi::math::Translation2d>("/Telemetry/translation")
           .Subscribe({});
 
-  wpi::Telemetry::Log("translation", value);
+  wpi::telemetry::Telemetry::Log("translation", value);
 
   auto logged = sub.Get();
   CHECK(value.X() == logged.X());
@@ -233,8 +233,8 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
                      "/Telemetry/translations")
                  .Subscribe({});
 
-  wpi::Telemetry::Log("translations",
-                      std::span<const wpi::math::Translation2d>{values});
+  wpi::telemetry::Telemetry::Log(
+      "translations", std::span<const wpi::math::Translation2d>{values});
 
   auto logged = sub.Get();
   REQUIRE(2u == logged.size());
@@ -255,8 +255,8 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
   wpi::util::SmallVector<uint8_t, 128> buf;
   REQUIRE(message.Pack(buf, value));
 
-  wpi::Telemetry::Log("translation", std::span<const uint8_t>{buf},
-                      message.GetTypeString());
+  wpi::telemetry::Telemetry::Log("translation", std::span<const uint8_t>{buf},
+                                 message.GetTypeString());
 
   auto logged = sub.Get();
   CHECK(value.X() == logged.X());
@@ -283,11 +283,11 @@ TEST_CASE_METHOD(
       inst.GetProtobufTopic<ThrowingTelemetryProto>("/Telemetry/throwingProto")
           .Subscribe({});
 
-  wpi::Telemetry::Log("throwingStruct", initialStruct);
-  wpi::Telemetry::Log("throwingStructs",
-                      std::span<const ThrowingTelemetryStruct>{
-                          initialStructs, std::size(initialStructs)});
-  wpi::Telemetry::Log("throwingProto", initialProto);
+  wpi::telemetry::Telemetry::Log("throwingStruct", initialStruct);
+  wpi::telemetry::Telemetry::Log(
+      "throwingStructs", std::span<const ThrowingTelemetryStruct>{
+                             initialStructs, std::size(initialStructs)});
+  wpi::telemetry::Telemetry::Log("throwingProto", initialProto);
 
   CHECK(initialStruct.value == structSub.Get().value);
   auto loggedStructs = structArraySub.Get();
@@ -299,18 +299,19 @@ TEST_CASE_METHOD(
   CHECK(initialProto.y == loggedProto.y);
 
   std::vector<std::string> warnings;
-  wpi::TelemetryRegistry::SetReportWarning(
+  wpi::telemetry::TelemetryRegistry::SetReportWarning(
       [&](std::string_view path, std::string_view msg) {
         warnings.emplace_back(std::format("{}: {}", path, msg));
       });
   ThrowingTelemetryStructState::throwDuringPack = true;
   ThrowingTelemetryProtoState::throwDuringPack = true;
 
-  CHECK_NOTHROW(wpi::Telemetry::Log("throwingStruct", updatedStruct));
-  CHECK_NOTHROW(wpi::Telemetry::Log(
+  CHECK_NOTHROW(
+      wpi::telemetry::Telemetry::Log("throwingStruct", updatedStruct));
+  CHECK_NOTHROW(wpi::telemetry::Telemetry::Log(
       "throwingStructs", std::span<const ThrowingTelemetryStruct>{
                              updatedStructs, std::size(updatedStructs)}));
-  CHECK_NOTHROW(wpi::Telemetry::Log("throwingProto", updatedProto));
+  CHECK_NOTHROW(wpi::telemetry::Telemetry::Log("throwingProto", updatedProto));
 
   ThrowingTelemetryStructState::throwDuringPack = false;
   ThrowingTelemetryProtoState::throwDuringPack = false;
@@ -334,11 +335,11 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
                  "NetworkTablesTelemetryBackendTest AppliesTelemetryProperties",
                  "[wpilibc][telemetry]") {
-  wpi::Telemetry::SetProperty("speed", "min", "0");
-  wpi::Telemetry::SetProperty("speed", "unit", "\"m/s\"");
+  wpi::telemetry::Telemetry::SetProperty("speed", "min", "0");
+  wpi::telemetry::Telemetry::SetProperty("speed", "unit", "\"m/s\"");
 
-  wpi::Telemetry::Log("speed", 4.0);
-  wpi::Telemetry::SetProperty("speed", "max", "10");
+  wpi::telemetry::Telemetry::Log("speed", 4.0);
+  wpi::telemetry::Telemetry::SetProperty("speed", "max", "10");
 
   auto topic = inst.GetTopic("/Telemetry/speed");
   auto min = topic.GetProperty("min");
@@ -359,11 +360,11 @@ TEST_CASE_METHOD(
   auto sub = inst.GetDoubleTopic("/Telemetry/duplicates")
                  .Subscribe(0.0, {.pollStorage = 10, .keepDuplicates = true});
 
-  wpi::Telemetry::Log("duplicates", 1.0);
-  wpi::Telemetry::KeepDuplicates("duplicates");
+  wpi::telemetry::Telemetry::Log("duplicates", 1.0);
+  wpi::telemetry::Telemetry::KeepDuplicates("duplicates");
   CHECK(1.0 == sub.Get());
 
-  wpi::Telemetry::Log("duplicates", 1.0);
+  wpi::telemetry::Telemetry::Log("duplicates", 1.0);
 
   auto values = sub.ReadQueue();
   REQUIRE(2u == values.size());
@@ -396,19 +397,19 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
                  "[wpilibc][telemetry]") {
   std::vector<std::string> warnings;
   bool nested = false;
-  wpi::TelemetryRegistry::SetReportWarning(
+  wpi::telemetry::TelemetryRegistry::SetReportWarning(
       [&](std::string_view path, std::string_view msg) {
         CHECK("/Telemetry/value" == path);
         CHECK("type mismatch" == msg);
         warnings.emplace_back(path);
         if (!nested) {
           nested = true;
-          wpi::Telemetry::Log("value", "again");
+          wpi::telemetry::Telemetry::Log("value", "again");
         }
       });
 
-  wpi::Telemetry::Log("value", int64_t{1});
-  wpi::Telemetry::Log("value", true);
+  wpi::telemetry::Telemetry::Log("value", int64_t{1});
+  wpi::telemetry::Telemetry::Log("value", true);
 
   CHECK((std::vector<std::string>{"/Telemetry/value", "/Telemetry/value"}) ==
         warnings);

@@ -113,7 +113,8 @@ class FieldObject2d {
       wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
-  class PosesTunable : public wpi::Tunable<std::vector<wpi::math::Pose2d>> {
+  class PosesTunable
+      : public wpi::tunable::Tunable<std::vector<wpi::math::Pose2d>> {
    public:
     explicit PosesTunable(wpi::util::mutex& mutex);
     PosesTunable(wpi::util::mutex& mutex, PosesTunable&& rhs);
@@ -124,7 +125,7 @@ class FieldObject2d {
     void Set(std::vector<wpi::math::Pose2d> poses);
 
    private:
-    using Base = wpi::Tunable<std::vector<wpi::math::Pose2d>>;
+    using Base = wpi::tunable::Tunable<std::vector<wpi::math::Pose2d>>;
 
     size_t GetStructSize() const override;
     bool UnpackStruct(std::span<const uint8_t> data) override;

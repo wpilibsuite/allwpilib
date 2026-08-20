@@ -411,7 +411,7 @@ std::string_view DualShock4Controller::GetTelemetryType() const {
   return "HID:DualShock4";
 }
 
-void DualShock4Controller::LogTo(wpi::TelemetryTable& table) const {
+void DualShock4Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

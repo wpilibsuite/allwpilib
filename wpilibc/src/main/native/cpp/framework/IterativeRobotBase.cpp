@@ -155,7 +155,7 @@ void IterativeRobotBase::LoopFunc() {
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {

@@ -48,7 +48,7 @@ void EdgeCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void EdgeCounter::LogTo(wpi::TelemetryTable& table) const {
+void EdgeCounter::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Count", GetCount());
 }
 

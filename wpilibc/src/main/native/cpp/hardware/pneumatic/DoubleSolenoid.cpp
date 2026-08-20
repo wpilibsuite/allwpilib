@@ -121,7 +121,7 @@ bool DoubleSolenoid::IsRevSolenoidDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::LogTo(wpi::TelemetryTable& table) const {
+void DoubleSolenoid::LogTo(wpi::telemetry::TelemetryTable& table) const {
   std::string_view str;
   switch (Get()) {
     case FORWARD:

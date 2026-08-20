@@ -22,7 +22,7 @@
 
 using namespace wpi::backend;
 
-class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
+class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
  public:
   Entry(wpi::log::DataLog& log, std::string_view prefix, std::string_view path)
       : m_log{log}, m_path{std::format("{}{}", prefix, path)} {}
@@ -56,7 +56,8 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
     }
     auto parsedValue = wpi::util::json::parse(value);
     if (!parsedValue) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "invalid property JSON");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path,
+                                                       "invalid property JSON");
       return;
     }
 
@@ -104,7 +105,7 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
       }
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -134,7 +135,7 @@ class DataLogTelemetryBackend::Entry : public wpi::TelemetryEntry {
       }
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -224,8 +225,8 @@ DataLogTelemetryBackend::DataLogTelemetryBackend(wpi::log::DataLog& log,
 
 DataLogTelemetryBackend::~DataLogTelemetryBackend() = default;
 
-std::shared_ptr<wpi::TelemetryEntry> DataLogTelemetryBackend::GetEntry(
-    std::string_view path) {
+std::shared_ptr<wpi::telemetry::TelemetryEntry>
+DataLogTelemetryBackend::GetEntry(std::string_view path) {
   std::scoped_lock lock{m_mutex};
   auto it = m_entries.find(path);
   if (it != m_entries.end()) {

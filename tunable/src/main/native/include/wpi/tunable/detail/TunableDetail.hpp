@@ -23,19 +23,19 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 struct TunableConfig;
-}  // namespace wpi
+}  // namespace wpi::tunable
 
-namespace wpi::detail {
+namespace wpi::tunable::detail {
 
 template <typename... Args>
 struct FirstArgIsTunableConfig : std::false_type {};
 
 template <typename First, typename... Rest>
 struct FirstArgIsTunableConfig<First, Rest...>
-    : std::bool_constant<
-          std::same_as<std::remove_cvref_t<First>, wpi::TunableConfig>> {};
+    : std::bool_constant<std::same_as<std::remove_cvref_t<First>,
+                                      wpi::tunable::TunableConfig>> {};
 
 template <typename... Args>
 concept FirstArgNotTunableConfig = !FirstArgIsTunableConfig<Args...>::value;
@@ -519,4 +519,4 @@ inline auto CastTunable(TunableBase* tunable, TunableTypeValue type) {
   }
 }
 
-}  // namespace wpi::detail
+}  // namespace wpi::tunable::detail

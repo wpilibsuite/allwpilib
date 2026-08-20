@@ -573,7 +573,7 @@ std::string_view SteamController::GetTelemetryType() const {
   return "HID:Steam";
 }
 
-void SteamController::LogTo(wpi::TelemetryTable& table) const {
+void SteamController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

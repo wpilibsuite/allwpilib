@@ -47,7 +47,7 @@ class RobotContainer {
   wpi::cmd::CommandPtr complexAuto = autos::ComplexAuto(&drive, &hatch);
 
   // The chooser for the autonomous routines
-  wpi::Selectable<wpi::cmd::Command*> chooser;
+  wpi::tunable::Selectable<wpi::cmd::Command*> chooser;
 
   void ConfigureButtonBindings();
 };

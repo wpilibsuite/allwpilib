@@ -403,7 +403,7 @@ std::string_view SwitchProController::GetTelemetryType() const {
   return "HID:SwitchPro";
 }
 
-void SwitchProController::LogTo(wpi::TelemetryTable& table) const {
+void SwitchProController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

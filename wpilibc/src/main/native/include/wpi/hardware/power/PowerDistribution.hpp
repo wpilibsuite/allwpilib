@@ -17,7 +17,7 @@ namespace wpi {
  * Class for getting voltage, current, temperature, power and energy from the
  * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH).
  */
-class PowerDistribution : public wpi::TelemetryLoggable {
+class PowerDistribution : public wpi::telemetry::TelemetryLoggable {
  public:
   /// Default module number.
   static constexpr int kDefaultModule = -1;
@@ -347,7 +347,7 @@ class PowerDistribution : public wpi::TelemetryLoggable {
    */
   StickyFaults GetStickyFaults() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

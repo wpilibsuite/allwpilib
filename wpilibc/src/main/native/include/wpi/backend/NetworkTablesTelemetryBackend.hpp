@@ -15,7 +15,7 @@
 namespace wpi::backend {
 
 /** A telemetry backend that sends logged data to NetworkTables. */
-class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
+class NetworkTablesTelemetryBackend : public wpi::telemetry::TelemetryBackend {
  public:
   /**
    * Construct.
@@ -34,7 +34,8 @@ class NetworkTablesTelemetryBackend : public wpi::TelemetryBackend {
    * @param path full name
    * @return telemetry entry
    */
-  std::shared_ptr<wpi::TelemetryEntry> GetEntry(std::string_view path) override;
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
+      std::string_view path) override;
 
   /**
    * Removes an entry for the given path.

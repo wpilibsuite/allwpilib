@@ -136,7 +136,7 @@ std::string_view {{ ClassName }}Controller::GetTelemetryType() const {
   return "HID:{{ ClassName }}";
 }
 
-void {{ ClassName }}Controller::LogTo(wpi::TelemetryTable& table) const {
+void {{ ClassName }}Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
 {%- for axis in axes %}
   table.Log("{{ axis.MethodName }}", Get{{ axis.MethodName }}());
 {%- endfor -%}

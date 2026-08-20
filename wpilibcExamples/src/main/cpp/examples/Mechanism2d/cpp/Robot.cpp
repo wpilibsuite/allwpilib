@@ -37,7 +37,7 @@ class Robot : public wpi::TimedRobot {
     wrist->SetAngle(wpi::units::degree_t{wristPotentiometer.Get()});
 
     // publish to telemetry
-    wpi::Telemetry::Log("Mech2d", mech);
+    wpi::telemetry::Telemetry::Log("Mech2d", mech);
   }
 
   void TeleopPeriodic() override {

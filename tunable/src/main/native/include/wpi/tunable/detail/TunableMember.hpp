@@ -22,11 +22,11 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 struct TunableConfig;
-}  // namespace wpi
+}  // namespace wpi::tunable
 
-namespace wpi::detail {
+namespace wpi::tunable::detail {
 
 template <typename T>
 class TunableMemberPointer {
@@ -433,4 +433,4 @@ class TunableMemberProtobuf : public detail::TunableMemberProtobufBase {
   mutable wpi::util::ProtobufMessage<T> m_message;
 };
 
-}  // namespace wpi::detail
+}  // namespace wpi::tunable::detail

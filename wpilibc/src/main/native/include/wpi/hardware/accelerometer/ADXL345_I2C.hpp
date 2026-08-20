@@ -19,7 +19,7 @@ namespace wpi {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public wpi::TelemetryLoggable {
+class ADXL345_I2C : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Accelerometer axes.
@@ -113,7 +113,7 @@ class ADXL345_I2C : public wpi::TelemetryLoggable {
    */
   virtual AllAxes GetAccelerations() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

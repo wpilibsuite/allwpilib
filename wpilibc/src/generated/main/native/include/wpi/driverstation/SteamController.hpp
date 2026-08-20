@@ -21,7 +21,7 @@ class EventLoop;
  * This class handles Steam input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class SteamController : public HIDDevice, public wpi::TelemetryLoggable {
+class SteamController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 2;
@@ -1184,7 +1184,7 @@ class SteamController : public HIDDevice, public wpi::TelemetryLoggable {
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
   std::string_view GetTelemetryType() const override;
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   double m_leftXDeadband = 0.1;

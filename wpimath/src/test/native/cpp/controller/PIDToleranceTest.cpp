@@ -25,29 +25,29 @@ TEST_CASE("PIDToleranceTest InitialTolerance", "[wpimath]") {
 }
 
 TEST_CASE("PIDToleranceTest TunedSetpointUpdatesSetpointState", "[wpimath]") {
-  wpi::TunableRegistry::Reset();
-  auto backend = std::make_shared<wpi::MockTunableBackend>();
-  wpi::TunableRegistry::RegisterBackend("", backend);
+  wpi::tunable::TunableRegistry::Reset();
+  auto backend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   wpi::math::PIDController controller{0.5, 0.0, 0.0};
-  wpi::Tunables::Publish("pid", controller);
+  wpi::tunable::Tunables::Publish("pid", controller);
 
   CHECK_FALSE(controller.AtSetpoint());
 
   auto setpointUid = backend->GetUid("/pid/setpoint");
   REQUIRE(setpointUid.has_value());
-  auto setpointInfo = wpi::TunableRegistry::GetTunable(*setpointUid);
+  auto setpointInfo = wpi::tunable::TunableRegistry::GetTunable(*setpointUid);
   REQUIRE(static_cast<bool>(setpointInfo));
   REQUIRE(setpointInfo.config != nullptr);
   CHECK(setpointInfo.config->polling ==
-        wpi::TunableConfig::Polling::GET_ON_CHANGE);
+        wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE);
 
   controller.SetSetpoint(1.0);
-  CHECK(wpi::TunableRegistry::GetTunable(*setpointUid).IsChanged());
-  wpi::TunableRegistry::Update();
+  CHECK(wpi::tunable::TunableRegistry::GetTunable(*setpointUid).IsChanged());
+  wpi::tunable::TunableRegistry::Update();
 
   backend->SetDouble("/pid/setpoint", kSetpoint);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(controller.GetSetpoint() == kSetpoint);
   CHECK(controller.GetError() == kSetpoint);
@@ -56,7 +56,7 @@ TEST_CASE("PIDToleranceTest TunedSetpointUpdatesSetpointState", "[wpimath]") {
 
   CHECK(controller.AtSetpoint());
 
-  wpi::TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
 }
 
 TEST_CASE("PIDToleranceTest AbsoluteTolerance", "[wpimath]") {

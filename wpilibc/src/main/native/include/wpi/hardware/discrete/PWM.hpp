@@ -17,7 +17,7 @@ class AddressableLED;
 /**
  * Class for sending pulse-width modulation (PWM) signals.
  */
-class PWM : public wpi::TelemetryLoggable {
+class PWM : public wpi::telemetry::TelemetryLoggable {
  public:
   friend class AddressableLED;
 
@@ -84,7 +84,7 @@ class PWM : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

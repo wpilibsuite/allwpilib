@@ -18,15 +18,16 @@ namespace wpi::units {
 
 namespace detail {
 template <class Units>
-TunableConfig MakeUnitTunableConfig() {
-  TunableConfig config;
+wpi::tunable::TunableConfig MakeUnitTunableConfig() {
+  wpi::tunable::TunableConfig config;
   config.properties["unit"] = std::string{ComplexAbbrev<Units>()};
   return config;
 }
 
 template <class Units>
-TunableConfig MakeUnitTunableConfig(const TunableConfig& config) {
-  TunableConfig unitConfig = config;
+wpi::tunable::TunableConfig MakeUnitTunableConfig(
+    const wpi::tunable::TunableConfig& config) {
+  wpi::tunable::TunableConfig unitConfig = config;
   unitConfig.properties["unit"] = std::string{ComplexAbbrev<Units>()};
   return unitConfig;
 }
@@ -43,9 +44,9 @@ class TunableUnit {
   explicit TunableUnit(ValueType val)
       : m_tunable{convert<Units, BaseUnits>(val).template to<T>(),
                   MakeUnitTunableConfig<Units>()} {}
-  explicit TunableUnit(const TunableConfig& config)
+  explicit TunableUnit(const wpi::tunable::TunableConfig& config)
       : m_tunable{MakeUnitTunableConfig<Units>(config)} {}
-  TunableUnit(ValueType val, const TunableConfig& config)
+  TunableUnit(ValueType val, const wpi::tunable::TunableConfig& config)
       : m_tunable{convert<Units, BaseUnits>(val).template to<T>(),
                   MakeUnitTunableConfig<Units>(config)} {}
 
@@ -56,7 +57,7 @@ class TunableUnit {
     m_tunable = convert<Units, BaseUnits>(value).template to<T>();
   }
 
-  Tunable<T>& GetInnerTunable() { return m_tunable; }
+  wpi::tunable::Tunable<T>& GetInnerTunable() { return m_tunable; }
 
   template <typename U>
     requires traits::is_convertible_unit_t<ValueType, U>::value
@@ -65,41 +66,42 @@ class TunableUnit {
   }
 
  private:
-  Tunable<T> m_tunable;
+  wpi::tunable::Tunable<T> m_tunable;
 };
 
 template <class Units, typename T, template <typename> class NonLinearScale>
-class TunableMemberValue : public wpi::detail::TunableMemberValueBase<double> {
+class TunableMemberValue
+    : public wpi::tunable::detail::TunableMemberValueBase<double> {
   using BaseUnits =
       unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;
 
  public:
   using ValueType = unit_t<Units, T, NonLinearScale>;
 
-  template <std::derived_from<ComplexTunable> Class>
+  template <std::derived_from<wpi::tunable::ComplexTunable> Class>
   explicit TunableMemberValue(ValueType Class::* member)
       : TunableMemberValueBase<double>{MakeUnitTunableConfig<Units>()},
         m_ptr{member} {}
 
-  template <std::derived_from<ComplexTunable> Class>
+  template <std::derived_from<wpi::tunable::ComplexTunable> Class>
   explicit TunableMemberValue(ValueType Class::* member,
-                              const TunableConfig& config)
+                              const wpi::tunable::TunableConfig& config)
       : TunableMemberValueBase<double>{MakeUnitTunableConfig<Units>(config)},
         m_ptr{member} {}
 
-  const double& Get(const ComplexTunable* obj) const override {
+  const double& Get(const wpi::tunable::ComplexTunable* obj) const override {
     m_value = convert<Units, BaseUnits>(m_ptr.Get(obj)).template to<T>();
     return m_value;
   }
 
-  void Set(ComplexTunable* obj, double value) override {
+  void Set(wpi::tunable::ComplexTunable* obj, double value) override {
     m_ptr.Get(obj) = unit_t<BaseUnits, T, NonLinearScale>{value};
     this->SetTunableChanged();
   }
 
  private:
   mutable double m_value;
-  wpi::detail::TunableMemberPointer<ValueType> m_ptr;
+  wpi::tunable::detail::TunableMemberPointer<ValueType> m_ptr;
 };
 }  // namespace detail
 
@@ -111,8 +113,9 @@ inline detail::TunableUnit<Units, T, NonLinearScale> GetCustomTunable(
 
 template <class Units, typename T, template <typename> class NonLinearScale,
           typename Class, typename... Args>
-inline std::unique_ptr<wpi::detail::TunableMemberBase> MakeTunableMember(
-    unit_t<Units, T, NonLinearScale> Class::* member, Args&&... args) {
+inline std::unique_ptr<wpi::tunable::detail::TunableMemberBase>
+MakeTunableMember(unit_t<Units, T, NonLinearScale> Class::* member,
+                  Args&&... args) {
   return std::make_unique<detail::TunableMemberValue<Units, T, NonLinearScale>>(
       member, std::forward<Args>(args)...);
 }

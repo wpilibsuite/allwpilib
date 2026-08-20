@@ -7,8 +7,10 @@
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
-wpi::TelemetryTable& Telemetry::GetTable() {
-  static wpi::TelemetryTable& root = wpi::TelemetryRegistry::GetTable("");
+wpi::telemetry::TelemetryTable& Telemetry::GetTable() {
+  static wpi::telemetry::TelemetryTable& root =
+      wpi::telemetry::TelemetryRegistry::GetTable("");
   return root;
 }

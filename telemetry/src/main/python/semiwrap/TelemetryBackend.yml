@@ -2,7 +2,7 @@ extra_includes:
 - wpi/telemetry/TelemetryEntry.hpp
 
 classes:
-  wpi::TelemetryBackend:
+  wpi::telemetry::TelemetryBackend:
     methods:
       TelemetryBackend:
       GetEntry:

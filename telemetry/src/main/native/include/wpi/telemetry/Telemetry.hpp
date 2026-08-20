@@ -10,7 +10,7 @@
 
 #include "wpi/telemetry/TelemetryTable.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 class Telemetry final {
  public:
@@ -21,7 +21,7 @@ class Telemetry final {
    *
    * @return table
    */
-  static wpi::TelemetryTable& GetTable();
+  static wpi::telemetry::TelemetryTable& GetTable();
 
   /**
    * Gets a child telemetry table.
@@ -29,7 +29,7 @@ class Telemetry final {
    * @param name table name
    * @return table
    */
-  static wpi::TelemetryTable& GetTable(std::string_view name) {
+  static wpi::telemetry::TelemetryTable& GetTable(std::string_view name) {
     return GetTable().GetTable(name);
   }
 
@@ -335,4 +335,4 @@ class Telemetry final {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

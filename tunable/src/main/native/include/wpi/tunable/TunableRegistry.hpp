@@ -12,7 +12,7 @@
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 class ComplexTunable;
 class TunableBackend;
@@ -312,4 +312,4 @@ void SetTunableRegistryPreUpdateCallback(std::function<void()> callback);
 
 }  // namespace detail
 
-}  // namespace wpi
+}  // namespace wpi::tunable

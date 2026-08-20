@@ -185,7 +185,7 @@ std::optional<std::string> Command::GetPreviousCompositionSite() const {
   return m_previousComposition;
 }
 
-void Command::LogTo(wpi::TelemetryTable& table) const {
+void Command::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("name", m_name);
   table.Log("running", IsScheduled());
   table.Log("isParented", IsComposed());
@@ -210,26 +210,28 @@ std::string_view Command::GetTelemetryType() const {
   return "Command";
 }
 
-void Command::PublishTunable(wpi::TunableTable& table) {
-  table.Publish("name", this, &Command::m_name,
-                wpi::TunableConfig{
-                    .isMutable = false,
-                    .polling = wpi::TunableConfig::Polling::GET_ON_CHANGE});
-  table.Publish("running", this, &Command::m_running,
-                wpi::TunableConfig{
-                    .onTune =
-                        [](TunableBase&, ComplexTunable* self) {
-                          if (auto command = static_cast<Command*>(self)) {
-                            bool isScheduled = command->IsScheduled();
-                            if (command->m_running && !isScheduled) {
-                              CommandScheduler::GetInstance().Schedule(command);
-                            } else if (!command->m_running && isScheduled) {
-                              command->Cancel();
-                            }
-                          }
-                        },
-                    .parent = this,
-                    .polling = wpi::TunableConfig::Polling::ALWAYS_GET});
+void Command::PublishTunable(wpi::tunable::TunableTable& table) {
+  table.Publish(
+      "name", this, &Command::m_name,
+      wpi::tunable::TunableConfig{
+          .isMutable = false,
+          .polling = wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE});
+  table.Publish(
+      "running", this, &Command::m_running,
+      wpi::tunable::TunableConfig{
+          .onTune =
+              [](TunableBase&, wpi::tunable::ComplexTunable* self) {
+                if (auto command = static_cast<Command*>(self)) {
+                  bool isScheduled = command->IsScheduled();
+                  if (command->m_running && !isScheduled) {
+                    CommandScheduler::GetInstance().Schedule(command);
+                  } else if (!command->m_running && isScheduled) {
+                    command->Cancel();
+                  }
+                }
+              },
+          .parent = this,
+          .polling = wpi::tunable::TunableConfig::Polling::ALWAYS_GET});
 }
 
 void Command::UpdateTunable() const {

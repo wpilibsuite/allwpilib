@@ -10,6 +10,7 @@
 #include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 TunableTable Tunables::GetTable() {
   return TunableTable{"/"};

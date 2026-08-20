@@ -35,12 +35,14 @@ namespace py = pybind11;
 namespace {
 
 using TunableVariant =
-    std::variant<wpi::TunableBool, wpi::TunableInt64, wpi::TunableDouble,
-                 wpi::TunableString, wpi::TunableRaw, wpi::TunableBoolVector,
-                 wpi::TunableInt64Vector, wpi::TunableDoubleVector,
-                 wpi::TunableStringVector,
-                 wpi::Tunable<WPyStruct, WPyStructInfo>,
-                 wpi::Tunable<std::vector<WPyStruct>, WPyStructInfo>>;
+    std::variant<wpi::tunable::TunableBool, wpi::tunable::TunableInt64,
+                 wpi::tunable::TunableDouble, wpi::tunable::TunableString,
+                 wpi::tunable::TunableRaw, wpi::tunable::TunableBoolVector,
+                 wpi::tunable::TunableInt64Vector,
+                 wpi::tunable::TunableDoubleVector,
+                 wpi::tunable::TunableStringVector,
+                 wpi::tunable::Tunable<WPyStruct, WPyStructInfo>,
+                 wpi::tunable::Tunable<std::vector<WPyStruct>, WPyStructInfo>>;
 
 class PyTunable;
 
@@ -428,9 +430,9 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
     m_lastStructData = PackCachedStructData();
   }
 
-  wpi::detail::TunableBase& GetBase() {
+  wpi::tunable::detail::TunableBase& GetBase() {
     return std::visit(
-        [](auto& value) -> wpi::detail::TunableBase& { return value; },
+        [](auto& value) -> wpi::tunable::detail::TunableBase& { return value; },
         m_value);
   }
 
@@ -607,23 +609,25 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
         m_value);
   }
 
-  wpi::TunableConfig MakeConfig(bool robust, bool isMutable,
-                                py::handle properties, std::string typeString,
-                                bool alwaysGet) {
-    wpi::TunableConfig config{
+  wpi::tunable::TunableConfig MakeConfig(bool robust, bool isMutable,
+                                         py::handle properties,
+                                         std::string typeString,
+                                         bool alwaysGet) {
+    wpi::tunable::TunableConfig config{
         .robust = robust,
         .isMutable = isMutable,
-        .polling = alwaysGet ? wpi::TunableConfig::Polling::ALWAYS_GET
-                             : wpi::TunableConfig::Polling::DEFAULT};
+        .polling = alwaysGet ? wpi::tunable::TunableConfig::Polling::ALWAYS_GET
+                             : wpi::tunable::TunableConfig::Polling::DEFAULT};
     if (!m_onTune.is_none()) {
-      config.onTune = [this](wpi::detail::TunableBase&, wpi::ComplexTunable*) {
+      config.onTune = [this](wpi::tunable::detail::TunableBase&,
+                             wpi::tunable::ComplexTunable*) {
         py::gil_scoped_acquire gil;
         m_onTune(GetCached());
       };
     }
     if (!m_getter.is_none() || !m_setter.is_none()) {
-      config.onRemoteSet = [this](wpi::detail::TunableBase&,
-                                  wpi::ComplexTunable*) {
+      config.onRemoteSet = [this](wpi::tunable::detail::TunableBase&,
+                                  wpi::tunable::ComplexTunable*) {
         py::gil_scoped_acquire gil;
         if (!m_setter.is_none()) {
           m_setter(GetCached());
@@ -651,26 +655,27 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
                              std::move(typeString), alwaysGet);
     switch (kind) {
       case ValueKind::kBoolean:
-        return wpi::TunableBool{value.cast<bool>(), config};
+        return wpi::tunable::TunableBool{value.cast<bool>(), config};
       case ValueKind::kInteger:
-        return wpi::TunableInt64{value.cast<int64_t>(), config};
+        return wpi::tunable::TunableInt64{value.cast<int64_t>(), config};
       case ValueKind::kDouble:
-        return wpi::TunableDouble{value.cast<double>(), config};
+        return wpi::tunable::TunableDouble{value.cast<double>(), config};
       case ValueKind::kString:
-        return wpi::TunableString{value.cast<std::string>(), config};
+        return wpi::tunable::TunableString{value.cast<std::string>(), config};
       case ValueKind::kRaw:
-        return wpi::TunableRaw{ToRawVector(value), config};
+        return wpi::tunable::TunableRaw{ToRawVector(value), config};
       case ValueKind::kBooleanArray:
-        return wpi::TunableBoolVector{value.cast<std::vector<bool>>(), config};
+        return wpi::tunable::TunableBoolVector{value.cast<std::vector<bool>>(),
+                                               config};
       case ValueKind::kIntegerArray:
-        return wpi::TunableInt64Vector{value.cast<std::vector<int64_t>>(),
-                                       config};
+        return wpi::tunable::TunableInt64Vector{
+            value.cast<std::vector<int64_t>>(), config};
       case ValueKind::kDoubleArray:
-        return wpi::TunableDoubleVector{value.cast<std::vector<double>>(),
-                                        config};
+        return wpi::tunable::TunableDoubleVector{
+            value.cast<std::vector<double>>(), config};
       case ValueKind::kStringArray:
-        return wpi::TunableStringVector{value.cast<std::vector<std::string>>(),
-                                        config};
+        return wpi::tunable::TunableStringVector{
+            value.cast<std::vector<std::string>>(), config};
       case ValueKind::kStruct: {
         py::type type = IsWpiStructType(valueType)
                             ? py::reinterpret_borrow<py::type>(valueType)
@@ -685,7 +690,7 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
               "type");
         }
         WPyStructInfo info{type};
-        return wpi::Tunable<WPyStruct, WPyStructInfo>{
+        return wpi::tunable::Tunable<WPyStruct, WPyStructInfo>{
             config, std::move(info),
             WPyStruct{py::reinterpret_borrow<py::object>(value)}};
       }
@@ -696,7 +701,7 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
                             : GetStructSequenceType(sequence);
         ValidateStructSequenceType(sequence, type);
         WPyStructInfo info{type};
-        return wpi::Tunable<std::vector<WPyStruct>, WPyStructInfo>{
+        return wpi::tunable::Tunable<std::vector<WPyStruct>, WPyStructInfo>{
             config, std::move(info), ToStructVector(sequence, true)};
       }
     }
@@ -897,7 +902,8 @@ void RemoveRefreshPath(std::string_view path);
 
 class PyTunableTable {
  public:
-  PyTunableTable(wpi::TunableTable table, PyComplexTunableAdapter* owner)
+  PyTunableTable(wpi::tunable::TunableTable table,
+                 PyComplexTunableAdapter* owner)
       : m_table{std::move(table)}, m_owner{owner} {}
 
   std::string GetPath() const { return m_table.GetPath(); }
@@ -920,11 +926,11 @@ class PyTunableTable {
  private:
   void StoreValue(std::string_view name, std::shared_ptr<PyTunable> tunable);
 
-  wpi::TunableTable m_table;
+  wpi::tunable::TunableTable m_table;
   PyComplexTunableAdapter* m_owner;
 };
 
-class PyComplexTunableAdapter : public wpi::ComplexTunable {
+class PyComplexTunableAdapter : public wpi::tunable::ComplexTunable {
  public:
   PyComplexTunableAdapter(py::object value, py::object initialPublishTunable)
       : m_value{std::move(value)},
@@ -943,7 +949,7 @@ class PyComplexTunableAdapter : public wpi::ComplexTunable {
 
   bool IsValue(py::handle value) const { return m_value.is(value); }
 
-  void PublishTunable(wpi::TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     py::gil_scoped_acquire gil;
     py::object publishTunable;
     if (m_initialPublishTunable) {
@@ -996,7 +1002,7 @@ class PyComplexTunableAdapter : public wpi::ComplexTunable {
   void RemovePath(std::string_view path) {
     {
       py::gil_scoped_release release;
-      wpi::TunableRegistry::Remove(path);
+      wpi::tunable::TunableRegistry::Remove(path);
     }
     RemoveRetainedPath(path);
   }
@@ -1090,20 +1096,21 @@ void ClearValues() {
 }
 
 void RegisterPreUpdateCallback() {
-  wpi::detail::SetTunableRegistryPreUpdateCallback([] { RefreshValues(); });
+  wpi::tunable::detail::SetTunableRegistryPreUpdateCallback(
+      [] { RefreshValues(); });
 }
 
 void CleanupPythonStorage() {
-  wpi::detail::SetTunableRegistryPreUpdateCallback(nullptr);
+  wpi::tunable::detail::SetTunableRegistryPreUpdateCallback(nullptr);
   ClearValues();
 }
 
 std::string NormalizePath(std::string_view path) {
   std::string buf;
-  return std::string{wpi::TunableRegistry::NormalizeName(path, buf)};
+  return std::string{wpi::tunable::TunableRegistry::NormalizeName(path, buf)};
 }
 
-std::string NormalizeTablePath(const wpi::TunableTable& table,
+std::string NormalizeTablePath(const wpi::tunable::TunableTable& table,
                                std::string_view name) {
   return NormalizePath(table.GetPath() + std::string{name});
 }
@@ -1134,7 +1141,7 @@ void RemovePath(std::string_view path) {
   std::string normalized = NormalizePath(path);
   {
     py::gil_scoped_release release;
-    wpi::TunableRegistry::Remove(normalized);
+    wpi::tunable::TunableRegistry::Remove(normalized);
   }
   RemoveRetainedPath(normalized);
 }
@@ -1191,8 +1198,8 @@ bool PyTunableTable::Publish(std::string_view name, py::object value) {
     if (published) {
       StoreValue(name, std::move(tunable));
     }
-  } else if (py::isinstance<wpi::ComplexTunable>(value)) {
-    auto& tunable = value.cast<wpi::ComplexTunable&>();
+  } else if (py::isinstance<wpi::tunable::ComplexTunable>(value)) {
+    auto& tunable = value.cast<wpi::tunable::ComplexTunable&>();
     {
       std::string nameString{name};
       py::gil_scoped_release release;
@@ -1225,7 +1232,9 @@ bool PyTunableTable::Publish(std::string_view name, py::object value) {
       }
     }
   } else {
-    throw py::type_error("value must be a Tunable or ComplexTunable");
+    throw py::type_error(
+        "value must be a wpi::tunable::Tunable or "
+        "wpi::tunable::ComplexTunable");
   }
   return published;
 }
@@ -1283,14 +1292,14 @@ void RemoveRootValue(std::string_view name) {
   RemovePath("/" + std::string{name});
 }
 
-void SetRaw(wpi::MockTunableBackend& self, std::string_view path,
+void SetRaw(wpi::tunable::MockTunableBackend& self, std::string_view path,
             py::handle value) {
   auto raw = ToRawVector(value);
   self.SetRaw(path, std::span<const uint8_t>{raw.data(), raw.size()});
 }
 
 template <typename T, typename F>
-void SetVector(wpi::MockTunableBackend& self, std::string_view path,
+void SetVector(wpi::tunable::MockTunableBackend& self, std::string_view path,
                const py::sequence& value, F setter) {
   std::vector<T> data;
   const size_t size = py::len(value);
@@ -1301,8 +1310,8 @@ void SetVector(wpi::MockTunableBackend& self, std::string_view path,
   (self.*setter)(path, std::span<const T>{data.data(), data.size()});
 }
 
-void SetBoolVector(wpi::MockTunableBackend& self, std::string_view path,
-                   const py::sequence& value) {
+void SetBoolVector(wpi::tunable::MockTunableBackend& self,
+                   std::string_view path, const py::sequence& value) {
   const size_t size = py::len(value);
   auto data = std::make_unique<bool[]>(size);
   for (size_t i = 0; i < size; ++i) {
@@ -1311,7 +1320,7 @@ void SetBoolVector(wpi::MockTunableBackend& self, std::string_view path,
   self.SetBoolVector(path, std::span<const bool>{data.get(), size});
 }
 
-void SetStruct(wpi::MockTunableBackend& self, std::string_view path,
+void SetStruct(wpi::tunable::MockTunableBackend& self, std::string_view path,
                py::handle value) {
   WPyStructInfo info{py::type::of(value)};
   self.SetStruct<WPyStruct, WPyStructInfo>(
@@ -1319,8 +1328,8 @@ void SetStruct(wpi::MockTunableBackend& self, std::string_view path,
       std::move(info));
 }
 
-void SetStructVector(wpi::MockTunableBackend& self, std::string_view path,
-                     const py::sequence& value) {
+void SetStructVector(wpi::tunable::MockTunableBackend& self,
+                     std::string_view path, const py::sequence& value) {
   WPyStructInfo info{GetStructSequenceType(value)};
   auto data = ToStructVector(value);
   self.SetStructVector<WPyStruct, WPyStructInfo>(
@@ -1328,7 +1337,8 @@ void SetStructVector(wpi::MockTunableBackend& self, std::string_view path,
       std::move(info));
 }
 
-py::object GetUid(const wpi::MockTunableBackend& self, std::string_view path) {
+py::object GetUid(const wpi::tunable::MockTunableBackend& self,
+                  std::string_view path) {
   if (auto uid = self.GetUid(path)) {
     return py::int_{*uid};
   }
@@ -1345,25 +1355,31 @@ py::object ValueToPython(const T& value) {
 }
 
 template <typename T>
-py::object ReadTunableValue(const wpi::TunableRegistry::TunableInfo& info) {
-  if (auto v = wpi::detail::CastTunable<T, false>(info.tunable, info.type)) {
+py::object ReadTunableValue(
+    const wpi::tunable::TunableRegistry::TunableInfo& info) {
+  if (auto v = wpi::tunable::detail::CastTunable<T, false>(info.tunable,
+                                                           info.type)) {
     return ValueToPython(v->Get());
   }
-  if (auto v = wpi::detail::CastTunable<T, true>(info.tunable, info.type)) {
+  if (auto v =
+          wpi::tunable::detail::CastTunable<T, true>(info.tunable, info.type)) {
     return ValueToPython(v->Get(info.config->parent));
   }
   throw py::type_error("tunable has unexpected type");
 }
 
-py::object ReadStructValue(const wpi::TunableRegistry::TunableInfo& info) {
-  if (auto v = wpi::detail::CastTunable<wpi::detail::TunableStructTag, false>(
-          info.tunable, info.type)) {
+py::object ReadStructValue(
+    const wpi::tunable::TunableRegistry::TunableInfo& info) {
+  if (auto v = wpi::tunable::detail::CastTunable<
+          wpi::tunable::detail::TunableStructTag, false>(info.tunable,
+                                                         info.type)) {
     std::vector<uint8_t> data(v->GetStructSize());
     v->PackStruct(data);
     return py::bytes{reinterpret_cast<const char*>(data.data()), data.size()};
   }
-  if (auto v = wpi::detail::CastTunable<wpi::detail::TunableStructTag, true>(
-          info.tunable, info.type)) {
+  if (auto v = wpi::tunable::detail::CastTunable<
+          wpi::tunable::detail::TunableStructTag, true>(info.tunable,
+                                                        info.type)) {
     std::vector<uint8_t> data(v->GetStructSize(info.config->parent));
     v->PackStruct(info.config->parent, data);
     return py::bytes{reinterpret_cast<const char*>(data.data()), data.size()};
@@ -1371,19 +1387,19 @@ py::object ReadStructValue(const wpi::TunableRegistry::TunableInfo& info) {
   throw py::type_error("tunable has unexpected type");
 }
 
-py::object GetTunableValue(const wpi::MockTunableBackend& self,
+py::object GetTunableValue(const wpi::tunable::MockTunableBackend& self,
                            std::string_view path) {
   auto uid = self.GetUid(path);
   if (!uid) {
     throw py::value_error("no tunable at path");
   }
 
-  auto info = wpi::TunableRegistry::GetTunable(*uid);
+  auto info = wpi::tunable::TunableRegistry::GetTunable(*uid);
   if (!info) {
     throw py::value_error("no registered tunable for path");
   }
 
-  using Type = wpi::detail::TunableTypeValue;
+  using Type = wpi::tunable::detail::TunableTypeValue;
   switch (info.type) {
     case Type::BOOLEAN:
     case Type::MEMBER_BOOLEAN:
@@ -1479,10 +1495,10 @@ void wpi::InitTunablePython(py::module_& m) {
       .def("set", &PyTunable::Set)
       .def("mutate", &PyTunable::Mutate);
 
-  py::class_<wpi::TunableTable>(m, "_NativeTunableTable")
-      .def_property_readonly("path", &TunableTable::GetPath)
-      .def("get_table", &TunableTable::GetTable)
-      .def("remove", &TunableTable::Remove);
+  py::class_<wpi::tunable::TunableTable>(m, "_NativeTunableTable")
+      .def_property_readonly("path", &wpi::tunable::TunableTable::GetPath)
+      .def("get_table", &wpi::tunable::TunableTable::GetTable)
+      .def("remove", &wpi::tunable::TunableTable::Remove);
 
   py::class_<PyTunableTable>(m, "TunableTable")
       .def_property_readonly("path", &PyTunableTable::GetPath)
@@ -1709,106 +1725,117 @@ void wpi::InitTunablePython(py::module_& m) {
           py::arg("properties") = py::none(), py::arg("type_string") = "")
       .def("remove", &PyTunableTable::Remove);
 
-  py::class_<wpi::Tunables>(m, "Tunables")
+  py::class_<wpi::tunable::Tunables>(m, "Tunables")
       .def_static(
           "get_table",
           [](std::string_view name) {
-            return PyTunableTable{
-                name.empty() ? Tunables::GetTable() : Tunables::GetTable(name),
-                nullptr};
+            return PyTunableTable{name.empty()
+                                      ? wpi::tunable::Tunables::GetTable()
+                                      : wpi::tunable::Tunables::GetTable(name),
+                                  nullptr};
           },
           py::arg("name") = "")
-      .def_static(
-          "publish",
-          [](std::string_view name, py::object value) {
-            return PyTunableTable{Tunables::GetTable(), nullptr}.Publish(name,
-                                                                         value);
-          })
+      .def_static("publish",
+                  [](std::string_view name, py::object value) {
+                    return PyTunableTable{wpi::tunable::Tunables::GetTable(),
+                                          nullptr}
+                        .Publish(name, value);
+                  })
       .def_static(
           "add",
           [](std::string_view name, py::object value, py::object valueType,
              py::object elementType, bool robust, bool isMutable,
              py::object onTune, py::object properties, std::string typeString) {
-            return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                name, std::move(value), std::move(valueType),
-                std::move(elementType), robust, isMutable, std::move(onTune),
-                std::move(properties), std::move(typeString));
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), std::move(valueType),
+                     std::move(elementType), robust, isMutable,
+                     std::move(onTune), std::move(properties),
+                     std::move(typeString));
           },
           py::arg("name"), py::arg("value"), py::kw_only(),
           py::arg("value_type") = py::none(),
           py::arg("element_type") = py::none(), py::arg("robust") = false,
           py::arg("mutable") = true, py::arg("on_tune") = py::none(),
           py::arg("properties") = py::none(), py::arg("type_string") = "")
-      .def_static("add_boolean",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                        name, std::move(value), BuiltinType("bool"), py::none(),
-                        false, true, py::none(), py::none(), "");
-                  })
-      .def_static("add_int",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                        name, std::move(value), BuiltinType("int"), py::none(),
-                        false, true, py::none(), py::none(), "");
-                  })
-      .def_static("add_long",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                        name, std::move(value), BuiltinType("int"), py::none(),
-                        false, true, py::none(), py::none(), "");
-                  })
-      .def_static("add_float",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                        name, std::move(value), BuiltinType("float"),
-                        py::none(), false, true, py::none(), py::none(), "");
-                  })
-      .def_static("add_double",
-                  [](std::string_view name, py::object value) {
-                    return PyTunableTable{Tunables::GetTable(), nullptr}.Add(
-                        name, std::move(value), BuiltinType("float"),
-                        py::none(), false, true, py::none(), py::none(), "");
-                  })
+      .def_static(
+          "add_boolean",
+          [](std::string_view name, py::object value) {
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), BuiltinType("bool"), py::none(),
+                     false, true, py::none(), py::none(), "");
+          })
+      .def_static(
+          "add_int",
+          [](std::string_view name, py::object value) {
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), BuiltinType("int"), py::none(),
+                     false, true, py::none(), py::none(), "");
+          })
+      .def_static(
+          "add_long",
+          [](std::string_view name, py::object value) {
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), BuiltinType("int"), py::none(),
+                     false, true, py::none(), py::none(), "");
+          })
+      .def_static(
+          "add_float",
+          [](std::string_view name, py::object value) {
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), BuiltinType("float"), py::none(),
+                     false, true, py::none(), py::none(), "");
+          })
+      .def_static(
+          "add_double",
+          [](std::string_view name, py::object value) {
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(), nullptr}
+                .Add(name, std::move(value), BuiltinType("float"), py::none(),
+                     false, true, py::none(), py::none(), "");
+          })
       .def_static("remove", &RemoveRootValue);
 
-  py::class_<wpi::TunableRegistry>(m, "TunableRegistry")
+  py::class_<wpi::tunable::TunableRegistry>(m, "TunableRegistry")
       .def_static("set_report_warning",
                   [](py::object func) {
                     if (func.is_none()) {
-                      TunableRegistry::SetReportWarning(nullptr);
+                      wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
                     } else {
                       auto callback = std::shared_ptr<py::object>{
                           new py::object{std::move(func)}, [](auto object) {
                             py::gil_scoped_acquire gil;
                             delete object;
                           }};
-                      TunableRegistry::SetReportWarning(
+                      wpi::tunable::TunableRegistry::SetReportWarning(
                           [callback](std::string_view msg) {
                             py::gil_scoped_acquire gil;
                             (*callback)(std::string{msg});
                           });
                     }
                   })
-      .def_static("report_warning", &TunableRegistry::ReportWarning)
-      .def_static(
-          "register_backend",
-          [](std::string_view prefix, std::shared_ptr<TunableBackend> backend) {
-            std::string prefixString{prefix};
-            py::gil_scoped_release release;
-            TunableRegistry::RegisterBackend(prefixString, std::move(backend));
-          })
-      .def_static("get_backend", &TunableRegistry::GetBackend)
+      .def_static("report_warning",
+                  &wpi::tunable::TunableRegistry::ReportWarning)
+      .def_static("register_backend",
+                  [](std::string_view prefix,
+                     std::shared_ptr<wpi::tunable::TunableBackend> backend) {
+                    std::string prefixString{prefix};
+                    py::gil_scoped_release release;
+                    wpi::tunable::TunableRegistry::RegisterBackend(
+                        prefixString, std::move(backend));
+                  })
+      .def_static("get_backend", &wpi::tunable::TunableRegistry::GetBackend)
       .def_static(
           "get_table",
           [](std::string_view path) {
-            return PyTunableTable{wpi::Tunables::GetTable(path), nullptr};
+            return PyTunableTable{wpi::tunable::Tunables::GetTable(path),
+                                  nullptr};
           },
           py::arg("path"))
       .def_static(
           "normalize_name",
           [](std::string_view path) {
             std::string buf;
-            return std::string{TunableRegistry::NormalizeName(path, buf)};
+            return std::string{
+                wpi::tunable::TunableRegistry::NormalizeName(path, buf)};
           })
       .def_static(
           "remove",
@@ -1823,13 +1850,14 @@ void wpi::InitTunablePython(py::module_& m) {
       .def_static("update",
                   [] {
                     py::gil_scoped_release release;
-                    TunableRegistry::Update();
+                    wpi::tunable::TunableRegistry::Update();
                   })
       .def_static(
           "with_update_mutex",
           [](py::function func) {
-            std::unique_lock lock{TunableRegistry::GetUpdateMutex(),
-                                  std::defer_lock};
+            std::unique_lock lock{
+                wpi::tunable::TunableRegistry::GetUpdateMutex(),
+                std::defer_lock};
             {
               py::gil_scoped_release release;
               lock.lock();
@@ -1843,54 +1871,59 @@ void wpi::InitTunablePython(py::module_& m) {
         ClearValues();
         {
           py::gil_scoped_release release;
-          TunableRegistry::Reset();
+          wpi::tunable::TunableRegistry::Reset();
         }
         RegisterPreUpdateCallback();
       });
 
-  py::class_<wpi::MockTunableBackend, py::smart_holder, wpi::TunableBackend>(
-      m, "MockTunableBackend")
+  py::class_<wpi::tunable::MockTunableBackend, py::smart_holder,
+             wpi::tunable::TunableBackend>(m, "MockTunableBackend")
       .def(py::init<>())
-      .def("set_bool", &MockTunableBackend::SetBool)
-      .def("set_int32", &MockTunableBackend::SetInt32)
-      .def("set_int64", &MockTunableBackend::SetInt64)
-      .def("set_float", &MockTunableBackend::SetFloat)
-      .def("set_double", &MockTunableBackend::SetDouble)
-      .def("set_string", &MockTunableBackend::SetString)
+      .def("set_bool", &wpi::tunable::MockTunableBackend::SetBool)
+      .def("set_int32", &wpi::tunable::MockTunableBackend::SetInt32)
+      .def("set_int64", &wpi::tunable::MockTunableBackend::SetInt64)
+      .def("set_float", &wpi::tunable::MockTunableBackend::SetFloat)
+      .def("set_double", &wpi::tunable::MockTunableBackend::SetDouble)
+      .def("set_string", &wpi::tunable::MockTunableBackend::SetString)
       .def("set_raw", &SetRaw)
       .def("set_struct", &SetStruct)
       .def("set_struct_vector", &SetStructVector)
       .def("set_struct_array", &SetStructVector)
       .def("set_bool_vector", &SetBoolVector)
       .def("set_int32_vector",
-           [](MockTunableBackend& self, std::string_view path,
+           [](wpi::tunable::MockTunableBackend& self, std::string_view path,
               const py::sequence& value) {
-             SetVector<int32_t>(self, path, value,
-                                &MockTunableBackend::SetInt32Vector);
+             SetVector<int32_t>(
+                 self, path, value,
+                 &wpi::tunable::MockTunableBackend::SetInt32Vector);
            })
       .def("set_int64_vector",
-           [](MockTunableBackend& self, std::string_view path,
+           [](wpi::tunable::MockTunableBackend& self, std::string_view path,
               const py::sequence& value) {
-             SetVector<int64_t>(self, path, value,
-                                &MockTunableBackend::SetInt64Vector);
+             SetVector<int64_t>(
+                 self, path, value,
+                 &wpi::tunable::MockTunableBackend::SetInt64Vector);
            })
       .def("set_float_vector",
-           [](MockTunableBackend& self, std::string_view path,
+           [](wpi::tunable::MockTunableBackend& self, std::string_view path,
               const py::sequence& value) {
-             SetVector<float>(self, path, value,
-                              &MockTunableBackend::SetFloatVector);
+             SetVector<float>(
+                 self, path, value,
+                 &wpi::tunable::MockTunableBackend::SetFloatVector);
            })
       .def("set_double_vector",
-           [](MockTunableBackend& self, std::string_view path,
+           [](wpi::tunable::MockTunableBackend& self, std::string_view path,
               const py::sequence& value) {
-             SetVector<double>(self, path, value,
-                               &MockTunableBackend::SetDoubleVector);
+             SetVector<double>(
+                 self, path, value,
+                 &wpi::tunable::MockTunableBackend::SetDoubleVector);
            })
       .def("set_string_vector",
-           [](MockTunableBackend& self, std::string_view path,
+           [](wpi::tunable::MockTunableBackend& self, std::string_view path,
               const py::sequence& value) {
-             SetVector<std::string>(self, path, value,
-                                    &MockTunableBackend::SetStringVector);
+             SetVector<std::string>(
+                 self, path, value,
+                 &wpi::tunable::MockTunableBackend::SetStringVector);
            })
       .def("get_uid", &GetUid)
       .def("get_value", &GetTunableValue);

@@ -19,7 +19,7 @@ namespace wpi {
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public wpi::TelemetryLoggable {
+class DigitalInput : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Create an instance of a Digital Input class.
@@ -56,7 +56,7 @@ class DigitalInput : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

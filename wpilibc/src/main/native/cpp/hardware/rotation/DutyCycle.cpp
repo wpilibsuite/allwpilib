@@ -52,7 +52,7 @@ int DutyCycle::GetSourceChannel() const {
   return m_channel;
 }
 
-void DutyCycle::LogTo(wpi::TelemetryTable& table) const {
+void DutyCycle::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Frequency", GetFrequency());
   table.Log("Output", GetOutput());
 }

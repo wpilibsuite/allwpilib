@@ -15,7 +15,7 @@ class AnalogInput;
 /**
  * Class for supporting continuous analog encoders, such as the US Digital MA3.
  */
-class AnalogEncoder : public wpi::TelemetryLoggable {
+class AnalogEncoder : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct a new AnalogEncoder attached to a specific AnalogIn channel.
@@ -129,7 +129,7 @@ class AnalogEncoder : public wpi::TelemetryLoggable {
    */
   int GetChannel() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

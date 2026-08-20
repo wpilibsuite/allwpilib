@@ -339,7 +339,7 @@ std::string_view GameCubeController::GetTelemetryType() const {
   return "HID:GameCube";
 }
 
-void GameCubeController::LogTo(wpi::TelemetryTable& table) const {
+void GameCubeController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("CStickX", GetCStickX());

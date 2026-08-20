@@ -20,7 +20,7 @@ Field2d::Field2d() {
   m_objects[0]->SetPose(wpi::math::Pose2d{});
 }
 
-Field2d::Field2d(Field2d&& rhs) : ComplexTunable{std::move(rhs)} {
+Field2d::Field2d(Field2d&& rhs) : wpi::tunable::ComplexTunable{std::move(rhs)} {
   std::swap(m_objects, rhs.m_objects);
 }
 
@@ -37,7 +37,7 @@ Field2d& Field2d::operator=(Field2d&& rhs) {
     RemoveTunableChildren();
   }
 
-  ComplexTunable::operator=(std::move(rhs));
+  wpi::tunable::ComplexTunable::operator=(std::move(rhs));
   std::swap(m_objects, rhs.m_objects);
 
   if (republishChildren) {
@@ -86,7 +86,7 @@ FieldObject2d* Field2d::GetRobotObject() {
   return m_objects[0].get();
 }
 
-void Field2d::LogTo(wpi::TelemetryTable& table) const {
+void Field2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
   for (auto&& obj : m_objects) {
     table.Log(obj->m_name, obj->m_posesTunable.Get());
@@ -101,7 +101,7 @@ std::string_view Field2d::GetTunableType() const {
   return "Field2d";
 }
 
-void Field2d::PublishTunable(wpi::TunableTable& table) {
+void Field2d::PublishTunable(wpi::tunable::TunableTable& table) {
   std::vector<std::pair<std::string, FieldObject2d*>> objects;
   {
     std::scoped_lock lock(m_mutex);
@@ -117,9 +117,9 @@ void Field2d::PublishTunable(wpi::TunableTable& table) {
 }
 
 bool Field2d::IsTunablePublished() const {
-  auto info = wpi::TunableRegistry::GetTunable(GetTunableUid());
-  return static_cast<const wpi::detail::TunableBase*>(info.tunable) ==
-         static_cast<const wpi::detail::TunableBase*>(this);
+  auto info = wpi::tunable::TunableRegistry::GetTunable(GetTunableUid());
+  return static_cast<const wpi::tunable::detail::TunableBase*>(info.tunable) ==
+         static_cast<const wpi::tunable::detail::TunableBase*>(this);
 }
 
 void Field2d::RemoveTunableChildren() {

@@ -161,21 +161,21 @@ std::string StreamOutput(F&& func) {
 class UnitTelemetry {
  public:
   UnitTelemetry() {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TelemetryRegistry::RegisterBackend("", mock);
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
   }
 
-  ~UnitTelemetry() { wpi::TelemetryRegistry::Reset(); }
+  ~UnitTelemetry() { wpi::telemetry::TelemetryRegistry::Reset(); }
 
-  std::shared_ptr<wpi::MockTelemetryBackend> mock =
-      std::make_shared<wpi::MockTelemetryBackend>();
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> mock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
 };
 
-class UnitComplexTunable final : public wpi::ComplexTunable {
+class UnitComplexTunable final : public wpi::tunable::ComplexTunable {
  public:
   std::string_view GetTunableType() const override { return "UnitComplex"; }
 
-  void PublishTunable(wpi::TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("distance", this, &UnitComplexTunable::distance);
   }
 
@@ -185,14 +185,14 @@ class UnitComplexTunable final : public wpi::ComplexTunable {
 class UnitTunable {
  public:
   UnitTunable() {
-    wpi::TunableRegistry::Reset();
-    wpi::TunableRegistry::RegisterBackend("", mock);
+    wpi::tunable::TunableRegistry::Reset();
+    wpi::tunable::TunableRegistry::RegisterBackend("", mock);
   }
 
-  ~UnitTunable() { wpi::TunableRegistry::Reset(); }
+  ~UnitTunable() { wpi::tunable::TunableRegistry::Reset(); }
 
-  std::shared_ptr<wpi::MockTunableBackend> mock =
-      std::make_shared<wpi::MockTunableBackend>();
+  std::shared_ptr<wpi::tunable::MockTunableBackend> mock =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
 };
 }  // namespace
 
@@ -3384,10 +3384,10 @@ TEST_CASE("Units overloadResolution", "[wpimath]") {
   CHECK(Scope::f(1_mm));
 }
 
-static_assert(wpi::SupportsTelemetryValue<wpi::units::meter_t>);
+static_assert(wpi::telemetry::SupportsTelemetryValue<wpi::units::meter_t>);
 
 TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
-  wpi::TelemetryTable& table = wpi::TelemetryRegistry::GetTable("/");
+  wpi::telemetry::TelemetryTable& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
   table.Log("testmeter", meter_t(5));
   table.Log("testsquaremeter", square_meter_t(3));
   table.Log("testwatt", watt_t(3));
@@ -3396,11 +3396,11 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 
   REQUIRE(actions[0].path == "/testmeter");
   REQUIRE(std::holds_alternative<
-          wpi::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[0].value)
               .key == "unit");
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[0].value)
               .value == "\"m\"");
 
@@ -3410,11 +3410,11 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 
   REQUIRE(actions[2].path == "/testsquaremeter");
   REQUIRE(std::holds_alternative<
-          wpi::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[2].value)
               .key == "unit");
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[2].value)
               .value == "\"m^2\"");
 
@@ -3424,11 +3424,11 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 
   REQUIRE(actions[4].path == "/testwatt");
   REQUIRE(std::holds_alternative<
-          wpi::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[4].value)
               .key == "unit");
-  REQUIRE(std::get<wpi::MockTelemetryBackend::SetPropertyValue>(
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
               actions[4].value)
               .value == "\"m^2 kg s^-3\"");
 
@@ -3438,29 +3438,29 @@ TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
 }
 
 TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {
-  wpi::Tunable<foot_t> distance{6_ft};
-  wpi::Tunables::Publish("distance", distance);
+  wpi::tunable::Tunable<foot_t> distance{6_ft};
+  wpi::tunable::Tunables::Publish("distance", distance);
   auto distanceUid = mock->GetUid("/distance");
   REQUIRE(distanceUid);
-  auto distanceInfo = wpi::TunableRegistry::GetTunable(*distanceUid);
+  auto distanceInfo = wpi::tunable::TunableRegistry::GetTunable(*distanceUid);
   REQUIRE(distanceInfo.config);
   CHECK(distanceInfo.config->properties.at("unit") == "m");
 
   mock->SetDouble("/distance", 2.0);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(distance.Get() == 2_m);
 
   UnitComplexTunable complex;
-  wpi::Tunables::Publish("complex", complex);
+  wpi::tunable::Tunables::Publish("complex", complex);
   auto memberUid = mock->GetUid("/complex/distance");
   REQUIRE(memberUid);
-  auto memberInfo = wpi::TunableRegistry::GetTunable(*memberUid);
+  auto memberInfo = wpi::tunable::TunableRegistry::GetTunable(*memberUid);
   REQUIRE(memberInfo.config);
   CHECK(memberInfo.config->properties.at("unit") == "m");
 
   mock->SetDouble("/complex/distance", 3.0);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.distance == 3_m);
 }

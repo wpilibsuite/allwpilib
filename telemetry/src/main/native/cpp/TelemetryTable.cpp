@@ -12,6 +12,7 @@
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 std::string_view TelemetryTable::GetPath() const {
   return m_path;

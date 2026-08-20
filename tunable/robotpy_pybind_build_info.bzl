@@ -77,7 +77,7 @@ def tunable_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-tunable.copy_headers)/wpi/tunable/ComplexTunable.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::ComplexTunable", "wpi__ComplexTunable.hpp"),
+                ("wpi::tunable::ComplexTunable", "wpi__tunable__ComplexTunable.hpp"),
             ],
         ),
         struct(
@@ -87,8 +87,8 @@ def tunable_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_file = "$(execpath :robotpy-native-tunable.copy_headers)/wpi/tunable/TunableBackend.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::TunableBackend", "wpi__TunableBackend.hpp"),
-                ("wpi::TunableBackend::PublishedTunable", "wpi__TunableBackend__PublishedTunable.hpp"),
+                ("wpi::tunable::TunableBackend", "wpi__tunable__TunableBackend.hpp"),
+                ("wpi::tunable::TunableBackend::PublishedTunable", "wpi__tunable__TunableBackend__PublishedTunable.hpp"),
             ],
         ),
     ]

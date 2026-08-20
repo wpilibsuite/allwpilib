@@ -7,7 +7,7 @@ functions:
   GetTelemetryTypeName:
     ignore: true
 classes:
-  wpi::TelemetryLoggable:
+  wpi::telemetry::TelemetryLoggable:
     methods:
       LogTo:
       GetTelemetryType:

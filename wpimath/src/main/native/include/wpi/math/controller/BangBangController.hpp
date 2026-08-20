@@ -30,8 +30,9 @@ namespace wpi::math {
  * ensure that your motor controllers are set to "coast" before attempting to
  * control them with a bang-bang controller.
  */
-class WPILIB_DLLEXPORT BangBangController : public wpi::TelemetryLoggable,
-                                            public wpi::ComplexTunable {
+class WPILIB_DLLEXPORT BangBangController
+    : public wpi::telemetry::TelemetryLoggable,
+      public wpi::tunable::ComplexTunable {
  public:
   /**
    * Creates a new bang-bang controller.
@@ -129,18 +130,18 @@ class WPILIB_DLLEXPORT BangBangController : public wpi::TelemetryLoggable,
     return Calculate(measurement, m_setpoint);
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 
-  void PublishTunable(wpi::TunableTable& table) override;
+  void PublishTunable(wpi::tunable::TunableTable& table) override;
 
   std::string_view GetTunableType() const override;
 
  private:
-  wpi::Tunable<double> m_tolerance;
+  wpi::tunable::Tunable<double> m_tolerance;
 
-  wpi::Tunable<double> m_setpoint;
+  wpi::tunable::Tunable<double> m_setpoint;
   double m_measurement = 0;
 
   // Usage reporting instances

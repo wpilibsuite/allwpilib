@@ -9,7 +9,7 @@
 
 using namespace wpi::math;
 
-void BangBangController::LogTo(wpi::TelemetryTable& table) const {
+void BangBangController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("tolerance", GetTolerance());
   table.Log("setpoint", GetSetpoint());
   table.Log("measurement", GetMeasurement());
@@ -21,7 +21,7 @@ std::string_view BangBangController::GetTelemetryType() const {
   return "BangBangController";
 }
 
-void BangBangController::PublishTunable(wpi::TunableTable& table) {
+void BangBangController::PublishTunable(wpi::tunable::TunableTable& table) {
   table.Publish("tolerance", m_tolerance);
   table.Publish("setpoint", m_setpoint);
 }

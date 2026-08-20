@@ -23,7 +23,7 @@ namespace wpi::backend {
 class NetworkTablesTunableBackendTestAccess;
 
 /** A tunable backend that publishes tunables to NetworkTables. */
-class NetworkTablesTunableBackend : public wpi::TunableBackend {
+class NetworkTablesTunableBackend : public wpi::tunable::TunableBackend {
   friend class NetworkTablesTunableBackendTestAccess;
 
  public:
@@ -48,9 +48,9 @@ class NetworkTablesTunableBackend : public wpi::TunableBackend {
   void Retire() override;
 
   bool Publish(std::string_view path, uint32_t uid,
-               wpi::detail::TunableBase& tunable,
-               const wpi::TunableConfig* config,
-               wpi::detail::TunableTypeValue type) override;
+               wpi::tunable::detail::TunableBase& tunable,
+               const wpi::tunable::TunableConfig* config,
+               wpi::tunable::detail::TunableTypeValue type) override;
 
   void MarkDirty(uint32_t uid) override;
 
@@ -69,8 +69,8 @@ class NetworkTablesTunableBackend : public wpi::TunableBackend {
   };
 
   void TrackEntry(const std::shared_ptr<Entry>& entry,
-                  const wpi::TunableConfig* config,
-                  wpi::detail::TunableTypeValue type);
+                  const wpi::tunable::TunableConfig* config,
+                  wpi::tunable::detail::TunableTypeValue type);
   void UntrackEntry(const std::shared_ptr<Entry>& entry);
   void EnqueueDirtyEntry(const std::shared_ptr<Entry>& entry);
   void UntrackEntryNow(const std::shared_ptr<Entry>& entry);

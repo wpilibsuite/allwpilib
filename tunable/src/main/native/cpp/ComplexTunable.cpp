@@ -7,6 +7,7 @@
 #include "wpi/tunable/TunableRegistry.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 void ComplexTunable::anchor() {}
 

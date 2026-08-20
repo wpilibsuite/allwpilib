@@ -18,11 +18,11 @@ namespace {
 class PIDTelemetryTest {
  public:
   PIDTelemetryTest() {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TelemetryRegistry::RegisterBackend("", backend);
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", backend);
   }
 
-  ~PIDTelemetryTest() { wpi::TelemetryRegistry::Reset(); }
+  ~PIDTelemetryTest() { wpi::telemetry::TelemetryRegistry::Reset(); }
 
   template <typename T>
   T Last(std::string_view path) {
@@ -31,8 +31,8 @@ class PIDTelemetryTest {
     return *value;
   }
 
-  std::shared_ptr<wpi::MockTelemetryBackend> backend =
-      std::make_shared<wpi::MockTelemetryBackend>();
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> backend =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
 };
 
 static_assert([] {
@@ -57,10 +57,10 @@ TEST_CASE_METHOD(PIDTelemetryTest, "PIDInputOutputTest LogsTelemetry",
   controller.SetIZone(5.0);
   controller.Calculate(7.0, 10.0);
 
-  wpi::Telemetry::Log("pid", controller);
+  wpi::telemetry::Telemetry::Log("pid", controller);
 
-  CHECK(Last<wpi::MockTelemetryBackend::LogStringValue>("/pid/.type").value ==
-        "PIDController");
+  CHECK(Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/pid/.type")
+            .value == "PIDController");
   CHECK(Last<double>("/pid/p") == 0.5);
   CHECK(Last<double>("/pid/i") == 0.1);
   CHECK(Last<double>("/pid/d") == 0.01);

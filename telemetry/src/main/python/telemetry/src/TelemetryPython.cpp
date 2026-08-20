@@ -98,7 +98,8 @@ namespace wpi::telemetry::python {
 
 class PyTelemetryTable {
  public:
-  explicit PyTelemetryTable(wpi::TelemetryTable& table) : m_table{&table} {}
+  explicit PyTelemetryTable(wpi::telemetry::TelemetryTable& table)
+      : m_table{&table} {}
 
   std::string GetPath() const { return std::string{m_table->GetPath()}; }
   bool SetType(std::string_view type) { return m_table->SetType(type); }
@@ -185,16 +186,16 @@ class PyTelemetryTable {
     kFallbackString,
   };
 
-  static void AddStructSchemas(const wpi::TelemetryTable::EntryHandle& entry,
-                               std::string_view typeString,
-                               const WPyStructInfo& info) {
+  static void AddStructSchemas(
+      const wpi::telemetry::TelemetryTable::EntryHandle& entry,
+      std::string_view typeString, const WPyStructInfo& info) {
     if (entry.HasPublishedSchema(typeString)) {
       return;
     }
     wpi::util::ForEachStructSchema<WPyStruct>(
         [&](std::string_view schemaType, std::string_view schema) {
-          wpi::TelemetryRegistry::AddSchema(entry.GetBackend(), schemaType,
-                                            "structschema", schema);
+          wpi::telemetry::TelemetryRegistry::AddSchema(
+              entry.GetBackend(), schemaType, "structschema", schema);
         },
         info);
     entry.MarkSchemaPublished(typeString);
@@ -214,7 +215,8 @@ class PyTelemetryTable {
     return bytes.cast<std::string>();
   }
 
-  wpi::TelemetryTable::EntryHandle GetEntry(std::string_view name) const {
+  wpi::telemetry::TelemetryTable::EntryHandle GetEntry(
+      std::string_view name) const {
     return m_table->GetEntry(name);
   }
 
@@ -278,7 +280,7 @@ class PyTelemetryTable {
       }
     }
 
-    if (py::isinstance<wpi::TelemetryLoggable>(value)) {
+    if (py::isinstance<wpi::telemetry::TelemetryLoggable>(value)) {
       logTo(py::cast(&child, py::return_value_policy::reference));
     } else {
       logTo(PyTelemetryTable{child});
@@ -391,9 +393,9 @@ class PyTelemetryTable {
     LogStructSequenceImpl(entry, value, type);
   }
 
-  void LogStructSequenceImpl(const wpi::TelemetryTable::EntryHandle& entry,
-                             const py::sequence& value,
-                             const py::type& type) const {
+  void LogStructSequenceImpl(
+      const wpi::telemetry::TelemetryTable::EntryHandle& entry,
+      const py::sequence& value, const py::type& type) const {
     WPyStructInfo info{type};
     std::string typeString{wpi::util::GetStructTypeString<WPyStruct>(info)};
     AddStructSchemas(entry, typeString, info);
@@ -414,7 +416,7 @@ class PyTelemetryTable {
     entry->LogRaw(std::span<const uint8_t>{data}, typeString);
   }
 
-  wpi::TelemetryTable* m_table;
+  wpi::telemetry::TelemetryTable* m_table;
 };
 
 }  // namespace wpi::telemetry::python
@@ -422,19 +424,19 @@ class PyTelemetryTable {
 namespace {
 
 py::object ActionValueToPython(
-    const wpi::MockTelemetryBackend::Action& action) {
+    const wpi::telemetry::MockTelemetryBackend::Action& action) {
   py::dict result;
   result["path"] = action.path;
   std::visit(
       [&](const auto& value) {
         using T = std::decay_t<decltype(value)>;
-        if constexpr (std::same_as<
-                          T, wpi::MockTelemetryBackend::KeepDuplicatesValue>) {
+        if constexpr (std::same_as<T, wpi::telemetry::MockTelemetryBackend::
+                                          KeepDuplicatesValue>) {
           result["kind"] = "keep_duplicates";
           result["value"] = value.value;
-        } else if constexpr (std::same_as<
-                                 T,
-                                 wpi::MockTelemetryBackend::SetPropertyValue>) {
+        } else if constexpr (std::same_as<T,
+                                          wpi::telemetry::MockTelemetryBackend::
+                                              SetPropertyValue>) {
           result["kind"] = "set_property";
           result["key"] = value.key;
           result["value"] = value.value;
@@ -450,14 +452,15 @@ py::object ActionValueToPython(
                              std::same_as<T, double>) {
           result["kind"] = "double";
           result["value"] = value;
-        } else if constexpr (std::same_as<
-                                 T,
-                                 wpi::MockTelemetryBackend::LogStringValue>) {
+        } else if constexpr (std::same_as<T,
+                                          wpi::telemetry::MockTelemetryBackend::
+                                              LogStringValue>) {
           result["kind"] = "string";
           result["value"] = value.value;
           result["type_string"] = value.typeString;
-        } else if constexpr (std::same_as<T, wpi::MockTelemetryBackend::
-                                                 LogBooleanArrayValue>) {
+        } else if constexpr (std::same_as<T,
+                                          wpi::telemetry::MockTelemetryBackend::
+                                              LogBooleanArrayValue>) {
           result["kind"] = "boolean[]";
           py::list list;
           for (int item : value.value) {
@@ -476,8 +479,9 @@ py::object ActionValueToPython(
         } else if constexpr (std::same_as<T, std::vector<std::string>>) {
           result["kind"] = "string[]";
           result["value"] = value;
-        } else if constexpr (std::same_as<
-                                 T, wpi::MockTelemetryBackend::LogRawValue>) {
+        } else if constexpr (std::same_as<T,
+                                          wpi::telemetry::MockTelemetryBackend::
+                                              LogRawValue>) {
           result["kind"] = "raw";
           result["value"] =
               py::bytes{reinterpret_cast<const char*>(value.value.data()),
@@ -489,7 +493,8 @@ py::object ActionValueToPython(
   return std::move(result);
 }
 
-py::object SchemaToPython(const wpi::MockTelemetryBackend::Schema* schema) {
+py::object SchemaToPython(
+    const wpi::telemetry::MockTelemetryBackend::Schema* schema) {
   if (!schema) {
     return py::none{};
   }
@@ -507,22 +512,23 @@ py::object SchemaToPython(const wpi::MockTelemetryBackend::Schema* schema) {
 void wpi::InitTelemetryPython(py::module_& m) {
   using telemetry::python::PyTelemetryTable;
 
-  py::class_<wpi::TelemetryTable>(m, "_NativeTelemetryTable")
+  py::class_<wpi::telemetry::TelemetryTable>(m, "_NativeTelemetryTable")
       .def_property_readonly("path",
-                             [](const TelemetryTable& self) {
+                             [](const wpi::telemetry::TelemetryTable& self) {
                                return std::string{self.GetPath()};
                              })
-      .def("set_type", &TelemetryTable::SetType)
-      .def("get_type", &TelemetryTable::GetType)
-      .def("has_type", &TelemetryTable::HasType)
-      .def("get_table", &TelemetryTable::GetTable,
+      .def("set_type", &wpi::telemetry::TelemetryTable::SetType)
+      .def("get_type", &wpi::telemetry::TelemetryTable::GetType)
+      .def("has_type", &wpi::telemetry::TelemetryTable::HasType)
+      .def("get_table", &wpi::telemetry::TelemetryTable::GetTable,
            py::return_value_policy::reference)
-      .def("keep_duplicates", &TelemetryTable::KeepDuplicates)
-      .def("set_property", &TelemetryTable::SetProperty)
+      .def("keep_duplicates", &wpi::telemetry::TelemetryTable::KeepDuplicates)
+      .def("set_property", &wpi::telemetry::TelemetryTable::SetProperty)
       .def(
           "log",
-          [](TelemetryTable& self, std::string_view name, py::object value,
-             py::object elementType, std::string_view typeString) {
+          [](wpi::telemetry::TelemetryTable& self, std::string_view name,
+             py::object value, py::object elementType,
+             std::string_view typeString) {
             PyTelemetryTable{self}.Log(name, value, std::move(elementType),
                                        typeString);
           },
@@ -542,11 +548,11 @@ void wpi::InitTelemetryPython(py::module_& m) {
            py::kw_only(), py::arg("element_type") = py::none(),
            py::arg("type_string") = "", kLogDoc);
 
-  py::class_<wpi::Telemetry>(m, "Telemetry")
+  py::class_<wpi::telemetry::Telemetry>(m, "Telemetry")
       .def_static(
           "get_table",
           [](std::string_view name) {
-            auto& root = Telemetry::GetTable();
+            auto& root = wpi::telemetry::Telemetry::GetTable();
             return PyTelemetryTable{name.empty() ? root : root.GetTable(name)};
           },
           py::arg("name") = "")
@@ -554,67 +560,72 @@ void wpi::InitTelemetryPython(py::module_& m) {
           "log",
           [](std::string_view name, py::object value, py::object elementType,
              std::string_view typeString) {
-            PyTelemetryTable{Telemetry::GetTable()}.Log(
+            PyTelemetryTable{wpi::telemetry::Telemetry::GetTable()}.Log(
                 name, value, std::move(elementType), typeString);
           },
           py::arg("name"), py::arg("value"), py::kw_only(),
           py::arg("element_type") = py::none(), py::arg("type_string") = "",
           kLogDoc)
-      .def_static("keep_duplicates", &Telemetry::KeepDuplicates)
-      .def_static("set_property", &Telemetry::SetProperty);
+      .def_static("keep_duplicates", &wpi::telemetry::Telemetry::KeepDuplicates)
+      .def_static("set_property", &wpi::telemetry::Telemetry::SetProperty);
 
-  py::class_<wpi::TelemetryRegistry>(m, "TelemetryRegistry")
+  py::class_<wpi::telemetry::TelemetryRegistry>(m, "TelemetryRegistry")
       .def_static(
           "set_report_warning",
           [](py::object func) {
             if (func.is_none()) {
-              TelemetryRegistry::SetReportWarning(nullptr);
+              wpi::telemetry::TelemetryRegistry::SetReportWarning(nullptr);
             } else {
               auto callback = std::shared_ptr<py::object>{
                   new py::object{std::move(func)}, [](auto object) {
                     py::gil_scoped_acquire gil;
                     delete object;
                   }};
-              TelemetryRegistry::SetReportWarning(
+              wpi::telemetry::TelemetryRegistry::SetReportWarning(
                   [callback](std::string_view path, std::string_view msg) {
                     py::gil_scoped_acquire gil;
                     (*callback)(std::string{path}, std::string{msg});
                   });
             }
           })
-      .def_static("report_warning", &TelemetryRegistry::ReportWarning)
-      .def_static("register_backend",
-                  [](std::string_view prefix,
-                     std::shared_ptr<TelemetryBackend> backend) {
-                    TelemetryRegistry::RegisterBackend(prefix,
-                                                       std::move(backend));
-                  })
-      .def_static("get_backend", &TelemetryRegistry::GetBackend)
-      .def_static("get_entry", &TelemetryRegistry::GetEntry)
+      .def_static("report_warning",
+                  &wpi::telemetry::TelemetryRegistry::ReportWarning)
+      .def_static(
+          "register_backend",
+          [](std::string_view prefix,
+             std::shared_ptr<wpi::telemetry::TelemetryBackend> backend) {
+            wpi::telemetry::TelemetryRegistry::RegisterBackend(
+                prefix, std::move(backend));
+          })
+      .def_static("get_backend", &wpi::telemetry::TelemetryRegistry::GetBackend)
+      .def_static("get_entry", &wpi::telemetry::TelemetryRegistry::GetEntry)
       .def_static(
           "get_table",
           [](std::string_view path) {
-            return PyTelemetryTable{TelemetryRegistry::GetTable(path)};
+            return PyTelemetryTable{
+                wpi::telemetry::TelemetryRegistry::GetTable(path)};
           },
           py::arg("path"))
-      .def_static("reset", &TelemetryRegistry::Reset);
+      .def_static("reset", &wpi::telemetry::TelemetryRegistry::Reset);
 
-  py::class_<wpi::DiscardTelemetryBackend, py::smart_holder,
-             wpi::TelemetryBackend>(m, "DiscardTelemetryBackend")
+  py::class_<wpi::telemetry::DiscardTelemetryBackend, py::smart_holder,
+             wpi::telemetry::TelemetryBackend>(m, "DiscardTelemetryBackend")
       .def(py::init<>());
 
-  py::class_<wpi::MultiTelemetryBackend, py::smart_holder,
-             wpi::TelemetryBackend>(m, "MultiTelemetryBackend")
+  py::class_<wpi::telemetry::MultiTelemetryBackend, py::smart_holder,
+             wpi::telemetry::TelemetryBackend>(m, "MultiTelemetryBackend")
       .def(py::init<>())
-      .def(py::init<std::vector<std::shared_ptr<TelemetryBackend>>>(),
-           py::arg("backends"));
+      .def(
+          py::init<
+              std::vector<std::shared_ptr<wpi::telemetry::TelemetryBackend>>>(),
+          py::arg("backends"));
 
-  py::class_<wpi::MockTelemetryBackend, py::smart_holder,
-             wpi::TelemetryBackend>(m, "MockTelemetryBackend")
+  py::class_<wpi::telemetry::MockTelemetryBackend, py::smart_holder,
+             wpi::telemetry::TelemetryBackend>(m, "MockTelemetryBackend")
       .def(py::init<>())
-      .def("clear", &MockTelemetryBackend::Clear)
+      .def("clear", &wpi::telemetry::MockTelemetryBackend::Clear)
       .def("get_actions",
-           [](const MockTelemetryBackend& self) {
+           [](const wpi::telemetry::MockTelemetryBackend& self) {
              py::list actions;
              for (const auto& action : self.GetActions()) {
                actions.append(ActionValueToPython(action));
@@ -622,7 +633,8 @@ void wpi::InitTelemetryPython(py::module_& m) {
              return actions;
            })
       .def("get_last_action",
-           [](const MockTelemetryBackend& self, std::string_view path) {
+           [](const wpi::telemetry::MockTelemetryBackend& self,
+              std::string_view path) {
              auto* action = self.GetLastAction(path);
              if (!action) {
                return py::object{py::none{}};
@@ -630,7 +642,8 @@ void wpi::InitTelemetryPython(py::module_& m) {
              return ActionValueToPython(*action);
            })
       .def("get_last_value",
-           [](const MockTelemetryBackend& self, std::string_view path) {
+           [](const wpi::telemetry::MockTelemetryBackend& self,
+              std::string_view path) {
              auto* action = self.GetLastAction(path);
              if (!action) {
                return py::object{py::none{}};
@@ -639,8 +652,8 @@ void wpi::InitTelemetryPython(py::module_& m) {
                  py::reinterpret_borrow<py::dict>(ActionValueToPython(*action));
              return py::object{result["value"]};
            })
-      .def("get_schema",
-           [](MockTelemetryBackend& self, std::string_view schemaName) {
-             return SchemaToPython(self.GetSchema(schemaName));
-           });
+      .def("get_schema", [](wpi::telemetry::MockTelemetryBackend& self,
+                            std::string_view schemaName) {
+        return SchemaToPython(self.GetSchema(schemaName));
+      });
 }

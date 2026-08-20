@@ -41,7 +41,7 @@ bool ProxyCommand::IsFinished() {
   return m_command == nullptr || !m_command->IsScheduled();
 }
 
-void ProxyCommand::LogTo(wpi::TelemetryTable& table) const {
+void ProxyCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("proxied", m_command ? m_command->GetName() : std::string{"null"});
 }

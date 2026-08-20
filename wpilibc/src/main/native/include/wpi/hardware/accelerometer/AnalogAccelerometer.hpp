@@ -19,7 +19,7 @@ namespace wpi {
  * sensors have multiple axis and can be treated as multiple devices. Each is
  * calibrated by finding the center value over a period of time.
  */
-class AnalogAccelerometer : public wpi::TelemetryLoggable {
+class AnalogAccelerometer : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Create a new instance of an accelerometer.
@@ -89,7 +89,7 @@ class AnalogAccelerometer : public wpi::TelemetryLoggable {
    */
   void SetZero(double zero);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

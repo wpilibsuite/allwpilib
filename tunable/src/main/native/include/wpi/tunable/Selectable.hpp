@@ -17,10 +17,10 @@
 #include "wpi/tunable/Tunable.hpp"
 #include "wpi/util/StringMap.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 namespace detail {
-class SelectableBase : public wpi::ComplexTunable {
+class SelectableBase : public wpi::tunable::ComplexTunable {
  public:
   SelectableBase();
 
@@ -29,15 +29,15 @@ class SelectableBase : public wpi::ComplexTunable {
   SelectableBase& operator=(const SelectableBase& oth) = delete;
   SelectableBase& operator=(SelectableBase&& oth) = default;
 
-  void PublishTunable(wpi::TunableTable& table) override;
+  void PublishTunable(wpi::tunable::TunableTable& table) override;
   std::string_view GetTunableType() const override;
 
  protected:
   virtual void Changed(std::string_view val) = 0;
 
-  wpi::Tunable<std::string> m_defaultChoice;
-  wpi::Tunable<std::vector<std::string>> m_options;
-  wpi::Tunable<std::string> m_selected;
+  wpi::tunable::Tunable<std::string> m_defaultChoice;
+  wpi::tunable::Tunable<std::vector<std::string>> m_options;
+  wpi::tunable::Tunable<std::string> m_selected;
 };
 }  // namespace detail
 
@@ -200,4 +200,4 @@ class Selectable final : public detail::SelectableBase {
   }
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

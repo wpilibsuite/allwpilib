@@ -143,29 +143,30 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
           "[wpimath]") {
   using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
 
-  wpi::TunableRegistry::Reset();
-  auto backend = std::make_shared<wpi::MockTunableBackend>();
-  wpi::TunableRegistry::RegisterBackend("", backend);
+  wpi::tunable::TunableRegistry::Reset();
+  auto backend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   Controller controller{0.0, 0.0, 0.0, {1_rad_per_s, 1_rad_per_s_sq}};
-  wpi::Tunables::Publish("profiled", controller);
+  wpi::tunable::Tunables::Publish("profiled", controller);
 
   auto constraintsUid = backend->GetUid("/profiled/constraints");
   REQUIRE(constraintsUid.has_value());
-  auto constraintsInfo = wpi::TunableRegistry::GetTunable(*constraintsUid);
+  auto constraintsInfo =
+      wpi::tunable::TunableRegistry::GetTunable(*constraintsUid);
   REQUIRE(static_cast<bool>(constraintsInfo));
   REQUIRE(constraintsInfo.config != nullptr);
   CHECK(constraintsInfo.config->polling ==
-        wpi::TunableConfig::Polling::GET_ON_CHANGE);
+        wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE);
   CHECK_FALSE(constraintsInfo.IsChanged());
 
   controller.SetConstraints({2_rad_per_s, 2_rad_per_s_sq});
-  constraintsInfo = wpi::TunableRegistry::GetTunable(*constraintsUid);
+  constraintsInfo = wpi::tunable::TunableRegistry::GetTunable(*constraintsUid);
   CHECK(constraintsInfo.IsChanged());
 
   backend->SetStruct("/profiled/constraints",
                      Controller::Constraints{10_rad_per_s, 10_rad_per_s_sq});
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(10_rad_per_s == controller.GetConstraints().maxVelocity);
   CHECK(10_rad_per_s_sq == controller.GetConstraints().maxAcceleration);
@@ -174,38 +175,39 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
   controller.Calculate(0_rad, 10_rad);
   CHECK(std::abs(0.2 - controller.GetSetpoint().velocity.value()) <= 1e-9);
 
-  wpi::TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedGoalUpdatesGoal", "[wpimath]") {
   using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
 
-  wpi::TunableRegistry::Reset();
-  auto backend = std::make_shared<wpi::MockTunableBackend>();
-  wpi::TunableRegistry::RegisterBackend("", backend);
+  wpi::tunable::TunableRegistry::Reset();
+  auto backend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", backend);
 
   Controller controller{0.0, 0.0, 0.0, {1_rad_per_s, 1_rad_per_s_sq}};
-  wpi::Tunables::Publish("profiled", controller);
+  wpi::tunable::Tunables::Publish("profiled", controller);
 
   auto goalUid = backend->GetUid("/profiled/goal");
   REQUIRE(goalUid.has_value());
-  auto goalInfo = wpi::TunableRegistry::GetTunable(*goalUid);
+  auto goalInfo = wpi::tunable::TunableRegistry::GetTunable(*goalUid);
   REQUIRE(static_cast<bool>(goalInfo));
   REQUIRE(goalInfo.config != nullptr);
-  CHECK(goalInfo.config->polling == wpi::TunableConfig::Polling::GET_ON_CHANGE);
+  CHECK(goalInfo.config->polling ==
+        wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE);
   CHECK_FALSE(goalInfo.IsChanged());
 
   backend->SetDouble("/profiled/goal", 2.0);
-  wpi::TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(2_rad == controller.GetGoal().position);
   CHECK(0_rad_per_s == controller.GetGoal().velocity);
 
   controller.SetGoal(3_rad);
-  CHECK(wpi::TunableRegistry::GetTunable(*goalUid).IsChanged());
-  wpi::TunableRegistry::Update();
+  CHECK(wpi::tunable::TunableRegistry::GetTunable(*goalUid).IsChanged());
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(backend->GetDouble("/profiled/goal") == 3.0);
 
-  wpi::TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
 }

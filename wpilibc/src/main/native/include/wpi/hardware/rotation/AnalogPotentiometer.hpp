@@ -17,7 +17,7 @@ namespace wpi {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public wpi::TelemetryLoggable {
+class AnalogPotentiometer : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.
@@ -98,7 +98,7 @@ class AnalogPotentiometer : public wpi::TelemetryLoggable {
    */
   double Get() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

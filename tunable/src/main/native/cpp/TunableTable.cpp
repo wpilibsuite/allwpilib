@@ -14,6 +14,7 @@
 #include "wpi/tunable/detail/TunableMember.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 TunableTable TunableTable::GetTable(std::string_view name) {
   return TunableTable{std::format("{}{}/", m_path, name)};

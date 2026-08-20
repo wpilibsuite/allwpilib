@@ -26,8 +26,9 @@ class RobotContainer {
   // The enum used as keys for selecting the command to run.
   enum CommandSelector { ONE, TWO, THREE };
 
-  // An example of how command selector may be used with Selectable
-  wpi::Selectable<CommandSelector> chooser;
+  // An example of how command selector may be used with
+  // wpi::tunable::Selectable
+  wpi::tunable::Selectable<CommandSelector> chooser;
 
   // The robot's subsystems and commands are defined here...
 

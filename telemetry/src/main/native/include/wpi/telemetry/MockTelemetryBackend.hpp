@@ -17,7 +17,7 @@
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 /**
  * A telemetry backend that saves logged data to an array for unit testing
@@ -204,4 +204,4 @@ class MockTelemetryBackend : public TelemetryBackend {
   std::vector<Action> m_actions;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

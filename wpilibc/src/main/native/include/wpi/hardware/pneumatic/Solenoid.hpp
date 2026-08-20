@@ -21,7 +21,7 @@ namespace wpi {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  */
-class Solenoid : public wpi::TelemetryLoggable {
+class Solenoid : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a solenoid for a specified module and type.
@@ -110,7 +110,7 @@ class Solenoid : public wpi::TelemetryLoggable {
    */
   void StartPulse();
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

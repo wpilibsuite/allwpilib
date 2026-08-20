@@ -13,7 +13,7 @@
 
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 
-namespace wpi::detail {
+namespace wpi::tunable::detail {
 
 template <typename T>
 struct always_false : std::false_type {};
@@ -74,4 +74,4 @@ concept TunableValueType =
     std::same_as<T, std::vector<double>> ||
     std::same_as<T, std::vector<std::string>>;
 
-}  // namespace wpi::detail
+}  // namespace wpi::tunable::detail

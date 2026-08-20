@@ -41,7 +41,7 @@ int DigitalInput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalInput::LogTo(wpi::TelemetryTable& table) const {
+void DigitalInput::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

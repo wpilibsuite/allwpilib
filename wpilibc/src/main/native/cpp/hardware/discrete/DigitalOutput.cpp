@@ -132,7 +132,7 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::LogTo(wpi::TelemetryTable& table) const {
+void DigitalOutput::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

@@ -20,8 +20,8 @@ class Robot : public wpi::TimedRobot {
     wpi::units::meters_per_second_squared_t filteredXAccel =
         xAccelFilter.Calculate(XAccel);
 
-    wpi::Telemetry::Log("X Acceleration", XAccel);
-    wpi::Telemetry::Log("Filtered X Acceleration", filteredXAccel);
+    wpi::telemetry::Telemetry::Log("X Acceleration", XAccel);
+    wpi::telemetry::Telemetry::Log("Filtered X Acceleration", filteredXAccel);
   }
 
  private:

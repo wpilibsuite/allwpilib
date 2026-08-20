@@ -53,7 +53,7 @@ class ProxyCommand : public CommandHelper<Command, ProxyCommand> {
 
   bool IsFinished() override;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   wpi::util::unique_function<Command*()> m_supplier;

@@ -42,7 +42,7 @@ class RobotContainer {
  private:
   // Assumes a gamepad plugged into channel 0
   wpi::Joystick controller{0};
-  wpi::Selectable<wpi::cmd::Command*> chooser;
+  wpi::tunable::Selectable<wpi::cmd::Command*> chooser;
 
   // The robot's subsystems
   Drivetrain drive;

@@ -24,7 +24,7 @@ namespace wpi {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public wpi::TelemetryLoggable {
+class AnalogInput : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an analog input.
@@ -73,7 +73,7 @@ class AnalogInput : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

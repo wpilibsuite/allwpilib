@@ -13,7 +13,7 @@
 
 #include "wpi/tunable/CustomTunable.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 template <typename T, typename... I>
 class Tunable;
@@ -148,4 +148,4 @@ class TunableTable final {
   std::string m_path;
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

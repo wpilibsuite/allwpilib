@@ -36,7 +36,8 @@ namespace wpi::cmd {
  * @see CommandScheduler
  * @see CommandHelper
  */
-class Command : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
+class Command : public wpi::telemetry::TelemetryLoggable,
+                public wpi::tunable::ComplexTunable {
  public:
   ~Command() override;
 
@@ -464,9 +465,9 @@ class Command : public wpi::TelemetryLoggable, public wpi::ComplexTunable {
    */
   virtual CommandPtr ToPtr() && = 0;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
-  void PublishTunable(wpi::TunableTable& table) override;
+  void PublishTunable(wpi::tunable::TunableTable& table) override;
   void UpdateTunable() const override;
   std::string_view GetTunableType() const override;
 

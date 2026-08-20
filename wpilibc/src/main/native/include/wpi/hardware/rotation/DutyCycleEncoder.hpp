@@ -19,7 +19,7 @@ class DutyCycle;
  * PWM Output, the CTRE Mag Encoder, the Rev Hex Encoder, and the AM Mag
  * Encoder.
  */
-class DutyCycleEncoder : public wpi::TelemetryLoggable {
+class DutyCycleEncoder : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct a new DutyCycleEncoder on a specific channel.
@@ -174,7 +174,7 @@ class DutyCycleEncoder : public wpi::TelemetryLoggable {
    */
   int GetSourceChannel() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

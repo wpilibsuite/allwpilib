@@ -20,8 +20,8 @@ class Robot : public wpi::TimedRobot {
     // 1 is fully on, 0 is fully off
     auto output = dutyCycle.GetOutput();
 
-    wpi::Telemetry::Log("Frequency", frequency);
-    wpi::Telemetry::Log("Duty Cycle", output);
+    wpi::telemetry::Telemetry::Log("Frequency", frequency);
+    wpi::telemetry::Telemetry::Log("Duty Cycle", output);
   }
 };
 

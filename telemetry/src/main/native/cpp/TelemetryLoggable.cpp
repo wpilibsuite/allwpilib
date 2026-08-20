@@ -5,5 +5,6 @@
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 void TelemetryLoggable::anchor() {}

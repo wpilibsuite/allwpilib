@@ -22,7 +22,7 @@ namespace wpi {
  * optical sensor detecting tape on a shooter wheel. Unlike encoders, this class
  * only needs a single digital input.
  */
-class Tachometer : public wpi::TelemetryLoggable {
+class Tachometer : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a new tachometer.
@@ -102,7 +102,7 @@ class Tachometer : public wpi::TelemetryLoggable {
    */
   bool GetStopped() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

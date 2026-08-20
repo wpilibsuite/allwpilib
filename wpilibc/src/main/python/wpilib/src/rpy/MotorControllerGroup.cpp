@@ -41,7 +41,8 @@ void PyMotorControllerGroup::Disable() {
   }
 }
 
-void PyMotorControllerGroup::LogTo(wpi::TelemetryTable& table) const {
+void PyMotorControllerGroup::LogTo(
+    wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", GetThrottle());
 }
 

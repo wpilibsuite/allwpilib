@@ -18,21 +18,21 @@
 
 struct Mechanism2dTest {
   Mechanism2dTest() {
-    wpi::TelemetryRegistry::Reset();
-    wpi::TelemetryRegistry::RegisterBackend("", mock);
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
   }
 
-  ~Mechanism2dTest() { wpi::TelemetryRegistry::Reset(); }
+  ~Mechanism2dTest() { wpi::telemetry::TelemetryRegistry::Reset(); }
 
-  std::shared_ptr<wpi::MockTelemetryBackend> mock =
-      std::make_shared<wpi::MockTelemetryBackend>();
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> mock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
 };
 
 TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
                  "[wpilibc][smartdashboard]") {
   wpi::Mechanism2d mechanism{5, 10};
 
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
     auto actions = mock->GetActions();
     REQUIRE(actions.size() == 3u);
@@ -43,7 +43,8 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
     CHECK(5.0 == (*dims)[0]);
     CHECK(10.0 == (*dims)[1]);
 
-    auto color = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
         "/mechanism/backgroundColor");
     REQUIRE(color);
     CHECK("#000020" == color->value);
@@ -51,9 +52,10 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
   }
 
   mechanism.SetBackgroundColor({255, 255, 255});
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
-    auto color = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
         "/mechanism/backgroundColor");
     REQUIRE(color);
     CHECK("#FFFFFF" == color->value);
@@ -64,7 +66,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Root",
                  "[wpilibc][smartdashboard]") {
   wpi::Mechanism2d mechanism{5, 10};
   wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
     auto pos =
         mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
@@ -75,7 +77,7 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Root",
     mock->Clear();
   }
   root->SetPosition(2, 4);
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
     auto pos =
         mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
@@ -93,12 +95,13 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
   wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
       "ligament", 3, wpi::units::degree_t{90}, 1,
       wpi::util::Color8Bit{255, 255, 255});
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
     auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
     REQUIRE(angle);
     CHECK(ligament->GetAngle() == *angle);
-    auto color = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
         "/mechanism/root/ligament/color");
     REQUIRE(color);
     CHECK(ligament->GetColor().HexString() == color->value);
@@ -115,12 +118,13 @@ TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);
-  wpi::Telemetry::Log("mechanism", mechanism);
+  wpi::telemetry::Telemetry::Log("mechanism", mechanism);
   {
     auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
     REQUIRE(angle);
     CHECK(ligament->GetAngle() == *angle);
-    auto color = mock->GetLastValue<wpi::MockTelemetryBackend::LogStringValue>(
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
         "/mechanism/root/ligament/color");
     REQUIRE(color);
     CHECK(ligament->GetColor().HexString() == color->value);

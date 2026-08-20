@@ -403,7 +403,7 @@ std::string_view Switch2GCController::GetTelemetryType() const {
   return "HID:Switch2GC";
 }
 
-void Switch2GCController::LogTo(wpi::TelemetryTable& table) const {
+void Switch2GCController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("CStickX", GetCStickX());

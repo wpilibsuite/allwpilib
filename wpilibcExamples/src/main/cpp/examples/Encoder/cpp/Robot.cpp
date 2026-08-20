@@ -40,10 +40,10 @@ class Robot : public wpi::TimedRobot {
 
   void TeleopPeriodic() override {
     // Retrieve the net displacement of the Encoder since the last Reset.
-    wpi::Telemetry::Log("Encoder Distance", encoder.GetDistance());
+    wpi::telemetry::Telemetry::Log("Encoder Distance", encoder.GetDistance());
 
     // Retrieve the current rate of the encoder.
-    wpi::Telemetry::Log("Encoder Rate", encoder.GetRate());
+    wpi::telemetry::Telemetry::Log("Encoder Rate", encoder.GetRate());
   }
 
  private:

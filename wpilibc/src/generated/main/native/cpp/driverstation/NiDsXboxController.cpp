@@ -262,7 +262,7 @@ std::string_view NiDsXboxController::GetTelemetryType() const {
   return "HID:NiDsXbox";
 }
 
-void NiDsXboxController::LogTo(wpi::TelemetryTable& table) const {
+void NiDsXboxController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftTrigger Axis", GetLeftTriggerAxis());
   table.Log("RightTrigger Axis", GetRightTriggerAxis());
   table.Log("LeftX", GetLeftX());

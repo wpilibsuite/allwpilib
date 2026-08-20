@@ -603,7 +603,7 @@ double Gamepad::GetAxisForTelemetry(Axis axis) const {
       .value_or(0.0);
 }
 
-void Gamepad::LogTo(wpi::TelemetryTable& table) const {
+void Gamepad::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftTriggerAxis", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
   table.Log("RightTriggerAxis", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
   table.Log("LeftXAxis", GetAxisForTelemetry(Axis::LEFT_X));

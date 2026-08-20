@@ -14,7 +14,7 @@
 namespace wpi {
 
 class PyMotorControllerGroup : public MotorController,
-                               public wpi::TelemetryLoggable {
+                               public wpi::telemetry::TelemetryLoggable {
  public:
   explicit PyMotorControllerGroup(
       std::vector<std::shared_ptr<wpi::MotorController>>&& args)
@@ -31,7 +31,7 @@ class PyMotorControllerGroup : public MotorController,
   bool GetInverted() const override;
   void Disable() override;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
 
  private:

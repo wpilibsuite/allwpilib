@@ -316,7 +316,7 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-void PowerDistribution::LogTo(wpi::TelemetryTable& table) const {
+void PowerDistribution::LogTo(wpi::telemetry::TelemetryTable& table) const {
   // Use manual reads to avoid printing errors
   int32_t status = 0;
   int32_t size = GetNumChannels();

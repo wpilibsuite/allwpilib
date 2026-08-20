@@ -12,7 +12,7 @@
 
 #include "wpi/tunable/detail/TunableTypeValue.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 struct TunableConfig;
 
@@ -116,4 +116,4 @@ class TunableBackend {
   virtual void Update() = 0;
 };
 
-}  // namespace wpi
+}  // namespace wpi::tunable

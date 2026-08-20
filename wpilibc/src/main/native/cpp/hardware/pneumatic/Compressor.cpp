@@ -76,7 +76,7 @@ CompressorConfigType Compressor::GetConfigType() const {
   return m_module->GetCompressorConfigType();
 }
 
-void Compressor::LogTo(wpi::TelemetryTable& table) const {
+void Compressor::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Enabled", IsEnabled());
   table.Log("Pressure switch", GetPressureSwitchValue());
   table.Log("Current (A)", GetCurrent());

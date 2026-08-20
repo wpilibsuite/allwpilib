@@ -58,7 +58,7 @@ Command::InterruptionBehavior RepeatCommand::GetInterruptionBehavior() const {
   return m_command->GetInterruptionBehavior();
 }
 
-void RepeatCommand::LogTo(wpi::TelemetryTable& table) const {
+void RepeatCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("command", m_command->GetName());
 }

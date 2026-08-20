@@ -16,7 +16,7 @@
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/mutex.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 /**
  * A telemetry backend that forwards logged data to multiple child backends.
@@ -107,4 +107,4 @@ class MultiTelemetryBackend : public TelemetryBackend {
   wpi::util::StringMap<std::shared_ptr<Entry>> m_entries;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

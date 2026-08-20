@@ -88,7 +88,7 @@ PWMMotorController::PWMMotorController(int channel) : m_pwm{channel} {
   }
 }
 
-void PWMMotorController::LogTo(wpi::TelemetryTable& table) const {
+void PWMMotorController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", GetThrottle());
 }
 

@@ -20,7 +20,7 @@ void HatchSubsystem::ReleaseHatch() {
   hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE);
 }
 
-void HatchSubsystem::LogTo(wpi::TelemetryTable& table) const {
+void HatchSubsystem::LogTo(wpi::telemetry::TelemetryTable& table) const {
   SubsystemBase::LogTo(table);
 
   // Publish the solenoid state to telemetry.

@@ -123,7 +123,7 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() const {
                  rawData[2] * GS_PER_LSB};
 }
 
-void ADXL345_I2C::LogTo(wpi::TelemetryTable& table) const {
+void ADXL345_I2C::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", GetAccelerations());
 }
 

@@ -30,7 +30,7 @@ bool WaitCommand::RunsWhenDisabled() const {
   return true;
 }
 
-void WaitCommand::LogTo(wpi::TelemetryTable& table) const {
+void WaitCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("duration", m_duration);
 }

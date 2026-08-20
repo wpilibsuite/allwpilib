@@ -493,7 +493,7 @@ std::vector<int64_t> CommandScheduler::GetScheduledCommandIds() const {
   return ids;
 }
 
-void CommandScheduler::LogTo(wpi::TelemetryTable& table) const {
+void CommandScheduler::LogTo(wpi::telemetry::TelemetryTable& table) const {
   std::vector<std::string> names = GetScheduledCommandNames();
   table.Log("Names", names);
 
@@ -505,24 +505,26 @@ std::string_view CommandScheduler::GetTelemetryType() const {
   return "Scheduler";
 }
 
-void CommandScheduler::PublishTunable(wpi::TunableTable& table) {
+void CommandScheduler::PublishTunable(wpi::tunable::TunableTable& table) {
   UpdateTunable();
   table.Publish(
       "Names", this, &CommandScheduler::m_scheduledCommandNames,
-      wpi::TunableConfig{.isMutable = false,
-                         .parent = this,
-                         .polling = wpi::TunableConfig::Polling::ALWAYS_GET});
+      wpi::tunable::TunableConfig{
+          .isMutable = false,
+          .parent = this,
+          .polling = wpi::tunable::TunableConfig::Polling::ALWAYS_GET});
   table.Publish(
       "Ids", this, &CommandScheduler::m_scheduledCommandIds,
-      wpi::TunableConfig{.isMutable = false,
-                         .parent = this,
-                         .polling = wpi::TunableConfig::Polling::ALWAYS_GET});
+      wpi::tunable::TunableConfig{
+          .isMutable = false,
+          .parent = this,
+          .polling = wpi::tunable::TunableConfig::Polling::ALWAYS_GET});
   table.Publish(
       "Cancel", this, &CommandScheduler::m_toCancel,
-      wpi::TunableConfig{
+      wpi::tunable::TunableConfig{
           .robust = true,
           .onTune =
-              [](TunableBase&, ComplexTunable* self) {
+              [](TunableBase&, wpi::tunable::ComplexTunable* self) {
                 auto scheduler = static_cast<CommandScheduler*>(self);
                 for (auto cancel : scheduler->m_toCancel) {
                   uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);

@@ -10,7 +10,7 @@
 
 using namespace wpi::math;
 
-void PIDController::LogTo(wpi::TelemetryTable& table) const {
+void PIDController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("p", GetP());
   table.Log("i", GetI());
   table.Log("d", GetD());
@@ -27,14 +27,14 @@ std::string_view PIDController::GetTelemetryType() const {
   return "PIDController";
 }
 
-void PIDController::PublishTunable(wpi::TunableTable& table) {
+void PIDController::PublishTunable(wpi::tunable::TunableTable& table) {
   table.Publish("p", m_Kp);
   table.Publish("i", m_Ki);
   table.Publish("d", m_Kd);
   table.Publish("izone", m_iZone);
-  auto setpointConfig = wpi::TunableConfig::GetOnChange();
-  setpointConfig.onTune = [](wpi::detail::TunableBase&,
-                             wpi::ComplexTunable* self) {
+  auto setpointConfig = wpi::tunable::TunableConfig::GetOnChange();
+  setpointConfig.onTune = [](wpi::tunable::detail::TunableBase&,
+                             wpi::tunable::ComplexTunable* self) {
     if (auto controller = static_cast<PIDController*>(self)) {
       controller->SetSetpoint(controller->GetSetpoint());
     }

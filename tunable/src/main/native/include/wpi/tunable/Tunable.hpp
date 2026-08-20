@@ -23,7 +23,7 @@
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
-namespace wpi {
+namespace wpi::tunable {
 
 struct TunableConfig;
 
@@ -244,4 +244,4 @@ std::unique_ptr<detail::TunableMemberBase> MakeTunableMember(T Class::* member,
       member, std::forward<Args>(args)...);
 }
 
-}  // namespace wpi
+}  // namespace wpi::tunable

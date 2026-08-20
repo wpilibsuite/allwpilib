@@ -49,7 +49,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
   drive.SetMaxOutput(maxOutput);
 }
 
-void DriveSubsystem::LogTo(wpi::TelemetryTable& table) const {
+void DriveSubsystem::LogTo(wpi::telemetry::TelemetryTable& table) const {
   SubsystemBase::LogTo(table);
 
   // Publish encoder distances to telemetry.

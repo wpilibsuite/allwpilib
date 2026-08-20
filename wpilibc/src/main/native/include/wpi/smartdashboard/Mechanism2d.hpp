@@ -33,7 +33,7 @@ namespace wpi {
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-class Mechanism2d : public wpi::TelemetryLoggable {
+class Mechanism2d : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Create a new Mechanism2d with the given dimensions and background color.
@@ -69,7 +69,7 @@ class Mechanism2d : public wpi::TelemetryLoggable {
    */
   void SetBackgroundColor(const wpi::util::Color8Bit& color);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

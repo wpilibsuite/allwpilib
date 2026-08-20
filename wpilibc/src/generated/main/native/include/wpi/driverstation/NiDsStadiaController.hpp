@@ -26,7 +26,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class NiDsStadiaController : public HIDDevice, public wpi::TelemetryLoggable {
+class NiDsStadiaController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -650,7 +650,7 @@ class NiDsStadiaController : public HIDDevice, public wpi::TelemetryLoggable {
   void SetRumble(GenericHID::RumbleType type, double value);
 
   std::string_view GetTelemetryType() const override;
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   GenericHID* m_hid;

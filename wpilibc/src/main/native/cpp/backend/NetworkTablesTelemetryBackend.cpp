@@ -21,7 +21,8 @@
 
 using namespace wpi::backend;
 
-class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
+class NetworkTablesTelemetryBackend::Entry
+    : public wpi::telemetry::TelemetryEntry {
  public:
   Entry(wpi::nt::NetworkTableInstance inst, std::string_view prefix,
         std::string_view path)
@@ -59,7 +60,8 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
     }
     auto parsedValue = wpi::util::json::parse(value);
     if (!parsedValue) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "invalid property JSON");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path,
+                                                       "invalid property JSON");
       return;
     }
 
@@ -95,7 +97,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetBoolean(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -112,7 +114,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetInteger(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -129,7 +131,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetFloat(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -146,7 +148,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetDouble(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -163,7 +165,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = m_typeString != typeString || !m_pub.SetString(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -180,7 +182,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetBooleanArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -197,7 +199,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetBooleanArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -224,7 +226,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetIntegerArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -241,7 +243,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetFloatArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -258,7 +260,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetDoubleArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -275,7 +277,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = !m_pub.SetStringArray(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -302,7 +304,7 @@ class NetworkTablesTelemetryBackend::Entry : public wpi::TelemetryEntry {
       typeMismatch = m_typeString != typeString || !m_pub.SetRaw(value);
     }
     if (typeMismatch) {
-      wpi::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
+      wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
@@ -329,8 +331,8 @@ NetworkTablesTelemetryBackend::NetworkTablesTelemetryBackend(
 
 NetworkTablesTelemetryBackend::~NetworkTablesTelemetryBackend() = default;
 
-std::shared_ptr<wpi::TelemetryEntry> NetworkTablesTelemetryBackend::GetEntry(
-    std::string_view path) {
+std::shared_ptr<wpi::telemetry::TelemetryEntry>
+NetworkTablesTelemetryBackend::GetEntry(std::string_view path) {
   std::scoped_lock lock{m_mutex};
   auto it = m_entries.find(path);
   if (it != m_entries.end()) {

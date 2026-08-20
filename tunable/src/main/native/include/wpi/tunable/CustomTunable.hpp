@@ -7,7 +7,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace wpi {
+namespace wpi::tunable {
 
 template <typename T, typename... I>
 struct CustomTunable {};
@@ -46,4 +46,4 @@ template <typename T, typename... I>
 concept IsCustomTunable = CustomTunableType<T, I...> || CustomTunableADL<T>;
 
 }  // namespace detail
-}  // namespace wpi
+}  // namespace wpi::tunable

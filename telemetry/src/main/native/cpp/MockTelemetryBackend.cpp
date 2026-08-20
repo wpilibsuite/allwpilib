@@ -14,6 +14,7 @@
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 static std::string_view NormalizeName(std::string_view path, std::string& buf) {
   if (util::starts_with(path, '/') && !util::contains(path, "//")) {

@@ -35,6 +35,7 @@
 
 using namespace wpi;
 using namespace wpi::backend;
+using namespace wpi::tunable;
 
 namespace {
 

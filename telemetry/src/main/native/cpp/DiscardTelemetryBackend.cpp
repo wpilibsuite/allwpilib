@@ -10,6 +10,7 @@
 #include "wpi/telemetry/TelemetryEntry.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 namespace {
 class Entry : public TelemetryEntry {

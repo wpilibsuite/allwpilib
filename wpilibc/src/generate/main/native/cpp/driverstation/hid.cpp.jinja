@@ -97,7 +97,7 @@ std::string_view {{ ConsoleName }}Controller::GetTelemetryType() const {
   return "HID:{{ ConsoleName }}";
 }
 
-void {{ ConsoleName }}Controller::LogTo(wpi::TelemetryTable& table) const {
+void {{ ConsoleName }}Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
 {%- for trigger in triggers %}
   table.Log("{{ capitalize_first(trigger.name) }} Axis", Get{{ capitalize_first(trigger.name) }}Axis());
 {%- endfor -%}

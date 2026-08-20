@@ -100,7 +100,7 @@ void ParallelDeadlineGroup::SetDeadline(std::unique_ptr<Command>&& deadline) {
   m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
 }
 
-void ParallelDeadlineGroup::LogTo(wpi::TelemetryTable& table) const {
+void ParallelDeadlineGroup::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("deadline", m_deadline->GetName());
 }

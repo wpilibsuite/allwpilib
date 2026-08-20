@@ -18,7 +18,7 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   m_y = y;
 }
 
-void MechanismRoot2d::LogTo(wpi::TelemetryTable& table) const {
+void MechanismRoot2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
   {
     std::scoped_lock lock(m_mutex);
     table.Log("position", {m_x, m_y});

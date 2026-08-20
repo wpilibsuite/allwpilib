@@ -24,7 +24,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class Gamepad : public HIDDevice, public wpi::TelemetryLoggable {
+class Gamepad : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** Represents a digital button on an Gamepad. */
   enum class Button {
@@ -1264,7 +1264,7 @@ class Gamepad : public HIDDevice, public wpi::TelemetryLoggable {
    */
   TouchpadFinger GetTouchpadFinger(int touchpad, int finger) const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
 
  private:

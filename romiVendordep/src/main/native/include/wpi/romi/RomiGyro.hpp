@@ -22,7 +22,7 @@ namespace wpi::romi {
  * This class is for the Romi onboard gyro, and will only work in
  * simulation/Romi mode. Only one instance of a RomiGyro is supported.
  */
-class RomiGyro : public wpi::TelemetryLoggable {
+class RomiGyro : public wpi::telemetry::TelemetryLoggable {
  public:
   RomiGyro();
 
@@ -95,7 +95,7 @@ class RomiGyro : public wpi::TelemetryLoggable {
   void Reset();
 
   std::string_view GetTelemetryType() const override;
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   hal::SimDevice m_simDevice;

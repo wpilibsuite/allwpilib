@@ -22,63 +22,68 @@
 #include "wpi/tunable/Tunables.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 TEST_CASE("TunableRegistryTest ReportWarning", "[tunable]") {
   std::string lastWarning;
-  TunableRegistry::SetReportWarning(
+  wpi::tunable::TunableRegistry::SetReportWarning(
       [&lastWarning](std::string_view msg) { lastWarning = msg; });
-  TunableRegistry::ReportWarning("test warning");
+  wpi::tunable::TunableRegistry::ReportWarning("test warning");
   CHECK(lastWarning == "test warning");
-  TunableRegistry::SetReportWarning(nullptr);
+  wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
 }
 
 TEST_CASE("TunableRegistryTest ReportWarningAllowsReentry", "[tunable]") {
   std::vector<std::string> warnings;
   bool nested = false;
-  TunableRegistry::SetReportWarning([&](std::string_view msg) {
+  wpi::tunable::TunableRegistry::SetReportWarning([&](std::string_view msg) {
     warnings.emplace_back(msg);
-    auto reportWarning = TunableRegistry::GetReportWarning();
-    TunableRegistry::SetReportWarning(reportWarning);
+    auto reportWarning = wpi::tunable::TunableRegistry::GetReportWarning();
+    wpi::tunable::TunableRegistry::SetReportWarning(reportWarning);
     if (!nested) {
       nested = true;
-      TunableRegistry::ReportWarning("nested warning");
+      wpi::tunable::TunableRegistry::ReportWarning("nested warning");
     }
   });
 
-  TunableRegistry::ReportWarning("outer warning");
+  wpi::tunable::TunableRegistry::ReportWarning("outer warning");
 
   REQUIRE(warnings.size() == 2u);
   CHECK(warnings[0] == "outer warning");
   CHECK(warnings[1] == "nested warning");
-  TunableRegistry::SetReportWarning(nullptr);
+  wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
 }
 
-static_assert(std::derived_from<TunableBool, detail::TunableValueBase<bool>>);
+static_assert(std::derived_from<wpi::tunable::TunableBool,
+                                detail::TunableValueBase<bool>>);
+static_assert(std::derived_from<wpi::tunable::TunableInt32,
+                                detail::TunableValueBase<int32_t>>);
+static_assert(std::derived_from<wpi::tunable::TunableInt64,
+                                detail::TunableValueBase<int64_t>>);
+static_assert(std::derived_from<wpi::tunable::TunableFloat,
+                                detail::TunableValueBase<float>>);
+static_assert(std::derived_from<wpi::tunable::TunableDouble,
+                                detail::TunableValueBase<double>>);
 static_assert(
-    std::derived_from<TunableInt32, detail::TunableValueBase<int32_t>>);
-static_assert(
-    std::derived_from<TunableInt64, detail::TunableValueBase<int64_t>>);
-static_assert(std::derived_from<TunableFloat, detail::TunableValueBase<float>>);
-static_assert(
-    std::derived_from<TunableDouble, detail::TunableValueBase<double>>);
-static_assert(std::derived_from<
-              TunableRaw, detail::TunableValueBase<std::vector<uint8_t>>>);
-static_assert(std::derived_from<TunableBoolVector,
+    std::derived_from<wpi::tunable::TunableRaw,
+                      detail::TunableValueBase<std::vector<uint8_t>>>);
+static_assert(std::derived_from<wpi::tunable::TunableBoolVector,
                                 detail::TunableValueBase<std::vector<bool>>>);
 static_assert(
-    std::derived_from<TunableInt32Vector,
+    std::derived_from<wpi::tunable::TunableInt32Vector,
                       detail::TunableValueBase<std::vector<int32_t>>>);
 static_assert(
-    std::derived_from<TunableInt64Vector,
+    std::derived_from<wpi::tunable::TunableInt64Vector,
                       detail::TunableValueBase<std::vector<int64_t>>>);
-static_assert(std::derived_from<TunableFloatVector,
+static_assert(std::derived_from<wpi::tunable::TunableFloatVector,
                                 detail::TunableValueBase<std::vector<float>>>);
-static_assert(std::derived_from<TunableDoubleVector,
+static_assert(std::derived_from<wpi::tunable::TunableDoubleVector,
                                 detail::TunableValueBase<std::vector<double>>>);
-static_assert(std::same_as<decltype(TunableRegistry::GetUpdateMutex()),
-                           wpi::util::recursive_mutex&>);
+static_assert(
+    std::same_as<decltype(wpi::tunable::TunableRegistry::GetUpdateMutex()),
+                 wpi::util::recursive_mutex&>);
 static_assert([] {
-  TunableDouble value{1.0};
+  wpi::tunable::TunableDouble value{1.0};
   value.Set(2.0);
   if (value.Get() != 2.0) {
     return false;
@@ -90,21 +95,22 @@ static_assert([] {
 
 namespace {
 struct TunableTest {
-  TunableTest() { TunableRegistry::RegisterBackend("", backend); }
+  TunableTest() { wpi::tunable::TunableRegistry::RegisterBackend("", backend); }
 
   ~TunableTest() {
-    TunableRegistry::SetReportWarning(nullptr);
-    TunableRegistry::Reset();
+    wpi::tunable::TunableRegistry::SetReportWarning(nullptr);
+    wpi::tunable::TunableRegistry::Reset();
   }
 
-  std::shared_ptr<MockTunableBackend> backend =
-      std::make_shared<MockTunableBackend>();
+  std::shared_ptr<wpi::tunable::MockTunableBackend> backend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
 };
 
-class RecordingChangedBackend : public TunableBackend {
+class RecordingChangedBackend : public wpi::tunable::TunableBackend {
  public:
   bool Publish(std::string_view, uint32_t uid, detail::TunableBase&,
-               const TunableConfig*, detail::TunableTypeValue) override {
+               const wpi::tunable::TunableConfig*,
+               detail::TunableTypeValue) override {
     m_uids.emplace_back(uid);
     return true;
   }
@@ -122,11 +128,11 @@ class RecordingChangedBackend : public TunableBackend {
   void Update() override {
     ++updateCount;
     for (auto uid : m_uids) {
-      auto info = TunableRegistry::GetTunable(uid);
+      auto info = wpi::tunable::TunableRegistry::GetTunable(uid);
       bool changed = info.IsChanged();
       changedStates.emplace_back(changed);
       if (changed) {
-        TunableRegistry::ResetChangedAfterUpdate(uid);
+        wpi::tunable::TunableRegistry::ResetChangedAfterUpdate(uid);
       }
     }
   }
@@ -138,7 +144,7 @@ class RecordingChangedBackend : public TunableBackend {
   std::vector<uint32_t> m_uids;
 };
 
-class RetiringMockTunableBackend : public MockTunableBackend {
+class RetiringMockTunableBackend : public wpi::tunable::MockTunableBackend {
  public:
   void Retire() override { ++retireCount; }
 
@@ -155,7 +161,7 @@ struct ReentrantMockUpdateStruct {
 };
 
 struct ReentrantMockUpdateState {
-  static inline MockTunableBackend* backend = nullptr;
+  static inline wpi::tunable::MockTunableBackend* backend = nullptr;
   static inline bool removePending = false;
   static inline bool queuePending = false;
 };
@@ -178,10 +184,10 @@ class CustomTunableType2 {
   CustomType2<T> Get() const { return CustomType2<T>{m_tunable.Get()}; }
   void Set(CustomType2<T> value) { m_tunable = value.val; }
 
-  Tunable<T>& GetInnerTunable() { return m_tunable; }
+  wpi::tunable::Tunable<T>& GetInnerTunable() { return m_tunable; }
 
  private:
-  Tunable<T> m_tunable;
+  wpi::tunable::Tunable<T> m_tunable;
 };
 
 template <typename T>
@@ -202,7 +208,7 @@ static_assert(std::derived_from<MyTest<CustomType2<int32_t>>,
                                 CustomTunableType2<int32_t>>);
 
 template <>
-class wpi::CustomTunable<CustomType> {
+class wpi::tunable::CustomTunable<CustomType> {
  public:
   CustomTunable() = default;
   explicit CustomTunable(const CustomType& val) : m_tunable{val.val} {}
@@ -210,29 +216,29 @@ class wpi::CustomTunable<CustomType> {
   CustomType Get() const { return CustomType{m_tunable.Get()}; }
   void Set(CustomType value) { m_tunable = value.val; }
 
-  Tunable<int32_t>& GetInnerTunable() { return m_tunable; }
+  wpi::tunable::Tunable<int32_t>& GetInnerTunable() { return m_tunable; }
 
  private:
-  Tunable<int32_t> m_tunable;
+  wpi::tunable::Tunable<int32_t> m_tunable;
 };
 
-static_assert(wpi::detail::CustomTunableType<CustomType>);
+static_assert(wpi::tunable::detail::CustomTunableType<CustomType>);
 
-class InspectableDoubleTunable : public TunableDouble {
+class InspectableDoubleTunable : public wpi::tunable::TunableDouble {
  public:
-  using TunableDouble::TunableDouble;
+  using wpi::tunable::TunableDouble::TunableDouble;
 
   uint32_t GetUid() const { return GetTunableUid(); }
 };
 
-struct AssignableComplex : public ComplexTunable {
+struct AssignableComplex : public wpi::tunable::ComplexTunable {
   explicit AssignableComplex(double value) : gain{value} {}
 
   uint32_t GetUid() const { return GetTunableUid(); }
   uint32_t GetGainUid() const { return gain.GetUid(); }
   double GetGain() const { return gain.Get(); }
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("gain", gain);
   }
 
@@ -264,7 +270,7 @@ struct wpi::util::Struct<ReentrantMockUpdateStruct> {
   static ReentrantMockUpdateStruct Unpack(std::span<const uint8_t> data) {
     if (ReentrantMockUpdateState::removePending) {
       ReentrantMockUpdateState::removePending = false;
-      Tunables::Remove("removeMe");
+      wpi::tunable::Tunables::Remove("removeMe");
     }
     if (ReentrantMockUpdateState::queuePending) {
       ReentrantMockUpdateState::queuePending = false;
@@ -277,12 +283,12 @@ struct wpi::util::Struct<ReentrantMockUpdateStruct> {
   }
 };
 
-struct MemberComplex : public ComplexTunable {
+struct MemberComplex : public wpi::tunable::ComplexTunable {
   int32_t gain = 1;
   TestStruct point{2, 3};
   int updateCount = 0;
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("gain", this, &MemberComplex::gain);
     table.Publish("point", this, &MemberComplex::point);
   }
@@ -292,12 +298,14 @@ struct MemberComplex : public ComplexTunable {
   }
 };
 
-struct RemovableMemberComplex : public ComplexTunable {
+struct RemovableMemberComplex : public wpi::tunable::ComplexTunable {
   int32_t gain = 1;
 
-  void PublishTunable(TunableTable& table) override { PublishGain(table); }
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
+    PublishGain(table);
+  }
 
-  void PublishGain(TunableTable& table) {
+  void PublishGain(wpi::tunable::TunableTable& table) {
     table.Publish("gain", this, &RemovableMemberComplex::gain);
   }
 
@@ -306,24 +314,24 @@ struct RemovableMemberComplex : public ComplexTunable {
   void MarkGainChanged() { SetChildTunableChanged("gain"); }
 };
 
-struct ChangedParentMemberComplex : public ComplexTunable {
+struct ChangedParentMemberComplex : public wpi::tunable::ComplexTunable {
   int32_t gain = 1;
 
-  void PublishTunable(TunableTable&) override {}
+  void PublishTunable(wpi::tunable::TunableTable&) override {}
 
-  void PublishGain(TunableTable& table) {
+  void PublishGain(wpi::tunable::TunableTable& table) {
     table.Publish("gain", this, &ChangedParentMemberComplex::gain);
   }
 
   void MarkChanged() { SetTunableChanged(); }
 };
 
-struct DynamicComplex : public ComplexTunable {
-  TunableDouble initial{1.0};
-  TunableDouble dynamic{2.0};
-  TunableDouble later{3.0};
+struct DynamicComplex : public wpi::tunable::ComplexTunable {
+  wpi::tunable::TunableDouble initial{1.0};
+  wpi::tunable::TunableDouble dynamic{2.0};
+  wpi::tunable::TunableDouble later{3.0};
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("initial", initial);
   }
 
@@ -334,12 +342,12 @@ struct DynamicComplex : public ComplexTunable {
   void RemoveDynamic() { RemoveChildTunable("dynamic"); }
 };
 
-struct UpdatingDynamicComplex : public ComplexTunable {
-  TunableDouble initial{1.0};
-  TunableDouble dynamic{2.0};
+struct UpdatingDynamicComplex : public wpi::tunable::ComplexTunable {
+  wpi::tunable::TunableDouble initial{1.0};
+  wpi::tunable::TunableDouble dynamic{2.0};
   int updateCount = 0;
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("initial", initial);
   }
 
@@ -388,12 +396,14 @@ class FakeProtobufMember : public detail::TunableMemberProtobufBase {
 
   std::string GetProtobufTypeString() const override { return m_typeString; }
 
-  bool UnpackProtobuf(ComplexTunable*, std::span<const uint8_t> data) override {
+  bool UnpackProtobuf(wpi::tunable::ComplexTunable*,
+                      std::span<const uint8_t> data) override {
     m_data.assign(data.begin(), data.end());
     return true;
   }
 
-  bool PackProtobuf(ComplexTunable*, std::vector<uint8_t>& buf) const override {
+  bool PackProtobuf(wpi::tunable::ComplexTunable*,
+                    std::vector<uint8_t>& buf) const override {
     buf = m_data;
     return true;
   }
@@ -408,32 +418,32 @@ class FakeProtobufMember : public detail::TunableMemberProtobufBase {
   std::vector<uint8_t> m_data;
 };
 
-struct FakeProtobufComplex : public ComplexTunable {
-  void PublishTunable(TunableTable& table) override {
+struct FakeProtobufComplex : public wpi::tunable::ComplexTunable {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("value", this,
                   std::make_unique<FakeProtobufMember>(
                       "proto:FakeMember", std::vector<uint8_t>{4, 5, 6}));
   }
 };
 
-struct DirectStructComplex : public ComplexTunable {
+struct DirectStructComplex : public wpi::tunable::ComplexTunable {
   TestStruct point{2, 3};
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("point", this, &DirectStructComplex::point);
   }
 };
 
-struct WrappedStructComplex : public ComplexTunable {
-  Tunable<TestStruct> point{TestStruct{2, 3}};
+struct WrappedStructComplex : public wpi::tunable::ComplexTunable {
+  wpi::tunable::Tunable<TestStruct> point{TestStruct{2, 3}};
 
-  void PublishTunable(TunableTable& table) override {
+  void PublishTunable(wpi::tunable::TunableTable& table) override {
     table.Publish("point", point);
   }
 };
 
 TEST_CASE_METHOD(TunableTest, "TunableTest IntTunable", "[tunable]") {
-  Tunable<int32_t> tunable;
+  wpi::tunable::Tunable<int32_t> tunable;
 
   tunable.Set(42);
   int32_t val = tunable.Get();
@@ -443,28 +453,28 @@ TEST_CASE_METHOD(TunableTest, "TunableTest IntTunable", "[tunable]") {
   val = tunable;
   CHECK(val == 63);
 
-  Tunables::Publish("test", tunable);
+  wpi::tunable::Tunables::Publish("test", tunable);
   backend->SetInt32("/test", 84);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val == 84);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest PrimitiveAndVectorTunables",
                  "[tunable]") {
-  TunableBool boolean{true};
-  TunableInt64 integer64{1};
-  TunableFloat floatValue{2.0f};
-  TunableDouble doubleValue{3.0};
-  TunableString stringValue{"start"};
-  TunableInt32Vector vectorValue{std::vector<int32_t>{1, 2}};
+  wpi::tunable::TunableBool boolean{true};
+  wpi::tunable::TunableInt64 integer64{1};
+  wpi::tunable::TunableFloat floatValue{2.0f};
+  wpi::tunable::TunableDouble doubleValue{3.0};
+  wpi::tunable::TunableString stringValue{"start"};
+  wpi::tunable::TunableInt32Vector vectorValue{std::vector<int32_t>{1, 2}};
 
-  Tunables::Publish("boolean", boolean);
-  Tunables::Publish("integer64", integer64);
-  Tunables::Publish("float", floatValue);
-  Tunables::Publish("double", doubleValue);
-  Tunables::Publish("string", stringValue);
-  Tunables::Publish("vector", vectorValue);
+  wpi::tunable::Tunables::Publish("boolean", boolean);
+  wpi::tunable::Tunables::Publish("integer64", integer64);
+  wpi::tunable::Tunables::Publish("float", floatValue);
+  wpi::tunable::Tunables::Publish("double", doubleValue);
+  wpi::tunable::Tunables::Publish("string", stringValue);
+  wpi::tunable::Tunables::Publish("vector", vectorValue);
 
   backend->SetBool("/boolean", false);
   backend->SetInt64("/integer64", 10);
@@ -474,7 +484,7 @@ TEST_CASE_METHOD(TunableTest, "TunableTest PrimitiveAndVectorTunables",
   std::vector<int32_t> remoteVector{3, 4};
   backend->SetInt32Vector("/vector", remoteVector);
   remoteVector[0] = 99;
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK_FALSE(boolean.Get());
   CHECK(integer64.Get() == 10);
@@ -485,33 +495,35 @@ TEST_CASE_METHOD(TunableTest, "TunableTest PrimitiveAndVectorTunables",
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendGetValues", "[tunable]") {
-  TunableBool boolean{true};
-  TunableInt32 integer32{1};
-  TunableInt64 integer64{2};
-  TunableFloat floatValue{3.0f};
-  TunableDouble doubleValue{4.0};
-  TunableString stringValue{"value"};
-  TunableRaw rawValue{std::vector<uint8_t>{1, 2}};
-  TunableBoolVector boolVector{std::vector<bool>{true, false}};
-  TunableInt32Vector int32Vector{std::vector<int32_t>{3, 4}};
-  TunableInt64Vector int64Vector{std::vector<int64_t>{5, 6}};
-  TunableFloatVector floatVector{std::vector<float>{7.0f, 8.0f}};
-  TunableDoubleVector doubleVector{std::vector<double>{9.0, 10.0}};
-  TunableStringVector stringVector{std::vector<std::string>{"one", "two"}};
+  wpi::tunable::TunableBool boolean{true};
+  wpi::tunable::TunableInt32 integer32{1};
+  wpi::tunable::TunableInt64 integer64{2};
+  wpi::tunable::TunableFloat floatValue{3.0f};
+  wpi::tunable::TunableDouble doubleValue{4.0};
+  wpi::tunable::TunableString stringValue{"value"};
+  wpi::tunable::TunableRaw rawValue{std::vector<uint8_t>{1, 2}};
+  wpi::tunable::TunableBoolVector boolVector{std::vector<bool>{true, false}};
+  wpi::tunable::TunableInt32Vector int32Vector{std::vector<int32_t>{3, 4}};
+  wpi::tunable::TunableInt64Vector int64Vector{std::vector<int64_t>{5, 6}};
+  wpi::tunable::TunableFloatVector floatVector{std::vector<float>{7.0f, 8.0f}};
+  wpi::tunable::TunableDoubleVector doubleVector{
+      std::vector<double>{9.0, 10.0}};
+  wpi::tunable::TunableStringVector stringVector{
+      std::vector<std::string>{"one", "two"}};
 
-  Tunables::Publish("boolean", boolean);
-  Tunables::Publish("integer32", integer32);
-  Tunables::Publish("integer64", integer64);
-  Tunables::Publish("float", floatValue);
-  Tunables::Publish("double", doubleValue);
-  Tunables::Publish("string", stringValue);
-  Tunables::Publish("raw", rawValue);
-  Tunables::Publish("boolVector", boolVector);
-  Tunables::Publish("int32Vector", int32Vector);
-  Tunables::Publish("int64Vector", int64Vector);
-  Tunables::Publish("floatVector", floatVector);
-  Tunables::Publish("doubleVector", doubleVector);
-  Tunables::Publish("stringVector", stringVector);
+  wpi::tunable::Tunables::Publish("boolean", boolean);
+  wpi::tunable::Tunables::Publish("integer32", integer32);
+  wpi::tunable::Tunables::Publish("integer64", integer64);
+  wpi::tunable::Tunables::Publish("float", floatValue);
+  wpi::tunable::Tunables::Publish("double", doubleValue);
+  wpi::tunable::Tunables::Publish("string", stringValue);
+  wpi::tunable::Tunables::Publish("raw", rawValue);
+  wpi::tunable::Tunables::Publish("boolVector", boolVector);
+  wpi::tunable::Tunables::Publish("int32Vector", int32Vector);
+  wpi::tunable::Tunables::Publish("int64Vector", int64Vector);
+  wpi::tunable::Tunables::Publish("floatVector", floatVector);
+  wpi::tunable::Tunables::Publish("doubleVector", doubleVector);
+  wpi::tunable::Tunables::Publish("stringVector", stringVector);
 
   CHECK(backend->GetBool("/boolean"));
   CHECK(backend->GetInt32("/integer32") == 1);
@@ -536,7 +548,7 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendGetValues", "[tunable]") {
         (std::vector<std::string>{"one", "two"}));
 
   MemberComplex complex;
-  Tunables::Publish("member", complex);
+  wpi::tunable::Tunables::Publish("member", complex);
   CHECK(backend->GetInt32("/member/gain") == 1);
 
   CHECK_THROWS_AS(backend->GetString("/integer32"), std::invalid_argument);
@@ -545,15 +557,15 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendGetValues", "[tunable]") {
 
 TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendStructAndProtobufGetters",
                  "[tunable]") {
-  Tunable<TestStruct> structValue{TestStruct{1, 2}};
-  Tunable<std::vector<TestStruct>> structVector{
+  wpi::tunable::Tunable<TestStruct> structValue{TestStruct{1, 2}};
+  wpi::tunable::Tunable<std::vector<TestStruct>> structVector{
       std::vector<TestStruct>{{3, 4}, {5, 6}}};
-  Tunable<std::array<TestStruct, 2>> structArray{
+  wpi::tunable::Tunable<std::array<TestStruct, 2>> structArray{
       std::array<TestStruct, 2>{TestStruct{7, 8}, TestStruct{9, 10}}};
 
-  Tunables::Publish("struct", structValue);
-  Tunables::Publish("structVector", structVector);
-  Tunables::Publish("structArray", structArray);
+  wpi::tunable::Tunables::Publish("struct", structValue);
+  wpi::tunable::Tunables::Publish("structVector", structVector);
+  wpi::tunable::Tunables::Publish("structArray", structArray);
 
   auto readStruct = backend->GetStruct<TestStruct>("/struct");
   CHECK(readStruct.a == 1);
@@ -576,19 +588,19 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendStructAndProtobufGetters",
   CHECK(readArray[1].b == 10);
 
   MemberComplex complex;
-  Tunables::Publish("memberStruct", complex);
+  wpi::tunable::Tunables::Publish("memberStruct", complex);
   auto readMemberStruct = backend->GetStruct<TestStruct>("/memberStruct/point");
   CHECK(readMemberStruct.a == 2);
   CHECK(readMemberStruct.b == 3);
 
   FakeProtobufTunable protobuf{"proto:Fake", {1, 2, 3}};
-  Tunables::Publish("protobuf", protobuf);
+  wpi::tunable::Tunables::Publish("protobuf", protobuf);
   CHECK(backend->GetProtobufTypeString("/protobuf") == "proto:Fake");
   CHECK(backend->GetProtobufData("/protobuf") ==
         (std::vector<uint8_t>{1, 2, 3}));
 
   FakeProtobufComplex protobufComplex;
-  Tunables::Publish("memberProtobuf", protobufComplex);
+  wpi::tunable::Tunables::Publish("memberProtobuf", protobufComplex);
   CHECK(backend->GetProtobufTypeString("/memberProtobuf/value") ==
         "proto:FakeMember");
   CHECK(backend->GetProtobufData("/memberProtobuf/value") ==
@@ -602,25 +614,26 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendStructAndProtobufGetters",
 
 TEST_CASE_METHOD(TunableTest, "TunableTest MutateMarksTunablesChanged",
                  "[tunable]") {
-  class InspectableInt : public TunableInt32 {
+  class InspectableInt : public wpi::tunable::TunableInt32 {
    public:
-    using TunableInt32::TunableInt32;
+    using wpi::tunable::TunableInt32::TunableInt32;
 
     uint32_t GetUid() const { return GetTunableUid(); }
   };
-  class InspectableVector : public TunableInt32Vector {
+  class InspectableVector : public wpi::tunable::TunableInt32Vector {
    public:
-    using TunableInt32Vector::TunableInt32Vector;
+    using wpi::tunable::TunableInt32Vector::TunableInt32Vector;
 
     uint32_t GetUid() const { return GetTunableUid(); }
   };
 
-  TunableConfig config;
+  wpi::tunable::TunableConfig config;
   InspectableInt integer{1, config};
   InspectableVector vector{std::vector<int32_t>{1, 2}, config};
 
-  auto integerInfo = TunableRegistry::GetTunable(integer.GetUid());
-  auto vectorInfo = TunableRegistry::GetTunable(vector.GetUid());
+  auto integerInfo =
+      wpi::tunable::TunableRegistry::GetTunable(integer.GetUid());
+  auto vectorInfo = wpi::tunable::TunableRegistry::GetTunable(vector.GetUid());
   REQUIRE(integerInfo);
   REQUIRE(vectorInfo);
   CHECK_FALSE(integerInfo.IsChanged());
@@ -629,8 +642,8 @@ TEST_CASE_METHOD(TunableTest, "TunableTest MutateMarksTunablesChanged",
   integer.Mutate() = 2;
   vector.Mutate().push_back(3);
 
-  integerInfo = TunableRegistry::GetTunable(integer.GetUid());
-  vectorInfo = TunableRegistry::GetTunable(vector.GetUid());
+  integerInfo = wpi::tunable::TunableRegistry::GetTunable(integer.GetUid());
+  vectorInfo = wpi::tunable::TunableRegistry::GetTunable(vector.GetUid());
   CHECK(integer.Get() == 2);
   CHECK(vector.Get() == (std::vector<int32_t>{1, 2, 3}));
   CHECK(integerInfo.IsChanged());
@@ -646,8 +659,8 @@ TEST_CASE_METHOD(
   {
     InspectableDoubleTunable source{2.0};
     InspectableDoubleTunable destination{1.0};
-    Tunables::Publish("copySource", source);
-    Tunables::Publish("copyDestination", destination);
+    wpi::tunable::Tunables::Publish("copySource", source);
+    wpi::tunable::Tunables::Publish("copyDestination", destination);
     copySourceUid = source.GetUid();
     copyDestinationUid = destination.GetUid();
 
@@ -656,26 +669,27 @@ TEST_CASE_METHOD(
     CHECK(source.GetUid() == copySourceUid);
     CHECK(destination.GetUid() == copyDestinationUid);
     CHECK(destination.Get() == 2.0);
-    REQUIRE(TunableRegistry::GetTunable(copyDestinationUid));
-    CHECK(TunableRegistry::GetTunable(copyDestinationUid).IsChanged());
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(copyDestinationUid));
+    CHECK(wpi::tunable::TunableRegistry::GetTunable(copyDestinationUid)
+              .IsChanged());
 
     backend->SetDouble("/copySource", 3.0);
     backend->SetDouble("/copyDestination", 4.0);
-    TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
 
     CHECK(source.Get() == 3.0);
     CHECK(destination.Get() == 4.0);
   }
-  CHECK_FALSE(TunableRegistry::GetTunable(copySourceUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(copyDestinationUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(copySourceUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(copyDestinationUid));
 
   uint32_t moveSourceUid;
   uint32_t moveDestinationUid;
   {
     InspectableDoubleTunable source{6.0};
     InspectableDoubleTunable destination{5.0};
-    Tunables::Publish("moveSource", source);
-    Tunables::Publish("moveDestination", destination);
+    wpi::tunable::Tunables::Publish("moveSource", source);
+    wpi::tunable::Tunables::Publish("moveDestination", destination);
     moveSourceUid = source.GetUid();
     moveDestinationUid = destination.GetUid();
 
@@ -684,40 +698,42 @@ TEST_CASE_METHOD(
     CHECK(source.GetUid() == moveSourceUid);
     CHECK(destination.GetUid() == moveDestinationUid);
     CHECK(destination.Get() == 6.0);
-    REQUIRE(TunableRegistry::GetTunable(moveDestinationUid));
-    CHECK(TunableRegistry::GetTunable(moveDestinationUid).IsChanged());
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(moveDestinationUid));
+    CHECK(wpi::tunable::TunableRegistry::GetTunable(moveDestinationUid)
+              .IsChanged());
 
     backend->SetDouble("/moveSource", 7.0);
     backend->SetDouble("/moveDestination", 8.0);
-    TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
 
     CHECK(source.Get() == 7.0);
     CHECK(destination.Get() == 8.0);
   }
-  CHECK_FALSE(TunableRegistry::GetTunable(moveSourceUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(moveDestinationUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(moveSourceUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(moveDestinationUid));
 }
 
 TEST_CASE_METHOD(
     TunableTest,
     "TunableTest MoveAssignmentMarksPublishedSourceChangedForMovableValues",
     "[tunable]") {
-  class InspectableStringTunable : public TunableString {
+  class InspectableStringTunable : public wpi::tunable::TunableString {
    public:
-    using TunableString::TunableString;
+    using wpi::tunable::TunableString::TunableString;
 
     uint32_t GetUid() const { return GetTunableUid(); }
   };
 
   InspectableStringTunable source{std::string{"source"}};
   InspectableStringTunable destination{std::string{"destination"}};
-  Tunables::Publish("moveStringSource", source);
-  Tunables::Publish("moveStringDestination", destination);
+  wpi::tunable::Tunables::Publish("moveStringSource", source);
+  wpi::tunable::Tunables::Publish("moveStringDestination", destination);
   uint32_t sourceUid = source.GetUid();
   uint32_t destinationUid = destination.GetUid();
 
-  auto sourceInfo = TunableRegistry::GetTunable(sourceUid);
-  auto destinationInfo = TunableRegistry::GetTunable(destinationUid);
+  auto sourceInfo = wpi::tunable::TunableRegistry::GetTunable(sourceUid);
+  auto destinationInfo =
+      wpi::tunable::TunableRegistry::GetTunable(destinationUid);
   REQUIRE(sourceInfo);
   REQUIRE(destinationInfo);
   CHECK_FALSE(sourceInfo.IsChanged());
@@ -728,10 +744,10 @@ TEST_CASE_METHOD(
   CHECK(source.GetUid() == sourceUid);
   CHECK(destination.GetUid() == destinationUid);
   CHECK(destination.Get() == "source");
-  REQUIRE(TunableRegistry::GetTunable(sourceUid));
-  REQUIRE(TunableRegistry::GetTunable(destinationUid));
-  CHECK(TunableRegistry::GetTunable(sourceUid).IsChanged());
-  CHECK(TunableRegistry::GetTunable(destinationUid).IsChanged());
+  REQUIRE(wpi::tunable::TunableRegistry::GetTunable(sourceUid));
+  REQUIRE(wpi::tunable::TunableRegistry::GetTunable(destinationUid));
+  CHECK(wpi::tunable::TunableRegistry::GetTunable(sourceUid).IsChanged());
+  CHECK(wpi::tunable::TunableRegistry::GetTunable(destinationUid).IsChanged());
 }
 
 TEST_CASE_METHOD(
@@ -743,7 +759,7 @@ TEST_CASE_METHOD(
   {
     AssignableComplex source{2.0};
     AssignableComplex destination{1.0};
-    Tunables::Publish("copyComplex", destination);
+    wpi::tunable::Tunables::Publish("copyComplex", destination);
     copyComplexUid = destination.GetUid();
     copyGainUid = destination.GetGainUid();
 
@@ -752,25 +768,26 @@ TEST_CASE_METHOD(
     CHECK(destination.GetUid() == copyComplexUid);
     CHECK(destination.GetGainUid() == copyGainUid);
     CHECK(destination.GetGain() == 2.0);
-    REQUIRE(TunableRegistry::GetTunable(copyComplexUid));
-    REQUIRE(TunableRegistry::GetTunable(copyGainUid));
-    CHECK(TunableRegistry::GetTunable(copyComplexUid).IsChanged());
-    CHECK(TunableRegistry::GetTunable(copyGainUid).IsChanged());
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(copyComplexUid));
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(copyGainUid));
+    CHECK(
+        wpi::tunable::TunableRegistry::GetTunable(copyComplexUid).IsChanged());
+    CHECK(wpi::tunable::TunableRegistry::GetTunable(copyGainUid).IsChanged());
 
     backend->SetDouble("/copyComplex/gain", 3.0);
-    TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
 
     CHECK(destination.GetGain() == 3.0);
   }
-  CHECK_FALSE(TunableRegistry::GetTunable(copyComplexUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(copyGainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(copyComplexUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(copyGainUid));
 
   uint32_t moveComplexUid;
   uint32_t moveGainUid;
   {
     AssignableComplex source{5.0};
     AssignableComplex destination{4.0};
-    Tunables::Publish("moveComplex", destination);
+    wpi::tunable::Tunables::Publish("moveComplex", destination);
     moveComplexUid = destination.GetUid();
     moveGainUid = destination.GetGainUid();
 
@@ -779,18 +796,19 @@ TEST_CASE_METHOD(
     CHECK(destination.GetUid() == moveComplexUid);
     CHECK(destination.GetGainUid() == moveGainUid);
     CHECK(destination.GetGain() == 5.0);
-    REQUIRE(TunableRegistry::GetTunable(moveComplexUid));
-    REQUIRE(TunableRegistry::GetTunable(moveGainUid));
-    CHECK(TunableRegistry::GetTunable(moveComplexUid).IsChanged());
-    CHECK(TunableRegistry::GetTunable(moveGainUid).IsChanged());
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(moveComplexUid));
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(moveGainUid));
+    CHECK(
+        wpi::tunable::TunableRegistry::GetTunable(moveComplexUid).IsChanged());
+    CHECK(wpi::tunable::TunableRegistry::GetTunable(moveGainUid).IsChanged());
 
     backend->SetDouble("/moveComplex/gain", 6.0);
-    TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
 
     CHECK(destination.GetGain() == 6.0);
   }
-  CHECK_FALSE(TunableRegistry::GetTunable(moveComplexUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(moveGainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(moveComplexUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(moveGainUid));
 }
 
 TEST_CASE_METHOD(
@@ -804,8 +822,8 @@ TEST_CASE_METHOD(
   {
     AssignableComplex source{5.0};
     AssignableComplex destination{4.0};
-    Tunables::Publish("moveAssignSource", source);
-    Tunables::Publish("moveAssignDestination", destination);
+    wpi::tunable::Tunables::Publish("moveAssignSource", source);
+    wpi::tunable::Tunables::Publish("moveAssignDestination", destination);
     sourceComplexUid = source.GetUid();
     sourceGainUid = source.GetGainUid();
     destinationComplexUid = destination.GetUid();
@@ -816,41 +834,44 @@ TEST_CASE_METHOD(
     CHECK(destination.GetUid() == sourceComplexUid);
     CHECK(destination.GetGainUid() == sourceGainUid);
     CHECK(destination.GetGain() == 5.0);
-    CHECK_FALSE(TunableRegistry::GetTunable(destinationComplexUid));
-    CHECK_FALSE(TunableRegistry::GetTunable(destinationGainUid));
+    CHECK_FALSE(
+        wpi::tunable::TunableRegistry::GetTunable(destinationComplexUid));
+    CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(destinationGainUid));
     CHECK_FALSE(backend->GetUid("/moveAssignDestination"));
     CHECK_FALSE(backend->GetUid("/moveAssignDestination/gain"));
-    REQUIRE(TunableRegistry::GetTunable(sourceComplexUid));
-    REQUIRE(TunableRegistry::GetTunable(sourceGainUid));
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(sourceComplexUid));
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(sourceGainUid));
 
     backend->SetDouble("/moveAssignSource/gain", 6.0);
-    TunableRegistry::Update();
+    wpi::tunable::TunableRegistry::Update();
 
     CHECK(destination.GetGain() == 6.0);
   }
-  CHECK_FALSE(TunableRegistry::GetTunable(sourceComplexUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(sourceGainUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(destinationComplexUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(destinationGainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(sourceComplexUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(sourceGainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(destinationComplexUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(destinationGainUid));
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest ConfigImmutableAndOnTune",
                  "[tunable]") {
   int calls = 0;
-  TunableConfig mutableConfig{
-      .onTune = [&](detail::TunableBase&, ComplexTunable*) { ++calls; }};
-  TunableConfig immutableConfig{.isMutable = false,
-                                .onTune = mutableConfig.onTune};
-  TunableInt32 mutableTunable{0, mutableConfig};
-  TunableInt32 immutableTunable{5, immutableConfig};
+  wpi::tunable::TunableConfig mutableConfig{
+      .onTune = [&](detail::TunableBase&, wpi::tunable::ComplexTunable*) {
+        ++calls;
+      }};
+  wpi::tunable::TunableConfig immutableConfig{.isMutable = false,
+                                              .onTune = mutableConfig.onTune};
+  wpi::tunable::TunableInt32 mutableTunable{0, mutableConfig};
+  wpi::tunable::TunableInt32 immutableTunable{5, immutableConfig};
 
-  Tunables::Publish("mutable", mutableTunable);
-  Tunables::Publish("immutable", immutableTunable);
+  wpi::tunable::Tunables::Publish("mutable", mutableTunable);
+  wpi::tunable::Tunables::Publish("immutable", immutableTunable);
 
   backend->SetInt32("/mutable", 1);
   backend->SetInt32("/immutable", 42);
   CHECK(calls == 0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(mutableTunable.Get() == 1);
   CHECK(immutableTunable.Get() == 5);
@@ -861,18 +882,19 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest MockSetterCanRemovePendingActionAndContinueUpdate",
     "[tunable]") {
-  Tunable<ReentrantMockUpdateStruct> first{ReentrantMockUpdateStruct{1}};
-  TunableDouble removeMe{1.0};
-  TunableDouble second{1.0};
-  Tunables::Publish("first", first);
-  Tunables::Publish("removeMe", removeMe);
-  Tunables::Publish("second", second);
+  wpi::tunable::Tunable<ReentrantMockUpdateStruct> first{
+      ReentrantMockUpdateStruct{1}};
+  wpi::tunable::TunableDouble removeMe{1.0};
+  wpi::tunable::TunableDouble second{1.0};
+  wpi::tunable::Tunables::Publish("first", first);
+  wpi::tunable::Tunables::Publish("removeMe", removeMe);
+  wpi::tunable::Tunables::Publish("second", second);
 
   ReentrantMockUpdateState::removePending = true;
   backend->SetStruct<ReentrantMockUpdateStruct>("/first", {2});
   backend->SetDouble("/removeMe", 99.0);
   backend->SetDouble("/second", 3.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(first.Get().value == 2);
   CHECK(removeMe.Get() == 1.0);
@@ -882,20 +904,21 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest MockSetterCanQueueActionForNextUpdate",
                  "[tunable]") {
-  Tunable<ReentrantMockUpdateStruct> first{ReentrantMockUpdateStruct{1}};
-  TunableDouble queued{1.0};
-  Tunables::Publish("first", first);
-  Tunables::Publish("queued", queued);
+  wpi::tunable::Tunable<ReentrantMockUpdateStruct> first{
+      ReentrantMockUpdateStruct{1}};
+  wpi::tunable::TunableDouble queued{1.0};
+  wpi::tunable::Tunables::Publish("first", first);
+  wpi::tunable::Tunables::Publish("queued", queued);
 
   ReentrantMockUpdateState::backend = backend.get();
   ReentrantMockUpdateState::queuePending = true;
   backend->SetStruct<ReentrantMockUpdateStruct>("/first", {2});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(first.Get().value == 2);
   CHECK(queued.Get() == 1.0);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(queued.Get() == 4.0);
   ReentrantMockUpdateState::backend = nullptr;
@@ -905,26 +928,26 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest UpdateDeduplicatesSameBackendRegisteredForMultiplePrefixes",
     "[tunable]") {
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
   auto recordingBackend = std::make_shared<RecordingChangedBackend>();
-  TunableRegistry::RegisterBackend("", recordingBackend);
-  TunableRegistry::RegisterBackend("/child", recordingBackend);
+  wpi::tunable::TunableRegistry::RegisterBackend("", recordingBackend);
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", recordingBackend);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(recordingBackend->updateCount == 1);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest ResetRemovesAllBackendEntries",
                  "[tunable]") {
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
   auto cleanupBackend = std::make_shared<RetiringMockTunableBackend>();
-  TunableRegistry::RegisterBackend("", cleanupBackend);
-  TunableDouble tunable{1.0};
-  Tunables::Publish("retained", tunable);
+  wpi::tunable::TunableRegistry::RegisterBackend("", cleanupBackend);
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("retained", tunable);
   REQUIRE(cleanupBackend->GetUid("/retained"));
 
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
 
   CHECK_FALSE(cleanupBackend->GetUid("/retained"));
   CHECK(cleanupBackend->retireCount == 1);
@@ -932,21 +955,22 @@ TEST_CASE_METHOD(TunableTest, "TunableTest ResetRemovesAllBackendEntries",
 
 TEST_CASE_METHOD(TunableTest, "TunableTest TunableConfigOptions", "[tunable]") {
   int calls = 0;
-  TunableConfig config{
+  wpi::tunable::TunableConfig config{
       .properties = wpi::util::json::object("min", 0),
       .robust = true,
       .typeString = "UnitTestWidget",
       .isMutable = false,
-      .onTune = [&](detail::TunableBase&, ComplexTunable*) { ++calls; },
-      .polling = TunableConfig::Polling::ALWAYS_GET};
-  class InspectableInt : public TunableInt32 {
+      .onTune = [&](detail::TunableBase&,
+                    wpi::tunable::ComplexTunable*) { ++calls; },
+      .polling = wpi::tunable::TunableConfig::Polling::ALWAYS_GET};
+  class InspectableInt : public wpi::tunable::TunableInt32 {
    public:
-    using TunableInt32::TunableInt32;
+    using wpi::tunable::TunableInt32::TunableInt32;
 
     uint32_t GetUid() const { return GetTunableUid(); }
   };
   InspectableInt tunable{1, config};
-  auto info = TunableRegistry::GetTunable(tunable.GetUid());
+  auto info = wpi::tunable::TunableRegistry::GetTunable(tunable.GetUid());
 
   REQUIRE(static_cast<bool>(info));
   REQUIRE(info.config != nullptr);
@@ -955,17 +979,20 @@ TEST_CASE_METHOD(TunableTest, "TunableTest TunableConfigOptions", "[tunable]") {
   REQUIRE(info.config->typeString.has_value());
   CHECK(info.config->typeString.value() == "UnitTestWidget");
   CHECK_FALSE(info.config->isMutable);
-  CHECK(info.config->polling == TunableConfig::Polling::ALWAYS_GET);
+  CHECK(info.config->polling ==
+        wpi::tunable::TunableConfig::Polling::ALWAYS_GET);
 
-  auto getOnChangeConfig = TunableConfig::GetOnChange();
-  CHECK(getOnChangeConfig.polling == TunableConfig::Polling::GET_ON_CHANGE);
+  auto getOnChangeConfig = wpi::tunable::TunableConfig::GetOnChange();
+  CHECK(getOnChangeConfig.polling ==
+        wpi::tunable::TunableConfig::Polling::GET_ON_CHANGE);
 
-  auto alwaysGetConfig = TunableConfig::AlwaysGet();
-  CHECK(alwaysGetConfig.polling == TunableConfig::Polling::ALWAYS_GET);
+  auto alwaysGetConfig = wpi::tunable::TunableConfig::AlwaysGet();
+  CHECK(alwaysGetConfig.polling ==
+        wpi::tunable::TunableConfig::Polling::ALWAYS_GET);
 
-  Tunables::Publish("configured", tunable);
+  wpi::tunable::Tunables::Publish("configured", tunable);
   backend->SetInt32("/configured", 2);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 1);
   CHECK(calls == 0);
@@ -981,17 +1008,19 @@ TEST_CASE_METHOD(TunableTest,
   bool receivedMember = false;
   bool receivedParent = false;
   MemberComplex complex;
-  TunableConfig config{.onTune = [&](detail::TunableBase& tunable,
-                                     ComplexTunable* parent) {
-    ++calls;
-    receivedMember = &tunable != static_cast<detail::TunableBase*>(&complex);
-    receivedParent = parent == &complex;
-  }};
+  wpi::tunable::TunableConfig config{
+      .onTune = [&](detail::TunableBase& tunable,
+                    wpi::tunable::ComplexTunable* parent) {
+        ++calls;
+        receivedMember =
+            &tunable != static_cast<detail::TunableBase*>(&complex);
+        receivedParent = parent == &complex;
+      }};
 
-  Tunables::Publish("complexOnTune/gain", &complex, &MemberComplex::gain,
-                    config);
+  wpi::tunable::Tunables::Publish("complexOnTune/gain", &complex,
+                                  &MemberComplex::gain, config);
   backend->SetInt32("/complexOnTune/gain", 7);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.gain == 7);
   CHECK(calls == 1);
@@ -1002,22 +1031,22 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexUpdateRunsBeforeBackendTuning",
                  "[tunable]") {
-  struct UpdatingComplex : ComplexTunable {
+  struct UpdatingComplex : wpi::tunable::ComplexTunable {
     int32_t source = 1;
     int32_t value = 0;
     int32_t tunedValue = -1;
 
-    void PublishTunable(TunableTable& table) override {
+    void PublishTunable(wpi::tunable::TunableTable& table) override {
       table.Publish(
           "value", this, &UpdatingComplex::value,
-          TunableConfig{.onTune =
-                            [](detail::TunableBase&, ComplexTunable* self) {
-                              if (auto complex =
-                                      static_cast<UpdatingComplex*>(self)) {
-                                complex->tunedValue = complex->value;
-                              }
-                            },
-                        .parent = this});
+          wpi::tunable::TunableConfig{
+              .onTune =
+                  [](detail::TunableBase&, wpi::tunable::ComplexTunable* self) {
+                    if (auto complex = static_cast<UpdatingComplex*>(self)) {
+                      complex->tunedValue = complex->value;
+                    }
+                  },
+              .parent = this});
     }
 
     void UpdateTunable() const override {
@@ -1026,16 +1055,16 @@ TEST_CASE_METHOD(TunableTest,
   };
 
   UpdatingComplex complex;
-  Tunables::Publish("updating", complex);
+  wpi::tunable::Tunables::Publish("updating", complex);
 
   complex.source = 2;
   backend->SetInt32("/updating/value", 5);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.value == 5);
   CHECK(complex.tunedValue == 5);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(complex.value == 2);
 }
 
@@ -1047,7 +1076,7 @@ TEST_CASE_METHOD(TunableTest,
   std::optional<uint32_t> pointUid;
   {
     MemberComplex complex;
-    Tunables::Publish("destroyedComplex", complex);
+    wpi::tunable::Tunables::Publish("destroyedComplex", complex);
     parentUid = backend->GetUid("/destroyedComplex");
     gainUid = backend->GetUid("/destroyedComplex/gain");
     pointUid = backend->GetUid("/destroyedComplex/point");
@@ -1062,10 +1091,10 @@ TEST_CASE_METHOD(TunableTest,
   CHECK_FALSE(backend->GetUid("/destroyedComplex"));
   CHECK_FALSE(backend->GetUid("/destroyedComplex/gain"));
   CHECK_FALSE(backend->GetUid("/destroyedComplex/point"));
-  CHECK_FALSE(TunableRegistry::GetTunable(*parentUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(*gainUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(*pointUid));
-  CHECK_NOTHROW(TunableRegistry::Update());
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*parentUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*gainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*pointUid));
+  CHECK_NOTHROW(wpi::tunable::TunableRegistry::Update());
 }
 
 TEST_CASE_METHOD(
@@ -1076,14 +1105,14 @@ TEST_CASE_METHOD(
   std::optional<uint32_t> gainUid;
   {
     ChangedParentMemberComplex complex;
-    Tunables::Publish("changedParent", complex);
+    wpi::tunable::Tunables::Publish("changedParent", complex);
     parentUid = backend->GetUid("/changedParent");
     REQUIRE(parentUid);
 
     complex.MarkChanged();
-    REQUIRE(TunableRegistry::GetTunable(*parentUid).IsChanged());
+    REQUIRE(wpi::tunable::TunableRegistry::GetTunable(*parentUid).IsChanged());
 
-    auto table = Tunables::GetTable("changedParent");
+    auto table = wpi::tunable::Tunables::GetTable("changedParent");
     complex.PublishGain(table);
     gainUid = backend->GetUid("/changedParent/gain");
     REQUIRE(gainUid);
@@ -1091,85 +1120,90 @@ TEST_CASE_METHOD(
 
   CHECK_FALSE(backend->GetUid("/changedParent"));
   CHECK_FALSE(backend->GetUid("/changedParent/gain"));
-  CHECK_FALSE(TunableRegistry::GetTunable(*parentUid));
-  CHECK_FALSE(TunableRegistry::GetTunable(*gainUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*parentUid));
+  CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*gainUid));
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest TunablesGetTableFacade",
                  "[tunable]") {
-  Tunable<double> tunable;
-  auto table = Tunables::GetTable("arm");
+  wpi::tunable::Tunable<double> tunable;
+  auto table = wpi::tunable::Tunables::GetTable("arm");
 
   table.Publish("speed", tunable);
   backend->SetDouble("/arm/speed", 2.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 2.0);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest TablePathsRouteAndRemove",
                  "[tunable]") {
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
-  CHECK(Tunables::GetTable().GetPath() == "/");
-  CHECK(Tunables::GetTable("drive").GetPath() == "/drive/");
-  CHECK(Tunables::GetTable("drive").GetTable("left").GetPath() ==
+  CHECK(wpi::tunable::Tunables::GetTable().GetPath() == "/");
+  CHECK(wpi::tunable::Tunables::GetTable("drive").GetPath() == "/drive/");
+  CHECK(wpi::tunable::Tunables::GetTable("drive").GetTable("left").GetPath() ==
         "/drive/left/");
 
-  TunableDouble root{1.0};
-  TunableDouble child{2.0};
-  Tunables::Publish("root", root);
-  Tunables::Publish("child/value", child);
+  wpi::tunable::TunableDouble root{1.0};
+  wpi::tunable::TunableDouble child{2.0};
+  wpi::tunable::Tunables::Publish("root", root);
+  wpi::tunable::Tunables::Publish("child/value", child);
 
   backend->SetDouble("/root", 3.0);
   childBackend->SetDouble("/child/value", 4.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(root.Get() == 3.0);
   CHECK(child.Get() == 4.0);
   CHECK_THROWS_AS(backend->SetDouble("/child/value", 5.0),
                   std::invalid_argument);
 
-  Tunables::Remove("child/value");
+  wpi::tunable::Tunables::Remove("child/value");
   CHECK_THROWS_AS(childBackend->SetDouble("/child/value", 6.0),
                   std::invalid_argument);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest GetBackendNormalizesPath",
                  "[tunable]") {
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
-  CHECK(TunableRegistry::GetBackend("child/value") == childBackend);
-  CHECK(TunableRegistry::GetBackend("//child//value") == childBackend);
-  CHECK(TunableRegistry::GetBackend("children/value") == backend);
+  CHECK(wpi::tunable::TunableRegistry::GetBackend("child/value") ==
+        childBackend);
+  CHECK(wpi::tunable::TunableRegistry::GetBackend("//child//value") ==
+        childBackend);
+  CHECK(wpi::tunable::TunableRegistry::GetBackend("children/value") == backend);
 
-  TunableRegistry::Reset();
-  auto childOnlyBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("child", childOnlyBackend);
+  wpi::tunable::TunableRegistry::Reset();
+  auto childOnlyBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("child", childOnlyBackend);
 
-  CHECK(TunableRegistry::GetBackend("child/value") == childOnlyBackend);
+  CHECK(wpi::tunable::TunableRegistry::GetBackend("child/value") ==
+        childOnlyBackend);
 
-  TunableRegistry::Reset();
-  auto repeatedSlashChildBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("//child", repeatedSlashChildBackend);
+  wpi::tunable::TunableRegistry::Reset();
+  auto repeatedSlashChildBackend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("//child",
+                                                 repeatedSlashChildBackend);
 
-  CHECK(TunableRegistry::GetBackend("child/value") ==
+  CHECK(wpi::tunable::TunableRegistry::GetBackend("child/value") ==
         repeatedSlashChildBackend);
 }
 
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest MissingBackendWarnsAndUsesNoopBackend",
                  "[tunable]") {
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
   std::vector<std::string> warnings;
-  TunableRegistry::SetReportWarning(
+  wpi::tunable::TunableRegistry::SetReportWarning(
       [&warnings](std::string_view msg) { warnings.emplace_back(msg); });
 
-  auto missingBackend = TunableRegistry::GetBackend("missing");
-  TunableDouble tunable{1.0};
-  Tunables::Publish("missing", tunable);
-  TunableRegistry::Update();
+  auto missingBackend = wpi::tunable::TunableRegistry::GetBackend("missing");
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("missing", tunable);
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(missingBackend->RemovePrefix("/missing").empty());
   bool foundWarning = false;
@@ -1184,25 +1218,25 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest RegisterBackendMigratesExistingMatchingTunables",
                  "[tunable]") {
-  TunableDouble root{1.0};
-  TunableDouble child{2.0};
-  Tunables::Publish("root", root);
-  Tunables::Publish("child/value", child);
+  wpi::tunable::TunableDouble root{1.0};
+  wpi::tunable::TunableDouble child{2.0};
+  wpi::tunable::Tunables::Publish("root", root);
+  wpi::tunable::Tunables::Publish("child/value", child);
 
   backend->SetDouble("/root", 3.0);
   backend->SetDouble("/child/value", 4.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(root.Get() == 3.0);
   CHECK(child.Get() == 4.0);
 
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
   CHECK_THROWS_AS(backend->SetDouble("/child/value", 5.0),
                   std::invalid_argument);
   childBackend->SetDouble("/child/value", 6.0);
   backend->SetDouble("/root", 7.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(root.Get() == 7.0);
   CHECK(child.Get() == 6.0);
@@ -1211,18 +1245,18 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest RegisterBackendNormalizesPrefixForMigration",
                  "[tunable]") {
-  TunableDouble child{2.0};
-  Tunables::Publish("child/value", child);
+  wpi::tunable::TunableDouble child{2.0};
+  wpi::tunable::Tunables::Publish("child/value", child);
 
   CHECK(backend->GetDouble("/child/value") == 2.0);
 
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("child", childBackend);
 
   CHECK_THROWS_AS(backend->SetDouble("/child/value", 3.0),
                   std::invalid_argument);
   childBackend->SetDouble("/child/value", 4.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(child.Get() == 4.0);
 }
@@ -1230,13 +1264,13 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest RegisterBackendMigrationUsesPathBoundaries",
                  "[tunable]") {
-  TunableDouble child{2.0};
-  TunableDouble children{3.0};
-  Tunables::Publish("child/value", child);
-  Tunables::Publish("children/value", children);
+  wpi::tunable::TunableDouble child{2.0};
+  wpi::tunable::TunableDouble children{3.0};
+  wpi::tunable::Tunables::Publish("child/value", child);
+  wpi::tunable::Tunables::Publish("children/value", children);
 
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
   CHECK_THROWS_AS(backend->SetDouble("/child/value", 4.0),
                   std::invalid_argument);
@@ -1246,7 +1280,7 @@ TEST_CASE_METHOD(TunableTest,
 
   childBackend->SetDouble("/child/value", 5.0);
   backend->SetDouble("/children/value", 6.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(child.Get() == 5.0);
   CHECK(children.Get() == 6.0);
@@ -1256,15 +1290,16 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest RegisterBackendReplacementMigratesExistingTunables",
     "[tunable]") {
-  TunableDouble tunable{1.0};
-  Tunables::Publish("value", tunable);
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("value", tunable);
 
-  auto replacementBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("", replacementBackend);
+  auto replacementBackend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", replacementBackend);
 
   CHECK_THROWS_AS(backend->SetDouble("/value", 2.0), std::invalid_argument);
   replacementBackend->SetDouble("/value", 3.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 3.0);
 }
@@ -1273,20 +1308,21 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest RegisterBackendReplacementRetiresDisplacedBackend",
     "[tunable]") {
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
   auto retiringBackend = std::make_shared<RetiringMockTunableBackend>();
-  TunableRegistry::RegisterBackend("", retiringBackend);
-  TunableDouble tunable{1.0};
-  Tunables::Publish("value", tunable);
+  wpi::tunable::TunableRegistry::RegisterBackend("", retiringBackend);
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("value", tunable);
 
-  auto replacementBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("", replacementBackend);
+  auto replacementBackend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", replacementBackend);
 
   CHECK_FALSE(retiringBackend->GetUid("/value"));
   CHECK(retiringBackend->retireCount == 1);
 
   replacementBackend->SetDouble("/value", 2.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(tunable.Get() == 2.0);
 }
@@ -1295,15 +1331,16 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest RegisterBackendReplacementKeepsStillRegisteredBackendOpen",
     "[tunable]") {
-  TunableRegistry::Reset();
+  wpi::tunable::TunableRegistry::Reset();
   auto sharedBackend = std::make_shared<RetiringMockTunableBackend>();
-  TunableRegistry::RegisterBackend("", sharedBackend);
-  TunableRegistry::RegisterBackend("/retained", sharedBackend);
-  TunableDouble tunable{1.0};
-  Tunables::Publish("retained/value", tunable);
+  wpi::tunable::TunableRegistry::RegisterBackend("", sharedBackend);
+  wpi::tunable::TunableRegistry::RegisterBackend("/retained", sharedBackend);
+  wpi::tunable::TunableDouble tunable{1.0};
+  wpi::tunable::Tunables::Publish("retained/value", tunable);
 
-  auto replacementBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("", replacementBackend);
+  auto replacementBackend =
+      std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("", replacementBackend);
 
   CHECK(sharedBackend->retireCount == 0);
   REQUIRE(sharedBackend->GetUid("/retained/value"));
@@ -1313,16 +1350,16 @@ TEST_CASE_METHOD(TunableTest,
                  "TunableTest RegisterBackendMigratesComplexTunable",
                  "[tunable]") {
   MemberComplex complex;
-  Tunables::Publish("child/complex", complex);
+  wpi::tunable::Tunables::Publish("child/complex", complex);
 
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
   CHECK_THROWS_AS(backend->SetInt32("/child/complex/gain", 2),
                   std::invalid_argument);
   childBackend->SetInt32("/child/complex/gain", 4);
   childBackend->SetStruct<TestStruct>("/child/complex/point", {5, 6});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.gain == 4);
   CHECK(complex.point.a == 5);
@@ -1333,12 +1370,12 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest MockBackendRemovePrefixReturnsMatchingTunables",
                  "[tunable]") {
-  TunableDouble root{1.0};
-  TunableDouble child{2.0};
-  TunableDouble children{3.0};
-  Tunables::Publish("root", root);
-  Tunables::Publish("child/value", child);
-  Tunables::Publish("children/value", children);
+  wpi::tunable::TunableDouble root{1.0};
+  wpi::tunable::TunableDouble child{2.0};
+  wpi::tunable::TunableDouble children{3.0};
+  wpi::tunable::Tunables::Publish("root", root);
+  wpi::tunable::Tunables::Publish("child/value", child);
+  wpi::tunable::Tunables::Publish("children/value", children);
 
   auto removed = backend->RemovePrefix("child");
 
@@ -1348,7 +1385,7 @@ TEST_CASE_METHOD(TunableTest,
   CHECK_THROWS_AS(backend->SetDouble("/child/value", 4.0),
                   std::invalid_argument);
   backend->SetDouble("/children/value", 5.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(root.Get() == 3.0);
   CHECK(child.Get() == 2.0);
   CHECK(children.Get() == 5.0);
@@ -1356,14 +1393,14 @@ TEST_CASE_METHOD(TunableTest,
 
 TEST_CASE_METHOD(TunableTest, "TunableTest MockBackendNormalizesPaths",
                  "[tunable]") {
-  TunableDouble value{1.0};
-  Tunables::Publish("child/value", value);
+  wpi::tunable::TunableDouble value{1.0};
+  wpi::tunable::Tunables::Publish("child/value", value);
 
   REQUIRE(backend->GetUid("child//value").has_value());
   CHECK(backend->GetDouble("//child/value") == 1.0);
 
   backend->SetDouble("child//value", 2.0);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(value.Get() == 2.0);
   CHECK(backend->GetDouble("/child/value") == 2.0);
@@ -1377,11 +1414,11 @@ TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexTunablePublishesMembersAndUpdates",
                  "[tunable]") {
   MemberComplex complex;
-  Tunables::Publish("complex", complex);
+  wpi::tunable::Tunables::Publish("complex", complex);
 
   backend->SetInt32("/complex/gain", 10);
   backend->SetStruct<TestStruct>("/complex/point", {11, 12});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.gain == 10);
   CHECK(complex.point.a == 11);
@@ -1392,12 +1429,12 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest RejectedComplexTunableDoesNotPublishMembers",
                  "[tunable]") {
-  TunableDouble existing{1.0};
-  Tunables::Publish("complex", existing);
+  wpi::tunable::TunableDouble existing{1.0};
+  wpi::tunable::Tunables::Publish("complex", existing);
 
   {
     MemberComplex rejected;
-    Tunables::Publish("complex", rejected);
+    wpi::tunable::Tunables::Publish("complex", rejected);
 
     CHECK(backend->GetDouble("/complex") == 1.0);
     CHECK(backend->GetUid("/complex").has_value());
@@ -1415,8 +1452,8 @@ TEST_CASE_METHOD(
     TunableTest,
     "TunableTest ComplexTunableAliasesUpdateOncePerRegistryCycleAcrossBackends",
     "[tunable]") {
-  struct CountingComplex : ComplexTunable {
-    void PublishTunable(TunableTable&) override {}
+  struct CountingComplex : wpi::tunable::ComplexTunable {
+    void PublishTunable(wpi::tunable::TunableTable&) override {}
 
     void UpdateTunable() const override {
       ++const_cast<CountingComplex*>(this)->updateCount;
@@ -1425,17 +1462,17 @@ TEST_CASE_METHOD(
     int updateCount = 0;
   };
 
-  auto childBackend = std::make_shared<MockTunableBackend>();
-  TunableRegistry::RegisterBackend("/child", childBackend);
+  auto childBackend = std::make_shared<wpi::tunable::MockTunableBackend>();
+  wpi::tunable::TunableRegistry::RegisterBackend("/child", childBackend);
 
   CountingComplex complex;
-  Tunables::Publish("first", complex);
-  Tunables::Publish("child/second", complex);
+  wpi::tunable::Tunables::Publish("first", complex);
+  wpi::tunable::Tunables::Publish("child/second", complex);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(complex.updateCount == 1);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   CHECK(complex.updateCount == 2);
 }
 
@@ -1444,15 +1481,15 @@ TEST_CASE_METHOD(
     "TunableTest ComplexTunableDynamicChildrenUseAllActiveParentPaths",
     "[tunable]") {
   DynamicComplex complex;
-  Tunables::Publish("first", complex);
-  Tunables::Publish("second", complex);
+  wpi::tunable::Tunables::Publish("first", complex);
+  wpi::tunable::Tunables::Publish("second", complex);
 
   complex.PublishDynamic();
 
   CHECK(backend->GetDouble("/first/dynamic") == 2.0);
   CHECK(backend->GetDouble("/second/dynamic") == 2.0);
 
-  Tunables::Remove("first");
+  wpi::tunable::Tunables::Remove("first");
   complex.PublishLater();
 
   CHECK_THROWS_AS(backend->GetDouble("/first/later"), std::invalid_argument);
@@ -1469,13 +1506,13 @@ TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexUpdateCanPublishAndRemoveChildren",
                  "[tunable]") {
   UpdatingDynamicComplex complex;
-  Tunables::Publish("a", complex);
+  wpi::tunable::Tunables::Publish("a", complex);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(backend->GetDouble("/a/dynamic") == 2.0);
 
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK_THROWS_AS(backend->GetDouble("/a/dynamic"), std::invalid_argument);
   CHECK(backend->GetDouble("/a/initial") == 1.0);
@@ -1486,8 +1523,8 @@ TEST_CASE_METHOD(
     "TunableTest RemoveChildTunableUnregistersMemberVariableWrapper",
     "[tunable]") {
   RemovableMemberComplex complex;
-  Tunables::Publish("removableMember", complex);
-  auto table = Tunables::GetTable("removableMember");
+  wpi::tunable::Tunables::Publish("removableMember", complex);
+  auto table = wpi::tunable::Tunables::GetTable("removableMember");
 
   for (int i = 0; i < 3; ++i) {
     auto uid = backend->GetUid("/removableMember/gain");
@@ -1496,14 +1533,14 @@ TEST_CASE_METHOD(
     complex.RemoveGain();
 
     CHECK_FALSE(backend->GetUid("/removableMember/gain"));
-    CHECK_FALSE(TunableRegistry::GetTunable(*uid));
+    CHECK_FALSE(wpi::tunable::TunableRegistry::GetTunable(*uid));
 
     complex.PublishGain(table);
   }
 
   auto uid = backend->GetUid("/removableMember/gain");
   REQUIRE(uid);
-  auto info = TunableRegistry::GetTunable(*uid);
+  auto info = wpi::tunable::TunableRegistry::GetTunable(*uid);
   REQUIRE(static_cast<bool>(info));
 
   complex.MarkGainChanged();
@@ -1514,15 +1551,15 @@ TEST_CASE_METHOD(
 TEST_CASE_METHOD(TunableTest, "TunableTest RemoveComplexTunableRemovesMembers",
                  "[tunable]") {
   MemberComplex complex;
-  Tunables::Publish("complex", complex);
+  wpi::tunable::Tunables::Publish("complex", complex);
 
-  Tunables::Remove("complex");
+  wpi::tunable::Tunables::Remove("complex");
 
   CHECK_THROWS_AS(backend->SetInt32("/complex/gain", 10),
                   std::invalid_argument);
   CHECK_THROWS_AS(backend->SetStruct<TestStruct>("/complex/point", {11, 12}),
                   std::invalid_argument);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.gain == 1);
   CHECK(complex.point.a == 2);
@@ -1534,10 +1571,10 @@ TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexTunableDirectStructSerializableMember",
                  "[tunable]") {
   DirectStructComplex complex;
-  Tunables::Publish("directStruct", complex);
+  wpi::tunable::Tunables::Publish("directStruct", complex);
 
   backend->SetStruct<TestStruct>("/directStruct/point", {4, 5});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.point.a == 4);
   CHECK(complex.point.b == 5);
@@ -1547,17 +1584,18 @@ TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexTunableWrappedStructSerializableMember",
                  "[tunable]") {
   WrappedStructComplex complex;
-  Tunables::Publish("wrappedStruct", complex);
+  wpi::tunable::Tunables::Publish("wrappedStruct", complex);
 
   backend->SetStruct<TestStruct>("/wrappedStruct/point", {6, 7});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
 
   CHECK(complex.point.Get().a == 6);
   CHECK(complex.point.Get().b == 7);
 }
 
-TEST_CASE_METHOD(TunableTest, "TunableTest CustomTunable", "[tunable]") {
-  Tunable<CustomType> tunable;
+TEST_CASE_METHOD(TunableTest, "TunableTest wpi::tunable::CustomTunable",
+                 "[tunable]") {
+  wpi::tunable::Tunable<CustomType> tunable;
 
   tunable.Set(CustomType{42});
   auto val = tunable.Get();
@@ -1567,15 +1605,15 @@ TEST_CASE_METHOD(TunableTest, "TunableTest CustomTunable", "[tunable]") {
   val = tunable;
   CHECK(val.val == 63);
 
-  Tunables::Publish("testCustom", tunable);
+  wpi::tunable::Tunables::Publish("testCustom", tunable);
   backend->SetInt32("/testCustom", 84);
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val.val == 84);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest StructTunable", "[tunable]") {
-  Tunable<TestStruct> tunable;
+  wpi::tunable::Tunable<TestStruct> tunable;
 
   tunable.Set({1, 2});
   auto val = tunable.Get();
@@ -1587,16 +1625,16 @@ TEST_CASE_METHOD(TunableTest, "TunableTest StructTunable", "[tunable]") {
   CHECK(val.a == 2);
   CHECK(val.b == 3);
 
-  Tunables::Publish("testStruct", tunable);
+  wpi::tunable::Tunables::Publish("testStruct", tunable);
   backend->SetStruct<TestStruct>("/testStruct", {3, 4});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val.a == 3);
   CHECK(val.b == 4);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest StructVectorTunable", "[tunable]") {
-  Tunable<std::vector<TestStruct>> tunable;
+  wpi::tunable::Tunable<std::vector<TestStruct>> tunable;
 
   tunable.Set({{1, 2}, {3, 4}});
   auto val = tunable.Get();
@@ -1616,9 +1654,9 @@ TEST_CASE_METHOD(TunableTest, "TunableTest StructVectorTunable", "[tunable]") {
   CHECK(val[2].a == 6);
   CHECK(val[2].b == 7);
 
-  Tunables::Publish("testStructVector", tunable);
+  wpi::tunable::Tunables::Publish("testStructVector", tunable);
   backend->SetStructVector<TestStruct>("/testStructVector", {{{5, 6}, {7, 8}}});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val.size() == 2u);
   CHECK(val[0].a == 5);
@@ -1628,7 +1666,7 @@ TEST_CASE_METHOD(TunableTest, "TunableTest StructVectorTunable", "[tunable]") {
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest StructArrayTunable", "[tunable]") {
-  Tunable<std::array<TestStruct, 2>> tunable;
+  wpi::tunable::Tunable<std::array<TestStruct, 2>> tunable;
 
   tunable.Set({{{1, 2}, {3, 4}}});
   auto val = tunable.Get();
@@ -1646,9 +1684,9 @@ TEST_CASE_METHOD(TunableTest, "TunableTest StructArrayTunable", "[tunable]") {
   CHECK(val[1].a == 4);
   CHECK(val[1].b == 5);
 
-  Tunables::Publish("testStructArray", tunable);
+  wpi::tunable::Tunables::Publish("testStructArray", tunable);
   backend->SetStructVector<TestStruct>("/testStructArray", {{{5, 6}, {7, 8}}});
-  TunableRegistry::Update();
+  wpi::tunable::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val.size() == 2u);
   CHECK(val[0].a == 5);

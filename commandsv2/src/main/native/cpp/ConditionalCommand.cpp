@@ -69,7 +69,7 @@ Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
   }
 }
 
-void ConditionalCommand::LogTo(wpi::TelemetryTable& table) const {
+void ConditionalCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("onTrue", m_onTrue->GetName());
   table.Log("onFalse", m_onFalse->GetName());

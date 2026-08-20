@@ -41,7 +41,7 @@ bool DeferredCommand::IsFinished() {
   return m_command->IsFinished();
 }
 
-void DeferredCommand::LogTo(wpi::TelemetryTable& table) const {
+void DeferredCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("deferred", m_command->GetName());
 }

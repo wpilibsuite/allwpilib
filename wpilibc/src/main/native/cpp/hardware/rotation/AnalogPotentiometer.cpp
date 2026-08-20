@@ -36,7 +36,7 @@ double AnalogPotentiometer::Get() const {
          m_offset;
 }
 
-void AnalogPotentiometer::LogTo(wpi::TelemetryTable& table) const {
+void AnalogPotentiometer::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

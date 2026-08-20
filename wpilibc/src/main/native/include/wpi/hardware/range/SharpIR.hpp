@@ -11,7 +11,7 @@
 
 namespace wpi {
 
-class SharpIR : public wpi::TelemetryLoggable {
+class SharpIR : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Sharp GP2Y0A02YK0F is an analog IR sensor capable of measuring
@@ -82,7 +82,7 @@ class SharpIR : public wpi::TelemetryLoggable {
    */
   wpi::units::meter_t GetRange() const;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

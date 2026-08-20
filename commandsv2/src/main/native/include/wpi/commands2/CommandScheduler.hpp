@@ -36,8 +36,8 @@ class Subsystem;
  *
  * This class is provided by the Commands v2 VendorDep
  */
-class CommandScheduler final : public wpi::TelemetryLoggable,
-                               public wpi::ComplexTunable {
+class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
+                               public wpi::tunable::ComplexTunable {
  public:
   /**
    * Returns the Scheduler instance.
@@ -469,9 +469,9 @@ class CommandScheduler final : public wpi::TelemetryLoggable,
   void RequireUngroupedAndUnscheduled(
       std::initializer_list<const Command*> commands);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
   std::string_view GetTelemetryType() const override;
-  void PublishTunable(wpi::TunableTable& table) override;
+  void PublishTunable(wpi::tunable::TunableTable& table) override;
   void UpdateTunable() const override;
   std::string_view GetTunableType() const override;
 

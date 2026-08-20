@@ -18,6 +18,7 @@
 #include "wpi/util/type_name.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 static void NotifyOnTune(uint32_t uid, TunableRegistry::TunableInfo& info) {
   TunableRegistry::ResetChangedAfterUpdate(uid);

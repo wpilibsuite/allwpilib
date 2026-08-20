@@ -427,7 +427,7 @@ std::string_view DualSenseController::GetTelemetryType() const {
   return "HID:DualSense";
 }
 
-void DualSenseController::LogTo(wpi::TelemetryTable& table) const {
+void DualSenseController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("LeftY", GetLeftY());
   table.Log("RightX", GetRightX());

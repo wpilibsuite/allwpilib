@@ -10,6 +10,7 @@
 #include "wpi/tunable/TunableTable.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 static constexpr const char* kDefault = "default";
 static constexpr const char* kOptions = "options";
@@ -24,13 +25,13 @@ detail::SelectableBase::SelectableBase()
               [](TunableBase& tunable, ComplexTunable* self) {
                 if (auto selectable = static_cast<SelectableBase*>(self)) {
                   auto& selected =
-                      static_cast<wpi::Tunable<std::string>&>(tunable);
+                      static_cast<wpi::tunable::Tunable<std::string>&>(tunable);
                   selectable->Changed(selected.Get());
                 }
               },
           .parent = this}} {}
 
-void detail::SelectableBase::PublishTunable(wpi::TunableTable& table) {
+void detail::SelectableBase::PublishTunable(wpi::tunable::TunableTable& table) {
   table.Publish(kDefault, m_defaultChoice);
   table.Publish(kOptions, m_options);
   table.Publish(kSelected, m_selected);

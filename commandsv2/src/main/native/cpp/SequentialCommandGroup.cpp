@@ -85,7 +85,8 @@ void SequentialCommandGroup::AddCommands(
   }
 }
 
-void SequentialCommandGroup::LogTo(wpi::TelemetryTable& table) const {
+void SequentialCommandGroup::LogTo(
+    wpi::telemetry::TelemetryTable& table) const {
   Command::LogTo(table);
   table.Log("index", m_currentCommandIndex);
 }

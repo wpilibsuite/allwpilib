@@ -42,7 +42,7 @@ class RobotContainer {
   ComplexAuto complexAuto{&drive, &hatch};
 
   // The chooser for the autonomous routines
-  wpi::Selectable<wpi::cmd::Command*> chooser;
+  wpi::tunable::Selectable<wpi::cmd::Command*> chooser;
 
   // The driver's controller
   wpi::Gamepad driverController{OIConstants::kDriverControllerPort};

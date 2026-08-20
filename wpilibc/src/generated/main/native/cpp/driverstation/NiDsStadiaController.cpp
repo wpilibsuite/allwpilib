@@ -314,7 +314,7 @@ std::string_view NiDsStadiaController::GetTelemetryType() const {
   return "HID:NiDsStadia";
 }
 
-void NiDsStadiaController::LogTo(wpi::TelemetryTable& table) const {
+void NiDsStadiaController::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("LeftX", GetLeftX());
   table.Log("RightX", GetRightX());
   table.Log("LeftY", GetLeftY());

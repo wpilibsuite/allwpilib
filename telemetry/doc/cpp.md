@@ -5,35 +5,35 @@ This file describes the C++ Telemetry API as it is used from C++ robot code. The
 - For the shared Telemetry design and Java-facing API, see [Telemetry design](telemetry.md).
 - For Python-specific behavior, see [Python API](python.md).
 
-- the main entry points are static functions on `wpi::Telemetry` and member functions on `wpi::TelemetryTable`
+- the main entry points are static functions on `wpi::telemetry::Telemetry` and member functions on `wpi::telemetry::TelemetryTable`
 
 - generic logging is template-based rather than overload-plus-reflection based
 
 - structured logging support uses `wpi::util::StructSerializable` and `wpi::util::ProtobufSerializable`, registers the corresponding schema with the selected backend, and logs the encoded bytes as raw values
 
-- custom telemetry support is provided with non-member `LogTo()`, `LogValueTo()`, and `GetTelemetryTypeName()` functions found by ADL, or by member functions bridged by `wpi::TelemetryLoggable`
+- custom telemetry support is provided with non-member `LogTo()`, `LogValueTo()`, and `GetTelemetryTypeName()` functions found by ADL, or by member functions bridged by `wpi::telemetry::TelemetryLoggable`
 
 ## C++ Overview
 
 For most robot code, a C++ user interacts with three pieces:
 
-- `wpi::Telemetry` for simple one-line publishing
+- `wpi::telemetry::Telemetry` for simple one-line publishing
 
-- `wpi::TelemetryTable` for grouping related values under a table path
+- `wpi::telemetry::TelemetryTable` for grouping related values under a table path
 
-- `wpi::TelemetryLoggable` or ADL-based helpers for complex custom types
+- `wpi::telemetry::TelemetryLoggable` or ADL-based helpers for complex custom types
 
 The API is header-driven and highly generic. In many cases there is no need to manually choose between primitive, string, struct, or protobuf logging. Instead, the correct path is selected by the template constraints on `TelemetryTable::Log()`.
 
-## `wpi::Telemetry`
+## `wpi::telemetry::Telemetry`
 
-`wpi::Telemetry` is the top-level convenience facade. It forwards to the root telemetry table.
+`wpi::telemetry::Telemetry` is the top-level convenience facade. It forwards to the root telemetry table.
 
 ```cpp
 class Telemetry final {
  public:
-  static wpi::TelemetryTable& GetTable();
-  static wpi::TelemetryTable& GetTable(std::string_view name);
+  static wpi::telemetry::TelemetryTable& GetTable();
+  static wpi::telemetry::TelemetryTable& GetTable(std::string_view name);
 
   static void KeepDuplicates(std::string_view name);
   static void SetProperty(std::string_view name, std::string_view key,
@@ -80,9 +80,9 @@ class Telemetry final {
 Typical usage:
 
 ```cpp
-wpi::Telemetry::Log("batteryVoltage", wpi::RobotController::GetBatteryVoltage());
-wpi::Telemetry::Log("enabled", wpi::DriverStation::IsEnabled());
-wpi::Telemetry::Log("state", std::string_view{"Ready"});
+wpi::telemetry::Telemetry::Log("batteryVoltage", wpi::RobotController::GetBatteryVoltage());
+wpi::telemetry::Telemetry::Log("enabled", wpi::DriverStation::IsEnabled());
+wpi::telemetry::Telemetry::Log("state", std::string_view{"Ready"});
 ```
 
 Using the root facade is appropriate when:
@@ -93,9 +93,9 @@ Using the root facade is appropriate when:
 
 - there is no need to cache a table reference in a subsystem or helper object
 
-## `wpi::TelemetryTable`
+## `wpi::telemetry::TelemetryTable`
 
-`wpi::TelemetryTable` is the main C++ abstraction for grouped telemetry. A table corresponds to a path such as `/Drive/` or `/PoseEstimator/Vision/`.
+`wpi::telemetry::TelemetryTable` is the main C++ abstraction for grouped telemetry. A table corresponds to a path such as `/Drive/` or `/PoseEstimator/Vision/`.
 
 ```cpp
 class TelemetryTable final {
@@ -162,7 +162,7 @@ class Shooter {
   }
 
  private:
-  wpi::TelemetryTable& m_telemetry = wpi::Telemetry::GetTable("Shooter");
+  wpi::telemetry::TelemetryTable& m_telemetry = wpi::telemetry::Telemetry::GetTable("Shooter");
   wpi::Encoder m_encoder{0, 1};
   units::volt_t m_lastVoltage = 0_V;
 };
@@ -171,7 +171,7 @@ class Shooter {
 Nested tables are used when the hierarchy itself is meaningful:
 
 ```cpp
-auto& estimator = wpi::Telemetry::GetTable("PoseEstimator");
+auto& estimator = wpi::telemetry::Telemetry::GetTable("PoseEstimator");
 auto& vision = estimator.GetTable("Vision");
 auto& odometry = estimator.GetTable("Odometry");
 
@@ -182,7 +182,7 @@ odometry.Log("pose", estimatedPose);
 `SetType()` is used when the table represents a known structured kind of object and consumers should interpret that table consistently:
 
 ```cpp
-auto& mechanism = wpi::Telemetry::GetTable("ArmMechanism");
+auto& mechanism = wpi::telemetry::Telemetry::GetTable("ArmMechanism");
 if (mechanism.SetType("Mechanism2d")) {
   mechanism.Log("layout", mechanismJson, "json");
 }
@@ -226,9 +226,9 @@ Primitive arrays:
 
 ```cpp
 std::array<double, 3> wheelSpeeds{left, right, average};
-wpi::Telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
+wpi::telemetry::Telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
 
-auto& table = wpi::Telemetry::GetTable("Drive");
+auto& table = wpi::telemetry::Telemetry::GetTable("Drive");
 table.Log("setpoints", {1.0, 2.0, 3.0});
 ```
 
@@ -236,21 +236,21 @@ String arrays:
 
 ```cpp
 std::array<std::string_view, 3> states{"Idle", "Aiming", "Shooting"};
-wpi::Telemetry::Log("availableStates", std::span{states});
+wpi::telemetry::Telemetry::Log("availableStates", std::span{states});
 ```
 
 Raw bytes with a custom type string:
 
 ```cpp
 std::span<const uint8_t> packet = GetSerializedFrame();
-wpi::Telemetry::Log("cameraFrame", packet, "image/jpeg");
+wpi::telemetry::Telemetry::Log("cameraFrame", packet, "image/jpeg");
 ```
 
 For arrays of custom objects, the most natural path is usually a `std::span<const T>` where `T` is struct-serializable. Struct arrays are encoded as raw bytes after schema registration. Spans of string-formattable element types can fall back to string arrays; unsupported element types fail at compile time.
 
 ```cpp
 std::array<wpi::Pose2d, 2> poses{startPose, goalPose};
-wpi::Telemetry::Log("waypoints", std::span{poses});
+wpi::telemetry::Telemetry::Log("waypoints", std::span{poses});
 ```
 
 ## Logging Structured Types with `Struct` and `Protobuf`
@@ -261,14 +261,14 @@ Example with a struct-serializable type:
 
 ```cpp
 wpi::Pose2d pose = estimator.GetEstimatedPosition();
-wpi::Telemetry::Log("estimatedPose", pose);
+wpi::telemetry::Telemetry::Log("estimatedPose", pose);
 ```
 
 Example with a protobuf-serializable type:
 
 ```cpp
 MyProtoCompatibleType message = BuildMessage();
-wpi::Telemetry::Log("visionResult", message);
+wpi::telemetry::Telemetry::Log("visionResult", message);
 ```
 
 When logging those values, the telemetry layer ensures the corresponding schema is registered with the selected backend and then emits the encoded bytes through `LogRaw()`.
@@ -281,12 +281,12 @@ table.Log("sample", value, info1, info2);
 
 From a user's perspective, these extra arguments are part of the type-specific serialization contract for that type.
 
-## Publishing Complex Objects with `wpi::TelemetryLoggable`
+## Publishing Complex Objects with `wpi::telemetry::TelemetryLoggable`
 
-For non-final classes or types that naturally own a telemetry schema, subclassing `wpi::TelemetryLoggable` is the most direct C++ pattern.
+For non-final classes or types that naturally own a telemetry schema, subclassing `wpi::telemetry::TelemetryLoggable` is the most direct C++ pattern.
 
 ```cpp
-class DriveSnapshot : public wpi::TelemetryLoggable {
+class DriveSnapshot : public wpi::telemetry::TelemetryLoggable {
  public:
   DriveSnapshot(const wpi::DifferentialDriveWheelSpeeds& wheelSpeeds,
                 const wpi::Pose2d& pose, bool closedLoop)
@@ -296,7 +296,7 @@ class DriveSnapshot : public wpi::TelemetryLoggable {
     return "DriveSnapshot";
   }
 
-  void LogTo(wpi::TelemetryTable& table) const override {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
     table.Log("leftMetersPerSecond", m_wheelSpeeds.left.value());
     table.Log("rightMetersPerSecond", m_wheelSpeeds.right.value());
     table.Log("pose", m_pose);
@@ -314,7 +314,7 @@ Logging it is just:
 
 ```cpp
 DriveSnapshot snapshot{m_drive.GetWheelSpeeds(), m_drive.GetPose(), m_drive.IsClosedLoop()};
-wpi::Telemetry::Log("drive", snapshot);
+wpi::telemetry::Telemetry::Log("drive", snapshot);
 ```
 
 That call creates or reuses a `/drive/` child table, checks the table type if one is provided, and then lets the object populate entries under that table.
@@ -342,7 +342,7 @@ inline std::string_view GetTelemetryTypeName(const VisionMeasurement&) {
   return "VisionMeasurement";
 }
 
-inline void LogTo(wpi::TelemetryTable& table, const VisionMeasurement& value) {
+inline void LogTo(wpi::telemetry::TelemetryTable& table, const VisionMeasurement& value) {
   table.Log("pose", value.pose);
   table.Log("timestamp", value.timestamp);
   table.Log("tagCount", value.tagCount);
@@ -355,7 +355,7 @@ Usage:
 
 ```cpp
 example::VisionMeasurement measurement{pose, timestamp, tagCount};
-wpi::Telemetry::Log("latestVision", measurement);
+wpi::telemetry::Telemetry::Log("latestVision", measurement);
 ```
 
 ### Pattern 2: Value-style logging via `LogValueTo()`
@@ -371,7 +371,7 @@ struct RgbColor {
   uint8_t b;
 };
 
-inline void LogValueTo(wpi::TelemetryTable& table, std::string_view name,
+inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view name,
                        const RgbColor& value) {
   table.Log(name,
             fmt::format("#{:02X}{:02X}{:02X}", value.r, value.g, value.b),
@@ -385,19 +385,19 @@ Usage:
 
 ```cpp
 example::RgbColor color{255, 128, 0};
-wpi::Telemetry::Log("ledColor", color);
+wpi::telemetry::Telemetry::Log("ledColor", color);
 ```
 
 ### Pattern 3: Class member functions without inheritance
 
-The header also provides bridge helpers so a class with member functions named `LogTo()` and `GetTelemetryType()` can work without explicitly inheriting from `wpi::TelemetryLoggable`.
+The header also provides bridge helpers so a class with member functions named `LogTo()` and `GetTelemetryType()` can work without explicitly inheriting from `wpi::telemetry::TelemetryLoggable`.
 
 ```cpp
 class SuperstructureSnapshot {
  public:
   std::string_view GetTelemetryType() const { return "SuperstructureSnapshot"; }
 
-  void LogTo(wpi::TelemetryTable& table) const {
+  void LogTo(wpi::telemetry::TelemetryTable& table) const {
     table.Log("elevatorHeight", m_elevatorHeight);
     table.Log("armAngle", m_armAngle);
   }
@@ -408,22 +408,22 @@ class SuperstructureSnapshot {
 };
 ```
 
-Because the required member functions exist, `wpi::Telemetry::Log("superstructure", snapshot);` works without additional glue.
+Because the required member functions exist, `wpi::telemetry::Telemetry::Log("superstructure", snapshot);` works without additional glue.
 
 ## Duplicate Preservation and Properties
 
 The C++ API exposes the same per-entry controls as the Java facade, but in C++ spelling.
 
 ```cpp
-wpi::Telemetry::KeepDuplicates("loopOverrunCount");
-wpi::Telemetry::SetProperty("loopOverrunCount", "unit", "\"count\"");
-wpi::Telemetry::Log("loopOverrunCount", overrunCount);
+wpi::telemetry::Telemetry::KeepDuplicates("loopOverrunCount");
+wpi::telemetry::Telemetry::SetProperty("loopOverrunCount", "unit", "\"count\"");
+wpi::telemetry::Telemetry::Log("loopOverrunCount", overrunCount);
 ```
 
 Or from a table:
 
 ```cpp
-auto& drive = wpi::Telemetry::GetTable("Drive");
+auto& drive = wpi::telemetry::Telemetry::GetTable("Drive");
 drive.KeepDuplicates("leftVelocity");
 drive.SetProperty("leftVelocity", "unit", "\"m/s\"");
 drive.Log("leftVelocity", leftVelocity);
@@ -433,19 +433,19 @@ Property values are strings. When the backend expects JSON-formatted property va
 
 ## Thread Safety
 
-`wpi::Telemetry` and `wpi::TelemetryTable` may be used from the main robot loop and secondary user threads at the same time when they route to WPILib-provided backends. There is no periodic update call or main-thread affinity. Concurrent calls to the same path are serialized where required by the backend, but their output order is unspecified.
+`wpi::telemetry::Telemetry` and `wpi::telemetry::TelemetryTable` may be used from the main robot loop and secondary user threads at the same time when they route to WPILib-provided backends. There is no periodic update call or main-thread affinity. Concurrent calls to the same path are serialized where required by the backend, but their output order is unspecified.
 
 The values passed through `std::span`, `std::string_view`, references, serializers, and ADL hooks remain owned by the caller. They must stay alive and must not be modified concurrently for the duration of the call. A backend must copy any non-owning data it wants to retain after the call returns.
 
-`LogTo()` and `wpi::TelemetryLoggable::LogTo()` can issue several table calls and are not atomic as a group. For a coherent multi-field sample, make an immutable copy of the application state and log that copy. Do not rely on a table mutex to protect the object being inspected.
+`LogTo()` and `wpi::telemetry::TelemetryLoggable::LogTo()` can issue several table calls and are not atomic as a group. For a coherent multi-field sample, make an immutable copy of the application state and log that copy. Do not rely on a table mutex to protect the object being inspected.
 
-Custom `wpi::TelemetryBackend` and `wpi::TelemetryEntry` implementations must support concurrent calls. In particular, `GetEntry()`, schema operations, entry logging and metadata methods, and `RemoveEntry()` can overlap during logging or backend rerouting. A previously returned entry may still be in use when its path is removed. The WPILib-provided backends satisfy this contract.
+Custom `wpi::telemetry::TelemetryBackend` and `wpi::telemetry::TelemetryEntry` implementations must support concurrent calls. In particular, `GetEntry()`, schema operations, entry logging and metadata methods, and `RemoveEntry()` can overlap during logging or backend rerouting. A previously returned entry may still be in use when its path is removed. The WPILib-provided backends satisfy this contract.
 
 The C++ mock backend protects writes, but `GetActions()`, `GetLastAction()`, and `GetSchema()` expose references or pointers whose lifetime is not protected after the method returns. Quiesce logging before inspecting or retaining those results; copying values with `GetLastValue<T>()` avoids retaining an internal value.
 
 ## C++ Migration from WPILib 2026
 
-For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::Telemetry`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::Tunable` instead.
+For values that were only displayed with `frc::SmartDashboard::Put*()`, use `wpi::telemetry::Telemetry`. For values that were displayed and then read back with `frc::SmartDashboard::Get*()` so the dashboard could change robot behavior, use `wpi::tunable::Tunable` instead.
 
 ### SmartDashboard Output to Telemetry
 
@@ -464,7 +464,7 @@ void RobotPeriodic() {
 **Is (Telemetry):**
 
 ```cpp
-wpi::TelemetryTable& m_driveTelemetry = wpi::Telemetry::GetTable("Drive");
+wpi::telemetry::TelemetryTable& m_driveTelemetry = wpi::telemetry::Telemetry::GetTable("Drive");
 
 void RobotPeriodic() {
   m_driveTelemetry.Log("leftVelocity", m_leftEncoder.GetRate());
@@ -493,7 +493,7 @@ void RobotPeriodic() {
 
 ```cpp
 void RobotPeriodic() {
-  wpi::Telemetry::Log("RobotPose", m_poseEstimator.GetEstimatedPosition());
+  wpi::telemetry::Telemetry::Log("RobotPose", m_poseEstimator.GetEstimatedPosition());
 }
 ```
 
@@ -522,7 +522,7 @@ wpi::Field2d m_field;
 
 void RobotPeriodic() {
   m_field.SetRobotPose(m_poseEstimator.GetEstimatedPosition());
-  wpi::Telemetry::Log("Field", m_field);
+  wpi::telemetry::Telemetry::Log("Field", m_field);
 }
 ```
 
@@ -546,8 +546,8 @@ void RobotPeriodic() {
 **Is (Tunable):**
 
 ```cpp
-wpi::TunableDouble m_intakeSpeed =
-    wpi::Tunables::Add<double>("Intake/speed", 0.65);
+wpi::tunable::TunableDouble m_intakeSpeed =
+    wpi::tunable::Tunables::Add<double>("Intake/speed", 0.65);
 
 void RobotPeriodic() {
   m_intakeMotor.Set(m_intakeSpeed.Get());
@@ -556,7 +556,7 @@ void RobotPeriodic() {
 
 ## Advanced: User-Facing Registry APIs
 
-Most robot code does not need `wpi::TelemetryRegistry`, but advanced C++ users may interact with it in a few cases:
+Most robot code does not need `wpi::telemetry::TelemetryRegistry`, but advanced C++ users may interact with it in a few cases:
 
 - registering a telemetry backend for a path prefix
 
@@ -577,8 +577,8 @@ class TelemetryRegistry final {
   static void RegisterBackend(std::string_view prefix,
                               std::shared_ptr<TelemetryBackend> backend);
   static std::shared_ptr<TelemetryBackend> GetBackend(std::string_view path);
-  static std::shared_ptr<wpi::TelemetryEntry> GetEntry(std::string_view path);
-  static wpi::TelemetryTable& GetTable(std::string_view path);
+  static std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(std::string_view path);
+  static wpi::telemetry::TelemetryTable& GetTable(std::string_view path);
   static void Reset();
 
   static bool HasSchema(TelemetryBackend& backend,
@@ -605,17 +605,17 @@ class TelemetryRegistry final {
 Typical test setup:
 
 ```cpp
-wpi::TelemetryRegistry::Reset();
-wpi::TelemetryRegistry::RegisterBackend("/", std::make_shared<wpi::MockTelemetryBackend>());
+wpi::telemetry::TelemetryRegistry::Reset();
+wpi::telemetry::TelemetryRegistry::RegisterBackend("/", std::make_shared<wpi::telemetry::MockTelemetryBackend>());
 ```
 
 `RegisterBackend()` stores a `std::shared_ptr<TelemetryBackend>`, uses longest-prefix matching, removes affected entries from their previous backend via `RemoveEntry()`, and clears cached table entries so future logs use the updated mapping. `Reset()` clears registered backends, removes cached entries from their backends, and resets cached table entries; backend object cleanup happens through normal `shared_ptr` lifetime. `GetEntry()` and `GetBackend()` report a warning and return a discard entry or backend if no backend matches a normalized path. A `GetEntry()` result owns a shared handle that keeps both the entry and its backend alive while the entry is used.
 
 Warning handlers installed with `SetReportWarning()` must not throw.
 
-## Backend Layer: `wpi::TelemetryEntry`
+## Backend Layer: `wpi::telemetry::TelemetryEntry`
 
-Most C++ users will never implement `wpi::TelemetryEntry`, but it is the interface used by telemetry backends to receive resolved values.
+Most C++ users will never implement `wpi::telemetry::TelemetryEntry`, but it is the interface used by telemetry backends to receive resolved values.
 
 ```cpp
 class TelemetryEntry {
@@ -650,7 +650,7 @@ class TelemetryEntry {
 
 This layer is primarily relevant to backend authors rather than normal robot-code authors. `TelemetryEntry` implementations must not throw from logging, metadata, or discard-checking methods; recoverable failures should be reported through `TelemetryRegistry::ReportWarning()` and skipped.
 
-`wpi::TelemetryBackend` also owns schema publication in C++:
+`wpi::telemetry::TelemetryBackend` also owns schema publication in C++:
 
 ```cpp
 class TelemetryBackend {
@@ -671,14 +671,14 @@ class TelemetryBackend {
 
 ## Typical C++ Usage Guidance
 
-- Use `wpi::Telemetry::Log()` for isolated values.
+- Use `wpi::telemetry::Telemetry::Log()` for isolated values.
 
-- Hold a `wpi::TelemetryTable&` in subsystem code when publishing related values every loop.
+- Hold a `wpi::telemetry::TelemetryTable&` in subsystem code when publishing related values every loop.
 
-- Prefer `LogTo()`/`GetTelemetryTypeName()` or `wpi::TelemetryLoggable` for multi-field custom objects.
+- Prefer `LogTo()`/`GetTelemetryTypeName()` or `wpi::telemetry::TelemetryLoggable` for multi-field custom objects.
 
 - Prefer struct/protobuf support for values that already have WPILib serialization support.
 
 - Use `std::span` or initializer lists for arrays.
 
-- Reach for `wpi::TelemetryRegistry` and `wpi::TelemetryEntry` only when implementing advanced integration points such as custom backends or test harnesses.
+- Reach for `wpi::telemetry::TelemetryRegistry` and `wpi::telemetry::TelemetryEntry` only when implementing advanced integration points such as custom backends or test harnesses.

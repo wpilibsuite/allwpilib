@@ -204,7 +204,7 @@ RobotBase::RobotBase() {
     inst.StartServer("networktables.json", "", "robot");
   }
 
-  wpi::TelemetryRegistry::SetReportWarning(
+  wpi::telemetry::TelemetryRegistry::SetReportWarning(
       [warningReporter](std::string_view path, std::string_view msg) {
         if (auto reporter = warningReporter.lock()) {
           reporter->ReportTelemetry(path, msg);
@@ -212,7 +212,7 @@ RobotBase::RobotBase() {
           PrintDefaultTelemetryWarning(path, msg);
         }
       });
-  wpi::TunableRegistry::SetReportWarning(
+  wpi::tunable::TunableRegistry::SetReportWarning(
       [warningReporter](std::string_view msg) {
         if (auto reporter = warningReporter.lock()) {
           reporter->ReportTunable(msg);
@@ -221,10 +221,10 @@ RobotBase::RobotBase() {
         }
       });
 
-  wpi::TelemetryRegistry::RegisterBackend(
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
       "", std::make_shared<backend::NetworkTablesTelemetryBackend>(
               inst, "/Telemetry"));
-  wpi::TunableRegistry::RegisterBackend(
+  wpi::tunable::TunableRegistry::RegisterBackend(
       "", std::make_shared<backend::NetworkTablesTunableBackend>(inst,
                                                                  "/Tunables"));
 

@@ -70,7 +70,7 @@ void Solenoid::StartPulse() {
   m_module->FireOneShot(m_channel);
 }
 
-void Solenoid::LogTo(wpi::TelemetryTable& table) const {
+void Solenoid::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("Value", Get());
 }
 

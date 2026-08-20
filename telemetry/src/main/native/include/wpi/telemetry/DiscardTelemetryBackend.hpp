@@ -8,7 +8,7 @@
 
 #include "wpi/telemetry/TelemetryBackend.hpp"
 
-namespace wpi {
+namespace wpi::telemetry {
 
 /** A telemetry backend that discards all logged data. */
 class DiscardTelemetryBackend : public TelemetryBackend {
@@ -67,4 +67,4 @@ class DiscardTelemetryBackend : public TelemetryBackend {
                  std::string_view schema) override;
 };
 
-}  // namespace wpi
+}  // namespace wpi::telemetry

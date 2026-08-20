@@ -20,6 +20,7 @@
 #include "wpi/util/mutex.hpp"
 
 using namespace wpi;
+using namespace wpi::telemetry;
 
 static void DefaultReportWarning(std::string_view path, std::string_view msg);
 

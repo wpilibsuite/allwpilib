@@ -29,6 +29,7 @@
 #include "wpi/util/mutex.hpp"
 
 using namespace wpi;
+using namespace wpi::tunable;
 
 static void DefaultReportWarning(std::string_view msg);
 
@@ -376,11 +377,11 @@ static std::vector<std::function<void()>> FinishUpdate(Instance& inst) {
   return callbacks;
 }
 
-bool wpi::TunableRegistry::TunableInfo::IsChanged() const {
+bool wpi::tunable::TunableRegistry::TunableInfo::IsChanged() const {
   return tunable && tunable->GetTunableChanged();
 }
 
-void wpi::TunableRegistry::TunableInfo::ResetChanged() {
+void wpi::tunable::TunableRegistry::TunableInfo::ResetChanged() {
   if (tunable) {
     tunable->ResetTunableChanged();
   }
@@ -981,7 +982,7 @@ wpi::util::recursive_mutex& TunableRegistry::GetUpdateMutex() {
   return GetInstance().updateMutex;
 }
 
-void wpi::detail::SetTunableRegistryPreUpdateCallback(
+void wpi::tunable::detail::SetTunableRegistryPreUpdateCallback(
     std::function<void()> callback) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.backendsMutex};

@@ -18,7 +18,7 @@ namespace wpi {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public wpi::TelemetryLoggable {
+class DigitalOutput : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Create an instance of a digital output.
@@ -138,7 +138,7 @@ class DigitalOutput : public wpi::TelemetryLoggable {
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

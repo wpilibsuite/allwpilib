@@ -11,7 +11,7 @@
 
 namespace wpi {
 /** Counts rising or falling edges on a single digital input. */
-class EdgeCounter : public wpi::TelemetryLoggable {
+class EdgeCounter : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a new edge counter.
@@ -48,7 +48,7 @@ class EdgeCounter : public wpi::TelemetryLoggable {
    */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

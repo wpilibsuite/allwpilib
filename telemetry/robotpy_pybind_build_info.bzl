@@ -77,7 +77,7 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
             header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/TelemetryEntry.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::TelemetryEntry", "wpi__TelemetryEntry.hpp"),
+                ("wpi::telemetry::TelemetryEntry", "wpi__telemetry__TelemetryEntry.hpp"),
             ],
         ),
         struct(
@@ -87,7 +87,7 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
             header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/TelemetryBackend.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::TelemetryBackend", "wpi__TelemetryBackend.hpp"),
+                ("wpi::telemetry::TelemetryBackend", "wpi__telemetry__TelemetryBackend.hpp"),
             ],
         ),
         struct(
@@ -97,7 +97,7 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
             header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/TelemetryLoggable.hpp",
             tmpl_class_names = [],
             trampolines = [
-                ("wpi::TelemetryLoggable", "wpi__TelemetryLoggable.hpp"),
+                ("wpi::telemetry::TelemetryLoggable", "wpi__telemetry__TelemetryLoggable.hpp"),
             ],
         ),
     ]

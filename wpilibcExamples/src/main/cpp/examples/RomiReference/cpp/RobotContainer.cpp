@@ -26,7 +26,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Setup chooser options.
   chooser.AddDefault("Auto Routine Distance", &autoDistance);
   chooser.Add("Auto Routine Time", &autoTime);
-  wpi::Tunables::Publish("Auto Selector", chooser);
+  wpi::tunable::Tunables::Publish("Auto Selector", chooser);
 }
 
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {

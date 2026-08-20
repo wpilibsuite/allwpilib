@@ -23,7 +23,7 @@ MechanismLigament2d::MechanismLigament2d(std::string_view name, double length,
   SetColor(color);
 }
 
-void MechanismLigament2d::LogTo(wpi::TelemetryTable& table) const {
+void MechanismLigament2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
   {
     std::scoped_lock lock(m_mutex);
     table.Log("color", m_color);

@@ -306,7 +306,7 @@ std::string_view NiDsPS5Controller::GetTelemetryType() const {
   return "HID:NiDsPS5";
 }
 
-void NiDsPS5Controller::LogTo(wpi::TelemetryTable& table) const {
+void NiDsPS5Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
   table.Log("L2 Axis", GetL2Axis());
   table.Log("R2 Axis", GetR2Axis());
   table.Log("LeftX", GetLeftX());

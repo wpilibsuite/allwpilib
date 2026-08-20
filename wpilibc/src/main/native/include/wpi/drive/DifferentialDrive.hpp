@@ -52,7 +52,8 @@ class MotorController;
  * or curvatureDrive methods should be called periodically to avoid Motor
  * Safety timeouts.
  */
-class DifferentialDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
+class DifferentialDrive : public RobotDriveBase,
+                          public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Wheel velocities for a differential drive.
@@ -197,7 +198,7 @@ class DifferentialDrive : public RobotDriveBase, public wpi::TelemetryLoggable {
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
   std::string_view GetTelemetryType() const override;
 

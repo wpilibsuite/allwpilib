@@ -21,7 +21,7 @@ class EventLoop;
  * This class handles {{ ClassName }} input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class {{ ClassName }}Controller : public HIDDevice, public wpi::TelemetryLoggable {
+class {{ ClassName }}Controller : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = {{ touchpads }};
@@ -275,7 +275,7 @@ class {{ ClassName }}Controller : public HIDDevice, public wpi::TelemetryLoggabl
 {%- endif %}
 
   std::string_view GetTelemetryType() const override;
-  void LogTo(wpi::TelemetryTable& table) const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:{% for axis in axes %}
   double m_{{ axis.Name }}Deadband = {{ axis.DefaultDeadband }};

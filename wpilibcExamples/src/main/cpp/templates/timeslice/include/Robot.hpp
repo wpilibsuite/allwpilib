@@ -23,7 +23,7 @@ class Robot : public wpi::TimesliceRobot {
   void UtilityPeriodic() override;
 
  private:
-  wpi::Selectable<std::string> chooser;
+  wpi::tunable::Selectable<std::string> chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string autoSelected;
