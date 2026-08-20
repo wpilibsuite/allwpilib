@@ -1093,6 +1093,11 @@ void RegisterPreUpdateCallback() {
   wpi::detail::SetTunableRegistryPreUpdateCallback([] { RefreshValues(); });
 }
 
+void CleanupPythonStorage() {
+  wpi::detail::SetTunableRegistryPreUpdateCallback(nullptr);
+  ClearValues();
+}
+
 std::string NormalizePath(std::string_view path) {
   std::string buf;
   return std::string{wpi::TunableRegistry::NormalizeName(path, buf)};
@@ -1431,6 +1436,13 @@ py::object GetTunableValue(const wpi::MockTunableBackend& self,
 
 void wpi::InitTunablePython(py::module_& m) {
   RegisterPreUpdateCallback();
+
+  static int unused;
+  py::capsule cleanup(&unused, [](void*) {
+    py::gil_scoped_acquire gil;
+    CleanupPythonStorage();
+  });
+  m.add_object("_tunable_cleanup", cleanup);
 
   py::class_<PyMutationList>(m, "_MutationList")
       .def("__len__", &PyMutationList::Size)
