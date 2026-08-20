@@ -213,7 +213,6 @@ class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
    * @param setpoint The desired setpoint.
    */
   constexpr void SetSetpoint(double setpoint) {
-    bool setpointChanged = m_setpoint != setpoint;
     m_setpoint = setpoint;
     m_haveSetpoint = true;
 
@@ -226,12 +225,6 @@ class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
     }
 
     m_errorDerivative = (m_error - m_prevError) / m_period.value();
-
-    if !consteval {
-      if (setpointChanged) {
-        SetChildTunableChanged("setpoint");
-      }
-    }
   }
 
   /**
@@ -360,14 +353,8 @@ class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
    * @param setpoint The new setpoint of the controller.
    */
   constexpr double Calculate(double measurement, double setpoint) {
-    bool setpointChanged = m_setpoint != setpoint;
     m_setpoint = setpoint;
     m_haveSetpoint = true;
-    if !consteval {
-      if (setpointChanged) {
-        SetChildTunableChanged("setpoint");
-      }
-    }
     return Calculate(measurement);
   }
 

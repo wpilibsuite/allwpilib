@@ -32,7 +32,7 @@ void PIDController::PublishTunable(wpi::tunables::TunableTable& table) {
   table.Publish("i", m_Ki);
   table.Publish("d", m_Kd);
   table.Publish("izone", m_iZone);
-  auto setpointConfig = wpi::tunables::TunableConfig::GetOnChange();
+  auto setpointConfig = wpi::tunables::TunableConfig::AlwaysGet();
   setpointConfig.onTune = [](wpi::tunables::detail::TunableBase&,
                              wpi::tunables::ComplexTunable* self) {
     if (auto controller = static_cast<PIDController*>(self)) {

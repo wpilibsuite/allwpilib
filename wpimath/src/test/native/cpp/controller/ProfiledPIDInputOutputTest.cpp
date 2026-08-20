@@ -178,6 +178,32 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
   wpi::tunables::TunableRegistry::Reset();
 }
 
+TEST_CASE("ProfiledPIDInputOutputTest TunedNestedControllerGainUpdatesState",
+          "[wpimath]") {
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+
+  wpi::tunables::TunableRegistry::Reset();
+  auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
+  wpi::tunables::TunableRegistry::RegisterBackend("", backend);
+
+  Controller controller{0.0, 0.0, 0.0, {1_rad_per_s, 1_rad_per_s_sq}};
+  wpi::tunables::Publish("profiled", controller);
+
+  auto pUid = backend->GetUid("/profiled/controller/p");
+  REQUIRE(pUid.has_value());
+  CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*pUid).IsChanged());
+
+  backend->SetDouble("/profiled/controller/p", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(controller.GetP() == 2.0);
+
+  controller.SetP(3.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTunable(*pUid).IsChanged());
+
+  wpi::tunables::TunableRegistry::Reset();
+}
+
 TEST_CASE("ProfiledPIDInputOutputTest TunedGoalUpdatesGoal", "[wpimath]") {
   using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
 
