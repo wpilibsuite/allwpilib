@@ -39,38 +39,38 @@ public class TurretPositionPIDF implements AutoCloseable {
   double kTurretRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
   // Hardware
-  DCMotor m_turretMotor;
-  Encoder m_encoder;
-  PWMSparkMax m_motor;
+  DCMotor turretMotor;
+  Encoder encoder;
+  PWMSparkMax motor;
 
   // Controls helpers
-  PIDController m_controller;
+  PIDController controller;
 
   // Simulation support
-  FlywheelSim m_turretSim;
+  FlywheelSim turretSim;
   // Integrated angle for position tracking (FlywheelSim models only velocity)
-  double m_turretAngle = 0.0;
-  EncoderSim m_encoderSim;
-  PWMMotorControllerSim m_motorSim;
+  double turretAngle = 0.0;
+  EncoderSim encoderSim;
+  PWMMotorControllerSim motorSim;
   // Simulation sensor filters
-  LinearFilter m_velocityFilter;
+  LinearFilter velocityFilter;
 
   // State variables
-  double m_desiredPosition = 0.0;
-  double m_voltage = 0.0;
-  double m_actualPosition = 0.0;
+  double desiredPosition = 0.0;
+  double voltage = 0.0;
+  double actualPosition = 0.0;
 
   /** Constructor: set up encoder, motor and PID controller for the turret. */
   public TurretPositionPIDF() {
     // Set up quadrature encoder for position measurement
-    m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-    m_encoder.setDistancePerPulse(kTurretRadiansPerEncoderPulse);
+    encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+    encoder.setDistancePerPulse(kTurretRadiansPerEncoderPulse);
 
     // Set up SPARK PWM motor controller
-    m_motor = new PWMSparkMax(kMotorPort);
+    motor = new PWMSparkMax(kMotorPort);
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kP, kI, kD);
+    controller = new PIDController(kP, kI, kD);
   }
 
   // Initialize simulation components
@@ -80,20 +80,20 @@ public class TurretPositionPIDF implements AutoCloseable {
    */
   public void initializeSimulation() {
     // Set up Vex 775 Pro motor model for simulation
-    m_turretMotor = DCMotor.getVex775Pro(1);
+    turretMotor = DCMotor.getVex775Pro(1);
 
     // Build a flywheel-style plant for the turret and create the sim.
-    var plant = Models.flywheelFromPhysicalConstants(m_turretMotor, kMomentOfInertia, kGearing);
-    m_turretSim = new FlywheelSim(plant, m_turretMotor);
+    var plant = Models.flywheelFromPhysicalConstants(turretMotor, kMomentOfInertia, kGearing);
+    turretSim = new FlywheelSim(plant, turretMotor);
 
     // Set up simulation model for the encoder
-    m_encoderSim = new EncoderSim(m_encoder);
+    encoderSim = new EncoderSim(encoder);
 
     // Create sensor filter for angular velocity feedback
-    m_velocityFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
+    velocityFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
-    m_motorSim = new PWMMotorControllerSim(m_motor);
+    motorSim = new PWMMotorControllerSim(motor);
   }
 
   /**
@@ -104,24 +104,24 @@ public class TurretPositionPIDF implements AutoCloseable {
   public void update() {
     //////////////////////////////////////////////////
     // Step 1: Read Sensors
-    m_actualPosition = m_encoder.getDistance();
+    actualPosition = encoder.getDistance();
 
     //////////////////////////////////////////////////
     // Step 2: Calculate Control
 
     // Position-based Feedback control only
-    m_voltage = m_controller.calculate(m_actualPosition, m_desiredPosition);
+    voltage = controller.calculate(actualPosition, desiredPosition);
 
     // Clamp voltage command to physically possible range
-    if (m_voltage > 12.0) {
-      m_voltage = 12.0;
-    } else if (m_voltage < -12.0) {
-      m_voltage = -12.0;
+    if (voltage > 12.0) {
+      voltage = 12.0;
+    } else if (voltage < -12.0) {
+      voltage = -12.0;
     }
 
     //////////////////////////////////////////////////
     // Step 3: Send Outputs
-    m_motor.setVoltage(m_voltage);
+    motor.setVoltage(voltage);
   }
 
   /**
@@ -130,7 +130,7 @@ public class TurretPositionPIDF implements AutoCloseable {
    * @param setpoint The desired position in radians
    */
   public void setSetpoint(double setpoint) {
-    m_desiredPosition = setpoint;
+    desiredPosition = setpoint;
   }
 
   /**
@@ -138,22 +138,22 @@ public class TurretPositionPIDF implements AutoCloseable {
    * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
-    if (m_turretSim != null) {
+    if (turretSim != null) {
       double vbat = RobotController.getBatteryVoltage();
-      double volts = m_motorSim.getThrottle() * vbat;
+      double volts = motorSim.getThrottle() * vbat;
       if (volts > vbat) {
         volts = vbat;
       } else if (volts < -vbat) {
         volts = -vbat;
       }
-      m_turretSim.setInputVoltage(volts);
-      m_turretSim.update(0.020);
+      turretSim.setInputVoltage(volts);
+      turretSim.update(0.020);
       // Integrate filtered angular velocity to obtain position for the encoder
-      double filteredVel = m_velocityFilter.calculate(m_turretSim.getAngularVelocity());
-      m_turretAngle += filteredVel * 0.020;
-      m_encoderSim.setDistance(m_turretAngle);
+      double filteredVel = velocityFilter.calculate(turretSim.getAngularVelocity());
+      turretAngle += filteredVel * 0.020;
+      encoderSim.setDistance(turretAngle);
       RoboRioSim.setVInVoltage(
-          BatterySim.calculateDefaultBatteryLoadedVoltage(m_turretSim.getCurrentDraw()));
+          BatterySim.calculateDefaultBatteryLoadedVoltage(turretSim.getCurrentDraw()));
     }
   }
 
@@ -162,11 +162,11 @@ public class TurretPositionPIDF implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("TurretPositionPIDF/MotorVoltage_V", m_voltage);
+    SmartDashboard.putNumber("TurretPositionPIDF/MotorVoltage_V", voltage);
     SmartDashboard.putNumber(
-        "TurretPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(m_actualPosition));
+        "TurretPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(actualPosition));
     SmartDashboard.putNumber(
-        "TurretPositionPIDF/DesiredPosition_degrees", Units.radiansToDegrees(m_desiredPosition));
+        "TurretPositionPIDF/DesiredPosition_degrees", Units.radiansToDegrees(desiredPosition));
   }
 
   /**
@@ -175,7 +175,7 @@ public class TurretPositionPIDF implements AutoCloseable {
    */
   @Override
   public void close() {
-    m_encoder.close();
-    m_motor.close();
+    encoder.close();
+    motor.close();
   }
 }

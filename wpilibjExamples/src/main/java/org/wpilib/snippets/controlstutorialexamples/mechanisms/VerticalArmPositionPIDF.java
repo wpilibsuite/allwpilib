@@ -38,36 +38,36 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
   double kVerticalArmRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
   // Hardware
-  DCMotor m_armMotor;
-  Encoder m_encoder;
-  PWMSparkMax m_motor;
+  DCMotor armMotor;
+  Encoder encoder;
+  PWMSparkMax motor;
 
   // Controls helpers
-  PIDController m_controller;
+  PIDController controller;
 
   // Simulation support
-  SingleJointedArmSim m_armSim;
-  EncoderSim m_encoderSim;
-  PWMMotorControllerSim m_motorSim;
+  SingleJointedArmSim armSim;
+  EncoderSim encoderSim;
+  PWMMotorControllerSim motorSim;
   // Simulation sensor filters
-  LinearFilter m_angleFilter;
+  LinearFilter angleFilter;
 
   // State variables
-  double m_desiredPosition = 0.0;
-  double m_voltage = 0.0;
-  double m_actualPosition = 0.0;
+  double desiredPosition = 0.0;
+  double voltage = 0.0;
+  double actualPosition = 0.0;
 
   /** Constructor: set up encoder, motor, and PID controller for the vertical arm. */
   public VerticalArmPositionPIDF() {
     // Set up quadrature encoder for position measurement
-    m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-    m_encoder.setDistancePerPulse(kVerticalArmRadiansPerEncoderPulse);
+    encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+    encoder.setDistancePerPulse(kVerticalArmRadiansPerEncoderPulse);
 
     // Set up SPARK PWM motor controller
-    m_motor = new PWMSparkMax(kMotorPort);
+    motor = new PWMSparkMax(kMotorPort);
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kP, kI, kD);
+    controller = new PIDController(kP, kI, kD);
   }
 
   // Initialize simulation components
@@ -78,12 +78,12 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    */
   public void initializeSimulation() {
     // Set up CIM motor model for simulation
-    m_armMotor = DCMotor.getKrakenX60(2);
+    armMotor = DCMotor.getKrakenX60(2);
 
     // Set up simulation model for the vertical arm mechanism
-    m_armSim =
+    armSim =
         new SingleJointedArmSim(
-            m_armMotor,
+            armMotor,
             kGearing,
             kArmMass
                 / (kArmLength
@@ -95,13 +95,13 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
             0.0);
 
     // Set up simulation model for the encoder
-    m_encoderSim = new EncoderSim(m_encoder);
+    encoderSim = new EncoderSim(encoder);
 
     // Create sensor filter for arm angle
-    m_angleFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
+    angleFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
-    m_motorSim = new PWMMotorControllerSim(m_motor);
+    motorSim = new PWMMotorControllerSim(motor);
   }
 
   /**
@@ -112,30 +112,30 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
   public void update() {
     //////////////////////////////////////////////////
     // Step 1: Read Sensors
-    m_actualPosition = m_encoder.getDistance();
+    actualPosition = encoder.getDistance();
 
     //////////////////////////////////////////////////
     // Step 2: Calculate
 
     // Gravity compensation proportional to cosine of the angle (0 = straight out)
-    double gravityComp = kG * Math.cos(m_actualPosition);
+    double gravityComp = kG * Math.cos(actualPosition);
 
     // Feedback Control
-    double pidOutput = m_controller.calculate(m_actualPosition, m_desiredPosition);
+    double pidOutput = controller.calculate(actualPosition, desiredPosition);
 
     // Total control effort is sum of feedforward and feedback
-    m_voltage = pidOutput + gravityComp;
+    voltage = pidOutput + gravityComp;
 
     // Clamp voltage command to physically possible range
-    if (m_voltage > 12.0) {
-      m_voltage = 12.0;
-    } else if (m_voltage < -12.0) {
-      m_voltage = -12.0;
+    if (voltage > 12.0) {
+      voltage = 12.0;
+    } else if (voltage < -12.0) {
+      voltage = -12.0;
     }
 
     //////////////////////////////////////////////////
     // Step 3: Send Outputs
-    m_motor.setVoltage(m_voltage);
+    motor.setVoltage(voltage);
   }
 
   /**
@@ -144,7 +144,7 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    * @param setpoint The desired position in radians
    */
   public void setSetpoint(double setpoint) {
-    m_desiredPosition = setpoint;
+    desiredPosition = setpoint;
   }
 
   /**
@@ -152,13 +152,13 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
-    if (m_armSim != null) {
-      m_armSim.setInput(m_motorSim.getThrottle() * RobotController.getBatteryVoltage());
-      m_armSim.update(0.020);
-      double filteredAngle = m_angleFilter.calculate(m_armSim.getAngle());
-      m_encoderSim.setDistance(filteredAngle);
+    if (armSim != null) {
+      armSim.setInput(motorSim.getThrottle() * RobotController.getBatteryVoltage());
+      armSim.update(0.020);
+      double filteredAngle = angleFilter.calculate(armSim.getAngle());
+      encoderSim.setDistance(filteredAngle);
       RoboRioSim.setVInVoltage(
-          BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDraw()));
+          BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDraw()));
     }
   }
 
@@ -167,12 +167,12 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("VerticalArmPositionPIDF/MotorVoltage_V", m_voltage);
+    SmartDashboard.putNumber("VerticalArmPositionPIDF/MotorVoltage_V", voltage);
     SmartDashboard.putNumber(
-        "VerticalArmPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(m_actualPosition));
+        "VerticalArmPositionPIDF/ActualPosition_degrees", Units.radiansToDegrees(actualPosition));
     SmartDashboard.putNumber(
         "VerticalArmPositionPIDF/DesiredPosition_degrees",
-        Units.radiansToDegrees(m_desiredPosition));
+        Units.radiansToDegrees(desiredPosition));
   }
 
   /**
@@ -181,7 +181,7 @@ public class VerticalArmPositionPIDF implements AutoCloseable {
    */
   @Override
   public void close() {
-    m_encoder.close();
-    m_motor.close();
+    encoder.close();
+    motor.close();
   }
 }

@@ -35,30 +35,30 @@ public class FlywheelBangBang implements AutoCloseable {
   double kFlywheelRadiansPerEncoderPulse = 2.0 * Math.PI / 2048.0;
 
   // Hardware
-  DCMotor m_flywheelMotor;
-  Encoder m_encoder;
-  PWMSparkMax m_motor;
+  DCMotor flywheelMotor;
+  Encoder encoder;
+  PWMSparkMax motor;
 
   // Simulation support
-  FlywheelSim m_flywheelSim;
-  EncoderSim m_encoderSim;
-  PWMMotorControllerSim m_motorSim;
+  FlywheelSim flywheelSim;
+  EncoderSim encoderSim;
+  PWMMotorControllerSim motorSim;
   // Simulation sensor filters (single-pole IIR ~20ms)
-  LinearFilter m_encoderFilter;
+  LinearFilter encoderFilter;
 
   // State Variables
-  double m_desiredVelocity = 0.0;
-  double m_voltage = 0.0;
-  double m_actualVelocity = 0.0;
+  double desiredVelocity = 0.0;
+  double voltage = 0.0;
+  double actualVelocity = 0.0;
 
   /** Constructor: set up encoder and motor controller for the bang-bang example. */
   public FlywheelBangBang() {
     // Set up quadrature encoder for velocity measurement
-    m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-    m_encoder.setDistancePerPulse(kFlywheelRadiansPerEncoderPulse);
+    encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+    encoder.setDistancePerPulse(kFlywheelRadiansPerEncoderPulse);
 
     // Set up SPARK PWM motor controller
-    m_motor = new PWMSparkMax(kMotorPort);
+    motor = new PWMSparkMax(kMotorPort);
   }
 
   // Initialize simulation components
@@ -68,21 +68,21 @@ public class FlywheelBangBang implements AutoCloseable {
    */
   public void initializeSimulation() {
     // Set up Vex 775 Pro motor model for simulation
-    m_flywheelMotor = DCMotor.getVex775Pro(1);
+    flywheelMotor = DCMotor.getVex775Pro(1);
 
     // Build a state-space plant from physical constants and create a FlywheelSim.
     var plant =
-        Models.flywheelFromPhysicalConstants(m_flywheelMotor, kFlywheelMomentOfInertia, kGearing);
-    m_flywheelSim = new FlywheelSim(plant, m_flywheelMotor);
+        Models.flywheelFromPhysicalConstants(flywheelMotor, kFlywheelMomentOfInertia, kGearing);
+    flywheelSim = new FlywheelSim(plant, flywheelMotor);
 
     // Set up simulation model for the encoder
-    m_encoderSim = new EncoderSim(m_encoder);
+    encoderSim = new EncoderSim(encoder);
 
     // Create sensor filter for encoder feedback (20ms time constant, 20ms period)
-    m_encoderFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
+    encoderFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
-    m_motorSim = new PWMMotorControllerSim(m_motor);
+    motorSim = new PWMMotorControllerSim(motor);
   }
 
   /**
@@ -93,20 +93,20 @@ public class FlywheelBangBang implements AutoCloseable {
   public void update() {
     //////////////////////////////////////////////////
     // Step 1: Read Sensors
-    m_actualVelocity = m_encoder.getRate();
+    actualVelocity = encoder.getRate();
 
     //////////////////////////////////////////////////
     // Step 2: Calculate
     // Bang-bang control: full power if below setpoint, off if above
-    if (m_actualVelocity < m_desiredVelocity) {
-      m_voltage = 12.0; // full power
+    if (actualVelocity < desiredVelocity) {
+      voltage = 12.0; // full power
     } else {
-      m_voltage = 0.0; // off
+      voltage = 0.0; // off
     }
 
     //////////////////////////////////////////////////
     // Step 3: Send Outputs
-    m_motor.setVoltage(m_voltage);
+    motor.setVoltage(voltage);
   }
 
   /**
@@ -115,7 +115,7 @@ public class FlywheelBangBang implements AutoCloseable {
    * @param setpoint The desired velocity in radians per second
    */
   public void setSetpoint(double setpoint) {
-    m_desiredVelocity = setpoint;
+    desiredVelocity = setpoint;
   }
 
   /**
@@ -123,10 +123,10 @@ public class FlywheelBangBang implements AutoCloseable {
    * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
-    if (m_flywheelSim != null) {
+    if (flywheelSim != null) {
       double vbat = RobotController.getBatteryVoltage();
 
-      double volts = m_motorSim.getThrottle() * vbat;
+      double volts = motorSim.getThrottle() * vbat;
 
       if (volts > vbat) {
         volts = vbat;
@@ -134,12 +134,12 @@ public class FlywheelBangBang implements AutoCloseable {
         volts = -vbat;
       }
 
-      m_flywheelSim.setInputVoltage(volts);
-      m_flywheelSim.update(0.020);
-      double filteredRadPerSec = m_encoderFilter.calculate(m_flywheelSim.getAngularVelocity());
-      m_encoderSim.setRate(filteredRadPerSec);
+      flywheelSim.setInputVoltage(volts);
+      flywheelSim.update(0.020);
+      double filteredRadPerSec = encoderFilter.calculate(flywheelSim.getAngularVelocity());
+      encoderSim.setRate(filteredRadPerSec);
       RoboRioSim.setVInVoltage(
-          BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelSim.getCurrentDraw()));
+          BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDraw()));
     }
   }
 
@@ -148,13 +148,13 @@ public class FlywheelBangBang implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("FlywheelBangBang/MotorVoltage_V", m_voltage);
+    SmartDashboard.putNumber("FlywheelBangBang/MotorVoltage_V", voltage);
     SmartDashboard.putNumber(
         "FlywheelBangBang/ActualVelocity_RPM",
-        Units.radiansPerSecondToRotationsPerMinute(m_actualVelocity));
+        Units.radiansPerSecondToRotationsPerMinute(actualVelocity));
     SmartDashboard.putNumber(
         "FlywheelBangBang/DesiredVelocity_RPM",
-        Units.radiansPerSecondToRotationsPerMinute(m_desiredVelocity));
+        Units.radiansPerSecondToRotationsPerMinute(desiredVelocity));
   }
 
   /**
@@ -163,7 +163,7 @@ public class FlywheelBangBang implements AutoCloseable {
    */
   @Override
   public void close() {
-    m_encoder.close();
-    m_motor.close();
+    encoder.close();
+    motor.close();
   }
 }

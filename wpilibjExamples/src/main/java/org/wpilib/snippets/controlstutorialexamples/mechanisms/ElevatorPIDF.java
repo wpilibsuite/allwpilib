@@ -19,10 +19,7 @@ import org.wpilib.simulation.RoboRioSim;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 
-// Suppression is intentional - this file shows a "simple-as-possible" implementation
-// that a beginner might reference. It is not intended to show "best" coding practices.
 /** Elevator PIDF example with trapezoidal profiling and simulation. */
-@SuppressWarnings({"checkstyle:MemberName"})
 public class ElevatorPIDF implements AutoCloseable {
   // Physical mechanism constants
   double kGearing = 15.0;
@@ -46,48 +43,48 @@ public class ElevatorPIDF implements AutoCloseable {
   int kEncoderAChannel = 8;
   int kEncoderBChannel = 9;
   double kElevatorHeightMetersPerEncoderPulse = 2.0 * Math.PI * kDrumRadius / 4096.0; // 2" drum
-  DCMotor m_elevatorMotor;
-  Encoder m_encoder;
-  PWMSparkMax m_motor;
+  DCMotor elevatorMotor;
+  Encoder encoder;
+  PWMSparkMax motor;
 
   // Controls Helpers: WPILib built-in classes for position control with motion profiling
-  TrapezoidProfile m_profile;
-  TrapezoidProfile.State m_profileState = new TrapezoidProfile.State();
-  PIDController m_controller;
-  ElevatorFeedforward m_feedforward;
+  TrapezoidProfile profile;
+  TrapezoidProfile.State profileState = new TrapezoidProfile.State();
+  PIDController controller;
+  ElevatorFeedforward feedforward;
 
   // Simulation Support
-  ElevatorSim m_elevatorSim;
-  EncoderSim m_encoderSim;
-  PWMMotorControllerSim m_motorSim;
+  ElevatorSim elevatorSim;
+  EncoderSim encoderSim;
+  PWMMotorControllerSim motorSim;
   // Simulation sensor filters
-  LinearFilter m_positionFilter;
+  LinearFilter positionFilter;
 
   // State Variables
-  double m_desiredPosition = 0.0;
-  double m_voltage = 0.0;
-  double m_actualPosition = 0.0;
-  double m_profiledPosition = 0.0;
+  double desiredPosition = 0.0;
+  double voltage = 0.0;
+  double actualPosition = 0.0;
+  double profiledPosition = 0.0;
 
   /** Constructor: set up encoder, motor controller, PID and controllers, and profiler. */
   public ElevatorPIDF() {
     // Set up quadrature encoder for position measurement
-    m_encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
-    m_encoder.setDistancePerPulse(kElevatorHeightMetersPerEncoderPulse);
+    encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+    encoder.setDistancePerPulse(kElevatorHeightMetersPerEncoderPulse);
 
     // Set up SPARK PWM motor controller
-    m_motor = new PWMSparkMax(kMotorPort);
+    motor = new PWMSparkMax(kMotorPort);
 
     // Set up trapezoidal profile for motion profiling
-    m_profile =
+    profile =
         new TrapezoidProfile(
             new TrapezoidProfile.Constraints(kProfileMaxVelocity, kProfileMaxAcceleration));
 
     // Set up WPILib's built-in PID controller for position control
-    m_controller = new PIDController(kP, kI, kD);
+    controller = new PIDController(kP, kI, kD);
 
     // Set up elevator feedforward controller for gravity and velocity compensation
-    m_feedforward = new ElevatorFeedforward(kS, kG, kV, 0.0);
+    feedforward = new ElevatorFeedforward(kS, kG, kV, 0.0);
   }
 
   // Initialize simulation components
@@ -97,12 +94,12 @@ public class ElevatorPIDF implements AutoCloseable {
    */
   public void initializeSimulation() {
     // Set up Kraken X60 motor model for simulation
-    m_elevatorMotor = DCMotor.getKrakenX60(2);
+    elevatorMotor = DCMotor.getKrakenX60(2);
 
     // Set up simulation model for the elevator mechanism
-    m_elevatorSim =
+    elevatorSim =
         new ElevatorSim(
-            m_elevatorMotor,
+            elevatorMotor,
             kGearing,
             kCarriageMass,
             kDrumRadius,
@@ -114,13 +111,13 @@ public class ElevatorPIDF implements AutoCloseable {
             0.0);
 
     // Set up simulation model for the encoder
-    m_encoderSim = new EncoderSim(m_encoder);
+    encoderSim = new EncoderSim(encoder);
 
     // Create sensor filter for elevator position
-    m_positionFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
+    positionFilter = LinearFilter.singlePoleIIR(0.05, 0.02);
 
     // Set up simulation model for the motor controller
-    m_motorSim = new PWMMotorControllerSim(m_motor);
+    motorSim = new PWMMotorControllerSim(motor);
   }
 
   /**
@@ -132,36 +129,36 @@ public class ElevatorPIDF implements AutoCloseable {
   public void update() {
     //////////////////////////////////////////////////
     // Step 1: Read Sensors
-    m_actualPosition = m_encoder.getDistance();
+    actualPosition = encoder.getDistance();
 
     //////////////////////////////////////////////////
     // Step 2: Calculate Profile
-    TrapezoidProfile.State goal = new TrapezoidProfile.State(m_desiredPosition, 0.0);
-    m_profileState = m_profile.calculate(0.020, m_profileState, goal);
-    m_profiledPosition = m_profileState.position;
+    TrapezoidProfile.State goal = new TrapezoidProfile.State(desiredPosition, 0.0);
+    profileState = profile.calculate(0.020, profileState, goal);
+    profiledPosition = profileState.position;
 
     //////////////////////////////////////////////////
     // Step 3: Calculate Control
 
     // Velocity-based feedforward, using profiler's output
-    double feedforwardOutput = m_feedforward.calculate(m_profileState.velocity);
+    double feedforwardOutput = feedforward.calculate(profileState.velocity);
 
     // Position-based feedback control
-    double pidOutput = m_controller.calculate(m_actualPosition, m_profiledPosition);
+    double pidOutput = controller.calculate(actualPosition, profiledPosition);
 
     // Total control effort is sum of feedforward and feedback
-    m_voltage = pidOutput + feedforwardOutput;
+    voltage = pidOutput + feedforwardOutput;
 
     // Clamp voltage command to physically possible range
-    if (m_voltage > 12.0) {
-      m_voltage = 12.0;
-    } else if (m_voltage < -12.0) {
-      m_voltage = -12.0;
+    if (voltage > 12.0) {
+      voltage = 12.0;
+    } else if (voltage < -12.0) {
+      voltage = -12.0;
     }
 
     //////////////////////////////////////////////////
     // Step 4: Send Outputs
-    m_motor.setVoltage(m_voltage);
+    motor.setVoltage(voltage);
   }
 
   /**
@@ -170,7 +167,7 @@ public class ElevatorPIDF implements AutoCloseable {
    * @param setpoint The desired position in meters
    */
   public void setSetpoint(double setpoint) {
-    m_desiredPosition = setpoint;
+    desiredPosition = setpoint;
   }
 
   /**
@@ -178,10 +175,10 @@ public class ElevatorPIDF implements AutoCloseable {
    * simulation mode to update the physics simulation and synchronize simulated sensors.
    */
   public void updateSimulation() {
-    if (m_elevatorSim != null) {
+    if (elevatorSim != null) {
       double vbat = RobotController.getBatteryVoltage();
 
-      double volts = m_motorSim.getThrottle() * vbat;
+      double volts = motorSim.getThrottle() * vbat;
 
       if (volts > vbat) {
         volts = vbat;
@@ -189,12 +186,12 @@ public class ElevatorPIDF implements AutoCloseable {
         volts = -vbat;
       }
 
-      m_elevatorSim.setInput(volts);
-      m_elevatorSim.update(0.020);
-      double filteredPos = m_positionFilter.calculate(m_elevatorSim.getPosition());
-      m_encoderSim.setDistance(filteredPos);
+      elevatorSim.setInput(volts);
+      elevatorSim.update(0.020);
+      double filteredPos = positionFilter.calculate(elevatorSim.getPosition());
+      encoderSim.setDistance(filteredPos);
       RoboRioSim.setVInVoltage(
-          BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDraw()));
+          BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDraw()));
     }
   }
 
@@ -203,10 +200,10 @@ public class ElevatorPIDF implements AutoCloseable {
    * mechanism state information for debugging and monitoring.
    */
   public void updateTelemetry() {
-    SmartDashboard.putNumber("ElevatorPIDF/MotorVoltage_V", m_voltage);
-    SmartDashboard.putNumber("ElevatorPIDF/ActualPosition_m", m_actualPosition);
-    SmartDashboard.putNumber("ElevatorPIDF/ProfiledPosition_m", m_profiledPosition);
-    SmartDashboard.putNumber("ElevatorPIDF/DesiredPosition_m", m_desiredPosition);
+    SmartDashboard.putNumber("ElevatorPIDF/MotorVoltage_V", voltage);
+    SmartDashboard.putNumber("ElevatorPIDF/ActualPosition_m", actualPosition);
+    SmartDashboard.putNumber("ElevatorPIDF/ProfiledPosition_m", profiledPosition);
+    SmartDashboard.putNumber("ElevatorPIDF/DesiredPosition_m", desiredPosition);
   }
 
   /**
@@ -215,7 +212,7 @@ public class ElevatorPIDF implements AutoCloseable {
    */
   @Override
   public void close() {
-    m_encoder.close();
-    m_motor.close();
+    encoder.close();
+    motor.close();
   }
 }
