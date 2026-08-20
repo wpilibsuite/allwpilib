@@ -25,6 +25,11 @@ public final class TelemetryTable {
 
   private record CachedEntry(TelemetryEntry entry, long resetGeneration) {}
 
+  private enum EntryMetadataKind {
+    KEEP_DUPLICATES,
+    PROPERTY
+  }
+
   private static final ClassValue<StaticFieldLookup> s_structLookupCache =
       new ClassValue<>() {
         @Override
@@ -242,6 +247,55 @@ public final class TelemetryTable {
     }
   }
 
+  private void applyEntryMetadata(
+      String name, String path, EntryMetadataKind kind, String key, String value) {
+    for (; ; ) {
+      CachedEntry cachedEntry = m_entriesMap.get(name);
+      if (cachedEntry != null) {
+        if (cachedEntry.resetGeneration() == m_resetGeneration.get()) {
+          applyEntryMetadata(cachedEntry.entry(), kind, key, value);
+          return;
+        }
+        m_entriesMap.remove(name, cachedEntry);
+        continue;
+      }
+
+      long resetGeneration = m_resetGeneration.get();
+      TelemetryEntry newEntry =
+          m_backend != null ? m_backend.getEntry(path) : TelemetryRegistry.getEntry(path);
+      boolean metadataApplied = false;
+      if (m_backend == null && !newEntry.isDiscard()) {
+        TelemetryRegistry.applyEntryMetadata(path, newEntry);
+        metadataApplied = true;
+      }
+
+      CachedEntry newCachedEntry = new CachedEntry(newEntry, resetGeneration);
+      cachedEntry = m_entriesMap.putIfAbsent(name, newCachedEntry);
+      boolean inserted = cachedEntry == null;
+      if (cachedEntry == null) {
+        cachedEntry = newCachedEntry;
+      }
+      if (cachedEntry.resetGeneration() == m_resetGeneration.get()) {
+        if (!(inserted && metadataApplied)) {
+          applyEntryMetadata(cachedEntry.entry(), kind, key, value);
+        }
+        return;
+      }
+      m_entriesMap.remove(name, cachedEntry);
+    }
+  }
+
+  private void applyEntryMetadata(
+      TelemetryEntry entry, EntryMetadataKind kind, String key, String value) {
+    if (!entry.isDiscard()) {
+      if (kind == EntryMetadataKind.KEEP_DUPLICATES) {
+        entry.keepDuplicates();
+      } else {
+        entry.setProperty(key, value);
+      }
+    }
+  }
+
   private boolean shouldLogTableValue(String name, TelemetryTable table) {
     TelemetryEntry entry = getEntry(name);
     return !entry.isDiscard() || m_backend == null && table.hasNonDiscardDescendant();
@@ -277,14 +331,22 @@ public final class TelemetryTable {
    * @param name the name
    */
   public void keepDuplicates(String name) {
-    TelemetryEntry entry = getEntry(name);
-    if (entry.isDiscard()) {
+    if (m_backend != null) {
+      TelemetryEntry entry = getEntry(name);
+      if (!entry.isDiscard()) {
+        entry.keepDuplicates();
+      }
       return;
     }
-    if (m_backend == null) {
-      TelemetryRegistry.keepEntryDuplicates(getEntryPath(name));
+
+    String path = getEntryPath(name);
+    boolean done = false;
+    while (!done) {
+      long resetGeneration = m_resetGeneration.get();
+      TelemetryRegistry.keepEntryDuplicates(path);
+      applyEntryMetadata(name, path, EntryMetadataKind.KEEP_DUPLICATES, null, null);
+      done = m_resetGeneration.get() == resetGeneration;
     }
-    entry.keepDuplicates();
   }
 
   /**
@@ -295,14 +357,22 @@ public final class TelemetryTable {
    * @param value property value
    */
   public void setProperty(String name, String key, String value) {
-    TelemetryEntry entry = getEntry(name);
-    if (entry.isDiscard()) {
+    if (m_backend != null) {
+      TelemetryEntry entry = getEntry(name);
+      if (!entry.isDiscard()) {
+        entry.setProperty(key, value);
+      }
       return;
     }
-    if (m_backend == null) {
-      TelemetryRegistry.setEntryProperty(getEntryPath(name), key, value);
+
+    String path = getEntryPath(name);
+    boolean done = false;
+    while (!done) {
+      long resetGeneration = m_resetGeneration.get();
+      TelemetryRegistry.setEntryProperty(path, key, value);
+      applyEntryMetadata(name, path, EntryMetadataKind.PROPERTY, key, value);
+      done = m_resetGeneration.get() == resetGeneration;
     }
-    entry.setProperty(key, value);
   }
 
   /**

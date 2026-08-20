@@ -121,7 +121,12 @@ class TelemetryTableTest {
   private static final class BlockingDiscardTelemetryBackend implements TelemetryBackend {
     BlockingDiscardTelemetryBackend(
         CountDownLatch enteredIsDiscard, CountDownLatch releaseIsDiscard) {
-      m_entry = new Entry(enteredIsDiscard, releaseIsDiscard);
+      this(enteredIsDiscard, releaseIsDiscard, true);
+    }
+
+    BlockingDiscardTelemetryBackend(
+        CountDownLatch enteredIsDiscard, CountDownLatch releaseIsDiscard, boolean discard) {
+      m_entry = new Entry(enteredIsDiscard, releaseIsDiscard, discard);
     }
 
     @Override
@@ -199,9 +204,10 @@ class TelemetryTableTest {
   }
 
   private static final class Entry implements TelemetryEntry {
-    Entry(CountDownLatch enteredIsDiscard, CountDownLatch releaseIsDiscard) {
+    Entry(CountDownLatch enteredIsDiscard, CountDownLatch releaseIsDiscard, boolean discard) {
       m_enteredIsDiscard = enteredIsDiscard;
       m_releaseIsDiscard = releaseIsDiscard;
+      m_discard = discard;
     }
 
     @Override
@@ -213,7 +219,7 @@ class TelemetryTableTest {
         Thread.currentThread().interrupt();
         throw new AssertionError(e);
       }
-      return true;
+      return m_discard;
     }
 
     @Override
@@ -272,6 +278,7 @@ class TelemetryTableTest {
 
     private final CountDownLatch m_enteredIsDiscard;
     private final CountDownLatch m_releaseIsDiscard;
+    private final boolean m_discard;
   }
 
   private static final class GenerationTelemetryBackend implements TelemetryBackend {
@@ -1679,6 +1686,83 @@ class TelemetryTableTest {
     discard.log("primitive", 2.0);
 
     assertEquals(2.0, m_mock.getLastValue("/discard/primitive", Double.class));
+  }
+
+  @Test
+  void testKeepDuplicatesAppliesMetadataAfterBackendResetDuringEntryLookup()
+      throws InterruptedException {
+    TelemetryTable table = Telemetry.getTable("rerouted");
+    CountDownLatch enteredIsDiscard = new CountDownLatch(1);
+    CountDownLatch releaseIsDiscard = new CountDownLatch(1);
+    TelemetryRegistry.registerBackend(
+        "/rerouted/dups",
+        new BlockingDiscardTelemetryBackend(enteredIsDiscard, releaseIsDiscard, false));
+    MockTelemetryBackend replacement = new MockTelemetryBackend();
+    AtomicReference<Throwable> metadataFailure = new AtomicReference<>();
+
+    Thread metadataThread =
+        new Thread(
+            () -> {
+              table.keepDuplicates("dups");
+            });
+    metadataThread.setUncaughtExceptionHandler((thread, error) -> metadataFailure.set(error));
+    metadataThread.start();
+
+    try {
+      assertTrue(enteredIsDiscard.await(5, TimeUnit.SECONDS));
+
+      TelemetryRegistry.registerBackend("/rerouted/dups", replacement);
+      table.log("dups", 1.0);
+    } finally {
+      releaseIsDiscard.countDown();
+      metadataThread.join(5000);
+    }
+
+    assertFalse(metadataThread.isAlive());
+    assertNull(metadataFailure.get());
+    assertFalse(replacement.getActions().isEmpty());
+    assertEquals("/rerouted/dups", replacement.getActions().get(0).path());
+    assertEquals(
+        new MockTelemetryBackend.KeepDuplicateValue(true), replacement.getActions().get(0).value());
+  }
+
+  @Test
+  void testSetPropertyAppliesMetadataAfterBackendResetDuringEntryLookup()
+      throws InterruptedException {
+    TelemetryTable table = Telemetry.getTable("rerouted");
+    CountDownLatch enteredIsDiscard = new CountDownLatch(1);
+    CountDownLatch releaseIsDiscard = new CountDownLatch(1);
+    TelemetryRegistry.registerBackend(
+        "/rerouted/prop",
+        new BlockingDiscardTelemetryBackend(enteredIsDiscard, releaseIsDiscard, false));
+    MockTelemetryBackend replacement = new MockTelemetryBackend();
+    AtomicReference<Throwable> metadataFailure = new AtomicReference<>();
+
+    Thread metadataThread =
+        new Thread(
+            () -> {
+              table.setProperty("prop", "unit", "\"count\"");
+            });
+    metadataThread.setUncaughtExceptionHandler((thread, error) -> metadataFailure.set(error));
+    metadataThread.start();
+
+    try {
+      assertTrue(enteredIsDiscard.await(5, TimeUnit.SECONDS));
+
+      TelemetryRegistry.registerBackend("/rerouted/prop", replacement);
+      table.log("prop", 1.0);
+    } finally {
+      releaseIsDiscard.countDown();
+      metadataThread.join(5000);
+    }
+
+    assertFalse(metadataThread.isAlive());
+    assertNull(metadataFailure.get());
+    assertFalse(replacement.getActions().isEmpty());
+    assertEquals("/rerouted/prop", replacement.getActions().get(0).path());
+    assertEquals(
+        new MockTelemetryBackend.SetPropertyValue("unit", "\"count\""),
+        replacement.getActions().get(0).value());
   }
 
   @Test

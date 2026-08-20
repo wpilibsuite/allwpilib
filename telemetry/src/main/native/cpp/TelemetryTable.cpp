@@ -86,23 +86,50 @@ TelemetryTable& TelemetryTable::GetTable(std::string_view name) const {
 }
 
 void TelemetryTable::KeepDuplicates(std::string_view name) {
-  auto entry = GetEntry(name);
-  if (entry->IsDiscard()) {
-    return;
+  auto path = std::format("{}{}", m_path, name);
+  for (;;) {
+    uint64_t resetGeneration;
+    {
+      std::scoped_lock lock{m_mutex};
+      resetGeneration = m_resetGeneration;
+    }
+
+    TelemetryRegistry::RecordKeepDuplicates(path);
+    bool metadataApplied = false;
+    auto entry = GetEntry(name, &metadataApplied);
+    if (!metadataApplied && !entry->IsDiscard()) {
+      entry->KeepDuplicates();
+    }
+
+    std::scoped_lock lock{m_mutex};
+    if (m_resetGeneration == resetGeneration) {
+      return;
+    }
   }
-  TelemetryRegistry::RecordKeepDuplicates(std::format("{}{}", m_path, name));
-  entry->KeepDuplicates();
 }
 
 void TelemetryTable::SetProperty(std::string_view name, std::string_view key,
                                  std::string_view value) {
-  auto entry = GetEntry(name);
-  if (entry->IsDiscard()) {
-    return;
+  auto path = std::format("{}{}", m_path, name);
+  for (;;) {
+    uint64_t resetGeneration;
+    {
+      std::scoped_lock lock{m_mutex};
+      resetGeneration = m_resetGeneration;
+    }
+
+    TelemetryRegistry::RecordProperty(path, key, value);
+    bool metadataApplied = false;
+    auto entry = GetEntry(name, &metadataApplied);
+    if (!metadataApplied && !entry->IsDiscard()) {
+      entry->SetProperty(key, value);
+    }
+
+    std::scoped_lock lock{m_mutex};
+    if (m_resetGeneration == resetGeneration) {
+      return;
+    }
   }
-  TelemetryRegistry::RecordProperty(std::format("{}{}", m_path, name), key,
-                                    value);
-  entry->SetProperty(key, value);
 }
 
 void TelemetryTable::Log(std::string_view name, bool value) {
@@ -266,6 +293,15 @@ void TelemetryTable::Log(std::string_view name, std::span<const uint8_t> value,
 }
 
 TelemetryTable::EntryHandle TelemetryTable::GetEntry(std::string_view name) {
+  return GetEntry(name, nullptr);
+}
+
+TelemetryTable::EntryHandle TelemetryTable::GetEntry(std::string_view name,
+                                                     bool* metadataApplied) {
+  if (metadataApplied) {
+    *metadataApplied = false;
+  }
+
   for (;;) {
     std::unique_lock lock{m_mutex};
     auto entryIt = m_entriesMap.find(name);
@@ -279,8 +315,10 @@ TelemetryTable::EntryHandle TelemetryTable::GetEntry(std::string_view name) {
 
     auto path = std::format("{}{}", m_path, name);
     auto newEntry = TelemetryRegistry::GetEntryHandle(path);
+    bool entryMetadataApplied = false;
     if (!newEntry.entry->IsDiscard()) {
       TelemetryRegistry::ApplyEntryMetadata(path, *newEntry.entry);
+      entryMetadataApplied = true;
     }
 
     lock.lock();
@@ -299,6 +337,9 @@ TelemetryTable::EntryHandle TelemetryTable::GetEntry(std::string_view name) {
     auto insertedIt = m_entriesMap.try_emplace(name, entry).first;
     entry = insertedIt->second;
     lock.unlock();
+    if (metadataApplied) {
+      *metadataApplied = entryMetadataApplied;
+    }
     return entry;
   }
 }

@@ -289,6 +289,114 @@ class BlockingTelemetryBackend : public wpi::telemetry::TelemetryBackend {
   std::shared_ptr<Entry> m_entry;
 };
 
+class BlockingIsDiscardBackend : public wpi::telemetry::TelemetryBackend {
+ public:
+  BlockingIsDiscardBackend(std::promise<void>* entered,
+                           std::shared_future<void> release, bool discard)
+      : m_entry{std::make_shared<Entry>(entered, std::move(release), discard)} {
+  }
+
+  std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
+      std::string_view path) override {
+    (void)path;
+    return m_entry;
+  }
+
+  bool HasSchema(std::string_view schemaName) const override {
+    (void)schemaName;
+    return false;
+  }
+
+  void AddSchema(std::string_view schemaName, std::string_view type,
+                 std::span<const uint8_t> schema) override {
+    (void)schemaName;
+    (void)type;
+    (void)schema;
+  }
+
+  void AddSchema(std::string_view schemaName, std::string_view type,
+                 std::string_view schema) override {
+    (void)schemaName;
+    (void)type;
+    (void)schema;
+  }
+
+ private:
+  class Entry : public wpi::telemetry::TelemetryEntry {
+   public:
+    Entry(std::promise<void>* entered, std::shared_future<void> release,
+          bool discard)
+        : m_entered{entered},
+          m_release{std::move(release)},
+          m_discard{discard} {}
+
+    bool IsDiscard() const override {
+      if (!m_enteredCalled.exchange(true)) {
+        m_entered->set_value();
+      }
+      m_release.wait();
+      return m_discard;
+    }
+
+    void KeepDuplicates() override {}
+
+    void SetProperty(std::string_view key, std::string_view value) override {
+      (void)key;
+      (void)value;
+    }
+
+    void LogBoolean(bool value) override { (void)value; }
+
+    void LogInt64(int64_t value) override { (void)value; }
+
+    void LogFloat(float value) override { (void)value; }
+
+    void LogDouble(double value) override { (void)value; }
+
+    void LogString(std::string_view value,
+                   std::string_view typeString) override {
+      (void)value;
+      (void)typeString;
+    }
+
+    void LogBooleanArray(std::span<const bool> value) override { (void)value; }
+
+    void LogBooleanArray(std::span<const int> value) override { (void)value; }
+
+    void LogInt16Array(std::span<const int16_t> value) override { (void)value; }
+
+    void LogInt32Array(std::span<const int32_t> value) override { (void)value; }
+
+    void LogInt64Array(std::span<const int64_t> value) override { (void)value; }
+
+    void LogFloatArray(std::span<const float> value) override { (void)value; }
+
+    void LogDoubleArray(std::span<const double> value) override { (void)value; }
+
+    void LogStringArray(std::span<const std::string> value) override {
+      (void)value;
+    }
+
+    void LogStringArray(std::span<const std::string_view> value) override {
+      (void)value;
+    }
+
+    void LogRaw(std::span<const uint8_t> value,
+                std::string_view typeString) override {
+      (void)value;
+      (void)typeString;
+    }
+
+   private:
+    std::promise<void>* m_entered;
+    std::shared_future<void> m_release;
+    bool m_discard;
+    mutable std::atomic_bool m_enteredCalled{false};
+  };
+
+  std::shared_ptr<Entry> m_entry;
+};
+
 class GenerationTelemetryBackend : public wpi::telemetry::TelemetryBackend {
  public:
   std::shared_ptr<wpi::telemetry::TelemetryEntry> GetEntry(
@@ -921,6 +1029,77 @@ TEST_CASE_METHOD(TelemetryTableTest, "TelemetryTableTest ResetClearsTableTypes",
   auto typeValue =
       Last<wpi::telemetry::MockTelemetryBackend::LogStringValue>("/test/.type");
   REQUIRE(typeValue.value == "TestStructLoggableType");
+}
+
+TEST_CASE_METHOD(
+    TelemetryTableTest,
+    "TelemetryTableTest "
+    "KeepDuplicatesAppliesMetadataAfterBackendResetDuringEntryLookup",
+    "[telemetry]") {
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/rerouted/");
+  std::promise<void> enteredIsDiscard;
+  auto enteredIsDiscardFuture = enteredIsDiscard.get_future();
+  std::promise<void> releaseIsDiscard;
+  auto releaseIsDiscardFuture = releaseIsDiscard.get_future().share();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/rerouted/dups",
+      std::make_shared<telemetrytest::BlockingIsDiscardBackend>(
+          &enteredIsDiscard, releaseIsDiscardFuture, false));
+  auto replacement = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+
+  auto metadataFuture =
+      std::async(std::launch::async, [&] { table.KeepDuplicates("dups"); });
+  enteredIsDiscardFuture.wait();
+
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/rerouted/dups",
+                                                     replacement);
+  table.Log("dups", 1.0);
+  releaseIsDiscard.set_value();
+  metadataFuture.get();
+
+  const auto& actions = replacement->GetActions();
+  REQUIRE_FALSE(actions.empty());
+  CHECK(actions[0].path == "/rerouted/dups");
+  CHECK(std::holds_alternative<
+        wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue>(
+      actions[0].value));
+}
+
+TEST_CASE_METHOD(TelemetryTableTest,
+                 "TelemetryTableTest "
+                 "SetPropertyAppliesMetadataAfterBackendResetDuringEntryLookup",
+                 "[telemetry]") {
+  auto& table = wpi::telemetry::TelemetryRegistry::GetTable("/rerouted/");
+  std::promise<void> enteredIsDiscard;
+  auto enteredIsDiscardFuture = enteredIsDiscard.get_future();
+  std::promise<void> releaseIsDiscard;
+  auto releaseIsDiscardFuture = releaseIsDiscard.get_future().share();
+  wpi::telemetry::TelemetryRegistry::RegisterBackend(
+      "/rerouted/prop",
+      std::make_shared<telemetrytest::BlockingIsDiscardBackend>(
+          &enteredIsDiscard, releaseIsDiscardFuture, false));
+  auto replacement = std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+
+  auto metadataFuture = std::async(std::launch::async, [&] {
+    table.SetProperty("prop", "unit", "\"count\"");
+  });
+  enteredIsDiscardFuture.wait();
+
+  wpi::telemetry::TelemetryRegistry::RegisterBackend("/rerouted/prop",
+                                                     replacement);
+  table.Log("prop", 1.0);
+  releaseIsDiscard.set_value();
+  metadataFuture.get();
+
+  const auto& actions = replacement->GetActions();
+  REQUIRE_FALSE(actions.empty());
+  CHECK(actions[0].path == "/rerouted/prop");
+  auto property =
+      std::get_if<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+          &actions[0].value);
+  REQUIRE(property != nullptr);
+  CHECK(property->key == "unit");
+  CHECK(property->value == "\"count\"");
 }
 
 TEST_CASE_METHOD(TelemetryTableTest,

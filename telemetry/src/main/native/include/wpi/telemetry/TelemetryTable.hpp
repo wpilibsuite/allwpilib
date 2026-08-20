@@ -644,6 +644,8 @@ class TelemetryTable final {
    */
   EntryHandle GetEntry(std::string_view name);
 
+  EntryHandle GetEntry(std::string_view name, bool* metadataApplied);
+
   bool HasNonDiscardDescendant();
 
   void TypeMismatch(std::string_view expectedType, std::string_view typeString);
