@@ -25,13 +25,15 @@ detail::SelectableBase::SelectableBase()
               [](TunableBase& tunable, ComplexTunable* self) {
                 if (auto selectable = static_cast<SelectableBase*>(self)) {
                   auto& selected =
-                      static_cast<wpi::tunables::Tunable<std::string>&>(tunable);
+                      static_cast<wpi::tunables::Tunable<std::string>&>(
+                          tunable);
                   selectable->Changed(selected.Get());
                 }
               },
           .parent = this}} {}
 
-void detail::SelectableBase::PublishTunable(wpi::tunables::TunableTable& table) {
+void detail::SelectableBase::PublishTunable(
+    wpi::tunables::TunableTable& table) {
   table.Publish(kDefault, m_defaultChoice);
   table.Publish(kOptions, m_options);
   table.Publish(kSelected, m_selected);

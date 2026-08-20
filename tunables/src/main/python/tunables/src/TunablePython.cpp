@@ -432,7 +432,9 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
 
   wpi::tunables::detail::TunableBase& GetBase() {
     return std::visit(
-        [](auto& value) -> wpi::tunables::detail::TunableBase& { return value; },
+        [](auto& value) -> wpi::tunables::detail::TunableBase& {
+          return value;
+        },
         m_value);
   }
 
@@ -610,9 +612,9 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
   }
 
   wpi::tunables::TunableConfig MakeConfig(bool robust, bool isMutable,
-                                         py::handle properties,
-                                         std::string typeString,
-                                         bool alwaysGet) {
+                                          py::handle properties,
+                                          std::string typeString,
+                                          bool alwaysGet) {
     wpi::tunables::TunableConfig config{
         .robust = robust,
         .isMutable = isMutable,
@@ -666,7 +668,7 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
         return wpi::tunables::TunableRaw{ToRawVector(value), config};
       case ValueKind::kBooleanArray:
         return wpi::tunables::TunableBoolVector{value.cast<std::vector<bool>>(),
-                                               config};
+                                                config};
       case ValueKind::kIntegerArray:
         return wpi::tunables::TunableInt64Vector{
             value.cast<std::vector<int64_t>>(), config};
@@ -1358,11 +1360,11 @@ template <typename T>
 py::object ReadTunableValue(
     const wpi::tunables::TunableRegistry::TunableInfo& info) {
   if (auto v = wpi::tunables::detail::CastTunable<T, false>(info.tunable,
-                                                           info.type)) {
+                                                            info.type)) {
     return ValueToPython(v->Get());
   }
-  if (auto v =
-          wpi::tunables::detail::CastTunable<T, true>(info.tunable, info.type)) {
+  if (auto v = wpi::tunables::detail::CastTunable<T, true>(info.tunable,
+                                                           info.type)) {
     return ValueToPython(v->Get(info.config->parent));
   }
   throw py::type_error("tunable has unexpected type");
@@ -1372,14 +1374,14 @@ py::object ReadStructValue(
     const wpi::tunables::TunableRegistry::TunableInfo& info) {
   if (auto v = wpi::tunables::detail::CastTunable<
           wpi::tunables::detail::TunableStructTag, false>(info.tunable,
-                                                         info.type)) {
+                                                          info.type)) {
     std::vector<uint8_t> data(v->GetStructSize());
     v->PackStruct(data);
     return py::bytes{reinterpret_cast<const char*>(data.data()), data.size()};
   }
   if (auto v = wpi::tunables::detail::CastTunable<
           wpi::tunables::detail::TunableStructTag, true>(info.tunable,
-                                                        info.type)) {
+                                                         info.type)) {
     std::vector<uint8_t> data(v->GetStructSize(info.config->parent));
     v->PackStruct(info.config->parent, data);
     return py::bytes{reinterpret_cast<const char*>(data.data()), data.size()};
@@ -1735,7 +1737,7 @@ void wpi::InitTunablePython(py::module_& m) {
       py::arg("name") = "");
   m.def("publish", [](std::string_view name, py::object value) {
     return PyTunableTable{wpi::tunables::GetTable(), nullptr}.Publish(name,
-                                                                     value);
+                                                                      value);
   });
   m.def(
       "add",

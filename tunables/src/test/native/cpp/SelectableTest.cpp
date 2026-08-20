@@ -38,7 +38,7 @@ TEST_CASE_METHOD(SelectableFixture, "SelectableTest ReturnsSelected",
     chooser.AddDefault("0", 0);
 
     wpi::tunables::Publish(std::format("ReturnsSelectedChooser{}", param),
-                          chooser);
+                           chooser);
     wpi::tunables::TunableRegistry::Update();
     backend->SetString(std::format("/ReturnsSelectedChooser{}/selected", param),
                        std::to_string(param));

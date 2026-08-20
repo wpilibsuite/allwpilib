@@ -20,7 +20,8 @@ Field2d::Field2d() {
   m_objects[0]->SetPose(wpi::math::Pose2d{});
 }
 
-Field2d::Field2d(Field2d&& rhs) : wpi::tunables::ComplexTunable{std::move(rhs)} {
+Field2d::Field2d(Field2d&& rhs)
+    : wpi::tunables::ComplexTunable{std::move(rhs)} {
   std::swap(m_objects, rhs.m_objects);
 }
 

@@ -111,7 +111,8 @@ class CountingComplexTunable final : public wpi::tunables::ComplexTunable {
 
 class StructMemberComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
-  explicit StructMemberComplexTunable(const wpi::tunables::TunableConfig& config)
+  explicit StructMemberComplexTunable(
+      const wpi::tunables::TunableConfig& config)
       : m_config{config} {}
 
   std::string_view GetTunableType() const override { return "StructMember"; }
@@ -322,13 +323,13 @@ TEST_CASE_METHOD(
   auto config = RobustConfig();
   wpi::tunables::TunableRaw raw{std::vector<uint8_t>{1, 2}, config};
   wpi::tunables::TunableBoolVector booleans{std::vector<bool>{true, false},
-                                           config};
+                                            config};
   wpi::tunables::TunableInt32Vector ints{std::vector<int32_t>{3, 4}, config};
   wpi::tunables::TunableInt64Vector longs{std::vector<int64_t>{5, 6}, config};
   wpi::tunables::TunableFloatVector floats{std::vector<float>{7.25f, 8.5f},
-                                          config};
+                                           config};
   wpi::tunables::TunableDoubleVector doubles{std::vector<double>{9.25, 10.5},
-                                            config};
+                                             config};
   wpi::tunables::Tunable<std::vector<std::string>> strings{
       std::vector<std::string>{"a", "b"}, config};
 
@@ -627,7 +628,7 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   config.onTune = [&](wpi::tunables::detail::TunableBase&,
                       wpi::tunables::ComplexTunable*) { ++calls; };
   wpi::tunables::Tunable<std::vector<wpi::math::Translation2d>> value{config,
-                                                                     initial};
+                                                                      initial};
   wpi::tunables::Publish("translations", value);
 
   auto sub = inst.GetStructArrayTopic<wpi::math::Translation2d>(
@@ -856,7 +857,7 @@ TEST_CASE_METHOD(
     ++standaloneCalls;
   };
   wpi::tunables::Tunable<ThrowingPackStruct> throwing{standaloneConfig,
-                                                     ThrowingPackStruct{1}};
+                                                      ThrowingPackStruct{1}};
   wpi::tunables::Publish("throwing", throwing);
 
   auto memberConfig = RobustConfig();
