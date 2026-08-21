@@ -39,7 +39,7 @@ public class RobotContainer {
   private final Selectable<Command> chooser = new Selectable<>();
 
   // The driver's controller
-  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

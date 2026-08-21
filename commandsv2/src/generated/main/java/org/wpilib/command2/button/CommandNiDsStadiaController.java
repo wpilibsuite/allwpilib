@@ -67,7 +67,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kA.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.A.value, loop);
   }
 
   /**
@@ -89,7 +89,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kB.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.B.value, loop);
   }
 
   /**
@@ -111,7 +111,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kX.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.X.value, loop);
   }
 
   /**
@@ -133,7 +133,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kY.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.Y.value, loop);
   }
 
   /**
@@ -155,7 +155,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kLeftBumper.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -177,7 +177,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kRightBumper.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -199,7 +199,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kLeftStick.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -221,7 +221,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kRightStick.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -243,7 +243,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger ellipses(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kEllipses.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.ELLIPSES.value, loop);
   }
 
   /**
@@ -265,7 +265,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger hamburger(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kHamburger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.HAMBURGER.value, loop);
   }
 
   /**
@@ -287,7 +287,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger stadia(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kStadia.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.STADIA.value, loop);
   }
 
   /**
@@ -309,7 +309,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger rightTrigger(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kRightTrigger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.RIGHT_TRIGGER.value, loop);
   }
 
   /**
@@ -331,7 +331,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger leftTrigger(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kLeftTrigger.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.LEFT_TRIGGER.value, loop);
   }
 
   /**
@@ -353,7 +353,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger google(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kGoogle.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.GOOGLE.value, loop);
   }
 
   /**
@@ -375,7 +375,7 @@ public class CommandNiDsStadiaController {
    *     to the given loop.
    */
   public Trigger frame(EventLoop loop) {
-    return m_hid.button(NiDsStadiaController.Button.kFrame.value, loop);
+    return m_hid.button(NiDsStadiaController.Button.FRAME.value, loop);
   }
 
   /**

@@ -28,7 +28,7 @@ class DifferentialDriveVoltageConstraintTest {
 
     Trajectory<DrivetrainSplineSample> trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
-            List.of(new Pose2d(0, 0, Rotation2d.kZero), new Pose2d(1, 0, Rotation2d.kZero)),
+            List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
 
     final double dt = 0.02;
@@ -74,17 +74,17 @@ class DifferentialDriveVoltageConstraintTest {
     assertDoesNotThrow(
         () ->
             DrivetrainSplineTrajectoryGenerator.generate(
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                new Pose2d(1, 0, Rotation2d.CCW_PI_2),
                 new ArrayList<>(),
-                new Pose2d(0, 1, Rotation2d.kPi),
+                new Pose2d(0, 1, Rotation2d.PI),
                 config));
 
     assertDoesNotThrow(
         () ->
             DrivetrainSplineTrajectoryGenerator.generate(
-                new Pose2d(0, 1, Rotation2d.kPi),
+                new Pose2d(0, 1, Rotation2d.PI),
                 new ArrayList<>(),
-                new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
+                new Pose2d(1, 0, Rotation2d.CCW_PI_2),
                 config.setReversed(true)));
   }
 }

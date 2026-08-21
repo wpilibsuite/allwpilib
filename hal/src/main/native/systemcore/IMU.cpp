@@ -11,7 +11,7 @@
 #include "mrclib/IMU.h"
 
 namespace {
-constexpr double kDegreesToRadians = std::numbers::pi / 180.0;
+constexpr double DEGREES_TO_RADIANS = std::numbers::pi / 180.0;
 }  // namespace
 
 namespace wpi::hal::init {

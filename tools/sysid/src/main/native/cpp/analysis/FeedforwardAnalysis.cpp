@@ -61,10 +61,10 @@ static void PopulateOLSData(const std::vector<PreparedData>& d,
     X(sample, 2) = std::copysign(1, pt.velocity);
 
     // Set test-specific variables
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       // Set the gravity term (for δ)
       X(sample, 3) = 1.0;
-    } else if (type == analysis::kArm) {
+    } else if (type == analysis::ARM) {
       // Set the cosine and sine terms (for δ and ε)
       X(sample, 3) = pt.cos;
       X(sample, 4) = pt.sin;
@@ -124,10 +124,10 @@ static void CheckOLSDataQuality(const Eigen::MatrixXd& X,
 
       // Fit for δ is bad
       if (maxIndex == 3) {
-        if (type == analysis::kElevator) {
+        if (type == analysis::ELEVATOR) {
           // Affects Kg
           badGains.set(3);
-        } else if (type == analysis::kArm) {
+        } else if (type == analysis::ARM) {
           // Affects Kg and offset
           badGains.set(3);
           badGains.set(4);
@@ -238,7 +238,7 @@ OLSResult CalculateFeedforwardGains(const Storage& data,
     gains.emplace_back(-α / β);
     gains.emplace_back(1 / β);
 
-    if (type == analysis::kElevator) {
+    if (type == analysis::ELEVATOR) {
       // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x) - Kg/Ka
       // dx/dt = αx + βu + γ sgn(x) + δ
 
@@ -249,7 +249,7 @@ OLSResult CalculateFeedforwardGains(const Storage& data,
       gains.emplace_back(-δ / β);
     }
 
-    if (type == analysis::kArm) {
+    if (type == analysis::ARM) {
       // dx/dt = -Kv/Ka x + 1/Ka u - Ks/Ka sgn(x)
       //           - Kg/Ka cos(offset) cos(angle)
       //           + Kg/Ka sin(offset) sin(angle)

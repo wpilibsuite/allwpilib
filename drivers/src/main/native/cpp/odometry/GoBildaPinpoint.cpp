@@ -25,8 +25,8 @@ using namespace wpi;
 
 GoBildaPinpoint::GoBildaPinpoint(I2C::Port port, int deviceAddress)
     : m_i2c{port, ValidateAddress(deviceAddress)},
-      m_bulkReadScope{kDefaultBulkReadScope.begin(),
-                      kDefaultBulkReadScope.end()} {
+      m_bulkReadScope{DEFAULT_BULK_READ_SCOPE.begin(),
+                      DEFAULT_BULK_READ_SCOPE.end()} {
   HAL_ReportUsage(
       std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
       "GoBildaPinpoint");
@@ -163,10 +163,10 @@ void GoBildaPinpoint::SetEncoderDirections(EncoderDirection xEncoder,
 void GoBildaPinpoint::SetEncoderResolution(OdometryPod pod) {
   switch (pod) {
     case OdometryPod::SWINGARM:
-      SetEncoderResolution(kSwingarmTicksPerMeter);
+      SetEncoderResolution(SWINGARM_TICKS_PER_METER);
       break;
     case OdometryPod::FOUR_BAR:
-      SetEncoderResolution(kFourBarTicksPerMeter);
+      SetEncoderResolution(FOUR_BAR_TICKS_PER_METER);
       break;
     default:
       throw std::invalid_argument("Invalid odometry pod type");
@@ -543,16 +543,16 @@ bool GoBildaPinpoint::ReadRegister(Register reg, bool clearPreviousBadRead) {
 
   bool previousBadRead = m_badReadDetected;
   m_badReadDetected = false;
-  int readLength = kRegisterLength;
+  int readLength = REGISTER_LENGTH;
   if (m_errorDetectionType == ErrorDetectionType::CRC) {
-    readLength += kCrcLength;
+    readLength += CRC_LENGTH;
   }
   std::vector<uint8_t> data = ReadBytes(reg, readLength);
   if (data.empty()) {
     return false;
   }
   if (m_errorDetectionType == ErrorDetectionType::CRC &&
-      !CheckCrc(data, kRegisterLength)) {
+      !CheckCrc(data, REGISTER_LENGTH)) {
     RecordFailure(reg, FailureReason::CRC_MISMATCH);
     return false;
   }
@@ -580,8 +580,8 @@ void GoBildaPinpoint::ReadPose() {
     return;
   }
 
-  SavePose(DecodeFloat(data, 0), DecodeFloat(data, kRegisterLength),
-           DecodeFloat(data, 2 * kRegisterLength), false);
+  SavePose(DecodeFloat(data, 0), DecodeFloat(data, REGISTER_LENGTH),
+           DecodeFloat(data, 2 * REGISTER_LENGTH), false);
   FinishRead(previousBadRead, false);
 }
 
@@ -595,9 +595,9 @@ void GoBildaPinpoint::ReadQuaternion() {
     return;
   }
 
-  SaveQuaternion(DecodeFloat(data, 0), DecodeFloat(data, kRegisterLength),
-                 DecodeFloat(data, 2 * kRegisterLength),
-                 DecodeFloat(data, 3 * kRegisterLength));
+  SaveQuaternion(DecodeFloat(data, 0), DecodeFloat(data, REGISTER_LENGTH),
+                 DecodeFloat(data, 2 * REGISTER_LENGTH),
+                 DecodeFloat(data, 3 * REGISTER_LENGTH));
   FinishRead(previousBadRead, false);
 }
 
@@ -608,10 +608,10 @@ std::vector<uint8_t> GoBildaPinpoint::ReadBulkSnapshot(
   }
   m_bulkReadScopeSynchronized = false;
 
-  std::size_t dataLength = registers.size() * kRegisterLength;
+  std::size_t dataLength = registers.size() * REGISTER_LENGTH;
   int readLength = static_cast<int>(
       dataLength +
-      (m_errorDetectionType == ErrorDetectionType::CRC ? kCrcLength : 0));
+      (m_errorDetectionType == ErrorDetectionType::CRC ? CRC_LENGTH : 0));
   std::vector<uint8_t> data = ReadBytes(Register::BULK_READ, readLength);
   if (!WriteBytes(Register::SET_BULK_READ,
                   EncodeBulkReadScope(m_bulkReadScope))) {
@@ -638,7 +638,7 @@ float GoBildaPinpoint::DecodeBulkFloat(const std::vector<uint8_t>& data,
   }
   std::size_t offset =
       static_cast<std::size_t>(std::distance(m_bulkReadScope.begin(), it)) *
-      kRegisterLength;
+      REGISTER_LENGTH;
   return DecodeFloat(data, offset);
 }
 
@@ -661,7 +661,7 @@ void GoBildaPinpoint::FixedBulkRead() {
   bool previousBadRead = m_badReadDetected;
   m_badReadDetected = false;
   std::vector<uint8_t> data =
-      ReadBytes(Register::BULK_READ, kFixedBulkReadLength);
+      ReadBytes(Register::BULK_READ, FIXED_BULK_READ_LENGTH);
   if (data.empty()) {
     return;
   }
@@ -687,10 +687,10 @@ void GoBildaPinpoint::FixedBulkRead() {
 void GoBildaPinpoint::FlexibleBulkRead() {
   bool previousBadRead = m_badReadDetected;
   m_badReadDetected = false;
-  std::size_t dataLength = m_bulkReadScope.size() * kRegisterLength;
+  std::size_t dataLength = m_bulkReadScope.size() * REGISTER_LENGTH;
   int readLength = static_cast<int>(
       dataLength +
-      (m_errorDetectionType == ErrorDetectionType::CRC ? kCrcLength : 0));
+      (m_errorDetectionType == ErrorDetectionType::CRC ? CRC_LENGTH : 0));
   std::vector<uint8_t> data = ReadBytes(Register::BULK_READ, readLength);
   if (data.empty()) {
     return;
@@ -704,7 +704,7 @@ void GoBildaPinpoint::FlexibleBulkRead() {
   bool hasLoopTime = false;
   for (std::size_t i = 0; i < m_bulkReadScope.size(); ++i) {
     if (m_bulkReadScope[i] == Register::LOOP_TIME) {
-      int32_t loopTime = DecodeInt(data, i * kRegisterLength);
+      int32_t loopTime = DecodeInt(data, i * REGISTER_LENGTH);
       if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
           loopTime <= 0) {
         RecordFailure(Register::LOOP_TIME, FailureReason::INVALID_LOOP_TIME);
@@ -732,7 +732,7 @@ void GoBildaPinpoint::FlexibleBulkRead() {
 
   for (std::size_t i = 0; i < m_bulkReadScope.size(); ++i) {
     Register reg = m_bulkReadScope[i];
-    std::size_t offset = i * kRegisterLength;
+    std::size_t offset = i * REGISTER_LENGTH;
     switch (GetRegisterType(reg)) {
       case RegisterType::INT32:
         if (reg != Register::LOOP_TIME && reg != Register::DEVICE_VERSION) {
@@ -801,13 +801,13 @@ void GoBildaPinpoint::SavePose(float xPosition, float yPosition, float heading,
                                bool bulkUpdate) {
   auto validatedX = ValidatePosition(
       Register::X_POSITION, m_xPositionMillimeters, xPosition,
-      kPositionChangeLimitMillimeters, m_haveXPosition, bulkUpdate);
+      POSITION_CHANGE_LIMIT_MILLIMETERS, m_haveXPosition, bulkUpdate);
   auto validatedY = ValidatePosition(
       Register::Y_POSITION, m_yPositionMillimeters, yPosition,
-      kPositionChangeLimitMillimeters, m_haveYPosition, bulkUpdate);
+      POSITION_CHANGE_LIMIT_MILLIMETERS, m_haveYPosition, bulkUpdate);
   auto validatedHeading =
       ValidatePosition(Register::H_ORIENTATION, m_headingRadians, heading,
-                       kHeadingChangeLimitRadians, m_haveHeading, bulkUpdate);
+                       HEADING_CHANGE_LIMIT_RADIANS, m_haveHeading, bulkUpdate);
   if (!validatedX || !validatedY || !validatedHeading) {
     return;
   }
@@ -831,7 +831,7 @@ void GoBildaPinpoint::SaveQuaternion(float w, float x, float y, float z) {
   double normSquared = static_cast<double>(w) * w + static_cast<double>(x) * x +
                        static_cast<double>(y) * y + static_cast<double>(z) * z;
   if (m_errorDetectionType == ErrorDetectionType::LOCAL_TEST &&
-      normSquared < kMinQuaternionNormSquared) {
+      normSquared < MIN_QUATERNION_NORM_SQUARED) {
     RecordFailure(Register::QUATERNION_W, FailureReason::INVALID_QUATERNION);
     return;
   }
@@ -851,7 +851,7 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     case Register::X_POSITION: {
       auto validated = ValidatePosition(
           Register::X_POSITION, m_xPositionMillimeters, value,
-          kPositionChangeLimitMillimeters, m_haveXPosition, bulkUpdate);
+          POSITION_CHANGE_LIMIT_MILLIMETERS, m_haveXPosition, bulkUpdate);
       if (validated) {
         m_xPositionMillimeters = *validated;
         m_haveXPosition = true;
@@ -861,7 +861,7 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     case Register::Y_POSITION: {
       auto validated = ValidatePosition(
           Register::Y_POSITION, m_yPositionMillimeters, value,
-          kPositionChangeLimitMillimeters, m_haveYPosition, bulkUpdate);
+          POSITION_CHANGE_LIMIT_MILLIMETERS, m_haveYPosition, bulkUpdate);
       if (validated) {
         m_yPositionMillimeters = *validated;
         m_haveYPosition = true;
@@ -871,7 +871,7 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     case Register::H_ORIENTATION: {
       auto validated = ValidatePosition(
           Register::H_ORIENTATION, m_headingRadians, value,
-          kHeadingChangeLimitRadians, m_haveHeading, bulkUpdate);
+          HEADING_CHANGE_LIMIT_RADIANS, m_haveHeading, bulkUpdate);
       if (validated) {
         m_headingRadians = *validated;
         m_haveHeading = true;
@@ -881,7 +881,7 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     case Register::X_VELOCITY: {
       auto validated =
           ValidateVelocity(Register::X_VELOCITY, value,
-                           kVelocityLimitMillimetersPerSecond, bulkUpdate);
+                           VELOCITY_LIMIT_MILLIMETERS_PER_SECOND, bulkUpdate);
       if (validated) {
         m_xVelocityMillimetersPerSecond = *validated;
       }
@@ -890,16 +890,16 @@ void GoBildaPinpoint::SaveFloat(Register reg, float value, bool bulkUpdate) {
     case Register::Y_VELOCITY: {
       auto validated =
           ValidateVelocity(Register::Y_VELOCITY, value,
-                           kVelocityLimitMillimetersPerSecond, bulkUpdate);
+                           VELOCITY_LIMIT_MILLIMETERS_PER_SECOND, bulkUpdate);
       if (validated) {
         m_yVelocityMillimetersPerSecond = *validated;
       }
       break;
     }
     case Register::H_VELOCITY: {
-      auto validated =
-          ValidateVelocity(Register::H_VELOCITY, value,
-                           kHeadingVelocityLimitRadiansPerSecond, bulkUpdate);
+      auto validated = ValidateVelocity(
+          Register::H_VELOCITY, value,
+          HEADING_VELOCITY_LIMIT_RADIANS_PER_SECOND, bulkUpdate);
       if (validated) {
         m_headingVelocityRadiansPerSecond = *validated;
       }
@@ -1076,12 +1076,12 @@ bool GoBildaPinpoint::CheckCrc(const std::vector<uint8_t>& data,
 
 uint8_t GoBildaPinpoint::ComputeCrc8(const std::vector<uint8_t>& data,
                                      std::size_t length) {
-  uint8_t crc = kCrcInitialValue;
+  uint8_t crc = CRC_INITIAL_VALUE;
   for (std::size_t index = 0; index < length; ++index) {
     crc ^= data[index];
     for (int bit = 0; bit < 8; ++bit) {
       if ((crc & 0x80) != 0) {
-        crc = static_cast<uint8_t>((crc << 1) ^ kCrcPolynomialValue);
+        crc = static_cast<uint8_t>((crc << 1) ^ CRC_POLYNOMIAL_VALUE);
       } else {
         crc = static_cast<uint8_t>(crc << 1);
       }

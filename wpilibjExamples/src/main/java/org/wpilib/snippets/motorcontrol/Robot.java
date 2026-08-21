@@ -25,10 +25,10 @@ import org.wpilib.telemetry.Telemetry;
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kJoystickPort = 0;
-  private static final int kEncoderPortA = 0;
-  private static final int kEncoderPortB = 1;
+  private static final int MOTOR_PORT = 0;
+  private static final int JOYSTICK_PORT = 0;
+  private static final int ENCODER_PORT_A = 0;
+  private static final int ENCODER_PORT_B = 1;
 
   private final PWMSparkMax motor;
   private final Joystick joystick;
@@ -36,9 +36,9 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    motor = new PWMSparkMax(kMotorPort);
-    joystick = new Joystick(kJoystickPort);
-    encoder = new Encoder(kEncoderPortA, kEncoderPortB);
+    motor = new PWMSparkMax(MOTOR_PORT);
+    joystick = new Joystick(JOYSTICK_PORT);
+    encoder = new Encoder(ENCODER_PORT_A, ENCODER_PORT_B);
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     encoder.setDistancePerPulse((Math.PI * 6) / 360.0);

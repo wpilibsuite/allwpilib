@@ -13,7 +13,7 @@ import org.wpilib.units.Unit;
 
 /** Utility functions for generated Epilogue telemetry loggers. */
 public final class EpilogueTelemetry {
-  private static final char[] kHex = "0123456789abcdef".toCharArray();
+  private static final char[] HEX = "0123456789abcdef".toCharArray();
   private static final Map<Unit, String> s_unitMetadata = new IdentityHashMap<>();
   private static final Map<String, String> s_symbolMetadata = new HashMap<>();
 
@@ -91,7 +91,7 @@ public final class EpilogueTelemetry {
         case '\t' -> out.append("\\t");
         default -> {
           if (ch < 0x20) {
-            out.append("\\u00").append(kHex[ch >>> 4]).append(kHex[ch & 0xf]);
+            out.append("\\u00").append(HEX[ch >>> 4]).append(HEX[ch & 0xf]);
           } else {
             out.append(ch);
           }

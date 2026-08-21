@@ -64,7 +64,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
     return instance;
   }
 
-  private static final Optional<Command> kNoInterruptor = Optional.empty();
+  private static final Optional<Command> NO_INTERRUPTOR = Optional.empty();
 
   private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
 
@@ -250,7 +250,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
       for (Subsystem requirement : requirements) {
         Command requiring = requiring(requirement);
         if (requiring != null
-            && requiring.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+            && requiring.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
           return;
         }
       }
@@ -321,7 +321,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
       Command command = iterator.next();
 
       if (isDisabled && !command.runsWhenDisabled()) {
-        cancel(command, kNoInterruptor);
+        cancel(command, NO_INTERRUPTOR);
         continue;
       }
 
@@ -441,7 +441,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
 
-    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
       DriverStationErrors.reportWarning(
           "Registering a non-interruptible default command!\n"
               + "This will likely prevent any other commands from requiring this subsystem.",
@@ -491,7 +491,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
    */
   public void cancel(Command... commands) {
     for (Command command : commands) {
-      cancel(command, kNoInterruptor);
+      cancel(command, NO_INTERRUPTOR);
     }
   }
 

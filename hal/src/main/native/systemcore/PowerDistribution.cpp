@@ -120,9 +120,9 @@ HAL_PowerDistributionType HAL_GetPowerDistributionType(
 int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
   if (IsCtre(handle)) {
-    return kNumCTREPDPChannels;
+    return NUM_CTREPDP_CHANNELS;
   } else {
-    return kNumREVPDHChannels;
+    return NUM_REVPDH_CHANNELS;
   }
 }
 
@@ -158,14 +158,14 @@ void HAL_GetPowerDistributionAllChannelCurrents(
     HAL_PowerDistributionHandle handle, double* currents,
     int32_t currentsLength, int32_t* status) {
   if (IsCtre(handle)) {
-    if (currentsLength < kNumCTREPDPChannels) {
+    if (currentsLength < NUM_CTREPDP_CHANNELS) {
       *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                           "Output array not large enough");
       return;
     }
     return HAL_GetPDPAllChannelCurrents(handle, currents, status);
   } else {
-    if (currentsLength < kNumREVPDHChannels) {
+    if (currentsLength < NUM_REVPDH_CHANNELS) {
       *status = MakeError(HAL_PARAMETER_OUT_OF_RANGE,
                           "Output array not large enough");
       return;

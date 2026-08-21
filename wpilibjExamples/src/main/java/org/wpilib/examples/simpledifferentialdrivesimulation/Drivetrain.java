@@ -26,13 +26,13 @@ import org.wpilib.telemetry.Telemetry;
 
 public class Drivetrain {
   // 3 meters per second.
-  public static final double kMaxVelocity = 3.0;
+  public static final double MAX_VELOCITY = 3.0;
   // 1/2 rotation per second.
-  public static final double kMaxAngularVelocity = Math.PI;
+  public static final double MAX_ANGULAR_VELOCITY = Math.PI;
 
-  private static final double kTrackwidth = 0.381 * 2;
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = -4096;
+  private static final double TRACKWIDTH = 0.381 * 2;
+  private static final double WHEEL_RADIUS = 0.0508;
+  private static final int ENCODER_RESOLUTION = -4096;
 
   private final PWMSparkMax leftLeader = new PWMSparkMax(1);
   private final PWMSparkMax leftFollower = new PWMSparkMax(2);
@@ -48,7 +48,7 @@ public class Drivetrain {
   private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
   private final DifferentialDriveKinematics kinematics =
-      new DifferentialDriveKinematics(kTrackwidth);
+      new DifferentialDriveKinematics(TRACKWIDTH);
   private final DifferentialDriveOdometry odometry =
       new DifferentialDriveOdometry(
           imu.getRotation2d(), leftEncoder.getDistance(), rightEncoder.getDistance());
@@ -65,7 +65,7 @@ public class Drivetrain {
       Models.differentialDriveFromSysId(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
+          drivetrainSystem, DCMotor.getCIM(2), 8, TRACKWIDTH, WHEEL_RADIUS, null);
 
   /** Subsystem constructor. */
   public Drivetrain() {
@@ -80,8 +80,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    leftEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
+    rightEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
 
     leftEncoder.reset();
     rightEncoder.reset();

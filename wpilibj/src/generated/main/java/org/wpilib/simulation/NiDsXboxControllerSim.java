@@ -42,7 +42,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(NiDsXboxController.Axis.kLeftX.value, value);
+    setRawAxis(NiDsXboxController.Axis.LEFT_X.value, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(NiDsXboxController.Axis.kRightX.value, value);
+    setRawAxis(NiDsXboxController.Axis.RIGHT_X.value, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(NiDsXboxController.Axis.kLeftY.value, value);
+    setRawAxis(NiDsXboxController.Axis.LEFT_Y.value, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(NiDsXboxController.Axis.kRightY.value, value);
+    setRawAxis(NiDsXboxController.Axis.RIGHT_Y.value, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftTriggerAxis(double value) {
-    setRawAxis(NiDsXboxController.Axis.kLeftTrigger.value, value);
+    setRawAxis(NiDsXboxController.Axis.LEFT_TRIGGER.value, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightTriggerAxis(double value) {
-    setRawAxis(NiDsXboxController.Axis.kRightTrigger.value, value);
+    setRawAxis(NiDsXboxController.Axis.RIGHT_TRIGGER.value, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setAButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kA.value, value);
+    setRawButton(NiDsXboxController.Button.A.value, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kB.value, value);
+    setRawButton(NiDsXboxController.Button.B.value, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setXButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kX.value, value);
+    setRawButton(NiDsXboxController.Button.X.value, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setYButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kY.value, value);
+    setRawButton(NiDsXboxController.Button.Y.value, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftBumperButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kLeftBumper.value, value);
+    setRawButton(NiDsXboxController.Button.LEFT_BUMPER.value, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightBumperButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kRightBumper.value, value);
+    setRawButton(NiDsXboxController.Button.RIGHT_BUMPER.value, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBackButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kBack.value, value);
+    setRawButton(NiDsXboxController.Button.BACK.value, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setStartButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kStart.value, value);
+    setRawButton(NiDsXboxController.Button.START.value, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftStickButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kLeftStick.value, value);
+    setRawButton(NiDsXboxController.Button.LEFT_STICK.value, value);
   }
 
   /**
@@ -177,6 +177,6 @@ public class NiDsXboxControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightStickButton(boolean value) {
-    setRawButton(NiDsXboxController.Button.kRightStick.value, value);
+    setRawButton(NiDsXboxController.Button.RIGHT_STICK.value, value);
   }
 }

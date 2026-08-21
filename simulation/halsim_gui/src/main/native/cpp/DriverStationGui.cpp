@@ -42,8 +42,8 @@ using namespace halsimgui;
 
 namespace {
 
-constexpr int kMaxSdlJoysticks = 16;
-constexpr int kKeyboardJoystickBaseIndex = kMaxSdlJoysticks;
+constexpr int MAX_SDL_JOYSTICKS = 16;
+constexpr int KEYBOARD_JOYSTICK_BASE_INDEX = MAX_SDL_JOYSTICKS;
 
 struct HALJoystickData {
   HALJoystickData() {
@@ -124,7 +124,9 @@ class KeyboardJoystick : public SystemJoystick {
   const char* GetName() const override { return m_name; }
   void GetData(HALJoystickData* data) const override { *data = m_data; }
   const char* GetGUID() const override { return m_guid; }
-  int GetIndex() const override { return m_index + kKeyboardJoystickBaseIndex; }
+  int GetIndex() const override {
+    return m_index + KEYBOARD_JOYSTICK_BASE_INDEX;
+  }
 
   void ClearKey(int key);
   virtual const char* GetKeyName(int key) const = 0;
@@ -157,7 +159,7 @@ class KeyboardJoystick : public SystemJoystick {
   std::vector<std::unique_ptr<wpi::glass::Storage>>& m_axisStorage;
   std::vector<AxisConfig> m_axisConfig;
 
-  static constexpr int kMaxButtonCount = 32;
+  static constexpr int MAX_BUTTON_COUNT = 32;
   std::vector<int>& m_buttonKey;
 
   struct PovConfig {
@@ -287,7 +289,7 @@ class DSSimModel : public wpi::glass::DSModel {
 }  // namespace
 
 // system joysticks
-static std::array<SDL_JoystickID, kMaxSdlJoysticks> gSdlJoystickIds{};
+static std::array<SDL_JoystickID, MAX_SDL_JOYSTICKS> gSdlJoystickIds{};
 static std::vector<std::unique_ptr<SystemJoystick>> gSdlJoysticks;
 static int gNumSdlJoysticks = 0;
 static std::vector<std::unique_ptr<SdlKeyboardJoystick>> gKeyboardJoysticks;
@@ -890,8 +892,8 @@ void KeyboardJoystick::SettingsDisplay() {
       if (m_buttonCount < 0) {
         m_buttonCount = 0;
       }
-      if (m_buttonCount > kMaxButtonCount) {
-        m_buttonCount = kMaxButtonCount;
+      if (m_buttonCount > MAX_BUTTON_COUNT) {
+        m_buttonCount = MAX_BUTTON_COUNT;
       }
     }
     while (m_buttonCount > static_cast<int>(m_buttonKey.size())) {
@@ -1270,11 +1272,11 @@ static void DriverStationExecute() {
   bool disableDS = IsDSDisabled();
   if (disableDS && !prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(wpi::glass::Window::kDisabled);
+      win->SetVisibility(wpi::glass::Window::DISABLED);
     }
   } else if (!disableDS && prevDisableDS) {
     if (auto win = DriverStationGui::dsManager->GetWindow("System Joysticks")) {
-      win->SetVisibility(wpi::glass::Window::kShow);
+      win->SetVisibility(wpi::glass::Window::SHOW);
     }
   }
   prevDisableDS = disableDS;
@@ -1324,7 +1326,7 @@ static void DriverStationExecute() {
   }
 
   gNumSdlJoysticks = 0;
-  for (int i = 0; i < kMaxSdlJoysticks; ++i) {
+  for (int i = 0; i < MAX_SDL_JOYSTICKS; ++i) {
     gSdlJoysticks[i]->Update();
     if (gSdlJoysticks[i]->IsPresent()) {
       gNumSdlJoysticks = i + 1;
@@ -1586,7 +1588,7 @@ static void DisplaySystemJoysticks() {
   }
   for (size_t i = 0; i < gKeyboardJoysticks.size(); ++i) {
     auto joy = gKeyboardJoysticks[i].get();
-    DisplaySystemJoystick(*joy, i + kKeyboardJoystickBaseIndex);
+    DisplaySystemJoystick(*joy, i + KEYBOARD_JOYSTICK_BASE_INDEX);
     if (ImGui::BeginPopupContextItem()) {
       char buf[64];
       wpi::util::format_to_n_c_str(buf, sizeof(buf), "{} Settings",
@@ -1755,7 +1757,7 @@ void DriverStationGui::GlobalInit() {
   dsManager = std::make_unique<DSManager>(storageRoot);
 
   // set up system joysticks (both SDL and keyboard)
-  for (int i = 0; i < kMaxSdlJoysticks; ++i) {
+  for (int i = 0; i < MAX_SDL_JOYSTICKS; ++i) {
     gSdlJoysticks.emplace_back(std::make_unique<SdlSystemJoystick>(i));
   }
 
@@ -1809,7 +1811,7 @@ void DriverStationGui::GlobalInit() {
 
       if (auto win = dsManager->AddWindow(
               label, [j = joy.get()] { j->SettingsDisplay(); },
-              wpi::glass::Window::kHide)) {
+              wpi::glass::Window::HIDE)) {
         win->DisableRenamePopup();
         win->SetDefaultPos(10 + 310 * i++, 50);
         if (i > 3) {

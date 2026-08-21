@@ -19,7 +19,7 @@ static_assert(static_cast<HAL_PowerDistributionType>(
 static_assert(static_cast<HAL_PowerDistributionType>(
                   wpi::PowerDistribution::ModuleType::REV) ==
               HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV);
-static_assert(wpi::PowerDistribution::kDefaultModule ==
+static_assert(wpi::PowerDistribution::DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 using namespace wpi;
@@ -29,10 +29,10 @@ PowerDistribution::PowerDistribution(CANBus busId) {
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      static_cast<int>(busId), kDefaultModule,
+      static_cast<int>(busId), DEFAULT_MODULE,
       HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC,
       stack.c_str(), &status);
-  WPILIB_CheckErrorStatus(status, "Module {}", kDefaultModule);
+  WPILIB_CheckErrorStatus(status, "Module {}", DEFAULT_MODULE);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 

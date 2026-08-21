@@ -87,25 +87,25 @@ classes:
       LogTo:
   wpi::NiDsPS4Controller::Button:
     attributes:
-      kSquare:
-      kCross:
-      kCircle:
-      kTriangle:
-      kL1:
-      kR1:
-      kL2:
-      kR2:
-      kShare:
-      kOptions:
-      kL3:
-      kR3:
-      kPS:
-      kTouchpad:
+      SQUARE:
+      CROSS:
+      CIRCLE:
+      TRIANGLE:
+      L1:
+      R1:
+      L2:
+      R2:
+      SHARE:
+      OPTIONS:
+      L3:
+      R3:
+      PS:
+      TOUCHPAD:
   wpi::NiDsPS4Controller::Axis:
     attributes:
-      kLeftX:
-      kLeftY:
-      kRightX:
-      kRightY:
-      kL2:
-      kR2:
+      LEFT_X:
+      LEFT_Y:
+      RIGHT_X:
+      RIGHT_Y:
+      L2:
+      R2:

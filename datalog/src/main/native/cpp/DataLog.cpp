@@ -22,7 +22,7 @@
 
 using namespace wpi::log;
 
-static constexpr size_t kRecordMaxHeaderSize = 17;
+static constexpr size_t RECORD_MAX_HEADER_SIZE = 17;
 
 static void DefaultLog(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
@@ -215,7 +215,7 @@ void DataLog::AppendStartRecord(int id, std::string_view name,
                                 std::string_view metadata, int64_t timestamp) {
   size_t strsize = name.size() + type.size() + metadata.size();
   uint8_t* buf = StartRecord(0, timestamp, 5 + 12 + strsize, 5);
-  *buf++ = impl::kControlStart;
+  *buf++ = impl::CONTROL_START;
   wpi::util::support::endian::write32le(buf, id);
   AppendStringImpl(name);
   AppendStringImpl(type);
@@ -225,7 +225,7 @@ void DataLog::AppendStartRecord(int id, std::string_view name,
 void DataLog::DoReleaseBufs(std::vector<Buffer>* bufs) {
   for (auto&& buf : *bufs) {
     buf.Clear();
-    if (m_free.size() < kMaxFreeCount) {
+    if (m_free.size() < MAX_FREE_COUNT) {
       [[likely]] m_free.emplace_back(std::move(buf));
     }
   }
@@ -250,7 +250,7 @@ void DataLog::Finish(int entry, int64_t timestamp) {
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(0, timestamp, 5, 5);
-  *buf++ = impl::kControlFinish;
+  *buf++ = impl::CONTROL_FINISH;
   wpi::util::support::endian::write32le(buf, entry);
 }
 
@@ -265,19 +265,19 @@ void DataLog::SetMetadata(int entry, std::string_view metadata,
     [[unlikely]] return;
   }
   uint8_t* buf = StartRecord(0, timestamp, 5 + 4 + metadata.size(), 5);
-  *buf++ = impl::kControlSetMetadata;
+  *buf++ = impl::CONTROL_SET_METADATA;
   wpi::util::support::endian::write32le(buf, entry);
   AppendStringImpl(metadata);
 }
 
 uint8_t* DataLog::Reserve(size_t size) {
-  assert(size <= kBlockSize);
+  assert(size <= BLOCK_SIZE);
   if (m_outgoing.empty() || size > m_outgoing.back().GetRemaining()) {
-    if (m_outgoing.size() == kMaxBufferCount / 2) {
+    if (m_outgoing.size() == MAX_BUFFER_COUNT / 2) {
       [[unlikely]] BufferHalfFull();
     }
     if (m_free.empty()) {
-      if (m_outgoing.size() >= kMaxBufferCount) {
+      if (m_outgoing.size() >= MAX_BUFFER_COUNT) {
         [[unlikely]]
         if (BufferFull()) {
           m_paused = true;
@@ -294,18 +294,18 @@ uint8_t* DataLog::Reserve(size_t size) {
 
 uint8_t* DataLog::StartRecord(uint32_t entry, uint64_t timestamp,
                               uint32_t payloadSize, size_t reserveSize) {
-  uint8_t* buf = Reserve(kRecordMaxHeaderSize + reserveSize);
+  uint8_t* buf = Reserve(RECORD_MAX_HEADER_SIZE + reserveSize);
   auto headerLen = WriteRecordHeader(buf, entry, timestamp, payloadSize);
-  m_outgoing.back().Unreserve(kRecordMaxHeaderSize - headerLen);
+  m_outgoing.back().Unreserve(RECORD_MAX_HEADER_SIZE - headerLen);
   buf += headerLen;
   return buf;
 }
 
 void DataLog::AppendImpl(std::span<const uint8_t> data) {
-  while (data.size() > kBlockSize) {
-    uint8_t* buf = Reserve(kBlockSize);
-    std::memcpy(buf, data.data(), kBlockSize);
-    data = data.subspan(kBlockSize);
+  while (data.size() > BLOCK_SIZE) {
+    uint8_t* buf = Reserve(BLOCK_SIZE);
+    std::memcpy(buf, data.data(), BLOCK_SIZE);
+    data = data.subspan(BLOCK_SIZE);
   }
   if (!data.empty()) {
     uint8_t* buf = Reserve(data.size());
@@ -426,12 +426,12 @@ void DataLog::AppendBooleanArray(int entry, std::span<const bool> arr,
   }
   StartRecord(entry, timestamp, arr.size(), 0);
   uint8_t* buf;
-  while (arr.size() > kBlockSize) {
-    buf = Reserve(kBlockSize);
-    for (auto val : arr.subspan(0, kBlockSize)) {
+  while (arr.size() > BLOCK_SIZE) {
+    buf = Reserve(BLOCK_SIZE);
+    for (auto val : arr.subspan(0, BLOCK_SIZE)) {
       *buf++ = val ? 1 : 0;
     }
-    arr = arr.subspan(kBlockSize);
+    arr = arr.subspan(BLOCK_SIZE);
   }
   buf = Reserve(arr.size());
   for (auto val : arr) {
@@ -450,12 +450,12 @@ void DataLog::AppendBooleanArray(int entry, std::span<const int> arr,
   }
   StartRecord(entry, timestamp, arr.size(), 0);
   uint8_t* buf;
-  while (arr.size() > kBlockSize) {
-    buf = Reserve(kBlockSize);
-    for (auto val : arr.subspan(0, kBlockSize)) {
+  while (arr.size() > BLOCK_SIZE) {
+    buf = Reserve(BLOCK_SIZE);
+    for (auto val : arr.subspan(0, BLOCK_SIZE)) {
       *buf++ = val & 1;
     }
-    arr = arr.subspan(kBlockSize);
+    arr = arr.subspan(BLOCK_SIZE);
   }
   buf = Reserve(arr.size());
   for (auto val : arr) {
@@ -484,13 +484,13 @@ void DataLog::AppendIntegerArray(int entry, std::span<const int64_t> arr,
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
     uint8_t* buf;
-    while ((arr.size() * 8) > kBlockSize) {
-      buf = Reserve(kBlockSize);
-      for (auto val : arr.subspan(0, kBlockSize / 8)) {
+    while ((arr.size() * 8) > BLOCK_SIZE) {
+      buf = Reserve(BLOCK_SIZE);
+      for (auto val : arr.subspan(0, BLOCK_SIZE / 8)) {
         wpi::util::support::endian::write64le(buf, val);
         buf += 8;
       }
-      arr = arr.subspan(kBlockSize / 8);
+      arr = arr.subspan(BLOCK_SIZE / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {
@@ -516,14 +516,14 @@ void DataLog::AppendFloatArray(int entry, std::span<const float> arr,
     }
     StartRecord(entry, timestamp, arr.size() * 4, 0);
     uint8_t* buf;
-    while ((arr.size() * 4) > kBlockSize) {
-      buf = Reserve(kBlockSize);
-      for (auto val : arr.subspan(0, kBlockSize / 4)) {
+    while ((arr.size() * 4) > BLOCK_SIZE) {
+      buf = Reserve(BLOCK_SIZE);
+      for (auto val : arr.subspan(0, BLOCK_SIZE / 4)) {
         wpi::util::support::endian::write32le(buf,
                                               std::bit_cast<uint32_t>(val));
         buf += 4;
       }
-      arr = arr.subspan(kBlockSize / 4);
+      arr = arr.subspan(BLOCK_SIZE / 4);
     }
     buf = Reserve(arr.size() * 4);
     for (auto val : arr) {
@@ -549,14 +549,14 @@ void DataLog::AppendDoubleArray(int entry, std::span<const double> arr,
     }
     StartRecord(entry, timestamp, arr.size() * 8, 0);
     uint8_t* buf;
-    while ((arr.size() * 8) > kBlockSize) {
-      buf = Reserve(kBlockSize);
-      for (auto val : arr.subspan(0, kBlockSize / 8)) {
+    while ((arr.size() * 8) > BLOCK_SIZE) {
+      buf = Reserve(BLOCK_SIZE);
+      for (auto val : arr.subspan(0, BLOCK_SIZE / 8)) {
         wpi::util::support::endian::write64le(buf,
                                               std::bit_cast<uint64_t>(val));
         buf += 8;
       }
-      arr = arr.subspan(kBlockSize / 8);
+      arr = arr.subspan(BLOCK_SIZE / 8);
     }
     buf = Reserve(arr.size() * 8);
     for (auto val : arr) {

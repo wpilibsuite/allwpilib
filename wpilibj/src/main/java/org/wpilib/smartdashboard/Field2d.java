@@ -36,7 +36,7 @@ import org.wpilib.units.measure.Distance;
 public class Field2d implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** Constructor. */
   public Field2d() {
-    m_objects.add(new FieldObject2d("Robot", Pose2d.kZero));
+    m_objects.add(new FieldObject2d("Robot", Pose2d.ZERO));
   }
 
   @Override

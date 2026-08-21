@@ -10,8 +10,8 @@
 
 using namespace wpi;
 
-static constexpr std::string_view kBackgroundColor = "backgroundColor";
-static constexpr std::string_view kDims = "dims";
+static constexpr std::string_view BACKGROUND_COLOR = "backgroundColor";
+static constexpr std::string_view DIMS = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
                          const wpi::util::Color8Bit& backgroundColor)
@@ -34,8 +34,8 @@ void Mechanism2d::SetBackgroundColor(const wpi::util::Color8Bit& color) {
 
 void Mechanism2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
   std::scoped_lock lock(m_mutex);
-  table.Log(kDims, {m_width, m_height});
-  table.Log(kBackgroundColor, m_color);
+  table.Log(DIMS, {m_width, m_height});
+  table.Log(BACKGROUND_COLOR, m_color);
   for (auto& entry : m_roots) {
     table.Log(entry.first, entry.second);
   }

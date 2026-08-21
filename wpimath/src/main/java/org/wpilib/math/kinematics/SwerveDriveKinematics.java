@@ -56,7 +56,7 @@ public class SwerveDriveKinematics
   private final int m_numModules;
   private final Translation2d[] m_modules;
   private Rotation2d[] m_moduleHeadings;
-  private Translation2d m_prevCoR = Translation2d.kZero;
+  private Translation2d m_prevCoR = Translation2d.ZERO;
 
   /**
    * Constructs a swerve drive kinematics object. This takes in a variable number of module
@@ -75,11 +75,11 @@ public class SwerveDriveKinematics
     m_numModules = moduleTranslations.length;
     m_modules = Arrays.copyOf(moduleTranslations, m_numModules);
     m_moduleHeadings = new Rotation2d[m_numModules];
-    Arrays.fill(m_moduleHeadings, Rotation2d.kZero);
+    Arrays.fill(m_moduleHeadings, Rotation2d.ZERO);
     m_firstOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 3);
     m_secondOrderInverseKinematics = new SimpleMatrix(m_numModules * 2, 4);
 
-    setInverseKinematics(Translation2d.kZero);
+    setInverseKinematics(Translation2d.ZERO);
 
     m_firstOrderForwardKinematics = m_firstOrderInverseKinematics.pseudoInverse();
     m_secondOrderForwardKinematics = m_secondOrderInverseKinematics.pseudoInverse();
@@ -169,7 +169,7 @@ public class SwerveDriveKinematics
    * @return An array containing the module states.
    */
   public SwerveModuleVelocity[] toSwerveModuleVelocities(ChassisVelocities chassisVelocities) {
-    return toSwerveModuleVelocities(chassisVelocities, Translation2d.kZero);
+    return toSwerveModuleVelocities(chassisVelocities, Translation2d.ZERO);
   }
 
   @Override
@@ -501,7 +501,7 @@ public class SwerveDriveKinematics
         && chassisAccelerations.ay == 0.0
         && chassisAccelerations.alpha == 0.0) {
       for (int i = 0; i < m_numModules; i++) {
-        moduleAccelerations[i] = new SwerveModuleAcceleration(0.0, Rotation2d.kZero);
+        moduleAccelerations[i] = new SwerveModuleAcceleration(0.0, Rotation2d.ZERO);
       }
       return moduleAccelerations;
     }
@@ -530,7 +530,7 @@ public class SwerveDriveKinematics
       double linearAcceleration = Math.hypot(x, y);
 
       if (linearAcceleration <= 1e-6) {
-        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.kZero);
+        moduleAccelerations[i] = new SwerveModuleAcceleration(linearAcceleration, Rotation2d.ZERO);
       } else {
         moduleAccelerations[i] =
             new SwerveModuleAcceleration(linearAcceleration, new Rotation2d(x, y));
@@ -550,7 +550,7 @@ public class SwerveDriveKinematics
    */
   public SwerveModuleAcceleration[] toSwerveModuleAccelerations(
       ChassisAccelerations chassisAccelerations, double angularVelocity) {
-    return toSwerveModuleAccelerations(chassisAccelerations, angularVelocity, Translation2d.kZero);
+    return toSwerveModuleAccelerations(chassisAccelerations, angularVelocity, Translation2d.ZERO);
   }
 
   @Override

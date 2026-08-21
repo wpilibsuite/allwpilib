@@ -30,23 +30,23 @@ const GenericHID& NiDsXboxController::GetHID() const {
 }
 
 double NiDsXboxController::GetLeftX() const {
-  return m_hid->GetRawAxis(Axis::kLeftX);
+  return m_hid->GetRawAxis(Axis::LEFT_X);
 }
 
 double NiDsXboxController::GetRightX() const {
-  return m_hid->GetRawAxis(Axis::kRightX);
+  return m_hid->GetRawAxis(Axis::RIGHT_X);
 }
 
 double NiDsXboxController::GetLeftY() const {
-  return m_hid->GetRawAxis(Axis::kLeftY);
+  return m_hid->GetRawAxis(Axis::LEFT_Y);
 }
 
 double NiDsXboxController::GetRightY() const {
-  return m_hid->GetRawAxis(Axis::kRightY);
+  return m_hid->GetRawAxis(Axis::RIGHT_Y);
 }
 
 double NiDsXboxController::GetLeftTriggerAxis() const {
-  return m_hid->GetRawAxis(Axis::kLeftTrigger);
+  return m_hid->GetRawAxis(Axis::LEFT_TRIGGER);
 }
 
 BooleanEvent NiDsXboxController::LeftTrigger(double threshold,
@@ -60,7 +60,7 @@ BooleanEvent NiDsXboxController::LeftTrigger(EventLoop* loop) const {
 }
 
 double NiDsXboxController::GetRightTriggerAxis() const {
-  return m_hid->GetRawAxis(Axis::kRightTrigger);
+  return m_hid->GetRawAxis(Axis::RIGHT_TRIGGER);
 }
 
 BooleanEvent NiDsXboxController::RightTrigger(double threshold,
@@ -74,15 +74,15 @@ BooleanEvent NiDsXboxController::RightTrigger(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetAButton() const {
-  return m_hid->GetRawButton(Button::kA);
+  return m_hid->GetRawButton(Button::A);
 }
 
 bool NiDsXboxController::GetAButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kA);
+  return m_hid->GetRawButtonPressed(Button::A);
 }
 
 bool NiDsXboxController::GetAButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kA);
+  return m_hid->GetRawButtonReleased(Button::A);
 }
 
 BooleanEvent NiDsXboxController::A(EventLoop* loop) const {
@@ -90,15 +90,15 @@ BooleanEvent NiDsXboxController::A(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetBButton() const {
-  return m_hid->GetRawButton(Button::kB);
+  return m_hid->GetRawButton(Button::B);
 }
 
 bool NiDsXboxController::GetBButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kB);
+  return m_hid->GetRawButtonPressed(Button::B);
 }
 
 bool NiDsXboxController::GetBButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kB);
+  return m_hid->GetRawButtonReleased(Button::B);
 }
 
 BooleanEvent NiDsXboxController::B(EventLoop* loop) const {
@@ -106,15 +106,15 @@ BooleanEvent NiDsXboxController::B(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetXButton() const {
-  return m_hid->GetRawButton(Button::kX);
+  return m_hid->GetRawButton(Button::X);
 }
 
 bool NiDsXboxController::GetXButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kX);
+  return m_hid->GetRawButtonPressed(Button::X);
 }
 
 bool NiDsXboxController::GetXButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kX);
+  return m_hid->GetRawButtonReleased(Button::X);
 }
 
 BooleanEvent NiDsXboxController::X(EventLoop* loop) const {
@@ -122,15 +122,15 @@ BooleanEvent NiDsXboxController::X(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetYButton() const {
-  return m_hid->GetRawButton(Button::kY);
+  return m_hid->GetRawButton(Button::Y);
 }
 
 bool NiDsXboxController::GetYButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kY);
+  return m_hid->GetRawButtonPressed(Button::Y);
 }
 
 bool NiDsXboxController::GetYButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kY);
+  return m_hid->GetRawButtonReleased(Button::Y);
 }
 
 BooleanEvent NiDsXboxController::Y(EventLoop* loop) const {
@@ -138,15 +138,15 @@ BooleanEvent NiDsXboxController::Y(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetLeftBumperButton() const {
-  return m_hid->GetRawButton(Button::kLeftBumper);
+  return m_hid->GetRawButton(Button::LEFT_BUMPER);
 }
 
 bool NiDsXboxController::GetLeftBumperButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kLeftBumper);
+  return m_hid->GetRawButtonPressed(Button::LEFT_BUMPER);
 }
 
 bool NiDsXboxController::GetLeftBumperButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kLeftBumper);
+  return m_hid->GetRawButtonReleased(Button::LEFT_BUMPER);
 }
 
 BooleanEvent NiDsXboxController::LeftBumper(EventLoop* loop) const {
@@ -154,15 +154,15 @@ BooleanEvent NiDsXboxController::LeftBumper(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetRightBumperButton() const {
-  return m_hid->GetRawButton(Button::kRightBumper);
+  return m_hid->GetRawButton(Button::RIGHT_BUMPER);
 }
 
 bool NiDsXboxController::GetRightBumperButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kRightBumper);
+  return m_hid->GetRawButtonPressed(Button::RIGHT_BUMPER);
 }
 
 bool NiDsXboxController::GetRightBumperButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kRightBumper);
+  return m_hid->GetRawButtonReleased(Button::RIGHT_BUMPER);
 }
 
 BooleanEvent NiDsXboxController::RightBumper(EventLoop* loop) const {
@@ -170,15 +170,15 @@ BooleanEvent NiDsXboxController::RightBumper(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetBackButton() const {
-  return m_hid->GetRawButton(Button::kBack);
+  return m_hid->GetRawButton(Button::BACK);
 }
 
 bool NiDsXboxController::GetBackButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kBack);
+  return m_hid->GetRawButtonPressed(Button::BACK);
 }
 
 bool NiDsXboxController::GetBackButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kBack);
+  return m_hid->GetRawButtonReleased(Button::BACK);
 }
 
 BooleanEvent NiDsXboxController::Back(EventLoop* loop) const {
@@ -186,15 +186,15 @@ BooleanEvent NiDsXboxController::Back(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetStartButton() const {
-  return m_hid->GetRawButton(Button::kStart);
+  return m_hid->GetRawButton(Button::START);
 }
 
 bool NiDsXboxController::GetStartButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kStart);
+  return m_hid->GetRawButtonPressed(Button::START);
 }
 
 bool NiDsXboxController::GetStartButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kStart);
+  return m_hid->GetRawButtonReleased(Button::START);
 }
 
 BooleanEvent NiDsXboxController::Start(EventLoop* loop) const {
@@ -202,15 +202,15 @@ BooleanEvent NiDsXboxController::Start(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetLeftStickButton() const {
-  return m_hid->GetRawButton(Button::kLeftStick);
+  return m_hid->GetRawButton(Button::LEFT_STICK);
 }
 
 bool NiDsXboxController::GetLeftStickButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kLeftStick);
+  return m_hid->GetRawButtonPressed(Button::LEFT_STICK);
 }
 
 bool NiDsXboxController::GetLeftStickButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kLeftStick);
+  return m_hid->GetRawButtonReleased(Button::LEFT_STICK);
 }
 
 BooleanEvent NiDsXboxController::LeftStick(EventLoop* loop) const {
@@ -218,15 +218,15 @@ BooleanEvent NiDsXboxController::LeftStick(EventLoop* loop) const {
 }
 
 bool NiDsXboxController::GetRightStickButton() const {
-  return m_hid->GetRawButton(Button::kRightStick);
+  return m_hid->GetRawButton(Button::RIGHT_STICK);
 }
 
 bool NiDsXboxController::GetRightStickButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kRightStick);
+  return m_hid->GetRawButtonPressed(Button::RIGHT_STICK);
 }
 
 bool NiDsXboxController::GetRightStickButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kRightStick);
+  return m_hid->GetRawButtonReleased(Button::RIGHT_STICK);
 }
 
 BooleanEvent NiDsXboxController::RightStick(EventLoop* loop) const {

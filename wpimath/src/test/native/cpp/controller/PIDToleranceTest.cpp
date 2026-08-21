@@ -13,13 +13,13 @@
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/tunables/Tunables.hpp"
 
-static constexpr double kSetpoint = 50.0;
-static constexpr double kRange = 200;
-static constexpr double kTolerance = 10.0;
+static constexpr double SETPOINT = 50.0;
+static constexpr double RANGE = 200;
+static constexpr double TOLERANCE = 10.0;
 
 TEST_CASE("PIDToleranceTest InitialTolerance", "[wpimath]") {
   wpi::math::PIDController controller{0.5, 0.0, 0.0};
-  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
+  controller.EnableContinuousInput(-RANGE / 2, RANGE / 2);
 
   CHECK_FALSE(controller.AtSetpoint());
 }
@@ -47,13 +47,13 @@ TEST_CASE("PIDToleranceTest TunedSetpointUpdatesSetpointState", "[wpimath]") {
       wpi::tunables::TunableRegistry::GetTunable(*setpointUid).IsChanged());
   wpi::tunables::TunableRegistry::Update();
 
-  backend->SetDouble("/pid/setpoint", kSetpoint);
+  backend->SetDouble("/pid/setpoint", SETPOINT);
   wpi::tunables::TunableRegistry::Update();
 
-  CHECK(controller.GetSetpoint() == kSetpoint);
-  CHECK(controller.GetError() == kSetpoint);
+  CHECK(controller.GetSetpoint() == SETPOINT);
+  CHECK(controller.GetError() == SETPOINT);
 
-  controller.Calculate(kSetpoint);
+  controller.Calculate(SETPOINT);
 
   CHECK(controller.AtSetpoint());
 
@@ -102,12 +102,12 @@ TEST_CASE("PIDToleranceTest TunedGainsUpdateMemberState", "[wpimath]") {
 
 TEST_CASE("PIDToleranceTest AbsoluteTolerance", "[wpimath]") {
   wpi::math::PIDController controller{0.5, 0.0, 0.0};
-  controller.EnableContinuousInput(-kRange / 2, kRange / 2);
+  controller.EnableContinuousInput(-RANGE / 2, RANGE / 2);
 
   CHECK_FALSE(controller.AtSetpoint());
 
-  controller.SetTolerance(kTolerance);
-  controller.SetSetpoint(kSetpoint);
+  controller.SetTolerance(TOLERANCE);
+  controller.SetSetpoint(SETPOINT);
 
   UNSCOPED_INFO(
       "Error was in tolerance when it should not have been. Error was "
@@ -121,14 +121,14 @@ TEST_CASE("PIDToleranceTest AbsoluteTolerance", "[wpimath]") {
       << controller.GetError());
   CHECK_FALSE(controller.AtSetpoint());
 
-  controller.Calculate(kSetpoint + kTolerance / 2);
+  controller.Calculate(SETPOINT + TOLERANCE / 2);
 
   UNSCOPED_INFO(
       "Error was not in tolerance when it should have been. Error was "
       << controller.GetError());
   CHECK(controller.AtSetpoint());
 
-  controller.Calculate(kSetpoint + 10 * kTolerance);
+  controller.Calculate(SETPOINT + 10 * TOLERANCE);
 
   UNSCOPED_INFO(
       "Error was in tolerance when it should not have been. Error was "

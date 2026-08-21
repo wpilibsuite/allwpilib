@@ -20,7 +20,7 @@ import org.wpilib.units.measure.Distance;
 
 /** Game field object on a Field2d. */
 public class FieldObject2d implements AutoCloseable {
-  private static final TunableConfig kPosesTunableConfig =
+  private static final TunableConfig POSES_TUNABLE_CONFIG =
       TunableConfig.of(TunableOption.GET_ON_CHANGE);
 
   /**
@@ -32,7 +32,7 @@ public class FieldObject2d implements AutoCloseable {
     m_name = name;
     m_posesTunable =
         Tunable.createConfig(
-            this::getPoseArray, this::setPoseArray, Pose2d[].class, kPosesTunableConfig);
+            this::getPoseArray, this::setPoseArray, Pose2d[].class, POSES_TUNABLE_CONFIG);
     setPoseArray(initialPoses);
   }
 
@@ -77,7 +77,7 @@ public class FieldObject2d implements AutoCloseable {
    */
   public synchronized Pose2d getPose() {
     if (m_poses.isEmpty()) {
-      return Pose2d.kZero;
+      return Pose2d.ZERO;
     }
     return m_poses.get(0);
   }

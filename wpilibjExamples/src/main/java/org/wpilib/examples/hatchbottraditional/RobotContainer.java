@@ -39,7 +39,7 @@ public class RobotContainer {
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command simpleAuto =
       new DriveDistance(
-          AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveVelocity, robotDrive);
+          AutoConstants.AUTO_DRIVE_DISTANCE_INCHES, AutoConstants.AUTO_DRIVE_VELOCITY, robotDrive);
 
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command complexAuto = new ComplexAuto(robotDrive, hatchSubsystem);
@@ -48,7 +48,7 @@ public class RobotContainer {
   private final Selectable<Command> chooser = new Selectable<>();
 
   // The driver's controller
-  Gamepad driverController = new Gamepad(OIConstants.kDriverControllerPort);
+  Gamepad driverController = new Gamepad(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

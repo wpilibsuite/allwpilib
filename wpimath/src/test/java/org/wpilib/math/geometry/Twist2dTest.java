@@ -15,7 +15,7 @@ class Twist2dTest {
     var straight = new Twist2d(5.0, 0.0, 0.0);
     var straightTransform = straight.exp();
 
-    var expected = new Transform2d(5.0, 0.0, Rotation2d.kZero);
+    var expected = new Transform2d(5.0, 0.0, Rotation2d.ZERO);
     assertEquals(expected, straightTransform);
   }
 
@@ -24,7 +24,7 @@ class Twist2dTest {
     var quarterCircle = new Twist2d(5.0 / 2.0 * Math.PI, 0, Math.PI / 2.0);
     var quarterCircleTransform = quarterCircle.exp();
 
-    var expected = new Transform2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
+    var expected = new Transform2d(5.0, 5.0, Rotation2d.CCW_PI_2);
     assertEquals(expected, quarterCircleTransform);
   }
 
@@ -33,7 +33,7 @@ class Twist2dTest {
     var diagonal = new Twist2d(2.0, 2.0, 0.0);
     var diagonalTransform = diagonal.exp();
 
-    var expected = new Transform2d(2.0, 2.0, Rotation2d.kZero);
+    var expected = new Transform2d(2.0, 2.0, Rotation2d.ZERO);
     assertEquals(expected, diagonalTransform);
   }
 
@@ -53,8 +53,8 @@ class Twist2dTest {
 
   @Test
   void testPose2dLog() {
-    final var start = Pose2d.kZero;
-    final var end = new Pose2d(5.0, 5.0, Rotation2d.kCCW_Pi_2);
+    final var start = Pose2d.ZERO;
+    final var end = new Pose2d(5.0, 5.0, Rotation2d.CCW_PI_2);
 
     final var twist = end.minus(start).log();
 

@@ -25,10 +25,10 @@ bool wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward>::Pack(
     OutputStream& stream,
     const wpi::math::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
-      .kv_linear = value.kVLinear.value(),
-      .ka_linear = value.kALinear.value(),
-      .kv_angular = value.kVAngular.value(),
-      .ka_angular = value.kAAngular.value(),
+      .kv_linear = value.V_LINEAR.value(),
+      .ka_linear = value.A_LINEAR.value(),
+      .kv_angular = value.V_ANGULAR.value(),
+      .ka_angular = value.A_ANGULAR.value(),
   };
   return stream.Encode(msg);
 }

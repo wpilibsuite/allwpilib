@@ -132,19 +132,19 @@ struct PeriodicFrame {
 struct SocketCanState {
   wpi::net::EventLoopRunner readLoopRunner;
   wpi::net::EventLoopRunner writeLoopRunner;
-  wpi::util::mutex writeMutex[wpi::hal::kNumCanBuses];
-  int socketHandle[wpi::hal::kNumCanBuses];
+  wpi::util::mutex writeMutex[wpi::hal::NUM_CAN_BUSES];
+  int socketHandle[wpi::hal::NUM_CAN_BUSES];
   // Message ID to per-bus periodic frame state. Accessed only on
   // writeLoopRunner.
   wpi::util::DenseMap<uint32_t, std::array<std::optional<PeriodicFrame>,
-                                           wpi::hal::kNumCanBuses>>
+                                           wpi::hal::NUM_CAN_BUSES>>
       periodicFrames;
 
-  wpi::util::mutex readMutex[wpi::hal::kNumCanBuses];
+  wpi::util::mutex readMutex[wpi::hal::NUM_CAN_BUSES];
   // TODO(thadhouse) we need a MUCH better way of doing this masking
   wpi::util::DenseMap<uint32_t, HAL_CANStreamMessage>
-      readFrames[wpi::hal::kNumCanBuses];
-  std::vector<CANStreamStorage*> canStreams[wpi::hal::kNumCanBuses];
+      readFrames[wpi::hal::NUM_CAN_BUSES];
+  std::vector<CANStreamStorage*> canStreams[wpi::hal::NUM_CAN_BUSES];
 
   bool InitializeBuses();
 
@@ -201,7 +201,7 @@ bool SocketCanState::InitializeBuses() {
       wpi::util::print("Failed to set CAN thread priority\n");
     }
 
-    for (int i = 0; i < wpi::hal::kNumCanBuses; i++) {
+    for (int i = 0; i < wpi::hal::NUM_CAN_BUSES; i++) {
       std::scoped_lock lock{writeMutex[i]};
       socketHandle[i] = socket(PF_CAN, SOCK_RAW, CAN_RAW);
       if (socketHandle[i] == -1) {
@@ -467,7 +467,7 @@ void SendMessage(int32_t busId, uint32_t messageId,
                  int32_t* status) {
   *status = 0;
 
-  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::NUM_CAN_BUSES) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -538,7 +538,7 @@ void HAL_CAN_SendMessage(int32_t busId, uint32_t messageId,
 void HAL_CAN_ReceiveMessage(int32_t busId, uint32_t messageId,
                             struct HAL_CANReceiveMessage* message,
                             int32_t* status) {
-  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::NUM_CAN_BUSES) {
     message->message.dataSize = 0;
     message->timeStamp = 0;
     *status = HAL_PARAMETER_OUT_OF_RANGE;
@@ -568,7 +568,7 @@ HAL_CANStreamHandle HAL_CAN_OpenStreamSession(int32_t busId, uint32_t messageId,
                                               int32_t* status) {
   *status = 0;
 
-  if (busId < 0 || busId >= wpi::hal::kNumCanBuses) {
+  if (busId < 0 || busId >= wpi::hal::NUM_CAN_BUSES) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return HAL_INVALID_HANDLE;
   }

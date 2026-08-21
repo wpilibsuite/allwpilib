@@ -560,47 +560,47 @@ class NiDsStadiaController : public HIDDevice, public wpi::telemetry::TelemetryL
   /** Represents a digital button on an NiDsStadiaController. */
   struct Button {
     /// A button.
-    static constexpr int kA = 0;
+    static constexpr int A = 0;
     /// B button.
-    static constexpr int kB = 1;
+    static constexpr int B = 1;
     /// X button.
-    static constexpr int kX = 2;
+    static constexpr int X = 2;
     /// Y button.
-    static constexpr int kY = 3;
+    static constexpr int Y = 3;
     /// Left bumper button.
-    static constexpr int kLeftBumper = 4;
+    static constexpr int LEFT_BUMPER = 4;
     /// Right bumper button.
-    static constexpr int kRightBumper = 5;
+    static constexpr int RIGHT_BUMPER = 5;
     /// Left stick button.
-    static constexpr int kLeftStick = 6;
+    static constexpr int LEFT_STICK = 6;
     /// Right stick button.
-    static constexpr int kRightStick = 7;
+    static constexpr int RIGHT_STICK = 7;
     /// Ellipses button.
-    static constexpr int kEllipses = 8;
+    static constexpr int ELLIPSES = 8;
     /// Hamburger button.
-    static constexpr int kHamburger = 9;
+    static constexpr int HAMBURGER = 9;
     /// Stadia button.
-    static constexpr int kStadia = 10;
+    static constexpr int STADIA = 10;
     /// Right trigger button.
-    static constexpr int kRightTrigger = 11;
+    static constexpr int RIGHT_TRIGGER = 11;
     /// Left trigger button.
-    static constexpr int kLeftTrigger = 12;
+    static constexpr int LEFT_TRIGGER = 12;
     /// Google button.
-    static constexpr int kGoogle = 13;
+    static constexpr int GOOGLE = 13;
     /// Frame button.
-    static constexpr int kFrame = 14;
+    static constexpr int FRAME = 14;
   };
 
   /** Represents an axis on an NiDsStadiaController. */
   struct Axis {
     /// Left X axis.
-    static constexpr int kLeftX = 0;
+    static constexpr int LEFT_X = 0;
     /// Right X axis.
-    static constexpr int kRightX = 3;
+    static constexpr int RIGHT_X = 3;
     /// Left Y axis.
-    static constexpr int kLeftY = 1;
+    static constexpr int LEFT_Y = 1;
     /// Right Y axis.
-    static constexpr int kRightY = 4;
+    static constexpr int RIGHT_Y = 4;
   };
 
   /**

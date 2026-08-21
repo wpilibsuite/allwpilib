@@ -16,9 +16,9 @@ namespace wpi::nt {
 class INetworkClient {
  public:
   struct ServerResolver {
-    enum class Kind { kNetworkTables, kSystemCore };
+    enum class Kind { NETWORK_TABLES, SYSTEM_CORE };
 
-    Kind kind = Kind::kNetworkTables;
+    Kind kind = Kind::NETWORK_TABLES;
     std::string serviceName;
     std::optional<std::string> team;
     unsigned int port = 0;

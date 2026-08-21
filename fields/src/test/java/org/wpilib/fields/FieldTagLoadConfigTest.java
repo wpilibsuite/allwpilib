@@ -38,7 +38,7 @@ class FieldTagLoadConfigTest {
             Units.inchesToMeters(127.272),
             Units.inchesToMeters(216.01),
             Units.inchesToMeters(67.932),
-            Rotation3d.kZero);
+            Rotation3d.ZERO);
     Optional<Pose3d> maybePose = field.getTagPose(1);
     assertTrue(maybePose.isPresent());
     assertEquals(expectedPose, maybePose.get());

@@ -30,8 +30,8 @@ class ServerSubscriber {
         m_options{options},
         m_periodMs(PubSubOptionsImpl::RoundPeriodicMs(options.periodicMs)) {
     UpdateMeta();
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
+    if (m_periodMs < MIN_PERIOD_MS) {
+      m_periodMs = MIN_PERIOD_MS;
     }
   }
   ServerSubscriber(const ServerSubscriber&) = delete;
@@ -43,8 +43,8 @@ class ServerSubscriber {
     m_options = options_;
     UpdateMeta();
     m_periodMs = PubSubOptionsImpl::RoundPeriodicMs(options_.periodicMs);
-    if (m_periodMs < kMinPeriodMs) {
-      m_periodMs = kMinPeriodMs;
+    if (m_periodMs < MIN_PERIOD_MS) {
+      m_periodMs = MIN_PERIOD_MS;
     }
   }
 

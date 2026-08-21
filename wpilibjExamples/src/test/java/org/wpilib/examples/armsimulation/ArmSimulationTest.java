@@ -40,9 +40,9 @@ class ArmSimulationTest {
     DriverStationSim.resetData();
     robot = new Robot();
     thread = new Thread(robot::startCompetition);
-    encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
-    motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
-    joystickSim = new JoystickSim(Constants.kJoystickPort);
+    encoderSim = EncoderSim.createForChannel(Constants.ENCODER_A_CHANNEL);
+    motorSim = new PWMMotorControllerSim(Constants.MOTOR_PORT);
+    joystickSim = new JoystickSim(Constants.JOYSTICK_PORT);
 
     thread.start();
     SimHooks.waitForProgramStart();
@@ -59,21 +59,21 @@ class ArmSimulationTest {
     }
     robot.close();
     encoderSim.resetData();
-    Preferences.remove(Constants.kArmPKey);
-    Preferences.remove(Constants.kArmPositionKey);
+    Preferences.remove(Constants.ARM_P_KEY);
+    Preferences.remove(Constants.ARM_POSITION_KEY);
     Preferences.removeAll();
     RoboRioSim.resetData();
     DriverStationSim.resetData();
     DriverStationSim.notifyNewData();
   }
 
-  @ValueSource(doubles = {Constants.kDefaultArmSetpointDegrees, 25.0, 50.0})
+  @ValueSource(doubles = {Constants.DEFAULT_ARM_SETPOINT_DEGREES, 25.0, 50.0})
   @ParameterizedTest
   void teleopTest(double setpoint) {
-    assertTrue(Preferences.containsKey(Constants.kArmPositionKey));
-    assertTrue(Preferences.containsKey(Constants.kArmPKey));
-    Preferences.setDouble(Constants.kArmPositionKey, setpoint);
-    assertEquals(setpoint, Preferences.getDouble(Constants.kArmPositionKey, Double.NaN));
+    assertTrue(Preferences.containsKey(Constants.ARM_POSITION_KEY));
+    assertTrue(Preferences.containsKey(Constants.ARM_P_KEY));
+    Preferences.setDouble(Constants.ARM_POSITION_KEY, setpoint);
+    assertEquals(setpoint, Preferences.getDouble(Constants.ARM_POSITION_KEY, Double.NaN));
     // teleop init
     {
       DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
@@ -88,7 +88,7 @@ class ArmSimulationTest {
       SimHooks.stepTiming(3);
 
       // Ensure arm is still at minimum angle.
-      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
+      assertEquals(Constants.MIN_ANGLE_RADS, encoderSim.getDistance(), 2.0);
     }
 
     {
@@ -115,7 +115,7 @@ class ArmSimulationTest {
       // advance 150 timesteps
       SimHooks.stepTiming(3.0);
 
-      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
+      assertEquals(Constants.MIN_ANGLE_RADS, encoderSim.getDistance(), 2.0);
     }
 
     {
@@ -143,7 +143,7 @@ class ArmSimulationTest {
       SimHooks.stepTiming(3.5);
 
       assertEquals(0.0, motorSim.getThrottle(), 0.01);
-      assertEquals(Constants.kMinAngleRads, encoderSim.getDistance(), 2.0);
+      assertEquals(Constants.MIN_ANGLE_RADS, encoderSim.getDistance(), 2.0);
     }
   }
 }

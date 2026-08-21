@@ -37,9 +37,9 @@ class ElevatorSimulationTest {
     DriverStationSim.resetData();
     robot = new Robot();
     thread = new Thread(robot::startCompetition);
-    encoderSim = EncoderSim.createForChannel(Constants.kEncoderAChannel);
-    motorSim = new PWMMotorControllerSim(Constants.kMotorPort);
-    joystickSim = new JoystickSim(Constants.kJoystickPort);
+    encoderSim = EncoderSim.createForChannel(Constants.ENCODER_A_CHANNEL);
+    motorSim = new PWMMotorControllerSim(Constants.MOTOR_PORT);
+    joystickSim = new JoystickSim(Constants.JOYSTICK_PORT);
 
     thread.start();
     SimHooks.waitForProgramStart();
@@ -88,12 +88,12 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.SETPOINT, encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.SETPOINT, encoderSim.getDistance(), 0.05);
     }
 
     {
@@ -115,12 +115,12 @@ class ElevatorSimulationTest {
       // advance 75 timesteps
       SimHooks.stepTiming(1.5);
 
-      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.SETPOINT, encoderSim.getDistance(), 0.05);
 
       // advance 25 timesteps to see setpoint is held.
       SimHooks.stepTiming(0.5);
 
-      assertEquals(Constants.kSetpoint, encoderSim.getDistance(), 0.05);
+      assertEquals(Constants.SETPOINT, encoderSim.getDistance(), 0.05);
     }
 
     {

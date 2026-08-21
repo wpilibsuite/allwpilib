@@ -18,30 +18,30 @@ import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.util.MathUtil;
 
 class LTVUnicycleControllerTest {
-  private static final double kTolerance = 1 / 12.0;
-  private static final double kAngularTolerance = Math.toRadians(2);
+  private static final double TOLERANCE = 1 / 12.0;
+  private static final double ANGULAR_TOLERANCE = Math.toRadians(2);
 
   @Test
   void testReachesReference() {
-    final double kDt = 0.02;
+    final double DT = 0.02;
 
     final var controller =
         new LTVUnicycleController(
-            VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), kDt);
-    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.kZero);
+            VecBuilder.fill(0.0625, 0.125, 2.5), VecBuilder.fill(4.0, 4.0), DT);
+    var robotPose = new Pose2d(2.7, 23.0, Rotation2d.ZERO);
 
     final var waypoints = new ArrayList<Pose2d>();
-    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.kZero));
+    waypoints.add(new Pose2d(2.75, 22.521, Rotation2d.ZERO));
     waypoints.add(new Pose2d(24.73, 19.68, new Rotation2d(5.846)));
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
 
     final var duration = trajectory.duration;
-    for (int i = 0; i < (duration / kDt); ++i) {
-      var state = trajectory.sampleAt(kDt * i);
+    for (int i = 0; i < (duration / DT); ++i) {
+      var state = trajectory.sampleAt(DT * i);
 
       var output = controller.calculate(robotPose, state);
-      robotPose = robotPose.plus(new Twist2d(output.vx * kDt, 0, output.omega * kDt).exp());
+      robotPose = robotPose.plus(new Twist2d(output.vx * DT, 0, output.omega * DT).exp());
     }
 
     final var states = trajectory.getSamples();
@@ -51,13 +51,13 @@ class LTVUnicycleControllerTest {
     // must be final or effectively final.
     final var finalRobotPose = robotPose;
     assertAll(
-        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), kTolerance),
-        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), kTolerance),
+        () -> assertEquals(endPose.getX(), finalRobotPose.getX(), TOLERANCE),
+        () -> assertEquals(endPose.getY(), finalRobotPose.getY(), TOLERANCE),
         () ->
             assertEquals(
                 0.0,
                 MathUtil.angleModulus(
                     endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
-                kAngularTolerance));
+                ANGULAR_TOLERANCE));
   }
 }

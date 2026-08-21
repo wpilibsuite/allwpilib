@@ -15,14 +15,14 @@ import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.tunable.Tunables;
 
 class PIDToleranceTest {
-  private static final double kSetpoint = 50.0;
-  private static final double kTolerance = 10.0;
-  private static final double kRange = 200;
+  private static final double SETPOINT = 50.0;
+  private static final double TOLERANCE = 10.0;
+  private static final double RANGE = 200;
 
   @Test
   void initialToleranceTest() {
     var controller = new PIDController(0.05, 0.0, 0.0);
-    controller.enableContinuousInput(-kRange / 2, kRange / 2);
+    controller.enableContinuousInput(-RANGE / 2, RANGE / 2);
 
     assertFalse(controller.atSetpoint());
   }
@@ -53,13 +53,13 @@ class PIDToleranceTest {
       assertTrue(setpointTunable.hasChanged());
       TunableRegistry.update();
 
-      backend.setDouble("/pid/setpoint", kSetpoint);
+      backend.setDouble("/pid/setpoint", SETPOINT);
       TunableRegistry.update();
 
-      assertEquals(kSetpoint, controller.getSetpoint());
-      assertEquals(kSetpoint, controller.getError());
+      assertEquals(SETPOINT, controller.getSetpoint());
+      assertEquals(SETPOINT, controller.getError());
 
-      controller.calculate(kSetpoint);
+      controller.calculate(SETPOINT);
 
       assertTrue(controller.atSetpoint());
     } finally {
@@ -70,12 +70,12 @@ class PIDToleranceTest {
   @Test
   void absoluteToleranceTest() {
     var controller = new PIDController(0.05, 0.0, 0.0);
-    controller.enableContinuousInput(-kRange / 2, kRange / 2);
+    controller.enableContinuousInput(-RANGE / 2, RANGE / 2);
 
     assertFalse(controller.atSetpoint());
 
-    controller.setTolerance(kTolerance);
-    controller.setSetpoint(kSetpoint);
+    controller.setTolerance(TOLERANCE);
+    controller.setSetpoint(SETPOINT);
 
     assertFalse(
         controller.atSetpoint(),
@@ -87,13 +87,13 @@ class PIDToleranceTest {
         controller.atSetpoint(),
         "Error was in tolerance when it should not have been. Error was " + controller.getError());
 
-    controller.calculate(kSetpoint + kTolerance / 2);
+    controller.calculate(SETPOINT + TOLERANCE / 2);
 
     assertTrue(
         controller.atSetpoint(),
         "Error was not in tolerance when it should have been. Error was " + controller.getError());
 
-    controller.calculate(kSetpoint + 10 * kTolerance);
+    controller.calculate(SETPOINT + 10 * TOLERANCE);
 
     assertFalse(
         controller.atSetpoint(),

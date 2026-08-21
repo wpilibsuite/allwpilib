@@ -80,10 +80,10 @@ TEST_CASE("PowerDistributionSimTest SetCurrent", "[wpilibc][simulation]") {
     auto cb =
         sim.RegisterCurrentCallback(channel, callback.GetCallback(), false);
 
-    const double kTestCurrent = 35.04 + channel;
-    sim.SetCurrent(channel, kTestCurrent);
-    CHECK(kTestCurrent == sim.GetCurrent(channel));
-    CHECK(kTestCurrent == pdp.GetCurrent(channel));
+    const double TEST_CURRENT = 35.04 + channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
+    CHECK(TEST_CURRENT == sim.GetCurrent(channel));
+    CHECK(TEST_CURRENT == pdp.GetCurrent(channel));
     CHECK(callback.WasTriggered());
     CHECK(callback.GetLastValue());
   }
@@ -97,8 +97,8 @@ TEST_CASE("PowerDistributionSimTest GetAllCurrents", "[wpilibc][simulation]") {
 
   // setup
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    sim.SetCurrent(channel, kTestCurrent);
+    const double TEST_CURRENT = 24 - channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
   }
 
   // run it
@@ -106,8 +106,8 @@ TEST_CASE("PowerDistributionSimTest GetAllCurrents", "[wpilibc][simulation]") {
 
   // verify
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    CHECK(kTestCurrent == currents[channel]);
+    const double TEST_CURRENT = 24 - channel;
+    CHECK(TEST_CURRENT == currents[channel]);
   }
 }
 

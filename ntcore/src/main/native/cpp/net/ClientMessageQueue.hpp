@@ -33,7 +33,7 @@ template <size_t MaxValueSize, bool IsMutexed>
 class ClientMessageQueueImpl final : public ClientMessageHandler,
                                      public ClientMessageQueue {
  public:
-  static constexpr size_t kBlockSize = 64;
+  static constexpr size_t BLOCK_SIZE = 64;
 
   explicit ClientMessageQueueImpl(wpi::util::Logger& logger)
       : m_logger{logger} {}
@@ -120,7 +120,7 @@ class ClientMessageQueueImpl final : public ClientMessageHandler,
   }
 
  private:
-  wpi::util::FastQueue<ClientMessage, kBlockSize> m_queue{kBlockSize - 1};
+  wpi::util::FastQueue<ClientMessage, BLOCK_SIZE> m_queue{BLOCK_SIZE - 1};
   wpi::util::Logger& m_logger;
 
   class NoMutex {

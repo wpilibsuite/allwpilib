@@ -201,7 +201,7 @@ def test_none_periodic(periodic_robot_test_fixture):
 
 
 def test_robot_periodic(periodic_robot_test_fixture):
-    kPeriod = 0.020  # 20 ms
+    PERIOD = 0.020  # 20 ms
 
     robot = periodic_robot_test_fixture
 
@@ -211,9 +211,9 @@ def test_robot_periodic(periodic_robot_test_fixture):
     assert robot.periodic_count == 0
 
     # Time step to get periodic calls on 20 ms robot loop
-    wsim.step_timing(kPeriod)
+    wsim.step_timing(PERIOD)
     assert robot.periodic_count == 1
 
     # Additional time steps should continue calling robot_periodic
-    wsim.step_timing(kPeriod)
+    wsim.step_timing(PERIOD)
     assert robot.periodic_count == 2

@@ -11,16 +11,16 @@ using namespace wpi::math;
 
 namespace {
 
-const Translation2d kExpectedData = Translation2d{3.504_m, 22.9_m};
+const Translation2d EXPECTED_DATA = Translation2d{3.504_m, 22.9_m};
 }  // namespace
 
 TEST_CASE("Translation2dProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK(kExpectedData.X().value() == unpacked_data->X().value());
-  CHECK(kExpectedData.Y().value() == unpacked_data->Y().value());
+  CHECK(EXPECTED_DATA.X().value() == unpacked_data->X().value());
+  CHECK(EXPECTED_DATA.Y().value() == unpacked_data->Y().value());
 }

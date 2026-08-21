@@ -107,7 +107,7 @@ class ParallelDeadlineGroup
   Command* m_deadline;
   bool m_runWhenDisabled{true};
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
   bool m_finished{true};
 };
 }  // namespace wpi::cmd

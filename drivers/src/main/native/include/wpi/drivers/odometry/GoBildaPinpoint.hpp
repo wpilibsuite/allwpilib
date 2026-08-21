@@ -461,19 +461,19 @@ class GoBildaPinpoint {
     SET_X_ENCODER_FORWARD = 1 << 5
   };
 
-  static constexpr int kRegisterLength = 4;
-  static constexpr int kFixedBulkReadLength = 40;
-  static constexpr int kCrcLength = 1;
-  static constexpr uint8_t kCrcInitialValue = 0x90;
-  static constexpr uint8_t kCrcPolynomialValue = 0x31;
-  static constexpr double kSwingarmTicksPerMeter = 13262.91192;
-  static constexpr double kFourBarTicksPerMeter = 19894.36789;
-  static constexpr float kPositionChangeLimitMillimeters = 5000.0f;
-  static constexpr float kHeadingChangeLimitRadians = 120.0f;
-  static constexpr float kVelocityLimitMillimetersPerSecond = 10000.0f;
-  static constexpr float kHeadingVelocityLimitRadiansPerSecond = 120.0f;
-  static constexpr double kMinQuaternionNormSquared = 1e-12;
-  static constexpr std::array<Register, 10> kDefaultBulkReadScope = {
+  static constexpr int REGISTER_LENGTH = 4;
+  static constexpr int FIXED_BULK_READ_LENGTH = 40;
+  static constexpr int CRC_LENGTH = 1;
+  static constexpr uint8_t CRC_INITIAL_VALUE = 0x90;
+  static constexpr uint8_t CRC_POLYNOMIAL_VALUE = 0x31;
+  static constexpr double SWINGARM_TICKS_PER_METER = 13262.91192;
+  static constexpr double FOUR_BAR_TICKS_PER_METER = 19894.36789;
+  static constexpr float POSITION_CHANGE_LIMIT_MILLIMETERS = 5000.0f;
+  static constexpr float HEADING_CHANGE_LIMIT_RADIANS = 120.0f;
+  static constexpr float VELOCITY_LIMIT_MILLIMETERS_PER_SECOND = 10000.0f;
+  static constexpr float HEADING_VELOCITY_LIMIT_RADIANS_PER_SECOND = 120.0f;
+  static constexpr double MIN_QUATERNION_NORM_SQUARED = 1e-12;
+  static constexpr std::array<Register, 10> DEFAULT_BULK_READ_SCOPE = {
       Register::DEVICE_STATUS,   Register::LOOP_TIME,
       Register::X_ENCODER_VALUE, Register::Y_ENCODER_VALUE,
       Register::X_POSITION,      Register::Y_POSITION,

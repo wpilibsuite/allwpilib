@@ -32,33 +32,33 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a NiDsPS4Controller. */
   public enum Button {
     /** Square button. */
-    kSquare(0),
+    SQUARE(0),
     /** Cross button. */
-    kCross(1),
+    CROSS(1),
     /** Circle button. */
-    kCircle(2),
+    CIRCLE(2),
     /** Triangle button. */
-    kTriangle(3),
+    TRIANGLE(3),
     /** Left trigger 1 button. */
-    kL1(4),
+    L1(4),
     /** Right trigger 1 button. */
-    kR1(5),
+    R1(5),
     /** Left trigger 2 button. */
-    kL2(6),
+    L2(6),
     /** Right trigger 2 button. */
-    kR2(7),
+    R2(7),
     /** Share button. */
-    kShare(8),
+    SHARE(8),
     /** Options button. */
-    kOptions(9),
+    OPTIONS(9),
     /** L3 (left stick) button. */
-    kL3(10),
+    L3(10),
     /** R3 (right stick) button. */
-    kR3(11),
+    R3(11),
     /** PlayStation button. */
-    kPS(12),
+    PS(12),
     /** Touchpad button. */
-    kTouchpad(13);
+    TOUCHPAD(13);
 
     /** Button value. */
     public final int value;
@@ -85,17 +85,17 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
   /** Represents an axis on an NiDsPS4Controller. */
   public enum Axis {
     /** Left X axis. */
-    kLeftX(0),
+    LEFT_X(0),
     /** Left Y axis. */
-    kLeftY(1),
+    LEFT_Y(1),
     /** Right X axis. */
-    kRightX(2),
+    RIGHT_X(2),
     /** Right Y axis. */
-    kRightY(5),
+    RIGHT_Y(5),
     /** Left trigger 2. */
-    kL2(3),
+    L2(3),
     /** Right trigger 2. */
-    kR2(4);
+    R2(4);
 
     /** Axis value. */
     public final int value;
@@ -159,7 +159,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getRawAxis(Axis.kLeftX.value);
+    return m_hid.getRawAxis(Axis.LEFT_X.value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getRawAxis(Axis.kLeftY.value);
+    return m_hid.getRawAxis(Axis.LEFT_Y.value);
   }
 
   /**
@@ -177,7 +177,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRawAxis(Axis.kRightX.value);
+    return m_hid.getRawAxis(Axis.RIGHT_X.value);
   }
 
   /**
@@ -186,7 +186,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRawAxis(Axis.kRightY.value);
+    return m_hid.getRawAxis(Axis.RIGHT_Y.value);
   }
 
   /**
@@ -196,7 +196,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getL2Axis() {
-    return m_hid.getRawAxis(Axis.kL2.value);
+    return m_hid.getRawAxis(Axis.L2.value);
   }
 
   /**
@@ -206,7 +206,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getR2Axis() {
-    return m_hid.getRawAxis(Axis.kR2.value);
+    return m_hid.getRawAxis(Axis.R2.value);
   }
 
   /**
@@ -215,7 +215,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getSquareButton() {
-    return m_hid.getRawButton(Button.kSquare.value);
+    return m_hid.getRawButton(Button.SQUARE.value);
   }
 
   /**
@@ -224,7 +224,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getSquareButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kSquare.value);
+    return m_hid.getRawButtonPressed(Button.SQUARE.value);
   }
 
   /**
@@ -233,7 +233,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getSquareButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kSquare.value);
+    return m_hid.getRawButtonReleased(Button.SQUARE.value);
   }
 
   /**
@@ -244,7 +244,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent square(EventLoop loop) {
-    return m_hid.button(Button.kSquare.value, loop);
+    return m_hid.button(Button.SQUARE.value, loop);
   }
 
   /**
@@ -253,7 +253,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getCrossButton() {
-    return m_hid.getRawButton(Button.kCross.value);
+    return m_hid.getRawButton(Button.CROSS.value);
   }
 
   /**
@@ -262,7 +262,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getCrossButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kCross.value);
+    return m_hid.getRawButtonPressed(Button.CROSS.value);
   }
 
   /**
@@ -271,7 +271,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getCrossButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kCross.value);
+    return m_hid.getRawButtonReleased(Button.CROSS.value);
   }
 
   /**
@@ -282,7 +282,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent cross(EventLoop loop) {
-    return m_hid.button(Button.kCross.value, loop);
+    return m_hid.button(Button.CROSS.value, loop);
   }
 
   /**
@@ -291,7 +291,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getCircleButton() {
-    return m_hid.getRawButton(Button.kCircle.value);
+    return m_hid.getRawButton(Button.CIRCLE.value);
   }
 
   /**
@@ -300,7 +300,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getCircleButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kCircle.value);
+    return m_hid.getRawButtonPressed(Button.CIRCLE.value);
   }
 
   /**
@@ -309,7 +309,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getCircleButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kCircle.value);
+    return m_hid.getRawButtonReleased(Button.CIRCLE.value);
   }
 
   /**
@@ -320,7 +320,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent circle(EventLoop loop) {
-    return m_hid.button(Button.kCircle.value, loop);
+    return m_hid.button(Button.CIRCLE.value, loop);
   }
 
   /**
@@ -329,7 +329,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getTriangleButton() {
-    return m_hid.getRawButton(Button.kTriangle.value);
+    return m_hid.getRawButton(Button.TRIANGLE.value);
   }
 
   /**
@@ -338,7 +338,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTriangleButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kTriangle.value);
+    return m_hid.getRawButtonPressed(Button.TRIANGLE.value);
   }
 
   /**
@@ -347,7 +347,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getTriangleButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kTriangle.value);
+    return m_hid.getRawButtonReleased(Button.TRIANGLE.value);
   }
 
   /**
@@ -358,7 +358,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent triangle(EventLoop loop) {
-    return m_hid.button(Button.kTriangle.value, loop);
+    return m_hid.button(Button.TRIANGLE.value, loop);
   }
 
   /**
@@ -367,7 +367,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getL1Button() {
-    return m_hid.getRawButton(Button.kL1.value);
+    return m_hid.getRawButton(Button.L1.value);
   }
 
   /**
@@ -376,7 +376,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL1ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kL1.value);
+    return m_hid.getRawButtonPressed(Button.L1.value);
   }
 
   /**
@@ -385,7 +385,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL1ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kL1.value);
+    return m_hid.getRawButtonReleased(Button.L1.value);
   }
 
   /**
@@ -396,7 +396,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent L1(EventLoop loop) {
-    return m_hid.button(Button.kL1.value, loop);
+    return m_hid.button(Button.L1.value, loop);
   }
 
   /**
@@ -405,7 +405,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getR1Button() {
-    return m_hid.getRawButton(Button.kR1.value);
+    return m_hid.getRawButton(Button.R1.value);
   }
 
   /**
@@ -414,7 +414,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR1ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kR1.value);
+    return m_hid.getRawButtonPressed(Button.R1.value);
   }
 
   /**
@@ -423,7 +423,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR1ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kR1.value);
+    return m_hid.getRawButtonReleased(Button.R1.value);
   }
 
   /**
@@ -434,7 +434,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent R1(EventLoop loop) {
-    return m_hid.button(Button.kR1.value, loop);
+    return m_hid.button(Button.R1.value, loop);
   }
 
   /**
@@ -443,7 +443,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getL2Button() {
-    return m_hid.getRawButton(Button.kL2.value);
+    return m_hid.getRawButton(Button.L2.value);
   }
 
   /**
@@ -452,7 +452,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL2ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kL2.value);
+    return m_hid.getRawButtonPressed(Button.L2.value);
   }
 
   /**
@@ -461,7 +461,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL2ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kL2.value);
+    return m_hid.getRawButtonReleased(Button.L2.value);
   }
 
   /**
@@ -472,7 +472,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent L2(EventLoop loop) {
-    return m_hid.button(Button.kL2.value, loop);
+    return m_hid.button(Button.L2.value, loop);
   }
 
   /**
@@ -481,7 +481,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getR2Button() {
-    return m_hid.getRawButton(Button.kR2.value);
+    return m_hid.getRawButton(Button.R2.value);
   }
 
   /**
@@ -490,7 +490,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR2ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kR2.value);
+    return m_hid.getRawButtonPressed(Button.R2.value);
   }
 
   /**
@@ -499,7 +499,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR2ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kR2.value);
+    return m_hid.getRawButtonReleased(Button.R2.value);
   }
 
   /**
@@ -510,7 +510,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent R2(EventLoop loop) {
-    return m_hid.button(Button.kR2.value, loop);
+    return m_hid.button(Button.R2.value, loop);
   }
 
   /**
@@ -519,7 +519,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getShareButton() {
-    return m_hid.getRawButton(Button.kShare.value);
+    return m_hid.getRawButton(Button.SHARE.value);
   }
 
   /**
@@ -528,7 +528,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getShareButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kShare.value);
+    return m_hid.getRawButtonPressed(Button.SHARE.value);
   }
 
   /**
@@ -537,7 +537,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getShareButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kShare.value);
+    return m_hid.getRawButtonReleased(Button.SHARE.value);
   }
 
   /**
@@ -548,7 +548,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent share(EventLoop loop) {
-    return m_hid.button(Button.kShare.value, loop);
+    return m_hid.button(Button.SHARE.value, loop);
   }
 
   /**
@@ -557,7 +557,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getOptionsButton() {
-    return m_hid.getRawButton(Button.kOptions.value);
+    return m_hid.getRawButton(Button.OPTIONS.value);
   }
 
   /**
@@ -566,7 +566,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getOptionsButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kOptions.value);
+    return m_hid.getRawButtonPressed(Button.OPTIONS.value);
   }
 
   /**
@@ -575,7 +575,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getOptionsButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kOptions.value);
+    return m_hid.getRawButtonReleased(Button.OPTIONS.value);
   }
 
   /**
@@ -586,7 +586,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent options(EventLoop loop) {
-    return m_hid.button(Button.kOptions.value, loop);
+    return m_hid.button(Button.OPTIONS.value, loop);
   }
 
   /**
@@ -595,7 +595,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getL3Button() {
-    return m_hid.getRawButton(Button.kL3.value);
+    return m_hid.getRawButton(Button.L3.value);
   }
 
   /**
@@ -604,7 +604,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getL3ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kL3.value);
+    return m_hid.getRawButtonPressed(Button.L3.value);
   }
 
   /**
@@ -613,7 +613,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getL3ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kL3.value);
+    return m_hid.getRawButtonReleased(Button.L3.value);
   }
 
   /**
@@ -624,7 +624,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent L3(EventLoop loop) {
-    return m_hid.button(Button.kL3.value, loop);
+    return m_hid.button(Button.L3.value, loop);
   }
 
   /**
@@ -633,7 +633,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getR3Button() {
-    return m_hid.getRawButton(Button.kR3.value);
+    return m_hid.getRawButton(Button.R3.value);
   }
 
   /**
@@ -642,7 +642,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getR3ButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kR3.value);
+    return m_hid.getRawButtonPressed(Button.R3.value);
   }
 
   /**
@@ -651,7 +651,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getR3ButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kR3.value);
+    return m_hid.getRawButtonReleased(Button.R3.value);
   }
 
   /**
@@ -662,7 +662,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent R3(EventLoop loop) {
-    return m_hid.button(Button.kR3.value, loop);
+    return m_hid.button(Button.R3.value, loop);
   }
 
   /**
@@ -671,7 +671,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getPSButton() {
-    return m_hid.getRawButton(Button.kPS.value);
+    return m_hid.getRawButton(Button.PS.value);
   }
 
   /**
@@ -680,7 +680,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getPSButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kPS.value);
+    return m_hid.getRawButtonPressed(Button.PS.value);
   }
 
   /**
@@ -689,7 +689,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getPSButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kPS.value);
+    return m_hid.getRawButtonReleased(Button.PS.value);
   }
 
   /**
@@ -700,7 +700,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent PS(EventLoop loop) {
-    return m_hid.button(Button.kPS.value, loop);
+    return m_hid.button(Button.PS.value, loop);
   }
 
   /**
@@ -709,7 +709,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getTouchpadButton() {
-    return m_hid.getRawButton(Button.kTouchpad.value);
+    return m_hid.getRawButton(Button.TOUCHPAD.value);
   }
 
   /**
@@ -718,7 +718,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getTouchpadButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kTouchpad.value);
+    return m_hid.getRawButtonPressed(Button.TOUCHPAD.value);
   }
 
   /**
@@ -727,7 +727,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getTouchpadButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kTouchpad.value);
+    return m_hid.getRawButtonReleased(Button.TOUCHPAD.value);
   }
 
   /**
@@ -738,7 +738,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent touchpad(EventLoop loop) {
-    return m_hid.button(Button.kTouchpad.value, loop);
+    return m_hid.button(Button.TOUCHPAD.value, loop);
   }
 
   /**

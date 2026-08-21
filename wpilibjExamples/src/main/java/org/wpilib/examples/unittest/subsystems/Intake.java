@@ -15,13 +15,13 @@ public class Intake implements AutoCloseable {
   private final DoubleSolenoid piston;
 
   public Intake() {
-    motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+    motor = new PWMSparkMax(IntakeConstants.MOTOR_PORT);
     piston =
         new DoubleSolenoid(
             CANBus.CAN_S0,
             PneumaticsModuleType.CTRE_PCM,
-            IntakeConstants.kPistonFwdChannel,
-            IntakeConstants.kPistonRevChannel);
+            IntakeConstants.PISTON_FWD_CHANNEL,
+            IntakeConstants.PISTON_REV_CHANNEL);
   }
 
   public void deploy() {

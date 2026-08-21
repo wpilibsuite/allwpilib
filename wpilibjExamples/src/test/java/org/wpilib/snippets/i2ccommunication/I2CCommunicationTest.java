@@ -28,7 +28,7 @@ import org.wpilib.simulation.SimHooks;
 class I2CCommunicationTest {
   private Robot robot;
   private Thread thread;
-  private final I2CSim i2c = new I2CSim(Robot.kPort.value);
+  private final I2CSim i2c = new I2CSim(Robot.PORT.value);
   private CompletableFuture<String> future;
   private CallbackStore callback;
 

@@ -9,7 +9,7 @@ import java.util.Arrays;
 /** Log array of string values. */
 public class StringArrayLogEntry extends DataLogEntry {
   /** The data type for string array values. */
-  public static final String kDataType = "string[]";
+  public static final String DATA_TYPE = "string[]";
 
   /**
    * Constructs a string array log entry.
@@ -20,7 +20,7 @@ public class StringArrayLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public StringArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

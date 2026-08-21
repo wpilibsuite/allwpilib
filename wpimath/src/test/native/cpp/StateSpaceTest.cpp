@@ -21,8 +21,8 @@
 
 namespace wpi::math {
 
-constexpr double kPositionStddev = 0.0001;
-constexpr auto kDt = 0.00505_s;
+constexpr double POSITION_STDDEV = 0.0001;
+constexpr auto DT = 0.00505_s;
 
 class StateSpaceTest {
  public:
@@ -41,22 +41,22 @@ class StateSpaceTest {
     return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
         .Slice(0);
   }();
-  LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, kDt};
-  KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, kDt};
-  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12_V, kDt};
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, DT};
+  KalmanFilter<2, 1, 1> observer{plant, {0.05, 1.0}, {0.0001}, DT};
+  LinearSystemLoop<2, 1, 1> loop{plant, controller, observer, 12_V, DT};
 };
 
 void Update(const LinearSystem<2, 1, 1>& plant, LinearSystemLoop<2, 1, 1>& loop,
             double noise) {
   Vectord<1> y = plant.CalculateY(loop.Xhat(), loop.U()) + Vectord<1>{noise};
   loop.Correct(y);
-  loop.Predict(kDt);
+  loop.Predict(DT);
 }
 
 TEST_CASE_METHOD(StateSpaceTest, "StateSpaceTest CorrectPredictLoop",
                  "[wpimath]") {
   std::default_random_engine generator;
-  std::normal_distribution<double> dist{0.0, kPositionStddev};
+  std::normal_distribution<double> dist{0.0, POSITION_STDDEV};
 
   Vectord<2> references{2.0, 0.0};
   loop.SetNextR(references);

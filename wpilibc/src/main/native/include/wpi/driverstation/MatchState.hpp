@@ -92,8 +92,8 @@ class MatchState final {
   /**
    * Returns the type of match being played provided by the FMS.
    *
-   * @return The match type enum (kNone, kPractice, kQualification,
-   *         kElimination)
+   * @return The match type enum (NONE, PRACTICE, QUALIFICATION,
+   *         ELIMINATION)
    */
   static MatchType GetMatchType() {
     return wpi::internal::DriverStationBackend::GetMatchType();

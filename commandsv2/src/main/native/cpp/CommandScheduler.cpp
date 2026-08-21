@@ -112,7 +112,7 @@ void CommandScheduler::Schedule(Command* command) {
     if (requirements.find(i1.first) != requirements.end()) {
       isDisjoint = false;
       allInterruptible &= (i1.second->GetInterruptionBehavior() ==
-                           Command::InterruptionBehavior::kCancelSelf);
+                           Command::InterruptionBehavior::CANCEL_SELF);
       intersection.emplace_back(i1.second);
     }
   }
@@ -552,7 +552,7 @@ std::string_view CommandScheduler::GetTunableType() const {
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
                                              std::unique_ptr<Command> command) {
   if (command->GetInterruptionBehavior() ==
-      Command::InterruptionBehavior::kCancelIncoming) {
+      Command::InterruptionBehavior::CANCEL_INCOMING) {
     std::puts(
         "Registering a non-interruptible default command!\n"
         "This will likely prevent any other commands from "

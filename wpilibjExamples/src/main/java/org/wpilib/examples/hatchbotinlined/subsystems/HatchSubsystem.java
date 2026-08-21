@@ -21,8 +21,8 @@ public class HatchSubsystem extends SubsystemBase {
       new DoubleSolenoid(
           CANBus.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
-          HatchConstants.kHatchSolenoidPorts[0],
-          HatchConstants.kHatchSolenoidPorts[1]);
+          HatchConstants.HATCH_SOLENOID_PORTS[0],
+          HatchConstants.HATCH_SOLENOID_PORTS[1]);
 
   /** Grabs the hatch. */
   public Command grabHatchCommand() {

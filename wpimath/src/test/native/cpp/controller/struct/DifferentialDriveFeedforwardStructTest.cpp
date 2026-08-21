@@ -12,15 +12,15 @@ using namespace wpi::math;
 struct DifferentialDriveFeedforwardStructTestData {
   using Type = DifferentialDriveFeedforward;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       decltype(1_V / 1_mps){0.174}, decltype(1_V / 1_mps_sq){0.229},
       decltype(1_V / 1_mps){4.4}, decltype(1_V / 1_mps_sq){4.5}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    CHECK(testData.kVLinear.value() == data.kVLinear.value());
-    CHECK(testData.kALinear.value() == data.kALinear.value());
-    CHECK(testData.kVAngular.value() == data.kVAngular.value());
-    CHECK(testData.kAAngular.value() == data.kAAngular.value());
+    CHECK(testData.V_LINEAR.value() == data.V_LINEAR.value());
+    CHECK(testData.A_LINEAR.value() == data.A_LINEAR.value());
+    CHECK(testData.V_ANGULAR.value() == data.V_ANGULAR.value());
+    CHECK(testData.A_ANGULAR.value() == data.A_ANGULAR.value());
   }
 };
 

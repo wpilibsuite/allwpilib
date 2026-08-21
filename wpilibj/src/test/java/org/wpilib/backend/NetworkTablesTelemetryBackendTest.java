@@ -112,7 +112,7 @@ class NetworkTablesTelemetryBackendTest {
     var structEntry =
         m_inst
             .getStructTopic("/Telemetry/translation", Translation2d.struct)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     final var structArrayEntry =
         m_inst
             .getStructArrayTopic("/Telemetry/translations", Translation2d.struct)
@@ -131,7 +131,7 @@ class NetworkTablesTelemetryBackendTest {
     var entry =
         m_inst
             .getProtobufTopic("/Telemetry/translation", Translation2d.proto)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
 
     Telemetry.log("translation", value, Translation2d.proto);
 
@@ -147,7 +147,7 @@ class NetworkTablesTelemetryBackendTest {
             "ThrowingTelemetryTranslation2d");
     var protobuf = new TelemetrySerializationTestUtil.Translation2dProtobufWrapper();
     final var structEntry =
-        m_inst.getStructTopic("/Telemetry/translation", struct).getEntry(Translation2d.kZero);
+        m_inst.getStructTopic("/Telemetry/translation", struct).getEntry(Translation2d.ZERO);
     final var structArrayEntry =
         m_inst
             .getStructArrayTopic("/Telemetry/translations", struct)
@@ -155,7 +155,7 @@ class NetworkTablesTelemetryBackendTest {
     final var protobufEntry =
         m_inst
             .getProtobufTopic("/Telemetry/translationProto", protobuf)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
 
     Telemetry.log("translation", initial, struct);
     Telemetry.log("translations", new Translation2d[] {initial}, struct);

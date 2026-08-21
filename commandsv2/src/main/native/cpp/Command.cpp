@@ -192,11 +192,11 @@ void Command::LogTo(wpi::telemetry::TelemetryTable& table) const {
 
   std::string_view behavior;
   switch (GetInterruptionBehavior()) {
-    case Command::InterruptionBehavior::kCancelIncoming:
-      behavior = "kCancelIncoming";
+    case Command::InterruptionBehavior::CANCEL_INCOMING:
+      behavior = "CANCEL_INCOMING";
       break;
-    case Command::InterruptionBehavior::kCancelSelf:
-      behavior = "kCancelSelf";
+    case Command::InterruptionBehavior::CANCEL_SELF:
+      behavior = "CANCEL_SELF";
       break;
     default:
       behavior = "Invalid";

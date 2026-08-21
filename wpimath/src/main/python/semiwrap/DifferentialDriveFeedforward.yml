@@ -10,10 +10,10 @@ classes:
     - wpi::units::radians_per_second_squared
     - wpi::units::compound_unit
     attributes:
-      kVLinear:
-      kALinear:
-      kVAngular:
-      kAAngular:
+      V_LINEAR:
+      A_LINEAR:
+      V_ANGULAR:
+      A_ANGULAR:
     methods:
       DifferentialDriveFeedforward:
         overloads:
@@ -23,23 +23,23 @@ classes:
           #   1 _V / 1 _rad_per_s ), decltype ( 1 _V / 1 _rad_per_s_sq ), wpi::units::meter_t
           # :
           #   param_override:
-          #     kVLinear:
+          #     V_LINEAR:
           #       x_type: decltype(1_V / 1_mps)
-          #     kALinear:
+          #     A_LINEAR:
           #       x_type: decltype(1_V / 1_mps_sq)
-          #     kVAngular:
+          #     V_ANGULAR:
           #       x_type: decltype(1_V / 1_rad_per_s)
-          #     kAAngular:
+          #     A_ANGULAR:
           #       x_type: decltype(1_V / 1_rad_per_s_sq)
           # decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ):
           #   param_override:
-          #     kVLinear:
+          #     V_LINEAR:
           #       x_type: decltype(1_V / 1_mps)
-          #     kALinear:
+          #     A_LINEAR:
           #       x_type: decltype(1_V / 1_mps_sq)
-          #     kVAngular:
+          #     V_ANGULAR:
           #       x_type: decltype(1_V / 1_mps)
-          #     kAAngular:
+          #     A_ANGULAR:
           #       x_type: decltype(1_V / 1_mps_sq)
       Calculate:
 

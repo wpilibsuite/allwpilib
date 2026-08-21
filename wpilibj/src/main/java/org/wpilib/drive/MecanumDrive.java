@@ -162,7 +162,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
    *     positive.
    */
   public void driveCartesian(double xVelocity, double yVelocity, double zRotation) {
-    driveCartesian(xVelocity, yVelocity, zRotation, Rotation2d.kZero);
+    driveCartesian(xVelocity, yVelocity, zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -221,7 +221,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
     }
 
     driveCartesian(
-        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.kZero);
+        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -238,7 +238,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
    */
   public static WheelVelocities driveCartesianIK(
       double xVelocity, double yVelocity, double zRotation) {
-    return driveCartesianIK(xVelocity, yVelocity, zRotation, Rotation2d.kZero);
+    return driveCartesianIK(xVelocity, yVelocity, zRotation, Rotation2d.ZERO);
   }
 
   /**

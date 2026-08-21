@@ -8,7 +8,7 @@
 #include "wpi/telemetry/Telemetry.hpp"
 
 Elevator::Elevator() {
-  encoder.SetDistancePerPulse(Constants::kArmEncoderDistPerPulse);
+  encoder.SetDistancePerPulse(Constants::ARM_ENCODER_DIST_PER_PULSE);
 }
 
 void Elevator::SimulationPeriodic() {

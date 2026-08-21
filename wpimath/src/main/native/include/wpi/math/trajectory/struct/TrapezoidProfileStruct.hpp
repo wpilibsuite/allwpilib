@@ -39,12 +39,12 @@ struct wpi::util::Struct<
                          wpi::units::traits::base_unit_of<Distance>>;
     using BaseConstraints =
         wpi::math::detail::TrapezoidProfileConstraints<BaseUnit>;
-    constexpr size_t kMaxVelocityOff = 0;
-    constexpr size_t kMaxAccelerationOff = kMaxVelocityOff + 8;
+    constexpr size_t MAX_VELOCITY_OFF = 0;
+    constexpr size_t MAX_ACCELERATION_OFF = MAX_VELOCITY_OFF + 8;
     return {typename BaseConstraints::Velocity_t{
-                wpi::util::UnpackStruct<double, kMaxVelocityOff>(data)},
+                wpi::util::UnpackStruct<double, MAX_VELOCITY_OFF>(data)},
             typename BaseConstraints::Acceleration_t{
-                wpi::util::UnpackStruct<double, kMaxAccelerationOff>(data)}};
+                wpi::util::UnpackStruct<double, MAX_ACCELERATION_OFF>(data)}};
   }
 
   static void Pack(
@@ -55,11 +55,11 @@ struct wpi::util::Struct<
                          wpi::units::traits::base_unit_of<Distance>>;
     using BaseConstraints =
         wpi::math::detail::TrapezoidProfileConstraints<BaseUnit>;
-    constexpr size_t kMaxVelocityOff = 0;
-    constexpr size_t kMaxAccelerationOff = kMaxVelocityOff + 8;
-    wpi::util::PackStruct<kMaxVelocityOff>(
+    constexpr size_t MAX_VELOCITY_OFF = 0;
+    constexpr size_t MAX_ACCELERATION_OFF = MAX_VELOCITY_OFF + 8;
+    wpi::util::PackStruct<MAX_VELOCITY_OFF>(
         data, typename BaseConstraints::Velocity_t{value.maxVelocity}.value());
-    wpi::util::PackStruct<kMaxAccelerationOff>(
+    wpi::util::PackStruct<MAX_ACCELERATION_OFF>(
         data, typename BaseConstraints::Acceleration_t{value.maxAcceleration}
                   .value());
   }

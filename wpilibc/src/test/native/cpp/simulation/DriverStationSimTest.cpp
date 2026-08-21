@@ -242,13 +242,13 @@ TEST_CASE("DriverStationTest MatchTime", "[wpilibc][simulation]") {
   DoubleCallback callback;
   auto cb = DriverStationSim::RegisterMatchTimeCallback(callback.GetCallback(),
                                                         false);
-  constexpr double kTestTime = 19.174;
-  DriverStationSim::SetMatchTime(kTestTime);
+  constexpr double TEST_TIME = 19.174;
+  DriverStationSim::SetMatchTime(TEST_TIME);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK(kTestTime == DriverStationSim::GetMatchTime());
-  CHECK(kTestTime == MatchState::GetMatchTime().value());
+  CHECK(TEST_TIME == DriverStationSim::GetMatchTime());
+  CHECK(TEST_TIME == MatchState::GetMatchTime().value());
   CHECK(callback.WasTriggered());
-  CHECK(kTestTime == callback.GetLastValue());
+  CHECK(TEST_TIME == callback.GetLastValue());
 }
 
 TEST_CASE("DriverStationTest SetGameData", "[wpilibc][simulation]") {

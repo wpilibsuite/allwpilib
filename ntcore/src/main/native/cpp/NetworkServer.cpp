@@ -38,10 +38,10 @@ using namespace wpi::nt;
 namespace uv = wpi::net::uv;
 
 // use a larger max message size for websockets
-static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
+static constexpr size_t MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
 
-static constexpr size_t kClientProcessMessageCountMax = 16;
-static constexpr uv::Timer::Time kHandshakeTimeout{5000};
+static constexpr size_t CLIENT_PROCESS_MESSAGE_COUNT_MAX = 16;
+static constexpr uv::Timer::Time HANDSHAKE_TIMEOUT{5000};
 
 class NetworkServer::ServerConnection {
  public:
@@ -83,7 +83,7 @@ class NetworkServer::ServerConnection4 final
             stream,
             {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu",
              "rtt.networktables.first.wpi.edu"},
-            kHandshakeTimeout) {
+            HANDSHAKE_TIMEOUT) {
     m_info.protocol_version = 0x0400;
   }
 
@@ -183,7 +183,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
     return;
   }
 
-  m_websocket->SetMaxMessageSize(kMaxMessageSize);
+  m_websocket->SetMaxMessageSize(MAX_MESSAGE_SIZE);
 
   m_websocket->open.connect([this, name = std::string{name}](
                                 std::string_view protocol) {
@@ -383,7 +383,7 @@ void NetworkServer::Init() {
   m_readLocalTimer = uv::Timer::Create(m_loop);
   if (m_readLocalTimer) {
     m_readLocalTimer->timeout.connect([this] {
-      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessLocalMessages(CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       }
@@ -420,7 +420,7 @@ void NetworkServer::Init() {
   m_flushLocal = uv::Async<>::Create(m_loop);
   if (m_flushLocal) {
     m_flushLocal->wakeup.connect([this] {
-      if (m_serverImpl.ProcessLocalMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessLocalMessages(CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       }
@@ -431,7 +431,8 @@ void NetworkServer::Init() {
   m_idle = uv::Idle::Create(m_loop);
   if (m_idle) {
     m_idle->idle.connect([this] {
-      if (m_serverImpl.ProcessIncomingMessages(kClientProcessMessageCountMax)) {
+      if (m_serverImpl.ProcessIncomingMessages(
+              CLIENT_PROCESS_MESSAGE_COUNT_MAX)) {
         DEBUG4("Starting idle processing");
         m_idle->Start();  // more to process
       } else {

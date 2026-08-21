@@ -11,15 +11,15 @@ import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import org.junit.jupiter.api.Test;
 
 class DifferentialDriveWheelAccelerationsTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testDefaultConstructor() {
     var wheelAccelerations = new DifferentialDriveWheelAccelerations();
 
     assertAll(
-        () -> assertEquals(0.0, wheelAccelerations.left, kEpsilon),
-        () -> assertEquals(0.0, wheelAccelerations.right, kEpsilon));
+        () -> assertEquals(0.0, wheelAccelerations.left, EPSILON),
+        () -> assertEquals(0.0, wheelAccelerations.right, EPSILON));
   }
 
   @Test
@@ -27,8 +27,8 @@ class DifferentialDriveWheelAccelerationsTest {
     var wheelAccelerations = new DifferentialDriveWheelAccelerations(1.5, 2.5);
 
     assertAll(
-        () -> assertEquals(1.5, wheelAccelerations.left, kEpsilon),
-        () -> assertEquals(2.5, wheelAccelerations.right, kEpsilon));
+        () -> assertEquals(1.5, wheelAccelerations.left, EPSILON),
+        () -> assertEquals(2.5, wheelAccelerations.right, EPSILON));
   }
 
   @Test
@@ -38,8 +38,8 @@ class DifferentialDriveWheelAccelerationsTest {
     var wheelAccelerations = new DifferentialDriveWheelAccelerations(left, right);
 
     assertAll(
-        () -> assertEquals(3.0, wheelAccelerations.left, kEpsilon),
-        () -> assertEquals(4.5, wheelAccelerations.right, kEpsilon));
+        () -> assertEquals(3.0, wheelAccelerations.left, EPSILON),
+        () -> assertEquals(4.5, wheelAccelerations.right, EPSILON));
   }
 
   @Test
@@ -101,37 +101,37 @@ class DifferentialDriveWheelAccelerationsTest {
     // Test interpolation at t=0 (should return start)
     final var atStart = start.interpolate(end, 0.0);
     assertAll(
-        () -> assertEquals(1.0, atStart.left, kEpsilon),
-        () -> assertEquals(2.0, atStart.right, kEpsilon));
+        () -> assertEquals(1.0, atStart.left, EPSILON),
+        () -> assertEquals(2.0, atStart.right, EPSILON));
 
     // Test interpolation at t=1 (should return end)
     final var atEnd = start.interpolate(end, 1.0);
     assertAll(
-        () -> assertEquals(5.0, atEnd.left, kEpsilon),
-        () -> assertEquals(6.0, atEnd.right, kEpsilon));
+        () -> assertEquals(5.0, atEnd.left, EPSILON),
+        () -> assertEquals(6.0, atEnd.right, EPSILON));
 
     // Test interpolation at t=0.5 (should return midpoint)
     final var atMidpoint = start.interpolate(end, 0.5);
     assertAll(
-        () -> assertEquals(3.0, atMidpoint.left, kEpsilon),
-        () -> assertEquals(4.0, atMidpoint.right, kEpsilon));
+        () -> assertEquals(3.0, atMidpoint.left, EPSILON),
+        () -> assertEquals(4.0, atMidpoint.right, EPSILON));
 
     // Test interpolation at t=0.25
     final var atQuarter = start.interpolate(end, 0.25);
     assertAll(
-        () -> assertEquals(2.0, atQuarter.left, kEpsilon),
-        () -> assertEquals(3.0, atQuarter.right, kEpsilon));
+        () -> assertEquals(2.0, atQuarter.left, EPSILON),
+        () -> assertEquals(3.0, atQuarter.right, EPSILON));
 
     // Test clamping: t < 0 should clamp to 0
     final var belowRange = start.interpolate(end, -0.5);
     assertAll(
-        () -> assertEquals(1.0, belowRange.left, kEpsilon),
-        () -> assertEquals(2.0, belowRange.right, kEpsilon));
+        () -> assertEquals(1.0, belowRange.left, EPSILON),
+        () -> assertEquals(2.0, belowRange.right, EPSILON));
 
     // Test clamping: t > 1 should clamp to 1
     final var aboveRange = start.interpolate(end, 1.5);
     assertAll(
-        () -> assertEquals(5.0, aboveRange.left, kEpsilon),
-        () -> assertEquals(6.0, aboveRange.right, kEpsilon));
+        () -> assertEquals(5.0, aboveRange.left, EPSILON),
+        () -> assertEquals(6.0, aboveRange.right, EPSILON));
   }
 }

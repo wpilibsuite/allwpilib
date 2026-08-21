@@ -56,7 +56,7 @@ public class CvSink extends ImageSink {
 
   /**
    * Create a sink for accepting OpenCV images. WaitForFrame() must be called on the created sink to
-   * get each new image. Defaults to kBGR for pixelFormat
+   * get each new image. Defaults to BGR for pixelFormat
    *
    * @param name Source name (arbitrary unique identifier)
    */

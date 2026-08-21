@@ -24,8 +24,8 @@ import org.wpilib.util.Color8Bit;
  * Mechanism2d object.
  */
 public class Robot extends TimedRobot {
-  private static final double kMetersPerPulse = 0.01;
-  private static final double kElevatorMinimumLength = 0.5;
+  private static final double METERS_PER_PULSE = 0.01;
+  private static final double ELEVATOR_MINIMUM_LENGTH = 0.5;
 
   private final PWMSparkMax elevatorMotor = new PWMSparkMax(0);
   private final PWMSparkMax wristMotor = new PWMSparkMax(1);
@@ -40,14 +40,14 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
+    elevatorEncoder.setDistancePerPulse(METERS_PER_PULSE);
 
     // the mechanism root node
     MechanismRoot2d root = mech.getRoot("climber", 2, 0);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
-    elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
+    elevator = root.append(new MechanismLigament2d("elevator", ELEVATOR_MINIMUM_LENGTH, 90));
     wrist =
         elevator.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.PURPLE)));
   }
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     // update the dashboard mechanism's state
-    elevator.setLength(kElevatorMinimumLength + elevatorEncoder.getDistance());
+    elevator.setLength(ELEVATOR_MINIMUM_LENGTH + elevatorEncoder.getDistance());
     wrist.setAngle(wristPot.get());
 
     // post the mechanism to telemetry

@@ -22,7 +22,7 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
   private final int m_module;
 
   /** Default module number. */
-  public static final int kDefaultModule = PowerDistributionJNI.DEFAULT_MODULE;
+  public static final int DEFAULT_MODULE = PowerDistributionJNI.DEFAULT_MODULE;
 
   /** Power distribution module type. */
   public enum ModuleType {
@@ -67,7 +67,7 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
   public PowerDistribution(CANBus busId) {
     m_handle =
         PowerDistributionJNI.initialize(
-            busId.value, kDefaultModule, PowerDistributionJNI.AUTOMATIC_TYPE);
+            busId.value, DEFAULT_MODULE, PowerDistributionJNI.AUTOMATIC_TYPE);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {

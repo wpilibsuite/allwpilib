@@ -41,7 +41,7 @@ import org.wpilib.epilogue.NotLogged;
 
 /** Generates logger class files for {@link Logged @Logged}-annotated classes. */
 public class LoggerGenerator {
-  public static final Predicate<ExecutableElement> kIsBuiltInJavaMethod =
+  public static final Predicate<ExecutableElement> IS_BUILT_IN_JAVA_METHOD =
       LoggerGenerator::isBuiltInJavaMethod;
   private final ProcessingEnvironment m_processingEnv;
   private final List<ElementHandler> m_handlers;
@@ -407,7 +407,7 @@ public class LoggerGenerator {
             .filter(e -> e.getModifiers().contains(Modifier.PUBLIC))
             .filter(e -> e.getParameters().isEmpty())
             .filter(e -> e.getReceiverType() != null)
-            .filter(kIsBuiltInJavaMethod.negate())
+            .filter(IS_BUILT_IN_JAVA_METHOD.negate())
             .filter(this::isLoggable)
             .filter(e -> !isSimpleGetterMethodForLoggedField(e, classFields))
             .toList());

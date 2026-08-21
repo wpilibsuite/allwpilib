@@ -37,9 +37,9 @@ class Drivetrain {
  public:
   Drivetrain();
 
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
+  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
   /**
@@ -108,11 +108,11 @@ class Drivetrain {
       wpi::nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr wpi::units::meter_t kWheelRadius = 0.0508_m;
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
+  static constexpr wpi::units::meter_t WHEEL_RADIUS = 0.0508_m;
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
-  static constexpr std::array<double, 7> kDefaultVal{0.0, 0.0, 0.0, 0.0,
+  static constexpr std::array<double, 7> DEFAULT_VAL{0.0, 0.0, 0.0, 0.0,
                                                      0.0, 0.0, 0.0};
 
   wpi::math::Transform3d robotToCamera{
@@ -125,7 +125,7 @@ class Drivetrain {
   wpi::nt::DoubleArrayTopic cameraToObjectTopic{
       inst.GetDoubleArrayTopic("cameraToObjectTopic")};
   wpi::nt::DoubleArrayEntry cameraToObjectEntry =
-      cameraToObjectTopic.GetEntry(kDefaultVal);
+      cameraToObjectTopic.GetEntry(DEFAULT_VAL);
   wpi::nt::DoubleArrayEntry& cameraToObjectEntryRef = cameraToObjectEntry;
 
   wpi::fields::Field field{
@@ -145,7 +145,7 @@ class Drivetrain {
 
   wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveKinematics kinematics{TRACKWIDTH};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
@@ -172,5 +172,5 @@ class Drivetrain {
       wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
-      drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
+      drivetrainSystem, TRACKWIDTH, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

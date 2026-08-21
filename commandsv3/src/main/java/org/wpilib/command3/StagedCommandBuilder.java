@@ -170,7 +170,7 @@ public final class StagedCommandBuilder {
       };
 
   private static final class BuilderBackedCommand implements Command {
-    private static final Runnable kNoOp = () -> {};
+    private static final Runnable NO_OP = () -> {};
 
     private final Set<Mechanism> m_requirements;
     private final Consumer<Coroutine> m_impl;
@@ -182,7 +182,7 @@ public final class StagedCommandBuilder {
       // Copy builder fields into the command so the builder object can be garbage collected
       m_requirements = new HashSet<>(builder.m_requirements);
       m_impl = builder.m_impl;
-      m_onCancel = Objects.requireNonNullElse(builder.m_onCancel, kNoOp);
+      m_onCancel = Objects.requireNonNullElse(builder.m_onCancel, NO_OP);
       m_name = builder.m_name;
       m_priority = builder.m_priority;
     }

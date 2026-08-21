@@ -32,35 +32,35 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a NiDsStadiaController. */
   public enum Button {
     /** A button. */
-    kA(0),
+    A(0),
     /** B button. */
-    kB(1),
+    B(1),
     /** X button. */
-    kX(2),
+    X(2),
     /** Y button. */
-    kY(3),
+    Y(3),
     /** Left bumper button. */
-    kLeftBumper(4),
+    LEFT_BUMPER(4),
     /** Right bumper button. */
-    kRightBumper(5),
+    RIGHT_BUMPER(5),
     /** Left stick button. */
-    kLeftStick(6),
+    LEFT_STICK(6),
     /** Right stick button. */
-    kRightStick(7),
+    RIGHT_STICK(7),
     /** Ellipses button. */
-    kEllipses(8),
+    ELLIPSES(8),
     /** Hamburger button. */
-    kHamburger(9),
+    HAMBURGER(9),
     /** Stadia button. */
-    kStadia(10),
+    STADIA(10),
     /** Right trigger button. */
-    kRightTrigger(11),
+    RIGHT_TRIGGER(11),
     /** Left trigger button. */
-    kLeftTrigger(12),
+    LEFT_TRIGGER(12),
     /** Google button. */
-    kGoogle(13),
+    GOOGLE(13),
     /** Frame button. */
-    kFrame(14);
+    FRAME(14);
 
     /** Button value. */
     public final int value;
@@ -87,13 +87,13 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
   /** Represents an axis on an NiDsStadiaController. */
   public enum Axis {
     /** Left X axis. */
-    kLeftX(0),
+    LEFT_X(0),
     /** Right X axis. */
-    kRightX(3),
+    RIGHT_X(3),
     /** Left Y axis. */
-    kLeftY(1),
+    LEFT_Y(1),
     /** Right Y axis. */
-    kRightY(4);
+    RIGHT_Y(4);
 
     /** Axis value. */
     public final int value;
@@ -157,7 +157,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return m_hid.getRawAxis(Axis.kLeftX.value);
+    return m_hid.getRawAxis(Axis.LEFT_X.value);
   }
 
   /**
@@ -166,7 +166,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getRightX() {
-    return m_hid.getRawAxis(Axis.kRightX.value);
+    return m_hid.getRawAxis(Axis.RIGHT_X.value);
   }
 
   /**
@@ -175,7 +175,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return m_hid.getRawAxis(Axis.kLeftY.value);
+    return m_hid.getRawAxis(Axis.LEFT_Y.value);
   }
 
   /**
@@ -184,7 +184,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The axis value.
    */
   public double getRightY() {
-    return m_hid.getRawAxis(Axis.kRightY.value);
+    return m_hid.getRawAxis(Axis.RIGHT_Y.value);
   }
 
   /**
@@ -193,7 +193,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getAButton() {
-    return m_hid.getRawButton(Button.kA.value);
+    return m_hid.getRawButton(Button.A.value);
   }
 
   /**
@@ -202,7 +202,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getAButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kA.value);
+    return m_hid.getRawButtonPressed(Button.A.value);
   }
 
   /**
@@ -211,7 +211,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getAButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kA.value);
+    return m_hid.getRawButtonReleased(Button.A.value);
   }
 
   /**
@@ -222,7 +222,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return m_hid.button(Button.kA.value, loop);
+    return m_hid.button(Button.A.value, loop);
   }
 
   /**
@@ -231,7 +231,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getBButton() {
-    return m_hid.getRawButton(Button.kB.value);
+    return m_hid.getRawButton(Button.B.value);
   }
 
   /**
@@ -240,7 +240,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kB.value);
+    return m_hid.getRawButtonPressed(Button.B.value);
   }
 
   /**
@@ -249,7 +249,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kB.value);
+    return m_hid.getRawButtonReleased(Button.B.value);
   }
 
   /**
@@ -260,7 +260,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return m_hid.button(Button.kB.value, loop);
+    return m_hid.button(Button.B.value, loop);
   }
 
   /**
@@ -269,7 +269,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getXButton() {
-    return m_hid.getRawButton(Button.kX.value);
+    return m_hid.getRawButton(Button.X.value);
   }
 
   /**
@@ -278,7 +278,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kX.value);
+    return m_hid.getRawButtonPressed(Button.X.value);
   }
 
   /**
@@ -287,7 +287,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kX.value);
+    return m_hid.getRawButtonReleased(Button.X.value);
   }
 
   /**
@@ -298,7 +298,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return m_hid.button(Button.kX.value, loop);
+    return m_hid.button(Button.X.value, loop);
   }
 
   /**
@@ -307,7 +307,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getYButton() {
-    return m_hid.getRawButton(Button.kY.value);
+    return m_hid.getRawButton(Button.Y.value);
   }
 
   /**
@@ -316,7 +316,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getYButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kY.value);
+    return m_hid.getRawButtonPressed(Button.Y.value);
   }
 
   /**
@@ -325,7 +325,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getYButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kY.value);
+    return m_hid.getRawButtonReleased(Button.Y.value);
   }
 
   /**
@@ -336,7 +336,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return m_hid.button(Button.kY.value, loop);
+    return m_hid.button(Button.Y.value, loop);
   }
 
   /**
@@ -345,7 +345,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getLeftBumperButton() {
-    return m_hid.getRawButton(Button.kLeftBumper.value);
+    return m_hid.getRawButton(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -354,7 +354,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftBumperButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kLeftBumper.value);
+    return m_hid.getRawButtonPressed(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -363,7 +363,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftBumperButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kLeftBumper.value);
+    return m_hid.getRawButtonReleased(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -374,7 +374,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return m_hid.button(Button.kLeftBumper.value, loop);
+    return m_hid.button(Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -383,7 +383,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getRightBumperButton() {
-    return m_hid.getRawButton(Button.kRightBumper.value);
+    return m_hid.getRawButton(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -392,7 +392,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightBumperButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kRightBumper.value);
+    return m_hid.getRawButtonPressed(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -401,7 +401,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kRightBumper.value);
+    return m_hid.getRawButtonReleased(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -412,7 +412,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return m_hid.button(Button.kRightBumper.value, loop);
+    return m_hid.button(Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -421,7 +421,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return m_hid.getRawButton(Button.kLeftStick.value);
+    return m_hid.getRawButton(Button.LEFT_STICK.value);
   }
 
   /**
@@ -430,7 +430,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kLeftStick.value);
+    return m_hid.getRawButtonPressed(Button.LEFT_STICK.value);
   }
 
   /**
@@ -439,7 +439,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kLeftStick.value);
+    return m_hid.getRawButtonReleased(Button.LEFT_STICK.value);
   }
 
   /**
@@ -450,7 +450,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return m_hid.button(Button.kLeftStick.value, loop);
+    return m_hid.button(Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -459,7 +459,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return m_hid.getRawButton(Button.kRightStick.value);
+    return m_hid.getRawButton(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -468,7 +468,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kRightStick.value);
+    return m_hid.getRawButtonPressed(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -477,7 +477,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kRightStick.value);
+    return m_hid.getRawButtonReleased(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -488,7 +488,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return m_hid.button(Button.kRightStick.value, loop);
+    return m_hid.button(Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -497,7 +497,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getEllipsesButton() {
-    return m_hid.getRawButton(Button.kEllipses.value);
+    return m_hid.getRawButton(Button.ELLIPSES.value);
   }
 
   /**
@@ -506,7 +506,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getEllipsesButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kEllipses.value);
+    return m_hid.getRawButtonPressed(Button.ELLIPSES.value);
   }
 
   /**
@@ -515,7 +515,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getEllipsesButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kEllipses.value);
+    return m_hid.getRawButtonReleased(Button.ELLIPSES.value);
   }
 
   /**
@@ -526,7 +526,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent ellipses(EventLoop loop) {
-    return m_hid.button(Button.kEllipses.value, loop);
+    return m_hid.button(Button.ELLIPSES.value, loop);
   }
 
   /**
@@ -535,7 +535,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getHamburgerButton() {
-    return m_hid.getRawButton(Button.kHamburger.value);
+    return m_hid.getRawButton(Button.HAMBURGER.value);
   }
 
   /**
@@ -544,7 +544,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getHamburgerButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kHamburger.value);
+    return m_hid.getRawButtonPressed(Button.HAMBURGER.value);
   }
 
   /**
@@ -553,7 +553,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getHamburgerButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kHamburger.value);
+    return m_hid.getRawButtonReleased(Button.HAMBURGER.value);
   }
 
   /**
@@ -564,7 +564,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent hamburger(EventLoop loop) {
-    return m_hid.button(Button.kHamburger.value, loop);
+    return m_hid.button(Button.HAMBURGER.value, loop);
   }
 
   /**
@@ -573,7 +573,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getStadiaButton() {
-    return m_hid.getRawButton(Button.kStadia.value);
+    return m_hid.getRawButton(Button.STADIA.value);
   }
 
   /**
@@ -582,7 +582,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getStadiaButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kStadia.value);
+    return m_hid.getRawButtonPressed(Button.STADIA.value);
   }
 
   /**
@@ -591,7 +591,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getStadiaButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kStadia.value);
+    return m_hid.getRawButtonReleased(Button.STADIA.value);
   }
 
   /**
@@ -602,7 +602,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent stadia(EventLoop loop) {
-    return m_hid.button(Button.kStadia.value, loop);
+    return m_hid.button(Button.STADIA.value, loop);
   }
 
   /**
@@ -611,7 +611,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getRightTriggerButton() {
-    return m_hid.getRawButton(Button.kRightTrigger.value);
+    return m_hid.getRawButton(Button.RIGHT_TRIGGER.value);
   }
 
   /**
@@ -620,7 +620,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightTriggerButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kRightTrigger.value);
+    return m_hid.getRawButtonPressed(Button.RIGHT_TRIGGER.value);
   }
 
   /**
@@ -629,7 +629,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightTriggerButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kRightTrigger.value);
+    return m_hid.getRawButtonReleased(Button.RIGHT_TRIGGER.value);
   }
 
   /**
@@ -640,7 +640,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent rightTrigger(EventLoop loop) {
-    return m_hid.button(Button.kRightTrigger.value, loop);
+    return m_hid.button(Button.RIGHT_TRIGGER.value, loop);
   }
 
   /**
@@ -649,7 +649,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getLeftTriggerButton() {
-    return m_hid.getRawButton(Button.kLeftTrigger.value);
+    return m_hid.getRawButton(Button.LEFT_TRIGGER.value);
   }
 
   /**
@@ -658,7 +658,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftTriggerButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kLeftTrigger.value);
+    return m_hid.getRawButtonPressed(Button.LEFT_TRIGGER.value);
   }
 
   /**
@@ -667,7 +667,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftTriggerButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kLeftTrigger.value);
+    return m_hid.getRawButtonReleased(Button.LEFT_TRIGGER.value);
   }
 
   /**
@@ -678,7 +678,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent leftTrigger(EventLoop loop) {
-    return m_hid.button(Button.kLeftTrigger.value, loop);
+    return m_hid.button(Button.LEFT_TRIGGER.value, loop);
   }
 
   /**
@@ -687,7 +687,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getGoogleButton() {
-    return m_hid.getRawButton(Button.kGoogle.value);
+    return m_hid.getRawButton(Button.GOOGLE.value);
   }
 
   /**
@@ -696,7 +696,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getGoogleButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kGoogle.value);
+    return m_hid.getRawButtonPressed(Button.GOOGLE.value);
   }
 
   /**
@@ -705,7 +705,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getGoogleButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kGoogle.value);
+    return m_hid.getRawButtonReleased(Button.GOOGLE.value);
   }
 
   /**
@@ -716,7 +716,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent google(EventLoop loop) {
-    return m_hid.button(Button.kGoogle.value, loop);
+    return m_hid.button(Button.GOOGLE.value, loop);
   }
 
   /**
@@ -725,7 +725,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return The state of the button.
    */
   public boolean getFrameButton() {
-    return m_hid.getRawButton(Button.kFrame.value);
+    return m_hid.getRawButton(Button.FRAME.value);
   }
 
   /**
@@ -734,7 +734,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getFrameButtonPressed() {
-    return m_hid.getRawButtonPressed(Button.kFrame.value);
+    return m_hid.getRawButtonPressed(Button.FRAME.value);
   }
 
   /**
@@ -743,7 +743,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    * @return Whether the button was released since the last check.
    */
   public boolean getFrameButtonReleased() {
-    return m_hid.getRawButtonReleased(Button.kFrame.value);
+    return m_hid.getRawButtonReleased(Button.FRAME.value);
   }
 
   /**
@@ -754,7 +754,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    *     attached to the given loop.
    */
   public BooleanEvent frame(EventLoop loop) {
-    return m_hid.button(Button.kFrame.value, loop);
+    return m_hid.button(Button.FRAME.value, loop);
   }
 
   /**

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.command3.proto.ProtobufCommands.ProtobufCommand;
 
 class SchedulerTelemetryTests extends CommandTestBase {
-  private static final double kEpsilon = 1e-9;
+  private static final double EPSILON = 1e-9;
 
   @Test
   void protobuf() {
@@ -35,7 +35,7 @@ class SchedulerTelemetryTests extends CommandTestBase {
     Scheduler.proto.pack(message, m_scheduler);
 
     assertAll(
-        () -> assertEquals(m_scheduler.lastRuntimeMs(), message.getLastTimeMs(), kEpsilon),
+        () -> assertEquals(m_scheduler.lastRuntimeMs(), message.getLastTimeMs(), EPSILON),
         () -> assertEquals(2, message.getQueuedCommands().length()),
         () -> assertEquals(4, message.getRunningCommands().length()));
 
@@ -85,13 +85,13 @@ class SchedulerTelemetryTests extends CommandTestBase {
               assertEquals(
                   m_scheduler.lastCommandRuntimeMs(command),
                   message.getLastTimeMs(),
-                  kEpsilon,
+                  EPSILON,
                   "lastTimeMs"),
           () ->
               assertEquals(
                   m_scheduler.totalRuntimeMs(command),
                   message.getTotalTimeMs(),
-                  kEpsilon,
+                  EPSILON,
                   "totalTimeMs"));
     } else {
       assertAll(

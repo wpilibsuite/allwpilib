@@ -29,16 +29,16 @@ class Arm {
 
  private:
   // The P gain for the PID controller that drives this arm.
-  double armKp = kDefaultArmKp;
-  wpi::units::degree_t armSetpoint = kDefaultArmSetpoint;
+  double armKp = DEFAULT_ARM_KP;
+  wpi::units::degree_t armSetpoint = DEFAULT_ARM_SETPOINT;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   wpi::math::DCMotor armGearbox = wpi::math::DCMotor::Vex775Pro(2);
 
   // Standard classes for controlling our arm
   wpi::math::PIDController controller{armKp, 0, 0};
-  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
-  wpi::PWMSparkMax motor{kMotorPort};
+  wpi::Encoder encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
+  wpi::PWMSparkMax motor{MOTOR_PORT};
 
   // Simulation classes help us simulate what's going on, including gravity.
   // This sim represents an arm with 2 775s, a 600:1 reduction, a mass of 5kg,
@@ -46,14 +46,14 @@ class Arm {
   // with a standard deviation of 1 encoder tick.
   wpi::sim::SingleJointedArmSim armSim{
       armGearbox,
-      kArmReduction,
-      wpi::sim::SingleJointedArmSim::EstimateMOI(kArmLength, kArmMass),
-      kArmLength,
-      kMinAngle,
-      kMaxAngle,
+      ARM_REDUCTION,
+      wpi::sim::SingleJointedArmSim::EstimateMOI(ARM_LENGTH, ARM_MASS),
+      ARM_LENGTH,
+      MIN_ANGLE,
+      MAX_ANGLE,
       true,
       0_deg,
-      {kArmEncoderDistPerPulse}};
+      {ARM_ENCODER_DIST_PER_PULSE}};
   wpi::sim::EncoderSim encoderSim{encoder};
 
   // Create a Mechanism2d display of an Arm

@@ -48,4 +48,4 @@ TRACK_WIDTH = 0.381 * 2
 GEARING_RATIO = 8
 WHEEL_RADIUS = 0.0508
 
-# kEncoderResolution = -
+# ENCODER_RESOLUTION = -

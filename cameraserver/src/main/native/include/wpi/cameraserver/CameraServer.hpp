@@ -24,7 +24,7 @@ namespace wpi {
 class CameraServer {
  public:
   /// CameraServer base port.
-  static constexpr uint16_t kBasePort = 1181;
+  static constexpr uint16_t BASE_PORT = 1181;
 
   /**
    * Initializes CameraServer integration with WPILib robot code.

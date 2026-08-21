@@ -82,7 +82,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger square(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kSquare.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.SQUARE.value, loop);
   }
 
   /**
@@ -106,7 +106,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger cross(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kCross.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.CROSS.value, loop);
   }
 
   /**
@@ -130,7 +130,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger circle(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kCircle.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.CIRCLE.value, loop);
   }
 
   /**
@@ -154,7 +154,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger triangle(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kTriangle.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.TRIANGLE.value, loop);
   }
 
   /**
@@ -178,7 +178,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger L1(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kL1.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.L1.value, loop);
   }
 
   /**
@@ -202,7 +202,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger R1(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kR1.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.R1.value, loop);
   }
 
   /**
@@ -226,7 +226,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger L2(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kL2.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.L2.value, loop);
   }
 
   /**
@@ -250,7 +250,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger R2(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kR2.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.R2.value, loop);
   }
 
   /**
@@ -274,7 +274,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger share(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kShare.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.SHARE.value, loop);
   }
 
   /**
@@ -298,7 +298,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger options(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kOptions.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.OPTIONS.value, loop);
   }
 
   /**
@@ -322,7 +322,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger L3(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kL3.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.L3.value, loop);
   }
 
   /**
@@ -346,7 +346,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger R3(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kR3.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.R3.value, loop);
   }
 
   /**
@@ -370,7 +370,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger PS(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kPS.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.PS.value, loop);
   }
 
   /**
@@ -394,7 +394,7 @@ public class CommandNiDsPS4Controller {
    *     to the given loop.
    */
   public Trigger touchpad(EventLoop loop) {
-    return m_hid.button(NiDsPS4Controller.Button.kTouchpad.value, loop);
+    return m_hid.button(NiDsPS4Controller.Button.TOUCHPAD.value, loop);
   }
 
   /**

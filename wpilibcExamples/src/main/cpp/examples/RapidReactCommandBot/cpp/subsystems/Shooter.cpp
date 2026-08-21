@@ -7,9 +7,9 @@
 #include "wpi/commands2/Commands.hpp"
 
 Shooter::Shooter() {
-  shooterFeedback.SetTolerance(ShooterConstants::kShooterTolerance.value());
+  shooterFeedback.SetTolerance(ShooterConstants::SHOOTER_TOLERANCE.value());
   shooterEncoder.SetDistancePerPulse(
-      ShooterConstants::kEncoderDistancePerPulse);
+      ShooterConstants::ENCODER_DISTANCE_PER_PULSE);
 
   SetDefaultCommand(RunOnce([this] {
                       shooterMotor.SetThrottle(0.0);

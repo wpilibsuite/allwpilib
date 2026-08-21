@@ -19,16 +19,16 @@ Drive::Drive() {
   rightLeader.SetInverted(true);
 
   // Sets the distance per pulse for the encoders
-  leftEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
-  rightEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
+  leftEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
+  rightEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
 
   // Set the controller to be continuous (because it is an angle controller)
   controller.EnableContinuousInput(-180_deg, 180_deg);
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  controller.SetTolerance(DriveConstants::kTurnTolerance,
-                          DriveConstants::kTurnRateTolerance);
+  controller.SetTolerance(DriveConstants::TURN_TOLERANCE,
+                          DriveConstants::TURN_RATE_TOLERANCE);
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,

@@ -126,9 +126,9 @@ void NTField2DModel::ObjectModel::NTUpdate(const wpi::nt::Value& value) {
   }
 
   auto raw = value.GetRaw();
-  constexpr size_t kPoseSize = wpi::util::GetStructSize<wpi::math::Pose2d>();
+  constexpr size_t POSE_SIZE = wpi::util::GetStructSize<wpi::math::Pose2d>();
   if (m_kind == TopicKind::POSE) {
-    if (raw.size() != kPoseSize) {
+    if (raw.size() != POSE_SIZE) {
       return;
     }
     m_poses.resize(1);
@@ -136,14 +136,14 @@ void NTField2DModel::ObjectModel::NTUpdate(const wpi::nt::Value& value) {
     return;
   }
 
-  if ((raw.size() % kPoseSize) != 0) {
+  if ((raw.size() % POSE_SIZE) != 0) {
     return;
   }
 
-  m_poses.resize(raw.size() / kPoseSize);
+  m_poses.resize(raw.size() / POSE_SIZE);
   for (size_t i = 0; i < m_poses.size(); ++i) {
     m_poses[i] = wpi::util::UnpackStruct<wpi::math::Pose2d>(
-        raw.subspan(i * kPoseSize, kPoseSize));
+        raw.subspan(i * POSE_SIZE, POSE_SIZE));
   }
 }
 

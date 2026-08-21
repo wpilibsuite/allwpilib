@@ -25,15 +25,16 @@
  * destructed!
  */
 class Robot : public wpi::TimedRobot {
-  static constexpr double kMetersPerPulse = 0.01;
-  static constexpr double kElevatorMinimumLength = 0.5;
+  static constexpr double METERS_PER_PULSE = 0.01;
+  static constexpr double ELEVATOR_MINIMUM_LENGTH = 0.5;
 
  public:
-  Robot() { elevatorEncoder.SetDistancePerPulse(kMetersPerPulse); }
+  Robot() { elevatorEncoder.SetDistancePerPulse(METERS_PER_PULSE); }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
-    elevator->SetLength(kElevatorMinimumLength + elevatorEncoder.GetDistance());
+    elevator->SetLength(ELEVATOR_MINIMUM_LENGTH +
+                        elevatorEncoder.GetDistance());
     wrist->SetAngle(wpi::units::degree_t{wristPotentiometer.Get()});
 
     // publish to telemetry

@@ -20,7 +20,7 @@ namespace wpi {
 class PowerDistribution : public wpi::telemetry::TelemetryLoggable {
  public:
   /// Default module number.
-  static constexpr int kDefaultModule = -1;
+  static constexpr int DEFAULT_MODULE = -1;
 
   /**
    * Power distribution module type.

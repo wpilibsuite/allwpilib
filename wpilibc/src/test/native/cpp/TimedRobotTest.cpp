@@ -29,7 +29,7 @@
 
 using namespace wpi;
 
-inline constexpr auto kPeriod = 20_ms;
+inline constexpr auto PERIOD = 20_ms;
 
 namespace {
 class TimedRobotTest {
@@ -71,7 +71,7 @@ class MockRobot : public TimedRobot {
   std::atomic<uint32_t> m_teleopPeriodicCount{0};
   std::atomic<uint32_t> m_utilityPeriodicCount{0};
 
-  MockRobot() : TimedRobot{kPeriod} {}
+  MockRobot() : TimedRobot{PERIOD} {}
 
   void SimulationInit() override { m_simulationInitCount++; }
 
@@ -132,7 +132,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(1u == robot.m_disabledInitCount);
@@ -152,7 +152,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest DisabledMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(1u == robot.m_disabledInitCount);
@@ -274,7 +274,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -294,7 +294,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -346,7 +346,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -366,7 +366,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest TeleopMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -417,7 +417,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -437,7 +437,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest UtilityMode", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_simulationInitCount);
   CHECK(0u == robot.m_disabledInitCount);
@@ -503,7 +503,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   CHECK(0u == robot.m_teleopExitCount);
   CHECK(0u == robot.m_utilityExitCount);
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(0u == robot.m_autonomousInitCount);
@@ -520,7 +520,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::AUTONOMOUS);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_autonomousInitCount);
@@ -537,7 +537,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::TELEOPERATED);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_autonomousInitCount);
@@ -554,7 +554,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetRobotMode(hal::RobotMode::UTILITY);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_autonomousInitCount);
@@ -570,7 +570,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest ModeChange", "[wpilibc]") {
   wpi::sim::DriverStationSim::SetEnabled(false);
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
 
   CHECK(2u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_autonomousInitCount);
@@ -590,7 +590,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodic", "[wpilibc]") {
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0);
+  robot.AddPeriodic([&] { callbackCount++; }, PERIOD / 2.0);
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
   wpi::sim::WaitForProgramStart();
@@ -602,13 +602,13 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodic", "[wpilibc]") {
   CHECK(0u == robot.m_disabledPeriodicCount);
   CHECK(0u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod / 2.0);
+  wpi::sim::StepTiming(PERIOD / 2.0);
 
   CHECK(0u == robot.m_disabledInitCount);
   CHECK(0u == robot.m_disabledPeriodicCount);
   CHECK(1u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod / 2.0);
+  wpi::sim::StepTiming(PERIOD / 2.0);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_disabledPeriodicCount);
@@ -623,7 +623,7 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodicWithOffset",
   MockRobot robot;
 
   std::atomic<uint32_t> callbackCount{0};
-  robot.AddPeriodic([&] { callbackCount++; }, kPeriod / 2.0, kPeriod / 4.0);
+  robot.AddPeriodic([&] { callbackCount++; }, PERIOD / 2.0, PERIOD / 4.0);
 
   // Expirations in this test (ms)
   //
@@ -642,25 +642,25 @@ TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AddPeriodicWithOffset",
   CHECK(0u == robot.m_disabledPeriodicCount);
   CHECK(0u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
+  wpi::sim::StepTiming(PERIOD * 3.0 / 8.0);
 
   CHECK(0u == robot.m_disabledInitCount);
   CHECK(0u == robot.m_disabledPeriodicCount);
   CHECK(0u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod * 3.0 / 8.0);
+  wpi::sim::StepTiming(PERIOD * 3.0 / 8.0);
 
   CHECK(0u == robot.m_disabledInitCount);
   CHECK(0u == robot.m_disabledPeriodicCount);
   CHECK(1u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod / 4.0);
+  wpi::sim::StepTiming(PERIOD / 4.0);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_disabledPeriodicCount);
   CHECK(1u == callbackCount);
 
-  wpi::sim::StepTiming(kPeriod / 4.0);
+  wpi::sim::StepTiming(PERIOD / 4.0);
 
   CHECK(1u == robot.m_disabledInitCount);
   CHECK(1u == robot.m_disabledPeriodicCount);

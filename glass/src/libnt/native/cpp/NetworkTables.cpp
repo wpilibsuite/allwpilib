@@ -1402,7 +1402,7 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1443,11 +1443,11 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
   }
 }
 
-static constexpr size_t kTextBufferSize = 4096;
+static constexpr size_t TEXT_BUFFER_SIZE = 4096;
 
 static char* GetTextBuffer(std::string_view in) {
-  static char textBuffer[kTextBufferSize];
-  size_t len = (std::min)(in.size(), kTextBufferSize - 1);
+  static char textBuffer[TEXT_BUFFER_SIZE];
+  size_t len = (std::min)(in.size(), TEXT_BUFFER_SIZE - 1);
   std::memcpy(textBuffer, in.data(), len);
   textBuffer[len] = '\0';
   return textBuffer;
@@ -1505,7 +1505,7 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
           ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
         } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
           unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
-                                    kNetworkTablesFlags_PrecisionBitShift;
+                                    NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1647,7 +1647,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     case NT_DOUBLE: {
       double v = val.GetDouble();
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1668,7 +1668,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      ImGui::InputText(typeStr, v, kTextBufferSize,
+      ImGui::InputText(typeStr, v, TEXT_BUFFER_SIZE,
                        ImGuiInputTextFlags_EnterReturnsTrue);
       if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
@@ -1818,7 +1818,7 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
 void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
                                              std::string_view path,
                                              NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
+  static char nameBuffer[TEXT_BUFFER_SIZE];
 
   if (ImGui::BeginMenu("Add new...")) {
     if (ImGui::IsWindowAppearing()) {
@@ -1826,7 +1826,7 @@ void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     }
 
     ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                             kTextBufferSize);
+                             TEXT_BUFFER_SIZE);
     std::string fullNewPath;
     if (path == "/") {
       path = "";
@@ -2337,7 +2337,7 @@ void NetworkTablesFlagsSettings::Update() {
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
-                         kNetworkTablesFlags_PrecisionBitShift);
+                         NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
   }
 
   m_flags &= ~(
@@ -2355,7 +2355,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
                                   : 0) |
-      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
+      (*m_pPrecision << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {

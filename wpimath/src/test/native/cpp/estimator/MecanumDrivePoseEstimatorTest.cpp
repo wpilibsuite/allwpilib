@@ -44,8 +44,9 @@ void testFollowTrajectory(
     std::function<wpi::math::Pose2d(wpi::math::DrivetrainSplineSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
-    const wpi::units::second_t dt, const wpi::units::second_t kVisionUpdateRate,
-    const wpi::units::second_t kVisionUpdateDelay, const bool checkError,
+    const wpi::units::second_t dt,
+    const wpi::units::second_t VISION_UPDATE_RATE,
+    const wpi::units::second_t VISION_UPDATE_DELAY, const bool checkError,
     const bool debug) {
   wpi::math::MecanumDriveWheelPositions wheelPositions{};
 
@@ -76,7 +77,7 @@ void testFollowTrajectory(
     // We are due for a new vision measurement if it's been `visionUpdateRate`
     // seconds since the last vision measurement
     if (visionPoses.empty() ||
-        visionPoses.back().first + kVisionUpdateRate < t) {
+        visionPoses.back().first + VISION_UPDATE_RATE < t) {
       auto visionPose =
           visionMeasurementGenerator(groundTruthState) +
           wpi::math::Transform2d{
@@ -89,7 +90,7 @@ void testFollowTrajectory(
     // We should apply the oldest vision measurement if it has been
     // `visionUpdateDelay` seconds since it was measured
     if (!visionPoses.empty() &&
-        visionPoses.front().first + kVisionUpdateDelay < t) {
+        visionPoses.front().first + VISION_UPDATE_DELAY < t) {
       auto visionEntry = visionPoses.front();
       estimator.AddVisionMeasurement(visionEntry.second, visionEntry.first);
       visionPoses.erase(visionPoses.begin());

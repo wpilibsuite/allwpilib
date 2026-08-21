@@ -41,7 +41,7 @@ class ConnectReq : public RequestImpl<ConnectReq, uv_connect_t> {
  */
 class NetworkStream : public Stream {
  public:
-  static constexpr int kDefaultBacklog = 128;
+  static constexpr int DEFAULT_BACKLOG = 128;
 
   std::shared_ptr<NetworkStream> shared_from_this() {
     return std::static_pointer_cast<NetworkStream>(Handle::shared_from_this());
@@ -58,7 +58,7 @@ class NetworkStream : public Stream {
    * @param backlog the number of connections the kernel might queue, same as
    *        listen(2).
    */
-  void Listen(int backlog = kDefaultBacklog);
+  void Listen(int backlog = DEFAULT_BACKLOG);
 
   /**
    * Start listening for incoming connections.  This is a convenience wrapper
@@ -70,7 +70,7 @@ class NetworkStream : public Stream {
    * @param backlog the number of connections the kernel might queue, same as
    *        listen(2).
    */
-  void Listen(std::function<void()> callback, int backlog = kDefaultBacklog);
+  void Listen(std::function<void()> callback, int backlog = DEFAULT_BACKLOG);
 
   /**
    * Accept incoming connection.

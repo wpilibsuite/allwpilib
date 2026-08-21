@@ -37,7 +37,7 @@ class I2CCommunicationTest {
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
     wpi::sim::DriverStationSim::ResetData();
-    port = static_cast<int32_t>(Robot::kPort);
+    port = static_cast<int32_t>(Robot::PORT);
 
     callbackHandle = HALSIM_RegisterI2CWriteCallback(port, &callback, nullptr);
 
