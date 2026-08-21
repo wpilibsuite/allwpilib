@@ -212,7 +212,7 @@ public class LoggerGenerator {
       }
 
       out.println("import org.wpilib.epilogue.Logged;");
-      out.println("import org.wpilib.epilogue.Epilogue;");
+      out.println("import org.wpilib.epilogue.generated.Epilogue;");
       out.println("import org.wpilib.epilogue.logging.ClassSpecificLogger;");
       out.println("import org.wpilib.epilogue.logging.EpilogueBackend;");
       if (requiresVarHandles) {

@@ -66,7 +66,7 @@ maven.install(
         "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
-        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-3",
+        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-4",
         "org.junit.jupiter:junit-jupiter:5.10.1",
         "org.junit.platform:junit-platform-console:1.10.1",
         "org.junit.platform:junit-platform-launcher:1.10.1",
@@ -77,6 +77,12 @@ maven.install(
         "org.apache.ant:ant-junit:1.10.12",
         "org.mockito:mockito-core:4.1.0",
         "com.google.testing.compile:compile-testing:0.21.0",
+    ],
+    excluded_artifacts = [
+        # avaje has incorrectly listed io.avaje:avaje-jsonb-inject-plugin as a dependency of io.avaje:avaje-jsonb,
+        # which results in runtime crashes when `--add-modules ALL-MODULE-PATH` is used.
+        # We don't use or care about avaje's dependency injection library, so we manually exclude the bridge library.
+        "io.avaje:avaje-jsonb-inject-plugin",
     ],
     lock_file = "//:maven_install.json",
     repositories = [
