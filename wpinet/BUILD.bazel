@@ -308,26 +308,6 @@ java_binary(
 )
 
 cc_binary(
-    name = "netconsoleServer",
-    srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
-    linkopts = select({
-        "@wpilib_toolchains//constraints/combined:is_linux": ["-lutil"],
-        "//conditions:default": [],
-    }),
-    deps = [
-        ":wpinet",
-    ],
-)
-
-cc_binary(
-    name = "netconsoleTee",
-    srcs = ["src/netconsoleTee/native/cpp/main.cpp"],
-    deps = [
-        ":wpinet",
-    ],
-)
-
-cc_binary(
     name = "dsclient",
     srcs = ["examples/dsclient/dsclient.cpp"],
     deps = [

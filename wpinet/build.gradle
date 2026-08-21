@@ -257,40 +257,5 @@ model {
                 }
             }
         }
-        netconsoleServer(NativeExecutableSpec) {
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [
-                            'src/netconsoleServer/native/cpp'
-                        ]
-                        includes = ['**/*.cpp']
-                    }
-                }
-            }
-            binaries.all { binary ->
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-                if (binary.targetPlatform.operatingSystem.isLinux()) {
-                    linker.args "-lutil"
-                }
-            }
-        }
-        netconsoleTee(NativeExecutableSpec) {
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [
-                            'src/netconsoleTee/native/cpp'
-                        ]
-                        includes = ['**/*.cpp']
-                    }
-                }
-            }
-            binaries.all { binary ->
-                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
-                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
-            }
-        }
     }
 }

@@ -183,25 +183,6 @@ if(WPILIB_WITH_EXECUTABLES)
             set_property(TARGET wpinet_${example} PROPERTY FOLDER "examples")
         endif()
     endforeach()
-
-    if(UNIX AND NOT APPLE AND NOT ANDROID)
-        set(LIBUTIL -lutil)
-    else()
-        set(LIBUTIL)
-    endif()
-
-    file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
-    add_executable(netconsoleServer ${netconsoleServer_src})
-    wpilib_target_warnings(netconsoleServer)
-    target_link_libraries(netconsoleServer wpinet ${LIBUTIL})
-
-    file(GLOB netconsoleTee_src src/netconsoleTee/native/cpp/*.cpp)
-    add_executable(netconsoleTee ${netconsoleTee_src})
-    wpilib_target_warnings(netconsoleTee)
-    target_link_libraries(netconsoleTee wpinet)
-
-    set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
-    set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 endif()
 
 if(WPILIB_WITH_TESTS)
