@@ -50,6 +50,7 @@ scan_headers_ignore = [
     "wpi/tunables/TunableRegistry.hpp",
     "wpi/tunables/TunableTable.hpp",
     "wpi/tunables/Tunables.hpp",
+    "wpi/tunables/detail/PathUtil.hpp",
     "wpi/tunables/detail/TunableBase.hpp",
     "wpi/tunables/detail/TunableDetail.hpp",
     "wpi/tunables/detail/TunableMember.hpp",

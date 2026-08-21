@@ -48,6 +48,7 @@ scan_headers_ignore = [
     "wpi/telemetry/Telemetry.hpp",
     "wpi/telemetry/TelemetryRegistry.hpp",
     "wpi/telemetry/TelemetryTable.hpp",
+    "wpi/telemetry/detail/PathUtil.hpp",
 ]
 
 [tool.semiwrap.name_transform]
