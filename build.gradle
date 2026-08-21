@@ -38,7 +38,6 @@ allprojects {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
         }
     }
-    wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
