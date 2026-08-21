@@ -485,14 +485,20 @@ public final class TunableRegistry {
     if (tunable instanceof Tunable.CustomTunable t) {
       return publish(path, t.getInnerTunable());
     }
-    TunableBackend backend = getBackend(path);
-    if (isMissingBackend(backend)) {
-      return false;
+    String normalized = PathUtil.normalizeName(path);
+    boolean missingBackend = false;
+    synchronized (s_backends) {
+      TunableBackend backend = getBackendForNormalizedPath(normalized);
+      if (isMissingBackend(backend)) {
+        missingBackend = true;
+      } else if (backend.publish(path, tunable)) {
+        addComplexChildPath(path, tunable);
+        recordComplexMigrationPublish(path);
+        return true;
+      }
     }
-    if (backend.publish(path, tunable)) {
-      addComplexChildPath(path, tunable);
-      recordComplexMigrationPublish(path);
-      return true;
+    if (missingBackend) {
+      reportWarning("no backend for path '" + normalized + "'");
     }
     return false;
   }
@@ -505,16 +511,24 @@ public final class TunableRegistry {
    * @return true if the backend accepted the tunable
    */
   public static boolean publish(String path, ComplexTunable tunable) {
-    TunableBackend backend = getBackend(path);
-    if (isMissingBackend(backend)) {
-      return false;
+    String normalized = PathUtil.normalizeName(path);
+    boolean missingBackend = false;
+    synchronized (s_backends) {
+      TunableBackend backend = getBackendForNormalizedPath(normalized);
+      if (isMissingBackend(backend)) {
+        missingBackend = true;
+      } else {
+        boolean addedPath = addComplexPath(path, tunable);
+        if (backend.publishComplex(path, tunable)) {
+          recordComplexMigrationPublish(path);
+          return true;
+        } else if (addedPath) {
+          removeComplexPath(path, tunable);
+        }
+      }
     }
-    boolean addedPath = addComplexPath(path, tunable);
-    if (backend.publishComplex(path, tunable)) {
-      recordComplexMigrationPublish(path);
-      return true;
-    } else if (addedPath) {
-      removeComplexPath(path, tunable);
+    if (missingBackend) {
+      reportWarning("no backend for path '" + normalized + "'");
     }
     return false;
   }

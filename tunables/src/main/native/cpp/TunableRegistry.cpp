@@ -102,10 +102,6 @@ static std::shared_ptr<TunableBackend> GetMissingBackend() {
   return backend;
 }
 
-static bool IsMissingBackend(const std::shared_ptr<TunableBackend>& backend) {
-  return backend == GetMissingBackend();
-}
-
 static void UpdateBackendSnapshot(Instance& inst) {
   inst.backendSnapshot.clear();
   for (auto backend : inst.backends) {
@@ -445,34 +441,45 @@ std::shared_ptr<TunableBackend> TunableRegistry::GetBackend(
 
 bool TunableRegistry::PublishImpl(std::string_view path,
                                   detail::TunableBase& tunable) {
-  auto backend = GetBackend(path);
-  if (IsMissingBackend(backend)) {
-    return false;
+  std::string normalizedBuf;
+  std::string_view normalizedPath = detail::NormalizeName(path, normalizedBuf);
+  Instance& inst = GetInstance();
+  bool missingBackend = false;
+  {
+    std::scoped_lock lock{inst.backendsMutex};
+    auto backend = GetBackendForNormalizedPath(inst, normalizedPath);
+    if (!backend) {
+      missingBackend = true;
+    } else {
+      const TunableConfig* config;
+      detail::TunableTypeValue type;
+      if ((tunable.m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
+        config = nullptr;
+        type = static_cast<detail::TunableTypeValue>(
+            tunable.m_uid & detail::TunableBase::UID_MASK);
+        // Ensure move tracking is set up
+        tunable.m_uid = RegisterTunable(&tunable, nullptr, type);
+      } else {
+        auto info = GetTunable(tunable.m_uid);
+        config = info.config;
+        type = info.type;
+      }
+      uint32_t uid = tunable.m_uid & detail::TunableBase::UID_MASK;
+      if (!backend->Publish(path, uid, tunable, config, type)) {
+        return false;
+      }
+      if (type == detail::TunableTypeValue::COMPLEX) {
+        AddComplexPath(uid, path);
+      } else {
+        AddComplexChildPath(uid, path);
+      }
+      return true;
+    }
   }
-
-  const TunableConfig* config;
-  detail::TunableTypeValue type;
-  if ((tunable.m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
-    config = nullptr;
-    type = static_cast<detail::TunableTypeValue>(tunable.m_uid &
-                                                 detail::TunableBase::UID_MASK);
-    // Ensure move tracking is set up
-    tunable.m_uid = RegisterTunable(&tunable, nullptr, type);
-  } else {
-    auto info = GetTunable(tunable.m_uid);
-    config = info.config;
-    type = info.type;
+  if (missingBackend) {
+    ReportWarning(std::format("no backend for path '{}'", normalizedPath));
   }
-  uint32_t uid = tunable.m_uid & detail::TunableBase::UID_MASK;
-  if (!backend->Publish(path, uid, tunable, config, type)) {
-    return false;
-  }
-  if (type == detail::TunableTypeValue::COMPLEX) {
-    AddComplexPath(uid, path);
-  } else {
-    AddComplexChildPath(uid, path);
-  }
-  return true;
+  return false;
 }
 
 bool TunableRegistry::Publish(std::string_view path,
@@ -501,67 +508,77 @@ bool TunableRegistry::Publish(
 
   Instance& inst = GetInstance();
   std::scoped_lock updateLock{inst.updateMutex};
-  auto backend = GetBackend(path);
-  if (IsMissingBackend(backend)) {
-    return false;
-  }
-
-  if ((tunable->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
-    tunable->m_uid =
-        RegisterTunable(tunable, nullptr, detail::TunableTypeValue::COMPLEX);
-  }
-  uint32_t parentUid = tunable->m_uid & detail::TunableBase::UID_MASK;
-
-  TunableConfig memberConfig;
-  const TunableConfig* config;
-  detail::TunableTypeValue type;
-  if ((member->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
-    memberConfig.parent = tunable;
-    config = &memberConfig;
-    type = static_cast<detail::TunableTypeValue>(member->m_uid &
-                                                 detail::TunableBase::UID_MASK);
-    member->m_uid = RegisterTunable(member.get(), config, type);
-  } else {
-    auto info = GetTunable(member->m_uid);
-    config = info.config;
-    type = info.type;
-  }
-  uint32_t memberUid = member->m_uid & detail::TunableBase::UID_MASK;
-
-  std::string childName = GetChildName(parentUid, path);
+  std::string normalizedBuf;
+  std::string_view normalizedPath = detail::NormalizeName(path, normalizedBuf);
+  bool missingBackend = false;
   {
-    std::scoped_lock lock{inst.tunablesMutex};
-    auto parentIt = inst.tunables.find(parentUid);
-    auto childIt = inst.tunables.find(memberUid);
-    if (parentIt != inst.tunables.end() && childIt != inst.tunables.end()) {
-      auto& child = *childIt->second;
-      if (!child.config) {
-        child.config = TunableConfig{};
+    std::scoped_lock lock{inst.backendsMutex};
+    auto backend = GetBackendForNormalizedPath(inst, normalizedPath);
+    if (!backend) {
+      missingBackend = true;
+    } else {
+      if ((tunable->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
+        tunable->m_uid = RegisterTunable(tunable, nullptr,
+                                         detail::TunableTypeValue::COMPLEX);
       }
-      child.config->parent = tunable;
-      child.parent = parentIt->second.get();
-      child.name = childName;
-      parentIt->second->children.emplace_back(&child);
-      config = &*child.config;
+      uint32_t parentUid = tunable->m_uid & detail::TunableBase::UID_MASK;
+
+      TunableConfig memberConfig;
+      const TunableConfig* config;
+      detail::TunableTypeValue type;
+      if ((member->m_uid & detail::TunableBase::TYPE_FLAG) != 0) {
+        memberConfig.parent = tunable;
+        config = &memberConfig;
+        type = static_cast<detail::TunableTypeValue>(
+            member->m_uid & detail::TunableBase::UID_MASK);
+        member->m_uid = RegisterTunable(member.get(), config, type);
+      } else {
+        auto info = GetTunable(member->m_uid);
+        config = info.config;
+        type = info.type;
+      }
+      uint32_t memberUid = member->m_uid & detail::TunableBase::UID_MASK;
+
+      std::string childName = GetChildName(parentUid, path);
+      {
+        std::scoped_lock lock{inst.tunablesMutex};
+        auto parentIt = inst.tunables.find(parentUid);
+        auto childIt = inst.tunables.find(memberUid);
+        if (parentIt != inst.tunables.end() && childIt != inst.tunables.end()) {
+          auto& child = *childIt->second;
+          if (!child.config) {
+            child.config = TunableConfig{};
+          }
+          child.config->parent = tunable;
+          child.parent = parentIt->second.get();
+          child.name = childName;
+          parentIt->second->children.emplace_back(&child);
+          config = &*child.config;
+        }
+      }
+
+      auto memberPtr = member.get();
+      if (!backend->Publish(path, memberUid, *memberPtr, config, type)) {
+        UnregisterTunable(memberUid);
+        return false;
+      }
+
+      {
+        std::scoped_lock lock{inst.tunablesMutex};
+        auto childIt = inst.tunables.find(memberUid);
+        if (childIt != inst.tunables.end()) {
+          childIt->second->member = std::move(member);
+        }
+      }
+
+      AddComplexChildPath(memberUid, path);
+      return true;
     }
   }
-
-  auto memberPtr = member.get();
-  if (!backend->Publish(path, memberUid, *memberPtr, config, type)) {
-    UnregisterTunable(memberUid);
-    return false;
+  if (missingBackend) {
+    ReportWarning(std::format("no backend for path '{}'", normalizedPath));
   }
-
-  {
-    std::scoped_lock lock{inst.tunablesMutex};
-    auto childIt = inst.tunables.find(memberUid);
-    if (childIt != inst.tunables.end()) {
-      childIt->second->member = std::move(member);
-    }
-  }
-
-  AddComplexChildPath(memberUid, path);
-  return true;
+  return false;
 }
 
 void TunableRegistry::Remove(std::string_view path) {
