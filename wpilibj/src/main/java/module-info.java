@@ -19,7 +19,6 @@ open module wpilib.core {
   exports org.wpilib.system;
   exports org.wpilib.opmode;
   exports org.wpilib.preferences;
-  exports org.wpilib.counter;
   exports org.wpilib.simulation;
   exports org.wpilib.hardware.expansionhub;
   exports org.wpilib.hardware.discrete;
