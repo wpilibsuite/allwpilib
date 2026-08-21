@@ -85,7 +85,7 @@ void ValidateStructSequenceType(const py::sequence& value,
   }
 }
 
-constexpr const char* kLogDoc = R"doc(Logs a telemetry value.
+constexpr const char* LOG_DOC = R"doc(Logs a telemetry value.
 
 Sequences must pass an explicit element_type. Use bool, int, float, or str for
 primitive arrays, object to log a string array using str() for each element, or
@@ -179,11 +179,11 @@ class PyTelemetryTable {
 
  private:
   enum class SequenceKind {
-    kBoolean,
-    kInteger,
-    kDouble,
-    kString,
-    kFallbackString,
+    BOOLEAN,
+    INTEGER,
+    DOUBLE,
+    STRING,
+    FALLBACK_STRING,
   };
 
   static void AddStructSchemas(
@@ -246,19 +246,19 @@ class PyTelemetryTable {
       throw py::type_error("telemetry element_type must be a Python type");
     }
     if (IsBuiltinType(elementType, "bool")) {
-      return SequenceKind::kBoolean;
+      return SequenceKind::BOOLEAN;
     }
     if (IsBuiltinType(elementType, "int")) {
-      return SequenceKind::kInteger;
+      return SequenceKind::INTEGER;
     }
     if (IsBuiltinType(elementType, "float")) {
-      return SequenceKind::kDouble;
+      return SequenceKind::DOUBLE;
     }
     if (IsBuiltinType(elementType, "str")) {
-      return SequenceKind::kString;
+      return SequenceKind::STRING;
     }
     if (IsBuiltinType(elementType, "object")) {
-      return SequenceKind::kFallbackString;
+      return SequenceKind::FALLBACK_STRING;
     }
     throw py::type_error("unsupported telemetry element_type");
   }
@@ -297,7 +297,7 @@ class PyTelemetryTable {
     SequenceKind kind = KindFromElementType(valueType);
     const size_t size = py::len(value);
     switch (kind) {
-      case SequenceKind::kBoolean: {
+      case SequenceKind::BOOLEAN: {
         auto data = std::make_unique<bool[]>(size);
         for (size_t i = 0; i < size; ++i) {
           py::handle item = value[static_cast<py::ssize_t>(i)];
@@ -310,7 +310,7 @@ class PyTelemetryTable {
         entry->LogBooleanArray(std::span<const bool>{data.get(), size});
         break;
       }
-      case SequenceKind::kInteger: {
+      case SequenceKind::INTEGER: {
         std::vector<int64_t> data;
         data.reserve(size);
         for (size_t i = 0; i < size; ++i) {
@@ -324,7 +324,7 @@ class PyTelemetryTable {
         entry->LogInt64Array(std::span<const int64_t>{data});
         break;
       }
-      case SequenceKind::kDouble: {
+      case SequenceKind::DOUBLE: {
         std::vector<double> data;
         data.reserve(size);
         for (size_t i = 0; i < size; ++i) {
@@ -340,7 +340,7 @@ class PyTelemetryTable {
         entry->LogDoubleArray(std::span<const double>{data});
         break;
       }
-      case SequenceKind::kString: {
+      case SequenceKind::STRING: {
         std::vector<std::string> data;
         data.reserve(size);
         for (size_t i = 0; i < size; ++i) {
@@ -353,7 +353,7 @@ class PyTelemetryTable {
         entry->LogStringArray(std::span<const std::string>{data});
         break;
       }
-      case SequenceKind::kFallbackString: {
+      case SequenceKind::FALLBACK_STRING: {
         std::vector<std::string> data;
         data.reserve(size);
         for (size_t i = 0; i < size; ++i) {
@@ -534,7 +534,7 @@ void wpi::InitTelemetryPython(py::module_& m) {
           },
           py::arg("name"), py::arg("value"), py::kw_only(),
           py::arg("element_type") = py::none(), py::arg("type_string") = "",
-          kLogDoc);
+          LOG_DOC);
 
   py::class_<PyTelemetryTable>(m, "TelemetryTable")
       .def_property_readonly("path", &PyTelemetryTable::GetPath)
@@ -546,7 +546,7 @@ void wpi::InitTelemetryPython(py::module_& m) {
       .def("set_property", &PyTelemetryTable::SetProperty)
       .def("log", &PyTelemetryTable::Log, py::arg("name"), py::arg("value"),
            py::kw_only(), py::arg("element_type") = py::none(),
-           py::arg("type_string") = "", kLogDoc);
+           py::arg("type_string") = "", LOG_DOC);
 
   m.def(
       "get_table",
@@ -564,7 +564,7 @@ void wpi::InitTelemetryPython(py::module_& m) {
       },
       py::arg("name"), py::arg("value"), py::kw_only(),
       py::arg("element_type") = py::none(), py::arg("type_string") = "",
-      kLogDoc);
+      LOG_DOC);
   m.def("keep_duplicates", &wpi::telemetry::KeepDuplicates);
   m.def("set_property", &wpi::telemetry::SetProperty);
 

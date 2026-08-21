@@ -561,15 +561,14 @@ void RobotPeriodic() {
 **Was (WPILib 2026):**
 
 ```cpp
-enum class DriveMode { kFieldRelative, kRobotRelative };
+enum class DriveMode { FIELD_RELATIVE, ROBOT_RELATIVE };
 
 frc::SendableChooser<DriveMode> m_driveModeChooser;
 
 void RobotInit() {
   m_driveModeChooser.SetDefaultOption("Field Relative",
-                                      DriveMode::kFieldRelative);
-  m_driveModeChooser.AddOption("Robot Relative",
-                               DriveMode::kRobotRelative);
+                                      DriveMode::FIELD_RELATIVE);
+  m_driveModeChooser.AddOption("Robot Relative", DriveMode::ROBOT_RELATIVE);
   frc::SmartDashboard::PutData("Drive Mode", &m_driveModeChooser);
 }
 
@@ -581,13 +580,13 @@ void TeleopPeriodic() {
 **Is (Selectable):**
 
 ```cpp
-enum class DriveMode { kFieldRelative, kRobotRelative };
+enum class DriveMode { FIELD_RELATIVE, ROBOT_RELATIVE };
 
 wpi::tunables::Selectable<DriveMode> m_driveMode;
 
 void RobotInit() {
-  m_driveMode.AddDefault("Field Relative", DriveMode::kFieldRelative);
-  m_driveMode.Add("Robot Relative", DriveMode::kRobotRelative);
+  m_driveMode.AddDefault("Field Relative", DriveMode::FIELD_RELATIVE);
+  m_driveMode.Add("Robot Relative", DriveMode::ROBOT_RELATIVE);
   wpi::tunables::Publish("Drive/mode", m_driveMode);
 }
 

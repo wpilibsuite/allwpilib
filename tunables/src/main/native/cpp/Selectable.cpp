@@ -13,20 +13,20 @@
 using namespace wpi;
 using namespace wpi::tunables;
 
-static constexpr const char* kDefault = "default";
-static constexpr const char* kOptions = "options";
-static constexpr const char* kSelected = "selected";
+static constexpr const char* DEFAULT = "default";
+static constexpr const char* OPTIONS = "options";
+static constexpr const char* SELECTED = "selected";
 
 detail::SelectableBase::SelectableBase() = default;
 
 void detail::SelectableBase::PublishTunable(
     wpi::tunables::TunableTable& table) {
-  table.Publish(kDefault, this, &SelectableBase::m_defaultChoice,
+  table.Publish(DEFAULT, this, &SelectableBase::m_defaultChoice,
                 TunableConfig{.isMutable = false});
-  table.Publish(kOptions, this, &SelectableBase::m_options,
+  table.Publish(OPTIONS, this, &SelectableBase::m_options,
                 TunableConfig{.isMutable = false});
   table.Publish(
-      kSelected, this, &SelectableBase::m_selected,
+      SELECTED, this, &SelectableBase::m_selected,
       TunableConfig{.robust = true,
                     .onTune = [](detail::TunableBase&, ComplexTunable* self) {
                       if (auto selectable =

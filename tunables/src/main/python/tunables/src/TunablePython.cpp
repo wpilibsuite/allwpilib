@@ -92,17 +92,17 @@ py::list ToPythonList(const std::vector<WPyStruct>& value) {
 }
 
 enum class ValueKind {
-  kBoolean,
-  kInteger,
-  kDouble,
-  kString,
-  kRaw,
-  kBooleanArray,
-  kIntegerArray,
-  kDoubleArray,
-  kStringArray,
-  kStruct,
-  kStructArray,
+  BOOLEAN,
+  INTEGER,
+  DOUBLE,
+  STRING,
+  RAW,
+  BOOLEAN_ARRAY,
+  INTEGER_ARRAY,
+  DOUBLE_ARRAY,
+  STRING_ARRAY,
+  STRUCT,
+  STRUCT_ARRAY,
 };
 
 bool IsWpiStruct(py::handle value) {
@@ -173,23 +173,23 @@ ValueKind KindFromScalarType(py::handle valueType) {
     throw py::type_error("tunable value_type must be a Python type");
   }
   if (IsBuiltinType(valueType, "bool")) {
-    return ValueKind::kBoolean;
+    return ValueKind::BOOLEAN;
   }
   if (IsBuiltinType(valueType, "int")) {
-    return ValueKind::kInteger;
+    return ValueKind::INTEGER;
   }
   if (IsBuiltinType(valueType, "float")) {
-    return ValueKind::kDouble;
+    return ValueKind::DOUBLE;
   }
   if (IsBuiltinType(valueType, "str")) {
-    return ValueKind::kString;
+    return ValueKind::STRING;
   }
   if (IsBuiltinType(valueType, "bytes") ||
       IsBuiltinType(valueType, "bytearray")) {
-    return ValueKind::kRaw;
+    return ValueKind::RAW;
   }
   if (IsWpiStructType(valueType)) {
-    return ValueKind::kStruct;
+    return ValueKind::STRUCT;
   }
   throw py::type_error("unsupported tunable value_type");
 }
@@ -199,19 +199,19 @@ ValueKind KindFromElementType(py::handle elementType) {
     throw py::type_error("tunable element_type must be a Python type");
   }
   if (IsBuiltinType(elementType, "bool")) {
-    return ValueKind::kBooleanArray;
+    return ValueKind::BOOLEAN_ARRAY;
   }
   if (IsBuiltinType(elementType, "int")) {
-    return ValueKind::kIntegerArray;
+    return ValueKind::INTEGER_ARRAY;
   }
   if (IsBuiltinType(elementType, "float")) {
-    return ValueKind::kDoubleArray;
+    return ValueKind::DOUBLE_ARRAY;
   }
   if (IsBuiltinType(elementType, "str")) {
-    return ValueKind::kStringArray;
+    return ValueKind::STRING_ARRAY;
   }
   if (IsWpiStructType(elementType)) {
-    return ValueKind::kStructArray;
+    return ValueKind::STRUCT_ARRAY;
   }
   throw py::type_error("unsupported tunable element_type");
 }
@@ -227,7 +227,7 @@ ValueKind InferSequenceKind(const py::sequence& value) {
   }
 
   if (IsWpiStruct(value[0])) {
-    return ValueKind::kStructArray;
+    return ValueKind::STRUCT_ARRAY;
   }
 
   for (size_t i = 0; i < size; ++i) {
@@ -244,18 +244,18 @@ ValueKind InferSequenceKind(const py::sequence& value) {
   }
 
   if (allBool) {
-    return ValueKind::kBooleanArray;
+    return ValueKind::BOOLEAN_ARRAY;
   }
   if (allInt) {
-    return ValueKind::kIntegerArray;
+    return ValueKind::INTEGER_ARRAY;
   }
   if (allNumeric) {
-    return ValueKind::kDoubleArray;
+    return ValueKind::DOUBLE_ARRAY;
   }
   if (allString) {
-    return ValueKind::kStringArray;
+    return ValueKind::STRING_ARRAY;
   }
-  return ValueKind::kStringArray;
+  return ValueKind::STRING_ARRAY;
 }
 
 ValueKind InferValueKind(py::handle value, py::handle valueType,
@@ -281,22 +281,22 @@ ValueKind InferValueKind(py::handle value, py::handle valueType,
     return KindFromScalarType(valueType);
   }
   if (py::isinstance<py::bool_>(value)) {
-    return ValueKind::kBoolean;
+    return ValueKind::BOOLEAN;
   }
   if (py::isinstance<py::int_>(value)) {
-    return ValueKind::kInteger;
+    return ValueKind::INTEGER;
   }
   if (py::isinstance<py::float_>(value)) {
-    return ValueKind::kDouble;
+    return ValueKind::DOUBLE;
   }
   if (py::isinstance<py::str>(value)) {
-    return ValueKind::kString;
+    return ValueKind::STRING;
   }
   if (IsBytesLike(value)) {
-    return ValueKind::kRaw;
+    return ValueKind::RAW;
   }
   if (IsWpiStruct(value)) {
-    return ValueKind::kStruct;
+    return ValueKind::STRUCT;
   }
   if (IsSequenceValue(value)) {
     return InferSequenceKind(py::reinterpret_borrow<py::sequence>(value));
@@ -657,29 +657,29 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
     auto config = MakeConfig(robust, isMutable, properties,
                              std::move(typeString), alwaysGet);
     switch (kind) {
-      case ValueKind::kBoolean:
+      case ValueKind::BOOLEAN:
         return wpi::tunables::TunableBool{value.cast<bool>(), config};
-      case ValueKind::kInteger:
+      case ValueKind::INTEGER:
         return wpi::tunables::TunableInt64{value.cast<int64_t>(), config};
-      case ValueKind::kDouble:
+      case ValueKind::DOUBLE:
         return wpi::tunables::TunableDouble{value.cast<double>(), config};
-      case ValueKind::kString:
+      case ValueKind::STRING:
         return wpi::tunables::TunableString{value.cast<std::string>(), config};
-      case ValueKind::kRaw:
+      case ValueKind::RAW:
         return wpi::tunables::TunableRaw{ToRawVector(value), config};
-      case ValueKind::kBooleanArray:
+      case ValueKind::BOOLEAN_ARRAY:
         return wpi::tunables::TunableBoolVector{value.cast<std::vector<bool>>(),
                                                 config};
-      case ValueKind::kIntegerArray:
+      case ValueKind::INTEGER_ARRAY:
         return wpi::tunables::TunableInt64Vector{
             value.cast<std::vector<int64_t>>(), config};
-      case ValueKind::kDoubleArray:
+      case ValueKind::DOUBLE_ARRAY:
         return wpi::tunables::TunableDoubleVector{
             value.cast<std::vector<double>>(), config};
-      case ValueKind::kStringArray:
+      case ValueKind::STRING_ARRAY:
         return wpi::tunables::TunableStringVector{
             value.cast<std::vector<std::string>>(), config};
-      case ValueKind::kStruct: {
+      case ValueKind::STRUCT: {
         py::type type = IsWpiStructType(valueType)
                             ? py::reinterpret_borrow<py::type>(valueType)
                             : py::type::of(value);
@@ -697,7 +697,7 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
             config, std::move(info),
             WPyStruct{py::reinterpret_borrow<py::object>(value)}};
       }
-      case ValueKind::kStructArray: {
+      case ValueKind::STRUCT_ARRAY: {
         auto sequence = py::reinterpret_borrow<py::sequence>(value);
         py::type type = IsWpiStructType(elementType)
                             ? py::reinterpret_borrow<py::type>(elementType)
