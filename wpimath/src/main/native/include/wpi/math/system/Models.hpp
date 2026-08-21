@@ -301,40 +301,40 @@ class WPILIB_DLLEXPORT Models {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity].
    *
-   * @param V_LINEAR  The linear velocity gain in volts per (meters per second).
-   * @param A_LINEAR  The linear acceleration gain in volts per (meters per
+   * @param kVLinear  The linear velocity gain in volts per (meters per second).
+   * @param kALinear  The linear acceleration gain in volts per (meters per
    *                  second squared).
-   * @param V_ANGULAR The angular velocity gain in volts per (meters per
+   * @param kVAngular The angular velocity gain in volts per (meters per
    *                  second).
-   * @param A_ANGULAR The angular acceleration gain in volts per (meters per
+   * @param kAAngular The angular acceleration gain in volts per (meters per
    *                  second squared).
-   * @throws domain_error if V_LINEAR <= 0, A_LINEAR <= 0, V_ANGULAR <= 0,
-   *         or A_ANGULAR <= 0.
+   * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
+   *         or kAAngular <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> DifferentialDriveFromSysId(
-      decltype(1_V / 1_mps) V_LINEAR, decltype(1_V / 1_mps_sq) A_LINEAR,
-      decltype(1_V / 1_mps) V_ANGULAR, decltype(1_V / 1_mps_sq) A_ANGULAR) {
-    if (V_LINEAR <= decltype(V_LINEAR){0}) {
+      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+      decltype(1_V / 1_mps) kVAngular, decltype(1_V / 1_mps_sq) kAAngular) {
+    if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (A_LINEAR <= decltype(A_LINEAR){0}) {
+    if (kALinear <= decltype(kALinear){0}) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (V_ANGULAR <= decltype(V_ANGULAR){0}) {
+    if (kVAngular <= decltype(kVAngular){0}) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (A_ANGULAR <= decltype(A_ANGULAR){0}) {
+    if (kAAngular <= decltype(kAAngular){0}) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
 
-    double A1 = -0.5 * (V_LINEAR.value() / A_LINEAR.value() +
-                        V_ANGULAR.value() / A_ANGULAR.value());
-    double A2 = -0.5 * (V_LINEAR.value() / A_LINEAR.value() -
-                        V_ANGULAR.value() / A_ANGULAR.value());
-    double B1 = 0.5 / A_LINEAR.value() + 0.5 / A_ANGULAR.value();
-    double B2 = 0.5 / A_LINEAR.value() - 0.5 / A_ANGULAR.value();
+    double A1 = -0.5 * (kVLinear.value() / kALinear.value() +
+                        kVAngular.value() / kAAngular.value());
+    double A2 = -0.5 * (kVLinear.value() / kALinear.value() -
+                        kVAngular.value() / kAAngular.value());
+    double B1 = 0.5 / kALinear.value() + 0.5 / kAAngular.value();
+    double B2 = 0.5 / kALinear.value() - 0.5 / kAAngular.value();
 
     Matrixd<2, 2> A{{A1, A2}, {A2, A1}};
     Matrixd<2, 2> B{{B1, B2}, {B2, B1}};
@@ -353,36 +353,36 @@ class WPILIB_DLLEXPORT Models {
    * voltage, right voltage], and the outputs are [left velocity, right
    * velocity].
    *
-   * @param V_LINEAR   The linear velocity gain in volts per (meters per
+   * @param kVLinear   The linear velocity gain in volts per (meters per
    * second).
-   * @param A_LINEAR   The linear acceleration gain in volts per (meters per
+   * @param kALinear   The linear acceleration gain in volts per (meters per
    *                   second squared).
-   * @param V_ANGULAR  The angular velocity gain in volts per (radians per
+   * @param kVAngular  The angular velocity gain in volts per (radians per
    *                   second).
-   * @param A_ANGULAR  The angular acceleration gain in volts per (radians per
+   * @param kAAngular  The angular acceleration gain in volts per (radians per
    *                   second squared).
    * @param trackwidth The distance between the differential drive's left and
    *                   right wheels, in meters.
-   * @throws domain_error if V_LINEAR <= 0, A_LINEAR <= 0, V_ANGULAR <= 0,
-   *         A_ANGULAR <= 0, or trackwidth <= 0.
+   * @throws domain_error if kVLinear <= 0, kALinear <= 0, kVAngular <= 0,
+   *         kAAngular <= 0, or trackwidth <= 0.
    * @see <a
    * href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   static constexpr LinearSystem<2, 2, 2> DifferentialDriveFromSysId(
-      decltype(1_V / 1_mps) V_LINEAR, decltype(1_V / 1_mps_sq) A_LINEAR,
-      decltype(1_V / 1_rad_per_s) V_ANGULAR,
-      decltype(1_V / 1_rad_per_s_sq) A_ANGULAR,
+      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
+      decltype(1_V / 1_rad_per_s) kVAngular,
+      decltype(1_V / 1_rad_per_s_sq) kAAngular,
       wpi::units::meter_t trackwidth) {
-    if (V_LINEAR <= decltype(V_LINEAR){0}) {
+    if (kVLinear <= decltype(kVLinear){0}) {
       throw std::domain_error("Kv,linear must be greater than zero.");
     }
-    if (A_LINEAR <= decltype(A_LINEAR){0}) {
+    if (kALinear <= decltype(kALinear){0}) {
       throw std::domain_error("Ka,linear must be greater than zero.");
     }
-    if (V_ANGULAR <= decltype(V_ANGULAR){0}) {
+    if (kVAngular <= decltype(kVAngular){0}) {
       throw std::domain_error("Kv,angular must be greater than zero.");
     }
-    if (A_ANGULAR <= decltype(A_ANGULAR){0}) {
+    if (kAAngular <= decltype(kAAngular){0}) {
       throw std::domain_error("Ka,angular must be greater than zero.");
     }
     if (trackwidth <= 0_m) {
@@ -400,9 +400,9 @@ class WPILIB_DLLEXPORT Models {
     //
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
     // to V/(m/s).
-    return DifferentialDriveFromSysId(V_LINEAR, A_LINEAR,
-                                      V_ANGULAR * 2.0 / trackwidth * 1_rad,
-                                      A_ANGULAR * 2.0 / trackwidth * 1_rad);
+    return DifferentialDriveFromSysId(kVLinear, kALinear,
+                                      kVAngular * 2.0 / trackwidth * 1_rad,
+                                      kAAngular * 2.0 / trackwidth * 1_rad);
   }
 };
 

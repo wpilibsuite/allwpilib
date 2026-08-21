@@ -34,9 +34,9 @@ public final class DifferentialDriveFeedforwardProto
 
   @Override
   public void pack(ProtobufDifferentialDriveFeedforward msg, DifferentialDriveFeedforward value) {
-    msg.setKvLinear(value.V_LINEAR);
-    msg.setKaLinear(value.A_LINEAR);
-    msg.setKvAngular(value.V_ANGULAR);
-    msg.setKaAngular(value.A_ANGULAR);
+    msg.setKvLinear(value.kVLinear);
+    msg.setKaLinear(value.kALinear);
+    msg.setKvAngular(value.kVAngular);
+    msg.setKaAngular(value.kAAngular);
   }
 }

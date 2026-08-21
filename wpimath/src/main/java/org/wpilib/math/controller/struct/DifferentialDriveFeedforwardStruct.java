@@ -27,23 +27,23 @@ public final class DifferentialDriveFeedforwardStruct
 
   @Override
   public String getSchema() {
-    return "double V_LINEAR;double A_LINEAR;double V_ANGULAR;double A_ANGULAR";
+    return "double kVLinear;double kALinear;double kVAngular;double kAAngular";
   }
 
   @Override
   public DifferentialDriveFeedforward unpack(ByteBuffer bb) {
-    double V_LINEAR = bb.getDouble();
-    double A_LINEAR = bb.getDouble();
-    double V_ANGULAR = bb.getDouble();
-    double A_ANGULAR = bb.getDouble();
-    return new DifferentialDriveFeedforward(V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR);
+    double kVLinear = bb.getDouble();
+    double kALinear = bb.getDouble();
+    double kVAngular = bb.getDouble();
+    double kAAngular = bb.getDouble();
+    return new DifferentialDriveFeedforward(kVLinear, kALinear, kVAngular, kAAngular);
   }
 
   @Override
   public void pack(ByteBuffer bb, DifferentialDriveFeedforward value) {
-    bb.putDouble(value.V_LINEAR);
-    bb.putDouble(value.A_LINEAR);
-    bb.putDouble(value.V_ANGULAR);
-    bb.putDouble(value.A_ANGULAR);
+    bb.putDouble(value.kVLinear);
+    bb.putDouble(value.kALinear);
+    bb.putDouble(value.kVAngular);
+    bb.putDouble(value.kAAngular);
   }
 }

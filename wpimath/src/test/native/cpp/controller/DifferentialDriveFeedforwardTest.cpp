@@ -20,18 +20,18 @@
 
 TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithTrackwidth",
           "[wpimath]") {
-  constexpr auto V_LINEAR = 1_V / 1_mps;
-  constexpr auto A_LINEAR = 1_V / 1_mps_sq;
-  constexpr auto V_ANGULAR = 1_V / 1_rad_per_s;
-  constexpr auto A_ANGULAR = 1_V / 1_rad_per_s_sq;
+  constexpr auto kVLinear = 1_V / 1_mps;
+  constexpr auto kALinear = 1_V / 1_mps_sq;
+  constexpr auto kVAngular = 1_V / 1_rad_per_s;
+  constexpr auto kAAngular = 1_V / 1_rad_per_s_sq;
   constexpr auto trackwidth = 1_m;
   constexpr wpi::units::second_t dt = 20_ms;
 
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
-      V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR, trackwidth};
+      kVLinear, kALinear, kVAngular, kAAngular, trackwidth};
   wpi::math::LinearSystem<2, 2, 2> plant =
       wpi::math::Models::DifferentialDriveFromSysId(
-          V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR, trackwidth);
+          kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
@@ -56,17 +56,17 @@ TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithTrackwidth",
 
 TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithoutTrackwidth",
           "[wpimath]") {
-  constexpr auto V_LINEAR = 1_V / 1_mps;
-  constexpr auto A_LINEAR = 1_V / 1_mps_sq;
-  constexpr auto V_ANGULAR = 1_V / 1_mps;
-  constexpr auto A_ANGULAR = 1_V / 1_mps_sq;
+  constexpr auto kVLinear = 1_V / 1_mps;
+  constexpr auto kALinear = 1_V / 1_mps_sq;
+  constexpr auto kVAngular = 1_V / 1_mps;
+  constexpr auto kAAngular = 1_V / 1_mps_sq;
   constexpr wpi::units::second_t dt = 20_ms;
 
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
-      V_LINEAR, A_LINEAR, V_ANGULAR, A_ANGULAR};
+      kVLinear, kALinear, kVAngular, kAAngular};
   wpi::math::LinearSystem<2, 2, 2> plant =
-      wpi::math::Models::DifferentialDriveFromSysId(V_LINEAR, A_LINEAR,
-                                                    V_ANGULAR, A_ANGULAR);
+      wpi::math::Models::DifferentialDriveFromSysId(kVLinear, kALinear,
+                                                    kVAngular, kAAngular);
   for (auto currentLeftVelocity = -4_mps; currentLeftVelocity <= 4_mps;
        currentLeftVelocity += 2_mps) {
     for (auto currentRightVelocity = -4_mps; currentRightVelocity <= 4_mps;
