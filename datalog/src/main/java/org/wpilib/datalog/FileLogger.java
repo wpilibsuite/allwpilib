@@ -4,12 +4,14 @@
 
 package org.wpilib.datalog;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * A class version of `tail -f`, otherwise known as `tail -f` at home. Watches a file and puts the
  * data into a data log. Only works on Linux-based platforms.
  */
 public class FileLogger implements AutoCloseable {
-  private final long m_impl;
+  private final AtomicLong m_impl;
 
   /**
    * Construct a FileLogger. When the specified file is modified, appended data will be appended to
@@ -20,11 +22,14 @@ public class FileLogger implements AutoCloseable {
    * @param key The log key to append data to.
    */
   public FileLogger(String file, DataLog log, String key) {
-    m_impl = DataLogJNI.createFileLogger(file, log.getImpl(), key);
+    m_impl = new AtomicLong(DataLogJNI.createFileLogger(file, log.getImpl(), key));
   }
 
   @Override
   public void close() {
-    DataLogJNI.freeFileLogger(m_impl);
+    long impl = m_impl.getAndSet(0);
+    if (impl != 0) {
+      DataLogJNI.freeFileLogger(impl);
+    }
   }
 }

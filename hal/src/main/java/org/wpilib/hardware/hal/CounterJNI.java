@@ -29,15 +29,23 @@ public class CounterJNI extends JNIWrapper {
   public static native void freeCounter(int counterHandle);
 
   /**
-   * Sets the up source to either detect rising edges or falling edges.
-   *
-   * <p>Note that both are allowed to be set true at the same time without issues.
+   * Sets the counter to detect rising or falling edges.
    *
    * @param counterHandle the counter handle
-   * @param risingEdge true to trigger on rising
-   * @see "HAL_SetCounterUpSourceEdge"
+   * @param risingEdge true to count rising edges, false to count falling
+   * @see "HAL_SetCounterEdgeConfiguration"
    */
   public static native void setCounterEdgeConfiguration(int counterHandle, boolean risingEdge);
+
+  /**
+   * Sets the time window used to calculate the counter rate.
+   *
+   * @param counterHandle the counter handle
+   * @param windowMilliseconds the rate calculation window in milliseconds; valid values are 5
+   *     through 255
+   * @see "HAL_SetCounterRateWindow"
+   */
+  public static native void setCounterRateWindow(int counterHandle, int windowMilliseconds);
 
   /**
    * Resets the Counter to zero.
@@ -63,38 +71,21 @@ public class CounterJNI extends JNIWrapper {
   public static native int getCounter(int counterHandle);
 
   /**
-   * Gets the Period of the most recent count.
-   *
-   * <p>Returns the time interval of the most recent count. This can be used for velocity
-   * calculations to determine shaft velocity.
+   * Gets the rate of the counter.
    *
    * @param counterHandle the counter handle
-   * @return the period of the last two pulses in units of seconds
-   * @see "HAL_GetCounterPeriod"
+   * @return the counter rate in counts per second
+   * @see "HAL_GetCounterRate"
    */
-  public static native double getCounterPeriod(int counterHandle);
-
-  /**
-   * Sets the maximum period where the device is still considered "moving".
-   *
-   * <p>Sets the maximum period where the device is considered moving. This value is used to
-   * determine the "stopped" state of the counter using the HAL_GetCounterStopped method.
-   *
-   * @param counterHandle the counter handle
-   * @param maxPeriod the maximum period where the counted device is considered moving in seconds
-   * @see "HAL_SetCounterMaxPeriod"
-   */
-  public static native void setCounterMaxPeriod(int counterHandle, double maxPeriod);
+  public static native double getCounterRate(int counterHandle);
 
   /**
    * Determines if the clock is stopped.
    *
-   * <p>Determine if the clocked input is stopped based on the MaxPeriod value set using the
-   * SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the device (and counter) are
-   * assumed to be stopped and it returns true.
+   * <p>Determines if the counter's current rate is zero.
    *
    * @param counterHandle the counter handle
-   * @return true if the most recent counter period exceeds the MaxPeriod value set by SetMaxPeriod
+   * @return true if the counter's current rate is zero
    * @see "HAL_GetCounterStopped"
    */
   public static native boolean getCounterStopped(int counterHandle);

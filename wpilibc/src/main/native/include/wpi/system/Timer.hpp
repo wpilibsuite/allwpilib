@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "wpi/units/time.hpp"
 
 namespace wpi {
@@ -40,7 +42,8 @@ class Timer {
    * Create a new timer object.
    *
    * Create a new timer object and reset the time to zero. The timer is
-   * initially not running and must be started.
+   * initially not running and must be started. Consider using
+   * CreateStarted() if the timer is used immediately after creation.
    */
   Timer();
 
@@ -129,6 +132,19 @@ class Timer {
   bool IsRunning() const;
 
   /**
+   * Creates a new timer that begins started.
+   *
+   * <p>This is equivalent to
+   * <pre>
+   *   wpi::Timer timer;
+   *   timer.Start();
+   * </pre>
+   *
+   * @return A new started timer.
+   */
+  static wpi::Timer CreateStarted();
+
+  /**
    * Return the clock time in seconds. By default, the time is the time returned
    * by GetMonotonicTimestamp(). However, the return value of this method may be
    * modified to use any time base, including non-monotonic time bases.
@@ -168,8 +184,11 @@ class Timer {
   static wpi::units::second_t GetMatchTime();
 
  private:
-  wpi::units::second_t m_startTime = 0_s;
-  wpi::units::second_t m_accumulatedTime = 0_s;
+  double GetMicroseconds() const;
+
+  std::chrono::microseconds m_startTime{0};
+  double m_startTimeRemainderUs = 0.0;
+  double m_accumulatedTimeUs = 0.0;
   bool m_running = false;
 };
 

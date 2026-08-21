@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
     id "org.ysb33r.doxygen" version "2.0.0"
 }
 
@@ -22,6 +23,7 @@ evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 evaluationDependsOn(':datalog')
+evaluationDependsOn(':drivers')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
@@ -50,6 +52,7 @@ cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
 cppProjectZips.add(project(':datalog').cppHeadersZip)
+cppProjectZips.add(project(':drivers').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms. Other platforms
@@ -115,6 +118,9 @@ doxygen.sourceSets.main {
         // mpack
         exclude 'wpi/util/mpack.h'
 
+        // hat-trie internal helpers
+        exclude 'wpi/util/array-hash/**'
+
         // units
         exclude 'wpi/units/**'
     }
@@ -148,12 +154,14 @@ tasks.register("zipCppDocs", Zip) {
     into '/'
 }
 
-// Java
-configurations {
-    javaSource {
-        transitive = false
-    }
+ext {
+    useJava = true
+    useCpp = false
+    skipDev = true
 }
+
+// Classpath for everything + OpenCV
+apply from: "${rootDir}/shared/opencv.gradle"
 
 def javaDocProjects = [
     project(':allwpilib-java'),
@@ -175,6 +183,7 @@ def javaDocProjects = [
     project(':romiVendordep'),
     project(':xrpVendordep'),
     project(':datalog'),
+    project(':drivers'),
 ]
 
 // Tracks module-info files to generate per-module javadoc subdirectories.

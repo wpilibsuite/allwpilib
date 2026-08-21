@@ -79,7 +79,6 @@ cc_test(
     srcs = glob(["src/test/native/**"]),
     deps = [
         ":cameraserver",
-        "//thirdparty/googletest",
     ],
 )
 

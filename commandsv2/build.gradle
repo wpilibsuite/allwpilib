@@ -1,7 +1,7 @@
 ext {
     nativeName = 'commandsv2'
     devMain = 'org.wpilib.commandsv2.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 evaluationDependsOn(':ntcore')
@@ -11,6 +11,7 @@ evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 
 apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 dependencies {
     implementation project(':wpiutil')
@@ -59,7 +60,10 @@ model {
             }
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            project(':hal').addHalDependency(it, 'shared')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+            }
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -69,7 +73,7 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'
-                project(':hal').addHalJniDependency(it)
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
             }
         }
     }

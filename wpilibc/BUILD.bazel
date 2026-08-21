@@ -13,11 +13,16 @@ load("//wpilibc:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//wpilibc:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+    visibility = ["//wpilibc:__subpackages__"],
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -48,19 +53,6 @@ py_binary(
 )
 
 py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    deps = [
-        requirement("jinja2"),
-        "//:generation",
-    ],
-)
-
-py_binary(
     name = "generate_wpilibc_py",
     srcs = ["generate_wpilibc.py"],
     main = "generate_wpilibc.py",
@@ -71,7 +63,6 @@ py_binary(
     deps = [
         ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -79,7 +70,6 @@ filegroup(
     name = "templates",
     srcs = glob(["src/generate/main/native/**"]) + glob(["src/generate/test/native/**"]) + [
         "//wpilibj:hid_schema",
-        "//wpilibj:pwm_schema",
     ],
 )
 
@@ -218,6 +208,7 @@ package_default_cc_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-generator",
+    generated_include_target = "//wpilibc:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -279,6 +270,7 @@ wpilib_simulation_extension(
 
 define_pybind_library(
     name = "robotpy-wpilib",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PKG_CONFIG_DEPS,
 )
 

@@ -9,19 +9,8 @@
 
 #include "HALInitializer.hpp"
 #include "mrclib/IMU.h"
-#include "wpi/hal/Errors.h"
 
 namespace {
-
-struct IMUInitializer {
-  MRC_Status status = MRC_IMU_Initialize();
-};
-
-static MRC_Status InitMrcImu() {
-  static IMUInitializer init;
-  return init.status;
-}
-
 constexpr double kDegreesToRadians = std::numbers::pi / 180.0;
 }  // namespace
 
@@ -31,12 +20,7 @@ void InitializeIMU() {}
 
 extern "C" {
 void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_Acceleration3d accelData;
   std::memset(&accelData, 0, sizeof(accelData));
   *status = MRC_IMU_GetAcceleration(&accelData);
@@ -47,12 +31,7 @@ void HAL_GetIMUAcceleration(HAL_Acceleration3d* accel, int32_t* status) {
 }
 
 void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_GyroRate3d rateData;
   std::memset(&rateData, 0, sizeof(rateData));
   *status = MRC_IMU_GetGyroRate(&rateData);
@@ -63,12 +42,7 @@ void HAL_GetIMUGyroRates(HAL_GyroRate3d* rate, int32_t* status) {
 }
 
 void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_EulerAngles3d angleData;
   std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesFlat(&angleData);
@@ -80,12 +54,7 @@ void HAL_GetIMUEulerAnglesFlat(HAL_EulerAngles3d* angles, int32_t* status) {
 
 void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
                                     int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_EulerAngles3d angleData;
   std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesLandscape(&angleData);
@@ -96,12 +65,7 @@ void HAL_GetIMUEulerAnglesLandscape(HAL_EulerAngles3d* angles,
 }
 
 void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_EulerAngles3d angleData;
   std::memset(&angleData, 0, sizeof(angleData));
   *status = MRC_IMU_GetEulerAnglesPortrait(&angleData);
@@ -112,12 +76,7 @@ void HAL_GetIMUEulerAnglesPortrait(HAL_EulerAngles3d* angles, int32_t* status) {
 }
 
 void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *status = initStatus;
-    return;
-  }
-
+  wpi::hal::init::CheckInit();
   MRC_Quaternion quatData;
   std::memset(&quatData, 0, sizeof(quatData));
   *status = MRC_IMU_GetQuaternion(&quatData);
@@ -129,12 +88,7 @@ void HAL_GetIMUQuaternion(HAL_Quaternion* quat, int32_t* status) {
 }
 
 double HAL_GetIMUYawFlat(int64_t* timestamp) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *timestamp = 0;
-    return 0;
-  }
-
+  wpi::hal::init::CheckInit();
   double ret = 0;
   *timestamp = 0;
   MRC_IMU_GetYawFlat(&ret, timestamp);
@@ -142,12 +96,7 @@ double HAL_GetIMUYawFlat(int64_t* timestamp) {
 }
 
 double HAL_GetIMUYawLandscape(int64_t* timestamp) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *timestamp = 0;
-    return 0;
-  }
-
+  wpi::hal::init::CheckInit();
   double ret = 0;
   *timestamp = 0;
   MRC_IMU_GetYawLandscape(&ret, timestamp);
@@ -155,12 +104,7 @@ double HAL_GetIMUYawLandscape(int64_t* timestamp) {
 }
 
 double HAL_GetIMUYawPortrait(int64_t* timestamp) {
-  MRC_Status initStatus = InitMrcImu();
-  if (initStatus != MRC_STATUS_SUCCESS) {
-    *timestamp = 0;
-    return 0;
-  }
-
+  wpi::hal::init::CheckInit();
   double ret = 0;
   *timestamp = 0;
   MRC_IMU_GetYawPortrait(&ret, timestamp);

@@ -6,6 +6,7 @@
 
 from commands2 import Command, Subsystem
 import wpilib
+import wpilib_drivers
 
 from constants import IntakeConstants
 
@@ -13,11 +14,11 @@ from constants import IntakeConstants
 class Intake(Subsystem):
     def __init__(self) -> None:
         super().__init__()
-        self.motor = wpilib.PWMSparkMax(IntakeConstants.MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(IntakeConstants.MOTOR_PORT)
 
         # Double solenoid connected to two channels of a PCM with the default CAN ID
         self.pistons = wpilib.DoubleSolenoid(
-            0,
+            wpilib.CANBus.CAN_S0,
             wpilib.PneumaticsModuleType.CTRE_PCM,
             IntakeConstants.SOLENOID_PORTS[0],
             IntakeConstants.SOLENOID_PORTS[1],

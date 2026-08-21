@@ -241,6 +241,21 @@ class LinearSystemLoop {
   StateVector Error() const { return m_controller->R() - m_observer->Xhat(); }
 
   /**
+   * Returns true if the error is within the tolerance set by SetTolerance()
+   * for every state.
+   */
+  bool AtReference() const { return m_controller->AtReference(); }
+
+  /**
+   * Sets the error which is considered tolerable for use with AtReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  void SetTolerance(const StateVector& tolerance) {
+    m_controller->SetTolerance(tolerance);
+  }
+
+  /**
    * Correct the state estimate x-hat using the measurements in y.
    *
    * @param y Measurement vector.

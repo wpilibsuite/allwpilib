@@ -20,10 +20,8 @@ FIELD_JSONS = glob(["src/main/native/resources/**/*.json"])
 FIELD_IMAGES = glob(
     [
         "src/main/native/resources/**/*.jpg",
-        "src/main/native/resources/**/*.jpeg",
         "src/main/native/resources/**/*.png",
     ],
-    allow_empty = True,
 )
 
 NO_SYSTEMCORE = select({
@@ -32,11 +30,16 @@ NO_SYSTEMCORE = select({
 })
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+    visibility = ["//fields:__subpackages__"],
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -242,19 +245,19 @@ wpilib_java_library(
 )
 
 java_library(
-    name = "fields-images-java",
+    name = "field-images-java",
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = FIELD_IMAGES,
     tags = [
-        "maven_coordinates=org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+        "maven_coordinates=org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
     ],
     visibility = ["//visibility:public"],
 )
 
 wpilib_maven_export(
-    name = "fields-images-java_publish",
-    lib_name = "fields-images-java",
-    maven_coordinates = "org.wpilib.fields:fields-images-java:$(WPILIB_VERSION)",
+    name = "field-images-java_publish",
+    lib_name = "field-images-java",
+    maven_coordinates = "org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
     visibility = ["//visibility:public"],
 )
 
@@ -289,7 +292,7 @@ cc_test(
 package_static_cc_project(
     name = "fieldimages",
     architectures = host_architectures,
-    maven_artifact_name = "fields-images-cpp",
+    maven_artifact_name = "field-images-cpp",
     maven_group_id = "org.wpilib.fields",
 )
 
@@ -301,6 +304,7 @@ package_default_cc_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-fields-generator",
+    generated_include_target = "//fields:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 

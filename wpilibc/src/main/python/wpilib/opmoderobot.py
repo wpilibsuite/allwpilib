@@ -62,15 +62,15 @@ class OpModeRobot(OpModeRobotBase):
 
         if text_color is None or background_color is None:
             self.add_opmode_factory(
-                make_opmode_instance, mode, name, group or "", description or ""
+                mode, name, group or "", description or "", make_opmode_instance
             )
         else:
             self.add_opmode_factory(
-                make_opmode_instance,
                 mode,
                 name,
                 group or "",
                 description or "",
                 text_color,
                 background_color,
+                make_opmode_instance,
             )

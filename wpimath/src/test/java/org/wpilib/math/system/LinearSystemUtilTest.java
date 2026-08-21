@@ -45,6 +45,10 @@ class LinearSystemUtilTest extends UtilityClassTest<LinearSystemUtil> {
     // Second eigenvalue is controllable and unstable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
     assertTrue(LinearSystemUtil.isStabilizable(A, B));
+
+    // Controllable complex eigenvalues (i and -i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
+    assertTrue(LinearSystemUtil.isStabilizable(A, B));
   }
 
   @Test
@@ -70,6 +74,10 @@ class LinearSystemUtilTest extends UtilityClassTest<LinearSystemUtil> {
     // First eigenvalue is unobservable and stable.
     // Second eigenvalue is observable and unstable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
+    assertTrue(LinearSystemUtil.isDetectable(A, C));
+
+    // Detectable complex eigenvalues (i and -i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
     assertTrue(LinearSystemUtil.isDetectable(A, C));
   }
 }

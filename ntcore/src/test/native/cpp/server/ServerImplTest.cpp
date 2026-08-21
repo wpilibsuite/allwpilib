@@ -584,4 +584,23 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest InvalidPubUid",
   CheckNoServerCalls(local);
 }
 
+TEST_CASE_METHOD(ServerImplTest,
+                 "ServerImplTest RejectsNetworkPublishOfReservedTopic",
+                 "[ntcore][server]") {
+  net::MockWireConnection wire;
+  SetPeriodicRecorder setPeriodic;
+  auto [name, id] = server.AddClient("test", "connInfo", false, wire,
+                                     setPeriodic.AsStdFunction());
+  std::vector<net::ClientMessage> msgs;
+  msgs.emplace_back(net::ClientMessage{net::PublishMsg{
+      1, "$clients", "msgpack", wpi::util::json::object(), {}}});
+
+  server.ProcessIncomingText(id, EncodeText(msgs));
+  server.SendOutgoing(id, 100);
+
+  logger.CheckMessage(NT_LOG_WARNING,
+                      "client 1 publish of reserved topic '$clients' ignored");
+  CHECK(wire.writeTextCalls.empty());
+}
+
 }  // namespace wpi::nt

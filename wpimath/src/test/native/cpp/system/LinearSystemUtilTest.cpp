@@ -29,6 +29,10 @@ TEST_CASE("LinearSystemUtilTest IsStabilizable", "[wpimath]") {
   // Second eigenvalue is controllable and unstable.
   CHECK((wpi::math::IsStabilizable<2, 1>(
       Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 1.2}}, B)));
+
+  // Controllable complex eigenvalues (i and -i)
+  CHECK((wpi::math::IsStabilizable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{0, 1}, {-1, 0}}, B)));
 }
 
 TEST_CASE("LinearSystemUtilTest IsDetectable", "[wpimath]") {
@@ -53,4 +57,8 @@ TEST_CASE("LinearSystemUtilTest IsDetectable", "[wpimath]") {
   // Second eigenvalue is observable and unstable.
   CHECK((wpi::math::IsDetectable<2, 1>(
       Eigen::Matrix<double, 2, 2>{{0.2, 0}, {0, 1.2}}, C)));
+
+  // Detectable complex eigenvalues (i and -i)
+  CHECK((wpi::math::IsDetectable<2, 1>(
+      Eigen::Matrix<double, 2, 2>{{0, 1}, {-1, 0}}, C)));
 }

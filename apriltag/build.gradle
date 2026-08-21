@@ -3,7 +3,7 @@ apply plugin: 'c'
 ext {
     nativeName = 'apriltag'
     devMain = 'org.wpilib.vision.apriltag.DevMain'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     useJava = true
     useCpp = true
     sharedCvConfigs = [

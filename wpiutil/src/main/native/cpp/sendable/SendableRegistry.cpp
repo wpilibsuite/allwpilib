@@ -322,6 +322,19 @@ Sendable* SendableRegistry::GetSendable(UID uid) {
   return inst.components[uid - 1]->sendable;
 }
 
+bool SendableRegistry::IsPublished(UID uid) {
+  auto& inst = GetInstance();
+  if (uid == 0) {
+    return false;
+  }
+  std::scoped_lock lock(inst.mutex);
+  if ((uid - 1) >= inst.components.size() || !inst.components[uid - 1]) {
+    return false;
+  }
+  auto& builder = inst.components[uid - 1]->builder;
+  return builder && builder->IsPublished();
+}
+
 void SendableRegistry::Publish(UID sendableUid,
                                std::unique_ptr<SendableBuilder> builder) {
   auto& inst = GetInstance();

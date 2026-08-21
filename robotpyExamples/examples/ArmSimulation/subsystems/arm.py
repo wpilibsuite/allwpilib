@@ -5,6 +5,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import wpilib.simulation
 import wpimath
 import wpimath.units
@@ -27,7 +28,7 @@ class Arm:
         self.encoder = wpilib.Encoder(
             Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL
         )
-        self.motor = wpilib.PWMSparkMax(Constants.MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(Constants.MOTOR_PORT)
 
         # Simulation classes help us simulate what's going on, including gravity.
         # This arm sim represents an arm that can travel from -75 degrees (rotated down front)

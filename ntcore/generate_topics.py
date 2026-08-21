@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
+
 from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
@@ -28,7 +29,7 @@ def generate_topics(
     for fn in java_template_directory.glob("*.jinja"):
         template = env.get_template(fn.name)
         outfn = fn.stem
-        if outfn.startswith("NetworkTable") or outfn.startswith("Generic"):
+        if outfn.startswith(("NetworkTable", "Generic")):
             write_file(generated_output_dir, outfn, template.render(types=types))
         else:
             for replacements in types:

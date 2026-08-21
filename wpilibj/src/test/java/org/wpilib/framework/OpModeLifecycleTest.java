@@ -29,28 +29,16 @@ class OpModeLifecycleTest {
     return OpModeOption.makeId(mode, name.hashCode());
   }
 
-  static class MockOpMode implements OpMode {
-    public final AtomicInteger constructedCount;
-    public final AtomicInteger disabledPeriodicCount;
-    public final AtomicInteger startCount;
-    public final AtomicInteger periodicCount;
-    public final AtomicInteger endCount;
-    public final AtomicInteger closeCount;
-
-    MockOpMode(
-        AtomicInteger constructedCount,
-        AtomicInteger disabledPeriodicCount,
-        AtomicInteger startCount,
-        AtomicInteger periodicCount,
-        AtomicInteger endCount,
-        AtomicInteger closeCount) {
-      this.constructedCount = constructedCount;
-      this.disabledPeriodicCount = disabledPeriodicCount;
-      this.startCount = startCount;
-      this.periodicCount = periodicCount;
-      this.endCount = endCount;
-      this.closeCount = closeCount;
-      this.constructedCount.incrementAndGet();
+  record MockOpMode(
+      AtomicInteger constructedCount,
+      AtomicInteger disabledPeriodicCount,
+      AtomicInteger startCount,
+      AtomicInteger periodicCount,
+      AtomicInteger endCount,
+      AtomicInteger closeCount)
+      implements OpMode {
+    MockOpMode {
+      constructedCount.incrementAndGet();
     }
 
     @Override
@@ -127,7 +115,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "TestOpMode",
         () ->
             new MockOpMode(
                 constructedCount,
@@ -135,9 +125,7 @@ class OpModeLifecycleTest {
                 startCount,
                 periodicCount,
                 endCount,
-                closeCount),
-        RobotMode.TELEOPERATED,
-        "TestOpMode");
+                closeCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -192,7 +180,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount2 = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "OpMode1",
         () ->
             new MockOpMode(
                 constructedCount1,
@@ -200,10 +190,10 @@ class OpModeLifecycleTest {
                 startCount1,
                 periodicCount1,
                 endCount1,
-                closeCount1),
+                closeCount1));
+    robot.addOpMode(
         RobotMode.TELEOPERATED,
-        "OpMode1");
-    robot.addOpModeFactory(
+        "OpMode2",
         () ->
             new MockOpMode(
                 constructedCount2,
@@ -211,9 +201,7 @@ class OpModeLifecycleTest {
                 startCount2,
                 periodicCount2,
                 endCount2,
-                closeCount2),
-        RobotMode.TELEOPERATED,
-        "OpMode2");
+                closeCount2));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -273,7 +261,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount2 = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "OpMode1",
         () ->
             new MockOpMode(
                 constructedCount1,
@@ -281,10 +271,10 @@ class OpModeLifecycleTest {
                 startCount1,
                 periodicCount1,
                 endCount1,
-                closeCount1),
+                closeCount1));
+    robot.addOpMode(
         RobotMode.TELEOPERATED,
-        "OpMode1");
-    robot.addOpModeFactory(
+        "OpMode2",
         () ->
             new MockOpMode(
                 constructedCount2,
@@ -292,9 +282,7 @@ class OpModeLifecycleTest {
                 startCount2,
                 periodicCount2,
                 endCount2,
-                closeCount2),
-        RobotMode.TELEOPERATED,
-        "OpMode2");
+                closeCount2));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -329,8 +317,8 @@ class OpModeLifecycleTest {
   void testGetCallbacksRunImmediatelyWhileDisabled() throws InterruptedException {
     AtomicInteger callbackCount = new AtomicInteger(0);
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
-        () -> new CallbackOpMode(callbackCount), RobotMode.TELEOPERATED, "CallbackOpMode");
+    robot.addOpMode(
+        RobotMode.TELEOPERATED, "CallbackOpMode", () -> new CallbackOpMode(callbackCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -369,7 +357,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "TestOpMode",
         () ->
             new MockOpMode(
                 constructedCount,
@@ -377,9 +367,7 @@ class OpModeLifecycleTest {
                 startCount,
                 periodicCount,
                 endCount,
-                closeCount),
-        RobotMode.TELEOPERATED,
-        "TestOpMode");
+                closeCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -416,7 +404,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "TestOpMode",
         () ->
             new MockOpMode(
                 constructedCount,
@@ -424,9 +414,7 @@ class OpModeLifecycleTest {
                 startCount,
                 periodicCount,
                 endCount,
-                closeCount),
-        RobotMode.TELEOPERATED,
-        "TestOpMode");
+                closeCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -481,7 +469,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "TestOpMode",
         () ->
             new MockOpMode(
                 constructedCount,
@@ -489,9 +479,7 @@ class OpModeLifecycleTest {
                 startCount,
                 periodicCount,
                 endCount,
-                closeCount),
-        RobotMode.TELEOPERATED,
-        "TestOpMode");
+                closeCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);
@@ -528,7 +516,9 @@ class OpModeLifecycleTest {
     AtomicInteger closeCount = new AtomicInteger(0);
 
     LifecycleRobot robot = new LifecycleRobot();
-    robot.addOpModeFactory(
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "TestOpMode",
         () ->
             new MockOpMode(
                 constructedCount,
@@ -536,9 +526,7 @@ class OpModeLifecycleTest {
                 startCount,
                 periodicCount,
                 endCount,
-                closeCount),
-        RobotMode.TELEOPERATED,
-        "TestOpMode");
+                closeCount));
     robot.publishOpModes();
 
     Thread robotThread = new Thread(robot::startCompetition);

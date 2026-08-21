@@ -4,15 +4,12 @@ load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
-    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
-
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
+        srcs = native.glob(["src/main/native/include/**"]),
         out = "native/wpihal/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "hal/src/generated/main/native/include": "",
             "hal/src/main/native/include": "",
         },
         verbose = False,
@@ -64,7 +61,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         strip_path_prefixes = ["hal"],
         entry_points = {
             "pkg_config": [
-                "mrclib = native.mrclib",
+                "mrclib = native.wpihal",
                 "wpihal = native.wpihal",
             ],
         },

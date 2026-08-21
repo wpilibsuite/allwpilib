@@ -83,17 +83,48 @@ public class Timer {
     }
   }
 
-  private double m_startTime;
-  private double m_accumulatedTime;
+  private long m_startTimeUs;
+  private double m_startTimeRemainderUs;
+  private double m_accumulatedTimeUs;
   private boolean m_running;
 
-  /** Timer constructor. */
+  /**
+   * Creates a new timer. The timer is initially not running and must be started with {@link
+   * #start()} to start measuring time. Consider using {@link #createStarted()} instead if the timer
+   * will be used immediately after creation.
+   */
   public Timer() {
     reset();
   }
 
-  private double getMsClock() {
-    return RobotController.getTime() / 1000.0;
+  /**
+   * Creates a new timer that begins started.
+   *
+   * <p>This is equivalent to
+   *
+   * {@snippet lang="java":
+   *  Timer timer = new Timer();
+   *  timer.start();
+   * }
+   *
+   * @return A new started timer.
+   */
+  public static Timer createStarted() {
+    var timer = new Timer();
+    timer.start();
+    return timer;
+  }
+
+  private long getUsClock() {
+    return RobotController.getTime();
+  }
+
+  private double getMicroseconds() {
+    if (m_running) {
+      return getUsClock() - m_startTimeUs - m_startTimeRemainderUs + m_accumulatedTimeUs;
+    } else {
+      return m_accumulatedTimeUs;
+    }
   }
 
   /**
@@ -104,11 +135,7 @@ public class Timer {
    * @return Current time value for this timer in seconds
    */
   public double get() {
-    if (m_running) {
-      return m_accumulatedTime + (getMsClock() - m_startTime) / 1000.0;
-    } else {
-      return m_accumulatedTime;
-    }
+    return getMicroseconds() / 1000000.0;
   }
 
   /**
@@ -117,8 +144,9 @@ public class Timer {
    * <p>Make the timer startTime the current time so new requests will be relative now.
    */
   public final void reset() {
-    m_accumulatedTime = 0;
-    m_startTime = getMsClock();
+    m_accumulatedTimeUs = 0.0;
+    m_startTimeUs = getUsClock();
+    m_startTimeRemainderUs = 0.0;
   }
 
   /**
@@ -128,7 +156,8 @@ public class Timer {
    */
   public void start() {
     if (!m_running) {
-      m_startTime = getMsClock();
+      m_startTimeUs = getUsClock();
+      m_startTimeRemainderUs = 0.0;
       m_running = true;
     }
   }
@@ -152,8 +181,10 @@ public class Timer {
    * clock.
    */
   public void stop() {
-    m_accumulatedTime = get();
-    m_running = false;
+    if (m_running) {
+      m_accumulatedTimeUs = getMicroseconds();
+      m_running = false;
+    }
   }
 
   /**
@@ -173,7 +204,7 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean hasElapsed(double seconds) {
-    return get() >= seconds;
+    return getMicroseconds() >= seconds * 1e6;
   }
 
   /**
@@ -185,10 +216,15 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean advanceIfElapsed(double seconds) {
-    if (get() >= seconds) {
+    double periodUs = seconds * 1e6;
+
+    if (getMicroseconds() >= periodUs) {
       // Advance the start time by the period.
       // Don't set it to the current time... we want to avoid drift.
-      m_startTime += seconds * 1000;
+      double advanceUs = m_startTimeRemainderUs + periodUs;
+      long wholeUs = (long) advanceUs;
+      m_startTimeUs += wholeUs;
+      m_startTimeRemainderUs = advanceUs - wholeUs;
       return true;
     } else {
       return false;

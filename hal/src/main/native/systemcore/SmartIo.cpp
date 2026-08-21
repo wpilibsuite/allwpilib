@@ -7,7 +7,6 @@
 #include "HALInitializer.hpp"
 #include "mrclib/SmartIO.h"
 #include "wpi/hal/AddressableLEDTypes.h"
-#include "wpi/hal/Errors.h"
 
 namespace wpi::hal {
 
@@ -22,12 +21,6 @@ void InitializeSmartIo() {
 
 }  // namespace init
 
-namespace {
-struct SmartIoInitializer {
-  MRC_Status status = MRC_SmartIO_Initialize();
-};
-}  // namespace
-
 SmartIo::~SmartIo() noexcept {
   if (closeOnDestroy) {
     MRC_SmartIO_Close(channel);
@@ -35,12 +28,6 @@ SmartIo::~SmartIo() noexcept {
 }
 
 int32_t SmartIo::InitializeMode(MRC_SmartIOMode mode) {
-  static SmartIoInitializer mrcSmartIo;
-
-  if (mrcSmartIo.status != 0) {
-    return mrcSmartIo.status;
-  }
-
   MRC_Status ret = MRC_SmartIO_InitializeMode(channel, mode);
   if (ret == 0) {
     currentMode = mode;
@@ -55,6 +42,20 @@ int32_t SmartIo::SwitchDioDirection(bool input) {
                         : MRC_SmartIOMode::MRC_SmartIOMode_DigitalOutput;
   }
   return ret;
+}
+
+int32_t SmartIo::SwitchCounterEdge(bool risingEdge) {
+  MRC_Status ret = MRC_SmartIO_SwitchCounterEdge(channel, risingEdge);
+  if (ret == 0) {
+    currentMode = risingEdge
+                      ? MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterRising
+                      : MRC_SmartIOMode::MRC_SmartIOMode_SingleCounterFalling;
+  }
+  return ret;
+}
+
+int32_t SmartIo::SetRateWindow(int32_t windowMilliseconds) {
+  return MRC_SmartIO_SetRateWindow(channel, windowMilliseconds);
 }
 
 int32_t SmartIo::SetDigitalOutput(bool value) {
@@ -118,11 +119,30 @@ int32_t SmartIo::GetAnalogInput(uint16_t* value) {
   return status;
 }
 
-int32_t SmartIo::GetCounter(int32_t* value) {
-  int32_t valueInt;
-  int32_t status = MRC_SmartIO_GetCounter(channel, &valueInt);
+int32_t SmartIo::ResetCounter() {
+  int32_t count;
+  int32_t status = MRC_SmartIO_GetCounter(channel, &count);
   if (status == 0) {
-    *value = valueInt;
+    counterResetCount = count;
+  }
+  return status;
+}
+
+int32_t SmartIo::GetCounter(int32_t* value) {
+  int32_t count;
+  int32_t status = MRC_SmartIO_GetCounter(channel, &count);
+  if (status == 0) {
+    *value =
+        static_cast<int32_t>(static_cast<int64_t>(count) - counterResetCount);
+  }
+  return status;
+}
+
+int32_t SmartIo::GetCounterRate(int32_t* value) {
+  int32_t rate;
+  int32_t status = MRC_SmartIO_GetCounterRate(channel, &rate);
+  if (status == 0) {
+    *value = rate;
   }
   return status;
 }

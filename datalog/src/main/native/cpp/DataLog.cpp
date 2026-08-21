@@ -70,17 +70,23 @@ void DataLog::StartFile() {
     return;
   }
 
+  if (m_extraHeader.size() > UINT32_MAX) {
+    WPI_ERROR(m_msglog, "extra header is too large for the data log format");
+    return;
+  }
+
   // Grab previously pending writes
   std::vector<Buffer> bufs;
   bufs.swap(m_outgoing);
   m_outgoing.reserve(bufs.size() + 1);
 
   // File header (version 1.0)
-  uint8_t* buf = Reserve(m_extraHeader.size() + 12);
+  uint8_t* buf = Reserve(12);
   static const uint8_t header[] = {'W', 'P', 'I', 'L', 'O', 'G', 0, 1};
   std::memcpy(buf, header, 8);
   wpi::util::support::endian::write32le(buf + 8, m_extraHeader.size());
-  std::memcpy(buf + 12, m_extraHeader.data(), m_extraHeader.size());
+  AppendImpl({reinterpret_cast<const uint8_t*>(m_extraHeader.data()),
+              m_extraHeader.size()});
 
   // Existing start and schema data records
   for (auto&& entryInfo : m_entries) {
@@ -109,6 +115,7 @@ void DataLog::FlushBufs(std::vector<Buffer>* writeBufs) {
   std::scoped_lock lock{m_mutex};
   writeBufs->swap(m_outgoing);
   DoReleaseBufs(&m_outgoing);
+  m_paused = m_manuallyPaused;
 }
 
 void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
@@ -118,11 +125,13 @@ void DataLog::ReleaseBufs(std::vector<Buffer>* bufs) {
 
 void DataLog::Pause() {
   std::scoped_lock lock{m_mutex};
+  m_manuallyPaused = true;
   m_paused = true;
 }
 
 void DataLog::Resume() {
   std::scoped_lock lock{m_mutex};
+  m_manuallyPaused = false;
   m_paused = false;
 }
 

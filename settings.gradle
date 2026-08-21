@@ -62,10 +62,10 @@ include 'tools:processstarter'
 include 'epilogue-processor'
 include 'epilogue-runtime'
 include 'thirdparty:catch2'
-include 'thirdparty:googletest'
 include 'thirdparty:imgui_suite'
 include 'tools:wpical'
 include 'datalog'
+include 'drivers'
 
 buildCache {
     def cred = {

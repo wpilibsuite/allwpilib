@@ -178,6 +178,8 @@ def copy_native_file(name, library, base_path):
     )
 
 def generate_native_files(name, pyproject_toml, pc_deps, libinit_files, pc_files):
+    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
+
     cmd = "$(locations //shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files) "
     cmd += "  $(location " + pyproject_toml + ")"
     cmd += " $(location " + pc_files[0] + ") "

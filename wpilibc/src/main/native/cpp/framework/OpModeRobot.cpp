@@ -209,11 +209,12 @@ void OpModeRobotBase::EndCompetition() {
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(
-    OpModeFactory factory, RobotMode mode, std::string_view name,
-    std::string_view group, std::string_view description,
-    const wpi::util::Color& textColor,
-    const wpi::util::Color& backgroundColor) {
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       std::string_view group,
+                                       std::string_view description,
+                                       const wpi::util::Color& textColor,
+                                       const wpi::util::Color& backgroundColor,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
                                      backgroundColor);
   if (id != 0) {
@@ -221,14 +222,19 @@ void OpModeRobotBase::AddOpModeFactory(
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                                       std::string_view name,
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
                                        std::string_view group,
-                                       std::string_view description) {
+                                       std::string_view description,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
+}
+
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       OpModeFactory factory) {
+  AddOpModeFactory(mode, name, {}, {}, std::move(factory));
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {

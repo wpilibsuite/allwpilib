@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import json
 import os
@@ -177,7 +177,7 @@ def main() -> None:
         parsed_json = json.load(f)
 
     if not isinstance(parsed_json, list):
-        raise ValueError(f"Expected top-level JSON array in {json_path}")
+        raise TypeError(f"Expected top-level JSON array in {json_path}")
 
     validate_entries(parsed_json, kind, is_cpp_commands)
     file_check(parsed_json, folder_path)

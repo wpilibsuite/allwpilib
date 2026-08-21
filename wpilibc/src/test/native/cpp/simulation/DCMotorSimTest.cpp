@@ -7,7 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/system/Models.hpp"
@@ -25,7 +25,7 @@ TEST_CASE("DCMotorSimTest VoltageSteadyState", "[wpilibc][simulation]") {
 
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();
@@ -75,7 +75,7 @@ TEST_CASE("DCMotorSimTest PositionFeedbackControl", "[wpilibc][simulation]") {
 
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();

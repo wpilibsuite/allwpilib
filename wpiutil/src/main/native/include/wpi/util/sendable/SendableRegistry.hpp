@@ -221,6 +221,14 @@ class SendableRegistry final {
   static Sendable* GetSendable(UID uid);
 
   /**
+   * Gets whether an object is published.
+   *
+   * @param uid unique id
+   * @return whether the object is published
+   */
+  static bool IsPublished(UID uid);
+
+  /**
    * Publishes an object in the registry.
    *
    * @param sendableUid sendable unique id

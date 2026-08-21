@@ -4,6 +4,7 @@
 
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
 
+#include <array>
 #include <cmath>
 #include <cstddef>
 #include <numbers>
@@ -13,6 +14,7 @@
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
@@ -426,7 +428,8 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
 
   std::array<Rotation2d, 4> expectedAngles;
   for (size_t i = 0; i < 4; i++) {
-    Rotation2d radiusAngle = m_kinematics.GetModules()[i].Angle();
+    Rotation2d radiusAngle =
+        m_kinematics.GetModules()[i].Angle().value_or(0_deg);
 
     // Tangential acceleration: perpendicular to radius (90° CCW from radius)
     Rotation2d tangentialDirection = radiusAngle + Rotation2d{90_deg};

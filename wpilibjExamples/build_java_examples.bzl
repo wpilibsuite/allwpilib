@@ -49,6 +49,7 @@ def build_examples(folders, halsim_deps):
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
@@ -78,6 +79,7 @@ def build_commands(folders):
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
@@ -110,6 +112,7 @@ def build_snippets(folders):
                 "//apriltag:apriltag-java",
                 "//cameraserver:cameraserver-java",
                 "//cscore:cscore-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
@@ -139,6 +142,7 @@ def build_templates(folders):
             ],
             deps = [
                 "//allwpilib-java:allwpilib-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//wpilibj:wpilibj-java",
@@ -173,6 +177,7 @@ def build_tests(example_test_folders, snippet_test_folders):
             deps = [
                 ":" + folder + "-example",
                 "//allwpilib-java:allwpilib-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",
@@ -207,6 +212,7 @@ def build_tests(example_test_folders, snippet_test_folders):
             deps = [
                 ":" + folder + "-snippet",
                 "//allwpilib-java:allwpilib-java",
+                "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
                 "//ntcore:ntcore-java",

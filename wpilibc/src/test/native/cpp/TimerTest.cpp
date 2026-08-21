@@ -4,17 +4,35 @@
 
 #include "wpi/system/Timer.hpp"
 
+#include <stdint.h>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/system/RobotController.hpp"
 
 using namespace wpi;
 
 namespace {
+uint64_t mockTime = 0;
+
+class ScopedMockTimeSource {
+ public:
+  ScopedMockTimeSource() {
+    RobotController::SetTimeSource([] { return mockTime; });
+  }
+
+  ~ScopedMockTimeSource() {
+    RobotController::SetTimeSource(
+        [] { return RobotController::GetMonotonicTime(); });
+  }
+};
+
 class TimerTest {
  public:
   TimerTest() {
+    mockTime = 0;
     wpi::sim::PauseTiming();
     wpi::sim::RestartTiming();
   }
@@ -47,6 +65,11 @@ TEST_CASE_METHOD(TimerTest, "TimerTest StartStop", "[wpilibc]") {
   CHECK_FALSE(timer.IsRunning());
 }
 
+TEST_CASE_METHOD(TimerTest, "TimerTest CreateStarted", "[wpilibc]") {
+  Timer timer = Timer::CreateStarted();
+  CHECK(timer.IsRunning());
+}
+
 TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
   Timer timer;
   timer.Start();
@@ -69,6 +92,23 @@ TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
   timer.Reset();
   wpi::sim::StepTiming(500_ms);
   CHECK(timer.Get() == 0_ms);
+}
+
+TEST_CASE_METHOD(TimerTest, "TimerTest ResetWithLargeTimestamp", "[wpilibc]") {
+  ScopedMockTimeSource timeSource;
+  mockTime = 1'000'002;
+
+  Timer timer;
+  timer.Start();
+
+  mockTime += 500'000;
+  CHECK(timer.Get() == 500_ms);
+
+  timer.Reset();
+  CHECK(timer.Get() == 0_s);
+
+  mockTime += 500'000;
+  CHECK(timer.Get() == 500_ms);
 }
 
 TEST_CASE_METHOD(TimerTest, "TimerTest HasElapsed", "[wpilibc]") {
@@ -111,6 +151,47 @@ TEST_CASE_METHOD(TimerTest, "TimerTest AdvanceIfElapsed", "[wpilibc]") {
   CHECK(timer.AdvanceIfElapsed(400_ms));
   CHECK(timer.AdvanceIfElapsed(400_ms));
   CHECK_FALSE(timer.AdvanceIfElapsed(400_ms));
+}
+
+TEST_CASE_METHOD(TimerTest,
+                 "TimerTest AdvanceIfElapsedPreservesFractionalPeriod",
+                 "[wpilibc]") {
+  ScopedMockTimeSource timeSource;
+  mockTime = 0;
+
+  Timer timer;
+  timer.Start();
+
+  auto period = wpi::units::second_t{1.0 / 60.0};
+
+  for (uint64_t i = 1; i <= 60; ++i) {
+    mockTime = (i * 1'000'000 + 59) / 60 + 100;
+
+    CHECK(timer.AdvanceIfElapsed(period));
+    CHECK_FALSE(timer.AdvanceIfElapsed(period));
+  }
+
+  CHECK_THAT(timer.Get().value(), Catch::Matchers::WithinAbs(100e-6, 1e-12));
+}
+
+TEST_CASE_METHOD(TimerTest,
+                 "TimerTest AdvanceIfElapsedProgressesWithSubMicrosecondPeriod",
+                 "[wpilibc]") {
+  ScopedMockTimeSource timeSource;
+  mockTime = 0;
+
+  Timer timer;
+  timer.Start();
+
+  mockTime = 1;
+  auto period = wpi::units::microsecond_t{0.1};
+
+  for (int i = 0; i < 10; ++i) {
+    CHECK(timer.AdvanceIfElapsed(period));
+  }
+
+  CHECK_FALSE(timer.AdvanceIfElapsed(period));
+  CHECK_THAT(timer.Get().value(), Catch::Matchers::WithinAbs(0.0, 1e-12));
 }
 
 TEST_CASE_METHOD(TimerTest, "TimerTest GetMonotonicTimestamp", "[wpilibc]") {

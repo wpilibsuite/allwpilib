@@ -509,6 +509,7 @@ class DataLog {
   mutable wpi::util::mutex m_mutex;
   bool m_active = false;
   bool m_paused = false;
+  bool m_manuallyPaused = false;
   std::string m_extraHeader;
   std::vector<Buffer> m_free;
   std::vector<Buffer> m_outgoing;

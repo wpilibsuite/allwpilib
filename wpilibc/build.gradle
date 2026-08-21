@@ -8,7 +8,7 @@ apply plugin: ExtraTasks
 
 ext {
     nativeName = 'wpilibc'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 apply from: "${rootDir}/shared/config.gradle"
@@ -54,13 +54,8 @@ gradle.taskGraph.addTaskExecutionGraphListener { graph ->
 
 project(':').libraryBuild.dependsOn build
 
-ext {
-    staticGtestConfigs = [:]
-}
-
-staticGtestConfigs["${nativeTestSuiteName}"] = []
-
 apply from: "${rootDir}/shared/catch2.gradle"
+apply from: "${rootDir}/shared/libmrclib.gradle"
 
 nativeUtils.exportsConfigs {
     wpilibc {
@@ -109,7 +104,10 @@ model {
                 }
 
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                project(':hal').addHalDependency(it, 'shared')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -130,7 +128,10 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                project(':hal').addHalDependency(it, 'shared')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -155,7 +156,10 @@ model {
             }
             binaries.all {
                 project(':ntcore').addNtcoreDependency(it, 'shared')
-                project(':hal').addHalDependency(it, 'shared')
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(it, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
@@ -204,9 +208,6 @@ model {
                     srcDirs 'src/test/native/include'
                 }
             }
-            binaries.all {
-                lib project: ':thirdparty:catch2', library: 'catch2', linkage: 'static'
-            }
         }
     }
     binaries {
@@ -217,7 +218,10 @@ model {
         }
         withType(GoogleTestTestSuiteBinarySpec) {
             project(':ntcore').addNtcoreDependency(it, 'shared')
-            project(':hal').addHalDependency(it, 'shared')
+            if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                nativeUtils.useRequiredLibrary(it, 'mrclib')
+            }
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'

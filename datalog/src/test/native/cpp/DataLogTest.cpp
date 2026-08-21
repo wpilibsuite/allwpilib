@@ -3,14 +3,20 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <array>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <string>
+#include <thread>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "wpi/datalog/DataLogReader.hpp"
 #include "wpi/datalog/DataLogWriter.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
 namespace {
@@ -134,6 +140,77 @@ class DataLogTest {
   wpi::log::DataLogWriter log{
       msglog, std::make_unique<wpi::util::raw_uvector_ostream>(data)};
 };
+
+TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
+          "[datalog][data-log]") {
+  auto output = std::make_shared<std::vector<uint8_t>>();
+  auto writer = std::make_shared<wpi::log::DataLogWriter>(
+      std::make_unique<wpi::util::raw_uvector_ostream>(*output));
+  int entry = writer->Start("raw", "raw", {}, 1);
+  auto payload = std::make_shared<std::vector<uint8_t>>(2 * 1024 * 1024);
+  std::promise<void> complete;
+  auto completed = complete.get_future();
+  std::thread appendThread{[writer, output, payload, entry,
+                            complete = std::move(complete)]() mutable {
+    writer->AppendRaw(entry, *payload, 2);
+    complete.set_value();
+  }};
+
+  if (completed.wait_for(std::chrono::seconds{2}) !=
+      std::future_status::ready) {
+    appendThread.detach();
+    FAIL("large foreground append deadlocked");
+  }
+  appendThread.join();
+  writer->Flush();
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(*output, "large-append")};
+  bool found = false;
+  for (const auto& record : reader) {
+    if (record.GetEntry() == entry && record.GetSize() == payload->size()) {
+      found = true;
+    }
+  }
+  CHECK(found);
+}
+
+TEST_CASE("DataLogTest FlushDoesNotResumeManualPause", "[datalog][data-log]") {
+  std::vector<uint8_t> output;
+  wpi::log::DataLogWriter writer{
+      std::make_unique<wpi::util::raw_uvector_ostream>(output)};
+  int entry = writer.Start("integer", "int64", {}, 1);
+  writer.Pause();
+  writer.Flush();
+  writer.AppendInteger(entry, 42, 2);
+  writer.Flush();
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(output, "manual-pause")};
+  REQUIRE(reader.IsValid());
+  for (const auto& record : reader) {
+    CHECK(record.GetEntry() != entry);
+  }
+}
+
+TEST_CASE("DataLogTest ExtraHeaderCrossesBufferBoundary",
+          "[datalog][data-log]") {
+  for (size_t size : {0u, 16372u, 16373u, 20000u, 32768u}) {
+    DYNAMIC_SECTION("size=" << size) {
+      std::vector<uint8_t> output;
+      std::string expected(size, 'x');
+      {
+        wpi::log::DataLogWriter writer{
+            std::make_unique<wpi::util::raw_uvector_ostream>(output), expected};
+        writer.Flush();
+      }
+      wpi::log::DataLogReader reader{
+          wpi::util::MemoryBuffer::GetMemBufferCopy(output, "extra-header")};
+      REQUIRE(reader.IsValid());
+      CHECK(reader.GetExtraHeader() == expected);
+    }
+  }
+}
 
 TEST_CASE_METHOD(DataLogTest, "DataLogTest SimpleInt", "[datalog][data-log]") {
   int entry = log.Start("test", "int64", "", 1);

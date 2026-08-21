@@ -64,7 +64,9 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
-target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+endif()
 
 target_compile_features(wpimath PUBLIC cxx_std_23)
 if(MSVC)
@@ -144,7 +146,7 @@ install(FILES ${WPILIB_BINARY_DIR}/wpimath-config.cmake DESTINATION share/wpimat
 install(EXPORT wpimath DESTINATION share/wpimath)
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpimath src/test/native/cpp)
+    wpilib_add_test(wpimath src/test/native/cpp)
     target_include_directories(wpimath_test PRIVATE src/test/native/include)
     target_link_libraries(wpimath_test wpimath)
 endif()

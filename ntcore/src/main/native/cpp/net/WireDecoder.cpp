@@ -5,8 +5,10 @@
 #include "WireDecoder.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <concepts>
 #include <format>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,6 +16,7 @@
 #include "Message.hpp"
 #include "MessageHandler.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mpack.h"
@@ -244,8 +247,15 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
                 error = "periodic value must be a number";
                 goto err;
               }
+              if (!std::isfinite(val) || val < 0 ||
+                  val > static_cast<double>(
+                            std::numeric_limits<unsigned int>::max()) /
+                            1000.0) {
+                error = "periodic value out of range";
+                goto err;
+              }
               options.periodic = val;
-              options.periodicMs = val * 1000;
+              options.periodicMs = static_cast<unsigned int>(val * 1000.0);
             }
 
             // send all changes
@@ -583,7 +593,16 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
   }
   // set time
   outValue->SetServerTime(time);
-  outValue->SetTime(time == 0 ? 0 : time + localTimeOffset);
+  if (time == 0) {
+    outValue->SetTime(0);
+  } else {
+    int64_t localTime;
+    if (wpi::util::AddOverflow(time, localTimeOffset, localTime)) {
+      *error = "timestamp out of range";
+      return false;
+    }
+    outValue->SetTime(localTime);
+  }
   // update input range
   *in = wpi::util::take_back(*in, remaining);
   return true;

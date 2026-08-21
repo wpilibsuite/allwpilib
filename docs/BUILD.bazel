@@ -23,6 +23,7 @@ paths = [
     "wpiutil/src/main/native/include",
     "wpiutil/src/main/native/thirdparty/argparse/include",
     "wpiutil/src/main/native/thirdparty/debugging/include",
+    "wpiutil/src/main/native/thirdparty/htrie/include",
     "wpiutil/src/main/native/thirdparty/json/include",
     "wpiutil/src/main/native/thirdparty/llvm/include",
     "wpiutil/src/main/native/thirdparty/mpack/include",
@@ -62,6 +63,7 @@ doxygen(
         "//cameraserver:doxygen-files",
         "//commandsv2:doxygen-files",
         "//cscore:doxygen-files",
+        "//drivers:doxygen-files",
         "//fields:doxygen-files",
         "//hal:doxygen-files",
         "//ntcore:doxygen-files",
@@ -101,6 +103,8 @@ doxygen(
         "*/uv/**",
         # mpack
         "*/wpi/util/mpack.h",
+        # hat-trie internal helpers
+        "*/wpi/util/array-hash/**",
         # units
         "*/wpi/units/**",
     ],
@@ -142,6 +146,7 @@ javadoc(
         "//commandsv2:commandsv2-java",
         "//commandsv3:commandsv3-java",
         "//cscore:cscore-java",
+        "//drivers:drivers-java",
         "//epilogue-runtime:epilogue-java",
         "//fields:fields-java",
         "//hal:hal-java",

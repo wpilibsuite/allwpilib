@@ -41,16 +41,25 @@ HAL_CounterHandle HAL_InitializeCounter(int channel, HAL_Bool risingEdge,
 void HAL_FreeCounter(HAL_CounterHandle counterHandle);
 
 /**
- * Sets the up source to either detect rising edges or falling edges.
- *
- * Note that both are allowed to be set true at the same time without issues.
+ * Sets the counter to detect rising or falling edges.
  *
  * @param[in] counterHandle  the counter handle
- * @param[in] risingEdge     true to trigger on rising
+ * @param[in] risingEdge     true to count rising edges, false to count falling
  * @param[out] status        Error status variable. 0 on success.
  */
 void HAL_SetCounterEdgeConfiguration(HAL_CounterHandle counterHandle,
                                      HAL_Bool risingEdge, int32_t* status);
+
+/**
+ * Sets the time window used to calculate the counter rate.
+ *
+ * @param[in] counterHandle      the counter handle
+ * @param[in] windowMilliseconds the rate calculation window in milliseconds;
+ *                               valid values are 5 through 255
+ * @param[out] status            Error status variable. 0 on success.
+ */
+void HAL_SetCounterRateWindow(HAL_CounterHandle counterHandle,
+                              int32_t windowMilliseconds, int32_t* status);
 
 /**
  * Resets the Counter to zero.
@@ -76,43 +85,22 @@ void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
- * Gets the Period of the most recent count.
- *
- * Returns the time interval of the most recent count. This can be used for
- * velocity calculations to determine shaft velocity.
+ * Gets the current counter rate.
  *
  * @param[in] counterHandle the counter handle
  * @param[out] status       Error status variable. 0 on success.
- * @return the period of the last two pulses in units of seconds
+ * @return the counter rate in counts per second
  */
-double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);
-
-/**
- * Sets the maximum period where the device is still considered "moving".
- *
- * Sets the maximum period where the device is considered moving. This value is
- * used to determine the "stopped" state of the counter using the
- * HAL_GetCounterStopped method.
- *
- * @param[in] counterHandle the counter handle
- * @param[in] maxPeriod     the maximum period where the counted device is
- *                          considered moving in seconds
- * @param[out] status       Error status variable. 0 on success.
- */
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counterHandle, double maxPeriod,
-                             int32_t* status);
+double HAL_GetCounterRate(HAL_CounterHandle counterHandle, int32_t* status);
 
 /**
  * Determines if the clock is stopped.
  *
- * Determine if the clocked input is stopped based on the MaxPeriod value set
- * using the SetMaxPeriod method. If the clock exceeds the MaxPeriod, then the
- * device (and counter) are assumed to be stopped and it returns true.
+ * Determines if the counter's current rate is zero.
  *
  * @param[in] counterHandle the counter handle
  * @param[out] status       Error status variable. 0 on success.
- * @return true if the most recent counter period exceeds the MaxPeriod value
- *         set by SetMaxPeriod
+ * @return true if the counter's current rate is zero
  */
 HAL_Bool HAL_GetCounterStopped(HAL_CounterHandle counterHandle,
                                int32_t* status);

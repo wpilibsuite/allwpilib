@@ -5,10 +5,10 @@
 package org.wpilib.examples.gyro;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.util.sendable.SendableRegistry;
 
 /**

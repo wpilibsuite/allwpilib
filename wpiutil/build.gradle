@@ -1,3 +1,6 @@
+import org.gradle.internal.jvm.Jvm
+import org.wpilib.jni.JniSystemDependencySet
+
 apply from: "${rootDir}/shared/resources.gradle"
 
 apply plugin: 'c'
@@ -7,7 +10,7 @@ ext {
     groupId = 'org.wpilib.wpiutil'
 
     nativeName = 'wpiutil'
-    nativeTestSuiteName = "${nativeName}Catch2Test"
+    nativeTestSuiteName = "${nativeName}Test"
     devMain = 'org.wpilib.util.DevMain'
     def generateTask = createGenerateResourcesTask('main', 'WPI', 'wpi', project)
 
@@ -148,6 +151,7 @@ cppHeadersZip {
         'src/main/native/thirdparty/argparse/include',
         'src/main/native/thirdparty/debugging/include',
         'src/main/native/thirdparty/double-conversion/include',
+        'src/main/native/thirdparty/htrie/include',
         'src/main/native/thirdparty/json/include',
         'src/main/native/thirdparty/llvm/include',
         'src/main/native/thirdparty/mpack/include',
@@ -196,7 +200,7 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/double-conversion/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/argparse/include/', 'src/main/native/thirdparty/debugging/include', 'src/main/native/thirdparty/double-conversion/include', 'src/main/native/thirdparty/htrie/include', 'src/main/native/thirdparty/llvm/include', 'src/main/native/thirdparty/sigslot/include', 'src/main/native/thirdparty/json/include', 'src/main/native/thirdparty/mpack/include', 'src/main/native/thirdparty/nanopb/include', 'src/main/native/thirdparty/upb/include'
                 }
             }
         }
@@ -219,6 +223,24 @@ model {
                     srcDirs 'src/test/native/include', 'src/generated/test/native/cpp'
                 }
             }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            def jniIncludeDir = new File(Jvm.current().javaHome, 'include')
+            def jniHeaderLocations = [jniIncludeDir.toString()]
+            [
+                'darwin',
+                'linux',
+                'win32',
+                'freebsd'
+            ].each {
+                def platformIncludeDir = new File(jniIncludeDir, it)
+                if (platformIncludeDir.exists()) {
+                    jniHeaderLocations << platformIncludeDir.toString()
+                }
+            }
+            lib(new JniSystemDependencySet(jniHeaderLocations, project))
         }
     }
 }

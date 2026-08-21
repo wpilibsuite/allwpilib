@@ -56,7 +56,7 @@ wpilib_java_library(
         "wpilib.command3",
         ["commandsv3/src/generated/main/java"],
     ),
-    maven_artifact_name = "commands3-java",
+    maven_artifact_name = "commandsv3-java",
     maven_group_id = "org.wpilib",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],

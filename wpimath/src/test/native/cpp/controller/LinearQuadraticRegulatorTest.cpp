@@ -195,4 +195,40 @@ TEST_CASE("LinearQuadraticRegulatorTest LatencyCompensate", "[wpimath]") {
   CHECK_NEAR(0.07904881, controller.K(0, 1), 1e-3);
 }
 
+TEST_CASE("LinearQuadraticRegulatorTest AtReference", "[wpimath]") {
+  LinearSystem<2, 1, 1> plant = [] {
+    auto motors = DCMotor::Vex775Pro(2);
+
+    // Carriage mass
+    constexpr auto m = 5_kg;
+
+    // Radius of pulley
+    constexpr auto r = 0.0181864_m;
+
+    // Gear ratio
+    constexpr double G = 40.0 / 40.0;
+
+    return wpi::math::Models::ElevatorFromPhysicalConstants(motors, m, r, G)
+        .Slice(0);
+  }();
+  LinearQuadraticRegulator<2, 1> controller{plant, {0.02, 0.4}, {12.0}, 5_ms};
+
+  // Default tolerance is zero; with zero error the controller is at reference.
+  controller.Calculate(Vectord<2>{0.0, 0.0}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
+
+  controller.SetTolerance(Vectord<2>{0.1, 0.2});
+
+  // The error is r - x, so with r = 0 the error is -x.
+  controller.Calculate(Vectord<2>{0.05, 0.1}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
+
+  controller.Calculate(Vectord<2>{0.2, 0.1}, Vectord<2>{0.0, 0.0});
+  CHECK_FALSE(controller.AtReference());
+
+  // Error exactly at the tolerance boundary is considered at reference.
+  controller.Calculate(Vectord<2>{0.1, 0.2}, Vectord<2>{0.0, 0.0});
+  CHECK(controller.AtReference());
+}
+
 }  // namespace wpi::math

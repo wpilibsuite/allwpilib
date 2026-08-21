@@ -31,6 +31,12 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run ada.py
+        run: |
+          cd upstream_utils
+          ./ada.py clone
+          ./ada.py copy-src
+          ./ada.py format-patch
       - name: Run apriltag.py
         run: |
           cd upstream_utils
@@ -67,12 +73,12 @@ jobs:
           ./gcem.py clone
           ./gcem.py copy-src
           ./gcem.py format-patch
-      - name: Run googletest.py
+      - name: Run htrie.py
         run: |
           cd upstream_utils
-          ./googletest.py clone
-          ./googletest.py copy-src
-          ./googletest.py format-patch
+          ./htrie.py clone
+          ./htrie.py copy-src
+          ./htrie.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils
@@ -103,6 +109,12 @@ jobs:
           ./libuv.py clone
           ./libuv.py copy-src
           ./libuv.py format-patch
+      - name: Run llhttp.py
+        run: |
+          cd upstream_utils
+          ./llhttp.py clone
+          ./llhttp.py copy-src
+          ./llhttp.py format-patch
       - name: Run llvm.py
         run: |
           cd upstream_utils

@@ -294,6 +294,24 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num, Outputs ex
   }
 
   /**
+   * Returns true if the error is within the tolerance set by setTolerance() for every state.
+   *
+   * @return True if the error is within tolerance of the reference.
+   */
+  public boolean atReference() {
+    return m_controller.atReference();
+  }
+
+  /**
+   * Sets the error which is considered tolerable for use with atReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  public void setTolerance(Matrix<States, N1> tolerance) {
+    m_controller.setTolerance(tolerance);
+  }
+
+  /**
    * Get the function used to clamp the input u.
    *
    * @return The clamping function.

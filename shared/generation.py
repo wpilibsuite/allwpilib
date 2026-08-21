@@ -4,23 +4,26 @@
 import argparse
 import subprocess
 import sys
-from enum import Enum, auto
+from collections.abc import Sequence
+from enum import Flag, auto
 from pathlib import Path
 
 
-class GeneratorTypes(Enum):
+class GeneratorTypes(Flag):
+    NONE = 0
     QUICKBUF = auto()
     NANOPB = auto()
 
 
 def make_arg_parser(
-    subproject_root: Path, repo_root: Path, *args
+    subproject_root: Path, repo_root: Path, types: GeneratorTypes = GeneratorTypes.NONE
 ) -> argparse.ArgumentParser:
     """Creates an ArgumentParser configured for QuickBuffers or nanopb generation.
 
     Keyword arguments:
     subproject_root -- Path to the subproject root. Determines default output and proto directories.
     repo_root -- Path to the repo root. Used to find the nanopb generator.
+    types -- Flagset of all the types of generators arguments are neede for.
 
     Returns:
     The ArgumentParser with the necessary arguments.
@@ -32,14 +35,14 @@ def make_arg_parser(
         default=subproject_root / "src/generated",
         type=Path,
     )
-    if GeneratorTypes.QUICKBUF in args or GeneratorTypes.NANOPB in args:
+    if GeneratorTypes.QUICKBUF in types or GeneratorTypes.NANOPB in types:
         parser.add_argument(
             "--proto_directory",
             help="Optional. If set, will use this directory to glob for protobuf files",
             default=subproject_root / "src/main/proto",
             type=Path,
         )
-    if GeneratorTypes.QUICKBUF in args:
+    if GeneratorTypes.QUICKBUF in types:
         parser.add_argument(
             "--protoc",
             help="Protoc executable command",
@@ -49,7 +52,7 @@ def make_arg_parser(
             "--quickbuf_plugin",
             help="Optional if you use protoc-quickbuf as protoc. Path to the quickbuf protoc plugin.",
         )
-    if GeneratorTypes.NANOPB in args:
+    if GeneratorTypes.NANOPB in types:
         parser.add_argument(
             "--nanopb",
             help="Nanopb generator command",
@@ -121,7 +124,7 @@ def generate_quickbuf(
             # Optional if using protoc-quickbuf
             args += [f"--plugin=protoc-gen-quickbuf={quickbuf_plugin}"]
         args += [
-            f"--quickbuf_out=gen_descriptors=true:{str(output_directory.absolute())}",
+            f"--quickbuf_out=gen_descriptors=true:{output_directory.absolute()!s}",
             f"-I{proto_dir.absolute()}",
             str(path.absolute()),
         ]
@@ -143,7 +146,7 @@ def generate_nanopb(
     nanopb: Path,
     output_directory: Path,
     proto_dir: Path,
-    extra_search_dirs: list[Path] = [],
+    extra_search_dirs: Sequence[Path] = (),
 ) -> None:
     """Generates QuickBuffers files.
 
