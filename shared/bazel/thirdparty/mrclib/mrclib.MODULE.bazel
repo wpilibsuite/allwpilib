@@ -19,7 +19,9 @@ _LIB_ARTIFACTS = {
 
 http_archive(
     name = "mrclib_headers",
-    build_file_content = """
+    build_file_content = """\
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "headers",
     hdrs = glob(["**"]),
