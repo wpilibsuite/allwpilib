@@ -46,14 +46,14 @@ void CheckFeasible(
 TEST_CASE("TrapezoidProfileTest ConstraintsRequirePositiveValues",
           "[wpimath]") {
   using Constraints =
-      wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints;
+      wpi::math::TrapezoidProfile<wpi::units::meters_>::Constraints;
 
   STATIC_REQUIRE(!std::is_default_constructible_v<Constraints>);
-  CHECK_THROWS_AS(Constraints(0_mps, 1_mps_sq), std::domain_error);
-  CHECK_THROWS_AS(Constraints(1_mps, 0_mps_sq), std::domain_error);
-  CHECK_THROWS_AS(Constraints(-1_mps, 1_mps_sq), std::domain_error);
-  CHECK_THROWS_AS(Constraints(1_mps, -1_mps_sq), std::domain_error);
-  CHECK_NOTHROW(Constraints(1_mps, 1_mps_sq));
+  CHECK_THROWS_AS(Constraints(0_mps, 1_mps2), std::domain_error);
+  CHECK_THROWS_AS(Constraints(1_mps, 0_mps2), std::domain_error);
+  CHECK_THROWS_AS(Constraints(-1_mps, 1_mps2), std::domain_error);
+  CHECK_THROWS_AS(Constraints(1_mps, -1_mps2), std::domain_error);
+  CHECK_NOTHROW(Constraints(1_mps, 1_mps2));
 }
 
 TEST_CASE("TrapezoidProfileTest CheckTiming", "[wpimath]") {

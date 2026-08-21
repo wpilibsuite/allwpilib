@@ -54,7 +54,7 @@ struct UnitsTunableTest {
 };
 
 struct UnitMemberComplex : public ComplexTunable {
-  wpi::units::meter_t distance{1.0};
+  wpi::units::meters<> distance{1.0};
 
   void PublishTunable(TunableTable& table) override {
     table.Publish("distance", this, &UnitMemberComplex::distance);

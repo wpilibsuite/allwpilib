@@ -21,14 +21,13 @@ namespace detail {
 template <class Distance>
 class TrapezoidProfileConstraints {
  public:
-  using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Velocity_t = wpi::units::unit_t<Velocity>;
-  using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+  using Distance_t = wpi::units::unit<Distance>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity_t = wpi::units::unit<Velocity>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration_t = wpi::units::unit<Acceleration>;
 
   /// Maximum velocity.
   Velocity_t maxVelocity{0};

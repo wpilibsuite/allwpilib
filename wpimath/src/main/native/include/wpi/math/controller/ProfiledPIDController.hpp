@@ -486,17 +486,15 @@ class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
   }
 
  private:
-  using BaseDistance =
-      wpi::units::unit<std::ratio<1>,
-                       wpi::units::traits::base_unit_of<Distance>>;
-  using BaseDistance_t = wpi::units::unit_t<BaseDistance>;
-
+  using BaseDistance = wpi::units::conversion_factor<
+      std::ratio<1>, wpi::units::traits::dimension_of_t<Distance>>;
+  using BaseUnit = wpi::units::unit<BaseDistance>;
   static constexpr double ToBaseGoalPosition(Distance_t position) {
-    return BaseDistance_t{position}.value();
+    return BaseUnit{position}.value();
   }
 
   static constexpr Distance_t FromBaseGoalPosition(double position) {
-    return BaseDistance_t{position};
+    return BaseUnit{position};
   }
 
   PIDController m_controller;

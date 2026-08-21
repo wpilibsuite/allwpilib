@@ -137,7 +137,7 @@ TEST_CASE("ProfiledPIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
           "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
@@ -176,7 +176,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedNestedControllerGainUpdatesState",
           "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
@@ -201,7 +201,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedNestedControllerGainUpdatesState",
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedGoalUpdatesGoal", "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();

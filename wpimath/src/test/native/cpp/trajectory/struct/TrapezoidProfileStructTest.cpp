@@ -14,7 +14,7 @@ using namespace wpi::math;
 
 TEST_CASE("TrapezoidProfileStructTest NonBaseDistanceConstraintRoundtrip",
           "[wpimath]") {
-  using Constraints = TrapezoidProfile<wpi::units::feet>::Constraints;
+  using Constraints = TrapezoidProfile<wpi::units::feet_>::Constraints;
   using StructType = wpi::util::Struct<Constraints>;
 
   const Constraints expected{Constraints::Velocity_t{3.0},
@@ -40,7 +40,7 @@ TEST_CASE("TrapezoidProfileStructTest NonBaseDistanceConstraintRoundtrip",
 
 TEST_CASE("TrapezoidProfileStructTest ConstraintsRejectZeroOnUnpack",
           "[wpimath]") {
-  using Constraints = TrapezoidProfile<wpi::units::meters>::Constraints;
+  using Constraints = TrapezoidProfile<wpi::units::meters_>::Constraints;
   using StructType = wpi::util::Struct<Constraints>;
 
   uint8_t zeroVelocityBuffer[StructType::GetSize()];

@@ -8,7 +8,7 @@ classes:
     - wpi::units::meters_per_second_squared_
     - wpi::units::radians_per_second_
     - wpi::units::radians_per_second_squared_
-    - wpi::units::compound_unit
+    - wpi::units::compound_conversion_factor
     attributes:
       kVLinear:
       kALinear:
