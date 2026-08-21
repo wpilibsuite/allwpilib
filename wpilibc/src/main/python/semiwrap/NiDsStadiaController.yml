@@ -1,12 +1,9 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::NiDsStadiaController:
     force_no_trampoline: true
-    ignored_bases:
-    - wpi::util::SendableHelper<NiDsStadiaController>
     methods:
       NiDsStadiaController:
         overloads:
@@ -88,7 +85,8 @@ classes:
       GetName:
       GetPort:
       SetRumble:
-      InitSendable:
+      GetTelemetryType:
+      LogTo:
   wpi::NiDsStadiaController::Button:
     attributes:
       kA:

@@ -7,7 +7,7 @@
 #include <string>
 
 #include "wpi/framework/TimesliceRobot.hpp"
-#include "wpi/smartdashboard/SendableChooser.hpp"
+#include "wpi/tunables/Selectable.hpp"
 
 class Robot : public wpi::TimesliceRobot {
  public:
@@ -23,7 +23,7 @@ class Robot : public wpi::TimesliceRobot {
   void UtilityPeriodic() override;
 
  private:
-  wpi::SendableChooser<std::string> chooser;
+  wpi::tunables::Selectable<std::string> chooser;
   const std::string kAutoNameDefault = "Default";
   const std::string kAutoNameCustom = "My Auto";
   std::string autoSelected;

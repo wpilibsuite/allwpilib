@@ -4,13 +4,13 @@
 
 #include "Robot.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/util/print.hpp"
 
 Robot::Robot() {
-  chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
-  chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
-  wpi::SmartDashboard::PutData("Auto Modes", &chooser);
+  chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+  chooser.Add(kAutoNameCustom, kAutoNameCustom);
+  wpi::tunables::Publish("Auto Modes", chooser);
 }
 
 /**
@@ -31,8 +31,9 @@ void Robot::RobotPeriodic() {}
  * auto name from the text box below the Gyro.
  *
  * You can add additional auto modes by adding additional comparisons to the
- * if-else structure below with additional strings. If using the SendableChooser
- * make sure to add them to the chooser code above as well.
+ * if-else structure below with additional strings. If using
+ * wpi::tunables::Selectable make sure to add them to the chooser code above as
+ * well.
  */
 void Robot::AutonomousInit() {
   autoSelected = chooser.GetSelected();

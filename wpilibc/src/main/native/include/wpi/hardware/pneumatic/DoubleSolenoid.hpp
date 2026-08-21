@@ -10,8 +10,7 @@
 #include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,8 +21,7 @@ namespace wpi {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public wpi::util::Sendable,
-                       public wpi::util::SendableHelper<DoubleSolenoid> {
+class DoubleSolenoid : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Possible values for a DoubleSolenoid.
@@ -126,7 +124,9 @@ class DoubleSolenoid : public wpi::util::Sendable,
    */
   bool IsRevSolenoidDisabled() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

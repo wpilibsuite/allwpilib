@@ -1,0 +1,53 @@
+classes:
+  wpi::telemetry::TelemetryEntry:
+    methods:
+      TelemetryEntry:
+      IsDiscard:
+      KeepDuplicates:
+      SetProperty:
+      LogBoolean:
+      LogInt8:
+      LogInt16:
+      LogInt32:
+      LogInt64:
+      LogFloat:
+      LogDouble:
+      LogString:
+      LogBooleanArray:
+        overloads:
+          std::span<const bool>:
+          std::span<const int>:
+            ignore: true
+      LogInt16Array:
+      LogInt32Array:
+      LogInt64Array:
+      LogFloatArray:
+      LogDoubleArray:
+      LogStringArray:
+        overloads:
+          std::span<const std::string>:
+          std::span<const std::string_view>:
+            ignore: true
+      LogRaw:
+    trampoline_inline_code: |
+      void LogBooleanArray(std::span<const int> value) override {
+        using LookupBase = typename PyTrampolineCfg::Base;
+        SEMIWRAP_OVERRIDE_PURE_NAME(TelemetryEntry, PYBIND11_TYPE(void),
+          LookupBase, "log_boolean_array", LogBooleanArray, value);
+      }
+
+      void LogStringArray(std::span<const std::string_view> value) override {
+        using LookupBase = typename PyTrampolineCfg::Base;
+        SEMIWRAP_OVERRIDE_PURE_NAME(TelemetryEntry, PYBIND11_TYPE(void),
+          LookupBase, "log_string_array", LogStringArray, value);
+      }
+    inline_code: |
+      .def("log_boolean_array", static_cast<void (wpi::telemetry::TelemetryEntry::*)(
+             std::span<const int>)>(&wpi::telemetry::TelemetryEntry::LogBooleanArray),
+           py::arg("value"), release_gil(),
+           py::doc("Logs a boolean array."))
+      .def("log_string_array", static_cast<void (wpi::telemetry::TelemetryEntry::*)(
+             std::span<const std::string_view>)>(
+             &wpi::telemetry::TelemetryEntry::LogStringArray),
+           py::arg("value"), release_gil(),
+           py::doc("Logs a String array."))

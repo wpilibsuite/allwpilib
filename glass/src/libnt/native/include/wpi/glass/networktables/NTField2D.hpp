@@ -14,7 +14,6 @@
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
 namespace wpi::glass {
@@ -29,13 +28,15 @@ class NTField2DModel : public Field2DModel {
   ~NTField2DModel() override;
 
   const char* GetPath() const { return m_path.c_str(); }
-  const char* GetName() const { return m_nameValue.c_str(); }
 
   void Update() override;
   bool Exists() override;
   bool IsReadOnly() override;
 
   FieldObjectModel* AddFieldObject(std::string_view name) override;
+  FieldObjectModel* AddFieldObject(std::string_view name,
+                                   std::string_view source,
+                                   std::string_view type) override;
   void RemoveFieldObject(std::string_view name) override;
   void ForEachFieldObject(wpi::util::function_ref<void(FieldObjectModel& model,
                                                        std::string_view name)>
@@ -45,9 +46,8 @@ class NTField2DModel : public Field2DModel {
   std::string m_path;
   wpi::nt::NetworkTableInstance m_inst;
   wpi::nt::MultiSubscriber m_tableSub;
-  wpi::nt::StringTopic m_nameTopic;
+  wpi::nt::Topic m_typeTopic;
   wpi::nt::NetworkTableListenerPoller m_poller;
-  std::string m_nameValue;
 
   class ObjectModel;
   using Objects = std::vector<std::unique_ptr<ObjectModel>>;

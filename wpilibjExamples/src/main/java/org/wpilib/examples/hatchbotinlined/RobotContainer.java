@@ -12,8 +12,9 @@ import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
 import org.wpilib.examples.hatchbotinlined.commands.Autos;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,7 +36,7 @@ public class RobotContainer {
   private final Command complexAuto = Autos.complexAuto(robotDrive, hatchSubsystem);
 
   // A chooser for autonomous commands
-  SendableChooser<Command> chooser = new SendableChooser<>();
+  private final Selectable<Command> chooser = new Selectable<>();
 
   // The driver's controller
   CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
@@ -56,15 +57,18 @@ public class RobotContainer {
             robotDrive));
 
     // Add commands to the autonomous command chooser
-    chooser.setDefaultOption("Simple Auto", simpleAuto);
-    chooser.addOption("Complex Auto", complexAuto);
+    chooser.addDefault("Simple Auto", simpleAuto);
+    chooser.add("Complex Auto", complexAuto);
 
     // Put the chooser on the dashboard
-    SmartDashboard.putData("Autonomous", chooser);
+    Tunables.publish("Autonomous", chooser);
+  }
 
-    // Put subsystems to dashboard.
-    SmartDashboard.putData("Drivetrain", robotDrive);
-    SmartDashboard.putData("HatchSubsystem", hatchSubsystem);
+  /** Update telemetry. */
+  public void updateTelemetry() {
+    // Put subsystems to telemetry.
+    Telemetry.log("Drivetrain", robotDrive);
+    Telemetry.log("HatchSubsystem", hatchSubsystem);
   }
 
   /**

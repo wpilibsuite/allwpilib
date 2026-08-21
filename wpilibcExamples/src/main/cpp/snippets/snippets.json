@@ -188,7 +188,7 @@
     "tags": [
       "Hardware",
       "PDP",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "CANPDP",
     "gradlebase": "cpp"
@@ -210,7 +210,7 @@
     "tags": [
       "Hardware",
       "Duty Cycle",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "DutyCycleInput",
     "gradlebase": "cpp"
@@ -278,7 +278,7 @@
     "tags": [
       "Basic Robot",
       "Encoder",
-      "SmartDashboard",
+      "Telemetry",
       "Joystick"
     ],
     "foldername": "MotorControl",

@@ -18,19 +18,23 @@ void wpi::glass::DisplayCommandScheduler(CommandSchedulerModel* m) {
   ImGui::Spacing();
 
   if (m->Exists()) {
+    bool readOnly = m->IsReadOnly();
     float pos = ImGui::GetContentRegionAvail().x * 0.97f -
                 ImGui::CalcTextSize("Cancel").x;
 
     const auto& commands = m->GetCurrentCommands();
     for (size_t i = 0; i < commands.size(); ++i) {
       ImGui::Text("%s", commands[i].c_str());
-      ImGui::SameLine(pos);
 
-      ImGui::PushID(i);
-      if (ImGui::Button("Cancel")) {
-        m->CancelCommand(i);
+      if (!readOnly) {
+        ImGui::SameLine(pos);
+
+        ImGui::PushID(i);
+        if (ImGui::Button("Cancel")) {
+          m->CancelCommand(i);
+        }
+        ImGui::PopID();
       }
-      ImGui::PopID();
     }
   } else {
     ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));

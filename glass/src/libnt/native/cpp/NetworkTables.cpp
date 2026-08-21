@@ -1872,11 +1872,51 @@ static void EmitParentContextMenu(NetworkTablesModel* model,
   }
 }
 
+static constexpr std::string_view NT_TOPIC_DRAG_DROP_PREFIX = "NT:";
+static constexpr size_t IMGUI_DRAG_DROP_TYPE_MAX_LENGTH = 32;
+
+static bool IsNTStructTopicType(NT_Type type, std::string_view typeStr) {
+  return type == NT_RAW && wpi::util::starts_with(typeStr, "struct:");
+}
+
+static bool GetNTTopicDragDropType(NT_Type type, std::string_view typeStr,
+                                   std::string* out) {
+  if (!IsNTStructTopicType(type, typeStr)) {
+    return false;
+  }
+
+  out->clear();
+  out->reserve(NT_TOPIC_DRAG_DROP_PREFIX.size() + typeStr.size());
+  out->append(NT_TOPIC_DRAG_DROP_PREFIX);
+  out->append(typeStr);
+
+  // ImGui payload type strings must fit in ImGuiPayload::DataType.
+  return out->size() <= IMGUI_DRAG_DROP_TYPE_MAX_LENGTH;
+}
+
+static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
+                                       std::string_view path,
+                                       std::string_view typeStr) {
+  if (!ImGui::BeginDragDropSource()) {
+    return;
+  }
+
+  ImGui::SetDragDropPayload(dragDropType.c_str(), path.data(), path.size());
+  ImGui::TextUnformatted(path.data(), path.data() + path.size());
+  ImGui::TextUnformatted(typeStr.data(), typeStr.data() + typeStr.size());
+  ImGui::EndDragDropSource();
+}
+
 static void EmitValueName(DataSource* source, const char* name,
-                          const char* path) {
+                          const char* path, NT_Type type,
+                          std::string_view typeStr) {
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
+  } else if (std::string dragDropType;
+             GetNTTopicDragDropType(type, typeStr, &dragDropType)) {
+    ImGui::Selectable(name);
+    EmitNTTopicDragDropPayload(dragDropType, path, typeStr);
   } else {
     ImGui::TextUnformatted(name);
   }
@@ -1892,7 +1932,8 @@ static void EmitValueTree(
   for (auto&& child : children) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str(),
+                  NT_UNASSIGNED, {});
 
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
@@ -1934,7 +1975,8 @@ static void EmitEntry(NetworkTablesModel* model,
   bool valueChildrenOpen = false;
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  EmitValueName(entry.source.get(), name, entry.info.name.c_str());
+  EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
+                entry.info.type, entry.info.type_str);
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {

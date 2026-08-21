@@ -7,16 +7,24 @@
 #include <stdint.h>
 
 #include <atomic>
+#include <string>
 #include <thread>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
+#include "wpi/simulation/AlertSim.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
@@ -27,11 +35,17 @@ namespace {
 class TimedRobotTest {
  public:
   TimedRobotTest() {
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::sim::AlertSim::ResetData();
     wpi::sim::PauseTiming();
     wpi::sim::SetProgramStarted(false);
   }
 
   ~TimedRobotTest() {
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::sim::AlertSim::ResetData();
     wpi::sim::ResumeTiming();
     wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
   }
@@ -171,6 +185,65 @@ TEST_CASE_METHOD(TimedRobotTest,
   MockRobot robot;
 
   CHECK(static_cast<int64_t>(wpi::util::GetProgramStartTime()) == sub.Get(-1));
+}
+
+TEST_CASE_METHOD(
+    TimedRobotTest,
+    "TimedRobotTest ConstructorRegistersTelemetryAndTunableBackends",
+    "[wpilibc]") {
+  auto inst = wpi::nt::NetworkTableInstance::GetDefault();
+  MockRobot robot;
+
+  wpi::telemetry::Log("telemetryDouble", 2.5);
+
+  auto telemetrySub =
+      inst.GetDoubleTopic("/Telemetry/telemetryDouble").Subscribe(0.0);
+  CHECK(telemetrySub.Get() == 2.5);
+
+  wpi::tunables::TunableDouble tunable{1.0};
+  wpi::tunables::Publish("tunableDouble", tunable);
+
+  auto tunableSub =
+      inst.GetDoubleTopic("/Tunables/tunableDouble").Subscribe(0.0);
+  CHECK(tunableSub.Get() == 1.0);
+
+  auto tunablePub = inst.GetDoubleTopic("/Tunables/tunableDouble").Publish();
+  tunablePub.Set(3.5);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(tunable.Get() == 3.5);
+}
+
+TEST_CASE_METHOD(TimedRobotTest,
+                 "TimedRobotTest ConstructorMapsWarningsToAlerts",
+                 "[wpilibc]") {
+  {
+    MockRobot robot;
+
+    wpi::telemetry::TelemetryRegistry::ReportWarning("/bad",
+                                                     "telemetry test warning");
+    wpi::tunables::TunableRegistry::ReportWarning("tunable test warning");
+
+    auto alerts = wpi::sim::AlertSim::GetActive();
+    CHECK(alerts.size() == 2);
+
+    bool sawTelemetry = false;
+    bool sawTunable = false;
+    for (const auto& alert : alerts) {
+      if (alert.group == "Telemetry" &&
+          alert.text.find("telemetry test warning") != std::string::npos) {
+        sawTelemetry = true;
+      }
+      if (alert.group == "Tunables" &&
+          alert.text.find("tunable test warning") != std::string::npos) {
+        sawTunable = true;
+      }
+    }
+    CHECK(sawTelemetry);
+    CHECK(sawTunable);
+  }
+
+  CHECK(wpi::sim::AlertSim::GetActive().empty());
 }
 
 TEST_CASE_METHOD(TimedRobotTest, "TimedRobotTest AutonomousMode", "[wpilibc]") {

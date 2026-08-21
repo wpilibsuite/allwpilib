@@ -8,12 +8,15 @@ evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':datalog')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':fields')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':commandsv2')
+evaluationDependsOn(':telemetry')
+evaluationDependsOn(':tunables')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -41,18 +44,20 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':datalog').cppHeadersZip)
+cppProjectZips.add(project(':drivers').cppHeadersZip)
 cppProjectZips.add(project(':fields').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
+cppProjectZips.add(project(':telemetry').cppHeadersZip)
+cppProjectZips.add(project(':tunables').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
-cppProjectZips.add(project(':datalog').cppHeadersZip)
-cppProjectZips.add(project(':drivers').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms. Other platforms
@@ -112,6 +117,10 @@ doxygen.sourceSets.main {
         // apriltag
         exclude 'apriltag_pose.h'
 
+        // htrie
+        exclude 'wpi/util/array-hash/**'
+        exclude 'wpi/util/htrie_*.hpp'
+
         // libuv
         exclude 'uv/**'
 
@@ -168,10 +177,14 @@ def javaDocProjects = [
     project(':cameraserver'),
     project(':commandsv3'),
     project(':cscore'),
+    project(':datalog'),
+    project(':drivers'),
     project(':epilogue-runtime'),
     project(':fields'),
     project(':hal'),
     project(':ntcore'),
+    project(':telemetry'),
+    project(':tunables'),
     project(':wpiannotations'),
     project(':commandsv2'),
     project(':wpilibj'),
@@ -181,8 +194,6 @@ def javaDocProjects = [
     project(':wpiutil'),
     project(':romiVendordep'),
     project(':xrpVendordep'),
-    project(':datalog'),
-    project(':drivers'),
 ]
 
 javaDocProjects.each {

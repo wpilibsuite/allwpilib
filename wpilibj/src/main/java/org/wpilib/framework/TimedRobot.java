@@ -74,6 +74,7 @@ public class TimedRobot extends IterativeRobotBase {
   @Override
   public void close() {
     NotifierJNI.destroyNotifier(m_notifier);
+    super.close();
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */

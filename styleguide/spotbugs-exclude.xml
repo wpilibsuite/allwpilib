@@ -97,6 +97,14 @@
     <Bug pattern="MS_MUTABLE_ARRAY" />
   </Match>
   <Match>
+    <!-- TelemetryTable intentionally reflects public test serializer fields by name. -->
+    <Bug pattern="MS_PKGPROTECT" />
+    <Or>
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedStructThing" />
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedProtoThing" />
+    </Or>
+  </Match>
+  <Match>
     <!--
     This seems to be a false positive from the &= used by these command compositions to determine runsWhenDisabled
     -->

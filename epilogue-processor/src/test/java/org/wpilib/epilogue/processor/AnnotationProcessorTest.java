@@ -42,7 +42,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -50,9 +50,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
+            table.log("x", object.x);
           }
         }
       }
@@ -80,7 +80,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -88,10 +88,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("y", object.y);
+            table.log("x", object.x);
+            table.log("y", object.y);
           }
         }
       }
@@ -119,7 +119,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -127,10 +127,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("getValue", object.getValue());
-            backend.log("getName", object.getName());
+            table.log("getValue", object.getValue());
+            table.log("getName", object.getName());
           }
         }
       }
@@ -182,7 +182,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -190,10 +190,56 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("y", object.y);
+            table.log("x", object.x);
+            table.log("y", object.y);
+          }
+        }
+      }
+      """;
+
+    assertLoggerGenerates(source, expectedGeneratedSource);
+  }
+
+  @Test
+  void measures() {
+    String source =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.units.Units;
+      import org.wpilib.units.measure.Distance;
+
+      @Logged
+      class Example {
+        Distance distance = Units.Feet.of(1.0);
+
+        public Distance getHeight() {
+          return Units.Meters.of(2.0);
+        }
+      }
+    """;
+
+    String expectedGeneratedSource =
+        """
+      package org.wpilib.epilogue;
+
+      import org.wpilib.epilogue.Logged;
+      import org.wpilib.epilogue.Epilogue;
+      import org.wpilib.epilogue.logging.ClassSpecificLogger;
+      import org.wpilib.telemetry.TelemetryTable;
+
+      public class ExampleLogger extends ClassSpecificLogger<Example> {
+        public ExampleLogger() {
+          super(Example.class);
+        }
+
+        @Override
+        public void update(TelemetryTable table, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            org.wpilib.epilogue.EpilogueTelemetry.logMeasure(table, "distance", object.distance);
+            org.wpilib.epilogue.EpilogueTelemetry.logMeasure(table, "getHeight", object.getHeight());
           }
         }
       }
@@ -221,7 +267,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -244,9 +290,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", ((double) $org_wpilib_epilogue_Example_x.get(object)));
+            table.log("x", ((double) $org_wpilib_epilogue_Example_x.get(object)));
           }
         }
       }
@@ -276,7 +322,7 @@ class AnnotationProcessorTest {
     import org.wpilib.epilogue.Logged;
     import org.wpilib.epilogue.Epilogue;
     import org.wpilib.epilogue.logging.ClassSpecificLogger;
-    import org.wpilib.epilogue.logging.EpilogueBackend;
+    import org.wpilib.telemetry.TelemetryTable;
     import java.lang.invoke.MethodHandles;
     import java.lang.invoke.VarHandle;
 
@@ -299,9 +345,9 @@ class AnnotationProcessorTest {
       }
 
       @Override
-      public void update(EpilogueBackend backend, Example object) {
+      public void update(TelemetryTable table, Example object) {
         if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-          backend.log("x", ((java.util.function.DoubleSupplier) $org_wpilib_epilogue_Example_x.get(object)).getAsDouble());
+          table.log("x", ((java.util.function.DoubleSupplier) $org_wpilib_epilogue_Example_x.get(object)).getAsDouble());
         }
       }
     }
@@ -311,14 +357,18 @@ class AnnotationProcessorTest {
   }
 
   @Test
-  void privateWithGenerics() {
+  void telemetryLoggablesSkipNulls() {
     String source =
         """
       package org.wpilib.epilogue;
 
       @Logged
       class Example {
-        private org.wpilib.smartdashboard.SendableChooser<String> chooser;
+        private org.wpilib.telemetry.TelemetryLoggable telemetry;
+        double afterField;
+
+        public org.wpilib.telemetry.TelemetryLoggable getTelemetry() { return null; }
+        public double getAfterGetter() { return 0.0; }
       }
       """;
 
@@ -329,19 +379,19 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
-        // Accesses private or superclass field org.wpilib.epilogue.Example.chooser
-        private static final VarHandle $org_wpilib_epilogue_Example_chooser;
+        // Accesses private or superclass field org.wpilib.epilogue.Example.telemetry
+        private static final VarHandle $org_wpilib_epilogue_Example_telemetry;
 
         static {
           try {
             var rootLookup = MethodHandles.lookup();
             var lookup$$org_wpilib_epilogue_Example = MethodHandles.privateLookupIn(org.wpilib.epilogue.Example.class, rootLookup);
-            $org_wpilib_epilogue_Example_chooser = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "chooser", org.wpilib.smartdashboard.SendableChooser.class);
+            $org_wpilib_epilogue_Example_telemetry = lookup$$org_wpilib_epilogue_Example.findVarHandle(org.wpilib.epilogue.Example.class, "telemetry", org.wpilib.telemetry.TelemetryLoggable.class);
           } catch (ReflectiveOperationException e) {
             throw new RuntimeException("[EPILOGUE] Could not load private fields for logging!", e);
           }
@@ -352,9 +402,18 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            logSendable(backend.getNested("chooser"), ((org.wpilib.smartdashboard.SendableChooser<java.lang.String>) $org_wpilib_epilogue_Example_chooser.get(object)));
+            var $$telemetry = ((org.wpilib.telemetry.TelemetryLoggable) $org_wpilib_epilogue_Example_telemetry.get(object));
+            if ($$telemetry != null) {
+              table.log("telemetry", $$telemetry);
+            };
+            table.log("afterField", object.afterField);
+            var __getTelemetry = object.getTelemetry();
+            if (__getTelemetry != null) {
+              table.log("getTelemetry", __getTelemetry);
+            };
+            table.log("getAfterGetter", object.getAfterGetter());
           }
         }
       }
@@ -384,7 +443,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -392,15 +451,15 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("low", object.low);
+            table.log("low", object.low);
           }
           if (Epilogue.shouldLog(Logged.Importance.INFO)) {
-            backend.log("medium", object.medium);
+            table.log("medium", object.medium);
           }
           if (Epilogue.shouldLog(Logged.Importance.CRITICAL)) {
-            backend.log("high", object.high);
+            table.log("high", object.high);
           }
         }
       }
@@ -432,7 +491,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -440,9 +499,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("enumValue", object.enumValue);
+            table.log("enumValue", object.enumValue.name());
           }
         }
       }
@@ -476,7 +535,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -484,9 +543,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("y", object.y);
+            table.log("y", object.y);
           }
         }
       }
@@ -522,7 +581,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -551,13 +610,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("e", object.e);
-            backend.log("a", object.a);
-            backend.log("b", ((double) $org_wpilib_epilogue_BaseExample_b.get(object)));
-            backend.log("c", ((double) $org_wpilib_epilogue_BaseExample_c.get(object)));
-            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
+            table.log("e", object.e);
+            table.log("a", object.a);
+            table.log("b", ((double) $org_wpilib_epilogue_BaseExample_b.get(object)));
+            table.log("c", ((double) $org_wpilib_epilogue_BaseExample_c.get(object)));
+            table.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
           }
         }
       }
@@ -603,7 +662,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -636,17 +695,17 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("h", object.h);
-            backend.log("i", ((double) $org_wpilib_epilogue_Example_i.get(object)));
-            backend.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
-            backend.log("e", object.e);
-            backend.log("f", ((double) $org_wpilib_epilogue_BaseExample_f.get(object)));
-            backend.log("g", ((double) $org_wpilib_epilogue_BaseExample_g.get(object)));
-            backend.log("a", object.a);
-            backend.log("getValue", object.getValue());
-            backend.log("getB", object.getB());
+            table.log("h", object.h);
+            table.log("i", ((double) $org_wpilib_epilogue_Example_i.get(object)));
+            table.log("d", ((double) $org_wpilib_epilogue_BaseExample_d.get(object)));
+            table.log("e", object.e);
+            table.log("f", ((double) $org_wpilib_epilogue_BaseExample_f.get(object)));
+            table.log("g", ((double) $org_wpilib_epilogue_BaseExample_g.get(object)));
+            table.log("a", object.a);
+            table.log("getValue", object.getValue());
+            table.log("getB", object.getB());
           }
         }
       }
@@ -680,7 +739,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -688,12 +747,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -727,7 +786,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -735,10 +794,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("getX", object.getX());
+            table.log("x", object.x);
+            table.log("getX", object.getX());
           }
         }
       }
@@ -772,7 +831,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -780,10 +839,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("getX", object.getX());
+            table.log("x", object.x);
+            table.log("getX", object.getX());
           }
         }
       }
@@ -817,7 +876,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -825,12 +884,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -864,7 +923,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -872,12 +931,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -911,7 +970,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -919,12 +978,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -946,7 +1005,7 @@ class AnnotationProcessorTest {
         double x;        // Should be logged
         double[] arr1;   // Should be logged
         double[][] arr2; // Should not be logged
-        List<Double> list; // Should not be logged
+        List<Double> list; // Should be logged
 
         public double getX() { return 0; }
         public double[] getArr1() { return null; }
@@ -961,7 +1020,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -969,12 +1028,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("list", object.list, java.lang.Double.class);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -995,7 +1055,7 @@ class AnnotationProcessorTest {
         boolean x;        // Should be logged
         boolean[] arr1;   // Should be logged
         boolean[][] arr2; // Should not be logged
-        List<Boolean> list; // Should not be logged
+        List<Boolean> list; // Should be logged
 
         public boolean getX() { return false; }
         public boolean[] getArr1() { return null; }
@@ -1010,7 +1070,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1018,12 +1078,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("list", object.list, java.lang.Boolean.class);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -1060,7 +1121,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1068,13 +1129,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x);
-            backend.log("arr1", object.arr1);
-            backend.log("list", object.list);
-            backend.log("getX", object.getX());
-            backend.log("getArr1", object.getArr1());
+            table.log("x", object.x);
+            table.log("arr1", object.arr1);
+            table.log("list", object.list, java.lang.String.class);
+            table.log("getX", object.getX());
+            table.log("getArr1", object.getArr1());
           }
         }
       }
@@ -1119,7 +1180,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1127,13 +1188,13 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x, org.wpilib.epilogue.Example.Structable.struct);
-            backend.log("arr1", object.arr1, org.wpilib.epilogue.Example.Structable.struct);
-            backend.log("list", object.list, org.wpilib.epilogue.Example.Structable.struct);
-            backend.log("getX", object.getX(), org.wpilib.epilogue.Example.Structable.struct);
-            backend.log("getArr1", object.getArr1(), org.wpilib.epilogue.Example.Structable.struct);
+            table.log("x", object.x, org.wpilib.epilogue.Example.Structable.struct);
+            table.log("arr1", object.arr1, org.wpilib.epilogue.Example.Structable.struct);
+            table.log("list", object.list, org.wpilib.epilogue.Example.Structable.struct);
+            table.log("getX", object.getX(), org.wpilib.epilogue.Example.Structable.struct);
+            table.log("getArr1", object.getArr1(), org.wpilib.epilogue.Example.Structable.struct);
           }
         }
       }
@@ -1193,7 +1254,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1201,9 +1262,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("x", object.x, org.wpilib.epilogue.ProtobufType.proto);
+            table.log("x", object.x, org.wpilib.epilogue.ProtobufType.proto);
           }
         }
       }
@@ -1240,7 +1301,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1248,12 +1309,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("list", object.list);
-            backend.log("set", object.set);
-            backend.log("queue", object.queue);
-            backend.log("stack", object.stack);
+            table.log("list", object.list, java.lang.String.class);
+            table.log("set", object.set, java.lang.String.class);
+            table.log("queue", object.queue, java.lang.String.class);
+            table.log("stack", object.stack, java.lang.String.class);
           }
         }
       }
@@ -1264,9 +1325,6 @@ class AnnotationProcessorTest {
 
   @Test
   void boxedPrimitiveLists() {
-    // Boxed primitives are not directly supported, nor are arrays of boxed primitives
-    // int[] is fine, but Integer[] is not
-
     String source =
         """
       package org.wpilib.epilogue;
@@ -1277,9 +1335,9 @@ class AnnotationProcessorTest {
 
       @Logged
       class Example {
-        /* Not logged */ List<Integer> ints;
-        /* Not logged */ List<Double> doubles;
-        /* Not logged */ List<Long> longs;
+        /* Logged */ List<Integer> ints;
+        /* Logged */ List<Double> doubles;
+        /* Logged */ List<Long> longs;
       }
       """;
 
@@ -1290,7 +1348,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1298,7 +1356,12 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
+          if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
+            table.log("ints", object.ints, java.lang.Integer.class);
+            table.log("doubles", object.doubles, java.lang.Double.class);
+            table.log("longs", object.longs, java.lang.Long.class);
+          }
         }
       }
       """;
@@ -1422,7 +1485,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
       import java.lang.invoke.MethodHandles;
       import java.lang.invoke.VarHandle;
 
@@ -1445,11 +1508,11 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            backend.log("valueA", object.valueA);
-            backend.log("valueB", ((java.lang.String) $org_wpilib_epilogue_Example_valueB.get(object)));
-            backend.log("upcast", object.upcast());
+            table.log("valueA", object.valueA);
+            table.log("valueB", ((java.lang.String) $org_wpilib_epilogue_Example_valueB.get(object)));
+            table.log("upcast", object.upcast());
           }
         }
       }
@@ -1490,7 +1553,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1498,10 +1561,10 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.org_wpilib_epilogue_ChildLogger.tryUpdate(backend.getNested("child"), object.child, Epilogue.getConfig().errorHandler);
-            Epilogue.org_wpilib_epilogue_IOLogger.tryUpdate(backend.getNested("io"), object.io, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_ChildLogger.tryUpdate(table.getTable("child"), object.child, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_IOLogger.tryUpdate(table.getTable("io"), object.io, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1577,7 +1640,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1585,31 +1648,31 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$asInterface = object.asInterface;
               if ($$asInterface instanceof org.wpilib.epilogue.Impl1 org_wpilib_epilogue_Impl1) {
-                Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(table.getTable("asInterface"), org_wpilib_epilogue_Impl1, Epilogue.getConfig().errorHandler);
               } else if ($$asInterface instanceof org.wpilib.epilogue.Impl2 org_wpilib_epilogue_Impl2) {
-                Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(backend.getNested("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(table.getTable("asInterface"), org_wpilib_epilogue_Impl2, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.IFace
-                Epilogue.org_wpilib_epilogue_IFaceLogger.tryUpdate(backend.getNested("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_IFaceLogger.tryUpdate(table.getTable("asInterface"), $$asInterface, Epilogue.getConfig().errorHandler);
               };
-              Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(backend.getNested("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
-              Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(backend.getNested("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_Impl1Logger.tryUpdate(table.getTable("firstImpl"), object.firstImpl, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_Impl2Logger.tryUpdate(table.getTable("secondImpl"), object.secondImpl, Epilogue.getConfig().errorHandler);
               var $$complex = object.complex;
               if ($$complex instanceof org.wpilib.epilogue.ConcreteLogged org_wpilib_epilogue_ConcreteLogged) {
-                Epilogue.org_wpilib_epilogue_ConcreteLoggedLogger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ConcreteLoggedLogger.tryUpdate(table.getTable("complex"), org_wpilib_epilogue_ConcreteLogged, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I4 org_wpilib_epilogue_I4) {
-                Epilogue.org_wpilib_epilogue_I4Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I4Logger.tryUpdate(table.getTable("complex"), org_wpilib_epilogue_I4, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I2 org_wpilib_epilogue_I2) {
-                Epilogue.org_wpilib_epilogue_I2Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I2Logger.tryUpdate(table.getTable("complex"), org_wpilib_epilogue_I2, Epilogue.getConfig().errorHandler);
               } else if ($$complex instanceof org.wpilib.epilogue.I3 org_wpilib_epilogue_I3) {
-                Epilogue.org_wpilib_epilogue_I3Logger.tryUpdate(backend.getNested("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_I3Logger.tryUpdate(table.getTable("complex"), org_wpilib_epilogue_I3, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("complex"), $$complex, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(table.getTable("complex"), $$complex, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1640,7 +1703,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class Outer$ExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public Outer$ExampleLogger() {
@@ -1648,9 +1711,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Outer.Example object) {
+          public void update(TelemetryTable table, Outer.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("x", object.x);
+              table.log("x", object.x);
             }
           }
         }
@@ -1686,7 +1749,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class A$B$C$D$ExampleLogger extends ClassSpecificLogger<A.B.C.D.Example> {
           public A$B$C$D$ExampleLogger() {
@@ -1694,9 +1757,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, A.B.C.D.Example object) {
+          public void update(TelemetryTable table, A.B.C.D.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("x", object.x);
+              table.log("x", object.x);
             }
           }
         }
@@ -1726,7 +1789,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class CustomExampleLogger extends ClassSpecificLogger<Outer.Example> {
           public CustomExampleLogger() {
@@ -1734,9 +1797,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Outer.Example object) {
+          public void update(TelemetryTable table, Outer.Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("x", object.x);
+              table.log("x", object.x);
             }
           }
         }
@@ -1779,7 +1842,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1787,16 +1850,16 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = object.theField;
               if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
-                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(table.getTable("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else if ($$theField instanceof org.wpilib.epilogue.ExtendingInterface org_wpilib_epilogue_ExtendingInterface) {
-                Epilogue.org_wpilib_epilogue_ExtendingInterfaceLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ExtendingInterfaceLogger.tryUpdate(table.getTable("theField"), org_wpilib_epilogue_ExtendingInterface, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(table.getTable("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1831,7 +1894,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
         import java.lang.invoke.MethodHandles;
         import java.lang.invoke.VarHandle;
 
@@ -1854,14 +1917,14 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
               var $$theField = ((org.wpilib.epilogue.I) $org_wpilib_epilogue_Example_theField.get(object));
               if ($$theField instanceof org.wpilib.epilogue.Base org_wpilib_epilogue_Base) {
-                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(backend.getNested("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_BaseLogger.tryUpdate(table.getTable("theField"), org_wpilib_epilogue_Base, Epilogue.getConfig().errorHandler);
               } else {
                 // Base type org.wpilib.epilogue.I
-                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(backend.getNested("theField"), $$theField, Epilogue.getConfig().errorHandler);
+                Epilogue.org_wpilib_epilogue_ILogger.tryUpdate(table.getTable("theField"), $$theField, Epilogue.getConfig().errorHandler);
               };
             }
           }
@@ -1893,7 +1956,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -1901,9 +1964,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.org_wpilib_epilogue_ImplicitLogger.tryUpdate(backend.getNested("i"), object.i, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_ImplicitLogger.tryUpdate(table.getTable("i"), object.i, Epilogue.getConfig().errorHandler);
             }
           }
         }
@@ -1919,6 +1982,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.logging.*;
+        import org.wpilib.telemetry.TelemetryTable;
 
         record Point(int x, int y) {}
 
@@ -1929,7 +1993,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Point point) {
+          public void update(TelemetryTable table, Point point) {
             // Implementation is irrelevant
           }
         }
@@ -1947,7 +2011,7 @@ class AnnotationProcessorTest {
       import org.wpilib.epilogue.Logged;
       import org.wpilib.epilogue.Epilogue;
       import org.wpilib.epilogue.logging.ClassSpecificLogger;
-      import org.wpilib.epilogue.logging.EpilogueBackend;
+      import org.wpilib.telemetry.TelemetryTable;
 
       public class ExampleLogger extends ClassSpecificLogger<Example> {
         public ExampleLogger() {
@@ -1955,9 +2019,9 @@ class AnnotationProcessorTest {
         }
 
         @Override
-        public void update(EpilogueBackend backend, Example object) {
+        public void update(TelemetryTable table, Example object) {
           if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-            Epilogue.org_wpilib_epilogue_CustomPointLogger.tryUpdate(backend.getNested("point"), object.point, Epilogue.getConfig().errorHandler);
+            Epilogue.org_wpilib_epilogue_CustomPointLogger.tryUpdate(table.getTable("point"), object.point, Epilogue.getConfig().errorHandler);
           }
         }
       }
@@ -1973,6 +2037,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.logging.*;
+        import org.wpilib.telemetry.TelemetryTable;
         import org.wpilib.math.numbers.*;
         import org.wpilib.math.util.Num;
         import org.wpilib.math.linalg.Vector;
@@ -1984,7 +2049,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Vector<?> object) {
+          public void update(TelemetryTable table, Vector<?> object) {
             // Implementation is irrelevant
           }
         }
@@ -2002,7 +2067,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2010,9 +2075,9 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              Epilogue.org_wpilib_epilogue_VectorLogger.tryUpdate(backend.getNested("vec"), object.vec, Epilogue.getConfig().errorHandler);
+              Epilogue.org_wpilib_epilogue_VectorLogger.tryUpdate(table.getTable("vec"), object.vec, Epilogue.getConfig().errorHandler);
             }
           }
         }
@@ -2028,6 +2093,7 @@ class AnnotationProcessorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.logging.*;
+        import org.wpilib.telemetry.TelemetryTable;
 
         class Generic<T> { }
 
@@ -2039,7 +2105,7 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Generic<T> object) {
+          public void update(TelemetryTable table, Generic<T> object) {
             // Implementation is irrelevant
           }
         }
@@ -2061,7 +2127,7 @@ class AnnotationProcessorTest {
 
     assertCompilationError(
         "[EPILOGUE] Custom logger classes cannot take generic type arguments",
-        9,
+        10,
         1,
         compilation.errors().get(0));
   }
@@ -2110,7 +2176,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2118,10 +2184,10 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("x", object.x());
-              backend.log("y", object.y());
+              table.log("x", object.x());
+              table.log("y", object.y());
             }
           }
         }
@@ -2198,7 +2264,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2206,11 +2272,11 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("x", object.x);
-              backend.log("withANoOpTransform", object.withANoOpTransform());
-              backend.log("withTemp", object.withTemp());
+              table.log("x", object.x);
+              table.log("withANoOpTransform", object.withANoOpTransform());
+              table.log("withTemp", object.withTemp());
             }
           }
         }
@@ -2250,7 +2316,7 @@ class AnnotationProcessorTest {
         import org.wpilib.epilogue.Logged;
         import org.wpilib.epilogue.Epilogue;
         import org.wpilib.epilogue.logging.ClassSpecificLogger;
-        import org.wpilib.epilogue.logging.EpilogueBackend;
+        import org.wpilib.telemetry.TelemetryTable;
 
         public class ExampleLogger extends ClassSpecificLogger<Example> {
           public ExampleLogger() {
@@ -2258,14 +2324,14 @@ class AnnotationProcessorTest {
           }
 
           @Override
-          public void update(EpilogueBackend backend, Example object) {
+          public void update(TelemetryTable table, Example object) {
             if (Epilogue.shouldLog(Logged.Importance.DEBUG)) {
-              backend.log("Member Prefix", object.m_memberPrefix);
-              backend.log("Constant Prefix", object.kConstantPrefix);
-              backend.log("Other Constant Prefix", object.k_otherConstantPrefix);
-              backend.log("Other Prefix", object.s_otherPrefix);
-              backend.log("The Getter Method", object.getTheGetterMethod());
-              backend.log("optedOut", object.optedOut());
+              table.log("Member Prefix", object.m_memberPrefix);
+              table.log("Constant Prefix", object.kConstantPrefix);
+              table.log("Other Constant Prefix", object.k_otherConstantPrefix);
+              table.log("Other Prefix", object.s_otherPrefix);
+              table.log("The Getter Method", object.getTheGetterMethod());
+              table.log("optedOut", object.optedOut());
             }
           }
         }

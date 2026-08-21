@@ -4,11 +4,8 @@
 
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 
-#include "wpi/hal/Ports.h"
-#include "wpi/hardware/pneumatic/PneumaticHub.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -23,7 +20,6 @@ Compressor::Compressor(CANBus busId, int module,
   m_module->EnableCompressorDigital();
 
   m_module->ReportUsage("Compressor", "");
-  wpi::util::SendableRegistry::Add(this, "Compressor", module);
 }
 
 Compressor::Compressor(CANBus busId, PneumaticsModuleType moduleType)
@@ -80,20 +76,17 @@ CompressorConfigType Compressor::GetConfigType() const {
   return m_module->GetCompressorConfigType();
 }
 
-void Compressor::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Compressor");
-  builder.AddBooleanProperty(
-      "Enabled", [this] { return IsEnabled(); }, nullptr);
-  builder.AddBooleanProperty(
-      "Pressure switch", [this] { return GetPressureSwitchValue(); }, nullptr);
-  builder.AddDoubleProperty(
-      "Current (A)", [this] { return GetCurrent().value(); }, nullptr);
+void Compressor::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Enabled", IsEnabled());
+  table.Log("Pressure switch", GetPressureSwitchValue());
+  table.Log("Current (A)", GetCurrent());
   // These are not supported by the CTRE PCM
   if (m_moduleType == PneumaticsModuleType::REV_PH) {
-    builder.AddDoubleProperty(
-        "Analog Voltage", [this] { return GetAnalogVoltage().value(); },
-        nullptr);
-    builder.AddDoubleProperty(
-        "Pressure (PSI)", [this] { return GetPressure().value(); }, nullptr);
+    table.Log("Analog Voltage", GetAnalogVoltage());
+    table.Log("Pressure (PSI)", GetPressure());
   }
+}
+
+std::string_view Compressor::GetTelemetryType() const {
+  return "Compressor";
 }

@@ -10,13 +10,12 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/nt/NTSendable.hpp"
-#include "wpi/nt/NetworkTable.hpp"
-#include "wpi/nt/NetworkTableEntry.hpp"
 #include "wpi/smartdashboard/FieldObject2d.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -38,8 +37,8 @@ namespace wpi {
  * also be shown by using the GetObject() function.  Other objects can
  * also have multiple poses (which will show the object at multiple locations).
  */
-class Field2d : public wpi::nt::NTSendable,
-                public wpi::util::SendableHelper<Field2d> {
+class Field2d : public wpi::telemetry::TelemetryLoggable,
+                public wpi::tunables::ComplexTunable {
  public:
   using Entry = size_t;
 
@@ -86,10 +85,28 @@ class Field2d : public wpi::nt::NTSendable,
    */
   FieldObject2d* GetRobotObject();
 
-  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
+  /**
+   * Gets the tunable type.
+   *
+   * @return Field2d type.
+   */
+  std::string_view GetTunableType() const override;
+
+  /**
+   * Publishes field objects to a tunable table.
+   *
+   * @param table wpi::tunables::Tunable table.
+   */
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
 
  private:
-  std::shared_ptr<wpi::nt::NetworkTable> m_table;
+  bool IsTunablePublished() const;
+  void RemoveTunableChildren();
+  void PublishTunableChildren();
 
   mutable wpi::util::mutex m_mutex;
   std::vector<std::unique_ptr<FieldObject2d>> m_objects;

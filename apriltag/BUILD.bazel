@@ -79,6 +79,8 @@ wpilib_cc_shared_library(
     name = "shared/apriltag",
     auto_export_windows_symbols = False,
     dynamic_deps = [
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
@@ -92,6 +94,8 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/apriltag",
     static_deps = [
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpimath:static/wpimath",
         "//wpiutil:static/wpiutil",
     ],
@@ -116,6 +120,8 @@ wpilib_cc_shared_library(
     auto_export_windows_symbols = False,
     dynamic_deps = [
         ":shared/apriltag",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
@@ -132,6 +138,8 @@ wpilib_jni_java_library(
     native_libs = [":shared/apriltagjni"],
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
@@ -158,6 +166,8 @@ wpilib_java_junit5_test(
     resources = glob(["src/test/resources/**"]),
     deps = [
         ":apriltag-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
@@ -201,6 +211,10 @@ define_native_wrapper(
 
 PYBIND_PKGCFG_DEPS = [
     "//apriltag:native/apriltag/robotpy-native-apriltag.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
     "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",

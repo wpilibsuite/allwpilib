@@ -4,6 +4,9 @@
 
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
+#include <stdexcept>
+#include <type_traits>
+
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/TestAssertions.hpp"
@@ -40,6 +43,19 @@ void CheckFeasible(
                          wpi::units::math::abs(initial.velocity) * kDt +
                              maxAccel / 2.0 * kDt * kDt,
                          1e-8_m);
+}
+
+TEST_CASE("TrapezoidProfileTest ConstraintsRequirePositiveValues",
+          "[wpimath]") {
+  using Constraints =
+      wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints;
+
+  STATIC_REQUIRE(!std::is_default_constructible_v<Constraints>);
+  CHECK_THROWS_AS(Constraints(0_mps, 1_mps_sq), std::domain_error);
+  CHECK_THROWS_AS(Constraints(1_mps, 0_mps_sq), std::domain_error);
+  CHECK_THROWS_AS(Constraints(-1_mps, 1_mps_sq), std::domain_error);
+  CHECK_THROWS_AS(Constraints(1_mps, -1_mps_sq), std::domain_error);
+  CHECK_NOTHROW(Constraints(1_mps, 1_mps_sq));
 }
 
 TEST_CASE("TrapezoidProfileTest CheckTiming", "[wpimath]") {

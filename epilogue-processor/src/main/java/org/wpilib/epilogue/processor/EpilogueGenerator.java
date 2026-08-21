@@ -133,9 +133,9 @@ public class EpilogueGenerator {
           out.println(
               "    "
                   + StringUtils.loggerFieldName(mainRobotClass)
-                  + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
+                  + ".tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);");
           out.println(
-              "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
+              "    config.table.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
           out.println("  }");
         }
 

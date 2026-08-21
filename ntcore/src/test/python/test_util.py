@@ -1,7 +1,7 @@
 import pytest
 
 from ntcore import NetworkTableInstance, NetworkTableType
-from ntcore.util import ntproperty, ChooserControl
+from ntcore.util import ntproperty, SelectableControl
 
 # def test_autoupdatevalue(nt):
 
@@ -136,8 +136,8 @@ def test_ntproperty_multitest(nt: NetworkTableInstance):
         nt.start_local()
 
 
-def test_chooser_control(nt: NetworkTableInstance):
-    c = ChooserControl("Autonomous Mode", inst=nt)
+def test_selectable_control(nt: NetworkTableInstance):
+    c = SelectableControl("Autonomous Mode", inst=nt)
 
     assert c.get_choices() == []
     assert c.get_selected() is None
@@ -145,32 +145,46 @@ def test_chooser_control(nt: NetworkTableInstance):
     c.set_selected("foo")
     assert c.get_selected() == "foo"
 
-    t = nt.get_table("/SmartDashboard/Autonomous Mode")
-    assert t.get_string("selected", None) == "foo"
+    t = nt.get_table("/Tunables/Autonomous Mode")
+    assert t.get_string("selected/tune", None) == "foo"
 
     t.put_string_array("options", ("option1", "option2"))
     assert c.get_choices() == ["option1", "option2"]
 
 
-def test_chooser_control_callbacks(nt: NetworkTableInstance):
+def test_selectable_control_empty_selection_falls_back(nt: NetworkTableInstance):
+    c = SelectableControl("Autonomous Mode", inst=nt)
+    t = nt.get_table("/Tunables/Autonomous Mode")
+
+    t.put_string("default", "option1")
+    t.put_string("selected/value", "")
+
+    assert c.get_selected() == "option1"
+
+    t.put_string("selected/tune", "option2")
+
+    assert c.get_selected() == "option2"
+
+
+def test_selectable_control_callbacks(nt: NetworkTableInstance):
     choices = []
     selected = []
 
-    c = ChooserControl(
+    c = SelectableControl(
         "Autonomous Mode",
         on_choices=choices.append,
         on_selected=selected.append,
         inst=nt,
     )
 
-    t = nt.get_table("/SmartDashboard/Autonomous Mode")
+    t = nt.get_table("/Tunables/Autonomous Mode")
     t.put_string("default", "option1")
     nt.wait_for_listener_queue(1.0)
 
     assert selected == ["option1"]
 
     t.put_string_array("options", ("option1", "option2"))
-    t.put_string("selected", "option2")
+    t.put_string("selected/value", "option2")
     nt.wait_for_listener_queue(1.0)
 
     assert choices == [["option1", "option2"]]
@@ -179,7 +193,78 @@ def test_chooser_control_callbacks(nt: NetworkTableInstance):
     c.close()
     c.close()
 
-    t.put_string("selected", "option1")
+    t.put_string("selected/value", "option1")
     nt.wait_for_listener_queue(1.0)
 
     assert selected == ["option1", "option2"]
+
+
+def test_selectable_control_default_callback_treats_empty_selection_as_unset(
+    nt: NetworkTableInstance,
+):
+    selected = []
+
+    c = SelectableControl(
+        "Autonomous Mode",
+        on_selected=selected.append,
+        inst=nt,
+    )
+
+    t = nt.get_table("/Tunables/Autonomous Mode")
+    t.put_string("selected/value", "")
+    nt.wait_for_listener_queue(1.0)
+    selected.clear()
+
+    t.put_string("default", "option1")
+    nt.wait_for_listener_queue(1.0)
+
+    assert selected == ["option1"]
+
+    c.close()
+
+
+def test_selectable_control_callbacks_deduplicate_initial_empty_selection(
+    nt: NetworkTableInstance,
+):
+    selected = []
+    t = nt.get_table("/Tunables/Autonomous Mode")
+    t.put_string("default", "option1")
+    t.put_string("selected/value", "")
+
+    c = SelectableControl(
+        "Autonomous Mode",
+        on_selected=selected.append,
+        inst=nt,
+    )
+
+    nt.wait_for_listener_queue(1.0)
+
+    assert selected == ["option1"]
+
+    c.close()
+
+
+def test_selectable_control_callbacks_deduplicate_tune_and_echo(
+    nt: NetworkTableInstance,
+):
+    selected = []
+    t = nt.get_table("/Tunables/Autonomous Mode")
+
+    c = SelectableControl(
+        "Autonomous Mode",
+        on_selected=selected.append,
+        inst=nt,
+    )
+
+    t.put_string("default", "option1")
+    nt.wait_for_listener_queue(1.0)
+    selected.clear()
+
+    c.set_selected("option2")
+    nt.wait_for_listener_queue(1.0)
+    t.put_string("selected/value", "option2")
+    nt.wait_for_listener_queue(1.0)
+
+    assert selected == ["option2"]
+
+    c.close()

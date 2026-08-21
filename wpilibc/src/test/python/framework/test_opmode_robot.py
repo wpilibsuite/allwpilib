@@ -1,5 +1,6 @@
 import pytest
 import threading
+import tunables
 from wpilib import simulation as wsim
 from wpilib.opmoderobot import OpModeRobot
 from wpilib import OpMode, RobotState
@@ -50,6 +51,36 @@ class MockRobot(OpModeRobot):
 
     def robot_periodic(self):
         self.periodic_count += 1
+
+
+def test_robot_loop_refreshes_getter_backed_tunables():
+    robot = MockRobot()
+    backend = tunables.MockTunableBackend()
+    value = [1]
+    robot_thread = threading.Thread(target=robot.start_competition, daemon=True)
+
+    tunables.TunableRegistry.reset()
+    try:
+        tunables.TunableRegistry.register_backend("", backend)
+        tunables.get_table().publish_int(
+            "getter",
+            lambda: value[0],
+            lambda tuned: value.__setitem__(0, tuned),
+        )
+
+        value[0] = 7
+        robot_thread.start()
+        wsim.wait_for_program_start()
+        wsim.DriverStationSim.set_enabled(False)
+        wsim.DriverStationSim.notify_new_data()
+        wsim.step_timing(0.02)
+
+        assert backend.get_value("/getter") == 7
+    finally:
+        robot.end_competition()
+        if robot_thread.is_alive():
+            robot_thread.join()
+        tunables.TunableRegistry.reset()
 
 
 @pytest.fixture(autouse=True)

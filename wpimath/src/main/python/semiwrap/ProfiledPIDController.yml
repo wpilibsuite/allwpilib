@@ -7,8 +7,6 @@ classes:
     - wpi::units::radians_per_second
     template_params:
     - Distance
-    ignored_bases:
-    - wpi::util::SendableHelper<ProfiledPIDController<Distance>>
     typealias:
     - typename wpi::math::ProfiledPIDController<Distance>::Velocity
     - typename wpi::math::ProfiledPIDController<Distance>::Velocity_t
@@ -62,7 +60,10 @@ classes:
           const State&:
           Distance_t, Velocity_t:
           Distance_t:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      PublishTunable:
+      GetTunableType:
 
 templates:
   ProfiledPIDController:

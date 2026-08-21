@@ -4,33 +4,30 @@
 
 #include "Robot.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/pressure.hpp"
 
-Robot::Robot() {
-  // Publish elements to shuffleboard.
-  wpi::SmartDashboard::PutData("Single Solenoid", &solenoid);
-  wpi::SmartDashboard::PutData("Double Solenoid", &doubleSolenoid);
-  wpi::SmartDashboard::PutData("Compressor", &compressor);
-}
+Robot::Robot() {}
 
 void Robot::TeleopPeriodic() {
+  // Publish elements to shuffleboard.
+  wpi::telemetry::Log("Single Solenoid", solenoid);
+  wpi::telemetry::Log("Double Solenoid", doubleSolenoid);
+  wpi::telemetry::Log("Compressor", compressor);
+
   // Publish some raw data
 
   // Get the pressure (in PSI) from the analog sensor connected to the PH.
   // This function is supported only on the PH!
   // On a PCM, this function will return 0.
-  wpi::SmartDashboard::PutNumber("PH Pressure [PSI]",
-                                 compressor.GetPressure().value());
+  wpi::telemetry::Log("PH Pressure [PSI]", compressor.GetPressure().value());
   // Get compressor current draw.
-  wpi::SmartDashboard::PutNumber("Compressor Current",
-                                 compressor.GetCurrent().value());
+  wpi::telemetry::Log("Compressor Current", compressor.GetCurrent().value());
   // Get whether the compressor is active.
-  wpi::SmartDashboard::PutBoolean("Compressor Active", compressor.IsEnabled());
+  wpi::telemetry::Log("Compressor Active", compressor.IsEnabled());
   // Get the digital pressure switch connected to the PCM/PH.
   // The switch is open when the pressure is over ~120 PSI.
-  wpi::SmartDashboard::PutBoolean("Pressure Switch",
-                                  compressor.GetPressureSwitchValue());
+  wpi::telemetry::Log("Pressure Switch", compressor.GetPressureSwitchValue());
 
   /*
    * The output of GetRawButton is true/false depending on whether

@@ -1,13 +1,10 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
 - wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::Switch2ProController:
     force_no_trampoline: true
-    ignored_bases:
-    - wpi::util::SendableHelper<Switch2ProController>
     attributes:
       TOUCHPAD_COUNT:
       SUPPORTS_RUMBLE:
@@ -126,7 +123,8 @@ classes:
         rename: button
       SetLeds:
       SetRumble:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
     enums:
       Button:
       Axis:

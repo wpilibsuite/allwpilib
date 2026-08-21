@@ -15,7 +15,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.epilogue.logging.ClassSpecificLogger;
-import org.wpilib.epilogue.logging.EpilogueBackend;
 
 /**
  * Handles logging of fields or methods. An element that passes the {@link #isLoggable(Element)}
@@ -173,8 +172,8 @@ public abstract class ElementHandler {
   /**
    * Generates a code snippet to place in a generated logger file to log the value of a field or
    * method. Log invocations are placed in a generated implementation of {@link
-   * ClassSpecificLogger#update(EpilogueBackend, Object)}, with access to the backend and logged
-   * object passed to the method call.
+   * ClassSpecificLogger#update(TelemetryTable, Object)}, with access to the table and logged object
+   * passed to the method call.
    *
    * @param element the field or method element to generate the logger call for
    * @return the generated log invocation

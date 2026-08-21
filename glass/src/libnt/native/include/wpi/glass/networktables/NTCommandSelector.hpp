@@ -28,7 +28,7 @@ class NTCommandSelectorModel : public CommandSelectorModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return false; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;

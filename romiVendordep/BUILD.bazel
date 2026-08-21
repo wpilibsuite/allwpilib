@@ -27,6 +27,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore",
+        "//telemetry",
+        "//tunables",
         "//wpilibc",
         "//wpinet",
     ],
@@ -37,6 +39,8 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpilibc:shared/wpilibc",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
@@ -50,9 +54,13 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/romiVendordep",
     static_deps = [
+        "//hal:static/wpiHal",
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -68,7 +76,10 @@ wpilib_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpilibj:wpilibj-java",
+        "//wpiutil:wpiutil-java",
     ],
 )
 
@@ -97,6 +108,9 @@ java_binary(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpilibj:wpilibj-java",
         "//wpiutil:wpiutil-java",
     ],
 )
@@ -125,6 +139,10 @@ PKG_CONFIG_DEPS = [
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
     "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
     "//wpilibc:robotpy-wpilib.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",

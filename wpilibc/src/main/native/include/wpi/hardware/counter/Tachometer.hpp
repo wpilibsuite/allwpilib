@@ -6,12 +6,11 @@
 
 #include "wpi/hal/Counter.h"
 #include "wpi/hardware/counter/EdgeConfiguration.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 /**
@@ -23,8 +22,7 @@ namespace wpi {
  * optical sensor detecting tape on a shooter wheel. Unlike encoders, this class
  * only needs a single digital input.
  */
-class Tachometer : public wpi::util::Sendable,
-                   public wpi::util::SendableHelper<Tachometer> {
+class Tachometer : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a new tachometer.
@@ -104,8 +102,9 @@ class Tachometer : public wpi::util::Sendable,
    */
   bool GetStopped() const;
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::util::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;

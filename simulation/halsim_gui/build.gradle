@@ -50,6 +50,8 @@ model {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             project.addLibSdlGpuDependency(it)
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
@@ -62,6 +64,8 @@ model {
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
         }
     }
 }

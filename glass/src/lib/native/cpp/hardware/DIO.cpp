@@ -60,13 +60,8 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
       }
     }
   } else {
-    const char* name = model->GetName();
-    if (name[0] != '\0') {
-      dioName.GetLabel(label, sizeof(label), name);
-    } else {
-      dioName.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
-                       index);
-    }
+    dioName.GetLabel(label, sizeof(label), model->IsInput() ? " In" : "Out",
+                     index);
     if (auto simDevice = model->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {

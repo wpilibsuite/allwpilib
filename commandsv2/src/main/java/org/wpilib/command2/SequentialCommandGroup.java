@@ -6,7 +6,7 @@ package org.wpilib.command2;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs a list of commands in sequence.
@@ -111,9 +111,8 @@ public class SequentialCommandGroup extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-
-    builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("index", m_currentCommandIndex);
   }
 }

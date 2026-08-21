@@ -18,7 +18,10 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpilibc>
 )
 wpilib_target_warnings(wpilibc)
-target_link_libraries(wpilibc PUBLIC hal ntcore wpimath datalog)
+target_link_libraries(
+    wpilibc
+    PUBLIC hal telemetry tunables ntcore wpimath datalog
+)
 
 set_property(TARGET wpilibc PROPERTY FOLDER "libraries")
 

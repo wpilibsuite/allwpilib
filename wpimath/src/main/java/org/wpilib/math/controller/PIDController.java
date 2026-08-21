@@ -6,12 +6,15 @@ package org.wpilib.math.controller;
 
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableTable;
 
 /** Implements a PID control loop. */
-public class PIDController implements Sendable, AutoCloseable {
+public class PIDController implements TelemetryLoggable, ComplexTunable {
   private static int instances;
 
   // Factor for "proportional" control
@@ -108,14 +111,7 @@ public class PIDController implements Sendable, AutoCloseable {
     m_period = period;
 
     instances++;
-    SendableRegistry.add(this, "PIDController", instances);
-
     MathSharedStore.reportUsage("PIDController", String.valueOf(instances));
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -130,9 +126,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kd The derivative coefficient.
    */
   public void setPID(double kp, double ki, double kd) {
-    m_kp = kp;
-    m_ki = ki;
-    m_kd = kd;
+    setP(kp);
+    setI(ki);
+    setD(kd);
   }
 
   /**
@@ -143,6 +139,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kp The proportional coefficient. Must be &gt;= 0.
    */
   public void setP(double kp) {
+    if (m_kp != kp) {
+      setChildTunableChanged("p");
+    }
     m_kp = kp;
   }
 
@@ -154,6 +153,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param ki The integral coefficient. Must be &gt;= 0.
    */
   public void setI(double ki) {
+    if (m_ki != ki) {
+      setChildTunableChanged("i");
+    }
     m_ki = ki;
   }
 
@@ -165,6 +167,9 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param kd The differential coefficient. Must be &gt;= 0.
    */
   public void setD(double kd) {
+    if (m_kd != kd) {
+      setChildTunableChanged("d");
+    }
     m_kd = kd;
   }
 
@@ -181,6 +186,9 @@ public class PIDController implements Sendable, AutoCloseable {
   public void setIZone(double iZone) {
     if (iZone < 0) {
       throw new IllegalArgumentException("IZone must be a non-negative number!");
+    }
+    if (m_iZone != iZone) {
+      setChildTunableChanged("izone");
     }
     m_iZone = iZone;
   }
@@ -263,6 +271,7 @@ public class PIDController implements Sendable, AutoCloseable {
    * @param setpoint The desired setpoint.
    */
   public void setSetpoint(double setpoint) {
+    final boolean setpointChanged = m_setpoint != setpoint;
     m_setpoint = setpoint;
     m_haveSetpoint = true;
 
@@ -274,6 +283,9 @@ public class PIDController implements Sendable, AutoCloseable {
     }
 
     m_errorDerivative = (m_error - m_prevError) / m_period;
+    if (setpointChanged) {
+      setChildTunableChanged("setpoint");
+    }
   }
 
   /**
@@ -389,8 +401,12 @@ public class PIDController implements Sendable, AutoCloseable {
    * @return The next controller output.
    */
   public double calculate(double measurement, double setpoint) {
+    final boolean setpointChanged = m_setpoint != setpoint;
     m_setpoint = setpoint;
     m_haveSetpoint = true;
+    if (setpointChanged) {
+      setChildTunableChanged("setpoint");
+    }
     return calculate(measurement);
   }
 
@@ -438,26 +454,46 @@ public class PIDController implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("PIDController");
-    builder.addDoubleProperty("p", this::getP, this::setP);
-    builder.addDoubleProperty("i", this::getI, this::setI);
-    builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty(
+  public void logTo(TelemetryTable table) {
+    table.log("p", getP());
+    table.log("i", getI());
+    table.log("d", getD());
+    table.log("izone", getIZone());
+    table.log("setpoint", getSetpoint());
+    table.log("measurement", m_measurement);
+    table.log("error", getError());
+    table.log("error derivative", getErrorDerivative());
+    table.log("previous error", m_prevError);
+    table.log("total error", getAccumulatedError());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "PIDController";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    var getOnChange = TunableConfig.of(TunableOption.GET_ON_CHANGE);
+    table.publishDouble("p", this::getP, this::setP, getOnChange);
+    table.publishDouble("i", this::getI, this::setI, getOnChange);
+    table.publishDouble("d", this::getD, this::setD, getOnChange);
+    table.publishDouble(
         "izone",
         this::getIZone,
-        (double toSet) -> {
+        v -> {
           try {
-            setIZone(toSet);
+            setIZone(v);
           } catch (IllegalArgumentException e) {
             MathSharedStore.reportError("IZone must be a non-negative number!", e.getStackTrace());
           }
-        });
-    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
-    builder.addDoubleProperty("measurement", () -> m_measurement, null);
-    builder.addDoubleProperty("error", this::getError, null);
-    builder.addDoubleProperty("error derivative", this::getErrorDerivative, null);
-    builder.addDoubleProperty("previous error", () -> this.m_prevError, null);
-    builder.addDoubleProperty("total error", this::getAccumulatedError, null);
+        },
+        getOnChange);
+    table.publishDouble("setpoint", this::getSetpoint, this::setSetpoint, getOnChange);
+  }
+
+  @Override
+  public String getTunableType() {
+    return "PIDController";
   }
 }

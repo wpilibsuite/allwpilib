@@ -18,6 +18,7 @@ from ._wpilib import (
     CompressorConfigType,
     CounterBase,
     DataLogManager,
+    DataLogTelemetryBackend,
     DifferentialDrive,
     DigitalInput,
     DigitalOutput,
@@ -63,6 +64,8 @@ from ._wpilib import (
     MotorControllerGroup,
     MotorSafety,
     NetworkBooleanEvent,
+    NetworkTablesTelemetryBackend,
+    NetworkTablesTunableBackend,
     NiDsPS4Controller,
     NiDsPS5Controller,
     NiDsStadiaController,
@@ -87,13 +90,9 @@ from ._wpilib import (
     RobotDriveBase,
     RobotState,
     RuntimeType,
-    SendableBuilderImpl,
-    SendableChooser,
-    SendableChooserBase,
     SensorUtil,
     SerialPort,
     SharpIR,
-    SmartDashboard,
     Solenoid,
     SteamController,
     Switch2GCController,
@@ -119,6 +118,39 @@ from ._wpilib import (
     wait,
 )
 
+
+def _register_networktables_telemetry_backend() -> None:
+    import telemetry as _telemetry
+    from ntcore import NetworkTableInstance
+
+    _telemetry.TelemetryRegistry.register_backend(
+        "",
+        NetworkTablesTelemetryBackend(NetworkTableInstance.get_default(), "/Telemetry"),
+    )
+
+
+def _register_networktables_tunable_backend() -> None:
+    import tunables as _tunables
+    from ntcore import NetworkTableInstance
+
+    _tunables.TunableRegistry.register_backend(
+        "",
+        NetworkTablesTunableBackend(NetworkTableInstance.get_default(), "/Tunables"),
+    )
+
+
+import telemetry as _telemetry
+import tunables as _tunables
+
+_telemetry.TelemetryRegistry.register_networktables_backend = staticmethod(
+    _register_networktables_telemetry_backend
+)
+_tunables.TunableRegistry.register_networktables_backend = staticmethod(
+    _register_networktables_tunable_backend
+)
+
+del _telemetry, _tunables
+
 __all__ = [
     "ADXL345_I2C",
     "AddressableLED",
@@ -136,6 +168,7 @@ __all__ = [
     "CompressorConfigType",
     "CounterBase",
     "DataLogManager",
+    "DataLogTelemetryBackend",
     "DifferentialDrive",
     "DigitalInput",
     "DigitalOutput",
@@ -181,6 +214,8 @@ __all__ = [
     "MotorControllerGroup",
     "MotorSafety",
     "NetworkBooleanEvent",
+    "NetworkTablesTelemetryBackend",
+    "NetworkTablesTunableBackend",
     "NiDsPS4Controller",
     "NiDsPS5Controller",
     "NiDsStadiaController",
@@ -205,13 +240,9 @@ __all__ = [
     "RobotDriveBase",
     "RobotState",
     "RuntimeType",
-    "SendableBuilderImpl",
-    "SendableChooser",
-    "SendableChooserBase",
     "SensorUtil",
     "SerialPort",
     "SharpIR",
-    "SmartDashboard",
     "Solenoid",
     "SteamController",
     "Switch2GCController",

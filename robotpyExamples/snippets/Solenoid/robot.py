@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 
 SOLENOID_BUTTON = 1
@@ -53,32 +54,19 @@ class MyRobot(wpilib.TimedRobot):
             module_type=wpilib.PneumaticsModuleType.REV_PH,
         )
 
-        # Publish elements to dashboard.
-        wpilib.SmartDashboard.put_data("Single Solenoid", self.solenoid)
-        wpilib.SmartDashboard.put_data("Double Solenoid", self.double_solenoid)
-        wpilib.SmartDashboard.put_data("Compressor", self.compressor)
-
     def teleop_periodic(self) -> None:
         # Publish some raw data
         # Get the pressure (in PSI) from the analog sensor connected to the PH.
         # This function is supported only on the PH!
         # On a PCM, this function will return 0.
-        wpilib.SmartDashboard.put_number(
-            "PH Pressure [PSI]", self.compressor.get_pressure()
-        )
+        telemetry.log("PH Pressure [PSI]", self.compressor.get_pressure())
         # Get compressor current draw.
-        wpilib.SmartDashboard.put_number(
-            "Compressor Current", self.compressor.get_current()
-        )
+        telemetry.log("Compressor Current", self.compressor.get_current())
         # Get whether the compressor is active.
-        wpilib.SmartDashboard.put_boolean(
-            "Compressor Active", self.compressor.is_enabled()
-        )
+        telemetry.log("Compressor Active", self.compressor.is_enabled())
         # Get the digital pressure switch connected to the PCM/PH.
         # The switch is open when the pressure is over ~120 PSI.
-        wpilib.SmartDashboard.put_boolean(
-            "Pressure Switch", self.compressor.get_pressure_switch_value()
-        )
+        telemetry.log("Pressure Switch", self.compressor.get_pressure_switch_value())
 
         # The output of get_raw_button is true/false depending on whether
         # the button is pressed; set takes a boolean for whether
@@ -123,3 +111,8 @@ class MyRobot(wpilib.TimedRobot):
                     # that the system is not full.
                     # Hybrid mode exists only on the PH! On the PCM, this enables digital control.
                     self.compressor.enable_hybrid(70, 120)
+
+        # Publish elements to dashboard.
+        telemetry.log("Single Solenoid", self.solenoid)
+        telemetry.log("Double Solenoid", self.double_solenoid)
+        telemetry.log("Compressor", self.compressor)

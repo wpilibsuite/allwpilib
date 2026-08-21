@@ -8,6 +8,7 @@ import math
 
 import ntcore
 import robotpy_fields
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -109,9 +110,6 @@ class Drivetrain:
 
         self.left_encoder.reset()
         self.right_encoder.reset()
-
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
-        wpilib.SmartDashboard.put_data("FieldEstimation", self.field_approximation)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
@@ -270,3 +268,6 @@ class Drivetrain:
         self.field_approximation.set_robot_pose(
             self.pose_estimator.get_estimated_position()
         )
+
+        telemetry.log("Field", self.field_sim)
+        telemetry.log("FieldEstimation", self.field_approximation)

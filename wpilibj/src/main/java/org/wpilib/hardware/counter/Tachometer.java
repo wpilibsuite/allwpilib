@@ -6,9 +6,10 @@ package org.wpilib.hardware.counter;
 
 import org.wpilib.hardware.hal.CounterJNI;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.internal.UnitTelemetry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.units.Units;
 
 /**
  * Tachometer.
@@ -18,7 +19,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  * sensor, break beam sensor, or optical sensor detecting tape on a shooter wheel. Unlike encoders,
  * this class only needs a single digital input.
  */
-public class Tachometer implements Sendable, AutoCloseable {
+public class Tachometer implements TelemetryLoggable, AutoCloseable {
   private final int m_handle;
   private int m_edgesPerRevolution = 1;
 
@@ -28,17 +29,14 @@ public class Tachometer implements Sendable, AutoCloseable {
    * @param channel The channel of the Tachometer.
    * @param configuration The edge configuration
    */
-  @SuppressWarnings("this-escape")
   public Tachometer(int channel, EdgeConfiguration configuration) {
     m_handle = CounterJNI.initializeCounter(channel, configuration.rising);
 
     HAL.reportUsage("IO", channel, "Tachometer");
-    SendableRegistry.add(this, "Tachometer", channel);
   }
 
   @Override
   public void close() {
-    SendableRegistry.remove(this);
     CounterJNI.freeCounter(m_handle);
   }
 
@@ -117,9 +115,12 @@ public class Tachometer implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Tachometer");
-    builder.addDoubleProperty("RPS", this::getRevolutionsPerSecond, null);
-    builder.addDoubleProperty("RPM", this::getRevolutionsPerMinute, null);
+  public void logTo(TelemetryTable table) {
+    UnitTelemetry.log(table, "RPM", getRevolutionsPerMinute(), Units.RotationsPerMinute);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Tachometer";
   }
 }

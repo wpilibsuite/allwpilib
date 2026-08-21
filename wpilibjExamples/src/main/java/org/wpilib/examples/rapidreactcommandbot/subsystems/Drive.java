@@ -18,7 +18,6 @@ import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.SendableRegistry;
 
 @Logged
 public class Drive extends SubsystemBase {
@@ -63,9 +62,6 @@ public class Drive extends SubsystemBase {
 
   /** Creates a new Drive subsystem. */
   public Drive() {
-    SendableRegistry.addChild(drive, leftLeader);
-    SendableRegistry.addChild(drive, rightLeader);
-
     leftLeader.addFollower(leftFollower);
     rightLeader.addFollower(rightFollower);
 

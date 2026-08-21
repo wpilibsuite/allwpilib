@@ -4,11 +4,10 @@
 
 package org.wpilib.epilogue;
 
-import org.wpilib.epilogue.logging.EpilogueBackend;
-import org.wpilib.epilogue.logging.NTEpilogueBackend;
 import org.wpilib.epilogue.logging.errors.ErrorHandler;
 import org.wpilib.epilogue.logging.errors.ErrorPrinter;
-import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -17,11 +16,10 @@ import org.wpilib.units.measure.Time;
  */
 public class EpilogueConfiguration {
   /**
-   * The backend implementation for Epilogue to use. By default, this will log data directly to
-   * NetworkTables. NetworkTable data can be mirrored to a log file on disk by calling {@code
-   * DataLogManager.start()} in your robot class constructor.
+   * The telemetry table for Epilogue to use. By default, this will use the root telemetry table.
+   * RobotBase registers telemetry to publish through NetworkTables under {@code /Telemetry}.
    */
-  public EpilogueBackend backend = new NTEpilogueBackend(NetworkTableInstance.getDefault());
+  public TelemetryTable table = Telemetry.getTable();
 
   /**
    * The period Epilogue will log at. By default this is the period that the robot runs at. This is

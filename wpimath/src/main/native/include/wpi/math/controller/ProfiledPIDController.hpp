@@ -5,19 +5,22 @@
 #pragma once
 
 #include <limits>
+#include <ratio>
 #include <string>
 
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/units/base.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 namespace detail {
@@ -30,9 +33,8 @@ int IncrementAndGetProfiledPIDControllerInstances();
  * profile.
  */
 template <class Distance>
-class ProfiledPIDController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<ProfiledPIDController<Distance>> {
+class ProfiledPIDController : public wpi::telemetry::TelemetryLoggable,
+                              public wpi::tunables::ComplexTunable {
  public:
   using Distance_t = wpi::units::unit_t<Distance>;
   using Velocity =
@@ -68,8 +70,6 @@ class ProfiledPIDController
       int instances = detail::IncrementAndGetProfiledPIDControllerInstances();
       wpi::math::MathSharedStore::ReportUsage("ProfiledPIDController",
                                               std::to_string(instances));
-      wpi::util::SendableRegistry::Add(this, "ProfiledPIDController",
-                                       instances);
     }
   }
 
@@ -206,14 +206,26 @@ class ProfiledPIDController
    *
    * @param goal The desired unprofiled setpoint.
    */
-  constexpr void SetGoal(State goal) { m_goal = goal; }
+  constexpr void SetGoal(State goal) {
+    double goalPosition = ToBaseGoalPosition(goal.position);
+    bool goalPositionChanged = m_goalPosition != goalPosition;
+    m_goal = goal;
+    m_goalPosition = goalPosition;
+    if !consteval {
+      if (goalPositionChanged) {
+        SetChildTunableChanged("goal");
+      }
+    }
+  }
 
   /**
    * Sets the goal for the ProfiledPIDController.
    *
    * @param goal The desired unprofiled setpoint.
    */
-  constexpr void SetGoal(Distance_t goal) { m_goal = {goal, Velocity_t{0}}; }
+  constexpr void SetGoal(Distance_t goal) {
+    SetGoal(State{goal, Velocity_t{0}});
+  }
 
   /**
    * Gets the goal for the ProfiledPIDController.
@@ -235,13 +247,16 @@ class ProfiledPIDController
   constexpr void SetConstraints(Constraints constraints) {
     m_constraints = constraints;
     m_profile = TrapezoidProfile<Distance>{m_constraints};
+    if !consteval {
+      SetChildTunableChanged("constraints");
+    }
   }
 
   /**
    * Get the velocity and acceleration constraints for this controller.
    * @return Velocity and acceleration constraints.
    */
-  constexpr Constraints GetConstraints() { return m_constraints; }
+  constexpr Constraints GetConstraints() const { return m_constraints; }
 
   /**
    * Returns the current setpoint of the ProfiledPIDController.
@@ -352,6 +367,14 @@ class ProfiledPIDController
       // offset from the measurement by the input range modulus; they don't need
       // to be equal.
       m_goal.position = goalMinDistance + measurement;
+      double goalPosition = ToBaseGoalPosition(m_goal.position);
+      bool goalPositionChanged = m_goalPosition != goalPosition;
+      m_goalPosition = goalPosition;
+      if !consteval {
+        if (goalPositionChanged) {
+          SetChildTunableChanged("goal");
+        }
+      }
       m_setpoint.position = setpointMinDistance + measurement;
     }
 
@@ -426,36 +449,58 @@ class ProfiledPIDController
     Reset(measuredPosition, Velocity_t{0});
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override {
-    builder.SetSmartDashboardType("ProfiledPIDController");
-    builder.AddDoubleProperty(
-        "p", [this] { return GetP(); }, [this](double value) { SetP(value); });
-    builder.AddDoubleProperty(
-        "i", [this] { return GetI(); }, [this](double value) { SetI(value); });
-    builder.AddDoubleProperty(
-        "d", [this] { return GetD(); }, [this](double value) { SetD(value); });
-    builder.AddDoubleProperty(
-        "izone", [this] { return GetIZone(); },
-        [this](double value) { SetIZone(value); });
-    builder.AddDoubleProperty(
-        "maxVelocity", [this] { return GetConstraints().maxVelocity.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{Velocity_t{value}, GetConstraints().maxAcceleration});
-        });
-    builder.AddDoubleProperty(
-        "maxAcceleration",
-        [this] { return GetConstraints().maxAcceleration.value(); },
-        [this](double value) {
-          SetConstraints(
-              Constraints{GetConstraints().maxVelocity, Acceleration_t{value}});
-        });
-    builder.AddDoubleProperty(
-        "goal", [this] { return GetGoal().position.value(); },
-        [this](double value) { SetGoal(Distance_t{value}); });
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
+    table.Log("controller", m_controller);
+    table.Log("constraints", m_constraints);
+    table.Log("goal", GetGoal().position);
+  }
+
+  std::string_view GetTelemetryType() const override {
+    return "ProfiledPIDController";
+  }
+
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
+    table.Publish("controller", m_controller);
+    auto constraintsConfig = wpi::tunables::TunableConfig::GetOnChange();
+    constraintsConfig.onTune = [](wpi::tunables::detail::TunableBase&,
+                                  wpi::tunables::ComplexTunable* self) {
+      if (auto controller = static_cast<ProfiledPIDController*>(self)) {
+        controller->SetConstraints(controller->GetConstraints());
+      }
+    };
+    constraintsConfig.parent = this;
+    table.Publish("constraints", this, &ProfiledPIDController::m_constraints,
+                  constraintsConfig);
+    auto goalConfig = wpi::tunables::TunableConfig::GetOnChange();
+    goalConfig.onTune = [](wpi::tunables::detail::TunableBase&,
+                           wpi::tunables::ComplexTunable* self) {
+      if (auto controller = static_cast<ProfiledPIDController*>(self)) {
+        controller->SetGoal(FromBaseGoalPosition(controller->m_goalPosition));
+      }
+    };
+    goalConfig.parent = this;
+    table.Publish("goal", this, &ProfiledPIDController::m_goalPosition,
+                  goalConfig);
+  }
+
+  std::string_view GetTunableType() const override {
+    return "ProfiledPIDController";
   }
 
  private:
+  using BaseDistance =
+      wpi::units::unit<std::ratio<1>,
+                       wpi::units::traits::base_unit_of<Distance>>;
+  using BaseDistance_t = wpi::units::unit_t<BaseDistance>;
+
+  static constexpr double ToBaseGoalPosition(Distance_t position) {
+    return BaseDistance_t{position}.value();
+  }
+
+  static constexpr Distance_t FromBaseGoalPosition(double position) {
+    return BaseDistance_t{position};
+  }
+
   PIDController m_controller;
   Distance_t m_minimumInput{0};
   Distance_t m_maximumInput{0};
@@ -464,6 +509,7 @@ class ProfiledPIDController
   TrapezoidProfile<Distance> m_profile;
   typename wpi::math::TrapezoidProfile<Distance>::State m_goal;
   typename wpi::math::TrapezoidProfile<Distance>::State m_setpoint;
+  double m_goalPosition = 0.0;
 };
 
 }  // namespace wpi::math

@@ -81,6 +81,8 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
             "//hal:shared/wpiHal",
             "//simulation/halsim_gui:shared/halsim_gui",
             "//ntcore:shared/ntcore",
+            "//telemetry:shared/telemetry",
+            "//tunables:shared/tunables",
             "//wpimath:shared/wpimath",
         ],
         extra_hdrs = extra_hdrs,

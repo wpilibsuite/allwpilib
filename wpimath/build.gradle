@@ -75,6 +75,9 @@ model {
     binaries {
         all {
             it.cppCompiler.define 'SLEIPNIR_EXPORTS'
+
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
         }
     }
 }
@@ -89,6 +92,8 @@ nativeUtils.exportsConfigs {
 
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
+    api project(":telemetry")
+    api project(":tunables")
     api project(":wpiunits")
     api libs.avaje.jsonb
     api libs.bundles.ejml

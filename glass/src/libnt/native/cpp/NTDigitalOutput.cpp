@@ -5,7 +5,8 @@
 #include "wpi/glass/networktables/NTDigitalOutput.hpp"
 
 #include <format>
-#include <utility>
+
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 
 using namespace wpi::glass;
 
@@ -17,9 +18,6 @@ NTDigitalOutputModel::NTDigitalOutputModel(wpi::nt::NetworkTableInstance inst,
     : m_inst{inst},
       m_value{
           inst.GetBooleanTopic(std::format("{}/Value", path)).GetEntry(false)},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
-                         .Subscribe(false)},
       m_valueData{std::format("NT_DOut:{}", path)} {}
 
 void NTDigitalOutputModel::SetValue(bool val) {
@@ -30,14 +28,12 @@ void NTDigitalOutputModel::Update() {
   for (auto&& v : m_value.ReadQueue()) {
     m_valueData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
-  }
 }
 
 bool NTDigitalOutputModel::Exists() {
   return m_value.Exists();
+}
+
+bool NTDigitalOutputModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_value.GetTopic());
 }

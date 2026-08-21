@@ -34,7 +34,6 @@ class NTSubsystemModel : public SubsystemModel {
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_name;
   wpi::nt::StringSubscriber m_defaultCommand;
   wpi::nt::StringSubscriber m_currentCommand;
 
