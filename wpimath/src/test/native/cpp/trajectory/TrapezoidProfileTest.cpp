@@ -5,6 +5,7 @@
 #include "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 #include <stdexcept>
+#include <type_traits>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -49,8 +50,7 @@ TEST_CASE("TrapezoidProfileTest ConstraintsRequirePositiveValues",
   using Constraints =
       wpi::math::TrapezoidProfile<wpi::units::meter>::Constraints;
 
-  CHECK(Constraints{}.maxVelocity == 0_mps);
-  CHECK(Constraints{}.maxAcceleration == 0_mps_sq);
+  STATIC_REQUIRE(!std::is_default_constructible_v<Constraints>);
   CHECK_THROWS_AS(Constraints(0_mps, 1_mps_sq), std::domain_error);
   CHECK_THROWS_AS(Constraints(1_mps, 0_mps_sq), std::domain_error);
   CHECK_THROWS_AS(Constraints(-1_mps, 1_mps_sq), std::domain_error);

@@ -57,12 +57,6 @@ public class TrapezoidProfile {
     /** Maximum acceleration. */
     public final double maxAcceleration;
 
-    /** Default constructor. */
-    public Constraints() {
-      this.maxVelocity = 0.0;
-      this.maxAcceleration = 0.0;
-    }
-
     /**
      * Constructs constraints for a TrapezoidProfile.
      *

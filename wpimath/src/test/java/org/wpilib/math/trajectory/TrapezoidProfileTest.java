@@ -70,10 +70,6 @@ class TrapezoidProfileTest {
 
   @Test
   void constraintsRequirePositiveValues() {
-    TrapezoidProfile.Constraints defaults = new TrapezoidProfile.Constraints();
-
-    assertEquals(0.0, defaults.maxVelocity);
-    assertEquals(0.0, defaults.maxAcceleration);
     assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(0.0, 1.0));
     assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(1.0, 0.0));
     assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(-1.0, 1.0));

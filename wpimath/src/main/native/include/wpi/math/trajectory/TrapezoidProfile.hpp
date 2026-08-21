@@ -38,15 +38,6 @@ class TrapezoidProfileConstraints {
   Acceleration_t maxAcceleration{0};
 
   /**
-   * Default constructor.
-   */
-  constexpr TrapezoidProfileConstraints() {
-    if !consteval {
-      wpi::math::MathSharedStore::ReportUsage("TrapezoidProfile", "");
-    }
-  }
-
-  /**
    * Constructs constraints for a Trapezoid Profile.
    *
    * @param maxVelocity Maximum velocity, must be positive.
