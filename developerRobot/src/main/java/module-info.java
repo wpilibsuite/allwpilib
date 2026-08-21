@@ -11,4 +11,5 @@ open module wpilib.developerrobot {
   requires wpilib;
   requires wpilib.command2;
   requires wpilib.command3;
+  requires wpilib.drivers;
 }

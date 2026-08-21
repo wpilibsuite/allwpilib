@@ -10,6 +10,7 @@ open module wpilib.examples {
   requires wpilib.command2;
   requires wpilib.command3;
   requires wpilib.cscore;
+  requires wpilib.drivers;
   requires wpilib.epilogue;
   requires wpilib.gamefields;
   requires wpilib.hal;
