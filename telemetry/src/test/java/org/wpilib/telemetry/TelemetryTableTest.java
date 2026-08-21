@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.telemetry.util.PathUtil;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;
@@ -107,7 +108,7 @@ class TelemetryTableTest {
 
     @Override
     public TelemetryEntry getEntry(String path) {
-      if ("/rerouted/.type".equals(TelemetryRegistry.normalizeName(path))
+      if ("/rerouted/.type".equals(PathUtil.normalizeName(path))
           && m_registered.compareAndSet(false, true)) {
         TelemetryRegistry.registerBackend("", m_replacement);
       }

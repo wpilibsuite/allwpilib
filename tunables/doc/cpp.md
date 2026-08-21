@@ -174,7 +174,6 @@ class TunableRegistry final {
   static void RegisterBackend(std::string_view prefix,
                               std::shared_ptr<wpi::tunables::TunableBackend> backend);
   static std::shared_ptr<wpi::tunables::TunableBackend> GetBackend(std::string_view path);
-  static std::string_view NormalizeName(std::string_view path, std::string& buf);
   static bool Publish(std::string_view path, wpi::tunables::detail::TunableBase& tunable);
   static bool Publish(std::string_view path, wpi::tunables::ComplexTunable& tunable);
   static bool Publish(std::string_view path, wpi::tunables::ComplexTunable* tunable,

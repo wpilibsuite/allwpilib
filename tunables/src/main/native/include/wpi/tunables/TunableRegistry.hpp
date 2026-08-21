@@ -83,16 +83,6 @@ class TunableRegistry final {
   static std::shared_ptr<TunableBackend> GetBackend(std::string_view path);
 
   /**
-   * Normalizes a tunable name.
-   *
-   * @param path input path
-   * @param buf scratch buffer used when the normalized name needs storage
-   * @return normalized path
-   */
-  static std::string_view NormalizeName(std::string_view path,
-                                        std::string& buf);
-
-  /**
    * Publishes a tunable.
    *
    * @param path normalized path

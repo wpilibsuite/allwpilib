@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
+import org.wpilib.telemetry.util.PathUtil;
 import org.wpilib.util.collections.PrefixMap;
 import org.wpilib.util.collections.prefixmap.StringPrefixMap;
 
@@ -188,7 +189,7 @@ public final class TelemetryRegistry {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public static void registerBackend(String prefix, TelemetryBackend backend) {
-    String normalizedPrefix = normalizeBackendPrefix(prefix);
+    String normalizedPrefix = PathUtil.normalizeBackendPrefix(prefix);
     List<RemovedEntry> removedEntries = new ArrayList<>();
     List<TelemetryBackend> registeredBackends = new ArrayList<>();
     Set<TelemetryBackend> registeredOwnedBackends =
@@ -257,7 +258,7 @@ public final class TelemetryRegistry {
    * @return telemetry backend, or a discard backend if no match
    */
   public static TelemetryBackend getBackend(String path) {
-    String normalized = normalizeName(path);
+    String normalized = PathUtil.normalizeName(path);
     TelemetryBackend backend;
     synchronized (s_backends) {
       backend = getBackendForNormalizedPath(normalized);
@@ -277,7 +278,7 @@ public final class TelemetryRegistry {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   static TelemetryEntry getEntry(String path) {
-    String normalized = normalizeName(path);
+    String normalized = PathUtil.normalizeName(path);
     for (; ; ) {
       TelemetryBackend backend;
       boolean missingBackend = false;
@@ -309,28 +310,30 @@ public final class TelemetryRegistry {
   }
 
   static void keepEntryDuplicates(String path) {
-    s_entryMetadata.computeIfAbsent(normalizeName(path), k -> new EntryMetadata()).keepDuplicates();
+    s_entryMetadata
+        .computeIfAbsent(PathUtil.normalizeName(path), k -> new EntryMetadata())
+        .keepDuplicates();
   }
 
   static void setEntryProperty(String path, String key, String value) {
     s_entryMetadata
-        .computeIfAbsent(normalizeName(path), k -> new EntryMetadata())
+        .computeIfAbsent(PathUtil.normalizeName(path), k -> new EntryMetadata())
         .setProperty(key, value);
   }
 
   static void applyEntryMetadata(String path, TelemetryEntry entry) {
-    EntryMetadata metadata = s_entryMetadata.get(normalizeName(path));
+    EntryMetadata metadata = s_entryMetadata.get(PathUtil.normalizeName(path));
     if (metadata != null) {
       metadata.apply(entry);
     }
   }
 
   static boolean hasNonDiscardDescendant(String tablePath) {
-    String normalized = normalizeTableName(tablePath);
+    String normalized = PathUtil.normalizeTableName(tablePath);
     List<BackendPrefix> descendants = new ArrayList<>();
     synchronized (s_backends) {
       for (Map.Entry<String, TelemetryBackend> entry : s_backends.entrySet()) {
-        if (isPathOrDescendant(entry.getKey(), normalized)) {
+        if (PathUtil.isPathOrDescendant(entry.getKey(), normalized)) {
           descendants.add(new BackendPrefix(entry.getKey(), entry.getValue()));
         }
       }
@@ -351,7 +354,7 @@ public final class TelemetryRegistry {
    * @return telemetry table
    */
   public static TelemetryTable getTable(String path) {
-    return s_tables.computeIfAbsent(normalizeTableName(path), TelemetryTable::new);
+    return s_tables.computeIfAbsent(PathUtil.normalizeTableName(path), TelemetryTable::new);
   }
 
   /**
@@ -386,45 +389,6 @@ public final class TelemetryRegistry {
     s_entryMetadata.clear();
   }
 
-  static String normalizeTableName(String path) {
-    path = normalizeName(path);
-    if (path.charAt(path.length() - 1) != '/') {
-      path = path + '/';
-    }
-    return path;
-  }
-
-  private static String normalizeBackendPrefix(String prefix) {
-    if (prefix.isEmpty()) {
-      return "";
-    }
-    String normalized = normalizeName(prefix);
-    while (normalized.length() > 1 && normalized.endsWith("/")) {
-      normalized = normalized.substring(0, normalized.length() - 1);
-    }
-    return normalized;
-  }
-
-  static String normalizeName(String path) {
-    if (!path.isEmpty() && path.charAt(0) == '/' && !path.contains("//")) {
-      return path;
-    }
-
-    StringBuilder normalized = new StringBuilder(path.length() + 1);
-    if (path.isEmpty() || path.charAt(0) != '/') {
-      normalized.append('/');
-    }
-    char previousChar = '\0';
-    for (int i = 0; i < path.length(); i++) {
-      char ch = path.charAt(i);
-      if (ch != '/' || previousChar != '/') {
-        normalized.append(ch);
-      }
-      previousChar = ch;
-    }
-    return normalized.toString();
-  }
-
   private static TelemetryBackend getBackendForNormalizedPath(String path) {
     String candidate = path;
     while (true) {
@@ -445,18 +409,6 @@ public final class TelemetryRegistry {
       return rootBackend;
     }
     return s_backends.get("");
-  }
-
-  private static boolean isPathOrDescendant(String path, String root) {
-    if (root.isEmpty() || "/".equals(root) || path.equals(root)) {
-      return true;
-    }
-    if (root.endsWith("/")) {
-      return path.startsWith(root);
-    }
-    return path.length() > root.length()
-        && path.startsWith(root)
-        && path.charAt(root.length()) == '/';
   }
 
   @SuppressWarnings("PMD.AvoidCatchingGenericException")

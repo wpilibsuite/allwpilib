@@ -39,6 +39,7 @@ import org.wpilib.tunable.TunableFloat;
 import org.wpilib.tunable.TunableInt;
 import org.wpilib.tunable.TunableLong;
 import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.util.PathUtil;
 import org.wpilib.util.function.BooleanConsumer;
 import org.wpilib.util.function.FloatConsumer;
 import org.wpilib.util.function.FloatSupplier;
@@ -67,18 +68,6 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private int m_updateDepth;
   private boolean m_usingOnChangeCallbacks;
   private boolean m_closed;
-
-  private static boolean isPathOrDescendant(String path, String root) {
-    if (root.isEmpty() || "/".equals(root) || path.equals(root)) {
-      return true;
-    }
-    if (root.endsWith("/")) {
-      return path.startsWith(root);
-    }
-    return path.length() > root.length()
-        && path.startsWith(root)
-        && path.charAt(root.length()) == '/';
-  }
 
   private static final class StoredEntry {
     StoredEntry(TunableEntry entry, TunableBase tunable, ComplexTunable complex) {
@@ -1233,13 +1222,13 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   @Override
   public List<PublishedTunable> removePrefix(String prefix) {
-    String normalizedPrefix = prefix.isEmpty() ? "" : TunableRegistry.normalizeName(prefix);
+    String normalizedPrefix = PathUtil.normalizePrefix(prefix);
     List<PublishedTunable> removed = new ArrayList<>();
     synchronized (m_entries) {
       var iterator = m_entries.entrySet().iterator();
       while (iterator.hasNext()) {
         var mapEntry = iterator.next();
-        if (!isPathOrDescendant(mapEntry.getKey(), normalizedPrefix)) {
+        if (!PathUtil.isPathOrDescendant(mapEntry.getKey(), normalizedPrefix)) {
           continue;
         }
         StoredEntry entry = mapEntry.getValue();
@@ -1259,7 +1248,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         List<String> pendingRemoves = new ArrayList<>();
         for (var pendingEntry : m_pendingPathStates.entrySet()) {
           if (pendingEntry.getValue()
-              && isPathOrDescendant(pendingEntry.getKey(), normalizedPrefix)) {
+              && PathUtil.isPathOrDescendant(pendingEntry.getKey(), normalizedPrefix)) {
             pendingRemoves.add(pendingEntry.getKey());
           }
         }

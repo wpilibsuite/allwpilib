@@ -13,6 +13,7 @@ import java.util.function.IntSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+import org.wpilib.tunable.util.PathUtil;
 import org.wpilib.util.function.BooleanConsumer;
 import org.wpilib.util.function.FloatConsumer;
 import org.wpilib.util.function.FloatSupplier;
@@ -64,7 +65,7 @@ public final class TunableTable {
    * @return true if the backend accepted the tunable
    */
   public boolean publish(String name, TunableBase tunable) {
-    return TunableRegistry.publish(TunableRegistry.normalizeName(m_path + name), tunable);
+    return TunableRegistry.publish(PathUtil.normalizeName(m_path + name), tunable);
   }
 
   /**
@@ -75,7 +76,7 @@ public final class TunableTable {
    * @return true if the backend accepted the tunable
    */
   public boolean publish(String name, ComplexTunable tunable) {
-    return TunableRegistry.publish(TunableRegistry.normalizeName(m_path + name), tunable);
+    return TunableRegistry.publish(PathUtil.normalizeName(m_path + name), tunable);
   }
 
   /**
@@ -258,6 +259,6 @@ public final class TunableTable {
    * @param name name
    */
   public void remove(String name) {
-    TunableRegistry.remove(TunableRegistry.normalizeName(m_path + name));
+    TunableRegistry.remove(PathUtil.normalizeName(m_path + name));
   }
 }

@@ -501,9 +501,6 @@ public final class TunableRegistry {
   // gets or creates a TunableTable for the given path
   public static TunableTable getTable(String path) {...}
 
-  // normalizes a name to start with "/" and collapses doubled slashes
-  public static String normalizeName(String path) {...}
-
   // warning reporting (e.g. for type mismatches detected at publish time)
   public static void setReportWarning(Consumer<String> func) {...}
   public static Consumer<String> getReportWarning() {...}
@@ -531,6 +528,8 @@ public interface TunableBackend extends AutoCloseable {
 ```
 
 The standard production backend is `NetworkTablesTunableBackend`, registered by `RobotBase` with the NT prefix `/Tunables`. It publishes non-robust tunables to `/Tunables/<path>` and robust tunables as separate `/Tunables/<path>/value` and `/Tunables/<path>/tune` topics. The backend calls `tunables.get()` to publish the current value and `tunables.set(value)` to apply a remotely-written value, subject to the mutability flag.
+
+Custom backend implementations can use `org.wpilib.tunable.util.PathUtil` for path normalization and descendant checks. `normalizePrefix()` preserves a trailing slash for `removePrefix()` descendant-only matching; registry backend registration uses its own normalization so `/foo` and `/foo/` register the same backend prefix.
 
 `markDirty()` is called when a tunable with change-notification support is modified locally; backends can use this to avoid polling unchanged `GET_ON_CHANGE` values. Backends should call `resetChangedAfterUpdate()` after publishing a changed value so all registered backends can observe the changed flag during the same registry update, and should use `runAfterUpdate()` for non-throwing callbacks that react to tuned values.
 

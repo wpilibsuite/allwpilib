@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
+import org.wpilib.telemetry.util.PathUtil;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.Struct;
@@ -203,11 +204,11 @@ public final class TelemetryTable {
   }
 
   private String getEntryPath(String name) {
-    return TelemetryRegistry.normalizeName(m_path + name);
+    return PathUtil.normalizeName(m_path + name);
   }
 
   private String getTablePath(String name) {
-    return TelemetryRegistry.normalizeTableName(m_path + name + "/");
+    return PathUtil.normalizeTableName(m_path + name + "/");
   }
 
   /**

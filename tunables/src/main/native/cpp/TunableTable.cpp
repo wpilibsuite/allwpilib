@@ -11,6 +11,7 @@
 
 #include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
 #include "wpi/tunables/detail/TunableMember.hpp"
 
 using namespace wpi;
@@ -24,23 +25,21 @@ bool TunableTable::Publish(std::string_view name,
                            detail::TunableBase& tunable) {
   std::string buf;
   return TunableRegistry::Publish(
-      TunableRegistry::NormalizeName(std::format("{}{}", m_path, name), buf),
-      tunable);
+      detail::NormalizeName(std::format("{}{}", m_path, name), buf), tunable);
 }
 
 bool TunableTable::Publish(std::string_view name, ComplexTunable& tunable) {
   std::string buf;
   return TunableRegistry::Publish(
-      TunableRegistry::NormalizeName(std::format("{}{}", m_path, name), buf),
-      tunable);
+      detail::NormalizeName(std::format("{}{}", m_path, name), buf), tunable);
 }
 
 bool TunableTable::Publish(std::string_view name, ComplexTunable* tunable,
                            std::unique_ptr<detail::TunableMemberBase> member) {
   std::string buf;
   return TunableRegistry::Publish(
-      TunableRegistry::NormalizeName(std::format("{}{}", m_path, name), buf),
-      tunable, std::move(member));
+      detail::NormalizeName(std::format("{}{}", m_path, name), buf), tunable,
+      std::move(member));
 }
 
 /**
@@ -50,5 +49,5 @@ bool TunableTable::Publish(std::string_view name, ComplexTunable* tunable,
 void TunableTable::Remove(std::string_view name) {
   std::string buf;
   TunableRegistry::Remove(
-      TunableRegistry::NormalizeName(std::format("{}{}", m_path, name), buf));
+      detail::NormalizeName(std::format("{}{}", m_path, name), buf));
 }

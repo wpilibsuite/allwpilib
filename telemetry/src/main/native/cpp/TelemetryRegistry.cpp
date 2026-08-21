@@ -14,7 +14,7 @@
 #include "wpi/telemetry/DiscardTelemetryBackend.hpp"
 #include "wpi/telemetry/TelemetryBackend.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
-#include "wpi/util/StringExtras.hpp"
+#include "wpi/telemetry/detail/PathUtil.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/htrie_map.hpp"
 #include "wpi/util/mutex.hpp"
@@ -62,62 +62,6 @@ static std::shared_ptr<TelemetryBackend> GetMissingBackend() {
   return backend;
 }
 
-static std::string_view NormalizeName(std::string_view path, std::string& buf) {
-  // common case is a well formatted name, so check first
-  if (util::starts_with(path, '/') && !util::contains(path, "//")) {
-    return path;
-  }
-  buf.clear();
-  buf.reserve(path.size() + 2);
-  if (!util::starts_with(path, '/')) {
-    buf.push_back('/');
-  }
-  char prevCh = '\0';
-  for (auto ch : path) {
-    if (ch != '/' || prevCh != '/') {
-      buf.push_back(ch);
-    }
-    prevCh = ch;
-  }
-  return buf;
-}
-
-static std::string_view NormalizeTableName(std::string_view path,
-                                           std::string& buf) {
-  // common case is a well formatted name, so check first
-  if (util::starts_with(path, '/') && util::ends_with(path, '/') &&
-      !util::contains(path, "//")) {
-    return path;
-  }
-  std::string_view normalized = NormalizeName(path, buf);
-  if (!util::ends_with(normalized, '/')) {
-    if (buf.empty()) {
-      buf = normalized;
-    }
-    buf.push_back('/');
-    return buf;
-  }
-  return normalized;
-}
-
-static std::string_view NormalizeBackendPrefix(std::string_view prefix,
-                                               std::string& buf) {
-  if (prefix.empty()) {
-    return prefix;
-  }
-  prefix = NormalizeName(prefix, buf);
-  if (prefix.size() > 1 && util::ends_with(prefix, '/')) {
-    if (buf.empty()) {
-      buf = prefix;
-    }
-    while (buf.size() > 1 && util::ends_with(buf, '/')) {
-      buf.pop_back();
-    }
-    return buf;
-  }
-  return prefix;
-}
-
 static std::shared_ptr<TelemetryBackend> GetBackendForNormalizedPath(
     Instance& inst, std::string_view path) {
   for (;;) {
@@ -142,17 +86,6 @@ static std::shared_ptr<TelemetryBackend> GetBackendForNormalizedPath(
     return defaultBackendIt.value();
   }
   return nullptr;
-}
-
-static bool IsPathOrDescendant(std::string_view path, std::string_view root) {
-  if (root.empty() || root == "/" || path == root) {
-    return true;
-  }
-  if (util::ends_with(root, '/')) {
-    return util::starts_with(path, root);
-  }
-  return path.size() > root.size() && util::starts_with(path, root) &&
-         path[root.size()] == '/';
 }
 
 static void DefaultReportWarning(std::string_view path, std::string_view msg) {
@@ -192,7 +125,7 @@ void TelemetryRegistry::ReportWarning(std::string_view path,
 void TelemetryRegistry::RegisterBackend(
     std::string_view prefix, std::shared_ptr<TelemetryBackend> backend) {
   std::string prefixBuf;
-  prefix = NormalizeBackendPrefix(prefix, prefixBuf);
+  prefix = detail::NormalizeBackendPrefix(prefix, prefixBuf);
   Instance& inst = GetInstance();
   std::vector<RemovedEntry> removedEntries;
   {
@@ -225,7 +158,7 @@ void TelemetryRegistry::RegisterBackend(
 std::shared_ptr<TelemetryBackend> TelemetryRegistry::GetBackend(
     std::string_view path) {
   std::string buf;
-  path = NormalizeName(path, buf);
+  path = detail::NormalizeName(path, buf);
   Instance& inst = GetInstance();
   {
     std::scoped_lock lock{inst.mutex};
@@ -241,7 +174,7 @@ std::shared_ptr<TelemetryBackend> TelemetryRegistry::GetBackend(
 TelemetryRegistry::EntryHandle TelemetryRegistry::GetEntryHandle(
     std::string_view path) {
   std::string buf;
-  path = NormalizeName(path, buf);
+  path = detail::NormalizeName(path, buf);
   Instance& inst = GetInstance();
   for (;;) {
     std::shared_ptr<TelemetryBackend> backend;
@@ -278,7 +211,7 @@ TelemetryRegistry::EntryHandle TelemetryRegistry::GetEntryHandle(
 
 bool TelemetryRegistry::HasNonDiscardDescendant(std::string_view tablePath) {
   std::string buf;
-  tablePath = NormalizeTableName(tablePath, buf);
+  tablePath = detail::NormalizeTableName(tablePath, buf);
   std::vector<std::pair<std::string, std::shared_ptr<TelemetryBackend>>>
       descendants;
   {
@@ -287,7 +220,7 @@ bool TelemetryRegistry::HasNonDiscardDescendant(std::string_view tablePath) {
     for (auto it = inst.backends.begin(); it != inst.backends.end(); ++it) {
       std::string prefix;
       it.key(prefix);
-      if (IsPathOrDescendant(prefix, tablePath)) {
+      if (detail::IsPathOrDescendant(prefix, tablePath)) {
         descendants.emplace_back(std::move(prefix), it.value());
       }
     }
@@ -317,7 +250,7 @@ std::shared_ptr<TelemetryEntry> TelemetryRegistry::GetEntry(
 
 void TelemetryRegistry::RecordKeepDuplicates(std::string_view path) {
   std::string buf;
-  path = NormalizeName(path, buf);
+  path = detail::NormalizeName(path, buf);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
   inst.entryMetadata[path].keepDuplicates = true;
@@ -327,7 +260,7 @@ void TelemetryRegistry::RecordProperty(std::string_view path,
                                        std::string_view key,
                                        std::string_view value) {
   std::string buf;
-  path = NormalizeName(path, buf);
+  path = detail::NormalizeName(path, buf);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
   inst.entryMetadata[path].properties[key] = value;
@@ -338,7 +271,7 @@ void TelemetryRegistry::ApplyEntryMetadata(std::string_view path,
   EntryMetadataSnapshot snapshot;
   {
     std::string buf;
-    path = NormalizeName(path, buf);
+    path = detail::NormalizeName(path, buf);
     Instance& inst = GetInstance();
     std::scoped_lock lock{inst.mutex};
     auto metadataIt = inst.entryMetadata.find(path);
@@ -363,7 +296,7 @@ void TelemetryRegistry::ApplyEntryMetadata(std::string_view path,
 
 TelemetryTable& TelemetryRegistry::GetTable(std::string_view path) {
   std::string buf;
-  path = NormalizeTableName(path, buf);
+  path = detail::NormalizeTableName(path, buf);
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.mutex};
   return inst.tables.try_emplace(path, path, TelemetryTable::private_init{})

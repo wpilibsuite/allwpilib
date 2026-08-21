@@ -13,8 +13,8 @@
 
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
 #include "wpi/tunables/detail/TunableTypeTraits.hpp"
-#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/type_name.hpp"
 
 using namespace wpi;
@@ -48,26 +48,6 @@ static bool IsMutable(TunableRegistry::TunableInfo& info) {
   return !info.config || info.config->isMutable;
 }
 
-static std::string_view NormalizePath(std::string_view path, std::string& buf) {
-  return TunableRegistry::NormalizeName(path, buf);
-}
-
-static std::string_view NormalizePrefix(std::string_view prefix,
-                                        std::string& buf) {
-  return prefix.empty() ? prefix : NormalizePath(prefix, buf);
-}
-
-static bool IsPathOrDescendant(std::string_view path, std::string_view root) {
-  if (root.empty() || root == "/" || path == root) {
-    return true;
-  }
-  if (wpi::util::ends_with(root, '/')) {
-    return wpi::util::starts_with(path, root);
-  }
-  return path.size() > root.size() && wpi::util::starts_with(path, root) &&
-         path[root.size()] == '/';
-}
-
 MockTunableBackend::~MockTunableBackend() = default;
 
 uint32_t MockTunableBackend::GetUidOrThrow(std::string_view path) const {
@@ -82,7 +62,7 @@ uint32_t MockTunableBackend::GetUidOrThrow(std::string_view path) const {
 template <detail::TunableValueType T>
 T MockTunableBackend::GetValue(std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (!info) {
@@ -134,7 +114,7 @@ template std::vector<std::string> MockTunableBackend::GetValue<
 
 std::string MockTunableBackend::GetStructTypeName(std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (!info) {
@@ -157,7 +137,7 @@ std::string MockTunableBackend::GetStructTypeName(std::string_view path) const {
 std::vector<uint8_t> MockTunableBackend::GetStructData(
     std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (!info) {
@@ -184,7 +164,7 @@ std::vector<uint8_t> MockTunableBackend::GetStructData(
 std::string MockTunableBackend::GetProtobufTypeString(
     std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (!info) {
@@ -207,7 +187,7 @@ std::string MockTunableBackend::GetProtobufTypeString(
 std::vector<uint8_t> MockTunableBackend::GetProtobufData(
     std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (!info) {
@@ -254,7 +234,7 @@ static T MakeCopy(std::span<U>&& value) {
 template <typename T, typename U>
 void MockTunableBackend::SetValue(std::string_view path, U value) {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   uint32_t uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (info.type != detail::GetTunableTypeValue<T, false>() &&
@@ -318,7 +298,7 @@ void MockTunableBackend::SetStructData(std::string_view path,
                                        std::string_view typeString,
                                        std::span<const uint8_t> data) {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   uint32_t uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (info.type != detail::TunableTypeValue::STRUCT &&
@@ -358,7 +338,7 @@ void MockTunableBackend::SetProtobufData(std::string_view path,
                                          std::string_view typeString,
                                          std::span<const uint8_t> data) {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   uint32_t uid = GetUidOrThrow(path);
   auto info = TunableRegistry::GetTunable(uid);
   if (info.type != detail::TunableTypeValue::PROTOBUF &&
@@ -399,7 +379,7 @@ bool MockTunableBackend::Publish(std::string_view path, uint32_t uid,
                                  const TunableConfig* config,
                                  detail::TunableTypeValue type) {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   std::scoped_lock lock{m_mutex};
   auto& curUid = m_tunables[path];
   if (curUid != 0) {
@@ -416,7 +396,7 @@ void MockTunableBackend::MarkDirty(uint32_t) {}
 
 void MockTunableBackend::Remove(std::string_view path) {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   std::scoped_lock lock{m_mutex};
   auto it = m_tunables.find(path);
   if (it != m_tunables.end()) {
@@ -437,11 +417,11 @@ void MockTunableBackend::Remove(std::string_view path) {
 std::vector<TunableBackend::PublishedTunable> MockTunableBackend::RemovePrefix(
     std::string_view prefix) {
   std::string prefixBuf;
-  prefix = NormalizePrefix(prefix, prefixBuf);
+  prefix = detail::NormalizePrefix(prefix, prefixBuf);
   std::scoped_lock lock{m_mutex};
   std::vector<PublishedTunable> removed;
   for (auto it = m_tunables.begin(); it != m_tunables.end();) {
-    if (!IsPathOrDescendant(it->first, prefix)) {
+    if (!detail::IsPathOrDescendant(it->first, prefix)) {
       ++it;
       continue;
     }
@@ -456,7 +436,7 @@ std::vector<TunableBackend::PublishedTunable> MockTunableBackend::RemovePrefix(
     }
     it = m_tunables.erase(it);
     std::erase_if(m_actions, [&](auto&& action) {
-      return IsPathOrDescendant(action.path, prefix);
+      return detail::IsPathOrDescendant(action.path, prefix);
     });
   }
   return removed;
@@ -477,7 +457,7 @@ void MockTunableBackend::UnregisterTunable(uint32_t uid) {
 std::optional<uint32_t> MockTunableBackend::GetUid(
     std::string_view path) const {
   std::string pathBuf;
-  path = NormalizePath(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   std::scoped_lock lock{m_mutex};
   auto it = m_tunables.find(path);
   if (it == m_tunables.end()) {

@@ -20,6 +20,7 @@
 #include "wpi/tunables/TunableBackend.hpp"
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
 #include "wpi/tunables/detail/TunableBase.hpp"
 #include "wpi/tunables/detail/TunableMember.hpp"
 #include "wpi/tunables/detail/TunableTypeValue.hpp"
@@ -123,36 +124,6 @@ static void DefaultReportWarning(std::string_view msg) {
   std::print(stderr, "Tunable warning: {}\n", msg);
 }
 
-static bool IsPathOrDescendant(std::string_view path, std::string_view root) {
-  if (path == root) {
-    return true;
-  }
-
-  std::string childPrefix{root};
-  if (childPrefix.empty() || childPrefix.back() != '/') {
-    childPrefix.push_back('/');
-  }
-  return wpi::util::starts_with(path, childPrefix);
-}
-
-static std::string_view NormalizeBackendPrefix(std::string_view prefix,
-                                               std::string& buf) {
-  if (prefix.empty()) {
-    return prefix;
-  }
-  prefix = TunableRegistry::NormalizeName(prefix, buf);
-  if (prefix.size() > 1 && wpi::util::ends_with(prefix, '/')) {
-    if (buf.empty()) {
-      buf = prefix;
-    }
-    while (buf.size() > 1 && wpi::util::ends_with(buf, '/')) {
-      buf.pop_back();
-    }
-    return buf;
-  }
-  return prefix;
-}
-
 static std::shared_ptr<TunableBackend> GetBackendForNormalizedPath(
     Instance& inst, std::string_view path) {
   for (;;) {
@@ -195,10 +166,7 @@ static void AddComplexChildPath(uint32_t uid, std::string_view path) {
   size_t bestPrefixSize = 0;
   for (auto&& entry : inst.complexUidByPath) {
     auto&& complexPath = entry.first;
-    std::string childPrefix{complexPath};
-    if (childPrefix.empty() || childPrefix.back() != '/') {
-      childPrefix.push_back('/');
-    }
+    std::string childPrefix = detail::GetChildTablePath(complexPath);
     if (wpi::util::starts_with(path, childPrefix) &&
         childPrefix.size() > bestPrefixSize) {
       bestPrefixSize = childPrefix.size();
@@ -215,7 +183,7 @@ static void RemoveComplexPaths(std::string_view path) {
 
   std::vector<std::pair<std::string, uint32_t>> paths;
   for (auto&& [complexPath, uid] : inst.complexUidByPath) {
-    if (IsPathOrDescendant(complexPath, path)) {
+    if (detail::IsPathOrDescendant(complexPath, path)) {
       paths.emplace_back(complexPath, uid);
     }
   }
@@ -238,7 +206,7 @@ static std::vector<uint32_t> RemoveComplexChildPaths(std::string_view path) {
   std::vector<uint32_t> uids;
   for (auto it = inst.complexChildUidByPath.begin();
        it != inst.complexChildUidByPath.end();) {
-    if (IsPathOrDescendant(it->first, path)) {
+    if (detail::IsPathOrDescendant(it->first, path)) {
       uids.emplace_back(it->second);
       it = inst.complexChildUidByPath.erase(it);
     } else {
@@ -317,33 +285,16 @@ static void UpdateComplexTunables() {
   }
 }
 
-static std::string GetChildTablePath(std::string_view path) {
-  std::string tablePath{path};
-  if (tablePath.empty() || tablePath.back() != '/') {
-    tablePath.push_back('/');
-  }
-  return tablePath;
-}
-
-static std::string NormalizeChildName(std::string_view name) {
-  std::string buf;
-  std::string_view normalized = TunableRegistry::NormalizeName(name, buf);
-  if (!normalized.empty() && normalized.front() == '/') {
-    normalized.remove_prefix(1);
-  }
-  return std::string{normalized};
-}
-
 static std::string GetChildName(uint32_t parentUid, std::string_view path) {
   size_t bestPrefixSize = 0;
   for (auto&& parentPath : GetComplexPaths(parentUid)) {
-    std::string childPrefix = GetChildTablePath(parentPath);
+    std::string childPrefix = detail::GetChildTablePath(parentPath);
     if (wpi::util::starts_with(path, childPrefix) &&
         childPrefix.size() > bestPrefixSize) {
       bestPrefixSize = childPrefix.size();
     }
   }
-  return NormalizeChildName(path.substr(bestPrefixSize));
+  return detail::NormalizeChildName(path.substr(bestPrefixSize));
 }
 
 static void ResetChangedNow(uint32_t uid) {
@@ -418,7 +369,7 @@ void TunableRegistry::RegisterBackend(std::string_view prefix,
                                       std::shared_ptr<TunableBackend> backend) {
   assert(backend);
   std::string prefixBuf;
-  prefix = NormalizeBackendPrefix(prefix, prefixBuf);
+  prefix = detail::NormalizeBackendPrefix(prefix, prefixBuf);
   Instance& inst = GetInstance();
   std::scoped_lock updateLock{inst.updateMutex};
   std::vector<std::shared_ptr<TunableBackend>> retireBackends;
@@ -479,7 +430,7 @@ void TunableRegistry::RegisterBackend(std::string_view prefix,
 std::shared_ptr<TunableBackend> TunableRegistry::GetBackend(
     std::string_view path) {
   std::string buf;
-  path = NormalizeName(path, buf);
+  path = detail::NormalizeName(path, buf);
   Instance& inst = GetInstance();
   {
     std::scoped_lock lock{inst.backendsMutex};
@@ -490,27 +441,6 @@ std::shared_ptr<TunableBackend> TunableRegistry::GetBackend(
   }
   ReportWarning(std::format("no backend for path '{}'", path));
   return GetMissingBackend();
-}
-
-std::string_view TunableRegistry::NormalizeName(std::string_view path,
-                                                std::string& buf) {
-  // common case is a well formatted name, so check first
-  if (util::starts_with(path, '/') && !util::contains(path, "//")) {
-    return path;
-  }
-  buf.clear();
-  buf.reserve(path.size() + 2);
-  if (!util::starts_with(path, '/')) {
-    buf.push_back('/');
-  }
-  char prevCh = '\0';
-  for (auto ch : path) {
-    if (ch != '/' || prevCh != '/') {
-      buf.push_back(ch);
-    }
-    prevCh = ch;
-  }
-  return buf;
 }
 
 bool TunableRegistry::PublishImpl(std::string_view path,
@@ -558,7 +488,7 @@ bool TunableRegistry::Publish(std::string_view path, ComplexTunable& tunable) {
   if (!PublishImpl(path, static_cast<detail::TunableBase&>(tunable))) {
     return false;
   }
-  TunableTable table{GetChildTablePath(path)};
+  TunableTable table{detail::GetChildTablePath(path)};
   tunable.PublishTunable(table);
   return true;
 }
@@ -640,10 +570,7 @@ void TunableRegistry::Remove(std::string_view path) {
   std::scoped_lock updateLock{inst.updateMutex};
   {
     std::scoped_lock lock{inst.backendsMutex};
-    std::string childPrefix{path};
-    if (childPrefix.empty() || childPrefix.back() != '/') {
-      childPrefix.push_back('/');
-    }
+    std::string childPrefix = detail::GetChildTablePath(path);
     for (auto backend : inst.backends) {
       backend->Remove(path);
       backend->RemovePrefix(childPrefix);
@@ -662,7 +589,7 @@ void TunableRegistry::PublishChild(ComplexTunable& parent,
   }
   for (auto&& path :
        GetComplexPaths(parent.m_uid & detail::TunableBase::UID_MASK)) {
-    TunableTable table{GetChildTablePath(path)};
+    TunableTable table{detail::GetChildTablePath(path)};
     table.Publish(name, tunable);
   }
 }
@@ -675,7 +602,7 @@ void TunableRegistry::PublishChild(ComplexTunable& parent,
   }
   for (auto&& path :
        GetComplexPaths(parent.m_uid & detail::TunableBase::UID_MASK)) {
-    TunableTable table{GetChildTablePath(path)};
+    TunableTable table{detail::GetChildTablePath(path)};
     table.Publish(name, tunable);
   }
 }
@@ -687,7 +614,7 @@ void TunableRegistry::RemoveChild(ComplexTunable& parent,
   }
   for (auto&& path :
        GetComplexPaths(parent.m_uid & detail::TunableBase::UID_MASK)) {
-    TunableTable table{GetChildTablePath(path)};
+    TunableTable table{detail::GetChildTablePath(path)};
     table.Remove(name);
   }
 }
@@ -698,7 +625,7 @@ void TunableRegistry::SetChildChanged(ComplexTunable& parent,
     return;
   }
 
-  std::string childName = NormalizeChildName(name);
+  std::string childName = detail::NormalizeChildName(name);
   Instance& inst = GetInstance();
   std::vector<detail::TunableBase*> changedTunables;
   {
@@ -818,7 +745,7 @@ void TunableRegistry::PrepareComplexMoveAssignment(
     Instance& inst = GetInstance();
     std::scoped_lock lock{inst.backendsMutex};
     for (auto&& path : paths) {
-      std::string childPrefix = GetChildTablePath(path);
+      std::string childPrefix = detail::GetChildTablePath(path);
       for (auto backend : inst.backends) {
         for (auto&& removed : backend->RemovePrefix(childPrefix)) {
           childUids.emplace_back(removed.uid);

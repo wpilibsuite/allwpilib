@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import org.wpilib.tunable.util.PathUtil;
 
 /** A mock tunable backend for testing. */
 public class MockTunableBackend implements TunableBackend {
@@ -21,14 +22,6 @@ public class MockTunableBackend implements TunableBackend {
 
   /** Constructs a mock tunable backend. */
   public MockTunableBackend() {}
-
-  private static String normalizePath(String path) {
-    return TunableRegistry.normalizeName(path);
-  }
-
-  private static String normalizePrefix(String prefix) {
-    return prefix.isEmpty() ? "" : normalizePath(prefix);
-  }
 
   private void addAction(Action action) {
     synchronized (m_actions) {
@@ -58,7 +51,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return tunable
    */
   public TunableBase getTunable(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -104,7 +97,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public boolean getBoolean(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -123,7 +116,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public int getInteger(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -142,7 +135,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public long getLong(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -161,7 +154,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public float getFloat(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -180,7 +173,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public double getDouble(String path) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -201,7 +194,7 @@ public class MockTunableBackend implements TunableBackend {
    * @return value
    */
   public <T> T getValue(String path, Class<T> cls) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       return switch (rawTunable) {
@@ -221,7 +214,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setBoolean(String path, boolean value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -250,7 +243,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setInt(String path, int value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -279,7 +272,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setLong(String path, long value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -308,7 +301,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setFloat(String path, float value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -337,7 +330,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setDouble(String path, double value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -367,7 +360,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public <T> void setValue(String path, T value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -404,7 +397,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setArray(String path, boolean[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -438,7 +431,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setArray(String path, int[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -471,7 +464,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setArray(String path, long[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -504,7 +497,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setArray(String path, float[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -537,7 +530,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public void setArray(String path, double[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -572,7 +565,7 @@ public class MockTunableBackend implements TunableBackend {
    * @param value value
    */
   public <T> void setArray(String path, T[] value) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       var rawTunable = m_entries.get(path);
       switch (rawTunable) {
@@ -605,7 +598,7 @@ public class MockTunableBackend implements TunableBackend {
 
   @Override
   public boolean publish(String path, TunableBase tunable) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       if (m_entries.containsKey(path)) {
         TunableRegistry.reportWarning("Tunable already exists: " + path);
@@ -618,7 +611,7 @@ public class MockTunableBackend implements TunableBackend {
 
   @Override
   public boolean publishComplex(String path, ComplexTunable tunable) {
-    path = normalizePath(path);
+    path = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       if (m_entries.containsKey(path)) {
         TunableRegistry.reportWarning("Tunable already exists: " + path);
@@ -633,7 +626,7 @@ public class MockTunableBackend implements TunableBackend {
 
   @Override
   public void remove(String path) {
-    String normalizedPath = normalizePath(path);
+    String normalizedPath = PathUtil.normalizeName(path);
     synchronized (m_entries) {
       m_entries.remove(normalizedPath);
     }
@@ -644,13 +637,13 @@ public class MockTunableBackend implements TunableBackend {
 
   @Override
   public List<PublishedTunable> removePrefix(String prefix) {
-    String normalizedPrefix = normalizePrefix(prefix);
+    String normalizedPrefix = PathUtil.normalizePrefix(prefix);
     List<PublishedTunable> removed = new ArrayList<>();
     synchronized (m_entries) {
       var iterator = m_entries.entrySet().iterator();
       while (iterator.hasNext()) {
         var entry = iterator.next();
-        if (!TunableRegistry.isPathOrDescendant(entry.getKey(), normalizedPrefix)) {
+        if (!PathUtil.isPathOrDescendant(entry.getKey(), normalizedPrefix)) {
           continue;
         }
         switch (entry.getValue()) {
@@ -664,8 +657,7 @@ public class MockTunableBackend implements TunableBackend {
       }
     }
     synchronized (m_actions) {
-      m_actions.removeIf(
-          action -> TunableRegistry.isPathOrDescendant(action.path, normalizedPrefix));
+      m_actions.removeIf(action -> PathUtil.isPathOrDescendant(action.path, normalizedPrefix));
     }
     return removed;
   }

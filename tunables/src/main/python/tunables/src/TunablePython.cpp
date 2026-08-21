@@ -25,6 +25,7 @@
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/tunables/TunableTable.hpp"
 #include "wpi/tunables/Tunables.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
 #include "wpi/tunables/detail/TunableBase.hpp"
 #include "wpi/tunables/detail/TunableDetail.hpp"
 #include "wpi/util/json.hpp"
@@ -1109,7 +1110,7 @@ void CleanupPythonStorage() {
 
 std::string NormalizePath(std::string_view path) {
   std::string buf;
-  return std::string{wpi::tunables::TunableRegistry::NormalizeName(path, buf)};
+  return std::string{wpi::tunables::detail::NormalizeName(path, buf)};
 }
 
 std::string NormalizeTablePath(const wpi::tunables::TunableTable& table,
@@ -1820,8 +1821,7 @@ void wpi::InitTunablePython(py::module_& m) {
           "normalize_name",
           [](std::string_view path) {
             std::string buf;
-            return std::string{
-                wpi::tunables::TunableRegistry::NormalizeName(path, buf)};
+            return std::string{wpi::tunables::detail::NormalizeName(path, buf)};
           })
       .def_static(
           "remove",

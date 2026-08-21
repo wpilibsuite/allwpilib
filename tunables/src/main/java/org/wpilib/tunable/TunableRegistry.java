@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import org.wpilib.tunable.util.PathUtil;
 import org.wpilib.util.collections.PrefixMap;
 import org.wpilib.util.collections.prefixmap.StringPrefixMap;
 
@@ -193,7 +194,7 @@ public final class TunableRegistry {
    */
   @SuppressWarnings({"PMD.CompareObjectsWithEquals", "PMD.AvoidCatchingGenericException"})
   public static void registerBackend(String prefix, TunableBackend backend) {
-    String normalizedPrefix = normalizeBackendPrefix(prefix);
+    String normalizedPrefix = PathUtil.normalizeBackendPrefix(prefix);
     List<TunableBackend> closeBackends = new ArrayList<>();
     synchronized (s_backends) {
       final List<TunableBackend> oldBackends = new ArrayList<>(s_backends.values());
@@ -323,7 +324,7 @@ public final class TunableRegistry {
    * @return tunable backend, or a no-op backend if no match
    */
   public static TunableBackend getBackend(String path) {
-    String normalized = normalizeName(path);
+    String normalized = PathUtil.normalizeName(path);
     TunableBackend backend;
     synchronized (s_backends) {
       backend = getBackendForNormalizedPath(normalized);
@@ -457,7 +458,7 @@ public final class TunableRegistry {
    * @return tunable table
    */
   public static TunableTable getTable(String path) {
-    return s_tables.computeIfAbsent(normalizeTableName(path), TunableTable::new);
+    return s_tables.computeIfAbsent(PathUtil.normalizeTableName(path), TunableTable::new);
   }
 
   /**
@@ -471,63 +472,6 @@ public final class TunableRegistry {
    */
   public static void publishComplexChildren(String path, ComplexTunable tunable) {
     tunable.publishTunable(getTable(path));
-  }
-
-  private static String normalizeTableName(String path) {
-    path = normalizeName(path);
-    if (path.charAt(path.length() - 1) != '/') {
-      path = path + '/';
-    }
-    return path;
-  }
-
-  private static String normalizeBackendPrefix(String prefix) {
-    if (prefix.isEmpty()) {
-      return "";
-    }
-    String normalized = normalizeName(prefix);
-    while (normalized.length() > 1 && normalized.endsWith("/")) {
-      normalized = normalized.substring(0, normalized.length() - 1);
-    }
-    return normalized;
-  }
-
-  /**
-   * Normalizes a tunable name.
-   *
-   * @param path input path
-   * @return normalized path
-   */
-  public static String normalizeName(String path) {
-    if (!path.isEmpty() && path.charAt(0) == '/' && !path.contains("//")) {
-      return path;
-    }
-
-    StringBuilder normalized = new StringBuilder(path.length() + 1);
-    if (path.isEmpty() || path.charAt(0) != '/') {
-      normalized.append('/');
-    }
-    char previousChar = '\0';
-    for (int i = 0; i < path.length(); i++) {
-      char ch = path.charAt(i);
-      if (ch != '/' || previousChar != '/') {
-        normalized.append(ch);
-      }
-      previousChar = ch;
-    }
-    return normalized.toString();
-  }
-
-  static boolean isPathOrDescendant(String path, String root) {
-    if (root.isEmpty() || "/".equals(root) || path.equals(root)) {
-      return true;
-    }
-    if (root.endsWith("/")) {
-      return path.startsWith(root);
-    }
-    return path.length() > root.length()
-        && path.startsWith(root)
-        && path.charAt(root.length()) == '/';
   }
 
   /**
@@ -584,7 +528,7 @@ public final class TunableRegistry {
    */
   static void publishChild(ComplexTunable parent, String name, TunableBase tunable) {
     for (String path : getComplexPaths(parent)) {
-      publish(normalizeName(path + "/" + name), tunable);
+      publish(PathUtil.normalizeName(path + "/" + name), tunable);
     }
   }
 
@@ -597,7 +541,7 @@ public final class TunableRegistry {
    */
   static void publishChild(ComplexTunable parent, String name, ComplexTunable tunable) {
     for (String path : getComplexPaths(parent)) {
-      publish(normalizeName(path + "/" + name), tunable);
+      publish(PathUtil.normalizeName(path + "/" + name), tunable);
     }
   }
 
@@ -609,7 +553,7 @@ public final class TunableRegistry {
    */
   static void removeChild(ComplexTunable parent, String name) {
     for (String path : getComplexPaths(parent)) {
-      remove(normalizeName(path + "/" + name));
+      remove(PathUtil.normalizeName(path + "/" + name));
     }
   }
 
@@ -627,7 +571,7 @@ public final class TunableRegistry {
         return;
       }
       for (String path : paths) {
-        TunableBase child = s_complexChildrenByPath.get(normalizeName(path + "/" + name));
+        TunableBase child = s_complexChildrenByPath.get(PathUtil.normalizeName(path + "/" + name));
         if (child != null && !children.contains(child)) {
           children.add(child);
         }
@@ -646,7 +590,7 @@ public final class TunableRegistry {
   public static void remove(String path) {
     // Backends may have changed since publishing, so remove from all backends
     synchronized (s_backends) {
-      String childPrefix = path.endsWith("/") ? path : path + "/";
+      String childPrefix = PathUtil.childTablePath(path);
       for (var entry : s_backends.values()) {
         entry.remove(path);
         entry.removePrefix(childPrefix);
@@ -734,7 +678,7 @@ public final class TunableRegistry {
     synchronized (s_complexPathsMutex) {
       String bestPrefix = null;
       for (String complexPath : s_complexByPath.keySet()) {
-        String childPrefix = complexPath.endsWith("/") ? complexPath : complexPath + "/";
+        String childPrefix = PathUtil.childTablePath(complexPath);
         if (path.startsWith(childPrefix)
             && (bestPrefix == null || childPrefix.length() > bestPrefix.length())) {
           bestPrefix = childPrefix;
@@ -759,10 +703,9 @@ public final class TunableRegistry {
 
   private static void removeComplexPaths(String path) {
     synchronized (s_complexPathsMutex) {
-      String childPrefix = path.endsWith("/") ? path : path + "/";
       List<String> paths = new ArrayList<>();
       for (String complexPath : s_complexByPath.keySet()) {
-        if (complexPath.equals(path) || complexPath.startsWith(childPrefix)) {
+        if (PathUtil.isPathOrDescendant(complexPath, path)) {
           paths.add(complexPath);
         }
       }
@@ -775,10 +718,9 @@ public final class TunableRegistry {
 
   private static void removeComplexChildPaths(String path) {
     synchronized (s_complexPathsMutex) {
-      String childPrefix = path.endsWith("/") ? path : path + "/";
       s_complexChildrenByPath
           .keySet()
-          .removeIf(childPath -> childPath.equals(path) || childPath.startsWith(childPrefix));
+          .removeIf(childPath -> PathUtil.isPathOrDescendant(childPath, path));
     }
   }
 

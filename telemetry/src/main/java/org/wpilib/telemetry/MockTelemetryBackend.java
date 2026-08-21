@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.wpilib.telemetry.util.PathUtil;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
 
@@ -117,7 +118,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @return Action, or null if no update to that path
    */
   public Action getLastAction(String path) {
-    path = TelemetryRegistry.normalizeName(path);
+    path = PathUtil.normalizeName(path);
     synchronized (this) {
       Entry entry = m_entries.get(path);
       if (entry == null || entry.m_last == -1) {
@@ -157,7 +158,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
 
   @Override
   public TelemetryEntry getEntry(String path) {
-    path = TelemetryRegistry.normalizeName(path);
+    path = PathUtil.normalizeName(path);
     synchronized (this) {
       return m_entries.computeIfAbsent(path, k -> new Entry(k));
     }
@@ -165,7 +166,7 @@ public class MockTelemetryBackend implements TelemetryBackend {
 
   @Override
   public void removeEntry(String path) {
-    path = TelemetryRegistry.normalizeName(path);
+    path = PathUtil.normalizeName(path);
     synchronized (this) {
       Entry entry = m_entries.remove(path);
       if (entry != null) {

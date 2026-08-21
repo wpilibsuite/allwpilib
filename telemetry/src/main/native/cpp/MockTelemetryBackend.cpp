@@ -11,29 +11,10 @@
 #include <vector>
 
 #include "wpi/telemetry/TelemetryEntry.hpp"
-#include "wpi/util/StringExtras.hpp"
+#include "wpi/telemetry/detail/PathUtil.hpp"
 
 using namespace wpi;
 using namespace wpi::telemetry;
-
-static std::string_view NormalizeName(std::string_view path, std::string& buf) {
-  if (util::starts_with(path, '/') && !util::contains(path, "//")) {
-    return path;
-  }
-  buf.clear();
-  buf.reserve(path.size() + 2);
-  if (!util::starts_with(path, '/')) {
-    buf.push_back('/');
-  }
-  char prevCh = '\0';
-  for (auto ch : path) {
-    if (ch != '/' || prevCh != '/') {
-      buf.push_back(ch);
-    }
-    prevCh = ch;
-  }
-  return buf;
-}
 
 class MockTelemetryBackend::Entry : public TelemetryEntry {
  public:
@@ -150,7 +131,7 @@ void MockTelemetryBackend::Clear() {
 std::shared_ptr<TelemetryEntry> MockTelemetryBackend::GetEntry(
     std::string_view path) {
   std::string pathBuf;
-  path = NormalizeName(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   std::scoped_lock lock{m_mutex};
   auto it = m_entries.find(path);
   if (it != m_entries.end()) {
@@ -164,7 +145,7 @@ std::shared_ptr<TelemetryEntry> MockTelemetryBackend::GetEntry(
 
 void MockTelemetryBackend::RemoveEntry(std::string_view path) {
   std::string pathBuf;
-  path = NormalizeName(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   std::scoped_lock lock{m_mutex};
   auto it = m_entries.find(path);
   if (it != m_entries.end()) {
@@ -199,7 +180,7 @@ void MockTelemetryBackend::AddSchema(std::string_view schemaName,
 const MockTelemetryBackend::Action* MockTelemetryBackend::GetLastActionImpl(
     std::string_view path) const {
   std::string pathBuf;
-  path = NormalizeName(path, pathBuf);
+  path = detail::NormalizeName(path, pathBuf);
   auto it = m_entries.find(path);
   if (it == m_entries.end()) {
     return nullptr;
