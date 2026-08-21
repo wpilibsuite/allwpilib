@@ -118,9 +118,7 @@ def test_90_degree_turn(odometry3d_test):
     assert pose.x == pytest.approx(12.0, abs=EPSILON)
     assert pose.y == pytest.approx(12.0, abs=EPSILON)
     assert pose.z == pytest.approx(0.0, abs=EPSILON)
-    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(
-        90.0, abs=EPSILON
-    )
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(90.0, abs=EPSILON)
 
 
 def test_gyro_angle_reset(odometry3d_test):
