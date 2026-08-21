@@ -26,11 +26,11 @@
 #include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
 #include "wpi/tunables/detail/TunableBase.hpp"
 #include "wpi/tunables/detail/TunableDetail.hpp"
 #include "wpi/tunables/detail/TunableMember.hpp"
 #include "wpi/tunables/detail/TunableTypeValue.hpp"
-#include "wpi/util/StringExtras.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi;
@@ -189,21 +189,6 @@ bool TypeMatches(const wpi::nt::Value& value, detail::TunableTypeValue type) {
     default:
       return false;
   }
-}
-
-std::string_view NormalizePrefix(std::string_view prefix, std::string& buf) {
-  return prefix.empty() ? prefix : TunableRegistry::NormalizeName(prefix, buf);
-}
-
-bool IsPathOrDescendant(std::string_view path, std::string_view root) {
-  if (root.empty() || root == "/" || path == root) {
-    return true;
-  }
-  if (wpi::util::ends_with(root, '/')) {
-    return wpi::util::starts_with(path, root);
-  }
-  return path.size() > root.size() && wpi::util::starts_with(path, root) &&
-         path[root.size()] == '/';
 }
 
 }  // namespace
@@ -1058,14 +1043,15 @@ void NetworkTablesTunableBackend::Remove(std::string_view path) {
 std::vector<TunableBackend::PublishedTunable>
 NetworkTablesTunableBackend::RemovePrefix(std::string_view prefix) {
   std::string prefixBuf;
-  prefix = NormalizePrefix(prefix, prefixBuf);
+  prefix = wpi::tunables::detail::NormalizePrefix(prefix, prefixBuf);
   std::scoped_lock lock{m_mutex};
   std::vector<PublishedTunable> removed;
   if (m_retired) {
     return removed;
   }
   for (auto it = m_entries.begin(); it != m_entries.end();) {
-    if (it->second->IsRemoved() || !IsPathOrDescendant(it->first, prefix)) {
+    if (it->second->IsRemoved() ||
+        !wpi::tunables::detail::IsPathOrDescendant(it->first, prefix)) {
       ++it;
       continue;
     }
