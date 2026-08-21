@@ -25,7 +25,7 @@ Command{{ ConsoleName }}Controller::Get{{ ConsoleName }}Controller() {
 {% for button in buttons %}
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::{{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, loop);
+      wpi::{{ ConsoleName }}Controller::Button::{{ button.ConstantName }}, loop);
 }
 {% endfor -%}
 {% for trigger in triggers -%}
@@ -33,7 +33,7 @@ Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(
 Trigger Command{{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(double threshold,
                                            wpi::EventLoop* loop) const {
   return m_hid->AxisGreaterThan(
-      wpi::{{ ConsoleName }}Controller::Axis::k{{ capitalize_first(trigger.name) }}, threshold, loop);
+      wpi::{{ ConsoleName }}Controller::Axis::{{ trigger.ConstantName }}, threshold, loop);
 }
 {% endif -%}
 {% endfor -%}

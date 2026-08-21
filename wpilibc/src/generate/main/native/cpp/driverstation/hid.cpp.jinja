@@ -32,12 +32,12 @@ const GenericHID& {{ ConsoleName }}Controller::GetHID() const {
 }
 {% for stick in sticks %}
 double {{ ConsoleName }}Controller::Get{{ stick.NameParts|map("capitalize")|join }}() const {
-  return m_hid->GetRawAxis(Axis::k{{ stick.NameParts|map("capitalize")|join }});
+  return m_hid->GetRawAxis(Axis::{{ stick.ConstantName }});
 }
 {% endfor -%}
 {% for trigger in triggers %}
 double {{ ConsoleName }}Controller::Get{{ capitalize_first(trigger.name) }}Axis() const {
-  return m_hid->GetRawAxis(Axis::k{{ capitalize_first(trigger.name) }});
+  return m_hid->GetRawAxis(Axis::{{ trigger.ConstantName }});
 }
 {% if trigger.UseThresholdMethods %}
 BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(double threshold,
@@ -53,15 +53,15 @@ BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(trigger.name) }}(E
 {% endfor -%}
 {% for button in buttons %}
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}Button() const {
-  return m_hid->GetRawButton(Button::k{{ capitalize_first(button.name) }});
+  return m_hid->GetRawButton(Button::{{ button.ConstantName }});
 }
 
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}ButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::k{{ capitalize_first(button.name) }});
+  return m_hid->GetRawButtonPressed(Button::{{ button.ConstantName }});
 }
 
 bool {{ ConsoleName }}Controller::Get{{ capitalize_first(button.name) }}ButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::k{{ capitalize_first(button.name) }});
+  return m_hid->GetRawButtonReleased(Button::{{ button.ConstantName }});
 }
 
 BooleanEvent {{ ConsoleName }}Controller::{{ capitalize_first(button.name) }}(EventLoop* loop) const {

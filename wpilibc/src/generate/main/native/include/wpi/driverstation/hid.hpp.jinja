@@ -141,7 +141,7 @@ class {{ ConsoleName }}Controller : public HIDDevice, public wpi::telemetry::Tel
   struct Button {
 {%- for button in buttons %}
     /// {{ capitalize_first(button.DocName|default(button.name)) }} button.
-    static constexpr int k{{ capitalize_first(button.name) }} = {{ button.value }};
+    static constexpr int {{ button.ConstantName }} = {{ button.value }};
 {%- endfor %}
   };
 
@@ -149,11 +149,11 @@ class {{ ConsoleName }}Controller : public HIDDevice, public wpi::telemetry::Tel
   struct Axis {
 {%- for stick in sticks %}
     /// {{ stick.NameParts|map("capitalize")|join(" ") }} axis.
-    static constexpr int k{{ stick.NameParts|map("capitalize")|join }} = {{ stick.value }};
+    static constexpr int {{ stick.ConstantName }} = {{ stick.value }};
 {%- endfor %}
 {%- for trigger in triggers %}
     /// {{ trigger.DocName|capitalize }}.
-    static constexpr int k{{ capitalize_first(trigger.name) }} = {{ trigger.value }};
+    static constexpr int {{ trigger.ConstantName }} = {{ trigger.value }};
 {%- endfor %}
   };
 

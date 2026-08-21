@@ -32,46 +32,48 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a NiDsStadiaController. */
   public enum Button {
     /** A button. */
-    A(0),
+    A(0, "AButton"),
     /** B button. */
-    B(1),
+    B(1, "BButton"),
     /** X button. */
-    X(2),
+    X(2, "XButton"),
     /** Y button. */
-    Y(3),
+    Y(3, "YButton"),
     /** Left bumper button. */
-    LEFT_BUMPER(4),
+    LEFT_BUMPER(4, "LeftBumperButton"),
     /** Right bumper button. */
-    RIGHT_BUMPER(5),
+    RIGHT_BUMPER(5, "RightBumperButton"),
     /** Left stick button. */
-    LEFT_STICK(6),
+    LEFT_STICK(6, "LeftStickButton"),
     /** Right stick button. */
-    RIGHT_STICK(7),
+    RIGHT_STICK(7, "RightStickButton"),
     /** Ellipses button. */
-    ELLIPSES(8),
+    ELLIPSES(8, "EllipsesButton"),
     /** Hamburger button. */
-    HAMBURGER(9),
+    HAMBURGER(9, "HamburgerButton"),
     /** Stadia button. */
-    STADIA(10),
+    STADIA(10, "StadiaButton"),
     /** Right trigger button. */
-    RIGHT_TRIGGER(11),
+    RIGHT_TRIGGER(11, "RightTriggerButton"),
     /** Left trigger button. */
-    LEFT_TRIGGER(12),
+    LEFT_TRIGGER(12, "LeftTriggerButton"),
     /** Google button. */
-    GOOGLE(13),
+    GOOGLE(13, "GoogleButton"),
     /** Frame button. */
-    FRAME(14);
+    FRAME(14, "FrameButton");
 
     /** Button value. */
     public final int value;
 
-    Button(int value) {
+    private final String m_name;
+
+    Button(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the button, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Button`.
+     * Get the human-friendly name of the button, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -79,32 +81,33 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
      */
     @Override
     public String toString() {
-      // Remove leading `k`
-      return this.name().substring(1) + "Button";
+      return m_name;
     }
   }
 
   /** Represents an axis on an NiDsStadiaController. */
   public enum Axis {
     /** Left X axis. */
-    LEFT_X(0),
+    LEFT_X(0, "LeftX"),
     /** Right X axis. */
-    RIGHT_X(3),
+    RIGHT_X(3, "RightX"),
     /** Left Y axis. */
-    LEFT_Y(1),
+    LEFT_Y(1, "LeftY"),
     /** Right Y axis. */
-    RIGHT_Y(4);
+    RIGHT_Y(4, "RightY");
 
     /** Axis value. */
     public final int value;
 
-    Axis(int value) {
+    private final String m_name;
+
+    Axis(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the axis, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Axis` if the name ends with `Trigger`.
+     * Get the human-friendly name of the axis, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -112,11 +115,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
      */
     @Override
     public String toString() {
-      var name = this.name().substring(1); // Remove leading `k`
-      if (name.endsWith("Trigger")) {
-        return name + "Axis";
-      }
-      return name;
+      return m_name;
     }
   }
 

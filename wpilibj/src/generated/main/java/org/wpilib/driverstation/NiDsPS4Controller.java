@@ -32,44 +32,46 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a NiDsPS4Controller. */
   public enum Button {
     /** Square button. */
-    SQUARE(0),
+    SQUARE(0, "SquareButton"),
     /** Cross button. */
-    CROSS(1),
+    CROSS(1, "CrossButton"),
     /** Circle button. */
-    CIRCLE(2),
+    CIRCLE(2, "CircleButton"),
     /** Triangle button. */
-    TRIANGLE(3),
+    TRIANGLE(3, "TriangleButton"),
     /** Left trigger 1 button. */
-    L1(4),
+    L1(4, "L1Button"),
     /** Right trigger 1 button. */
-    R1(5),
+    R1(5, "R1Button"),
     /** Left trigger 2 button. */
-    L2(6),
+    L2(6, "L2Button"),
     /** Right trigger 2 button. */
-    R2(7),
+    R2(7, "R2Button"),
     /** Share button. */
-    SHARE(8),
+    SHARE(8, "ShareButton"),
     /** Options button. */
-    OPTIONS(9),
+    OPTIONS(9, "OptionsButton"),
     /** L3 (left stick) button. */
-    L3(10),
+    L3(10, "L3Button"),
     /** R3 (right stick) button. */
-    R3(11),
+    R3(11, "R3Button"),
     /** PlayStation button. */
-    PS(12),
+    PS(12, "PSButton"),
     /** Touchpad button. */
-    TOUCHPAD(13);
+    TOUCHPAD(13, "TouchpadButton");
 
     /** Button value. */
     public final int value;
 
-    Button(int value) {
+    private final String m_name;
+
+    Button(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the button, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Button`.
+     * Get the human-friendly name of the button, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -77,36 +79,37 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
      */
     @Override
     public String toString() {
-      // Remove leading `k`
-      return this.name().substring(1) + "Button";
+      return m_name;
     }
   }
 
   /** Represents an axis on an NiDsPS4Controller. */
   public enum Axis {
     /** Left X axis. */
-    LEFT_X(0),
+    LEFT_X(0, "LeftX"),
     /** Left Y axis. */
-    LEFT_Y(1),
+    LEFT_Y(1, "LeftY"),
     /** Right X axis. */
-    RIGHT_X(2),
+    RIGHT_X(2, "RightX"),
     /** Right Y axis. */
-    RIGHT_Y(5),
+    RIGHT_Y(5, "RightY"),
     /** Left trigger 2. */
-    L2(3),
+    L2(3, "L2Axis"),
     /** Right trigger 2. */
-    R2(4);
+    R2(4, "R2Axis");
 
     /** Axis value. */
     public final int value;
 
-    Axis(int value) {
+    private final String m_name;
+
+    Axis(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the axis, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Axis` if the name ends with `2`.
+     * Get the human-friendly name of the axis, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -114,11 +117,7 @@ public class NiDsPS4Controller implements HIDDevice, TelemetryLoggable {
      */
     @Override
     public String toString() {
-      var name = this.name().substring(1); // Remove leading `k`
-      if (name.endsWith("2")) {
-        return name + "Axis";
-      }
-      return name;
+      return m_name;
     }
   }
 
