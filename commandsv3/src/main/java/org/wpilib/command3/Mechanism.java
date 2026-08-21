@@ -5,6 +5,7 @@
 package org.wpilib.command3;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.annotation.NoDiscard;
 import org.wpilib.units.measure.Time;
@@ -115,6 +116,16 @@ public interface Mechanism {
    */
   default Command idleFor(Time duration) {
     return idle().withTimeout(duration);
+  }
+
+  /**
+   * Returns a command that idles this mechanism until the given condition becomes true.
+   *
+   * @param condition What condition the mechanism should wait for.
+   * @return A new idle command.
+   */
+  public Command idleUntil(BooleanSupplier condition) {
+    return idle().until(condition).withAutomaticName();
   }
 
   /**
