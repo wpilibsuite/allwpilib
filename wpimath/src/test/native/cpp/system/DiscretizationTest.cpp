@@ -65,7 +65,7 @@ TEST_CASE("DiscretizationTest DiscretizeSlowModelAQ", "[wpimath]") {
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
+  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::Tsit5<
       std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
                                              const wpi::math::Matrixd<2, 2>&)>,
       wpi::math::Matrixd<2, 2>>(
@@ -97,7 +97,7 @@ TEST_CASE("DiscretizationTest DiscretizeFastModelAQ", "[wpimath]") {
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
-  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
+  wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::Tsit5<
       std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
                                              const wpi::math::Matrixd<2, 2>&)>,
       wpi::math::Matrixd<2, 2>>(

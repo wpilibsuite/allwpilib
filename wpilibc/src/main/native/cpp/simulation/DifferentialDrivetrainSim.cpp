@@ -60,8 +60,8 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
 }
 
 void DifferentialDrivetrainSim::Update(wpi::units::second_t dt) {
-  m_x = wpi::math::RKDP([this](auto& x, auto& u) { return Dynamics(x, u); },
-                        m_x, m_u, dt);
+  m_x = wpi::math::Tsit5([this](auto& x, auto& u) { return Dynamics(x, u); },
+                         m_x, m_u, dt);
   m_y = m_x + wpi::math::Normal<7>(m_measurementStdDevs);
 }
 

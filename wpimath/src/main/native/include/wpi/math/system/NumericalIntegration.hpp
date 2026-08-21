@@ -72,7 +72,7 @@ T RK4(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt) {
 }
 
 /**
- * Performs adaptive Dormand-Prince integration of dx/dt = f(x, u) for dt.
+ * Performs adaptive Tsitouras 5th Order integration of dx/dt = f(x, u) for dt.
  *
  * @param f        The function to integrate. It must take two arguments x and
  *                 u.
@@ -83,29 +83,34 @@ T RK4(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt) {
  *                 number like 1e-6.
  */
 template <typename F, typename T, typename U>
-T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
-  // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
+T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
+  // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
   // Butcher tableau the following arrays came from.
 
   constexpr int kDim = 7;
 
   // clang-format off
   constexpr double A[kDim - 1][kDim - 1]{
-      {      1.0 / 5.0},
-      {      3.0 / 40.0,        9.0 / 40.0},
-      {     44.0 / 45.0,      -56.0 / 15.0,       32.0 / 9.0},
-      {19372.0 / 6561.0, -25360.0 / 2187.0, 64448.0 / 6561.0, -212.0 / 729.0},
-      { 9017.0 / 3168.0,     -355.0 / 33.0, 46732.0 / 5247.0,   49.0 / 176.0, -5103.0 / 18656.0},
-      {    35.0 / 384.0,               0.0,   500.0 / 1113.0,  125.0 / 192.0,  -2187.0 / 6784.0, 11.0 / 84.0}};
+      {              0.161},
+      {  -0.008480655492357,    0.335480655492357},
+      {   2.897153057105494,   -6.359448489975075,    4.362295432869582},
+      {   5.325864828439257,  -11.748883564062828,    7.495539342889837,  -0.092495066361755},
+      {   5.861455442946420,  -12.920969317847110,    8.159367898576159,  -0.071584973281401,  -0.028269050394068},
+      // a₇ᵢ = bᵢ, i = 1, 2, ··· , 6
+      {   0.096460766818065,     0.01,                0.479889650414500,   1.379008574103742,  -3.290069515436081,   2.324710524099774}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{
-      35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0,
-      11.0 / 84.0,  0.0};
-  constexpr std::array<double, kDim> b2{5179.0 / 57600.0,    0.0,
-                                        7571.0 / 16695.0,    393.0 / 640.0,
-                                        -92097.0 / 339200.0, 187.0 / 2100.0,
-                                        1.0 / 40.0};
+  constexpr std::array<double, kDim> b1{0.09646076681806523,
+                                        0.01,
+                                        0.4798896504144996,
+                                        1.379008574103742,
+                                        -3.290069515436081,
+                                        2.324710524099774,
+                                        0.0};
+  constexpr std::array<double, kDim> b2{0.001780011052226,  0.000816434459657,
+                                        -0.007880878010262, 0.144711007173263,
+                                        -0.582357165452555, 0.458082105929187,
+                                        1.0 / 66.0};
 
   // Loop until dt has elapsed
   double dtElapsed = 0.0;
@@ -150,7 +155,7 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
 }
 
 /**
- * Performs adaptive Dormand-Prince integration of dy/dt = f(t, y) for dt.
+ * Performs adaptive Tsitouras 5th Order integration of dy/dt = f(t, y) for dt.
  *
  * @param f        The function to integrate. It must take two arguments t and
  *                 y.
@@ -161,33 +166,38 @@ T RKDP(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
  *                 number like 1e-6.
  */
 template <typename F, typename T>
-T RKDP(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
-       double maxError = 1e-6) {
-  // See https://en.wikipedia.org/wiki/Dormand%E2%80%93Prince_method for the
+T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
+        double maxError = 1e-6) {
+  // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
   // Butcher tableau the following arrays came from.
 
   constexpr int kDim = 7;
 
   // clang-format off
   constexpr double A[kDim - 1][kDim - 1]{
-      {      1.0 / 5.0},
-      {      3.0 / 40.0,        9.0 / 40.0},
-      {     44.0 / 45.0,      -56.0 / 15.0,       32.0 / 9.0},
-      {19372.0 / 6561.0, -25360.0 / 2187.0, 64448.0 / 6561.0, -212.0 / 729.0},
-      { 9017.0 / 3168.0,     -355.0 / 33.0, 46732.0 / 5247.0,   49.0 / 176.0, -5103.0 / 18656.0},
-      {    35.0 / 384.0,               0.0,   500.0 / 1113.0,  125.0 / 192.0,  -2187.0 / 6784.0, 11.0 / 84.0}};
+      {              0.161},
+      {  -0.008480655492357,    0.335480655492357},
+      {   2.897153057105494,   -6.359448489975075,    4.362295432869582},
+      {   5.325864828439257,  -11.748883564062828,    7.495539342889837,  -0.092495066361755},
+      {   5.861455442946420,  -12.920969317847110,    8.159367898576159,  -0.071584973281401,  -0.028269050394068},
+      // a₇ᵢ = bᵢ, i = 1, 2, ··· , 6
+      {   0.096460766818065,     0.01,                0.479889650414500,   1.379008574103742,  -3.290069515436081,   2.324710524099774}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{
-      35.0 / 384.0, 0.0, 500.0 / 1113.0, 125.0 / 192.0, -2187.0 / 6784.0,
-      11.0 / 84.0,  0.0};
-  constexpr std::array<double, kDim> b2{5179.0 / 57600.0,    0.0,
-                                        7571.0 / 16695.0,    393.0 / 640.0,
-                                        -92097.0 / 339200.0, 187.0 / 2100.0,
-                                        1.0 / 40.0};
+  constexpr std::array<double, kDim> b1{0.09646076681806523,
+                                        0.01,
+                                        0.4798896504144996,
+                                        1.379008574103742,
+                                        -3.290069515436081,
+                                        2.324710524099774,
+                                        0.0};
+  constexpr std::array<double, kDim> b2{0.001780011052226,  0.000816434459657,
+                                        -0.007880878010262, 0.144711007173263,
+                                        -0.582357165452555, 0.458082105929187,
+                                        1.0 / 66.0};
 
-  constexpr std::array<double, kDim - 1> c{1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0,
-                                           8.0 / 9.0, 1.0,        1.0};
+  constexpr std::array<double, kDim - 1> c{
+      0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
 
   // Loop until dt has elapsed
   double dtElapsed = 0.0;

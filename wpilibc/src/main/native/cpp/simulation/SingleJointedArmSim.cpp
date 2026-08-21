@@ -116,7 +116,7 @@ wpi::math::Vectord<2> SingleJointedArmSim::UpdateX(
   //   f(x, u) = Ax + Bu + [0  α]ᵀ
   //   f(x, u) = Ax + Bu + [0  3/2⋅g⋅cos(θ)/L]ᵀ
 
-  wpi::math::Vectord<2> updatedXhat = wpi::math::RKDP(
+  wpi::math::Vectord<2> updatedXhat = wpi::math::Tsit5(
       [&](const auto& x, const auto& u) -> wpi::math::Vectord<2> {
         wpi::math::Vectord<2> xdot = m_plant.A() * x + m_plant.B() * u;
 
