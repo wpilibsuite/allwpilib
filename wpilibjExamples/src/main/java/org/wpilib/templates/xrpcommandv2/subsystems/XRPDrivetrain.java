@@ -13,7 +13,8 @@ public class XRPDrivetrain extends SubsystemBase {
   private static final double GEAR_RATIO =
       (30.0 / 14.0) * (28.0 / 16.0) * (36.0 / 9.0) * (26.0 / 8.0); // 48.75:1
   private static final double COUNTS_PER_MOTOR_SHAFT_REV = 12.0;
-  private static final double COUNTS_PER_REVOLUTION = COUNTS_PER_MOTOR_SHAFT_REV * GEAR_RATIO; // 585.0
+  private static final double COUNTS_PER_REVOLUTION =
+      COUNTS_PER_MOTOR_SHAFT_REV * GEAR_RATIO; // 585.0
   private static final double WHEEL_DIAMETER_INCH = 2.3622; // 60 mm
 
   // The XRP has the left and right motors set to

@@ -28,7 +28,8 @@ public class Robot extends TimedRobot {
   private static final int ENCODER_A_CHANNEL = 0;
   private static final int ENCODER_B_CHANNEL = 1;
   private static final int JOYSTICK_PORT = 0;
-  private static final double SPINUP_RAD_PER_SEC = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
+  private static final double SPINUP_RAD_PER_SEC =
+      Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
   private static final double FLYWHEEL_MOMENT_OF_INERTIA = 0.00032; // kg * m^2
 

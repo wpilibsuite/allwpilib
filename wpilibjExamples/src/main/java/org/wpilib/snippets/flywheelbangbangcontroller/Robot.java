@@ -78,7 +78,8 @@ public class Robot extends TimedRobot {
     double setpoint =
         Math.max(
             0.0,
-            joystick.getRawAxis(0) * Units.rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
+            joystick.getRawAxis(0)
+                * Units.rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
 
     // Set setpoint and measurement of the bang-bang controller
     double bangOutput = bangBangController.calculate(encoder.getRate(), setpoint) * 12.0;

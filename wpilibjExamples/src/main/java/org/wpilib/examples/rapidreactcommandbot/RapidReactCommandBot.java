@@ -68,7 +68,8 @@ public class RapidReactCommandBot {
     driverController
         .faceDown()
         .onTrue(
-            parallel(shooter.shootCommand(ShooterConstants.SHOOTER_TARGET_RPS), storage.runCommand())
+            parallel(
+                    shooter.shootCommand(ShooterConstants.SHOOTER_TARGET_RPS), storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
 
