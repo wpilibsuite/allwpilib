@@ -23,7 +23,7 @@ static_assert(WPI_ALERT_LOW == org_wpilib_util_AlertDataJNI_LEVEL_LOW);
 using namespace wpi::util::java;
 
 static bool mockTimeEnabled = false;
-static uint64_t mockNow = 0;
+static int64_t mockNow = 0;
 
 static JException illegalArgEx;
 static JException indexOobEx;

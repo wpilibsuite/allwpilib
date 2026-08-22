@@ -281,7 +281,8 @@ void Thread::Main() {
     if (sysTimeCount >= 250) {
       sysTimeCount = 0;
       if (RobotController::IsSystemTimeValid()) {
-        sysTimeEntry.Append(wpi::util::GetSystemTime(), wpi::util::Now());
+        sysTimeEntry.Append(wpi::util::GetSystemTime() / 1000,
+                            wpi::util::Now());
       }
     }
   }

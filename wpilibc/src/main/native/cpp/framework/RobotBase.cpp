@@ -85,7 +85,7 @@ class WPILibMathShared : public wpi::math::MathShared {
   }
 
   wpi::units::second_t GetTimestamp() override {
-    return wpi::units::second_t{wpi::util::Now() * 1.0e-6};
+    return wpi::units::second_t{wpi::util::Now() * 1.0e-9};
   }
 };
 }  // namespace

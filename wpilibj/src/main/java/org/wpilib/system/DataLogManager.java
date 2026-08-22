@@ -450,7 +450,7 @@ public final class DataLogManager {
       if (sysTimeCount >= 250) {
         sysTimeCount = 0;
         if (RobotController.isSystemTimeValid()) {
-          sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
+          sysTimeEntry.append(WPIUtilJNI.getSystemTime() / 1000L, WPIUtilJNI.now());
         }
       }
     }

@@ -31,7 +31,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
    * @param name name of the entry
    * @param struct struct serialization implementation
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return StructLogEntry
    */
   public static <T> StructLogEntry<T> create(
@@ -61,7 +61,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param struct struct serialization implementation
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return StructLogEntry
    */
   public static <T> StructLogEntry<T> create(
@@ -86,7 +86,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(T value, long timestamp) {
     synchronized (m_buf) {
@@ -111,7 +111,7 @@ public final class StructLogEntry<T> extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void update(T value, long timestamp) {
     synchronized (m_buf) {

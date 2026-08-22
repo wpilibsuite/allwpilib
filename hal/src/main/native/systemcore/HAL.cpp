@@ -26,7 +26,7 @@
 
 using namespace wpi::hal;
 
-static uint64_t dsStartTime;
+static int64_t dsStartTime;
 
 static int32_t teamNumber = -1;
 
@@ -62,7 +62,7 @@ void InitializeHAL() {
 }
 }  // namespace init
 
-uint64_t GetDSInitializeTime() {
+int64_t GetDSInitializeTime() {
   return dsStartTime;
 }
 
@@ -177,7 +177,7 @@ int32_t HAL_GetTeamNumber(void) {
   return teamNumber;
 }
 
-uint64_t HAL_GetMonotonicTime(void) {
+int64_t HAL_GetMonotonicTime(void) {
   wpi::hal::init::CheckInit();
   return wpi::util::NowDefault();
 }

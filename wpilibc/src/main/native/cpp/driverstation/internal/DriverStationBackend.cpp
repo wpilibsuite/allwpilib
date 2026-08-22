@@ -117,11 +117,11 @@ struct MatchDataSender {
 class JoystickLogSender {
  public:
   void Init(wpi::log::DataLog& log, unsigned int stick, int64_t timestamp);
-  void Send(uint64_t timestamp);
+  void Send(int64_t timestamp);
 
  private:
-  void AppendButtons(HAL_JoystickButtons buttons, uint64_t timestamp);
-  void AppendPOVs(const HAL_JoystickPOVs& povs, uint64_t timestamp);
+  void AppendButtons(HAL_JoystickButtons buttons, int64_t timestamp);
+  void AppendPOVs(const HAL_JoystickPOVs& povs, int64_t timestamp);
 
   unsigned int m_stick;
   HAL_JoystickButtons m_prevButtons;
@@ -135,7 +135,7 @@ class JoystickLogSender {
 class DataLogSender {
  public:
   void Init(wpi::log::DataLog& log, bool logJoysticks, int64_t timestamp);
-  void Send(uint64_t timestamp);
+  void Send(int64_t timestamp);
 
  private:
   std::atomic_bool m_initialized{false};
@@ -1247,7 +1247,7 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   AppendPOVs(m_prevPOVs, timestamp);
 }
 
-void JoystickLogSender::Send(uint64_t timestamp) {
+void JoystickLogSender::Send(int64_t timestamp) {
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(m_stick, &buttons);
   if (buttons.available != m_prevButtons.available ||
@@ -1280,7 +1280,7 @@ void JoystickLogSender::Send(uint64_t timestamp) {
 }
 
 void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
-                                      uint64_t timestamp) {
+                                      int64_t timestamp) {
   int count = availableToCount(buttons.available);
   uint8_t buttonsArr[64];
   for (int i = 0; i < count; ++i) {
@@ -1292,7 +1292,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
 }
 
 void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
-                                   uint64_t timestamp) {
+                                   int64_t timestamp) {
   int count = availableToCount(povs.available);
   int64_t povsArr[HAL_MAX_JOYSTICK_POVS];
   for (int i = 0; i < count; ++i) {
@@ -1327,7 +1327,7 @@ void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
   m_initialized = true;
 }
 
-void DataLogSender::Send(uint64_t timestamp) {
+void DataLogSender::Send(int64_t timestamp) {
   if (!m_initialized) {
     return;
   }

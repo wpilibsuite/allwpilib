@@ -120,7 +120,7 @@ class DataLog {
    *             schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AddSchema(std::string_view name, std::string_view type,
                  std::span<const uint8_t> schema, int64_t timestamp = 0);
@@ -138,7 +138,7 @@ class DataLog {
    *             schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AddSchema(std::string_view name, std::string_view type,
                  std::string_view schema, int64_t timestamp = 0) {
@@ -155,7 +155,7 @@ class DataLog {
    *
    * @tparam T protobuf serializable type
    * @param msg protobuf message
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   template <wpi::util::ProtobufSerializable T>
   void AddProtobufSchema(wpi::util::ProtobufMessage<T>& msg,
@@ -176,7 +176,7 @@ class DataLog {
    *
    * @tparam T struct serializable type
    * @param info optional struct type info
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   template <typename T, typename... I>
     requires wpi::util::StructSerializable<T, I...>
@@ -201,7 +201,7 @@ class DataLog {
    * @param name Name
    * @param type Data type
    * @param metadata Initial metadata (e.g. data properties)
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    *
    * @return Entry index
    */
@@ -212,7 +212,7 @@ class DataLog {
    * Finish an entry.
    *
    * @param entry Entry index
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Finish(int entry, int64_t timestamp = 0);
 
@@ -221,7 +221,7 @@ class DataLog {
    *
    * @param entry Entry index
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void SetMetadata(int entry, std::string_view metadata, int64_t timestamp = 0);
 
@@ -230,7 +230,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param data Byte array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendRaw(int entry, std::span<const uint8_t> data, int64_t timestamp);
 
@@ -239,7 +239,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param data Byte array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendRaw2(int entry, std::span<const std::span<const uint8_t>> data,
                   int64_t timestamp);
@@ -249,7 +249,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param value Boolean value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendBoolean(int entry, bool value, int64_t timestamp);
 
@@ -258,7 +258,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param value Integer value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendInteger(int entry, int64_t value, int64_t timestamp);
 
@@ -267,7 +267,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param value Float value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendFloat(int entry, float value, int64_t timestamp);
 
@@ -276,7 +276,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param value Double value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendDouble(int entry, double value, int64_t timestamp);
 
@@ -285,7 +285,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param value String value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendString(int entry, std::string_view value, int64_t timestamp);
 
@@ -294,7 +294,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Boolean array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendBooleanArray(int entry, std::span<const bool> arr,
                           int64_t timestamp);
@@ -304,7 +304,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Boolean array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendBooleanArray(int entry, std::span<const int> arr,
                           int64_t timestamp);
@@ -314,7 +314,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Boolean array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendBooleanArray(int entry, std::span<const uint8_t> arr,
                           int64_t timestamp);
@@ -324,7 +324,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Integer array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendIntegerArray(int entry, std::span<const int64_t> arr,
                           int64_t timestamp);
@@ -334,7 +334,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Float array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendFloatArray(int entry, std::span<const float> arr,
                         int64_t timestamp);
@@ -344,7 +344,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr Double array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendDoubleArray(int entry, std::span<const double> arr,
                          int64_t timestamp);
@@ -354,7 +354,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr String array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendStringArray(int entry, std::span<const std::string> arr,
                          int64_t timestamp);
@@ -364,7 +364,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr String array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendStringArray(int entry, std::span<const std::string_view> arr,
                          int64_t timestamp);
@@ -374,7 +374,7 @@ class DataLog {
    *
    * @param entry Entry index, as returned by Start()
    * @param arr String array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void AppendStringArray(int entry, std::span<const struct WPI_String> arr,
                          int64_t timestamp);
@@ -493,7 +493,7 @@ class DataLog {
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
                 std::string_view metadata, int64_t timestamp);
-  uint8_t* StartRecord(uint32_t entry, uint64_t timestamp, uint32_t payloadSize,
+  uint8_t* StartRecord(uint32_t entry, int64_t timestamp, uint32_t payloadSize,
                        size_t reserveSize);
   uint8_t* Reserve(size_t size);
   void AppendImpl(std::span<const uint8_t> data);
@@ -564,7 +564,7 @@ class DataLogEntry {
    * Updates the metadata for the entry.
    *
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void SetMetadata(std::string_view metadata, int64_t timestamp = 0) {
     m_log->SetMetadata(m_entry, metadata, timestamp);
@@ -573,7 +573,7 @@ class DataLogEntry {
   /**
    * Finishes the entry.
    *
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Finish(int64_t timestamp = 0) { m_log->Finish(m_entry, timestamp); }
 
@@ -658,7 +658,7 @@ class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const uint8_t> data, int64_t timestamp = 0) {
     m_log->AppendRaw(m_entry, data, timestamp);
@@ -672,7 +672,7 @@ class RawLogEntry : public DataLogValueEntryImpl<std::vector<uint8_t>> {
    * result in unexpected results.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const uint8_t> data, int64_t timestamp = 0);
 };
@@ -695,7 +695,7 @@ class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(bool value, int64_t timestamp = 0) {
     m_log->AppendBoolean(m_entry, value, timestamp);
@@ -709,7 +709,7 @@ class BooleanLogEntry : public DataLogValueEntryImpl<bool> {
    * result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(bool value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
@@ -738,7 +738,7 @@ class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(int64_t value, int64_t timestamp = 0) {
     m_log->AppendInteger(m_entry, value, timestamp);
@@ -752,7 +752,7 @@ class IntegerLogEntry : public DataLogValueEntryImpl<int64_t> {
    * result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(int64_t value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
@@ -781,7 +781,7 @@ class FloatLogEntry : public DataLogValueEntryImpl<float> {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(float value, int64_t timestamp = 0) {
     m_log->AppendFloat(m_entry, value, timestamp);
@@ -795,7 +795,7 @@ class FloatLogEntry : public DataLogValueEntryImpl<float> {
    * result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(float value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
@@ -824,7 +824,7 @@ class DoubleLogEntry : public DataLogValueEntryImpl<double> {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(double value, int64_t timestamp = 0) {
     m_log->AppendDouble(m_entry, value, timestamp);
@@ -838,7 +838,7 @@ class DoubleLogEntry : public DataLogValueEntryImpl<double> {
    * result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(double value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
@@ -870,7 +870,7 @@ class StringLogEntry : public DataLogValueEntryImpl<std::string> {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::string_view value, int64_t timestamp = 0) {
     m_log->AppendString(m_entry, value, timestamp);
@@ -884,7 +884,7 @@ class StringLogEntry : public DataLogValueEntryImpl<std::string> {
    * result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::string_view value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};
@@ -915,7 +915,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * must be monotonically increasing.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const bool> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
@@ -925,7 +925,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<bool> arr, int64_t timestamp = 0) {
     Append(std::span{arr.begin(), arr.end()}, timestamp);
@@ -935,7 +935,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const int> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
@@ -945,7 +945,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<int> arr, int64_t timestamp = 0) {
     Append(std::span{arr.begin(), arr.end()}, timestamp);
@@ -955,7 +955,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const uint8_t> arr, int64_t timestamp = 0) {
     m_log->AppendBooleanArray(m_entry, arr, timestamp);
@@ -969,7 +969,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const bool> arr, int64_t timestamp = 0);
 
@@ -981,7 +981,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<bool> arr, int64_t timestamp = 0) {
     Update(std::span{arr.begin(), arr.end()}, timestamp);
@@ -995,7 +995,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const int> arr, int64_t timestamp = 0);
 
@@ -1007,7 +1007,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<int> arr, int64_t timestamp = 0) {
     Update(std::span{arr.begin(), arr.end()}, timestamp);
@@ -1021,7 +1021,7 @@ class BooleanArrayLogEntry : public DataLogValueEntryImpl<std::vector<int>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const uint8_t> arr, int64_t timestamp = 0);
 };
@@ -1046,7 +1046,7 @@ class IntegerArrayLogEntry
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const int64_t> arr, int64_t timestamp = 0) {
     m_log->AppendIntegerArray(m_entry, arr, timestamp);
@@ -1056,7 +1056,7 @@ class IntegerArrayLogEntry
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
@@ -1070,7 +1070,7 @@ class IntegerArrayLogEntry
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const int64_t> arr, int64_t timestamp = 0);
 
@@ -1082,7 +1082,7 @@ class IntegerArrayLogEntry
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<int64_t> arr, int64_t timestamp = 0) {
     Update({arr.begin(), arr.end()}, timestamp);
@@ -1107,7 +1107,7 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const float> arr, int64_t timestamp = 0) {
     m_log->AppendFloatArray(m_entry, arr, timestamp);
@@ -1117,7 +1117,7 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<float> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
@@ -1131,7 +1131,7 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const float> arr, int64_t timestamp = 0);
 
@@ -1143,7 +1143,7 @@ class FloatArrayLogEntry : public DataLogValueEntryImpl<std::vector<float>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<float> arr, int64_t timestamp = 0) {
     Update({arr.begin(), arr.end()}, timestamp);
@@ -1169,7 +1169,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const double> arr, int64_t timestamp = 0) {
     m_log->AppendDoubleArray(m_entry, arr, timestamp);
@@ -1179,7 +1179,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<double> arr, int64_t timestamp = 0) {
     Append({arr.begin(), arr.end()}, timestamp);
@@ -1193,7 +1193,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const double> arr, int64_t timestamp = 0);
 
@@ -1205,7 +1205,7 @@ class DoubleArrayLogEntry : public DataLogValueEntryImpl<std::vector<double>> {
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<double> arr, int64_t timestamp = 0) {
     Update({arr.begin(), arr.end()}, timestamp);
@@ -1232,7 +1232,7 @@ class StringArrayLogEntry
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const std::string> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
@@ -1242,7 +1242,7 @@ class StringArrayLogEntry
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const std::string_view> arr, int64_t timestamp = 0) {
     m_log->AppendStringArray(m_entry, arr, timestamp);
@@ -1252,7 +1252,7 @@ class StringArrayLogEntry
    * Appends a record to the log.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::initializer_list<std::string_view> arr,
               int64_t timestamp = 0) {
@@ -1268,7 +1268,7 @@ class StringArrayLogEntry
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const std::string> arr, int64_t timestamp = 0);
 
@@ -1280,7 +1280,7 @@ class StringArrayLogEntry
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const std::string_view> arr, int64_t timestamp = 0);
 
@@ -1292,7 +1292,7 @@ class StringArrayLogEntry
    * result in unexpected results.
    *
    * @param arr Values to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::initializer_list<std::string_view> arr,
               int64_t timestamp = 0) {
@@ -1345,7 +1345,7 @@ class StructLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
     if constexpr (sizeof...(I) == 0) {
@@ -1370,7 +1370,7 @@ class StructLogEntry : public DataLogEntry {
    * result in unexpected results.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(const T& data, int64_t timestamp = 0) {
     if constexpr (sizeof...(I) == 0) {
@@ -1484,7 +1484,7 @@ class StructArrayLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   template <typename U>
 #if __cpp_lib_ranges >= 201911L
@@ -1506,7 +1506,7 @@ class StructArrayLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(std::span<const T> data, int64_t timestamp = 0) {
     std::apply(
@@ -1527,7 +1527,7 @@ class StructArrayLogEntry : public DataLogEntry {
    * result in unexpected results.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(std::span<const T> data, int64_t timestamp = 0) {
     std::apply(
@@ -1620,7 +1620,7 @@ class ProtobufLogEntry : public DataLogEntry {
    * Appends a record to the log.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Append(const T& data, int64_t timestamp = 0) {
     wpi::util::SmallVector<uint8_t, 128> buf;
@@ -1639,7 +1639,7 @@ class ProtobufLogEntry : public DataLogEntry {
    * result in unexpected results.
    *
    * @param data Data to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   void Update(const T& data, int64_t timestamp = 0) {
     std::scoped_lock lock{m_mutex};

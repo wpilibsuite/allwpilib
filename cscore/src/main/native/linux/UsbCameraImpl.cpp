@@ -577,9 +577,11 @@ void UsbCameraImpl::CameraThreadMain() {
             // grab current time in the same timebase as buf.timestamp
             struct timespec ts;
             if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0) {
-              int64_t nowTime = {ts.tv_sec * 1'000'000 + ts.tv_nsec / 1000};
-              int64_t bufTime = {buf.timestamp.tv_sec * 1'000'000 +
-                                 buf.timestamp.tv_usec};
+              int64_t nowTime =
+                  static_cast<int64_t>(ts.tv_sec) * 1'000'000'000 + ts.tv_nsec;
+              int64_t bufTime =
+                  static_cast<int64_t>(buf.timestamp.tv_sec) * 1'000'000'000 +
+                  static_cast<int64_t>(buf.timestamp.tv_usec) * 1000;
               // And offset frameTime by the latency
               int64_t offset{nowTime - bufTime};
               frameTime -= offset;
@@ -593,7 +595,7 @@ void UsbCameraImpl::CameraThreadMain() {
               } else {
                 timeSource = WPI_TIMESRC_UNKNOWN;
               }
-              SDEBUG4("Frame was {} uS old, flags {}, source {}", offset,
+              SDEBUG4("Frame was {} ns old, flags {}, source {}", offset,
                       tsrcFlags, static_cast<int>(timeSource));
             } else {
               // Can't do anything if we can't access the clock, leave default

@@ -5,6 +5,7 @@
 #include "wpi/datalog/DataLogReader.hpp"
 
 #include <bit>
+#include <limits>
 #include <optional>
 #include <utility>
 
@@ -293,8 +294,14 @@ bool DataLogReader::GetRecord(size_t* pos, DataLogRecord* out) const {
   if (size > (buf.size() - headerLen)) {
     return false;
   }
-  int64_t timestamp =
+  uint64_t rawTime =
       ReadVarInt(buf.subspan(1 + entryLen + sizeLen, timestampLen));
+  if (rawTime >
+      static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) / 1000) {
+    return false;
+  }
+  int64_t fileTimestamp = static_cast<int64_t>(rawTime);
+  int64_t timestamp = fileTimestamp * 1000;
   *out = DataLogRecord{entry, timestamp, buf.subspan(headerLen, size)};
   *pos += headerLen + size;
   return true;

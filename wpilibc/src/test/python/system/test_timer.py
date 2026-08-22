@@ -72,19 +72,19 @@ def test_reset():
 
 
 def test_reset_with_large_timestamp():
-    mock_time = 1_000_002
+    mock_time = 1_000_000_002
     RobotController.set_time_source(lambda: mock_time)
 
     timer = Timer()
     timer.start()
 
-    mock_time += 500_000
+    mock_time += 500_000_000
     assert timer.get() == pytest.approx(0.5)
 
     timer.reset()
     assert timer.get() == 0.0
 
-    mock_time += 500_000
+    mock_time += 500_000_000
     assert timer.get() == pytest.approx(0.5)
 
 
@@ -140,15 +140,15 @@ def test_advance_if_elapsed_preserves_fractional_period():
     period = 1.0 / 60.0
 
     for i in range(1, 61):
-        mock_time["value"] = (i * 1_000_000 + 59) // 60 + 100
+        mock_time["value"] = (i * 1_000_000_000 + 59) // 60 + 100
 
         assert timer.advance_if_elapsed(period)
         assert not timer.advance_if_elapsed(period)
 
-    assert timer.get() == pytest.approx(100e-6, abs=1e-12)
+    assert timer.get() == pytest.approx(100e-9, abs=1e-12)
 
 
-def test_advance_if_elapsed_progresses_with_sub_microsecond_period():
+def test_advance_if_elapsed_progresses_with_sub_nanosecond_period():
     mock_time = {"value": 0}
     RobotController.set_time_source(lambda: mock_time["value"])
 
@@ -156,7 +156,7 @@ def test_advance_if_elapsed_progresses_with_sub_microsecond_period():
     timer.start()
 
     mock_time["value"] = 1
-    period = 0.1e-6
+    period = 0.1e-9
 
     for _ in range(10):
         assert timer.advance_if_elapsed(period)

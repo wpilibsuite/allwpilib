@@ -42,7 +42,7 @@ void TimedRobot::EndCompetition() {
 
 TimedRobot::TimedRobot(wpi::units::second_t period)
     : IterativeRobotBase(period) {
-  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
+  m_startTime = std::chrono::nanoseconds{RobotController::GetMonotonicTime()};
   AddPeriodic([=, this] { LoopFunc(); }, period);
 
   int32_t status = 0;

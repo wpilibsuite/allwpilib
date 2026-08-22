@@ -42,7 +42,7 @@ void Tracer::PrintEpochs() {
 
 void Tracer::PrintEpochs(wpi::util::raw_ostream& os) {
   using std::chrono::duration_cast;
-  using std::chrono::microseconds;
+  using std::chrono::nanoseconds;
 
   auto now = wpi::hal::monotonic_clock::now();
   if (now - m_lastEpochsPrintTime > MIN_PRINT_PERIOD) {
@@ -50,7 +50,7 @@ void Tracer::PrintEpochs(wpi::util::raw_ostream& os) {
     for (const auto& epoch : m_epochs) {
       os << std::format(
           "\t{}: {:.6f}s\n", epoch.first,
-          duration_cast<microseconds>(epoch.second).count() / 1.0e6);
+          duration_cast<nanoseconds>(epoch.second).count() / 1.0e9);
     }
   }
 }

@@ -176,7 +176,7 @@ int32_t HAL_GetTeamNumber(void) {
   return HALSIM_GetRoboRioTeamNumber();
 }
 
-uint64_t HAL_GetMonotonicTime(void) {
+int64_t HAL_GetMonotonicTime(void) {
   return wpi::hal::GetMonotonicTime();
 }
 

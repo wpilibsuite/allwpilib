@@ -15,10 +15,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     reader = DataLogReader(args.infile)
+    local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
     entries = {}
     for record in reader:
-        timestamp = record.getTimestamp() / 1000000
+        timestamp = record.getTimestamp() / 1_000_000_000
         if record.isStart():
             try:
                 data = record.getStartData()
@@ -59,8 +60,11 @@ if __name__ == "__main__":
             try:
                 # handle systemTime specially
                 if entry.name == "systemTime" and entry.type == "int64":
-                    dt = datetime.fromtimestamp(record.getInteger() / 1000000)
-                    print(f"  {dt:%Y-%m-%d %H:%M:%S.%f}")
+                    val = record.getInteger()
+                    dt = datetime.datetime.fromtimestamp(
+                        val // 1_000_000, tz=local_timezone
+                    )
+                    print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                     continue
 
                 if entry.type == "double":

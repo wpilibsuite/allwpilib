@@ -19,15 +19,15 @@ typedef struct WPI_RawFrame {  // NOLINT
   uint8_t* data;
   // function to free image data (may be NULL)
   void (*freeFunc)(void* cbdata, void* data, size_t capacity);
-  void* freeCbData;    // data passed to freeFunc
-  size_t capacity;     // data buffer capacity, in bytes
-  size_t size;         // actual size of data, in bytes
-  int pixelFormat;     // WPI_PixelFormat
-  int width;           // width of image, in pixels
-  int height;          // height of image, in pixels
-  int stride;          // size of each row of data, in bytes (may be 0)
-  uint64_t timestamp;  // image capture timestamp
-  int timestampSrc;    // WPI_TimestampSource
+  void* freeCbData;   // data passed to freeFunc
+  size_t capacity;    // data buffer capacity, in bytes
+  size_t size;        // actual size of data, in bytes
+  int pixelFormat;    // WPI_PixelFormat
+  int width;          // width of image, in pixels
+  int height;         // height of image, in pixels
+  int stride;         // size of each row of data, in bytes (may be 0)
+  int64_t timestamp;  // image capture timestamp
+  int timestampSrc;   // WPI_TimestampSource
 } WPI_RawFrame;
 
 /**

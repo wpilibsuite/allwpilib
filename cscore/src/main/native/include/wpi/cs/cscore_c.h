@@ -278,7 +278,7 @@ void CS_GetSourceName(CS_Source source, struct WPI_String* name,
                       CS_Status* status);
 void CS_GetSourceDescription(CS_Source source, struct WPI_String* description,
                              CS_Status* status);
-uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
+int64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 void CS_SetSourceConnectionStrategy(CS_Source source,
                                     enum CS_ConnectionStrategy strategy,
                                     CS_Status* status);
@@ -388,7 +388,7 @@ CS_Sink CS_CreateCvSink(const struct WPI_String* name,
                         enum WPI_PixelFormat pixelFormat, CS_Status* status);
 CS_Sink CS_CreateCvSinkCallback(const struct WPI_String* name,
                                 enum WPI_PixelFormat pixelFormat, void* data,
-                                void (*processFrame)(void* data, uint64_t time),
+                                void (*processFrame)(void* data, int64_t time),
                                 CS_Status* status);
 /** @} */
 

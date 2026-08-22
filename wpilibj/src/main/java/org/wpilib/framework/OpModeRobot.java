@@ -71,7 +71,7 @@ public abstract class OpModeRobot extends RobotBase {
   private final PeriodicPriorityQueue m_callbacks = new PeriodicPriorityQueue();
   private int m_notifier;
   private final double m_period;
-  private final long m_startTimeUs;
+  private final long m_startTimeNs;
 
   // OpMode lifecycle state
   private long m_lastModeId = -1;
@@ -517,7 +517,7 @@ public abstract class OpModeRobot extends RobotBase {
     m_notifier = NotifierJNI.createNotifier();
     NotifierJNI.setNotifierName(m_notifier, "OpModeRobot");
 
-    m_startTimeUs = RobotController.getMonotonicTime();
+    m_startTimeNs = RobotController.getMonotonicTime();
 
     m_loopOverrunAlert =
         new Alert(
@@ -546,7 +546,7 @@ public abstract class OpModeRobot extends RobotBase {
    * @param period The period at which to run the callback.
    */
   public void addPeriodic(Runnable callback, double period) {
-    m_callbacks.add(callback, m_startTimeUs, period);
+    m_callbacks.add(callback, m_startTimeNs, period);
   }
 
   /**
@@ -591,11 +591,11 @@ public abstract class OpModeRobot extends RobotBase {
   public void nonePeriodic() {}
 
   /**
-   * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
+   * Return the system clock time in nanoseconds for the start of the current periodic loop. This is
+   * in the same time base as Timer.getMonotonicTimestamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current periodic function.
+   * @return Robot running time in nanoseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
     return m_callbacks.getLoopStartTime();
@@ -735,7 +735,7 @@ public abstract class OpModeRobot extends RobotBase {
     System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
 
     // Register the main opmode periodic callback
-    m_currentOpModePeriodic = m_callbacks.add(m_currentOpMode::periodic, m_startTimeUs, m_period);
+    m_currentOpModePeriodic = m_callbacks.add(m_currentOpMode::periodic, m_startTimeNs, m_period);
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");

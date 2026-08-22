@@ -205,7 +205,9 @@ class DataLogIterator:
             raise StopIteration
         entry = self._readVarInt(self.pos + 1, entryLen)
         size = self._readVarInt(self.pos + 1 + entryLen, sizeLen)
-        timestamp = self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen)
+        timestamp = (
+            self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen) * 1000
+        )
         if len(self.buf) < (self.pos + headerLen + size):
             raise StopIteration
         record = DataLogRecord(
@@ -263,7 +265,7 @@ class DataLogReader:
 if __name__ == "__main__":
     import mmap
     import sys
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
@@ -276,9 +278,11 @@ if __name__ == "__main__":
             print("not a log file", file=sys.stderr)
             sys.exit(1)
 
+        local_timezone = datetime.now(timezone.utc).astimezone().tzinfo
+
         entries = {}
         for record in reader:
-            timestamp = record.timestamp / 1000000
+            timestamp = record.timestamp / 1_000_000_000
             if record.isStart():
                 try:
                     data = record.getStartData()
@@ -321,8 +325,9 @@ if __name__ == "__main__":
                 try:
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
-                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)  # noqa: DTZ006
-                        print(f"  {dt:%Y-%m-%d %H:%M:%S.%f}")
+                        val = record.getInteger()
+                        dt = datetime.fromtimestamp(val // 1_000_000, tz=local_timezone)
+                        print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                         continue
 
                     if entry.type == "double":

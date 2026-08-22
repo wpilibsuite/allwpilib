@@ -25,7 +25,7 @@ import org.wpilib.util.WPIUtilJNI;
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final long MIN_PRINT_PERIOD = (long) 1e6; // μs
+  private static final double MIN_PRINT_PERIOD = 1.0; // s
 
   private double m_startTime;
   private double m_timeout;
@@ -52,7 +52,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond resolution.
+   * @param timeout The watchdog's timeout in seconds with nanosecond resolution.
    * @param callback This function is called when the timeout expires.
    */
   public Watchdog(double timeout, Runnable callback) {
@@ -64,7 +64,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Watchdog constructor.
    *
-   * @param timeout The watchdog's timeout with microsecond resolution.
+   * @param timeout The watchdog's timeout with nanosecond resolution.
    * @param callback This function is called when the timeout expires.
    */
   public Watchdog(Time timeout, Runnable callback) {
@@ -106,7 +106,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond resolution.
+   * @param timeout The watchdog's timeout in seconds with nanosecond resolution.
    */
   public void setTimeout(double timeout) {
     m_startTime = Timer.getMonotonicTimestamp();
@@ -228,7 +228,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       NotifierJNI.cancelNotifierAlarm(m_notifier, true);
     } else {
       NotifierJNI.setNotifierAlarm(
-          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e6), 0, true, true);
+          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e9), 0, true, true);
     }
   }
 
@@ -259,7 +259,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         // has occurred, so call its timeout function.
         Watchdog watchdog = m_watchdogs.poll();
 
-        double now = curTime * 1e-6;
+        double now = curTime * 1e-9;
         if (now - watchdog.m_lastTimeoutPrint > MIN_PRINT_PERIOD) {
           watchdog.m_lastTimeoutPrint = now;
           if (!watchdog.m_suppressTimeoutMessage) {

@@ -31,16 +31,16 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
       return HAL_INVALID_HANDLE;
     }
 
-    uint64_t waitTime = wpi::hal::GetDSInitializeTime() + 400000;
+    int64_t waitTime = wpi::hal::GetDSInitializeTime() + 400'000'000;
 
     // Ensure we have been alive for long enough to receive a few Power packets.
     do {
-      uint64_t currentTime = HAL_GetMonotonicTime();
+      int64_t currentTime = HAL_GetMonotonicTime();
       if (currentTime >= waitTime) {
         break;
       }
       std::this_thread::sleep_for(
-          std::chrono::microseconds(waitTime - currentTime));
+          std::chrono::nanoseconds(waitTime - currentTime));
     } while (true);
 
     // Try PDP first

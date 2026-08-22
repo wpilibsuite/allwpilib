@@ -46,18 +46,21 @@ static unsigned int WriteVarInt(uint8_t* buf, T val) {
   return len;
 }
 
+static int64_t ToFileTimestamp(int64_t timestamp) {
+  int64_t actualTimestamp = timestamp == 0 ? wpi::util::Now() : timestamp;
+  return (std::max)(actualTimestamp, int64_t{0}) / 1000;
+}
+
 // min size: 4, max size: 17
 static unsigned int WriteRecordHeader(uint8_t* buf, uint32_t entry,
-                                      uint64_t timestamp,
-                                      uint32_t payloadSize) {
+                                      int64_t timestamp, uint32_t payloadSize) {
   uint8_t* origbuf = buf++;
 
   unsigned int entryLen = WriteVarInt(buf, entry);
   buf += entryLen;
   unsigned int payloadLen = WriteVarInt(buf, payloadSize);
   buf += payloadLen;
-  unsigned int timestampLen =
-      WriteVarInt(buf, timestamp == 0 ? wpi::util::Now() : timestamp);
+  unsigned int timestampLen = WriteVarInt(buf, ToFileTimestamp(timestamp));
   buf += timestampLen;
   *origbuf =
       ((timestampLen - 1) << 4) | ((payloadLen - 1) << 2) | (entryLen - 1);
@@ -292,7 +295,7 @@ uint8_t* DataLog::Reserve(size_t size) {
   return m_outgoing.back().Reserve(size);
 }
 
-uint8_t* DataLog::StartRecord(uint32_t entry, uint64_t timestamp,
+uint8_t* DataLog::StartRecord(uint32_t entry, int64_t timestamp,
                               uint32_t payloadSize, size_t reserveSize) {
   uint8_t* buf = Reserve(kRecordMaxHeaderSize + reserveSize);
   auto headerLen = WriteRecordHeader(buf, entry, timestamp, payloadSize);

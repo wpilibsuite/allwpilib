@@ -34,7 +34,7 @@ public final class ProtobufLogEntry<T> extends DataLogEntry {
    * @param name name of the entry
    * @param proto protobuf serialization implementation
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return ProtobufLogEntry
    */
   public static <T, MessageType extends ProtoMessage<?>> ProtobufLogEntry<T> create(
@@ -66,7 +66,7 @@ public final class ProtobufLogEntry<T> extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param proto protobuf serialization implementation
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return ProtobufLogEntry
    */
   public static <T, MessageType extends ProtoMessage<?>> ProtobufLogEntry<T> create(
@@ -93,7 +93,7 @@ public final class ProtobufLogEntry<T> extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(T value, long timestamp) {
     try {
@@ -122,7 +122,7 @@ public final class ProtobufLogEntry<T> extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void update(T value, long timestamp) {
     try {

@@ -639,8 +639,8 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void multiPress() {
-    var currentTimeMicros = new AtomicLong(1000000); // Start at 1s
-    RobotController.setTimeSource(currentTimeMicros::get);
+    var currentTimeNanos = new AtomicLong(1_000_000_000); // Start at 1s
+    RobotController.setTimeSource(currentTimeNanos::get);
 
     var signal = new AtomicBoolean(false);
     var baseTrigger = new Trigger(m_scheduler, signal::get);
@@ -650,7 +650,7 @@ class TriggerTest extends CommandTestBase {
     assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire initially");
 
     // First press at 1.1s
-    currentTimeMicros.set(1100000);
+    currentTimeNanos.set(1_100_000_000);
     signal.set(true);
     m_scheduler.run();
     assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 1 press");
@@ -659,7 +659,7 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
 
     // Second press at 1.2s
-    currentTimeMicros.set(1200000);
+    currentTimeNanos.set(1_200_000_000);
     signal.set(true);
     m_scheduler.run();
     assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after 2 presses");
@@ -668,7 +668,7 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
 
     // Third press at 1.3s
-    currentTimeMicros.set(1300000);
+    currentTimeNanos.set(1_300_000_000);
     signal.set(true);
     m_scheduler.run();
     assertTrue(multiPressTrigger.getAsBoolean(), "Should fire after 3 presses");
@@ -679,7 +679,7 @@ class TriggerTest extends CommandTestBase {
     // Fourth press at 2.0s (First press at 1.1s should be NOT yet expired, so 1.1s, 1.2s, 1.3s,
     // 2.0s ->
     // 4 presses)
-    currentTimeMicros.set(2000000);
+    currentTimeNanos.set(2_000_000_000L);
     signal.set(true);
     m_scheduler.run();
     assertTrue(
@@ -691,14 +691,14 @@ class TriggerTest extends CommandTestBase {
 
     // Wait until 2.2s. Press at 1.1s is expired (exactly 1.1s elapsed).
     // Remaining: 1.2s, 1.3s, 2.0s -> 3 presses.
-    currentTimeMicros.set(2200000);
+    currentTimeNanos.set(2_200_000_000L);
     m_scheduler.run();
     assertTrue(
         multiPressTrigger.getAsBoolean(),
         "Should still fire as there are 3 presses within last 1s");
 
     // Wait until 2.4s. Presses at 1.2s and 1.3s are definitely expired. Only 2.0s remains.
-    currentTimeMicros.set(2400000);
+    currentTimeNanos.set(2_400_000_000L);
     m_scheduler.run();
     assertFalse(multiPressTrigger.getAsBoolean(), "Should not fire after presses expire");
   }
