@@ -1,5 +1,18 @@
 [
   {
+    "name": "USB Serial Detection",
+    "foldername": "usbserial",
+    "gradlebase": "java",
+    "robotclass": "Robot",
+    "description": "Open and close a serial port as a USB serial device is connected and disconnected.",
+    "tags": [
+      "Hardware",
+      "USB",
+      "Serial"
+    ],
+    "commandversion": 2
+  },
+  {
     "name": "Getting Started",
     "description": "A differential-drive robot with split-stick Xbox arcade drive with a simple time-based autonomous.",
     "tags": [

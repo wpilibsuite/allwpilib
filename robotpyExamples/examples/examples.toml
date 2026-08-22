@@ -35,6 +35,7 @@ base = [
   "TankDrive",
   "TankDriveXboxController",
   "UnitTest",
+  "UsbSerial",
   "XrpReference",
 ]
 

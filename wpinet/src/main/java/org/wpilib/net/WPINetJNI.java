@@ -6,6 +6,7 @@ package org.wpilib.net;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import org.wpilib.util.runtime.RuntimeLoader;
 
 /** WPINet JNI. */
@@ -190,6 +191,25 @@ public class WPINetJNI {
    * @return Service data for MulticastServiceResolver.
    */
   public static native ServiceData[] getMulticastServiceResolverData(int handle);
+
+  /** Creates a USB device detector. */
+  public static native int createUsbDeviceDetector(
+      int port, Consumer<UsbDevice> connected, Consumer<UsbDevice> disconnected);
+
+  /** Frees a USB device detector. */
+  public static native void freeUsbDeviceDetector(int handle);
+
+  /** Starts a USB device detector. */
+  public static native boolean startUsbDeviceDetector(int handle);
+
+  /** Stops a USB device detector. */
+  public static native void stopUsbDeviceDetector(int handle);
+
+  /** Returns whether a USB device detector is running. */
+  public static native boolean isUsbDeviceDetectorRunning(int handle);
+
+  /** Returns whether a USB device detector implementation is available. */
+  public static native boolean getUsbDeviceDetectorHasImplementation(int handle);
 
   /** Utility class. */
   private WPINetJNI() {}

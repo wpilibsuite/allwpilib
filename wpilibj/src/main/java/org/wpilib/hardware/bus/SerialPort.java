@@ -8,30 +8,9 @@ import java.nio.charset.StandardCharsets;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SerialPortJNI;
 
-/** Driver for the serial ports (USB, MXP, Onboard) on the roboRIO. */
+/** Driver for serial ports. */
 public class SerialPort implements AutoCloseable {
   private int m_portHandle;
-
-  /** Serial port. */
-  public enum Port {
-    /** Onboard serial port on the roboRIO. */
-    ONBOARD(0),
-    /** MXP (roboRIO MXP) serial port. */
-    MXP(1),
-    /** USB serial port (same as kUSB1). */
-    USB(2),
-    /** USB serial port 1. */
-    USB_1(2),
-    /** USB serial port 2. */
-    USB_2(3);
-
-    /** Port value. */
-    public final int value;
-
-    Port(int value) {
-      this.value = value;
-    }
-  }
 
   /** Represents the parity to use for serial communications. */
   public enum Parity {
@@ -109,14 +88,14 @@ public class SerialPort implements AutoCloseable {
    * Create an instance of a Serial Port class.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port The Serial port to use
+   * @param portName The operating system port name (for example, "COM3" or "/dev/ttyUSB0").
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    * @param parity Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    */
   public SerialPort(
-      final int baudRate, Port port, final int dataBits, Parity parity, StopBits stopBits) {
-    m_portHandle = SerialPortJNI.serialInitializePort((byte) port.value);
+      final int baudRate, String portName, final int dataBits, Parity parity, StopBits stopBits) {
+    m_portHandle = SerialPortJNI.serialInitializePort(portName);
     SerialPortJNI.serialSetBaudRate(m_portHandle, baudRate);
     SerialPortJNI.serialSetDataBits(m_portHandle, (byte) dataBits);
     SerialPortJNI.serialSetParity(m_portHandle, (byte) parity.value);
@@ -133,40 +112,40 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.reportUsage("SerialPort", port.value, "");
+    HAL.reportUsage("SerialPort[" + portName + "]", "");
   }
 
   /**
    * Create an instance of a Serial Port class. Defaults to one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port The serial port to use.
+   * @param portName The operating system port name (for example, "COM3" or "/dev/ttyUSB0").
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    * @param parity Select the type of parity checking to use.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
-    this(baudRate, port, dataBits, parity, StopBits.ONE);
+  public SerialPort(final int baudRate, String portName, final int dataBits, Parity parity) {
+    this(baudRate, portName, dataBits, parity, StopBits.ONE);
   }
 
   /**
    * Create an instance of a Serial Port class. Defaults to no parity and one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port The serial port to use.
+   * @param portName The operating system port name (for example, "COM3" or "/dev/ttyUSB0").
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits) {
-    this(baudRate, port, dataBits, Parity.NONE, StopBits.ONE);
+  public SerialPort(final int baudRate, String portName, final int dataBits) {
+    this(baudRate, portName, dataBits, Parity.NONE, StopBits.ONE);
   }
 
   /**
    * Create an instance of a Serial Port class. Defaults to 8 databits, no parity, and one stop bit.
    *
    * @param baudRate The baud rate to configure the serial port.
-   * @param port The serial port to use.
+   * @param portName The operating system port name (for example, "COM3" or "/dev/ttyUSB0").
    */
-  public SerialPort(final int baudRate, Port port) {
-    this(baudRate, port, 8, Parity.NONE, StopBits.ONE);
+  public SerialPort(final int baudRate, String portName) {
+    this(baudRate, portName, 8, Parity.NONE, StopBits.ONE);
   }
 
   @Override

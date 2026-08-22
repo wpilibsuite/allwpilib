@@ -1,5 +1,17 @@
 [
   {
+    "name": "USB Serial Detection",
+    "foldername": "UsbSerial",
+    "gradlebase": "cpp",
+    "description": "Open and close a serial port as a USB serial device is connected and disconnected.",
+    "tags": [
+      "Hardware",
+      "USB",
+      "Serial"
+    ],
+    "commandversion": 2
+  },
+  {
     "name": "Mechanism2d",
     "foldername": "Mechanism2d",
     "gradlebase": "cpp",

@@ -34,6 +34,7 @@ EXAMPLE_PROJECTS = [
     "examples/TankDrive",
     "examples/TankDriveXboxController",
     "examples/UnitTest",
+    "examples/UsbSerial",
     "examples/XrpReference",
 ]
 SNIPPET_PROJECTS = [

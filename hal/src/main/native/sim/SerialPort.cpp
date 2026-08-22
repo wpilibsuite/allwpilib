@@ -11,15 +11,8 @@ void InitializeSerialPort() {}
 }  // namespace wpi::hal::init
 
 extern "C" {
-HAL_SerialPortHandle HAL_InitializeSerialPort(HAL_SerialPort port,
+HAL_SerialPortHandle HAL_InitializeSerialPort(const char* portName,
                                               int32_t* status) {
-  wpi::hal::init::CheckInit();
-  return HAL_INVALID_HANDLE;
-}
-
-HAL_SerialPortHandle HAL_InitializeSerialPortDirect(HAL_SerialPort port,
-                                                    const char* portName,
-                                                    int32_t* status) {
   wpi::hal::init::CheckInit();
   return HAL_INVALID_HANDLE;
 }

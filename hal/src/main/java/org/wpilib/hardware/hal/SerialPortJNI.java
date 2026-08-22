@@ -13,27 +13,14 @@ public class SerialPortJNI extends JNIWrapper {
   /**
    * Initializes a serial port.
    *
-   * <p>The channels are either the onboard RS232, the MXP UART, or 2 USB ports. The top port is
-   * USB1, the bottom port is USB2.
+   * <p>The port name is platform-specific. For example, it may be "COM3" on Windows or
+   * "/dev/ttyUSB0" on Linux.
    *
-   * @param port the serial port to initialize
+   * @param portName the operating system port name
    * @return Serial Port Handle
    * @see "HAL_InitializeSerialPort"
    */
-  public static native int serialInitializePort(byte port);
-
-  /**
-   * Initializes a serial port with a direct name.
-   *
-   * <p>This name is the /dev name for a specific port. Note these are not always consistent between
-   * Systemcore reboots.
-   *
-   * @param port the serial port to initialize
-   * @param portName the dev port name
-   * @return Serial Port Handle
-   * @see "HAL_InitializeSerialPortDirect"
-   */
-  public static native int serialInitializePortDirect(byte port, String portName);
+  public static native int serialInitializePort(String portName);
 
   /**
    * Sets the baud rate of a serial port.
