@@ -68,6 +68,20 @@ platform(
 )
 
 platform(
+    name = "linux_arm64_trixie",
+    exec_properties = {
+        "Arch": "arm64",
+        "OSFamily": "Linux",
+        "container-image": "docker://wpilib/debian-base:arm64-trixie@sha256:a5addc848192deea04eb74960e0eff9acb7cd3f30e39c00d42b1b8692ba174dd",
+    },
+    flags = [
+    ] + gcc_flags,
+    parents = [
+        "@wpilib_toolchains//platforms/trixie64",
+    ],
+)
+
+platform(
     name = "osx",
     flags = [
     ],
