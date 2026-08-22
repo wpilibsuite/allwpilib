@@ -1261,6 +1261,25 @@ static void CoalesceQueuedMouseMotionWheelEvents(double framePeriod) {
   }
 }
 
+static void ProcessImGuiSDLEvent(const SDL_Event& event) {
+  if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+      event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+    // The ImGui SDL backend ignores button-event coordinates. Queue them as a
+    // mouse-position event first so fast motion does not detach a click from
+    // the cursor position reported by SDL for that button transition.
+    SDL_Event motionEvent = {};
+    motionEvent.type = SDL_EVENT_MOUSE_MOTION;
+    motionEvent.motion.timestamp = event.button.timestamp;
+    motionEvent.motion.windowID = event.button.windowID;
+    motionEvent.motion.which = event.button.which;
+    motionEvent.motion.x = event.button.x;
+    motionEvent.motion.y = event.button.y;
+    ImGui_ImplSDL3_ProcessEvent(&motionEvent);
+  }
+
+  ImGui_ImplSDL3_ProcessEvent(&event);
+}
+
 void gui::Main() {
   // Main loop
   double previousStartTime = 0.0;
@@ -1279,7 +1298,7 @@ void gui::Main() {
           handler(event);
         }
       }
-      ImGui_ImplSDL3_ProcessEvent(&event);
+      ProcessImGuiSDLEvent(event);
 
       if (event.type == SDL_EVENT_QUIT) {
         gContext->exit = true;
