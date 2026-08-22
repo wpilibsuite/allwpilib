@@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.wpilib.system.RobotController;
 
-class CommandTestBase {
+public class CommandTestBase {
   protected Scheduler m_scheduler;
   protected List<SchedulerEvent> m_events;
   protected long m_opModeId = 0;
