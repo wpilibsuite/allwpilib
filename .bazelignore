@@ -1,3 +1,6 @@
+.git
+.gradle
+build
 build_cmake
 build-cmake
 
