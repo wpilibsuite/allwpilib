@@ -86,7 +86,6 @@ write_source_files(
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
-        "//robotpyExamples:write_example_project_list",
     ],
     tags = ["pregeneration"],
 )

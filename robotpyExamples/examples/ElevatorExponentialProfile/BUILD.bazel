@@ -1,0 +1,9 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "ElevatorExponentialProfile",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+    ],
+)

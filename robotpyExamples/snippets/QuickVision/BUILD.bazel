@@ -1,0 +1,11 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "QuickVision",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        # "//cscore:robotpy-cscore",
+        "//drivers:wpilib-drivers",
+    ],
+)

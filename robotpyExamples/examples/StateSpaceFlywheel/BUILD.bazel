@@ -1,0 +1,12 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "StateSpaceFlywheel",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//drivers:wpilib-drivers",
+        requirement("numpy"),
+    ],
+)
