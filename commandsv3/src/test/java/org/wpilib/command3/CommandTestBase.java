@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.wpilib.math.util.MathShared;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.system.RobotController;
 
 class CommandTestBase {
@@ -39,6 +41,23 @@ class CommandTestBase {
           @Override
           String getOpModeName() {
             return m_opModeName;
+          }
+        });
+  }
+
+  @BeforeEach
+  void initTime() {
+    MathSharedStore.setMathShared(
+        new MathShared() {
+          @Override
+          public void reportError(String error, StackTraceElement[] stackTrace) {}
+
+          @Override
+          public void reportUsage(String resource, String data) {}
+
+          @Override
+          public double getTimestamp() {
+            return RobotController.getTime() / 1e6;
           }
         });
   }

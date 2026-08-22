@@ -13,6 +13,7 @@ import static org.wpilib.units.Units.Seconds;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
 import org.wpilib.system.RobotController;
@@ -610,12 +611,14 @@ class TriggerTest extends CommandTestBase {
   void triggerUnbindsWhenCommandScopeInactive() {
     var triggerSignal = new AtomicBoolean(false);
     var commandRan = new AtomicBoolean(false);
+    var triggerRef = new AtomicReference<Trigger>();
     var innerCommand = Command.noRequirements(_ -> commandRan.set(true)).named("Inner");
 
     var outerCommand =
         Command.noRequirements(
                 co -> {
                   var trigger = new Trigger(m_scheduler, triggerSignal::get);
+                  triggerRef.set(trigger);
                   trigger.onTrue(innerCommand);
                   co.park();
                 })
@@ -633,6 +636,8 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.cancel(outerCommand);
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(outerCommand));
+
+    assertFalse(triggerRef.get().isBound(), "Trigger should unbind when command scope exits");
 
     // The trigger should have unbound itself during the last run() call.
   }

@@ -114,7 +114,7 @@ public final class Scheduler implements ProtobufSerializable {
    */
   private final Collection<Binding> m_activeBindings = new ArrayList<>();
 
-  private final Collection<Trigger> m_boundTriggers = new ArrayList<>();
+  private final Set<Trigger> m_boundTriggers = new LinkedHashSet<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final SequencedSet<CommandState> m_queuedToRun = new LinkedHashSet<>();

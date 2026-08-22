@@ -11,8 +11,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.wpilib.event.EventLoop;
 import org.wpilib.math.filter.Debouncer;
@@ -48,6 +50,7 @@ public class Trigger implements BooleanSupplier {
   private final BooleanSupplier m_condition;
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
+  private final List<Trigger> m_dependencies;
 
   /** The value of the signal before the most recent call to {@link #poll()}. May be null. */
   private Signal m_previousSignal;
@@ -57,8 +60,13 @@ public class Trigger implements BooleanSupplier {
 
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
   private final Runnable m_eventLoopCallback = this::poll;
-  private boolean m_bound = true;
-  private final BindingScope m_creationScope;
+
+  // The scope for the lifetime of this trigger. All bindings are removed when the scope exits.
+  // If a trigger is reused across multiple scopes (eg created while one opmode is loaded and reused
+  // in a later opmode), the lifetime scope changes to that new scope. This doesn't apply if the
+  // original scope is still active; triggers created in the global scope will continue to use the
+  // global scope if they're used in opmodes or commands.
+  private BindingScope m_lifetimeScope;
 
   /**
    * Represents the state of a signal: high or low. Used instead of a boolean for nullity on the
@@ -106,10 +114,17 @@ public class Trigger implements BooleanSupplier {
    */
   @SuppressWarnings("this-escape")
   public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
+    this(scheduler, loop, condition, List.of());
+  }
+
+  @SuppressWarnings("this-escape")
+  private Trigger(
+      Scheduler scheduler, EventLoop loop, BooleanSupplier condition, List<Trigger> dependencies) {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
-    m_creationScope = BindingScope.createNarrowestScope(m_scheduler);
+    m_dependencies = List.copyOf(requireNonNullParam(dependencies, "dependencies", "Trigger"));
+    m_lifetimeScope = BindingScope.createNarrowestScope(m_scheduler);
 
     m_scheduler.addBoundTrigger(this);
     m_loop.bind(m_eventLoopCallback);
@@ -252,7 +267,12 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
-    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() && trigger.getAsBoolean());
+    var dependencies =
+        trigger instanceof Trigger dependentTrigger
+            ? List.of(this, dependentTrigger)
+            : List.of(this);
+    return new Trigger(
+        m_scheduler, m_loop, () -> getAsBoolean() && trigger.getAsBoolean(), dependencies);
   }
 
   /**
@@ -262,7 +282,12 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when either component trigger is active.
    */
   public Trigger or(BooleanSupplier trigger) {
-    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() || trigger.getAsBoolean());
+    var dependencies =
+        trigger instanceof Trigger dependentTrigger
+            ? List.of(this, dependentTrigger)
+            : List.of(this);
+    return new Trigger(
+        m_scheduler, m_loop, () -> getAsBoolean() || trigger.getAsBoolean(), dependencies);
   }
 
   /**
@@ -272,7 +297,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(m_scheduler, m_loop, () -> !getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> !getAsBoolean(), List.of(this));
   }
 
   /**
@@ -296,7 +321,8 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     var debouncer = new Debouncer(duration.in(Seconds), type);
-    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(getAsBoolean()));
+    return new Trigger(
+        m_scheduler, m_loop, () -> debouncer.calculate(getAsBoolean()), List.of(this));
   }
 
   /**
@@ -311,7 +337,10 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger risingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW);
+        m_scheduler,
+        m_loop,
+        () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW,
+        List.of(this));
   }
 
   /**
@@ -326,7 +355,10 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger fallingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
+        m_scheduler,
+        m_loop,
+        () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH,
+        List.of(this));
   }
 
   /**
@@ -383,7 +415,8 @@ public class Trigger implements BooleanSupplier {
 
             return m_timestamps.size() >= pressCount;
           }
-        });
+        },
+        List.of(this));
   }
 
   private void poll() {
@@ -515,7 +548,7 @@ public class Trigger implements BooleanSupplier {
   /** Checks if the creation scope is currently active. */
   // package-private for the scheduler to access
   boolean isScopeActive() {
-    return m_creationScope.active();
+    return m_lifetimeScope.active();
   }
 
   /**
@@ -542,7 +575,52 @@ public class Trigger implements BooleanSupplier {
         });
     m_bindings.clear();
     m_loop.unbind(m_eventLoopCallback); // note: ConcurrentModificationException if called in poll()
-    m_bound = false;
+  }
+
+  private void ensureBound() {
+    ensureBound(new HashSet<>());
+  }
+
+  private void ensureBound(Set<Trigger> visited) {
+    if (!visited.add(this)) {
+      return;
+    }
+
+    m_dependencies.forEach(dependency -> dependency.ensureBound(visited));
+
+    if (!m_lifetimeScope.active()) {
+      // Switch trigger lifetime scope if it's used outside its original scope.
+      // This happens if the trigger is instantiated in one scope (eg opmode A), cached, and then
+      // reused in a different scope (eg opmode B) after the original scope exited.
+      // A very common usecase is CommandGenericHID.button(), which lazily creates a trigger when
+      // called and caches it for future use. If the first time a particular button is referenced is
+      // in an opmode, that button would only be usable when that opmode is re-entered; or if that
+      // button is first referenced in a command, it'd only be usable when that command happens to
+      // be running.
+      // This would be very bad and cause inconsistent behavior. Thus, we widen the scope of the
+      // trigger if it gets reused outside its original scope (ie, it's been created in scope A,
+      // cached, and then reused in scope B after scope A exited).
+      m_lifetimeScope = BindingScope.createNarrowestScope(m_scheduler);
+
+      // The scheduler will have removed this trigger when the original scope exited.
+      // We need to re-register it so the scheduler can clean it up again when the new scope exits.
+      m_scheduler.addBoundTrigger(this);
+    }
+
+    if (!m_loop.isBound(m_eventLoopCallback)) {
+      m_loop.bind(m_eventLoopCallback);
+    }
+  }
+
+  /**
+   * Checks if this trigger is currently bound to the event loop. An unbound trigger will never
+   * update its {@link #getAsBoolean()} method and never schedule any commands.
+   *
+   * @return {@code true} if the trigger is currently bound to the event loop, {@code false} if not
+   * @see #unbind()
+   */
+  public boolean isBound() {
+    return m_loop.isBound(m_eventLoopCallback);
   }
 
   // package-private for testing
@@ -553,16 +631,28 @@ public class Trigger implements BooleanSupplier {
         .computeIfAbsent(bindingType, _k -> new ArrayList<>())
         .add(new Binding(scope, bindingType, command, new Throwable().getStackTrace()));
 
-    if (!m_bound) {
-      // Ensure we're bound to the event loop.
-      // Otherwise, the command binding will never fire.
-      m_loop.bind(m_eventLoopCallback);
-      m_bound = true;
-    }
+    // Ensure we're bound to the event loop.
+    // Otherwise, the command binding will never fire.
+    // This also ensures that a cached trigger created in a scope that's no longer active
+    // will be re-scoped; otherwise, the scheduler would just immediately remove the bindings.
+    ensureBound();
   }
 
   private void addBinding(BindingType bindingType, Command command) {
     var scope = BindingScope.createNarrowestScope(m_scheduler);
     addBinding(scope, bindingType, command);
+  }
+
+  // prevent subclasses from overwriting equals and hashCode, which could potentially introduce
+  // collisions for distinct objects
+
+  @Override
+  public final boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
+  public final int hashCode() {
+    return super.hashCode();
   }
 }
