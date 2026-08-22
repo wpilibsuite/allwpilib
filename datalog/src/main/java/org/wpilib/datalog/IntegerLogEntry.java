@@ -15,7 +15,7 @@ public class IntegerLogEntry extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public IntegerLogEntry(DataLog log, String name, String metadata, long timestamp) {
     super(log, name, DATA_TYPE, metadata, timestamp);
@@ -37,7 +37,7 @@ public class IntegerLogEntry extends DataLogEntry {
    *
    * @param log datalog
    * @param name name of the entry
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public IntegerLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
@@ -57,7 +57,7 @@ public class IntegerLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(long value, long timestamp) {
     m_log.appendInteger(m_entry, value, timestamp);
@@ -79,7 +79,7 @@ public class IntegerLogEntry extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(long value, long timestamp) {
     if (!m_hasLastValue || m_lastValue != value) {

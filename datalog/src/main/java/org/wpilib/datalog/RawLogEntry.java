@@ -19,7 +19,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param name name of the entry
    * @param metadata metadata
    * @param type Data type
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public RawLogEntry(DataLog log, String name, String metadata, String type, long timestamp) {
     super(log, name, type, metadata, timestamp);
@@ -43,7 +43,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public RawLogEntry(DataLog log, String name, String metadata, long timestamp) {
     this(log, name, metadata, DATA_TYPE, timestamp);
@@ -65,7 +65,7 @@ public class RawLogEntry extends DataLogEntry {
    *
    * @param log datalog
    * @param name name of the entry
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   public RawLogEntry(DataLog log, String name, long timestamp) {
     this(log, name, "", timestamp);
@@ -85,7 +85,7 @@ public class RawLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record; will send entire array contents
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(byte[] value, long timestamp) {
     m_log.appendRaw(m_entry, value, timestamp);
@@ -106,7 +106,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param value Data to record
    * @param start Start position of data (in byte array)
    * @param len Length of data (must be less than or equal to value.length - offset)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(byte[] value, int start, int len, long timestamp) {
     m_log.appendRaw(m_entry, value, start, len, timestamp);
@@ -127,7 +127,7 @@ public class RawLogEntry extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Data to record; will send from value.position() to value.limit()
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(ByteBuffer value, long timestamp) {
     m_log.appendRaw(m_entry, value, timestamp);
@@ -148,7 +148,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param value Data to record
    * @param start Start position of data (in value buffer)
    * @param len Length of data (must be less than or equal to value.length - offset)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(ByteBuffer value, int start, int len, long timestamp) {
     m_log.appendRaw(m_entry, value, start, len, timestamp);
@@ -172,7 +172,7 @@ public class RawLogEntry extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record; will send entire array contents
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(byte[] value, long timestamp) {
     if (!equalsLast(value, 0, value.length)) {
@@ -202,7 +202,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param value Data to record
    * @param start Start position of data (in byte array)
    * @param len Length of data (must be less than or equal to value.length - offset)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(byte[] value, int start, int len, long timestamp) {
     if (!equalsLast(value, start, len)) {
@@ -232,7 +232,7 @@ public class RawLogEntry extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Data to record; will send from value.position() to value.limit()
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(ByteBuffer value, long timestamp) {
     if (!equalsLast(value)) {
@@ -264,7 +264,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param value Data to record
    * @param start Start position of data (in value buffer)
    * @param len Length of data (must be less than or equal to value.length - offset)
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public synchronized void update(ByteBuffer value, int start, int len, long timestamp) {
     if (!equalsLast(value, start, len)) {

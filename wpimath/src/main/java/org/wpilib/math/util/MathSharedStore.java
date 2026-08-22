@@ -29,7 +29,7 @@ public final class MathSharedStore {
 
             @Override
             public double getTimestamp() {
-              return WPIUtilJNI.now() * 1.0e-6;
+              return WPIUtilJNI.now() * 1.0e-9;
             }
           };
     }

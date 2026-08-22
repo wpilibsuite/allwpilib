@@ -34,7 +34,7 @@ class DebouncerTest {
     debouncer.calculate(false);
     assertFalse(debouncer.calculate(true));
 
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
 
     assertTrue(debouncer.calculate(true));
   }
@@ -46,7 +46,7 @@ class DebouncerTest {
     debouncer.calculate(true);
     assertTrue(debouncer.calculate(false));
 
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
 
     assertFalse(debouncer.calculate(false));
 
@@ -60,12 +60,12 @@ class DebouncerTest {
     debouncer.calculate(false);
     assertFalse(debouncer.calculate(true));
 
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
 
     assertTrue(debouncer.calculate(true));
     assertTrue(debouncer.calculate(false));
 
-    WPIUtilJNI.setMockTime(2000000L);
+    WPIUtilJNI.setMockTime(2_000_000_000L);
 
     assertFalse(debouncer.calculate(false));
   }

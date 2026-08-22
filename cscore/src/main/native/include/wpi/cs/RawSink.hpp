@@ -59,7 +59,7 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrame(wpi::util::RawFrame& image, double timeout = 0.225) const {
@@ -73,7 +73,7 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeout(wpi::util::RawFrame& image) const {
@@ -93,7 +93,7 @@ class RawSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameLastTime(wpi::util::RawFrame& image, uint64_t lastFrameTime,

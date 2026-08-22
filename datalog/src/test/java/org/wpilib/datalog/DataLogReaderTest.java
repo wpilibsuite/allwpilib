@@ -45,4 +45,19 @@ class DataLogReaderTest {
     assertEquals(10, buffer.position());
     assertEquals(ByteOrder.BIG_ENDIAN, buffer.order());
   }
+
+  @Test
+  void convertsFileTimestampToNanoseconds() {
+    ByteBuffer buffer = ByteBuffer.allocate(20);
+    buffer.put(new byte[] {'W', 'P', 'I', 'L', 'O', 'G', 0, 1, 0, 0, 0, 0});
+    buffer.put(new byte[] {0, 1, 4, 4, 'D', 'A', 'T', 'A'});
+    buffer.flip();
+
+    DataLogReader reader = new DataLogReader(buffer);
+    DataLogRecord record = reader.iterator().next();
+
+    assertEquals(1, record.getEntry());
+    assertEquals(4000, record.getTimestamp());
+    assertArrayEquals(new byte[] {'D', 'A', 'T', 'A'}, record.getRaw());
+  }
 }

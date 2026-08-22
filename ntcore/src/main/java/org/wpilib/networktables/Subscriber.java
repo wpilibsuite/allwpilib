@@ -16,7 +16,7 @@ public interface Subscriber extends PubSub {
   /**
    * Gets the last time the entry's value was changed.
    *
-   * @return Entry last change time
+   * @return Entry last change time, in nanoseconds
    */
   long getLastChange();
 }

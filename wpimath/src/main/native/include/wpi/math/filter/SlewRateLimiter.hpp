@@ -45,8 +45,7 @@ class SlewRateLimiter {
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
-        m_prevTime{wpi::units::microsecond_t{
-            wpi::math::MathSharedStore::GetTimestamp()}} {}
+        m_prevTime{wpi::math::MathSharedStore::GetTimestamp()} {}
 
   /**
    * Creates a new SlewRateLimiter with the given positive rate limit and

@@ -53,27 +53,27 @@ class RobotController {
   static int32_t GetTeamNumber();
 
   /**
-   * Sets a new source to provide the clock time in microseconds. Changing this
+   * Sets a new source to provide the clock time in nanoseconds. Changing this
    * affects the return value of {@code GetTime}.
    *
-   * @param supplier Function to return the time in microseconds.
+   * @param supplier Function to return the time in nanoseconds.
    */
   static void SetTimeSource(std::function<uint64_t()> supplier);
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the
+   * Read the nanosecond timestamp. By default, the time is based on the
    * monotonic clock. However, the return value of this method may be modified
    * to use any time base, including non-monotonic and non-continuous time
    * bases.
    *
-   * @return The current time in microseconds.
+   * @return The current time in nanoseconds.
    */
   static uint64_t GetTime();
 
   /**
-   * Read the microsecond-resolution monotonic timer.
+   * Read the nanosecond-resolution monotonic timer.
    *
-   * @return The current monotonic time in microseconds.
+   * @return The current monotonic time in nanoseconds.
    */
   static uint64_t GetMonotonicTime();
 

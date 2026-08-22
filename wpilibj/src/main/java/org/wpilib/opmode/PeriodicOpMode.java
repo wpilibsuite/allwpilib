@@ -42,7 +42,7 @@ import org.wpilib.system.RobotController;
  */
 public abstract class PeriodicOpMode implements OpMode {
   private final Set<PeriodicPriorityQueue.Callback> m_callbacks;
-  private final long m_startTimeUs = RobotController.getMonotonicTime();
+  private final long m_startTimeNs = RobotController.getMonotonicTime();
 
   /** Constructor for PeriodicOpMode. */
   @SuppressWarnings("this-escape")
@@ -81,6 +81,6 @@ public abstract class PeriodicOpMode implements OpMode {
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public final void addPeriodic(Runnable callback, double period, double offset) {
-    m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeUs, period, offset));
+    m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeNs, period, offset));
   }
 }

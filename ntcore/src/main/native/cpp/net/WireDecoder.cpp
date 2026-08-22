@@ -460,7 +460,7 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
                          in->size());
   mpack_expect_array_match(&reader, 4);
   *outId = mpack_expect_int(&reader);
-  auto time = mpack_expect_i64(&reader);
+  auto wireTime = mpack_expect_i64(&reader);
   int type = mpack_expect_int(&reader);
   switch (type) {
     case 0:  // boolean
@@ -592,12 +592,18 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
     return false;
   }
   // set time
-  outValue->SetServerTime(time);
-  if (time == 0) {
+  int64_t serverTime = 0;
+  if (wireTime != 0 &&
+      wpi::util::MulOverflow(wireTime, int64_t{1000}, serverTime)) {
+    *error = "timestamp out of range";
+    return false;
+  }
+  outValue->SetServerTime(serverTime);
+  if (serverTime == 0) {
     outValue->SetTime(0);
   } else {
     int64_t localTime;
-    if (wpi::util::AddOverflow(time, localTimeOffset, localTime)) {
+    if (wpi::util::AddOverflow(serverTime, localTimeOffset, localTime)) {
       *error = "timestamp out of range";
       return false;
     }

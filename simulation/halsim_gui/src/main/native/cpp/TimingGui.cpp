@@ -103,7 +103,7 @@ static void DisplayTiming() {
       }
       ImGui::TableNextColumn();
       if (notifiers[i].intervalTime != 0) {
-        ImGui::Text("%.3f", notifiers[i].intervalTime / 1000000.0);
+        ImGui::Text("%.3f", notifiers[i].intervalTime / 1'000'000'000.0);
       }
       ImGui::TableNextColumn();
       ImGui::Text("%d", notifiers[i].overrunCount);

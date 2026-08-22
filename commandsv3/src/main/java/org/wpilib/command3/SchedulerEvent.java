@@ -16,54 +16,54 @@ import org.wpilib.system.RobotController;
  */
 public sealed interface SchedulerEvent {
   /**
-   * The timestamp for when the event occurred. Measured in microseconds since some arbitrary start
+   * The timestamp for when the event occurred. Measured in nanoseconds since some arbitrary start
    * time.
    *
    * @return The event timestamp.
    * @see RobotController#getTime()
    */
-  long timestampMicros();
+  long timestampNanos();
 
   /**
    * An event marking when a command is scheduled in {@link Scheduler#schedule(Command)}.
    *
    * @param command The command that was scheduled
-   * @param timestampMicros When the command was scheduled
+   * @param timestampNanos When the command was scheduled
    */
-  record Scheduled(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Scheduled(Command command, long timestampNanos) implements SchedulerEvent {}
 
   /**
    * An event marking when a command starts running.
    *
    * @param command The command that started
-   * @param timestampMicros When the command started
+   * @param timestampNanos When the command started
    */
-  record Mounted(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Mounted(Command command, long timestampNanos) implements SchedulerEvent {}
 
   /**
    * An event marking when a command yielded control with {@link Coroutine#yield()}.
    *
    * @param command The command that yielded
-   * @param timestampMicros When the command yielded
+   * @param timestampNanos When the command yielded
    */
-  record Yielded(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Yielded(Command command, long timestampNanos) implements SchedulerEvent {}
 
   /**
    * An event marking when a command completed naturally.
    *
    * @param command The command that completed
-   * @param timestampMicros When the command completed
+   * @param timestampNanos When the command completed
    */
-  record Completed(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Completed(Command command, long timestampNanos) implements SchedulerEvent {}
 
   /**
    * An event marking when a command threw or encountered an unhanded exception.
    *
    * @param command The command that encountered the error
    * @param error The unhandled error
-   * @param timestampMicros When the error occurred
+   * @param timestampNanos When the error occurred
    */
-  record CompletedWithError(Command command, Throwable error, long timestampMicros)
+  record CompletedWithError(Command command, Throwable error, long timestampNanos)
       implements SchedulerEvent {}
 
   /**
@@ -72,9 +72,9 @@ public sealed interface SchedulerEvent {
    * cancellation event.
    *
    * @param command The command that was canceled
-   * @param timestampMicros When the command was canceled
+   * @param timestampNanos When the command was canceled
    */
-  record Canceled(Command command, long timestampMicros) implements SchedulerEvent {}
+  record Canceled(Command command, long timestampNanos) implements SchedulerEvent {}
 
   /**
    * An event marking when a command was interrupted by another. Typically followed by an {@link
@@ -82,8 +82,8 @@ public sealed interface SchedulerEvent {
    *
    * @param command The command that was interrupted
    * @param interrupter The interrupting command
-   * @param timestampMicros When the command was interrupted
+   * @param timestampNanos When the command was interrupted
    */
-  record Interrupted(Command command, Command interrupter, long timestampMicros)
+  record Interrupted(Command command, Command interrupter, long timestampNanos)
       implements SchedulerEvent {}
 }

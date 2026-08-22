@@ -686,10 +686,10 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
   Frame::Time lastFrameTime = 0;
   Frame::Time timePerFrame = 0;
   if (m_fps != 0) {
-    timePerFrame = 1000000.0 / m_fps;
+    timePerFrame = 1'000'000'000.0 / m_fps;
   }
   Frame::Time averageFrameTime = 0;
-  Frame::Time averagePeriod = 1000000;  // 1 second window
+  Frame::Time averagePeriod = 1'000'000'000;  // 1 second window
   if (averagePeriod < timePerFrame) {
     averagePeriod = timePerFrame * 10;
   }
@@ -774,7 +774,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
     // sending the content-length fixes random stream disruption observed
     // with firefox
     lastFrameTime = thisFrameTime;
-    double timestamp = lastFrameTime / 1000000.0;
+    double timestamp = lastFrameTime / 1'000'000'000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n" << "Content-Type: image/jpeg\r\n";
     wpi::util::print(oss, "Content-Length: {}\r\n", size);

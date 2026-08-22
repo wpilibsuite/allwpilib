@@ -124,7 +124,7 @@ class VideoSource {
    * Get the last time a frame was captured.
    * This uses the same time base as wpi::util::Now().
    *
-   * @return Time in 1 us increments.
+   * @return Time in 1 ns increments.
    */
   uint64_t GetLastFrameTime() const {
     m_status = 0;

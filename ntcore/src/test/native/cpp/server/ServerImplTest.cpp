@@ -420,7 +420,7 @@ TEST_CASE_METHOD(ServerImplTest, "ServerImplTest ZeroTimestampNegativeTime",
   Value defaultValue = Value::MakeDouble(1.0, 10);
   defaultValue.SetTime(0);
   defaultValue.SetServerTime(0);
-  Value value = Value::MakeDouble(5, -10);
+  Value value = Value::MakeDouble(5, -10'000);
   local.announceReturns.emplace_back(topicHandle);
 
   {

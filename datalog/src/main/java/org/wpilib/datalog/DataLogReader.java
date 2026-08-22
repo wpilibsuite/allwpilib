@@ -123,6 +123,10 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       int entry = (int) readVarInt(pos + 1, entryLen);
       int size = (int) readVarInt(pos + 1 + entryLen, sizeLen);
       long timestamp = readVarInt(pos + 1 + entryLen + sizeLen, timestampLen);
+      if (timestamp < 0 || timestamp > Long.MAX_VALUE / 1000) {
+        throw new NoSuchElementException();
+      }
+      timestamp *= 1000;
       // build a slice of the data contents
       ByteBuffer data = m_buf.duplicate();
       data.position(pos + headerLen);

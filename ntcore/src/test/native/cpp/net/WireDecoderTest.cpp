@@ -53,8 +53,8 @@ TEST_CASE("WireDecodeBinary rejects overflowing timestamp adjustments",
     CHECK(input.size() == encoded.size());
   };
 
-  check(std::numeric_limits<int64_t>::max(), 1);
-  check(std::numeric_limits<int64_t>::min(), -1);
+  check(std::numeric_limits<int64_t>::max(), 808);
+  check(std::numeric_limits<int64_t>::min(), -809);
 }
 
 TEST_CASE_METHOD(WireDecodeTextClientTest,

@@ -148,7 +148,7 @@ public class Notifier implements AutoCloseable {
    * @param delay Time in seconds to wait before the callback is called.
    */
   public void startSingle(double delay) {
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e6), 0, false, false);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), (long) (delay * 1e9), 0, false, false);
   }
 
   /**
@@ -170,8 +170,8 @@ public class Notifier implements AutoCloseable {
    *     call to this method.
    */
   public void startPeriodic(double period) {
-    long periodMicroS = (long) (period * 1e6);
-    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodMicroS, periodMicroS, false, false);
+    long periodNs = (long) (period * 1e9);
+    NotifierJNI.setNotifierAlarm(m_notifier.get(), periodNs, periodNs, false, false);
   }
 
   /**

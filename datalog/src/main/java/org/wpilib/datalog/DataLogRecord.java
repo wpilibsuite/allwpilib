@@ -41,7 +41,7 @@ public class DataLogRecord {
   /**
    * Gets the record timestamp.
    *
-   * @return Timestamp, in integer microseconds
+   * @return Timestamp, in integer nanoseconds
    */
   public long getTimestamp() {
     return m_timestamp;

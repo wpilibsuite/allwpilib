@@ -5,8 +5,8 @@
 package org.wpilib.hardware.led;
 
 import static org.wpilib.units.Units.Meters;
-import static org.wpilib.units.Units.Microsecond;
-import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Nanosecond;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Value;
 
 import java.util.Map;
@@ -227,14 +227,14 @@ public interface LEDPattern {
    * @return the scrolling pattern
    */
   default LEDPattern scrollAtRelativeVelocity(Frequency velocity) {
-    final double periodMicros = velocity.asPeriod().in(Microseconds);
+    final double periodNanos = velocity.asPeriod().in(Nanoseconds);
 
     return mapIndex(
         (bufLen, index) -> {
           long now = RobotController.getTime();
 
           // index should move by (buf.length) / (period)
-          double t = (now % (long) periodMicros) / periodMicros;
+          double t = (now % (long) periodNanos) / periodNanos;
           int offset = (int) (t * bufLen);
 
           return Math.floorMod(index + offset, bufLen);
@@ -267,18 +267,18 @@ public interface LEDPattern {
    */
   default LEDPattern scrollAtAbsoluteVelocity(LinearVelocity velocity, Distance ledSpacing) {
     // eg velocity = 10 m/s, spacing = 0.01m
-    // meters per micro = 1e-5 m/us
-    // micros per LED = 1e-2 m / (1e-5 m/us) = 1e-3 us
+    // meters per nano = 1e-8 m/ns
+    // nanos per LED = 1e-2 m / (1e-8 m/ns) = 1e6 ns
 
-    var metersPerMicro = velocity.in(Meters.per(Microsecond));
-    var microsPerLED = (int) (ledSpacing.in(Meters) / metersPerMicro);
+    var metersPerNano = velocity.in(Meters.per(Nanosecond));
+    var nanosPerLED = (int) (ledSpacing.in(Meters) / metersPerNano);
 
     return mapIndex(
         (bufLen, index) -> {
           long now = RobotController.getTime();
 
-          // every step in time that's a multiple of microsPerLED will increment the offset by 1
-          var offset = (int) (now / microsPerLED);
+          // every step in time that's a multiple of nanosPerLED will increment the offset by 1
+          var offset = (int) (now / nanosPerLED);
 
           // floorMod so if the offset is negative, we still get positive outputs
           return Math.floorMod(index + offset, bufLen);
@@ -294,12 +294,12 @@ public interface LEDPattern {
    * @return the blinking pattern
    */
   default LEDPattern blink(Time onTime, Time offTime) {
-    final long totalTimeMicros = (long) (onTime.in(Microseconds) + offTime.in(Microseconds));
-    final long onTimeMicros = (long) onTime.in(Microseconds);
+    final long totalTimeNanos = (long) (onTime.in(Nanoseconds) + offTime.in(Nanoseconds));
+    final long onTimeNanos = (long) onTime.in(Nanoseconds);
 
     HAL.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
-      if (RobotController.getTime() % totalTimeMicros < onTimeMicros) {
+      if (RobotController.getTime() % totalTimeNanos < onTimeNanos) {
         applyTo(reader, writer);
       } else {
         OFF.applyTo(reader, writer);
@@ -345,7 +345,7 @@ public interface LEDPattern {
    * @return the breathing pattern
    */
   default LEDPattern breathe(Time period) {
-    final long periodMicros = (long) period.in(Microseconds);
+    final long periodNanos = (long) period.in(Nanoseconds);
 
     HAL.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
@@ -353,7 +353,7 @@ public interface LEDPattern {
           reader,
           (i, r, g, b) -> {
             // How far we are in the cycle, in the range [0, 1)
-            double t = (RobotController.getTime() % periodMicros) / (double) periodMicros;
+            double t = (RobotController.getTime() % periodNanos) / (double) periodNanos;
             double phase = t * 2 * Math.PI;
 
             // Apply the cosine function and shift its output from [-1, 1] to [0, 1]

@@ -90,22 +90,22 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
           continue;
         }
         int64_t rtt2 = rtt / 2;
-        if (rtt2 < m_rtt2Us) {
+        if (rtt2 < m_rtt2Ns) {
           int64_t serverTimeAtResponse;
-          int64_t serverTimeOffsetUs;
+          int64_t serverTimeOffsetNs;
           if (wpi::util::AddOverflow(value.server_time(), rtt2,
                                      serverTimeAtResponse) ||
               wpi::util::SubOverflow(serverTimeAtResponse, now,
-                                     serverTimeOffsetUs) ||
-              serverTimeOffsetUs == std::numeric_limits<int64_t>::min()) {
+                                     serverTimeOffsetNs) ||
+              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
             WARN("RTT ping response has invalid timestamp values");
             continue;
           }
-          m_rtt2Us = static_cast<uint32_t>(rtt2);
-          DEBUG3("Time offset: {}", serverTimeOffsetUs);
-          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+          m_rtt2Ns = rtt2;
+          DEBUG3("Time offset: {}", serverTimeOffsetNs);
+          m_outgoing.SetTimeOffset(serverTimeOffsetNs);
           m_haveTimeOffset = true;
-          m_timeSyncUpdated(serverTimeOffsetUs, m_rtt2Us, true);
+          m_timeSyncUpdated(serverTimeOffsetNs, m_rtt2Ns, true);
         }
       }
       continue;

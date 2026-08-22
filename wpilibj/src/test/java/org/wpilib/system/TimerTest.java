@@ -93,18 +93,18 @@ class TimerTest {
   @ResourceLock("timing")
   void resetWithLargeTimestampTest() {
     RobotController.setTimeSource(() -> m_mockTime);
-    m_mockTime = 1_000_002;
+    m_mockTime = 1_000_000_002;
 
     var timer = new Timer();
     timer.start();
 
-    m_mockTime += 500_000;
+    m_mockTime += 500_000_000;
     assertEquals(timer.get(), 0.5);
 
     timer.reset();
     assertEquals(timer.get(), 0.0);
 
-    m_mockTime += 500_000;
+    m_mockTime += 500_000_000;
     assertEquals(timer.get(), 0.5);
   }
 
@@ -166,25 +166,25 @@ class TimerTest {
     double period = 1.0 / 60.0;
 
     for (long i = 1; i <= 60; ++i) {
-      m_mockTime = (i * 1_000_000 + 59) / 60 + 100;
+      m_mockTime = (i * 1_000_000_000 + 59) / 60 + 100;
 
       assertTrue(timer.advanceIfElapsed(period));
       assertFalse(timer.advanceIfElapsed(period));
     }
 
-    assertEquals(timer.get(), 100e-6, 1e-12);
+    assertEquals(timer.get(), 100e-9, 1e-12);
   }
 
   @Test
   @ResourceLock("timing")
-  void advanceIfElapsedProgressesWithSubMicrosecondPeriodTest() {
+  void advanceIfElapsedProgressesWithSubNanosecondPeriodTest() {
     RobotController.setTimeSource(() -> m_mockTime);
 
     var timer = new Timer();
     timer.start();
 
     m_mockTime = 1;
-    double period = 0.1e-6;
+    double period = 0.1e-9;
 
     for (int i = 0; i < 10; ++i) {
       assertTrue(timer.advanceIfElapsed(period));

@@ -40,7 +40,7 @@ using namespace wpi::glass;
 static constexpr int AXIS_COUNT = 3;
 
 static double GetTimestampDisplayOffsetSeconds() {
-  return static_cast<double>(GetTimestampDisplayOffset()) * 1.0e-6;
+  return static_cast<double>(GetTimestampDisplayOffset()) * 1.0e-9;
 }
 
 namespace {
@@ -293,8 +293,8 @@ void PlotSeries::SetSource(DataSource* source) {
   }
 }
 
-void PlotSeries::AppendValue(double value, int64_t timeUs) {
-  double time = (timeUs != 0 ? timeUs : wpi::util::Now()) * 1.0e-6;
+void PlotSeries::AppendValue(double value, int64_t timeNs) {
+  double time = (timeNs != 0 ? timeNs : wpi::util::Now()) * 1.0e-9;
   if (IsDigital()) {
     if (m_size < MAX_SIZE) {
       m_data[m_size] = ImPlotPoint{time, value};
@@ -625,21 +625,21 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
                                static_cast<int>(i));
 
-  int64_t timeOffsetUs = GetTimestampDisplayOffset();
-  double timeOffset = static_cast<double>(timeOffsetUs) * 1.0e-6;
+  int64_t timeOffsetNs = GetTimestampDisplayOffset();
+  double timeOffset = static_cast<double>(timeOffsetNs) * 1.0e-9;
   bool timeOffsetChanged = false;
   if (m_timeOffsetValid) {
-    if (timeOffsetUs != m_timeOffset) {
+    if (timeOffsetNs != m_timeOffset) {
       double offsetDelta = (static_cast<double>(m_timeOffset) -
-                            static_cast<double>(timeOffsetUs)) *
-                           1.0e-6;
+                            static_cast<double>(timeOffsetNs)) *
+                           1.0e-9;
       m_xaxisRange.Min += offsetDelta;
       m_xaxisRange.Max += offsetDelta;
-      m_timeOffset = timeOffsetUs;
+      m_timeOffset = timeOffsetNs;
       timeOffsetChanged = true;
     }
   } else {
-    m_timeOffset = timeOffsetUs;
+    m_timeOffset = timeOffsetNs;
     m_timeOffsetValid = true;
   }
 
@@ -892,7 +892,7 @@ void PlotView::Display() {
     }
   }
 
-  double now = wpi::util::Now() * 1.0e-6;
+  double now = wpi::util::Now() * 1.0e-9;
   for (size_t i = 0; i < m_plots.size(); ++i) {
     ImGui::PushID(i);
     m_plots[i]->EmitPlot(*this, now, m_provider->IsPaused(), i);
