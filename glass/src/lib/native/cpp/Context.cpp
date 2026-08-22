@@ -419,12 +419,6 @@ double wpi::glass::TimestampToDisplayTime(int64_t time) {
          1.0e-9;
 }
 
-double wpi::glass::TimestampToDisplayTime(int64_t time) {
-  return (static_cast<double>(time) -
-          static_cast<double>(GetTimestampDisplayOffset())) *
-         1.0e-9;
-}
-
 double wpi::glass::ServerTimestampToDisplayTime(int64_t time) {
   if (gContext->timestampDisplayMode ==
       TimestampDisplayMode::SERVER_ZERO_START) {
