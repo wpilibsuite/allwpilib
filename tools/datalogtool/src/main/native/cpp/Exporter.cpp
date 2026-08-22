@@ -583,13 +583,13 @@ static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
       Entry* entry = entryIt->second;
 
       if (style == 0) {
-        wpi::util::print(os, "{},\"", record.GetTimestamp() / 1000000.0);
+        wpi::util::print(os, "{},\"", record.GetTimestamp() / 1'000'000'000.0);
         PrintEscapedCsvString(os, entry->name);
         os << '"' << ',';
         ValueToCsv(os, *entry, record);
         os << '\n';
       } else if (style == 1 && entry->column != -1) {
-        wpi::util::print(os, "{},", record.GetTimestamp() / 1000000.0);
+        wpi::util::print(os, "{},", record.GetTimestamp() / 1'000'000'000.0);
         for (int i = 0; i < entry->column; ++i) {
           os << ',';
         }
