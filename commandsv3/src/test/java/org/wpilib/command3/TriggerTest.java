@@ -192,9 +192,11 @@ class TriggerTest extends CommandTestBase {
     var fetcher =
         new OpModeFetcher() {
           long m_id = 12345;
+          String m_name = "This is an opmode!";
 
           void clear() {
             m_id = 0;
+            m_name = null;
           }
 
           @Override
@@ -204,7 +206,7 @@ class TriggerTest extends CommandTestBase {
 
           @Override
           String getOpModeName() {
-            return "This is an opmode!";
+            return m_name;
           }
         };
     OpModeFetcher.setFetcher(fetcher);
