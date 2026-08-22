@@ -21,7 +21,7 @@ class DifferentialTrajectoryProtoTest {
           List.of(
               new DifferentialSample(
                   0.0,
-                  Pose2d.kZero,
+                  Pose2d.ZERO,
                   new ChassisVelocities(1.0, 0.0, 0.0),
                   new ChassisAccelerations(0.5, 0.0, 0.0),
                   0.9,

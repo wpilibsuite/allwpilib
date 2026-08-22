@@ -16,21 +16,21 @@ import org.wpilib.hardware.imu.OnboardIMU;
  * keeping.
  */
 public class Robot extends TimedRobot {
-  private static final double kAngleSetpoint = 0.0;
+  private static final double ANGLE_SETPOINT = 0.0;
   private static final double kP = 0.005; // proportional turning constant
 
-  private static final int kLeftMotorPort = 0;
-  private static final int kRightMotorPort = 1;
-  private static final OnboardIMU.MountOrientation kIMUMountOrientation =
+  private static final int LEFT_MOTOR_PORT = 0;
+  private static final int RIGHT_MOTOR_PORT = 1;
+  private static final OnboardIMU.MountOrientation IMU_MOUNT_ORIENTATION =
       OnboardIMU.MountOrientation.FLAT;
-  private static final int kJoystickPort = 0;
+  private static final int JOYSTICK_PORT = 0;
 
-  private final PWMSparkMax leftDrive = new PWMSparkMax(kLeftMotorPort);
-  private final PWMSparkMax rightDrive = new PWMSparkMax(kRightMotorPort);
+  private final PWMSparkMax leftDrive = new PWMSparkMax(LEFT_MOTOR_PORT);
+  private final PWMSparkMax rightDrive = new PWMSparkMax(RIGHT_MOTOR_PORT);
   private final DifferentialDrive robotDrive =
       new DifferentialDrive(leftDrive::setThrottle, rightDrive::setThrottle);
-  private final OnboardIMU imu = new OnboardIMU(kIMUMountOrientation);
-  private final Joystick joystick = new Joystick(kJoystickPort);
+  private final OnboardIMU imu = new OnboardIMU(IMU_MOUNT_ORIENTATION);
+  private final Joystick joystick = new Joystick(JOYSTICK_PORT);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    double turningValue = (kAngleSetpoint - imu.getRotation2d().getDegrees()) * kP;
+    double turningValue = (ANGLE_SETPOINT - imu.getRotation2d().getDegrees()) * kP;
     robotDrive.arcadeDrive(-joystick.getY(), -turningValue);
   }
 }

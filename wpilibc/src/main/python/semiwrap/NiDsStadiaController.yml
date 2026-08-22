@@ -89,24 +89,24 @@ classes:
       LogTo:
   wpi::NiDsStadiaController::Button:
     attributes:
-      kA:
-      kB:
-      kX:
-      kY:
-      kLeftBumper:
-      kRightBumper:
-      kLeftStick:
-      kRightStick:
-      kEllipses:
-      kHamburger:
-      kStadia:
-      kRightTrigger:
-      kLeftTrigger:
-      kGoogle:
-      kFrame:
+      A:
+      B:
+      X:
+      Y:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      LEFT_STICK:
+      RIGHT_STICK:
+      ELLIPSES:
+      HAMBURGER:
+      STADIA:
+      RIGHT_TRIGGER:
+      LEFT_TRIGGER:
+      GOOGLE:
+      FRAME:
   wpi::NiDsStadiaController::Axis:
     attributes:
-      kLeftX:
-      kRightX:
-      kLeftY:
-      kRightY:
+      LEFT_X:
+      RIGHT_X:
+      LEFT_Y:
+      RIGHT_Y:

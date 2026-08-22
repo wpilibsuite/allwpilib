@@ -13,9 +13,9 @@ import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 
 public class Robot extends TimedRobot {
-  private static double kDt = 0.02;
-  private static double kMaxVelocity = 1.75;
-  private static double kMaxAcceleration = 0.75;
+  private static double DT = 0.02;
+  private static double MAX_VELOCITY = 1.75;
+  private static double MAX_ACCELERATION = 0.75;
   private static double kP = 1.3;
   private static double kI = 0.0;
   private static double kD = 0.7;
@@ -30,9 +30,9 @@ public class Robot extends TimedRobot {
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
   private final TrapezoidProfile.Constraints constraints =
-      new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+      new TrapezoidProfile.Constraints(MAX_VELOCITY, MAX_ACCELERATION);
   private final ProfiledPIDController controller =
-      new ProfiledPIDController(kP, kI, kD, constraints, kDt);
+      new ProfiledPIDController(kP, kI, kD, constraints, DT);
   private final ElevatorFeedforward feedforward = new ElevatorFeedforward(kS, kG, kV);
 
   public Robot() {

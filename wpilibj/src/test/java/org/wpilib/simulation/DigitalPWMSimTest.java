@@ -26,16 +26,16 @@ class DigitalPWMSimTest {
       DoubleCallback dutyCycleCallback = new DoubleCallback();
       try (CallbackStore initCb = sim.registerInitializedCallback(initializeCallback, false);
           CallbackStore dutyCycleCb = sim.registerDutyCycleCallback(dutyCycleCallback, false)) {
-        final double kTestDutyCycle = 0.191;
-        output.enablePWM(kTestDutyCycle);
+        final double TEST_DUTY_CYCLE = 0.191;
+        output.enablePWM(TEST_DUTY_CYCLE);
 
         assertTrue(sim.getInitialized());
         assertTrue(initializeCallback.wasTriggered());
         assertTrue(initializeCallback.getSetValue());
 
-        assertEquals(kTestDutyCycle, sim.getDutyCycle());
+        assertEquals(TEST_DUTY_CYCLE, sim.getDutyCycle());
         assertTrue(dutyCycleCallback.wasTriggered());
-        assertEquals(kTestDutyCycle, dutyCycleCallback.getSetValue());
+        assertEquals(TEST_DUTY_CYCLE, dutyCycleCallback.getSetValue());
       }
     }
   }

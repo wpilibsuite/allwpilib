@@ -329,7 +329,7 @@ class NetworkTablesTunableBackendTest {
     floatArray.set(new float[] {11.25f, 12.5f});
     doubleArray.set(new double[] {13.25, 14.5});
     stringArray.set(new String[] {"a", "b"});
-    protobufValue.set(Translation2d.kZero);
+    protobufValue.set(Translation2d.ZERO);
     TunableRegistry.update();
 
     assertTrue(value("nullBoolean").getBoolean(false));
@@ -350,7 +350,7 @@ class NetworkTablesTunableBackendTest {
     assertArrayEquals(
         new String[] {"a", "b"}, value("nullStrings").getStringArray(new String[] {}));
     assertEquals(
-        Translation2d.kZero,
+        Translation2d.ZERO,
         m_inst
             .getProtobufTopic("/Tunables/nullProtobuf/value", Translation2d.proto)
             .getEntry(new Translation2d())
@@ -454,7 +454,7 @@ class NetworkTablesTunableBackendTest {
     var entry =
         m_inst
             .getStructTopic("/Tunables/translation/value", Translation2d.struct)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     assertEquals(initial, entry.get());
 
     m_inst.getStructTopic("/Tunables/translation/tune", Translation2d.struct).publish().set(tuned);
@@ -479,7 +479,7 @@ class NetworkTablesTunableBackendTest {
     var entry =
         m_inst
             .getStructTopic("/Tunables/translation/value", Translation2d.struct)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     assertEquals(initial, entry.get());
     entry.readQueue();
 
@@ -571,12 +571,12 @@ class NetworkTablesTunableBackendTest {
 
     Tunable<Translation2d> struct =
         Tunable.createConfig(
-            Translation2d.kZero,
+            Translation2d.ZERO,
             new Translation2dStructWrapper("ThrowingPackTranslation2d", true, false),
             robust());
     Tunable<Translation2d> protobuf =
         Tunable.createConfig(
-            Translation2d.kZero, new Translation2dProtobufWrapper(true, false), robust());
+            Translation2d.ZERO, new Translation2dProtobufWrapper(true, false), robust());
 
     assertDoesNotThrow(() -> Tunables.publish("throwingStruct", struct));
     assertDoesNotThrow(() -> Tunables.publish("throwingProtobuf", protobuf));
@@ -654,7 +654,7 @@ class NetworkTablesTunableBackendTest {
     var entry =
         m_inst
             .getStructTopic("/Tunables/supplierTranslation", Translation2d.struct)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     assertEquals(initial, entry.get());
 
     m_inst
@@ -707,7 +707,7 @@ class NetworkTablesTunableBackendTest {
     var entry =
         m_inst
             .getProtobufTopic("/Tunables/translation/value", Translation2d.proto)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     assertEquals(initial, entry.get());
 
     m_inst.getProtobufTopic("/Tunables/translation/tune", Translation2d.proto).publish().set(tuned);
@@ -728,13 +728,13 @@ class NetworkTablesTunableBackendTest {
     m_inst
         .getProtobufTopic("/Tunables/defaultTranslation/tune", Translation2d.proto)
         .publish()
-        .set(Translation2d.kZero);
+        .set(Translation2d.ZERO);
     m_inst.flush();
     TunableRegistry.update();
 
-    assertEquals(Translation2d.kZero, tunable.get());
+    assertEquals(Translation2d.ZERO, tunable.get());
     assertEquals(
-        Translation2d.kZero,
+        Translation2d.ZERO,
         m_inst
             .getProtobufTopic("/Tunables/defaultTranslation/value", Translation2d.proto)
             .getEntry(new Translation2d())
@@ -755,7 +755,7 @@ class NetworkTablesTunableBackendTest {
     var entry =
         m_inst
             .getProtobufTopic("/Tunables/malformedTranslation/value", Translation2d.proto)
-            .getEntry(Translation2d.kZero);
+            .getEntry(Translation2d.ZERO);
     assertEquals(initial, entry.get());
     entry.readQueue();
 

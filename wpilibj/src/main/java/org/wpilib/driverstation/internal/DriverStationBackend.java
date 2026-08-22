@@ -150,7 +150,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "DriverStation";
+    private static final String SMART_DASHBOARD_TYPE = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -178,8 +178,8 @@ public final class DriverStationBackend {
       table
           .getStringTopic(".type")
           .publishEx(
-              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
-          .set(kSmartDashboardType);
+              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}")
+          .set(SMART_DASHBOARD_TYPE);
       gameData = table.getStringTopic("GameData").publish();
       gameData.set("");
       eventName = table.getStringTopic("EventName").publish();

@@ -11,62 +11,62 @@
 
 template <int States, int Inputs, int Outputs>
 struct wpi::util::Struct<wpi::math::LinearSystem<States, Inputs, Outputs>> {
-  static constexpr ct_string kTypeName = wpi::util::Concat(
+  static constexpr ct_string TYPE_NAME = wpi::util::Concat(
       "LinearSystem__"_ct_string, wpi::util::NumToCtString<States>(),
       "_"_ct_string, wpi::util::NumToCtString<Inputs>(), "_"_ct_string,
       wpi::util::NumToCtString<Outputs>());
-  static constexpr std::string_view GetTypeName() { return kTypeName; }
+  static constexpr std::string_view GetTypeName() { return TYPE_NAME; }
   static constexpr size_t GetSize() {
     return wpi::util::Struct<wpi::math::Matrixd<States, States>>::GetSize() +
            wpi::util::Struct<wpi::math::Matrixd<States, Inputs>>::GetSize() +
            wpi::util::Struct<wpi::math::Matrixd<Outputs, States>>::GetSize() +
            wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::GetSize();
   }
-  static constexpr ct_string kSchema = wpi::util::Concat(
-      wpi::util::Struct<wpi::math::Matrixd<States, States>>::kTypeName,
+  static constexpr ct_string SCHEMA = wpi::util::Concat(
+      wpi::util::Struct<wpi::math::Matrixd<States, States>>::TYPE_NAME,
       " a;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<States, Inputs>>::kTypeName,
+      wpi::util::Struct<wpi::math::Matrixd<States, Inputs>>::TYPE_NAME,
       " b;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<Outputs, States>>::kTypeName,
+      wpi::util::Struct<wpi::math::Matrixd<Outputs, States>>::TYPE_NAME,
       " c;"_ct_string,
-      wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::kTypeName,
+      wpi::util::Struct<wpi::math::Matrixd<Outputs, Inputs>>::TYPE_NAME,
       " d"_ct_string);
-  static constexpr std::string_view GetSchema() { return kSchema; }
+  static constexpr std::string_view GetSchema() { return SCHEMA; }
 
   static wpi::math::LinearSystem<States, Inputs, Outputs> Unpack(
       std::span<const uint8_t> data) {
-    constexpr size_t kAOff = 0;
-    constexpr size_t kBOff =
-        kAOff + wpi::util::GetStructSize<wpi::math::Matrixd<States, States>>();
-    constexpr size_t kCOff =
-        kBOff + wpi::util::GetStructSize<wpi::math::Matrixd<States, Inputs>>();
-    constexpr size_t kDOff =
-        kCOff + wpi::util::GetStructSize<wpi::math::Matrixd<Outputs, States>>();
+    constexpr size_t A_OFF = 0;
+    constexpr size_t B_OFF =
+        A_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<States, States>>();
+    constexpr size_t C_OFF =
+        B_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<States, Inputs>>();
+    constexpr size_t D_OFF =
+        C_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<Outputs, States>>();
     return wpi::math::LinearSystem<States, Inputs, Outputs>{
-        wpi::util::UnpackStruct<wpi::math::Matrixd<States, States>, kAOff>(
+        wpi::util::UnpackStruct<wpi::math::Matrixd<States, States>, A_OFF>(
             data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<States, Inputs>, kBOff>(
+        wpi::util::UnpackStruct<wpi::math::Matrixd<States, Inputs>, B_OFF>(
             data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, States>, kCOff>(
+        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, States>, C_OFF>(
             data),
-        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, Inputs>, kDOff>(
+        wpi::util::UnpackStruct<wpi::math::Matrixd<Outputs, Inputs>, D_OFF>(
             data)};
   }
 
   static void Pack(
       std::span<uint8_t> data,
       const wpi::math::LinearSystem<States, Inputs, Outputs>& value) {
-    constexpr size_t kAOff = 0;
-    constexpr size_t kBOff =
-        kAOff + wpi::util::GetStructSize<wpi::math::Matrixd<States, States>>();
-    constexpr size_t kCOff =
-        kBOff + wpi::util::GetStructSize<wpi::math::Matrixd<States, Inputs>>();
-    constexpr size_t kDOff =
-        kCOff + wpi::util::GetStructSize<wpi::math::Matrixd<Outputs, States>>();
-    wpi::util::PackStruct<kAOff>(data, value.A());
-    wpi::util::PackStruct<kBOff>(data, value.B());
-    wpi::util::PackStruct<kCOff>(data, value.C());
-    wpi::util::PackStruct<kDOff>(data, value.D());
+    constexpr size_t A_OFF = 0;
+    constexpr size_t B_OFF =
+        A_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<States, States>>();
+    constexpr size_t C_OFF =
+        B_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<States, Inputs>>();
+    constexpr size_t D_OFF =
+        C_OFF + wpi::util::GetStructSize<wpi::math::Matrixd<Outputs, States>>();
+    wpi::util::PackStruct<A_OFF>(data, value.A());
+    wpi::util::PackStruct<B_OFF>(data, value.B());
+    wpi::util::PackStruct<C_OFF>(data, value.C());
+    wpi::util::PackStruct<D_OFF>(data, value.D());
   }
 
   static void ForEachNested(

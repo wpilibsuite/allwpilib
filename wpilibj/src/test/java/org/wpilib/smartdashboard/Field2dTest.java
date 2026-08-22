@@ -138,7 +138,7 @@ class Field2dTest {
     field.close();
     TunableRegistry.update();
 
-    assertEquals(Pose2d.kZero, field.getRobotPose());
+    assertEquals(Pose2d.ZERO, field.getRobotPose());
 
     assertThrows(
         IllegalArgumentException.class,

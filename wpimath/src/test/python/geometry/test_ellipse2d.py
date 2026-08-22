@@ -37,49 +37,49 @@ def test_contains():
 
 
 def test_distance():
-    kEpsilon = 1e-9
+    EPSILON = 1e-9
 
     center = Pose2d(x=1, y=2, rotation=Rotation2d.from_degrees(270))
     ellipse = Ellipse2d(center, x_semi_axis=1, y_semi_axis=2)
 
     point1 = Translation2d(x=2.5, y=2)
-    assert ellipse.distance(point1) == pytest.approx(0, abs=kEpsilon)
+    assert ellipse.distance(point1) == pytest.approx(0, abs=EPSILON)
 
     point2 = Translation2d(x=1, y=2)
-    assert ellipse.distance(point2) == pytest.approx(0, abs=kEpsilon)
+    assert ellipse.distance(point2) == pytest.approx(0, abs=EPSILON)
 
     point3 = Translation2d(x=1, y=1)
-    assert ellipse.distance(point3) == pytest.approx(0, abs=kEpsilon)
+    assert ellipse.distance(point3) == pytest.approx(0, abs=EPSILON)
 
     point4 = Translation2d(x=-1, y=2.5)
-    assert ellipse.distance(point4) == pytest.approx(0.19210128384806818, abs=kEpsilon)
+    assert ellipse.distance(point4) == pytest.approx(0.19210128384806818, abs=EPSILON)
 
 
 def test_nearest():
-    kEpsilon = 1e-9
+    EPSILON = 1e-9
 
     center = Pose2d(x=1, y=2, rotation=Rotation2d.from_degrees(270))
     ellipse = Ellipse2d(center, x_semi_axis=1, y_semi_axis=2)
 
     point1 = Translation2d(x=2.5, y=2)
     nearest_point1 = ellipse.nearest(point1)
-    assert nearest_point1.x == pytest.approx(2.5, abs=kEpsilon)
-    assert nearest_point1.y == pytest.approx(2.0, abs=kEpsilon)
+    assert nearest_point1.x == pytest.approx(2.5, abs=EPSILON)
+    assert nearest_point1.y == pytest.approx(2.0, abs=EPSILON)
 
     point2 = Translation2d(x=1, y=2)
     nearest_point2 = ellipse.nearest(point2)
-    assert nearest_point2.x == pytest.approx(1.0, abs=kEpsilon)
-    assert nearest_point2.y == pytest.approx(2.0, abs=kEpsilon)
+    assert nearest_point2.x == pytest.approx(1.0, abs=EPSILON)
+    assert nearest_point2.y == pytest.approx(2.0, abs=EPSILON)
 
     point3 = Translation2d(x=1, y=1)
     nearest_point3 = ellipse.nearest(point3)
-    assert nearest_point3.x == pytest.approx(1.0, abs=kEpsilon)
-    assert nearest_point3.y == pytest.approx(1.0, abs=kEpsilon)
+    assert nearest_point3.x == pytest.approx(1.0, abs=EPSILON)
+    assert nearest_point3.y == pytest.approx(1.0, abs=EPSILON)
 
     point4 = Translation2d(x=-1, y=2.5)
     nearest_point4 = ellipse.nearest(point4)
-    assert nearest_point4.x == pytest.approx(-0.8512799937611617, abs=kEpsilon)
-    assert nearest_point4.y == pytest.approx(2.378405333174535, abs=kEpsilon)
+    assert nearest_point4.x == pytest.approx(-0.8512799937611617, abs=EPSILON)
+    assert nearest_point4.y == pytest.approx(2.378405333174535, abs=EPSILON)
 
 
 def test_equals():

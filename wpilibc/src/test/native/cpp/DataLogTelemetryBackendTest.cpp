@@ -195,13 +195,13 @@ class DataLogTelemetryBackendTest {
 
   static std::vector<wpi::math::Translation2d> DecodeTranslationArray(
       const std::vector<uint8_t>& raw) {
-    constexpr size_t kStructSize =
+    constexpr size_t STRUCT_SIZE =
         wpi::util::Struct<wpi::math::Translation2d>::GetSize();
-    REQUIRE(0u == raw.size() % kStructSize);
+    REQUIRE(0u == raw.size() % STRUCT_SIZE);
     std::vector<wpi::math::Translation2d> values;
-    for (size_t offset = 0; offset < raw.size(); offset += kStructSize) {
+    for (size_t offset = 0; offset < raw.size(); offset += STRUCT_SIZE) {
       values.emplace_back(wpi::util::UnpackStruct<wpi::math::Translation2d>(
-          std::span<const uint8_t>{raw.data() + offset, kStructSize}));
+          std::span<const uint8_t>{raw.data() + offset, STRUCT_SIZE}));
     }
     return values;
   }

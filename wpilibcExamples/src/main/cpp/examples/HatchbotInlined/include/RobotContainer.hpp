@@ -32,7 +32,8 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  wpi::cmd::CommandGamepad driverController{OIConstants::kDriverControllerPort};
+  wpi::cmd::CommandGamepad driverController{
+      OIConstants::DRIVER_CONTROLLER_PORT};
 
   // The robot's subsystems and commands are defined here...
 

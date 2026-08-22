@@ -14,11 +14,11 @@ public class Debouncer {
   /** Type of debouncing to perform. */
   public enum DebounceType {
     /** Rising edge. */
-    kRising,
+    RISING,
     /** Falling edge. */
-    kFalling,
+    FALLING,
     /** Both rising and falling edges. */
-    kBoth
+    BOTH
   }
 
   private double m_debounceTime;
@@ -40,7 +40,7 @@ public class Debouncer {
 
     resetTimer();
 
-    m_baseline = m_debounceType == DebounceType.kFalling;
+    m_baseline = m_debounceType == DebounceType.FALLING;
   }
 
   /**
@@ -50,7 +50,7 @@ public class Debouncer {
    *     value to change.
    */
   public Debouncer(double debounceTime) {
-    this(debounceTime, DebounceType.kRising);
+    this(debounceTime, DebounceType.RISING);
   }
 
   private void resetTimer() {
@@ -73,7 +73,7 @@ public class Debouncer {
     }
 
     if (hasElapsed()) {
-      if (m_debounceType == DebounceType.kBoth) {
+      if (m_debounceType == DebounceType.BOTH) {
         m_baseline = input;
         resetTimer();
       }
@@ -111,7 +111,7 @@ public class Debouncer {
   public void setDebounceType(DebounceType type) {
     m_debounceType = type;
 
-    m_baseline = m_debounceType == DebounceType.kFalling;
+    m_baseline = m_debounceType == DebounceType.FALLING;
   }
 
   /**

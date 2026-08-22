@@ -12,7 +12,7 @@
 
 using namespace wpi;
 using RumbleType = GenericHID::RumbleType;
-static constexpr double kEpsilon = 0.0001;
+static constexpr double EPSILON = 0.0001;
 TEST_CASE("GenericHIDTest RumbleRange", "[wpilibc]") {
   GenericHID hid = internal::DriverStationBackend::ConstructGenericHID(0);
   sim::GenericHIDSim sim{0};
@@ -22,22 +22,22 @@ TEST_CASE("GenericHIDTest RumbleRange", "[wpilibc]") {
     hid.SetRumble(RumbleType::LEFT_RUMBLE, rumbleValue);
     CHECK_THAT(rumbleValue,
                Catch::Matchers::WithinAbs(
-                   sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                   sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
 
     hid.SetRumble(RumbleType::RIGHT_RUMBLE, rumbleValue);
     CHECK_THAT(rumbleValue,
                Catch::Matchers::WithinAbs(
-                   sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                   sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
 
     hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, rumbleValue);
     CHECK_THAT(rumbleValue,
                Catch::Matchers::WithinAbs(
-                   sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                   sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
 
     hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, rumbleValue);
     CHECK_THAT(rumbleValue,
                Catch::Matchers::WithinAbs(
-                   sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                   sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   }
 }
 
@@ -51,59 +51,59 @@ TEST_CASE("GenericHIDTest RumbleTypes", "[wpilibc]") {
   hid.SetRumble(RumbleType::RIGHT_RUMBLE, 0);
   hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 0);
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
 
   // test left only
   hid.SetRumble(RumbleType::LEFT_RUMBLE, 1);
   CHECK_THAT(1, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   hid.SetRumble(RumbleType::LEFT_RUMBLE, 0);
 
   // test right only
   hid.SetRumble(RumbleType::RIGHT_RUMBLE, 1);
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
   CHECK_THAT(1, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   hid.SetRumble(RumbleType::RIGHT_RUMBLE, 0);
 
   // test left trigger only
   hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 1);
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
   CHECK_THAT(1, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   hid.SetRumble(RumbleType::LEFT_TRIGGER_RUMBLE, 0);
 
   // test right trigger only
   hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 1);
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_RUMBLE), EPSILON));
   CHECK_THAT(0, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::LEFT_TRIGGER_RUMBLE), EPSILON));
   CHECK_THAT(1, Catch::Matchers::WithinAbs(
-                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), kEpsilon));
+                    sim.GetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE), EPSILON));
   hid.SetRumble(RumbleType::RIGHT_TRIGGER_RUMBLE, 0);
 }

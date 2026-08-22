@@ -14,8 +14,8 @@ import org.wpilib.tunable.Tunables;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String DEFAULT_AUTO = "Default";
+  private static final String CUSTOM_AUTO = "My Auto";
   private String autoSelected;
   private final Selectable<String> chooser = new Selectable<>();
 
@@ -26,8 +26,8 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-    chooser.addDefault("Default Auto", kDefaultAuto);
-    chooser.add("My Auto", kCustomAuto);
+    chooser.addDefault("Default Auto", DEFAULT_AUTO);
+    chooser.add("My Auto", CUSTOM_AUTO);
     Tunables.publish("Auto choices", chooser);
   }
 
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autoSelected = chooser.getSelected();
-    // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    // autoSelected = SmartDashboard.getString("Auto Selector", DEFAULT_AUTO);
     System.out.println("Auto selected: " + autoSelected);
 
     drivetrain.resetEncoders();
@@ -64,10 +64,10 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (autoSelected) {
-      case kCustomAuto:
+      case CUSTOM_AUTO:
         // Put custom auto code here
         break;
-      case kDefaultAuto:
+      case DEFAULT_AUTO:
       default:
         // Put default auto code here
         break;

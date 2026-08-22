@@ -11,17 +11,17 @@ using namespace wpi::math;
 
 namespace {
 
-const Rotation3d kExpectedData =
+const Rotation3d EXPECTED_DATA =
     Rotation3d{Quaternion{2.29, 0.191, 0.191, 17.4}};
 }  // namespace
 
 TEST_CASE("Rotation3dProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.GetQuaternion() == unpacked_data->GetQuaternion());
+  CHECK(EXPECTED_DATA.GetQuaternion() == unpacked_data->GetQuaternion());
 }

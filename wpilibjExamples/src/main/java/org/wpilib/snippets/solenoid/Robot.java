@@ -39,10 +39,10 @@ public class Robot extends TimedRobot {
   // Compressor connected to a PH with a default CAN ID (1)
   private final Compressor compressor = new Compressor(CANBus.CAN_S0, PneumaticsModuleType.REV_PH);
 
-  static final int kSolenoidButton = 1;
-  static final int kDoubleSolenoidForwardButton = 2;
-  static final int kDoubleSolenoidReverseButton = 3;
-  static final int kCompressorButton = 4;
+  static final int SOLENOID_BUTTON = 1;
+  static final int DOUBLE_SOLENOID_FORWARD_BUTTON = 2;
+  static final int DOUBLE_SOLENOID_REVERSE_BUTTON = 3;
+  static final int COMPRESSOR_BUTTON = 4;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {}
@@ -73,20 +73,20 @@ public class Robot extends TimedRobot {
      * the button is pressed; Set takes a boolean for whether
      * to retract the solenoid (false) or extend it (true).
      */
-    solenoid.set(stick.getRawButton(kSolenoidButton));
+    solenoid.set(stick.getRawButton(SOLENOID_BUTTON));
 
     /*
      * GetRawButtonPressed will only return true once per press.
      * If a button is pressed, set the solenoid to the respective channel.
      */
-    if (stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
+    if (stick.getRawButtonPressed(DOUBLE_SOLENOID_FORWARD_BUTTON)) {
       doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
-    } else if (stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
+    } else if (stick.getRawButtonPressed(DOUBLE_SOLENOID_REVERSE_BUTTON)) {
       doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
     }
 
     // On button press, toggle the compressor.
-    if (stick.getRawButtonPressed(kCompressorButton)) {
+    if (stick.getRawButtonPressed(COMPRESSOR_BUTTON)) {
       // Check whether the compressor is currently enabled.
       boolean isCompressorEnabled = compressor.isEnabled();
       if (isCompressorEnabled) {

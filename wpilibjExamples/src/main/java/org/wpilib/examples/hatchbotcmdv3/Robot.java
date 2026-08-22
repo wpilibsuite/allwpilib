@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
 
   // The driver's controller
   private final CommandGamepad driverController =
-      new CommandGamepad(Constants.OIConstants.kDriverControllerPort);
+      new CommandGamepad(Constants.OIConstants.DRIVER_CONTROLLER_PORT);
 
   // The robot's mechanisms
   private final DriveMechanism robotDrive = new DriveMechanism();

@@ -145,12 +145,12 @@ struct PCM {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTREPCM_MODULES,
                              HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPCM() {
-  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
+  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTREPCM_MODULES,
                                HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
@@ -266,7 +266,7 @@ void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
 }
 
 HAL_Bool HAL_CheckCTREPCMSolenoidChannel(int32_t channel) {
-  return channel < kNumCTRESolenoidChannels && channel >= 0;
+  return channel < NUM_CTRE_SOLENOID_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {

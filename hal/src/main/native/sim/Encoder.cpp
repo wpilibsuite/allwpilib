@@ -28,20 +28,20 @@ struct Empty {};
 }  // namespace
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                             kNumEncoders + kNumCounters,
+                             NUM_ENCODERS + NUM_COUNTERS,
                              HAL_HandleEnum::ENCODER>* encoderHandles;
 
-static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
+static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, NUM_ENCODERS,
                              HAL_HandleEnum::FPGA_ENCODER>* fpgaEncoderHandles;
 
 namespace wpi::hal::init {
 void InitializeEncoder() {
-  static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, kNumEncoders,
+  static LimitedHandleResource<HAL_FPGAEncoderHandle, Empty, NUM_ENCODERS,
                                HAL_HandleEnum::FPGA_ENCODER>
       feH;
   fpgaEncoderHandles = &feH;
   static LimitedHandleResource<HAL_EncoderHandle, Encoder,
-                               kNumEncoders + kNumCounters,
+                               NUM_ENCODERS + NUM_COUNTERS,
                                HAL_HandleEnum::ENCODER>
       eH;
   encoderHandles = &eH;

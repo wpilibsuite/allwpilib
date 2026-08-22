@@ -30,7 +30,7 @@ import org.wpilib.util.AlertDataJNI;
 import org.wpilib.util.WPIUtilJNI;
 
 class TimedRobotTest {
-  static final double kPeriod = 0.02;
+  static final double PERIOD = 0.02;
 
   @SuppressWarnings("PMD.PublicFieldNamingConvention")
   static class MockRobot extends TimedRobot {
@@ -53,7 +53,7 @@ class TimedRobotTest {
     public final AtomicInteger m_utilityExitCount = new AtomicInteger(0);
 
     MockRobot() {
-      super(kPeriod);
+      super(PERIOD);
     }
 
     @Override
@@ -324,7 +324,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(1, robot.m_disabledInitCount.get());
@@ -344,7 +344,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(1, robot.m_disabledInitCount.get());
@@ -405,7 +405,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -425,7 +425,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -486,7 +486,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -506,7 +506,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -567,7 +567,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -587,7 +587,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_simulationInitCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
@@ -663,7 +663,7 @@ class TimedRobotTest {
     assertEquals(0, robot.m_teleopExitCount.get());
     assertEquals(0, robot.m_utilityExitCount.get());
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_autonomousInitCount.get());
@@ -680,7 +680,7 @@ class TimedRobotTest {
     DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
     DriverStationSim.notifyNewData();
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_autonomousInitCount.get());
@@ -697,7 +697,7 @@ class TimedRobotTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.notifyNewData();
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_autonomousInitCount.get());
@@ -714,7 +714,7 @@ class TimedRobotTest {
     DriverStationSim.setRobotMode(RobotMode.UTILITY);
     DriverStationSim.notifyNewData();
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_autonomousInitCount.get());
@@ -730,7 +730,7 @@ class TimedRobotTest {
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(2, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_autonomousInitCount.get());
@@ -758,7 +758,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), PERIOD / 2.0);
 
     Thread robotThread = new Thread(robot::startCompetition);
     robotThread.start();
@@ -771,13 +771,13 @@ class TimedRobotTest {
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(0, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod / 2.0);
+    SimHooks.stepTiming(PERIOD / 2.0);
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(1, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod / 2.0);
+    SimHooks.stepTiming(PERIOD / 2.0);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
@@ -799,7 +799,7 @@ class TimedRobotTest {
     MockRobot robot = new MockRobot();
 
     final AtomicInteger callbackCount = new AtomicInteger(0);
-    robot.addPeriodic(() -> callbackCount.addAndGet(1), kPeriod / 2.0, kPeriod / 4.0);
+    robot.addPeriodic(() -> callbackCount.addAndGet(1), PERIOD / 2.0, PERIOD / 4.0);
 
     // Expirations in this test (ms)
     //
@@ -821,25 +821,25 @@ class TimedRobotTest {
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(0, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod * 3.0 / 8.0);
+    SimHooks.stepTiming(PERIOD * 3.0 / 8.0);
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(0, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod * 3.0 / 8.0);
+    SimHooks.stepTiming(PERIOD * 3.0 / 8.0);
 
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(1, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod / 4.0);
+    SimHooks.stepTiming(PERIOD / 4.0);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());
     assertEquals(1, callbackCount.get());
 
-    SimHooks.stepTiming(kPeriod / 4.0);
+    SimHooks.stepTiming(PERIOD / 4.0);
 
     assertEquals(1, robot.m_disabledInitCount.get());
     assertEquals(1, robot.m_disabledPeriodicCount.get());

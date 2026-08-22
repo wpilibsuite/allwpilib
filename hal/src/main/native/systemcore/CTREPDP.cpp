@@ -120,12 +120,12 @@ struct PDP {
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
+static IndexedHandleResource<HAL_PDPHandle, PDP, NUM_CTREPDP_MODULES,
                              HAL_HandleEnum::CTRE_PDP>* pdpHandles;
 
 namespace wpi::hal::init {
 void InitializeCTREPDP() {
-  static IndexedHandleResource<HAL_PDPHandle, PDP, kNumCTREPDPModules,
+  static IndexedHandleResource<HAL_PDPHandle, PDP, NUM_CTREPDP_MODULES,
                                HAL_HandleEnum::CTRE_PDP>
       pH;
   pdpHandles = &pH;
@@ -141,7 +141,7 @@ HAL_PDPHandle HAL_InitializePDP(int32_t busId, int32_t module,
   if (!HAL_CheckPDPModule(module)) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for CTRE PDP", 0,
-                                       kNumCTREPDPModules - 1, module);
+                                       NUM_CTREPDP_MODULES - 1, module);
     return HAL_INVALID_HANDLE;
   }
 
@@ -178,11 +178,11 @@ int32_t HAL_GetPDPModuleNumber(HAL_PDPHandle handle, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
-  return module < kNumCTREPDPModules && module >= 0;
+  return module < NUM_CTREPDP_MODULES && module >= 0;
 }
 
 HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
-  return channel < kNumCTREPDPChannels && channel >= 0;
+  return channel < NUM_CTREPDP_CHANNELS && channel >= 0;
 }
 
 double HAL_GetPDPTemperature(HAL_PDPHandle handle, int32_t* status) {

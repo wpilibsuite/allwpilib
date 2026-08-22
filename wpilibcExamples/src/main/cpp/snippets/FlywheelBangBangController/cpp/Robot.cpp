@@ -28,7 +28,7 @@ class Robot : public wpi::TimedRobot {
   void TeleopPeriodic() override {
     // Scale setpoint value between 0 and maxSetpointValue
     wpi::units::radians_per_second_t setpoint = wpi::units::math::max(
-        0_rpm, joystick.GetRawAxis(0) * kMaxSetpointValue);
+        0_rpm, joystick.GetRawAxis(0) * MAX_SETPOINT_VALUE);
 
     // Set setpoint and measurement of the bang-bang controller
     wpi::units::volt_t bangOutput =
@@ -63,45 +63,45 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
 
   // Max setpoint for joystick control
-  static constexpr wpi::units::radians_per_second_t kMaxSetpointValue =
+  static constexpr wpi::units::radians_per_second_t MAX_SETPOINT_VALUE =
       6000_rpm;
 
   // Joystick to control setpoint
   wpi::Joystick joystick{0};
 
-  wpi::PWMSparkMax flywheelMotor{kMotorPort};
-  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::PWMSparkMax flywheelMotor{MOTOR_PORT};
+  wpi::Encoder encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
   wpi::math::BangBangController bangBangController;
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  static constexpr wpi::units::volt_t kFlywheelKs = 0.0001_V;
-  static constexpr decltype(1_V / 1_rad_per_s) kFlywheelKv = 0.000195_V / 1_rpm;
-  static constexpr decltype(1_V / 1_rad_per_s_sq) kFlywheelKa =
+  static constexpr wpi::units::volt_t FLYWHEEL_KS = 0.0001_V;
+  static constexpr decltype(1_V / 1_rad_per_s) FLYWHEEL_KV = 0.000195_V / 1_rpm;
+  static constexpr decltype(1_V / 1_rad_per_s_sq) FLYWHEEL_KA =
       0.0003_V / 1_rev_per_m_per_s;
   wpi::math::SimpleMotorFeedforward<wpi::units::radians> feedforward{
-      kFlywheelKs, kFlywheelKv, kFlywheelKa};
+      FLYWHEEL_KS, FLYWHEEL_KV, FLYWHEEL_KA};
 
   // Simulation classes help us simulate our robot
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
-  static constexpr double kFlywheelGearing = 1.0;
+  static constexpr double FLYWHEEL_GEARING = 1.0;
 
   // 1/2 MR²
   static constexpr wpi::units::kilogram_square_meter_t
-      kFlywheelMomentOfInertia = 0.5 * 1.5_lb * 4_in * 4_in;
+      FLYWHEEL_MOMENT_OF_INERTIA = 0.5 * 1.5_lb * 4_in * 4_in;
 
   wpi::math::DCMotor gearbox = wpi::math::DCMotor::NEO(1);
   wpi::math::LinearSystem<1, 1, 1> plant{
       wpi::math::Models::FlywheelFromPhysicalConstants(
-          gearbox, kFlywheelMomentOfInertia, kFlywheelGearing)};
+          gearbox, FLYWHEEL_MOMENT_OF_INERTIA, FLYWHEEL_GEARING)};
 
   wpi::sim::FlywheelSim flywheelSim{plant, gearbox};
   wpi::sim::EncoderSim encoderSim{encoder};

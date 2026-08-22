@@ -132,7 +132,7 @@ TEST_CASE("NetworkOutgoingQueueTest UpdatePeriodCalcUsesGcdAndMinimum",
           "[ntcore][network-outgoing-queue]") {
   CHECK(UpdatePeriodCalc(UINT32_MAX, 100) == 100u);
   CHECK(UpdatePeriodCalc(100, 40) == 20u);
-  CHECK(UpdatePeriodCalc(6, 4) == kMinPeriodMs);
+  CHECK(UpdatePeriodCalc(6, 4) == MIN_PERIOD_MS);
 }
 
 TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
@@ -163,7 +163,7 @@ TEST_CASE("NetworkOutgoingQueueTest CalculatePeriodUsesGcdAndMinimum",
 
   periods = {2, 4};
   CHECK(CalculatePeriod(periods, [](uint32_t period) { return period; }) ==
-        kMinPeriodMs);
+        MIN_PERIOD_MS);
 }
 
 TEST_CASE(
@@ -218,9 +218,9 @@ TEST_CASE("NetworkOutgoingQueueTest NormalValueKeepsOnlyNewestQueuedTimestamp",
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(7, Value::MakeDouble(1.0, 100), ValueSendMode::kNormal);
-  queue.SendValue(7, Value::MakeDouble(2.0, 200), ValueSendMode::kNormal);
-  queue.SendValue(7, Value::MakeDouble(3.0, 150), ValueSendMode::kNormal);
+  queue.SendValue(7, Value::MakeDouble(1.0, 100), ValueSendMode::NORMAL);
+  queue.SendValue(7, Value::MakeDouble(2.0, 200), ValueSendMode::NORMAL);
+  queue.SendValue(7, Value::MakeDouble(3.0, 150), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
@@ -237,10 +237,10 @@ TEST_CASE("NetworkOutgoingQueueTest NormalValueShrinkUpdatesTotalSize",
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SendValue(1, Value::MakeString(std::string(900 * 1024, 'x'), 10),
-                  ValueSendMode::kNormal);
-  queue.SendValue(1, Value::MakeDouble(1.0, 20), ValueSendMode::kNormal);
-  queue.SendValue(1, Value::MakeDouble(2.0, 30), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(3.0, 40), ValueSendMode::kAll);
+                  ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeDouble(1.0, 20), ValueSendMode::NORMAL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 30), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(3.0, 40), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
@@ -265,13 +265,13 @@ TEST_CASE("NetworkOutgoingQueueTest NormalValueReplacesAfterPeriodChange",
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
 
   queue.SetPeriod(2, 50);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
@@ -293,14 +293,14 @@ TEST_CASE(
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::ALL);
 
   queue.SetPeriod(2, 50);
-  queue.SendValue(2, Value::MakeDouble(4.0, 40), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(4.0, 40), ValueSendMode::NORMAL);
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
@@ -328,14 +328,14 @@ TEST_CASE(
 
   queue.SetPeriod(1, 100);
   queue.SendMessage(1, Publish(1, "first"));
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::ALL);
   queue.SendMessage(1, Publish(1, "second"));
 
   queue.SetPeriod(2, 50);
   queue.SendMessage(2, Publish(2, "dest"));
 
   queue.SetPeriod(1, 50);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
 
@@ -362,8 +362,8 @@ TEST_CASE("NetworkOutgoingQueueTest SendAllValuesAppendBelowBackpressureLimit",
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::kAll);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(2.0, 20), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
@@ -384,10 +384,10 @@ TEST_CASE(
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
   queue.SendValue(1, Value::MakeString(std::string(1024 * 1024, 'x'), 10),
-                  ValueSendMode::kAll);
+                  ValueSendMode::ALL);
   queue.SendValue(1, Value::MakeString(std::string(1024 * 1024, 'y'), 20),
-                  ValueSendMode::kAll);
-  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::kAll);
+                  ValueSendMode::ALL);
+  queue.SendValue(1, Value::MakeDouble(3.0, 30), ValueSendMode::ALL);
 
   queue.SendOutgoing(5, true);
 
@@ -404,13 +404,13 @@ TEST_CASE(
   wire.binaryWriteReturns = {0, 1};
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
   REQUIRE(wire.binaryWrites.size() == 2u);
 
-  queue.SendValue(2, Value::MakeDouble(3.0, 30), ValueSendMode::kNormal);
+  queue.SendValue(2, Value::MakeDouble(3.0, 30), ValueSendMode::NORMAL);
   queue.SendOutgoing(10, true);
 
   REQUIRE(wire.binaryWrites.size() == 3u);
@@ -426,8 +426,8 @@ TEST_CASE("NetworkOutgoingQueueTest FlushBackpressureRetainsLastUnsentValue",
   wire.flushReturns = {1};
   NetworkOutgoingQueue<ServerMessage> queue{wire, false};
 
-  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
-  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::kNormal);
+  queue.SendValue(1, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
+  queue.SendValue(2, Value::MakeDouble(2.0, 20), ValueSendMode::NORMAL);
 
   queue.SendOutgoing(5, true);
   REQUIRE(wire.binaryWrites.size() == 2u);
@@ -446,7 +446,7 @@ TEST_CASE("NetworkOutgoingQueueTest ClientImmediateValueAppliesTimeOffset",
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
   queue.SetTimeOffset(5);
 
-  queue.SendValue(3, Value::MakeDouble(1.0, 10), ValueSendMode::kImm);
+  queue.SendValue(3, Value::MakeDouble(1.0, 10), ValueSendMode::IMM);
 
   REQUIRE(wire.binarySends.size() == 1u);
   auto [id, value] = DecodeBinary(wire.binarySends[0], -5);
@@ -462,7 +462,7 @@ TEST_CASE("NetworkOutgoingQueueTest LocalQueueSendsImmediately",
   NetworkOutgoingQueue<ClientMessage> queue{wire, true};
 
   queue.SendMessage(5, Publish(5, "local"));
-  queue.SendValue(5, Value::MakeDouble(1.0, 10), ValueSendMode::kNormal);
+  queue.SendValue(5, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
   queue.SendOutgoing(5, true);
 
   REQUIRE(wire.textSends.size() == 1u);

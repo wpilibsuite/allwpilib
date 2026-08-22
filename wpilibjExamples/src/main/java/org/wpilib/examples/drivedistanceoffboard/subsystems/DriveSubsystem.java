@@ -18,17 +18,17 @@ import org.wpilib.system.Timer;
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final ExampleSmartMotorController leftLeader =
-      new ExampleSmartMotorController(DriveConstants.kLeftMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR1PORT);
 
   private final ExampleSmartMotorController leftFollower =
-      new ExampleSmartMotorController(DriveConstants.kLeftMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR2PORT);
 
   // The motors on the right side of the drive.
   private final ExampleSmartMotorController rightLeader =
-      new ExampleSmartMotorController(DriveConstants.kRightMotor1Port);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR1PORT);
 
   private final ExampleSmartMotorController rightFollower =
-      new ExampleSmartMotorController(DriveConstants.kRightMotor2Port);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR2PORT);
 
   // The feedforward controller.
   private final SimpleMotorFeedforward feedforward =
@@ -42,7 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final TrapezoidProfile profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxVelocity, DriveConstants.kMaxAcceleration));
+              DriveConstants.MAX_VELOCITY, DriveConstants.MAX_ACCELERATION));
 
   // The timer
   private final Timer timer = new Timer();
@@ -86,12 +86,12 @@ public class DriveSubsystem extends SubsystemBase {
       TrapezoidProfile.State nextRight) {
     // Feedforward is divided by battery voltage to normalize it to [-1, 1]
     leftLeader.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         currentLeft.position,
         feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
     rightLeader.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         currentRight.position,
         feedforward.calculate(currentLeft.velocity, nextLeft.velocity)
             / RobotController.getBatteryVoltage());
@@ -151,7 +151,7 @@ public class DriveSubsystem extends SubsystemBase {
                   profile.calculate(currentTime, new State(), new State(distance, 0));
               var nextSetpoint =
                   profile.calculate(
-                      currentTime + DriveConstants.kDt, new State(), new State(distance, 0));
+                      currentTime + DriveConstants.DT, new State(), new State(distance, 0));
               setDriveStates(currentSetpoint, currentSetpoint, nextSetpoint, nextSetpoint);
             })
         .until(() -> profile.isFinished(0));
@@ -192,12 +192,12 @@ public class DriveSubsystem extends SubsystemBase {
                       new State(initialRightDistance + distance, 0));
               var nextLeftSetpoint =
                   profile.calculate(
-                      currentTime + DriveConstants.kDt,
+                      currentTime + DriveConstants.DT,
                       new State(initialLeftDistance, 0),
                       new State(initialLeftDistance + distance, 0));
               var nextRightSetpoint =
                   profile.calculate(
-                      currentTime + DriveConstants.kDt,
+                      currentTime + DriveConstants.DT,
                       new State(initialRightDistance, 0),
                       new State(initialRightDistance + distance, 0));
               setDriveStates(

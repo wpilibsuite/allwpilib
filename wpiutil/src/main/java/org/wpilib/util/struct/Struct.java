@@ -147,7 +147,7 @@ public interface Struct<T> {
 
   /**
    * Deserializes a double array from a raw struct serialized ByteBuffer starting at the current
-   * position. Will increment the ByteBuffer position by size * kSizeDouble bytes. Will not
+   * position. Will increment the ByteBuffer position by size * SIZE_DOUBLE bytes. Will not
    * otherwise modify the ByteBuffer (e.g. byte order will not be changed).
    *
    * @param bb ByteBuffer
@@ -180,7 +180,7 @@ public interface Struct<T> {
 
   /**
    * Puts array contents to a ByteBuffer starting at the current position. Will increment the
-   * ByteBuffer position by size * kSizeDouble bytes. Will not otherwise modify the ByteBuffer (e.g.
+   * ByteBuffer position by size * SIZE_DOUBLE bytes. Will not otherwise modify the ByteBuffer (e.g.
    * byte order will not be changed).
    *
    * @param bb ByteBuffer

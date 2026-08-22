@@ -21,8 +21,8 @@ struct DataLogHeader {
 };
 
 std::optional<DataLogHeader> ParseHeader(std::span<const uint8_t> buf) {
-  constexpr size_t kFixedHeaderSize = 12;
-  if (buf.size() < kFixedHeaderSize ||
+  constexpr size_t FIXED_HEADER_SIZE = 12;
+  if (buf.size() < FIXED_HEADER_SIZE ||
       std::string_view{reinterpret_cast<const char*>(buf.data()), 6} !=
           "WPILOG") {
     return std::nullopt;
@@ -34,15 +34,15 @@ std::optional<DataLogHeader> ParseHeader(std::span<const uint8_t> buf) {
   }
 
   uint32_t extraHeaderSize = wpi::util::support::endian::read32le(&buf[8]);
-  if (extraHeaderSize > buf.size() - kFixedHeaderSize) {
+  if (extraHeaderSize > buf.size() - FIXED_HEADER_SIZE) {
     return std::nullopt;
   }
 
   return DataLogHeader{
       version,
-      {reinterpret_cast<const char*>(buf.data() + kFixedHeaderSize),
+      {reinterpret_cast<const char*>(buf.data() + FIXED_HEADER_SIZE),
        extraHeaderSize},
-      kFixedHeaderSize + extraHeaderSize};
+      FIXED_HEADER_SIZE + extraHeaderSize};
 }
 }  // namespace
 
@@ -63,17 +63,17 @@ static bool ReadString(std::span<const uint8_t>* buf, std::string_view* str) {
 
 bool DataLogRecord::IsStart() const {
   return m_entry == 0 && m_data.size() >= 17 &&
-         m_data[0] == impl::kControlStart;
+         m_data[0] == impl::CONTROL_START;
 }
 
 bool DataLogRecord::IsFinish() const {
   return m_entry == 0 && m_data.size() == 5 &&
-         m_data[0] == impl::kControlFinish;
+         m_data[0] == impl::CONTROL_FINISH;
 }
 
 bool DataLogRecord::IsSetMetadata() const {
   return m_entry == 0 && m_data.size() >= 9 &&
-         m_data[0] == impl::kControlSetMetadata;
+         m_data[0] == impl::CONTROL_SET_METADATA;
 }
 
 bool DataLogRecord::GetStartData(StartRecordData* out) const {

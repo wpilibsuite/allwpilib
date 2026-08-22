@@ -5,33 +5,33 @@
 #include "wpi/math/geometry/struct/Twist3dStruct.hpp"
 
 namespace {
-constexpr size_t kDxOff = 0;
-constexpr size_t kDyOff = kDxOff + 8;
-constexpr size_t kDzOff = kDyOff + 8;
-constexpr size_t kRxOff = kDzOff + 8;
-constexpr size_t kRyOff = kRxOff + 8;
-constexpr size_t kRzOff = kRyOff + 8;
+constexpr size_t DX_OFF = 0;
+constexpr size_t DY_OFF = DX_OFF + 8;
+constexpr size_t DZ_OFF = DY_OFF + 8;
+constexpr size_t RX_OFF = DZ_OFF + 8;
+constexpr size_t RY_OFF = RX_OFF + 8;
+constexpr size_t RZ_OFF = RY_OFF + 8;
 }  // namespace
 
 using StructType = wpi::util::Struct<wpi::math::Twist3d>;
 
 wpi::math::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Twist3d{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDxOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDyOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDzOff>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kRxOff>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kRyOff>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kRzOff>(data)},
+      wpi::units::meter_t{wpi::util::UnpackStruct<double, DX_OFF>(data)},
+      wpi::units::meter_t{wpi::util::UnpackStruct<double, DY_OFF>(data)},
+      wpi::units::meter_t{wpi::util::UnpackStruct<double, DZ_OFF>(data)},
+      wpi::units::radian_t{wpi::util::UnpackStruct<double, RX_OFF>(data)},
+      wpi::units::radian_t{wpi::util::UnpackStruct<double, RY_OFF>(data)},
+      wpi::units::radian_t{wpi::util::UnpackStruct<double, RZ_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const wpi::math::Twist3d& value) {
-  wpi::util::PackStruct<kDxOff>(data, value.dx.value());
-  wpi::util::PackStruct<kDyOff>(data, value.dy.value());
-  wpi::util::PackStruct<kDzOff>(data, value.dz.value());
-  wpi::util::PackStruct<kRxOff>(data, value.rx.value());
-  wpi::util::PackStruct<kRyOff>(data, value.ry.value());
-  wpi::util::PackStruct<kRzOff>(data, value.rz.value());
+  wpi::util::PackStruct<DX_OFF>(data, value.dx.value());
+  wpi::util::PackStruct<DY_OFF>(data, value.dy.value());
+  wpi::util::PackStruct<DZ_OFF>(data, value.dz.value());
+  wpi::util::PackStruct<RX_OFF>(data, value.rx.value());
+  wpi::util::PackStruct<RY_OFF>(data, value.ry.value());
+  wpi::util::PackStruct<RZ_OFF>(data, value.rz.value());
 }

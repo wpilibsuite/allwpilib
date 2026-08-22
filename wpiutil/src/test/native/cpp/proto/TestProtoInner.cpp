@@ -50,25 +50,25 @@ using ProtoType = wpi::util::Protobuf<TestProtoInner>;
 }  // namespace
 
 TEST_CASE("TestProtoInnerTest RoundtripNanopb", "[wpiutil][proto]") {
-  const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
+  const TestProtoInner EXPECTED_DATA = TestProtoInner{"Hello!"};
 
   wpi::util::ProtobufMessage<TestProtoInner> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   std::optional<TestProtoInner> unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK(kExpectedData.msg == unpacked_data->msg);
+  CHECK(EXPECTED_DATA.msg == unpacked_data->msg);
 }
 
 TEST_CASE("TestProtoInnerTest RoundtripNanopbEmpty", "[wpiutil][proto]") {
-  const TestProtoInner kExpectedData = TestProtoInner{"Hello!"};
+  const TestProtoInner EXPECTED_DATA = TestProtoInner{"Hello!"};
 
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
-  CHECK(kExpectedData.msg == unpacked_data->msg);
+  CHECK(EXPECTED_DATA.msg == unpacked_data->msg);
 }

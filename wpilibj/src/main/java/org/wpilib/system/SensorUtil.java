@@ -12,7 +12,7 @@ import org.wpilib.hardware.hal.PortsJNI;
  */
 public final class SensorUtil {
   /** Number of SmartIo Ports. */
-  public static final int kSmartIoPorts = PortsJNI.getNumSmartIo();
+  public static final int SMART_IO_PORTS = PortsJNI.getNumSmartIo();
 
   /** Number of solenoid channels per module. */
   public static final int NUM_CTRE_SOLENOID_CHANNELS = PortsJNI.getNumCTRESolenoidChannels();

@@ -30,31 +30,31 @@ const GenericHID& NiDsStadiaController::GetHID() const {
 }
 
 double NiDsStadiaController::GetLeftX() const {
-  return m_hid->GetRawAxis(Axis::kLeftX);
+  return m_hid->GetRawAxis(Axis::LEFT_X);
 }
 
 double NiDsStadiaController::GetRightX() const {
-  return m_hid->GetRawAxis(Axis::kRightX);
+  return m_hid->GetRawAxis(Axis::RIGHT_X);
 }
 
 double NiDsStadiaController::GetLeftY() const {
-  return m_hid->GetRawAxis(Axis::kLeftY);
+  return m_hid->GetRawAxis(Axis::LEFT_Y);
 }
 
 double NiDsStadiaController::GetRightY() const {
-  return m_hid->GetRawAxis(Axis::kRightY);
+  return m_hid->GetRawAxis(Axis::RIGHT_Y);
 }
 
 bool NiDsStadiaController::GetAButton() const {
-  return m_hid->GetRawButton(Button::kA);
+  return m_hid->GetRawButton(Button::A);
 }
 
 bool NiDsStadiaController::GetAButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kA);
+  return m_hid->GetRawButtonPressed(Button::A);
 }
 
 bool NiDsStadiaController::GetAButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kA);
+  return m_hid->GetRawButtonReleased(Button::A);
 }
 
 BooleanEvent NiDsStadiaController::A(EventLoop* loop) const {
@@ -62,15 +62,15 @@ BooleanEvent NiDsStadiaController::A(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetBButton() const {
-  return m_hid->GetRawButton(Button::kB);
+  return m_hid->GetRawButton(Button::B);
 }
 
 bool NiDsStadiaController::GetBButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kB);
+  return m_hid->GetRawButtonPressed(Button::B);
 }
 
 bool NiDsStadiaController::GetBButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kB);
+  return m_hid->GetRawButtonReleased(Button::B);
 }
 
 BooleanEvent NiDsStadiaController::B(EventLoop* loop) const {
@@ -78,15 +78,15 @@ BooleanEvent NiDsStadiaController::B(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetXButton() const {
-  return m_hid->GetRawButton(Button::kX);
+  return m_hid->GetRawButton(Button::X);
 }
 
 bool NiDsStadiaController::GetXButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kX);
+  return m_hid->GetRawButtonPressed(Button::X);
 }
 
 bool NiDsStadiaController::GetXButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kX);
+  return m_hid->GetRawButtonReleased(Button::X);
 }
 
 BooleanEvent NiDsStadiaController::X(EventLoop* loop) const {
@@ -94,15 +94,15 @@ BooleanEvent NiDsStadiaController::X(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetYButton() const {
-  return m_hid->GetRawButton(Button::kY);
+  return m_hid->GetRawButton(Button::Y);
 }
 
 bool NiDsStadiaController::GetYButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kY);
+  return m_hid->GetRawButtonPressed(Button::Y);
 }
 
 bool NiDsStadiaController::GetYButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kY);
+  return m_hid->GetRawButtonReleased(Button::Y);
 }
 
 BooleanEvent NiDsStadiaController::Y(EventLoop* loop) const {
@@ -110,15 +110,15 @@ BooleanEvent NiDsStadiaController::Y(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetLeftBumperButton() const {
-  return m_hid->GetRawButton(Button::kLeftBumper);
+  return m_hid->GetRawButton(Button::LEFT_BUMPER);
 }
 
 bool NiDsStadiaController::GetLeftBumperButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kLeftBumper);
+  return m_hid->GetRawButtonPressed(Button::LEFT_BUMPER);
 }
 
 bool NiDsStadiaController::GetLeftBumperButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kLeftBumper);
+  return m_hid->GetRawButtonReleased(Button::LEFT_BUMPER);
 }
 
 BooleanEvent NiDsStadiaController::LeftBumper(EventLoop* loop) const {
@@ -126,15 +126,15 @@ BooleanEvent NiDsStadiaController::LeftBumper(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetRightBumperButton() const {
-  return m_hid->GetRawButton(Button::kRightBumper);
+  return m_hid->GetRawButton(Button::RIGHT_BUMPER);
 }
 
 bool NiDsStadiaController::GetRightBumperButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kRightBumper);
+  return m_hid->GetRawButtonPressed(Button::RIGHT_BUMPER);
 }
 
 bool NiDsStadiaController::GetRightBumperButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kRightBumper);
+  return m_hid->GetRawButtonReleased(Button::RIGHT_BUMPER);
 }
 
 BooleanEvent NiDsStadiaController::RightBumper(EventLoop* loop) const {
@@ -142,15 +142,15 @@ BooleanEvent NiDsStadiaController::RightBumper(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetLeftStickButton() const {
-  return m_hid->GetRawButton(Button::kLeftStick);
+  return m_hid->GetRawButton(Button::LEFT_STICK);
 }
 
 bool NiDsStadiaController::GetLeftStickButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kLeftStick);
+  return m_hid->GetRawButtonPressed(Button::LEFT_STICK);
 }
 
 bool NiDsStadiaController::GetLeftStickButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kLeftStick);
+  return m_hid->GetRawButtonReleased(Button::LEFT_STICK);
 }
 
 BooleanEvent NiDsStadiaController::LeftStick(EventLoop* loop) const {
@@ -158,15 +158,15 @@ BooleanEvent NiDsStadiaController::LeftStick(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetRightStickButton() const {
-  return m_hid->GetRawButton(Button::kRightStick);
+  return m_hid->GetRawButton(Button::RIGHT_STICK);
 }
 
 bool NiDsStadiaController::GetRightStickButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kRightStick);
+  return m_hid->GetRawButtonPressed(Button::RIGHT_STICK);
 }
 
 bool NiDsStadiaController::GetRightStickButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kRightStick);
+  return m_hid->GetRawButtonReleased(Button::RIGHT_STICK);
 }
 
 BooleanEvent NiDsStadiaController::RightStick(EventLoop* loop) const {
@@ -174,15 +174,15 @@ BooleanEvent NiDsStadiaController::RightStick(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetEllipsesButton() const {
-  return m_hid->GetRawButton(Button::kEllipses);
+  return m_hid->GetRawButton(Button::ELLIPSES);
 }
 
 bool NiDsStadiaController::GetEllipsesButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kEllipses);
+  return m_hid->GetRawButtonPressed(Button::ELLIPSES);
 }
 
 bool NiDsStadiaController::GetEllipsesButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kEllipses);
+  return m_hid->GetRawButtonReleased(Button::ELLIPSES);
 }
 
 BooleanEvent NiDsStadiaController::Ellipses(EventLoop* loop) const {
@@ -190,15 +190,15 @@ BooleanEvent NiDsStadiaController::Ellipses(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetHamburgerButton() const {
-  return m_hid->GetRawButton(Button::kHamburger);
+  return m_hid->GetRawButton(Button::HAMBURGER);
 }
 
 bool NiDsStadiaController::GetHamburgerButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kHamburger);
+  return m_hid->GetRawButtonPressed(Button::HAMBURGER);
 }
 
 bool NiDsStadiaController::GetHamburgerButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kHamburger);
+  return m_hid->GetRawButtonReleased(Button::HAMBURGER);
 }
 
 BooleanEvent NiDsStadiaController::Hamburger(EventLoop* loop) const {
@@ -206,15 +206,15 @@ BooleanEvent NiDsStadiaController::Hamburger(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetStadiaButton() const {
-  return m_hid->GetRawButton(Button::kStadia);
+  return m_hid->GetRawButton(Button::STADIA);
 }
 
 bool NiDsStadiaController::GetStadiaButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kStadia);
+  return m_hid->GetRawButtonPressed(Button::STADIA);
 }
 
 bool NiDsStadiaController::GetStadiaButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kStadia);
+  return m_hid->GetRawButtonReleased(Button::STADIA);
 }
 
 BooleanEvent NiDsStadiaController::Stadia(EventLoop* loop) const {
@@ -222,15 +222,15 @@ BooleanEvent NiDsStadiaController::Stadia(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetRightTriggerButton() const {
-  return m_hid->GetRawButton(Button::kRightTrigger);
+  return m_hid->GetRawButton(Button::RIGHT_TRIGGER);
 }
 
 bool NiDsStadiaController::GetRightTriggerButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kRightTrigger);
+  return m_hid->GetRawButtonPressed(Button::RIGHT_TRIGGER);
 }
 
 bool NiDsStadiaController::GetRightTriggerButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kRightTrigger);
+  return m_hid->GetRawButtonReleased(Button::RIGHT_TRIGGER);
 }
 
 BooleanEvent NiDsStadiaController::RightTrigger(EventLoop* loop) const {
@@ -238,15 +238,15 @@ BooleanEvent NiDsStadiaController::RightTrigger(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetLeftTriggerButton() const {
-  return m_hid->GetRawButton(Button::kLeftTrigger);
+  return m_hid->GetRawButton(Button::LEFT_TRIGGER);
 }
 
 bool NiDsStadiaController::GetLeftTriggerButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kLeftTrigger);
+  return m_hid->GetRawButtonPressed(Button::LEFT_TRIGGER);
 }
 
 bool NiDsStadiaController::GetLeftTriggerButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kLeftTrigger);
+  return m_hid->GetRawButtonReleased(Button::LEFT_TRIGGER);
 }
 
 BooleanEvent NiDsStadiaController::LeftTrigger(EventLoop* loop) const {
@@ -254,15 +254,15 @@ BooleanEvent NiDsStadiaController::LeftTrigger(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetGoogleButton() const {
-  return m_hid->GetRawButton(Button::kGoogle);
+  return m_hid->GetRawButton(Button::GOOGLE);
 }
 
 bool NiDsStadiaController::GetGoogleButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kGoogle);
+  return m_hid->GetRawButtonPressed(Button::GOOGLE);
 }
 
 bool NiDsStadiaController::GetGoogleButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kGoogle);
+  return m_hid->GetRawButtonReleased(Button::GOOGLE);
 }
 
 BooleanEvent NiDsStadiaController::Google(EventLoop* loop) const {
@@ -270,15 +270,15 @@ BooleanEvent NiDsStadiaController::Google(EventLoop* loop) const {
 }
 
 bool NiDsStadiaController::GetFrameButton() const {
-  return m_hid->GetRawButton(Button::kFrame);
+  return m_hid->GetRawButton(Button::FRAME);
 }
 
 bool NiDsStadiaController::GetFrameButtonPressed() {
-  return m_hid->GetRawButtonPressed(Button::kFrame);
+  return m_hid->GetRawButtonPressed(Button::FRAME);
 }
 
 bool NiDsStadiaController::GetFrameButtonReleased() {
-  return m_hid->GetRawButtonReleased(Button::kFrame);
+  return m_hid->GetRawButtonReleased(Button::FRAME);
 }
 
 BooleanEvent NiDsStadiaController::Frame(EventLoop* loop) const {

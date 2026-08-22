@@ -84,11 +84,11 @@ class DataSource {
 
 template <typename T>
   requires std::derived_from<T, DataSource> && requires {
-    { T::kType } -> std::convertible_to<const char*>;
+    { T::TYPE } -> std::convertible_to<const char*>;
   }
 static T* AcceptDragDropPayload(ImGuiDragDropFlags flags = 0) {
   char buf[32];
-  std::snprintf(buf, sizeof(buf), "DataSource:%s", T::kType);
+  std::snprintf(buf, sizeof(buf), "DataSource:%s", T::TYPE);
   if (auto payload = ImGui::AcceptDragDropPayload(buf, flags)) {
     return static_cast<T*>(*static_cast<DataSource**>(payload->Data));
   }
@@ -124,7 +124,7 @@ class ValueSource : public DataSource {
 
 class BooleanSource : public ValueSource<bool> {
  public:
-  static constexpr const char* kType = "boolean";
+  static constexpr const char* TYPE = "boolean";
 
   explicit BooleanSource(std::string id) : ValueSource{std::move(id)} {
     Register();
@@ -135,7 +135,7 @@ class BooleanSource : public ValueSource<bool> {
 
 class DoubleSource : public ValueSource<double> {
  public:
-  static constexpr const char* kType = "boolean";
+  static constexpr const char* TYPE = "boolean";
 
   explicit DoubleSource(std::string id) : ValueSource{std::move(id)} {
     Register();
@@ -146,7 +146,7 @@ class DoubleSource : public ValueSource<double> {
 
 class FloatSource : public ValueSource<float> {
  public:
-  static constexpr const char* kType = "float";
+  static constexpr const char* TYPE = "float";
 
   explicit FloatSource(std::string id) : ValueSource{std::move(id)} {
     Register();
@@ -157,7 +157,7 @@ class FloatSource : public ValueSource<float> {
 
 class IntegerSource : public ValueSource<int64_t> {
  public:
-  static constexpr const char* kType = "integer";
+  static constexpr const char* TYPE = "integer";
 
   explicit IntegerSource(std::string id) : ValueSource{std::move(id)} {
     Register();
@@ -168,7 +168,7 @@ class IntegerSource : public ValueSource<int64_t> {
 
 class StringSource : public DataSource {
  public:
-  static constexpr const char* kType = "string";
+  static constexpr const char* TYPE = "string";
 
   explicit StringSource(std::string id) : DataSource{std::move(id)} {
     Register();

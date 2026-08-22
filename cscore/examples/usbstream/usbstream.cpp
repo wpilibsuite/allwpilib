@@ -27,7 +27,7 @@ int main() {
         wpi::util::print("FPS={} MBPS={}\n", camera.GetActualFPS(),
                          (camera.GetActualDataRate() / 1000000.0));
       },
-      wpi::cs::RawEvent::kTelemetryUpdated, false, &status);
+      wpi::cs::RawEvent::TELEMETRY_UPDATED, false, &status);
   wpi::cs::SetTelemetryPeriod(1.0);
 
   std::getchar();

@@ -16,10 +16,10 @@ int main(int argc, char** argv) {
   using std::chrono::high_resolution_clock;
   using std::chrono::microseconds;
 
-  int kNumRuns = 10;
+  int numRuns = 10;
 
   if (argc == 2) {
-    kNumRuns = std::stoi(argv[1]);
+    numRuns = std::stoi(argv[1]);
   }
 
   wpi::log::DataLogBackgroundWriter log;
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     auto resVec = std::vector<microseconds::rep>();
     wpi::util::print("{}: ", name);
 
-    for (int i = 0; i < kNumRuns; ++i) {
+    for (int i = 0; i < numRuns; ++i) {
       auto start = high_resolution_clock::now();
       fn(log);
       auto stop = high_resolution_clock::now();
@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
     }
 
     wpi::util::print(
-        "{}us\n", std::accumulate(resVec.begin(), resVec.end(), 0) / kNumRuns);
+        "{}us\n", std::accumulate(resVec.begin(), resVec.end(), 0) / numRuns);
   }
 
   return EXIT_SUCCESS;

@@ -16,7 +16,7 @@
 namespace wpi::glass {
 class NTMecanumDriveModel : public DriveModel {
  public:
-  static constexpr const char* kType = "MecanumDrive";
+  static constexpr const char* TYPE = "MecanumDrive";
 
   explicit NTMecanumDriveModel(std::string_view path);
   NTMecanumDriveModel(wpi::nt::NetworkTableInstance inst,

@@ -32,10 +32,10 @@ class QuinticHermiteSplineTest {
 
       // Make sure the twist is under the tolerance defined by the Spline class.
       auto twist = (p1.first - p0.first).Log();
-      CHECK(std::abs(twist.dx.value()) < SplineParameterizer::kMaxDx.value());
-      CHECK(std::abs(twist.dy.value()) < SplineParameterizer::kMaxDy.value());
+      CHECK(std::abs(twist.dx.value()) < SplineParameterizer::MAX_DX.value());
+      CHECK(std::abs(twist.dy.value()) < SplineParameterizer::MAX_DY.value());
       CHECK(std::abs(twist.dtheta.value()) <
-            SplineParameterizer::kMaxDtheta.value());
+            SplineParameterizer::MAX_DTHETA.value());
     }
 
     // Check first point.

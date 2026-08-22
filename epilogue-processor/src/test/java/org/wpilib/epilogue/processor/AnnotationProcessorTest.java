@@ -9,7 +9,7 @@ import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -151,7 +151,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
@@ -1410,7 +1410,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
@@ -2118,7 +2118,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
@@ -2146,7 +2146,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source));
 
@@ -2359,7 +2359,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString("example.Example", source),
@@ -2399,7 +2399,7 @@ class AnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(
                 JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", loggedClassContent));

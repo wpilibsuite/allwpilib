@@ -10,7 +10,7 @@ import java.util.Arrays;
 /** Log raw byte array values. */
 public class RawLogEntry extends DataLogEntry {
   /** The data type for raw values. */
-  public static final String kDataType = "raw";
+  public static final String DATA_TYPE = "raw";
 
   /**
    * Constructs a raw log entry.
@@ -46,7 +46,7 @@ public class RawLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public RawLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    this(log, name, metadata, kDataType, timestamp);
+    this(log, name, metadata, DATA_TYPE, timestamp);
   }
 
   /**

@@ -10,7 +10,7 @@
 void Robot::TeleopPeriodic() {
   // Activate the intake while the trigger is held
   if (joystick.GetTrigger()) {
-    intake.Activate(IntakeConstants::kIntakeVelocity);
+    intake.Activate(IntakeConstants::INTAKE_VELOCITY);
   } else {
     intake.Activate(0);
   }

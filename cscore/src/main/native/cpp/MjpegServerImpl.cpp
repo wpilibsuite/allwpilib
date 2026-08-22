@@ -806,7 +806,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     return;
   }
 
-  enum { kCommand, kStream, kGetSettings, kGetSourceConfig, kRootPage } kind;
+  enum { COMMAND, STREAM, GET_SETTINGS, GET_SOURCE_CONFIG, ROOT_PAGE } kind;
   std::string_view parameters;
   size_t pos;
 
@@ -815,37 +815,37 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility, others are for Axis camera compatibility.
   if ((pos = req.find("POST /stream")) != std::string_view::npos) {
-    kind = kStream;
+    kind = STREAM;
     parameters =
         wpi::util::substr(wpi::util::substr(req, req.find('?', pos + 12)), 1);
   } else if ((pos = req.find("GET /?action=stream")) !=
              std::string_view::npos) {
-    kind = kStream;
+    kind = STREAM;
     parameters =
         wpi::util::substr(wpi::util::substr(req, req.find('&', pos + 19)), 1);
   } else if ((pos = req.find("GET /stream.mjpg")) != std::string_view::npos) {
-    kind = kStream;
+    kind = STREAM;
     parameters =
         wpi::util::substr(wpi::util::substr(req, req.find('?', pos + 16)), 1);
   } else if (req.find("GET /settings") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
-    kind = kGetSettings;
+    kind = GET_SETTINGS;
   } else if (req.find("GET /config") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
-    kind = kGetSourceConfig;
+    kind = GET_SOURCE_CONFIG;
   } else if (req.find("GET /input") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
-    kind = kGetSettings;
+    kind = GET_SETTINGS;
   } else if (req.find("GET /output") != std::string_view::npos &&
              req.find(".json") != std::string_view::npos) {
-    kind = kGetSettings;
+    kind = GET_SETTINGS;
   } else if ((pos = req.find("GET /?action=command")) !=
              std::string_view::npos) {
-    kind = kCommand;
+    kind = COMMAND;
     parameters =
         wpi::util::substr(wpi::util::substr(req, req.find('&', pos + 20)), 1);
   } else if (req.find("GET / ") != std::string_view::npos || req == "GET /\n") {
-    kind = kRootPage;
+    kind = ROOT_PAGE;
   } else {
     SDEBUG("HTTP request resource not found");
     SendError(os, 404, "Resource not found");
@@ -873,7 +873,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
   // Send response
   switch (kind) {
-    case kStream:
+    case STREAM:
       if (auto source = GetSource()) {
         SDEBUG("request for stream {}", source->GetName());
         if (!ProcessCommand(os, *source, parameters, false)) {
@@ -882,7 +882,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       }
       SendStream(os);
       break;
-    case kCommand:
+    case COMMAND:
       if (auto source = GetSource()) {
         ProcessCommand(os, *source, parameters, true);
       } else {
@@ -891,7 +891,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         SDEBUG("Ignored due to no connected source.");
       }
       break;
-    case kGetSettings:
+    case GET_SETTINGS:
       SDEBUG("request for JSON file");
       if (auto source = GetSource()) {
         SendJSON(os, *source, true);
@@ -899,7 +899,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         SendError(os, 404, "Resource not found");
       }
       break;
-    case kGetSourceConfig:
+    case GET_SOURCE_CONFIG:
       SDEBUG("request for JSON file");
       if (auto source = GetSource()) {
         SendHeader(os, 200, "OK", "application/json");
@@ -910,7 +910,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         SendError(os, 404, "Resource not found");
       }
       break;
-    case kRootPage:
+    case ROOT_PAGE:
       SDEBUG("request for root page");
       SendHeader(os, 200, "OK", "text/html");
       if (auto source = GetSource()) {

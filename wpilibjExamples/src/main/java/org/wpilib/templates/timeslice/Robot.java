@@ -14,8 +14,8 @@ import org.wpilib.tunable.Tunables;
  * creating this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimesliceRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
+  private static final String DEFAULT_AUTO = "Default";
+  private static final String CUSTOM_AUTO = "My Auto";
   private String autoSelected;
   private final Selectable<String> chooser = new Selectable<>();
 
@@ -33,8 +33,8 @@ public class Robot extends TimesliceRobot {
     // Total usage: 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2)
     // = 9 ms -> 90% allocated
 
-    chooser.addDefault("Default Auto", kDefaultAuto);
-    chooser.add("My Auto", kCustomAuto);
+    chooser.addDefault("Default Auto", DEFAULT_AUTO);
+    chooser.add("My Auto", CUSTOM_AUTO);
     Tunables.publish("Auto choices", chooser);
   }
 
@@ -61,7 +61,7 @@ public class Robot extends TimesliceRobot {
   @Override
   public void autonomousInit() {
     autoSelected = chooser.getSelected();
-    // autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+    // autoSelected = SmartDashboard.getString("Auto Selector", DEFAULT_AUTO);
     System.out.println("Auto selected: " + autoSelected);
   }
 
@@ -69,10 +69,10 @@ public class Robot extends TimesliceRobot {
   @Override
   public void autonomousPeriodic() {
     switch (autoSelected) {
-      case kCustomAuto:
+      case CUSTOM_AUTO:
         // Put custom auto code here
         break;
-      case kDefaultAuto:
+      case DEFAULT_AUTO:
       default:
         // Put default auto code here
         break;

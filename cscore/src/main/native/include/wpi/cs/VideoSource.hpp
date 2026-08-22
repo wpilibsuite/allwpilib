@@ -32,15 +32,15 @@ class VideoSource {
    */
   enum Kind {
     /// Unknown video source.
-    kUnknown = CS_SOURCE_UNKNOWN,
+    UNKNOWN = CS_SOURCE_UNKNOWN,
     /// USB video source.
-    kUsb = CS_SOURCE_USB,
+    USB = CS_SOURCE_USB,
     /// HTTP video source.
-    kHttp = CS_SOURCE_HTTP,
+    HTTP = CS_SOURCE_HTTP,
     /// CV video source.
-    kCv = CS_SOURCE_CV,
+    CV = CS_SOURCE_CV,
     /// Raw video source.
-    kRaw = CS_SOURCE_RAW,
+    RAW = CS_SOURCE_RAW,
   };
 
   /** Connection strategy.  Used for SetConnectionStrategy(). */
@@ -49,19 +49,19 @@ class VideoSource {
      * Automatically connect or disconnect based on whether any sinks are
      * connected to this source.  This is the default behavior.
      */
-    kConnectionAutoManage = CS_CONNECTION_AUTO_MANAGE,
+    CONNECTION_AUTO_MANAGE = CS_CONNECTION_AUTO_MANAGE,
 
     /**
      * Try to keep the connection open regardless of whether any sinks are
      * connected.
      */
-    kConnectionKeepOpen = CS_CONNECTION_KEEP_OPEN,
+    CONNECTION_KEEP_OPEN = CS_CONNECTION_KEEP_OPEN,
 
     /**
      * Never open the connection.  If this is set when the connection is open,
      * close the connection.
      */
-    kConnectionForceClose = CS_CONNECTION_FORCE_CLOSE
+    CONNECTION_FORCE_CLOSE = CS_CONNECTION_FORCE_CLOSE
   };
 
   VideoSource() noexcept = default;
@@ -170,7 +170,7 @@ class VideoSource {
   /** Get a property.
    *
    * @param name Property name
-   * @return Property contents (of kind Property::kNone if no property with
+   * @return Property contents (of kind Property::NONE if no property with
    *         the given name exists)
    */
   VideoProperty GetProperty(std::string_view name) {

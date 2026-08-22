@@ -631,7 +631,7 @@ private final Tunable<Pose2d> targetPose = Tunables.addValue("drive/targetPose",
 public final class Robot extends TimedRobot {
   private final Field2d m_field = new Field2d();
   private final FieldObject2d m_target = m_field.getObject("Target");
-  private Pose2d m_driveTargetPose = Pose2d.kZero;
+  private Pose2d m_driveTargetPose = Pose2d.ZERO;
 
   @Override
   public void robotInit() {
@@ -873,7 +873,7 @@ public void robotInit() {
 ```java
 private final Field2d m_field = new Field2d();
 private final FieldObject2d m_target = m_field.getObject("Target");
-private Pose2d m_driveTargetPose = Pose2d.kZero;
+private Pose2d m_driveTargetPose = Pose2d.ZERO;
 
 public void robotInit() {
   SmartDashboard.putData("Field", m_field);
@@ -890,7 +890,7 @@ public void robotPeriodic() {
 ```java
 private final Field2d m_field = new Field2d();
 private final FieldObject2d m_target = m_field.getObject("Target");
-private Pose2d m_driveTargetPose = Pose2d.kZero;
+private Pose2d m_driveTargetPose = Pose2d.ZERO;
 
 public void robotInit() {
   Tunables.publish("Field", m_field);

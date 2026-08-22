@@ -12,21 +12,21 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("SwerveModuleAccelerationsTest DefaultConstructor", "[wpimath]") {
   SwerveModuleAcceleration moduleAccelerations;
 
-  CHECK_NEAR(moduleAccelerations.acceleration.value(), 0.0, kEpsilon);
-  CHECK_NEAR(moduleAccelerations.angle.Radians().value(), 0.0, kEpsilon);
+  CHECK_NEAR(moduleAccelerations.acceleration.value(), 0.0, EPSILON);
+  CHECK_NEAR(moduleAccelerations.angle.Radians().value(), 0.0, EPSILON);
 }
 
 TEST_CASE("SwerveModuleAccelerationsTest ParameterizedConstructor",
           "[wpimath]") {
   SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq, Rotation2d{1.5_rad}};
 
-  CHECK_NEAR(moduleAccelerations.acceleration.value(), 2.5, kEpsilon);
-  CHECK_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, kEpsilon);
+  CHECK_NEAR(moduleAccelerations.acceleration.value(), 2.5, EPSILON);
+  CHECK_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, EPSILON);
 }
 
 TEST_CASE("SwerveModuleAccelerationsTest Equals", "[wpimath]") {

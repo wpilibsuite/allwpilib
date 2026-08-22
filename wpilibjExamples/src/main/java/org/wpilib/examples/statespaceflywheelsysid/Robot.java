@@ -23,17 +23,18 @@ import org.wpilib.math.util.Units;
  * flywheel.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
-  private static final int kJoystickPort = 0;
-  private static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
+  private static final int JOYSTICK_PORT = 0;
+  private static final double SPINUP_RAD_PER_SEC =
+      Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
   // Volts per (radian per second)
-  private static final double kFlywheelKv = 0.023;
+  private static final double FLYWHEEL_KV = 0.023;
 
   // Volts per (radian per second squared)
-  private static final double kFlywheelKa = 0.001;
+  private static final double FLYWHEEL_KA = 0.001;
 
   // The plant holds a state-space model of our flywheel. This system has the following properties:
   //
@@ -43,7 +44,7 @@ public class Robot extends TimedRobot {
   //
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
   private final LinearSystem<N1, N1, N1> flywheelPlant =
-      Models.flywheelFromSysId(kFlywheelKv, kFlywheelKa);
+      Models.flywheelFromSysId(FLYWHEEL_KV, FLYWHEEL_KA);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   private final KalmanFilter<N1, N1, N1> observer =
@@ -69,12 +70,12 @@ public class Robot extends TimedRobot {
       new LinearSystemLoop<>(flywheelPlant, controller, observer, 12.0, 0.020);
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  private final Encoder encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final Encoder encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
-  private final PWMSparkMax motor = new PWMSparkMax(kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(MOTOR_PORT);
 
   // A joystick to read the trigger from.
-  private final Joystick joystick = new Joystick(kJoystickPort);
+  private final Joystick joystick = new Joystick(JOYSTICK_PORT);
 
   public Robot() {
     // We go 2 pi radians per 4096 clicks.
@@ -93,7 +94,7 @@ public class Robot extends TimedRobot {
     // PID controller.
     if (joystick.getTriggerPressed()) {
       // We just pressed the trigger, so let's set our next reference
-      loop.setNextR(VecBuilder.fill(kSpinupRadPerSec));
+      loop.setNextR(VecBuilder.fill(SPINUP_RAD_PER_SEC));
     } else if (joystick.getTriggerReleased()) {
       // We just released the trigger, so let's spin down
       loop.setNextR(VecBuilder.fill(0.0));

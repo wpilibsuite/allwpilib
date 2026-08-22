@@ -34,12 +34,12 @@ TEST_CASE("BiquadFilterTest FirstOrderMatchesSinglePoleIIR",
           "[wpimath][filter]") {
   // SinglePoleIIR: y[n] = (1-g) x[n] + g y[n-1], g = exp(-dt/T)
   // As biquad:     {1-g, 0, 0, -g, 0}
-  constexpr double kTimeConstant = 0.015915;
-  constexpr double kPeriod = 0.005;
-  double g = std::exp(-kPeriod / kTimeConstant);
+  constexpr double TIME_CONSTANT = 0.015915;
+  constexpr double PERIOD = 0.005;
+  double g = std::exp(-PERIOD / TIME_CONSTANT);
 
   auto linear =
-      wpi::math::LinearFilter<double>::SinglePoleIIR(kTimeConstant, 5_ms);
+      wpi::math::LinearFilter<double>::SinglePoleIIR(TIME_CONSTANT, 5_ms);
   BiquadFilter biquad({{1.0 - g, 0.0, 0.0, -g, 0.0}});
 
   std::mt19937 rng(7);
@@ -61,7 +61,7 @@ TEST_CASE("BiquadFilterTest Butterworth4thOrderLowPass", "[wpimath][filter]") {
   });
 
   // Impulse response, first 30 samples, from scipy.signal.sosfilt.
-  constexpr std::array<double, 30> kExpected = {
+  constexpr std::array<double, 30> EXPECTED = {
       0.00041659920440659937, 0.0029914483065925663,  0.010405740533503665,
       0.024092655231875183,   0.04300386328531425,    0.06442081415630327,
       0.08518000836484753,    0.10245740377665029,    0.1142030744642985,
@@ -74,11 +74,11 @@ TEST_CASE("BiquadFilterTest Butterworth4thOrderLowPass", "[wpimath][filter]") {
       -0.004938595712161598,  -0.0012334395430879353, 0.0017903545884787877,
   };
 
-  for (size_t i = 0; i < kExpected.size(); ++i) {
+  for (size_t i = 0; i < EXPECTED.size(); ++i) {
     double x = (i == 0) ? 1.0 : 0.0;
     double y = filter.Calculate(x);
     UNSCOPED_INFO("sample " << i);
-    CHECK_NEAR(y, kExpected[i], 1e-10);
+    CHECK_NEAR(y, EXPECTED[i], 1e-10);
   }
 }
 
@@ -89,11 +89,11 @@ TEST_CASE("BiquadFilterTest Notch60Hz", "[wpimath][filter]") {
        -1.8251457105120341, 0.9629940509502151},
   });
 
-  constexpr double kFs = 1000.0;
-  constexpr int kSamples = 1000;
-  std::vector<double> output(kSamples);
-  for (int n = 0; n < kSamples; ++n) {
-    double t = n / kFs;
+  constexpr double FS = 1000.0;
+  constexpr int SAMPLES = 1000;
+  std::vector<double> output(SAMPLES);
+  for (int n = 0; n < SAMPLES; ++n) {
+    double t = n / FS;
     double x = std::sin(2.0 * std::numbers::pi * 10.0 * t) +
                std::sin(2.0 * std::numbers::pi * 60.0 * t);
     output[n] = filter.Calculate(x);
@@ -106,22 +106,22 @@ TEST_CASE("BiquadFilterTest Notch60Hz", "[wpimath][filter]") {
   // Attenuation check via a basic DFT at 10 Hz and 60 Hz over the last 512
   // samples (in steady state). 60 Hz should be strongly attenuated, 10 Hz
   // should pass almost untouched.
-  constexpr int kWindow = 512;
+  constexpr int WINDOW = 512;
   auto bin = [&](const std::vector<double>& sig, double freq) {
     double re = 0.0;
     double im = 0.0;
-    for (int n = 0; n < kWindow; ++n) {
-      double x = sig[kSamples - kWindow + n];
-      double phase = 2.0 * std::numbers::pi * freq * n / kFs;
+    for (int n = 0; n < WINDOW; ++n) {
+      double x = sig[SAMPLES - WINDOW + n];
+      double phase = 2.0 * std::numbers::pi * freq * n / FS;
       re += x * std::cos(phase);
       im -= x * std::sin(phase);
     }
     return std::hypot(re, im);
   };
 
-  std::vector<double> input(kSamples);
-  for (int n = 0; n < kSamples; ++n) {
-    double t = n / kFs;
+  std::vector<double> input(SAMPLES);
+  for (int n = 0; n < SAMPLES; ++n) {
+    double t = n / FS;
     input[n] = std::sin(2.0 * std::numbers::pi * 10.0 * t) +
                std::sin(2.0 * std::numbers::pi * 60.0 * t);
   }
@@ -157,35 +157,35 @@ TEST_CASE("BiquadFilterTest Order8ButterworthMatchesScipy",
 
   // Linear chirp from 1 Hz to 200 Hz over 500 samples at 1 kHz.
   // Matches scipy.signal.chirp(t, f0=1, f1=200, t1=t[-1], method='linear').
-  constexpr int kSamples = 500;
-  constexpr double kFs = 1000.0;
-  constexpr double kF0 = 1.0;
-  constexpr double kF1 = 200.0;
-  const double t1 = (kSamples - 1) / kFs;
-  const double k = (kF1 - kF0) / t1;
+  constexpr int SAMPLES = 500;
+  constexpr double FS = 1000.0;
+  constexpr double F0 = 1.0;
+  constexpr double F1 = 200.0;
+  const double t1 = (SAMPLES - 1) / FS;
+  const double k = (F1 - F0) / t1;
 
   std::array<double, 5> spot_samples{};
-  constexpr std::array<int, 5> kSpotIndices{10, 50, 100, 250, 499};
-  constexpr std::array<double, 5> kExpected{
+  constexpr std::array<int, 5> SPOT_INDICES{10, 50, 100, 250, 499};
+  constexpr std::array<double, 5> EXPECTED{
       0.8950675041062186,  -0.7902247252134351,    0.1716891991372734,
       0.05240058121316523, -0.0016952227415119995,
   };
 
   size_t spot_idx = 0;
-  for (int n = 0; n < kSamples; ++n) {
-    double t = n / kFs;
-    double phase = 2.0 * std::numbers::pi * (kF0 * t + 0.5 * k * t * t);
+  for (int n = 0; n < SAMPLES; ++n) {
+    double t = n / FS;
+    double phase = 2.0 * std::numbers::pi * (F0 * t + 0.5 * k * t * t);
     double x = std::cos(phase);
     double y = filter.Calculate(x);
 
-    if (spot_idx < kSpotIndices.size() && n == kSpotIndices[spot_idx]) {
+    if (spot_idx < SPOT_INDICES.size() && n == SPOT_INDICES[spot_idx]) {
       spot_samples[spot_idx++] = y;
     }
   }
 
-  for (size_t i = 0; i < kExpected.size(); ++i) {
-    UNSCOPED_INFO("sample index " << kSpotIndices[i]);
-    CHECK_NEAR(spot_samples[i], kExpected[i], 1e-10);
+  for (size_t i = 0; i < EXPECTED.size(); ++i) {
+    UNSCOPED_INFO("sample index " << SPOT_INDICES[i]);
+    CHECK_NEAR(spot_samples[i], EXPECTED[i], 1e-10);
   }
 }
 
@@ -219,17 +219,17 @@ TEST_CASE("BiquadFilterTest ResetToSteadyState", "[wpimath][filter]") {
       {1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979},
   });
 
-  constexpr double kInput = 3.0;
-  filter.Reset(kInput);
+  constexpr double INPUT = 3.0;
+  filter.Reset(INPUT);
 
   // Cascade DC gain for a Butterworth LP is 1.0, so output should equal input.
-  CHECK_NEAR(filter.LastValue(), kInput, 1e-12);
-  double y = filter.Calculate(kInput);
-  CHECK_NEAR(y, kInput, 1e-12);
+  CHECK_NEAR(filter.LastValue(), INPUT, 1e-12);
+  double y = filter.Calculate(INPUT);
+  CHECK_NEAR(y, INPUT, 1e-12);
 
   // And remain at steady state
   for (int i = 0; i < 20; ++i) {
-    CHECK_NEAR(filter.Calculate(kInput), kInput, 1e-12);
+    CHECK_NEAR(filter.Calculate(INPUT), INPUT, 1e-12);
   }
 }
 
@@ -240,12 +240,12 @@ TEST_CASE("BiquadFilterTest DCGainConverges", "[wpimath][filter]") {
       {1.0, 2.0, 1.0, -1.7009643319435257, 0.7884997398152979},
   });
 
-  constexpr double kInput = 2.5;
+  constexpr double INPUT = 2.5;
   double y = 0.0;
   for (int i = 0; i < 500; ++i) {
-    y = filter.Calculate(kInput);
+    y = filter.Calculate(INPUT);
   }
-  CHECK_NEAR(y, kInput, 1e-6);  // Butterworth LP has DC gain 1
+  CHECK_NEAR(y, INPUT, 1e-6);  // Butterworth LP has DC gain 1
 }
 
 TEST_CASE("BiquadFilterTest NumSections", "[wpimath][filter]") {

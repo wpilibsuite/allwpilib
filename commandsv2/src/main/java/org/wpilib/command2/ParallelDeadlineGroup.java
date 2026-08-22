@@ -28,7 +28,7 @@ public class ParallelDeadlineGroup extends Command {
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
-  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.CANCEL_INCOMING;
 
   /**
    * Creates a new ParallelDeadlineGroup. The given commands, including the deadline, will be
@@ -88,8 +88,8 @@ public class ParallelDeadlineGroup extends Command {
       m_commands.put(command, false);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
-      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
-        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      if (command.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF) {
+        m_interruptBehavior = InterruptionBehavior.CANCEL_SELF;
       }
     }
   }

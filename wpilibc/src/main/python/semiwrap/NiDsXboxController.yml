@@ -80,21 +80,21 @@ classes:
       LogTo:
   wpi::NiDsXboxController::Button:
     attributes:
-      kLeftBumper:
-      kRightBumper:
-      kLeftStick:
-      kRightStick:
-      kA:
-      kB:
-      kX:
-      kY:
-      kBack:
-      kStart:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      LEFT_STICK:
+      RIGHT_STICK:
+      A:
+      B:
+      X:
+      Y:
+      BACK:
+      START:
   wpi::NiDsXboxController::Axis:
     attributes:
-      kLeftX:
-      kRightX:
-      kLeftY:
-      kRightY:
-      kLeftTrigger:
-      kRightTrigger:
+      LEFT_X:
+      RIGHT_X:
+      LEFT_Y:
+      RIGHT_Y:
+      LEFT_TRIGGER:
+      RIGHT_TRIGGER:

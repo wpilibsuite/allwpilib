@@ -263,12 +263,12 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
       MecanumDriveWheelVelocities{5_mps, 6_mps, 4_mps, 7_mps}.Desaturate(
           5.5_mps);
 
-  double kFactor = 5.5 / 7.0;
+  double FACTOR = 5.5 / 7.0;
 
-  CHECK_NEAR(wheelVelocities.frontLeft.value(), 5.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.frontRight.value(), 6.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.rearRight.value(), 7.0 * kFactor, 1E-9);
+  CHECK_NEAR(wheelVelocities.frontLeft.value(), 5.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.frontRight.value(), 6.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.rearLeft.value(), 4.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.rearRight.value(), 7.0 * FACTOR, 1E-9);
 }
 
 TEST_CASE_METHOD(MecanumDriveKinematicsTest,
@@ -278,12 +278,12 @@ TEST_CASE_METHOD(MecanumDriveKinematicsTest,
       MecanumDriveWheelVelocities{-5_mps, 6_mps, 4_mps, -7_mps}.Desaturate(
           5.5_mps);
 
-  constexpr double kFactor = 5.5 / 7.0;
+  constexpr double FACTOR = 5.5 / 7.0;
 
-  CHECK_NEAR(wheelVelocities.frontLeft.value(), -5.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.frontRight.value(), 6.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.rearLeft.value(), 4.0 * kFactor, 1E-9);
-  CHECK_NEAR(wheelVelocities.rearRight.value(), -7.0 * kFactor, 1E-9);
+  CHECK_NEAR(wheelVelocities.frontLeft.value(), -5.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.frontRight.value(), 6.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.rearLeft.value(), 4.0 * FACTOR, 1E-9);
+  CHECK_NEAR(wheelVelocities.rearRight.value(), -7.0 * FACTOR, 1E-9);
 }
 
 TEST_CASE_METHOD(MecanumDriveKinematicsTest,

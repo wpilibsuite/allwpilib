@@ -18,7 +18,7 @@ public class SerialPort implements AutoCloseable {
     ONBOARD(0),
     /** MXP (roboRIO MXP) serial port. */
     MXP(1),
-    /** USB serial port (same as kUSB1). */
+    /** USB serial port (same as USB1). */
     USB(2),
     /** USB serial port 1. */
     USB_1(2),

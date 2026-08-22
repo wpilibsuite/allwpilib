@@ -1,7 +1,7 @@
 classes:
   wpi::xrp::XRPOnBoardIO:
     attributes:
-      kMessageInterval:
+      MESSAGE_INTERVAL:
       m_nextMessageTime:
     methods:
       XRPOnBoardIO:

@@ -57,8 +57,8 @@ class Robot : public wpi::TimedRobot {
   wpi::Compressor compressor{wpi::CANBus::CAN_S0,
                              wpi::PneumaticsModuleType::REV_PH};
 
-  static constexpr int kSolenoidButton = 1;
-  static constexpr int kDoubleSolenoidForward = 2;
-  static constexpr int kDoubleSolenoidReverse = 3;
-  static constexpr int kCompressorButton = 4;
+  static constexpr int SOLENOID_BUTTON = 1;
+  static constexpr int DOUBLE_SOLENOID_FORWARD = 2;
+  static constexpr int DOUBLE_SOLENOID_REVERSE = 3;
+  static constexpr int COMPRESSOR_BUTTON = 4;
 };

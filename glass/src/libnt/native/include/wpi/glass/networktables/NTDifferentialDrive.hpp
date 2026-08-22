@@ -16,7 +16,7 @@
 namespace wpi::glass {
 class NTDifferentialDriveModel : public DriveModel {
  public:
-  static constexpr const char* kType = "DifferentialDrive";
+  static constexpr const char* TYPE = "DifferentialDrive";
 
   explicit NTDifferentialDriveModel(std::string_view path);
   NTDifferentialDriveModel(wpi::nt::NetworkTableInstance instance,

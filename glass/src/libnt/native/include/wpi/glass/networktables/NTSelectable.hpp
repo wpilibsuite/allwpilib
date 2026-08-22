@@ -16,7 +16,7 @@ namespace wpi::glass {
 
 class NTSelectableModel : public SelectableModel {
  public:
-  static constexpr const char* kType = "Selectable";
+  static constexpr const char* TYPE = "Selectable";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTSelectableModel(std::string_view path);

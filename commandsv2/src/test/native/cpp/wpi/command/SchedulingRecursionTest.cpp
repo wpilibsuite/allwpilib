@@ -23,7 +23,7 @@ class SelfCancellingCommand
   SelfCancellingCommand(CommandScheduler* scheduler, int& counter,
                         Subsystem* requirement,
                         Command::InterruptionBehavior interruptionBehavior =
-                            Command::InterruptionBehavior::kCancelSelf)
+                            Command::InterruptionBehavior::CANCEL_SELF)
       : m_scheduler(scheduler),
         m_counter(counter),
         m_interrupt(interruptionBehavior) {
@@ -411,16 +411,16 @@ namespace {
     Check##Name(Command::InterruptionBehavior::Behavior);   \
   }
 
-SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, kCancelSelf)
-SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, kCancelIncoming)
+SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, CANCEL_SELF)
+SCHEDULING_RECURSION_TEST_CASE(CancelFromInitialize, CANCEL_INCOMING)
 SCHEDULING_RECURSION_TEST_CASE(DefaultCommandGetsRescheduledAfterSelfCanceling,
-                               kCancelSelf)
+                               CANCEL_SELF)
 SCHEDULING_RECURSION_TEST_CASE(DefaultCommandGetsRescheduledAfterSelfCanceling,
-                               kCancelIncoming)
-SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, kCancelSelf)
-SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, kCancelIncoming)
-SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, kCancelSelf)
-SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, kCancelIncoming)
+                               CANCEL_INCOMING)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, CANCEL_SELF)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndCancel, CANCEL_INCOMING)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, CANCEL_SELF)
+SCHEDULING_RECURSION_TEST_CASE(ScheduleFromEndInterrupt, CANCEL_INCOMING)
 
 #undef SCHEDULING_RECURSION_TEST_CASE
 

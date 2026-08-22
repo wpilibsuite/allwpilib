@@ -28,16 +28,16 @@ TEST_CASE("DigitalPWMSimTest Initialize", "[wpilibc][simulation]") {
   auto dutyCycleCB =
       sim.RegisterDutyCycleCallback(dutyCycleCallback.GetCallback(), false);
 
-  constexpr double kTestDutyCycle = 0.191;
-  output.EnablePWM(kTestDutyCycle);
+  constexpr double TEST_DUTY_CYCLE = 0.191;
+  output.EnablePWM(TEST_DUTY_CYCLE);
 
   CHECK(sim.GetInitialized());
   CHECK(initializeCallback.WasTriggered());
   CHECK(initializeCallback.GetLastValue());
 
-  CHECK(kTestDutyCycle == sim.GetDutyCycle());
+  CHECK(TEST_DUTY_CYCLE == sim.GetDutyCycle());
   CHECK(dutyCycleCallback.WasTriggered());
-  CHECK(kTestDutyCycle == dutyCycleCallback.GetLastValue());
+  CHECK(TEST_DUTY_CYCLE == dutyCycleCallback.GetLastValue());
 }
 
 TEST_CASE("DigitalPWMSimTest SetPin", "[wpilibc][simulation]") {

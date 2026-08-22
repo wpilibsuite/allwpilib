@@ -12,7 +12,7 @@ using namespace wpi::math;
 struct SwerveDriveKinematicsStructTestData {
   using Type = SwerveDriveKinematics<4>;
 
-  inline static const Type kTestData{wpi::math::Translation2d{1.0_m, 0.9_m},
+  inline static const Type TEST_DATA{wpi::math::Translation2d{1.0_m, 0.9_m},
                                      wpi::math::Translation2d{1.1_m, -0.8_m},
                                      wpi::math::Translation2d{-1.2_m, 0.7_m},
                                      wpi::math::Translation2d{-1.3_m, -0.6_m}};

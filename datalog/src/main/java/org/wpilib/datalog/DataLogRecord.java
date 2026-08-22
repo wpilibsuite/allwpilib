@@ -18,9 +18,9 @@ import java.util.InputMismatchException;
  * Used only for reading (e.g. with DataLogReader).
  */
 public class DataLogRecord {
-  private static final int kControlStart = 0;
-  private static final int kControlFinish = 1;
-  private static final int kControlSetMetadata = 2;
+  private static final int CONTROL_START = 0;
+  private static final int CONTROL_FINISH = 1;
+  private static final int CONTROL_SET_METADATA = 2;
 
   DataLogRecord(int entry, long timestamp, ByteBuffer data) {
     m_entry = entry;
@@ -97,7 +97,7 @@ public class DataLogRecord {
    * @return True if start control record, false otherwise.
    */
   public boolean isStart() {
-    return m_entry == 0 && m_data.remaining() >= 17 && m_data.get(0) == kControlStart;
+    return m_entry == 0 && m_data.remaining() >= 17 && m_data.get(0) == CONTROL_START;
   }
 
   /**
@@ -107,7 +107,7 @@ public class DataLogRecord {
    * @return True if finish control record, false otherwise.
    */
   public boolean isFinish() {
-    return m_entry == 0 && m_data.remaining() == 5 && m_data.get(0) == kControlFinish;
+    return m_entry == 0 && m_data.remaining() == 5 && m_data.get(0) == CONTROL_FINISH;
   }
 
   /**
@@ -117,7 +117,7 @@ public class DataLogRecord {
    * @return True if set metadata control record, false otherwise.
    */
   public boolean isSetMetadata() {
-    return m_entry == 0 && m_data.remaining() >= 9 && m_data.get(0) == kControlSetMetadata;
+    return m_entry == 0 && m_data.remaining() >= 9 && m_data.get(0) == CONTROL_SET_METADATA;
   }
 
   /**

@@ -281,7 +281,7 @@ class Trigger {
    */
   Trigger Debounce(wpi::units::second_t debounceTime,
                    wpi::math::Debouncer::DebounceType type =
-                       wpi::math::Debouncer::DebounceType::kRising);
+                       wpi::math::Debouncer::DebounceType::RISING);
 
   /**
    * Creates a new multi-press trigger from this trigger - it will become active

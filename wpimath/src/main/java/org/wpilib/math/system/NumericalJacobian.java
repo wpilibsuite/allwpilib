@@ -17,7 +17,7 @@ public final class NumericalJacobian {
     // Utility Class.
   }
 
-  private static final double kEpsilon = 1e-5;
+  private static final double EPSILON = 1e-5;
 
   /**
    * Computes the numerical Jacobian with respect to x for f(x).
@@ -42,9 +42,9 @@ public final class NumericalJacobian {
     for (int i = 0; i < cols.getNum(); i++) {
       var dxPlus = x.copy();
       var dxMinus = x.copy();
-      dxPlus.set(i, 0, dxPlus.get(i, 0) + kEpsilon);
-      dxMinus.set(i, 0, dxMinus.get(i, 0) - kEpsilon);
-      var dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * kEpsilon);
+      dxPlus.set(i, 0, dxPlus.get(i, 0) + EPSILON);
+      dxMinus.set(i, 0, dxMinus.get(i, 0) - EPSILON);
+      var dF = f.apply(dxPlus).minus(f.apply(dxMinus)).div(2 * EPSILON);
 
       result.setColumn(i, Matrix.changeBoundsUnchecked(dF));
     }

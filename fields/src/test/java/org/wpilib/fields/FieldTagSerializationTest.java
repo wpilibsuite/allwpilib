@@ -27,8 +27,8 @@ class FieldTagSerializationTest {
             Units.feetToMeters(27.0),
             "frc",
             List.of(
-                new FieldTag(1, Pose3d.kZero),
-                new FieldTag(3, new Pose3d(0, 1, 0, Rotation3d.kZero))));
+                new FieldTag(1, Pose3d.ZERO),
+                new FieldTag(3, new Pose3d(0, 1, 0, Rotation3d.ZERO))));
 
     var fieldType = Jsonb.instance().type(Field.class);
 

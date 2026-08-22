@@ -37,15 +37,15 @@ class RobotContainer {
   HatchSubsystem hatch;
 
   // The autonomous routines
-  DriveDistance simpleAuto{AutoConstants::kAutoDriveDistanceInches,
-                           AutoConstants::kAutoDriveVelocity, &drive};
+  DriveDistance simpleAuto{AutoConstants::AUTO_DRIVE_DISTANCE_INCHES,
+                           AutoConstants::AUTO_DRIVE_VELOCITY, &drive};
   ComplexAuto complexAuto{&drive, &hatch};
 
   // The chooser for the autonomous routines
   wpi::tunables::Selectable<wpi::cmd::Command*> chooser;
 
   // The driver's controller
-  wpi::Gamepad driverController{OIConstants::kDriverControllerPort};
+  wpi::Gamepad driverController{OIConstants::DRIVER_CONTROLLER_PORT};
 
   void ConfigureButtonBindings();
 };

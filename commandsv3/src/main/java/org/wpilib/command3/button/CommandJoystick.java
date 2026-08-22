@@ -76,7 +76,7 @@ public class CommandJoystick {
    *     given loop.
    */
   public Trigger trigger(EventLoop loop) {
-    return m_hid.button(Joystick.ButtonType.kTrigger.value, loop);
+    return m_hid.button(Joystick.ButtonType.TRIGGER.value, loop);
   }
 
   /**
@@ -98,7 +98,7 @@ public class CommandJoystick {
    *     loop.
    */
   public Trigger top(EventLoop loop) {
-    return m_hid.button(Joystick.ButtonType.kTop.value, loop);
+    return m_hid.button(Joystick.ButtonType.TOP.value, loop);
   }
 
   /**

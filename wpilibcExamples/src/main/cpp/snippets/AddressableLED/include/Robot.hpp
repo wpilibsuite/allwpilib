@@ -16,15 +16,15 @@ class Robot : public wpi::TimedRobot {
   void RobotPeriodic() override;
 
  private:
-  static constexpr int kLength = 60;
+  static constexpr int LENGTH = 60;
 
   // SmartIO port 1
   wpi::AddressableLED led{1};
-  std::array<wpi::AddressableLED::LEDData, kLength>
+  std::array<wpi::AddressableLED::LEDData, LENGTH>
       ledBuffer;  // Reuse the buffer
 
   // Our LED strip has a density of 120 LEDs per meter
-  wpi::units::meter_t kLedSpacing{1 / 120.0};
+  wpi::units::meter_t LED_SPACING{1 / 120.0};
 
   // Create an LED pattern that will display a rainbow across
   // all hues at maximum saturation and half brightness
@@ -33,5 +33,5 @@ class Robot : public wpi::TimedRobot {
   // Create a new pattern that scrolls the rainbow pattern across the LED
   // strip, moving at a velocity of 1 meter per second.
   wpi::LEDPattern scrollingRainbow =
-      rainbow.ScrollAtAbsoluteVelocity(1_mps, kLedSpacing);
+      rainbow.ScrollAtAbsoluteVelocity(1_mps, LED_SPACING);
 };

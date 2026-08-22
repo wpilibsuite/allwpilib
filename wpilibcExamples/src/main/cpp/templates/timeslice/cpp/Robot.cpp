@@ -19,8 +19,8 @@ Robot::Robot() : wpi::TimesliceRobot{5_ms, 10_ms} {
   // 5 ms (robot) + 2 ms (controller 1) + 2 ms (controller 2) = 9 ms
   // 9 ms / 10 ms -> 90% allocated
 
-  chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
-  chooser.Add(kAutoNameCustom, kAutoNameCustom);
+  chooser.AddDefault(AUTO_NAME_DEFAULT, AUTO_NAME_DEFAULT);
+  chooser.Add(AUTO_NAME_CUSTOM, AUTO_NAME_CUSTOM);
   wpi::tunables::Publish("Auto Modes", chooser);
 }
 
@@ -49,10 +49,10 @@ void Robot::RobotPeriodic() {}
 void Robot::AutonomousInit() {
   autoSelected = chooser.GetSelected();
   // autoSelected = SmartDashboard::GetString("Auto Selector",
-  //     kAutoNameDefault);
+  //     AUTO_NAME_DEFAULT);
   wpi::util::print("Auto selected: {}\n", autoSelected);
 
-  if (autoSelected == kAutoNameCustom) {
+  if (autoSelected == AUTO_NAME_CUSTOM) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
@@ -60,7 +60,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  if (autoSelected == kAutoNameCustom) {
+  if (autoSelected == AUTO_NAME_CUSTOM) {
     // Custom Auto goes here
   } else {
     // Default Auto goes here
