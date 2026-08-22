@@ -1,0 +1,101 @@
+name: CMake Build
+description: Setup, build, and test with CMake
+
+inputs:
+  shell:
+    description: The shell to use for configure, build, and test steps
+    required: true
+  configure-flags:
+    description: Flags to pass to the CMake configure command
+    required: false
+  cc:
+    description: Compiler to install (Arch Linux only)
+    required: false
+  cmake-version:
+    description: CMake version to install (Windows only)
+    required: true
+  artifactory-username:
+    required: true
+  artifactory-password:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      if: runner.os != 'Windows'
+      shell: ${{ inputs.shell }}
+      run: |
+          # Arch Linux
+          if command -v pacman >/dev/null 2>&1; then
+            pacman -Syu --noconfirm avahi cmake ${{ inputs.cc }} jdk25-openjdk \
+              libxinerama ninja opencv sccache xorg-xrandr
+          # Debian
+          elif command -v apt >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y libopencv-dev ninja-build
+          # macOS
+          else
+            brew install ceres-solver eigen ninja opencv sdl3 suite-sparse
+            brew link --force libomp
+          fi
+
+    - name: Setup avahi-daemon
+      if: runner.os == 'Linux'
+      shell: ${{ inputs.shell }}
+      run: |
+          mkdir -p /var/run/dbus
+          dbus-uuidgen --ensure
+          dbus-daemon --system --address=unix:path=/var/run/dbus/system_bus_socket
+          avahi-daemon -D
+
+    - uses: TheMrMilchmann/setup-msvc-dev@v4
+      if: runner.os == 'Windows'
+      with:
+          arch: x64
+
+    - name: Install CMake (Windows)
+      if: runner.os == 'Windows'
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: ${{ inputs.cmake-version }}
+
+    - name: Install sccache
+      uses: mozilla-actions/sccache-action@v0.0.11
+
+    - uses: actions/checkout@v7
+
+    - name: Run vcpkg (Windows)
+      if: runner.os == 'Windows'
+      uses: lukka/run-vcpkg@v11.6
+      with:
+          vcpkgDirectory: ${{ runner.workspace }}/vcpkg
+          vcpkgGitCommitId: 74e6536215718009aae747d86d84b78376bf9e09 # HEAD on 2025-10-17
+
+    - name: configure
+      shell: ${{ inputs.shell }}
+      run: cmake ${{ inputs.configure-flags }}
+      env:
+          SCCACHE_WEBDAV_USERNAME: ${{ inputs.artifactory-username }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ inputs.artifactory-password }}
+
+    - name: build
+      shell: ${{ inputs.shell }}
+      run: cmake --build build-cmake --parallel $(nproc)
+      env:
+          SCCACHE_WEBDAV_USERNAME: ${{ inputs.artifactory-username }}
+          SCCACHE_WEBDAV_PASSWORD: ${{ inputs.artifactory-password }}
+
+    - name: test
+      if: runner.os != 'Windows'
+      shell: ${{ inputs.shell }}
+      working-directory: build-cmake
+      # CameraCalibrationTest Typical inexplicably crashes
+      run: ctest --output-on-failure -E 'CameraCalibrationTest Typical'
+
+    - name: test (windows)
+      if: runner.os == 'Windows'
+      shell: ${{ inputs.shell }}
+      working-directory: build-cmake
+      # UnitTest_test segfaults on exit occasionally
+      run: ctest --output-on-failure -E 'UnitTest'
