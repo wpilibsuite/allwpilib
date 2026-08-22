@@ -94,9 +94,9 @@ int main(int argc, const char** argv) {
         int64_t val;
         if (record.GetInteger(&val)) {
           auto timeval = std::chrono::system_clock::time_point(
-              std::chrono::seconds(val / 1'000'000'000));
-          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:09}\n", timeval,
-                           val % 1'000'000'000);
+              std::chrono::seconds(val / 1'000'000));
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n", timeval,
+                           val % 1'000'000);
         } else {
           wpi::util::print("  invalid\n");
         }
