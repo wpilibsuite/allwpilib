@@ -40,7 +40,7 @@ Downloader::Downloader(wpi::glass::Storage& storage)
 Downloader::~Downloader() {
   {
     std::scoped_lock lock{m_mutex};
-    m_state = EXIT;
+    m_state = STATE_EXIT;
   }
   m_cv.notify_all();
   m_thread.join();
@@ -59,14 +59,14 @@ void Downloader::DisplayConnect() {
 
   // Connect button
   if (ImGui::Button("Connect")) {
-    m_state = CONNECTING;
+    m_state = STATE_CONNECTING;
     m_cv.notify_all();
   }
 }
 
 void Downloader::DisplayDisconnectButton() {
   if (ImGui::Button("Disconnect")) {
-    m_state = DISCONNECTING;
+    m_state = STATE_DISCONNECTING;
     m_cv.notify_all();
   }
 }
@@ -74,7 +74,7 @@ void Downloader::DisplayDisconnectButton() {
 void Downloader::DisplayRemoteDirSelector() {
   ImGui::SameLine();
   if (ImGui::Button("Refresh")) {
-    m_state = GET_FILES;
+    m_state = STATE_GET_FILES;
     m_cv.notify_all();
   }
 
@@ -96,7 +96,7 @@ void Downloader::DisplayRemoteDirSelector() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
   if (ImGui::InputText("Remote Dir", &m_remoteDir,
                        ImGuiInputTextFlags_EnterReturnsTrue)) {
-    m_state = GET_FILES;
+    m_state = STATE_GET_FILES;
     m_cv.notify_all();
   }
 
@@ -117,7 +117,7 @@ void Downloader::DisplayRemoteDirSelector() {
         }
         m_remoteDir += dir;
       }
-      m_state = GET_FILES;
+      m_state = STATE_GET_FILES;
       m_cv.notify_all();
     }
   }
@@ -137,7 +137,7 @@ void Downloader::DisplayLocalDirSelector() {
   // Download button
   if (!m_localDir.empty()) {
     if (ImGui::Button("Download")) {
-      m_state = DOWNLOAD;
+      m_state = STATE_DOWNLOAD;
       m_cv.notify_all();
     }
   }
@@ -152,7 +152,7 @@ void Downloader::DisplayLocalDirSelector() {
   if (ImGui::BeginPopup("DeleteConfirm")) {
     ImGui::TextUnformatted("Are you sure? This will NOT download the files");
     if (ImGui::Button("DELETE")) {
-      m_state = DELETE;
+      m_state = STATE_DELETE;
       m_cv.notify_all();
       ImGui::CloseCurrentPopup();
     }
@@ -172,14 +172,15 @@ size_t Downloader::DisplayFiles() {
           ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp)) {
     ImGui::TableSetupColumn("File");
     ImGui::TableSetupColumn("Size");
-    ImGui::TableSetupColumn((m_state == DOWNLOAD || m_state == DOWNLOAD_DONE ||
-                             m_state == DELETE || m_state == DELETE_DONE)
-                                ? "Status"
-                                : "Selected");
+    ImGui::TableSetupColumn(
+        (m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE ||
+         m_state == STATE_DELETE || m_state == STATE_DELETE_DONE)
+            ? "Status"
+            : "Selected");
     ImGui::TableHeadersRow();
     for (auto&& file : m_fileList) {
-      if ((m_state == DOWNLOAD || m_state == DOWNLOAD_DONE ||
-           m_state == DELETE || m_state == DELETE_DONE) &&
+      if ((m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE ||
+           m_state == STATE_DELETE || m_state == STATE_DELETE_DONE) &&
           !file.selected) {
         continue;
       }
@@ -193,13 +194,13 @@ size_t Downloader::DisplayFiles() {
       auto sizeText = std::format("{}", file.size);
       ImGui::TextUnformatted(sizeText.c_str());
       ImGui::TableNextColumn();
-      if (m_state == DOWNLOAD || m_state == DOWNLOAD_DONE) {
+      if (m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE) {
         if (!file.status.empty()) {
           ImGui::TextUnformatted(file.status.c_str());
         } else {
           ImGui::ProgressBar(file.complete);
         }
-      } else if (m_state == DELETE || m_state == DELETE_DONE) {
+      } else if (m_state == STATE_DELETE || m_state == STATE_DELETE_DONE) {
         if (!file.status.empty()) {
           ImGui::TextUnformatted(file.status.c_str());
         }
@@ -227,42 +228,42 @@ void Downloader::Display() {
   }
 
   switch (m_state) {
-    case DISCONNECTED:
+    case STATE_DISCONNECTED:
       DisplayConnect();
       break;
-    case CONNECTING:
+    case STATE_CONNECTING:
       DisplayDisconnectButton();
       ImGui::Text("Connecting to %s...", m_serverTeam.c_str());
       break;
-    case DISCONNECTING:
+    case STATE_DISCONNECTING:
       ImGui::TextUnformatted("Disconnecting...");
       break;
-    case CONNECTED:
-    case GET_FILES:
+    case STATE_CONNECTED:
+    case STATE_GET_FILES:
       DisplayDisconnectButton();
       DisplayRemoteDirSelector();
       if (DisplayFiles() > 0) {
         DisplayLocalDirSelector();
       }
       break;
-    case DOWNLOAD:
-    case DOWNLOAD_DONE:
+    case STATE_DOWNLOAD:
+    case STATE_DOWNLOAD_DONE:
       DisplayDisconnectButton();
       DisplayFiles();
-      if (m_state == DOWNLOAD_DONE) {
+      if (m_state == STATE_DOWNLOAD_DONE) {
         if (ImGui::Button("Download complete!")) {
-          m_state = GET_FILES;
+          m_state = STATE_GET_FILES;
           m_cv.notify_all();
         }
       }
       break;
-    case DELETE:
-    case DELETE_DONE:
+    case STATE_DELETE:
+    case STATE_DELETE_DONE:
       DisplayDisconnectButton();
       DisplayFiles();
-      if (m_state == DELETE_DONE) {
+      if (m_state == STATE_DELETE_DONE) {
         if (ImGui::Button("Deletion complete!")) {
-          m_state = GET_FILES;
+          m_state = STATE_GET_FILES;
           m_cv.notify_all();
         }
       }
@@ -279,13 +280,13 @@ void Downloader::ThreadMain() {
   std::unique_ptr<uint8_t[]> copyBuf = std::make_unique<uint8_t[]>(BUF_SIZE);
 
   std::unique_lock lock{m_mutex};
-  while (m_state != EXIT) {
+  while (m_state != STATE_EXIT) {
     State prev = m_state;
     m_cv.wait(lock, [&] { return m_state != prev; });
     m_error.clear();
     try {
       switch (m_state) {
-        case CONNECTING:
+        case STATE_CONNECTING:
           if (auto team =
                   wpi::util::parse_integer<unsigned int>(m_serverTeam, 10)) {
             // team number
@@ -304,7 +305,7 @@ void Downloader::ThreadMain() {
           }
           lock.lock();
           // FALLTHROUGH
-        case GET_FILES: {
+        case STATE_GET_FILES: {
           std::string dir = m_remoteDir;
           std::vector<sftp::Attributes> fileList;
           lock.unlock();
@@ -318,7 +319,7 @@ void Downloader::ThreadMain() {
             m_error = ex.what();
             m_dirList.clear();
             m_fileList.clear();
-            m_state = CONNECTED;
+            m_state = STATE_CONNECTED;
             break;
           }
           std::sort(
@@ -340,16 +341,16 @@ void Downloader::ThreadMain() {
             }
           }
 
-          m_state = CONNECTED;
+          m_state = STATE_CONNECTED;
           break;
         }
-        case DISCONNECTING:
+        case STATE_DISCONNECTING:
           session.reset();
-          m_state = DISCONNECTED;
+          m_state = STATE_DISCONNECTED;
           break;
-        case DOWNLOAD: {
+        case STATE_DOWNLOAD: {
           for (auto&& file : m_fileList) {
-            if (m_state != DOWNLOAD) {
+            if (m_state != STATE_DOWNLOAD) {
               // user aborted
               break;
             }
@@ -433,14 +434,14 @@ void Downloader::ThreadMain() {
             lock.lock();
           err: {}
           }
-          if (m_state == DOWNLOAD) {
-            m_state = DOWNLOAD_DONE;
+          if (m_state == STATE_DOWNLOAD) {
+            m_state = STATE_DOWNLOAD_DONE;
           }
           break;
         }
-        case DELETE: {
+        case STATE_DELETE: {
           for (auto&& file : m_fileList) {
-            if (m_state != DELETE) {
+            if (m_state != STATE_DELETE) {
               // user aborted
               break;
             }
@@ -466,8 +467,8 @@ void Downloader::ThreadMain() {
             lock.lock();
             file.status = "Deleted";
           }
-          if (m_state == DELETE) {
-            m_state = DELETE_DONE;
+          if (m_state == STATE_DELETE) {
+            m_state = STATE_DELETE_DONE;
           }
           break;
         }
@@ -477,7 +478,7 @@ void Downloader::ThreadMain() {
     } catch (sftp::Exception& ex) {
       m_error = ex.what();
       session.reset();
-      m_state = DISCONNECTED;
+      m_state = STATE_DISCONNECTED;
     }
   }
 }
