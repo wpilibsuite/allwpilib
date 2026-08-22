@@ -66,6 +66,20 @@ class NetworkTablesTelemetryBackendTest {
   }
 
   @Test
+  void publishesExplicitTimestamp() {
+    long timestamp = 123456789L;
+    var backend = new NetworkTablesTelemetryBackend(m_inst, "/Telemetry");
+    var sub = m_inst.getDoubleTopic("/Telemetry/timestamped").subscribe(0.0);
+
+    backend.getEntry("/timestamped").logDouble(2.5, timestamp);
+
+    var value = sub.getAtomic();
+    assertEquals(timestamp, value.timestamp);
+    assertEquals(2.5, value.value);
+    backend.close();
+  }
+
+  @Test
   void publishesArrayAndRawDataTypes() {
     Telemetry.log("booleans", new boolean[] {true, false});
     Telemetry.log("shorts", new short[] {1, 2});
@@ -265,12 +279,12 @@ class NetworkTablesTelemetryBackendTest {
     var staleEntry = backend.getEntry("/stale");
     backend.removeEntry("/stale");
 
-    staleEntry.logDouble(1.25);
+    staleEntry.logDouble(1.25, 0);
 
     var topic = m_inst.getTopic("/Telemetry/stale");
     assertFalse(topic.exists());
 
-    backend.getEntry("/stale").logDouble(2.5);
+    backend.getEntry("/stale").logDouble(2.5, 0);
 
     assertTrue(topic.exists());
     assertEquals(2.5, topic.getGenericEntry().getDouble(0.0));

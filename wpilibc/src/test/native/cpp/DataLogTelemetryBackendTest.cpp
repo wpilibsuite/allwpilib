@@ -39,6 +39,7 @@ class DataLogTelemetryBackendTest {
     std::string type;
     std::string metadata;
     std::vector<std::vector<uint8_t>> records;
+    std::vector<int64_t> timestamps;
   };
 
   struct LogSnapshot {
@@ -88,6 +89,8 @@ class DataLogTelemetryBackendTest {
           auto raw = record.GetRaw();
           snapshot.entries[it->second].records.emplace_back(raw.begin(),
                                                             raw.end());
+          snapshot.entries[it->second].timestamps.emplace_back(
+              record.GetTimestamp());
         }
       }
     }
@@ -263,6 +266,20 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
 }
 
 TEST_CASE_METHOD(DataLogTelemetryBackendTest,
+                 "DataLogTelemetryBackendTest LogsExplicitTimestamp",
+                 "[wpilibc][telemetry]") {
+  constexpr int64_t timestamp = 123456789;
+
+  backend->GetEntry("/timestamped")->LogDouble(2.5, timestamp);
+
+  auto snapshot = ReadSnapshot();
+  const auto& timestamped = Entry(snapshot, "timestamped");
+  REQUIRE_FALSE(timestamped.timestamps.empty());
+  CHECK(timestamp == timestamped.timestamps.back());
+  CHECK(2.5 == DecodeDouble(Last(timestamped)));
+}
+
+TEST_CASE_METHOD(DataLogTelemetryBackendTest,
                  "DataLogTelemetryBackendTest LogsArrayAndRawDataTypes",
                  "[wpilibc][telemetry]") {
   const bool boolValues[] = {true, false};
@@ -400,8 +417,8 @@ TEST_CASE_METHOD(DataLogTelemetryBackendTest,
   auto staleEntry = backend->GetEntry("/stale");
   backend->RemoveEntry("/stale");
 
-  staleEntry->LogDouble(1.25);
-  backend->GetEntry("/stale")->LogDouble(2.5);
+  staleEntry->LogDouble(1.25, 0);
+  backend->GetEntry("/stale")->LogDouble(2.5, 0);
 
   auto snapshot = ReadSnapshot();
   const auto& stale = Entry(snapshot, "stale");

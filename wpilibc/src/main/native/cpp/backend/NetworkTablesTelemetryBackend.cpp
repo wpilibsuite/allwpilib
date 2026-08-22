@@ -84,7 +84,7 @@ class NetworkTablesTelemetryBackend::Entry
     }
   }
 
-  void LogBoolean(bool value) override {
+  void LogBoolean(bool value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -94,14 +94,14 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("boolean");
       }
-      typeMismatch = !m_pub.SetBoolean(value);
+      typeMismatch = !m_pub.SetBoolean(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogInt64(int64_t value) override {
+  void LogInt64(int64_t value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -111,14 +111,14 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("int");
       }
-      typeMismatch = !m_pub.SetInteger(value);
+      typeMismatch = !m_pub.SetInteger(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogFloat(float value) override {
+  void LogFloat(float value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -128,14 +128,14 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("float");
       }
-      typeMismatch = !m_pub.SetFloat(value);
+      typeMismatch = !m_pub.SetFloat(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogDouble(double value) override {
+  void LogDouble(double value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -145,14 +145,15 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("double");
       }
-      typeMismatch = !m_pub.SetDouble(value);
+      typeMismatch = !m_pub.SetDouble(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogString(std::string_view value, std::string_view typeString) override {
+  void LogString(std::string_view value, std::string_view typeString,
+                 int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -162,14 +163,16 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish(typeString);
       }
-      typeMismatch = m_typeString != typeString || !m_pub.SetString(value);
+      typeMismatch =
+          m_typeString != typeString || !m_pub.SetString(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogBooleanArray(std::span<const bool> value) override {
+  void LogBooleanArray(std::span<const bool> value,
+                       int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -179,14 +182,14 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("boolean[]");
       }
-      typeMismatch = !m_pub.SetBooleanArray(value);
+      typeMismatch = !m_pub.SetBooleanArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogBooleanArray(std::span<const int> value) override {
+  void LogBooleanArray(std::span<const int> value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -196,24 +199,27 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("boolean[]");
       }
-      typeMismatch = !m_pub.SetBooleanArray(value);
+      typeMismatch = !m_pub.SetBooleanArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogInt16Array(std::span<const int16_t> value) override {
+  void LogInt16Array(std::span<const int16_t> value,
+                     int64_t timestamp) override {
     std::vector<int64_t> arr{value.begin(), value.end()};
-    LogInt64Array(arr);
+    LogInt64Array(arr, timestamp);
   }
 
-  void LogInt32Array(std::span<const int32_t> value) override {
+  void LogInt32Array(std::span<const int32_t> value,
+                     int64_t timestamp) override {
     std::vector<int64_t> arr{value.begin(), value.end()};
-    LogInt64Array(arr);
+    LogInt64Array(arr, timestamp);
   }
 
-  void LogInt64Array(std::span<const int64_t> value) override {
+  void LogInt64Array(std::span<const int64_t> value,
+                     int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -223,14 +229,14 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("int[]");
       }
-      typeMismatch = !m_pub.SetIntegerArray(value);
+      typeMismatch = !m_pub.SetIntegerArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogFloatArray(std::span<const float> value) override {
+  void LogFloatArray(std::span<const float> value, int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -240,14 +246,15 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("float[]");
       }
-      typeMismatch = !m_pub.SetFloatArray(value);
+      typeMismatch = !m_pub.SetFloatArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogDoubleArray(std::span<const double> value) override {
+  void LogDoubleArray(std::span<const double> value,
+                      int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -257,14 +264,15 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("double[]");
       }
-      typeMismatch = !m_pub.SetDoubleArray(value);
+      typeMismatch = !m_pub.SetDoubleArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogStringArray(std::span<const std::string> value) override {
+  void LogStringArray(std::span<const std::string> value,
+                      int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -274,24 +282,25 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish("string[]");
       }
-      typeMismatch = !m_pub.SetStringArray(value);
+      typeMismatch = !m_pub.SetStringArray(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");
     }
   }
 
-  void LogStringArray(std::span<const std::string_view> value) override {
+  void LogStringArray(std::span<const std::string_view> value,
+                      int64_t timestamp) override {
     std::vector<std::string> arr;
     arr.reserve(value.size());
     for (auto&& val : value) {
       arr.emplace_back(val);
     }
-    LogStringArray(arr);
+    LogStringArray(arr, timestamp);
   }
 
-  void LogRaw(std::span<const uint8_t> value,
-              std::string_view typeString) override {
+  void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+              int64_t timestamp) override {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -301,7 +310,8 @@ class NetworkTablesTelemetryBackend::Entry
       if (!m_pub) {
         m_pub = Publish(typeString);
       }
-      typeMismatch = m_typeString != typeString || !m_pub.SetRaw(value);
+      typeMismatch =
+          m_typeString != typeString || !m_pub.SetRaw(value, timestamp);
     }
     if (typeMismatch) {
       wpi::telemetry::TelemetryRegistry::ReportWarning(m_path, "type mismatch");

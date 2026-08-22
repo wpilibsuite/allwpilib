@@ -230,52 +230,52 @@ class TelemetryTableTest {
     public void setProperty(String key, String value) {}
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {}
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {}
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {}
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {}
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {}
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {}
 
     @Override
-    public void logBoolean(boolean value) {}
+    public void logBoolean(boolean value, long timestamp) {}
 
     @Override
-    public void logLong(long value) {}
+    public void logLong(long value, long timestamp) {}
 
     @Override
-    public void logFloat(float value) {}
+    public void logFloat(float value, long timestamp) {}
 
     @Override
-    public void logDouble(double value) {}
+    public void logDouble(double value, long timestamp) {}
 
     @Override
-    public void logString(String value, String typeString) {}
+    public void logString(String value, String typeString, long timestamp) {}
 
     @Override
-    public void logBooleanArray(boolean[] value) {}
+    public void logBooleanArray(boolean[] value, long timestamp) {}
 
     @Override
-    public void logShortArray(short[] value) {}
+    public void logShortArray(short[] value, long timestamp) {}
 
     @Override
-    public void logIntArray(int[] value) {}
+    public void logIntArray(int[] value, long timestamp) {}
 
     @Override
-    public void logLongArray(long[] value) {}
+    public void logLongArray(long[] value, long timestamp) {}
 
     @Override
-    public void logFloatArray(float[] value) {}
+    public void logFloatArray(float[] value, long timestamp) {}
 
     @Override
-    public void logDoubleArray(double[] value) {}
+    public void logDoubleArray(double[] value, long timestamp) {}
 
     @Override
-    public void logStringArray(String[] value) {}
+    public void logStringArray(String[] value, long timestamp) {}
 
     @Override
-    public void logRaw(byte[] value, String typeString) {}
+    public void logRaw(byte[] value, String typeString, long timestamp) {}
 
     private final CountDownLatch m_enteredIsDiscard;
     private final CountDownLatch m_releaseIsDiscard;
@@ -315,54 +315,54 @@ class TelemetryTableTest {
       public void setProperty(String key, String value) {}
 
       @Override
-      public <T> void logStruct(T value, Struct<? super T> struct) {}
+      public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {}
 
       @Override
-      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {}
+      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {}
 
       @Override
-      public <T> void logStructArray(T[] value, Struct<? super T> struct) {}
+      public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {}
 
       @Override
-      public void logBoolean(boolean value) {}
+      public void logBoolean(boolean value, long timestamp) {}
 
       @Override
-      public void logLong(long value) {}
+      public void logLong(long value, long timestamp) {}
 
       @Override
-      public void logFloat(float value) {}
+      public void logFloat(float value, long timestamp) {}
 
       @Override
-      public void logDouble(double value) {
+      public void logDouble(double value, long timestamp) {
         m_logGenerations.add(m_generation);
       }
 
       @Override
-      public void logString(String value, String typeString) {}
+      public void logString(String value, String typeString, long timestamp) {}
 
       @Override
-      public void logBooleanArray(boolean[] value) {}
+      public void logBooleanArray(boolean[] value, long timestamp) {}
 
       @Override
-      public void logShortArray(short[] value) {}
+      public void logShortArray(short[] value, long timestamp) {}
 
       @Override
-      public void logIntArray(int[] value) {}
+      public void logIntArray(int[] value, long timestamp) {}
 
       @Override
-      public void logLongArray(long[] value) {}
+      public void logLongArray(long[] value, long timestamp) {}
 
       @Override
-      public void logFloatArray(float[] value) {}
+      public void logFloatArray(float[] value, long timestamp) {}
 
       @Override
-      public void logDoubleArray(double[] value) {}
+      public void logDoubleArray(double[] value, long timestamp) {}
 
       @Override
-      public void logStringArray(String[] value) {}
+      public void logStringArray(String[] value, long timestamp) {}
 
       @Override
-      public void logRaw(byte[] value, String typeString) {}
+      public void logRaw(byte[] value, String typeString, long timestamp) {}
 
       private final int m_generation;
     }
@@ -415,58 +415,58 @@ class TelemetryTableTest {
       public void setProperty(String key, String value) {}
 
       @Override
-      public <T> void logStruct(T value, Struct<? super T> struct) {}
+      public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {}
 
       @Override
-      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {}
+      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {}
 
       @Override
-      public <T> void logStructArray(T[] value, Struct<? super T> struct) {}
+      public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {}
 
       @Override
-      public void logBoolean(boolean value) {}
+      public void logBoolean(boolean value, long timestamp) {}
 
       @Override
-      public void logLong(long value) {}
+      public void logLong(long value, long timestamp) {}
 
       @Override
-      public void logFloat(float value) {
-        logDouble(value);
+      public void logFloat(float value, long timestamp) {
+        logDouble(value, timestamp);
       }
 
       @Override
-      public void logDouble(double value) {
+      public void logDouble(double value, long timestamp) {
         if (!m_closed) {
           m_logs++;
         }
       }
 
       @Override
-      public void logString(String value, String typeString) {}
+      public void logString(String value, String typeString, long timestamp) {}
 
       @Override
-      public void logBooleanArray(boolean[] value) {}
+      public void logBooleanArray(boolean[] value, long timestamp) {}
 
       @Override
-      public void logShortArray(short[] value) {}
+      public void logShortArray(short[] value, long timestamp) {}
 
       @Override
-      public void logIntArray(int[] value) {}
+      public void logIntArray(int[] value, long timestamp) {}
 
       @Override
-      public void logLongArray(long[] value) {}
+      public void logLongArray(long[] value, long timestamp) {}
 
       @Override
-      public void logFloatArray(float[] value) {}
+      public void logFloatArray(float[] value, long timestamp) {}
 
       @Override
-      public void logDoubleArray(double[] value) {}
+      public void logDoubleArray(double[] value, long timestamp) {}
 
       @Override
-      public void logStringArray(String[] value) {}
+      public void logStringArray(String[] value, long timestamp) {}
 
       @Override
-      public void logRaw(byte[] value, String typeString) {}
+      public void logRaw(byte[] value, String typeString, long timestamp) {}
 
       private boolean m_closed;
     }
@@ -713,7 +713,7 @@ class TelemetryTableTest {
   @Test
   void testMockBackendNormalizesPaths() {
     TelemetryEntry entry = m_mock.getEntry("drive//speed");
-    entry.logDouble(1.0);
+    entry.logDouble(1.0, 0);
 
     assertFalse(entry.isDiscard());
     assertEquals(1.0, m_mock.getLastValue("/drive/speed", Double.class));
@@ -725,7 +725,7 @@ class TelemetryTableTest {
     assertTrue(entry.isDiscard());
     assertNull(m_mock.getLastAction("/drive/speed"));
 
-    entry.logDouble(2.0);
+    entry.logDouble(2.0, 0);
 
     assertNull(m_mock.getLastAction("/drive/speed"));
 
@@ -733,7 +733,7 @@ class TelemetryTableTest {
     assertNotSame(newEntry, entry);
     assertFalse(newEntry.isDiscard());
 
-    newEntry.logDouble(3.0);
+    newEntry.logDouble(3.0, 0);
 
     assertEquals(3.0, m_mock.getLastValue("/drive/speed", Double.class));
   }
@@ -1495,7 +1495,7 @@ class TelemetryTableTest {
     CountingCloseTelemetryBackend child = new CountingCloseTelemetryBackend();
     MultiTelemetryBackend multi = new MultiTelemetryBackend(child, child);
 
-    multi.getEntry("/duplicate").logDouble(1.0);
+    multi.getEntry("/duplicate").logDouble(1.0, 0);
 
     assertEquals(2, child.getActions().size());
     assertEquals("/duplicate", child.getActions().get(0).path());
@@ -1529,13 +1529,13 @@ class TelemetryTableTest {
     TelemetryRegistry.registerBackend("", multi);
 
     TelemetryEntry staleEntry = TelemetryRegistry.getEntry("rerouted");
-    staleEntry.logDouble(1.0);
+    staleEntry.logDouble(1.0, 0);
     child.clear();
 
     TelemetryRegistry.registerBackend("/rerouted", new DiscardTelemetryBackend());
 
     assertTrue(staleEntry.isDiscard());
-    staleEntry.logDouble(2.0);
+    staleEntry.logDouble(2.0, 0);
     assertTrue(child.getActions().isEmpty());
   }
 
@@ -1548,7 +1548,7 @@ class TelemetryTableTest {
     multi.close();
 
     assertTrue(staleEntry.isDiscard());
-    staleEntry.logDouble(1.0);
+    staleEntry.logDouble(1.0, 0);
     assertTrue(child.getActions().isEmpty());
   }
 
@@ -1658,13 +1658,13 @@ class TelemetryTableTest {
     TelemetryRegistry.registerBackend("", backend);
 
     TelemetryEntry entry = TelemetryRegistry.getEntry("direct");
-    entry.logDouble(1.0);
+    entry.logDouble(1.0, 0);
     assertEquals(1, backend.getLogs());
 
     TelemetryRegistry.reset();
 
     assertEquals(1, backend.getRemoves());
-    entry.logDouble(2.0);
+    entry.logDouble(2.0, 0);
     assertEquals(1, backend.getLogs());
   }
 

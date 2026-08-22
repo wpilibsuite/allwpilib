@@ -39,75 +39,101 @@ class MockTelemetryBackend::Entry : public TelemetryEntry {
     AppendAction(SetPropertyValue{std::string{key}, std::string{value}});
   }
 
-  void LogBoolean(bool value) override { AppendAction(value); }
-
-  void LogInt16(int16_t value) override { AppendAction(value); }
-
-  void LogInt32(int32_t value) override { AppendAction(value); }
-
-  void LogInt64(int64_t value) override { AppendAction(value); }
-
-  void LogFloat(float value) override { AppendAction(value); }
-
-  void LogDouble(double value) override { AppendAction(value); }
-
-  void LogString(std::string_view value, std::string_view typeString) override {
-    AppendAction(LogStringValue{std::string{value}, std::string{typeString}});
+  void LogBoolean(bool value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
   }
 
-  void LogBooleanArray(std::span<const bool> value) override {
+  void LogInt16(int16_t value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
+  }
+
+  void LogInt32(int32_t value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
+  }
+
+  void LogInt64(int64_t value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
+  }
+
+  void LogFloat(float value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
+  }
+
+  void LogDouble(double value, int64_t timestamp) override {
+    AppendAction(value, timestamp);
+  }
+
+  void LogString(std::string_view value, std::string_view typeString,
+                 int64_t timestamp) override {
+    AppendAction(LogStringValue{std::string{value}, std::string{typeString}},
+                 timestamp);
+  }
+
+  void LogBooleanArray(std::span<const bool> value,
+                       int64_t timestamp) override {
     AppendAction(
-        LogBooleanArrayValue{std::vector<int>{value.begin(), value.end()}});
+        LogBooleanArrayValue{std::vector<int>{value.begin(), value.end()}},
+        timestamp);
   }
 
-  void LogBooleanArray(std::span<const int> value) override {
+  void LogBooleanArray(std::span<const int> value, int64_t timestamp) override {
     AppendAction(
-        LogBooleanArrayValue{std::vector<int>{value.begin(), value.end()}});
+        LogBooleanArrayValue{std::vector<int>{value.begin(), value.end()}},
+        timestamp);
   }
 
-  void LogInt16Array(std::span<const int16_t> value) override {
-    AppendAction(std::vector<int16_t>{value.begin(), value.end()});
+  void LogInt16Array(std::span<const int16_t> value,
+                     int64_t timestamp) override {
+    AppendAction(std::vector<int16_t>{value.begin(), value.end()}, timestamp);
   }
 
-  void LogInt32Array(std::span<const int32_t> value) override {
-    AppendAction(std::vector<int32_t>{value.begin(), value.end()});
+  void LogInt32Array(std::span<const int32_t> value,
+                     int64_t timestamp) override {
+    AppendAction(std::vector<int32_t>{value.begin(), value.end()}, timestamp);
   }
 
-  void LogInt64Array(std::span<const int64_t> value) override {
-    AppendAction(std::vector<int64_t>{value.begin(), value.end()});
+  void LogInt64Array(std::span<const int64_t> value,
+                     int64_t timestamp) override {
+    AppendAction(std::vector<int64_t>{value.begin(), value.end()}, timestamp);
   }
 
-  void LogFloatArray(std::span<const float> value) override {
-    AppendAction(std::vector<float>{value.begin(), value.end()});
+  void LogFloatArray(std::span<const float> value, int64_t timestamp) override {
+    AppendAction(std::vector<float>{value.begin(), value.end()}, timestamp);
   }
 
-  void LogDoubleArray(std::span<const double> value) override {
-    AppendAction(std::vector<double>{value.begin(), value.end()});
+  void LogDoubleArray(std::span<const double> value,
+                      int64_t timestamp) override {
+    AppendAction(std::vector<double>{value.begin(), value.end()}, timestamp);
   }
 
-  void LogStringArray(std::span<const std::string> value) override {
-    AppendAction(std::vector<std::string>{value.begin(), value.end()});
+  void LogStringArray(std::span<const std::string> value,
+                      int64_t timestamp) override {
+    AppendAction(std::vector<std::string>{value.begin(), value.end()},
+                 timestamp);
   }
 
-  void LogStringArray(std::span<const std::string_view> value) override {
-    AppendAction(std::vector<std::string>{value.begin(), value.end()});
+  void LogStringArray(std::span<const std::string_view> value,
+                      int64_t timestamp) override {
+    AppendAction(std::vector<std::string>{value.begin(), value.end()},
+                 timestamp);
   }
 
-  void LogRaw(std::span<const uint8_t> value,
-              std::string_view typeString) override {
+  void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+              int64_t timestamp) override {
     AppendAction(LogRawValue{std::vector<uint8_t>{value.begin(), value.end()},
-                             std::string{typeString}});
+                             std::string{typeString}},
+                 timestamp);
   }
 
  private:
   template <typename T>
-  void AppendAction(T&& value) {
+  void AppendAction(T&& value, int64_t timestamp = 0) {
     std::scoped_lock lock{m_backend.m_mutex};
     if (m_removed) {
       return;
     }
     m_last = m_backend.m_actions.size();
-    m_backend.m_actions.emplace_back(m_path, std::forward<T>(value));
+    m_backend.m_actions.emplace_back(m_path, std::forward<T>(value), timestamp);
   }
 
   std::string m_path;
