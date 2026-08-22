@@ -120,8 +120,8 @@ public class DataLogReader implements Iterable<DataLogRecord> {
       int sizeLen = ((lenbyte >> 2) & 0x3) + 1;
       int timestampLen = ((lenbyte >> 4) & 0x7) + 1;
       int headerLen = 1 + entryLen + sizeLen + timestampLen;
-      int entry = (int) readVarInt(pos + 1, entryLen);
-      int size = (int) readVarInt(pos + 1 + entryLen, sizeLen);
+      final int entry = (int) readVarInt(pos + 1, entryLen);
+      final int size = (int) readVarInt(pos + 1 + entryLen, sizeLen);
       long timestamp = readVarInt(pos + 1 + entryLen + sizeLen, timestampLen);
       if (timestamp < 0 || timestamp > Long.MAX_VALUE / 1000) {
         throw new NoSuchElementException();
