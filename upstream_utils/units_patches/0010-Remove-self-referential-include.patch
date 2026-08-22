@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Wed, 19 Aug 2026 19:20:28 -0400
-Subject: [PATCH 10/11] Remove self-referential include
+Subject: [PATCH 10/12] Remove self-referential include
 
 ---
  include/units/core.h | 1 -

@@ -32,91 +32,84 @@ wpi::tunables::TunableConfig MakeUnitTunableConfig(
   return unitConfig;
 }
 
-template <class Units, typename T, template <typename> class NonLinearScale>
+template <UnitType Unit>
 class TunableUnit {
-  using BaseUnits =
-      unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;
+  using BaseUnits = unit<conversion_factor<std::ratio<1>,
+                                      wpi::units::traits::dimension_of_t<Unit>>>;
+  using UnderlyingType = typename traits::unit_traits<Unit>::underlying_type;
 
  public:
-  using ValueType = unit_t<Units, T, NonLinearScale>;
-
-  TunableUnit() : m_tunable{MakeUnitTunableConfig<Units>()} {}
-  explicit TunableUnit(ValueType val)
-      : m_tunable{convert<Units, BaseUnits>(val).template to<T>(),
-                  MakeUnitTunableConfig<Units>()} {}
+  TunableUnit() : m_tunable{MakeUnitTunableConfig<Unit>()} {}
+  explicit TunableUnit(Unit val)
+      : m_tunable{BaseUnits(val).template to<UnderlyingType>(), MakeUnitTunableConfig<Unit>()} {
+  }
   explicit TunableUnit(const wpi::tunables::TunableConfig& config)
-      : m_tunable{MakeUnitTunableConfig<Units>(config)} {}
-  TunableUnit(ValueType val, const wpi::tunables::TunableConfig& config)
-      : m_tunable{convert<Units, BaseUnits>(val).template to<T>(),
-                  MakeUnitTunableConfig<Units>(config)} {}
+      : m_tunable{MakeUnitTunableConfig<Unit>(config)} {}
+  TunableUnit(Unit val, const wpi::tunables::TunableConfig& config)
+      : m_tunable{BaseUnits(val).template to<UnderlyingType>(),
+                  MakeUnitTunableConfig<Unit>(config)} {}
 
-  ValueType Get() const {
-    return unit_t<BaseUnits, T, NonLinearScale>{m_tunable.Get()};
-  }
-  void Set(ValueType value) {
-    m_tunable = convert<Units, BaseUnits>(value).template to<T>();
-  }
+  Unit Get() const { return Unit{m_tunable.Get()}; }
+  void Set(Unit value) { m_tunable = value.template to<UnderlyingType>(); }
 
-  wpi::tunables::Tunable<T>& GetInnerTunable() { return m_tunable; }
+  wpi::tunables::Tunable<UnderlyingType>& GetInnerTunable() {
+    return m_tunable;
+  }
 
   template <typename U>
-    requires traits::is_convertible_unit_t<ValueType, U>::value
+    requires wpi::units::same_dimension<U, Unit>
   operator U() const {  // NOLINT(google-explicit-constructor)
     return Get();
   }
 
  private:
-  wpi::tunables::Tunable<T> m_tunable;
+  wpi::tunables::Tunable<UnderlyingType> m_tunable;
 };
 
-template <class Units, typename T, template <typename> class NonLinearScale>
+template <UnitType Unit>
 class TunableMemberValue
     : public wpi::tunables::detail::TunableMemberValueBase<double> {
-  using BaseUnits =
-      unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;
+  using BaseUnits = conversion_factor<std::ratio<1>,
+                                      wpi::units::traits::dimension_of_t<Unit>>;
+  using UnderlyingType = typename traits::unit_traits<Unit>::underlying_type;
 
  public:
-  using ValueType = unit_t<Units, T, NonLinearScale>;
-
   template <std::derived_from<wpi::tunables::ComplexTunable> Class>
-  explicit TunableMemberValue(ValueType Class::* member)
-      : TunableMemberValueBase<double>{MakeUnitTunableConfig<Units>()},
+  explicit TunableMemberValue(Unit Class::* member)
+      : TunableMemberValueBase<double>{MakeUnitTunableConfig<Unit>()},
         m_ptr{member} {}
 
   template <std::derived_from<wpi::tunables::ComplexTunable> Class>
-  explicit TunableMemberValue(ValueType Class::* member,
+  explicit TunableMemberValue(Unit Class::* member,
                               const wpi::tunables::TunableConfig& config)
-      : TunableMemberValueBase<double>{MakeUnitTunableConfig<Units>(config)},
+      : TunableMemberValueBase<double>{MakeUnitTunableConfig<Unit>(config)},
         m_ptr{member} {}
 
   const double& Get(const wpi::tunables::ComplexTunable* obj) const override {
-    m_value = convert<Units, BaseUnits>(m_ptr.Get(obj)).template to<T>();
+    m_value = m_ptr.Get(obj).template to<UnderlyingType>();
     return m_value;
   }
 
   void Set(wpi::tunables::ComplexTunable* obj, double value) override {
-    m_ptr.Get(obj) = unit_t<BaseUnits, T, NonLinearScale>{value};
+    m_ptr.Get(obj) = Unit{value};
     this->SetTunableChanged();
   }
 
  private:
   mutable double m_value;
-  wpi::tunables::detail::TunableMemberPointer<ValueType> m_ptr;
+  wpi::tunables::detail::TunableMemberPointer<Unit> m_ptr;
 };
 }  // namespace detail
 
-template <class Units, typename T, template <typename> class NonLinearScale>
-inline detail::TunableUnit<Units, T, NonLinearScale> GetCustomTunable(
-    const unit_t<Units, T, NonLinearScale>& value) {
+template <UnitType Unit>
+inline detail::TunableUnit<Unit> GetCustomTunable(const Unit& value) {
   return {value};
 }
 
-template <class Units, typename T, template <typename> class NonLinearScale,
-          typename Class, typename... Args>
+template <UnitType Unit, typename Class, typename... Args>
 inline std::unique_ptr<wpi::tunables::detail::TunableMemberBase>
-MakeTunableMember(unit_t<Units, T, NonLinearScale> Class::* member,
-                  Args&&... args) {
-  return std::make_unique<detail::TunableMemberValue<Units, T, NonLinearScale>>(
+MakeTunableMember(Unit Class::* member, Args&&... args) {
+  return std::make_unique<detail::TunableMemberValue<Unit>>(
       member, std::forward<Args>(args)...);
 }
 
