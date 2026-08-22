@@ -41,7 +41,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
-        "exclusive",
         "no-asan",
         "no-tsan",
     ],
@@ -83,7 +82,6 @@ package_default_cc_project(
 wpilib_java_junit5_test(
     name = "tunables-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
-    tags = ["exclusive"],
     deps = [
         ":tunables-java",
         "//wpiutil:wpiutil-java",
@@ -132,7 +130,6 @@ define_pybind_library(
 robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
-    tags = ["exclusive"],
     deps = [
         ":robotpy-tunables",
         "//wpiutil:robotpy-wpiutil",
