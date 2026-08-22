@@ -120,9 +120,9 @@ public final class PrintLog {
                 "  "
                     + m_timeFormatter.format(
                         LocalDateTime.ofEpochSecond(
-                            val / 1_000_000_000, (int) (val % 1_000_000_000), ZoneOffset.UTC))
+                            val / 1_000_000, (int) ((val % 1_000_000) * 1000), ZoneOffset.UTC))
                     + "."
-                    + String.format("%09d", val % 1_000_000_000));
+                    + String.format("%06d", val % 1_000_000));
             continue;
           }
 
