@@ -9,9 +9,7 @@
 #include <cstdio>
 #include <utility>
 
-#include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
-#include "wpi/hal/DriverStation.hpp"
+#include "wpi/driverstation/RobotState.hpp"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
@@ -25,7 +23,7 @@ void TimedRobot::StartCompetition() {
 
   // Tell the DS that the robot is ready to be enabled
   std::puts("\n********** Robot program startup complete **********");
-  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
+  wpi::RobotState::ObserveUserProgramStarting();
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
