@@ -36,14 +36,6 @@ int64_t GetZeroTime();
 double TimestampToDisplayTime(int64_t time);
 
 /**
- * Converts a timestamp to the current display time base.
- *
- * @param time timestamp in nanoseconds
- * @return display time in seconds
- */
-double TimestampToDisplayTime(int64_t time);
-
-/**
  * Resets the workspace (all storage except window storage).
  * Operates effectively like calling LoadStorage() on a path with no existing
  * storage files. Note this will result in auto-saving of the reset state to
