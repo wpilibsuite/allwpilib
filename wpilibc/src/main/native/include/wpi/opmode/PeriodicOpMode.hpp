@@ -122,7 +122,7 @@ class PeriodicOpMode : public OpMode {
 
  private:
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback> m_callbacks;
-  std::chrono::microseconds m_startTime;
+  std::chrono::nanoseconds m_startTime;
 };
 
 }  // namespace wpi

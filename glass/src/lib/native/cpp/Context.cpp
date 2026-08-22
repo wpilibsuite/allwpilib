@@ -416,13 +416,13 @@ int64_t wpi::glass::GetTimestampDisplayOffset() {
 double wpi::glass::TimestampToDisplayTime(uint64_t time) {
   return (static_cast<double>(time) -
           static_cast<double>(GetTimestampDisplayOffset())) *
-         1.0e-6;
+         1.0e-9;
 }
 
 double wpi::glass::TimestampToDisplayTime(int64_t time) {
   return (static_cast<double>(time) -
           static_cast<double>(GetTimestampDisplayOffset())) *
-         1.0e-6;
+         1.0e-9;
 }
 
 double wpi::glass::ServerTimestampToDisplayTime(int64_t time) {
@@ -437,7 +437,7 @@ double wpi::glass::ServerTimestampToDisplayTime(int64_t time) {
       time -= static_cast<int64_t>(GetTimestampDisplayStartTime(gContext));
     }
   }
-  return static_cast<double>(time) * 1.0e-6;
+  return static_cast<double>(time) * 1.0e-9;
 }
 
 void wpi::glass::WorkspaceReset() {

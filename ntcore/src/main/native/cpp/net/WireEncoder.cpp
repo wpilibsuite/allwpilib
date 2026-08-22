@@ -18,6 +18,17 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 using namespace mpack;
 
+static int64_t ToWireTimestamp(int64_t time) {
+  if (time == 0) {
+    return 0;
+  }
+  int64_t wireTime = time / 1000;
+  if (wireTime == 0) {
+    return time > 0 ? 1 : -1;
+  }
+  return wireTime;
+}
+
 void wpi::nt::net::WireEncodePublish(wpi::util::raw_ostream& os, int pubuid,
                                      std::string_view name,
                                      std::string_view typeStr,
@@ -220,7 +231,7 @@ bool wpi::nt::net::WireEncodeBinary(wpi::util::raw_ostream& os, int id,
   });
   mpack_start_array(&writer, 4);
   mpack_write_int(&writer, id);
-  mpack_write_int(&writer, time);
+  mpack_write_int(&writer, ToWireTimestamp(time));
   switch (value.type()) {
     case NT_BOOLEAN:
       mpack_write_u8(&writer, 0);

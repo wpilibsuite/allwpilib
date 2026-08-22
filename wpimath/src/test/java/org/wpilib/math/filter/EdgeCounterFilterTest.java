@@ -32,19 +32,19 @@ class EdgeCounterFilterTest {
 
     assertFalse(filter.calculate(true)); // First edge
 
-    WPIUtilJNI.setMockTime(50_000L);
+    WPIUtilJNI.setMockTime(50_000_000L);
     assertFalse(filter.calculate(false)); // First edge ended
 
-    WPIUtilJNI.setMockTime(100_000L);
+    WPIUtilJNI.setMockTime(100_000_000L);
     assertTrue(filter.calculate(true)); // Second edge
 
-    WPIUtilJNI.setMockTime(150_000L);
+    WPIUtilJNI.setMockTime(150_000_000L);
     assertTrue(filter.calculate(true)); // Still true
 
-    WPIUtilJNI.setMockTime(250_000L);
+    WPIUtilJNI.setMockTime(250_000_000L);
     assertTrue(filter.calculate(true)); // Still true
 
-    WPIUtilJNI.setMockTime(300_000L);
+    WPIUtilJNI.setMockTime(300_000_000L);
     assertFalse(filter.calculate(false)); // Input false, should reset
   }
 
@@ -54,13 +54,13 @@ class EdgeCounterFilterTest {
 
     assertFalse(filter.calculate(true)); // First edge
 
-    WPIUtilJNI.setMockTime(50_000L);
+    WPIUtilJNI.setMockTime(50_000_000L);
     filter.calculate(false); // First edge ended
 
-    WPIUtilJNI.setMockTime(250_000L);
+    WPIUtilJNI.setMockTime(250_000_000L);
     assertFalse(filter.calculate(true)); // Second edge after window expired
 
-    WPIUtilJNI.setMockTime(300_000L);
+    WPIUtilJNI.setMockTime(300_000_000L);
     assertFalse(filter.calculate(true)); // Still false
   }
 

@@ -46,6 +46,11 @@ static unsigned int WriteVarInt(uint8_t* buf, T val) {
   return len;
 }
 
+static uint64_t ToFileTimestamp(uint64_t timestamp) {
+  uint64_t actualTimestamp = timestamp == 0 ? wpi::util::Now() : timestamp;
+  return actualTimestamp / 1000;
+}
+
 // min size: 4, max size: 17
 static unsigned int WriteRecordHeader(uint8_t* buf, uint32_t entry,
                                       uint64_t timestamp,
@@ -56,8 +61,7 @@ static unsigned int WriteRecordHeader(uint8_t* buf, uint32_t entry,
   buf += entryLen;
   unsigned int payloadLen = WriteVarInt(buf, payloadSize);
   buf += payloadLen;
-  unsigned int timestampLen =
-      WriteVarInt(buf, timestamp == 0 ? wpi::util::Now() : timestamp);
+  unsigned int timestampLen = WriteVarInt(buf, ToFileTimestamp(timestamp));
   buf += timestampLen;
   *origbuf =
       ((timestampLen - 1) << 4) | ((payloadLen - 1) << 2) | (entryLen - 1);

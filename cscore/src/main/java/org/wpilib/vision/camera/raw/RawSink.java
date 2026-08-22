@@ -31,7 +31,7 @@ public class RawSink extends ImageSink {
    *
    * @param frame The frame object in which to store the image.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
-   *     is in the same time base as wpi::Now(), and is in 1 us increments.
+   *     is in the same time base as wpi::Now(), and is in 1 ns increments.
    */
   public long grabFrame(RawFrame frame) {
     return grabFrame(frame, 0.225);
@@ -44,7 +44,7 @@ public class RawSink extends ImageSink {
    * @param frame The frame object in which to store the image.
    * @param timeout The frame timeout in seconds.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
-   *     is in the same time base as wpi::Now(), and is in 1 us increments.
+   *     is in the same time base as wpi::Now(), and is in 1 ns increments.
    */
   public long grabFrame(RawFrame frame, double timeout) {
     return CameraServerJNI.grabRawSinkFrameTimeout(m_handle, frame, frame.getNativeObj(), timeout);
@@ -56,7 +56,7 @@ public class RawSink extends ImageSink {
    *
    * @param frame The frame object in which to store the image.
    * @return Frame time, or 0 on error (call getError() to obtain the error message); the frame time
-   *     is in the same time base as wpi::Now(), and is in 1 us increments.
+   *     is in the same time base as wpi::Now(), and is in 1 ns increments.
    */
   public long grabFrameNoTimeout(RawFrame frame) {
     return CameraServerJNI.grabRawSinkFrame(m_handle, frame, frame.getNativeObj());

@@ -61,8 +61,8 @@ void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle);
  * If an absolute alarmTime is in the past, the notifier will alarm immediately.
  *
  * @param[in] notifierHandle the notifier handle
- * @param[in] alarmTime      the first alarm time (in microseconds)
- * @param[in] intervalTime   the periodic interval time (in microseconds)
+ * @param[in] alarmTime      the first alarm time (in nanoseconds)
+ * @param[in] intervalTime   the periodic interval time (in nanoseconds)
  * @param[in] absolute       true if the alarm time is absolute
  * @param[in] ack            true to acknowledge any prior alarm
  * @param[out] status        Error status variable. 0 on success.

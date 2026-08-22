@@ -51,7 +51,7 @@ class CvSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) {
@@ -71,7 +71,7 @@ class CvSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeout(cv::Mat& image) {
@@ -93,7 +93,7 @@ class CvSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225) {
@@ -121,7 +121,7 @@ class CvSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image) {
@@ -155,7 +155,7 @@ class CvSink : public ImageSink {
    *
    * @return Frame time, or 0 on error (call GetError() to obtain the error
    *         message); the frame time is in the same time base as
-   * wpi::util::Now(), and is in 1 us increments.
+   * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t GrabFrameDirectLastTime(cv::Mat& image, uint64_t lastFrameTime,
@@ -180,7 +180,7 @@ class CvSink : public ImageSink {
    * Get the last time a frame was grabbed. This uses the same time base as
    * wpi::util::Now().
    *
-   * @return Time in 1 us increments.
+   * @return Time in 1 ns increments.
    */
   [[nodiscard]]
   uint64_t LastFrameTime() {

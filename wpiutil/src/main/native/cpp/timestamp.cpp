@@ -10,8 +10,8 @@
 #include "wpi/util/timestamp.h"
 
 static uint64_t timestamp() noexcept {
-  // 1-us intervals
-  return std::chrono::duration_cast<std::chrono::microseconds>(
+  // 1-ns intervals
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
              std::chrono::steady_clock::now().time_since_epoch())
       .count();
 }
@@ -44,8 +44,8 @@ uint64_t wpi::util::GetProgramStartTime() {
 }
 
 uint64_t wpi::util::GetSystemTime() {
-  // 1-us intervals
-  return std::chrono::duration_cast<std::chrono::microseconds>(
+  // 1-ns intervals
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
              std::chrono::system_clock::now().time_since_epoch())
       .count();
 }

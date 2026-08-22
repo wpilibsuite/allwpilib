@@ -184,11 +184,11 @@ class Timer {
   static wpi::units::second_t GetMatchTime();
 
  private:
-  double GetMicroseconds() const;
+  double GetNanoseconds() const;
 
-  std::chrono::microseconds m_startTime{0};
-  double m_startTimeRemainderUs = 0.0;
-  double m_accumulatedTimeUs = 0.0;
+  std::chrono::nanoseconds m_startTime{0};
+  double m_startTimeRemainderNs = 0.0;
+  double m_accumulatedTimeNs = 0.0;
   bool m_running = false;
 };
 

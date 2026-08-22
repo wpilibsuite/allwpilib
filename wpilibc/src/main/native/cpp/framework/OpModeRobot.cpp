@@ -40,7 +40,7 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
 
-  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
+  m_startTime = std::chrono::nanoseconds{RobotController::GetMonotonicTime()};
 
   // Add LoopFunc as periodic callback
   AddPeriodic([this] { LoopFunc(); }, period);

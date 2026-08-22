@@ -241,12 +241,12 @@ struct NT_LogMessage {
 /** NetworkTables time sync event data. */
 struct NT_TimeSyncEventData {
   /**
-   * Offset between local time and server time, in microseconds. Add this value
+   * Offset between local time and server time, in nanoseconds. Add this value
    * to local time to get the estimated equivalent server time.
    */
   int64_t serverTimeOffset;
 
-  /** Measured round trip time divided by 2, in microseconds. */
+  /** Measured round trip time divided by 2, in nanoseconds. */
   int64_t rtt2;
 
   /**
@@ -440,7 +440,7 @@ enum NT_Type NT_GetEntryType(NT_Entry entry);
  * Returns 0 if the handle is invalid.
  *
  * @param entry   entry handle
- * @return Entry last change time
+ * @return Entry last change time, in nanoseconds
  */
 uint64_t NT_GetEntryLastChange(NT_Entry entry);
 
@@ -1370,7 +1370,7 @@ NT_Bool NT_IsConnected(NT_Inst inst);
  * @param inst instance handle
  * @param valid set to true if the return value is valid, false otherwise
  *              (output)
- * @return Time offset in microseconds (if valid is set to true)
+ * @return Time offset in nanoseconds (if valid is set to true)
  */
 int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid);
 
@@ -1447,7 +1447,7 @@ void NT_DisposeEventArray(struct NT_Event* arr, size_t count);
 void NT_DisposeEvent(struct NT_Event* event);
 
 /**
- * Returns monotonic current time in 1 us increments.
+ * Returns monotonic current time in 1 ns increments.
  * This is the same time base used for entry and connection timestamps.
  * This function by default simply wraps WPI_Now(), but if NT_SetNow() is
  * called, this function instead returns the value passed to NT_SetNow();
@@ -1464,7 +1464,7 @@ int64_t NT_Now(void);
  * be used only if the overhead of calling WPI_Now() is a concern.
  * If used, it should be called periodically with the value of WPI_Now().
  *
- * @param timestamp timestamp (1 us increments)
+ * @param timestamp timestamp (1 ns increments)
  */
 void NT_SetNow(int64_t timestamp);
 
@@ -1726,7 +1726,8 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value);
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the boolean from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
  */
@@ -1738,7 +1739,8 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the int from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_int       returns the int assigned to the name
  * @return            1 if successful, or 0 if value is null or not an int
  */
@@ -1750,7 +1752,8 @@ NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the float from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_float     returns the float assigned to the name
  * @return            1 if successful, or 0 if value is null or not a float
  */
@@ -1762,7 +1765,8 @@ NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the double from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_double    returns the double assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
  */
@@ -1774,7 +1778,8 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the string from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param str_len     returns the length of the string
  * @return            pointer to the string (UTF-8), or null if error
  *
@@ -1791,7 +1796,8 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the string from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param raw_len     returns the length of the string
  * @return            pointer to the raw value (UTF-8), or null if error
  *
@@ -1808,7 +1814,8 @@ uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the boolean array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the boolean array, or null if error
  *
@@ -1825,7 +1832,8 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the int array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the int array, or null if error
  *
@@ -1842,7 +1850,8 @@ int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the float array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the float array, or null if error
  *
@@ -1859,7 +1868,8 @@ float* NT_GetValueFloatArray(const struct NT_Value* value,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the double array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the double array, or null if error
  *
@@ -1876,7 +1886,8 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the struct WPI_String array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the struct WPI_String array, or null if error
  *

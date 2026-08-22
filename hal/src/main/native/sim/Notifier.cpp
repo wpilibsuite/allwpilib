@@ -96,7 +96,7 @@ void NotifierThread::Main() {
     uint64_t curTime = HAL_GetMonotonicTime();
     if (alarm.notifier->alarmTime > curTime) {
       m_cond.wait_for(
-          lock, std::chrono::microseconds{alarm.notifier->alarmTime - curTime});
+          lock, std::chrono::nanoseconds{alarm.notifier->alarmTime - curTime});
     }
     if (!m_active) {
       break;
