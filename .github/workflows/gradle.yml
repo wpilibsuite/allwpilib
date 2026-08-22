@@ -339,7 +339,7 @@ jobs:
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
           github.ref == 'refs/heads/main'
-        run: cd combiner && ./gradlew publish -Pallwpilib -Pbuild2027
+        run: cd combiner && ./gradlew publish -Pallwpilib
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
@@ -348,7 +348,7 @@ jobs:
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
           startsWith(github.ref, 'refs/tags/v')
-        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish -Pbuild2027
+        run: cd combiner && ./gradlew publish -Pallwpilib -PreleaseRepoPublish
         env:
           RUN_AZURE_ARTIFACTORY_RELEASE: "TRUE"
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
