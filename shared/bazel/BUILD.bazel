@@ -1,3 +1,5 @@
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
+
 package(default_visibility = ["//visibility:public"])
 
 windows_flags = [
@@ -65,6 +67,25 @@ platform(
     parents = [
         "@wpilib_toolchains//platforms/linux_x86_64",
     ],
+)
+
+platform(
+    name = "linux_arm64_trixie",
+    exec_properties = {
+        "Arch": "arm64",
+        "OSFamily": "Linux",
+        "container-image": "docker://wpilib/debian-base:arm64-trixie@sha256:a5addc848192deea04eb74960e0eff9acb7cd3f30e39c00d42b1b8692ba174dd",
+    },
+    flags = [
+    ] + gcc_flags,
+    parents = [
+        "@wpilib_toolchains//platforms/trixie64",
+    ],
+)
+
+alias(
+    name = "linux_host",
+    actual = ":linux_arm64_trixie" if "@platforms//cpu:aarch64" in HOST_CONSTRAINTS else ":linux_x86_64",
 )
 
 platform(
