@@ -201,7 +201,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
@@ -249,7 +249,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->
