@@ -20,7 +20,7 @@
 
 namespace uv = wpi::net::uv;
 
-static uint64_t startTime = wpi::util::Now();
+static int64_t startTime = wpi::util::Now();
 
 static bool NewlineBuffer(std::string& rem, uv::Buffer& buf, size_t len,
                           wpi::util::SmallVectorImpl<uv::Buffer>& bufs,

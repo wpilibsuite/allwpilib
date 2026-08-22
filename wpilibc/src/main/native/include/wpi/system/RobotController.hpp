@@ -58,7 +58,7 @@ class RobotController {
    *
    * @param supplier Function to return the time in nanoseconds.
    */
-  static void SetTimeSource(std::function<uint64_t()> supplier);
+  static void SetTimeSource(std::function<int64_t()> supplier);
 
   /**
    * Read the nanosecond timestamp. By default, the time is based on the
@@ -68,14 +68,14 @@ class RobotController {
    *
    * @return The current time in nanoseconds.
    */
-  static uint64_t GetTime();
+  static int64_t GetTime();
 
   /**
    * Read the nanosecond-resolution monotonic timer.
    *
    * @return The current monotonic time in nanoseconds.
    */
-  static uint64_t GetMonotonicTime();
+  static int64_t GetMonotonicTime();
 
   /**
    * Read the battery voltage.
@@ -200,7 +200,7 @@ class RobotController {
   static CANStatus GetCANStatus(CANBus busId);
 
  private:
-  static std::function<uint64_t()> m_timeSource;
+  static std::function<int64_t()> m_timeSource;
 };
 
 }  // namespace wpi

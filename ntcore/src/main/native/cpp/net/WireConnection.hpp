@@ -49,7 +49,7 @@ class WireConnection {
   virtual void SendBinary(
       wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) = 0;
 
-  virtual uint64_t GetLastFlushTime() const = 0;  // in nanoseconds
+  virtual int64_t GetLastFlushTime() const = 0;  // in nanoseconds
 
   // Gets the timestamp of the last incoming data
   virtual uint64_t GetLastReceivedTime() const = 0;  // in milliseconds

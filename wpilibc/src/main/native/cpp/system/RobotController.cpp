@@ -15,7 +15,7 @@
 
 using namespace wpi;
 
-std::function<uint64_t()> RobotController::m_timeSource = [] {
+std::function<int64_t()> RobotController::m_timeSource = [] {
   return RobotController::GetMonotonicTime();
 };
 
@@ -39,15 +39,15 @@ int32_t RobotController::GetTeamNumber() {
   return HAL_GetTeamNumber();
 }
 
-void RobotController::SetTimeSource(std::function<uint64_t()> supplier) {
+void RobotController::SetTimeSource(std::function<int64_t()> supplier) {
   m_timeSource = supplier;
 }
 
-uint64_t RobotController::GetTime() {
+int64_t RobotController::GetTime() {
   return m_timeSource();
 }
 
-uint64_t RobotController::GetMonotonicTime() {
+int64_t RobotController::GetMonotonicTime() {
   return HAL_GetMonotonicTime();
 }
 

@@ -126,7 +126,7 @@ class VideoSource {
    *
    * @return Time in 1 ns increments.
    */
-  uint64_t GetLastFrameTime() const {
+  int64_t GetLastFrameTime() const {
     m_status = 0;
     return GetSourceLastFrameTime(m_handle, &m_status);
   }

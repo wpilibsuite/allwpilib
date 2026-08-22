@@ -283,7 +283,7 @@ bool SocketCanState::InitializeBuses() {
           }
 
           uint32_t messageId = MapSocketCanToMessageId(frame.can_id);
-          uint64_t timestamp = wpi::util::Now();
+          int64_t timestamp = wpi::util::Now();
           // Ensure FDF flag is set for the read later.
           if (rVal == CANFD_MTU) {
             frame.flags |= CANFD_FDF;

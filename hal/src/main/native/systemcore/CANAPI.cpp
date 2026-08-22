@@ -255,9 +255,9 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = wpi::util::Now();
+      int64_t now = wpi::util::Now();
       if (now - i->second.timeStamp >
-          (static_cast<uint64_t>(timeoutMs) * 1000)) {
+          (static_cast<int64_t>(timeoutMs) * 1'000'000)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;

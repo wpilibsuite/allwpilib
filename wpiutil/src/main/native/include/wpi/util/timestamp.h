@@ -15,7 +15,7 @@ extern "C" {
  * In general this is the time returned by the operating system.
  * @return Time in nanoseconds.
  */
-uint64_t WPI_NowDefault(void);
+int64_t WPI_NowDefault(void);
 
 /**
  * Set the implementation used by WPI_Now().
@@ -28,14 +28,14 @@ uint64_t WPI_NowDefault(void);
  * implementation and original program start time, pass NULL.
  * @param func Function called by WPI_Now() to return the time.
  */
-void WPI_SetNowImpl(uint64_t (*func)(void));
+void WPI_SetNowImpl(int64_t (*func)(void));
 
 /**
  * Return a value representing the current time in nanoseconds.
  * The epoch is not defined.
  * @return Time in nanoseconds.
  */
-uint64_t WPI_Now(void);
+int64_t WPI_Now(void);
 
 /**
  * Return the timestamp at which the program started.
@@ -46,7 +46,7 @@ uint64_t WPI_Now(void);
  *
  * @return Program start time in nanoseconds.
  */
-uint64_t WPI_GetProgramStartTime(void);
+int64_t WPI_GetProgramStartTime(void);
 
 /**
  * Return the current system time in nanoseconds since the Unix epoch
@@ -54,7 +54,7 @@ uint64_t WPI_GetProgramStartTime(void);
  *
  * @return Time in nanoseconds.
  */
-uint64_t WPI_GetSystemTime(void);
+int64_t WPI_GetSystemTime(void);
 
 #ifdef __cplusplus
 }  // extern "C"

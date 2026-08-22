@@ -67,9 +67,9 @@ void HAL_DestroyNotifier(HAL_NotifierHandle notifierHandle);
  * @param[in] ack            true to acknowledge any prior alarm
  * @param[out] status        Error status variable. 0 on success.
  */
-void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, uint64_t alarmTime,
-                          uint64_t intervalTime, HAL_Bool absolute,
-                          HAL_Bool ack, int32_t* status);
+void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, int64_t alarmTime,
+                          int64_t intervalTime, HAL_Bool absolute, HAL_Bool ack,
+                          int32_t* status);
 
 /**
  * Cancels all future notifier alarms for a notifier.

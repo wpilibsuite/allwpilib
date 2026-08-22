@@ -43,7 +43,7 @@ static TimestampDisplayMode TimestampDisplayModeFromString(
   return TimestampDisplayMode::SERVER_ZERO_START;
 }
 
-static uint64_t GetTimestampDisplayStartTime(Context* ctx) {
+static int64_t GetTimestampDisplayStartTime(Context* ctx) {
   if (ctx->timestampDisplayStartTimeOverride) {
     return ctx->timestampDisplayStartTime;
   }
@@ -405,7 +405,7 @@ void wpi::glass::SetCurrentContext(Context* ctx) {
   gContext = ctx;
 }
 
-uint64_t wpi::glass::GetZeroTime() {
+int64_t wpi::glass::GetZeroTime() {
   return GetTimestampDisplayStartTime(gContext);
 }
 
@@ -413,7 +413,7 @@ int64_t wpi::glass::GetTimestampDisplayOffset() {
   return ::GetTimestampDisplayOffset(gContext);
 }
 
-double wpi::glass::TimestampToDisplayTime(uint64_t time) {
+double wpi::glass::TimestampToDisplayTime(int64_t time) {
   return (static_cast<double>(time) -
           static_cast<double>(GetTimestampDisplayOffset())) *
          1.0e-9;

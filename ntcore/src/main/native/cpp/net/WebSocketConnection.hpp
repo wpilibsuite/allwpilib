@@ -56,7 +56,7 @@ class WebSocketConnection final
     Send(wpi::net::WebSocket::Frame::BINARY, writer);
   }
 
-  uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
+  int64_t GetLastFlushTime() const final { return m_lastFlushTime; }
 
   uint64_t GetLastReceivedTime() const final {
     return m_ws.GetLastReceivedTime();
@@ -116,7 +116,7 @@ class WebSocketConnection final
   wpi::net::uv::Error m_err;
   State m_state = EMPTY;
   std::string m_reason;
-  uint64_t m_lastFlushTime = 0;
+  int64_t m_lastFlushTime = 0;
   unsigned int m_version;
 };
 
