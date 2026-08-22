@@ -26,11 +26,11 @@
 #include "wpi/util/string.hpp"
 
 namespace {
-static constexpr int64_t kNoAlarm = std::numeric_limits<int64_t>::max();
+static constexpr int64_t NO_ALARM = std::numeric_limits<int64_t>::max();
 
 struct Notifier {
   std::string name;
-  std::atomic<int64_t> alarmTime = kNoAlarm;
+  std::atomic<int64_t> alarmTime = NO_ALARM;
   int64_t intervalTime = 0;
   std::atomic<int32_t> userOverrunCount = 0;
   int32_t overrunCount = 0;
@@ -130,7 +130,7 @@ void NotifierThread::ProcessAlarms() {
       m_alarmQueue.push(std::move(alarm));
     } else {
       // Disable one-shot alarm
-      notifier.alarmTime = kNoAlarm;
+      notifier.alarmTime = NO_ALARM;
     }
 
     // If the last call was acknowledged, signal the handler
@@ -193,7 +193,7 @@ void HAL_SetNotifierAlarm(HAL_NotifierHandle notifierHandle, int64_t alarmTime,
     alarmTime += HAL_GetMonotonicTime();
   }
 
-  int64_t prevWakeup = kNoAlarm;
+  int64_t prevWakeup = NO_ALARM;
   if (!thr->m_alarmQueue.empty()) {
     prevWakeup = thr->m_alarmQueue.top().notifier->alarmTime;
     thr->m_alarmQueue.remove({notifierHandle, notifier});
@@ -223,7 +223,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle, HAL_Bool ack,
   }
 
   thr->m_alarmQueue.remove({notifierHandle, notifier});
-  notifier->alarmTime = kNoAlarm;
+  notifier->alarmTime = NO_ALARM;
 }
 
 void HAL_AcknowledgeNotifierAlarm(HAL_NotifierHandle notifierHandle,
