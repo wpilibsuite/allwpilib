@@ -58,8 +58,8 @@ class MockTelemetryBackend : public TelemetryBackend {
   /** A logged action. */
   struct Action {
     template <typename T>
-    Action(std::string_view path_, T value_)
-        : path{path_}, value{std::move(value_)} {}
+    Action(std::string_view path_, T value_, int64_t timestamp_ = 0)
+        : path{path_}, value{std::move(value_)}, timestamp{timestamp_} {}
 
     std::string path;
     std::variant<KeepDuplicatesValue, SetPropertyValue, bool, int16_t, int32_t,
@@ -68,6 +68,7 @@ class MockTelemetryBackend : public TelemetryBackend {
                  std::vector<int64_t>, std::vector<float>, std::vector<double>,
                  std::vector<std::string>, LogRawValue>
         value;
+    int64_t timestamp = 0;
   };
 
   struct Schema {

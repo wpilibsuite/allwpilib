@@ -91,6 +91,17 @@ class DataLogTelemetryBackendTest {
   }
 
   @Test
+  void logsExplicitTimestamp() {
+    long timestamp = 123456789L;
+
+    m_backend.getEntry("/timestamped").logDouble(2.5, timestamp);
+
+    DataLogRecord record = last(entry(readSnapshot(), "timestamped"));
+    assertEquals(timestamp, record.getTimestamp());
+    assertEquals(2.5, record.getDouble());
+  }
+
+  @Test
   void logsArrayAndRawDataTypes() {
     m_table.log("booleans", new boolean[] {true, false});
     m_table.log("shorts", new short[] {1, 2});
@@ -100,7 +111,7 @@ class DataLogTelemetryBackendTest {
     m_table.log("doubles", new double[] {9.25, 10.5});
     m_table.log("strings", new String[] {"a", "b"});
     m_table.log("raw", new byte[] {11, 12, 13});
-    m_backend.getEntry("/customRaw").logRaw(new byte[] {14, 15}, "custom");
+    m_backend.getEntry("/customRaw").logRaw(new byte[] {14, 15}, "custom", 0);
 
     LogSnapshot snapshot = readSnapshot();
 
@@ -145,7 +156,7 @@ class DataLogTelemetryBackendTest {
 
   @Test
   void logsCustomRawDataType() {
-    m_backend.getEntry("/customRaw").logRaw(new byte[] {14, 15}, "custom");
+    m_backend.getEntry("/customRaw").logRaw(new byte[] {14, 15}, "custom", 0);
 
     LogSnapshot snapshot = readSnapshot();
 
@@ -299,8 +310,8 @@ class DataLogTelemetryBackendTest {
     var staleEntry = m_backend.getEntry("/stale");
     m_backend.removeEntry("/stale");
 
-    staleEntry.logDouble(1.25);
-    m_backend.getEntry("/stale").logDouble(2.5);
+    staleEntry.logDouble(1.25, 0);
+    m_backend.getEntry("/stale").logDouble(2.5, 0);
 
     EntryData stale = entry(readSnapshot(), "stale");
     assertEquals(1, stale.records.size());
