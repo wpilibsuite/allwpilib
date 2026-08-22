@@ -69,10 +69,7 @@ FileLogger::FileLogger(std::string_view file,
 }
 FileLogger::FileLogger(std::string_view file, log::DataLog& log,
                        std::string_view key)
-    : FileLogger(file, Buffer([entry = log.Start(key, "string"),
-                               &log](std::string_view line) {
-                   log.AppendString(entry, line, 0);
-                 })) {}
+    : FileLogger(file, Buffer(log.MakeFileLoggerCallback(key))) {}
 FileLogger::FileLogger(FileLogger&& other)
 #ifdef __linux__
     : m_fileHandle{std::exchange(other.m_fileHandle, -1)},

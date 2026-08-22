@@ -47,6 +47,7 @@ DataLogWriter::DataLogWriter(wpi::util::Logger& msglog,
 }
 
 DataLogWriter::~DataLogWriter() {
+  InvalidateFileLoggerCallbacks();
   if (m_os) {
     Flush();
   }

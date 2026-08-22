@@ -69,6 +69,8 @@ classes:
         ignore: true
       BufferHalfFull:
       BufferFull:
+      InvalidateFileLoggerCallbacks:
+        ignore: true
   wpi::log::DataLogEntry:
     force_no_trampoline: true
     methods:

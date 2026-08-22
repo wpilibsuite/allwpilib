@@ -6,13 +6,19 @@
 
 #include <atomic>
 #include <chrono>
+#include <filesystem>
 #include <format>
+#include <fstream>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+
+#include "wpi/datalog/DataLogWriter.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 #ifdef __linux__
 #include <fcntl.h>
@@ -69,6 +75,31 @@ TEST_CASE("FileLoggerTest BufferMultipleMultiLinePartials",
 }
 
 #ifdef __linux__
+TEST_CASE("FileLoggerTest DataLogCanBeDestroyedFirst",
+          "[datalog][file-logger]") {
+  auto path = std::filesystem::temp_directory_path() /
+              std::format("wpi_filelogger_log_lifetime_{}", getpid());
+  {
+    std::ofstream create{path};
+  }
+
+  std::vector<uint8_t> output;
+  auto log = std::make_unique<wpi::log::DataLogWriter>(
+      std::make_unique<wpi::util::raw_uvector_ostream>(output));
+  wpi::log::FileLogger logger{path.string(), *log, "console"};
+
+  log.reset();
+  for (int i = 0; i < 100; ++i) {
+    {
+      std::ofstream append{path, std::ios::app};
+      append << "line\n";
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  }
+
+  std::filesystem::remove(path);
+}
+
 TEST_CASE("FileLoggerTest MissingFileDoesNotDeadlock",
           "[datalog][file-logger]") {
   // Constructing a FileLogger for a nonexistent path used to spawn a reader
