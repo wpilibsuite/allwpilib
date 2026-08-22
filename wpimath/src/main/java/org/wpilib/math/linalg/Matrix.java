@@ -351,9 +351,69 @@ public class Matrix<R extends Num, C extends Num>
     return new Matrix<>(this.m_storage.solve(Objects.requireNonNull(b).m_storage));
   }
 
+  // Coefficients for (13, 13) Padé approximant of exp(A) are from the following program:
+  //
+  // #!/usr/bin/env python
+  //
+  // import mpmath as mp
+  //
+  // # https://en.wikipedia.org/wiki/IEEE_754#Basic_and_interchange_formats
+  // mp.mp.prec = 53  # double precision
+  //
+  // L = 13
+  // M = 13
+  // p, q = mp.pade(mp.taylor(mp.exp, 0, L + M), L, M)
+  //
+  // print("final double[] exp_pade_p = {")
+  // for p_k in p:
+  //     print(f"{p_k},")
+  // print("};")
+  // print("final double[] exp_pade_q = {")
+  // for q_k in q:
+  //     print(f"{q_k},")
+  // print("};")
+  private static final int EXP_PADE_NUM_COEFFS = 14;
+  private static final double[] exp_pade_p = {
+    1.0,
+    0.499990230081164,
+    0.119995046409932,
+    0.0183321303805272,
+    0.00199256821044989,
+    0.000163023228899284,
+    1.03503116756581e-05,
+    5.17494197262237e-07,
+    2.04264137492554e-08,
+    6.30408624558965e-10,
+    1.48321142940355e-11,
+    2.52798500184321e-13,
+    2.80856861084989e-15,
+    1.542952427598e-17,
+  };
+  private static final double[] exp_pade_q = {
+    1.0,
+    -0.500009769918836,
+    0.120004816328768,
+    -0.0183344676554892,
+    0.00199292268802792,
+    -0.00016306127289381,
+    1.03533632064684e-05,
+    -5.17682297838286e-07,
+    2.04354204459939e-08,
+    -6.30742323603127e-10,
+    1.48414840237133e-11,
+    -2.52988721915697e-13,
+    2.81109127187942e-15,
+    -1.54461768813769e-17,
+  };
+
+  static {
+    assert exp_pade_p.length == EXP_PADE_NUM_COEFFS;
+    assert exp_pade_q.length == EXP_PADE_NUM_COEFFS;
+  }
+
   /**
-   * Computes the matrix exponential using Eigen's solver. This method only works for square
-   * matrices, and will otherwise throw an {@link MatrixDimensionException}.
+   * Computes the matrix exponential. This method only works for square matrices, and will otherwise
+   * throw an {@link MatrixDimensionException}.
    *
    * @return The exponential of A.
    */
@@ -366,12 +426,53 @@ public class Matrix<R extends Num, C extends Num>
               + " x "
               + this.getNumCols());
     }
-    Matrix<R, C> toReturn = new Matrix<>(new SimpleMatrix(this.getNumRows(), this.getNumCols()));
-    EigenJNI.exp(
-        this.m_storage.getDDRM().getData(),
-        this.getNumRows(),
-        toReturn.m_storage.getDDRM().getData());
-    return toReturn;
+
+    // Scale down A
+    //
+    //   A_scaled = A⋅2⁻ⁿ
+    final int n = (int) Math.max(0.0, Math.ceil(Math.log(this.normIndP1()) / Math.log(2.0)));
+    var A_scaled = this.m_storage.scale(Math.pow(2.0, -n));
+
+    //     13
+    // P = Σ pₖA_scaledᵏ
+    //    k=0
+    //
+    //     13
+    // Q = Σ qₖA_scaledᵏ
+    //    k=0
+    var P = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_p[0], P.getDDRM());
+    var Q = SimpleMatrix.identity(this.getNumRows());
+    CommonOps_DDRM.scale(exp_pade_q[0], Q.getDDRM());
+    var A_scaled_pow = A_scaled;
+    for (int k = 1; k < EXP_PADE_NUM_COEFFS; ++k) {
+      // P += A_scaled_pow * exp_pade_p[k]
+      CommonOps_DDRM.add(P.getDDRM(), A_scaled_pow.scale(exp_pade_p[k]).getDDRM(), P.getDDRM());
+      // Q += A_scaled_pow * exp_pade_q[k]
+      CommonOps_DDRM.add(Q.getDDRM(), A_scaled_pow.scale(exp_pade_q[k]).getDDRM(), Q.getDDRM());
+      A_scaled_pow = A_scaled_pow.mult(A_scaled);
+    }
+
+    // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade
+    // defines the Padé approximant as exp(A_scaled)Q ≈ P, so:
+    //
+    //   exp(A_scaled) ≈ P / Q
+    //   exp(A_scaled) ≈ (Qᵀ \ Pᵀ)ᵀ
+    CommonOps_DDRM.transpose(Q.getDDRM());
+    CommonOps_DDRM.transpose(P.getDDRM());
+    var exp_A_scaled = Q.solve(P);
+    CommonOps_DDRM.transpose(exp_A_scaled.getDDRM());
+
+    // Unscale via repeated squaring
+    //
+    //   exp(A⋅2⁻ⁿ) = exp(A_scaled)
+    //   exp(A)^2⁻ⁿ = exp(A_scaled)
+    //   exp(A) = exp(A_scaled)^2ⁿ
+    for (int i = 0; i < n; ++i) {
+      exp_A_scaled = exp_A_scaled.mult(exp_A_scaled);
+    }
+
+    return new Matrix<>(exp_A_scaled);
   }
 
   /**
