@@ -294,13 +294,14 @@ bool DataLogReader::GetRecord(size_t* pos, DataLogRecord* out) const {
   if (size > (buf.size() - headerLen)) {
     return false;
   }
-  uint64_t fileTimestamp =
+  uint64_t rawTime =
       ReadVarInt(buf.subspan(1 + entryLen + sizeLen, timestampLen));
-  if (fileTimestamp >
+  if (rawTime >
       static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) / 1000) {
     return false;
   }
-  int64_t timestamp = static_cast<int64_t>(fileTimestamp) * 1000;
+  int64_t fileTimestamp = static_cast<int64_t>(rawTime);
+  int64_t timestamp = fileTimestamp * 1000;
   *out = DataLogRecord{entry, timestamp, buf.subspan(headerLen, size)};
   *pos += headerLen + size;
   return true;

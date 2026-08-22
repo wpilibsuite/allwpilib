@@ -13,7 +13,7 @@ namespace wpi::util {
  * In general this is the time returned by the operating system.
  * @return Time in nanoseconds.
  */
-uint64_t NowDefault();
+int64_t NowDefault();
 
 /**
  * Set the implementation used by Now().
@@ -26,14 +26,14 @@ uint64_t NowDefault();
  * implementation and original program start time, pass nullptr.
  * @param func Function called by Now() to return the time.
  */
-void SetNowImpl(uint64_t (*func)());
+void SetNowImpl(int64_t (*func)());
 
 /**
  * Return a value representing the current time in nanoseconds.
  * This is a monotonic clock with an undefined epoch.
  * @return Time in nanoseconds.
  */
-uint64_t Now();
+int64_t Now();
 
 /**
  * Return the timestamp at which the program started.
@@ -44,7 +44,7 @@ uint64_t Now();
  *
  * @return Program start time in nanoseconds.
  */
-uint64_t GetProgramStartTime();
+int64_t GetProgramStartTime();
 
 /**
  * Return the current system time in nanoseconds since the Unix epoch
@@ -52,6 +52,6 @@ uint64_t GetProgramStartTime();
  *
  * @return Time in nanoseconds.
  */
-uint64_t GetSystemTime();
+int64_t GetSystemTime();
 
 }  // namespace wpi::util

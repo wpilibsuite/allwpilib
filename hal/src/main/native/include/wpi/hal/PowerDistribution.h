@@ -413,7 +413,7 @@ void HAL_StartPowerDistributionStream(HAL_PowerDistributionHandle handle,
 typedef struct HAL_PowerDistributionChannelData {
   float current;
   int32_t channel;
-  uint64_t timestamp;
+  int64_t timestamp;
 } HAL_PowerDistributionChannelData;
 
 HAL_PowerDistributionChannelData* HAL_GetPowerDistributionStreamData(

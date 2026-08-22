@@ -112,7 +112,7 @@ int32_t HAL_GetCommsDisableCount(int32_t* status);
  *
  * @return The current monotonic time in nanoseconds.
  */
-uint64_t HAL_GetMonotonicTime(void);
+int64_t HAL_GetMonotonicTime(void);
 
 /**
  * Gets the current state of the Robot Signal Light (RSL).

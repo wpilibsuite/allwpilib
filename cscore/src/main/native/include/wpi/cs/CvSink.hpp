@@ -54,7 +54,7 @@ class CvSink : public ImageSink {
    * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) {
+  int64_t GrabFrame(cv::Mat& image, double timeout = 0.225) {
     cv::Mat tmpnam;
     auto retVal = GrabFrameDirect(tmpnam);
     if (retVal <= 0) {
@@ -74,7 +74,7 @@ class CvSink : public ImageSink {
    * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeout(cv::Mat& image) {
+  int64_t GrabFrameNoTimeout(cv::Mat& image) {
     cv::Mat tmpnam;
     auto retVal = GrabFrameNoTimeoutDirect(tmpnam);
     if (retVal <= 0) {
@@ -96,7 +96,7 @@ class CvSink : public ImageSink {
    * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225) {
+  int64_t GrabFrameDirect(cv::Mat& image, double timeout = 0.225) {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
@@ -124,7 +124,7 @@ class CvSink : public ImageSink {
    * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameNoTimeoutDirect(cv::Mat& image) {
+  int64_t GrabFrameNoTimeoutDirect(cv::Mat& image) {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
@@ -158,8 +158,8 @@ class CvSink : public ImageSink {
    * wpi::util::Now(), and is in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t GrabFrameDirectLastTime(cv::Mat& image, uint64_t lastFrameTime,
-                                   double timeout = 0.225) {
+  int64_t GrabFrameDirectLastTime(cv::Mat& image, int64_t lastFrameTime,
+                                  double timeout = 0.225) {
     rawFrame.height = 0;
     rawFrame.width = 0;
     rawFrame.stride = 0;
@@ -183,7 +183,7 @@ class CvSink : public ImageSink {
    * @return Time in 1 ns increments.
    */
   [[nodiscard]]
-  uint64_t LastFrameTime() {
+  int64_t LastFrameTime() {
     return rawFrame.timestamp;
   }
 

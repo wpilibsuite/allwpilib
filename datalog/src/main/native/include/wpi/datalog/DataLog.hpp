@@ -493,7 +493,7 @@ class DataLog {
   // must be called with m_mutex held
   int StartImpl(std::string_view name, std::string_view type,
                 std::string_view metadata, int64_t timestamp);
-  uint8_t* StartRecord(uint32_t entry, uint64_t timestamp, uint32_t payloadSize,
+  uint8_t* StartRecord(uint32_t entry, int64_t timestamp, uint32_t payloadSize,
                        size_t reserveSize);
   uint8_t* Reserve(size_t size);
   void AppendImpl(std::span<const uint8_t> data);

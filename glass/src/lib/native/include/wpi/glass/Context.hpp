@@ -25,7 +25,7 @@ void SetCurrentContext(Context* ctx);
 /**
  * Gets the timestamp display start time.
  */
-uint64_t GetZeroTime();
+int64_t GetZeroTime();
 
 /**
  * Converts a timestamp to the current display time base.
@@ -33,7 +33,7 @@ uint64_t GetZeroTime();
  * @param time timestamp in nanoseconds
  * @return display time in seconds
  */
-double TimestampToDisplayTime(uint64_t time);
+double TimestampToDisplayTime(int64_t time);
 
 /**
  * Converts a timestamp to the current display time base.

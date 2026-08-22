@@ -147,7 +147,7 @@ struct HAL_CANMessage {
 
 struct HAL_CANReceiveMessage {
   /** Receive timestamp (wpi time) */
-  uint64_t timeStamp;
+  int64_t timeStamp;
   /** The received message */
   struct HAL_CANMessage message;
 };

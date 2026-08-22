@@ -24,7 +24,7 @@ class monotonic_clock {
   static constexpr bool is_steady = true;
 
   static time_point now() noexcept {
-    uint64_t currentTime = HAL_GetMonotonicTime();
+    int64_t currentTime = HAL_GetMonotonicTime();
     return time_point{std::chrono::nanoseconds{currentTime}};
   }
 };

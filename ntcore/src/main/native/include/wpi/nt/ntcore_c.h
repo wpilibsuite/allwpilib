@@ -202,7 +202,7 @@ struct NT_ConnectionInfo {
    * The last time any update was received from the remote node (same scale as
    * returned by wpi::nt::Now()).
    */
-  uint64_t last_update;
+  int64_t last_update;
 
   /**
    * The protocol version being used for this connection.  This in protocol
@@ -442,7 +442,7 @@ enum NT_Type NT_GetEntryType(NT_Entry entry);
  * @param entry   entry handle
  * @return Entry last change time, in nanoseconds
  */
-uint64_t NT_GetEntryLastChange(NT_Entry entry);
+int64_t NT_GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
@@ -1731,7 +1731,7 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value);
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
  */
-NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueBoolean(const struct NT_Value* value, int64_t* last_change,
                            NT_Bool* v_boolean);
 
 /**
@@ -1744,7 +1744,7 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
  * @param v_int       returns the int assigned to the name
  * @return            1 if successful, or 0 if value is null or not an int
  */
-NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueInteger(const struct NT_Value* value, int64_t* last_change,
                            int64_t* v_int);
 
 /**
@@ -1757,7 +1757,7 @@ NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
  * @param v_float     returns the float assigned to the name
  * @return            1 if successful, or 0 if value is null or not a float
  */
-NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueFloat(const struct NT_Value* value, int64_t* last_change,
                          float* v_float);
 
 /**
@@ -1770,7 +1770,7 @@ NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
  * @param v_double    returns the double assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
  */
-NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueDouble(const struct NT_Value* value, int64_t* last_change,
                           double* v_double);
 
 /**
@@ -1788,7 +1788,7 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
+char* NT_GetValueString(const struct NT_Value* value, int64_t* last_change,
                         size_t* str_len);
 
 /**
@@ -1806,7 +1806,7 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
+uint8_t* NT_GetValueRaw(const struct NT_Value* value, int64_t* last_change,
                         size_t* raw_len);
 
 /**
@@ -1825,7 +1825,7 @@ uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
  * freed separately.
  */
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size);
+                                 int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the int array from the NT_Value.
@@ -1843,7 +1843,7 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
  * freed separately.
  */
 int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size);
+                                 int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the float array from the NT_Value.
@@ -1860,8 +1860,8 @@ int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
  * The returned array is a copy of the array in the value, and must be
  * freed separately.
  */
-float* NT_GetValueFloatArray(const struct NT_Value* value,
-                             uint64_t* last_change, size_t* arr_size);
+float* NT_GetValueFloatArray(const struct NT_Value* value, int64_t* last_change,
+                             size_t* arr_size);
 
 /**
  * Returns a copy of the double array from the NT_Value.
@@ -1879,7 +1879,7 @@ float* NT_GetValueFloatArray(const struct NT_Value* value,
  * freed separately.
  */
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
-                               uint64_t* last_change, size_t* arr_size);
+                               int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the struct WPI_String array from the NT_Value.
@@ -1899,7 +1899,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * WPI_FreeStringArray() function will free all the struct WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                          uint64_t* last_change,
+                                          int64_t* last_change,
                                           size_t* arr_size);
 
 /** @} */

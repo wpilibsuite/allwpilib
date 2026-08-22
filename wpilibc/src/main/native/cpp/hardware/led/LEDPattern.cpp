@@ -100,9 +100,7 @@ LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
 
     // every step in time that's a multiple of nanosPerLed will increment
     // the offset by 1
-    // cast unsigned int64 `now` to a signed int64 so we can get negative
-    // offset values for negative velocities
-    auto offset = static_cast<int64_t>(now) / nanosPerLed;
+    auto offset = now / nanosPerLed;
 
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
                                static_cast<int>(bufLen));
@@ -111,8 +109,8 @@ LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
 
 LEDPattern LEDPattern::Blink(wpi::units::second_t onTime,
                              wpi::units::second_t offTime) {
-  auto totalNanos = wpi::units::nanosecond_t{onTime + offTime}.to<uint64_t>();
-  auto onNanos = wpi::units::nanosecond_t{onTime}.to<uint64_t>();
+  auto totalNanos = wpi::units::nanosecond_t{onTime + offTime}.to<int64_t>();
+  auto onNanos = wpi::units::nanosecond_t{onTime}.to<int64_t>();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     if (wpi::util::Now() % totalNanos < onNanos) {
@@ -142,7 +140,7 @@ LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
 
   return LEDPattern{[periodNanos, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&writer, periodNanos](int i, wpi::util::Color color) {
-      double t = (wpi::util::Now() % periodNanos.to<uint64_t>()) /
+      double t = (wpi::util::Now() % periodNanos.to<int64_t>()) /
                  periodNanos.to<double>();
       double phase = t * 2 * std::numbers::pi;
 

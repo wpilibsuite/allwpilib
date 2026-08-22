@@ -129,14 +129,14 @@ void PyNotifier::SetCallback(std::function<void()> handler) {
 void PyNotifier::StartSingle(wpi::units::second_t delay) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier,
-                       wpi::units::nanosecond_t{delay}.to<uint64_t>(), 0, false,
+                       wpi::units::nanosecond_t{delay}.to<int64_t>(), 0, false,
                        false, &status);
   WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }
 
 void PyNotifier::StartPeriodic(wpi::units::second_t period) {
   int32_t status = 0;
-  auto periodNs = wpi::units::nanosecond_t{period}.to<uint64_t>();
+  auto periodNs = wpi::units::nanosecond_t{period}.to<int64_t>();
   HAL_SetNotifierAlarm(m_notifier, periodNs, periodNs, false, false, &status);
   WPILIB_CheckErrorStatus(status, "SetNotifierAlarm");
 }

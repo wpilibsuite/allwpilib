@@ -15,7 +15,7 @@
 using namespace wpi;
 
 namespace {
-uint64_t mockTime = 0;
+int64_t mockTime = 0;
 
 class ScopedMockTimeSource {
  public:
@@ -96,7 +96,7 @@ TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
 
 TEST_CASE_METHOD(TimerTest, "TimerTest ResetWithLargeTimestamp", "[wpilibc]") {
   ScopedMockTimeSource timeSource;
-  mockTime = 1'000'000'002;
+  mockTime = 1'000'000'000LL;
 
   Timer timer;
   timer.Start();
@@ -164,8 +164,8 @@ TEST_CASE_METHOD(TimerTest,
 
   auto period = wpi::units::second_t{1.0 / 60.0};
 
-  for (uint64_t i = 1; i <= 60; ++i) {
-    mockTime = (i * 1'000'000'000 + 59) / 60 + 100;
+  for (int64_t i = 1; i <= 60; ++i) {
+    mockTime = (i * 1'000'000'000LL + 59) / 60 + 100;
 
     CHECK(timer.AdvanceIfElapsed(period));
     CHECK_FALSE(timer.AdvanceIfElapsed(period));

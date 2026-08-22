@@ -64,15 +64,15 @@ struct BackendState {
 };
 
 BackendState gBackendState;
-uint64_t gMockNow = 0;
+int64_t gMockNow = 0;
 
-uint64_t MockNow() {
+int64_t MockNow() {
   return gMockNow;
 }
 
 class ScopedNowImpl {
  public:
-  explicit ScopedNowImpl(uint64_t now) {
+  explicit ScopedNowImpl(int64_t now) {
     gMockNow = now;
     WPI_SetNowImpl(MockNow);
   }

@@ -72,7 +72,7 @@ class RecordingWireConnection : public WireConnection {
     binarySends.emplace_back(std::move(binary));
   }
 
-  uint64_t GetLastFlushTime() const override { return lastFlushTime; }
+  int64_t GetLastFlushTime() const override { return lastFlushTime; }
   uint64_t GetLastReceivedTime() const override { return lastReceivedTime; }
 
   void StopRead() override { readStopped = true; }
@@ -94,7 +94,7 @@ class RecordingWireConnection : public WireConnection {
   unsigned int version = 0x0401;
   bool ready = true;
   bool readStopped = false;
-  uint64_t lastFlushTime = 0;
+  int64_t lastFlushTime = 0;
   uint64_t lastReceivedTime = 0;
   std::string disconnectReason;
   std::vector<uint64_t> pings;
