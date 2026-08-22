@@ -2,7 +2,7 @@ name: Nightly Build
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Every day at 12:00 AM UTC (8PM EST)
+    - cron: "0 0 * * 0" # Every Sunday at 12:00 AM UTC (8PM EST)
   pull_request: # TODO:TODO:TODO: REMOVE
 
 concurrency:
