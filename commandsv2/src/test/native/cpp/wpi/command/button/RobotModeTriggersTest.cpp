@@ -18,6 +18,7 @@ TEST_CASE("RobotModeTriggersTest Autonomous", "[commandsv2][command]") {
   DriverStationSim::SetRobotMode(wpi::hal::RobotMode::AUTONOMOUS);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
   Trigger autonomous = RobotModeTriggers::Autonomous();
   CHECK(autonomous.Get());
 }
@@ -27,6 +28,7 @@ TEST_CASE("RobotModeTriggersTest Teleop", "[commandsv2][command]") {
   DriverStationSim::SetRobotMode(wpi::hal::RobotMode::TELEOPERATED);
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
   Trigger teleop = RobotModeTriggers::Teleop();
   CHECK(teleop.Get());
 }
@@ -36,6 +38,7 @@ TEST_CASE("RobotModeTriggersTest Disabled", "[commandsv2][command]") {
   DriverStationSim::SetEnabled(false);
   DriverStationSim::NotifyNewData();
   Trigger disabled = RobotModeTriggers::Disabled();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
   CHECK(disabled.Get());
 }
 
@@ -45,5 +48,6 @@ TEST_CASE("RobotModeTriggersTest UtilityMode", "[commandsv2][command]") {
   DriverStationSim::SetEnabled(true);
   DriverStationSim::NotifyNewData();
   Trigger test = RobotModeTriggers::Utility();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
   CHECK(test.Get());
 }

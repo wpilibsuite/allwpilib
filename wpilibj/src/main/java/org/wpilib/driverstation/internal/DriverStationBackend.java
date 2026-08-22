@@ -22,6 +22,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.TouchpadFinger;
 import org.wpilib.framework.OpModeRobot;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.AllianceStationID;
 import org.wpilib.hardware.hal.ControlWord;
@@ -723,7 +724,7 @@ public final class DriverStationBackend {
   private static boolean m_silenceJoystickAlerts;
   private static final JoystickAlerts[] m_joystickAlerts = new JoystickAlerts[JOYSTICK_PORTS];
 
-  private static boolean m_userProgramStarted = false;
+  private static volatile boolean m_userProgramStarted = false;
   private static final Map<Long, OpModeOption> m_opModes = new HashMap<>();
   private static final ReentrantLock m_opModesMutex = new ReentrantLock();
 
@@ -1385,9 +1386,18 @@ public final class DriverStationBackend {
    *
    * <p>Note that this does not indicate whether the robot is enabled or disabled.
    *
+   * <p>This method always returns {@link RobotMode#UNKNOWN} while the main robot class is being
+   * constructed and initialized (more specifically, it returns {@link RobotMode#UNKNOWN} until
+   * {@link #observeUserProgramStarting()} is called, which the WPILib framework will automatically
+   * call during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return robot mode
    */
   public static RobotMode getRobotMode() {
+    if (!m_userProgramStarted) {
+      return RobotMode.UNKNOWN;
+    }
+
     m_cacheDataMutex.lock();
     try {
       return m_controlWord.getRobotMode();
@@ -1400,27 +1410,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public static boolean isAutonomous() {
-    m_cacheDataMutex.lock();
-    try {
-      return m_controlWord.isAutonomous();
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return getRobotMode() == RobotMode.AUTONOMOUS;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * autonomous mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if autonomous should be set and the robot should be enabled.
    */
   public static boolean isAutonomousEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isAutonomousEnabled();
+      return isAutonomous() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1430,22 +1445,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controlled mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if operator-controlled mode should be enabled, false otherwise.
    */
   public static boolean isTeleop() {
-    return m_controlWord.isTeleop();
+    return getRobotMode() == RobotMode.TELEOPERATED;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in
    * operator-controller mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if operator-controlled mode should be set and the robot should be enabled.
    */
   public static boolean isTeleopEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isTeleopEnabled();
+      return isTeleop() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1455,27 +1480,32 @@ public final class DriverStationBackend {
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if utility mode should be enabled, false otherwise.
    */
   public static boolean isUtility() {
-    m_cacheDataMutex.lock();
-    try {
-      return m_controlWord.isUtility();
-    } finally {
-      m_cacheDataMutex.unlock();
-    }
+    return getRobotMode() == RobotMode.UTILITY;
   }
 
   /**
    * Gets a value indicating whether the Driver Station requires the robot to be running in Utility
    * mode and enabled.
    *
+   * <p>This method always returns {@code false} while the main robot class is being constructed and
+   * initialized (more specifically, it returns {@code false} until {@link
+   * #observeUserProgramStarting()} is called, which the WPILib framework will automatically call
+   * during {@link TimedRobot#startCompetition()} and {@link OpModeRobot#startCompetition()}).
+   *
    * @return True if utility mode should be set and the robot should be enabled.
    */
   public static boolean isUtilityEnabled() {
     m_cacheDataMutex.lock();
     try {
-      return m_controlWord.isUtilityEnabled();
+      return isUtility() && isEnabled();
     } finally {
       m_cacheDataMutex.unlock();
     }
@@ -1669,6 +1699,28 @@ public final class DriverStationBackend {
   public static void observeUserProgramStarting() {
     m_userProgramStarted = true;
     DriverStationJNI.observeUserProgramStarting();
+  }
+
+  /**
+   * For internal unit testing in WPILib. Not for team use. Has no effect unless called in
+   * simulation mode.
+   *
+   * <p>Resets the {@code m_userProgramStarted} flag for unit tests. Does not reset anything in the
+   * JNI layer.
+   */
+  public static void clearUserProgramStarted() {
+    if (!RobotBase.isSimulation()) {
+      // NOP unless running in sim. We don't want teams to call this; it would prevent their
+      // programs from transitioning between modes and from detecting opmode selections.
+      reportWarning(
+          "DriverStationBackend.clearUserProgramStarted() was called! "
+              + "This method exists solely for internal WPILib unit tests "
+              + "and does nothing in team code.",
+          true);
+      return;
+    }
+
+    m_userProgramStarted = false;
   }
 
   /**
