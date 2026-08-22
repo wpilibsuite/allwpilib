@@ -265,7 +265,7 @@ class DataLogReader:
 if __name__ == "__main__":
     import mmap
     import sys
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
@@ -277,6 +277,8 @@ if __name__ == "__main__":
         if not reader:
             print("not a log file", file=sys.stderr)
             sys.exit(1)
+
+        local_timezone = datetime.now(timezone.utc).astimezone().tzinfo
 
         entries = {}
         for record in reader:
@@ -325,8 +327,8 @@ if __name__ == "__main__":
                     if entry.name == "systemTime" and entry.type == "int64":
                         val = record.getInteger()
                         dt = datetime.fromtimestamp(
-                            val // 1_000_000_000
-                        )  # noqa: DTZ006
+                            val // 1_000_000_000, tz=local_timezone
+                        )
                         print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000_000:09d}")
                         continue
 

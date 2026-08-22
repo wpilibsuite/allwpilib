@@ -15,6 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     reader = DataLogReader(args.infile)
+    local_timezone = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo
 
     entries = {}
     for record in reader:
@@ -60,7 +61,9 @@ if __name__ == "__main__":
                 # handle systemTime specially
                 if entry.name == "systemTime" and entry.type == "int64":
                     val = record.getInteger()
-                    dt = datetime.fromtimestamp(val // 1_000_000_000)
+                    dt = datetime.datetime.fromtimestamp(
+                        val // 1_000_000_000, tz=local_timezone
+                    )
                     print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000_000:09d}")
                     continue
 
