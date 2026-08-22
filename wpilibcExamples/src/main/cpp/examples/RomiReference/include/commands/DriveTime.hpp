@@ -21,7 +21,7 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
    * @param time How much time to drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveTime(double velocity, wpi::units::second_t time, Drivetrain* drive)
+  DriveTime(double velocity, wpi::units::seconds<> time, Drivetrain* drive)
       : velocity(velocity), duration(time), drive(drive) {
     AddRequirements(drive);
   }
@@ -33,7 +33,7 @@ class DriveTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, DriveTime> {
 
  private:
   double velocity;
-  wpi::units::second_t duration;
+  wpi::units::seconds<> duration;
   Drivetrain* drive;
   wpi::Timer timer;
 };

@@ -16,26 +16,26 @@ void Drivetrain::SetVelocities(
   double rightOutput = rightPIDController.Calculate(rightEncoder.GetRate(),
                                                     velocities.right.value());
 
-  leftLeader.SetVoltage(wpi::units::volt_t{leftOutput} + leftFeedforward);
-  rightLeader.SetVoltage(wpi::units::volt_t{rightOutput} + rightFeedforward);
+  leftLeader.SetVoltage(wpi::units::volts<>{leftOutput} + leftFeedforward);
+  rightLeader.SetVoltage(wpi::units::volts<>{rightOutput} + rightFeedforward);
 }
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
-                       wpi::units::radians_per_second_t rot) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xVelocity,
+                       wpi::units::radians_per_second<> rot) {
   SetVelocities(kinematics.ToWheelVelocities({xVelocity, 0_mps, rot}));
 }
 
 void Drivetrain::UpdateOdometry() {
   odometry.Update(imu.GetRotation2d(),
-                  wpi::units::meter_t{leftEncoder.GetDistance()},
-                  wpi::units::meter_t{rightEncoder.GetDistance()});
+                  wpi::units::meters<>{leftEncoder.GetDistance()},
+                  wpi::units::meters<>{rightEncoder.GetDistance()});
 }
 
 void Drivetrain::ResetOdometry(const wpi::math::Pose2d& pose) {
   drivetrainSimulator.SetPose(pose);
-  odometry.ResetPosition(imu.GetRotation2d(),
-                         wpi::units::meter_t{leftEncoder.GetDistance()},
-                         wpi::units::meter_t{rightEncoder.GetDistance()}, pose);
+  odometry.ResetPosition(
+      imu.GetRotation2d(), wpi::units::meters<>{leftEncoder.GetDistance()},
+      wpi::units::meters<>{rightEncoder.GetDistance()}, pose);
 }
 
 void Drivetrain::SimulationPeriodic() {
@@ -43,9 +43,9 @@ void Drivetrain::SimulationPeriodic() {
   // simulation, and write the simulated positions and velocities to our
   // simulated encoder and gyro. We negate the right side so that positive
   // voltages make the right side move forward.
-  drivetrainSimulator.SetInputs(wpi::units::volt_t{leftLeader.GetThrottle()} *
+  drivetrainSimulator.SetInputs(wpi::units::volts<>{leftLeader.GetThrottle()} *
                                     wpi::RobotController::GetInputVoltage(),
-                                wpi::units::volt_t{rightLeader.GetThrottle()} *
+                                wpi::units::volts<>{rightLeader.GetThrottle()} *
                                     wpi::RobotController::GetInputVoltage());
   drivetrainSimulator.Update(20_ms);
 

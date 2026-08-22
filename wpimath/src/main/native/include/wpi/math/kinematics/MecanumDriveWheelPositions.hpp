@@ -16,22 +16,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelPositions {
   /**
    * Distance driven by the front-left wheel.
    */
-  wpi::units::meter_t frontLeft = 0_m;
+  wpi::units::meters<> frontLeft = 0_m;
 
   /**
    * Distance driven by the front-right wheel.
    */
-  wpi::units::meter_t frontRight = 0_m;
+  wpi::units::meters<> frontRight = 0_m;
 
   /**
    * Distance driven by the rear-left wheel.
    */
-  wpi::units::meter_t rearLeft = 0_m;
+  wpi::units::meters<> rearLeft = 0_m;
 
   /**
    * Distance driven by the rear-right wheel.
    */
-  wpi::units::meter_t rearRight = 0_m;
+  wpi::units::meters<> rearRight = 0_m;
 
   /**
    * Checks equality between this MecanumDriveWheelPositions and another object.

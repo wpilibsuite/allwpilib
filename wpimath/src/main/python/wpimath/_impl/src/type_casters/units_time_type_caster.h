@@ -1,102 +1,102 @@
 #pragma once
 
-#include "wpi/units/time.hpp"
+#include <wpi/units/time.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::second_t> {
+template <> struct handle_type_name<wpi::units::seconds<>> {
   static constexpr auto name = _("wpimath.units.seconds");
 };
 
-template <> struct handle_type_name<wpi::units::seconds> {
+template <> struct handle_type_name<wpi::units::seconds_> {
   static constexpr auto name = _("wpimath.units.seconds");
 };
 
-template <> struct handle_type_name<wpi::units::nanosecond_t> {
+template <> struct handle_type_name<wpi::units::nanoseconds<>> {
   static constexpr auto name = _("wpimath.units.nanoseconds");
 };
 
-template <> struct handle_type_name<wpi::units::nanoseconds> {
+template <> struct handle_type_name<wpi::units::nanoseconds_> {
   static constexpr auto name = _("wpimath.units.nanoseconds");
 };
 
-template <> struct handle_type_name<wpi::units::microsecond_t> {
+template <> struct handle_type_name<wpi::units::microseconds<>> {
   static constexpr auto name = _("wpimath.units.microseconds");
 };
 
-template <> struct handle_type_name<wpi::units::microseconds> {
+template <> struct handle_type_name<wpi::units::microseconds_> {
   static constexpr auto name = _("wpimath.units.microseconds");
 };
 
-template <> struct handle_type_name<wpi::units::millisecond_t> {
+template <> struct handle_type_name<wpi::units::milliseconds<>> {
   static constexpr auto name = _("wpimath.units.milliseconds");
 };
 
-template <> struct handle_type_name<wpi::units::milliseconds> {
+template <> struct handle_type_name<wpi::units::milliseconds_> {
   static constexpr auto name = _("wpimath.units.milliseconds");
 };
 
-template <> struct handle_type_name<wpi::units::kilosecond_t> {
+template <> struct handle_type_name<wpi::units::kiloseconds<>> {
   static constexpr auto name = _("wpimath.units.kiloseconds");
 };
 
-template <> struct handle_type_name<wpi::units::kiloseconds> {
+template <> struct handle_type_name<wpi::units::kiloseconds_> {
   static constexpr auto name = _("wpimath.units.kiloseconds");
 };
 
-template <> struct handle_type_name<wpi::units::minute_t> {
+template <> struct handle_type_name<wpi::units::minutes<>> {
   static constexpr auto name = _("wpimath.units.minutes");
 };
 
-template <> struct handle_type_name<wpi::units::minutes> {
+template <> struct handle_type_name<wpi::units::minutes_> {
   static constexpr auto name = _("wpimath.units.minutes");
 };
 
-template <> struct handle_type_name<wpi::units::hour_t> {
+template <> struct handle_type_name<wpi::units::hours<>> {
   static constexpr auto name = _("wpimath.units.hours");
 };
 
-template <> struct handle_type_name<wpi::units::hours> {
+template <> struct handle_type_name<wpi::units::hours_> {
   static constexpr auto name = _("wpimath.units.hours");
 };
 
-template <> struct handle_type_name<wpi::units::day_t> {
+template <> struct handle_type_name<wpi::units::days<>> {
   static constexpr auto name = _("wpimath.units.days");
 };
 
-template <> struct handle_type_name<wpi::units::days> {
+template <> struct handle_type_name<wpi::units::days_> {
   static constexpr auto name = _("wpimath.units.days");
 };
 
-template <> struct handle_type_name<wpi::units::week_t> {
+template <> struct handle_type_name<wpi::units::weeks<>> {
   static constexpr auto name = _("wpimath.units.weeks");
 };
 
-template <> struct handle_type_name<wpi::units::weeks> {
+template <> struct handle_type_name<wpi::units::weeks_> {
   static constexpr auto name = _("wpimath.units.weeks");
 };
 
-template <> struct handle_type_name<wpi::units::year_t> {
+template <> struct handle_type_name<wpi::units::years<>> {
   static constexpr auto name = _("wpimath.units.years");
 };
 
-template <> struct handle_type_name<wpi::units::years> {
+template <> struct handle_type_name<wpi::units::years_> {
   static constexpr auto name = _("wpimath.units.years");
 };
 
-template <> struct handle_type_name<wpi::units::julian_year_t> {
+template <> struct handle_type_name<wpi::units::julian_years<>> {
   static constexpr auto name = _("wpimath.units.julian_years");
 };
 
-template <> struct handle_type_name<wpi::units::julian_years> {
+template <> struct handle_type_name<wpi::units::julian_years_> {
   static constexpr auto name = _("wpimath.units.julian_years");
 };
 
-template <> struct handle_type_name<wpi::units::gregorian_year_t> {
+template <> struct handle_type_name<wpi::units::gregorian_years<>> {
   static constexpr auto name = _("wpimath.units.gregorian_years");
 };
 
-template <> struct handle_type_name<wpi::units::gregorian_years> {
+template <> struct handle_type_name<wpi::units::gregorian_years_> {
   static constexpr auto name = _("wpimath.units.gregorian_years");
 };
 

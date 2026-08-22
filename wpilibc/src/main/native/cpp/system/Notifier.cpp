@@ -103,20 +103,20 @@ void Notifier::SetCallback(std::function<void()> callback) {
   m_callback = callback;
 }
 
-void Notifier::StartSingle(wpi::units::second_t delay) {
+void Notifier::StartSingle(wpi::units::seconds<> delay) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(delay * 1e6), 0, false,
                        false, &status);
 }
 
-void Notifier::StartPeriodic(wpi::units::second_t period) {
+void Notifier::StartPeriodic(wpi::units::seconds<> period) {
   int32_t status = 0;
   HAL_SetNotifierAlarm(m_notifier, static_cast<uint64_t>(period * 1e6),
                        static_cast<uint64_t>(period * 1e6), false, false,
                        &status);
 }
 
-void Notifier::StartPeriodic(wpi::units::hertz_t frequency) {
+void Notifier::StartPeriodic(wpi::units::hertz<> frequency) {
   StartPeriodic(1 / frequency);
 }
 

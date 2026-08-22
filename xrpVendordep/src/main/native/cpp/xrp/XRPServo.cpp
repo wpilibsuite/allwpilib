@@ -46,8 +46,8 @@ XRPServo::XRPServo(int deviceNum) {
   }
 }
 
-void XRPServo::SetAngle(wpi::units::radian_t angle) {
-  angle = std::clamp<wpi::units::radian_t>(angle, 0_deg, 180_deg);
+void XRPServo::SetAngle(wpi::units::radians<> angle) {
+  angle = std::clamp<wpi::units::radians<>>(angle, 0_deg, 180_deg);
   double pos = angle.value() / std::numbers::pi;
 
   if (m_simPosition) {
@@ -55,9 +55,9 @@ void XRPServo::SetAngle(wpi::units::radian_t angle) {
   }
 }
 
-wpi::units::radian_t XRPServo::GetAngle() const {
+wpi::units::radians<> XRPServo::GetAngle() const {
   if (m_simPosition) {
-    return wpi::units::radian_t{m_simPosition.Get() * std::numbers::pi};
+    return wpi::units::radians<>{m_simPosition.Get() * std::numbers::pi};
   }
 
   return 90_deg;

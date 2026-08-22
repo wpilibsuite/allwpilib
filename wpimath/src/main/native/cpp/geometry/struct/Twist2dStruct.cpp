@@ -14,9 +14,9 @@ using StructType = wpi::util::Struct<wpi::math::Twist2d>;
 
 wpi::math::Twist2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Twist2d{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDxOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kDyOff>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, kDthetaOff>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, kDxOff>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, kDyOff>(data)},
+      wpi::units::radians<>{wpi::util::UnpackStruct<double, kDthetaOff>(data)},
   };
 }
 

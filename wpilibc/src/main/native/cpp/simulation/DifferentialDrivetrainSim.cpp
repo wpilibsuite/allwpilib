@@ -17,9 +17,9 @@ using namespace wpi;
 using namespace wpi::sim;
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
-    wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meter_t trackwidth,
+    wpi::math::LinearSystem<2, 2, 2> plant, wpi::units::meters<> trackwidth,
     wpi::math::DCMotor driveMotor, double gearRatio,
-    wpi::units::meter_t wheelRadius,
+    wpi::units::meters<> wheelRadius,
     const std::array<double, 7>& measurementStdDevs)
     : m_plant(std::move(plant)),
       m_rb(trackwidth / 2.0),
@@ -35,8 +35,8 @@ DifferentialDrivetrainSim::DifferentialDrivetrainSim(
 
 DifferentialDrivetrainSim::DifferentialDrivetrainSim(
     wpi::math::DCMotor driveMotor, double gearing,
-    wpi::units::kilogram_square_meter_t J, wpi::units::kilogram_t mass,
-    wpi::units::meter_t wheelRadius, wpi::units::meter_t trackwidth,
+    wpi::units::kilogram_square_meters<> J, wpi::units::kilograms<> mass,
+    wpi::units::meters<> wheelRadius, wpi::units::meters<> trackwidth,
     const std::array<double, 7>& measurementStdDevs)
     : DifferentialDrivetrainSim(
           wpi::math::Models::DifferentialDriveFromPhysicalConstants(
@@ -49,8 +49,8 @@ Eigen::Vector2d DifferentialDrivetrainSim::ClampInput(
       u, wpi::RobotController::GetInputVoltage());
 }
 
-void DifferentialDrivetrainSim::SetInputs(wpi::units::volt_t leftVoltage,
-                                          wpi::units::volt_t rightVoltage) {
+void DifferentialDrivetrainSim::SetInputs(wpi::units::volts<> leftVoltage,
+                                          wpi::units::volts<> rightVoltage) {
   m_u << leftVoltage.value(), rightVoltage.value();
   m_u = ClampInput(m_u);
 }
@@ -59,7 +59,7 @@ void DifferentialDrivetrainSim::SetGearing(double newGearing) {
   m_currentGearing = newGearing;
 }
 
-void DifferentialDrivetrainSim::Update(wpi::units::second_t dt) {
+void DifferentialDrivetrainSim::Update(wpi::units::seconds<> dt) {
   m_x = wpi::math::RKDP([this](auto& x, auto& u) { return Dynamics(x, u); },
                         m_x, m_u, dt);
   m_y = m_x + wpi::math::Normal<7>(m_measurementStdDevs);
@@ -86,34 +86,34 @@ double DifferentialDrivetrainSim::GetState(int state) const {
 }
 
 wpi::math::Rotation2d DifferentialDrivetrainSim::GetHeading() const {
-  return wpi::units::radian_t{GetOutput(State::HEADING)};
+  return wpi::units::radians<>{GetOutput(State::HEADING)};
 }
 
 wpi::math::Pose2d DifferentialDrivetrainSim::GetPose() const {
-  return wpi::math::Pose2d{wpi::units::meter_t{GetOutput(State::X)},
-                           wpi::units::meter_t{GetOutput(State::Y)},
+  return wpi::math::Pose2d{wpi::units::meters<>{GetOutput(State::X)},
+                           wpi::units::meters<>{GetOutput(State::Y)},
                            GetHeading()};
 }
 
-wpi::units::ampere_t DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
+wpi::units::amperes<> DifferentialDrivetrainSim::GetLeftCurrentDraw() const {
   return m_motor.Current(
-             wpi::units::radians_per_second_t{m_x(State::LEFT_VELOCITY) *
+             wpi::units::radians_per_second<>{m_x(State::LEFT_VELOCITY) *
                                               m_currentGearing /
                                               m_wheelRadius.value()},
-             wpi::units::volt_t{m_u(0)}) *
+             wpi::units::volts<>{m_u(0)}) *
          wpi::util::sgn(m_u(0));
 }
 
-wpi::units::ampere_t DifferentialDrivetrainSim::GetRightCurrentDraw() const {
+wpi::units::amperes<> DifferentialDrivetrainSim::GetRightCurrentDraw() const {
   return m_motor.Current(
-             wpi::units::radians_per_second_t{m_x(State::RIGHT_VELOCITY) *
+             wpi::units::radians_per_second<>{m_x(State::RIGHT_VELOCITY) *
                                               m_currentGearing /
                                               m_wheelRadius.value()},
-             wpi::units::volt_t{m_u(1)}) *
+             wpi::units::volts<>{m_u(1)}) *
          wpi::util::sgn(m_u(1));
 }
 
-wpi::units::ampere_t DifferentialDrivetrainSim::GetCurrentDraw() const {
+wpi::units::amperes<> DifferentialDrivetrainSim::GetCurrentDraw() const {
   return GetLeftCurrentDraw() + GetRightCurrentDraw();
 }
 

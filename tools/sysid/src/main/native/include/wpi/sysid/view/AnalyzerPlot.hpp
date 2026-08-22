@@ -55,7 +55,7 @@ class AnalyzerPlot {
   void SetData(const Storage& rawData, const Storage& filteredData,
                std::string_view unit,
                const AnalysisManager::FeedforwardGains& ff,
-               const std::array<wpi::units::second_t, 4>& startTimes,
+               const std::array<wpi::units::seconds<>, 4>& startTimes,
                AnalysisType type, std::atomic<bool>& abort);
 
   /**

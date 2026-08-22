@@ -25,7 +25,7 @@ std::optional<wpi::math::SwerveModuleAcceleration> wpi::util::Protobuf<
   }
 
   return wpi::math::SwerveModuleAcceleration{
-      units::meters_per_second_squared_t{msg.acceleration},
+      units::meters_per_second_squared<>{msg.acceleration},
       iangle[0],
   };
 }

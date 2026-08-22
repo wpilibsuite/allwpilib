@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <array>
 
-#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -19,22 +18,22 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelVelocities {
   /**
    * Velocity of the front-left wheel.
    */
-  wpi::units::meters_per_second_t frontLeft = 0_mps;
+  wpi::units::meters_per_second<> frontLeft = 0_mps;
 
   /**
    * Velocity of the front-right wheel.
    */
-  wpi::units::meters_per_second_t frontRight = 0_mps;
+  wpi::units::meters_per_second<> frontRight = 0_mps;
 
   /**
    * Velocity of the rear-left wheel.
    */
-  wpi::units::meters_per_second_t rearLeft = 0_mps;
+  wpi::units::meters_per_second<> rearLeft = 0_mps;
 
   /**
    * Velocity of the rear-right wheel.
    */
-  wpi::units::meters_per_second_t rearRight = 0_mps;
+  wpi::units::meters_per_second<> rearRight = 0_mps;
 
   /**
    * Renormalizes the wheel velocities if any individual velocity is above the
@@ -53,15 +52,14 @@ struct WPILIB_DLLEXPORT MecanumDriveWheelVelocities {
    */
   [[nodiscard]]
   constexpr MecanumDriveWheelVelocities Desaturate(
-      wpi::units::meters_per_second_t attainableMaxVelocity) const {
-    std::array<wpi::units::meters_per_second_t, 4> wheelVelocities{
+      wpi::units::meters_per_second<> attainableMaxVelocity) const {
+    std::array<wpi::units::meters_per_second<>, 4> wheelVelocities{
         frontLeft, frontRight, rearLeft, rearRight};
-    wpi::units::meters_per_second_t realMaxVelocity =
-        wpi::units::math::abs(*std::max_element(
-            wheelVelocities.begin(), wheelVelocities.end(),
-            [](const auto& a, const auto& b) {
-              return wpi::units::math::abs(a) < wpi::units::math::abs(b);
-            }));
+    wpi::units::meters_per_second<> realMaxVelocity = wpi::units::abs(
+        *std::max_element(wheelVelocities.begin(), wheelVelocities.end(),
+                          [](const auto& a, const auto& b) {
+                            return wpi::units::abs(a) < wpi::units::abs(b);
+                          }));
 
     if (realMaxVelocity > attainableMaxVelocity) {
       for (int i = 0; i < 4; ++i) {

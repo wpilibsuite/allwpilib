@@ -16,8 +16,8 @@ std::optional<wpi::math::DifferentialDriveWheelVoltages> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialDriveWheelVoltages{
-      wpi::units::volt_t{msg.left},
-      wpi::units::volt_t{msg.right},
+      wpi::units::volts<>{msg.left},
+      wpi::units::volts<>{msg.right},
   };
 }
 

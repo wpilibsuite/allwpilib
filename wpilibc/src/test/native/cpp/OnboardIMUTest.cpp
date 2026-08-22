@@ -30,19 +30,19 @@ TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
 
   sim::OnboardIMUSim sim{};
 
-  sim.SetAngleX(wpi::units::radian_t{1});
-  sim.SetAngleY(wpi::units::radian_t{2});
-  sim.SetAngleZ(wpi::units::radian_t{3});
+  sim.SetAngleX(wpi::units::radians<>{1});
+  sim.SetAngleY(wpi::units::radians<>{2});
+  sim.SetAngleZ(wpi::units::radians<>{3});
 
-  sim.SetGyroRateX(wpi::units::radians_per_second_t{3.504});
-  sim.SetGyroRateY(wpi::units::radians_per_second_t{1.91});
-  sim.SetGyroRateZ(wpi::units::radians_per_second_t{22.9});
+  sim.SetGyroRateX(wpi::units::radians_per_second<>{3.504});
+  sim.SetGyroRateY(wpi::units::radians_per_second<>{1.91});
+  sim.SetGyroRateZ(wpi::units::radians_per_second<>{22.9});
 
-  sim.SetAccelX(wpi::units::meters_per_second_squared_t{-1});
-  sim.SetAccelY(wpi::units::meters_per_second_squared_t{-2});
-  sim.SetAccelZ(wpi::units::meters_per_second_squared_t{-3});
+  sim.SetAccelX(wpi::units::meters_per_second_squared<>{-1});
+  sim.SetAccelY(wpi::units::meters_per_second_squared<>{-2});
+  sim.SetAccelZ(wpi::units::meters_per_second_squared<>{-3});
 
-  sim.SetYaw(wpi::units::radian_t{1.234});
+  sim.SetYaw(wpi::units::radians<>{1.234});
 
   CHECK(1.0 == imu.GetAngleX().value());
   CHECK(2.0 == imu.GetAngleY().value());

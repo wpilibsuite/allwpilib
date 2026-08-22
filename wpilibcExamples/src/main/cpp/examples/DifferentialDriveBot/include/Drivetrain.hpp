@@ -45,19 +45,19 @@ class Drivetrain {
     rightEncoder.Reset();
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
+  static constexpr wpi::units::meters_per_second<> kMaxVelocity =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr wpi::units::radians_per_second<> kMaxAngularVelocity{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetVelocities(
       const wpi::math::DifferentialDriveWheelVelocities& velocities);
-  void Drive(wpi::units::meters_per_second_t xVelocity,
-             wpi::units::radians_per_second_t rot);
+  void Drive(wpi::units::meters_per_second<> xVelocity,
+             wpi::units::radians_per_second<> rot);
   void UpdateOdometry();
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
+  static constexpr wpi::units::meters<> kTrackwidth = 0.381_m * 2;
   static constexpr double kWheelRadius = 0.0508;  // meters
   static constexpr int kEncoderResolution = 4096;
 
@@ -76,11 +76,11 @@ class Drivetrain {
 
   wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
   wpi::math::DifferentialDriveOdometry odometry{
-      imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
-      wpi::units::meter_t{rightEncoder.GetDistance()}};
+      imu.GetRotation2d(), wpi::units::meters<>{leftEncoder.GetDistance()},
+      wpi::units::meters<>{rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
       1_V, 3_V / 1_mps};
 };

@@ -23,7 +23,7 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
    *
    * @param duration the time to wait
    */
-  explicit WaitCommand(wpi::units::second_t duration);
+  explicit WaitCommand(wpi::units::seconds<> duration);
 
   WaitCommand(WaitCommand&& other) = default;
 
@@ -44,6 +44,6 @@ class WaitCommand : public CommandHelper<Command, WaitCommand> {
   wpi::Timer m_timer;
 
  private:
-  wpi::units::second_t m_duration;
+  wpi::units::seconds<> m_duration;
 };
 }  // namespace wpi::cmd

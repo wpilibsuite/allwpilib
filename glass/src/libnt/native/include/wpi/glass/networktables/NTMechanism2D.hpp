@@ -94,7 +94,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
     ImU32 GetColor() const final { return m_colorValue; }
     double GetWeight() const final { return m_weightValue; }
     wpi::math::Rotation2d GetAngle() const final { return m_angleValue; }
-    wpi::units::meter_t GetLength() const final { return m_lengthValue; }
+    wpi::units::meters<> GetLength() const final { return m_lengthValue; }
 
     bool NTUpdate(const wpi::nt::Event& event, std::string_view name);
 
@@ -111,7 +111,7 @@ class NTMechanism2DModel : public Mechanism2DModel {
     ImU32 m_colorValue = IM_COL32_WHITE;
     double m_weightValue = 1.0;
     wpi::math::Rotation2d m_angleValue;
-    wpi::units::meter_t m_lengthValue = 0.0_m;
+    wpi::units::meters<> m_lengthValue = 0.0_m;
   };
 
   class RootModel final : public MechanismRootModel {

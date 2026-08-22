@@ -7,7 +7,6 @@
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/curvature.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -26,12 +25,12 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     : public TrajectoryConstraint {
  public:
   constexpr explicit CentripetalAccelerationConstraint(
-      wpi::units::meters_per_second_squared_t maxCentripetalAcceleration)
+      wpi::units::meters_per_second_squared<> maxCentripetalAcceleration)
       : m_maxCentripetalAcceleration(maxCentripetalAcceleration) {}
 
-  constexpr wpi::units::meters_per_second_t MaxVelocity(
+  constexpr wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     // ac = v²/r
     // k (curvature) = 1/r
 
@@ -42,19 +41,19 @@ class WPILIB_DLLEXPORT CentripetalAccelerationConstraint
     // We have to multiply by 1_rad here to get the units to cancel out nicely.
     // The units library defines a unit for radians although it is technically
     // unitless.
-    return wpi::units::math::sqrt(m_maxCentripetalAcceleration /
-                                  wpi::units::math::abs(curvature) * 1_rad);
+    return wpi::units::sqrt(m_maxCentripetalAcceleration /
+                            wpi::units::abs(curvature) * 1_rad);
   }
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     // The acceleration of the robot has no impact on the centripetal
     // acceleration of the robot.
     return {};
   }
 
  private:
-  wpi::units::meters_per_second_squared_t m_maxCentripetalAcceleration;
+  wpi::units::meters_per_second_squared<> m_maxCentripetalAcceleration;
 };
 }  // namespace wpi::math

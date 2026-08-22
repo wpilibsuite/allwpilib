@@ -22,7 +22,7 @@ class TurnDegrees
    * @param angle Degrees to turn. Leverages encoders to compare distance.
    * @param drive The drive subsystem on which this command will run
    */
-  TurnDegrees(double velocity, wpi::units::degree_t angle, Drivetrain* drive)
+  TurnDegrees(double velocity, wpi::units::degrees<> angle, Drivetrain* drive)
       : velocity(velocity), angle(angle), drive(drive) {
     AddRequirements(drive);
   }
@@ -34,8 +34,8 @@ class TurnDegrees
 
  private:
   double velocity;
-  wpi::units::degree_t angle;
+  wpi::units::degrees<> angle;
   Drivetrain* drive;
 
-  wpi::units::meter_t GetAverageTurningDistance();
+  wpi::units::meters<> GetAverageTurningDistance();
 };

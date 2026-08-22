@@ -4,8 +4,7 @@
 
 #pragma once
 
-#include "wpi/units/base.hpp"
-#include "wpi/units/math.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -17,12 +16,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelVelocities {
   /**
    * Velocity of the left side of the robot.
    */
-  wpi::units::meters_per_second_t left = 0_mps;
+  wpi::units::meters_per_second<> left = 0_mps;
 
   /**
    * Velocity of the right side of the robot.
    */
-  wpi::units::meters_per_second_t right = 0_mps;
+  wpi::units::meters_per_second<> right = 0_mps;
 
   /**
    * Renormalizes the wheel velocities if either side is above the specified
@@ -41,9 +40,9 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelVelocities {
    */
   [[nodiscard]]
   constexpr DifferentialDriveWheelVelocities Desaturate(
-      wpi::units::meters_per_second_t attainableMaxVelocity) {
-    auto realMaxVelocity = wpi::units::math::max(wpi::units::math::abs(left),
-                                                 wpi::units::math::abs(right));
+      wpi::units::meters_per_second<> attainableMaxVelocity) {
+    auto realMaxVelocity =
+        wpi::units::max(wpi::units::abs(left), wpi::units::abs(right));
 
     if (realMaxVelocity > attainableMaxVelocity) {
       return {left / realMaxVelocity * attainableMaxVelocity,

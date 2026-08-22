@@ -48,11 +48,11 @@ bool IsTimingPaused() {
   return HALSIM_IsTimingPaused();
 }
 
-void StepTiming(wpi::units::second_t delta) {
+void StepTiming(wpi::units::seconds<> delta) {
   HALSIM_StepTiming(static_cast<uint64_t>(delta.value() * 1e6));
 }
 
-void StepTimingAsync(wpi::units::second_t delta) {
+void StepTimingAsync(wpi::units::seconds<> delta) {
   HALSIM_StepTimingAsync(static_cast<uint64_t>(delta.value() * 1e6));
 }
 

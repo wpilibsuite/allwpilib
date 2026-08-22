@@ -50,7 +50,7 @@ class PWM : public wpi::telemetry::TelemetryLoggable {
    * @param time Microsecond PWM value. Range 0 - 4096.
    * @Common This is one of the commonly used methods for this class
    */
-  void SetPulseTime(wpi::units::microsecond_t time);
+  void SetPulseTime(wpi::units::microseconds<> time);
 
   /**
    * Get the PWM pulse time directly from the hardware.
@@ -59,7 +59,7 @@ class PWM : public wpi::telemetry::TelemetryLoggable {
    *
    * @return Microsecond PWM control value. Range 0 - 4096.
    */
-  wpi::units::microsecond_t GetPulseTime() const;
+  wpi::units::microseconds<> GetPulseTime() const;
 
   /**
    * Temporarily disables the PWM output. The next set call will re-enable
@@ -73,7 +73,7 @@ class PWM : public wpi::telemetry::TelemetryLoggable {
    * @param period The output period to apply to this channel, in milliseconds.
    * Valid values are 5ms, 10ms, and 20ms. Default is 20 ms.
    */
-  void SetOutputPeriod(wpi::units::millisecond_t period);
+  void SetOutputPeriod(wpi::units::milliseconds<> period);
 
   int GetChannel() const;
 

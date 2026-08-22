@@ -30,7 +30,7 @@ void FieldObject2d::SetPose(const wpi::math::Pose2d& pose) {
   SetPoses({pose});
 }
 
-void FieldObject2d::SetPose(wpi::units::meter_t x, wpi::units::meter_t y,
+void FieldObject2d::SetPose(wpi::units::meters<> x, wpi::units::meters<> y,
                             wpi::math::Rotation2d rotation) {
   SetPoses({{x, y, rotation}});
 }

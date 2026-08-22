@@ -212,7 +212,7 @@ TEST_CASE("LEDPatternTest ScrollRelativeForward", "[wpilibc]") {
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
   auto scroll =
-      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{1 / 256.0});
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz<>{1 / 256.0});
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -256,7 +256,7 @@ TEST_CASE("LEDPatternTest ScrollRelativeBackward", "[wpilibc]") {
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
   auto scroll =
-      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{-1 / 256.0});
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz<>{-1 / 256.0});
 
   static uint64_t now = 0ull;
   WPI_SetNowImpl([] { return now; });
@@ -972,7 +972,7 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtRelativeVelocity(wpi::units::hertz_t{1e6 / 8.0});
+                     .ScrollAtRelativeVelocity(wpi::units::hertz<>{1e6 / 8.0});
 
   pattern.ApplyTo(buffer);
 

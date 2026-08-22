@@ -33,14 +33,14 @@ class RomiServo {
    *
    * @param angle Desired angle in radians
    */
-  void SetAngle(wpi::units::radian_t angle);
+  void SetAngle(wpi::units::radians<> angle);
 
   /**
    * Get the servo angle.
    *
    * @return Current servo angle in radians
    */
-  wpi::units::radian_t GetAngle() const;
+  wpi::units::radians<> GetAngle() const;
 
  private:
   hal::SimDevice m_simDevice;

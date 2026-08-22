@@ -67,7 +67,7 @@ BooleanEvent BooleanEvent::Falling() {
                       });
 }
 
-BooleanEvent BooleanEvent::Debounce(wpi::units::second_t debounceTime,
+BooleanEvent BooleanEvent::Debounce(wpi::units::seconds<> debounceTime,
                                     wpi::math::Debouncer::DebounceType type) {
   return BooleanEvent(
       this->m_loop,

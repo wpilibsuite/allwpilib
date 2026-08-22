@@ -15,6 +15,7 @@
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/tunables/TunableTable.hpp"
 #include "wpi/tunables/Tunables.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/tunable.hpp"
 
@@ -45,7 +46,10 @@ class RecordingDirtyBackend : public TunableBackend {
 };
 
 struct UnitsTunableTest {
-  UnitsTunableTest() { TunableRegistry::RegisterBackend("", backend); }
+  UnitsTunableTest() {
+    wpi::tunables::TunableRegistry::Reset();
+    TunableRegistry::RegisterBackend("", backend);
+  }
 
   ~UnitsTunableTest() { TunableRegistry::Reset(); }
 
@@ -54,16 +58,21 @@ struct UnitsTunableTest {
 };
 
 struct UnitMemberComplex : public ComplexTunable {
-  wpi::units::meter_t distance{1.0};
+  wpi::units::meters<> distance{1.0};
+
+  std::string_view GetTunableType() const override { return "UnitComplex"; }
 
   void PublishTunable(TunableTable& table) override {
     table.Publish("distance", this, &UnitMemberComplex::distance);
   }
 };
+
 }  // namespace
 
+
 TEST_CASE_METHOD(UnitsTunableTest,
-                 "UnitsTunableTest MemberRemoteTuneMarksDirty", "[tunable]") {
+                 "UnitsTunableTest MemberRemoteTuneMarksDirty",
+                 "[wpimath][tunable]") {
   auto recordingBackend = std::make_shared<RecordingDirtyBackend>();
   TunableRegistry::RegisterBackend("/recording", recordingBackend);
 
@@ -79,4 +88,32 @@ TEST_CASE_METHOD(UnitsTunableTest,
   CHECK(std::find(recordingBackend->dirtyUids.begin(),
                   recordingBackend->dirtyUids.end(),
                   *uid) != recordingBackend->dirtyUids.end());
+}
+TEST_CASE_METHOD(UnitsTunableTest, "UnitsTunableTest PublishAndTune",
+                 "[wpimath][tunable]") {
+  wpi::tunables::Tunable<wpi::units::meters<>> distance{6_m};
+  wpi::tunables::Publish("distance", distance);
+  auto distanceUid = backend->GetUid("/distance");
+  REQUIRE(distanceUid);
+  auto distanceInfo = wpi::tunables::TunableRegistry::GetTunable(*distanceUid);
+  REQUIRE(distanceInfo.config);
+  CHECK(distanceInfo.config->properties.at("unit") == "m");
+
+  backend->SetDouble("/distance", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(distance.Get() == 2_m);
+
+  UnitMemberComplex complex;
+  wpi::tunables::Publish("complex", complex);
+  auto memberUid = backend->GetUid("/complex/distance");
+  REQUIRE(memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo.config);
+  CHECK(memberInfo.config->properties.at("unit") == "m");
+
+  backend->SetDouble("/complex/distance", 3.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(complex.distance == 3_m);
 }

@@ -24,7 +24,7 @@ TEST_CASE("RoboRioSimTest SetVin", "[wpilibc][simulation]") {
       voltageCallback.GetCallback(), false);
   constexpr double kTestVoltage = 1.91;
 
-  RoboRioSim::SetVInVoltage(wpi::units::volt_t{kTestVoltage});
+  RoboRioSim::SetVInVoltage(wpi::units::volts<>{kTestVoltage});
   CHECK(voltageCallback.WasTriggered());
   CHECK(kTestVoltage == voltageCallback.GetLastValue());
   CHECK(kTestVoltage == RoboRioSim::GetVInVoltage().value());
@@ -61,8 +61,8 @@ TEST_CASE("RoboRioSimTest SetBrownout", "[wpilibc][simulation]") {
   constexpr double kExpectedRecoveryVoltage = 8.0;
 
   RobotController::SetBrownoutVoltages(
-      wpi::units::volt_t{kRequestedBrownoutVoltage},
-      wpi::units::volt_t{kRequestedRecoveryVoltage});
+      wpi::units::volts<>{kRequestedBrownoutVoltage},
+      wpi::units::volts<>{kRequestedRecoveryVoltage});
   CHECK(brownoutVoltageCallback.WasTriggered());
   CHECK(recoveryVoltageCallback.WasTriggered());
   CHECK(kExpectedBrownoutVoltage == brownoutVoltageCallback.GetLastValue());
@@ -115,13 +115,13 @@ TEST_CASE("RoboRioSimTest Set3V3", "[wpilibc][simulation]") {
   constexpr double kTestCurrent = 174;
   constexpr int kTestFaults = 229;
 
-  RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t{kTestVoltage});
+  RoboRioSim::SetUserVoltage3V3(wpi::units::volts<>{kTestVoltage});
   CHECK(voltageCallback.WasTriggered());
   CHECK(kTestVoltage == voltageCallback.GetLastValue());
   CHECK(kTestVoltage == RoboRioSim::GetUserVoltage3V3().value());
   CHECK(kTestVoltage == RobotController::GetVoltage3V3());
 
-  RoboRioSim::SetUserCurrent3V3(wpi::units::ampere_t{kTestCurrent});
+  RoboRioSim::SetUserCurrent3V3(wpi::units::amperes<>{kTestCurrent});
   CHECK(currentCallback.WasTriggered());
   CHECK(kTestCurrent == currentCallback.GetLastValue());
   CHECK(kTestCurrent == RoboRioSim::GetUserCurrent3V3().value());
@@ -148,7 +148,7 @@ TEST_CASE("RoboRioSimTest SetCPUTemp", "[wpilibc][simulation]") {
       RoboRioSim::RegisterCPUTempCallback(callback.GetCallback(), false);
   constexpr double kCPUTemp = 100.0;
 
-  RoboRioSim::SetCPUTemp(wpi::units::celsius_t{kCPUTemp});
+  RoboRioSim::SetCPUTemp(wpi::units::celsius<>{kCPUTemp});
   CHECK(callback.WasTriggered());
   CHECK(kCPUTemp == callback.GetLastValue());
   CHECK(kCPUTemp == RoboRioSim::GetCPUTemp().value());

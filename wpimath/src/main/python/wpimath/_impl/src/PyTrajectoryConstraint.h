@@ -12,15 +12,15 @@ namespace wpi::math {
 struct PyTrajectoryConstraint : public TrajectoryConstraint {
   PyTrajectoryConstraint() {}
 
-  wpi::units::meters_per_second_t MaxVelocity(
+  wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     return m_constraint->MaxVelocity(pose, curvature, velocity);
   }
 
   MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     return m_constraint->MinMaxAcceleration(pose, curvature, velocity);
   }
 

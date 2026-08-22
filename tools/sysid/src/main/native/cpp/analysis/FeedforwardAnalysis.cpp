@@ -14,7 +14,6 @@
 #include <Eigen/Eigenvalues>
 
 #include "wpi/sysid/analysis/OLS.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/StringExtras.hpp"
 

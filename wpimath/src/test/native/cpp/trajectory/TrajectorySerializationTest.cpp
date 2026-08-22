@@ -23,7 +23,7 @@
 using namespace wpi::math;
 
 TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   // Convert DrivetrainSplineTrajectory to HolonomicTrajectory
@@ -59,7 +59,7 @@ TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
 
 TEST_CASE("TrajectorySerializationTest TestDifferentialSerialization",
           "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   DifferentialDriveKinematics kinematics{0.5_m};

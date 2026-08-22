@@ -1,22 +1,22 @@
 #pragma once
 
-#include "wpi/units/data.hpp"
+#include <wpi/units/data.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::exabyte_t> {
+template <> struct handle_type_name<wpi::units::exabytes<>> {
   static constexpr auto name = _("wpimath.units.exabytes");
 };
 
-template <> struct handle_type_name<wpi::units::exabytes> {
+template <> struct handle_type_name<wpi::units::exabytes_> {
   static constexpr auto name = _("wpimath.units.exabytes");
 };
 
-template <> struct handle_type_name<wpi::units::exabit_t> {
+template <> struct handle_type_name<wpi::units::exabits<>> {
   static constexpr auto name = _("wpimath.units.exabits");
 };
 
-template <> struct handle_type_name<wpi::units::exabits> {
+template <> struct handle_type_name<wpi::units::exabits_> {
   static constexpr auto name = _("wpimath.units.exabits");
 };
 

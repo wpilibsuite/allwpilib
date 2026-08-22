@@ -10,7 +10,6 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -28,17 +27,17 @@ struct WPILIB_DLLEXPORT Twist2d final {
   /**
    * Linear "dx" component
    */
-  wpi::units::meter_t dx = 0_m;
+  wpi::units::meters<> dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  wpi::units::meter_t dy = 0_m;
+  wpi::units::meters<> dy = 0_m;
 
   /**
    * Angular "dtheta" component (radians)
    */
-  wpi::units::radian_t dtheta = 0_rad;
+  wpi::units::radians<> dtheta = 0_rad;
 
   /**
    * Obtain a new Transform2d from a (constant curvature) velocity.
@@ -65,9 +64,9 @@ struct WPILIB_DLLEXPORT Twist2d final {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist2d& other) const {
-    return wpi::units::math::abs(dx - other.dx) < 1E-9_m &&
-           wpi::units::math::abs(dy - other.dy) < 1E-9_m &&
-           wpi::units::math::abs(dtheta - other.dtheta) < 1E-9_rad;
+    return wpi::units::abs(dx - other.dx) < 1E-9_m &&
+           wpi::units::abs(dy - other.dy) < 1E-9_m &&
+           wpi::units::abs(dtheta - other.dtheta) < 1E-9_rad;
   }
 
   /**

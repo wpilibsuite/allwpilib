@@ -65,7 +65,7 @@ class DigitalOutput : public wpi::telemetry::TelemetryLoggable {
    * @param pulseLength The pulse length in seconds
    * @Common This is one of the commonly used methods for this class
    */
-  void Pulse(wpi::units::second_t pulseLength);
+  void Pulse(wpi::units::seconds<> pulseLength);
 
   /**
    * Determine if the pulse is still going.

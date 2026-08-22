@@ -34,7 +34,7 @@ wpi::util::Protobuf<wpi::math::HolonomicSample>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::HolonomicSample{
-      wpi::units::second_t{msg.time},
+      wpi::units::seconds<>{msg.time},
       iPose[0],
       iVel[0],
       iAccel[0],

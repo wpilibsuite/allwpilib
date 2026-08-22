@@ -6,9 +6,9 @@ classes:
     methods:
       LinearPlantInversionFeedforward:
         overloads:
-          const LinearSystem<States, Inputs, Outputs>&, wpi::units::second_t:
+          const LinearSystem<States, Inputs, Outputs>&, wpi::units::seconds<>:
             ignore: true
-          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, wpi::units::second_t:
+          const Matrixd<States, States>&, const Matrixd<States, Inputs>&, wpi::units::seconds<>:
       Uff:
         overloads:
           '[const]':

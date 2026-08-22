@@ -34,7 +34,7 @@ class ElevatorSim {
    * @param voltage Voltage to apply over the timestep.
    * @param dt      Sample period.
    */
-  void Update(wpi::units::volt_t voltage, wpi::units::second_t dt);
+  void Update(wpi::units::volts<> voltage, wpi::units::seconds<> dt);
 
   /**
    * Returns the position.
@@ -56,7 +56,7 @@ class ElevatorSim {
    * @param voltage The voltage that is being applied to the mechanism / input
    * @return The acceleration given the state and input
    */
-  double GetAcceleration(wpi::units::volt_t voltage) const;
+  double GetAcceleration(wpi::units::volts<> voltage) const;
 
   /**
    * Resets model position and velocity.

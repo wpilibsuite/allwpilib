@@ -1,54 +1,54 @@
 #pragma once
 
-#include "wpi/units/magnetic_flux.hpp"
+#include <wpi/units/magnetic_flux.h>
 
 namespace pybind11 {
 namespace detail {
-template <> struct handle_type_name<wpi::units::weber_t> {
+template <> struct handle_type_name<wpi::units::webers<>> {
   static constexpr auto name = _("wpimath.units.webers");
 };
 
-template <> struct handle_type_name<wpi::units::webers> {
+template <> struct handle_type_name<wpi::units::webers_> {
   static constexpr auto name = _("wpimath.units.webers");
 };
 
-template <> struct handle_type_name<wpi::units::nanoweber_t> {
+template <> struct handle_type_name<wpi::units::nanowebers<>> {
   static constexpr auto name = _("wpimath.units.nanowebers");
 };
 
-template <> struct handle_type_name<wpi::units::nanowebers> {
+template <> struct handle_type_name<wpi::units::nanowebers_> {
   static constexpr auto name = _("wpimath.units.nanowebers");
 };
 
-template <> struct handle_type_name<wpi::units::microweber_t> {
+template <> struct handle_type_name<wpi::units::microwebers<>> {
   static constexpr auto name = _("wpimath.units.microwebers");
 };
 
-template <> struct handle_type_name<wpi::units::microwebers> {
+template <> struct handle_type_name<wpi::units::microwebers_> {
   static constexpr auto name = _("wpimath.units.microwebers");
 };
 
-template <> struct handle_type_name<wpi::units::milliweber_t> {
+template <> struct handle_type_name<wpi::units::milliwebers<>> {
   static constexpr auto name = _("wpimath.units.milliwebers");
 };
 
-template <> struct handle_type_name<wpi::units::milliwebers> {
+template <> struct handle_type_name<wpi::units::milliwebers_> {
   static constexpr auto name = _("wpimath.units.milliwebers");
 };
 
-template <> struct handle_type_name<wpi::units::kiloweber_t> {
+template <> struct handle_type_name<wpi::units::kilowebers<>> {
   static constexpr auto name = _("wpimath.units.kilowebers");
 };
 
-template <> struct handle_type_name<wpi::units::kilowebers> {
+template <> struct handle_type_name<wpi::units::kilowebers_> {
   static constexpr auto name = _("wpimath.units.kilowebers");
 };
 
-template <> struct handle_type_name<wpi::units::maxwell_t> {
+template <> struct handle_type_name<wpi::units::maxwells<>> {
   static constexpr auto name = _("wpimath.units.maxwells");
 };
 
-template <> struct handle_type_name<wpi::units::maxwells> {
+template <> struct handle_type_name<wpi::units::maxwells_> {
   static constexpr auto name = _("wpimath.units.maxwells");
 };
 

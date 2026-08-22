@@ -6,11 +6,11 @@ classes:
     methods:
       DifferentialDrivetrainSim:
         overloads:
-          ? wpi::math::LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&
+          ? wpi::math::LinearSystem<2, 2, 2>, wpi::units::meters<>, wpi::math::DCMotor, double, wpi::units::meters<>, const std::array<double, 7>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 7>{}
-          ? wpi::math::DCMotor, double, wpi::units::kilogram_square_meter_t, wpi::units::kilogram_t, wpi::units::meter_t, wpi::units::meter_t, const std::array<double, 7>&
+          ? wpi::math::DCMotor, double, wpi::units::kilogram_square_meters<>, wpi::units::kilograms<>, wpi::units::meters<>, wpi::units::meters<>, const std::array<double, 7>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 7>{}
@@ -33,11 +33,11 @@ classes:
       Dynamics:
       CreateKitbotSim:
         overloads:
-          wpi::math::DCMotor, double, wpi::units::meter_t, const std::array<double, 7>&:
+          wpi::math::DCMotor, double, wpi::units::meters<>, const std::array<double, 7>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 7>{}
-          wpi::math::DCMotor, double, wpi::units::meter_t, wpi::units::kilogram_square_meter_t, const std::array<double, 7>&:
+          wpi::math::DCMotor, double, wpi::units::meters<>, wpi::units::kilogram_square_meters<>, const std::array<double, 7>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 7>{}
@@ -79,22 +79,22 @@ classes:
 
 inline_code: |-
   cls_DifferentialDrivetrainSim
-    .def("get_left_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+    .def("get_left_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::feet<> {
       return self->GetLeftPosition();
     })
-    .def("get_left_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+    .def("get_left_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inches<> {
       return self->GetLeftPosition();
     })
-    .def("get_left_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+    .def("get_left_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second<> {
       return self->GetLeftVelocity();
     })
-    .def("get_right_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::foot_t {
+    .def("get_right_position_feet", [](DifferentialDrivetrainSim * self) -> wpi::units::feet<> {
       return self->GetRightPosition();
     })
-    .def("get_right_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inch_t {
+    .def("get_right_position_inches", [](DifferentialDrivetrainSim * self) -> wpi::units::inches<> {
       return self->GetRightPosition();
     })
-    .def("get_right_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second_t {
+    .def("get_right_velocity_fps", [](DifferentialDrivetrainSim * self) -> wpi::units::feet_per_second<> {
       return self->GetRightVelocity();
     })
   ;

@@ -103,11 +103,11 @@ bool NTMechanism2DModel::NTMechanismObjectModel::NTUpdate(
       }
     } else if (valueData->topic == m_angleTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
-        m_angleValue = wpi::units::degree_t{valueData->value.GetDouble()};
+        m_angleValue = wpi::units::degrees<>{valueData->value.GetDouble()};
       }
     } else if (valueData->topic == m_lengthTopic.GetHandle()) {
       if (valueData->value && valueData->value.IsDouble()) {
-        m_lengthValue = wpi::units::meter_t{valueData->value.GetDouble()};
+        m_lengthValue = wpi::units::meters<>{valueData->value.GetDouble()};
       }
     } else {
       m_group.NTUpdate(event, childName);
@@ -131,8 +131,8 @@ bool NTMechanism2DModel::RootModel::NTUpdate(const wpi::nt::Event& event,
       if (valueData->value && valueData->value.IsDoubleArray()) {
         auto arr = valueData->value.GetDoubleArray();
         if (arr.size() == 2) {
-          m_pos = wpi::math::Translation2d{wpi::units::meter_t{arr[0]},
-                                           wpi::units::meter_t{arr[1]}};
+          m_pos = wpi::math::Translation2d{wpi::units::meters<>{arr[0]},
+                                           wpi::units::meters<>{arr[1]}};
         }
       }
     } else {
@@ -201,7 +201,7 @@ void NTMechanism2DModel::Update() {
           auto arr = valueData->value.GetDoubleArray();
           if (arr.size() == 2) {
             m_dimensionsValue = wpi::math::Translation2d{
-                wpi::units::meter_t{arr[0]}, wpi::units::meter_t{arr[1]}};
+                wpi::units::meters<>{arr[0]}, wpi::units::meters<>{arr[1]}};
           }
         }
       } else if (valueData->topic == m_bgColorTopic.GetHandle()) {

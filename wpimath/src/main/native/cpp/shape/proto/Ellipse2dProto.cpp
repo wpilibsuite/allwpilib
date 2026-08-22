@@ -27,8 +27,8 @@ wpi::util::Protobuf<wpi::math::Ellipse2d>::Unpack(InputStream& stream) {
 
   return wpi::math::Ellipse2d{
       ipose[0],
-      wpi::units::meter_t{msg.xSemiAxis},
-      wpi::units::meter_t{msg.ySemiAxis},
+      wpi::units::meters<>{msg.xSemiAxis},
+      wpi::units::meters<>{msg.ySemiAxis},
   };
 }
 

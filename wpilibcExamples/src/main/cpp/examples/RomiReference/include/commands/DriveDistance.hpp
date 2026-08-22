@@ -20,7 +20,7 @@ class DriveDistance
    * @param distance The distance the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  DriveDistance(double velocity, wpi::units::meter_t distance,
+  DriveDistance(double velocity, wpi::units::meters<> distance,
                 Drivetrain* drive)
       : velocity(velocity), distance(distance), drive(drive) {
     AddRequirements(drive);
@@ -33,6 +33,6 @@ class DriveDistance
 
  private:
   double velocity;
-  wpi::units::meter_t distance;
+  wpi::units::meters<> distance;
   Drivetrain* drive;
 };

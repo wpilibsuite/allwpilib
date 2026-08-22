@@ -5,8 +5,11 @@
 namespace pybind11 {
 namespace detail {
 
-template <class U, typename T, template <typename> class S>
-struct npy_format_descriptor<wpi::units::unit_t<U, T, S>> {
+template <wpi::units::ConversionFactorType ConversionFactor,
+          wpi::units::ArithmeticType T,
+          wpi::units::NumericalScaleType<T> NumericalScale>
+struct npy_format_descriptor<
+    wpi::units::unit<ConversionFactor, T, NumericalScale>> {
   static constexpr auto name = const_name("numpy.float64");
   static constexpr int value = npy_api::NPY_DOUBLE_;
 

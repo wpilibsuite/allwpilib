@@ -6,20 +6,20 @@ extra_includes:
 functions:
   RK4:
     overloads:
-      F&&, T, wpi::units::second_t:
+      F&&, T, wpi::units::seconds<>:
         template_impls:
         - [std::function<Eigen::MatrixXd(Eigen::MatrixXd)>, Eigen::MatrixXd]
-      F&&, T, U, wpi::units::second_t:
+      F&&, T, U, wpi::units::seconds<>:
         template_impls:
         - ["std::function<Eigen::MatrixXd(Eigen::MatrixXd, Eigen::MatrixXd)>", Eigen::MatrixXd, Eigen::MatrixXd]
-      F&&, wpi::units::second_t, T, wpi::units::second_t:
+      F&&, wpi::units::seconds<>, T, wpi::units::seconds<>:
         template_impls:
-        - ["std::function<Eigen::MatrixXd(wpi::units::second_t, Eigen::MatrixXd)>", Eigen::MatrixXd]
+        - ["std::function<Eigen::MatrixXd(wpi::units::seconds<>, Eigen::MatrixXd)>", Eigen::MatrixXd]
   RKDP:
     overloads:
-      F&&, T, U, wpi::units::second_t, double:
+      F&&, T, U, wpi::units::seconds<>, double:
         template_impls:
         - ["std::function<Eigen::MatrixXd(Eigen::MatrixXd, Eigen::MatrixXd)>", Eigen::MatrixXd, Eigen::MatrixXd]
-      F&&, wpi::units::second_t, T, wpi::units::second_t, double:
+      F&&, wpi::units::seconds<>, T, wpi::units::seconds<>, double:
         template_impls:
-        - ["std::function<Eigen::MatrixXd(wpi::units::second_t, Eigen::MatrixXd)>", Eigen::MatrixXd]
+        - ["std::function<Eigen::MatrixXd(wpi::units::seconds<>, Eigen::MatrixXd)>", Eigen::MatrixXd]

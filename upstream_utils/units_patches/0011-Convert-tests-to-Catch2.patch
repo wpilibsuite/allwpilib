@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Fri, 21 Aug 2026 17:06:34 -0400
+Subject: [PATCH 11/12] Convert tests to Catch2
+
+---
+ test/main.cpp | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/test/main.cpp b/test/main.cpp
+index bb3e0acb36b6d190b920425da19b79d05c44d68a..6cb9951494a37de523369424115910343e99a513 100644
+--- a/test/main.cpp
++++ b/test/main.cpp
+@@ -2225,7 +2225,7 @@ TEST_F(UnitType, unitTypeMultiplication)
+ 
+ 	// dimensionless result
+ 	result = 60_km / 400_mm;
+-	EXPECT_EQ(150'000, result);
++	EXPECT_EQ(150000, result);
+ 
+ 	// concentration
+ 	percent<double> pResult = percent<double>(5.0) * percent<double>(4.0);
+@@ -2552,7 +2552,7 @@ TEST_F(UnitType, unitTypeDivision)
+ 	unit<inverse<meters<double>>> k = 50.0_pct / 1.0_m;
+ 	EXPECT_DOUBLE_EQ(k.value(), 0.5);
+ 	meters<double> l = 10.0_km / 25.0_pct;
+-	EXPECT_EQ(l, 40'000.0_m);
++	EXPECT_EQ(l, 40_000.0_m);
+ 	dimensionless<double> m_dim = 5.0_pct / 4.0_pct;
+ 	EXPECT_EQ(m_dim, 1.25);
+ 	auto n = 5_pct / 4_pct;
+@@ -3190,9 +3190,9 @@ TEST_F(UnitType, integerConversionWidensIntermediate)
+ 	(void)big;
+ 
+ 	// 5e16 ft * 381 = 1.905e19 overflows int64 (max ~9.2e18), but 5e16 * 381 / 1250 = 1.524e16 fits.
+-	const std::int64_t v      = 50'000'000'000'000'000LL;
++	const std::int64_t v      = 50_000_000_000_000_000LL;
+ 	const auto         meters = units::convert<units::length::meters<std::int64_t>>(feet<std::int64_t>(v));
+-	EXPECT_EQ(15'240'000'000'000'000LL, meters.value());
++	EXPECT_EQ(15_240_000_000_000_000LL, meters.value());
+ 
+ 	// Ordinary and negative magnitudes are exact and unchanged (widening never alters a result that already fit).
+ 	EXPECT_EQ(381, units::convert<units::length::meters<std::int64_t>>(feet<std::int64_t>(1250)).value());
+@@ -3256,7 +3256,7 @@ TEST_F(UnitType, hashOfLargeValueDoesNotOverflow)
+ 	// intermediate. With the widened conversion the hash of a big value is computed without undefined behavior
+ 	// (run under -fsanitize=undefined this must not trip). Equal values under one key type hash equally.
+ 	const auto h = std::hash<millimeters<std::int64_t>>()(kilometers<std::int64_t>(3000)); // 3e9 mm
+-	EXPECT_EQ(h, std::hash<millimeters<std::int64_t>>()(millimeters<std::int64_t>(3'000'000'000LL)));
++	EXPECT_EQ(h, std::hash<millimeters<std::int64_t>>()(millimeters<std::int64_t>(3_000_000_000LL)));
+ 	EXPECT_EQ(std::hash<meters<int>>()(meters<int>(7)), std::hash<meters<int>>()(meters<int>(7)));
+ }
+ 

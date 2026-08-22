@@ -87,7 +87,7 @@ CommandPtr DeferredProxy(wpi::util::unique_function<CommandPtr()> supplier) {
                {});
 }
 
-CommandPtr Wait(wpi::units::second_t duration) {
+CommandPtr Wait(wpi::units::seconds<> duration) {
   return WaitCommand(duration).ToPtr();
 }
 

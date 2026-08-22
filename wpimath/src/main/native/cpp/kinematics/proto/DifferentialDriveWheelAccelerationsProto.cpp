@@ -15,8 +15,8 @@ wpi::util::Protobuf<wpi::math::DifferentialDriveWheelAccelerations>::Unpack(
   }
 
   return wpi::math::DifferentialDriveWheelAccelerations{
-      units::meters_per_second_squared_t{msg.left},
-      units::meters_per_second_squared_t{msg.right},
+      units::meters_per_second_squared<>{msg.left},
+      units::meters_per_second_squared<>{msg.right},
   };
 }
 

@@ -25,7 +25,7 @@ class Elevator {
   Elevator();
   void SimulationPeriodic();
   void UpdateTelemetry();
-  void ReachGoal(wpi::units::meter_t goal);
+  void ReachGoal(wpi::units::meters<> goal);
   void Reset();
   void Stop();
 
@@ -34,12 +34,12 @@ class Elevator {
   wpi::math::DCMotor elevatorGearbox = wpi::math::DCMotor::NEO(2);
 
   // Standard classes for controlling our elevator
-  wpi::math::ExponentialProfile<wpi::units::meters,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       Constants::kElevatorMaxV, Constants::kElevatorkV, Constants::kElevatorkA};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
-      constraints};
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       setpoint;
 
   wpi::math::PIDController controller{

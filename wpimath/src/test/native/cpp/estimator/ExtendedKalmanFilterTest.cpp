@@ -21,7 +21,7 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
@@ -43,15 +43,15 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
   constexpr auto J = 5.6_kg_sq_m;      // Robot moment of inertia
 
   auto C1 = -std::pow(Ghigh, 2) * motors.Kt /
-            (motors.Kv * motors.R * wpi::units::math::pow<2>(r));
+            (motors.Kv * motors.R * wpi::units::pow<2>(r));
   auto C2 = Ghigh * motors.Kt / (motors.R * r);
-  auto k1 = (1 / m + wpi::units::math::pow<2>(rb) / J);
-  auto k2 = (1 / m - wpi::units::math::pow<2>(rb) / J);
+  auto k1 = (1 / m + wpi::units::pow<2>(rb) / J);
+  auto k2 = (1 / m - wpi::units::pow<2>(rb) / J);
 
-  wpi::units::meters_per_second_t vl{x(3)};
-  wpi::units::meters_per_second_t vr{x(4)};
-  wpi::units::volt_t Vl{u(0)};
-  wpi::units::volt_t Vr{u(1)};
+  wpi::units::meters_per_second<> vl{x(3)};
+  wpi::units::meters_per_second<> vr{x(4)};
+  wpi::units::volts<> Vl{u(0)};
+  wpi::units::volts<> Vr{u(1)};
 
   auto v = 0.5 * (vl + vr);
   return wpi::math::Vectord<5>{
@@ -77,7 +77,7 @@ wpi::math::Vectord<5> GlobalMeasurementModel(
 }  // namespace
 
 TEST_CASE("ExtendedKalmanFilterTest Init", "[wpimath]") {
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
                                                     LocalMeasurementModel,
@@ -96,7 +96,7 @@ TEST_CASE("ExtendedKalmanFilterTest Init", "[wpimath]") {
 }
 
 TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
@@ -109,7 +109,7 @@ TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8_mps, 0.1_mps2});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
   wpi::math::Vectord<2> u = wpi::math::Vectord<2>::Zero();
@@ -125,9 +125,9 @@ TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
   auto duration = trajectory.Duration();
   for (size_t i = 0; i < (duration / dt).value(); ++i) {
     auto ref = trajectory.SampleAt(dt * i);
-    wpi::units::meters_per_second_t vl =
+    wpi::units::meters_per_second<> vl =
         ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
-    wpi::units::meters_per_second_t vr =
+    wpi::units::meters_per_second<> vr =
         ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
 
     wpi::math::Vectord<5> nextR{

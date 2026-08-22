@@ -41,71 +41,71 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
    * @param angularPosition The new position
    * @param angularVelocity The new velocity
    */
-  void SetState(wpi::units::radian_t angularPosition,
-                wpi::units::radians_per_second_t angularVelocity);
+  void SetState(wpi::units::radians<> angularPosition,
+                wpi::units::radians_per_second<> angularVelocity);
 
   /**
    * Sets the DC motor's angular position.
    *
    * @param angularPosition The new position in radians.
    */
-  void SetAngle(wpi::units::radian_t angularPosition);
+  void SetAngle(wpi::units::radians<> angularPosition);
 
   /**
    * Sets the DC motor's angular velocity.
    *
    * @param angularVelocity The new velocity in radians per second.
    */
-  void SetAngularVelocity(wpi::units::radians_per_second_t angularVelocity);
+  void SetAngularVelocity(wpi::units::radians_per_second<> angularVelocity);
 
   /**
    * Returns the DC motor position.
    *
    * @return The DC motor position.
    */
-  wpi::units::radian_t GetAngularPosition() const;
+  wpi::units::radians<> GetAngularPosition() const;
 
   /**
    * Returns the DC motor velocity.
    *
    * @return The DC motor velocity.
    */
-  wpi::units::radians_per_second_t GetAngularVelocity() const;
+  wpi::units::radians_per_second<> GetAngularVelocity() const;
 
   /**
    * Returns the DC motor acceleration.
    *
    * @return The DC motor acceleration
    */
-  wpi::units::radians_per_second_squared_t GetAngularAcceleration() const;
+  wpi::units::radians_per_second_squared<> GetAngularAcceleration() const;
 
   /**
    * Returns the DC motor torque.
    *
    * @return The DC motor torque
    */
-  wpi::units::newton_meter_t GetTorque() const;
+  wpi::units::newton_meters<> GetTorque() const;
 
   /**
    * Returns the DC motor current draw.
    *
    * @return The DC motor current draw.
    */
-  wpi::units::ampere_t GetCurrentDraw() const;
+  wpi::units::amperes<> GetCurrentDraw() const;
 
   /**
    * Gets the input voltage for the DC motor.
    *
    * @return The DC motor input voltage.
    */
-  wpi::units::volt_t GetInputVoltage() const;
+  wpi::units::volts<> GetInputVoltage() const;
 
   /**
    * Sets the input voltage for the DC motor.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(wpi::units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volts<> voltage);
 
   /**
    * Returns the gearbox.
@@ -120,11 +120,11 @@ class DCMotorSim : public LinearSystemSim<2, 1, 2> {
   /**
    * Returns the moment of inertia
    */
-  wpi::units::kilogram_square_meter_t GetJ() const;
+  wpi::units::kilogram_square_meters<> GetJ() const;
 
  private:
   wpi::math::DCMotor m_gearbox;
   double m_gearing;
-  wpi::units::kilogram_square_meter_t m_j;
+  wpi::units::kilogram_square_meters<> m_j;
 };
 }  // namespace wpi::sim

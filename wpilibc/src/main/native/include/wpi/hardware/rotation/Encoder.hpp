@@ -133,7 +133,7 @@ class Encoder : public CounterBase, public wpi::telemetry::TelemetryLoggable {
    * @param window The rate calculation window. Valid values are 5 ms through
    *               255 ms. The default is 50 ms.
    */
-  void SetRateWindow(wpi::units::millisecond_t window);
+  void SetRateWindow(wpi::units::milliseconds<> window);
 
   /**
    * Set the distance per pulse for this encoder.

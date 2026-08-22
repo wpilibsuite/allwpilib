@@ -13,7 +13,6 @@
 #include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/curvature.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/MathExtras.hpp"
@@ -41,8 +40,8 @@ DrivetrainSplineSample DrivetrainSplineTrajectory::Interpolate(
 
   // Check whether the robot is reversing at this stage.
   const bool reversing = startForwardVelocity < 0_mps ||
-                         (units::math::abs(startForwardVelocity) < 1e-9_mps &&
-                          startForwardAccel < 0_mps_sq);
+                         (units::abs(startForwardVelocity) < 1e-9_mps &&
+                          startForwardAccel < 0_mps2);
 
   // Calculate the new velocity
   // v_f = v_0 + at
@@ -61,7 +60,8 @@ DrivetrainSplineSample DrivetrainSplineTrajectory::Interpolate(
   const auto interpolationFrac =
       newS / end.pose.Translation().Distance(start.pose.Translation());
 
-  Pose2d newPose = start.pose + (end.pose - start.pose) * interpolationFrac;
+  Pose2d newPose =
+      start.pose + (end.pose - start.pose) * interpolationFrac.value();
   auto newAccel =
       wpi::util::Lerp(startForwardAccel, end.ForwardAcceleration(), t);
   auto newCurvature = wpi::util::Lerp(start.curvature, end.curvature, t);

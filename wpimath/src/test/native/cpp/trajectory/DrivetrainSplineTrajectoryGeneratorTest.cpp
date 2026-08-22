@@ -15,7 +15,6 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
@@ -23,17 +22,16 @@ using namespace wpi::math;
 
 TEST_CASE("DrivetrainSplineTrajectoryGeneratorTest ObeysConstraints",
           "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
     auto point = trajectory.SampleAt(t);
 
-    CHECK(wpi::units::math::abs(point.ForwardVelocity()) <= 12_fps + 0.01_fps);
-    CHECK(wpi::units::math::abs(point.ForwardAcceleration()) <=
-          12_fps_sq + 0.01_fps_sq);
+    CHECK(wpi::units::abs(point.ForwardVelocity()) <= 12_fps + 0.01_fps);
+    CHECK(wpi::units::abs(point.ForwardAcceleration()) <= 12_fps2 + 0.01_fps2);
   }
 }
 
@@ -41,7 +39,7 @@ TEST_CASE("DrivetrainSplineTrajectoryGeneratorTest ReturnsEmptyOnMalformed",
           "[wpimath]") {
   const auto t = DrivetrainSplineTrajectoryGenerator::Generate(
       std::vector<Pose2d>{Pose2d{0_m, 0_m, 0_deg}, Pose2d{1_m, 0_m, 180_deg}},
-      TrajectoryConfig(12_fps, 12_fps_sq));
+      TrajectoryConfig(12_fps, 12_fps2));
 
   REQUIRE(t.Samples().size() == 1u);
   REQUIRE(t.Duration() == 0_s);
@@ -55,7 +53,7 @@ TEST_CASE("DrivetrainSplineTrajectoryGeneratorTest CurvatureOptimization",
        {-1_m, 0_m, 270_deg},
        {0_m, -1_m, 0_deg},
        {1_m, 0_m, 90_deg}},
-      TrajectoryConfig{12_fps, 12_fps_sq});
+      TrajectoryConfig{12_fps, 12_fps2});
 
   for (size_t i = 1; i < t.Samples().size() - 1; ++i) {
     CHECK(0 != t.Samples()[i].curvature.value());

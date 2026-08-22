@@ -16,11 +16,11 @@ wpi::util::Protobuf<wpi::math::DCMotor>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::DCMotor{
-      wpi::units::volt_t{msg.nominal_voltage},
-      wpi::units::newton_meter_t{msg.stall_torque},
-      wpi::units::ampere_t{msg.stall_current},
-      wpi::units::ampere_t{msg.free_current},
-      wpi::units::radians_per_second_t{msg.free_speed},
+      wpi::units::volts<>{msg.nominal_voltage},
+      wpi::units::newton_meters<>{msg.stall_torque},
+      wpi::units::amperes<>{msg.stall_current},
+      wpi::units::amperes<>{msg.free_current},
+      wpi::units::radians_per_second<>{msg.free_speed},
   };
 }
 

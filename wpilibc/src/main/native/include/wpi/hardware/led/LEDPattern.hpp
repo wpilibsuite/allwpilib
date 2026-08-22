@@ -121,7 +121,7 @@ class LEDPattern {
    * long (assuming equal LED density on both segments).
    */
   [[nodiscard]]
-  LEDPattern ScrollAtRelativeVelocity(wpi::units::hertz_t velocity);
+  LEDPattern ScrollAtRelativeVelocity(wpi::units::hertz<> velocity);
 
   /**
    * Creates a pattern that plays this one scrolling up an LED strip. A negative
@@ -132,12 +132,12 @@ class LEDPattern {
    *
    * <pre>
    *   // LEDs per meter, a known value taken from the spec sheet of our
-   * particular LED strip wpi::units::meter_t LED_SPACING =
-   * wpi::units::meter_t{1 /60.0};
+   * particular LED strip wpi::units::meters<> LED_SPACING =
+   * wpi::units::meters<>{1 /60.0};
    *
    *   wpi::LEDPattern rainbow = wpi::LEDPattern::Rainbow();
    *   wpi::LEDPattern scrollingRainbow = rainbow.ScrollAtAbsoluteVelocity(
-   *     wpi::units::feet_per_second_t{1 / 3.0}, LED_SPACING);
+   *     wpi::units::feet_per_second<>{1 / 3.0}, LED_SPACING);
    * </pre>
    *
    * <p>Note that this pattern will scroll <i>faster</i> if applied to a less
@@ -150,8 +150,8 @@ class LEDPattern {
    * @return the scrolling pattern
    */
   [[nodiscard]]
-  LEDPattern ScrollAtAbsoluteVelocity(wpi::units::meters_per_second_t velocity,
-                                      wpi::units::meter_t ledSpacing);
+  LEDPattern ScrollAtAbsoluteVelocity(wpi::units::meters_per_second<> velocity,
+                                      wpi::units::meters<> ledSpacing);
 
   /**
    * Creates a pattern that switches between playing this pattern and turning
@@ -162,10 +162,10 @@ class LEDPattern {
    * @return the blinking pattern
    */
   [[nodiscard]]
-  LEDPattern Blink(wpi::units::second_t onTime, wpi::units::second_t offTime);
+  LEDPattern Blink(wpi::units::seconds<> onTime, wpi::units::seconds<> offTime);
 
   /**
-   * Like {@link LEDPattern::Blink(wpi::units::second_t)}, but where the
+   * Like {@link LEDPattern::Blink(wpi::units::seconds<>)}, but where the
    * "off" time is exactly equal to the "on" time.
    *
    * @param onTime how long the pattern should play for (and be turned off for),
@@ -173,7 +173,7 @@ class LEDPattern {
    * @return the blinking pattern
    */
   [[nodiscard]]
-  LEDPattern Blink(wpi::units::second_t onTime);
+  LEDPattern Blink(wpi::units::seconds<> onTime);
 
   /**
    * Creates a pattern that blinks this one on and off in sync with a true/false
@@ -195,7 +195,7 @@ class LEDPattern {
    * @return the breathing pattern
    */
   [[nodiscard]]
-  LEDPattern Breathe(wpi::units::second_t period);
+  LEDPattern Breathe(wpi::units::seconds<> period);
 
   /**
    * Creates a pattern that plays this pattern overlaid on another. Anywhere

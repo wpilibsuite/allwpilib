@@ -11,7 +11,7 @@ classes:
     template_inline_code: |
       cls_SwerveDriveKinematicsConstraint
         .def_static("from_fps", [](const wpi::math::SwerveDriveKinematics<NumModules>& kinematics,
-                                  wpi::units::feet_per_second_t maxVelocity) {
+                                  wpi::units::feet_per_second<> maxVelocity) {
           return std::make_shared<wpi::math::SwerveDriveKinematicsConstraint<NumModules>>(kinematics, maxVelocity);
         }, py::arg("kinematics"), py::arg("max_velocity"))
       ;

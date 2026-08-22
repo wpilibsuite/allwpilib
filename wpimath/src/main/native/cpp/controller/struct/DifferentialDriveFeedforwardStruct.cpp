@@ -16,11 +16,11 @@ wpi::util::Struct<wpi::math::DifferentialDriveFeedforward>::Unpack(
     std::span<const uint8_t> data) {
   return {decltype(1_V /
                    1_mps){wpi::util::UnpackStruct<double, kKvLinearOff>(data)},
-          decltype(1_V / 1_mps_sq){
-              wpi::util::UnpackStruct<double, kKaLinearOff>(data)},
+          decltype(1_V /
+                   1_mps2){wpi::util::UnpackStruct<double, kKaLinearOff>(data)},
           decltype(1_V /
                    1_mps){wpi::util::UnpackStruct<double, kKvAngularOff>(data)},
-          decltype(1_V / 1_mps_sq){
+          decltype(1_V / 1_mps2){
               wpi::util::UnpackStruct<double, kKaAngularOff>(data)}};
 }
 

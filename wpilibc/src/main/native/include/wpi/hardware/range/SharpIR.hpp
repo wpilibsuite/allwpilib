@@ -64,8 +64,8 @@ class SharpIR : public wpi::telemetry::TelemetryLoggable {
    * @param min Minimum distance to report
    * @param max Maximum distance to report
    */
-  SharpIR(int channel, double a, double b, wpi::units::meter_t min,
-          wpi::units::meter_t max);
+  SharpIR(int channel, double a, double b, wpi::units::meters<> min,
+          wpi::units::meters<> max);
 
   /**
    * Get the analog input channel number.
@@ -80,7 +80,7 @@ class SharpIR : public wpi::telemetry::TelemetryLoggable {
    * @return range of the target returned by the sensor
    * @Common This is one of the commonly used methods for this class
    */
-  wpi::units::meter_t GetRange() const;
+  wpi::units::meters<> GetRange() const;
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
@@ -94,8 +94,8 @@ class SharpIR : public wpi::telemetry::TelemetryLoggable {
 
   double m_A;
   double m_B;
-  wpi::units::meter_t m_min;
-  wpi::units::meter_t m_max;
+  wpi::units::meters<> m_min;
+  wpi::units::meters<> m_max;
 };
 
 }  // namespace wpi

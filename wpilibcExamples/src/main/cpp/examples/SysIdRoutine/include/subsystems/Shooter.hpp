@@ -36,19 +36,19 @@ class Shooter : public wpi::cmd::SubsystemBase {
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
                               nullptr},
       wpi::cmd::sysid::Mechanism{
-          [this](wpi::units::volt_t driveVoltage) {
+          [this](wpi::units::volts<> driveVoltage) {
             shooterMotor.SetVoltage(driveVoltage);
           },
           [this](wpi::sysid::SysIdRoutineLog* log) {
             log->Motor("shooter-wheel")
                 .voltage(shooterMotor.GetThrottle() *
                          wpi::RobotController::GetBatteryVoltage())
-                .position(wpi::units::turn_t{shooterEncoder.GetDistance()})
+                .position(wpi::units::turns<>{shooterEncoder.GetDistance()})
                 .velocity(
-                    wpi::units::turns_per_second_t{shooterEncoder.GetRate()});
+                    wpi::units::turns_per_second<>{shooterEncoder.GetRate()});
           },
           this}};
   wpi::math::PIDController shooterFeedback{constants::shooter::kP, 0, 0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> shooterFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> shooterFeedforward{
       constants::shooter::kS, constants::shooter::kV, constants::shooter::kA};
 };

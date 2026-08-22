@@ -13,11 +13,11 @@ wpi::math::ChassisAccelerations wpi::util::Struct<
   constexpr size_t kAyOff = kAxOff + 8;
   constexpr size_t kAlphaOff = kAyOff + 8;
   return wpi::math::ChassisAccelerations{
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kAxOff>(data)},
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, kAyOff>(data)},
-      units::radians_per_second_squared_t{
+      units::radians_per_second_squared<>{
           wpi::util::UnpackStruct<double, kAlphaOff>(data)},
   };
 }

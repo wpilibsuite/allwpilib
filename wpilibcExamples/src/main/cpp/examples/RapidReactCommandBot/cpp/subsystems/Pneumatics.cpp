@@ -20,8 +20,8 @@ wpi::cmd::CommandPtr Pneumatics::DisableCompressorCommand() {
       });
 }
 
-wpi::units::pounds_per_square_inch_t Pneumatics::GetPressure() {
+wpi::units::pounds_per_square_inch<> Pneumatics::GetPressure() {
   // Get the pressure (in PSI) from an analog pressure sensor connected to
   // the RIO.
-  return wpi::units::pounds_per_square_inch_t{pressureTransducer.Get()};
+  return wpi::units::pounds_per_square_inch<>{pressureTransducer.Get()};
 }

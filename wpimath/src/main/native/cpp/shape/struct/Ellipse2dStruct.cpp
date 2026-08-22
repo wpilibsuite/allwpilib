@@ -16,8 +16,10 @@ using StructType = wpi::util::Struct<wpi::math::Ellipse2d>;
 wpi::math::Ellipse2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Ellipse2d{
       wpi::util::UnpackStruct<wpi::math::Pose2d, kCenterOff>(data),
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kXSemiAxisOff>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, kYSemiAxisOff>(data)},
+      wpi::units::meters<>{
+          wpi::util::UnpackStruct<double, kXSemiAxisOff>(data)},
+      wpi::units::meters<>{
+          wpi::util::UnpackStruct<double, kYSemiAxisOff>(data)},
   };
 }
 

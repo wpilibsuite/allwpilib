@@ -49,7 +49,7 @@ class HolonomicSample : public TrajectorySample {
    * @param a The robot acceleration at this sample (in the field reference
    *          frame).
    */
-  constexpr HolonomicSample(wpi::units::second_t time, const Pose2d& p,
+  constexpr HolonomicSample(wpi::units::seconds<> time, const Pose2d& p,
                             const ChassisVelocities& v,
                             const ChassisAccelerations& a)
       : TrajectorySample{time}, pose{p}, velocity{v}, acceleration{a} {}

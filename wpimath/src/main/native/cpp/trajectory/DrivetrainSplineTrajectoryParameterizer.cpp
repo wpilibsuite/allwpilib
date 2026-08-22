@@ -38,9 +38,8 @@
 #include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
 #include "wpi/math/trajectory/constraint/TrajectoryConstraint.hpp"
 #include "wpi/units/acceleration.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
@@ -50,10 +49,10 @@ DrivetrainSplineTrajectory
 DrivetrainSplineTrajectoryParameterizer::Parameterize(
     const std::vector<PoseWithCurvature>& points,
     const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
-    wpi::units::meters_per_second_t startVelocity,
-    wpi::units::meters_per_second_t endVelocity,
-    wpi::units::meters_per_second_t maxVelocity,
-    wpi::units::meters_per_second_squared_t maxAcceleration, bool reversed) {
+    wpi::units::meters_per_second<> startVelocity,
+    wpi::units::meters_per_second<> endVelocity,
+    wpi::units::meters_per_second<> maxVelocity,
+    wpi::units::meters_per_second_squared<> maxAcceleration, bool reversed) {
   std::vector<ConstrainedState> constrainedStates(points.size());
 
   ConstrainedState predecessor{points.front(), 0_m, startVelocity,
@@ -67,8 +66,9 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
     constrainedState.pose = points[i];
 
     // Begin constraining based on predecessor
-    wpi::units::meter_t ds = constrainedState.pose.first.Translation().Distance(
-        predecessor.pose.first.Translation());
+    wpi::units::meters<> ds =
+        constrainedState.pose.first.Translation().Distance(
+            predecessor.pose.first.Translation());
     constrainedState.distance = ds + predecessor.distance;
 
     // We may need to iterate to find the maximum end velocity and common
@@ -77,9 +77,9 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // Enforce global max velocity and max reachable velocity by global
       // acceleration limit. v_f = √(v_i² + 2ad).
 
-      constrainedState.maxVelocity = wpi::units::math::min(
-          maxVelocity, wpi::units::math::sqrt(
-                           predecessor.maxVelocity * predecessor.maxVelocity +
+      constrainedState.maxVelocity = wpi::units::min(
+          maxVelocity,
+          wpi::units::sqrt(predecessor.maxVelocity * predecessor.maxVelocity +
                            predecessor.maxAcceleration * ds * 2.0));
 
       constrainedState.minAcceleration = -maxAcceleration;
@@ -88,7 +88,7 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // At this point, the constrained state is fully constructed apart from
       // all the custom-defined user constraints.
       for (const auto& constraint : constraints) {
-        constrainedState.maxVelocity = wpi::units::math::min(
+        constrainedState.maxVelocity = wpi::units::min(
             constrainedState.maxVelocity,
             constraint->MaxVelocity(constrainedState.pose.first,
                                     constrainedState.pose.second,
@@ -105,19 +105,19 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // If the actual acceleration for this state is higher than the max
       // acceleration that we applied, then we need to reduce the max
       // acceleration of the predecessor and try again.
-      wpi::units::meters_per_second_squared_t actualAcceleration =
+      wpi::units::meters_per_second_squared<> actualAcceleration =
           (constrainedState.maxVelocity * constrainedState.maxVelocity -
            predecessor.maxVelocity * predecessor.maxVelocity) /
           (ds * 2.0);
 
       // If we violate the max acceleration constraint, let's modify the
       // predecessor.
-      if (constrainedState.maxAcceleration < actualAcceleration - 1E-6_mps_sq) {
+      if (constrainedState.maxAcceleration < actualAcceleration - 1E-6_mps2) {
         predecessor.maxAcceleration = constrainedState.maxAcceleration;
       } else {
         // Constrain the predecessor's max acceleration to the current
         // acceleration.
-        if (actualAcceleration > predecessor.minAcceleration + 1E-6_mps_sq) {
+        if (actualAcceleration > predecessor.minAcceleration + 1E-6_mps2) {
           predecessor.maxAcceleration = actualAcceleration;
         }
         // If the actual acceleration is less than the predecessor's min
@@ -134,15 +134,15 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
   // Backward pass
   for (int i = points.size() - 1; i >= 0; i--) {
     auto& constrainedState = constrainedStates[i];
-    wpi::units::meter_t ds =
+    wpi::units::meters<> ds =
         constrainedState.distance - successor.distance;  // negative
 
     while (true) {
       // Enforce max velocity limit (reverse)
       // v_f = √(v_i² + 2ad), where v_i = successor.
-      wpi::units::meters_per_second_t newMaxVelocity =
-          wpi::units::math::sqrt(successor.maxVelocity * successor.maxVelocity +
-                                 successor.minAcceleration * ds * 2.0);
+      wpi::units::meters_per_second<> newMaxVelocity =
+          wpi::units::sqrt(successor.maxVelocity * successor.maxVelocity +
+                           successor.minAcceleration * ds * 2.0);
 
       // No more limits to impose! This state can be finalized.
       if (newMaxVelocity >= constrainedState.maxVelocity) {
@@ -161,11 +161,11 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // If the actual acceleration for this state is lower than the min
       // acceleration, then we need to lower the min acceleration of the
       // successor and try again.
-      wpi::units::meters_per_second_squared_t actualAcceleration =
+      wpi::units::meters_per_second_squared<> actualAcceleration =
           (constrainedState.maxVelocity * constrainedState.maxVelocity -
            successor.maxVelocity * successor.maxVelocity) /
           (ds * 2.0);
-      if (constrainedState.minAcceleration > actualAcceleration + 1E-6_mps_sq) {
+      if (constrainedState.minAcceleration > actualAcceleration + 1E-6_mps2) {
         successor.minAcceleration = constrainedState.minAcceleration;
       } else {
         successor.minAcceleration = actualAcceleration;
@@ -179,38 +179,38 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
   // trajectory samples.
 
   const size_t numStates = constrainedStates.size();
-  std::vector<wpi::units::meters_per_second_t> velocities(numStates);
-  std::vector<wpi::units::second_t> times(numStates);
+  std::vector<wpi::units::meters_per_second<>> velocities(numStates);
+  std::vector<wpi::units::seconds<>> times(numStates);
   // segAccel[i] is the (forward, path-relative) acceleration on the segment
   // arriving at state i (from state i - 1).
-  std::vector<wpi::units::meters_per_second_squared_t> segAccel(numStates);
+  std::vector<wpi::units::meters_per_second_squared<>> segAccel(numStates);
 
-  wpi::units::second_t t = 0_s;
-  wpi::units::meter_t s = 0_m;
-  wpi::units::meters_per_second_t v = 0_mps;
+  wpi::units::seconds<> t = 0_s;
+  wpi::units::meters<> s = 0_m;
+  wpi::units::meters_per_second<> v = 0_mps;
 
   for (unsigned int i = 0; i < numStates; i++) {
     auto state = constrainedStates[i];
 
     // Calculate the change in position between the current state and the
     // previous state.
-    wpi::units::meter_t ds = state.distance - s;
+    wpi::units::meters<> ds = state.distance - s;
 
     // Calculate the acceleration between the current state and the previous
     // state. ds is zero at the first state, where there is no preceding
     // segment, so the acceleration there is left at zero.
-    wpi::units::meters_per_second_squared_t accel =
-        ds == 0_m ? 0_mps_sq
+    wpi::units::meters_per_second_squared<> accel =
+        ds == 0_m ? 0_mps2
                   : (state.maxVelocity * state.maxVelocity - v * v) / (ds * 2);
     segAccel[i] = accel;
 
     // Calculate dt.
-    wpi::units::second_t dt = 0_s;
+    wpi::units::seconds<> dt = 0_s;
     if (i > 0) {
-      if (wpi::units::math::abs(accel) > 1E-6_mps_sq) {
+      if (wpi::units::abs(accel) > 1E-6_mps2) {
         // v_f = v_0 + at
         dt = (state.maxVelocity - v) / accel;
-      } else if (wpi::units::math::abs(v) > 1E-6_mps) {
+      } else if (wpi::units::abs(v) > 1E-6_mps) {
         // delta_x = vt
         dt = ds / v;
       } else {
@@ -237,7 +237,7 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
   samples.reserve(numStates);
   for (size_t i = 0; i < numStates; i++) {
     const auto& state = constrainedStates[i];
-    wpi::units::meters_per_second_squared_t accel =
+    wpi::units::meters_per_second_squared<> accel =
         i + 1 < numStates ? segAccel[i + 1] : segAccel[i];
     samples.emplace_back(times[i], state.pose.first,
                          (reversed ? -velocities[i] : velocities[i]),
@@ -264,11 +264,11 @@ void DrivetrainSplineTrajectoryParameterizer::EnforceAccelerationLimits(
           "back one-by-one.");
     }
 
-    state->minAcceleration = wpi::units::math::max(
+    state->minAcceleration = wpi::units::max(
         state->minAcceleration,
         reverse ? -minMaxAccel.maxAcceleration : minMaxAccel.minAcceleration);
 
-    state->maxAcceleration = wpi::units::math::min(
+    state->maxAcceleration = wpi::units::min(
         state->maxAcceleration,
         reverse ? -minMaxAccel.minAcceleration : minMaxAccel.maxAcceleration);
   }

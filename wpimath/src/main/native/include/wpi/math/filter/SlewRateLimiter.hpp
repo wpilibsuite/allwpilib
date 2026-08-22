@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include "wpi/math/util/MathShared.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -23,10 +23,10 @@ namespace wpi::math {
 template <class Unit>
 class SlewRateLimiter {
  public:
-  using Unit_t = wpi::units::unit_t<Unit>;
-  using Rate =
-      wpi::units::compound_unit<Unit, wpi::units::inverse<wpi::units::seconds>>;
-  using Rate_t = wpi::units::unit_t<Rate>;
+  using Unit_t = wpi::units::unit<Unit>;
+  using Rate = wpi::units::compound_conversion_factor<
+      Unit, wpi::units::inverse<wpi::units::seconds_>>;
+  using Rate_t = wpi::units::unit<Rate>;
 
   /**
    * Creates a new SlewRateLimiter with the given positive and negative rate
@@ -45,7 +45,7 @@ class SlewRateLimiter {
       : m_positiveRateLimit{positiveRateLimit},
         m_negativeRateLimit{negativeRateLimit},
         m_prevVal{initialValue},
-        m_prevTime{wpi::units::microsecond_t{
+        m_prevTime{wpi::units::microseconds<>{
             wpi::math::MathSharedStore::GetTimestamp()}} {}
 
   /**
@@ -65,12 +65,12 @@ class SlewRateLimiter {
    * rate.
    */
   Unit_t Calculate(Unit_t input) {
-    wpi::units::second_t currentTime =
+    wpi::units::seconds<> currentTime =
         wpi::math::MathSharedStore::GetTimestamp();
-    wpi::units::second_t elapsedTime = currentTime - m_prevTime;
+    wpi::units::seconds<> elapsedTime = currentTime - m_prevTime;
     m_prevVal +=
-        std::clamp(input - m_prevVal, m_negativeRateLimit * elapsedTime,
-                   m_positiveRateLimit * elapsedTime);
+        std::clamp<Unit_t>(input - m_prevVal, m_negativeRateLimit * elapsedTime,
+                           m_positiveRateLimit * elapsedTime);
     m_prevTime = currentTime;
     return m_prevVal;
   }
@@ -123,6 +123,6 @@ class SlewRateLimiter {
   Rate_t m_positiveRateLimit;
   Rate_t m_negativeRateLimit;
   Unit_t m_prevVal;
-  wpi::units::second_t m_prevTime;
+  wpi::units::seconds<> m_prevTime;
 };
 }  // namespace wpi::math

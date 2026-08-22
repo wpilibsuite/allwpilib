@@ -1,0 +1,48 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 17 Dec 2025 17:35:32 -0800
+Subject: [PATCH 07/12] Update PLURAL_TAG for minutes
+
+---
+ include/units/time.h | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/include/units/time.h b/include/units/time.h
+index 9289985cfb8c1ba074025b2f9ef0d4128dbf16d3..3fe2f9f4c961e918c3f582e717410a0f0296d371 100644
+--- a/include/units/time.h
++++ b/include/units/time.h
+@@ -49,20 +49,17 @@
+ #include <units/core.h>
+ 
+ /**
+- * @def			UNIT_ADD_WITH_PLURAL_TAG(namespaceName, namePlural, abbreviation, definition)
+- * @brief		Like `UNIT_ADD`, but WITHOUT the unit constant, whose name would collide with the
+- *				abbreviation, e.g. `minutes` with abbreviation `min` (the constant `min` clashes).
+- * @details		Registers everything `UNIT_ADD` does except `UNIT_ADD_CONSTANT`: the strong conversion
+- *				factor and the named-class registration are included so `name()`/`abbreviation()` resolve
+- *				and diagnostics print the friendly type, exactly as for a `UNIT_ADD` unit.
++ * @def			UNIT_ADD_WITH_PLURAL_CONSTANT(namespaceName, namePlural, abbreviation, definition)
++ * @brief		Like `UNIT_ADD`, but the constant name is plural, e.g. `5 * mins`
+  * @sa			`UNIT_ADD`
+  */
+-#define UNIT_ADD_WITH_PLURAL_TAG(namespaceName, namePlural, abbreviation, /*definition*/...)                                                                   \
++#define UNIT_ADD_WITH_PLURAL_CONSTANT(namespaceName, namePlural, abbreviation, /*definition*/...)                                                              \
+ 	UNIT_ADD_STRONG_CONVERSION_FACTOR(namespaceName, namePlural, __VA_ARGS__)                                                                                  \
+ 	UNIT_ADD_UNIT_DEFINITION(namespaceName, namePlural, __VA_ARGS__)                                                                                           \
+ 	UNIT_ADD_NAME(namespaceName, namePlural, abbreviation)                                                                                                     \
+ 	UNIT_REGISTER_NAMED_CLASS(namespaceName, namePlural)                                                                                                       \
+-	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)
++	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)                                                                                                 \
++	UNIT_ADD_CONSTANT(namespaceName, namePlural, abbreviation##s)
+ 
+ namespace units
+ {
+@@ -75,7 +72,7 @@ namespace units
+ 	 * @sa			See unit for more information on unit type containers.
+ 	 */
+ 	UNIT_ADD_WITH_METRIC_PREFIXES(time, seconds, s, conversion_factor<std::ratio<1>, dimension::time>)
+-	UNIT_ADD_WITH_PLURAL_TAG(time, minutes, min, conversion_factor<std::ratio<60>, seconds_>)
++	UNIT_ADD_WITH_PLURAL_CONSTANT(time, minutes, min, conversion_factor<std::ratio<60>, seconds_>)
+ 	UNIT_ADD(time, hours, hr, conversion_factor<std::ratio<60>, minutes<>>)
+ 	UNIT_ADD(time, days, d, conversion_factor<std::ratio<24>, hours_>)
+ 	UNIT_ADD(time, weeks, wk, conversion_factor<std::ratio<7>, days_>)

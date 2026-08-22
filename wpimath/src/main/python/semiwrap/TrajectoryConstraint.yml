@@ -1,7 +1,7 @@
 classes:
   wpi::math::TrajectoryConstraint:
     force_type_casters:
-    - wpi::units::meters_per_second_squared
+    - wpi::units::meters_per_second_squared_
     methods:
       TrajectoryConstraint:
       MaxVelocity:
@@ -12,8 +12,8 @@ classes:
       maxAcceleration:
     inline_code: |
       .def(py::init([](
-          wpi::units::meters_per_second_squared_t minAcceleration,
-          wpi::units::meters_per_second_squared_t maxAcceleration) {
+          wpi::units::meters_per_second_squared<> minAcceleration,
+          wpi::units::meters_per_second_squared<> maxAcceleration) {
         return wpi::math::TrajectoryConstraint::MinMax{minAcceleration, maxAcceleration};
       }), py::arg("min_acceleration"), py::arg("max_acceleration"))
 

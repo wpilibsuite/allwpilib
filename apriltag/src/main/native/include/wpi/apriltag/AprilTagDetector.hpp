@@ -98,7 +98,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
      * angles that are close to straight or close to 180 degrees. Zero means
      * that no quads are rejected. Default is 45 degrees.
      */
-    wpi::units::radian_t criticalAngle = 45_deg;
+    wpi::units::radians<> criticalAngle = 45_deg;
 
     /**
      * When fitting lines to the contours, the maximum mean squared error
@@ -255,7 +255,7 @@ class WPILIB_DLLEXPORT AprilTagDetector {
 
   void* m_impl;
   wpi::util::StringMap<void*> m_families;
-  wpi::units::radian_t m_qtpCriticalAngle = 10_deg;
+  wpi::units::radians<> m_qtpCriticalAngle = 10_deg;
 };
 
 }  // namespace wpi::apriltag

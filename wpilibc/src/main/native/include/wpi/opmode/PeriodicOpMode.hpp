@@ -101,7 +101,7 @@ class PeriodicOpMode : public OpMode {
    * @param period   The period at which to run the callback.
    */
   void AddPeriodic(std::function<void()> callback,
-                   wpi::units::second_t period) {
+                   wpi::units::seconds<> period) {
     AddPeriodic(std::move(callback), period, period);
   }
 
@@ -117,8 +117,8 @@ class PeriodicOpMode : public OpMode {
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
-                   wpi::units::second_t offset);
+  void AddPeriodic(std::function<void()> callback, wpi::units::seconds<> period,
+                   wpi::units::seconds<> offset);
 
  private:
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback> m_callbacks;

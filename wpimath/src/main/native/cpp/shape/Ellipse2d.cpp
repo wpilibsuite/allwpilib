@@ -45,8 +45,8 @@ Translation2d Ellipse2d::Nearest(const Translation2d& point) const {
 
     problem.solve();
 
-    rotPoint = wpi::math::Translation2d{wpi::units::meter_t{x.value()},
-                                        wpi::units::meter_t{y.value()}};
+    rotPoint = wpi::math::Translation2d{wpi::units::meters<>{x.value()},
+                                        wpi::units::meters<>{y.value()}};
   }
 
   // Undo rotation

@@ -9,7 +9,7 @@
 
 using namespace wpi::math;
 
-EdgeCounterFilter::EdgeCounterFilter(int requiredEdges, units::second_t window)
+EdgeCounterFilter::EdgeCounterFilter(int requiredEdges, units::seconds<> window)
     : m_requiredEdges(requiredEdges), m_windowTime(window) {
   ResetTimer();
 }

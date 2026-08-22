@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Joseph Eng <91924258+KangarooKoala@users.noreply.github.com>
+Date: Wed, 3 Dec 2025 17:52:35 -0800
+Subject: [PATCH 02/12] Disable iostream support by default
+
+---
+ include/units/core.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index c868f7876f0b2370681e298a21e5e9103a7a7ed4..5df2099337881dfefe59082caaaa587a41fde56f 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -69,6 +69,10 @@
+ #include <utility>
+ #include <version>
+ 
++// We don't want to use iostream, but do want format
++#define UNIT_LIB_DISABLE_IOSTREAM
++#define UNIT_LIB_ENABLE_FORMAT
++
+ // ---------------------------------------------------------------------------------------------------------------------
+ //	TEXT-FEATURE CONFIGURATION (opt-out; full capability is the default)
+ // ---------------------------------------------------------------------------------------------------------------------

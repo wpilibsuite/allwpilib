@@ -119,7 +119,7 @@ int SerialPort::Write(std::string_view buffer) {
   return retVal;
 }
 
-void SerialPort::SetTimeout(wpi::units::second_t timeout) {
+void SerialPort::SetTimeout(wpi::units::seconds<> timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_portHandle, timeout.value(), &status);
   WPILIB_CheckErrorStatus(status, "SetTimeout");

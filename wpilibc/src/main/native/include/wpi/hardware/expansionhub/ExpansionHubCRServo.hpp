@@ -44,7 +44,7 @@ class ExpansionHubCRServo {
    *
    * @param pulseWidth Pulse width
    */
-  void SetPulseWidth(wpi::units::microsecond_t pulseWidth);
+  void SetPulseWidth(wpi::units::microseconds<> pulseWidth);
 
   /**
    * Sets if the servo output is enabled or not. Defaults to false.
@@ -58,7 +58,7 @@ class ExpansionHubCRServo {
    *
    * @param framePeriod The frame period
    */
-  void SetFramePeriod(wpi::units::microsecond_t framePeriod);
+  void SetFramePeriod(wpi::units::microseconds<> framePeriod);
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -76,8 +76,8 @@ class ExpansionHubCRServo {
    * @param minPwm Minimum PWM
    * @param maxPwm Maximum PWM
    */
-  void SetPWMRange(wpi::units::microsecond_t minPwm,
-                   wpi::units::microsecond_t maxPwm);
+  void SetPWMRange(wpi::units::microseconds<> minPwm,
+                   wpi::units::microseconds<> maxPwm);
 
   /**
    * Sets whether the servo is reversed.
@@ -89,13 +89,13 @@ class ExpansionHubCRServo {
   void SetReversed(bool reversed);
 
  private:
-  wpi::units::microsecond_t GetFullRangeScaleFactor() const;
+  wpi::units::microseconds<> GetFullRangeScaleFactor() const;
 
   ExpansionHub m_hub;
   int m_channel;
 
-  wpi::units::microsecond_t m_minPwm = 600_us;
-  wpi::units::microsecond_t m_maxPwm = 2400_us;
+  wpi::units::microseconds<> m_minPwm = 600_us;
+  wpi::units::microseconds<> m_maxPwm = 2400_us;
 
   bool m_reversed = false;
 

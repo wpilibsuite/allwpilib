@@ -20,14 +20,15 @@ namespace wpi::math {
 TEST_CASE("SimpleMotorFeedforwardTest Calculate", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = 3_V / 1_mps;
-  constexpr auto Ka = 0.6_V / 1_mps_sq;
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr auto Ka = 0.6_V / 1_mps2;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   constexpr Matrixd<1, 1> A{{-Kv.value() / Ka.value()}};
   constexpr Matrixd<1, 1> B{{1.0 / Ka.value()}};
 
   wpi::math::LinearPlantInversionFeedforward<1, 1> plantInversion{A, B, dt};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> simpleMotor{Ks, Kv,
+                                                                     Ka};
 
   constexpr Vectord<1> r{{2.0}};
   constexpr Vectord<1> nextR{{3.0}};
@@ -46,10 +47,10 @@ TEST_CASE("SimpleMotorFeedforwardTest Calculate", "[wpimath]") {
 TEST_CASE("SimpleMotorFeedforwardTest NegativeGains", "[wpimath]") {
   constexpr auto Ks = 0.5_V;
   constexpr auto Kv = -3_V / 1_mps;
-  constexpr auto Ka = -0.6_V / 1_mps_sq;
-  constexpr wpi::units::second_t dt = 0_ms;
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> simpleMotor{Ks, Kv, Ka,
-                                                                   dt};
+  constexpr auto Ka = -0.6_V / 1_mps2;
+  constexpr wpi::units::seconds<> dt = 0_ms;
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> simpleMotor{Ks, Kv, Ka,
+                                                                     dt};
   CHECK(simpleMotor.GetKv().value() == 0);
   CHECK(simpleMotor.GetKa().value() == 0);
   CHECK(simpleMotor.GetDt().value() == 0.02);

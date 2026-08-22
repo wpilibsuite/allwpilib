@@ -23,7 +23,7 @@ class Pneumatics : wpi::cmd::SubsystemBase {
    *
    * @return the measured pressure, in PSI
    */
-  wpi::units::pounds_per_square_inch_t GetPressure();
+  wpi::units::pounds_per_square_inch<> GetPressure();
 
  private:
   // External analog pressure sensor

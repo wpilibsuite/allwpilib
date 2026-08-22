@@ -17,7 +17,7 @@
 
 using namespace sysid;
 
-static double Lerp(wpi::units::second_t time,
+static double Lerp(wpi::units::seconds<> time,
                    std::vector<MotorData::Run::Sample<double>>& data) {
   auto next = std::find_if(data.begin(), data.end(), [&](const auto& entry) {
     return entry.time > time;

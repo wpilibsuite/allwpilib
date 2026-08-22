@@ -15,7 +15,7 @@ using StructType = wpi::util::Struct<wpi::math::HolonomicSample>;
 
 wpi::math::HolonomicSample StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::HolonomicSample{
-      wpi::units::second_t{
+      wpi::units::seconds<>{
           wpi::util::UnpackStruct<double, kTimestampOff>(data)},
       wpi::util::UnpackStruct<wpi::math::Pose2d, kPoseOff>(data),
       wpi::util::UnpackStruct<wpi::math::ChassisVelocities, kVelocityOff>(data),
