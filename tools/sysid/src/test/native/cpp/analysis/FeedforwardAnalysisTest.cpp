@@ -44,8 +44,8 @@ inline constexpr int MOVEMENT_COMBINATIONS = 16;
  */
 template <typename Model>
 sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
-  constexpr auto USTEP = 0.25_V / 1_s;
-  constexpr wpi::units::volt_t UMAX = 7_V;
+  constexpr auto U_STEP = 0.25_V / 1_s;
+  constexpr wpi::units::volt_t U_MAX = 7_V;
   constexpr wpi::units::second_t T = 5_ms;
   constexpr wpi::units::second_t TEST_DURATION = 5_s;
 
@@ -64,7 +64,7 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
           std::sin(model.GetPosition())});
 
       model.Update(voltage, T);
-      voltage += USTEP * T;
+      voltage += U_STEP * T;
     }
   }
 
@@ -79,7 +79,7 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
           std::sin(model.GetPosition())});
 
       model.Update(voltage, T);
-      voltage -= USTEP * T;
+      voltage -= U_STEP * T;
     }
   }
 
@@ -94,7 +94,7 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
           std::sin(model.GetPosition())});
 
       model.Update(voltage, T);
-      voltage = UMAX;
+      voltage = U_MAX;
     }
   }
 
@@ -109,7 +109,7 @@ sysid::Storage CollectData(Model& model, std::bitset<4> movements) {
           std::sin(model.GetPosition())});
 
       model.Update(voltage, T);
-      voltage = -UMAX;
+      voltage = -U_MAX;
     }
   }
 
