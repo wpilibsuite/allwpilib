@@ -250,8 +250,10 @@ Timer = "wpi/system/Timer.hpp"
 Tracer = "wpi/system/Tracer.hpp"
 Watchdog = "wpi/system/Watchdog.hpp"
 
+# wpi/preferences
+Preferences = "wpi/preferences/Preferences.hpp"
+
 # wpi/util
-Preferences = "wpi/util/Preferences.hpp"
 SensorUtil = "wpi/util/SensorUtil.hpp"
 
 
