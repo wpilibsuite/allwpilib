@@ -21,6 +21,7 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -137,7 +138,7 @@ class LinearQuadraticRegulator {
     }
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("LinearQuadraticRegulator", "");
+    wpi::util::ReportUsage("LinearQuadraticRegulator", "");
   }
 
   /**
@@ -197,7 +198,7 @@ class LinearQuadraticRegulator {
     }
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("LinearQuadraticRegulator", "");
+    wpi::util::ReportUsage("LinearQuadraticRegulator", "");
   }
 
   LinearQuadraticRegulator(LinearQuadraticRegulator&&) = default;

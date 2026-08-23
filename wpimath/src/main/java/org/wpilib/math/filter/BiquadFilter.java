@@ -5,7 +5,7 @@
 package org.wpilib.math.filter;
 
 import org.wpilib.math.filter.internal.BiquadFilterDesigner;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * This class implements a cascade of second-order IIR filter sections (biquads) in Direct Form II
@@ -101,7 +101,7 @@ public class BiquadFilter {
     m_state = new double[sections.length][2];
 
     instances++;
-    MathSharedStore.reportUsage("BiquadFilter", String.valueOf(instances));
+    UsageReporting.reportUsage("BiquadFilter", String.valueOf(instances));
   }
 
   /**

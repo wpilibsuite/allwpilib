@@ -7,9 +7,9 @@ package org.wpilib.opmode;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.system.RobotController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * An opmode structure for periodic operation. This base class implements a loop that runs one or
@@ -48,7 +48,7 @@ public abstract class PeriodicOpMode implements OpMode {
   @SuppressWarnings("this-escape")
   protected PeriodicOpMode() {
     m_callbacks = new TreeSet<>();
-    HAL.reportUsage("OpMode", "PeriodicOpMode");
+    UsageReporting.reportUsage("OpMode", "PeriodicOpMode");
   }
 
   @Override

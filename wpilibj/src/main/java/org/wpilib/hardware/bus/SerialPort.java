@@ -5,8 +5,8 @@
 package org.wpilib.hardware.bus;
 
 import java.nio.charset.StandardCharsets;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SerialPortJNI;
+import org.wpilib.util.UsageReporting;
 
 /** Driver for the serial ports (USB, MXP, Onboard) on the roboRIO. */
 public class SerialPort implements AutoCloseable {
@@ -133,7 +133,7 @@ public class SerialPort implements AutoCloseable {
 
     disableTermination();
 
-    HAL.reportUsage("SerialPort", port.value, "");
+    UsageReporting.reportUsage("SerialPort", port.value, "");
   }
 
   /**

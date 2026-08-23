@@ -15,12 +15,12 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableTable.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi::cmd;
 
@@ -66,7 +66,7 @@ CommandScheduler::CommandScheduler()
     : m_impl(new Impl), m_watchdog(wpi::TimedRobot::DEFAULT_PERIOD, [] {
         std::puts("CommandScheduler loop time overrun.");
       }) {
-  HAL_ReportUsage("CommandScheduler", "");
+  wpi::util::ReportUsage("CommandScheduler", "");
 }
 
 CommandScheduler::~CommandScheduler() {

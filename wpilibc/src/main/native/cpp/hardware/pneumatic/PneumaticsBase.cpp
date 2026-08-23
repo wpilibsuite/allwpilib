@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 
+#include <format>
 #include <memory>
 
 #include "wpi/hal/REVPH.h"
@@ -46,4 +47,9 @@ int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
                          static_cast<int>(moduleType));
+}
+
+void PneumaticsBase::ReportUsage(std::string_view device, int instanceNumber,
+                                 std::string_view data) {
+  ReportUsage(std::format("{}[{}]", device, instanceNumber), data);
 }

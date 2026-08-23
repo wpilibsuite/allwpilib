@@ -59,7 +59,7 @@ public class Solenoid implements TelemetryLoggable, AutoCloseable {
       throw new AllocationException("Solenoid already allocated");
     }
 
-    m_module.reportUsage("Solenoid[" + channel + "]", "Solenoid");
+    m_module.reportUsage("Solenoid", channel, "Solenoid");
   }
 
   @Override

@@ -5,7 +5,6 @@
 package org.wpilib.hardware.rotation;
 
 import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
@@ -13,6 +12,7 @@ import org.wpilib.math.util.MathUtil;
 import org.wpilib.system.RobotController;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
 public class AnalogEncoder implements TelemetryLoggable, AutoCloseable {
@@ -83,7 +83,7 @@ public class AnalogEncoder implements TelemetryLoggable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    HAL.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
+    UsageReporting.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
   }
 
   private double mapSensorRange(double pos) {

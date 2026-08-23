@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.proto.MecanumDriveKinematicsProto;
 import org.wpilib.math.kinematics.struct.MecanumDriveKinematicsStruct;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -83,7 +83,7 @@ public class MecanumDriveKinematics
     setInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage("MecanumDriveKinematics", "");
+    UsageReporting.reportUsage("MecanumDriveKinematics", "");
   }
 
   /**

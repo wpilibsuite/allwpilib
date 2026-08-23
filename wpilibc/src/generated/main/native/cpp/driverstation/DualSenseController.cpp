@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ DualSenseController::DualSenseController(int port)
 
 DualSenseController::DualSenseController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "DualSenseController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "DualSenseController");
 }
 
 GenericHID& DualSenseController::GetHID() {

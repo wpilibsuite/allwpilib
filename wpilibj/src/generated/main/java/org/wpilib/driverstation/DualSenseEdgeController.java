@@ -10,7 +10,7 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -163,7 +163,7 @@ public class DualSenseEdgeController implements HIDDevice, TelemetryLoggable {
    */
   public DualSenseEdgeController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
   }
 
   /**

@@ -7,13 +7,13 @@ package org.wpilib.drive;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.DoubleConsumer;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -181,7 +181,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
   public void driveCartesian(
       double xVelocity, double yVelocity, double zRotation, Rotation2d gyroAngle) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "MecanumCartesian");
+      UsageReporting.reportUsage("RobotDrive", "MecanumCartesian");
       m_reported = true;
     }
 
@@ -216,7 +216,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
    */
   public void drivePolar(double magnitude, Rotation2d angle, double zRotation) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "MecanumPolar");
+      UsageReporting.reportUsage("RobotDrive", "MecanumPolar");
       m_reported = true;
     }
 

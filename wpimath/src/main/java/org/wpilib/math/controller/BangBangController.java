@@ -4,13 +4,13 @@
 
 package org.wpilib.math.controller;
 
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.tunable.ComplexTunable;
 import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Implements a bang-bang controller, which outputs either 0 or 1 depending on whether the
@@ -44,7 +44,7 @@ public class BangBangController implements TelemetryLoggable, ComplexTunable {
     setTolerance(tolerance);
 
     instances++;
-    MathSharedStore.reportUsage("BangBangController", String.valueOf(instances));
+    UsageReporting.reportUsage("BangBangController", String.valueOf(instances));
   }
 
   /**

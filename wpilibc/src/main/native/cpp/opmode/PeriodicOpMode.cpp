@@ -6,15 +6,15 @@
 
 #include <utility>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
 PeriodicOpMode::PeriodicOpMode()
     : m_startTime{
           std::chrono::nanoseconds{RobotController::GetMonotonicTime()}} {
-  HAL_ReportUsage("OpMode", "PeriodicOpMode");
+  wpi::util::ReportUsage("OpMode", "PeriodicOpMode");
 }
 
 void PeriodicOpMode::AddPeriodic(std::function<void()> callback,

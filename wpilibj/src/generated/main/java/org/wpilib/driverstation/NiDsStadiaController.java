@@ -13,7 +13,7 @@ import org.wpilib.driverstation.GenericHID.RumbleType;
 import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
 
@@ -147,7 +147,7 @@ public class NiDsStadiaController implements HIDDevice, TelemetryLoggable {
    */
   public NiDsStadiaController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "NiDsStadiaController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "NiDsStadiaController");
   }
 
   /**

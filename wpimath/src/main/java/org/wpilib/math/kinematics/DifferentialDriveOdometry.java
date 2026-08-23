@@ -8,8 +8,8 @@ import static org.wpilib.units.Units.Meters;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -38,7 +38,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
         gyroAngle,
         new DifferentialDriveWheelPositions(leftDistance, rightDistance),
         initialPose);
-    MathSharedStore.reportUsage("DifferentialDriveOdometry", "");
+    UsageReporting.reportUsage("DifferentialDriveOdometry", "");
   }
 
   /**

@@ -14,6 +14,7 @@
 #include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -47,8 +48,7 @@ class WPILIB_DLLEXPORT BangBangController
       : m_tolerance(tolerance) {
     if !consteval {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsage("BangBangController",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("BangBangController", std::to_string(instances));
     }
   }
 

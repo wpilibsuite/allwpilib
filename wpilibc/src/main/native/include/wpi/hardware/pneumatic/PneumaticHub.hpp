@@ -125,6 +125,8 @@ class PneumaticHub : public PneumaticsBase {
   Compressor MakeCompressor() override;
 
   void ReportUsage(std::string_view device, std::string_view data) override;
+  void ReportUsage(std::string_view device, int instanceNumber,
+                   std::string_view data) override;
 
   /** Version and device data received from a REV PH. */
   struct Version {

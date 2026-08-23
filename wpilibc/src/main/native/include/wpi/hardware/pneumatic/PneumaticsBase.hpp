@@ -266,6 +266,16 @@ class PneumaticsBase {
   virtual void ReportUsage(std::string_view device, std::string_view data) = 0;
 
   /**
+   * Report usage.
+   *
+   * @param device device name
+   * @param instanceNumber an index that identifies the device instance
+   * @param data arbitrary usage data
+   */
+  virtual void ReportUsage(std::string_view device, int instanceNumber,
+                           std::string_view data);
+
+  /**
    * For internal use to get a module for a specific type.
    *
    * @param busId The bus ID.

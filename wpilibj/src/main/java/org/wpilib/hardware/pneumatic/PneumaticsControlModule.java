@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.hal.CTREPCMJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
 import org.wpilib.system.SensorUtil;
+import org.wpilib.util.UsageReporting;
 
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {
@@ -372,6 +372,11 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public void reportUsage(String device, String data) {
-    HAL.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
+    UsageReporting.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
+  }
+
+  @Override
+  public void reportUsage(String device, int instanceNumber, String data) {
+    UsageReporting.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, instanceNumber, data);
   }
 }

@@ -7,11 +7,11 @@
 #include <string>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -22,7 +22,7 @@ AnalogInput::AnalogInput(int channel) {
   m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("IO", channel, "AnalogInput");
+  wpi::util::ReportUsage("IO", channel, "AnalogInput");
 }
 
 int AnalogInput::GetValue() const {

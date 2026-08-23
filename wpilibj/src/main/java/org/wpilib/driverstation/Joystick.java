@@ -7,7 +7,7 @@ package org.wpilib.driverstation;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from Flight Joysticks connected to the Driver Station.
@@ -104,7 +104,7 @@ public class Joystick implements HIDDevice {
     m_axes[AxisType.TWIST.value] = DEFAULT_TWIST_CHANNEL;
     m_axes[AxisType.THROTTLE.value] = DEFAULT_THROTTLE_CHANNEL;
 
-    HAL.reportUsage("HID", hid.getPort(), "Joystick");
+    UsageReporting.reportUsage("HID", hid.getPort(), "Joystick");
   }
 
   /**

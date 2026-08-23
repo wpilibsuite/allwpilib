@@ -6,7 +6,7 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.hardware.motor.PWMMotorController;
 
 /**
@@ -40,6 +40,6 @@ public class Spark extends PWMMotorController {
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "RevSPARK");
+    UsageReporting.reportUsage("IO", getChannel(), "RevSPARK");
   }
 }

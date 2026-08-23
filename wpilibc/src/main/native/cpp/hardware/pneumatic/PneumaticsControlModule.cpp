@@ -10,7 +10,6 @@
 
 #include "wpi/hal/CTREPCM.h"
 #include "wpi/hal/Ports.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
@@ -18,6 +17,7 @@
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -303,7 +303,14 @@ Compressor PneumaticsControlModule::MakeCompressor() {
 
 void PneumaticsControlModule::ReportUsage(std::string_view device,
                                           std::string_view data) {
-  HAL_ReportUsage(std::format("PCM[{}]/{}", m_module, device), data);
+  wpi::util::ReportUsage(std::format("PCM[{}]/{}", m_module, device), data);
+}
+
+void PneumaticsControlModule::ReportUsage(std::string_view device,
+                                          int instanceNumber,
+                                          std::string_view data) {
+  wpi::util::ReportUsage(std::format("PCM[{}]/{}", m_module, device),
+                         instanceNumber, data);
 }
 
 std::shared_ptr<PneumaticsBase> PneumaticsControlModule::GetForModule(

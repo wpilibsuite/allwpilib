@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ LogitechF310Controller::LogitechF310Controller(int port)
 
 LogitechF310Controller::LogitechF310Controller(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "LogitechF310Controller");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "LogitechF310Controller");
 }
 
 GenericHID& LogitechF310Controller::GetHID() {

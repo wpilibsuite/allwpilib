@@ -7,9 +7,9 @@ package org.wpilib.hardware.accelerometer;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle operation of an analog accelerometer. The accelerometer reads acceleration directly
@@ -24,7 +24,7 @@ public class AnalogAccelerometer implements TelemetryLoggable, AutoCloseable {
 
   /** Common initialization. */
   private void initAccelerometer() {
-    HAL.reportUsage("IO", m_analogChannel.getChannel(), "Accelerometer");
+    UsageReporting.reportUsage("IO", m_analogChannel.getChannel(), "Accelerometer");
   }
 
   /**

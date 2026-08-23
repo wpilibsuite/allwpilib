@@ -10,6 +10,7 @@
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
 #include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi::math;
 
@@ -17,5 +18,5 @@ MecanumDriveOdometry::MecanumDriveOdometry(
     MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
     : Odometry(kinematics, gyroAngle, wheelPositions, initialPose) {
-  wpi::math::MathSharedStore::ReportUsage("MecanumDriveOdometry", "");
+  wpi::util::ReportUsage("MecanumDriveOdometry", "");
 }

@@ -18,13 +18,13 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/framework/RobotBase.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Filesystem.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/util/SafeThread.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -79,10 +79,10 @@ static std::string MakeLogDir(std::string_view dir) {
       (s.permissions() & fs::perms::others_write) != fs::perms::none) {
     fs::create_directory("/u/logs", ec);
     return "/u/logs";
-    HAL_ReportUsage("DataLogManager", "USB");
+    wpi::util::ReportUsage("DataLogManager", "USB");
   }
   fs::create_directory("/home/systemcore/logs", ec);
-  HAL_ReportUsage("DataLogManager", "Onboard");
+  wpi::util::ReportUsage("DataLogManager", "Onboard");
   return "/home/systemcore/logs";
 #else
   std::string logDir = filesystem::GetOperatingDirectory() + "/logs";

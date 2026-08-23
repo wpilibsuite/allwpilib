@@ -5,10 +5,10 @@
 package org.wpilib.hardware.discrete;
 
 import org.wpilib.hardware.hal.DIOJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
@@ -31,7 +31,7 @@ public class DigitalOutput implements AutoCloseable, TelemetryLoggable {
 
     m_handle = DIOJNI.initializeDIOPort(channel, false);
 
-    HAL.reportUsage("IO", channel, "DigitalOutput");
+    UsageReporting.reportUsage("IO", channel, "DigitalOutput");
   }
 
   @Override

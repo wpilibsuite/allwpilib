@@ -11,9 +11,9 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic regulator (LQR). LQRs use
@@ -128,7 +128,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_tolerance = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
+    UsageReporting.reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**
@@ -170,7 +170,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     m_tolerance = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
+    UsageReporting.reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**

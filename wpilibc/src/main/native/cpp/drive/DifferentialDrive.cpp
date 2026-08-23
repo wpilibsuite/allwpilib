@@ -9,10 +9,10 @@
 #include <string>
 #include <utility>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/motor/MotorController.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -30,7 +30,7 @@ void DifferentialDrive::ArcadeDrive(double xVelocity, double zRotation,
                                     bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_ReportUsage("RobotDrive", "DifferentialArcade");
+    wpi::util::ReportUsage("RobotDrive", "DifferentialArcade");
     reported = true;
   }
 
@@ -52,7 +52,7 @@ void DifferentialDrive::CurvatureDrive(double xVelocity, double zRotation,
                                        bool allowTurnInPlace) {
   static bool reported = false;
   if (!reported) {
-    HAL_ReportUsage("RobotDrive", "DifferentialCurvature");
+    wpi::util::ReportUsage("RobotDrive", "DifferentialCurvature");
     reported = true;
   }
 
@@ -74,7 +74,7 @@ void DifferentialDrive::TankDrive(double leftVelocity, double rightVelocity,
                                   bool squareInputs) {
   static bool reported = false;
   if (!reported) {
-    HAL_ReportUsage("RobotDrive", "DifferentialTank");
+    wpi::util::ReportUsage("RobotDrive", "DifferentialTank");
     reported = true;
   }
 

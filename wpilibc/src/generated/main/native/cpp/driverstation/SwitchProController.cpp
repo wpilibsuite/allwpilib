@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ SwitchProController::SwitchProController(int port)
 
 SwitchProController::SwitchProController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "SwitchProController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "SwitchProController");
 }
 
 GenericHID& SwitchProController::GetHID() {

@@ -5,11 +5,11 @@
 #include "wpi/hardware/discrete/PWM.hpp"
 
 #include "wpi/hal/PWM.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -23,7 +23,7 @@ PWM::PWM(int channel) {
 
   SetDisabled();
 
-  HAL_ReportUsage("IO", channel, "PWM");
+  wpi::util::ReportUsage("IO", channel, "PWM");
 }
 
 PWM::~PWM() {

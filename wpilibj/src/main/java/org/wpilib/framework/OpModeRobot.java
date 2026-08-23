@@ -43,6 +43,7 @@ import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.util.Alert;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
+import org.wpilib.util.UsageReporting;
 
 /**
  * OpModeRobot implements the opmode-based robot program framework.
@@ -533,7 +534,7 @@ public abstract class OpModeRobot extends RobotBase {
     addAnnotatedOpModeClasses(getClass().getPackage());
     RobotState.publishOpModes();
 
-    HAL.reportUsage("Framework", "OpModeRobot");
+    UsageReporting.reportUsage("Framework", "OpModeRobot");
   }
 
   /**

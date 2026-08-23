@@ -37,6 +37,7 @@ import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.units.Measure;
 import org.wpilib.units.Unit;
 import org.wpilib.util.Alert;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
@@ -75,11 +76,6 @@ public abstract class RobotBase implements AutoCloseable {
           @Override
           public void reportError(String error, StackTraceElement[] stackTrace) {
             DriverStationErrors.reportError(error, stackTrace);
-          }
-
-          @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
           }
 
           @Override
@@ -269,7 +265,7 @@ public abstract class RobotBase implements AutoCloseable {
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
-                HAL.reportUsage("NT/" + event.connInfo.remoteId, "");
+                UsageReporting.reportUsage("NT/" + event.connInfo.remoteId, "");
               }
             });
   }
@@ -557,12 +553,13 @@ public abstract class RobotBase implements AutoCloseable {
     if (!HAL.initialize()) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+    UsageReporting.setReportUsageImpl(HAL::reportUsage);
 
     // Force refresh DS data
     DriverStationBackend.refreshData();
 
-    HAL.reportUsage("Language", "Java");
-    HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
+    UsageReporting.reportUsage("Language", "Java");
+    UsageReporting.reportUsage("WPILibVersion", WPILibVersion.Version);
     HAL.publishWpilibVersion(WPILibVersion.Version + " (Java)");
 
     if (HAL.hasMain()) {

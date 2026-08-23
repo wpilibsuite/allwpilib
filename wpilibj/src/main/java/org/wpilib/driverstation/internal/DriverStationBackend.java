@@ -39,6 +39,7 @@ import org.wpilib.networktables.StructPublisher;
 import org.wpilib.util.Alert;
 import org.wpilib.util.AlertException;
 import org.wpilib.util.Color;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
 
@@ -1634,7 +1635,8 @@ public final class DriverStationBackend {
             .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
 
     for (RobotMode mode : RobotMode.values()) {
-      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
+      UsageReporting.reportUsage(
+          "OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 

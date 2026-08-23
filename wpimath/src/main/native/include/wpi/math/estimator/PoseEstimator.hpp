@@ -25,6 +25,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -76,7 +77,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    wpi::math::MathSharedStore::ReportUsage("PoseEstimator", "");
+    wpi::util::ReportUsage("PoseEstimator", "");
   }
 
   /**

@@ -11,9 +11,9 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
@@ -23,7 +23,7 @@ LEDPattern::LEDPattern(
                        std::function<void(int, wpi::util::Color)>)>
         impl)
     : m_impl(std::move(impl)) {
-  HAL_ReportUsage("LEDPattern", "");
+  wpi::util::ReportUsage("LEDPattern", "");
 }
 
 void LEDPattern::ApplyTo(

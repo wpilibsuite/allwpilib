@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ Switch2GCController::Switch2GCController(int port)
 
 Switch2GCController::Switch2GCController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "Switch2GCController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "Switch2GCController");
 }
 
 GenericHID& Switch2GCController::GetHID() {

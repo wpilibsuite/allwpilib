@@ -6,10 +6,10 @@ import os.path
 import traceback
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
 
-import hal
 from telemetry import TelemetryLoggable, TelemetryTable
 from typing_extensions import Self
 from tunables import ComplexTunable, Tunable, TunableRegistry, TunableTable
+import wpiutil
 from wpilib import (
     RobotState,
     EventLoop,
@@ -105,7 +105,7 @@ class CommandScheduler(TelemetryLoggable, ComplexTunable):
 
         self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
-        hal.report_usage("CommandScheduler", "")
+        wpiutil.report_usage("CommandScheduler", "")
 
     def set_period(self, period: float) -> None:
         """

@@ -10,7 +10,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
@@ -28,7 +28,7 @@ SwitchN64Controller::SwitchN64Controller(int port)
 
 SwitchN64Controller::SwitchN64Controller(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "SwitchN64Controller");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "SwitchN64Controller");
 }
 
 GenericHID& SwitchN64Controller::GetHID() {

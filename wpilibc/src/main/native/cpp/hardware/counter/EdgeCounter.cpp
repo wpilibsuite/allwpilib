@@ -7,10 +7,10 @@
 #include <string>
 
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -25,7 +25,7 @@ EdgeCounter::EdgeCounter(int channel, EdgeConfiguration configuration)
 
   Reset();
 
-  HAL_ReportUsage("IO", channel, "EdgeCounter");
+  wpi::util::ReportUsage("IO", channel, "EdgeCounter");
 }
 
 int EdgeCounter::GetCount() const {

@@ -6,7 +6,7 @@
 
 #include "wpi/drivers/motor/PWMVictorSPX.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -15,5 +15,5 @@ PWMVictorSPX::PWMVictorSPX(int channel) : PWMMotorController(channel) {
   m_pwm.SetOutputPeriod(5_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "PWMVictorSPX");
+  wpi::util::ReportUsage("IO", GetChannel(), "PWMVictorSPX");
 }

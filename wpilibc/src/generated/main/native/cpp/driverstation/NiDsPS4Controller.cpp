@@ -8,7 +8,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
@@ -18,7 +18,7 @@ NiDsPS4Controller::NiDsPS4Controller(int port)
 
 NiDsPS4Controller::NiDsPS4Controller(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "NiDsPS4Controller");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "NiDsPS4Controller");
 }
 
 GenericHID& NiDsPS4Controller::GetHID() {

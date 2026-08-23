@@ -10,6 +10,9 @@ void cleanup_safethread_gil();
 void set_now_impl(py::object fn);
 void cleanup_now_impl();
 
+void set_report_usage_impl(py::object fn);
+void cleanup_report_usage_impl();
+
 SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
 
@@ -18,11 +21,13 @@ SEMIWRAP_PYBIND11_MODULE(m) {
     cleanup_stack_trace_hook();
     cleanup_safethread_gil();
     cleanup_now_impl();
+    cleanup_report_usage_impl();
   });
 
   setup_safethread_gil();
 
   m.def("_setup_stack_trace_hook", &setup_stack_trace_hook);
   m.def("set_now_impl", &set_now_impl);
+  m.def("set_report_usage_impl", &set_report_usage_impl);
   m.add_object("_st_cleanup", cleanup);
 }

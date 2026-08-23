@@ -7,11 +7,11 @@ package org.wpilib.drive;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.DoubleConsumer;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -146,7 +146,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
    */
   public void arcadeDrive(double xVelocity, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialArcade");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialArcade");
       m_reported = true;
     }
 
@@ -177,7 +177,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
    */
   public void curvatureDrive(double xVelocity, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialCurvature");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialCurvature");
       m_reported = true;
     }
 
@@ -219,7 +219,7 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
    */
   public void tankDrive(double leftVelocity, double rightVelocity, boolean squareInputs) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialTank");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialTank");
       m_reported = true;
     }
 

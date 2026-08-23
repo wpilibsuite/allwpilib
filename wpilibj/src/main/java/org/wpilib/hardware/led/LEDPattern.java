@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import org.wpilib.driverstation.DriverStationErrors;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.collections.LongToObjectHashMap;
 import org.wpilib.units.measure.Dimensionless;
@@ -23,6 +22,7 @@ import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.Color;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 
 /**
@@ -151,7 +151,7 @@ public interface LEDPattern {
    * @return the mapped pattern
    */
   default LEDPattern mapIndex(IndexMapper indexMapper) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       int bufLen = reader.getLength();
       applyTo(
@@ -297,7 +297,7 @@ public interface LEDPattern {
     final long totalTimeNanos = (long) (onTime.in(Nanoseconds) + offTime.in(Nanoseconds));
     final long onTimeNanos = (long) onTime.in(Nanoseconds);
 
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       if (RobotController.getTime() % totalTimeNanos < onTimeNanos) {
         applyTo(reader, writer);
@@ -327,7 +327,7 @@ public interface LEDPattern {
    * @return the blinking pattern
    */
   default LEDPattern synchronizedBlink(BooleanSupplier signal) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       if (signal.getAsBoolean()) {
         applyTo(reader, writer);
@@ -347,7 +347,7 @@ public interface LEDPattern {
   default LEDPattern breathe(Time period) {
     final long periodNanos = (long) period.in(Nanoseconds);
 
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       applyTo(
           reader,
@@ -379,7 +379,7 @@ public interface LEDPattern {
    * @return the combined overlay pattern
    */
   default LEDPattern overlayOn(LEDPattern base) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       // write the base pattern down first...
       base.applyTo(reader, writer);
@@ -407,7 +407,7 @@ public interface LEDPattern {
    * @return the blended pattern
    */
   default LEDPattern blend(LEDPattern other) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       applyTo(reader, writer);
 
@@ -439,7 +439,7 @@ public interface LEDPattern {
    * @return the masked pattern
    */
   default LEDPattern mask(LEDPattern mask) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       // Apply the current pattern down as normal...
       applyTo(reader, writer);
@@ -479,7 +479,7 @@ public interface LEDPattern {
   default LEDPattern atBrightness(Dimensionless relativeBrightness) {
     double multiplier = relativeBrightness.in(Value);
 
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       applyTo(
           reader,
@@ -506,7 +506,7 @@ public interface LEDPattern {
    * @return the pattern
    */
   static LEDPattern solid(Color color) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       int bufLen = reader.getLength();
       for (int led = 0; led < bufLen; led++) {
@@ -536,7 +536,7 @@ public interface LEDPattern {
    * @return the mask pattern
    */
   static LEDPattern progressMaskLayer(DoubleSupplier progressSupplier) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       double progress = Math.clamp(progressSupplier.getAsDouble(), 0, 1);
 
@@ -573,7 +573,7 @@ public interface LEDPattern {
    * @return a motionless step pattern
    */
   static LEDPattern steps(Map<? extends Number, Color> steps) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     if (steps.isEmpty()) {
       // no colors specified
       DriverStationErrors.reportWarning("Creating LED steps with no colors!", false);
@@ -635,7 +635,7 @@ public interface LEDPattern {
    * @return a motionless gradient pattern
    */
   static LEDPattern gradient(GradientType type, Color... colors) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     if (colors.length == 0) {
       // Nothing to display
       DriverStationErrors.reportWarning("Creating a gradient with no colors!", false);
@@ -693,7 +693,7 @@ public interface LEDPattern {
    * @return the rainbow pattern
    */
   static LEDPattern rainbow(int saturation, int value) {
-    HAL.reportUsage("LEDPattern", "");
+    UsageReporting.reportUsage("LEDPattern", "");
     return (reader, writer) -> {
       int bufLen = reader.getLength();
       for (int i = 0; i < bufLen; i++) {

@@ -17,13 +17,13 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi;
@@ -45,7 +45,7 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
   // Add LoopFunc as periodic callback
   AddPeriodic([this] { LoopFunc(); }, period);
 
-  HAL_ReportUsage("Framework", "OpModeRobot");
+  wpi::util::ReportUsage("Framework", "OpModeRobot");
 }
 
 OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}

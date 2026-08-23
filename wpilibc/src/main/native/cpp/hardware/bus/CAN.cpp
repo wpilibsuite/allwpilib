@@ -9,8 +9,8 @@
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/CANAPI.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -26,7 +26,7 @@ CAN::CAN(CANBus busId, int deviceId, int deviceManufacturer, int deviceType) {
   WPILIB_CheckErrorStatus(status, "device id {} mfg {} type {}", deviceId,
                           deviceManufacturer, deviceType);
 
-  HAL_ReportUsage(
+  wpi::util::ReportUsage(
       std::format("CAN[{}][{}][{}]", deviceType, deviceManufacturer, deviceId),
       "");
 }

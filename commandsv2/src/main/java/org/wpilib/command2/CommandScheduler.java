@@ -28,7 +28,6 @@ import org.wpilib.driverstation.RobotState;
 import org.wpilib.event.EventLoop;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -38,6 +37,7 @@ import org.wpilib.tunable.TunableConfig;
 import org.wpilib.tunable.TunableOption;
 import org.wpilib.tunable.TunableRegistry;
 import org.wpilib.tunable.TunableTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
@@ -102,7 +102,7 @@ public final class CommandScheduler implements TelemetryLoggable, ComplexTunable
   private final Watchdog m_watchdog = new Watchdog(TimedRobot.DEFAULT_PERIOD, () -> {});
 
   CommandScheduler() {
-    HAL.reportUsage("CommandScheduler", "");
+    UsageReporting.reportUsage("CommandScheduler", "");
   }
 
   /**

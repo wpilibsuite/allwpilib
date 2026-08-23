@@ -7,9 +7,9 @@
 #include <format>
 
 #include "wpi/hal/Encoder.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -145,7 +145,7 @@ void Encoder::InitEncoder(int aChannel, int bChannel, bool reverseDirection,
       type = "Encoder:4x";
       break;
   }
-  HAL_ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
+  wpi::util::ReportUsage(std::format("IO[{},{}]", aChannel, bChannel), type);
 }
 
 double Encoder::DecodingScaleFactor() const {

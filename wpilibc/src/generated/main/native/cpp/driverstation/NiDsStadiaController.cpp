@@ -8,7 +8,7 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
@@ -18,7 +18,7 @@ NiDsStadiaController::NiDsStadiaController(int port)
 
 NiDsStadiaController::NiDsStadiaController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "NiDsStadiaController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "NiDsStadiaController");
 }
 
 GenericHID& NiDsStadiaController::GetHID() {

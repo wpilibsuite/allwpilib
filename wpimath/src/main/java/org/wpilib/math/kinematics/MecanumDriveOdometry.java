@@ -6,7 +6,7 @@ package org.wpilib.math.kinematics;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for mecanum drive odometry. Odometry allows you to track the robot's position on the field
@@ -31,7 +31,7 @@ public class MecanumDriveOdometry extends Odometry<MecanumDriveWheelPositions> {
       MecanumDriveWheelPositions wheelPositions,
       Pose2d initialPose) {
     super(kinematics, gyroAngle, wheelPositions, initialPose);
-    MathSharedStore.reportUsage("MecanumDriveOdometry", "");
+    UsageReporting.reportUsage("MecanumDriveOdometry", "");
   }
 
   /**

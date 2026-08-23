@@ -31,6 +31,7 @@
 #include "wpi/telemetry/TelemetryRegistry.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/Alert.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 #include "wpi/util/timestamp.hpp"
 
@@ -46,9 +47,11 @@ int wpi::RunHALInitialization() {
     std::puts("FATAL ERROR: HAL could not be initialized");
     return -1;
   }
+  wpi::util::SetReportUsageImpl(
+      static_cast<WPI_ReportUsageImpl>(HAL_ReportUsage));
   wpi::internal::DriverStationBackend::RefreshData();
-  HAL_ReportUsage("Language", "C++");
-  HAL_ReportUsage("WPILibVersion", GetWPILibVersion());
+  wpi::util::ReportUsage("Language", "C++");
+  wpi::util::ReportUsage("WPILibVersion", GetWPILibVersion());
   HAL_PublishWpilibVersion(std::format("{} (C++)", GetWPILibVersion()));
 
   std::puts("\n********** Robot program starting **********");
@@ -78,10 +81,6 @@ class WPILibMathShared : public wpi::math::MathShared {
   void ReportWarningV(std::string_view format, std::format_args args) override {
     wpi::ReportErrorV(warn::Warning, __FILE__, __LINE__, __FUNCTION__, format,
                       args);
-  }
-
-  void ReportUsage(std::string_view resource, std::string_view data) override {
-    HAL_ReportUsage(resource, data);
   }
 
   wpi::units::second_t GetTimestamp() override {
@@ -250,7 +249,7 @@ RobotBase::RobotBase() {
       inst.AddConnectionListener(false, [&](const wpi::nt::Event& event) {
         if (event.Is(wpi::nt::EventFlags::CONNECTED)) {
           auto connInfo = event.GetConnectionInfo();
-          HAL_ReportUsage(std::format("NT/{}", connInfo->remote_id), "");
+          wpi::util::ReportUsage(std::format("NT/{}", connInfo->remote_id), "");
         }
       });
 

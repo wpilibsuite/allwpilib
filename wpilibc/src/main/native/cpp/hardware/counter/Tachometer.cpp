@@ -7,10 +7,10 @@
 #include <string>
 
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -23,7 +23,7 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
       stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "{}", channel);
 
-  HAL_ReportUsage("IO", channel, "Tachometer");
+  wpi::util::ReportUsage("IO", channel, "Tachometer");
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {

@@ -10,7 +10,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for swerve drive odometry. Odometry allows you to track the robot's position on the field
@@ -46,7 +46,7 @@ public class SwerveDriveOdometry3d extends Odometry3d<SwerveModulePosition[]> {
 
     m_numModules = modulePositions.length;
 
-    MathSharedStore.reportUsage("SwerveDriveOdometry3d", "");
+    UsageReporting.reportUsage("SwerveDriveOdometry3d", "");
   }
 
   /**

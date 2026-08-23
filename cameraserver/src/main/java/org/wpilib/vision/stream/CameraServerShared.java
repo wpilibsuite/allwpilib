@@ -21,14 +21,6 @@ public interface CameraServerShared {
   void reportDriverStationError(String error);
 
   /**
-   * Report usage.
-   *
-   * @param resource the resource name
-   * @param data arbitrary string data
-   */
-  void reportUsage(String resource, String data);
-
-  /**
    * Get if running on a Systemcore.
    *
    * @return true if on Systemcore

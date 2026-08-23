@@ -7,7 +7,7 @@ package org.wpilib.math.trajectory;
 import java.util.Objects;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileConstraintsStruct;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileStateStruct;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.struct.StructSerializable;
 
 /**
@@ -70,7 +70,7 @@ public class TrapezoidProfile {
 
       this.maxVelocity = maxVelocity;
       this.maxAcceleration = maxAcceleration;
-      MathSharedStore.reportUsage("TrapezoidProfile", "");
+      UsageReporting.reportUsage("TrapezoidProfile", "");
     }
   }
 

@@ -7,11 +7,11 @@
 #include <string>
 
 #include "wpi/hal/DutyCycle.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -24,7 +24,7 @@ void DutyCycle::InitDutyCycle() {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   m_handle = HAL_InitializeDutyCycle(m_channel, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  HAL_ReportUsage("IO", m_channel, "DutyCycle");
+  wpi::util::ReportUsage("IO", m_channel, "DutyCycle");
 }
 
 wpi::units::hertz_t DutyCycle::GetFrequency() const {

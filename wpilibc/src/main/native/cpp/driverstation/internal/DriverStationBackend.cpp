@@ -23,7 +23,6 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Power.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -36,6 +35,7 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/string.hpp"
@@ -912,14 +912,15 @@ void DriverStationBackend::PublishOpModes() {
     ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
   }
 
-  HAL_ReportUsage("OpMode/AUTONOMOUS",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
-  HAL_ReportUsage("OpMode/TELEOPERATED",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
-  HAL_ReportUsage("OpMode/UTILITY",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
-  HAL_ReportUsage("OpMode/UNKNOWN",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
+  wpi::util::ReportUsage("OpMode/AUTONOMOUS",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
+  wpi::util::ReportUsage(
+      "OpMode/TELEOPERATED",
+      std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
+  wpi::util::ReportUsage("OpMode/UTILITY",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
+  wpi::util::ReportUsage("OpMode/UNKNOWN",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
 }
 
 void DriverStationBackend::ClearOpModes() {

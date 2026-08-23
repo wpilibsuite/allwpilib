@@ -32,7 +32,7 @@ ExpansionHubMotor::ExpansionHubMotor(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(std::format("ExHubMotor[{}]", channel), "ExHubMotor");
+  m_hub.ReportUsage("ExHubMotor", channel, "ExHubMotor");
 
   auto systemServer = SystemServer::GetSystemServer();
 

@@ -8,7 +8,6 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Collection;
 import java.util.EnumSet;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTable;
 import org.wpilib.networktables.NetworkTableEntry;
@@ -50,7 +49,7 @@ public final class Preferences {
 
   static {
     setNetworkTableInstance(NetworkTableInstance.getDefault());
-    HAL.reportUsage("Preferences", "");
+    UsageReporting.reportUsage("Preferences", "");
   }
 
   /**

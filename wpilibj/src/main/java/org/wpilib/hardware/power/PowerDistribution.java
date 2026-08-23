@@ -5,13 +5,13 @@
 package org.wpilib.hardware.power;
 
 import org.wpilib.hardware.bus.CANBus;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PowerDistributionFaults;
 import org.wpilib.hardware.hal.PowerDistributionJNI;
 import org.wpilib.hardware.hal.PowerDistributionStickyFaults;
 import org.wpilib.hardware.hal.PowerDistributionVersion;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CTRE Power
@@ -51,9 +51,9 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (moduleType == ModuleType.CTRE) {
-      HAL.reportUsage("PDP", m_module, "");
+      UsageReporting.reportUsage("PDP", m_module, "");
     } else {
-      HAL.reportUsage("PDH", m_module, "");
+      UsageReporting.reportUsage("PDH", m_module, "");
     }
   }
 
@@ -71,9 +71,9 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
     if (PowerDistributionJNI.getType(m_handle) == PowerDistributionJNI.CTRE_TYPE) {
-      HAL.reportUsage("PowerDistribution", m_module, "CTRE");
+      UsageReporting.reportUsage("PowerDistribution", m_module, "CTRE");
     } else {
-      HAL.reportUsage("PowerDistribution", m_module, "Rev");
+      UsageReporting.reportUsage("PowerDistribution", m_module, "Rev");
     }
   }
 

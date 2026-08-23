@@ -6,8 +6,8 @@
 
 #include <format>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/struct/Struct.hpp"
 
 using namespace wpi;
@@ -47,9 +47,8 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, int range, int deviceAddress)
   // Specify the data format to read
   SetRange(range);
 
-  HAL_ReportUsage(
-      std::format("I2C[{}][{}]", static_cast<int>(port), deviceAddress),
-      "ADXL345");
+  wpi::util::ReportUsage(std::format("I2C[{}]", static_cast<int>(port)),
+                         deviceAddress, "ADXL345");
 }
 
 I2C::Port ADXL345_I2C::GetI2CPort() const {

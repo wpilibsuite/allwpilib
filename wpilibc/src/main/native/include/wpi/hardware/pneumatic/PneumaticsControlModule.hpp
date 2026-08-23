@@ -196,6 +196,8 @@ class PneumaticsControlModule : public PneumaticsBase {
   Compressor MakeCompressor() override;
 
   void ReportUsage(std::string_view device, std::string_view data) override;
+  void ReportUsage(std::string_view device, int instanceNumber,
+                   std::string_view data) override;
 
  private:
   class DataStore;

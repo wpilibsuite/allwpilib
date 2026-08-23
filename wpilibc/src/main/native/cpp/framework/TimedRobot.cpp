@@ -12,9 +12,9 @@
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -50,7 +50,7 @@ TimedRobot::TimedRobot(wpi::units::second_t period)
   WPILIB_CheckErrorStatus(status, "InitializeNotifier");
   HAL_SetNotifierName(m_notifier, "TimedRobot", &status);
 
-  HAL_ReportUsage("Framework", "TimedRobot");
+  wpi::util::ReportUsage("Framework", "TimedRobot");
 }
 
 TimedRobot::TimedRobot(wpi::units::hertz_t frequency)

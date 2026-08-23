@@ -7,12 +7,12 @@ package org.wpilib.framework;
 import static org.wpilib.units.Units.Seconds;
 
 import org.wpilib.driverstation.internal.DriverStationBackend;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.NotifierJNI;
 import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.UsageReporting;
 
 /**
  * TimedRobot implements the IterativeRobotBase robot program framework.
@@ -50,7 +50,7 @@ public class TimedRobot extends IterativeRobotBase {
     addPeriodic(this::loopFunc, period);
     NotifierJNI.setNotifierName(m_notifier, "TimedRobot");
 
-    HAL.reportUsage("Framework", "TimedRobot");
+    UsageReporting.reportUsage("Framework", "TimedRobot");
   }
 
   /**

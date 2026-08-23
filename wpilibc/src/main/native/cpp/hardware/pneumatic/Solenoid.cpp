@@ -4,7 +4,6 @@
 
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
 
-#include <format>
 #include <utility>
 
 #include "wpi/system/Errors.hpp"
@@ -27,7 +26,7 @@ Solenoid::Solenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
                            m_channel);
   }
 
-  m_module->ReportUsage(std::format("Solenoid[{}]", m_channel), "Solenoid");
+  m_module->ReportUsage("Solenoid", m_channel, "Solenoid");
 }
 
 Solenoid::Solenoid(CANBus busId, PneumaticsModuleType moduleType, int channel)

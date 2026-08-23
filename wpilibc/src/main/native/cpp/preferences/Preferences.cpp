@@ -9,12 +9,12 @@
 #include <string>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/MultiSubscriber.hpp"
 #include "wpi/nt/NetworkTable.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
 #include "wpi/nt/StringTopic.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi;
@@ -182,5 +182,5 @@ Instance::Instance() {
           }
         }
       });
-  HAL_ReportUsage("Preferences", "");
+  wpi::util::ReportUsage("Preferences", "");
 }

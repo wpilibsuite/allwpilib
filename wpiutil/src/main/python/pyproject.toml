@@ -81,6 +81,7 @@ RawFrame_c = "wpi/util/RawFrame.h"
 RawFrame = "wpi/util/RawFrame.hpp"
 Timestamp = "wpi/util/timestamp.hpp"
 Alert = "wpi/util/Alert.hpp"
+UsageReporting = "wpi/util/UsageReporting.hpp"
 
 WPyStruct = "src/wpistruct/wpystruct_fns.h"
 

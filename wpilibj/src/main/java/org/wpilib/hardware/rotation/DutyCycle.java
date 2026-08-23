@@ -5,9 +5,9 @@
 package org.wpilib.hardware.rotation;
 
 import org.wpilib.hardware.hal.DutyCycleJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class to read a duty cycle PWM input.
@@ -29,7 +29,7 @@ public class DutyCycle implements TelemetryLoggable, AutoCloseable {
     m_handle = DutyCycleJNI.initialize(channel);
 
     m_channel = channel;
-    HAL.reportUsage("IO", channel, "DutyCycle");
+    UsageReporting.reportUsage("IO", channel, "DutyCycle");
   }
 
   /** Close the DutyCycle and free all resources. */

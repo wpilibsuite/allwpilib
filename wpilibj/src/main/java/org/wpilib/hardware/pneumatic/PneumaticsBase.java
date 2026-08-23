@@ -257,4 +257,15 @@ public interface PneumaticsBase extends AutoCloseable {
    * @param data arbitrary usage data
    */
   void reportUsage(String device, String data);
+
+  /**
+   * Report usage.
+   *
+   * @param device device name
+   * @param instanceNumber an index that identifies the device instance
+   * @param data arbitrary usage data
+   */
+  default void reportUsage(String device, int instanceNumber, String data) {
+    reportUsage(device + "[" + instanceNumber + "]", data);
+  }
 }
