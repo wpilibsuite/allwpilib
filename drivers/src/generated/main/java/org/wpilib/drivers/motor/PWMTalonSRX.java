@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.util.UsageReporting;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Motor Controller.
