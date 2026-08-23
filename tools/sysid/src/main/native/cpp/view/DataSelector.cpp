@@ -136,7 +136,7 @@ void DataSelector::Display() {
   }
 
   if (m_executedTests.size() < 4 && !m_testCountValidated) {
-    for (auto test : m_validTests) {
+    for (auto test : VALID_TESTS) {
       if (!m_executedTests.contains(test)) {
         m_missingTests.push_back(test);
         m_testCountValidated = true;
