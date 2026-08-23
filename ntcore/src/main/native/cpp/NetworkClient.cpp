@@ -159,7 +159,7 @@ void NetworkClientBase::StartResolvers() {
     return;
   }
 
-  if (m_serverResolver->kind == ServerResolver::Kind::SYSTEM_CORE) {
+  if (m_serverResolver->kind == ServerResolver::Kind::SYSTEMCORE) {
     if (m_serverResolver->team) {
       m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
           m_loop, m_logger, *m_serverResolver->team, m_serverResolver->port);

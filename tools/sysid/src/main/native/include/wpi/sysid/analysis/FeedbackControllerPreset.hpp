@@ -73,7 +73,7 @@ enum class FeedbackControllerLoopType { POSITION, VELOCITY };
 namespace presets {
 inline constexpr FeedbackControllerPreset DEFAULT{1.0, 1.0, 20_ms, true, 0_s};
 
-inline constexpr FeedbackControllerPreset WPI_LIB{DEFAULT};
+inline constexpr FeedbackControllerPreset WPILIB{DEFAULT};
 
 // Measurement delay from a moving average filter:
 //

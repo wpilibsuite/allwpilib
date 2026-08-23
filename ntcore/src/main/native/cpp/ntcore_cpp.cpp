@@ -734,7 +734,7 @@ static void AddTeamServer(
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
     unsigned int port) {
   INetworkClient::ServerResolver resolver;
-  resolver.kind = INetworkClient::ServerResolver::Kind::SYSTEM_CORE;
+  resolver.kind = INetworkClient::ServerResolver::Kind::SYSTEMCORE;
   resolver.port = port;
   return resolver;
 }

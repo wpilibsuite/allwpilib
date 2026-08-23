@@ -33,7 +33,7 @@ Analyzer::Analyzer(wpi::glass::Storage& storage, wpi::util::Logger& logger)
     : m_logger(logger) {
   // Fill the wpi::util::StringMap with preset values.
   m_presets["Default"] = presets::DEFAULT;
-  m_presets["WPILib"] = presets::WPI_LIB;
+  m_presets["WPILib"] = presets::WPILIB;
   m_presets["CTRE Phoenix 5"] = presets::CTRE_V5;
   m_presets["CTRE Phoenix 6"] = presets::CTRE_V6;
   m_presets["REV Brushless Encoder Port"] = presets::REVNEO_BUILT_IN;
