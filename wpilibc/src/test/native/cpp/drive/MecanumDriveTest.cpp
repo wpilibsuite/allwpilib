@@ -93,6 +93,7 @@ TEST_CASE("MecanumDriveTest Cartesian", "[wpilibc][drive]") {
                           [&](double output) { fr.SetThrottle(output); },
                           [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.DriveCartesian(1.0, 0.0, 0.0);
@@ -140,6 +141,7 @@ TEST_CASE("MecanumDriveTest CartesianGyro90CW", "[wpilibc][drive]") {
                           [&](double output) { fr.SetThrottle(output); },
                           [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward in global frame; left in robot frame
   drive.DriveCartesian(1.0, 0.0, 0.0, 90_deg);
@@ -187,6 +189,7 @@ TEST_CASE("MecanumDriveTest Polar", "[wpilibc][drive]") {
                           [&](double output) { fr.SetThrottle(output); },
                           [&](double output) { rr.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.DrivePolar(1.0, 0_deg, 0.0);
