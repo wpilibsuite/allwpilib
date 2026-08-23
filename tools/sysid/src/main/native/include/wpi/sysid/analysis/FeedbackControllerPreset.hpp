@@ -134,8 +134,8 @@ inline constexpr FeedbackControllerPreset CTRE_V6{1.0, 1.0, 1_ms, true, 1_ms};
  *
  * Total delay = 8-tap moving average delay = (8 - 1) / 2 * 32 ms = 112 ms.
  */
-inline constexpr FeedbackControllerPreset REVNEO_BUILT_IN{1.0 / 12.0, 60.0,
-                                                          1_ms, false, 112_ms};
+inline constexpr FeedbackControllerPreset REV_NEO_BUILT_IN{1.0 / 12.0, 60.0,
+                                                           1_ms, false, 112_ms};
 
 /**
  * https://www.revrobotics.com/content/sw/max/sw-docs/cpp/classrev_1_1_c_a_n_encoder.html#a7e6ce792bc0c0558fb944771df572e6a

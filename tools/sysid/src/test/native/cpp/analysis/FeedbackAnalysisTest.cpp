@@ -98,7 +98,7 @@ TEST_CASE("FeedbackAnalysisTest VelocityREV", "[sysid]") {
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::REVNEO_BUILT_IN, params, Kv, Ka);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka);
 
   CHECK(Kp == Catch::Approx(0.00241).margin(0.005));
   CHECK(Kd == Catch::Approx(0.00).margin(0.05));
@@ -111,7 +111,7 @@ TEST_CASE("FeedbackAnalysisTest VelocityREVConversion", "[sysid]") {
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculateVelocityFeedbackGains(
-      sysid::presets::REVNEO_BUILT_IN, params, Kv, Ka, 3.0);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka, 3.0);
 
   // This should have the same Kp as the test above, but scaled by a factor
   // of 3.
@@ -166,7 +166,7 @@ TEST_CASE("FeedbackAnalysisTest PositionREV", "[sysid]") {
   sysid::LQRParameters params{1, 1.5, 7};
 
   auto [Kp, Kd] = sysid::CalculatePositionFeedbackGains(
-      sysid::presets::REVNEO_BUILT_IN, params, Kv, Ka);
+      sysid::presets::REV_NEO_BUILT_IN, params, Kv, Ka);
 
   CHECK(Kp == Catch::Approx(0.30202).margin(0.05));
   CHECK(Kd == Catch::Approx(48.518).margin(0.05));

@@ -36,7 +36,7 @@ Analyzer::Analyzer(wpi::glass::Storage& storage, wpi::util::Logger& logger)
   m_presets["WPILib"] = presets::WPILIB;
   m_presets["CTRE Phoenix 5"] = presets::CTRE_V5;
   m_presets["CTRE Phoenix 6"] = presets::CTRE_V6;
-  m_presets["REV Brushless Encoder Port"] = presets::REVNEO_BUILT_IN;
+  m_presets["REV Brushless Encoder Port"] = presets::REV_NEO_BUILT_IN;
   m_presets["REV Brushed Encoder Port"] = presets::REV_NON_NEO;
   m_presets["REV Data Port"] = presets::REV_NON_NEO;
   m_presets["Venom"] = presets::VENOM;
