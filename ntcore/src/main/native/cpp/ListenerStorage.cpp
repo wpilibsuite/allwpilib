@@ -27,6 +27,9 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
+        if (m_shutdown) {
+          break;
+        }
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
@@ -351,7 +354,7 @@ void ListenerStorage::Reset() {
     std::scoped_lock lock{m_mutex};
     if (auto thr = m_thread.GetThread()) {
       // Prevent future callbacks from running.
-      thr->m_callbacks.clear();
+      thr->m_shutdown = true;
     } else {
       DoReset();
       return;

@@ -114,6 +114,7 @@ class ListenerStorage final : public IListenerStorage {
     wpi::util::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
     wpi::util::Event m_waitQueueWakeup;
     wpi::util::Event m_waitQueueWaiter;
+    bool m_shutdown{false};
   };
   wpi::util::SafeThreadOwner<Thread> m_thread;
 };
