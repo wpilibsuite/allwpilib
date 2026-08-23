@@ -34,10 +34,10 @@ inline constexpr double ELEVATOR_KP = 5.0;
 inline constexpr double ELEVATOR_KI = 0.0;
 inline constexpr double ELEVATOR_KD = 0.0;
 
-inline constexpr wpi::units::volt_t ELEVATORK_S = 0.0_V;
-inline constexpr wpi::units::volt_t ELEVATORK_G = 0.762_V;
-inline constexpr auto ELEVATORK_V = 0.762_V / 1_mps;
-inline constexpr auto ELEVATORK_A = 0.0_V / 1_mps_sq;
+inline constexpr wpi::units::volt_t ELEVATOR_KS = 0.0_V;
+inline constexpr wpi::units::volt_t ELEVATOR_KG = 0.762_V;
+inline constexpr auto ELEVATOR_KV = 0.762_V / 1_mps;
+inline constexpr auto ELEVATOR_KA = 0.0_V / 1_mps_sq;
 
 inline constexpr double ELEVATOR_GEARING = 10.0;
 inline constexpr wpi::units::meter_t ELEVATOR_DRUM_RADIUS = 2_in;

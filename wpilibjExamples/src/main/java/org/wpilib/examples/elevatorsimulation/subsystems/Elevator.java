@@ -35,10 +35,10 @@ public class Elevator implements AutoCloseable {
           new TrapezoidProfile.Constraints(2.45, 2.45));
   ElevatorFeedforward feedforward =
       new ElevatorFeedforward(
-          Constants.ELEVATORK_S,
-          Constants.ELEVATORK_G,
-          Constants.ELEVATORK_V,
-          Constants.ELEVATORK_A);
+          Constants.ELEVATOR_KS,
+          Constants.ELEVATOR_KG,
+          Constants.ELEVATOR_KV,
+          Constants.ELEVATOR_KA);
   private final Encoder encoder =
       new Encoder(Constants.ENCODER_A_CHANNEL, Constants.ENCODER_B_CHANNEL);
   private final PWMSparkMax motor = new PWMSparkMax(Constants.MOTOR_PORT);

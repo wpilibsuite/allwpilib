@@ -40,8 +40,8 @@ class Elevator {
       constraints};
 
   wpi::math::ElevatorFeedforward feedforward{
-      Constants::ELEVATORK_S, Constants::ELEVATORK_G, Constants::ELEVATORK_V,
-      Constants::ELEVATORK_A};
+      Constants::ELEVATOR_KS, Constants::ELEVATOR_KG, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
   wpi::Encoder encoder{Constants::ENCODER_A_CHANNEL,
                        Constants::ENCODER_B_CHANNEL};
   wpi::PWMSparkMax motor{Constants::MOTOR_PORT};

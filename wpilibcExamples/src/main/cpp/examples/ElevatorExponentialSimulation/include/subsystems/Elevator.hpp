@@ -36,8 +36,8 @@ class Elevator {
   // Standard classes for controlling our elevator
   wpi::math::ExponentialProfile<wpi::units::meters,
                                 wpi::units::volts>::Constraints constraints{
-      Constants::ELEVATOR_MAX_V, Constants::ELEVATORK_V,
-      Constants::ELEVATORK_A};
+      Constants::ELEVATOR_MAX_V, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
       constraints};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
@@ -47,8 +47,8 @@ class Elevator {
       Constants::ELEVATOR_KP, Constants::ELEVATOR_KI, Constants::ELEVATOR_KD};
 
   wpi::math::ElevatorFeedforward feedforward{
-      Constants::ELEVATORK_S, Constants::ELEVATORK_G, Constants::ELEVATORK_V,
-      Constants::ELEVATORK_A};
+      Constants::ELEVATOR_KS, Constants::ELEVATOR_KG, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
   wpi::Encoder encoder{Constants::ENCODER_A_CHANNEL,
                        Constants::ENCODER_B_CHANNEL};
   wpi::PWMSparkMax motor{Constants::MOTOR_PORT};

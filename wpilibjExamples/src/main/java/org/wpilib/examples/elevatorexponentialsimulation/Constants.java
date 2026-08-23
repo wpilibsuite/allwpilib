@@ -17,10 +17,10 @@ public class Constants {
   public static final double ELEVATOR_KD = 0;
 
   public static final double ELEVATOR_MAX_V = 10.0; // volts (V)
-  public static final double ELEVATORK_S = 0.0; // volts (V)
-  public static final double ELEVATORK_G = 0.62; // volts (V)
-  public static final double ELEVATORK_V = 3.9; // volts (V)
-  public static final double ELEVATORK_A = 0.06; // volts (V)
+  public static final double ELEVATOR_KS = 0.0; // volts (V)
+  public static final double ELEVATOR_KG = 0.62; // volts (V)
+  public static final double ELEVATOR_KV = 3.9; // volts (V)
+  public static final double ELEVATOR_KA = 0.06; // volts (V)
 
   public static final double ELEVATOR_GEARING = 5.0;
   public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(1.0);
