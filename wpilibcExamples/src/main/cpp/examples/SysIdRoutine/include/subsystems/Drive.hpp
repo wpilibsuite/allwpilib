@@ -24,8 +24,8 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax leftMotor{constants::drive::LEFT_MOTOR1PORT};
-  wpi::PWMSparkMax rightMotor{constants::drive::RIGHT_MOTOR1PORT};
+  wpi::PWMSparkMax leftMotor{constants::drive::LEFT_MOTOR1_PORT};
+  wpi::PWMSparkMax rightMotor{constants::drive::RIGHT_MOTOR1_PORT};
   wpi::DifferentialDrive drive{
       [this](auto val) { leftMotor.SetThrottle(val); },
       [this](auto val) { rightMotor.SetThrottle(val); }};

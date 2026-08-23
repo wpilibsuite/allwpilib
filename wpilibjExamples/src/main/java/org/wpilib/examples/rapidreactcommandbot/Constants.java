@@ -16,10 +16,10 @@ import org.wpilib.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int LEFT_MOTOR1PORT = 0;
-    public static final int LEFT_MOTOR2PORT = 1;
-    public static final int RIGHT_MOTOR1PORT = 2;
-    public static final int RIGHT_MOTOR2PORT = 3;
+    public static final int LEFT_MOTOR1_PORT = 0;
+    public static final int LEFT_MOTOR2_PORT = 1;
+    public static final int RIGHT_MOTOR1_PORT = 2;
+    public static final int RIGHT_MOTOR2_PORT = 3;
 
     public static final int[] LEFT_ENCODER_PORTS = {0, 1};
     public static final int[] RIGHT_ENCODER_PORTS = {2, 3};

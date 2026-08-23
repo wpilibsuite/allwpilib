@@ -18,17 +18,17 @@ import org.wpilib.system.Timer;
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final ExampleSmartMotorController leftLeader =
-      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR1PORT);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR1_PORT);
 
   private final ExampleSmartMotorController leftFollower =
-      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR2PORT);
+      new ExampleSmartMotorController(DriveConstants.LEFT_MOTOR2_PORT);
 
   // The motors on the right side of the drive.
   private final ExampleSmartMotorController rightLeader =
-      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR1PORT);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR1_PORT);
 
   private final ExampleSmartMotorController rightFollower =
-      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR2PORT);
+      new ExampleSmartMotorController(DriveConstants.RIGHT_MOTOR2_PORT);
 
   // The feedforward controller.
   private final SimpleMotorFeedforward feedforward =

@@ -16,12 +16,12 @@ import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveMechanism implements Mechanism, TelemetryLoggable {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1PORT);
-  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.LEFT_MOTOR2PORT);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1PORT);
-  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.RIGHT_MOTOR2PORT);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =

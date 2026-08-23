@@ -20,10 +20,10 @@ import org.wpilib.system.RobotController;
 
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.LEFT_MOTOR1PORT);
+  private final PWMSparkMax leftMotor = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1PORT);
+  private final PWMSparkMax rightMotor = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =
@@ -79,8 +79,8 @@ public class Drive extends SubsystemBase {
   /** Creates a new Drive subsystem. */
   public Drive() {
     // Add the second motors on each side of the drivetrain
-    leftMotor.addFollower(new PWMSparkMax(DriveConstants.LEFT_MOTOR2PORT));
-    rightMotor.addFollower(new PWMSparkMax(DriveConstants.RIGHT_MOTOR2PORT));
+    leftMotor.addFollower(new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT));
+    rightMotor.addFollower(new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT));
 
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's

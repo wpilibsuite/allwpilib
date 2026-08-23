@@ -7,8 +7,8 @@
 #include "wpi/commands2/Commands.hpp"
 
 Drive::Drive() {
-  leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::LEFT_MOTOR2PORT});
-  rightMotor.AddFollower(wpi::PWMSparkMax{constants::drive::RIGHT_MOTOR2PORT});
+  leftMotor.AddFollower(wpi::PWMSparkMax{constants::drive::LEFT_MOTOR2_PORT});
+  rightMotor.AddFollower(wpi::PWMSparkMax{constants::drive::RIGHT_MOTOR2_PORT});
 
   rightMotor.SetInverted(true);
 

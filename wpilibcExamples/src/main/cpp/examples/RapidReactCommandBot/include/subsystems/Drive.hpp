@@ -49,10 +49,10 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degree_t angle);
 
  private:
-  wpi::PWMSparkMax leftLeader{DriveConstants::LEFT_MOTOR1PORT};
-  wpi::PWMSparkMax leftFollower{DriveConstants::LEFT_MOTOR2PORT};
-  wpi::PWMSparkMax rightLeader{DriveConstants::RIGHT_MOTOR1PORT};
-  wpi::PWMSparkMax rightFollower{DriveConstants::RIGHT_MOTOR2PORT};
+  wpi::PWMSparkMax leftLeader{DriveConstants::LEFT_MOTOR1_PORT};
+  wpi::PWMSparkMax leftFollower{DriveConstants::LEFT_MOTOR2_PORT};
+  wpi::PWMSparkMax rightLeader{DriveConstants::RIGHT_MOTOR1_PORT};
+  wpi::PWMSparkMax rightFollower{DriveConstants::RIGHT_MOTOR2_PORT};
 
   wpi::DifferentialDrive drive{
       [&](double output) { leftLeader.SetThrottle(output); },

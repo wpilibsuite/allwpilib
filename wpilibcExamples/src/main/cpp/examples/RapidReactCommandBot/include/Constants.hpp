@@ -13,10 +13,10 @@
 #include "wpi/units/voltage.hpp"
 
 namespace DriveConstants {
-inline constexpr int LEFT_MOTOR1PORT = 0;
-inline constexpr int LEFT_MOTOR2PORT = 1;
-inline constexpr int RIGHT_MOTOR1PORT = 2;
-inline constexpr int RIGHT_MOTOR2PORT = 3;
+inline constexpr int LEFT_MOTOR1_PORT = 0;
+inline constexpr int LEFT_MOTOR2_PORT = 1;
+inline constexpr int RIGHT_MOTOR1_PORT = 2;
+inline constexpr int RIGHT_MOTOR2_PORT = 3;
 
 inline constexpr int LEFT_ENCODER_PORTS[]{0, 1};
 inline constexpr int RIGHT_ENCODER_PORTS[]{2, 3};

@@ -9,10 +9,10 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : leftLeader{LEFT_MOTOR1PORT},
-      leftFollower{LEFT_MOTOR2PORT},
-      rightLeader{RIGHT_MOTOR1PORT},
-      rightFollower{RIGHT_MOTOR2PORT},
+    : leftLeader{LEFT_MOTOR1_PORT},
+      leftFollower{LEFT_MOTOR2_PORT},
+      rightLeader{RIGHT_MOTOR1_PORT},
+      rightFollower{RIGHT_MOTOR2_PORT},
       feedforward{ks, kv, ka} {
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's

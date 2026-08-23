@@ -21,10 +21,10 @@
 
 namespace DriveConstants {
 inline constexpr wpi::units::second_t DT{0.02};
-inline constexpr int LEFT_MOTOR1PORT = 0;
-inline constexpr int LEFT_MOTOR2PORT = 1;
-inline constexpr int RIGHT_MOTOR1PORT = 2;
-inline constexpr int RIGHT_MOTOR2PORT = 3;
+inline constexpr int LEFT_MOTOR1_PORT = 0;
+inline constexpr int LEFT_MOTOR2_PORT = 1;
+inline constexpr int RIGHT_MOTOR1_PORT = 2;
+inline constexpr int RIGHT_MOTOR2_PORT = 3;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or

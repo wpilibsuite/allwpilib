@@ -9,10 +9,10 @@
 using namespace DriveConstants;
 
 DriveSubsystem::DriveSubsystem()
-    : left1{LEFT_MOTOR1PORT},
-      left2{LEFT_MOTOR2PORT},
-      right1{RIGHT_MOTOR1PORT},
-      right2{RIGHT_MOTOR2PORT},
+    : left1{LEFT_MOTOR1_PORT},
+      left2{LEFT_MOTOR2_PORT},
+      right1{RIGHT_MOTOR1_PORT},
+      right2{RIGHT_MOTOR2_PORT},
       leftEncoder{LEFT_ENCODER_PORTS[0], LEFT_ENCODER_PORTS[1]},
       rightEncoder{RIGHT_ENCODER_PORTS[0], RIGHT_ENCODER_PORTS[1]} {
   left1.AddFollower(left2);
