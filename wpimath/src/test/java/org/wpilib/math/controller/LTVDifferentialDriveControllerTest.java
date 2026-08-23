@@ -49,12 +49,12 @@ class LTVDifferentialDriveControllerTest {
     public static final int RIGHT_VELOCITY = 4;
   }
 
-  private static final double LINEAR_V = 3.02; // V/(m/s)
-  private static final double LINEAR_A = 0.642; // V/(m/s²)
-  private static final double ANGULAR_V = 1.382; // V/(m/s)
-  private static final double ANGULAR_A = 0.08495; // V/(m/s²)
+  private static final double LINEAR_KV = 3.02; // V/(m/s)
+  private static final double LINEAR_KA = 0.642; // V/(m/s²)
+  private static final double ANGULAR_KV = 1.382; // V/(m/s)
+  private static final double ANGULAR_KA = 0.08495; // V/(m/s²)
   private static final LinearSystem<N2, N2, N2> plant =
-      Models.differentialDriveFromSysId(LINEAR_V, LINEAR_A, ANGULAR_V, ANGULAR_A);
+      Models.differentialDriveFromSysId(LINEAR_KV, LINEAR_KA, ANGULAR_KV, ANGULAR_KA);
   private static final double TRACKWIDTH = 0.9;
 
   private static Matrix<N5, N1> dynamics(Matrix<N5, N1> x, Matrix<N2, N1> u) {
