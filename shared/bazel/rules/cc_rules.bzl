@@ -318,7 +318,7 @@ def wpilib_cc_library(
     if hdrs_pkg_root:
         pkg_files(
             name = name + "-hdrs-pkg",
-            srcs = native.glob([hdrs_pkg_root + "/**"]),
+            srcs = native.glob([hdrs_pkg_root + "/**"], allow_empty = True),
             strip_prefix = hdrs_pkg_root,
             visibility = visibility,
         )

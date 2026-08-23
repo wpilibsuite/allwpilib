@@ -4,6 +4,7 @@ import multiprocessing
 import multiprocessing.connection
 import os
 import pathlib
+import pickle
 import signal
 import sys
 import time
@@ -127,7 +128,7 @@ class WorkerPlugin:
 
 
 def _run_test(
-    item_nodeid, config_args, robot_class, robot_file, verbose, pipe, root_path
+    item_nodeid, config_args, robot_class_data, robot_file, verbose, pipe, root_path
 ):
     """This function runs in a subprocess"""
     logging.root.addHandler(logging.NullHandler())
@@ -135,8 +136,10 @@ def _run_test(
 
     _enable_faulthandler()
 
-    # This is used by getDeployDirectory, so make sure it gets fixed
+    # This is used by the operating and deploy directory lookups, so set it
+    # before importing the robot module.
     robotpy.main.robot_py_path = robot_file
+    robot_class = pickle.loads(robot_class_data)
 
     os.chdir(root_path)
 
@@ -281,7 +284,7 @@ class IsolatedTestsPlugin:
             args=(
                 nodeid,
                 config_args,
-                self._robot_class,
+                pickle.dumps(self._robot_class),
                 self._robot_file,
                 self._verbose,
                 cconn,

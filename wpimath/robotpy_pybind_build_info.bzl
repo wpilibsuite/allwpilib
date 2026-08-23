@@ -1193,12 +1193,14 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrapezoidProfile.hpp",
             tmpl_class_names = [
-                ("TrapezoidProfile_tmpl1", "TrapezoidProfile"),
-                ("TrapezoidProfile_tmpl2", "TrapezoidProfileRadians"),
+                ("TrapezoidProfile_tmpl1", "_TrapezoidProfileConstraints"),
+                ("TrapezoidProfile_tmpl2", "_TrapezoidProfileRadiansConstraints"),
+                ("TrapezoidProfile_tmpl3", "TrapezoidProfile"),
+                ("TrapezoidProfile_tmpl4", "TrapezoidProfileRadians"),
             ],
             trampolines = [
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
-                ("wpi::math::TrapezoidProfile::Constraints", "wpi__math__TrapezoidProfile__Constraints.hpp"),
+                ("wpi::math::detail::TrapezoidProfileConstraints", "wpi__math__detail__TrapezoidProfileConstraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
                 ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
             ],
@@ -1315,7 +1317,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
     gen_libinit(
         name = "wpimath.gen_lib_init",
         output_file = "src/main/python/wpimath/_init__wpimath.py",
-        modules = ["native.wpimath._init_robotpy_native_wpimath", "wpiutil._init__wpiutil"],
+        modules = ["native.wpimath._init_robotpy_native_wpimath", "telemetry._init__telemetry", "tunables._init__tunables", "wpiutil._init__wpiutil"],
     )
 
     gen_pkgconf(
@@ -1343,6 +1345,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         trampoline_subpath = "src/main/python/wpimath",
         deps = header_to_dat_deps,
         local_native_libraries = [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1358,12 +1362,18 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         deps = [
             ":wpimath.tmpl_hdrs",
             ":wpimath.trampoline_hdrs",
+            "//telemetry:telemetry",
+            "//telemetry:telemetry_pybind_library",
+            "//tunables:tunables",
+            "//tunables:tunables_pybind_library",
             "//wpimath:wpimath",
             "//wpimath:wpimath-casters",
             "//wpiutil:wpiutil",
             "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
+            "//telemetry:shared/telemetry",
+            "//tunables:shared/tunables",
             "//wpimath:shared/wpimath",
             "//wpiutil:shared/wpiutil",
         ],
@@ -1402,7 +1412,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -1428,7 +1438,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/wpimath/**"], exclude = ["src/main/python/wpimath/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/wpimath/**"], exclude = ["src/main/python/wpimath/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -1453,6 +1463,8 @@ def define_pybind_library(name, pkgcfgs = []):
         ],
         imports = ["src/main/python"],
         deps = [
+            "//telemetry:robotpy-telemetry",
+            "//tunables:robotpy-tunables",
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
@@ -1460,7 +1472,7 @@ def define_pybind_library(name, pkgcfgs = []):
         summary = "Binary wrapper for WPILib Math library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-wpiutil==0.0.0"],
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0"],
         python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
@@ -1471,7 +1483,9 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1483,7 +1497,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//wpimath:robotpy-native-wpimath.copy_headers",
         ],
         package_root_file = "src/main/python/wpimath/__init__.py",

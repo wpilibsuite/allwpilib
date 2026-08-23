@@ -30,9 +30,14 @@ import org.wpilib.framework.RobotBase;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.system.Watchdog;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.TunableTable;
 
 /**
  * The scheduler responsible for running {@link Command}s. A Command-based robot should call {@link
@@ -43,7 +48,7 @@ import org.wpilib.util.sendable.SendableRegistry;
  *
  * <p>This class is provided by the Commands v2 VendorDep
  */
-public final class CommandScheduler implements Sendable, AutoCloseable {
+public final class CommandScheduler implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** The Singleton Instance. */
   private static CommandScheduler instance;
 
@@ -59,7 +64,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return instance;
   }
 
-  private static final Optional<Command> kNoInterruptor = Optional.empty();
+  private static final Optional<Command> NO_INTERRUPTOR = Optional.empty();
 
   private final Map<Command, Exception> m_composedCommands = new WeakHashMap<>();
 
@@ -98,7 +103,52 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
 
   CommandScheduler() {
     HAL.reportUsage("CommandScheduler", "");
-    SendableRegistry.add(this, "Scheduler");
+  }
+
+  /**
+   * Closes this command scheduler and releases scheduler-owned state.
+   *
+   * <p>Scheduled commands are ended as interrupted without running scheduler event hooks.
+   */
+  @Override
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  public void close() {
+    TunableRegistry.remove(this);
+    disable();
+    m_initActions.clear();
+    m_executeActions.clear();
+    m_interruptActions.clear();
+    m_finishActions.clear();
+
+    for (Command command : m_scheduledCommands.toArray(new Command[0])) {
+      if (!m_scheduledCommands.contains(command) || m_endingCommands.contains(command)) {
+        continue;
+      }
+      m_endingCommands.add(command);
+      command.end(true);
+      m_endingCommands.remove(command);
+      m_watchdog.addEpoch(command.getName() + ".end(true)");
+    }
+
+    m_watchdog.close();
+    m_scheduledCommands.clear();
+    m_requirements.clear();
+    m_subsystems.clear();
+    m_defaultButtonLoop.clear();
+    m_activeButtonLoop = m_defaultButtonLoop;
+    enable();
+    m_inRunLoop = false;
+    m_toSchedule.clear();
+    m_toCancelCommands.clear();
+    m_toCancelInterruptors.clear();
+    m_endingCommands.clear();
+    m_composedCommands.clear();
+
+    synchronized (CommandScheduler.class) {
+      if (instance == this) {
+        instance = null;
+      }
+    }
   }
 
   /**
@@ -109,11 +159,6 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void setPeriod(double period) {
     m_watchdog.setTimeout(period);
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -205,7 +250,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       for (Subsystem requirement : requirements) {
         Command requiring = requiring(requirement);
         if (requiring != null
-            && requiring.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+            && requiring.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
           return;
         }
       }
@@ -276,7 +321,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       Command command = iterator.next();
 
       if (isDisabled && !command.runsWhenDisabled()) {
-        cancel(command, kNoInterruptor);
+        cancel(command, NO_INTERRUPTOR);
         continue;
       }
 
@@ -396,7 +441,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
       throw new IllegalArgumentException("Default commands must require their subsystem!");
     }
 
-    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.kCancelIncoming) {
+    if (defaultCommand.getInterruptionBehavior() == InterruptionBehavior.CANCEL_INCOMING) {
       DriverStationErrors.reportWarning(
           "Registering a non-interruptible default command!\n"
               + "This will likely prevent any other commands from requiring this subsystem.",
@@ -446,7 +491,7 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
    */
   public void cancel(Command... commands) {
     for (Command command : commands) {
-      cancel(command, kNoInterruptor);
+      cancel(command, NO_INTERRUPTOR);
     }
   }
 
@@ -741,45 +786,73 @@ public final class CommandScheduler implements Sendable, AutoCloseable {
     return m_composedCommands.keySet();
   }
 
+  private String[] getScheduledCommandNames() {
+    String[] names = new String[m_scheduledCommands.size()];
+    int i = 0;
+    for (Command command : m_scheduledCommands) {
+      names[i] = command.getName();
+      i++;
+    }
+    return names;
+  }
+
+  private long[] getScheduledCommandIds() {
+    long[] ids = new long[m_scheduledCommands.size()];
+    int i = 0;
+    for (Command command : m_scheduledCommands) {
+      ids[i] = command.hashCode();
+      i++;
+    }
+    return ids;
+  }
+
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Scheduler");
-    builder.addStringArrayProperty(
+  public void logTo(TelemetryTable table) {
+    String[] names = getScheduledCommandNames();
+    table.log("Names", names);
+
+    long[] ids = getScheduledCommandIds();
+    table.log("Ids", ids);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Scheduler";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    TunableConfig immutableConfig =
+        TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.ALWAYS_GET);
+    table.publish(
         "Names",
-        () -> {
-          String[] names = new String[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            names[i] = command.getName();
-            i++;
-          }
-          return names;
-        },
-        null);
-    builder.addIntegerArrayProperty(
+        Tunable.createConfig(
+            this::getScheduledCommandNames, null, String[].class, immutableConfig));
+    table.publish(
         "Ids",
-        () -> {
-          long[] ids = new long[m_scheduledCommands.size()];
-          int i = 0;
-          for (Command command : m_scheduledCommands) {
-            ids[i] = command.hashCode();
-            i++;
-          }
-          return ids;
-        },
-        null);
-    builder.addIntegerArrayProperty(
+        Tunable.createConfig(this::getScheduledCommandIds, null, long[].class, immutableConfig));
+
+    final long[] empty = {};
+    table.publish(
         "Cancel",
-        () -> new long[] {},
-        toCancel -> {
-          Map<Long, Command> ids = new LinkedHashMap<>();
-          for (Command command : m_scheduledCommands) {
-            long id = command.hashCode();
-            ids.put(id, command);
-          }
-          for (long hash : toCancel) {
-            cancel(ids.get(hash));
-          }
-        });
+        Tunable.createConfig(
+            () -> empty,
+            toCancel -> {
+              Map<Long, Command> ids = new LinkedHashMap<>();
+              for (Command command : m_scheduledCommands) {
+                long id = command.hashCode();
+                ids.put(id, command);
+              }
+              for (long hash : toCancel) {
+                cancel(ids.get(hash));
+              }
+            },
+            long[].class,
+            TunableConfig.of(TunableOption.ROBUST, TunableOption.ALWAYS_GET)));
+  }
+
+  @Override
+  public String getTunableType() {
+    return "Scheduler";
   }
 }

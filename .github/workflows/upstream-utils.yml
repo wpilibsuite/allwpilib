@@ -73,6 +73,12 @@ jobs:
           ./gcem.py clone
           ./gcem.py copy-src
           ./gcem.py format-patch
+      - name: Run htrie.py
+        run: |
+          cd upstream_utils
+          ./htrie.py clone
+          ./htrie.py copy-src
+          ./htrie.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils

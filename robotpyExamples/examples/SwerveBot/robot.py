@@ -14,7 +14,7 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         """Robot initialization function"""
         super().__init__()
-        self.controller = wpilib.NiDsXboxController(0)
+        self.controller = wpilib.XboxController(0)
         self.swerve = drivetrain.Drivetrain()
 
         # Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.

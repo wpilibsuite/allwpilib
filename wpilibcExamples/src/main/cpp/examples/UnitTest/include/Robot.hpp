@@ -15,5 +15,5 @@ class Robot : public wpi::TimedRobot {
 
  private:
   Intake intake;
-  wpi::Joystick joystick{OperatorConstants::kJoystickIndex};
+  wpi::Joystick joystick{OperatorConstants::JOYSTICK_INDEX};
 };

@@ -4,15 +4,14 @@
 
 #include "wpi/hardware/power/PowerDistribution.hpp"
 
-#include <format>
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
 #include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 static_assert(static_cast<HAL_PowerDistributionType>(
                   wpi::PowerDistribution::ModuleType::CTRE) ==
@@ -20,20 +19,20 @@ static_assert(static_cast<HAL_PowerDistributionType>(
 static_assert(static_cast<HAL_PowerDistributionType>(
                   wpi::PowerDistribution::ModuleType::REV) ==
               HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_REV);
-static_assert(wpi::PowerDistribution::kDefaultModule ==
+static_assert(wpi::PowerDistribution::DEFAULT_MODULE ==
               HAL_DEFAULT_POWER_DISTRIBUTION_MODULE);
 
 using namespace wpi;
 
-PowerDistribution::PowerDistribution(int busId) {
+PowerDistribution::PowerDistribution(CANBus busId) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      busId, kDefaultModule,
+      static_cast<int>(busId), DEFAULT_MODULE,
       HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_AUTOMATIC,
       stack.c_str(), &status);
-  WPILIB_CheckErrorStatus(status, "Module {}", kDefaultModule);
+  WPILIB_CheckErrorStatus(status, "Module {}", DEFAULT_MODULE);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", m_module);
 
@@ -43,17 +42,17 @@ PowerDistribution::PowerDistribution(int busId) {
   } else {
     HAL_ReportUsage("PDH", m_module, "");
   }
-  wpi::util::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
-PowerDistribution::PowerDistribution(int busId, int module,
+PowerDistribution::PowerDistribution(CANBus busId, int module,
                                      ModuleType moduleType) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
   m_handle = HAL_InitializePowerDistribution(
-      busId, module, static_cast<HAL_PowerDistributionType>(moduleType),
-      stack.c_str(), &status);
+      static_cast<int>(busId), module,
+      static_cast<HAL_PowerDistributionType>(moduleType), stack.c_str(),
+      &status);
   WPILIB_CheckErrorStatus(status, "Module {}", module);
   m_module = HAL_GetPowerDistributionModuleNumber(m_handle, &status);
   WPILIB_ReportError(status, "Module {}", module);
@@ -63,7 +62,6 @@ PowerDistribution::PowerDistribution(int busId, int module,
   } else {
     HAL_ReportUsage("PDH_REV", m_module, "");
   }
-  wpi::util::SendableRegistry::Add(this, "PowerDistribution", m_module);
 }
 
 int PowerDistribution::GetNumChannels() const {
@@ -318,41 +316,21 @@ PowerDistribution::StickyFaults PowerDistribution::GetStickyFaults() const {
   return stickyFaults;
 }
 
-void PowerDistribution::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PowerDistribution");
-  int numChannels = GetNumChannels();
+void PowerDistribution::LogTo(wpi::telemetry::TelemetryTable& table) const {
   // Use manual reads to avoid printing errors
-  for (int i = 0; i < numChannels; ++i) {
-    builder.AddDoubleProperty(
-        std::format("Chan{}", i),
-        [=, this] {
-          int32_t lStatus = 0;
-          return HAL_GetPowerDistributionChannelCurrent(m_handle, i, &lStatus);
-        },
-        nullptr);
-  }
-  builder.AddDoubleProperty(
-      "Voltage",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionVoltage(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddDoubleProperty(
-      "TotalCurrent",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionTotalCurrent(m_handle, &lStatus);
-      },
-      nullptr);
-  builder.AddBooleanProperty(
-      "SwitchableChannel",
-      [=, this] {
-        int32_t lStatus = 0;
-        return HAL_GetPowerDistributionSwitchableChannel(m_handle, &lStatus);
-      },
-      [=, this](bool value) {
-        int32_t lStatus = 0;
-        HAL_SetPowerDistributionSwitchableChannel(m_handle, value, &lStatus);
-      });
+  int32_t status = 0;
+  int32_t size = GetNumChannels();
+  wpi::util::SmallVector<double, 24> currents(size);
+  HAL_GetPowerDistributionAllChannelCurrents(m_handle, currents.data(), size,
+                                             &status);
+  table.Log("Current", currents);
+  table.Log("Voltage", HAL_GetPowerDistributionVoltage(m_handle, &status));
+  table.Log("TotalCurrent",
+            HAL_GetPowerDistributionTotalCurrent(m_handle, &status));
+  table.Log("SwitchableChannel",
+            HAL_GetPowerDistributionSwitchableChannel(m_handle, &status));
+}
+
+std::string_view PowerDistribution::GetTelemetryType() const {
+  return "PowerDistribution";
 }

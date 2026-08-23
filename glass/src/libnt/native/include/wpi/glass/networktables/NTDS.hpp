@@ -18,7 +18,7 @@ namespace wpi::glass {
 
 class NTDSModel : public DSModel {
  public:
-  static constexpr const char* kType = "DriverStation";
+  static constexpr const char* TYPE = "DriverStation";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTDSModel(std::string_view path);

@@ -149,6 +149,8 @@ def fields_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//fields:robotpy-native-fields.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -191,7 +193,7 @@ def fields_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -215,7 +217,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/robotpy_fields/**"], exclude = ["src/main/python/robotpy_fields/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/robotpy_fields/**"], exclude = ["src/main/python/robotpy_fields/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -259,8 +261,10 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//fields:robotpy-native-fields.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -272,7 +276,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//fields:robotpy-native-fields.copy_headers",
         ],
         package_root_file = "src/main/python/robotpy_fields/__init__.py",

@@ -11,16 +11,16 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::DifferentialDriveKinematics>;
-const DifferentialDriveKinematics kExpectedData{
+const DifferentialDriveKinematics EXPECTED_DATA{
     DifferentialDriveKinematics{1.74_m}};
 }  // namespace
 
 TEST_CASE("DifferentialDriveKinematicsStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialDriveKinematics unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.trackwidth.value() == unpacked_data.trackwidth.value());
+  CHECK(EXPECTED_DATA.trackwidth.value() == unpacked_data.trackwidth.value());
 }

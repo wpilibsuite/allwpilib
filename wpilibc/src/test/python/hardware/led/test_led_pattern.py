@@ -25,7 +25,7 @@ def lerp_rgb(a: Color, b: Color, t: float) -> Color8Bit:
 def restore_time_source():
     RobotController.set_time_source(lambda: 0)
     yield
-    RobotController.set_time_source(RobotController.get_time)
+    RobotController.set_time_source(RobotController.get_monotonic_time)
 
 
 def test_apply_to_buffer_direct():

@@ -33,10 +33,12 @@ class HttpWebSocketServerConnection
    *
    * @param stream network stream
    * @param protocols Acceptable subprotocols
+   * @param requestTimeout Timeout for server handshake to be established
    */
   HttpWebSocketServerConnection(std::shared_ptr<uv::Stream> stream,
-                                std::span<const std::string_view> protocols)
-      : HttpServerConnection{stream},
+                                std::span<const std::string_view> protocols,
+                                uv::Timer::Time requestTimeout = {})
+      : HttpServerConnection{stream, requestTimeout},
         m_helper{m_request},
         m_protocols{protocols.begin(), protocols.end()} {
     // Handle upgrade event
@@ -52,6 +54,7 @@ class HttpWebSocketServerConnection
       }
 
       // Disconnect HttpServerConnection header reader
+      CancelRequestTimeout();
       m_dataConn.disconnect();
       m_messageCompleteConn.disconnect();
 
@@ -78,12 +81,14 @@ class HttpWebSocketServerConnection
    *
    * @param stream network stream
    * @param protocols Acceptable subprotocols
+   * @param requestTimeout Timeout for server handshake to be established
    */
   HttpWebSocketServerConnection(
       std::shared_ptr<uv::Stream> stream,
-      std::initializer_list<std::string_view> protocols)
-      : HttpWebSocketServerConnection(stream,
-                                      {protocols.begin(), protocols.end()}) {}
+      std::initializer_list<std::string_view> protocols,
+      uv::Timer::Time requestTimeout = {})
+      : HttpWebSocketServerConnection(
+            stream, {protocols.begin(), protocols.end()}, requestTimeout) {}
 
  protected:
   /**

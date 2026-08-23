@@ -67,7 +67,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger a(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kA.value, loop);
+    return m_hid.button(NiDsXboxController.Button.A.value, loop);
   }
 
   /**
@@ -89,7 +89,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger b(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kB.value, loop);
+    return m_hid.button(NiDsXboxController.Button.B.value, loop);
   }
 
   /**
@@ -111,7 +111,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger x(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kX.value, loop);
+    return m_hid.button(NiDsXboxController.Button.X.value, loop);
   }
 
   /**
@@ -133,7 +133,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger y(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kY.value, loop);
+    return m_hid.button(NiDsXboxController.Button.Y.value, loop);
   }
 
   /**
@@ -155,7 +155,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger leftBumper(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kLeftBumper.value, loop);
+    return m_hid.button(NiDsXboxController.Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -177,7 +177,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger rightBumper(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kRightBumper.value, loop);
+    return m_hid.button(NiDsXboxController.Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -199,7 +199,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger back(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kBack.value, loop);
+    return m_hid.button(NiDsXboxController.Button.BACK.value, loop);
   }
 
   /**
@@ -221,7 +221,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger start(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kStart.value, loop);
+    return m_hid.button(NiDsXboxController.Button.START.value, loop);
   }
 
   /**
@@ -243,7 +243,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger leftStick(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kLeftStick.value, loop);
+    return m_hid.button(NiDsXboxController.Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -265,7 +265,7 @@ public class CommandNiDsXboxController {
    *     to the given loop.
    */
   public Trigger rightStick(EventLoop loop) {
-    return m_hid.button(NiDsXboxController.Button.kRightStick.value, loop);
+    return m_hid.button(NiDsXboxController.Button.RIGHT_STICK.value, loop);
   }
 
   /**
@@ -279,7 +279,7 @@ public class CommandNiDsXboxController {
    *     threshold, attached to the given event loop
    */
   public Trigger leftTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(NiDsXboxController.Axis.kLeftTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(NiDsXboxController.Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -318,7 +318,7 @@ public class CommandNiDsXboxController {
    *     threshold, attached to the given event loop
    */
   public Trigger rightTrigger(double threshold, EventLoop loop) {
-    return m_hid.axisGreaterThan(NiDsXboxController.Axis.kRightTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(NiDsXboxController.Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**

@@ -20,18 +20,18 @@
 using namespace wpi;
 
 // The Preferences table name
-static constexpr std::string_view kTableName{"Preferences"};
-static constexpr std::string_view kSmartDashboardType = "RobotPreferences";
+static constexpr std::string_view TABLE_NAME{"Preferences"};
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "RobotPreferences";
 namespace {
 struct Instance {
   Instance();
 
   std::shared_ptr<wpi::nt::NetworkTable> table{
-      wpi::nt::NetworkTableInstance::GetDefault().GetTable(kTableName)};
+      wpi::nt::NetworkTableInstance::GetDefault().GetTable(TABLE_NAME)};
   wpi::nt::StringPublisher typePublisher{
       table->GetStringTopic(".type").PublishEx(
           wpi::nt::StringTopic::TYPE_STRING,
-          wpi::util::json::object("SmartDashboard", kSmartDashboardType))};
+          wpi::util::json::object("SmartDashboard", SMART_DASHBOARD_TYPE))};
   wpi::nt::MultiSubscriber tableSubscriber{
       wpi::nt::NetworkTableInstance::GetDefault(),
       {{std::format("{}/", table->GetPath())}}};
@@ -172,7 +172,7 @@ void Preferences::RemoveAll() {
 }
 
 Instance::Instance() {
-  typePublisher.Set(kSmartDashboardType);
+  typePublisher.Set(SMART_DASHBOARD_TYPE);
   listener = wpi::nt::NetworkTableListener::CreateListener(
       tableSubscriber, NT_EVENT_PUBLISH | NT_EVENT_IMMEDIATE,
       [typeTopic = typePublisher.GetTopic().GetHandle()](auto& event) {

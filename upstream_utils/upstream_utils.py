@@ -175,7 +175,12 @@ def has_git_rev(rev: str):
     Returns:
     True if the revision exists, otherwise False.
     """
-    return subprocess.run(["git", "rev-parse", "--verify", "-q", rev]).returncode == 0
+    return (
+        subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", rev], check=False
+        ).returncode
+        == 0
+    )
 
 
 class Lib:
@@ -185,7 +190,7 @@ class Lib:
         url: str,
         tag: str,
         copy_upstream_src: Callable[[Path], None],
-        patch_options={},
+        patch_options={},  # noqa: B006
         *,
         pre_patch_hook=None,
         pre_patch_commits=0,
@@ -258,7 +263,7 @@ class Lib:
                 subprocess.check_call(["git", "clone", "--filter=tree:0", self.url])
             else:
                 print(err_msg_if_absent, file=sys.stderr)
-                exit(1)
+                sys.exit(1)
         os.chdir(dest)
 
     def get_root_tags(self):
@@ -286,13 +291,13 @@ class Lib:
                 "ERROR: Could not determine root tag: No tags match 'upstream_utils_root-*'",
                 file=sys.stderr,
             )
-            exit(1)
+            sys.exit(1)
         if len(root_tags) > 1:
             print(
                 f"ERROR: Could not determine root tag: Multiple candidates: {root_tags}",
                 file=sys.stderr,
             )
-            exit(1)
+            sys.exit(1)
         return root_tags[0]
 
     def set_root_tag(self, tag: str):

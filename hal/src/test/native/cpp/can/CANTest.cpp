@@ -11,7 +11,7 @@
 #include "wpi/hal/simulation/CanData.h"
 
 namespace wpi::hal {
-static constexpr int32_t kCANBusS0 = 0;
+static constexpr int32_t CAN_BUS_S0 = 0;
 
 struct CANTestStore {
   CANTestStore(int32_t busId, int32_t deviceId, int32_t* status) {
@@ -46,7 +46,7 @@ struct CANSendCallbackStore {
 TEST_CASE("CANTest CanIdPacking", "[hal][can]") {
   int32_t status = 0;
   int32_t deviceId = 12;
-  CANTestStore testStore(kCANBusS0, deviceId, &status);
+  CANTestStore testStore(CAN_BUS_S0, deviceId, &status);
   REQUIRE(0 == status);
 
   std::pair<int32_t, bool> storePair;

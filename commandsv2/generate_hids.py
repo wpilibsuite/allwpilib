@@ -14,7 +14,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
-from shared.generation import write_file, add_jinja_args, make_arg_parser
+
+from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
 def generate_hids(
@@ -24,7 +25,9 @@ def generate_hids(
         return
 
     with schema_file.open(encoding="utf-8") as f:
-        controllers = json.load(f)
+        controllers = [
+            _normalize_hid_controller(controller) for controller in json.load(f)
+        ]
 
     # Java files
     java_subdirectory = "main/java/org/wpilib/command2/button"
@@ -87,6 +90,23 @@ def _snake_case(name: str) -> str:
     name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
     return name.lower()
+
+
+def _with_constant_name(entry: dict):
+    normalized = dict(entry)
+    normalized["ConstantName"] = _constant_name(entry["name"])
+    return normalized
+
+
+def _normalize_hid_controller(controller: dict):
+    normalized = dict(controller)
+    normalized["buttons"] = [
+        _with_constant_name(button) for button in controller["buttons"]
+    ]
+    normalized["triggers"] = [
+        _with_constant_name(trigger) for trigger in controller.get("triggers", [])
+    ]
+    return normalized
 
 
 def _python_display_name(name: str) -> str:

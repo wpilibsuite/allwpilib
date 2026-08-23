@@ -15,7 +15,7 @@
 namespace wpi::glass {
 class NTSubsystemModel : public SubsystemModel {
  public:
-  static constexpr const char* kType = "Subsystem";
+  static constexpr const char* TYPE = "Subsystem";
 
   explicit NTSubsystemModel(std::string_view path);
   NTSubsystemModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
@@ -34,7 +34,6 @@ class NTSubsystemModel : public SubsystemModel {
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_name;
   wpi::nt::StringSubscriber m_defaultCommand;
   wpi::nt::StringSubscriber m_currentCommand;
 

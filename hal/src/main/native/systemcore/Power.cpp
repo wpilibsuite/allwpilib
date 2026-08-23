@@ -4,6 +4,8 @@
 
 #include "wpi/hal/Power.h"
 
+#include <cmath>
+
 #include "HALInitializer.hpp"
 #include "SystemServerInternal.hpp"
 #include "mrclib/Systemcore.h"
@@ -74,16 +76,43 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
   return;
 }
 
-void HAL_SetBrownoutVoltage(double voltage, int32_t* status) {
+void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
+                             int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return;
-}
+  constexpr double MILLIVOLTS_PER_VOLT = 1000.0;
+  constexpr double BROWNOUT_VOLTAGE_MIN =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV / MILLIVOLTS_PER_VOLT;
+  constexpr double BROWNOUT_VOLTAGE_MAX =
+      MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV / MILLIVOLTS_PER_VOLT;
+  constexpr double RECOVERY_VOLTAGE_MAX =
+      MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV / MILLIVOLTS_PER_VOLT;
+  if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
+      brownoutVoltage < BROWNOUT_VOLTAGE_MIN ||
+      brownoutVoltage > BROWNOUT_VOLTAGE_MAX ||
+      recoveryVoltage < BROWNOUT_VOLTAGE_MIN ||
+      recoveryVoltage > RECOVERY_VOLTAGE_MAX) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
-double HAL_GetBrownoutVoltage(int32_t* status) {
-  initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  auto brownoutMillivolts = std::lround(brownoutVoltage * MILLIVOLTS_PER_VOLT);
+  auto recoveryMillivolts = std::lround(recoveryVoltage * MILLIVOLTS_PER_VOLT);
+  if (recoveryMillivolts <
+      brownoutMillivolts +
+          MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  MRC_Status mrcStatus = MRC_Systemcore_SetBrownoutVoltages(brownoutMillivolts,
+                                                            recoveryMillivolts);
+  if (mrcStatus == MRC_STATUS_PARAMETER_OUT_OF_RANGE) {
+    *status = HAL_PARAMETER_OUT_OF_RANGE;
+  } else if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+  } else {
+    *status = HAL_SUCCESS;
+  }
 }
 
 double HAL_GetCPUTemp(int32_t* status) {

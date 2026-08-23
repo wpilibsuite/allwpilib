@@ -25,6 +25,7 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//hal:wpiHal",
+        "//hal:wpiHalMrc",
         "//wpinet",
     ],
 )
@@ -44,6 +45,7 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//hal:wpiHal",
+        "//hal:wpiHalMrc",
         "//wpinet",
     ],
 )

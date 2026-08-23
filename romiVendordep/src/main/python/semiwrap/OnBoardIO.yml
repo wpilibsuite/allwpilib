@@ -1,7 +1,7 @@
 classes:
   wpi::romi::OnBoardIO:
     attributes:
-      kMessageInterval:
+      MESSAGE_INTERVAL:
       m_nextMessageTime:
     enums:
       ChannelMode:

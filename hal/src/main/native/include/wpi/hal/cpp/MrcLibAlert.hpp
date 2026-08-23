@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <stdint.h>
-
 namespace wpi::hal {
-int32_t SetMrcLibAlertBackend();
+void SetMrcLibAlertBackend();
 }  // namespace wpi::hal

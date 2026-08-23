@@ -8,11 +8,12 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
-#include "wpi/nt/DoubleArrayTopic.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
@@ -34,7 +35,8 @@ class FieldObject2d {
   struct private_init {};
 
  public:
-  FieldObject2d(std::string_view name, const private_init&) : m_name{name} {}
+  FieldObject2d(std::string_view name, const private_init&)
+      : m_name{name}, m_posesTunable{m_mutex} {}
 
   FieldObject2d(FieldObject2d&& rhs);
   FieldObject2d& operator=(FieldObject2d&& rhs);
@@ -86,13 +88,12 @@ class FieldObject2d {
    */
   template <typename SampleType>
   void SetTrajectory(const wpi::math::Trajectory<SampleType>& trajectory) {
-    std::scoped_lock lock(m_mutex);
-    m_poses.clear();
-    m_poses.reserve(trajectory.Samples().size());
+    std::vector<wpi::math::Pose2d> poses;
+    poses.reserve(trajectory.Samples().size());
     for (auto&& state : trajectory.Samples()) {
-      m_poses.push_back(state.pose);
+      poses.push_back(state.pose);
     }
-    UpdateEntry();
+    m_posesTunable.Set(std::move(poses));
   }
 
   /**
@@ -112,13 +113,30 @@ class FieldObject2d {
       wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const;
 
  private:
-  void UpdateEntry(bool setDefault = false);
-  void UpdateFromEntry() const;
+  class PosesTunable
+      : public wpi::tunables::Tunable<std::vector<wpi::math::Pose2d>> {
+   public:
+    explicit PosesTunable(wpi::util::mutex& mutex);
+    PosesTunable(wpi::util::mutex& mutex, PosesTunable&& rhs);
+    PosesTunable& operator=(PosesTunable&& rhs);
+
+    std::vector<wpi::math::Pose2d> Get() const;
+    void Set(std::span<const wpi::math::Pose2d> poses);
+    void Set(std::vector<wpi::math::Pose2d> poses);
+
+   private:
+    using Base = wpi::tunables::Tunable<std::vector<wpi::math::Pose2d>>;
+
+    size_t GetStructSize() const override;
+    bool UnpackStruct(std::span<const uint8_t> data) override;
+    void PackStruct(std::span<uint8_t> buf) const override;
+
+    wpi::util::mutex* m_mutex;
+  };
 
   mutable wpi::util::mutex m_mutex;
   std::string m_name;
-  wpi::nt::DoubleArrayEntry m_entry;
-  mutable wpi::util::SmallVector<wpi::math::Pose2d, 1> m_poses;
+  PosesTunable m_posesTunable;
 };
 
 }  // namespace wpi

@@ -11,11 +11,11 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 
-static constexpr int kPercentageMode = 0;
-static constexpr int kVoltageMode = 1;
-static constexpr int kPositionMode = 2;
-static constexpr int kVelocityMode = 3;
-static constexpr int kFollowerMode = 4;
+static constexpr int PERCENTAGE_MODE = 0;
+static constexpr int VOLTAGE_MODE = 1;
+static constexpr int POSITION_MODE = 2;
+static constexpr int VELOCITY_MODE = 3;
+static constexpr int FOLLOWER_MODE = 4;
 
 using namespace wpi;
 
@@ -98,25 +98,25 @@ ExpansionHubMotor::~ExpansionHubMotor() noexcept {
 
 void ExpansionHubMotor::SetThrottle(double throttle) {
   SetEnabled(true);
-  m_modePublisher.Set(kPercentageMode);
+  m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(throttle);
 }
 
 void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
   SetEnabled(true);
-  m_modePublisher.Set(kVoltageMode);
+  m_modePublisher.Set(VOLTAGE_MODE);
   m_setpointPublisher.Set(voltage.value());
 }
 
 void ExpansionHubMotor::SetPositionSetpoint(double setpoint) {
   SetEnabled(true);
-  m_modePublisher.Set(kPositionMode);
+  m_modePublisher.Set(POSITION_MODE);
   m_setpointPublisher.Set(setpoint);
 }
 
 void ExpansionHubMotor::SetVelocitySetpoint(double setpoint) {
   SetEnabled(true);
-  m_modePublisher.Set(kVelocityMode);
+  m_modePublisher.Set(VELOCITY_MODE);
   m_setpointPublisher.Set(setpoint);
 }
 
@@ -171,7 +171,7 @@ void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
   }
   m_hub.AddFollower(leader.m_channel, m_channel);
   SetEnabled(true);
-  m_modePublisher.Set(kFollowerMode);
+  m_modePublisher.Set(FOLLOWER_MODE);
   if (direction == FollowDirection::Opposed) {
     m_setpointPublisher.Set(leader.m_channel + 4);
   } else {
@@ -182,6 +182,6 @@ void ExpansionHubMotor::Follow(const ExpansionHubMotor& leader,
 void ExpansionHubMotor::Unfollow() {
   m_hub.RemoveFollower(m_channel);
   SetEnabled(false);
-  m_modePublisher.Set(kPercentageMode);
+  m_modePublisher.Set(PERCENTAGE_MODE);
   m_setpointPublisher.Set(0);
 }

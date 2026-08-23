@@ -102,20 +102,20 @@ TEST_CASE("BiquadFilterChebyshevTest Cheby1BandPass4thOrderMatchesScipy",
 
 TEST_CASE("BiquadFilterChebyshevTest Cheby1LowPassPassbandStaysWithinRipple",
           "[wpimath][filter]") {
-  constexpr double kRippleDb = 1.0;
+  constexpr double RIPPLE_DB = 1.0;
   auto filter =
-      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, kRippleDb);
+      BiquadFilter::ChebyshevI(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, RIPPLE_DB);
   auto sections = filter.Sections();
 
   // For even order, |H(0)| = 1/sqrt(1+eps^2) — i.e. -ripple dB at DC.
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
   double dcDb = 20.0 * std::log10(gainDc);
-  CHECK_NEAR(dcDb, -kRippleDb, 0.01);
+  CHECK_NEAR(dcDb, -RIPPLE_DB, 0.01);
 
   // |H(fc)| = 1/sqrt(1+eps^2) too (ripple boundary).
   double gainFc = CascadeMagnitude(sections, 50.0, 1000.0);
   double fcDb = 20.0 * std::log10(gainFc);
-  CHECK_NEAR(fcDb, -kRippleDb, 0.01);
+  CHECK_NEAR(fcDb, -RIPPLE_DB, 0.01);
 
   // Strong attenuation past the cutoff.
   double gainStop = CascadeMagnitude(sections, 200.0, 1000.0);
@@ -183,9 +183,9 @@ TEST_CASE("BiquadFilterChebyshevTest Cheby2HighPassResponse",
   // cascade response (same caveat as Butterworth BP/BS). Verify the response
   // at points that uniquely characterize the filter rather than per-section
   // coefficients.
-  constexpr double kAttenDb = 40.0;
+  constexpr double ATTEN_DB = 40.0;
   auto filter = BiquadFilter::ChebyshevII(Kind::HighPass, 4, 1000.0_Hz,
-                                          100.0_Hz, kAttenDb);
+                                          100.0_Hz, ATTEN_DB);
   auto sections = filter.Sections();
 
   // Passband (high frequencies): unity gain.
@@ -194,20 +194,20 @@ TEST_CASE("BiquadFilterChebyshevTest Cheby2HighPassResponse",
 
   // Stopband edge fc=100: response reaches the stopband attenuation.
   double gainFc = CascadeMagnitude(sections, 100.0, 1000.0);
-  CHECK(20.0 * std::log10(gainFc) < -kAttenDb + 0.01);
+  CHECK(20.0 * std::log10(gainFc) < -ATTEN_DB + 0.01);
 
   // DC: deeply attenuated.
   double gainDc = CascadeMagnitude(sections, 0.0, 1000.0);
-  CHECK(20.0 * std::log10(gainDc) < -kAttenDb + 0.5);
+  CHECK(20.0 * std::log10(gainDc) < -ATTEN_DB + 0.5);
 }
 
 TEST_CASE("BiquadFilterChebyshevTest Cheby2BandStopResponse",
           "[wpimath][filter]") {
   // BandStop: zero pairings differ from scipy in the same way as Butterworth
   // BS — total response matches but per-section coefficients don't.
-  constexpr double kAttenDb = 40.0;
+  constexpr double ATTEN_DB = 40.0;
   auto filter = BiquadFilter::ChebyshevII(Kind::BandStop, 4, 1000.0_Hz, 80.0_Hz,
-                                          120.0_Hz, kAttenDb);
+                                          120.0_Hz, ATTEN_DB);
   auto sections = filter.Sections();
 
   // Outside the stop band: unity gain.
@@ -217,17 +217,17 @@ TEST_CASE("BiquadFilterChebyshevTest Cheby2BandStopResponse",
   // Stop-band edges hit the attenuation level; deeper inside the band is
   // at least that attenuated.
   CHECK(20.0 * std::log10(CascadeMagnitude(sections, 80.0, 1000.0)) <
-        -kAttenDb + 0.01);
+        -ATTEN_DB + 0.01);
   CHECK(20.0 * std::log10(CascadeMagnitude(sections, 120.0, 1000.0)) <
-        -kAttenDb + 0.01);
+        -ATTEN_DB + 0.01);
 }
 
 TEST_CASE(
     "BiquadFilterChebyshevTest Cheby2LowPassFlatPassbandRipplesInStopband",
     "[wpimath][filter]") {
-  constexpr double kAttenDb = 40.0;
+  constexpr double ATTEN_DB = 40.0;
   auto filter =
-      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, kAttenDb);
+      BiquadFilter::ChebyshevII(Kind::LowPass, 4, 1000.0_Hz, 50.0_Hz, ATTEN_DB);
   auto sections = filter.Sections();
 
   // Cheby2 has |H(0)| = 1 always (no DC ripple).
@@ -236,11 +236,11 @@ TEST_CASE(
 
   // At the stopband edge fc=50, |H| reaches the stopband attenuation.
   double gainFc = CascadeMagnitude(sections, 50.0, 1000.0);
-  CHECK(20.0 * std::log10(gainFc) < -kAttenDb + 0.01);
+  CHECK(20.0 * std::log10(gainFc) < -ATTEN_DB + 0.01);
 
-  // Stopband stays at or below kAttenDb attenuation.
+  // Stopband stays at or below ATTEN_DB attenuation.
   double gainDeep = CascadeMagnitude(sections, 100.0, 1000.0);
-  CHECK(20.0 * std::log10(gainDeep) < -kAttenDb + 0.5);
+  CHECK(20.0 * std::log10(gainDeep) < -ATTEN_DB + 0.5);
 }
 
 TEST_CASE("BiquadFilterChebyshevTest Cheby2RejectsInvalidArgs",

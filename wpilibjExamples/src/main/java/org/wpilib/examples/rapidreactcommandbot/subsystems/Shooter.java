@@ -9,30 +9,30 @@ import static org.wpilib.command2.Commands.waitUntil;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.ShooterConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 
 @Logged
 public class Shooter extends SubsystemBase {
-  private final PWMSparkMax shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
-  private final PWMSparkMax feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
+  private final PWMSparkMax shooterMotor = new PWMSparkMax(ShooterConstants.SHOOTER_MOTOR_PORT);
+  private final PWMSparkMax feederMotor = new PWMSparkMax(ShooterConstants.FEEDER_MOTOR_PORT);
   private final Encoder shooterEncoder =
       new Encoder(
-          ShooterConstants.kEncoderPorts[0],
-          ShooterConstants.kEncoderPorts[1],
-          ShooterConstants.kEncoderReversed);
+          ShooterConstants.ENCODER_PORTS[0],
+          ShooterConstants.ENCODER_PORTS[1],
+          ShooterConstants.ENCODER_REVERSED);
   private final SimpleMotorFeedforward shooterFeedforward =
       new SimpleMotorFeedforward(ShooterConstants.kS, ShooterConstants.kV);
   private final PIDController shooterFeedback = new PIDController(ShooterConstants.kP, 0.0, 0.0);
 
   /** The shooter subsystem for the robot. */
   public Shooter() {
-    shooterFeedback.setTolerance(ShooterConstants.kShooterToleranceRPS);
-    shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
+    shooterFeedback.setTolerance(ShooterConstants.SHOOTER_TOLERANCE_RPS);
+    shooterEncoder.setDistancePerPulse(ShooterConstants.ENCODER_DISTANCE_PER_PULSE);
 
     // Set default command to turn off both the shooter and feeder motors, and then idle
     setDefaultCommand(

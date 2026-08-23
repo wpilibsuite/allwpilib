@@ -81,7 +81,10 @@ class OpModeLifecycleTest {
     wpi::RobotState::ClearOpModes();
   }
 
-  ~OpModeLifecycleTest() { wpi::sim::ResumeTiming(); }
+  ~OpModeLifecycleTest() {
+    wpi::sim::ResumeTiming();
+    wpi::nt::ResetInstance(wpi::nt::GetDefaultInstance());
+  }
 
  protected:
   static int64_t MakeOpModeId(wpi::RobotMode mode, std::string_view name) {
@@ -94,9 +97,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest EnabledTransition",
                  "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts); },
-      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "TestOpMode", [&] {
+    return std::make_unique<LifecycleOpMode>(counts);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -141,12 +144,12 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   Counts counts1;
   Counts counts2;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts1); },
-      wpi::RobotMode::TELEOPERATED, "OpMode1");
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts2); },
-      wpi::RobotMode::TELEOPERATED, "OpMode2");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "OpMode1", [&] {
+    return std::make_unique<LifecycleOpMode>(counts1);
+  });
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "OpMode2", [&] {
+    return std::make_unique<LifecycleOpMode>(counts2);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -199,12 +202,12 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
   Counts counts1;
   Counts counts2;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts1); },
-      wpi::RobotMode::TELEOPERATED, "OpMode1");
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts2); },
-      wpi::RobotMode::TELEOPERATED, "OpMode2");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "OpMode1", [&] {
+    return std::make_unique<LifecycleOpMode>(counts1);
+  });
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "OpMode2", [&] {
+    return std::make_unique<LifecycleOpMode>(counts2);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -243,9 +246,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
                  "[wpilibc]") {
   std::atomic<uint32_t> callbackCount{0};
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<CallbackOpMode>(callbackCount); },
-      wpi::RobotMode::TELEOPERATED, "CallbackOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "CallbackOpMode", [&] {
+    return std::make_unique<CallbackOpMode>(callbackCount);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -279,9 +282,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest InitialEnabledState",
                  "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts); },
-      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "TestOpMode", [&] {
+    return std::make_unique<LifecycleOpMode>(counts);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -311,9 +314,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest,
                  "OpModeLifecycleTest ReconstructionOnDisable", "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts); },
-      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "TestOpMode", [&] {
+    return std::make_unique<LifecycleOpMode>(counts);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -360,9 +363,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DeselectOpMode",
                  "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts); },
-      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "TestOpMode", [&] {
+    return std::make_unique<LifecycleOpMode>(counts);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};
@@ -394,9 +397,9 @@ TEST_CASE_METHOD(OpModeLifecycleTest, "OpModeLifecycleTest DsDisconnect",
                  "[wpilibc]") {
   Counts counts;
   LifecycleRobot robot;
-  robot.AddOpModeFactory(
-      [&] { return std::make_unique<LifecycleOpMode>(counts); },
-      wpi::RobotMode::TELEOPERATED, "TestOpMode");
+  robot.AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "TestOpMode", [&] {
+    return std::make_unique<LifecycleOpMode>(counts);
+  });
   robot.PublishOpModes();
 
   std::thread robotThread{[&] { robot.StartCompetition(); }};

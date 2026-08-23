@@ -92,10 +92,10 @@ inline std::string GetOperatingDirectory() {
 namespace DriverStation {
 // #ifdef __FIRST_SYSTEMCORE__
 // using MatchType = MatchType_t;
-// constexpr int kNone = kMatchType_none;
-// constexpr int kPractice = kMatchType_practice;
-// constexpr int kQualification = kMatchType_qualification;
-// constexpr int kElimination = kMatchType_elimination;
+// constexpr int NONE = MATCH_TYPE_NONE;
+// constexpr int PRACTICE = MATCH_TYPE_PRACTICE;
+// constexpr int QUALIFICATION = MATCH_TYPE_QUALIFICATION;
+// constexpr int ELIMINATION = MATCH_TYPE_ELIMINATION;
 // char gEventName[128];
 // MatchType_t gMatchType;
 // uint16_t gMatchNumber;
@@ -103,7 +103,7 @@ namespace DriverStation {
 // uint8_t gGameSpecificMessage[16];
 // uint16_t gGameSpecificMessageSize;
 // #else
-enum MatchType { kNone, kPractice, kQualification, kElimination };
+enum MatchType { NONE, PRACTICE, QUALIFICATION, ELIMINATION };
 // #endif
 
 inline void UpdateMatchInfo() {
@@ -121,7 +121,7 @@ inline MatchType GetMatchType() {
   // #ifdef __FIRST_SYSTEMCORE__
   //   return gMatchType;
   // #else
-  return kNone;
+  return NONE;
   // #endif
 }
 
@@ -202,7 +202,7 @@ struct Instance {
 
 // if less than this much free space, delete log files until there is this much
 // free space OR there are this many files remaining.
-static constexpr uintmax_t kFreeSpaceThreshold = 50000000;
+static constexpr uintmax_t FREE_SPACE_THRESHOLD = 50000000;
 static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static std::string MakeLogDir(std::string_view dir) {
@@ -267,7 +267,7 @@ void Thread::Main() {
     } else {
       freeSpace = UINTMAX_MAX;
     }
-    if (freeSpace < kFreeSpaceThreshold) {
+    if (freeSpace < FREE_SPACE_THRESHOLD) {
       // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we
       // just created one)
       std::vector<fs::directory_entry> entries;
@@ -295,7 +295,7 @@ void Thread::Main() {
           WPILIB_ReportError(warn::Warning, "DataLogManager: Deleted {}",
                              entry.path().string());
           freeSpace += size;
-          if (freeSpace >= kFreeSpaceThreshold) {
+          if (freeSpace >= FREE_SPACE_THRESHOLD) {
             break;
           }
         } else {
@@ -303,13 +303,13 @@ void Thread::Main() {
                              entry.path().string());
         }
       }
-    } else if (freeSpace < 2 * kFreeSpaceThreshold) {
+    } else if (freeSpace < 2 * FREE_SPACE_THRESHOLD) {
       WPILIB_ReportError(
           warn::Warning,
           "DataLogManager: Log storage device has {} MB of free space "
           "remaining! Logs will get deleted below {} MB of free space. "
           "Consider deleting logs off the storage device.",
-          freeSpace / 1000000, kFreeSpaceThreshold / 1000000);
+          freeSpace / 1000000, FREE_SPACE_THRESHOLD / 1000000);
     }
   }
 
@@ -382,17 +382,17 @@ void Thread::Main() {
         // actually received it
         DriverStation::UpdateMatchInfo();
         auto matchType = DriverStation::GetMatchType();
-        if (matchType != DriverStation::kNone) {
+        if (matchType != DriverStation::NONE) {
           // rename per match info
           char matchTypeChar;
           switch (matchType) {
-            case DriverStation::kPractice:
+            case DriverStation::PRACTICE:
               matchTypeChar = 'P';
               break;
-            case DriverStation::kQualification:
+            case DriverStation::QUALIFICATION:
               matchTypeChar = 'Q';
               break;
-            case DriverStation::kElimination:
+            case DriverStation::ELIMINATION:
               matchTypeChar = 'E';
               break;
             default:

@@ -26,8 +26,7 @@ classes:
       GetEnabled3V3:
       GetFaultCount3V3:
       GetBatteryVoltage:
-      GetBrownoutVoltage:
-      SetBrownoutVoltage:
+      SetBrownoutVoltages:
       GetCPUTemp:
       GetCANStatus:
       GetCommsDisableCount:

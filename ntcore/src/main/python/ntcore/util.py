@@ -11,7 +11,13 @@ from ._ntcore import (
     Value,
 )
 
-__all__ = ["ntproperty", "ChooserControl"]
+__all__ = ["ntproperty", "SelectableControl"]
+
+_SENTINEL = object()
+
+
+def _selection_is_unset(value: Optional[str]) -> bool:
+    return value is None or value == ""
 
 
 class _NtProperty:
@@ -110,7 +116,7 @@ def ntproperty(
     A property that you can add to your classes to access NetworkTables
     variables like a normal variable.
 
-    :param key: A full NetworkTables key (eg ``/SmartDashboard/foo``)
+    :param key: A full NetworkTables key (for example, ``/Example/foo``)
     :param default_value: Default value to use if not in the table
     :type  default_value: any
     :param write_default: If True, put the default value to the table,
@@ -126,7 +132,7 @@ def ntproperty(
 
         class Foo(object):
 
-            something = ntproperty('/SmartDashboard/something', True)
+            something = ntproperty('/Example/something', True)
 
             ...
 
@@ -152,9 +158,9 @@ def ntproperty(
     return property(fget=ntprop.get, fset=ntprop.set, doc=doc)
 
 
-class ChooserControl:
+class SelectableControl:
     """
-    Interacts with a :class:`wpilib.SendableChooser`
+    Interacts with a :class:`tunables.Selectable`
     object over NetworkTables.
     """
 
@@ -178,26 +184,36 @@ class ChooserControl:
         if inst is None:
             inst = NetworkTableInstance.get_default()
 
-        self.subtable = inst.get_table("SmartDashboard").get_sub_table(key)
+        self.subtable = inst.get_table("Tunables").get_sub_table(key)
+        self.selected_subtable = self.subtable.get_sub_table("selected")
 
         self.on_choices = on_choices
         self.on_selected = on_selected
         self._listener = None
+        self._selected_listener = None
+        self._last_selected = _SENTINEL
 
         if on_choices or on_selected:
             self._listener = self.subtable.add_listener(
                 EventFlags.IMMEDIATE | EventFlags.VALUE_ALL, self._on_change
             )
+        if on_selected:
+            self._selected_listener = self.selected_subtable.add_listener(
+                EventFlags.IMMEDIATE | EventFlags.VALUE_ALL, self._on_selected_change
+            )
 
     def close(self) -> None:
-        """Stops listening for changes to the ``SendableChooser``"""
+        """Stops listening for changes to the ``Selectable``"""
         if self._listener is not None:
             self.subtable.remove_listener(self._listener)
             self._listener = None
+        if self._selected_listener is not None:
+            self.selected_subtable.remove_listener(self._selected_listener)
+            self._selected_listener = None
 
     def get_choices(self) -> Sequence[str]:
         """
-        Returns the current choices. If the chooser doesn't exist, this
+        Returns the current choices. If the selectable doesn't exist, this
         will return an empty tuple.
         """
         return self.subtable.get_string_array("options", [])
@@ -206,18 +222,33 @@ class ChooserControl:
         """
         Returns the current selection or None
         """
-        selected = self.subtable.get_string("selected", None)
-        if selected is None:
+        return self._get_effective_selection()
+
+    def _get_effective_selection(self) -> Optional[str]:
+        selected = self.selected_subtable.get_string("value", None)
+        if _selection_is_unset(selected):
+            selected = self.selected_subtable.get_string("tune", None)
+        if _selection_is_unset(selected):
             selected = self.subtable.get_string("default", None)
+        if _selection_is_unset(selected):
+            return None
         return selected
+
+    def _notify_selected_if_changed(self) -> None:
+        selected = self._get_effective_selection()
+        if selected == self._last_selected:
+            return
+        self._last_selected = selected
+        if selected is not None and self.on_selected is not None:
+            self.on_selected(selected)
 
     def set_selected(self, selection: str) -> None:
         """
-        Sets the active selection on the chooser
+        Sets the active selection on the selectable
 
         :param selection: Active selection name
         """
-        self.subtable.put_string("selected", selection)
+        self.selected_subtable.put_string("tune", selection)
 
     def _on_change(self, table, key, event):
         value = event.data.value.value()
@@ -225,12 +256,9 @@ class ChooserControl:
         if key == "options":
             if self.on_choices is not None:
                 self.on_choices(value)
-        elif key == "selected":
-            if self.on_selected is not None:
-                self.on_selected(value)
         elif key == "default":
-            if (
-                self.on_selected is not None
-                and self.subtable.get_string("selected", None) is None
-            ):
-                self.on_selected(value)
+            self._notify_selected_if_changed()
+
+    def _on_selected_change(self, table, key, event):
+        if key == "value" or key == "tune":
+            self._notify_selected_if_changed()

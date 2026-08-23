@@ -36,7 +36,7 @@ public class CAN implements Closeable {
    * @param busId The bus ID
    * @param deviceId The device id
    */
-  public CAN(CANBusMap busId, int deviceId) {
+  public CAN(CANBus busId, int deviceId) {
     this(busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE);
   }
 
@@ -49,7 +49,7 @@ public class CAN implements Closeable {
    * @param deviceManufacturer The device manufacturer
    * @param deviceType The device type
    */
-  public CAN(CANBusMap busId, int deviceId, int deviceManufacturer, int deviceType) {
+  public CAN(CANBus busId, int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(busId.value, deviceManufacturer, deviceId, deviceType);
     HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }

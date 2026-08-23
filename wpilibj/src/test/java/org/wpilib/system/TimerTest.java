@@ -16,6 +16,8 @@ import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.SimHooks;
 
 class TimerTest {
+  private long m_mockTime;
+
   @BeforeEach
   void setup() {
     HAL.initialize();
@@ -25,6 +27,7 @@ class TimerTest {
 
   @AfterEach
   void cleanup() {
+    RobotController.setTimeSource(RobotController::getMonotonicTime);
     SimHooks.resumeTiming();
   }
 
@@ -88,6 +91,25 @@ class TimerTest {
 
   @Test
   @ResourceLock("timing")
+  void resetWithLargeTimestampTest() {
+    RobotController.setTimeSource(() -> m_mockTime);
+    m_mockTime = 1_000_002;
+
+    var timer = new Timer();
+    timer.start();
+
+    m_mockTime += 500_000;
+    assertEquals(timer.get(), 0.5);
+
+    timer.reset();
+    assertEquals(timer.get(), 0.0);
+
+    m_mockTime += 500_000;
+    assertEquals(timer.get(), 0.5);
+  }
+
+  @Test
+  @ResourceLock("timing")
   void hasElapsedTest() {
     var timer = new Timer();
 
@@ -130,6 +152,46 @@ class TimerTest {
     assertTrue(timer.advanceIfElapsed(0.4));
     assertTrue(timer.advanceIfElapsed(0.4));
     assertFalse(timer.advanceIfElapsed(0.4));
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void advanceIfElapsedPreservesFractionalPeriodTest() {
+    RobotController.setTimeSource(() -> m_mockTime);
+    m_mockTime = 0;
+
+    var timer = new Timer();
+    timer.start();
+
+    double period = 1.0 / 60.0;
+
+    for (long i = 1; i <= 60; ++i) {
+      m_mockTime = (i * 1_000_000 + 59) / 60 + 100;
+
+      assertTrue(timer.advanceIfElapsed(period));
+      assertFalse(timer.advanceIfElapsed(period));
+    }
+
+    assertEquals(timer.get(), 100e-6, 1e-12);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void advanceIfElapsedProgressesWithSubMicrosecondPeriodTest() {
+    RobotController.setTimeSource(() -> m_mockTime);
+
+    var timer = new Timer();
+    timer.start();
+
+    m_mockTime = 1;
+    double period = 0.1e-6;
+
+    for (int i = 0; i < 10; ++i) {
+      assertTrue(timer.advanceIfElapsed(period));
+    }
+
+    assertFalse(timer.advanceIfElapsed(period));
+    assertEquals(timer.get(), 0.0, 1e-12);
   }
 
   @Test

@@ -1,7 +1,5 @@
 classes:
   wpi::math::BangBangController:
-    ignored_bases:
-    - wpi::util::SendableHelper<BangBangController>
     methods:
       BangBangController:
       SetSetpoint:
@@ -15,4 +13,7 @@ classes:
         overloads:
           double, double:
           double:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
+      PublishTunable:
+      GetTunableType:

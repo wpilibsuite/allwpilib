@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.networktables.NTSendable;
-import org.wpilib.networktables.NTSendableBuilder;
-import org.wpilib.networktables.NetworkTable;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Distance;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * 2D representation of game field for dashboards.
@@ -32,18 +33,15 @@ import org.wpilib.util.sendable.SendableRegistry;
  * using the getObject() function. Other objects can also have multiple poses (which will show the
  * object at multiple locations).
  */
-public class Field2d implements NTSendable, AutoCloseable {
+public class Field2d implements TelemetryLoggable, ComplexTunable, AutoCloseable {
   /** Constructor. */
-  @SuppressWarnings("this-escape")
   public Field2d() {
-    FieldObject2d obj = new FieldObject2d("Robot");
-    obj.setPose(Pose2d.kZero);
-    m_objects.add(obj);
-    SendableRegistry.add(this, "Field");
+    m_objects.add(new FieldObject2d("Robot", Pose2d.ZERO));
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
+    TunableRegistry.remove(this);
     for (FieldObject2d obj : m_objects) {
       obj.close();
     }
@@ -103,11 +101,7 @@ public class Field2d implements NTSendable, AutoCloseable {
     }
     FieldObject2d obj = new FieldObject2d(name);
     m_objects.add(obj);
-    if (m_table != null) {
-      synchronized (obj) {
-        obj.m_entry = m_table.getDoubleArrayTopic(name).getEntry(new double[] {});
-      }
-    }
+    publishChildTunable(obj.m_name, obj.m_posesTunable);
     return obj;
   }
 
@@ -121,20 +115,42 @@ public class Field2d implements NTSendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(NTSendableBuilder builder) {
-    builder.setSmartDashboardType("Field2d");
-
+  public void logTo(TelemetryTable table) {
     synchronized (this) {
-      m_table = builder.getTable();
       for (FieldObject2d obj : m_objects) {
         synchronized (obj) {
-          obj.m_entry = m_table.getDoubleArrayTopic(obj.m_name).getEntry(new double[] {});
-          obj.updateEntry(true);
+          table.log(obj.m_name, obj.m_poses.toArray(new Pose2d[0]));
         }
       }
     }
   }
 
-  private NetworkTable m_table;
+  @Override
+  public String getTelemetryType() {
+    return "Field2d";
+  }
+
+  /**
+   * Gets the tunable type.
+   *
+   * @return Field2d type.
+   */
+  @Override
+  public String getTunableType() {
+    return "Field2d";
+  }
+
+  /**
+   * Publishes field objects to a tunable table.
+   *
+   * @param table Tunable table.
+   */
+  @Override
+  public synchronized void publishTunable(TunableTable table) {
+    for (FieldObject2d obj : m_objects) {
+      table.publish(obj.m_name, obj.m_posesTunable);
+    }
+  }
+
   private final List<FieldObject2d> m_objects = new ArrayList<>();
 }

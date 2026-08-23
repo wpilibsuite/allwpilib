@@ -4,13 +4,13 @@
 
 #include "subsystems/HatchSubsystem.hpp"
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace HatchConstants;
 
 HatchSubsystem::HatchSubsystem()
-    : hatchSolenoid{0, wpi::PneumaticsModuleType::CTRE_PCM,
-                    kHatchSolenoidPorts[0], kHatchSolenoidPorts[1]} {}
+    : hatchSolenoid{wpi::CANBus::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
+                    HATCH_SOLENOID_PORTS[0], HATCH_SOLENOID_PORTS[1]} {}
 
 wpi::cmd::CommandPtr HatchSubsystem::GrabHatchCommand() {
   // implicitly require `this`
@@ -24,12 +24,9 @@ wpi::cmd::CommandPtr HatchSubsystem::ReleaseHatchCommand() {
       [this] { hatchSolenoid.Set(wpi::DoubleSolenoid::REVERSE); });
 }
 
-void HatchSubsystem::InitSendable(wpi::util::SendableBuilder& builder) {
-  SubsystemBase::InitSendable(builder);
+void HatchSubsystem::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  SubsystemBase::LogTo(table);
 
   // Publish the solenoid state to telemetry.
-  builder.AddBooleanProperty(
-      "extended",
-      [this] { return hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD; },
-      nullptr);
+  table.Log("extended", hatchSolenoid.Get() == wpi::DoubleSolenoid::FORWARD);
 }

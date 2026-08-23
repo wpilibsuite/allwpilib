@@ -13,20 +13,19 @@
 
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 namespace wpi::math {
 
 /**
  * Implements a PID control loop.
  */
-class WPILIB_DLLEXPORT PIDController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<PIDController> {
+class WPILIB_DLLEXPORT PIDController : public wpi::telemetry::TelemetryLoggable,
+                                       public wpi::tunables::ComplexTunable {
  public:
   /**
    * Allocates a PIDController with the given constants for Kp, Ki, and Kd.
@@ -76,7 +75,6 @@ class WPILIB_DLLEXPORT PIDController
 
       wpi::math::MathSharedStore::ReportUsage("PIDController",
                                               std::to_string(instances));
-      wpi::util::SendableRegistry::Add(this, "PIDController", instances);
     }
   }
 
@@ -371,20 +369,27 @@ class WPILIB_DLLEXPORT PIDController
     m_haveMeasurement = false;
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
+
+  std::string_view GetTunableType() const override;
 
  private:
   // Factor for "proportional" control
-  double m_Kp;
+  wpi::tunables::Tunable<double> m_Kp;
 
   // Factor for "integral" control
-  double m_Ki;
+  wpi::tunables::Tunable<double> m_Ki;
 
   // Factor for "derivative" control
-  double m_Kd;
+  wpi::tunables::Tunable<double> m_Kd;
 
   // The error range where "integral" control applies
-  double m_iZone = std::numeric_limits<double>::infinity();
+  wpi::tunables::Tunable<double> m_iZone{
+      std::numeric_limits<double>::infinity()};
 
   // The period (in seconds) of the control loop running this controller
   wpi::units::second_t m_period;
@@ -415,7 +420,7 @@ class WPILIB_DLLEXPORT PIDController
   double m_errorTolerance = 0.05;
   double m_errorDerivativeTolerance = std::numeric_limits<double>::infinity();
 
-  double m_setpoint = 0;
+  double m_setpoint = 0.0;
   double m_measurement = 0;
 
   bool m_haveSetpoint = false;

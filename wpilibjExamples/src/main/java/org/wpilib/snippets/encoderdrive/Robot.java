@@ -5,8 +5,8 @@
 package org.wpilib.snippets.encoderdrive;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 
 /**

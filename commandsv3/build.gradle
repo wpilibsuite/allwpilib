@@ -1,11 +1,10 @@
 ext {
     useJava = true
     useCpp = false
-    baseId = 'commands3'
+    baseId = 'commandsv3'
     groupId = 'org.wpilib'
 
-    nativeName = 'commands3'
-    devMain = 'org.wpilib.commands3.DevMain'
+    devMain = 'org.wpilib.command3.DevMain'
 }
 
 apply from: "${rootDir}/shared/java/javacommon.gradle"

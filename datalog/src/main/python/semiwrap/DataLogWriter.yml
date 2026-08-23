@@ -1,5 +1,13 @@
 classes:
   wpi::log::DataLogWriter:
+    inline_code: |
+      .def("__enter__", [](DataLogWriter *self) {
+        return self;
+      })
+      .def("__exit__", [](DataLogWriter &self, py::args args) {
+        py::gil_scoped_release release;
+        self.Stop();
+      })
     methods:
       DataLogWriter:
         overloads:

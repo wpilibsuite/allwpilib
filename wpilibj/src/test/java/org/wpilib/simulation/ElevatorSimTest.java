@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.motor.PWMVictorSPX;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.linalg.VecBuilder;
@@ -38,7 +37,7 @@ class ElevatorSimTest {
             0.01,
             0.0);
 
-    try (var motor = new PWMVictorSPX(0);
+    try (var motor = new TestPWMMotorController(0);
         var encoder = new Encoder(0, 1)) {
       var encoderSim = new EncoderSim(encoder);
 

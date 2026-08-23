@@ -25,77 +25,77 @@ NiDsStadiaControllerSim::NiDsStadiaControllerSim(int port) : GenericHIDSim{port}
 }
 
 void NiDsStadiaControllerSim::SetLeftX(double value) {
-  SetRawAxis(NiDsStadiaController::Axis::kLeftX, value);
+  SetRawAxis(NiDsStadiaController::Axis::LEFT_X, value);
 }
 
 void NiDsStadiaControllerSim::SetRightX(double value) {
-  SetRawAxis(NiDsStadiaController::Axis::kRightX, value);
+  SetRawAxis(NiDsStadiaController::Axis::RIGHT_X, value);
 }
 
 void NiDsStadiaControllerSim::SetLeftY(double value) {
-  SetRawAxis(NiDsStadiaController::Axis::kLeftY, value);
+  SetRawAxis(NiDsStadiaController::Axis::LEFT_Y, value);
 }
 
 void NiDsStadiaControllerSim::SetRightY(double value) {
-  SetRawAxis(NiDsStadiaController::Axis::kRightY, value);
+  SetRawAxis(NiDsStadiaController::Axis::RIGHT_Y, value);
 }
 
 void NiDsStadiaControllerSim::SetAButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kA, value);
+  SetRawButton(NiDsStadiaController::Button::A, value);
 }
 
 void NiDsStadiaControllerSim::SetBButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kB, value);
+  SetRawButton(NiDsStadiaController::Button::B, value);
 }
 
 void NiDsStadiaControllerSim::SetXButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kX, value);
+  SetRawButton(NiDsStadiaController::Button::X, value);
 }
 
 void NiDsStadiaControllerSim::SetYButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kY, value);
+  SetRawButton(NiDsStadiaController::Button::Y, value);
 }
 
 void NiDsStadiaControllerSim::SetLeftBumperButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kLeftBumper, value);
+  SetRawButton(NiDsStadiaController::Button::LEFT_BUMPER, value);
 }
 
 void NiDsStadiaControllerSim::SetRightBumperButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kRightBumper, value);
+  SetRawButton(NiDsStadiaController::Button::RIGHT_BUMPER, value);
 }
 
 void NiDsStadiaControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kLeftStick, value);
+  SetRawButton(NiDsStadiaController::Button::LEFT_STICK, value);
 }
 
 void NiDsStadiaControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kRightStick, value);
+  SetRawButton(NiDsStadiaController::Button::RIGHT_STICK, value);
 }
 
 void NiDsStadiaControllerSim::SetEllipsesButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kEllipses, value);
+  SetRawButton(NiDsStadiaController::Button::ELLIPSES, value);
 }
 
 void NiDsStadiaControllerSim::SetHamburgerButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kHamburger, value);
+  SetRawButton(NiDsStadiaController::Button::HAMBURGER, value);
 }
 
 void NiDsStadiaControllerSim::SetStadiaButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kStadia, value);
+  SetRawButton(NiDsStadiaController::Button::STADIA, value);
 }
 
 void NiDsStadiaControllerSim::SetRightTriggerButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kRightTrigger, value);
+  SetRawButton(NiDsStadiaController::Button::RIGHT_TRIGGER, value);
 }
 
 void NiDsStadiaControllerSim::SetLeftTriggerButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kLeftTrigger, value);
+  SetRawButton(NiDsStadiaController::Button::LEFT_TRIGGER, value);
 }
 
 void NiDsStadiaControllerSim::SetGoogleButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kGoogle, value);
+  SetRawButton(NiDsStadiaController::Button::GOOGLE, value);
 }
 
 void NiDsStadiaControllerSim::SetFrameButton(bool value) {
-  SetRawButton(NiDsStadiaController::Button::kFrame, value);
+  SetRawButton(NiDsStadiaController::Button::FRAME, value);
 }

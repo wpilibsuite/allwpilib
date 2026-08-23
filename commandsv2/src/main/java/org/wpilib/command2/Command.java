@@ -12,11 +12,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.tunable.ComplexTunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
+import org.wpilib.tunable.TunableTable;
 import org.wpilib.units.measure.Time;
 import org.wpilib.util.function.BooleanConsumer;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
 
 /**
  * A state machine representing a complete action to be performed by the robot. Commands are run by
@@ -29,15 +32,18 @@ import org.wpilib.util.sendable.SendableRegistry;
  * <p>This class is provided by the Commands v2 VendorDep
  */
 @NoDiscard("Commands must be used! Did you mean to bind it to a trigger?")
-public abstract class Command implements Sendable {
+public abstract class Command implements TelemetryLoggable, ComplexTunable {
   /** Requirements set. */
   private final Set<Subsystem> m_requirements = new HashSet<>();
+
+  private String m_name;
+  private String m_subsystem = "Ungrouped";
 
   /** Default constructor. */
   @SuppressWarnings("this-escape")
   protected Command() {
     String name = getClass().getName();
-    SendableRegistry.add(this, name.substring(name.lastIndexOf('.') + 1));
+    m_name = name.substring(name.lastIndexOf('.') + 1);
   }
 
   /** The initial subroutine of a command. Called once when the command is initially scheduled. */
@@ -120,7 +126,7 @@ public abstract class Command implements Sendable {
    * @return The display name of the Command
    */
   public String getName() {
-    return SendableRegistry.getName(this);
+    return m_name;
   }
 
   /**
@@ -129,7 +135,8 @@ public abstract class Command implements Sendable {
    * @param name The display name of the Command.
    */
   public void setName(String name) {
-    SendableRegistry.setName(this, name);
+    m_name = name;
+    setChildTunableChanged("name");
   }
 
   /**
@@ -138,7 +145,7 @@ public abstract class Command implements Sendable {
    * @return Subsystem name
    */
   public String getSubsystem() {
-    return SendableRegistry.getSubsystem(this);
+    return m_subsystem;
   }
 
   /**
@@ -147,7 +154,7 @@ public abstract class Command implements Sendable {
    * @param subsystem subsystem name
    */
   public void setSubsystem(String subsystem) {
-    SendableRegistry.setSubsystem(this, subsystem);
+    m_subsystem = subsystem;
   }
 
   /**
@@ -549,10 +556,10 @@ public abstract class Command implements Sendable {
    * How the command behaves when another command with a shared requirement is scheduled.
    *
    * @return a variant of {@link InterruptionBehavior}, defaulting to {@link
-   *     InterruptionBehavior#kCancelSelf kCancelSelf}.
+   *     InterruptionBehavior#CANCEL_SELF CANCEL_SELF}.
    */
   public InterruptionBehavior getInterruptionBehavior() {
-    return InterruptionBehavior.kCancelSelf;
+    return InterruptionBehavior.CANCEL_SELF;
   }
 
   /**
@@ -578,10 +585,28 @@ public abstract class Command implements Sendable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Command");
-    builder.addStringProperty(".name", this::getName, null);
-    builder.addBooleanProperty(
+  public void logTo(TelemetryTable table) {
+    table.log("name", m_name);
+    table.log("running", isScheduled());
+    table.log("isParented", CommandScheduler.getInstance().isComposed(this));
+    table.log("interruptBehavior", getInterruptionBehavior().toString());
+    table.log("runsWhenDisabled", runsWhenDisabled());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "Command";
+  }
+
+  @Override
+  public void publishTunable(TunableTable table) {
+    table.publishValue(
+        "name",
+        this::getName,
+        this::setName,
+        String.class,
+        TunableConfig.of(TunableOption.IMMUTABLE, TunableOption.GET_ON_CHANGE));
+    table.publishBoolean(
         "running",
         this::isScheduled,
         value -> {
@@ -594,12 +619,13 @@ public abstract class Command implements Sendable {
               cancel();
             }
           }
-        });
-    builder.addBooleanProperty(
-        ".isParented", () -> CommandScheduler.getInstance().isComposed(this), null);
-    builder.addStringProperty(
-        "interruptBehavior", () -> getInterruptionBehavior().toString(), null);
-    builder.addBooleanProperty("runsWhenDisabled", this::runsWhenDisabled, null);
+        },
+        TunableConfig.of(TunableOption.ALWAYS_GET));
+  }
+
+  @Override
+  public String getTunableType() {
+    return "Command";
   }
 
   /**
@@ -613,8 +639,8 @@ public abstract class Command implements Sendable {
      *
      * <p>This is the default behavior.
      */
-    kCancelSelf,
+    CANCEL_SELF,
     /** This command continues, and the incoming command is not scheduled. */
-    kCancelIncoming
+    CANCEL_INCOMING
   }
 }

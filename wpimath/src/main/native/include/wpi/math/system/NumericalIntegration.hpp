@@ -87,10 +87,10 @@ T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
   // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
   // Butcher tableau the following arrays came from.
 
-  constexpr int kDim = 7;
+  constexpr int DIM = 7;
 
   // clang-format off
-  constexpr double A[kDim - 1][kDim - 1]{
+  constexpr double A[DIM - 1][DIM - 1]{
       {              0.161},
       {  -0.008480655492357,    0.335480655492357},
       {   2.897153057105494,   -6.359448489975075,    4.362295432869582},
@@ -100,17 +100,17 @@ T Tsit5(F&& f, T x, U u, wpi::units::second_t dt, double maxError = 1e-6) {
       {   0.096460766818065,     0.01,                0.479889650414500,   1.379008574103742,  -3.290069515436081,   2.324710524099774}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{0.09646076681806523,
-                                        0.01,
-                                        0.4798896504144996,
-                                        1.379008574103742,
-                                        -3.290069515436081,
-                                        2.324710524099774,
-                                        0.0};
-  constexpr std::array<double, kDim> b2{0.001780011052226,  0.000816434459657,
-                                        -0.007880878010262, 0.144711007173263,
-                                        -0.582357165452555, 0.458082105929187,
-                                        1.0 / 66.0};
+  constexpr std::array<double, DIM> b1{0.09646076681806523,
+                                       0.01,
+                                       0.4798896504144996,
+                                       1.379008574103742,
+                                       -3.290069515436081,
+                                       2.324710524099774,
+                                       0.0};
+  constexpr std::array<double, DIM> b2{0.001780011052226,  0.000816434459657,
+                                       -0.007880878010262, 0.144711007173263,
+                                       -0.582357165452555, 0.458082105929187,
+                                       1.0 / 66.0};
 
   // Loop until dt has elapsed
   double dtElapsed = 0.0;
@@ -171,10 +171,10 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
   // See http://users.uoa.gr/~tsitourasc/RK54_new_v2.pdf Table 1 for the
   // Butcher tableau the following arrays came from.
 
-  constexpr int kDim = 7;
+  constexpr int DIM = 7;
 
   // clang-format off
-  constexpr double A[kDim - 1][kDim - 1]{
+  constexpr double A[DIM - 1][DIM - 1]{
       {              0.161},
       {  -0.008480655492357,    0.335480655492357},
       {   2.897153057105494,   -6.359448489975075,    4.362295432869582},
@@ -184,19 +184,19 @@ T Tsit5(F&& f, wpi::units::second_t t, T y, wpi::units::second_t dt,
       {   0.096460766818065,     0.01,                0.479889650414500,   1.379008574103742,  -3.290069515436081,   2.324710524099774}};
   // clang-format on
 
-  constexpr std::array<double, kDim> b1{0.09646076681806523,
-                                        0.01,
-                                        0.4798896504144996,
-                                        1.379008574103742,
-                                        -3.290069515436081,
-                                        2.324710524099774,
-                                        0.0};
-  constexpr std::array<double, kDim> b2{0.001780011052226,  0.000816434459657,
-                                        -0.007880878010262, 0.144711007173263,
-                                        -0.582357165452555, 0.458082105929187,
-                                        1.0 / 66.0};
+  constexpr std::array<double, DIM> b1{0.09646076681806523,
+                                       0.01,
+                                       0.4798896504144996,
+                                       1.379008574103742,
+                                       -3.290069515436081,
+                                       2.324710524099774,
+                                       0.0};
+  constexpr std::array<double, DIM> b2{0.001780011052226,  0.000816434459657,
+                                       -0.007880878010262, 0.144711007173263,
+                                       -0.582357165452555, 0.458082105929187,
+                                       1.0 / 66.0};
 
-  constexpr std::array<double, kDim - 1> c{
+  constexpr std::array<double, DIM - 1> c{
       0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
 
   // Loop until dt has elapsed

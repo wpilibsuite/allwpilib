@@ -165,34 +165,46 @@ class OpModeRobotBase : public RobotBase {
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color
    * @param backgroundColor background color
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group,
-                        std::string_view description,
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
                         const wpi::util::Color& textColor,
-                        const wpi::util::Color& backgroundColor);
+                        const wpi::util::Color& backgroundColor,
+                        OpModeFactory factory);
 
   /**
    * Adds an operating mode option using a factory function that creates the
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group = {},
-                        std::string_view description = {});
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
+                        OpModeFactory factory);
+
+  /**
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param factory factory function
+   */
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        OpModeFactory factory);
 
   /**
    * Removes an operating mode option. It's necessary to call PublishOpModes()
@@ -311,11 +323,11 @@ class OpModeRobot : public OpModeRobotBase {
                  const wpi::util::Color& backgroundColor) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
       AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description, textColor, backgroundColor);
+          mode, name, group, description, textColor, backgroundColor,
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description, textColor, backgroundColor);
+      AddOpModeFactory(mode, name, group, description, textColor,
+                       backgroundColor, [] { return std::make_unique<T>(); });
     }
   }
 
@@ -336,12 +348,12 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view group = {},
                  std::string_view description = {}) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description);
+      AddOpModeFactory(mode, name, group, description, [this] {
+        return std::make_unique<T>(*static_cast<Derived*>(this));
+      });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description);
+      AddOpModeFactory(mode, name, group, description,
+                       [] { return std::make_unique<T>(); });
     }
   }
 };

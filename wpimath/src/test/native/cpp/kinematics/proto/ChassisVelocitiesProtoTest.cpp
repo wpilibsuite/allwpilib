@@ -11,19 +11,19 @@ using namespace wpi::math;
 
 namespace {
 
-const ChassisVelocities kExpectedData =
+const ChassisVelocities EXPECTED_DATA =
     ChassisVelocities{2.29_mps, 2.2_mps, 0.3504_rad_per_s};
 }  // namespace
 
 TEST_CASE("ChassisVelocitiesProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.vx.value() == unpacked_data->vx.value());
-  CHECK(kExpectedData.vy.value() == unpacked_data->vy.value());
-  CHECK(kExpectedData.omega.value() == unpacked_data->omega.value());
+  CHECK(EXPECTED_DATA.vx.value() == unpacked_data->vx.value());
+  CHECK(EXPECTED_DATA.vy.value() == unpacked_data->vy.value());
+  CHECK(EXPECTED_DATA.omega.value() == unpacked_data->omega.value());
 }

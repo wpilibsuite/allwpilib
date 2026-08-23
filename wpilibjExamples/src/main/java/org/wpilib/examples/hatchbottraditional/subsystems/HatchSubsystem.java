@@ -9,18 +9,19 @@ import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.examples.hatchbottraditional.Constants.HatchConstants;
+import org.wpilib.hardware.bus.CANBus;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /** A hatch mechanism actuated by a single {@link DoubleSolenoid}. */
 public class HatchSubsystem extends SubsystemBase {
   private final DoubleSolenoid hatchSolenoid =
       new DoubleSolenoid(
-          0,
+          CANBus.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
-          HatchConstants.kHatchSolenoidPorts[0],
-          HatchConstants.kHatchSolenoidPorts[1]);
+          HatchConstants.HATCH_SOLENOID_PORTS[0],
+          HatchConstants.HATCH_SOLENOID_PORTS[1]);
 
   /** Grabs the hatch. */
   public void grabHatch() {
@@ -33,9 +34,9 @@ public class HatchSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
     // Publish the solenoid state to telemetry.
-    builder.addBooleanProperty("extended", () -> hatchSolenoid.get() == FORWARD, null);
+    table.log("extended", hatchSolenoid.get() == FORWARD);
   }
 }

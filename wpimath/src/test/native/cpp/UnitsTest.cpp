@@ -6,6 +6,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <memory>
 #if __has_include(<format>) && !defined(UNIT_LIB_DISABLE_FMT)
 #include <format>
 #endif
@@ -21,6 +22,15 @@
 
 #include "wpi/math/TestAssertions.hpp"
 
+#include "wpi/telemetry/MockTelemetryBackend.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/MockTunableBackend.hpp"
+#include "wpi/tunables/Tunable.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/Tunables.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
@@ -59,6 +69,7 @@
 #include "wpi/units/temperature.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/torque.hpp"
+#include "wpi/units/tunable.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/units/volume.hpp"
@@ -146,6 +157,43 @@ std::string StreamOutput(F&& func) {
   return output.str();
 }
 #endif
+
+class UnitTelemetry {
+ public:
+  UnitTelemetry() {
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
+  }
+
+  ~UnitTelemetry() { wpi::telemetry::TelemetryRegistry::Reset(); }
+
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> mock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+};
+
+class UnitComplexTunable final : public wpi::tunables::ComplexTunable {
+ public:
+  std::string_view GetTunableType() const override { return "UnitComplex"; }
+
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
+    table.Publish("distance", this, &UnitComplexTunable::distance);
+  }
+
+  foot_t distance{1_ft};
+};
+
+class UnitTunable {
+ public:
+  UnitTunable() {
+    wpi::tunables::TunableRegistry::Reset();
+    wpi::tunables::TunableRegistry::RegisterBackend("", mock);
+  }
+
+  ~UnitTunable() { wpi::tunables::TunableRegistry::Reset(); }
+
+  std::shared_ptr<wpi::tunables::MockTunableBackend> mock =
+      std::make_shared<wpi::tunables::MockTunableBackend>();
+};
 }  // namespace
 
 TEST_CASE_METHOD(TypeTraits, "TypeTraits isRatio", "[wpimath]") {
@@ -3334,4 +3382,85 @@ TEST_CASE("Units overloadResolution", "[wpimath]") {
   };
   // Make sure this properly selects the meter overload
   CHECK(Scope::f(1_mm));
+}
+
+static_assert(wpi::telemetry::SupportsTelemetryValue<wpi::units::meter_t>);
+
+TEST_CASE_METHOD(UnitTelemetry, "UnitTelemetry Log", "[wpimath]") {
+  wpi::telemetry::TelemetryTable& table = wpi::telemetry::TelemetryRegistry::GetTable("/");
+  table.Log("testmeter", meter_t(5));
+  table.Log("testsquaremeter", square_meter_t(3));
+  table.Log("testwatt", watt_t(3));
+  auto actions = mock->GetActions();
+  REQUIRE(actions.size() == 6u);
+
+  REQUIRE(actions[0].path == "/testmeter");
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[0].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[0].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[0].value)
+              .value == "\"m\"");
+
+  REQUIRE(actions[1].path == "/testmeter");
+  REQUIRE(std::holds_alternative<double>(actions[1].value));
+  REQUIRE(std::get<double>(actions[1].value) == 5);
+
+  REQUIRE(actions[2].path == "/testsquaremeter");
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[2].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[2].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[2].value)
+              .value == "\"m^2\"");
+
+  REQUIRE(actions[3].path == "/testsquaremeter");
+  REQUIRE(std::holds_alternative<double>(actions[3].value));
+  REQUIRE(std::get<double>(actions[3].value) == 3);
+
+  REQUIRE(actions[4].path == "/testwatt");
+  REQUIRE(std::holds_alternative<
+          wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(actions[4].value));
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[4].value)
+              .key == "unit");
+  REQUIRE(std::get<wpi::telemetry::MockTelemetryBackend::SetPropertyValue>(
+              actions[4].value)
+              .value == "\"m^2 kg s^-3\"");
+
+  REQUIRE(actions[5].path == "/testwatt");
+  REQUIRE(std::holds_alternative<double>(actions[5].value));
+  REQUIRE(std::get<double>(actions[5].value) == 3);
+}
+
+TEST_CASE_METHOD(UnitTunable, "UnitTunable PublishAndTune", "[wpimath]") {
+  wpi::tunables::Tunable<foot_t> distance{6_ft};
+  wpi::tunables::Publish("distance", distance);
+  auto distanceUid = mock->GetUid("/distance");
+  REQUIRE(distanceUid);
+  auto distanceInfo = wpi::tunables::TunableRegistry::GetTunable(*distanceUid);
+  REQUIRE(distanceInfo.config);
+  CHECK(distanceInfo.config->properties.at("unit") == "m");
+
+  mock->SetDouble("/distance", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(distance.Get() == 2_m);
+
+  UnitComplexTunable complex;
+  wpi::tunables::Publish("complex", complex);
+  auto memberUid = mock->GetUid("/complex/distance");
+  REQUIRE(memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo.config);
+  CHECK(memberInfo.config->properties.at("unit") == "m");
+
+  mock->SetDouble("/complex/distance", 3.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(complex.distance == 3_m);
 }

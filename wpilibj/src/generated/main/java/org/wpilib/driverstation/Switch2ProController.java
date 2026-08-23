@@ -11,8 +11,9 @@ import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
 import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Handle input from Switch2Pro controllers connected to the Driver Station.
@@ -20,7 +21,9 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Switch2Pro input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class Switch2ProController implements HIDDevice, Sendable {
+public class Switch2ProController implements HIDDevice, TelemetryLoggable {
+  private static final double MAX_DEADBAND = Math.nextDown(1.0);
+
   /** The number of touchpads supported by this controller. */
   public static final int TOUCHPAD_COUNT = 0;
 
@@ -124,6 +127,20 @@ public class Switch2ProController implements HIDDevice, Sendable {
     }
   }
 
+  private double m_leftXDeadband = 0.1;
+  private double m_leftYDeadband = 0.1;
+  private double m_rightXDeadband = 0.1;
+  private double m_rightYDeadband = 0.1;
+  private double m_ZLDeadband = 0.01;
+  private double m_ZRDeadband = 0.01;
+
+  private static double clampDeadband(double deadband) {
+    if (Double.isNaN(deadband)) {
+      return 0.0;
+    }
+    return Math.clamp(deadband, 0.0, MAX_DEADBAND);
+  }
+
   private final GenericHID m_hid;
 
   /**
@@ -187,55 +204,133 @@ public class Switch2ProController implements HIDDevice, Sendable {
   /**
    * Get the Left X value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftX() {
-    return getAxis(Axis.LEFT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_X), m_leftXDeadband);
+  }
+
+  /**
+   * Set the deadband for the Left X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftXDeadband(double deadband) {
+    m_leftXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the Left Y value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setLeftYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getLeftY() {
-    return getAxis(Axis.LEFT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.LEFT_Y), m_leftYDeadband);
+  }
+
+  /**
+   * Set the deadband for the Left Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setLeftYDeadband(double deadband) {
+    m_leftYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the Right X value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightXDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightX() {
-    return getAxis(Axis.RIGHT_X);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_X), m_rightXDeadband);
+  }
+
+  /**
+   * Set the deadband for the Right X axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightXDeadband(double deadband) {
+    m_rightXDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the Right Y value of the controller.
    *
+   * <p>A deadband of 0.1 is applied by default. Use {@link #setRightYDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getRightY() {
-    return getAxis(Axis.RIGHT_Y);
+    return MathUtil.applyDeadband(getAxis(Axis.RIGHT_Y), m_rightYDeadband);
+  }
+
+  /**
+   * Set the deadband for the Right Y axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setRightYDeadband(double deadband) {
+    m_rightYDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the ZL value of the controller.
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setZLDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getZL() {
-    return getAxis(Axis.ZL);
+    return MathUtil.applyDeadband(getAxis(Axis.ZL), m_ZLDeadband);
+  }
+
+  /**
+   * Set the deadband for the ZL axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setZLDeadband(double deadband) {
+    m_ZLDeadband = clampDeadband(deadband);
   }
 
   /**
    * Get the ZR value of the controller.
    *
+   * <p>A deadband of 0.01 is applied by default. Use {@link #setZRDeadband} to change it.
+   *
    * @return The axis value.
    */
   public double getZR() {
-    return getAxis(Axis.ZR);
+    return MathUtil.applyDeadband(getAxis(Axis.ZR), m_ZRDeadband);
+  }
+
+  /**
+   * Set the deadband for the ZR axis.
+   *
+   * <p>The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  public void setZRDeadband(double deadband) {
+    m_ZRDeadband = clampDeadband(deadband);
   }
 
   /**
@@ -1062,33 +1157,36 @@ public class Switch2ProController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Switch2Pro");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("ZL", this::getZL, null);
-    builder.addDoubleProperty("ZR", this::getZR, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Minus", this::getMinusButton, null);
-    builder.addBooleanProperty("Home", this::getHomeButton, null);
-    builder.addBooleanProperty("Plus", this::getPlusButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("L", this::getLButton, null);
-    builder.addBooleanProperty("R", this::getRButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Capture", this::getCaptureButton, null);
-    builder.addBooleanProperty("GR", this::getGRButton, null);
-    builder.addBooleanProperty("GL", this::getGLButton, null);
-    builder.addBooleanProperty("C", this::getCButton, null);
+  public String getTelemetryType() {
+    return "HID:Switch2Pro";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("ZL", getZL());
+    table.log("ZR", getZR());
+    table.log("BButton", getBButton());
+    table.log("AButton", getAButton());
+    table.log("YButton", getYButton());
+    table.log("XButton", getXButton());
+    table.log("MinusButton", getMinusButton());
+    table.log("HomeButton", getHomeButton());
+    table.log("PlusButton", getPlusButton());
+    table.log("LeftStickButton", getLeftStickButton());
+    table.log("RightStickButton", getRightStickButton());
+    table.log("LButton", getLButton());
+    table.log("RButton", getRButton());
+    table.log("DpadUpButton", getDpadUpButton());
+    table.log("DpadDownButton", getDpadDownButton());
+    table.log("DpadLeftButton", getDpadLeftButton());
+    table.log("DpadRightButton", getDpadRightButton());
+    table.log("CaptureButton", getCaptureButton());
+    table.log("GRButton", getGRButton());
+    table.log("GLButton", getGLButton());
+    table.log("CButton", getCButton());
   }
 }

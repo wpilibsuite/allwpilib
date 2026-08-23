@@ -398,7 +398,7 @@ TEST_CASE("LEDPatternTest LEDDataSetHSVExactRgbValues", "[wpilibc]") {
     int b;
   };
 
-  constexpr TestCase kCases[] = {
+  constexpr TestCase CASES[] = {
       {0, 0, 0, 0, 0, 0},          {0, 0, 255, 255, 255, 255},
       {0, 255, 255, 255, 0, 0},    {60, 255, 255, 0, 255, 0},
       {120, 255, 255, 0, 0, 255},  {30, 255, 255, 255, 255, 0},
@@ -407,7 +407,7 @@ TEST_CASE("LEDPatternTest LEDDataSetHSVExactRgbValues", "[wpilibc]") {
       {120, 255, 128, 0, 0, 128},
   };
 
-  for (const auto& test : kCases) {
+  for (const auto& test : CASES) {
     UNSCOPED_INFO("SetHSV(" << test.h << ", " << test.s << ", " << test.v
                             << ")");
     AddressableLED::LEDData data;
@@ -430,12 +430,12 @@ TEST_CASE("LEDPatternTest RainbowFullSizeExactRgbValues", "[wpilibc]") {
     int b;
   };
 
-  constexpr TestCase kCases[] = {
+  constexpr TestCase CASES[] = {
       {0, 255, 0, 0},    {30, 255, 255, 0}, {60, 0, 255, 0},
       {90, 0, 255, 255}, {120, 0, 0, 255},  {150, 255, 0, 255},
   };
 
-  for (const auto& test : kCases) {
+  for (const auto& test : CASES) {
     UNSCOPED_INFO("LED " << test.index);
     CHECK(test.r == (buffer[test.index].r & 0xFF));
     CHECK(test.g == (buffer[test.index].g & 0xFF));

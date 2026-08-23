@@ -65,6 +65,8 @@ wpilib_cc_shared_library(
     name = "shared/halsim_gui",
     dynamic_deps = [
         "//hal:shared/wpiHal",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//datalog:shared/datalog",
         "//ntcore:shared/ntcore",

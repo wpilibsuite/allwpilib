@@ -34,9 +34,9 @@ import org.wpilib.networktables.Topic;
  */
 public final class Preferences {
   /** The Preferences table name. */
-  private static final String kTableName = "Preferences";
+  private static final String TABLE_NAME = "Preferences";
 
-  private static final String kSmartDashboardType = "RobotPreferences";
+  private static final String SMART_DASHBOARD_TYPE = "RobotPreferences";
 
   /** The network table. */
   private static NetworkTable m_table;
@@ -59,7 +59,7 @@ public final class Preferences {
    * @param inst NetworkTable instance
    */
   public static synchronized void setNetworkTableInstance(NetworkTableInstance inst) {
-    m_table = inst.getTable(kTableName);
+    m_table = inst.getTable(TABLE_NAME);
     if (m_typePublisher != null) {
       m_typePublisher.close();
     }
@@ -67,8 +67,8 @@ public final class Preferences {
         m_table
             .getStringTopic(".type")
             .publishEx(
-                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
-    m_typePublisher.set(kSmartDashboardType);
+                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}");
+    m_typePublisher.set(SMART_DASHBOARD_TYPE);
 
     // Subscribe to all Preferences; this ensures we get the latest values
     // ahead of a getter call.

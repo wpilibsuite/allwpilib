@@ -30,10 +30,10 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for PWM", 0,
-                                       kNumSmartIo - 1, channel);
+                                       NUM_SMART_IO - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -90,7 +90,7 @@ void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return channel < kNumSmartIo && channel >= 0;
+  return channel < NUM_SMART_IO && channel >= 0;
 }
 
 void HAL_SetPWMPulseTimeMicroseconds(HAL_DigitalHandle pwmPortHandle,

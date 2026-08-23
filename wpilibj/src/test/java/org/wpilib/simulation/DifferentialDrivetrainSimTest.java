@@ -57,9 +57,9 @@ class DifferentialDrivetrainSimTest {
 
     var traj =
         DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.kZero,
+            Pose2d.ZERO,
             List.of(),
-            new Pose2d(2, 2, Rotation2d.kZero),
+            new Pose2d(2, 2, Rotation2d.ZERO),
             new TrajectoryConfig(1, 1)
                 .addConstraint(new DifferentialDriveKinematicsConstraint(kinematics, 1)));
 

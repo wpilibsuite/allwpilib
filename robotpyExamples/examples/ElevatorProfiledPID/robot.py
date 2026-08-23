@@ -8,6 +8,7 @@
 import math
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 
@@ -26,7 +27,7 @@ class MyRobot(wpilib.TimedRobot):
         super().__init__()
         self.joystick = wpilib.Joystick(1)
         self.encoder = wpilib.Encoder(2, 3)
-        self.motor = wpilib.PWMSparkMax(1)
+        self.motor = wpilib_drivers.PWMSparkMax(1)
 
         # Create a PID controller whose setpoint's change is subject to maximum
         # velocity and acceleration constraints.

@@ -6,6 +6,7 @@
 import math
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 
@@ -20,10 +21,10 @@ class Drivetrain:
     ENCODER_RESOLUTION = 4096  # counts per revolution
 
     def __init__(self) -> None:
-        self.left_leader = wpilib.PWMSparkMax(1)
-        self.left_follower = wpilib.PWMSparkMax(2)
-        self.right_leader = wpilib.PWMSparkMax(3)
-        self.right_follower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib_drivers.PWMSparkMax(1)
+        self.left_follower = wpilib_drivers.PWMSparkMax(2)
+        self.right_leader = wpilib_drivers.PWMSparkMax(3)
+        self.right_follower = wpilib_drivers.PWMSparkMax(4)
 
         # Make sure both motors for each side are in the same group
         self.left_leader.add_follower(self.left_follower)

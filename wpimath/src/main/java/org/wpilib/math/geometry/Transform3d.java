@@ -31,7 +31,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    *
    * <p>This exists to avoid allocations for common transformations.
    */
-  public static final Transform3d kZero = new Transform3d();
+  public static final Transform3d ZERO = new Transform3d();
 
   private final Translation3d m_translation;
   private final Rotation3d m_rotation;
@@ -109,8 +109,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
-    m_translation = Translation3d.kZero;
-    m_rotation = Rotation3d.kZero;
+    m_translation = Translation3d.ZERO;
+    m_rotation = Rotation3d.ZERO;
   }
 
   /**
@@ -153,7 +153,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The composition of the two transformations.
    */
   public Transform3d plus(Transform3d other) {
-    return new Transform3d(Pose3d.kZero, Pose3d.kZero.transformBy(this).transformBy(other));
+    return new Transform3d(Pose3d.ZERO, Pose3d.ZERO.transformBy(this).transformBy(other));
   }
 
   /**

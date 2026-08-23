@@ -11,7 +11,6 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-
 BASE_RESOURCE_DIR = "/org/wpilib/fields/"
 FIELDS_RESOURCE_DIR = "org/wpilib/fields"
 
@@ -42,11 +41,11 @@ def cpp_nullable_string(value: str | None) -> str:
     return string_literal(value)
 
 
-def number_literal(value: int | float) -> str:
+def number_literal(value: float) -> str:
     return json.dumps(value)
 
 
-def cpp_meter_t(value: int | float) -> str:
+def cpp_meter_t(value: float) -> str:
     return f"wpi::units::meter_t{{{number_literal(value)}}}"
 
 
@@ -68,7 +67,7 @@ def default_enum_name(rel_json: str) -> str:
 def validate_number_object(value: dict, key: str, json_file: Path) -> int | float:
     item = value[key]
     if not isinstance(item, int | float) or isinstance(item, bool):
-        raise ValueError(f"{json_file}: {key} must be a number")
+        raise TypeError(f"{json_file}: {key} must be a number")
     return item
 
 
@@ -85,7 +84,7 @@ def validate_field(json_file: Path, rel_json: str, field: dict):
 
     for key in ("name", "season", "game", "program"):
         if not isinstance(field[key], str):
-            raise ValueError(f"{json_file}: {key} must be a string")
+            raise TypeError(f"{json_file}: {key} must be a string")
 
     program = rel_json.split("/", 1)[0]
     if field["program"] != program:
@@ -101,11 +100,11 @@ def validate_field(json_file: Path, rel_json: str, field: dict):
             raise ValueError(f"{json_file}: field-image path must be a string")
         for key in ("top", "left", "bottom", "right"):
             if not isinstance(image.get(key), int) or isinstance(image.get(key), bool):
-                raise ValueError(f"{json_file}: field-image {key} must be an integer")
+                raise TypeError(f"{json_file}: field-image {key} must be an integer")
 
     field_dimensions = field["field-dimensions"]
     if not isinstance(field_dimensions, dict):
-        raise ValueError(f"{json_file}: field-dimensions must be an object")
+        raise TypeError(f"{json_file}: field-dimensions must be an object")
     validate_number_object(field_dimensions, "length", json_file)
     validate_number_object(field_dimensions, "width", json_file)
 
@@ -115,45 +114,45 @@ def validate_field(json_file: Path, rel_json: str, field: dict):
 
 def validate_field_tags(json_file: Path, tags: list[dict]):
     if not isinstance(tags, list):
-        raise ValueError(f"{json_file}: field-tags must be an array")
+        raise TypeError(f"{json_file}: field-tags must be an array")
 
     for tag in tags:
         if not isinstance(tag, dict):
-            raise ValueError(f"{json_file}: each tag must be an object")
+            raise TypeError(f"{json_file}: each tag must be an object")
         if not isinstance(tag.get("ID"), int):
-            raise ValueError(f"{json_file}: each tag ID must be an integer")
+            raise TypeError(f"{json_file}: each tag ID must be an integer")
         pose = tag.get("pose")
         if not isinstance(pose, dict):
-            raise ValueError(f"{json_file}: each tag pose must be an object")
+            raise TypeError(f"{json_file}: each tag pose must be an object")
         translation = pose.get("translation")
         if not isinstance(translation, dict):
-            raise ValueError(f"{json_file}: each translation must be an object")
+            raise TypeError(f"{json_file}: each translation must be an object")
         for key in ("x", "y", "z"):
             validate_number_object(translation, key, json_file)
         rotation = pose.get("rotation")
         if not isinstance(rotation, dict):
-            raise ValueError(f"{json_file}: each rotation must be an object")
+            raise TypeError(f"{json_file}: each rotation must be an object")
         quaternion = rotation.get("quaternion")
         if not isinstance(quaternion, dict):
-            raise ValueError(f"{json_file}: each quaternion must be an object")
+            raise TypeError(f"{json_file}: each quaternion must be an object")
         for key in ("W", "X", "Y", "Z"):
             validate_number_object(quaternion, key, json_file)
 
 
 def validate_generator_config(config_file: Path, config: dict):
     if not isinstance(config.get("defaultField"), str):
-        raise ValueError(f"{config_file}: defaultField must be a string")
+        raise TypeError(f"{config_file}: defaultField must be a string")
     if not isinstance(config.get("fields"), list):
-        raise ValueError(f"{config_file}: fields must be an array")
+        raise TypeError(f"{config_file}: fields must be an array")
 
     resources = set()
     enums = set()
     for entry in config["fields"]:
         if not isinstance(entry, dict):
-            raise ValueError(f"{config_file}: each field entry must be an object")
+            raise TypeError(f"{config_file}: each field entry must be an object")
         for key in ("resource", "enum"):
             if not isinstance(entry.get(key), str):
-                raise ValueError(f"{config_file}: each field entry needs {key}")
+                raise TypeError(f"{config_file}: each field entry needs {key}")
         if entry["resource"] in resources:
             raise ValueError(f"{config_file}: duplicate resource {entry['resource']}")
         if entry["enum"] in enums:

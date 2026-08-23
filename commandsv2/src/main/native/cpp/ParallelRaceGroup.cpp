@@ -67,8 +67,8 @@ void ParallelRaceGroup::AddCommands(
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
       if (command->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+          Command::InterruptionBehavior::CANCEL_SELF) {
+        m_interruptBehavior = Command::InterruptionBehavior::CANCEL_SELF;
       }
       m_commands.emplace_back(std::move(command));
     } else {

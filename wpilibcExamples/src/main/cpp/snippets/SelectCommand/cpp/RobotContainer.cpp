@@ -4,16 +4,16 @@
 
 #include "RobotContainer.hpp"
 
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  chooser.SetDefaultOption("ONE", CommandSelector::ONE);
-  chooser.AddOption("TWO", CommandSelector::TWO);
-  chooser.AddOption("THREE", CommandSelector::THREE);
+  chooser.AddDefault("ONE", CommandSelector::ONE);
+  chooser.Add("TWO", CommandSelector::TWO);
+  chooser.Add("THREE", CommandSelector::THREE);
 
-  wpi::SmartDashboard::PutData("Auto Chooser", &chooser);
+  wpi::tunables::Publish("Auto Chooser", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();

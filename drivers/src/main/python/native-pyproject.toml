@@ -1,0 +1,40 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "hatchling",
+    "hatch-nativelib~=0.2.0",
+    "hatch-robotpy~=0.2.1",
+    "robotpy-native-wpilib==0.0.0",
+]
+
+[project]
+name = "robotpy-native-wpilib-drivers"
+version = "0.0.0"
+description = "WPILib third-party drivers library"
+requires-python = ">=3.11"
+license = "BSD-3-Clause"
+
+dependencies = [
+    "robotpy-native-wpilib==0.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/native"]
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "drivers-cpp"
+group_id = "org.wpilib.drivers"
+repo_url = ""
+version = "0.0.0"
+
+extract_to = "src/native/wpilib_drivers"
+libs = ["drivers"]
+
+[[tool.hatch.build.hooks.nativelib.pcfile]]
+pcfile = "src/native/wpilib_drivers/robotpy-native-wpilib-drivers.pc"
+name = "wpilib_drivers"
+
+includedir = "src/native/wpilib_drivers/include"
+libdir = "src/native/wpilib_drivers/lib"
+shared_libraries = ["drivers"]
+requires = ["robotpy-native-wpilib"]

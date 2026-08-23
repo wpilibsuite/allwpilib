@@ -15,11 +15,11 @@ using namespace wpi;
 Joystick::Joystick(int port) : Joystick{DriverStation::GetGenericHID(port)} {}
 
 Joystick::Joystick(GenericHID& hid) : m_hid{&hid} {
-  m_axes[Axis::kX] = kDefaultXChannel;
-  m_axes[Axis::kY] = kDefaultYChannel;
-  m_axes[Axis::kZ] = kDefaultZChannel;
-  m_axes[Axis::kTwist] = kDefaultTwistChannel;
-  m_axes[Axis::kThrottle] = kDefaultThrottleChannel;
+  m_axes[Axis::X] = DEFAULT_X_CHANNEL;
+  m_axes[Axis::Y] = DEFAULT_Y_CHANNEL;
+  m_axes[Axis::Z] = DEFAULT_Z_CHANNEL;
+  m_axes[Axis::TWIST] = DEFAULT_TWIST_CHANNEL;
+  m_axes[Axis::THROTTLE] = DEFAULT_THROTTLE_CHANNEL;
 
   HAL_ReportUsage("HID", hid.GetPort(), "Joystick");
 }
@@ -33,43 +33,43 @@ const GenericHID& Joystick::GetHID() const {
 }
 
 void Joystick::SetXChannel(int channel) {
-  m_axes[Axis::kX] = channel;
+  m_axes[Axis::X] = channel;
 }
 
 void Joystick::SetYChannel(int channel) {
-  m_axes[Axis::kY] = channel;
+  m_axes[Axis::Y] = channel;
 }
 
 void Joystick::SetZChannel(int channel) {
-  m_axes[Axis::kZ] = channel;
+  m_axes[Axis::Z] = channel;
 }
 
 void Joystick::SetTwistChannel(int channel) {
-  m_axes[Axis::kTwist] = channel;
+  m_axes[Axis::TWIST] = channel;
 }
 
 void Joystick::SetThrottleChannel(int channel) {
-  m_axes[Axis::kThrottle] = channel;
+  m_axes[Axis::THROTTLE] = channel;
 }
 
 int Joystick::GetXChannel() const {
-  return m_axes[Axis::kX];
+  return m_axes[Axis::X];
 }
 
 int Joystick::GetYChannel() const {
-  return m_axes[Axis::kY];
+  return m_axes[Axis::Y];
 }
 
 int Joystick::GetZChannel() const {
-  return m_axes[Axis::kZ];
+  return m_axes[Axis::Z];
 }
 
 int Joystick::GetTwistChannel() const {
-  return m_axes[Axis::kTwist];
+  return m_axes[Axis::TWIST];
 }
 
 int Joystick::GetThrottleChannel() const {
-  return m_axes[Axis::kThrottle];
+  return m_axes[Axis::THROTTLE];
 }
 
 bool Joystick::GetRawButton(int button) const {
@@ -93,35 +93,35 @@ POVDirection Joystick::GetPOV(int pov) const {
 }
 
 double Joystick::GetX() const {
-  return m_hid->GetRawAxis(m_axes[Axis::kX]);
+  return m_hid->GetRawAxis(m_axes[Axis::X]);
 }
 
 double Joystick::GetY() const {
-  return m_hid->GetRawAxis(m_axes[Axis::kY]);
+  return m_hid->GetRawAxis(m_axes[Axis::Y]);
 }
 
 double Joystick::GetZ() const {
-  return m_hid->GetRawAxis(m_axes[Axis::kZ]);
+  return m_hid->GetRawAxis(m_axes[Axis::Z]);
 }
 
 double Joystick::GetTwist() const {
-  return m_hid->GetRawAxis(m_axes[Axis::kTwist]);
+  return m_hid->GetRawAxis(m_axes[Axis::TWIST]);
 }
 
 double Joystick::GetThrottle() const {
-  return m_hid->GetRawAxis(m_axes[Axis::kThrottle]);
+  return m_hid->GetRawAxis(m_axes[Axis::THROTTLE]);
 }
 
 bool Joystick::GetTrigger() const {
-  return m_hid->GetRawButton(Button::kTrigger);
+  return m_hid->GetRawButton(Button::TRIGGER);
 }
 
 bool Joystick::GetTriggerPressed() {
-  return m_hid->GetRawButtonPressed(Button::kTrigger);
+  return m_hid->GetRawButtonPressed(Button::TRIGGER);
 }
 
 bool Joystick::GetTriggerReleased() {
-  return m_hid->GetRawButtonReleased(Button::kTrigger);
+  return m_hid->GetRawButtonReleased(Button::TRIGGER);
 }
 
 BooleanEvent Joystick::Trigger(EventLoop* loop) const {
@@ -129,15 +129,15 @@ BooleanEvent Joystick::Trigger(EventLoop* loop) const {
 }
 
 bool Joystick::GetTop() const {
-  return m_hid->GetRawButton(Button::kTop);
+  return m_hid->GetRawButton(Button::TOP);
 }
 
 bool Joystick::GetTopPressed() {
-  return m_hid->GetRawButtonPressed(Button::kTop);
+  return m_hid->GetRawButtonPressed(Button::TOP);
 }
 
 bool Joystick::GetTopReleased() {
-  return m_hid->GetRawButtonReleased(Button::kTop);
+  return m_hid->GetRawButtonReleased(Button::TOP);
 }
 
 BooleanEvent Joystick::Top(EventLoop* loop) const {

@@ -24,17 +24,17 @@ HAL_DigitalHandle HAL_InitializePWMPort(int32_t channel,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumPWMChannels) {
+  if (channel < 0 || channel >= NUM_PWM_CHANNELS) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for PWM", 0,
-                                       kNumPWMChannels - 1, channel);
+                                       NUM_PWM_CHANNELS - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
   uint8_t origChannel = static_cast<uint8_t>(channel);
 
-  if (origChannel < kNumPWMHeaders) {
-    channel += kNumDigitalChannels;  // remap Headers to end of allocations
+  if (origChannel < NUM_PWM_HEADERS) {
+    channel += NUM_DIGITAL_CHANNELS;  // remap Headers to end of allocations
   } else {
     channel = remapMXPPWMChannel(channel) + 10;  // remap MXP to proper channel
   }
@@ -71,7 +71,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle) {
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
-  return channel < kNumPWMChannels && channel >= 0;
+  return channel < NUM_PWM_CHANNELS && channel >= 0;
 }
 
 void HAL_SetPWMSimDevice(HAL_DigitalHandle handle, HAL_SimDeviceHandle device) {

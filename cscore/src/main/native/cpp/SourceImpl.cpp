@@ -21,7 +21,7 @@
 
 using namespace wpi::cs;
 
-static constexpr size_t kMaxImagesAvail = 32;
+static constexpr size_t MAX_IMAGES_AVAIL = 32;
 
 SourceImpl::SourceImpl(std::string_view name, wpi::util::Logger& logger,
                        Notifier& notifier, Telemetry& telemetry)
@@ -552,7 +552,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
   if (it != m_imagesAvail.end()) {
     *it = std::move(image);
-  } else if (m_imagesAvail.size() > kMaxImagesAvail) {
+  } else if (m_imagesAvail.size() > MAX_IMAGES_AVAIL) {
     // Replace smallest buffer; don't need to check for null because the above
     // find would have found it.
     auto it2 = std::min_element(

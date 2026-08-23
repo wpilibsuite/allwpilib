@@ -7,7 +7,7 @@ package org.wpilib.command2;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs a set of commands in parallel, ending only when a specific
@@ -28,7 +28,7 @@ public class ParallelDeadlineGroup extends Command {
   private boolean m_runWhenDisabled = true;
   private boolean m_finished = true;
   private Command m_deadline;
-  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.CANCEL_INCOMING;
 
   /**
    * Creates a new ParallelDeadlineGroup. The given commands, including the deadline, will be
@@ -88,8 +88,8 @@ public class ParallelDeadlineGroup extends Command {
       m_commands.put(command, false);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
-      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
-        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      if (command.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF) {
+        m_interruptBehavior = InterruptionBehavior.CANCEL_SELF;
       }
     }
   }
@@ -145,9 +145,8 @@ public class ParallelDeadlineGroup extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-
-    builder.addStringProperty("deadline", m_deadline::getName, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("deadline", m_deadline.getName());
   }
 }

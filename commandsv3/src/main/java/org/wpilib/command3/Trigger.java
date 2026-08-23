@@ -283,7 +283,7 @@ public class Trigger implements BooleanSupplier {
    * @return The debounced trigger (rising edges debounced only)
    */
   public Trigger debounce(Time duration) {
-    return debounce(duration, Debouncer.DebounceType.kRising);
+    return debounce(duration, Debouncer.DebounceType.RISING);
   }
 
   /**

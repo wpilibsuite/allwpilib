@@ -426,13 +426,14 @@ Java_org_wpilib_datalog_DataLogJNI_appendRaw
     return;
   }
   CriticalJSpan<const jbyte> cvalue{env, value};
-  if (static_cast<unsigned int>(start + length) > cvalue.size()) {
-    wpi::ThrowIndexOobException(
-        env, "start + len must be smaller than array length");
+  size_t startPos = static_cast<size_t>(start);
+  size_t lengthSize = static_cast<size_t>(length);
+  if (startPos > cvalue.size() || lengthSize > cvalue.size() - startPos) {
+    wpi::ThrowIndexOobException(env, "start + len must be within array length");
     return;
   }
   reinterpret_cast<DataLog*>(impl)->AppendRaw(
-      entry, cvalue.uarray().subspan(start, length), timestamp);
+      entry, cvalue.uarray().subspan(startPos, lengthSize), timestamp);
 }
 
 /*
@@ -461,14 +462,21 @@ Java_org_wpilib_datalog_DataLogJNI_appendRawBuffer
     wpi::ThrowIndexOobException(env, "length must be >= 0");
     return;
   }
-  JSpan<const jbyte> cvalue{env, value, static_cast<size_t>(start + length)};
+  auto cvalue = JSpan<const jbyte>::Create(
+      env, value, static_cast<size_t>(start), static_cast<size_t>(length));
   if (!cvalue) {
-    wpi::ThrowIllegalArgumentException(env,
-                                       "value must be a native ByteBuffer");
+    if (cvalue.error() ==
+        JSpan<const jbyte>::DirectBufferError::OUT_OF_BOUNDS) {
+      wpi::ThrowIndexOobException(env,
+                                  "start + len must be within buffer capacity");
+    } else {
+      wpi::ThrowIllegalArgumentException(env,
+                                         "value must be a native ByteBuffer");
+    }
     return;
   }
-  reinterpret_cast<DataLog*>(impl)->AppendRaw(
-      entry, cvalue.uarray().subspan(start, length), timestamp);
+  reinterpret_cast<DataLog*>(impl)->AppendRaw(entry, cvalue->uarray(),
+                                              timestamp);
 }
 
 /*

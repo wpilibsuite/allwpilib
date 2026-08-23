@@ -284,7 +284,7 @@ def test_load_field_without_image(tmp_path):
 }
 """
     path = tmp_path / "imageless.json"
-    path.write_text(field_json, encoding="utf-8")
+    path.write_bytes(field_json.encode("utf-8"))
 
     field = robotpy_fields.Field(str(path))
 

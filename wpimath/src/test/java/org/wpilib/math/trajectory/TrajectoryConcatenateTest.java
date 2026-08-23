@@ -17,14 +17,11 @@ class TrajectoryConcatenateTest {
   void testStates() {
     var t1 =
         DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.kZero,
-            List.of(),
-            new Pose2d(1, 1, Rotation2d.kZero),
-            new TrajectoryConfig(2, 2));
+            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.ZERO), new TrajectoryConfig(2, 2));
 
     var t2 =
         DrivetrainSplineTrajectoryGenerator.generate(
-            new Pose2d(1, 1, Rotation2d.kZero),
+            new Pose2d(1, 1, Rotation2d.ZERO),
             List.of(),
             new Pose2d(2, 2, Rotation2d.fromDegrees(45)),
             new TrajectoryConfig(2, 2));

@@ -17,6 +17,7 @@
 
 #endif
 
+#include <chrono>
 #include <format>
 #include <random>
 #include <string>
@@ -29,18 +30,18 @@
 
 using namespace wpi::log;
 
-static constexpr uintmax_t kMinFreeSpace = 5 * 1024 * 1024;
+static constexpr uintmax_t MIN_FREE_SPACE = 5 * 1024 * 1024;
 
 static std::string FormatBytesSize(uintmax_t value) {
-  static constexpr uintmax_t kKiB = 1024;
-  static constexpr uintmax_t kMiB = kKiB * 1024;
-  static constexpr uintmax_t kGiB = kMiB * 1024;
-  if (value >= kGiB) {
-    return std::format("{:.1f} GiB", static_cast<double>(value) / kGiB);
-  } else if (value >= kMiB) {
-    return std::format("{:.1f} MiB", static_cast<double>(value) / kMiB);
-  } else if (value >= kKiB) {
-    return std::format("{:.1f} KiB", static_cast<double>(value) / kKiB);
+  static constexpr uintmax_t KIB = 1024;
+  static constexpr uintmax_t MIB = KIB * 1024;
+  static constexpr uintmax_t GIB = MIB * 1024;
+  if (value >= GIB) {
+    return std::format("{:.1f} GiB", static_cast<double>(value) / GIB);
+  } else if (value >= MIB) {
+    return std::format("{:.1f} MiB", static_cast<double>(value) / MIB);
+  } else if (value >= KIB) {
+    return std::format("{:.1f} KiB", static_cast<double>(value) / KIB);
   } else {
     return std::format("{} B", value);
   }
@@ -59,7 +60,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(wpi::util::Logger& msglog,
                                                  double period,
                                                  std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
-      m_period{period},
+      m_period{period < 0.0 ? 0.0 : period},
       m_newFilename{filename},
       m_thread{[this, dir = std::string{dir}] { WriterThreadMain(dir); }} {}
 
@@ -74,7 +75,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(
     std::function<void(std::span<const uint8_t> data)> write, double period,
     std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
-      m_period{period},
+      m_period{period < 0.0 ? 0.0 : period},
       m_thread{[this, write = std::move(write)] {
         WriterThreadMain(std::move(write));
       }} {}
@@ -83,9 +84,10 @@ DataLogBackgroundWriter::~DataLogBackgroundWriter() {
   {
     std::scoped_lock lock{m_mutex};
     m_shutdown = true;
+    m_wakeup = true;
     m_doFlush = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
   m_thread.join();
 }
 
@@ -93,31 +95,33 @@ void DataLogBackgroundWriter::SetFilename(std::string_view filename) {
   {
     std::scoped_lock lock{m_mutex};
     m_newFilename = filename;
+    m_wakeup = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 void DataLogBackgroundWriter::Flush() {
   {
     std::scoped_lock lock{m_mutex};
+    m_wakeup = true;
     m_doFlush = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 void DataLogBackgroundWriter::Pause() {
   DataLog::Pause();
   std::scoped_lock lock{m_mutex};
-  m_state = kPaused;
+  m_state = PAUSED;
 }
 
 void DataLogBackgroundWriter::Resume() {
   DataLog::Resume();
   std::scoped_lock lock{m_mutex};
-  if (m_state == kPaused) {
-    m_state = kActive;
-  } else if (m_state == kStopped) {
-    m_state = kStart;
+  if (m_state == PAUSED) {
+    m_state = ACTIVE;
+  } else if (m_state == STOPPED) {
+    m_state = START;
   }
 }
 
@@ -125,10 +129,11 @@ void DataLogBackgroundWriter::Stop() {
   DataLog::Stop();
   {
     std::scoped_lock lock{m_mutex};
-    m_state = kStopped;
+    m_state = STOPPED;
     m_newFilename.clear();
+    m_wakeup = true;
   }
-  m_cond.notify_all();
+  m_cond.notify_one();
 }
 
 static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
@@ -237,11 +242,11 @@ void DataLogBackgroundWriter::StartLogFile(WriterThreadState& state) {
   } else {
     state.freeSpace = UINTMAX_MAX;
   }
-  if (state.freeSpace < kMinFreeSpace) {
+  if (state.freeSpace < MIN_FREE_SPACE) {
     WPI_ERROR(m_msglog,
               "Insufficient free space ({} available), no log being saved",
               FormatBytesSize(state.freeSpace));
-    m_state = kStopped;
+    m_state = STOPPED;
   } else {
     // try preferred filename, or randomize it a few times, before giving up
     for (int i = 0; i < 5; ++i) {
@@ -298,13 +303,13 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 
   std::unique_lock lock{m_mutex};
   do {
-    bool doFlush = false;
-    auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
-    if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
-      doFlush = true;
-    }
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
+    bool doFlush = timedOut || m_doFlush;
+    m_wakeup = false;
+    m_doFlush = false;
 
-    if (m_state == kStopped) {
+    if (m_state == STOPPED) {
       state.Close();
       continue;
     }
@@ -335,15 +340,15 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       doStart = true;
     }
 
-    if (m_state == kStart || doStart) {
+    if (m_state == START || doStart) {
       lock.unlock();
       DataLog::Stop();
       StartLogFile(state);
       lock.lock();
-      if (m_state == kStopped) {
+      if (m_state == STOPPED) {
         continue;
       }
-      m_state = kActive;
+      m_state = ACTIVE;
       written = 0;
     }
 
@@ -366,10 +371,12 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       state.SetFilename(newFilename);
     }
 
-    if (doFlush || m_doFlush) {
-      // flush to file
-      m_doFlush = false;
+    if (doFlush) {
+      // Never acquire the base DataLog mutex while holding m_mutex. Append
+      // paths acquire them in the opposite order when BufferHalfFull() runs.
+      lock.unlock();
       DataLog::FlushBufs(&toWrite);
+      lock.lock();
       if (toWrite.empty()) {
         continue;
       }
@@ -393,7 +400,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
           // stop writing when we go below the minimum free space
           state.freeSpace -= buf.GetData().size();
           written += buf.GetData().size();
-          if (state.freeSpace < kMinFreeSpace) {
+          if (state.freeSpace < MIN_FREE_SPACE) {
             [[unlikely]] WPI_ERROR(
                 m_msglog,
                 "Stopped logging due to low free space ({} available)",
@@ -412,14 +419,18 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
 #endif
         lock.lock();
         if (blocked) {
-          [[unlikely]] m_state = kPaused;
+          [[unlikely]] m_state = PAUSED;
         }
       }
 
       // release buffers back to free list
+      lock.unlock();
       ReleaseBufs(&toWrite);
+      lock.lock();
     }
-  } while (!m_shutdown);
+    // If shutdown was requested while writing, loop once more to process the
+    // destructor's flush request.
+  } while (!m_shutdown || m_doFlush);
 }
 
 void DataLogBackgroundWriter::WriterThreadMain(
@@ -432,16 +443,18 @@ void DataLogBackgroundWriter::WriterThreadMain(
 
   std::unique_lock lock{m_mutex};
   do {
-    bool doFlush = false;
-    auto timeoutTime = std::chrono::steady_clock::now() + periodTime;
-    if (m_cond.wait_until(lock, timeoutTime) == std::cv_status::timeout) {
-      doFlush = true;
-    }
+    bool timedOut =
+        !m_cond.wait_for(lock, periodTime, [this] { return m_wakeup; });
+    bool doFlush = timedOut || m_doFlush;
+    m_wakeup = false;
+    m_doFlush = false;
 
-    if (doFlush || m_doFlush) {
-      // flush to file
-      m_doFlush = false;
+    if (doFlush) {
+      // Never acquire the base DataLog mutex while holding m_mutex. Append
+      // paths acquire them in the opposite order when BufferHalfFull() runs.
+      lock.unlock();
       DataLog::FlushBufs(&toWrite);
+      lock.lock();
       if (toWrite.empty()) {
         continue;
       }
@@ -456,9 +469,13 @@ void DataLogBackgroundWriter::WriterThreadMain(
       lock.lock();
 
       // release buffers back to free list
+      lock.unlock();
       ReleaseBufs(&toWrite);
+      lock.lock();
     }
-  } while (!m_shutdown);
+    // If shutdown was requested while writing, loop once more to process the
+    // destructor's flush request.
+  } while (!m_shutdown || m_doFlush);
 
   write({});  // indicate EOF
 }

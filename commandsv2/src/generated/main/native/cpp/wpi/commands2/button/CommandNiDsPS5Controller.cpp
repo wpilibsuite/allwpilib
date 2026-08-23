@@ -23,72 +23,72 @@ CommandNiDsPS5Controller::GetNiDsPS5Controller() {
 
 Trigger CommandNiDsPS5Controller::Square(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kSquare, loop);
+      wpi::NiDsPS5Controller::Button::SQUARE, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Cross(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kCross, loop);
+      wpi::NiDsPS5Controller::Button::CROSS, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Circle(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kCircle, loop);
+      wpi::NiDsPS5Controller::Button::CIRCLE, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Triangle(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kTriangle, loop);
+      wpi::NiDsPS5Controller::Button::TRIANGLE, loop);
 }
 
 Trigger CommandNiDsPS5Controller::L1(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kL1, loop);
+      wpi::NiDsPS5Controller::Button::L1, loop);
 }
 
 Trigger CommandNiDsPS5Controller::R1(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kR1, loop);
+      wpi::NiDsPS5Controller::Button::R1, loop);
 }
 
 Trigger CommandNiDsPS5Controller::L2(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kL2, loop);
+      wpi::NiDsPS5Controller::Button::L2, loop);
 }
 
 Trigger CommandNiDsPS5Controller::R2(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kR2, loop);
+      wpi::NiDsPS5Controller::Button::R2, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Create(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kCreate, loop);
+      wpi::NiDsPS5Controller::Button::CREATE, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Options(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kOptions, loop);
+      wpi::NiDsPS5Controller::Button::OPTIONS, loop);
 }
 
 Trigger CommandNiDsPS5Controller::L3(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kL3, loop);
+      wpi::NiDsPS5Controller::Button::L3, loop);
 }
 
 Trigger CommandNiDsPS5Controller::R3(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kR3, loop);
+      wpi::NiDsPS5Controller::Button::R3, loop);
 }
 
 Trigger CommandNiDsPS5Controller::PS(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kPS, loop);
+      wpi::NiDsPS5Controller::Button::PS, loop);
 }
 
 Trigger CommandNiDsPS5Controller::Touchpad(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS5Controller::Button::kTouchpad, loop);
+      wpi::NiDsPS5Controller::Button::TOUCHPAD, loop);
 }
 
 double CommandNiDsPS5Controller::GetLeftX() const {

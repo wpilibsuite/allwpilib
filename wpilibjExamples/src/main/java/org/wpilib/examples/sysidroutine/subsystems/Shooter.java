@@ -12,8 +12,8 @@ import java.util.function.DoubleSupplier;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.sysidroutine.Constants.ShooterConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
@@ -21,17 +21,17 @@ import org.wpilib.system.RobotController;
 
 public class Shooter extends SubsystemBase {
   // The motor on the shooter wheel .
-  private final PWMSparkMax shooterMotor = new PWMSparkMax(ShooterConstants.kShooterMotorPort);
+  private final PWMSparkMax shooterMotor = new PWMSparkMax(ShooterConstants.SHOOTER_MOTOR_PORT);
 
   // The motor on the feeder wheels.
-  private final PWMSparkMax feederMotor = new PWMSparkMax(ShooterConstants.kFeederMotorPort);
+  private final PWMSparkMax feederMotor = new PWMSparkMax(ShooterConstants.FEEDER_MOTOR_PORT);
 
   // The shooter wheel encoder
   private final Encoder shooterEncoder =
       new Encoder(
-          ShooterConstants.kEncoderPorts[0],
-          ShooterConstants.kEncoderPorts[1],
-          ShooterConstants.kEncoderReversed);
+          ShooterConstants.ENCODER_PORTS[0],
+          ShooterConstants.ENCODER_PORTS[1],
+          ShooterConstants.ENCODER_REVERSED);
 
   // Create a new SysId routine for characterizing the shooter.
   private final SysIdRoutine sysIdRoutine =
@@ -65,7 +65,7 @@ public class Shooter extends SubsystemBase {
   /** Creates a new Shooter subsystem. */
   public Shooter() {
     // Sets the distance per pulse for the encoders
-    shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
+    shooterEncoder.setDistancePerPulse(ShooterConstants.ENCODER_DISTANCE_PER_PULSE);
   }
 
   /**
@@ -79,7 +79,7 @@ public class Shooter extends SubsystemBase {
           shooterMotor.setVoltage(
               shooterFeedback.calculate(shooterEncoder.getRate(), shooterVelocity.getAsDouble())
                   + shooterFeedforward.calculate(shooterVelocity.getAsDouble()));
-          feederMotor.setThrottle(ShooterConstants.kFeederVelocity);
+          feederMotor.setThrottle(ShooterConstants.FEEDER_VELOCITY);
         })
         .finallyDo(
             () -> {

@@ -9,7 +9,7 @@ import java.util.Arrays;
 /** Log array of float values. */
 public class FloatArrayLogEntry extends DataLogEntry {
   /** The data type for float array values. */
-  public static final String kDataType = "float[]";
+  public static final String DATA_TYPE = "float[]";
 
   /**
    * Constructs a float array log entry.
@@ -20,7 +20,7 @@ public class FloatArrayLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public FloatArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

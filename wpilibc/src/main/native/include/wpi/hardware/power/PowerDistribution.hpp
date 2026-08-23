@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
+#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -17,11 +17,10 @@ namespace wpi {
  * Class for getting voltage, current, temperature, power and energy from the
  * CTRE Power Distribution Panel (PDP) or REV Power Distribution Hub (PDH).
  */
-class PowerDistribution : public wpi::util::Sendable,
-                          public wpi::util::SendableHelper<PowerDistribution> {
+class PowerDistribution : public wpi::telemetry::TelemetryLoggable {
  public:
   /// Default module number.
-  static constexpr int kDefaultModule = -1;
+  static constexpr int DEFAULT_MODULE = -1;
 
   /**
    * Power distribution module type.
@@ -41,7 +40,7 @@ class PowerDistribution : public wpi::util::Sendable,
    *
    * @param busId The bus ID.
    */
-  explicit PowerDistribution(int busId);
+  explicit PowerDistribution(CANBus busId);
 
   /**
    * Constructs a PowerDistribution object.
@@ -50,7 +49,7 @@ class PowerDistribution : public wpi::util::Sendable,
    * @param module The CAN ID of the PDP/PDH
    * @param moduleType The type of module
    */
-  PowerDistribution(int busId, int module, ModuleType moduleType);
+  PowerDistribution(CANBus busId, int module, ModuleType moduleType);
 
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;
@@ -348,7 +347,9 @@ class PowerDistribution : public wpi::util::Sendable,
    */
   StickyFaults GetStickyFaults() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::util::Handle<HAL_PowerDistributionHandle, HAL_CleanPowerDistribution>

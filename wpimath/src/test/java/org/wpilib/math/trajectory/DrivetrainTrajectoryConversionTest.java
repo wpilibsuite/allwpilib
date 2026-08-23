@@ -20,7 +20,7 @@ import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
 
 class DrivetrainTrajectoryConversionTest {
-  private static final double kEpsilon = 1e-6;
+  private static final double EPSILON = 1e-6;
 
   /**
    * Generates a sample trajectory similar to the 2018 cross scale auto.
@@ -32,7 +32,7 @@ class DrivetrainTrajectoryConversionTest {
     final double maxAccel = feetToMeters(12);
 
     // 2018 cross scale auto waypoints.
-    var sideStart = new Pose2d(feetToMeters(1.54), feetToMeters(23.23), Rotation2d.kPi);
+    var sideStart = new Pose2d(feetToMeters(1.54), feetToMeters(23.23), Rotation2d.PI);
     var crossScale =
         new Pose2d(feetToMeters(23.7), feetToMeters(6.8), Rotation2d.fromDegrees(-160));
 
@@ -41,11 +41,11 @@ class DrivetrainTrajectoryConversionTest {
     waypoints.add(
         sideStart.plus(
             new Transform2d(
-                new Translation2d(feetToMeters(-13), feetToMeters(0)), Rotation2d.kZero)));
+                new Translation2d(feetToMeters(-13), feetToMeters(0)), Rotation2d.ZERO)));
     waypoints.add(
         sideStart.plus(
             new Transform2d(
-                new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.kCW_Pi_2)));
+                new Translation2d(feetToMeters(-19.5), feetToMeters(5)), Rotation2d.CW_PI_2)));
     waypoints.add(crossScale);
 
     TrajectoryConfig config = new TrajectoryConfig(maxVelocity, maxAccel).setReversed(true);
@@ -61,9 +61,9 @@ class DrivetrainTrajectoryConversionTest {
   static Trajectory<DrivetrainSplineSample> generateStraightTrajectory() {
     var waypoints =
         List.of(
-            new Pose2d(0, 0, Rotation2d.kZero),
-            new Pose2d(1, 0, Rotation2d.kZero),
-            new Pose2d(2, 0, Rotation2d.kZero));
+            new Pose2d(0, 0, Rotation2d.ZERO),
+            new Pose2d(1, 0, Rotation2d.ZERO),
+            new Pose2d(2, 0, Rotation2d.ZERO));
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
@@ -78,11 +78,11 @@ class DrivetrainTrajectoryConversionTest {
   static Trajectory<DrivetrainSplineSample> generateCircularTrajectory() {
     var waypoints =
         List.of(
-            new Pose2d(1, 0, Rotation2d.kCCW_Pi_2),
-            new Pose2d(0, 1, Rotation2d.kPi),
-            new Pose2d(-1, 0, Rotation2d.kCW_Pi_2),
-            new Pose2d(0, -1, Rotation2d.kZero),
-            new Pose2d(1, 0, Rotation2d.kCCW_Pi_2));
+            new Pose2d(1, 0, Rotation2d.CCW_PI_2),
+            new Pose2d(0, 1, Rotation2d.PI),
+            new Pose2d(-1, 0, Rotation2d.CW_PI_2),
+            new Pose2d(0, -1, Rotation2d.ZERO),
+            new Pose2d(1, 0, Rotation2d.CCW_PI_2));
 
     TrajectoryConfig config = new TrajectoryConfig(2.0, 2.0);
 
@@ -113,13 +113,13 @@ class DrivetrainTrajectoryConversionTest {
               assertEquals(
                   expectedWheelVelocities.left,
                   sample.leftVelocity,
-                  kEpsilon,
+                  EPSILON,
                   "Left wheel speed mismatch at t=" + sample.time),
           () ->
               assertEquals(
                   expectedWheelVelocities.right,
                   sample.rightVelocity,
-                  kEpsilon,
+                  EPSILON,
                   "Right wheel speed mismatch at t=" + sample.time));
 
       // Verify inverse: wheel speeds should produce the original chassis speeds
@@ -132,19 +132,19 @@ class DrivetrainTrajectoryConversionTest {
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).vx,
                   reconstructedVelocities.vx,
-                  kEpsilon,
+                  EPSILON,
                   "Reconstructed vx mismatch at t=" + sample.time),
           () ->
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).vy,
                   reconstructedVelocities.vy,
-                  kEpsilon,
+                  EPSILON,
                   "Reconstructed vy mismatch at t=" + sample.time),
           () ->
               assertEquals(
                   sample.velocity.toRobotRelative(sample.pose.getRotation()).omega,
                   reconstructedVelocities.omega,
-                  kEpsilon,
+                  EPSILON,
                   "Reconstructed omega mismatch at t=" + sample.time));
     }
   }
@@ -161,8 +161,8 @@ class DrivetrainTrajectoryConversionTest {
       DifferentialDriveWheelVelocities expectedWheelVelocities =
           kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
 
-      assertEquals(expectedWheelVelocities.left, sample.leftVelocity, kEpsilon);
-      assertEquals(expectedWheelVelocities.right, sample.rightVelocity, kEpsilon);
+      assertEquals(expectedWheelVelocities.left, sample.leftVelocity, EPSILON);
+      assertEquals(expectedWheelVelocities.right, sample.rightVelocity, EPSILON);
 
       // For straight motion, left and right speeds should be approximately equal
       assertEquals(sample.leftVelocity, sample.rightVelocity, 0.01);

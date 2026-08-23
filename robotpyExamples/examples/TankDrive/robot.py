@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -18,8 +19,8 @@ class MyRobot(wpilib.TimedRobot):
         """Robot initialization function"""
         super().__init__()
 
-        left_motor = wpilib.PWMSparkMax(0)
-        right_motor = wpilib.PWMSparkMax(1)
+        left_motor = wpilib_drivers.PWMSparkMax(0)
+        right_motor = wpilib_drivers.PWMSparkMax(1)
         self.robot_drive = wpilib.DifferentialDrive(left_motor, right_motor)
         self.left_stick = wpilib.Joystick(0)
         self.right_stick = wpilib.Joystick(1)

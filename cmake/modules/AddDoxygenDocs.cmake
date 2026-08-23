@@ -3,6 +3,7 @@ macro(add_doxygen_docs)
         apriltag
         cameraserver
         cscore
+        drivers
         fields
         hal
         ntcore

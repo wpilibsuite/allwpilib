@@ -80,7 +80,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "DriverStation";
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "DriverStation";
 
 struct MatchDataSender {
   MatchDataSender()
@@ -94,8 +94,8 @@ struct MatchDataSender {
   std::shared_ptr<wpi::nt::NetworkTable> table =
       wpi::nt::NetworkTableInstance::GetDefault().GetTable("DriverStation");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
-      table, ".type", kSmartDashboardType,
-      wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
+      table, ".type", SMART_DASHBOARD_TYPE,
+      wpi::util::json::object("SmartDashboard", SMART_DASHBOARD_TYPE)};
   MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",

@@ -27,7 +27,7 @@ public class SwerveModuleVelocity
   public double velocity;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.kZero;
+  public Rotation2d angle = Rotation2d.ZERO;
 
   /** SwerveModuleVelocity protobuf for serialization. */
   public static final SwerveModuleVelocityProto proto = new SwerveModuleVelocityProto();
@@ -99,7 +99,7 @@ public class SwerveModuleVelocity
   public SwerveModuleVelocity optimize(Rotation2d currentAngle) {
     var delta = angle.minus(currentAngle);
     if (Math.abs(delta.getDegrees()) > 90.0) {
-      return new SwerveModuleVelocity(-velocity, angle.rotateBy(Rotation2d.kPi));
+      return new SwerveModuleVelocity(-velocity, angle.rotateBy(Rotation2d.PI));
     } else {
       return new SwerveModuleVelocity(velocity, angle);
     }

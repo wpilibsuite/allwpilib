@@ -23,15 +23,14 @@
 
 namespace wpi::log {
 FileLogger::FileLogger(std::string_view file,
-                       std::function<void(std::string_view)> callback)
+                       std::function<void(std::string_view)> callback) {
 #ifdef __linux__
-    : m_fileHandle{open(file.data(), O_RDONLY)},
-      m_inotifyHandle{inotify_init()},
-      m_inotifyWatchHandle{
-          inotify_add_watch(m_inotifyHandle, file.data(), IN_MODIFY)}
-#endif
-{
-#ifdef __linux__
+  std::string fileStr{file};
+  m_fileHandle = open(fileStr.c_str(), O_RDONLY);
+  m_inotifyHandle = inotify_init();
+  m_inotifyWatchHandle =
+      inotify_add_watch(m_inotifyHandle, fileStr.c_str(), IN_MODIFY);
+
   // inotify watches the file's inode, so a file that does not exist yet will
   // never generate events (and a file created later won't be picked up).
   // Don't spawn a thread in that case; without a watch, a reader blocked in

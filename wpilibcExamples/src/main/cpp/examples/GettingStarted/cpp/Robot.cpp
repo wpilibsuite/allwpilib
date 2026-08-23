@@ -3,17 +3,14 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "wpi/drive/DifferentialDrive.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Gamepad.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/system/Timer.hpp"
 
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &left);
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &right);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.

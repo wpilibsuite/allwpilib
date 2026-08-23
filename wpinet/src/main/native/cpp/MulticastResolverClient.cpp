@@ -15,7 +15,7 @@
 
 using namespace wpi::net;
 
-static constexpr uv::Timer::Time kReconnectTime{1000};
+static constexpr uv::Timer::Time RECONNECT_TIME{1000};
 
 std::shared_ptr<MulticastResolverClient> MulticastResolverClient::Create(
     wpi::net::uv::Loop& loop, wpi::util::Logger& logger,
@@ -57,7 +57,7 @@ void MulticastResolverClient::Init() {
   });
 
   Restart();
-  m_timer->Start(kReconnectTime, kReconnectTime);
+  m_timer->Start(RECONNECT_TIME, RECONNECT_TIME);
 }
 
 void MulticastResolverClient::Close() {

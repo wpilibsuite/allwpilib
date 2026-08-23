@@ -26,6 +26,7 @@ class ConnectionListenerTest {
   }
 
   void Connect(const char* address, unsigned int port4);
+  void WaitForServerConnectionState(bool connected);
 
  protected:
   NT_Inst server_inst;
@@ -47,6 +48,16 @@ void ConnectionListenerTest::Connect(const char* address, unsigned int port4) {
     }
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+void ConnectionListenerTest::WaitForServerConnectionState(bool connected) {
+  int count = 0;
+  while (!wpi::nt::GetConnections(server_inst).empty() != connected) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    if (++count > 30) {
+      FAIL("timed out waiting for server connection state");
+    }
+  }
 }
 
 TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Polled",
@@ -98,29 +109,38 @@ TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Threaded",
         result.push_back(event);
       });
 
-  // trigger a connect event
+  // Trigger a connect, disconnect, and reconnect sequence. A connection retry
+  // can produce this sequence before Connect() returns.
   Connect(param.first, 20001 + param.second);
+  WaitForServerConnectionState(true);
+  wpi::nt::StopClient(client_inst);
+  WaitForServerConnectionState(false);
+  Connect(param.first, 20001 + param.second);
+  WaitForServerConnectionState(true);
 
   bool timed_out = false;
   REQUIRE(wpi::util::WaitForObject(handle, 1.0, &timed_out));
   REQUIRE_FALSE(timed_out);
+  REQUIRE(wpi::nt::WaitForListenerQueue(server_inst, 1.0));
 
-  // get the event
+  // get the events
   {
     std::scoped_lock lock{m};
-    REQUIRE(result.size() == 1u);
-    CHECK(handle == result[0].listener);
-    CHECK(result[0].GetConnectionInfo());
-    CHECK(result[0].flags == wpi::nt::EventFlags::CONNECTED);
+    REQUIRE_FALSE(result.empty());
+    for (const auto& event : result) {
+      CHECK(handle == event.listener);
+      CHECK(event.GetConnectionInfo());
+    }
+    CHECK(result.back().flags == wpi::nt::EventFlags::CONNECTED);
     result.clear();
   }
 
   // trigger a disconnect event
   wpi::nt::StopClient(client_inst);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  WaitForServerConnectionState(false);
 
   // wait for thread
-  wpi::nt::WaitForListenerQueue(server_inst, 1.0);
+  REQUIRE(wpi::nt::WaitForListenerQueue(server_inst, 1.0));
 
   // get the event
   {

@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 
+#include "wpi/hardware/bus/CANBus.hpp"
 #include "wpi/units/temperature.hpp"
 #include "wpi/units/voltage.hpp"
 
@@ -170,21 +171,18 @@ class RobotController {
   static void ResetRailFaultCounts();
 
   /**
-   * Get the current brownout voltage setting.
+   * Set the voltages where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage
+   * The brownout voltage must be between 5 V and 8 V, inclusive. The recovery
+   * voltage must be no greater than 8.5 V and at least 0.5 V above the brownout
+   * voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from
+   *                        brownout
    */
-  static wpi::units::volt_t GetBrownoutVoltage();
-
-  /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
-   *
-   * Note that this only does anything on the roboRIO 2.
-   * On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage
-   */
-  static void SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage);
+  static void SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
+                                  wpi::units::volt_t recoveryVoltage);
 
   /**
    * Get the current CPU temperature.
@@ -199,7 +197,7 @@ class RobotController {
    * @param busId The bus ID.
    * @return The status of the CAN bus
    */
-  static CANStatus GetCANStatus(int busId);
+  static CANStatus GetCANStatus(CANBus busId);
 
  private:
   static std::function<uint64_t()> m_timeSource;

@@ -17,6 +17,7 @@
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
 #include "SystemServerInternal.hpp"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/StringExtras.hpp"
@@ -189,8 +190,14 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   wpi::hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
+  MRC_Bool brownedOut = false;
+  MRC_Status mrcStatus = MRC_Systemcore_GetBrownedOut(&brownedOut);
+  if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+    return false;
+  }
+  *status = HAL_SUCCESS;
+  return brownedOut;
 }
 
 int32_t HAL_GetCommsDisableCount(int32_t* status) {

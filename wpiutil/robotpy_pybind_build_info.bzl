@@ -150,36 +150,6 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "Sendable",
-            yml_file = "semiwrap/Sendable.yml",
-            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/Sendable.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::Sendable", "wpi__util__Sendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableBuilder",
-            yml_file = "semiwrap/SendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::SendableBuilder", "wpi__util__SendableBuilder.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableRegistry",
-            yml_file = "semiwrap/SendableRegistry.yml",
-            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableRegistry.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::SendableRegistry", "wpi__util__SendableRegistry.hpp"),
-            ],
-        ),
-        struct(
             class_name = "WPyStruct",
             yml_file = "semiwrap/WPyStruct.yml",
             header_root = "wpiutil/src/main/python/wpiutil",
@@ -282,7 +252,7 @@ def publish_library_casters():
         tags = ["robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -308,7 +278,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/wpiutil/**"], exclude = ["src/main/python/wpiutil/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/wpiutil/**"], exclude = ["src/main/python/wpiutil/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -350,7 +320,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
         package_root_file = "src/main/python/wpiutil/__init__.py",
@@ -361,7 +331,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
         package_root_file = "src/main/python/wpiutil/__init__.py",

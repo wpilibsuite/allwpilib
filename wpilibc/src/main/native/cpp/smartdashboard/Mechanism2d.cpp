@@ -4,15 +4,14 @@
 
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 
-#include <memory>
 #include <string_view>
 
-#include "wpi/nt/NTSendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
-static constexpr std::string_view kBackgroundColor = "backgroundColor";
-static constexpr std::string_view kDims = "dims";
+static constexpr std::string_view BACKGROUND_COLOR = "backgroundColor";
+static constexpr std::string_view DIMS = "dims";
 
 Mechanism2d::Mechanism2d(double width, double height,
                          const wpi::util::Color8Bit& backgroundColor)
@@ -22,31 +21,26 @@ Mechanism2d::Mechanism2d(double width, double height,
 
 MechanismRoot2d* Mechanism2d::GetRoot(std::string_view name, double x,
                                       double y) {
+  std::scoped_lock lock(m_mutex);
   auto [it, isNew] =
       m_roots.try_emplace(name, name, x, y, MechanismRoot2d::private_init{});
-  if (isNew && m_table) {
-    it->second.Update(m_table->GetSubTable(name));
-  }
   return &it->second;
 }
 
 void Mechanism2d::SetBackgroundColor(const wpi::util::Color8Bit& color) {
+  std::scoped_lock lock(m_mutex);
   m_color = color.HexString();
-  if (m_colorPub) {
-    m_colorPub.Set(m_color);
+}
+
+void Mechanism2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  std::scoped_lock lock(m_mutex);
+  table.Log(DIMS, {m_width, m_height});
+  table.Log(BACKGROUND_COLOR, m_color);
+  for (auto& entry : m_roots) {
+    table.Log(entry.first, entry.second);
   }
 }
 
-void Mechanism2d::InitSendable(wpi::nt::NTSendableBuilder& builder) {
-  builder.SetSmartDashboardType("Mechanism2d");
-
-  std::scoped_lock lock(m_mutex);
-  m_table = builder.GetTable();
-  m_dimsPub = m_table->GetDoubleArrayTopic(kDims).Publish();
-  m_dimsPub.Set({{m_width, m_height}});
-  m_colorPub = m_table->GetStringTopic(kBackgroundColor).Publish();
-  m_colorPub.Set(m_color);
-  for (auto& entry : m_roots) {
-    entry.second.Update(m_table->GetSubTable(entry.first));
-  }
+std::string_view Mechanism2d::GetTelemetryType() const {
+  return "Mechanism2d";
 }

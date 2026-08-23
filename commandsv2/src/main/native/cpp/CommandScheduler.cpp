@@ -16,10 +16,11 @@
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hal/UsageReporting.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/SmallVector.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
 
 using namespace wpi::cmd;
 
@@ -66,11 +67,9 @@ CommandScheduler::CommandScheduler()
         std::puts("CommandScheduler loop time overrun.");
       }) {
   HAL_ReportUsage("CommandScheduler", "");
-  wpi::util::SendableRegistry::Add(this, "Scheduler");
 }
 
 CommandScheduler::~CommandScheduler() {
-  wpi::util::SendableRegistry::Remove(this);
   std::unique_ptr<Impl>().swap(m_impl);
 }
 
@@ -113,7 +112,7 @@ void CommandScheduler::Schedule(Command* command) {
     if (requirements.find(i1.first) != requirements.end()) {
       isDisjoint = false;
       allInterruptible &= (i1.second->GetInterruptionBehavior() ==
-                           Command::InterruptionBehavior::kCancelSelf);
+                           Command::InterruptionBehavior::CANCEL_SELF);
       intersection.emplace_back(i1.second);
     }
   }
@@ -477,47 +476,83 @@ void CommandScheduler::RequireUngroupedAndUnscheduled(
   }
 }
 
-void CommandScheduler::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Scheduler");
-  builder.AddStringArrayProperty(
-      "Names",
-      [this]() mutable {
-        std::vector<std::string> names;
-        for (Command* command : m_impl->scheduledCommands) {
-          names.emplace_back(command->GetName());
-        }
-        return names;
-      },
-      nullptr);
-  builder.AddIntegerArrayProperty(
-      "Ids",
-      [this]() mutable {
-        std::vector<int64_t> ids;
-        for (Command* command : m_impl->scheduledCommands) {
-          uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
-          ids.emplace_back(static_cast<int64_t>(ptrTmp));
-        }
-        return ids;
-      },
-      nullptr);
-  builder.AddIntegerArrayProperty(
-      "Cancel", []() { return std::vector<int64_t>{}; },
-      [this](std::span<const int64_t> toCancel) mutable {
-        for (auto cancel : toCancel) {
-          uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
-          Command* command = reinterpret_cast<Command*>(ptrTmp);
-          if (m_impl->scheduledCommands.find(command) !=
-              m_impl->scheduledCommands.end()) {
-            Cancel(command);
-          }
-        }
-      });
+std::vector<std::string> CommandScheduler::GetScheduledCommandNames() const {
+  std::vector<std::string> names;
+  for (Command* command : m_impl->scheduledCommands) {
+    names.emplace_back(command->GetName());
+  }
+  return names;
+}
+
+std::vector<int64_t> CommandScheduler::GetScheduledCommandIds() const {
+  std::vector<int64_t> ids;
+  for (Command* command : m_impl->scheduledCommands) {
+    uintptr_t ptrTmp = reinterpret_cast<uintptr_t>(command);
+    ids.emplace_back(static_cast<int64_t>(ptrTmp));
+  }
+  return ids;
+}
+
+void CommandScheduler::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  std::vector<std::string> names = GetScheduledCommandNames();
+  table.Log("Names", names);
+
+  std::vector<int64_t> ids = GetScheduledCommandIds();
+  table.Log("Ids", ids);
+}
+
+std::string_view CommandScheduler::GetTelemetryType() const {
+  return "Scheduler";
+}
+
+void CommandScheduler::PublishTunable(wpi::tunables::TunableTable& table) {
+  UpdateTunable();
+  table.Publish(
+      "Names", this, &CommandScheduler::m_scheduledCommandNames,
+      wpi::tunables::TunableConfig{
+          .isMutable = false,
+          .parent = this,
+          .polling = wpi::tunables::TunableConfig::Polling::ALWAYS_GET});
+  table.Publish(
+      "Ids", this, &CommandScheduler::m_scheduledCommandIds,
+      wpi::tunables::TunableConfig{
+          .isMutable = false,
+          .parent = this,
+          .polling = wpi::tunables::TunableConfig::Polling::ALWAYS_GET});
+  table.Publish(
+      "Cancel", this, &CommandScheduler::m_toCancel,
+      wpi::tunables::TunableConfig{
+          .robust = true,
+          .onTune =
+              [](TunableBase&, wpi::tunables::ComplexTunable* self) {
+                auto scheduler = static_cast<CommandScheduler*>(self);
+                for (auto cancel : scheduler->m_toCancel) {
+                  uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
+                  Command* command = reinterpret_cast<Command*>(ptrTmp);
+                  if (scheduler->m_impl->scheduledCommands.find(command) !=
+                      scheduler->m_impl->scheduledCommands.end()) {
+                    scheduler->Cancel(command);
+                  }
+                }
+                scheduler->m_toCancel.clear();
+                scheduler->SetChildTunableChanged("Cancel");
+              },
+          .parent = this});
+}
+
+void CommandScheduler::UpdateTunable() const {
+  m_scheduledCommandNames = GetScheduledCommandNames();
+  m_scheduledCommandIds = GetScheduledCommandIds();
+}
+
+std::string_view CommandScheduler::GetTunableType() const {
+  return "Scheduler";
 }
 
 void CommandScheduler::SetDefaultCommandImpl(Subsystem* subsystem,
                                              std::unique_ptr<Command> command) {
   if (command->GetInterruptionBehavior() ==
-      Command::InterruptionBehavior::kCancelIncoming) {
+      Command::InterruptionBehavior::CANCEL_INCOMING) {
     std::puts(
         "Registering a non-interruptible default command!\n"
         "This will likely prevent any other commands from "

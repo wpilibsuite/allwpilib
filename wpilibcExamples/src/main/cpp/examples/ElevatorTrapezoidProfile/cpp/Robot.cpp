@@ -15,7 +15,7 @@
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t kDt = 20_ms;
+  static constexpr wpi::units::second_t DT = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -31,10 +31,10 @@ class Robot : public wpi::TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    setpoint = profile.Calculate(kDt, setpoint, goal);
+    setpoint = profile.Calculate(DT, setpoint, goal);
 
     // Send setpoint to offboard controller PID
-    motor.SetSetpoint(ExampleSmartMotorController::PIDMode::kPosition,
+    motor.SetSetpoint(ExampleSmartMotorController::PIDMode::POSITION,
                       setpoint.position.value(),
                       feedforward.Calculate(setpoint.velocity) / 12_V);
   }

@@ -108,6 +108,8 @@ model {
                 lib project: ':datalog', library: 'datalog', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 project.addLibSdlGpuDependency(it)
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -142,6 +144,8 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 project.addLibSdlGpuDependency(it)
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'

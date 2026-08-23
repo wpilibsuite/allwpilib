@@ -10,16 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.units.Units;
 
 class Transform2dTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testNewWithMeasures() {
     var transform =
         new Transform2d(Units.Inches.of(6), Units.Inches.of(8), Rotation2d.fromDegrees(45));
 
-    assertEquals(0.1524, transform.getX(), kEpsilon);
-    assertEquals(0.2032, transform.getY(), kEpsilon);
-    assertEquals(Math.PI / 4, transform.getRotation().getRadians(), kEpsilon);
+    assertEquals(0.1524, transform.getX(), EPSILON);
+    assertEquals(0.2032, transform.getY(), EPSILON);
+    assertEquals(Math.PI / 4, transform.getRotation().getRadians(), EPSILON);
   }
 
   @Test

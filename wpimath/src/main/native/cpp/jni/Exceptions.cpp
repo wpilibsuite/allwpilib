@@ -13,12 +13,9 @@ using namespace wpi::util::java;
 //
 
 JException illegalArgEx;
-JException ioEx;
-JException trajectorySerializationEx;
 
 static const JExceptionInit exceptions[] = {
-    {"java/lang/IllegalArgumentException", &illegalArgEx},
-    {"java/io/IOException", &ioEx}};
+    {"java/lang/IllegalArgumentException", &illegalArgEx}};
 
 extern "C" {
 

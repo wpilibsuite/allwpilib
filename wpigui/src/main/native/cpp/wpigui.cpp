@@ -1134,10 +1134,161 @@ bool gui::Initialize(const char* title, int width, int height,
   return true;
 }
 
+static void AppendCoalescedMouseMotionWheelEvents(
+    ImVector<ImGuiInputEvent>& output, const ImGuiInputEvent* begin,
+    const ImGuiInputEvent* end, int maxTrickledSegments, bool* changed) {
+  // Count contiguous runs of mouse position and wheel events. ImGui already
+  // processes repeated events of the same type in one frame, but alternating
+  // runs are what get trickled across frames.
+  int segments = 0;
+  ImGuiInputEventType lastType = ImGuiInputEventType_None;
+  for (const ImGuiInputEvent* event = begin; event != end; ++event) {
+    if (event->Type != lastType) {
+      ++segments;
+      lastType = event->Type;
+    }
+  }
+
+  if (segments <= maxTrickledSegments) {
+    for (const ImGuiInputEvent* event = begin; event != end; ++event) {
+      output.push_back(*event);
+    }
+    return;
+  }
+
+  *changed = true;
+
+  // Preserve the coarse ordering ImGui needs to target wheel input: the latest
+  // cursor position before scrolling, the summed wheel delta, and the latest
+  // cursor position after scrolling. Button, key, text, and other events split
+  // mouse groups before this point, so transition trickling remains intact.
+  ImGuiInputEvent motionBeforeWheel;
+  ImGuiInputEvent wheel;
+  ImGuiInputEvent motionAfterWheel;
+  bool hasMotionBeforeWheel = false;
+  bool hasWheel = false;
+  bool hasMotionAfterWheel = false;
+
+  for (const ImGuiInputEvent* event = begin; event != end; ++event) {
+    if (event->Type == ImGuiInputEventType_MousePos) {
+      if (hasWheel) {
+        motionAfterWheel = *event;
+        hasMotionAfterWheel = true;
+      } else {
+        motionBeforeWheel = *event;
+        hasMotionBeforeWheel = true;
+      }
+    } else if (hasWheel) {
+      wheel.MouseWheel.WheelX += event->MouseWheel.WheelX;
+      wheel.MouseWheel.WheelY += event->MouseWheel.WheelY;
+      wheel.MouseWheel.MouseSource = event->MouseWheel.MouseSource;
+    } else {
+      wheel = *event;
+      hasWheel = true;
+    }
+  }
+
+  if (hasWheel) {
+    if (hasMotionBeforeWheel) {
+      output.push_back(motionBeforeWheel);
+    }
+    output.push_back(wheel);
+    if (hasMotionAfterWheel) {
+      output.push_back(motionAfterWheel);
+    }
+  } else if (hasMotionBeforeWheel) {
+    output.push_back(motionBeforeWheel);
+  }
+}
+
+constexpr int FALLBACK_MOUSE_MOTION_WHEEL_FPS = 30;
+
+static void CoalesceQueuedMouseMotionWheelEvents(double framePeriod) {
+  ImGuiContext* context = ImGui::GetCurrentContext();
+  if (!context) {
+    return;
+  }
+
+  ImVector<ImGuiInputEvent>& queue = context->InputEventsQueue;
+  ImVector<ImGuiInputEvent> coalesced;
+  coalesced.reserve(queue.Size);
+
+  // ImGui trickles alternating mouse motion and wheel inputs across frames to
+  // preserve ordering. That is usually useful, but a high-rate scroll wheel
+  // plus mouse movement can create enough alternating segments for the GUI to
+  // lag behind visible input. Keep exact ordering while the backlog is small,
+  // then coalesce once the queued mouse-only stream would take noticeably long
+  // to trickle at the measured frame rate.
+  constexpr int COALESCED_MOUSE_MOTION_WHEEL_SEGMENTS = 3;
+  constexpr int MAX_MOUSE_MOTION_WHEEL_TRICKLE_LATENCY_MS = 150;
+
+  if (framePeriod <= 0.0) {
+    framePeriod = 1.0 / FALLBACK_MOUSE_MOTION_WHEEL_FPS;
+  }
+  int maxTrickledSegments =
+      static_cast<int>(MAX_MOUSE_MOTION_WHEEL_TRICKLE_LATENCY_MS / 1000.0 /
+                       framePeriod) +
+      1;
+  maxTrickledSegments =
+      std::max(COALESCED_MOUSE_MOTION_WHEEL_SEGMENTS, maxTrickledSegments);
+  bool changed = false;
+
+  // Only coalesce contiguous mouse motion/wheel groups. Other input events stay
+  // as ordering barriers so quick clicks, shortcuts, and text editing keep
+  // ImGui's normal trickling behavior.
+  for (int i = 0; i < queue.Size;) {
+    if (queue[i].Type != ImGuiInputEventType_MousePos &&
+        queue[i].Type != ImGuiInputEventType_MouseWheel) {
+      coalesced.push_back(queue[i]);
+      ++i;
+      continue;
+    }
+
+    int groupStart = i;
+    do {
+      ++i;
+    } while (i < queue.Size &&
+             (queue[i].Type == ImGuiInputEventType_MousePos ||
+              queue[i].Type == ImGuiInputEventType_MouseWheel));
+
+    AppendCoalescedMouseMotionWheelEvents(coalesced, queue.Data + groupStart,
+                                          queue.Data + i, maxTrickledSegments,
+                                          &changed);
+  }
+
+  if (changed) {
+    queue.swap(coalesced);
+  }
+}
+
+static void ProcessImGuiSDLEvent(const SDL_Event& event) {
+  if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+      event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+    // The ImGui SDL backend ignores button-event coordinates. Queue them as a
+    // mouse-position event first so fast motion does not detach a click from
+    // the cursor position reported by SDL for that button transition.
+    SDL_Event motionEvent = {};
+    motionEvent.type = SDL_EVENT_MOUSE_MOTION;
+    motionEvent.motion.timestamp = event.button.timestamp;
+    motionEvent.motion.windowID = event.button.windowID;
+    motionEvent.motion.which = event.button.which;
+    motionEvent.motion.x = event.button.x;
+    motionEvent.motion.y = event.button.y;
+    ImGui_ImplSDL3_ProcessEvent(&motionEvent);
+  }
+
+  ImGui_ImplSDL3_ProcessEvent(&event);
+}
+
 void gui::Main() {
   // Main loop
+  double previousStartTime = 0.0;
   while (!gContext->exit) {
     double startTime = GetTime();
+    double framePeriod = previousStartTime > 0.0
+                             ? startTime - previousStartTime
+                             : 1.0 / FALLBACK_MOUSE_MOTION_WHEEL_FPS;
+    previousStartTime = startTime;
 
     // Poll and handle events (inputs, window resize, etc.)
     SDL_Event event;
@@ -1147,7 +1298,7 @@ void gui::Main() {
           handler(event);
         }
       }
-      ImGui_ImplSDL3_ProcessEvent(&event);
+      ProcessImGuiSDLEvent(event);
 
       if (event.type == SDL_EVENT_QUIT) {
         gContext->exit = true;
@@ -1160,6 +1311,7 @@ void gui::Main() {
         }
       }
     }
+    CoalesceQueuedMouseMotionWheelEvents(framePeriod);
 
     bool windowMinimized =
         (SDL_GetWindowFlags(gContext->window) & SDL_WINDOW_MINIMIZED) != 0;

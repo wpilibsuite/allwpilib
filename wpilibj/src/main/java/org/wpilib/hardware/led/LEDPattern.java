@@ -302,7 +302,7 @@ public interface LEDPattern {
       if (RobotController.getTime() % totalTimeMicros < onTimeMicros) {
         applyTo(reader, writer);
       } else {
-        kOff.applyTo(reader, writer);
+        OFF.applyTo(reader, writer);
       }
     };
   }
@@ -332,7 +332,7 @@ public interface LEDPattern {
       if (signal.getAsBoolean()) {
         applyTo(reader, writer);
       } else {
-        kOff.applyTo(reader, writer);
+        OFF.applyTo(reader, writer);
       }
     };
   }
@@ -432,7 +432,7 @@ public interface LEDPattern {
    * than averaging the colors for each LED. This can be helpful for displaying only a portion of
    * the base pattern by applying a mask that sets the desired area to white, and all other areas to
    * black. However, it can also be used to display only certain color channels or hues; for
-   * example, masking with {@code LEDPattern.color(Color.kRed)} will turn off the green and blue
+   * example, masking with {@code LEDPattern.color(Color.RED)} will turn off the green and blue
    * channels on the output pattern, leaving only the red LEDs to be illuminated.
    *
    * @param mask the mask to apply
@@ -467,10 +467,10 @@ public interface LEDPattern {
    *
    * <pre>
    *   // Solid red, but at 50% brightness
-   *   LEDPattern.solid(Color.kRed).atBrightness(Percent.of(50));
+   *   LEDPattern.solid(Color.RED).atBrightness(Percent.of(50));
    *
    *   // Solid white, but at only 10% (i.e. ~0.5V)
-   *   LEDPattern.solid(Color.kWhite).atBrightness(Percent.of(10));
+   *   LEDPattern.solid(Color.WHITE).atBrightness(Percent.of(10));
    * </pre>
    *
    * @param relativeBrightness the multiplier to apply to all channels to modify brightness
@@ -497,7 +497,7 @@ public interface LEDPattern {
   }
 
   /** A pattern that turns off all LEDs. */
-  LEDPattern kOff = solid(Color.BLACK);
+  LEDPattern OFF = solid(Color.BLACK);
 
   /**
    * Creates a pattern that displays a single static color along the entire length of the LED strip.
@@ -526,7 +526,7 @@ public interface LEDPattern {
    * end, based on where an elevator is in its range of travel.
    *
    * <pre>
-   *   LEDPattern basePattern = gradient(Color.kRed, Color.kBlue);
+   *   LEDPattern basePattern = gradient(Color.RED, Color.BLUE);
    *   LEDPattern progressPattern =
    *     basePattern.mask(progressMaskLayer(() -> elevator.getHeight() / elevator.maxHeight());
    * </pre>
@@ -562,10 +562,10 @@ public interface LEDPattern {
    *
    * <pre>
    *   // Display red from 0-33%, white from 33% - 67%, and blue from 67% to 100%
-   *   steps(Map.of(0.00, Color.kRed, 0.33, Color.kWhite, 0.67, Color.kBlue))
+   *   steps(Map.of(0.00, Color.RED, 0.33, Color.WHITE, 0.67, Color.BLUE))
    *
    *   // Half off, half on
-   *   steps(Map.of(0.5, Color.kWhite))
+   *   steps(Map.of(0.5, Color.WHITE))
    * </pre>
    *
    * @param steps a map of progress to the color to start displaying at that position along the LED
@@ -577,7 +577,7 @@ public interface LEDPattern {
     if (steps.isEmpty()) {
       // no colors specified
       DriverStationErrors.reportWarning("Creating LED steps with no colors!", false);
-      return kOff;
+      return OFF;
     }
 
     if (steps.size() == 1 && steps.keySet().iterator().next().doubleValue() == 0) {
@@ -639,7 +639,7 @@ public interface LEDPattern {
     if (colors.length == 0) {
       // Nothing to display
       DriverStationErrors.reportWarning("Creating a gradient with no colors!", false);
-      return kOff;
+      return OFF;
     }
 
     if (colors.length == 1) {

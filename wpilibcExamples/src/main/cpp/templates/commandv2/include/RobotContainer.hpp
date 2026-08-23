@@ -25,7 +25,7 @@ class RobotContainer {
  private:
   // Replace with CommandPS4Controller or CommandJoystick if needed
   wpi::cmd::CommandGamepad driverController{
-      OperatorConstants::kDriverControllerPort};
+      OperatorConstants::DRIVER_CONTROLLER_PORT};
 
   // The robot's subsystems are defined here...
   ExampleSubsystem subsystem;

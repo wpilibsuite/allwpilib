@@ -13,15 +13,15 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<TrajectorySample>;
-const TrajectorySample kExpectedData{1.23_s};
+const TrajectorySample EXPECTED_DATA{1.23_s};
 }  // namespace
 
 TEST_CASE("TrajectorySampleStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   TrajectorySample unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.time.value() == unpacked_data.time.value());
+  CHECK(EXPECTED_DATA.time.value() == unpacked_data.time.value());
 }

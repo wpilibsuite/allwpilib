@@ -9,7 +9,7 @@ import java.util.Arrays;
 /** Log array of boolean values. */
 public class BooleanArrayLogEntry extends DataLogEntry {
   /** The data type for boolean array values. */
-  public static final String kDataType = "boolean[]";
+  public static final String DATA_TYPE = "boolean[]";
 
   /**
    * Constructs a boolean array log entry.
@@ -20,7 +20,7 @@ public class BooleanArrayLogEntry extends DataLogEntry {
    * @param timestamp entry creation timestamp (0=now)
    */
   public BooleanArrayLogEntry(DataLog log, String name, String metadata, long timestamp) {
-    super(log, name, kDataType, metadata, timestamp);
+    super(log, name, DATA_TYPE, metadata, timestamp);
   }
 
   /**

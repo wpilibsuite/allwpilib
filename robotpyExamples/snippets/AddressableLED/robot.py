@@ -6,7 +6,6 @@
 #
 
 import wpilib
-import wpimath.units
 
 
 class MyRobot(wpilib.TimedRobot):

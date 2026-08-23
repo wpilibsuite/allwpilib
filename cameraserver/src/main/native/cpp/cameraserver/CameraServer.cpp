@@ -29,7 +29,7 @@
 
 using namespace wpi;
 
-static constexpr char const* kPublishName = "/CameraPublisher";
+static constexpr char const* PUBLISH_NAME = "/CameraPublisher";
 
 namespace {
 
@@ -80,10 +80,10 @@ struct Instance {
   wpi::util::DenseMap<CS_Sink, CS_Source> m_fixedSources;
   wpi::util::DenseMap<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
-      nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
+      nt::NetworkTableInstance::GetDefault().GetTable(PUBLISH_NAME)};
   cs::VideoListener m_videoListener;
   int m_tableListener;
-  int m_nextPort{CameraServer::kBasePort};
+  int m_nextPort{CameraServer::BASE_PORT};
   std::vector<std::string> m_addresses;
 };
 
@@ -391,7 +391,7 @@ Instance::Instance() {
         std::scoped_lock lock(m_mutex);
         CS_Status status = 0;
         switch (event.kind) {
-          case cs::VideoEvent::kSourceCreated: {
+          case cs::VideoEvent::SOURCE_CREATED: {
             // Create subtable for the camera
             auto table = m_publishTable->GetSubTable(event.name);
             m_publishers.insert(
@@ -399,10 +399,10 @@ Instance::Instance() {
                  SourcePublisher{*this, table, event.sourceHandle}});
             break;
           }
-          case cs::VideoEvent::kSourceDestroyed:
+          case cs::VideoEvent::SOURCE_DESTROYED:
             m_publishers.erase(event.sourceHandle);
             break;
-          case cs::VideoEvent::kSourceConnected:
+          case cs::VideoEvent::SOURCE_CONNECTED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
               wpi::util::SmallString<64> descBuf;
@@ -411,30 +411,30 @@ Instance::Instance() {
               publisher->connectedPublisher.Set(true);
             }
             break;
-          case cs::VideoEvent::kSourceDisconnected:
+          case cs::VideoEvent::SOURCE_DISCONNECTED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->connectedPublisher.Set(false);
             }
             break;
-          case cs::VideoEvent::kSourceVideoModesUpdated:
+          case cs::VideoEvent::SOURCE_VIDEO_MODES_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->modesPublisher.Set(
                   GetSourceModeValues(event.sourceHandle));
             }
             break;
-          case cs::VideoEvent::kSourceVideoModeChanged:
+          case cs::VideoEvent::SOURCE_VIDEO_MODE_CHANGED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->modeEntry.Set(VideoModeToString(event.mode));
             }
             break;
-          case cs::VideoEvent::kSourcePropertyCreated:
+          case cs::VideoEvent::SOURCE_PROPERTY_CREATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->properties.insert(
                   {event.propertyHandle,
                    PropertyPublisher{*publisher->table, event}});
             }
             break;
-          case cs::VideoEvent::kSourcePropertyValueUpdated:
+          case cs::VideoEvent::SOURCE_PROPERTY_VALUE_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               auto ppIt = publisher->properties.find(event.propertyHandle);
               if (ppIt != publisher->properties.end()) {
@@ -442,7 +442,7 @@ Instance::Instance() {
               }
             }
             break;
-          case cs::VideoEvent::kSourcePropertyChoicesUpdated:
+          case cs::VideoEvent::SOURCE_PROPERTY_CHOICES_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               auto ppIt = publisher->properties.find(event.propertyHandle);
               if (ppIt != publisher->properties.end() &&
@@ -457,10 +457,10 @@ Instance::Instance() {
               }
             }
             break;
-          case cs::VideoEvent::kSinkSourceChanged:
-          case cs::VideoEvent::kSinkCreated:
-          case cs::VideoEvent::kSinkDestroyed:
-          case cs::VideoEvent::kNetworkInterfacesChanged:
+          case cs::VideoEvent::SINK_SOURCE_CHANGED:
+          case cs::VideoEvent::SINK_CREATED:
+          case cs::VideoEvent::SINK_DESTROYED:
+          case cs::VideoEvent::NETWORK_INTERFACES_CHANGED:
             m_addresses = cs::GetNetworkInterfaces();
             UpdateStreamValues();
             break;
@@ -552,7 +552,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
     auto it = inst.m_sinks.find(name);
     if (it != inst.m_sinks.end()) {
       auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
+      if (kind != cs::VideoSink::CV) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
                                        static_cast<int>(kind));
@@ -579,7 +579,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
     auto it = inst.m_sinks.find(name);
     if (it != inst.m_sinks.end()) {
       auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
+      if (kind != cs::VideoSink::CV) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
                                        static_cast<int>(kind));

@@ -21,19 +21,19 @@ Window::Window(Storage& storage, std::string_view id,
     : m_id{id},
       m_name{storage.GetString("name")},
       m_defaultName{id},
-      m_visible{storage.GetBool("visible", defaultVisibility != kHide)},
-      m_enabled{storage.GetBool("enabled", defaultVisibility != kDisabled)},
+      m_visible{storage.GetBool("visible", defaultVisibility != HIDE)},
+      m_enabled{storage.GetBool("enabled", defaultVisibility != DISABLED)},
       m_defaultVisible{storage.GetValue("visible").boolDefault},
       m_defaultEnabled{storage.GetValue("enabled").boolDefault} {}
 
 void Window::SetVisibility(Visibility visibility) {
-  m_visible = visibility != kHide;
-  m_enabled = visibility != kDisabled;
+  m_visible = visibility != HIDE;
+  m_enabled = visibility != DISABLED;
 }
 
 void Window::SetDefaultVisibility(Visibility visibility) {
-  m_defaultVisible = visibility != kHide;
-  m_defaultEnabled = visibility != kDisabled;
+  m_defaultVisible = visibility != HIDE;
+  m_defaultEnabled = visibility != DISABLED;
 }
 
 void Window::Display() {

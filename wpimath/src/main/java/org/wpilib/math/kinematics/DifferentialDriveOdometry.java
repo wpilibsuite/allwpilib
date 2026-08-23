@@ -65,7 +65,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle, double leftDistance, double rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose2d.ZERO);
   }
 
   /**
@@ -78,7 +78,7 @@ public class DifferentialDriveOdometry extends Odometry<DifferentialDriveWheelPo
    */
   public DifferentialDriveOdometry(
       Rotation2d gyroAngle, Distance leftDistance, Distance rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose2d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose2d.ZERO);
   }
 
   /**

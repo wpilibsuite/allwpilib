@@ -5,6 +5,7 @@
 package org.wpilib.math.trajectory;
 
 import java.util.Objects;
+import org.wpilib.math.trajectory.struct.TrapezoidProfileConstraintsStruct;
 import org.wpilib.math.trajectory.struct.TrapezoidProfileStateStruct;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.util.struct.StructSerializable;
@@ -45,7 +46,11 @@ public class TrapezoidProfile {
   private ProfileTiming m_profile = new ProfileTiming();
 
   /** Profile constraints. */
-  public static class Constraints {
+  public static class Constraints implements StructSerializable {
+    /** The struct used to serialize this class. */
+    public static final TrapezoidProfileConstraintsStruct struct =
+        new TrapezoidProfileConstraintsStruct();
+
     /** Maximum velocity. */
     public final double maxVelocity;
 
@@ -55,8 +60,8 @@ public class TrapezoidProfile {
     /**
      * Constructs constraints for a TrapezoidProfile.
      *
-     * @param maxVelocity Maximum velocity, must be non-negative.
-     * @param maxAcceleration Maximum acceleration, must be non-negative.
+     * @param maxVelocity Maximum velocity, must be positive.
+     * @param maxAcceleration Maximum acceleration, must be positive.
      */
     public Constraints(double maxVelocity, double maxAcceleration) {
       if (maxVelocity <= 0.0 || maxAcceleration <= 0.0) {

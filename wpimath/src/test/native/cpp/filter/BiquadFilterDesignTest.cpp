@@ -247,13 +247,13 @@ TEST_CASE(
 
 TEST_CASE("BiquadFilterDesignTest MovingAverageOddLengthNullsAtFsOverN",
           "[wpimath][filter]") {
-  constexpr double kFs = 1000.0;
-  constexpr int kN = 5;
-  auto filter = BiquadFilter::MovingAverage(kN);
+  constexpr double FS = 1000.0;
+  constexpr int N = 5;
+  auto filter = BiquadFilter::MovingAverage(N);
   auto sections = filter.Sections();
-  double gainDc = CascadeMagnitude(sections, 0.0, kFs);
-  double gainNull = CascadeMagnitude(sections, kFs / kN, kFs);
-  double gainHalfNull = CascadeMagnitude(sections, kFs / (2.0 * kN), kFs);
+  double gainDc = CascadeMagnitude(sections, 0.0, FS);
+  double gainNull = CascadeMagnitude(sections, FS / N, FS);
+  double gainHalfNull = CascadeMagnitude(sections, FS / (2.0 * N), FS);
   CHECK_NEAR(gainDc, 1.0, 1e-12);
   CHECK(gainNull < 1e-10);
   CHECK(gainHalfNull > 0.1);
@@ -263,19 +263,19 @@ TEST_CASE(
     "BiquadFilterDesignTest MovingAverageMatchesSumAverageImpulseResponse",
     "[wpimath][filter]") {
   // Verify impulse response of the cascade equals 1/N for N samples, then 0.
-  constexpr int kN = 7;
-  auto filter = BiquadFilter::MovingAverage(kN);
+  constexpr int N = 7;
+  auto filter = BiquadFilter::MovingAverage(N);
 
-  std::array<double, kN + 3> out{};
+  std::array<double, N + 3> out{};
   for (size_t i = 0; i < out.size(); ++i) {
     double x = (i == 0) ? 1.0 : 0.0;
     out[i] = filter.Calculate(x);
   }
-  for (int i = 0; i < kN; ++i) {
+  for (int i = 0; i < N; ++i) {
     UNSCOPED_INFO("tap " << i);
-    CHECK_NEAR(out[i], 1.0 / kN, 1e-12);
+    CHECK_NEAR(out[i], 1.0 / N, 1e-12);
   }
-  for (size_t i = kN; i < out.size(); ++i) {
+  for (size_t i = N; i < out.size(); ++i) {
     UNSCOPED_INFO("post-window " << i);
     CHECK_NEAR(out[i], 0.0, 1e-12);
   }

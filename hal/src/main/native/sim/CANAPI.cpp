@@ -69,7 +69,7 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
                                 int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
+  if (busId < 0 || busId > wpi::hal::NUM_CAN_BUSES) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return HAL_INVALID_HANDLE;
   }
