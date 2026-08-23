@@ -294,7 +294,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      m_mockTime = time * 1_250_000; // 1.25ms per LED
+      m_mockTime = time * 1_250_000L; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -330,7 +330,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      m_mockTime = time * 1_250_000; // 1.25ms per LED
+      m_mockTime = time * 1_250_000L; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
