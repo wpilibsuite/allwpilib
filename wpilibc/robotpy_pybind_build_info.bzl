@@ -1157,7 +1157,7 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             class_name = "Preferences",
             yml_file = "semiwrap/Preferences.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/util/Preferences.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/preferences/Preferences.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::Preferences", "wpi__Preferences.hpp"),

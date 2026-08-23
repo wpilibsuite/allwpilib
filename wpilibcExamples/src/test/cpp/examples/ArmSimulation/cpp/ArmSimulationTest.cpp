@@ -13,12 +13,12 @@
 #include "Constants.hpp"
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/preferences/Preferences.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/Preferences.hpp"
 
 class ArmSimulationTest {
   Robot robot;

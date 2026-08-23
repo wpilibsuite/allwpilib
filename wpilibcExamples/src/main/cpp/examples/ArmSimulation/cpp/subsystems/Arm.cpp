@@ -4,9 +4,9 @@
 
 #include "subsystems/Arm.hpp"
 
+#include "wpi/preferences/Preferences.hpp"
 #include "wpi/system/RobotController.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
-#include "wpi/util/Preferences.hpp"
 
 Arm::Arm() {
   encoder.SetDistancePerPulse(ARM_ENCODER_DIST_PER_PULSE);
