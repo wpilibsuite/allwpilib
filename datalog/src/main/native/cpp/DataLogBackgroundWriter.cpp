@@ -33,15 +33,15 @@ using namespace wpi::log;
 static constexpr uintmax_t MIN_FREE_SPACE = 5 * 1024 * 1024;
 
 static std::string FormatBytesSize(uintmax_t value) {
-  static constexpr uintmax_t KI_B = 1024;
-  static constexpr uintmax_t MI_B = KI_B * 1024;
-  static constexpr uintmax_t GI_B = MI_B * 1024;
-  if (value >= GI_B) {
-    return std::format("{:.1f} GiB", static_cast<double>(value) / GI_B);
-  } else if (value >= MI_B) {
-    return std::format("{:.1f} MiB", static_cast<double>(value) / MI_B);
-  } else if (value >= KI_B) {
-    return std::format("{:.1f} KiB", static_cast<double>(value) / KI_B);
+  static constexpr uintmax_t KIB = 1024;
+  static constexpr uintmax_t MIB = KIB * 1024;
+  static constexpr uintmax_t GIB = MIB * 1024;
+  if (value >= GIB) {
+    return std::format("{:.1f} GiB", static_cast<double>(value) / GIB);
+  } else if (value >= MIB) {
+    return std::format("{:.1f} MiB", static_cast<double>(value) / MIB);
+  } else if (value >= KIB) {
+    return std::format("{:.1f} KiB", static_cast<double>(value) / KIB);
   } else {
     return std::format("{} B", value);
   }
