@@ -278,8 +278,6 @@ if __name__ == "__main__":
             print("not a log file", file=sys.stderr)
             sys.exit(1)
 
-        local_timezone = datetime.now(timezone.utc).astimezone().tzinfo
-
         entries = {}
         for record in reader:
             timestamp = record.timestamp / 1_000_000_000
@@ -326,7 +324,9 @@ if __name__ == "__main__":
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
                         val = record.getInteger()
-                        dt = datetime.fromtimestamp(val // 1_000_000, tz=local_timezone)
+                        dt = datetime.fromtimestamp(
+                            val // 1_000_000, tz=timezone.utc
+                        ).astimezone()
                         print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                         continue
 
