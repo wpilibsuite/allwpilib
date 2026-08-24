@@ -729,9 +729,14 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::net::raw_socket_ostream& os) {
 
       // update average
       if (averageFrameTime != 0) {
-        averageFrameTime =
-            averageFrameTime * (averagePeriod - timePerFrame) / averagePeriod +
-            deltaTime * timePerFrame / averagePeriod;
+        // Use floating-point intermediates to avoid int64_t overflow after
+        // long frame gaps.
+        double weightedAverage =
+            (static_cast<double>(averageFrameTime) *
+                 (averagePeriod - timePerFrame) +
+             static_cast<double>(deltaTime) * timePerFrame) /
+            averagePeriod;
+        averageFrameTime = static_cast<Frame::Time>(weightedAverage);
       } else {
         averageFrameTime = deltaTime;
       }
