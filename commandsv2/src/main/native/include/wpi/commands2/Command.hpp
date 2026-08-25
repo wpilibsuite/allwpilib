@@ -152,20 +152,6 @@ class Command : public wpi::telemetry::TelemetryLoggable,
   void SetName(std::string_view name);
 
   /**
-   * Gets the subsystem name of this Command.
-   *
-   * @return Subsystem name
-   */
-  std::string GetSubsystem() const;
-
-  /**
-   * Sets the subsystem name of this Command.
-   *
-   * @param subsystem subsystem name
-   */
-  void SetSubsystem(std::string_view subsystem);
-
-  /**
    * An enum describing the command's behavior when another command with a
    * shared requirement is scheduled.
    */
@@ -478,7 +464,6 @@ class Command : public wpi::telemetry::TelemetryLoggable,
   /// Requirements set.
   wpi::util::SmallSet<Subsystem*, 4> m_requirements;
   std::string m_name;
-  std::string m_subsystem = "Ungrouped";
   mutable bool m_running = false;
 
   std::optional<std::string> m_previousComposition;

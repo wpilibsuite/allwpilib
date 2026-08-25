@@ -65,7 +65,6 @@ class Command(TelemetryLoggable, ComplexTunable):
         )
         instance.requirements = set()
         instance._name = cls.__name__
-        instance._subsystem = "Ungrouped"
         return instance
 
     def __init__(self):
@@ -139,22 +138,6 @@ class Command(TelemetryLoggable, ComplexTunable):
         :param name: Name
         """
         self._name = name
-
-    def get_subsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return self._subsystem
-
-    def set_subsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        self._subsystem = subsystem
 
     def with_timeout(self, seconds: float) -> ParallelRaceGroup:
         """
