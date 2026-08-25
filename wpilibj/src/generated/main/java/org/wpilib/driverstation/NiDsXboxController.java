@@ -13,9 +13,9 @@ import org.wpilib.driverstation.GenericHID.RumbleType;
 import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.util.UsageReporting;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from NiDsXbox controllers connected to the Driver Station.

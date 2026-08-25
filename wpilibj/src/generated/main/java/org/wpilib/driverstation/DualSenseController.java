@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.util.UsageReporting;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from DualSense controllers connected to the Driver Station.

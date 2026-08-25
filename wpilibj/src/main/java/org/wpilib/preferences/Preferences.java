@@ -17,6 +17,7 @@ import org.wpilib.networktables.NetworkTableListener;
 import org.wpilib.networktables.StringPublisher;
 import org.wpilib.networktables.StringTopic;
 import org.wpilib.networktables.Topic;
+import org.wpilib.util.UsageReporting;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
