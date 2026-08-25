@@ -86,7 +86,8 @@ public class MockTelemetryBackend implements TelemetryBackend {
    *
    * @param path logged path
    * @param value logged value
-   * @param timestamp logged timestamp, or 0 to use the current time
+   * @param timestamp logged timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
   public record Action(String path, Object value, long timestamp) {}
 
