@@ -92,13 +92,29 @@ class DataLogTelemetryBackendTest {
 
   @Test
   void logsExplicitTimestamp() {
-    long timestamp = 123456789L;
+    long timestamp = 123456000L;
+    Translation2d value = new Translation2d(1.25, 2.5);
 
     m_backend.getEntry("/timestamped").logDouble(2.5, timestamp);
+    m_backend.getEntry("/timestampedRaw").logRaw(new byte[] {1, 2, 3}, "custom", timestamp);
+    m_backend.getEntry("/timestampedStruct").logStruct(value, Translation2d.struct, timestamp);
+    m_backend
+        .getEntry("/timestampedStructArray")
+        .logStructArray(new Translation2d[] {value}, Translation2d.struct, timestamp);
+    m_backend.getEntry("/timestampedProto").logProtobuf(value, Translation2d.proto, timestamp);
 
-    DataLogRecord record = last(entry(readSnapshot(), "timestamped"));
-    assertEquals(timestamp, record.getTimestamp());
-    assertEquals(2.5, record.getDouble());
+    LogSnapshot snapshot = readSnapshot();
+    EntryData timestamped = entry(snapshot, "timestamped");
+    assertStartAndLastTimestamp(timestamped, timestamp);
+    assertEquals(2.5, last(timestamped).getDouble());
+
+    EntryData timestampedRaw = entry(snapshot, "timestampedRaw");
+    assertStartAndLastTimestamp(timestampedRaw, timestamp);
+    assertArrayEquals(new byte[] {1, 2, 3}, last(timestampedRaw).getRaw());
+
+    assertStartAndLastTimestamp(entry(snapshot, "timestampedStruct"), timestamp);
+    assertStartAndLastTimestamp(entry(snapshot, "timestampedStructArray"), timestamp);
+    assertStartAndLastTimestamp(entry(snapshot, "timestampedProto"), timestamp);
   }
 
   @Test
@@ -334,6 +350,7 @@ class DataLogTelemetryBackendTest {
         EntryData entry = snapshot.entries.computeIfAbsent(start.name, _ -> new EntryData());
         entry.type = start.type;
         entry.metadata = start.metadata;
+        entry.startTimestamps.add(record.getTimestamp());
       } else if (record.isSetMetadata()) {
         DataLogRecord.MetadataRecordData metadata = record.getSetMetadataData();
         String name = names.get(metadata.entry);
@@ -366,6 +383,11 @@ class DataLogTelemetryBackendTest {
     return entry.records.get(entry.records.size() - 1);
   }
 
+  private static void assertStartAndLastTimestamp(EntryData entry, long timestamp) {
+    assertEquals(List.of(timestamp), entry.startTimestamps);
+    assertEquals(timestamp, last(entry).getTimestamp());
+  }
+
   private static final class LogSnapshot {
     final Map<String, EntryData> entries = new HashMap<>();
 
@@ -382,11 +404,20 @@ class DataLogTelemetryBackendTest {
   private static final class EntryData {
     String type;
     String metadata;
+    final List<Long> startTimestamps = new ArrayList<>();
     final List<DataLogRecord> records = new ArrayList<>();
 
     @Override
     public String toString() {
-      return "{type=" + type + ", metadata=" + metadata + ", records=" + records.size() + "}";
+      return "{type="
+          + type
+          + ", metadata="
+          + metadata
+          + ", startTimestamps="
+          + startTimestamps
+          + ", records="
+          + records.size()
+          + "}";
     }
   }
 }

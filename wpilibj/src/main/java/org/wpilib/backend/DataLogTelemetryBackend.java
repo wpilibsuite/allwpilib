@@ -170,14 +170,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> StructLogEntry<T> initStruct(Struct<T> struct) {
+    private <T> StructLogEntry<T> initStruct(Struct<T> struct, long timestamp) {
       if (m_closed) {
         return null;
       }
       DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
-          StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
+          StructLogEntry<T> e =
+              StructLogEntry.create(m_log, m_path, struct, m_properties, timestamp);
           m_struct = struct;
           m_entry = e;
           yield e;
@@ -196,7 +197,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          StructLogEntry<? super T> entry = initStruct(struct);
+          StructLogEntry<? super T> entry = initStruct(struct, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
               entry.append(value, timestamp);
@@ -215,14 +216,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
+    private <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto, long timestamp) {
       if (m_closed) {
         return null;
       }
       DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
-          ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
+          ProtobufLogEntry<T> e =
+              ProtobufLogEntry.create(m_log, m_path, proto, m_properties, timestamp);
           m_proto = proto;
           m_entry = e;
           yield e;
@@ -241,7 +243,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          ProtobufLogEntry<? super T> entry = initProtobuf(proto);
+          ProtobufLogEntry<? super T> entry = initProtobuf(proto, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
               entry.append(value, timestamp);
@@ -260,7 +262,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
+    private <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct, long timestamp) {
       if (m_closed) {
         return null;
       }
@@ -268,7 +270,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       return switch (entry) {
         case null -> {
           StructArrayLogEntry<T> e =
-              StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
+              StructArrayLogEntry.create(m_log, m_path, struct, m_properties, timestamp);
           m_struct = struct;
           m_entry = e;
           yield e;
@@ -287,7 +289,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          StructArrayLogEntry<? super T> entry = initStructArray(struct);
+          StructArrayLogEntry<? super T> entry = initStructArray(struct, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
               entry.append(value, timestamp);
@@ -326,7 +328,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new BooleanLogEntry(m_log, m_path, m_properties);
+          entry = new BooleanLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -356,7 +358,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new IntegerLogEntry(m_log, m_path, m_properties);
+          entry = new IntegerLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -386,7 +388,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new FloatLogEntry(m_log, m_path, m_properties);
+          entry = new FloatLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -416,7 +418,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new DoubleLogEntry(m_log, m_path, m_properties);
+          entry = new DoubleLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -447,7 +449,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         DataLogEntry entry = m_entry;
         if (entry == null) {
           m_typeString = typeString;
-          entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
+          entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString, timestamp);
           m_entry = entry;
         }
 
@@ -477,7 +479,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
+          entry = new BooleanArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -517,7 +519,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
+          entry = new IntegerArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -563,7 +565,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
+          entry = new FloatArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -593,7 +595,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
+          entry = new DoubleArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -623,7 +625,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new StringArrayLogEntry(m_log, m_path, m_properties);
+          entry = new StringArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
@@ -654,7 +656,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         DataLogEntry entry = m_entry;
         if (entry == null) {
           m_typeString = typeString;
-          entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
+          entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString, timestamp);
           m_entry = entry;
         }
 

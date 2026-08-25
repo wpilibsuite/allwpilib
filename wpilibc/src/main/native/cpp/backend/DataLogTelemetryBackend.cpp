@@ -90,7 +90,7 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
         return;
       }
       if (std::holds_alternative<std::monostate>(m_entry)) {
-        EntryType entry{m_log, m_path, m_propertiesStr};
+        EntryType entry{m_log, m_path, m_propertiesStr, timestamp};
         m_entryIndex = entry.GetIndex();
         m_entry = std::move(entry);
       }
@@ -119,7 +119,8 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
       }
       if (std::holds_alternative<std::monostate>(m_entry)) {
         m_typeString = typeString;
-        EntryType entry{m_log, m_path, m_propertiesStr, m_typeString};
+        EntryType entry{m_log, m_path, m_propertiesStr, m_typeString,
+                        timestamp};
         m_entryIndex = entry.GetIndex();
         m_entry = std::move(entry);
       }
