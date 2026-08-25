@@ -39,8 +39,8 @@ void Elevator::UpdateTelemetry() {
   wpi::telemetry::Log("Elevator Sim", mech2d);
 }
 
-void Elevator::ReachGoal(wpi::units::meter_t goal) {
-  wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
+void Elevator::ReachGoal(wpi::units::meters<> goal) {
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goalState{goal, 0_mps};
 
   auto next = profile.Calculate(20_ms, setpoint, goalState);
@@ -50,7 +50,7 @@ void Elevator::ReachGoal(wpi::units::meter_t goal) {
   auto feedforwardOutput =
       feedforward.Calculate(setpoint.velocity, next.velocity);
 
-  motor.SetVoltage(wpi::units::volt_t{pidOutput} + feedforwardOutput);
+  motor.SetVoltage(wpi::units::volts<>{pidOutput} + feedforwardOutput);
 
   setpoint = next;
 }

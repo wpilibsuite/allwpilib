@@ -1,0 +1,136 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 22 Aug 2026 02:38:08 -0400
+Subject: [PATCH 11/12] Add Tunable and Telemetry support
+
+---
+ include/units/core.h | 95 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 089690db7ddb8d98da97823b90626ca816035a43..7c62a965d80ddefe57c56d612e5b236764564497 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -127,6 +127,11 @@
+ #include <string_view>
+ #endif
+ 
++#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
++#include <string_view>
++#include <wpi/util/ct_string.hpp>
++#include <wpi/telemetry/TelemetryTable.hpp>
++#endif
+ #include <gcem.hpp>
+ 
+ #if defined(UNIT_LIB_ENABLE_STRING)
+@@ -211,6 +216,29 @@ namespace units
+ //	MACROS
+ //------------------------------
+ 
++/**
++ * @def			UNIT_ADD_TELEMETRY(namespaceName, namePlural, abbreviation)
++ * @brief		Macro for generating the boiler-plate code needed for telemetry for a new unit.
++ * @details		The macro generates the code to insert units into a wpi::telemetry::TelemetryTable
++ * @param		namespaceName namespace in which the new units will be encapsulated.
++ * @param		namePlural plural version of the unit name, e.g. 'meters'
++ * @param		abbrev - abbreviated unit name, e.g. 'm'
++ * @note		When UNIT_LIB_DISABLE_TELEMETRY is defined, the macro does not generate any code
++ */
++#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
++  #define UNIT_ADD_TELEMETRY(namespaceName, namePlural, abbrev)\
++  inline namespace namespaceName\
++  {\
++	  inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view name, const namePlural <>& value)\
++	  {\
++			table.SetProperty(name, "unit", "\"" #abbrev "\"");\
++			table.Log(name, value.value());\
++	  }\
++  }
++#else
++	 #define UNIT_ADD_TELEMETRY(namespaceName, namePlural, abbrev)
++#endif
++
+ /**
+  * @def			UNIT_ADD_STRONG_CONVERSION_FACTOR(namespaceName, namePlural, __VA_ARGS__)
+  * @brief		Helper macro for generating the boilerplate code generating the tags of a new unit.
+@@ -465,6 +493,7 @@ namespace units
+ 	UNIT_ADD_UNIT_DEFINITION(namespaceName, namePlural, __VA_ARGS__)                                                                                                                                   \
+ 	UNIT_ADD_NAME(namespaceName, namePlural, abbreviation)                                                                                                                                             \
+ 	UNIT_REGISTER_NAMED_CLASS(namespaceName, namePlural)                                                                                                                                               \
++	UNIT_ADD_TELEMETRY(namespaceName, namePlural, abbreviation)                                                                                                                                        \
+ 	UNIT_ADD_LITERALS(namespaceName, namePlural, abbreviation)                                                                                                                                         \
+ 	UNIT_ADD_CONSTANT(namespaceName, namePlural, abbreviation)
+ 
+@@ -6369,6 +6398,72 @@ namespace units
+ #endif
+ #endif
+ 
++//----------------------------------------------------------------------------------------------------------------------
++//  TELEMETRY SUPPORT
++//----------------------------------------------------------------------------------------------------------------------
++namespace wpi::units {
++#if (__has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)) || (__has_include(<wpi/tunables/Tunable.hpp>) && !defined(UNIT_LIB_DISABLE_TUNABLE))
++	namespace detail
++	{
++		template<bool b>
++		constexpr auto only_if(const auto& s)
++		{
++			if constexpr (b)
++			{
++				return s;
++			}
++			else
++			{
++				using namespace wpi::util::literals;
++				return ""_ct_string;
++			}
++		}
++
++		template<bool separator, class D, class E>
++		consteval auto dim_to_string(const dim<D, E>&)
++		{
++			using namespace wpi::util::literals;
++			return wpi::util::Concat(only_if<separator>(" "_ct_string),
++				only_if<(E::num != 0)>(wpi::util::ct_string<char, std::char_traits<char>, std::string_view(D::abbreviation).size()>(std::string_view(D::abbreviation))),
++				only_if<(E::num != 0 && E::num != 1)>("^"_ct_string), only_if<(E::num != 0 && E::num != 1)>(wpi::util::NumToCtString<E::num>()), only_if<(E::den != 1)>("/"_ct_string),
++				only_if<(E::den != 1)>(wpi::util::NumToCtString<E::den>()));
++		}
++		template<class Dim, class... Dims>
++		consteval auto dims_to_string(const dimension_t<Dim, Dims...>&)
++		{
++			using namespace wpi::util::literals;
++			return wpi::util::Concat(dim_to_string<false>(Dim{}), dim_to_string<true>(Dims{})...);
++		}
++		// For dimensionless
++		consteval auto dims_to_string(const dimension_t<>&)
++		{
++			using namespace wpi::util::literals;
++			return ""_ct_string;
++		}
++		template<UnitType Units>
++		consteval auto ComplexAbbrev()
++		{
++			using conversion_factor = typename traits::unit_traits<Units>::conversion_factor;
++			using DimType           = traits::dimension_of_t<conversion_factor>;
++			return dims_to_string(DimType{});
++		}
++	} // namespace detail
++#endif
++
++#if __has_include(<wpi/telemetry/TelemetryTable.hpp>) && !defined(UNIT_LIB_DISABLE_TELEMETRY)
++	template<UnitType Unit>
++	inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view n, const Unit& value)
++	{
++		using BaseUnits      = unit<conversion_factor<std::ratio<1>, traits::dimension_of_t<Unit>>>;
++		using UnderlyingType = typename traits::unit_traits<Unit>::underlying_type;
++		using namespace wpi::util::literals;
++		auto unitJson = wpi::util::Concat("\""_ct_string, detail::ComplexAbbrev<BaseUnits>(), "\""_ct_string);
++		table.SetProperty(n, "unit", unitJson);
++		table.Log(n, BaseUnits(value).template to<UnderlyingType>());
++	}
++#endif
++} // namespace wpi::units
++
+ #ifndef UNIT_NO_LITERAL_SUPPORT
+ namespace units::literals {}
+ using namespace units::literals;

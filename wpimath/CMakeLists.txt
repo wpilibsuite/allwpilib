@@ -91,11 +91,16 @@ else()
     target_link_libraries(wpimath Eigen3::Eigen)
 endif()
 
-install(DIRECTORY src/main/native/thirdparty/gcem/include/ DESTINATION "${include_dest}/wpimath")
+install(
+    DIRECTORY src/main/native/thirdparty/gcem/include/ src/main/native/thirdparty/units/include/
+    DESTINATION "${include_dest}/wpimath"
+)
 target_include_directories(
     wpimath
     SYSTEM
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/gcem/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/units/include>
 )
 
 if(NOT WPILIB_USE_SYSTEM_SLEIPNIR)

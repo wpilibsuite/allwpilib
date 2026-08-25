@@ -78,7 +78,7 @@ CommandScheduler& CommandScheduler::GetInstance() {
   return scheduler;
 }
 
-void CommandScheduler::SetPeriod(wpi::units::second_t period) {
+void CommandScheduler::SetPeriod(wpi::units::seconds<> period) {
   m_watchdog.SetTimeout(period);
 }
 

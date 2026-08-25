@@ -107,7 +107,7 @@ template <int States, int Inputs>
 Matrixd<Inputs, States> GetImplicitModelFollowingK(
     const Matrixd<States, States>& A, const Matrixd<States, Inputs>& B,
     const Matrixd<States, States>& Q, const Matrixd<Inputs, Inputs>& R,
-    const Matrixd<States, States>& Aref, wpi::units::second_t dt) {
+    const Matrixd<States, States>& Aref, wpi::units::seconds<> dt) {
   // Discretize real dynamics
   Matrixd<States, States> discA;
   Matrixd<States, Inputs> discB;

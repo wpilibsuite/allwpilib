@@ -42,7 +42,7 @@ class WaitUntilCommand : public CommandHelper<Command, WaitUntilCommand> {
    * @param time the match time after which to end, in seconds
    * @see wpi::DriverStation::GetMatchTime()
    */
-  explicit WaitUntilCommand(wpi::units::second_t time);
+  explicit WaitUntilCommand(wpi::units::seconds<> time);
 
   WaitUntilCommand(WaitUntilCommand&& other) = default;
 

@@ -55,8 +55,8 @@ void Analyzer::UpdateFeedforwardGains() {
     m_settings.preset.measurementDelay =
         m_settings.type == FeedbackControllerLoopType::POSITION
             // Clamp feedback measurement delay to ≥ 0
-            ? wpi::units::math::max(0_s, m_manager->GetPositionDelay())
-            : wpi::units::math::max(0_s, m_manager->GetVelocityDelay());
+            ? wpi::units::max(0_s, m_manager->GetPositionDelay())
+            : wpi::units::max(0_s, m_manager->GetVelocityDelay());
     PrepareGraphs();
   } catch (const sysid::InvalidDataError& e) {
     m_state = AnalyzerState::GENERAL_DATA_ERROR;
@@ -83,7 +83,7 @@ void Analyzer::UpdateFeedbackGains() {
   const auto& Ka = m_feedforwardGains.Ka;
   if (Kv.isValidGain && Ka.isValidGain) {
     const auto& fb = m_manager->CalculateFeedback(Kv, Ka);
-    m_timescale = wpi::units::second_t{Ka.gain / Kv.gain};
+    m_timescale = wpi::units::seconds<>{Ka.gain / Kv.gain};
     m_timescaleValid = true;
     m_Kp = fb.Kp;
     m_Kd = fb.Kd;
@@ -468,7 +468,7 @@ void Analyzer::DisplayFeedforwardParameters(float beginX, float beginY) {
     if (ImGui::SliderFloat("Test Duration", &m_stepTestDuration,
                            m_manager->GetMinStepTime().value(),
                            m_manager->GetMaxStepTime().value(), "%.2f")) {
-      m_settings.stepTestDuration = wpi::units::second_t{m_stepTestDuration};
+      m_settings.stepTestDuration = wpi::units::seconds<>{m_stepTestDuration};
       PrepareData();
     }
   }

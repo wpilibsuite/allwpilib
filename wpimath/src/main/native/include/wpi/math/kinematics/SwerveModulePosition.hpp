@@ -6,7 +6,6 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -18,7 +17,7 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
   /**
    * Distance the wheel of a module has traveled
    */
-  wpi::units::meter_t distance = 0_m;
+  wpi::units::meters<> distance = 0_m;
 
   /**
    * Angle of the module.
@@ -32,7 +31,7 @@ struct WPILIB_DLLEXPORT SwerveModulePosition {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModulePosition& other) const {
-    return wpi::units::math::abs(distance - other.distance) < 1E-9_m &&
+    return wpi::units::abs(distance - other.distance) < 1E-9_m &&
            angle == other.angle;
   }
 

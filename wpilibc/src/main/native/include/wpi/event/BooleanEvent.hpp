@@ -122,7 +122,7 @@ class BooleanEvent {
    * @param type The debounce type.
    * @return The debounced event.
    */
-  BooleanEvent Debounce(wpi::units::second_t debounceTime,
+  BooleanEvent Debounce(wpi::units::seconds<> debounceTime,
                         wpi::math::Debouncer::DebounceType type =
                             wpi::math::Debouncer::DebounceType::RISING);
 

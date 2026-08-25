@@ -14,8 +14,8 @@ wpi::util::Protobuf<wpi::math::Translation2d>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Translation2d{
-      wpi::units::meter_t{msg.x},
-      wpi::units::meter_t{msg.y},
+      wpi::units::meters<>{msg.x},
+      wpi::units::meters<>{msg.y},
   };
 }
 

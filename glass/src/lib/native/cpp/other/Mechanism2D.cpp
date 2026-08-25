@@ -38,10 +38,10 @@ namespace {
 // Per-frame data (not persistent)
 struct FrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
-                                scale},
-            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
-                                scale}};
+    return {wpi::units::meters<>{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+                                 scale},
+            wpi::units::meters<>{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+                                 scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),

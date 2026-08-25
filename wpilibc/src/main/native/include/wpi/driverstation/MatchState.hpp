@@ -39,7 +39,7 @@ class MatchState final {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static wpi::units::second_t GetMatchTime() {
+  static wpi::units::seconds<> GetMatchTime() {
     return wpi::internal::DriverStationBackend::GetMatchTime();
   }
 

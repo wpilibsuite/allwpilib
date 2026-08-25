@@ -20,7 +20,7 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
    * @param time How much time to turn
    * @param drive The drive subsystem on which this command will run
    */
-  TurnTime(double velocity, wpi::units::second_t time, Drivetrain* drive)
+  TurnTime(double velocity, wpi::units::seconds<> time, Drivetrain* drive)
       : velocity(velocity), duration(time), drive(drive) {
     AddRequirements(drive);
   }
@@ -32,7 +32,7 @@ class TurnTime : public wpi::cmd::CommandHelper<wpi::cmd::Command, TurnTime> {
 
  private:
   double velocity;
-  wpi::units::second_t duration;
+  wpi::units::seconds<> duration;
   Drivetrain* drive;
   wpi::Timer timer;
 };

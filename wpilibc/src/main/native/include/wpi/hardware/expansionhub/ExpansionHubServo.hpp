@@ -49,14 +49,14 @@ class ExpansionHubServo {
    * current angle range.
    * @Common This is one of the commonly used methods for this class
    */
-  void SetAngle(wpi::units::degree_t angle);
+  void SetAngle(wpi::units::degrees<> angle);
 
   /**
    * Sets the raw pulse width output on the servo.
    *
    * @param pulseWidth Pulse width
    */
-  void SetPulseWidth(wpi::units::microsecond_t pulseWidth);
+  void SetPulseWidth(wpi::units::microseconds<> pulseWidth);
 
   /**
    * Sets if the servo output is enabled or not. Defaults to false.
@@ -70,7 +70,7 @@ class ExpansionHubServo {
    *
    * @param framePeriod The frame period
    */
-  void SetFramePeriod(wpi::units::microsecond_t framePeriod);
+  void SetFramePeriod(wpi::units::microseconds<> framePeriod);
 
   /**
    * Gets if the underlying ExpansionHub is connected.
@@ -88,8 +88,8 @@ class ExpansionHubServo {
    * @param minAngle Minimum angle
    * @param maxAngle Maximum angle
    */
-  void SetAngleRange(wpi::units::degree_t minAngle,
-                     wpi::units::degree_t maxAngle);
+  void SetAngleRange(wpi::units::degrees<> minAngle,
+                     wpi::units::degrees<> maxAngle);
 
   /**
    * Sets the PWM range for the servo.
@@ -100,8 +100,8 @@ class ExpansionHubServo {
    * @param minPwm Minimum PWM
    * @param maxPwm Maximum PWM
    */
-  void SetPWMRange(wpi::units::microsecond_t minPwm,
-                   wpi::units::microsecond_t maxPwm);
+  void SetPWMRange(wpi::units::microseconds<> minPwm,
+                   wpi::units::microseconds<> maxPwm);
 
   /**
    * Sets whether the servo is reversed.
@@ -113,17 +113,17 @@ class ExpansionHubServo {
   void SetReversed(bool reversed);
 
  private:
-  wpi::units::microsecond_t GetFullRangeScaleFactor();
-  wpi::units::degree_t GetServoAngleRange();
+  wpi::units::microseconds<> GetFullRangeScaleFactor();
+  wpi::units::degrees<> GetServoAngleRange();
 
   ExpansionHub m_hub;
   int m_channel;
 
-  wpi::units::degree_t m_maxServoAngle = 180.0_deg;
-  wpi::units::degree_t m_minServoAngle = 0.0_deg;
+  wpi::units::degrees<> m_maxServoAngle = 180.0_deg;
+  wpi::units::degrees<> m_minServoAngle = 0.0_deg;
 
-  wpi::units::microsecond_t m_minPwm = 600_us;
-  wpi::units::microsecond_t m_maxPwm = 2400_us;
+  wpi::units::microseconds<> m_minPwm = 600_us;
+  wpi::units::microseconds<> m_maxPwm = 2400_us;
 
   bool m_reversed = false;
 

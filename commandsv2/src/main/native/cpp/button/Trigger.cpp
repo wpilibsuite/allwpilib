@@ -176,7 +176,7 @@ Trigger Trigger::ToggleOnFalse(CommandPtr&& command) {
   return *this;
 }
 
-Trigger Trigger::Debounce(wpi::units::second_t debounceTime,
+Trigger Trigger::Debounce(wpi::units::seconds<> debounceTime,
                           wpi::math::Debouncer::DebounceType type) {
   return Trigger(m_loop, [debouncer = wpi::math::Debouncer(debounceTime, type),
                           condition = m_condition]() mutable {
@@ -184,7 +184,7 @@ Trigger Trigger::Debounce(wpi::units::second_t debounceTime,
   });
 }
 
-Trigger Trigger::MultiPress(int requiredPresses, units::second_t windowTime) {
+Trigger Trigger::MultiPress(int requiredPresses, units::seconds<> windowTime) {
   return Trigger(m_loop, [filter = wpi::math::EdgeCounterFilter(requiredPresses,
                                                                 windowTime),
                           condition = m_condition]() mutable {

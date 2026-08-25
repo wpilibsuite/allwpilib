@@ -7,9 +7,9 @@ classes:
     methods:
       ExtendedKalmanFilter:
         overloads:
-          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, wpi::units::second_t
+          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, wpi::units::seconds<>
           :
-          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, std::function<OutputVector (const OutputVector&, const OutputVector&)>, std::function<StateVector (const StateVector&, const StateVector&)>, wpi::units::second_t
+          ? std::function<StateVector (const StateVector&, const InputVector&)>, std::function<OutputVector (const StateVector&, const InputVector&)>, const StateArray&, const OutputArray&, std::function<OutputVector (const OutputVector&, const OutputVector&)>, std::function<StateVector (const StateVector&, const StateVector&)>, wpi::units::seconds<>
           :
       P:
         overloads:

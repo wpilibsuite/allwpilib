@@ -53,10 +53,10 @@ constexpr std::string_view POSE2D_ARRAY_TYPE = "struct:Pose2d[]";
 // Per-frame field data (not persistent)
 struct FieldFrameData {
   wpi::math::Translation2d GetPosFromScreen(const ImVec2& cursor) const {
-    return {wpi::units::meter_t{(std::clamp(cursor.x, min.x, max.x) - min.x) /
-                                scale},
-            wpi::units::meter_t{(max.y - std::clamp(cursor.y, min.y, max.y)) /
-                                scale}};
+    return {wpi::units::meters<>{(std::clamp(cursor.x, min.x, max.x) - min.x) /
+                                 scale},
+            wpi::units::meters<>{(max.y - std::clamp(cursor.y, min.y, max.y)) /
+                                 scale}};
   }
   ImVec2 GetScreenFromPos(const wpi::math::Translation2d& pos) const {
     return {min.x + scale * pos.X().to<float>(),
@@ -77,7 +77,7 @@ struct SelectedTargetInfo {
   FieldObjectModel* objModel = nullptr;
   std::string name;
   size_t index;
-  wpi::units::radian_t rot;
+  wpi::units::radians<> rot;
   ImVec2 poseCenter;  // center of the pose (screen coordinates)
   ImVec2 center;      // center of the target (screen coordinates)
   float radius;       // target radius
@@ -89,7 +89,7 @@ struct SelectedTargetInfo {
 struct PoseDragState {
   SelectedTargetInfo target;
   ImVec2 initialOffset;
-  wpi::units::radian_t initialAngle = 0_rad;
+  wpi::units::radians<> initialAngle = 0_rad;
 };
 
 // Popup edit state
@@ -141,8 +141,8 @@ struct DisplayOptions {
   float weight = DEFAULT_WEIGHT;
   int color = DEFAULT_COLOR;
 
-  wpi::units::meter_t width = DEFAULT_WIDTH;
-  wpi::units::meter_t length = DEFAULT_LENGTH;
+  wpi::units::meters<> width = DEFAULT_WIDTH;
+  wpi::units::meters<> length = DEFAULT_LENGTH;
 
   bool arrows = DEFAULT_ARROWS;
   int arrowSize = DEFAULT_ARROW_SIZE;
@@ -161,7 +161,7 @@ class PoseFrameData {
                          size_t index, const FieldFrameData& ffd,
                          const DisplayOptions& displayOptions);
   void SetPosition(const wpi::math::Translation2d& pos);
-  void SetRotation(wpi::units::radian_t rot);
+  void SetRotation(wpi::units::radians<> rot);
   const wpi::math::Rotation2d& GetRotation() const { return m_pose.Rotation(); }
   const wpi::math::Pose2d& GetPose() const { return m_pose; }
   float GetHitRadius() const { return m_hitRadius; }
@@ -275,19 +275,19 @@ static PoseDragState gDragState;
 static PopupState gPopupState;
 static DisplayUnits gDisplayUnits = DISPLAY_METERS;
 
-static double ConvertDisplayLength(wpi::units::meter_t v) {
+static double ConvertDisplayLength(wpi::units::meters<> v) {
   switch (gDisplayUnits) {
     case DISPLAY_FEET:
-      return v.convert<wpi::units::feet>().value();
+      return v.convert<wpi::units::feet_>().value();
     case DISPLAY_INCHES:
-      return v.convert<wpi::units::inches>().value();
+      return v.convert<wpi::units::inches_>().value();
     case DISPLAY_METERS:
     default:
       return v.value();
   }
 }
 
-static double ConvertDisplayAngle(wpi::units::degree_t v) {
+static double ConvertDisplayAngle(wpi::units::degrees<> v) {
   return v.value();
 }
 
@@ -324,7 +324,7 @@ static void AcceptFieldObjectDrop(Field2DModel* model) {
   ImGui::EndDragDropTarget();
 }
 
-static bool InputLength(const char* label, wpi::units::meter_t* v,
+static bool InputLength(const char* label, wpi::units::meters<>* v,
                         double step = 0.0, double step_fast = 0.0,
                         const char* format = "%.6f",
                         ImGuiInputTextFlags flags = 0) {
@@ -332,14 +332,14 @@ static bool InputLength(const char* label, wpi::units::meter_t* v,
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
       case DISPLAY_FEET:
-        *v = wpi::units::foot_t{dv};
+        *v = wpi::units::feet<>{dv};
         break;
       case DISPLAY_INCHES:
-        *v = wpi::units::inch_t{dv};
+        *v = wpi::units::inches<>{dv};
         break;
       case DISPLAY_METERS:
       default:
-        *v = wpi::units::meter_t{dv};
+        *v = wpi::units::meters<>{dv};
         break;
     }
     return true;
@@ -351,7 +351,7 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
                              double step_fast = 0.0,
                              const char* format = "%.3f",
                              ImGuiInputTextFlags flags = 0) {
-  wpi::units::meter_t uv{*v};
+  wpi::units::meters<> uv{*v};
   if (InputLength(label, &uv, step, step_fast, format, flags)) {
     *v = uv.to<float>();
     return true;
@@ -359,13 +359,13 @@ static bool InputFloatLength(const char* label, float* v, double step = 0.0,
   return false;
 }
 
-static bool InputAngle(const char* label, wpi::units::degree_t* v,
+static bool InputAngle(const char* label, wpi::units::degrees<>* v,
                        double step = 0.0, double step_fast = 0.0,
                        const char* format = "%.6f",
                        ImGuiInputTextFlags flags = 0) {
   double dv = ConvertDisplayAngle(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
-    *v = wpi::units::degree_t{dv};
+    *v = wpi::units::degrees<>{dv};
     return true;
   }
   return false;
@@ -660,8 +660,8 @@ DisplayOptions ObjectInfo::GetDisplayOptions() const {
   rv.style = static_cast<DisplayOptions::Style>(m_style.GetValue());
   rv.weight = m_weight;
   rv.color = ImGui::ColorConvertFloat4ToU32(m_color.GetColor());
-  rv.width = wpi::units::meter_t{m_width};
-  rv.length = wpi::units::meter_t{m_length};
+  rv.width = wpi::units::meters<>{m_width};
+  rv.length = wpi::units::meters<>{m_length};
   rv.arrows = m_arrows;
   rv.arrowSize = m_arrowSize;
   rv.arrowWeight = m_arrowWeight;
@@ -801,7 +801,7 @@ void PoseFrameData::SetPosition(const wpi::math::Translation2d& pos) {
   m_model.SetPose(m_index, m_pose);
 }
 
-void PoseFrameData::SetRotation(wpi::units::radian_t rot) {
+void PoseFrameData::SetRotation(wpi::units::radians<> rot) {
   m_pose = wpi::math::Pose2d{m_pose.Translation(), rot};
   m_model.SetPose(m_index, m_pose);
 }
@@ -906,7 +906,7 @@ void PoseFrameData::HandleDrag(const ImVec2& cursor) {
   } else {
     ImVec2 off = cursor - m_center;
     SetRotation(gDragState.initialAngle -
-                wpi::units::radian_t{std::atan2(off.y, off.x)});
+                wpi::units::radians<>{std::atan2(off.y, off.x)});
     gDragState.target.center = m_corners[gDragState.target.corner - 2];
     gDragState.target.rot = GetRotation().Radians();
   }
@@ -1099,8 +1099,8 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
       gDragState.initialOffset = m_mousePos - target->poseCenter;
       if (target->corner != 1) {
         gDragState.initialAngle =
-            wpi::units::radian_t{std::atan2(gDragState.initialOffset.y,
-                                            gDragState.initialOffset.x)} +
+            wpi::units::radians<>{std::atan2(gDragState.initialOffset.y,
+                                             gDragState.initialOffset.x)} +
             target->rot;
       }
     }

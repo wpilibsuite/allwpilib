@@ -74,7 +74,7 @@ class PeriodicPriorityQueue {
      * @param offset    The offset from the common starting time.
      */
     Callback(std::function<void()> func, std::chrono::nanoseconds startTime,
-             wpi::units::second_t period, wpi::units::second_t offset);
+             wpi::units::seconds<> period, wpi::units::seconds<> offset);
 
     /**
      * Construct a callback container using units-based period.
@@ -84,7 +84,7 @@ class PeriodicPriorityQueue {
      * @param period    The period at which to run the callback.
      */
     Callback(std::function<void()> func, std::chrono::nanoseconds startTime,
-             wpi::units::second_t period);
+             wpi::units::seconds<> period);
 
     bool operator>(const Callback& rhs) const {
       if (expirationTime == rhs.expirationTime) {
@@ -126,7 +126,7 @@ class PeriodicPriorityQueue {
    * @param period    The period at which to run the callback.
    */
   void Add(std::function<void()> func, std::chrono::nanoseconds startTime,
-           wpi::units::second_t period);
+           wpi::units::seconds<> period);
 
   /**
    * Adds a periodic callback to the queue.
@@ -138,7 +138,7 @@ class PeriodicPriorityQueue {
    * @param offset    The offset from the common starting time.
    */
   void Add(std::function<void()> func, std::chrono::nanoseconds startTime,
-           wpi::units::second_t period, wpi::units::second_t offset);
+           wpi::units::seconds<> period, wpi::units::seconds<> offset);
 
   /**
    * Adds a pre-constructed callback to the queue.
@@ -201,13 +201,13 @@ class PeriodicPriorityQueue {
    * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::nanosecond_t GetLoopStartTime() const { return m_loopStartTime; }
+  wpi::units::nanoseconds<> GetLoopStartTime() const { return m_loopStartTime; }
 
  private:
   wpi::util::priority_queue<Callback, std::vector<Callback>, std::greater<>>
       m_queue;
 
-  wpi::units::nanosecond_t m_loopStartTime{0};
+  wpi::units::nanoseconds<> m_loopStartTime{0};
 };
 
 }  // namespace wpi::internal

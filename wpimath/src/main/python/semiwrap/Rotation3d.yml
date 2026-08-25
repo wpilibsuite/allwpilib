@@ -10,16 +10,16 @@ functions:
 classes:
   wpi::math::Rotation3d:
     force_type_casters:
-    - wpi::units::radians_per_second
-    - wpi::units::second_t
+    - wpi::units::radians_per_second_
+    - wpi::units::seconds<>
     methods:
       Rotation3d:
         overloads:
           '':
           const Quaternion&:
             keepalive: []
-          wpi::units::radian_t, wpi::units::radian_t, wpi::units::radian_t:
-          const Eigen::Vector3d&, wpi::units::radian_t:
+          wpi::units::radians<>, wpi::units::radians<>, wpi::units::radians<>:
+          const Eigen::Vector3d&, wpi::units::radians<>:
             keepalive: []
           const Eigen::Vector3d&:
             keepalive: []
@@ -49,29 +49,29 @@ classes:
 
 inline_code: |
   cls_Rotation3d
-    .def_static("from_radians", [](wpi::units::radian_t roll, wpi::units::radian_t pitch, wpi::units::radian_t yaw) {
+    .def_static("from_radians", [](wpi::units::radians<> roll, wpi::units::radians<> pitch, wpi::units::radians<> yaw) {
       return std::make_unique<Rotation3d>(roll, pitch, yaw);
     }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
-    .def_static("from_degrees", [](wpi::units::degree_t roll, wpi::units::degree_t pitch, wpi::units::degree_t yaw) {
+    .def_static("from_degrees", [](wpi::units::degrees<> roll, wpi::units::degrees<> pitch, wpi::units::degrees<> yaw) {
       return std::make_unique<Rotation3d>(roll, pitch, yaw);
     }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
-    .def_static("from_rotations", [](wpi::units::turn_t roll, wpi::units::turn_t pitch, wpi::units::turn_t yaw) {
+    .def_static("from_rotations", [](wpi::units::turns<> roll, wpi::units::turns<> pitch, wpi::units::turns<> yaw) {
       return std::make_unique<Rotation3d>(roll, pitch, yaw);
     }, py::arg("roll"), py::arg("pitch"), py::arg("yaw"))
     .def_property_readonly("x", &Rotation3d::X)
     .def_property_readonly("y", &Rotation3d::Y)
     .def_property_readonly("z", &Rotation3d::Z)
     .def_property_readonly("angle", &Rotation3d::Angle)
-    .def_property_readonly("x_degrees", [](const Rotation3d * self) -> wpi::units::degree_t {
+    .def_property_readonly("x_degrees", [](const Rotation3d * self) -> wpi::units::degrees<> {
       return self->X();
     })
-    .def_property_readonly("y_degrees", [](const Rotation3d * self) -> wpi::units::degree_t {
+    .def_property_readonly("y_degrees", [](const Rotation3d * self) -> wpi::units::degrees<> {
       return self->Y();
     })
-    .def_property_readonly("z_degrees", [](const Rotation3d * self) -> wpi::units::degree_t {
+    .def_property_readonly("z_degrees", [](const Rotation3d * self) -> wpi::units::degrees<> {
       return self->Z();
     })
-    .def_property_readonly("angle_degrees", [](const Rotation3d * self) -> wpi::units::degree_t {
+    .def_property_readonly("angle_degrees", [](const Rotation3d * self) -> wpi::units::degrees<> {
       return self->Angle();
     })
     .def("__repr__", py::overload_cast<const Rotation3d&>(&rpy::toString));

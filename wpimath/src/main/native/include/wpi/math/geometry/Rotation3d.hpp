@@ -15,7 +15,6 @@
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -99,17 +98,17 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * @param pitch The counterclockwise rotation angle around the Y axis (pitch).
    * @param yaw The counterclockwise rotation angle around the Z axis (yaw).
    */
-  constexpr Rotation3d(wpi::units::radian_t roll, wpi::units::radian_t pitch,
-                       wpi::units::radian_t yaw) {
+  constexpr Rotation3d(wpi::units::radians<> roll, wpi::units::radians<> pitch,
+                       wpi::units::radians<> yaw) {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion
-    double cr = wpi::units::math::cos(roll * 0.5);
-    double sr = wpi::units::math::sin(roll * 0.5);
+    double cr = wpi::units::cos(roll * 0.5);
+    double sr = wpi::units::sin(roll * 0.5);
 
-    double cp = wpi::units::math::cos(pitch * 0.5);
-    double sp = wpi::units::math::sin(pitch * 0.5);
+    double cp = wpi::units::cos(pitch * 0.5);
+    double sp = wpi::units::sin(pitch * 0.5);
 
-    double cy = wpi::units::math::cos(yaw * 0.5);
-    double sy = wpi::units::math::sin(yaw * 0.5);
+    double cy = wpi::units::cos(yaw * 0.5);
+    double sy = wpi::units::sin(yaw * 0.5);
 
     m_q = Quaternion{cr * cp * cy + sr * sp * sy, sr * cp * cy - cr * sp * sy,
                      cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy};
@@ -123,17 +122,17 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * @param angle The rotation around the axis.
    */
   constexpr Rotation3d(const Eigen::Vector3d& axis,
-                       wpi::units::radian_t angle) {
+                       wpi::units::radians<> angle) {
     double norm = ct_matrix{axis}.norm();
     if (norm == 0.0) {
       return;
     }
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
-    Eigen::Vector3d v{{axis(0) / norm * wpi::units::math::sin(angle / 2.0),
-                       axis(1) / norm * wpi::units::math::sin(angle / 2.0),
-                       axis(2) / norm * wpi::units::math::sin(angle / 2.0)}};
-    m_q = Quaternion{wpi::units::math::cos(angle / 2.0), v(0), v(1), v(2)};
+    Eigen::Vector3d v{{axis(0) / norm * wpi::units::sin(angle / 2.0),
+                       axis(1) / norm * wpi::units::sin(angle / 2.0),
+                       axis(2) / norm * wpi::units::sin(angle / 2.0)}};
+    m_q = Quaternion{wpi::units::cos(angle / 2.0), v(0), v(1), v(2)};
   }
 
   /**
@@ -144,7 +143,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * @param rvec The rotation vector.
    */
   constexpr explicit Rotation3d(const Eigen::Vector3d& rvec)
-      : Rotation3d{rvec, wpi::units::radian_t{ct_matrix{rvec}.norm()}} {}
+      : Rotation3d{rvec, wpi::units::radians<>{ct_matrix{rvec}.norm()}} {}
 
   /**
    * Constructs a Rotation3d from a rotation matrix.
@@ -394,10 +393,10 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * @param dt The time over which to integrate.
    * @return The rotation in the world frame projected forward.
    */
-  constexpr Rotation3d Integrate(units::radians_per_second_t rollRate,
-                                 units::radians_per_second_t pitchRate,
-                                 units::radians_per_second_t yawRate,
-                                 units::second_t dt) const {
+  constexpr Rotation3d Integrate(units::radians_per_second<> rollRate,
+                                 units::radians_per_second<> pitchRate,
+                                 units::radians_per_second<> yawRate,
+                                 units::seconds<> dt) const {
     // qₖ₊₁ = qₖ exp(1/2 W dt) where W = 0 + ω_x î + ω_y ĵ + ω_z k̂
     //
     // https://math.stackexchange.com/a/2099673
@@ -413,7 +412,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
   /**
    * Returns the counterclockwise rotation angle around the X axis (roll).
    */
-  constexpr wpi::units::radian_t X() const {
+  constexpr wpi::units::radians<> X() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -424,7 +423,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double sxcy = 2.0 * (w * x + y * z);
     double cy_sq = cxcy * cxcy + sxcy * sxcy;
     if (cy_sq > 1e-20) {
-      return wpi::units::radian_t{gcem::atan2(sxcy, cxcy)};
+      return wpi::units::radians<>{gcem::atan2(sxcy, cxcy)};
     } else {
       return 0_rad;
     }
@@ -433,7 +432,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
   /**
    * Returns the counterclockwise rotation angle around the Y axis (pitch).
    */
-  constexpr wpi::units::radian_t Y() const {
+  constexpr wpi::units::radians<> Y() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -442,17 +441,17 @@ class WPILIB_DLLEXPORT Rotation3d final {
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     double ratio = 2.0 * (w * y - z * x);
     if (gcem::abs(ratio) >= 1.0) {
-      return wpi::units::radian_t{
+      return wpi::units::radians<>{
           gcem::copysign(std::numbers::pi / 2.0, ratio)};
     } else {
-      return wpi::units::radian_t{gcem::asin(ratio)};
+      return wpi::units::radians<>{gcem::asin(ratio)};
     }
   }
 
   /**
    * Returns the counterclockwise rotation angle around the Z axis (yaw).
    */
-  constexpr wpi::units::radian_t Z() const {
+  constexpr wpi::units::radians<> Z() const {
     double w = m_q.W();
     double x = m_q.X();
     double y = m_q.Y();
@@ -463,9 +462,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double cysz = 2.0 * (w * z + x * y);
     double cy_sq = cycz * cycz + cysz * cysz;
     if (cy_sq > 1e-20) {
-      return wpi::units::radian_t{gcem::atan2(cysz, cycz)};
+      return wpi::units::radians<>{gcem::atan2(cysz, cycz)};
     } else {
-      return wpi::units::radian_t{gcem::atan2(2.0 * w * z, w * w - z * z)};
+      return wpi::units::radians<>{gcem::atan2(2.0 * w * z, w * w - z * z)};
     }
   }
 
@@ -484,9 +483,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
   /**
    * Returns the angle in the axis-angle representation of this rotation.
    */
-  constexpr wpi::units::radian_t Angle() const {
+  constexpr wpi::units::radians<> Angle() const {
     double norm = gcem::hypot(m_q.X(), m_q.Y(), m_q.Z());
-    return wpi::units::radian_t{2.0 * gcem::atan2(norm, m_q.W())};
+    return wpi::units::radians<>{2.0 * gcem::atan2(norm, m_q.W())};
   }
 
   /**

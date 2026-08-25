@@ -22,17 +22,16 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
 #define CHECK_NEAR_UNITS(val1, val2, eps) \
-  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
+  CHECK(wpi::units::abs(val1 - val2) <= eps)
 
-static constexpr wpi::units::meter_t TOLERANCE{1 / 12.0};
-static constexpr wpi::units::radian_t ANGULAR_TOLERANCE{2.0 * std::numbers::pi /
-                                                        180.0};
+static constexpr wpi::units::meters<> TOLERANCE{1 / 12.0};
+static constexpr wpi::units::radians<> ANGULAR_TOLERANCE{
+    2.0 * std::numbers::pi / 180.0};
 
 /**
  * States of the drivetrain system.
@@ -56,9 +55,9 @@ class State {
 };
 
 static constexpr auto LINEAR_V = 3.02_V / 1_mps;
-static constexpr auto LINEAR_A = 0.642_V / 1_mps_sq;
+static constexpr auto LINEAR_A = 0.642_V / 1_mps2;
 static constexpr auto ANGULAR_V = 1.382_V / 1_mps;
-static constexpr auto ANGULAR_A = 0.08495_V / 1_mps_sq;
+static constexpr auto ANGULAR_A = 0.08495_V / 1_mps2;
 static auto plant = wpi::math::Models::DifferentialDriveFromSysId(
     LINEAR_V, LINEAR_A, ANGULAR_V, ANGULAR_A);
 static constexpr auto TRACKWIDTH = 0.9_m;
@@ -77,7 +76,7 @@ wpi::math::Vectord<5> Dynamics(const wpi::math::Vectord<5>& x,
 }
 
 TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
-  constexpr wpi::units::second_t DT = 20_ms;
+  constexpr wpi::units::seconds<> DT = 20_ms;
 
   wpi::math::LTVDifferentialDriveController controller{
       plant, TRACKWIDTH, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, DT};
@@ -87,7 +86,7 @@ TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8_mps, 0.1_mps2});
 
   wpi::math::Vectord<5> x = wpi::math::Vectord<5>::Zero();
   x(State::X) = robotPose.X().value();
@@ -98,12 +97,12 @@ TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
   for (size_t i = 0; i < (duration / DT).value(); ++i) {
     wpi::math::DifferentialSample state{trajectory.SampleAt(DT * i),
                                         kinematics};
-    robotPose = wpi::math::Pose2d{wpi::units::meter_t{x(State::X)},
-                                  wpi::units::meter_t{x(State::Y)},
-                                  wpi::units::radian_t{x(State::HEADING)}};
+    robotPose = wpi::math::Pose2d{wpi::units::meters<>{x(State::X)},
+                                  wpi::units::meters<>{x(State::Y)},
+                                  wpi::units::radians<>{x(State::HEADING)}};
     auto [leftVoltage, rightVoltage] = controller.Calculate(
-        robotPose, wpi::units::meters_per_second_t{x(State::LEFT_VELOCITY)},
-        wpi::units::meters_per_second_t{x(State::RIGHT_VELOCITY)}, state);
+        robotPose, wpi::units::meters_per_second<>{x(State::LEFT_VELOCITY)},
+        wpi::units::meters_per_second<>{x(State::RIGHT_VELOCITY)}, state);
 
     x = wpi::math::RKDP(
         &Dynamics, x,

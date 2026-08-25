@@ -15,8 +15,8 @@ using StructType =
 wpi::math::DifferentialDriveWheelPositions StructType::Unpack(
     std::span<const uint8_t> data) {
   return wpi::math::DifferentialDriveWheelPositions{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, LEFT_OFF>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, RIGHT_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, LEFT_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, RIGHT_OFF>(data)},
   };
 }
 

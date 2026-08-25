@@ -30,9 +30,8 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/array.hpp"
@@ -48,9 +47,9 @@ void testFollowTrajectory(
     std::function<wpi::math::Pose2d(wpi::math::DrivetrainSplineSample&)>
         visionMeasurementGenerator,
     const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
-    const wpi::units::second_t dt,
-    const wpi::units::second_t VISION_UPDATE_RATE,
-    const wpi::units::second_t VISION_UPDATE_DELAY, const bool checkError,
+    const wpi::units::seconds<> dt,
+    const wpi::units::seconds<> VISION_UPDATE_RATE,
+    const wpi::units::seconds<> VISION_UPDATE_DELAY, const bool checkError,
     const bool debug) {
   wpi::util::array<wpi::math::SwerveModulePosition, 4> positions{
       wpi::util::empty_array};
@@ -60,11 +59,11 @@ void testFollowTrajectory(
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  wpi::units::second_t t = 0_s;
+  wpi::units::seconds<> t = 0_s;
 
-  std::vector<std::pair<wpi::units::second_t, wpi::math::Pose2d>> visionPoses;
-  std::vector<
-      std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::math::Pose2d>>
+  std::vector<std::pair<wpi::units::seconds<>, wpi::math::Pose2d>> visionPoses;
+  std::vector<std::tuple<wpi::units::seconds<>, wpi::units::seconds<>,
+                         wpi::math::Pose2d>>
       visionLog;
 
   double maxError = -std::numeric_limits<double>::max();
@@ -142,8 +141,8 @@ void testFollowTrajectory(
     wpi::util::print(
         "apply_time, measured_time, vision_x, vision_y, vision_theta\n");
 
-    wpi::units::second_t apply_time;
-    wpi::units::second_t measure_time;
+    wpi::units::seconds<> apply_time;
+    wpi::units::seconds<> measure_time;
     wpi::math::Pose2d vision_pose;
     for (auto record : visionLog) {
       std::tie(apply_time, measure_time, vision_pose) = record;
@@ -192,7 +191,7 @@ TEST_CASE("SwerveDrivePoseEstimatorTest AccuracyFacingTrajectory",
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+          wpi::math::TrajectoryConfig(2_mps, 2.0_mps2));
 
   testFollowTrajectory(
       kinematics, estimator, trajectory,
@@ -229,11 +228,11 @@ TEST_CASE("SwerveDrivePoseEstimatorTest BadInitialPose", "[wpimath]") {
                       wpi::math::Pose2d{0_m, 0_m, 135_deg},
                       wpi::math::Pose2d{-3_m, 0_m, -90_deg},
                       wpi::math::Pose2d{0_m, 0_m, 45_deg}},
-          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+          wpi::math::TrajectoryConfig(2_mps, 2.0_mps2));
 
-  for (wpi::units::degree_t offset_direction_degs = 0_deg;
+  for (wpi::units::degrees<> offset_direction_degs = 0_deg;
        offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
-    for (wpi::units::degree_t offset_heading_degs = 0_deg;
+    for (wpi::units::degrees<> offset_heading_degs = 0_deg;
          offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
@@ -295,27 +294,27 @@ TEST_CASE("SwerveDrivePoseEstimatorTest SimultaneousVisionMeasurements",
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 0_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 0_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
 
     CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 3_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 1_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
 
     CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
   }
 
   {
-    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
-    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
-    auto dtheta = wpi::units::math::abs(
+    auto dx = wpi::units::abs(estimator.GetEstimatedPosition().X() - 2_m);
+    auto dy = wpi::units::abs(estimator.GetEstimatedPosition().Y() - 4_m);
+    auto dtheta = wpi::units::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
 
     CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
@@ -382,15 +381,15 @@ TEST_CASE("SwerveDrivePoseEstimatorTest TestSampleAt", "[wpimath]") {
   // error
   for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
     wpi::util::array<wpi::math::SwerveModulePosition, 4> wheelPositions{
-        {wpi::math::SwerveModulePosition{wpi::units::meter_t{time},
+        {wpi::math::SwerveModulePosition{wpi::units::meters<>{time},
                                          wpi::math::Rotation2d{}},
-         wpi::math::SwerveModulePosition{wpi::units::meter_t{time},
+         wpi::math::SwerveModulePosition{wpi::units::meters<>{time},
                                          wpi::math::Rotation2d{}},
-         wpi::math::SwerveModulePosition{wpi::units::meter_t{time},
+         wpi::math::SwerveModulePosition{wpi::units::meters<>{time},
                                          wpi::math::Rotation2d{}},
-         wpi::math::SwerveModulePosition{wpi::units::meter_t{time},
+         wpi::math::SwerveModulePosition{wpi::units::meters<>{time},
                                          wpi::math::Rotation2d{}}}};
-    estimator.UpdateWithTime(wpi::units::second_t{time},
+    estimator.UpdateWithTime(wpi::units::seconds<>{time},
                              wpi::math::Rotation2d{}, wheelPositions);
   }
 

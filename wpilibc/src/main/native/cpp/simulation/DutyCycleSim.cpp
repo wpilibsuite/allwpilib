@@ -46,11 +46,11 @@ std::unique_ptr<CallbackStore> DutyCycleSim::RegisterFrequencyCallback(
   return store;
 }
 
-wpi::units::hertz_t DutyCycleSim::GetFrequency() const {
-  return wpi::units::hertz_t{HALSIM_GetDutyCycleFrequency(m_index)};
+wpi::units::hertz<> DutyCycleSim::GetFrequency() const {
+  return wpi::units::hertz<>{HALSIM_GetDutyCycleFrequency(m_index)};
 }
 
-void DutyCycleSim::SetFrequency(wpi::units::hertz_t frequency) {
+void DutyCycleSim::SetFrequency(wpi::units::hertz<> frequency) {
   HALSIM_SetDutyCycleFrequency(m_index, frequency.value());
 }
 

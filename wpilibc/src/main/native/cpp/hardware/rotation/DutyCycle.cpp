@@ -27,11 +27,11 @@ void DutyCycle::InitDutyCycle() {
   wpi::util::ReportUsage("IO", m_channel, "DutyCycle");
 }
 
-wpi::units::hertz_t DutyCycle::GetFrequency() const {
+wpi::units::hertz<> DutyCycle::GetFrequency() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleFrequency(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return wpi::units::hertz_t{retVal};
+  return wpi::units::hertz<>{retVal};
 }
 
 double DutyCycle::GetOutput() const {
@@ -41,11 +41,11 @@ double DutyCycle::GetOutput() const {
   return retVal;
 }
 
-wpi::units::second_t DutyCycle::GetHighTime() const {
+wpi::units::seconds<> DutyCycle::GetHighTime() const {
   int32_t status = 0;
   auto retVal = HAL_GetDutyCycleHighTime(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", GetSourceChannel());
-  return wpi::units::nanosecond_t{static_cast<double>(retVal)};
+  return wpi::units::nanoseconds<>{static_cast<double>(retVal)};
 }
 
 int DutyCycle::GetSourceChannel() const {

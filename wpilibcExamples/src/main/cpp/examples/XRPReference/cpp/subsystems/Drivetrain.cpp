@@ -48,27 +48,27 @@ int Drivetrain::GetRightEncoderCount() {
   return rightEncoder.Get();
 }
 
-wpi::units::meter_t Drivetrain::GetLeftDistance() {
-  return wpi::units::meter_t{leftEncoder.GetDistance()};
+wpi::units::meters<> Drivetrain::GetLeftDistance() {
+  return wpi::units::meters<>{leftEncoder.GetDistance()};
 }
 
-wpi::units::meter_t Drivetrain::GetRightDistance() {
-  return wpi::units::meter_t{rightEncoder.GetDistance()};
+wpi::units::meters<> Drivetrain::GetRightDistance() {
+  return wpi::units::meters<>{rightEncoder.GetDistance()};
 }
 
-wpi::units::meter_t Drivetrain::GetAverageDistance() {
+wpi::units::meters<> Drivetrain::GetAverageDistance() {
   return (GetLeftDistance() + GetRightDistance()) / 2.0;
 }
 
-wpi::units::radian_t Drivetrain::GetGyroAngleX() {
+wpi::units::radians<> Drivetrain::GetGyroAngleX() {
   return gyro.GetAngleX();
 }
 
-wpi::units::radian_t Drivetrain::GetGyroAngleY() {
+wpi::units::radians<> Drivetrain::GetGyroAngleY() {
   return gyro.GetAngleY();
 }
 
-wpi::units::radian_t Drivetrain::GetGyroAngleZ() {
+wpi::units::radians<> Drivetrain::GetGyroAngleZ() {
   return gyro.GetAngleZ();
 }
 

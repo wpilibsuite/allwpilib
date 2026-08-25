@@ -31,14 +31,14 @@ inline constexpr std::string_view ARM_POSITION_KEY = "ArmPosition";
 inline constexpr std::string_view ARM_P_KEY = "ArmP";
 
 inline constexpr double DEFAULT_ARM_KP = 50.0;
-inline constexpr wpi::units::degree_t DEFAULT_ARM_SETPOINT = 75.0_deg;
+inline constexpr wpi::units::degrees<> DEFAULT_ARM_SETPOINT = 75.0_deg;
 
-inline constexpr wpi::units::radian_t MIN_ANGLE = -75.0_deg;
-inline constexpr wpi::units::radian_t MAX_ANGLE = 255.0_deg;
+inline constexpr wpi::units::radians<> MIN_ANGLE = -75.0_deg;
+inline constexpr wpi::units::radians<> MAX_ANGLE = 255.0_deg;
 
 inline constexpr double ARM_REDUCTION = 200.0;
-inline constexpr wpi::units::kilogram_t ARM_MASS = 8.0_kg;
-inline constexpr wpi::units::meter_t ARM_LENGTH = 30.0_in;
+inline constexpr wpi::units::kilograms<> ARM_MASS = 8.0_kg;
+inline constexpr wpi::units::meters<> ARM_LENGTH = 30.0_in;
 
 // distance per pulse = (angle per revolution) / (pulses per revolution)
 //  = (2 * PI rads) / (4096 pulses)

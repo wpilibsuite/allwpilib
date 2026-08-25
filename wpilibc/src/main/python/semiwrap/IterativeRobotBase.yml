@@ -15,7 +15,7 @@ classes:
         overloads:
           double:
             ignore: true
-          wpi::units::second_t:
+          wpi::units::seconds<>:
       LoopFunc:
       SimulationInit:
       SimulationPeriodic:

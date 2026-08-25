@@ -51,15 +51,15 @@ class Drivetrain {
     rightLeader.SetInverted(true);
   }
 
-  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
+  static constexpr wpi::units::meters_per_second<> MAX_VELOCITY =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
+  static constexpr wpi::units::radians_per_second<> MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetVelocities(
       const wpi::math::DifferentialDriveWheelVelocities& velocities);
-  void Drive(wpi::units::meters_per_second_t xVelocity,
-             wpi::units::radians_per_second_t rot);
+  void Drive(wpi::units::meters_per_second<> xVelocity,
+             wpi::units::radians_per_second<> rot);
   void UpdateOdometry();
   void ResetOdometry(const wpi::math::Pose2d& pose);
 
@@ -69,7 +69,7 @@ class Drivetrain {
   void Periodic();
 
  private:
-  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
+  static constexpr wpi::units::meters<> TRACKWIDTH = 0.381_m * 2;
   static constexpr double WHEEL_RADIUS = 0.0508;  // meters
   static constexpr int ENCODER_RESOLUTION = 4096;
 
@@ -88,12 +88,12 @@ class Drivetrain {
 
   wpi::math::DifferentialDriveKinematics kinematics{TRACKWIDTH};
   wpi::math::DifferentialDriveOdometry odometry{
-      imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
-      wpi::units::meter_t{rightEncoder.GetDistance()}};
+      imu.GetRotation2d(), wpi::units::meters<>{leftEncoder.GetDistance()},
+      wpi::units::meters<>{rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
       1_V, 3_V / 1_mps};
 
   // Simulation classes help us simulate our robot
@@ -102,7 +102,7 @@ class Drivetrain {
   wpi::Field2d fieldSim;
   wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(
-          1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
+          1.98_V / 1_mps, 0.2_V / 1_mps2, 1.5_V / 1_mps, 0.3_V / 1_mps2);
   wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
       drivetrainSystem, TRACKWIDTH, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

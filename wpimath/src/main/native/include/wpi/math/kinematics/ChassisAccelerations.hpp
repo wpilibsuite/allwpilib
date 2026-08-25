@@ -27,17 +27,17 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
   /**
    * Acceleration along the x-axis. (Fwd is +)
    */
-  units::meters_per_second_squared_t ax = 0_mps_sq;
+  units::meters_per_second_squared<> ax = 0_mps2;
 
   /**
    * Acceleration along the y-axis. (Left is +)
    */
-  units::meters_per_second_squared_t ay = 0_mps_sq;
+  units::meters_per_second_squared<> ay = 0_mps2;
 
   /**
    * Angular acceleration of the robot frame. (CCW is +)
    */
-  units::radians_per_second_squared_t alpha = 0_rad_per_s_sq;
+  units::radians_per_second_squared<> alpha = 0_rad_per_s_sq;
 
   /**
    * Converts this field-relative set of accelerations into a robot-relative
@@ -54,10 +54,10 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
       const Rotation2d& robotAngle) const {
     // CW rotation into chassis frame
     auto rotated =
-        Translation2d{units::meter_t{ax.value()}, units::meter_t{ay.value()}}
+        Translation2d{units::meters<>{ax.value()}, units::meters<>{ay.value()}}
             .RotateBy(-robotAngle);
-    return {units::meters_per_second_squared_t{rotated.X().value()},
-            units::meters_per_second_squared_t{rotated.Y().value()}, alpha};
+    return {units::meters_per_second_squared<>{rotated.X().value()},
+            units::meters_per_second_squared<>{rotated.Y().value()}, alpha};
   }
 
   /**
@@ -75,10 +75,10 @@ struct WPILIB_DLLEXPORT ChassisAccelerations {
       const Rotation2d& robotAngle) const {
     // CCW rotation out of chassis frame
     auto rotated =
-        Translation2d{units::meter_t{ax.value()}, units::meter_t{ay.value()}}
+        Translation2d{units::meters<>{ax.value()}, units::meters<>{ay.value()}}
             .RotateBy(robotAngle);
-    return {units::meters_per_second_squared_t{rotated.X().value()},
-            units::meters_per_second_squared_t{rotated.Y().value()}, alpha};
+    return {units::meters_per_second_squared<>{rotated.X().value()},
+            units::meters_per_second_squared<>{rotated.Y().value()}, alpha};
   }
 
   /**

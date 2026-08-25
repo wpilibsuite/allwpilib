@@ -14,7 +14,7 @@ using StructType = wpi::util::Struct<wpi::math::SwerveModuleVelocity>;
 wpi::math::SwerveModuleVelocity StructType::Unpack(
     std::span<const uint8_t> data) {
   return wpi::math::SwerveModuleVelocity{
-      wpi::units::meters_per_second_t{
+      wpi::units::meters_per_second<>{
           wpi::util::UnpackStruct<double, VELOCITY_OFF>(data)},
       wpi::util::UnpackStruct<wpi::math::Rotation2d, ANGLE_OFF>(data),
   };

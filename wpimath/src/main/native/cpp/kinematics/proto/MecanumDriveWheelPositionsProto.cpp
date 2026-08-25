@@ -14,10 +14,10 @@ std::optional<wpi::math::MecanumDriveWheelPositions> wpi::util::Protobuf<
   }
 
   return wpi::math::MecanumDriveWheelPositions{
-      wpi::units::meter_t{msg.front_left},
-      wpi::units::meter_t{msg.front_right},
-      wpi::units::meter_t{msg.rear_left},
-      wpi::units::meter_t{msg.rear_right},
+      wpi::units::meters<>{msg.front_left},
+      wpi::units::meters<>{msg.front_right},
+      wpi::units::meters<>{msg.rear_left},
+      wpi::units::meters<>{msg.rear_right},
   };
 }
 

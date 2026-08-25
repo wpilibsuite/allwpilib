@@ -15,15 +15,15 @@
 using namespace wpi::math;
 
 DifferentialDriveWheelVoltages DifferentialDriveFeedforward::Calculate(
-    wpi::units::meters_per_second_t currentLeftVelocity,
-    wpi::units::meters_per_second_t nextLeftVelocity,
-    wpi::units::meters_per_second_t currentRightVelocity,
-    wpi::units::meters_per_second_t nextRightVelocity,
-    wpi::units::second_t dt) {
+    wpi::units::meters_per_second<> currentLeftVelocity,
+    wpi::units::meters_per_second<> nextLeftVelocity,
+    wpi::units::meters_per_second<> currentRightVelocity,
+    wpi::units::meters_per_second<> nextRightVelocity,
+    wpi::units::seconds<> dt) {
   wpi::math::LinearPlantInversionFeedforward<2, 2> feedforward{m_plant, dt};
 
   Eigen::Vector2d r{currentLeftVelocity, currentRightVelocity};
   Eigen::Vector2d nextR{nextLeftVelocity, nextRightVelocity};
   auto u = feedforward.Calculate(r, nextR);
-  return {wpi::units::volt_t{u(0)}, wpi::units::volt_t{u(1)}};
+  return {wpi::units::volts<>{u(0)}, wpi::units::volts<>{u(1)}};
 }

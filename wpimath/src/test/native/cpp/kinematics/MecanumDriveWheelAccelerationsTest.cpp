@@ -25,8 +25,8 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest DefaultConstructor",
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest ParameterizedConstructor",
           "[wpimath]") {
-  MecanumDriveWheelAccelerations wheelAccelerations{1.0_mps_sq, 2.0_mps_sq,
-                                                    3.0_mps_sq, 4.0_mps_sq};
+  MecanumDriveWheelAccelerations wheelAccelerations{1.0_mps2, 2.0_mps2,
+                                                    3.0_mps2, 4.0_mps2};
 
   CHECK_NEAR(wheelAccelerations.frontLeft.value(), 1.0, EPSILON);
   CHECK_NEAR(wheelAccelerations.frontRight.value(), 2.0, EPSILON);
@@ -35,10 +35,10 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest ParameterizedConstructor",
 }
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest Plus", "[wpimath]") {
-  const MecanumDriveWheelAccelerations left{1.0_mps_sq, 0.5_mps_sq, 2.0_mps_sq,
-                                            1.5_mps_sq};
-  const MecanumDriveWheelAccelerations right{2.0_mps_sq, 1.5_mps_sq, 0.5_mps_sq,
-                                             1.0_mps_sq};
+  const MecanumDriveWheelAccelerations left{1.0_mps2, 0.5_mps2, 2.0_mps2,
+                                            1.5_mps2};
+  const MecanumDriveWheelAccelerations right{2.0_mps2, 1.5_mps2, 0.5_mps2,
+                                             1.0_mps2};
 
   const auto wheelAccelerations = left + right;
 
@@ -49,10 +49,10 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest Plus", "[wpimath]") {
 }
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest Minus", "[wpimath]") {
-  const MecanumDriveWheelAccelerations left{5.0_mps_sq, 4.0_mps_sq, 6.0_mps_sq,
-                                            2.5_mps_sq};
-  const MecanumDriveWheelAccelerations right{1.0_mps_sq, 2.0_mps_sq, 3.0_mps_sq,
-                                             0.5_mps_sq};
+  const MecanumDriveWheelAccelerations left{5.0_mps2, 4.0_mps2, 6.0_mps2,
+                                            2.5_mps2};
+  const MecanumDriveWheelAccelerations right{1.0_mps2, 2.0_mps2, 3.0_mps2,
+                                             0.5_mps2};
 
   const auto wheelAccelerations = left - right;
 
@@ -63,8 +63,8 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest Minus", "[wpimath]") {
 }
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest UnaryMinus", "[wpimath]") {
-  const auto wheelAccelerations = -MecanumDriveWheelAccelerations{
-      1.0_mps_sq, -2.0_mps_sq, 3.0_mps_sq, -4.0_mps_sq};
+  const auto wheelAccelerations =
+      -MecanumDriveWheelAccelerations{1.0_mps2, -2.0_mps2, 3.0_mps2, -4.0_mps2};
 
   CHECK_NEAR(wheelAccelerations.frontLeft.value(), -1.0, EPSILON);
   CHECK_NEAR(wheelAccelerations.frontRight.value(), 2.0, EPSILON);
@@ -74,8 +74,7 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest UnaryMinus", "[wpimath]") {
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest Multiplication", "[wpimath]") {
   const auto wheelAccelerations =
-      MecanumDriveWheelAccelerations{2.0_mps_sq, 2.5_mps_sq, 3.0_mps_sq,
-                                     3.5_mps_sq} *
+      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 3.0_mps2, 3.5_mps2} *
       2.0;
 
   CHECK_NEAR(wheelAccelerations.frontLeft.value(), 4.0, EPSILON);
@@ -86,8 +85,7 @@ TEST_CASE("MecanumDriveWheelAccelerationsTest Multiplication", "[wpimath]") {
 
 TEST_CASE("MecanumDriveWheelAccelerationsTest Division", "[wpimath]") {
   const auto wheelAccelerations =
-      MecanumDriveWheelAccelerations{2.0_mps_sq, 2.5_mps_sq, 1.5_mps_sq,
-                                     1.0_mps_sq} /
+      MecanumDriveWheelAccelerations{2.0_mps2, 2.5_mps2, 1.5_mps2, 1.0_mps2} /
       2.0;
 
   CHECK_NEAR(wheelAccelerations.frontLeft.value(), 1.0, EPSILON);

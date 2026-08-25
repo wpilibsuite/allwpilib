@@ -59,7 +59,7 @@ class LinearSystemLoop {
   LinearSystemLoop(LinearSystem<States, Inputs, Outputs>& plant,
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
-                   wpi::units::volt_t maxVoltage, wpi::units::second_t dt)
+                   wpi::units::volts<> maxVoltage, wpi::units::seconds<> dt)
       : LinearSystemLoop(
             plant, controller, observer,
             [=](const InputVector& u) {
@@ -84,7 +84,7 @@ class LinearSystemLoop {
                    LinearQuadraticRegulator<States, Inputs>& controller,
                    KalmanFilter<States, Inputs, Outputs>& observer,
                    std::function<InputVector(const InputVector&)> clampFunction,
-                   wpi::units::second_t dt)
+                   wpi::units::seconds<> dt)
       : LinearSystemLoop(
             controller,
             LinearPlantInversionFeedforward<States, Inputs>{plant, dt},
@@ -105,7 +105,7 @@ class LinearSystemLoop {
       LinearQuadraticRegulator<States, Inputs>& controller,
       const LinearPlantInversionFeedforward<States, Inputs>& feedforward,
       KalmanFilter<States, Inputs, Outputs>& observer,
-      wpi::units::volt_t maxVoltage)
+      wpi::units::volts<> maxVoltage)
       : LinearSystemLoop(controller, feedforward, observer,
                          [=](const InputVector& u) {
                            return wpi::math::DesaturateInputVector<Inputs>(
@@ -272,7 +272,7 @@ class LinearSystemLoop {
    *
    * @param dt Timestep for model update.
    */
-  void Predict(wpi::units::second_t dt) {
+  void Predict(wpi::units::seconds<> dt) {
     InputVector u =
         ClampInput(m_controller->Calculate(m_observer->Xhat(), m_nextR) +
                    m_feedforward.Calculate(m_nextR));

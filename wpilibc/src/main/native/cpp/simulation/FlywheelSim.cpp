@@ -36,39 +36,39 @@ FlywheelSim::FlywheelSim(const wpi::math::LinearSystem<1, 1, 1>& plant,
       m_j(m_gearing * gearbox.Kt.value() /
           (gearbox.R.value() * m_plant.B(0, 0))) {}
 
-void FlywheelSim::SetVelocity(wpi::units::radians_per_second_t velocity) {
+void FlywheelSim::SetVelocity(wpi::units::radians_per_second<> velocity) {
   LinearSystemSim::SetState(wpi::math::Vectord<1>{velocity.value()});
 }
 
-wpi::units::radians_per_second_t FlywheelSim::GetAngularVelocity() const {
-  return wpi::units::radians_per_second_t{GetOutput(0)};
+wpi::units::radians_per_second<> FlywheelSim::GetAngularVelocity() const {
+  return wpi::units::radians_per_second<>{GetOutput(0)};
 }
 
-wpi::units::radians_per_second_squared_t FlywheelSim::GetAngularAcceleration()
+wpi::units::radians_per_second_squared<> FlywheelSim::GetAngularAcceleration()
     const {
-  return wpi::units::radians_per_second_squared_t{
+  return wpi::units::radians_per_second_squared<>{
       (m_plant.A() * m_x + m_plant.B() * m_u)(0, 0)};
 }
 
-wpi::units::newton_meter_t FlywheelSim::GetTorque() const {
-  return wpi::units::newton_meter_t{GetAngularAcceleration().value() *
-                                    m_j.value()};
+wpi::units::newton_meters<> FlywheelSim::GetTorque() const {
+  return wpi::units::newton_meters<>{GetAngularAcceleration().value() *
+                                     m_j.value()};
 }
 
-wpi::units::ampere_t FlywheelSim::GetCurrentDraw() const {
+wpi::units::amperes<> FlywheelSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(0)} * m_gearing,
-                           wpi::units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(wpi::units::radians_per_second<>{m_x(0)} * m_gearing,
+                           wpi::units::volts<>{m_u(0)}) *
          wpi::util::sgn(m_u(0));
 }
 
-wpi::units::volt_t FlywheelSim::GetInputVoltage() const {
-  return wpi::units::volt_t{GetInput(0)};
+wpi::units::volts<> FlywheelSim::GetInputVoltage() const {
+  return wpi::units::volts<>{GetInput(0)};
 }
 
-void FlywheelSim::SetInputVoltage(wpi::units::volt_t voltage) {
+void FlywheelSim::SetInputVoltage(wpi::units::volts<> voltage) {
   SetInput(wpi::math::Vectord<1>{voltage.value()});
   ClampInput(wpi::RobotController::GetBatteryVoltage().value());
 }

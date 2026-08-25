@@ -55,10 +55,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param dt         Discretization timestep.
    */
   LTVDifferentialDriveController(const wpi::math::LinearSystem<2, 2, 2>& plant,
-                                 wpi::units::meter_t trackwidth,
+                                 wpi::units::meters<> trackwidth,
                                  const wpi::util::array<double, 5>& Qelems,
                                  const wpi::util::array<double, 2>& Relems,
-                                 wpi::units::second_t dt)
+                                 wpi::units::seconds<> dt)
       : m_trackwidth{trackwidth},
         m_A{plant.A()},
         m_B{plant.B()},
@@ -97,8 +97,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityTolerance Right velocity error which is tolerable.
    */
   void SetTolerance(const Pose2d& poseTolerance,
-                    wpi::units::meters_per_second_t leftVelocityTolerance,
-                    wpi::units::meters_per_second_t rightVelocityTolerance) {
+                    wpi::units::meters_per_second<> leftVelocityTolerance,
+                    wpi::units::meters_per_second<> rightVelocityTolerance) {
     m_tolerance = Eigen::Vector<double, 5>{
         poseTolerance.X().value(), poseTolerance.Y().value(),
         poseTolerance.Rotation().Radians().value(),
@@ -119,10 +119,10 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    * @param rightVelocityRef The desired right velocity.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
-      wpi::units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
-      wpi::units::meters_per_second_t leftVelocityRef,
-      wpi::units::meters_per_second_t rightVelocityRef);
+      const Pose2d& currentPose, wpi::units::meters_per_second<> leftVelocity,
+      wpi::units::meters_per_second<> rightVelocity, const Pose2d& poseRef,
+      wpi::units::meters_per_second<> leftVelocityRef,
+      wpi::units::meters_per_second<> rightVelocityRef);
 
   /**
    * Returns the left and right output voltages of the LTV controller.
@@ -137,8 +137,8 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
    *                     from a trajectory.
    */
   DifferentialDriveWheelVoltages Calculate(
-      const Pose2d& currentPose, wpi::units::meters_per_second_t leftVelocity,
-      wpi::units::meters_per_second_t rightVelocity,
+      const Pose2d& currentPose, wpi::units::meters_per_second<> leftVelocity,
+      wpi::units::meters_per_second<> rightVelocity,
       const DifferentialSample& desiredState) {
     return Calculate(currentPose, leftVelocity, rightVelocity,
                      desiredState.pose, desiredState.leftVelocity,
@@ -146,7 +146,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   }
 
  private:
-  wpi::units::meter_t m_trackwidth;
+  wpi::units::meters<> m_trackwidth;
 
   // Continuous velocity dynamics
   Eigen::Matrix<double, 2, 2> m_A;
@@ -156,7 +156,7 @@ class WPILIB_DLLEXPORT LTVDifferentialDriveController {
   Eigen::Matrix<double, 5, 5> m_Q;
   Eigen::Matrix<double, 2, 2> m_R;
 
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   Eigen::Vector<double, 5> m_error;
   Eigen::Vector<double, 5> m_tolerance;

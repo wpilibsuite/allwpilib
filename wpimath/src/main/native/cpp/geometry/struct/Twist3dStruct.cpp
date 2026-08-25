@@ -17,12 +17,12 @@ using StructType = wpi::util::Struct<wpi::math::Twist3d>;
 
 wpi::math::Twist3d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Twist3d{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, DX_OFF>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, DY_OFF>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, DZ_OFF>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, RX_OFF>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, RY_OFF>(data)},
-      wpi::units::radian_t{wpi::util::UnpackStruct<double, RZ_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, DX_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, DY_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, DZ_OFF>(data)},
+      wpi::units::radians<>{wpi::util::UnpackStruct<double, RX_OFF>(data)},
+      wpi::units::radians<>{wpi::util::UnpackStruct<double, RY_OFF>(data)},
+      wpi::units::radians<>{wpi::util::UnpackStruct<double, RZ_OFF>(data)},
   };
 }
 

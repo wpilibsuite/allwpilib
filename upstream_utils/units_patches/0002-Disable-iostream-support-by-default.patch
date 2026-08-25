@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 22 Aug 2026 15:53:24 -0400
+Subject: [PATCH 02/12] Disable iostream support by default
+
+---
+ include/units/core.h | 6 ++++++
+ test/main.cpp        | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index c868f7876f0b2370681e298a21e5e9103a7a7ed4..1b260af3ceba4ce85ae31104f489b2347d4ed012 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -69,6 +69,12 @@
+ #include <utility>
+ #include <version>
+ 
++// We don't want to use iostream, but do want format
++#ifndef UNIT_LIB_FORCE_IOSTREAM
++#define UNIT_LIB_DISABLE_IOSTREAM
++#endif
++#define UNIT_LIB_ENABLE_FORMAT
++
+ // ---------------------------------------------------------------------------------------------------------------------
+ //	TEXT-FEATURE CONFIGURATION (opt-out; full capability is the default)
+ // ---------------------------------------------------------------------------------------------------------------------
+diff --git a/test/main.cpp b/test/main.cpp
+index bb3e0acb36b6d190b920425da19b79d05c44d68a..3b705a95d3ae68a70f7f91451a8b052c7c93e715 100644
+--- a/test/main.cpp
++++ b/test/main.cpp
+@@ -6,6 +6,7 @@
+ // test
+ #endif
+ 
++#define UNIT_LIB_FORCE_IOSTREAM
+ #include <array>
+ #include <atomic>
+ #include <chrono>

@@ -28,7 +28,7 @@
 
 using namespace wpi;
 
-OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
+OpModeRobotBase::OpModeRobotBase(wpi::units::seconds<> period)
     : m_period{period},
       m_loopOverrunAlert{
           "opmode-loop-overrun",
@@ -51,7 +51,7 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
 OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
 
 void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
-                                  wpi::units::second_t period) {
+                                  wpi::units::seconds<> period) {
   m_callbacks.Add(std::move(callback), m_startTime, period);
 }
 

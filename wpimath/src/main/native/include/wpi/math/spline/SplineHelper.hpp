@@ -110,10 +110,10 @@ class WPILIB_DLLEXPORT SplineHelper {
 
     if (waypoints.size() > 1) {
       waypoints.emplace(waypoints.begin(),
-                        Translation2d{wpi::units::meter_t{xInitial[0]},
-                                      wpi::units::meter_t{yInitial[0]}});
-      waypoints.emplace_back(Translation2d{wpi::units::meter_t{xFinal[0]},
-                                           wpi::units::meter_t{yFinal[0]}});
+                        Translation2d{wpi::units::meters<>{xInitial[0]},
+                                      wpi::units::meters<>{yInitial[0]}});
+      waypoints.emplace_back(Translation2d{wpi::units::meters<>{xFinal[0]},
+                                           wpi::units::meters<>{yFinal[0]}});
 
       // Populate tridiagonal system for clamped cubic
       /* See:

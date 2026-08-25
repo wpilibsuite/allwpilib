@@ -44,14 +44,14 @@ class TimedRobot : public IterativeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit TimedRobot(wpi::units::second_t period = DEFAULT_PERIOD);
+  explicit TimedRobot(wpi::units::seconds<> period = DEFAULT_PERIOD);
 
   /**
    * Constructor for TimedRobot.
    *
    * @param frequency The frequency of the robot loop function.
    */
-  explicit TimedRobot(wpi::units::hertz_t frequency);
+  explicit TimedRobot(wpi::units::hertz<> frequency);
 
   TimedRobot(TimedRobot&&) = default;
   TimedRobot& operator=(TimedRobot&&) = default;
@@ -68,7 +68,7 @@ class TimedRobot : public IterativeRobotBase {
    * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::nanosecond_t GetLoopStartTime() const {
+  wpi::units::nanoseconds<> GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -84,8 +84,8 @@ class TimedRobot : public IterativeRobotBase {
    *                 for scheduling a callback in a different timeslot relative
    *                 to TimedRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
-                   wpi::units::second_t offset = 0_s);
+  void AddPeriodic(std::function<void()> callback, wpi::units::seconds<> period,
+                   wpi::units::seconds<> offset = 0_s);
 
  protected:
   wpi::util::Handle<HAL_NotifierHandle, HAL_DestroyNotifier> m_notifier;

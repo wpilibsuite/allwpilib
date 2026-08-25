@@ -27,40 +27,41 @@ inline constexpr bool LEFT_ENCODER_REVERSED = false;
 inline constexpr bool RIGHT_ENCODER_REVERSED = true;
 
 inline constexpr int ENCODER_CPR = 1024;
-inline constexpr wpi::units::meter_t WHEEL_DIAMETER = 6_in;
-inline constexpr wpi::units::meter_t ENCODER_DISTANCE_PER_PULSE =
+inline constexpr wpi::units::meters<> WHEEL_DIAMETER = 6_in;
+inline constexpr wpi::units::meters<> ENCODER_DISTANCE_PER_PULSE =
     (WHEEL_DIAMETER * std::numbers::pi) / static_cast<double>(ENCODER_CPR);
 }  // namespace drive
 
 namespace shooter {
 
-using kv_unit = wpi::units::compound_unit<
-    wpi::units::compound_unit<wpi::units::volts, wpi::units::seconds>,
-    wpi::units::inverse<wpi::units::turns>>;
-using kv_unit_t = wpi::units::unit_t<kv_unit>;
+using kv_unit = wpi::units::compound_conversion_factor<
+    wpi::units::compound_conversion_factor<wpi::units::volts_,
+                                           wpi::units::seconds_>,
+    wpi::units::inverse<wpi::units::turns_>>;
+using kv_unit_t = wpi::units::unit<kv_unit>;
 
-using ka_unit = wpi::units::compound_unit<
-    wpi::units::volts,
-    wpi::units::inverse<wpi::units::turns_per_second_squared>>;
-using ka_unit_t = wpi::units::unit_t<ka_unit>;
+using ka_unit = wpi::units::compound_conversion_factor<
+    wpi::units::volts_,
+    wpi::units::inverse<wpi::units::turns_per_second_squared_>>;
+using ka_unit_t = wpi::units::unit<ka_unit>;
 
 inline constexpr std::array<int, 2> ENCODER_PORTS = {4, 5};
 inline constexpr bool ENCODER_REVERSED = false;
 inline constexpr int ENCODER_CPR = 1024;
-inline constexpr wpi::units::turn_t ENCODER_DISTANCE_PER_PULSE =
+inline constexpr wpi::units::turns<> ENCODER_DISTANCE_PER_PULSE =
     1_tr / static_cast<double>(ENCODER_CPR);
 
 inline constexpr int SHOOTER_MOTOR_PORT = 4;
 inline constexpr int FEEDER_MOTOR_PORT = 5;
 
-inline constexpr wpi::units::turns_per_second_t SHOOTER_FREE_SPEED = 5300_tps;
-inline constexpr wpi::units::turns_per_second_t SHOOTER_TARGET_VELOCITY =
+inline constexpr wpi::units::turns_per_second<> SHOOTER_FREE_SPEED = 5300_tps;
+inline constexpr wpi::units::turns_per_second<> SHOOTER_TARGET_VELOCITY =
     4000_tps;
-inline constexpr wpi::units::turns_per_second_t SHOOTER_TOLERANCE = 50_tps;
+inline constexpr wpi::units::turns_per_second<> SHOOTER_TOLERANCE = 50_tps;
 
 inline constexpr double kP = 1.0;
 
-inline constexpr wpi::units::volt_t kS = 0.05_V;
+inline constexpr wpi::units::volts<> kS = 0.05_V;
 inline constexpr kv_unit_t kV = 12_V / SHOOTER_FREE_SPEED;
 inline constexpr ka_unit_t kA = 0_V * 1_s * 1_s / 1_tr;
 
@@ -78,8 +79,8 @@ inline constexpr int BALL_SENSOR_PORT = 6;
 }  // namespace storage
 
 namespace autonomous {
-inline constexpr wpi::units::second_t TIMEOUT = 3_s;
-inline constexpr wpi::units::meter_t DRIVE_DISTANCE = 2_m;
+inline constexpr wpi::units::seconds<> TIMEOUT = 3_s;
+inline constexpr wpi::units::meters<> DRIVE_DISTANCE = 2_m;
 inline constexpr double DRIVE_VELOCITY = 0.5;
 }  // namespace autonomous
 

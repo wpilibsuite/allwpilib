@@ -20,7 +20,7 @@ TEST_CASE("DifferentialDriveOdometryTest EncoderDistances", "[wpimath]") {
   DifferentialDriveOdometry odometry{45_deg, 0_m, 0_m};
 
   const auto& pose =
-      odometry.Update(135_deg, 0_m, wpi::units::meter_t{5 * std::numbers::pi});
+      odometry.Update(135_deg, 0_m, wpi::units::meters<>{5 * std::numbers::pi});
 
   CHECK_NEAR(pose.X().value(), 5.0, EPSILON);
   CHECK_NEAR(pose.Y().value(), 5.0, EPSILON);

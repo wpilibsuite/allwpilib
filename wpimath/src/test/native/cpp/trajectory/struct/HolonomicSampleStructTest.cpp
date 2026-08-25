@@ -16,7 +16,7 @@ using StructType = wpi::util::Struct<HolonomicSample>;
 const HolonomicSample EXPECTED_DATA{
     1.23_s, Pose2d{1.1_m, 2.2_m, Rotation2d{33.3_deg}},
     ChassisVelocities{3.3_mps, 4.4_mps, 5.5_rad_per_s},
-    ChassisAccelerations{6.6_mps_sq, 7.7_mps_sq, 8.8_rad_per_s_sq}};
+    ChassisAccelerations{6.6_mps2, 7.7_mps2, 8.8_rad_per_s_sq}};
 }  // namespace
 
 TEST_CASE("HolonomicSampleStructTest Roundtrip", "[wpimath]") {

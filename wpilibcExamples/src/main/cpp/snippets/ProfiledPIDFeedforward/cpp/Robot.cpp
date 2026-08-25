@@ -22,11 +22,11 @@ class Robot : public wpi::TimedRobot {
 
   // Controls a simple motor's position using a
   // wpi::math::SimpleMotorFeedforward and a wpi::math::ProfiledPIDController
-  void GoToPosition(wpi::units::meter_t goalPosition) {
+  void GoToPosition(wpi::units::meters<> goalPosition) {
     auto pidVal = controller.Calculate(
-        wpi::units::meter_t{encoder.GetDistance()}, goalPosition);
+        wpi::units::meters<>{encoder.GetDistance()}, goalPosition);
     motor.SetVoltage(
-        wpi::units::volt_t{pidVal} +
+        wpi::units::volts<>{pidVal} +
         feedforward.Calculate(lastVelocity, controller.GetSetpoint().velocity));
     lastVelocity = controller.GetSetpoint().velocity;
   }
@@ -37,14 +37,14 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
-      1.0, 0.0, 0.0, {5_mps, 10_mps_sq}};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
-      0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps_sq};
+  wpi::math::ProfiledPIDController<wpi::units::meters_> controller{
+      1.0, 0.0, 0.0, {5_mps, 10_mps2}};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0.5_V, 1.5_V / 1_mps, 0.3_V / 1_mps2};
   wpi::Encoder encoder{0, 1};
   wpi::PWMSparkMax motor{0};
 
-  wpi::units::meters_per_second_t lastVelocity = 0_mps;
+  wpi::units::meters_per_second<> lastVelocity = 0_mps;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

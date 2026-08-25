@@ -65,7 +65,7 @@ class Trajectory {
    *
    * @return The duration of the trajectory.
    */
-  wpi::units::second_t Duration() const { return m_duration; }
+  wpi::units::seconds<> Duration() const { return m_duration; }
 
   /**
    * Returns the samples of the trajectory.
@@ -95,7 +95,7 @@ class Trajectory {
    * @return The sample at that point in time.
    * @throws std::runtime_error if the trajectory has no samples.
    */
-  SampleType SampleAt(wpi::units::second_t t) const {
+  SampleType SampleAt(wpi::units::seconds<> t) const {
     if (m_samples.empty()) {
       throw std::runtime_error(
           "Trajectory cannot be sampled if it has no samples.");
@@ -131,7 +131,7 @@ class Trajectory {
    * @return The sample at that point in time.
    */
   SampleType SampleAt(double t) const {
-    return SampleAt(wpi::units::second_t{t});
+    return SampleAt(wpi::units::seconds<>{t});
   }
 
   /**
@@ -202,8 +202,8 @@ class Trajectory {
   }
 
   std::vector<SampleType> m_samples;
-  std::map<wpi::units::second_t, SampleType> m_sampleMap;
-  wpi::units::second_t m_duration{0};
+  std::map<wpi::units::seconds<>, SampleType> m_sampleMap;
+  wpi::units::seconds<> m_duration{0};
 };
 
 }  // namespace wpi::math

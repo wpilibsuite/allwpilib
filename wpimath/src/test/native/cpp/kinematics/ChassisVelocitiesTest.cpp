@@ -21,15 +21,15 @@ static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("ChassisVelocitiesTest Discretize", "[wpimath]") {
   constexpr wpi::math::ChassisVelocities target{1_mps, 0_mps, 0.5_rad_per_s};
-  constexpr wpi::units::second_t duration = 1_s;
-  constexpr wpi::units::second_t dt = 10_ms;
+  constexpr wpi::units::seconds<> duration = 1_s;
+  constexpr wpi::units::seconds<> dt = 10_ms;
 
   const auto velocities = target.Discretize(duration);
   const wpi::math::Twist2d twist{velocities.vx * dt, velocities.vy * dt,
                                  velocities.omega * dt};
 
   wpi::math::Pose2d pose;
-  for (wpi::units::second_t time = 0_s; time < duration; time += dt) {
+  for (wpi::units::seconds<> time = 0_s; time < duration; time += dt) {
     pose = pose + twist.Exp();
   }
 

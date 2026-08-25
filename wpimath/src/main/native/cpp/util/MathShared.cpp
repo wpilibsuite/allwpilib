@@ -22,8 +22,8 @@ class DefaultMathShared : public MathShared {
   void ReportErrorV(std::string_view format, std::format_args args) override {}
   void ReportWarningV(std::string_view format, std::format_args args) override {
   }
-  wpi::units::second_t GetTimestamp() override {
-    return wpi::units::second_t{wpi::util::Now() * 1.0e-9};
+  wpi::units::seconds<> GetTimestamp() override {
+    return wpi::units::seconds<>{wpi::util::Now() * 1.0e-9};
   }
 };
 }  // namespace

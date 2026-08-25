@@ -51,11 +51,11 @@ int64_t RobotController::GetMonotonicTime() {
   return HAL_GetMonotonicTime();
 }
 
-wpi::units::volt_t RobotController::GetBatteryVoltage() {
+wpi::units::volts<> RobotController::GetBatteryVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
   WPILIB_CheckErrorStatus(status, "GetBatteryVoltage");
-  return wpi::units::volt_t{retVal};
+  return wpi::units::volts<>{retVal};
 }
 
 bool RobotController::IsSysActive() {
@@ -140,19 +140,19 @@ void RobotController::ResetRailFaultCounts() {
   WPILIB_CheckErrorStatus(status, "ResetRailFaultCounts");
 }
 
-void RobotController::SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
-                                          wpi::units::volt_t recoveryVoltage) {
+void RobotController::SetBrownoutVoltages(wpi::units::volts<> brownoutVoltage,
+                                          wpi::units::volts<> recoveryVoltage) {
   int32_t status = 0;
   HAL_SetBrownoutVoltages(brownoutVoltage.value(), recoveryVoltage.value(),
                           &status);
   WPILIB_CheckErrorStatus(status, "SetBrownoutVoltages");
 }
 
-wpi::units::celsius_t RobotController::GetCPUTemp() {
+wpi::units::celsius<> RobotController::GetCPUTemp() {
   int32_t status = 0;
   double retVal = HAL_GetCPUTemp(&status);
   WPILIB_CheckErrorStatus(status, "GetCPUTemp");
-  return wpi::units::celsius_t{retVal};
+  return wpi::units::celsius<>{retVal};
 }
 
 CANStatus RobotController::GetCANStatus(CANBus busId) {

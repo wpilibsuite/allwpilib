@@ -9,8 +9,7 @@
 #include <type_traits>
 
 #include "wpi/math/util/MathShared.hpp"
-#include "wpi/units/base.hpp"
-#include "wpi/units/math.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/UsageReporting.hpp"
 
@@ -23,14 +22,12 @@ namespace detail {
 template <class Distance>
 class TrapezoidProfileConstraints {
  public:
-  using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Velocity_t = wpi::units::unit_t<Velocity>;
-  using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity_t = wpi::units::unit<Velocity>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration_t = wpi::units::unit<Acceleration>;
 
   /// Maximum velocity.
   Velocity_t maxVelocity{0};
@@ -91,15 +88,13 @@ class TrapezoidProfileConstraints {
 template <class Distance>
 class TrapezoidProfile {
  public:
-  using Distance_t = wpi::units::unit_t<Distance>;
-  using Velocity =
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Velocity_t = wpi::units::unit_t<Velocity>;
-  using Acceleration =
-      wpi::units::compound_unit<Velocity,
-                                wpi::units::inverse<wpi::units::seconds>>;
-  using Acceleration_t = wpi::units::unit_t<Acceleration>;
+  using Distance_t = wpi::units::unit<Distance>;
+  using Velocity = wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>;
+  using Velocity_t = wpi::units::unit<Velocity>;
+  using Acceleration = wpi::units::compound_conversion_factor<
+      Velocity, wpi::units::inverse<wpi::units::seconds_>>;
+  using Acceleration_t = wpi::units::unit<Acceleration>;
 
   using Constraints = detail::TrapezoidProfileConstraints<Distance>;
 
@@ -123,11 +118,11 @@ class TrapezoidProfile {
   class ProfileTiming {
    public:
     /// The time the profile spends in the first leg.
-    wpi::units::second_t t_1;
+    wpi::units::seconds<> t_1;
     /// The time the profile spends at the velocity limit.
-    wpi::units::second_t t_2;
+    wpi::units::seconds<> t_2;
     /// The time the profile spends in the last leg.
-    wpi::units::second_t t_3;
+    wpi::units::seconds<> t_3;
 
     constexpr bool operator==(const ProfileTiming&) const = default;
   };
@@ -155,14 +150,15 @@ class TrapezoidProfile {
    * @param goal The desired state when the profile is complete.
    * @return The position and velocity of the profile at time t.
    */
-  constexpr State Calculate(wpi::units::second_t t, State current, State goal) {
+  constexpr State Calculate(wpi::units::seconds<> t, State current,
+                            State goal) {
     // Sampled trajectory should start at the current state, regardless of
     // validity.
     State sample{current};
 
     // Adjust states so that they are within the constraints and get the time
     // required for the current state to return to a valid state.
-    wpi::units::second_t recoveryTime = AdjustStates(current, goal);
+    wpi::units::seconds<> recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
     m_profile = GenerateProfile(sign, current, goal);
 
@@ -174,7 +170,7 @@ class TrapezoidProfile {
     // proper recovery.
     m_profile.t_1 += recoveryTime;
 
-    auto advance = [](wpi::units::second_t time, Acceleration_t acceleration,
+    auto advance = [](wpi::units::seconds<> time, Acceleration_t acceleration,
                       State& state) {
       // x = x_i + v_i t + at² / 2   (2)
       state.position +=
@@ -184,7 +180,7 @@ class TrapezoidProfile {
     };
 
     Acceleration_t acceleration = sign * m_constraints.maxAcceleration;
-    advance(wpi::units::math::min(t, m_profile.t_1),
+    advance(wpi::units::min(t, m_profile.t_1),
             // Handle recovery to a feasible state if necessary.
             recoveryTime > 0.0_s && sample.velocity * sign > Velocity_t{0.0}
                 ? -acceleration
@@ -193,12 +189,11 @@ class TrapezoidProfile {
 
     if (t > m_profile.t_1) {
       t -= m_profile.t_1;
-      advance(wpi::units::math::min(t, m_profile.t_2), Acceleration_t{0.0},
-              sample);
+      advance(wpi::units::min(t, m_profile.t_2), Acceleration_t{0.0}, sample);
 
       if (t > m_profile.t_2) {
         t -= m_profile.t_2;
-        advance(wpi::units::math::min(t, m_profile.t_3), -acceleration, sample);
+        advance(wpi::units::min(t, m_profile.t_3), -acceleration, sample);
 
         if (t > m_profile.t_3) {
           sample = goal;
@@ -218,11 +213,11 @@ class TrapezoidProfile {
    * @param goal The goal state.
    * @return The time left until the target state.
    */
-  constexpr wpi::units::second_t TimeLeftUntil(State current,
-                                               State goal) const {
+  constexpr wpi::units::seconds<> TimeLeftUntil(State current,
+                                                State goal) const {
     // Adjust states so that they are within the constraints and get the time
     // required for the current state to return to a valid state.
-    wpi::units::second_t recoveryTime = AdjustStates(current, goal);
+    wpi::units::seconds<> recoveryTime = AdjustStates(current, goal);
     double sign = GetSign(current, goal);
     ProfileTiming profile = GenerateProfile(sign, current, goal);
 
@@ -236,7 +231,7 @@ class TrapezoidProfile {
    *
    * @return The duration of the profile, or zero if no goal was set.
    */
-  constexpr wpi::units::second_t Duration() const {
+  constexpr wpi::units::seconds<> Duration() const {
     return m_profile.t_1 + m_profile.t_2 + m_profile.t_3;
   }
 
@@ -249,7 +244,7 @@ class TrapezoidProfile {
    * @param t The time since the beginning of the profile.
    * @return True if the profile has reached the goal.
    */
-  constexpr bool IsFinished(wpi::units::second_t t) const {
+  constexpr bool IsFinished(wpi::units::seconds<> t) const {
     return t >= Duration();
   }
 
@@ -268,28 +263,27 @@ class TrapezoidProfile {
    * @param goal The goal state state to be adjusted.
    * @return The time taken to make the current state valid.
    */
-  constexpr wpi::units::second_t AdjustStates(State& current,
-                                              State& goal) const {
-    if (wpi::units::math::abs(goal.velocity) > m_constraints.maxVelocity) {
+  constexpr wpi::units::seconds<> AdjustStates(State& current,
+                                               State& goal) const {
+    if (wpi::units::abs(goal.velocity) > m_constraints.maxVelocity) {
       goal.velocity =
-          wpi::units::math::copysign(m_constraints.maxVelocity, goal.velocity);
+          wpi::units::copysign(m_constraints.maxVelocity, goal.velocity);
     }
 
-    wpi::units::second_t recoveryTime{0.0};
+    wpi::units::seconds<> recoveryTime{0.0};
     Velocity_t violationAmount =
-        wpi::units::math::abs(current.velocity) - m_constraints.maxVelocity;
+        wpi::units::abs(current.velocity) - m_constraints.maxVelocity;
 
     if (violationAmount > Velocity_t{0.0}) {
       recoveryTime = violationAmount / m_constraints.maxAcceleration;
       // x = x_i + v_i t + at² / 2   (2)
-      current.position +=
-          current.velocity * recoveryTime +
-          wpi::units::math::copysign(m_constraints.maxAcceleration,
-                                     -current.velocity) *
-              recoveryTime * recoveryTime / 2.0;
+      current.position += current.velocity * recoveryTime +
+                          wpi::units::copysign(m_constraints.maxAcceleration,
+                                               -current.velocity) *
+                              recoveryTime * recoveryTime / 2.0;
       // The closest valid velocity will have the magnitude of the max velocity.
-      current.velocity = wpi::units::math::copysign(m_constraints.maxVelocity,
-                                                    current.velocity);
+      current.velocity =
+          wpi::units::copysign(m_constraints.maxVelocity, current.velocity);
     }
 
     return recoveryTime;
@@ -310,7 +304,7 @@ class TrapezoidProfile {
 
     // Calculate threshold displacement
     // d = |v_t - v_i|(v_t + v_i) / (2 a_m)   (9)
-    Distance_t d = wpi::units::math::abs(goal.velocity - current.velocity) *
+    Distance_t d = wpi::units::abs(goal.velocity - current.velocity) *
                    (goal.velocity + current.velocity) /
                    (2.0 * m_constraints.maxAcceleration);
 
@@ -323,7 +317,7 @@ class TrapezoidProfile {
     // calculated. We do not have control over the floating point precision
     // error from previous calculations, and as such, it is difficult to bound
     // the possible error. 1e-12 should be good enough for FRC though.
-    if (wpi::units::math::abs(dx - d) < Distance_t{1e-12}) {
+    if (wpi::units::abs(dx - d) < Distance_t{1e-12}) {
       return std::copysign(1.0, goal.velocity.value());
     } else {
       if (dx > d) {
@@ -356,11 +350,11 @@ class TrapezoidProfile {
     // Calculate the peak velocity to compare to velocity constraint.
     // v_p = √(aΔx + (v_t² + v_i²) / 2)   (8)
     Velocity_t peakVelocity =
-        sign * wpi::units::math::sqrt(wpi::units::math::max(
+        sign * wpi::units::sqrt(wpi::units::max(
                    acceleration * dx + (goal.velocity * goal.velocity +
                                         current.velocity * current.velocity) /
                                            2,
-                   wpi::units::math::pow<2>(Velocity_t{0.0})));
+                   wpi::units::pow<2>(Velocity_t{0.0})));
 
     // Handle the case where we hit maximum velocity.
     if (sign * peakVelocity > m_constraints.maxVelocity) {

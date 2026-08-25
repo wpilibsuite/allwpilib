@@ -162,7 +162,7 @@ TEST_CASE_METHOD(TimerTest,
   Timer timer;
   timer.Start();
 
-  auto period = wpi::units::second_t{1.0 / 60.0};
+  auto period = wpi::units::seconds<>{1.0 / 60.0};
 
   for (int64_t i = 1; i <= 60; ++i) {
     mockTime = (i * 1'000'000'000LL + 59) / 60 + 100;
@@ -184,7 +184,7 @@ TEST_CASE_METHOD(TimerTest,
   timer.Start();
 
   mockTime = 1;
-  auto period = wpi::units::nanosecond_t{0.1};
+  auto period = wpi::units::nanoseconds<>{0.1};
 
   for (int i = 0; i < 10; ++i) {
     CHECK(timer.AdvanceIfElapsed(period));

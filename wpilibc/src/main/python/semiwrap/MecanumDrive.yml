@@ -4,7 +4,7 @@ extra_includes:
 classes:
   wpi::MecanumDrive:
     force_type_casters:
-    - wpi::units::radian_t
+    - wpi::units::radians<>
     methods:
       MecanumDrive:
         overloads:

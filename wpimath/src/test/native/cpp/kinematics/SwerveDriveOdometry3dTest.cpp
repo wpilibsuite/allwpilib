@@ -136,13 +136,13 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
           std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 45_deg}},
-          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+          TrajectoryConfig(5.0_mps, 2.0_mps2));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t t = 0_s;
+  wpi::units::seconds<> dt = 20_ms;
+  wpi::units::seconds<> t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -204,13 +204,13 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
           std::vector{Pose2d{0_m, 0_m, 45_deg}, Pose2d{3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 135_deg}, Pose2d{-3_m, 0_m, -90_deg},
                       Pose2d{0_m, 0_m, 45_deg}},
-          TrajectoryConfig(5.0_mps, 2.0_mps_sq));
+          TrajectoryConfig(5.0_mps, 2.0_mps2));
 
   std::default_random_engine generator;
   std::normal_distribution<double> distribution(0.0, 1.0);
 
-  wpi::units::second_t dt = 20_ms;
-  wpi::units::second_t t = 0_s;
+  wpi::units::seconds<> dt = 20_ms;
+  wpi::units::seconds<> t = 0_s;
 
   double maxError = -std::numeric_limits<double>::max();
   double errorSum = 0;
@@ -263,7 +263,7 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
   CHECK_NEAR(pose.X().value(), 0.0, 1e-9);
   CHECK_NEAR(pose.Y().value(), 0.0, 1e-9);
   CHECK_NEAR(pose.Z().value(), 0.0, 1e-9);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, 1e-9);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, 1e-9);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, 1e-9);
+  CHECK_NEAR(wpi::units::degrees<>{pose.Rotation().X()}.value(), 0.0, 1e-9);
+  CHECK_NEAR(wpi::units::degrees<>{pose.Rotation().Y()}.value(), 5.0, 1e-9);
+  CHECK_NEAR(wpi::units::degrees<>{pose.Rotation().Z()}.value(), 90.0, 1e-9);
 }

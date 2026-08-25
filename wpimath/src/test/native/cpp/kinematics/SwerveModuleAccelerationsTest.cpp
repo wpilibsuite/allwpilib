@@ -23,19 +23,16 @@ TEST_CASE("SwerveModuleAccelerationsTest DefaultConstructor", "[wpimath]") {
 
 TEST_CASE("SwerveModuleAccelerationsTest ParameterizedConstructor",
           "[wpimath]") {
-  SwerveModuleAcceleration moduleAccelerations{2.5_mps_sq, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations{2.5_mps2, Rotation2d{1.5_rad}};
 
   CHECK_NEAR(moduleAccelerations.acceleration.value(), 2.5, EPSILON);
   CHECK_NEAR(moduleAccelerations.angle.Radians().value(), 1.5, EPSILON);
 }
 
 TEST_CASE("SwerveModuleAccelerationsTest Equals", "[wpimath]") {
-  SwerveModuleAcceleration moduleAccelerations1{2.0_mps_sq,
-                                                Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations2{2.0_mps_sq,
-                                                Rotation2d{1.5_rad}};
-  SwerveModuleAcceleration moduleAccelerations3{2.1_mps_sq,
-                                                Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations1{2.0_mps2, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations2{2.0_mps2, Rotation2d{1.5_rad}};
+  SwerveModuleAcceleration moduleAccelerations3{2.1_mps2, Rotation2d{1.5_rad}};
 
   CHECK(moduleAccelerations1 == moduleAccelerations2);
   CHECK(moduleAccelerations1 != moduleAccelerations3);

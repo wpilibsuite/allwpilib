@@ -9,15 +9,15 @@
 #include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/velocity.hpp"
 
 static constexpr double TOLERANCE = 1e-6;
 
 // Shared constructor parameters used by all tests
-static constexpr wpi::units::unit_t<wpi::math::AntiTipping::kp_unit> KP{0.1};
-static constexpr wpi::units::radian_t THRESHOLD = 3_deg;
-static constexpr wpi::units::meters_per_second_t MAX_SPEED = 2_mps;
+static constexpr wpi::units::unit<wpi::math::AntiTipping::kp_unit> KP{0.1};
+static constexpr wpi::units::radians<> THRESHOLD = 3_deg;
+static constexpr wpi::units::meters_per_second<> MAX_SPEED = 2_mps;
 
 TEST_CASE("AntiTippingTest BelowThresholdGeneratesNoCorrection", "[wpimath]") {
   wpi::math::AntiTipping antiTipping{KP, THRESHOLD, MAX_SPEED};

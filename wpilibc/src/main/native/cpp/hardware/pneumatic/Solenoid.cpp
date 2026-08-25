@@ -61,7 +61,7 @@ bool Solenoid::IsDisabled() const {
   return (m_module->GetSolenoidDisabledList() & m_mask) != 0;
 }
 
-void Solenoid::SetPulseDuration(wpi::units::second_t duration) {
+void Solenoid::SetPulseDuration(wpi::units::seconds<> duration) {
   m_module->SetOneShotDuration(m_channel, duration);
 }
 

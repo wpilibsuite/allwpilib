@@ -37,7 +37,7 @@ class MotorController {
    *
    * @param voltage The voltage.
    */
-  virtual void SetVoltage(wpi::units::volt_t voltage);
+  virtual void SetVoltage(wpi::units::volts<> voltage);
 
   /**
    * Gets the throttle of the motor controller.

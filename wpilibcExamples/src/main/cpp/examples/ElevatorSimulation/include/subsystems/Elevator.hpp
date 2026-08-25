@@ -25,7 +25,7 @@ class Elevator {
   Elevator();
   void SimulationPeriodic();
   void UpdateTelemetry();
-  void ReachGoal(wpi::units::meter_t goal);
+  void ReachGoal(wpi::units::meters<> goal);
   void Stop();
 
  private:
@@ -33,9 +33,9 @@ class Elevator {
   wpi::math::DCMotor elevatorGearbox = wpi::math::DCMotor::Vex775Pro(4);
 
   // Standard classes for controlling our elevator
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
-      2.45_mps, 2.45_mps_sq};
-  wpi::math::ProfiledPIDController<wpi::units::meters> controller{
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::Constraints constraints{
+      2.45_mps, 2.45_mps2};
+  wpi::math::ProfiledPIDController<wpi::units::meters_> controller{
       Constants::ELEVATOR_KP, Constants::ELEVATOR_KI, Constants::ELEVATOR_KD,
       constraints};
 

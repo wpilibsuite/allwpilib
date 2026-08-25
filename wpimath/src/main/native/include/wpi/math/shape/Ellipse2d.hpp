@@ -12,9 +12,8 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/array.hpp"
 
@@ -34,8 +33,8 @@ class WPILIB_DLLEXPORT Ellipse2d final {
    * @param xSemiAxis The x semi-axis.
    * @param ySemiAxis The y semi-axis.
    */
-  constexpr Ellipse2d(const Pose2d& center, wpi::units::meter_t xSemiAxis,
-                      wpi::units::meter_t ySemiAxis)
+  constexpr Ellipse2d(const Pose2d& center, wpi::units::meters<> xSemiAxis,
+                      wpi::units::meters<> ySemiAxis)
       : m_center{center}, m_xSemiAxis{xSemiAxis}, m_ySemiAxis{ySemiAxis} {
     if (xSemiAxis <= 0_m || ySemiAxis <= 0_m) {
       throw std::invalid_argument("Ellipse2d semi-axes must be positive");
@@ -72,14 +71,14 @@ class WPILIB_DLLEXPORT Ellipse2d final {
    *
    * @return The x semi-axis.
    */
-  constexpr wpi::units::meter_t XSemiAxis() const { return m_xSemiAxis; }
+  constexpr wpi::units::meters<> XSemiAxis() const { return m_xSemiAxis; }
 
   /**
    * Returns the y semi-axis.
    *
    * @return The y semi-axis.
    */
-  constexpr wpi::units::meter_t YSemiAxis() const { return m_ySemiAxis; }
+  constexpr wpi::units::meters<> YSemiAxis() const { return m_ySemiAxis; }
 
   /**
    * Returns the focal points of the ellipse. In a perfect circle, this will
@@ -89,12 +88,12 @@ class WPILIB_DLLEXPORT Ellipse2d final {
    */
   constexpr wpi::util::array<Translation2d, 2> FocalPoints() const {
     // Major semi-axis
-    auto a = wpi::units::math::max(m_xSemiAxis, m_ySemiAxis);
+    auto a = wpi::units::max(m_xSemiAxis, m_ySemiAxis);
 
     // Minor semi-axis
-    auto b = wpi::units::math::min(m_xSemiAxis, m_ySemiAxis);
+    auto b = wpi::units::min(m_xSemiAxis, m_ySemiAxis);
 
-    auto c = wpi::units::math::sqrt(a * a - b * b);
+    auto c = wpi::units::sqrt(a * a - b * b);
 
     if (m_xSemiAxis > m_ySemiAxis) {
       return wpi::util::array{
@@ -154,7 +153,7 @@ class WPILIB_DLLEXPORT Ellipse2d final {
    * @param point The point to check.
    * @return The distance (0, if the point is contained by the ellipse)
    */
-  wpi::units::meter_t Distance(const Translation2d& point) const {
+  wpi::units::meters<> Distance(const Translation2d& point) const {
     return Nearest(point).Distance(point);
   }
 
@@ -175,14 +174,14 @@ class WPILIB_DLLEXPORT Ellipse2d final {
    */
   constexpr bool operator==(const Ellipse2d& other) const {
     return m_center == other.m_center &&
-           wpi::units::math::abs(m_xSemiAxis - other.m_xSemiAxis) < 1E-9_m &&
-           wpi::units::math::abs(m_ySemiAxis - other.m_ySemiAxis) < 1E-9_m;
+           wpi::units::abs(m_xSemiAxis - other.m_xSemiAxis) < 1E-9_m &&
+           wpi::units::abs(m_ySemiAxis - other.m_ySemiAxis) < 1E-9_m;
   }
 
  private:
   Pose2d m_center;
-  wpi::units::meter_t m_xSemiAxis;
-  wpi::units::meter_t m_ySemiAxis;
+  wpi::units::meters<> m_xSemiAxis;
+  wpi::units::meters<> m_ySemiAxis;
 
   /**
    * Solves the equation of an ellipse from the given point. This is a helper

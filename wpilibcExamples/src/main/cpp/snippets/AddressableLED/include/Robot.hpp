@@ -24,7 +24,7 @@ class Robot : public wpi::TimedRobot {
       ledBuffer;  // Reuse the buffer
 
   // Our LED strip has a density of 120 LEDs per meter
-  wpi::units::meter_t LED_SPACING{1 / 120.0};
+  wpi::units::meters<> LED_SPACING{1 / 120.0};
 
   // Create an LED pattern that will display a rainbow across
   // all hues at maximum saturation and half brightness

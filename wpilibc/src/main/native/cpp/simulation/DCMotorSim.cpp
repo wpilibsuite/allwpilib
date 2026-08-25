@@ -36,53 +36,53 @@ DCMotorSim::DCMotorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
       m_j(m_gearing * gearbox.Kt.value() /
           (gearbox.R.value() * m_plant.B(1, 0))) {}
 
-void DCMotorSim::SetState(wpi::units::radian_t angularPosition,
-                          wpi::units::radians_per_second_t angularVelocity) {
+void DCMotorSim::SetState(wpi::units::radians<> angularPosition,
+                          wpi::units::radians_per_second<> angularVelocity) {
   SetState(wpi::math::Vectord<2>{angularPosition, angularVelocity});
 }
 
-void DCMotorSim::SetAngle(wpi::units::radian_t angularPosition) {
+void DCMotorSim::SetAngle(wpi::units::radians<> angularPosition) {
   SetState(angularPosition, GetAngularVelocity());
 }
 
 void DCMotorSim::SetAngularVelocity(
-    wpi::units::radians_per_second_t angularVelocity) {
+    wpi::units::radians_per_second<> angularVelocity) {
   SetState(GetAngularPosition(), angularVelocity);
 }
 
-wpi::units::radian_t DCMotorSim::GetAngularPosition() const {
-  return wpi::units::radian_t{GetOutput(0)};
+wpi::units::radians<> DCMotorSim::GetAngularPosition() const {
+  return wpi::units::radians<>{GetOutput(0)};
 }
 
-wpi::units::radians_per_second_t DCMotorSim::GetAngularVelocity() const {
-  return wpi::units::radians_per_second_t{GetOutput(1)};
+wpi::units::radians_per_second<> DCMotorSim::GetAngularVelocity() const {
+  return wpi::units::radians_per_second<>{GetOutput(1)};
 }
 
-wpi::units::radians_per_second_squared_t DCMotorSim::GetAngularAcceleration()
+wpi::units::radians_per_second_squared<> DCMotorSim::GetAngularAcceleration()
     const {
-  return wpi::units::radians_per_second_squared_t{
+  return wpi::units::radians_per_second_squared<>{
       (m_plant.A() * m_x + m_plant.B() * m_u)(1, 0)};
 }
 
-wpi::units::newton_meter_t DCMotorSim::GetTorque() const {
-  return wpi::units::newton_meter_t{GetAngularAcceleration().value() *
-                                    m_j.value()};
+wpi::units::newton_meters<> DCMotorSim::GetTorque() const {
+  return wpi::units::newton_meters<>{GetAngularAcceleration().value() *
+                                     m_j.value()};
 }
 
-wpi::units::ampere_t DCMotorSim::GetCurrentDraw() const {
+wpi::units::amperes<> DCMotorSim::GetCurrentDraw() const {
   // I = V / R - omega / (Kv * R)
   // Reductions are greater than 1, so a reduction of 10:1 would mean the motor
   // is spinning 10x faster than the output.
-  return m_gearbox.Current(wpi::units::radians_per_second_t{m_x(1)} * m_gearing,
-                           wpi::units::volt_t{m_u(0)}) *
+  return m_gearbox.Current(wpi::units::radians_per_second<>{m_x(1)} * m_gearing,
+                           wpi::units::volts<>{m_u(0)}) *
          wpi::util::sgn(m_u(0));
 }
 
-wpi::units::volt_t DCMotorSim::GetInputVoltage() const {
-  return wpi::units::volt_t{GetInput(0)};
+wpi::units::volts<> DCMotorSim::GetInputVoltage() const {
+  return wpi::units::volts<>{GetInput(0)};
 }
 
-void DCMotorSim::SetInputVoltage(wpi::units::volt_t voltage) {
+void DCMotorSim::SetInputVoltage(wpi::units::volts<> voltage) {
   SetInput(wpi::math::Vectord<1>{voltage.value()});
   ClampInput(wpi::RobotController::GetBatteryVoltage().value());
 }
@@ -95,6 +95,6 @@ double DCMotorSim::GetGearing() const {
   return m_gearing;
 }
 
-wpi::units::kilogram_square_meter_t DCMotorSim::GetJ() const {
+wpi::units::kilogram_square_meters<> DCMotorSim::GetJ() const {
   return m_j;
 }

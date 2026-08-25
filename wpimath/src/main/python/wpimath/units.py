@@ -323,11 +323,11 @@ millihertz = float
 kilohertz = float
 
 # illuminance
-luxes = float
-nanoluxes = float
-microluxes = float
-milliluxes = float
-kiloluxes = float
+lux = float
+nanolux = float
+microlux = float
+millilux = float
+kilolux = float
 footcandles = float
 lumens_per_square_inch = float
 phots = float
@@ -400,7 +400,7 @@ nanograms = float
 micrograms = float
 milligrams = float
 kilograms = float
-metric_tons = float
+tonnes = float
 pounds = float
 long_tons = float
 short_tons = float
@@ -427,7 +427,7 @@ micropascals = float
 millipascals = float
 kilopascals = float
 bars = float
-mbars = float
+millibars = float
 atmospheres = float
 pounds_per_square_inch = float
 torrs = float
@@ -450,7 +450,7 @@ millisieverts = float
 kilosieverts = float
 curies = float
 rutherfords = float
-rads = float
+radiation_absorbed_dose = float
 
 # resistance
 ohms = float
@@ -469,7 +469,7 @@ degrees_squared = float
 spats = float
 
 # substance
-moles = float
+mols = float
 
 # temperature
 kelvin = float

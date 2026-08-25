@@ -58,7 +58,7 @@ class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
    * Changes the period of the loop overrun watchdog. This should be kept in
    * sync with the TimedRobot period.
    */
-  void SetPeriod(wpi::units::second_t period);
+  void SetPeriod(wpi::units::seconds<> period);
 
   /**
    * Get the active button poll.

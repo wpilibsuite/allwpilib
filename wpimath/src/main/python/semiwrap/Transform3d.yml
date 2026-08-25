@@ -10,7 +10,7 @@ classes:
           const Pose3d&, const Pose3d&:
             keepalive: []
           Translation3d, Rotation3d:
-          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, Rotation3d:
+          wpi::units::meters<>, wpi::units::meters<>, wpi::units::meters<>, Rotation3d:
           const Eigen::Matrix4d&:
             rename: from_matrix
             keepalive: []
@@ -36,13 +36,13 @@ inline_code: |
     .def_property_readonly("x", &Transform3d::X)
     .def_property_readonly("y", &Transform3d::Y)
     .def_property_readonly("z", &Transform3d::Z)
-    .def_property_readonly("x_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("x_feet", [](const Transform3d * self) -> wpi::units::feet<> {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("y_feet", [](const Transform3d * self) -> wpi::units::feet<> {
       return self->Y();
     })
-    .def_property_readonly("z_feet", [](const Transform3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("z_feet", [](const Transform3d * self) -> wpi::units::feet<> {
       return self->Z();
     })
     .def("__repr__", py::overload_cast<const Transform3d&>(&rpy::toString));

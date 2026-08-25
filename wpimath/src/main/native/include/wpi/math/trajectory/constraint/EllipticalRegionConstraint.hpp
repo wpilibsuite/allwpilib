@@ -32,20 +32,20 @@ class EllipticalRegionConstraint : public TrajectoryConstraint {
                                        const Constraint& constraint)
       : m_ellipse{ellipse}, m_constraint{constraint} {}
 
-  constexpr wpi::units::meters_per_second_t MaxVelocity(
+  constexpr wpi::units::meters_per_second<> MaxVelocity(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MaxVelocity(pose, curvature, velocity);
     } else {
-      return wpi::units::meters_per_second_t{
+      return wpi::units::meters_per_second<>{
           std::numeric_limits<double>::infinity()};
     }
   }
 
   constexpr MinMax MinMaxAcceleration(
       const Pose2d& pose, wpi::units::curvature_t curvature,
-      wpi::units::meters_per_second_t velocity) const override {
+      wpi::units::meters_per_second<> velocity) const override {
     if (m_ellipse.Contains(pose.Translation())) {
       return m_constraint.MinMaxAcceleration(pose, curvature, velocity);
     } else {

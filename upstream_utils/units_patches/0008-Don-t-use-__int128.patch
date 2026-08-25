@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Mon, 17 Aug 2026 21:47:06 -0400
+Subject: [PATCH 08/12] Don't use __int128
+
+---
+ include/units/core.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 73638ba1ee5138502ab57f2dfc742770469b09e8..6101b5dd8c10fe26ddfe77d3d5a0e39eb4d76a5b 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -2257,15 +2257,9 @@ namespace units
+ 		/// value that fits the target; a double-width intermediate holds the product. `__int128` is used where the
+ 		/// compiler provides it; otherwise the intermediate falls back to `std::intmax_t` (the widest standard
+ 		/// integer) and a manual 128-bit mul-divide guards the product.
+-#if defined(__SIZEOF_INT128__)
+-		using widest_signed_int   = __int128;
+-		using widest_unsigned_int = unsigned __int128;
+-		inline constexpr bool has_builtin_int128 = true;
+-#else
+ 		using widest_signed_int   = std::intmax_t;
+ 		using widest_unsigned_int = std::uintmax_t;
+ 		inline constexpr bool has_builtin_int128 = false;
+-#endif
+ 
+ 		/// Compute `value * num / den` for an integral `value` without overflowing the intermediate product, in a
+ 		/// double-width intermediate. On a compiler with `__int128` the whole expression rides in 128 bits; without

@@ -3,8 +3,8 @@ classes:
     methods:
       DifferentialDriveAccelerationLimiter:
         overloads:
-          ? LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::units::meters_per_second_squared_t, wpi::units::radians_per_second_squared_t
+          ? LinearSystem<2, 2, 2>, wpi::units::meters<>, wpi::units::meters_per_second_squared<>, wpi::units::radians_per_second_squared<>
           :
-          ? LinearSystem<2, 2, 2>, wpi::units::meter_t, wpi::units::meters_per_second_squared_t, wpi::units::meters_per_second_squared_t, wpi::units::radians_per_second_squared_t
+          ? LinearSystem<2, 2, 2>, wpi::units::meters<>, wpi::units::meters_per_second_squared<>, wpi::units::meters_per_second_squared<>, wpi::units::radians_per_second_squared<>
           :
       Calculate:

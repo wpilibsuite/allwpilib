@@ -237,7 +237,7 @@ class GoBildaPinpoint {
    * @throws std::invalid_argument if either offset is nonfinite or cannot be
    *     represented by the device's 32-bit floating-point register.
    */
-  void SetOffsets(wpi::units::meter_t xOffset, wpi::units::meter_t yOffset);
+  void SetOffsets(wpi::units::meters<> xOffset, wpi::units::meters<> yOffset);
 
   /** Recalibrates the IMU. The robot must remain stationary for 0.25 seconds.
    */
@@ -299,7 +299,7 @@ class GoBildaPinpoint {
    * @throws std::invalid_argument if position is nonfinite or cannot be
    *     represented by a 32-bit float.
    */
-  void SetXPosition(wpi::units::meter_t position);
+  void SetXPosition(wpi::units::meters<> position);
 
   /**
    * Overrides the tracked Y position.
@@ -308,7 +308,7 @@ class GoBildaPinpoint {
    * @throws std::invalid_argument if position is nonfinite or cannot be
    *     represented by a 32-bit float.
    */
-  void SetYPosition(wpi::units::meter_t position);
+  void SetYPosition(wpi::units::meters<> position);
 
   /**
    * Overrides the tracked heading.
@@ -317,7 +317,7 @@ class GoBildaPinpoint {
    * @throws std::invalid_argument if heading is nonfinite or cannot be
    *     represented by a 32-bit float.
    */
-  void SetHeading(wpi::units::radian_t heading);
+  void SetHeading(wpi::units::radians<> heading);
 
   /** @return Device identifier. */
   int32_t GetDeviceId();
@@ -370,7 +370,7 @@ class GoBildaPinpoint {
   int32_t GetLoopTimeMicroseconds();
 
   /** @return Device loop frequency, or zero if no loop time has been read. */
-  wpi::units::hertz_t GetFrequency();
+  wpi::units::hertz<> GetFrequency();
 
   /** @return Raw X encoder count in ticks. */
   int32_t GetXEncoder();
@@ -379,28 +379,28 @@ class GoBildaPinpoint {
   int32_t GetYEncoder();
 
   /** @return Tracked X position. */
-  wpi::units::meter_t GetXPosition();
+  wpi::units::meters<> GetXPosition();
 
   /** @return Tracked Y position. */
-  wpi::units::meter_t GetYPosition();
+  wpi::units::meters<> GetYPosition();
 
   /** @return Continuous tracked heading, not constrained to one rotation. */
-  wpi::units::radian_t GetHeading();
+  wpi::units::radians<> GetHeading();
 
   /** @return Tracked X velocity. */
-  wpi::units::meters_per_second_t GetXVelocity();
+  wpi::units::meters_per_second<> GetXVelocity();
 
   /** @return Tracked Y velocity. */
-  wpi::units::meters_per_second_t GetYVelocity();
+  wpi::units::meters_per_second<> GetYVelocity();
 
   /** @return Heading velocity. */
-  wpi::units::radians_per_second_t GetHeadingVelocity();
+  wpi::units::radians_per_second<> GetHeadingVelocity();
 
   /** @return X pod offset. */
-  wpi::units::meter_t GetXOffset();
+  wpi::units::meters<> GetXOffset();
 
   /** @return Y pod offset. */
-  wpi::units::meter_t GetYOffset();
+  wpi::units::meters<> GetYOffset();
 
   /**
    * Returns the tracked pose. The heading is normalized by Rotation2d.
@@ -439,7 +439,7 @@ class GoBildaPinpoint {
    * @return Pitch.
    * @throws std::runtime_error if the firmware is older than v3.
    */
-  wpi::units::radian_t GetPitch();
+  wpi::units::radians<> GetPitch();
 
   /**
    * Returns the roll.
@@ -447,7 +447,7 @@ class GoBildaPinpoint {
    * @return Roll.
    * @throws std::runtime_error if the firmware is older than v3.
    */
-  wpi::units::radian_t GetRoll();
+  wpi::units::radians<> GetRoll();
 
  private:
   enum class RegisterType { INT32, FLOAT, BULK };
@@ -481,7 +481,7 @@ class GoBildaPinpoint {
       Register::Y_VELOCITY,      Register::H_VELOCITY};
 
   static int ValidateAddress(int deviceAddress);
-  static float MetersToMillimeters(wpi::units::meter_t meters,
+  static float MetersToMillimeters(wpi::units::meters<> meters,
                                    const char* parameterName);
   static float RequireFiniteFloat(double value, const char* parameterName);
   bool RequireFirmwareVersion3(const char* feature);

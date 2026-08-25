@@ -191,7 +191,7 @@ class Command : public wpi::telemetry::TelemetryLoggable,
    * @param duration the timeout duration
    * @return the command with the timeout added
    */
-  CommandPtr WithTimeout(wpi::units::second_t duration) &&;
+  CommandPtr WithTimeout(wpi::units::seconds<> duration) &&;
 
   /**
    * Decorates this command with an interrupt condition. If the specified

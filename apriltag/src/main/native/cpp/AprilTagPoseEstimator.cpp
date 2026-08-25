@@ -46,9 +46,9 @@ static wpi::math::Transform3d MakePose(const apriltag_pose_t& pose) {
   if (!pose.R || !pose.t) {
     return {};
   }
-  return {wpi::math::Translation3d{wpi::units::meter_t{pose.t->data[0]},
-                                   wpi::units::meter_t{pose.t->data[1]},
-                                   wpi::units::meter_t{pose.t->data[2]}},
+  return {wpi::math::Translation3d{wpi::units::meters<>{pose.t->data[0]},
+                                   wpi::units::meters<>{pose.t->data[1]},
+                                   wpi::units::meters<>{pose.t->data[2]}},
           wpi::math::Rotation3d{OrthogonalizeRotationMatrix(
               Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>{
                   pose.R->data})}};

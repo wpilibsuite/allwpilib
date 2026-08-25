@@ -212,7 +212,7 @@ TEST_CASE("LEDPatternTest ScrollRelativeForward", "[wpilibc]") {
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
   auto scroll =
-      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{1 / 256.0});
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz<>{1 / 256.0});
 
   static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
@@ -256,7 +256,7 @@ TEST_CASE("LEDPatternTest ScrollRelativeBackward", "[wpilibc]") {
   // Scrolling at 1/256th of the buffer per second,
   // or 1 individual diode per second
   auto scroll =
-      pattern.ScrollAtRelativeVelocity(wpi::units::hertz_t{-1 / 256.0});
+      pattern.ScrollAtRelativeVelocity(wpi::units::hertz<>{-1 / 256.0});
 
   static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
@@ -693,7 +693,7 @@ TEST_CASE("LEDPatternTest Breathe", "[wpilibc]") {
   wpi::util::Color midGray{0.5, 0.5, 0.5};
   std::array<AddressableLED::LEDData, 1> buffer;
   auto white = LEDPattern::Solid(wpi::util::Color::WHITE);
-  auto pattern = white.Breathe(wpi::units::nanosecond_t{4});
+  auto pattern = white.Breathe(4_ns);
 
   static int64_t now = 0;
   WPI_SetNowImpl([] { return now; });
@@ -972,7 +972,7 @@ TEST_CASE("LEDPatternTest RelativeScrollingMask", "[wpilibc]") {
 
   auto pattern = LEDPattern::Steps(colorSteps)
                      .Mask(LEDPattern::Steps(maskSteps))
-                     .ScrollAtRelativeVelocity(wpi::units::hertz_t{1e9 / 8.0});
+                     .ScrollAtRelativeVelocity(wpi::units::hertz<>{1e9 / 8.0});
 
   pattern.ApplyTo(buffer);
 

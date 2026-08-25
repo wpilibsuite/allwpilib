@@ -10,7 +10,7 @@ classes:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 1>{0.0}
-          const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, const std::array<double, 1>&:
+          const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meters<>, const std::array<double, 1>&:
             param_override:
               measurementStdDevs:
                 default: std::array<double, 1>{0.0}

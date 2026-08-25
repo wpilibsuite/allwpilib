@@ -9,7 +9,7 @@
 using namespace wpi::cmd;
 
 NotifierCommand::NotifierCommand(std::function<void()> toRun,
-                                 wpi::units::second_t period,
+                                 wpi::units::seconds<> period,
                                  Requirements requirements)
     : m_toRun(toRun), m_notifier{std::move(toRun)}, m_period{period} {
   AddRequirements(requirements);

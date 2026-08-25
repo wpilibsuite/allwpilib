@@ -30,7 +30,7 @@ class XRPOnBoardIO {
   XRPOnBoardIO() {}  // No need to do anything. No configurable IO
 
   static constexpr auto MESSAGE_INTERVAL = 1_s;
-  wpi::units::second_t m_nextMessageTime = 0_s;
+  wpi::units::seconds<> m_nextMessageTime = 0_s;
 
   /**
    * Gets if the USER button is pressed.

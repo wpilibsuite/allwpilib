@@ -1020,9 +1020,9 @@ std::optional<int> DriverStationBackend::GetLocation() {
   }
 }
 
-wpi::units::second_t DriverStationBackend::GetMatchTime() {
+wpi::units::seconds<> DriverStationBackend::GetMatchTime() {
   int32_t status = 0;
-  return wpi::units::second_t{HAL_GetMatchTime(&status)};
+  return wpi::units::seconds<>{HAL_GetMatchTime(&status)};
 }
 
 double DriverStationBackend::GetBatteryVoltage() {

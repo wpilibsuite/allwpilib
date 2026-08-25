@@ -37,9 +37,9 @@ class Drivetrain {
  public:
   Drivetrain();
 
-  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
+  static constexpr wpi::units::meters_per_second<> MAX_VELOCITY =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
+  static constexpr wpi::units::radians_per_second<> MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
   /**
@@ -55,8 +55,8 @@ class Drivetrain {
    * @param xVelocity Linear velocity.
    * @param rot Angular Velocity.
    */
-  void Drive(wpi::units::meters_per_second_t xVelocity,
-             wpi::units::radians_per_second_t rot);
+  void Drive(wpi::units::meters_per_second<> xVelocity,
+             wpi::units::radians_per_second<> rot);
 
   /**
    * Updates the field-relative position.
@@ -108,8 +108,8 @@ class Drivetrain {
       wpi::nt::DoubleArrayEntry& cameraToObjectEntry);
 
  private:
-  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
-  static constexpr wpi::units::meter_t WHEEL_RADIUS = 0.0508_m;
+  static constexpr wpi::units::meters<> TRACKWIDTH = 0.381_m * 2;
+  static constexpr wpi::units::meters<> WHEEL_RADIUS = 0.0508_m;
   static constexpr int ENCODER_RESOLUTION = 4096;
 
   static constexpr std::array<double, 7> DEFAULT_VAL{0.0, 0.0, 0.0, 0.0,
@@ -118,7 +118,7 @@ class Drivetrain {
   wpi::math::Transform3d robotToCamera{
       wpi::math::Translation3d{1_m, 1_m, 1_m},
       wpi::math::Rotation3d{0_rad, 0_rad,
-                            wpi::units::radian_t{std::numbers::pi / 2}}};
+                            wpi::units::radians<>{std::numbers::pi / 2}}};
 
   wpi::nt::NetworkTableInstance inst{
       wpi::nt::NetworkTableInstance::GetDefault()};
@@ -151,15 +151,15 @@ class Drivetrain {
   // robot!
   wpi::math::DifferentialDrivePoseEstimator poseEstimator{
       imu.GetRotation2d(),
-      wpi::units::meter_t{leftEncoder.GetDistance()},
-      wpi::units::meter_t{rightEncoder.GetDistance()},
+      wpi::units::meters<>{leftEncoder.GetDistance()},
+      wpi::units::meters<>{rightEncoder.GetDistance()},
       wpi::math::Pose2d{},
       {0.01, 0.01, 0.01},
       {0.1, 0.1, 0.1}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
       1_V, 3_V / 1_mps};
 
   // Simulation classes
@@ -170,7 +170,7 @@ class Drivetrain {
   wpi::Field2d fieldApproximation;
   wpi::math::LinearSystem<2, 2, 2> drivetrainSystem =
       wpi::math::Models::DifferentialDriveFromSysId(
-          1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
+          1.98_V / 1_mps, 0.2_V / 1_mps2, 1.5_V / 1_mps, 0.3_V / 1_mps2);
   wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
       drivetrainSystem, TRACKWIDTH, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

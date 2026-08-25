@@ -17,7 +17,7 @@ void wpi::math::to_json(wpi::util::json& json,
 
 void wpi::math::from_json(const wpi::util::json& json,
                           Translation3d& translation) {
-  translation = Translation3d{wpi::units::meter_t{json.at("x").get_number()},
-                              wpi::units::meter_t{json.at("y").get_number()},
-                              wpi::units::meter_t{json.at("z").get_number()}};
+  translation = Translation3d{wpi::units::meters<>{json.at("x").get_number()},
+                              wpi::units::meters<>{json.at("y").get_number()},
+                              wpi::units::meters<>{json.at("z").get_number()}};
 }

@@ -33,18 +33,18 @@ void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void Tachometer::SetRateWindow(wpi::units::millisecond_t window) {
+void Tachometer::SetRateWindow(wpi::units::milliseconds<> window) {
   int32_t status = 0;
   HAL_SetCounterRateWindow(m_handle, static_cast<int32_t>(window.value()),
                            &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
 }
 
-wpi::units::hertz_t Tachometer::GetFrequency() const {
+wpi::units::hertz<> Tachometer::GetFrequency() const {
   int32_t status = 0;
   double rate = HAL_GetCounterRate(m_handle, &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);
-  return wpi::units::hertz_t{rate};
+  return wpi::units::hertz<>{rate};
 }
 
 int Tachometer::GetEdgesPerRevolution() const {
@@ -54,18 +54,18 @@ void Tachometer::SetEdgesPerRevolution(int edges) {
   m_edgesPerRevolution = edges;
 }
 
-wpi::units::turns_per_second_t Tachometer::GetRevolutionsPerSecond() const {
+wpi::units::turns_per_second<> Tachometer::GetRevolutionsPerSecond() const {
   int edgesPerRevolution = GetEdgesPerRevolution();
   if (edgesPerRevolution == 0) {
     return 0_tps;
   }
   auto rotationHz = GetFrequency() / edgesPerRevolution;
-  return wpi::units::turns_per_second_t{rotationHz.value()};
+  return wpi::units::turns_per_second<>{rotationHz.value()};
 }
 
-wpi::units::revolutions_per_minute_t Tachometer::GetRevolutionsPerMinute()
+wpi::units::revolutions_per_minute<> Tachometer::GetRevolutionsPerMinute()
     const {
-  return wpi::units::revolutions_per_minute_t{GetRevolutionsPerSecond()};
+  return wpi::units::revolutions_per_minute<>{GetRevolutionsPerSecond()};
 }
 
 bool Tachometer::GetStopped() const {

@@ -134,7 +134,7 @@ class LinearFilter {
    *                     user.
    */
   static constexpr LinearFilter<T> SinglePoleIIR(double timeConstant,
-                                                 wpi::units::second_t period) {
+                                                 wpi::units::seconds<> period) {
     double gain = gcem::exp(-period.value() / timeConstant);
     return LinearFilter({1.0 - gain}, {-gain});
   }
@@ -154,7 +154,7 @@ class LinearFilter {
    *                     user.
    */
   static constexpr LinearFilter<T> HighPass(double timeConstant,
-                                            wpi::units::second_t period) {
+                                            wpi::units::seconds<> period) {
     double gain = gcem::exp(-period.value() / timeConstant);
     return LinearFilter({gain, -gain}, {-gain});
   }
@@ -198,7 +198,7 @@ class LinearFilter {
   template <int Derivative, int Samples>
   static LinearFilter<T> FiniteDifference(
       const wpi::util::array<int, Samples>& stencil,
-      wpi::units::second_t period) {
+      wpi::units::seconds<> period) {
     // See
     // https://en.wikipedia.org/wiki/Finite_difference_coefficient#Arbitrary_stencil_points
     //
@@ -264,7 +264,8 @@ class LinearFilter {
    * @param period      The period in seconds between samples taken by the user.
    */
   template <int Derivative, int Samples>
-  static LinearFilter<T> BackwardFiniteDifference(wpi::units::second_t period) {
+  static LinearFilter<T> BackwardFiniteDifference(
+      wpi::units::seconds<> period) {
     // Generate stencil points from -(samples - 1) to 0
     wpi::util::array<int, Samples> stencil{wpi::util::empty_array};
     for (int i = 0; i < Samples; ++i) {

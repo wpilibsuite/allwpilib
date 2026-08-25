@@ -60,16 +60,16 @@ TEST_CASE("DiscretizationTest DiscretizeSlowModelAQ", "[wpimath]") {
   wpi::math::Matrixd<2, 2> contA{{0, 1}, {0, 0}};
   wpi::math::Matrixd<2, 2> contQ{{1, 0}, {0, 1}};
 
-  constexpr wpi::units::second_t dt = 1_s;
+  constexpr wpi::units::seconds<> dt = 1_s;
 
   //       T
   // Q_d ≈ ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
-      std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
+      std::function<wpi::math::Matrixd<2, 2>(wpi::units::seconds<>,
                                              const wpi::math::Matrixd<2, 2>&)>,
       wpi::math::Matrixd<2, 2>>(
-      [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
+      [&](wpi::units::seconds<> t, const wpi::math::Matrixd<2, 2>&) {
         return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
                                         (contA.transpose() * t.value()).exp());
       },
@@ -92,16 +92,16 @@ TEST_CASE("DiscretizationTest DiscretizeFastModelAQ", "[wpimath]") {
   wpi::math::Matrixd<2, 2> contA{{0, 1}, {0, -1406.29}};
   wpi::math::Matrixd<2, 2> contQ{{0.0025, 0}, {0, 1}};
 
-  constexpr wpi::units::second_t dt = 5_ms;
+  constexpr wpi::units::seconds<> dt = 5_ms;
 
   //       T
   // Q_d = ∫ e^(Aτ) Q e^(Aᵀτ) dτ
   //       0
   wpi::math::Matrixd<2, 2> discQIntegrated = wpi::math::RKDP<
-      std::function<wpi::math::Matrixd<2, 2>(wpi::units::second_t,
+      std::function<wpi::math::Matrixd<2, 2>(wpi::units::seconds<>,
                                              const wpi::math::Matrixd<2, 2>&)>,
       wpi::math::Matrixd<2, 2>>(
-      [&](wpi::units::second_t t, const wpi::math::Matrixd<2, 2>&) {
+      [&](wpi::units::seconds<> t, const wpi::math::Matrixd<2, 2>&) {
         return wpi::math::Matrixd<2, 2>((contA * t.value()).exp() * contQ *
                                         (contA.transpose() * t.value()).exp());
       },

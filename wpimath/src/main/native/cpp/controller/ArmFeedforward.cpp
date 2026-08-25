@@ -17,24 +17,23 @@
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/NumericalIntegration.hpp"
-#include "wpi/units/base.hpp"
-#include "wpi/units/math.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/MathExtras.hpp"
 
 using namespace wpi::math;
 
-wpi::units::volt_t ArmFeedforward::Calculate(
-    wpi::units::unit_t<Angle> currentAngle,
-    wpi::units::unit_t<Velocity> currentVelocity,
-    wpi::units::unit_t<Velocity> nextVelocity) const {
+wpi::units::volts<> ArmFeedforward::Calculate(
+    wpi::units::unit<Angle> currentAngle,
+    wpi::units::unit<Velocity> currentVelocity,
+    wpi::units::unit<Velocity> nextVelocity) const {
   using VarMat = slp::VariableMatrix<double>;
 
   // Small kₐ values make the solver ill-conditioned
-  if (kA < wpi::units::unit_t<ka_unit>{1e-1}) {
+  if (kA < wpi::units::unit<ka_unit>{1e-1}) {
     auto acceleration = (nextVelocity - currentVelocity) / m_dt;
     return kS * wpi::util::sgn(currentVelocity.value()) + kV * currentVelocity +
-           kA * acceleration + kG * wpi::units::math::cos(currentAngle);
+           kA * acceleration + kG * wpi::units::cos(currentAngle);
   }
 
   // Arm dynamics
@@ -55,7 +54,7 @@ wpi::units::volt_t ArmFeedforward::Calculate(
   auto acceleration = (nextVelocity - currentVelocity) / m_dt;
   u_k.set_value((kS * wpi::util::sgn(currentVelocity.value()) +
                  kV * currentVelocity + kA * acceleration +
-                 kG * wpi::units::math::cos(currentAngle))
+                 kG * wpi::units::cos(currentAngle))
                     .value());
 
   auto r_k1 = RK4<decltype(f), VarMat, VarMat>(f, r_k, u_k, m_dt);
@@ -118,5 +117,5 @@ wpi::units::volt_t ArmFeedforward::Calculate(
     }
   }
 
-  return wpi::units::volt_t{u_k.value()};
+  return wpi::units::volts<>{u_k.value()};
 }

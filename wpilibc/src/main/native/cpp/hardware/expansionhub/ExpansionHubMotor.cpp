@@ -102,7 +102,7 @@ void ExpansionHubMotor::SetThrottle(double throttle) {
   m_setpointPublisher.Set(throttle);
 }
 
-void ExpansionHubMotor::SetVoltage(wpi::units::volt_t voltage) {
+void ExpansionHubMotor::SetVoltage(wpi::units::volts<> voltage) {
   SetEnabled(true);
   m_modePublisher.Set(VOLTAGE_MODE);
   m_setpointPublisher.Set(voltage.value());
@@ -128,8 +128,8 @@ void ExpansionHubMotor::SetNeutralMode(NeutralMode mode) {
   m_floatOn0Publisher.Set(mode == NeutralMode::COAST);
 }
 
-wpi::units::ampere_t ExpansionHubMotor::GetCurrent() const {
-  return wpi::units::ampere_t{m_currentSubscriber.Get(0)};
+wpi::units::amperes<> ExpansionHubMotor::GetCurrent() const {
+  return wpi::units::amperes<>{m_currentSubscriber.Get(0)};
 }
 
 void ExpansionHubMotor::SetDistancePerCount(double perCount) {

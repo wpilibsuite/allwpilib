@@ -47,16 +47,16 @@ class DrivetrainSplineSample : public HolonomicSample {
    * @param curvature The curvature of the path at this sample.
    */
   constexpr DrivetrainSplineSample(
-      wpi::units::second_t time, const Pose2d& pose,
-      wpi::units::meters_per_second_t velocity,
-      wpi::units::meters_per_second_squared_t acceleration,
+      wpi::units::seconds<> time, const Pose2d& pose,
+      wpi::units::meters_per_second<> velocity,
+      wpi::units::meters_per_second_squared<> acceleration,
       wpi::units::curvature_t curvature)
-      : HolonomicSample{time, pose,
-                        ChassisVelocities{velocity, 0_mps, velocity * curvature}
-                            .ToFieldRelative(pose.Rotation()),
-                        ChassisAccelerations{acceleration, 0_mps_sq,
-                                             acceleration * curvature}
-                            .ToFieldRelative(pose.Rotation())},
+      : HolonomicSample{
+            time, pose,
+            ChassisVelocities{velocity, 0_mps, velocity * curvature}
+                .ToFieldRelative(pose.Rotation()),
+            ChassisAccelerations{acceleration, 0_mps2, acceleration * curvature}
+                .ToFieldRelative(pose.Rotation())},
         curvature{curvature} {}
 
   /**
@@ -70,7 +70,7 @@ class DrivetrainSplineSample : public HolonomicSample {
    *     reference frame).
    * @param curvature The curvature of the path at this sample.
    */
-  constexpr DrivetrainSplineSample(wpi::units::second_t time,
+  constexpr DrivetrainSplineSample(wpi::units::seconds<> time,
                                    const Pose2d& pose,
                                    const ChassisVelocities& velocity,
                                    const ChassisAccelerations& acceleration,
@@ -98,7 +98,7 @@ class DrivetrainSplineSample : public HolonomicSample {
    *
    * @return The forward velocity.
    */
-  constexpr wpi::units::meters_per_second_t ForwardVelocity() const {
+  constexpr wpi::units::meters_per_second<> ForwardVelocity() const {
     return velocity.ToRobotRelative(pose.Rotation()).vx;
   }
 
@@ -109,7 +109,7 @@ class DrivetrainSplineSample : public HolonomicSample {
    *
    * @return The forward acceleration.
    */
-  constexpr wpi::units::meters_per_second_squared_t ForwardAcceleration()
+  constexpr wpi::units::meters_per_second_squared<> ForwardAcceleration()
       const {
     return acceleration.ToRobotRelative(pose.Rotation()).ax;
   }

@@ -18,10 +18,10 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
   return wpi::cmd::Run(
              [this, shooterVelocity] {
                shooterMotor.SetVoltage(
-                   wpi::units::volt_t{shooterFeedback.Calculate(
+                   wpi::units::volts<>{shooterFeedback.Calculate(
                        shooterEncoder.GetRate(), shooterVelocity())} +
                    shooterFeedforward.Calculate(
-                       wpi::units::turns_per_second_t{shooterVelocity()}));
+                       wpi::units::turns_per_second<>{shooterVelocity()}));
                feederMotor.SetThrottle(constants::shooter::FEEDER_VELOCITY);
              },
              {this})

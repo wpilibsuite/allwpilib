@@ -14,9 +14,9 @@ wpi::util::Protobuf<wpi::math::ChassisVelocities>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::ChassisVelocities{
-      wpi::units::meters_per_second_t{msg.vx},
-      wpi::units::meters_per_second_t{msg.vy},
-      wpi::units::radians_per_second_t{msg.omega},
+      wpi::units::meters_per_second<>{msg.vx},
+      wpi::units::meters_per_second<>{msg.vy},
+      wpi::units::radians_per_second<>{msg.omega},
   };
 }
 

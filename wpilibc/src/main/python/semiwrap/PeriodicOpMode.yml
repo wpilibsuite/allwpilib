@@ -7,7 +7,7 @@ classes:
       End:
       AddPeriodic:
         overloads:
-          std::function<void ()>, wpi::units::second_t:
-          std::function<void ()>, wpi::units::second_t, wpi::units::second_t:
+          std::function<void ()>, wpi::units::seconds<>:
+          std::function<void ()>, wpi::units::seconds<>, wpi::units::seconds<>:
       PeriodicOpMode:
       GetCallbacks:

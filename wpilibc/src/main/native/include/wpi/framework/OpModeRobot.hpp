@@ -80,7 +80,7 @@ class OpModeRobotBase : public RobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit OpModeRobotBase(wpi::units::second_t period);
+  explicit OpModeRobotBase(wpi::units::seconds<> period);
 
   /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
@@ -144,7 +144,8 @@ class OpModeRobotBase : public RobotBase {
    * @param callback The callback to run.
    * @param period The period at which to run the callback.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
+  void AddPeriodic(std::function<void()> callback,
+                   wpi::units::seconds<> period);
 
   /**
    * Return the system clock time in nanoseconds for the start of the current
@@ -156,7 +157,7 @@ class OpModeRobotBase : public RobotBase {
    * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::nanosecond_t GetLoopStartTime() const {
+  wpi::units::nanoseconds<> GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -255,7 +256,7 @@ class OpModeRobotBase : public RobotBase {
 
   wpi::internal::PeriodicPriorityQueue m_callbacks;
   HAL_NotifierHandle m_notifier;
-  wpi::units::second_t m_period;
+  wpi::units::seconds<> m_period;
   std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
@@ -295,7 +296,8 @@ class OpModeRobot : public OpModeRobotBase {
    *
    * @param period The period of the robot loop function.
    */
-  explicit OpModeRobot(wpi::units::second_t period) : OpModeRobotBase{period} {}
+  explicit OpModeRobot(wpi::units::seconds<> period)
+      : OpModeRobotBase{period} {}
 
   /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.

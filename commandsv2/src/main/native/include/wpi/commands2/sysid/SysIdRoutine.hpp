@@ -16,8 +16,8 @@
 
 namespace wpi::cmd::sysid {
 
-using ramp_rate_t = wpi::units::unit_t<wpi::units::compound_unit<
-    wpi::units::volt, wpi::units::inverse<wpi::units::second>>>;
+using ramp_rate_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+    wpi::units::volts_, wpi::units::inverse<wpi::units::seconds_>>>;
 
 /** Hardware-independent configuration for a SysId test routine. */
 class Config {
@@ -26,10 +26,10 @@ class Config {
   ramp_rate_t rampRate{1_V / 1_s};
 
   /// The step voltage output used for dynamic test routines.
-  wpi::units::volt_t stepVoltage{7_V};
+  wpi::units::volts<> stepVoltage{7_V};
 
   /// Safety timeout for the test routine commands.
-  wpi::units::second_t timeout{10_s};
+  wpi::units::seconds<> timeout{10_s};
 
   /// Optional handle for recording test state in a third-party logging
   /// solution.
@@ -49,8 +49,8 @@ class Config {
    *   passed to this callback instead of logged in WPILog.
    */
   Config(std::optional<ramp_rate_t> rampRate,
-         std::optional<wpi::units::volt_t> stepVoltage,
-         std::optional<wpi::units::second_t> timeout,
+         std::optional<wpi::units::volts<>> stepVoltage,
+         std::optional<wpi::units::seconds<>> timeout,
          std::function<void(wpi::sysid::State)> recordState)
       : recordState{std::move(recordState)} {
     if (rampRate) {
@@ -69,7 +69,7 @@ class Mechanism {
  public:
   /// Sends the SysId-specified drive signal to the mechanism motors during test
   /// routines.
-  std::function<void(wpi::units::volt_t)> drive;
+  std::function<void(wpi::units::volts<>)> drive;
 
   /// Returns measured data (voltages, positions, velocities) of the mechanism
   /// motors during test routines.
@@ -102,7 +102,7 @@ class Mechanism {
    *   "sysid-test-state-mechanism". Defaults to the name of the subsystem if
    *   left null.
    */
-  Mechanism(std::function<void(wpi::units::volt_t)> drive,
+  Mechanism(std::function<void(wpi::units::volts<>)> drive,
             std::function<void(wpi::sysid::SysIdRoutineLog*)> log,
             wpi::cmd::Subsystem* subsystem, std::string_view name)
       : drive{std::move(drive)},
@@ -127,7 +127,7 @@ class Mechanism {
    *   test commands. The subsystem's `name` will be appended to the log entry
    *   title for the routine's test state, e.g. "sysid-test-state-subsystem".
    */
-  Mechanism(std::function<void(wpi::units::volt_t)> drive,
+  Mechanism(std::function<void(wpi::units::volts<>)> drive,
             std::function<void(wpi::sysid::SysIdRoutineLog*)> log,
             wpi::cmd::Subsystem* subsystem)
       : drive{std::move(drive)},
@@ -190,7 +190,7 @@ class SysIdRoutine : public wpi::sysid::SysIdRoutineLog {
  private:
   Config m_config;
   Mechanism m_mechanism;
-  wpi::units::volt_t m_outputVolts{0};
+  wpi::units::volts<> m_outputVolts{0};
   std::function<void(wpi::sysid::State)> m_recordState;
   wpi::Timer timer;
 };

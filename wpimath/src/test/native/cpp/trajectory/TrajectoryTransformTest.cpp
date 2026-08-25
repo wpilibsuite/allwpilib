@@ -56,7 +56,7 @@ void TestSameForwardScalars(
 }
 
 TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
+  wpi::math::TrajectoryConfig config{3_mps, 3_mps2};
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       wpi::math::Pose2d{}, {}, wpi::math::Pose2d{1_m, 1_m, 90_deg}, config);
 
@@ -74,7 +74,7 @@ TEST_CASE("TrajectoryTransformsTest TransformBy", "[wpimath]") {
 }
 
 TEST_CASE("TrajectoryTransformsTest RelativeTo", "[wpimath]") {
-  wpi::math::TrajectoryConfig config{3_mps, 3_mps_sq};
+  wpi::math::TrajectoryConfig config{3_mps, 3_mps2};
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       wpi::math::Pose2d{1_m, 2_m, 30_deg}, {},
       wpi::math::Pose2d{5_m, 7_m, 90_deg}, config);

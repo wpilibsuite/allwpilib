@@ -546,7 +546,7 @@ class DriverStationBackend final {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static wpi::units::second_t GetMatchTime();
+  static wpi::units::seconds<> GetMatchTime();
 
   /**
    * Read the battery voltage.

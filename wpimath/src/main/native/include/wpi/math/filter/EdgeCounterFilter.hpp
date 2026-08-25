@@ -32,7 +32,7 @@ class WPILIB_DLLEXPORT EdgeCounterFilter {
    *               occur after the first rising edge.
    */
   explicit EdgeCounterFilter(int requiredEdges,
-                             wpi::units::second_t windowTime);
+                             wpi::units::seconds<> windowTime);
 
   /**
    * Applies the edge counter filter to the input stream.
@@ -49,7 +49,7 @@ class WPILIB_DLLEXPORT EdgeCounterFilter {
    * @param windowTime The maximum time window in which all required edges must
    *               occur after the first rising edge.
    */
-  constexpr void SetWindowTime(wpi::units::second_t windowTime) {
+  constexpr void SetWindowTime(wpi::units::seconds<> windowTime) {
     m_windowTime = windowTime;
   }
 
@@ -59,7 +59,7 @@ class WPILIB_DLLEXPORT EdgeCounterFilter {
    * @return The maximum time window in which all required edges must occur
    *         after the first rising edge.
    */
-  constexpr wpi::units::second_t GetWindowTime() const { return m_windowTime; }
+  constexpr wpi::units::seconds<> GetWindowTime() const { return m_windowTime; }
 
   /**
    * Sets the required number of edges.
@@ -80,9 +80,9 @@ class WPILIB_DLLEXPORT EdgeCounterFilter {
 
  private:
   int m_requiredEdges;
-  wpi::units::second_t m_windowTime;
+  wpi::units::seconds<> m_windowTime;
 
-  wpi::units::second_t m_firstEdgeTime;
+  wpi::units::seconds<> m_firstEdgeTime;
   int m_currentCount = 0;
 
   bool m_lastInput = false;

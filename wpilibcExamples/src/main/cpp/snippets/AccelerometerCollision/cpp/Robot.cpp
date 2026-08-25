@@ -28,8 +28,8 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  wpi::units::meters_per_second_squared_t prevXAccel = 0.0_mps_sq;
-  wpi::units::meters_per_second_squared_t prevYAccel = 0.0_mps_sq;
+  wpi::units::meters_per_second_squared<> prevXAccel = 0.0_mps2;
+  wpi::units::meters_per_second_squared<> prevYAccel = 0.0_mps2;
   wpi::OnboardIMU accelerometer{wpi::OnboardIMU::MountOrientation::FLAT};
 };
 

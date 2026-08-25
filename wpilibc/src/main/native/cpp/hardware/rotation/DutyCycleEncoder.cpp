@@ -118,7 +118,7 @@ void DutyCycleEncoder::SetDutyCycleRange(double min, double max) {
   m_sensorMax = std::clamp(max, 0.0, 1.0);
 }
 
-wpi::units::hertz_t DutyCycleEncoder::GetFrequency() const {
+wpi::units::hertz<> DutyCycleEncoder::GetFrequency() const {
   return m_dutyCycle->GetFrequency();
 }
 
@@ -130,7 +130,7 @@ bool DutyCycleEncoder::IsConnected() const {
 }
 
 void DutyCycleEncoder::SetConnectedFrequencyThreshold(
-    wpi::units::hertz_t frequency) {
+    wpi::units::hertz<> frequency) {
   if (frequency < 0_Hz) {
     frequency = 0_Hz;
   }
@@ -141,7 +141,7 @@ void DutyCycleEncoder::SetInverted(bool inverted) {
   m_isInverted = inverted;
 }
 
-void DutyCycleEncoder::SetAssumedFrequency(wpi::units::hertz_t frequency) {
+void DutyCycleEncoder::SetAssumedFrequency(wpi::units::hertz<> frequency) {
   if (frequency.value() == 0) {
     m_period = 0_s;
   } else {

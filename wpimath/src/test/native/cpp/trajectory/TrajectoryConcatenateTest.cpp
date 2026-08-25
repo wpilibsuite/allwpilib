@@ -15,9 +15,9 @@
 
 TEST_CASE("TrajectoryConcatenateTest Samples", "[wpimath]") {
   auto t1 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps_sq});
+      {}, {}, {1_m, 1_m, 0_deg}, {2_mps, 2_mps2});
   auto t2 = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps_sq});
+      {1_m, 1_m, 0_deg}, {}, {2_m, 2_m, 45_deg}, {2_mps, 2_mps2});
 
   auto t = t1 + t2;
 

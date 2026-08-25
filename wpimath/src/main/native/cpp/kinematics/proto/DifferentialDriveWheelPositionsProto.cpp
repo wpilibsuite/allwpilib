@@ -14,8 +14,8 @@ std::optional<wpi::math::DifferentialDriveWheelPositions> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialDriveWheelPositions{
-      wpi::units::meter_t{msg.left},
-      wpi::units::meter_t{msg.right},
+      wpi::units::meters<>{msg.left},
+      wpi::units::meters<>{msg.right},
   };
 }
 

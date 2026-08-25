@@ -62,7 +62,7 @@ class ExpansionHubMotor {
    *
    * @param voltage The voltage to drive the motor at
    */
-  void SetVoltage(wpi::units::volt_t voltage);
+  void SetVoltage(wpi::units::volts<> voltage);
 
   /**
    * Command the motor to drive to a specific position setpoint. This value will
@@ -100,7 +100,7 @@ class ExpansionHubMotor {
    *
    * @return Motor current
    */
-  wpi::units::ampere_t GetCurrent() const;
+  wpi::units::amperes<> GetCurrent() const;
 
   /**
    * Sets the distance per count of the encoder. Used to scale encoder readings.

@@ -15,9 +15,9 @@ std::optional<wpi::math::DifferentialDriveFeedforward> wpi::util::Protobuf<
 
   return wpi::math::DifferentialDriveFeedforward{
       decltype(1_V / 1_mps){msg.kvLinear},
-      decltype(1_V / 1_mps_sq){msg.kaLinear},
+      decltype(1_V / 1_mps2){msg.kaLinear},
       decltype(1_V / 1_mps){msg.kvAngular},
-      decltype(1_V / 1_mps_sq){msg.kaAngular},
+      decltype(1_V / 1_mps2){msg.kaAngular},
   };
 }
 

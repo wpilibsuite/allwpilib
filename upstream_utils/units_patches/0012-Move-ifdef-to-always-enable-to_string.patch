@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Sat, 22 Aug 2026 05:22:29 -0400
+Subject: [PATCH 12/12] Move ifdef to always enable to_string
+
+---
+ include/units/core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/units/core.h b/include/units/core.h
+index 7c62a965d80ddefe57c56d612e5b236764564497..6fe49a1ba6505a9f53465234dd73d38391c0d938 100644
+--- a/include/units/core.h
++++ b/include/units/core.h
+@@ -3604,6 +3604,7 @@ namespace units
+ 
+ 		return os;
+ 	}
++#endif
+ 
+ 	//----------------------------
+ 	//  to_string
+@@ -3630,7 +3631,6 @@ namespace units
+ 		s.append(detail::unit_label(obj));
+ 		return s;
+ 	}
+-#endif
+ 
+ 	//------------------------------
+ 	//	std::ratio helpers

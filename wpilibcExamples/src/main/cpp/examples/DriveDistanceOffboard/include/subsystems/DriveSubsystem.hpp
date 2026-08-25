@@ -35,10 +35,10 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    * @param nextRight The next right wheel state.
    */
   void SetDriveStates(
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-      wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight);
+      wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentLeft,
+      wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentRight,
+      wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextLeft,
+      wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextRight);
 
   /**
    * Drives the robot using arcade controls.
@@ -58,14 +58,14 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    *
    * @return the average of the TWO encoder readings
    */
-  wpi::units::meter_t GetLeftEncoderDistance();
+  wpi::units::meters<> GetLeftEncoderDistance();
 
   /**
    * Gets the distance of the right encoder.
    *
    * @return the average of the TWO encoder readings
    */
-  wpi::units::meter_t GetRightEncoderDistance();
+  wpi::units::meters<> GetRightEncoderDistance();
 
   /**
    * Sets the max output of the drive.  Useful for scaling the drive to drive
@@ -82,7 +82,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    * @param distance The distance to drive forward.
    * @return A command.
    */
-  wpi::cmd::CommandPtr ProfiledDriveDistance(wpi::units::meter_t distance);
+  wpi::cmd::CommandPtr ProfiledDriveDistance(wpi::units::meters<> distance);
 
   /**
    * Creates a command to drive forward a specified distance using a motion
@@ -92,14 +92,14 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    * @return A command.
    */
   wpi::cmd::CommandPtr DynamicProfiledDriveDistance(
-      wpi::units::meter_t distance);
+      wpi::units::meters<> distance);
 
  private:
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
+  wpi::math::TrapezoidProfile<wpi::units::meters_> profile{
       {DriveConstants::MAX_VELOCITY, DriveConstants::MAX_ACCELERATION}};
   wpi::Timer timer;
-  wpi::units::meter_t initialLeftDistance;
-  wpi::units::meter_t initialRightDistance;
+  wpi::units::meters<> initialLeftDistance;
+  wpi::units::meters<> initialRightDistance;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
@@ -110,7 +110,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
   ExampleSmartMotorController rightFollower;
 
   // A feedforward component for the drive
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward;
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward;
 
   // The robot's drive
   wpi::DifferentialDrive drive{[&](double output) { leftLeader.Set(output); },

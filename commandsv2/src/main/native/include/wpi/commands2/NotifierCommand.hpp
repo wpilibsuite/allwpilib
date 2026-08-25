@@ -34,7 +34,7 @@ class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
    * @param period       the period at which the notifier should run
    * @param requirements the subsystems required by this command
    */
-  NotifierCommand(std::function<void()> toRun, wpi::units::second_t period,
+  NotifierCommand(std::function<void()> toRun, wpi::units::seconds<> period,
                   Requirements requirements = {});
 
   NotifierCommand(NotifierCommand&& other);
@@ -48,6 +48,6 @@ class NotifierCommand : public CommandHelper<Command, NotifierCommand> {
  private:
   std::function<void()> m_toRun;
   wpi::Notifier m_notifier;
-  wpi::units::second_t m_period;
+  wpi::units::seconds<> m_period;
 };
 }  // namespace wpi::cmd

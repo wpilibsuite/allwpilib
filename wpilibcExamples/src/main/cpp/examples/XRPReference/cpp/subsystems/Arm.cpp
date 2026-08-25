@@ -8,6 +8,6 @@ void Arm::Periodic() {
   // This method will be called once per scheduler run.
 }
 
-void Arm::SetAngle(wpi::units::radian_t angle) {
+void Arm::SetAngle(wpi::units::radians<> angle) {
   armServo.SetAngle(angle);
 }

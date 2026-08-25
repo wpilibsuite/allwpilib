@@ -118,12 +118,12 @@ void MotorSafety::Feed() {
   m_stopTime = Timer::GetMonotonicTimestamp() + m_expiration;
 }
 
-void MotorSafety::SetExpiration(wpi::units::second_t expirationTime) {
+void MotorSafety::SetExpiration(wpi::units::seconds<> expirationTime) {
   std::scoped_lock lock(m_thisMutex);
   m_expiration = expirationTime;
 }
 
-wpi::units::second_t MotorSafety::GetExpiration() const {
+wpi::units::seconds<> MotorSafety::GetExpiration() const {
   std::scoped_lock lock(m_thisMutex);
   return m_expiration;
 }
@@ -145,7 +145,7 @@ bool MotorSafety::IsSafetyEnabled() const {
 
 void MotorSafety::Check() {
   bool enabled;
-  wpi::units::second_t stopTime;
+  wpi::units::seconds<> stopTime;
 
   {
     std::scoped_lock lock(m_thisMutex);

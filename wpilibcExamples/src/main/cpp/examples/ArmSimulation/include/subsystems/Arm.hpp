@@ -30,7 +30,7 @@ class Arm {
  private:
   // The P gain for the PID controller that drives this arm.
   double armKp = DEFAULT_ARM_KP;
-  wpi::units::degree_t armSetpoint = DEFAULT_ARM_SETPOINT;
+  wpi::units::degrees<> armSetpoint = DEFAULT_ARM_SETPOINT;
 
   // The arm gearbox represents a gearbox containing two Vex 775pro motors.
   wpi::math::DCMotor armGearbox = wpi::math::DCMotor::Vex775Pro(2);

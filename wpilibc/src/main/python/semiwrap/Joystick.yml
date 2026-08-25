@@ -56,6 +56,6 @@ classes:
       GetRawAxis:
       GetPOV:
     inline_code: |
-      .def("get_direction_degrees", [](const Joystick &self) -> wpi::units::degree_t {
+      .def("get_direction_degrees", [](const Joystick &self) -> wpi::units::degrees<> {
         return self.GetDirection();
       })

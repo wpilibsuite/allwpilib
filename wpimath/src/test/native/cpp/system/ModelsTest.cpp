@@ -70,8 +70,8 @@ TEST_CASE("ModelsTest ElevatorFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
-  constexpr auto model = wpi::math::Models::ElevatorFromSysId(
-      kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
+  constexpr auto model =
+      wpi::math::Models::ElevatorFromSysId(kv * 1_V / 1_mps, ka * 1_V / 1_mps2);
 
   REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));

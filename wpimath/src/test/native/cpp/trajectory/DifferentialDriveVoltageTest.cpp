@@ -26,18 +26,18 @@ using namespace wpi::math;
 
 TEST_CASE("DifferentialDriveVoltageConstraintTest Constraint", "[wpimath]") {
   // Pick an unreasonably large kA to ensure the constraint has to do some work
-  SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps_sq};
+  SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
+                                                          3_V / 1_mps2};
   const DifferentialDriveKinematics kinematics{0.5_m};
   const auto maxVoltage = 10_V;
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 
   auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
   for (auto t = 0_s; t < trajectory.Duration(); t += dt) {
     auto point = trajectory.SampleAt(t);
 
@@ -64,14 +64,14 @@ TEST_CASE("DifferentialDriveVoltageConstraintTest Constraint", "[wpimath]") {
 }
 
 TEST_CASE("DifferentialDriveVoltageConstraintTest HighCurvature", "[wpimath]") {
-  SimpleMotorFeedforward<wpi::units::meter> feedforward{1_V, 1_V / 1_mps,
-                                                        3_V / 1_mps_sq};
+  SimpleMotorFeedforward<wpi::units::meters_> feedforward{1_V, 1_V / 1_mps,
+                                                          3_V / 1_mps2};
   // Large trackwidth - need to test with radius of curvature less than half of
   // trackwidth
   const DifferentialDriveKinematics kinematics{3_m};
   const auto maxVoltage = 10_V;
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       DifferentialDriveVoltageConstraint(feedforward, kinematics, maxVoltage));
 

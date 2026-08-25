@@ -31,10 +31,10 @@ void DriveSubsystem::Periodic() {
 }
 
 void DriveSubsystem::SetDriveStates(
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State currentRight,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextLeft,
-    wpi::math::TrapezoidProfile<wpi::units::meters>::State nextRight) {
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State currentRight,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextLeft,
+    wpi::math::TrapezoidProfile<wpi::units::meters_>::State nextRight) {
   // Feedforward is divided by battery voltage to normalize it to [-1, 1]
   leftLeader.SetSetpoint(
       ExampleSmartMotorController::PIDMode::POSITION,
@@ -57,12 +57,12 @@ void DriveSubsystem::ResetEncoders() {
   rightLeader.ResetEncoder();
 }
 
-wpi::units::meter_t DriveSubsystem::GetLeftEncoderDistance() {
-  return wpi::units::meter_t{leftLeader.GetEncoderDistance()};
+wpi::units::meters<> DriveSubsystem::GetLeftEncoderDistance() {
+  return wpi::units::meters<>{leftLeader.GetEncoderDistance()};
 }
 
-wpi::units::meter_t DriveSubsystem::GetRightEncoderDistance() {
-  return wpi::units::meter_t{rightLeader.GetEncoderDistance()};
+wpi::units::meters<> DriveSubsystem::GetRightEncoderDistance() {
+  return wpi::units::meters<>{rightLeader.GetEncoderDistance()};
 }
 
 void DriveSubsystem::SetMaxOutput(double maxOutput) {
@@ -70,7 +70,7 @@ void DriveSubsystem::SetMaxOutput(double maxOutput) {
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
-    wpi::units::meter_t distance) {
+    wpi::units::meters<> distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning
@@ -92,7 +92,7 @@ wpi::cmd::CommandPtr DriveSubsystem::ProfiledDriveDistance(
 }
 
 wpi::cmd::CommandPtr DriveSubsystem::DynamicProfiledDriveDistance(
-    wpi::units::meter_t distance) {
+    wpi::units::meters<> distance) {
   return StartRun(
              [&] {
                // Restart timer so profile setpoints start at the beginning

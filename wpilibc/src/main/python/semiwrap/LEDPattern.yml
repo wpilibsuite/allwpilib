@@ -27,8 +27,8 @@ classes:
       ScrollAtAbsoluteVelocity:
       Blink:
         overloads:
-          wpi::units::second_t, wpi::units::second_t:
-          wpi::units::second_t:
+          wpi::units::seconds<>, wpi::units::seconds<>:
+          wpi::units::seconds<>:
       SynchronizedBlink:
       Breathe:
       OverlayOn:

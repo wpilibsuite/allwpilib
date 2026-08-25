@@ -198,7 +198,7 @@ class SerialPort {
    *
    * @param timeout The time to wait for I/O.
    */
-  void SetTimeout(wpi::units::second_t timeout);
+  void SetTimeout(wpi::units::seconds<> timeout);
 
   /**
    * Specify the size of the input buffer.

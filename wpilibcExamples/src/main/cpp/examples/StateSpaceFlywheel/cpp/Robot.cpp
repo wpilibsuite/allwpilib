@@ -24,9 +24,9 @@ class Robot : public wpi::TimedRobot {
   static constexpr int ENCODER_A_CHANNEL = 0;
   static constexpr int ENCODER_B_CHANNEL = 1;
   static constexpr int JOYSTICK_PORT = 0;
-  static constexpr wpi::units::radians_per_second_t SPINUP = 500_rpm;
+  static constexpr wpi::units::radians_per_second<> SPINUP = 500_rpm;
 
-  static constexpr wpi::units::kilogram_square_meter_t
+  static constexpr wpi::units::kilogram_square_meters<>
       FLYWHEEL_MOMENT_OF_INERTIA = 0.00032_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the flywheel
@@ -109,7 +109,7 @@ class Robot : public wpi::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
+    motor.SetVoltage(wpi::units::volts<>{loop.U(0)});
   }
 };
 

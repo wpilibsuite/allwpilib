@@ -13,8 +13,8 @@ using StructType = wpi::util::Struct<wpi::math::Translation2d>;
 
 wpi::math::Translation2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Translation2d{
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, X_OFF>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, Y_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, X_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, Y_OFF>(data)},
   };
 }
 

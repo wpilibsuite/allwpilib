@@ -18,15 +18,15 @@ using StructType = wpi::util::Struct<wpi::math::DifferentialSample>;
 wpi::math::DifferentialSample StructType::Unpack(
     std::span<const uint8_t> data) {
   return wpi::math::DifferentialSample{
-      wpi::units::second_t{
+      wpi::units::seconds<>{
           wpi::util::UnpackStruct<double, TIMESTAMP_OFF>(data)},
       wpi::util::UnpackStruct<wpi::math::Pose2d, POSE_OFF>(data),
       wpi::util::UnpackStruct<wpi::math::ChassisVelocities, VELOCITY_OFF>(data),
       wpi::util::UnpackStruct<wpi::math::ChassisAccelerations,
                               ACCELERATION_OFF>(data),
-      wpi::units::meters_per_second_t{
+      wpi::units::meters_per_second<>{
           wpi::util::UnpackStruct<double, LEFT_VELOCITY_OFF>(data)},
-      wpi::units::meters_per_second_t{
+      wpi::units::meters_per_second<>{
           wpi::util::UnpackStruct<double, RIGHT_VELOCITY_OFF>(data)},
   };
 }

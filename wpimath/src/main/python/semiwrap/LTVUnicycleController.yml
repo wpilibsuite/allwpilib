@@ -3,8 +3,8 @@ classes:
     methods:
       LTVUnicycleController:
         overloads:
-          wpi::units::second_t:
-          const wpi::util::array<double, 3>&, const wpi::util::array<double, 2>&, wpi::units::second_t:
+          wpi::units::seconds<>:
+          const wpi::util::array<double, 3>&, const wpi::util::array<double, 2>&, wpi::units::seconds<>:
             # param_override:
             #   maxVelocity:
             #     default: 9_mps
@@ -12,6 +12,6 @@ classes:
       SetTolerance:
       Calculate:
         overloads:
-          const Pose2d&, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t:
+          const Pose2d&, const Pose2d&, wpi::units::meters_per_second<>, wpi::units::radians_per_second<>:
           const Pose2d&, const HolonomicSample&:
       SetEnabled:

@@ -14,7 +14,7 @@ void PyMotorControllerGroup::SetThrottle(double throttle) {
   }
 }
 
-void PyMotorControllerGroup::SetVoltage(wpi::units::volt_t voltage) {
+void PyMotorControllerGroup::SetVoltage(wpi::units::volts<> voltage) {
   for (auto motorController : m_motorControllers) {
     motorController->SetVoltage(m_isInverted ? -voltage : voltage);
   }

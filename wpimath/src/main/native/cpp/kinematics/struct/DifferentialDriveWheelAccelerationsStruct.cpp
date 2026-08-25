@@ -13,9 +13,9 @@ wpi::util::Struct<wpi::math::DifferentialDriveWheelAccelerations>::Unpack(
   constexpr size_t LEFT_OFF = 0;
   constexpr size_t RIGHT_OFF = LEFT_OFF + 8;
   return wpi::math::DifferentialDriveWheelAccelerations{
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, LEFT_OFF>(data)},
-      units::meters_per_second_squared_t{
+      units::meters_per_second_squared<>{
           wpi::util::UnpackStruct<double, RIGHT_OFF>(data)},
   };
 }

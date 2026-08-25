@@ -41,14 +41,14 @@ class MotorSafety {
    *
    * @param expirationTime The timeout value.
    */
-  void SetExpiration(wpi::units::second_t expirationTime);
+  void SetExpiration(wpi::units::seconds<> expirationTime);
 
   /**
    * Retrieve the timeout value for the corresponding motor safety object.
    *
    * @return the timeout value.
    */
-  wpi::units::second_t GetExpiration() const;
+  wpi::units::seconds<> GetExpiration() const;
 
   /**
    * Determine if the motor is still operating or has timed out.
@@ -108,13 +108,13 @@ class MotorSafety {
   static constexpr auto DEFAULT_SAFETY_EXPIRATION = 100_ms;
 
   // The expiration time for this object
-  wpi::units::second_t m_expiration = DEFAULT_SAFETY_EXPIRATION;
+  wpi::units::seconds<> m_expiration = DEFAULT_SAFETY_EXPIRATION;
 
   // True if motor safety is enabled for this motor
   bool m_enabled = false;
 
   // The FPGA clock value when the motor has expired
-  wpi::units::second_t m_stopTime = Timer::GetMonotonicTimestamp();
+  wpi::units::seconds<> m_stopTime = Timer::GetMonotonicTimestamp();
 
   mutable wpi::util::mutex m_thisMutex;
 };

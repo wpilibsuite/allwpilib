@@ -15,9 +15,9 @@ using StructType =
 wpi::math::DifferentialDriveWheelVelocities StructType::Unpack(
     std::span<const uint8_t> data) {
   return wpi::math::DifferentialDriveWheelVelocities{
-      wpi::units::meters_per_second_t{
+      wpi::units::meters_per_second<>{
           wpi::util::UnpackStruct<double, LEFT_OFF>(data)},
-      wpi::units::meters_per_second_t{
+      wpi::units::meters_per_second<>{
           wpi::util::UnpackStruct<double, RIGHT_OFF>(data)},
   };
 }

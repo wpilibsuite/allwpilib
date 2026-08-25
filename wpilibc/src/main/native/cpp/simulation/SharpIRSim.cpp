@@ -18,6 +18,6 @@ SharpIRSim::SharpIRSim(int channel) {
   m_simRange = deviceSim.GetDouble("Range (m)");
 }
 
-void SharpIRSim::SetRange(wpi::units::meter_t range) {
+void SharpIRSim::SetRange(wpi::units::meters<> range) {
   m_simRange.Set(range.value());
 }

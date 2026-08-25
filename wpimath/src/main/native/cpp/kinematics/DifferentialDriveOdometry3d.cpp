@@ -15,8 +15,8 @@
 using namespace wpi::math;
 
 DifferentialDriveOdometry3d::DifferentialDriveOdometry3d(
-    const Rotation3d& gyroAngle, wpi::units::meter_t leftDistance,
-    wpi::units::meter_t rightDistance, const Pose3d& initialPose)
+    const Rotation3d& gyroAngle, wpi::units::meters<> leftDistance,
+    wpi::units::meters<> rightDistance, const Pose3d& initialPose)
     : Odometry3d(DifferentialDriveKinematics{1_m}, gyroAngle,
                  {leftDistance, rightDistance}, initialPose) {
   wpi::util::ReportUsage("DifferentialDriveOdometry3d", "");

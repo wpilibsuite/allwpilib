@@ -13,7 +13,6 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
@@ -22,7 +21,7 @@ TEST_CASE("EllipticalRegionConstraintTest Constraint", "[wpimath]") {
   constexpr auto maxVelocity = 2_fps;
   constexpr wpi::math::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
-  auto config = TrajectoryConfig(13_fps, 13_fps_sq);
+  auto config = TrajectoryConfig(13_fps, 13_fps2);
   config.AddConstraint(
       EllipticalRegionConstraint{ellipse, MaxVelocityConstraint{maxVelocity}});
   auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
@@ -30,9 +29,8 @@ TEST_CASE("EllipticalRegionConstraintTest Constraint", "[wpimath]") {
   bool exceededConstraintOutsideRegion = false;
   for (auto& point : trajectory.Samples()) {
     if (ellipse.Contains(point.pose.Translation())) {
-      CHECK(wpi::units::math::abs(point.ForwardVelocity()) <
-            maxVelocity + 0.05_mps);
-    } else if (wpi::units::math::abs(point.ForwardVelocity()) >=
+      CHECK(wpi::units::abs(point.ForwardVelocity()) < maxVelocity + 0.05_mps);
+    } else if (wpi::units::abs(point.ForwardVelocity()) >=
                maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }

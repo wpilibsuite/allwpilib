@@ -71,10 +71,10 @@ class WPILIB_DLLEXPORT DrivetrainSplineTrajectoryParameterizer {
   static DrivetrainSplineTrajectory Parameterize(
       const std::vector<PoseWithCurvature>& points,
       const std::vector<std::unique_ptr<TrajectoryConstraint>>& constraints,
-      wpi::units::meters_per_second_t startVelocity,
-      wpi::units::meters_per_second_t endVelocity,
-      wpi::units::meters_per_second_t maxVelocity,
-      wpi::units::meters_per_second_squared_t maxAcceleration, bool reversed);
+      wpi::units::meters_per_second<> startVelocity,
+      wpi::units::meters_per_second<> endVelocity,
+      wpi::units::meters_per_second<> maxVelocity,
+      wpi::units::meters_per_second_squared<> maxAcceleration, bool reversed);
 
  private:
   constexpr static double EPSILON = 1E-6;
@@ -86,10 +86,10 @@ class WPILIB_DLLEXPORT DrivetrainSplineTrajectoryParameterizer {
    */
   struct ConstrainedState {
     PoseWithCurvature pose = {Pose2d{}, wpi::units::curvature_t{0.0}};
-    wpi::units::meter_t distance = 0_m;
-    wpi::units::meters_per_second_t maxVelocity = 0_mps;
-    wpi::units::meters_per_second_squared_t minAcceleration = 0_mps_sq;
-    wpi::units::meters_per_second_squared_t maxAcceleration = 0_mps_sq;
+    wpi::units::meters<> distance = 0_m;
+    wpi::units::meters_per_second<> maxVelocity = 0_mps;
+    wpi::units::meters_per_second_squared<> minAcceleration = 0_mps2;
+    wpi::units::meters_per_second_squared<> maxAcceleration = 0_mps2;
   };
 
   /**

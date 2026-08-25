@@ -81,7 +81,7 @@ class ExtendedKalmanFilter {
       std::function<StateVector(const StateVector&, const InputVector&)> f,
       std::function<OutputVector(const StateVector&, const InputVector&)> h,
       const StateArray& stateStdDevs, const OutputArray& measurementStdDevs,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : m_f(std::move(f)), m_h(std::move(h)) {
     m_contQ = CovarianceMatrix(stateStdDevs);
     m_contR = CovarianceMatrix(measurementStdDevs);
@@ -170,7 +170,7 @@ class ExtendedKalmanFilter {
           residualFuncY,
       std::function<StateVector(const StateVector&, const StateVector&)>
           addFuncX,
-      wpi::units::second_t dt)
+      wpi::units::seconds<> dt)
       : m_f(std::move(f)),
         m_h(std::move(h)),
         m_residualFuncY(std::move(residualFuncY)),
@@ -290,7 +290,7 @@ class ExtendedKalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, wpi::units::second_t dt) {
+  void Predict(const InputVector& u, wpi::units::seconds<> dt) {
     // Find continuous A
     StateMatrix contA =
         NumericalJacobianX<States, States, Inputs>(m_f, m_xHat, u);
@@ -420,7 +420,7 @@ class ExtendedKalmanFilter {
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   StateMatrix m_initP;
 };

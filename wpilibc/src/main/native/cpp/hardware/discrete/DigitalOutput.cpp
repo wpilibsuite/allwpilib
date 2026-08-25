@@ -55,7 +55,7 @@ int DigitalOutput::GetChannel() const {
   return m_channel;
 }
 
-void DigitalOutput::Pulse(wpi::units::second_t pulseLength) {
+void DigitalOutput::Pulse(wpi::units::seconds<> pulseLength) {
   int32_t status = 0;
   HAL_Pulse(m_handle, pulseLength.value(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", m_channel);

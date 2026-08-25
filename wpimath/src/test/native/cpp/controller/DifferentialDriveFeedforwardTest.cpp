@@ -21,11 +21,11 @@
 TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithTrackwidth",
           "[wpimath]") {
   constexpr auto kvLinear = 1_V / 1_mps;
-  constexpr auto kaLinear = 1_V / 1_mps_sq;
+  constexpr auto kaLinear = 1_V / 1_mps2;
   constexpr auto kvAngular = 1_V / 1_rad_per_s;
   constexpr auto kaAngular = 1_V / 1_rad_per_s_sq;
   constexpr auto trackwidth = 1_m;
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kvLinear, kaLinear, kvAngular, kaAngular, trackwidth};
@@ -57,10 +57,10 @@ TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithTrackwidth",
 TEST_CASE("DifferentialDriveFeedforwardTest CalculateWithoutTrackwidth",
           "[wpimath]") {
   constexpr auto kvLinear = 1_V / 1_mps;
-  constexpr auto kaLinear = 1_V / 1_mps_sq;
+  constexpr auto kaLinear = 1_V / 1_mps2;
   constexpr auto kvAngular = 1_V / 1_mps;
-  constexpr auto kaAngular = 1_V / 1_mps_sq;
-  constexpr wpi::units::second_t dt = 20_ms;
+  constexpr auto kaAngular = 1_V / 1_mps2;
+  constexpr wpi::units::seconds<> dt = 20_ms;
 
   wpi::math::DifferentialDriveFeedforward differentialDriveFeedforward{
       kvLinear, kaLinear, kvAngular, kaAngular};

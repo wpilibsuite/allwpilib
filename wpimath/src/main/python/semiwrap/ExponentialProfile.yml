@@ -1,7 +1,7 @@
 classes:
   wpi::math::ExponentialProfile:
     force_type_casters:
-    - wpi::units::meters_per_second_t
+    - wpi::units::meters_per_second<>
     template_params:
     - Distance
     - Input
@@ -56,5 +56,5 @@ templates:
   ExponentialProfile:
     qualname: wpi::math::ExponentialProfile
     params:
-    - wpi::units::meter
-    - wpi::units::volt
+    - wpi::units::meters_
+    - wpi::units::volts_

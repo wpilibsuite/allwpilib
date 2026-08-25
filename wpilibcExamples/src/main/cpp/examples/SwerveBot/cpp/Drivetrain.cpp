@@ -4,10 +4,10 @@
 
 #include "Drivetrain.hpp"
 
-void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
-                       wpi::units::meters_per_second_t yVelocity,
-                       wpi::units::radians_per_second_t rot, bool fieldRelative,
-                       wpi::units::second_t period) {
+void Drivetrain::Drive(wpi::units::meters_per_second<> xVelocity,
+                       wpi::units::meters_per_second<> yVelocity,
+                       wpi::units::radians_per_second<> rot, bool fieldRelative,
+                       wpi::units::seconds<> period) {
   wpi::math::ChassisVelocities chassisVelocities{xVelocity, yVelocity, rot};
   if (fieldRelative) {
     chassisVelocities = chassisVelocities.ToRobotRelative(imu.GetRotation2d());

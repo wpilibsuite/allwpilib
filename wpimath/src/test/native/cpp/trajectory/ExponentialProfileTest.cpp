@@ -12,47 +12,47 @@
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
 static constexpr auto DT = 10_ms;
 static constexpr auto kV = 2.5629_V / 1_mps;
-static constexpr auto kA = 0.43277_V / 1_mps_sq;
+static constexpr auto kA = 0.43277_V / 1_mps2;
 
 #define CHECK_NEAR_UNITS(val1, val2, eps) \
-  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
+  CHECK(wpi::units::abs(val1 - val2) <= eps)
 
-wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
 CheckDynamics(
-    wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile,
-    wpi::math::ExponentialProfile<wpi::units::meter,
-                                  wpi::units::volts>::Constraints constraints,
-    wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward,
-    wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
-        current,
-    wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
-        goal) {
+    wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+        profile,
+    wpi::math::ExponentialProfile<wpi::units::meters_,
+                                  wpi::units::volts_>::Constraints constraints,
+    wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward,
+    wpi::math::ExponentialProfile<wpi::units::meters_,
+                                  wpi::units::volts_>::State current,
+    wpi::math::ExponentialProfile<wpi::units::meters_,
+                                  wpi::units::volts_>::State goal) {
   auto next = profile.Calculate(DT, current, goal);
   auto signal = feedforward.Calculate(current.velocity, next.velocity);
 
-  CHECK(wpi::units::math::abs(signal) <= (constraints.maxInput + 1e-9_V));
+  CHECK(wpi::units::abs(signal) <= (constraints.maxInput + 1e-9_V));
 
   return next;
 }
 
 TEST_CASE("ExponentialProfileTest ReachesGoal", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{10_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   for (int i = 0; i < 450; ++i) {
@@ -64,24 +64,23 @@ TEST_CASE("ExponentialProfileTest ReachesGoal", "[wpimath]") {
 // Tests that decreasing the maximum velocity in the middle when it is already
 // moving faster than the new max is handled correctly
 TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChange", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{10_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile =
-          wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>{
-              constraints};
+      profile = wpi::math::ExponentialProfile<wpi::units::meters_,
+                                              wpi::units::volts_>{constraints};
     }
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
@@ -93,24 +92,23 @@ TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChange", "[wpimath]") {
 // moving faster than the new max is handled correctly
 TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChangeBackward",
           "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-10_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   for (int i = 0; i < 300; ++i) {
     if (i == 150) {
       constraints.maxInput = 9_V;
-      profile =
-          wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>{
-              constraints};
+      profile = wpi::math::ExponentialProfile<wpi::units::meters_,
+                                              wpi::units::volts_>{constraints};
     }
 
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
@@ -120,16 +118,16 @@ TEST_CASE("ExponentialProfileTest PosContinuousUnderVelChangeBackward",
 
 // There is some somewhat tricky code for dealing with going backwards
 TEST_CASE("ExponentialProfileTest Backwards", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-10_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state;
 
   for (int i = 0; i < 400; ++i) {
@@ -139,16 +137,16 @@ TEST_CASE("ExponentialProfileTest Backwards", "[wpimath]") {
 }
 
 TEST_CASE("ExponentialProfileTest SwitchGoalInMiddle", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-10_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   for (int i = 0; i < 50; ++i) {
@@ -165,23 +163,23 @@ TEST_CASE("ExponentialProfileTest SwitchGoalInMiddle", "[wpimath]") {
 
 // Checks to make sure that it hits top velocity on long trajectories
 TEST_CASE("ExponentialProfileTest TopVelocity", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{40_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state;
 
-  wpi::units::meters_per_second_t maxVelocity = 0_mps;
+  wpi::units::meters_per_second<> maxVelocity = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
-    maxVelocity = wpi::units::math::max(state.velocity, maxVelocity);
+    maxVelocity = wpi::units::max(state.velocity, maxVelocity);
   }
 
   CHECK_NEAR_UNITS(constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
@@ -190,23 +188,23 @@ TEST_CASE("ExponentialProfileTest TopVelocity", "[wpimath]") {
 
 // Checks to make sure that it hits top velocity on long trajectories
 TEST_CASE("ExponentialProfileTest TopVelocityBackward", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-40_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state;
 
-  wpi::units::meters_per_second_t maxVelocity = 0_mps;
+  wpi::units::meters_per_second<> maxVelocity = 0_mps;
 
   for (int i = 0; i < 900; ++i) {
     state = CheckDynamics(profile, constraints, feedforward, state, goal);
-    maxVelocity = wpi::units::math::min(state.velocity, maxVelocity);
+    maxVelocity = wpi::units::min(state.velocity, maxVelocity);
   }
 
   CHECK_NEAR_UNITS(-constraints.MaxVelocity(), maxVelocity, 1e-5_mps);
@@ -215,16 +213,16 @@ TEST_CASE("ExponentialProfileTest TopVelocityBackward", "[wpimath]") {
 
 // Checks to make sure that it hits top velocity on long trajectories
 TEST_CASE("ExponentialProfileTest HighInitialVelocity", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{40_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 8_mps};
 
   for (int i = 0; i < 900; ++i) {
@@ -236,16 +234,16 @@ TEST_CASE("ExponentialProfileTest HighInitialVelocity", "[wpimath]") {
 
 // Checks to make sure that it hits top velocity on long trajectories
 TEST_CASE("ExponentialProfileTest HighInitialVelocityBackward", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-40_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, -8_mps};
 
   for (int i = 0; i < 900; ++i) {
@@ -256,19 +254,19 @@ TEST_CASE("ExponentialProfileTest HighInitialVelocityBackward", "[wpimath]") {
 }
 
 TEST_CASE("ExponentialProfileTest TestHeuristic", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
   std::vector<std::tuple<
-      wpi::math::ExponentialProfile<wpi::units::meter,
-                                    wpi::units::volts>::State,  // initial
-      wpi::math::ExponentialProfile<wpi::units::meter,
-                                    wpi::units::volts>::State,  // goal
-      wpi::math::ExponentialProfile<wpi::units::meter,
-                                    wpi::units::volts>::State>  // inflection
-                                                                // point
+      wpi::math::ExponentialProfile<wpi::units::meters_,
+                                    wpi::units::volts_>::State,  // initial
+      wpi::math::ExponentialProfile<wpi::units::meters_,
+                                    wpi::units::volts_>::State,  // goal
+      wpi::math::ExponentialProfile<wpi::units::meters_,
+                                    wpi::units::volts_>::State>  // inflection
+                                                                 // point
               >
       testCases{
           // red > green and purple => always positive => false
@@ -313,16 +311,16 @@ TEST_CASE("ExponentialProfileTest TestHeuristic", "[wpimath]") {
 }
 
 TEST_CASE("ExponentialProfileTest TimingToCurrent", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{2_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   for (int i = 0; i < 900; ++i) {
@@ -334,16 +332,16 @@ TEST_CASE("ExponentialProfileTest TimingToCurrent", "[wpimath]") {
 }
 
 TEST_CASE("ExponentialProfileTest TimingToGoal", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{2_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   auto prediction = profile.TimeLeftUntil(state, goal);
@@ -361,16 +359,16 @@ TEST_CASE("ExponentialProfileTest TimingToGoal", "[wpimath]") {
 }
 
 TEST_CASE("ExponentialProfileTest TimingToNegativeGoal", "[wpimath]") {
-  wpi::math::ExponentialProfile<wpi::units::meter,
-                                wpi::units::volts>::Constraints constraints{
+  wpi::math::ExponentialProfile<wpi::units::meters_,
+                                wpi::units::volts_>::Constraints constraints{
       12_V, -kV / kA, 1 / kA};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts> profile{
-      constraints};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meter> feedforward{
-      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps_sq, DT};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>
+      profile{constraints};
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
+      0_V, 2.5629_V / 1_mps, 0.43277_V / 1_mps2, DT};
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       goal{-2_m, 0_mps};
-  wpi::math::ExponentialProfile<wpi::units::meter, wpi::units::volts>::State
+  wpi::math::ExponentialProfile<wpi::units::meters_, wpi::units::volts_>::State
       state{0_m, 0_mps};
 
   auto prediction = profile.TimeLeftUntil(state, goal);

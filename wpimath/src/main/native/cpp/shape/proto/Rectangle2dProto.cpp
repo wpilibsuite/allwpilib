@@ -27,8 +27,8 @@ wpi::util::Protobuf<wpi::math::Rectangle2d>::Unpack(InputStream& stream) {
 
   return wpi::math::Rectangle2d{
       ipose[0],
-      wpi::units::meter_t{msg.xWidth},
-      wpi::units::meter_t{msg.yWidth},
+      wpi::units::meters<>{msg.xWidth},
+      wpi::units::meters<>{msg.yWidth},
   };
 }
 

@@ -27,7 +27,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
    *
    * @param setpointRotationsPerSecond The desired shooter velocity
    */
-  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second_t setpoint);
+  wpi::cmd::CommandPtr ShootCommand(wpi::units::turns_per_second<> setpoint);
 
  private:
   wpi::PWMSparkMax shooterMotor{ShooterConstants::SHOOTER_MOTOR_PORT};
@@ -36,7 +36,7 @@ class Shooter : public wpi::cmd::SubsystemBase {
   wpi::Encoder shooterEncoder{ShooterConstants::ENCODER_PORTS[0],
                               ShooterConstants::ENCODER_PORTS[1],
                               ShooterConstants::ENCODER_REVERSED};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> shooterFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> shooterFeedforward{
       ShooterConstants::kS, ShooterConstants::kV};
   wpi::math::PIDController shooterFeedback{ShooterConstants::kP, 0.0, 0.0};
 };

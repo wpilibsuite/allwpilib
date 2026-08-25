@@ -148,7 +148,7 @@ double Joystick::GetMagnitude() const {
   return std::hypot(GetX(), GetY());
 }
 
-wpi::units::radian_t Joystick::GetDirection() const {
+wpi::units::radians<> Joystick::GetDirection() const {
   // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#joystick-and-controller-coordinate-system
   // A positive rotation around the X axis moves the joystick right, and a
   // positive rotation around the Y axis moves the joystick backward. When
@@ -157,5 +157,5 @@ wpi::units::radian_t Joystick::GetDirection() const {
   //
   // It's rotated 90 degrees CCW (y is negated and the arguments are reversed)
   // so that 0 radians is forward.
-  return wpi::units::radian_t{std::atan2(GetX(), -GetY())};
+  return wpi::units::radians<>{std::atan2(GetX(), -GetY())};
 }

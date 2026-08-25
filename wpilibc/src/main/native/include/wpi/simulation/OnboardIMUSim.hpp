@@ -12,19 +12,19 @@ namespace wpi::sim {
 
 class OnboardIMUSim {
  public:
-  void SetAngleX(wpi::units::radian_t angle);
-  void SetAngleY(wpi::units::radian_t angle);
-  void SetAngleZ(wpi::units::radian_t angle);
+  void SetAngleX(wpi::units::radians<> angle);
+  void SetAngleY(wpi::units::radians<> angle);
+  void SetAngleZ(wpi::units::radians<> angle);
 
-  void SetGyroRateX(wpi::units::radians_per_second_t rate);
-  void SetGyroRateY(wpi::units::radians_per_second_t rate);
-  void SetGyroRateZ(wpi::units::radians_per_second_t rate);
+  void SetGyroRateX(wpi::units::radians_per_second<> rate);
+  void SetGyroRateY(wpi::units::radians_per_second<> rate);
+  void SetGyroRateZ(wpi::units::radians_per_second<> rate);
 
-  void SetAccelX(wpi::units::meters_per_second_squared_t accel);
-  void SetAccelY(wpi::units::meters_per_second_squared_t accel);
-  void SetAccelZ(wpi::units::meters_per_second_squared_t accel);
+  void SetAccelX(wpi::units::meters_per_second_squared<> accel);
+  void SetAccelY(wpi::units::meters_per_second_squared<> accel);
+  void SetAccelZ(wpi::units::meters_per_second_squared<> accel);
 
-  void SetYaw(wpi::units::radian_t angle);
+  void SetYaw(wpi::units::radians<> angle);
 };
 
 }  // namespace wpi::sim

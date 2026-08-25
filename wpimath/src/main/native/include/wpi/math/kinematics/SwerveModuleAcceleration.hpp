@@ -7,7 +7,6 @@
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -18,7 +17,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAcceleration {
   /**
    * Acceleration of the wheel of the module.
    */
-  units::meters_per_second_squared_t acceleration = 0_mps_sq;
+  units::meters_per_second_squared<> acceleration = 0_mps2;
 
   /**
    * Angle of the acceleration vector.
@@ -32,7 +31,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAcceleration {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModuleAcceleration& other) const {
-    return units::math::abs(acceleration - other.acceleration) < 1E-9_mps_sq &&
+    return units::abs(acceleration - other.acceleration) < 1E-9_mps2 &&
            angle == other.angle;
   }
 
@@ -54,7 +53,7 @@ struct WPILIB_DLLEXPORT SwerveModuleAcceleration {
     auto sumX = thisX + otherX;
     auto sumY = thisY + otherY;
 
-    auto resultAcceleration = units::math::hypot(sumX, sumY);
+    auto resultAcceleration = units::hypot(sumX, sumY);
     auto resultAngle = Rotation2d{sumX.value(), sumY.value()};
 
     return {resultAcceleration, resultAngle};

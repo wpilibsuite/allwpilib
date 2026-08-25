@@ -21,7 +21,7 @@ class UnitTopic;
 /**
  * Timestamped unit.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 struct TimestampedUnit {
@@ -49,7 +49,7 @@ struct TimestampedUnit {
 /**
  * NetworkTables unit-typed subscriber.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitSubscriber : public Subscriber {
@@ -87,7 +87,7 @@ class UnitSubscriber : public Subscriber {
    * @return value
    */
   ValueType Get(ParamType defaultValue) const {
-    return T{::wpi::nt::GetDouble(m_subHandle, defaultValue.value())};
+    return T{::wpi::nt::GetDouble(m_subHandle, defaultValue.raw())};
   }
 
   /**
@@ -109,7 +109,7 @@ class UnitSubscriber : public Subscriber {
    */
   TimestampedValueType GetAtomic(ParamType defaultValue) const {
     auto doubleVal =
-        ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.value());
+        ::wpi::nt::GetAtomicDouble(m_subHandle, defaultValue.raw());
     return {doubleVal.time, doubleVal.serverTime, doubleVal.value};
   }
 
@@ -148,7 +148,7 @@ class UnitSubscriber : public Subscriber {
 /**
  * NetworkTables unit-typed publisher.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitPublisher : public Publisher {
@@ -176,7 +176,7 @@ class UnitPublisher : public Publisher {
    * @param time timestamp; 0 indicates current NT time should be used
    */
   void Set(ParamType value, int64_t time = 0) {
-    ::wpi::nt::SetDouble(m_pubHandle, value.value(), time);
+    ::wpi::nt::SetDouble(m_pubHandle, value.raw(), time);
   }
 
   /**
@@ -187,7 +187,7 @@ class UnitPublisher : public Publisher {
    * @param value value
    */
   void SetDefault(ParamType value) {
-    ::wpi::nt::SetDefaultDouble(m_pubHandle, value.value());
+    ::wpi::nt::SetDefaultDouble(m_pubHandle, value.raw());
   }
 
   /**
@@ -205,7 +205,7 @@ class UnitPublisher : public Publisher {
  *
  * @note Unlike NetworkTableEntry, the entry goes away when this is destroyed.
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
@@ -265,7 +265,7 @@ class UnitEntry final : public UnitSubscriber<T>, public UnitPublisher<T> {
  * correct behavior the publisher and subscriber must use the same unit type,
  * but this can be checked at runtime using IsMatchingUnit().
  *
- * @tparam T unit type, e.g. wpi::units::meter_t
+ * @tparam T unit type, e.g. wpi::units::meters<>
  */
 template <typename T>
 class UnitTopic final : public Topic {

@@ -26,8 +26,8 @@ RomiServo::RomiServo(int channel) {
   }
 }
 
-void RomiServo::SetAngle(wpi::units::radian_t angle) {
-  angle = std::clamp<wpi::units::radian_t>(angle, 0_deg, 180_deg);
+void RomiServo::SetAngle(wpi::units::radians<> angle) {
+  angle = std::clamp<wpi::units::radians<>>(angle, 0_deg, 180_deg);
   double pos = angle.value() / std::numbers::pi;
 
   if (m_simPosition) {
@@ -35,9 +35,9 @@ void RomiServo::SetAngle(wpi::units::radian_t angle) {
   }
 }
 
-wpi::units::radian_t RomiServo::GetAngle() const {
+wpi::units::radians<> RomiServo::GetAngle() const {
   if (m_simPosition) {
-    return wpi::units::radian_t{m_simPosition.Get() * std::numbers::pi};
+    return wpi::units::radians<>{m_simPosition.Get() * std::numbers::pi};
   }
 
   return 90_deg;

@@ -15,7 +15,7 @@ classes:
     inline_code: |
       .def(
         py::init<
-          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t
+          wpi::units::meters<>, wpi::units::meters<>, wpi::units::meters<>, wpi::units::meters<>
         >(),
         py::arg("front_left") = 0, py::arg("front_right") = 0, py::arg("rear_left") = 0, py::arg("rear_right") = 0
       )

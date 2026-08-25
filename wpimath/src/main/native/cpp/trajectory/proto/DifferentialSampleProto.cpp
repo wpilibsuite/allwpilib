@@ -36,12 +36,12 @@ std::optional<wpi::math::DifferentialSample> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialSample{
-      wpi::units::second_t{msg.time},
+      wpi::units::seconds<>{msg.time},
       iPose[0],
       iVel[0],
       iAccel[0],
-      wpi::units::meters_per_second_t{msg.left_velocity},
-      wpi::units::meters_per_second_t{msg.right_velocity},
+      wpi::units::meters_per_second<>{msg.left_velocity},
+      wpi::units::meters_per_second<>{msg.right_velocity},
   };
 }
 

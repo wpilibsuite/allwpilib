@@ -11,7 +11,7 @@ constexpr size_t TIMESTAMP_OFF = 0;
 using StructType = wpi::util::Struct<wpi::math::TrajectorySample>;
 
 wpi::math::TrajectorySample StructType::Unpack(std::span<const uint8_t> data) {
-  return wpi::math::TrajectorySample{wpi::units::second_t{
+  return wpi::math::TrajectorySample{wpi::units::seconds<>{
       wpi::util::UnpackStruct<double, TIMESTAMP_OFF>(data)}};
 }
 

@@ -17,7 +17,7 @@
 using namespace wpi::math;
 
 TEST_CASE("SampleJsonTest TestBaseSample", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
@@ -38,7 +38,7 @@ TEST_CASE("SampleJsonTest TestBaseSample", "[wpimath]") {
 }
 
 TEST_CASE("SampleJsonTest TestFromJson", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   for (const auto& splineSample : splineTrajectory.Samples()) {
@@ -59,7 +59,7 @@ TEST_CASE("SampleJsonTest TestFromJson", "[wpimath]") {
 }
 
 TEST_CASE("SampleJsonTest TestDifferentialSamples", "[wpimath]") {
-  TrajectoryConfig config{12_fps, 12_fps_sq};
+  TrajectoryConfig config{12_fps, 12_fps2};
   auto splineTrajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   DifferentialDriveKinematics kinematics{0.5_m};

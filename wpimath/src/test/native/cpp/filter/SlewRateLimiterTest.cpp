@@ -13,12 +13,12 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/timestamp.h"
 
-static wpi::units::second_t now = 0_s;
+static wpi::units::seconds<> now = 0_s;
 
 class SlewRateLimiterTest {
  public:
   SlewRateLimiterTest() {
-    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanoseconds<>{now}.to<int64_t>(); });
   }
 
   ~SlewRateLimiterTest() { WPI_SetNowImpl(nullptr); }
@@ -26,9 +26,9 @@ class SlewRateLimiterTest {
 
 TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateLimit",
                  "[wpimath]") {
-  WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
+  WPI_SetNowImpl([] { return wpi::units::nanoseconds<>{now}.to<int64_t>(); });
 
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps);
 
   now += 1_s;
 
@@ -37,7 +37,7 @@ TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateLimit",
 
 TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateNoLimit",
                  "[wpimath]") {
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps);
 
   now += 1_s;
 
@@ -47,7 +47,7 @@ TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateNoLimit",
 TEST_CASE_METHOD(SlewRateLimiterTest,
                  "SlewRateLimiterTest SlewRatePositiveNegativeLimit",
                  "[wpimath]") {
-  wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps, -0.5_mps);
+  wpi::math::SlewRateLimiter<wpi::units::meters_> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 

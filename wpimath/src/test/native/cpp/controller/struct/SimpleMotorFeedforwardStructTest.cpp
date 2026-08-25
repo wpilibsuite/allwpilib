@@ -14,9 +14,9 @@ struct SimpleMotorFeedforwardStructTestData {
   using Type = SimpleMotorFeedforward<T>;
 
   inline static const Type TEST_DATA = {
-      wpi::units::volt_t{0.4},
-      wpi::units::volt_t{4.0} / (wpi::units::unit_t<T>{1} / 1_s),
-      wpi::units::volt_t{0.7} / (wpi::units::unit_t<T>{1} / 1_s / 1_s), 25_ms};
+      wpi::units::volts<>{0.4},
+      wpi::units::volts<>{4.0} / (wpi::units::unit<T>{1} / 1_s),
+      wpi::units::volts<>{0.7} / (wpi::units::unit<T>{1} / 1_s / 1_s), 25_ms};
 
   static void CheckEq(const Type& testData, const Type& data) {
     CHECK(testData.GetKs().value() == data.GetKs().value());
@@ -28,10 +28,10 @@ struct SimpleMotorFeedforwardStructTestData {
 
 INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardMeters, StructTest,
-    SimpleMotorFeedforwardStructTestData<wpi::units::meters>);
+    SimpleMotorFeedforwardStructTestData<wpi::units::meters_>);
 INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardFeet, StructTest,
-    SimpleMotorFeedforwardStructTestData<wpi::units::feet>);
+    SimpleMotorFeedforwardStructTestData<wpi::units::feet_>);
 INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(
     SimpleMotorFeedforwardRadians, StructTest,
-    SimpleMotorFeedforwardStructTestData<wpi::units::radians>);
+    SimpleMotorFeedforwardStructTestData<wpi::units::radians_>);

@@ -49,7 +49,7 @@ TEST_CASE("NumericalIntegrationTest RK4TimeVarying", "[wpimath]") {
                            std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RK4(
-      [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
+      [](wpi::units::seconds<> t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
                                      (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },
@@ -93,7 +93,7 @@ TEST_CASE("NumericalIntegrationTest RKDPTimeVarying", "[wpimath]") {
                            std::pow(std::exp(5.0) + 1.0, 2.0)};
 
   wpi::math::Vectord<1> y1 = wpi::math::RKDP(
-      [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
+      [](wpi::units::seconds<> t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
                                      (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};
       },

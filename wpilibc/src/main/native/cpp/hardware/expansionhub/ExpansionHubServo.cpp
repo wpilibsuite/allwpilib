@@ -65,14 +65,14 @@ void ExpansionHubServo::SetPosition(double value) {
   SetPulseWidth(rawValue);
 }
 
-void ExpansionHubServo::SetAngle(wpi::units::degree_t angle) {
+void ExpansionHubServo::SetAngle(wpi::units::degrees<> angle) {
   angle = std::clamp(angle, m_minServoAngle, m_maxServoAngle);
 
   // NOLINTNEXTLINE(bugprone-integer-division)
   SetPosition((angle - m_minServoAngle) / GetServoAngleRange());
 }
 
-void ExpansionHubServo::SetPulseWidth(wpi::units::microsecond_t pulseWidth) {
+void ExpansionHubServo::SetPulseWidth(wpi::units::microseconds<> pulseWidth) {
   SetEnabled(true);
   m_pulseWidthPublisher.Set(pulseWidth.value());
 }
@@ -81,20 +81,20 @@ void ExpansionHubServo::SetEnabled(bool enabled) {
   m_enabledPublisher.Set(enabled);
 }
 
-void ExpansionHubServo::SetFramePeriod(wpi::units::microsecond_t framePeriod) {
+void ExpansionHubServo::SetFramePeriod(wpi::units::microseconds<> framePeriod) {
   m_framePeriodPublisher.Set(framePeriod.value());
 }
 
-wpi::units::microsecond_t ExpansionHubServo::GetFullRangeScaleFactor() {
+wpi::units::microseconds<> ExpansionHubServo::GetFullRangeScaleFactor() {
   return m_maxPwm - m_minPwm;
 }
 
-wpi::units::degree_t ExpansionHubServo::GetServoAngleRange() {
+wpi::units::degrees<> ExpansionHubServo::GetServoAngleRange() {
   return m_maxServoAngle - m_minServoAngle;
 }
 
-void ExpansionHubServo::SetPWMRange(wpi::units::microsecond_t minPwm,
-                                    wpi::units::microsecond_t maxPwm) {
+void ExpansionHubServo::SetPWMRange(wpi::units::microseconds<> minPwm,
+                                    wpi::units::microseconds<> maxPwm) {
   if (maxPwm <= minPwm) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
                            "Max PWM must be greater than Min PWM");
@@ -107,8 +107,8 @@ void ExpansionHubServo::SetReversed(const bool reversed) {
   m_reversed = reversed;
 }
 
-void ExpansionHubServo::SetAngleRange(wpi::units::degree_t minAngle,
-                                      wpi::units::degree_t maxAngle) {
+void ExpansionHubServo::SetAngleRange(wpi::units::degrees<> minAngle,
+                                      wpi::units::degrees<> maxAngle) {
   if (maxAngle <= minAngle) {
     throw WPILIB_MakeError(err::ParameterOutOfRange,
                            "Max angle must be greater than Min angle");

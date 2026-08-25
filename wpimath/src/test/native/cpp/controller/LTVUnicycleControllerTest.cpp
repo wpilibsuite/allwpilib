@@ -17,19 +17,18 @@
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 #define CHECK_NEAR_UNITS(val1, val2, eps) \
-  CHECK(wpi::units::math::abs(val1 - val2) <= eps)
+  CHECK(wpi::units::abs(val1 - val2) <= eps)
 
-static constexpr wpi::units::meter_t TOLERANCE{1 / 12.0};
-static constexpr wpi::units::radian_t ANGULAR_TOLERANCE{2.0 * std::numbers::pi /
-                                                        180.0};
+static constexpr wpi::units::meters<> TOLERANCE{1 / 12.0};
+static constexpr wpi::units::radians<> ANGULAR_TOLERANCE{
+    2.0 * std::numbers::pi / 180.0};
 
 TEST_CASE("LTVUnicycleControllerTest ReachesReference", "[wpimath]") {
-  constexpr wpi::units::second_t DT = 20_ms;
+  constexpr wpi::units::seconds<> DT = 20_ms;
 
   wpi::math::LTVUnicycleController controller{
       {0.0625, 0.125, 2.5}, {4.0, 4.0}, DT};
@@ -38,7 +37,7 @@ TEST_CASE("LTVUnicycleControllerTest ReachesReference", "[wpimath]") {
   auto waypoints = std::vector{wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
                                wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
   auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
-      waypoints, {8.8_mps, 0.1_mps_sq});
+      waypoints, {8.8_mps, 0.1_mps2});
 
   auto duration = trajectory.Duration();
   for (size_t i = 0; i < (duration / DT).value(); ++i) {

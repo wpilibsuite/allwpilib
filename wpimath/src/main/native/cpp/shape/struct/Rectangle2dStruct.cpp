@@ -16,8 +16,8 @@ using StructType = wpi::util::Struct<wpi::math::Rectangle2d>;
 wpi::math::Rectangle2d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Rectangle2d{
       wpi::util::UnpackStruct<wpi::math::Pose2d, CENTER_OFF>(data),
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, X_WIDTH_OFF>(data)},
-      wpi::units::meter_t{wpi::util::UnpackStruct<double, Y_WIDTH_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, X_WIDTH_OFF>(data)},
+      wpi::units::meters<>{wpi::util::UnpackStruct<double, Y_WIDTH_OFF>(data)},
   };
 }
 

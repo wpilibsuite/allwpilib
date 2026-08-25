@@ -22,11 +22,11 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterVInVoltageCallback(
   return store;
 }
 
-wpi::units::volt_t RoboRioSim::GetVInVoltage() {
-  return wpi::units::volt_t{HALSIM_GetRoboRioVInVoltage()};
+wpi::units::volts<> RoboRioSim::GetVInVoltage() {
+  return wpi::units::volts<>{HALSIM_GetRoboRioVInVoltage()};
 }
 
-void RoboRioSim::SetVInVoltage(wpi::units::volt_t vInVoltage) {
+void RoboRioSim::SetVInVoltage(wpi::units::volts<> vInVoltage) {
   HALSIM_SetRoboRioVInVoltage(vInVoltage.value());
 }
 
@@ -39,11 +39,11 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserVoltage3V3Callback(
   return store;
 }
 
-wpi::units::volt_t RoboRioSim::GetUserVoltage3V3() {
-  return wpi::units::volt_t{HALSIM_GetRoboRioUserVoltage3V3()};
+wpi::units::volts<> RoboRioSim::GetUserVoltage3V3() {
+  return wpi::units::volts<>{HALSIM_GetRoboRioUserVoltage3V3()};
 }
 
-void RoboRioSim::SetUserVoltage3V3(wpi::units::volt_t userVoltage3V3) {
+void RoboRioSim::SetUserVoltage3V3(wpi::units::volts<> userVoltage3V3) {
   HALSIM_SetRoboRioUserVoltage3V3(userVoltage3V3.value());
 }
 
@@ -56,11 +56,11 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterUserCurrent3V3Callback(
   return store;
 }
 
-wpi::units::ampere_t RoboRioSim::GetUserCurrent3V3() {
-  return wpi::units::ampere_t{HALSIM_GetRoboRioUserCurrent3V3()};
+wpi::units::amperes<> RoboRioSim::GetUserCurrent3V3() {
+  return wpi::units::amperes<>{HALSIM_GetRoboRioUserCurrent3V3()};
 }
 
-void RoboRioSim::SetUserCurrent3V3(wpi::units::ampere_t userCurrent3V3) {
+void RoboRioSim::SetUserCurrent3V3(wpi::units::amperes<> userCurrent3V3) {
   HALSIM_SetRoboRioUserCurrent3V3(userCurrent3V3.value());
 }
 
@@ -107,11 +107,11 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterBrownoutVoltageCallback(
   return store;
 }
 
-wpi::units::volt_t RoboRioSim::GetBrownoutVoltage() {
-  return wpi::units::volt_t{HALSIM_GetRoboRioBrownoutVoltage()};
+wpi::units::volts<> RoboRioSim::GetBrownoutVoltage() {
+  return wpi::units::volts<>{HALSIM_GetRoboRioBrownoutVoltage()};
 }
 
-void RoboRioSim::SetBrownoutVoltage(wpi::units::volt_t vInVoltage) {
+void RoboRioSim::SetBrownoutVoltage(wpi::units::volts<> vInVoltage) {
   HALSIM_SetRoboRioBrownoutVoltage(vInVoltage.value());
 }
 
@@ -125,12 +125,12 @@ RoboRioSim::RegisterBrownoutRecoveryVoltageCallback(NotifyCallback callback,
   return store;
 }
 
-wpi::units::volt_t RoboRioSim::GetBrownoutRecoveryVoltage() {
-  return wpi::units::volt_t{HALSIM_GetRoboRioBrownoutRecoveryVoltage()};
+wpi::units::volts<> RoboRioSim::GetBrownoutRecoveryVoltage() {
+  return wpi::units::volts<>{HALSIM_GetRoboRioBrownoutRecoveryVoltage()};
 }
 
 void RoboRioSim::SetBrownoutRecoveryVoltage(
-    wpi::units::volt_t brownoutRecoveryVoltage) {
+    wpi::units::volts<> brownoutRecoveryVoltage) {
   HALSIM_SetRoboRioBrownoutRecoveryVoltage(brownoutRecoveryVoltage.value());
 }
 
@@ -143,11 +143,11 @@ std::unique_ptr<CallbackStore> RoboRioSim::RegisterCPUTempCallback(
   return store;
 }
 
-wpi::units::celsius_t RoboRioSim::GetCPUTemp() {
-  return wpi::units::celsius_t{HALSIM_GetRoboRioCPUTemp()};
+wpi::units::celsius<> RoboRioSim::GetCPUTemp() {
+  return wpi::units::celsius<>{HALSIM_GetRoboRioCPUTemp()};
 }
 
-void RoboRioSim::SetCPUTemp(wpi::units::celsius_t cpuTemp) {
+void RoboRioSim::SetCPUTemp(wpi::units::celsius<> cpuTemp) {
   HALSIM_SetRoboRioCPUTemp(cpuTemp.value());
 }
 

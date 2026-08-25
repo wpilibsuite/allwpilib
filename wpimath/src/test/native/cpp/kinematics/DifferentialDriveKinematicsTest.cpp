@@ -71,7 +71,7 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseKinematicsForRotateInPlace",
           "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisVelocities chassisVelocities{
-      0.0_mps, 0.0_mps, wpi::units::radians_per_second_t{std::numbers::pi}};
+      0.0_mps, 0.0_mps, wpi::units::radians_per_second<>{std::numbers::pi}};
   const auto wheelVelocities = kinematics.ToWheelVelocities(chassisVelocities);
 
   CHECK_NEAR(wheelVelocities.left.value(), -0.381 * std::numbers::pi, EPSILON);
@@ -82,8 +82,8 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardKinematicsForRotateInPlace",
           "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelVelocities wheelVelocities{
-      wpi::units::meters_per_second_t{+0.381 * std::numbers::pi},
-      wpi::units::meters_per_second_t{-0.381 * std::numbers::pi}};
+      wpi::units::meters_per_second<>{+0.381 * std::numbers::pi},
+      wpi::units::meters_per_second<>{-0.381 * std::numbers::pi}};
   const auto chassisVelocities =
       kinematics.ToChassisVelocities(wheelVelocities);
 
@@ -118,7 +118,7 @@ TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForZeros",
 TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForStraightLine",
           "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
-  const ChassisAccelerations chassisAccelerations{3.0_mps_sq, 0_mps_sq,
+  const ChassisAccelerations chassisAccelerations{3.0_mps2, 0_mps2,
                                                   0_rad_per_s_sq};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
@@ -130,8 +130,8 @@ TEST_CASE("DifferentialDriveKinematicsTest InverseAccelerationsForStraightLine",
 TEST_CASE("DifferentialDriveKinematicsTest ForwardAccelerationsForStraightLine",
           "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
-  const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps_sq,
-                                                               3.0_mps_sq};
+  const DifferentialDriveWheelAccelerations wheelAccelerations{3.0_mps2,
+                                                               3.0_mps2};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 
@@ -145,8 +145,8 @@ TEST_CASE(
     "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const ChassisAccelerations chassisAccelerations{
-      0.0_mps_sq, 0.0_mps_sq,
-      wpi::units::radians_per_second_squared_t{std::numbers::pi}};
+      0.0_mps2, 0.0_mps2,
+      wpi::units::radians_per_second_squared<>{std::numbers::pi}};
   const auto wheelAccelerations =
       kinematics.ToWheelAccelerations(chassisAccelerations);
 
@@ -161,8 +161,8 @@ TEST_CASE(
     "[wpimath]") {
   const DifferentialDriveKinematics kinematics{0.381_m * 2};
   const DifferentialDriveWheelAccelerations wheelAccelerations{
-      wpi::units::meters_per_second_squared_t{+0.381 * std::numbers::pi},
-      wpi::units::meters_per_second_squared_t{-0.381 * std::numbers::pi}};
+      wpi::units::meters_per_second_squared<>{+0.381 * std::numbers::pi},
+      wpi::units::meters_per_second_squared<>{-0.381 * std::numbers::pi}};
   const auto chassisAccelerations =
       kinematics.ToChassisAccelerations(wheelAccelerations);
 

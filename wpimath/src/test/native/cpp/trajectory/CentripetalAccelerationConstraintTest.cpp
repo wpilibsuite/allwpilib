@@ -10,16 +10,16 @@
 #include "wpi/math/trajectory/TrajectoryConfig.hpp"
 #include "wpi/units/acceleration.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/base.hpp"
+#include "wpi/units/core.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
 using namespace wpi::math;
 
 TEST_CASE("CentripetalAccelerationConstraintTest Constraint", "[wpimath]") {
-  const auto maxCentripetalAcceleration = 7_fps_sq;
+  const auto maxCentripetalAcceleration = 7_fps2;
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       CentripetalAccelerationConstraint(maxCentripetalAcceleration));
 
@@ -28,9 +28,8 @@ TEST_CASE("CentripetalAccelerationConstraintTest Constraint", "[wpimath]") {
   for (auto t = 0_s; t < trajectory.Duration(); t += 20_ms) {
     auto point = trajectory.SampleAt(t);
     auto centripetalAcceleration =
-        wpi::units::math::pow<2>(point.ForwardVelocity()) * point.curvature /
-        1_rad;
+        wpi::units::pow<2>(point.ForwardVelocity()) * point.curvature / 1_rad;
 
-    CHECK(centripetalAcceleration < maxCentripetalAcceleration + 0.05_mps_sq);
+    CHECK(centripetalAcceleration < maxCentripetalAcceleration + 0.05_mps2);
   }
 }

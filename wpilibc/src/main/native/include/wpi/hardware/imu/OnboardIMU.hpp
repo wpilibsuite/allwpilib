@@ -43,7 +43,7 @@ class OnboardIMU {
    * @return yaw value
    * @Common This is one of the commonly used methods for this class
    */
-  wpi::units::radian_t GetYaw();
+  wpi::units::radians<> GetYaw();
 
   /**
    * Reset the current yaw value to 0. Future reads of the yaw value will be
@@ -75,59 +75,59 @@ class OnboardIMU {
    * Get the angle about the X axis of the IMU.
    * @return angle about the X axis
    */
-  wpi::units::radian_t GetAngleX();
+  wpi::units::radians<> GetAngleX();
 
   /**
    * Get the angle about the Y axis of the IMU.
    * @return angle about the Y axis
    */
-  wpi::units::radian_t GetAngleY();
+  wpi::units::radians<> GetAngleY();
 
   /**
    * Get the angle about the Z axis of the IMU.
    * @return angle about the Z axis
    */
-  wpi::units::radian_t GetAngleZ();
+  wpi::units::radians<> GetAngleZ();
 
   /**
    * Get the angular rate about the X axis of the IMU.
    * @return angular rate about the X axis
    */
-  wpi::units::radians_per_second_t GetGyroRateX();
+  wpi::units::radians_per_second<> GetGyroRateX();
 
   /**
    * Get the angular rate about the Y axis of the IMU.
    * @return angular rate about the Y axis
    */
-  wpi::units::radians_per_second_t GetGyroRateY();
+  wpi::units::radians_per_second<> GetGyroRateY();
 
   /**
    * Get the angular rate about the Z axis of the IMU.
    * @return angular rate about the Z axis
    */
-  wpi::units::radians_per_second_t GetGyroRateZ();
+  wpi::units::radians_per_second<> GetGyroRateZ();
 
   /**
    * Get the acceleration along the X axis of the IMU.
    * @return acceleration along the X axis
    */
-  wpi::units::meters_per_second_squared_t GetAccelX();
+  wpi::units::meters_per_second_squared<> GetAccelX();
 
   /**
    * Get the acceleration along the Z axis of the IMU.
    * @return acceleration along the Z axis
    */
-  wpi::units::meters_per_second_squared_t GetAccelY();
+  wpi::units::meters_per_second_squared<> GetAccelY();
 
   /**
    * Get the acceleration along the Z axis of the IMU.
    * @return acceleration along the Z axis
    */
-  wpi::units::meters_per_second_squared_t GetAccelZ();
+  wpi::units::meters_per_second_squared<> GetAccelZ();
 
  private:
-  wpi::units::radian_t GetYawNoOffset();
+  wpi::units::radians<> GetYawNoOffset();
   MountOrientation m_mountOrientation;
-  wpi::units::radian_t m_yawOffset{0};
+  wpi::units::radians<> m_yawOffset{0};
 };
 }  // namespace wpi

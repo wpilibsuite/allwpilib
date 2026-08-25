@@ -15,8 +15,8 @@ classes:
       Translation3d:
         overloads:
           '':
-          wpi::units::meter_t, wpi::units::meter_t, wpi::units::meter_t:
-          wpi::units::meter_t, const Rotation3d&:
+          wpi::units::meters<>, wpi::units::meters<>, wpi::units::meters<>:
+          wpi::units::meters<>, const Rotation3d&:
           const Eigen::Vector3d&:
           const Translation2d&:
       Distance:
@@ -48,25 +48,25 @@ classes:
       Cross:
 inline_code: |
   cls_Translation3d
-    .def_static("from_feet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::foot_t z){
+    .def_static("from_feet", [](wpi::units::feet<> x, wpi::units::feet<> y, wpi::units::feet<> z){
       return std::make_unique<Translation3d>(x, y, z);
     }, py::arg("x"), py::arg("y"), py::arg("z"))
     .def_property_readonly("x", &Translation3d::X)
     .def_property_readonly("y", &Translation3d::Y)
     .def_property_readonly("z", &Translation3d::Z)
-    .def_property_readonly("x_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("x_feet", [](const Translation3d * self) -> wpi::units::feet<> {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("y_feet", [](const Translation3d * self) -> wpi::units::feet<> {
       return self->Y();
     })
-    .def_property_readonly("z_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+    .def_property_readonly("z_feet", [](const Translation3d * self) -> wpi::units::feet<> {
       return self->Z();
     })
-    .def("distance_feet", [](Translation3d * self, const Translation3d &other) -> wpi::units::foot_t {
+    .def("distance_feet", [](Translation3d * self, const Translation3d &other) -> wpi::units::feet<> {
       return self->Distance(other);
     })
-    .def("norm_feet", [](const Translation3d * self) -> wpi::units::foot_t {
+    .def("norm_feet", [](const Translation3d * self) -> wpi::units::feet<> {
       return self->Norm();
     })
     .def("__abs__", &Translation3d::Norm)

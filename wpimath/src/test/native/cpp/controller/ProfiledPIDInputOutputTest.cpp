@@ -18,90 +18,89 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/angular_acceleration.hpp"
 #include "wpi/units/angular_velocity.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/time.hpp"
 
 TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput1", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(-180_deg, 180_deg);
 
-  static constexpr wpi::units::degree_t SETPOINT{-179.0};
-  static constexpr wpi::units::degree_t MEASUREMENT{-179.0};
-  static constexpr wpi::units::degree_t GOAL{179.0};
+  static constexpr wpi::units::degrees<> SETPOINT{-179.0};
+  static constexpr wpi::units::degrees<> MEASUREMENT{-179.0};
+  static constexpr wpi::units::degrees<> GOAL{179.0};
 
   controller.Reset(SETPOINT);
   CHECK(controller.Calculate(MEASUREMENT, GOAL) < 0.0);
 
   // Error must be less than half the input range at all times
-  CHECK(wpi::units::math::abs(controller.GetSetpoint().position - MEASUREMENT) <
+  CHECK(wpi::units::abs(controller.GetSetpoint().position - MEASUREMENT) <
         180_deg);
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput2", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
-  controller.EnableContinuousInput(-wpi::units::radian_t{std::numbers::pi},
-                                   wpi::units::radian_t{std::numbers::pi});
+  controller.EnableContinuousInput(-wpi::units::radians<>{std::numbers::pi},
+                                   wpi::units::radians<>{std::numbers::pi});
 
-  static constexpr wpi::units::radian_t SETPOINT{-3.4826633343199735};
-  static constexpr wpi::units::radian_t MEASUREMENT{-3.1352207333939606};
-  static constexpr wpi::units::radian_t GOAL{-3.534162788601621};
+  static constexpr wpi::units::radians<> SETPOINT{-3.4826633343199735};
+  static constexpr wpi::units::radians<> MEASUREMENT{-3.1352207333939606};
+  static constexpr wpi::units::radians<> GOAL{-3.534162788601621};
 
   controller.Reset(SETPOINT);
   CHECK(controller.Calculate(MEASUREMENT, GOAL) < 0.0);
 
   // Error must be less than half the input range at all times
-  CHECK(wpi::units::math::abs(controller.GetSetpoint().position - MEASUREMENT) <
-        wpi::units::radian_t{std::numbers::pi});
+  CHECK(wpi::units::abs(controller.GetSetpoint().position - MEASUREMENT) <
+        wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput3", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
-  controller.EnableContinuousInput(-wpi::units::radian_t{std::numbers::pi},
-                                   wpi::units::radian_t{std::numbers::pi});
+  controller.EnableContinuousInput(-wpi::units::radians<>{std::numbers::pi},
+                                   wpi::units::radians<>{std::numbers::pi});
 
-  static constexpr wpi::units::radian_t SETPOINT{-3.5176604690006377};
-  static constexpr wpi::units::radian_t MEASUREMENT{3.1191729343822456};
-  static constexpr wpi::units::radian_t GOAL{2.709680418117445};
+  static constexpr wpi::units::radians<> SETPOINT{-3.5176604690006377};
+  static constexpr wpi::units::radians<> MEASUREMENT{3.1191729343822456};
+  static constexpr wpi::units::radians<> GOAL{2.709680418117445};
 
   controller.Reset(SETPOINT);
   CHECK(controller.Calculate(MEASUREMENT, GOAL) < 0.0);
 
   // Error must be less than half the input range at all times
-  CHECK(wpi::units::math::abs(controller.GetSetpoint().position - MEASUREMENT) <
-        wpi::units::radian_t{std::numbers::pi});
+  CHECK(wpi::units::abs(controller.GetSetpoint().position - MEASUREMENT) <
+        wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest ContinuousInput4", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(1);
   controller.EnableContinuousInput(
-      0_rad, wpi::units::radian_t{2.0 * std::numbers::pi});
+      0_rad, wpi::units::radians<>{2.0 * std::numbers::pi});
 
-  static constexpr wpi::units::radian_t SETPOINT{2.78};
-  static constexpr wpi::units::radian_t MEASUREMENT{3.12};
-  static constexpr wpi::units::radian_t GOAL{2.71};
+  static constexpr wpi::units::radians<> SETPOINT{2.78};
+  static constexpr wpi::units::radians<> MEASUREMENT{3.12};
+  static constexpr wpi::units::radians<> GOAL{2.71};
 
   controller.Reset(SETPOINT);
   CHECK(controller.Calculate(MEASUREMENT, GOAL) < 0.0);
 
   // Error must be less than half the input range at all times
-  CHECK(wpi::units::math::abs(controller.GetSetpoint().position - MEASUREMENT) <
-        wpi::units::radian_t{std::numbers::pi});
+  CHECK(wpi::units::abs(controller.GetSetpoint().position - MEASUREMENT) <
+        wpi::units::radians<>{std::numbers::pi});
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest ProportionalGainOutput", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetP(4);
@@ -110,7 +109,7 @@ TEST_CASE("ProfiledPIDInputOutputTest ProportionalGainOutput", "[wpimath]") {
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest IntegralGainOutput", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetI(4);
@@ -125,7 +124,7 @@ TEST_CASE("ProfiledPIDInputOutputTest IntegralGainOutput", "[wpimath]") {
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
-  wpi::math::ProfiledPIDController<wpi::units::degree> controller{
+  wpi::math::ProfiledPIDController<wpi::units::degrees_> controller{
       0.0, 0.0, 0.0, {360_deg_per_s, 180_deg_per_s_sq}};
 
   controller.SetD(4);
@@ -138,7 +137,7 @@ TEST_CASE("ProfiledPIDInputOutputTest DerivativeGainOutput", "[wpimath]") {
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
           "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
@@ -177,7 +176,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedConstraintsRebuildProfile",
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedNestedControllerGainUpdatesState",
           "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();
@@ -202,7 +201,7 @@ TEST_CASE("ProfiledPIDInputOutputTest TunedNestedControllerGainUpdatesState",
 }
 
 TEST_CASE("ProfiledPIDInputOutputTest TunedGoalUpdatesGoal", "[wpimath]") {
-  using Controller = wpi::math::ProfiledPIDController<wpi::units::radian>;
+  using Controller = wpi::math::ProfiledPIDController<wpi::units::radians_>;
 
   wpi::tunables::TunableRegistry::Reset();
   auto backend = std::make_shared<wpi::tunables::MockTunableBackend>();

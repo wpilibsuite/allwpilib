@@ -24,7 +24,7 @@ inline constexpr bool LEFT_ENCODER_REVERSED = false;
 inline constexpr bool RIGHT_ENCODER_REVERSED = true;
 
 inline constexpr double ENCODER_CPR = 1024;
-inline constexpr wpi::units::meter_t WHEEL_DIAMETER = 6_in;
+inline constexpr wpi::units::meters<> WHEEL_DIAMETER = 6_in;
 inline constexpr double ENCODER_DISTANCE_PER_PULSE =
     // Assumes the encoders are directly mounted on the wheel shafts
     ((WHEEL_DIAMETER * std::numbers::pi) / ENCODER_CPR).value();
@@ -76,7 +76,7 @@ inline constexpr auto SHOOTER_TOLERANCE = 50_tps;
 // robot.
 inline constexpr double kP = 1;
 
-inline constexpr wpi::units::volt_t kS = 0.05_V;
+inline constexpr wpi::units::volts<> kS = 0.05_V;
 // Should have value 12V at free speed
 inline constexpr auto kV = 12_V / SHOOTER_FREE;
 
@@ -88,7 +88,7 @@ inline constexpr int DRIVER_CONTROLLER_PORT = 0;
 }  // namespace OIConstants
 
 namespace AutoConstants {
-constexpr wpi::units::second_t TIMEOUT = 3_s;
-constexpr wpi::units::meter_t DRIVE_DISTANCE = 2_m;
+constexpr wpi::units::seconds<> TIMEOUT = 3_s;
+constexpr wpi::units::meters<> DRIVE_DISTANCE = 2_m;
 constexpr double DRIVE_VELOCITY = 0.5;
 }  // namespace AutoConstants

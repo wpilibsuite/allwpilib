@@ -50,7 +50,7 @@ class ArmSimulationTest {
 
 TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
                  "[wpilibcExamples][examples][simulation][arm]") {
-  wpi::units::degree_t setpoint =
+  wpi::units::degrees<> setpoint =
       GENERATE(DEFAULT_ARM_SETPOINT, 25.0_deg, 50.0_deg);
 
   CHECK(wpi::Preferences::ContainsKey(ARM_POSITION_KEY));
@@ -83,16 +83,16 @@ TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
 
     wpi::sim::StepTiming(1.5_s);
 
-    CHECK_THAT(wpi::units::radian_t{encoderSim.GetDistance()}
-                   .convert<wpi::units::degree>()
+    CHECK_THAT(wpi::units::radians<>{encoderSim.GetDistance()}
+                   .convert<wpi::units::degrees_>()
                    .value(),
                Catch::Matchers::WithinAbs(setpoint.value(), 2.0));
 
     // see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    CHECK_THAT(wpi::units::radian_t{encoderSim.GetDistance()}
-                   .convert<wpi::units::degree>()
+    CHECK_THAT(wpi::units::radians<>{encoderSim.GetDistance()}
+                   .convert<wpi::units::degrees_>()
                    .value(),
                Catch::Matchers::WithinAbs(setpoint.value(), 2.0));
   }
@@ -116,16 +116,16 @@ TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
     // advance 75 timesteps
     wpi::sim::StepTiming(1.5_s);
 
-    CHECK_THAT(wpi::units::radian_t{encoderSim.GetDistance()}
-                   .convert<wpi::units::degree>()
+    CHECK_THAT(wpi::units::radians<>{encoderSim.GetDistance()}
+                   .convert<wpi::units::degrees_>()
                    .value(),
                Catch::Matchers::WithinAbs(setpoint.value(), 2.0));
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
-    CHECK_THAT(wpi::units::radian_t{encoderSim.GetDistance()}
-                   .convert<wpi::units::degree>()
+    CHECK_THAT(wpi::units::radians<>{encoderSim.GetDistance()}
+                   .convert<wpi::units::degrees_>()
                    .value(),
                Catch::Matchers::WithinAbs(setpoint.value(), 2.0));
   }

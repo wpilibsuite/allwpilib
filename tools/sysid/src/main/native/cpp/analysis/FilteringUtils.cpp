@@ -115,16 +115,16 @@ static void PrepareMechData(std::vector<PreparedData>* data,
   }
 }
 
-std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::units::second_t>
+std::tuple<wpi::units::seconds<>, wpi::units::seconds<>, wpi::units::seconds<>>
 sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                            AnalysisManager::Settings* settings,
-                           wpi::units::second_t minStepTime,
-                           wpi::units::second_t maxStepTime) {
+                           wpi::units::seconds<> minStepTime,
+                           wpi::units::seconds<> maxStepTime) {
   auto voltageBegins =
       std::find_if(data->begin(), data->end(),
                    [](auto& datum) { return std::abs(datum.voltage) > 0; });
 
-  wpi::units::second_t firstTimestamp = voltageBegins->timestamp;
+  wpi::units::seconds<> firstTimestamp = voltageBegins->timestamp;
   double firstPosition = voltageBegins->position;
 
   auto motionBegins = std::find_if(
@@ -133,7 +133,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                (settings->velocityThreshold * datum.dt.value());
       });
 
-  wpi::units::second_t positionDelay;
+  wpi::units::seconds<> positionDelay;
   if (motionBegins != data->end()) {
     positionDelay = motionBegins->timestamp - firstTimestamp;
   } else {
@@ -159,7 +159,7 @@ sysid::TrimStepVoltageData(std::vector<PreparedData>* data,
                    maxAccel->acceleration;
       });
 
-  wpi::units::second_t velocityDelay;
+  wpi::units::seconds<> velocityDelay;
   if (accelBegins != data->end()) {
     velocityDelay = accelBegins->timestamp - firstTimestamp;
 
@@ -229,9 +229,9 @@ double sysid::GetMaxSpeed(
   return max;
 }
 
-wpi::units::second_t sysid::GetMeanTimeDelta(
+wpi::units::seconds<> sysid::GetMeanTimeDelta(
     const std::vector<PreparedData>& data) {
-  std::vector<wpi::units::second_t> dts;
+  std::vector<wpi::units::seconds<>> dts;
 
   for (const auto& pt : data) {
     if (pt.dt > 0_s && pt.dt < 500_ms) {
@@ -242,8 +242,8 @@ wpi::units::second_t sysid::GetMeanTimeDelta(
   return std::accumulate(dts.begin(), dts.end(), 0_s) / dts.size();
 }
 
-wpi::units::second_t sysid::GetMeanTimeDelta(const Storage& data) {
-  std::vector<wpi::units::second_t> dts;
+wpi::units::seconds<> sysid::GetMeanTimeDelta(const Storage& data) {
+  std::vector<wpi::units::seconds<>> dts;
 
   for (const auto& pt : data.slowForward) {
     if (pt.dt > 0_s && pt.dt < 500_ms) {
@@ -320,7 +320,7 @@ static std::string RemoveStr(std::string_view str, std::string_view removeStr) {
  *
  * @return The maximum duration of the Dynamic Tests
  */
-static wpi::units::second_t GetMaxStepTime(
+static wpi::units::seconds<> GetMaxStepTime(
     wpi::util::StringMap<std::vector<PreparedData>>& data) {
   auto maxStepTime = 0_s;
   for (auto& it : data) {
@@ -342,9 +342,9 @@ static wpi::units::second_t GetMaxStepTime(
 void sysid::InitialTrimAndFilter(
     wpi::util::StringMap<std::vector<PreparedData>>* data,
     AnalysisManager::Settings* settings,
-    std::vector<wpi::units::second_t>& positionDelays,
-    std::vector<wpi::units::second_t>& velocityDelays,
-    wpi::units::second_t& minStepTime, wpi::units::second_t& maxStepTime,
+    std::vector<wpi::units::seconds<>>& positionDelays,
+    std::vector<wpi::units::seconds<>>& velocityDelays,
+    wpi::units::seconds<>& minStepTime, wpi::units::seconds<>& maxStepTime,
     std::string_view unit) {
   auto& preparedData = *data;
 

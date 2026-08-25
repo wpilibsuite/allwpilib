@@ -279,7 +279,7 @@ class Trigger {
    * @param type The debounce type.
    * @return The debounced trigger.
    */
-  Trigger Debounce(wpi::units::second_t debounceTime,
+  Trigger Debounce(wpi::units::seconds<> debounceTime,
                    wpi::math::Debouncer::DebounceType type =
                        wpi::math::Debouncer::DebounceType::RISING);
 
@@ -297,7 +297,7 @@ class Trigger {
    * @param windowTime The time in which the presses must occur.
    * @return The multi-press trigger.
    */
-  Trigger MultiPress(int requiredPresses, units::second_t windowTime);
+  Trigger MultiPress(int requiredPresses, units::seconds<> windowTime);
 
   /**
    * Returns the current state of this trigger.

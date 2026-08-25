@@ -61,7 +61,7 @@ class Field2d : public wpi::telemetry::TelemetryLoggable,
    * @param y Y location
    * @param rotation rotation
    */
-  void SetRobotPose(wpi::units::meter_t x, wpi::units::meter_t y,
+  void SetRobotPose(wpi::units::meters<> x, wpi::units::meters<> y,
                     wpi::math::Rotation2d rotation);
 
   /**

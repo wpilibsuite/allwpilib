@@ -40,11 +40,11 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * right wheels, in meters.
    */
   constexpr DifferentialDriveFeedforward(
-      decltype(1_V / 1_mps) kvLinear, decltype(1_V / 1_mps_sq) kaLinear,
+      decltype(1_V / 1_mps) kvLinear, decltype(1_V / 1_mps2) kaLinear,
       decltype(1_V / 1_rad_per_s) kvAngular,
-      decltype(1_V / 1_rad_per_s_sq) kaAngular, wpi::units::meter_t trackwidth)
+      decltype(1_V / 1_rad_per_s_sq) kaAngular, wpi::units::meters<> trackwidth)
       // See Models::DifferentialDriveFromSysId(decltype(1_V / 1_mps),
-      // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
+      // decltype(1_V / 1_mps2), decltype(1_V / 1_rad_per_s), decltype(1_V /
       // 1_rad_per_s_sq))
       : DifferentialDriveFeedforward{kvLinear, kaLinear,
                                      kvAngular * 2.0 / trackwidth * 1_rad,
@@ -62,9 +62,9 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * second squared).
    */
   constexpr DifferentialDriveFeedforward(decltype(1_V / 1_mps) kvLinear,
-                                         decltype(1_V / 1_mps_sq) kaLinear,
+                                         decltype(1_V / 1_mps2) kaLinear,
                                          decltype(1_V / 1_mps) kvAngular,
-                                         decltype(1_V / 1_mps_sq) kaAngular)
+                                         decltype(1_V / 1_mps2) kaAngular)
       : m_plant{wpi::math::Models::DifferentialDriveFromSysId(
             kvLinear, kaLinear, kvAngular, kaAngular)},
         kvLinear{kvLinear},
@@ -87,16 +87,16 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
    * @param dt Discretization timestep.
    */
   DifferentialDriveWheelVoltages Calculate(
-      wpi::units::meters_per_second_t currentLeftVelocity,
-      wpi::units::meters_per_second_t nextLeftVelocity,
-      wpi::units::meters_per_second_t currentRightVelocity,
-      wpi::units::meters_per_second_t nextRightVelocity,
-      wpi::units::second_t dt);
+      wpi::units::meters_per_second<> currentLeftVelocity,
+      wpi::units::meters_per_second<> nextLeftVelocity,
+      wpi::units::meters_per_second<> currentRightVelocity,
+      wpi::units::meters_per_second<> nextRightVelocity,
+      wpi::units::seconds<> dt);
 
   decltype(1_V / 1_mps) kvLinear;
-  decltype(1_V / 1_mps_sq) kaLinear;
+  decltype(1_V / 1_mps2) kaLinear;
   decltype(1_V / 1_mps) kvAngular;
-  decltype(1_V / 1_mps_sq) kaAngular;
+  decltype(1_V / 1_mps2) kaAngular;
 };
 }  // namespace wpi::math
 

@@ -34,7 +34,7 @@ class OnBoardIO {
   OnBoardIO(OnBoardIO::ChannelMode dio1, OnBoardIO::ChannelMode dio2);
 
   static constexpr auto MESSAGE_INTERVAL = 1_s;
-  wpi::units::second_t m_nextMessageTime = 0_s;
+  wpi::units::seconds<> m_nextMessageTime = 0_s;
 
   /**
    * Gets if the A button is pressed.

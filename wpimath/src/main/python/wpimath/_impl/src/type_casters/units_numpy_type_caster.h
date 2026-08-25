@@ -1,12 +1,13 @@
 #pragma once
 
 #include <pybind11/numpy.h>
+#include <wpi/units/core.hpp>
 
 namespace pybind11 {
 namespace detail {
 
-template <class U, typename T, template <typename> class S>
-struct npy_format_descriptor<wpi::units::unit_t<U, T, S>> {
+template <wpi::units::UnitType Unit>
+struct npy_format_descriptor<Unit> {
   static constexpr auto name = const_name("numpy.float64");
   static constexpr int value = npy_api::NPY_DOUBLE_;
 

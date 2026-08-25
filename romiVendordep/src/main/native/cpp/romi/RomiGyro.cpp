@@ -26,57 +26,57 @@ RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
   }
 }
 
-wpi::units::radian_t RomiGyro::GetAngle() const {
+wpi::units::radians<> RomiGyro::GetAngle() const {
   return GetAngleZ();
 }
 
-wpi::units::radians_per_second_t RomiGyro::GetRate() const {
+wpi::units::radians_per_second<> RomiGyro::GetRate() const {
   return GetRateZ();
 }
 
-wpi::units::radians_per_second_t RomiGyro::GetRateX() const {
+wpi::units::radians_per_second<> RomiGyro::GetRateX() const {
   if (m_simRateX) {
-    return wpi::units::degrees_per_second_t{m_simRateX.Get()};
+    return wpi::units::degrees_per_second<>{m_simRateX.Get()};
   }
 
   return 0.0_rad_per_s;
 }
 
-wpi::units::radians_per_second_t RomiGyro::GetRateY() const {
+wpi::units::radians_per_second<> RomiGyro::GetRateY() const {
   if (m_simRateY) {
-    return wpi::units::degrees_per_second_t{m_simRateY.Get()};
+    return wpi::units::degrees_per_second<>{m_simRateY.Get()};
   }
 
   return 0.0_rad_per_s;
 }
 
-wpi::units::radians_per_second_t RomiGyro::GetRateZ() const {
+wpi::units::radians_per_second<> RomiGyro::GetRateZ() const {
   if (m_simRateZ) {
-    return wpi::units::degrees_per_second_t{m_simRateZ.Get()};
+    return wpi::units::degrees_per_second<>{m_simRateZ.Get()};
   }
 
   return 0.0_rad_per_s;
 }
 
-wpi::units::radian_t RomiGyro::GetAngleX() const {
+wpi::units::radians<> RomiGyro::GetAngleX() const {
   if (m_simAngleX) {
-    return wpi::units::degree_t{m_simAngleX.Get() - m_angleXOffset};
+    return wpi::units::degrees<>{m_simAngleX.Get() - m_angleXOffset};
   }
 
   return 0.0_rad;
 }
 
-wpi::units::radian_t RomiGyro::GetAngleY() const {
+wpi::units::radians<> RomiGyro::GetAngleY() const {
   if (m_simAngleY) {
-    return wpi::units::degree_t{m_simAngleY.Get() - m_angleYOffset};
+    return wpi::units::degrees<>{m_simAngleY.Get() - m_angleYOffset};
   }
 
   return 0.0_rad;
 }
 
-wpi::units::radian_t RomiGyro::GetAngleZ() const {
+wpi::units::radians<> RomiGyro::GetAngleZ() const {
   if (m_simAngleZ) {
-    return wpi::units::degree_t{m_simAngleZ.Get() - m_angleZOffset};
+    return wpi::units::degrees<>{m_simAngleZ.Get() - m_angleZOffset};
   }
 
   return 0.0_rad;

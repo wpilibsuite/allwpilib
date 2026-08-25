@@ -29,8 +29,8 @@ SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
   return SharpIR(channel, 5.2819, -1.161, 2_cm, 15_cm);
 }
 
-SharpIR::SharpIR(int channel, double a, double b, wpi::units::meter_t min,
-                 wpi::units::meter_t max)
+SharpIR::SharpIR(int channel, double a, double b, wpi::units::meters<> min,
+                 wpi::units::meters<> max)
     : m_sensor(channel), m_A(a), m_B(b), m_min(min), m_max(max) {
   wpi::util::ReportUsage("IO", channel, "SharpIR");
 
@@ -46,15 +46,15 @@ int SharpIR::GetChannel() const {
   return m_sensor.GetChannel();
 }
 
-wpi::units::meter_t SharpIR::GetRange() const {
+wpi::units::meters<> SharpIR::GetRange() const {
   if (m_simRange) {
-    return std::clamp(wpi::units::meter_t{m_simRange.Get()}, m_min, m_max);
+    return std::clamp(wpi::units::meters<>{m_simRange.Get()}, m_min, m_max);
   } else {
     // Don't allow zero/negative values
     auto v = std::max(m_sensor.GetVoltage(), 0.00001);
 
-    return std::clamp(wpi::units::meter_t{m_A * std::pow(v, m_B) * 1e-2}, m_min,
-                      m_max);
+    return std::clamp(wpi::units::meters<>{m_A * std::pow(v, m_B) * 1e-2},
+                      m_min, m_max);
   }
 }
 

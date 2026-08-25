@@ -14,9 +14,9 @@ std::optional<wpi::math::ChassisAccelerations> wpi::util::Protobuf<
   }
 
   return wpi::math::ChassisAccelerations{
-      units::meters_per_second_squared_t{msg.ax},
-      units::meters_per_second_squared_t{msg.ay},
-      units::radians_per_second_squared_t{msg.alpha},
+      units::meters_per_second_squared<>{msg.ax},
+      units::meters_per_second_squared<>{msg.ay},
+      units::radians_per_second_squared<>{msg.alpha},
   };
 }
 

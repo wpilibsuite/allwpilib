@@ -7,7 +7,7 @@ classes:
       StartCompetition:
       OpModeRobotBase:
         overloads:
-          wpi::units::second_t:
+          wpi::units::seconds<>:
           "":
       DriverStationConnected:
       NonePeriodic:
@@ -41,7 +41,7 @@ classes:
     methods:
       OpModeRobot:
         overloads:
-          wpi::units::second_t:
+          wpi::units::seconds<>:
           "":
       AddOpMode:
         overloads:

@@ -9,7 +9,7 @@
 
 using namespace wpi::math;
 
-Debouncer::Debouncer(wpi::units::second_t debounceTime, DebounceType type)
+Debouncer::Debouncer(wpi::units::seconds<> debounceTime, DebounceType type)
     : m_debounceTime(debounceTime), m_debounceType(type) {
   m_baseline = m_debounceType == DebounceType::FALLING;
   ResetTimer();

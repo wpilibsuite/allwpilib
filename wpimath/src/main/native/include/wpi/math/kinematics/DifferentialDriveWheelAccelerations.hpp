@@ -15,12 +15,12 @@ struct WPILIB_DLLEXPORT DifferentialDriveWheelAccelerations {
   /**
    * Acceleration of the left side of the robot.
    */
-  units::meters_per_second_squared_t left = 0_mps_sq;
+  units::meters_per_second_squared<> left = 0_mps2;
 
   /**
    * Acceleration of the right side of the robot.
    */
-  units::meters_per_second_squared_t right = 0_mps_sq;
+  units::meters_per_second_squared<> right = 0_mps2;
 
   /**
    * Adds two DifferentialDriveWheelAccelerations and returns the sum.

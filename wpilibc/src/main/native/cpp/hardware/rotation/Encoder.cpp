@@ -73,7 +73,7 @@ double Encoder::GetRate() const {
   return value;
 }
 
-void Encoder::SetRateWindow(wpi::units::millisecond_t window) {
+void Encoder::SetRateWindow(wpi::units::milliseconds<> window) {
   int32_t status = 0;
   HAL_SetEncoderRateWindow(m_encoder, static_cast<int32_t>(window.value()),
                            &status);

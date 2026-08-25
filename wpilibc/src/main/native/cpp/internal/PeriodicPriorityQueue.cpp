@@ -36,8 +36,8 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
 
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::nanoseconds startTime,
-                                          wpi::units::second_t period,
-                                          wpi::units::second_t offset)
+                                          wpi::units::seconds<> period,
+                                          wpi::units::seconds<> offset)
     : Callback{
           std::move(func), startTime,
           std::chrono::nanoseconds{static_cast<int64_t>(period.value() * 1e9)},
@@ -46,8 +46,8 @@ PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
 
 PeriodicPriorityQueue::Callback::Callback(std::function<void()> func,
                                           std::chrono::nanoseconds startTime,
-                                          wpi::units::second_t period)
-    : Callback{std::move(func), startTime, period, wpi::units::second_t{0}} {}
+                                          wpi::units::seconds<> period)
+    : Callback{std::move(func), startTime, period, 0_s} {}
 
 void PeriodicPriorityQueue::Add(std::function<void()> func,
                                 std::chrono::nanoseconds startTime,
@@ -64,14 +64,14 @@ void PeriodicPriorityQueue::Add(std::function<void()> func,
 
 void PeriodicPriorityQueue::Add(std::function<void()> func,
                                 std::chrono::nanoseconds startTime,
-                                wpi::units::second_t period) {
-  Add(std::move(func), startTime, period, wpi::units::second_t{0});
+                                wpi::units::seconds<> period) {
+  Add(std::move(func), startTime, period, wpi::units::seconds<>{0});
 }
 
 void PeriodicPriorityQueue::Add(std::function<void()> func,
                                 std::chrono::nanoseconds startTime,
-                                wpi::units::second_t period,
-                                wpi::units::second_t offset) {
+                                wpi::units::seconds<> period,
+                                wpi::units::seconds<> offset) {
   m_queue.emplace(std::move(func), startTime, period, offset);
 }
 
@@ -106,7 +106,7 @@ bool PeriodicPriorityQueue::RunCallbacks(HAL_NotifierHandle notifier) {
 
   const std::chrono::nanoseconds currentTime{
       RobotController::GetMonotonicTime()};
-  m_loopStartTime = wpi::units::nanosecond_t{currentTime};
+  m_loopStartTime = wpi::units::nanoseconds<>{currentTime};
 
   callback.func();
 

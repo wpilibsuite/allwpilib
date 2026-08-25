@@ -38,7 +38,6 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/curvature.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -108,9 +107,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
       const auto twist = (end.value().first - start.value().first).Log();
 
-      if (wpi::units::math::abs(twist.dy) > MAX_DY ||
-          wpi::units::math::abs(twist.dx) > MAX_DX ||
-          wpi::units::math::abs(twist.dtheta) > MAX_DTHETA) {
+      if (wpi::units::abs(twist.dy) > MAX_DY ||
+          wpi::units::abs(twist.dx) > MAX_DX ||
+          wpi::units::abs(twist.dtheta) > MAX_DTHETA) {
         stack.emplace(StackContents{(current.t0 + current.t1) / 2, current.t1});
         stack.emplace(StackContents{current.t0, (current.t0 + current.t1) / 2});
       } else {
@@ -127,9 +126,9 @@ class WPILIB_DLLEXPORT SplineParameterizer {
 
  private:
   // Constraints for spline parameterization.
-  static inline constexpr wpi::units::meter_t MAX_DX = 5_in;
-  static inline constexpr wpi::units::meter_t MAX_DY = 0.05_in;
-  static inline constexpr wpi::units::radian_t MAX_DTHETA = 0.0872_rad;
+  static inline constexpr wpi::units::meters<> MAX_DX = 5_in;
+  static inline constexpr wpi::units::meters<> MAX_DY = 0.05_in;
+  static inline constexpr wpi::units::radians<> MAX_DTHETA = 0.0872_rad;
 
   struct StackContents {
     double t0;

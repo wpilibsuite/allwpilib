@@ -26,7 +26,7 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-inline constexpr wpi::units::second_t DT = 5_ms;
+inline constexpr wpi::units::seconds<> DT = 5_ms;
 inline constexpr double POSITION_STDDEV = 0.0001;
 
 namespace {
@@ -54,17 +54,17 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
   wpi::math::Vectord<2> references{2.0, 0.0};
   loop.SetNextR(references);
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
-      4_mps, 3_mps_sq};
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{constraints};
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::Constraints constraints{
+      4_mps, 3_mps2};
+  wpi::math::TrapezoidProfile<wpi::units::meters_> profile{constraints};
 
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State state{
-      wpi::units::meter_t{loop.Xhat(0)},
-      wpi::units::meters_per_second_t{loop.Xhat(1)}};
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State state{
+      wpi::units::meters<>{loop.Xhat(0)},
+      wpi::units::meters_per_second<>{loop.Xhat(1)}};
   for (int i = 0; i < 1000; ++i) {
     state = profile.Calculate(DT, state,
-                              {wpi::units::meter_t{references(0)},
-                               wpi::units::meters_per_second_t{references(1)}});
+                              {wpi::units::meters<>{references(0)},
+                               wpi::units::meters_per_second<>{references(1)}});
     loop.SetNextR({state.position.value(), state.velocity.value()});
 
     wpi::math::Matrixd<1, 1> y{
@@ -104,7 +104,7 @@ TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
   wpi::math::Vectord<1> references{3000.0 / 60.0 * 2.0 * std::numbers::pi};
   loop.SetNextR(references);
 
-  wpi::units::second_t time = 0_s;
+  wpi::units::seconds<> time = 0_s;
   while (time < 10_s) {
     loop.SetNextR(references);
     wpi::math::Matrixd<1, 1> y{

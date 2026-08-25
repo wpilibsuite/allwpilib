@@ -43,14 +43,14 @@ class SwerveModule {
   wpi::Encoder turningEncoder;
 
   wpi::math::PIDController drivePIDController{1.0, 0, 0};
-  wpi::math::ProfiledPIDController<wpi::units::radians> turningPIDController{
+  wpi::math::ProfiledPIDController<wpi::units::radians_> turningPIDController{
       1.0,
       0.0,
       0.0,
       {MODULE_MAX_ANGULAR_VELOCITY, MODULE_MAX_ANGULAR_ACCELERATION}};
 
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> driveFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> driveFeedforward{
       1_V, 3_V / 1_mps};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radians> turnFeedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> turnFeedforward{
       1_V, 0.5_V / 1_rad_per_s};
 };

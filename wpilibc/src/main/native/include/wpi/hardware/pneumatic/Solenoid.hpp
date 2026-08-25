@@ -100,7 +100,7 @@ class Solenoid : public wpi::telemetry::TelemetryLoggable {
    *
    * @see startPulse()
    */
-  void SetPulseDuration(wpi::units::second_t duration);
+  void SetPulseDuration(wpi::units::seconds<> duration);
 
   /**
    * %Trigger the pneumatics module to generate a pulse of the duration set in

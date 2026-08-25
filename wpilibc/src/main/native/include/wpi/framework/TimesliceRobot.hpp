@@ -93,8 +93,8 @@ class TimesliceRobot : public TimedRobot {
    *                         allocations should be less than or equal to this
    *                         value.
    */
-  explicit TimesliceRobot(wpi::units::second_t robotPeriodicAllocation,
-                          wpi::units::second_t controllerPeriod);
+  explicit TimesliceRobot(wpi::units::seconds<> robotPeriodicAllocation,
+                          wpi::units::seconds<> controllerPeriod);
 
   /**
    * Schedule a periodic function with the constructor's controller period and
@@ -110,11 +110,11 @@ class TimesliceRobot : public TimedRobot {
    * @param allocation The function's runtime allocation out of the controller
    *                   period.
    */
-  void Schedule(std::function<void()> func, wpi::units::second_t allocation);
+  void Schedule(std::function<void()> func, wpi::units::seconds<> allocation);
 
  private:
-  wpi::units::second_t m_nextOffset;
-  wpi::units::second_t m_controllerPeriod;
+  wpi::units::seconds<> m_nextOffset;
+  wpi::units::seconds<> m_controllerPeriod;
 };
 
 }  // namespace wpi

@@ -27,13 +27,13 @@ class Robot : public wpi::TimedRobot {
   static constexpr int ENCODER_B_CHANNEL = 1;
   static constexpr int JOYSTICK_PORT = 0;
 
-  static constexpr wpi::units::radian_t RAISED_POSITION = 90_deg;
-  static constexpr wpi::units::radian_t LOWERED_POSITION = 0_deg;
+  static constexpr wpi::units::radians<> RAISED_POSITION = 90_deg;
+  static constexpr wpi::units::radians<> LOWERED_POSITION = 0_deg;
 
   // Moment of inertia of the arm. Can be estimated with CAD. If finding this
   // constant is difficult, wpi::math::LinearSystem.identifyPositionSystem may
   // be better.
-  static constexpr wpi::units::kilogram_square_meter_t ARM_MOI = 1.2_kg_sq_m;
+  static constexpr wpi::units::kilogram_square_meters<> ARM_MOI = 1.2_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the arm
   // spins slower than the motors, this number should be greater than one.
@@ -87,10 +87,11 @@ class Robot : public wpi::TimedRobot {
   wpi::PWMSparkMax motor{MOTOR_PORT};
   wpi::Gamepad joystick{JOYSTICK_PORT};
 
-  wpi::math::TrapezoidProfile<wpi::units::radians> profile{
+  wpi::math::TrapezoidProfile<wpi::units::radians_> profile{
       {45_deg_per_s, 90_deg_per_s / 1_s}};
 
-  wpi::math::TrapezoidProfile<wpi::units::radians>::State lastProfiledReference;
+  wpi::math::TrapezoidProfile<wpi::units::radians_>::State
+      lastProfiledReference;
 
  public:
   Robot() {
@@ -102,14 +103,14 @@ class Robot : public wpi::TimedRobot {
     loop.Reset(wpi::math::Vectord<2>{encoder.GetDistance(), encoder.GetRate()});
 
     lastProfiledReference = {
-        wpi::units::radian_t{encoder.GetDistance()},
-        wpi::units::radians_per_second_t{encoder.GetRate()}};
+        wpi::units::radians<>{encoder.GetDistance()},
+        wpi::units::radians_per_second<>{encoder.GetRate()}};
   }
 
   void TeleopPeriodic() override {
     // Sets the target position of our arm. This is similar to setting the
     // setpoint of a PID controller.
-    wpi::math::TrapezoidProfile<wpi::units::radians>::State goal;
+    wpi::math::TrapezoidProfile<wpi::units::radians_>::State goal;
     if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
       goal = {RAISED_POSITION, 0_rad_per_s};
@@ -134,7 +135,7 @@ class Robot : public wpi::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
+    motor.SetVoltage(wpi::units::volts<>{loop.U(0)});
   }
 };
 

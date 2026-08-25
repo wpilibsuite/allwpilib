@@ -38,8 +38,8 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * @param maxVelocity The max velocity of the trajectory.
    * @param maxAcceleration The max acceleration of the trajectory.
    */
-  TrajectoryConfig(wpi::units::meters_per_second_t maxVelocity,
-                   wpi::units::meters_per_second_squared_t maxAcceleration)
+  TrajectoryConfig(wpi::units::meters_per_second<> maxVelocity,
+                   wpi::units::meters_per_second_squared<> maxAcceleration)
       : m_maxVelocity(maxVelocity), m_maxAcceleration(maxAcceleration) {}
 
   TrajectoryConfig(const TrajectoryConfig&) = delete;
@@ -52,7 +52,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the start velocity of the trajectory.
    * @param startVelocity The start velocity of the trajectory.
    */
-  void SetStartVelocity(wpi::units::meters_per_second_t startVelocity) {
+  void SetStartVelocity(wpi::units::meters_per_second<> startVelocity) {
     m_startVelocity = startVelocity;
   }
 
@@ -60,7 +60,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Sets the end velocity of the trajectory.
    * @param endVelocity The end velocity of the trajectory.
    */
-  void SetEndVelocity(wpi::units::meters_per_second_t endVelocity) {
+  void SetEndVelocity(wpi::units::meters_per_second<> endVelocity) {
     m_endVelocity = endVelocity;
   }
 
@@ -115,7 +115,7 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the starting velocity of the trajectory.
    * @return The starting velocity of the trajectory.
    */
-  wpi::units::meters_per_second_t StartVelocity() const {
+  wpi::units::meters_per_second<> StartVelocity() const {
     return m_startVelocity;
   }
 
@@ -123,19 +123,19 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
    * Returns the ending velocity of the trajectory.
    * @return The ending velocity of the trajectory.
    */
-  wpi::units::meters_per_second_t EndVelocity() const { return m_endVelocity; }
+  wpi::units::meters_per_second<> EndVelocity() const { return m_endVelocity; }
 
   /**
    * Returns the maximum velocity of the trajectory.
    * @return The maximum velocity of the trajectory.
    */
-  wpi::units::meters_per_second_t MaxVelocity() const { return m_maxVelocity; }
+  wpi::units::meters_per_second<> MaxVelocity() const { return m_maxVelocity; }
 
   /**
    * Returns the maximum acceleration of the trajectory.
    * @return The maximum acceleration of the trajectory.
    */
-  wpi::units::meters_per_second_squared_t MaxAcceleration() const {
+  wpi::units::meters_per_second_squared<> MaxAcceleration() const {
     return m_maxAcceleration;
   }
 
@@ -155,10 +155,10 @@ class WPILIB_DLLEXPORT TrajectoryConfig {
   bool IsReversed() const { return m_reversed; }
 
  private:
-  wpi::units::meters_per_second_t m_startVelocity = 0_mps;
-  wpi::units::meters_per_second_t m_endVelocity = 0_mps;
-  wpi::units::meters_per_second_t m_maxVelocity;
-  wpi::units::meters_per_second_squared_t m_maxAcceleration;
+  wpi::units::meters_per_second<> m_startVelocity = 0_mps;
+  wpi::units::meters_per_second<> m_endVelocity = 0_mps;
+  wpi::units::meters_per_second<> m_maxVelocity;
+  wpi::units::meters_per_second_squared<> m_maxAcceleration;
   std::vector<std::unique_ptr<TrajectoryConstraint>> m_constraints;
   bool m_reversed = false;
 };

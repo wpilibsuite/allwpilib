@@ -20,7 +20,7 @@ namespace wpi {
  *
  * @param seconds Length of time to pause, in seconds.
  */
-void Wait(wpi::units::second_t seconds);
+void Wait(wpi::units::seconds<> seconds);
 
 /**
  * @brief  Gives real-time clock system time with nanosecond resolution
@@ -28,7 +28,7 @@ void Wait(wpi::units::second_t seconds);
  *         on Saturday.
  * @Common This is one of the commonly used methods for this class
  */
-wpi::units::second_t GetSystemTime();
+wpi::units::seconds<> GetSystemTime();
 
 /**
  * A timer class.
@@ -62,7 +62,7 @@ class Timer {
    * @return Current time value for this timer in seconds
    * @Common This is one of the commonly used methods for this class
    */
-  wpi::units::second_t Get() const;
+  wpi::units::seconds<> Get() const;
 
   /**
    * Reset the timer by setting the time to 0.
@@ -112,7 +112,7 @@ class Timer {
    * @param period The period to check.
    * @return       True if the period has passed.
    */
-  bool HasElapsed(wpi::units::second_t period) const;
+  bool HasElapsed(wpi::units::seconds<> period) const;
 
   /**
    * Check if the period specified has passed and if it has, advance the start
@@ -122,7 +122,7 @@ class Timer {
    * @param period The period to check for.
    * @return       True if the period has passed.
    */
-  bool AdvanceIfElapsed(wpi::units::second_t period);
+  bool AdvanceIfElapsed(wpi::units::seconds<> period);
 
   /**
    * Whether the timer is currently running.
@@ -151,7 +151,7 @@ class Timer {
    *
    * @returns Robot running time in seconds.
    */
-  static wpi::units::second_t GetTimestamp();
+  static wpi::units::seconds<> GetTimestamp();
 
   /**
    * Return the monotonic clock time in seconds.
@@ -160,7 +160,7 @@ class Timer {
    *
    * @returns Monotonic time in seconds.
    */
-  static wpi::units::second_t GetMonotonicTimestamp();
+  static wpi::units::seconds<> GetMonotonicTimestamp();
 
   /**
    * Return the approximate match time. The FMS does not send an official match
@@ -181,7 +181,7 @@ class Timer {
    *
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
-  static wpi::units::second_t GetMatchTime();
+  static wpi::units::seconds<> GetMatchTime();
 
  private:
   double GetNanoseconds() const;

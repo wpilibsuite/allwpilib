@@ -54,18 +54,18 @@ TEST_CASE("JoystickTest GetDirection", "[wpilibc]") {
   joysim.SetX(0.5);
   joysim.SetY(0);
   joysim.NotifyNewData();
-  REQUIRE_THAT(wpi::units::radian_t{90_deg}.value(),
+  REQUIRE_THAT(wpi::units::radians<>{90_deg}.value(),
                Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 
   joysim.SetX(0);
   joysim.SetY(-.5);
   joysim.NotifyNewData();
-  REQUIRE_THAT(wpi::units::radian_t{0_deg}.value(),
+  REQUIRE_THAT(wpi::units::radians<>{0_deg}.value(),
                Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 
   joysim.SetX(0.5);
   joysim.SetY(-0.5);
   joysim.NotifyNewData();
-  REQUIRE_THAT(wpi::units::radian_t{45_deg}.value(),
+  REQUIRE_THAT(wpi::units::radians<>{45_deg}.value(),
                Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 }

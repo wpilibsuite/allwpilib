@@ -19,14 +19,15 @@ namespace wpi::sim {
 class ElevatorSim : public LinearSystemSim<2, 1, 2> {
  public:
   template <typename Distance>
-  using Velocity_t = wpi::units::unit_t<wpi::units::compound_unit<
-      Distance, wpi::units::inverse<wpi::units::seconds>>>;
+  using Velocity_t = wpi::units::unit<wpi::units::compound_conversion_factor<
+      Distance, wpi::units::inverse<wpi::units::seconds_>>>;
 
   template <typename Distance>
-  using Acceleration_t = wpi::units::unit_t<wpi::units::compound_unit<
-      wpi::units::compound_unit<Distance,
-                                wpi::units::inverse<wpi::units::seconds>>,
-      wpi::units::inverse<wpi::units::seconds>>>;
+  using Acceleration_t =
+      wpi::units::unit<wpi::units::compound_conversion_factor<
+          wpi::units::compound_conversion_factor<
+              Distance, wpi::units::inverse<wpi::units::seconds_>>,
+          wpi::units::inverse<wpi::units::seconds_>>>;
 
   /**
    * Constructs a simulated elevator mechanism.
@@ -41,9 +42,9 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const wpi::math::LinearSystem<2, 1, 2>& plant,
-              const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
-              wpi::units::meter_t maxHeight, bool simulateGravity,
-              wpi::units::meter_t startingHeight,
+              const wpi::math::DCMotor& gearbox, wpi::units::meters<> minHeight,
+              wpi::units::meters<> maxHeight, bool simulateGravity,
+              wpi::units::meters<> startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -61,10 +62,10 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   ElevatorSim(const wpi::math::DCMotor& gearbox, double gearing,
-              wpi::units::kilogram_t carriageMass,
-              wpi::units::meter_t drumRadius, wpi::units::meter_t minHeight,
-              wpi::units::meter_t maxHeight, bool simulateGravity,
-              wpi::units::meter_t startingHeight,
+              wpi::units::kilograms<> carriageMass,
+              wpi::units::meters<> drumRadius, wpi::units::meters<> minHeight,
+              wpi::units::meters<> maxHeight, bool simulateGravity,
+              wpi::units::meters<> startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
 
   /**
@@ -80,13 +81,13 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param measurementStdDevs The standard deviation of the measurements.
    */
   template <typename Distance>
-    requires std::same_as<wpi::units::meter, Distance> ||
-             std::same_as<wpi::units::radian, Distance>
+    requires std::same_as<wpi::units::meters_, Distance> ||
+             std::same_as<wpi::units::radians_, Distance>
   ElevatorSim(decltype(1_V / Velocity_t<Distance>(1)) kV,
               decltype(1_V / Acceleration_t<Distance>(1)) kA,
-              const wpi::math::DCMotor& gearbox, wpi::units::meter_t minHeight,
-              wpi::units::meter_t maxHeight, bool simulateGravity,
-              wpi::units::meter_t startingHeight,
+              const wpi::math::DCMotor& gearbox, wpi::units::meters<> minHeight,
+              wpi::units::meters<> maxHeight, bool simulateGravity,
+              wpi::units::meters<> startingHeight,
               const std::array<double, 2>& measurementStdDevs = {0.0, 0.0});
   using LinearSystemSim::SetState;
 
@@ -97,8 +98,8 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param position The new position
    * @param velocity The new velocity
    */
-  void SetState(wpi::units::meter_t position,
-                wpi::units::meters_per_second_t velocity);
+  void SetState(wpi::units::meters<> position,
+                wpi::units::meters_per_second<> velocity);
 
   /**
    * Returns whether the elevator would hit the lower limit.
@@ -106,7 +107,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param elevatorHeight The elevator height.
    * @return Whether the elevator would hit the lower limit.
    */
-  bool WouldHitLowerLimit(wpi::units::meter_t elevatorHeight) const;
+  bool WouldHitLowerLimit(wpi::units::meters<> elevatorHeight) const;
 
   /**
    * Returns whether the elevator would hit the upper limit.
@@ -114,7 +115,7 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    * @param elevatorHeight The elevator height.
    * @return Whether the elevator would hit the upper limit.
    */
-  bool WouldHitUpperLimit(wpi::units::meter_t elevatorHeight) const;
+  bool WouldHitUpperLimit(wpi::units::meters<> elevatorHeight) const;
 
   /**
    * Returns whether the elevator has hit the lower limit.
@@ -135,28 +136,28 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    *
    * @return The position of the elevator.
    */
-  wpi::units::meter_t GetPosition() const;
+  wpi::units::meters<> GetPosition() const;
 
   /**
    * Returns the velocity of the elevator.
    *
    * @return The velocity of the elevator.
    */
-  wpi::units::meters_per_second_t GetVelocity() const;
+  wpi::units::meters_per_second<> GetVelocity() const;
 
   /**
    * Returns the elevator current draw.
    *
    * @return The elevator current draw.
    */
-  wpi::units::ampere_t GetCurrentDraw() const;
+  wpi::units::amperes<> GetCurrentDraw() const;
 
   /**
    * Sets the input voltage for the elevator.
    *
    * @param voltage The input voltage.
    */
-  void SetInputVoltage(wpi::units::volt_t voltage);
+  void SetInputVoltage(wpi::units::volts<> voltage);
 
  protected:
   /**
@@ -168,12 +169,12 @@ class ElevatorSim : public LinearSystemSim<2, 1, 2> {
    */
   wpi::math::Vectord<2> UpdateX(const wpi::math::Vectord<2>& currentXhat,
                                 const wpi::math::Vectord<1>& u,
-                                wpi::units::second_t dt) override;
+                                wpi::units::seconds<> dt) override;
 
  private:
   wpi::math::DCMotor m_gearbox;
-  wpi::units::meter_t m_minHeight;
-  wpi::units::meter_t m_maxHeight;
+  wpi::units::meters<> m_minHeight;
+  wpi::units::meters<> m_maxHeight;
   bool m_simulateGravity;
 };
 }  // namespace wpi::sim

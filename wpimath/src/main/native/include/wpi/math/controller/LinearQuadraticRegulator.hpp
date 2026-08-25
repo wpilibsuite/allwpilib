@@ -63,7 +63,7 @@ class LinearQuadraticRegulator {
   template <int Outputs>
   LinearQuadraticRegulator(const LinearSystem<States, Inputs, Outputs>& plant,
                            const StateArray& Qelems, const InputArray& Relems,
-                           wpi::units::second_t dt)
+                           wpi::units::seconds<> dt)
       : LinearQuadraticRegulator(plant.A(), plant.B(), Qelems, Relems, dt) {}
 
   /**
@@ -83,7 +83,7 @@ class LinearQuadraticRegulator {
   LinearQuadraticRegulator(const Matrixd<States, States>& A,
                            const Matrixd<States, Inputs>& B,
                            const StateArray& Qelems, const InputArray& Relems,
-                           wpi::units::second_t dt)
+                           wpi::units::seconds<> dt)
       : LinearQuadraticRegulator(A, B, CostMatrix(Qelems), CostMatrix(Relems),
                                  dt) {}
 
@@ -101,7 +101,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, Inputs>& B,
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
-                           wpi::units::second_t dt) {
+                           wpi::units::seconds<> dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -157,7 +157,7 @@ class LinearQuadraticRegulator {
                            const Matrixd<States, States>& Q,
                            const Matrixd<Inputs, Inputs>& R,
                            const Matrixd<States, Inputs>& N,
-                           wpi::units::second_t dt) {
+                           wpi::units::seconds<> dt) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(A, B, dt, &discA, &discB);
@@ -318,8 +318,8 @@ class LinearQuadraticRegulator {
    */
   template <int Outputs>
   void LatencyCompensate(const LinearSystem<States, Inputs, Outputs>& plant,
-                         wpi::units::second_t dt,
-                         wpi::units::second_t inputDelay) {
+                         wpi::units::seconds<> dt,
+                         wpi::units::seconds<> inputDelay) {
     Matrixd<States, States> discA;
     Matrixd<States, Inputs> discB;
     DiscretizeAB<States, Inputs>(plant.A(), plant.B(), dt, &discA, &discB);

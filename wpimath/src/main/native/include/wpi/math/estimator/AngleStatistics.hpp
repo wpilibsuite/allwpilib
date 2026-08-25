@@ -28,7 +28,7 @@ Vectord<States> AngleResidual(const Vectord<States>& a,
                               const Vectord<States>& b, int angleStateIdx) {
   Vectord<States> ret = a - b;
   ret[angleStateIdx] =
-      AngleModulus(wpi::units::radian_t{ret[angleStateIdx]}).value();
+      AngleModulus(wpi::units::radians<>{ret[angleStateIdx]}).value();
   return ret;
 }
 

@@ -21,7 +21,7 @@ TEST_CASE("DifferentialDriveKinematicsConstraintTest Constraint", "[wpimath]") {
   const auto maxVelocity = 12_fps;
   const DifferentialDriveKinematics kinematics{27_in};
 
-  auto config = TrajectoryConfig(12_fps, 12_fps_sq);
+  auto config = TrajectoryConfig(12_fps, 12_fps2);
   config.AddConstraint(
       DifferentialDriveKinematicsConstraint(kinematics, maxVelocity));
 

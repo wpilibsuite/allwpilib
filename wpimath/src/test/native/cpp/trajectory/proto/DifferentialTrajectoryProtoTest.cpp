@@ -16,13 +16,13 @@ const DifferentialTrajectory EXPECTED_DATA =
     DifferentialTrajectory{std::vector<DifferentialSample>{
         DifferentialSample{
             0_s, Pose2d{}, ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
-            ChassisAccelerations{0.5_mps_sq, 0_mps_sq, 0_rad_per_s_sq}, 0.9_mps,
+            ChassisAccelerations{0.5_mps2, 0_mps2, 0_rad_per_s_sq}, 0.9_mps,
             1.1_mps},
         DifferentialSample{
             1_s, Pose2d{1.1_m, 2.2_m, 30_deg},
             ChassisVelocities{1.5_mps, 0_mps, 0.3_rad_per_s},
-            ChassisAccelerations{0.1_mps_sq, 0_mps_sq, 0.4_rad_per_s_sq},
-            1.4_mps, 1.6_mps}}};
+            ChassisAccelerations{0.1_mps2, 0_mps2, 0.4_rad_per_s_sq}, 1.4_mps,
+            1.6_mps}}};
 }  // namespace
 
 TEST_CASE("DifferentialTrajectoryProtoTest Roundtrip", "[wpimath]") {

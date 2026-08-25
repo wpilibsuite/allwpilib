@@ -41,7 +41,7 @@ class XRPGyro {
    *
    * @return the current heading of the robot in radians.
    */
-  wpi::units::radian_t GetAngle() const;
+  wpi::units::radians<> GetAngle() const;
 
   /**
    * Gets the angle the robot is facing.
@@ -57,49 +57,49 @@ class XRPGyro {
    *
    * @return the current rate in radians per second
    */
-  wpi::units::radians_per_second_t GetRate() const;
+  wpi::units::radians_per_second<> GetRate() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the X-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  wpi::units::radians_per_second_t GetRateX() const;
+  wpi::units::radians_per_second<> GetRateX() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the Y-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  wpi::units::radians_per_second_t GetRateY() const;
+  wpi::units::radians_per_second<> GetRateY() const;
 
   /**
    * Gets the rate of turn in radians-per-second around the Z-axis.
    *
    * @return rate of turn in radians-per-second
    */
-  wpi::units::radians_per_second_t GetRateZ() const;
+  wpi::units::radians_per_second<> GetRateZ() const;
 
   /**
    * Gets the currently reported angle around the X-axis.
    *
    * @return current angle around X-axis in radians
    */
-  wpi::units::radian_t GetAngleX() const;
+  wpi::units::radians<> GetAngleX() const;
 
   /**
    * Gets the currently reported angle around the Y-axis.
    *
    * @return current angle around Y-axis in radians
    */
-  wpi::units::radian_t GetAngleY() const;
+  wpi::units::radians<> GetAngleY() const;
 
   /**
    * Gets the currently reported angle around the Z-axis.
    *
    * @return current angle around Z-axis in radians
    */
-  wpi::units::radian_t GetAngleZ() const;
+  wpi::units::radians<> GetAngleZ() const;
 
   /**
    * Reset the gyro angles to 0.
@@ -115,9 +115,9 @@ class XRPGyro {
   hal::SimDouble m_simAngleY;
   hal::SimDouble m_simAngleZ;
 
-  wpi::units::radian_t m_angleXOffset = 0_rad;
-  wpi::units::radian_t m_angleYOffset = 0_rad;
-  wpi::units::radian_t m_angleZOffset = 0_rad;
+  wpi::units::radians<> m_angleXOffset = 0_rad;
+  wpi::units::radians<> m_angleYOffset = 0_rad;
+  wpi::units::radians<> m_angleZOffset = 0_rad;
 };
 
 /** @} */

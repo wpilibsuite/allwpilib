@@ -107,8 +107,8 @@ void GoBildaPinpoint::SetErrorDetectionType(
   m_errorDetectionType = errorDetectionType;
 }
 
-void GoBildaPinpoint::SetOffsets(wpi::units::meter_t xOffset,
-                                 wpi::units::meter_t yOffset) {
+void GoBildaPinpoint::SetOffsets(wpi::units::meters<> xOffset,
+                                 wpi::units::meters<> yOffset) {
   float xOffsetMillimeters = MetersToMillimeters(xOffset, "xOffset");
   float yOffsetMillimeters = MetersToMillimeters(yOffset, "yOffset");
   WriteFloat(Register::X_POD_OFFSET, xOffsetMillimeters);
@@ -208,21 +208,21 @@ void GoBildaPinpoint::SetPose(const wpi::math::Pose2d& pose) {
   }
 }
 
-void GoBildaPinpoint::SetXPosition(wpi::units::meter_t position) {
+void GoBildaPinpoint::SetXPosition(wpi::units::meters<> position) {
   if (WriteFloat(Register::X_POSITION,
                  MetersToMillimeters(position, "position"))) {
     m_haveXPosition = false;
   }
 }
 
-void GoBildaPinpoint::SetYPosition(wpi::units::meter_t position) {
+void GoBildaPinpoint::SetYPosition(wpi::units::meters<> position) {
   if (WriteFloat(Register::Y_POSITION,
                  MetersToMillimeters(position, "position"))) {
     m_haveYPosition = false;
   }
 }
 
-void GoBildaPinpoint::SetHeading(wpi::units::radian_t heading) {
+void GoBildaPinpoint::SetHeading(wpi::units::radians<> heading) {
   if (WriteFloat(Register::H_ORIENTATION,
                  RequireFiniteFloat(heading.value(), "heading"))) {
     m_haveHeading = false;
@@ -285,9 +285,9 @@ int32_t GoBildaPinpoint::GetLoopTimeMicroseconds() {
   return m_loopTimeMicroseconds;
 }
 
-wpi::units::hertz_t GoBildaPinpoint::GetFrequency() {
+wpi::units::hertz<> GoBildaPinpoint::GetFrequency() {
   int32_t loopTime = GetLoopTimeMicroseconds();
-  return wpi::units::hertz_t{loopTime == 0 ? 0.0 : 1000000.0 / loopTime};
+  return wpi::units::hertz<>{loopTime == 0 ? 0.0 : 1000000.0 / loopTime};
 }
 
 int32_t GoBildaPinpoint::GetXEncoder() {
@@ -300,46 +300,46 @@ int32_t GoBildaPinpoint::GetYEncoder() {
   return m_yEncoderValue;
 }
 
-wpi::units::meter_t GoBildaPinpoint::GetXPosition() {
+wpi::units::meters<> GoBildaPinpoint::GetXPosition() {
   ReadIfNotInBulkScope(Register::X_POSITION);
-  return wpi::units::meter_t{m_xPositionMillimeters / 1000.0};
+  return wpi::units::meters<>{m_xPositionMillimeters / 1000.0};
 }
 
-wpi::units::meter_t GoBildaPinpoint::GetYPosition() {
+wpi::units::meters<> GoBildaPinpoint::GetYPosition() {
   ReadIfNotInBulkScope(Register::Y_POSITION);
-  return wpi::units::meter_t{m_yPositionMillimeters / 1000.0};
+  return wpi::units::meters<>{m_yPositionMillimeters / 1000.0};
 }
 
-wpi::units::radian_t GoBildaPinpoint::GetHeading() {
+wpi::units::radians<> GoBildaPinpoint::GetHeading() {
   ReadIfNotInBulkScope(Register::H_ORIENTATION);
-  return wpi::units::radian_t{m_headingRadians};
+  return wpi::units::radians<>{m_headingRadians};
 }
 
-wpi::units::meters_per_second_t GoBildaPinpoint::GetXVelocity() {
+wpi::units::meters_per_second<> GoBildaPinpoint::GetXVelocity() {
   ReadIfNotInBulkScope(Register::X_VELOCITY);
-  return wpi::units::meters_per_second_t{m_xVelocityMillimetersPerSecond /
+  return wpi::units::meters_per_second<>{m_xVelocityMillimetersPerSecond /
                                          1000.0};
 }
 
-wpi::units::meters_per_second_t GoBildaPinpoint::GetYVelocity() {
+wpi::units::meters_per_second<> GoBildaPinpoint::GetYVelocity() {
   ReadIfNotInBulkScope(Register::Y_VELOCITY);
-  return wpi::units::meters_per_second_t{m_yVelocityMillimetersPerSecond /
+  return wpi::units::meters_per_second<>{m_yVelocityMillimetersPerSecond /
                                          1000.0};
 }
 
-wpi::units::radians_per_second_t GoBildaPinpoint::GetHeadingVelocity() {
+wpi::units::radians_per_second<> GoBildaPinpoint::GetHeadingVelocity() {
   ReadIfNotInBulkScope(Register::H_VELOCITY);
-  return wpi::units::radians_per_second_t{m_headingVelocityRadiansPerSecond};
+  return wpi::units::radians_per_second<>{m_headingVelocityRadiansPerSecond};
 }
 
-wpi::units::meter_t GoBildaPinpoint::GetXOffset() {
+wpi::units::meters<> GoBildaPinpoint::GetXOffset() {
   ReadIfNotInBulkScope(Register::X_POD_OFFSET);
-  return wpi::units::meter_t{m_xPodOffsetMillimeters / 1000.0};
+  return wpi::units::meters<>{m_xPodOffsetMillimeters / 1000.0};
 }
 
-wpi::units::meter_t GoBildaPinpoint::GetYOffset() {
+wpi::units::meters<> GoBildaPinpoint::GetYOffset() {
   ReadIfNotInBulkScope(Register::Y_POD_OFFSET);
-  return wpi::units::meter_t{m_yPodOffsetMillimeters / 1000.0};
+  return wpi::units::meters<>{m_yPodOffsetMillimeters / 1000.0};
 }
 
 wpi::math::Pose2d GoBildaPinpoint::GetPose() {
@@ -347,9 +347,9 @@ wpi::math::Pose2d GoBildaPinpoint::GetPose() {
     ReadPose();
   }
   return wpi::math::Pose2d{
-      wpi::units::meter_t{m_xPositionMillimeters / 1000.0},
-      wpi::units::meter_t{m_yPositionMillimeters / 1000.0},
-      wpi::math::Rotation2d{wpi::units::radian_t{m_headingRadians}}};
+      wpi::units::meters<>{m_xPositionMillimeters / 1000.0},
+      wpi::units::meters<>{m_yPositionMillimeters / 1000.0},
+      wpi::math::Rotation2d{wpi::units::radians<>{m_headingRadians}}};
 }
 
 wpi::math::Quaternion GoBildaPinpoint::GetQuaternion() {
@@ -365,18 +365,18 @@ wpi::math::Rotation3d GoBildaPinpoint::GetRotation3d() {
   return wpi::math::Rotation3d{GetQuaternion()};
 }
 
-wpi::units::radian_t GoBildaPinpoint::GetPitch() {
+wpi::units::radians<> GoBildaPinpoint::GetPitch() {
   if (RequireFirmwareVersion3("Pitch output")) {
     ReadIfNotInBulkScope(Register::PITCH);
   }
-  return wpi::units::radian_t{m_pitchRadians};
+  return wpi::units::radians<>{m_pitchRadians};
 }
 
-wpi::units::radian_t GoBildaPinpoint::GetRoll() {
+wpi::units::radians<> GoBildaPinpoint::GetRoll() {
   if (RequireFirmwareVersion3("Roll output")) {
     ReadIfNotInBulkScope(Register::ROLL);
   }
-  return wpi::units::radian_t{m_rollRadians};
+  return wpi::units::radians<>{m_rollRadians};
 }
 
 int GoBildaPinpoint::ValidateAddress(int deviceAddress) {
@@ -386,7 +386,7 @@ int GoBildaPinpoint::ValidateAddress(int deviceAddress) {
   return deviceAddress;
 }
 
-float GoBildaPinpoint::MetersToMillimeters(wpi::units::meter_t meters,
+float GoBildaPinpoint::MetersToMillimeters(wpi::units::meters<> meters,
                                            const char* parameterName) {
   return RequireFiniteFloat(meters.value() * 1000.0, parameterName);
 }

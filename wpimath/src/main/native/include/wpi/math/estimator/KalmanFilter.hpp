@@ -71,7 +71,8 @@ class KalmanFilter {
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const StateArray& stateStdDevs,
-               const OutputArray& measurementStdDevs, wpi::units::second_t dt) {
+               const OutputArray& measurementStdDevs,
+               wpi::units::seconds<> dt) {
     m_plant = &plant;
 
     m_contQ = CovarianceMatrix(stateStdDevs);
@@ -184,7 +185,7 @@ class KalmanFilter {
    * @param u  New control input from controller.
    * @param dt Timestep for prediction.
    */
-  void Predict(const InputVector& u, wpi::units::second_t dt) {
+  void Predict(const InputVector& u, wpi::units::seconds<> dt) {
     // Find discrete A and Q
     StateMatrix discA;
     StateMatrix discQ;
@@ -251,7 +252,7 @@ class KalmanFilter {
   StateMatrix m_P;
   StateMatrix m_contQ;
   Matrixd<Outputs, Outputs> m_contR;
-  wpi::units::second_t m_dt;
+  wpi::units::seconds<> m_dt;
 
   StateMatrix m_initP;
 };

@@ -39,7 +39,7 @@ class DutyCycle : public wpi::telemetry::TelemetryLoggable {
    *
    * @return frequency
    */
-  wpi::units::hertz_t GetFrequency() const;
+  wpi::units::hertz<> GetFrequency() const;
 
   /**
    * Get the output ratio of the duty cycle signal.
@@ -55,7 +55,7 @@ class DutyCycle : public wpi::telemetry::TelemetryLoggable {
    *
    * @return high time of last pulse
    */
-  wpi::units::second_t GetHighTime() const;
+  wpi::units::seconds<> GetHighTime() const;
 
   /**
    * Get the channel of the source.

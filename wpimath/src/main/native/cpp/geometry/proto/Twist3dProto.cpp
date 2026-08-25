@@ -14,9 +14,9 @@ wpi::util::Protobuf<wpi::math::Twist3d>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Twist3d{
-      wpi::units::meter_t{msg.dx},  wpi::units::meter_t{msg.dy},
-      wpi::units::meter_t{msg.dz},  wpi::units::radian_t{msg.rx},
-      wpi::units::radian_t{msg.ry}, wpi::units::radian_t{msg.rz},
+      wpi::units::meters<>{msg.dx},  wpi::units::meters<>{msg.dy},
+      wpi::units::meters<>{msg.dz},  wpi::units::radians<>{msg.rx},
+      wpi::units::radians<>{msg.ry}, wpi::units::radians<>{msg.rz},
   };
 }
 

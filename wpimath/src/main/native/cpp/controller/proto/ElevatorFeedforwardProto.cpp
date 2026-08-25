@@ -16,10 +16,10 @@ std::optional<wpi::math::ElevatorFeedforward> wpi::util::Protobuf<
   }
 
   return wpi::math::ElevatorFeedforward{
-      wpi::units::volt_t{msg.ks},
-      wpi::units::volt_t{msg.kg},
-      wpi::units::unit_t<wpi::math::ElevatorFeedforward::kv_unit>{msg.kv},
-      wpi::units::unit_t<wpi::math::ElevatorFeedforward::ka_unit>{msg.ka},
+      wpi::units::volts<>{msg.ks},
+      wpi::units::volts<>{msg.kg},
+      wpi::units::unit<wpi::math::ElevatorFeedforward::kv_unit>{msg.kv},
+      wpi::units::unit<wpi::math::ElevatorFeedforward::ka_unit>{msg.ka},
   };
 }
 

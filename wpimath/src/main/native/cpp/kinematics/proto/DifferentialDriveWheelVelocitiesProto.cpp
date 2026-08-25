@@ -14,8 +14,8 @@ std::optional<wpi::math::DifferentialDriveWheelVelocities> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialDriveWheelVelocities{
-      wpi::units::meters_per_second_t{msg.left},
-      wpi::units::meters_per_second_t{msg.right},
+      wpi::units::meters_per_second<>{msg.left},
+      wpi::units::meters_per_second<>{msg.right},
   };
 }
 

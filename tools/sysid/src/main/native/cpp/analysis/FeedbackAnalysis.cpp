@@ -22,7 +22,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
     const FeedbackControllerPreset& preset, const LQRParameters& params,
     double Kv, double Ka) {
   using Kv_t = decltype(1_V / 1_mps);
-  using Ka_t = decltype(1_V / 1_mps_sq);
+  using Ka_t = decltype(1_V / 1_mps2);
 
   if (!std::isfinite(Kv) || !std::isfinite(Ka)) {
     return {0.0, 0.0};
@@ -54,7 +54,7 @@ FeedbackGains sysid::CalculatePositionFeedbackGains(
       controller.K(0, 0) * preset.outputConversionFactor,
       controller.K(0, 1) * preset.outputConversionFactor /
           (preset.normalized ? 1
-                             : wpi::units::second_t{preset.period}.value())};
+                             : wpi::units::seconds<>{preset.period}.value())};
 }
 
 FeedbackGains sysid::CalculateVelocityFeedbackGains(

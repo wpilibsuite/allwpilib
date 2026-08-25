@@ -69,7 +69,7 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
   });
 }
 
-LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
+LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz<> velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
   // Invert and multiply by 1,000,000,000 to get nanoseconds
@@ -89,7 +89,7 @@ LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
 }
 
 LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
-    wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
+    wpi::units::meters_per_second<> velocity, wpi::units::meters<> ledSpacing) {
   // Velocity is in terms of meters per second
   // Multiply by 1,000,000,000 to use nanoseconds instead of seconds
   auto nanosPerLed =
@@ -107,10 +107,10 @@ LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
   });
 }
 
-LEDPattern LEDPattern::Blink(wpi::units::second_t onTime,
-                             wpi::units::second_t offTime) {
-  auto totalNanos = wpi::units::nanosecond_t{onTime + offTime}.to<int64_t>();
-  auto onNanos = wpi::units::nanosecond_t{onTime}.to<int64_t>();
+LEDPattern LEDPattern::Blink(wpi::units::seconds<> onTime,
+                             wpi::units::seconds<> offTime) {
+  auto totalNanos = wpi::units::nanoseconds<>{onTime + offTime}.to<int64_t>();
+  auto onNanos = wpi::units::nanoseconds<>{onTime}.to<int64_t>();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
     if (wpi::util::Now() % totalNanos < onNanos) {
@@ -121,7 +121,7 @@ LEDPattern LEDPattern::Blink(wpi::units::second_t onTime,
   }};
 }
 
-LEDPattern LEDPattern::Blink(wpi::units::second_t onTime) {
+LEDPattern LEDPattern::Blink(wpi::units::seconds<> onTime) {
   return LEDPattern::Blink(onTime, onTime);
 }
 
@@ -135,8 +135,8 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
   }};
 }
 
-LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
-  auto periodNanos = wpi::units::nanosecond_t{period};
+LEDPattern LEDPattern::Breathe(wpi::units::seconds<> period) {
+  auto periodNanos = wpi::units::nanoseconds<>{period};
 
   return LEDPattern{[periodNanos, self = *this](auto data, auto writer) {
     self.ApplyTo(data, [&writer, periodNanos](int i, wpi::util::Color color) {

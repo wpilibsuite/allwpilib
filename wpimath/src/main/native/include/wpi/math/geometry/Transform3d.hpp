@@ -61,8 +61,8 @@ class WPILIB_DLLEXPORT Transform3d final {
    * @param z The z component of the translational component of the transform.
    * @param rotation The rotational component of the transform.
    */
-  constexpr Transform3d(wpi::units::meter_t x, wpi::units::meter_t y,
-                        wpi::units::meter_t z, Rotation3d rotation)
+  constexpr Transform3d(wpi::units::meters<> x, wpi::units::meters<> y,
+                        wpi::units::meters<> z, Rotation3d rotation)
       : m_translation{x, y, z}, m_rotation{std::move(rotation)} {}
 
   /**
@@ -112,21 +112,21 @@ class WPILIB_DLLEXPORT Transform3d final {
    *
    * @return The x component of the transformation's translation.
    */
-  constexpr wpi::units::meter_t X() const { return m_translation.X(); }
+  constexpr wpi::units::meters<> X() const { return m_translation.X(); }
 
   /**
    * Returns the Y component of the transformation's translation.
    *
    * @return The y component of the transformation's translation.
    */
-  constexpr wpi::units::meter_t Y() const { return m_translation.Y(); }
+  constexpr wpi::units::meters<> Y() const { return m_translation.Y(); }
 
   /**
    * Returns the Z component of the transformation's translation.
    *
    * @return The z component of the transformation's translation.
    */
-  constexpr wpi::units::meter_t Z() const { return m_translation.Z(); }
+  constexpr wpi::units::meters<> Z() const { return m_translation.Z(); }
 
   /**
    * Returns an affine transformation matrix representation of this
@@ -268,12 +268,12 @@ constexpr Twist3d Transform3d::Log() const {
 
     Vector3d translation_component = V_inv * u;
 
-    return Twist3d{wpi::units::meter_t{translation_component(0)},
-                   wpi::units::meter_t{translation_component(1)},
-                   wpi::units::meter_t{translation_component(2)},
-                   wpi::units::radian_t{rvec(0)},
-                   wpi::units::radian_t{rvec(1)},
-                   wpi::units::radian_t{rvec(2)}};
+    return Twist3d{wpi::units::meters<>{translation_component(0)},
+                   wpi::units::meters<>{translation_component(1)},
+                   wpi::units::meters<>{translation_component(2)},
+                   wpi::units::radians<>{rvec(0)},
+                   wpi::units::radians<>{rvec(1)},
+                   wpi::units::radians<>{rvec(2)}};
   };
 
   if consteval {

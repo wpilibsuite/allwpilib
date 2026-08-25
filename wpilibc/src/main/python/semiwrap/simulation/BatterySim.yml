@@ -1,13 +1,13 @@
 classes:
   wpi::sim::BatterySim:
     force_type_casters:
-    - wpi::units::ampere_t
+    - wpi::units::amperes<>
     methods:
       Calculate:
         overloads:
-          wpi::units::volt_t, wpi::units::ohm_t, std::span<const wpi::units::ampere_t>:
-          wpi::units::volt_t, wpi::units::ohm_t, std::initializer_list<wpi::units::ampere_t>:
+          wpi::units::volts<>, wpi::units::ohms<>, std::span<const wpi::units::amperes<>>:
+          wpi::units::volts<>, wpi::units::ohms<>, std::initializer_list<wpi::units::amperes<>>:
             ignore: true
-          std::span<const wpi::units::ampere_t>:
-          std::initializer_list<wpi::units::ampere_t>:
+          std::span<const wpi::units::amperes<>>:
+          std::initializer_list<wpi::units::amperes<>>:
             ignore: true

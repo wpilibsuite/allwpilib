@@ -15,7 +15,7 @@
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t DT = 20_ms;
+  static constexpr wpi::units::seconds<> DT = 20_ms;
 
   Robot() {
     // Note: These gains are fake, and will have to be tuned for your robot.
@@ -42,16 +42,16 @@ class Robot : public wpi::TimedRobot {
  private:
   wpi::Joystick joystick{1};
   ExampleSmartMotorController motor{1};
-  wpi::math::SimpleMotorFeedforward<wpi::units::meters> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::meters_> feedforward{
       // Note: These gains are fake, and will have to be tuned for your robot.
       1_V, 1.5_V * 1_s / 1_m};
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  wpi::math::TrapezoidProfile<wpi::units::meters> profile{
-      {1.75_mps, 0.75_mps_sq}};
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
-  wpi::math::TrapezoidProfile<wpi::units::meters>::State setpoint;
+  wpi::math::TrapezoidProfile<wpi::units::meters_> profile{
+      {1.75_mps, 0.75_mps2}};
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State goal;
+  wpi::math::TrapezoidProfile<wpi::units::meters_>::State setpoint;
 };
 
 #ifndef RUNNING_WPILIB_TESTS

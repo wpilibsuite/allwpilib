@@ -140,7 +140,7 @@ jobs:
             **/upstream_utils/**
             **/generated/**
             ./wpigui/src/main/native/cpp/portable-file-dialogs.*
-            ./wpimath/src/main/native/include/wpi/units/base.hpp
+            ./wpimath/src/test/native/cpp/units/main.cpp
             ./wpinet/src/main/native/linux/AvahiClient.*
             ./wpiutil/src/main/native/include/wpi/util/FastQueue.hpp
             ./wpiutil/src/test/native/cpp/json/**

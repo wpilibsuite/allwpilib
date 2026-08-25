@@ -12,7 +12,6 @@
 #include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
@@ -30,32 +29,32 @@ struct WPILIB_DLLEXPORT Twist3d final {
   /**
    * Linear "dx" component
    */
-  wpi::units::meter_t dx = 0_m;
+  wpi::units::meters<> dx = 0_m;
 
   /**
    * Linear "dy" component
    */
-  wpi::units::meter_t dy = 0_m;
+  wpi::units::meters<> dy = 0_m;
 
   /**
    * Linear "dz" component
    */
-  wpi::units::meter_t dz = 0_m;
+  wpi::units::meters<> dz = 0_m;
 
   /**
    * Rotation vector x component.
    */
-  wpi::units::radian_t rx = 0_rad;
+  wpi::units::radians<> rx = 0_rad;
 
   /**
    * Rotation vector y component.
    */
-  wpi::units::radian_t ry = 0_rad;
+  wpi::units::radians<> ry = 0_rad;
 
   /**
    * Rotation vector z component.
    */
-  wpi::units::radian_t rz = 0_rad;
+  wpi::units::radians<> rz = 0_rad;
 
   /**
    * Obtain a new Transform3d from a (constant curvature) velocity.
@@ -82,12 +81,12 @@ struct WPILIB_DLLEXPORT Twist3d final {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const Twist3d& other) const {
-    return wpi::units::math::abs(dx - other.dx) < 1E-9_m &&
-           wpi::units::math::abs(dy - other.dy) < 1E-9_m &&
-           wpi::units::math::abs(dz - other.dz) < 1E-9_m &&
-           wpi::units::math::abs(rx - other.rx) < 1E-9_rad &&
-           wpi::units::math::abs(ry - other.ry) < 1E-9_rad &&
-           wpi::units::math::abs(rz - other.rz) < 1E-9_rad;
+    return wpi::units::abs(dx - other.dx) < 1E-9_m &&
+           wpi::units::abs(dy - other.dy) < 1E-9_m &&
+           wpi::units::abs(dz - other.dz) < 1E-9_m &&
+           wpi::units::abs(rx - other.rx) < 1E-9_rad &&
+           wpi::units::abs(ry - other.ry) < 1E-9_rad &&
+           wpi::units::abs(rz - other.rz) < 1E-9_rad;
   }
 
   /**
@@ -153,9 +152,9 @@ constexpr Transform3d Twist3d::Exp() const {
     Vector3d translation_component = V * u;
 
     const Transform3d transform{
-        Translation3d{wpi::units::meter_t{translation_component(0)},
-                      wpi::units::meter_t{translation_component(1)},
-                      wpi::units::meter_t{translation_component(2)}},
+        Translation3d{wpi::units::meters<>{translation_component(0)},
+                      wpi::units::meters<>{translation_component(1)},
+                      wpi::units::meters<>{translation_component(2)}},
         Rotation3d{R}};
 
     return transform;

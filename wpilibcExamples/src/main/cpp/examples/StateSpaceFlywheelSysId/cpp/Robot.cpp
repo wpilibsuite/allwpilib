@@ -22,7 +22,7 @@ class Robot : public wpi::TimedRobot {
   static constexpr int ENCODER_A_CHANNEL = 0;
   static constexpr int ENCODER_B_CHANNEL = 1;
   static constexpr int JOYSTICK_PORT = 0;
-  static constexpr wpi::units::radians_per_second_t SPINUP = 500_rpm;
+  static constexpr wpi::units::radians_per_second<> SPINUP = 500_rpm;
 
   // Volts per (radian per second)
   static constexpr auto FLYWHEEL_KV = 0.023_V / 1_rad_per_s;
@@ -106,7 +106,7 @@ class Robot : public wpi::TimedRobot {
     // Send the new calculated voltage to the motors.
     // voltage = duty cycle * battery voltage, so
     // duty cycle = voltage / battery voltage
-    motor.SetVoltage(wpi::units::volt_t{loop.U(0)});
+    motor.SetVoltage(wpi::units::volts<>{loop.U(0)});
   }
 };
 

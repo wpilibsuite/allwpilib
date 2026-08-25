@@ -13,7 +13,7 @@ namespace {
 const HolonomicSample EXPECTED_DATA =
     HolonomicSample{1.5_s, Pose2d{1.1_m, 2.2_m, 30_deg},
                     ChassisVelocities{1_mps, 2_mps, 3_rad_per_s},
-                    ChassisAccelerations{4_mps_sq, 5_mps_sq, 6_rad_per_s_sq}};
+                    ChassisAccelerations{4_mps2, 5_mps2, 6_rad_per_s_sq}};
 }  // namespace
 
 TEST_CASE("HolonomicSampleProtoTest Roundtrip", "[wpimath]") {

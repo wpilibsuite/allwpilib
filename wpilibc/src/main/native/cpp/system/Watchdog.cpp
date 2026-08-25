@@ -104,7 +104,7 @@ void Watchdog::Impl::Main() {
     // has occurred, so call its timeout function.
     auto watchdog = m_watchdogs.pop();
 
-    wpi::units::second_t now{curTime * 1e-9};
+    wpi::units::seconds<> now{curTime * 1e-9};
     if (now - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {
@@ -126,7 +126,8 @@ void Watchdog::Impl::Main() {
   }
 }
 
-Watchdog::Watchdog(wpi::units::second_t timeout, std::function<void()> callback)
+Watchdog::Watchdog(wpi::units::seconds<> timeout,
+                   std::function<void()> callback)
     : m_timeout(timeout), m_callback(std::move(callback)), m_impl(GetImpl()) {}
 
 Watchdog::~Watchdog() {
@@ -159,11 +160,11 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   return *this;
 }
 
-wpi::units::second_t Watchdog::GetTime() const {
+wpi::units::seconds<> Watchdog::GetTime() const {
   return Timer::GetMonotonicTimestamp() - m_startTime;
 }
 
-void Watchdog::SetTimeout(wpi::units::second_t timeout) {
+void Watchdog::SetTimeout(wpi::units::seconds<> timeout) {
   m_startTime = Timer::GetMonotonicTimestamp();
   m_tracer.ClearEpochs();
 
@@ -177,7 +178,7 @@ void Watchdog::SetTimeout(wpi::units::second_t timeout) {
   m_impl->UpdateAlarm();
 }
 
-wpi::units::second_t Watchdog::GetTimeout() const {
+wpi::units::seconds<> Watchdog::GetTimeout() const {
   std::scoped_lock lock(m_impl->m_mutex);
   return m_timeout;
 }

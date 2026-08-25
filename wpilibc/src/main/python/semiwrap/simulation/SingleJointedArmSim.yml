@@ -7,11 +7,11 @@ classes:
     methods:
       SingleJointedArmSim:
         overloads:
-          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, double, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
+          ? const wpi::math::LinearSystem<2, 1, 2>&, const wpi::math::DCMotor&, double, wpi::units::meters<>, wpi::units::radians<>, wpi::units::radians<>, bool, wpi::units::radians<>, const std::array<double, 2>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 2>{0.0, 0.0}
-          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meter_t, wpi::units::meter_t, wpi::units::radian_t, wpi::units::radian_t, bool, wpi::units::radian_t, const std::array<double, 2>&
+          ? const wpi::math::DCMotor&, double, wpi::units::kilogram_square_meters<>, wpi::units::meters<>, wpi::units::radians<>, wpi::units::radians<>, bool, wpi::units::radians<>, const std::array<double, 2>&
           : param_override:
               measurementStdDevs:
                 default: std::array<double, 2>{0.0, 0.0}
@@ -29,10 +29,10 @@ classes:
 
 inline_code: |-
   cls_SingleJointedArmSim
-    .def("get_angle_degrees", [](SingleJointedArmSim * self) -> wpi::units::degree_t {
+    .def("get_angle_degrees", [](SingleJointedArmSim * self) -> wpi::units::degrees<> {
       return self->GetAngle();
     })
-    .def("get_velocity_dps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second_t {
+    .def("get_velocity_dps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second<> {
       return self->GetVelocity();
     })
   ;

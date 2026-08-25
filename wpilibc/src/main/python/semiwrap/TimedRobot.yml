@@ -18,5 +18,5 @@ classes:
             default: 0_s
       TimedRobot:
         overloads:
-          wpi::units::second_t:
-          wpi::units::hertz_t:
+          wpi::units::seconds<>:
+          wpi::units::hertz<>:

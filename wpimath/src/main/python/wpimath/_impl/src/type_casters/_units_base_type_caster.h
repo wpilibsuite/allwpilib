@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pybind11/pybind11.h>
+#include <wpi/units/core.hpp>
 
 namespace pybind11 {
 namespace detail {
@@ -11,27 +12,25 @@ namespace detail {
   When going from C++ to Python (eg, return values), the units that a user
   gets as a float are in whatever the unit was for C++.
 
-    wpi::units::foot_t getFeet();    // converted to float, value is feet
+    wpi::units::feet<> getFeet();    // converted to float, value is feet
 
   When going from Python to C++, the units a user uses are once again
   whatever the C++ function specifies:
 
-    void setFeet(wpi::units::foot_t ft);   // must pass a float, it's in feet
-    void setMeters(wpi::units::meter_t m); // must pass a float, it's in meters
+    void setFeet(wpi::units::feet<> ft);    // must pass a float, it's in feet
+    void setMeters(wpi::units::meters<> m); // must pass a float, it's in meters
 
   Unfortunately, with this type caster and robotpy-build there are mismatch
   issues with implicit conversions when default values are used that don't
   match the actual value:
 
-    foo(wpi::units::second_t tm = 10_ms);    // if not careful, pybind11 will 
-                                        // store as 10 seconds
+    foo(wpi::units::seconds<> tm = 10_ms);    // if not careful, pybind11 will
+                                              // store as 10 seconds
 */
-template <class U, typename T, template <typename> class S>
-struct type_caster<wpi::units::unit_t<U, T, S>> {
-  using value_type = wpi::units::unit_t<U, T, S>;
-
+template <wpi::units::UnitType Unit>
+struct type_caster<Unit> {
   // TODO: there should be a way to include the type with this
-  PYBIND11_TYPE_CASTER(value_type, handle_type_name<value_type>::name);
+  PYBIND11_TYPE_CASTER(Unit, handle_type_name<Unit>::name);
 
   // Python -> C++
   bool load(handle src, bool convert) {
@@ -40,14 +39,14 @@ struct type_caster<wpi::units::unit_t<U, T, S>> {
     if (!convert && !PyFloat_Check(src.ptr()))
       return false;
     auto cvted = PyFloat_AsDouble(src.ptr());
-    value = value_type(cvted);
+    value = Unit(cvted);
     return !(cvted == -1 && PyErr_Occurred());
   }
 
   // C++ -> Python
-  static handle cast(const value_type &src, return_value_policy /* policy */,
+  static handle cast(const Unit& src, return_value_policy /* policy */,
                      handle /* parent */) {
-    return PyFloat_FromDouble(src.template to<double>());
+    return PyFloat_FromDouble(src.raw());
   }
 };
 

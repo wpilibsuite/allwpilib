@@ -25,12 +25,12 @@ void wpi::math::to_json(wpi::util::json& json,
 void wpi::math::from_json(const wpi::util::json& json,
                           DifferentialSample& sample) {
   sample = DifferentialSample{
-      wpi::units::second_t{json.at("time").get_number()},
+      wpi::units::seconds<>{json.at("time").get_number()},
       json.at("pose").get<Pose2d>(),
       json.at("velocity").get<ChassisVelocities>(),
       json.at("acceleration").get<ChassisAccelerations>(),
-      wpi::units::meters_per_second_t{json.at("leftVelocity").get_number()},
-      wpi::units::meters_per_second_t{json.at("rightVelocity").get_number()}};
+      wpi::units::meters_per_second<>{json.at("leftVelocity").get_number()},
+      wpi::units::meters_per_second<>{json.at("rightVelocity").get_number()}};
 }
 
 void wpi::math::to_json(wpi::util::json& json,

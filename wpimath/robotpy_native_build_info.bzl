@@ -9,6 +9,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + ["//wpimath:generated-native-include-files"] + native.glob([
             "src/main/native/thirdparty/gcem/include/**",
             "src/main/native/thirdparty/sleipnir/include/**",
+            "src/main/native/thirdparty/units/include/**",
         ]),
         out = "native/wpimath/include",
         root_paths = ["src/main/native/include/"],
@@ -17,6 +18,7 @@ def define_native_wrapper(name, pyproject_toml = None):
             "wpimath/src/main/native/include": "",
             "wpimath/src/main/native/thirdparty/gcem/include": "",
             "wpimath/src/main/native/thirdparty/sleipnir/include": "",
+            "wpimath/src/main/native/thirdparty/units/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],

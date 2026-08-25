@@ -35,7 +35,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @param type         Which type of state change the debouncing will be
    *                     performed on.
    */
-  explicit Debouncer(wpi::units::second_t debounceTime,
+  explicit Debouncer(wpi::units::seconds<> debounceTime,
                      DebounceType type = DebounceType::RISING);
 
   /**
@@ -52,7 +52,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @param time The number of seconds the value must change from baseline
    *             for the filtered value to change.
    */
-  constexpr void SetDebounceTime(wpi::units::second_t time) {
+  constexpr void SetDebounceTime(wpi::units::seconds<> time) {
     m_debounceTime = time;
   }
 
@@ -62,7 +62,7 @@ class WPILIB_DLLEXPORT Debouncer {
    * @return The number of seconds the value must change from baseline
    *             for the filtered value to change.
    */
-  constexpr wpi::units::second_t GetDebounceTime() const {
+  constexpr wpi::units::seconds<> GetDebounceTime() const {
     return m_debounceTime;
   }
 
@@ -85,11 +85,11 @@ class WPILIB_DLLEXPORT Debouncer {
   constexpr DebounceType GetDebounceType() const { return m_debounceType; }
 
  private:
-  wpi::units::second_t m_debounceTime;
+  wpi::units::seconds<> m_debounceTime;
   bool m_baseline;
   DebounceType m_debounceType;
 
-  wpi::units::second_t m_prevTime;
+  wpi::units::seconds<> m_prevTime;
 
   void ResetTimer();
 

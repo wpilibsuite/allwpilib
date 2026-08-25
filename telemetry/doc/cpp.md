@@ -138,7 +138,7 @@ class Shooter {
  private:
   wpi::telemetry::TelemetryTable& m_telemetry = wpi::telemetry::GetTable("Shooter");
   wpi::Encoder m_encoder{0, 1};
-  units::volt_t m_lastVoltage = 0_V;
+  wpi::units::volts<> m_lastVoltage = 0_V;
 };
 ```
 

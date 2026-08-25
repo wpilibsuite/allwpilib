@@ -35,7 +35,7 @@ Field::Field(std::string_view path) {
 
 Field::Field(std::string_view name, std::string_view season,
              std::string_view game, std::optional<FieldImage> image,
-             wpi::units::meter_t fieldLength, wpi::units::meter_t fieldWidth,
+             wpi::units::meters<> fieldLength, wpi::units::meters<> fieldWidth,
              std::string_view program, std::vector<FieldTag> tags)
     : m_name{name},
       m_season{season},
@@ -90,11 +90,11 @@ std::optional<FieldImage> Field::GetImage() const {
   return m_image;
 }
 
-wpi::units::meter_t Field::GetLength() const {
+wpi::units::meters<> Field::GetLength() const {
   return m_fieldLength;
 }
 
-wpi::units::meter_t Field::GetWidth() const {
+wpi::units::meters<> Field::GetWidth() const {
   return m_fieldWidth;
 }
 
@@ -245,10 +245,10 @@ void wpi::fields::from_json(const wpi::util::json& json, Field& field) {
     field.m_image = json.at("field-image").get<FieldImage>();
   }
 
-  field.m_fieldLength = wpi::units::meter_t{
+  field.m_fieldLength = wpi::units::meters<>{
       json.at("field-dimensions").at("length").get_number()};
-  field.m_fieldWidth =
-      wpi::units::meter_t{json.at("field-dimensions").at("width").get_number()};
+  field.m_fieldWidth = wpi::units::meters<>{
+      json.at("field-dimensions").at("width").get_number()};
   field.m_program = json.at("program").get_string();
   field.m_resourceFile.clear();
   field.m_hasTags = json.contains("field-tags");

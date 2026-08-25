@@ -8,8 +8,8 @@ classes:
     methods:
       TimeInterpolatableBuffer:
         overloads:
-          wpi::units::second_t, std::function<T (const T&, const T&, double)>:
-          wpi::units::second_t:
+          wpi::units::seconds<>, std::function<T (const T&, const T&, double)>:
+          wpi::units::seconds<>:
       AddSample:
       Clear:
       Sample:

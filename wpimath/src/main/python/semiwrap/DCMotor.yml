@@ -16,8 +16,8 @@ classes:
       DCMotor:
       Current:
         overloads:
-          wpi::units::radians_per_second_t, wpi::units::volt_t [const]:
-          wpi::units::newton_meter_t [const]:
+          wpi::units::radians_per_second<>, wpi::units::volts<> [const]:
+          wpi::units::newton_meters<> [const]:
       Torque:
       Voltage:
       Velocity:

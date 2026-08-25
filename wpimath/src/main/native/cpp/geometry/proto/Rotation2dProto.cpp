@@ -14,7 +14,7 @@ wpi::util::Protobuf<wpi::math::Rotation2d>::Unpack(InputStream& stream) {
   }
 
   return wpi::math::Rotation2d{
-      wpi::units::radian_t{msg.value},
+      wpi::units::radians<>{msg.value},
   };
 }
 

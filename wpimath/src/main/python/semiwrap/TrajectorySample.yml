@@ -23,7 +23,7 @@ classes:
       TrajectorySample:
         overloads:
           "":
-          wpi::units::second_t:
+          wpi::units::seconds<>:
       operator==:
 
 inline_code: |

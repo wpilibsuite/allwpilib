@@ -13,7 +13,7 @@ classes:
       SetPose:
         overloads:
           const wpi::math::Pose2d&:
-          wpi::units::meter_t, wpi::units::meter_t, wpi::math::Rotation2d:
+          wpi::units::meters<>, wpi::units::meters<>, wpi::math::Rotation2d:
       GetPose:
       SetPoses:
         overloads:

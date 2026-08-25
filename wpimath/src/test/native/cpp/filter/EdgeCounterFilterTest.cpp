@@ -11,12 +11,12 @@
 #include "wpi/units/time.hpp"
 #include "wpi/util/timestamp.h"
 
-static wpi::units::second_t now = 0_s;
+static wpi::units::seconds<> now = 0_s;
 
 class EdgeCounterFilterTest {
  protected:
   EdgeCounterFilterTest() {
-    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanoseconds<>{now}.to<int64_t>(); });
     now = 0_ms;
   }
 

@@ -24,7 +24,7 @@ TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
                                            0.01_V / 1_rad_per_s_sq);
   wpi::sim::FlywheelSim sim{plant, wpi::math::DCMotor::NEO(2)};
   wpi::math::PIDController controller{0.2, 0.0, 0.0};
-  wpi::math::SimpleMotorFeedforward<wpi::units::radian> feedforward{
+  wpi::math::SimpleMotorFeedforward<wpi::units::radians_> feedforward{
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
@@ -36,7 +36,7 @@ TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
   for (int i = 0; i < 100; i++) {
     // RobotPeriodic runs first
     auto voltageOut = controller.Calculate(encoder.GetRate(), 200.0);
-    motor.SetVoltage(wpi::units::volt_t{voltageOut} +
+    motor.SetVoltage(wpi::units::volts<>{voltageOut} +
                      feedforward.Calculate(200_rad_per_s));
 
     // Then, SimulationPeriodic runs

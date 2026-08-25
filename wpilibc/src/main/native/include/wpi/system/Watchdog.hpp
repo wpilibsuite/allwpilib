@@ -31,10 +31,10 @@ class Watchdog {
    *                 resolution.
    * @param callback This function is called when the timeout expires.
    */
-  Watchdog(wpi::units::second_t timeout, std::function<void()> callback);
+  Watchdog(wpi::units::seconds<> timeout, std::function<void()> callback);
 
   template <typename Callable, typename Arg, typename... Args>
-  Watchdog(wpi::units::second_t timeout, Callable&& f, Arg&& arg,
+  Watchdog(wpi::units::seconds<> timeout, Callable&& f, Arg&& arg,
            Args&&... args)
       : Watchdog(timeout,
                  std::bind(std::forward<Callable>(f), std::forward<Arg>(arg),
@@ -48,7 +48,7 @@ class Watchdog {
   /**
    * Returns the time since the watchdog was last fed.
    */
-  wpi::units::second_t GetTime() const;
+  wpi::units::seconds<> GetTime() const;
 
   /**
    * Sets the watchdog's timeout.
@@ -56,12 +56,12 @@ class Watchdog {
    * @param timeout The watchdog's timeout in seconds with nanosecond
    *                resolution.
    */
-  void SetTimeout(wpi::units::second_t timeout);
+  void SetTimeout(wpi::units::seconds<> timeout);
 
   /**
    * Returns the watchdog's timeout.
    */
-  wpi::units::second_t GetTimeout() const;
+  wpi::units::seconds<> GetTimeout() const;
 
   /**
    * Returns true if the watchdog timer has expired.
@@ -114,11 +114,11 @@ class Watchdog {
   // Used for timeout print rate-limiting
   static constexpr auto MIN_PRINT_PERIOD = 1_s;
 
-  wpi::units::second_t m_startTime = 0_s;
-  wpi::units::second_t m_timeout;
-  wpi::units::second_t m_expirationTime = 0_s;
+  wpi::units::seconds<> m_startTime = 0_s;
+  wpi::units::seconds<> m_timeout;
+  wpi::units::seconds<> m_expirationTime = 0_s;
   std::function<void()> m_callback;
-  wpi::units::second_t m_lastTimeoutPrintTime = 0_s;
+  wpi::units::seconds<> m_lastTimeoutPrintTime = 0_s;
 
   Tracer m_tracer;
   bool m_isExpired = false;

@@ -20,7 +20,7 @@
  */
 
 namespace DriveConstants {
-inline constexpr wpi::units::second_t DT{0.02};
+inline constexpr wpi::units::seconds<> DT{0.02};
 inline constexpr int LEFT_MOTOR1_PORT = 0;
 inline constexpr int LEFT_MOTOR2_PORT = 1;
 inline constexpr int RIGHT_MOTOR1_PORT = 2;
@@ -37,7 +37,7 @@ inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
 inline constexpr double kp = 1;
 
 inline constexpr auto MAX_VELOCITY = 3_mps;
-inline constexpr auto MAX_ACCELERATION = 3_mps_sq;
+inline constexpr auto MAX_ACCELERATION = 3_mps2;
 
 }  // namespace DriveConstants
 

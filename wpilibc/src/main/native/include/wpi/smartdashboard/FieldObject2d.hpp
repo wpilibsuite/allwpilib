@@ -55,7 +55,7 @@ class FieldObject2d {
    * @param y Y location
    * @param rotation rotation
    */
-  void SetPose(wpi::units::meter_t x, wpi::units::meter_t y,
+  void SetPose(wpi::units::meters<> x, wpi::units::meters<> y,
                wpi::math::Rotation2d rotation);
 
   /**

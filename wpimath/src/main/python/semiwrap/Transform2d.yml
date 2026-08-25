@@ -6,16 +6,16 @@ extra_includes:
 classes:
   wpi::math::Transform2d:
     force_type_casters:
-    - wpi::units::foot_t
-    - wpi::units::meter_t
-    - wpi::units::radian_t
+    - wpi::units::feet<>
+    - wpi::units::meters<>
+    - wpi::units::radians<>
     methods:
       Transform2d:
         overloads:
           const Pose2d&, const Pose2d&:
             keepalive: []
           Translation2d, Rotation2d:
-          wpi::units::meter_t, wpi::units::meter_t, Rotation2d:
+          wpi::units::meters<>, wpi::units::meters<>, Rotation2d:
           const Eigen::Matrix3d&:
             rename: from_matrix
             keepalive: []
@@ -34,18 +34,18 @@ classes:
 
 inline_code: |
   cls_Transform2d
-    .def_static("from_feet", [](wpi::units::foot_t x, wpi::units::foot_t y, wpi::units::radian_t angle){
+    .def_static("from_feet", [](wpi::units::feet<> x, wpi::units::feet<> y, wpi::units::radians<> angle){
       return std::make_unique<Transform2d>(Translation2d(x, y), Rotation2d(angle));
     }, py::arg("x"), py::arg("y"), py::arg("angle"))
-    .def(py::init([](wpi::units::meter_t x, wpi::units::meter_t y, wpi::units::radian_t angle) {
+    .def(py::init([](wpi::units::meters<> x, wpi::units::meters<> y, wpi::units::radians<> angle) {
       return std::make_unique<Transform2d>(Translation2d(x, y), Rotation2d(angle));
     }), py::arg("x"), py::arg("y"), py::arg("angle"))
     .def_property_readonly("x", &Transform2d::X)
     .def_property_readonly("y", &Transform2d::Y)
-    .def_property_readonly("x_feet", [](Transform2d * self) -> wpi::units::foot_t {
+    .def_property_readonly("x_feet", [](Transform2d * self) -> wpi::units::feet<> {
       return self->X();
     })
-    .def_property_readonly("y_feet", [](Transform2d * self) -> wpi::units::foot_t {
+    .def_property_readonly("y_feet", [](Transform2d * self) -> wpi::units::feet<> {
       return self->Y();
     })
     .def("__repr__", py::overload_cast<const Transform2d&>(&rpy::toString));

@@ -15,7 +15,7 @@
 class Drivetrain : public wpi::cmd::SubsystemBase {
  public:
   static constexpr double COUNTS_PER_REVOLUTION = 1440.0;
-  static constexpr wpi::units::meter_t WHEEL_DIAMETER = 70_mm;
+  static constexpr wpi::units::meters<> WHEEL_DIAMETER = 70_mm;
 
   Drivetrain();
 
@@ -56,42 +56,42 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
    *
    * @return the left-side distance driven
    */
-  wpi::units::meter_t GetLeftDistance();
+  wpi::units::meters<> GetLeftDistance();
 
   /**
    * Gets the right distance driven.
    *
    * @return the right-side distance driven
    */
-  wpi::units::meter_t GetRightDistance();
+  wpi::units::meters<> GetRightDistance();
 
   /**
    * Returns the average distance traveled by the left and right encoders.
    *
    * @return The average distance traveled by the left and right encoders.
    */
-  wpi::units::meter_t GetAverageDistance();
+  wpi::units::meters<> GetAverageDistance();
 
   /**
    * Current angle of the Romi around the X-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleX();
+  wpi::units::radians<> GetGyroAngleX();
 
   /**
    * Current angle of the Romi around the Y-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleY();
+  wpi::units::radians<> GetGyroAngleY();
 
   /**
    * Current angle of the Romi around the Z-axis.
    *
    * @return The current angle of the Romi.
    */
-  wpi::units::radian_t GetGyroAngleZ();
+  wpi::units::radians<> GetGyroAngleZ();
 
   /**
    * Reset the gyro.

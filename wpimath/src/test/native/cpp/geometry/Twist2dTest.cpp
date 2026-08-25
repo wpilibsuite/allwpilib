@@ -28,7 +28,7 @@ TEST_CASE("Twist2dTest Straight", "[wpimath]") {
 
 TEST_CASE("Twist2dTest QuarterCircle", "[wpimath]") {
   const Twist2d quarterCircle{5_m / 2.0 * std::numbers::pi, 0_m,
-                              wpi::units::radian_t{std::numbers::pi / 2.0}};
+                              wpi::units::radians<>{std::numbers::pi / 2.0}};
   const auto quarterCircleTransform = quarterCircle.Exp();
 
   CHECK_DOUBLE_EQ(5.0, quarterCircleTransform.X().value());
@@ -63,8 +63,8 @@ TEST_CASE("Twist2dTest Pose2dLog", "[wpimath]") {
 
   const auto twist = (end - start).Log();
 
-  Twist2d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi}, 0_m,
-                   wpi::units::radian_t{std::numbers::pi / 2.0}};
+  Twist2d expected{wpi::units::meters<>{5.0 / 2.0 * std::numbers::pi}, 0_m,
+                   wpi::units::radians<>{std::numbers::pi / 2.0}};
   CHECK(expected == twist);
 
   // Make sure computed twist gives back original end pose

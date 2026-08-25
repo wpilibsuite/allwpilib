@@ -6,7 +6,6 @@
 
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
 
@@ -18,7 +17,7 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
   /**
    * Velocity of the wheel of the module.
    */
-  wpi::units::meters_per_second_t velocity = 0_mps;
+  wpi::units::meters_per_second<> velocity = 0_mps;
 
   /**
    * Angle of the module.
@@ -32,7 +31,7 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
    * @return Whether the two objects are equal.
    */
   constexpr bool operator==(const SwerveModuleVelocity& other) const {
-    return wpi::units::math::abs(velocity - other.velocity) < 1E-9_mps &&
+    return wpi::units::abs(velocity - other.velocity) < 1E-9_mps &&
            angle == other.angle;
   }
 
@@ -49,7 +48,7 @@ struct WPILIB_DLLEXPORT SwerveModuleVelocity {
   constexpr SwerveModuleVelocity Optimize(
       const Rotation2d& currentAngle) const {
     auto delta = angle - currentAngle;
-    if (wpi::units::math::abs(delta.Degrees()) > 90_deg) {
+    if (wpi::units::abs(delta.Degrees()) > 90_deg) {
       return {-velocity, angle + Rotation2d{180_deg}};
     } else {
       return {velocity, angle};
