@@ -375,7 +375,7 @@ public class {{ ClassName }}Controller implements HIDDevice, TelemetryLoggable {
     table.log("{{ axis.MethodName }}", get{{ axis.MethodName }}());
 {%- endfor -%}
 {% for button in buttons %}
-    table.log("{{ button.MethodName }}Button", get{{ button.MethodName }}Button());
+    table.log("{{ button.MethodName }}", get{{ button.MethodName }}Button());
 {%- endfor %}
   }
 }

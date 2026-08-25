@@ -141,6 +141,6 @@ void {{ ClassName }}Controller::LogTo(wpi::telemetry::TelemetryTable& table) con
   table.Log("{{ axis.MethodName }}", Get{{ axis.MethodName }}());
 {%- endfor -%}
 {% for button in buttons %}
-  table.Log("{{ button.MethodName }}Button", Get{{ button.MethodName }}Button());
+  table.Log("{{ button.MethodName }}", Get{{ button.MethodName }}Button());
 {%- endfor %}
 }

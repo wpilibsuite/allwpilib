@@ -1049,21 +1049,21 @@ public class Switch2GCController implements HIDDevice, TelemetryLoggable {
     table.log("CStickY", getCStickY());
     table.log("LTrigger", getLTrigger());
     table.log("RTrigger", getRTrigger());
-    table.log("AButton", getAButton());
-    table.log("XButton", getXButton());
-    table.log("BButton", getBButton());
-    table.log("YButton", getYButton());
-    table.log("HomeButton", getHomeButton());
-    table.log("StartButton", getStartButton());
-    table.log("ZLButton", getZLButton());
-    table.log("ZButton", getZButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("CaptureButton", getCaptureButton());
-    table.log("CButton", getCButton());
-    table.log("LButton", getLButton());
-    table.log("RButton", getRButton());
+    table.log("A", getAButton());
+    table.log("X", getXButton());
+    table.log("B", getBButton());
+    table.log("Y", getYButton());
+    table.log("Home", getHomeButton());
+    table.log("Start", getStartButton());
+    table.log("ZL", getZLButton());
+    table.log("Z", getZButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Capture", getCaptureButton());
+    table.log("C", getCButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
   }
 }

@@ -1070,21 +1070,21 @@ public class DualShock4Controller implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("L2", getL2());
     table.log("R2", getR2());
-    table.log("CrossButton", getCrossButton());
-    table.log("CircleButton", getCircleButton());
-    table.log("SquareButton", getSquareButton());
-    table.log("TriangleButton", getTriangleButton());
-    table.log("ShareButton", getShareButton());
-    table.log("PSButton", getPSButton());
-    table.log("OptionsButton", getOptionsButton());
-    table.log("L3Button", getL3Button());
-    table.log("R3Button", getR3Button());
-    table.log("L1Button", getL1Button());
-    table.log("R1Button", getR1Button());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("TouchpadButton", getTouchpadButton());
+    table.log("Cross", getCrossButton());
+    table.log("Circle", getCircleButton());
+    table.log("Square", getSquareButton());
+    table.log("Triangle", getTriangleButton());
+    table.log("Share", getShareButton());
+    table.log("PS", getPSButton());
+    table.log("Options", getOptionsButton());
+    table.log("L3", getL3Button());
+    table.log("R3", getR3Button());
+    table.log("L1", getL1Button());
+    table.log("R1", getR1Button());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Touchpad", getTouchpadButton());
   }
 }
