@@ -89,7 +89,17 @@ public class MockTelemetryBackend implements TelemetryBackend {
    * @param timestamp logged timestamp in nanoseconds in the same time base as {@link
    *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  public record Action(String path, Object value, long timestamp) {}
+  public record Action(String path, Object value, long timestamp) {
+    /**
+     * Constructs a logged action with the current-time timestamp sentinel.
+     *
+     * @param path logged path
+     * @param value logged value
+     */
+    public Action(String path, Object value) {
+      this(path, value, 0);
+    }
+  }
 
   private final Map<String, Entry> m_entries = new HashMap<>();
   private final List<Action> m_actions = new ArrayList<>();
