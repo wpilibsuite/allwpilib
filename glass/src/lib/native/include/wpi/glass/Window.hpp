@@ -30,6 +30,9 @@ class Window {
 
   std::string_view GetId() const { return m_id; }
 
+  Storage& GetStorage() { return m_storage; }
+  const Storage& GetStorage() const { return m_storage; }
+
   bool HasView() { return static_cast<bool>(m_view); }
 
   void SetView(std::unique_ptr<View> view) { m_view = std::move(view); }
@@ -119,6 +122,7 @@ class Window {
   void ScaleDefault(float scale);
 
  private:
+  Storage& m_storage;
   std::string m_id;
   std::string& m_name;
   std::string m_defaultName;
