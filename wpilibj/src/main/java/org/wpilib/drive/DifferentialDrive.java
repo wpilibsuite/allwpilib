@@ -50,7 +50,7 @@ import org.wpilib.telemetry.TelemetryTable;
  * arcadeDrive, or curvatureDrive methods should be called periodically to avoid Motor Safety
  * timeouts.
  */
-public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggable, AutoCloseable {
+public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_leftMotor;
   private final DoubleConsumer m_rightMotor;
 
@@ -120,9 +120,6 @@ public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggab
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
   }
-
-  @Override
-  public void close() {}
 
   /**
    * Arcade drive method for differential drive platform. The calculated values will be squared to

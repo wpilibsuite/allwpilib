@@ -136,6 +136,5 @@ public class Elevator implements AutoCloseable {
   public void close() {
     encoder.close();
     motor.close();
-    mech2d.close();
   }
 }

@@ -48,7 +48,7 @@ import org.wpilib.telemetry.TelemetryTable;
  * <p>{@link org.wpilib.hardware.motor.MotorSafety} is enabled by default. The driveCartesian or
  * drivePolar methods should be called periodically to avoid Motor Safety timeouts.
  */
-public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, AutoCloseable {
+public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_frontLeftMotor;
   private final DoubleConsumer m_rearLeftMotor;
   private final DoubleConsumer m_frontRightMotor;
@@ -146,9 +146,6 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable, A
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
   }
-
-  @Override
-  public void close() {}
 
   /**
    * Drive method for Mecanum platform.

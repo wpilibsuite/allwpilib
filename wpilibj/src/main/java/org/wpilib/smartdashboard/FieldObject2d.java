@@ -19,7 +19,7 @@ import org.wpilib.tunable.TunableOption;
 import org.wpilib.units.measure.Distance;
 
 /** Game field object on a Field2d. */
-public class FieldObject2d implements AutoCloseable {
+public class FieldObject2d {
   private static final TunableConfig POSES_TUNABLE_CONFIG =
       TunableConfig.of(TunableOption.GET_ON_CHANGE);
 
@@ -35,9 +35,6 @@ public class FieldObject2d implements AutoCloseable {
             this::getPoseArray, this::setPoseArray, Pose2d[].class, POSES_TUNABLE_CONFIG);
     setPoseArray(initialPoses);
   }
-
-  @Override
-  public void close() {}
 
   /**
    * Set the pose from a Pose object.

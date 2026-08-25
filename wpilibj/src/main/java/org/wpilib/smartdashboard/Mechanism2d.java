@@ -22,7 +22,7 @@ import org.wpilib.util.Color8Bit;
  * @see MechanismLigament2d
  * @see MechanismRoot2d
  */
-public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
+public final class Mechanism2d implements TelemetryLoggable {
   private final Map<String, MechanismRoot2d> m_roots;
   private final double[] m_dims = new double[2];
   private String m_color;
@@ -53,13 +53,6 @@ public final class Mechanism2d implements TelemetryLoggable, AutoCloseable {
     m_dims[0] = width;
     m_dims[1] = height;
     setBackgroundColor(backgroundColor);
-  }
-
-  @Override
-  public synchronized void close() {
-    for (MechanismRoot2d root : m_roots.values()) {
-      root.close();
-    }
   }
 
   /**

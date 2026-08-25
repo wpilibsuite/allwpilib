@@ -127,8 +127,5 @@ public class Arm implements AutoCloseable {
   public void close() {
     motor.close();
     encoder.close();
-    mech2d.close();
-    armPivot.close();
-    arm.close();
   }
 }

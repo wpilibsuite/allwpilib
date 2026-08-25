@@ -42,9 +42,6 @@ public class Field2d implements TelemetryLoggable, ComplexTunable, AutoCloseable
   @Override
   public synchronized void close() {
     TunableRegistry.remove(this);
-    for (FieldObject2d obj : m_objects) {
-      obj.close();
-    }
   }
 
   /**
