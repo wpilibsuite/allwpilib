@@ -321,8 +321,12 @@ TEST_CASE_METHOD(TableListenerTest,
           "[Test thread] Timed out waiting for listenerDoneEvent");
   T_CHECK(wpi::util::WaitForObject(destroyerThreadDoneEvent, 1.0, &timedOut),
           "[Test thread] Timed out waiting for destroyerThreadDoneEvent");
-  if (!timedOut && destroyerThread.joinable()) {
-    destroyerThread.join();
+  if (destroyerThread.joinable()) {
+    if (timedOut) {
+      destroyerThread.detach();
+    } else {
+      destroyerThread.join();
+    }
   }
 
   T_CHECK(callbackSuccessful, "[Test thread] callbackSuccessful");
