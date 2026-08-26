@@ -13,8 +13,8 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.geometry.Twist3d;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for double follower wheel odometry. Odometry allows you to track the robot's position on
@@ -73,7 +73,7 @@ public class TwoDeadWheelOdometry3d {
     m_previousYWheelPos = yWheelPos;
     m_pose = initialPose;
 
-    MathSharedStore.reportUsage("TwoDeadWheelOdometry3d", "");
+    UsageReporting.reportUsage("TwoDeadWheelOdometry3d", "");
   }
 
   /**
@@ -94,7 +94,7 @@ public class TwoDeadWheelOdometry3d {
       double xWheelPos,
       double yWheelPos,
       Rotation3d gyroAngle) {
-    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose3d.kZero);
+    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose3d.ZERO);
   }
 
   /**
@@ -144,7 +144,7 @@ public class TwoDeadWheelOdometry3d {
       Distance xWheelPos,
       Distance yWheelPos,
       Rotation3d gyroAngle) {
-    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose3d.kZero);
+    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose3d.ZERO);
   }
 
   /**

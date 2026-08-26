@@ -41,8 +41,8 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
-            Pose3d.kZero,
+            Rotation3d.ZERO,
+            Pose3d.ZERO,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.5, 0.5, 0.5, 0.5));
 
@@ -50,9 +50,9 @@ class TwoDeadWheelPoseEstimator3dTest {
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
             new TrajectoryConfig(2, 2));
 
@@ -77,17 +77,17 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
-            Pose3d.kZero,
+            Rotation3d.ZERO,
+            Pose3d.ZERO,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
-                new Pose2d(3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(135)),
-                new Pose2d(-3, 0, Rotation2d.kCW_Pi_2),
+                new Pose2d(-3, 0, Rotation2d.CW_PI_2),
                 new Pose2d(0, 0, Rotation2d.fromDegrees(45))),
             new TrajectoryConfig(2, 2));
 
@@ -131,7 +131,7 @@ class TwoDeadWheelPoseEstimator3dTest {
       final double visionUpdateRate,
       final double visionUpdateDelay,
       final boolean checkError) {
-    estimator.resetPosition(0, 0, Rotation3d.kZero, new Pose3d(startingPose));
+    estimator.resetPosition(0, 0, Rotation3d.ZERO, new Pose3d(startingPose));
 
     var rand = new Random(3538);
 
@@ -242,18 +242,18 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
+            Rotation3d.ZERO,
             new Pose3d(1, 2, 0, new Rotation3d(0, 0, -Math.PI / 2)),
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
 
-    estimator.updateWithTime(0, 0, 0, Rotation3d.kZero);
+    estimator.updateWithTime(0, 0, 0, Rotation3d.ZERO);
 
     var visionMeasurements =
         new Pose2d[] {
-          new Pose2d(0, 0, Rotation2d.kZero),
-          new Pose2d(3, 1, Rotation2d.kCCW_Pi_2),
-          new Pose2d(2, 4, Rotation2d.kPi),
+          new Pose2d(0, 0, Rotation2d.ZERO),
+          new Pose2d(3, 1, Rotation2d.CCW_PI_2),
+          new Pose2d(2, 4, Rotation2d.PI),
         };
 
     for (int i = 0; i < 1000; i++) {
@@ -288,8 +288,8 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
-            Pose3d.kZero,
+            Rotation3d.ZERO,
+            Pose3d.ZERO,
             VecBuilder.fill(0.1, 0.1, 0.1, 0.1),
             VecBuilder.fill(0.9, 0.9, 0.9, 0.9));
 
@@ -297,7 +297,7 @@ class TwoDeadWheelPoseEstimator3dTest {
 
     // Add enough measurements to fill up the buffer
     for (; time < 4; time += 0.02) {
-      estimator.updateWithTime(time, 1, 1, Rotation3d.kZero);
+      estimator.updateWithTime(time, 1, 1, Rotation3d.ZERO);
     }
 
     var odometryPose = estimator.getEstimatedPosition();
@@ -342,8 +342,8 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
-            Pose3d.kZero,
+            Rotation3d.ZERO,
+            Pose3d.ZERO,
             VecBuilder.fill(1, 1, 1, 1),
             VecBuilder.fill(1, 1, 1, 1));
 
@@ -353,35 +353,35 @@ class TwoDeadWheelPoseEstimator3dTest {
     // Add odometry measurements, but don't fill up the buffer
     // Add a tiny tolerance for the upper bound because of floating point rounding error
     for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
-      estimator.updateWithTime(time, time, 0, Rotation3d.kZero);
+      estimator.updateWithTime(time, time, 0, Rotation3d.ZERO);
     }
 
     // Sample at an added time
-    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(1.02));
     // Sample between updates (test interpolation)
-    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(1.01));
     // Sampling before the oldest value returns the oldest value
-    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(0.5));
     // Sampling after the newest value returns the newest value
-    assertEquals(Optional.of(new Pose3d(2, 0, 0, Rotation3d.kZero)), estimator.sampleAt(2.5));
+    assertEquals(Optional.of(new Pose3d(2, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(2.5));
 
     // Add a vision measurement after the odometry measurements (while keeping all of the old
     // odometry measurements)
     estimator.addVisionMeasurement(new Pose3d(2, 0, 0, new Rotation3d(0, 0, 1)), 2.2);
 
     // Make sure nothing changed (except the newest value)
-    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
-    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
-    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(1.02, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.01, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1, 0, 0, Rotation3d.ZERO)), estimator.sampleAt(0.5));
 
     // Add a vision measurement before the odometry measurements that's still in the buffer
-    estimator.addVisionMeasurement(new Pose3d(1, 0.2, 0, Rotation3d.kZero), 0.9);
+    estimator.addVisionMeasurement(new Pose3d(1, 0.2, 0, Rotation3d.ZERO), 0.9);
 
     // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-    assertEquals(Optional.of(new Pose3d(1.02, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(1.02));
-    assertEquals(Optional.of(new Pose3d(1.01, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(1.01));
-    assertEquals(Optional.of(new Pose3d(1, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(0.5));
-    assertEquals(Optional.of(new Pose3d(2, 0.1, 0, Rotation3d.kZero)), estimator.sampleAt(2.5));
+    assertEquals(Optional.of(new Pose3d(1.02, 0.1, 0, Rotation3d.ZERO)), estimator.sampleAt(1.02));
+    assertEquals(Optional.of(new Pose3d(1.01, 0.1, 0, Rotation3d.ZERO)), estimator.sampleAt(1.01));
+    assertEquals(Optional.of(new Pose3d(1, 0.1, 0, Rotation3d.ZERO)), estimator.sampleAt(0.5));
+    assertEquals(Optional.of(new Pose3d(2, 0.1, 0, Rotation3d.ZERO)), estimator.sampleAt(2.5));
   }
 
   @Test
@@ -392,14 +392,14 @@ class TwoDeadWheelPoseEstimator3dTest {
             1,
             0,
             0,
-            Rotation3d.kZero,
-            Pose3d.kZero,
+            Rotation3d.ZERO,
+            Pose3d.ZERO,
             VecBuilder.fill(1, 1, 1, 1),
             VecBuilder.fill(1, 1, 1, 1));
 
     // Test reset position
 
-    estimator.resetPosition(1, 0, Rotation3d.kZero, new Pose3d(1, 0, 0, Rotation3d.kZero));
+    estimator.resetPosition(1, 0, Rotation3d.ZERO, new Pose3d(1, 0, 0, Rotation3d.ZERO));
 
     assertAll(
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -410,7 +410,7 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation and wheel positions
-    estimator.update(2, 0, Rotation3d.kZero);
+    estimator.update(2, 0, Rotation3d.ZERO);
 
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -422,7 +422,7 @@ class TwoDeadWheelPoseEstimator3dTest {
 
     // Add a vision measurement with a different translation
     estimator.addVisionMeasurement(
-        new Pose3d(3, 0, 0, Rotation3d.kZero), MathSharedStore.getTimestamp());
+        new Pose3d(3, 0, 0, Rotation3d.ZERO), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -433,7 +433,7 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test reset rotation
-    estimator.resetRotation(new Rotation3d(Rotation2d.kCCW_Pi_2));
+    estimator.resetRotation(new Rotation3d(Rotation2d.CCW_PI_2));
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -446,7 +446,7 @@ class TwoDeadWheelPoseEstimator3dTest {
                 Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
 
     // Test orientation
-    estimator.update(3, 0, Rotation3d.kZero);
+    estimator.update(3, 0, Rotation3d.ZERO);
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -460,7 +460,7 @@ class TwoDeadWheelPoseEstimator3dTest {
 
     // Add a vision measurement with a different rotation
     estimator.addVisionMeasurement(
-        new Pose3d(2.5, 1, 0, new Rotation3d(Rotation2d.kPi)), MathSharedStore.getTimestamp());
+        new Pose3d(2.5, 1, 0, new Rotation3d(Rotation2d.PI)), MathSharedStore.getTimestamp());
 
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
@@ -490,7 +490,7 @@ class TwoDeadWheelPoseEstimator3dTest {
                 kEpsilon));
 
     // Test reset pose
-    estimator.resetPose(Pose3d.kZero);
+    estimator.resetPose(Pose3d.ZERO);
 
     assertAll(
         () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),

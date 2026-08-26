@@ -10,8 +10,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for double follower wheel odometry. Odometry allows you to track the robot's position on
@@ -64,7 +64,7 @@ public class TwoDeadWheelOdometry {
     m_previousYWheelPos = yWheelPos;
     m_pose = initialPose;
 
-    MathSharedStore.reportUsage("TwoDeadWheelOdometry", "");
+    UsageReporting.reportUsage("TwoDeadWheelOdometry", "");
   }
 
   /**
@@ -85,7 +85,7 @@ public class TwoDeadWheelOdometry {
       double xWheelPos,
       double yWheelPos,
       Rotation2d gyroAngle) {
-    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose2d.kZero);
+    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose2d.ZERO);
   }
 
   /**
@@ -135,7 +135,7 @@ public class TwoDeadWheelOdometry {
       Distance xWheelPos,
       Distance yWheelPos,
       Rotation2d gyroAngle) {
-    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose2d.kZero);
+    this(xWheelYPos, yWheelXPos, xWheelPos, yWheelPos, gyroAngle, Pose2d.ZERO);
   }
 
   /**

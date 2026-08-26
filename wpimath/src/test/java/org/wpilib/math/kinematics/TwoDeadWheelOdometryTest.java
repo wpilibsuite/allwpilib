@@ -22,14 +22,14 @@ class TwoDeadWheelOdometryTest {
   private static final double m_yWheelXPos = 1;
 
   private final TwoDeadWheelOdometry m_odometry =
-      new TwoDeadWheelOdometry(m_xWheelYPos, m_yWheelXPos, 0.0, 0.0, Rotation2d.kZero);
+      new TwoDeadWheelOdometry(m_xWheelYPos, m_yWheelXPos, 0.0, 0.0, Rotation2d.ZERO);
 
   @Test
   void testMultipleConsecutiveUpdates() {
-    m_odometry.resetPosition(1, 1, Rotation2d.kZero, Pose2d.kZero);
+    m_odometry.resetPosition(1, 1, Rotation2d.ZERO, Pose2d.ZERO);
 
-    m_odometry.update(1, 1, Rotation2d.kZero);
-    var secondPose = m_odometry.update(1, 1, Rotation2d.kZero);
+    m_odometry.update(1, 1, Rotation2d.ZERO);
+    var secondPose = m_odometry.update(1, 1, Rotation2d.ZERO);
 
     assertAll(
         () -> assertEquals(0.0, secondPose.getX(), 0.01),
@@ -39,10 +39,10 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testTwoIterations() {
-    m_odometry.resetPosition(0.0, 0.0, Rotation2d.kZero, Pose2d.kZero);
+    m_odometry.resetPosition(0.0, 0.0, Rotation2d.ZERO, Pose2d.ZERO);
 
-    m_odometry.update(0.0, 0.0, Rotation2d.kZero);
-    final var pose = m_odometry.update(0.1, 0.0, Rotation2d.kZero);
+    m_odometry.update(0.0, 0.0, Rotation2d.ZERO);
+    final var pose = m_odometry.update(0.1, 0.0, Rotation2d.ZERO);
 
     assertAll(
         () -> assertEquals(0.1, pose.getX(), 0.01),
@@ -52,9 +52,9 @@ class TwoDeadWheelOdometryTest {
 
   @Test
   void testGyroAngleReset() {
-    var gyro = Rotation2d.kCCW_Pi_2;
-    var fieldAngle = Rotation2d.kZero;
-    m_odometry.resetPosition(0.0, 0.0, gyro, new Pose2d(Translation2d.kZero, fieldAngle));
+    var gyro = Rotation2d.CCW_PI_2;
+    var fieldAngle = Rotation2d.ZERO;
+    m_odometry.resetPosition(0.0, 0.0, gyro, new Pose2d(Translation2d.ZERO, fieldAngle));
     m_odometry.update(1.0, 0.0, gyro);
     var pose = m_odometry.update(1.0, 0.0, gyro);
 
@@ -119,12 +119,12 @@ class TwoDeadWheelOdometryTest {
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
-                Pose2d.kZero,
+                Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
                 new Pose2d(10, 10, Rotation2d.fromDegrees(-90)),
                 new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
                 new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
-                new Pose2d(10, 10, Rotation2d.kZero)),
+                new Pose2d(10, 10, Rotation2d.ZERO)),
             new TrajectoryConfig(0.5, 2));
 
     var odometry =
@@ -210,17 +210,17 @@ class TwoDeadWheelOdometryTest {
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(
-                Pose2d.kZero,
+                Pose2d.ZERO,
                 new Pose2d(20, 20, Rotation2d.fromDegrees(45)),
                 new Pose2d(10, 10, Rotation2d.fromDegrees(-90)),
                 new Pose2d(30, 30, Rotation2d.fromDegrees(135)),
                 new Pose2d(20, 20, Rotation2d.fromDegrees(-90)),
-                new Pose2d(10, 10, Rotation2d.kZero)),
+                new Pose2d(10, 10, Rotation2d.ZERO)),
             new TrajectoryConfig(0.5, 2));
 
     var odometry =
         new TwoDeadWheelOdometry(
-            m_xWheelYPos, m_yWheelXPos, xWheelPos, yWheelPos, Rotation2d.kZero, Pose2d.kZero);
+            m_xWheelYPos, m_yWheelXPos, xWheelPos, yWheelPos, Rotation2d.ZERO, Pose2d.ZERO);
 
     var rand = new Random(5190);
 
