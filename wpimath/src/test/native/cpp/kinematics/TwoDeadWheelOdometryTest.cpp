@@ -8,8 +8,9 @@
 #include <random>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -26,7 +27,7 @@
 
 using namespace wpi::math;
 
-class TwoDeadWheelOdometryTest : public ::testing::Test {
+class TwoDeadWheelOdometryTest {
  protected:
   wpi::units::meter_t m_xWheelYPos = 1_m;
   wpi::units::meter_t m_yWheelXPos = 1_m;
@@ -38,76 +39,90 @@ class TwoDeadWheelOdometryTest : public ::testing::Test {
       {1, 0, -m_xWheelYPos.value()}, {0, 1, m_yWheelXPos.value()}};
 };
 
-TEST_F(TwoDeadWheelOdometryTest, MultipleConsecutiveUpdates) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest MultipleConsecutiveUpdates",
+                 "[wpimath]") {
   odometry.ResetPosition(1_m, 1_m, 0_rad, Pose2d{});
 
   odometry.Update(1_m, 1_m, 0_rad);
   auto secondPose = odometry.Update(1_m, 1_m, 0_rad);
 
-  EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().Radians().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.X().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Rotation().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, TwoIterations) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest TwoIterations", "[wpimath]") {
   odometry.ResetPosition(0_m, 0_m, 0_rad, Pose2d{});
 
   odometry.Update(0_m, 0_m, 0_rad);
   auto pose = odometry.Update(0.1_m, 0_m, 0_rad);
 
-  EXPECT_NEAR(pose.X().value(), 0.1, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 0.1, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, GyroAngleReset) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest GyroAngleReset", "[wpimath]") {
   odometry.ResetPosition(0_m, 0_m, 90_deg, Pose2d{});
 
   odometry.Update(1_m, 0_m, 90_deg);
   auto pose = odometry.Update(1_m, 0_m, 90_deg);
 
-  EXPECT_NEAR(pose.X().value(), 1, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 1, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Radians().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, StraightForwardsForwardKinematics) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest StraightForwardsForwardKinematics",
+                 "[wpimath]") {
   const auto chassisVelocities =
       odometry.ToChassisVelocities(5_mps, 0_mps, 0_rad_per_s);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 5, 0.1);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 0, 0.1);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.vx.value(), 5, 0.1);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0, 0.1);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, StraightLeftForwardKinematics) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest StraightLeftForwardKinematics",
+                 "[wpimath]") {
   const auto chassisVelocities =
       odometry.ToChassisVelocities(0_mps, 5_mps, 0_rad_per_s);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 0, 0.1);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 5, 0.1);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.vy.value(), 5, 0.1);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0, 0.1);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, SpinInPlaceForwardKinematics) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest SpinInPlaceForwardKinematics",
+                 "[wpimath]") {
   const auto chassisVelocities =
       odometry.ToChassisVelocities(-5_mps, 5_mps, 5_rad_per_s);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 0, 0.1);
-  EXPECT_NEAR(chassisVelocities.vy.value(), 0, 0.1);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 5, 0.1);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0, 0.1);
+  CHECK_NEAR(chassisVelocities.omega.value(), 5, 0.1);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, MixedMotionForwardKinematics) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest MixedMotionForwardKinematics",
+                 "[wpimath]") {
   const auto chassisVelocities =
       odometry.ToChassisVelocities(1_mps, -1_mps, 5_rad_per_s);
 
-  EXPECT_NEAR(chassisVelocities.vx.value(), 6, 0.1);
-  EXPECT_NEAR(chassisVelocities.vy.value(), -6, 0.1);
-  EXPECT_NEAR(chassisVelocities.omega.value(), 5, 0.1);
+  CHECK_NEAR(chassisVelocities.vx.value(), 6, 0.1);
+  CHECK_NEAR(chassisVelocities.vy.value(), -6, 0.1);
+  CHECK_NEAR(chassisVelocities.omega.value(), 5, 0.1);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingTrajectory) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest AccuracyFacingTrajectory",
+                 "[wpimath]") {
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
@@ -178,14 +193,15 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.35);
-  EXPECT_LT(maxError, 0.35);
-  EXPECT_NEAR(trajectoryDistanceTravelled.value(),
-              odometryDistanceTravelled.value(),
-              trajectoryDistanceTravelled.value() * 0.05);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.35);
+  CHECK(maxError < 0.35);
+  CHECK_NEAR(trajectoryDistanceTravelled.value(),
+             odometryDistanceTravelled.value(),
+             trajectoryDistanceTravelled.value() * 0.05);
 }
 
-TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingXAxis) {
+TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
+                 "TwoDeadWheelOdometryTest AccuracyFacingXAxis", "[wpimath]") {
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
@@ -255,9 +271,9 @@ TEST_F(TwoDeadWheelOdometryTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.35);
-  EXPECT_LT(maxError, 0.35);
-  EXPECT_NEAR(trajectoryDistanceTravelled.value(),
-              odometryDistanceTravelled.value(),
-              trajectoryDistanceTravelled.value() * 0.05);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.35);
+  CHECK(maxError < 0.35);
+  CHECK_NEAR(trajectoryDistanceTravelled.value(),
+             odometryDistanceTravelled.value(),
+             trajectoryDistanceTravelled.value() * 0.05);
 }

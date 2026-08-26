@@ -8,8 +8,9 @@
 #include <random>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
@@ -28,7 +29,7 @@
 
 using namespace wpi::math;
 
-class TwoDeadWheelOdometry3dTest : public ::testing::Test {
+class TwoDeadWheelOdometry3dTest {
  protected:
   wpi::units::meter_t m_xWheelYPos = 1_m;
   wpi::units::meter_t m_yWheelXPos = 1_m;
@@ -40,48 +41,54 @@ class TwoDeadWheelOdometry3dTest : public ::testing::Test {
       {1, 0, -m_xWheelYPos.value()}, {0, 1, m_yWheelXPos.value()}};
 };
 
-TEST_F(TwoDeadWheelOdometry3dTest, MultipleConsecutiveUpdates) {
+TEST_CASE_METHOD(TwoDeadWheelOdometry3dTest,
+                 "TwoDeadWheelOdometry3dTest MultipleConsecutiveUpdates",
+                 "[wpimath]") {
   odometry.ResetPosition(1_m, 1_m, Rotation3d{}, Pose3d{});
 
   odometry.Update(1_m, 1_m, Rotation3d{});
   auto secondPose = odometry.Update(1_m, 1_m, Rotation3d{});
 
-  EXPECT_NEAR(secondPose.X().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().X().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(secondPose.Rotation().Z().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.X().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Z().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Rotation().X().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Rotation().Y().value(), 0.0, 0.01);
+  CHECK_NEAR(secondPose.Rotation().Z().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometry3dTest, TwoIterations) {
+TEST_CASE_METHOD(TwoDeadWheelOdometry3dTest,
+                 "TwoDeadWheelOdometry3dTest TwoIterations", "[wpimath]") {
   odometry.ResetPosition(0_m, 0_m, Rotation3d{}, Pose3d{});
 
   odometry.Update(0_m, 0_m, Rotation3d{});
   auto pose = odometry.Update(0.1_m, 0_m, Rotation3d{});
 
-  EXPECT_NEAR(pose.X().value(), 0.1, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().X().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Z().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 0.1, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().X().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Z().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometry3dTest, GyroAngleReset) {
+TEST_CASE_METHOD(TwoDeadWheelOdometry3dTest,
+                 "TwoDeadWheelOdometry3dTest GyroAngleReset", "[wpimath]") {
   odometry.ResetPosition(0_m, 0_m, Rotation3d{0_rad, 0_rad, 90_deg}, Pose3d{});
 
   odometry.Update(1_m, 0_m, Rotation3d{0_rad, 0_rad, 90_deg});
   auto pose = odometry.Update(1_m, 0_m, Rotation3d{0_rad, 0_rad, 90_deg});
 
-  EXPECT_NEAR(pose.X().value(), 1.0, 0.01);
-  EXPECT_NEAR(pose.Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Z().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().X().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Y().value(), 0.0, 0.01);
-  EXPECT_NEAR(pose.Rotation().Z().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.X().value(), 1.0, 0.01);
+  CHECK_NEAR(pose.Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Z().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().X().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Y().value(), 0.0, 0.01);
+  CHECK_NEAR(pose.Rotation().Z().value(), 0.0, 0.01);
 }
 
-TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
+TEST_CASE_METHOD(TwoDeadWheelOdometry3dTest,
+                 "TwoDeadWheelOdometry3dTest AccuracyFacingTrajectory",
+                 "[wpimath]") {
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
@@ -157,14 +164,16 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingTrajectory) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.35);
-  EXPECT_LT(maxError, 0.35);
-  EXPECT_NEAR(trajectoryDistanceTravelled.value(),
-              odometryDistanceTravelled.value(),
-              trajectoryDistanceTravelled.value() * 0.05);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.35);
+  CHECK(maxError < 0.35);
+  CHECK_NEAR(trajectoryDistanceTravelled.value(),
+             odometryDistanceTravelled.value(),
+             trajectoryDistanceTravelled.value() * 0.05);
 }
 
-TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
+TEST_CASE_METHOD(TwoDeadWheelOdometry3dTest,
+                 "TwoDeadWheelOdometry3dTest AccuracyFacingXAxis",
+                 "[wpimath]") {
   auto xWheelPos = 0_m;
   auto yWheelPos = 0_m;
 
@@ -239,9 +248,9 @@ TEST_F(TwoDeadWheelOdometry3dTest, AccuracyFacingXAxis) {
     t += dt;
   }
 
-  EXPECT_LT(errorSum / (trajectory.Duration().value() / dt.value()), 0.15);
-  EXPECT_LT(maxError, 0.3);
-  EXPECT_NEAR(trajectoryDistanceTravelled.value(),
-              odometryDistanceTravelled.value(),
-              trajectoryDistanceTravelled.value() * 0.05);
+  CHECK(errorSum / (trajectory.Duration().value() / dt.value()) < 0.15);
+  CHECK(maxError < 0.3);
+  CHECK_NEAR(trajectoryDistanceTravelled.value(),
+             odometryDistanceTravelled.value(),
+             trajectoryDistanceTravelled.value() * 0.05);
 }

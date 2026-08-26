@@ -14,8 +14,9 @@
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
@@ -159,22 +160,23 @@ void testFollowTrajectory(
     }
   }
 
-  EXPECT_NEAR(endingPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 0.08);
-  EXPECT_NEAR(endingPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 0.08);
-  EXPECT_NEAR(endingPose.Rotation().Radians().value(),
-              estimator.GetEstimatedPosition().Rotation().Radians().value(),
-              0.15);
+  CHECK_NEAR(endingPose.X().value(),
+             estimator.GetEstimatedPosition().X().value(), 0.08);
+  CHECK_NEAR(endingPose.Y().value(),
+             estimator.GetEstimatedPosition().Y().value(), 0.08);
+  CHECK_NEAR(endingPose.Rotation().Radians().value(),
+             estimator.GetEstimatedPosition().Rotation().Radians().value(),
+             0.15);
 
   if (checkError) {
     // NOLINTNEXTLINE(bugprone-integer-division)
-    EXPECT_LT(errorSum / (trajectory.Duration() / dt), 0.058);
-    EXPECT_LT(maxError, 0.2);
+    CHECK(errorSum / (trajectory.Duration() / dt) < 0.058);
+    CHECK(maxError < 0.2);
   }
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, AccuracyFacingTrajectory) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest AccuracyFacingTrajectory",
+          "[wpimath]") {
   wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
                                                  1_m,
                                                  0_m,
@@ -206,7 +208,7 @@ TEST(TwoDeadWheelPoseEstimatorTest, AccuracyFacingTrajectory) {
       false);
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, BadInitialPose) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest BadInitialPose", "[wpimath]") {
   wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
                                                  1_m,
                                                  0_m,
@@ -252,7 +254,8 @@ TEST(TwoDeadWheelPoseEstimatorTest, BadInitialPose) {
   }
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, SimultaneousVisionMeasurements) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest SimultaneousVisionMeasurements",
+          "[wpimath]") {
   // This tests for multiple vision measurements applied at the same time.
   // The expected behavior is that all measurements affect the estimated pose.
   // The alternative result is that only one vision measurement affects the
@@ -285,7 +288,7 @@ TEST(TwoDeadWheelPoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = wpi::units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    CHECK(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
   }
 
   {
@@ -294,7 +297,7 @@ TEST(TwoDeadWheelPoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = wpi::units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
   }
 
   {
@@ -303,11 +306,12 @@ TEST(TwoDeadWheelPoseEstimatorTest, SimultaneousVisionMeasurements) {
     auto dtheta = wpi::units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
 
-    EXPECT_TRUE(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
   }
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestDiscardStaleVisionMeasurements",
+          "[wpimath]") {
   wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
                                                  1_m,
                                                  0_m,
@@ -330,16 +334,16 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestDiscardStaleVisionMeasurements) {
                         wpi::math::Rotation2d{0.1_rad}},
       1_s, {0.1, 0.1, 0.1});
 
-  EXPECT_NEAR(odometryPose.X().value(),
-              estimator.GetEstimatedPosition().X().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Y().value(),
-              estimator.GetEstimatedPosition().Y().value(), 1e-6);
-  EXPECT_NEAR(odometryPose.Rotation().Radians().value(),
-              estimator.GetEstimatedPosition().Rotation().Radians().value(),
-              1e-6);
+  CHECK_NEAR(odometryPose.X().value(),
+             estimator.GetEstimatedPosition().X().value(), 1e-6);
+  CHECK_NEAR(odometryPose.Y().value(),
+             estimator.GetEstimatedPosition().Y().value(), 1e-6);
+  CHECK_NEAR(odometryPose.Rotation().Radians().value(),
+             estimator.GetEstimatedPosition().Rotation().Radians().value(),
+             1e-6);
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, TestSampleAt) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestSampleAt", "[wpimath]") {
   wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
                                                  1_m,
                                                  0_m,
@@ -350,7 +354,7 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestSampleAt) {
                                                  {1.0, 1.0, 1.0}};
 
   // Returns empty when null
-  EXPECT_EQ(std::nullopt, estimator.SampleAt(1_s));
+  CHECK(std::nullopt == estimator.SampleAt(1_s));
 
   // Add odometry measurements, but don't fill up the buffer
   // Add a tiny tolerance for the upper bound because of floating point rounding
@@ -362,19 +366,19 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestSampleAt) {
   }
 
   // Sample at an added time
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}) ==
       estimator.SampleAt(1.02_s));
   // Sample between updates (test interpolation)
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}) ==
       estimator.SampleAt(1.01_s));
   // Sampling before the oldest value returns the oldest value
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(0.5_s));
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
   // Sampling after the newest value returns the newest value
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(2.5_s));
+  CHECK(std::optional(wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(2.5_s));
 
   // Add a vision measurement after the odometry measurements (while keeping all
   // of the old odometry measurements)
@@ -382,14 +386,14 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestSampleAt) {
       wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}}, 2.2_s);
 
   // Make sure nothing changed (except the newest value)
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}),
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}) ==
       estimator.SampleAt(1.02_s));
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}),
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}) ==
       estimator.SampleAt(1.01_s));
-  EXPECT_EQ(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}),
-            estimator.SampleAt(0.5_s));
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
 
   // Add a vision measurement before the odometry measurements that's still in
   // the buffer
@@ -397,21 +401,19 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestSampleAt) {
       wpi::math::Pose2d{1_m, 0.2_m, wpi::math::Rotation2d{}}, 0.9_s);
 
   // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.02_m, 0.1_m, wpi::math::Rotation2d{}}),
-      estimator.SampleAt(1.02_s));
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}),
-      estimator.SampleAt(1.01_s));
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}),
-      estimator.SampleAt(0.5_s));
-  EXPECT_EQ(
-      std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}),
-      estimator.SampleAt(2.5_s));
+  CHECK(std::optional(
+            wpi::math::Pose2d{1.02_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(1.02_s));
+  CHECK(std::optional(
+            wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(1.01_s));
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
+  CHECK(std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(2.5_s));
 }
 
-TEST(TwoDeadWheelPoseEstimatorTest, TestReset) {
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestReset", "[wpimath]") {
   wpi::math::TwoDeadWheelPoseEstimator estimator{
       1_m,
       1_m,
@@ -423,9 +425,9 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestReset) {
       {1.0, 1.0, 1.0}};
 
   // Test initial pose
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       1, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset position
@@ -433,18 +435,18 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestReset) {
   estimator.ResetPosition(1_m, 0_m, wpi::math::Rotation2d{},
                           wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}});
 
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test orientation and wheel positions
 
   estimator.Update(2_m, 0_m, wpi::math::Rotation2d{});
 
-  EXPECT_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Add a vision measurement with a different translation
@@ -452,26 +454,26 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestReset) {
       wpi::math::Pose2d{3_m, 0_m, wpi::math::Rotation2d{}},
       wpi::math::MathSharedStore::GetTimestamp());
 
-  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset rotation
   estimator.ResetRotation(wpi::math::Rotation2d{90_deg});
 
-  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       std::numbers::pi / 2,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test orientation
   estimator.Update(3_m, 0_m, wpi::math::Rotation2d{});
 
-  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       std::numbers::pi / 2,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
@@ -480,26 +482,26 @@ TEST(TwoDeadWheelPoseEstimatorTest, TestReset) {
       wpi::math::Pose2d{2.5_m, 1_m, wpi::math::Rotation2d{180_deg}},
       wpi::math::MathSharedStore::GetTimestamp());
 
-  EXPECT_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset translation
   estimator.ResetTranslation(wpi::math::Translation2d{-1_m, -1_m});
 
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       std::numbers::pi * 3.0 / 4,
       estimator.GetEstimatedPosition().Rotation().Radians().value());
 
   // Test reset pose
   estimator.ResetPose(wpi::math::Pose2d{});
 
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
-  EXPECT_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
-  EXPECT_DOUBLE_EQ(
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
       0, estimator.GetEstimatedPosition().Rotation().Radians().value());
 }
