@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "ChassisVelocities.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -20,7 +21,7 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-class TwoDeadWheelOdometry {
+class WPILIB_DLLEXPORT TwoDeadWheelOdometry {
   /*
    * This class uses logic cloned from Odometry.java. It does not extend
    * Odometry because the structure of the kinematics and odometry classes
@@ -49,13 +50,7 @@ class TwoDeadWheelOdometry {
                                 wpi::units::meter_t xWheelPos,
                                 wpi::units::meter_t yWheelPos,
                                 const Rotation2d& gyroAngle,
-                                const Pose2d& initialPose = Pose2d{})
-      : m_xWheelYPos(xWheelYPos),
-        m_yWheelXPos(yWheelXPos),
-        m_pose(initialPose),
-        m_previousXWheelPos(xWheelPos),
-        m_previousYWheelPos(yWheelPos),
-        m_previousGyroAngle(gyroAngle) {}
+                                const Pose2d& initialPose = Pose2d{});
 
   /**
    * Resets the robot's position on the field.

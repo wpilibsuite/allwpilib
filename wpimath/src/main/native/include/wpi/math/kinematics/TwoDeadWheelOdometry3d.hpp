@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "ChassisVelocities.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
 #include "wpi/math/geometry/Twist3d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
+#include "wpi/util/SymbolExports.hpp"
 
 namespace wpi::math {
 
@@ -23,7 +24,7 @@ namespace wpi::math {
  * path following. Furthermore, odometry can be used for latency compensation
  * when using computer-vision systems.
  */
-class TwoDeadWheelOdometry3d {
+class WPILIB_DLLEXPORT TwoDeadWheelOdometry3d {
  public:
   /**
    * Constructs a TwoDeadWheelOdometry3d object.
@@ -44,13 +45,7 @@ class TwoDeadWheelOdometry3d {
                                   wpi::units::meter_t xWheelPos,
                                   wpi::units::meter_t yWheelPos,
                                   const Rotation3d& gyroAngle,
-                                  const Pose3d& initialPose = Pose3d{})
-      : m_xWheelYPos(xWheelYPos),
-        m_yWheelXPos(yWheelXPos),
-        m_pose(initialPose),
-        m_previousXWheelPos(xWheelPos),
-        m_previousYWheelPos(yWheelPos),
-        m_previousGyroAngle(gyroAngle) {}
+                                  const Pose3d& initialPose = Pose3d{});
 
   /**
    * Resets the robot's position on the field.
