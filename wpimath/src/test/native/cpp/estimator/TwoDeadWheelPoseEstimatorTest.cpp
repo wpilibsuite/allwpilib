@@ -288,7 +288,7 @@ TEST_CASE("TwoDeadWheelPoseEstimatorTest SimultaneousVisionMeasurements",
     auto dtheta = wpi::units::math::abs(
         estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
 
-    CHECK(dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad);
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
   }
 
   {
