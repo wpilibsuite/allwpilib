@@ -26,7 +26,7 @@ import org.wpilib.simulation.testutils.EnumCallback;
 class DriverStationSimTest {
   @Test
   void testEnabled() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     assertFalse(RobotState.isEnabled());
@@ -43,7 +43,7 @@ class DriverStationSimTest {
 
   @Test
   void testAutonomous() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     assertFalse(RobotState.isAutonomous());
@@ -61,7 +61,7 @@ class DriverStationSimTest {
 
   @Test
   void testTest() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     assertFalse(RobotState.isUtility());
@@ -79,7 +79,7 @@ class DriverStationSimTest {
 
   @Test
   void testEstop() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     assertFalse(RobotState.isEStopped());
@@ -96,7 +96,7 @@ class DriverStationSimTest {
 
   @Test
   void testFmsAttached() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     assertFalse(RobotState.isFMSAttached());
@@ -113,7 +113,7 @@ class DriverStationSimTest {
 
   @Test
   void testDsAttached() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
     DriverStationBackend.refreshData();
 
@@ -136,7 +136,7 @@ class DriverStationSimTest {
 
   @Test
   void testAllianceStationId() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     EnumCallback callback = new EnumCallback();
@@ -220,7 +220,7 @@ class DriverStationSimTest {
   @ParameterizedTest
   @EnumSource(MatchType.class)
   void testMatchType(MatchType matchType) {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     DriverStationSim.setMatchType(matchType);
@@ -230,7 +230,7 @@ class DriverStationSimTest {
 
   @Test
   void testReplayNumber() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     DriverStationSim.setReplayNumber(4);
@@ -240,7 +240,7 @@ class DriverStationSimTest {
 
   @Test
   void testMatchNumber() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     DriverStationSim.setMatchNumber(3);
@@ -250,7 +250,7 @@ class DriverStationSimTest {
 
   @Test
   void testMatchTime() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     DoubleCallback callback = new DoubleCallback();
@@ -267,7 +267,7 @@ class DriverStationSimTest {
 
   @Test
   void testSetGameData() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     final String message = "Hello";
@@ -280,7 +280,7 @@ class DriverStationSimTest {
 
   @Test
   void testSetGameDataEmpty() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     DriverStationSim.setGameData("");
@@ -290,7 +290,7 @@ class DriverStationSimTest {
 
   @Test
   void testSetEventName() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.resetData();
 
     final String message = "The Best Event";

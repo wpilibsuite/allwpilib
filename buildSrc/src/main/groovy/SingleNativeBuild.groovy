@@ -66,7 +66,7 @@ class SingleNativeBuild implements Plugin<Project> {
                 }
                 NativeBinarySpec nativeBin = (NativeBinarySpec)it
                 if (nativeBin.targetPlatform.operatingSystem.isMacOsX()) {
-                    nativeBin.tasks.withType(AbstractNativeSourceCompileTask) { AbstractNativeSourceCompileTask compileTask->
+                    nativeBin.tasks.withType(AbstractNativeSourceCompileTask).configureEach { AbstractNativeSourceCompileTask compileTask->
                         compileTask.getSystemIncludes().setFrom()
                     }
                 }
@@ -131,7 +131,7 @@ class SingleNativeBuild implements Plugin<Project> {
 
                     }
 
-                    baseBin.tasks.withType(AbstractNativeSourceCompileTask) { oCompileTask ->
+                    baseBin.tasks.withType(AbstractNativeSourceCompileTask).configureEach { oCompileTask ->
                         def compileTask = (AbstractNativeSourceCompileTask) oCompileTask
                         if (binary instanceof SharedLibraryBinarySpec) {
                             def sBinary = (SharedLibraryBinarySpec) binary

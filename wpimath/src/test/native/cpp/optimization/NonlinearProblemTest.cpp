@@ -5,13 +5,13 @@
 #include <cmath>
 #include <ranges>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 #include <sleipnir/autodiff/expression_type.hpp>
 #include <sleipnir/autodiff/variable.hpp>
 #include <sleipnir/optimization/problem.hpp>
 #include <sleipnir/optimization/solver/exit_status.hpp>
 
-#include "wpi/util/print.hpp"
+#include "wpi/math/TestAssertions.hpp"
 
 template <typename T>
 auto Range(T start, T end, T step) {
@@ -19,9 +19,7 @@ auto Range(T start, T end, T step) {
          std::views::transform([=](auto&& i) { return start + T(i) * step; });
 }
 
-TEST(ProblemTest, Quartic) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest Quartic", "[wpimath]") {
   slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
@@ -31,22 +29,16 @@ TEST(ProblemTest, Quartic) {
 
   problem.subject_to(x >= 1.0);
 
-  EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
-  EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::NONE);
-  EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::LINEAR);
+  CHECK(problem.cost_function_type() == slp::ExpressionType::NONLINEAR);
+  CHECK(problem.equality_constraint_type() == slp::ExpressionType::NONE);
+  CHECK(problem.inequality_constraint_type() == slp::ExpressionType::LINEAR);
 
-  EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+  CHECK(problem.solve() == slp::ExitStatus::SUCCESS);
 
-  EXPECT_NEAR(x.value(), 1.0, 1e-6);
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
-  }
+  CHECK_NEAR(x.value(), 1.0, 1e-6);
 }
 
-TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest RosenbrockWithCubicAndLineConstraint", "[wpimath]") {
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-0.5, 2.5, 0.1)) {
@@ -62,12 +54,12 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
       problem.subject_to(y >= pow(x - 1.0, 3.0) + 1.0);
       problem.subject_to(y <= -x + 2.0);
 
-      EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
-      EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::NONE);
-      EXPECT_EQ(problem.inequality_constraint_type(),
-                slp::ExpressionType::NONLINEAR);
+      CHECK(problem.cost_function_type() == slp::ExpressionType::NONLINEAR);
+      CHECK(problem.equality_constraint_type() == slp::ExpressionType::NONE);
+      CHECK(problem.inequality_constraint_type() ==
+            slp::ExpressionType::NONLINEAR);
 
-      EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+      CHECK(problem.solve() == slp::ExitStatus::SUCCESS);
 
       auto near = [](double expected, double actual, double tolerance) {
         return std::abs(expected - actual) < tolerance;
@@ -75,19 +67,13 @@ TEST(ProblemTest, RosenbrockWithCubicAndLineConstraint) {
 
       // Local minimum at (0.0, 0.0)
       // Global minimum at (1.0, 1.0)
-      EXPECT_TRUE((near(0.0, x.value(), 1e-2) || near(1.0, x.value(), 1e-2)));
-      EXPECT_TRUE((near(0.0, y.value(), 1e-2) || near(1.0, y.value(), 1e-2)));
+      CHECK((near(0.0, x.value(), 1e-2) || near(1.0, x.value(), 1e-2)));
+      CHECK((near(0.0, y.value(), 1e-2) || near(1.0, y.value(), 1e-2)));
     }
-  }
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
   }
 }
 
-TEST(ProblemTest, RosenbrockWithDiskConstraint) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest RosenbrockWithDiskConstraint", "[wpimath]") {
   // https://en.wikipedia.org/wiki/Test_functions_for_optimization#Test_functions_for_constrained_optimization
   for (auto x0 : Range(-1.5, 1.5, 0.1)) {
     for (auto y0 : Range(-1.5, 1.5, 0.1)) {
@@ -102,26 +88,20 @@ TEST(ProblemTest, RosenbrockWithDiskConstraint) {
 
       problem.subject_to(pow(x, 2.0) + pow(y, 2.0) <= 2.0);
 
-      EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
-      EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::NONE);
-      EXPECT_EQ(problem.inequality_constraint_type(),
-                slp::ExpressionType::QUADRATIC);
+      CHECK(problem.cost_function_type() == slp::ExpressionType::NONLINEAR);
+      CHECK(problem.equality_constraint_type() == slp::ExpressionType::NONE);
+      CHECK(problem.inequality_constraint_type() ==
+            slp::ExpressionType::QUADRATIC);
 
-      EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+      CHECK(problem.solve() == slp::ExitStatus::SUCCESS);
 
-      EXPECT_NEAR(x.value(), 1.0, 1e-3);
-      EXPECT_NEAR(y.value(), 1.0, 1e-3);
+      CHECK_NEAR(x.value(), 1.0, 1e-3);
+      CHECK_NEAR(y.value(), 1.0, 1e-3);
     }
-  }
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
   }
 }
 
-TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest Minimum2DDistanceWithLinearConstraint", "[wpimath]") {
   slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
@@ -134,23 +114,17 @@ TEST(ProblemTest, Minimum2DDistanceWithLinearConstraint) {
 
   problem.subject_to(y == -x + 5.0);
 
-  EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
-  EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::LINEAR);
-  EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::NONE);
+  CHECK(problem.cost_function_type() == slp::ExpressionType::NONLINEAR);
+  CHECK(problem.equality_constraint_type() == slp::ExpressionType::LINEAR);
+  CHECK(problem.inequality_constraint_type() == slp::ExpressionType::NONE);
 
-  EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+  CHECK(problem.solve() == slp::ExitStatus::SUCCESS);
 
-  EXPECT_NEAR(x.value(), 2.5, 1e-2);
-  EXPECT_NEAR(y.value(), 2.5, 1e-2);
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
-  }
+  CHECK_NEAR(x.value(), 2.5, 1e-2);
+  CHECK_NEAR(y.value(), 2.5, 1e-2);
 }
 
-TEST(ProblemTest, ConflictingBounds) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest ConflictingBounds", "[wpimath]") {
   slp::Problem<double> problem;
 
   auto x = problem.decision_variable();
@@ -162,22 +136,14 @@ TEST(ProblemTest, ConflictingBounds) {
   problem.subject_to(x >= 0.5);
   problem.subject_to(x <= -0.5);
 
-  EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::NONLINEAR);
-  EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::NONE);
-  EXPECT_EQ(problem.inequality_constraint_type(),
-            slp::ExpressionType::NONLINEAR);
+  CHECK(problem.cost_function_type() == slp::ExpressionType::NONLINEAR);
+  CHECK(problem.equality_constraint_type() == slp::ExpressionType::NONE);
+  CHECK(problem.inequality_constraint_type() == slp::ExpressionType::NONLINEAR);
 
-  EXPECT_EQ(problem.solve({.diagnostics = true}),
-            slp::ExitStatus::GLOBALLY_INFEASIBLE);
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
-  }
+  CHECK(problem.solve() == slp::ExitStatus::GLOBALLY_INFEASIBLE);
 }
 
-TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
-  testing::internal::CaptureStdout();
-
+TEST_CASE("ProblemTest WachterAndBieglerLineSearchFailure", "[wpimath]") {
   // See example 19.2 of [1]
   //
   // [1] Nocedal, J. and Wright, S. "Numerical Optimization", 2nd. ed., Ch. 19.
@@ -200,17 +166,13 @@ TEST(ProblemTest, WachterAndBieglerLineSearchFailure) {
   problem.subject_to(s1 >= 0.0);
   problem.subject_to(s2 >= 0.0);
 
-  EXPECT_EQ(problem.cost_function_type(), slp::ExpressionType::LINEAR);
-  EXPECT_EQ(problem.equality_constraint_type(), slp::ExpressionType::QUADRATIC);
-  EXPECT_EQ(problem.inequality_constraint_type(), slp::ExpressionType::LINEAR);
+  CHECK(problem.cost_function_type() == slp::ExpressionType::LINEAR);
+  CHECK(problem.equality_constraint_type() == slp::ExpressionType::QUADRATIC);
+  CHECK(problem.inequality_constraint_type() == slp::ExpressionType::LINEAR);
 
-  EXPECT_EQ(problem.solve({.diagnostics = true}), slp::ExitStatus::SUCCESS);
+  CHECK(problem.solve() == slp::ExitStatus::SUCCESS);
 
-  EXPECT_NEAR(x.value(), 1.0, 1e-6);
-  EXPECT_NEAR(s1.value(), 0.0, 1e-6);
-  EXPECT_NEAR(s2.value(), 0.5, 1e-6);
-
-  if (auto output = testing::internal::GetCapturedStdout(); HasFailure()) {
-    wpi::util::println("{}", output);
-  }
+  CHECK_NEAR(x.value(), 1.0, 1e-6);
+  CHECK_NEAR(s1.value(), 0.0, 1e-6);
+  CHECK_NEAR(s2.value(), 0.5, 1e-6);
 }

@@ -4,7 +4,7 @@
 
 #include "wpi/commands2/button/POVButton.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
@@ -15,7 +15,8 @@
 using namespace wpi::cmd;
 class POVButtonTest : public CommandTestBase {};
 
-TEST_F(POVButtonTest, SetPOV) {
+TEST_CASE_METHOD(POVButtonTest, "POVButtonTest SetPOV",
+                 "[commandsv2][command]") {
   wpi::sim::JoystickSim joysim(1);
   joysim.SetPOV(wpi::POVDirection::UP);
   joysim.NotifyNewData();
@@ -28,14 +29,14 @@ TEST_F(POVButtonTest, SetPOV) {
   wpi::Joystick joy(1);
   POVButton(&joy, wpi::POVDirection::RIGHT).OnTrue(&command);
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK_FALSE(scheduler.IsScheduled(&command));
 
   joysim.SetPOV(wpi::POVDirection::RIGHT);
   joysim.NotifyNewData();
 
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  CHECK(scheduler.IsScheduled(&command));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK_FALSE(scheduler.IsScheduled(&command));
 }

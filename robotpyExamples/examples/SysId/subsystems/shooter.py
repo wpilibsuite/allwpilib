@@ -8,8 +8,9 @@ from typing import Callable
 
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
-from wpilib import Encoder, PWMSparkMax, RobotController
+from wpilib import Encoder, RobotController
 from wpilib.sysid import SysIdRoutineLog
+from wpilib_drivers import PWMSparkMax
 
 import wpimath
 import wpimath.units
@@ -58,7 +59,7 @@ class Shooter(Subsystem):
         self.shooter_feedback = wpimath.PIDController(ShooterConstants.P, 0, 0)
         # Feedforward controller to run the shooter wheel in closed-loop, set the constants equal to
         # those calculated by SysId
-        self.shooter_feedforward = wpimath.SimpleMotorFeedforwardRadians(
+        self.shooter_feedforward = wpimath.SimpleMotorFeedforward(
             ShooterConstants.S,
             ShooterConstants.V / wpimath.units.rotations_to_radians(1),
             ShooterConstants.A / wpimath.units.rotations_to_radians(1),
@@ -98,8 +99,8 @@ class Shooter(Subsystem):
             self.feeder_motor.set_throttle(ShooterConstants.FEEDER_VELOCITY)
 
         def _stop_motors(interrupted: bool) -> None:
-            self.shooter_motor.stop_motor()
-            self.feeder_motor.stop_motor()
+            self.shooter_motor.set_throttle(0.0)
+            self.feeder_motor.set_throttle(0.0)
 
         return self.run(_run_shooter).finally_do(_stop_motors).with_name("runShooter")
 

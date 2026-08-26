@@ -7,12 +7,11 @@ package org.wpilib.drive;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.function.DoubleConsumer;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.MotorController;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -51,13 +50,11 @@ import org.wpilib.util.sendable.SendableRegistry;
  * arcadeDrive, or curvatureDrive methods should be called periodically to avoid Motor Safety
  * timeouts.
  */
-public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoCloseable {
-  private static int instances;
-
+public class DifferentialDrive extends RobotDriveBase implements TelemetryLoggable {
   private final DoubleConsumer m_leftMotor;
   private final DoubleConsumer m_rightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry
   private double m_leftOutput;
   private double m_rightOutput;
 
@@ -100,13 +97,10 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor.
    * @param rightMotor Right motor.
    */
-  @SuppressWarnings({"removal", "this-escape"})
   public DifferentialDrive(MotorController leftMotor, MotorController rightMotor) {
     this(
         (double output) -> leftMotor.setThrottle(output),
         (double output) -> rightMotor.setThrottle(output));
-    SendableRegistry.addChild(this, leftMotor);
-    SendableRegistry.addChild(this, rightMotor);
   }
 
   /**
@@ -119,20 +113,12 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    * @param leftMotor Left motor setter.
    * @param rightMotor Right motor setter.
    */
-  @SuppressWarnings("this-escape")
   public DifferentialDrive(DoubleConsumer leftMotor, DoubleConsumer rightMotor) {
     requireNonNullParam(leftMotor, "leftMotor", "DifferentialDrive");
     requireNonNullParam(rightMotor, "rightMotor", "DifferentialDrive");
 
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
-    instances++;
-    SendableRegistry.add(this, "DifferentialDrive", instances);
-  }
-
-  @Override
-  public void close() {
-    SendableRegistry.remove(this);
   }
 
   /**
@@ -157,7 +143,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void arcadeDrive(double xVelocity, double zRotation, boolean squareInputs) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialArcade");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialArcade");
       m_reported = true;
     }
 
@@ -188,7 +174,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void curvatureDrive(double xVelocity, double zRotation, boolean allowTurnInPlace) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialCurvature");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialCurvature");
       m_reported = true;
     }
 
@@ -230,7 +216,7 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
    */
   public void tankDrive(double leftVelocity, double rightVelocity, boolean squareInputs) {
     if (!m_reported) {
-      HAL.reportUsage("RobotDrive", "DifferentialTank");
+      UsageReporting.reportUsage("RobotDrive", "DifferentialTank");
       m_reported = true;
     }
 
@@ -366,10 +352,13 @@ public class DifferentialDrive extends RobotDriveBase implements Sendable, AutoC
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("DifferentialDrive");
-    builder.setActuator(true);
-    builder.addDoubleProperty("Left Motor Velocity", () -> m_leftOutput, m_leftMotor);
-    builder.addDoubleProperty("Right Motor Velocity", () -> m_rightOutput, m_rightMotor);
+  public void logTo(TelemetryTable table) {
+    table.log("Left Motor Velocity", m_leftOutput);
+    table.log("Right Motor Velocity", m_rightOutput);
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "DifferentialDrive";
   }
 }

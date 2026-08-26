@@ -4,68 +4,27 @@
 
 #pragma once
 
-#include <algorithm>
+#include <cstdint>
 #include <initializer_list>
-#include <memory>
-#include <ostream>
 #include <span>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
-#include <gmock/gmock.h>
-
-#include "wpi/util/TestPrinters.hpp"
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
 
 namespace wpi::util {
 
 template <typename T>
-class SpanMatcher : public ::testing::MatcherInterface<std::span<T>> {
- public:
-  explicit SpanMatcher(std::span<T> good_) : good{good_.begin(), good_.end()} {}
-
-  bool MatchAndExplain(std::span<T> val,
-                       ::testing::MatchResultListener* listener) const override;
-  void DescribeTo(::std::ostream* os) const override;
-  void DescribeNegationTo(::std::ostream* os) const override;
-
- private:
-  std::vector<std::remove_cv_t<T>> good;
-};
-
-template <typename T>
-inline ::testing::Matcher<std::span<const typename T::value_type>> SpanEq(
-    const T& good) {
-  return ::testing::MakeMatcher(
-      new SpanMatcher(std::span<const typename T::value_type>(good)));
+inline auto SpanEq(const T& good) {
+  return Catch::Matchers::RangeEquals(
+      std::vector<std::remove_cv_t<typename T::value_type>>{good.begin(),
+                                                            good.end()});
 }
 
 template <typename T>
-inline ::testing::Matcher<std::span<const T>> SpanEq(
-    std::initializer_list<const T> good) {
-  return ::testing::MakeMatcher(
-      new SpanMatcher<const T>({good.begin(), good.end()}));
-}
-
-template <typename T>
-bool SpanMatcher<T>::MatchAndExplain(
-    std::span<T> val, ::testing::MatchResultListener* listener) const {
-  if (val.size() != good.size() ||
-      !std::equal(val.begin(), val.end(), good.begin())) {
-    return false;
-  }
-  return true;
-}
-
-template <typename T>
-void SpanMatcher<T>::DescribeTo(::std::ostream* os) const {
-  PrintTo(std::span<T>{good}, os);
-}
-
-template <typename T>
-void SpanMatcher<T>::DescribeNegationTo(::std::ostream* os) const {
-  *os << "is not equal to ";
-  PrintTo(std::span<T>{good}, os);
+inline auto SpanEq(std::initializer_list<const T> good) {
+  return Catch::Matchers::RangeEquals(
+      std::vector<std::remove_cv_t<T>>{good.begin(), good.end()});
 }
 
 }  // namespace wpi::util

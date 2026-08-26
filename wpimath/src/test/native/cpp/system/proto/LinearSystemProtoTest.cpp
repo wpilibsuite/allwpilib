@@ -4,7 +4,7 @@
 
 #include "wpi/math/system/proto/LinearSystemProto.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/system/LinearSystem.hpp"
@@ -14,7 +14,7 @@ using namespace wpi::math;
 struct LinearSystemProtoTestData {
   using Type = LinearSystem<2, 3, 4>;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       Matrixd<2, 2>{{1.1, 1.2}, {1.3, 1.4}},
       Matrixd<2, 3>{{2.1, 2.2, 2.3}, {2.4, 2.5, 2.6}},
       Matrixd<4, 2>{{3.1, 3.2}, {3.3, 3.4}, {3.5, 3.6}, {3.7, 3.8}},
@@ -24,12 +24,12 @@ struct LinearSystemProtoTestData {
                     {4.10, 4.11, 4.12}}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.A(), data.A());
-    EXPECT_EQ(testData.B(), data.B());
-    EXPECT_EQ(testData.C(), data.C());
-    EXPECT_EQ(testData.D(), data.D());
+    CHECK(testData.A() == data.A());
+    CHECK(testData.B() == data.B());
+    CHECK(testData.C() == data.C());
+    CHECK(testData.D() == data.D());
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(LinearSystem, ProtoTest,
-                               LinearSystemProtoTestData);
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(LinearSystem, ProtoTest,
+                                     LinearSystemProtoTestData);

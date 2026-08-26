@@ -5,7 +5,6 @@
 #include "wpi/glass/networktables/NTGyro.hpp"
 
 #include <format>
-#include <utility>
 
 #include "wpi/util/StringExtras.hpp"
 
@@ -18,14 +17,10 @@ NTGyroModel::NTGyroModel(wpi::nt::NetworkTableInstance inst,
                          std::string_view path)
     : m_inst{inst},
       m_angle{inst.GetDoubleTopic(std::format("{}/Value", path)).Subscribe(0)},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe({})},
       m_angleData{std::format("NT_Gyro:{}", path)},
       m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTGyroModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_angle.ReadQueue()) {
     m_angleData.SetValue(v.value, v.time);
   }

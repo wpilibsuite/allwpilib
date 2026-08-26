@@ -5,6 +5,7 @@ classes:
   wpi::Timer:
     methods:
       Timer:
+      CreateStarted:
       Get:
       Reset:
       Start:

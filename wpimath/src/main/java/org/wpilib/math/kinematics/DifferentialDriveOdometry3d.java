@@ -12,8 +12,8 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Class for differential drive odometry. Odometry allows you to track the robot's position on the
@@ -47,7 +47,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
         gyroAngle,
         new DifferentialDriveWheelPositions(leftDistance, rightDistance),
         initialPose);
-    MathSharedStore.reportUsage("DifferentialDriveOdometry3d", "");
+    UsageReporting.reportUsage("DifferentialDriveOdometry3d", "");
   }
 
   /**
@@ -73,7 +73,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, double leftDistance, double rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose3d.ZERO);
   }
 
   /**
@@ -85,7 +85,7 @@ public class DifferentialDriveOdometry3d extends Odometry3d<DifferentialDriveWhe
    */
   public DifferentialDriveOdometry3d(
       Rotation3d gyroAngle, Distance leftDistance, Distance rightDistance) {
-    this(gyroAngle, leftDistance, rightDistance, Pose3d.kZero);
+    this(gyroAngle, leftDistance, rightDistance, Pose3d.ZERO);
   }
 
   /**

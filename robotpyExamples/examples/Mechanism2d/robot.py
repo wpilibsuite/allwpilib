@@ -5,7 +5,9 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
+import wpilib_drivers
 import wpiutil
 
 
@@ -23,8 +25,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def __init__(self):
         super().__init__()
-        self.elevator_motor = wpilib.PWMSparkMax(0)
-        self.wrist_motor = wpilib.PWMSparkMax(1)
+        self.elevator_motor = wpilib_drivers.PWMSparkMax(0)
+        self.wrist_motor = wpilib_drivers.PWMSparkMax(1)
         self.wrist_pot = wpilib.AnalogPotentiometer(1, 90)
         self.elevator_encoder = wpilib.Encoder(0, 1)
         self.joystick = wpilib.Joystick(0)
@@ -45,15 +47,15 @@ class MyRobot(wpilib.TimedRobot):
             "wrist", 0.5, 90, 6, wpiutil.Color8Bit(wpiutil.Color.PURPLE)
         )
 
-        # post the mechanism to the dashboard
-        wpilib.SmartDashboard.put_data("Mech2d", self.mech)
-
     def robot_periodic(self):
         # update the dashboard mechanism's state
         self.elevator.set_length(
             self.ELEVATOR_MINIMUM_LENGTH + self.elevator_encoder.get_distance()
         )
         self.wrist.set_angle(self.wrist_pot.get())
+
+        # post the mechanism to the dashboard
+        telemetry.log("Mech2d", self.mech)
 
     def teleop_periodic(self):
         self.elevator_motor.set_throttle(self.joystick.get_raw_axis(0))

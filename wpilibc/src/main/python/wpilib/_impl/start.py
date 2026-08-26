@@ -1,5 +1,6 @@
 import hal
 import wpilib
+import wpiutil
 import logging
 import os.path
 import sys
@@ -155,7 +156,8 @@ class RobotStarter:
             return False
 
     def _start(self, robot_cls: wpilib.RobotBase) -> bool:
-        hal.report_usage("Language", "Python")
+        wpiutil.set_report_usage_impl(hal.report_usage)
+        wpiutil.report_usage("Language", "Python")
         hal.publish_wpilib_version(f"{wpilib.__version__} (Python)")
 
         is_simulation = wpilib.RobotBase.is_simulation()
@@ -189,8 +191,6 @@ class RobotStarter:
             report_error_internal(
                 "timed out while waiting for NT server to start", is_warning=True
             )
-
-        wpilib.SmartDashboard.init()
 
         # Call DriverStationBackend.refresh_data() to kick things off
         wpilib.DriverStationBackend.refresh_data()

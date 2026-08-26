@@ -45,11 +45,11 @@ HAL_PowerDistributionHandle HAL_InitializePowerDistribution(
     if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
       *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                          "Invalid Index for CTRE PDP", 0,
-                                         kNumCTREPDPModules - 1, module);
+                                         NUM_CTREPDP_MODULES - 1, module);
     } else {
       *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                          "Invalid Index for REV PDH", 1,
-                                         kNumREVPDHModules, module);
+                                         NUM_REVPDH_MODULES, module);
     }
     return HAL_INVALID_HANDLE;
   }
@@ -78,9 +78,9 @@ int32_t HAL_GetPowerDistributionModuleNumber(HAL_PowerDistributionHandle handle,
 HAL_Bool HAL_CheckPowerDistributionModule(int32_t module,
                                           HAL_PowerDistributionType type) {
   if (type == HAL_PowerDistributionType::HAL_POWER_DISTRIBUTION_CTRE) {
-    return module < kNumCTREPDPModules && module >= 0;
+    return module < NUM_CTREPDP_MODULES && module >= 0;
   } else {
-    return module <= kNumREVPDHModules && module >= 1;
+    return module <= NUM_REVPDH_MODULES && module >= 1;
   }
 }
 
@@ -88,9 +88,9 @@ HAL_Bool HAL_CheckPowerDistributionChannel(HAL_PowerDistributionHandle handle,
                                            int32_t channel) {
   // TODO make this grab from the handle directly
   if (false) {
-    return channel < kNumCTREPDPChannels && channel >= 0;
+    return channel < NUM_CTREPDP_CHANNELS && channel >= 0;
   } else {
-    return channel < kNumREVPDHChannels && channel >= 0;
+    return channel < NUM_REVPDH_CHANNELS && channel >= 0;
   }
 }
 
@@ -103,9 +103,9 @@ int32_t HAL_GetPowerDistributionNumChannels(HAL_PowerDistributionHandle handle,
                                             int32_t* status) {
   // TODO make this grab from the handle directly
   if (false) {
-    return kNumCTREPDPChannels;
+    return NUM_CTREPDP_CHANNELS;
   } else {
-    return kNumREVPDHChannels;
+    return NUM_REVPDH_CHANNELS;
   }
 }
 
@@ -146,7 +146,7 @@ void HAL_GetPowerDistributionAllChannelCurrents(
   }
 
   auto& data = SimPowerDistributionData[module];
-  int toCopy = (std::min)(currentsLength, kNumPDSimChannels);
+  int toCopy = (std::min)(currentsLength, NUM_PD_SIM_CHANNELS);
   for (int i = 0; i < toCopy; i++) {
     currents[i] = data.current[i];
   }
@@ -160,7 +160,7 @@ double HAL_GetPowerDistributionTotalCurrent(HAL_PowerDistributionHandle handle,
 
   double total = 0.0;
   auto& data = SimPowerDistributionData[module];
-  for (int i = 0; i < kNumPDSimChannels; i++) {
+  for (int i = 0; i < NUM_PD_SIM_CHANNELS; i++) {
     total += data.current[i];
   }
   return total;

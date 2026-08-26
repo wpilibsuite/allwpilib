@@ -25,7 +25,7 @@ public class PeriodicPriorityQueue {
   /** Internal priority queue ordered by callback expiration times. */
   private final PriorityQueue<Callback> m_queue;
 
-  private long m_loopStartTimeMicros;
+  private long m_loopStartTimeNanos;
 
   /** Constructs an empty callback queue. */
   public PeriodicPriorityQueue() {
@@ -37,7 +37,7 @@ public class PeriodicPriorityQueue {
    *
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in monotonic timestamp
-   *     microseconds.
+   *     nanoseconds.
    * @param periodSeconds The callback period in seconds.
    * @param offsetSeconds The offset from the common starting time in seconds.
    * @return the callback object
@@ -53,7 +53,7 @@ public class PeriodicPriorityQueue {
    *
    * @param func The function to call periodically.
    * @param timestamp The common starting point for callback scheduling in monotonic timestamp
-   *     microseconds.
+   *     nanoseconds.
    * @param periodSeconds The callback period in seconds.
    * @return the callback object
    */
@@ -172,28 +172,28 @@ public class PeriodicPriorityQueue {
       return false;
     }
 
-    m_loopStartTimeMicros = RobotController.getMonotonicTime();
+    m_loopStartTimeNanos = RobotController.getMonotonicTime();
 
     callback.func.run();
 
     // Increment the expiration time by the number of full periods it's behind
     // plus one to avoid rapid repeat fires from a large loop overrun. We
-    // assume m_loopStartTime ≥ expirationTime rather than checking for it since
+    // assume m_loopStartTime >= expirationTime rather than checking for it since
     // the callback wouldn't be running otherwise.
     callback.expirationTime +=
         callback.period
-            + (m_loopStartTimeMicros - callback.expirationTime) / callback.period * callback.period;
+            + (m_loopStartTimeNanos - callback.expirationTime) / callback.period * callback.period;
     m_queue.add(callback);
 
     // Process all other callbacks that are ready to run
-    while (m_queue.peek().expirationTime <= m_loopStartTimeMicros) {
+    while (m_queue.peek().expirationTime <= m_loopStartTimeNanos) {
       callback = m_queue.poll();
 
       callback.func.run();
 
       callback.expirationTime +=
           callback.period
-              + (m_loopStartTimeMicros - callback.expirationTime)
+              + (m_loopStartTimeNanos - callback.expirationTime)
                   / callback.period
                   * callback.period;
       m_queue.add(callback);
@@ -203,14 +203,14 @@ public class PeriodicPriorityQueue {
   }
 
   /**
-   * Return the system clock time in microseconds for the start of the current periodic loop. This
-   * is in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
+   * Return the system clock time in nanoseconds for the start of the current periodic loop. This is
+   * in the same time base as Timer.getMonotonicTimeStamp(), but is stable through a loop. It is
    * updated at the beginning of every periodic callback (including the normal periodic loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current periodic function.
+   * @return Robot running time in nanoseconds, as of the start of the current periodic function.
    */
   public long getLoopStartTime() {
-    return m_loopStartTimeMicros;
+    return m_loopStartTimeNanos;
   }
 
   /**
@@ -227,10 +227,10 @@ public class PeriodicPriorityQueue {
     /** The function to execute when the callback fires. */
     public final Runnable func;
 
-    /** The period at which to run the callback in microseconds. */
+    /** The period at which to run the callback in nanoseconds. */
     public final long period;
 
-    /** The next scheduled execution time in monotonic timestamp microseconds. */
+    /** The next scheduled execution time in monotonic timestamp nanoseconds. */
     public long expirationTime;
 
     /**
@@ -243,9 +243,9 @@ public class PeriodicPriorityQueue {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param startTime The common starting point for all callback scheduling in microseconds.
-     * @param period The period at which to run the callback in microseconds.
-     * @param offset The offset from the common starting time in microseconds.
+     * @param startTime The common starting point for all callback scheduling in nanoseconds.
+     * @param period The period at which to run the callback in nanoseconds.
+     * @param offset The offset from the common starting time in nanoseconds.
      */
     public Callback(Runnable func, long startTime, long period, long offset) {
       this.func = func;
@@ -262,23 +262,23 @@ public class PeriodicPriorityQueue {
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param timestamp The common starting point for all callback scheduling in nanoseconds.
      * @param periodSeconds The period at which to run the callback in seconds.
      * @param offsetSeconds The offset from the common starting time in seconds.
      */
     public Callback(Runnable func, long timestamp, double periodSeconds, double offsetSeconds) {
-      this(func, timestamp, (long) (periodSeconds * 1e6), (long) (offsetSeconds * 1e6));
+      this(func, timestamp, (long) (periodSeconds * 1e9), (long) (offsetSeconds * 1e9));
     }
 
     /**
      * Construct a callback container.
      *
      * @param func The callback to run.
-     * @param timestamp The common starting point for all callback scheduling in microseconds.
+     * @param timestamp The common starting point for all callback scheduling in nanoseconds.
      * @param periodSeconds The period at which to run the callback in seconds.
      */
     public Callback(Runnable func, long timestamp, double periodSeconds) {
-      this(func, timestamp, (long) (periodSeconds * 1e6), 0);
+      this(func, timestamp, (long) (periodSeconds * 1e9), 0);
     }
 
     /**

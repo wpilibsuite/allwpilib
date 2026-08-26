@@ -9,7 +9,7 @@
 #include "Constants.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/commands2/sysid/SysIdRoutine.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
@@ -25,12 +25,12 @@ class Shooter : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr SysIdDynamic(wpi::cmd::sysid::Direction direction);
 
  private:
-  wpi::PWMSparkMax shooterMotor{constants::shooter::kShooterMotorPort};
-  wpi::PWMSparkMax feederMotor{constants::shooter::kFeederMotorPort};
+  wpi::PWMSparkMax shooterMotor{constants::shooter::SHOOTER_MOTOR_PORT};
+  wpi::PWMSparkMax feederMotor{constants::shooter::FEEDER_MOTOR_PORT};
 
-  wpi::Encoder shooterEncoder{constants::shooter::kEncoderPorts[0],
-                              constants::shooter::kEncoderPorts[1],
-                              constants::shooter::kEncoderReversed};
+  wpi::Encoder shooterEncoder{constants::shooter::ENCODER_PORTS[0],
+                              constants::shooter::ENCODER_PORTS[1],
+                              constants::shooter::ENCODER_REVERSED};
 
   wpi::cmd::sysid::SysIdRoutine sysIdRoutine{
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,

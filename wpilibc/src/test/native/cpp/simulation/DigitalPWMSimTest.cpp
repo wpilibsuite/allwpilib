@@ -4,7 +4,8 @@
 
 #include "wpi/simulation/DigitalPWMSim.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
@@ -12,12 +13,12 @@
 
 namespace wpi::sim {
 
-TEST(DigitalPWMSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+TEST_CASE("DigitalPWMSimTest Initialize", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   DigitalOutput output{0};
   DigitalPWMSim sim(output);
-  EXPECT_FALSE(sim.GetInitialized());
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback initializeCallback;
   auto initCb =
@@ -27,20 +28,20 @@ TEST(DigitalPWMSimTest, Initialize) {
   auto dutyCycleCB =
       sim.RegisterDutyCycleCallback(dutyCycleCallback.GetCallback(), false);
 
-  constexpr double kTestDutyCycle = 0.191;
-  output.EnablePWM(kTestDutyCycle);
+  constexpr double TEST_DUTY_CYCLE = 0.191;
+  output.EnablePWM(TEST_DUTY_CYCLE);
 
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(initializeCallback.WasTriggered());
-  EXPECT_TRUE(initializeCallback.GetLastValue());
+  CHECK(sim.GetInitialized());
+  CHECK(initializeCallback.WasTriggered());
+  CHECK(initializeCallback.GetLastValue());
 
-  EXPECT_EQ(kTestDutyCycle, sim.GetDutyCycle());
-  EXPECT_TRUE(dutyCycleCallback.WasTriggered());
-  EXPECT_EQ(kTestDutyCycle, dutyCycleCallback.GetLastValue());
+  CHECK(TEST_DUTY_CYCLE == sim.GetDutyCycle());
+  CHECK(dutyCycleCallback.WasTriggered());
+  CHECK(TEST_DUTY_CYCLE == dutyCycleCallback.GetLastValue());
 }
 
-TEST(DigitalPWMSimTest, SetPin) {
-  HAL_Initialize(500, 0);
+TEST_CASE("DigitalPWMSimTest SetPin", "[wpilibc][simulation]") {
+  HAL_Initialize();
 
   DigitalOutput output{2};
   DigitalPWMSim sim(output);
@@ -49,9 +50,9 @@ TEST(DigitalPWMSimTest, SetPin) {
   auto cb = sim.RegisterPinCallback(callback.GetCallback(), false);
 
   sim.SetPin(191);
-  EXPECT_EQ(191, sim.GetPin());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_EQ(191, callback.GetLastValue());
+  CHECK(191 == sim.GetPin());
+  CHECK(callback.WasTriggered());
+  CHECK(191 == callback.GetLastValue());
 }
 
 }  // namespace wpi::sim

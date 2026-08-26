@@ -22,21 +22,10 @@ public final class HAL extends JNIWrapper {
    * variables in a program MUST call this function in their constructors if they want to use other
    * HAL calls.
    *
-   * <p>The common parameters are 500 for timeout and 0 for mode.
-   *
-   * <p>This function is safe to call from any thread, and as many times as you wish. It internally
-   * guards from any reentrancy.
-   *
-   * <p>The applicable modes are: 0: Try to kill an existing HAL from another program, if not
-   * successful, error. 1: Force kill a HAL from another program. 2: Just warn if another hal exists
-   * and cannot be killed. Will likely result in undefined behavior.
-   *
-   * @param timeout the initialization timeout (ms)
-   * @param mode the initialization mode (see remarks)
    * @return true if initialization was successful, otherwise false.
    * @see "HAL_Initialize"
    */
-  public static native boolean initialize(int timeout, int mode);
+  public static native boolean initialize();
 
   /**
    * Call this to shut down HAL.

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -12,7 +12,7 @@
 using namespace wpi::math;
 
 namespace {
-const HolonomicTrajectory kExpectedData =
+const HolonomicTrajectory EXPECTED_DATA =
     HolonomicTrajectory{std::vector<HolonomicSample>{
         HolonomicSample{
             0_s, Pose2d{}, ChassisVelocities{1_mps, 0_mps, 0_rad_per_s},
@@ -23,13 +23,13 @@ const HolonomicTrajectory kExpectedData =
             ChassisAccelerations{0.1_mps_sq, 0.2_mps_sq, 0.4_rad_per_s_sq}}}};
 }  // namespace
 
-TEST(HolonomicTrajectoryProtoTest, Roundtrip) {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+TEST_CASE("HolonomicTrajectoryProtoTest Roundtrip", "[wpimath]") {
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData, unpacked_data.value());
+  CHECK(EXPECTED_DATA == unpacked_data.value());
 }

@@ -6,7 +6,8 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "callback_helpers/TestCallbackHelpers.hpp"
 #include "wpi/hal/HAL.h"
@@ -15,58 +16,63 @@
 
 namespace wpi::sim {
 
-TEST(PowerDistributionSimTest, Initialize) {
-  HAL_Initialize(500, 0);
+TEST_CASE("PowerDistributionSimTest Initialize", "[wpilibc][simulation]") {
+  HAL_Initialize();
   PowerDistributionSim sim{2};
-  EXPECT_FALSE(sim.GetInitialized());
+  sim.ResetData();
+  CHECK_FALSE(sim.GetInitialized());
 
   BooleanCallback callback;
 
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
-  PowerDistribution pdp(0, 2, wpi::PowerDistribution::ModuleType::CTRE);
-  EXPECT_TRUE(sim.GetInitialized());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  PowerDistribution pdp(CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE);
+  CHECK(sim.GetInitialized());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 
   callback.Reset();
   sim.SetInitialized(false);
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_FALSE(callback.GetLastValue());
+  CHECK(callback.WasTriggered());
+  CHECK_FALSE(callback.GetLastValue());
 }
 
-TEST(PowerDistributionSimTest, SetTemperature) {
-  HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+TEST_CASE("PowerDistributionSimTest SetTemperature", "[wpilibc][simulation]") {
+  HAL_Initialize();
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
   auto cb = sim.RegisterTemperatureCallback(callback.GetCallback(), false);
 
   sim.SetTemperature(35.04);
-  EXPECT_EQ(35.04, sim.GetTemperature());
-  EXPECT_EQ(35.04, pdp.GetTemperature());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(35.04 == sim.GetTemperature());
+  CHECK(35.04 == pdp.GetTemperature());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(PowerDistributionSimTest, SetVoltage) {
-  HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+TEST_CASE("PowerDistributionSimTest SetVoltage", "[wpilibc][simulation]") {
+  HAL_Initialize();
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   DoubleCallback callback;
   auto cb = sim.RegisterVoltageCallback(callback.GetCallback(), false);
 
   sim.SetVoltage(35.04);
-  EXPECT_EQ(35.04, sim.GetVoltage());
-  EXPECT_EQ(35.04, pdp.GetVoltage());
-  EXPECT_TRUE(callback.WasTriggered());
-  EXPECT_TRUE(callback.GetLastValue());
+  CHECK(35.04 == sim.GetVoltage());
+  CHECK(35.04 == pdp.GetVoltage());
+  CHECK(callback.WasTriggered());
+  CHECK(callback.GetLastValue());
 }
 
-TEST(PowerDistributionSimTest, SetCurrent) {
-  HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::CTRE};
+TEST_CASE("PowerDistributionSimTest SetCurrent", "[wpilibc][simulation]") {
+  HAL_Initialize();
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::CTRE};
   PowerDistributionSim sim(pdp);
 
   for (int channel = 0; channel < HAL_GetNumCTREPDPChannels(); ++channel) {
@@ -74,24 +80,25 @@ TEST(PowerDistributionSimTest, SetCurrent) {
     auto cb =
         sim.RegisterCurrentCallback(channel, callback.GetCallback(), false);
 
-    const double kTestCurrent = 35.04 + channel;
-    sim.SetCurrent(channel, kTestCurrent);
-    EXPECT_EQ(kTestCurrent, sim.GetCurrent(channel));
-    EXPECT_EQ(kTestCurrent, pdp.GetCurrent(channel));
-    EXPECT_TRUE(callback.WasTriggered());
-    EXPECT_TRUE(callback.GetLastValue());
+    const double TEST_CURRENT = 35.04 + channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
+    CHECK(TEST_CURRENT == sim.GetCurrent(channel));
+    CHECK(TEST_CURRENT == pdp.GetCurrent(channel));
+    CHECK(callback.WasTriggered());
+    CHECK(callback.GetLastValue());
   }
 }
 
-TEST(PowerDistributionSimTest, GetAllCurrents) {
-  HAL_Initialize(500, 0);
-  PowerDistribution pdp{0, 2, wpi::PowerDistribution::ModuleType::REV};
+TEST_CASE("PowerDistributionSimTest GetAllCurrents", "[wpilibc][simulation]") {
+  HAL_Initialize();
+  PowerDistribution pdp{CANBus::CAN_S0, 2,
+                        wpi::PowerDistribution::ModuleType::REV};
   PowerDistributionSim sim(pdp);
 
   // setup
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    sim.SetCurrent(channel, kTestCurrent);
+    const double TEST_CURRENT = 24 - channel;
+    sim.SetCurrent(channel, TEST_CURRENT);
   }
 
   // run it
@@ -99,8 +106,8 @@ TEST(PowerDistributionSimTest, GetAllCurrents) {
 
   // verify
   for (int channel = 0; channel < pdp.GetNumChannels(); ++channel) {
-    const double kTestCurrent = 24 - channel;
-    EXPECT_EQ(kTestCurrent, currents[channel]);
+    const double TEST_CURRENT = 24 - channel;
+    CHECK(TEST_CURRENT == currents[channel]);
   }
 }
 

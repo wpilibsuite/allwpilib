@@ -27,7 +27,7 @@ class Watchdog {
   /**
    * Watchdog constructor.
    *
-   * @param timeout  The watchdog's timeout in seconds with microsecond
+   * @param timeout  The watchdog's timeout in seconds with nanosecond
    *                 resolution.
    * @param callback This function is called when the timeout expires.
    */
@@ -53,7 +53,7 @@ class Watchdog {
   /**
    * Sets the watchdog's timeout.
    *
-   * @param timeout The watchdog's timeout in seconds with microsecond
+   * @param timeout The watchdog's timeout in seconds with nanosecond
    *                resolution.
    */
   void SetTimeout(wpi::units::second_t timeout);

@@ -4,8 +4,8 @@
 
 package org.wpilib.examples.mecanumbot;
 
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
@@ -18,8 +18,8 @@ import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxVelocity = 3.0; // 3 meters per second
-  public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
+  public static final double MAX_VELOCITY = 3.0; // 3 meters per second
+  public static final double MAX_ANGULAR_VELOCITY = Math.PI; // 1/2 rotation per second
 
   private final PWMSparkMax frontLeftMotor = new PWMSparkMax(1);
   private final PWMSparkMax frontRightMotor = new PWMSparkMax(2);
@@ -132,7 +132,7 @@ public class Drivetrain {
     setVelocities(
         kinematics
             .toWheelVelocities(chassisVelocities.discretize(period))
-            .desaturate(kMaxVelocity));
+            .desaturate(MAX_VELOCITY));
   }
 
   /** Updates the field relative position of the robot. */

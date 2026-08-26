@@ -199,7 +199,7 @@ public class ElevatorFeedforward implements ProtobufSerializable, StructSerializ
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity) {
-    // See wpimath/algorithms.md#Elevator_feedforward for derivation
+    // See wpimath/docs/ElevatorFeedforward.md for derivation
     if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kg + kv * nextVelocity;
     } else {

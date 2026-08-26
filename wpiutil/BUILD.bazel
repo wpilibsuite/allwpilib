@@ -22,6 +22,7 @@ filegroup(
         "src/main/native/thirdparty/argparse/include/**/*",
         "src/main/native/thirdparty/debugging/include/**/*",
         "src/main/native/thirdparty/double-conversion/include/**/*",
+        "src/main/native/thirdparty/htrie/include/**/*",
         "src/main/native/thirdparty/json/include/**/*",
         "src/main/native/thirdparty/llvm/include/**/*",
         "src/main/native/thirdparty/mpack/include/**/*",
@@ -59,6 +60,9 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    deps = [
+        "//:generation",
+    ],
 )
 
 filegroup(
@@ -108,6 +112,11 @@ third_party_cc_lib_helper(
     include_root = "src/main/native/thirdparty/json/include",
     src_root = "src/main/native/thirdparty/json/src",
     visibility = ["//visibility:public"],
+)
+
+third_party_cc_lib_helper(
+    name = "htrie",
+    include_root = "src/main/native/thirdparty/htrie/include",
 )
 
 third_party_cc_lib_helper(
@@ -174,6 +183,7 @@ wpilib_cc_library(
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
         ":argparse",
+        ":htrie",
         ":sigslot",
     ],
     third_party_libraries = [
@@ -277,21 +287,13 @@ cc_library(
     strip_include_prefix = "src/generated/test/native/cpp",
 )
 
-CATCH2_SRCS = [
-    "src/test/native/cpp/TestCatch2.cpp",
-    "src/test/native/cpp/catch2main.cpp",
-]
-
 cc_test(
-    name = "wpiutil-gtest-cpp-test",
+    name = "wpiutil-cpp-test",
     size = "small",
-    srcs = glob(
-        [
-            "src/test/native/cpp/**",
-            "src/generated/test/native/cpp/*",
-        ],
-        exclude = CATCH2_SRCS,
-    ),
+    srcs = glob([
+        "src/test/native/cpp/**",
+        "src/generated/test/native/cpp/*",
+    ]),
     linkstatic = True,
     tags = ["no-tsan"],  # TODO(pj.reiniger) Find problem
     deps = [
@@ -299,19 +301,7 @@ cc_test(
         ":wpiutil",
         ":wpiutil-testlib",
         "//thirdparty/catch2",
-        "//thirdparty/googletest",
-    ],
-)
-
-cc_test(
-    name = "wpiutil-catch2-cpp-test",
-    size = "small",
-    srcs = CATCH2_SRCS,
-    linkstatic = True,
-    deps = [
-        ":wpiutil",
-        ":wpiutil-testlib",
-        "//thirdparty/catch2",
+        "@wpilib_toolchains//jni",
     ],
 )
 
@@ -347,6 +337,7 @@ generate_robotpy_native_wrapper_build_info(
         "argparse",
         "debugging",
         "double-conversion",
+        "htrie",
         "json",
         "llvm",
         "mpack",
@@ -389,6 +380,7 @@ wpiutil_extension(
 
 define_pybind_library(
     name = "robotpy-wpiutil",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 

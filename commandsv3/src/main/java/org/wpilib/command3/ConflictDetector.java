@@ -54,6 +54,10 @@ public final class ConflictDetector {
    */
   public static void throwIfConflicts(Collection<? extends Command> commands) {
     requireNonNullParam(commands, "commands", "ConflictDetector.throwIfConflicts");
+    if (commands.size() <= 1) {
+      // can't have conflicts with only one command
+      return;
+    }
 
     var conflicts = findAllConflicts(commands);
     if (conflicts.isEmpty()) {
@@ -85,6 +89,9 @@ public final class ConflictDetector {
     requireNonNullParam(commands, "commands", "ConflictDetector.findAllConflicts");
 
     List<Conflict> conflicts = new ArrayList<>();
+    if (commands.size() <= 1) {
+      return conflicts;
+    }
 
     int i = 0;
     for (Command command : commands) {

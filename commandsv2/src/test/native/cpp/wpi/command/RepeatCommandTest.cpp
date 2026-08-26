@@ -11,7 +11,8 @@
 using namespace wpi::cmd;
 class RepeatCommandTest : public CommandTestBase {};
 
-TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
+TEST_CASE_METHOD(RepeatCommandTest, "RepeatCommandTest CallsMethodsCorrectly",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int initCounter = 0;
@@ -30,50 +31,50 @@ TEST_F(RepeatCommandTest, CallsMethodsCorrectly) {
                         })
           .Repeatedly();
 
-  EXPECT_EQ(0, initCounter);
-  EXPECT_EQ(0, exeCounter);
-  EXPECT_EQ(0, isFinishedCounter);
-  EXPECT_EQ(0, endCounter);
+  CHECK(0 == initCounter);
+  CHECK(0 == exeCounter);
+  CHECK(0 == isFinishedCounter);
+  CHECK(0 == endCounter);
 
   scheduler.Schedule(command);
-  EXPECT_EQ(1, initCounter);
-  EXPECT_EQ(0, exeCounter);
-  EXPECT_EQ(0, isFinishedCounter);
-  EXPECT_EQ(0, endCounter);
+  CHECK(1 == initCounter);
+  CHECK(0 == exeCounter);
+  CHECK(0 == isFinishedCounter);
+  CHECK(0 == endCounter);
 
   isFinishedHook = false;
   scheduler.Run();
-  EXPECT_EQ(1, initCounter);
-  EXPECT_EQ(1, exeCounter);
-  EXPECT_EQ(1, isFinishedCounter);
-  EXPECT_EQ(0, endCounter);
+  CHECK(1 == initCounter);
+  CHECK(1 == exeCounter);
+  CHECK(1 == isFinishedCounter);
+  CHECK(0 == endCounter);
 
   isFinishedHook = true;
   scheduler.Run();
-  EXPECT_EQ(1, initCounter);
-  EXPECT_EQ(2, exeCounter);
-  EXPECT_EQ(2, isFinishedCounter);
-  EXPECT_EQ(1, endCounter);
+  CHECK(1 == initCounter);
+  CHECK(2 == exeCounter);
+  CHECK(2 == isFinishedCounter);
+  CHECK(1 == endCounter);
 
   isFinishedHook = false;
   scheduler.Run();
-  EXPECT_EQ(2, initCounter);
-  EXPECT_EQ(3, exeCounter);
-  EXPECT_EQ(3, isFinishedCounter);
-  EXPECT_EQ(1, endCounter);
+  CHECK(2 == initCounter);
+  CHECK(3 == exeCounter);
+  CHECK(3 == isFinishedCounter);
+  CHECK(1 == endCounter);
 
   isFinishedHook = true;
   scheduler.Run();
-  EXPECT_EQ(2, initCounter);
-  EXPECT_EQ(4, exeCounter);
-  EXPECT_EQ(4, isFinishedCounter);
-  EXPECT_EQ(2, endCounter);
+  CHECK(2 == initCounter);
+  CHECK(4 == exeCounter);
+  CHECK(4 == isFinishedCounter);
+  CHECK(2 == endCounter);
 
   command.Cancel();
-  EXPECT_EQ(2, initCounter);
-  EXPECT_EQ(4, exeCounter);
-  EXPECT_EQ(4, isFinishedCounter);
-  EXPECT_EQ(2, endCounter);
+  CHECK(2 == initCounter);
+  CHECK(4 == exeCounter);
+  CHECK(4 == isFinishedCounter);
+  CHECK(2 == endCounter);
 }
 
 INSTANTIATE_SINGLE_COMMAND_COMPOSITION_TEST_SUITE(RepeatCommandTest,

@@ -97,7 +97,7 @@ public class ProtobufHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    return "backend.log(\"%s\", %s, %s)"
+    return "table.log(\"%s\", %s, %s)"
         .formatted(
             loggedName(element),
             elementAccess(element, loggedClass),

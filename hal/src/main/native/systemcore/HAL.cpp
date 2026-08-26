@@ -17,6 +17,7 @@
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
 #include "SystemServerInternal.hpp"
+#include "mrclib/Systemcore.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
 #include "wpi/util/StringExtras.hpp"
@@ -25,7 +26,7 @@
 
 using namespace wpi::hal;
 
-static uint64_t dsStartTime;
+static int64_t dsStartTime;
 
 static int32_t teamNumber = -1;
 
@@ -39,7 +40,6 @@ void InitializeHAL() {
   InitializeCTREPCM();
   InitializeREVPH();
   InitializeAddressableLED();
-  InitializeAlert();
   InitializeAnalogInput();
   InitializeCAN();
   InitializeCANAPI();
@@ -62,7 +62,7 @@ void InitializeHAL() {
 }
 }  // namespace init
 
-uint64_t GetDSInitializeTime() {
+int64_t GetDSInitializeTime() {
   return dsStartTime;
 }
 
@@ -177,7 +177,7 @@ int32_t HAL_GetTeamNumber(void) {
   return teamNumber;
 }
 
-uint64_t HAL_GetMonotonicTime(void) {
+int64_t HAL_GetMonotonicTime(void) {
   wpi::hal::init::CheckInit();
   return wpi::util::NowDefault();
 }
@@ -190,8 +190,14 @@ HAL_Bool HAL_GetSystemActive(int32_t* status) {
 
 HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   wpi::hal::init::CheckInit();
-  *status = HAL_HANDLE_ERROR;
-  return false;
+  MRC_Bool brownedOut = false;
+  MRC_Status mrcStatus = MRC_Systemcore_GetBrownedOut(&brownedOut);
+  if (mrcStatus != MRC_STATUS_SUCCESS) {
+    *status = HAL_INCOMPATIBLE_STATE;
+    return false;
+  }
+  *status = HAL_SUCCESS;
+  return brownedOut;
 }
 
 int32_t HAL_GetCommsDisableCount(int32_t* status) {
@@ -206,7 +212,7 @@ HAL_Bool HAL_GetRSLState(int32_t* status) {
   return false;
 }
 
-HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+HAL_Bool HAL_Initialize(void) {
   static std::atomic_bool initialized{false};
   static wpi::util::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished

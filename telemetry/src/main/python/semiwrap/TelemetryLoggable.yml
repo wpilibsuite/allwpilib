@@ -1,0 +1,13 @@
+extra_includes:
+- wpi/telemetry/TelemetryTable.hpp
+
+functions:
+  LogTo:
+    ignore: true
+  GetTelemetryTypeName:
+    ignore: true
+classes:
+  wpi::telemetry::TelemetryLoggable:
+    methods:
+      LogTo:
+      GetTelemetryType:

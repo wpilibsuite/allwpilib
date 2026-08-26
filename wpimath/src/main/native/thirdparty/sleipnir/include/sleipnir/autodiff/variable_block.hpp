@@ -3,6 +3,8 @@
 #pragma once
 
 #include <concepts>
+#include <cstddef>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -12,6 +14,7 @@
 #include "sleipnir/autodiff/slice.hpp"
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/util/assert.hpp"
+#include "sleipnir/util/concepts.hpp"
 #include "sleipnir/util/empty.hpp"
 #include "sleipnir/util/function_ref.hpp"
 
@@ -631,6 +634,13 @@ class VariableBlock : public SleipnirBase {
     }
 
     return result;
+  }
+
+  /// Returns the matrix exponential.
+  ///
+  /// @return The matrix exponential.
+  std::remove_cv_t<Mat> exp() const {
+    return std::remove_cv_t<Mat>{*this}.exp();
   }
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

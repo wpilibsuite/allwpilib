@@ -23,13 +23,13 @@ extern "C" {
 /*
  * Class:     org_wpilib_hardware_hal_HAL
  * Method:    initialize
- * Signature: (II)Z
+ * Signature: ()Z
  */
 JNIEXPORT jboolean JNICALL
 Java_org_wpilib_hardware_hal_HAL_initialize
-  (JNIEnv*, jclass, jint timeout, jint mode)
+  (JNIEnv*, jclass)
 {
-  return HAL_Initialize(timeout, mode);
+  return HAL_Initialize();
 }
 
 /*

@@ -68,18 +68,29 @@ def pytest_configure(config):
 """)
 
 
-def _configure_isolated_plugin(pytester, parallelism=1, robot_class="DummyRobot"):
+def _configure_isolated_plugin(
+    pytester,
+    parallelism=1,
+    robot_class="DummyRobot",
+    robot_module="robot_module",
+    robot_file_name=None,
+):
+    if robot_file_name is None:
+        robot_file = "pathlib.Path(__file__).resolve()"
+    else:
+        robot_file = f"pathlib.Path(__file__).parent / {robot_file_name!r}"
+
     pytester.makeconftest(f"""
 import pathlib
 
 from wpilib.testing.pytest_isolated_tests_plugin import IsolatedTestsPlugin
 
-from robot_module import {robot_class}
+from {robot_module} import {robot_class}
 
 def pytest_configure(config):
     if "--no-header" in config.invocation_params.args:
         return
-    robot_file = pathlib.Path(__file__).resolve()
+    robot_file = {robot_file}
     config.pluginmanager.register(
         IsolatedTestsPlugin({robot_class}, robot_file, False, False, {parallelism})
     )
@@ -164,6 +175,40 @@ def test_robot_failure_output(robot):
     assert robot_pid_one != main_pid
     assert robot_pid_two != main_pid
     assert robot_pid_one != robot_pid_two
+
+
+def test_isolated_plugin_uses_robot_directory_during_robot_import(pytester):
+    robot_dir = pytester.path / "robot_project"
+    robot_dir.mkdir()
+    robot_dir.joinpath("__init__.py").touch()
+    robot_dir.joinpath("robot.py").write_text("""
+import wpilib
+
+IMPORT_OPERATING_DIRECTORY = wpilib.get_operating_directory()
+
+
+class ImportDirectoryRobot(wpilib.TimedRobot):
+    pass
+""")
+    _configure_isolated_plugin(
+        pytester,
+        robot_class="ImportDirectoryRobot",
+        robot_module="robot_project.robot",
+        robot_file_name="robot_project/robot.py",
+    )
+    pytester.makepyfile(test_isolated="""
+import pathlib
+
+from robot_project.robot import IMPORT_OPERATING_DIRECTORY
+
+
+def test_operating_directory(robot, robot_file):
+    assert pathlib.Path(IMPORT_OPERATING_DIRECTORY) == robot_file.parent.absolute()
+""")
+
+    result = pytester.runpytest_subprocess("-vv")
+
+    result.assert_outcomes(passed=1)
 
 
 def test_isolated_plugin_assertion_rendering(pytester):

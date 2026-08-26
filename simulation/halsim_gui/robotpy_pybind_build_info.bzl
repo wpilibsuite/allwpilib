@@ -81,6 +81,8 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
             "//hal:shared/wpiHal",
             "//simulation/halsim_gui:shared/halsim_gui",
             "//ntcore:shared/ntcore",
+            "//telemetry:shared/telemetry",
+            "//tunables:shared/tunables",
             "//wpimath:shared/wpimath",
         ],
         extra_hdrs = extra_hdrs,
@@ -123,7 +125,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/halsim_gui/**"], exclude = ["src/main/python/halsim_gui/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/halsim_gui/**"], exclude = ["src/main/python/halsim_gui/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 

@@ -4,6 +4,7 @@
 
 #ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
 #include <cstdio>
+#include <format>
 #include <print>
 #include <system_error>
 #include <utility>

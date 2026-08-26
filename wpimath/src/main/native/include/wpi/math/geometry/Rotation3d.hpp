@@ -419,7 +419,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double y = m_q.Y();
     double z = m_q.Z();
 
-    // wpimath/algorithms.md
+    // See wpimath/docs/Quaternion.md
     double cxcy = 1.0 - 2.0 * (x * x + y * y);
     double sxcy = 2.0 * (w * x + y * z);
     double cy_sq = cxcy * cxcy + sxcy * sxcy;
@@ -458,7 +458,7 @@ class WPILIB_DLLEXPORT Rotation3d final {
     double y = m_q.Y();
     double z = m_q.Z();
 
-    // wpimath/algorithms.md
+    // wpimath/docs/Quaternion.md
     double cycz = 1.0 - 2.0 * (y * y + z * z);
     double cysz = 2.0 * (w * z + x * y);
     double cy_sq = cycz * cycz + cysz * cysz;

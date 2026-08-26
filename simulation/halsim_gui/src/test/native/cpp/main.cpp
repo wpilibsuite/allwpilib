@@ -30,7 +30,7 @@ TEST_CASE("HALSimGui RuntimeType", "[simulation][halsim_gui]") {
 
 int main(int argc, char** argv) {
   if (!IsCatchListCommand(argc, argv)) {
-    HAL_Initialize(500, 0);
+    HAL_Initialize();
   }
   return Catch::Session().run(argc, argv);
 }

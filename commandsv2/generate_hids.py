@@ -4,18 +4,18 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
 import re
+import sys
 from pathlib import Path
+
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
 
-
-def write_controller_file(output_dir: Path, controller_name: str, contents: str):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    output_file = output_dir / controller_name
-    output_file.write_text(contents, encoding="utf-8", newline="\n")
+from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
 def generate_hids(
@@ -25,7 +25,9 @@ def generate_hids(
         return
 
     with schema_file.open(encoding="utf-8") as f:
-        controllers = json.load(f)
+        controllers = [
+            _normalize_hid_controller(controller) for controller in json.load(f)
+        ]
 
     # Java files
     java_subdirectory = "main/java/org/wpilib/command2/button"
@@ -38,8 +40,7 @@ def generate_hids(
     template = env.get_template("commandhid.java.jinja")
     for controller in controllers:
         controllerName = f"Command{controller['ConsoleName']}Controller.java"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
     # C++ headers
     hdr_subdirectory = "main/native/include/wpi/commands2/button"
@@ -52,8 +53,7 @@ def generate_hids(
     template = env.get_template("commandhid.hpp.jinja")
     for controller in controllers:
         controllerName = f"Command{controller['ConsoleName']}Controller.hpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
     # C++ files
     cpp_subdirectory = "main/native/cpp/wpi/commands2/button"
@@ -65,8 +65,7 @@ def generate_hids(
     template = env.get_template("commandhid.cpp.jinja")
     for controller in controllers:
         controllerName = f"Command{controller['ConsoleName']}Controller.cpp"
-        output = template.render(controller)
-        write_controller_file(root_path, controllerName, output)
+        write_file(root_path, controllerName, template.render(controller))
 
 
 def _capitalize_first(name: str) -> str:
@@ -91,6 +90,23 @@ def _snake_case(name: str) -> str:
     name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
     name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
     return name.lower()
+
+
+def _with_constant_name(entry: dict):
+    normalized = dict(entry)
+    normalized["ConstantName"] = _constant_name(entry["name"])
+    return normalized
+
+
+def _normalize_hid_controller(controller: dict):
+    normalized = dict(controller)
+    normalized["buttons"] = [
+        _with_constant_name(button) for button in controller["buttons"]
+    ]
+    normalized["triggers"] = [
+        _with_constant_name(trigger) for trigger in controller.get("triggers", [])
+    ]
+    return normalized
 
 
 def _python_display_name(name: str) -> str:
@@ -181,8 +197,7 @@ def generate_first_ds_hids(
         template = env.get_template("first_ds_commandhid.java.jinja")
         for controller in controllers:
             controller_name = f"Command{controller['ClassName']}Controller.java"
-            output = template.render(controller)
-            write_controller_file(root_path, controller_name, output)
+            write_file(root_path, controller_name, template.render(controller))
 
         # C++ headers
         hdr_subdirectory = "main/native/include/wpi/commands2/button"
@@ -195,8 +210,7 @@ def generate_first_ds_hids(
         template = env.get_template("first_ds_commandhid.hpp.jinja")
         for controller in controllers:
             controller_name = f"Command{controller['ClassName']}Controller.hpp"
-            output = template.render(controller)
-            write_controller_file(root_path, controller_name, output)
+            write_file(root_path, controller_name, template.render(controller))
 
         # C++ files
         cpp_subdirectory = "main/native/cpp/wpi/commands2/button"
@@ -209,8 +223,7 @@ def generate_first_ds_hids(
         template = env.get_template("first_ds_commandhid.cpp.jinja")
         for controller in controllers:
             controller_name = f"Command{controller['ClassName']}Controller.cpp"
-            output = template.render(controller)
-            write_controller_file(root_path, controller_name, output)
+            write_file(root_path, controller_name, template.render(controller))
 
     if python_output_directory is not None:
         python_subdirectory = "commands2/button"
@@ -223,33 +236,15 @@ def generate_first_ds_hids(
         template = env.get_template("first_ds_commandhid.py.jinja")
         for controller in controllers:
             controller_name = f"command{controller['ClassName'].lower()}controller.py"
-            output = template.render(controller)
-            write_controller_file(root_path, controller_name, output)
+            write_file(root_path, controller_name, template.render(controller))
 
 
 def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/generated",
-        type=Path,
-    )
-    parser.add_argument(
-        "--template_root",
-        help="Optional. If set, will use this directory as the root for the jinja templates",
-        default=dirname / "src/generate",
-        type=Path,
-    )
-    parser.add_argument(
-        "--schema_file",
-        help="Optional. If set, will use this file for the joystick schema",
-        default="wpilibj/src/generate/hids.json",
-        type=Path,
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/hids.json")
     parser.add_argument(
         "--first_ds_schema_file",
         help="Optional. If set, will use this file for the FIRST Driver Station HID schema",

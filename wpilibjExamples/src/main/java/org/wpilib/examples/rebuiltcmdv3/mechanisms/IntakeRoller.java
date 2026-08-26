@@ -23,7 +23,7 @@ public class IntakeRoller implements Mechanism {
    * @return Command to stop the roller
    */
   public Command stop() {
-    return runRepeatedly(motor::stopMotor).named("Intake.Roller.Stop");
+    return runRepeatedly(() -> motor.setThrottle(0.0)).named("Intake.Roller.Stop");
   }
 
   @Override
@@ -40,7 +40,7 @@ public class IntakeRoller implements Mechanism {
   public Command intake() {
     return run(coroutine -> {
           motor.setSetpoint(
-              ExampleSmartMotorController.PIDMode.kVelocity,
+              ExampleSmartMotorController.PIDMode.VELOCITY,
               IntakeConstants.ROLLER_INTAKE_SPEED.in(RadiansPerSecond));
 
           coroutine.park();
@@ -57,7 +57,7 @@ public class IntakeRoller implements Mechanism {
   public Command expel() {
     return run(coroutine -> {
           motor.setSetpoint(
-              ExampleSmartMotorController.PIDMode.kVelocity,
+              ExampleSmartMotorController.PIDMode.VELOCITY,
               IntakeConstants.ROLLER_EXPULSION_SPEED.in(RadiansPerSecond));
 
           coroutine.park();

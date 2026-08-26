@@ -257,28 +257,6 @@ java_binary(
     ],
 )
 
-[wpilib_cc_library(
-    name = example + "-examples",
-    srcs = glob([
-        "examples/" + example + "/*.cpp",
-    ]),
-    tags = [
-        "wpi-example",
-    ],
-    deps = [
-        "//cscore",
-        "//wpigui",
-        "@bzlmodrio-opencv//libraries/cpp/opencv",
-    ],
-) for example in [
-    "enum_usb",
-    "httpcvstream",
-    "settings",
-    "usbcvstream",
-    "usbstream",
-    "usbviewer",
-]]
-
 package_default_jni_project(
     name = "cscore",
     maven_artifact_name = "cscore-cpp",

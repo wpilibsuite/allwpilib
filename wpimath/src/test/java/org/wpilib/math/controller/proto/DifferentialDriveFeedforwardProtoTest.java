@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.wpilib.ProtoTestBase;
 import org.wpilib.math.controller.DifferentialDriveFeedforward;
-import org.wpilib.math.proto.ProtobufDifferentialDriveFeedforward;
+import org.wpilib.math.controller.proto.detail.ProtobufDifferentialDriveFeedforward;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")
 class DifferentialDriveFeedforwardProtoTest
@@ -22,9 +22,9 @@ class DifferentialDriveFeedforwardProtoTest
   @Override
   public void checkEquals(
       DifferentialDriveFeedforward testData, DifferentialDriveFeedforward data) {
-    assertEquals(testData.kVLinear, data.kVLinear);
-    assertEquals(testData.kALinear, data.kALinear);
-    assertEquals(testData.kVAngular, data.kVAngular);
-    assertEquals(testData.kAAngular, data.kAAngular);
+    assertEquals(testData.kvLinear, data.kvLinear);
+    assertEquals(testData.kaLinear, data.kaLinear);
+    assertEquals(testData.kvAngular, data.kvAngular);
+    assertEquals(testData.kaAngular, data.kaAngular);
   }
 }

@@ -17,6 +17,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 /**
@@ -43,8 +44,7 @@ class WPILIB_DLLEXPORT DifferentialDriveKinematics
   constexpr explicit DifferentialDriveKinematics(wpi::units::meter_t trackwidth)
       : trackwidth(trackwidth) {
     if !consteval {
-      wpi::math::MathSharedStore::ReportUsage("DifferentialDriveKinematics",
-                                              "");
+      wpi::util::ReportUsage("DifferentialDriveKinematics", "");
     }
   }
 

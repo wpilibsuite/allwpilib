@@ -13,11 +13,6 @@ functions:
     ignore: true
 classes:
   wpi::RobotBase:
-    attributes:
-      m_threadId:
-        ignore: true
-      connListenerHandle:
-        ignore: true
     methods:
       IsEnabled:
       IsDisabled:

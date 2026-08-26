@@ -20,6 +20,8 @@ HALSIMGUI_DATASOURCE_DOUBLE(RoboRioUserCurrent3V3, "Rio 3.3V Current");
 HALSIMGUI_DATASOURCE_BOOLEAN(RoboRioUserActive3V3, "Rio 3.3V Active");
 HALSIMGUI_DATASOURCE_INT(RoboRioUserFaults3V3, "Rio 3.3V Faults");
 HALSIMGUI_DATASOURCE_DOUBLE(RoboRioBrownoutVoltage, "Rio Brownout Voltage");
+HALSIMGUI_DATASOURCE_DOUBLE(RoboRioBrownoutRecoveryVoltage,
+                            "Rio Brownout Recovery Voltage");
 
 class RoboRioUser3V3RailSimModel : public wpi::glass::RoboRioRailModel {
  public:
@@ -58,16 +60,23 @@ class RoboRioSimModel : public wpi::glass::RoboRioModel {
   wpi::glass::DoubleSource* GetBrownoutVoltage() override {
     return &m_brownoutVoltage;
   }
+  wpi::glass::DoubleSource* GetBrownoutRecoveryVoltage() override {
+    return &m_brownoutRecoveryVoltage;
+  }
 
   void SetVInVoltage(double val) override { HALSIM_SetRoboRioVInVoltage(val); }
   void SetBrownoutVoltage(double val) override {
     HALSIM_SetRoboRioBrownoutVoltage(val);
+  }
+  void SetBrownoutRecoveryVoltage(double val) override {
+    HALSIM_SetRoboRioBrownoutRecoveryVoltage(val);
   }
 
  private:
   RoboRioVInVoltageSource m_vInVoltage;
   RoboRioUser3V3RailSimModel m_user3V3Rail;
   RoboRioBrownoutVoltageSource m_brownoutVoltage;
+  RoboRioBrownoutRecoveryVoltageSource m_brownoutRecoveryVoltage;
 };
 }  // namespace
 

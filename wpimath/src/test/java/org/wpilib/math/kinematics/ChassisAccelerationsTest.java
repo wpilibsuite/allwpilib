@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 
 class ChassisAccelerationsTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testDefaultConstructor() {
     var accelerations = new ChassisAccelerations();
 
     assertAll(
-        () -> assertEquals(0.0, accelerations.ax, kEpsilon),
-        () -> assertEquals(0.0, accelerations.ay, kEpsilon),
-        () -> assertEquals(0.0, accelerations.alpha, kEpsilon));
+        () -> assertEquals(0.0, accelerations.ax, EPSILON),
+        () -> assertEquals(0.0, accelerations.ay, EPSILON),
+        () -> assertEquals(0.0, accelerations.alpha, EPSILON));
   }
 
   @Test
@@ -30,9 +30,9 @@ class ChassisAccelerationsTest {
     var accelerations = new ChassisAccelerations(1.0, 2.0, 3.0);
 
     assertAll(
-        () -> assertEquals(1.0, accelerations.ax, kEpsilon),
-        () -> assertEquals(2.0, accelerations.ay, kEpsilon),
-        () -> assertEquals(3.0, accelerations.alpha, kEpsilon));
+        () -> assertEquals(1.0, accelerations.ax, EPSILON),
+        () -> assertEquals(2.0, accelerations.ay, EPSILON),
+        () -> assertEquals(3.0, accelerations.alpha, EPSILON));
   }
 
   @Test
@@ -43,20 +43,20 @@ class ChassisAccelerationsTest {
     var accelerations = new ChassisAccelerations(ax, ay, alpha);
 
     assertAll(
-        () -> assertEquals(2.5, accelerations.ax, kEpsilon),
-        () -> assertEquals(1.5, accelerations.ay, kEpsilon),
-        () -> assertEquals(0.75, accelerations.alpha, kEpsilon));
+        () -> assertEquals(2.5, accelerations.ax, EPSILON),
+        () -> assertEquals(1.5, accelerations.ay, EPSILON),
+        () -> assertEquals(0.75, accelerations.alpha, EPSILON));
   }
 
   @Test
   void testToRobotRelative() {
     final var chassisAccelerations =
-        new ChassisAccelerations(1.0, 0.0, 0.5).toRobotRelative(Rotation2d.kCW_Pi_2);
+        new ChassisAccelerations(1.0, 0.0, 0.5).toRobotRelative(Rotation2d.CW_PI_2);
 
     assertAll(
-        () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),
-        () -> assertEquals(1.0, chassisAccelerations.ay, kEpsilon),
-        () -> assertEquals(0.5, chassisAccelerations.alpha, kEpsilon));
+        () -> assertEquals(0.0, chassisAccelerations.ax, EPSILON),
+        () -> assertEquals(1.0, chassisAccelerations.ay, EPSILON),
+        () -> assertEquals(0.5, chassisAccelerations.alpha, EPSILON));
   }
 
   @Test
@@ -65,9 +65,9 @@ class ChassisAccelerationsTest {
         new ChassisAccelerations(1.0, 0.0, 0.5).toFieldRelative(Rotation2d.fromDegrees(45.0));
 
     assertAll(
-        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisAccelerations.ax, kEpsilon),
-        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisAccelerations.ay, kEpsilon),
-        () -> assertEquals(0.5, chassisAccelerations.alpha, kEpsilon));
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisAccelerations.ax, EPSILON),
+        () -> assertEquals(1.0 / Math.sqrt(2.0), chassisAccelerations.ay, EPSILON),
+        () -> assertEquals(0.5, chassisAccelerations.alpha, EPSILON));
   }
 
   @Test
@@ -133,9 +133,9 @@ class ChassisAccelerationsTest {
     var result = start.interpolate(end, 0.5);
 
     assertAll(
-        () -> assertEquals(5.0, result.ax, kEpsilon),
-        () -> assertEquals(10.0, result.ay, kEpsilon),
-        () -> assertEquals(15.0, result.alpha, kEpsilon));
+        () -> assertEquals(5.0, result.ax, EPSILON),
+        () -> assertEquals(10.0, result.ay, EPSILON),
+        () -> assertEquals(15.0, result.alpha, EPSILON));
   }
 
   @Test
@@ -146,15 +146,15 @@ class ChassisAccelerationsTest {
     // Test t = 0 (should return start)
     var resultStart = start.interpolate(end, 0.0);
     assertAll(
-        () -> assertEquals(1.0, resultStart.ax, kEpsilon),
-        () -> assertEquals(2.0, resultStart.ay, kEpsilon),
-        () -> assertEquals(3.0, resultStart.alpha, kEpsilon));
+        () -> assertEquals(1.0, resultStart.ax, EPSILON),
+        () -> assertEquals(2.0, resultStart.ay, EPSILON),
+        () -> assertEquals(3.0, resultStart.alpha, EPSILON));
 
     // Test t = 1 (should return end)
     var resultEnd = start.interpolate(end, 1.0);
     assertAll(
-        () -> assertEquals(4.0, resultEnd.ax, kEpsilon),
-        () -> assertEquals(5.0, resultEnd.ay, kEpsilon),
-        () -> assertEquals(6.0, resultEnd.alpha, kEpsilon));
+        () -> assertEquals(4.0, resultEnd.ax, EPSILON),
+        () -> assertEquals(5.0, resultEnd.ay, EPSILON),
+        () -> assertEquals(6.0, resultEnd.alpha, EPSILON));
   }
 }

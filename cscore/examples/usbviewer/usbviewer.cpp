@@ -39,7 +39,7 @@ int main() {
     cv::Mat frame;
     while (!stopCamera) {
       // get frame from camera
-      uint64_t time = cvsink.GrabFrame(frame);
+      int64_t time = cvsink.GrabFrame(frame);
       if (time == 0) {
         wpi::util::print("error: {}\n", cvsink.GetError());
         continue;
@@ -75,7 +75,7 @@ int main() {
   });
 
   gui::CreateContext();
-  gui::Initialize("Hello World", 1024, 768);
+  gui::Initialize("Hello World", 1024, 768, gui::RendererPreference::PREFER_2D);
   gui::Texture tex;
   gui::AddEarlyExecute([&] {
     std::unique_ptr<cv::Mat> frame;

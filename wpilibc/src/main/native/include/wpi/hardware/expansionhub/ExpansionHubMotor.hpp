@@ -52,6 +52,7 @@ class ExpansionHubMotor {
    *
    * @param throttle The throttle where -1 indicates full reverse and 1
    *     indicates full forward.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetThrottle(double throttle);
 

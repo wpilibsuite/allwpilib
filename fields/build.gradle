@@ -1,9 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
 
-if (project.hasProperty('onlylinuxsystemcore')) {
-    return;
-}
-
 apply plugin: 'cpp'
 apply plugin: 'java'
 apply plugin: 'visual-studio'
@@ -16,6 +12,8 @@ if (OperatingSystem.current().isWindows()) {
 dependencies {
     annotationProcessor libs.avaje.jsonb.generator
     implementation libs.avaje.jsonb
+    implementation project(':wpimath')
+    implementation project(':wpiutil')
 }
 
 ext {
@@ -29,15 +27,74 @@ apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
-def generateTask = createGenerateResourcesTask('main', 'FIELDS', 'wpi::fields', project)
+evaluationDependsOn(':wpimath')
+
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+
+def generateTask = createGenerateResourcesTask(
+        'main',
+        'FIELDS',
+        'wpi::fields',
+        project,
+        'src/main/native/resources',
+        ['**/*.json'])
+def generateImagesTask = createGenerateResourcesTask(
+        'mainImages',
+        'FIELD_IMAGES',
+        'wpi::fields',
+        project,
+        'src/main/native/resources',
+        [
+            '**/*.jpg',
+            '**/*.jpeg',
+            '**/*.png'
+        ])
 
 project(':').libraryBuild.dependsOn build
-tasks.withType(CppCompile) {
+tasks.withType(CppCompile).configureEach {
     dependsOn generateTask
+    dependsOn generateImagesTask
+}
+
+nativeUtils.exportsConfigs {
+    fields {
+    }
+    fieldimages {
+    }
 }
 
 sourceSets.main.resources {
     srcDirs 'src/main/native/resources'
+    include '**/*.json'
+}
+
+def fieldImagesJavaBaseName = makeZipBaseName(project.groupId, "field-images-java")
+
+task fieldImagesJar(type: Jar) {
+    archiveBaseName = fieldImagesJavaBaseName
+    destinationDirectory = file("$buildDir/outputs")
+
+    from('src/main/native/resources') {
+        include '**/*.jpg', '**/*.jpeg', '**/*.png'
+    }
+}
+
+tasks.named("assemble") {
+    dependsOn(fieldImagesJar)
+}
+build.dependsOn fieldImagesJar
+addTaskToCopyAllOutputs(fieldImagesJar)
+
+publishing {
+    publications {
+        fieldImagesJava(MavenPublication) {
+            artifact fieldImagesJar
+
+            artifactId = "field-images-java"
+            groupId = project.groupId
+            version = wpilibVersioning.version.get()
+        }
+    }
 }
 
 model {
@@ -47,11 +104,14 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp"
-                        include '**/*.cpp'
+                        srcDirs 'src/generated/main/native/cpp/fields',
+                                'src/main/native/cpp',
+                                "$buildDir/generated/main/cpp"
+                        include 'fields.cpp', 'FieldTag.cpp', 'FieldImage.cpp', 'Field.cpp', '*.json.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include'
+                        srcDirs 'src/main/native/include',
+                                'src/generated/main/native/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
@@ -60,6 +120,45 @@ model {
                         include '*.rc'
                     }
                 }
+            }
+            binaries.all {
+                it.cppCompiler.define 'WPILIB_EXPORTS'
+            }
+            appendDebugPathToBinaries(binaries)
+        }
+        fieldimages(NativeLibrarySpec) {
+            baseName = 'fieldimages'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/generated/main/native/cpp/fieldimages',
+                                "$buildDir/generated/mainImages/cpp"
+                        include 'field_images.cpp', '*.jpg.cpp', '*.jpeg.cpp', '*.png.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include',
+                                project(':wpiutil').file('src/main/native/include')
+                    }
+                }
+            }
+            binaries.all {
+                it.cppCompiler.define 'WPILIB_EXPORTS'
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+            }
+            appendDebugPathToBinaries(binaries)
+        }
+    }
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            if (it.component.name == nativeName) {
+                lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             }
         }
     }

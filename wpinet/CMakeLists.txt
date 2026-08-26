@@ -17,9 +17,19 @@ if(NOT MSVC AND NOT APPLE)
     endif()
 endif()
 
+file(GLOB_RECURSE llhttp_native_src src/main/native/thirdparty/llhttp/src/*.c)
+
+if(NOT MSVC)
+    set_source_files_properties(
+        ${llhttp_native_src}
+        PROPERTIES COMPILE_FLAGS "-Wno-error=pedantic -Wno-error=format"
+    )
+endif()
+
 file(
     GLOB_RECURSE wpinet_native_src
     src/main/native/cpp/*.cpp
+    src/main/native/thirdparty/ada/src/ada.cpp
     src/main/native/thirdparty/tcpsockets/cpp/*.cpp
 )
 list(REMOVE_ITEM wpinet_native_src ${wpinet_jni_src})
@@ -71,7 +81,7 @@ set(uv_linux_src
     src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp
 )
 
-add_library(wpinet ${wpinet_native_src})
+add_library(wpinet ${wpinet_native_src} ${llhttp_native_src})
 set_target_properties(wpinet PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpinet PROPERTY FOLDER "libraries")
@@ -138,13 +148,19 @@ else()
 endif()
 
 install(
-    DIRECTORY src/main/native/include/ src/main/native/thirdparty/tcpsockets/include/
+    DIRECTORY
+        src/main/native/include/
+        src/main/native/thirdparty/ada/include/
+        src/main/native/thirdparty/llhttp/include/
+        src/main/native/thirdparty/tcpsockets/include/
     DESTINATION "${include_dest}/wpinet"
 )
 target_include_directories(
     wpinet
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/ada/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llhttp/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/tcpsockets/include>
         $<INSTALL_INTERFACE:${include_dest}/wpinet>
 )
@@ -156,38 +172,40 @@ configure_file(wpinet-config.cmake.in ${WPILIB_BINARY_DIR}/wpinet-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/wpinet-config.cmake DESTINATION share/wpinet)
 install(EXPORT wpinet DESTINATION share/wpinet)
 
-subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
-foreach(example ${wpinet_examples})
-    file(GLOB wpinet_example_src examples/${example}/*.cpp)
-    if(wpinet_example_src)
-        add_executable(wpinet_${example} ${wpinet_example_src})
-        wpilib_target_warnings(wpinet_${example})
-        target_link_libraries(wpinet_${example} wpinet)
-        set_property(TARGET wpinet_${example} PROPERTY FOLDER "examples")
-    endif()
-endforeach()
+if(WPILIB_WITH_EXECUTABLES)
+    subdir_list(wpinet_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+    foreach(example ${wpinet_examples})
+        file(GLOB wpinet_example_src examples/${example}/*.cpp)
+        if(wpinet_example_src)
+            add_executable(wpinet_${example} ${wpinet_example_src})
+            wpilib_target_warnings(wpinet_${example})
+            target_link_libraries(wpinet_${example} wpinet)
+            set_property(TARGET wpinet_${example} PROPERTY FOLDER "examples")
+        endif()
+    endforeach()
 
-if(UNIX AND NOT APPLE AND NOT ANDROID)
-    set(LIBUTIL -lutil)
-else()
-    set(LIBUTIL)
+    if(UNIX AND NOT APPLE AND NOT ANDROID)
+        set(LIBUTIL -lutil)
+    else()
+        set(LIBUTIL)
+    endif()
+
+    file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
+    add_executable(netconsoleServer ${netconsoleServer_src})
+    wpilib_target_warnings(netconsoleServer)
+    target_link_libraries(netconsoleServer wpinet ${LIBUTIL})
+
+    file(GLOB netconsoleTee_src src/netconsoleTee/native/cpp/*.cpp)
+    add_executable(netconsoleTee ${netconsoleTee_src})
+    wpilib_target_warnings(netconsoleTee)
+    target_link_libraries(netconsoleTee wpinet)
+
+    set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
+    set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
 endif()
 
-file(GLOB netconsoleServer_src src/netconsoleServer/native/cpp/*.cpp)
-add_executable(netconsoleServer ${netconsoleServer_src})
-wpilib_target_warnings(netconsoleServer)
-target_link_libraries(netconsoleServer wpinet ${LIBUTIL})
-
-file(GLOB netconsoleTee_src src/netconsoleTee/native/cpp/*.cpp)
-add_executable(netconsoleTee ${netconsoleTee_src})
-wpilib_target_warnings(netconsoleTee)
-target_link_libraries(netconsoleTee wpinet)
-
-set_property(TARGET netconsoleServer PROPERTY FOLDER "examples")
-set_property(TARGET netconsoleTee PROPERTY FOLDER "examples")
-
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(wpinet src/test/native/cpp)
+    wpilib_add_test(wpinet src/test/native/cpp)
     target_include_directories(wpinet_test PRIVATE src/test/native/include src/main/native/cpp)
     target_link_libraries(wpinet_test wpinet ${LIBUTIL} wpiutil_testlib)
 endif()

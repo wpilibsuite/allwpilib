@@ -16,12 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.simulation.DualShock4ControllerSim;
 
 class DualShock4ControllerTest {
   @Test
   void testWrappedHID() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller controller = new DualShock4Controller(2);
     DualShock4ControllerSim sim = new DualShock4ControllerSim(controller);
     sim.notifyNewData();
@@ -37,7 +38,7 @@ class DualShock4ControllerTest {
   @EnumSource(value = DualShock4Controller.Button.class)
   void testButtons(DualShock4Controller.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller joy = new DualShock4Controller(2);
     DualShock4ControllerSim joysim = new DualShock4ControllerSim(joy);
 
@@ -76,7 +77,7 @@ class DualShock4ControllerTest {
   @EnumSource(value = DualShock4Controller.Axis.class)
   void testAxes(DualShock4Controller.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DualShock4Controller joy = new DualShock4Controller(2);
     DualShock4ControllerSim joysim = new DualShock4ControllerSim(joy);
 
@@ -84,12 +85,32 @@ class DualShock4ControllerTest {
 
     String simSetMethodName = "set" + axisName;
     String joyGetMethodName = "get" + axisName;
+    String joySetDeadbandMethodName = "set" + axisName + "Deadband";
 
     Method simSetMethod = joysim.getClass().getMethod(simSetMethodName, double.class);
     Method joyGetMethod = joy.getClass().getMethod(joyGetMethodName);
+    final Method joySetDeadbandMethod =
+        joy.getClass().getMethod(joySetDeadbandMethodName, double.class);
 
     simSetMethod.invoke(joysim, 0.35);
     joysim.notifyNewData();
+    double defaultDeadband = axis.value < 4 ? 0.1 : 0.01;
+    assertEquals(
+        MathUtil.applyDeadband(0.35, defaultDeadband),
+        (Double) joyGetMethod.invoke(joy),
+        0.001);
+
+    joySetDeadbandMethod.invoke(joy, 0.2);
+    assertEquals(
+        MathUtil.applyDeadband(0.35, 0.2), (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, -1.0);
+    assertEquals(0.35, (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, 2.0);
+    assertEquals(0.0, (Double) joyGetMethod.invoke(joy), 0.001);
+
+    joySetDeadbandMethod.invoke(joy, Double.NaN);
     assertEquals(0.35, (Double) joyGetMethod.invoke(joy), 0.001);
   }
 }

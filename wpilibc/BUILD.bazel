@@ -13,11 +13,16 @@ load("//wpilibc:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//wpilibc:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+    visibility = ["//wpilibc:__subpackages__"],
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -28,7 +33,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -38,17 +46,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
-)
-
-py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
@@ -62,7 +63,6 @@ py_binary(
     deps = [
         ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -70,7 +70,6 @@ filegroup(
     name = "templates",
     srcs = glob(["src/generate/main/native/**"]) + glob(["src/generate/test/native/**"]) + [
         "//wpilibj:hid_schema",
-        "//wpilibj:pwm_schema",
     ],
 )
 
@@ -113,17 +112,9 @@ wpilib_cc_library(
     srcs = [
         ":generate-version",
     ] + glob([
-        "src/main/native/cppcs/**",
         "src/main/native/cpp/**",
     ]),
     hdrs = glob(["src/main/native/include/**"]),
-    copts = [
-        # TODO(austin): this needs to be different for shared vs dynamic.
-        "-DDYNAMIC_CAMERA_SERVER",
-    ] + select({
-        "//shared/bazel/rules:compilation_mode_dbg": ["-DDYNAMIC_CAMERA_SERVER_DEBUG"],
-        "//conditions:default": [],
-    }),
     extra_src_pkg_files = [
         ":generated_version_files_pkg",
     ],
@@ -134,12 +125,12 @@ wpilib_cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//cameraserver:cameraserver-headers",
-        "//cscore:cscore-headers",
         "//datalog",
         "//hal:wpiHal",
         "//ntcore",
         "//ntcore:ntcore-headers",
+        "//telemetry",
+        "//tunables",
         "//wpimath",
         "//wpinet",
         "//wpiutil",
@@ -152,6 +143,8 @@ wpilib_cc_shared_library(
         "//datalog:shared/datalog",
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
@@ -168,6 +161,8 @@ wpilib_cc_static_library(
         "//datalog:static/datalog",
         "//hal:static/wpiHal",
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpimath:static/wpimath",
         "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
@@ -199,7 +194,7 @@ cc_test(
     deps = [
         ":test-headers",
         ":wpilibc",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -219,6 +214,7 @@ package_default_cc_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-generator",
+    generated_include_target = "//wpilibc:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -235,6 +231,10 @@ PKG_CONFIG_DEPS = [
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
     "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
     "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
@@ -280,6 +280,7 @@ wpilib_simulation_extension(
 
 define_pybind_library(
     name = "robotpy-wpilib",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PKG_CONFIG_DEPS,
 )
 

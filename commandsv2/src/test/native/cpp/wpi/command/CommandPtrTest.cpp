@@ -14,7 +14,8 @@
 using namespace wpi::cmd;
 class CommandPtrTest : public CommandTestBase {};
 
-TEST_F(CommandPtrTest, MovedFrom) {
+TEST_CASE_METHOD(CommandPtrTest, "CommandPtrTest MovedFrom",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -22,22 +23,23 @@ TEST_F(CommandPtrTest, MovedFrom) {
   CommandPtr movedFrom = wpi::cmd::Run([&counter] { counter++; });
   CommandPtr movedTo = std::move(movedFrom);
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Schedule(movedTo));
-  EXPECT_NO_FATAL_FAILURE(scheduler.Run());
+  CHECK_NOTHROW(scheduler.Schedule(movedTo));
+  CHECK_NOTHROW(scheduler.Run());
 
-  EXPECT_EQ(1, counter);
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(movedTo));
+  CHECK(1 == counter);
+  CHECK_NOTHROW(scheduler.Cancel(movedTo));
 
-  EXPECT_THROW(scheduler.Schedule(movedFrom), wpi::RuntimeError);
+  CHECK_THROWS_AS(scheduler.Schedule(movedFrom), wpi::RuntimeError);
   // NOLINTNEXTLINE(clang-analyzer-cplusplus.Move)
-  EXPECT_THROW(movedFrom.IsScheduled(), wpi::RuntimeError);
-  EXPECT_THROW(static_cast<void>(std::move(movedFrom).Repeatedly()),
-               wpi::RuntimeError);
+  CHECK_THROWS_AS(movedFrom.IsScheduled(), wpi::RuntimeError);
+  CHECK_THROWS_AS(static_cast<void>(std::move(movedFrom).Repeatedly()),
+                  wpi::RuntimeError);
 
-  EXPECT_EQ(1, counter);
+  CHECK(1 == counter);
 }
 
-TEST_F(CommandPtrTest, NullInitialization) {
-  EXPECT_THROW(auto cmd = CommandPtr{std::unique_ptr<Command>{}},
-               wpi::RuntimeError);
+TEST_CASE_METHOD(CommandPtrTest, "CommandPtrTest NullInitialization",
+                 "[commandsv2][command]") {
+  CHECK_THROWS_AS([] { CommandPtr cmd{std::unique_ptr<Command>{}}; }(),
+                  wpi::RuntimeError);
 }

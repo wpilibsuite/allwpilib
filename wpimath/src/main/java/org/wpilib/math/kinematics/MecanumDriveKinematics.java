@@ -9,7 +9,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.proto.MecanumDriveKinematicsProto;
 import org.wpilib.math.kinematics.struct.MecanumDriveKinematicsStruct;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -48,7 +48,7 @@ public class MecanumDriveKinematics
   private final Translation2d m_rearLeftWheel;
   private final Translation2d m_rearRightWheel;
 
-  private Translation2d m_prevCoR = Translation2d.kZero;
+  private Translation2d m_prevCoR = Translation2d.ZERO;
 
   /** MecanumDriveKinematics protobuf for serialization. */
   public static final MecanumDriveKinematicsProto proto = new MecanumDriveKinematicsProto();
@@ -83,7 +83,7 @@ public class MecanumDriveKinematics
     setInverseKinematics(frontLeftWheel, frontRightWheel, rearLeftWheel, rearRightWheel);
     m_forwardKinematics = m_inverseKinematics.pseudoInverse();
 
-    MathSharedStore.reportUsage("MecanumDriveKinematics", "");
+    UsageReporting.reportUsage("MecanumDriveKinematics", "");
   }
 
   /**
@@ -137,7 +137,7 @@ public class MecanumDriveKinematics
    */
   @Override
   public MecanumDriveWheelVelocities toWheelVelocities(ChassisVelocities chassisVelocities) {
-    return toWheelVelocities(chassisVelocities, Translation2d.kZero);
+    return toWheelVelocities(chassisVelocities, Translation2d.ZERO);
   }
 
   /**
@@ -217,7 +217,7 @@ public class MecanumDriveKinematics
   @Override
   public MecanumDriveWheelAccelerations toWheelAccelerations(
       ChassisAccelerations chassisAccelerations) {
-    return toWheelAccelerations(chassisAccelerations, Translation2d.kZero);
+    return toWheelAccelerations(chassisAccelerations, Translation2d.ZERO);
   }
 
   /**

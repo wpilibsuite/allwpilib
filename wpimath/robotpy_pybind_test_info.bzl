@@ -99,7 +99,7 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -123,7 +123,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/test/python/cpp/wpimath_test/**"], exclude = ["src/test/python/cpp/wpimath_test/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/test/python/cpp/wpimath_test/**"], exclude = ["src/test/python/cpp/wpimath_test/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -157,7 +157,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/test/python/cpp/semiwrap",
-        extra_hdrs = native.glob(["src/test/python/cpp/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
         ],
         package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
         pkgcfgs = pkgcfgs,
@@ -167,7 +167,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/test/python/cpp/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
         ],
         package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
         pkgcfgs = pkgcfgs,

@@ -8,8 +8,7 @@
 #include <string>
 
 #include "wpi/drive/RobotDriveBase.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -54,8 +53,7 @@ class MotorController;
  * Safety timeouts.
  */
 class DifferentialDrive : public RobotDriveBase,
-                          public wpi::util::Sendable,
-                          public wpi::util::SendableHelper<DifferentialDrive> {
+                          public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Wheel velocities for a differential drive.
@@ -111,6 +109,7 @@ class DifferentialDrive : public RobotDriveBase,
    *     [-1.0..1.0]. Counterclockwise is positive.
    * @param squareInputs If set, decreases the input sensitivity at low
    *     velocities.
+   * @Common This is one of the commonly used methods for this class
    */
   void ArcadeDrive(double xVelocity, double zRotation,
                    bool squareInputs = true);
@@ -199,13 +198,15 @@ class DifferentialDrive : public RobotDriveBase,
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::function<void(double)> m_leftMotor;
   std::function<void(double)> m_rightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry property getters
   double m_leftOutput = 0.0;
   double m_rightOutput = 0.0;
 };

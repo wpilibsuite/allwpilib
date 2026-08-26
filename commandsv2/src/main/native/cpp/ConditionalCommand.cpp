@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi::cmd;
 
@@ -60,29 +60,19 @@ bool ConditionalCommand::RunsWhenDisabled() const {
 Command::InterruptionBehavior ConditionalCommand::GetInterruptionBehavior()
     const {
   if (m_onTrue->GetInterruptionBehavior() ==
-          InterruptionBehavior::kCancelSelf ||
+          InterruptionBehavior::CANCEL_SELF ||
       m_onFalse->GetInterruptionBehavior() ==
-          InterruptionBehavior::kCancelSelf) {
-    return InterruptionBehavior::kCancelSelf;
+          InterruptionBehavior::CANCEL_SELF) {
+    return InterruptionBehavior::CANCEL_SELF;
   } else {
-    return InterruptionBehavior::kCancelIncoming;
+    return InterruptionBehavior::CANCEL_INCOMING;
   }
 }
 
-void ConditionalCommand::InitSendable(wpi::util::SendableBuilder& builder) {
-  Command::InitSendable(builder);
-  builder.AddStringProperty(
-      "onTrue", [this] { return m_onTrue->GetName(); }, nullptr);
-  builder.AddStringProperty(
-      "onFalse", [this] { return m_onFalse->GetName(); }, nullptr);
-  builder.AddStringProperty(
-      "selected",
-      [this] {
-        if (m_selectedCommand) {
-          return m_selectedCommand->GetName();
-        } else {
-          return std::string{"null"};
-        }
-      },
-      nullptr);
+void ConditionalCommand::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  Command::LogTo(table);
+  table.Log("onTrue", m_onTrue->GetName());
+  table.Log("onFalse", m_onFalse->GetName());
+  table.Log("selected", m_selectedCommand ? m_selectedCommand->GetName()
+                                          : std::string{"null"});
 }

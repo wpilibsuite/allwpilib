@@ -68,6 +68,7 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
         src/main/native/thirdparty/double-conversion/include/
+        src/main/native/thirdparty/htrie/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/mpack/include/
@@ -83,6 +84,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/htrie/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
@@ -99,48 +101,37 @@ configure_file(wpiutil-config.cmake.in ${WPILIB_BINARY_DIR}/wpiutil-config.cmake
 install(FILES ${WPILIB_BINARY_DIR}/wpiutil-config.cmake DESTINATION share/wpiutil)
 install(EXPORT wpiutil DESTINATION share/wpiutil)
 
-add_executable(wpiutildev src/dev/native/cpp/main.cpp)
-wpilib_target_warnings(wpiutildev)
-target_link_libraries(wpiutildev wpiutil)
+if(WPILIB_WITH_EXECUTABLES)
+    add_executable(wpiutildev src/dev/native/cpp/main.cpp)
+    wpilib_target_warnings(wpiutildev)
+    target_link_libraries(wpiutildev wpiutil)
 
-subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
-foreach(example ${wpiutil_examples})
-    file(GLOB wpiutil_example_src examples/${example}/*.cpp)
-    if(wpiutil_example_src)
-        add_executable(wpiutil_${example} ${wpiutil_example_src})
-        wpilib_target_warnings(wpiutil_${example})
-        target_link_libraries(wpiutil_${example} wpiutil)
-        set_property(TARGET wpiutil_${example} PROPERTY FOLDER "examples")
-    endif()
-endforeach()
+    subdir_list(wpiutil_examples "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+    foreach(example ${wpiutil_examples})
+        file(GLOB wpiutil_example_src examples/${example}/*.cpp)
+        if(wpiutil_example_src)
+            add_executable(wpiutil_${example} ${wpiutil_example_src})
+            wpilib_target_warnings(wpiutil_${example})
+            target_link_libraries(wpiutil_${example} wpiutil)
+            set_property(TARGET wpiutil_${example} PROPERTY FOLDER "examples")
+        endif()
+    endforeach()
+endif()
 
 if(WPILIB_WITH_TESTS)
     file(GLOB_RECURSE wpiutil_testlib_src src/test/native/include/*.h)
     add_library(wpiutil_testlib INTERFACE ${wpiutil_test_src})
     target_include_directories(wpiutil_testlib INTERFACE src/test/native/include)
 
-    # Not using wpilib_add_test until we migrate more tests
-    file(GLOB_RECURSE test_src src/test/native/cpp/*.cpp)
-    file(GLOB catch2_test_src src/test/native/cpp/catch2main.cpp src/test/native/cpp/TestCatch2.cpp)
-    list(REMOVE_ITEM test_src ${catch2_test_src})
-    add_executable(wpiutil_test ${test_src})
-    set_property(TARGET wpiutil_test PROPERTY FOLDER "tests")
-    wpilib_target_warnings(wpiutil_test)
-    if(BUILD_SHARED_LIBS)
-        target_compile_definitions(wpiutil_test PRIVATE -DGTEST_LINKED_AS_SHARED_LIBRARY)
-    endif()
+    file(GLOB wpiutil_jni_test_src src/test/native/cpp/JniUtilTest.cpp)
+    file(GLOB_RECURSE wpiutil_cmake_test_src src/test/native/cpp/*.cpp)
+    list(REMOVE_ITEM wpiutil_cmake_test_src ${wpiutil_jni_test_src})
+    wpilib_add_test(wpiutil ${wpiutil_cmake_test_src})
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /wd4101 /wd4251)
     endif()
-    add_test(NAME wpiutil COMMAND wpiutil_test)
     target_include_directories(wpiutil_test PRIVATE src/generated/test/native/cpp)
     file(GLOB_RECURSE wpiutil_nanopb_test_src src/generated/test/native/cpp/*.cpp)
     target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
-    target_link_libraries(wpiutil_test wpiutil googletest wpiutil_testlib)
-
-    wpilib_add_test_catch2(wpiutil_catch2 ${catch2_test_src})
-    target_link_libraries(wpiutil_catch2_test wpiutil wpiutil_testlib)
-    if(MSVC)
-        target_compile_options(wpiutil_test PRIVATE /utf-8)
-    endif()
+    target_link_libraries(wpiutil_test wpiutil wpiutil_testlib)
 endif()

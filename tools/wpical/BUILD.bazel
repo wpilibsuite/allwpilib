@@ -89,7 +89,6 @@ copts = select({
     ],
     "@platforms//os:osx": osx_copts,
     "@platforms//os:windows": [
-        "/wd4047",
         "/wd4098",
         "/wd4267",
     ],
@@ -114,13 +113,10 @@ osx_cxxopts = unix_cxxopts + [
 ]
 
 cxxopts = select({
-    "@platforms//os:linux": unix_cxxopts + [
-        "-Wno-deprecated-enum-enum-conversion",
-    ],
+    "@platforms//os:linux": unix_cxxopts,
     "@platforms//os:osx": osx_cxxopts,
     "@platforms//os:windows": [
         "/wd4068",
-        "/wd4101",
         "/wd4200",
         "/wd4576",
         "/wd4715",
@@ -128,20 +124,6 @@ cxxopts = select({
 })
 
 mac_linkopts = [
-    "-framework",
-    "Metal",
-    "-framework",
-    "MetalKit",
-    "-framework",
-    "Cocoa",
-    "-framework",
-    "IOKit",
-    "-framework",
-    "CoreFoundation",
-    "-framework",
-    "CoreVideo",
-    "-framework",
-    "QuartzCore",
     "-framework",
     "Accelerate",
     "-framework",
@@ -154,10 +136,6 @@ linkopts = select({
     "@platforms//os:linux": [],
     "@platforms//os:osx": mac_linkopts,
     "@platforms//os:windows": [
-        "-DEFAULTLIB:Gdi32.lib",
-        "-DEFAULTLIB:Shell32.lib",
-        "-DEFAULTLIB:d3d11.lib",
-        "-DEFAULTLIB:d3dcompiler.lib",
         "-DEFAULTLIB:Comdlg32.lib",
         "-DEFAULTLIB:dbghelp.lib",
         "-DEFAULTLIB:Advapi32.lib",
@@ -169,7 +147,7 @@ wpilib_cc_library(
     srcs = glob(
         [
             "src/main/native/cpp/**/*.cpp",
-            "src/main/native/thirdparty/libdogleg/src/**/*.cpp",
+            "src/main/native/thirdparty/libdogleg/src/**/*.c",
             "src/main/native/thirdparty/mrcal/src/**/*.cpp",
             "src/main/native/thirdparty/mrcal/src/**/*.c",
             "src/main/native/thirdparty/mrcal_java/src/**/*.cpp",
@@ -190,6 +168,7 @@ wpilib_cc_library(
     deps = [
         ":headers",
         "//apriltag",
+        "//fields",
         "//shared/bazel/thirdparty/ceres",
         "//wpigui",
         "//wpiutil",

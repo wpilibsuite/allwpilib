@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package wpi.proto;
+
+import "wpimath/protobuf/geometry2d.proto";
+
+option java_package = "org.wpilib.math.shape.proto.detail";
+
+option java_outer_classname = "ProtobufShapeDescriptor";
+
+option java_multiple_files = true;
+
+message ProtobufRectangle2d {
+  ProtobufPose2d center = 1;
+  double xWidth = 2;
+  double yWidth = 3;
+}
+
+message ProtobufEllipse2d {
+  ProtobufPose2d center = 1;
+  double xSemiAxis = 2;
+  double ySemiAxis = 3;
+}

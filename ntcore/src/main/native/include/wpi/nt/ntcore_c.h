@@ -202,7 +202,7 @@ struct NT_ConnectionInfo {
    * The last time any update was received from the remote node (same scale as
    * returned by wpi::nt::Now()).
    */
-  uint64_t last_update;
+  int64_t last_update;
 
   /**
    * The protocol version being used for this connection.  This in protocol
@@ -241,12 +241,12 @@ struct NT_LogMessage {
 /** NetworkTables time sync event data. */
 struct NT_TimeSyncEventData {
   /**
-   * Offset between local time and server time, in microseconds. Add this value
+   * Offset between local time and server time, in nanoseconds. Add this value
    * to local time to get the estimated equivalent server time.
    */
   int64_t serverTimeOffset;
 
-  /** Measured round trip time divided by 2, in microseconds. */
+  /** Measured round trip time divided by 2, in nanoseconds. */
   int64_t rtt2;
 
   /**
@@ -440,9 +440,9 @@ enum NT_Type NT_GetEntryType(NT_Entry entry);
  * Returns 0 if the handle is invalid.
  *
  * @param entry   entry handle
- * @return Entry last change time
+ * @return Entry last change time, in nanoseconds
  */
-uint64_t NT_GetEntryLastChange(NT_Entry entry);
+int64_t NT_GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
@@ -1160,8 +1160,8 @@ void NT_StartServer(NT_Inst inst, const struct WPI_String* persist_filename,
 void NT_StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use NT_SetServer or NT_SetServerTeam to set the server
- * name and port.
+ * Starts a client.  Use NT_SetServer, NT_SetServerTeam, NT_SetServerFixed, or
+ * NT_SetServerMdns to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1201,13 +1201,89 @@ void NT_SetServerMulti(NT_Inst inst, size_t count,
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using commonly known robot addresses for the specified team.
+ * Attempts connections to the following addresses in parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ *
+ * It also connects using matching Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
  *
  * @param inst        instance handle
- * @param team        team number
+ * @param team        team number string
  * @param port        port to communicate over
  */
-void NT_SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
+void NT_SetServerTeam(NT_Inst inst, const struct WPI_String* team,
+                      unsigned int port);
+
+/**
+ * Sets server addresses and port for client (without restarting client).
+ * Attempts connections to the following static addresses and hostnames in
+ * parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ * - robot.local
+ *
+ * It also connects using all Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
+ *
+ * @param inst        instance handle
+ * @param team        team number string
+ * @param port        port to communicate over
+ */
+void NT_SetServerFixed(NT_Inst inst, const struct WPI_String* team,
+                       unsigned int port);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using a NetworkTables server announced over mDNS with the specified
+ * service name.  The mDNS lookup is used only for the server address; the
+ * default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ */
+void NT_SetServerMdns(NT_Inst inst, const struct WPI_String* service_name);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMulti(NT_Inst inst, const struct WPI_String* service_name,
+                           size_t count, const struct WPI_String* server_names,
+                           const unsigned int* ports);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified mDNS port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param mdns_port     mDNS port to communicate over
+ * @param count         length of the server_names and ports arrays
+ * @param server_names  array of server names (each a UTF-8 string, null
+ *                      terminated)
+ * @param ports         array of ports to communicate over (one for each server)
+ */
+void NT_SetServerMdnsMultiPort(NT_Inst inst,
+                               const struct WPI_String* service_name,
+                               unsigned int mdns_port, size_t count,
+                               const struct WPI_String* server_names,
+                               const unsigned int* ports);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically
@@ -1294,7 +1370,7 @@ NT_Bool NT_IsConnected(NT_Inst inst);
  * @param inst instance handle
  * @param valid set to true if the return value is valid, false otherwise
  *              (output)
- * @return Time offset in microseconds (if valid is set to true)
+ * @return Time offset in nanoseconds (if valid is set to true)
  */
 int64_t NT_GetServerTimeOffset(NT_Inst inst, NT_Bool* valid);
 
@@ -1371,7 +1447,7 @@ void NT_DisposeEventArray(struct NT_Event* arr, size_t count);
 void NT_DisposeEvent(struct NT_Event* event);
 
 /**
- * Returns monotonic current time in 1 us increments.
+ * Returns monotonic current time in 1 ns increments.
  * This is the same time base used for entry and connection timestamps.
  * This function by default simply wraps WPI_Now(), but if NT_SetNow() is
  * called, this function instead returns the value passed to NT_SetNow();
@@ -1388,7 +1464,7 @@ int64_t NT_Now(void);
  * be used only if the overhead of calling WPI_Now() is a concern.
  * If used, it should be called periodically with the value of WPI_Now().
  *
- * @param timestamp timestamp (1 us increments)
+ * @param timestamp timestamp (1 ns increments)
  */
 void NT_SetNow(int64_t timestamp);
 
@@ -1650,11 +1726,12 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value);
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the boolean from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
  */
-NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueBoolean(const struct NT_Value* value, int64_t* last_change,
                            NT_Bool* v_boolean);
 
 /**
@@ -1662,11 +1739,12 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the int from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_int       returns the int assigned to the name
  * @return            1 if successful, or 0 if value is null or not an int
  */
-NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueInteger(const struct NT_Value* value, int64_t* last_change,
                            int64_t* v_int);
 
 /**
@@ -1674,11 +1752,12 @@ NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the float from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_float     returns the float assigned to the name
  * @return            1 if successful, or 0 if value is null or not a float
  */
-NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueFloat(const struct NT_Value* value, int64_t* last_change,
                          float* v_float);
 
 /**
@@ -1686,11 +1765,12 @@ NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the double from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param v_double    returns the double assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
  */
-NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueDouble(const struct NT_Value* value, int64_t* last_change,
                           double* v_double);
 
 /**
@@ -1698,7 +1778,8 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns 0.
  *
  * @param value       NT_Value struct to get the string from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param str_len     returns the length of the string
  * @return            pointer to the string (UTF-8), or null if error
  *
@@ -1707,7 +1788,7 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
+char* NT_GetValueString(const struct NT_Value* value, int64_t* last_change,
                         size_t* str_len);
 
 /**
@@ -1715,7 +1796,8 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the string from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param raw_len     returns the length of the string
  * @return            pointer to the raw value (UTF-8), or null if error
  *
@@ -1724,7 +1806,7 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
+uint8_t* NT_GetValueRaw(const struct NT_Value* value, int64_t* last_change,
                         size_t* raw_len);
 
 /**
@@ -1732,7 +1814,8 @@ uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the boolean array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the boolean array, or null if error
  *
@@ -1742,14 +1825,15 @@ uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
  * freed separately.
  */
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size);
+                                 int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the int array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the int array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the int array, or null if error
  *
@@ -1759,14 +1843,15 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
  * freed separately.
  */
 int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size);
+                                 int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the float array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the float array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the float array, or null if error
  *
@@ -1775,15 +1860,16 @@ int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
  * The returned array is a copy of the array in the value, and must be
  * freed separately.
  */
-float* NT_GetValueFloatArray(const struct NT_Value* value,
-                             uint64_t* last_change, size_t* arr_size);
+float* NT_GetValueFloatArray(const struct NT_Value* value, int64_t* last_change,
+                             size_t* arr_size);
 
 /**
  * Returns a copy of the double array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the double array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the double array, or null if error
  *
@@ -1793,14 +1879,15 @@ float* NT_GetValueFloatArray(const struct NT_Value* value,
  * freed separately.
  */
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
-                               uint64_t* last_change, size_t* arr_size);
+                               int64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the struct WPI_String array from the NT_Value.
  * If the NT_Value is null, or is assigned to a different type, returns null.
  *
  * @param value       NT_Value struct to get the struct WPI_String array from
- * @param last_change returns time in ms since the last change in the value
+ * @param last_change returns timestamp in nanoseconds for the last change in
+ * the value
  * @param arr_size    returns the number of elements in the array
  * @return            pointer to the struct WPI_String array, or null if error
  *
@@ -1812,7 +1899,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * WPI_FreeStringArray() function will free all the struct WPI_Strings.
  */
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                          uint64_t* last_change,
+                                          int64_t* last_change,
                                           size_t* arr_size);
 
 /** @} */

@@ -16,7 +16,9 @@
 using namespace wpi::cmd;
 class ParallelDeadlineGroupTest : public CommandTestBase {};
 
-TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
+TEST_CASE_METHOD(ParallelDeadlineGroupTest,
+                 "ParallelDeadlineGroupTest DeadlineGroupSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -32,17 +34,17 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
       make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
                                             std::move(command3Holder)));
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(2);
-  EXPECT_CALL(*command1, End(false));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(2);
+  command1->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(1);
-  EXPECT_CALL(*command2, End(false));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(1);
+  command2->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command3, Initialize());
-  EXPECT_CALL(*command3, Execute()).Times(2);
-  EXPECT_CALL(*command3, End(true));
+  command3->ExpectInitialize(1);
+  command3->ExpectExecute(2);
+  command3->ExpectEnd(true, 1);
 
   scheduler.Schedule(&group);
 
@@ -51,10 +53,12 @@ TEST_F(ParallelDeadlineGroupTest, DeadlineGroupSchedule) {
   command1->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
+TEST_CASE_METHOD(ParallelDeadlineGroupTest,
+                 "ParallelDeadlineGroupTest SequentialGroupInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -72,17 +76,17 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
       make_vector<std::unique_ptr<Command>>(std::move(command2Holder),
                                             std::move(command3Holder)));
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(1);
-  EXPECT_CALL(*command1, End(true));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(1);
+  command1->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(1);
-  EXPECT_CALL(*command2, End(true));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(1);
+  command2->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command3, Initialize());
-  EXPECT_CALL(*command3, Execute()).Times(1);
-  EXPECT_CALL(*command3, End(true));
+  command3->ExpectInitialize(1);
+  command3->ExpectExecute(1);
+  command3->ExpectEnd(true, 1);
 
   scheduler.Schedule(&group);
 
@@ -90,18 +94,22 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterrupt) {
   scheduler.Cancel(&group);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancel) {
+TEST_CASE_METHOD(ParallelDeadlineGroupTest,
+                 "ParallelDeadlineGroupTest DeadlineGroupNotScheduledCancel",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto group = Deadline(None(), None());
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(group));
+  CHECK_NOTHROW(scheduler.Cancel(group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
+TEST_CASE_METHOD(ParallelDeadlineGroupTest,
+                 "ParallelDeadlineGroupTest ParallelDeadlineCopy",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -111,13 +119,15 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineCopy) {
   auto group = Deadline(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
+TEST_CASE_METHOD(ParallelDeadlineGroupTest,
+                 "ParallelDeadlineGroupTest ParallelDeadlineRequirement",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -134,8 +144,8 @@ TEST_F(ParallelDeadlineGroupTest, ParallelDeadlineRequirement) {
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(command3));
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(command3));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
 class TestableDeadlineCommand : public ParallelDeadlineGroup {

@@ -193,7 +193,11 @@
     ],
     "foldername": "apriltagsvision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "apriltag",
+      "cameraserver"
+    ]
   },
   {
     "name": "PDP CAN Monitoring",
@@ -201,7 +205,7 @@
     "tags": [
       "Hardware",
       "PDP",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "canpdp",
     "gradlebase": "java",
@@ -225,7 +229,7 @@
     "tags": [
       "Hardware",
       "Duty Cycle",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "dutycycleinput",
     "gradlebase": "java",
@@ -263,7 +267,10 @@
     ],
     "foldername": "httpcamera",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "I2C Communication Sample",
@@ -285,7 +292,10 @@
     ],
     "foldername": "intermediatevision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Motor Control",
@@ -293,7 +303,7 @@
     "tags": [
       "Basic Robot",
       "Encoder",
-      "SmartDashboard",
+      "Telemetry",
       "Joystick"
     ],
     "foldername": "motorcontrol",
@@ -319,7 +329,10 @@
     ],
     "foldername": "quickvision",
     "gradlebase": "java",
-    "robotclass": "Robot"
+    "robotclass": "Robot",
+    "extravendordeps": [
+      "cameraserver"
+    ]
   },
   {
     "name": "Solenoids",

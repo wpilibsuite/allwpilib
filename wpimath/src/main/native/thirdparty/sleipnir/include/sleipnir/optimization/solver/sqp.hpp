@@ -339,6 +339,7 @@ ExitStatus sqp(const SQPMatrixCallbacks<Scalar>& matrix_callbacks,
     α = α_max;
 
     const FilterEntry<Scalar> current_entry{f, c_e};
+    const Scalar D_ϕ = g.transpose() * step.p_x;
 
     // Loop until a step is accepted
     while (1) {
@@ -363,7 +364,7 @@ ExitStatus sqp(const SQPMatrixCallbacks<Scalar>& matrix_callbacks,
 
       // Check whether filter accepts trial iterate
       FilterEntry trial_entry{trial_f, trial_c_e};
-      if (filter.try_add(current_entry, trial_entry, step.p_x, g, α)) {
+      if (filter.try_add(current_entry, trial_entry, D_ϕ, α)) {
         // Accept step
         break;
       }
@@ -428,7 +429,7 @@ ExitStatus sqp(const SQPMatrixCallbacks<Scalar>& matrix_callbacks,
 
           // Check whether the filter accepts trial iterate
           FilterEntry trial_entry{trial_f, trial_c_e};
-          if (filter.try_add(current_entry, trial_entry, step.p_x, g, α)) {
+          if (filter.try_add(current_entry, trial_entry, D_ϕ, α)) {
             step = soc_step;
             α = α_soc;
             step_acceptable = true;
@@ -524,12 +525,13 @@ ExitStatus sqp(const SQPMatrixCallbacks<Scalar>& matrix_callbacks,
         DenseVector trial_c_e = matrices.c_e(trial_x);
 
         FilterEntry trial_entry{matrices.f(trial_x), trial_c_e};
+        const Scalar D_ϕ_restoration = g.transpose() * (trial_x - x);
 
         // If the current iterate sufficiently reduces constraint violation and
         // is accepted by the normal filter, stop feasibility restoration
         return trial_entry.constraint_violation <
                    Scalar(0.9) * initial_entry.constraint_violation &&
-               filter.try_add(initial_entry, trial_entry, trial_x - x, g, α);
+               filter.try_add(initial_entry, trial_entry, D_ϕ_restoration, α);
       });
       auto status = feasibility_restoration<Scalar>(matrices, callbacks,
                                                     options, x, y, iterations);

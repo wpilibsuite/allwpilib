@@ -34,7 +34,7 @@ elseif(APPLE)
 endif()
 
 if(WPILIB_WITH_TESTS)
-    wpilib_add_test_catch2(sysid src/test/native/cpp)
+    wpilib_add_test(sysid src/test/native/cpp)
     wpilib_link_macos_gui(sysid_test)
     target_sources(sysid_test PRIVATE ${sysid_src})
     target_compile_definitions(sysid_test PRIVATE RUNNING_SYSID_TESTS)

@@ -26,7 +26,7 @@
 #include <implot.h>
 #include <implot_internal.h>
 
-#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ColorSetting.hpp"
@@ -37,7 +37,11 @@
 
 using namespace wpi::glass;
 
-static constexpr int kAxisCount = 3;
+static constexpr int AXIS_COUNT = 3;
+
+static double GetTimestampDisplayOffsetSeconds() {
+  return static_cast<double>(GetTimestampDisplayOffset()) * 1.0e-9;
+}
 
 namespace {
 class PlotView;
@@ -63,7 +67,7 @@ class PlotSeries {
   void SetSource(DataSource* source);
   DataSource* GetSource() const { return m_source; }
 
-  enum Action { kNone, kMoveUp, kMoveDown, kDelete };
+  enum Action { NONE, MOVE_UP, MOVE_DOWN, DELETE };
   Action EmitPlot(PlotView& view, double now, size_t i, size_t plotIndex);
   void EmitSettings(size_t i);
   void EmitDragDropPayload(PlotView& view, size_t i, size_t plotIndex);
@@ -77,8 +81,8 @@ class PlotSeries {
 
  private:
   bool IsDigital() const {
-    return m_digital.GetValue() == kDigital ||
-           (m_digital.GetValue() == kAuto && m_source && m_digitalSource);
+    return m_digital.GetValue() == DIGITAL ||
+           (m_digital.GetValue() == AUTO && m_source && m_digitalSource);
   }
   void AppendValue(double value, int64_t time);
 
@@ -92,22 +96,22 @@ class PlotSeries {
   // user settings
   std::string& m_name;
   int& m_yAxis;
-  static constexpr float kDefaultColor[4] = {0.0, 0.0, 0.0, IMPLOT_AUTO};
+  static constexpr float DEFAULT_COLOR[4] = {0.0, 0.0, 0.0, IMPLOT_AUTO};
   ColorSetting m_color;
   EnumSetting m_marker;
   float& m_weight;
 
-  enum Digital { kAuto, kDigital, kAnalog };
+  enum Digital { AUTO, DIGITAL, ANALOG };
   EnumSetting m_digital;
   int& m_digitalBitHeight;
   int& m_digitalBitGap;
 
   // value storage
-  static constexpr int kMaxSize = 20000;
-  static constexpr double kTimeGap = 0.05;
+  static constexpr int MAX_SIZE = 20000;
+  static constexpr double TIME_GAP = 0.05;
   std::atomic<int> m_size = 0;
   std::atomic<int> m_offset = 0;
-  ImPlotPoint m_data[kMaxSize];
+  ImPlotPoint m_data[MAX_SIZE];
 };
 
 class Plot {
@@ -142,8 +146,8 @@ class Plot {
 
   std::string& m_name;
   bool& m_visible;
-  static constexpr float kDefaultBackgroundColor[4] = {0.0, 0.0, 0.0,
-                                                       IMPLOT_AUTO};
+  static constexpr float DEFAULT_BACKGROUND_COLOR[4] = {0.0, 0.0, 0.0,
+                                                        IMPLOT_AUTO};
   ColorSetting m_backgroundColor;
   bool& m_showPause;
   bool& m_lockPrevX;
@@ -177,6 +181,8 @@ class Plot {
   };
   std::vector<PlotAxis> m_axis;
   ImPlotRange m_xaxisRange;  // read from plot, used for lockPrevX
+  int64_t m_timeOffset = 0;
+  bool m_timeOffsetValid = false;
 };
 
 class PlotView : public View {
@@ -204,14 +210,14 @@ PlotSeries::PlotSeries(Storage& storage)
     : m_id{storage.GetString("id")},
       m_name{storage.GetString("name")},
       m_yAxis{storage.GetInt("yAxis", 0)},
-      m_color{storage.GetFloatArray("color", kDefaultColor)},
+      m_color{storage.GetFloatArray("color", DEFAULT_COLOR)},
       m_marker{storage.GetString("marker"),
                0,
                {"None", "Auto", "Circle", "Square", "Diamond", "Up", "Down",
                 "Left", "Right", "Cross", "Plus", "Asterisk"}},
       m_weight{storage.GetFloat("weight", 1.0f)},
       m_digital{
-          storage.GetString("digital"), kAuto, {"Auto", "Digital", "Analog"}},
+          storage.GetString("digital"), AUTO, {"Auto", "Digital", "Analog"}},
       m_digitalBitHeight{storage.GetInt("digitalBitHeight", 8)},
       m_digitalBitGap{storage.GetInt("digitalBitGap", 4)} {}
 
@@ -287,23 +293,23 @@ void PlotSeries::SetSource(DataSource* source) {
   }
 }
 
-void PlotSeries::AppendValue(double value, int64_t timeUs) {
-  double time = (timeUs != 0 ? timeUs : wpi::util::Now()) * 1.0e-6;
+void PlotSeries::AppendValue(double value, int64_t timeNs) {
+  double time = (timeNs != 0 ? timeNs : wpi::util::Now()) * 1.0e-9;
   if (IsDigital()) {
-    if (m_size < kMaxSize) {
+    if (m_size < MAX_SIZE) {
       m_data[m_size] = ImPlotPoint{time, value};
       ++m_size;
     } else {
       m_data[m_offset] = ImPlotPoint{time, value};
-      m_offset = (m_offset + 1) % kMaxSize;
+      m_offset = (m_offset + 1) % MAX_SIZE;
     }
   } else {
     // as an analog graph draws linear lines in between each value,
     // insert duplicate value if "long" time between updates so it
     // looks appropriately flat
-    if (m_size < kMaxSize) {
+    if (m_size < MAX_SIZE) {
       if (m_size > 0) {
-        if ((time - m_data[m_size - 1].x) > kTimeGap) {
+        if ((time - m_data[m_size - 1].x) > TIME_GAP) {
           m_data[m_size] = ImPlotPoint{time, m_data[m_size - 1].y};
           ++m_size;
         }
@@ -312,18 +318,18 @@ void PlotSeries::AppendValue(double value, int64_t timeUs) {
       ++m_size;
     } else {
       if (m_offset == 0) {
-        if ((time - m_data[kMaxSize - 1].x) > kTimeGap) {
-          m_data[m_offset] = ImPlotPoint{time, m_data[kMaxSize - 1].y};
+        if ((time - m_data[MAX_SIZE - 1].x) > TIME_GAP) {
+          m_data[m_offset] = ImPlotPoint{time, m_data[MAX_SIZE - 1].y};
           ++m_offset;
         }
       } else {
-        if ((time - m_data[m_offset - 1].x) > kTimeGap) {
+        if ((time - m_data[m_offset - 1].x) > TIME_GAP) {
           m_data[m_offset] = ImPlotPoint{time, m_data[m_offset - 1].y};
-          m_offset = (m_offset + 1) % kMaxSize;
+          m_offset = (m_offset + 1) % MAX_SIZE;
         }
       }
       m_data[m_offset] = ImPlotPoint{time, value};
-      m_offset = (m_offset + 1) % kMaxSize;
+      m_offset = (m_offset + 1) % MAX_SIZE;
     }
   }
 }
@@ -357,17 +363,18 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   // we handle the offset logic ourselves to avoid wrap issues with size + 1
   struct GetterData {
     double now;
-    double zeroTime;
+    double timeOffset;
     ImPlotPoint* data;
     int size;
     int offset;
   };
-  GetterData getterData = {now, GetZeroTime() * 1.0e-6, m_data, size, offset};
+  GetterData getterData = {now, GetTimestampDisplayOffsetSeconds(), m_data,
+                           size, offset};
   auto getter = [](int idx, void* data) {
     auto d = static_cast<GetterData*>(data);
     if (idx == d->size) {
       return ImPlotPoint{
-          d->now - d->zeroTime,
+          d->now - d->timeOffset,
           d->data[d->offset == 0 ? d->size - 1 : d->offset - 1].y};
     }
     ImPlotPoint* point;
@@ -376,7 +383,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     } else {
       point = &d->data[d->offset + idx - d->size];
     }
-    return ImPlotPoint{point->x - d->zeroTime, point->y};
+    return ImPlotPoint{point->x - d->timeOffset, point->y};
   };
 
   if (m_color.GetColorFloat()[3] == IMPLOT_AUTO) {
@@ -411,7 +418,7 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
   }
 
   // Edit settings via popup
-  Action rv = kNone;
+  Action rv = NONE;
   if (ImPlot::BeginLegendPopup(label)) {
     ImGui::TextUnformatted(m_id.c_str());
     if (ImGui::Button("Close")) {
@@ -421,17 +428,17 @@ PlotSeries::Action PlotSeries::EmitPlot(PlotView& view, double now, size_t i,
     ImGui::InputText("##editname", &m_name);
     if (ImGui::Button("Move Up")) {
       ImGui::CloseCurrentPopup();
-      rv = kMoveUp;
+      rv = MOVE_UP;
     }
     ImGui::SameLine();
     if (ImGui::Button("Move Down")) {
       ImGui::CloseCurrentPopup();
-      rv = kMoveDown;
+      rv = MOVE_DOWN;
     }
     ImGui::SameLine();
     if (ImGui::Button("Delete")) {
       ImGui::CloseCurrentPopup();
-      rv = kDelete;
+      rv = DELETE;
     }
     EmitSettings(i);
     ImPlot::EndLegendPopup();
@@ -516,7 +523,7 @@ Plot::Plot(Storage& storage)
       m_name{storage.GetString("name")},
       m_visible{storage.GetBool("visible", true)},
       m_backgroundColor{
-          storage.GetFloatArray("backgroundColor", kDefaultBackgroundColor)},
+          storage.GetFloatArray("backgroundColor", DEFAULT_BACKGROUND_COLOR)},
       m_showPause{storage.GetBool("showPause", true)},
       m_lockPrevX{storage.GetBool("lockPrevX", false)},
       m_legend{storage.GetBool("legend", true)},
@@ -532,8 +539,8 @@ Plot::Plot(Storage& storage)
       m_autoHeight{storage.GetBool("autoHeight", true)},
       m_height{storage.GetInt("height", 300)} {
   auto& axesStorage = storage.GetChildArray("axis");
-  axesStorage.resize(kAxisCount);
-  for (int i = 0; i < kAxisCount; ++i) {
+  axesStorage.resize(AXIS_COUNT);
+  for (int i = 0; i < AXIS_COUNT; ++i) {
     if (!axesStorage[i]) {
       axesStorage[i] = std::make_unique<Storage>();
     }
@@ -590,7 +597,7 @@ void Plot::DragDropTarget(PlotView& view, size_t i, bool inPlot) {
       DragDropAccept(view, i, -1);
       ImPlot::EndDragDropTarget();
     }
-    for (int y = 0; y < kAxisCount; ++y) {
+    for (int y = 0; y < AXIS_COUNT; ++y) {
       if (ImPlot::GetCurrentPlot()->YAxis(y).Enabled &&
           ImPlot::BeginDragDropTargetAxis(ImAxis_Y1 + y)) {
         DragDropAccept(view, i, y);
@@ -618,6 +625,24 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
   wpi::util::format_to_n_c_str(label, sizeof(label), "{}###plot{}", m_name,
                                static_cast<int>(i));
 
+  int64_t timeOffsetNs = GetTimestampDisplayOffset();
+  double timeOffset = static_cast<double>(timeOffsetNs) * 1.0e-9;
+  bool timeOffsetChanged = false;
+  if (m_timeOffsetValid) {
+    if (timeOffsetNs != m_timeOffset) {
+      double offsetDelta = (static_cast<double>(m_timeOffset) -
+                            static_cast<double>(timeOffsetNs)) *
+                           1.0e-9;
+      m_xaxisRange.Min += offsetDelta;
+      m_xaxisRange.Max += offsetDelta;
+      m_timeOffset = timeOffsetNs;
+      timeOffsetChanged = true;
+    }
+  } else {
+    m_timeOffset = timeOffsetNs;
+    m_timeOffsetValid = true;
+  }
+
   ImPlotFlags plotFlags = (m_legend ? 0 : ImPlotFlags_NoLegend) |
                           (m_crosshairs ? ImPlotFlags_Crosshairs : 0) |
                           (m_mousePosition ? 0 : ImPlotFlags_NoMouseText);
@@ -644,14 +669,19 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
                               ImGuiCond_Always);
     } else {
       // also force-pause plots if overall timing is paused
-      double zeroTime = GetZeroTime() * 1.0e-6;
-      ImPlot::SetupAxisLimits(
-          ImAxis_X1, now - zeroTime - m_viewTime, now - zeroTime,
-          (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
+      double displayNow = now - timeOffset;
+      if (timeOffsetChanged && (paused || m_paused)) {
+        ImPlot::SetupAxisLimits(ImAxis_X1, m_xaxisRange.Min, m_xaxisRange.Max,
+                                ImGuiCond_Always);
+      } else {
+        ImPlot::SetupAxisLimits(
+            ImAxis_X1, displayNow - m_viewTime, displayNow,
+            (paused || m_paused) ? ImGuiCond_Once : ImGuiCond_Always);
+      }
     }
 
     // setup y axes
-    for (int i = 0; i < kAxisCount; ++i) {
+    for (int i = 0; i < AXIS_COUNT; ++i) {
       if ((i == 1 && !m_yAxis2) || (i == 2 && !m_yAxis3)) {
         continue;
       }
@@ -680,19 +710,19 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
 
     for (size_t j = 0; j < m_series.size(); ++j) {
       switch (m_series[j]->EmitPlot(view, now, j, i)) {
-        case PlotSeries::kMoveUp:
+        case PlotSeries::MOVE_UP:
           if (j > 0) {
             std::swap(m_seriesStorage[j - 1], m_seriesStorage[j]);
             std::swap(m_series[j - 1], m_series[j]);
           }
           break;
-        case PlotSeries::kMoveDown:
+        case PlotSeries::MOVE_DOWN:
           if (j < (m_series.size() - 1)) {
             std::swap(m_seriesStorage[j], m_seriesStorage[j + 1]);
             std::swap(m_series[j], m_series[j + 1]);
           }
           break;
-        case PlotSeries::kDelete:
+        case PlotSeries::DELETE:
           m_seriesStorage.erase(m_seriesStorage.begin() + j);
           m_series.erase(m_series.begin() + j);
           break;
@@ -717,7 +747,7 @@ void Plot::EmitPlot(PlotView& view, double now, bool paused, size_t i) {
         (plot->Items.Legend.Flags & ImPlotLegendFlags_Horizontal) != 0;
     m_legendLocation = plot->Items.Legend.Location;
 
-    for (int i = 0; i < kAxisCount; ++i) {
+    for (int i = 0; i < AXIS_COUNT; ++i) {
       if ((i == 1 && !m_yAxis2) || (i == 2 && !m_yAxis3)) {
         continue;
       }
@@ -862,7 +892,7 @@ void PlotView::Display() {
     }
   }
 
-  double now = wpi::util::Now() * 1.0e-6;
+  double now = wpi::util::Now() * 1.0e-9;
   for (size_t i = 0; i < m_plots.size(); ++i) {
     ImGui::PushID(i);
     m_plots[i]->EmitPlot(*this, now, m_provider->IsPaused(), i);

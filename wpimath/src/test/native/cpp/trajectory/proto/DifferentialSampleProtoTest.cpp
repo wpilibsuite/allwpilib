@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/trajectory/DifferentialSample.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -10,7 +10,7 @@
 using namespace wpi::math;
 
 namespace {
-const DifferentialSample kExpectedData =
+const DifferentialSample EXPECTED_DATA =
     DifferentialSample{1.5_s,
                        Pose2d{1.1_m, 2.2_m, 30_deg},
                        ChassisVelocities{1_mps, 2_mps, 3_rad_per_s},
@@ -19,13 +19,13 @@ const DifferentialSample kExpectedData =
                        4.56_mps};
 }  // namespace
 
-TEST(DifferentialSampleProtoTest, Roundtrip) {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+TEST_CASE("DifferentialSampleProtoTest Roundtrip", "[wpimath]") {
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData, unpacked_data.value());
+  CHECK(EXPECTED_DATA == unpacked_data.value());
 }

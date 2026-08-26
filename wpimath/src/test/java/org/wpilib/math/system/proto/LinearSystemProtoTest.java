@@ -11,8 +11,8 @@ import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.numbers.N4;
-import org.wpilib.math.proto.ProtobufLinearSystem;
 import org.wpilib.math.system.LinearSystem;
+import org.wpilib.math.system.proto.detail.ProtobufLinearSystem;
 import org.wpilib.math.util.Nat;
 
 @SuppressWarnings("PMD.TestClassWithoutTestCases")

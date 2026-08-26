@@ -26,6 +26,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -81,7 +82,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    wpi::math::MathSharedStore::ReportUsage("PoseEstimator3d", "");
+    wpi::util::ReportUsage("PoseEstimator3d", "");
   }
 
   /**
@@ -103,7 +104,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (size_t row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_K.diagonal()[row] = 0.0;
@@ -254,11 +255,8 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     auto odometryEstimate = m_odometryPoseBuffer.Sample(timestamp);
 
     // Step 5: Apply the vision compensation to the odometry pose.
-    // TODO Replace with std::optional::transform() in C++23
-    if (odometryEstimate) {
-      return visionUpdate.Compensate(*odometryEstimate);
-    }
-    return std::nullopt;
+    return odometryEstimate.transform(
+        [&](const auto& o) { return visionUpdate.Compensate(o); });
   }
 
   /**
@@ -286,7 +284,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
         m_odometryPoseBuffer.GetInternalBuffer().front().first -
-                kBufferDuration >
+                BUFFER_DURATION >
             timestamp) {
       return;
     }
@@ -479,7 +477,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
     }
   };
 
-  static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
+  static constexpr wpi::units::second_t BUFFER_DURATION = 1.5_s;
 
   Odometry3d<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
       m_odometry;
@@ -492,7 +490,7 @@ class WPILIB_DLLEXPORT PoseEstimator3d {
       Eigen::DiagonalMatrix<double, 6>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
-  TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{kBufferDuration};
+  TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer{BUFFER_DURATION};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset. May

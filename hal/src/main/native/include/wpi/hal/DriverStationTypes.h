@@ -151,7 +151,7 @@ struct HAL_JoystickTouchpads {
 typedef struct HAL_JoystickTouchpads HAL_JoystickTouchpads;
 
 struct HAL_GameData {
-  char gameData[9];
+  char gameData[65];
 };
 typedef struct HAL_GameData HAL_GameData;
 

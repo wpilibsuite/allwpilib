@@ -6,12 +6,12 @@
 
 #include <utility>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/NullDeleter.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -69,10 +69,7 @@ void AnalogEncoder::Init(double fullRange, double expectedZero) {
   m_fullRange = fullRange;
   m_expectedZero = expectedZero;
 
-  HAL_ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
-
-  wpi::util::SendableRegistry::Add(this, "Analog Encoder",
-                                   m_analogInput->GetChannel());
+  wpi::util::ReportUsage("IO", m_analogInput->GetChannel(), "AnalogEncoder");
 }
 
 double AnalogEncoder::Get() const {
@@ -122,8 +119,10 @@ double AnalogEncoder::MapSensorRange(double pos) const {
   return pos;
 }
 
-void AnalogEncoder::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("AbsoluteEncoder");
-  builder.AddDoubleProperty(
-      "Position", [this] { return this->Get(); }, nullptr);
+void AnalogEncoder::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Position", Get());
+}
+
+std::string_view AnalogEncoder::GetTelemetryType() const {
+  return "AbsoluteEncoder";
 }

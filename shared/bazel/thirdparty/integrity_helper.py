@@ -123,6 +123,31 @@ def update_ceres(version):
     )
 
 
+def update_libsdlgpu(version):
+    has_headers = True
+    classifiers = [
+        "linuxarm64static",
+        "linuxarm64staticdebug",
+        "linuxx86-64static",
+        "linuxx86-64staticdebug",
+        "osxuniversalstatic",
+        "osxuniversalstaticdebug",
+        "windowsarm64static",
+        "windowsarm64staticdebug",
+        "windowsx86-64static",
+        "windowsx86-64staticdebug",
+    ]
+    url_base = f"https://frcmaven.wpi.edu/release/org/wpilib/thirdparty/libsdl-gpu/{version}/libsdl-gpu-{version}-%s.zip"
+
+    download_integrities(
+        "shared/bazel/thirdparty/libsdlgpu/libsdlgpu.MODULE.bazel",
+        has_headers,
+        classifiers,
+        url_base,
+        False,
+    )
+
+
 def update_libssh(version):
     has_headers = True
     classifiers = [
@@ -175,6 +200,7 @@ def main():
         versions = tomllib.load(f)["versions"]
 
     update_ceres(versions["ceres"])
+    update_libsdlgpu(versions["libsdlgpu"])
     update_libssh(versions["libssh"])
     update_mrclib(versions["mrclib"])
 

@@ -1,12 +1,3 @@
-include(LinkMacOSGUI)
-
-set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS OFF)
-set(GLFW_INSTALL OFF)
-add_subdirectory("glfw")
-set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
-export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
-
 # Add imgui directly to our build.
 file(GLOB imgui_sources imgui/cpp/*.cpp imgui/cpp/misc/cpp/*.cpp)
 file(GLOB implot_sources implot/cpp/*.cpp)
@@ -15,9 +6,9 @@ set(imgui_all_sources
     ${imgui_sources}
     ${implot_sources}
     ${fonts_sources}
-    imgui/cpp/backends/imgui_impl_glfw.cpp
-    imgui/cpp/backends/imgui_impl_opengl3.cpp
-    generated/gl3w/src/gl3w.c
+    imgui/cpp/backends/imgui_impl_sdl3.cpp
+    imgui/cpp/backends/imgui_impl_sdlgpu3.cpp
+    imgui/cpp/backends/imgui_impl_sdlrenderer3.cpp
     stb/cpp/stb_image.cpp
 )
 if(MSVC)
@@ -25,19 +16,7 @@ if(MSVC)
 else()
     add_library(imgui ${imgui_all_sources})
 endif()
-target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
-if(MSVC)
-    target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_dx11.cpp)
-else()
-    if(APPLE)
-        target_compile_options(imgui PRIVATE -fobjc-arc)
-        wpilib_link_macos_gui(imgui)
-        target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_metal.mm)
-    else()
-        #target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_opengl3.cpp)
-    endif()
-endif()
-target_link_libraries(imgui PUBLIC glfw)
+target_link_libraries(imgui PUBLIC SDL3::SDL3)
 target_include_directories(
     imgui
     PUBLIC
@@ -45,7 +24,6 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/misc/cpp>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/backends>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/implot/include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/gl3w/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/fonts/include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
     PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"

@@ -1,20 +1,17 @@
 {
-  "game": "2025-2026 FTC DECODE",
-  "field-image": "2025-2026-decode.png",
-  "field-corners": {
-    "top-left": [
-      0,
-      0
-    ],
-    "bottom-right": [
-      2445,
-      2445
-    ]
+  "name": "2025-2026 FTC DECODE",
+  "season": "2025-2026",
+  "game": "DECODE",
+  "field-image": {
+    "path": "2025-2026-decode.png",
+    "top": 0,
+    "left": 0,
+    "bottom": 2445,
+    "right": 2445
   },
-  "field-size": [
-    11.93183333,
-    11.93183333
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 3.636822798984,
+    "width": 3.636822798984
+  },
   "program": "ftc"
 }

@@ -5,7 +5,7 @@ package wpi.proto;
 import "wpimath/protobuf/geometry2d.proto";
 import "wpimath/protobuf/kinematics.proto";
 
-option java_package = "org.wpilib.math.proto";
+option java_package = "org.wpilib.math.trajectory.proto.detail";
 
 option java_outer_classname = "ProtobufTrajectoryDescriptor";
 

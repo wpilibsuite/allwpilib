@@ -21,7 +21,9 @@ namespace wpi::math {
  * permanent-magnet DC motor.
  */
 template <class Distance>
-  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+  requires wpi::units::length_unit<Distance> ||
+           wpi::units::angle_unit<Distance> ||
+           wpi::units::dimensionless_unit<Distance>
 class SimpleMotorFeedforward {
  public:
   using Velocity =
@@ -97,7 +99,7 @@ class SimpleMotorFeedforward {
   constexpr wpi::units::volt_t Calculate(
       wpi::units::unit_t<Velocity> currentVelocity,
       wpi::units::unit_t<Velocity> nextVelocity) const {
-    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
+    // See wpimath/docs/SimpleMotorFeedforward.md for derivation
     if (kA < decltype(kA)(1e-9)) {
       return kS * wpi::util::sgn(nextVelocity) + kV * nextVelocity;
     } else {

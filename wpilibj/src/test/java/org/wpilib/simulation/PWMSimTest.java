@@ -17,7 +17,7 @@ import org.wpilib.simulation.testutils.IntCallback;
 class PWMSimTest {
   @Test
   void testInitialize() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     PWMSim sim = new PWMSim(0);
     sim.resetData();
@@ -33,7 +33,7 @@ class PWMSimTest {
 
   @Test
   void testSetPulseTime() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     PWMSim sim = new PWMSim(0);
     sim.resetData();
@@ -53,7 +53,7 @@ class PWMSimTest {
 
   @Test
   void testSetOutputPeriod() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     PWMSim sim = new PWMSim(0);
     sim.resetData();

@@ -75,7 +75,7 @@ class RobotTestingPlugin:
         pause_timing()
         restart_timing()
 
-        wpilib.DriverStationBackend.silence_joystick_connection_warning(True)
+        wpilib.DriverStationBackend.silence_joystick_connection_alert(True)
         DriverStationSim.set_robot_mode(RobotMode.AUTONOMOUS)
         DriverStationSim.set_enabled(False)
         DriverStationSim.notify_new_data()
@@ -117,9 +117,8 @@ class RobotTestingPlugin:
         nt_inst._reset()
 
         # Cleanup WPILib globals
-        # -> preferences, SmartDashboard, MotorSafety
+        # -> preferences and MotorSafety
         wpilib.simulation._simulation._reset_wpilib_simulation_data()
-        wpilib._wpilib._clear_smart_dashboard_data()
 
         # Cancel all periodic callbacks
         hal.simulation.cancel_all_sim_periodic_callbacks()

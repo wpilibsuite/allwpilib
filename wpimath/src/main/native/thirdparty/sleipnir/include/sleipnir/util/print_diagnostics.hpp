@@ -9,6 +9,8 @@
 #include <chrono>
 #include <cmath>
 #include <ranges>
+#include <ratio>
+#include <span>
 #include <string>
 #include <utility>
 

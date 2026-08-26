@@ -153,18 +153,16 @@ The `OpModeRobot` class is the base class for the user's `Robot` class.  It exte
 ```java
 public abstract class OpModeRobot extends RobotBase {
   // OpMode registration methods
-  public void addOpModeFactory(Supplier<OpMode> factory, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
+  public void addOpMode(RobotMode mode, String name, String group, String description,
+      Color textColor, Color backgroundColor, Supplier<OpMode> factory) {...}
 
   // add a particular opmode class (Java only)
-  public void addOpMode(Class<? extends OpMode> cls, RobotMode mode,
-      String name, String group, String description,
-      Color textColor, Color backgroundColor) {...}
-  public void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
+  public void addOpMode(RobotMode mode, String name, String group, String description,
+      Color textColor, Color backgroundColor, Class<? extends OpMode> cls) {...}
+  private void addAnnotatedOpMode(Class<? extends OpMode> cls) {...}
 
   // add all annotated opmodes in a package and nested packages
-  public void addAnnotatedOpModeClasses(Package pkg) {...}
+  private void addAnnotatedOpModeClasses(Package pkg) {...}
 
   public void removeOpMode(RobotMode mode, String name) {...}
   public void publishOpModes() {...}

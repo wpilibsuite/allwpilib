@@ -4,9 +4,9 @@
 
 package org.wpilib.math.trajectory.proto;
 
-import org.wpilib.math.proto.ProtobufHolonomicTrajectory;
 import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.trajectory.HolonomicTrajectory;
+import org.wpilib.math.trajectory.proto.detail.ProtobufHolonomicTrajectory;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

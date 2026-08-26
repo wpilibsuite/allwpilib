@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
@@ -15,42 +15,45 @@
 
 static wpi::units::second_t now = 0_s;
 
-class SlewRateLimiterTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-    WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+class SlewRateLimiterTest {
+ public:
+  SlewRateLimiterTest() {
+    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
   }
 
-  void TearDown() override { WPI_SetNowImpl(nullptr); }
+  ~SlewRateLimiterTest() { WPI_SetNowImpl(nullptr); }
 };
 
-TEST_F(SlewRateLimiterTest, SlewRateLimit) {
-  WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateLimit",
+                 "[wpimath]") {
+  WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
 
   wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
 
   now += 1_s;
 
-  EXPECT_LT(limiter.Calculate(2_m), 2_m);
+  CHECK(limiter.Calculate(2_m) < 2_m);
 }
 
-TEST_F(SlewRateLimiterTest, SlewRateNoLimit) {
+TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateNoLimit",
+                 "[wpimath]") {
   wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
 
   now += 1_s;
 
-  EXPECT_EQ(limiter.Calculate(0.5_m), 0.5_m);
+  CHECK(limiter.Calculate(0.5_m) == 0.5_m);
 }
 
-TEST_F(SlewRateLimiterTest, SlewRatePositiveNegativeLimit) {
+TEST_CASE_METHOD(SlewRateLimiterTest,
+                 "SlewRateLimiterTest SlewRatePositiveNegativeLimit",
+                 "[wpimath]") {
   wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps, -0.5_mps);
 
   now += 1_s;
 
-  EXPECT_EQ(limiter.Calculate(2_m), 1_m);
+  CHECK(limiter.Calculate(2_m) == 1_m);
 
   now += 1_s;
 
-  EXPECT_EQ(limiter.Calculate(0_m), 0.5_m);
+  CHECK(limiter.Calculate(0_m) == 0.5_m);
 }

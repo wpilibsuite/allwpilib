@@ -49,11 +49,11 @@ bool IsTimingPaused() {
 }
 
 void StepTiming(wpi::units::second_t delta) {
-  HALSIM_StepTiming(static_cast<uint64_t>(delta.value() * 1e6));
+  HALSIM_StepTiming(static_cast<int64_t>(delta.value() * 1e9));
 }
 
 void StepTimingAsync(wpi::units::second_t delta) {
-  HALSIM_StepTimingAsync(static_cast<uint64_t>(delta.value() * 1e6));
+  HALSIM_StepTimingAsync(static_cast<int64_t>(delta.value() * 1e9));
 }
 
 }  // namespace wpi::sim

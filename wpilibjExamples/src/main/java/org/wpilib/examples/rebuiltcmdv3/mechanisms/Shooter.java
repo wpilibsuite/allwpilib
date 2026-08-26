@@ -122,7 +122,7 @@ public class Shooter implements Mechanism {
     return runRepeatedly(
             () -> {
               hoodMotor.setSetpoint(
-                  ExampleSmartMotorController.PIDMode.kPosition, angle.get().in(Radians));
+                  ExampleSmartMotorController.PIDMode.POSITION, angle.get().in(Radians));
             })
         .named("Shooter.RunHoodAngle");
   }
@@ -138,7 +138,7 @@ public class Shooter implements Mechanism {
     return runRepeatedly(
             () -> {
               flywheelMotorPrimary.setSetpoint(
-                  ExampleSmartMotorController.PIDMode.kVelocity, speed.get().in(RPM));
+                  ExampleSmartMotorController.PIDMode.VELOCITY, speed.get().in(RPM));
             })
         .named("Shooter.RunFlywheelSpeed");
   }

@@ -33,7 +33,7 @@ NetworkTablesProvider::NetworkTablesProvider(Storage& storage,
     for (auto&& childIt : m_storage.GetChildren()) {
       auto id = childIt.key();
       auto typePtr = m_typeCache.FindValue(id);
-      if (!typePtr || typePtr->type != Storage::Value::kString) {
+      if (!typePtr || typePtr->type != Storage::Value::STRING) {
         continue;
       }
 
@@ -197,7 +197,7 @@ void NetworkTablesProvider::Show(ViewEntry* entry, Window* window) {
 
   // the window might exist and we're just not associated to it yet
   if (!window) {
-    window = GetOrAddWindow(entry->name, true, Window::kHide);
+    window = GetOrAddWindow(entry->name, true, Window::HIDE);
   }
   if (!window) {
     return;

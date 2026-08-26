@@ -6,4 +6,4 @@ _sse = getattr(_wpi_hal, "set_show_extensions_not_found_messages", None)
 if _sse:
     _wpi_hal.set_show_extensions_not_found_messages(False)
 
-_wpi_hal.initialize(500, 0)
+_wpi_hal.initialize()

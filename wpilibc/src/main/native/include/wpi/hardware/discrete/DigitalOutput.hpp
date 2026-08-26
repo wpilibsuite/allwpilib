@@ -5,10 +5,9 @@
 #pragma once
 
 #include "wpi/hal/DIO.h"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -19,8 +18,7 @@ namespace wpi {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public wpi::util::Sendable,
-                      public wpi::util::SendableHelper<DigitalOutput> {
+class DigitalOutput : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Create an instance of a digital output.
@@ -42,6 +40,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * Set the value of a digital output to either one (true) or zero (false).
    *
    * @param value 1 (true) for high, 0 (false) for disabled
+   * @Common This is one of the commonly used methods for this class
    */
   void Set(bool value);
 
@@ -64,6 +63,7 @@ class DigitalOutput : public wpi::util::Sendable,
    * specified in seconds. Maximum of 65535 microseconds.
    *
    * @param pulseLength The pulse length in seconds
+   * @Common This is one of the commonly used methods for this class
    */
   void Pulse(wpi::units::second_t pulseLength);
 
@@ -138,7 +138,9 @@ class DigitalOutput : public wpi::util::Sendable,
    */
   void SetSimDevice(HAL_SimDeviceHandle device);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   int m_channel;

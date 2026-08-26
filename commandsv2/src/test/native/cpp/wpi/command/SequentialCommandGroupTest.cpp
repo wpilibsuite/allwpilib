@@ -14,7 +14,9 @@
 using namespace wpi::cmd;
 class SequentialCommandGroupTest : public CommandTestBase {};
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
+TEST_CASE_METHOD(SequentialCommandGroupTest,
+                 "SequentialCommandGroupTest SequentialGroupSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -29,17 +31,17 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(1);
-  EXPECT_CALL(*command1, End(false));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(1);
+  command1->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(1);
-  EXPECT_CALL(*command2, End(false));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(1);
+  command2->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command3, Initialize());
-  EXPECT_CALL(*command3, Execute()).Times(1);
-  EXPECT_CALL(*command3, End(false));
+  command3->ExpectInitialize(1);
+  command3->ExpectExecute(1);
+  command3->ExpectEnd(false, 1);
 
   scheduler.Schedule(&group);
 
@@ -50,10 +52,12 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupSchedule) {
   command3->SetFinished(true);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
+TEST_CASE_METHOD(SequentialCommandGroupTest,
+                 "SequentialCommandGroupTest SequentialGroupInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -68,19 +72,19 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
       std::move(command1Holder), std::move(command2Holder),
       std::move(command3Holder))};
 
-  EXPECT_CALL(*command1, Initialize());
-  EXPECT_CALL(*command1, Execute()).Times(1);
-  EXPECT_CALL(*command1, End(false));
+  command1->ExpectInitialize(1);
+  command1->ExpectExecute(1);
+  command1->ExpectEnd(false, 1);
 
-  EXPECT_CALL(*command2, Initialize());
-  EXPECT_CALL(*command2, Execute()).Times(0);
-  EXPECT_CALL(*command2, End(false)).Times(0);
-  EXPECT_CALL(*command2, End(true));
+  command2->ExpectInitialize(1);
+  command2->ExpectExecute(0);
+  command2->ExpectEnd(false, 0);
+  command2->ExpectEnd(true, 1);
 
-  EXPECT_CALL(*command3, Initialize()).Times(0);
-  EXPECT_CALL(*command3, Execute()).Times(0);
-  EXPECT_CALL(*command3, End(false)).Times(0);
-  EXPECT_CALL(*command3, End(true)).Times(0);
+  command3->ExpectInitialize(0);
+  command3->ExpectExecute(0);
+  command3->ExpectEnd(false, 0);
+  command3->ExpectEnd(true, 0);
 
   scheduler.Schedule(&group);
 
@@ -89,18 +93,22 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupInterrupt) {
   scheduler.Cancel(&group);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(&group));
+  CHECK_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupNotScheduledCancel) {
+TEST_CASE_METHOD(SequentialCommandGroupTest,
+                 "SequentialCommandGroupTest SequentialGroupNotScheduledCancel",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   SequentialCommandGroup group{InstantCommand(), InstantCommand()};
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+  CHECK_NOTHROW(scheduler.Cancel(&group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
+TEST_CASE_METHOD(SequentialCommandGroupTest,
+                 "SequentialCommandGroupTest SequentialGroupCopy",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -110,13 +118,15 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupCopy) {
   auto group = Sequence(std::move(command));
   scheduler.Schedule(group);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
+TEST_CASE_METHOD(SequentialCommandGroupTest,
+                 "SequentialCommandGroupTest SequentialGroupRequirement",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem requirement1;
@@ -133,8 +143,8 @@ TEST_F(SequentialCommandGroupTest, SequentialGroupRequirement) {
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
 
-  EXPECT_TRUE(scheduler.IsScheduled(command3));
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(command3));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
 INSTANTIATE_MULTI_COMMAND_COMPOSITION_TEST_SUITE(SequentialCommandGroupTest,

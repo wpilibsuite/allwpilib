@@ -14,7 +14,7 @@ import org.wpilib.hardware.hal.can.CANStatus;
 class CANStatusTest {
   @Test
   void canStatusGetDoesntThrow() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     CANStatus status = new CANStatus();
     assertDoesNotThrow(() -> CANJNI.getCANStatus(0, status));
   }

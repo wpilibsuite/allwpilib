@@ -19,6 +19,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -116,7 +117,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -176,7 +177,7 @@ class UnscentedKalmanFilter {
     m_dt = dt;
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("UnscentedKalmanFilter", "");
+    wpi::util::ReportUsage("UnscentedKalmanFilter", "");
   }
 
   /**
@@ -438,10 +439,10 @@ class UnscentedKalmanFilter {
               .transpose();
     }
 
-    // Compute the Kalman gain
+    // Compute the Kalman gain (see wpimath/docs/LinalgIdentities.md)
     //
     //   K = (P_{xy} / S_{y}ᵀ) / S_{y}
-    //   K = (S_{y} \ P_{xy})ᵀ / S_{y}
+    //   K = (S_{y} \ P_{xy}ᵀ)ᵀ / S_{y}
     //   K = (S_{y}ᵀ \ (S_{y} \ P_{xy}ᵀ))ᵀ
     //
     // equation (27)

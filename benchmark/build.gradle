@@ -29,6 +29,7 @@ ext {
     skipDev = true
 }
 
+apply from: "${rootDir}/shared/libmrclib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 application {
@@ -55,6 +56,8 @@ dependencies {
     implementation project(':epilogue-runtime')
     implementation project(':hal')
     implementation project(':ntcore')
+    implementation project(':telemetry')
+    implementation project(':tunables')
     implementation project(':wpilibj')
     implementation project(':commandsv2')
     implementation project(':wpimath')
@@ -218,8 +221,11 @@ model {
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
                 lib project: ':cscore', library: 'cscoreJNIShared', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
-                project(':hal').addHalJniDependency(binary)
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'shared'
+                lib project: ':hal', library: 'halJNIShared', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 project(':ntcore').addNtcoreJniDependency(binary)
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
@@ -230,6 +236,8 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"
@@ -272,13 +280,18 @@ model {
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
                 lib project: ':cscore', library: 'cscore', linkage: 'static'
-                project(':hal').addHalDependency(binary, 'static')
+                if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                }
+                lib project: ':hal', library: 'hal', linkage: 'static'
                 project(':ntcore').addNtcoreDependency(binary, 'static')
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                 lib project: ':commandsv2', library: 'commandsv2', linkage: 'static'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"

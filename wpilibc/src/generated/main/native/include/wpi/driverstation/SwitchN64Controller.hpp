@@ -8,8 +8,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,10 +21,7 @@ class EventLoop;
  * This class handles SwitchN64 input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class SwitchN64Controller
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<SwitchN64Controller> {
+class SwitchN64Controller : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 0;
@@ -145,30 +141,78 @@ class SwitchN64Controller
   /**
    * Get the Left X value of the controller.
    *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftXDeadband() to change it.
+   *
    * @return the axis value.
    */
   double GetLeftX() const;
 
   /**
+   * Set the deadband for the Left X axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftXDeadband(double deadband);
+
+  /**
    * Get the Left Y value of the controller.
+   *
+   * A deadband of 0.1 is applied by default. Use
+   * SetLeftYDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetLeftY() const;
 
   /**
+   * Set the deadband for the Left Y axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetLeftYDeadband(double deadband);
+
+  /**
    * Get the Z Axis value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetZAxisDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetZAxis() const;
 
   /**
+   * Set the deadband for the Z Axis axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetZAxisDeadband(double deadband);
+
+  /**
    * Get the ZR value of the controller.
+   *
+   * A deadband of 0.01 is applied by default. Use
+   * SetZRDeadband() to change it.
    *
    * @return the axis value.
    */
   double GetZR() const;
+
+  /**
+   * Set the deadband for the ZR axis.
+   *
+   * The deadband is clamped to [0, 1).
+   *
+   * @param deadband The deadband to apply.
+   */
+  void SetZRDeadband(double deadband);
 
   /**
    * Get the value of the axis.
@@ -719,9 +763,14 @@ class SwitchN64Controller
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
+  double m_leftXDeadband = 0.1;
+  double m_leftYDeadband = 0.1;
+  double m_ZAxisDeadband = 0.01;
+  double m_ZRDeadband = 0.01;
   GenericHID* m_hid;
 };
 

@@ -8,59 +8,77 @@
 
 #include <cstring>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/util/struct/Struct.hpp"
 
 template <typename T>
-class StructTest : public testing::Test {};
+class StructTest {};
 
-TYPED_TEST_SUITE_P(StructTest);
+#define CATCH_TYPED_TEST_SUITE_P(Suite)
+
+#define CATCH_TYPED_TEST_P(Suite, Name) \
+  template <typename TypeParam>         \
+  void Suite##_##Name()
+
+#define REGISTER_CATCH_TYPED_TEST_SUITE_P(Suite, ...)
+
+#define INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(Prefix, Suite, TypeParam) \
+  TEST_CASE(#Suite " " #Prefix " RoundTrip", "[wpimath]") {            \
+    Suite##_RoundTrip<TypeParam>();                                    \
+  }                                                                    \
+  TEST_CASE(#Suite " " #Prefix " DoublePack", "[wpimath]") {           \
+    Suite##_DoublePack<TypeParam>();                                   \
+  }                                                                    \
+  TEST_CASE(#Suite " " #Prefix " DoubleUnpack", "[wpimath]") {         \
+    Suite##_DoubleUnpack<TypeParam>();                                 \
+  }
 
 // For these tests:
-// TypeParam defines Type, kTestData, and CheckEq
+// TypeParam defines Type, TEST_DATA, and CheckEq
 // Type is the data type
 // StructType is the instantiation of wpi::util::Struct<>
 
-TYPED_TEST_P(StructTest, RoundTrip) {
+CATCH_TYPED_TEST_P(StructTest, RoundTrip) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
-TYPED_TEST_P(StructTest, DoublePack) {
+CATCH_TYPED_TEST_P(StructTest, DoublePack) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
-TYPED_TEST_P(StructTest, DoubleUnpack) {
+CATCH_TYPED_TEST_P(StructTest, DoubleUnpack) {
   using Type = typename TypeParam::Type;
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   {
     Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 
   {
     Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 }
 
-REGISTER_TYPED_TEST_SUITE_P(StructTest, RoundTrip, DoublePack, DoubleUnpack);
+REGISTER_CATCH_TYPED_TEST_SUITE_P(StructTest, RoundTrip, DoublePack,
+                                  DoubleUnpack);

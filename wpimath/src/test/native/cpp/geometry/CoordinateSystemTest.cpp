@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/CoordinateAxis.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
@@ -22,20 +22,18 @@ void CheckPose3dConvert(const Pose3d& poseFrom, const Pose3d& poseTo,
                         const CoordinateSystem& coordFrom,
                         const CoordinateSystem& coordTo) {
   // "from" to "to"
-  EXPECT_EQ(
-      poseTo.Translation(),
-      CoordinateSystem::Convert(poseFrom.Translation(), coordFrom, coordTo));
-  EXPECT_EQ(poseTo.Rotation(),
-            CoordinateSystem::Convert(poseFrom.Rotation(), coordFrom, coordTo));
-  EXPECT_EQ(poseTo, CoordinateSystem::Convert(poseFrom, coordFrom, coordTo));
+  CHECK(poseTo.Translation() ==
+        CoordinateSystem::Convert(poseFrom.Translation(), coordFrom, coordTo));
+  CHECK(poseTo.Rotation() ==
+        CoordinateSystem::Convert(poseFrom.Rotation(), coordFrom, coordTo));
+  CHECK(poseTo == CoordinateSystem::Convert(poseFrom, coordFrom, coordTo));
 
   // "to" to "from"
-  EXPECT_EQ(
-      poseFrom.Translation(),
-      CoordinateSystem::Convert(poseTo.Translation(), coordTo, coordFrom));
-  EXPECT_EQ(poseFrom.Rotation(),
-            CoordinateSystem::Convert(poseTo.Rotation(), coordTo, coordFrom));
-  EXPECT_EQ(poseFrom, CoordinateSystem::Convert(poseTo, coordTo, coordFrom));
+  CHECK(poseFrom.Translation() ==
+        CoordinateSystem::Convert(poseTo.Translation(), coordTo, coordFrom));
+  CHECK(poseFrom.Rotation() ==
+        CoordinateSystem::Convert(poseTo.Rotation(), coordTo, coordFrom));
+  CHECK(poseFrom == CoordinateSystem::Convert(poseTo, coordTo, coordFrom));
 }
 
 void CheckTransform3dConvert(const Transform3d& transformFrom,
@@ -43,21 +41,21 @@ void CheckTransform3dConvert(const Transform3d& transformFrom,
                              const CoordinateSystem& coordFrom,
                              const CoordinateSystem& coordTo) {
   // "from" to "to"
-  EXPECT_EQ(transformTo.Translation(),
-            CoordinateSystem::Convert(transformFrom.Translation(), coordFrom,
-                                      coordTo));
-  EXPECT_EQ(transformTo,
-            CoordinateSystem::Convert(transformFrom, coordFrom, coordTo));
+  CHECK(transformTo.Translation() ==
+        CoordinateSystem::Convert(transformFrom.Translation(), coordFrom,
+                                  coordTo));
+  CHECK(transformTo ==
+        CoordinateSystem::Convert(transformFrom, coordFrom, coordTo));
 
   // "to" to "from"
-  EXPECT_EQ(
-      transformFrom.Translation(),
+  CHECK(
+      transformFrom.Translation() ==
       CoordinateSystem::Convert(transformTo.Translation(), coordTo, coordFrom));
-  EXPECT_EQ(transformFrom,
-            CoordinateSystem::Convert(transformTo, coordTo, coordFrom));
+  CHECK(transformFrom ==
+        CoordinateSystem::Convert(transformTo, coordTo, coordFrom));
 }
 
-TEST(CoordinateSystemTest, Pose3dEDNtoNWU) {
+TEST_CASE("CoordinateSystemTest Pose3dEDNtoNWU", "[wpimath]") {
   // No rotation from EDN to NWU
   CheckPose3dConvert(
       Pose3d{1_m, 2_m, 3_m, Rotation3d{}},
@@ -83,7 +81,7 @@ TEST(CoordinateSystemTest, Pose3dEDNtoNWU) {
       CoordinateSystem::EDN(), CoordinateSystem::NWU());
 }
 
-TEST(CoordinateSystemTest, Pose3dEDNtoNED) {
+TEST_CASE("CoordinateSystemTest Pose3dEDNtoNED", "[wpimath]") {
   // No rotation from EDN to NED
   CheckPose3dConvert(Pose3d{1_m, 2_m, 3_m, Rotation3d{}},
                      Pose3d{3_m, 1_m, 2_m, Rotation3d{90_deg, 0_deg, 90_deg}},
@@ -105,7 +103,7 @@ TEST(CoordinateSystemTest, Pose3dEDNtoNED) {
                      CoordinateSystem::EDN(), CoordinateSystem::NED());
 }
 
-TEST(CoordinateSystemTest, Transform3dEDNtoNWU) {
+TEST_CASE("CoordinateSystemTest Transform3dEDNtoNWU", "[wpimath]") {
   // No rotation from EDN to NWU
   CheckTransform3dConvert(
       Transform3d{Translation3d{1_m, 2_m, 3_m}, Rotation3d{}},
@@ -134,7 +132,7 @@ TEST(CoordinateSystemTest, Transform3dEDNtoNWU) {
                           CoordinateSystem::EDN(), CoordinateSystem::NWU());
 }
 
-TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
+TEST_CASE("CoordinateSystemTest Transform3dEDNtoNED", "[wpimath]") {
   // No rotation from EDN to NED
   CheckTransform3dConvert(
       Transform3d{Translation3d{1_m, 2_m, 3_m}, Rotation3d{}},
@@ -163,14 +161,14 @@ TEST(CoordinateSystemTest, Transform3dEDNtoNED) {
                           CoordinateSystem::EDN(), CoordinateSystem::NED());
 }
 
-TEST(CoordinateSystemTest, LeftHandedSystemThrowsException) {
-  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::E(),
-                                CoordinateAxis::U()),
-               std::domain_error);
-  EXPECT_THROW(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
-                                CoordinateAxis::N()),
-               std::domain_error);
-  EXPECT_THROW(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
-                                CoordinateAxis::D()),
-               std::domain_error);
+TEST_CASE("CoordinateSystemTest LeftHandedSystemThrowsException", "[wpimath]") {
+  CHECK_THROWS_AS(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::E(),
+                                   CoordinateAxis::U()),
+                  std::domain_error);
+  CHECK_THROWS_AS(CoordinateSystem(CoordinateAxis::E(), CoordinateAxis::U(),
+                                   CoordinateAxis::N()),
+                  std::domain_error);
+  CHECK_THROWS_AS(CoordinateSystem(CoordinateAxis::N(), CoordinateAxis::W(),
+                                   CoordinateAxis::D()),
+                  std::domain_error);
 }

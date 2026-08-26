@@ -4,7 +4,7 @@
 
 #include "wpi/math/kinematics/proto/SwerveDriveKinematicsProto.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "../../ProtoTestBase.hpp"
 #include "wpi/math/kinematics/SwerveDriveKinematics.hpp"
@@ -14,15 +14,15 @@ using namespace wpi::math;
 struct SwerveDriveKinematicsProtoTestData {
   using Type = SwerveDriveKinematics<4>;
 
-  inline static const Type kTestData{wpi::math::Translation2d{1.0_m, 0.9_m},
+  inline static const Type TEST_DATA{wpi::math::Translation2d{1.0_m, 0.9_m},
                                      wpi::math::Translation2d{1.1_m, -0.8_m},
                                      wpi::math::Translation2d{-1.2_m, 0.7_m},
                                      wpi::math::Translation2d{-1.3_m, -0.6_m}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.GetModules(), data.GetModules());
+    CHECK(testData.GetModules() == data.GetModules());
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(SwerveDriveKinematics, ProtoTest,
-                               SwerveDriveKinematicsProtoTestData);
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(SwerveDriveKinematics, ProtoTest,
+                                     SwerveDriveKinematicsProtoTestData);

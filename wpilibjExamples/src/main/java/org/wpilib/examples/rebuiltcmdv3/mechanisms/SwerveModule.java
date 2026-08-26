@@ -33,15 +33,15 @@ public final class SwerveModule {
    * @param targetVelocity The target velocity of the module.
    */
   public void setTargetVelocity(SwerveModuleVelocity targetVelocity) {
-    driveMotor.setSetpoint(ExampleSmartMotorController.PIDMode.kVelocity, targetVelocity.velocity);
+    driveMotor.setSetpoint(ExampleSmartMotorController.PIDMode.VELOCITY, targetVelocity.velocity);
     turnMotor.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition, targetVelocity.angle.getRadians());
+        ExampleSmartMotorController.PIDMode.POSITION, targetVelocity.angle.getRadians());
   }
 
   /** Stops the module by turning off the drive and turn motors. */
   public void stop() {
-    driveMotor.stopMotor();
-    turnMotor.stopMotor();
+    driveMotor.setThrottle(0.0);
+    turnMotor.setThrottle(0.0);
   }
 
   /**

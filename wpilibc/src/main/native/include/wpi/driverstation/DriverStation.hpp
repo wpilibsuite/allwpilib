@@ -39,6 +39,7 @@ class DriverStation final {
    * @param port The port index on the Driver Station that the controller is
    * plugged into (0-5).
    * @return The Gamepad object for the given port.
+   * @Common This is one of the commonly used methods for this class
    */
   static Gamepad& GetGamepad(int port);
 

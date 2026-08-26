@@ -35,6 +35,7 @@ class ExpansionHubServo {
    * to full right.
    *
    * @param value Position from 0.0 to 1.0.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetPosition(double value);
 
@@ -46,6 +47,7 @@ class ExpansionHubServo {
    *
    * @param angle Position in angle units. Will be clamped to be within the
    * current angle range.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetAngle(wpi::units::degree_t angle);
 

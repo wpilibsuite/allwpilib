@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 SHOT_VELOCITY = 200.0  # rpm
@@ -16,14 +17,14 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
 
-        self.shooter = wpilib.PWMSparkMax(0)
+        self.shooter = wpilib_drivers.PWMSparkMax(0)
         self.shooter_encoder = wpilib.Encoder(0, 1)
         self.controller = wpimath.PIDController(0.3, 0, 0)
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(0.1, 0.065)
 
-        self.kicker = wpilib.PWMSparkMax(1)
+        self.kicker = wpilib_drivers.PWMSparkMax(1)
 
-        self.intake = wpilib.PWMSparkMax(2)
+        self.intake = wpilib_drivers.PWMSparkMax(2)
 
         self.loop = wpilib.EventLoop()
         self.joystick = wpilib.Joystick(0)
@@ -42,14 +43,14 @@ class MyRobot(wpilib.TimedRobot):
         intake_button.and_(is_ball_at_kicker_event.negate()).if_high(
             # and there is not a ball at the kicker
             # activate the intake
-            lambda: self.intake.set(0.5)
+            lambda: self.intake.set_throttle(0.5)
         )
 
         # if the thumb button is not held
         intake_button.negate().or_(is_ball_at_kicker_event).if_high(
             # or there is a ball in the kicker
             # stop the intake
-            self.intake.stop_motor
+            lambda: self.intake.set_throttle(0.0)
         )
 
         shoot_trigger = wpilib.BooleanEvent(self.loop, self.joystick.get_trigger)
@@ -66,7 +67,7 @@ class MyRobot(wpilib.TimedRobot):
         )
 
         # if not, stop
-        shoot_trigger.negate().if_high(self.shooter.stop_motor)
+        shoot_trigger.negate().if_high(lambda: self.shooter.set_throttle(0.0))
 
         at_target_velocity = wpilib.BooleanEvent(
             self.loop, self.controller.at_setpoint
@@ -81,7 +82,7 @@ class MyRobot(wpilib.TimedRobot):
         # when we stop being at the target velocity, it means the ball was shot
         at_target_velocity.falling().if_high(
             # so stop the kicker
-            self.kicker.stop_motor
+            lambda: self.kicker.set_throttle(0.0)
         )
 
     def robot_periodic(self) -> None:

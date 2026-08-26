@@ -520,6 +520,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
           m_frameSize = (static_cast<uint16_t>(m_header[2]) << 8) |
                         static_cast<uint16_t>(m_header[3]);
         } else if (len == 127) {
+          // RFC 6455 limits payload lengths to 63 bits.
+          if ((m_header[2] & 0x80) != 0) {
+            return Fail(1002, "invalid 64-bit payload length");
+          }
           m_frameSize = (static_cast<uint64_t>(m_header[2]) << 56) |
                         (static_cast<uint64_t>(m_header[3]) << 48) |
                         (static_cast<uint64_t>(m_header[4]) << 40) |
@@ -534,8 +538,10 @@ void WebSocket::HandleIncoming(uv::Buffer& buf, size_t size) {
 
         // limit maximum size
         bool control = (m_header[0] & FLAG_CONTROL) != 0;
-        if (((control ? m_controlPayload.size() : m_payload.size()) +
-             m_frameSize) > m_maxMessageSize) {
+        size_t accumulatedSize =
+            control ? m_controlPayload.size() : m_payload.size();
+        if (accumulatedSize > m_maxMessageSize ||
+            m_frameSize > m_maxMessageSize - accumulatedSize) {
           return Fail(1009, "message too large");
         }
       }

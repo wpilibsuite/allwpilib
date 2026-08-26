@@ -8,23 +8,23 @@ import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.constants.DriveConstants;
 import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rectangle2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.SwerveModulePosition;
+import org.wpilib.math.shape.Rectangle2d;
 
 @Logged
 public class PoseEstimator {
   private final SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.KINEMATICS,
-          Rotation2d.kZero,
+          Rotation2d.ZERO,
           new SwerveModulePosition[] {
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition()
           },
-          Pose2d.kZero);
+          Pose2d.ZERO);
 
   /**
    * Updates the pose estimator with the current gyro heading and swerve module positions.

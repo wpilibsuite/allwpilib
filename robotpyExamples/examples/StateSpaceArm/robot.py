@@ -7,6 +7,7 @@
 
 import math
 import wpilib
+import wpilib_drivers
 import wpimath.units
 import wpimath
 
@@ -95,7 +96,7 @@ class MyRobot(wpilib.TimedRobot):
         # An encoder set up to measure flywheel velocity in radians per second.
         self.encoder = wpilib.Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL)
 
-        self.motor = wpilib.PWMSparkMax(MOTOR_PORT)
+        self.motor = wpilib_drivers.PWMSparkMax(MOTOR_PORT)
 
         # A joystick to read the trigger from.
         self.joystick = wpilib.Joystick(JOYSTICK_PORT)

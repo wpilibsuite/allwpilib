@@ -26,7 +26,7 @@
 #include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
 #include <upb/wire/decode.h>
 
-#include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/support/ExtraGuiWidgets.hpp"
@@ -53,6 +53,9 @@ enum ShowCategory {
   ShowTransitory,
   ShowAll,
 };
+
+static constexpr std::string_view PROGRAM_START_TIME_TOPIC =
+    "/Robot/ProgramStartTime";
 }  // namespace
 
 static bool IsVisible(ShowCategory category, bool persistent, bool retained) {
@@ -96,6 +99,7 @@ NetworkTablesModel::NetworkTablesModel(wpi::nt::NetworkTableInstance inst)
   m_poller.AddListener({{"", "$"}}, wpi::nt::EventFlags::TOPIC |
                                         wpi::nt::EventFlags::VALUE_ALL |
                                         wpi::nt::EventFlags::IMMEDIATE);
+  m_poller.AddTimeSyncListener(true);
 }
 
 NetworkTablesModel::Entry::~Entry() {
@@ -976,6 +980,10 @@ void NetworkTablesModel::Update() {
         }
       }
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
+        if (info->name == PROGRAM_START_TIME_TOPIC) {
+          m_serverProgramStartTime.reset();
+          ApplyServerTime();
+        }
         // meta topic handling
         if (wpi::util::starts_with(info->name, '$')) {
           // meta topic handling
@@ -1020,6 +1028,9 @@ void NetworkTablesModel::Update() {
       if (entry) {
         entry->value = std::move(valueData->value);
         entry->UpdateFromValue(*this);
+        if (entry->info.name == PROGRAM_START_TIME_TOPIC) {
+          UpdateProgramStartTime(entry->value);
+        }
         if (wpi::util::starts_with(entry->info.name, '$') &&
             entry->value.IsRaw() && entry->info.type_str == "msgpack") {
           // meta topic handling
@@ -1106,6 +1117,14 @@ void NetworkTablesModel::Update() {
           }
         }
       }
+    } else if (auto timeSyncData = event.GetTimeSyncEventData()) {
+      if (timeSyncData->valid) {
+        m_serverTimeOffset = timeSyncData->serverTimeOffset;
+      } else {
+        m_serverTimeOffset.reset();
+        m_serverProgramStartTime.reset();
+      }
+      ApplyServerTime();
     }
   }
 
@@ -1184,6 +1203,33 @@ void NetworkTablesModel::RebuildTreeImpl(std::vector<TreeNode>* tree,
 
 bool NetworkTablesModel::Exists() {
   return true;
+}
+
+void NetworkTablesModel::UpdateProgramStartTime(const wpi::nt::Value& value) {
+  if (!value.IsInteger()) {
+    m_serverProgramStartTime.reset();
+    ApplyServerTime();
+    return;
+  }
+
+  int64_t programStartTime = value.GetInteger();
+  if (programStartTime < 0) {
+    m_serverProgramStartTime.reset();
+    ApplyServerTime();
+    return;
+  }
+
+  m_serverProgramStartTime = programStartTime;
+  ApplyServerTime();
+}
+
+void NetworkTablesModel::ApplyServerTime() {
+  if (!gContext) {
+    return;
+  }
+
+  gContext->timestampDisplayServerTimeOffset = m_serverTimeOffset;
+  gContext->timestampDisplayServerStartTime = m_serverProgramStartTime;
 }
 
 NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
@@ -1356,7 +1402,7 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
       break;
     case NT_DOUBLE: {
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1397,11 +1443,11 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
   }
 }
 
-static constexpr size_t kTextBufferSize = 4096;
+static constexpr size_t TEXT_BUFFER_SIZE = 4096;
 
 static char* GetTextBuffer(std::string_view in) {
-  static char textBuffer[kTextBufferSize];
-  size_t len = (std::min)(in.size(), kTextBufferSize - 1);
+  static char textBuffer[TEXT_BUFFER_SIZE];
+  size_t len = (std::min)(in.size(), TEXT_BUFFER_SIZE - 1);
   std::memcpy(textBuffer, in.data(), len);
   textBuffer[len] = '\0';
   return textBuffer;
@@ -1459,7 +1505,7 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
           ImGui::InputFloat(label, &m_arr[row], 0, 0, "%.6f");
         } else if constexpr (NTType == NT_DOUBLE_ARRAY) {
           unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
-                                    kNetworkTablesFlags_PrecisionBitShift;
+                                    NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1601,7 +1647,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     case NT_DOUBLE: {
       double v = val.GetDouble();
       unsigned char precision = (flags & NetworkTablesFlags_Precision) >>
-                                kNetworkTablesFlags_PrecisionBitShift;
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -1622,7 +1668,7 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
     }
     case NT_STRING: {
       char* v = GetTextBuffer(entry.valueStr);
-      ImGui::InputText(typeStr, v, kTextBufferSize,
+      ImGui::InputText(typeStr, v, TEXT_BUFFER_SIZE,
                        ImGuiInputTextFlags_EnterReturnsTrue);
       if (ImGui::IsItemDeactivatedAfterEdit()) {
         if (v[0] == '"') {
@@ -1772,7 +1818,7 @@ static void CreateTopicMenuItem(NetworkTablesModel* model,
 void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
                                              std::string_view path,
                                              NetworkTablesFlags flags) {
-  static char nameBuffer[kTextBufferSize];
+  static char nameBuffer[TEXT_BUFFER_SIZE];
 
   if (ImGui::BeginMenu("Add new...")) {
     if (ImGui::IsWindowAppearing()) {
@@ -1780,7 +1826,7 @@ void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
     }
 
     ImGui::InputTextWithHint("New item name", "example", nameBuffer,
-                             kTextBufferSize);
+                             TEXT_BUFFER_SIZE);
     std::string fullNewPath;
     if (path == "/") {
       path = "";
@@ -1826,11 +1872,51 @@ static void EmitParentContextMenu(NetworkTablesModel* model,
   }
 }
 
+static constexpr std::string_view NT_TOPIC_DRAG_DROP_PREFIX = "NT:";
+static constexpr size_t IMGUI_DRAG_DROP_TYPE_MAX_LENGTH = 32;
+
+static bool IsNTStructTopicType(NT_Type type, std::string_view typeStr) {
+  return type == NT_RAW && wpi::util::starts_with(typeStr, "struct:");
+}
+
+static bool GetNTTopicDragDropType(NT_Type type, std::string_view typeStr,
+                                   std::string* out) {
+  if (!IsNTStructTopicType(type, typeStr)) {
+    return false;
+  }
+
+  out->clear();
+  out->reserve(NT_TOPIC_DRAG_DROP_PREFIX.size() + typeStr.size());
+  out->append(NT_TOPIC_DRAG_DROP_PREFIX);
+  out->append(typeStr);
+
+  // ImGui payload type strings must fit in ImGuiPayload::DataType.
+  return out->size() <= IMGUI_DRAG_DROP_TYPE_MAX_LENGTH;
+}
+
+static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
+                                       std::string_view path,
+                                       std::string_view typeStr) {
+  if (!ImGui::BeginDragDropSource()) {
+    return;
+  }
+
+  ImGui::SetDragDropPayload(dragDropType.c_str(), path.data(), path.size());
+  ImGui::TextUnformatted(path.data(), path.data() + path.size());
+  ImGui::TextUnformatted(typeStr.data(), typeStr.data() + typeStr.size());
+  ImGui::EndDragDropSource();
+}
+
 static void EmitValueName(DataSource* source, const char* name,
-                          const char* path) {
+                          const char* path, NT_Type type,
+                          std::string_view typeStr) {
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
+  } else if (std::string dragDropType;
+             GetNTTopicDragDropType(type, typeStr, &dragDropType)) {
+    ImGui::Selectable(name);
+    EmitNTTopicDragDropPayload(dragDropType, path, typeStr);
   } else {
     ImGui::TextUnformatted(name);
   }
@@ -1846,7 +1932,8 @@ static void EmitValueTree(
   for (auto&& child : children) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str());
+    EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str(),
+                  NT_UNASSIGNED, {});
 
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
@@ -1888,7 +1975,8 @@ static void EmitEntry(NetworkTablesModel* model,
   bool valueChildrenOpen = false;
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
-  EmitValueName(entry.source.get(), name, entry.info.name.c_str());
+  EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
+                entry.info.type, entry.info.type_str);
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
@@ -1977,8 +2065,7 @@ static void EmitEntry(NetworkTablesModel* model,
   if (flags & NetworkTablesFlags_ShowTimestamp) {
     ImGui::TableNextColumn();
     if (entry.value) {
-      ImGui::Text("%f", (entry.value.last_change() * 1.0e-6) -
-                            (GetZeroTime() * 1.0e-6));
+      ImGui::Text("%f", TimestampToDisplayTime(entry.value.last_change()));
     } else {
       ImGui::TextUnformatted("");
     }
@@ -1990,7 +2077,8 @@ static void EmitEntry(NetworkTablesModel* model,
       if (entry.value.server_time() == 1) {
         ImGui::TextUnformatted("---");
       } else {
-        ImGui::Text("%f", entry.value.server_time() * 1.0e-6);
+        ImGui::Text("%f",
+                    ServerTimestampToDisplayTime(entry.value.server_time()));
       }
     } else {
       ImGui::TextUnformatted("");
@@ -2249,7 +2337,7 @@ void NetworkTablesFlagsSettings::Update() {
         m_defaultFlags & NetworkTablesFlags_CreateNoncanonicalKeys);
     m_pPrecision = &storage.GetInt(
         "precision", (m_defaultFlags & NetworkTablesFlags_Precision) >>
-                         kNetworkTablesFlags_PrecisionBitShift);
+                         NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
   }
 
   m_flags &= ~(
@@ -2267,7 +2355,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
                                   : 0) |
-      (*m_pPrecision << kNetworkTablesFlags_PrecisionBitShift);
+      (*m_pPrecision << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT);
 }
 
 void NetworkTablesFlagsSettings::DisplayMenu() {

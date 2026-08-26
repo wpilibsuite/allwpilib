@@ -15,6 +15,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/voltage.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -132,7 +133,7 @@ class LinearSystemLoop {
         m_clampFunc(clampFunction) {
     m_nextR.setZero();
     Reset(m_nextR);
-    wpi::math::MathSharedStore::ReportUsage("LinearSystemLoop", "");
+    wpi::util::ReportUsage("LinearSystemLoop", "");
   }
 
   LinearSystemLoop(LinearSystemLoop&&) = default;
@@ -241,6 +242,21 @@ class LinearSystemLoop {
   StateVector Error() const { return m_controller->R() - m_observer->Xhat(); }
 
   /**
+   * Returns true if the error is within the tolerance set by SetTolerance()
+   * for every state.
+   */
+  bool AtReference() const { return m_controller->AtReference(); }
+
+  /**
+   * Sets the error which is considered tolerable for use with AtReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  void SetTolerance(const StateVector& tolerance) {
+    m_controller->SetTolerance(tolerance);
+  }
+
+  /**
    * Correct the state estimate x-hat using the measurements in y.
    *
    * @param y Measurement vector.
@@ -285,9 +301,9 @@ class LinearSystemLoop {
   StateVector m_nextR;
 
   // These are accessible from non-templated subclasses.
-  static constexpr int kStates = States;
-  static constexpr int kInputs = Inputs;
-  static constexpr int kOutputs = Outputs;
+  static constexpr int STATES = States;
+  static constexpr int INPUTS = Inputs;
+  static constexpr int OUTPUTS = Outputs;
 };
 
 extern template class EXPORT_TEMPLATE_DECLARE(WPILIB_DLLEXPORT)

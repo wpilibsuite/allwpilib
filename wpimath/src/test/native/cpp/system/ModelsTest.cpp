@@ -4,7 +4,7 @@
 
 #include "wpi/math/system/Models.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/system/DCMotor.hpp"
@@ -18,76 +18,74 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-TEST(ModelsTest, FlywheelFromPhysicalConstants) {
+TEST_CASE("ModelsTest FlywheelFromPhysicalConstants", "[wpimath]") {
   constexpr auto model = wpi::math::Models::FlywheelFromPhysicalConstants(
       wpi::math::DCMotor::NEO(2), 0.00032_kg_sq_m, 1.0);
 
-  ASSERT_TRUE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-26.87032}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1354.166667}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(wpi::math::Matrixd<1, 1>{1.0}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
+  REQUIRE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-26.87032}, 0.001));
+  REQUIRE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1354.166667}, 0.001));
+  REQUIRE(model.C().isApprox(wpi::math::Matrixd<1, 1>{1.0}, 0.001));
+  REQUIRE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
 }
 
-TEST(ModelsTest, FlywheelFromSysId) {
+TEST_CASE("ModelsTest FlywheelFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
   constexpr auto model = wpi::math::Models::FlywheelFromSysId(
       kv * 1_V / 1_rad_per_s, ka * 1_V / 1_rad_per_s_sq);
 
-  ASSERT_TRUE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-kv / ka}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1.0 / ka}, 0.001));
+  REQUIRE(model.A().isApprox(wpi::math::Matrixd<1, 1>{-kv / ka}, 0.001));
+  REQUIRE(model.B().isApprox(wpi::math::Matrixd<1, 1>{1.0 / ka}, 0.001));
 }
 
-TEST(ModelsTest, DifferentialDriveFromPhysicalConstants) {
+TEST_CASE("ModelsTest DifferentialDriveFromPhysicalConstants", "[wpimath]") {
   constexpr auto model =
       wpi::math::Models::DifferentialDriveFromPhysicalConstants(
           wpi::math::DCMotor::NEO(4), 70_kg, 0.05_m, 0.4_m, 6.0_kg_sq_m, 6.0);
 
-  ASSERT_TRUE(model.A().isApprox(
+  REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{-10.14132, 3.06598}, {3.06598, -10.14132}},
       0.001));
-  ASSERT_TRUE(model.B().isApprox(
+  REQUIRE(model.B().isApprox(
       wpi::math::Matrixd<2, 2>{{4.2590, -1.28762}, {-1.2876, 4.2590}}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(
-      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(
-      wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}}, 0.001));
+  REQUIRE(model.C().isApprox(wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}},
+                             0.001));
+  REQUIRE(model.D().isApprox(wpi::math::Matrixd<2, 2>{{0.0, 0.0}, {0.0, 0.0}},
+                             0.001));
 }
 
-TEST(ModelsTest, ElevatorFromPhysicalConstants) {
+TEST_CASE("ModelsTest ElevatorFromPhysicalConstants", "[wpimath]") {
   auto model = wpi::math::Models::ElevatorFromPhysicalConstants(
                    wpi::math::DCMotor::NEO(2), 5_kg, 0.05_m, 12)
                    .Slice(0);
-  ASSERT_TRUE(model.A().isApprox(
+  REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -99.05473}}, 0.001));
-  ASSERT_TRUE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 20.8}, 0.001));
-  ASSERT_TRUE(model.C().isApprox(wpi::math::Matrixd<1, 2>{1.0, 0.0}, 0.001));
-  ASSERT_TRUE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
+  REQUIRE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 20.8}, 0.001));
+  REQUIRE(model.C().isApprox(wpi::math::Matrixd<1, 2>{1.0, 0.0}, 0.001));
+  REQUIRE(model.D().isApprox(wpi::math::Matrixd<1, 1>{0.0}, 0.001));
 }
 
-TEST(ModelsTest, ElevatorFromSysId) {
+TEST_CASE("ModelsTest ElevatorFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
   constexpr auto model = wpi::math::Models::ElevatorFromSysId(
       kv * 1_V / 1_mps, ka * 1_V / 1_mps_sq);
 
-  ASSERT_TRUE(model.A().isApprox(
+  REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
-  ASSERT_TRUE(
-      model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
+  REQUIRE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }
 
-TEST(ModelsTest, SingleJointedArmFromSysId) {
+TEST_CASE("ModelsTest SingleJointedArmFromSysId", "[wpimath]") {
   constexpr double kv = 1.0;
   constexpr double ka = 0.5;
 
   constexpr auto model = wpi::math::Models::SingleJointedArmFromSysId(
       kv * 1_V / 1_rad_per_s, ka * 1_V / 1_rad_per_s_sq);
 
-  ASSERT_TRUE(model.A().isApprox(
+  REQUIRE(model.A().isApprox(
       wpi::math::Matrixd<2, 2>{{0.0, 1.0}, {0.0, -kv / ka}}, 0.001));
-  ASSERT_TRUE(
-      model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
+  REQUIRE(model.B().isApprox(wpi::math::Matrixd<2, 1>{0.0, 1.0 / ka}, 0.001));
 }

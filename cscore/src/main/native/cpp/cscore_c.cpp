@@ -126,7 +126,7 @@ void CS_GetSourceDescription(CS_Source source, WPI_String* description,
                       wpi::cs::GetSourceDescription(source, buf, status));
 }
 
-uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
+int64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return wpi::cs::GetSourceLastFrameTime(source, status);
 }
 

@@ -5,7 +5,6 @@ from ._wpilib import (
     ADXL345_I2C,
     AddressableLED,
     AddressableLEDBuffer,
-    Alert,
     Alliance,
     AnalogAccelerometer,
     AnalogEncoder,
@@ -13,12 +12,13 @@ from ._wpilib import (
     AnalogPotentiometer,
     BooleanEvent,
     CAN,
-    CANBusMap,
+    CANBus,
     CANStatus,
     Compressor,
     CompressorConfigType,
     CounterBase,
     DataLogManager,
+    DataLogTelemetryBackend,
     DifferentialDrive,
     DigitalInput,
     DigitalOutput,
@@ -32,6 +32,7 @@ from ._wpilib import (
     DutyCycle,
     DutyCycleEncoder,
     EdgeConfiguration,
+    EdgeCounter,
     Encoder,
     EventLoop,
     ExpansionHub,
@@ -50,7 +51,6 @@ from ._wpilib import (
     I2C,
     IterativeRobotBase,
     Joystick,
-    Koors40,
     LEDPattern,
     LogitechF310Controller,
     MatchState,
@@ -64,6 +64,8 @@ from ._wpilib import (
     MotorControllerGroup,
     MotorSafety,
     NetworkBooleanEvent,
+    NetworkTablesTelemetryBackend,
+    NetworkTablesTunableBackend,
     NiDsPS4Controller,
     NiDsPS5Controller,
     NiDsStadiaController,
@@ -75,12 +77,6 @@ from ._wpilib import (
     POVDirection,
     PWM,
     PWMMotorController,
-    PWMSparkFlex,
-    PWMSparkMax,
-    PWMTalonFX,
-    PWMTalonSRX,
-    PWMVenom,
-    PWMVictorSPX,
     PeriodicOpMode,
     PeriodicPriorityQueue,
     PneumaticHub,
@@ -94,16 +90,10 @@ from ._wpilib import (
     RobotDriveBase,
     RobotState,
     RuntimeType,
-    SendableBuilderImpl,
-    SendableChooser,
-    SendableChooserBase,
     SensorUtil,
     SerialPort,
     SharpIR,
-    SmartDashboard,
     Solenoid,
-    Spark,
-    SparkMini,
     SteamController,
     Switch2GCController,
     Switch2ProController,
@@ -111,14 +101,11 @@ from ._wpilib import (
     SwitchProController,
     SystemServer,
     Tachometer,
-    Talon,
     TimedRobot,
     Timer,
     TimesliceRobot,
     TouchpadFinger,
     Tracer,
-    UpDownCounter,
-    VictorSP,
     Watchdog,
     XboxController,
     get_current_thread_priority,
@@ -131,11 +118,43 @@ from ._wpilib import (
     wait,
 )
 
+
+def _register_networktables_telemetry_backend() -> None:
+    import telemetry as _telemetry
+    from ntcore import NetworkTableInstance
+
+    _telemetry.TelemetryRegistry.register_backend(
+        "",
+        NetworkTablesTelemetryBackend(NetworkTableInstance.get_default(), "/Telemetry"),
+    )
+
+
+def _register_networktables_tunable_backend() -> None:
+    import tunables as _tunables
+    from ntcore import NetworkTableInstance
+
+    _tunables.TunableRegistry.register_backend(
+        "",
+        NetworkTablesTunableBackend(NetworkTableInstance.get_default(), "/Tunables"),
+    )
+
+
+import telemetry as _telemetry
+import tunables as _tunables
+
+_telemetry.TelemetryRegistry.register_networktables_backend = staticmethod(
+    _register_networktables_telemetry_backend
+)
+_tunables.TunableRegistry.register_networktables_backend = staticmethod(
+    _register_networktables_tunable_backend
+)
+
+del _telemetry, _tunables
+
 __all__ = [
     "ADXL345_I2C",
     "AddressableLED",
     "AddressableLEDBuffer",
-    "Alert",
     "Alliance",
     "AnalogAccelerometer",
     "AnalogEncoder",
@@ -143,12 +162,13 @@ __all__ = [
     "AnalogPotentiometer",
     "BooleanEvent",
     "CAN",
-    "CANBusMap",
+    "CANBus",
     "CANStatus",
     "Compressor",
     "CompressorConfigType",
     "CounterBase",
     "DataLogManager",
+    "DataLogTelemetryBackend",
     "DifferentialDrive",
     "DigitalInput",
     "DigitalOutput",
@@ -162,6 +182,7 @@ __all__ = [
     "DutyCycle",
     "DutyCycleEncoder",
     "EdgeConfiguration",
+    "EdgeCounter",
     "Encoder",
     "EventLoop",
     "ExpansionHub",
@@ -180,7 +201,6 @@ __all__ = [
     "I2C",
     "IterativeRobotBase",
     "Joystick",
-    "Koors40",
     "LEDPattern",
     "LogitechF310Controller",
     "MatchState",
@@ -194,6 +214,8 @@ __all__ = [
     "MotorControllerGroup",
     "MotorSafety",
     "NetworkBooleanEvent",
+    "NetworkTablesTelemetryBackend",
+    "NetworkTablesTunableBackend",
     "NiDsPS4Controller",
     "NiDsPS5Controller",
     "NiDsStadiaController",
@@ -205,12 +227,6 @@ __all__ = [
     "POVDirection",
     "PWM",
     "PWMMotorController",
-    "PWMSparkFlex",
-    "PWMSparkMax",
-    "PWMTalonFX",
-    "PWMTalonSRX",
-    "PWMVenom",
-    "PWMVictorSPX",
     "PeriodicOpMode",
     "PeriodicPriorityQueue",
     "PneumaticHub",
@@ -224,16 +240,10 @@ __all__ = [
     "RobotDriveBase",
     "RobotState",
     "RuntimeType",
-    "SendableBuilderImpl",
-    "SendableChooser",
-    "SendableChooserBase",
     "SensorUtil",
     "SerialPort",
     "SharpIR",
-    "SmartDashboard",
     "Solenoid",
-    "Spark",
-    "SparkMini",
     "SteamController",
     "Switch2GCController",
     "Switch2ProController",
@@ -241,14 +251,11 @@ __all__ = [
     "SwitchProController",
     "SystemServer",
     "Tachometer",
-    "Talon",
     "TimedRobot",
     "Timer",
     "TimesliceRobot",
     "TouchpadFinger",
     "Tracer",
-    "UpDownCounter",
-    "VictorSP",
     "Watchdog",
     "XboxController",
     "get_current_thread_priority",

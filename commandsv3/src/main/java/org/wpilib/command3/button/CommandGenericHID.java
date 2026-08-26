@@ -16,7 +16,7 @@ import org.wpilib.driverstation.GenericHID;
 import org.wpilib.driverstation.POVDirection;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.event.EventLoop;
-import org.wpilib.math.util.Pair;
+import org.wpilib.util.Pair;
 
 /**
  * A version of {@link GenericHID} with {@link Trigger} factories for command-based.

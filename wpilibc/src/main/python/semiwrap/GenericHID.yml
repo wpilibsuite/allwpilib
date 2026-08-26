@@ -38,6 +38,7 @@ classes:
       GetPort:
       SetLeds:
       SetRumble:
+      SetRawRumble:
       GetAxesMaximumIndex:
       GetAxesAvailable:
       GetPOVsMaximumIndex:

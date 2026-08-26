@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include "wpi/math/geometry/Ellipse2d.hpp"
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Pose3d.hpp"
-#include "wpi/math/geometry/Rectangle2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Rotation3d.hpp"
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/shape/Ellipse2d.hpp"
+#include "wpi/math/shape/Rectangle2d.hpp"
 
 namespace rpy {
 

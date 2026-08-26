@@ -21,9 +21,9 @@ import org.wpilib.math.util.MathSharedStore;
 
 /** Helper class used to generate drivetrain spline trajectories with various constraints. */
 public final class DrivetrainSplineTrajectoryGenerator {
-  private static final Transform2d kFlip = new Transform2d(Translation2d.kZero, Rotation2d.kPi);
+  private static final Transform2d FLIP = new Transform2d(Translation2d.ZERO, Rotation2d.PI);
 
-  private static final DrivetrainSplineTrajectory kDoNothingTrajectory =
+  private static final DrivetrainSplineTrajectory DO_NOTHING_TRAJECTORY =
       new DrivetrainSplineTrajectory(List.of(new DrivetrainSplineSample()));
   private static BiConsumer<String, StackTraceElement[]> errorFunc;
 
@@ -85,13 +85,13 @@ public final class DrivetrainSplineTrajectoryGenerator {
                   newInitial, interiorWaypoints.toArray(new Translation2d[0]), newEnd));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return DO_NOTHING_TRAJECTORY;
     }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.pose = point.pose.plus(kFlip);
+        point.pose = point.pose.plus(FLIP);
         point.curvature *= -1;
       }
     }
@@ -161,13 +161,13 @@ public final class DrivetrainSplineTrajectoryGenerator {
                   newControlVectors.toArray(new Spline.ControlVector[] {})));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return DO_NOTHING_TRAJECTORY;
     }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.pose = point.pose.plus(kFlip);
+        point.pose = point.pose.plus(FLIP);
         point.curvature *= -1;
       }
     }
@@ -197,7 +197,7 @@ public final class DrivetrainSplineTrajectoryGenerator {
     List<Pose2d> newWaypoints = new ArrayList<>();
     if (config.isReversed()) {
       for (Pose2d originalWaypoint : waypoints) {
-        newWaypoints.add(originalWaypoint.plus(kFlip));
+        newWaypoints.add(originalWaypoint.plus(FLIP));
       }
     } else {
       newWaypoints.addAll(waypoints);
@@ -212,13 +212,13 @@ public final class DrivetrainSplineTrajectoryGenerator {
                   SplineHelper.getQuinticSplinesFromWaypoints(newWaypoints)));
     } catch (MalformedSplineException ex) {
       reportError(ex.getMessage(), ex.getStackTrace());
-      return kDoNothingTrajectory;
+      return DO_NOTHING_TRAJECTORY;
     }
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
       for (var point : points) {
-        point.pose = point.pose.plus(kFlip);
+        point.pose = point.pose.plus(FLIP);
         point.curvature *= -1;
       }
     }

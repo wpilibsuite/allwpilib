@@ -10,13 +10,13 @@ using namespace wpi::cmd::sysid;
 
 wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
   wpi::sysid::State state;
-  if (direction == Direction::kForward) {
+  if (direction == Direction::FORWARD) {
     state = wpi::sysid::State::QUASISTATIC_FORWARD;
-  } else {  // if (direction == Direction::kReverse) {
+  } else {  // if (direction == Direction::REVERSE) {
     state = wpi::sysid::State::QUASISTATIC_REVERSE;
   }
 
-  double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
+  double outputSign = direction == Direction::FORWARD ? 1.0 : -1.0;
 
   return m_mechanism.subsystem->RunOnce([this] { timer.Restart(); })
       .AndThen(
@@ -40,13 +40,13 @@ wpi::cmd::CommandPtr SysIdRoutine::Quasistatic(Direction direction) {
 
 wpi::cmd::CommandPtr SysIdRoutine::Dynamic(Direction direction) {
   wpi::sysid::State state;
-  if (direction == Direction::kForward) {
+  if (direction == Direction::FORWARD) {
     state = wpi::sysid::State::DYNAMIC_FORWARD;
-  } else {  // if (direction == Direction::kReverse) {
+  } else {  // if (direction == Direction::REVERSE) {
     state = wpi::sysid::State::DYNAMIC_REVERSE;
   }
 
-  double outputSign = direction == Direction::kForward ? 1.0 : -1.0;
+  double outputSign = direction == Direction::FORWARD ? 1.0 : -1.0;
 
   return m_mechanism.subsystem
       ->RunOnce([this] { m_outputVolts = m_config.stepVoltage; })

@@ -10,30 +10,30 @@
 
 template <size_t NumModules>
 struct wpi::util::Struct<wpi::math::SwerveDriveKinematics<NumModules>> {
-  static constexpr ct_string kTypeName =
+  static constexpr ct_string TYPE_NAME =
       wpi::util::Concat("SwerveDriveKinematics__"_ct_string,
                         wpi::util::NumToCtString<NumModules>());
-  static constexpr std::string_view GetTypeName() { return kTypeName; }
+  static constexpr std::string_view GetTypeName() { return TYPE_NAME; }
   static constexpr size_t GetSize() {
     return NumModules * wpi::util::Struct<wpi::math::Translation2d>::GetSize();
   }
-  static constexpr ct_string kSchema =
+  static constexpr ct_string SCHEMA =
       wpi::util::Concat("Translation2d modules["_ct_string,
                         wpi::util::NumToCtString<NumModules>(), "]"_ct_string);
-  static constexpr std::string_view GetSchema() { return kSchema; }
+  static constexpr std::string_view GetSchema() { return SCHEMA; }
 
   static wpi::math::SwerveDriveKinematics<NumModules> Unpack(
       std::span<const uint8_t> data) {
-    constexpr size_t kModulesOff = 0;
+    constexpr size_t MODULES_OFF = 0;
     return wpi::math::SwerveDriveKinematics<NumModules>{
-        wpi::util::UnpackStructArray<wpi::math::Translation2d, kModulesOff,
+        wpi::util::UnpackStructArray<wpi::math::Translation2d, MODULES_OFF,
                                      NumModules>(data)};
   }
 
   static void Pack(std::span<uint8_t> data,
                    const wpi::math::SwerveDriveKinematics<NumModules>& value) {
-    constexpr size_t kModulesOff = 0;
-    wpi::util::PackStructArray<kModulesOff, NumModules>(data,
+    constexpr size_t MODULES_OFF = 0;
+    wpi::util::PackStructArray<MODULES_OFF, NumModules>(data,
                                                         value.GetModules());
   }
 

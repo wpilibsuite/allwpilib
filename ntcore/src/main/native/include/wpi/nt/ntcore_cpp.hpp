@@ -196,12 +196,12 @@ class TimeSyncEventData {
       : serverTimeOffset{serverTimeOffset}, rtt2{rtt2}, valid{valid} {}
 
   /**
-   * Offset between local time and server time, in microseconds. Add this value
+   * Offset between local time and server time, in nanoseconds. Add this value
    * to local time to get the estimated equivalent server time.
    */
   int64_t serverTimeOffset;
 
-  /** Measured round trip time divided by 2, in microseconds. */
+  /** Measured round trip time divided by 2, in nanoseconds. */
   int64_t rtt2;
 
   /**
@@ -474,7 +474,7 @@ NT_Type GetEntryType(NT_Entry entry);
  * Returns 0 if the handle is invalid.
  *
  * @param subentry   subscriber or entry handle
- * @return Entry last change time
+ * @return Entry last change time, in nanoseconds
  */
 int64_t GetEntryLastChange(NT_Handle subentry);
 
@@ -1101,8 +1101,8 @@ void StartServer(NT_Inst inst, std::string_view persist_filename,
 void StopServer(NT_Inst inst);
 
 /**
- * Starts a client.  Use SetServer or SetServerTeam to set the server name
- * and port.
+ * Starts a client.  Use SetServer, SetServerTeam, SetServerFixed, or
+ * SetServerMdns to set the server name and port.
  *
  * @param inst      instance handle
  * @param identity  network identity to advertise (cannot be empty string)
@@ -1138,13 +1138,93 @@ void SetServer(
 
 /**
  * Sets server addresses and port for client (without restarting client).
- * Connects using commonly known robot addresses for the specified team.
+ * Attempts connections to the following addresses in parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ *
+ * It also connects using matching Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
  *
  * @param inst        instance handle
- * @param team        team number
+ * @param team        team number string
  * @param port        port to communicate over
  */
-void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port);
+void SetServerTeam(NT_Inst inst, std::string_view team, unsigned int port);
+
+/**
+ * Sets server addresses and port for client (without restarting client).
+ * Attempts connections to the following static addresses and hostnames in
+ * parallel:
+ * - 10.TE.AM.2
+ * - 172.26.0.1 on Windows, or 172.27.0.1 on other platforms (USB)
+ * - 172.30.0.1 (WiFi)
+ * - robot.local
+ *
+ * It also connects using all Systemcore mDNS announcements.
+ * The team-specific 10.TE.AM.2 address is only added if the team string
+ * parses as an integer in the range 0 to 25599 inclusive.
+ *
+ * @param inst        instance handle
+ * @param team        team number string
+ * @param port        port to communicate over
+ */
+void SetServerFixed(NT_Inst inst, std::string_view team, unsigned int port);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using a NetworkTables server announced over mDNS with the specified
+ * service name.  The mDNS lookup is used only for the server address; the
+ * default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ */
+void SetServerMdns(NT_Inst inst, std::string_view service_name);
+
+/**
+ * Sets server address and port for client (without restarting client).
+ * Connects using the fixed server address and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param server_name   server name
+ * @param port          port to communicate over
+ */
+void SetServerMdns(NT_Inst inst, std::string_view service_name,
+                   std::string_view server_name, unsigned int port);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the default NetworkTables port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param servers       array of server name and port pairs
+ */
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name,
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
+
+/**
+ * Sets server addresses and ports for client (without restarting client).
+ * Connects using fixed server addresses and a NetworkTables server announced
+ * over mDNS with the specified service name.  The mDNS lookup is used only for
+ * the server address; the specified mDNS port is used.
+ *
+ * @param inst          instance handle
+ * @param service_name  mDNS service name
+ * @param mdns_port     mDNS port to communicate over
+ * @param servers       array of server name and port pairs
+ */
+void SetServerMdns(
+    NT_Inst inst, std::string_view service_name, unsigned int mdns_port,
+    std::span<const std::pair<std::string_view, unsigned int>> servers);
 
 /**
  * Disconnects the client if it's running and connected. This will automatically
@@ -1224,7 +1304,7 @@ bool IsConnected(NT_Inst inst);
  * receive updates as events, add a listener to the "time sync" event.
  *
  * @param inst instance handle
- * @return Time offset in microseconds (optional)
+ * @return Time offset in nanoseconds (optional)
  */
 std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
 
@@ -1236,7 +1316,7 @@ std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
  */
 
 /**
- * Returns monotonic current time in 1 us increments.
+ * Returns monotonic current time in 1 ns increments.
  * This is the same time base used for value and connection timestamps.
  * This function by default simply wraps wpi::util::Now(), but if SetNow() is
  * called, this function instead returns the value passed to SetNow();
@@ -1253,7 +1333,7 @@ int64_t Now();
  * be used only if the overhead of calling wpi::util::Now() is a concern.
  * If used, it should be called periodically with the value of wpi::util::Now().
  *
- * @param timestamp timestamp (1 us increments)
+ * @param timestamp timestamp (1 ns increments)
  */
 void SetNow(int64_t timestamp);
 

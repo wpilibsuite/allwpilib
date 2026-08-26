@@ -109,6 +109,7 @@ static void DisplayMainMenu() {
     ImGui::Text("Datalog Tool");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
@@ -149,7 +150,7 @@ void Application(std::string_view saveDir) {
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayGui);
-  gui::Initialize("Datalog Tool", 925, 510);
+  gui::Initialize("Datalog Tool", 925, 510, gui::RendererPreference::PREFER_2D);
 
   gDownloadVisible = &wpi::glass::GetStorageRoot()
                           .GetChild("download")

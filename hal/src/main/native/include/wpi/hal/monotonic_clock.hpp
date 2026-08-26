@@ -16,16 +16,16 @@ namespace wpi::hal {
  */
 class monotonic_clock {
  public:
-  using rep = std::chrono::microseconds::rep;
-  using period = std::chrono::microseconds::period;
-  using duration = std::chrono::microseconds;
+  using rep = std::chrono::nanoseconds::rep;
+  using period = std::chrono::nanoseconds::period;
+  using duration = std::chrono::nanoseconds;
   using time_point = std::chrono::time_point<monotonic_clock>;
 
   static constexpr bool is_steady = true;
 
   static time_point now() noexcept {
-    uint64_t currentTime = HAL_GetMonotonicTime();
-    return time_point{std::chrono::microseconds{currentTime}};
+    int64_t currentTime = HAL_GetMonotonicTime();
+    return time_point{std::chrono::nanoseconds{currentTime}};
   }
 };
 

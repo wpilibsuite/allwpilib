@@ -20,6 +20,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 
 /**
  * This class wraps {@link Odometry3d} to fuse latency-compensated vision measurements with encoder
@@ -49,10 +50,10 @@ public class PoseEstimator3d<T> {
   // Diagonal of Kalman gain matrix K
   private final double[] m_vision_k = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-  private static final double kBufferDuration = 1.5;
+  private static final double BUFFER_DURATION = 1.5;
   // Maps timestamps to odometry-only pose estimates
   private final TimeInterpolatableBuffer<Pose3d> m_odometryPoseBuffer =
-      TimeInterpolatableBuffer.createBuffer(kBufferDuration);
+      TimeInterpolatableBuffer.createBuffer(BUFFER_DURATION);
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer, unless there have
   // been no vision measurements after the last reset. May contain one entry while
@@ -85,7 +86,7 @@ public class PoseEstimator3d<T> {
       m_q[i] = stateStdDevs.get(i, 0) * stateStdDevs.get(i, 0);
     }
     setVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    MathSharedStore.getMathShared().reportUsage("PoseEstimator3d", "");
+    UsageReporting.reportUsage("PoseEstimator3d", "");
   }
 
   /**
@@ -105,7 +106,7 @@ public class PoseEstimator3d<T> {
     }
 
     // Solve for closed form Kalman gain for continuous Kalman filter with A = 0
-    // and C = I. See wpimath/algorithms.md.
+    // and C = I. See wpimath/docs/ClosedFormKalmanGain.md.
     for (int row = 0; row < 4; ++row) {
       if (m_q[row] == 0.0) {
         m_vision_k[row] = 0.0;
@@ -286,7 +287,7 @@ public class PoseEstimator3d<T> {
   public void addVisionMeasurement(Pose3d visionRobotPose, double timestamp) {
     // Step 0: If this measurement is old enough to be outside the pose buffer's timespan, skip.
     if (m_odometryPoseBuffer.getInternalBuffer().isEmpty()
-        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - kBufferDuration > timestamp) {
+        || m_odometryPoseBuffer.getInternalBuffer().lastKey() - BUFFER_DURATION > timestamp) {
       return;
     }
 

@@ -100,33 +100,6 @@ std::string_view EscapeHTML(std::string_view str,
   return {buf.data(), buf.size()};
 }
 
-HttpQueryMap::HttpQueryMap(std::string_view query) {
-  wpi::util::split(query, '&', 100, false, [&](auto elem) {
-    auto [nameEsc, valueEsc] = wpi::util::split(elem, '=');
-    wpi::util::SmallString<64> nameBuf;
-    bool err = false;
-    auto name = wpi::net::UnescapeURI(nameEsc, nameBuf, &err);
-    // note: ignores duplicates
-    if (!err) {
-      m_elems.try_emplace(name, valueEsc);
-    }
-  });
-}
-
-std::optional<std::string_view> HttpQueryMap::Get(
-    std::string_view name, wpi::util::SmallVectorImpl<char>& buf) const {
-  auto it = m_elems.find(name);
-  if (it == m_elems.end()) {
-    return {};
-  }
-  bool err = false;
-  auto val = wpi::net::UnescapeURI(it->second, buf, &err);
-  if (err) {
-    return {};
-  }
-  return val;
-}
-
 HttpPath::HttpPath(std::string_view path) {
   // special-case root path to be a single empty element
   if (path == "/") {

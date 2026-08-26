@@ -20,7 +20,7 @@ class NiDsXboxControllerTest {
   @EnumSource(value = NiDsXboxController.Button.class)
   void testButtons(NiDsXboxController.Button button)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsXboxController joy = new NiDsXboxController(2);
     NiDsXboxControllerSim joysim = new NiDsXboxControllerSim(joy);
 
@@ -60,7 +60,7 @@ class NiDsXboxControllerTest {
   @EnumSource(value = NiDsXboxController.Axis.class)
   void testAxes(NiDsXboxController.Axis axis)
       throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     NiDsXboxController joy = new NiDsXboxController(2);
     NiDsXboxControllerSim joysim = new NiDsXboxControllerSim(joy);
 

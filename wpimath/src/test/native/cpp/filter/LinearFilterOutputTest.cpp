@@ -12,26 +12,27 @@
 #include <functional>
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/array.hpp"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
-static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
-static constexpr double kHighPassTimeConstant = 0.006631;
-static constexpr double kHighPassExpectedOutput = 10.074717;
-static constexpr int32_t kMovAvgTaps = 6;
-static constexpr double kMovAvgExpectedOutput = -10.191644;
+static constexpr auto FILTER_STEP = 5_ms;
+static constexpr auto FILTER_TIME = 2_s;
+static constexpr double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+static constexpr double SINGLE_POLE_IIR_EXPECTED_OUTPUT = -3.2172003;
+static constexpr double HIGH_PASS_TIME_CONSTANT = 0.006631;
+static constexpr double HIGH_PASS_EXPECTED_OUTPUT = 10.074717;
+static constexpr int32_t MOV_AVG_TAPS = 6;
+static constexpr double MOV_AVG_EXPECTED_OUTPUT = -10.191644;
 
 enum LinearFilterOutputTestType {
-  kTestSinglePoleIIR,
-  kTestHighPass,
-  kTestMovAvg,
-  kTestPulse
+  TEST_SINGLE_POLE_IIR,
+  TEST_HIGH_PASS,
+  TEST_MOV_AVG,
+  TEST_PULSE
 };
 
 static double GetData(double t) {
@@ -47,80 +48,56 @@ static double GetPulseData(double t) {
   }
 }
 
-/**
- * A fixture that includes a consistent data source wrapped in a filter
- */
-class LinearFilterOutputTest
-    : public testing::TestWithParam<LinearFilterOutputTestType> {
- protected:
-  wpi::math::LinearFilter<double> m_filter = [=] {
-    switch (GetParam()) {
-      case kTestSinglePoleIIR:
-        return wpi::math::LinearFilter<double>::SinglePoleIIR(
-            kSinglePoleIIRTimeConstant, kFilterStep);
-        break;
-      case kTestHighPass:
-        return wpi::math::LinearFilter<double>::HighPass(kHighPassTimeConstant,
-                                                         kFilterStep);
-        break;
-      case kTestMovAvg:
-        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
-        break;
-      default:
-        return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
-        break;
-    }
-  }();
-  std::function<double(double)> m_data;
-  double m_expectedOutput = 0.0;
-
-  LinearFilterOutputTest() {
-    switch (GetParam()) {
-      case kTestSinglePoleIIR: {
-        m_data = GetData;
-        m_expectedOutput = kSinglePoleIIRExpectedOutput;
-        break;
-      }
-
-      case kTestHighPass: {
-        m_data = GetData;
-        m_expectedOutput = kHighPassExpectedOutput;
-        break;
-      }
-
-      case kTestMovAvg: {
-        m_data = GetData;
-        m_expectedOutput = kMovAvgExpectedOutput;
-        break;
-      }
-
-      case kTestPulse: {
-        m_data = GetPulseData;
-        m_expectedOutput = 0.0;
-        break;
-      }
-    }
+static wpi::math::LinearFilter<double> MakeFilter(
+    LinearFilterOutputTestType testType) {
+  switch (testType) {
+    case TEST_SINGLE_POLE_IIR:
+      return wpi::math::LinearFilter<double>::SinglePoleIIR(
+          SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP);
+    case TEST_HIGH_PASS:
+      return wpi::math::LinearFilter<double>::HighPass(HIGH_PASS_TIME_CONSTANT,
+                                                       FILTER_STEP);
+    case TEST_MOV_AVG:
+    case TEST_PULSE:
+      return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
   }
-};
+
+  return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
+}
+
+static void CheckFilterOutput(LinearFilterOutputTestType testType,
+                              std::function<double(double)> data,
+                              double expectedOutput) {
+  auto filter = MakeFilter(testType);
+  double filterOutput = 0.0;
+  for (auto t = 0_s; t < FILTER_TIME; t += FILTER_STEP) {
+    filterOutput = filter.Calculate(data(t.value()));
+  }
+
+  CHECK_FLOAT_EQ(expectedOutput, filterOutput);
+}
 
 /**
  * Test if the linear filters produce consistent output for a given data set.
  */
-TEST_P(LinearFilterOutputTest, Output) {
-  double filterOutput = 0.0;
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
-    filterOutput = m_filter.Calculate(m_data(t.value()));
+TEST_CASE("LinearFilterOutputTest Output", "[wpimath]") {
+  SECTION("SinglePoleIIR") {
+    CheckFilterOutput(TEST_SINGLE_POLE_IIR, GetData,
+                      SINGLE_POLE_IIR_EXPECTED_OUTPUT);
   }
 
-  RecordProperty("LinearFilterOutput", filterOutput);
+  SECTION("HighPass") {
+    CheckFilterOutput(TEST_HIGH_PASS, GetData, HIGH_PASS_EXPECTED_OUTPUT);
+  }
 
-  EXPECT_FLOAT_EQ(m_expectedOutput, filterOutput)
-      << "Filter output didn't match expected value";
+  SECTION("MovingAverage") {
+    CheckFilterOutput(TEST_MOV_AVG, GetData, MOV_AVG_EXPECTED_OUTPUT);
+  }
+
+  SECTION("Pulse") {
+    CheckFilterOutput(TEST_PULSE, GetPulseData, 0.0);
+  }
 }
-
-INSTANTIATE_TEST_SUITE_P(Tests, LinearFilterOutputTest,
-                         testing::Values(kTestSinglePoleIIR, kTestHighPass,
-                                         kTestMovAvg, kTestPulse));
 
 template <int Derivative, int Samples, typename F, typename DfDx>
 void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
@@ -148,9 +125,9 @@ void AssertCentralResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
     // half the window size in the past.
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()),
-                filter.Calculate(f(i * h.value())),
-                std::pow(h.value(), Samples - Derivative));
+    CHECK_NEAR(dfdx((i - static_cast<int>((Samples - 1) / 2)) * h.value()),
+               filter.Calculate(f(i * h.value())),
+               std::pow(h.value(), Samples - Derivative));
   }
 }
 
@@ -170,15 +147,15 @@ void AssertBackwardResults(F&& f, DfDx&& dfdx, wpi::units::second_t h,
 
     // The order of accuracy is O(h^(N - d)) where N is number of stencil
     // points and d is order of derivative
-    EXPECT_NEAR(dfdx(i * h.value()), filter.Calculate(f(i * h.value())),
-                10.0 * std::pow(h.value(), Samples - Derivative));
+    CHECK_NEAR(dfdx(i * h.value()), filter.Calculate(f(i * h.value())),
+               10.0 * std::pow(h.value(), Samples - Derivative));
   }
 }
 
 /**
  * Test central finite difference.
  */
-TEST(LinearFilterOutputTest, CentralFiniteDifference) {
+TEST_CASE("LinearFilterOutputTest CentralFiniteDifference", "[wpimath]") {
   constexpr auto h = 5_ms;
 
   AssertCentralResults<1, 3>(
@@ -251,7 +228,7 @@ TEST(LinearFilterOutputTest, CentralFiniteDifference) {
 /**
  * Test backward finite difference.
  */
-TEST(LinearFilterOutputTest, BackwardFiniteDifference) {
+TEST_CASE("LinearFilterOutputTest BackwardFiniteDifference", "[wpimath]") {
   constexpr auto h = 5_ms;
 
   AssertBackwardResults<1, 2>(

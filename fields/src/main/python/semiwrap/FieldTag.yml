@@ -1,0 +1,20 @@
+classes:
+  wpi::fields::FieldTag:
+    force_no_trampoline: true
+    attributes:
+      ID:
+      pose:
+    methods:
+      operator==:
+    inline_code: |
+      .def(py::init([](int id, wpi::math::Pose3d pose) {
+        return FieldTag{id, pose};
+      }), py::arg("id"), py::arg("pose"))
+      .def("__repr__", [](const FieldTag &self) {
+        return py::str("FieldTag(ID={}, pose={!r})").format(self.ID, self.pose);
+      })
+functions:
+  to_json:
+    ignore: true
+  from_json:
+    ignore: true
