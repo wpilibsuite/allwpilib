@@ -1,4 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
 load("@rules_python//python:defs.bzl", "py_library")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library")
@@ -30,10 +31,23 @@ robotpy_py_test(
     "python",
     srcs = glob(
         ["**/*.py"],
-        exclude = ["cpp/**"],
+        exclude = [
+            "cpp/**",
+            "test_pyi.py",
+        ],
     ),
     deps = [
         ":wpiutil_test",
+        "//wpiutil/src/main/python",
+        requirement("pytest"),
+    ],
+)
+
+robotpy_py_test(
+    "python_stubs",
+    srcs = ["test_pyi.py"],
+    target_compatible_with = HOST_CONSTRAINTS,
+    deps = [
         "//wpiutil/src/main/python",
         requirement("pytest"),
     ],

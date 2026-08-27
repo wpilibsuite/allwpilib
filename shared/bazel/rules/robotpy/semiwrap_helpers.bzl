@@ -1,5 +1,6 @@
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select", "robotpy_host_compatibility")
 
 RESOLVE_CASTERS_DIR = "generated/resolve_casters/"
 HEADER_DAT_DIR = "generated/header_to_dat/"
@@ -7,6 +8,64 @@ DAT_TO_CC_DIR = "generated/dat_to_cc/"
 DAT_TO_TMPL_CC_DIR = "generated/dat_to_tmpl_cc/"
 DAT_TO_TMPL_HDR_DIR = "generated/dat_to_tmpl_hdr/"
 GEN_MODINIT_HDR_DIR = "generated/gen_modinit_hdr/"
+
+def _make_pyi_impl(ctx):
+    args = ctx.actions.args()
+    args.add("semiwrap.cmd.make_pyi")
+    args.add(ctx.attr.package_name)
+    for stub_path, output_file in zip(ctx.attr.stub_paths, ctx.outputs.outs):
+        args.add(stub_path)
+        args.add(output_file.path)
+    args.add("--")
+
+    module_inputs = []
+    for module_name, module_target in zip(ctx.attr.module_names, ctx.attr.module_files):
+        module_files = module_target.files.to_list()
+        if len(module_files) != 1:
+            fail("make_pyi module {} must provide exactly one file".format(module_name))
+        module_file = module_files[0]
+        module_inputs.append(module_file)
+        args.add(module_name)
+        args.add(module_file.path)
+
+    ctx.actions.run(
+        arguments = [args],
+        executable = ctx.executable.runner,
+        inputs = module_inputs,
+        mnemonic = "MakePyi",
+        outputs = ctx.outputs.outs,
+        progress_message = "Generating Python stubs for {}".format(ctx.attr.package_name),
+    )
+
+_make_pyi = rule(
+    implementation = _make_pyi_impl,
+    attrs = {
+        "module_files": attr.label_list(allow_files = True, cfg = "target"),
+        "module_names": attr.string_list(),
+        "outs": attr.output_list(mandatory = True),
+        "package_name": attr.string(mandatory = True),
+        "runner": attr.label(executable = True, cfg = "target", mandatory = True),
+        "stub_paths": attr.string_list(),
+    },
+)
+
+def make_pyi(name, package_name, output_files, module_files, runner):
+    """Runs semiwrap's pybind11-stubgen wrapper for a compiled extension."""
+    _make_pyi(
+        name = name,
+        module_files = [module_file for _, module_file in module_files],
+        module_names = [module_name for module_name, _ in module_files],
+        outs = [output_file for _, output_file in output_files],
+        package_name = package_name,
+        runner = runner,
+        stub_paths = [stub_path for stub_path, _ in output_files],
+        # The runner and extensions are built in the target configuration so
+        # they are shared with the wheel. Match the same OS/CPU on the execution
+        # side, even when Bazel selects a non-host execution platform.
+        exec_compatible_with = HOST_CONSTRAINTS,
+        target_compatible_with = robotpy_host_compatibility(),
+        tags = ["robotpy"],
+    )
 
 def _location_helper(filename):
     return " $(locations " + filename + ")"

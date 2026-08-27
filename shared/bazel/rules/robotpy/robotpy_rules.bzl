@@ -1,9 +1,10 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
-load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:packaging.bzl", "py_wheel")
-load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select", "robotpy_host_only_select")
 
 def create_pybind_library(
         name,
@@ -64,6 +65,8 @@ def robotpy_library(
         name,
         deps = [],
         data = [],
+        pyi_srcs = [],
+        pyi_deps = [],
         strip_path_prefixes = None,
         distribution = None,
         summary = None,
@@ -82,9 +85,26 @@ def robotpy_library(
         <name> - The python library
         <name>-wheel - A wheel for the library
     """
+    host_pyi_srcs = robotpy_host_only_select(pyi_srcs)
+
+    if pyi_srcs:
+        py_binary(
+            name = name + ".make_pyi_runner",
+            srcs = ["//shared/bazel/rules/robotpy:wrapper.py"],
+            main = "//shared/bazel/rules/robotpy:wrapper.py",
+            data = data,
+            deps = deps + pyi_deps + [
+                "//shared/bazel/rules/robotpy:hack_pkgcfgs",
+                requirement("numpy"),
+                requirement("semiwrap"),
+            ],
+            tags = ["manual", "robotpy"],
+            target_compatible_with = robotpy_compatibility_select(),
+        )
+
     py_library(
         name = name + "-lib",
-        data = data,
+        data = data + host_pyi_srcs,
         deps = deps,
         tags = ["robotpy"],
         **kwargs
@@ -98,7 +118,7 @@ def robotpy_library(
         requires = requires,
         project_urls = project_urls,
         author_email = author_email,
-        deps = data + [":{}-lib".format(name)],
+        deps = data + host_pyi_srcs + [":{}-lib".format(name)],
         strip_path_prefixes = strip_path_prefixes,
         entry_points = entry_points,
         description_file = description_file,

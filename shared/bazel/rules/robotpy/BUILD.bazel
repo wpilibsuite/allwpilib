@@ -1,4 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement", "whl_requirement")
+load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 load("@rules_python//python:pip.bzl", "whl_filegroup")
@@ -7,6 +8,12 @@ exports_files([
     "wrapper.py",
     "version_template.in",
 ])
+
+config_setting(
+    name = "host_platform",
+    constraint_values = HOST_CONSTRAINTS,
+    visibility = ["//visibility:public"],
+)
 
 py_library(
     name = "hack_pkgcfgs",
