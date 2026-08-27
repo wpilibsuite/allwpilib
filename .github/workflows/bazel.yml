@@ -12,21 +12,61 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore,linuxsystemcorestatic",                 os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug",            os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,linuxx86-64static,headers,sources",     os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug,linuxx86-64staticdebug",                os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
-
-          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, container: "", action: "test" }
-
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2025, container: "", action: "test" }
-          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2025, container: "", action: "test" }
-
-          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2025, container: "", action: "build" }
-          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2025, container: "", action: "build" }
-
-          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2025, container: "", action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2025, container: "", action: "build" }
+          - name: "Linux System Core"
+            classifier: "linuxsystemcore,linuxsystemcorestatic"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "build"
+          - name: "Linux System Core Debug"
+            classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "build"
+          - name: "Linux x86-64"
+            classifier: "linuxx86-64,linuxx86-64static,headers,sources"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "test"
+          - name: "Linux x86-64 Debug"
+            classifier: "linuxx86-64debug,linuxx86-64staticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "test"
+          - name: "macOS"
+            classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-12vcpu-macos-15', 'macOS-15') }}
+            container: ""
+            action: "test"
+          - name: "Windows x86-64"
+            classifier: "windowsx86-64,windowsx86-64static,headers,sources"
+            os: windows-2025
+            container: ""
+            action: "test"
+          - name: "Windows x86-64 Debug"
+            classifier: "windowsx86-64debug,windowsx86-64staticdebug"
+            os: windows-2025
+            container: ""
+            action: "test"
+          - name: "Windows ARM64"
+            classifier: "windowsarm64,windowsarm64static"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows ARM64 Debug"
+            classifier: "windowsarm64debug,windowsarm64staticdebug"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows System Core"
+            classifier: "linuxsystemcore,linuxsystemcorestatic"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows System Core Debug"
+            classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: windows-2025
+            container: ""
+            action: "build"
 
     name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
     runs-on: ${{ matrix.os }}
@@ -105,7 +145,7 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -126,7 +166,7 @@ jobs:
         if: ${{ failure() }}
 
   mod-lock:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -148,7 +188,7 @@ jobs:
 
   non_robotpy_pregeneration:
     name: "Non-RobotPy Pregen"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
@@ -178,7 +218,7 @@ jobs:
 
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
@@ -219,7 +259,7 @@ jobs:
   # that get transferred to the upstream mostrobotpy repository
   robotpy_format:
     name: "RobotPy Formatting"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with:
