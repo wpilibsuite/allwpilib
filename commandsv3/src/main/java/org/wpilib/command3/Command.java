@@ -425,6 +425,9 @@ public interface Command {
     return new Command() {
       @Override
       public void run(Coroutine coroutine) {
+        if (coroutine.scheduler().isScheduledOrRunning(originalCommand)) {
+          return;
+        }
         coroutine.scheduler().m_unschedulableCommands.add(originalCommand);
         Command.this.run(coroutine);
         coroutine.scheduler().m_unschedulableCommands.remove(originalCommand);
