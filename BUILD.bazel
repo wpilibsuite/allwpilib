@@ -32,6 +32,8 @@ java_package_configuration(
         "-Xlint:-serial",
         # ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        # ignore warnings for classes missing explicit constructors
+        "-Xlint:-missing-explicit-ctor",
     ],
     # Apply our flags to just our repository. Otherwise, Bazel will compile its
     # tools with our flags, and not all of them are warning-free.
