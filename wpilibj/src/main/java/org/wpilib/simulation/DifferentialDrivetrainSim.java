@@ -355,14 +355,22 @@ public class DifferentialDrivetrainSim {
 
   /** Represents the different states of the drivetrain. */
   public enum State {
+    /** The X position state. */
     X(0),
+    /** The Y position state. */
     Y(1),
+    /** The heading state. */
     HEADING(2),
+    /** The left-side velocity state. */
     LEFT_VELOCITY(3),
+    /** The right-side velocity state. */
     RIGHT_VELOCITY(4),
+    /** The left-side position state. */
     LEFT_POSITION(5),
+    /** The right-side position state. */
     RIGHT_POSITION(6);
 
+    /** The row in the state vector the state corresponds to. */
     public final int value;
 
     State(int i) {

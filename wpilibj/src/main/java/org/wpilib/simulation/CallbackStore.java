@@ -9,18 +9,36 @@ public class CallbackStore implements AutoCloseable {
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   protected interface CancelCallbackFunc {
+    /**
+     * Cancels a callback using the provided index and unique identifier.
+     *
+     * @param index The index of the resource associated with the callback.
+     * @param uid The unique identifier of the callback to cancel.
+     */
     void cancel(int index, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   protected interface CancelCallbackChannelFunc {
+    /**
+     * Cancels a registered callback identified by the provided parameters.
+     *
+     * @param index the index of the digital I/O channel
+     * @param channel the specific channel associated with the callback
+     * @param uid the unique identifier for the callback to cancel
+     */
     void cancel(int index, int channel, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
   protected interface CancelCallbackNoIndexFunc {
+    /**
+     * Cancels the callback associated with the given unique identifier.
+     *
+     * @param uid the unique identifier for the callback to be canceled
+     */
     void cancel(int uid);
   }
 
