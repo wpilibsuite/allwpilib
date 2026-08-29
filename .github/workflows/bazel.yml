@@ -12,14 +12,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
-          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
-          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
+          - { name: "Linux System Core", classifier: "linuxsystemcore,linuxsystemcorestatic",                 os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug",            os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "build" }
+          - { name: "Linux x86-64",      classifier: "linuxx86-64,linuxx86-64static,headers,sources",     os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
+          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug,linuxx86-64staticdebug",                os: ubuntu-24.04, container: wpilib/debian-base:trixie, action: "test" }
 
           - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, container: "", action: "test" }
 
