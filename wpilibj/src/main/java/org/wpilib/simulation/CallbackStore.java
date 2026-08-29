@@ -8,26 +8,26 @@ package org.wpilib.simulation;
 public class CallbackStore implements AutoCloseable {
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
-  interface CancelCallbackFunc {
+  protected interface CancelCallbackFunc {
     void cancel(int index, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
-  interface CancelCallbackChannelFunc {
+  protected interface CancelCallbackChannelFunc {
     void cancel(int index, int channel, int uid);
   }
 
   /** <b>Note: This interface is for simulation classes only. It should not be used by teams!</b> */
   @SuppressWarnings("PMD.ImplicitFunctionalInterface")
-  interface CancelCallbackNoIndexFunc {
+  protected interface CancelCallbackNoIndexFunc {
     void cancel(int uid);
   }
 
   /**
    * Constructs an empty CallbackStore. This constructor is to allow 3rd party sim providers (eg
-   * vendors) to subclass this class (without needing provide dummy constructing parameters) so that
-   * the register methods of their sim classes can return CallbackStores like the builtin sims.
+   * vendors) to subclass this class (without needing to provide dummy constructing parameters) so
+   * that the register methods of their sim classes can return CallbackStores like the builtin sims.
    * <b>Note: It should not be called by teams that are just using sims!</b>
    */
   protected CallbackStore() {
@@ -45,7 +45,7 @@ public class CallbackStore implements AutoCloseable {
    * @param uid TODO
    * @param ccf TODO
    */
-  public CallbackStore(int index, int uid, CancelCallbackFunc ccf) {
+  protected CallbackStore(int index, int uid, CancelCallbackFunc ccf) {
     this.m_cancelType = NORMAL_CANCEL;
     this.m_index = index;
     this.m_uid = uid;
@@ -60,7 +60,7 @@ public class CallbackStore implements AutoCloseable {
    * @param uid TODO
    * @param ccf TODO
    */
-  public CallbackStore(int index, int channel, int uid, CancelCallbackChannelFunc ccf) {
+  protected CallbackStore(int index, int channel, int uid, CancelCallbackChannelFunc ccf) {
     this.m_cancelType = CHANNEL_CANCEL;
     this.m_index = index;
     this.m_uid = uid;
@@ -74,7 +74,7 @@ public class CallbackStore implements AutoCloseable {
    * @param uid TODO
    * @param ccf TODO
    */
-  public CallbackStore(int uid, CancelCallbackNoIndexFunc ccf) {
+  protected CallbackStore(int uid, CancelCallbackNoIndexFunc ccf) {
     this.m_cancelType = NO_INDEX_CANCEL;
     this.m_uid = uid;
     this.m_cancelCallbackNoIndex = ccf;
