@@ -421,10 +421,13 @@ public interface Command {
    * @return A command that has the same implementation as this command, but with a different name.
    */
   default Command named(String newName) {
+    var originalCommand = this;
     return new Command() {
       @Override
       public void run(Coroutine coroutine) {
+        coroutine.scheduler().m_unschedulableCommands.add(originalCommand);
         Command.this.run(coroutine);
+        coroutine.scheduler().m_unschedulableCommands.remove(originalCommand);
       }
 
       @Override
