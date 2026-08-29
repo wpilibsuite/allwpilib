@@ -354,7 +354,7 @@ public class DifferentialDrivetrainSim {
   }
 
   /** Represents the different states of the drivetrain. */
-  enum State {
+  public enum State {
     X(0),
     Y(1),
     HEADING(2),
