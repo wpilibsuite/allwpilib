@@ -96,7 +96,7 @@ jobs:
           else
             TARGETS=...
           fi
-          bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.log"
+          bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
         shell: bash
 
       - uses: actions/upload-artifact@v7
