@@ -115,7 +115,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           archive: false
-          path: "${{ matrix.name }} Exec Log.log"
+          path: "${{ matrix.name }} Exec Log.binpb.zst"
       - name: Check disk free space
         if: always()
         run: df -h
