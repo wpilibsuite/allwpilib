@@ -43,7 +43,12 @@ namespace gui = wpi::gui;
 
 namespace {
 
-enum DisplayUnits { kDisplayMeters = 0, kDisplayFeet, kDisplayInches };
+enum DisplayUnits { DISPLAY_METERS = 0, DISPLAY_FEET, DISPLAY_INCHES };
+
+constexpr const char* NT_POSE2D_DRAG_DROP_TYPE = "NT:struct:Pose2d";
+constexpr const char* NT_POSE2D_ARRAY_DRAG_DROP_TYPE = "NT:struct:Pose2d[]";
+constexpr std::string_view POSE2D_TYPE = "struct:Pose2d";
+constexpr std::string_view POSE2D_ARRAY_TYPE = "struct:Pose2d[]";
 
 // Per-frame field data (not persistent)
 struct FieldFrameData {
@@ -117,34 +122,34 @@ class PopupState {
 struct DisplayOptions {
   explicit DisplayOptions(const gui::Texture& texture) : texture{texture} {}
 
-  enum Style { kBoxImage = 0, kLine, kLineClosed, kTrack, kHidden };
+  enum Style { BOX_IMAGE = 0, LINE, LINE_CLOSED, TRACK, HIDDEN };
 
-  static constexpr Style kDefaultStyle = kBoxImage;
-  static constexpr float kDefaultWeight = 4.0f;
-  static constexpr float kDefaultColorFloat[] = {255, 0, 0, 255};
-  static constexpr ImU32 kDefaultColor = IM_COL32(255, 0, 0, 255);
-  static constexpr auto kDefaultWidth = 0.6858_m;
-  static constexpr auto kDefaultLength = 0.8204_m;
-  static constexpr bool kDefaultArrows = true;
-  static constexpr int kDefaultArrowSize = 50;
-  static constexpr float kDefaultArrowWeight = 4.0f;
-  static constexpr float kDefaultArrowColorFloat[] = {0, 255, 0, 255};
-  static constexpr ImU32 kDefaultArrowColor = IM_COL32(0, 255, 0, 255);
-  static constexpr bool kDefaultSelectable = true;
+  static constexpr Style DEFAULT_STYLE = BOX_IMAGE;
+  static constexpr float DEFAULT_WEIGHT = 4.0f;
+  static constexpr float DEFAULT_COLOR_FLOAT[] = {255, 0, 0, 255};
+  static constexpr ImU32 DEFAULT_COLOR = IM_COL32(255, 0, 0, 255);
+  static constexpr auto DEFAULT_WIDTH = 0.6858_m;
+  static constexpr auto DEFAULT_LENGTH = 0.8204_m;
+  static constexpr bool DEFAULT_ARROWS = true;
+  static constexpr int DEFAULT_ARROW_SIZE = 50;
+  static constexpr float DEFAULT_ARROW_WEIGHT = 4.0f;
+  static constexpr float DEFAULT_ARROW_COLOR_FLOAT[] = {0, 255, 0, 255};
+  static constexpr ImU32 DEFAULT_ARROW_COLOR = IM_COL32(0, 255, 0, 255);
+  static constexpr bool DEFAULT_SELECTABLE = true;
 
-  Style style = kDefaultStyle;
-  float weight = kDefaultWeight;
-  int color = kDefaultColor;
+  Style style = DEFAULT_STYLE;
+  float weight = DEFAULT_WEIGHT;
+  int color = DEFAULT_COLOR;
 
-  wpi::units::meter_t width = kDefaultWidth;
-  wpi::units::meter_t length = kDefaultLength;
+  wpi::units::meter_t width = DEFAULT_WIDTH;
+  wpi::units::meter_t length = DEFAULT_LENGTH;
 
-  bool arrows = kDefaultArrows;
-  int arrowSize = kDefaultArrowSize;
-  float arrowWeight = kDefaultArrowWeight;
-  int arrowColor = kDefaultArrowColor;
+  bool arrows = DEFAULT_ARROWS;
+  int arrowSize = DEFAULT_ARROW_SIZE;
+  float arrowWeight = DEFAULT_ARROW_WEIGHT;
+  int arrowColor = DEFAULT_ARROW_COLOR;
 
-  bool selectable = kDefaultSelectable;
+  bool selectable = DEFAULT_SELECTABLE;
 
   const gui::Texture& texture;
 };
@@ -225,8 +230,8 @@ class ObjectInfo {
 
 class FieldInfo {
  public:
-  static constexpr auto kDefaultWidth = 17.5483_m;
-  static constexpr auto kDefaultHeight = 8.0519_m;
+  static constexpr auto DEFAULT_WIDTH = 17.5483_m;
+  static constexpr auto DEFAULT_HEIGHT = 8.0519_m;
 
   explicit FieldInfo(Storage& storage);
 
@@ -268,15 +273,15 @@ class FieldInfo {
 
 static PoseDragState gDragState;
 static PopupState gPopupState;
-static DisplayUnits gDisplayUnits = kDisplayMeters;
+static DisplayUnits gDisplayUnits = DISPLAY_METERS;
 
 static double ConvertDisplayLength(wpi::units::meter_t v) {
   switch (gDisplayUnits) {
-    case kDisplayFeet:
+    case DISPLAY_FEET:
       return v.convert<wpi::units::feet>().value();
-    case kDisplayInches:
+    case DISPLAY_INCHES:
       return v.convert<wpi::units::inches>().value();
-    case kDisplayMeters:
+    case DISPLAY_METERS:
     default:
       return v.value();
   }
@@ -286,6 +291,39 @@ static double ConvertDisplayAngle(wpi::units::degree_t v) {
   return v.value();
 }
 
+static std::string_view GetDefaultObjectName(std::string_view path) {
+  auto pos = path.find_last_of('/');
+  if (pos == std::string_view::npos || pos + 1 >= path.size()) {
+    return path;
+  }
+  return path.substr(pos + 1);
+}
+
+static void AcceptFieldObjectDropPayload(Field2DModel* model,
+                                         const char* dragDropType,
+                                         std::string_view type) {
+  if (const ImGuiPayload* payload =
+          ImGui::AcceptDragDropPayload(dragDropType)) {
+    std::string_view data{static_cast<const char*>(payload->Data),
+                          static_cast<size_t>(payload->DataSize)};
+    if (!data.empty()) {
+      model->AddFieldObject(GetDefaultObjectName(data), data, type);
+    }
+  }
+}
+
+static void AcceptFieldObjectDrop(Field2DModel* model) {
+  if (!ImGui::BeginDragDropTarget()) {
+    return;
+  }
+
+  AcceptFieldObjectDropPayload(model, NT_POSE2D_DRAG_DROP_TYPE, POSE2D_TYPE);
+  AcceptFieldObjectDropPayload(model, NT_POSE2D_ARRAY_DRAG_DROP_TYPE,
+                               POSE2D_ARRAY_TYPE);
+
+  ImGui::EndDragDropTarget();
+}
+
 static bool InputLength(const char* label, wpi::units::meter_t* v,
                         double step = 0.0, double step_fast = 0.0,
                         const char* format = "%.6f",
@@ -293,13 +331,13 @@ static bool InputLength(const char* label, wpi::units::meter_t* v,
   double dv = ConvertDisplayLength(*v);
   if (ImGui::InputDouble(label, &dv, step, step_fast, format, flags)) {
     switch (gDisplayUnits) {
-      case kDisplayFeet:
+      case DISPLAY_FEET:
         *v = wpi::units::foot_t{dv};
         break;
-      case kDisplayInches:
+      case DISPLAY_INCHES:
         *v = wpi::units::inch_t{dv};
         break;
-      case kDisplayMeters:
+      case DISPLAY_METERS:
       default:
         *v = wpi::units::meter_t{dv};
         break;
@@ -351,8 +389,8 @@ static bool InputPose(wpi::math::Pose2d* pose) {
 FieldInfo::FieldInfo(Storage& storage)
     : m_builtin{storage.GetString("builtin", "Custom")},
       m_filename{storage.GetString("image")},
-      m_width{storage.GetFloat("width", kDefaultWidth.to<float>())},
-      m_height{storage.GetFloat("height", kDefaultHeight.to<float>())},
+      m_width{storage.GetFloat("width", DEFAULT_WIDTH.to<float>())},
+      m_height{storage.GetFloat("height", DEFAULT_HEIGHT.to<float>())},
       m_top{storage.GetInt("top", 0)},
       m_left{storage.GetInt("left", 0)},
       m_bottom{storage.GetInt("bottom", -1)},
@@ -597,24 +635,24 @@ void FieldInfo::Draw(ImDrawList* drawList, const FieldFrameData& ffd) const {
 
 ObjectInfo::ObjectInfo(Storage& storage)
     : m_width{
-          storage.GetFloat("width", DisplayOptions::kDefaultWidth.to<float>())},
+          storage.GetFloat("width", DisplayOptions::DEFAULT_WIDTH.to<float>())},
       m_length{storage.GetFloat("length",
-                                DisplayOptions::kDefaultLength.to<float>())},
+                                DisplayOptions::DEFAULT_LENGTH.to<float>())},
       m_style{storage.GetString("style"),
-              DisplayOptions::kDefaultStyle,
+              DisplayOptions::DEFAULT_STYLE,
               {"Box/Image", "Line", "Line (Closed)", "Track", "Hidden"}},
-      m_weight{storage.GetFloat("weight", DisplayOptions::kDefaultWeight)},
+      m_weight{storage.GetFloat("weight", DisplayOptions::DEFAULT_WEIGHT)},
       m_color{
-          storage.GetFloatArray("color", DisplayOptions::kDefaultColorFloat)},
-      m_arrows{storage.GetBool("arrows", DisplayOptions::kDefaultArrows)},
+          storage.GetFloatArray("color", DisplayOptions::DEFAULT_COLOR_FLOAT)},
+      m_arrows{storage.GetBool("arrows", DisplayOptions::DEFAULT_ARROWS)},
       m_arrowSize{
-          storage.GetInt("arrowSize", DisplayOptions::kDefaultArrowSize)},
-      m_arrowWeight{
-          storage.GetFloat("arrowWeight", DisplayOptions::kDefaultArrowWeight)},
+          storage.GetInt("arrowSize", DisplayOptions::DEFAULT_ARROW_SIZE)},
+      m_arrowWeight{storage.GetFloat("arrowWeight",
+                                     DisplayOptions::DEFAULT_ARROW_WEIGHT)},
       m_arrowColor{storage.GetFloatArray(
-          "arrowColor", DisplayOptions::kDefaultArrowColorFloat)},
+          "arrowColor", DisplayOptions::DEFAULT_ARROW_COLOR_FLOAT)},
       m_selectable{
-          storage.GetBool("selectable", DisplayOptions::kDefaultSelectable)},
+          storage.GetBool("selectable", DisplayOptions::DEFAULT_SELECTABLE)},
       m_filename{storage.GetString("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
@@ -636,7 +674,7 @@ void ObjectInfo::DisplaySettings() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   m_style.Combo("Style");
   switch (m_style.GetValue()) {
-    case DisplayOptions::kBoxImage:
+    case DisplayOptions::BOX_IMAGE:
       if (ImGui::Button("Choose image...")) {
         m_fileOpener = std::make_unique<pfd::open_file>(
             "Choose object image", "",
@@ -651,7 +689,7 @@ void ObjectInfo::DisplaySettings() {
       InputFloatLength("Width", &m_width);
       InputFloatLength("Length", &m_length);
       break;
-    case DisplayOptions::kTrack:
+    case DisplayOptions::TRACK:
       InputFloatLength("Width", &m_width);
       break;
     default:
@@ -706,7 +744,7 @@ void ObjectInfo::DrawLine(ImDrawList* drawList,
     i += nlin - 1;
   }
 
-  if (points.size() > 2 && m_style.GetValue() == DisplayOptions::kLineClosed) {
+  if (points.size() > 2 && m_style.GetValue() == DisplayOptions::LINE_CLOSED) {
     drawList->AddLine(points.back(), points.front(), color, m_weight);
   }
 }
@@ -808,7 +846,7 @@ std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
     return {1, dist};
   }
 
-  if (m_displayOptions.style == DisplayOptions::kBoxImage) {
+  if (m_displayOptions.style == DisplayOptions::BOX_IMAGE) {
     dist = gui::GetDistSquared(cursor, m_corners[0]);
     if (dist < hitRadiusSquared) {
       return {2, dist};
@@ -828,7 +866,7 @@ std::pair<int, float> PoseFrameData::IsHovered(const ImVec2& cursor) const {
     if (dist < hitRadiusSquared) {
       return {5, dist};
     }
-  } else if (m_displayOptions.style == DisplayOptions::kTrack) {
+  } else if (m_displayOptions.style == DisplayOptions::TRACK) {
     dist = gui::GetDistSquared(cursor, m_corners[4]);
     if (dist < hitRadiusSquared) {
       return {6, dist};
@@ -878,7 +916,7 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
                          std::vector<ImVec2>* left,
                          std::vector<ImVec2>* right) const {
   switch (m_displayOptions.style) {
-    case DisplayOptions::kBoxImage:
+    case DisplayOptions::BOX_IMAGE:
       if (m_displayOptions.texture) {
         drawList->AddImageQuad(m_displayOptions.texture, m_corners[0],
                                m_corners[1], m_corners[2], m_corners[3]);
@@ -887,16 +925,16 @@ void PoseFrameData::Draw(ImDrawList* drawList, std::vector<ImVec2>* center,
       drawList->AddQuad(m_corners[0], m_corners[1], m_corners[2], m_corners[3],
                         m_displayOptions.color, m_displayOptions.weight);
       break;
-    case DisplayOptions::kLine:
-    case DisplayOptions::kLineClosed:
+    case DisplayOptions::LINE:
+    case DisplayOptions::LINE_CLOSED:
       center->emplace_back(m_center);
       break;
-    case DisplayOptions::kTrack:
+    case DisplayOptions::TRACK:
       center->emplace_back(m_center);
       left->emplace_back(m_corners[4]);
       right->emplace_back(m_corners[5]);
       break;
-    case DisplayOptions::kHidden:
+    case DisplayOptions::HIDDEN:
       break;
   }
 
@@ -916,7 +954,7 @@ void wpi::glass::DisplayField2DSettings(Field2DModel* model) {
   }
 
   EnumSetting displayUnits{GetStorage().GetString("units"),
-                           kDisplayMeters,
+                           DISPLAY_METERS,
                            {"meters", "feet", "inches"}};
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
   displayUnits.Combo("Units");
@@ -990,6 +1028,7 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   m_mousePos = ImGui::GetIO().MousePos;
   m_drawList = ImGui::GetWindowDrawList();
   m_isHovered = ImGui::IsItemHovered();
+  AcceptFieldObjectDrop(model);
 
   // field
   field->LoadImage();
@@ -1043,7 +1082,10 @@ void FieldDisplay::Display(FieldInfo* field, Field2DModel* model,
   }
 
   // right-click popup for editing
-  if (m_isHovered && ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+  bool canEditTarget = target && !target->objModel->IsReadOnly();
+  bool canInsertTarget = !target && !model->IsReadOnly();
+  if ((canEditTarget || canInsertTarget) && m_isHovered &&
+      ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
     gPopupState.Open(target, m_ffd.GetPosFromScreen(m_mousePos));
     ImGui::OpenPopup("edit");
   }
@@ -1079,6 +1121,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
   obj.LoadImage();
 
   auto displayOptions = obj.GetDisplayOptions();
+  bool readOnly = model.IsReadOnly();
 
   m_centerLine.resize(0);
   m_leftLine.resize(0);
@@ -1094,7 +1137,7 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     PoseFrameData pfd{pose, model, i, m_ffd, displayOptions};
 
     // check for potential drag targets
-    if (displayOptions.selectable && m_isHovered &&
+    if (!readOnly && displayOptions.selectable && m_isHovered &&
         !gDragState.target.objModel) {
       auto [corner, dist] = pfd.IsHovered(m_mousePos);
       if (corner > 0) {
@@ -1105,7 +1148,8 @@ void FieldDisplay::DisplayObject(FieldObjectModel& model,
     }
 
     // handle active dragging of this object
-    if (gDragState.target.objModel == &model && gDragState.target.index == i) {
+    if (!readOnly && gDragState.target.objModel == &model &&
+        gDragState.target.index == i) {
       pfd.HandleDrag(m_mousePos);
     }
 
@@ -1196,6 +1240,9 @@ void PopupState::DisplayInsert(Field2DModel* model) {
       ImGui::SetItemDefaultFocus();
     }
     model->ForEachFieldObject([&](auto& objModel, auto name) {
+      if (objModel.IsReadOnly()) {
+        return;
+      }
       bool selected = m_insertModel == &objModel;
       if (ImGui::Selectable(name.data(), selected)) {
         m_insertModel = &objModel;

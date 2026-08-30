@@ -23,77 +23,77 @@ CommandNiDsStadiaController::GetNiDsStadiaController() {
 
 Trigger CommandNiDsStadiaController::A(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kA, loop);
+      wpi::NiDsStadiaController::Button::A, loop);
 }
 
 Trigger CommandNiDsStadiaController::B(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kB, loop);
+      wpi::NiDsStadiaController::Button::B, loop);
 }
 
 Trigger CommandNiDsStadiaController::X(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kX, loop);
+      wpi::NiDsStadiaController::Button::X, loop);
 }
 
 Trigger CommandNiDsStadiaController::Y(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kY, loop);
+      wpi::NiDsStadiaController::Button::Y, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftBumper(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kLeftBumper, loop);
+      wpi::NiDsStadiaController::Button::LEFT_BUMPER, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightBumper(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kRightBumper, loop);
+      wpi::NiDsStadiaController::Button::RIGHT_BUMPER, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftStick(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kLeftStick, loop);
+      wpi::NiDsStadiaController::Button::LEFT_STICK, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightStick(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kRightStick, loop);
+      wpi::NiDsStadiaController::Button::RIGHT_STICK, loop);
 }
 
 Trigger CommandNiDsStadiaController::Ellipses(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kEllipses, loop);
+      wpi::NiDsStadiaController::Button::ELLIPSES, loop);
 }
 
 Trigger CommandNiDsStadiaController::Hamburger(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kHamburger, loop);
+      wpi::NiDsStadiaController::Button::HAMBURGER, loop);
 }
 
 Trigger CommandNiDsStadiaController::Stadia(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kStadia, loop);
+      wpi::NiDsStadiaController::Button::STADIA, loop);
 }
 
 Trigger CommandNiDsStadiaController::RightTrigger(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kRightTrigger, loop);
+      wpi::NiDsStadiaController::Button::RIGHT_TRIGGER, loop);
 }
 
 Trigger CommandNiDsStadiaController::LeftTrigger(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kLeftTrigger, loop);
+      wpi::NiDsStadiaController::Button::LEFT_TRIGGER, loop);
 }
 
 Trigger CommandNiDsStadiaController::Google(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kGoogle, loop);
+      wpi::NiDsStadiaController::Button::GOOGLE, loop);
 }
 
 Trigger CommandNiDsStadiaController::Frame(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsStadiaController::Button::kFrame, loop);
+      wpi::NiDsStadiaController::Button::FRAME, loop);
 }
 
 double CommandNiDsStadiaController::GetLeftX() const {

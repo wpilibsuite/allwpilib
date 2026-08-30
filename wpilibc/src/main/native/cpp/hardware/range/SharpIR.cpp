@@ -6,11 +6,10 @@
 
 #include <algorithm>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/discrete/AnalogInput.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -33,8 +32,7 @@ SharpIR SharpIR::GP2Y0A51SK0F(int channel) {
 SharpIR::SharpIR(int channel, double a, double b, wpi::units::meter_t min,
                  wpi::units::meter_t max)
     : m_sensor(channel), m_A(a), m_B(b), m_min(min), m_max(max) {
-  HAL_ReportUsage("IO", channel, "SharpIR");
-  wpi::util::SendableRegistry::Add(this, "SharpIR", channel);
+  wpi::util::ReportUsage("IO", channel, "SharpIR");
 
   m_simDevice = wpi::hal::SimDevice("SharpIR", m_sensor.GetChannel());
   if (m_simDevice) {
@@ -60,8 +58,10 @@ wpi::units::meter_t SharpIR::GetRange() const {
   }
 }
 
-void SharpIR::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Ultrasonic");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetRange().value(); }, nullptr);
+void SharpIR::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", GetRange());
+}
+
+std::string_view SharpIR::GetTelemetryType() const {
+  return "Ultrasonic";
 }

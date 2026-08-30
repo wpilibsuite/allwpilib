@@ -9,7 +9,7 @@
 #include "Constants.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 
 class Intake : public wpi::cmd::SubsystemBase {
@@ -24,10 +24,10 @@ class Intake : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr RetractCommand();
 
  private:
-  wpi::PWMSparkMax motor{IntakeConstants::kMotorPort};
+  wpi::PWMSparkMax motor{IntakeConstants::MOTOR_PORT};
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
-  wpi::DoubleSolenoid piston{0, wpi::PneumaticsModuleType::CTRE_PCM,
-                             IntakeConstants::kSolenoidPorts[0],
-                             IntakeConstants::kSolenoidPorts[1]};
+  wpi::DoubleSolenoid piston{
+      wpi::CANPort::CAN_S0, wpi::PneumaticsModuleType::CTRE_PCM,
+      IntakeConstants::SOLENOID_PORTS[0], IntakeConstants::SOLENOID_PORTS[1]};
 };

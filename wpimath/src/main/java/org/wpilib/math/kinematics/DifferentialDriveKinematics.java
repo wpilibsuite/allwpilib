@@ -9,8 +9,8 @@ import static org.wpilib.units.Units.Meters;
 import org.wpilib.math.geometry.Twist2d;
 import org.wpilib.math.kinematics.proto.DifferentialDriveKinematicsProto;
 import org.wpilib.math.kinematics.struct.DifferentialDriveKinematicsStruct;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.units.measure.Distance;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -49,7 +49,7 @@ public class DifferentialDriveKinematics
    */
   public DifferentialDriveKinematics(double trackwidth) {
     this.trackwidth = trackwidth;
-    MathSharedStore.reportUsage("DifferentialDriveKinematics", "");
+    UsageReporting.reportUsage("DifferentialDriveKinematics", "");
   }
 
   /**

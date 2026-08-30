@@ -17,6 +17,12 @@ DataLogReaderThread::~DataLogReaderThread() {
     m_active = false;
     m_thread.join();
   }
+  if (m_protoPool) {
+    upb_DefPool_Free(m_protoPool);
+  }
+  if (m_arena) {
+    upb_Arena_Free(m_arena);
+  }
 }
 
 void DataLogReaderThread::ReadMain() {
@@ -34,20 +40,22 @@ void DataLogReaderThread::ReadMain() {
     if (record.IsStart()) {
       DataLogReaderEntry data;
       if (record.GetStartData(&data)) {
-        std::scoped_lock lock{m_mutex};
-        auto& entryPtr = m_entriesById[data.entry];
-        if (entryPtr) {
-          wpi::util::print("...DUPLICATE entry ID, overriding\n");
-        }
-        auto [it, isNew] = m_entriesByName.emplace(data.name, data);
-        if (isNew) {
-          it->second.ranges.emplace_back(recordIt, recordEnd);
-        }
-        entryPtr = &it->second;
-        if (data.type == "structschema" ||
-            data.type == "proto:FileDescriptorProto") {
-          schemaEntries.try_emplace(data.entry, entryPtr,
-                                    std::span<const uint8_t>{});
+        {
+          std::scoped_lock lock{m_mutex};
+          auto& entryPtr = m_entriesById[data.entry];
+          if (entryPtr) {
+            wpi::util::print("...DUPLICATE entry ID, overriding\n");
+          }
+          auto [it, isNew] = m_entriesByName.emplace(data.name, data);
+          if (isNew) {
+            it->second.ranges.emplace_back(recordIt, recordEnd);
+          }
+          entryPtr = &it->second;
+          if (data.type == "structschema" ||
+              data.type == "proto:FileDescriptorProto") {
+            schemaEntries.try_emplace(data.entry, entryPtr,
+                                      std::span<const uint8_t>{});
+          }
         }
         sigEntryAdded(data);
       } else {
@@ -112,14 +120,21 @@ void DataLogReaderThread::ReadMain() {
     } else if (auto filename =
                    wpi::util::remove_prefix(name, "/.schema/proto:")) {
       // protobuf descriptor handling
+      if (!m_protoPool || !m_arena) {
+        wpi::util::print("could not allocate protobuf schema resources\n");
+        continue;
+      }
+      auto* descriptor = google_protobuf_FileDescriptorProto_parse(
+          reinterpret_cast<const char*>(data.data()), data.size(), m_arena);
+      if (!descriptor) {
+        wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
+                         *filename);
+        continue;
+      }
       upb_Status status;
-      status.ok = true;
-      upb_DefPool_AddFile(
-          m_protoPool,
-          google_protobuf_FileDescriptorProto_parse(
-              reinterpret_cast<const char*>(data.data()), data.size(), m_arena),
-          &status);
-      if (!status.ok) {
+      upb_Status_Clear(&status);
+      upb_DefPool_AddFile(m_protoPool, descriptor, &status);
+      if (!upb_Status_IsOk(&status)) {
         wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
                          *filename);
       }

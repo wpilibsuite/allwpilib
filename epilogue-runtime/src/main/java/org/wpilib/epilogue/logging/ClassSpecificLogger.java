@@ -4,12 +4,9 @@
 
 package org.wpilib.epilogue.logging;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.wpilib.epilogue.CustomLoggerFor;
 import org.wpilib.epilogue.logging.errors.ErrorHandler;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * Base class for class-specific generated loggers. Loggers are generated at compile time by the
@@ -22,10 +19,6 @@ import org.wpilib.util.sendable.SendableBuilder;
 @SuppressWarnings("unused") // Used by generated subclasses
 public abstract class ClassSpecificLogger<T> {
   private final Class<T> m_clazz;
-  // TODO: This will hold onto Sendables that are otherwise no longer referenced by a robot program.
-  //       Determine if that's a concern
-  // Linked hashmap to maintain insert order
-  private final Map<Sendable, SendableBuilder> m_sendables = new LinkedHashMap<>();
 
   private boolean m_disabled = false;
 
@@ -39,28 +32,28 @@ public abstract class ClassSpecificLogger<T> {
   }
 
   /**
-   * Updates an object's fields in a data log.
+   * Updates an object's fields in telemetry.
    *
-   * @param backend the backend to update
+   * @param table the telemetry table to update
    * @param object the object to update in the log
    */
-  protected abstract void update(EpilogueBackend backend, T object);
+  protected abstract void update(TelemetryTable table, T object);
 
   /**
-   * Attempts to update the data log. Will do nothing if the logger is {@link #disable() disabled}.
+   * Attempts to update telemetry. Will do nothing if the logger is {@link #disable() disabled}.
    *
-   * @param backend the backend to log data to
+   * @param table the telemetry table to log data to
    * @param object the data object to log
    * @param errorHandler the handler to use if logging raised an exception
    */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  public final void tryUpdate(EpilogueBackend backend, T object, ErrorHandler errorHandler) {
+  public final void tryUpdate(TelemetryTable table, T object, ErrorHandler errorHandler) {
     if (m_disabled) {
       return;
     }
 
     try {
-      update(backend, object);
+      update(table, object);
     } catch (Exception e) {
       errorHandler.handle(e, this);
     }
@@ -92,26 +85,5 @@ public abstract class ClassSpecificLogger<T> {
    */
   public final Class<T> getLoggedType() {
     return m_clazz;
-  }
-
-  /**
-   * Logs a sendable type.
-   *
-   * @param backend the backend to log data into
-   * @param sendable the sendable object to log
-   */
-  protected void logSendable(EpilogueBackend backend, Sendable sendable) {
-    if (sendable == null) {
-      return;
-    }
-
-    if (m_sendables.containsKey(sendable)) {
-      m_sendables.get(sendable).update();
-    } else {
-      var builder = new LogBackedSendableBuilder(backend);
-      sendable.initSendable(builder);
-      m_sendables.put(sendable, builder);
-      builder.update();
-    }
   }
 }

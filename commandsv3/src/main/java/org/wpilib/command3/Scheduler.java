@@ -4,8 +4,8 @@
 
 package org.wpilib.command3;
 
-import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Milliseconds;
+import static org.wpilib.units.Units.Nanoseconds;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -792,7 +792,7 @@ public final class Scheduler implements ProtobufSerializable {
    * TimedRobot#robotPeriodic()}
    */
   public void run() {
-    final long startMicros = RobotController.getTime();
+    final long startNanos = RobotController.getTime();
 
     // Cancel any commands with stale binding scopes
     cancelStaleBindings();
@@ -818,8 +818,8 @@ public final class Scheduler implements ProtobufSerializable {
     // Run every command in order until they call Coroutine.yield() or exit
     runCommands();
 
-    final long endMicros = RobotController.getTime();
-    m_lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+    final long endNanos = RobotController.getTime();
+    m_lastRunTimeMs = Milliseconds.convertFrom(endNanos - startNanos, Nanoseconds);
   }
 
   private void cancelStaleBindings() {
@@ -925,7 +925,7 @@ public final class Scheduler implements ProtobufSerializable {
     var previousState = currentState();
 
     m_currentCommandAncestry.push(state);
-    long startMicros = RobotController.getTime();
+    long startNanos = RobotController.getTime();
     emitMountedEvent(command);
     coroutine.mount();
     try {
@@ -934,8 +934,8 @@ public final class Scheduler implements ProtobufSerializable {
       // Command encountered an uncaught exception.
       handleCommandException(state, e);
     } finally {
-      long endMicros = RobotController.getTime();
-      double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+      long endNanos = RobotController.getTime();
+      double elapsedMs = Milliseconds.convertFrom(endNanos - startNanos, Nanoseconds);
       state.setLastRuntimeMs(elapsedMs);
 
       if (state.equals(currentState())) {

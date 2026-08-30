@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "wpi/hardware/motor/PWMVictorSPX.hpp"
+#include "motorcontrol/TestPWMMotorController.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
@@ -28,7 +28,7 @@ TEST_CASE("StateSpaceSimTest FlywheelSim", "[wpilibc][simulation]") {
       0_V, 0.02_V / 1_rad_per_s, 0.01_V / 1_rad_per_s_sq};
   wpi::Encoder encoder{0, 1};
   wpi::sim::EncoderSim encoderSim{encoder};
-  wpi::PWMVictorSPX motor{0};
+  wpi::TestPWMMotorController motor{0};
 
   wpi::sim::RoboRioSim::ResetData();
   encoderSim.ResetData();

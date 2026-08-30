@@ -77,10 +77,10 @@ HAL_AddressableLEDHandle HAL_InitializeAddressableLED(
     int32_t channel, const char* allocationLocation, int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumSmartIo) {
+  if (channel < 0 || channel >= NUM_SMART_IO) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for AddressableLED", 0,
-                                       kNumSmartIo - 1, channel);
+                                       NUM_SMART_IO - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 

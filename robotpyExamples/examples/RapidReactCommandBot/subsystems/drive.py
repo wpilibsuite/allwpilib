@@ -8,6 +8,7 @@ from typing import Callable
 
 from commands2 import Command, Subsystem
 import wpilib
+import wpilib_drivers
 import wpimath
 
 from constants import DriveConstants
@@ -19,12 +20,14 @@ class Drive(Subsystem):
         super().__init__()
 
         # The motors on the left side of the drive.
-        self.left_leader = wpilib.PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT)
-        self.left_follower = wpilib.PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT)
+        self.left_leader = wpilib_drivers.PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT)
+        self.left_follower = wpilib_drivers.PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT)
 
         # The motors on the right side of the drive.
-        self.right_leader = wpilib.PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT)
-        self.right_follower = wpilib.PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT)
+        self.right_leader = wpilib_drivers.PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT)
+        self.right_follower = wpilib_drivers.PWMSparkMax(
+            DriveConstants.RIGHT_MOTOR2_PORT
+        )
 
         # The robot's drive
         self.drive = wpilib.DifferentialDrive(self.left_leader, self.right_leader)

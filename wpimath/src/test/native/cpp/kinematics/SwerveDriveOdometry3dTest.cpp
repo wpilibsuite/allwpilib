@@ -32,7 +32,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 0.01;
+static constexpr double EPSILON = 0.01;
 
 class SwerveDriveOdometry3dTest {
  protected:
@@ -58,10 +58,10 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
-  CHECK_NEAR(pose.X().value(), 1, kEpsilon);
-  CHECK_NEAR(pose.Y().value(), 2, kEpsilon);
-  CHECK_NEAR(pose.Z().value(), 0, kEpsilon);
-  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 1, EPSILON);
+  CHECK_NEAR(pose.Y().value(), 2, EPSILON);
+  CHECK_NEAR(pose.Z().value(), 0, EPSILON);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
@@ -76,10 +76,10 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
   auto pose = m_odometry.Update(wpi::math::Rotation3d{},
                                 {position, position, position, position});
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Z().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Z().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
@@ -94,10 +94,10 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
   auto pose = m_odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {fl, fr, bl, br});
 
-  CHECK_NEAR(12.0, pose.X().value(), kEpsilon);
-  CHECK_NEAR(12.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Z().value(), kEpsilon);
-  CHECK_NEAR(90.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  CHECK_NEAR(12.0, pose.X().value(), EPSILON);
+  CHECK_NEAR(12.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Z().value(), EPSILON);
+  CHECK_NEAR(90.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
@@ -110,10 +110,10 @@ TEST_CASE_METHOD(SwerveDriveOdometry3dTest,
   auto pose = m_odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 90_deg},
                                 {position, position, position, position});
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Z().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Z().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Rotation().ToRotation2d().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometry3dTest,

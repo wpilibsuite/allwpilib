@@ -14,10 +14,10 @@ std::optional<wpi::math::DifferentialDriveFeedforward> wpi::util::Protobuf<
   }
 
   return wpi::math::DifferentialDriveFeedforward{
-      decltype(1_V / 1_mps){msg.kv_linear},
-      decltype(1_V / 1_mps_sq){msg.ka_linear},
-      decltype(1_V / 1_mps){msg.kv_angular},
-      decltype(1_V / 1_mps_sq){msg.ka_angular},
+      decltype(1_V / 1_mps){msg.kvLinear},
+      decltype(1_V / 1_mps_sq){msg.kaLinear},
+      decltype(1_V / 1_mps){msg.kvAngular},
+      decltype(1_V / 1_mps_sq){msg.kaAngular},
   };
 }
 
@@ -25,10 +25,10 @@ bool wpi::util::Protobuf<wpi::math::DifferentialDriveFeedforward>::Pack(
     OutputStream& stream,
     const wpi::math::DifferentialDriveFeedforward& value) {
   wpi_proto_ProtobufDifferentialDriveFeedforward msg{
-      .kv_linear = value.kVLinear.value(),
-      .ka_linear = value.kALinear.value(),
-      .kv_angular = value.kVAngular.value(),
-      .ka_angular = value.kAAngular.value(),
+      .kvLinear = value.kvLinear.value(),
+      .kaLinear = value.kaLinear.value(),
+      .kvAngular = value.kvAngular.value(),
+      .kaAngular = value.kaAngular.value(),
   };
   return stream.Encode(msg);
 }

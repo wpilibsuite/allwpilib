@@ -4,6 +4,8 @@
 
 #include "wpi/system/Timer.hpp"
 
+#include <stdint.h>
+
 #include <chrono>
 #include <thread>
 
@@ -30,26 +32,43 @@ wpi::units::second_t GetSystemTime() {
 
 using namespace wpi;
 
+namespace {
+
+std::chrono::nanoseconds GetTimestampNanoseconds() {
+  return std::chrono::nanoseconds{
+      static_cast<int64_t>(wpi::RobotController::GetTime())};
+}
+
+}  // namespace
+
 Timer::Timer() {
   Reset();
 }
 
 wpi::units::second_t Timer::Get() const {
+  return wpi::units::nanosecond_t{GetNanoseconds()};
+}
+
+double Timer::GetNanoseconds() const {
   if (m_running) {
-    return (GetTimestamp() - m_startTime) + m_accumulatedTime;
+    return static_cast<double>(
+               (GetTimestampNanoseconds() - m_startTime).count()) -
+           m_startTimeRemainderNs + m_accumulatedTimeNs;
   } else {
-    return m_accumulatedTime;
+    return m_accumulatedTimeNs;
   }
 }
 
 void Timer::Reset() {
-  m_accumulatedTime = 0_s;
-  m_startTime = GetTimestamp();
+  m_accumulatedTimeNs = 0.0;
+  m_startTime = GetTimestampNanoseconds();
+  m_startTimeRemainderNs = 0.0;
 }
 
 void Timer::Start() {
   if (!m_running) {
-    m_startTime = GetTimestamp();
+    m_startTime = GetTimestampNanoseconds();
+    m_startTimeRemainderNs = 0.0;
     m_running = true;
   }
 }
@@ -64,19 +83,24 @@ void Timer::Restart() {
 
 void Timer::Stop() {
   if (m_running) {
-    m_accumulatedTime = Get();
+    m_accumulatedTimeNs = GetNanoseconds();
     m_running = false;
   }
 }
 
 bool Timer::HasElapsed(wpi::units::second_t period) const {
-  return Get() >= period;
+  return GetNanoseconds() >= wpi::units::nanosecond_t{period}.value();
 }
 
 bool Timer::AdvanceIfElapsed(wpi::units::second_t period) {
-  if (Get() >= period) {
+  double periodNs = wpi::units::nanosecond_t{period}.value();
+
+  if (GetNanoseconds() >= periodNs) {
     // Advance the start time by the period.
-    m_startTime += period;
+    double advanceNs = m_startTimeRemainderNs + periodNs;
+    auto wholeNs = static_cast<int64_t>(advanceNs);
+    m_startTime += std::chrono::nanoseconds{wholeNs};
+    m_startTimeRemainderNs = advanceNs - wholeNs;
     // Don't set it to the current time... we want to avoid drift.
     return true;
   } else {
@@ -95,13 +119,12 @@ Timer Timer::CreateStarted() {
 }
 
 wpi::units::second_t Timer::GetTimestamp() {
-  return wpi::units::second_t{wpi::RobotController::GetTime() * 1.0e-6};
+  return GetTimestampNanoseconds();
 }
 
 wpi::units::second_t Timer::GetMonotonicTimestamp() {
-  // Monotonic timestamp is in microseconds
-  return wpi::units::second_t{wpi::RobotController::GetMonotonicTime() *
-                              1.0e-6};
+  return std::chrono::nanoseconds{
+      static_cast<int64_t>(wpi::RobotController::GetMonotonicTime())};
 }
 
 wpi::units::second_t Timer::GetMatchTime() {

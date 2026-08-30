@@ -93,10 +93,10 @@ TEST_CASE_METHOD(ConditionalCommandTest,
 TEST_CASE_METHOD(ConditionalCommandTest, "ConditionalCommandTest AllCancelSelf",
                  "[commandsv2][command]") {
   auto command = Either(
-      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
-      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::CANCEL_SELF),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::CANCEL_SELF),
       [] { return true; });
-  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+  CHECK(Command::InterruptionBehavior::CANCEL_SELF ==
         command.get()->GetInterruptionBehavior());
 }
 
@@ -104,11 +104,11 @@ TEST_CASE_METHOD(ConditionalCommandTest,
                  "ConditionalCommandTest AllCancelIncoming",
                  "[commandsv2][command]") {
   auto command = Either(Idle().WithInterruptBehavior(
-                            Command::InterruptionBehavior::kCancelIncoming),
+                            Command::InterruptionBehavior::CANCEL_INCOMING),
                         Idle().WithInterruptBehavior(
-                            Command::InterruptionBehavior::kCancelIncoming),
+                            Command::InterruptionBehavior::CANCEL_INCOMING),
                         [] { return false; });
-  CHECK(Command::InterruptionBehavior::kCancelIncoming ==
+  CHECK(Command::InterruptionBehavior::CANCEL_INCOMING ==
         command.get()->GetInterruptionBehavior());
 }
 
@@ -116,11 +116,11 @@ TEST_CASE_METHOD(ConditionalCommandTest,
                  "ConditionalCommandTest OneCancelSelfOneIncoming",
                  "[commandsv2][command]") {
   auto command = Either(
-      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::CANCEL_SELF),
       Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming),
+          Command::InterruptionBehavior::CANCEL_INCOMING),
       [] { return false; });
-  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+  CHECK(Command::InterruptionBehavior::CANCEL_SELF ==
         command.get()->GetInterruptionBehavior());
 }
 
@@ -129,9 +129,9 @@ TEST_CASE_METHOD(ConditionalCommandTest,
                  "[commandsv2][command]") {
   auto command = Either(
       Idle().WithInterruptBehavior(
-          Command::InterruptionBehavior::kCancelIncoming),
-      Idle().WithInterruptBehavior(Command::InterruptionBehavior::kCancelSelf),
+          Command::InterruptionBehavior::CANCEL_INCOMING),
+      Idle().WithInterruptBehavior(Command::InterruptionBehavior::CANCEL_SELF),
       [] { return false; });
-  CHECK(Command::InterruptionBehavior::kCancelSelf ==
+  CHECK(Command::InterruptionBehavior::CANCEL_SELF ==
         command.get()->GetInterruptionBehavior());
 }

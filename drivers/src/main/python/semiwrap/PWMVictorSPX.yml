@@ -1,0 +1,4 @@
+classes:
+  wpi::PWMVictorSPX:
+    methods:
+      PWMVictorSPX:

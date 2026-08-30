@@ -23,7 +23,6 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Power.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTable.hpp"
@@ -36,6 +35,7 @@
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/EventVector.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/string.hpp"
@@ -80,7 +80,7 @@ class MatchDataSenderEntry {
   typename Topic::ValueType prevVal;
 };
 
-static constexpr std::string_view kSmartDashboardType = "DriverStation";
+static constexpr std::string_view SMART_DASHBOARD_TYPE = "DriverStation";
 
 struct MatchDataSender {
   MatchDataSender()
@@ -94,8 +94,8 @@ struct MatchDataSender {
   std::shared_ptr<wpi::nt::NetworkTable> table =
       wpi::nt::NetworkTableInstance::GetDefault().GetTable("DriverStation");
   MatchDataSenderEntry<wpi::nt::StringTopic> typeMetaData{
-      table, ".type", kSmartDashboardType,
-      wpi::util::json::object("SmartDashboard", kSmartDashboardType)};
+      table, ".type", SMART_DASHBOARD_TYPE,
+      wpi::util::json::object("SmartDashboard", SMART_DASHBOARD_TYPE)};
   MatchDataSenderEntry<wpi::nt::StringTopic> gameData{table, "GameData", ""};
   MatchDataSenderEntry<wpi::nt::StringTopic> eventName{table, "EventName", ""};
   MatchDataSenderEntry<wpi::nt::IntegerTopic> matchNumber{table, "MatchNumber",
@@ -117,11 +117,11 @@ struct MatchDataSender {
 class JoystickLogSender {
  public:
   void Init(wpi::log::DataLog& log, unsigned int stick, int64_t timestamp);
-  void Send(uint64_t timestamp);
+  void Send(int64_t timestamp);
 
  private:
-  void AppendButtons(HAL_JoystickButtons buttons, uint64_t timestamp);
-  void AppendPOVs(const HAL_JoystickPOVs& povs, uint64_t timestamp);
+  void AppendButtons(HAL_JoystickButtons buttons, int64_t timestamp);
+  void AppendPOVs(const HAL_JoystickPOVs& povs, int64_t timestamp);
 
   unsigned int m_stick;
   HAL_JoystickButtons m_prevButtons;
@@ -135,7 +135,7 @@ class JoystickLogSender {
 class DataLogSender {
  public:
   void Init(wpi::log::DataLog& log, bool logJoysticks, int64_t timestamp);
-  void Send(uint64_t timestamp);
+  void Send(int64_t timestamp);
 
  private:
   std::atomic_bool m_initialized{false};
@@ -912,14 +912,15 @@ void DriverStationBackend::PublishOpModes() {
     ++modeCounts[HAL_OpMode_GetRobotMode(opMode.id)];
   }
 
-  HAL_ReportUsage("OpMode/AUTONOMOUS",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
-  HAL_ReportUsage("OpMode/TELEOPERATED",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
-  HAL_ReportUsage("OpMode/UTILITY",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
-  HAL_ReportUsage("OpMode/UNKNOWN",
-                  std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
+  wpi::util::ReportUsage("OpMode/AUTONOMOUS",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_AUTONOMOUS]));
+  wpi::util::ReportUsage(
+      "OpMode/TELEOPERATED",
+      std::to_string(modeCounts[HAL_ROBOT_MODE_TELEOPERATED]));
+  wpi::util::ReportUsage("OpMode/UTILITY",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_UTILITY]));
+  wpi::util::ReportUsage("OpMode/UNKNOWN",
+                         std::to_string(modeCounts[HAL_ROBOT_MODE_UNKNOWN]));
 }
 
 void DriverStationBackend::ClearOpModes() {
@@ -1247,7 +1248,7 @@ void JoystickLogSender::Init(wpi::log::DataLog& log, unsigned int stick,
   AppendPOVs(m_prevPOVs, timestamp);
 }
 
-void JoystickLogSender::Send(uint64_t timestamp) {
+void JoystickLogSender::Send(int64_t timestamp) {
   HAL_JoystickButtons buttons;
   HAL_GetJoystickButtons(m_stick, &buttons);
   if (buttons.available != m_prevButtons.available ||
@@ -1280,7 +1281,7 @@ void JoystickLogSender::Send(uint64_t timestamp) {
 }
 
 void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
-                                      uint64_t timestamp) {
+                                      int64_t timestamp) {
   int count = availableToCount(buttons.available);
   uint8_t buttonsArr[64];
   for (int i = 0; i < count; ++i) {
@@ -1292,7 +1293,7 @@ void JoystickLogSender::AppendButtons(HAL_JoystickButtons buttons,
 }
 
 void JoystickLogSender::AppendPOVs(const HAL_JoystickPOVs& povs,
-                                   uint64_t timestamp) {
+                                   int64_t timestamp) {
   int count = availableToCount(povs.available);
   int64_t povsArr[HAL_MAX_JOYSTICK_POVS];
   for (int i = 0; i < count; ++i) {
@@ -1327,7 +1328,7 @@ void DataLogSender::Init(wpi::log::DataLog& log, bool logJoysticks,
   m_initialized = true;
 }
 
-void DataLogSender::Send(uint64_t timestamp) {
+void DataLogSender::Send(int64_t timestamp) {
   if (!m_initialized) {
     return;
   }

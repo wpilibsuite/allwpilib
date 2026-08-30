@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.com>
+Date: Sat, 15 Aug 2026 00:00:00 -0700
+Subject: [PATCH 2/2] Make LLHTTP_EXPORT empty
+
+wpinet automatically exports symbols, and llhttp's visibility and dllexport
+attributes interfere with other libraries.
+---
+ src/native/api.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/src/native/api.h b/src/native/api.h
+index 0a58d4e064717e498b82148c9fd9539163131a21..e87a0a053353987ffb7ffb068ced9ae9256ea24d 100644
+--- a/src/native/api.h
++++ b/src/native/api.h
+@@ -5,13 +5,7 @@ extern "C" {
+ #endif
+ #include <stddef.h>
+ 
+-#if defined(__wasm__)
+-#define LLHTTP_EXPORT __attribute__((visibility("default")))
+-#elif defined(_WIN32)
+-#define LLHTTP_EXPORT __declspec(dllexport)
+-#else
+ #define LLHTTP_EXPORT
+-#endif
+ 
+ typedef llhttp__internal_t llhttp_t;
+ typedef struct llhttp_settings_s llhttp_settings_t;

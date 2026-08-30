@@ -16,10 +16,10 @@ class IntakeTest {
  public:
   Intake intake;  // create our intake
   wpi::sim::PWMMotorControllerSim simMotor{
-      IntakeConstants::kMotorPort};  // create our simulation PWM
+      IntakeConstants::MOTOR_PORT};  // create our simulation PWM
   wpi::sim::DoubleSolenoidSim simPiston{
-      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::kPistonFwdChannel,
-      IntakeConstants::kPistonRevChannel};  // create our simulation solenoid
+      wpi::PneumaticsModuleType::CTRE_PCM, IntakeConstants::PISTON_FWD_CHANNEL,
+      IntakeConstants::PISTON_REV_CHANNEL};  // create our simulation solenoid
 };
 
 TEST_CASE_METHOD(IntakeTest, "IntakeTest doesnt work when closed",

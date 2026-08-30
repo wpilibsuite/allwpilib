@@ -36,39 +36,39 @@ def test_contains():
 
 
 def test_distance():
-    kEpsilon = 1e-9
+    EPSILON = 1e-9
 
     center = Pose2d(x=1.0, y=2.0, rotation=Rotation2d.from_degrees(270))
     rect = Rectangle2d(center, x_width=1, y_width=2.0)
 
     point1 = Translation2d(x=2.5, y=2)
-    assert rect.distance(point1) == pytest.approx(0.5, abs=kEpsilon)
+    assert rect.distance(point1) == pytest.approx(0.5, abs=EPSILON)
 
     point2 = Translation2d(x=1, y=2)
-    assert rect.distance(point2) == pytest.approx(0, abs=kEpsilon)
+    assert rect.distance(point2) == pytest.approx(0, abs=EPSILON)
 
     point3 = Translation2d(x=1, y=1)
-    assert rect.distance(point3) == pytest.approx(0.5, abs=kEpsilon)
+    assert rect.distance(point3) == pytest.approx(0.5, abs=EPSILON)
 
     point4 = Translation2d(x=-1, y=2.5)
-    assert rect.distance(point4) == pytest.approx(1, abs=kEpsilon)
+    assert rect.distance(point4) == pytest.approx(1, abs=EPSILON)
 
 
 def test_nearest():
-    kEpsilon = 1e-9
+    EPSILON = 1e-9
 
     center = Pose2d(x=1, y=1, rotation=Rotation2d.from_degrees(90))
     rect = Rectangle2d(center, x_width=3, y_width=4)
 
     point1 = Translation2d(x=1, y=3)
     nearest_point1 = rect.nearest(point1)
-    assert nearest_point1.x == pytest.approx(1.0, abs=kEpsilon)
-    assert nearest_point1.y == pytest.approx(2.5, abs=kEpsilon)
+    assert nearest_point1.x == pytest.approx(1.0, abs=EPSILON)
+    assert nearest_point1.y == pytest.approx(2.5, abs=EPSILON)
 
     point2 = Translation2d(x=0, y=0)
     nearest_point2 = rect.nearest(point2)
-    assert nearest_point2.x == pytest.approx(0.0, abs=kEpsilon)
-    assert nearest_point2.y == pytest.approx(0.0, abs=kEpsilon)
+    assert nearest_point2.x == pytest.approx(0.0, abs=EPSILON)
+    assert nearest_point2.y == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_equals():

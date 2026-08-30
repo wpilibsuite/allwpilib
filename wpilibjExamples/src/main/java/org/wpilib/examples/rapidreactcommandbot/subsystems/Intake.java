@@ -8,23 +8,24 @@ import static org.wpilib.examples.rapidreactcommandbot.Constants.IntakeConstants
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rapidreactcommandbot.Constants.IntakeConstants;
-import org.wpilib.hardware.motor.PWMSparkMax;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 @Logged
 public class Intake extends SubsystemBase {
-  private final PWMSparkMax motor = new PWMSparkMax(IntakeConstants.kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(IntakeConstants.MOTOR_PORT);
 
   // Double solenoid connected to two channels of a PCM with the default CAN ID
   private final DoubleSolenoid pistons =
       new DoubleSolenoid(
-          0,
+          CANPort.CAN_S0,
           PneumaticsModuleType.CTRE_PCM,
-          IntakeConstants.kSolenoidPorts[0],
-          IntakeConstants.kSolenoidPorts[1]);
+          IntakeConstants.SOLENOID_PORTS[0],
+          IntakeConstants.SOLENOID_PORTS[1]);
 
   /** Returns a command that deploys the intake, and then runs the intake motor indefinitely. */
   public Command intakeCommand() {

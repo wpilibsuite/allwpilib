@@ -74,7 +74,7 @@ public class DrivetrainSplineSample extends HolonomicSample {
 
   /** Constructs a DrivetrainSplineSample with all values set to zero. */
   public DrivetrainSplineSample() {
-    this(0.0, Pose2d.kZero, 0.0, 0.0, 0.0);
+    this(0.0, Pose2d.ZERO, 0.0, 0.0, 0.0);
   }
 
   /**

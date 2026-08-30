@@ -124,7 +124,7 @@ class BooleanEvent {
    */
   BooleanEvent Debounce(wpi::units::second_t debounceTime,
                         wpi::math::Debouncer::DebounceType type =
-                            wpi::math::Debouncer::DebounceType::kRising);
+                            wpi::math::Debouncer::DebounceType::RISING);
 
  private:
   /// Poller loop.

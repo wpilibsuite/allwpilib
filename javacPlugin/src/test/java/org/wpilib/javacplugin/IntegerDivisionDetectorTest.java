@@ -146,7 +146,7 @@ class IntegerDivisionDetectorTest {
     final String finalSource = code.toString();
     var compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", finalSource));
 
     var errors = compilation.errors();
@@ -179,7 +179,7 @@ class IntegerDivisionDetectorTest {
 
     var compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -198,7 +198,7 @@ class IntegerDivisionDetectorTest {
 
     var compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -235,7 +235,7 @@ class IntegerDivisionDetectorTest {
 
     var compilation =
         javac()
-            .withOptions(CompileTestUtils.kJavaVersionOptions)
+            .withOptions(CompileTestUtils.JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();

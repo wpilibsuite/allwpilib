@@ -14,11 +14,15 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
+    name = "generated-native-include-files",
+    srcs = glob(["src/generated/main/native/include/**/*"]),
+)
+
+filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/include/**/*",
         "src/main/native/include/**/*",
-    ]),
+    ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
 
@@ -234,6 +238,7 @@ package_default_jni_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-ntcore-generator",
+    generated_include_target = "//ntcore:generated-native-include-files",
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -273,6 +278,7 @@ ntcore_extension(
 
 define_pybind_library(
     name = "pyntcore",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 

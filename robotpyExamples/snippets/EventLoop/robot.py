@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 SHOT_VELOCITY = 200.0  # rpm
@@ -16,14 +17,14 @@ class MyRobot(wpilib.TimedRobot):
     def __init__(self) -> None:
         super().__init__()
 
-        self.shooter = wpilib.PWMSparkMax(0)
+        self.shooter = wpilib_drivers.PWMSparkMax(0)
         self.shooter_encoder = wpilib.Encoder(0, 1)
         self.controller = wpimath.PIDController(0.3, 0, 0)
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(0.1, 0.065)
 
-        self.kicker = wpilib.PWMSparkMax(1)
+        self.kicker = wpilib_drivers.PWMSparkMax(1)
 
-        self.intake = wpilib.PWMSparkMax(2)
+        self.intake = wpilib_drivers.PWMSparkMax(2)
 
         self.loop = wpilib.EventLoop()
         self.joystick = wpilib.Joystick(0)

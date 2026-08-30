@@ -216,7 +216,7 @@ class NetworkTablesModel : public Model {
 
 using NetworkTablesFlags = int;
 
-static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 9;
+static constexpr const int NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT = 9;
 
 enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
@@ -227,9 +227,10 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowTimestamp = 1 << 5,
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
-  NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
+  NetworkTablesFlags_Precision = 0xff
+                                 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT,
   NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
-                               (6 << kNetworkTablesFlags_PrecisionBitShift),
+                               (6 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT),
 };
 
 void DisplayNetworkTablesInfo(NetworkTablesModel* model);

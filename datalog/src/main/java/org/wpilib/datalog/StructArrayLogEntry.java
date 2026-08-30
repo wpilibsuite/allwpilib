@@ -34,7 +34,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * @param name name of the entry
    * @param struct struct serialization implementation
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return StructArrayLogEntry
    */
   public static <T> StructArrayLogEntry<T> create(
@@ -64,7 +64,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * @param log datalog
    * @param name name of the entry
    * @param struct struct serialization implementation
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    * @return StructArrayLogEntry
    */
   public static <T> StructArrayLogEntry<T> create(
@@ -100,7 +100,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(T[] value, long timestamp) {
     synchronized (m_buf) {
@@ -122,7 +122,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * Appends a record to the log.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void append(Collection<T> value, long timestamp) {
     synchronized (m_buf) {
@@ -147,7 +147,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void update(T[] value, long timestamp) {
     synchronized (m_buf) {
@@ -189,7 +189,7 @@ public final class StructArrayLogEntry<T> extends DataLogEntry {
    * pointing to the same underlying log entry name will likely result in unexpected results.
    *
    * @param value Value to record
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void update(Collection<T> value, long timestamp) {
     synchronized (m_buf) {

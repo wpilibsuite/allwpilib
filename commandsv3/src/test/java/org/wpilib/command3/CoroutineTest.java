@@ -62,12 +62,12 @@ class CoroutineTest extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(command));
 
     // Advance time to 0.5s
-    currentTime.set(500_000L);
+    currentTime.set(500_000_000L);
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command));
 
     // Advance time to 1.1s (past 1.0s timeout)
-    currentTime.set(1_100_000L);
+    currentTime.set(1_100_000_000L);
     m_scheduler.run();
 
     // Should have timed out
@@ -107,7 +107,7 @@ class CoroutineTest extends CommandTestBase {
     m_scheduler.run();
 
     // Advance time to exactly 1.0s and set condition
-    currentTime.set(1_000_000L);
+    currentTime.set(1_000_000_000L);
     condition.set(true);
     m_scheduler.run();
 

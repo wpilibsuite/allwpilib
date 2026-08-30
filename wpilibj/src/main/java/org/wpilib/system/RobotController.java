@@ -6,10 +6,11 @@ package org.wpilib.system;
 
 import static org.wpilib.units.Units.Amps;
 import static org.wpilib.units.Units.Celsius;
-import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Volts;
 
 import java.util.function.LongSupplier;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.hardware.hal.PowerJNI;
@@ -59,53 +60,53 @@ public final class RobotController {
   }
 
   /**
-   * Sets a new source to provide the clock time in microseconds. Changing this affects the return
+   * Sets a new source to provide the clock time in nanoseconds. Changing this affects the return
    * value of {@code getTime} in Java.
    *
-   * @param supplier Function to return the time in microseconds.
+   * @param supplier Function to return the time in nanoseconds.
    */
   public static void setTimeSource(LongSupplier supplier) {
     m_timeSource = supplier;
   }
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the monotonic clock. However,
+   * Read the nanosecond timestamp. By default, the time is based on the monotonic clock. However,
    * the return value of this method may be modified to use any time base, including non-monotonic
    * and non-continuous time bases.
    *
-   * @return The current time in microseconds.
+   * @return The current time in nanoseconds.
    */
   public static long getTime() {
     return m_timeSource.getAsLong();
   }
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the monotonic clock. However,
+   * Read the nanosecond timestamp. By default, the time is based on the monotonic clock. However,
    * the return value of this method may be modified to use any time base, including non-monotonic
    * and non-continuous time bases.
    *
    * @return The current time in a measure.
    */
   public static Time getMeasureTime() {
-    return Microseconds.of(m_timeSource.getAsLong());
+    return Nanoseconds.of(m_timeSource.getAsLong());
   }
 
   /**
-   * Read the microsecond monotonic timer.
+   * Read the nanosecond monotonic timer.
    *
-   * @return The current monotonic time in microseconds.
+   * @return The current monotonic time in nanoseconds.
    */
   public static long getMonotonicTime() {
     return HALUtil.getMonotonicTime();
   }
 
   /**
-   * Read the microsecond monotonic timer in a measure.
+   * Read the nanosecond monotonic timer in a measure.
    *
    * @return The current monotonic time in a measure.
    */
   public static Time getMeasureMonotonicTime() {
-    return Microseconds.of(HALUtil.getMonotonicTime());
+    return Nanoseconds.of(HALUtil.getMonotonicTime());
   }
 
   /**
@@ -261,43 +262,30 @@ public final class RobotController {
   }
 
   /**
-   * Get the current brownout voltage setting.
+   * Set the voltages where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage
+   * <p>The brownout voltage must be between 5 V and 8 V, inclusive. The recovery voltage must be no
+   * greater than 8.5 V and at least 0.5 V above the brownout voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from brownout
    */
-  public static double getBrownoutVoltage() {
-    return PowerJNI.getBrownoutVoltage();
+  public static void setBrownoutVoltages(double brownoutVoltage, double recoveryVoltage) {
+    PowerJNI.setBrownoutVoltages(brownoutVoltage, recoveryVoltage);
   }
 
   /**
-   * Get the current brownout voltage setting in a measure.
+   * Set the voltages in measures where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage in a measure.
+   * <p>The brownout voltage must be between 5 V and 8 V, inclusive. The recovery voltage must be no
+   * greater than 8.5 V and at least 0.5 V above the brownout voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from brownout
    */
-  public static Voltage getMeasureBrownoutVoltage() {
-    return Volts.of(PowerJNI.getBrownoutVoltage());
-  }
-
-  /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
-   *
-   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage
-   */
-  public static void setBrownoutVoltage(double brownoutVoltage) {
-    PowerJNI.setBrownoutVoltage(brownoutVoltage);
-  }
-
-  /**
-   * Set the voltage in a measure the roboRIO will brownout and disable all outputs.
-   *
-   * <p>Note that this only does anything on the roboRIO 2. On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage in a measure
-   */
-  public static void setBrownoutVoltage(Voltage brownoutVoltage) {
-    PowerJNI.setBrownoutVoltage(brownoutVoltage.baseUnitMagnitude());
+  public static void setBrownoutVoltages(Voltage brownoutVoltage, Voltage recoveryVoltage) {
+    PowerJNI.setBrownoutVoltages(
+        brownoutVoltage.baseUnitMagnitude(), recoveryVoltage.baseUnitMagnitude());
   }
 
   /**
@@ -324,9 +312,9 @@ public final class RobotController {
    * @param busId The bus ID
    * @return The status of the CAN bus
    */
-  public static CANStatus getCANStatus(int busId) {
+  public static CANStatus getCANStatus(CANPort busId) {
     CANStatus status = new CANStatus();
-    CANJNI.getCANStatus(busId, status);
+    CANJNI.getCANStatus(busId.value, status);
     return status;
   }
 }

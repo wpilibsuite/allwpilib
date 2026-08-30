@@ -5,17 +5,18 @@
 #
 
 import commands2
+import telemetry
 import wpilib
+import wpilib_drivers
 import constants
 
 
 class DriveSubsystem(commands2.Subsystem):
     def __init__(self) -> None:
-
-        self.left1 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
-        self.left2 = wpilib.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
-        self.right1 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
-        self.right2 = wpilib.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
+        self.left1 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR1_PORT)
+        self.left2 = wpilib_drivers.PWMVictorSPX(constants.LEFT_MOTOR2_PORT)
+        self.right1 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR1_PORT)
+        self.right2 = wpilib_drivers.PWMVictorSPX(constants.RIGHT_MOTOR2_PORT)
 
         self.left1.add_follower(self.left2)
         self.right1.add_follower(self.right2)
@@ -68,3 +69,8 @@ class DriveSubsystem(commands2.Subsystem):
         drive to drive more slowly.
         """
         self.drive.set_max_output(max_output)
+
+    def log_to(self, table: telemetry.TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("leftDistance", self.left_encoder.get_distance())
+        table.log("rightDistance", self.right_encoder.get_distance())

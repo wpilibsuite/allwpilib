@@ -15,12 +15,11 @@
 #include "wpi/nt/IntegerArrayTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 class NTCommandSchedulerModel : public CommandSchedulerModel {
  public:
-  static constexpr const char* kType = "Scheduler";
+  static constexpr const char* TYPE = "Scheduler";
 
   explicit NTCommandSchedulerModel(std::string_view path);
   NTCommandSchedulerModel(wpi::nt::NetworkTableInstance inst,
@@ -35,14 +34,17 @@ class NTCommandSchedulerModel : public CommandSchedulerModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return false; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_name;
   wpi::nt::StringArraySubscriber m_commands;
   wpi::nt::IntegerArraySubscriber m_ids;
+  wpi::nt::IntegerArrayTopic m_cancelTopic;
+  wpi::nt::IntegerArrayTopic m_cancelTuneTopic;
+  wpi::nt::IntegerArrayTopic m_cancelValueTopic;
   wpi::nt::IntegerArrayPublisher m_cancel;
+  wpi::nt::IntegerArrayPublisher m_cancelTune;
 
   std::string m_nameValue;
   std::vector<std::string> m_commandsValue;

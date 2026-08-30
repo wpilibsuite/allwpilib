@@ -39,6 +39,7 @@ import org.wpilib.networktables.StructPublisher;
 import org.wpilib.util.Alert;
 import org.wpilib.util.AlertException;
 import org.wpilib.util.Color;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.EventVector;
 
@@ -150,7 +151,7 @@ public final class DriverStationBackend {
   }
 
   private static class MatchDataSender {
-    private static final String kSmartDashboardType = "DriverStation";
+    private static final String SMART_DASHBOARD_TYPE = "DriverStation";
 
     final StringPublisher gameData;
     final StringPublisher eventName;
@@ -178,8 +179,8 @@ public final class DriverStationBackend {
       table
           .getStringTopic(".type")
           .publishEx(
-              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}")
-          .set(kSmartDashboardType);
+              StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + SMART_DASHBOARD_TYPE + "\"}")
+          .set(SMART_DASHBOARD_TYPE);
       gameData = table.getStringTopic("GameData").publish();
       gameData.set("");
       eventName = table.getStringTopic("EventName").publish();
@@ -1634,7 +1635,8 @@ public final class DriverStationBackend {
             .collect(Collectors.groupingBy(OpModeOption::getMode, Collectors.counting()));
 
     for (RobotMode mode : RobotMode.values()) {
-      HAL.reportUsage("OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
+      UsageReporting.reportUsage(
+          "OpMode/" + mode, String.valueOf(modeCounts.getOrDefault(mode, 0L)));
     }
   }
 

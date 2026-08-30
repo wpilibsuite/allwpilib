@@ -8,6 +8,7 @@ apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
 evaluationDependsOn(':hal')
+evaluationDependsOn(':drivers')
 
 apply from: '../shared/config.gradle'
 apply from: "${rootDir}/shared/catch2.gradle"
@@ -67,6 +68,7 @@ ext {
 
 def simModules = ["halsim_gui"]
 
+apply from: "${rootDir}/shared/libmrclib.gradle"
 apply from: "${rootDir}/shared/opencv.gradle"
 
 model {
@@ -83,13 +85,17 @@ model {
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':fields', library: 'fields', linkage: 'shared'
                 lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                lib project: ':drivers', library: 'drivers', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                 project(':ntcore').addNtcoreDependency(binary, 'shared')
                 lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                project(':hal').addHalDependency(binary, 'shared')
+                nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
             }
             sources {
                 cpp {
@@ -113,15 +119,19 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     if (binary.targetPlatform.name == getCurrentArch()) {
                         simModules.each {
                             lib project: ":simulation:$it", library: it, linkage: 'shared'
@@ -162,15 +172,19 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 }
                 sources {
                     cpp {
@@ -194,15 +208,19 @@ model {
                     lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
                     lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
                     lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    lib project: ':drivers', library: 'drivers', linkage: 'shared'
                     lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                     lib project: ':fields', library: 'fields', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
                     project(':ntcore').addNtcoreDependency(binary, 'shared')
                     lib project: ':cscore', library: 'cscore', linkage: 'shared'
-                    project(':hal').addHalDependency(binary, 'shared')
+                    nativeUtils.useRequiredLibrary(binary, 'mrclib')
+                    lib project: ':hal', library: 'hal', linkage: 'shared'
                     lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
                     lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                    lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     if (binary.targetPlatform.name == getCurrentArch()) {
                         simModules.each {
                             lib project: ":simulation:$it", library: it, linkage: 'shared'
@@ -312,15 +330,19 @@ model {
             lib project: ':romiVendordep', library: 'romiVendordep', linkage: 'shared'
             lib project: ':xrpVendordep', library: 'xrpVendordep', linkage: 'shared'
             lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+            lib project: ':drivers', library: 'drivers', linkage: 'shared'
             lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
             lib project: ':fields', library: 'fields', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':cscore', library: 'cscore', linkage: 'shared'
-            project(':hal').addHalDependency(it, 'shared')
+            nativeUtils.useRequiredLibrary(it, 'mrclib')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             nativeUtils.useRequiredLibrary(it, 'opencv_shared')
 
             it.cppCompiler.define('RUNNING_WPILIB_TESTS')

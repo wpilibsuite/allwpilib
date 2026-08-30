@@ -55,7 +55,7 @@ static const JClassInit classes[] = {
     {"[J", &jlongArrayCls},
     {"[F", &jfloatArrayCls},
     {"[D", &jdoubleArrayCls},
-    {"[Ljava/lang/Object;", &jobjectArrayCls},
+    {"[Ljava/lang/String;", &jobjectArrayCls},
 };
 
 static const JExceptionInit exceptions[] = {
@@ -220,7 +220,7 @@ static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedDoubleArray value) {
 
 static jobject MakeJObject(JNIEnv* env, wpi::nt::TimestampedStringArray value) {
   static jmethodID constructor = env->GetMethodID(
-      timestampedStringArrayCls, "<init>", "(JJ[Ljava/lang/Object;)V");
+      timestampedStringArrayCls, "<init>", "(JJ[Ljava/lang/String;)V");
   JLocal<jobjectArray> val{env, MakeJStringArray(env, value.value)};
   return env->NewObject(timestampedStringArrayCls, constructor,
                         static_cast<jlong>(value.time),
@@ -1351,7 +1351,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultDoubleArray
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getAtomicStringArray
- * Signature: (I[Ljava/lang/Object;)Lorg/wpilib/networktables/TimestampedStringArray;
+ * Signature: (I[Ljava/lang/String;)Lorg/wpilib/networktables/TimestampedStringArray;
  */
 JNIEXPORT jobject JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_getAtomicStringArray
@@ -1375,7 +1375,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_readQueueStringArray
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    readQueueValuesStringArray
- * Signature: (I)[[Ljava/lang/Object;
+ * Signature: (I)[[Ljava/lang/String;
  */
 JNIEXPORT jobjectArray JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesStringArray
@@ -1387,7 +1387,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_readQueueValuesStringArray
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setStringArray
- * Signature: (IJ[Ljava/lang/Object;)Z
+ * Signature: (IJ[Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setStringArray
@@ -1403,7 +1403,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setStringArray
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    getStringArray
- * Signature: (I[Ljava/lang/Object;)[Ljava/lang/Object;
+ * Signature: (I[Ljava/lang/String;)[Ljava/lang/String;
  */
 JNIEXPORT jobjectArray JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_getStringArray
@@ -1419,7 +1419,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_getStringArray
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setDefaultStringArray
- * Signature: (IJ[Ljava/lang/Object;)Z
+ * Signature: (IJ[Ljava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setDefaultStringArray

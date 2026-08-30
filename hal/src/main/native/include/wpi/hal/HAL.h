@@ -108,11 +108,11 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status);
 int32_t HAL_GetCommsDisableCount(int32_t* status);
 
 /**
- * Reads the microsecond-resolution monotonic timer.
+ * Reads the nanosecond-resolution monotonic timer.
  *
- * @return The current monotonic time in microseconds.
+ * @return The current monotonic time in nanoseconds.
  */
-uint64_t HAL_GetMonotonicTime(void);
+int64_t HAL_GetMonotonicTime(void);
 
 /**
  * Gets the current state of the Robot Signal Light (RSL).

@@ -9,7 +9,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeDIOData() {
-  static DIOData sdd[kNumDigitalChannels];
+  static DIOData sdd[NUM_DIGITAL_CHANNELS];
   ::wpi::hal::SimDIOData = sdd;
 }
 }  // namespace wpi::hal::init

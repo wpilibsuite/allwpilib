@@ -11,15 +11,15 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::Rotation2d>;
-const Rotation2d kExpectedData{Rotation2d{1.91_rad}};
+const Rotation2d EXPECTED_DATA{Rotation2d{1.91_rad}};
 }  // namespace
 
 TEST_CASE("Rotation2dStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Rotation2d unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.Radians() == unpacked_data.Radians());
+  CHECK(EXPECTED_DATA.Radians() == unpacked_data.Radians());
 }

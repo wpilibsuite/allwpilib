@@ -21,7 +21,7 @@ class EllipticalRegionConstraintTest {
     double maxVelocity = Units.feetToMeters(3.0);
     var ellipse =
         new Ellipse2d(
-            new Pose2d(Units.feetToMeters(5.0), Units.feetToMeters(2.5), Rotation2d.kPi),
+            new Pose2d(Units.feetToMeters(5.0), Units.feetToMeters(2.5), Rotation2d.PI),
             Units.feetToMeters(5.0),
             Units.feetToMeters(2.5));
 

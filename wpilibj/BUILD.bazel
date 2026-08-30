@@ -35,19 +35,6 @@ py_binary(
 )
 
 py_binary(
-    name = "generate_pwm_motor_controllers",
-    srcs = ["generate_pwm_motor_controllers.py"],
-    target_compatible_with = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
-    deps = [
-        requirement("jinja2"),
-        "//:generation",
-    ],
-)
-
-py_binary(
     name = "generate_wpilibj_py",
     srcs = ["generate_wpilibj.py"],
     main = "generate_wpilibj.py",
@@ -58,7 +45,6 @@ py_binary(
     deps = [
         ":generate_first_ds_hids",
         ":generate_hids",
-        ":generate_pwm_motor_controllers",
     ],
 )
 
@@ -102,10 +88,14 @@ wpilib_java_library(
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
         "@maven//:org_ejml_ejml_java9module",
     ],
 )
@@ -128,11 +118,15 @@ wpilib_java_junit5_test(
     resources = glob(["src/test/resources/**"]),
     deps = [
         ":wpilibj-java",
+        "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 
@@ -150,6 +144,8 @@ java_binary(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
@@ -167,18 +163,9 @@ filegroup(
 )
 
 filegroup(
-    name = "pwm_schema",
-    srcs = [
-        "src/generate/pwm_motor_controllers.json",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
     name = "templates",
     srcs = glob(["src/generate/**/*.jinja"]) + [
         ":hid_schema",
-        ":pwm_schema",
     ],
     visibility = ["//visibility:public"],
 )

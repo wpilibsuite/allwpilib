@@ -16,8 +16,7 @@ struct WPILIB_DLLEXPORT
   }
   static constexpr size_t GetSize() { return 32; }
   static constexpr std::string_view GetSchema() {
-    return "double kv_linear;double ka_linear;double kv_angular;double "
-           "ka_angular";
+    return "double kvLinear;double kaLinear;double kvAngular;double kaAngular";
   }
 
   static wpi::math::DifferentialDriveFeedforward Unpack(

@@ -61,20 +61,13 @@ public class PowerJNI extends JNIWrapper {
   public static native void resetUserCurrentFaults();
 
   /**
-   * Set the voltage the Systemcore will brownout and disable all outputs.
+   * Set the voltages where the Systemcore will enter and recover from brownout.
    *
-   * @param voltage The brownout voltage
-   * @see "HAL_SetBrownoutVoltage"
+   * @param brownoutVoltage the voltage where the Systemcore will enter brownout
+   * @param recoveryVoltage the voltage where the Systemcore will recover from brownout
+   * @see "HAL_SetBrownoutVoltages"
    */
-  public static native void setBrownoutVoltage(double voltage);
-
-  /**
-   * Get the current brownout voltage setting.
-   *
-   * @return The brownout voltage
-   * @see "HAL_GetBrownoutVoltage"
-   */
-  public static native double getBrownoutVoltage();
+  public static native void setBrownoutVoltages(double brownoutVoltage, double recoveryVoltage);
 
   /**
    * Get the current CPU temperature in degrees Celsius.

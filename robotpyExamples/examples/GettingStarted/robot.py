@@ -6,6 +6,7 @@
 #
 
 import wpilib
+import wpilib_drivers
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -15,8 +16,8 @@ class MyRobot(wpilib.TimedRobot):
         should be used for any initialization code.
         """
         super().__init__()
-        self.left_drive = wpilib.PWMSparkMax(0)
-        self.right_drive = wpilib.PWMSparkMax(1)
+        self.left_drive = wpilib_drivers.PWMSparkMax(0)
+        self.right_drive = wpilib_drivers.PWMSparkMax(1)
         self.robot_drive = wpilib.DifferentialDrive(self.left_drive, self.right_drive)
         self.controller = wpilib.Gamepad(0)
         self.timer = wpilib.Timer()

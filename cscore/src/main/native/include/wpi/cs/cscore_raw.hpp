@@ -25,17 +25,17 @@ CS_Source CreateRawSource(std::string_view name, bool isCv,
 
 CS_Sink CreateRawSink(std::string_view name, bool isCv, CS_Status* status);
 CS_Sink CreateRawSinkCallback(std::string_view name, bool isCv,
-                              std::function<void(uint64_t time)> processFrame,
+                              std::function<void(int64_t time)> processFrame,
                               CS_Status* status);
 
 void PutSourceFrame(CS_Source source, const WPI_RawFrame& image,
                     CS_Status* status);
-uint64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status);
-uint64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
-                              CS_Status* status);
-uint64_t GrabSinkFrameTimeoutLastTime(CS_Sink sink, WPI_RawFrame& image,
-                                      double timeout, uint64_t lastFrameTime,
-                                      CS_Status* status);
+int64_t GrabSinkFrame(CS_Sink sink, WPI_RawFrame& image, CS_Status* status);
+int64_t GrabSinkFrameTimeout(CS_Sink sink, WPI_RawFrame& image, double timeout,
+                             CS_Status* status);
+int64_t GrabSinkFrameTimeoutLastTime(CS_Sink sink, WPI_RawFrame& image,
+                                     double timeout, int64_t lastFrameTime,
+                                     CS_Status* status);
 
 /** @} */
 

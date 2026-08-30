@@ -6,6 +6,7 @@
 import math
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 
@@ -16,10 +17,10 @@ class Drivetrain:
     MAX_ANGULAR_VELOCITY = math.pi  # 1/2 rotation per second
 
     def __init__(self) -> None:
-        self.front_left_motor = wpilib.PWMSparkMax(1)
-        self.front_right_motor = wpilib.PWMSparkMax(2)
-        self.back_left_motor = wpilib.PWMSparkMax(3)
-        self.back_right_motor = wpilib.PWMSparkMax(4)
+        self.front_left_motor = wpilib_drivers.PWMSparkMax(1)
+        self.front_right_motor = wpilib_drivers.PWMSparkMax(2)
+        self.back_left_motor = wpilib_drivers.PWMSparkMax(3)
+        self.back_right_motor = wpilib_drivers.PWMSparkMax(4)
 
         self.front_left_encoder = wpilib.Encoder(0, 1)
         self.front_right_encoder = wpilib.Encoder(2, 3)

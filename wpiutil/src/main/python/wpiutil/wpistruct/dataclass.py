@@ -220,6 +220,8 @@ def _process_class(cls, struct_name: typing.Optional[str]):
 
     s = struct.Struct(f"<{''.join(fmts)}")
     uvals = ", ".join(unpackvals)
+    if len(unpackvals) == 1:
+        uvals += ","
     cvals = ", ".join(cvvals)
     vals = ", ".join(vvals)
 

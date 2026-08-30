@@ -16,13 +16,16 @@ void wpi::glass::DisplayCommandSelector(CommandSelectorModel* m) {
   }
   if (m->Exists()) {
     if (auto run = m->GetRunningData()) {
+      bool readOnly = m->IsReadOnly();
       bool running = run->GetValue();
-      if (ImGui::Button(running ? "Cancel" : "Run")) {
+      if (!readOnly && ImGui::Button(running ? "Cancel" : "Run")) {
         running = !running;
         m->SetRunning(running);
       }
-      ImGui::SameLine();
       if (running) {
+        if (!readOnly) {
+          ImGui::SameLine();
+        }
         ImGui::Text("Running...");
       }
     }

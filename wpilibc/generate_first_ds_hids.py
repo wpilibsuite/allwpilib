@@ -14,7 +14,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader
-from shared.generation import write_file, add_jinja_args, make_arg_parser
+
+from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
 def _capitalize_first(name: str) -> str:
@@ -89,6 +90,10 @@ def _hex_literal(value: int):
 def _normalize_controller(controller: dict):
     normalized = dict(controller)
     normalized["axes"] = _normalize_mapping(controller["axes"])
+    for axis in normalized["axes"]:
+        # The standardized DS gamepad layout uses axes 0-3 for sticks and
+        # axes 4-5 for analog triggers.
+        axis["DefaultDeadband"] = 0.1 if axis["value"] < 4 else 0.01
     normalized["buttons"] = _normalize_mapping(controller["buttons"])
     normalized["supportedOutputs"] = _supported_outputs(controller)
     normalized["SupportedOutputsValue"] = _supported_outputs_value(

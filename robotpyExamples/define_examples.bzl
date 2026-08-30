@@ -15,6 +15,7 @@ def _define_robot_project(projects, project_type):
             ":robotpy",
             "//apriltag:robotpy-apriltag",
             "//commandsv2:commandsv2-py",
+            "//drivers:wpilib-drivers",
             "//fields:robotpy-fields",
             "//wpilibc:robotpy-wpilib",
             "//romiVendordep:robotpy-romi",

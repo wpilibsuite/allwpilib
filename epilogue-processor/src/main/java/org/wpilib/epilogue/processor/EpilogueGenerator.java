@@ -59,7 +59,7 @@ public class EpilogueGenerator {
         out.println("import static org.wpilib.units.Units.Seconds;");
         out.println();
 
-        out.println("import org.wpilib.hardware.hal.HAL;");
+        out.println("import org.wpilib.util.UsageReporting;");
         out.println();
 
         out.println("public final class Epilogue {");
@@ -68,7 +68,7 @@ public class EpilogueGenerator {
         out.println(
             """
               static {
-                HAL.reportUsage("Epilogue", "");
+                UsageReporting.reportUsage("Epilogue", "");
               }
             """);
 
@@ -133,9 +133,9 @@ public class EpilogueGenerator {
           out.println(
               "    "
                   + StringUtils.loggerFieldName(mainRobotClass)
-                  + ".tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);");
+                  + ".tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);");
           out.println(
-              "    config.backend.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
+              "    config.table.log(\"Epilogue/Stats/Last Run\", (System.nanoTime() - start) / 1e6);");
           out.println("  }");
         }
 

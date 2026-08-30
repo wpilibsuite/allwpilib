@@ -64,15 +64,15 @@ struct BackendState {
 };
 
 BackendState gBackendState;
-uint64_t gMockNow = 0;
+int64_t gMockNow = 0;
 
-uint64_t MockNow() {
+int64_t MockNow() {
   return gMockNow;
 }
 
 class ScopedNowImpl {
  public:
-  explicit ScopedNowImpl(uint64_t now) {
+  explicit ScopedNowImpl(int64_t now) {
     gMockNow = now;
     WPI_SetNowImpl(MockNow);
   }
@@ -151,7 +151,7 @@ void BackendResetAlertData() {
   gBackendState.reset = true;
 }
 
-const WPI_AlertBackend kTestBackend{
+const WPI_AlertBackend testBackend{
     BackendCreateAlert,   BackendDestroyAlert,  BackendSetAlertActive,
     BackendIsAlertActive, BackendSetAlertText,  BackendGetAlertText,
     BackendGetAlertLevel, BackendGetNumAlerts,  BackendGetAlerts,
@@ -394,7 +394,7 @@ TEST_CASE_METHOD(AlertTest,
                  "AlertTest CApiNullCreateHandleRejectedBeforeBackend",
                  "[wpiutil]") {
   gBackendState = BackendState{};
-  WPI_SetAlertBackend(&kTestBackend);
+  WPI_SetAlertBackend(&testBackend);
 
   WPI_String group = wpi::util::make_string("backendGroup");
   WPI_String id = wpi::util::make_string("backendId");
@@ -409,7 +409,7 @@ TEST_CASE_METHOD(AlertTest,
 TEST_CASE_METHOD(AlertTest, "AlertTest CustomBackendDispatchesAllOperations",
                  "[wpiutil]") {
   gBackendState = BackendState{};
-  WPI_SetAlertBackend(&kTestBackend);
+  WPI_SetAlertBackend(&testBackend);
 
   WPI_String group = wpi::util::make_string("backendGroup");
   WPI_String id = wpi::util::make_string("backendId");
@@ -459,7 +459,7 @@ TEST_CASE_METHOD(AlertTest, "AlertTest CustomBackendDispatchesAllOperations",
 TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperReleaseDoesNotDestroyHandle",
                  "[wpiutil]") {
   gBackendState = BackendState{};
-  WPI_SetAlertBackend(&kTestBackend);
+  WPI_SetAlertBackend(&testBackend);
 
   {
     Alert alert{"backendGroup", "backendId", "backendText",

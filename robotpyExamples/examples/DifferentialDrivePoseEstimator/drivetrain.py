@@ -8,7 +8,9 @@ import math
 
 import ntcore
 import robotpy_fields
+import telemetry
 import wpilib
+import wpilib_drivers
 import wpilib.simulation
 import wpimath
 import wpimath.units
@@ -25,10 +27,10 @@ class Drivetrain:
     ENCODER_RESOLUTION = 4096
 
     def __init__(self, camera_to_object_topic: ntcore.DoubleArrayTopic) -> None:
-        self.left_leader = wpilib.PWMSparkMax(1)
-        self.left_follower = wpilib.PWMSparkMax(2)
-        self.right_leader = wpilib.PWMSparkMax(3)
-        self.right_follower = wpilib.PWMSparkMax(4)
+        self.left_leader = wpilib_drivers.PWMSparkMax(1)
+        self.left_follower = wpilib_drivers.PWMSparkMax(2)
+        self.right_leader = wpilib_drivers.PWMSparkMax(3)
+        self.right_follower = wpilib_drivers.PWMSparkMax(4)
 
         self.left_encoder = wpilib.Encoder(0, 1)
         self.right_encoder = wpilib.Encoder(2, 3)
@@ -108,9 +110,6 @@ class Drivetrain:
 
         self.left_encoder.reset()
         self.right_encoder.reset()
-
-        wpilib.SmartDashboard.put_data("Field", self.field_sim)
-        wpilib.SmartDashboard.put_data("FieldEstimation", self.field_approximation)
 
     def set_velocities(
         self, velocities: wpimath.DifferentialDriveWheelVelocities
@@ -269,3 +268,6 @@ class Drivetrain:
         self.field_approximation.set_robot_pose(
             self.pose_estimator.get_estimated_position()
         )
+
+        telemetry.log("Field", self.field_sim)
+        telemetry.log("FieldEstimation", self.field_approximation)

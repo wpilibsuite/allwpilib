@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'java-library'
     id "org.ysb33r.doxygen" version "2.0.0"
 }
 
@@ -7,12 +8,15 @@ evaluationDependsOn(':apriltag')
 evaluationDependsOn(':cameraserver')
 evaluationDependsOn(':commandsv3')
 evaluationDependsOn(':cscore')
+evaluationDependsOn(':datalog')
 evaluationDependsOn(':epilogue-runtime')
 evaluationDependsOn(':fields')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
 evaluationDependsOn(':wpiannotations')
 evaluationDependsOn(':commandsv2')
+evaluationDependsOn(':telemetry')
+evaluationDependsOn(':tunables')
 evaluationDependsOn(':wpilibc')
 evaluationDependsOn(':wpilibj')
 evaluationDependsOn(':wpimath')
@@ -22,6 +26,7 @@ evaluationDependsOn(':wpiutil')
 evaluationDependsOn(':romiVendordep')
 evaluationDependsOn(':xrpVendordep')
 evaluationDependsOn(':datalog')
+evaluationDependsOn(':drivers')
 
 def baseArtifactIdCpp = 'documentation'
 def artifactGroupIdCpp = 'org.wpilib.wpilibc'
@@ -39,17 +44,20 @@ def cppIncludeRoots = []
 cppProjectZips.add(project(':apriltag').cppHeadersZip)
 cppProjectZips.add(project(':cameraserver').cppHeadersZip)
 cppProjectZips.add(project(':cscore').cppHeadersZip)
+cppProjectZips.add(project(':datalog').cppHeadersZip)
+cppProjectZips.add(project(':drivers').cppHeadersZip)
 cppProjectZips.add(project(':fields').cppHeadersZip)
 cppProjectZips.add(project(':hal').cppHeadersZip)
 cppProjectZips.add(project(':ntcore').cppHeadersZip)
 cppProjectZips.add(project(':commandsv2').cppHeadersZip)
+cppProjectZips.add(project(':telemetry').cppHeadersZip)
+cppProjectZips.add(project(':tunables').cppHeadersZip)
 cppProjectZips.add(project(':wpilibc').cppHeadersZip)
 cppProjectZips.add(project(':wpimath').cppHeadersZip)
 cppProjectZips.add(project(':wpinet').cppHeadersZip)
 cppProjectZips.add(project(':wpiutil').cppHeadersZip)
 cppProjectZips.add(project(':romiVendordep').cppHeadersZip)
 cppProjectZips.add(project(':xrpVendordep').cppHeadersZip)
-cppProjectZips.add(project(':datalog').cppHeadersZip)
 
 doxygen {
     // Doxygen binaries are only provided for x86_64 platforms. Other platforms
@@ -109,11 +117,18 @@ doxygen.sourceSets.main {
         // apriltag
         exclude 'apriltag_pose.h'
 
+        // htrie
+        exclude 'wpi/util/array-hash/**'
+        exclude 'wpi/util/htrie_*.hpp'
+
         // libuv
         exclude 'uv/**'
 
         // mpack
         exclude 'wpi/util/mpack.h'
+
+        // hat-trie internal helpers
+        exclude 'wpi/util/array-hash/**'
 
         // units
         exclude 'wpi/units/**'
@@ -148,22 +163,28 @@ tasks.register("zipCppDocs", Zip) {
     into '/'
 }
 
-// Java
-configurations {
-    javaSource {
-        transitive = false
-    }
+ext {
+    useJava = true
+    useCpp = false
+    skipDev = true
 }
+
+// Classpath for everything + OpenCV
+apply from: "${rootDir}/shared/opencv.gradle"
 
 def javaDocProjects = [
     project(':apriltag'),
     project(':cameraserver'),
     project(':commandsv3'),
     project(':cscore'),
+    project(':datalog'),
+    project(':drivers'),
     project(':epilogue-runtime'),
     project(':fields'),
     project(':hal'),
     project(':ntcore'),
+    project(':telemetry'),
+    project(':tunables'),
     project(':wpiannotations'),
     project(':commandsv2'),
     project(':wpilibj'),
@@ -173,13 +194,14 @@ def javaDocProjects = [
     project(':wpiutil'),
     project(':romiVendordep'),
     project(':xrpVendordep'),
-    project(':datalog'),
 ]
 
+javaDocProjects.each {
+    dependencies.api it
+}
+
 tasks.register('generateJavaDocs', Javadoc) {
-    javaDocProjects.each {
-        classpath += it.sourceSets.main.compileClasspath
-    }
+    classpath = sourceSets.main.compileClasspath
     options.links("https://docs.oracle.com/en/java/javase/25/docs/api/")
     // workaround for opencv site blocking javadoc tool. If the link is changed,
     // docs/opencv/element-list must be redownloaded
@@ -227,7 +249,6 @@ tasks.register('generateJavaDocs', Javadoc) {
     javaDocProjects.each {
         source it.sourceSets.main.java
     }
-    source configurations.javaSource.collect { zipTree(it) }
     include '**/*.java'
     failOnError = true
 

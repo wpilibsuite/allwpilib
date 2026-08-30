@@ -5,6 +5,7 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -289,14 +290,18 @@ class RobotBase {
    */
   RobotBase();
 
-  virtual ~RobotBase() = default;
+  /** Destructor. */
+  virtual ~RobotBase();
 
  protected:
   RobotBase(RobotBase&&) = default;
   RobotBase& operator=(RobotBase&&) = default;
 
  private:
+  struct WarningReporter;
+
   static std::thread::id m_threadId;
+  std::shared_ptr<WarningReporter> m_warningReporter;
   wpi::nt::IntegerPublisher m_programStartTimePublisher;
   NT_Listener connListenerHandle;
 };

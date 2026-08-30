@@ -21,7 +21,7 @@ class CommandTestBase {
 
   @BeforeEach
   void initScheduler() {
-    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
+    RobotController.setTimeSource(System::nanoTime);
     m_scheduler = Scheduler.createIndependentScheduler();
     m_events = new ArrayList<>();
     m_scheduler.addEventListener(m_events::add);

@@ -11,9 +11,9 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/util/MathExtras.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi;
@@ -23,7 +23,7 @@ LEDPattern::LEDPattern(
                        std::function<void(int, wpi::util::Color)>)>
         impl)
     : m_impl(std::move(impl)) {
-  HAL_ReportUsage("LEDPattern", "");
+  wpi::util::ReportUsage("LEDPattern", "");
 }
 
 void LEDPattern::ApplyTo(
@@ -72,15 +72,15 @@ LEDPattern LEDPattern::OffsetBy(int offset) {
 LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
   // velocity is in terms of LED lengths per second (1_hz = full cycle per
   // second, 0.5_hz = half cycle per second, 2_hz = two cycles per second)
-  // Invert and multiply by 1,000,000 to get microseconds
-  double periodMicros = 1e6 / velocity.value();
+  // Invert and multiply by 1,000,000,000 to get nanoseconds
+  double periodNanos = 1e9 / velocity.value();
 
   return MapIndex([=](size_t bufLen, size_t i) {
     auto now = wpi::util::Now();
 
     // index should move by (bufLen) / (period)
     double t =
-        (now % static_cast<int64_t>(std::floor(periodMicros))) / periodMicros;
+        (now % static_cast<int64_t>(std::floor(periodNanos))) / periodNanos;
     int offset = static_cast<int>(std::floor(t * bufLen));
 
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
@@ -91,18 +91,16 @@ LEDPattern LEDPattern::ScrollAtRelativeVelocity(wpi::units::hertz_t velocity) {
 LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
     wpi::units::meters_per_second_t velocity, wpi::units::meter_t ledSpacing) {
   // Velocity is in terms of meters per second
-  // Multiply by 1,000,000 to use microseconds instead of seconds
-  auto microsPerLed =
-      static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e6));
+  // Multiply by 1,000,000,000 to use nanoseconds instead of seconds
+  auto nanosPerLed =
+      static_cast<int64_t>(std::floor((ledSpacing / velocity).value() * 1e9));
 
   return MapIndex([=](size_t bufLen, size_t i) {
     auto now = wpi::util::Now();
 
-    // every step in time that's a multiple of microsPerLED will increment
+    // every step in time that's a multiple of nanosPerLed will increment
     // the offset by 1
-    // cast unsigned int64 `now` to a signed int64 so we can get negative
-    // offset values for negative velocities
-    auto offset = static_cast<int64_t>(now) / microsPerLed;
+    auto offset = now / nanosPerLed;
 
     return wpi::math::FloorMod(static_cast<int>(i) + offset,
                                static_cast<int>(bufLen));
@@ -111,11 +109,11 @@ LEDPattern LEDPattern::ScrollAtAbsoluteVelocity(
 
 LEDPattern LEDPattern::Blink(wpi::units::second_t onTime,
                              wpi::units::second_t offTime) {
-  auto totalMicros = wpi::units::microsecond_t{onTime + offTime}.to<uint64_t>();
-  auto onMicros = wpi::units::microsecond_t{onTime}.to<uint64_t>();
+  auto totalNanos = wpi::units::nanosecond_t{onTime + offTime}.to<int64_t>();
+  auto onNanos = wpi::units::nanosecond_t{onTime}.to<int64_t>();
 
   return LEDPattern{[=, self = *this](auto data, auto writer) {
-    if (wpi::util::Now() % totalMicros < onMicros) {
+    if (wpi::util::Now() % totalNanos < onNanos) {
       self.ApplyTo(data, writer);
     } else {
       LEDPattern::Off().ApplyTo(data, writer);
@@ -138,12 +136,12 @@ LEDPattern LEDPattern::SynchronizedBlink(std::function<bool()> signal) {
 }
 
 LEDPattern LEDPattern::Breathe(wpi::units::second_t period) {
-  auto periodMicros = wpi::units::microsecond_t{period};
+  auto periodNanos = wpi::units::nanosecond_t{period};
 
-  return LEDPattern{[periodMicros, self = *this](auto data, auto writer) {
-    self.ApplyTo(data, [&writer, periodMicros](int i, wpi::util::Color color) {
-      double t = (wpi::util::Now() % periodMicros.to<uint64_t>()) /
-                 periodMicros.to<double>();
+  return LEDPattern{[periodNanos, self = *this](auto data, auto writer) {
+    self.ApplyTo(data, [&writer, periodNanos](int i, wpi::util::Color color) {
+      double t = (wpi::util::Now() % periodNanos.to<int64_t>()) /
+                 periodNanos.to<double>();
       double phase = t * 2 * std::numbers::pi;
 
       // Apply the cosine function and shift its output from [-1, 1] to [0, 1]

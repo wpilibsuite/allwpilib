@@ -7,6 +7,7 @@
 import math
 
 import wpilib
+import wpilib_drivers
 import wpimath
 
 WHEEL_RADIUS = 0.0508
@@ -36,8 +37,8 @@ class SwerveModule:
         :param turningEncoderChannelA: DIO input for the turning encoder channel A
         :param turningEncoderChannelB: DIO input for the turning encoder channel B
         """
-        self.drive_motor = wpilib.PWMSparkMax(drive_motor_channel)
-        self.turning_motor = wpilib.PWMSparkMax(turning_motor_channel)
+        self.drive_motor = wpilib_drivers.PWMSparkMax(drive_motor_channel)
+        self.turning_motor = wpilib_drivers.PWMSparkMax(turning_motor_channel)
 
         self.drive_encoder = wpilib.Encoder(
             drive_encoder_channel_a, drive_encoder_channel_b

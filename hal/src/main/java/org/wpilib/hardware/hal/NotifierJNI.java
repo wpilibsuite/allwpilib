@@ -55,8 +55,8 @@ public class NotifierJNI extends JNIWrapper {
    * <p>If an absolute alarmTime is in the past, the notifier will alarm immediately.
    *
    * @param notifierHandle the notifier handle
-   * @param alarmTime the first alarm time (in microseconds)
-   * @param intervalTime the periodic interval time (in microseconds)
+   * @param alarmTime the first alarm time (in nanoseconds)
+   * @param intervalTime the periodic interval time (in nanoseconds)
    * @param absolute true if the alarm time is absolute
    * @param ack true to acknowledge any prior alarm
    * @see "HAL_SetNotifierAlarm"

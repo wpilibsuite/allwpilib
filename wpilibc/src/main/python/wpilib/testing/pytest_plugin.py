@@ -117,9 +117,8 @@ class RobotTestingPlugin:
         nt_inst._reset()
 
         # Cleanup WPILib globals
-        # -> preferences, SmartDashboard, MotorSafety
+        # -> preferences and MotorSafety
         wpilib.simulation._simulation._reset_wpilib_simulation_data()
-        wpilib._wpilib._clear_smart_dashboard_data()
 
         # Cancel all periodic callbacks
         hal.simulation.cancel_all_sim_periodic_callbacks()

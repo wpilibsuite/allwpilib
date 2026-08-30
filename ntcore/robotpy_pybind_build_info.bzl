@@ -197,26 +197,6 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "NTSendable",
-            yml_file = "semiwrap/NTSendable.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendable.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendable", "wpi__nt__NTSendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NTSendableBuilder",
-            yml_file = "semiwrap/NTSendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendableBuilder", "wpi__nt__NTSendableBuilder.hpp"),
-            ],
-        ),
-        struct(
             class_name = "NetworkTable",
             yml_file = "semiwrap/NetworkTable.yml",
             header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
@@ -496,7 +476,7 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -520,7 +500,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/ntcore/**"], exclude = ["src/main/python/ntcore/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/ntcore/**"], exclude = ["src/main/python/ntcore/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -565,7 +545,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -579,7 +559,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//ntcore:robotpy-native-ntcore.copy_headers",
         ],
         package_root_file = "src/main/python/ntcore/__init__.py",

@@ -21,7 +21,7 @@ ExpansionHubServo::ExpansionHubServo(int usbId, int channel)
                            channel);
   }
 
-  m_hub.ReportUsage(std::format("ExHubServo[{}]", channel), "ExHubServo");
+  m_hub.ReportUsage("ExHubServo", channel, "ExHubServo");
 
   auto systemServer = SystemServer::GetSystemServer();
 

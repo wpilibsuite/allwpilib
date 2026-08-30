@@ -35,12 +35,12 @@ namespace wpi::math::filter::internal {
 
 namespace {
 
-constexpr double kCoefEps = 2e-16;
+constexpr double COEF_EPS = 2e-16;
 
 // 10^x - 1 evaluated as expm1(x · ln10) for accuracy when x is small.
 double Pow10m1(double x) {
-  constexpr double kLn10 = 2.302585092994045684017991454684;
-  return std::expm1(kLn10 * x);
+  constexpr double LN10 = 2.302585092994045684017991454684;
+  return std::expm1(LN10 * x);
 }
 
 }  // namespace
@@ -212,7 +212,7 @@ Zpk EllipticPrototype(int order, double rippleDb, double stopAttenDb) {
   std::vector<cplx> zerosUpper;
   for (size_t i = 0; i < jacobi.size(); ++i) {
     double sn = jacobi[i].sn;
-    if (std::abs(sn) <= kCoefEps) {
+    if (std::abs(sn) <= COEF_EPS) {
       continue;
     }
     cplx z{0.0, 1.0 / (sqrtM * sn)};
@@ -248,7 +248,7 @@ Zpk EllipticPrototype(int order, double rippleDb, double stopAttenDb) {
       out.poles.push_back(p);
     }
     for (const auto& p : polesUpper) {
-      if (std::abs(p.imag()) > kCoefEps) {
+      if (std::abs(p.imag()) > COEF_EPS) {
         out.poles.push_back(std::conj(p));
       }
     }

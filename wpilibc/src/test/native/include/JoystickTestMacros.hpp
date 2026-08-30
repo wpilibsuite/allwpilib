@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include <cmath>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+#include "wpi/math/util/MathUtil.hpp"
 
 #define AXIS_TEST(JoystickType, AxisName)                  \
   TEST_CASE(#JoystickType "Test Get" #AxisName,            \
@@ -16,6 +20,34 @@
     joysim.NotifyNewData();                                \
     REQUIRE_THAT(joy.Get##AxisName(),                      \
                  Catch::Matchers::WithinAbs(0.35, 0.001)); \
+  }
+
+#define DEADBAND_AXIS_TEST(JoystickType, AxisName, DefaultDeadband)            \
+  TEST_CASE(#JoystickType "Test Get" #AxisName,                                \
+            "[wpilibc][hid][controller]") {                                    \
+    JoystickType joy{2};                                                       \
+    sim::JoystickType##Sim joysim{joy};                                        \
+    joysim.Set##AxisName(0.35);                                                \
+    joysim.NotifyNewData();                                                    \
+    REQUIRE_THAT(joy.Get##AxisName(),                                          \
+                 Catch::Matchers::WithinAbs(                                   \
+                     wpi::math::ApplyDeadband(0.35, DefaultDeadband), 0.001)); \
+                                                                               \
+    joy.Set##AxisName##Deadband(0.2);                                          \
+    REQUIRE_THAT(joy.Get##AxisName(),                                          \
+                 Catch::Matchers::WithinAbs(                                   \
+                     wpi::math::ApplyDeadband(0.35, 0.2), 0.001));             \
+                                                                               \
+    joy.Set##AxisName##Deadband(-1.0);                                         \
+    REQUIRE_THAT(joy.Get##AxisName(),                                          \
+                 Catch::Matchers::WithinAbs(0.35, 0.001));                     \
+                                                                               \
+    joy.Set##AxisName##Deadband(2.0);                                          \
+    REQUIRE_THAT(joy.Get##AxisName(), Catch::Matchers::WithinAbs(0.0, 0.001)); \
+                                                                               \
+    joy.Set##AxisName##Deadband(NAN);                                          \
+    REQUIRE_THAT(joy.Get##AxisName(),                                          \
+                 Catch::Matchers::WithinAbs(0.35, 0.001));                     \
   }
 
 #define BUTTON_TEST(JoystickType, ButtonName)              \

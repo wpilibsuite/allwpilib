@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -34,7 +34,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -60,7 +60,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -93,7 +93,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -125,7 +125,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     // Can't detect this
@@ -148,7 +148,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -174,7 +174,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -202,7 +202,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -230,7 +230,7 @@ class MaxLengthDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();

@@ -5,18 +5,18 @@
 #include "wpi/math/geometry/struct/Rotation3dStruct.hpp"
 
 namespace {
-constexpr size_t kQOff = 0;
+constexpr size_t Q_OFF = 0;
 }  // namespace
 
 using StructType = wpi::util::Struct<wpi::math::Rotation3d>;
 
 wpi::math::Rotation3d StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::Rotation3d{
-      wpi::util::UnpackStruct<wpi::math::Quaternion, kQOff>(data),
+      wpi::util::UnpackStruct<wpi::math::Quaternion, Q_OFF>(data),
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const wpi::math::Rotation3d& value) {
-  wpi::util::PackStruct<kQOff>(data, value.GetQuaternion());
+  wpi::util::PackStruct<Q_OFF>(data, value.GetQuaternion());
 }

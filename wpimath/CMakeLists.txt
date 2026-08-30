@@ -64,14 +64,16 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 set_target_properties(wpimath PROPERTIES DEBUG_POSTFIX "d")
 
 set_property(TARGET wpimath PROPERTY FOLDER "libraries")
-target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+if(BUILD_SHARED_LIBS)
+    target_compile_definitions(wpimath PRIVATE WPILIB_EXPORTS SLEIPNIR_EXPORTS)
+endif()
 
 target_compile_features(wpimath PUBLIC cxx_std_23)
 if(MSVC)
     target_compile_options(wpimath PUBLIC /utf-8 /bigobj)
 endif()
 wpilib_target_warnings(wpimath)
-target_link_libraries(wpimath wpiutil)
+target_link_libraries(wpimath telemetry tunables wpiutil)
 
 if(NOT WPILIB_USE_SYSTEM_EIGEN)
     install(

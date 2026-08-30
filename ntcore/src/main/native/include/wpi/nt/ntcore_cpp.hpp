@@ -196,12 +196,12 @@ class TimeSyncEventData {
       : serverTimeOffset{serverTimeOffset}, rtt2{rtt2}, valid{valid} {}
 
   /**
-   * Offset between local time and server time, in microseconds. Add this value
+   * Offset between local time and server time, in nanoseconds. Add this value
    * to local time to get the estimated equivalent server time.
    */
   int64_t serverTimeOffset;
 
-  /** Measured round trip time divided by 2, in microseconds. */
+  /** Measured round trip time divided by 2, in nanoseconds. */
   int64_t rtt2;
 
   /**
@@ -474,7 +474,7 @@ NT_Type GetEntryType(NT_Entry entry);
  * Returns 0 if the handle is invalid.
  *
  * @param subentry   subscriber or entry handle
- * @return Entry last change time
+ * @return Entry last change time, in nanoseconds
  */
 int64_t GetEntryLastChange(NT_Handle subentry);
 
@@ -1304,7 +1304,7 @@ bool IsConnected(NT_Inst inst);
  * receive updates as events, add a listener to the "time sync" event.
  *
  * @param inst instance handle
- * @return Time offset in microseconds (optional)
+ * @return Time offset in nanoseconds (optional)
  */
 std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
 
@@ -1316,7 +1316,7 @@ std::optional<int64_t> GetServerTimeOffset(NT_Inst inst);
  */
 
 /**
- * Returns monotonic current time in 1 us increments.
+ * Returns monotonic current time in 1 ns increments.
  * This is the same time base used for value and connection timestamps.
  * This function by default simply wraps wpi::util::Now(), but if SetNow() is
  * called, this function instead returns the value passed to SetNow();
@@ -1333,7 +1333,7 @@ int64_t Now();
  * be used only if the overhead of calling wpi::util::Now() is a concern.
  * If used, it should be called periodically with the value of wpi::util::Now().
  *
- * @param timestamp timestamp (1 us increments)
+ * @param timestamp timestamp (1 ns increments)
  */
 void SetNow(int64_t timestamp);
 

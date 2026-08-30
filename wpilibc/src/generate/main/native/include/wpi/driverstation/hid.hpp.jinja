@@ -12,8 +12,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -29,10 +28,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class {{ ConsoleName }}Controller
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<{{ ConsoleName }}Controller> {
+class {{ ConsoleName }}Controller : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -145,7 +141,7 @@ class {{ ConsoleName }}Controller
   struct Button {
 {%- for button in buttons %}
     /// {{ capitalize_first(button.DocName|default(button.name)) }} button.
-    static constexpr int k{{ capitalize_first(button.name) }} = {{ button.value }};
+    static constexpr int {{ button.ConstantName }} = {{ button.value }};
 {%- endfor %}
   };
 
@@ -153,11 +149,11 @@ class {{ ConsoleName }}Controller
   struct Axis {
 {%- for stick in sticks %}
     /// {{ stick.NameParts|map("capitalize")|join(" ") }} axis.
-    static constexpr int k{{ stick.NameParts|map("capitalize")|join }} = {{ stick.value }};
+    static constexpr int {{ stick.ConstantName }} = {{ stick.value }};
 {%- endfor %}
 {%- for trigger in triggers %}
     /// {{ trigger.DocName|capitalize }}.
-    static constexpr int k{{ capitalize_first(trigger.name) }} = {{ trigger.value }};
+    static constexpr int {{ trigger.ConstantName }} = {{ trigger.value }};
 {%- endfor %}
   };
 
@@ -207,7 +203,8 @@ class {{ ConsoleName }}Controller
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   GenericHID* m_hid;

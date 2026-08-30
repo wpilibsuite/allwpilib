@@ -9,6 +9,7 @@
 #include <functional>
 #include <string>
 
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/units/temperature.hpp"
 #include "wpi/units/voltage.hpp"
 
@@ -52,29 +53,29 @@ class RobotController {
   static int32_t GetTeamNumber();
 
   /**
-   * Sets a new source to provide the clock time in microseconds. Changing this
+   * Sets a new source to provide the clock time in nanoseconds. Changing this
    * affects the return value of {@code GetTime}.
    *
-   * @param supplier Function to return the time in microseconds.
+   * @param supplier Function to return the time in nanoseconds.
    */
-  static void SetTimeSource(std::function<uint64_t()> supplier);
+  static void SetTimeSource(std::function<int64_t()> supplier);
 
   /**
-   * Read the microsecond timestamp. By default, the time is based on the
+   * Read the nanosecond timestamp. By default, the time is based on the
    * monotonic clock. However, the return value of this method may be modified
    * to use any time base, including non-monotonic and non-continuous time
    * bases.
    *
-   * @return The current time in microseconds.
+   * @return The current time in nanoseconds.
    */
-  static uint64_t GetTime();
+  static int64_t GetTime();
 
   /**
-   * Read the microsecond-resolution monotonic timer.
+   * Read the nanosecond-resolution monotonic timer.
    *
-   * @return The current monotonic time in microseconds.
+   * @return The current monotonic time in nanoseconds.
    */
-  static uint64_t GetMonotonicTime();
+  static int64_t GetMonotonicTime();
 
   /**
    * Read the battery voltage.
@@ -170,21 +171,18 @@ class RobotController {
   static void ResetRailFaultCounts();
 
   /**
-   * Get the current brownout voltage setting.
+   * Set the voltages where the robot will enter and recover from brownout.
    *
-   * @return The brownout voltage
+   * The brownout voltage must be between 5 V and 8 V, inclusive. The recovery
+   * voltage must be no greater than 8.5 V and at least 0.5 V above the brownout
+   * voltage.
+   *
+   * @param brownoutVoltage the voltage where the robot will enter brownout
+   * @param recoveryVoltage the voltage where the robot will recover from
+   *                        brownout
    */
-  static wpi::units::volt_t GetBrownoutVoltage();
-
-  /**
-   * Set the voltage the roboRIO will brownout and disable all outputs.
-   *
-   * Note that this only does anything on the roboRIO 2.
-   * On the roboRIO it is a no-op.
-   *
-   * @param brownoutVoltage The brownout voltage
-   */
-  static void SetBrownoutVoltage(wpi::units::volt_t brownoutVoltage);
+  static void SetBrownoutVoltages(wpi::units::volt_t brownoutVoltage,
+                                  wpi::units::volt_t recoveryVoltage);
 
   /**
    * Get the current CPU temperature.
@@ -199,10 +197,10 @@ class RobotController {
    * @param busId The bus ID.
    * @return The status of the CAN bus
    */
-  static CANStatus GetCANStatus(int busId);
+  static CANStatus GetCANStatus(CANPort busId);
 
  private:
-  static std::function<uint64_t()> m_timeSource;
+  static std::function<int64_t()> m_timeSource;
 };
 
 }  // namespace wpi

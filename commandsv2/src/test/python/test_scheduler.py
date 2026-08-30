@@ -7,6 +7,9 @@ if TYPE_CHECKING:
     from .util import *
 
 import pytest
+import telemetry
+import tunables
+import wpilib
 
 
 def test_scheduler_lambda_test_no_interrupt(scheduler: commands2.CommandScheduler):
@@ -132,3 +135,82 @@ def test_schedule_scheduled_no_op(scheduler: commands2.CommandScheduler):
     scheduler.schedule(command)
 
     assert counter == 1
+
+
+def test_scheduler_logs_names_and_ids(scheduler: commands2.CommandScheduler):
+    backend = telemetry.MockTelemetryBackend()
+    telemetry.TelemetryRegistry.reset()
+    telemetry.TelemetryRegistry.register_backend("", backend)
+    command = commands2.WaitCommand(10).with_name("WaitForIt")
+
+    try:
+        scheduler.schedule(command)
+        scheduler.log_to(telemetry.get_table())
+
+        assert backend.get_last_action("/Names")["kind"] == "string[]"
+        assert backend.get_last_value("/Names") == ["WaitForIt"]
+        assert backend.get_last_action("/Ids")["kind"] == "integer[]"
+        assert backend.get_last_value("/Ids") == [id(command)]
+    finally:
+        telemetry.TelemetryRegistry.reset()
+
+
+def test_scheduler_tunable_publishes_names_ids_and_cancel(
+    scheduler: commands2.CommandScheduler,
+):
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend("", backend)
+    command = commands2.WaitCommand(10).with_name("WaitForIt")
+
+    try:
+        scheduler.schedule(command)
+        tunables.publish("scheduler", scheduler)
+
+        assert backend.get_value("/scheduler/Names") == ["WaitForIt"]
+        assert backend.get_value("/scheduler/Ids") == [id(command)]
+        assert backend.get_value("/scheduler/Cancel") == []
+
+        scheduler.cancel(command)
+        tunables.TunableRegistry.update()
+
+        assert backend.get_value("/scheduler/Names") == []
+        assert backend.get_value("/scheduler/Ids") == []
+
+        scheduler.schedule(command)
+        tunables.TunableRegistry.update()
+
+        assert backend.get_value("/scheduler/Names") == ["WaitForIt"]
+        assert backend.get_value("/scheduler/Ids") == [id(command)]
+
+        backend.set_int64_vector("/scheduler/Cancel", [id(command)])
+        tunables.TunableRegistry.update()
+
+        assert not scheduler.is_scheduled(command)
+    finally:
+        tunables.TunableRegistry.reset()
+
+
+def test_reset_instance_removes_scheduler_tunable_publications(
+    scheduler: commands2.CommandScheduler,
+):
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend("", backend)
+
+    try:
+        command = commands2.WaitCommand(10).with_name("OldCommand")
+        scheduler.schedule(command)
+        tunables.publish("scheduler", scheduler)
+
+        commands2.CommandScheduler.reset_instance()
+        replacement = commands2.CommandScheduler.get_instance()
+        tunables.publish("scheduler", replacement)
+        tunables.TunableRegistry.update()
+
+        assert backend.get_value("/scheduler/Names") == []
+        assert backend.get_value("/scheduler/Ids") == []
+        assert backend.get_value("/scheduler/Cancel") == []
+    finally:
+        tunables.TunableRegistry.reset()
+        commands2.CommandScheduler.reset_instance()

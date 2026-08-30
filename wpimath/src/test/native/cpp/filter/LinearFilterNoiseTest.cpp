@@ -17,12 +17,12 @@
 #include "wpi/units/time.hpp"
 
 // Filter constants
-static constexpr auto kFilterStep = 5_ms;
-static constexpr auto kFilterTime = 2_s;
-static constexpr double kSinglePoleIIRTimeConstant = 0.015915;
-static constexpr int32_t kMovAvgTaps = 6;
+static constexpr auto FILTER_STEP = 5_ms;
+static constexpr auto FILTER_TIME = 2_s;
+static constexpr double SINGLE_POLE_IIR_TIME_CONSTANT = 0.015915;
+static constexpr int32_t MOV_AVG_TAPS = 6;
 
-enum LinearFilterNoiseTestType { kTestSinglePoleIIR, kTestMovAvg };
+enum LinearFilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOV_AVG };
 
 static double GetData(double t) {
   return 100.0 * std::sin(2.0 * std::numbers::pi * t);
@@ -31,14 +31,14 @@ static double GetData(double t) {
 static wpi::math::LinearFilter<double> MakeFilter(
     LinearFilterNoiseTestType testType) {
   switch (testType) {
-    case kTestSinglePoleIIR:
+    case TEST_SINGLE_POLE_IIR:
       return wpi::math::LinearFilter<double>::SinglePoleIIR(
-          kSinglePoleIIRTimeConstant, kFilterStep);
-    case kTestMovAvg:
-      return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+          SINGLE_POLE_IIR_TIME_CONSTANT, FILTER_STEP);
+    case TEST_MOV_AVG:
+      return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
   }
 
-  return wpi::math::LinearFilter<double>::MovingAverage(kMovAvgTaps);
+  return wpi::math::LinearFilter<double>::MovingAverage(MOV_AVG_TAPS);
 }
 
 static void CheckNoiseReduce(LinearFilterNoiseTestType testType) {
@@ -50,7 +50,7 @@ static void CheckNoiseReduce(LinearFilterNoiseTestType testType) {
   std::mt19937 gen{rd()};
   std::normal_distribution<double> distr{0.0, 10.0};
 
-  for (auto t = 0_s; t < kFilterTime; t += kFilterStep) {
+  for (auto t = 0_s; t < FILTER_TIME; t += FILTER_STEP) {
     double theory = GetData(t.value());
     double noise = distr(gen);
     filterError += std::abs(filter.Calculate(theory + noise) - theory);
@@ -66,10 +66,10 @@ static void CheckNoiseReduce(LinearFilterNoiseTestType testType) {
  */
 TEST_CASE("LinearFilterNoiseTest NoiseReduce", "[wpimath]") {
   SECTION("SinglePoleIIR") {
-    CheckNoiseReduce(kTestSinglePoleIIR);
+    CheckNoiseReduce(TEST_SINGLE_POLE_IIR);
   }
 
   SECTION("MovingAverage") {
-    CheckNoiseReduce(kTestMovAvg);
+    CheckNoiseReduce(TEST_MOV_AVG);
   }
 }

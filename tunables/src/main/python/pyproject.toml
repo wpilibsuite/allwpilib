@@ -1,0 +1,73 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [
+    "semiwrap~=0.6.0",
+    "hatch-meson~=0.1.2",
+    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "robotpy-native-tunables==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+]
+
+[project]
+name = "robotpy-tunables"
+version = "0.0.0"
+description = "Binary wrapper for WPILib tunables library"
+requires-python = ">=3.11"
+authors = [
+    {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
+]
+license = "BSD-3-Clause"
+dependencies = [
+    "robotpy-native-tunables==0.0.0",
+    "robotpy-wpiutil==0.0.0",
+]
+
+[project.urls]
+"Source code" = "https://github.com/robotpy/mostrobotpy"
+
+[tool.hatch.build.hooks.robotpy]
+version_file = "tunables/version.py"
+
+[tool.hatch.build.hooks.semiwrap]
+
+[tool.hatch.build.hooks.meson]
+
+[tool.hatch.build.targets.wheel]
+packages = ["tunables"]
+
+[tool.semiwrap]
+update_init = [
+    "tunables"
+]
+scan_headers_ignore = [
+    "src/TunablePython.h",
+    "wpi/tunables/CustomTunable.hpp",
+    "wpi/tunables/MockTunableBackend.hpp",
+    "wpi/tunables/Selectable.hpp",
+    "wpi/tunables/Tunable.hpp",
+    "wpi/tunables/TunableConfig.hpp",
+    "wpi/tunables/TunableRegistry.hpp",
+    "wpi/tunables/TunableTable.hpp",
+    "wpi/tunables/Tunables.hpp",
+    "wpi/tunables/detail/PathUtil.hpp",
+    "wpi/tunables/detail/TunableBase.hpp",
+    "wpi/tunables/detail/TunableDetail.hpp",
+    "wpi/tunables/detail/TunableMember.hpp",
+    "wpi/tunables/detail/TunableTypeTraits.hpp",
+    "wpi/tunables/detail/TunableTypeValue.hpp",
+]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
+
+[tool.semiwrap.extension_modules."tunables._tunables"]
+name = "tunables"
+wraps = ["robotpy-native-tunables"]
+depends = ["wpiutil"]
+
+[tool.semiwrap.extension_modules."tunables._tunables".headers]
+ComplexTunable = "wpi/tunables/ComplexTunable.hpp"
+TunableBackend = "wpi/tunables/TunableBackend.hpp"

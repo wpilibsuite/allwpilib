@@ -15,7 +15,7 @@
 #include "wpi/util/Color.hpp"
 #include "wpi/util/string.hpp"
 
-inline constexpr auto kPeriod = 20_ms;
+inline constexpr auto PERIOD = 20_ms;
 
 namespace {
 class OpModeRobotTest {
@@ -210,11 +210,11 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RobotPeriodic",
   CHECK(robot.m_robotPeriodicCount.load() == 0u);
 
   // Step timing to allow callbacks to execute
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
   CHECK(robot.m_robotPeriodicCount.load() == 1u);
 
   // Additional time steps should continue calling RobotPeriodic
-  wpi::sim::StepTiming(kPeriod);
+  wpi::sim::StepTiming(PERIOD);
   CHECK(robot.m_robotPeriodicCount.load() == 2u);
 
   robot.EndCompetition();

@@ -37,7 +37,7 @@
 #include <float.h>
 
 #include "poseutils.h"
-#include "strides.h"
+#include "_strides.h"
 
 void mrcal_R_from_r_full( // outputs
                          double* R,       // (3,3) array

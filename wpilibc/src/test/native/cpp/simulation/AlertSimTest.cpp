@@ -55,17 +55,17 @@ void GrowingBackendFreeAlerts(WPI_AlertInfo* arr, int32_t length) {
   }
 }
 
-const WPI_AlertBackend kGrowingBackend{nullptr,
-                                       nullptr,
-                                       nullptr,
-                                       nullptr,
-                                       nullptr,
-                                       nullptr,
-                                       nullptr,
-                                       GrowingBackendGetNumAlerts,
-                                       GrowingBackendGetAlerts,
-                                       GrowingBackendFreeAlerts,
-                                       nullptr};
+const WPI_AlertBackend growingBackend{nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
+                                      GrowingBackendGetNumAlerts,
+                                      GrowingBackendGetAlerts,
+                                      GrowingBackendFreeAlerts,
+                                      nullptr};
 
 class ScopedAlertBackend {
  public:
@@ -260,7 +260,7 @@ TEST_CASE_METHOD(
     "AlertSimTest GetAllClampsToAllocatedLengthWhenBackendCountGrows",
     "[wpilibc][simulation]") {
   gGrowingBackendState = {};
-  ScopedAlertBackend backend{&kGrowingBackend};
+  ScopedAlertBackend backend{&growingBackend};
 
   auto alerts = AlertSim::GetAll();
 

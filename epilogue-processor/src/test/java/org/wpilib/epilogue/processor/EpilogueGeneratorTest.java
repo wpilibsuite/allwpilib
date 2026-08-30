@@ -7,7 +7,7 @@ package org.wpilib.epilogue.processor;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -33,11 +33,11 @@ class EpilogueGeneratorTest {
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -86,11 +86,11 @@ class EpilogueGeneratorTest {
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -119,8 +119,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.Example robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
         }
         """;
@@ -145,11 +145,11 @@ class EpilogueGeneratorTest {
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -178,8 +178,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.Example robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -227,11 +227,11 @@ class EpilogueGeneratorTest {
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -261,8 +261,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_AlphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_AlphaBotLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -272,8 +272,8 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.BetaBot robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -330,6 +330,7 @@ class EpilogueGeneratorTest {
         package org.wpilib.epilogue;
 
         import org.wpilib.epilogue.logging.*;
+        import org.wpilib.telemetry.TelemetryTable;
 
         class A {}
         class B extends A {}
@@ -340,7 +341,7 @@ class EpilogueGeneratorTest {
           public CustomLogger() { super(A.class); }
 
           @Override
-          public void update(EpilogueBackend backend, A object) {} // implementation is irrelevant
+          public void update(TelemetryTable table, A object) {} // implementation is irrelevant
         }
 
         @Logged
@@ -357,11 +358,11 @@ class EpilogueGeneratorTest {
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -393,7 +394,7 @@ class EpilogueGeneratorTest {
       String loggedClassContent, String loggerClassContent) {
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("", loggedClassContent));
 

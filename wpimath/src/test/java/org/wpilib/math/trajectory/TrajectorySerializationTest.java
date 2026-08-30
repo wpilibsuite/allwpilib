@@ -19,28 +19,28 @@ class TrajectorySerializationTest {
   // JSON serializes doubles to their shortest decimal form, which can round-trip
   // up to one ULP off, so samples are compared with a small tolerance rather than
   // for exact equality (matching SampleJsonTest).
-  private static final double kEpsilon = 1e-9;
+  private static final double EPSILON = 1e-9;
 
   <SampleType extends HolonomicSample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
-    assertEquals(expected.duration, actual.duration, kEpsilon);
+    assertEquals(expected.duration, actual.duration, EPSILON);
     assertEquals(expected.samples.size(), actual.samples.size());
     for (int i = 0; i < expected.samples.size(); i++) {
       HolonomicSample e = expected.samples.get(i);
       HolonomicSample a = actual.samples.get(i);
-      assertEquals(e.time, a.time, kEpsilon);
-      assertEquals(e.pose.getX(), a.pose.getX(), kEpsilon);
-      assertEquals(e.pose.getY(), a.pose.getY(), kEpsilon);
-      assertEquals(e.pose.getRotation().getRadians(), a.pose.getRotation().getRadians(), kEpsilon);
-      assertEquals(e.velocity.vx, a.velocity.vx, kEpsilon);
-      assertEquals(e.velocity.vy, a.velocity.vy, kEpsilon);
-      assertEquals(e.velocity.omega, a.velocity.omega, kEpsilon);
-      assertEquals(e.acceleration.ax, a.acceleration.ax, kEpsilon);
-      assertEquals(e.acceleration.ay, a.acceleration.ay, kEpsilon);
-      assertEquals(e.acceleration.alpha, a.acceleration.alpha, kEpsilon);
+      assertEquals(e.time, a.time, EPSILON);
+      assertEquals(e.pose.getX(), a.pose.getX(), EPSILON);
+      assertEquals(e.pose.getY(), a.pose.getY(), EPSILON);
+      assertEquals(e.pose.getRotation().getRadians(), a.pose.getRotation().getRadians(), EPSILON);
+      assertEquals(e.velocity.vx, a.velocity.vx, EPSILON);
+      assertEquals(e.velocity.vy, a.velocity.vy, EPSILON);
+      assertEquals(e.velocity.omega, a.velocity.omega, EPSILON);
+      assertEquals(e.acceleration.ax, a.acceleration.ax, EPSILON);
+      assertEquals(e.acceleration.ay, a.acceleration.ay, EPSILON);
+      assertEquals(e.acceleration.alpha, a.acceleration.alpha, EPSILON);
       if (e instanceof DifferentialSample de && a instanceof DifferentialSample da) {
-        assertEquals(de.leftVelocity, da.leftVelocity, kEpsilon);
-        assertEquals(de.rightVelocity, da.rightVelocity, kEpsilon);
+        assertEquals(de.leftVelocity, da.leftVelocity, EPSILON);
+        assertEquals(de.rightVelocity, da.rightVelocity, EPSILON);
       }
     }
   }

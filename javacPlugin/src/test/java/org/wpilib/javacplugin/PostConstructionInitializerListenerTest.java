@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -35,7 +35,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -62,7 +62,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -99,7 +99,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -129,7 +129,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -159,7 +159,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -191,7 +191,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -218,7 +218,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -260,7 +260,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -296,7 +296,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -330,7 +330,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -364,7 +364,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -409,7 +409,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).failed();
@@ -442,7 +442,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -470,7 +470,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -498,7 +498,7 @@ class PostConstructionInitializerListenerTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();

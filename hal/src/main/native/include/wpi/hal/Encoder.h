@@ -163,6 +163,17 @@ double HAL_GetEncoderDistance(HAL_EncoderHandle encoderHandle, int32_t* status);
 double HAL_GetEncoderRate(HAL_EncoderHandle encoderHandle, int32_t* status);
 
 /**
+ * Sets the time window used to calculate the encoder rate.
+ *
+ * @param[in] encoderHandle      the encoder handle
+ * @param[in] windowMilliseconds the rate calculation window in milliseconds;
+ *                               valid values are 5 through 255
+ * @param[out] status            Error status variable. 0 on success.
+ */
+void HAL_SetEncoderRateWindow(HAL_EncoderHandle encoderHandle,
+                              int32_t windowMilliseconds, int32_t* status);
+
+/**
  * Sets the distance traveled per encoder pulse. This is used as a scaling
  * factor for the rate and distance calls.
  *

@@ -8,8 +8,8 @@
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/discrete/DigitalInput.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 
 class Storage : wpi::cmd::SubsystemBase {
  public:
@@ -21,6 +21,6 @@ class Storage : wpi::cmd::SubsystemBase {
   wpi::cmd::Trigger HasCargo{[this] { return ballSensor.Get(); }};
 
  private:
-  wpi::PWMSparkMax motor{StorageConstants::kMotorPort};
-  wpi::DigitalInput ballSensor{StorageConstants::kBallSensorPort};
+  wpi::PWMSparkMax motor{StorageConstants::MOTOR_PORT};
+  wpi::DigitalInput ballSensor{StorageConstants::BALL_SENSOR_PORT};
 };

@@ -7,9 +7,9 @@ package org.wpilib.opmode;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.internal.PeriodicPriorityQueue;
 import org.wpilib.system.RobotController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * An opmode structure for periodic operation. This base class implements a loop that runs one or
@@ -42,13 +42,13 @@ import org.wpilib.system.RobotController;
  */
 public abstract class PeriodicOpMode implements OpMode {
   private final Set<PeriodicPriorityQueue.Callback> m_callbacks;
-  private final long m_startTimeUs = RobotController.getMonotonicTime();
+  private final long m_startTimeNs = RobotController.getMonotonicTime();
 
   /** Constructor for PeriodicOpMode. */
   @SuppressWarnings("this-escape")
   protected PeriodicOpMode() {
     m_callbacks = new TreeSet<>();
-    HAL.reportUsage("OpMode", "PeriodicOpMode");
+    UsageReporting.reportUsage("OpMode", "PeriodicOpMode");
   }
 
   @Override
@@ -81,6 +81,6 @@ public abstract class PeriodicOpMode implements OpMode {
    *     scheduling a callback in a different timeslot relative to TimedRobot.
    */
   public final void addPeriodic(Runnable callback, double period, double offset) {
-    m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeUs, period, offset));
+    m_callbacks.add(new PeriodicPriorityQueue.Callback(callback, m_startTimeNs, period, offset));
   }
 }

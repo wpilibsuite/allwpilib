@@ -6,8 +6,8 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 
-#include "autodiff.hh"
-#include "strides.h"
+#include "_autodiff.hh"
+#include "_strides.h"
 
 extern "C" {
 #include "poseutils.h"
@@ -783,8 +783,9 @@ void mrcal_compose_r_full( // output
                            const double* r_0,   // (3,) array
                            int r_0_stride0,     // in bytes. <= 0 means "contiguous"
                            const double* r_1,   // (3,) array
-                           int r_1_stride0      // in bytes. <= 0 means "contiguous"
-                           )
+                           int r_1_stride0,     // in bytes. <= 0 means "contiguous"
+                           bool inverted0,
+                           bool inverted1)
 {
     init_stride_1D(r_out,  3);
     init_stride_2D(dr_dr0, 3,3);
@@ -803,6 +804,8 @@ void mrcal_compose_r_full( // output
         r1g.init_vars(r_1,
                       0, 3, -1,
                       r_1_stride0);
+        if(inverted0) r0g *= -1;
+        if(inverted1) r1g *= -1;
 
         vec_withgrad_t<0, 3> r01g;
         compose_r_core<0>( &r01g,
@@ -822,6 +825,8 @@ void mrcal_compose_r_full( // output
         r1g.init_vars(r_1,
                       0, 3, -1,
                       r_1_stride0);
+        if(inverted0) r0g *= -1;
+        if(inverted1) r1g *= -1;
 
         vec_withgrad_t<3, 3> r01g;
         compose_r_core<3>( &r01g,
@@ -846,6 +851,8 @@ void mrcal_compose_r_full( // output
         r1g.init_vars(r_1,
                       0, 3, 0,
                       r_1_stride0);
+        if(inverted0) r0g *= -1;
+        if(inverted1) r1g *= -1;
 
         vec_withgrad_t<3, 3> r01g;
         compose_r_core<3>( &r01g,
@@ -870,6 +877,8 @@ void mrcal_compose_r_full( // output
         r1g.init_vars(r_1,
                       0, 3, 3,
                       r_1_stride0);
+        if(inverted0) r0g *= -1;
+        if(inverted1) r1g *= -1;
 
         vec_withgrad_t<6, 3> r01g;
         compose_r_core<6>( &r01g,

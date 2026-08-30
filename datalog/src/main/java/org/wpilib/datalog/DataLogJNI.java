@@ -161,7 +161,7 @@ public class DataLogJNI {
    * @param name Name (the string passed as the data type for records using this schema)
    * @param type Type of schema (e.g. "protobuf", "struct", etc)
    * @param schema Schema data
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void addSchema(long impl, String name, String type, byte[] schema, long timestamp);
 
@@ -178,7 +178,7 @@ public class DataLogJNI {
    * @param name Name
    * @param type Data type
    * @param metadata Initial metadata (e.g. data properties)
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    * @return Entry index
    */
   static native int start(long impl, String name, String type, String metadata, long timestamp);
@@ -188,7 +188,7 @@ public class DataLogJNI {
    *
    * @param impl data log implementation handle
    * @param entry Entry index
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void finish(long impl, int entry, long timestamp);
 
@@ -198,7 +198,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void setMetadata(long impl, int entry, String metadata, long timestamp);
 
@@ -216,7 +216,7 @@ public class DataLogJNI {
    * @param entry Entry index, as returned by WPI_DataLog_Start()
    * @param data Byte array to record
    * @param len Length of byte array
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendRaw(
       long impl, int entry, byte[] data, int start, int len, long timestamp);
@@ -228,19 +228,20 @@ public class DataLogJNI {
    * @param entry Entry index, as returned by WPI_DataLog_Start()
    * @param data ByteBuffer to record
    * @param len Length of byte array
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static void appendRaw(long impl, int entry, ByteBuffer data, int start, int len, long timestamp) {
+    if (start < 0) {
+      throw new IndexOutOfBoundsException("start must be >= 0");
+    }
+    if (len < 0) {
+      throw new IndexOutOfBoundsException("len must be >= 0");
+    }
+    int capacity = data.capacity();
+    if (start > capacity || len > capacity - start) {
+      throw new IndexOutOfBoundsException("start + len must be within buffer capacity");
+    }
     if (data.isDirect()) {
-      if (start < 0) {
-        throw new IndexOutOfBoundsException("start must be >= 0");
-      }
-      if (len < 0) {
-        throw new IndexOutOfBoundsException("len must be >= 0");
-      }
-      if ((start + len) > data.capacity()) {
-        throw new IndexOutOfBoundsException("start + len must be smaller than buffer capacity");
-      }
       appendRawBuffer(impl, entry, data, start, len, timestamp);
     } else if (data.hasArray()) {
       appendRaw(impl, entry, data.array(), data.arrayOffset() + start, len, timestamp);
@@ -249,7 +250,7 @@ public class DataLogJNI {
     }
   }
 
-  private static native void appendRawBuffer(
+  static native void appendRawBuffer(
       long impl, int entry, ByteBuffer data, int start, int len, long timestamp);
 
   /**
@@ -258,7 +259,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Boolean value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendBoolean(long impl, int entry, boolean value, long timestamp);
 
@@ -268,7 +269,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Integer value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendInteger(long impl, int entry, long value, long timestamp);
 
@@ -278,7 +279,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Float value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendFloat(long impl, int entry, float value, long timestamp);
 
@@ -288,7 +289,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Double value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendDouble(long impl, int entry, double value, long timestamp);
 
@@ -298,7 +299,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value String value to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendString(long impl, int entry, String value, long timestamp);
 
@@ -308,7 +309,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Boolean array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendBooleanArray(long impl, int entry, boolean[] value, long timestamp);
 
@@ -318,7 +319,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Integer array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendIntegerArray(long impl, int entry, long[] value, long timestamp);
 
@@ -328,7 +329,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Float array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendFloatArray(long impl, int entry, float[] value, long timestamp);
 
@@ -338,7 +339,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value Double array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendDoubleArray(long impl, int entry, double[] value, long timestamp);
 
@@ -348,7 +349,7 @@ public class DataLogJNI {
    * @param impl data log implementation handle
    * @param entry Entry index, as returned by Start()
    * @param value String array to record
-   * @param timestamp Time stamp (may be 0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (may be 0 to indicate now)
    */
   static native void appendStringArray(long impl, int entry, String[] value, long timestamp);
 

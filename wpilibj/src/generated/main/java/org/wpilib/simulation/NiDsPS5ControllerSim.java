@@ -42,7 +42,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kLeftX.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.LEFT_X.value, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kLeftY.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.LEFT_Y.value, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kRightX.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.RIGHT_X.value, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kRightY.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.RIGHT_Y.value, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL2Axis(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kL2.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.L2.value, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR2Axis(double value) {
-    setRawAxis(NiDsPS5Controller.Axis.kR2.value, value);
+    setRawAxis(NiDsPS5Controller.Axis.R2.value, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setSquareButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kSquare.value, value);
+    setRawButton(NiDsPS5Controller.Button.SQUARE.value, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCrossButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kCross.value, value);
+    setRawButton(NiDsPS5Controller.Button.CROSS.value, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCircleButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kCircle.value, value);
+    setRawButton(NiDsPS5Controller.Button.CIRCLE.value, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTriangleButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kTriangle.value, value);
+    setRawButton(NiDsPS5Controller.Button.TRIANGLE.value, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL1Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kL1.value, value);
+    setRawButton(NiDsPS5Controller.Button.L1.value, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR1Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kR1.value, value);
+    setRawButton(NiDsPS5Controller.Button.R1.value, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL2Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kL2.value, value);
+    setRawButton(NiDsPS5Controller.Button.L2.value, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR2Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kR2.value, value);
+    setRawButton(NiDsPS5Controller.Button.R2.value, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setCreateButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kCreate.value, value);
+    setRawButton(NiDsPS5Controller.Button.CREATE.value, value);
   }
 
   /**
@@ -177,7 +177,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setOptionsButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kOptions.value, value);
+    setRawButton(NiDsPS5Controller.Button.OPTIONS.value, value);
   }
 
   /**
@@ -186,7 +186,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setL3Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kL3.value, value);
+    setRawButton(NiDsPS5Controller.Button.L3.value, value);
   }
 
   /**
@@ -195,7 +195,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setR3Button(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kR3.value, value);
+    setRawButton(NiDsPS5Controller.Button.R3.value, value);
   }
 
   /**
@@ -204,7 +204,7 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setPSButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kPS.value, value);
+    setRawButton(NiDsPS5Controller.Button.PS.value, value);
   }
 
   /**
@@ -213,6 +213,6 @@ public class NiDsPS5ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setTouchpadButton(boolean value) {
-    setRawButton(NiDsPS5Controller.Button.kTouchpad.value, value);
+    setRawButton(NiDsPS5Controller.Button.TOUCHPAD.value, value);
   }
 }

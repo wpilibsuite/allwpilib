@@ -28,9 +28,6 @@
 
 #include "llhttp.h"
 
-typedef int (*llhttp__internal__span_cb)(
-             llhttp__internal_t*, const char*, const char*);
-
 static const unsigned char llparse_blob0[] = {
   'o', 'n'
 };
@@ -10267,7 +10264,7 @@ int llhttp__internal_execute(llhttp__internal_t* state, const char* p, const cha
   if (state->_span_pos0 != NULL) {
     int error;
   
-    error = ((llhttp__internal__span_cb) state->_span_cb0)(state, state->_span_pos0, (const char*) endp);
+    error = state->_span_cb0(state, state->_span_pos0, (const unsigned char*) endp);
     if (error != 0) {
       state->error = error;
       state->error_pos = endp;

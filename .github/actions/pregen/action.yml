@@ -36,9 +36,7 @@ runs:
       shell: bash
 
     - name: Regenerate PWM motor controllers
-      run: |
-        ./wpilibc/generate_pwm_motor_controllers.py
-        ./wpilibj/generate_pwm_motor_controllers.py
+      run: python ./drivers/generate_pwm_motor_controllers.py
       shell: bash
 
     - name: Regenerate mrcal minimath

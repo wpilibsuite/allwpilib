@@ -147,16 +147,16 @@ class OpModeRobotBase : public RobotBase {
   void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
 
   /**
-   * Return the system clock time in microseconds for the start of the current
+   * Return the system clock time in nanoseconds for the start of the current
    * periodic loop. This is in the same time base as
    * Timer.getMonotonicTimeStamp(), but is stable through a loop. It is updated
    * at the beginning of every periodic callback (including the normal periodic
    * loop).
    *
-   * @return Robot running time in microseconds, as of the start of the current
+   * @return Robot running time in nanoseconds, as of the start of the current
    * periodic function.
    */
-  wpi::units::microsecond_t GetLoopStartTime() const {
+  wpi::units::nanosecond_t GetLoopStartTime() const {
     return m_callbacks.GetLoopStartTime();
   }
 
@@ -165,34 +165,46 @@ class OpModeRobotBase : public RobotBase {
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
    * @param textColor text color
    * @param backgroundColor background color
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group,
-                        std::string_view description,
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
                         const wpi::util::Color& textColor,
-                        const wpi::util::Color& backgroundColor);
+                        const wpi::util::Color& backgroundColor,
+                        OpModeFactory factory);
 
   /**
    * Adds an operating mode option using a factory function that creates the
    * opmode. It's necessary to call PublishOpModes() to make the added modes
    * visible to the driver station.
    *
-   * @param factory factory function
    * @param mode robot mode
    * @param name name of the operating mode
    * @param group group of the operating mode
    * @param description description of the operating mode
+   * @param factory factory function
    */
-  void AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                        std::string_view name, std::string_view group = {},
-                        std::string_view description = {});
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        std::string_view group, std::string_view description,
+                        OpModeFactory factory);
+
+  /**
+   * Adds an operating mode option using a factory function that creates the
+   * opmode. It's necessary to call PublishOpModes() to make the added modes
+   * visible to the driver station.
+   *
+   * @param mode robot mode
+   * @param name name of the operating mode
+   * @param factory factory function
+   */
+  void AddOpModeFactory(RobotMode mode, std::string_view name,
+                        OpModeFactory factory);
 
   /**
    * Removes an operating mode option. It's necessary to call PublishOpModes()
@@ -244,7 +256,7 @@ class OpModeRobotBase : public RobotBase {
   wpi::internal::PeriodicPriorityQueue m_callbacks;
   HAL_NotifierHandle m_notifier;
   wpi::units::second_t m_period;
-  std::chrono::microseconds m_startTime;
+  std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
 
@@ -311,11 +323,11 @@ class OpModeRobot : public OpModeRobotBase {
                  const wpi::util::Color& backgroundColor) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
       AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description, textColor, backgroundColor);
+          mode, name, group, description, textColor, backgroundColor,
+          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description, textColor, backgroundColor);
+      AddOpModeFactory(mode, name, group, description, textColor,
+                       backgroundColor, [] { return std::make_unique<T>(); });
     }
   }
 
@@ -336,12 +348,12 @@ class OpModeRobot : public OpModeRobotBase {
                  std::string_view group = {},
                  std::string_view description = {}) {
     if constexpr (detail::OneArgOpMode<T, Derived>) {
-      AddOpModeFactory(
-          [this] { return std::make_unique<T>(*static_cast<Derived*>(this)); },
-          mode, name, group, description);
+      AddOpModeFactory(mode, name, group, description, [this] {
+        return std::make_unique<T>(*static_cast<Derived*>(this));
+      });
     } else if constexpr (detail::NoArgOpMode<T>) {
-      AddOpModeFactory([] { return std::make_unique<T>(); }, mode, name, group,
-                       description);
+      AddOpModeFactory(mode, name, group, description,
+                       [] { return std::make_unique<T>(); });
     }
   }
 };

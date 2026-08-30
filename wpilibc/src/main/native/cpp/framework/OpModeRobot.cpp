@@ -17,13 +17,13 @@
 #include "wpi/hal/DriverStationTypes.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/opmode/OpMode.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/RobotController.hpp"
+#include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/util/SafeThread.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi;
@@ -40,12 +40,12 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
   m_notifier = HAL_CreateNotifier(&status);
   HAL_SetNotifierName(m_notifier, "OpModeRobot", &status);
 
-  m_startTime = std::chrono::microseconds{RobotController::GetMonotonicTime()};
+  m_startTime = std::chrono::nanoseconds{RobotController::GetMonotonicTime()};
 
   // Add LoopFunc as periodic callback
   AddPeriodic([this] { LoopFunc(); }, period);
 
-  HAL_ReportUsage("Framework", "OpModeRobot");
+  wpi::util::ReportUsage("Framework", "OpModeRobot");
 }
 
 OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
@@ -164,8 +164,8 @@ void OpModeRobotBase::LoopFunc() {
   // Always observe user program state
   HAL_ObserveUserProgram(word.GetValue());
 
-  SmartDashboard::UpdateValues();
-  m_watchdog.AddEpoch("SmartDashboard::UpdateValues()");
+  wpi::tunables::TunableRegistry::Update();
+  m_watchdog.AddEpoch("TunableRegistry::Update()");
 
   if constexpr (IsSimulation()) {
     HAL_SimPeriodicBefore();
@@ -209,11 +209,12 @@ void OpModeRobotBase::EndCompetition() {
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(
-    OpModeFactory factory, RobotMode mode, std::string_view name,
-    std::string_view group, std::string_view description,
-    const wpi::util::Color& textColor,
-    const wpi::util::Color& backgroundColor) {
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       std::string_view group,
+                                       std::string_view description,
+                                       const wpi::util::Color& textColor,
+                                       const wpi::util::Color& backgroundColor,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description, textColor,
                                      backgroundColor);
   if (id != 0) {
@@ -221,14 +222,19 @@ void OpModeRobotBase::AddOpModeFactory(
   }
 }
 
-void OpModeRobotBase::AddOpModeFactory(OpModeFactory factory, RobotMode mode,
-                                       std::string_view name,
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
                                        std::string_view group,
-                                       std::string_view description) {
+                                       std::string_view description,
+                                       OpModeFactory factory) {
   int64_t id = RobotState::AddOpMode(mode, name, group, description);
   if (id != 0) {
     m_opModes[id] = OpModeData{std::string{name}, std::move(factory)};
   }
+}
+
+void OpModeRobotBase::AddOpModeFactory(RobotMode mode, std::string_view name,
+                                       OpModeFactory factory) {
+  AddOpModeFactory(mode, name, {}, {}, std::move(factory));
 }
 
 void OpModeRobotBase::RemoveOpMode(RobotMode mode, std::string_view name) {
