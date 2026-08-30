@@ -40,7 +40,7 @@ public class ShooterHood implements Mechanism {
     return runRepeatedly(
             () -> {
               hoodMotor.setSetpoint(
-                  ExampleSmartMotorController.PIDMode.kPosition, angle.get().in(Radians));
+                  ExampleSmartMotorController.PIDMode.POSITION, angle.get().in(Radians));
             })
         .named("Shooter.Hood.RunHoodAngle");
   }
