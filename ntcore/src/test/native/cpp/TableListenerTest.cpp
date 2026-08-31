@@ -308,6 +308,10 @@ TEST_CASE_METHOD(TableListenerTest,
     wpi::util::SetEvent(exitListenerEvent);
     wpi::util::WaitForObject(listenerDoneEvent, 3.0, NULL);
     T_FAIL("Timed out waiting for destroyerThreadReadyEvent");
+
+    if (destroyerThread.joinable()) {
+      destroyerThread.detach();
+    }
     return;
   }
   T_INFO("[Test thread] Received destroyerThreadReadyEvent");
