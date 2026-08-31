@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
 #include <imgui_stdlib.h>
 #include <upb/message/message.h>
@@ -110,7 +111,14 @@ NetworkTablesModel::Entry::~Entry() {
 
 void NetworkTablesModel::Entry::UpdateInfo(wpi::nt::TopicInfo&& info_) {
   info = std::move(info_);
-  properties = info.GetProperties();
+  auto propertiesJson = wpi::util::json::parse(info.properties);
+  if (propertiesJson) {
+    properties = std::move(*propertiesJson);
+    propertiesValidJson = true;
+  } else {
+    properties = wpi::util::json::object();
+    propertiesValidJson = false;
+  }
 
   persistent = false;
   if (auto prop = properties.lookup("persistent")) {
@@ -123,6 +131,165 @@ void NetworkTablesModel::Entry::UpdateInfo(wpi::nt::TopicInfo&& info_) {
   if (auto prop = properties.lookup("retained")) {
     if (prop->is_bool()) {
       retained = prop->get_bool();
+    }
+  }
+}
+
+static void CollectExactSubscriberTopics(
+    std::vector<std::string>* topics,
+    std::span<const NetworkTablesModel::Client::Subscriber> subscribers) {
+  for (auto&& sub : subscribers) {
+    if (sub.options.prefixMatch) {
+      continue;
+    }
+    for (auto&& topic : sub.topics) {
+      if (!topic.empty()) {
+        topics->emplace_back(topic);
+      }
+    }
+  }
+}
+
+static bool HasExactSubscriberTopic(
+    std::span<const NetworkTablesModel::Client::Subscriber> subscribers,
+    std::string_view name) {
+  for (auto&& sub : subscribers) {
+    if (sub.options.prefixMatch) {
+      continue;
+    }
+    if (std::find_if(sub.topics.begin(), sub.topics.end(), [&](auto&& topic) {
+          return topic == name;
+        }) != sub.topics.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static bool IsSubscriberApplicableToTopic(
+    const NetworkTablesModel::Client::Subscriber& subscriber,
+    std::string_view name) {
+  bool special = wpi::util::starts_with(name, '$');
+  for (auto&& topicName : subscriber.topics) {
+    if ((!subscriber.options.prefixMatch && name == topicName) ||
+        (subscriber.options.prefixMatch && (!special || !topicName.empty()) &&
+         wpi::util::starts_with(name, topicName))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static void AddApplicableTopicSubscribers(
+    std::vector<wpi::nt::meta::TopicSubscriber>* subscribers,
+    std::string_view topicName, std::string_view clientName,
+    std::span<const NetworkTablesModel::Client::Subscriber> clientSubscribers) {
+  for (auto&& clientSubscriber : clientSubscribers) {
+    if (!IsSubscriberApplicableToTopic(clientSubscriber, topicName)) {
+      continue;
+    }
+
+    auto& subscriber = subscribers->emplace_back();
+    subscriber.client = clientName;
+    subscriber.subuid = clientSubscriber.uid;
+    subscriber.options = clientSubscriber.options;
+  }
+}
+
+static void ClearValueSource(NetworkTablesModel::ValueSource* valueSource) {
+  valueSource->value = {};
+  valueSource->valueStr.clear();
+  valueSource->typeStr.clear();
+  valueSource->source.reset();
+  valueSource->valueChildren.clear();
+  valueSource->valueChildrenMap = false;
+}
+
+bool NetworkTablesModel::UpdateSubscriberOnlyEntries() {
+  std::vector<std::string> exactSubscriberTopics;
+  CollectExactSubscriberTopics(&exactSubscriberTopics, m_server.subscribers);
+  for (auto&& client : m_clients) {
+    CollectExactSubscriberTopics(&exactSubscriberTopics,
+                                 client.second.subscribers);
+  }
+  std::sort(exactSubscriberTopics.begin(), exactSubscriberTopics.end());
+  exactSubscriberTopics.erase(
+      std::unique(exactSubscriberTopics.begin(), exactSubscriberTopics.end()),
+      exactSubscriberTopics.end());
+
+  bool changed = false;
+  std::vector<NT_Topic> topicsToRemove;
+  for (auto& entry : m_sortedEntries) {
+    if (!entry || !entry->subscriberOnly) {
+      continue;
+    }
+
+    bool stillSubscribed =
+        std::binary_search(exactSubscriberTopics.begin(),
+                           exactSubscriberTopics.end(), entry->info.name);
+    if (stillSubscribed && entry->info.type == NT_UNASSIGNED &&
+        entry->publisher == 0) {
+      continue;
+    }
+
+    if (!stillSubscribed && entry->info.type == NT_UNASSIGNED &&
+        entry->publisher == 0) {
+      topicsToRemove.emplace_back(entry->info.topic);
+      entry = nullptr;
+      changed = true;
+    } else {
+      entry->subscriberOnly = false;
+    }
+  }
+
+  for (auto topic : topicsToRemove) {
+    m_entries.erase(topic);
+  }
+  if (!topicsToRemove.empty()) {
+    std::erase(m_sortedEntries, nullptr);
+  }
+
+  for (auto&& topicName : exactSubscriberTopics) {
+    auto entryIt = std::find_if(
+        m_sortedEntries.begin(), m_sortedEntries.end(),
+        [&](auto entry) { return entry && entry->info.name == topicName; });
+    if (entryIt != m_sortedEntries.end()) {
+      if ((*entryIt)->info.type == NT_UNASSIGNED &&
+          (*entryIt)->publisher == 0) {
+        (*entryIt)->subscriberOnly = true;
+      }
+      continue;
+    }
+
+    auto topic = wpi::nt::GetTopic(m_inst.GetHandle(), topicName);
+    auto& entry = m_entries[topic];
+    if (!entry) {
+      entry = std::make_unique<Entry>();
+      entry->UpdateInfo(wpi::nt::GetTopicInfo(topic));
+      entry->subscriberOnly = true;
+      m_sortedEntries.emplace_back(entry.get());
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
+void NetworkTablesModel::UpdateDerivedTopicSubscribers() {
+  for (auto* entry : m_sortedEntries) {
+    if (!entry || entry->hasTopicSubscriberMetadata) {
+      continue;
+    }
+
+    entry->subscribers.clear();
+    AddApplicableTopicSubscribers(&entry->subscribers, entry->info.name, {},
+                                  m_server.subscribers);
+    for (auto&& client : m_clients) {
+      std::string_view clientName = client.second.id.empty()
+                                        ? std::string_view{client.first}
+                                        : std::string_view{client.second.id};
+      AddApplicableTopicSubscribers(&entry->subscribers, entry->info.name,
+                                    clientName, client.second.subscribers);
     }
   }
 }
@@ -727,6 +894,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(std::string_view name,
   valueChildren.clear();
   value = wpi::nt::Value::MakeString(v, time);
   valueStr = v;
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<StringSource*>(source.get());
   if (!s) {
     source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -756,6 +927,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, bool value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<BooleanSource*>(source.get());
   if (!s) {
     source = std::make_unique<BooleanSource>(std::format("NT:{}", name));
@@ -767,6 +942,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, float value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<FloatSource*>(source.get());
   if (!s) {
     source = std::make_unique<FloatSource>(std::format("NT:{}", name));
@@ -778,6 +957,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, double value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<DoubleSource*>(source.get());
   if (!s) {
     source = std::make_unique<DoubleSource>(std::format("NT:{}", name));
@@ -789,6 +972,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, int64_t value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<IntegerSource*>(source.get());
   if (!s) {
     source = std::make_unique<IntegerSource>(std::format("NT:{}", name));
@@ -885,6 +1072,10 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         os.write_escaped(value.GetString());
         os << '"';
 
+        if (!gContext) {
+          source.reset();
+          return;
+        }
         auto s = dynamic_cast<StringSource*>(source.get());
         if (!s) {
           source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -969,6 +1160,34 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
 
 void NetworkTablesModel::Update() {
   bool updateTree = false;
+  bool updateSubscriberOnlyEntries = false;
+  bool updateDerivedTopicSubscribers = false;
+  auto getExistingTopicEntry = [&](std::string_view name) -> Entry* {
+    auto topic = wpi::nt::GetTopic(m_inst.GetHandle(), name);
+    auto it = m_entries.find(topic);
+    if (it == m_entries.end()) {
+      return nullptr;
+    }
+    return it->second.get();
+  };
+  auto addTopicEntry = [&](std::string_view name) {
+    bool created = false;
+    auto* topicEntry = AddEntryForUpdate(
+        wpi::nt::GetTopic(m_inst.GetHandle(), name), &created);
+    if (created) {
+      updateTree = true;
+      updateDerivedTopicSubscribers = true;
+    }
+    return topicEntry;
+  };
+  auto hasExactSubscriberForTopic = [&](std::string_view name) {
+    if (HasExactSubscriberTopic(m_server.subscribers, name)) {
+      return true;
+    }
+    return std::any_of(m_clients.begin(), m_clients.end(), [&](auto&& client) {
+      return HasExactSubscriberTopic(client.second.subscribers, name);
+    });
+  };
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
@@ -976,23 +1195,40 @@ void NetworkTablesModel::Update() {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
-          updateTree = true;
+          updateDerivedTopicSubscribers = true;
         }
+        entry->subscriberOnly = false;
+        updateTree = true;
       }
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         if (info->name == PROGRAM_START_TIME_TOPIC) {
           m_serverProgramStartTime.reset();
           ApplyServerTime();
         }
+        if (entry && !wpi::util::starts_with(info->name, '$') &&
+            hasExactSubscriberForTopic(info->name)) {
+          entry->UpdateInfo(std::move(*info));
+          ClearValueSource(entry.get());
+          entry->publisher = 0;
+          entry->publishers.clear();
+          entry->subscriberOnly = true;
+          updateTree = true;
+          updateDerivedTopicSubscribers = true;
+          continue;
+        }
         // meta topic handling
         if (wpi::util::starts_with(info->name, '$')) {
           // meta topic handling
           if (info->name == "$clients") {
             m_clients.clear();
+            updateSubscriberOnlyEntries = true;
+            updateDerivedTopicSubscribers = true;
           } else if (info->name == "$serverpub") {
             m_server.publishers.clear();
           } else if (info->name == "$serversub") {
             m_server.subscribers.clear();
+            updateSubscriberOnlyEntries = true;
+            updateDerivedTopicSubscribers = true;
           } else if (auto client =
                          wpi::util::remove_prefix(info->name, "$clientpub$")) {
             auto it = m_clients.find(*client);
@@ -1004,6 +1240,20 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.subscribers.clear();
+              updateSubscriberOnlyEntries = true;
+              updateDerivedTopicSubscribers = true;
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$pub$")) {
+            if (auto* topicEntry = getExistingTopicEntry(*topicName)) {
+              topicEntry->publishers.clear();
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$sub$")) {
+            if (auto* topicEntry = getExistingTopicEntry(*topicName)) {
+              topicEntry->hasTopicSubscriberMetadata = false;
+              topicEntry->subscribers.clear();
+              updateDerivedTopicSubscribers = true;
             }
           }
         }
@@ -1015,6 +1265,7 @@ void NetworkTablesModel::Update() {
         }
         m_entries.erase(info->topic);
         updateTree = true;
+        updateSubscriberOnlyEntries = true;
         continue;
       }
       if (event.flags & wpi::nt::EventFlags::PROPERTIES) {
@@ -1040,10 +1291,14 @@ void NetworkTablesModel::Update() {
               std::erase(m_sortedEntries, nullptr);
             }
             UpdateClients(entry->value.GetRaw());
+            updateSubscriberOnlyEntries = true;
+            updateDerivedTopicSubscribers = true;
           } else if (entry->info.name == "$serverpub") {
             m_server.UpdatePublishers(entry->value.GetRaw());
           } else if (entry->info.name == "$serversub") {
             m_server.UpdateSubscribers(entry->value.GetRaw());
+            updateSubscriberOnlyEntries = true;
+            updateDerivedTopicSubscribers = true;
           } else if (auto client = wpi::util::remove_prefix(entry->info.name,
                                                             "$clientpub$")) {
             auto it = m_clients.find(*client);
@@ -1055,6 +1310,46 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
+              updateSubscriberOnlyEntries = true;
+              updateDerivedTopicSubscribers = true;
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$pub$")) {
+            if (auto publishers = wpi::nt::meta::DecodeTopicPublishers(
+                    entry->value.GetRaw())) {
+              auto* topicEntry = publishers->empty()
+                                     ? getExistingTopicEntry(*topicName)
+                                     : addTopicEntry(*topicName);
+              if (topicEntry) {
+                topicEntry->publishers = std::move(*publishers);
+                if (!topicEntry->publishers.empty()) {
+                  topicEntry->subscriberOnly = false;
+                }
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic publishers\n");
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$sub$")) {
+            if (auto subscribers = wpi::nt::meta::DecodeTopicSubscribers(
+                    entry->value.GetRaw())) {
+              auto* topicEntry = getExistingTopicEntry(*topicName);
+              bool hasExactSubscriber = std::any_of(
+                  subscribers->begin(), subscribers->end(),
+                  [](const auto& sub) { return !sub.options.prefixMatch; });
+              if (!topicEntry &&
+                  (hasExactSubscriber || !subscribers->empty())) {
+                topicEntry = addTopicEntry(*topicName);
+                topicEntry->subscriberOnly =
+                    hasExactSubscriber &&
+                    topicEntry->info.type == NT_UNASSIGNED;
+              }
+              if (topicEntry) {
+                topicEntry->hasTopicSubscriberMetadata = true;
+                topicEntry->subscribers = std::move(*subscribers);
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic subscribers\n");
             }
           }
         } else if (auto typeStr = wpi::util::remove_prefix(entry->info.name,
@@ -1126,6 +1421,15 @@ void NetworkTablesModel::Update() {
       }
       ApplyServerTime();
     }
+  }
+
+  if (updateSubscriberOnlyEntries && UpdateSubscriberOnlyEntries()) {
+    updateTree = true;
+    updateDerivedTopicSubscribers = true;
+  }
+
+  if (updateDerivedTopicSubscribers || updateSubscriberOnlyEntries) {
+    UpdateDerivedTopicSubscribers();
   }
 
   // shortcut common case (updates)
@@ -1242,16 +1546,26 @@ NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
   return *entryIt;
 }
 
-NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
+NetworkTablesModel::Entry* NetworkTablesModel::AddEntryForUpdate(
+    NT_Topic topic, bool* created) {
   auto& entry = m_entries[topic];
   if (!entry) {
     entry = std::make_unique<Entry>();
-    entry->info = wpi::nt::GetTopicInfo(topic);
-    entry->properties = entry->info.GetProperties();
+    entry->UpdateInfo(wpi::nt::GetTopicInfo(topic));
     m_sortedEntries.emplace_back(entry.get());
+    if (created) {
+      *created = true;
+    }
+  } else if (created) {
+    *created = false;
   }
-  RebuildTree();
   return entry.get();
+}
+
+NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
+  auto* entry = AddEntryForUpdate(topic);
+  RebuildTree();
+  return entry;
 }
 
 NetworkTablesModel::Client::Subscriber::Subscriber(
@@ -1383,6 +1697,10 @@ static void EmitEntryValueReadonly(const NetworkTablesModel::ValueSource& entry,
                                    NetworkTablesFlags flags) {
   auto& val = entry.value;
   if (!val) {
+    const char* typeStr = overrideTypeStr
+                              ? GetTypeString(NT_UNASSIGNED, overrideTypeStr)
+                              : "unassigned";
+    ImGui::LabelText(typeStr, "%s", "");
     return;
   }
 
@@ -1458,6 +1776,34 @@ class ArrayEditor {
  public:
   virtual ~ArrayEditor() = default;
   virtual bool Emit() = 0;
+};
+
+class PublishValueEditor {
+ public:
+  PublishValueEditor(NetworkTablesModel& model, std::string name, NT_Type type,
+                     std::string typeStr, NetworkTablesFlags flags)
+      : m_model{model},
+        m_name{std::move(name)},
+        m_type{type},
+        m_typeStr{std::move(typeStr)},
+        m_flags{flags} {}
+
+  bool Emit();
+
+ private:
+  bool Publish();
+  wpi::nt::Value MakeValue() const;
+
+  NetworkTablesModel& m_model;
+  std::string m_name;
+  NT_Type m_type;
+  std::string m_typeStr;
+  NetworkTablesFlags m_flags;
+  int m_boolean = 0;
+  int64_t m_integer = 0;
+  float m_float = 0.0f;
+  double m_double = 0.0;
+  std::string m_string;
 };
 
 template <int NTType, typename T>
@@ -1587,16 +1933,122 @@ bool ArrayEditorImpl<NTType, T>::Emit() {
   }
   return false;
 }
+
+bool PublishValueEditor::Emit() {
+  ImGui::TextUnformatted(m_name.c_str());
+  ImGui::Separator();
+
+  bool publish = false;
+  ImGui::SetNextItemWidth(24 * ImGui::GetFontSize());
+  switch (m_type) {
+    case NT_BOOLEAN: {
+      static const char* boolOptions[] = {"false", "true"};
+      ImGui::Combo("Value", &m_boolean, boolOptions, 2);
+      break;
+    }
+    case NT_INTEGER:
+      publish = InputExpr<int64_t>("Value", &m_integer, "%" PRId64,
+                                   ImGuiInputTextFlags_EnterReturnsTrue);
+      break;
+    case NT_FLOAT:
+      publish = InputExpr<float>("Value", &m_float, "%.6f",
+                                 ImGuiInputTextFlags_EnterReturnsTrue);
+      break;
+    case NT_DOUBLE: {
+      unsigned char precision = (m_flags & NetworkTablesFlags_Precision) >>
+                                NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT;
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
+      publish = InputExpr<double>("Value", &m_double,
+                                  std::format("%.{}f", precision).c_str(),
+                                  ImGuiInputTextFlags_EnterReturnsTrue);
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+      break;
+    }
+    case NT_STRING:
+      publish = ImGui::InputText("Value", &m_string,
+                                 ImGuiInputTextFlags_EnterReturnsTrue);
+      break;
+    default:
+      ImGui::TextUnformatted("Unsupported type");
+      break;
+  }
+
+  if (ImGui::Button("Cancel")) {
+    return true;
+  }
+  ImGui::SameLine();
+  if ((ImGui::Button("Publish") || publish) && Publish()) {
+    return true;
+  }
+  return false;
+}
+
+bool PublishValueEditor::Publish() {
+  auto* entry = m_model.GetEntry(m_name);
+  if (!entry) {
+    entry = m_model.AddEntry(
+        wpi::nt::GetTopic(m_model.GetInstance().GetHandle(), m_name));
+  }
+  if (entry->publisher == 0) {
+    entry->publisher = wpi::nt::Publish(entry->info.topic, m_type, m_typeStr);
+  }
+  if (entry->publisher == 0) {
+    return false;
+  }
+
+  auto value = MakeValue();
+  return value && wpi::nt::SetEntryValue(entry->publisher, value);
+}
+
+wpi::nt::Value PublishValueEditor::MakeValue() const {
+  switch (m_type) {
+    case NT_BOOLEAN:
+      return wpi::nt::Value::MakeBoolean(m_boolean != 0);
+    case NT_INTEGER:
+      return wpi::nt::Value::MakeInteger(m_integer);
+    case NT_FLOAT:
+      return wpi::nt::Value::MakeFloat(m_float);
+    case NT_DOUBLE:
+      return wpi::nt::Value::MakeDouble(m_double);
+    case NT_STRING:
+      return wpi::nt::Value::MakeString(m_string);
+    default:
+      return {};
+  }
+}
 }  // namespace
 
 static ImGuiID gArrayEditorID;
 static std::unique_ptr<ArrayEditor> gArrayEditor;
+static ImGuiID gPublishValueEditorID;
+static std::unique_ptr<PublishValueEditor> gPublishValueEditor;
+
+static bool IsInitialPublishSupported(NT_Type type);
+static void EmitPublishTopicButton(NetworkTablesModel* model,
+                                   const NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags);
 
 static void EmitEntryValueEditable(NetworkTablesModel* model,
                                    NetworkTablesModel::Entry& entry,
                                    NetworkTablesFlags flags) {
   auto& val = entry.value;
+  ImGui::PushID(entry.info.name.c_str());
   if (!val) {
+    if (entry.info.type == NT_UNASSIGNED ||
+        IsInitialPublishSupported(entry.info.type)) {
+      EmitPublishTopicButton(model, entry, flags);
+    } else {
+      EmitEntryValueReadonly(
+          entry,
+          entry.info.type_str.empty() ? nullptr : entry.info.type_str.c_str(),
+          flags);
+    }
+    ImGui::PopID();
     return;
   }
 
@@ -1606,7 +2058,6 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
   ImGui::SetNextItemWidth(
       -1 * (ImGui::CalcTextSize(typeStr).x + ImGui::GetStyle().FramePadding.x));
 
-  ImGui::PushID(entry.info.name.c_str());
   switch (val.type()) {
     case NT_BOOLEAN: {
       static const char* boolOptions[] = {"false", "true"};
@@ -1768,50 +2219,125 @@ static void EmitEntryValueEditable(NetworkTablesModel* model,
   ImGui::PopID();
 }
 
+static bool IsInitialPublishSupported(NT_Type type) {
+  switch (type) {
+    case NT_UNASSIGNED:
+    case NT_BOOLEAN:
+    case NT_INTEGER:
+    case NT_FLOAT:
+    case NT_DOUBLE:
+    case NT_STRING:
+    case NT_BOOLEAN_ARRAY:
+    case NT_INTEGER_ARRAY:
+    case NT_FLOAT_ARRAY:
+    case NT_DOUBLE_ARRAY:
+    case NT_STRING_ARRAY:
+      return true;
+    default:
+      return false;
+  }
+}
+
 static void CreateTopicMenuItem(NetworkTablesModel* model,
                                 std::string_view path, NT_Type type,
-                                const char* typeStr, bool enabled) {
+                                const char* typeStr, bool enabled,
+                                NetworkTablesFlags flags) {
   if (ImGui::MenuItem(typeStr, nullptr, false, enabled)) {
-    auto entry = model->AddEntry(
-        wpi::nt::GetTopic(model->GetInstance().GetHandle(), path));
-    if (entry->publisher == 0) {
-      entry->publisher = wpi::nt::Publish(entry->info.topic, type, typeStr);
-      // publish a default value so it's editable
-      switch (type) {
-        case NT_BOOLEAN:
-          wpi::nt::SetDefaultBoolean(entry->publisher, false);
-          break;
-        case NT_INTEGER:
-          wpi::nt::SetDefaultInteger(entry->publisher, 0);
-          break;
-        case NT_FLOAT:
-          wpi::nt::SetDefaultFloat(entry->publisher, 0.0);
-          break;
-        case NT_DOUBLE:
-          wpi::nt::SetDefaultDouble(entry->publisher, 0.0);
-          break;
-        case NT_STRING:
-          wpi::nt::SetDefaultString(entry->publisher, "");
-          break;
-        case NT_BOOLEAN_ARRAY:
-          wpi::nt::SetDefaultBooleanArray(entry->publisher, {});
-          break;
-        case NT_INTEGER_ARRAY:
-          wpi::nt::SetDefaultIntegerArray(entry->publisher, {});
-          break;
-        case NT_FLOAT_ARRAY:
-          wpi::nt::SetDefaultFloatArray(entry->publisher, {});
-          break;
-        case NT_DOUBLE_ARRAY:
-          wpi::nt::SetDefaultDoubleArray(entry->publisher, {});
-          break;
-        case NT_STRING_ARRAY:
-          wpi::nt::SetDefaultStringArray(entry->publisher, {});
-          break;
-        default:
-          break;
-      }
+    switch (type) {
+      case NT_BOOLEAN:
+      case NT_INTEGER:
+      case NT_FLOAT:
+      case NT_DOUBLE:
+      case NT_STRING:
+        gPublishValueEditor = std::make_unique<PublishValueEditor>(
+            *model, std::string{path}, type, typeStr, flags);
+        ImGui::OpenPopup(gPublishValueEditorID);
+        break;
+      case NT_BOOLEAN_ARRAY:
+        gArrayEditor = std::make_unique<ArrayEditorImpl<NT_BOOLEAN_ARRAY, int>>(
+            *model, std::string{path}, flags, std::span<const int>{});
+        ImGui::OpenPopup(gArrayEditorID);
+        break;
+      case NT_INTEGER_ARRAY:
+        gArrayEditor =
+            std::make_unique<ArrayEditorImpl<NT_INTEGER_ARRAY, int64_t>>(
+                *model, std::string{path}, flags, std::span<const int64_t>{});
+        ImGui::OpenPopup(gArrayEditorID);
+        break;
+      case NT_FLOAT_ARRAY:
+        gArrayEditor = std::make_unique<ArrayEditorImpl<NT_FLOAT_ARRAY, float>>(
+            *model, std::string{path}, flags, std::span<const float>{});
+        ImGui::OpenPopup(gArrayEditorID);
+        break;
+      case NT_DOUBLE_ARRAY:
+        gArrayEditor =
+            std::make_unique<ArrayEditorImpl<NT_DOUBLE_ARRAY, double>>(
+                *model, std::string{path}, flags, std::span<const double>{});
+        ImGui::OpenPopup(gArrayEditorID);
+        break;
+      case NT_STRING_ARRAY:
+        gArrayEditor =
+            std::make_unique<ArrayEditorImpl<NT_STRING_ARRAY, std::string>>(
+                *model, std::string{path}, flags,
+                std::span<const std::string>{});
+        ImGui::OpenPopup(gArrayEditorID);
+        break;
+      default:
+        break;
     }
+  }
+}
+
+static void CreateTopicMenuItems(NetworkTablesModel* model,
+                                 std::string_view path, bool enabled,
+                                 NetworkTablesFlags flags) {
+  CreateTopicMenuItem(model, path, NT_STRING, "string", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_INTEGER, "int", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_FLOAT, "float", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_DOUBLE, "double", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_BOOLEAN, "boolean", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_STRING_ARRAY, "string[]", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_INTEGER_ARRAY, "int[]", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_FLOAT_ARRAY, "float[]", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_DOUBLE_ARRAY, "double[]", enabled, flags);
+  CreateTopicMenuItem(model, path, NT_BOOLEAN_ARRAY, "boolean[]", enabled,
+                      flags);
+}
+
+static void CreateTopicMenuItems(NetworkTablesModel* model,
+                                 const NetworkTablesModel::Entry& entry,
+                                 bool enabled, NetworkTablesFlags flags) {
+  if (entry.info.type == NT_UNASSIGNED) {
+    CreateTopicMenuItems(model, entry.info.name, enabled, flags);
+    return;
+  }
+
+  const char* typeStr = entry.info.type_str.empty()
+                            ? GetTypeString(entry.info.type, nullptr)
+                            : entry.info.type_str.c_str();
+  CreateTopicMenuItem(model, entry.info.name, entry.info.type, typeStr,
+                      enabled && IsInitialPublishSupported(entry.info.type),
+                      flags);
+}
+
+static void DisplayNetworkTablesPublishMenu(
+    NetworkTablesModel* model, const NetworkTablesModel::Entry& entry,
+    bool enabled, NetworkTablesFlags flags) {
+  if (ImGui::BeginMenu("Publish...", enabled)) {
+    CreateTopicMenuItems(model, entry, true, flags);
+    ImGui::EndMenu();
+  }
+}
+
+static void EmitPublishTopicButton(NetworkTablesModel* model,
+                                   const NetworkTablesModel::Entry& entry,
+                                   NetworkTablesFlags flags) {
+  if (ImGui::SmallButton("Publish...")) {
+    ImGui::OpenPopup("publish");
+  }
+  if (ImGui::BeginPopup("publish")) {
+    CreateTopicMenuItems(model, entry, true, flags);
+    ImGui::EndPopup();
   }
 }
 
@@ -1841,19 +2367,7 @@ void wpi::glass::DisplayNetworkTablesAddMenu(NetworkTablesModel* model,
                     nameBuffer[0] != '\0') &&
                    !exists;
 
-    CreateTopicMenuItem(model, fullNewPath, NT_STRING, "string", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER, "int", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT, "float", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE, "double", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN, "boolean", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_STRING_ARRAY, "string[]",
-                        enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_INTEGER_ARRAY, "int[]", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_FLOAT_ARRAY, "float[]", enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_DOUBLE_ARRAY, "double[]",
-                        enabled);
-    CreateTopicMenuItem(model, fullNewPath, NT_BOOLEAN_ARRAY, "boolean[]",
-                        enabled);
+    CreateTopicMenuItems(model, fullNewPath, enabled, flags);
 
     ImGui::EndMenu();
   }
@@ -1907,9 +2421,176 @@ static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
   ImGui::EndDragDropSource();
 }
 
+static const char* GetMetadataClientName(const std::string& client) {
+  return client.empty() ? "<server>" : client.c_str();
+}
+
+static bool EmitTopicMetadataCount(const char* icon, size_t count) {
+  if (count == 0) {
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+  }
+  ImGui::Text("%s %u", icon, static_cast<unsigned int>(count));
+  bool hovered = ImGui::IsItemHovered();
+  if (count == 0) {
+    ImGui::PopStyleColor();
+  }
+  return hovered;
+}
+
+static void EmitTopicPublishersTooltip(
+    const std::vector<wpi::nt::meta::TopicPublisher>& publishers) {
+  ImGui::Text("Publishers: %u", static_cast<unsigned int>(publishers.size()));
+  if (publishers.empty()) {
+    return;
+  }
+  ImGui::Separator();
+  if (ImGui::BeginTable("topic_publishers", 2,
+                        ImGuiTableFlags_SizingFixedFit |
+                            ImGuiTableFlags_BordersInnerV |
+                            ImGuiTableFlags_RowBg)) {
+    ImGui::TableSetupColumn("Client");
+    ImGui::TableSetupColumn("UID");
+    ImGui::TableHeadersRow();
+    for (auto&& pub : publishers) {
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      ImGui::TextUnformatted(GetMetadataClientName(pub.client));
+      ImGui::TableNextColumn();
+      ImGui::Text("%" PRId64, pub.pubuid);
+    }
+    ImGui::EndTable();
+  }
+}
+
+static void EmitTopicSubscribersTooltip(
+    const std::vector<wpi::nt::meta::TopicSubscriber>& subscribers) {
+  ImGui::Text("Subscribers: %u", static_cast<unsigned int>(subscribers.size()));
+  if (subscribers.empty()) {
+    return;
+  }
+  ImGui::Separator();
+  if (ImGui::BeginTable("topic_subscribers", 6,
+                        ImGuiTableFlags_SizingFixedFit |
+                            ImGuiTableFlags_BordersInnerV |
+                            ImGuiTableFlags_RowBg)) {
+    ImGui::TableSetupColumn("Client");
+    ImGui::TableSetupColumn("UID");
+    ImGui::TableSetupColumn("Period");
+    ImGui::TableSetupColumn("Topics Only");
+    ImGui::TableSetupColumn("Send All");
+    ImGui::TableSetupColumn("Prefix");
+    ImGui::TableHeadersRow();
+    for (auto&& sub : subscribers) {
+      ImGui::TableNextRow();
+      ImGui::TableNextColumn();
+      ImGui::TextUnformatted(GetMetadataClientName(sub.client));
+      ImGui::TableNextColumn();
+      ImGui::Text("%" PRId64, sub.subuid);
+      ImGui::TableNextColumn();
+      ImGui::Text("%.3f", sub.options.periodic);
+      ImGui::TableNextColumn();
+      ImGui::TextUnformatted(sub.options.topicsOnly ? "Yes" : "No");
+      ImGui::TableNextColumn();
+      ImGui::TextUnformatted(sub.options.sendAll ? "Yes" : "No");
+      ImGui::TableNextColumn();
+      ImGui::TextUnformatted(sub.options.prefixMatch ? "Yes" : "No");
+    }
+    ImGui::EndTable();
+  }
+}
+
+static void EmitTopicMetadataCounts(const NetworkTablesModel::Entry& entry) {
+  float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+  if (EmitTopicMetadataCount(ICON_FA_UPLOAD, entry.publishers.size())) {
+    ImGui::BeginTooltip();
+    EmitTopicPublishersTooltip(entry.publishers);
+    ImGui::EndTooltip();
+  }
+  ImGui::SameLine(0.0f, spacing);
+  if (EmitTopicMetadataCount(ICON_FA_DOWNLOAD, entry.subscribers.size())) {
+    ImGui::BeginTooltip();
+    EmitTopicSubscribersTooltip(entry.subscribers);
+    ImGui::EndTooltip();
+  }
+}
+
+static const char* GetJsonTreeSummary(const wpi::util::json& value) {
+  if (value.is_object()) {
+    return value.empty() ? "{}" : "{...}";
+  }
+  if (value.is_array()) {
+    return value.empty() ? "[]" : "[...]";
+  }
+  return "";
+}
+
+static void EmitJsonValueTree(std::string_view name,
+                              const wpi::util::json& value) {
+  if (value.is_object() || value.is_array()) {
+    const char* summary = GetJsonTreeSummary(value);
+    if (value.empty()) {
+      if (name.empty()) {
+        ImGui::TextUnformatted(summary);
+      } else {
+        ImGui::Text("%.*s: %s", static_cast<int>(name.size()), name.data(),
+                    summary);
+      }
+      return;
+    }
+
+    std::string label = name.empty() ? std::string{summary}
+                                     : std::format("{}: {}", name, summary);
+    if (TreeNodeEx(label.c_str(), ImGuiTreeNodeFlags_SpanFullWidth)) {
+      if (value.is_object()) {
+        for (auto&& [key, child] : value.get_object()) {
+          PushID(key.c_str());
+          EmitJsonValueTree(key, child);
+          PopID();
+        }
+      } else {
+        auto&& array = value.get_array();
+        for (size_t i = 0; i < array.size(); ++i) {
+          PushID(static_cast<int>(i));
+          EmitJsonValueTree(std::format("[{}]", i), array[i]);
+          PopID();
+        }
+      }
+      TreePop();
+    }
+    return;
+  }
+
+  std::string valueText = value.to_string();
+  if (name.empty()) {
+    ImGui::TextUnformatted(valueText.c_str());
+  } else {
+    ImGui::Text("%.*s: %s", static_cast<int>(name.size()), name.data(),
+                valueText.c_str());
+  }
+}
+
+static void EmitTopicProperties(const NetworkTablesModel::Entry& entry) {
+  if (entry.propertiesValidJson) {
+    EmitJsonValueTree({}, entry.properties);
+  } else {
+    ImGui::Text("%s", entry.info.properties.c_str());
+  }
+}
+
+static void EmitBoldTextOverlay(const char* text, ImVec2 pos) {
+  pos.x += 1.0f;
+  ImGui::GetWindowDrawList()->AddText(pos, ImGui::GetColorU32(ImGuiCol_Text),
+                                      text);
+}
+
 static void EmitValueName(DataSource* source, const char* name,
                           const char* path, NT_Type type,
-                          std::string_view typeStr) {
+                          std::string_view typeStr,
+                          NetworkTablesModel* model = nullptr,
+                          NetworkTablesFlags flags = NetworkTablesFlags_Default,
+                          NetworkTablesModel::Entry* entry = nullptr) {
+  ImVec2 textPos = ImGui::GetCursorScreenPos();
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
@@ -1922,19 +2603,47 @@ static void EmitValueName(DataSource* source, const char* name,
   }
   if (ImGui::BeginPopupContextItem(path)) {
     ImGui::TextUnformatted(path);
+    if (model && entry) {
+      bool canPublish =
+          !entry->value && IsInitialPublishSupported(entry->info.type);
+      bool canUnpublish = entry->publisher != 0;
+      bool enabled = (flags & NetworkTablesFlags_ReadOnly) == 0;
+      if (canPublish || canUnpublish) {
+        ImGui::Separator();
+      }
+      if (canPublish) {
+        DisplayNetworkTablesPublishMenu(model, *entry, enabled, flags);
+      }
+      if (canUnpublish) {
+        ImGui::BeginDisabled(!enabled);
+        if (ImGui::Button("Unpublish")) {
+          wpi::nt::Unpublish(entry->publisher);
+          entry->publisher = 0;
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndDisabled();
+      }
+    }
     ImGui::EndPopup();
+  }
+  if (entry && entry->publisher != 0) {
+    EmitBoldTextOverlay(name, textPos);
   }
 }
 
 static void EmitValueTree(
     const std::vector<NetworkTablesModel::EntryValueTreeNode>& children,
     NetworkTablesFlags flags) {
+  const bool showPubSub = flags & NetworkTablesFlags_ShowPubSub;
   for (auto&& child : children) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
     EmitValueName(child.source.get(), child.name.c_str(), child.path.c_str(),
                   NT_UNASSIGNED, {});
 
+    if (showPubSub) {
+      ImGui::TableNextColumn();
+    }
     ImGui::TableNextColumn();
     if (!child.valueChildren.empty()) {
       auto pos = ImGui::GetCursorPos();
@@ -1973,21 +2682,32 @@ static void EmitEntry(NetworkTablesModel* model,
   }
 
   bool valueChildrenOpen = false;
+  char valueChildrenLabel[128] = "";
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
   EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
-                entry.info.type, entry.info.type_str);
+                entry.info.type, entry.info.type_str, model, flags, &entry);
+
+  if (flags & NetworkTablesFlags_ShowPubSub) {
+    ImGui::TableNextColumn();
+    EmitTopicMetadataCounts(entry);
+  }
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
     auto pos = ImGui::GetCursorPos();
-    char label[128];
     std::string_view ts = entry.info.type_str;
     bool havePopup = GetHeadingTypeString(&ts);
-    wpi::util::format_to_n_c_str(label, sizeof(label), "{}##v_{}", ts.data(),
+    wpi::util::format_to_n_c_str(valueChildrenLabel, sizeof(valueChildrenLabel),
+                                 "{}##v_{}", ts.data(),
                                  entry.info.name.c_str());
-    valueChildrenOpen = TreeNodeEx(label, ImGuiTreeNodeFlags_SpanFullWidth |
-                                              ImGuiTreeNodeFlags_AllowOverlap);
+    valueChildrenOpen =
+        TreeNodeEx(valueChildrenLabel, ImGuiTreeNodeFlags_SpanFullWidth |
+                                           ImGuiTreeNodeFlags_AllowOverlap);
+    if (valueChildrenOpen) {
+      // Sibling columns should not inherit the value tree's storage scope.
+      PopStorageStack();
+    }
     if (havePopup) {
       if (ImGui::IsItemHovered()) {
         ImGui::BeginTooltip();
@@ -2006,7 +2726,7 @@ static void EmitEntry(NetworkTablesModel* model,
     if ((entry.value.IsBooleanArray() || entry.value.IsFloatArray() ||
          entry.value.IsDoubleArray() || entry.value.IsIntegerArray() ||
          entry.value.IsStringArray()) &&
-        ImGui::BeginPopupContextItem(label)) {
+        ImGui::BeginPopupContextItem(valueChildrenLabel)) {
       if (ImGui::Selectable("Edit Array")) {
         if (entry.value.IsBooleanArray()) {
           gArrayEditor =
@@ -2046,8 +2766,11 @@ static void EmitEntry(NetworkTablesModel* model,
 
   if (flags & NetworkTablesFlags_ShowProperties) {
     ImGui::TableNextColumn();
-    ImGui::Text("%s", entry.info.properties.c_str());
-    if (ImGui::BeginPopupContextItem(entry.info.name.c_str())) {
+    PushID(entry.info.name.c_str());
+    ImGui::BeginGroup();
+    EmitTopicProperties(entry);
+    ImGui::EndGroup();
+    if (ImGui::BeginPopupContextItem("properties")) {
       if (ImGui::Checkbox("persistent", &entry.persistent)) {
         wpi::nt::SetTopicPersistent(entry.info.topic, entry.persistent);
       }
@@ -2060,6 +2783,7 @@ static void EmitEntry(NetworkTablesModel* model,
       }
       ImGui::EndPopup();
     }
+    PopID();
   }
 
   if (flags & NetworkTablesFlags_ShowTimestamp) {
@@ -2086,6 +2810,8 @@ static void EmitEntry(NetworkTablesModel* model,
   }
 
   if (valueChildrenOpen) {
+    // Restore value tree storage for child rows; TreePop() pops it.
+    PushStorageStack(valueChildrenLabel);
     EmitValueTree(entry.valueChildren, flags);
     TreePop();
   }
@@ -2126,17 +2852,22 @@ static void DisplayTable(NetworkTablesModel* model,
   }
 
   const bool showProperties = (flags & NetworkTablesFlags_ShowProperties);
+  const bool showPubSub = (flags & NetworkTablesFlags_ShowPubSub);
   const bool showTimestamp = (flags & NetworkTablesFlags_ShowTimestamp);
   const bool showServerTimestamp =
       (flags & NetworkTablesFlags_ShowServerTimestamp);
 
   ImGui::BeginTable("values",
-                    2 + (showProperties ? 1 : 0) + (showTimestamp ? 1 : 0) +
-                        (showServerTimestamp ? 1 : 0),
+                    2 + (showPubSub ? 1 : 0) + (showProperties ? 1 : 0) +
+                        (showTimestamp ? 1 : 0) + (showServerTimestamp ? 1 : 0),
                     ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit |
                         ImGuiTableFlags_BordersInner);
   ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed,
                           0.35f * ImGui::GetWindowWidth());
+  if (showPubSub) {
+    ImGui::TableSetupColumn("Pub/Sub", ImGuiTableColumnFlags_WidthFixed,
+                            8 * ImGui::GetFontSize());
+  }
   ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed,
                           12 * ImGui::GetFontSize());
   if (showProperties) {
@@ -2297,6 +3028,16 @@ void wpi::glass::DisplayNetworkTables(NetworkTablesModel* model,
     ImGui::EndPopup();
   }
 
+  gPublishValueEditorID = ImGui::GetID("Publish Value");
+  if (ImGui::BeginPopupModal("Publish Value", nullptr,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (!gPublishValueEditor || gPublishValueEditor->Emit()) {
+      ImGui::CloseCurrentPopup();
+      gPublishValueEditor.reset();
+    }
+    ImGui::EndPopup();
+  }
+
   if (flags & NetworkTablesFlags_CombinedView) {
     DisplayTable(model, model->GetTreeRoot(), flags, ShowAll);
   } else {
@@ -2327,6 +3068,8 @@ void NetworkTablesFlagsSettings::Update() {
         "special", m_defaultFlags & NetworkTablesFlags_ShowSpecial);
     m_pShowProperties = &storage.GetBool(
         "properties", m_defaultFlags & NetworkTablesFlags_ShowProperties);
+    m_pShowPubSub = &storage.GetBool(
+        "pubSub", m_defaultFlags & NetworkTablesFlags_ShowPubSub);
     m_pShowTimestamp = &storage.GetBool(
         "timestamp", m_defaultFlags & NetworkTablesFlags_ShowTimestamp);
     m_pShowServerTimestamp = &storage.GetBool(
@@ -2343,7 +3086,7 @@ void NetworkTablesFlagsSettings::Update() {
   m_flags &= ~(
       NetworkTablesFlags_TreeView | NetworkTablesFlags_CombinedView |
       NetworkTablesFlags_ShowSpecial | NetworkTablesFlags_ShowProperties |
-      NetworkTablesFlags_ShowTimestamp |
+      NetworkTablesFlags_ShowPubSub | NetworkTablesFlags_ShowTimestamp |
       NetworkTablesFlags_ShowServerTimestamp |
       NetworkTablesFlags_CreateNoncanonicalKeys | NetworkTablesFlags_Precision);
   m_flags |=
@@ -2351,6 +3094,7 @@ void NetworkTablesFlagsSettings::Update() {
       (*m_pCombinedView ? NetworkTablesFlags_CombinedView : 0) |
       (*m_pShowSpecial ? NetworkTablesFlags_ShowSpecial : 0) |
       (*m_pShowProperties ? NetworkTablesFlags_ShowProperties : 0) |
+      (*m_pShowPubSub ? NetworkTablesFlags_ShowPubSub : 0) |
       (*m_pShowTimestamp ? NetworkTablesFlags_ShowTimestamp : 0) |
       (*m_pShowServerTimestamp ? NetworkTablesFlags_ShowServerTimestamp : 0) |
       (*m_pCreateNoncanonicalKeys ? NetworkTablesFlags_CreateNoncanonicalKeys
@@ -2366,6 +3110,7 @@ void NetworkTablesFlagsSettings::DisplayMenu() {
   ImGui::MenuItem("Combined View", "", m_pCombinedView);
   ImGui::MenuItem("Show Special", "", m_pShowSpecial);
   ImGui::MenuItem("Show Properties", "", m_pShowProperties);
+  ImGui::MenuItem("Show Pub/Sub", "", m_pShowPubSub);
   ImGui::MenuItem("Show Timestamp", "", m_pShowTimestamp);
   ImGui::MenuItem("Show Server Timestamp", "", m_pShowServerTimestamp);
   if (ImGui::BeginMenu("Decimal Precision")) {

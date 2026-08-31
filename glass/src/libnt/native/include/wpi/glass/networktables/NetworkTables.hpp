@@ -107,12 +107,21 @@ class NetworkTablesModel : public Model {
     /** JSON representation of the topic properties. */
     wpi::util::json properties;
 
+    /** Whether the topic properties are valid JSON. */
+    bool propertiesValidJson{true};
+
     /** Specific common property flags. */
     bool persistent{false};
     bool retained{false};
 
     /** Publisher (created when the value changes). */
     NT_Publisher publisher{0};
+
+    /** Whether this entry is shown only because an exact subscriber exists. */
+    bool subscriberOnly{false};
+
+    /** Whether subscriber metadata came from the topic's `$sub$...` topic. */
+    bool hasTopicSubscriberMetadata{false};
 
     std::vector<wpi::nt::meta::TopicPublisher> publishers;
     std::vector<wpi::nt::meta::TopicSubscriber> subscribers;
@@ -186,6 +195,9 @@ class NetworkTablesModel : public Model {
   upb_Arena* GetProtobufArena() { return m_arena; }
 
  private:
+  Entry* AddEntryForUpdate(NT_Topic topic, bool* created = nullptr);
+  bool UpdateSubscriberOnlyEntries();
+  void UpdateDerivedTopicSubscribers();
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
   void UpdateClients(std::span<const uint8_t> data);
@@ -227,6 +239,7 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowTimestamp = 1 << 5,
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
+  NetworkTablesFlags_ShowPubSub = 1 << 8,
   NetworkTablesFlags_Precision = 0xff
                                  << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT,
   NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
@@ -259,6 +272,7 @@ class NetworkTablesFlagsSettings {
   bool* m_pCombinedView = nullptr;
   bool* m_pShowSpecial = nullptr;
   bool* m_pShowProperties = nullptr;
+  bool* m_pShowPubSub = nullptr;
   bool* m_pShowTimestamp = nullptr;
   bool* m_pShowServerTimestamp = nullptr;
   bool* m_pCreateNoncanonicalKeys = nullptr;
