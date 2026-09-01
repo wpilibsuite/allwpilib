@@ -39,8 +39,9 @@ class Drive : public wpi::cmd::SubsystemBase {
                             constants::drive::RIGHT_ENCODER_REVERSED};
 
   wpi::cmd::sysid::SysIdRoutine sysIdRoutine{
-      wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
-                              nullptr},
+      // Use 4 volts for the dynamic test. Change this value to suit your
+      // mechanism.
+      wpi::cmd::sysid::Config{std::nullopt, 4_V, std::nullopt, nullptr},
       wpi::cmd::sysid::Mechanism{
           [this](wpi::units::volt_t driveVoltage) {
             leftMotor.SetVoltage(driveVoltage);
