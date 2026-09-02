@@ -6,8 +6,8 @@ package org.wpilib.examples.rapidreactcommandbot;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.epilogue.Epilogue;
 import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.generated.Epilogue;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.DataLogManager;
 

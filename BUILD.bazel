@@ -32,6 +32,11 @@ java_package_configuration(
         "-Xlint:-serial",
         # ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        # ignore module warnings for requirements on automatic modules (opencv, quickbuf)
+        "-Xlint:-requires-automatic",
+        "-Xlint:-requires-transitive-automatic",
+        "-Xlint:-exports",  # workaround for #9350
+        "-Xlint:-missing-explicit-ctor",  # workaround for #9349
     ],
     # Apply our flags to just our repository. Otherwise, Bazel will compile its
     # tools with our flags, and not all of them are warning-free.

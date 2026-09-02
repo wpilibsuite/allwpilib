@@ -7,7 +7,7 @@ load("//drivers:generate.bzl", "generate_drivers")
 load("//drivers:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//drivers:robotpy_pybind_build_info.bzl", "define_pybind_library", "drivers_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
@@ -119,11 +119,16 @@ wpilib_java_library(
     srcs = glob(
         ["src/main/java/**/*.java"],
     ) + [":generated_java"],
+    javacopts = patch_module(
+        "wpilib.drivers",
+        ["drivers/src/generated/main/java"],
+    ),
     maven_artifact_name = "drivers-java",
     maven_group_id = "org.wpilib.drivers",
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
+        "//ntcore:ntcore-java",
         "//telemetry:telemetry-java",
         "//tunables:tunables-java",
         "//wpilibj:wpilibj-java",
@@ -153,6 +158,7 @@ wpilib_java_junit5_test(
     deps = [
         ":drivers-java",
         "//hal:hal-java",
+        "//ntcore:ntcore-java",
         "//telemetry:telemetry-java",
         "//tunables:tunables-java",
         "//wpilibj:wpilibj-java",
