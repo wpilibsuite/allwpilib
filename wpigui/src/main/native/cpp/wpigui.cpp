@@ -1633,8 +1633,11 @@ static void ApplyCommonStyle(Style selectedStyle) {
   style.HoverDelayShort = 0.35f;
   style.HoverDelayNormal = 0.60f;
   style.HoverFlagsForTooltipMouse =
-      ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort;
-  style.HoverFlagsForTooltipNav = ImGuiHoveredFlags_DelayNormal;
+      ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort |
+      ImGuiHoveredFlags_AllowWhenDisabled;
+  style.HoverFlagsForTooltipNav =
+      ImGuiHoveredFlags_NoSharedDelay | ImGuiHoveredFlags_DelayNormal |
+      ImGuiHoveredFlags_AllowWhenDisabled;
 
   ImPlotStyle& plotStyle = ImPlot::GetStyle();
   plotStyle.Colors[ImPlotCol_FrameBg] = palette.control;
