@@ -605,10 +605,10 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "CANBus",
-            yml_file = "semiwrap/CANBus.yml",
+            class_name = "CANPort",
+            yml_file = "semiwrap/CANPort.yml",
             header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/bus/CANBus.hpp",
+            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/hardware/bus/CANPort.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),

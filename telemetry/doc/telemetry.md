@@ -512,27 +512,27 @@ public interface TelemetryEntry {
   void keepDuplicates();
   void setProperty(String key, String value);
 
-  <T> void logStruct(T value, Struct<? super T> struct);
-  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto);
-  <T> void logStructArray(T[] value, Struct<? super T> struct);
+  <T> void logStruct(T value, Struct<? super T> struct, long timestamp);
+  <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp);
+  <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp);
 
-  void logBoolean(boolean value);
-  default void logByte(byte value) {...}
-  default void logShort(short value) {...}
-  default void logInt(int value) {...}
-  void logLong(long value);
-  void logFloat(float value);
-  void logDouble(double value);
-  void logString(String value, String typeString);
+  void logBoolean(boolean value, long timestamp);
+  default void logByte(byte value, long timestamp) {...}
+  default void logShort(short value, long timestamp) {...}
+  default void logInt(int value, long timestamp) {...}
+  void logLong(long value, long timestamp);
+  void logFloat(float value, long timestamp);
+  void logDouble(double value, long timestamp);
+  void logString(String value, String typeString, long timestamp);
 
-  void logBooleanArray(boolean[] value);
-  void logShortArray(short[] value);
-  void logIntArray(int[] value);
-  void logLongArray(long[] value);
-  void logFloatArray(float[] value);
-  void logDoubleArray(double[] value);
-  void logStringArray(String[] value);
-  void logRaw(byte[] value, String typeString);
+  void logBooleanArray(boolean[] value, long timestamp);
+  void logShortArray(short[] value, long timestamp);
+  void logIntArray(int[] value, long timestamp);
+  void logLongArray(long[] value, long timestamp);
+  void logFloatArray(float[] value, long timestamp);
+  void logDoubleArray(double[] value, long timestamp);
+  void logStringArray(String[] value, long timestamp);
+  void logRaw(byte[] value, String typeString, long timestamp);
 }
 ```
 
@@ -544,7 +544,7 @@ Key behavior:
 
 - `logByte`, `logShort`, and `logInt` default to widening into `logLong`, so a backend can implement integer handling with a single required path.
 
-- Backends are responsible for storing, transporting, deduplicating, or timestamping values as appropriate for that transport.
+- Backends are responsible for storing, transporting, deduplicating, and applying timestamps as appropriate for that transport. The `timestamp` parameter is in nanoseconds in the same time base as `WPIUtilJNI.now()`, or `0` to use the current time.
 
 - Metadata (`setProperty`) and duplicate-preservation (`keepDuplicates`) are handled at the entry level rather than the table level.
 
@@ -564,68 +564,68 @@ public final class ConsoleTelemetryBackend implements TelemetryBackend {
       public void setProperty(String key, String value) {}
 
       @Override
-      public <T> void logStruct(T value, Struct<? super T> struct) {
+      public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
         System.out.println(path + " = " + value + " [struct=" + struct.getTypeName() + "]");
       }
 
       @Override
-      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+      public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
         System.out.println(path + " = " + value + " [proto=" + proto.getTypeString() + "]");
       }
 
       @Override
-      public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+      public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
         System.out.println(path + " = struct array length " + value.length);
       }
 
       @Override
-      public void logBoolean(boolean value) {
+      public void logBoolean(boolean value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logLong(long value) {
+      public void logLong(long value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logFloat(float value) {
+      public void logFloat(float value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logDouble(double value) {
+      public void logDouble(double value, long timestamp) {
         System.out.println(path + " = " + value);
       }
 
       @Override
-      public void logString(String value, String typeString) {
+      public void logString(String value, String typeString, long timestamp) {
         System.out.println(path + " = " + value + " [type=" + typeString + "]");
       }
 
       @Override
-      public void logBooleanArray(boolean[] value) {}
+      public void logBooleanArray(boolean[] value, long timestamp) {}
 
       @Override
-      public void logShortArray(short[] value) {}
+      public void logShortArray(short[] value, long timestamp) {}
 
       @Override
-      public void logIntArray(int[] value) {}
+      public void logIntArray(int[] value, long timestamp) {}
 
       @Override
-      public void logLongArray(long[] value) {}
+      public void logLongArray(long[] value, long timestamp) {}
 
       @Override
-      public void logFloatArray(float[] value) {}
+      public void logFloatArray(float[] value, long timestamp) {}
 
       @Override
-      public void logDoubleArray(double[] value) {}
+      public void logDoubleArray(double[] value, long timestamp) {}
 
       @Override
-      public void logStringArray(String[] value) {}
+      public void logStringArray(String[] value, long timestamp) {}
 
       @Override
-      public void logRaw(byte[] value, String typeString) {}
+      public void logRaw(byte[] value, String typeString, long timestamp) {}
     };
   }
 

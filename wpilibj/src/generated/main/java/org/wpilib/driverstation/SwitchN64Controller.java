@@ -955,20 +955,20 @@ public class SwitchN64Controller implements HIDDevice, TelemetryLoggable {
     table.log("LeftY", getLeftY());
     table.log("ZAxis", getZAxis());
     table.log("ZR", getZR());
-    table.log("AButton", getAButton());
-    table.log("BButton", getBButton());
-    table.log("CLeftButton", getCLeftButton());
-    table.log("CUpButton", getCUpButton());
-    table.log("CaptureButton", getCaptureButton());
-    table.log("HomeButton", getHomeButton());
-    table.log("StartButton", getStartButton());
-    table.log("CDownButton", getCDownButton());
-    table.log("LButton", getLButton());
-    table.log("RButton", getRButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("CRightButton", getCRightButton());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("CLeft", getCLeftButton());
+    table.log("CUp", getCUpButton());
+    table.log("Capture", getCaptureButton());
+    table.log("Home", getHomeButton());
+    table.log("Start", getStartButton());
+    table.log("CDown", getCDownButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("CRight", getCRightButton());
   }
 }

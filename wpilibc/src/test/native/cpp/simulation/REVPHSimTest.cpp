@@ -22,18 +22,18 @@ TEST_CASE("REVPHSimTest InitializedCallback", "[wpilibc][simulation]") {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   CHECK(sim.GetInitialized());
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 }
 
 TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{CANBus::CAN_S0, 1,
+  DoubleSolenoid doubleSolenoid{CANPort::CAN_S0, 1,
                                 wpi::PneumaticsModuleType::REV_PH, 3, 4};
 
   BooleanCallback callback3;
@@ -81,7 +81,7 @@ TEST_CASE("REVPHSimTest SolenoidOutput", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetCompressorOn", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -98,7 +98,7 @@ TEST_CASE("REVPHSimTest SetCompressorOn", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetEnableDigital", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -119,7 +119,7 @@ TEST_CASE("REVPHSimTest SetEnableDigital", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetEnableAnalog", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -140,7 +140,7 @@ TEST_CASE("REVPHSimTest SetEnableAnalog", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetEnableHybrid", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -161,7 +161,7 @@ TEST_CASE("REVPHSimTest SetEnableHybrid", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 
@@ -178,7 +178,7 @@ TEST_CASE("REVPHSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("REVPHSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
-  PneumaticHub ph{CANBus::CAN_S0};
+  PneumaticHub ph{CANPort::CAN_S0};
   REVPHSim sim(ph);
   sim.ResetData();
 

@@ -24,7 +24,7 @@ static_assert(wpi::PowerDistribution::DEFAULT_MODULE ==
 
 using namespace wpi;
 
-PowerDistribution::PowerDistribution(CANBus busId) {
+PowerDistribution::PowerDistribution(CANPort busId) {
   auto stack = wpi::util::GetStackTrace(1);
 
   int32_t status = 0;
@@ -44,7 +44,7 @@ PowerDistribution::PowerDistribution(CANBus busId) {
   }
 }
 
-PowerDistribution::PowerDistribution(CANBus busId, int module,
+PowerDistribution::PowerDistribution(CANPort busId, int module,
                                      ModuleType moduleType) {
   auto stack = wpi::util::GetStackTrace(1);
 

@@ -120,26 +120,26 @@ class PyTelemetryTable {
       ValidateNoExplicitTelemetryType(elementType, typeString);
       auto entry = GetEntry(name);
       if (!entry->IsDiscard()) {
-        entry->LogBoolean(value.cast<bool>());
+        entry->LogBoolean(value.cast<bool>(), 0);
       }
     } else if (py::isinstance<py::int_>(value)) {
       ValidateNoExplicitTelemetryType(elementType, typeString);
       auto entry = GetEntry(name);
       if (!entry->IsDiscard()) {
-        entry->LogInt64(value.cast<int64_t>());
+        entry->LogInt64(value.cast<int64_t>(), 0);
       }
     } else if (py::isinstance<py::float_>(value)) {
       ValidateNoExplicitTelemetryType(elementType, typeString);
       auto entry = GetEntry(name);
       if (!entry->IsDiscard()) {
-        entry->LogDouble(value.cast<double>());
+        entry->LogDouble(value.cast<double>(), 0);
       }
     } else if (py::isinstance<py::str>(value)) {
       ValidateNoElementType(elementType);
       auto entry = GetEntry(name);
       if (!entry->IsDiscard()) {
         auto str = value.cast<std::string>();
-        entry->LogString(str, typeString.empty() ? "string" : typeString);
+        entry->LogString(str, typeString.empty() ? "string" : typeString, 0);
       }
     } else if (IsBytesLike(value)) {
       ValidateNoElementType(elementType);
@@ -148,7 +148,7 @@ class PyTelemetryTable {
         auto raw = BytesLikeToString(value);
         auto data = std::span<const uint8_t>{
             reinterpret_cast<const uint8_t*>(raw.data()), raw.size()};
-        entry->LogRaw(data, typeString.empty() ? "raw" : typeString);
+        entry->LogRaw(data, typeString.empty() ? "raw" : typeString, 0);
       }
     } else if (auto logTo = GetOptionalAttr(value, "log_to")) {
       ValidateNoExplicitTelemetryType(elementType, typeString);
@@ -172,7 +172,7 @@ class PyTelemetryTable {
       ValidateNoExplicitTelemetryType(elementType, typeString);
       auto entry = GetEntry(name);
       if (!entry->IsDiscard()) {
-        entry->LogString(py::str(value).cast<std::string>(), "string");
+        entry->LogString(py::str(value).cast<std::string>(), "string", 0);
       }
     }
   }
@@ -307,7 +307,7 @@ class PyTelemetryTable {
           }
           data[i] = item.cast<bool>();
         }
-        entry->LogBooleanArray(std::span<const bool>{data.get(), size});
+        entry->LogBooleanArray(std::span<const bool>{data.get(), size}, 0);
         break;
       }
       case SequenceKind::INTEGER: {
@@ -321,7 +321,7 @@ class PyTelemetryTable {
           }
           data.emplace_back(item.cast<int64_t>());
         }
-        entry->LogInt64Array(std::span<const int64_t>{data});
+        entry->LogInt64Array(std::span<const int64_t>{data}, 0);
         break;
       }
       case SequenceKind::DOUBLE: {
@@ -337,7 +337,7 @@ class PyTelemetryTable {
           }
           data.emplace_back(item.cast<double>());
         }
-        entry->LogDoubleArray(std::span<const double>{data});
+        entry->LogDoubleArray(std::span<const double>{data}, 0);
         break;
       }
       case SequenceKind::STRING: {
@@ -350,7 +350,7 @@ class PyTelemetryTable {
           }
           data.emplace_back(item.cast<std::string>());
         }
-        entry->LogStringArray(std::span<const std::string>{data});
+        entry->LogStringArray(std::span<const std::string>{data}, 0);
         break;
       }
       case SequenceKind::FALLBACK_STRING: {
@@ -360,7 +360,7 @@ class PyTelemetryTable {
           data.emplace_back(
               py::str(value[static_cast<py::ssize_t>(i)]).cast<std::string>());
         }
-        entry->LogStringArray(std::span<const std::string>{data});
+        entry->LogStringArray(std::span<const std::string>{data}, 0);
         break;
       }
     }
@@ -379,7 +379,7 @@ class PyTelemetryTable {
     std::vector<uint8_t> data(wpi::util::GetStructSize<WPyStruct>(info));
     WPyStruct wrapped{py::reinterpret_borrow<py::object>(value)};
     wpi::util::PackStruct(std::span<uint8_t>{data}, wrapped, info);
-    entry->LogRaw(std::span<const uint8_t>{data}, typeString);
+    entry->LogRaw(std::span<const uint8_t>{data}, typeString, 0);
   }
 
   void LogStructSequence(std::string_view name, const py::sequence& value,
@@ -413,7 +413,7 @@ class PyTelemetryTable {
     }
 
     typeString += "[]";
-    entry->LogRaw(std::span<const uint8_t>{data}, typeString);
+    entry->LogRaw(std::span<const uint8_t>{data}, typeString, 0);
   }
 
   wpi::telemetry::TelemetryTable* m_table;
@@ -427,6 +427,7 @@ py::object ActionValueToPython(
     const wpi::telemetry::MockTelemetryBackend::Action& action) {
   py::dict result;
   result["path"] = action.path;
+  result["timestamp"] = action.timestamp;
   std::visit(
       [&](const auto& value) {
         using T = std::decay_t<decltype(value)>;

@@ -8,8 +8,8 @@ classes:
     methods:
       Compressor:
         overloads:
-          CANBus, PneumaticsModuleType:
-          CANBus, int, PneumaticsModuleType:
+          CANPort, PneumaticsModuleType:
+          CANPort, int, PneumaticsModuleType:
       IsEnabled:
       GetPressureSwitchValue:
       GetCurrent:

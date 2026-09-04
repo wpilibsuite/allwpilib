@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.power;
 
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.PowerDistributionFaults;
 import org.wpilib.hardware.hal.PowerDistributionJNI;
 import org.wpilib.hardware.hal.PowerDistributionStickyFaults;
@@ -46,7 +46,7 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
    * @param module The CAN ID of the PDP/PDH.
    * @param moduleType Module type (CTRE or REV).
    */
-  public PowerDistribution(CANBus busId, int module, ModuleType moduleType) {
+  public PowerDistribution(CANPort busId, int module, ModuleType moduleType) {
     m_handle = PowerDistributionJNI.initialize(busId.value, module, moduleType.value);
     m_module = PowerDistributionJNI.getModuleNumber(m_handle);
 
@@ -64,7 +64,7 @@ public class PowerDistribution implements TelemetryLoggable, AutoCloseable {
    *
    * @param busId The bus ID
    */
-  public PowerDistribution(CANBus busId) {
+  public PowerDistribution(CANPort busId) {
     m_handle =
         PowerDistributionJNI.initialize(
             busId.value, DEFAULT_MODULE, PowerDistributionJNI.AUTOMATIC_TYPE);

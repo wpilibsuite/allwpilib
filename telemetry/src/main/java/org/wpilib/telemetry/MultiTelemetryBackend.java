@@ -183,7 +183,7 @@ public class MultiTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -191,12 +191,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logStruct(value, struct);
+        m_entries.get(i).logStruct(value, struct, timestamp);
       }
     }
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -204,12 +204,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logProtobuf(value, proto);
+        m_entries.get(i).logProtobuf(value, proto, timestamp);
       }
     }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -217,12 +217,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logStructArray(value, struct);
+        m_entries.get(i).logStructArray(value, struct, timestamp);
       }
     }
 
     @Override
-    public void logBoolean(boolean value) {
+    public void logBoolean(boolean value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -230,12 +230,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logBoolean(value);
+        m_entries.get(i).logBoolean(value, timestamp);
       }
     }
 
     @Override
-    public void logByte(byte value) {
+    public void logByte(byte value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -243,12 +243,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logByte(value);
+        m_entries.get(i).logByte(value, timestamp);
       }
     }
 
     @Override
-    public void logShort(short value) {
+    public void logShort(short value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -256,12 +256,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logShort(value);
+        m_entries.get(i).logShort(value, timestamp);
       }
     }
 
     @Override
-    public void logInt(int value) {
+    public void logInt(int value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -269,12 +269,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logInt(value);
+        m_entries.get(i).logInt(value, timestamp);
       }
     }
 
     @Override
-    public void logLong(long value) {
+    public void logLong(long value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -282,12 +282,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logLong(value);
+        m_entries.get(i).logLong(value, timestamp);
       }
     }
 
     @Override
-    public void logFloat(float value) {
+    public void logFloat(float value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -295,12 +295,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logFloat(value);
+        m_entries.get(i).logFloat(value, timestamp);
       }
     }
 
     @Override
-    public void logDouble(double value) {
+    public void logDouble(double value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -308,12 +308,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logDouble(value);
+        m_entries.get(i).logDouble(value, timestamp);
       }
     }
 
     @Override
-    public void logString(String value, String typeString) {
+    public void logString(String value, String typeString, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -321,12 +321,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logString(value, typeString);
+        m_entries.get(i).logString(value, typeString, timestamp);
       }
     }
 
     @Override
-    public void logBooleanArray(boolean[] value) {
+    public void logBooleanArray(boolean[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -334,12 +334,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logBooleanArray(value);
+        m_entries.get(i).logBooleanArray(value, timestamp);
       }
     }
 
     @Override
-    public void logShortArray(short[] value) {
+    public void logShortArray(short[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -347,12 +347,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logShortArray(value);
+        m_entries.get(i).logShortArray(value, timestamp);
       }
     }
 
     @Override
-    public void logIntArray(int[] value) {
+    public void logIntArray(int[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -360,12 +360,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logIntArray(value);
+        m_entries.get(i).logIntArray(value, timestamp);
       }
     }
 
     @Override
-    public void logLongArray(long[] value) {
+    public void logLongArray(long[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -373,12 +373,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logLongArray(value);
+        m_entries.get(i).logLongArray(value, timestamp);
       }
     }
 
     @Override
-    public void logFloatArray(float[] value) {
+    public void logFloatArray(float[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -386,12 +386,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logFloatArray(value);
+        m_entries.get(i).logFloatArray(value, timestamp);
       }
     }
 
     @Override
-    public void logDoubleArray(double[] value) {
+    public void logDoubleArray(double[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -399,12 +399,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logDoubleArray(value);
+        m_entries.get(i).logDoubleArray(value, timestamp);
       }
     }
 
     @Override
-    public void logStringArray(String[] value) {
+    public void logStringArray(String[] value, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -412,12 +412,12 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logStringArray(value);
+        m_entries.get(i).logStringArray(value, timestamp);
       }
     }
 
     @Override
-    public void logRaw(byte[] value, String typeString) {
+    public void logRaw(byte[] value, String typeString, long timestamp) {
       if (m_closed) {
         return;
       }
@@ -425,7 +425,7 @@ public class MultiTelemetryBackend implements TelemetryBackend {
         if (m_closed) {
           return;
         }
-        m_entries.get(i).logRaw(value, typeString);
+        m_entries.get(i).logRaw(value, typeString, timestamp);
       }
     }
   }

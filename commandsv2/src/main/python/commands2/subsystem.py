@@ -198,34 +198,6 @@ class Subsystem(TelemetryLoggable):
         """
         self._name = name
 
-    def get_subsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return self._subsystem
-
-    def set_subsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        self._subsystem = subsystem
-
-    def add_child(self, name: str, child: Any) -> None:
-        """
-        Associates a named child with this Subsystem when the child exposes naming methods.
-
-        :param name:  name to give child
-        :param child: sendable
-        """
-        if hasattr(child, "set_name"):
-            child.set_name(name)
-        if hasattr(child, "set_subsystem"):
-            child.set_subsystem(self.get_subsystem())
-
     def log_to(self, table: TelemetryTable) -> None:
         default = self.get_default_command()
         table.log(".hasDefault", default is not None)

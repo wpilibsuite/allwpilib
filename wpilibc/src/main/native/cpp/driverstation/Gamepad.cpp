@@ -604,12 +604,12 @@ double Gamepad::GetAxisForTelemetry(Axis axis) const {
 }
 
 void Gamepad::LogTo(wpi::telemetry::TelemetryTable& table) const {
-  table.Log("LeftTriggerAxis", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
-  table.Log("RightTriggerAxis", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
-  table.Log("LeftXAxis", GetAxisForTelemetry(Axis::LEFT_X));
-  table.Log("LeftYAxis", GetAxisForTelemetry(Axis::LEFT_Y));
-  table.Log("RightXAxis", GetAxisForTelemetry(Axis::RIGHT_X));
-  table.Log("RightYAxis", GetAxisForTelemetry(Axis::RIGHT_Y));
+  table.Log("LeftTrigger", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
+  table.Log("RightTrigger", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
+  table.Log("LeftX", GetAxisForTelemetry(Axis::LEFT_X));
+  table.Log("LeftY", GetAxisForTelemetry(Axis::LEFT_Y));
+  table.Log("RightX", GetAxisForTelemetry(Axis::RIGHT_X));
+  table.Log("RightY", GetAxisForTelemetry(Axis::RIGHT_Y));
 
   uint64_t buttons =
       wpi::internal::DriverStationBackend::GetStickButtons(m_hid->GetPort());

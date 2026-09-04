@@ -51,7 +51,7 @@ class Robot : public wpi::TimedRobot {
 
  private:
   // Object for dealing with the Power Distribution Panel (PDP).
-  wpi::PowerDistribution pdp{wpi::CANBus::CAN_S0};
+  wpi::PowerDistribution pdp{wpi::CANPort::CAN_S0};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

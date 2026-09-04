@@ -57,14 +57,6 @@ std::string Command::GetName() const {
   return m_name;
 }
 
-std::string Command::GetSubsystem() const {
-  return m_subsystem;
-}
-
-void Command::SetSubsystem(std::string_view subsystem) {
-  m_subsystem = subsystem;
-}
-
 CommandPtr Command::WithTimeout(wpi::units::second_t duration) && {
   return std::move(*this).ToPtr().WithTimeout(duration);
 }

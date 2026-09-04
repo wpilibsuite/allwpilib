@@ -8,8 +8,8 @@ classes:
     methods:
       PneumaticsControlModule:
         overloads:
-          CANBus:
-          CANBus, int:
+          CANPort:
+          CANPort, int:
       GetCompressor:
       DisableCompressor:
       EnableCompressorDigital:

@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.system.SensorUtil;
 
 /** Interface for pneumatics devices. */
@@ -17,7 +17,7 @@ public interface PneumaticsBase extends AutoCloseable {
    * @param type module type
    * @return module
    */
-  static PneumaticsBase getForType(CANBus busId, int module, PneumaticsModuleType type) {
+  static PneumaticsBase getForType(CANPort busId, int module, PneumaticsModuleType type) {
     return switch (type) {
       case CTRE_PCM -> new PneumaticsControlModule(busId, module);
       case REV_PH -> new PneumaticHub(busId, module);

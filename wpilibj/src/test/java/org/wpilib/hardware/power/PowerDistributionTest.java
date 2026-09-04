@@ -7,7 +7,7 @@ package org.wpilib.hardware.power;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.power.PowerDistribution.ModuleType;
 import org.wpilib.simulation.PDPSim;
@@ -16,7 +16,7 @@ class PowerDistributionTest {
   @Test
   void testGetAllCurrents() {
     HAL.initialize();
-    PowerDistribution pdp = new PowerDistribution(CANBus.CAN_S0, 1, ModuleType.REV);
+    PowerDistribution pdp = new PowerDistribution(CANPort.CAN_S0, 1, ModuleType.REV);
     PDPSim sim = new PDPSim(pdp);
 
     for (int i = 0; i < pdp.getNumChannels(); i++) {

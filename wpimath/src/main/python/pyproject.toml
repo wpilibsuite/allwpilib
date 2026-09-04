@@ -1502,6 +1502,8 @@ SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
+TwoDeadWheelPoseEstimator = "wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp"
+TwoDeadWheelPoseEstimator3d = "wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp"
 
 # wpi/math/filter
 BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
@@ -1557,7 +1559,8 @@ SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleVelocity = "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-
+TwoDeadWheelOdometry = "wpi/math/kinematics/TwoDeadWheelOdometry.hpp"
+TwoDeadWheelOdometry3d = "wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp"
 
 # wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"

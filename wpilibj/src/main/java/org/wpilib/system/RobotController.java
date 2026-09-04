@@ -10,7 +10,7 @@ import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Volts;
 
 import java.util.function.LongSupplier;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.hardware.hal.PowerJNI;
@@ -312,7 +312,7 @@ public final class RobotController {
    * @param busId The bus ID
    * @return The status of the CAN bus
    */
-  public static CANStatus getCANStatus(CANBus busId) {
+  public static CANStatus getCANStatus(CANPort busId) {
     CANStatus status = new CANStatus();
     CANJNI.getCANStatus(busId.value, status);
     return status;

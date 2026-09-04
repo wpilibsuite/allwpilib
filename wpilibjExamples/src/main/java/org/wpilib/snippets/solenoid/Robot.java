@@ -6,7 +6,7 @@ package org.wpilib.snippets.solenoid;
 
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.Compressor;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
@@ -29,15 +29,15 @@ public class Robot extends TimedRobot {
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN ID.
-  private final Solenoid solenoid = new Solenoid(CANBus.CAN_S0, PneumaticsModuleType.REV_PH, 0);
+  private final Solenoid solenoid = new Solenoid(CANPort.CAN_S0, PneumaticsModuleType.REV_PH, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
   private final DoubleSolenoid doubleSolenoid =
-      new DoubleSolenoid(CANBus.CAN_S0, PneumaticsModuleType.REV_PH, 1, 2);
+      new DoubleSolenoid(CANPort.CAN_S0, PneumaticsModuleType.REV_PH, 1, 2);
 
   // Compressor connected to a PH with a default CAN ID (1)
-  private final Compressor compressor = new Compressor(CANBus.CAN_S0, PneumaticsModuleType.REV_PH);
+  private final Compressor compressor = new Compressor(CANPort.CAN_S0, PneumaticsModuleType.REV_PH);
 
   static final int SOLENOID_BUTTON = 1;
   static final int DOUBLE_SOLENOID_FORWARD_BUTTON = 2;

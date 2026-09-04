@@ -21,7 +21,7 @@ class MyRobot(wpilib.TimedRobot):
         super().__init__()
 
         # Object for dealing with the Power Distribution Panel (PDP).
-        self.pdp = wpilib.PowerDistribution(wpilib.CANBus.CAN_S0)
+        self.pdp = wpilib.PowerDistribution(wpilib.CANPort.CAN_S0)
 
     def robot_periodic(self):
         # Put the PDP itself to the dashboard

@@ -159,6 +159,19 @@ TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
   CHECK("{\"ok\":true}" == json.GetString(""));
 }
 
+TEST_CASE_METHOD(NetworkTablesTelemetryBackendTest,
+                 "NetworkTablesTelemetryBackendTest PublishesExplicitTimestamp",
+                 "[wpilibc][telemetry]") {
+  constexpr int64_t timestamp = 123456789;
+  auto sub = inst.GetDoubleTopic("/Telemetry/timestamped").Subscribe(0.0);
+
+  backend->GetEntry("/timestamped")->LogDouble(2.5, timestamp);
+
+  auto value = sub.GetAtomic();
+  CHECK(timestamp == value.time);
+  CHECK(2.5 == value.value);
+}
+
 TEST_CASE_METHOD(
     NetworkTablesTelemetryBackendTest,
     "NetworkTablesTelemetryBackendTest PublishesArrayAndRawDataTypes",
@@ -378,13 +391,13 @@ TEST_CASE_METHOD(
   auto staleEntry = backend->GetEntry("/stale");
   backend->RemoveEntry("/stale");
 
-  staleEntry->LogDouble(1.25);
+  staleEntry->LogDouble(1.25, 0);
 
   auto topic = inst.GetTopic("/Telemetry/stale");
   CHECK_FALSE(topic.Exists());
 
   auto sub = topic.GenericSubscribe();
-  backend->GetEntry("/stale")->LogDouble(2.5);
+  backend->GetEntry("/stale")->LogDouble(2.5, 0);
 
   CHECK(topic.Exists());
   CHECK(2.5 == sub.GetDouble(0.0));

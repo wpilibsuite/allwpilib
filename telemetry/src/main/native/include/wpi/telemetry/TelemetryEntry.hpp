@@ -55,131 +55,182 @@ class TelemetryEntry {
    * Logs a boolean.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogBoolean(bool value) = 0;
+  virtual void LogBoolean(bool value, int64_t timestamp) = 0;
 
   /**
    * Logs a byte.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt8(int8_t value) { LogInt64(value); }
+  virtual void LogInt8(int8_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
 
   /**
    * Logs a short.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt16(int16_t value) { LogInt64(value); }
+  virtual void LogInt16(int16_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
 
   /**
    * Logs an int.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt32(int32_t value) { LogInt64(value); }
+  virtual void LogInt32(int32_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
 
   /**
    * Logs a long.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt64(int64_t value) = 0;
+  virtual void LogInt64(int64_t value, int64_t timestamp) = 0;
 
   /**
    * Logs a float.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogFloat(float value) = 0;
+  virtual void LogFloat(float value, int64_t timestamp) = 0;
 
   /**
    * Logs a double.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogDouble(double value) = 0;
+  virtual void LogDouble(double value, int64_t timestamp) = 0;
 
   /**
    * Logs a String.
    *
    * @param value the value
    * @param typeString the type string
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogString(std::string_view value,
-                         std::string_view typeString) = 0;
+  virtual void LogString(std::string_view value, std::string_view typeString,
+                         int64_t timestamp) = 0;
 
   /**
    * Logs a boolean array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogBooleanArray(std::span<const bool> value) = 0;
+  virtual void LogBooleanArray(std::span<const bool> value,
+                               int64_t timestamp) = 0;
 
   /**
    * Logs a boolean array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogBooleanArray(std::span<const int> value) = 0;
+  virtual void LogBooleanArray(std::span<const int> value,
+                               int64_t timestamp) = 0;
 
   /**
    * Logs a short array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt16Array(std::span<const int16_t> value) = 0;
+  virtual void LogInt16Array(std::span<const int16_t> value,
+                             int64_t timestamp) = 0;
 
   /**
    * Logs an int array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt32Array(std::span<const int32_t> value) = 0;
+  virtual void LogInt32Array(std::span<const int32_t> value,
+                             int64_t timestamp) = 0;
 
   /**
    * Logs a long array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogInt64Array(std::span<const int64_t> value) = 0;
+  virtual void LogInt64Array(std::span<const int64_t> value,
+                             int64_t timestamp) = 0;
 
   /**
    * Logs a float array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogFloatArray(std::span<const float> value) = 0;
+  virtual void LogFloatArray(std::span<const float> value,
+                             int64_t timestamp) = 0;
 
   /**
    * Logs a double array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogDoubleArray(std::span<const double> value) = 0;
+  virtual void LogDoubleArray(std::span<const double> value,
+                              int64_t timestamp) = 0;
 
   /**
    * Logs a String array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogStringArray(std::span<const std::string> value) = 0;
+  virtual void LogStringArray(std::span<const std::string> value,
+                              int64_t timestamp) = 0;
 
   /**
    * Logs a String array.
    *
    * @param value the value
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
-  virtual void LogStringArray(std::span<const std::string_view> value) = 0;
+  virtual void LogStringArray(std::span<const std::string_view> value,
+                              int64_t timestamp) = 0;
 
   /**
    * Logs a raw value (byte array).
    *
    * @param value the value
    * @param typeString the type string
+   * @param timestamp timestamp in nanoseconds in the same time base as
+   *     wpi::util::Now(), or 0 to use the current time
    */
   virtual void LogRaw(std::span<const uint8_t> value,
-                      std::string_view typeString) = 0;
+                      std::string_view typeString, int64_t timestamp) = 0;
 };
 
 }  // namespace wpi::telemetry

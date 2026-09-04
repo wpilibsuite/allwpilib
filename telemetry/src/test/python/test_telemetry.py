@@ -36,43 +36,43 @@ class RecordingTelemetryEntry(telemetry.TelemetryEntry):
     def set_property(self, key: str, value: str) -> None:
         self.actions.append(("property", key, value))
 
-    def log_boolean(self, value: bool) -> None:
+    def log_boolean(self, value: bool, timestamp: int) -> None:
         self.actions.append(("boolean", value))
 
-    def log_int64(self, value: int) -> None:
+    def log_int64(self, value: int, timestamp: int) -> None:
         self.actions.append(("integer", value))
 
-    def log_float(self, value: float) -> None:
+    def log_float(self, value: float, timestamp: int) -> None:
         self.actions.append(("float", value))
 
-    def log_double(self, value: float) -> None:
+    def log_double(self, value: float, timestamp: int) -> None:
         self.actions.append(("double", value))
 
-    def log_string(self, value: str, type_string: str) -> None:
+    def log_string(self, value: str, type_string: str, timestamp: int) -> None:
         self.actions.append(("string", value, type_string))
 
-    def log_boolean_array(self, value) -> None:
+    def log_boolean_array(self, value, timestamp: int) -> None:
         self.actions.append(("boolean[]", list(value)))
 
-    def log_int16_array(self, value) -> None:
+    def log_int16_array(self, value, timestamp: int) -> None:
         self.actions.append(("integer[]", list(value)))
 
-    def log_int32_array(self, value) -> None:
+    def log_int32_array(self, value, timestamp: int) -> None:
         self.actions.append(("integer[]", list(value)))
 
-    def log_int64_array(self, value) -> None:
+    def log_int64_array(self, value, timestamp: int) -> None:
         self.actions.append(("integer[]", list(value)))
 
-    def log_float_array(self, value) -> None:
+    def log_float_array(self, value, timestamp: int) -> None:
         self.actions.append(("float[]", list(value)))
 
-    def log_double_array(self, value) -> None:
+    def log_double_array(self, value, timestamp: int) -> None:
         self.actions.append(("double[]", list(value)))
 
-    def log_string_array(self, value) -> None:
+    def log_string_array(self, value, timestamp: int) -> None:
         self.actions.append(("string[]", list(value)))
 
-    def log_raw(self, value, type_string: str) -> None:
+    def log_raw(self, value, type_string: str, timestamp: int) -> None:
         self.actions.append(("raw", bytes(value), type_string))
 
 
@@ -135,6 +135,7 @@ def test_telemetry_logs_python_object(backend):
 
     assert backend.get_last_action("/PythonValue/.type") == {
         "path": "/PythonValue/.type",
+        "timestamp": 0,
         "kind": "string",
         "value": "TestValue",
         "type_string": "string",
@@ -416,6 +417,7 @@ def test_struct_logging_registers_schema_and_raw_bytes(backend):
     }
     assert backend.get_last_action("/point") == {
         "path": "/point",
+        "timestamp": 0,
         "kind": "raw",
         "value": wpistruct.pack(point),
         "type_string": "struct:TelemetryPoint",
@@ -432,6 +434,7 @@ def test_struct_array_logging_registers_schema_and_raw_bytes(backend):
     )
     assert backend.get_last_action("/points") == {
         "path": "/points",
+        "timestamp": 0,
         "kind": "raw",
         "value": wpistruct.pack_array(points),
         "type_string": "struct:TelemetryPoint[]",
@@ -448,6 +451,7 @@ def test_empty_struct_array_with_element_type_logs_schema_and_empty_raw_bytes(
     )
     assert backend.get_last_action("/points") == {
         "path": "/points",
+        "timestamp": 0,
         "kind": "raw",
         "value": b"",
         "type_string": "struct:TelemetryPoint[]",

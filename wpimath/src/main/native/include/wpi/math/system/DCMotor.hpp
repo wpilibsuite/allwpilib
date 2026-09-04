@@ -241,8 +241,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * Return a gearbox of Kraken X60 brushless motors.
    */
   static constexpr DCMotor KrakenX60(int numMotors = 1) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
-    return DCMotor(12_V, 7.09_Nm, 366_A, 2_A, 6000_rpm, numMotors);
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return DCMotor(12_V, 7.157_Nm, 374.4_A, 2_A, 6065_rpm, numMotors);
   }
 
   /**
@@ -250,8 +250,8 @@ class WPILIB_DLLEXPORT DCMotor {
    * Control) enabled.
    */
   static constexpr DCMotor KrakenX60FOC(int numMotors = 1) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
-    return DCMotor(12_V, 9.37_Nm, 483_A, 2_A, 5800_rpm, numMotors);
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return DCMotor(12_V, 9.362_Nm, 476.1_A, 2_A, 5785_rpm, numMotors);
   }
 
   /**
@@ -259,7 +259,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   static constexpr DCMotor KrakenX44(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return DCMotor(12_V, 4.11_Nm, 279_A, 2_A, 7758_rpm, numMotors);
+    return DCMotor(12_V, 4.113_Nm, 279.1_A, 2_A, 7758_rpm, numMotors);
   }
 
   /**
@@ -268,7 +268,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   static constexpr DCMotor KrakenX44FOC(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return DCMotor(12_V, 5.01_Nm, 329_A, 2_A, 7368_rpm, numMotors);
+    return DCMotor(12_V, 5.011_Nm, 329.2_A, 2_A, 7368_rpm, numMotors);
   }
 
   /**
@@ -276,7 +276,7 @@ class WPILIB_DLLEXPORT DCMotor {
    */
   static constexpr DCMotor Minion(int numMotors = 1) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return DCMotor(12_V, 3.17_Nm, 211_A, 2_A, 7704_rpm, numMotors);
+    return DCMotor(12_V, 3.173_Nm, 211.6_A, 2_A, 7704_rpm, numMotors);
   }
 
   /**

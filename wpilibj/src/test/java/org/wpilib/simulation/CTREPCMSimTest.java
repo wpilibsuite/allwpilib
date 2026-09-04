@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.pneumatic.CompressorConfigType;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
@@ -20,7 +20,7 @@ import org.wpilib.simulation.testutils.BooleanCallback;
 import org.wpilib.simulation.testutils.DoubleCallback;
 
 class CTREPCMSimTest {
-  private static final CANBus BUS = CANBus.CAN_S0;
+  private static final CANPort BUS = CANPort.CAN_S0;
 
   @Test
   void testInitialization() {

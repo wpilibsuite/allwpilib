@@ -86,8 +86,20 @@ public class MockTelemetryBackend implements TelemetryBackend {
    *
    * @param path logged path
    * @param value logged value
+   * @param timestamp logged timestamp in nanoseconds in the same time base as {@link
+   *     org.wpilib.util.WPIUtilJNI#now() WPIUtilJNI.now()}, or 0 to use the current time
    */
-  public record Action(String path, Object value) {}
+  public record Action(String path, Object value, long timestamp) {
+    /**
+     * Constructs a logged action with the current-time timestamp sentinel.
+     *
+     * @param path logged path
+     * @param value logged value
+     */
+    public Action(String path, Object value) {
+      this(path, value, 0);
+    }
+  }
 
   private final Map<String, Entry> m_entries = new HashMap<>();
   private final List<Action> m_actions = new ArrayList<>();
@@ -175,13 +187,13 @@ public class MockTelemetryBackend implements TelemetryBackend {
     }
   }
 
-  private void log(Entry entry, Object value) {
+  private void log(Entry entry, Object value, long timestamp) {
     synchronized (this) {
       if (entry.m_removed) {
         return;
       }
       entry.m_last = m_actions.size();
-      m_actions.add(new Action(entry.m_path, value));
+      m_actions.add(new Action(entry.m_path, value, timestamp));
     }
   }
 
@@ -204,23 +216,23 @@ public class MockTelemetryBackend implements TelemetryBackend {
 
     @Override
     public void keepDuplicates() {
-      log(this, new KeepDuplicateValue(true));
+      log(this, new KeepDuplicateValue(true), 0);
     }
 
     @Override
     public void setProperty(String key, String value) {
-      log(this, new SetPropertyValue(key, value));
+      log(this, new SetPropertyValue(key, value), 0);
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {
-      logStructImpl(value, struct);
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
+      logStructImpl(value, struct, timestamp);
     }
 
-    private <T> void logStructImpl(T value, Struct<T> struct) {
+    private <T> void logStructImpl(T value, Struct<T> struct, long timestamp) {
       if (struct.isImmutable()) {
         // log it directly
-        log(this, new LogStructValue<T>(value, struct));
+        log(this, new LogStructValue<T>(value, struct), timestamp);
       } else if (struct.isCloneable()) {
         T clonedValue;
         try {
@@ -228,26 +240,26 @@ public class MockTelemetryBackend implements TelemetryBackend {
         } catch (CloneNotSupportedException e) {
           TelemetryRegistry.reportWarning(
               m_path, "struct.isCloneable() returned true, but clone() raised exception");
-          log(this, new LogStructValue<T>(value, struct));
+          log(this, new LogStructValue<T>(value, struct), timestamp);
           return;
         }
-        log(this, new LogStructValue<T>(clonedValue, struct));
+        log(this, new LogStructValue<T>(clonedValue, struct), timestamp);
       } else {
         // log it directly, but warn
         TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable struct");
-        log(this, new LogStructValue<T>(value, struct));
+        log(this, new LogStructValue<T>(value, struct), timestamp);
       }
     }
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
-      logProtobufImpl(value, proto);
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
+      logProtobufImpl(value, proto, timestamp);
     }
 
-    private <T> void logProtobufImpl(T value, Protobuf<T, ?> proto) {
+    private <T> void logProtobufImpl(T value, Protobuf<T, ?> proto, long timestamp) {
       if (proto.isImmutable()) {
         // log it directly
-        log(this, new LogProtobufValue<T>(value, proto));
+        log(this, new LogProtobufValue<T>(value, proto), timestamp);
       } else if (proto.isCloneable()) {
         T clonedValue;
         try {
@@ -255,26 +267,26 @@ public class MockTelemetryBackend implements TelemetryBackend {
         } catch (CloneNotSupportedException e) {
           TelemetryRegistry.reportWarning(
               m_path, "proto.isCloneable() returned true, but clone() raised exception");
-          log(this, new LogProtobufValue<T>(value, proto));
+          log(this, new LogProtobufValue<T>(value, proto), timestamp);
           return;
         }
-        log(this, new LogProtobufValue<T>(clonedValue, proto));
+        log(this, new LogProtobufValue<T>(clonedValue, proto), timestamp);
       } else {
         // log it directly, but warn
         TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable proto");
-        log(this, new LogProtobufValue<T>(value, proto));
+        log(this, new LogProtobufValue<T>(value, proto), timestamp);
       }
     }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {
-      logStructArrayImpl(value, struct);
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
+      logStructArrayImpl(value, struct, timestamp);
     }
 
-    private <T> void logStructArrayImpl(T[] value, Struct<T> struct) {
+    private <T> void logStructArrayImpl(T[] value, Struct<T> struct, long timestamp) {
       if (struct.isImmutable()) {
         // log it directly
-        log(this, new LogStructArrayValue<T>(value.clone(), struct));
+        log(this, new LogStructArrayValue<T>(value.clone(), struct), timestamp);
       } else if (struct.isCloneable()) {
         @SuppressWarnings("unchecked")
         T[] clonedArray = (T[]) Array.newInstance(struct.getTypeClass(), value.length);
@@ -285,90 +297,90 @@ public class MockTelemetryBackend implements TelemetryBackend {
         } catch (CloneNotSupportedException e) {
           TelemetryRegistry.reportWarning(
               m_path, "struct.isCloneable() returned true, but clone() raised exception");
-          log(this, new LogStructArrayValue<T>(value.clone(), struct));
+          log(this, new LogStructArrayValue<T>(value.clone(), struct), timestamp);
           return;
         }
-        log(this, new LogStructArrayValue<T>(clonedArray, struct));
+        log(this, new LogStructArrayValue<T>(clonedArray, struct), timestamp);
       } else {
         // log it directly, but warn
         TelemetryRegistry.reportWarning(m_path, "logging non-immutable and non-cloneable struct");
-        log(this, new LogStructArrayValue<T>(value.clone(), struct));
+        log(this, new LogStructArrayValue<T>(value.clone(), struct), timestamp);
       }
     }
 
     @Override
-    public void logBoolean(boolean value) {
-      log(this, value);
+    public void logBoolean(boolean value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logShort(short value) {
-      log(this, value);
+    public void logShort(short value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logInt(int value) {
-      log(this, value);
+    public void logInt(int value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logLong(long value) {
-      log(this, value);
+    public void logLong(long value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logFloat(float value) {
-      log(this, value);
+    public void logFloat(float value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logDouble(double value) {
-      log(this, value);
+    public void logDouble(double value, long timestamp) {
+      log(this, value, timestamp);
     }
 
     @Override
-    public void logString(String value, String typeString) {
-      log(this, new LogStringValue(value, typeString));
+    public void logString(String value, String typeString, long timestamp) {
+      log(this, new LogStringValue(value, typeString), timestamp);
     }
 
     @Override
-    public void logBooleanArray(boolean[] value) {
-      log(this, value.clone());
+    public void logBooleanArray(boolean[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logShortArray(short[] value) {
-      log(this, value.clone());
+    public void logShortArray(short[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logIntArray(int[] value) {
-      log(this, value.clone());
+    public void logIntArray(int[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logLongArray(long[] value) {
-      log(this, value.clone());
+    public void logLongArray(long[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logFloatArray(float[] value) {
-      log(this, value.clone());
+    public void logFloatArray(float[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logDoubleArray(double[] value) {
-      log(this, value.clone());
+    public void logDoubleArray(double[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logStringArray(String[] value) {
-      log(this, value.clone());
+    public void logStringArray(String[] value, long timestamp) {
+      log(this, value.clone(), timestamp);
     }
 
     @Override
-    public void logRaw(byte[] value, String typeString) {
-      log(this, new LogRawValue(value.clone(), typeString));
+    public void logRaw(byte[] value, String typeString, long timestamp) {
+      log(this, new LogRawValue(value.clone(), typeString), timestamp);
     }
 
     private final String m_path;

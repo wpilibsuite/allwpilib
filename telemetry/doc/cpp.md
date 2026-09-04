@@ -599,30 +599,46 @@ class TelemetryEntry {
   virtual void KeepDuplicates() = 0;
   virtual void SetProperty(std::string_view key, std::string_view value) = 0;
 
-  virtual void LogBoolean(bool value) = 0;
-  virtual void LogInt8(int8_t value) { LogInt64(value); }
-  virtual void LogInt16(int16_t value) { LogInt64(value); }
-  virtual void LogInt32(int32_t value) { LogInt64(value); }
-  virtual void LogInt64(int64_t value) = 0;
-  virtual void LogFloat(float value) = 0;
-  virtual void LogDouble(double value) = 0;
+  virtual void LogBoolean(bool value, int64_t timestamp) = 0;
+  virtual void LogInt8(int8_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
+  virtual void LogInt16(int16_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
+  virtual void LogInt32(int32_t value, int64_t timestamp) {
+    LogInt64(value, timestamp);
+  }
+  virtual void LogInt64(int64_t value, int64_t timestamp) = 0;
+  virtual void LogFloat(float value, int64_t timestamp) = 0;
+  virtual void LogDouble(double value, int64_t timestamp) = 0;
   virtual void LogString(std::string_view value,
-                         std::string_view typeString) = 0;
-  virtual void LogBooleanArray(std::span<const bool> value) = 0;
-  virtual void LogBooleanArray(std::span<const int> value) = 0;
-  virtual void LogInt16Array(std::span<const int16_t> value) = 0;
-  virtual void LogInt32Array(std::span<const int32_t> value) = 0;
-  virtual void LogInt64Array(std::span<const int64_t> value) = 0;
-  virtual void LogFloatArray(std::span<const float> value) = 0;
-  virtual void LogDoubleArray(std::span<const double> value) = 0;
-  virtual void LogStringArray(std::span<const std::string> value) = 0;
-  virtual void LogStringArray(std::span<const std::string_view> value) = 0;
+                         std::string_view typeString,
+                         int64_t timestamp) = 0;
+  virtual void LogBooleanArray(std::span<const bool> value,
+                               int64_t timestamp) = 0;
+  virtual void LogBooleanArray(std::span<const int> value,
+                               int64_t timestamp) = 0;
+  virtual void LogInt16Array(std::span<const int16_t> value,
+                             int64_t timestamp) = 0;
+  virtual void LogInt32Array(std::span<const int32_t> value,
+                             int64_t timestamp) = 0;
+  virtual void LogInt64Array(std::span<const int64_t> value,
+                             int64_t timestamp) = 0;
+  virtual void LogFloatArray(std::span<const float> value,
+                             int64_t timestamp) = 0;
+  virtual void LogDoubleArray(std::span<const double> value,
+                              int64_t timestamp) = 0;
+  virtual void LogStringArray(std::span<const std::string> value,
+                              int64_t timestamp) = 0;
+  virtual void LogStringArray(std::span<const std::string_view> value,
+                              int64_t timestamp) = 0;
   virtual void LogRaw(std::span<const uint8_t> value,
-                      std::string_view typeString) = 0;
+                      std::string_view typeString, int64_t timestamp) = 0;
 };
 ```
 
-This layer is primarily relevant to backend authors rather than normal robot-code authors. `TelemetryEntry` implementations must not throw from logging, metadata, or discard-checking methods; recoverable failures should be reported through `TelemetryRegistry::ReportWarning()` and skipped.
+This layer is primarily relevant to backend authors rather than normal robot-code authors. Each logging method receives a `timestamp` in nanoseconds in the same time base as `wpi::util::Now()`, or `0` to use the current time. `TelemetryEntry` implementations must not throw from logging, metadata, or discard-checking methods; recoverable failures should be reported through `TelemetryRegistry::ReportWarning()` and skipped.
 
 `wpi::telemetry::TelemetryBackend` also owns schema publication in C++:
 

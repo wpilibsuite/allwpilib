@@ -886,6 +886,26 @@ ImFont* Context::FontMaker::GetFont() const {
   return font;
 }
 
+static bool SetDefaultFontByName(const std::string& name) {
+  for (auto&& makeFont : gContext->makeFonts) {
+    if (makeFont.GetName() == name) {
+      ImGui::GetIO().FontDefault = makeFont.GetFont();
+      gContext->defaultFontName = makeFont.GetName();
+      return true;
+    }
+  }
+  return false;
+}
+
+static void LoadDefaultFont() {
+  if (!SetDefaultFontByName(gContext->defaultFontName) &&
+      !gContext->makeFonts.empty()) {
+    auto& makeFont = gContext->makeFonts.front();
+    ImGui::GetIO().FontDefault = makeFont.GetFont();
+    gContext->defaultFontName = makeFont.GetName();
+  }
+}
+
 static void UpdateFontScale() {
   // Scale based on OS window content scaling
   float windowScale = 1.0;
@@ -1130,6 +1150,7 @@ bool gui::Initialize(const char* title, int width, int height,
 
   // Load Fonts
   UpdateFontScale();
+  LoadDefaultFont();
 
   return true;
 }
@@ -1716,8 +1737,7 @@ void gui::EmitViewMenu() {
         auto& name = makeFont.GetName();
         bool selected = gContext->defaultFontName == name;
         if (ImGui::MenuItem(name.c_str(), nullptr, &selected)) {
-          ImGui::GetIO().FontDefault = makeFont.GetFont();
-          gContext->defaultFontName = name;
+          SetDefaultFontByName(name);
         }
       }
       ImGui::EndMenu();

@@ -155,7 +155,7 @@ wpi::units::celsius_t RobotController::GetCPUTemp() {
   return wpi::units::celsius_t{retVal};
 }
 
-CANStatus RobotController::GetCANStatus(CANBus busId) {
+CANStatus RobotController::GetCANStatus(CANPort busId) {
   int32_t status = 0;
   float percentBusUtilization = 0;
   uint32_t busOffCount = 0;

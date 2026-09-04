@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
@@ -31,7 +31,7 @@ class Solenoid : public wpi::telemetry::TelemetryLoggable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
+  Solenoid(CANPort busId, int module, PneumaticsModuleType moduleType,
            int channel);
 
   /**
@@ -41,7 +41,7 @@ class Solenoid : public wpi::telemetry::TelemetryLoggable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(CANBus busId, PneumaticsModuleType moduleType, int channel);
+  Solenoid(CANPort busId, PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 

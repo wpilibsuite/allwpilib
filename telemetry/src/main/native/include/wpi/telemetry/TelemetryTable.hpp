@@ -234,11 +234,11 @@ class TelemetryTable final {
         return;
       }
       if constexpr (sizeof...(I) == 0) {
-        entry->LogString(std::string_view{value}, "string");
+        entry->LogString(std::string_view{value}, "string", 0);
       } else if constexpr (sizeof...(I) == 1 &&
                            (std::constructible_from<std::string_view, I> &&
                             ...)) {
-        entry->LogString(std::string_view{value}, std::string_view{info...});
+        entry->LogString(std::string_view{value}, std::string_view{info...}, 0);
       } else {
         static_assert(impl::always_false<T>::value,
                       "Don't know how to serialize type");
@@ -267,14 +267,14 @@ class TelemetryTable final {
           if constexpr (wpi::util::is_constexpr([] { S::GetSize(); })) {
             uint8_t buf[S::GetSize()];
             S::Pack(buf, value);
-            entry->LogRaw(std::span{buf}, typeString);
+            entry->LogRaw(std::span{buf}, typeString, 0);
             return;
           }
         }
         wpi::util::SmallVector<uint8_t, 128> buf;
         buf.resize_for_overwrite(S::GetSize(info...));
         S::Pack(buf, value, info...);
-        entry->LogRaw(std::span{buf}, typeString);
+        entry->LogRaw(std::span{buf}, typeString, 0);
       } catch (const std::exception& e) {
         ReportWarning(path, "failed to publish struct value", e);
       } catch (...) {
@@ -297,7 +297,7 @@ class TelemetryTable final {
           ReportWarning(path, "failed to publish protobuf value");
           return;
         }
-        entry->LogRaw(buf, typeString);
+        entry->LogRaw(buf, typeString, 0);
       } catch (const std::exception& e) {
         ReportWarning(path, "failed to publish protobuf value", e);
       } catch (...) {
@@ -308,19 +308,19 @@ class TelemetryTable final {
       if (entry->IsDiscard()) {
         return;
       }
-      entry->LogInt64(static_cast<int64_t>(value));
+      entry->LogInt64(static_cast<int64_t>(value), 0);
     } else if constexpr (std::floating_point<T>) {
       auto entry = GetEntry(name);
       if (entry->IsDiscard()) {
         return;
       }
-      entry->LogDouble(static_cast<double>(value));
+      entry->LogDouble(static_cast<double>(value), 0);
     } else if constexpr (std::constructible_from<std::formatter<T>>) {
       auto entry = GetEntry(name);
       if (entry->IsDiscard()) {
         return;
       }
-      entry->LogString(std::format("{}", value), "string");
+      entry->LogString(std::format("{}", value), "string", 0);
     } else {
       static_assert(impl::always_false<T>::value,
                     "Don't know how to serialize type");
@@ -342,28 +342,28 @@ class TelemetryTable final {
     }
     using U = std::remove_cv_t<T>;
     if constexpr (std::same_as<U, bool>) {
-      entry->LogBooleanArray(value);
+      entry->LogBooleanArray(value, 0);
     } else if constexpr (std::same_as<U, int16_t>) {
-      entry->LogInt16Array(value);
+      entry->LogInt16Array(value, 0);
     } else if constexpr (std::same_as<U, int32_t>) {
-      entry->LogInt32Array(value);
+      entry->LogInt32Array(value, 0);
     } else if constexpr (std::same_as<U, int64_t>) {
-      entry->LogInt64Array(value);
+      entry->LogInt64Array(value, 0);
     } else if constexpr (std::same_as<U, float>) {
-      entry->LogFloatArray(value);
+      entry->LogFloatArray(value, 0);
     } else if constexpr (std::same_as<U, double>) {
-      entry->LogDoubleArray(value);
+      entry->LogDoubleArray(value, 0);
     } else if constexpr (std::same_as<U, std::string>) {
-      entry->LogStringArray(value);
+      entry->LogStringArray(value, 0);
     } else if constexpr (std::same_as<U, std::string_view>) {
-      entry->LogStringArray(value);
+      entry->LogStringArray(value, 0);
     } else if constexpr (std::same_as<U, uint8_t>) {
       if constexpr (sizeof...(I) == 0) {
-        entry->LogRaw(value, "raw");
+        entry->LogRaw(value, "raw", 0);
       } else if constexpr (sizeof...(I) == 1 &&
                            (std::constructible_from<std::string_view, I> &&
                             ...)) {
-        entry->LogRaw(value, std::string_view{info...});
+        entry->LogRaw(value, std::string_view{info...}, 0);
       } else {
         static_assert(impl::always_false<T>::value,
                       "Don't know how to serialize type");
@@ -374,7 +374,7 @@ class TelemetryTable final {
       for (auto&& v : value) {
         values.emplace_back(static_cast<int64_t>(v));
       }
-      entry->LogInt64Array(values);
+      entry->LogInt64Array(values, 0);
     } else if constexpr (wpi::util::StructSerializable<T, I...>) {
       auto structTypeString = wpi::util::GetStructTypeString<T>(info...);
       auto path = std::format("{}{}", m_path, name);
@@ -388,7 +388,7 @@ class TelemetryTable final {
             [&](auto bytes) {
               entry->LogRaw(
                   bytes,
-                  std::format("{}[]", std::string_view{structTypeString}));
+                  std::format("{}[]", std::string_view{structTypeString}), 0);
             },
             info...);
       } catch (const std::exception& e) {
@@ -402,7 +402,7 @@ class TelemetryTable final {
       for (auto&& v : value) {
         strings.emplace_back(std::format("{}", v));
       }
-      entry->LogStringArray(strings);
+      entry->LogStringArray(strings, 0);
     } else {
       static_assert(impl::always_false<T>::value,
                     "Don't know how to serialize type");

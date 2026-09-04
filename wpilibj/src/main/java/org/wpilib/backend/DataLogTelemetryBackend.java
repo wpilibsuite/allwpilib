@@ -170,14 +170,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> StructLogEntry<T> initStruct(Struct<T> struct) {
+    private <T> StructLogEntry<T> initStruct(Struct<T> struct, long timestamp) {
       if (m_closed) {
         return null;
       }
       DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
-          StructLogEntry<T> e = StructLogEntry.create(m_log, m_path, struct, m_properties);
+          StructLogEntry<T> e =
+              StructLogEntry.create(m_log, m_path, struct, m_properties, timestamp);
           m_struct = struct;
           m_entry = e;
           yield e;
@@ -192,16 +193,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStruct(T value, Struct<? super T> struct) {
+    public <T> void logStruct(T value, Struct<? super T> struct, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          StructLogEntry<? super T> entry = initStruct(struct);
+          StructLogEntry<? super T> entry = initStruct(struct, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
-              entry.append(value);
+              entry.append(value, timestamp);
             } else {
-              entry.update(value);
+              entry.update(value, timestamp);
             }
           } else if (!m_closed) {
             typeMismatch = true;
@@ -215,14 +216,15 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto) {
+    private <T> ProtobufLogEntry<T> initProtobuf(Protobuf<T, ?> proto, long timestamp) {
       if (m_closed) {
         return null;
       }
       DataLogEntry entry = m_entry;
       return switch (entry) {
         case null -> {
-          ProtobufLogEntry<T> e = ProtobufLogEntry.create(m_log, m_path, proto, m_properties);
+          ProtobufLogEntry<T> e =
+              ProtobufLogEntry.create(m_log, m_path, proto, m_properties, timestamp);
           m_proto = proto;
           m_entry = e;
           yield e;
@@ -237,16 +239,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto) {
+    public <T> void logProtobuf(T value, Protobuf<? super T, ?> proto, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          ProtobufLogEntry<? super T> entry = initProtobuf(proto);
+          ProtobufLogEntry<? super T> entry = initProtobuf(proto, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
-              entry.append(value);
+              entry.append(value, timestamp);
             } else {
-              entry.update(value);
+              entry.update(value, timestamp);
             }
           } else if (!m_closed) {
             typeMismatch = true;
@@ -260,7 +262,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       }
     }
 
-    private <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct) {
+    private <T> StructArrayLogEntry<T> initStructArray(Struct<T> struct, long timestamp) {
       if (m_closed) {
         return null;
       }
@@ -268,7 +270,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
       return switch (entry) {
         case null -> {
           StructArrayLogEntry<T> e =
-              StructArrayLogEntry.create(m_log, m_path, struct, m_properties);
+              StructArrayLogEntry.create(m_log, m_path, struct, m_properties, timestamp);
           m_struct = struct;
           m_entry = e;
           yield e;
@@ -283,16 +285,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public <T> void logStructArray(T[] value, Struct<? super T> struct) {
+    public <T> void logStructArray(T[] value, Struct<? super T> struct, long timestamp) {
       boolean typeMismatch = false;
       try {
         synchronized (this) {
-          StructArrayLogEntry<? super T> entry = initStructArray(struct);
+          StructArrayLogEntry<? super T> entry = initStructArray(struct, timestamp);
           if (entry != null) {
             if (m_keepDuplicates) {
-              entry.append(value);
+              entry.append(value, timestamp);
             } else {
-              entry.update(value);
+              entry.update(value, timestamp);
             }
           } else if (!m_closed) {
             typeMismatch = true;
@@ -317,7 +319,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logBoolean(boolean value) {
+    public void logBoolean(boolean value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -326,16 +328,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new BooleanLogEntry(m_log, m_path, m_properties);
+          entry = new BooleanLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case BooleanLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -347,7 +349,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logLong(long value) {
+    public void logLong(long value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -356,16 +358,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new IntegerLogEntry(m_log, m_path, m_properties);
+          entry = new IntegerLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case IntegerLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -377,7 +379,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logFloat(float value) {
+    public void logFloat(float value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -386,16 +388,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new FloatLogEntry(m_log, m_path, m_properties);
+          entry = new FloatLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case FloatLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -407,7 +409,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logDouble(double value) {
+    public void logDouble(double value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -416,16 +418,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new DoubleLogEntry(m_log, m_path, m_properties);
+          entry = new DoubleLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case DoubleLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -437,7 +439,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logString(String value, String typeString) {
+    public void logString(String value, String typeString, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -447,16 +449,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         DataLogEntry entry = m_entry;
         if (entry == null) {
           m_typeString = typeString;
-          entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString);
+          entry = new StringLogEntry(m_log, m_path, m_properties, m_typeString, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case StringLogEntry e when m_typeString.equals(typeString) -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -468,7 +470,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logBooleanArray(boolean[] value) {
+    public void logBooleanArray(boolean[] value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -477,16 +479,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new BooleanArrayLogEntry(m_log, m_path, m_properties);
+          entry = new BooleanArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case BooleanArrayLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -498,17 +500,17 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logShortArray(short[] value) {
-      logLongArray(toLongArray(value));
+    public void logShortArray(short[] value, long timestamp) {
+      logLongArray(toLongArray(value), timestamp);
     }
 
     @Override
-    public void logIntArray(int[] value) {
-      logLongArray(toLongArray(value));
+    public void logIntArray(int[] value, long timestamp) {
+      logLongArray(toLongArray(value), timestamp);
     }
 
     @Override
-    public void logLongArray(long[] value) {
+    public void logLongArray(long[] value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -517,16 +519,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new IntegerArrayLogEntry(m_log, m_path, m_properties);
+          entry = new IntegerArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case IntegerArrayLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -554,7 +556,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logFloatArray(float[] value) {
+    public void logFloatArray(float[] value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -563,16 +565,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new FloatArrayLogEntry(m_log, m_path, m_properties);
+          entry = new FloatArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case FloatArrayLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -584,7 +586,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logDoubleArray(double[] value) {
+    public void logDoubleArray(double[] value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -593,16 +595,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new DoubleArrayLogEntry(m_log, m_path, m_properties);
+          entry = new DoubleArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case DoubleArrayLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -614,7 +616,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logStringArray(String[] value) {
+    public void logStringArray(String[] value, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -623,16 +625,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
 
         DataLogEntry entry = m_entry;
         if (entry == null) {
-          entry = new StringArrayLogEntry(m_log, m_path, m_properties);
+          entry = new StringArrayLogEntry(m_log, m_path, m_properties, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case StringArrayLogEntry e -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;
@@ -644,7 +646,7 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
     }
 
     @Override
-    public void logRaw(byte[] value, String typeString) {
+    public void logRaw(byte[] value, String typeString, long timestamp) {
       boolean typeMismatch = false;
       synchronized (this) {
         if (m_closed) {
@@ -654,16 +656,16 @@ public class DataLogTelemetryBackend implements TelemetryBackend {
         DataLogEntry entry = m_entry;
         if (entry == null) {
           m_typeString = typeString;
-          entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString);
+          entry = new RawLogEntry(m_log, m_path, m_properties, m_typeString, timestamp);
           m_entry = entry;
         }
 
         switch (entry) {
           case RawLogEntry e when m_typeString.equals(typeString) -> {
             if (m_keepDuplicates) {
-              e.append(value);
+              e.append(value, timestamp);
             } else {
-              e.update(value);
+              e.update(value, timestamp);
             }
           }
           default -> typeMismatch = true;

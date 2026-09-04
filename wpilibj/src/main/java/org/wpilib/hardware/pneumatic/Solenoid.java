@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -27,7 +27,7 @@ public class Solenoid implements TelemetryLoggable, AutoCloseable {
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  public Solenoid(final CANBus busId, final PneumaticsModuleType moduleType, final int channel) {
+  public Solenoid(final CANPort busId, final PneumaticsModuleType moduleType, final int channel) {
     this(busId, PneumaticsBase.getDefaultForType(moduleType), moduleType, channel);
   }
 
@@ -40,7 +40,7 @@ public class Solenoid implements TelemetryLoggable, AutoCloseable {
    * @param channel The channel the solenoid is on.
    */
   public Solenoid(
-      final CANBus busId,
+      final CANPort busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int channel) {

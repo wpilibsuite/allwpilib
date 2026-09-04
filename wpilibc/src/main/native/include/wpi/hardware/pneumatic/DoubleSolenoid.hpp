@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "wpi/hal/Types.h"
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
@@ -45,7 +45,7 @@ class DoubleSolenoid : public wpi::telemetry::TelemetryLoggable {
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
+  DoubleSolenoid(CANPort busId, int module, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
 
   /**
@@ -57,7 +57,7 @@ class DoubleSolenoid : public wpi::telemetry::TelemetryLoggable {
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
-  DoubleSolenoid(CANBus busId, PneumaticsModuleType moduleType,
+  DoubleSolenoid(CANPort busId, PneumaticsModuleType moduleType,
                  int forwardChannel, int reverseChannel);
 
   ~DoubleSolenoid() override;

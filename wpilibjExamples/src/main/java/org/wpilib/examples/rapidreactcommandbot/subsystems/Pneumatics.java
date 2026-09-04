@@ -7,7 +7,7 @@ package org.wpilib.examples.rapidreactcommandbot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.epilogue.Logged;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.Compressor;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.hardware.rotation.AnalogPotentiometer;
@@ -27,7 +27,7 @@ public class Pneumatics extends SubsystemBase {
 
   // Compressor connected to a PCM with a default CAN ID (0)
   private final Compressor compressor =
-      new Compressor(CANBus.CAN_S0, PneumaticsModuleType.CTRE_PCM);
+      new Compressor(CANPort.CAN_S0, PneumaticsModuleType.CTRE_PCM);
 
   /**
    * Query the analog pressure sensor.

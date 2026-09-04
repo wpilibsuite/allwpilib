@@ -29,7 +29,7 @@ static_assert(
     HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_HYBRID);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
-    CANBus busId, int module, PneumaticsModuleType moduleType) {
+    CANPort busId, int module, PneumaticsModuleType moduleType) {
   if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return PneumaticsControlModule::GetForModule(busId, module);
   } else if (moduleType == PneumaticsModuleType::REV_PH) {

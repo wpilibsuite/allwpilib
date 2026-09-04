@@ -1556,12 +1556,12 @@ public class Gamepad implements HIDDevice, TelemetryLoggable {
 
   @Override
   public void logTo(TelemetryTable table) {
-    table.log("LeftTriggerAxis", getAxisForTelemetry(Axis.LEFT_TRIGGER));
-    table.log("RightTriggerAxis", getAxisForTelemetry(Axis.RIGHT_TRIGGER));
-    table.log("LeftXAxis", getAxisForTelemetry(Axis.LEFT_X));
-    table.log("LeftYAxis", getAxisForTelemetry(Axis.LEFT_Y));
-    table.log("RightXAxis", getAxisForTelemetry(Axis.RIGHT_X));
-    table.log("RightYAxis", getAxisForTelemetry(Axis.RIGHT_Y));
+    table.log("LeftTrigger", getAxisForTelemetry(Axis.LEFT_TRIGGER));
+    table.log("RightTrigger", getAxisForTelemetry(Axis.RIGHT_TRIGGER));
+    table.log("LeftX", getAxisForTelemetry(Axis.LEFT_X));
+    table.log("LeftY", getAxisForTelemetry(Axis.LEFT_Y));
+    table.log("RightX", getAxisForTelemetry(Axis.RIGHT_X));
+    table.log("RightY", getAxisForTelemetry(Axis.RIGHT_Y));
 
     long buttons = DriverStationBackend.getStickButtons(m_hid.getPort());
     table.log("FaceDown", (buttons & (1L << Button.FACE_DOWN.value)) != 0);

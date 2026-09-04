@@ -22,18 +22,18 @@ TEST_CASE("CTREPCMSimTest InitializedCallback", "[wpilibc][simulation]") {
   BooleanCallback callback;
   auto cb = sim.RegisterInitializedCallback(callback.GetCallback(), false);
 
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CHECK(sim.GetInitialized());
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue());
 }
 
 TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
-  DoubleSolenoid doubleSolenoid{CANBus::CAN_S0,
+  DoubleSolenoid doubleSolenoid{CANPort::CAN_S0,
                                 wpi::PneumaticsModuleType::CTRE_PCM, 3, 4};
 
   BooleanCallback callback3;
@@ -81,7 +81,7 @@ TEST_CASE("CTREPCMSimTest SolenoidOutput", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("CTREPCMSimTest SetCompressorOn", "[wpilibc][simulation]") {
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -98,7 +98,7 @@ TEST_CASE("CTREPCMSimTest SetCompressorOn", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("CTREPCMSimTest SetEnableDigital", "[wpilibc][simulation]") {
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -117,7 +117,7 @@ TEST_CASE("CTREPCMSimTest SetEnableDigital", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("CTREPCMSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 
@@ -134,7 +134,7 @@ TEST_CASE("CTREPCMSimTest SetPressureSwitchEnabled", "[wpilibc][simulation]") {
 }
 
 TEST_CASE("CTREPCMSimTest SetCompressorCurrent", "[wpilibc][simulation]") {
-  PneumaticsControlModule pcm{CANBus::CAN_S0};
+  PneumaticsControlModule pcm{CANPort::CAN_S0};
   CTREPCMSim sim(pcm);
   sim.ResetData();
 

@@ -7,8 +7,8 @@ classes:
     methods:
       PowerDistribution:
         overloads:
-          CANBus:
-          CANBus, int, ModuleType:
+          CANPort:
+          CANPort, int, ModuleType:
       GetVoltage:
       GetTemperature:
       GetCurrent:

@@ -82,7 +82,7 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
   }
 
   template <typename EntryType, typename T>
-  void Log(T value) {
+  void Log(T value, int64_t timestamp) {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -90,15 +90,15 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
         return;
       }
       if (std::holds_alternative<std::monostate>(m_entry)) {
-        EntryType entry{m_log, m_path, m_propertiesStr};
+        EntryType entry{m_log, m_path, m_propertiesStr, timestamp};
         m_entryIndex = entry.GetIndex();
         m_entry = std::move(entry);
       }
       if (auto entry = std::get_if<EntryType>(&m_entry)) {
         if (m_keepDuplicates) {
-          entry->Append(value);
+          entry->Append(value, timestamp);
         } else {
-          entry->Update(value);
+          entry->Update(value, timestamp);
         }
       } else {
         typeMismatch = true;
@@ -110,7 +110,7 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
   }
 
   template <typename EntryType, typename T>
-  void LogTypeString(T value, std::string_view typeString) {
+  void LogTypeString(T value, std::string_view typeString, int64_t timestamp) {
     bool typeMismatch = false;
     {
       std::scoped_lock lock{m_mutex};
@@ -119,16 +119,17 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
       }
       if (std::holds_alternative<std::monostate>(m_entry)) {
         m_typeString = typeString;
-        EntryType entry{m_log, m_path, m_propertiesStr, m_typeString};
+        EntryType entry{m_log, m_path, m_propertiesStr, m_typeString,
+                        timestamp};
         m_entryIndex = entry.GetIndex();
         m_entry = std::move(entry);
       }
       if (auto entry = std::get_if<EntryType>(&m_entry);
           entry && m_typeString == typeString) {
         if (m_keepDuplicates) {
-          entry->Append(value);
+          entry->Append(value, timestamp);
         } else {
-          entry->Update(value);
+          entry->Update(value, timestamp);
         }
       } else {
         typeMismatch = true;
@@ -139,65 +140,75 @@ class DataLogTelemetryBackend::Entry : public wpi::telemetry::TelemetryEntry {
     }
   }
 
-  void LogBoolean(bool value) override {
-    Log<wpi::log::BooleanLogEntry>(value);
+  void LogBoolean(bool value, int64_t timestamp) override {
+    Log<wpi::log::BooleanLogEntry>(value, timestamp);
   }
 
-  void LogInt64(int64_t value) override {
-    Log<wpi::log::IntegerLogEntry>(value);
+  void LogInt64(int64_t value, int64_t timestamp) override {
+    Log<wpi::log::IntegerLogEntry>(value, timestamp);
   }
 
-  void LogFloat(float value) override { Log<wpi::log::FloatLogEntry>(value); }
-
-  void LogDouble(double value) override {
-    Log<wpi::log::DoubleLogEntry>(value);
+  void LogFloat(float value, int64_t timestamp) override {
+    Log<wpi::log::FloatLogEntry>(value, timestamp);
   }
 
-  void LogString(std::string_view value, std::string_view typeString) override {
-    LogTypeString<wpi::log::StringLogEntry>(value, typeString);
+  void LogDouble(double value, int64_t timestamp) override {
+    Log<wpi::log::DoubleLogEntry>(value, timestamp);
   }
 
-  void LogBooleanArray(std::span<const bool> value) override {
-    Log<wpi::log::BooleanArrayLogEntry>(value);
+  void LogString(std::string_view value, std::string_view typeString,
+                 int64_t timestamp) override {
+    LogTypeString<wpi::log::StringLogEntry>(value, typeString, timestamp);
   }
 
-  void LogBooleanArray(std::span<const int> value) override {
-    Log<wpi::log::BooleanArrayLogEntry>(value);
+  void LogBooleanArray(std::span<const bool> value,
+                       int64_t timestamp) override {
+    Log<wpi::log::BooleanArrayLogEntry>(value, timestamp);
   }
 
-  void LogInt16Array(std::span<const int16_t> value) override {
+  void LogBooleanArray(std::span<const int> value, int64_t timestamp) override {
+    Log<wpi::log::BooleanArrayLogEntry>(value, timestamp);
+  }
+
+  void LogInt16Array(std::span<const int16_t> value,
+                     int64_t timestamp) override {
     std::vector<int64_t> arr{value.begin(), value.end()};
-    LogInt64Array(arr);
+    LogInt64Array(arr, timestamp);
   }
 
-  void LogInt32Array(std::span<const int32_t> value) override {
+  void LogInt32Array(std::span<const int32_t> value,
+                     int64_t timestamp) override {
     std::vector<int64_t> arr{value.begin(), value.end()};
-    LogInt64Array(arr);
+    LogInt64Array(arr, timestamp);
   }
 
-  void LogInt64Array(std::span<const int64_t> value) override {
-    Log<wpi::log::IntegerArrayLogEntry>(value);
+  void LogInt64Array(std::span<const int64_t> value,
+                     int64_t timestamp) override {
+    Log<wpi::log::IntegerArrayLogEntry>(value, timestamp);
   }
 
-  void LogFloatArray(std::span<const float> value) override {
-    Log<wpi::log::FloatArrayLogEntry>(value);
+  void LogFloatArray(std::span<const float> value, int64_t timestamp) override {
+    Log<wpi::log::FloatArrayLogEntry>(value, timestamp);
   }
 
-  void LogDoubleArray(std::span<const double> value) override {
-    Log<wpi::log::DoubleArrayLogEntry>(value);
+  void LogDoubleArray(std::span<const double> value,
+                      int64_t timestamp) override {
+    Log<wpi::log::DoubleArrayLogEntry>(value, timestamp);
   }
 
-  void LogStringArray(std::span<const std::string> value) override {
-    Log<wpi::log::StringArrayLogEntry>(value);
+  void LogStringArray(std::span<const std::string> value,
+                      int64_t timestamp) override {
+    Log<wpi::log::StringArrayLogEntry>(value, timestamp);
   }
 
-  void LogStringArray(std::span<const std::string_view> value) override {
-    Log<wpi::log::StringArrayLogEntry>(value);
+  void LogStringArray(std::span<const std::string_view> value,
+                      int64_t timestamp) override {
+    Log<wpi::log::StringArrayLogEntry>(value, timestamp);
   }
 
-  void LogRaw(std::span<const uint8_t> value,
-              std::string_view typeString) override {
-    LogTypeString<wpi::log::RawLogEntry>(value, typeString);
+  void LogRaw(std::span<const uint8_t> value, std::string_view typeString,
+              int64_t timestamp) override {
+    LogTypeString<wpi::log::RawLogEntry>(value, typeString, timestamp);
   }
 
  private:

@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "wpi/hal/PowerDistribution.h"
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/Handle.hpp"
 
@@ -40,7 +40,7 @@ class PowerDistribution : public wpi::telemetry::TelemetryLoggable {
    *
    * @param busId The bus ID.
    */
-  explicit PowerDistribution(CANBus busId);
+  explicit PowerDistribution(CANPort busId);
 
   /**
    * Constructs a PowerDistribution object.
@@ -49,7 +49,7 @@ class PowerDistribution : public wpi::telemetry::TelemetryLoggable {
    * @param module The CAN ID of the PDP/PDH
    * @param moduleType The type of module
    */
-  PowerDistribution(CANBus busId, int module, ModuleType moduleType);
+  PowerDistribution(CANPort busId, int module, ModuleType moduleType);
 
   PowerDistribution(PowerDistribution&&) = default;
   PowerDistribution& operator=(PowerDistribution&&) = default;

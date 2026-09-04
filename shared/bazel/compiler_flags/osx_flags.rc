@@ -2,10 +2,10 @@ common:macos --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-Wno-shorten-64-to-32
 common:macos --host_per_file_copt=external/.*@-Wno-deprecated-non-prototype,-Wno-unused-function,-Wno-sign-compare
 
 # C++ only
-common:macos --repo_env=BAZEL_CXXOPTS="-std=c++23:-pedantic:-fPIC:-Wno-unused-parameter:-Wno-error=deprecated-enum-enum-conversion:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-unused-const-variable:-Wno-error=c11-extensions:-pthread:-Wno-deprecated-anon-enum-enum-conversion"
+common:macos --repo_env=BAZEL_CXXOPTS="-std=c++23:-pedantic:-Wno-unused-parameter:-Wno-error=deprecated-enum-enum-conversion:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-unused-const-variable:-Wno-error=c11-extensions:-pthread:-Wno-deprecated-anon-enum-enum-conversion"
 
 # C only
-common:macos --repo_env=BAZEL_CONLYOPTS="-pedantic:-fPIC:-Wno-unknown-warning-option:-Wno-unused-parameter:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-fixed-enum-extension"
+common:macos --repo_env=BAZEL_CONLYOPTS="-pedantic:-Wno-unknown-warning-option:-Wno-unused-parameter:-Wno-missing-field-initializers:-Wno-unused-private-field:-Wno-fixed-enum-extension"
 
 common:macos --repo_env=BAZEL_LINKOPTS="-Wl,-rpath,'@loader_path'"
 
@@ -14,3 +14,5 @@ common:macos --per_file_copt=external/.*@-Wno-pedantic,-Wno-deprecated-declarati
 
 common:macos --host_per_file_copt=external/.*\.c$@-Wno-c11-extensions
 common:macos --per_file_copt=external/.*\.c$@-Wno-c11-extensions
+
+common:macos --force_pic

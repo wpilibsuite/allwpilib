@@ -1050,21 +1050,21 @@ public class SwitchProController implements HIDDevice, TelemetryLoggable {
     table.log("RightY", getRightY());
     table.log("ZL", getZL());
     table.log("ZR", getZR());
-    table.log("BButton", getBButton());
-    table.log("AButton", getAButton());
-    table.log("YButton", getYButton());
-    table.log("XButton", getXButton());
-    table.log("MinusButton", getMinusButton());
-    table.log("HomeButton", getHomeButton());
-    table.log("PlusButton", getPlusButton());
-    table.log("LeftStickButton", getLeftStickButton());
-    table.log("RightStickButton", getRightStickButton());
-    table.log("LButton", getLButton());
-    table.log("RButton", getRButton());
-    table.log("DpadUpButton", getDpadUpButton());
-    table.log("DpadDownButton", getDpadDownButton());
-    table.log("DpadLeftButton", getDpadLeftButton());
-    table.log("DpadRightButton", getDpadRightButton());
-    table.log("CaptureButton", getCaptureButton());
+    table.log("B", getBButton());
+    table.log("A", getAButton());
+    table.log("Y", getYButton());
+    table.log("X", getXButton());
+    table.log("Minus", getMinusButton());
+    table.log("Home", getHomeButton());
+    table.log("Plus", getPlusButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Capture", getCaptureButton());
   }
 }

@@ -4,7 +4,7 @@
 
 package org.wpilib.hardware.pneumatic;
 
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.util.AllocationException;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -43,7 +43,7 @@ public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
    * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(
-      final CANBus busId,
+      final CANPort busId,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,
       final int reverseChannel) {
@@ -66,7 +66,7 @@ public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
    */
   @SuppressWarnings("PMD.UseTryWithResources")
   public DoubleSolenoid(
-      final CANBus busId,
+      final CANPort busId,
       final int module,
       final PneumaticsModuleType moduleType,
       final int forwardChannel,
