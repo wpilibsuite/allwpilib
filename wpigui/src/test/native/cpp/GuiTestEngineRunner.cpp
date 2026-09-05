@@ -6,6 +6,8 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <format>
+#include <print>
 #include <string>
 #include <string_view>
 
@@ -41,7 +43,7 @@ std::string MakeDefaultSaveDir(std::string_view appName) {
   }
 
   return (std::filesystem::temp_directory_path() /
-          ("wpilib-" + safeName + "-imgui-test"))
+          std::format("wpilib-{}-imgui-test", safeName))
       .string();
 }
 
@@ -77,7 +79,7 @@ void DestroyEngine() {
 void wpi::gui::test::InstallTestEngineHooks() {
   wpi::gui::AddInit([] {
     if (!gRunnerState.registrar) {
-      std::fputs("No ImGui test registrar was provided.\n", stderr);
+      std::println(stderr, "No ImGui test registrar was provided.");
       wpi::gui::Exit();
       return;
     }
@@ -103,8 +105,8 @@ void wpi::gui::test::InstallTestEngineHooks() {
     ImGuiTestEngine_GetTestList(gRunnerState.engine, &tests);
     gRunnerState.expectedTests = tests.Size;
     if (gRunnerState.expectedTests == 0) {
-      std::fprintf(stderr, "%s registered no ImGui tests.\n",
-                   gRunnerState.appName.c_str());
+      std::println(stderr, "{} registered no ImGui tests.",
+                   gRunnerState.appName);
       wpi::gui::Exit();
       return;
     }
@@ -177,8 +179,8 @@ int wpi::gui::test::RunTestApp(std::string_view appName, AppFunc app,
     }
   }
 
-  std::fprintf(stderr, "%s ImGui tests: %d/%d passed (%d queued)\n",
-               gRunnerState.appName.c_str(), gRunnerState.summary.CountSuccess,
+  std::println(stderr, "{} ImGui tests: {}/{} passed ({} queued)",
+               gRunnerState.appName, gRunnerState.summary.CountSuccess,
                gRunnerState.summary.CountTested,
                gRunnerState.summary.CountInQueue);
 
