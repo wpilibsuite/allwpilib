@@ -190,6 +190,10 @@ model {
                     nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 }
                 nativeUtils.useRequiredLibrary(it, 'ceres')
+
+                if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Accelerate'
+                }
             }
             appendDebugPathToBinaries(binaries)
         }
