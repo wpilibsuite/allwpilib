@@ -13,8 +13,9 @@
 #include <opencv2/core/types.hpp>
 #include <poseutils.h>
 #include <suitesparse/cholmod.h>
+#include <wpi/util/SymbolExports.hpp>
 
-std::vector<mrcal_point3_t> compute_uncertainty(
+WPILIB_DLLEXPORT std::vector<mrcal_point3_t> compute_uncertainty(
     std::span<mrcal_point3_t> observations_board, std::span<double> intrinsics,
     std::span<mrcal_pose_t> rt_ref_frames, mrcal_calobject_warp_t warp,
     cv::Size imagerSize, cv::Size calobjectSize, double calobjectSpacing,

@@ -12,6 +12,7 @@
 #include <mrcal.h>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <wpi/util/SymbolExports.hpp>
 
 struct mrcal_result {
   bool success;
@@ -45,11 +46,11 @@ struct mrcal_result {
  * @param squareSize The size of the squares in a physical distance unit.
  * @param focal_len_guess A focal length guess in pixels.
  */
-mrcal_pose_t getSeedPose(const mrcal_point3_t* c_observations_board_pool,
-                         cv::Size boardSize, cv::Size imagerSize,
-                         double squareSize, double focal_len_guess);
+WPILIB_DLLEXPORT mrcal_pose_t
+getSeedPose(const mrcal_point3_t* c_observations_board_pool, cv::Size boardSize,
+            cv::Size imagerSize, double squareSize, double focal_len_guess);
 
-std::unique_ptr<mrcal_result> mrcal_main(
+WPILIB_DLLEXPORT std::unique_ptr<mrcal_result> mrcal_main(
     // List, depth is ordered array observation[N frames, object_height,
     // object_width] = [x,y, weight] weight<0 means ignored)
     std::span<mrcal_point3_t> observations_board,
@@ -69,8 +70,8 @@ enum class CameraLensModel {
   LENSMODEL_SPLINED_STEREOGRAPHIC
 };
 
-bool undistort_mrcal(cv::Mat* dst, const cv::Mat* cameraMat,
-                     const cv::Mat* distCoeffs, CameraLensModel lensModel,
-                     // Extra stuff for splined stereographic models
-                     uint16_t order, uint16_t Nx, uint16_t Ny,
-                     uint16_t fov_x_deg);
+WPILIB_DLLEXPORT bool undistort_mrcal(
+    cv::Mat* dst, const cv::Mat* cameraMat, const cv::Mat* distCoeffs,
+    CameraLensModel lensModel,
+    // Extra stuff for splined stereographic models
+    uint16_t order, uint16_t Nx, uint16_t Ny, uint16_t fov_x_deg);
