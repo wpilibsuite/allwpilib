@@ -259,12 +259,13 @@ double _observed_pixel_uncertainty_from_inputs(std::vector<double>& x,
                                                int measurement_index_board) {
   // Compute variance from residuals
   double sum = 0.0, sum_sq = 0.0;
-  for (size_t i = measurement_index_board;
+  for (int i = measurement_index_board;
        i < measurement_index_board + num_measurements_board; i++) {
     double val = x[i];
     sum += val;
     sum_sq += val * val;
   }
+
   double mean = sum / x.size();
   double variance = (sum_sq / x.size()) - (mean * mean);
 
@@ -300,6 +301,8 @@ CalibrationUncertaintyContext create_calibration_uncertainty_context(
   std::vector<int32_t> Jt_p(Nmeasurements + 1);
   std::vector<int32_t> Jt_i(N_j_nonzero);
   std::vector<double_t> Jt_x(N_j_nonzero);
+
+  Jt_p[0] = 0;
 
   cholmod_sparse Jt = {.nrow = static_cast<size_t>(Nstate),
                        .ncol = static_cast<size_t>(Nmeasurements),
@@ -461,7 +464,7 @@ std::vector<mrcal_point3_t> compute_uncertainty(
     std::span<mrcal_pose_t> rt_ref_frames, mrcal_calobject_warp_t warp,
     cv::Size imagerSize, cv::Size calobjectSize, double calobjectSpacing,
     cv::Size sampleResolution) {
-  mrcal_lensmodel_t lensmodel;
+  mrcal_lensmodel_t lensmodel{};
   lensmodel.type = MRCAL_LENSMODEL_OPENCV8;
 
   // Create calibration uncertainty context once

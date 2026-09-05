@@ -7,8 +7,7 @@ package org.wpilib.mrcal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
@@ -20,6 +19,28 @@ public class MrCalJNI {
     LENSMODEL_OPENCV8,
     LENSMODEL_STEREOGRAPHIC,
     LENSMODEL_SPLINED_STEREOGRAPHIC;
+  }
+
+  /**
+   * A single board observation for mrcal calibration
+   *
+   * @param corners The positions of each of the detected corners
+   * @param levels The decimation level each of the corners was observed at
+   * @param ids The id of each corner, if the observation was a partial observation; can be null.
+   *     Ids start at zero in the top left corner of the physical board (ignoring rotation) and
+   *     should increase in reading order. Corners may be provided in any order as long as they are
+   *     paired with the correct id for their physical position on the board.
+   */
+  public record MrCalObservation(Point[] corners, float[] levels, int[] ids) {
+    /**
+     * Creates a complete board observation for mrcal calibration
+     *
+     * @param corners The positions of each of the detected corners
+     * @param levels The decimation level each of the corners was observed at
+     */
+    public MrCalObservation(Point[] corners, float[] levels) {
+      this(corners, levels, null);
+    }
   }
 
   public static class MrCalResult {
@@ -237,47 +258,70 @@ public class MrCalJNI {
       double warpY);
 
   /**
-   * Convert a list of board-pixel-corners and detection levels for each snapshot of a chessboard
-   * boardWidth x boardHeight to a packed double[] suitable to pass to
-   * MrCalJni::mrcal_calibrate_camera. Levels will be converted to weights using weight = 0.5^level,
-   * as explained
+   * Convert a list of board-pixel-corners, detection decimation levels, and corner IDs for each
+   * snapshot of a chessboard boardWidth x boardHeight to a packed double[] suitable to pass to
+   * MrCalJni::mrcal_calibrate_camera. Ids are used to determine which corners are actually present
+   * and so the returned usage info matches the caller's input. Levels will be converted to weights
+   * using weight = 0.5^level, as explained
    * [here](https://github.com/dkogan/mrcal/blob/7cd9ac4c854a4b244a35f554c9ebd0464d59e9ff/mrcal-calibrate-cameras#L152)
    */
   private static double[] makeObservations(
-      List<MatOfPoint2f> board_corners,
-      List<MatOfFloat> board_corner_levels,
-      int boardWidth,
-      int boardHeight) {
-    double[] observations = new double[boardWidth * boardHeight * 3 * board_corners.size()];
+      List<MrCalObservation> observations, int boardWidth, int boardHeight) {
+    double[] packedObservations = new double[boardWidth * boardHeight * 3 * observations.size()];
+    Arrays.fill(packedObservations, -1.0);
 
-    int i = 0;
-    for (int b = 0; b < board_corners.size(); b++) {
-      var board = board_corners.get(b);
-      var levels = board_corner_levels.get(b).toArray();
-      var corners = board.toArray();
+    for (int b = 0; b < observations.size(); b++) {
+      final var observation = observations.get(b);
 
-      if (!(corners.length == levels.length && corners.length == boardWidth * boardHeight)) {
-        return null;
-      }
+      final var corners = observation.corners();
+      final var levels = observation.levels();
+      final var ids = observation.ids();
 
-      // Assume that we're correct in terms of row/column major-ness (lol)
-      for (int c = 0; c < corners.length; c++) {
-        var corner = corners[c];
-        float level = levels[c];
+      if (ids == null) {
+        // No ids, assume a full rectangular board
+        if (!(corners.length == levels.length && corners.length == boardWidth * boardHeight)) {
+          return null;
+        }
 
-        observations[i * 3 + 0] = corner.x;
-        observations[i * 3 + 1] = corner.y;
-        observations[i * 3 + 2] = level;
+        // Assume that we're correct in terms of row/column major-ness (lol)
+        for (int c = 0; c < corners.length; c++) {
+          var corner = corners[c];
+          float level = levels[c];
 
-        i += 1;
+          int i = boardWidth * boardHeight * b + c;
+
+          packedObservations[i * 3 + 0] = corner.x;
+          packedObservations[i * 3 + 1] = corner.y;
+          packedObservations[i * 3 + 2] = level;
+        }
+      } else {
+        // Ids present, some corners may be missing
+        if (!(corners.length == levels.length
+            && corners.length == ids.length
+            && corners.length <= boardWidth * boardHeight)) {
+          return null;
+        }
+
+        // Assume that we're correct in terms of row/column major-ness (lol)
+        for (int c = 0; c < corners.length; c++) {
+          var corner = corners[c];
+          float level = levels[c];
+          int id = ids[c];
+
+          if (id < 0 || id >= boardWidth * boardHeight) {
+            return null;
+          }
+
+          int i = boardWidth * boardHeight * b + id;
+
+          packedObservations[i * 3 + 0] = corner.x;
+          packedObservations[i * 3 + 1] = corner.y;
+          packedObservations[i * 3 + 2] = level;
+        }
       }
     }
 
-    if (i * 3 != observations.length) {
-      return null;
-    }
-
-    return observations;
+    return packedObservations;
   }
 
   /**
@@ -287,9 +331,13 @@ public class MrCalJNI {
    * then calls {@link #mrcal_calibrate_camera} to perform calibration. Each corner's detection
    * level is converted to a weight (0.5^level), and negative levels indicate undetected corners.
    *
-   * @param board_corners List of detected chessboard corners for each frame
-   * @param board_corner_levels List of detection levels for each corner in each frame. Point weight
-   *     is calculated as weight = 0.5^level. Negative weight will ignore this observation
+   * <p>When observations include corner IDs, the returned corner-usage mask is remapped back to the
+   * same subset and order that was provided by the caller.
+   *
+   * @param observations A list of observations, each containing a list of corner locations,
+   *     decimation levels, and optional corner ids. If ids is null, the observation is treated as a
+   *     full board. If ids is present, only the listed corners are used; each id must be within the
+   *     board bounds and non-negative.
    * @param boardWidth Number of internal corners horizontally
    * @param boardHeight Number of internal corners vertically
    * @param boardSpacing Physical spacing between corners (meters)
@@ -299,22 +347,38 @@ public class MrCalJNI {
    * @return Calibration result with optimized intrinsics, poses, and error metrics
    */
   public static MrCalResult calibrateCamera(
-      List<MatOfPoint2f> board_corners,
-      List<MatOfFloat> board_corner_levels,
+      List<MrCalObservation> observations,
       int boardWidth,
       int boardHeight,
       double boardSpacing,
       int imageWidth,
       int imageHeight,
       double focalLen) {
-    if (!(board_corners.size() == board_corner_levels.size())) {
-      return new MrCalResult(false);
+    var packedObservations = makeObservations(observations, boardWidth, boardHeight);
+
+    var results =
+        mrcal_calibrate_camera(
+            packedObservations,
+            boardWidth,
+            boardHeight,
+            boardSpacing,
+            imageWidth,
+            imageHeight,
+            focalLen);
+
+    // Only return corners used for the corners that were provided in the input
+    for (int b = 0; b < observations.size(); b++) {
+      var observation = observations.get(b);
+      if (observation.ids() != null) {
+        boolean[] fullCorners = results.cornersUsed.get(b);
+        boolean[] partialCorners = new boolean[observation.ids().length];
+        for (int i = 0; i < observation.ids().length; i++) {
+          partialCorners[i] = fullCorners[observation.ids()[i]];
+        }
+        results.cornersUsed.set(b, partialCorners);
+      }
     }
 
-    var observations =
-        makeObservations(board_corners, board_corner_levels, boardWidth, boardHeight);
-
-    return mrcal_calibrate_camera(
-        observations, boardWidth, boardHeight, boardSpacing, imageWidth, imageHeight, focalLen);
+    return results;
   }
 }

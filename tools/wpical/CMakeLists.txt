@@ -9,13 +9,6 @@ configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
 generate_resources(src/main/native/resources generated/main/cpp WPIcal wpical wpical_resources_src)
 
 file(GLOB wpical_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)
-file(
-    GLOB_RECURSE wpical_thirdparty_src
-    src/main/native/thirdparty/libdogleg/src/*.c
-    src/main/native/thirdparty/mrcal/src/*.c
-    src/main/native/thirdparty/mrcal/src/*.cpp
-    src/main/native/thirdparty/mrcal_java/src/*.cpp
-)
 
 if(WIN32)
     set(wpical_rc src/main/native/win/wpical.rc)
@@ -25,26 +18,10 @@ elseif(APPLE)
     set_source_files_properties(${APP_ICON_MACOSX} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
-add_executable(
-    wpical
-    ${wpical_src}
-    ${wpical_thirdparty_src}
-    ${wpical_resources_src}
-    ${wpical_rc}
-    ${APP_ICON_MACOSX}
-)
+add_executable(wpical ${wpical_src} ${wpical_resources_src} ${wpical_rc} ${APP_ICON_MACOSX})
 wpilib_link_macos_gui(wpical)
 wpilib_target_warnings(wpical)
-target_include_directories(
-    wpical
-    SYSTEM
-    PRIVATE
-        src/main/native/include
-        src/main/native/thirdparty/libdogleg/include
-        src/main/native/thirdparty/mrcal/include
-        src/main/native/thirdparty/mrcal/generated
-        src/main/native/thirdparty/mrcal_java/include
-)
+target_include_directories(wpical SYSTEM PRIVATE src/main/native/include)
 
 if(MSVC)
     set(compile_flags
@@ -89,8 +66,6 @@ else()
     )
 endif()
 
-set_source_files_properties(${wpical_thirdparty_src} PROPERTIES COMPILE_OPTIONS "${compile_flags}")
-
 find_package(OpenCV REQUIRED)
 find_package(CHOLMOD CONFIG REQUIRED)
 find_package(SuiteSparse_config CONFIG REQUIRED)
@@ -113,6 +88,7 @@ target_link_libraries(
     wpical
     apriltag
     fields
+    mrcal
     wpimath
     opencv_highgui
     opencv_imgproc
@@ -141,7 +117,7 @@ endif()
 if(WPILIB_WITH_TESTS)
     wpilib_add_test(wpical src/test/native/cpp)
     wpilib_link_macos_gui(wpical_test)
-    target_sources(wpical_test PRIVATE ${wpical_src} ${wpical_thirdparty_src})
+    target_sources(wpical_test PRIVATE ${wpical_src})
     target_compile_definitions(wpical_test PRIVATE RUNNING_WPICAL_TESTS)
 
     if(MSVC)
@@ -149,16 +125,7 @@ if(WPILIB_WITH_TESTS)
     endif()
 
     target_compile_options(wpical_test PRIVATE ${compile_flags})
-    target_include_directories(
-        wpical_test
-        SYSTEM
-        PRIVATE
-            src/main/native/include
-            src/main/native/thirdparty/libdogleg/include
-            src/main/native/thirdparty/mrcal/include
-            src/main/native/thirdparty/mrcal/generated
-            src/main/native/thirdparty/mrcal_java/include
-    )
+    target_include_directories(wpical_test SYSTEM PRIVATE src/main/native/include)
 
     target_compile_definitions(wpical_test PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
     target_compile_definitions(
@@ -170,6 +137,7 @@ if(WPILIB_WITH_TESTS)
         wpical_test
         apriltag
         fields
+        mrcal
         wpimath
         opencv_highgui
         opencv_objdetect

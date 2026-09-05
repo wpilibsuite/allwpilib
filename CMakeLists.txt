@@ -339,6 +339,7 @@ if(WPILIB_WITH_GUI)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     if(WPILIB_WITH_WPICAL)
+        add_subdirectory(mrcal)
         add_subdirectory(tools/wpical)
     endif()
 
