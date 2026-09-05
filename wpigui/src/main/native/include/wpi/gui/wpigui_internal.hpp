@@ -72,6 +72,8 @@ struct Context : public SavedSettings {
   std::vector<std::function<void(SDL_Event& event)>> eventHandlers;
   std::vector<std::function<void()>> earlyExecutors;
   std::vector<std::function<void()>> lateExecutors;
+  std::vector<std::function<void()>> preSwapExecutors;
+  std::vector<std::function<void()>> postSwapExecutors;
 
   std::vector<SDL_Surface*> icons;
 

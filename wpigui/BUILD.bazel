@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -41,6 +42,19 @@ wpilib_cc_static_library(
     visibility = ["//visibility:public"],
     deps = [
         ":wpigui",
+    ],
+)
+
+cc_library(
+    name = "wpigui_imgui_test",
+    srcs = ["src/test/native/cpp/GuiTestEngineRunner.cpp"],
+    hdrs = ["src/test/native/include/wpi/gui/test/GuiTestEngineRunner.hpp"],
+    strip_include_prefix = "src/test/native/include",
+    target_compatible_with = imgui_test_target_compatible_with(),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":wpigui",
+        "//shared/bazel/thirdparty/imgui_test_engine",
     ],
 )
 

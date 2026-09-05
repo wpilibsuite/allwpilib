@@ -1,6 +1,7 @@
 project(outlineviewer)
 
 include(CompileWarnings)
+include(AddTest)
 include(GenResources)
 include(LinkMacOSGUI)
 
@@ -32,4 +33,18 @@ if(WIN32)
     set_target_properties(outlineviewer PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
     set_target_properties(outlineviewer PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "OutlineViewer")
+endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(outlineviewer src/test/native/imgui)
+    wpilib_link_macos_gui(outlineviewer_imgui_test)
+    target_sources(
+        outlineviewer_imgui_test
+        PRIVATE
+            ${outlineviewer_src}
+            ${outlineviewer_resources_src}
+            ${outlineviewer_rc}
+            ${APP_ICON_MACOSX}
+    )
+    target_link_libraries(outlineviewer_imgui_test libglassnt libglass)
 endif()

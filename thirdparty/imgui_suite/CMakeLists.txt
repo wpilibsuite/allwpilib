@@ -31,8 +31,40 @@ target_include_directories(
 
 target_compile_features(imgui PUBLIC cxx_std_23)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 20.0)
-  target_compile_options(imgui PUBLIC -Wno-nontrivial-memcall)
+if(WPILIB_WITH_IMGUI_TESTS)
+    target_compile_definitions(
+        imgui
+        PUBLIC
+            IMGUI_ENABLE_TEST_ENGINE
+            IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0
+            IMGUI_TEST_ENGINE_ENABLE_COROUTINE_STDTHREAD_IMPL=1
+    )
+
+    set(imgui_test_engine_dir "${imgui_test_engine_SOURCE_DIR}/imgui_test_engine")
+    add_library(
+        imgui_test_engine
+        STATIC
+        ${imgui_test_engine_dir}/imgui_capture_tool.cpp
+        ${imgui_test_engine_dir}/imgui_te_context.cpp
+        ${imgui_test_engine_dir}/imgui_te_coroutine.cpp
+        ${imgui_test_engine_dir}/imgui_te_engine.cpp
+        ${imgui_test_engine_dir}/imgui_te_exporters.cpp
+        ${imgui_test_engine_dir}/imgui_te_perftool.cpp
+        ${imgui_test_engine_dir}/imgui_te_ui.cpp
+        ${imgui_test_engine_dir}/imgui_te_utils.cpp
+    )
+    target_link_libraries(imgui_test_engine PUBLIC imgui)
+    target_include_directories(
+        imgui_test_engine
+        PUBLIC
+            "$<BUILD_INTERFACE:${imgui_test_engine_SOURCE_DIR}>"
+            "$<BUILD_INTERFACE:${imgui_test_engine_dir}>"
+    )
+    target_compile_features(imgui_test_engine PUBLIC cxx_std_23)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 20.0)
+    target_compile_options(imgui PUBLIC -Wno-nontrivial-memcall)
 endif()
 
 install(TARGETS imgui EXPORT imgui)

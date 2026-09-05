@@ -109,4 +109,14 @@ if(WPILIB_WITH_EXECUTABLES)
     elseif(APPLE)
         set_target_properties(glass PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "Glass")
     endif()
+
+    if(WPILIB_WITH_IMGUI_TESTS)
+        wpilib_add_imgui_test(glass src/test/native/imgui)
+        wpilib_link_macos_gui(glass_imgui_test)
+        target_sources(
+            glass_imgui_test
+            PRIVATE ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX}
+        )
+        target_link_libraries(glass_imgui_test libglassnt libglass)
+    endif()
 endif()

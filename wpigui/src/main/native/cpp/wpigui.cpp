@@ -638,7 +638,17 @@ static void RenderGPUFrame(ImDrawData* drawData) {
     ImGui::RenderPlatformWindowsDefault();
   }
 
+  for (auto&& execute : gContext->preSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
   SDL_SubmitGPUCommandBuffer(commandBuffer);
+  for (auto&& execute : gContext->postSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
 }
 
 static void Render2DFrame(ImDrawData* drawData) {
@@ -651,7 +661,17 @@ static void Render2DFrame(ImDrawData* drawData) {
                               gContext->clearColor.z, gContext->clearColor.w);
   SDL_RenderClear(gRendererContext.sdlRenderer);
   ImGui_ImplSDLRenderer3_RenderDrawData(drawData, gRendererContext.sdlRenderer);
+  for (auto&& execute : gContext->preSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
   SDL_RenderPresent(gRendererContext.sdlRenderer);
+  for (auto&& execute : gContext->postSwapExecutors) {
+    if (execute) {
+      execute();
+    }
+  }
 }
 
 static bool InitRenderer(SDL_WindowFlags windowFlags,
@@ -1494,6 +1514,18 @@ void gui::AddEarlyExecute(std::function<void()> execute) {
 void gui::AddLateExecute(std::function<void()> execute) {
   if (execute) {
     gContext->lateExecutors.emplace_back(std::move(execute));
+  }
+}
+
+void gui::AddPreSwap(std::function<void()> execute) {
+  if (execute) {
+    gContext->preSwapExecutors.emplace_back(std::move(execute));
+  }
+}
+
+void gui::AddPostSwap(std::function<void()> execute) {
+  if (execute) {
+    gContext->postSwapExecutors.emplace_back(std::move(execute));
   }
 }
 

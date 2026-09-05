@@ -37,6 +37,14 @@ cc_library(
     name = "imgui",
     srcs = IMGUI_SOURCES,
     hdrs = IMGUI_HEADERS,
+    defines = select({
+        "//shared/bazel/rules:with_imgui_tests_enabled": [
+            "IMGUI_ENABLE_TEST_ENGINE",
+            "IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0",
+            "IMGUI_TEST_ENGINE_ENABLE_COROUTINE_STDTHREAD_IMPL=1",
+        ],
+        "//conditions:default": [],
+    }),
     includes = [
         "imgui/include",
         "imgui/include/backends",

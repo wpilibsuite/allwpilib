@@ -19,3 +19,38 @@ macro(wpilib_add_test name)
         target_compile_options(${name}_test PRIVATE /wd4101 /wd4251 /utf-8)
     endif()
 endmacro()
+
+macro(wpilib_add_imgui_test name)
+    set(wpilib_imgui_test_src)
+    foreach(src ${ARGN})
+        if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
+            file(GLOB_RECURSE wpilib_imgui_dir_src ${src}/*.cpp)
+            list(APPEND wpilib_imgui_test_src ${wpilib_imgui_dir_src})
+        else()
+            list(APPEND wpilib_imgui_test_src ${src})
+        endif()
+    endforeach()
+    add_executable(${name}_imgui_test ${wpilib_imgui_test_src})
+    set_property(TARGET ${name}_imgui_test PROPERTY FOLDER "tests")
+    wpilib_target_warnings(${name}_imgui_test)
+    target_compile_definitions(${name}_imgui_test PRIVATE RUNNING_IMGUI_TESTS)
+    target_link_libraries(${name}_imgui_test wpigui_imgui_test)
+    add_test(NAME ${name}_imgui_test COMMAND ${name}_imgui_test)
+    set(wpilib_imgui_test_environment WPIGUI_FORCE_RENDERER=2d)
+    if(WPILIB_IMGUI_TESTS_HEADLESS)
+        list(
+            APPEND
+            wpilib_imgui_test_environment
+            SDL_VIDEO_DRIVER=dummy
+            SDL_RENDER_DRIVER=software
+            SDL_VIDEO_DUMMY_SAVE_FRAMES=0
+        )
+    endif()
+    set_tests_properties(
+        ${name}_imgui_test
+        PROPERTIES ENVIRONMENT "${wpilib_imgui_test_environment}" TIMEOUT 30
+    )
+    if(MSVC)
+        target_compile_options(${name}_imgui_test PRIVATE /wd4101 /wd4251 /utf-8)
+    endif()
+endmacro()

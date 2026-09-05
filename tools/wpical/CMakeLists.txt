@@ -182,3 +182,51 @@ if(WPILIB_WITH_TESTS)
         Ceres::ceres
     )
 endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(wpical src/test/native/imgui)
+    wpilib_link_macos_gui(wpical_imgui_test)
+    target_sources(
+        wpical_imgui_test
+        PRIVATE
+            ${wpical_src}
+            ${wpical_thirdparty_src}
+            ${wpical_resources_src}
+            ${wpical_rc}
+            ${APP_ICON_MACOSX}
+    )
+    if(MSVC)
+        target_compile_options(wpical_imgui_test PRIVATE /utf-8)
+    endif()
+    target_compile_options(wpical_imgui_test PRIVATE ${compile_flags})
+    target_include_directories(
+        wpical_imgui_test
+        SYSTEM
+        PRIVATE
+            src/main/native/include
+            src/main/native/thirdparty/libdogleg/include
+            src/main/native/thirdparty/mrcal/include
+            src/main/native/thirdparty/mrcal/generated
+            src/main/native/thirdparty/mrcal_java/include
+    )
+    target_compile_definitions(wpical_imgui_test PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
+    target_compile_definitions(
+        wpical_imgui_test
+        PUBLIC PROJECT_ROOT_PATH="${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/assets"
+    )
+    target_link_libraries(
+        wpical_imgui_test
+        apriltag
+        fields
+        wpimath
+        opencv_highgui
+        opencv_objdetect
+        opencv_videoio
+        libglass
+        wpigui
+        wpiutil
+        ${cholmod_target}
+        ${suitesparse_target}
+        Ceres::ceres
+    )
+endif()
