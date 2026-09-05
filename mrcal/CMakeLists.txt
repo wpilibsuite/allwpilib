@@ -100,10 +100,18 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/libdogleg/include>
 )
 
+# mrcal_wrapper.cpp calls solvePnP, which OpenCV 4 ships in calib3d and OpenCV 5
+# ships in calib.
+if(TARGET opencv_calib3d)
+    set(opencv_calib_target opencv_calib3d)
+else()
+    set(opencv_calib_target opencv_calib)
+endif()
+
 # wpimath supplies Eigen, which mrcal-uncertainty.cpp needs.
 target_link_libraries(
     mrcal
-    PUBLIC wpimath opencv_core opencv_calib3d ${cholmod_target} ${suitesparse_target}
+    PUBLIC wpimath opencv_core ${opencv_calib_target} ${cholmod_target} ${suitesparse_target}
 )
 
 target_compile_definitions(mrcal PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
