@@ -19,9 +19,10 @@ import us.hebi.quickbuf.ProtoSource;
 public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
   private ProtobufBuffer(Protobuf<T, MessageType> proto) {
     m_buf = new byte[1024];
+    m_bufView = ByteBuffer.wrap(m_buf);
     m_sink = ProtoSink.newInstance(m_buf);
-    m_sink.setOutput(m_buf);
     m_source = ProtoSource.newArraySource();
+    m_bufferSource = ProtoSource.newBufferSource();
     m_msg = proto.createMessage();
     m_proto = proto;
   }
@@ -72,15 +73,16 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
     int size = m_msg.getSerializedSize();
     if (size > m_buf.length) {
       m_buf = new byte[size * 2];
+      m_bufView = ByteBuffer.wrap(m_buf);
       m_sink.setOutput(m_buf);
     }
 
     m_sink.reset();
     m_msg.writeTo(m_sink);
 
-    ByteBuffer byteBuf = ByteBuffer.wrap(m_buf);
-    byteBuf.position(m_sink.getTotalBytesWritten());
-    return byteBuf;
+    m_bufView.clear();
+    m_bufView.position(m_sink.getTotalBytesWritten());
+    return m_bufView;
   }
 
   /**
@@ -119,8 +121,8 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
    */
   public T read(ByteBuffer buf) throws IOException {
     m_msg.clearQuick();
-    m_source.setInput(buf);
-    m_msg.mergeFrom(m_source);
+    m_bufferSource.setInput(buf);
+    m_msg.mergeFrom(m_bufferSource);
     return m_proto.unpack(m_msg);
   }
 
@@ -163,14 +165,16 @@ public final class ProtobufBuffer<T, MessageType extends ProtoMessage<?>> {
    */
   public void readInto(T out, ByteBuffer buf) throws IOException {
     m_msg.clearQuick();
-    m_source.setInput(buf);
-    m_msg.mergeFrom(m_source);
+    m_bufferSource.setInput(buf);
+    m_msg.mergeFrom(m_bufferSource);
     m_proto.unpackInto(out, m_msg);
   }
 
   private byte[] m_buf;
+  private ByteBuffer m_bufView;
   private final ProtoSink m_sink;
   private final ProtoSource m_source;
+  private final ProtoSource m_bufferSource;
   private final MessageType m_msg;
   private final Protobuf<T, MessageType> m_proto;
 }
