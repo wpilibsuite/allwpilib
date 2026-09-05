@@ -102,7 +102,7 @@ linkopts = select({
         "-framework",
         "Accelerate",
     ],
-    "@platforms//os:windows": [],
+    "@platforms//os:windows": ["-DEFAULTLIB:Ole32.lib"],
 })
 
 wpilib_cc_library(
