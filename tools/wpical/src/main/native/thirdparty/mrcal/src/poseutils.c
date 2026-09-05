@@ -716,7 +716,7 @@ void mrcal_compose_Rt_full( // output
     {
         // R01 = R0t R1t
         // t01 = -R0t R1t t1 - R0t t0
-        const double R0t_t0[3];
+        double R0t_t0[3];
         mul_vec3_gen33_vout_full(R0t_t0, sizeof(R0t_t0[0]),
                                  &P2(Rt_0,  3,0), Rt_0_stride1,
                                  &P2(Rt_0,0,0), Rt_0_stride0, Rt_0_stride1);

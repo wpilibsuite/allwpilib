@@ -1424,8 +1424,17 @@ static bool evaluateStep_adjustTrustRegion(// out
   return true;
 }
 
+static bool cancellation_requested(dogleg_cancel_callback_t* is_cancelled,
+                                   void* cancellation_cookie)
+{
+  return is_cancelled != NULL && is_cancelled(cancellation_cookie);
+}
+
 // returns the step count or <0 on error
-static int runOptimizer(dogleg_solverContext_t* ctx)
+static int runOptimizer(dogleg_solverContext_t* ctx,
+                        dogleg_cancel_callback_t* is_cancelled,
+                        void* cancellation_cookie,
+                        bool* cancelled)
 {
   double trustregion = ctx->parameters->trustregion0;
   int stepCount = 0;
@@ -1436,6 +1445,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
                                      ctx) )
     return -1;
 
+  if(cancellation_requested(is_cancelled, cancellation_cookie))
+  {
+    *cancelled = true;
+    return stepCount;
+  }
+
   if(converged)
     return stepCount;
 
@@ -1444,10 +1459,22 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
 
   while( stepCount<ctx->parameters->max_iterations )
   {
+    if(cancellation_requested(is_cancelled, cancellation_cookie))
+    {
+      *cancelled = true;
+      return stepCount;
+    }
+
     SAY_IF_VERBOSE( "================= step %d", stepCount );
 
     while(1)
     {
+      if(cancellation_requested(is_cancelled, cancellation_cookie))
+      {
+        *cancelled = true;
+        return stepCount;
+      }
+
       SAY_IF_VERBOSE("--------");
 
       // We're trying again with a new trust region. We're about to compute a
@@ -1468,6 +1495,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
       }
       ctx->afterStep->have_step_to_here = true;
 
+      if(cancellation_requested(is_cancelled, cancellation_cookie))
+      {
+        *cancelled = true;
+        return stepCount;
+      }
+
       // negative expectedImprovement is used to indicate that we're done
       if(expectedImprovement < 0.0)
       {
@@ -1481,6 +1514,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
                                         ctx->afterStep,
                                         ctx))
         return -1;
+
+      if(cancellation_requested(is_cancelled, cancellation_cookie))
+      {
+        *cancelled = true;
+        return stepCount;
+      }
 
       SAY_IF_VERBOSE( "Evaluated operating point with norm2_x %.6g", ctx->afterStep->norm2_x);
       if(ctx->parameters->debug_vnlog)
@@ -1709,6 +1748,9 @@ static double _dogleg_optimize(double* p, unsigned int Nstate,
 
                                // NULL to use the globals
                                const dogleg_parameters2_t* parameters,
+                               dogleg_cancel_callback_t* is_cancelled,
+                               void* cancellation_cookie,
+                               bool* cancelled,
                                dogleg_solverContext_t** returnContext)
 {
   dogleg_solverContext_t* ctx = malloc(sizeof(dogleg_solverContext_t));
@@ -1799,7 +1841,8 @@ static double _dogleg_optimize(double* p, unsigned int Nstate,
   memcpy(ctx->beforeStep->p, p, Nstate * sizeof(double));
 
   // everything is set up, so run the solver!
-  int    numsteps = runOptimizer(ctx);
+  int    numsteps = runOptimizer(ctx, is_cancelled, cancellation_cookie,
+                                 cancelled);
   double norm2_x  = ctx->beforeStep->norm2_x;
   if(numsteps < 0)
   {
@@ -1826,18 +1869,36 @@ double dogleg_optimize2(double* p, unsigned int Nstate,
                         dogleg_callback_t* f,
                         void* cookie,
                         const dogleg_parameters2_t* parameters,
+                        dogleg_cancel_callback_t* is_cancelled,
+                        void* cancellation_cookie,
+                        bool* cancelled,
                         dogleg_solverContext_t** returnContext)
 {
+  bool cancelled_local = false;
+  if(cancelled == NULL)
+    cancelled = &cancelled_local;
+  else
+    *cancelled = false;
+
   if( NJnnz == 0 )
   {
     SAY( "I must have NJnnz > 0, instead I have %d", NJnnz);
     return -1.0;
   }
 
+  if(cancellation_requested(is_cancelled, cancellation_cookie))
+  {
+    *cancelled = true;
+    if(returnContext != NULL)
+      *returnContext = NULL;
+    return 0.0;
+  }
+
   return _dogleg_optimize(p, Nstate, Nmeas, NJnnz,
                           f, NULL, NULL,
                           cookie,
                           parameters,
+                          is_cancelled, cancellation_cookie, cancelled,
                           returnContext);
 }
 
@@ -1849,6 +1910,7 @@ double dogleg_optimize(double* p, unsigned int Nstate,
 {
   return dogleg_optimize2(p,Nstate,Nmeas,NJnnz,f,cookie,
                           NULL, // no parameters; use the globals
+                          NULL, NULL, NULL,
                           returnContext);
 }
 
@@ -1863,6 +1925,7 @@ double dogleg_optimize_dense2(double* p, unsigned int Nstate,
                           NULL, f, NULL,
                           cookie,
                           parameters,
+                          NULL, NULL, NULL,
                           returnContext);
 }
 double dogleg_optimize_dense_products(double* p, unsigned int Nstate,
@@ -1874,6 +1937,7 @@ double dogleg_optimize_dense_products(double* p, unsigned int Nstate,
                           NULL, NULL, f,
                           cookie,
                           parameters,
+                          NULL, NULL, NULL,
                           returnContext);
 }
 double dogleg_optimize_dense(double* p, unsigned int Nstate,

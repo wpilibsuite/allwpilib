@@ -45,6 +45,9 @@ typedef void (dogleg_callback_dense_products_t)(// in
                                                 // context
                                                 void*           cookie);
 
+// Return true to stop an optimization at the next iteration boundary
+typedef bool (dogleg_cancel_callback_t)(void* cookie);
+
 // an operating point of the solver
 typedef struct
 {
@@ -284,6 +287,9 @@ double dogleg_optimize2(double* p, unsigned int Nstate,
                         unsigned int Nmeas, unsigned int NJnnz,
                         dogleg_callback_t* f, void* cookie,
                         const dogleg_parameters2_t* parameters,
+                        dogleg_cancel_callback_t* is_cancelled,
+                        void* cancellation_cookie,
+                        bool* cancelled,
                         dogleg_solverContext_t** returnContext);
 
 // Main optimization function if we're using dense linear algebra. The arguments

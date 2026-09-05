@@ -6250,8 +6250,21 @@ mrcal_optimize( // out
                 int calibration_object_height_n,
                 bool verbose,
 
-                bool check_gradient)
+                bool check_gradient,
+                mrcal_cancel_callback_t* is_cancelled,
+                void* cancellation_cookie,
+                bool* cancelled)
 {
+    if(cancelled != NULL)
+        *cancelled = false;
+
+    if(is_cancelled != NULL && is_cancelled(cancellation_cookie))
+    {
+        if(cancelled != NULL)
+            *cancelled = true;
+        return (mrcal_stats_t){.rms_reproj_error__pixels = -1.0};
+    }
+
     if( Nobservations_board > 0 )
     {
         if( problem_selections.do_optimize_calobject_warp && calobject_warp == NULL )
@@ -6438,11 +6451,24 @@ mrcal_optimize( // out
             if(solver_context != NULL)
                 dogleg_freeContext(&solver_context);
 
-            norm2_error = dogleg_optimize2(packed_state.data(),
-                                           Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
-                                           (dogleg_callback_t*)&optimizer_callback, &ctx,
-                                           &dogleg_parameters,
-                                           &solver_context);
+            bool dogleg_cancelled = false;
+            norm2_error = dogleg_optimize2(
+                packed_state.data(),
+                Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
+                (dogleg_callback_t*)&optimizer_callback, &ctx,
+                &dogleg_parameters,
+                (dogleg_cancel_callback_t*)is_cancelled, cancellation_cookie,
+                &dogleg_cancelled,
+                &solver_context);
+
+            if(dogleg_cancelled)
+            {
+                if(cancelled != NULL)
+                    *cancelled = true;
+                if(solver_context != NULL)
+                    dogleg_freeContext(&solver_context);
+                return stats;
+            }
 
             if(norm2_error < 0) {
                 // libdogleg barfed. I quit out
@@ -6609,9 +6635,17 @@ mrcal_optimize( // out
     }
     else
         for(int ivar=0; ivar<Nstate; ivar++)
+        {
+            if(is_cancelled != NULL && is_cancelled(cancellation_cookie))
+            {
+                if(cancelled != NULL)
+                    *cancelled = true;
+                return stats;
+            }
             dogleg_testGradient(ivar, packed_state.data(),
                                 Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
                                 (dogleg_callback_t*)&optimizer_callback, &ctx);
+        }
 
     stats.rms_reproj_error__pixels =
 #if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS

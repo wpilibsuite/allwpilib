@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <Eigen/Core>
@@ -90,6 +91,8 @@ class CameraCalibrator {
 
   std::atomic_int m_totalFrames;
   std::vector<std::shared_ptr<Worker>> m_workers;
+  mrcal_cancellation_source m_stopSource;
+  std::thread m_processingThread;
 };
 
 void to_json(wpi::util::json& json, const CameraModel& cameraModel);

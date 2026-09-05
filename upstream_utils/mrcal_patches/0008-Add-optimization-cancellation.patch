@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 29 Aug 2026 16:18:06 -0700
+Subject: [PATCH 8/8] Add optimization cancellation
+
+---
+ mrcal-pywrap.c        |  3 ++-
+ mrcal.cpp             | 46 +++++++++++++++++++++++++++++++++++++------
+ mrcal.h               |  8 +++++++-
+ test/test-gradients.c |  3 ++-
+ 4 files changed, 51 insertions(+), 9 deletions(-)
+
+diff --git a/mrcal-pywrap.c b/mrcal-pywrap.c
+index 86dc53754e209a922cfea49b3de36929a5a88263..d58bb747e14e95950b8f25d5c3919c5d906c0539 100644
+--- a/mrcal-pywrap.c
++++ b/mrcal-pywrap.c
+@@ -1839,7 +1839,8 @@ PyObject* _optimize(optimizemode_t optimizemode,
+                                 calibration_object_height_n,
+                                 verbose,
+ 
+-                                false);
++                                false,
++                                NULL, NULL, NULL);
+ 
+             if(stats.rms_reproj_error__pixels < 0.0)
+             {
+diff --git a/mrcal.cpp b/mrcal.cpp
+index 8ea2c873b28fbdd0d53ccb6af15a6726b1741a68..dba67443290a97aa820a6f0170953c7cdac2b0a5 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -6250,8 +6250,21 @@ mrcal_optimize( // out
+                 int calibration_object_height_n,
+                 bool verbose,
+ 
+-                bool check_gradient)
++                bool check_gradient,
++                mrcal_cancel_callback_t* is_cancelled,
++                void* cancellation_cookie,
++                bool* cancelled)
+ {
++    if(cancelled != NULL)
++        *cancelled = false;
++
++    if(is_cancelled != NULL && is_cancelled(cancellation_cookie))
++    {
++        if(cancelled != NULL)
++            *cancelled = true;
++        return (mrcal_stats_t){.rms_reproj_error__pixels = -1.0};
++    }
++
+     if( Nobservations_board > 0 )
+     {
+         if( problem_selections.do_optimize_calobject_warp && calobject_warp == NULL )
+@@ -6438,11 +6451,24 @@ mrcal_optimize( // out
+             if(solver_context != NULL)
+                 dogleg_freeContext(&solver_context);
+ 
+-            norm2_error = dogleg_optimize2(packed_state.data(),
+-                                           Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
+-                                           (dogleg_callback_t*)&optimizer_callback, &ctx,
+-                                           &dogleg_parameters,
+-                                           &solver_context);
++            bool dogleg_cancelled = false;
++            norm2_error = dogleg_optimize2(
++                packed_state.data(),
++                Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
++                (dogleg_callback_t*)&optimizer_callback, &ctx,
++                &dogleg_parameters,
++                (dogleg_cancel_callback_t*)is_cancelled, cancellation_cookie,
++                &dogleg_cancelled,
++                &solver_context);
++
++            if(dogleg_cancelled)
++            {
++                if(cancelled != NULL)
++                    *cancelled = true;
++                if(solver_context != NULL)
++                    dogleg_freeContext(&solver_context);
++                return stats;
++            }
+ 
+             if(norm2_error < 0) {
+                 // libdogleg barfed. I quit out
+@@ -6609,9 +6635,17 @@ mrcal_optimize( // out
+     }
+     else
+         for(int ivar=0; ivar<Nstate; ivar++)
++        {
++            if(is_cancelled != NULL && is_cancelled(cancellation_cookie))
++            {
++                if(cancelled != NULL)
++                    *cancelled = true;
++                return stats;
++            }
+             dogleg_testGradient(ivar, packed_state.data(),
+                                 Nstate, ctx.Nmeasurements, ctx.N_j_nonzero,
+                                 (dogleg_callback_t*)&optimizer_callback, &ctx);
++        }
+ 
+     stats.rms_reproj_error__pixels =
+ #if defined ENABLE_TRIANGULATED_WARNINGS && ENABLE_TRIANGULATED_WARNINGS
+diff --git a/mrcal.h b/mrcal.h
+index 05c82512ce50339ffa60363546f3ce184c5b7c81..8e3ed1d5c156ee8a8afd4bd376b235b6d02e6bf4 100644
+--- a/mrcal.h
++++ b/mrcal.h
+@@ -446,6 +446,9 @@ bool mrcal_corresponding_icam_extrinsics(// out
+                                          int Nobservations_point,
+                                          const mrcal_observation_point_t* observations_point);
+ 
++// Return true to stop an optimization at the next iteration boundary
++typedef bool (mrcal_cancel_callback_t)(void* cookie);
++
+ // Solve the given optimization problem
+ //
+ // This is the entry point to the mrcal optimization routine. The argument list
+@@ -518,7 +521,10 @@ mrcal_optimize( // out
+                 int calibration_object_height_n,
+                 bool verbose,
+ 
+-                bool check_gradient);
++                bool check_gradient,
++                mrcal_cancel_callback_t* is_cancelled,
++                void* cancellation_cookie,
++                bool* cancelled);
+ 
+ 
+ // These are cholmod_sparse, cholmod_factor, cholmod_common. I don't want to
+diff --git a/test/test-gradients.c b/test/test-gradients.c
+index 3029dead852531f9fe1c89f196d6806d2128772e..2cfd48b6d856fa685ad908a1eebbaf0e83db8cf9 100644
+--- a/test/test-gradients.c
++++ b/test/test-gradients.c
+@@ -494,7 +494,8 @@ int main(int argc, char* argv[] )
+                         calibration_object_height_n,
+ 
+                         false,
+-                        true);
++                        true,
++                        NULL, NULL, NULL);
+ 
+     if(stats.rms_reproj_error__pixels < 0)
+         return 1;

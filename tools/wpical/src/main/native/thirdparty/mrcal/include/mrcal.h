@@ -446,6 +446,9 @@ bool mrcal_corresponding_icam_extrinsics(// out
                                          int Nobservations_point,
                                          const mrcal_observation_point_t* observations_point);
 
+// Return true to stop an optimization at the next iteration boundary
+typedef bool (mrcal_cancel_callback_t)(void* cookie);
+
 // Solve the given optimization problem
 //
 // This is the entry point to the mrcal optimization routine. The argument list
@@ -518,7 +521,10 @@ mrcal_optimize( // out
                 int calibration_object_height_n,
                 bool verbose,
 
-                bool check_gradient);
+                bool check_gradient,
+                mrcal_cancel_callback_t* is_cancelled,
+                void* cancellation_cookie,
+                bool* cancelled);
 
 
 // These are cholmod_sparse, cholmod_factor, cholmod_common. I don't want to

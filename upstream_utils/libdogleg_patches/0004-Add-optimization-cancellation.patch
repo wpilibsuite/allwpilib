@@ -1,0 +1,216 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 29 Aug 2026 16:18:06 -0700
+Subject: [PATCH 4/4] Add optimization cancellation
+
+---
+ dogleg.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ dogleg.h |  6 +++++
+ sample.c |  4 +++-
+ 3 files changed, 75 insertions(+), 3 deletions(-)
+
+diff --git a/dogleg.c b/dogleg.c
+index cac3c3d95990cc563432ad30bd62a40d35335ac4..9b1b641290989c495200577e4c1799e33e6f15a4 100644
+--- a/dogleg.c
++++ b/dogleg.c
+@@ -1424,8 +1424,17 @@ static bool evaluateStep_adjustTrustRegion(// out
+   return true;
+ }
+ 
++static bool cancellation_requested(dogleg_cancel_callback_t* is_cancelled,
++                                   void* cancellation_cookie)
++{
++  return is_cancelled != NULL && is_cancelled(cancellation_cookie);
++}
++
+ // returns the step count or <0 on error
+-static int runOptimizer(dogleg_solverContext_t* ctx)
++static int runOptimizer(dogleg_solverContext_t* ctx,
++                        dogleg_cancel_callback_t* is_cancelled,
++                        void* cancellation_cookie,
++                        bool* cancelled)
+ {
+   double trustregion = ctx->parameters->trustregion0;
+   int stepCount = 0;
+@@ -1436,6 +1445,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
+                                      ctx) )
+     return -1;
+ 
++  if(cancellation_requested(is_cancelled, cancellation_cookie))
++  {
++    *cancelled = true;
++    return stepCount;
++  }
++
+   if(converged)
+     return stepCount;
+ 
+@@ -1444,10 +1459,22 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
+ 
+   while( stepCount<ctx->parameters->max_iterations )
+   {
++    if(cancellation_requested(is_cancelled, cancellation_cookie))
++    {
++      *cancelled = true;
++      return stepCount;
++    }
++
+     SAY_IF_VERBOSE( "================= step %d", stepCount );
+ 
+     while(1)
+     {
++      if(cancellation_requested(is_cancelled, cancellation_cookie))
++      {
++        *cancelled = true;
++        return stepCount;
++      }
++
+       SAY_IF_VERBOSE("--------");
+ 
+       // We're trying again with a new trust region. We're about to compute a
+@@ -1468,6 +1495,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
+       }
+       ctx->afterStep->have_step_to_here = true;
+ 
++      if(cancellation_requested(is_cancelled, cancellation_cookie))
++      {
++        *cancelled = true;
++        return stepCount;
++      }
++
+       // negative expectedImprovement is used to indicate that we're done
+       if(expectedImprovement < 0.0)
+       {
+@@ -1482,6 +1515,12 @@ static int runOptimizer(dogleg_solverContext_t* ctx)
+                                         ctx))
+         return -1;
+ 
++      if(cancellation_requested(is_cancelled, cancellation_cookie))
++      {
++        *cancelled = true;
++        return stepCount;
++      }
++
+       SAY_IF_VERBOSE( "Evaluated operating point with norm2_x %.6g", ctx->afterStep->norm2_x);
+       if(ctx->parameters->debug_vnlog)
+         vnlog_debug_data.norm2x_after = ctx->afterStep->norm2_x;
+@@ -1709,6 +1748,9 @@ static double _dogleg_optimize(double* p, unsigned int Nstate,
+ 
+                                // NULL to use the globals
+                                const dogleg_parameters2_t* parameters,
++                               dogleg_cancel_callback_t* is_cancelled,
++                               void* cancellation_cookie,
++                               bool* cancelled,
+                                dogleg_solverContext_t** returnContext)
+ {
+   dogleg_solverContext_t* ctx = malloc(sizeof(dogleg_solverContext_t));
+@@ -1799,7 +1841,8 @@ static double _dogleg_optimize(double* p, unsigned int Nstate,
+   memcpy(ctx->beforeStep->p, p, Nstate * sizeof(double));
+ 
+   // everything is set up, so run the solver!
+-  int    numsteps = runOptimizer(ctx);
++  int    numsteps = runOptimizer(ctx, is_cancelled, cancellation_cookie,
++                                 cancelled);
+   double norm2_x  = ctx->beforeStep->norm2_x;
+   if(numsteps < 0)
+   {
+@@ -1826,18 +1869,36 @@ double dogleg_optimize2(double* p, unsigned int Nstate,
+                         dogleg_callback_t* f,
+                         void* cookie,
+                         const dogleg_parameters2_t* parameters,
++                        dogleg_cancel_callback_t* is_cancelled,
++                        void* cancellation_cookie,
++                        bool* cancelled,
+                         dogleg_solverContext_t** returnContext)
+ {
++  bool cancelled_local = false;
++  if(cancelled == NULL)
++    cancelled = &cancelled_local;
++  else
++    *cancelled = false;
++
+   if( NJnnz == 0 )
+   {
+     SAY( "I must have NJnnz > 0, instead I have %d", NJnnz);
+     return -1.0;
+   }
+ 
++  if(cancellation_requested(is_cancelled, cancellation_cookie))
++  {
++    *cancelled = true;
++    if(returnContext != NULL)
++      *returnContext = NULL;
++    return 0.0;
++  }
++
+   return _dogleg_optimize(p, Nstate, Nmeas, NJnnz,
+                           f, NULL, NULL,
+                           cookie,
+                           parameters,
++                          is_cancelled, cancellation_cookie, cancelled,
+                           returnContext);
+ }
+ 
+@@ -1849,6 +1910,7 @@ double dogleg_optimize(double* p, unsigned int Nstate,
+ {
+   return dogleg_optimize2(p,Nstate,Nmeas,NJnnz,f,cookie,
+                           NULL, // no parameters; use the globals
++                          NULL, NULL, NULL,
+                           returnContext);
+ }
+ 
+@@ -1863,6 +1925,7 @@ double dogleg_optimize_dense2(double* p, unsigned int Nstate,
+                           NULL, f, NULL,
+                           cookie,
+                           parameters,
++                          NULL, NULL, NULL,
+                           returnContext);
+ }
+ double dogleg_optimize_dense_products(double* p, unsigned int Nstate,
+@@ -1874,6 +1937,7 @@ double dogleg_optimize_dense_products(double* p, unsigned int Nstate,
+                           NULL, NULL, f,
+                           cookie,
+                           parameters,
++                          NULL, NULL, NULL,
+                           returnContext);
+ }
+ double dogleg_optimize_dense(double* p, unsigned int Nstate,
+diff --git a/dogleg.h b/dogleg.h
+index 933e9e894d9d1e29fb0084c472724f8e19b75112..8c941a53c1ac889fa8d94e1d60b1d801eacd27fa 100644
+--- a/dogleg.h
++++ b/dogleg.h
+@@ -45,6 +45,9 @@ typedef void (dogleg_callback_dense_products_t)(// in
+                                                 // context
+                                                 void*           cookie);
+ 
++// Return true to stop an optimization at the next iteration boundary
++typedef bool (dogleg_cancel_callback_t)(void* cookie);
++
+ // an operating point of the solver
+ typedef struct
+ {
+@@ -284,6 +287,9 @@ double dogleg_optimize2(double* p, unsigned int Nstate,
+                         unsigned int Nmeas, unsigned int NJnnz,
+                         dogleg_callback_t* f, void* cookie,
+                         const dogleg_parameters2_t* parameters,
++                        dogleg_cancel_callback_t* is_cancelled,
++                        void* cancellation_cookie,
++                        bool* cancelled,
+                         dogleg_solverContext_t** returnContext);
+ 
+ // Main optimization function if we're using dense linear algebra. The arguments
+diff --git a/sample.c b/sample.c
+index 0afd0f0c84b365c066d237cd313711b143f29905..621903799e213f03cb6d5ac1384b62ecb65bea25 100644
+--- a/sample.c
++++ b/sample.c
+@@ -413,7 +413,9 @@ int main(int argc, char* argv[] )
+   if(      solve_type == DOGLEG_SPARSE         )
+     optimum = dogleg_optimize2(p, Nstate, Nmeasurements, Jnnz,
+                                &optimizerCallback, &dogleg_parameters,
+-                               &dogleg_parameters, NULL);
++                               &dogleg_parameters,
++                               NULL, NULL, NULL,
++                               NULL);
+   else if( solve_type == DOGLEG_DENSE         )
+     optimum = dogleg_optimize_dense2(p, Nstate, Nmeasurements,
+                                      &optimizerCallback_dense, &dogleg_parameters,

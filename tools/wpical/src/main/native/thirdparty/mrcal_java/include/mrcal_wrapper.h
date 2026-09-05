@@ -17,12 +17,48 @@
 
 #include <mrcal.h>
 
+#include <atomic>
 #include <memory>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
 #include <span>
 #include <utility>
 #include <vector>
+
+class mrcal_cancellation_token {
+ public:
+  mrcal_cancellation_token() = default;
+
+  bool stop_requested() const noexcept {
+    return m_state && m_state->load(std::memory_order_relaxed);
+  }
+
+ private:
+  explicit mrcal_cancellation_token(
+      std::shared_ptr<std::atomic_bool> state)
+      : m_state{std::move(state)} {}
+
+  std::shared_ptr<std::atomic_bool> m_state;
+
+  friend class mrcal_cancellation_source;
+};
+
+class mrcal_cancellation_source {
+ public:
+  mrcal_cancellation_source()
+      : m_state{std::make_shared<std::atomic_bool>(false)} {}
+
+  mrcal_cancellation_token get_token() const noexcept {
+    return mrcal_cancellation_token{m_state};
+  }
+
+  bool request_stop() noexcept {
+    return !m_state->exchange(true, std::memory_order_relaxed);
+  }
+
+ private:
+  std::shared_ptr<std::atomic_bool> m_state;
+};
 
 struct mrcal_result {
   bool success;
@@ -68,7 +104,8 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // res, pixels
     cv::Size cameraRes,
     // focal length, in pixels
-    double focal_len_guess);
+    double focal_len_guess,
+    mrcal_cancellation_token stopToken = {});
 
 enum class CameraLensModel {
   LENSMODEL_OPENCV5 = 0,

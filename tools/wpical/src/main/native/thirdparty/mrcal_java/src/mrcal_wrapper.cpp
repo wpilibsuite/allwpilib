@@ -41,6 +41,10 @@ mrcal_pose_t *extrinsics_rt_fromref =
 mrcal_point3_t *points =
     nullptr; // Seems to always to be None for single camera?
 
+static bool is_cancelled(void *cookie) {
+  return static_cast<mrcal_cancellation_token *>(cookie)->stop_requested();
+}
+
 static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // List, depth is ordered array observation[N frames, object_height,
     // object_width] = [x,y, weight] weight<0 means ignored)
@@ -54,7 +58,12 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
     // solver options
     mrcal_problem_selections_t problem_selections,
     // seed intrinsics/cameramodel to optimize for
-    mrcal_lensmodel_t mrcal_lensmodel, std::vector<double> intrinsics) {
+    mrcal_lensmodel_t mrcal_lensmodel, std::vector<double> intrinsics,
+    mrcal_cancellation_token stopToken) {
+  if (stopToken.stop_requested()) {
+    return nullptr;
+  }
+
   // Number of board observations we've got. List of boards. in python, it's
   // (number of chessboard pictures) x (rows) x (cos) x (3)
   // hard-coded to 8, since that's what I've got below
@@ -168,6 +177,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   int *c_imagersizes = imagersize;
   int verbose = 0;
 
+  bool cancelled = false;
   auto stats = mrcal_optimize(
       NULL, -1, c_x_final, Nmeasurements * sizeof(double), c_intrinsics,
       c_extrinsics, c_frames, c_points, c_calobject_warp, Ncameras_intrinsics,
@@ -176,7 +186,12 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
       Nobservations_point, NULL, -1, // We don't use these, so pass nulls
       c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel,
       c_imagersizes, problem_selections, NULL, calibration_object_spacing,
-      calibration_object_width_n, calibration_object_height_n, verbose, false);
+      calibration_object_width_n, calibration_object_height_n, verbose, false,
+      is_cancelled, &stopToken, &cancelled);
+
+  if (cancelled) {
+    return nullptr;
+  }
 
   std::vector<double> residuals = {c_x_final, c_x_final + Nmeasurements};
   return std::make_unique<mrcal_result>(
@@ -343,9 +358,14 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // Chessboard size, in corners (not squares)
     Size calobjectSize, double calibration_object_spacing,
     // res, pixels
-    Size cameraRes, double focal_length_guess) {
+    Size cameraRes, double focal_length_guess,
+    mrcal_cancellation_token stopToken) {
 
   std::unique_ptr<mrcal_result> result;
+
+  if (stopToken.stop_requested()) {
+    return nullptr;
+  }
 
   {
     // stereographic initial guess for intrinsics
@@ -372,7 +392,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
     // And run calibration. This should mutate frames_rt_toref in place
     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
                              calibration_object_spacing, cameraRes, options,
-                             mrcal_lensmodel, intrinsics);
+                             mrcal_lensmodel, intrinsics, stopToken);
+    if (!result) {
+      return nullptr;
+    }
   }
 
   {
@@ -393,7 +416,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
 
     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
                              calibration_object_spacing, cameraRes, options,
-                             mrcal_lensmodel, result->intrinsics);
+                             mrcal_lensmodel, result->intrinsics, stopToken);
+    if (!result) {
+      return nullptr;
+    }
   }
 
   {
@@ -443,7 +469,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
 
     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
                              calibration_object_spacing, cameraRes, options,
-                             mrcal_lensmodel, intrinsics);
+                             mrcal_lensmodel, intrinsics, stopToken);
+    if (!result) {
+      return nullptr;
+    }
   }
 
   {
@@ -463,7 +492,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
 
     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
                              calibration_object_spacing, cameraRes, options,
-                             mrcal_lensmodel, result->intrinsics);
+                             mrcal_lensmodel, result->intrinsics, stopToken);
+    if (!result) {
+      return nullptr;
+    }
   }
 
   return result;

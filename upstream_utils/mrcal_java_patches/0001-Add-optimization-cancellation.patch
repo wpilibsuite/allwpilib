@@ -1,0 +1,190 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Thad House <thadhouse1@gmail.com>
+Date: Sat, 29 Aug 2026 16:18:06 -0700
+Subject: [PATCH] Add optimization cancellation
+
+---
+ src/mrcal_wrapper.cpp | 46 ++++++++++++++++++++++++++++++++++++-------
+ src/mrcal_wrapper.h   | 39 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 77 insertions(+), 8 deletions(-)
+
+diff --git a/src/mrcal_wrapper.cpp b/src/mrcal_wrapper.cpp
+index 0037e22989aad720cd058379e398c958e5269bab..5a8f70df3ca5814c7f0f1579cc7fa0044ef81bea 100644
+--- a/src/mrcal_wrapper.cpp
++++ b/src/mrcal_wrapper.cpp
+@@ -41,6 +41,10 @@ mrcal_pose_t *extrinsics_rt_fromref =
+ mrcal_point3_t *points =
+     nullptr; // Seems to always to be None for single camera?
+ 
++static bool is_cancelled(void *cookie) {
++  return static_cast<mrcal_cancellation_token *>(cookie)->stop_requested();
++}
++
+ static std::unique_ptr<mrcal_result> mrcal_calibrate(
+     // List, depth is ordered array observation[N frames, object_height,
+     // object_width] = [x,y, weight] weight<0 means ignored)
+@@ -54,7 +58,12 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
+     // solver options
+     mrcal_problem_selections_t problem_selections,
+     // seed intrinsics/cameramodel to optimize for
+-    mrcal_lensmodel_t mrcal_lensmodel, std::vector<double> intrinsics) {
++    mrcal_lensmodel_t mrcal_lensmodel, std::vector<double> intrinsics,
++    mrcal_cancellation_token stopToken) {
++  if (stopToken.stop_requested()) {
++    return nullptr;
++  }
++
+   // Number of board observations we've got. List of boards. in python, it's
+   // (number of chessboard pictures) x (rows) x (cos) x (3)
+   // hard-coded to 8, since that's what I've got below
+@@ -168,6 +177,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
+   int *c_imagersizes = imagersize;
+   int verbose = 0;
+ 
++  bool cancelled = false;
+   auto stats = mrcal_optimize(
+       NULL, -1, c_x_final, Nmeasurements * sizeof(double), c_intrinsics,
+       c_extrinsics, c_frames, c_points, c_calobject_warp, Ncameras_intrinsics,
+@@ -176,7 +186,12 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
+       Nobservations_point, NULL, -1, // We don't use these, so pass nulls
+       c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel,
+       c_imagersizes, problem_selections, NULL, calibration_object_spacing,
+-      calibration_object_width_n, calibration_object_height_n, verbose, false);
++      calibration_object_width_n, calibration_object_height_n, verbose, false,
++      is_cancelled, &stopToken, &cancelled);
++
++  if (cancelled) {
++    return nullptr;
++  }
+ 
+   std::vector<double> residuals = {c_x_final, c_x_final + Nmeasurements};
+   return std::make_unique<mrcal_result>(
+@@ -343,10 +358,15 @@ std::unique_ptr<mrcal_result> mrcal_main(
+     // Chessboard size, in corners (not squares)
+     Size calobjectSize, double calibration_object_spacing,
+     // res, pixels
+-    Size cameraRes, double focal_length_guess) {
++    Size cameraRes, double focal_length_guess,
++    mrcal_cancellation_token stopToken) {
+ 
+   std::unique_ptr<mrcal_result> result;
+ 
++  if (stopToken.stop_requested()) {
++    return nullptr;
++  }
++
+   {
+     // stereographic initial guess for intrinsics
+     double cx = (cameraRes.width / 2.0) - 0.5;
+@@ -372,7 +392,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
+     // And run calibration. This should mutate frames_rt_toref in place
+     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
+                              calibration_object_spacing, cameraRes, options,
+-                             mrcal_lensmodel, intrinsics);
++                             mrcal_lensmodel, intrinsics, stopToken);
++    if (!result) {
++      return nullptr;
++    }
+   }
+ 
+   {
+@@ -393,7 +416,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
+ 
+     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
+                              calibration_object_spacing, cameraRes, options,
+-                             mrcal_lensmodel, result->intrinsics);
++                             mrcal_lensmodel, result->intrinsics, stopToken);
++    if (!result) {
++      return nullptr;
++    }
+   }
+ 
+   {
+@@ -443,7 +469,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
+ 
+     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
+                              calibration_object_spacing, cameraRes, options,
+-                             mrcal_lensmodel, intrinsics);
++                             mrcal_lensmodel, intrinsics, stopToken);
++    if (!result) {
++      return nullptr;
++    }
+   }
+ 
+   {
+@@ -463,7 +492,10 @@ std::unique_ptr<mrcal_result> mrcal_main(
+ 
+     result = mrcal_calibrate(observations_board, frames_rt_toref, calobjectSize,
+                              calibration_object_spacing, cameraRes, options,
+-                             mrcal_lensmodel, result->intrinsics);
++                             mrcal_lensmodel, result->intrinsics, stopToken);
++    if (!result) {
++      return nullptr;
++    }
+   }
+ 
+   return result;
+diff --git a/src/mrcal_wrapper.h b/src/mrcal_wrapper.h
+index e59586944161cc3809cc2efe6ab19d6245e4180f..e71955d0b6ef4a781c3a24a94272b8ee4acb8f00 100644
+--- a/src/mrcal_wrapper.h
++++ b/src/mrcal_wrapper.h
+@@ -17,6 +17,7 @@
+ 
+ #include <mrcal.h>
+ 
++#include <atomic>
+ #include <memory>
+ #include <opencv2/core/mat.hpp>
+ #include <opencv2/core/types.hpp>
+@@ -24,6 +25,41 @@
+ #include <utility>
+ #include <vector>
+ 
++class mrcal_cancellation_token {
++ public:
++  mrcal_cancellation_token() = default;
++
++  bool stop_requested() const noexcept {
++    return m_state && m_state->load(std::memory_order_relaxed);
++  }
++
++ private:
++  explicit mrcal_cancellation_token(
++      std::shared_ptr<std::atomic_bool> state)
++      : m_state{std::move(state)} {}
++
++  std::shared_ptr<std::atomic_bool> m_state;
++
++  friend class mrcal_cancellation_source;
++};
++
++class mrcal_cancellation_source {
++ public:
++  mrcal_cancellation_source()
++      : m_state{std::make_shared<std::atomic_bool>(false)} {}
++
++  mrcal_cancellation_token get_token() const noexcept {
++    return mrcal_cancellation_token{m_state};
++  }
++
++  bool request_stop() noexcept {
++    return !m_state->exchange(true, std::memory_order_relaxed);
++  }
++
++ private:
++  std::shared_ptr<std::atomic_bool> m_state;
++};
++
+ struct mrcal_result {
+   bool success;
+   std::vector<double> intrinsics;
+@@ -68,7 +104,8 @@ std::unique_ptr<mrcal_result> mrcal_main(
+     // res, pixels
+     cv::Size cameraRes,
+     // focal length, in pixels
+-    double focal_len_guess);
++    double focal_len_guess,
++    mrcal_cancellation_token stopToken = {});
+ 
+ enum class CameraLensModel {
+   LENSMODEL_OPENCV5 = 0,

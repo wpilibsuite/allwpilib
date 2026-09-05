@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Gold856 <117957790+Gold856@users.noreply.github.com>
 Date: Wed, 22 Jul 2026 17:59:52 -0400
-Subject: [PATCH 2/3] Fix static_asserts
+Subject: [PATCH 2/4] Fix static_asserts
 
 Bitfields are packed differently on MSVC, and we need assert.h.
 ---
