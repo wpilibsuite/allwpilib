@@ -801,6 +801,7 @@ static void DisplayGui() {
   ImGui::End();
 }
 
+#ifndef RUNNING_WPICAL_TESTS
 void Application(std::string_view saveDir) {
   wpi::gui::CreateContext();
   wpi::glass::CreateContext();
@@ -829,6 +830,7 @@ void Application(std::string_view saveDir) {
   wpi::glass::DestroyContext();
   wpi::gui::DestroyContext();
 }
+#endif
 
 #if !defined(RUNNING_WPICAL_TESTS) && !defined(RUNNING_IMGUI_TESTS)
 #ifdef _WIN32
