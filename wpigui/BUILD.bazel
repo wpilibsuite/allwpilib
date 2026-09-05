@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
 load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
