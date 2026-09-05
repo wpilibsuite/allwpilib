@@ -141,6 +141,8 @@ model {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (project.hasProperty('splitSetup')) {
                     splitSetup(it)
                 }
@@ -184,6 +186,8 @@ model {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (it in SharedLibraryBinarySpec) {
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                 } else {
@@ -240,6 +244,8 @@ model {
                 }
                 lib library: "${nativeName}", linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 }
@@ -284,6 +290,8 @@ model {
                 lib library: "${nativeName}", linkage: 'shared'
                 lib library: "${nativeName}JNIShared", linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (!project.hasProperty('noWpiutil')) {
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
@@ -311,6 +319,8 @@ model {
                     }
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                    lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     if (it in SharedLibraryBinarySpec) {
                         nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                     } else {
@@ -350,6 +360,8 @@ model {
                     }
                     lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                     lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                    lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                    lib project: ':tunables', library: 'tunables', linkage: 'shared'
                     nativeUtils.useRequiredLibrary(it, 'opencv_shared')
                     nativeUtils.useRequiredLibrary(it, 'ceres')
                     lib library: "${nativeName}", linkage: 'shared'
@@ -372,6 +384,8 @@ model {
             }
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             if (it in SharedLibraryBinarySpec) {
                 nativeUtils.useRequiredLibrary(it, 'opencv_shared')
             } else {
