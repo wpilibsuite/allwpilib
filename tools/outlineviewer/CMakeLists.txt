@@ -46,5 +46,5 @@ if(WPILIB_WITH_IMGUI_TESTS)
             ${outlineviewer_rc}
             ${APP_ICON_MACOSX}
     )
-    target_link_libraries(outlineviewer_imgui_test libglassnt libglass)
+    target_link_libraries(outlineviewer_imgui_test libglassnt_imgui_test libglass_imgui_test)
 endif()

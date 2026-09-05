@@ -51,8 +51,7 @@ wpilib_imgui_cc_test(
         ":generate-version",
     ],
     deps = [
-        "//glass",
-        "//glass:glassnt",
+        "//glass:glassnt-imgui",
     ],
 )
 

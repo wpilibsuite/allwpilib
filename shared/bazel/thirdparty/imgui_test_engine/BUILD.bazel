@@ -25,7 +25,7 @@ cc_library(
     target_compatible_with = imgui_test_target_compatible_with(),
     deps = select({
         "//shared/bazel/rules:with_imgui_tests_enabled": [
-            "//thirdparty/imgui_suite",
+            "//thirdparty/imgui_suite:imgui_for_tests",
             "@imgui_test_engine//:header_paths",
         ],
         "//conditions:default": [],

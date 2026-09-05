@@ -80,7 +80,7 @@ wpilib_imgui_cc_test(
     }),
     deps = [
         "//datalog",
-        "//glass",
+        "//glass:glass-imgui",
         "//shared/bazel/thirdparty/libssh",
     ],
 )

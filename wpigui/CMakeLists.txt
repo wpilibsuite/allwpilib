@@ -26,10 +26,20 @@ if(WPILIB_WITH_EXECUTABLES)
 endif()
 
 if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(wpigui_imgui STATIC ${wpigui_src})
+    set_target_properties(wpigui_imgui PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET wpigui_imgui PROPERTY FOLDER "tests")
+    wpilib_target_warnings(wpigui_imgui)
+    target_link_libraries(wpigui_imgui PUBLIC imgui_test_engine)
+    target_include_directories(
+        wpigui_imgui
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+    )
+
     add_library(wpigui_imgui_test STATIC src/test/native/cpp/GuiTestEngineRunner.cpp)
     set_property(TARGET wpigui_imgui_test PROPERTY FOLDER "tests")
     wpilib_target_warnings(wpigui_imgui_test)
-    target_link_libraries(wpigui_imgui_test PUBLIC wpigui imgui_test_engine)
+    target_link_libraries(wpigui_imgui_test PUBLIC wpigui_imgui imgui_test_engine)
     target_include_directories(
         wpigui_imgui_test
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/test/native/include>

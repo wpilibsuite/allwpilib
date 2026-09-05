@@ -222,8 +222,8 @@ if(WPILIB_WITH_IMGUI_TESTS)
         opencv_highgui
         opencv_objdetect
         opencv_videoio
-        libglass
-        wpigui
+        libglass_imgui_test
+        wpigui_imgui
         wpiutil
         ${cholmod_target}
         ${suitesparse_target}
