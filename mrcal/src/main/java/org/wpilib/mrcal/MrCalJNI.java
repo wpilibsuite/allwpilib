@@ -22,7 +22,7 @@ public class MrCalJNI {
   }
 
   /**
-   * A single board observation for mrcal calibration
+   * A single board observation for mrcal calibration.
    *
    * @param corners The positions of each of the detected corners
    * @param levels The decimation level each of the corners was observed at
@@ -33,7 +33,7 @@ public class MrCalJNI {
    */
   public record MrCalObservation(Point[] corners, float[] levels, int[] ids) {
     /**
-     * Creates a complete board observation for mrcal calibration
+     * Creates a complete board observation for mrcal calibration.
      *
      * @param corners The positions of each of the detected corners
      * @param levels The decimation level each of the corners was observed at
@@ -305,7 +305,7 @@ public class MrCalJNI {
         // Assume that we're correct in terms of row/column major-ness (lol)
         for (int c = 0; c < corners.length; c++) {
           var corner = corners[c];
-          float level = levels[c];
+          final float level = levels[c];
           int id = ids[c];
 
           if (id < 0 || id >= boardWidth * boardHeight) {

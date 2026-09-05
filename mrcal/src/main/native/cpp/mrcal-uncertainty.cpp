@@ -4,7 +4,6 @@
 
 #include "mrcal-uncertainty.hpp"
 
-#include <chrono>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -217,7 +216,7 @@ _dq_db_projection_uncertainty(mrcal_point3_t pcam, mrcal_lensmodel_t lensmodel,
     for (size_t pose = 0; pose < Nboards; pose++) {
       mrcal_rotate_point_r_inverted(
           // out
-          p_frames.row(pose).data(), NULL, NULL,
+          p_frames.row(pose).data(), nullptr, nullptr,
           // in
           rt_ref_frame[pose].r.xyz, p_ref.data());
     }
@@ -230,7 +229,7 @@ _dq_db_projection_uncertainty(mrcal_point3_t pcam, mrcal_lensmodel_t lensmodel,
     mrcal_point3_t dummy;
     mrcal_rotate_point_r(
         // out
-        dummy.xyz, dpref_dframes[pose].data(), NULL,
+        dummy.xyz, dpref_dframes[pose].data(), nullptr,
         // in
         rt_ref_frame[pose].r.xyz, p_frames.row(pose).data());
   }
@@ -286,7 +285,7 @@ CalibrationUncertaintyContext create_calibration_uncertainty_context(
                        problem_selections, &lensmodel);
 
   int Nmeasurements = mrcal_num_measurements(
-      Nobservations_board, 0, NULL, 0, calibration_object_width_n,
+      Nobservations_board, 0, nullptr, 0, calibration_object_width_n,
       calibration_object_height_n, 1, 0, 6, 0, 0, problem_selections,
       &lensmodel);
   int Nmeasurements_boards = mrcal_num_measurements_boards(
@@ -539,16 +538,10 @@ std::vector<mrcal_point3_t> compute_uncertainty(
     auto& pi = pcam[i];
     auto& qi = q[i];
 
-    auto start = std::chrono::high_resolution_clock::now();
-
     double uncertainty = projection_uncertainty_fast(context, pi, lensmodel,
                                                      rt_ref_frames, intrinsics);
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-    ret.push_back(mrcal_point3_t{qi.x, qi.y, uncertainty});
+    ret.push_back(mrcal_point3_t{{qi.x, qi.y, uncertainty}});
   }
 
   return ret;

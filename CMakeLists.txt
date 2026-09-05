@@ -90,6 +90,13 @@ cmake_dependent_option(
 option(WPILIB_WITH_CSCORE "Build cscore (needs OpenCV)" ON)
 option(WPILIB_WITH_NTCORE "Build ntcore" ON)
 option(WPILIB_WITH_WPICAL "Build wpical" OFF)
+cmake_dependent_option(
+    WPILIB_WITH_MRCAL
+    "Build mrcal (needs OpenCV, Ceres, and SuiteSparse)"
+    OFF
+    "NOT WPILIB_WITH_WPICAL"
+    ON
+)
 option(WPILIB_WITH_WPIMATH "Build wpimath" ON)
 option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, drivers, and developerRobot (needs OpenCV)" ON)
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
@@ -139,6 +146,8 @@ wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WP
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_MRCAL REQUIRES WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_IMGUI_TESTS REQUIRES WPILIB_WITH_GUI WPILIB_WITH_TESTS)
 
@@ -333,13 +342,16 @@ if(WPILIB_WITH_FIELDS)
     add_subdirectory(fields)
 endif()
 
+if(WPILIB_WITH_MRCAL)
+    add_subdirectory(mrcal)
+endif()
+
 if(WPILIB_WITH_GUI)
     find_package(SDL3 CONFIG REQUIRED)
     add_subdirectory(thirdparty/imgui_suite)
     add_subdirectory(wpigui)
     add_subdirectory(glass)
     if(WPILIB_WITH_WPICAL)
-        add_subdirectory(mrcal)
         add_subdirectory(tools/wpical)
     endif()
 

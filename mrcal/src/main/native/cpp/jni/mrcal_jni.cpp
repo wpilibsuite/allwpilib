@@ -100,8 +100,7 @@ static std::string what(
 template <typename T>
 class JNIArrayView {
  public:
-  JNIArrayView(JNIEnv* env, jdoubleArray jArray)
-      : env_(env), jArray_(jArray), size_(0) {
+  JNIArrayView(JNIEnv* env, jdoubleArray jArray) : env_(env), jArray_(jArray) {
     if (jArray) {
       size_ = env->GetArrayLength(jArray);
       data_ = env->GetDoubleArrayElements(jArray, nullptr);
@@ -132,7 +131,7 @@ class JNIArrayView {
   JNIEnv* env_;
   jdoubleArray jArray_;
   jdouble* data_{nullptr};
-  jsize size_;
+  jsize size_{0};
 };
 
 extern "C" {

@@ -134,7 +134,7 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   }
 
   int Nmeasurements = mrcal_num_measurements(
-      Nobservations_board, Nobservations_point, NULL,
+      Nobservations_board, Nobservations_point, nullptr,
       0,  // We don't use these, so pass nulls
       calibration_object_width_n, calibration_object_height_n,
       Ncameras_intrinsics, Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
@@ -159,13 +159,13 @@ static std::unique_ptr<mrcal_result> mrcal_calibrate(
   int verbose = 0;
 
   auto stats = mrcal_optimize(
-      NULL, -1, c_x_final, Nmeasurements * sizeof(double), c_intrinsics,
+      nullptr, -1, c_x_final, Nmeasurements * sizeof(double), c_intrinsics,
       c_extrinsics, c_frames, c_points, c_calobject_warp, Ncameras_intrinsics,
       Ncameras_extrinsics, Nframes, Npoints, Npoints_fixed,
       c_observations_board, c_observations_point, Nobservations_board,
-      Nobservations_point, NULL, -1,  // We don't use these, so pass nulls
+      Nobservations_point, nullptr, -1,  // We don't use these, so pass nulls
       c_observations_board_pool, c_observations_point_pool, &mrcal_lensmodel,
-      c_imagersizes, problem_selections, NULL, calibration_object_spacing,
+      c_imagersizes, problem_selections, nullptr, calibration_object_spacing,
       calibration_object_width_n, calibration_object_height_n, verbose, false);
 
   std::vector<double> residuals = {c_x_final, c_x_final + Nmeasurements};
@@ -212,16 +212,21 @@ static mrcal_problem_selections_t construct_problem_selections(
     MrcalSolveOptions s, int Ncameras_intrinsics, int Ncameras_extrinsics,
     int Nframes, int Nobservations_board) {
   // By default we optimize everything we can
-  if (s.do_optimize_intrinsics_core < 0)
+  if (s.do_optimize_intrinsics_core < 0) {
     s.do_optimize_intrinsics_core = Ncameras_intrinsics > 0;
-  if (s.do_optimize_intrinsics_distortions < 0)
+  }
+  if (s.do_optimize_intrinsics_distortions < 0) {
     s.do_optimize_intrinsics_core = Ncameras_intrinsics > 0;
-  if (s.do_optimize_extrinsics < 0)
+  }
+  if (s.do_optimize_extrinsics < 0) {
     s.do_optimize_extrinsics = Ncameras_extrinsics > 0;
-  if (s.do_optimize_frames < 0)
+  }
+  if (s.do_optimize_frames < 0) {
     s.do_optimize_frames = Nframes > 0;
-  if (s.do_optimize_calobject_warp < 0)
+  }
+  if (s.do_optimize_calobject_warp < 0) {
     s.do_optimize_calobject_warp = Nobservations_board > 0;
+  }
   return {
       .do_optimize_intrinsics_core =
           static_cast<bool>(s.do_optimize_intrinsics_core),
@@ -294,8 +299,8 @@ mrcal_pose_t getSeedPose(const mrcal_point3_t* c_observations_board_pool,
       BARF("couldn't unproject!");
     }
     model = {.type = MRCAL_LENSMODEL_PINHOLE};
-    mrcal_project(mrcal_imagepts.data(), NULL, NULL, out.data(), out.size(),
-                  &model, intrinsics);
+    mrcal_project(mrcal_imagepts.data(), nullptr, nullptr, out.data(),
+                  out.size(), &model, intrinsics);
 
     std::transform(mrcal_imagepts.begin(), mrcal_imagepts.end(),
                    imagePoints.begin(),
@@ -407,10 +412,11 @@ std::unique_ptr<mrcal_result> mrcal_main(
     std::vector<double> seedDistortions(nDistortion);
 
     for (int j = 0; j < seedDistortions.size(); j++) {
-      if (j < 5)
+      if (j < 5) {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-6;
-      else
+      } else {
         seedDistortions[j] = dis(gen) * 2.0 * 1e-9;
+      }
     }
 
     // copy distortion into our big intrinsics array
