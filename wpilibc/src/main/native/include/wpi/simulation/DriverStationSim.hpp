@@ -8,7 +8,8 @@
 
 #include <memory>
 
-#include "wpi/driverstation/internal/DriverStationBackend.hpp"
+#include "wpi/driverstation/MatchType.hpp"
+#include "wpi/driverstation/POVDirection.hpp"
 #include "wpi/hal/DriverStationTypes.hpp"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/simulation/CallbackStore.hpp"

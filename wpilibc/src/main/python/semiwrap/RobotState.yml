@@ -14,6 +14,7 @@ classes:
       IsTeleopEnabled:
       IsUtility:
       IsUtilityEnabled:
+      OpModeToString:
       AddOpMode:
         overloads:
           RobotMode, std::string_view, std::string_view, std::string_view, const wpi::util::Color&, const wpi::util::Color&:
@@ -21,6 +22,7 @@ classes:
       RemoveOpMode:
       PublishOpModes:
       ClearOpModes:
+      ObserveUserProgramStarting:
       GetOpModeId:
       GetOpMode:
       IsOpMode:
