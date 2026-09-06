@@ -17,6 +17,9 @@ public class ExpansionHubPositionConstants {
   private final DoublePublisher m_dPublisher;
 
   private final DoublePublisher m_sPublisher;
+  private final DoublePublisher m_gPublisher;
+  private final DoublePublisher m_cosPublisher;
+  private final DoublePublisher m_cosRatioPublisher;
 
   private final BooleanPublisher m_continuousPublisher;
   private final DoublePublisher m_continuousMinimumPublisher;
@@ -52,6 +55,29 @@ public class ExpansionHubPositionConstants {
         systemServer
             .getDoubleTopic(
                 "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/ks")
+            .publish(options);
+
+    m_gPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kg")
+            .publish(options);
+
+    m_cosPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/" + hubNumber + "/motor" + motorNumber + "/constants/position" + "/kcos")
+            .publish(options);
+
+    m_cosRatioPublisher =
+        systemServer
+            .getDoubleTopic(
+                "/rhsp/"
+                    + hubNumber
+                    + "/motor"
+                    + motorNumber
+                    + "/constants/position"
+                    + "/kcosRatio")
             .publish(options);
 
     m_continuousPublisher =
@@ -121,9 +147,51 @@ public class ExpansionHubPositionConstants {
   }
 
   /**
+   * Sets the gravity compensation gain for a lifting mechanism.
+   *
+   * <p>These gravity-compensation settings are mutually exclusive; setting this value clears the
+   * arm gravity gain.
+   *
+   * @param g The lifting gravity gain.
+   * @return This object, for method chaining.
+   */
+  public ExpansionHubPositionConstants setG(double g) {
+    m_gPublisher.set(g);
+    m_cosPublisher.set(0);
+    return this;
+  }
+
+  /**
+   * Sets the gravity compensation gain for an arm mechanism.
+   *
+   * <p>These gravity-compensation settings are mutually exclusive; setting this value clears the
+   * lift gravity gain.
+   *
+   * @param cos The arm gravity gain.
+   * @return This object, for method chaining.
+   */
+  public ExpansionHubPositionConstants setCos(double cos) {
+    m_cosPublisher.set(cos);
+    m_gPublisher.set(0);
+    return this;
+  }
+
+  /**
+   * Sets the conversion factor that translates the selected sensor's position units into absolute
+   * mechanism rotations for an arm mechanism.
+   *
+   * @param cosRatio The conversion factor for the arm gravity compensation ratio.
+   * @return This object, for method chaining.
+   */
+  public ExpansionHubPositionConstants setCosRatio(double cosRatio) {
+    m_cosRatioPublisher.set(cosRatio);
+    return this;
+  }
+
+  /**
    * Enables continuous input.
    *
-   * <p>Rather then using the max and min input range as constraints, it considers them to be the
+   * <p>Rather than using the max and min input range as constraints, it considers them to be the
    * same point and automatically calculates the shortest route to the setpoint.
    *
    * @param minimumInput The minimum value expected from the input.
@@ -153,6 +221,9 @@ public class ExpansionHubPositionConstants {
     m_iPublisher.close();
     m_dPublisher.close();
     m_sPublisher.close();
+    m_gPublisher.close();
+    m_cosPublisher.close();
+    m_cosRatioPublisher.close();
     m_continuousPublisher.close();
     m_continuousMinimumPublisher.close();
     m_continuousMaximumPublisher.close();

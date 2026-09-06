@@ -5,3 +5,6 @@ classes:
       SetS:
       EnableContinuousInput:
       DisableContinuousInput:
+      SetG:
+      SetCos:
+      SetCosRatio:
