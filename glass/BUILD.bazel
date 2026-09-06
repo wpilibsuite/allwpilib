@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with", "wpilib_imgui_cc_test")

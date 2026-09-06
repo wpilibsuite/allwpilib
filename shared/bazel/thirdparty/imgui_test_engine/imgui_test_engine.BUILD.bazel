@@ -8,10 +8,10 @@ package(
 
 license(
     name = "license",
+    package_name = "Dear ImGui Test Engine",
     copyright_notice = "Copyright (c) 2018-2026 Omar Cornut",
     license_kind = "@rules_license//licenses/generic:restricted",
     license_text = "imgui_test_engine/LICENSE.txt",
-    package_name = "Dear ImGui Test Engine",
     package_url = "https://github.com/ocornut/imgui_test_engine",
 )
 
