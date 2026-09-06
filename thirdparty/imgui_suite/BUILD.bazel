@@ -37,11 +37,11 @@ IMGUI_HEADERS = glob(["imgui/include/*.h"]) + [
 cc_library(
     name = "imgui",
     srcs = IMGUI_SOURCES,
+    hdrs = IMGUI_HEADERS,
     defines = select({
         "//shared/bazel/rules:with_imgui_test_engine_hooks_enabled": IMGUI_TEST_ENGINE_DEFINES,
         "//conditions:default": [],
     }),
-    hdrs = IMGUI_HEADERS,
     includes = [
         "imgui/include",
         "imgui/include/backends",

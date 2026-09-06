@@ -93,8 +93,8 @@ bool_flag(
 config_setting(
     name = "with_imgui_test_engine_hooks_enabled",
     flag_values = {
-        ":with_imgui_tests": "true",
         ":with_imgui_test_engine_hooks": "true",
+        ":with_imgui_tests": "true",
     },
     visibility = ["//visibility:public"],
 )
