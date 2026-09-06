@@ -17,3 +17,9 @@ set_property(TARGET halsim_xrp PROPERTY FOLDER "libraries")
 
 install(TARGETS halsim_xrp EXPORT halsim_xrp)
 export(TARGETS halsim_xrp FILE halsim_xrp.cmake NAMESPACE halsim_xrp::)
+
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test(halsim_xrp src/test/native/cpp src/main/native/cpp/XRP.cpp)
+    target_include_directories(halsim_xrp_test PRIVATE src/main/native/include)
+    target_link_libraries(halsim_xrp_test wpinet)
+endif()

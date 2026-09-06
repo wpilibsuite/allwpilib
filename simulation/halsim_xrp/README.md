@@ -20,7 +20,22 @@ GATT control characteristic UUID: `7d2ea28b-f7bd-485d-9d6a-2c3f0b214a3f`
 
 GATT status characteristic UUID: `7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f`
 
-The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linux and macOS. Linux and macOS fall back to GATT if the L2CAP channel cannot be opened. Windows uses GATT Write Without Response and notifications.
+The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linux, with GATT fallback. Windows and macOS use GATT Write Without Response and notifications. CoreBluetooth exposes L2CAP as a stream, which does not preserve the packet boundaries required by this protocol.
+
+GATT connections must support at least 85 bytes per notification (ATT MTU 88). The client checks this before reporting a connection. Windows and macOS manage MTU negotiation; Linux requests an MTU large enough for the configured packet capacity.
+
+Periodic control packets are best effort and are not retried when the transport is busy. macOS submits these writes without waiting for CoreBluetooth write readiness; Windows submits them without waiting for earlier WinRT writes to complete. A one-shot rename request is retained until the transport is ready (after outstanding writes complete on Windows); newer control packets are dropped while it is pending so they cannot make the rename's sequence stale. Acceptance for sending does not acknowledge that the firmware received or saved the name.
+
+### macOS application permissions
+
+The application hosting HALSim XRP must provide `NSBluetoothAlwaysUsageDescription` in its `Info.plist`, for example:
+
+```xml
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Connect to an XRP robot to run WPILib robot programs.</string>
+```
+
+The WPILib CMake application bundle template includes this entry. A simulation extension is a library; its own property list cannot supply permissions for a separate host executable. For Java, Python, and IDE launches, ensure the host application/launcher provides the entry and has Bluetooth access in System Settings. macOS can terminate an application that accesses Bluetooth without the required usage description. Verify the actual launcher used for simulation, as its permissions may differ from those of Terminal.
 
 ## XRP Protocol
 
@@ -33,6 +48,8 @@ All multi-byte values are big-endian. Each packet starts with the same 5-byte he
 | _uint16_t_ sequence | _uint8_t_ control | _uint16_t_ field mask  | payload   |
 
 The payload contains each field selected by the field mask, emitted in ascending bit order. Packets with unknown field bits or payload sizes that do not exactly match the selected fields are ignored.
+
+Sequences advance modulo 65536. Duplicate and stale packets are ignored; forward jumps must be smaller than 32768. Status packets may be coalesced by the firmware, including across rollover. A new connection resets the client's status sequence tracking.
 
 ### Control Byte
 

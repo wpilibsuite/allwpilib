@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -33,6 +34,7 @@ namespace {
 
 constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
 constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
+constexpr size_t MAX_XRP_STATUS_PACKET_SIZE = 85;
 constexpr size_t MAX_LATENCY_SEND_TIMES = 512;
 constexpr uint32_t INVALID_CONTROL_RX_AGE_US = UINT32_MAX;
 constexpr const char* XRP_GATT_SERVICE_UUID =
@@ -250,6 +252,9 @@ bool HALSimXRP::Initialize() {
         if (auto self = weakSelf.lock()) {
           if (!status.connected) {
             self->m_xrp.ResetStatusPacketSequence();
+            self->m_controlPacketSendTimes.clear();
+            self->m_controlPacketSendOrder.clear();
+            self->m_haveLastLatencyControlSeq = false;
           }
           std::scoped_lock lock(self->m_statusMutex);
           self->m_status = status;
@@ -377,14 +382,17 @@ void HALSimXRP::ConnectBluetooth(std::string address,
     config.gattControlCharacteristicUuid = XRP_GATT_CONTROL_CHARACTERISTIC_UUID;
     config.gattStatusCharacteristicUuid = XRP_GATT_STATUS_CHARACTERISTIC_UUID;
     config.maxPacketSize = MAX_BLUETOOTH_PACKET_SIZE;
+    config.minReceivePacketSize = MAX_XRP_STATUS_PACKET_SIZE;
   }
 
   SaveBluetoothTarget(config.address, config.addressType, targetName);
-  m_xrp.ResetStatusPacketSequence();
-
-  if (m_bluetoothClient) {
-    m_bluetoothClient->Connect(std::move(config));
-  }
+  m_exec->Send(
+      [self = shared_from_this(), config = std::move(config)]() mutable {
+        self->m_xrp.ResetStatusPacketSequence();
+        if (self->m_bluetoothClient) {
+          self->m_bluetoothClient->Connect(std::move(config));
+        }
+      });
 }
 
 void HALSimXRP::RememberBluetoothTarget(std::string address,
@@ -409,13 +417,30 @@ void HALSimXRP::RememberBluetoothTarget(std::string address,
 }
 
 void HALSimXRP::DisconnectBluetooth() {
-  m_xrp.ResetStatusPacketSequence();
-  if (m_bluetoothClient) {
-    m_bluetoothClient->Disconnect("Disconnected by user");
-  }
+  m_exec->Send([self = shared_from_this()] {
+    self->m_xrp.ResetStatusPacketSequence();
+    if (self->m_bluetoothClient) {
+      self->m_bluetoothClient->Disconnect("Disconnected by user");
+    }
+  });
 }
 
-bool HALSimXRP::RenameBluetoothDevice(std::string_view deviceName) {
+std::future<bool> HALSimXRP::RenameBluetoothDevice(
+    std::string_view deviceName) {
+  auto result = std::make_shared<std::promise<bool>>();
+  auto future = result->get_future();
+  if (!m_exec || m_loop.IsClosing()) {
+    result->set_value(false);
+    return future;
+  }
+  m_exec->Send(
+      [self = shared_from_this(), result, name = std::string{deviceName}] {
+        result->set_value(self->RenameBluetoothDeviceOnLoop(name));
+      });
+  return future;
+}
+
+bool HALSimXRP::RenameBluetoothDeviceOnLoop(std::string_view deviceName) {
   if (!m_bluetoothClient || deviceName.empty() ||
       deviceName.size() > CONTROL_DEVICE_NAME_MAX_LENGTH) {
     return false;
@@ -447,7 +472,9 @@ bool HALSimXRP::RenameBluetoothDevice(std::string_view deviceName) {
     GetBufferPool().Release(sendBufs);
   }
 
-  return !packet.empty() && m_bluetoothClient->Send(packet);
+  return !packet.empty() &&
+         m_bluetoothClient->Send(packet,
+                                 wpi::net::BluetoothPacketSendMode::QUEUED);
 }
 
 XRPConnectionStatus HALSimXRP::GetConnectionStatus() const {
@@ -491,16 +518,19 @@ void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
 }
 
 void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
-  // We'll use a signal from robot code to send all the data
-  auto type = simData.lookup("type");
-  if (type->is_string() && type->get_string() == "HAL") {
-    auto halData = simData.lookup("data");
-    if (halData && halData->contains(">sim_periodic_after")) {
-      SendStateToXRP();
+  // HAL callbacks may originate on several threads. Keep XRP state and all
+  // packet generation on the loop so rename and control packets stay ordered.
+  m_exec->Send([self = shared_from_this(), simData] {
+    auto type = simData.lookup("type");
+    if (type && type->is_string() && type->get_string() == "HAL") {
+      auto halData = simData.lookup("data");
+      if (halData && halData->contains(">sim_periodic_after")) {
+        self->SendStateToXRP();
+      }
+    } else {
+      self->m_xrp.HandleWPILibUpdate(simData);
     }
-  } else {
-    m_xrp.HandleWPILibUpdate(simData);
-  }
+  });
 }
 
 uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
@@ -516,10 +546,7 @@ void HALSimXRP::SendStateToXRP() {
                                   }};
   m_xrp.SetupXRPSendBuffer(stream);
 
-  auto self = shared_from_this();
-  m_exec->Send([this, self, sendBufs]() mutable {
-    SendPacketToXRP(std::span<uv::Buffer>{sendBufs.data(), sendBufs.size()});
-  });
+  SendPacketToXRP(sendBufs);
 }
 
 void HALSimXRP::SendPacketToXRP(std::span<uv::Buffer> sendBufs) {

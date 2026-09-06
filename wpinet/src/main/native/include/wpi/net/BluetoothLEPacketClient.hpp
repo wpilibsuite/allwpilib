@@ -31,6 +31,11 @@ enum class BluetoothAddressType { PUBLIC, RANDOM };
 enum class BluetoothPacketTransport { NONE, L2CAP, GATT };
 
 /**
+ * Whether to retain a packet when the transport is busy.
+ */
+enum class BluetoothPacketSendMode { BEST_EFFORT, QUEUED };
+
+/**
  * Discovered Bluetooth LE device.
  */
 struct BluetoothLEDeviceInfo {
@@ -90,6 +95,8 @@ struct BluetoothLEPacketClientConfig {
   std::string gattStatusCharacteristicUuid;
   size_t maxPacketSize = 512;
   bool preferL2CAP = true;
+  /** Minimum required notification payload capacity; zero accepts any MTU. */
+  size_t minReceivePacketSize = 0;
 };
 
 /**
@@ -170,9 +177,15 @@ class BluetoothLEPacketClient {
    * Sends one packet.
    *
    * @param packet packet payload to send.
-   * @return true if the packet was accepted for sending.
+   * @param mode BEST_EFFORT may drop the packet if the transport is busy.
+   *        QUEUED retains a single pending packet until it can be sent; newer
+   *        packets cannot overtake it. Neither mode acknowledges peer receipt.
+   * @return true if the packet was accepted for sending; false if disconnected,
+   *         the packet is too large, or the transport's send queue is full.
    */
-  bool Send(std::span<const uint8_t> packet);
+  bool Send(
+      std::span<const uint8_t> packet,
+      BluetoothPacketSendMode mode = BluetoothPacketSendMode::BEST_EFFORT);
 
   /**
    * Gets the current connection status.

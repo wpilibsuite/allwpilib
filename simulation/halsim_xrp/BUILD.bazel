@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -106,6 +106,20 @@ wpilib_cc_static_library(
     visibility = ["//visibility:public"],
     deps = [
         ":halsim_xrp_static",
+    ],
+)
+
+cc_test(
+    name = "halsim_xrp-test",
+    size = "small",
+    srcs = glob(["src/test/native/cpp/*.cpp"]) + [
+        "src/main/native/cpp/XRP.cpp",
+        "src/main/native/include/wpi/halsim/xrp/XRP.hpp",
+    ],
+    includes = ["src/main/native/include"],
+    deps = [
+        "//thirdparty/catch2",
+        "//wpinet",
     ],
 )
 
