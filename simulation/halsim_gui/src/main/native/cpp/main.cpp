@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include <imgui.h>
+#include <implot.h>
 
 #include "AddressableLEDGui.hpp"
 #include "AnalogInputSimGui.hpp"
@@ -94,6 +95,8 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension(
       HALSIMGUI_EXT_ADDGUIEARLYEXECUTE,
       reinterpret_cast<void*>((AddGuiEarlyExecuteFn)&AddGuiEarlyExecute));
+  HAL_RegisterExtension(HALSIMGUI_EXT_ADDMAINMENU,
+                        reinterpret_cast<void*>((AddMainMenuFn)&AddMainMenu));
   HAL_RegisterExtension(HALSIMGUI_EXT_GUIEXIT,
                         reinterpret_cast<void*>((GuiExitFn)&GuiExit));
   HAL_RegisterExtension(
@@ -225,6 +228,9 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension(
       HALSIMGUI_EXT_GETIMGUICONTEXT,
       reinterpret_cast<void*>((GetImguiContextFn)&ImGui::GetCurrentContext));
+  HAL_RegisterExtension(
+      HALSIMGUI_EXT_GETIMPLOTCONTEXT,
+      reinterpret_cast<void*>((GetImPlotContextFn)&ImPlot::GetCurrentContext));
   HAL_RegisterExtensionListener(
       nullptr, [](void*, const char* name, void* data) {
         if (std::string_view{name} == "ds_socket") {
@@ -235,6 +241,7 @@ int HALSIM_InitExtension(void) {
       nullptr,
       [](void*) {
         gui::Main();
+        gPlotProvider.reset();
         wpi::glass::DestroyContext();
         gui::DestroyContext();
       },

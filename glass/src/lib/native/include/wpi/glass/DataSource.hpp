@@ -62,8 +62,6 @@ class DataSource {
 
   static DataSource* Find(std::string_view id);
 
-  static wpi::util::sig::Signal<const char*, DataSource*> sourceCreated;
-
  private:
   std::string m_id;
   std::string& m_name;
