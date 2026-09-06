@@ -75,10 +75,25 @@ void Window::Display() {
   ImGui::SetNextWindowSizeConstraints({minWidth, 0}, ImVec2{FLT_MAX, FLT_MAX});
 
   if (Begin(label.c_str(), &m_visible, m_flags)) {
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    // Constrains the window within the bounds of the viewport, resizing as
+    // necessary
+    ImVec2 min = {};
+    ImVec2 max = ImGui::GetMainViewport()->Size;
+    // Make sure the window isn't minimized and bounds checking is enabled
+    if (max.x > 0 && max.y > 0 &&
+        glass::GetStorageRoot().GetBool("bounds_checking", true)) {
+      // Might need to shrink window to fit in viewport
+      ImVec2 newSize = {std::clamp(window->Size.x, 0.0f, max.x - min.x),
+                        std::clamp(window->Size.y, 0.0f, max.y - min.y)};
+      ImGui::SetWindowSize(newSize);
+      ImVec2 newPos = {std::clamp(window->Pos.x, min.x, max.x - newSize.x),
+                       std::clamp(window->Pos.y, min.y, max.y - newSize.y)};
+      ImGui::SetWindowPos(newPos);
+    }
     if (m_renamePopupEnabled || m_view->HasSettings()) {
       bool isClicked = (ImGui::IsMouseReleased(ImGuiMouseButton_Right) &&
                         ImGui::IsItemHovered());
-      ImGuiWindow* window = ImGui::GetCurrentWindow();
 
       bool settingsButtonClicked = false;
       // Not docked, and window has just enough for the circles not to be
