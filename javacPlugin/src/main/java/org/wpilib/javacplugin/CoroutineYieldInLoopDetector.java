@@ -56,14 +56,14 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
    * arguments will be the ones that need to be yielded on.
    *
    * <p>If a `while` or `do-while` loop is not encountered while further traversing the tree, then
-   * the initial object will not be modified and will be discarded, unused. But if a loop _is_
-   * encountered, then m_loop will be assigned to that loop element and further traversal will
+   * the initial object will not be modified and will be discarded, unused. When a loop is
+   * encountered, a new LoopState will be created for that loop element and further traversal will
    * occur. Any calls to `yield()` on one of the coroutine arguments declared by the enclosing
    * method or lambda function will be detected and added to m_yieldCalls. Any loops encountered
    * while m_loop is set are child loops, and will be parsed standalone and given new LoopState
-   * objects, which will then be added to m_children. Error reporting is only done by the root state
-   * object once its entire AST has been traversed, to ensure that inner loops do not report errors
-   * first and appearing out of order in the compiler output.
+   * objects, which will then be added to m_children. Error reporting is only done by each top-level
+   * loop state object once its entire AST has been traversed, to ensure that inner loops do not
+   * report errors first and appear out of order in the compiler output.
    *
    * <p>Note: this is a mutable type so that a single object may be updated as the tree traversal
    * reaches points of interest (lambda definition, loop declarations, and so on) and have its state
@@ -176,37 +176,41 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
 
     @Override
     public LoopState visitWhileLoop(WhileLoopTree node, LoopState loopState) {
+      if (loopState == null) {
+        return super.visitWhileLoop(node, null);
+      }
+
       return visitLoop(node, loopState, state -> super.visitWhileLoop(node, state));
     }
 
     @Override
     public LoopState visitDoWhileLoop(DoWhileLoopTree node, LoopState loopState) {
+      if (loopState == null) {
+        return super.visitDoWhileLoop(node, null);
+      }
+
       return visitLoop(node, loopState, state -> super.visitDoWhileLoop(node, state));
     }
 
     private LoopState visitLoop(
         StatementTree node, LoopState loopState, Function<LoopState, LoopState> superMethod) {
-      if (loopState == null) {
-        // Not inside a coroutine-accepting method or lambda function; bail
-        return superMethod.apply(loopState);
-      }
-
       var path = m_trees.getPath(m_root, node);
       if (Suppressions.hasSuppression(m_trees, path, SUPPRESSION_KEY)) {
         // Error is suppressed in this context, don't bother checking
         return superMethod.apply(loopState);
       }
 
+      // Give every loop its own state so sibling loops don't share/report the same state
+      var localState = new LoopState();
+      localState.m_loop = node;
+      localState.m_availableCoroutines.addAll(loopState.m_availableCoroutines);
+
       if (loopState.m_loop == null) {
-        loopState.m_loop = node;
-        var result = superMethod.apply(loopState);
-        printErrors(loopState);
+        var result = superMethod.apply(localState);
+        printErrors(localState);
         return result;
       } else {
         // Nested loop; split off a new child with the same available coroutines
-        var localState = new LoopState();
-        localState.m_loop = node;
-        localState.m_availableCoroutines.addAll(loopState.m_availableCoroutines);
         loopState.m_children.add(localState);
 
         // Don't print errors now - we'll handle that when we finish the parent loop
