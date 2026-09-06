@@ -5,26 +5,29 @@
 package org.wpilib.javacplugin;
 
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.DoWhileLoopTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 /**
- * Checks for {@code while} loops inside methods or lambda functions that accept coroutine
- * arguments. If a loop does not call {@code yield()} on one of the most local coroutine objects, a
- * compiler error will be emitted for that loop element. This check cannot be silenced.
+ * Checks for {@code while} or {@code do-while} loops inside methods or lambda functions that accept
+ * coroutine arguments. If a loop does not call {@code yield()} on one of the most local coroutine
+ * objects, a compiler error will be emitted for that loop element. This check cannot be silenced.
  */
 // Note: cannot be silenced because annotations cannot be placed on loops.
 // This is not legal Java:
@@ -45,22 +48,22 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
   }
 
   /**
-   * Tracks the state of a while loop while traversing the AST. These are initially created when
-   * encountering a method or lambda function declaration, after checking that the method or lambda
-   * accepts at least one Coroutine argument. All Coroutine arguments on the method or lambda
-   * function will be added to m_availableCoroutines. If a nested lambda function is found that
-   * accepts coroutines, then a new state will be created for that lambda and its coroutine
+   * Tracks the state of a while or do-while loop while traversing the AST. These are initially
+   * created when encountering a method or lambda function declaration, after checking that the
+   * method or lambda accepts at least one Coroutine argument. All Coroutine arguments on the method
+   * or lambda function will be added to m_availableCoroutines. If a nested lambda function is found
+   * that accepts coroutines, then a new state will be created for that lambda and its coroutine
    * arguments will be the ones that need to be yielded on.
    *
-   * <p>If a `while` loop is not encountered while further traversing the tree, then the initial
-   * object will not be modified and will be discarded, unused. But if a `while` loop _is_
+   * <p>If a `while` or `do-while` loop is not encountered while further traversing the tree, then
+   * the initial object will not be modified and will be discarded, unused. But if a loop _is_
    * encountered, then m_loop will be assigned to that loop element and further traversal will
    * occur. Any calls to `yield()` on one of the coroutine arguments declared by the enclosing
-   * method or lambda function will be detected and added to m_yieldCalls. Any `while` loops
-   * encountered while m_loop is set are child loops, and will be parsed standalone and given new
-   * LoopState objects, which will then be added to m_children. Error reporting is only done by the
-   * root state object once its entire AST has been traversed, to ensure that inner loops do not
-   * report errors first and appearing out of order in the compiler output.
+   * method or lambda function will be detected and added to m_yieldCalls. Any loops encountered
+   * while m_loop is set are child loops, and will be parsed standalone and given new LoopState
+   * objects, which will then be added to m_children. Error reporting is only done by the root state
+   * object once its entire AST has been traversed, to ensure that inner loops do not report errors
+   * first and appearing out of order in the compiler output.
    *
    * <p>Note: this is a mutable type so that a single object may be updated as the tree traversal
    * reaches points of interest (lambda definition, loop declarations, and so on) and have its state
@@ -68,7 +71,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
    */
   private static final class LoopState {
     /** The loop element being tracked. */
-    WhileLoopTree m_loop;
+    StatementTree m_loop;
 
     /**
      * All discovered calls to Coroutine.yield(). Only applies to calls to coroutines in
@@ -84,9 +87,9 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
     final List<VariableElement> m_availableCoroutines = new ArrayList<>();
 
     /**
-     * All `while` loops nested inside m_loop. Only applies to direct children; loops in
-     * conditionals, switch blocks, and the like will be present, but not loops in other nested
-     * loops, nor loops declared inside a lambda inside a loop.
+     * All loops nested inside m_loop. Only applies to direct children; loops in conditionals,
+     * switch blocks, and the like will be present, but not loops in other nested loops, nor loops
+     * declared inside a lambda inside a loop.
      */
     final List<LoopState> m_children = new ArrayList<>();
   }
@@ -173,20 +176,30 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
 
     @Override
     public LoopState visitWhileLoop(WhileLoopTree node, LoopState loopState) {
+      return visitLoop(node, loopState, state -> super.visitWhileLoop(node, state));
+    }
+
+    @Override
+    public LoopState visitDoWhileLoop(DoWhileLoopTree node, LoopState loopState) {
+      return visitLoop(node, loopState, state -> super.visitDoWhileLoop(node, state));
+    }
+
+    private LoopState visitLoop(
+        StatementTree node, LoopState loopState, Function<LoopState, LoopState> superMethod) {
       if (loopState == null) {
         // Not inside a coroutine-accepting method or lambda function; bail
-        return super.visitWhileLoop(node, null);
+        return superMethod.apply(loopState);
       }
 
       var path = m_trees.getPath(m_root, node);
       if (Suppressions.hasSuppression(m_trees, path, SUPPRESSION_KEY)) {
         // Error is suppressed in this context, don't bother checking
-        return super.visitWhileLoop(node, loopState);
+        return superMethod.apply(loopState);
       }
 
       if (loopState.m_loop == null) {
         loopState.m_loop = node;
-        var result = super.visitWhileLoop(node, loopState);
+        var result = superMethod.apply(loopState);
         printErrors(loopState);
         return result;
       } else {
@@ -199,7 +212,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
         // Don't print errors now - we'll handle that when we finish the parent loop
         // Otherwise, errors would be printed by the innermost loops first and appear out of order,
         // which is confusing
-        return super.visitWhileLoop(node, localState);
+        return superMethod.apply(localState);
       }
     }
 
