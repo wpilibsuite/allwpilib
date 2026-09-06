@@ -13,14 +13,14 @@ def main(argv):
     parser.add_argument(
         "--output_directory",
         help="Optional. If set, will output the generated files to this directory, otherwise it will use a path relative to the script",
-        default=dirname / "src/main/native/thirdparty/mrcal/generated/",
+        default=dirname / "src/main/native/thirdparty/generated/",
         type=Path,
     )
     args = parser.parse_args(argv)
 
     args.output_directory.mkdir(parents=True, exist_ok=True)
     result = subprocess.check_output(
-        f"{dirname}/src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl"
+        f"{dirname}/src/main/native/thirdparty/src/minimath/minimath_generate.pl"
     )
     (args.output_directory / "minimath_generated.h").write_text(
         str(result, encoding="UTF8")
