@@ -39,8 +39,7 @@ macro(wpilib_add_imgui_test name)
     set(wpilib_imgui_test_environment WPIGUI_FORCE_RENDERER=2d)
     if(WPILIB_IMGUI_TESTS_HEADLESS)
         list(
-            APPEND
-            wpilib_imgui_test_environment
+            APPEND wpilib_imgui_test_environment
             SDL_VIDEO_DRIVER=dummy
             SDL_RENDER_DRIVER=software
             SDL_VIDEO_DUMMY_SAVE_FRAMES=0

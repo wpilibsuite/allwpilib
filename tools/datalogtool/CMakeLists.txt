@@ -39,11 +39,7 @@ if(WPILIB_WITH_IMGUI_TESTS)
     wpilib_link_macos_gui(datalogtool_imgui_test)
     target_sources(
         datalogtool_imgui_test
-        PRIVATE
-            ${datalogtool_src}
-            ${datalogtool_resources_src}
-            ${datalogtool_rc}
-            ${APP_ICON_MACOSX}
+        PRIVATE ${datalogtool_src} ${datalogtool_resources_src} ${datalogtool_rc} ${APP_ICON_MACOSX}
     )
     target_link_libraries(datalogtool_imgui_test libglass_for_tests ssh datalog wpiutil)
 endif()
