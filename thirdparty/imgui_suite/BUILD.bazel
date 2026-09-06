@@ -2,7 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
+load("//shared/bazel/rules:imgui_test.bzl", "IMGUI_TEST_ENGINE_DEFINES")
 load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
@@ -34,15 +34,13 @@ IMGUI_HEADERS = glob(["imgui/include/*.h"]) + [
     "imgui/include/misc/cpp/imgui_stdlib.h",
 ]
 
-IMGUI_TEST_DEFINES = [
-    "IMGUI_ENABLE_TEST_ENGINE",
-    "IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0",
-    "IMGUI_TEST_ENGINE_ENABLE_COROUTINE_STDTHREAD_IMPL=1",
-]
-
 cc_library(
     name = "imgui",
     srcs = IMGUI_SOURCES,
+    defines = select({
+        "//shared/bazel/rules:with_imgui_test_engine_hooks_enabled": IMGUI_TEST_ENGINE_DEFINES,
+        "//conditions:default": [],
+    }),
     hdrs = IMGUI_HEADERS,
     includes = [
         "imgui/include",
@@ -55,26 +53,7 @@ cc_library(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [
-        "//shared/bazel/thirdparty/libsdlgpu",
-    ],
-)
-
-cc_library(
-    name = "imgui_for_tests",
-    testonly = True,
-    srcs = IMGUI_SOURCES,
-    hdrs = IMGUI_HEADERS,
-    defines = IMGUI_TEST_DEFINES,
-    includes = [
-        "imgui/include",
-        "imgui/include/backends",
-        "imgui/include/misc/cpp",
-    ],
-    linkstatic = True,
-    strip_include_prefix = "imgui/include",
-    target_compatible_with = imgui_test_target_compatible_with(),
-    visibility = ["//visibility:public"],
+    visibility = ["//shared/bazel/thirdparty/imgui_test_engine:__pkg__"],
     deps = [
         "//shared/bazel/thirdparty/libsdlgpu",
     ],
@@ -93,20 +72,6 @@ cc_library(
     strip_include_prefix = "implot/include",
     deps = [
         ":imgui",
-    ],
-)
-
-cc_library(
-    name = "implot_for_tests",
-    testonly = True,
-    srcs = glob(["implot/cpp/**"]),
-    hdrs = glob(["implot/include/**"]),
-    includes = ["implot/include"],
-    linkstatic = True,
-    strip_include_prefix = "implot/include",
-    target_compatible_with = imgui_test_target_compatible_with(),
-    deps = [
-        ":imgui_for_tests",
     ],
 )
 
@@ -136,33 +101,6 @@ wpilib_cc_library(
         ":imgui",
         ":implot",
         ":stb",
-    ],
-)
-
-cc_library(
-    name = "fonts_for_tests",
-    testonly = True,
-    srcs = glob(["generated/fonts/src/**"]),
-    hdrs = glob(["generated/fonts/include/**"]),
-    includes = ["generated/fonts/include"],
-    target_compatible_with = imgui_test_target_compatible_with(),
-    deps = [
-        ":imgui_for_tests",
-    ],
-)
-
-cc_library(
-    name = "imgui_suite_for_tests",
-    testonly = True,
-    linkstatic = True,
-    target_compatible_with = imgui_test_target_compatible_with(),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":fonts_for_tests",
-        ":imgui_for_tests",
-        ":implot_for_tests",
-        ":stb",
-        "//shared/bazel/thirdparty/imgui_test_engine",
     ],
 )
 

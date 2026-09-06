@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":headers",
         "//shared/bazel/thirdparty/libsdlgpu",
-        "//thirdparty/imgui_suite:imgui_suite_for_tests",
+        "//thirdparty/imgui_suite",
     ],
 )
 

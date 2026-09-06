@@ -1,5 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
+load("//shared/bazel/rules:imgui_test.bzl", "IMGUI_TEST_ENGINE_DEFINES", "imgui_test_target_compatible_with")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,15 +18,11 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    defines = [
-        "IMGUI_ENABLE_TEST_ENGINE",
-        "IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0",
-        "IMGUI_TEST_ENGINE_ENABLE_COROUTINE_STDTHREAD_IMPL=1",
-    ],
+    defines = IMGUI_TEST_ENGINE_DEFINES,
     target_compatible_with = imgui_test_target_compatible_with(),
     deps = select({
         "//shared/bazel/rules:with_imgui_tests_enabled": [
-            "//thirdparty/imgui_suite:imgui_for_tests",
+            "//thirdparty/imgui_suite:imgui",
             "@imgui_test_engine//:header_paths",
         ],
         "//conditions:default": [],

@@ -18,6 +18,8 @@ Bazel can build GUI tests that use [imgui_test_engine](https://github.com/ocornu
 
 To enable the tests, pass `--config=imgui_tests` or the underlying build setting `--//shared/bazel/rules:with_imgui_tests=true`. The first enabled build needs network access so Bazel can download the pinned upstream source archive.
 
+The ImGui GUI test macro transitions an internal hook flag for the generated C++ test binary so the ImGui test-engine macros apply only to the GUI test dependency graph, not to ordinary GUI executables built under `--config=imgui_tests`.
+
 The ImGui GUI test targets are:
 - `//glass:glass-imgui-test`
 - `//simulation/halsim_gui:halsim_gui-imgui-test`
