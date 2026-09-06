@@ -45,5 +45,5 @@ if(WPILIB_WITH_IMGUI_TESTS)
             ${datalogtool_rc}
             ${APP_ICON_MACOSX}
     )
-    target_link_libraries(datalogtool_imgui_test libglass_imgui_test ssh datalog wpiutil)
+    target_link_libraries(datalogtool_imgui_test libglass_for_tests ssh datalog wpiutil)
 endif()

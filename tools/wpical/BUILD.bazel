@@ -178,7 +178,8 @@ wpilib_cc_library(
 )
 
 cc_library(
-    name = "wpical_imgui_lib",
+    name = "wpical_lib_for_tests",
+    testonly = True,
     srcs = glob(
         [
             "src/main/native/cpp/**/*.cpp",
@@ -203,7 +204,7 @@ cc_library(
         "//apriltag",
         "//fields",
         "//shared/bazel/thirdparty/ceres",
-        "//wpigui:wpigui_imgui",
+        "//wpigui:wpigui_for_tests",
         "//wpiutil",
         "@bzlmodrio-opencv//libraries/cpp/opencv",
     ],
@@ -269,8 +270,8 @@ wpilib_imgui_cc_test(
         "__BAZEL__=1",
     ],
     deps = [
-        ":wpical_imgui_lib",
-        "//glass:glass-imgui",
+        ":wpical_lib_for_tests",
+        "//glass:glass_for_tests",
         "//shared/bazel/thirdparty/ceres",
         "@bazel_tools//tools/cpp/runfiles",
     ],

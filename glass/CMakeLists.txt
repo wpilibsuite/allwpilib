@@ -41,16 +41,16 @@ install(
 )
 
 if(WPILIB_WITH_IMGUI_TESTS)
-    add_library(libglass_imgui_test STATIC ${libglass_src})
-    set_target_properties(libglass_imgui_test PROPERTIES DEBUG_POSTFIX "d")
-    set_property(TARGET libglass_imgui_test PROPERTY FOLDER "tests")
-    wpilib_target_warnings(libglass_imgui_test)
+    add_library(libglass_for_tests STATIC ${libglass_src})
+    set_target_properties(libglass_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglass_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglass_for_tests)
     target_link_libraries(
-        libglass_imgui_test
-        PUBLIC wpigui_imgui wpimath wpiutil fields fieldimages
+        libglass_for_tests
+        PUBLIC wpigui_for_tests wpimath wpiutil fields fieldimages
     )
     target_include_directories(
-        libglass_imgui_test
+        libglass_for_tests
         PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/include>
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/lib/native/thirdparty/mrccomm/include>
@@ -90,13 +90,13 @@ export(TARGETS libglassnt FILE libglassnt.cmake NAMESPACE libglassnt::)
 install(DIRECTORY src/libnt/native/include/ DESTINATION "${include_dest}/glass")
 
 if(WPILIB_WITH_IMGUI_TESTS)
-    add_library(libglassnt_imgui_test STATIC ${libglassnt_src})
-    set_target_properties(libglassnt_imgui_test PROPERTIES DEBUG_POSTFIX "d")
-    set_property(TARGET libglassnt_imgui_test PROPERTY FOLDER "tests")
-    wpilib_target_warnings(libglassnt_imgui_test)
-    target_link_libraries(libglassnt_imgui_test PUBLIC ntcore libglass_imgui_test)
+    add_library(libglassnt_for_tests STATIC ${libglassnt_src})
+    set_target_properties(libglassnt_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET libglassnt_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(libglassnt_for_tests)
+    target_link_libraries(libglassnt_for_tests PUBLIC ntcore libglass_for_tests)
     target_include_directories(
-        libglassnt_imgui_test
+        libglassnt_for_tests
         PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/libnt/native/include>
     )
 endif()
@@ -146,6 +146,6 @@ if(WPILIB_WITH_EXECUTABLES)
             glass_imgui_test
             PRIVATE ${glass_src} ${glass_resources_src} ${glass_rc} ${APP_ICON_MACOSX}
         )
-        target_link_libraries(glass_imgui_test libglassnt_imgui_test libglass_imgui_test)
+        target_link_libraries(glass_imgui_test libglassnt_for_tests libglass_for_tests)
     endif()
 endif()

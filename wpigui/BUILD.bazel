@@ -46,7 +46,8 @@ wpilib_cc_static_library(
 )
 
 cc_library(
-    name = "wpigui_imgui",
+    name = "wpigui_for_tests",
+    testonly = True,
     srcs = glob(["src/main/native/cpp/**/*.cpp"]),
     tags = [
         "wpi-cpp-gui",
@@ -61,14 +62,15 @@ cc_library(
 )
 
 cc_library(
-    name = "wpigui_imgui_test",
+    name = "wpigui_test_runner",
+    testonly = True,
     srcs = ["src/test/native/cpp/GuiTestEngineRunner.cpp"],
     hdrs = ["src/test/native/include/wpi/gui/test/GuiTestEngineRunner.hpp"],
     strip_include_prefix = "src/test/native/include",
     target_compatible_with = imgui_test_target_compatible_with(),
     visibility = ["//visibility:public"],
     deps = [
-        ":wpigui_imgui",
+        ":wpigui_for_tests",
         "//shared/bazel/thirdparty/imgui_test_engine",
     ],
 )

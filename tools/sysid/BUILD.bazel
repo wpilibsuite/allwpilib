@@ -48,7 +48,8 @@ cc_binary(
 )
 
 cc_library(
-    name = "sysid-imgui-lib",
+    name = "sysid_lib_for_tests",
+    testonly = True,
     srcs = SYSID_SRCS,
     hdrs = glob(["src/main/native/include/**"]),
     defines = ["RUNNING_IMGUI_TESTS"],
@@ -56,8 +57,8 @@ cc_library(
     target_compatible_with = imgui_test_target_compatible_with(),
     deps = [
         "//datalog",
-        "//glass:glass-imgui",
-        "//wpigui:wpigui_imgui_test",
+        "//glass:glass_for_tests",
+        "//wpigui:wpigui_test_runner",
         "//wpinet",
     ],
 )
@@ -80,7 +81,7 @@ wpilib_imgui_cc_test(
     size = "small",
     srcs = glob(["src/test/native/imgui/**"]),
     deps = [
-        ":sysid-imgui-lib",
+        ":sysid_lib_for_tests",
     ],
 )
 

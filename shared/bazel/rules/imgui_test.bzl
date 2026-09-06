@@ -29,7 +29,7 @@ def wpilib_imgui_cc_test(
         name = name,
         srcs = srcs,
         defines = defines + ["RUNNING_IMGUI_TESTS"],
-        deps = deps + ["//wpigui:wpigui_imgui_test"],
+        deps = deps + ["//wpigui:wpigui_test_runner"],
         env = IMGUI_TEST_ENV,
         tags = tags + [
             "imgui-test",

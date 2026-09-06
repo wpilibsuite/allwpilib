@@ -42,11 +42,11 @@ wpilib_configure_imgui_target(imgui)
 
 if(WPILIB_WITH_IMGUI_TESTS)
     set(imgui_test_engine_dir "${imgui_test_engine_SOURCE_DIR}/imgui_test_engine")
-    add_library(imgui_test STATIC ${imgui_all_sources})
-    set_property(TARGET imgui_test PROPERTY FOLDER "tests")
-    wpilib_configure_imgui_target(imgui_test)
+    add_library(imgui_for_tests STATIC ${imgui_all_sources})
+    set_property(TARGET imgui_for_tests PROPERTY FOLDER "tests")
+    wpilib_configure_imgui_target(imgui_for_tests)
     target_compile_definitions(
-        imgui_test
+        imgui_for_tests
         PUBLIC
             IMGUI_ENABLE_TEST_ENGINE
             IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0
@@ -65,7 +65,7 @@ if(WPILIB_WITH_IMGUI_TESTS)
         ${imgui_test_engine_dir}/imgui_te_ui.cpp
         ${imgui_test_engine_dir}/imgui_te_utils.cpp
     )
-    target_link_libraries(imgui_test_engine PUBLIC imgui_test)
+    target_link_libraries(imgui_test_engine PUBLIC imgui_for_tests)
     target_include_directories(
         imgui_test_engine
         PUBLIC

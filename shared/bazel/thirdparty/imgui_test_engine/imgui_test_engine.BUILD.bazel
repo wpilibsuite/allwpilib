@@ -4,6 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "sources",
+    testonly = True,
     srcs = [
         "imgui_test_engine/imgui_capture_tool.cpp",
         "imgui_test_engine/imgui_te_context.cpp",
@@ -18,6 +19,7 @@ filegroup(
 
 filegroup(
     name = "headers",
+    testonly = True,
     srcs = glob([
         "imgui_test_engine/**/*.h",
     ]),
@@ -25,6 +27,7 @@ filegroup(
 
 cc_library(
     name = "header_paths",
+    testonly = True,
     hdrs = [":headers"],
     includes = [
         ".",
@@ -34,5 +37,6 @@ cc_library(
 
 filegroup(
     name = "license",
+    testonly = True,
     srcs = ["imgui_test_engine/LICENSE.txt"],
 )

@@ -126,7 +126,7 @@ wpilib_imgui_cc_test(
         "no-asan",
     ],
     deps = [
-        "//glass:glassnt-imgui",
+        "//glass:glassnt_for_tests",
         "//hal:wpiHal",
     ],
 )

@@ -53,7 +53,8 @@ wpilib_cc_static_library(
 )
 
 cc_library(
-    name = "glass-imgui",
+    name = "glass_for_tests",
+    testonly = True,
     srcs = glob(["src/lib/native/cpp/**/*.cpp"]) + [
         ":mrccomm-srcs",
     ],
@@ -68,7 +69,7 @@ cc_library(
         ":mrccomm-headers",
         "//fields",
         "//fields:fieldimages",
-        "//wpigui:wpigui_imgui",
+        "//wpigui:wpigui_for_tests",
         "//wpimath",
         "//wpiutil",
     ],
@@ -121,7 +122,8 @@ wpilib_cc_static_library(
 )
 
 cc_library(
-    name = "glassnt-imgui",
+    name = "glassnt_for_tests",
+    testonly = True,
     srcs = glob(["src/libnt/native/cpp/*.cpp"]),
     hdrs = glob(["src/libnt/native/include/**/*.hpp"]),
     strip_include_prefix = "src/libnt/native/include",
@@ -131,7 +133,7 @@ cc_library(
     target_compatible_with = imgui_test_target_compatible_with(),
     visibility = ["//visibility:public"],
     deps = [
-        ":glass-imgui",
+        ":glass_for_tests",
         "//ntcore",
     ],
 )
@@ -178,7 +180,7 @@ wpilib_imgui_cc_test(
         "src/test/native/imgui/**",
     ]),
     deps = [
-        ":glassnt-imgui",
+        ":glassnt_for_tests",
     ],
 )
 
