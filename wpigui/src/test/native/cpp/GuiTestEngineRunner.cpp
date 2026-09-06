@@ -4,10 +4,13 @@
 
 #include "wpi/gui/test/GuiTestEngineRunner.hpp"
 
+#include <cstdint>
 #include <cstdio>
 #include <filesystem>
 #include <format>
 #include <print>
+#include <random>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -30,6 +33,12 @@ struct RunnerState {
 
 RunnerState gRunnerState;
 
+uint64_t MakeRandomSuffix() {
+  std::random_device randomDevice;
+  return (static_cast<uint64_t>(randomDevice()) << 32) ^
+         static_cast<uint64_t>(randomDevice());
+}
+
 std::string MakeDefaultSaveDir(std::string_view appName) {
   std::string safeName;
   safeName.reserve(appName.size());
@@ -42,9 +51,20 @@ std::string MakeDefaultSaveDir(std::string_view appName) {
     }
   }
 
-  return (std::filesystem::temp_directory_path() /
-          std::format("wpilib-{}-imgui-test", safeName))
-      .string();
+  const auto baseDir = std::filesystem::temp_directory_path() /
+                       std::format("wpilib-{}-imgui-test", safeName);
+  std::filesystem::create_directories(baseDir);
+
+  for (int i = 0; i < 100; ++i) {
+    const auto saveDir = baseDir / std::format("{:016x}", MakeRandomSuffix());
+    if (std::filesystem::create_directory(saveDir)) {
+      return saveDir.string();
+    }
+  }
+
+  throw std::runtime_error{
+      std::format("Failed to create unique ImGui test save directory in {}",
+                  baseDir.string())};
 }
 
 void ResetRunnerState(std::string_view appName,
