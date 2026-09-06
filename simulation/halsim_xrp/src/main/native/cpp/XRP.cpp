@@ -138,12 +138,11 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
 
   {
     std::scoped_lock lock(m_data_snapshot_mutex);
-    if (m_have_wpilib_bound_seq && seq <= m_wpilib_bound_seq) {
-      // If the old sequence was within 3 or uint16_t max and the new
-      // sequence is < 3 - we've prob rolled over
-      if (!((0xFFFF - m_wpilib_bound_seq < 3) && seq < 3)) {
-        return;
-      }
+    uint16_t distance = static_cast<uint16_t>(seq - m_wpilib_bound_seq);
+    // Firmware may coalesce packets across rollover. Half the sequence space
+    // or more is ambiguous and must be treated as stale.
+    if (m_have_wpilib_bound_seq && (distance == 0 || distance >= 0x8000)) {
+      return;
     }
 
     m_wpilib_bound_seq = seq;
@@ -636,8 +635,7 @@ void XRP::ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet) {
   encJson["data"] = wpi::util::json::object(">count", count);
 
   if (encoderData.periodValid) {
-    encJson["data"].emplace_back(
-        wpi::util::json::object(">period", encoderData.period));
+    encJson["data"][">period"] = encoderData.period;
   }
   m_wpilib_update_func(encJson);
 }

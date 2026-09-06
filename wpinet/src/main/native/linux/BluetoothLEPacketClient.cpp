@@ -312,7 +312,7 @@ class BluetoothLEPacketClient::Impl
     });
   }
 
-  bool Send(std::span<const uint8_t> packet) {
+  bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode) {
     if (packet.empty()) {
       return false;
     }
@@ -330,10 +330,13 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    if (m_loop.GetThreadId() == std::this_thread::get_id()) {
+      return SendOnLoop(packet, mode);
+    }
     std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
     auto self = shared_from_this();
-    m_exec->Send([self, packetCopy = std::move(packetCopy)] {
-      self->SendOnLoop(packetCopy);
+    m_exec->Send([self, packetCopy = std::move(packetCopy), mode] {
+      self->SendOnLoop(packetCopy, mode);
     });
     return true;
   }
@@ -406,7 +409,11 @@ class BluetoothLEPacketClient::Impl
         return;
       }
       if ((events & UV_WRITABLE) != 0) {
-        self->CheckConnect();
+        if (self->IsConnecting()) {
+          self->CheckConnect();
+        } else {
+          self->FlushPendingPacket();
+        }
       }
       if ((events & UV_READABLE) != 0) {
         if (self->m_activeTransport == LinuxBluetoothTransport::GATT) {
@@ -620,6 +627,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void CloseSocket() {
+    m_pendingPacket.clear();
     StopConnectTimer();
 
     if (m_poll) {
@@ -864,6 +872,11 @@ class BluetoothLEPacketClient::Impl
   }
 
   void SendGattFindServiceRequest() {
+    if (static_cast<size_t>(m_gattMtu - 3) < m_config.minReceivePacketSize) {
+      FailGatt(std::format("Bluetooth GATT MTU supports {} bytes; {} required",
+                           m_gattMtu - 3, m_config.minReceivePacketSize));
+      return;
+    }
     UpdateStatus([](auto& status) {
       status.status = "Discovering Bluetooth GATT service";
     });
@@ -1216,48 +1229,64 @@ class BluetoothLEPacketClient::Impl
     }
   }
 
-  void SendOnLoop(std::span<const uint8_t> packet) {
-    if (m_socket < 0) {
-      return;
+  bool SendOnLoop(std::span<const uint8_t> packet,
+                  BluetoothPacketSendMode mode) {
+    if (m_socket < 0 || !m_pendingPacket.empty()) {
+      return false;
     }
 
+    std::vector<uint8_t> pdu;
     if (m_activeTransport == LinuxBluetoothTransport::GATT) {
       if (m_gattState != GattDiscoveryState::CONNECTED ||
           m_gattControlValueHandle == 0) {
-        return;
+        return false;
       }
-
       if (packet.size() + 3 > m_gattMtu) {
         SetError("Packet is larger than Bluetooth GATT write MTU");
         CloseOnLoop("Disconnected");
-        return;
+        return false;
       }
-
-      std::vector<uint8_t> pdu;
       pdu.reserve(packet.size() + 3);
       pdu.push_back(ATT_OP_WRITE_COMMAND);
       AppendLe16(&pdu, m_gattControlValueHandle);
       pdu.insert(pdu.end(), packet.begin(), packet.end());
+    } else {
+      pdu.assign(packet.begin(), packet.end());
+    }
+    return SendPdu(pdu, mode);
+  }
 
-      ssize_t sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
-      if (sent == static_cast<ssize_t>(pdu.size())) {
-        UpdateStatus([](auto& status) { ++status.packetsSent; });
-      } else if (sent < 0 && errno != EAGAIN && errno != EWOULDBLOCK &&
-                 errno != EINTR) {
-        SetError(ErrnoString("Bluetooth GATT send failed"));
-        CloseOnLoop("Disconnected");
+  bool SendPdu(std::span<const uint8_t> pdu, BluetoothPacketSendMode mode) {
+    ssize_t sent;
+    do {
+      sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
+    } while (sent < 0 && errno == EINTR);
+    if (sent == static_cast<ssize_t>(pdu.size())) {
+      UpdateStatus([](auto& status) { ++status.packetsSent; });
+      return true;
+    }
+    if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      if (mode == BluetoothPacketSendMode::QUEUED) {
+        m_pendingPacket.assign(pdu.begin(), pdu.end());
+        m_poll->Start(UV_READABLE | UV_WRITABLE | UV_DISCONNECT);
+        return true;
       }
+      return false;
+    }
+    SetError(sent < 0 ? ErrnoString("Bluetooth send failed")
+                      : "Bluetooth send was truncated");
+    CloseOnLoop("Disconnected");
+    return false;
+  }
+
+  void FlushPendingPacket() {
+    if (m_pendingPacket.empty() || m_socket < 0) {
       return;
     }
-
-    ssize_t sent = ::send(m_socket, packet.data(), packet.size(), MSG_NOSIGNAL);
-    if (sent == static_cast<ssize_t>(packet.size())) {
-      UpdateStatus([](auto& status) { ++status.packetsSent; });
-    } else if (sent < 0 && errno != EAGAIN && errno != EWOULDBLOCK &&
-               errno != EINTR) {
-      SetError(ErrnoString("Bluetooth send failed"));
-      CloseOnLoop("Disconnected");
-    }
+    auto pending = std::move(m_pendingPacket);
+    m_pendingPacket.clear();
+    m_poll->Start(UV_READABLE | UV_DISCONNECT);
+    SendPdu(pending, BluetoothPacketSendMode::QUEUED);
   }
 
   void SetConnecting(std::string_view text) {
@@ -1309,6 +1338,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   uv::Loop& m_loop;
+  std::vector<uint8_t> m_pendingPacket;
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
@@ -1382,8 +1412,9 @@ void BluetoothLEPacketClient::Disconnect(std::string_view reason) {
   m_impl->Disconnect(reason);
 }
 
-bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet) {
-  return m_impl->Send(packet);
+bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet,
+                                   BluetoothPacketSendMode mode) {
+  return m_impl->Send(packet, mode);
 }
 
 BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::GetStatus() const {

@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <deque>
 #include <functional>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <span>
@@ -72,7 +73,14 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   void ConnectBluetooth(std::string address, XRPBluetoothAddressType type,
                         std::string name = {});
   void DisconnectBluetooth();
-  bool RenameBluetoothDevice(std::string_view deviceName);
+  /**
+   * Queues a device name packet in sequence with periodic control packets.
+   *
+   * @param deviceName full Bluetooth name or suffix to send to the firmware.
+   * @return Future indicating whether the transport accepted the packet;
+   *         this does not acknowledge that the firmware saved the name.
+   */
+  std::future<bool> RenameBluetoothDevice(std::string_view deviceName);
   XRPConnectionStatus GetConnectionStatus() const;
 
   /**
@@ -128,6 +136,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   void RecordControlPacketSent(std::span<const uint8_t> packet);
   void UpdateLatencyFromXRP(std::span<const uint8_t> packet);
   void SendStateToXRP();
+  bool RenameBluetoothDeviceOnLoop(std::string_view deviceName);
   void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
   void SetError(std::string_view error);
   void RegisterSimProviders();

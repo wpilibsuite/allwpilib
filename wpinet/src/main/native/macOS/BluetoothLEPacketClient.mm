@@ -42,7 +42,7 @@ class BluetoothLEPacketClient::Impl
 
   bool Connect(BluetoothLEPacketClientConfig config);
   void Disconnect(std::string_view reason);
-  bool Send(std::span<const uint8_t> packet);
+  bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode);
   BluetoothLEPacketConnectionStatus GetStatus() const;
 
   void SetStatus(std::string_view status);
@@ -51,6 +51,7 @@ class BluetoothLEPacketClient::Impl
   void SetDisconnected(std::string_view reason);
   void DidReceivePacket(std::span<const uint8_t> packet);
   void DidSendPacket();
+  void FinishQueuedPacket();
 
  private:
   template <typename F>
@@ -75,6 +76,7 @@ class BluetoothLEPacketClient::Impl
   mutable std::mutex m_statusMutex;
   BluetoothLEPacketConnectionStatus m_status;
   BluetoothLEPacketClientConfig m_config;
+  bool m_queuedPacket = false;
 };
 
 namespace {
@@ -91,6 +93,7 @@ struct MacBluetoothLEPacketClientBridge {
   void (*didReceivePacket)(void* context, std::span<const uint8_t> packet) =
       nullptr;
   void (*didSendPacket)(void* context) = nullptr;
+  void (*finishQueuedPacket)(void* context) = nullptr;
 
   explicit operator bool() const { return context != nullptr; }
 
@@ -121,6 +124,12 @@ struct MacBluetoothLEPacketClientBridge {
   void DidReceivePacket(std::span<const uint8_t> packet) const {
     if (didReceivePacket != nullptr) {
       didReceivePacket(context, packet);
+    }
+  }
+
+  void FinishQueuedPacket() const {
+    if (finishQueuedPacket != nullptr) {
+      finishQueuedPacket(context);
     }
   }
 
@@ -296,10 +305,11 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
-            maxPacketSize:(NSUInteger)maxPacketSize;
+     minReceivePacketSize:(NSUInteger)minReceivePacketSize;
 - (void)disconnectWithReason:(NSString*)reason;
 - (void)cancelCurrentConnection;
-- (void)sendPacket:(NSData*)packet;
+- (void)sendPacket:(NSData*)packet mode:(BluetoothPacketSendMode)mode;
+- (void)flushPendingPacket;
 - (void)invalidate;
 @end
 
@@ -314,7 +324,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   CBUUID* _serviceUuid;
   CBUUID* _controlUuid;
   CBUUID* _statusUuid;
-  NSUInteger _maxPacketSize;
+  NSUInteger _minReceivePacketSize;
+  NSData* _pendingPacket;
   BOOL _connectRequested;
 }
 
@@ -327,7 +338,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     dispatch_queue_set_specific(_queue, &MAC_BLUETOOTH_QUEUE_KEY,
                                 (__bridge void*)self, nullptr);
     _central = [[CBCentralManager alloc] initWithDelegate:self queue:_queue];
-    _maxPacketSize = 512;
+    _minReceivePacketSize = 0;
   }
   return self;
 }
@@ -336,16 +347,17 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
-            maxPacketSize:(NSUInteger)maxPacketSize {
+     minReceivePacketSize:(NSUInteger)minReceivePacketSize {
   dispatch_async(_queue, ^{
     _target = [target copy];
     _serviceUuid = [CBUUID UUIDWithString:serviceUuid];
     _controlUuid = [CBUUID UUIDWithString:controlUuid];
     _statusUuid = [CBUUID UUIDWithString:statusUuid];
-    _maxPacketSize = maxPacketSize;
+    _minReceivePacketSize = minReceivePacketSize;
     _connectRequested = YES;
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
+    _pendingPacket = nil;
     if (_peripheral != nil) {
       [_central cancelPeripheralConnection:_peripheral];
       _peripheral = nil;
@@ -365,6 +377,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     }
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
+    _pendingPacket = nil;
     if (_bridge) {
       _bridge.SetDisconnected(ToString(reason));
     }
@@ -382,6 +395,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     }
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
+    _pendingPacket = nil;
   };
   if (dispatch_get_specific(&MAC_BLUETOOTH_QUEUE_KEY) == (__bridge void*)self) {
     block();
@@ -390,9 +404,13 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
 }
 
-- (void)sendPacket:(NSData*)packet {
+- (void)sendPacket:(NSData*)packet mode:(BluetoothPacketSendMode)mode {
   dispatch_async(_queue, ^{
-    if (_peripheral == nil || _controlCharacteristic == nil) {
+    if (_peripheral == nil || _controlCharacteristic == nil ||
+        !_statusCharacteristic.isNotifying) {
+      if (mode == BluetoothPacketSendMode::QUEUED && _bridge) {
+        _bridge.FinishQueuedPacket();
+      }
       return;
     }
     NSUInteger maxWriteLength =
@@ -404,13 +422,37 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
       }
       return;
     }
+    if (mode == BluetoothPacketSendMode::QUEUED &&
+        !_peripheral.canSendWriteWithoutResponse) {
+      _pendingPacket = packet;
+      return;
+    }
+    // Periodic control values are best effort: never retain stale robot state.
     [_peripheral writeValue:packet
           forCharacteristic:_controlCharacteristic
                        type:CBCharacteristicWriteWithoutResponse];
     if (_bridge) {
+      if (mode == BluetoothPacketSendMode::QUEUED) {
+        _bridge.FinishQueuedPacket();
+      }
       _bridge.DidSendPacket();
     }
   });
+}
+
+- (void)flushPendingPacket {
+  if (_pendingPacket == nil || !_peripheral.canSendWriteWithoutResponse) {
+    return;
+  }
+  NSData* packet = _pendingPacket;
+  _pendingPacket = nil;
+  [self sendPacket:packet mode:BluetoothPacketSendMode::QUEUED];
+}
+
+- (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
+  if (peripheral == _peripheral) {
+    [self flushPendingPacket];
+  }
 }
 
 - (void)invalidate {
@@ -426,6 +468,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     _bridge = {};
     _controlCharacteristic = nil;
     _statusCharacteristic = nil;
+    _pendingPacket = nil;
   };
   if (dispatch_get_specific(&MAC_BLUETOOTH_QUEUE_KEY) == (__bridge void*)self) {
     block();
@@ -552,6 +595,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   _peripheral = nil;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
+  _pendingPacket = nil;
   if (_bridge) {
     _bridge.SetError(std::format("Failed to connect Bluetooth device: {}",
                                  ToString(error)));
@@ -570,6 +614,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   _peripheral = nil;
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
+  _pendingPacket = nil;
   if (_bridge) {
     if (error != nil) {
       _bridge.SetError(
@@ -640,6 +685,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
 
   _controlCharacteristic = nil;
   _statusCharacteristic = nil;
+  _pendingPacket = nil;
   for (CBCharacteristic* characteristic in service.characteristics) {
     if ([characteristic.UUID isEqual:_controlUuid]) {
       _controlCharacteristic = characteristic;
@@ -680,6 +726,14 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
 
   if (characteristic.isNotifying && _bridge) {
+    NSUInteger payloadMtu = [peripheral
+        maximumWriteValueLengthForType:CBCharacteristicWriteWithoutResponse];
+    if (payloadMtu < _minReceivePacketSize) {
+      _bridge.SetError(
+          std::format("Bluetooth GATT MTU supports {} bytes; {} required",
+                      payloadMtu, _minReceivePacketSize));
+      return;
+    }
     _bridge.SetConnected(BluetoothPacketTransport::GATT);
   }
 }
@@ -741,6 +795,9 @@ std::shared_ptr<BluetoothLEPacketClient::Impl> BluetoothLEPacketClient::Impl::Cr
   bridge.didSendPacket = [](void* context) {
     static_cast<Impl*>(context)->DidSendPacket();
   };
+  bridge.finishQueuedPacket = [](void* context) {
+    static_cast<Impl*>(context)->FinishQueuedPacket();
+  };
   impl->m_client =
       [[WPINetMacBluetoothLEPacketClient alloc] initWithBridge:bridge];
   return impl;
@@ -777,6 +834,7 @@ bool BluetoothLEPacketClient::Impl::Connect(
   {
     std::scoped_lock lock{m_statusMutex};
     m_config = config;
+    m_queuedPacket = false;
     m_status.targetAddress = config.address;
     m_status.addressType = config.addressType;
     m_status.targetConfigured = true;
@@ -791,7 +849,7 @@ bool BluetoothLEPacketClient::Impl::Connect(
                   serviceUuid:ToNSString(config.gattServiceUuid)
                   controlUuid:ToNSString(config.gattControlCharacteristicUuid)
                    statusUuid:ToNSString(config.gattStatusCharacteristicUuid)
-                maxPacketSize:config.maxPacketSize];
+         minReceivePacketSize:config.minReceivePacketSize];
   return true;
 }
 
@@ -799,7 +857,8 @@ void BluetoothLEPacketClient::Impl::Disconnect(std::string_view reason) {
   [m_client disconnectWithReason:ToNSString(reason)];
 }
 
-bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet) {
+bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
+                                         BluetoothPacketSendMode mode) {
   if (packet.empty()) {
     return false;
   }
@@ -811,6 +870,14 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet) {
       return false;
     }
     tooLarge = packet.size() > m_config.maxPacketSize;
+    if (!tooLarge) {
+      if (m_queuedPacket) {
+        return false;
+      }
+      if (mode == BluetoothPacketSendMode::QUEUED) {
+        m_queuedPacket = true;
+      }
+    }
   }
   if (tooLarge) {
     SetError("Packet is larger than Bluetooth transport MTU");
@@ -818,7 +885,7 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet) {
   }
 
   NSData* data = [NSData dataWithBytes:packet.data() length:packet.size()];
-  [m_client sendPacket:data];
+  [m_client sendPacket:data mode:mode];
   return true;
 }
 
@@ -834,6 +901,7 @@ void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status) {
 void BluetoothLEPacketClient::Impl::SetError(std::string_view error) {
   [m_client cancelCurrentConnection];
   UpdateStatus([&](auto& status) {
+    m_queuedPacket = false;
     status.error = error;
     status.status = error;
     status.connecting = false;
@@ -857,6 +925,7 @@ void BluetoothLEPacketClient::Impl::SetConnected(
 
 void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason) {
   UpdateStatus([&](auto& status) {
+    m_queuedPacket = false;
     status.connecting = false;
     status.connected = false;
     status.transport = BluetoothPacketTransport::NONE;
@@ -874,6 +943,11 @@ void BluetoothLEPacketClient::Impl::DidReceivePacket(
       callback(packetCopy);
     });
   }
+}
+
+void BluetoothLEPacketClient::Impl::FinishQueuedPacket() {
+  std::scoped_lock lock{m_statusMutex};
+  m_queuedPacket = false;
 }
 
 void BluetoothLEPacketClient::Impl::DidSendPacket() {
@@ -933,8 +1007,9 @@ void BluetoothLEPacketClient::Disconnect(std::string_view reason) {
   m_impl->Disconnect(reason);
 }
 
-bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet) {
-  return m_impl->Send(packet);
+bool BluetoothLEPacketClient::Send(std::span<const uint8_t> packet,
+                                   BluetoothPacketSendMode mode) {
+  return m_impl->Send(packet, mode);
 }
 
 BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::GetStatus() const {
