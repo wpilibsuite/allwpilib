@@ -10,10 +10,14 @@ def define_native_wrapper(name, pyproject_toml = None):
             "src/main/native/thirdparty/ada/include/**",
             "src/main/native/thirdparty/llhttp/include/**",
             "src/main/native/thirdparty/tcpsockets/include/**",
-        ]),
+        ]) + [
+            "@libuv//:include_files",
+        ],
         out = "native/wpinet/include",
+        include_external_repositories = ["libuv*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
+            "include": "",
             "wpinet/src/main/native/include": "",
             "wpinet/src/main/native/thirdparty/ada/include": "",
             "wpinet/src/main/native/thirdparty/llhttp/include": "",
