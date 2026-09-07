@@ -6,6 +6,16 @@ WPILib is normally built with Gradle, but [Bazel](https://www.bazel.build/) can 
 ## Prerequisites
 - Install [Bazelisk](https://github.com/bazelbuild/bazelisk/releases) and add it to your path. Bazelisk is a wrapper that will download the correct version of Bazel specified in the repository. Note: You can alias/rename the binary to `bazel` if you want to keep the familiar `bazel build` vs `bazelisk build` syntax.
 
+### Windows
+On Windows, Bazelisk hands off to `tools/bazel.bat` instead of running Bazel directly. That wrapper downloads a private copy of [PortableGit](https://github.com/git-for-windows/git/releases) into `%USERPROFILE%\.cache\bazel\portable_git\<release tag>-<checksum prefix>` (verified against a pinned SHA256), puts it at the front of `PATH`, and points `BAZEL_SH` at its `bash.exe`. The build then gets the same `bash`, `sh`, and `git` on every machine rather than whichever ones happen to be installed.
+
+Keeping the rest of your environment out of the build is Bazel's job rather than the wrapper's. Actions are covered by `--incompatible_strict_action_env`, and repository rules and module extensions by `--experimental_strict_repo_env`, which limits them to `PATH`, `PATHEXT`, and the variables named by the `--repo_env` lines in `.bazelrc`. Your environment is otherwise left alone, so `bazel run` targets still see it.
+
+Consequences worth knowing about:
+- You must invoke Bazel through Bazelisk. Running a `bazel.exe` binary directly skips the wrapper, and the build will fall back to whatever shell it can find.
+- The first invocation on a machine spends a minute or so fetching and unpacking PortableGit. Later invocations reuse the cached copy.
+- Set `BAZEL_VC` (or `BAZEL_VS`) if Visual Studio isn't installed in the default location. `.bazelrc` passes those through to the toolchain configuration; without a `--repo_env` line a variable will not reach it.
+
 ## Building
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
 Other examples:
