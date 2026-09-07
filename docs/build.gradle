@@ -245,6 +245,8 @@ tasks.register('generateJavaDocs', Javadoc) {
     options.addBooleanOption("Xdoclint:html,missing,reference,syntax", true)
     options.addBooleanOption('html5', true)
     options.linkSource(true)
+    options.header('<a href="https://docs.wpilib.org/">WPILib Documentation</a>')
+    options.bottom('<a href="https://docs.wpilib.org/">WPILib Documentation</a>')
     dependsOn project(':wpilibj').generateJavaVersion
     javaDocProjects.each {
         source it.sourceSets.main.java
