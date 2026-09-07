@@ -13,11 +13,6 @@ bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_ap
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
 
-# The vendored libuv, presented as the libuv module -- the override points at
-# a MODULE.bazel/BUILD.bazel pair in the vendored tree that mirrors BCR's
-# libuv API, the same way eigen is wired up below. Everything that names
-# @libuv links this one copy, so a dependency that also uses libuv (@aos is
-# about to) does not land a second set of uv_* symbols in the binary.
 bazel_dep(name = "libuv", version = "1.49.2")
 local_path_override(
     module_name = "libuv",
