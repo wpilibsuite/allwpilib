@@ -575,8 +575,8 @@ static void DrawLatencyPlot(const XRPConnectionStatus& status) {
     if (gGui.latencyTimes[i] < minimumTime) {
       continue;
     }
-    maximumLatencyMs = std::max(maximumLatencyMs, gGui.roundTripLatencyMs[i]);
-    maximumLatencyMs = std::max(maximumLatencyMs, gGui.xrpControlRxAgeMs[i]);
+    maximumLatencyMs = (std::max)(maximumLatencyMs, gGui.roundTripLatencyMs[i]);
+    maximumLatencyMs = (std::max)(maximumLatencyMs, gGui.xrpControlRxAgeMs[i]);
   }
   maximumLatencyMs *= 1.25;
 
@@ -858,8 +858,8 @@ static float GetCompoundComponentWidth() {
       (availableWidth - suffixWidth - ImGui::GetStyle().ItemSpacing.x -
        spacing * 2.0f) /
       3.0f;
-  return std::max(ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("--").x,
-                  std::min(componentWidth, availableComponentWidth));
+  return (std::max)(ImGui::CalcTextSize("+").x + ImGui::CalcTextSize("--").x,
+                    (std::min)(componentWidth, availableComponentWidth));
 }
 
 static void DrawDataRowComponent(const DataRowComponent& component,
@@ -909,7 +909,7 @@ static void DrawCompoundDataRow(
   for (const auto& component : components) {
     if (component.present) {
       anyPresent = true;
-      latestUpdate = std::max(latestUpdate, component.lastUpdate);
+      latestUpdate = (std::max)(latestUpdate, component.lastUpdate);
     }
   }
 
@@ -992,7 +992,7 @@ static void DrawDioLedRow(
     sources[i] = sourceSlots[i].source.get();
     if (value.present) {
       anyPresent = true;
-      latestUpdate = std::max(latestUpdate, value.lastUpdate);
+      latestUpdate = (std::max)(latestUpdate, value.lastUpdate);
     }
   }
 
@@ -1454,7 +1454,7 @@ static void DrawXRPMenuIcon(ImDrawList* drawList, XRPMenuIcon icon, ImVec2 min,
                             ImVec2 max, ImU32 color) {
   ImVec2 size{max.x - min.x, max.y - min.y};
   ImVec2 center{(min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f};
-  float stroke = std::max(1.0f, size.y * 0.08f);
+  float stroke = (std::max)(1.0f, size.y * 0.08f);
 
   if (icon == XRPMenuIcon::CONNECT) {
     ImVec2 p1{center.x - size.x * 0.18f, center.y - size.y * 0.24f};
@@ -1537,7 +1537,7 @@ static void DrawXRPMenuBarStatusControls() {
   float currentX = ImGui::GetCursorPosX();
   float targetX =
       ImGui::GetWindowWidth() - controlsWidth - style.WindowPadding.x;
-  ImGui::SameLine(std::max(currentX + style.ItemSpacing.x, targetX));
+  ImGui::SameLine((std::max)(currentX + style.ItemSpacing.x, targetX));
 
   const auto& status = gGui.connectionStatus;
   bool commandRunning =

@@ -603,7 +603,7 @@ void XRP::ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet) {
       static_cast<uint32_t>(wpi::util::support::endian::read32be(&packet[4]));
   XRPEncoderData encoderData;
   encoderData.count = count;
-  if (period_numerator != std::numeric_limits<uint32_t>::max()) {
+  if (period_numerator != (std::numeric_limits<uint32_t>::max)()) {
     encoderData.period =
         static_cast<double>(period_numerator >> 1) / ENCODER_PERIOD_DENOMINATOR;
 
