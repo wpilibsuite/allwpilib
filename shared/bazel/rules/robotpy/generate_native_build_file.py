@@ -91,7 +91,7 @@ def main():
     module_include_targets = []
     module_include_repos = set()
     for entry in args.module_include_targets or []:
-        label, _, strip = entry.partition("=")
+        label = entry.partition("=")[0]
         module_include_targets.append(label)
         module_include_repos.add(label.removeprefix("@").split("//")[0] + "*")
 
