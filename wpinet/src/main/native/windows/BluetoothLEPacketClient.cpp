@@ -893,9 +893,7 @@ class BluetoothLEPacketClient::Impl
       std::scoped_lock lock{m_statusMutex};
       snapshot = m_status;
     }
-    if (m_statusCallback) {
-      m_statusCallback(snapshot);
-    }
+    QueueStatus(snapshot);
   }
 
   void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot) {
