@@ -133,10 +133,6 @@ wpilib_cc_library(
         ":ada",
         ":private_includes",
         "//wpiutil",
-        # The real libuv, shared with @aos -- linking wpinet's vendored copy
-        # next to AOS's @libuv would put two sets of uv_* symbols in every
-        # robot binary. The vendored tree still exists for the CMake build;
-        # Bazel does not compile it.
         "@libuv",
     ],
 )
