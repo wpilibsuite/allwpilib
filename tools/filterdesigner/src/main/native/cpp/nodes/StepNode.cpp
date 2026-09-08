@@ -85,6 +85,10 @@ void StepNode::draw() {
   }
   ImGui::SetNextItemWidth(kItemWidth);
   ImGui::InputInt("Step at sample", &m_logic->startSample);
+  // Mirrors the clamp Signal() applies, every frame rather than on edit: a
+  // length edit can leave the step past the end just as a typed value can.
+  m_logic->startSample =
+      std::clamp(m_logic->startSample, 0, std::max(0, m_logic->length - 1));
 }
 
 #else  // RUNNING_FILTERDESIGNER_TESTS
