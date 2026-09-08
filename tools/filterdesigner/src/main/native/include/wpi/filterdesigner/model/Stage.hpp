@@ -37,12 +37,15 @@ enum class Family { Butterworth, Chebyshev1, Chebyshev2, Elliptic };
  * Ceilings on the two integer stage parameters. Both designers accept any
  * value above zero and do work in proportion to it — an accidental extra
  * digit or three stalls the UI thread, and a large enough one throws
- * bad_alloc past the invalid_argument handler. The ceilings sit well past
- * anything a robot filter needs: a 32nd-order cascade, or a 1024-tap
- * average that spans a full second at 1 kHz.
+ * bad_alloc past the invalid_argument handler.
+ *
+ * kMaxTaps is numerical, not defensive: a MovingAverage's all-zero sections
+ * have exponentially growing partial-product coefficients, so the
+ * time-domain cascade's impulse response is off by 8e-10 at 32 taps and 4e-2
+ * at 64. The frequency response, evaluated section by section, is unaffected.
  */
 inline constexpr int kMaxOrder = 32;
-inline constexpr int kMaxTaps = 1024;
+inline constexpr int kMaxTaps = 32;
 
 /** Per-stage design parameters. Sample rate is shared across all stages. */
 struct Stage {

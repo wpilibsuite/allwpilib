@@ -233,4 +233,21 @@ TEST_CASE("ApplyFilterTest AllNonFiniteInputProducesAllNaN",
   }
 }
 
+TEST_CASE("ApplyFilterTest MovingAverageAtMaxTapsStaysAccurate",
+          "[filterdesigner]") {
+  // kMaxTaps is placed where the all-zero cascade still evaluates exactly;
+  // raising it breaks this long before the coefficients go non-finite.
+  constexpr int kTaps = wpi::filterdesigner::kMaxTaps;
+  auto filter = SectionsOf(BiquadFilter::MovingAverage(kTaps));
+  std::vector<double> in(static_cast<size_t>(kTaps) + 4, 0.0);
+  in[0] = 1.0;
+  auto out = ApplyFilter(in, filter);
+  REQUIRE(out.size() == in.size());
+  for (size_t i = 0; i < out.size(); ++i) {
+    UNSCOPED_INFO("sample " << i);
+    CHECK_NEAR(out[i], i < static_cast<size_t>(kTaps) ? 1.0 / kTaps : 0.0,
+               1e-9);
+  }
+}
+
 }  // namespace
