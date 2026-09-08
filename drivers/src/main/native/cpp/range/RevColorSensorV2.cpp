@@ -331,7 +331,8 @@ bool RevColorSensorV2::WriteEnable(int value) {
 
 std::vector<uint8_t> RevColorSensorV2::ReadRegister(Register reg, int count) {
   std::vector<uint8_t> data(count);
-  if (m_i2c.Read(static_cast<int>(reg) | COMMAND_BIT, count, data.data())) {
+  if (m_i2c.Read(static_cast<int>(reg) | COMMAND_AUTO_INCREMENT, count,
+                 data.data())) {
     RecordFailure(FailureReason::I2C_READ_ABORTED);
     return {};
   }
@@ -339,7 +340,7 @@ std::vector<uint8_t> RevColorSensorV2::ReadRegister(Register reg, int count) {
 }
 
 bool RevColorSensorV2::WriteRegister(Register reg, int value) {
-  if (m_i2c.Write(static_cast<int>(reg) | COMMAND_BIT,
+  if (m_i2c.Write(static_cast<int>(reg) | COMMAND_AUTO_INCREMENT,
                   static_cast<uint8_t>(value))) {
     RecordFailure(FailureReason::I2C_WRITE_ABORTED);
     return false;

@@ -26,7 +26,11 @@ using Gain = wpi::RevColorSensorV2::Gain;
 using LedDrive = wpi::RevColorSensorV2::LedDrive;
 using Register = wpi::RevColorSensorV2::Register;
 
-constexpr int COMMAND_BIT = 0x80;
+/// Command bit plus the auto-increment command type. The sensor advances
+/// through consecutive registers during a multi-byte read only when the command
+/// type is auto-increment.
+constexpr int COMMAND_AUTO_INCREMENT = 0x80 | (0x01 << 5);
+
 constexpr uint8_t TMD37821_DEVICE_ID = 0x60;
 
 constexpr int STATUS_COLOR_VALID = 0x01;
@@ -72,12 +76,14 @@ class ColorSensorTestFixture {
   }
 
   void SetRegister(Register reg, std::vector<uint8_t> data) {
-    m_registerData[static_cast<int>(reg) | COMMAND_BIT] = std::move(data);
+    m_registerData[static_cast<int>(reg) | COMMAND_AUTO_INCREMENT] =
+        std::move(data);
   }
 
   /// Returns the most recent two-byte write to the given register.
   std::vector<uint8_t> LastWriteTo(Register reg) const {
-    auto address = static_cast<uint8_t>(static_cast<int>(reg) | COMMAND_BIT);
+    auto address =
+        static_cast<uint8_t>(static_cast<int>(reg) | COMMAND_AUTO_INCREMENT);
     for (auto it = m_writes.rbegin(); it != m_writes.rend(); ++it) {
       if (it->size() > 1 && (*it)[0] == address) {
         return *it;
@@ -89,12 +95,16 @@ class ColorSensorTestFixture {
 
   std::unordered_map<int, std::vector<uint8_t>> m_registerData;
   std::vector<std::vector<uint8_t>> m_writes;
+  std::vector<int> m_readRegisters;
+  std::vector<unsigned int> m_readCounts;
   int m_selectedRegister = 0;
 
  private:
   static void ReadCallback(const char*, void* param, unsigned char* buffer,
                            unsigned int count) {
     auto& self = *static_cast<ColorSensorTestFixture*>(param);
+    self.m_readRegisters.push_back(self.m_selectedRegister);
+    self.m_readCounts.push_back(count);
     std::fill_n(buffer, count, 0);
     auto it = self.m_registerData.find(self.m_selectedRegister);
     if (it != self.m_registerData.end()) {
@@ -120,7 +130,7 @@ class ColorSensorTestFixture {
 };
 
 std::vector<uint8_t> RegisterWrite(Register reg, int value) {
-  return {static_cast<uint8_t>(static_cast<int>(reg) | COMMAND_BIT),
+  return {static_cast<uint8_t>(static_cast<int>(reg) | COMMAND_AUTO_INCREMENT),
           static_cast<uint8_t>(value)};
 }
 
@@ -226,6 +236,27 @@ TEST_CASE_METHOD(ColorSensorTestFixture,
   CHECK(sensor.GetColor().blue == Catch::Approx(0.1).margin(1e-3));
 
   CHECK(sensor.GetProximity() == Catch::Approx(512.0 / 1023.0));
+}
+
+TEST_CASE_METHOD(
+    ColorSensorTestFixture,
+    "RevColorSensorV2 addresses the bulk read with the auto-increment type",
+    "[drivers][rev-color-sensor-v2]") {
+  SetRegister(Register::STATUS, StatusBlock(STATUS_ALL_VALID, 1, 2, 3, 4, 5));
+
+  wpi::RevColorSensorV2 sensor{wpi::I2C::Port::PORT_0};
+  m_readRegisters.clear();
+  m_readCounts.clear();
+  sensor.Update();
+
+  // Without the auto-increment command type the sensor would return the STATUS
+  // register once per byte instead of advancing through the color and
+  // proximity registers.
+  REQUIRE(m_readRegisters.size() == 1);
+  CHECK(m_readRegisters[0] == 0xB3);
+  CHECK(m_readRegisters[0] ==
+        (static_cast<int>(Register::STATUS) | 0x80 | 0x20));
+  CHECK(m_readCounts[0] == 11);
 }
 
 TEST_CASE_METHOD(ColorSensorTestFixture,

@@ -388,6 +388,16 @@ class RevColorSensorV2 {
   /// Every register access is prefixed with the command bit.
   static constexpr int COMMAND_BIT = 0x80;
 
+  /// Command type selecting the auto-increment protocol. Without it the sensor
+  /// uses the repeated-byte protocol, which returns the addressed register once
+  /// per byte instead of advancing through consecutive registers, so a
+  /// multi-byte read would return the same register repeatedly.
+  static constexpr int COMMAND_TYPE_AUTO_INCREMENT = 0x01 << 5;
+
+  /// Register address prefix used for every read and write.
+  static constexpr int COMMAND_AUTO_INCREMENT =
+      COMMAND_BIT | COMMAND_TYPE_AUTO_INCREMENT;
+
   static constexpr uint8_t TMD37821_DEVICE_ID = 0x60;
   static constexpr uint8_t TMD37823_DEVICE_ID = 0x69;
 

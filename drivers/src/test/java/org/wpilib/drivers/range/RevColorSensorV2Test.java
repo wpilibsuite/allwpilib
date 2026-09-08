@@ -35,7 +35,12 @@ import org.wpilib.simulation.I2CSim;
 class RevColorSensorV2Test {
   private static final double DELTA = 1e-9;
 
-  private static final int COMMAND_BIT = 0x80;
+  /**
+   * Command bit plus the auto-increment command type. The sensor advances through consecutive
+   * registers during a multi-byte read only when the command type is auto-increment.
+   */
+  private static final int COMMAND_AUTO_INCREMENT = 0x80 | (0x01 << 5);
+
   private static final byte TMD37821_DEVICE_ID = 0x60;
 
   private static final int STATUS_COLOR_VALID = 0x01;
@@ -50,6 +55,8 @@ class RevColorSensorV2Test {
   private final I2CSim m_i2cSim = new I2CSim(I2C.Port.PORT_0.value);
   private final Map<Integer, byte[]> m_registerData = new HashMap<>();
   private final List<byte[]> m_writes = new ArrayList<>();
+  private final List<Integer> m_readRegisters = new ArrayList<>();
+  private final List<Integer> m_readCounts = new ArrayList<>();
 
   private CallbackStore m_readCallback;
   private CallbackStore m_writeCallback;
@@ -62,6 +69,8 @@ class RevColorSensorV2Test {
     m_readCallback =
         m_i2cSim.registerReadCallback(
             (name, buffer, count) -> {
+              m_readRegisters.add(m_selectedRegister);
+              m_readCounts.add(count);
               byte[] data = m_registerData.get(m_selectedRegister);
               if (data != null) {
                 System.arraycopy(data, 0, buffer, 0, Math.min(count, data.length));
@@ -205,6 +214,24 @@ class RevColorSensorV2Test {
       assertEquals(0.1, sensor.getColor().blue, 1e-3);
 
       assertEquals(512.0 / 1023.0, sensor.getProximity(), DELTA);
+    }
+  }
+
+  @Test
+  void addressesTheBulkReadWithTheAutoIncrementCommandType() {
+    setRegister(Register.STATUS, statusBlock(STATUS_ALL_VALID, 1, 2, 3, 4, 5));
+
+    try (var sensor = new RevColorSensorV2(I2C.Port.PORT_0)) {
+      m_readRegisters.clear();
+      m_readCounts.clear();
+      sensor.update();
+
+      // Without the auto-increment command type the sensor would return the STATUS register
+      // once per byte instead of advancing through the color and proximity registers.
+      assertEquals(1, m_readRegisters.size());
+      assertEquals(0xB3, m_readRegisters.get(0));
+      assertEquals(Register.STATUS.getAddress() | 0x80 | 0x20, m_readRegisters.get(0));
+      assertEquals(11, m_readCounts.get(0));
     }
   }
 
@@ -407,12 +434,13 @@ class RevColorSensorV2Test {
   }
 
   private void setRegister(Register register, byte[] data) {
-    m_registerData.put(register.getAddress() | COMMAND_BIT, data);
+    m_registerData.put(register.getAddress() | COMMAND_AUTO_INCREMENT, data);
   }
 
   private byte[] lastWriteTo(Register register) {
     for (int i = m_writes.size() - 1; i >= 0; i--) {
-      if (Byte.toUnsignedInt(m_writes.get(i)[0]) == (register.getAddress() | COMMAND_BIT)) {
+      if (Byte.toUnsignedInt(m_writes.get(i)[0])
+          == (register.getAddress() | COMMAND_AUTO_INCREMENT)) {
         return m_writes.get(i);
       }
     }
@@ -437,7 +465,7 @@ class RevColorSensorV2Test {
   }
 
   private static void assertWrite(byte[] write, Register register, int expected) {
-    assertEquals(register.getAddress() | COMMAND_BIT, Byte.toUnsignedInt(write[0]));
+    assertEquals(register.getAddress() | COMMAND_AUTO_INCREMENT, Byte.toUnsignedInt(write[0]));
     assertEquals(expected, Byte.toUnsignedInt(write[1]));
   }
 

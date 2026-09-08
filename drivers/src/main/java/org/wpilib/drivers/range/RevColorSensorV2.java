@@ -41,6 +41,16 @@ public class RevColorSensorV2 implements AutoCloseable {
   /** Every register access is prefixed with the command bit. */
   private static final int COMMAND_BIT = 0x80;
 
+  /**
+   * Command type selecting the auto-increment protocol. Without it the sensor uses the
+   * repeated-byte protocol, which returns the addressed register once per byte instead of advancing
+   * through consecutive registers, so a multi-byte read would return the same register repeatedly.
+   */
+  private static final int COMMAND_TYPE_AUTO_INCREMENT = 0x01 << 5;
+
+  /** Register address prefix used for every read and write. */
+  private static final int COMMAND_AUTO_INCREMENT = COMMAND_BIT | COMMAND_TYPE_AUTO_INCREMENT;
+
   private static final byte TMD37821_DEVICE_ID = 0x60;
   private static final byte TMD37823_DEVICE_ID = 0x69;
 
@@ -807,7 +817,7 @@ public class RevColorSensorV2 implements AutoCloseable {
 
   private byte[] readRegister(Register register, int count) {
     byte[] data = new byte[count];
-    if (requireOpen().read(register.m_address | COMMAND_BIT, count, data)) {
+    if (requireOpen().read(register.m_address | COMMAND_AUTO_INCREMENT, count, data)) {
       recordFailure(FailureReason.I2C_READ_ABORTED);
       return new byte[0];
     }
@@ -815,7 +825,7 @@ public class RevColorSensorV2 implements AutoCloseable {
   }
 
   private boolean writeRegister(Register register, int value) {
-    if (requireOpen().write(register.m_address | COMMAND_BIT, value)) {
+    if (requireOpen().write(register.m_address | COMMAND_AUTO_INCREMENT, value)) {
       recordFailure(FailureReason.I2C_WRITE_ABORTED);
       return false;
     }
