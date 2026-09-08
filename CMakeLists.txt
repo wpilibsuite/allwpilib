@@ -58,6 +58,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 if(MSVC)
     add_compile_options(/Zc:__cplusplus)
 endif()
+
+# MinGW doesn't respect WINDOWS_EXPORT_ALL_SYMBOLS
+# so add it manually
+if(MINGW)
+    add_link_options(LINKER:--export-all-symbols)
+endif()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WPILIB_BINARY_DIR}/lib)

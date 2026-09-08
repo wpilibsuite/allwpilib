@@ -186,8 +186,10 @@
 
 EXPORT_TEMPLATE_TEST(DEFAULT, );
 EXPORT_TEMPLATE_TEST(DEFAULT, __attribute__((visibility("default"))));
+#ifdef _MSC_VER
 EXPORT_TEMPLATE_TEST(MSVC_HACK, __declspec(dllexport));
 EXPORT_TEMPLATE_TEST(DEFAULT, __declspec(dllimport));
+#endif
 
 #undef EXPORT_TEMPLATE_TEST
 #undef EXPORT_TEMPLATE_TEST_DEFAULT_DEFAULT
