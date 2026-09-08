@@ -37,5 +37,5 @@ build:linux --force_pic
 build:linux --features=set_soname
 build:linux --host_features=set_soname
 
-build:linux --host_platform=//shared/bazel:linux_x86_64
-build:linux --platforms=//shared/bazel:linux_x86_64
+build:linux --host_platform=//shared/bazel:linux_host
+build:linux --platforms=//shared/bazel:linux_host
