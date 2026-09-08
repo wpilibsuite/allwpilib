@@ -145,4 +145,30 @@ TEST_CASE("FilterResponseTest PhaseIsUnwrapped", "[filterdesigner]") {
   CHECK(resp->phasesDegrees.back() < -360.0);
 }
 
+TEST_CASE("FilterResponseTest GridReachesBelowAMovingAverageCutoff",
+          "[filterdesigner]") {
+  // A moving average's poles all sit at the origin, so the pole-based bound
+  // finds nothing and fs/numPoints alone starts the grid above the cutoff.
+  auto filter = SectionsOf(BiquadFilter::MovingAverage(32));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0, 32);
+  REQUIRE(resp);
+  // First null at fs/taps = 31.25 Hz; a decade below that is 3.125 Hz, well
+  // under the ~13.8 Hz cutoff, where fs/numPoints alone would give 31.25.
+  CHECK(resp->frequencies.front() < 3.2);
+  CHECK(resp->frequencies.front() > 0.0);
+  UNSCOPED_INFO("the first point must sit in the passband");
+  CHECK_NEAR(resp->magnitudesDb.front(), 0.0, 0.5);
+}
+
+TEST_CASE("FilterResponseTest HighPassZerosDoNotLowerTheGrid",
+          "[filterdesigner]") {
+  // Every high-pass carries zeros at z = 1. Counting them as features would
+  // drop the grid's start to the 1e-6 Hz floor and squash the plot.
+  auto filter = SectionsOf(BiquadFilter::Butterworth(
+      BiquadFilter::Kind::HighPass, 4, 1000_Hz, 100_Hz));
+  auto resp = FrequencyResponse::Compute(filter, 1000.0, 512);
+  REQUIRE(resp);
+  CHECK_NEAR(resp->frequencies.front(), 1000.0 / 512.0, 1e-9);
+}
+
 }  // namespace

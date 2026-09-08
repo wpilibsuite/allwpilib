@@ -14,8 +14,9 @@ namespace wpi::filterdesigner {
 /**
  * Frequency response of a biquad cascade, sampled on a log-spaced grid that
  * ends at the Nyquist frequency and starts low enough to show the filter's
- * passband: a decade below the lowest pole's corner frequency, or
- * @c fs/numPoints, whichever is lower.
+ * passband: a decade below the cascade's lowest corner frequency (its slowest
+ * pole, or for a pure-FIR section its first null), or @c fs/numPoints,
+ * whichever is lower.
  */
 struct FrequencyResponse {
   std::vector<double> frequencies;  ///< Hz, log-spaced.

@@ -16,19 +16,31 @@ namespace wpi::filterdesigner {
 
 namespace {
 
-// Corner frequency of the cascade's slowest pole, in Hz. A z-plane pole p
-// corresponds to an s-plane pole at ln(p)·fs, and |ln p| is that pole's
-// distance from the origin, i.e. its corner in rad/sample. Poles at the
-// origin (pure-FIR sections) have no corner and are skipped.
-std::optional<double> LowestPoleCorner(const Sections& sections, double fs) {
+// Corner frequency of the cascade's slowest feature, in Hz: a z-plane root r
+// sits at |ln r| rad/sample, and roots at the origin or at z = 1 have none.
+// A pure-FIR section's poles are all at the origin, so a moving average
+// reports nothing without its zeros. Zeros count only for those sections —
+// the z = 1 zeros every high-pass carries are not features of its passband.
+std::optional<double> LowestCorner(const Sections& sections, double fs) {
   std::optional<double> lowest;
-  for (const auto& p : ComputePolesZeros(sections).poles) {
-    if (std::abs(p) == 0.0) {
-      continue;
+  auto consider = [&](const std::complex<double>& r) {
+    if (std::abs(r) == 0.0) {
+      return;
     }
-    double corner = std::abs(std::log(p)) * fs / (2.0 * std::numbers::pi);
+    double corner = std::abs(std::log(r)) * fs / (2.0 * std::numbers::pi);
     if (corner > 0.0 && (!lowest || corner < *lowest)) {
       lowest = corner;
+    }
+  };
+  for (const Section& s : sections) {
+    PoleZeroPlot pz = ComputePolesZeros(Sections{s});
+    for (const auto& p : pz.poles) {
+      consider(p);
+    }
+    if (s.a1 == 0.0 && s.a2 == 0.0) {
+      for (const auto& z : pz.zeros) {
+        consider(z);
+      }
     }
   }
   return lowest;
@@ -46,9 +58,9 @@ std::optional<FrequencyResponse> FrequencyResponse::Compute(
   // The grid has to reach below the filter's own corner or the passband and
   // cutoff of a low-frequency design never appear: fs/numPoints alone puts a
   // 1 Hz low-pass at 1 kHz and 512 points off the left edge. Start a decade
-  // under the slowest pole, and never above the old fs/numPoints bound.
+  // under the slowest feature, and never above the old fs/numPoints bound.
   double fLow = fs / static_cast<double>(numPoints);
-  if (auto corner = LowestPoleCorner(sections, fs)) {
+  if (auto corner = LowestCorner(sections, fs)) {
     fLow = std::min(fLow, *corner / 10.0);
   }
   fLow = std::max(fLow, 1e-6);
