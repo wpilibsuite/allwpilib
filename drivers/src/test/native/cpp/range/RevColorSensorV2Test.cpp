@@ -402,6 +402,24 @@ TEST_CASE_METHOD(ColorSensorTestFixture,
   CHECK(LastWriteTo(Register::ATIME) == RegisterWrite(Register::ATIME, 255));
 }
 
+TEST_CASE_METHOD(
+    ColorSensorTestFixture,
+    "RevColorSensorV2 saturates integration times beyond the sensor range",
+    "[drivers][rev-color-sensor-v2]") {
+  wpi::RevColorSensorV2 sensor{wpi::I2C::Port::PORT_0};
+
+  // A duration whose cycle count cannot be represented as an int still has to
+  // saturate at the documented maximum. Converting such a value to int before
+  // clamping would be undefined behavior.
+  for (double milliseconds : {1e6, 1e18, std::numeric_limits<double>::max()}) {
+    sensor.SetIntegrationTime(wpi::units::millisecond_t{milliseconds});
+
+    CHECK(sensor.GetIntegrationTime().value() == Catch::Approx(614.4));
+    CHECK(sensor.GetMaximumRawColorValue() == 65535);
+    CHECK(LastWriteTo(Register::ATIME) == RegisterWrite(Register::ATIME, 0));
+  }
+}
+
 TEST_CASE_METHOD(ColorSensorTestFixture,
                  "RevColorSensorV2 rejects invalid configuration values",
                  "[drivers][rev-color-sensor-v2]") {

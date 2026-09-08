@@ -256,9 +256,14 @@ int RevColorSensorV2::IntegrationTimeRegister(
     throw std::invalid_argument(
         "integrationTime must be finite and greater than zero");
   }
-  int cycles = static_cast<int>(
-      std::ceil(milliseconds / INTEGRATION_CYCLE_MILLISECONDS));
-  return MAX_INTEGRATION_CYCLES - std::min(cycles, MAX_INTEGRATION_CYCLES);
+  // The cycle count is clamped while it is still floating point. A duration
+  // longer than the sensor can integrate for produces a value beyond the range
+  // of int, and converting that to int is undefined behavior, so clamping after
+  // the conversion would be too late to saturate at the maximum.
+  double cycles = std::ceil(milliseconds / INTEGRATION_CYCLE_MILLISECONDS);
+  int clampedCycles = static_cast<int>(
+      std::min(cycles, static_cast<double>(MAX_INTEGRATION_CYCLES)));
+  return MAX_INTEGRATION_CYCLES - clampedCycles;
 }
 
 bool RevColorSensorV2::Initialize() {
