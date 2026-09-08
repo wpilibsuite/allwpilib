@@ -223,13 +223,6 @@ void SetStyle(Style style);
 void SetFPS(int fps);
 
 /**
- * Sets the clear (background) color.
- *
- * @param color Color
- */
-void SetClearColor(ImVec4 color);
-
-/**
  * Gets the (platform-specific) absolute directory for save files.
  *
  * @return Absolute path, including trailing "/". Empty string if directory

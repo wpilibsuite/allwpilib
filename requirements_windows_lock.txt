@@ -44,9 +44,9 @@ colorama==0.4.6 \
     #   click
     #   pkgconf
     #   pytest
-cxxheaderparser[pcpp]==1.7.0 \
-    --hash=sha256:2d0282e6f3cc25484acb2d737b3b5a646b947ae48cc0060242c50925d402f2ed \
-    --hash=sha256:3c8ade60cc0c102bdd3eeb26fbc9ae30c3ae9b74ce881fab91e8fe8647b1a5f4
+cxxheaderparser[pcpp]==2.0.0 \
+    --hash=sha256:6298f40fcedf8a3a7dbec679c4e88686f24f34edb5bdc1fdca65c1802a4205ab \
+    --hash=sha256:d545e6e627bc7d305204a9fe1e9ea4f88983419ec3a6c0fec1e3f419c3006a07
     # via semiwrap
 dictdiffer==0.9.0 \
     --hash=sha256:17bacf5fbfe613ccf1b6d512bd766e6b21fb798822a133aa86098b8ac9997578 \
@@ -570,9 +570,9 @@ ruamel-yaml-clib==0.2.15 \
     --hash=sha256:fd4c928ddf6bce586285daa6d90680b9c291cfd045fc40aad34e445d57b1bf51 \
     --hash=sha256:fe239bdfdae2302e93bd6e8264bd9b71290218fff7084a9db250b55caaccf43f
     # via ruamel-yaml
-semiwrap==0.6.1 \
-    --hash=sha256:79eda0fab281d712eafa8b0b35c6efe6d40c85fd4cffc292d16dd957dbe3fc37 \
-    --hash=sha256:c8d303f9a095a54c98cc1a50fdfd3a15e0f1273346d6d1efec6530dbf82843d9
+semiwrap==0.7.0 \
+    --hash=sha256:1eabc374ade17f45fc9d7157a982e197e56acdb4d8fa8d6f9bf3a2e788477ff1 \
+    --hash=sha256:a1903007fd2fb85add69241c021149567ce5d1237b55c6acdfe55fe3bb3c7376
     # via -r requirements.txt
 sphinxify==0.12 \
     --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \

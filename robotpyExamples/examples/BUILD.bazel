@@ -1,0 +1,12 @@
+load("@bazel_skylib//lib:subpackages.bzl", "subpackages")
+load("//robotpyExamples:example_list_test.bzl", "example_list_test")
+
+example_list_test(
+    name = "check_example_list",
+    config = "examples.toml",
+    robot_packages = subpackages.all(),
+    tags = [
+        "no-ide",
+        "smoketest",
+    ],
+)

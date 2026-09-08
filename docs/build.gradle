@@ -109,7 +109,7 @@ doxygen.sourceSets.main {
         exclude 'wpi/util/raw_ostream.hpp'
 
         // Sleipnir
-        exclude 'sleipnir/optimization/solver/interior_point.hpp'
+        exclude 'sleipnir/optimization/solver/ipm.hpp'
         exclude 'sleipnir/optimization/solver/newton.hpp'
         exclude 'sleipnir/optimization/solver/sqp.hpp'
         exclude 'sleipnir/optimization/solver/util/feasibility_restoration.hpp'

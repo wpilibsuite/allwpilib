@@ -9,6 +9,30 @@ build --experimental_cc_static_library
 build --experimental_cc_shared_library
 build --incompatible_strict_action_env
 
+# Actions get a fixed environment from the flag above, but repository rules and
+# module extensions still see the client environment in full, and that is where
+# the C++ toolchain gets configured -- rules_cc declares roughly thirty
+# variables as inputs to cc_autoconf.
+common:windows --experimental_strict_repo_env
+common:windows --repo_env=BAZEL_SH
+# publishing_rule.bzl declares this as an environ input and reads it straight out
+# of the environment, which is how a developer picks a subset of the artifact
+# variants to build.
+common:windows --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER
+# Escape hatches for a Visual Studio install outside the default location.
+common:windows --repo_env=BAZEL_VC
+common:windows --repo_env=BAZEL_VS
+common:windows --repo_env=BAZEL_VC_FULL_VERSION
+common:windows --repo_env=BAZEL_WINSDK_FULL_VERSION
+# Keep the pinned git away from the developer's ~/.gitconfig, where settings
+# like core.autocrlf or url.*.insteadOf would make a fetch machine dependent. A
+# nonexistent config path reads as an empty config. This has to live here rather
+# than in the wrapper: exported to every process Bazel launches it would also
+# reach `bazel run //:copybara`, which needs the real configuration to find a
+# credential helper and an identity to push with.
+common:windows --repo_env=GIT_CONFIG_GLOBAL=/dev/null
+common:windows --repo_env=GIT_CONFIG_SYSTEM=/dev/null
+
 build --java_language_version=25
 build --java_runtime_version=remotejdk_25
 build --tool_java_language_version=25

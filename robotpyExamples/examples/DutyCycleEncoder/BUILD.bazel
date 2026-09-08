@@ -1,0 +1,10 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "DutyCycleEncoder",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//drivers:wpilib-drivers",
+    ],
+)

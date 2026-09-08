@@ -2,8 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <chrono>
 #include <filesystem>
 #include <format>
+#include <future>
 #include <map>
 #include <memory>
 #include <optional>
@@ -284,7 +286,24 @@ void CalibrateCamera() {
   static std::unique_ptr<pfd::open_file> cameraVideoSelector;
   static std::string cameraVideoPath;
   static std::unique_ptr<wpical::CameraCalibrator> videoProcessor;
+  static std::vector<std::future<void>> videoProcessorCleanupTasks;
   static bool calibrating = false;
+
+  std::erase_if(videoProcessorCleanupTasks, [](auto& task) {
+    return task.wait_for(std::chrono::seconds{0}) == std::future_status::ready;
+  });
+  const bool videoProcessorCleanupPending = !videoProcessorCleanupTasks.empty();
+
+  auto cleanupVideoProcessor = [&] {
+    if (!videoProcessor) {
+      return;
+    }
+    videoProcessor->Stop();
+    videoProcessorCleanupTasks.emplace_back(std::async(
+        std::launch::async, [processor = std::move(videoProcessor)]() mutable {
+          processor.reset();
+        }));
+  };
 
   static double squareWidth = 0.709;
   static double markerWidth = 0.551;
@@ -338,6 +357,7 @@ void CalibrateCamera() {
         }
         ImGui::CloseCurrentPopup();
         calibrating = false;
+        cleanupVideoProcessor();
       } else if (!videoProcessor->IsFinished()) {
         double processed = videoProcessor->TotalFramesProcessed();
         double total = videoProcessor->TotalFrames();
@@ -354,20 +374,27 @@ void CalibrateCamera() {
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Always);
         ImGui::OpenPopup("Camera Calibration Error");
         calibrating = false;
+        cleanupVideoProcessor();
       }
-    } else if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
-      videoProcessor = std::make_unique<wpical::CameraCalibrator>(
-          numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
-          cameraVideoPath);
-      calibrating = true;
+    } else {
+      ImGui::BeginDisabled(videoProcessorCleanupPending);
+      if (ImGui::Button("Calibrate") && !cameraVideoPath.empty()) {
+        videoProcessor = std::make_unique<wpical::CameraCalibrator>(
+            numWorkers, squareWidth, markerWidth, boardWidth, boardHeight,
+            cameraVideoPath);
+        calibrating = true;
+      }
+      ImGui::EndDisabled();
     }
     ImGui::SameLine();
     if (ImGui::Button("Close")) {
-      if (videoProcessor) {
-        videoProcessor->Stop();
-      }
+      cleanupVideoProcessor();
       calibrating = false;
       ImGui::CloseCurrentPopup();
+    }
+    if (videoProcessorCleanupPending) {
+      ImGui::TextUnformatted(
+          "Waiting for the previous calibration to finish...");
     }
     ImGui::EndPopup();
   }

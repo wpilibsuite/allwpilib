@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.0",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
@@ -41,7 +41,6 @@ update_init = [
     "tunables"
 ]
 scan_headers_ignore = [
-    "src/TunablePython.h",
     "wpi/tunables/CustomTunable.hpp",
     "wpi/tunables/MockTunableBackend.hpp",
     "wpi/tunables/Selectable.hpp",
@@ -56,6 +55,16 @@ scan_headers_ignore = [
     "wpi/tunables/detail/TunableMember.hpp",
     "wpi/tunables/detail/TunableTypeTraits.hpp",
     "wpi/tunables/detail/TunableTypeValue.hpp",
+
+    # internals
+    "src/TunablePython.h",
+    "src/rpy/MockTunableBackendFunctions.h",
+    "src/rpy/PyComplexTunableAdapter.h",
+    "src/rpy/PyMutationList.h",
+    "src/rpy/PyTunable.h",
+    "src/rpy/PyTunableTable.h",
+    "src/rpy/TunableStorage.h",
+    "src/rpy/TunableValuePython.h",
 ]
 
 [tool.semiwrap.name_transform]

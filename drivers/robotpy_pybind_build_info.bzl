@@ -170,26 +170,6 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
                 ("wpi::SparkMini", "wpi__SparkMini.hpp"),
             ],
         ),
-        struct(
-            class_name = "Talon",
-            yml_file = "semiwrap/Talon.yml",
-            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/motor/Talon.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::Talon", "wpi__Talon.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "VictorSP",
-            yml_file = "semiwrap/VictorSP.yml",
-            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/motor/VictorSP.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::VictorSP", "wpi__VictorSP.hpp"),
-            ],
-        ),
     ]
 
     resolve_casters(
