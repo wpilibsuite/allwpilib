@@ -314,6 +314,7 @@ if(WPILIB_WITH_GUI)
     endif()
 
     if(WPILIB_WITH_EXECUTABLES)
+        add_subdirectory(tools/filterdesigner)
         add_subdirectory(tools/outlineviewer)
         add_subdirectory(tools/sysid)
         if(LIBSSH_FOUND)

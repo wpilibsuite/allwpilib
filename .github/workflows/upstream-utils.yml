@@ -85,6 +85,12 @@ jobs:
           ./imgui.py clone
           ./imgui.py copy-src
           ./imgui.py format-patch
+      - name: Run imnodeflow.py
+        run: |
+          cd upstream_utils
+          ./imnodeflow.py clone
+          ./imnodeflow.py copy-src
+          ./imnodeflow.py format-patch
       - name: Run implot.py
         run: |
           cd upstream_utils
@@ -139,6 +145,12 @@ jobs:
           ./mrcal_java.py clone
           ./mrcal_java.py copy-src
           ./mrcal_java.py format-patch
+      - name: Run pocketfft.py
+        run: |
+          cd upstream_utils
+          ./pocketfft.py clone
+          ./pocketfft.py copy-src
+          ./pocketfft.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
