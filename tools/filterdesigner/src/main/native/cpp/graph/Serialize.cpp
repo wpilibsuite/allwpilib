@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <fstream>
 #include <ios>
 #include <limits>
@@ -151,7 +152,7 @@ DeserializeResult DeserializeGraph(std::string_view jsonText, Graph& graph,
 
   auto parsed = json::parse(jsonText);
   if (!parsed) {
-    result.error = std::string{"Malformed JSON: "} + parsed.error();
+    result.error = std::format("Malformed JSON: {}", parsed.error());
     return result;
   }
 
@@ -355,7 +356,7 @@ std::string SaveGraphToFile(std::string_view path, const Graph& graph) {
   std::string text = SerializeGraph(graph);
   std::ofstream out(std::string{path}, std::ios::binary | std::ios::trunc);
   if (!out) {
-    return std::string{"Could not open for writing: "} + std::string{path};
+    return std::format("Could not open for writing: {}", path);
   }
   out << text;
   // Not just the stream state here: the last buffered chunk is flushed by the
@@ -363,7 +364,7 @@ std::string SaveGraphToFile(std::string_view path, const Graph& graph) {
   // clean save over a truncated file.
   out.close();
   if (!out) {
-    return std::string{"Write failed: "} + std::string{path};
+    return std::format("Write failed: {}", path);
   }
   return {};
 }
@@ -373,7 +374,7 @@ DeserializeResult LoadGraphFromFile(std::string_view path, Graph& graph,
   DeserializeResult result;
   std::ifstream in(std::string{path}, std::ios::binary);
   if (!in) {
-    result.error = std::string{"Could not open: "} + std::string{path};
+    result.error = std::format("Could not open: {}", path);
     return result;
   }
   std::ostringstream ss;
