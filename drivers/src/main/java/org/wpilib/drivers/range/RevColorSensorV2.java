@@ -64,11 +64,11 @@ public class RevColorSensorV2 implements AutoCloseable {
   private static final int STATUS_COLOR_VALID = 0x01;
   private static final int STATUS_PROXIMITY_VALID = 0x02;
 
-  /** The TMD3782 family requires this control bit to be set to select the IR photodiode. */
-  private static final int CONTROL_IR_DIODE = 0x20;
-
-  private static final int GAIN_MASK = 0x03;
-  private static final int LED_DRIVE_MASK = 0xC0;
+  /**
+   * CONTROL proximity diode select field (bits 5:4), set to the value that measures proximity with
+   * the infrared diode. The other values of this field are reserved.
+   */
+  private static final int CONTROL_PDIODE_IR = 0x02 << 4;
 
   /** STATUS through the high byte of the proximity data, read as one block. */
   private static final int BULK_READ_LENGTH = 11;
@@ -156,8 +156,8 @@ public class RevColorSensorV2 implements AutoCloseable {
     GAIN_4(0x01),
     /** 16x gain. */
     GAIN_16(0x02),
-    /** 64x gain. */
-    GAIN_64(0x03);
+    /** 60x gain. */
+    GAIN_60(0x03);
 
     private final int m_value;
 
@@ -777,16 +777,21 @@ public class RevColorSensorV2 implements AutoCloseable {
         && enable();
   }
 
+  /**
+   * Writes every CONTROL field explicitly rather than preserving the register's current contents.
+   * Disabling the sensor does not reset CONTROL, so a value retained from an earlier configuration
+   * could leave a reserved proximity diode or proximity gain selection in place, which changes
+   * every proximity reading and invalidates the distance calibration.
+   *
+   * <p>This covers all eight bits: the LED drive occupies bits 7:6, the proximity diode select bits
+   * 5:4, the proximity gain bits 3:2, and the color gain bits 1:0. The proximity gain is left as
+   * zero, selecting the 1x gain the distance calibration was fitted at and the only value this part
+   * defines.
+   *
+   * @return whether the write succeeded
+   */
   private boolean writeControl() {
-    byte[] data = readRegister(Register.CONTROL, 1);
-    if (data.length == 0) {
-      return false;
-    }
-    int control =
-        (data[0] & 0xFF & ~(GAIN_MASK | LED_DRIVE_MASK))
-            | CONTROL_IR_DIODE
-            | m_gain.m_value
-            | m_ledDrive.m_value;
+    int control = m_ledDrive.m_value | CONTROL_PDIODE_IR | m_gain.m_value;
     return writeRegister(Register.CONTROL, control);
   }
 

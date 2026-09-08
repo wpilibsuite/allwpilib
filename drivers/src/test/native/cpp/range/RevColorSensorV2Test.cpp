@@ -160,19 +160,28 @@ TEST_CASE_METHOD(ColorSensorTestFixture,
 }
 
 TEST_CASE_METHOD(ColorSensorTestFixture,
-                 "RevColorSensorV2 preserves unrelated control bits",
+                 "RevColorSensorV2 overwrites retained control fields",
                  "[drivers][rev-color-sensor-v2]") {
-  SetRegister(Register::CONTROL, {0x0C});
+  // A retained proximity diode bit and proximity gain, as the sensor holds them
+  // across a program restart. Disabling the sensor does not reset this
+  // register, and preserving these bits would select a reserved diode and
+  // proximity gain instead of the calibrated ones.
+  SetRegister(Register::CONTROL, {0x1C});
 
   wpi::RevColorSensorV2 sensor{wpi::I2C::Port::PORT_0};
-  sensor.SetGain(Gain::GAIN_64);
+
+  // Bits 7:6 LED drive (50%), 5:4 IR diode, 3:2 proximity gain 1x, 1:0 color
+  // gain (4x).
+  CHECK(LastWriteTo(Register::CONTROL) ==
+        RegisterWrite(Register::CONTROL, 0x61));
+
+  sensor.SetGain(Gain::GAIN_60);
   sensor.SetLedDrive(LedDrive::PERCENT_12_5);
 
-  // Bits 3:2 are untouched, bit 5 selects the IR photodiode, bits 7:6 are the
-  // LED drive, and bits 1:0 are the gain.
+  // The diode and proximity gain fields stay at their calibrated values.
   CHECK(LastWriteTo(Register::CONTROL) ==
-        RegisterWrite(Register::CONTROL, 0xEF));
-  CHECK(sensor.GetGain() == Gain::GAIN_64);
+        RegisterWrite(Register::CONTROL, 0xE3));
+  CHECK(sensor.GetGain() == Gain::GAIN_60);
   CHECK(sensor.GetLedDrive() == LedDrive::PERCENT_12_5);
 }
 

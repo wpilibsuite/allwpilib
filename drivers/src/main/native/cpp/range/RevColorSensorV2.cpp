@@ -83,7 +83,7 @@ void RevColorSensorV2::SetGain(Gain gain) {
     case Gain::GAIN_1:
     case Gain::GAIN_4:
     case Gain::GAIN_16:
-    case Gain::GAIN_64:
+    case Gain::GAIN_60:
       break;
     default:
       throw std::invalid_argument("Invalid gain");
@@ -294,12 +294,18 @@ bool RevColorSensorV2::Configure() {
 }
 
 bool RevColorSensorV2::WriteControl() {
-  std::vector<uint8_t> data = ReadRegister(Register::CONTROL, 1);
-  if (data.empty()) {
-    return false;
-  }
-  int control = (data[0] & ~(GAIN_MASK | LED_DRIVE_MASK)) | CONTROL_IR_DIODE |
-                static_cast<int>(m_gain) | static_cast<int>(m_ledDrive);
+  // Every CONTROL field is written explicitly rather than preserving the
+  // register's current contents. Disabling the sensor does not reset CONTROL,
+  // so a value retained from an earlier configuration could leave a reserved
+  // proximity diode or proximity gain selection in place, which changes every
+  // proximity reading and invalidates the distance calibration.
+  //
+  // This covers all eight bits: the LED drive occupies bits 7:6, the proximity
+  // diode select bits 5:4, the proximity gain bits 3:2, and the color gain bits
+  // 1:0. The proximity gain is left as zero, selecting the 1x gain the distance
+  // calibration was fitted at and the only value this part defines.
+  int control = static_cast<int>(m_ledDrive) | CONTROL_PDIODE_IR |
+                static_cast<int>(m_gain);
   return WriteRegister(Register::CONTROL, control);
 }
 

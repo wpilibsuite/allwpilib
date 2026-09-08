@@ -83,8 +83,8 @@ class RevColorSensorV2 {
     GAIN_4 = 0x01,
     /// 16x gain.
     GAIN_16 = 0x02,
-    /// 64x gain.
-    GAIN_64 = 0x03
+    /// 60x gain.
+    GAIN_60 = 0x03
   };
 
   /** Nominal drive current of the proximity LED. */
@@ -411,12 +411,10 @@ class RevColorSensorV2 {
   static constexpr int STATUS_COLOR_VALID = 0x01;
   static constexpr int STATUS_PROXIMITY_VALID = 0x02;
 
-  /// The TMD3782 family requires this control bit to be set to select the IR
-  /// photodiode.
-  static constexpr int CONTROL_IR_DIODE = 0x20;
-
-  static constexpr int GAIN_MASK = 0x03;
-  static constexpr int LED_DRIVE_MASK = 0xC0;
+  /// CONTROL proximity diode select field (bits 5:4), set to the value that
+  /// measures proximity with the infrared diode. The other values of this field
+  /// are reserved.
+  static constexpr int CONTROL_PDIODE_IR = 0x02 << 4;
 
   /// STATUS through the high byte of the proximity data, read as one block.
   static constexpr int BULK_READ_LENGTH = 11;

@@ -145,16 +145,21 @@ class RevColorSensorV2Test {
   }
 
   @Test
-  void preservesUnrelatedControlBits() {
-    setRegister(Register.CONTROL, new byte[] {0x0C});
+  void overwritesRetainedControlFields() {
+    // A retained proximity diode bit and proximity gain, as the sensor holds them across a
+    // program restart. Disabling the sensor does not reset this register, and preserving these
+    // bits would select a reserved diode and proximity gain instead of the calibrated ones.
+    setRegister(Register.CONTROL, new byte[] {0x1C});
 
     try (var sensor = new RevColorSensorV2(I2C.Port.PORT_0)) {
-      sensor.setGain(Gain.GAIN_64);
+      // Bits 7:6 LED drive (50%), 5:4 IR diode, 3:2 proximity gain 1x, 1:0 color gain (4x).
+      assertWrite(lastWriteTo(Register.CONTROL), Register.CONTROL, 0x61);
+
+      sensor.setGain(Gain.GAIN_60);
       sensor.setLedDrive(LedDrive.PERCENT_12_5);
 
-      // Bits 3:2 are untouched, bit 5 selects the IR photodiode, bits 7:6 are the LED drive,
-      // and bits 1:0 are the gain.
-      assertWrite(lastWriteTo(Register.CONTROL), Register.CONTROL, 0xEF);
+      // The diode and proximity gain fields stay at their calibrated values.
+      assertWrite(lastWriteTo(Register.CONTROL), Register.CONTROL, 0xE3);
     }
   }
 
