@@ -116,6 +116,19 @@ public class Trigger implements BooleanSupplier {
   }
 
   /**
+   * Starts the command when the condition changes.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger onChange(Command command) {
+    requireNonNullParam(command, "command", "onChange");
+    addBinding(BindingType.SCHEDULE_ON_RISING_EDGE, command);
+    addBinding(BindingType.SCHEDULE_ON_FALLING_EDGE, command);
+    return this;
+  }
+
+  /**
    * Starts the given command whenever the condition changes from `false` to `true`.
    *
    * @param command the command to start
