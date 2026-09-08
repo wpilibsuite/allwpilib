@@ -30,7 +30,17 @@ std::vector<std::complex<double>> QuadraticRoots(double p0, double p1,
   if (scale == 0.0) {
     return {};
   }
-  const double coefEps = kRelEps * scale;
+  // Roots are invariant under a common scaling, and without one the
+  // discriminant underflows for a section carrying the cascade gain:
+  // {1e-200, 0, -1e-200} has zeros at ±1, but 4·p0·p2 rounds to zero and
+  // collapses them onto the origin. A power of two rescales exactly.
+  int exponent = 0;
+  std::frexp(scale, &exponent);
+  p0 = std::ldexp(p0, -exponent);
+  p1 = std::ldexp(p1, -exponent);
+  p2 = std::ldexp(p2, -exponent);
+
+  const double coefEps = kRelEps * std::ldexp(scale, -exponent);
   if (std::abs(p0) < coefEps) {
     if (std::abs(p1) < coefEps) {
       return {};

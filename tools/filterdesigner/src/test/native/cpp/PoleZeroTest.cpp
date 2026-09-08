@@ -5,6 +5,7 @@
 #include "wpi/filterdesigner/model/PoleZero.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <complex>
 #include <numbers>
@@ -182,6 +183,23 @@ TEST_CASE("PoleZeroTest TinyGainSectionKeepsItsZeros", "[filterdesigner]") {
                               << ") should sit at -1");
     CHECK_NEAR(z.real(), -1.0, 1e-6);
     CHECK_NEAR(z.imag(), 0.0, 1e-6);
+  }
+}
+
+TEST_CASE("PoleZeroTest TinyGainSectionKeepsSeparatedZeros",
+          "[filterdesigner]") {
+  // A band-pass numerator is {g, 0, -g}. Squaring a small enough g underflows,
+  // so a discriminant taken on the raw coefficients reads zero and puts both
+  // zeros at the origin instead of at ±1.
+  Sections sections{Section{1e-200, 0.0, -1e-200, 0.0, 0.0}};
+  auto pz = ComputePolesZeros(sections);
+  REQUIRE(pz.zeros.size() == 2u);
+  std::array<double, 2> real{pz.zeros[0].real(), pz.zeros[1].real()};
+  std::ranges::sort(real);
+  CHECK_NEAR(real[0], -1.0, 1e-12);
+  CHECK_NEAR(real[1], 1.0, 1e-12);
+  for (const auto& z : pz.zeros) {
+    CHECK_NEAR(z.imag(), 0.0, 1e-12);
   }
 }
 
