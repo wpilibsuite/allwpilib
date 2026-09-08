@@ -27,6 +27,9 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
+        if (m_shutdown) {
+          break;
+        }
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
@@ -346,17 +349,32 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
+  // If a callback is currently running, wait for it to complete.
   {
     std::scoped_lock lock{m_mutex};
-    m_pollers.clear();
-    m_listeners.clear();
-    m_connListeners.clear();
-    m_topicListeners.clear();
-    m_valueListeners.clear();
-    m_logListeners.clear();
-    m_timeSyncListeners.clear();
+    if (auto thr = m_thread.GetThread()) {
+      // Prevent future callbacks from running.
+      thr->m_shutdown = true;
+    } else {
+      DoReset();
+      return;
+    }
   }
+
   m_thread.Join();
+
+  std::scoped_lock lock{m_mutex};
+  DoReset();
+}
+
+void ListenerStorage::DoReset() {
+  m_pollers.clear();
+  m_listeners.clear();
+  m_connListeners.clear();
+  m_topicListeners.clear();
+  m_valueListeners.clear();
+  m_logListeners.clear();
+  m_timeSyncListeners.clear();
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
