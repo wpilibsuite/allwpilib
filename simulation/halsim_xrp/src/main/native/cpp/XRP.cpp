@@ -49,6 +49,9 @@ size_t ExpectedStatusPayloadSize(uint16_t mask) {
   if (HasField(mask, STATUS_TIMING)) {
     size += 4;
   }
+  if (HasField(mask, STATUS_COMMAND_ACK)) {
+    size += 5;
+  }
 
   return size;
 }
@@ -123,9 +126,9 @@ void XRP::HandleWPILibUpdate(const wpi::util::json& data) {
   }
 }
 
-void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
+bool XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   if (packet.size() < PACKET_HEADER_SIZE) {
-    return;
+    return false;
   }
 
   uint16_t seq = (packet[0] << 8) + packet[1];
@@ -133,7 +136,7 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   if ((fieldMask & ~STATUS_ALL_FIELDS) != 0 ||
       packet.size() !=
           PACKET_HEADER_SIZE + ExpectedStatusPayloadSize(fieldMask)) {
-    return;
+    return false;
   }
 
   {
@@ -142,7 +145,7 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
     // Firmware may coalesce packets across rollover. Half the sequence space
     // or more is ambiguous and must be treated as stale.
     if (m_have_wpilib_bound_seq && (distance == 0 || distance >= 0x8000)) {
-      return;
+      return false;
     }
 
     m_wpilib_bound_seq = seq;
@@ -187,6 +190,12 @@ void XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
   if (HasField(fieldMask, STATUS_TIMING)) {
     packet = packet.subspan(4);
   }
+
+  if (HasField(fieldMask, STATUS_COMMAND_ACK)) {
+    ReadCommandAckData(packet.subspan(0, 5));
+  }
+
+  return true;
 }
 
 void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
@@ -199,14 +208,16 @@ void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
   m_xrp_bound_seq++;
 }
 
-void XRP::SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
-                                  std::string_view deviceName) {
+uint16_t XRP::SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
+                                      std::string_view deviceName) {
+  uint16_t seq = m_xrp_bound_seq;
   SetupSendHeader(buf, CONTROL_DEVICE_NAME);
   buf << static_cast<uint8_t>(deviceName.size());
   for (char c : deviceName) {
     buf << static_cast<uint8_t>(c);
   }
   m_xrp_bound_seq++;
+  return seq;
 }
 
 void XRP::ResetStatusPacketSequence() {
@@ -662,4 +673,18 @@ void XRP::ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet) {
   analogJson["data"] = wpi::util::json::object(">voltage", voltage);
 
   m_wpilib_update_func(analogJson);
+}
+
+void XRP::ReadCommandAckData(std::span<const uint8_t> packet) {
+  if (packet.size() < 5) {
+    return;
+  }
+
+  std::scoped_lock lock(m_data_snapshot_mutex);
+  auto& commandAck = m_data_snapshot.status.commandAck;
+  commandAck.value.controlSeq = ReadUint16(packet, 0);
+  commandAck.value.controlFieldMask = ReadUint16(packet, 2);
+  commandAck.value.result = packet[4];
+  commandAck.present = true;
+  commandAck.lastUpdate = std::chrono::steady_clock::now();
 }

@@ -4,6 +4,7 @@
 
 #include "wpi/halsim/xrp/XRP.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <string>
@@ -23,6 +24,19 @@ void ReceiveSequence(XRP& xrp, uint16_t seq) {
   std::array<uint8_t, 5> packet{static_cast<uint8_t>(seq >> 8),
                                 static_cast<uint8_t>(seq), 0, 0, 0};
   xrp.HandleXRPUpdate(packet);
+}
+
+std::vector<uint8_t> MakeStatus(uint16_t seq, uint16_t mask,
+                                std::initializer_list<uint8_t> payload) {
+  std::vector<uint8_t> result(PACKET_HEADER_SIZE + payload.size());
+  result[0] = static_cast<uint8_t>(seq >> 8);
+  result[1] = static_cast<uint8_t>(seq);
+  result[2] = 0;
+  result[3] = static_cast<uint8_t>(mask >> 8);
+  result[4] = static_cast<uint8_t>(mask);
+  std::copy(payload.begin(), payload.end(),
+            result.begin() + PACKET_HEADER_SIZE);
+  return result;
 }
 
 std::vector<uint8_t> MakeControl(XRP& xrp, std::string_view name = {}) {
@@ -86,6 +100,31 @@ TEST_CASE("XRP malformed status does not consume a sequence", "[xrp]") {
   CHECK(xrp.GetDataSnapshot().status.packet.sequence == 1);
   ReceiveSequence(xrp, 2);
   CHECK(xrp.GetDataSnapshot().status.packet.sequence == 2);
+}
+
+TEST_CASE("XRP reads command acknowledgement status packets", "[xrp]") {
+  XRP xrp;
+  auto ack =
+      MakeStatus(1, STATUS_COMMAND_ACK, {0, 7, 0x80, 0, COMMAND_ACK_SUCCESS});
+  CHECK(xrp.HandleXRPUpdate(ack));
+  auto snapshot = xrp.GetDataSnapshot();
+  REQUIRE(snapshot.status.commandAck.present);
+  CHECK(snapshot.status.commandAck.value.controlSeq == 7);
+  CHECK(snapshot.status.commandAck.value.controlFieldMask ==
+        CONTROL_DEVICE_NAME);
+  CHECK(snapshot.status.commandAck.value.result == COMMAND_ACK_SUCCESS);
+
+  auto firstUpdate = snapshot.status.commandAck.lastUpdate;
+  CHECK_FALSE(xrp.HandleXRPUpdate(ack));
+  snapshot = xrp.GetDataSnapshot();
+  CHECK(snapshot.status.commandAck.lastUpdate == firstUpdate);
+
+  auto rejected =
+      MakeStatus(2, STATUS_COMMAND_ACK, {0, 8, 0x80, 0, COMMAND_ACK_REJECTED});
+  CHECK(xrp.HandleXRPUpdate(rejected));
+  snapshot = xrp.GetDataSnapshot();
+  CHECK(snapshot.status.commandAck.value.controlSeq == 8);
+  CHECK(snapshot.status.commandAck.value.result == COMMAND_ACK_REJECTED);
 }
 
 TEST_CASE("XRP encoder update preserves count and signed period", "[xrp]") {

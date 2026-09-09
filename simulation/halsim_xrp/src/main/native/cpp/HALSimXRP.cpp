@@ -34,8 +34,12 @@ namespace {
 
 constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
 constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
+// Firmware sends command acknowledgements as separate 10-byte packets, so the
+// largest periodic status packet still determines the required notification
+// MTU.
 constexpr size_t MAX_XRP_STATUS_PACKET_SIZE = 85;
 constexpr size_t MAX_LATENCY_SEND_TIMES = 512;
+constexpr auto RENAME_ACK_TIMEOUT = std::chrono::seconds{5};
 constexpr uint32_t INVALID_CONTROL_RX_AGE_US = UINT32_MAX;
 constexpr const char* XRP_GATT_SERVICE_UUID =
     "7d2ea28a-f7bd-485d-9d6a-2c3f0b214a3f";
@@ -57,6 +61,12 @@ struct SavedBluetoothTarget {
 struct TimingEcho {
   uint16_t lastControlSeq = 0;
   uint32_t controlRxAgeUs = 0;
+};
+
+struct CommandAck {
+  uint16_t controlSeq = 0;
+  uint16_t controlFieldMask = 0;
+  uint8_t result = COMMAND_ACK_REJECTED;
 };
 
 const char* AddressTypeToString(XRPBluetoothAddressType type) {
@@ -215,6 +225,21 @@ std::optional<TimingEcho> ReadTimingEcho(std::span<const uint8_t> packet) {
   return TimingEcho{ReadUint16BE(packet.subspan(0, 2)), controlRxAgeUs};
 }
 
+std::optional<CommandAck> ReadCommandAck(std::span<const uint8_t> packet) {
+  if (packet.size() != PACKET_HEADER_SIZE + 5) {
+    return std::nullopt;
+  }
+
+  uint16_t fieldMask = ReadUint16BE(packet.subspan(3, 2));
+  if (fieldMask != STATUS_COMMAND_ACK) {
+    return std::nullopt;
+  }
+
+  packet = packet.subspan(PACKET_HEADER_SIZE);
+  return CommandAck{ReadUint16BE(packet.subspan(0, 2)),
+                    ReadUint16BE(packet.subspan(2, 2)), packet[4]};
+}
+
 }  // namespace
 
 HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
@@ -233,7 +258,9 @@ HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
   }
 }
 
-HALSimXRP::~HALSimXRP() = default;
+HALSimXRP::~HALSimXRP() {
+  CompletePendingRename(false);
+}
 
 bool HALSimXRP::Initialize() {
   if (!m_exec) {
@@ -255,6 +282,7 @@ bool HALSimXRP::Initialize() {
             self->m_controlPacketSendTimes.clear();
             self->m_controlPacketSendOrder.clear();
             self->m_haveLastLatencyControlSeq = false;
+            self->CompletePendingRename(false);
           }
           std::scoped_lock lock(self->m_statusMutex);
           self->m_status = status;
@@ -388,6 +416,7 @@ void HALSimXRP::ConnectBluetooth(std::string address,
   SaveBluetoothTarget(config.address, config.addressType, targetName);
   m_exec->Send(
       [self = shared_from_this(), config = std::move(config)]() mutable {
+        self->CompletePendingRename(false);
         self->m_xrp.ResetStatusPacketSequence();
         if (self->m_bluetoothClient) {
           self->m_bluetoothClient->Connect(std::move(config));
@@ -435,15 +464,18 @@ std::future<bool> HALSimXRP::RenameBluetoothDevice(
   }
   m_exec->Send(
       [self = shared_from_this(), result, name = std::string{deviceName}] {
-        result->set_value(self->RenameBluetoothDeviceOnLoop(name));
+        self->RenameBluetoothDeviceOnLoop(name, result);
       });
   return future;
 }
 
-bool HALSimXRP::RenameBluetoothDeviceOnLoop(std::string_view deviceName) {
+void HALSimXRP::RenameBluetoothDeviceOnLoop(
+    std::string_view deviceName, std::shared_ptr<std::promise<bool>> result) {
   if (!m_bluetoothClient || deviceName.empty() ||
-      deviceName.size() > CONTROL_DEVICE_NAME_MAX_LENGTH) {
-    return false;
+      deviceName.size() > CONTROL_DEVICE_NAME_MAX_LENGTH ||
+      m_pendingRenameResult) {
+    result->set_value(false);
+    return;
   }
 
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
@@ -451,7 +483,7 @@ bool HALSimXRP::RenameBluetoothDeviceOnLoop(std::string_view deviceName) {
                                     std::lock_guard lock(m_buffer_mutex);
                                     return GetBufferPool().Allocate();
                                   }};
-  m_xrp.SetupRenameDeviceBuffer(stream, deviceName);
+  uint16_t controlSeq = m_xrp.SetupRenameDeviceBuffer(stream, deviceName);
 
   size_t packetSize = 0;
   for (const auto& buf : sendBufs) {
@@ -472,9 +504,17 @@ bool HALSimXRP::RenameBluetoothDeviceOnLoop(std::string_view deviceName) {
     GetBufferPool().Release(sendBufs);
   }
 
-  return !packet.empty() &&
-         m_bluetoothClient->Send(packet,
-                                 wpi::net::BluetoothPacketSendMode::QUEUED);
+  if (packet.empty() ||
+      !m_bluetoothClient->Send(packet,
+                               wpi::net::BluetoothPacketSendMode::QUEUED)) {
+    result->set_value(false);
+    return;
+  }
+
+  m_pendingRenameSeq = controlSeq;
+  m_pendingRenameDeadline =
+      std::chrono::steady_clock::now() + RENAME_ACK_TIMEOUT;
+  m_pendingRenameResult = std::move(result);
 }
 
 XRPConnectionStatus HALSimXRP::GetConnectionStatus() const {
@@ -492,8 +532,12 @@ void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
   }
 
   // Hand this off to the XRP object to deal with the messages
-  m_xrp.HandleXRPUpdate(packet);
+  if (!m_xrp.HandleXRPUpdate(packet)) {
+    return;
+  }
   UpdateLatencyFromXRP(packet);
+  UpdateCommandAckFromXRP(packet);
+  CheckPendingRenameTimeout();
 }
 
 void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
@@ -539,6 +583,8 @@ uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {
 }
 
 void HALSimXRP::SendStateToXRP() {
+  CheckPendingRenameTimeout();
+
   wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
   wpi::net::raw_uv_ostream stream{sendBufs, [&] {
                                     std::lock_guard lock(m_buffer_mutex);
@@ -618,6 +664,31 @@ void HALSimXRP::UpdateLatencyFromXRP(std::span<const uint8_t> packet) {
   m_status.latencyControlSeq = timingEcho->lastControlSeq;
   m_status.roundTripLatencyMs = roundTripLatencyMs;
   m_status.xrpControlRxAgeMs = timingEcho->controlRxAgeUs / 1000.0;
+}
+
+void HALSimXRP::UpdateCommandAckFromXRP(std::span<const uint8_t> packet) {
+  auto commandAck = ReadCommandAck(packet);
+  if (!commandAck || !m_pendingRenameResult ||
+      commandAck->controlSeq != m_pendingRenameSeq ||
+      commandAck->controlFieldMask != CONTROL_DEVICE_NAME) {
+    return;
+  }
+
+  CompletePendingRename(commandAck->result == COMMAND_ACK_SUCCESS);
+}
+
+void HALSimXRP::CheckPendingRenameTimeout() {
+  if (m_pendingRenameResult &&
+      std::chrono::steady_clock::now() >= m_pendingRenameDeadline) {
+    CompletePendingRename(false);
+  }
+}
+
+void HALSimXRP::CompletePendingRename(bool success) {
+  auto result = std::exchange(m_pendingRenameResult, nullptr);
+  if (result) {
+    result->set_value(success);
+  }
 }
 
 void HALSimXRP::SetError(std::string_view error) {

@@ -77,8 +77,10 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
    * Queues a device name packet in sequence with periodic control packets.
    *
    * @param deviceName full Bluetooth name or suffix to send to the firmware.
-   * @return Future indicating whether the transport accepted the packet;
-   *         this does not acknowledge that the firmware saved the name.
+   * @return Future indicating whether the firmware acknowledged saving the
+   *         name. The future resolves false if the packet cannot be sent, the
+   *         firmware rejects it, the acknowledgement times out, or the
+   *         connection closes before the acknowledgement arrives.
    */
   std::future<bool> RenameBluetoothDevice(std::string_view deviceName);
   XRPConnectionStatus GetConnectionStatus() const;
@@ -135,8 +137,12 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
 
   void RecordControlPacketSent(std::span<const uint8_t> packet);
   void UpdateLatencyFromXRP(std::span<const uint8_t> packet);
+  void UpdateCommandAckFromXRP(std::span<const uint8_t> packet);
   void SendStateToXRP();
-  bool RenameBluetoothDeviceOnLoop(std::string_view deviceName);
+  void RenameBluetoothDeviceOnLoop(std::string_view deviceName,
+                                   std::shared_ptr<std::promise<bool>> result);
+  void CheckPendingRenameTimeout();
+  void CompletePendingRename(bool success);
   void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
   void SetError(std::string_view error);
   void RegisterSimProviders();
@@ -145,6 +151,9 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   std::unordered_map<uint16_t, std::chrono::steady_clock::time_point>
       m_controlPacketSendTimes;
   std::deque<uint16_t> m_controlPacketSendOrder;
+  std::shared_ptr<std::promise<bool>> m_pendingRenameResult;
+  std::chrono::steady_clock::time_point m_pendingRenameDeadline;
+  uint16_t m_pendingRenameSeq = 0;
   uint16_t m_lastLatencyControlSeq = 0;
   bool m_haveLastLatencyControlSeq = false;
 };

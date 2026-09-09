@@ -59,10 +59,13 @@ constexpr uint16_t STATUS_ANALOG_0 = 1u << 7;
 constexpr uint16_t STATUS_ANALOG_1 = 1u << 8;
 constexpr uint16_t STATUS_ANALOG_2 = 1u << 9;
 constexpr uint16_t STATUS_TIMING = 1u << 10;
+constexpr uint16_t STATUS_COMMAND_ACK = 1u << 11;
 constexpr uint16_t STATUS_ALL_FIELDS =
     STATUS_ENCODER_0 | STATUS_ENCODER_1 | STATUS_ENCODER_2 | STATUS_ENCODER_3 |
     STATUS_DIO | STATUS_GYRO | STATUS_ACCEL | STATUS_ANALOG_0 |
-    STATUS_ANALOG_1 | STATUS_ANALOG_2 | STATUS_TIMING;
+    STATUS_ANALOG_1 | STATUS_ANALOG_2 | STATUS_TIMING | STATUS_COMMAND_ACK;
+constexpr uint8_t COMMAND_ACK_SUCCESS = 0;
+constexpr uint8_t COMMAND_ACK_REJECTED = 1;
 
 template <typename T>
 struct XRPDataField {
@@ -95,6 +98,12 @@ struct XRPEncoderData {
   bool periodValid = false;
 };
 
+struct XRPCommandAckData {
+  uint16_t controlSeq = 0;
+  uint16_t controlFieldMask = 0;
+  uint8_t result = COMMAND_ACK_REJECTED;
+};
+
 struct XRPControlData {
   XRPPacketInfo packet;
   bool enabled = false;
@@ -110,6 +119,7 @@ struct XRPStatusData {
   XRPDataField<XRPGyroData> gyro;
   XRPDataField<XRPAxisData> accel;
   std::array<XRPDataField<float>, 3> analogInputs;
+  XRPDataField<XRPCommandAckData> commandAck;
 };
 
 struct XRPDataSnapshot {
@@ -126,11 +136,11 @@ class XRP {
   }
 
   void HandleWPILibUpdate(const wpi::util::json& data);
-  void HandleXRPUpdate(std::span<const uint8_t> packet);
+  bool HandleXRPUpdate(std::span<const uint8_t> packet);
 
   void SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf);
-  void SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
-                               std::string_view deviceName);
+  uint16_t SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
+                                   std::string_view deviceName);
 
   /**
    * Allows status packets from a new XRP connection to restart their sequence.
@@ -167,6 +177,7 @@ class XRP {
   void ReadDIOData(uint8_t presentMask, uint8_t valueMask);
   void ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet);
   void ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet);
+  void ReadCommandAckData(std::span<const uint8_t> packet);
 
   // Robot State
   std::map<uint8_t, bool> m_digital_outputs;

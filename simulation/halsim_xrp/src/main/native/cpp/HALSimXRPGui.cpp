@@ -54,6 +54,7 @@ constexpr double LATENCY_HISTORY_SECONDS = 10.0;
 constexpr size_t XRP_DEVICE_NAME_SUFFIX_MAX_LENGTH =
     CONTROL_DEVICE_NAME_MAX_LENGTH - XRP_DEVICE_NAME_PREFIX.size();
 constexpr auto XRP_RENAME_RECONNECT_DELAY = 9s;
+constexpr auto XRP_RENAME_RESTART_TIMEOUT = 10s;
 constexpr size_t LATENCY_MAX_SAMPLES = 1500;
 constexpr float LATENCY_PLOT_HEIGHT = 110.0f;
 constexpr double DATA_FADE_DELAY_SECONDS = 0.25;
@@ -144,7 +145,9 @@ struct GuiState {
   std::string renameDeviceNameSuffix;
   std::future<bool> pendingRename;
   bool renameReconnectPending = false;
+  bool renameRestartObserved = false;
   std::chrono::steady_clock::time_point renameReconnectTime;
+  std::chrono::steady_clock::time_point renameRestartDeadline;
   std::string renameReconnectTarget;
   XRPBluetoothAddressType renameReconnectAddressType =
       XRPBluetoothAddressType::RANDOM;
@@ -460,27 +463,50 @@ static void InitializeFromConnection(const XRPConnectionStatus& status) {
 }
 
 static void UpdateRenameReconnect(HALSimXRP& simXRP) {
+  auto now = std::chrono::steady_clock::now();
   if (gGui.pendingRename.valid()) {
     if (gGui.pendingRename.wait_for(0s) != std::future_status::ready) {
       return;
     }
     if (!gGui.pendingRename.get()) {
+      gGui.renameReconnectPending = false;
+      gGui.renameRestartObserved = false;
       gGui.commandStatus = "Rename failed; try again";
       return;
     }
     gGui.renameReconnectPending = true;
-    gGui.renameReconnectTime =
-        std::chrono::steady_clock::now() + XRP_RENAME_RECONNECT_DELAY;
+    gGui.renameRestartObserved = false;
+    gGui.renameRestartDeadline = now + XRP_RENAME_RESTART_TIMEOUT;
+    gGui.commandStatus = "Renaming XRP; waiting for restart";
+  }
+
+  if (!gGui.renameReconnectPending) {
+    return;
+  }
+
+  if (!gGui.renameRestartObserved) {
+    if (gGui.connectionStatus.connected || gGui.connectionStatus.connecting) {
+      if (now >= gGui.renameRestartDeadline) {
+        gGui.renameReconnectPending = false;
+        gGui.commandStatus =
+            "Rename did not restart XRP; still using previous target";
+      }
+      return;
+    }
+
+    gGui.renameRestartObserved = true;
+    gGui.renameReconnectTime = now + XRP_RENAME_RECONNECT_DELAY;
     UpsertDevice(gGui.renameReconnectTarget, gGui.renameReconnectAddressType,
                  gGui.renameReconnectName);
     simXRP.RememberBluetoothTarget(gGui.renameReconnectTarget,
                                    gGui.renameReconnectAddressType,
                                    gGui.renameReconnectName);
-    gGui.commandStatus = "Renaming XRP; waiting for restart";
+    gGui.commandStatus = "XRP restarted; waiting to reconnect";
+    return;
   }
-  if (!gGui.renameReconnectPending || gGui.connectionStatus.connected ||
-      gGui.connectionStatus.connecting ||
-      std::chrono::steady_clock::now() < gGui.renameReconnectTime) {
+
+  if (gGui.connectionStatus.connected || gGui.connectionStatus.connecting ||
+      now < gGui.renameReconnectTime) {
     return;
   }
 
@@ -494,6 +520,11 @@ static void UpdateRenameReconnect(HALSimXRP& simXRP) {
                           gGui.renameReconnectName);
   gGui.commandStatus = "Reconnecting to renamed XRP";
   gGui.commandOutput.clear();
+}
+
+static bool IsCommandRunning() {
+  return gGui.pendingCommand.valid() || gGui.pendingRename.valid() ||
+         gGui.renameReconnectPending;
 }
 
 static void ClearLatencyHistory() {
@@ -1252,8 +1283,9 @@ static bool CanConnectXRP(const XRPConnectionStatus& status,
          !IsConnectionActive(status);
 }
 
-static bool CanDisconnectXRP(const XRPConnectionStatus& status) {
-  return status.connected || status.connecting;
+static bool CanDisconnectXRP(const XRPConnectionStatus& status,
+                             bool commandRunning) {
+  return !commandRunning && (status.connected || status.connecting);
 }
 
 static bool CanRenameXRP(const XRPConnectionStatus& status,
@@ -1281,6 +1313,8 @@ static void RenameConnectedXRP(HALSimXRP& simXRP,
                                     ? newName
                                     : status.targetAddress;
   gGui.pendingRename = simXRP.RenameBluetoothDevice(newName);
+  gGui.renameReconnectPending = false;
+  gGui.renameRestartObserved = false;
   gGui.renameReconnectTarget = reconnectTarget;
   gGui.renameReconnectAddressType = status.addressType;
   gGui.renameReconnectName = newName;
@@ -1352,7 +1386,7 @@ static void DrawConnectionControls(HALSimXRP& simXRP,
   ImGui::EndDisabled();
 
   ImGui::SameLine();
-  ImGui::BeginDisabled(!CanDisconnectXRP(status));
+  ImGui::BeginDisabled(!CanDisconnectXRP(status, commandRunning));
   if (ImGui::Button("Disconnect")) {
     simXRP.DisconnectBluetooth();
   }
@@ -1384,8 +1418,7 @@ static void DrawXRPBluetoothWindow() {
 
   ImGui::Separator();
 
-  bool commandRunning =
-      gGui.pendingCommand.valid() || gGui.pendingRename.valid();
+  bool commandRunning = IsCommandRunning();
   if (status.supported) {
     DrawDeviceControls(commandRunning);
     DrawConnectionControls(*simXRP, status, commandRunning);
@@ -1540,8 +1573,7 @@ static void DrawXRPMenuBarStatusControls() {
   ImGui::SameLine((std::max)(currentX + style.ItemSpacing.x, targetX));
 
   const auto& status = gGui.connectionStatus;
-  bool commandRunning =
-      gGui.pendingCommand.valid() || gGui.pendingRename.valid();
+  bool commandRunning = IsCommandRunning();
   auto simXRP = gSimXRP.lock();
 
   DrawXRPConnectionBadge(status);
@@ -1553,7 +1585,7 @@ static void DrawXRPMenuBarStatusControls() {
   }
   ImGui::SameLine();
   if (XRPMenuIconButton("##XRPDisconnect", "Disconnect XRP",
-                        simXRP && CanDisconnectXRP(status),
+                        simXRP && CanDisconnectXRP(status, commandRunning),
                         XRPMenuIcon::DISCONNECT)) {
     simXRP->DisconnectBluetooth();
   }

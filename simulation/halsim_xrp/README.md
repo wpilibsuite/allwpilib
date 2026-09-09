@@ -24,7 +24,7 @@ The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linu
 
 GATT connections must support at least 85 bytes per notification (ATT MTU 88). The client checks this before reporting a connection. Windows and macOS manage MTU negotiation; Linux requests an MTU large enough for the configured packet capacity.
 
-Periodic control packets are best effort and are not retried when the transport is busy. macOS submits these writes without waiting for CoreBluetooth write readiness; Windows submits them without waiting for earlier WinRT writes to complete. A one-shot rename request is retained until the transport is ready (after outstanding writes complete on Windows); newer control packets are dropped while it is pending so they cannot make the rename's sequence stale. Acceptance for sending does not acknowledge that the firmware received or saved the name.
+Periodic control packets are best effort and are not retried when the transport is busy. macOS submits these writes without waiting for CoreBluetooth write readiness; Windows submits them without waiting for earlier WinRT writes to complete. A one-shot rename request is retained until the transport is ready (after outstanding writes complete on Windows); newer control packets are dropped while it is pending so they cannot make the rename's sequence stale. The firmware replies to the rename with an ACK-only status packet that reports whether the name was saved.
 
 ### macOS application permissions
 
@@ -91,8 +91,9 @@ A device name control packet must use only field bit 15. The payload may contain
 | 8     | AnalogIn 1   | _uint16_t_ value |
 | 9     | AnalogIn 2   | _uint16_t_ value |
 | 10    | Timing       | _uint16_t_ last control sequence, _uint16_t_ control receive age in 10 us units |
+| 11    | Command ACK  | _uint16_t_ control sequence, _uint16_t_ control field mask, _uint8_t_ result |
 
-XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`.
+XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`. Command ACK status packets are sent with only bit 11 set; result `0` is success and result `1` is rejected.
 
 #### Encoders
 
