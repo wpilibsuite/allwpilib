@@ -41,13 +41,25 @@ struct Instance {
 
   util::mutex tunablesMutex;
   struct TunableInfoImpl {
+    struct ParentLink {
+      TunableInfoImpl* parent;
+      std::string path;
+    };
+
+    struct ChildLink {
+      TunableInfoImpl* child;
+      std::string path;
+      std::string name;
+      bool ownedMember;
+    };
+
     uint32_t uid;
     detail::TunableBase* tunable;
     std::optional<TunableConfig> config;
     detail::TunableTypeValue type;
-    std::string name;
-    TunableInfoImpl* parent = nullptr;
-    std::vector<TunableInfoImpl*> children;
+    uint64_t tuneRevision = 0;
+    std::vector<ParentLink> parents;
+    std::vector<ChildLink> children;
     std::unique_ptr<detail::TunableMemberBase> member;
   };
   wpi::util::DenseMap<uint32_t, std::unique_ptr<TunableInfoImpl>> tunables;
@@ -146,31 +158,155 @@ static std::shared_ptr<TunableBackend> GetBackendForNormalizedPath(
   return nullptr;
 }
 
+struct ComplexParentMatch {
+  Instance::TunableInfoImpl* parent;
+  std::string name;
+};
+
+static std::optional<ComplexParentMatch> FindNearestComplexParentLocked(
+    Instance& inst, uint32_t childUid, std::string_view path) {
+  size_t bestPrefixSize = 0;
+  uint32_t bestParentUid = 0;
+  for (auto&& entry : inst.complexUidByPath) {
+    auto&& complexPath = entry.first;
+    uint32_t parentUid = entry.second;
+    if (parentUid == childUid) {
+      continue;
+    }
+    std::string childPrefix = detail::GetChildTablePath(complexPath);
+    if (wpi::util::starts_with(path, childPrefix) &&
+        childPrefix.size() > bestPrefixSize) {
+      bestPrefixSize = childPrefix.size();
+      bestParentUid = parentUid;
+    }
+  }
+
+  if (bestParentUid == 0) {
+    return std::nullopt;
+  }
+
+  auto parentIt = inst.tunables.find(bestParentUid);
+  if (parentIt == inst.tunables.end()) {
+    return std::nullopt;
+  }
+
+  return ComplexParentMatch{
+      parentIt->second.get(),
+      detail::NormalizeChildName(path.substr(bestPrefixSize))};
+}
+
+static void LinkComplexParentLocked(Instance& inst, uint32_t childUid,
+                                    std::string_view path, bool ownedMember) {
+  auto childIt = inst.tunables.find(childUid);
+  if (childIt == inst.tunables.end()) {
+    return;
+  }
+
+  auto parent = FindNearestComplexParentLocked(inst, childUid, path);
+  if (!parent) {
+    return;
+  }
+
+  auto& child = *childIt->second;
+  std::string pathString{path};
+  if (std::find_if(
+          child.parents.begin(), child.parents.end(), [&](const auto& link) {
+            return link.parent == parent->parent && link.path == pathString;
+          }) == child.parents.end()) {
+    child.parents.emplace_back(
+        Instance::TunableInfoImpl::ParentLink{parent->parent, pathString});
+  }
+
+  auto childLink =
+      std::find_if(parent->parent->children.begin(),
+                   parent->parent->children.end(), [&](const auto& link) {
+                     return link.child == &child && link.path == pathString;
+                   });
+  if (childLink != parent->parent->children.end()) {
+    childLink->ownedMember = childLink->ownedMember || ownedMember;
+    childLink->name = parent->name;
+  } else {
+    parent->parent->children.emplace_back(Instance::TunableInfoImpl::ChildLink{
+        &child, std::move(pathString), std::move(parent->name), ownedMember});
+  }
+}
+
+static void UnlinkComplexParentPathLocked(Instance& inst, uint32_t childUid,
+                                          std::string_view path) {
+  auto childIt = inst.tunables.find(childUid);
+  if (childIt == inst.tunables.end()) {
+    return;
+  }
+
+  auto& child = *childIt->second;
+  std::string pathString{path};
+  for (auto parentIt = child.parents.begin();
+       parentIt != child.parents.end();) {
+    if (parentIt->path != pathString) {
+      ++parentIt;
+      continue;
+    }
+    auto* parent = parentIt->parent;
+    std::erase_if(parent->children, [&](const auto& link) {
+      return link.child == &child && link.path == pathString;
+    });
+    parentIt = child.parents.erase(parentIt);
+  }
+}
+
+static void UnlinkAllComplexRelationsLocked(
+    Instance::TunableInfoImpl& tunable) {
+  for (auto&& parentLink : tunable.parents) {
+    auto* parent = parentLink.parent;
+    std::erase_if(parent->children,
+                  [&](const auto& link) { return link.child == &tunable; });
+  }
+  tunable.parents.clear();
+
+  for (auto&& childLink : tunable.children) {
+    auto* child = childLink.child;
+    std::erase_if(child->parents,
+                  [&](const auto& link) { return link.parent == &tunable; });
+  }
+  tunable.children.clear();
+}
+
+static void LinkExistingComplexDescendantsLocked(Instance& inst,
+                                                 std::string_view path) {
+  std::string childPrefix = detail::GetChildTablePath(path);
+  for (auto&& [childPath, childUid] : inst.complexChildUidByPath) {
+    if (wpi::util::starts_with(childPath, childPrefix)) {
+      LinkComplexParentLocked(inst, childUid, childPath, false);
+    }
+  }
+  for (auto&& [complexPath, childUid] : inst.complexUidByPath) {
+    if (complexPath != path &&
+        wpi::util::starts_with(complexPath, childPrefix)) {
+      LinkComplexParentLocked(inst, childUid, complexPath, false);
+    }
+  }
+}
+
 static void AddComplexPath(uint32_t uid, std::string_view path) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.tunablesMutex};
-  if (inst.complexUidByPath.contains(std::string{path})) {
+  std::string pathString{path};
+  if (inst.complexUidByPath.contains(pathString)) {
     return;
   }
-  inst.complexUidByPath[std::string{path}] = uid;
-  inst.complexPaths[uid].emplace_back(path);
+
+  LinkComplexParentLocked(inst, uid, pathString, false);
+  inst.complexUidByPath[pathString] = uid;
+  inst.complexPaths[uid].emplace_back(pathString);
+  LinkExistingComplexDescendantsLocked(inst, pathString);
 }
 
 static void AddComplexChildPath(uint32_t uid, std::string_view path) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.tunablesMutex};
-  size_t bestPrefixSize = 0;
-  for (auto&& entry : inst.complexUidByPath) {
-    auto&& complexPath = entry.first;
-    std::string childPrefix = detail::GetChildTablePath(complexPath);
-    if (wpi::util::starts_with(path, childPrefix) &&
-        childPrefix.size() > bestPrefixSize) {
-      bestPrefixSize = childPrefix.size();
-    }
-  }
-  if (bestPrefixSize != 0) {
-    inst.complexChildUidByPath[std::string{path}] = uid;
-  }
+  std::string pathString{path};
+  inst.complexChildUidByPath[pathString] = uid;
+  LinkComplexParentLocked(inst, uid, pathString, false);
 }
 
 static void RemoveComplexPaths(std::string_view path) {
@@ -184,6 +320,7 @@ static void RemoveComplexPaths(std::string_view path) {
     }
   }
   for (auto&& [complexPath, uid] : paths) {
+    UnlinkComplexParentPathLocked(inst, uid, complexPath);
     inst.complexUidByPath.erase(complexPath);
     auto pathsIt = inst.complexPaths.find(uid);
     if (pathsIt == inst.complexPaths.end()) {
@@ -203,7 +340,9 @@ static std::vector<uint32_t> RemoveComplexChildPaths(std::string_view path) {
   for (auto it = inst.complexChildUidByPath.begin();
        it != inst.complexChildUidByPath.end();) {
     if (detail::IsPathOrDescendant(it->first, path)) {
+      std::string childPath = it->first;
       uids.emplace_back(it->second);
+      UnlinkComplexParentPathLocked(inst, it->second, childPath);
       it = inst.complexChildUidByPath.erase(it);
     } else {
       ++it;
@@ -281,18 +420,6 @@ static void UpdateComplexTunables() {
   }
 }
 
-static std::string GetChildName(uint32_t parentUid, std::string_view path) {
-  size_t bestPrefixSize = 0;
-  for (auto&& parentPath : GetComplexPaths(parentUid)) {
-    std::string childPrefix = detail::GetChildTablePath(parentPath);
-    if (wpi::util::starts_with(path, childPrefix) &&
-        childPrefix.size() > bestPrefixSize) {
-      bestPrefixSize = childPrefix.size();
-    }
-  }
-  return detail::NormalizeChildName(path.substr(bestPrefixSize));
-}
-
 static void ResetChangedNow(uint32_t uid) {
   auto info = TunableRegistry::GetTunable(uid);
   if (info) {
@@ -332,6 +459,24 @@ void wpi::tunables::TunableRegistry::TunableInfo::ResetChanged() {
   if (tunable) {
     tunable->ResetTunableChanged();
   }
+}
+
+uint64_t TunableRegistry::GetTuneRevision(const detail::TunableBase& tunable) {
+  if (!detail::TunableBase::IsRegisteredUid(tunable.m_uid)) {
+    return 0;
+  }
+
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  auto it = inst.tunables.find(tunable.m_uid & detail::TunableBase::UID_MASK);
+  if (it == inst.tunables.end()) {
+    return 0;
+  }
+  return it->second->tuneRevision;
+}
+
+uint64_t TunableRegistry::GetTuneRevision(const ComplexTunable& tunable) {
+  return GetTuneRevision(static_cast<const detail::TunableBase&>(tunable));
 }
 
 void TunableRegistry::SetReportWarning(
@@ -465,13 +610,13 @@ bool TunableRegistry::PublishImpl(std::string_view path,
         type = info.type;
       }
       uint32_t uid = tunable.m_uid & detail::TunableBase::UID_MASK;
-      if (!backend->Publish(path, uid, tunable, config, type)) {
+      if (!backend->Publish(normalizedPath, uid, tunable, config, type)) {
         return false;
       }
       if (type == detail::TunableTypeValue::COMPLEX) {
-        AddComplexPath(uid, path);
+        AddComplexPath(uid, normalizedPath);
       } else {
-        AddComplexChildPath(uid, path);
+        AddComplexChildPath(uid, normalizedPath);
       }
       return true;
     }
@@ -495,7 +640,9 @@ bool TunableRegistry::Publish(std::string_view path, ComplexTunable& tunable) {
   if (!PublishImpl(path, static_cast<detail::TunableBase&>(tunable))) {
     return false;
   }
-  TunableTable table{detail::GetChildTablePath(path)};
+  std::string normalizedBuf;
+  std::string_view normalizedPath = detail::NormalizeName(path, normalizedBuf);
+  TunableTable table{detail::GetChildTablePath(normalizedPath)};
   tunable.PublishTunable(table);
   return true;
 }
@@ -539,7 +686,6 @@ bool TunableRegistry::Publish(
       }
       uint32_t memberUid = member->m_uid & detail::TunableBase::UID_MASK;
 
-      std::string childName = GetChildName(parentUid, path);
       {
         std::scoped_lock lock{inst.tunablesMutex};
         auto parentIt = inst.tunables.find(parentUid);
@@ -550,15 +696,14 @@ bool TunableRegistry::Publish(
             child.config = TunableConfig{};
           }
           child.config->parent = tunable;
-          child.parent = parentIt->second.get();
-          child.name = childName;
-          parentIt->second->children.emplace_back(&child);
+          LinkComplexParentLocked(inst, memberUid, normalizedPath, true);
           config = &*child.config;
         }
       }
 
       auto memberPtr = member.get();
-      if (!backend->Publish(path, memberUid, *memberPtr, config, type)) {
+      if (!backend->Publish(normalizedPath, memberUid, *memberPtr, config,
+                            type)) {
         UnregisterTunable(memberUid);
         return false;
       }
@@ -571,7 +716,7 @@ bool TunableRegistry::Publish(
         }
       }
 
-      AddComplexChildPath(memberUid, path);
+      AddComplexChildPath(memberUid, normalizedPath);
       return true;
     }
   }
@@ -653,8 +798,12 @@ void TunableRegistry::SetChildChanged(ComplexTunable& parent,
       return;
     }
     for (auto child : parentIt->second->children) {
-      if (child->name == childName) {
-        changedTunables.emplace_back(child->tunable);
+      if (child.name == childName) {
+        auto* tunable = child.child->tunable;
+        if (std::find(changedTunables.begin(), changedTunables.end(),
+                      tunable) == changedTunables.end()) {
+          changedTunables.emplace_back(tunable);
+        }
       }
     }
   }
@@ -784,12 +933,18 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
   {
     std::scoped_lock lock{inst.tunablesMutex};
     auto collect = [&](auto&& self, uint32_t curUid) -> void {
+      if (std::find(uidsToErase.begin(), uidsToErase.end(), curUid) !=
+          uidsToErase.end()) {
+        return;
+      }
       auto it = inst.tunables.find(curUid);
       if (it == inst.tunables.end()) {
         return;
       }
-      for (auto child : it->second->children) {
-        self(self, child->uid);
+      for (auto&& child : it->second->children) {
+        if (child.ownedMember) {
+          self(self, child.child->uid);
+        }
       }
       uidsToErase.emplace_back(curUid);
     };
@@ -810,6 +965,7 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
       if (auto pathsIt = inst.complexPaths.find(eraseUid);
           pathsIt != inst.complexPaths.end()) {
         for (auto&& path : pathsIt->second) {
+          UnlinkComplexParentPathLocked(inst, eraseUid, path);
           inst.complexUidByPath.erase(path);
         }
         inst.complexPaths.erase(pathsIt);
@@ -817,6 +973,8 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
       for (auto childIt = inst.complexChildUidByPath.begin();
            childIt != inst.complexChildUidByPath.end();) {
         if (childIt->second == eraseUid) {
+          std::string childPath = childIt->first;
+          UnlinkComplexParentPathLocked(inst, eraseUid, childPath);
           childIt = inst.complexChildUidByPath.erase(childIt);
         } else {
           ++childIt;
@@ -827,10 +985,7 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
         continue;
       }
       auto& info = *it->second;
-      if (info.parent) {
-        std::erase(info.parent->children, &info);
-      }
-      info.children.clear();
+      UnlinkAllComplexRelationsLocked(info);
       info.tunable->m_uid = detail::TunableBase::TYPE_FLAG | (eraseUid >> 24);
       auto& uidInfo = inst.uidInfo[eraseUid >> 24];
       uidInfo.freeUids.push_back(eraseUid & 0x00ffffff);
@@ -845,9 +1000,11 @@ void TunableRegistry::MoveTunable(uint32_t uid, detail::TunableBase* tunable) {
   auto it = inst.tunables.find(uid);
   if (it != inst.tunables.end()) {
     it->second->tunable = tunable;
-    for (auto child : it->second->children) {
-      if (child->config) {
-        child->config->parent = static_cast<ComplexTunable*>(tunable);
+    if (it->second->type == detail::TunableTypeValue::COMPLEX) {
+      for (auto&& child : it->second->children) {
+        if (child.child->config && child.child->config->parent) {
+          child.child->config->parent = static_cast<ComplexTunable*>(tunable);
+        }
       }
     }
   } else {
@@ -899,6 +1056,32 @@ void TunableRegistry::NotifyChanged(uint32_t uid) {
   std::scoped_lock lock{inst.backendsMutex};
   for (auto&& backend : inst.backendSnapshot) {
     backend->MarkDirty(uid);
+  }
+}
+
+void TunableRegistry::RecordTuneApplied(uint32_t uid) {
+  uid &= detail::TunableBase::UID_MASK;
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  auto it = inst.tunables.find(uid);
+  if (it == inst.tunables.end()) {
+    return;
+  }
+
+  std::vector<Instance::TunableInfoImpl*> records;
+  auto collect = [&](auto&& self, Instance::TunableInfoImpl* info) -> void {
+    if (std::find(records.begin(), records.end(), info) != records.end()) {
+      return;
+    }
+    records.emplace_back(info);
+    for (auto&& parent : info->parents) {
+      self(self, parent.parent);
+    }
+  };
+  collect(collect, it->second.get());
+
+  for (auto* info : records) {
+    ++info->tuneRevision;
   }
 }
 
