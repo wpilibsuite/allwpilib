@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -36,6 +38,7 @@ std::string NormalizeTablePath(const wpi::tunables::TunableTable& table,
 void RemoveRetainedPath(std::string_view path);
 void RemovePath(std::string_view path);
 void RemoveValue(pybind11::handle value);
+std::optional<uint64_t> GetRetainedTuneRevision(pybind11::handle value);
 void InitializeTunablePython(pybind11::module_& module);
 
 }  // namespace python
