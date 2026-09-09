@@ -87,6 +87,9 @@ public abstract class TunableBase {
   // returns true if the value has changed since the flag was last reset
   public boolean hasChanged() {...}
 
+  // returns the current backend-applied tune revision equality token
+  public long getTuneRevision() {...}
+
   // clears the changed flag; generally only called by backends
   public void resetChanged() {...}
 
@@ -101,6 +104,22 @@ public abstract class TunableBase {
 
   // returns the properties JSON string
   public String getProperties() {...}
+}
+```
+
+### Tune Revision
+
+Every tunable has a non-consuming tune revision. A newly constructed tunable starts at revision zero. The revision advances once for each tuning input that a backend successfully applies, including accepted inputs that produce the same stored value after clamping, canonicalization, or retained-value reconciliation. Invalid inputs rejected by the backend, writes to immutable tunables, direct local `set()` calls, assignment, in-place mutation, getter refreshes, ordinary publication, backend migration, and unpublish/republish operations do not advance it. If a robust publication applies a retained remote value during initial publication, that applied input does advance the revision.
+
+The revision belongs to the tunable instance and is shared by every publication alias for that instance. Reads have no side effects, so independent observers can save and compare the same current token. Treat the value as a 64-bit equality token and compare a saved value with `!=`; code should not rely on ordering, nonnegative signed interpretation, or indefinite monotonic range. The getter follows the same threading model as the rest of the tunable API and does not make tunable access thread-safe.
+
+```java
+long seenRevision = driveGain.getTuneRevision();
+
+// Later, normally after TunableRegistry.update()
+if (driveGain.getTuneRevision() != seenRevision) {
+  seenRevision = driveGain.getTuneRevision();
+  rebuildController(driveGain.get());
 }
 ```
 
@@ -488,6 +507,7 @@ public final class TunableRegistry {
   public static void update() {...}
 
   // backend helpers for update cycle ordering
+  public static void recordTuneApplied(TunableBase tunable) {...}
   public static void resetChangedAfterUpdate(TunableBase tunable) {...}
   public static void runAfterUpdate(Runnable callback) {...}
   public static void updateComplexIfNeeded(ComplexTunable tunable) {...}
@@ -532,6 +552,8 @@ The standard production backend is `NetworkTablesTunableBackend`, registered by 
 Custom backend implementations can use `org.wpilib.tunable.util.PathUtil` for path normalization and descendant checks. `normalizePrefix()` preserves a trailing slash for `removePrefix()` descendant-only matching; registry backend registration uses its own normalization so `/foo` and `/foo/` register the same backend prefix.
 
 `markDirty()` is called when a tunable with change-notification support is modified locally; backends can use this to avoid polling unchanged `GET_ON_CHANGE` values. Backends should call `resetChangedAfterUpdate()` after publishing a changed value so all registered backends can observe the changed flag during the same registry update, and should use `runAfterUpdate()` for non-throwing callbacks that react to tuned values.
+
+Backends should call `recordTuneApplied()` immediately after they successfully apply a tuning input and before scheduling the corresponding `onTune` callback. This keeps `getTuneRevision()` independent from callbacks, so tunables without a config or `onTune` handler still report remote tuning.
 
 Warning handlers installed with `setReportWarning()` must not throw.
 

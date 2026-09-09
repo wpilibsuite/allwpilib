@@ -152,6 +152,135 @@ def test_primitive_and_array_tunables_update_from_backend(backend):
     assert strings.get() == ["c", "d"]
 
 
+def test_tune_revision_tracks_mock_backend_applications(backend):
+    value = tunables.add("revision", 1)
+
+    observer_one_revision = value.get_tune_revision()
+    observer_two_revision = value.get_tune_revision()
+    assert observer_one_revision == 0
+    assert observer_two_revision == 0
+    assert value.get_tune_revision() == observer_one_revision
+
+    value.set(2)
+    value.mutate()
+    assert value.get_tune_revision() == 0
+
+    backend.set_int64("/revision", 3)
+    backend.set_int64("/revision", 3)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == 3
+    assert value.get_tune_revision() == 2
+    assert observer_one_revision != value.get_tune_revision()
+    assert observer_two_revision != value.get_tune_revision()
+
+    observer_one_revision = value.get_tune_revision()
+    observer_two_revision = value.get_tune_revision()
+    assert observer_one_revision == observer_two_revision
+
+    tunables.publish("revisionAlias", value)
+    backend.set_int64("/revisionAlias", 4)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == 4
+    assert value.get_tune_revision() == 3
+
+
+def test_tune_revision_covers_struct_arrays_and_getter_setter_tunables(backend):
+    integers = tunables.add("integerArrayRevision", [1, 2])
+    point = tunables.add("pointRevision", TunablePoint(3, 4))
+    retained = [7]
+    getter_setter = tunables.get_table().publish_int(
+        "getterSetterRevision",
+        lambda: retained[0],
+        lambda _value: None,
+    )
+
+    integers.mutate()[0] = 5
+    point.mutate().a = 6
+    retained[0] = 8
+    tunables.TunableRegistry.update()
+
+    assert integers.get_tune_revision() == 0
+    assert point.get_tune_revision() == 0
+    assert getter_setter.get_tune_revision() == 0
+
+    backend.set_int64_vector("/integerArrayRevision", [5, 2])
+    backend.set_struct("/pointRevision", TunablePoint(6, 4))
+    backend.set_int64("/getterSetterRevision", 99)
+    tunables.TunableRegistry.update()
+
+    assert integers.get_tune_revision() == 1
+    assert point.get_tune_revision() == 1
+    assert getter_setter.get_tune_revision() == 1
+    assert getter_setter.get() == 8
+
+
+def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):
+    wrong_type = tunables.add("wrongTypeRevision", 1.0)
+    immutable = tunables.add("immutableRevision", 5, mutable=False)
+
+    with pytest.raises(ValueError):
+        backend.set_int64("/wrongTypeRevision", 2)
+    backend.set_int64("/immutableRevision", 42)
+    tunables.TunableRegistry.update()
+
+    assert wrong_type.get_tune_revision() == 0
+    assert immutable.get_tune_revision() == 0
+    assert immutable.get() == 5
+
+
+def test_tune_revision_is_visible_inside_on_tune(backend):
+    calls = []
+    value = None
+
+    def on_tune(_tuned_value):
+        calls.append(value.get_tune_revision())
+        value.set(3.0)
+
+    value = tunables.add("callbackRevision", 1.0, on_tune=on_tune)
+
+    backend.set_double("/callbackRevision", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert calls == [1]
+    assert value.get() == pytest.approx(3.0)
+    assert value.get_tune_revision() == 1
+
+    tunables.TunableRegistry.update()
+
+    assert calls == [1]
+    assert value.get_tune_revision() == 1
+
+
+def test_tune_revision_is_shared_across_aliases_and_migration(backend):
+    value = tunables.add("sharedRevision", 1.0)
+    tunables.publish("sharedRevisionAlias", value)
+
+    backend.set_double("/sharedRevision", 2.0)
+    backend.set_double("/sharedRevisionAlias", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == pytest.approx(3.0)
+    assert value.get_tune_revision() == 2
+
+    tunables.remove("sharedRevision")
+    tunables.publish("sharedRevisionRepublished", value)
+    assert value.get_tune_revision() == 2
+
+    replacement_backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.register_backend(
+        "/sharedRevisionRepublished", replacement_backend
+    )
+    assert value.get_tune_revision() == 2
+
+    replacement_backend.set_double("/sharedRevisionRepublished", 4.0)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == pytest.approx(4.0)
+    assert value.get_tune_revision() == 3
+
+
 def test_mutate_updates_stored_primitive_array_tunables(backend):
     raw = tunables.add("raw", b"abc")
     booleans = tunables.add("booleans", [True, False])

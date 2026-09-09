@@ -45,6 +45,7 @@ struct Instance {
     detail::TunableBase* tunable;
     std::optional<TunableConfig> config;
     detail::TunableTypeValue type;
+    uint64_t tuneRevision = 0;
     std::string name;
     TunableInfoImpl* parent = nullptr;
     std::vector<TunableInfoImpl*> children;
@@ -332,6 +333,20 @@ void wpi::tunables::TunableRegistry::TunableInfo::ResetChanged() {
   if (tunable) {
     tunable->ResetTunableChanged();
   }
+}
+
+uint64_t wpi::tunables::detail::TunableBase::GetTuneRevision() const {
+  if (!IsRegisteredUid(m_uid)) {
+    return 0;
+  }
+
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  auto it = inst.tunables.find(m_uid & UID_MASK);
+  if (it == inst.tunables.end()) {
+    return 0;
+  }
+  return it->second->tuneRevision;
 }
 
 void TunableRegistry::SetReportWarning(
@@ -899,6 +914,16 @@ void TunableRegistry::NotifyChanged(uint32_t uid) {
   std::scoped_lock lock{inst.backendsMutex};
   for (auto&& backend : inst.backendSnapshot) {
     backend->MarkDirty(uid);
+  }
+}
+
+void TunableRegistry::RecordTuneApplied(uint32_t uid) {
+  uid &= detail::TunableBase::UID_MASK;
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  auto it = inst.tunables.find(uid);
+  if (it != inst.tunables.end()) {
+    ++it->second->tuneRevision;
   }
 }
 

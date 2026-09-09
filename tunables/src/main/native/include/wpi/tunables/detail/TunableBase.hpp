@@ -25,6 +25,30 @@ class WPILIB_DLLEXPORT TunableBase {
   friend class wpi::tunables::TunableRegistry;
   friend struct wpi::tunables::TunableRegistry::TunableInfo;
 
+ public:
+  /**
+   * Returns this tunable's tuning revision token.
+   *
+   * The token starts at zero and changes once for each tuning input that a
+   * backend successfully applies to this tunable. Direct local Set() calls,
+   * assignment, in-place mutation, and getter refreshes do not change it.
+   * Reading the token does not consume or reset it, so independent observers
+   * can each store a previous token and compare it to the current value with
+   * !=.
+   *
+   * Treat this as a 64-bit equality token. Do not rely on ordering or sign.
+   * This getter follows the same threading model as the rest of the tunable API
+   * and does not make tunable access thread-safe.
+   *
+   * The revision is stored in the registry record for registered tunables. Unit
+   * tests that call TunableRegistry::Reset() while a tunable is still alive
+   * discard that record; such stale objects report zero until they are
+   * re-created or otherwise re-registered.
+   *
+   * @return current tuning revision token
+   */
+  uint64_t GetTuneRevision() const;
+
  protected:
   struct ForceTunableRegister {};
 
