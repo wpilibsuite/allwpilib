@@ -23,6 +23,7 @@
 #include <imgui.h>
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
 
@@ -251,7 +252,7 @@ void BiquadStageNode::draw() {
   }
 
   // Keep stage nodes compact so multi-stage chains stay readable.
-  const float kItemWidth = 160.0f;
+  const float kItemWidth = ScaleToFont(160.0f);
 
   // Before the InputDouble, or the mirrored rate lags a frame behind.
   const Signal* input = getInVal<const Signal*>("in");

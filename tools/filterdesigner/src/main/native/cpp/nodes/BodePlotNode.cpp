@@ -30,6 +30,7 @@
 #include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/FilterResponse.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
 
@@ -128,7 +129,7 @@ void BodePlotNode::draw() {
         BiquadStageNode::UpstreamErrorFor(inPin(kInputNames[i]));
     if (!upstreamErr.empty()) {
       DrawStatusText(kStatusErrorColor, std::format("in{}: {}", i, upstreamErr),
-                     m_logic->plotWidth);
+                     ScaleToFont(m_logic->plotWidth));
     }
   }
 
@@ -147,7 +148,8 @@ void BodePlotNode::draw() {
     }
   }
 
-  ImVec2 plotSize{m_logic->plotWidth, m_logic->plotHeight};
+  ImVec2 plotSize{ScaleToFont(m_logic->plotWidth),
+                  ScaleToFont(m_logic->plotHeight)};
   if (ImPlot::BeginSubplots("##bode", 2, 1, plotSize,
                             ImPlotSubplotFlags_LinkAllX)) {
     ImPlotAxisFlags magFlags =
@@ -201,7 +203,7 @@ void BodePlotNode::draw() {
   }
 
   // Drag-resize grip, anchored to the end of the subplots block.
-  const float kGripSize = 12.0f;
+  const float kGripSize = ScaleToFont(12.0f);
   ImVec2 plotBR = ImGui::GetItemRectMax();
   ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
@@ -209,9 +211,10 @@ void BodePlotNode::draw() {
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     ImVec2 delta = ImGui::GetIO().MouseDelta;
     m_logic->plotWidth = std::max(BodePlotNodeLogic::kMinPlotWidth,
-                                  m_logic->plotWidth + delta.x);
-    m_logic->plotHeight = std::max(BodePlotNodeLogic::kMinPlotHeight,
-                                   m_logic->plotHeight + delta.y);
+                                  m_logic->plotWidth + ScaleFromFont(delta.x));
+    m_logic->plotHeight =
+        std::max(BodePlotNodeLogic::kMinPlotHeight,
+                 m_logic->plotHeight + ScaleFromFont(delta.y));
   }
   if (hovered || ImGui::IsItemActive()) {
     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);

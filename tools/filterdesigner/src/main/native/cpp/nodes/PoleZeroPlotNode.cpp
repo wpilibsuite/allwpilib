@@ -32,6 +32,7 @@
 #include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/PoleZero.hpp"
 #include "wpi/filterdesigner/nodes/BiquadStageNode.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
 
@@ -134,7 +135,7 @@ void PoleZeroPlotNode::draw() {
         BiquadStageNode::UpstreamErrorFor(inPin(kInputNames[i]));
     if (!upstreamErr.empty()) {
       DrawStatusText(kStatusErrorColor, std::format("in{}: {}", i, upstreamErr),
-                     m_logic->plotWidth);
+                     ScaleToFont(m_logic->plotWidth));
     }
   }
 
@@ -157,7 +158,8 @@ void PoleZeroPlotNode::draw() {
     BuildUnitCircle(circleX, circleY);
   }
 
-  ImVec2 plotSize{m_logic->plotWidth, m_logic->plotHeight};
+  ImVec2 plotSize{ScaleToFont(m_logic->plotWidth),
+                  ScaleToFont(m_logic->plotHeight)};
   // ImPlot shows a legend by default; SetupLegend only positions it.
   ImPlotFlags plotFlags = ImPlotFlags_Equal;
   if (!m_logic->showLegend) {
@@ -217,7 +219,7 @@ void PoleZeroPlotNode::draw() {
     ImPlot::EndPlot();
   }
 
-  const float kGripSize = 12.0f;
+  const float kGripSize = ScaleToFont(12.0f);
   ImVec2 plotBR = ImGui::GetItemRectMax();
   ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
@@ -225,9 +227,10 @@ void PoleZeroPlotNode::draw() {
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     ImVec2 delta = ImGui::GetIO().MouseDelta;
     m_logic->plotWidth = std::max(PoleZeroPlotNodeLogic::kMinPlotWidth,
-                                  m_logic->plotWidth + delta.x);
-    m_logic->plotHeight = std::max(PoleZeroPlotNodeLogic::kMinPlotHeight,
-                                   m_logic->plotHeight + delta.y);
+                                  m_logic->plotWidth + ScaleFromFont(delta.x));
+    m_logic->plotHeight =
+        std::max(PoleZeroPlotNodeLogic::kMinPlotHeight,
+                 m_logic->plotHeight + ScaleFromFont(delta.y));
   }
   if (hovered || ImGui::IsItemActive()) {
     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);

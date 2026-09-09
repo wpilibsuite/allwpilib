@@ -30,7 +30,7 @@ struct FrequencyPlotNodeLogic {
   /** If true, x-axis is log-scaled; default is linear. */
   bool logFrequency = false;
 
-  /** Canvas size in pixels. The node auto-sizes to it. */
+  /** Canvas size at the default font. The node auto-sizes to it. */
   float plotWidth = 600.0f;
   float plotHeight = 320.0f;
 

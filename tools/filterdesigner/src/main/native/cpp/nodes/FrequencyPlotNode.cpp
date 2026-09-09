@@ -28,6 +28,7 @@
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
 #include "wpi/filterdesigner/model/Spectrum.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -141,7 +142,8 @@ void FrequencyPlotNode::draw() {
                         gappy.c_str());
   }
 
-  ImVec2 plotSize{m_logic->plotWidth, m_logic->plotHeight};
+  ImVec2 plotSize{ScaleToFont(m_logic->plotWidth),
+                  ScaleToFont(m_logic->plotHeight)};
   // ImPlot shows a legend by default; SetupLegend only positions it.
   ImPlotFlags plotFlags =
       m_logic->showLegend ? ImPlotFlags_None : ImPlotFlags_NoLegend;
@@ -186,7 +188,7 @@ void FrequencyPlotNode::draw() {
     ImPlot::EndPlot();
   }
 
-  const float kGripSize = 12.0f;
+  const float kGripSize = ScaleToFont(12.0f);
   ImVec2 plotBR = ImGui::GetItemRectMax();
   ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
@@ -194,9 +196,10 @@ void FrequencyPlotNode::draw() {
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     ImVec2 delta = ImGui::GetIO().MouseDelta;
     m_logic->plotWidth = std::max(FrequencyPlotNodeLogic::kMinPlotWidth,
-                                  m_logic->plotWidth + delta.x);
-    m_logic->plotHeight = std::max(FrequencyPlotNodeLogic::kMinPlotHeight,
-                                   m_logic->plotHeight + delta.y);
+                                  m_logic->plotWidth + ScaleFromFont(delta.x));
+    m_logic->plotHeight =
+        std::max(FrequencyPlotNodeLogic::kMinPlotHeight,
+                 m_logic->plotHeight + ScaleFromFont(delta.y));
   }
   if (hovered || ImGui::IsItemActive()) {
     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);

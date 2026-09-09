@@ -8,6 +8,8 @@
 
 #include <imgui.h>
 
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
+
 namespace wpi::filterdesigner {
 
 /**
@@ -38,7 +40,7 @@ inline constexpr float kStatusWrapWidth = 300.0f;
 
 /** Draws @p text in @p color, word-wrapped at @p wrapWidth from the cursor. */
 inline void DrawStatusText(const ImVec4& color, std::string_view text,
-                           float wrapWidth = kStatusWrapWidth) {
+                           float wrapWidth = ScaleToFont(kStatusWrapWidth)) {
   ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapWidth);
   ImGui::PushStyleColor(ImGuiCol_Text, color);
   ImGui::TextUnformatted(text.data(), text.data() + text.size());
@@ -47,8 +49,8 @@ inline void DrawStatusText(const ImVec4& color, std::string_view text,
 }
 
 /** @ref DrawStatusText in the theme's disabled-text color. */
-inline void DrawStatusTextDisabled(std::string_view text,
-                                   float wrapWidth = kStatusWrapWidth) {
+inline void DrawStatusTextDisabled(
+    std::string_view text, float wrapWidth = ScaleToFont(kStatusWrapWidth)) {
   DrawStatusText(ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled), text,
                  wrapWidth);
 }

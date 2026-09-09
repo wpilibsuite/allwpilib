@@ -27,6 +27,7 @@
 #include <imgui_stdlib.h>
 
 #include "wpi/filterdesigner/nodes/NameTreePicker.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/SamplingReadout.hpp"
 #endif
 
@@ -295,7 +296,7 @@ void NT4SourceNode::draw() {
   // Unconditionally, so a freshly-picked topic starts filling next frame.
   m_logic->Update();
 
-  const float kItemWidth = 200.0f;
+  const float kItemWidth = ScaleToFont(200.0f);
 
   ImGui::BeginDisabled(m_clientStarted);
   int modeIdx = static_cast<int>(m_logic->serverMode);

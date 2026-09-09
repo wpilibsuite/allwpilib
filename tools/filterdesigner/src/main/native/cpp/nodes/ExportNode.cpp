@@ -25,6 +25,7 @@
 #include <imgui.h>
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
 
@@ -98,7 +99,7 @@ void ExportNode::draw() {
     return;
   }
 
-  const float kItemWidth = 220.0f;
+  const float kItemWidth = ScaleToFont(220.0f);
 
   int langIdx = static_cast<int>(m_logic->lang);
   ImGui::SetNextItemWidth(kItemWidth);

@@ -15,8 +15,9 @@ struct PoleZeroPlotNodeLogic {
   bool showLegend = true;
 
   /**
-   * Canvas size in pixels. The view is equal-aspect, so this changes how much
-   * of the plane is visible rather than distorting the unit circle.
+   * Canvas size at the default font. The view is equal-aspect, so this
+   * changes how much of the plane is visible rather than distorting the unit
+   * circle.
    */
   float plotWidth = 360.0f;
   float plotHeight = 360.0f;

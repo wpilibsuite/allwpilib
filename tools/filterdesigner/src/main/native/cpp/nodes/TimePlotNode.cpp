@@ -27,6 +27,7 @@
 #include <implot.h>
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -120,7 +121,8 @@ void TimePlotNode::draw() {
     return;
   }
 
-  ImVec2 plotSize{m_logic->plotWidth, m_logic->plotHeight};
+  ImVec2 plotSize{ScaleToFont(m_logic->plotWidth),
+                  ScaleToFont(m_logic->plotHeight)};
   // ImPlot shows a legend by default; SetupLegend only positions it.
   ImPlotFlags plotFlags =
       m_logic->showLegend ? ImPlotFlags_None : ImPlotFlags_NoLegend;
@@ -160,7 +162,7 @@ void TimePlotNode::draw() {
 
   // Safe as an interactive widget: ImNodeFlow only takes node-drag from the
   // header rectangle.
-  const float kGripSize = 12.0f;
+  const float kGripSize = ScaleToFont(12.0f);
   ImVec2 plotBR = ImGui::GetItemRectMax();
   ImGui::SetCursorScreenPos(ImVec2{plotBR.x - kGripSize, plotBR.y - kGripSize});
   ImGui::InvisibleButton("##resize", ImVec2{kGripSize, kGripSize});
@@ -168,9 +170,10 @@ void TimePlotNode::draw() {
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     ImVec2 delta = ImGui::GetIO().MouseDelta;
     m_logic->plotWidth = std::max(TimePlotNodeLogic::kMinPlotWidth,
-                                  m_logic->plotWidth + delta.x);
-    m_logic->plotHeight = std::max(TimePlotNodeLogic::kMinPlotHeight,
-                                   m_logic->plotHeight + delta.y);
+                                  m_logic->plotWidth + ScaleFromFont(delta.x));
+    m_logic->plotHeight =
+        std::max(TimePlotNodeLogic::kMinPlotHeight,
+                 m_logic->plotHeight + ScaleFromFont(delta.y));
   }
   if (hovered || ImGui::IsItemActive()) {
     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNWSE);

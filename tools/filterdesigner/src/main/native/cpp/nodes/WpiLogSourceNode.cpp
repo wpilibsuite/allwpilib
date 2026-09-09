@@ -29,6 +29,7 @@
 #include <implot.h>
 
 #include "wpi/filterdesigner/nodes/NameTreePicker.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/SamplingReadout.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
@@ -114,6 +115,11 @@ constexpr double kSnapFraction = 0.02;
 // stray Shift+click.
 constexpr float kMinWindowPixels = 4.0f;
 
+/** Floor applied to the measured content width, in current-font pixels. */
+float ContentWidth(float measured) {
+  return std::max(ScaleToFont(kMinContentWidth), measured);
+}
+
 // The pauses, and everything outside the window, are darkened rather than
 // hidden: what a selection leaves out is the point of looking at the strip.
 constexpr ImU32 kGapFill = IM_COL32(0, 0, 0, 90);
@@ -190,7 +196,7 @@ void WpiLogSourceNode::DrawTimeline() {
 
   if (!ImPlot::BeginPlot(
           "##timeline",
-          ImVec2{std::max(kMinContentWidth, m_contentWidth), kTimelineHeight},
+          ImVec2{ContentWidth(m_contentWidth), ScaleToFont(kTimelineHeight)},
           ImPlotFlags_NoTitle | ImPlotFlags_NoLegend | ImPlotFlags_NoMenus |
               ImPlotFlags_NoMouseText)) {
     inputMap.Pan = savedPan;
@@ -354,7 +360,7 @@ void WpiLogSourceNode::DrawBody() {
   }
   if (!m_logic->LoadError().empty()) {
     DrawStatusText(kStatusErrorColor, m_logic->LoadError(),
-                   std::max(kMinContentWidth, m_contentWidth));
+                   ContentWidth(m_contentWidth));
   }
   if (!m_logic->HasFile()) {
     ImGui::TextDisabled("No log loaded.");
@@ -366,7 +372,7 @@ void WpiLogSourceNode::DrawBody() {
 
   // Same width as the timeline, for the same reason: a log's entry names run
   // long and 220 px truncated most of them to "NT:/Spindexer/Vel...".
-  ImGui::SetNextItemWidth(std::max(kMinContentWidth, m_contentWidth));
+  ImGui::SetNextItemWidth(ContentWidth(m_contentWidth));
   const char* currentLabel = m_logic->SelectedEntry().empty()
                                  ? "<none>"
                                  : m_logic->SelectedEntry().c_str();
@@ -382,7 +388,7 @@ void WpiLogSourceNode::DrawBody() {
   DrawTimeline();
 
   if (const auto* signal = m_logic->Signal()) {
-    DrawSamplingReadout(*signal, std::max(kMinContentWidth, m_contentWidth));
+    DrawSamplingReadout(*signal, ContentWidth(m_contentWidth));
   }
 }
 

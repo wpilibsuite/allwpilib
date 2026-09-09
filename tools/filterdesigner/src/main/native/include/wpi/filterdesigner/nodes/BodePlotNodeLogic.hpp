@@ -26,7 +26,7 @@ struct BodePlotNodeLogic {
    */
   int numPoints = 512;
 
-  /** Canvas size in pixels; plotHeight covers both stacked subplots. */
+  /** Canvas size at the default font; plotHeight covers both subplots. */
   float plotWidth = 600.0f;
   float plotHeight = 360.0f;
 

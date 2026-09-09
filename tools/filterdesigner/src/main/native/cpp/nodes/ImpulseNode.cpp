@@ -17,6 +17,8 @@
 
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 #include <imgui.h>
+
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #endif
 
 namespace wpi::filterdesigner {
@@ -61,7 +63,7 @@ void ImpulseNode::Register(NodeRegistry& registry) {
 #ifndef RUNNING_FILTERDESIGNER_TESTS
 
 void ImpulseNode::draw() {
-  const float kItemWidth = 160.0f;
+  const float kItemWidth = ScaleToFont(160.0f);
   ImGui::SetNextItemWidth(kItemWidth);
   ImGui::InputDouble("Sample rate (Hz)", &m_logic->sampleRate, 0.0, 0.0,
                      "%.3f");

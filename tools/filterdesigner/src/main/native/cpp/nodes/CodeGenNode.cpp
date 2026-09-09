@@ -24,6 +24,7 @@
 #include <imgui.h>
 
 #include "wpi/filterdesigner/graph/Topology.hpp"
+#include "wpi/filterdesigner/nodes/NodeScale.hpp"
 #include "wpi/filterdesigner/nodes/StatusText.hpp"
 #endif
 
@@ -82,12 +83,12 @@ void CodeGenNode::draw() {
     return;
   }
 
-  const float kItemWidth = 220.0f;
+  const float kItemWidth = ScaleToFont(220.0f);
   // The code box grows to its widest line up to this, then scrolls. A section
   // line carries five 17-significant-digit doubles, so at the default font it
   // runs to roughly four times kItemWidth.
-  constexpr float kMaxCodeWidth = 720.0f;
-  constexpr float kMaxCodeHeight = 320.0f;
+  const float kMaxCodeWidth = ScaleToFont(720.0f);
+  const float kMaxCodeHeight = ScaleToFont(320.0f);
 
   int langIdx = static_cast<int>(m_logic->lang);
   ImGui::SetNextItemWidth(kItemWidth);
