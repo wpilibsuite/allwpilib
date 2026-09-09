@@ -208,6 +208,37 @@ def test_networktables_tunable_getter_setter_echoes_canonical_value(nt):
     assert value_entry.get_double(0.0) == pytest.approx(5.0)
 
 
+def test_networktables_tunable_revision_uses_native_backend_state(nt):
+    value = tunables.Tunable(1.0, robust=True)
+    tunables.publish("revision", value)
+
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+
+    nt.get_entry("/Tunables/revision/tune").set_double(2.0)
+    nt.flush()
+    tunables.TunableRegistry.update()
+
+    assert value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    retained = nt.get_topic("/Tunables/initialRevision/tune").generic_publish_ex(
+        "double", {"retained": True}
+    )
+    try:
+        retained.set_double(4.0)
+        nt.flush()
+
+        initial = tunables.Tunable(1.0, robust=True)
+        tunables.publish("initialRevision", initial)
+
+        assert initial.get() == pytest.approx(4.0)
+        assert tunables.TunableRegistry.get_tune_revision(initial) == 1
+    finally:
+        unpublish = getattr(retained, "unpublish", None)
+        if unpublish is not None:
+            unpublish()
+
+
 def test_selectable():
     chooser = tunables.Selectable()
     assert chooser.get_selected() is None

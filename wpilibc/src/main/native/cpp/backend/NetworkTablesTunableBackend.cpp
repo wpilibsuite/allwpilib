@@ -275,6 +275,7 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
     if (!DoUpdateTunable(info, value)) {
       return false;
     }
+    TunableRegistry::RecordTuneApplied(m_uid);
     NotifyRemoteSet(info);
     m_forceUpdate = true;
     return true;

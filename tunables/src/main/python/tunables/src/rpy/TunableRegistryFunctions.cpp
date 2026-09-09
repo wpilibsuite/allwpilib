@@ -6,7 +6,9 @@
 #include <string>
 #include <utility>
 
+#include "PyTunable.h"
 #include "TunableStorage.h"
+#include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
 #include "wpi/tunables/Tunables.hpp"
 
@@ -130,6 +132,24 @@ wpi::tunables::TunableTable GetRegistryTable(std::string_view path) {
 
 std::string NormalizeName(std::string_view path) {
   return NormalizePath(path);
+}
+
+uint64_t GetTuneRevision(py::handle value) {
+  if (py::isinstance<PyTunable>(value)) {
+    auto tunable = value.cast<std::shared_ptr<PyTunable>>();
+    return wpi::tunables::TunableRegistry::GetTuneRevision(tunable->GetBase());
+  }
+  if (py::isinstance<wpi::tunables::ComplexTunable>(value)) {
+    auto& tunable = value.cast<wpi::tunables::ComplexTunable&>();
+    return wpi::tunables::TunableRegistry::GetTuneRevision(tunable);
+  }
+  if (auto revision = GetRetainedTuneRevision(value)) {
+    return *revision;
+  }
+  if (py::hasattr(value, "publish_tunables")) {
+    return 0;
+  }
+  throw py::type_error("value must be a tunables.Tunable or ComplexTunable");
 }
 
 void Remove(RemovableValue value) {

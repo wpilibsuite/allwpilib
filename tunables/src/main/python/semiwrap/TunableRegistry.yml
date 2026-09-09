@@ -59,6 +59,10 @@ classes:
         ignore: true
       ResetChangedAfterUpdate:
         ignore: true
+      RecordTuneApplied:
+        no_release_gil: true
+      GetTuneRevision:
+        ignore: true
       RunAfterUpdate:
         ignore: true
       GetUpdateMutex:
@@ -80,6 +84,12 @@ classes:
       MoveTunable:
         ignore: true
     inline_code: |
+      .def_static(
+          "get_tune_revision",
+          &wpi::tunables::python::GetTuneRevision, py::arg("value"),
+          "Return the native 64-bit tune revision equality token for a "
+          "tunable or complex tunable. Save the returned value and compare it "
+          "with != to detect backend-applied tuning.")
       .def_static("get_table", &wpi::tunables::python::GetRegistryTable,
                   py::arg("path"))
       .def_static("normalize_name", &wpi::tunables::python::NormalizeName,

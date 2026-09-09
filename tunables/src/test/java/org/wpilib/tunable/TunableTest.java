@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -430,6 +431,164 @@ class TunableTest {
     assertEquals(20L, longValue.get());
     assertEquals(30.0f, floatValue.get());
     assertEquals(40.0, doubleValue.get());
+  }
+
+  @Test
+  void testTuneRevisionTracksMockBackendRemoteApplications() {
+    TunableInt tunable = TunableInt.create(1);
+
+    long observerOneRevision = TunableRegistry.getTuneRevision(tunable);
+    long observerTwoRevision = TunableRegistry.getTuneRevision(tunable);
+    assertEquals(0, observerOneRevision);
+    assertEquals(0, observerTwoRevision);
+    assertEquals(observerOneRevision, TunableRegistry.getTuneRevision(tunable));
+
+    tunable.set(2);
+    assertEquals(0, TunableRegistry.getTuneRevision(tunable));
+
+    Tunables.publish("revision", tunable);
+    assertEquals(0, TunableRegistry.getTuneRevision(tunable));
+
+    m_mock.setInt("/revision", 3);
+    m_mock.setInt("/revision", 3);
+    TunableRegistry.update();
+
+    assertEquals(3, tunable.get());
+    assertEquals(2, TunableRegistry.getTuneRevision(tunable));
+    assertNotEquals(observerOneRevision, TunableRegistry.getTuneRevision(tunable));
+    assertNotEquals(observerTwoRevision, TunableRegistry.getTuneRevision(tunable));
+
+    observerOneRevision = TunableRegistry.getTuneRevision(tunable);
+    observerTwoRevision = TunableRegistry.getTuneRevision(tunable);
+    assertEquals(observerOneRevision, observerTwoRevision);
+
+    Tunables.publish("revisionAlias", tunable);
+    m_mock.setInt("/revisionAlias", 4);
+    TunableRegistry.update();
+
+    assertEquals(4, tunable.get());
+    assertEquals(3, TunableRegistry.getTuneRevision(tunable));
+
+    Tunables.remove("revision");
+    Tunables.publish("revisionRepublished", tunable);
+    assertEquals(3, TunableRegistry.getTuneRevision(tunable));
+
+    MockTunableBackend childBackend = new MockTunableBackend();
+    TunableRegistry.registerBackend("/revisionRepublished", childBackend);
+    assertEquals(3, TunableRegistry.getTuneRevision(tunable));
+
+    childBackend.setInt("/revisionRepublished", 5);
+    TunableRegistry.update();
+
+    assertEquals(5, tunable.get());
+    assertEquals(4, TunableRegistry.getTuneRevision(tunable));
+  }
+
+  @Test
+  void testTuneRevisionCoversStructuredAndGetterSetterTunables() {
+    Tunable<int[]> array = Tunable.create(new int[] {1, 2});
+    Tunable<StructThing> struct = Tunable.create(new StructThing(1));
+    final int[] retained = {7};
+    TunableInt getterSetter =
+        TunableInt.create(
+            () -> retained[0],
+            value -> {
+              // Accepted backend inputs count even when a setter retains its value.
+            });
+
+    Tunables.publish("arrayRevision", array);
+    Tunables.publish("structRevision", struct);
+    Tunables.publish("getterSetterRevision", getterSetter);
+
+    array.set(new int[] {9, 10});
+    struct.set(new StructThing(2));
+    getterSetter.set(8);
+    assertEquals(0, TunableRegistry.getTuneRevision(array));
+    assertEquals(0, TunableRegistry.getTuneRevision(struct));
+    assertEquals(0, TunableRegistry.getTuneRevision(getterSetter));
+
+    m_mock.setArray("/arrayRevision", new int[] {9, 10});
+    m_mock.setValue("/structRevision", new StructThing(2));
+    m_mock.setInt("/getterSetterRevision", 99);
+    TunableRegistry.update();
+
+    assertEquals(1, TunableRegistry.getTuneRevision(array));
+    assertEquals(1, TunableRegistry.getTuneRevision(struct));
+    assertEquals(1, TunableRegistry.getTuneRevision(getterSetter));
+    assertEquals(7, getterSetter.get());
+  }
+
+  @Test
+  void testTuneRevisionPropagatesFromComplexChildren() {
+    DynamicComplex complex = new DynamicComplex();
+    Tunables.publish("complexRevision", complex);
+
+    assertEquals(0, TunableRegistry.getTuneRevision(complex));
+    assertEquals(0, TunableRegistry.getTuneRevision(complex.m_initial));
+
+    m_mock.setDouble("/complexRevision/initial", 2.0);
+    TunableRegistry.update();
+
+    assertEquals(2.0, complex.m_initial.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(complex.m_initial));
+    assertEquals(1, TunableRegistry.getTuneRevision(complex));
+
+    complex.publishDynamic();
+    m_mock.setDouble("/complexRevision/dynamic", 3.0);
+    TunableRegistry.update();
+
+    assertEquals(3.0, complex.m_dynamic.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(complex.m_dynamic));
+    assertEquals(2, TunableRegistry.getTuneRevision(complex));
+  }
+
+  @Test
+  void testTuneRevisionIgnoresRejectedAndImmutableMockInputs() {
+    TunableDouble wrongType = TunableDouble.create(1.0);
+    TunableInt immutable = TunableInt.createConfig(5, TunableConfig.of(TunableOption.IMMUTABLE));
+
+    Tunables.publish("wrongTypeRevision", wrongType);
+    Tunables.publish("immutableRevision", immutable);
+
+    assertThrows(IllegalArgumentException.class, () -> m_mock.setInt("/wrongTypeRevision", 2));
+    m_mock.setInt("/immutableRevision", 42);
+    TunableRegistry.update();
+
+    assertEquals(0, TunableRegistry.getTuneRevision(wrongType));
+    assertEquals(0, TunableRegistry.getTuneRevision(immutable));
+    assertEquals(5, immutable.get());
+  }
+
+  @Test
+  void testTuneRevisionIsVisibleInsideOnTune() {
+    AtomicReference<Long> callbackRevision = new AtomicReference<>();
+    AtomicInteger calls = new AtomicInteger();
+    AtomicReference<TunableDouble> tunableReference = new AtomicReference<>();
+    TunableConfig config =
+        TunableConfig.of(
+            TunableOption.onTune(
+                () -> {
+                  TunableDouble tunable = tunableReference.get();
+                  callbackRevision.set(TunableRegistry.getTuneRevision(tunable));
+                  calls.incrementAndGet();
+                  tunable.set(3.0);
+                }));
+    TunableDouble tunable = TunableDouble.createConfig(1.0, config);
+    tunableReference.set(tunable);
+    Tunables.publish("callbackRevision", tunable);
+
+    m_mock.setDouble("/callbackRevision", 2.0);
+    TunableRegistry.update();
+
+    assertEquals(1, calls.get());
+    assertEquals(1L, callbackRevision.get());
+    assertEquals(3.0, tunable.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+
+    TunableRegistry.update();
+
+    assertEquals(1, calls.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(tunable));
   }
 
   @Test
@@ -1343,6 +1502,11 @@ class TunableTest {
 
     Tunables.publish("custom", custom);
     assertEquals(7, m_mock.getInteger("/custom"));
+
+    m_mock.setInt("/custom", 8);
+    TunableRegistry.update();
+    assertEquals(new CustomThing(8), custom.get());
+    assertEquals(1, TunableRegistry.getTuneRevision(custom));
 
     Tunable<int[]> ints = Tunable.create(new int[] {1, 2});
     Tunables.publish("ints", ints);

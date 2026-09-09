@@ -256,6 +256,15 @@ void RemoveValue(py::handle value) {
   }
 }
 
+std::optional<uint64_t> GetRetainedTuneRevision(py::handle value) {
+  for (auto&& entry : GetComplexValues()) {
+    if (entry.second->IsValue(value)) {
+      return wpi::tunables::TunableRegistry::GetTuneRevision(*entry.second);
+    }
+  }
+  return std::nullopt;
+}
+
 void InitializeTunablePython(py::module_& module) {
   RegisterPreUpdateCallback();
 
