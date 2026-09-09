@@ -761,8 +761,11 @@ public final class Scheduler implements ProtobufSerializable {
     m_queuedToRun.removeIf(state -> state.command() == command);
 
     if (running) {
-      // Only run the hook if the command was running. If it was on deck or not
+      // Only run the hooks if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
+      // Always run onExit first, in case cancellation has special behavior that overrides
+      // standard exit logic.
+      command.onExit();
       command.onCancel();
       emitCanceledEvent(command);
     }
@@ -964,6 +967,7 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void handleCommandCompletion(Command command) {
+    command.onExit();
     emitCompletedEvent(command);
     m_runningCommands.remove(command);
     removeOrphanedChildren(command);
@@ -1202,6 +1206,9 @@ public final class Scheduler implements ProtobufSerializable {
       var entry = liveIter.next();
       liveIter.remove();
       Command canceledCommand = entry.getKey();
+      // Always run onExit first, in case cancellation has special behavior that overrides
+      // standard exit logic.
+      canceledCommand.onExit();
       canceledCommand.onCancel();
       emitCanceledEvent(canceledCommand);
     }
