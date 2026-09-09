@@ -907,20 +907,30 @@ static void LoadDefaultFont() {
 }
 
 static void UpdateFontScale() {
-  // Scale based on OS window content scaling
+  // Content scale only. ImGui lays out in points and applies the window's
+  // pixel density itself through DisplayFramebufferScale, so folding the
+  // density in here as well would scale fonts twice.
   float windowScale = 1.0;
   if (gContext->window) {
-    windowScale = SDL_GetWindowDisplayScale(gContext->window);
+    windowScale =
+        SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(gContext->window));
     if (windowScale <= 0.0f) {
       windowScale = 1.0f;
     }
   }
-  float fontScale = gContext->userScale / 100.0 * windowScale;
-  if (fontScale < 0.5) {
-    fontScale = 0.5;
+  float uiScale = gContext->userScale / 100.0 * windowScale;
+  if (uiScale < 0.5) {
+    uiScale = 0.5;
   }
-  ImGui::GetStyle().FontSizeBase = 11;
-  ImGui::GetStyle().FontScaleDpi = fontScale;
+  ImGui::GetStyle().FontSizeBase = 13;
+  ImGui::GetStyle().FontScaleDpi = uiScale;
+
+  // ImGui never scales style metrics itself, so rebuild them on a zoom
+  // change; otherwise the text grows inside boxes that stay put.
+  if (uiScale != gContext->styleScale) {
+    gContext->styleScale = uiScale;
+    SetStyle(static_cast<Style>(gContext->style));
+  }
 }
 
 static void ShutdownGuiSystem(bool deleteSettingsFile) {
@@ -1070,9 +1080,9 @@ bool gui::Initialize(const char* title, int width, int height,
   if (!gContext->loadedWidthHeight) {
     // force user scale if window scale is smaller
     if (windowScale <= 0.5) {
-      gContext->userScale = 0;
+      gContext->userScale = 50;
     } else if (windowScale <= 0.75) {
-      gContext->userScale = 1;
+      gContext->userScale = 75;
     }
     if (windowScale != 1.0) {
       for (auto&& func : gContext->windowScalers) {
@@ -1828,10 +1838,18 @@ static void ApplyCommonStyle(Style selectedStyle) {
   plotStyle.Colors[ImPlotCol_AxisBgActive] = withAlpha(palette.accent, 0.55f);
   plotStyle.Colors[ImPlotCol_Selection] = withAlpha(palette.accent, 0.45f);
   plotStyle.Colors[ImPlotCol_Crosshairs] = palette.accentStrong;
+  plotStyle.PlotDefaultSize = ImVec2(400.0f, 300.0f);
+  plotStyle.PlotMinSize = ImVec2(200.0f, 150.0f);
   plotStyle.PlotBorderSize = 1.0f;
   plotStyle.MinorAlpha = 0.18f;
   plotStyle.MajorTickLen = ImVec2(6.0f, 6.0f);
   plotStyle.MinorTickLen = ImVec2(3.0f, 3.0f);
+  plotStyle.MajorTickSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MinorTickSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MajorGridSize = ImVec2(1.0f, 1.0f);
+  plotStyle.MinorGridSize = ImVec2(1.0f, 1.0f);
+  plotStyle.DigitalPadding = 20.0f;
+  plotStyle.DigitalSpacing = 4.0f;
   plotStyle.PlotPadding = ImVec2(12.0f, 12.0f);
   plotStyle.LabelPadding = ImVec2(8.0f, 6.0f);
   plotStyle.LegendPadding = ImVec2(10.0f, 10.0f);
@@ -1844,11 +1862,91 @@ static void ApplyCommonStyle(Style selectedStyle) {
   gContext->clearColor = palette.canvas;
 }
 
+static void ScaleStyle(float scale) {
+  ImGuiStyle& style = ImGui::GetStyle();
+  const ImGuiStyle& unscaled = *gContext->unscaledStyle;
+  style.ScaleAllSizes(scale);
+
+  // ScaleAllSizes truncates, so a metric of 1 rounds away to nothing below
+  // 100%. Keep the ones that were non-zero non-zero.
+  auto keepHairline = [](float scaled, float base) {
+    return (base > 0.0f && scaled < 1.0f) ? 1.0f : scaled;
+  };
+  style.WindowBorderSize =
+      keepHairline(style.WindowBorderSize, unscaled.WindowBorderSize);
+  style.ChildBorderSize =
+      keepHairline(style.ChildBorderSize, unscaled.ChildBorderSize);
+  style.PopupBorderSize =
+      keepHairline(style.PopupBorderSize, unscaled.PopupBorderSize);
+  style.FrameBorderSize =
+      keepHairline(style.FrameBorderSize, unscaled.FrameBorderSize);
+  style.TabBorderSize =
+      keepHairline(style.TabBorderSize, unscaled.TabBorderSize);
+  style.TabBarBorderSize =
+      keepHairline(style.TabBarBorderSize, unscaled.TabBarBorderSize);
+  style.SeparatorSize =
+      keepHairline(style.SeparatorSize, unscaled.SeparatorSize);
+  style.TreeLinesSize =
+      keepHairline(style.TreeLinesSize, unscaled.TreeLinesSize);
+  // Zero would draw no software cursor, and ImGui also multiplies the
+  // tooltip offset by it.
+  style.MouseCursorScale =
+      keepHairline(style.MouseCursorScale, unscaled.MouseCursorScale);
+
+  // ImPlot has no ScaleAllSizes of its own, and ApplyCommonStyle rewrites
+  // every one of these from constants on the call above, so the values read
+  // here are unscaled and scaling them cannot compound.
+  ImPlotStyle& plotStyle = ImPlot::GetStyle();
+  const ImPlotStyle plotBase = plotStyle;
+  auto keepHairlineVec = [&keepHairline](ImVec2 scaled, ImVec2 base) {
+    return ImVec2{keepHairline(scaled.x, base.x),
+                  keepHairline(scaled.y, base.y)};
+  };
+  plotStyle.PlotBorderSize = keepHairline(
+      ImTrunc(plotStyle.PlotBorderSize * scale), plotBase.PlotBorderSize);
+  plotStyle.MajorTickSize = keepHairlineVec(
+      ImTrunc(plotStyle.MajorTickSize * scale), plotBase.MajorTickSize);
+  plotStyle.MinorTickSize = keepHairlineVec(
+      ImTrunc(plotStyle.MinorTickSize * scale), plotBase.MinorTickSize);
+  plotStyle.MajorGridSize = keepHairlineVec(
+      ImTrunc(plotStyle.MajorGridSize * scale), plotBase.MajorGridSize);
+  plotStyle.MinorGridSize = keepHairlineVec(
+      ImTrunc(plotStyle.MinorGridSize * scale), plotBase.MinorGridSize);
+  plotStyle.PlotDefaultSize = ImTrunc(plotStyle.PlotDefaultSize * scale);
+  plotStyle.PlotMinSize = ImTrunc(plotStyle.PlotMinSize * scale);
+  plotStyle.DigitalPadding = ImTrunc(plotStyle.DigitalPadding * scale);
+  plotStyle.DigitalSpacing = ImTrunc(plotStyle.DigitalSpacing * scale);
+  plotStyle.MajorTickLen = ImTrunc(plotStyle.MajorTickLen * scale);
+  plotStyle.MinorTickLen = ImTrunc(plotStyle.MinorTickLen * scale);
+  plotStyle.PlotPadding = ImTrunc(plotStyle.PlotPadding * scale);
+  plotStyle.LabelPadding = ImTrunc(plotStyle.LabelPadding * scale);
+  plotStyle.LegendPadding = ImTrunc(plotStyle.LegendPadding * scale);
+  plotStyle.LegendInnerPadding = ImTrunc(plotStyle.LegendInnerPadding * scale);
+  plotStyle.LegendSpacing = ImTrunc(plotStyle.LegendSpacing * scale);
+  plotStyle.MousePosPadding = ImTrunc(plotStyle.MousePosPadding * scale);
+  plotStyle.AnnotationPadding = ImTrunc(plotStyle.AnnotationPadding * scale);
+}
+
 void gui::SetStyle(Style style) {
   gContext->style = static_cast<int>(style);
   if (!ImGui::GetCurrentContext()) {
     return;
   }
+  // From the unscaled baseline each time: ScaleAllSizes multiplies in place,
+  // and ApplyCommonStyle rewrites only some of what it scales, so the rest
+  // would compound across zoom changes. The font fields belong to
+  // UpdateFontScale, which runs before this.
+  ImGuiStyle& current = ImGui::GetStyle();
+  const float fontSizeBase = current.FontSizeBase;
+  const float fontScaleMain = current.FontScaleMain;
+  const float fontScaleDpi = current.FontScaleDpi;
+  if (gContext->unscaledStyle) {
+    current = *gContext->unscaledStyle;
+  }
+  current.FontSizeBase = fontSizeBase;
+  current.FontScaleMain = fontScaleMain;
+  current.FontScaleDpi = fontScaleDpi;
+
   switch (style) {
     case Style::CLASSIC:
       ImGui::StyleColorsClassic();
@@ -1868,6 +1966,11 @@ void gui::SetStyle(Style style) {
       break;
   }
   ApplyCommonStyle(style);
+
+  // Captured before scaling, so the next call rebuilds from it. Anything the
+  // application set on the style rides along rather than being reset.
+  gContext->unscaledStyle = current;
+  ScaleStyle(gContext->styleScale);
 }
 
 void gui::SetFPS(int fps) {

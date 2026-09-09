@@ -6,6 +6,7 @@
 
 #include <atomic>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,6 +35,11 @@ struct SavedSettings {
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};
+
+  // Scale the style metrics were last built at, and the pre-scale style they
+  // were built from. The baseline carries any fields the app set itself.
+  float styleScale = 1.0f;
+  std::optional<ImGuiStyle> unscaledStyle;
 
   std::string title;
   int defaultWidth;
