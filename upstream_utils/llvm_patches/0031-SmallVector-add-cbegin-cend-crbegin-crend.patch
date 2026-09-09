@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 26 May 2026 16:55:28 -0700
-Subject: [PATCH 33/34] SmallVector: add cbegin()/cend()/crbegin()/crend()
+Subject: [PATCH 31/32] SmallVector: add cbegin()/cend()/crbegin()/crend()
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index d99edbbf0260bd41fd64a60fbef6a1c3d39e721d..e1683723e781da48feff9c317112229bf75ede2f 100644
+index 8c40be4537192a6bfe96572d8bf32fb3b5bcbabf..e9e273c5c21f9f5dcd37826474971fedfb664156 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -282,14 +282,18 @@ public:
+@@ -278,14 +278,18 @@ public:
    // forward iterator creation methods.
    iterator begin() { return (iterator)this->BeginX; }
    const_iterator begin() const { return (const_iterator)this->BeginX; }
