@@ -39,7 +39,7 @@ build --tool_java_language_version=25
 build --tool_java_runtime_version=remotejdk_25
 
 test --test_output=errors
-test --test_verbose_timeout_warnings
+test --notest_verbose_timeout_warnings
 
 import %workspace%/shared/bazel/compiler_flags/sanitizers.rc
 import %workspace%/shared/bazel/compiler_flags/linux_flags.rc
