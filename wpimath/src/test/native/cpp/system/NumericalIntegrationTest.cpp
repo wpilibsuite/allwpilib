@@ -58,9 +58,9 @@ TEST_CASE("NumericalIntegrationTest RK4TimeVarying", "[wpimath]") {
              1e-3);
 }
 
-// Tests that integrating dx/dt = 0 works with RKDP
-TEST_CASE("NumericalIntegrationTest ZeroRKDP", "[wpimath]") {
-  wpi::math::Vectord<1> y1 = wpi::math::RKDP(
+// Tests that integrating dx/dt = 0 works with Tsit5
+TEST_CASE("NumericalIntegrationTest ZeroTsit5", "[wpimath]") {
+  wpi::math::Vectord<1> y1 = wpi::math::Tsit5(
       [](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return wpi::math::Vectord<1>::Zero();
       },
@@ -68,11 +68,11 @@ TEST_CASE("NumericalIntegrationTest ZeroRKDP", "[wpimath]") {
   CHECK_NEAR(y1(0), 0.0, 1e-3);
 }
 
-// Tests that integrating dx/dt = eˣ works with RKDP
-TEST_CASE("NumericalIntegrationTest ExponentialRKDP", "[wpimath]") {
+// Tests that integrating dx/dt = eˣ works with Tsit5
+TEST_CASE("NumericalIntegrationTest ExponentialTsit5", "[wpimath]") {
   wpi::math::Vectord<1> y0{0.0};
 
-  wpi::math::Vectord<1> y1 = wpi::math::RKDP(
+  wpi::math::Vectord<1> y1 = wpi::math::Tsit5(
       [](const wpi::math::Vectord<1>& x, const wpi::math::Vectord<1>& u) {
         return wpi::math::Vectord<1>{std::exp(x(0))};
       },
@@ -80,7 +80,7 @@ TEST_CASE("NumericalIntegrationTest ExponentialRKDP", "[wpimath]") {
   CHECK_NEAR(y1(0), std::exp(0.1) - std::exp(0), 1e-3);
 }
 
-// Tests RKDP with a time varying solution. From
+// Tests Tsit5 with a time varying solution. From
 // http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
 //
 //   dx/dt = x(2/(eᵗ + 1) - 1)
@@ -88,11 +88,11 @@ TEST_CASE("NumericalIntegrationTest ExponentialRKDP", "[wpimath]") {
 // The true (analytical) solution is:
 //
 //   x(t) = 12eᵗ/(eᵗ + 1)²
-TEST_CASE("NumericalIntegrationTest RKDPTimeVarying", "[wpimath]") {
+TEST_CASE("NumericalIntegrationTest Tsit5TimeVarying", "[wpimath]") {
   wpi::math::Vectord<1> y0{12.0 * std::exp(5.0) /
                            std::pow(std::exp(5.0) + 1.0, 2.0)};
 
-  wpi::math::Vectord<1> y1 = wpi::math::RKDP(
+  wpi::math::Vectord<1> y1 = wpi::math::Tsit5(
       [](wpi::units::second_t t, const wpi::math::Vectord<1>& x) {
         return wpi::math::Vectord<1>{x(0) *
                                      (2.0 / (std::exp(t.value()) + 1.0) - 1.0)};

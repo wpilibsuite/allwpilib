@@ -87,7 +87,7 @@ DifferentialSample DifferentialTrajectory::Interpolate(
   };
 
   Eigen::Vector<double, 6> endState =
-      wpi::math::RKDP(dynamics, initialState, initialInput, interpDt);
+      wpi::math::Tsit5(dynamics, initialState, initialInput, interpDt);
 
   double x = endState(0);
   double y = endState(1);

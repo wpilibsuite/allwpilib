@@ -105,7 +105,7 @@ TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
         robotPose, wpi::units::meters_per_second_t{x(State::LEFT_VELOCITY)},
         wpi::units::meters_per_second_t{x(State::RIGHT_VELOCITY)}, state);
 
-    x = wpi::math::RKDP(
+    x = wpi::math::Tsit5(
         &Dynamics, x,
         wpi::math::Vectord<2>{leftVoltage.value(), rightVoltage.value()}, DT);
   }

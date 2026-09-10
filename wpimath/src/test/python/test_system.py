@@ -53,9 +53,9 @@ def test_rk4_time_varying():
     assert math.isclose(y1[0, 0], expected, abs_tol=1e-3)
 
 
-def test_rkdp_zero():
-    """Tests that integrating dx/dt = 0 works with RKDP"""
-    y1 = wpimath.rkdp(
+def test_tsit5_zero():
+    """Tests that integrating dx/dt = 0 works with Tsit5"""
+    y1 = wpimath.tsit5(
         lambda x, u: np.zeros((1, 1)),
         np.array([[0.0]]),
         np.array([[0.0]]),
@@ -65,11 +65,11 @@ def test_rkdp_zero():
     assert math.isclose(y1[0, 0], 0.0, abs_tol=1e-3)
 
 
-def test_rkdp_exponential():
-    """Tests that integrating dx/dt = eˣ works with RKDP"""
+def test_tsit5_exponential():
+    """Tests that integrating dx/dt = eˣ works with Tsit5"""
     y0 = np.array([[0.0]])
 
-    y1 = wpimath.rkdp(
+    y1 = wpimath.tsit5(
         lambda x, u: np.array([[math.exp(x[0, 0])]]),
         y0,
         np.array([[0.0]]),
@@ -79,9 +79,9 @@ def test_rkdp_exponential():
     assert math.isclose(y1[0, 0], math.exp(0.1) - math.exp(0.0), abs_tol=1e-3)
 
 
-def test_rkdp_time_varying():
+def test_tsit5_time_varying():
     """
-    Tests RKDP with a time varying solution. From
+    Tests Tsit5 with a time varying solution. From
     http://www2.hawaii.edu/~jmcfatri/math407/RungeKuttaTest.html:
 
         dx/dt = x(2/(eᵗ + 1) - 1)
@@ -92,7 +92,7 @@ def test_rkdp_time_varying():
     """
     y0 = np.array([[12.0 * math.exp(5.0) / math.pow(math.exp(5.0) + 1.0, 2.0)]])
 
-    y1 = wpimath.rkdp(
+    y1 = wpimath.tsit5(
         lambda t, x: np.array([[x[0, 0] * (2.0 / (math.exp(t) + 1.0) - 1.0)]]),
         5.0,
         y0,
