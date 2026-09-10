@@ -4,6 +4,7 @@
 
 package org.wpilib.xrp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.wpilib.hardware.hal.SimBoolean;
@@ -43,6 +44,7 @@ public class XRPMotor implements MotorController {
 
   private final SimDouble m_simThrottle;
   private final SimBoolean m_simInverted;
+  private final ArrayList<XRPMotor> m_followers = new ArrayList<>();
 
   /**
    * Constructs an XRPMotor.
@@ -76,6 +78,10 @@ public class XRPMotor implements MotorController {
 
       m_simThrottle.set(invert ? -throttle : throttle);
     }
+
+    for (var follower : m_followers) {
+      follower.setThrottle(throttle);
+    }
   }
 
   @Override
@@ -102,5 +108,14 @@ public class XRPMotor implements MotorController {
   @Override
   public void disable() {
     setThrottle(0.0);
+  }
+
+  /**
+   * Make the given XRP motor follow the output of this one.
+   *
+   * @param follower The motor follower.
+   */
+  public void addFollower(XRPMotor follower) {
+    m_followers.add(follower);
   }
 }
