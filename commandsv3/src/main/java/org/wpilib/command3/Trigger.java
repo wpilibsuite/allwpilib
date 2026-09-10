@@ -31,6 +31,30 @@ import org.wpilib.units.measure.Time;
  * <p>Triggers can easily be composed for advanced functionality using the {@link
  * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
+ * <table>
+ * <caption>Positive trigger command bindings</caption>
+ * <tr>
+ * <th>Method</th>
+ * <th>Schedules</th>
+ * <th>Cancels on false</th>
+ * </tr>
+ * <tr>
+ * <td>{@link #onTrue(Command)}</td>
+ * <td>On a rising edge</td>
+ * <td>No</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #ifTrue(Command)}</td>
+ * <td>On every true poll</td>
+ * <td>No</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #whileTrue(Command)}</td>
+ * <td>On a rising edge</td>
+ * <td>Yes</td>
+ * </tr>
+ * </table>
+ *
  * <p>Trigger bindings created inside a running command will only be active while that command is
  * running. This is useful for defining trigger-based behavior only in a certain scope and avoids
  * needing to create dozens of global triggers. Any commands scheduled by these triggers will be
@@ -124,6 +148,22 @@ public class Trigger implements BooleanSupplier {
   public Trigger onTrue(Command command) {
     requireNonNullParam(command, "command", "onTrue");
     addBinding(BindingType.SCHEDULE_ON_RISING_EDGE, command);
+    return this;
+  }
+
+  /**
+   * Starts the given command on every event-loop poll where the condition is {@code true}.
+   *
+   * <p>This does not cancel the command when the condition becomes {@code false}; use {@link
+   * #whileTrue(Command)} for that behavior. Scheduling an already-running command follows ordinary
+   * scheduler behavior and does not restart it.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger ifTrue(Command command) {
+    requireNonNullParam(command, "command", "ifTrue");
+    addBinding(BindingType.SCHEDULE_WHILE_HIGH, command);
     return this;
   }
 
@@ -397,6 +437,7 @@ public class Trigger implements BooleanSupplier {
 
     // Always attempt to schedule bindings based on the current signal
     if (m_cachedSignal == Signal.HIGH) {
+      scheduleBindings(BindingType.SCHEDULE_WHILE_HIGH);
       scheduleBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH);
     } else if (m_cachedSignal == Signal.LOW) {
       scheduleBindings(BindingType.CONTINUOUSLY_SCHEDULE_WHILE_LOW);
