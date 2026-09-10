@@ -1,0 +1,80 @@
+From efa5b4eda56d8948b75078688be7b29f6c0adb31 Mon Sep 17 00:00:00 2001
+From: Austin Schuh <austin.linux@gmail.com>
+Date: Thu, 10 Sep 2026 18:52:27 -0700
+Subject: [PATCH] Suppress pedantic warnings for GNU __int128
+
+GCC rejects __int128 under -Wpedantic, and the SSE2 control byte mask
+trips -Woverflow under -pedantic. Both are deliberate here, but they
+fail any build that includes these headers with -pedantic -Werror.
+---
+ absl/container/internal/hashtable_control_bytes.h |  3 +++
+ absl/hash/internal/hash.h                         |  7 +++++++
+ absl/numeric/int128.h                             | 10 ++++++++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/absl/container/internal/hashtable_control_bytes.h b/absl/container/internal/hashtable_control_bytes.h
+index 70016e1..2a96978 100644
+--- a/absl/container/internal/hashtable_control_bytes.h
++++ b/absl/container/internal/hashtable_control_bytes.h
+@@ -264,7 +264,10 @@ inline bool IsEmptyOrDeleted(ctrl_t c) { return c < ctrl_t::kSentinel; }
+ inline __m128i _mm_cmpgt_epi8_fixed(__m128i a, __m128i b) {
+ #if defined(__GNUC__) && !defined(__clang__)
+   if (std::is_unsigned<char>::value) {
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Woverflow"
+     const __m128i mask = _mm_set1_epi8(0x80);
++#pragma GCC diagnostic pop
+     const __m128i diff = _mm_subs_epi8(b, a);
+     return _mm_cmpeq_epi8(_mm_and_si128(diff, mask), mask);
+   }
+diff --git a/absl/hash/internal/hash.h b/absl/hash/internal/hash.h
+index 8837679..c1a8a87 100644
+--- a/absl/hash/internal/hash.h
++++ b/absl/hash/internal/hash.h
+@@ -390,10 +390,17 @@ struct is_uniquely_represented<bool> : std::false_type {};
+ 
+ #ifdef ABSL_HAVE_INTRINSIC_INT128
+ // Specialize the trait for GNU extension types.
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
+ template <>
+ struct is_uniquely_represented<__int128> : std::true_type {};
+ template <>
+ struct is_uniquely_represented<unsigned __int128> : std::true_type {};
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic pop
++#endif
+ #endif  // ABSL_HAVE_INTRINSIC_INT128
+ 
+ template <typename T>
+diff --git a/absl/numeric/int128.h b/absl/numeric/int128.h
+index 32603b0..ae0b0c3 100644
+--- a/absl/numeric/int128.h
++++ b/absl/numeric/int128.h
+@@ -40,6 +40,12 @@
+ #include "absl/base/port.h"
+ #include "absl/types/compare.h"
+ 
++// __int128 is a GNU extension, which -Wpedantic rejects.
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wpedantic"
++#endif
++
+ #if defined(_MSC_VER)
+ // In very old versions of MSVC and when the /Zc:wchar_t flag is off, wchar_t is
+ // a typedef for unsigned short.  Otherwise wchar_t is mapped to the __wchar_t
+@@ -1221,4 +1227,8 @@ ABSL_NAMESPACE_END
+ 
+ #undef ABSL_INTERNAL_WCHAR_T
+ 
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic pop
++#endif
++
+ #endif  // ABSL_NUMERIC_INT128_H_
+-- 
+2.47.3
+

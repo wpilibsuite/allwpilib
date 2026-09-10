@@ -1,0 +1,93 @@
+load("@aos//aos:config.bzl", "aos_config")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
+
+cc_library(
+    name = "aosnt",
+    srcs = ["src/main/native/cpp/NtBridge.cpp"],
+    hdrs = ["src/main/native/include/wpi/aosnt/NtBridge.hpp"],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aosnt/types:nt_types_fbs",
+        "//ntcore",
+        "@aos//aos:configuration",
+        "@aos//aos/events:event_loop",
+        "@aos//aos/protobuf:flatbuffer_to_proto",
+    ],
+)
+
+cc_binary(
+    name = "aosnt-bridge",
+    srcs = ["src/bridge/native/cpp/main.cpp"],
+    deps = [
+        ":aosnt",
+        "//ntcore",
+        "//wpiutil",
+        "@aos//aos:configuration",
+        "@aos//aos:init",
+        "@aos//aos/events:shm_event_loop",
+    ],
+)
+
+package_binary_cc_project(
+    name = "aosnt-bridge",
+    maven_artifact_name = "aosnt-bridge",
+    maven_group_id = "org.wpilib.aosnt",
+    systemcore = True,
+)
+
+aos_config(
+    name = "aos_config",
+    src = "aos_config_source.json",
+    flatbuffers = [
+        "//aosnt/types:nt_types_fbs",
+        "@aos//aos/events:event_loop_fbs",
+        "@aos//aos/logging:dynamic_log_command_fbs",
+        "@aos//aos/logging:log_message_fbs",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+    ],
+)
+
+# Two tagged channels with one name, which NtBridge refuses.
+aos_config(
+    name = "aos_duplicate_config",
+    src = "aos_duplicate_config_source.json",
+    flatbuffers = [
+        "@aos//aos/events:event_loop_fbs",
+        "@aos//aos/logging:dynamic_log_command_fbs",
+        "@aos//aos/logging:log_message_fbs",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+        "@aos//aos/testing/ping_pong:pong_fbs",
+    ],
+)
+
+cc_test(
+    name = "aosnt-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/**/*.cpp"]),
+    # protobuf's headers still use absl::disjunction, which abseil deprecated.
+    # The osx_flags.rc exemptions match on the source being compiled, so they
+    # do not reach headers this test includes.
+    copts = select({
+        "@platforms//os:osx": ["-Wno-error=deprecated-declarations"],
+        "//conditions:default": [],
+    }),
+    data = [
+        ":aos_config",
+        ":aos_duplicate_config",
+    ],
+    deps = [
+        ":aosnt",
+        "//aosnt/types:nt_types_fbs",
+        "//ntcore",
+        "//thirdparty/catch2",
+        "//wpiutil:wpiutil-testlib",
+        "@aos//aos:configuration",
+        "@aos//aos:init",
+        "@aos//aos/events:simulated_event_loop",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@com_google_protobuf//:protobuf",
+    ],
+)

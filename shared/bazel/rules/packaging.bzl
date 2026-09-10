@@ -390,14 +390,21 @@ def package_binary_cc_project(
         maven_artifact_name,
         extra_files = [],
         architectures = None,
-        renames = None):
+        renames = None,
+        systemcore = False):
     """Packages the C++ binary targets for a project.
 
     This assumes that static libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
-    transitions, packages them up, and deploys them for just the native
-    platforms.
+    transitions, packages them up, and deploys them for the native platforms,
+    and for the SystemCore too if `systemcore` is set.
     """
+    linux_artifacts = {
+        "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
+    }
+    if systemcore:
+        linux_artifacts["linuxsystemcore"] = ":{}_zip-opt-systemcore".format(name)
+
     pkg_files(
         name = "{}-files".format(name),
         srcs = [name],
@@ -420,9 +427,7 @@ def package_binary_cc_project(
         name = "{}_publish".format(name),
         maven_coordinates = "{}:{}:$(WPILIB_VERSION)".format(maven_group_id, maven_artifact_name),
         classifier_artifacts = {},
-        linux_artifacts = _filter_artifacts(architectures, {
-            "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
-        }),
+        linux_artifacts = _filter_artifacts(architectures, linux_artifacts),
         osx_artifacts = _filter_artifacts(architectures, {
             "osxuniversalstatic": ":{}_zip-opt-osxuniversal".format(name),
         }),

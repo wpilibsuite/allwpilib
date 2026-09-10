@@ -131,6 +131,7 @@ write_source_files(
 publish_all(
     name = "publish",
     targets = [
+        "//aosnt:aosnt-bridge_publish.publish",
         "//apriltag:apriltag-cpp_publish.publish",
         "//apriltag:apriltag-java_publish.publish",
         "//cameraserver:cameraserver-cpp_publish.publish",

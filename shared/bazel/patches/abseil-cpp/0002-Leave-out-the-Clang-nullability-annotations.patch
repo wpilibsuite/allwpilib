@@ -1,0 +1,29 @@
+From: Austin Schuh <austin.linux@gmail.com>
+Date: Thu, 11 Sep 2026 16:40:00 -0700
+Subject: [PATCH] Leave out the Clang nullability annotations
+
+Clang rejects _Nullable, _Nonnull and _Null_unspecified under
+-Wnullability-extension, which fails any build that includes these
+headers with -Werror. The annotations carry no behavior, so define them
+only when a build asks for them.
+---
+ absl/base/nullability.h | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/absl/base/nullability.h b/absl/base/nullability.h
+--- a/absl/base/nullability.h
++++ b/absl/base/nullability.h
+@@ -223,8 +223,11 @@
+ // No-op except for being a human readable signal.
+ #define ABSL_POINTERS_DEFAULT_NONNULL
+
+-#if defined(__clang__) && !defined(__OBJC__) && \
+-    ABSL_HAVE_FEATURE(nullability_on_classes)
++// The nullability specifiers below are Clang extensions, which Clang warns
++// about under -Wnullability-extension. They are annotations only, so leave
++// them out unless a build asks for them.
++#if defined(ABSL_ENABLE_CLANG_NULLABILITY) && defined(__clang__) && \
++    !defined(__OBJC__) && ABSL_HAVE_FEATURE(nullability_on_classes)
+ // absl_nonnull (default with `ABSL_POINTERS_DEFAULT_NONNULL`)
+ //
+ // The indicated pointer is never null. It is the responsibility of the provider
