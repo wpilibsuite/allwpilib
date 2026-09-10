@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpilib-drivers==0.0.0",
     "wpilib==0.0.0",
@@ -37,7 +37,7 @@ version_file = "wpilib_drivers/version.py"
 packages = ["wpilib_drivers"]
 
 [tool.semiwrap]
-update_init = ["wpilib_drivers"]
+update_init = ["wpilib_drivers wpilib_drivers._drivers"]
 
 [tool.semiwrap.name_transform]
 default = "snake_case"

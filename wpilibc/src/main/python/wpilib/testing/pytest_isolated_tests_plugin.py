@@ -16,7 +16,13 @@ import robotpy.main
 import wpilib
 
 
+from .pytest_isolated_order_adapter import (
+    PytestOrderAdapter,
+    PytestOrderWorkerPlugin,
+    PytestOrderWorkerState,
+)
 from .pytest_plugin import RobotTestingPlugin
+from ._opmode import OpModes, OpModeTestingPlugin
 
 
 class _NullTerminalWriter:
@@ -128,7 +134,15 @@ class WorkerPlugin:
 
 
 def _run_test(
-    item_nodeid, config_args, robot_class_data, robot_file, verbose, pipe, root_path
+    item_nodeid,
+    config_args,
+    robot_class_data,
+    robot_file,
+    opmodes: OpModes | None,
+    verbose,
+    order_state: PytestOrderWorkerState,
+    pipe,
+    root_path,
 ):
     """This function runs in a subprocess"""
     logging.root.addHandler(logging.NullHandler())
@@ -146,11 +160,19 @@ def _run_test(
     # keep the plugins around because it has a reference to the robot
     # and we don't want it to die and deadlock
     plugin = RobotTestingPlugin(robot_class, robot_file, True)
+    plugin._opmodes = opmodes
     worker_plugin = WorkerPlugin(pipe)
+    order_plugin = PytestOrderWorkerPlugin(order_state)
 
     ec = pytest.main(
-        [item_nodeid, "--no-header", "-p", "no:terminalreporter", *config_args],
-        plugins=[plugin, worker_plugin],
+        [
+            item_nodeid,
+            "--no-header",
+            "-p",
+            "no:terminalreporter",
+            *config_args,
+        ],
+        plugins=[plugin, worker_plugin, order_plugin],
     )
 
     # ensure output is printed out
@@ -184,7 +206,7 @@ class IsolatedTestJob:
             self.exit_code = ec
 
 
-class IsolatedTestsPlugin:
+class IsolatedTestsPlugin(OpModeTestingPlugin):
     """
     This pytest plugin runs any test that uses the 'robot' fixture in an
     isolated subprocess
@@ -212,6 +234,13 @@ class IsolatedTestsPlugin:
         self._parallelism = max(1, parallelism)
         self._shouldstop = False
 
+    @pytest.hookimpl(trylast=True)
+    def pytest_collection_modifyitems(
+        self, config: pytest.Config, items: list[pytest.Item]
+    ):
+        self._ordering = PytestOrderAdapter(config)
+        self._ordering.validate(items)
+
     @pytest.hookimpl(wrapper=True)
     def pytest_sessionstart(self, session: pytest.Session):
         self._config = session.config
@@ -236,33 +265,57 @@ class IsolatedTestsPlugin:
         if session.config.option.collectonly:
             return True
 
+        inprocess_items = [
+            item
+            for item in session.items
+            if not isinstance(item, pytest.Function) or "robot" not in item.fixturenames
+        ]
+        inprocess_index = 0
         running: list[IsolatedTestJob] = []
-        deferred: list[pytest.Function] = []
         try:
-            # Start any tests that use the robot fixture first. Tests that don't
-            # use the robot fixture will be ran later
-            for item in session.items:
-                assert isinstance(item, pytest.Function)
-                if "robot" not in item.fixturenames:
-                    deferred.append(item)
-                    continue
+            # pytest-order has already sorted session.items. Preserve boundaries
+            # between ordering-marker groups while retaining the existing parallel
+            # scheduling within each group.
+            for group in self._ordering.groups(session.items):
+                deferred: list[pytest.Item] = []
 
-                while len(running) >= self._parallelism:
+                # Start this group's robot tests first, then overlap its plain
+                # tests with the isolated jobs just as the original loop did.
+                for item in group:
+                    if not (
+                        # pytest plugins may generate their own items.
+                        isinstance(item, pytest.Function)
+                        and "robot" in item.fixturenames
+                    ):
+                        deferred.append(item)
+                        continue
+
+                    while len(running) >= self._parallelism:
+                        self._wait_for_jobs(running, session)
+
+                    running.append(self._start_isolated_test(item))
+                    self._maybe_raise(session)
+
+                for item in deferred:
+                    # Observe completed isolated failures before starting more
+                    # in-process work, so --maxfail can stop the group promptly.
+                    if any(job.conn.poll() for job in running):
+                        self._wait_for_jobs(running, session)
+
+                    nextitem = (
+                        inprocess_items[inprocess_index + 1]
+                        if inprocess_index + 1 < len(inprocess_items)
+                        else None
+                    )
+                    inprocess_index += 1
+                    session.config.hook.pytest_runtest_protocol(
+                        item=item, nextitem=nextitem
+                    )
+                    self._maybe_raise(session)
+
+                # No work from one marker group may cross into the next.
+                while running:
                     self._wait_for_jobs(running, session)
-
-                running.append(self._start_isolated_test(item))
-                self._maybe_raise(session)
-
-            # Run the in-process tests now while the robot tests are finishing
-            for idx, item in enumerate(deferred):
-                nextitem = deferred[idx + 1] if idx + 1 < len(deferred) else None
-                session.config.hook.pytest_runtest_protocol(
-                    item=item, nextitem=nextitem
-                )
-                self._maybe_raise(session)
-
-            while running:
-                self._wait_for_jobs(running, session)
         finally:
             for job in running:
                 self._cleanup_job(job)
@@ -286,7 +339,9 @@ class IsolatedTestsPlugin:
                 config_args,
                 pickle.dumps(self._robot_class),
                 self._robot_file,
+                self._opmodes,
                 self._verbose,
+                self._ordering.worker_state(item),
                 cconn,
                 self._config.rootpath,
             ),
@@ -399,10 +454,10 @@ class IsolatedTestsPlugin:
         job.process.close()
 
     def _maybe_raise(self, session: pytest.Session):
-        if self._shouldstop:
-            raise session.Interrupted(self._shouldstop)
         if session.shouldfail:
             raise session.Failed(session.shouldfail)
+        if self._shouldstop:
+            raise session.Interrupted(self._shouldstop)
         if session.shouldstop:
             raise session.Interrupted(session.shouldstop)
 
@@ -455,7 +510,17 @@ class IsolatedTestsPlugin:
         if exit_code is not None:
             job.exit_code = int(exit_code)
 
-        job.worker_completed = True
+        if job.exit_code == pytest.ExitCode.INTERRUPTED and not self._shouldstop:
+            self._shouldstop = "interrupted in worker"
+
+        # Normal test failures have already produced reports, and interruptions
+        # stop the parent session. Other exit codes need a synthetic failure
+        # report from _finalize_job.
+        job.worker_completed = job.exit_code in (
+            pytest.ExitCode.OK,
+            pytest.ExitCode.TESTS_FAILED,
+            pytest.ExitCode.INTERRUPTED,
+        )
         job.finished = True
 
     def _handlefailures(self, rep: pytest.TestReport):

@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpiutil==0.0.0",
 ]
@@ -53,6 +53,7 @@ scan_headers_ignore = [
     "pb_common.h",
     "pb_decode.h",
     "pb_encode.h",
+    "src/type_casters/wpybuffer.h",
     "upb/*",
     "utf8_range.h",
 ]

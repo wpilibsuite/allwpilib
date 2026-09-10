@@ -1,12 +1,15 @@
 classes:
   wpi::backend::NetworkTablesTunableBackend:
     force_no_trampoline: true
+    doc_append: |
+      Python method overrides are not called by the registry.
+    typealias:
+    - wpi::tunables::TunableBackend::PublishedTunable
     methods:
       NetworkTablesTunableBackend:
       Publish:
         ignore: true
       MarkDirty:
-        ignore: true
       Remove:
       RemovePrefix:
       UnregisterTunable:
