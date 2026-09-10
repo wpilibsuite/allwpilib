@@ -7,6 +7,7 @@ open module wpilib.command3 {
   requires transitive us.hebi.quickbuf.runtime;
   requires transitive wpilib.core;
   requires transitive wpilib.ntcore;
+  requires transitive wpilib.tunable;
   requires transitive wpilib.units;
   requires transitive wpilib.util;
   requires wpilib.annotation;
