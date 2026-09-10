@@ -36,6 +36,60 @@ class TriggerTest extends CommandTestBase {
   }
 
   @Test
+  void ifTrueOneShotSchedulesOnEveryTruePoll() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var counter = new AtomicLong(0);
+    var oneshot = Command.noRequirements(_ -> counter.incrementAndGet()).named("One Shot");
+    trigger.ifTrue(oneshot);
+
+    m_scheduler.run();
+    assertEquals(0, counter.get(), "Command should not run while signal is false");
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(1, counter.get(), "Command should run on first true poll");
+
+    m_scheduler.run();
+    assertEquals(2, counter.get(), "Command should run again on the next true poll");
+
+    signal.set(false);
+    m_scheduler.run();
+    assertEquals(2, counter.get(), "Command should not run while signal is false");
+  }
+
+  @Test
+  void ifTrueLongRunningCommandDoesNotRestartOrCancelOnFalse() {
+    var signal = new AtomicBoolean(false);
+    var trigger = new Trigger(m_scheduler, signal::get);
+    var starts = new AtomicLong(0);
+    var cancels = new AtomicLong(0);
+    var command =
+        Command.noRequirements(
+                co -> {
+                  starts.incrementAndGet();
+                  co.park();
+                })
+            .whenCanceled(cancels::incrementAndGet)
+            .named("Long Running Command");
+    trigger.ifTrue(command);
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(1, starts.get(), "Command should start on the first true poll");
+    assertTrue(m_scheduler.isRunning(command));
+
+    m_scheduler.run();
+    assertEquals(1, starts.get(), "Already-running command should not restart");
+    assertTrue(m_scheduler.isRunning(command));
+
+    signal.set(false);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command), "Command should keep running when signal is false");
+    assertEquals(0, cancels.get(), "Command should not be canceled by ifTrue");
+  }
+
+  @Test
   void onFalse() {
     var signal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, signal::get);
