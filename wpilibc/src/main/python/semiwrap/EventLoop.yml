@@ -7,7 +7,8 @@ classes:
       Bind:
         cpp_code: |
           [](EventLoop *self, std::function<void()> action) {
-            self->Bind(std::move(action));
+            return self->Bind(std::move(action));
           }
+      Unbind:
       Poll:
       Clear:
