@@ -94,6 +94,18 @@ public interface Mechanism {
   }
 
   /**
+   * Starts building a command that requires this mechanism. The given function will be called
+   * exactly once, after which the command will complete. Useful for building commands that only
+   * need to perform a single one-shot action.
+   *
+   * @param action The action to run.
+   * @return The command builder, for further configuration.
+   */
+  default NeedsNameBuilderStage runOnce(Runnable action) {
+    return run(_ -> action.run());
+  }
+
+  /**
    * Returns a command that idles this mechanism until another command claims it. The idle command
    * has {@link Command#LOWEST_PRIORITY the lowest priority} and can be interrupted by any other
    * command.
