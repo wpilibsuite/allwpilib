@@ -100,6 +100,9 @@ public final class Rotation3d
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
    *
+   * <p>To construct a Rotation3d from intrinsic roll, pitch, and yaw, pass the angles in reverse
+   * order: {@code new Rotation3d(yaw, pitch, roll)}.
+   *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the
    * direction of positive rotation.
@@ -132,6 +135,9 @@ public final class Rotation3d
    *
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
+   *
+   * <p>To construct a Rotation3d from intrinsic roll, pitch, and yaw, pass the angles in reverse
+   * order: {@code new Rotation3d(yaw, pitch, roll)}.
    *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the

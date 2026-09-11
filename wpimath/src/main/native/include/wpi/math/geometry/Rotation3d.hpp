@@ -91,6 +91,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
    *
+   * To construct a Rotation3d from intrinsic roll, pitch, and yaw, pass the
+   * angles in reverse order: Rotation3d{yaw, pitch, roll}.
+   *
    * Angles are measured counterclockwise with the rotation axis pointing "out
    * of the page". If you point your right thumb along the positive axis
    * direction, your fingers curl in the direction of positive rotation.
