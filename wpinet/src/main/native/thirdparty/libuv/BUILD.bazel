@@ -1,0 +1,103 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+# wpilib's vendored libuv, presented with the same API as BCR's libuv module: a
+# public cc_library named libuv, built from src/ and include/. The root
+# MODULE.bazel points the libuv module here with a local_path_override, so
+# everything in the tree that names @libuv -- wpinet, @aos -- links this one
+# copy, and one set of uv_* symbols lands in a binary.
+#
+# The lists differ from BCR's overlay because the vendored tree does: the
+# sources are C renamed to C++ by upstream_utils, and wpilib's patches embed
+# the Windows link pragmas and _WIN32_WINNT in the code, so the local_defines
+# and Windows linkopts BCR carries are not needed here.
+
+UNIX_UV_SRCS = [
+    "src/unix/async.cpp",
+    "src/unix/core.cpp",
+    "src/unix/dl.cpp",
+    "src/unix/fs.cpp",
+    "src/unix/getaddrinfo.cpp",
+    "src/unix/getnameinfo.cpp",
+    "src/unix/loop-watcher.cpp",
+    "src/unix/loop.cpp",
+    "src/unix/pipe.cpp",
+    "src/unix/poll.cpp",
+    "src/unix/process.cpp",
+    "src/unix/random-devurandom.cpp",
+    "src/unix/random-getentropy.cpp",
+    "src/unix/random-getrandom.cpp",
+    "src/unix/signal.cpp",
+    "src/unix/stream.cpp",
+    "src/unix/tcp.cpp",
+    "src/unix/thread.cpp",
+    "src/unix/tty.cpp",
+    "src/unix/udp.cpp",
+] + glob(["src/unix/*.h"])
+
+MAC_UV_SRCS = [
+    "src/unix/bsd-ifaddrs.cpp",
+    "src/unix/darwin.cpp",
+    "src/unix/darwin-proctitle.cpp",
+    "src/unix/fsevents.cpp",
+    "src/unix/kqueue.cpp",
+    "src/unix/proctitle.cpp",
+]
+
+LINUX_UV_SRCS = [
+    "src/unix/linux.cpp",
+    "src/unix/procfs-exepath.cpp",
+    "src/unix/proctitle.cpp",
+    "src/unix/random-sysctl-linux.cpp",
+]
+
+WIN_UV_SRCS = glob([
+    "src/win/*.cpp",
+    "src/win/*.h",
+])
+
+cc_library(
+    name = "libuv",
+    srcs = glob([
+        "src/*.cpp",
+        "src/*.h",
+    ]) + select({
+        "@platforms//os:osx": UNIX_UV_SRCS + MAC_UV_SRCS,
+        "@platforms//os:windows": WIN_UV_SRCS,
+        "//conditions:default": UNIX_UV_SRCS + LINUX_UV_SRCS,
+    }),
+    hdrs = glob(["include/**/*.h"]),
+    copts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": [
+            "-Wno-error=pedantic",
+            "-Wno-error=format",
+        ],
+    }),
+    includes = ["src"],
+    linkopts = select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-pthread"],
+    }) + select({
+        "@platforms//os:linux": [
+            "-ldl",
+            "-lrt",
+        ],
+        "//conditions:default": [],
+    }),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)
+
+# The raw trees, for wpinet's doxygen bundle and its published artifacts --
+# rules there cannot glob across the package boundary this BUILD file creates.
+filegroup(
+    name = "include_files",
+    srcs = glob(["include/**"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "src_files",
+    srcs = glob(["src/**"]),
+    visibility = ["//visibility:public"],
+)

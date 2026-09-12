@@ -1,23 +1,31 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:12:41 -0400
-Subject: [PATCH 02/34] Wrap std::min/max calls in parens, for Windows warnings
+Subject: [PATCH 02/32] Wrap std::min/max calls in parens, for Windows warnings
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       | 14 +++++++-------
- llvm/include/llvm/ADT/DenseMapInfo.h   |  6 +++---
+ llvm/include/llvm/ADT/DenseMap.h       | 16 ++++++++--------
  llvm/include/llvm/ADT/SmallPtrSet.h    |  2 +-
  llvm/include/llvm/ADT/SmallVector.h    |  6 +++---
  llvm/include/llvm/Support/AlignOf.h    |  4 ++--
  llvm/include/llvm/Support/ConvertUTF.h |  2 +-
  llvm/include/llvm/Support/MathExtras.h | 20 ++++++++++----------
- 7 files changed, 27 insertions(+), 27 deletions(-)
+ 6 files changed, 25 insertions(+), 25 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65d33e0909 100644
+index 1480031c8d7da486da6a4397fc486522a9f43f19..21a72afd18e463a7b75adf2dc1be2e9c58995675 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -429,7 +429,7 @@ protected:
+@@ -97,7 +97,7 @@ LLVM_ATTRIBUTE_ALWAYS_INLINE void forEachUsed(const UsedT *U, unsigned N,
+ // the used words.  NumBuckets is a power of two >= 4, so the bucket region size
+ // is a multiple of sizeof(UsedT) and the trailing used words are aligned.
+ template <typename BucketT> constexpr size_t allocAlign() {
+-  return std::max(alignof(BucketT), alignof(UsedT));
++  return (std::max)(alignof(BucketT), alignof(UsedT));
+ }
+ template <typename BucketT> size_t allocBytes(unsigned Num) {
+   return sizeof(BucketT) * static_cast<size_t>(Num) +
+@@ -502,7 +502,7 @@ protected:
        return 0;
      // +1 is required because of the strict inequality.
      // For example, if NumEntries is 48, we need to return 128.
@@ -26,8 +34,8 @@ index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65
    }
  
    // Move key/value from Other to *this.
-@@ -846,8 +846,8 @@ private:
-   }
+@@ -944,8 +944,8 @@ private:
+   void kill() { deallocateBuckets(); }
  
    static unsigned roundUpNumBuckets(unsigned MinNumBuckets) {
 -    return std::max(64u,
@@ -37,7 +45,7 @@ index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65
    }
  
    bool maybeMoveFast(DenseMap &&Other) {
-@@ -861,7 +861,7 @@ private:
+@@ -959,7 +959,7 @@ private:
    std::pair<bool, unsigned> planShrinkAndClear() const {
      unsigned NewNumBuckets = 0;
      if (NumEntries)
@@ -46,10 +54,10 @@ index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65
      if (NewNumBuckets == NumBuckets)
        return {false, 0};          // Reuse.
      return {true, NewNumBuckets}; // Reallocate.
-@@ -1109,8 +1109,8 @@ private:
+@@ -1220,8 +1220,8 @@ private:
    static unsigned roundUpNumBuckets(unsigned MinNumBuckets) {
      if (MinNumBuckets <= InlineBuckets)
-       return MinNumBuckets;
+       return InlineBuckets;
 -    return std::max(64u,
 -                    static_cast<unsigned>(NextPowerOf2(MinNumBuckets - 1)));
 +    return (std::max)(64u,
@@ -57,7 +65,7 @@ index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65
    }
  
    bool maybeMoveFast(SmallDenseMap &&Other) {
-@@ -1133,7 +1133,7 @@ private:
+@@ -1243,7 +1243,7 @@ private:
      if (!this->empty()) {
        NewNumBuckets = 1u << (Log2_32_Ceil(this->size()) + 1);
        if (NewNumBuckets > InlineBuckets)
@@ -65,34 +73,13 @@ index fe8868619730e4c7054974905cc959cd99c7ef12..d207a515ef05425f924920a8d06d7c65
 +        NewNumBuckets = (std::max)(64u, NewNumBuckets);
      }
      bool Reuse = Small ? NewNumBuckets <= InlineBuckets
-                        : NewNumBuckets == getLargeRep()->NumBuckets;
-diff --git a/llvm/include/llvm/ADT/DenseMapInfo.h b/llvm/include/llvm/ADT/DenseMapInfo.h
-index f24aeb4371e7f4844d93dfda6f52b44216f01c6d..9e8378b5b119dcd2c14b0b281a4d24bae94d4a36 100644
---- a/llvm/include/llvm/ADT/DenseMapInfo.h
-+++ b/llvm/include/llvm/ADT/DenseMapInfo.h
-@@ -111,13 +111,13 @@ template<> struct DenseMapInfo<char> {
- template <typename T>
- struct DenseMapInfo<
-     T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, char>>> {
--  static constexpr T getEmptyKey() { return std::numeric_limits<T>::max(); }
-+  static constexpr T getEmptyKey() { return (std::numeric_limits<T>::max)(); }
- 
-   static constexpr T getTombstoneKey() {
-     if constexpr (std::is_unsigned_v<T> || std::is_same_v<T, long>)
--      return std::numeric_limits<T>::max() - 1;
-+      return (std::numeric_limits<T>::max)() - 1;
-     else
--      return std::numeric_limits<T>::min();
-+      return (std::numeric_limits<T>::min)();
-   }
- 
-   static unsigned getHashValue(const T &Val) {
+                        : NewNumBuckets == storage.Large.NumBuckets;
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index 8e7c8b30293b203d70d1b0d07d1d6866edc89934..c07de1a110479ed625b112cc5b30d0bd5d56430f 100644
+index d685279d3c31b871f7754500d70df3c8d6de276c..4e2f49a4e9953c4bd37da16ce7f51e1366b1cc6f 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
-@@ -131,7 +131,7 @@ public:
-     size_type NewSize = NewNumEntries + (NewNumEntries / 3);
+@@ -130,7 +130,7 @@ public:
+     size_type NewSize = NewNumEntries + (NewNumEntries / 2);
      NewSize = llvm::bit_ceil(NewSize);
      // Like insert_imp_big, always allocate at least 128 elements.
 -    NewSize = std::max(128u, NewSize);
@@ -101,10 +88,10 @@ index 8e7c8b30293b203d70d1b0d07d1d6866edc89934..c07de1a110479ed625b112cc5b30d0bd
    }
  
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index 4499a51d40da615a3074ece034f7c30a3ddd709e..e27d0d71ec6176ee8081660f9ed6ba6672d7828d 100644
+index 712f0f5f5087b44c5b7cac9f7d8e16fae9075506..e589300ce5ace50dbc7125b98951b2db2d71245d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -57,7 +57,7 @@ protected:
+@@ -60,7 +60,7 @@ protected:
  
    /// The maximum value of the Size_T used.
    static constexpr size_t SizeTypeMax() {
@@ -113,7 +100,7 @@ index 4499a51d40da615a3074ece034f7c30a3ddd709e..e27d0d71ec6176ee8081660f9ed6ba66
    }
  
    SmallVectorBase() = delete;
-@@ -282,7 +282,7 @@ public:
+@@ -285,7 +285,7 @@ public:
  
    size_type size_in_bytes() const { return size() * sizeof(T); }
    size_type max_size() const {
@@ -122,7 +109,7 @@ index 4499a51d40da615a3074ece034f7c30a3ddd709e..e27d0d71ec6176ee8081660f9ed6ba66
    }
  
    size_t capacity_in_bytes() const { return capacity() * sizeof(T); }
-@@ -711,7 +711,7 @@ public:
+@@ -733,7 +733,7 @@ public:
      }
  
      // Assign over existing elements.
@@ -147,7 +134,7 @@ index 4f02e81dba151e01f48f3f7eacfa264f7143d6b7..6e843a345116700b921be8d1129d31ac
  
  } // end namespace llvm
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index 4049b742683ce5c61202e61c856f33074d2fc586..d5f66c4525dd5b2e2cdb4ab5e4d523c19e36b25f 100644
+index 540848239f250927700715ccd8bac3436be51031..38a7d12438ae7cfb046bf3787b379f464d73e11e 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
 @@ -128,7 +128,7 @@ namespace llvm {
@@ -160,7 +147,7 @@ index 4049b742683ce5c61202e61c856f33074d2fc586..d5f66c4525dd5b2e2cdb4ab5e4d523c1
  /* Some fundamental constants */
  #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 0a253efc2abcb54f4f7146460c8cac1d61c01029..120a1641110aca97acf2ab9cd3806d94accbb8aa 100644
+index f5383e3e63e8be03e459b75218b43e840e50a884..ce393a9ab336c509ad18f38e349caf1195f0cb9c 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -329,26 +329,26 @@ constexpr size_t CTLog2() {

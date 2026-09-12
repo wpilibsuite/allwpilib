@@ -15,8 +15,6 @@ class Robot : public wpi::TimedRobot {
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     right.SetInverted(true);
-    robotDrive.SetExpiration(100_ms);
-    timer.Start();
   }
 
   void AutonomousInit() override { timer.Restart(); }

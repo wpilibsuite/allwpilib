@@ -94,7 +94,7 @@ doxygen(
         "*/wpi/util/StringExtras.hpp",
         "*/wpi/util/raw_ostream.hpp",
         # Sleipnir
-        "*/sleipnir/optimization/solver/interior_point.hpp",
+        "*/sleipnir/optimization/solver/ipm.hpp",
         "*/sleipnir/optimization/solver/newton.hpp",
         "*/sleipnir/optimization/solver/sqp.hpp",
         # apriltag

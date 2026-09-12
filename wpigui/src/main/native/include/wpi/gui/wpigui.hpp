@@ -136,6 +136,22 @@ void AddEarlyExecute(std::function<void()> execute);
 void AddLateExecute(std::function<void()> execute);
 
 /**
+ * Adds pre-swap executor to GUI. The passed function is called after the Dear
+ * ImGui frame is rendered and immediately before the renderer presents it.
+ *
+ * @param execute pre-swap function
+ */
+void AddPreSwap(std::function<void()> execute);
+
+/**
+ * Adds post-swap executor to GUI. The passed function is called immediately
+ * after the renderer presents a frame.
+ *
+ * @param execute post-swap function
+ */
+void AddPostSwap(std::function<void()> execute);
+
+/**
  * Adds an SDL event handler to GUI. The passed function is called for each
  * SDL event before Dear ImGui processes it. To have any effect, must be called
  * prior to Main().
@@ -221,13 +237,6 @@ void SetStyle(Style style);
  * @param fps FPS (0=vsync)
  */
 void SetFPS(int fps);
-
-/**
- * Sets the clear (background) color.
- *
- * @param color Color
- */
-void SetClearColor(ImVec4 color);
 
 /**
  * Gets the (platform-specific) absolute directory for save files.

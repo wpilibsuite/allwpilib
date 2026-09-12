@@ -92,7 +92,7 @@ class power_of_two_growth_policy {
   /**
    * Return the maximum number of buckets supported by the policy.
    */
-  std::size_t max_bucket_count() const {
+  static constexpr std::size_t max_bucket_count() {
     // Largest power of two.
     return (std::numeric_limits<std::size_t>::max() / 2) + 1;
   }
@@ -175,14 +175,14 @@ class mod_growth_policy {
     }
   }
 
-  std::size_t max_bucket_count() const { return MAX_BUCKET_COUNT; }
+  static constexpr std::size_t max_bucket_count() { return MAX_BUCKET_COUNT; }
 
   void clear() noexcept { m_mod = 1; }
 
  private:
   static constexpr double REHASH_SIZE_MULTIPLICATION_FACTOR =
       1.0 * GrowthFactor::num / GrowthFactor::den;
-  static const std::size_t MAX_BUCKET_COUNT =
+  static constexpr std::size_t MAX_BUCKET_COUNT =
       std::size_t(double(std::numeric_limits<std::size_t>::max() /
                          REHASH_SIZE_MULTIPLICATION_FACTOR));
 
@@ -345,7 +345,9 @@ class prime_growth_policy {
     return detail::PRIMES[m_iprime + 1];
   }
 
-  std::size_t max_bucket_count() const { return detail::PRIMES.back(); }
+  static constexpr std::size_t max_bucket_count() {
+    return detail::PRIMES.back();
+  }
 
   void clear() noexcept { m_iprime = 0; }
 

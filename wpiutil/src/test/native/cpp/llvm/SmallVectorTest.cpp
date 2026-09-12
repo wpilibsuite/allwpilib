@@ -603,6 +603,53 @@ TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest AppendNonIterTest", 
   assertValuesInOrder(V, 3u, 1, 7, 7);
 }
 
+struct input_iterator {
+  using iterator_category = std::input_iterator_tag;
+  using value_type = int;
+  using difference_type = int;
+  using pointer = value_type *;
+  using reference = value_type &;
+
+  const int **State;
+  int operator*() const { return **State; }
+  input_iterator &operator++() {
+    (*State)++;
+    return *this;
+  }
+  bool operator==(const input_iterator &Other) const {
+    return *State == *Other.State;
+  }
+  bool operator!=(const input_iterator &Other) const {
+    return !(*this == Other);
+  }
+};
+
+TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest AppendInputIterator", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
+  auto &V = this->theVector;
+  V.push_back(1);
+  static constexpr int Src[] = {5, 6, 7, 8};
+  // Construct an input iterator that actually returns different results on the
+  // second iteration.
+  const int *BeginState = &Src[0];
+  const int *EndState = &Src[2];
+  V.append(input_iterator{&BeginState}, input_iterator{&EndState});
+  assertValuesInOrder(V, 3u, 1, 5, 6);
+}
+
+TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertInputIterator", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
+  auto &V = this->theVector;
+  V.push_back(1);
+  V.push_back(2);
+  static constexpr int Src[] = {5, 6, 7, 8};
+  // Construct an input iterator that actually returns different results on the
+  // second iteration.
+  const int *BeginState = &Src[0];
+  const int *EndState = &Src[2];
+  V.insert(V.begin() + 1, input_iterator{&BeginState},
+           input_iterator{&EndState});
+  assertValuesInOrder(V, 4u, 1, 5, 6, 2);
+}
+
 struct output_iterator {
   using iterator_category = std::output_iterator_tag;
   using value_type = int;
@@ -1231,6 +1278,12 @@ TEST_CASE("SmallVectorTest ToVector", "[wpiutil][llvm]") {
     CHECK_THAT(IntVector, Catch::Matchers::RangeEquals({1, 2, 3}));
     IntVector = to_vector<3>(V);
     CHECK_THAT(IntVector, Catch::Matchers::RangeEquals({1, 2, 3}));
+  }
+  {
+    SmallVector<bool> V = {true, false, true};
+    std::span<bool> ref = V;
+    auto copy = to_vector(ref);
+    CHECK_THAT(copy, Catch::Matchers::RangeEquals({true, false, true}));
   }
 }
 

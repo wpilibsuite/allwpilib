@@ -67,7 +67,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
-        "exclusive",
         "no-asan",
         "no-tsan",
     ],
@@ -80,7 +79,6 @@ cc_test(
 wpilib_java_junit5_test(
     name = "telemetry-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
-    tags = ["exclusive"],
     deps = [
         ":telemetry-java",
         "//wpiutil:wpiutil-java",
@@ -129,7 +127,6 @@ define_pybind_library(
 robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
-    tags = ["exclusive"],
     deps = [
         ":robotpy-telemetry",
         "//wpiutil:robotpy-wpiutil",
