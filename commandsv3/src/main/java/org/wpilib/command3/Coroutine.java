@@ -156,8 +156,7 @@ public final class Coroutine {
 
     // private - only the coroutine can construct these
     private ForkResult(
-        Collection<Command> forkedCommands,
-        List<ScheduleResult.Failure> failedCommands) {
+        Collection<Command> forkedCommands, List<ScheduleResult.Failure> failedCommands) {
       m_forkedCommands = List.copyOf(forkedCommands);
       m_failedCommands = List.copyOf(failedCommands);
     }

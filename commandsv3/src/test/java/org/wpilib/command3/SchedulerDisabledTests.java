@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.wpilib.command3.Scheduler.ScheduleResult.RequiresUnsafeMechanisms;
 import org.wpilib.command3.Scheduler.ScheduleResult.Success;
@@ -110,8 +111,13 @@ class SchedulerDisabledTests extends CommandTestBase {
         "Entire composition should have been canceled");
     assertSchedulerEvent(
         ForkFailure.class,
-        e -> e.command() == parent,
-        "Parent should receive an interrupted event");
+        e ->
+            e.command() == parent
+                && e.failures().size() == 1
+                && e.failures().getFirst() instanceof RequiresUnsafeMechanisms(var cmd, var mechs)
+                && cmd == child
+                && mechs.equals(Set.of(mech)),
+        "Parent should receive a ForkFailure event");
     assertSchedulerEvent(
         Canceled.class, e -> e.command() == parent, "Parent should receive a cancellation event");
   }

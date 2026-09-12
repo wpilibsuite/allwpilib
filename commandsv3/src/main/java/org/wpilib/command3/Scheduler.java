@@ -1049,13 +1049,9 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void handleCoroutineIRQ(Coroutine coroutine, Command command) {
-    // The coroutine requested to be interrupted. Cancel this command and bubble up the stack
-    // to interrupt the entire composition.
-    var failure = coroutine.getForkResult().getFailedCommands().getFirst();
-
-    Command root = getRoot(command);
+    Command root = getRoot(command); // capture the root command before modifying scheduler state
     m_currentCommandAncestry.clear();
-    emitForkFailureEvent(command, failure);
+    emitForkFailureEvent(command, coroutine.getForkResult().getFailedCommands());
     cancel(root);
     Continuation.mountContinuation(null);
   }
@@ -1435,8 +1431,8 @@ public final class Scheduler implements ProtobufSerializable {
     emitEvent(event);
   }
 
-  private void emitForkFailureEvent(Command command, Scheduler.ScheduleResult.Failure failure) {
-    var event = new SchedulerEvent.ForkFailure(command, failure, RobotController.getTime());
+  private void emitForkFailureEvent(Command command, List<ScheduleResult.Failure> failures) {
+    var event = new SchedulerEvent.ForkFailure(command, failures, RobotController.getTime());
     emitEvent(event);
   }
 

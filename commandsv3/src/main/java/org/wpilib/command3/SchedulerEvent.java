@@ -4,7 +4,9 @@
 
 package org.wpilib.command3;
 
+import java.util.List;
 import java.util.function.Consumer;
+import org.wpilib.command3.Scheduler.ScheduleResult;
 import org.wpilib.system.RobotController;
 
 /**
@@ -90,10 +92,10 @@ public sealed interface SchedulerEvent {
   /**
    * An event marking when a child command could not be forked.
    *
-   * @param command The child command that could not be forked
-   * @param failure The reason the child command could not be forked
-   * @param timestampNanos When the child command was attempted to be forked
+   * @param command The command attempting to fork the child commands
+   * @param failures The reasons the child commands could not be forked
+   * @param timestampNanos When the child commands were attempted to be forked
    */
-  record ForkFailure(Command command, Scheduler.ScheduleResult.Failure failure, long timestampNanos)
+  record ForkFailure(Command command, List<ScheduleResult.Failure> failures, long timestampNanos)
       implements SchedulerEvent {}
 }
