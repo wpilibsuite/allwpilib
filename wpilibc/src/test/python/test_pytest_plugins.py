@@ -3,98 +3,11 @@ import sys
 
 import pytest
 
-
-def _make_robot_module(pytester):
-    pytester.makepyfile(robot_module="""
-import wpilib
-
-
-class DummyRobot(wpilib.TimedRobot):
-    def __init__(self):
-        super().__init__()
-        self.did_init = True
-
-
-class AutonomousPeriodicFailed(wpilib.TimedRobot):
-    def autonomous_periodic(self):
-        assert False
-
-
-class TeleopPeriodicFailed(wpilib.TimedRobot):
-    def teleop_periodic(self):
-        assert False
-
-
-class TeleopInitFailed(wpilib.TimedRobot):
-    def teleop_init(self):
-        assert False
-
-
-class IterativeStateRobot(wpilib.TimedRobot):
-
-    def disabled_init(self):
-        self.did_disabled_init = True
-
-    def disabled_periodic(self):
-        self.did_disabled_periodic = True
-
-    def autonomous_init(self):
-        self.did_auto_init = True
-
-    def autonomous_periodic(self):
-        self.did_auto_periodic = True
-
-    def teleop_init(self):
-        self.did_teleop_init = True
-
-    def teleop_periodic(self):
-        self.did_teleop_periodic = True
-
-""")
-
-
-def _configure_robot_testing_plugin(pytester, robot_class="DummyRobot"):
-    pytester.makeconftest(f"""
-import pathlib
-
-from wpilib.testing.pytest_plugin import RobotTestingPlugin
-
-from robot_module import {robot_class}
-
-
-def pytest_configure(config):
-    robot_file = pathlib.Path(__file__).resolve()
-    config.pluginmanager.register(RobotTestingPlugin({robot_class}, robot_file, False))
-""")
-
-
-def _configure_isolated_plugin(
-    pytester,
-    parallelism=1,
-    robot_class="DummyRobot",
-    robot_module="robot_module",
-    robot_file_name=None,
-):
-    if robot_file_name is None:
-        robot_file = "pathlib.Path(__file__).resolve()"
-    else:
-        robot_file = f"pathlib.Path(__file__).parent / {robot_file_name!r}"
-
-    pytester.makeconftest(f"""
-import pathlib
-
-from wpilib.testing.pytest_isolated_tests_plugin import IsolatedTestsPlugin
-
-from {robot_module} import {robot_class}
-
-def pytest_configure(config):
-    if "--no-header" in config.invocation_params.args:
-        return
-    robot_file = {robot_file}
-    config.pluginmanager.register(
-        IsolatedTestsPlugin({robot_class}, robot_file, False, False, {parallelism})
-    )
-""")
+from pytest_plugin_test_helpers import (
+    _configure_isolated_plugin,
+    _configure_robot_testing_plugin,
+    _make_robot_module,
+)
 
 
 def test_robot_testing_plugin_success(pytester):
@@ -311,6 +224,28 @@ def test_robot_two(robot):
     )
 
 
+def test_isolated_plugin_reports_worker_collection_exit(pytester):
+    _make_robot_module(pytester)
+    _configure_isolated_plugin(pytester)
+    with pytester.path.joinpath("conftest.py").open("a") as fp:
+        fp.write("""
+
+
+def pytest_collection_modifyitems(config, items):
+    if "--no-header" in config.invocation_params.args:
+        items.clear()
+""")
+    pytester.makepyfile(test_isolated="""
+def test_robot(robot):
+    assert robot is not None
+""")
+
+    result = pytester.runpytest_subprocess("-v")
+
+    result.assert_outcomes(failed=1)
+    result.stdout.fnmatch_lines(["*subprocess exited with exit code 5*"])
+
+
 def test_isolated_plugin_maxfail_stops_early(pytester):
     _make_robot_module(pytester)
     _configure_isolated_plugin(pytester)
@@ -329,6 +264,33 @@ def test_robot_second(robot):
     assert not any("test_robot_second" in line for line in result.outlines)
 
 
+def test_isolated_plugin_maxfail_stops_deferred_tests(pytester):
+    _make_robot_module(pytester)
+    _configure_isolated_plugin(pytester, parallelism=2)
+    pytester.makepyfile(test_isolated="""
+import pathlib
+import time
+
+
+def test_robot_failure(robot):
+    assert False
+
+
+def test_plain_waits_for_failure():
+    time.sleep(1)
+
+
+def test_plain_must_not_run():
+    pathlib.Path("plain-ran").touch()
+""")
+
+    result = pytester.runpytest_subprocess("-v", "-x")
+
+    assert result.parseoutcomes()["failed"] == 1
+    assert result.ret == pytest.ExitCode.TESTS_FAILED
+    assert not (pytester.path / "plain-ran").exists()
+
+
 @pytest.mark.parametrize("isolated", [False, True])
 def test_builtin_tests_module(pytester, isolated):
     _make_robot_module(pytester)
@@ -340,7 +302,7 @@ def test_builtin_tests_module(pytester, isolated):
 
     result = pytester.runpytest_subprocess("-q")
 
-    result.assert_outcomes(passed=4)
+    result.assert_outcomes(passed=4, skipped=1)
 
 
 def _run_robot_suite(pytester, isolated, robot_class, test_source, *args):
@@ -432,3 +394,57 @@ def test_state_transitions(robot, control):
     )
 
     result.assert_outcomes(passed=1)
+
+
+@pytest.mark.parametrize(
+    "a_fixture, b_fixture",
+    [("robot", "robot"), ("robot", ""), ("", "robot")],
+    ids=["RR", "RN", "NR"],
+)
+def test_unordered_tests_still_run_in_parallel(pytester, a_fixture, b_fixture):
+    """
+    Tests WITHOUT @pytest.mark.order must not be serialised by order-marker
+    support.  With parallelism=2, two 1.5 s tests must overlap in wall-clock
+    time.
+
+    NR is the case collection order alone cannot deliver: the plain test is
+    collected first, so following the given order would run it to completion
+    before the subprocess was even spawned.  Within a group the run loop is free
+    to schedule for throughput, so it starts the isolated test before running any
+    in-process test and the two overlap regardless of which was collected first.
+
+    NN is omitted: two in-process tests both run here, and this process runs one
+    test at a time -- serial by design, and no scheduling can change it.
+    """
+    _make_robot_module(pytester)
+    _configure_isolated_plugin(pytester, parallelism=2)
+
+    def params(f):
+        return f"({f})" if f else "()"
+
+    pytester.makepyfile(test_parallel_execution=f"""\
+import pathlib
+import time
+
+
+def test_a{params(a_fixture)}:
+    pathlib.Path("a_start.txt").write_text(str(time.monotonic()))
+    time.sleep(1.5)
+    pathlib.Path("a_end.txt").write_text(str(time.monotonic()))
+
+
+def test_b{params(b_fixture)}:
+    pathlib.Path("b_start.txt").write_text(str(time.monotonic()))
+    time.sleep(1.5)
+    pathlib.Path("b_end.txt").write_text(str(time.monotonic()))
+""")
+
+    result = pytester.runpytest_subprocess("-vv")
+    result.assert_outcomes(passed=2)
+
+    root = pathlib.Path(pytester.path)
+    a_end = float((root / "a_end.txt").read_text())
+    b_start = float((root / "b_start.txt").read_text())
+    assert (
+        b_start < a_end
+    ), f"Expected parallel: b_start={b_start:.3f} a_end={a_end:.3f}"

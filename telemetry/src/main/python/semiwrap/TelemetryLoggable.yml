@@ -8,7 +8,9 @@ functions:
     ignore: true
 classes:
   wpi::telemetry::TelemetryLoggable:
+    force_no_default_constructor: true
     methods:
       LogTo:
-        ignore_py: true
+        no_release_gil: true
       GetTelemetryType:
+        no_release_gil: true

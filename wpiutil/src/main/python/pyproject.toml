@@ -53,6 +53,7 @@ scan_headers_ignore = [
     "pb_common.h",
     "pb_decode.h",
     "pb_encode.h",
+    "src/type_casters/wpybuffer.h",
     "upb/*",
     "utf8_range.h",
 ]

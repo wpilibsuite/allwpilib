@@ -1,0 +1,8 @@
+classes:
+  wpi::tunables::detail::TunableBase:
+    rename: _TunableBase
+    force_no_default_constructor: true
+    force_no_trampoline: true
+    nodelete: true
+  wpi::tunables::detail::TunableMemberBase:
+    ignore: true

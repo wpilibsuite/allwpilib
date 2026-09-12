@@ -1,0 +1,77 @@
+extra_includes:
+- memory
+- optional
+- string
+- utility
+- pybind11/typing.h
+- rpy/PyTelemetryTable.h
+- wpi/telemetry/TelemetryBackend.hpp
+- wpystruct.h
+
+classes:
+  wpi::telemetry::TelemetryRegistry:
+    force_no_default_constructor: true
+    methods:
+      SetReportWarning:
+        no_release_gil: true
+        param_override:
+          func:
+            name: callback
+            x_type: std::optional<py::typing::Callable<void(std::string_view, std::string_view)>>
+            default: std::nullopt
+        cpp_code: |
+          [](std::optional<py::typing::Callable<
+                 void(std::string_view, std::string_view)>> callback) {
+            if (!callback) {
+              wpi::telemetry::TelemetryRegistry::SetReportWarning(nullptr);
+              return;
+            }
+
+            auto callbackOwner = std::shared_ptr<py::function>{
+                new py::function{std::move(*callback)}, [](py::function* callback) {
+                  py::gil_scoped_acquire gil;
+                  delete callback;
+                }};
+            wpi::telemetry::TelemetryRegistry::SetReportWarning(
+                [callbackOwner](std::string_view path, std::string_view msg) {
+                  py::gil_scoped_acquire gil;
+                  (*callbackOwner)(std::string{path}, std::string{msg});
+                });
+          }
+      GetReportWarning:
+        ignore: true
+      ReportWarning:
+      RegisterBackend:
+        cpp_code: |
+          [](std::string_view prefix,
+             std::shared_ptr<wpi::telemetry::TelemetryBackend> backend) {
+            wpi::telemetry::TelemetryRegistry::RegisterBackend(
+                prefix, std::move(backend));
+          }
+      GetBackend:
+      GetEntry:
+      GetTable:
+        no_release_gil: true
+        cpp_code: |
+          [](std::string_view path) {
+            return wpi::telemetry::python::PyTelemetryTable{
+                wpi::telemetry::TelemetryRegistry::GetTable(path)};
+          }
+      Reset:
+      HasSchema:
+      AddSchema:
+        overloads:
+          TelemetryBackend&, std::string_view, std::string_view, std::span<const uint8_t>:
+          TelemetryBackend&, std::string_view, std::string_view, std::string_view:
+      AddProtobufSchema:
+        ignore: true
+      AddStructSchema:
+        no_release_gil: true
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](TelemetryBackend &backend, const py::type &type) {
+            WPyStructInfo info(type);
+            return TelemetryRegistry::AddStructSchema<WPyStruct, WPyStructInfo>(backend, info);
+          }

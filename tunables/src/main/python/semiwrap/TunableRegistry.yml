@@ -1,0 +1,114 @@
+defaults:
+  default_args_as_kw_only: true
+
+extra_includes:
+- optional
+- utility
+- rpy/TunableRegistryFunctions.h
+
+functions:
+  SetTunableRegistryPreUpdateCallback:
+    ignore: true
+
+classes:
+  wpi::tunables::TunableRegistry:
+    force_no_default_constructor: true
+    methods:
+      SetReportWarning:
+        no_release_gil: true
+        param_override:
+          func:
+            name: callback
+            x_type: std::optional<wpi::tunables::python::ReportWarningCallback>
+        cpp_code: |
+          [](std::optional<wpi::tunables::python::ReportWarningCallback> callback) {
+            wpi::tunables::python::SetReportWarning(std::move(callback));
+          }
+      GetReportWarning:
+        ignore: true
+      ReportWarning:
+        no_release_gil: true
+      RegisterBackend:
+        no_release_gil: true
+        cpp_code: |
+          [](std::string_view prefix,
+             std::shared_ptr<wpi::tunables::TunableBackend> backend) {
+            wpi::tunables::python::RegisterBackend(prefix, std::move(backend));
+          }
+      GetBackend:
+        no_release_gil: true
+      Publish:
+        ignore: true
+      Remove:
+        no_release_gil: true
+        param_override:
+          path:
+            name: value
+            x_type: wpi::tunables::python::RemovableValue
+        cpp_code: |
+          [](wpi::tunables::python::RemovableValue value) {
+            wpi::tunables::python::Remove(std::move(value));
+          }
+      Update:
+        no_release_gil: true
+        cpp_code: |
+          [] {
+            wpi::tunables::python::Update();
+          }
+      NotifyChanged:
+        ignore: true
+      ResetChangedAfterUpdate:
+        ignore: true
+      RunAfterUpdate:
+        ignore: true
+      GetUpdateMutex:
+        ignore: true
+      Reset:
+        no_release_gil: true
+        cpp_code: |
+          [] {
+            wpi::tunables::python::Reset();
+          }
+      GetTunable:
+        ignore: true
+      RegisterTunable:
+        ignore: true
+      MoveTunableCallbackParent:
+        ignore: true
+      UnregisterTunable:
+        ignore: true
+      MoveTunable:
+        ignore: true
+    inline_code: |
+      .def_static("get_table", &wpi::tunables::python::GetRegistryTable,
+                  py::arg("path"))
+      .def_static("normalize_name", &wpi::tunables::python::NormalizeName,
+                  py::arg("path"));
+      py::class_<wpi::tunables::python::UpdateMutexContext>(
+          m, "_UpdateMutexContext")
+          .def("__enter__",
+               [](py::object self)
+                   -> wpi::tunables::python::UpdateMutexContext& {
+                 auto& context =
+                     self.cast<wpi::tunables::python::UpdateMutexContext&>();
+                 context.Enter(self);
+                 return context;
+               },
+               py::return_value_policy::reference_internal)
+          .def("__exit__",
+               [](wpi::tunables::python::UpdateMutexContext &self,
+                  py::args) {
+                 self.Exit();
+                 return false;
+               });
+      cls_TunableRegistry.def_static(
+          "with_update_mutex",
+          &wpi::tunables::python::MakeUpdateMutexContext,
+          "Return a context manager that holds the registry update mutex. "
+          "Enter and exit must occur on the same thread; while entered, the "
+          "context retains itself until owner-thread exit. Defensive C++ "
+          "destruction on a nonowner thread abandons rather than unlocks the "
+          "mutex. Critical sections should be short and every competing "
+          "tunable access must participate.")
+  wpi::tunables::TunableRegistry::TunableInfo:
+    ignore: true

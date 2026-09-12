@@ -3,8 +3,8 @@
 #include <stdint.h>
 
 #include <concepts>
+#include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -14,90 +14,102 @@
 namespace py = pybind11;
 
 namespace wpi::telemetry::python {
+namespace {
 
-py::object ActionValueToPython(
-    const wpi::telemetry::MockTelemetryBackend::Action& action) {
-  py::dict result;
-  result["path"] = action.path;
-  result["timestamp"] = action.timestamp;
-  std::visit(
-      [&](const auto& value) {
+PyObject* gMockBackendValueTypes;
+
+}  // namespace
+
+void InitializeMockBackendValueTypes(py::module_& module) {
+  py::module_ mockBackend = py::module_::import("telemetry.mock_backend");
+  py::tuple valueTypes = py::make_tuple(
+      mockBackend.attr("KeepDuplicatesValue"),
+      mockBackend.attr("SetPropertyValue"), mockBackend.attr("LogStringValue"),
+      mockBackend.attr("LogBooleanArrayValue"), mockBackend.attr("LogRawValue"),
+      mockBackend.attr("Action"));
+  auto* valueTypesPtr = valueTypes.ptr();
+  py::capsule cleanup{static_cast<void*>(valueTypesPtr), [](void* value) {
+                        auto* valueTypes = static_cast<PyObject*>(value);
+                        if (gMockBackendValueTypes == valueTypes) {
+                          gMockBackendValueTypes = nullptr;
+                        }
+                        Py_DECREF(valueTypes);
+                      }};
+  valueTypes.release();
+  module.attr("_mock_backend_value_types") = cleanup;
+  gMockBackendValueTypes = valueTypesPtr;
+}
+
+py::object GetMockBackendValueType(MockBackendValueType type) {
+  if (!gMockBackendValueTypes) {
+    throw std::runtime_error(
+        "mock backend value type cache is not initialized");
+  }
+  PyObject* valueType =
+      PyTuple_GetItem(gMockBackendValueTypes, static_cast<Py_ssize_t>(type));
+  if (!valueType) {
+    throw py::error_already_set{};
+  }
+  return py::reinterpret_borrow<py::object>(valueType);
+}
+
+std::optional<ActionValue> GetLastValue(
+    const wpi::telemetry::MockTelemetryBackend& backend,
+    std::string_view path) {
+  auto* action = backend.GetLastAction(path);
+  if (!action) {
+    return std::nullopt;
+  }
+
+  return std::visit(
+      [](const auto& value) -> ActionValue {
         using T = std::decay_t<decltype(value)>;
-        if constexpr (std::same_as<T, wpi::telemetry::MockTelemetryBackend::
-                                          KeepDuplicatesValue>) {
-          result["kind"] = "keep_duplicates";
-          result["value"] = value.value;
-        } else if constexpr (std::same_as<T,
-                                          wpi::telemetry::MockTelemetryBackend::
-                                              SetPropertyValue>) {
-          result["kind"] = "set_property";
-          result["key"] = value.key;
-          result["value"] = value.value;
-        } else if constexpr (std::same_as<T, bool>) {
-          result["kind"] = "boolean";
-          result["value"] = value;
-        } else if constexpr (std::same_as<T, int16_t> ||
-                             std::same_as<T, int32_t> ||
-                             std::same_as<T, int64_t>) {
-          result["kind"] = "integer";
-          result["value"] = value;
-        } else if constexpr (std::same_as<T, float> ||
-                             std::same_as<T, double>) {
-          result["kind"] = "double";
-          result["value"] = value;
-        } else if constexpr (std::same_as<T,
-                                          wpi::telemetry::MockTelemetryBackend::
-                                              LogStringValue>) {
-          result["kind"] = "string";
-          result["value"] = value.value;
-          result["type_string"] = value.typeString;
+        if constexpr (
+            std::same_as<
+                T, wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue> ||
+            std::same_as<
+                T, wpi::telemetry::MockTelemetryBackend::SetPropertyValue> ||
+            std::same_as<
+                T, wpi::telemetry::MockTelemetryBackend::LogStringValue>) {
+          return ActionValue{py::cast(value.value)};
         } else if constexpr (std::same_as<T,
                                           wpi::telemetry::MockTelemetryBackend::
                                               LogBooleanArrayValue>) {
-          result["kind"] = "boolean[]";
-          py::list list;
+          py::list result;
           for (int item : value.value) {
-            list.append(item != 0);
+            result.append(item != 0);
           }
-          result["value"] = std::move(list);
-        } else if constexpr (std::same_as<T, std::vector<int16_t>> ||
-                             std::same_as<T, std::vector<int32_t>> ||
-                             std::same_as<T, std::vector<int64_t>>) {
-          result["kind"] = "integer[]";
-          result["value"] = value;
-        } else if constexpr (std::same_as<T, std::vector<float>> ||
-                             std::same_as<T, std::vector<double>>) {
-          result["kind"] = "double[]";
-          result["value"] = value;
-        } else if constexpr (std::same_as<T, std::vector<std::string>>) {
-          result["kind"] = "string[]";
-          result["value"] = value;
+          return ActionValue{std::move(result)};
         } else if constexpr (std::same_as<T,
                                           wpi::telemetry::MockTelemetryBackend::
                                               LogRawValue>) {
-          result["kind"] = "raw";
-          result["value"] =
+          return ActionValue{
               py::bytes{reinterpret_cast<const char*>(value.value.data()),
-                        value.value.size()};
-          result["type_string"] = value.typeString;
+                        value.value.size()}};
+        } else {
+          return ActionValue{py::cast(value)};
         }
       },
-      action.value);
-  return std::move(result);
+      action->value);
 }
 
-py::object SchemaToPython(
-    const wpi::telemetry::MockTelemetryBackend::Schema* schema) {
+std::optional<ObjectDict> GetSchema(
+    const wpi::telemetry::MockTelemetryBackend& backend,
+    std::string_view schemaName) {
+  auto* schema =
+      const_cast<wpi::telemetry::MockTelemetryBackend&>(backend).GetSchema(
+          schemaName);
   if (!schema) {
-    return py::none{};
+    return std::nullopt;
   }
-  py::dict result;
+
+  ObjectDict result;
   result["type"] = schema->type;
   result["schema_bytes"] =
       py::bytes{reinterpret_cast<const char*>(schema->schemaBytes.data()),
                 schema->schemaBytes.size()};
   result["schema_string"] = schema->schemaString;
-  return std::move(result);
+  return result;
 }
 
 }  // namespace wpi::telemetry::python

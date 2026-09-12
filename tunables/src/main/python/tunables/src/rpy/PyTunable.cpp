@@ -1,25 +1,49 @@
 #include "PyTunable.h"
 
+#include <algorithm>
+#include <memory>
+#include <mutex>
 #include <span>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-#include <pybind11/stl.h>
-#include <wpi/tunables/ComplexTunable.hpp>
+#include <wpi_json_type_caster.h>
+#include <wpybuffer.h>
 
-#include "PyMutationList.h"
 #include "TunableValuePython.h"
+#include "wpi/tunables/TunableConfig.hpp"
 
 namespace py = pybind11;
 
 namespace wpi::tunables::python {
+
+class PyTunable::CallbackOwner {
+ public:
+  void Store(std::weak_ptr<PyTunable> owner) {
+    std::scoped_lock lock{m_mutex};
+    m_owner = std::move(owner);
+  }
+
+  std::shared_ptr<PyTunable> Lock() {
+    std::scoped_lock lock{m_mutex};
+    return m_owner.lock();
+  }
+
+ private:
+  std::mutex m_mutex;
+  std::weak_ptr<PyTunable> m_owner;
+};
+
 namespace {
 
 enum class ValueKind {
   BOOLEAN,
+  INT32,
   INTEGER,
+  FLOAT,
   DOUBLE,
   STRING,
   RAW,
@@ -39,42 +63,30 @@ bool IsWpiStructType(py::handle value) {
   return PyType_Check(value.ptr()) && py::hasattr(value, "WPIStruct");
 }
 
-bool IsBytesLike(py::handle value) {
-  return PyBytes_Check(value.ptr()) || PyByteArray_Check(value.ptr()) ||
-         PyMemoryView_Check(value.ptr());
-}
-
-bool IsBuiltinType(py::handle value, const char* name) {
-  return value.is(py::module_::import("builtins").attr(name));
-}
-
-bool IsNoType(py::handle type) {
-  return type.is_none();
-}
-
 bool IsSequenceValue(py::handle value) {
   return PySequence_Check(value.ptr()) && !py::isinstance<py::str>(value) &&
-         !IsBytesLike(value);
+         !wpi::util::python::IsBytesLike(value);
 }
 
 ValueKind KindFromScalarType(py::handle valueType) {
   if (py::isinstance<py::str>(valueType)) {
     throw py::type_error("tunable value_type must be a Python type");
   }
-  if (IsBuiltinType(valueType, "bool")) {
+  if (valueType.is(py::handle{reinterpret_cast<PyObject*>(&PyBool_Type)})) {
     return ValueKind::BOOLEAN;
   }
-  if (IsBuiltinType(valueType, "int")) {
+  if (valueType.is(py::handle{reinterpret_cast<PyObject*>(&PyLong_Type)})) {
     return ValueKind::INTEGER;
   }
-  if (IsBuiltinType(valueType, "float")) {
+  if (valueType.is(py::handle{reinterpret_cast<PyObject*>(&PyFloat_Type)})) {
     return ValueKind::DOUBLE;
   }
-  if (IsBuiltinType(valueType, "str")) {
+  if (valueType.is(py::handle{reinterpret_cast<PyObject*>(&PyUnicode_Type)})) {
     return ValueKind::STRING;
   }
-  if (IsBuiltinType(valueType, "bytes") ||
-      IsBuiltinType(valueType, "bytearray")) {
+  if (valueType.is(py::handle{reinterpret_cast<PyObject*>(&PyBytes_Type)}) ||
+      valueType.is(
+          py::handle{reinterpret_cast<PyObject*>(&PyByteArray_Type)})) {
     return ValueKind::RAW;
   }
   if (IsWpiStructType(valueType)) {
@@ -87,16 +99,17 @@ ValueKind KindFromElementType(py::handle elementType) {
   if (py::isinstance<py::str>(elementType)) {
     throw py::type_error("tunable element_type must be a Python type");
   }
-  if (IsBuiltinType(elementType, "bool")) {
+  if (elementType.is(py::handle{reinterpret_cast<PyObject*>(&PyBool_Type)})) {
     return ValueKind::BOOLEAN_ARRAY;
   }
-  if (IsBuiltinType(elementType, "int")) {
+  if (elementType.is(py::handle{reinterpret_cast<PyObject*>(&PyLong_Type)})) {
     return ValueKind::INTEGER_ARRAY;
   }
-  if (IsBuiltinType(elementType, "float")) {
+  if (elementType.is(py::handle{reinterpret_cast<PyObject*>(&PyFloat_Type)})) {
     return ValueKind::DOUBLE_ARRAY;
   }
-  if (IsBuiltinType(elementType, "str")) {
+  if (elementType.is(
+          py::handle{reinterpret_cast<PyObject*>(&PyUnicode_Type)})) {
     return ValueKind::STRING_ARRAY;
   }
   if (IsWpiStructType(elementType)) {
@@ -147,21 +160,21 @@ ValueKind InferSequenceKind(const py::sequence& value) {
   return ValueKind::STRING_ARRAY;
 }
 
-ValueKind InferValueKind(py::handle value, py::handle valueType,
-                         py::handle elementType) {
-  bool hasValueType = !IsNoType(valueType);
-  bool hasElementType = !IsNoType(elementType);
-  if (hasValueType && hasElementType) {
+ValueKind InferValueKind(
+    py::handle value,
+    const py::typing::Optional<PyTunable::PythonType>& valueType,
+    const py::typing::Optional<PyTunable::PythonType>& elementType) {
+  if (!valueType.is_none() && !elementType.is_none()) {
     throw py::type_error("value_type and element_type are mutually exclusive");
   }
-  if (hasElementType) {
+  if (!elementType.is_none()) {
     if (!IsSequenceValue(value)) {
       throw py::type_error(
           "element_type is only supported for tunable sequences");
     }
     return KindFromElementType(elementType);
   }
-  if (hasValueType) {
+  if (!valueType.is_none()) {
     if (IsSequenceValue(value)) {
       throw py::type_error(
           "value_type is only supported for scalar tunables; use "
@@ -181,7 +194,7 @@ ValueKind InferValueKind(py::handle value, py::handle valueType,
   if (py::isinstance<py::str>(value)) {
     return ValueKind::STRING;
   }
-  if (IsBytesLike(value)) {
+  if (wpi::util::python::IsBytesLike(value)) {
     return ValueKind::RAW;
   }
   if (IsWpiStruct(value)) {
@@ -193,108 +206,76 @@ ValueKind InferValueKind(py::handle value, py::handle valueType,
   throw py::type_error("cannot infer tunable type; pass value_type explicitly");
 }
 
-template <typename T>
-struct IsStdVector : std::false_type {};
-
-template <typename T, typename Allocator>
-struct IsStdVector<std::vector<T, Allocator>> : std::true_type {};
-
-template <typename T>
-inline constexpr bool IsStdVectorV = IsStdVector<T>::value;
-
-template <typename T>
-py::list ToPythonList(const std::vector<T>& value) {
-  py::list data;
-  for (const auto& item : value) {
-    data.append(item);
-  }
-  return data;
-}
-
-py::list ToPythonList(const std::vector<uint8_t>& value) {
-  py::list data;
-  for (uint8_t item : value) {
-    data.append(static_cast<int>(item));
-  }
-  return data;
-}
-
-py::list ToPythonList(const std::vector<bool>& value) {
-  py::list data;
-  for (bool item : value) {
-    data.append(item);
-  }
-  return data;
-}
-
-py::list ToPythonList(const std::vector<WPyStruct>& value) {
-  py::list data;
-  for (auto&& item : value) {
-    data.append(item.py);
-  }
-  return data;
-}
-
 }  // namespace
 
-PyTunable::PyTunable(py::object value, py::object getter, py::object setter,
-                     py::object onTune, bool robust, bool isMutable,
-                     py::object valueType, py::object elementType,
-                     py::object properties, std::string typeString,
-                     bool alwaysGet)
+PyTunable::PyTunable(py::object value, std::optional<Getter> getter,
+                     std::optional<Setter> setter,
+                     std::optional<TuneCallback> onTune, bool robust,
+                     bool isMutable, py::typing::Optional<PythonType> valueType,
+                     py::typing::Optional<PythonType> elementType,
+                     std::optional<Properties> properties,
+                     std::string typeString, bool alwaysGet, bool narrowScalar)
     : m_getter{std::move(getter)},
       m_setter{std::move(setter)},
       m_onTune{std::move(onTune)},
-      m_value{MakeValue(value, robust, isMutable, std::move(valueType),
-                        std::move(elementType), std::move(properties),
-                        std::move(typeString), alwaysGet)} {
+      m_callbackOwner{std::make_shared<CallbackOwner>()},
+      m_value{MakeValue(value, robust, isMutable, valueType, elementType,
+                        properties, std::move(typeString), alwaysGet,
+                        narrowScalar)} {
   py::gil_scoped_acquire gil;
   m_lastStructData = PackCachedStructData();
 }
 
 wpi::tunables::detail::TunableBase& PyTunable::GetBase() {
+  m_callbackOwner->Store(shared_from_this());
   return std::visit(
       [](auto& value) -> wpi::tunables::detail::TunableBase& { return value; },
       m_value);
 }
 
 py::object PyTunable::Get() const {
-  if (!m_getter.is_none()) {
-    return m_getter();
+  if (m_getter) {
+    return (*m_getter)();
   }
   return GetCached();
 }
 
-void PyTunable::Set(py::handle value) {
-  py::object pyValue = py::reinterpret_borrow<py::object>(value);
-  if (!m_setter.is_none()) {
-    m_setter(pyValue);
+void PyTunable::Set(py::object value) {
+  if (m_setter) {
+    (*m_setter)(value);
   }
-  if (!m_getter.is_none()) {
-    SetCached(m_getter());
+  if (m_getter) {
+    SetCached((*m_getter)());
   } else {
-    SetCached(pyValue);
+    SetCached(value);
   }
 }
 
 py::object PyTunable::Mutate() {
-  if (!m_getter.is_none()) {
-    py::object value = m_getter();
+  auto* tunable =
+      std::get_if<wpi::tunables::Tunable<WPyStruct, WPyStructInfo>>(&m_value);
+  if (!tunable) {
+    throw py::type_error(
+        "mutate() is only supported for individual struct values; "
+        "use get() and set() for other types");
+  }
+  if (m_getter) {
+    py::object value = (*m_getter)();
     SetCached(value);
     return value;
   }
-  return MutateCached();
+  return tunable->Mutate().py;
 }
 
 void PyTunable::Refresh() {
-  if (!m_getter.is_none()) {
+  if (m_getter) {
     py::gil_scoped_acquire gil;
-    SetCachedIfChanged(m_getter());
+    SetCachedIfChanged((*m_getter)());
   }
 }
 
 bool PyTunable::NeedsRefresh() const {
-  return !m_getter.is_none();
+  return m_getter.has_value();
 }
 
 template <typename T>
@@ -371,23 +352,6 @@ py::object PyTunable::GetCached() const {
       m_value);
 }
 
-py::object PyTunable::MutateCached() {
-  auto owner = shared_from_this();
-  return std::visit(
-      [&owner](auto& tunable) -> py::object {
-        auto& value = tunable.Mutate();
-        using T = std::remove_cvref_t<decltype(value)>;
-        if constexpr (std::same_as<T, WPyStruct>) {
-          return value.py;
-        } else if constexpr (IsStdVectorV<T>) {
-          return MakeMutationList(owner, ToPythonList(value));
-        } else {
-          return py::cast(value);
-        }
-      },
-      m_value);
-}
-
 void PyTunable::SetCached(py::handle value) {
   std::visit(
       [&](auto& tunable) {
@@ -426,56 +390,76 @@ std::optional<std::vector<uint8_t>> PyTunable::PackCachedStructData() const {
       m_value);
 }
 
-wpi::tunables::TunableConfig PyTunable::MakeConfig(bool robust, bool isMutable,
-                                                   py::handle properties,
-                                                   std::string typeString,
-                                                   bool alwaysGet) {
+wpi::tunables::TunableConfig PyTunable::MakeConfig(
+    bool robust, bool isMutable, const std::optional<Properties>& properties,
+    std::string typeString, bool alwaysGet) {
   wpi::tunables::TunableConfig config{
       .robust = robust,
       .isMutable = isMutable,
       .polling = alwaysGet ? wpi::tunables::TunableConfig::Polling::ALWAYS_GET
                            : wpi::tunables::TunableConfig::Polling::DEFAULT};
-  if (!m_onTune.is_none()) {
-    config.onTune = [this](wpi::tunables::detail::TunableBase&,
-                           wpi::tunables::ComplexTunable*) {
+  if (m_onTune) {
+    config.onTune = [callbackOwner = m_callbackOwner](
+                        wpi::tunables::detail::TunableBase&,
+                        wpi::tunables::ComplexTunable*) {
       py::gil_scoped_acquire gil;
-      m_onTune(GetCached());
+      auto owner = callbackOwner->Lock();
+      if (owner) {
+        (*owner->m_onTune)(owner->GetCached());
+      }
     };
   }
-  if (!m_getter.is_none() || !m_setter.is_none()) {
-    config.onRemoteSet = [this](wpi::tunables::detail::TunableBase&,
-                                wpi::tunables::ComplexTunable*) {
+  if (m_getter || m_setter) {
+    config.onRemoteSet = [callbackOwner = m_callbackOwner](
+                             wpi::tunables::detail::TunableBase&,
+                             wpi::tunables::ComplexTunable*) {
       py::gil_scoped_acquire gil;
-      if (!m_setter.is_none()) {
-        m_setter(GetCached());
+      auto owner = callbackOwner->Lock();
+      if (!owner) {
+        return;
       }
-      if (!m_getter.is_none()) {
-        SetCached(m_getter());
+      if (owner->m_setter) {
+        (*owner->m_setter)(owner->GetCached());
+      }
+      if (owner->m_getter) {
+        owner->SetCached((*owner->m_getter)());
       }
     };
   }
   if (!typeString.empty()) {
     config.typeString = std::move(typeString);
   }
-  if (!properties.is_none()) {
-    config.properties = ToJson(properties);
+  if (properties) {
+    config.properties = pyjson::to_json(*properties);
   }
   return config;
 }
 
-TunableVariant PyTunable::MakeValue(py::handle value, bool robust,
-                                    bool isMutable, py::object valueType,
-                                    py::object elementType,
-                                    py::object properties,
-                                    std::string typeString, bool alwaysGet) {
+PyTunable::TunableVariant PyTunable::MakeValue(
+    py::handle value, bool robust, bool isMutable,
+    const py::typing::Optional<PythonType>& valueType,
+    const py::typing::Optional<PythonType>& elementType,
+    const std::optional<Properties>& properties, std::string typeString,
+    bool alwaysGet, bool narrowScalar) {
   auto kind = InferValueKind(value, valueType, elementType);
+  if (narrowScalar) {
+    if (kind == ValueKind::INTEGER) {
+      kind = ValueKind::INT32;
+    } else if (kind == ValueKind::DOUBLE) {
+      kind = ValueKind::FLOAT;
+    }
+  }
   auto config = MakeConfig(robust, isMutable, properties, std::move(typeString),
                            alwaysGet);
   switch (kind) {
     case ValueKind::BOOLEAN:
       return wpi::tunables::TunableBool{value.cast<bool>(), config};
+    case ValueKind::INT32:
+      return wpi::tunables::TunableInt32{value.cast<int32_t>(), config};
     case ValueKind::INTEGER:
       return wpi::tunables::TunableInt64{value.cast<int64_t>(), config};
+    case ValueKind::FLOAT:
+      return wpi::tunables::TunableFloat{value.cast<float>(), config};
     case ValueKind::DOUBLE:
       return wpi::tunables::TunableDouble{value.cast<double>(), config};
     case ValueKind::STRING:
@@ -495,7 +479,7 @@ TunableVariant PyTunable::MakeValue(py::handle value, bool robust,
       return wpi::tunables::TunableStringVector{
           value.cast<std::vector<std::string>>(), config};
     case ValueKind::STRUCT: {
-      py::type type = IsWpiStructType(valueType)
+      py::type type = !valueType.is_none() && IsWpiStructType(valueType)
                           ? py::reinterpret_borrow<py::type>(valueType)
                           : py::type::of(value);
       int isInstance = PyObject_IsInstance(value.ptr(), type.ptr());
@@ -504,8 +488,7 @@ TunableVariant PyTunable::MakeValue(py::handle value, bool robust,
       }
       if (isInstance == 0) {
         throw py::type_error(
-            "struct tunables require values of the specified WPIStruct "
-            "type");
+            "struct tunables require values of the specified WPIStruct type");
       }
       WPyStructInfo info{type};
       return wpi::tunables::Tunable<WPyStruct, WPyStructInfo>{
@@ -514,7 +497,7 @@ TunableVariant PyTunable::MakeValue(py::handle value, bool robust,
     }
     case ValueKind::STRUCT_ARRAY: {
       auto sequence = py::reinterpret_borrow<py::sequence>(value);
-      py::type type = IsWpiStructType(elementType)
+      py::type type = !elementType.is_none() && IsWpiStructType(elementType)
                           ? py::reinterpret_borrow<py::type>(elementType)
                           : GetStructSequenceType(sequence);
       ValidateStructSequenceType(sequence, type);

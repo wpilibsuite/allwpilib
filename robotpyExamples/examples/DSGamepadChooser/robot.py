@@ -7,7 +7,7 @@
 
 from hal import RobotMode
 import wpilib
-from wpilib.opmoderobot import OpModeRobot
+from wpilib.opmodes import OpModeRobot
 
 
 class DoNothingTeleop(wpilib.PeriodicOpMode):

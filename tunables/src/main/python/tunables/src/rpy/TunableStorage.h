@@ -5,19 +5,22 @@
 #include <string_view>
 
 #include <pybind11/pybind11.h>
-#include <wpi/tunables/TunableTable.hpp>
 
-namespace wpi::tunables::python {
+namespace wpi::tunables {
+
+class TunableTable;
+
+namespace python {
 
 class PyComplexTunableAdapter;
 class PyTunable;
 
 namespace detail {
 
-void StoreValue(std::string path, std::shared_ptr<PyTunable> tunable);
-void StoreComplexValue(std::string path,
-                       std::shared_ptr<PyComplexTunableAdapter> tunable);
-void StoreNativeComplexValue(std::string path, pybind11::object tunable);
+void StoreValue(std::string path, std::shared_ptr<PyTunable> value);
+void StoreComplex(std::string path,
+                  std::shared_ptr<PyComplexTunableAdapter> value);
+void StoreNativeComplexValue(std::string path, pybind11::object value);
 
 }  // namespace detail
 
@@ -33,6 +36,7 @@ std::string NormalizeTablePath(const wpi::tunables::TunableTable& table,
 void RemoveRetainedPath(std::string_view path);
 void RemovePath(std::string_view path);
 void RemoveValue(pybind11::handle value);
-void RemoveRootValue(std::string_view name);
+void InitializeTunablePython(pybind11::module_& module);
 
-}  // namespace wpi::tunables::python
+}  // namespace python
+}  // namespace wpi::tunables

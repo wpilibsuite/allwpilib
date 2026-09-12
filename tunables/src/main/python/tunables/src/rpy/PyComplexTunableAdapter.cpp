@@ -3,23 +3,41 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <utility>
-
-#include <pybind11/pybind11.h>
-#include <wpi/tunables/TunableRegistry.hpp>
 
 #include "PyTunableTable.h"
 #include "TunableStorage.h"
 #include "TunableValuePython.h"
+#include "wpi/tunables/TunableRegistry.hpp"
 
 namespace py = pybind11;
 
 namespace wpi::tunables::python {
+namespace {
+
+std::string MakeChildPrefix(std::string_view path) {
+  std::string prefix{path};
+  if (prefix.empty() || prefix.back() != '/') {
+    prefix.push_back('/');
+  }
+  return prefix;
+}
+
+bool IsPathOrDescendant(std::string_view candidate, std::string_view path,
+                        std::string_view childPrefix) {
+  return candidate == path || candidate.starts_with(childPrefix);
+}
+
+bool IsPathOrDescendant(std::string_view candidate, std::string_view path) {
+  return IsPathOrDescendant(candidate, path, MakeChildPrefix(path));
+}
+
+}  // namespace
 
 PyComplexTunableAdapter::PyComplexTunableAdapter(
     py::object value, py::object initialPublishTunable)
-    : m_value{std::move(value)},
+    : m_tableOwnerContext{std::make_shared<TunableTableOwnerContext>()},
+      m_value{std::move(value)},
       m_initialPublishTunable{std::move(initialPublishTunable)} {
   if (auto getTunableType = GetOptionalAttr(m_value, "get_tunable_type")) {
     py::object typeObj = (*getTunableType)();
@@ -28,8 +46,6 @@ PyComplexTunableAdapter::PyComplexTunableAdapter(
     }
   }
 }
-
-PyComplexTunableAdapter::~PyComplexTunableAdapter() = default;
 
 std::string_view PyComplexTunableAdapter::GetTunableType() const {
   return m_type;
@@ -49,7 +65,9 @@ void PyComplexTunableAdapter::PublishTunable(
   } else {
     publishTunable = m_value.attr("publish_tunables");
   }
-  publishTunable(PyTunableTable{table, this});
+  m_tableOwnerContext->owner = shared_from_this();
+  publishTunable(table::MakePythonTable(wpi::tunables::TunableTable{table},
+                                        m_tableOwnerContext));
 }
 
 void PyComplexTunableAdapter::UpdateTunable() const {
@@ -95,6 +113,7 @@ void PyComplexTunableAdapter::AddNativeComplex(std::string path,
 }
 
 void PyComplexTunableAdapter::RemovePath(std::string_view path) {
+  table::InvalidatePendingPublications(path);
   {
     py::gil_scoped_release release;
     wpi::tunables::TunableRegistry::Remove(path);
@@ -104,31 +123,23 @@ void PyComplexTunableAdapter::RemovePath(std::string_view path) {
 
 void PyComplexTunableAdapter::RemoveRetainedPath(std::string_view path) {
   RemoveRefreshPath(path);
-  std::string childPrefix{path};
-  if (childPrefix.empty() || childPrefix.back() != '/') {
-    childPrefix.push_back('/');
-  }
-  auto isPathOrDescendant = [&](std::string_view candidate) {
-    return candidate == path || candidate.starts_with(childPrefix);
-  };
-  std::erase_if(m_values,
-                [&](auto&& child) { return isPathOrDescendant(child.first); });
+  std::string childPrefix = MakeChildPrefix(path);
+  std::erase_if(m_values, [&](auto&& child) {
+    return IsPathOrDescendant(child.first, path, childPrefix);
+  });
   for (auto it = m_complex.begin(); it != m_complex.end();) {
-    if (isPathOrDescendant(it->first)) {
+    if (IsPathOrDescendant(it->first, path, childPrefix)) {
       it = m_complex.erase(it);
+    } else if (IsPathOrDescendant(path, it->first)) {
+      it->second->RemoveRetainedPath(path);
+      ++it;
     } else {
-      std::string nestedChildPrefix{it->first};
-      if (nestedChildPrefix.empty() || nestedChildPrefix.back() != '/') {
-        nestedChildPrefix.push_back('/');
-      }
-      if (path == it->first || path.starts_with(nestedChildPrefix)) {
-        it->second->RemoveRetainedPath(path);
-      }
       ++it;
     }
   }
-  std::erase_if(m_nativeComplex,
-                [&](auto&& child) { return isPathOrDescendant(child.first); });
+  std::erase_if(m_nativeComplex, [&](auto&& child) {
+    return IsPathOrDescendant(child.first, path, childPrefix);
+  });
 }
 
 }  // namespace wpi::tunables::python

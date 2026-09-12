@@ -42,29 +42,22 @@ update_init = [
 ]
 scan_headers_ignore = [
     "wpi/tunables/CustomTunable.hpp",
-    "wpi/tunables/MockTunableBackend.hpp",
     "wpi/tunables/Selectable.hpp",
     "wpi/tunables/Tunable.hpp",
     "wpi/tunables/TunableConfig.hpp",
-    "wpi/tunables/TunableRegistry.hpp",
-    "wpi/tunables/TunableTable.hpp",
     "wpi/tunables/Tunables.hpp",
     "wpi/tunables/detail/PathUtil.hpp",
-    "wpi/tunables/detail/TunableBase.hpp",
     "wpi/tunables/detail/TunableDetail.hpp",
     "wpi/tunables/detail/TunableMember.hpp",
     "wpi/tunables/detail/TunableTypeTraits.hpp",
-    "wpi/tunables/detail/TunableTypeValue.hpp",
 
-    # internals
-    "src/TunablePython.h",
-    "src/rpy/MockTunableBackendFunctions.h",
-    "src/rpy/PyComplexTunableAdapter.h",
-    "src/rpy/PyMutationList.h",
-    "src/rpy/PyTunable.h",
-    "src/rpy/PyTunableTable.h",
-    "src/rpy/TunableStorage.h",
-    "src/rpy/TunableValuePython.h",
+    # rpy
+    "rpy/MockTunableBackendFunctions.h",
+    "rpy/PyComplexTunableAdapter.h",
+    "rpy/PyTunableTable.h",
+    "rpy/TunableRegistryFunctions.h",
+    "rpy/TunableStorage.h",
+    "rpy/TunableValuePython.h"
 ]
 
 [tool.semiwrap.name_transform]
@@ -76,7 +69,15 @@ known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I
 name = "tunables"
 wraps = ["robotpy-native-tunables"]
 depends = ["wpiutil"]
+includes = ["tunables/src"]
 
 [tool.semiwrap.extension_modules."tunables._tunables".headers]
+TunableBase = "wpi/tunables/detail/TunableBase.hpp"
+TunableTable = "wpi/tunables/TunableTable.hpp"
+PyTunable = "rpy/PyTunable.h"
 ComplexTunable = "wpi/tunables/ComplexTunable.hpp"
+TunableTypeValue = "wpi/tunables/detail/TunableTypeValue.hpp"
 TunableBackend = "wpi/tunables/TunableBackend.hpp"
+MockTunableBackend = "wpi/tunables/MockTunableBackend.hpp"
+TunableRegistry = "wpi/tunables/TunableRegistry.hpp"
+TunableFunctions = "rpy/TunableFunctions.h"

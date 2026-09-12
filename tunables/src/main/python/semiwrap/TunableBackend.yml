@@ -2,11 +2,14 @@ classes:
   wpi::tunables::TunableBackend:
     force_no_default_constructor: true
     force_no_trampoline: true
+    doc_append: |
+      Backends must be implemented in native code. Python method overrides are
+      not called by the registry. Publish tunables through tunables.publish()
+      or TunableTable, not directly through a backend.
     methods:
       Publish:
         ignore: true
       MarkDirty:
-        ignore: true
       Remove:
       RemovePrefix:
       UnregisterTunable:

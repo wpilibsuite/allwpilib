@@ -91,6 +91,46 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
             ],
         ),
         struct(
+            class_name = "DiscardTelemetryBackend",
+            yml_file = "semiwrap/DiscardTelemetryBackend.yml",
+            header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
+            header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/DiscardTelemetryBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::DiscardTelemetryBackend", "wpi__telemetry__DiscardTelemetryBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "MultiTelemetryBackend",
+            yml_file = "semiwrap/MultiTelemetryBackend.yml",
+            header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
+            header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/MultiTelemetryBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::MultiTelemetryBackend", "wpi__telemetry__MultiTelemetryBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "MockTelemetryBackend",
+            yml_file = "semiwrap/MockTelemetryBackend.yml",
+            header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
+            header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/MockTelemetryBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::MockTelemetryBackend", "wpi__telemetry__MockTelemetryBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TelemetryRegistry",
+            yml_file = "semiwrap/TelemetryRegistry.yml",
+            header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
+            header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/TelemetryRegistry.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::TelemetryRegistry", "wpi__telemetry__TelemetryRegistry.hpp"),
+            ],
+        ),
+        struct(
             class_name = "TelemetryLoggable",
             yml_file = "semiwrap/TelemetryLoggable.yml",
             header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
@@ -99,6 +139,34 @@ def telemetry_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inc
             trampolines = [
                 ("wpi::telemetry::TelemetryLoggable", "wpi__telemetry__TelemetryLoggable.hpp"),
             ],
+        ),
+        struct(
+            class_name = "TelemetryTable",
+            yml_file = "semiwrap/TelemetryTable.yml",
+            header_root = "$(execpath :robotpy-native-telemetry.copy_headers)",
+            header_file = "$(execpath :robotpy-native-telemetry.copy_headers)/wpi/telemetry/TelemetryTable.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::TelemetryTable", "wpi__telemetry__TelemetryTable.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "PyTelemetryTable",
+            yml_file = "semiwrap/PyTelemetryTable.yml",
+            header_root = "telemetry/src/main/python/telemetry/src",
+            header_file = "telemetry/src/main/python/telemetry/src/rpy/PyTelemetryTable.h",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::telemetry::python::PyTelemetryTable", "wpi__telemetry__python__PyTelemetryTable.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TelemetryFunctions",
+            yml_file = "semiwrap/TelemetryFunctions.yml",
+            header_root = "telemetry/src/main/python/telemetry/src",
+            header_file = "telemetry/src/main/python/telemetry/src/rpy/TelemetryFunctions.h",
+            tmpl_class_names = [],
+            trampolines = [],
         ),
     ]
 
