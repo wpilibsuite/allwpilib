@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.common.collect.Sets;
 import com.google.testing.compile.Compilation;
@@ -40,7 +40,7 @@ class OpModeAnnotationProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new OpModeAnnotationProcessor())
             .compile(JavaFileObjects.forSourceString("example.Example", source));
 
