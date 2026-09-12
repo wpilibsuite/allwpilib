@@ -1,26 +1,26 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 1 Aug 2026 17:02:07 -0700
-Subject: [PATCH 34/34] Convert LLVM unit tests to Catch2
+Subject: [PATCH 32/32] Convert LLVM unit tests to Catch2
 
 ---
  llvm/unittests/ADT/DenseMapTest.cpp         | 190 ++++----
  llvm/unittests/ADT/FunctionExtrasTest.cpp   |  15 +-
  llvm/unittests/ADT/PointerIntPairTest.cpp   |  13 +-
- llvm/unittests/ADT/PointerUnionTest.cpp     |  50 ++-
- llvm/unittests/ADT/STLForwardCompatTest.cpp |  65 ++-
+ llvm/unittests/ADT/PointerUnionTest.cpp     |  61 +--
+ llvm/unittests/ADT/STLForwardCompatTest.cpp |  73 ++--
  llvm/unittests/ADT/SmallPtrSetTest.cpp      |  30 +-
- llvm/unittests/ADT/SmallSetTest.cpp         |  23 +-
+ llvm/unittests/ADT/SmallSetTest.cpp         |  31 +-
  llvm/unittests/ADT/SmallStringTest.cpp      |  33 +-
- llvm/unittests/ADT/SmallVectorTest.cpp      | 452 +++++++++++---------
+ llvm/unittests/ADT/SmallVectorTest.cpp      | 458 +++++++++++---------
  llvm/unittests/Support/ConvertUTFTest.cpp   |  38 +-
  llvm/unittests/Support/EndianTest.cpp       |  61 ++-
  llvm/unittests/Support/ErrnoTest.cpp        |   6 +-
  llvm/unittests/Support/MathExtrasTest.cpp   | 324 +++++++-------
- 13 files changed, 665 insertions(+), 635 deletions(-)
+ 13 files changed, 681 insertions(+), 652 deletions(-)
 
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f39a7958e9 100644
+index 136cfb8ce168233a7985094a7dab4db136e5207e..1a781e9fcef3fa606a70e53e9377bb62832ea9f8 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -16,14 +16,18 @@
@@ -44,7 +44,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  
  using namespace llvm;
  
-@@ -111,7 +115,7 @@ std::optional<uint32_t> getTestKey(int i, std::optional<uint32_t> *) {
+@@ -109,7 +113,7 @@ std::optional<uint32_t> getTestKey(int i, std::optional<uint32_t> *) {
  // allows all of the map implementations to be tested with shared
  // implementations of helper routines.
  template <typename T>
@@ -53,7 +53,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  protected:
    T Map;
  
-@@ -131,50 +135,43 @@ typename T::key_type *const DenseMapTest<T>::dummy_key_ptr = nullptr;
+@@ -129,50 +133,43 @@ typename T::key_type *const DenseMapTest<T>::dummy_key_ptr = nullptr;
  template <typename T>
  typename T::mapped_type *const DenseMapTest<T>::dummy_value_ptr = nullptr;
  
@@ -122,7 +122,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    this->Map[this->getKey()] = this->getValue();
  
    // Size tests
-@@ -183,21 +180,21 @@ TYPED_TEST(DenseMapTest, SingleEntryMapTest) {
+@@ -181,21 +178,21 @@ TYPED_TEST(DenseMapTest, SingleEntryMapTest) {
    EXPECT_FALSE(this->Map.empty());
  
    // Iterator tests
@@ -148,7 +148,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    this->Map[this->getKey(0)] = this->getValue(0);
    this->Map[this->getKey(1)] = this->getValue(1);
    this->Map[this->getKey(2)] = this->getValue(2);
-@@ -215,56 +212,56 @@ TYPED_TEST(DenseMapTest, AtTest) {
+@@ -213,56 +210,56 @@ TYPED_TEST(DenseMapTest, AtTest) {
  }
  
  // Test clear() method
@@ -216,7 +216,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  
    EXPECT_EQ(5u, copyMap.size());
    for (int Key = 0; Key < 5; ++Key)
-@@ -272,18 +269,18 @@ TYPED_TEST(DenseMapTest, CopyConstructorNotSmallTest) {
+@@ -270,18 +267,18 @@ TYPED_TEST(DenseMapTest, CopyConstructorNotSmallTest) {
  }
  
  // Test range constructors.
@@ -239,7 +239,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
                               {this->getKey(1), this->getValue(2)}});
    EXPECT_EQ(2u, MapFromInitList.size());
    EXPECT_EQ(this->getValue(1), MapFromInitList[this->getKey(0)]);
-@@ -291,56 +288,56 @@ TYPED_TEST(DenseMapTest, RangeConstructorTest) {
+@@ -289,56 +286,56 @@ TYPED_TEST(DenseMapTest, RangeConstructorTest) {
  }
  
  // Test copying from a default-constructed map.
@@ -308,7 +308,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  
    this->Map.swap(otherMap);
    EXPECT_EQ(0u, this->Map.size());
-@@ -374,9 +371,9 @@ TYPED_TEST(DenseMapTest, SwapTest) {
+@@ -372,9 +369,9 @@ TYPED_TEST(DenseMapTest, SwapTest) {
  }
  
  // A more complex iteration test
@@ -320,7 +320,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  
    // Insert 100 numbers into the map
    for (int i = 0; i < 100; ++i) {
-@@ -387,25 +384,27 @@ TYPED_TEST(DenseMapTest, IterationTest) {
+@@ -385,25 +382,27 @@ TYPED_TEST(DenseMapTest, IterationTest) {
    }
  
    // Iterate over all numbers and mark each one found.
@@ -357,7 +357,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  // TYPED_TEST below cycles through different types.  We define UniversalSmallSet
-@@ -415,9 +414,9 @@ template <typename T, unsigned N>
+@@ -413,9 +412,9 @@ template <typename T, unsigned N>
  using UniversalSmallSet =
      std::conditional_t<std::is_pointer_v<T>, SmallPtrSet<T, N>, SmallSet<T, N>>;
  
@@ -370,7 +370,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    for (int I = 0; I < 10; ++I) {
      auto K = this->getKey(I);
      auto V = this->getValue(I);
-@@ -426,8 +425,8 @@ TYPED_TEST(DenseMapTest, KeysValuesIterator) {
+@@ -424,8 +423,8 @@ TYPED_TEST(DenseMapTest, KeysValuesIterator) {
      this->Map[K] = V;
    }
  
@@ -381,7 +381,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    for (auto K : this->Map.keys())
      ActualKeys.insert(K);
    for (auto V : this->Map.values())
-@@ -437,9 +436,9 @@ TYPED_TEST(DenseMapTest, KeysValuesIterator) {
+@@ -435,9 +434,9 @@ TYPED_TEST(DenseMapTest, KeysValuesIterator) {
    EXPECT_EQ(Values, ActualValues);
  }
  
@@ -394,7 +394,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    for (int I = 0; I < 10; ++I) {
      auto K = this->getKey(I);
      auto V = this->getValue(I);
-@@ -448,9 +447,9 @@ TYPED_TEST(DenseMapTest, ConstKeysValuesIterator) {
+@@ -446,9 +445,9 @@ TYPED_TEST(DenseMapTest, ConstKeysValuesIterator) {
      this->Map[K] = V;
    }
  
@@ -407,7 +407,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
    for (auto K : ConstMap.keys())
      ActualKeys.insert(K);
    for (auto V : ConstMap.values())
-@@ -487,8 +486,8 @@ TEST(DenseMapCustomTest, InsertRange) {
+@@ -485,8 +484,8 @@ TEST(DenseMapCustomTest, InsertRange) {
    M.insert_range(InputVals);
  
    EXPECT_EQ(M.size(), 2u);
@@ -418,7 +418,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  TEST(SmallDenseMapCustomTest, InsertRange) {
-@@ -498,8 +497,8 @@ TEST(SmallDenseMapCustomTest, InsertRange) {
+@@ -496,8 +495,8 @@ TEST(SmallDenseMapCustomTest, InsertRange) {
    M.insert_range(InputVals);
  
    EXPECT_EQ(M.size(), 2u);
@@ -429,7 +429,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  // Test for the default minimum size of a DenseMap
-@@ -740,22 +739,22 @@ TEST(DenseMapCustomTest, FindAsTest) {
+@@ -736,22 +735,22 @@ TEST(DenseMapCustomTest, FindAsTest) {
    EXPECT_EQ(1u, map.find(0)->second);
    EXPECT_EQ(2u, map.find(1)->second);
    EXPECT_EQ(3u, map.find(2)->second);
@@ -457,7 +457,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  TEST(DenseMapCustomTest, SmallDenseMapInitializerList) {
-@@ -797,7 +796,7 @@ TEST(DenseMapCustomTest, SmallDenseMapGrowTest) {
+@@ -791,7 +790,7 @@ TEST(DenseMapCustomTest, SmallDenseMapGrowTest) {
    // SmallDenseMap which led to a map with num elements == small capacity not
    // having an empty bucket any more.  Finding an element not in the map would
    // therefore never terminate.
@@ -466,7 +466,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  TEST(DenseMapCustomTest, LargeSmallDenseMapCompaction) {
-@@ -815,7 +814,7 @@ TEST(DenseMapCustomTest, LargeSmallDenseMapCompaction) {
+@@ -809,7 +808,7 @@ TEST(DenseMapCustomTest, LargeSmallDenseMapCompaction) {
    EXPECT_EQ(33u, map.size());
    // Similar to the previous test, check for a non-existing element, as an
    // indirect check that tombstones have been removed.
@@ -475,7 +475,7 @@ index 0b20004ebb91f519158d244d48aa71f2a23a0dca..fa5d1ef709e818f683a3d0373dd1d0f3
  }
  
  TEST(DenseMapCustomTest, SmallDenseMapWithNumBucketsNonPowerOf2) {
-@@ -943,12 +942,11 @@ TEST(DenseMapCustomTest, VariantSupport) {
+@@ -933,12 +932,11 @@ TEST(DenseMapCustomTest, VariantSupport) {
    };
    Map.try_emplace(Keys[0], 0);
    Map.try_emplace(Keys[1], 1);
@@ -582,13 +582,13 @@ index 0e1b87c0b3141799161e6649d4e5be96429dbf5e..b6c8e6e6b8517a46841e4fd3a6d75419
    static_assert(std::is_trivially_copyable_v<
                      PointerIntPair<Fixnum31, 1, bool, FixnumPointerTraits>>,
 diff --git a/llvm/unittests/ADT/PointerUnionTest.cpp b/llvm/unittests/ADT/PointerUnionTest.cpp
-index d8ac3aed76da28a2406d3fdb3876c924faba9366..e2e96e97e5fe805407b51c7c7e22602b31090cbe 100644
+index 258e4050984e87874cc6e88dba8a73898b466c97..9cddaa077c8512540dac13562dbfb84d63937aad 100644
 --- a/llvm/unittests/ADT/PointerUnionTest.cpp
 +++ b/llvm/unittests/ADT/PointerUnionTest.cpp
-@@ -7,7 +7,11 @@
- //===----------------------------------------------------------------------===//
+@@ -8,7 +8,11 @@
  
  #include "llvm/ADT/PointerUnion.h"
+ #include "llvm/ADT/DenseMap.h"
 -#include "gtest/gtest.h"
 +#include <catch2/catch_test_macros.hpp>
 +#include <catch2/matchers/catch_matchers_floating_point.hpp>
@@ -598,7 +598,7 @@ index d8ac3aed76da28a2406d3fdb3876c924faba9366..e2e96e97e5fe805407b51c7c7e22602b
  using namespace llvm;
  
  namespace {
-@@ -16,7 +20,7 @@ using PU = PointerUnion<int *, float *>;
+@@ -17,7 +21,7 @@ using PU = PointerUnion<int *, float *>;
  using PU3 = PointerUnion<int *, float *, long long *>;
  using PU4 = PointerUnion<int *, float *, long long *, double *>;
  
@@ -607,7 +607,7 @@ index d8ac3aed76da28a2406d3fdb3876c924faba9366..e2e96e97e5fe805407b51c7c7e22602b
    float f;
    int i;
    double d;
-@@ -35,27 +39,27 @@ struct PointerUnionTest : public testing::Test {
+@@ -38,27 +42,27 @@ struct PointerUnionTest : public testing::Test {
  };
  
  TEST_F(PointerUnionTest, Comparison) {
@@ -650,18 +650,7 @@ index d8ac3aed76da28a2406d3fdb3876c924faba9366..e2e96e97e5fe805407b51c7c7e22602b
  }
  
  TEST_F(PointerUnionTest, Null) {
-@@ -66,8 +70,8 @@ TEST_F(PointerUnionTest, Null) {
-   EXPECT_FALSE(!b);
-   EXPECT_TRUE(!n);
-   // workaround an issue with EXPECT macros and explicit bool
--  EXPECT_TRUE((bool)a);
--  EXPECT_TRUE((bool)b);
-+  EXPECT_TRUE(static_cast<bool>(a));
-+  EXPECT_TRUE(static_cast<bool>(b));
-   EXPECT_FALSE(n);
- 
-   EXPECT_NE(n, b);
-@@ -147,13 +151,13 @@ TEST_F(PointerUnionTest, ManyElements) {
+@@ -150,15 +154,13 @@ TEST_F(PointerUnionTest, ManyElements) {
    EXPECT_TRUE(isa<Aligned<7> *>(a));
    EXPECT_EQ(dyn_cast_if_present<Aligned<7> *>(a), &a7);
  
@@ -672,15 +661,51 @@ index d8ac3aed76da28a2406d3fdb3876c924faba9366..e2e96e97e5fe805407b51c7c7e22602b
  }
  
  TEST_F(PointerUnionTest, GetAddrOfPtr1) {
--  EXPECT_TRUE((void *)b.getAddrOfPtr1() == (void *)&b);
--  EXPECT_TRUE((void *)n.getAddrOfPtr1() == (void *)&n);
+-  EXPECT_TRUE(static_cast<void *>(b.getAddrOfPtr1()) ==
+-              static_cast<void *>(&b));
+-  EXPECT_TRUE(static_cast<void *>(n.getAddrOfPtr1()) ==
+-              static_cast<void *>(&n));
 +  EXPECT_EQ(static_cast<void*>(b.getAddrOfPtr1()), static_cast<void*>(&b));
 +  EXPECT_EQ(static_cast<void*>(n.getAddrOfPtr1()), static_cast<void*>(&n));
  }
  
  TEST_F(PointerUnionTest, NewCastInfra) {
+@@ -372,10 +374,11 @@ TEST(PointerUnionNestedTest, NestedTagPreservation) {
+   OverClaimWrapper extracted = cast<OverClaimWrapper>(outer);
+   InnerPU extractedInner = extracted.Value;
+ 
+-  EXPECT_TRUE(isa<LowAlign *>(extractedInner))
+-      << "Inner PointerUnion tag corrupted during doCast: expected LowAlign*, "
+-         "got HighAlign*. doCast must not clear bits beyond "
+-         "minLowBitsAvailable().";
++  SCOPED_TRACE(
++    "Inner PointerUnion tag corrupted during doCast: expected LowAlign*, "
++    "got HighAlign*. doCast must not clear bits beyond "
++    "minLowBitsAvailable().");
++  EXPECT_TRUE(isa<LowAlign *>(extractedInner));
+   EXPECT_EQ(cast<LowAlign *>(extractedInner), &low);
+ 
+   // Also verify the HighAlign* path (tag = 0) works.
+@@ -471,7 +474,7 @@ static_assert(!pointer_union_detail::useFixedWidthTags<
+ static_assert(PointerLikeTypeTraits<PU2Tier>::NumLowBitsAvailable == 0);
+ static_assert(PointerLikeTypeTraits<PU3Tier>::NumLowBitsAvailable == 0);
+ 
+-struct PointerUnion2TierTest : public testing::Test {
++struct PointerUnion2TierTest {
+   Align4<0> a0;
+   Align4<1> a1;
+   Align4<2> a2;
+@@ -623,7 +626,7 @@ TEST_F(PointerUnion2TierTest, OpaqueValueRoundTrip) {
+ 
+ // 3-tier tests
+ 
+-struct PointerUnion3TierTest : public testing::Test {
++struct PointerUnion3TierTest {
+   Align4<0> a0;
+   Align4<1> a1;
+   Align4<2> a2;
 diff --git a/llvm/unittests/ADT/STLForwardCompatTest.cpp b/llvm/unittests/ADT/STLForwardCompatTest.cpp
-index d0092fdb52b01ce8c237f2d8a6e9378b80ad3810..50ff72e8b8fb70db85f11271c4af855a62e69b34 100644
+index f23d5b7ce7cc762fb6d1b8e5053eeac5d926e7e9..8c8a7ae9907e699a2c56ef30c0a0aef76c319eac 100644
 --- a/llvm/unittests/ADT/STLForwardCompatTest.cpp
 +++ b/llvm/unittests/ADT/STLForwardCompatTest.cpp
 @@ -8,7 +8,11 @@
@@ -694,9 +719,9 @@ index d0092fdb52b01ce8c237f2d8a6e9378b80ad3810..50ff72e8b8fb70db85f11271c4af855a
 +#include <catch2/matchers/catch_matchers_vector.hpp>
 +#include <catch2/catch_template_test_macros.hpp>
  
+ #include <iterator>
  #include <optional>
- #include <type_traits>
-@@ -17,39 +21,28 @@
+@@ -20,39 +24,28 @@ namespace llvm {
  namespace {
  
  template <typename T>
@@ -724,6 +749,15 @@ index d0092fdb52b01ce8c237f2d8a6e9378b80ad3810..50ff72e8b8fb70db85f11271c4af855a
 -  using To = typename TypeParam::second_type;
 -  EXPECT_TRUE(
 -      (std::is_same<typename llvm::remove_cvref<From>::type, To>::value));
+-}
+-
+-TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRefT) {
+-  using From = typename TypeParam::first_type;
+-  EXPECT_TRUE((std::is_same<typename llvm::remove_cvref<From>::type,
+-                            llvm::remove_cvref_t<From>>::value));
+-}
+-
+-template <typename T> class TypeIdentityTest : public ::testing::Test {
 +class STLForwardCompatRemoveCVRefTest {};
 +
 +#define WPIUTIL_TEST_TYPES_STLForwardCompatRemoveCVRefTest \
@@ -737,33 +771,28 @@ index d0092fdb52b01ce8c237f2d8a6e9378b80ad3810..50ff72e8b8fb70db85f11271c4af855a
 +  using From = typename TestType::first_type;
 +  using To = typename TestType::second_type;
 +  CHECK(std::is_same < typename llvm::remove_cvref<From>::type, To>::value);
- }
- 
--TYPED_TEST(STLForwardCompatRemoveCVRefTest, RemoveCVRefT) {
--  using From = typename TypeParam::first_type;
--  EXPECT_TRUE((std::is_same<typename llvm::remove_cvref<From>::type,
--                            llvm::remove_cvref_t<From>>::value));
++}
++
 +TEMPLATE_TEST_CASE_METHOD(STLForwardCompatRemoveCVRefTest, "STLForwardCompatRemoveCVRefTest RemoveCVRefT", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_STLForwardCompatRemoveCVRefTest) {
 +  using From = typename TestType::first_type;
 +  CHECK(std::is_same < typename llvm::remove_cvref<From>::type,
 +                            llvm::remove_cvref_t<From>>::value);
- }
- 
--template <typename T> class TypeIdentityTest : public ::testing::Test {
++}
++
 +template <typename T> class TypeIdentityTest {
  public:
    using TypeIdentity = llvm::type_identity<T>;
  };
-@@ -57,15 +50,11 @@ public:
+@@ -60,15 +53,11 @@ public:
  struct A {
    struct B {};
  };
 -using TypeIdentityTestTypes =
 -    ::testing::Types<int, volatile int, A, const A::B>;
+-
+-TYPED_TEST_SUITE(TypeIdentityTest, TypeIdentityTestTypes, /*NameGenerator*/);
 +#define WPIUTIL_TEST_TYPES_TypeIdentityTest int, volatile int, A, const A::B
  
--TYPED_TEST_SUITE(TypeIdentityTest, TypeIdentityTestTypes, /*NameGenerator*/);
--
 -TYPED_TEST(TypeIdentityTest, Identity) {
 -  // TestFixture is the instantiated TypeIdentityTest.
 -  EXPECT_TRUE(
@@ -775,7 +804,7 @@ index d0092fdb52b01ce8c237f2d8a6e9378b80ad3810..50ff72e8b8fb70db85f11271c4af855a
  
  TEST(TransformTest, TransformStd) {
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 33d167cf87e588d46682916888eaf81713854046..444420e0eb1daca268d4b699d9f32c1eb1c0275b 100644
+index cab0a4cb4dafb600ddeedb11efdd89a104aaa616..ee4f0754e615ad68694f133ce3bda7d81d81a542 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -13,13 +13,16 @@
@@ -872,10 +901,10 @@ index 33d167cf87e588d46682916888eaf81713854046..444420e0eb1daca268d4b699d9f32c1e
 +  CHECK_THAT(Set, UnorderedRangeEquals({&Vals[0], &Vals[1], &Vals[2],
 +                                        &Vals[3], &Vals[4], &Vals[5]}));
  
-   // Reserving 192 should result in 256 buckets.
-   Set.reserve(192);
+   // Reserving 192 should result in 512 buckets: 192 * 3 / 2 = 288, rounded
+   // up to the next power of two.
 diff --git a/llvm/unittests/ADT/SmallSetTest.cpp b/llvm/unittests/ADT/SmallSetTest.cpp
-index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6fe92a7d5a 100644
+index 32ddd820fe290f3a84dd2a4c1a4ef4635f17d707..bb6cde763dbd905dbeb65e796431773150b6b8c7 100644
 --- a/llvm/unittests/ADT/SmallSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallSetTest.cpp
 @@ -11,8 +11,11 @@
@@ -891,8 +920,8 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
 +#include <catch2/catch_template_test_macros.hpp>
  #include <algorithm>
  #include <string>
- 
-@@ -21,20 +24,20 @@ using namespace llvm;
+ #include <type_traits>
+@@ -22,20 +25,20 @@ using namespace llvm;
  TEST(SmallSetTest, ConstructorIteratorPair) {
    std::initializer_list<int> L = {1, 2, 3, 4, 5};
    SmallSet<int, 4> S(std::begin(L), std::end(L));
@@ -916,7 +945,7 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
  }
  
  TEST(SmallSet, MoveConstructor) {
-@@ -42,7 +45,7 @@ TEST(SmallSet, MoveConstructor) {
+@@ -43,7 +46,7 @@ TEST(SmallSet, MoveConstructor) {
    SmallSet<int, 4> S = L;
    SmallSet<int, 4> T = std::move(S);
  
@@ -925,7 +954,7 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
  }
  
  TEST(SmallSet, CopyAssignment) {
-@@ -50,7 +53,7 @@ TEST(SmallSet, CopyAssignment) {
+@@ -51,7 +54,7 @@ TEST(SmallSet, CopyAssignment) {
    SmallSet<int, 4> T;
    T = S;
  
@@ -934,7 +963,7 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
  }
  
  TEST(SmallSet, MoveAssignment) {
-@@ -59,7 +62,7 @@ TEST(SmallSet, MoveAssignment) {
+@@ -60,7 +63,7 @@ TEST(SmallSet, MoveAssignment) {
    SmallSet<int, 4> T;
    T = std::move(S);
  
@@ -943,7 +972,7 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
  }
  
  TEST(SmallSetTest, Insert) {
-@@ -123,14 +126,14 @@ TEST(SmallSetTest, InsertPerfectFwd) {
+@@ -124,14 +127,14 @@ TEST(SmallSetTest, InsertPerfectFwd) {
  TEST(SmallSetTest, CtorRange) {
    constexpr unsigned Args[] = {3, 1, 2};
    SmallSet<int, 4> s1(llvm::from_range, Args);
@@ -960,6 +989,24 @@ index 7cb7e6c9d8482ed185845c6b09e4b91355d9b413..e7fcb5aa502c52af3bd4338cdeb4eb6f
  }
  
  TEST(SmallSetTest, Grow) {
+@@ -259,13 +262,13 @@ TEST(SmallSetTest, IteratorDerefConst) {
+   // Verify that dereference of SmallSet's iterator gives const-reference.
+   SmallSet<int, 4> sint;
+   EXPECT_TRUE(is_const_ref<decltype(sint)::const_iterator::reference>);
+-  EXPECT_TRUE(is_const_ref<decltype(*sint.begin())> &&
+-              is_const_ref<decltype(*sint.end())>);
++  EXPECT_TRUE((is_const_ref<decltype(*sint.begin())> &&
++               is_const_ref<decltype(*sint.end())>));
+ 
+   SmallSet<std::string, 4> sstr;
+   EXPECT_TRUE(is_const_ref<decltype(sstr)::const_iterator::reference>);
+-  EXPECT_TRUE(is_const_ref<decltype(*sstr.begin())> &&
+-              is_const_ref<decltype(*sstr.end())>);
++  EXPECT_TRUE((is_const_ref<decltype(*sstr.begin())> &&
++               is_const_ref<decltype(*sstr.end())>));
+ }
+ 
+ TEST(SmallSetTest, EqualityComparisonTest) {
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
 index e8c8085f4620628764d866c5fd042777de92d820..c8ed241ec48c0a7d900a985d5ef7b673acc28bfa 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
@@ -1089,7 +1136,7 @@ index e8c8085f4620628764d866c5fd042777de92d820..c8ed241ec48c0a7d900a985d5ef7b673
  
  TEST_F(SmallStringTest, StringViewConversion) {
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a609617bcc607 100644
+index 7767ef128decee0d512fdebc879f2f45e07bb560..98dc58d51b3dedc1cf9ae73d276df511fb1adf4b 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -12,12 +12,24 @@
@@ -1449,7 +1496,25 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AppendRepeatedTest");
    auto &V = this->theVector;
    V.push_back(Constructable(1));
-@@ -548,7 +613,7 @@ struct output_iterator {
+@@ -559,7 +624,7 @@ struct input_iterator {
+   }
+ };
+ 
+-TYPED_TEST(SmallVectorTest, AppendInputIterator) {
++TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest AppendInputIterator", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
+   auto &V = this->theVector;
+   V.push_back(1);
+   static constexpr int Src[] = {5, 6, 7, 8};
+@@ -571,7 +636,7 @@ TYPED_TEST(SmallVectorTest, AppendInputIterator) {
+   assertValuesInOrder(V, 3u, 1, 5, 6);
+ }
+ 
+-TYPED_TEST(SmallVectorTest, InsertInputIterator) {
++TEMPLATE_TEST_CASE_METHOD(SmallVectorTest, "SmallVectorTest InsertInputIterator", "[wpiutil][llvm]", WPIUTIL_TEST_TYPES_SmallVectorTest) {
+   auto &V = this->theVector;
+   V.push_back(1);
+   V.push_back(2);
+@@ -595,7 +660,7 @@ struct output_iterator {
    operator Constructable() { return 7; }
  };
  
@@ -1458,7 +1523,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AppendRepeatedTest");
    auto &V = this->theVector;
    V.push_back(Constructable(1));
-@@ -556,7 +621,7 @@ TYPED_TEST(SmallVectorTest, AppendRepeatedNonForwardIterator) {
+@@ -603,7 +668,7 @@ TYPED_TEST(SmallVectorTest, AppendRepeatedNonForwardIterator) {
    assertValuesInOrder(V, 3u, 1, 7, 7);
  }
  
@@ -1467,7 +1532,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AppendSmallVector");
    auto &V = this->theVector;
    SmallVector<Constructable, 3> otherVector = {7, 7};
-@@ -566,7 +631,7 @@ TYPED_TEST(SmallVectorTest, AppendSmallVector) {
+@@ -613,7 +678,7 @@ TYPED_TEST(SmallVectorTest, AppendSmallVector) {
  }
  
  // Assign test
@@ -1476,7 +1541,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AssignTest");
    auto &V = this->theVector;
    V.push_back(Constructable(1));
-@@ -575,7 +640,7 @@ TYPED_TEST(SmallVectorTest, AssignTest) {
+@@ -622,7 +687,7 @@ TYPED_TEST(SmallVectorTest, AssignTest) {
  }
  
  // Assign test
@@ -1485,7 +1550,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AssignTest");
    auto &V = this->theVector;
    V.push_back(Constructable(1));
-@@ -585,7 +650,7 @@ TYPED_TEST(SmallVectorTest, AssignRangeTest) {
+@@ -632,7 +697,7 @@ TYPED_TEST(SmallVectorTest, AssignRangeTest) {
  }
  
  // Assign test
@@ -1494,7 +1559,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AssignTest");
    auto &V = this->theVector;
    V.push_back(Constructable(1));
-@@ -593,7 +658,7 @@ TYPED_TEST(SmallVectorTest, AssignNonIterTest) {
+@@ -640,7 +705,7 @@ TYPED_TEST(SmallVectorTest, AssignNonIterTest) {
    assertValuesInOrder(V, 2u, 7, 7);
  }
  
@@ -1503,7 +1568,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AssignSmallVector");
    auto &V = this->theVector;
    SmallVector<Constructable, 3> otherVector = {7, 7};
-@@ -602,7 +667,7 @@ TYPED_TEST(SmallVectorTest, AssignSmallVector) {
+@@ -649,7 +714,7 @@ TYPED_TEST(SmallVectorTest, AssignSmallVector) {
    assertValuesInOrder(V, 2u, 7, 7);
  }
  
@@ -1512,7 +1577,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("AssignSpan");
    auto &V = this->theVector;
    Constructable Other[] = {7, 8, 9};
-@@ -612,7 +677,7 @@ TYPED_TEST(SmallVectorTest, AssignSpan) {
+@@ -659,7 +724,7 @@ TYPED_TEST(SmallVectorTest, AssignSpan) {
  }
  
  // Move-assign test
@@ -1521,7 +1586,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("MoveAssignTest");
    auto &V = this->theVector;
    auto &U = this->otherVector;
-@@ -633,17 +698,15 @@ TYPED_TEST(SmallVectorTest, MoveAssignTest) {
+@@ -680,17 +745,15 @@ TYPED_TEST(SmallVectorTest, MoveAssignTest) {
    // Make sure the # of constructor/destructor calls line up. There
    // are two live objects after clearing the other vector.
    U.clear();
@@ -1542,7 +1607,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("EraseTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 3);
-@@ -653,7 +716,7 @@ TYPED_TEST(SmallVectorTest, EraseTest) {
+@@ -700,7 +763,7 @@ TYPED_TEST(SmallVectorTest, EraseTest) {
  }
  
  // Erase a range of elements
@@ -1551,7 +1616,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("EraseRangeTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 3);
-@@ -663,28 +726,28 @@ TYPED_TEST(SmallVectorTest, EraseRangeTest) {
+@@ -710,28 +773,28 @@ TYPED_TEST(SmallVectorTest, EraseRangeTest) {
  }
  
  // Insert a single element.
@@ -1585,7 +1650,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRepeatedTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 4);
-@@ -695,8 +758,8 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedTest) {
+@@ -742,8 +805,8 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedTest) {
    // FIXME: This is inefficient, we shouldn't move things into newly allocated
    // space, then move them up/around, there should only be 2 or 4 move
    // constructions here.
@@ -1596,7 +1661,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Move assign the next two to shift them up and make a gap.
    EXPECT_EQ(1, Constructable::getNumMoveAssignmentCalls());
    // Copy construct the two new elements from the parameter.
-@@ -707,7 +770,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedTest) {
+@@ -754,7 +817,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedTest) {
    assertValuesInOrder(V, 6u, 1, 16, 16, 2, 3, 4);
  }
  
@@ -1605,7 +1670,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRepeatedTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 4);
-@@ -717,7 +780,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedNonIterTest) {
+@@ -764,7 +827,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedNonIterTest) {
    assertValuesInOrder(V, 6u, 1, 7, 7, 2, 3, 4);
  }
  
@@ -1614,7 +1679,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRepeatedTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 4);
-@@ -726,8 +789,8 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedAtEndTest) {
+@@ -773,8 +836,8 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedAtEndTest) {
    // Just copy construct them into newly allocated space
    EXPECT_EQ(2, Constructable::getNumCopyConstructorCalls());
    // Move everything across if reallocation is needed.
@@ -1625,7 +1690,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Without ever moving or copying anything else.
    EXPECT_EQ(0, Constructable::getNumCopyAssignmentCalls());
    EXPECT_EQ(0, Constructable::getNumMoveAssignmentCalls());
-@@ -736,7 +799,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedAtEndTest) {
+@@ -783,7 +846,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedAtEndTest) {
    assertValuesInOrder(V, 6u, 1, 2, 3, 4, 16, 16);
  }
  
@@ -1634,7 +1699,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRepeatedTest");
    auto &V = this->theVector;
    makeSequence(V, 10, 15);
-@@ -747,7 +810,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedEmptyTest) {
+@@ -794,7 +857,7 @@ TYPED_TEST(SmallVectorTest, InsertRepeatedEmptyTest) {
  }
  
  // Insert range.
@@ -1643,7 +1708,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRangeTest");
    auto &V = this->theVector;
    Constructable Arr[3] =
-@@ -761,8 +824,8 @@ TYPED_TEST(SmallVectorTest, InsertRangeTest) {
+@@ -808,8 +871,8 @@ TYPED_TEST(SmallVectorTest, InsertRangeTest) {
    // FIXME: This is inefficient, we shouldn't move things into newly allocated
    // space, then move them up/around, there should only be 2 or 3 move
    // constructions here.
@@ -1654,7 +1719,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Copy assign the lower 2 new elements into existing space.
    EXPECT_EQ(2, Constructable::getNumCopyAssignmentCalls());
    // Copy construct the third element into newly allocated space.
-@@ -772,7 +835,7 @@ TYPED_TEST(SmallVectorTest, InsertRangeTest) {
+@@ -819,7 +882,7 @@ TYPED_TEST(SmallVectorTest, InsertRangeTest) {
  }
  
  
@@ -1663,7 +1728,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRangeTest");
    auto &V = this->theVector;
    Constructable Arr[3] =
-@@ -789,14 +852,14 @@ TYPED_TEST(SmallVectorTest, InsertRangeAtEndTest) {
+@@ -836,14 +899,14 @@ TYPED_TEST(SmallVectorTest, InsertRangeAtEndTest) {
    EXPECT_EQ(0, Constructable::getNumCopyAssignmentCalls());
    // Reallocation might occur, causing all elements to be moved into the new
    // buffer.
@@ -1681,7 +1746,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("InsertRangeTest");
    auto &V = this->theVector;
    makeSequence(V, 1, 3);
-@@ -807,65 +870,65 @@ TYPED_TEST(SmallVectorTest, InsertEmptyRangeTest) {
+@@ -854,65 +917,65 @@ TYPED_TEST(SmallVectorTest, InsertEmptyRangeTest) {
  }
  
  // Comparison tests.
@@ -1763,7 +1828,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    auto &V = this->theVector;
    EXPECT_EQ(0u, V.size());
    V.reserve(4);
-@@ -883,7 +946,7 @@ TYPED_TEST(SmallVectorTest, DirectVectorTest) {
+@@ -930,7 +993,7 @@ TYPED_TEST(SmallVectorTest, DirectVectorTest) {
    EXPECT_EQ(4, V[3].getValue());
  }
  
@@ -1772,7 +1837,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    auto &V = this->theVector;
    std::list<int> L;
    V.insert(V.end(), L.begin(), L.end());
-@@ -898,19 +961,13 @@ protected:
+@@ -945,19 +1008,13 @@ protected:
    VectorT2 otherVector;
  };
  
@@ -1798,7 +1863,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    SCOPED_TRACE("MoveAssignTest-DualVectorTypes");
    auto &V = this->theVector;
    auto &U = this->otherVector;
-@@ -929,17 +986,15 @@ TYPED_TEST(DualSmallVectorsTest, MoveAssignment) {
+@@ -976,17 +1033,15 @@ TYPED_TEST(DualSmallVectorsTest, MoveAssignment) {
    // Make sure the # of constructor/destructor calls line up. There
    // are two live objects after clearing the other vector.
    U.clear();
@@ -1819,7 +1884,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
  
    // We shouldn't have copied anything in this whole process.
    EXPECT_EQ(Constructable::getNumCopyConstructorCalls(), 0);
-@@ -1051,68 +1106,68 @@ TEST(SmallVectorTest, EmplaceBack) {
+@@ -1098,68 +1153,68 @@ TEST(SmallVectorTest, EmplaceBack) {
    {
      SmallVector<Emplaceable, 3> V;
      Emplaceable &back = V.emplace_back();
@@ -1930,7 +1995,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    }
    {
      SmallVector<int, 1> V;
-@@ -1173,9 +1228,9 @@ TEST(SmallVectorTest, ToVector) {
+@@ -1220,15 +1275,15 @@ TEST(SmallVectorTest, ToVector) {
      // for being/end iterators.
      namespace_with_adl::MyVector V = {{1, 2, 3}};
      auto IntVector = to_vector(V);
@@ -1940,9 +2005,16 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
 -    EXPECT_THAT(IntVector, testing::ElementsAre(1, 2, 3));
 +    CHECK_THAT(IntVector, Catch::Matchers::RangeEquals({1, 2, 3}));
    }
+   {
+     SmallVector<bool> V = {true, false, true};
+     span<bool> ref = V;
+     auto copy = to_vector(ref);
+-    EXPECT_THAT(copy, testing::ElementsAre(true, false, true));
++    CHECK_THAT(copy, Catch::Matchers::RangeEquals({true, false, true}));
+   }
  }
  
-@@ -1240,9 +1295,9 @@ TEST(SmallVectorTest, ToVectorOf) {
+@@ -1293,9 +1348,9 @@ TEST(SmallVectorTest, ToVectorOf) {
      // iterators.
      namespace_with_adl::MyVector V = {{1, 2, 3}};
      auto UnsignedVector = to_vector_of<unsigned>(V);
@@ -1954,7 +2026,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    }
  }
  
-@@ -1259,9 +1314,7 @@ protected:
+@@ -1312,9 +1367,7 @@ protected:
      return std::is_same_v<T, typename VectorT::value_type>;
    }
  
@@ -1965,7 +2037,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
      // Fill up the small size so that insertions move the elements.
      for (int I = 0, E = NumBuiltinElts(V); I != E; ++I)
        V.emplace_back(I + 1);
-@@ -1271,13 +1324,10 @@ protected:
+@@ -1324,13 +1377,10 @@ protected:
  // Test one type that's trivially copyable (int) and one that isn't
  // (Constructable) since reference invalidation may be fixed differently for
  // each.
@@ -1982,7 +2054,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    int N = NumBuiltinElts(V);
-@@ -1299,7 +1349,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, PushBack) {
+@@ -1352,7 +1402,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, PushBack) {
    EXPECT_EQ(int(V.size()) - 1, V.back());
  }
  
@@ -1991,7 +2063,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    int N = NumBuiltinElts(V);
-@@ -1328,7 +1378,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, PushBackMoved) {
+@@ -1381,7 +1431,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, PushBackMoved) {
    }
  }
  
@@ -2000,7 +2072,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    auto &V = this->V;
    (void)V;
    int N = NumBuiltinElts(V);
-@@ -1342,7 +1392,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Resize) {
+@@ -1395,7 +1445,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Resize) {
    EXPECT_EQ(1, V.back());
  }
  
@@ -2009,7 +2081,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    auto &V = this->V;
    (void)V;
    V.append(1, V.back());
-@@ -1358,11 +1408,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Append) {
+@@ -1411,11 +1461,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Append) {
    EXPECT_EQ(1, V.back());
  }
  
@@ -2024,7 +2096,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
  
    ASSERT_EQ(3u, NumBuiltinElts(V));
    ASSERT_EQ(3u, V.size());
-@@ -1371,11 +1421,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, AppendRange) {
+@@ -1424,11 +1474,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, AppendRange) {
  
    // Confirm this checks for growth when there's more than one element
    // appended.
@@ -2038,7 +2110,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    (void)V;
-@@ -1413,17 +1463,17 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Assign) {
+@@ -1466,17 +1516,17 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Assign) {
    EXPECT_EQ(2, V[0]);
  }
  
@@ -2061,7 +2133,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    (void)V;
-@@ -1445,7 +1495,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Insert) {
+@@ -1498,7 +1548,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, Insert) {
    EXPECT_EQ(int(V.size() - 1), V.back());
  }
  
@@ -2070,7 +2142,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    (void)V;
-@@ -1473,7 +1523,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertMoved) {
+@@ -1526,7 +1576,7 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertMoved) {
    }
  }
  
@@ -2079,7 +2151,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    auto &V = this->V;
    (void)V;
  
-@@ -1492,12 +1542,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertN) {
+@@ -1545,12 +1595,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertN) {
    EXPECT_EQ(1, V.front());
  }
  
@@ -2095,7 +2167,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
  
    ASSERT_EQ(3u, NumBuiltinElts(V));
    ASSERT_EQ(3u, V.size());
-@@ -1506,11 +1555,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertRange) {
+@@ -1559,11 +1608,11 @@ TYPED_TEST(SmallVectorReferenceInvalidationTest, InsertRange) {
  
    // Confirm this checks for growth when there's more than one element
    // inserted.
@@ -2109,7 +2181,7 @@ index f7a3110f183820212179644fd31009685e172943..ac88d582d0ca8468d26f6a37af8a6096
    // Note: setup adds [1, 2, ...] to V until it's at capacity in small mode.
    auto &V = this->V;
    int N = NumBuiltinElts(V);
-@@ -1542,24 +1591,19 @@ protected:
+@@ -1595,24 +1644,19 @@ protected:
  
    VectorT V;
  
@@ -2327,7 +2399,7 @@ index 747d9dde0b73752e53c23e8fc750a3a0c64743fb..b0eb3234ab68694dbdf002ff3af56625
  using namespace llvm::sys;
  
 diff --git a/llvm/unittests/Support/MathExtrasTest.cpp b/llvm/unittests/Support/MathExtrasTest.cpp
-index 5cb85fc55da92c75dbe431721e44b99594b162dd..1ea3df25fd03bbb3912176dcf5e75abebb1d4674 100644
+index 27e8b26e8801d388d70e2abab2b40bc2dc5982a7..8efc9b23b62f1819d001971b20df94ed7313eac5 100644
 --- a/llvm/unittests/Support/MathExtrasTest.cpp
 +++ b/llvm/unittests/Support/MathExtrasTest.cpp
 @@ -7,7 +7,11 @@
@@ -2567,7 +2639,7 @@ index 5cb85fc55da92c75dbe431721e44b99594b162dd..1ea3df25fd03bbb3912176dcf5e75abe
  
    // Same overflow condition, divideSignedWouldOverflow, applies.
  }
-@@ -567,129 +549,127 @@ TEST(MathExtras, Mod) {
+@@ -567,130 +549,128 @@ TEST(MathExtras, Mod) {
    EXPECT_EQ(mod(0, 3), 0);
  }
  
@@ -2778,4 +2850,5 @@ index 5cb85fc55da92c75dbe431721e44b99594b162dd..1ea3df25fd03bbb3912176dcf5e75abe
 +  EXPECT_FALSE(MulOverflow < TestType>(0, -5, Result));
 +  EXPECT_EQ(Result, TestType(0));
  }
- } // namespace
+ 
+ TEST(MathExtras, NumDigitsBase10) {

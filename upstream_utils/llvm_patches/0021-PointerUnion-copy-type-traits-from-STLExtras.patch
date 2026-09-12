@@ -1,20 +1,20 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Wed, 10 Aug 2022 17:07:52 -0700
-Subject: [PATCH 22/34] PointerUnion: copy type traits from STLExtras
+Subject: [PATCH 21/32] PointerUnion: copy type traits from STLExtras
 
 ---
  llvm/include/llvm/ADT/PointerUnion.h | 46 ++++++++++++++++++++++++++++
  1 file changed, 46 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index c3d6458777d186a700c359089c4afcac8db0185a..02d11537e3823a43301295e4645d84357df63703 100644
+index 0d81c37681065d9d89a416f7a00da9f92b0af4b4..35be479876ff4da021361fb581d97240312edb3c 100644
 --- a/llvm/include/llvm/ADT/PointerUnion.h
 +++ b/llvm/include/llvm/ADT/PointerUnion.h
-@@ -23,9 +23,55 @@
- #include <cassert>
+@@ -25,9 +25,55 @@
  #include <cstddef>
  #include <cstdint>
+ #include <optional>
 +#include <type_traits>
  
  namespace llvm {
@@ -65,5 +65,5 @@ index c3d6458777d186a700c359089c4afcac8db0185a..02d11537e3823a43301295e4645d8435
 +using TypeAtIndex = std::tuple_element_t<I, std::tuple<Ts...>>;
 +
  namespace pointer_union_detail {
-   /// Determine the number of bits required to store integers with values < n.
-   /// This is ceil(log2(n)).
+ 
+ /// Determine the number of bits required to store values in [0, NumValues).

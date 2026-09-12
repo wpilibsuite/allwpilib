@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sun, 29 Oct 2023 23:00:08 -0700
-Subject: [PATCH 26/34] raw_ostream: Add SetNumBytesInBuffer
+Subject: [PATCH 24/32] raw_ostream: Add SetNumBytesInBuffer
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index f2df534b6bd7a37840fc0c3dba0f657b8b90812e..5289d11d630cc57deebff6647c684fa26a70a16a 100644
+index 4817b816edaeebee140c2a193718676561975602..6e66bd2f70d4f25bd871e8400be14f344b2b2c7f 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -366,6 +366,11 @@ protected:
+@@ -368,6 +368,11 @@ protected:
      SetBufferAndMode(BufferStart, Size, BufferKind::ExternalBuffer);
    }
  

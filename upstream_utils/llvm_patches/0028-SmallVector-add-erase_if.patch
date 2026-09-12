@@ -1,17 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 18 Jun 2024 09:07:33 -0700
-Subject: [PATCH 30/34] SmallVector: add erase_if()
+Subject: [PATCH 28/32] SmallVector: add erase_if()
 
 ---
  llvm/include/llvm/ADT/SmallVector.h | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index f5483efde17da0a6b352a966a61fb800fa7109bb..d99edbbf0260bd41fd64a60fbef6a1c3d39e721d 100644
+index 74012c1df6e653986408cfa154ab19b21ddbc927..8c40be4537192a6bfe96572d8bf32fb3b5bcbabf 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -1351,6 +1351,14 @@ template <typename T, unsigned N> struct DenseMapInfo<llvm::SmallVector<T, N>> {
+@@ -1367,6 +1367,14 @@ template <typename T, unsigned N> struct DenseMapInfo<llvm::SmallVector<T, N>> {
    }
  };
  

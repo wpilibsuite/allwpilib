@@ -1,23 +1,24 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Tue, 11 Jul 2023 22:56:09 -0700
-Subject: [PATCH 24/34] Use C++20 <bit> header
+Subject: [PATCH 22/32] Use C++20 <bit> header
 
 ---
- llvm/include/llvm/ADT/DenseMap.h       |   1 +
+ llvm/include/llvm/ADT/DenseMap.h       |   5 +-
  llvm/include/llvm/ADT/PointerUnion.h   |   2 +-
  llvm/include/llvm/ADT/SmallPtrSet.h    |   6 +-
  llvm/include/llvm/Support/Endian.h     | 159 +++++++++++++------------
  llvm/include/llvm/Support/MathExtras.h |  23 ++--
  llvm/lib/Support/ConvertUTFWrapper.cpp |   5 +-
+ llvm/lib/Support/MathExtras.cpp        |   3 +-
  llvm/unittests/Support/EndianTest.cpp  |  60 ++++------
- 7 files changed, 125 insertions(+), 131 deletions(-)
+ 8 files changed, 129 insertions(+), 134 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
-index 41199ac39da56994d9086600e6dfc1dad2c93ce0..2c23fa2d268d34429faa0ed7b1d889c2c5ea4f9c 100644
+index ef6895b8d90958604c121df0fafe00aa8cf4d77b..33fa0c2fe9a48bb7d32b1cb4e3ecb91a7dbee37b 100644
 --- a/llvm/include/llvm/ADT/DenseMap.h
 +++ b/llvm/include/llvm/ADT/DenseMap.h
-@@ -26,6 +26,7 @@
+@@ -32,6 +32,7 @@
  #include "llvm/Support/ReverseIteration.h"
  #include "llvm/Support/type_traits.h"
  #include <algorithm>
@@ -25,42 +26,60 @@ index 41199ac39da56994d9086600e6dfc1dad2c93ce0..2c23fa2d268d34429faa0ed7b1d889c2
  #include <cassert>
  #include <cstddef>
  #include <cstring>
-diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index 02d11537e3823a43301295e4645d84357df63703..be3bbb6ac65588626b746ce83aa3ed65ac9dc856 100644
---- a/llvm/include/llvm/ADT/PointerUnion.h
-+++ b/llvm/include/llvm/ADT/PointerUnion.h
-@@ -76,7 +76,7 @@ namespace pointer_union_detail {
-   /// Determine the number of bits required to store integers with values < n.
-   /// This is ceil(log2(n)).
-   constexpr int bitsRequired(unsigned n) {
--    return n == 0 ? 0 : llvm::bit_width_constexpr(n - 1);
-+    return n == 0 ? 0 : std::bit_width(n - 1);
+@@ -88,7 +89,7 @@ LLVM_ATTRIBUTE_ALWAYS_INLINE void forEachUsed(const UsedT *U, unsigned N,
+   for (unsigned W = 0; W != NW; ++W) {
+     UsedT Bits = U[W];
+     while (Bits) {
+-      Func((W << 5) + llvm::countr_zero(Bits));
++      Func((W << 5) + std::countr_zero(Bits));
+       Bits &= Bits - 1;
+     }
+   }
+@@ -1391,7 +1392,7 @@ private:
+         }
+         Bits = Used[W];
+       }
+-      Ptr = Buckets + ((W << 5) + llvm::countr_zero(Bits));
++      Ptr = Buckets + ((W << 5) + std::countr_zero(Bits));
+     }
    }
  
-   template <typename... Ts> constexpr int lowBitsAvailable() {
+diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
+index 35be479876ff4da021361fb581d97240312edb3c..efafa7c01ebc77f4342b08ce6d63095f6e409134 100644
+--- a/llvm/include/llvm/ADT/PointerUnion.h
++++ b/llvm/include/llvm/ADT/PointerUnion.h
+@@ -79,7 +79,7 @@ namespace pointer_union_detail {
+ /// Determine the number of bits required to store values in [0, NumValues).
+ /// This is ceil(log2(NumValues)).
+ constexpr int bitsRequired(unsigned NumValues) {
+-  return NumValues == 0 ? 0 : llvm::bit_width_constexpr(NumValues - 1);
++  return NumValues == 0 ? 0 : std::bit_width(NumValues - 1);
+ }
+ 
+ template <typename... Ts> constexpr int lowBitsAvailable() {
 diff --git a/llvm/include/llvm/ADT/SmallPtrSet.h b/llvm/include/llvm/ADT/SmallPtrSet.h
-index c07de1a110479ed625b112cc5b30d0bd5d56430f..474aa405d789e8c291d3bfc16a653ad043365883 100644
+index 4e2f49a4e9953c4bd37da16ce7f51e1366b1cc6f..e50393190aa3991e57f4038d342630038de2b6a2 100644
 --- a/llvm/include/llvm/ADT/SmallPtrSet.h
 +++ b/llvm/include/llvm/ADT/SmallPtrSet.h
 @@ -81,7 +81,7 @@ protected:
    explicit SmallPtrSetImplBase(const void **SmallStorage, unsigned SmallSize)
        : CurArray(SmallStorage), CurArraySize(SmallSize), NumEntries(0),
-         NumTombstones(0), IsSmall(true) {
+         IsSmall(true) {
 -    assert(llvm::has_single_bit(SmallSize) &&
 +    assert(std::has_single_bit(SmallSize) &&
             "Initial size must be a power of two!");
    }
  
-@@ -129,7 +129,7 @@ public:
-     // We must Grow -- find the size where we'd be 75% full, then round up to
+@@ -128,7 +128,7 @@ public:
+     // We must Grow -- find the size where we'd be 2/3 full, then round up to
      // the next power of two.
-     size_type NewSize = NewNumEntries + (NewNumEntries / 3);
+     size_type NewSize = NewNumEntries + (NewNumEntries / 2);
 -    NewSize = llvm::bit_ceil(NewSize);
 +    NewSize = std::bit_ceil(NewSize);
      // Like insert_imp_big, always allocate at least 128 elements.
      NewSize = (std::max)(128u, NewSize);
      Grow(NewSize);
-@@ -533,7 +533,7 @@ class SmallPtrSet : public SmallPtrSetImpl<PtrType> {
+@@ -538,7 +538,7 @@ class SmallPtrSet : public SmallPtrSetImpl<PtrType> {
    using BaseT = SmallPtrSetImpl<PtrType>;
  
    // Make sure that SmallSize is a power of two, round up if not.
@@ -476,7 +495,7 @@ index f5f4381c1003572024223da4825363d93a60aad9..1c5e447374e5dc1738a1e3fc6511395e
  
  } // end namespace endian
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 0735d9c9f756349a19c5aa2ec34ceca5d8274f16..38b1486c54be5102025192b3b90e86e54ab347c0 100644
+index 1cd3923b7ee022c3a196079c295a735b0337b365..798bf68c11041c7701d1b5622606eec0340f52ea 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -16,6 +16,7 @@
@@ -565,7 +584,7 @@ index 0735d9c9f756349a19c5aa2ec34ceca5d8274f16..38b1486c54be5102025192b3b90e86e5
  
  /// A and B are either alignments or offsets. Return the minimum alignment that
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 17b2760fe5c579a61e85188d482cbc9ec28f6c09..7f5d8958230414edf9db69ff08dd36d02c00f37d 100644
+index e4c23d737eb1c69528d24e95418ce5d6b730cddc..251df445e06d775847023c063cc7665615639511 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -9,6 +9,7 @@
@@ -593,6 +612,27 @@ index 17b2760fe5c579a61e85188d482cbc9ec28f6c09..7f5d8958230414edf9db69ff08dd36d0
 +      I = std::byteswap(I);
      Src = &ByteSwapped[0];
      SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
+   }
+diff --git a/llvm/lib/Support/MathExtras.cpp b/llvm/lib/Support/MathExtras.cpp
+index 4424cdd935fef5074c41cc3860a0cf329857999e..d7b8f7228b244a0aecaf195ac8ac19ed8b5a0fa8 100644
+--- a/llvm/lib/Support/MathExtras.cpp
++++ b/llvm/lib/Support/MathExtras.cpp
+@@ -17,6 +17,7 @@
+ #else
+ #include <cmath>
+ #endif
++#include <bit>
+ 
+ namespace llvm {
+ 
+@@ -58,7 +59,7 @@ namespace llvm {
+       }
+     } Data;
+ 
+-    uint64_t Base2 = X ? countl_zero(X) : 64;
++    uint64_t Base2 = X ? std::countl_zero(X) : 64;
+     uint64_t Digits = Data.AtLeast[Base2];
+     return Digits + (X >= Data.Boundaries[Digits]);
    }
 diff --git a/llvm/unittests/Support/EndianTest.cpp b/llvm/unittests/Support/EndianTest.cpp
 index 0ee631db74ac1f70ca5e9bb4cf6cdcb1d2205e57..d707fdb55c7c97b21310b48bf3c23e328dd644aa 100644
