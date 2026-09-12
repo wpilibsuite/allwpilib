@@ -23,6 +23,23 @@ Other examples:
 - `bazel test //wpiutil:wpiutil-cpp-test` - Runs only the cpp test target in the wpiutil folder
 - `bazel coverage //wpiutil/...` - (*Nix only) - Runs a code coverage report for both C++ and Java on all the targets under wpiutil
 
+## Optional ImGui GUI tests
+Bazel can build GUI tests that use [imgui_test_engine](https://github.com/ocornut/imgui_test_engine). This dependency is disabled by default because the `imgui_test_engine/` directory uses the Dear ImGui Test Engine License. Normal `bazel build //...` and `bazel test //...` invocations do not build these tests or download the dependency.
+
+To enable the tests, pass `--config=imgui_tests` or the underlying build setting `--//shared/bazel/rules:with_imgui_tests=true`. The first enabled build needs network access so Bazel can download the pinned upstream source archive.
+
+The ImGui GUI test macro transitions an internal hook flag for the generated C++ test binary so the ImGui test-engine macros apply only to the GUI test dependency graph, not to ordinary GUI executables built under `--config=imgui_tests`.
+
+The ImGui GUI test targets are:
+- `//glass:glass-imgui-test`
+- `//simulation/halsim_gui:halsim_gui-imgui-test`
+- `//tools/datalogtool:datalogtool-imgui-test`
+- `//tools/outlineviewer:outlineviewer-imgui-test`
+- `//tools/sysid:sysid-imgui-test`
+- `//tools/wpical:wpical-imgui-test`
+
+These tests run headless by default using SDL's dummy video driver, the software SDL renderer, and `WPIGUI_FORCE_RENDERER=2d`.
+
 ## User settings
 When invoking Bazel, it will check if `user.bazelrc` exists for additional, user specified flags. You can use these settings to do things like always ignore builds in a specific folder, or limiting the CPU/RAM usage during a build.
 Examples:
