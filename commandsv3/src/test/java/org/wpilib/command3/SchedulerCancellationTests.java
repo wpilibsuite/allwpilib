@@ -368,6 +368,75 @@ class SchedulerCancellationTests extends CommandTestBase {
   }
 
   @Test
+  void compositionsWithSharedCommandsDoNotSelfCancel() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+
+    var count = new AtomicInteger(0);
+    var cancellationCount = new AtomicInteger(0);
+    var innerCommand =
+        mech.run(
+                coroutine -> {
+                  count.set(0);
+
+                  while (true) {
+                    count.incrementAndGet();
+                    coroutine.yield();
+                  }
+                })
+            .whenCanceled(cancellationCount::incrementAndGet)
+            .named("Inner Command");
+
+    // two compositions with conflicting requirements (mech) running the same command object
+    final var parent1 =
+        Command.requiring(mech).executing(c -> c.await(innerCommand)).named("Parent 1");
+    final var parent2 =
+        Command.requiring(mech).executing(c -> c.await(innerCommand)).named("Parent 2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, innerCommand), m_scheduler.getRunningCommands());
+    assertEquals(1, count.get());
+    m_scheduler.run();
+    assertEquals(2, count.get());
+
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+    assertEquals(
+        List.of(parent2, innerCommand),
+        m_scheduler.getRunningCommands(),
+        "parent2 should have started");
+    assertEquals(1, cancellationCount.get(), "Inner command should have been canceled");
+    assertEquals(1, count.get(), "Inner command should have restarted");
+
+    m_scheduler.run();
+    assertEquals(
+        List.of(parent2, innerCommand),
+        m_scheduler.getRunningCommands(),
+        "parent2 and inner command should still be running");
+    assertEquals(1, cancellationCount.get(), "Inner command should not have been canceled again");
+    assertEquals(2, count.get(), "Inner command should have continued running");
+  }
+
+  @Test
+  void compositionsAwaitingSameCommandDoNotInterrupt() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var sharedCommand = mech.run(Coroutine::park).named("Shared Command");
+
+    // Both compositions await the same command instance, so parent2's `await` call just waits
+    // for the already-running process to exit instead of restarting it and interrupting parent1
+    final var parent1 = Command.noRequirements(c -> c.await(sharedCommand)).named("Parent 1");
+    final var parent2 = Command.noRequirements(c -> c.await(sharedCommand)).named("Parent 2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, sharedCommand), m_scheduler.getRunningCommands());
+
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, sharedCommand, parent2), m_scheduler.getRunningCommands());
+  }
+
+  @Test
   void doesNotRunOnCancelWhenInterruptingOnDeck() {
     var ran = new AtomicBoolean(false);
 

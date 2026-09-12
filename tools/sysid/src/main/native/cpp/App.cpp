@@ -20,6 +20,9 @@
 #include "wpi/glass/Window.hpp"
 #include "wpi/glass/WindowManager.hpp"
 #include "wpi/glass/other/Log.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/sysid/view/Analyzer.hpp"
@@ -58,6 +61,9 @@ void Application(std::string_view saveDir) {
   // Create the wpigui (along with Dear ImGui) and Glass contexts.
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   // Add icons
   gui::AddIcon(sysid::GetResource_sysid_16_png());
@@ -151,8 +157,10 @@ void Application(std::string_view saveDir) {
                                     sysid::PROGRAM_LOG_WINDOW_SIZE.y);
   gProgramLogWindow->DisableRenamePopup();
 
+#ifndef RUNNING_IMGUI_TESTS
   // Configure save file.
   gui::ConfigurePlatformSaveFile("sysid.ini");
+#endif
 
   // Add menu bar.
   gui::AddLateExecute([] {

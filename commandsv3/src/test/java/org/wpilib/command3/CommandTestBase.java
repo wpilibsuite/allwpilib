@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.math.util.MathShared;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.system.RobotController;
@@ -20,6 +21,7 @@ class CommandTestBase {
   protected List<SchedulerEvent> m_events;
   protected long m_opModeId = 0;
   protected String m_opModeName = "";
+  protected RobotMode m_robotMode = RobotMode.UNKNOWN;
 
   @BeforeEach
   void initScheduler() {
@@ -31,8 +33,8 @@ class CommandTestBase {
 
   @BeforeEach
   void initOpmodeFetcher() {
-    OpModeFetcher.setFetcher(
-        new OpModeFetcher() {
+    RobotStateFetcher.setFetcher(
+        new RobotStateFetcher() {
           @Override
           long getOpModeId() {
             return m_opModeId;
@@ -41,6 +43,11 @@ class CommandTestBase {
           @Override
           String getOpModeName() {
             return m_opModeName;
+          }
+
+          @Override
+          RobotMode getRobotMode() {
+            return m_robotMode;
           }
         });
   }
@@ -54,7 +61,7 @@ class CommandTestBase {
 
           @Override
           public double getTimestamp() {
-            return RobotController.getTime() / 1e6;
+            return RobotController.getTime() / 1e9;
           }
         });
   }
@@ -63,6 +70,7 @@ class CommandTestBase {
   void resetOpmodeFetcher() {
     m_opModeId = 0;
     m_opModeName = "";
+    m_robotMode = RobotMode.UNKNOWN;
   }
 
   /**

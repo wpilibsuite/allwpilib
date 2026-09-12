@@ -579,10 +579,18 @@ public final class Scheduler implements ProtobufSerializable {
       return result;
     }
 
-    // Track this binding so we can disable it when it's out of scope.
-    // Note that, even though triggers can clean themselves up, commands that are manually scheduled
-    // cannot do the same, so we have to track them in the scheduler.
-    m_activeBindings.add(binding);
+    if (!(binding.scope() instanceof BindingScope.ForCommand)) {
+      // Track this binding so we can disable it when it's out of scope.
+      // Note that, even though triggers can clean themselves up, commands that are manually
+      // scheduled cannot do the same, so we have to track them in the scheduler.
+
+      // We don't bother tracking command-scoped bindings; the bound command will already be
+      // cleaned up in the same cycle that the parent command exits, so this would attempt to
+      // double-cancel a child command across two cycles (once when the parent exits, and then in
+      // the next cycle in cancelStaleBindings). That would cause problems if the command object
+      // is immediately rescheduled as cancelStaleBindings would immediately cancel the new run
+      m_activeBindings.add(binding);
+    }
 
     // Evict conflicting on-deck commands
     // We check above if the input command is lower priority than any of these,

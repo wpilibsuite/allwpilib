@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.0",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-telemetry==0.0.0",
     "robotpy-wpiutil==0.0.0",
@@ -41,7 +41,6 @@ update_init = [
     "telemetry"
 ]
 scan_headers_ignore = [
-    "src/TelemetryPython.h",
     "wpi/telemetry/DiscardTelemetryBackend.hpp",
     "wpi/telemetry/MockTelemetryBackend.hpp",
     "wpi/telemetry/MultiTelemetryBackend.hpp",
@@ -49,6 +48,11 @@ scan_headers_ignore = [
     "wpi/telemetry/TelemetryRegistry.hpp",
     "wpi/telemetry/TelemetryTable.hpp",
     "wpi/telemetry/detail/PathUtil.hpp",
+
+    # internals
+    "src/TelemetryPython.h",
+    "src/rpy/MockTelemetryBackendFunctions.h",
+    "src/rpy/PyTelemetryTable.h"
 ]
 
 [tool.semiwrap.name_transform]

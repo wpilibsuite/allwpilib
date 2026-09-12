@@ -8,6 +8,7 @@ classes:
     methods:
       GetTunableType:
       PublishTunable:
+        ignore_py: true
       UpdateTunable:
       ComplexTunable:
         overloads:
@@ -15,6 +16,7 @@ classes:
           const ForceTunableRegister&:
             ignore: true
       PublishChildTunable:
+        ignore_py: true
         overloads:
           std::string_view, detail::TunableBase&:
           std::string_view, ComplexTunable&:

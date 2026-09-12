@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpilib-drivers==0.0.0",
     "wpilib==0.0.0",
@@ -60,5 +60,3 @@ PWMVenom = "wpi/drivers/motor/PWMVenom.hpp"
 PWMVictorSPX = "wpi/drivers/motor/PWMVictorSPX.hpp"
 Spark = "wpi/drivers/motor/Spark.hpp"
 SparkMini = "wpi/drivers/motor/SparkMini.hpp"
-Talon = "wpi/drivers/motor/Talon.hpp"
-VictorSP = "wpi/drivers/motor/VictorSP.hpp"

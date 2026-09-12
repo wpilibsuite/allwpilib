@@ -5,6 +5,7 @@ module(
 
 include("//docs:doxygen.MODULE.bazel")
 include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+include("//shared/bazel/thirdparty/imgui_test_engine:imgui_test_engine.MODULE.bazel")
 include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
 include("//shared/bazel/thirdparty/libsdlgpu:libsdlgpu.MODULE.bazel")
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
@@ -12,6 +13,12 @@ include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
 bazel_dep(name = "rules_cc", version = "0.2.18")
 bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "libuv", version = "1.49.2")
+local_path_override(
+    module_name = "libuv",
+    path = "wpinet/src/main/native/thirdparty/libuv",
+)
+
 bazel_dep(name = "bazel_features", version = "1.43.0")
 bazel_dep(name = "bazel_lib", version = "3.5.0")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")

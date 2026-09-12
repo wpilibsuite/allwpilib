@@ -10,4 +10,5 @@ classes:
   wpi::telemetry::TelemetryLoggable:
     methods:
       LogTo:
+        ignore_py: true
       GetTelemetryType:

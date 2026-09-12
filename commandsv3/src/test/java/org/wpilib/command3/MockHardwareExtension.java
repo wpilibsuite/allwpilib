@@ -6,14 +6,15 @@ package org.wpilib.command3;
 
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.wpilib.hardware.hal.RobotMode;
 
 public class MockHardwareExtension implements BeforeEachCallback {
   @Override
   public void beforeEach(ExtensionContext context) {
-    OpModeFetcher.setFetcher(new MockOpModeFetcher());
+    RobotStateFetcher.setFetcher(new MockRobotStateFetcher());
   }
 
-  private static final class MockOpModeFetcher extends OpModeFetcher {
+  private static final class MockRobotStateFetcher extends RobotStateFetcher {
     @Override
     long getOpModeId() {
       return 0;
@@ -22,6 +23,11 @@ public class MockHardwareExtension implements BeforeEachCallback {
     @Override
     String getOpModeName() {
       return "";
+    }
+
+    @Override
+    RobotMode getRobotMode() {
+      return RobotMode.UNKNOWN;
     }
   }
 }

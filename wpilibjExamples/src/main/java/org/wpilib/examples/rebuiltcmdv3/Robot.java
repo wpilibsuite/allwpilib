@@ -29,6 +29,9 @@ public class Robot extends OpModeRobot {
 
   public final Trigger inNeutralZone = new Trigger(() -> poseEstimator.inZone(NEUTRAL_ZONE));
 
+  // Store the scheduler in a field for Epilogue to pick up and log for us
+  private final Scheduler scheduler = Scheduler.getDefault();
+
   /** Initializes the robot class and sets safe default commands for all its mechanisms. */
   public Robot() {
     swerveDrive.setDefaultCommand(swerveDrive.idle());
@@ -42,7 +45,7 @@ public class Robot extends OpModeRobot {
     poseEstimator.odometryUpdate(swerveDrive.getGyroHeading(), swerveDrive.getModulePositions());
 
     // 2. Run the scheduler to poll triggers and execute our commands.
-    Scheduler.getDefault().run();
+    scheduler.run();
 
     // 3. Update telemetry.
     Epilogue.update(this);

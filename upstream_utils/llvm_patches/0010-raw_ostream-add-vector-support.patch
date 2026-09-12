@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:48:59 -0400
-Subject: [PATCH 10/34] raw_ostream: add vector support
+Subject: [PATCH 10/32] raw_ostream: add vector support
 
 ---
  llvm/include/llvm/Support/raw_ostream.h | 115 ++++++++++++++++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 10/34] raw_ostream: add vector support
  2 files changed, 162 insertions(+)
 
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index f346d36ca7a36ab2d9bcddc205db0abf50c2a136..991ede221d8c265a384ede4d4b037dbbb61d6afd 100644
+index f262b6ea1b02eac2f6cb708926838fa95045aa3e..0cfe9e210c0b26303aae2e7f4027ef82c4054515 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
 @@ -25,6 +25,7 @@
@@ -20,7 +20,7 @@ index f346d36ca7a36ab2d9bcddc205db0abf50c2a136..991ede221d8c265a384ede4d4b037dbb
  
  namespace llvm {
  
-@@ -275,12 +276,24 @@ public:
+@@ -274,12 +275,24 @@ public:
      return write(Str.data(), Str.size());
    }
  
@@ -45,7 +45,7 @@ index f346d36ca7a36ab2d9bcddc205db0abf50c2a136..991ede221d8c265a384ede4d4b037dbb
  
    /// indent - Insert 'NumSpaces' spaces.
    raw_ostream &indent(unsigned NumSpaces);
-@@ -642,6 +655,108 @@ public:
+@@ -643,6 +656,108 @@ public:
    static bool classof(const raw_ostream *OS);
  };
  
@@ -155,10 +155,10 @@ index f346d36ca7a36ab2d9bcddc205db0abf50c2a136..991ede221d8c265a384ede4d4b037dbb
  class LLVM_ABI raw_null_ostream : public raw_pwrite_stream {
    /// See raw_ostream::write_impl.
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 32f5d5fb78b1a9e4288b875c64ded0040d6fdce6..dd1ce4a784d096949681e297103c50aa002d636d 100644
+index 4b29558843ddd57b2c52b3037afafc29c81ec23b..d453672d952d20c8eee53d51edd9e48d51e16179 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -677,6 +677,53 @@ bool raw_svector_ostream::classof(const raw_ostream *OS) {
+@@ -672,6 +672,53 @@ bool raw_svector_ostream::classof(const raw_ostream *OS) {
    return OS->get_kind() == OStreamKind::OK_SVecStream;
  }
  

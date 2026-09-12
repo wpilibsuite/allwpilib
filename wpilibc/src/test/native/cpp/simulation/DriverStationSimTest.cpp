@@ -39,6 +39,7 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsAutonomous());
   EnumCallback callback;
@@ -48,6 +49,12 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
   DriverStationSim::NotifyNewData();
   CHECK(DriverStationSim::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(RobotState::IsAutonomous());
+  CHECK_FALSE(RobotState::IsAutonomousEnabled());
+
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  CHECK(RobotState::IsAutonomousEnabled());
+
   CHECK(RobotState::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_AUTONOMOUS);
@@ -57,6 +64,7 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsUtility());
   EnumCallback callback;
@@ -66,6 +74,12 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
   DriverStationSim::NotifyNewData();
   CHECK(DriverStationSim::GetRobotMode() == RobotMode::UTILITY);
   CHECK(RobotState::IsUtility());
+  CHECK_FALSE(RobotState::IsUtilityEnabled());
+
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  CHECK(RobotState::IsUtilityEnabled());
+
   CHECK(RobotState::GetRobotMode() == RobotMode::UTILITY);
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_UTILITY);
