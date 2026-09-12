@@ -37,6 +37,56 @@ TEST_CASE_METHOD(TriggerTest, "TriggerTest OnTrue", "[commandsv2][command]") {
   CHECK_FALSE(scheduler.IsScheduled(&command));
 }
 
+TEST_CASE_METHOD(TriggerTest, "TriggerTest IfTrue RunOnce",
+                 "[commandsv2][command]") {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool pressed = false;
+  int counter = 0;
+
+  Trigger([&pressed] {
+    return pressed;
+  }).IfTrue(RunOnce([&counter] { counter++; }));
+
+  scheduler.Run();
+  CHECK(counter == 0);
+  pressed = true;
+  scheduler.Run();
+  CHECK(counter == 1);
+  scheduler.Run();
+  CHECK(counter == 2);
+  pressed = false;
+  scheduler.Run();
+  CHECK(counter == 2);
+}
+
+TEST_CASE_METHOD(TriggerTest, "TriggerTest IfTrue DoesNotRestartOrCancel",
+                 "[commandsv2][command]") {
+  auto& scheduler = CommandScheduler::GetInstance();
+  bool pressed = false;
+  int startCounter = 0;
+  int endCounter = 0;
+  FunctionalCommand command([&startCounter] { startCounter++; }, [] {},
+                            [&endCounter](bool) { endCounter++; },
+                            [] { return false; });
+
+  Trigger([&pressed] { return pressed; }).IfTrue(&command);
+
+  pressed = true;
+  scheduler.Run();
+  CHECK(startCounter == 1);
+  CHECK(scheduler.IsScheduled(&command));
+
+  scheduler.Run();
+  CHECK(startCounter == 1);
+  CHECK(scheduler.IsScheduled(&command));
+
+  pressed = false;
+  scheduler.Run();
+  CHECK(startCounter == 1);
+  CHECK(endCounter == 0);
+  CHECK(scheduler.IsScheduled(&command));
+}
+
 TEST_CASE_METHOD(TriggerTest, "TriggerTest OnFalse", "[commandsv2][command]") {
   auto& scheduler = CommandScheduler::GetInstance();
   bool finished = false;
