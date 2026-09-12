@@ -4,22 +4,27 @@
 
 package org.wpilib.event;
 
-import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedHashSet;
+import org.wpilib.util.container.WeakLinkedHashSet;
 
 /**
  * A declarative way to bind a set of actions to a loop and execute them when the loop is polled.
  */
 public final class EventLoop {
-  private final Collection<Runnable> m_bindings = new LinkedHashSet<>();
+  // Keep all bindings in one insertion-ordered collection for polling.
+  private final WeakLinkedHashSet<Runnable> m_bindings = new WeakLinkedHashSet<>();
+  // Keep strong references for strongly bound actions to prevent garbage collection.
+  private final LinkedHashSet<Runnable> m_strongBindings = new LinkedHashSet<>();
   private boolean m_running;
 
   /** Default constructor. */
   public EventLoop() {}
 
   /**
-   * Bind a new action to run when the loop is polled.
+   * Bind a new action to run when the loop is polled. The event loop keeps a reference to the
+   * action, which will prevent it from being garbage collected. If memory leaks are a concern,
+   * consider {@link #bindWeak(Runnable)}.
    *
    * @param action the action to run.
    */
@@ -28,6 +33,30 @@ public final class EventLoop {
       throw new ConcurrentModificationException("Cannot bind EventLoop while it is running");
     }
     m_bindings.add(action);
+    m_strongBindings.add(action);
+  }
+
+  /**
+   * Weakly binds a new action to run when the loop is polled. Unlike {@link #bind(Runnable)}, a
+   * weakly bound action will not be prevented from being garbage collected.
+   *
+   * @param action the action to run
+   */
+  public void bindWeak(Runnable action) {
+    if (m_running) {
+      throw new ConcurrentModificationException("Cannot bind EventLoop while it is running");
+    }
+    m_bindings.add(action);
+  }
+
+  /**
+   * Checks if an action is bound to the event loop.
+   *
+   * @param action the action to check
+   * @return true if the action is bound, false if not
+   */
+  public boolean isBound(Runnable action) {
+    return m_bindings.contains(action);
   }
 
   /**
@@ -41,6 +70,7 @@ public final class EventLoop {
       throw new ConcurrentModificationException("Cannot unbind EventLoop while it is running");
     }
     m_bindings.remove(action);
+    m_strongBindings.remove(action);
   }
 
   /** Poll all bindings. */
@@ -60,5 +90,6 @@ public final class EventLoop {
       throw new ConcurrentModificationException("Cannot clear EventLoop while it is running");
     }
     m_bindings.clear();
+    m_strongBindings.clear();
   }
 }

@@ -114,7 +114,8 @@ public final class Scheduler implements ProtobufSerializable {
    */
   private final Collection<Binding> m_activeBindings = new ArrayList<>();
 
-  private final Collection<Trigger> m_boundTriggers = new ArrayList<>();
+  /** Triggers with active command bindings that must not be allowed to be garbage collected. */
+  private final Set<Trigger> m_boundTriggers = new HashSet<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final SequencedSet<CommandState> m_queuedToRun = new LinkedHashSet<>();
@@ -842,10 +843,13 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void unbindStaleTriggers() {
+    // Remove strong references to any triggers that have gone stale. This allows triggers to be
+    // garbage collected if they're not referenced outside the scope that created them. We don't
+    // clear any command bindings or unbind it from the event loop; otherwise, cached triggers
+    // would stop being updated until new command bindings are added.
     for (var iterator = m_boundTriggers.iterator(); iterator.hasNext(); ) {
       var trigger = iterator.next();
       if (!trigger.isScopeActive()) {
-        trigger.unbind();
         iterator.remove();
       }
     }
@@ -855,9 +859,18 @@ public final class Scheduler implements ProtobufSerializable {
    * Adds a bound trigger to this scheduler. The trigger will be unbound from the event loop when
    * its creation scope becomes inactive and may be eligible for garbage collection.
    */
-  // package-private for Trigger to call when constructed
+  // package-private for Trigger
   void addBoundTrigger(Trigger trigger) {
     m_boundTriggers.add(trigger);
+  }
+
+  /**
+   * Removes strong retention for a trigger, allowing it to potentially be garbage collected if no
+   * other references to it remain.
+   */
+  // package-private for Trigger
+  void removeBoundTrigger(Trigger trigger) {
+    m_boundTriggers.remove(trigger);
   }
 
   private void promoteScheduledCommands() {
