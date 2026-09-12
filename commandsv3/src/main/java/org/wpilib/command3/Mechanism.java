@@ -30,6 +30,20 @@ public interface Mechanism {
   }
 
   /**
+   * Marks this mechanism as being controllable when the robot is in a disabled mode. If a mechanism
+   * is not controllable, commands that require it cannot be scheduled when the robot is disabled
+   * and will be canceled when the robot enters a disabled mode.
+   *
+   * <p>By default, mechanisms are not controllable during disabled. Override this method to return
+   * {@code true} if the mechanism should be controllable during disabled modes.
+   *
+   * @return Whether this mechanism is controllable during disabled modes.
+   */
+  default boolean controllableDuringDisabled() {
+    return false;
+  }
+
+  /**
    * Gets the name of this mechanism. This will default to the name of this mechanism's class.
    *
    * @return The name of the mechanism.
