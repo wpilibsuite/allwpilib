@@ -23,7 +23,7 @@ import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 /**
- * Validates opmode annotations {@code @Autonomous}, {@code @Teleop}, {@code @TestOpMode}.
+ * Validates opmode annotations {@code @Autonomous}, {@code @Teleop}, {@code @Utility}.
  *
  * <p>Requirements:
  *
@@ -83,9 +83,9 @@ public class OpModeAnnotationValidator implements TaskListener {
       CharSequence qname = typeElem.getQualifiedName();
       boolean isAutonomous = "org.wpilib.opmode.Autonomous".contentEquals(qname);
       boolean isTeleop = "org.wpilib.opmode.Teleop".contentEquals(qname);
-      boolean isTestOpMode = "org.wpilib.opmode.TestOpMode".contentEquals(qname);
+      boolean isUtilityOpMode = "org.wpilib.opmode.Utility".contentEquals(qname);
 
-      if (!(isAutonomous || isTeleop || isTestOpMode)) {
+      if (!(isAutonomous || isTeleop || isUtilityOpMode)) {
         return super.visitAnnotation(node, unused);
       }
 
