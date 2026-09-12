@@ -15,7 +15,7 @@ class ActionValue : public pybind11::object {
  public:
   using pybind11::object::object;
 
-  ActionValue(pybind11::object&& value)
+  explicit ActionValue(pybind11::object&& value)
       : pybind11::object{std::move(value)} {}
 };
 

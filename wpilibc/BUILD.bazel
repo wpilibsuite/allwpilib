@@ -286,6 +286,7 @@ define_pybind_library(
 
 robotpy_py_test(
     "python_tests",
+    size = "medium",
     srcs = glob(["src/test/python/**/*.py"]),
     tags = ["exclusive-if-local"],
     deps = [
