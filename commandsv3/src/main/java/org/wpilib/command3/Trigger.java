@@ -109,7 +109,19 @@ public class Trigger implements BooleanSupplier {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
-    m_creationScope = BindingScope.createNarrowestScope(m_scheduler);
+
+    // Treat robot mode scopes as globals for the purposes of trigger object lifetimes.
+    // Any bindings made to the trigger will still use the appropriate scopes, but this prevents
+    // bugs where a trigger created in eg `autonomousInit()` and cached, then later rebound in
+    // `teleopInit()`, would get removed from the scheduler _after_ the new binding was added in
+    // `teleopInit()` due to init functions running _before_ `robotPeriodic()`.
+    // This does open the possibility for these triggers to never be cleaned up, but robot mode
+    // changes are so infrequent that it's not a big deal.
+    m_creationScope =
+        switch (BindingScope.createNarrowestScope(m_scheduler)) {
+          case BindingScope.RobotModeScope _ -> BindingScope.Global.INSTANCE;
+          case BindingScope useMe -> useMe;
+        };
 
     m_scheduler.addBoundTrigger(this);
     m_loop.bind(m_eventLoopCallback);
