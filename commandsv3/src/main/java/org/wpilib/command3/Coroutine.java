@@ -202,10 +202,8 @@ public final class Coroutine {
      * <p>This method does nothing if no commands were successfully forked.
      */
     public void awaitCompletion() {
-      for (Command command : m_forkedCommands) {
-        if (m_scheduler.isRunning(command)) {
-          Coroutine.this.yield();
-        }
+      while (m_forkedCommands.stream().anyMatch(m_scheduler::isRunning)) {
+        Coroutine.this.yield();
       }
     }
 
