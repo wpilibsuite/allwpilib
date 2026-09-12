@@ -8,6 +8,6 @@
 
 int main(int argc, char** argv) {
   // AOS requires this before anything creates an event loop.
-  aos::InitGoogle(&argc, &argv);
+  aos::InitEmbedded();
   return Catch::Session().run(argc, argv);
 }

@@ -6,7 +6,6 @@
 #include <exception>
 #include <optional>
 #include <string_view>
-#include <vector>
 
 #include "aos/configuration.h"
 #include "aos/events/shm_event_loop.h"
@@ -27,15 +26,17 @@ int main(int argc, char** argv) {
   unsigned int port = ROBOT_SYSTEM_SERVER_NT_PORT;
   std::string_view identity = "aosnt";
 
-  // Take our options out of argv. Everything else is AOS's, and InitGoogle
-  // rejects flags it does not know.
-  std::vector<char*> aos_args{argv[0]};
+  // The only options there are. AOS's flags are not forwarded.
   for (int i = 1; i < argc; ++i) {
     std::string_view arg{argv[i]};
     if (arg != "--config" && arg != "--server" && arg != "--port" &&
         arg != "--identity") {
-      aos_args.push_back(argv[i]);
-      continue;
+      wpi::util::print(stderr,
+                       "unknown option {}\n"
+                       "usage: {} [--config PATH] [--server HOST] [--port N] "
+                       "[--identity NAME]\n",
+                       arg, argv[0]);
+      return 1;
     }
     if (i + 1 >= argc) {
       wpi::util::print(stderr, "{} needs a value\n", arg);
@@ -51,24 +52,17 @@ int main(int argc, char** argv) {
     } else {
       std::optional<unsigned int> parsed =
           wpi::util::parse_integer<unsigned int>(value, 10);
-      if (!parsed) {
-        wpi::util::print(stderr, "--port needs an integer\n");
+      if (!parsed || *parsed == 0 || *parsed > 65535) {
+        wpi::util::print(stderr, "--port needs a number from 1 to 65535\n");
         return 1;
       }
       port = *parsed;
     }
   }
 
-  int aos_argc = static_cast<int>(aos_args.size());
-  char** aos_argv = aos_args.data();
-  aos::InitGoogle(&aos_argc, &aos_argv);
-  if (aos_argc > 1) {
-    wpi::util::print(stderr,
-                     "usage: {} [--config PATH] [--server HOST] [--port N] "
-                     "[--identity NAME]\n",
-                     argv[0]);
-    return 1;
-  }
+  // AOS requires this before anything creates an event loop.
+  aos::InitGoogle(nullptr, nullptr,
+                  aos::InitOptions{.parse_command_line = false});
 
   aos::FlatbufferDetachedBuffer<aos::Configuration> config =
       aos::configuration::ReadConfig(config_path);
