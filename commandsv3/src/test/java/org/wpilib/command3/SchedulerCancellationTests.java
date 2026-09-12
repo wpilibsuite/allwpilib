@@ -90,6 +90,48 @@ class SchedulerCancellationTests extends CommandTestBase {
   }
 
   @Test
+  void cancelRunningEmitsEvent() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    m_scheduler.cancel(command);
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        e -> e.command().equals(command),
+        "Cancellation did not emit an event");
+  }
+
+  @Test
+  void cancelQueuedEmitsEvent() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancel(command);
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        e -> e.command().equals(command),
+        "Cancellation did not emit an event");
+  }
+
+  @Test
+  void cancelUnknownDoesNotEmitEvent() {
+    // Create a command but do not schedule it.
+    // The scheduler won't know about it and should not emit an event.
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.cancel(command);
+    assertEquals(
+        List.of(), m_events, "Cancellation of an unknown command should not emit an event");
+  }
+
+  @Test
+  void cancelNullDoesNothing() {
+    m_scheduler.cancel(null);
+    assertEquals(
+        List.of(),
+        m_events,
+        "Cancellation of null should not emit an event and should not throw an exception");
+  }
+
+  @Test
   void commandCancelingSelf() {
     var ranAfterCancel = new AtomicBoolean(false);
     var commandRef = new AtomicReference<Command>(null);

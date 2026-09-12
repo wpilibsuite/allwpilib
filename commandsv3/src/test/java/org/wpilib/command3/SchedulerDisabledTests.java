@@ -5,6 +5,7 @@
 package org.wpilib.command3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -142,5 +143,23 @@ class SchedulerDisabledTests extends CommandTestBase {
         List.of(), m_scheduler.getRunningCommands(), "The default command should not be running");
     assertEquals(
         command, m_scheduler.getDefaultCommandFor(mech), "The default command should be set");
+  }
+
+  @Test
+  void robotDisabledBetweenQueueAndRun() {
+    var mech = new DummyMechanism("mech", m_scheduler);
+    var command = mech.run(Coroutine::park).named("Command");
+
+    var result = m_scheduler.schedule(command);
+    assertInstanceOf(Success.class, result, "The command should have been scheduled");
+
+    m_enabled = false;
+    m_scheduler.run();
+    assertEquals(
+        List.of(), m_scheduler.getRunningCommands(), "The command should have been canceled");
+    assertSchedulerEvent(
+        Canceled.class,
+        e -> e.command().equals(command),
+        "The command should have received a cancellation event");
   }
 }

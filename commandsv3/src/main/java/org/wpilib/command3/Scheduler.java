@@ -782,12 +782,16 @@ public final class Scheduler implements ProtobufSerializable {
     // required mechanisms, unless another command requiring those mechanisms is scheduled between
     // calling cancel() and calling run()
     m_runningCommands.remove(command);
-    m_queuedToRun.removeIf(state -> state.command() == command);
+    boolean queued = m_queuedToRun.removeIf(state -> state.command() == command);
 
     if (running) {
       // Only run the hook if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
       command.onCancel();
+    }
+
+    if (running || queued) {
+      // Emit a cancellation event only if the given command was in the scheduler
       emitCanceledEvent(command);
     }
 
