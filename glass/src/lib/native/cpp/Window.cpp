@@ -18,7 +18,8 @@ using namespace wpi::glass;
 
 Window::Window(Storage& storage, std::string_view id,
                Visibility defaultVisibility)
-    : m_id{id},
+    : m_storage{storage},
+      m_id{id},
       m_name{storage.GetString("name")},
       m_defaultName{id},
       m_visible{storage.GetBool("visible", defaultVisibility != HIDE)},

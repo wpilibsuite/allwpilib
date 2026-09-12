@@ -5,9 +5,22 @@
 #include "wpi/glass/networktables/NTAlerts.hpp"
 
 #include <format>
+#include <string>
 #include <utility>
+#include <vector>
 
 using namespace wpi::glass;
+
+namespace {
+
+void AddAlerts(std::vector<AlertData>* alerts,
+               const std::vector<std::string>& texts, AlertData::Level level) {
+  for (auto&& text : texts) {
+    alerts->emplace_back("", "", text, 0, level);
+  }
+}
+
+}  // namespace
 
 NTAlertsModel::NTAlertsModel(std::string_view path)
     : NTAlertsModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
@@ -43,8 +56,15 @@ void NTAlertsModel::Update() {
   for (auto&& v : m_errors.ReadQueue()) {
     m_errorsValue = std::move(v.value);
   }
+
+  m_alerts.clear();
+  m_alerts.reserve(m_errorsValue.size() + m_warningsValue.size() +
+                   m_infosValue.size());
+  AddAlerts(&m_alerts, m_errorsValue, AlertData::Level::HIGH);
+  AddAlerts(&m_alerts, m_warningsValue, AlertData::Level::MEDIUM);
+  AddAlerts(&m_alerts, m_infosValue, AlertData::Level::LOW);
 }
 
 bool NTAlertsModel::Exists() {
-  return m_infos.Exists();
+  return m_infos.Exists() || m_warnings.Exists() || m_errors.Exists();
 }
