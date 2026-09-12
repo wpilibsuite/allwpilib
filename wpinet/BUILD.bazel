@@ -231,30 +231,6 @@ cc_binary(
     ],
 )
 
-cc_binary(
-    name = "dsclient",
-    srcs = ["examples/dsclient/dsclient.cpp"],
-    deps = [
-        ":wpinet",
-    ],
-)
-
-cc_binary(
-    name = "parallelconnect",
-    srcs = ["examples/parallelconnect/parallelconnect.cpp"],
-    deps = [
-        ":wpinet",
-    ],
-)
-
-cc_binary(
-    name = "webserver",
-    srcs = ["examples/webserver/webserver.cpp"],
-    deps = [
-        ":wpinet",
-    ],
-)
-
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpinet-generator",
     module_include_targets = {
