@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * <p>Errors reported by the compiler plugin may be suppressed by annotating the offending method
- * with {@code SuppressWarnings("PostConstructionInitializer")} or {@code
+ * with {@code SuppressWarnings("WPILib.PostConstructionInitializer")} or {@code
  * SuppressWarnings(PostConstructionInitializer.SUPPRESSION_KEY)}. This is intended to be used in
  * tests to allow runtime error handling code to be tested, but may also be used to suppress
  * spurious warnings in production code.
