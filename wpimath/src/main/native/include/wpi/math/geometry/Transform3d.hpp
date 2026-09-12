@@ -170,6 +170,13 @@ class WPILIB_DLLEXPORT Transform3d final {
   }
 
   /**
+   * Returns a Transform2d representing this Transform3d projected into the X-Y plane.
+   */
+  constexpr Transform2d ToTransform2d() const {
+    return Transform2d{m_translation.ToTranslation2d(), m_rotation.ToRotation2d()};
+  }
+
+  /**
    * Multiplies the transform by the scalar.
    *
    * @param scalar The scalar.
