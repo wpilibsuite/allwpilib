@@ -17,6 +17,7 @@ evaluationDependsOn(':wpilibj')
 
 dependencies {
     annotationProcessor project(':javacPlugin')
+    annotationProcessor libs.avaje.jsonb.generator
     implementation project(':wpiannotations')
     implementation project(':wpiutil')
     implementation project(':wpinet')
@@ -24,6 +25,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    implementation libs.avaje.jsonb
     api(libs.quickbuf.runtime)
     testAnnotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':epilogue-processor')
