@@ -286,6 +286,11 @@ py::object PyTunable::Mutate() {
   return MutateCached();
 }
 
+uint64_t PyTunable::GetTuneRevision() const {
+  return std::visit([](const auto& value) { return value.GetTuneRevision(); },
+                    m_value);
+}
+
 void PyTunable::Refresh() {
   if (!m_getter.is_none()) {
     py::gil_scoped_acquire gil;

@@ -70,6 +70,7 @@ public class MockTunableBackend implements TunableBackend {
   }
 
   private static void notifyOnTune(TunableBase tunable) {
+    TunableRegistry.recordTuneApplied(tunable);
     TunableRegistry.resetChangedAfterUpdate(tunable);
     var config = tunable.getConfig();
     if (config != null) {

@@ -88,7 +88,10 @@ void wpi::InitTunablePython(py::module_& m) {
            py::arg("always_get") = false)
       .def("get", &PyTunable::Get)
       .def("set", &PyTunable::Set)
-      .def("mutate", &PyTunable::Mutate);
+      .def("mutate", &PyTunable::Mutate)
+      .def("get_tune_revision", &PyTunable::GetTuneRevision,
+           "Return the native tuning revision equality token. Compare a saved "
+           "value with != to detect backend-applied tuning.");
 
   py::class_<wpi::tunables::TunableTable>(m, "_NativeTunableTable")
       .def_property_readonly("path", &wpi::tunables::TunableTable::GetPath)

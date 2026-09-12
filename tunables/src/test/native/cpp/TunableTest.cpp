@@ -82,6 +82,10 @@ static_assert(std::derived_from<wpi::tunables::TunableDoubleVector,
 static_assert(
     std::same_as<decltype(wpi::tunables::TunableRegistry::GetUpdateMutex()),
                  wpi::util::recursive_mutex&>);
+static_assert(
+    std::same_as<decltype(std::declval<wpi::tunables::TunableDouble&>()
+                              .GetTuneRevision()),
+                 uint64_t>);
 static_assert([] {
   wpi::tunables::TunableDouble value{1.0};
   value.Set(2.0);
@@ -225,6 +229,18 @@ class wpi::tunables::CustomTunable<CustomType> {
 };
 
 static_assert(wpi::tunables::detail::CustomTunableType<CustomType>);
+static_assert(
+    std::same_as<decltype(std::declval<wpi::tunables::Tunable<CustomType>&>()
+                              .GetInnerTunable()),
+                 wpi::tunables::Tunable<int32_t>&>);
+static_assert(std::same_as<
+              decltype(std::declval<const wpi::tunables::Tunable<CustomType>&>()
+                           .GetInnerTunable()),
+              const wpi::tunables::Tunable<int32_t>&>);
+static_assert(std::same_as<
+              decltype(std::declval<const wpi::tunables::Tunable<CustomType>&>()
+                           .GetTuneRevision()),
+              uint64_t>);
 
 class InspectableDoubleTunable : public wpi::tunables::TunableDouble {
  public:
@@ -299,6 +315,8 @@ struct MemberComplex : public wpi::tunables::ComplexTunable {
   void UpdateTunable() const override {
     ++const_cast<MemberComplex*>(this)->updateCount;
   }
+
+  void MarkGainChanged() { SetChildTunableChanged("gain"); }
 };
 
 struct RemovableMemberComplex : public wpi::tunables::ComplexTunable {
@@ -671,6 +689,196 @@ TEST_CASE_METHOD(TunableTest, "TunableTest SameScalarAssignmentDoesNotDirty",
   info = wpi::tunables::TunableRegistry::GetTunable(value.GetUid());
   REQUIRE(info);
   CHECK(info.IsChanged());
+}
+
+TEST_CASE_METHOD(TunableTest,
+                 "TunableTest TuneRevisionTracksMockBackendApplications",
+                 "[tunable]") {
+  wpi::tunables::TunableInt32 value{1};
+
+  uint64_t observerOneRevision = value.GetTuneRevision();
+  uint64_t observerTwoRevision = value.GetTuneRevision();
+  CHECK(observerOneRevision == 0);
+  CHECK(observerTwoRevision == 0);
+  CHECK(observerOneRevision == value.GetTuneRevision());
+
+  value.Set(2);
+  value.Mutate() = 3;
+  CHECK(value.GetTuneRevision() == 0);
+
+  wpi::tunables::Publish("revision", value);
+  CHECK(value.GetTuneRevision() == 0);
+
+  backend->SetInt32("/revision", 4);
+  backend->SetInt32("/revision", 4);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(value.Get() == 4);
+  CHECK(value.GetTuneRevision() == 2);
+  CHECK(observerOneRevision != value.GetTuneRevision());
+  CHECK(observerTwoRevision != value.GetTuneRevision());
+
+  observerOneRevision = value.GetTuneRevision();
+  observerTwoRevision = value.GetTuneRevision();
+  CHECK(observerOneRevision == observerTwoRevision);
+
+  wpi::tunables::Publish("revisionAlias", value);
+  backend->SetInt32("/revisionAlias", 5);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(value.Get() == 5);
+  CHECK(value.GetTuneRevision() == 3);
+}
+
+TEST_CASE_METHOD(TunableTest,
+                 "TunableTest TuneRevisionCoversStructuredAndMemberTunables",
+                 "[tunable]") {
+  wpi::tunables::TunableInt32Vector vector{std::vector<int32_t>{1, 2}};
+  wpi::tunables::Tunable<TestStruct> structValue{TestStruct{3, 4}};
+  MemberComplex complex;
+
+  wpi::tunables::Publish("vectorRevision", vector);
+  wpi::tunables::Publish("structRevision", structValue);
+  wpi::tunables::Publish("memberRevision", complex);
+  auto memberUid = backend->GetUid("/memberRevision/gain");
+  REQUIRE(memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo);
+
+  vector.Set(std::vector<int32_t>{5, 6});
+  structValue.Set({7, 8});
+  complex.gain = 9;
+  complex.MarkGainChanged();
+  CHECK(vector.GetTuneRevision() == 0);
+  CHECK(structValue.GetTuneRevision() == 0);
+  CHECK(memberInfo.tunable->GetTuneRevision() == 0);
+
+  backend->SetInt32Vector("/vectorRevision", std::vector<int32_t>{5, 6});
+  backend->SetStruct<TestStruct>("/structRevision", {7, 8});
+  backend->SetInt32("/memberRevision/gain", 9);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(vector.GetTuneRevision() == 1);
+  CHECK(structValue.GetTuneRevision() == 1);
+  CHECK(memberInfo.tunable->GetTuneRevision() == 1);
+}
+
+TEST_CASE_METHOD(TunableTest,
+                 "TunableTest TuneRevisionIgnoresRejectedAndImmutableInputs",
+                 "[tunable]") {
+  wpi::tunables::TunableDouble wrongType{1.0};
+  wpi::tunables::TunableConfig immutableConfig{.isMutable = false};
+  wpi::tunables::TunableInt32 immutable{5, immutableConfig};
+
+  wpi::tunables::Publish("wrongTypeRevision", wrongType);
+  wpi::tunables::Publish("immutableRevision", immutable);
+
+  CHECK_THROWS_AS(backend->SetInt32("/wrongTypeRevision", 2),
+                  std::invalid_argument);
+  backend->SetInt32("/immutableRevision", 42);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(wrongType.GetTuneRevision() == 0);
+  CHECK(immutable.GetTuneRevision() == 0);
+  CHECK(immutable.Get() == 5);
+}
+
+TEST_CASE_METHOD(TunableTest, "TunableTest TuneRevisionIsVisibleInsideOnTune",
+                 "[tunable]") {
+  int calls = 0;
+  uint64_t callbackRevision = 0;
+  wpi::tunables::TunableDouble* valuePtr = nullptr;
+  wpi::tunables::TunableConfig config{
+      .onTune = [&](detail::TunableBase& tunable,
+                    wpi::tunables::ComplexTunable*) {
+        ++calls;
+        callbackRevision = tunable.GetTuneRevision();
+        valuePtr->Set(3.0);
+      }};
+  wpi::tunables::TunableDouble value{1.0, config};
+  valuePtr = &value;
+  wpi::tunables::Publish("callbackRevision", value);
+
+  backend->SetDouble("/callbackRevision", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(calls == 1);
+  CHECK(callbackRevision == 1);
+  CHECK(value.Get() == 3.0);
+  CHECK(value.GetTuneRevision() == 1);
+
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(calls == 1);
+  CHECK(value.GetTuneRevision() == 1);
+}
+
+TEST_CASE_METHOD(TunableTest,
+                 "TunableTest TuneRevisionPreservesLifecycleAndMigration",
+                 "[tunable]") {
+  wpi::tunables::TunableDouble value{1.0};
+  wpi::tunables::Publish("lifecycle", value);
+
+  backend->SetDouble("/lifecycle", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(value.GetTuneRevision() == 1);
+
+  wpi::tunables::Remove("lifecycle");
+  wpi::tunables::Publish("lifecycle", value);
+  CHECK(value.GetTuneRevision() == 1);
+
+  auto childBackend = std::make_shared<wpi::tunables::MockTunableBackend>();
+  wpi::tunables::TunableRegistry::RegisterBackend("/lifecycle", childBackend);
+  CHECK(value.GetTuneRevision() == 1);
+
+  childBackend->SetDouble("/lifecycle", 3.0);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(value.Get() == 3.0);
+  CHECK(value.GetTuneRevision() == 2);
+}
+
+TEST_CASE_METHOD(TunableTest, "TunableTest TuneRevisionCopyMoveAndIdReuse",
+                 "[tunable]") {
+  uint32_t reusableUid = 0;
+  {
+    InspectableDoubleTunable first{1.0};
+    wpi::tunables::Publish("firstRevisionReuse", first);
+    reusableUid = first.GetUid();
+    backend->SetDouble("/firstRevisionReuse", 2.0);
+    wpi::tunables::TunableRegistry::Update();
+    CHECK(first.GetTuneRevision() == 1);
+  }
+  CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(reusableUid));
+
+  InspectableDoubleTunable reused{3.0};
+  wpi::tunables::Publish("reusedRevision", reused);
+  CHECK(reused.GetUid() == reusableUid);
+  CHECK(reused.GetTuneRevision() == 0);
+
+  InspectableDoubleTunable source{4.0};
+  wpi::tunables::Publish("copyMoveSource", source);
+  backend->SetDouble("/copyMoveSource", 5.0);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(source.GetTuneRevision() == 1);
+
+  InspectableDoubleTunable copied{source};
+  CHECK(copied.GetTuneRevision() == 0);
+  wpi::tunables::Publish("copiedRevision", copied);
+  CHECK(copied.GetTuneRevision() == 0);
+
+  InspectableDoubleTunable moved{std::move(source)};
+  CHECK(moved.GetTuneRevision() == 1);
+  CHECK(source.GetTuneRevision() == 0);
+
+  wpi::tunables::TunableDouble destination{7.0};
+  wpi::tunables::Publish("destinationRevision", destination);
+  backend->SetDouble("/destinationRevision", 8.0);
+  wpi::tunables::TunableRegistry::Update();
+  REQUIRE(destination.GetTuneRevision() == 1);
+
+  destination = moved;
+  CHECK(destination.Get() == 5.0);
+  CHECK(destination.GetTuneRevision() == 1);
 }
 
 TEST_CASE_METHOD(
@@ -1622,20 +1830,26 @@ TEST_CASE_METHOD(TunableTest,
 TEST_CASE_METHOD(TunableTest, "TunableTest wpi::tunables::CustomTunable",
                  "[tunable]") {
   wpi::tunables::Tunable<CustomType> tunable;
+  const auto& constTunable = tunable;
 
   tunable.Set(CustomType{42});
   auto val = tunable.Get();
   CHECK(val.val == 42);
+  CHECK(tunable.GetTuneRevision() == 0);
+  CHECK(constTunable.GetTuneRevision() == 0);
 
   tunable = CustomType{63};
   val = tunable;
   CHECK(val.val == 63);
+  CHECK(tunable.GetTuneRevision() == 0);
 
   wpi::tunables::Publish("testCustom", tunable);
   backend->SetInt32("/testCustom", 84);
   wpi::tunables::TunableRegistry::Update();
   val = tunable.Get();
   CHECK(val.val == 84);
+  CHECK(tunable.GetTuneRevision() == 1);
+  CHECK(constTunable.GetTuneRevision() == 1);
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest StructTunable", "[tunable]") {

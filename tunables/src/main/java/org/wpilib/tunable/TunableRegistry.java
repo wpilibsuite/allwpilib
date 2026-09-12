@@ -373,6 +373,20 @@ public final class TunableRegistry {
   }
 
   /**
+   * Records that a backend successfully applied one tuning input to a tunable.
+   *
+   * <p>{@link TunableBackend} implementations should call this exactly once after each accepted
+   * remote tuning input has been applied to the tunable value, before scheduling any corresponding
+   * {@code onTune} callback. Rejected inputs and writes ignored due to immutability should not call
+   * this method.
+   *
+   * @param tunable tuned tunable
+   */
+  public static void recordTuneApplied(TunableBase tunable) {
+    tunable.recordTuneApplied();
+  }
+
+  /**
    * Resets a tunable's changed flag after the current update cycle finishes.
    *
    * <p>Backends should call this after publishing a changed tunable so every alias in every backend

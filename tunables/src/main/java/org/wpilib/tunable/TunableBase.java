@@ -5,10 +5,11 @@
 package org.wpilib.tunable;
 
 /** The base class for tunables. */
-@SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
+@SuppressWarnings({"PMD.AbstractClassWithoutAbstractMethod", "PMD.CompareObjectsWithEquals"})
 public abstract class TunableBase {
   private final TunableConfig m_config;
   private final boolean m_supportsChangeNotification;
+  private long m_tuneRevision;
 
   /**
    * Whether the tunable value has changed since the last time it was tuned. This is set to true
@@ -78,6 +79,25 @@ public abstract class TunableBase {
   }
 
   /**
+   * Returns this tunable's tuning revision token.
+   *
+   * <p>The token starts at zero and changes once for each tuning input that a backend successfully
+   * applies to this tunable. Direct local {@code set()} calls, in-place mutations, and getter
+   * refreshes do not change it. Reading the token does not consume or reset it, so independent
+   * observers can each store a previous token and compare it to the current value with {@code !=}.
+   *
+   * <p>Treat this as a 64-bit equality token. Do not rely on ordering or sign. This getter follows
+   * the same threading model as the rest of the tunable API and does not make tunable access
+   * thread-safe.
+   *
+   * @return current tuning revision token
+   */
+  public long getTuneRevision() {
+    TunableBase owner = getRevisionOwner();
+    return owner == this ? m_tuneRevision : owner.getTuneRevision();
+  }
+
+  /**
    * Returns whether this tunable notifies backends when set() marks it changed.
    *
    * @return true if this tunable notifies backends when changed, false otherwise
@@ -99,5 +119,24 @@ public abstract class TunableBase {
   /** Resets the changed flag. Should generally only be used by backends. */
   public void resetChanged() {
     m_changed = false;
+  }
+
+  void recordTuneApplied() {
+    TunableBase owner = getRevisionOwner();
+    if (owner == this) {
+      m_tuneRevision++;
+    } else {
+      owner.recordTuneApplied();
+    }
+  }
+
+  private TunableBase getRevisionOwner() {
+    if (this instanceof Tunable.CustomTunable custom) {
+      TunableBase inner = custom.getInnerTunable();
+      if (inner != null && inner != this) {
+        return inner;
+      }
+    }
+    return this;
   }
 }
