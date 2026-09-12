@@ -13,56 +13,67 @@ jobs:
       matrix:
         include:
           - name: "Linux System Core"
+            compilation_mode: opt
             classifier: "linuxsystemcore,linuxsystemcorestatic"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "build"
           - name: "Linux System Core Debug"
+            compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "build"
           - name: "Linux x86-64"
+            compilation_mode: opt
             classifier: "linuxx86-64,linuxx86-64static,headers,sources"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "test"
           - name: "Linux x86-64 Debug"
+            compilation_mode: dbg
             classifier: "linuxx86-64debug,linuxx86-64staticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "test"
           - name: "macOS"
+            compilation_mode: opt
             classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-12vcpu-macos-15', 'macOS-15') }}
             container: ""
             action: "test"
           - name: "Windows x86-64"
+            compilation_mode: opt
             classifier: "windowsx86-64,windowsx86-64static,headers,sources"
             os: windows-2025
             container: ""
             action: "test"
           - name: "Windows x86-64 Debug"
+            compilation_mode: dbg
             classifier: "windowsx86-64debug,windowsx86-64staticdebug"
             os: windows-2025
             container: ""
             action: "test"
           - name: "Windows ARM64"
+            compilation_mode: opt
             classifier: "windowsarm64,windowsarm64static"
             os: windows-2025
             container: ""
             action: "build"
           - name: "Windows ARM64 Debug"
+            compilation_mode: dbg
             classifier: "windowsarm64debug,windowsarm64staticdebug"
             os: windows-2025
             container: ""
             action: "build"
           - name: "Windows System Core"
+            compilation_mode: opt
             classifier: "linuxsystemcore,linuxsystemcorestatic"
             os: windows-2025
             container: ""
             action: "build"
           - name: "Windows System Core Debug"
+            compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: windows-2025
             container: ""
@@ -136,7 +147,7 @@ jobs:
           else
             TARGETS=...
           fi
-          bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
+          bazel ${ACTION} -c ${{ matrix.compilation_mode }} ${TARGETS} --config=ci --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
         shell: bash
 
       - name: Check disk free space
