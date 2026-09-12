@@ -17,6 +17,14 @@ class Trigger:
 
     It is very easy to link a button to a command. For instance, you could link the trigger button
     of a joystick to a "score" command.
+
+    ======================  ==================  ================
+    Method                  Schedules           Cancels on false
+    ======================  ==================  ================
+    :meth:`on_true`         On a rising edge    No
+    :meth:`if_true`         On every true poll  No
+    :meth:`while_true`      On a rising edge    Yes
+    ======================  ==================  ================
     """
 
     _loop: EventLoop
@@ -108,6 +116,25 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
         @self._add_binding
         def _(previous, current):
             if not previous and current:
+                command.schedule()
+
+        return self
+
+    def if_true(self, command: Command) -> Self:
+        """
+        Starts the given command on every event-loop poll where the condition is ``True``.
+
+        This does not cancel the command when the condition becomes ``False``; use
+        :meth:`while_true` for that behavior. Scheduling an already-running command follows
+        ordinary scheduler behavior and does not restart it.
+
+        :param command: the command to start
+        :returns: this trigger, so calls can be chained
+        """
+
+        @self._add_binding
+        def _(previous, current):
+            if current:
                 command.schedule()
 
         return self

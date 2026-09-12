@@ -39,6 +39,13 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
   pybind11::object Get() const;
   void Set(pybind11::handle value);
   pybind11::object Mutate();
+
+  /**
+   * Returns the native tuning revision equality token. Save the returned value
+   * and compare it with != to detect backend-applied tuning.
+   */
+  uint64_t GetTuneRevision() const;
+
   void Refresh();
   bool NeedsRefresh() const;
 

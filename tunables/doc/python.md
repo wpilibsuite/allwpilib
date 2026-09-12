@@ -42,6 +42,7 @@ class Tunable:
     def get(self): ...
     def set(self, value): ...
     def mutate(self): ...
+    def get_tune_revision(self) -> int: ...
 ```
 
 Supported value kinds are:
@@ -66,6 +67,8 @@ points = tunables.Tunable([], element_type=TunablePoint)  # a WPIStruct class
 ```
 
 `properties` is converted from normal Python JSON-like values (`None`, bools, numbers, strings, lists, and dicts) into the backend property JSON. `type_string` overrides the backend type string. `mutable=False` prevents remote writes from calling the setter. `robust=True` requests the robust backend publication form. `on_tune`, when supplied, is called with the tuned value after a backend applies a remote write during `TunableRegistry.update()`. Getter, setter, and `on_tune` callables must not raise.
+
+`get_tune_revision()` returns the native 64-bit tuning revision equality token. It starts at zero and advances once for each backend-applied tuning input, including accepted same-value inputs. Local `set()`, `mutate()`, getter refreshes, rejected inputs, and writes to immutable tunables do not advance it. Reads are non-consuming; save the value and compare a later value with `!=` to detect tuning without relying on ordering.
 
 Use `mutate()` when changing a mutable value in place, such as a WPIStruct object or a WPIStruct object contained in a struct array. Directly mutating the object returned by `get()` can bypass `set()` and will not mark the tunable changed.
 

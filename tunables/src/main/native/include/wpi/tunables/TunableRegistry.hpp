@@ -128,6 +128,18 @@ class TunableRegistry final {
   static void NotifyChanged(uint32_t uid);
 
   /**
+   * Records that a backend successfully applied one tuning input to a tunable.
+   *
+   * TunableBackend implementations should call this exactly once after each
+   * accepted remote tuning input has been applied to the tunable value, before
+   * scheduling any corresponding onTune callback. Rejected inputs and writes
+   * ignored due to immutability should not call this method.
+   *
+   * @param uid tunable uid
+   */
+  static void RecordTuneApplied(uint32_t uid);
+
+  /**
    * Resets a tunable's changed flag after the current update cycle finishes.
    *
    * Backends should call this after publishing a changed tunable so every alias
@@ -172,6 +184,10 @@ class TunableRegistry final {
   /**
    * Clear all registered backends. Should typically only be used by unit test
    * code.
+   *
+   * This also clears registry-stored tune revision records. Tunables that stay
+   * alive across Reset() have stale registration identities and report a zero
+   * revision until they are re-created or otherwise re-registered.
    */
   static void Reset();
 

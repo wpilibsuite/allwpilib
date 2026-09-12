@@ -60,29 +60,65 @@ class Tunable<T, I...> : public detail::TunableValueBase<T> {
 template <typename T, typename... I>
   requires(!detail::TunableValueType<T> && detail::CustomTunableType<T, I...>)
 class Tunable<T, I...> : public CustomTunable<T, I...> {
+  using Base = CustomTunable<T, I...>;
+
  public:
   template <typename... Args>
   constexpr explicit Tunable(I&&... info, Args&&... args)
-      : CustomTunable<T, I...>{std::forward<I>(info)...,
-                               std::forward<Args>(args)...} {}
+      : Base{std::forward<I>(info)..., std::forward<Args>(args)...} {}
 
   template <typename... Args>
   constexpr explicit Tunable(const TunableConfig& config, I&&... info,
                              Args&&... args)
-      : CustomTunable<T, I...>{config, std::forward<I>(info)...,
-                               std::forward<Args>(args)...} {}
+      : Base{config, std::forward<I>(info)..., std::forward<Args>(args)...} {}
 
   template <typename U>
     requires(!std::same_as<std::remove_cvref_t<U>, Tunable<T, I...>>)
   constexpr Tunable<T, I...>& operator=(U&& value) {
-    CustomTunable<T>::Set(value);
+    Base::Set(value);
     return *this;
   }
 
   constexpr
   operator std::remove_cvref_t<decltype(  // NOLINT(google-explicit-constructor)
-      std::declval<CustomTunable<T>>().Get())>() const {
-    return CustomTunable<T>::Get();
+      std::declval<Base>().Get())>() const {
+    return Base::Get();
+  }
+
+  /**
+   * Gets the inner tunable used for publication and backend integration.
+   *
+   * @return inner tunable
+   */
+  auto& GetInnerTunable() { return Base::GetInnerTunable(); }
+
+  /**
+   * Gets the inner tunable used for publication and backend integration.
+   *
+   * @return inner tunable
+   */
+  const auto& GetInnerTunable() const {
+    if constexpr (requires(const Base& base) {
+                    {
+                      base.GetInnerTunable()
+                    } -> detail::IsTunableBaseReference;
+                  }) {
+      return static_cast<const Base&>(*this).GetInnerTunable();
+    } else {
+      return const_cast<Tunable<T, I...>*>(this)->GetInnerTunable();
+    }
+  }
+
+  /**
+   * Returns the inner tunable's tuning revision token.
+   *
+   * This forwards through GetInnerTunable(), so a custom adapter shares the
+   * same non-consuming revision history as its published inner tunable.
+   *
+   * @return current tuning revision token
+   */
+  uint64_t GetTuneRevision() const {
+    return GetInnerTunable().GetTuneRevision();
   }
 };
 
@@ -108,6 +144,44 @@ class Tunable<T, I...> : public decltype(GetCustomTunable(std::declval<T>())) {
   operator std::remove_cvref_t<decltype(  // NOLINT(google-explicit-constructor)
       std::declval<Base>().Get())>() const {
     return Base::Get();
+  }
+
+  /**
+   * Gets the inner tunable used for publication and backend integration.
+   *
+   * @return inner tunable
+   */
+  auto& GetInnerTunable() {
+    return Base::GetInnerTunable();
+  }
+
+  /**
+   * Gets the inner tunable used for publication and backend integration.
+   *
+   * @return inner tunable
+   */
+  const auto& GetInnerTunable() const {
+    if constexpr (requires(const Base& base) {
+                    {
+                      base.GetInnerTunable()
+                    } -> detail::IsTunableBaseReference;
+                  }) {
+      return static_cast<const Base&>(*this).GetInnerTunable();
+    } else {
+      return const_cast<Tunable<T, I...>*>(this)->GetInnerTunable();
+    }
+  }
+
+  /**
+   * Returns the inner tunable's tuning revision token.
+   *
+   * This forwards through GetInnerTunable(), so an ADL adapter shares the same
+   * non-consuming revision history as its published inner tunable.
+   *
+   * @return current tuning revision token
+   */
+  uint64_t GetTuneRevision() const {
+    return GetInnerTunable().GetTuneRevision();
   }
 };
 

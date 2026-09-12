@@ -14,6 +14,7 @@ evaluationDependsOn(':ntcore')
 evaluationDependsOn(':hal')
 evaluationDependsOn(':wpimath')
 evaluationDependsOn(':wpilibj')
+evaluationDependsOn(':tunables')
 
 dependencies {
     annotationProcessor project(':javacPlugin')
@@ -24,6 +25,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':wpimath')
     implementation project(':wpilibj')
+    implementation project(':tunables')
     api(libs.quickbuf.runtime)
     testAnnotationProcessor project(':javacPlugin')
     testAnnotationProcessor project(':epilogue-processor')

@@ -18,6 +18,7 @@ from .joystickbutton import JoystickButton
 from .networkbutton import NetworkButton
 from .povbutton import POVButton
 from .trigger import Trigger
+from .tunabletriggers import TunableTriggers
 
 __all__ = [
     "Trigger",
@@ -40,4 +41,5 @@ __all__ = [
     "JoystickButton",
     "NetworkButton",
     "POVButton",
+    "TunableTriggers",
 ]

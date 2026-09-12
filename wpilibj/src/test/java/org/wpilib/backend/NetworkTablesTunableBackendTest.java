@@ -223,6 +223,62 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void tuneRevisionTracksNetworkTablesRemoteUpdatesWithoutConfigOrCallback() {
+    Tunable<Double> tunable = Tunable.create(1.0);
+    Tunables.publish("revision", tunable);
+
+    assertEquals(0, tunable.getTuneRevision());
+
+    m_inst.getTopic("/Tunables/revision").getGenericEntry().setDouble(2.0);
+    m_inst.flush();
+    TunableRegistry.update();
+
+    assertEquals(2.0, tunable.get());
+    assertEquals(1, tunable.getTuneRevision());
+    assertEquals(1, tunable.getTuneRevision());
+  }
+
+  @Test
+  void tuneRevisionCountsRobustInitialRemoteApplication() {
+    try (GenericPublisher publisher =
+        m_inst
+            .getTopic("/Tunables/initialRevision/tune")
+            .genericPublishEx("double", "{\"retained\":true}")) {
+      publisher.setDouble(4.0);
+      m_inst.flush();
+
+      Tunable<Double> tunable = Tunable.createConfig(1.0, robust());
+      Tunables.publish("initialRevision", tunable);
+
+      assertEquals(4.0, tunable.get());
+      assertEquals(4.0, value("initialRevision").getDouble(0.0));
+      assertEquals(1, tunable.getTuneRevision());
+    }
+  }
+
+  @Test
+  void tuneRevisionIgnoresGetterRefreshes() {
+    AtomicReference<Double> value = new AtomicReference<>(1.0);
+    TunableDouble tunable =
+        TunableDouble.createConfig(
+            value::get, value::set, robust().withPolling(TunableConfig.Polling.ALWAYS_GET));
+    Tunables.publish("getterRevision", tunable);
+
+    value.set(2.0);
+    TunableRegistry.update();
+
+    assertEquals(2.0, value("getterRevision").getDouble(0.0));
+    assertEquals(0, tunable.getTuneRevision());
+
+    tune("getterRevision").setDouble(3.0);
+    m_inst.flush();
+    TunableRegistry.update();
+
+    assertEquals(3.0, tunable.get());
+    assertEquals(1, tunable.getTuneRevision());
+  }
+
+  @Test
   void publishesAndTunesArrayAndRawDataTypes() {
     Tunable<byte[]> rawValue = Tunable.createConfig(new byte[] {1, 2}, robust());
     Tunable<boolean[]> booleanArray = Tunable.createConfig(new boolean[] {true, false}, robust());
@@ -500,6 +556,7 @@ class NetworkTablesTunableBackendTest {
       assertDoesNotThrow(TunableRegistry::update);
     }
     assertEquals(initial, tunable.get());
+    assertEquals(0, tunable.getTuneRevision());
     assertEquals(0, calls.get());
     assertEquals(0, entry.readQueue().length);
     assertWarning(warnings, "/Tunables/translation", "rejected struct tune payload");
@@ -559,6 +616,7 @@ class NetworkTablesTunableBackendTest {
       assertDoesNotThrow(TunableRegistry::update);
     }
     assertArrayEquals(initial, tunable.get());
+    assertEquals(0, tunable.getTuneRevision());
     assertEquals(0, calls.get());
     assertEquals(0, entry.readQueue().length);
     assertWarning(warnings, "/Tunables/translations", "rejected struct array tune payload");
@@ -618,6 +676,8 @@ class NetworkTablesTunableBackendTest {
 
     assertEquals(initial, struct.get());
     assertEquals(initialProto, protobuf.get());
+    assertEquals(0, struct.getTuneRevision());
+    assertEquals(0, protobuf.getTuneRevision());
     assertWarning(warnings, "/Tunables/throwingStructTune", "rejected struct tune payload");
     assertWarning(warnings, "/Tunables/throwingProtobufTune", "rejected protobuf tune payload");
   }
@@ -772,6 +832,7 @@ class NetworkTablesTunableBackendTest {
     }
 
     assertEquals(initial, tunable.get());
+    assertEquals(0, tunable.getTuneRevision());
     assertEquals(0, calls.get());
     assertEquals(0, entry.readQueue().length);
     assertWarning(warnings, "/Tunables/malformedTranslation", "rejected protobuf tune payload");
@@ -893,16 +954,34 @@ class NetworkTablesTunableBackendTest {
   @Test
   void onTuneRunsForMutableRemoteUpdates() {
     AtomicInteger calls = new AtomicInteger();
+    AtomicReference<Long> callbackRevision = new AtomicReference<>();
+    AtomicReference<Tunable<Double>> tunableReference = new AtomicReference<>();
     Tunable<Double> tunable =
-        Tunable.createConfig(1.0, robust().withOnTune(calls::incrementAndGet));
+        Tunable.createConfig(
+            1.0,
+            robust()
+                .withOnTune(
+                    () -> {
+                      callbackRevision.set(tunableReference.get().getTuneRevision());
+                      calls.incrementAndGet();
+                      tunableReference.get().set(4.0);
+                    }));
+    tunableReference.set(tunable);
     Tunables.publish("mutable", tunable);
 
     tune("mutable").setDouble(2.0);
     m_inst.flush();
     TunableRegistry.update();
 
-    assertEquals(2.0, tunable.get());
+    assertEquals(4.0, tunable.get());
     assertEquals(1, calls.get());
+    assertEquals(1L, callbackRevision.get());
+    assertEquals(1, tunable.getTuneRevision());
+
+    TunableRegistry.update();
+
+    assertEquals(1, calls.get());
+    assertEquals(1, tunable.getTuneRevision());
   }
 
   @Test
@@ -1133,6 +1212,7 @@ class NetworkTablesTunableBackendTest {
     TunableRegistry.update();
 
     assertEquals(1.0, tunable.get());
+    assertEquals(0, tunable.getTuneRevision());
     assertEquals(0, calls.get());
   }
 
