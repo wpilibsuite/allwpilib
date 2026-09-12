@@ -32,6 +32,9 @@ cc_binary(
 
 package_binary_cc_project(
     name = "aosnt-bridge",
+    # aos_dump reads the channels the bridge publishes, so it is what you reach
+    # for when a topic does not show up in NetworkTables.
+    extra_binaries = ["@aos//aos:aos_dump"],
     maven_artifact_name = "aosnt-bridge",
     maven_group_id = "org.wpilib.aosnt",
     systemcore = True,
