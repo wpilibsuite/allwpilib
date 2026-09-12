@@ -24,7 +24,7 @@ classes:
       RobotPeriodic:
       SimulationInit:
       SimulationPeriodic:
-      DisabledInit:
+      DisabledEnter:
       DisabledPeriodic:
       DisabledExit:
       AddPeriodic:

@@ -22,7 +22,7 @@ Robot::Robot() {
 void Robot::RobotPeriodic() {}
 
 // This function is only once each time Autonomous is enabled
-void Robot::AutonomousInit() {
+void Robot::AutonomousEnter() {
   timer.Restart();
 }
 
@@ -38,8 +38,8 @@ void Robot::AutonomousPeriodic() {
   }
 }
 
-// This function is only once each time telop is enabled
-void Robot::TeleopInit() {}
+// This function is called each time telop is enabled
+void Robot::TeleopEnter() {}
 
 // This function is called periodically during teleop mode
 void Robot::TeleopPeriodic() {
