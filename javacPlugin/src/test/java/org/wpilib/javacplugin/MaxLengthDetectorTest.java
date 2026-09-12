@@ -69,7 +69,7 @@ class MaxLengthDetectorTest {
     var error = errors.get(0);
     assertEquals(
         "[WPILib] String literal exceeds maximum length: \"abcdefghijklmnopqrstuvwxyz1234567890\""
-            + " (36 characters) is longer than 1 character. This error cannot be silenced.",
+            + " (36 characters) is longer than 1 character.",
         error.getMessage(null));
   }
 
@@ -102,7 +102,7 @@ class MaxLengthDetectorTest {
     var error = errors.get(0);
     assertEquals(
         "[WPILib] String literal exceeds maximum length: \"12\" (2 characters) is longer than 1"
-            + " character. This error cannot be silenced.",
+            + " character.",
         error.getMessage(null));
   }
 
@@ -157,7 +157,7 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was 0). This error cannot be silenced.",
+        "[WPILib] @MaxLength value must be >= 1 (was 0).",
         error.getMessage(null));
   }
 
@@ -185,7 +185,7 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was -123). This error cannot be silenced.",
+        "[WPILib] @MaxLength value must be >= 1 (was -123).",
         error.getMessage(null));
   }
 
@@ -215,7 +215,7 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was 0). This error cannot be silenced.",
+        "[WPILib] @MaxLength value must be >= 1 (was 0).",
         error.getMessage(null));
   }
 
@@ -245,7 +245,7 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was -3). This error cannot be silenced.",
+        "[WPILib] @MaxLength value must be >= 1 (was -3).",
         error.getMessage(null));
   }
 }

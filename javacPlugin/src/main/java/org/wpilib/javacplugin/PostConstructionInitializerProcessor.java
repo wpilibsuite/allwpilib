@@ -90,7 +90,7 @@ public class PostConstructionInitializerProcessor extends AbstractProcessor {
     String message =
         "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
             + typeName
-            + ". This error cannot be silenced.";
+            + ".";
 
     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, errorNode);
   }
@@ -100,8 +100,7 @@ public class PostConstructionInitializerProcessor extends AbstractProcessor {
         "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
             + "of type "
             + typeName
-            + " with a @PostConstructionInitializer.InitializedParam annotation. "
-            + "This error cannot be silenced.";
+            + " with a @PostConstructionInitializer.InitializedParam annotation.";
 
     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, errorNode);
   }

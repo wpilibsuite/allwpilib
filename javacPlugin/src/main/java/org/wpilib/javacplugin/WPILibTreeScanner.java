@@ -40,9 +40,7 @@ abstract class WPILibTreeScanner<R, P> extends TreeScanner<R, P> {
             .append(' ')
             .append(normalizeMessage(message));
 
-    if (suppression == null) {
-      builder.append(" This error cannot be silenced.");
-    } else {
+    if (suppression != null) {
       builder
           .append(" If this is intentional, the error may be silenced with @SuppressWarnings(\"")
           .append(suppression)

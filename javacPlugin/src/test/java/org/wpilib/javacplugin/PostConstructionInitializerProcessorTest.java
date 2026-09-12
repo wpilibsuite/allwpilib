@@ -39,7 +39,7 @@ class PostConstructionInitializerProcessorTest {
     var error = compilation.errors().get(0);
     assertEquals(
         "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
-            + "frc.robot.Example. This error cannot be silenced.",
+            + "frc.robot.Example.",
         error.getMessage(null));
   }
 
@@ -141,14 +141,14 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(
         "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
             + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
-            + "annotation. This error cannot be silenced.",
+            + "annotation.",
         error1.getMessage(null));
 
     var error2 = compilation.errors().get(1);
     assertEquals(
         "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
             + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
-            + "annotation. This error cannot be silenced.",
+            + "annotation.",
         error2.getMessage(null));
   }
 
@@ -180,7 +180,7 @@ class PostConstructionInitializerProcessorTest {
     var error = compilation.errors().get(0);
     assertEquals(
         "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
-            + "frc.robot.Example. This error cannot be silenced.",
+            + "frc.robot.Example.",
         error.getMessage(null));
   }
 }

@@ -135,35 +135,35 @@ class OpModeAnnotationValidatorTest {
 
     // Autonomous
     assertEquals(
-        "[WPILib] @Autonomous opmode name must be <= 32 characters (was 74). This error cannot be silenced.",
+        "[WPILib] @Autonomous opmode name must be <= 32 characters (was 74).",
         errors.get(0).getMessage(null));
     assertEquals(
-        "[WPILib] @Autonomous opmode group must be <= 12 characters (was 32). This error cannot be silenced.",
+        "[WPILib] @Autonomous opmode group must be <= 12 characters (was 32).",
         errors.get(1).getMessage(null));
     assertEquals(
-        "[WPILib] @Autonomous opmode description must be <= 64 characters (was 99). This error cannot be silenced.",
+        "[WPILib] @Autonomous opmode description must be <= 64 characters (was 99).",
         errors.get(2).getMessage(null));
 
     // Teleop
     assertEquals(
-        "[WPILib] @Teleop opmode name must be <= 32 characters (was 74). This error cannot be silenced.",
+        "[WPILib] @Teleop opmode name must be <= 32 characters (was 74).",
         errors.get(3).getMessage(null));
     assertEquals(
-        "[WPILib] @Teleop opmode group must be <= 12 characters (was 32). This error cannot be silenced.",
+        "[WPILib] @Teleop opmode group must be <= 12 characters (was 32).",
         errors.get(4).getMessage(null));
     assertEquals(
-        "[WPILib] @Teleop opmode description must be <= 64 characters (was 99). This error cannot be silenced.",
+        "[WPILib] @Teleop opmode description must be <= 64 characters (was 99).",
         errors.get(5).getMessage(null));
 
     // Utility
     assertEquals(
-        "[WPILib] @Utility opmode name must be <= 32 characters (was 74). This error cannot be silenced.",
+        "[WPILib] @Utility opmode name must be <= 32 characters (was 74).",
         errors.get(6).getMessage(null));
     assertEquals(
-        "[WPILib] @Utility opmode group must be <= 12 characters (was 32). This error cannot be silenced.",
+        "[WPILib] @Utility opmode group must be <= 12 characters (was 32).",
         errors.get(7).getMessage(null));
     assertEquals(
-        "[WPILib] @Utility opmode description must be <= 64 characters (was 99). This error cannot be silenced.",
+        "[WPILib] @Utility opmode description must be <= 64 characters (was 99).",
         errors.get(8).getMessage(null));
   }
 }
