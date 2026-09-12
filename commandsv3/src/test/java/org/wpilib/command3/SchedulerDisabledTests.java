@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.command3.Scheduler.ScheduleResult.RequiresUnsafeMechanisms;
 import org.wpilib.command3.Scheduler.ScheduleResult.Success;
 import org.wpilib.command3.SchedulerEvent.Canceled;
-import org.wpilib.command3.SchedulerEvent.Interrupted;
+import org.wpilib.command3.SchedulerEvent.ForkFailure;
 
 @SuppressWarnings("PMD.CompareObjectsWithEquals")
 class SchedulerDisabledTests extends CommandTestBase {
@@ -108,7 +108,7 @@ class SchedulerDisabledTests extends CommandTestBase {
         m_scheduler.getRunningCommands(),
         "Entire composition should have been canceled");
     assertSchedulerEvent(
-        Interrupted.class,
+        ForkFailure.class,
         e -> e.command() == parent,
         "Parent should receive an interrupted event");
     assertSchedulerEvent(

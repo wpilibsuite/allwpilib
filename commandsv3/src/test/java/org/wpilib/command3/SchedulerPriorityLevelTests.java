@@ -310,7 +310,7 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(highPriority), "Higher priority command should still run");
     // Only the command that failed to fork should get an interrupted event.
     // All other commands in the composition will still be canceled, but won't be interrupted.
-    assertInterruptedBy(current, highPriority);
+    assertSchedulerEvent(SchedulerEvent.ForkFailure.class, e -> e.command().equals(current), "");
     for (var command : List.of(grandparent, parent, current, child, grandchild)) {
       assertFalse(
           m_scheduler.isScheduledOrRunning(command), command.name() + " should have been canceled");
@@ -382,9 +382,13 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
         c -> c.command().equals(parent),
         "Should have received a Canceled event for parent");
     assertSchedulerEvent(
-        SchedulerEvent.Interrupted.class,
-        i -> i.command().equals(parent) && i.interrupter().equals(highPriority),
-        "Should have received an Interrupted event for parent");
+        SchedulerEvent.ForkFailure.class,
+        e ->
+            e.command().equals(parent)
+                && e.failure() instanceof LowerPriorityThanRunningCommand(var failed, var running)
+                && failed.equals(defaultPriority)
+                && running.equals(highPriority),
+        "Parent should have failed to fork");
   }
 
   private void assertUnschedulableSingleChildReturnsFailure(CoroutineForkOperation operation) {
@@ -449,16 +453,5 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertTrue(
         result.getFailedCommands().stream().noneMatch(Scheduler.ScheduleResult::successful),
         "All failure results should be unsuccessful");
-  }
-
-  private void assertInterruptedBy(Command command, Command interrupter) {
-    assertSchedulerEvent(
-        SchedulerEvent.Canceled.class,
-        event -> event.command().equals(command),
-        command.name() + " should have received a Canceled event");
-    assertSchedulerEvent(
-        SchedulerEvent.Interrupted.class,
-        event -> event.command().equals(command) && event.interrupter().equals(interrupter),
-        command.name() + " should have received an Interrupted event");
   }
 }

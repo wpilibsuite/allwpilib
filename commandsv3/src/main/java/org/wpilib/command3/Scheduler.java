@@ -1046,23 +1046,12 @@ public final class Scheduler implements ProtobufSerializable {
 
   private void handleCoroutineIRQ(Coroutine coroutine, Command command) {
     // The coroutine requested to be interrupted. Cancel this command and bubble up the stack
-    // to interrupt the entire composition. Because InterruptEvent only supports a single
-    // interruptor, we attribute the interrupt to the first conflicting command.
+    // to interrupt the entire composition.
     var failure = coroutine.getForkResult().getFailedCommands().getFirst();
-    Command interruptor =
-        switch (failure) {
-          case LowerPriorityThanRunningCommand(var _, Command conflict) -> conflict;
-          case LowerPriorityThanQueuedCommand(var _, Command conflict) -> conflict;
-          default -> {
-            // Shouldn't get here (this is a bug in WPILib code, not handling new cases).
-            // But we don't want to crash user programs, so just attribute to null.
-            yield null;
-          }
-        };
 
     Command root = getRoot(command);
     m_currentCommandAncestry.clear();
-    emitInterruptedEvent(command, interruptor);
+    emitForkFailureEvent(command, failure);
     cancel(root);
     Continuation.mountContinuation(null);
   }
@@ -1439,6 +1428,11 @@ public final class Scheduler implements ProtobufSerializable {
 
   private void emitInterruptedEvent(Command command, Command interrupter) {
     var event = new SchedulerEvent.Interrupted(command, interrupter, RobotController.getTime());
+    emitEvent(event);
+  }
+
+  private void emitForkFailureEvent(Command command, Scheduler.ScheduleResult.Failure failure) {
+    var event = new SchedulerEvent.ForkFailure(command, failure, RobotController.getTime());
     emitEvent(event);
   }
 

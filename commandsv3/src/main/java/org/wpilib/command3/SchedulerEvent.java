@@ -86,4 +86,14 @@ public sealed interface SchedulerEvent {
    */
   record Interrupted(Command command, Command interrupter, long timestampNanos)
       implements SchedulerEvent {}
+
+  /**
+   * An event marking when a child command could not be forked.
+   *
+   * @param command The child command that could not be forked
+   * @param failure The reason the child command could not be forked
+   * @param timestampNanos When the child command was attempted to be forked
+   */
+  record ForkFailure(Command command, Scheduler.ScheduleResult.Failure failure, long timestampNanos)
+      implements SchedulerEvent {}
 }
