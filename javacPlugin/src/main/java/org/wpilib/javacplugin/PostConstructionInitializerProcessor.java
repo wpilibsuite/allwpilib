@@ -88,14 +88,16 @@ public class PostConstructionInitializerProcessor extends AbstractProcessor {
 
   private void printErrorForNoParams(Element errorNode, Name typeName) {
     String message =
-        "Static @PostConstructionInitializer method must take a parameter of type " + typeName;
+        "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
+            + typeName;
 
     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, message, errorNode);
   }
 
   private void printTaggedParameterCountError(Element errorNode, Name typeName) {
     String message =
-        "Static @PostConstructionInitializer method must take exactly one parameter of type "
+        "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
+            + "of type "
             + typeName
             + " with a @PostConstructionInitializer.InitializedParam annotation";
 

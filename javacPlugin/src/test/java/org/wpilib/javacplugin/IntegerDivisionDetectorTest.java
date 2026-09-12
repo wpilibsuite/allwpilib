@@ -162,7 +162,10 @@ class IntegerDivisionDetectorTest {
                 + finalSource);
 
     for (var error : errors) {
-      assertEquals("integer division in a floating-point context", error.getMessage(null));
+      assertEquals(
+          "[WPILib] Integer division in a floating-point context. If this is intentional,"
+              + " the error may be silenced with @SuppressWarnings(\"WPILib.IntegerDivision\")",
+          error.getMessage(null));
     }
   }
 
@@ -205,7 +208,10 @@ class IntegerDivisionDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("integer division in a floating-point context", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Integer division in a floating-point context. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.IntegerDivision\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -215,18 +221,18 @@ class IntegerDivisionDetectorTest {
         package wpilib.robot;
 
         class Example {
-          @SuppressWarnings("IntegerDivision")
+          @SuppressWarnings("WPILib.IntegerDivision")
           float f = 1 / 2;
 
           void method() {
-            @SuppressWarnings("IntegerDivision")
+            @SuppressWarnings("WPILib.IntegerDivision")
             double d = 3 / 4;
 
             @SuppressWarnings("all")
             float f2 = 5 / 6;
           }
 
-          @SuppressWarnings("IntegerDivision")
+          @SuppressWarnings("WPILib.IntegerDivision")
           double method2() {
             return 7 / 8;
           }

@@ -38,7 +38,7 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take a parameter of type "
+        "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
             + "frc.robot.Example",
         error.getMessage(null));
   }
@@ -139,14 +139,16 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(2, compilation.errors().size());
     var error1 = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take exactly one parameter of type "
-            + "frc.robot.Example with a @PostConstructionInitializer.InitializedParam annotation",
+        "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
+            + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
+            + "annotation",
         error1.getMessage(null));
 
     var error2 = compilation.errors().get(1);
     assertEquals(
-        "Static @PostConstructionInitializer method must take exactly one parameter of type "
-            + "frc.robot.Example with a @PostConstructionInitializer.InitializedParam annotation",
+        "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
+            + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
+            + "annotation",
         error2.getMessage(null));
   }
 
@@ -177,7 +179,7 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take a parameter of type "
+        "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
             + "frc.robot.Example",
         error.getMessage(null));
   }

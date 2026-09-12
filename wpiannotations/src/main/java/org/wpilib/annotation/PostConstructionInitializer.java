@@ -48,7 +48,7 @@ public @interface PostConstructionInitializer {
    * The string key to use in {@link SuppressWarnings} annotations to suppress compiler error
    * messages related to this annotation.
    */
-  String SUPPRESSION_KEY = "PostConstructionInitializer";
+  String SUPPRESSION_KEY = "WPILib.PostConstructionInitializer";
 
   /**
    * Marks a specific parameter in a static initializer method as being the initialized object. This

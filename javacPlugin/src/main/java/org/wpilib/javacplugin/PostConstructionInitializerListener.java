@@ -15,7 +15,6 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
 import com.sun.source.util.Trees;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,7 +30,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
-import javax.tools.Diagnostic;
 import org.wpilib.annotation.PostConstructionInitializer;
 
 /**
@@ -55,7 +53,8 @@ public class PostConstructionInitializerListener implements TaskListener {
     var compilationUnit = e.getCompilationUnit();
     if (e.getKind() == TaskEvent.Kind.ANALYZE && m_visitedCUs.add(compilationUnit)) {
       var state = new State();
-      compilationUnit.accept(new Scanner(compilationUnit), state);
+      var scanner = new Scanner(compilationUnit);
+      compilationUnit.accept(scanner, state);
 
       if (state.m_initializedObjects.isEmpty()) {
         // Good! No partially initialized objects were detected.
@@ -67,9 +66,8 @@ public class PostConstructionInitializerListener implements TaskListener {
       for (InitializedObject partiallyInitializedObject : state.m_initializedObjects.values()) {
         var object = partiallyInitializedObject.object();
         var uncalledInitializers = partiallyInitializedObject.initializers();
-        trees.printMessage(
-            Diagnostic.Kind.ERROR,
-            "Partially-initialized object `%s` is missing %s %s"
+        scanner.printError(
+            "Partially-initialized object `%s` is missing %s %s."
                 .formatted(
                     object.getSimpleName(),
                     uncalledInitializers.size() == 1
@@ -79,7 +77,7 @@ public class PostConstructionInitializerListener implements TaskListener {
                         .map(i -> "`" + i.initializer().getSimpleName() + "()`")
                         .collect(Collectors.joining(", "))),
             trees.getTree(object),
-            compilationUnit);
+            PostConstructionInitializer.SUPPRESSION_KEY);
       }
     }
   }
@@ -188,13 +186,9 @@ public class PostConstructionInitializerListener implements TaskListener {
     }
   }
 
-  private final class Scanner extends TreeScanner<State, State> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<State, State> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, PostConstructionInitializerListener.this.m_task);
     }
 
     @Override

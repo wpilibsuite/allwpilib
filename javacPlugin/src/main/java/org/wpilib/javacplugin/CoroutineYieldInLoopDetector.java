@@ -13,13 +13,11 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * Checks for {@code while} loops inside methods or lambda functions that accept coroutine
@@ -91,13 +89,9 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
     final List<LoopState> m_children = new ArrayList<>();
   }
 
-  private final class Scanner extends TreeScanner<LoopState, LoopState> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<LoopState, LoopState> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, CoroutineYieldInLoopDetector.this.m_task);
     }
 
     @Override
@@ -215,8 +209,8 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
       }
 
       if (state.m_yieldCalls.isEmpty()) {
-        m_trees.printMessage(
-            Diagnostic.Kind.ERROR, buildErrorMessageForLoop(state), state.m_loop, m_root);
+        // Not suppressible
+        printError(buildErrorMessageForLoop(state), state.m_loop, null);
       }
 
       // Recurse over children
@@ -257,7 +251,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
         }
       }
 
-      messageBuilder.append(" inside loop");
+      messageBuilder.append(" inside loop.");
 
       return messageBuilder;
     }
