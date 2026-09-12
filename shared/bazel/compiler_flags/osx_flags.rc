@@ -1,4 +1,4 @@
-common:macos --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-Wno-shorten-64-to-32:-Wno-gcc-compat"
+common:macos --repo_env=BAZEL_COPTS="-Wall:-Wextra:-Werror:-Wno-shorten-64-to-32:-Wno-gcc-compat:-Wno-nullability-extension"
 common:macos --host_per_file_copt=external/.*@-Wno-deprecated-non-prototype,-Wno-unused-function,-Wno-sign-compare
 
 # C++ only

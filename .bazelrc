@@ -132,4 +132,8 @@ common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,
 build --@rules_python//python/config_settings:bootstrap_impl=script
 build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
 
+# AOS has both aos/flatbuffers/ and aos/flatbuffers.py; without this Bazel
+# synthesizes an aos/flatbuffers/__init__.py that shadows the module.
+build --incompatible_default_to_explicit_init_py
+
 try-import %workspace%/bazel_auth.rc
