@@ -56,8 +56,8 @@ std::shared_ptr<PyTunable> Add(
     wpi::tunables::TunableTable& table, std::string_view name,
     pybind11::object value,
     pybind11::typing::Optional<PythonType> valueType = pybind11::none(),
-    pybind11::typing::Optional<PythonType> elementType = pybind11::none(), bool robust = false,
-    bool isMutable = true,
+    pybind11::typing::Optional<PythonType> elementType = pybind11::none(),
+    bool robust = false, bool isMutable = true,
     std::optional<TuneCallback> onTune = std::nullopt,
     std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
@@ -93,17 +93,17 @@ std::shared_ptr<PyTunable> AddDouble(
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishValue(
     wpi::tunables::TunableTable& table, std::string_view name, Getter getter,
-    Setter setter, pybind11::typing::Optional<PythonType> valueType = pybind11::none(),
-    pybind11::typing::Optional<PythonType> elementType = pybind11::none(), bool robust = false,
-    bool isMutable = true,
+    Setter setter,
+    pybind11::typing::Optional<PythonType> valueType = pybind11::none(),
+    pybind11::typing::Optional<PythonType> elementType = pybind11::none(),
+    bool robust = false, bool isMutable = true,
     std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishBoolean(
     wpi::tunables::TunableTable& table, std::string_view name,
     TypedGetter<BoolCallbackValue> getter,
     TypedSetter<BoolCallbackValue> setter, bool robust = false,
-    bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishInt(
     wpi::tunables::TunableTable& table, std::string_view name,
@@ -121,29 +121,25 @@ std::shared_ptr<PyTunable> PublishFloat(
     wpi::tunables::TunableTable& table, std::string_view name,
     TypedGetter<FloatCallbackValue> getter,
     TypedSetter<FloatCallbackValue> setter, bool robust = false,
-    bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishDouble(
     wpi::tunables::TunableTable& table, std::string_view name,
     TypedGetter<FloatCallbackValue> getter,
-    TypedSetter<FloatCallbackValue> setter,
-    bool robust = false, bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    TypedSetter<FloatCallbackValue> setter, bool robust = false,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishString(
     wpi::tunables::TunableTable& table, std::string_view name,
     TypedGetter<StringCallbackValue> getter,
-    TypedSetter<StringCallbackValue> setter,
-    bool robust = false, bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    TypedSetter<StringCallbackValue> setter, bool robust = false,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishBooleanArray(
     wpi::tunables::TunableTable& table, std::string_view name,
     ArrayGetter<BoolCallbackValue> getter,
     ArraySetter<BoolCallbackValue> setter, bool robust = false,
-    bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishIntegerArray(
     wpi::tunables::TunableTable& table, std::string_view name,
@@ -154,23 +150,20 @@ std::shared_ptr<PyTunable> PublishIntegerArray(
 std::shared_ptr<PyTunable> PublishDoubleArray(
     wpi::tunables::TunableTable& table, std::string_view name,
     ArrayGetter<FloatCallbackValue> getter,
-    ArraySetter<FloatCallbackValue> setter,
-    bool robust = false, bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    ArraySetter<FloatCallbackValue> setter, bool robust = false,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishStringArray(
     wpi::tunables::TunableTable& table, std::string_view name,
     ArrayGetter<StringCallbackValue> getter,
-    ArraySetter<StringCallbackValue> setter,
-    bool robust = false, bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    ArraySetter<StringCallbackValue> setter, bool robust = false,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 std::shared_ptr<PyTunable> PublishRaw(
     wpi::tunables::TunableTable& table, std::string_view name,
     TypedGetter<BytesCallbackValue> getter,
-    TypedSetter<BytesCallbackValue> setter,
-    bool robust = false, bool isMutable = true,
-    std::optional<Properties> properties = std::nullopt,
+    TypedSetter<BytesCallbackValue> setter, bool robust = false,
+    bool isMutable = true, std::optional<Properties> properties = std::nullopt,
     std::string typeString = "");
 void Remove(wpi::tunables::TunableTable& table, std::string_view name);
 void InvalidatePendingPublications(std::string_view path);

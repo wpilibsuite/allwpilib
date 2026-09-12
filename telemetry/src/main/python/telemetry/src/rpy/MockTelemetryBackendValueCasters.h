@@ -12,13 +12,11 @@
 namespace pybind11::detail {
 
 template <>
-struct type_caster<
-    wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue> {
+struct type_caster<wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue> {
   using Type = wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue;
 
   PYBIND11_TYPE_CASTER(
-      Type,
-      const_name("telemetry.mock_backend.KeepDuplicatesValue"));
+      Type, const_name("telemetry.mock_backend.KeepDuplicatesValue"));
 
   bool load(handle src, bool) {
     if (!src) {
@@ -53,8 +51,8 @@ template <>
 struct type_caster<wpi::telemetry::MockTelemetryBackend::SetPropertyValue> {
   using Type = wpi::telemetry::MockTelemetryBackend::SetPropertyValue;
 
-  PYBIND11_TYPE_CASTER(
-      Type, const_name("telemetry.mock_backend.SetPropertyValue"));
+  PYBIND11_TYPE_CASTER(Type,
+                       const_name("telemetry.mock_backend.SetPropertyValue"));
 
   bool load(handle src, bool) {
     if (!src) {
@@ -91,8 +89,8 @@ template <>
 struct type_caster<wpi::telemetry::MockTelemetryBackend::LogStringValue> {
   using Type = wpi::telemetry::MockTelemetryBackend::LogStringValue;
 
-  PYBIND11_TYPE_CASTER(
-      Type, const_name("telemetry.mock_backend.LogStringValue"));
+  PYBIND11_TYPE_CASTER(Type,
+                       const_name("telemetry.mock_backend.LogStringValue"));
 
   bool load(handle src, bool) {
     if (!src) {
@@ -126,13 +124,11 @@ struct type_caster<wpi::telemetry::MockTelemetryBackend::LogStringValue> {
 };
 
 template <>
-struct type_caster<
-    wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue> {
+struct type_caster<wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue> {
   using Type = wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue;
 
   PYBIND11_TYPE_CASTER(
-      Type,
-      const_name("telemetry.mock_backend.LogBooleanArrayValue"));
+      Type, const_name("telemetry.mock_backend.LogBooleanArrayValue"));
 
   bool load(handle src, bool) {
     if (!src) {
@@ -176,8 +172,7 @@ template <>
 struct type_caster<wpi::telemetry::MockTelemetryBackend::LogRawValue> {
   using Type = wpi::telemetry::MockTelemetryBackend::LogRawValue;
 
-  PYBIND11_TYPE_CASTER(
-      Type, const_name("telemetry.mock_backend.LogRawValue"));
+  PYBIND11_TYPE_CASTER(Type, const_name("telemetry.mock_backend.LogRawValue"));
 
   bool load(handle src, bool) {
     if (!src) {
@@ -220,8 +215,7 @@ template <>
 struct type_caster<wpi::telemetry::MockTelemetryBackend::Action> {
   using Type = wpi::telemetry::MockTelemetryBackend::Action;
 
-  static constexpr auto name =
-      const_name("telemetry.mock_backend.Action");
+  static constexpr auto name = const_name("telemetry.mock_backend.Action");
 
   static handle cast(const Type& src, return_value_policy, handle) {
     object cls = wpi::telemetry::python::GetMockBackendValueType(

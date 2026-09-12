@@ -88,11 +88,10 @@ class PyTelemetryTable {
    * bytearray, and memoryview). Wrap other buffer exporters in memoryview to
    * explicitly log their raw bytes in C order.
    */
-  void Log(
-      std::string_view name, pybind11::object value,
-      pybind11::typing::Optional<pybind11::typing::Type<pybind11::object>>
-          elementType = pybind11::none(),
-      std::string_view typeString = "") const;
+  void Log(std::string_view name, pybind11::object value,
+           pybind11::typing::Optional<pybind11::typing::Type<pybind11::object>>
+               elementType = pybind11::none(),
+           std::string_view typeString = "") const;
 
  private:
   using ElementType = pybind11::typing::Type<pybind11::object>;
@@ -123,8 +122,7 @@ class PyTelemetryTable {
   void LogSequence(std::string_view name, const pybind11::sequence& value,
                    pybind11::handle valueType) const;
   void LogStruct(std::string_view name, pybind11::handle value) const;
-  void LogStructSequence(std::string_view name,
-                         const pybind11::sequence& value,
+  void LogStructSequence(std::string_view name, const pybind11::sequence& value,
                          const pybind11::type& type) const;
   void LogStructSequenceImpl(
       const wpi::telemetry::TelemetryTable::EntryHandle& entry,

@@ -34,8 +34,7 @@ void InitializeMockBackendValueTypes(pybind11::module_& module);
 pybind11::object GetMockBackendValueType(MockBackendValueType type);
 
 std::optional<ActionValue> GetLastValue(
-    const wpi::telemetry::MockTelemetryBackend& backend,
-    std::string_view path);
+    const wpi::telemetry::MockTelemetryBackend& backend, std::string_view path);
 
 std::optional<ObjectDict> GetSchema(
     const wpi::telemetry::MockTelemetryBackend& backend,
@@ -47,8 +46,7 @@ namespace pybind11::detail {
 
 template <>
 struct handle_type_name<wpi::telemetry::python::ActionValue> {
-  static constexpr auto name =
-      const_name("telemetry.mock_backend.ActionValue");
+  static constexpr auto name = const_name("telemetry.mock_backend.ActionValue");
 };
 
 }  // namespace pybind11::detail

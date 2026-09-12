@@ -19,10 +19,10 @@ namespace detail {
 
 void StoreValue(std::string path, std::shared_ptr<PyTunable> value);
 void StoreComplex(std::string path,
-                   std::shared_ptr<PyComplexTunableAdapter> value);
+                  std::shared_ptr<PyComplexTunableAdapter> value);
 void StoreNativeComplexValue(std::string path, pybind11::object value);
 
-};  // namespace detail
+}  // namespace detail
 
 void StoreRefreshValue(std::string_view path,
                        const std::shared_ptr<PyTunable>& tunable);

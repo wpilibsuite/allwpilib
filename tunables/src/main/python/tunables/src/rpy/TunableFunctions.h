@@ -49,7 +49,8 @@ bool Publish(std::string_view name, pybind11::object value);
 std::shared_ptr<PyTunable> Add(
     std::string_view name, pybind11::object value,
     pybind11::typing::Optional<table::PythonType> valueType = pybind11::none(),
-    pybind11::typing::Optional<table::PythonType> elementType = pybind11::none(),
+    pybind11::typing::Optional<table::PythonType> elementType =
+        pybind11::none(),
     bool robust = false, bool isMutable = true,
     std::optional<table::TuneCallback> onTune = std::nullopt,
     std::optional<table::Properties> properties = std::nullopt,

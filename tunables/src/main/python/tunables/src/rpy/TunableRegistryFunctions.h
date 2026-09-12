@@ -18,8 +18,7 @@ namespace wpi::tunables::python {
 
 using ReportWarningCallback =
     pybind11::typing::Callable<void(std::string_view)>;
-using RemovableValue =
-    pybind11::typing::Union<pybind11::str, pybind11::object>;
+using RemovableValue = pybind11::typing::Union<pybind11::str, pybind11::object>;
 
 class UpdateMutexContext final {
  public:

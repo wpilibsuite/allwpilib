@@ -27,11 +27,10 @@ PyTelemetryTable GetTable(std::string_view name = "");
  * bytearray, and memoryview). Wrap other buffer exporters in memoryview to
  * explicitly log their raw bytes in C order.
  */
-void Log(
-    std::string_view name, pybind11::object value,
-    pybind11::typing::Optional<pybind11::typing::Type<pybind11::object>>
-        elementType = pybind11::none(),
-    std::string_view typeString = "");
+void Log(std::string_view name, pybind11::object value,
+         pybind11::typing::Optional<pybind11::typing::Type<pybind11::object>>
+             elementType = pybind11::none(),
+         std::string_view typeString = "");
 
 /**
  * Indicates duplicate values should be preserved. Normally duplicate values

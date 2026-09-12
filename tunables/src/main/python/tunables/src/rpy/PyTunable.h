@@ -27,13 +27,10 @@ namespace wpi::tunables::python {
 class PyTunable : public std::enable_shared_from_this<PyTunable> {
  public:
   using Getter = pybind11::typing::Callable<pybind11::object()>;
-  using Setter =
-      pybind11::typing::Callable<void(pybind11::object)>;
-  using TuneCallback =
-      pybind11::typing::Callable<void(pybind11::object)>;
+  using Setter = pybind11::typing::Callable<void(pybind11::object)>;
+  using TuneCallback = pybind11::typing::Callable<void(pybind11::object)>;
   using PythonType = pybind11::typing::Type<pybind11::object>;
-  using Properties =
-      pybind11::typing::Dict<pybind11::str, pybind11::object>;
+  using Properties = pybind11::typing::Dict<pybind11::str, pybind11::object>;
 
   /**
    * Creates an unpublished tunable. The tunable type is inferred from value
@@ -43,7 +40,8 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
    *
    * @param value initial value
    * @param getter optional function that supplies the current local value
-   * @param setter optional function that receives values set locally or remotely
+   * @param setter optional function that receives values set locally or
+   * remotely
    * @param onTune callback that receives the value after a remote update
    * @param robust whether to separately echo a remotely set value
    * @param isMutable whether remote updates may change the tunable
@@ -53,16 +51,16 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
    * @param typeString custom tunable type string
    * @param alwaysGet whether to call getter on every backend update
    */
-  PyTunable(pybind11::object value,
-            std::optional<Getter> getter = std::nullopt,
-            std::optional<Setter> setter = std::nullopt,
-            std::optional<TuneCallback> onTune = std::nullopt,
-            bool robust = false, bool isMutable = true,
-            pybind11::typing::Optional<PythonType> valueType = pybind11::none(),
-            pybind11::typing::Optional<PythonType> elementType = pybind11::none(),
-            std::optional<Properties> properties = std::nullopt,
-            std::string typeString = "", bool alwaysGet = false,
-            bool narrowScalar = false);
+  PyTunable(
+      pybind11::object value, std::optional<Getter> getter = std::nullopt,
+      std::optional<Setter> setter = std::nullopt,
+      std::optional<TuneCallback> onTune = std::nullopt, bool robust = false,
+      bool isMutable = true,
+      pybind11::typing::Optional<PythonType> valueType = pybind11::none(),
+      pybind11::typing::Optional<PythonType> elementType = pybind11::none(),
+      std::optional<Properties> properties = std::nullopt,
+      std::string typeString = "", bool alwaysGet = false,
+      bool narrowScalar = false);
 
   wpi::tunables::detail::TunableBase& GetBase();
 
@@ -102,32 +100,25 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
  private:
   class CallbackOwner;
 
-  using TunableVariant =
-      std::variant<wpi::tunables::TunableBool,
-                   wpi::tunables::TunableInt32,
-                   wpi::tunables::TunableInt64,
-                   wpi::tunables::TunableFloat,
-                   wpi::tunables::TunableDouble,
-                   wpi::tunables::TunableString,
-                   wpi::tunables::TunableRaw,
-                   wpi::tunables::TunableBoolVector,
-                   wpi::tunables::TunableInt64Vector,
-                   wpi::tunables::TunableDoubleVector,
-                   wpi::tunables::TunableStringVector,
-                   wpi::tunables::Tunable<WPyStruct, WPyStructInfo>,
-                   wpi::tunables::Tunable<std::vector<WPyStruct>,
-                                           WPyStructInfo>>;
+  using TunableVariant = std::variant<
+      wpi::tunables::TunableBool, wpi::tunables::TunableInt32,
+      wpi::tunables::TunableInt64, wpi::tunables::TunableFloat,
+      wpi::tunables::TunableDouble, wpi::tunables::TunableString,
+      wpi::tunables::TunableRaw, wpi::tunables::TunableBoolVector,
+      wpi::tunables::TunableInt64Vector, wpi::tunables::TunableDoubleVector,
+      wpi::tunables::TunableStringVector,
+      wpi::tunables::Tunable<WPyStruct, WPyStructInfo>,
+      wpi::tunables::Tunable<std::vector<WPyStruct>, WPyStructInfo>>;
 
   template <typename T>
   static bool CachedValuesEqual(const T& lhs, const T& rhs);
 
   template <typename T>
   static constexpr bool IsStructCachedValue =
-      std::same_as<T, WPyStruct> ||
-      std::same_as<T, std::vector<WPyStruct>>;
+      std::same_as<T, WPyStruct> || std::same_as<T, std::vector<WPyStruct>>;
 
   static std::vector<uint8_t> PackStructValue(const WPyStruct& value,
-                                               const WPyStructInfo& info);
+                                              const WPyStructInfo& info);
 
   template <typename T>
   static std::optional<std::vector<uint8_t>> PackStructData(const T&);
@@ -146,9 +137,8 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
   std::optional<std::vector<uint8_t>> PackCachedStructData() const;
 
   wpi::tunables::TunableConfig MakeConfig(
-      bool robust, bool isMutable,
-      const std::optional<Properties>& properties, std::string typeString,
-      bool alwaysGet);
+      bool robust, bool isMutable, const std::optional<Properties>& properties,
+      std::string typeString, bool alwaysGet);
   TunableVariant MakeValue(
       pybind11::handle value, bool robust, bool isMutable,
       const pybind11::typing::Optional<PythonType>& valueType,
