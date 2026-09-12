@@ -411,7 +411,12 @@ pytest==9.0.2 \
     --hash=sha256:75186651a92bd89611d1d9fc20f0b4345fd827c41ccd5c299a868a05d70edf11
     # via
     #   -r requirements.txt
+    #   pytest-order
     #   pytest-reraise
+pytest-order==1.5.0 \
+    --hash=sha256:667ba2b7303fe2c529848663e0a41dfb0cc4d64f09f87272e4a9a1751efb52b2 \
+    --hash=sha256:96acd7587b5a2855dcaa4a898288103d202894a61afd813adbc9b77aab04d90d
+    # via -r requirements.txt
 pytest-reraise==2.1.2 \
     --hash=sha256:5ab59bd0e2028be095289e6dfc9e36cc0b56936465278f3223e81bea0f2d1c70 \
     --hash=sha256:c22430d33b2cc18905959d7af28978e371113fcc6ef67b5fec95efcd80b88c16

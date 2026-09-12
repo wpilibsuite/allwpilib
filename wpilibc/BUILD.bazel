@@ -292,5 +292,6 @@ robotpy_py_test(
     deps = [
         ":robotpy-wpilib",
         requirement("pytest"),
+        requirement("pytest-order"),
     ],
 )
