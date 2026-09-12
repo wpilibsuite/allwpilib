@@ -59,7 +59,9 @@ class NtBridge {
   /**
    * Constructs a bridge.
    *
-   * @param event_loop The event loop to subscribe on. Must outlive this.
+   * @param event_loop The event loop to subscribe on. AOS watchers cannot be
+   *                   unregistered, so this must not be destroyed while the
+   *                   event loop can still run.
    * @param instance The NetworkTables instance to publish to. Must outlive
    *                 this.
    * @throws std::invalid_argument if a tagged channel has no schema, or two
