@@ -31,7 +31,7 @@ runs:
           echo "BuildBuddy token detected; configuring BuildBuddy cache"
           echo "build:build_buddy --remote_header=x-buildbuddy-api-key=${BB_TOKEN}" > bazel_auth.rc
           echo "build:ci --config=build_buddy" >> bazel_auth.rc
-          echo "build:linux --config=build_buddy_rbe" >> bazel_auth.rc
+          echo "build:linux --config=build_buddy_rbe_enable" >> bazel_auth.rc
         else
           echo "No cache credentials detected; falling back to readonly WPI cache"
           echo "build:ci --config=remote_cache" > bazel_auth.rc

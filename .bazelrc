@@ -108,9 +108,10 @@ build:remote --spawn_strategy=remote,sandboxed
 build:remote --grpc_keepalive_time=30s
 
 common:build_buddy_rbe --config=build_buddy
-common:build_buddy_rbe --config=remote
 common:build_buddy_rbe --config=build_buddy_readonly
-build:build_buddy_rbe --remote_executor=grpcs://remote.buildbuddy.io
+common:build_buddy_rbe --config=build_buddy_rbe_enable
+common:build_buddy_rbe_enable --config=remote
+build:build_buddy_rbe_enable --remote_executor=grpcs://remote.buildbuddy.io
 
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote_cache
