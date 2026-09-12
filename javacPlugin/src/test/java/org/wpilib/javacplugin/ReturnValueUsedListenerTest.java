@@ -113,7 +113,7 @@ class ReturnValueUsedListenerTest {
 
         import org.wpilib.annotation.NoDiscard;
 
-        @NoDiscard("Custom message.")
+        @NoDiscard("Custom message")
         class Example {
           Example getExample() { return new Example(); }
 
@@ -184,7 +184,7 @@ class ReturnValueUsedListenerTest {
 
         import org.wpilib.annotation.NoDiscard;
 
-        @NoDiscard("Objects of type `Base` must be used.")
+        @NoDiscard("Objects of type `Base` must be used")
         abstract class Base { }
 
         class Example extends Base {
@@ -218,7 +218,7 @@ class ReturnValueUsedListenerTest {
 
         import org.wpilib.annotation.NoDiscard;
 
-        @NoDiscard("Objects implementing `I` must be used.")
+        @NoDiscard("Objects implementing `I` must be used")
         interface I { }
 
         class Example implements I {
@@ -252,10 +252,10 @@ class ReturnValueUsedListenerTest {
 
         import org.wpilib.annotation.NoDiscard;
 
-        @NoDiscard("Objects implementing `I` must be used.")
+        @NoDiscard("Objects implementing `I` must be used")
         interface I { }
 
-        @NoDiscard("Objects implementing `I2` must be used.")
+        @NoDiscard("Objects implementing `I2` must be used")
         interface I2 { }
 
         class Example implements I, I2 {
@@ -295,7 +295,7 @@ class ReturnValueUsedListenerTest {
         import org.wpilib.annotation.NoDiscard;
 
         class Example {
-          @NoDiscard("Custom message.")
+          @NoDiscard("Custom message")
           int getI() { return 0; }
 
           void usage() {

@@ -25,8 +25,7 @@ public @interface NoDiscard {
   String SUPPRESSION_KEY = "WPILib.NoDiscard";
 
   /**
-   * An error message to display if the return value is not used. Messages should end with
-   * punctuation (a period, question mark, or exclamation point) for readability.
+   * An error message to display if the return value is not used.
    *
    * @return The error message.
    */

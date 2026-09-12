@@ -35,7 +35,10 @@ abstract class WPILibTreeScanner<R, P> extends TreeScanner<R, P> {
 
   private static String buildFullMessage(CharSequence message, CharSequence suppression) {
     StringBuilder builder =
-        new StringBuilder(86).append(WPILIB_MESSAGE_PREFIX).append(' ').append(message);
+        new StringBuilder(86)
+            .append(WPILIB_MESSAGE_PREFIX)
+            .append(' ')
+            .append(normalizeMessage(message));
 
     if (suppression == null) {
       builder.append(" This error cannot be silenced.");
@@ -47,5 +50,23 @@ abstract class WPILibTreeScanner<R, P> extends TreeScanner<R, P> {
     }
 
     return builder.toString();
+  }
+
+  /**
+   * Normalizes the message by appending a period if the message does not already end with a
+   * punctuation mark.
+   *
+   * @param input The message to normalize.
+   * @return The normalized message.
+   */
+  private static CharSequence normalizeMessage(CharSequence input) {
+    if (input.isEmpty()) {
+      return input;
+    }
+
+    return switch (input.charAt(input.length() - 1)) {
+      case '.', '!', '?' -> input;
+      default -> input + ".";
+    };
   }
 }
