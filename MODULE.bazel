@@ -174,3 +174,12 @@ single_version_override(
     patches = ["shared/bazel/patches/abseil-cpp/0001-Suppress-pedantic-warnings-for-GNU-int128.patch"],
     version = "20260526.0",
 )
+
+# liburing comes in through AOS. Its configure needs make only to print two
+# version numbers, and the Windows SystemCore builds have no make.
+single_version_override(
+    module_name = "liburing",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/liburing/0001-Read-the-version-without-make.patch"],
+    version = "2.14.bcr.2",
+)
