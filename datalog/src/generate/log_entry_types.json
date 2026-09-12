@@ -1,0 +1,112 @@
+[
+  {
+    "Name": "Boolean",
+    "TypeDoc": "boolean",
+    "ConstructorTypeDoc": "boolean",
+    "DataType": "boolean",
+    "JavaType": "boolean",
+    "NoValueDoc": "false",
+    "IsArray": false,
+    "IsNullable": false,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "BooleanArray",
+    "TypeDoc": "boolean",
+    "ConstructorTypeDoc": "boolean array",
+    "DataType": "boolean[]",
+    "JavaType": "boolean[]",
+    "NoValueDoc": "null",
+    "IsArray": true,
+    "IsNullable": true,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "Double",
+    "TypeDoc": "double",
+    "ConstructorTypeDoc": "double",
+    "DataType": "double",
+    "JavaType": "double",
+    "NoValueDoc": "0",
+    "IsArray": false,
+    "IsNullable": false,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "DoubleArray",
+    "TypeDoc": "double",
+    "ConstructorTypeDoc": "double array",
+    "DataType": "double[]",
+    "JavaType": "double[]",
+    "NoValueDoc": "false",
+    "IsArray": true,
+    "IsNullable": true,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "Float",
+    "TypeDoc": "float",
+    "ConstructorTypeDoc": "float",
+    "DataType": "float",
+    "JavaType": "float",
+    "NoValueDoc": "0",
+    "IsArray": false,
+    "IsNullable": false,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "FloatArray",
+    "TypeDoc": "float",
+    "ConstructorTypeDoc": "float array",
+    "DataType": "float[]",
+    "JavaType": "float[]",
+    "NoValueDoc": "false",
+    "IsArray": true,
+    "IsNullable": true,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "Integer",
+    "TypeDoc": "integer",
+    "ConstructorTypeDoc": "integer",
+    "DataType": "int64",
+    "JavaType": "long",
+    "NoValueDoc": "0",
+    "IsArray": false,
+    "IsNullable": false,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "IntegerArray",
+    "TypeDoc": "integer",
+    "ConstructorTypeDoc": "integer array",
+    "DataType": "int64[]",
+    "JavaType": "long[]",
+    "NoValueDoc": "false",
+    "IsArray": true,
+    "IsNullable": true,
+    "HasTypeParameter": false
+  },
+  {
+    "Name": "String",
+    "TypeDoc": "string",
+    "ConstructorTypeDoc": "String",
+    "DataType": "string",
+    "JavaType": "String",
+    "NoValueDoc": "null",
+    "IsArray": false,
+    "IsNullable": true,
+    "HasTypeParameter": true
+  },
+  {
+    "Name": "StringArray",
+    "TypeDoc": "string",
+    "ConstructorTypeDoc": "string array",
+    "DataType": "string[]",
+    "JavaType": "String[]",
+    "NoValueDoc": "false",
+    "IsArray": true,
+    "IsNullable": true,
+    "HasTypeParameter": false
+  }
+]
