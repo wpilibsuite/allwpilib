@@ -24,7 +24,7 @@ class CoroutineInLoopListenerTest {
       """;
 
   @Test
-  void noYieldInLoopWithoutCoroutines() {
+  void noYieldInWhileLoopWithoutCoroutines() {
     String source =
         """
       package wpilib.robot;
@@ -46,7 +46,29 @@ class CoroutineInLoopListenerTest {
   }
 
   @Test
-  void basicYieldInLoopInLambda() {
+  void noYieldInDoWhileLoopWithoutCoroutines() {
+    String source =
+        """
+      package wpilib.robot;
+
+      class Example {
+        Runnable lambda = () -> {
+          do {
+          } while (true);
+        };
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void basicYieldInWhileLoopInLambda() {
     String source =
         """
       package wpilib.robot;
@@ -74,7 +96,35 @@ class CoroutineInLoopListenerTest {
   }
 
   @Test
-  void basicYieldInLoopInMethod() {
+  void basicYieldInDoWhileLoopInLambda() {
+    String source =
+        """
+      package wpilib.robot;
+
+      import java.util.function.Consumer;
+      import org.wpilib.command3.Coroutine;
+
+      class Example {
+        Consumer<Coroutine> lambda = coroutine -> {
+          do {
+            coroutine.yield();
+          } while (true);
+        };
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void basicYieldInWhileLoopInMethod() {
     String source =
         """
       package wpilib.robot;
@@ -87,7 +137,7 @@ class CoroutineInLoopListenerTest {
           while (true) {
             coroutine.yield();
           }
-        };
+        }
       }
       """;
 
@@ -102,7 +152,35 @@ class CoroutineInLoopListenerTest {
   }
 
   @Test
-  void noYieldInLoopInLambda() {
+  void basicYieldInDoWhileLoopInMethod() {
+    String source =
+        """
+      package wpilib.robot;
+
+      import java.util.function.Consumer;
+      import org.wpilib.command3.Coroutine;
+
+      class Example {
+        void useCoroutine(Coroutine coroutine) {
+          do {
+            coroutine.yield();
+          } while (true);
+        }
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
+  void noYieldInWhileLoopInLambda() {
     String source =
         """
       package wpilib.robot;
@@ -115,6 +193,37 @@ class CoroutineInLoopListenerTest {
           while (true) {
             // No yield
           }
+        };
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+  }
+
+  @Test
+  void noYieldInDoWhileLoopInLambda() {
+    String source =
+        """
+      package wpilib.robot;
+
+      import java.util.function.Consumer;
+      import org.wpilib.command3.Coroutine;
+
+      class Example {
+        Consumer<Coroutine> lambda = coroutine -> {
+          do {
+            // No yield
+          } while (true);
         };
       }
       """;
@@ -384,6 +493,76 @@ class CoroutineInLoopListenerTest {
   }
 
   @Test
+  void yieldInWhileButNotDoWhileChild() {
+    String source =
+        """
+      package wpilib.robot;
+
+      import java.util.function.Consumer;
+      import org.wpilib.command3.Coroutine;
+
+      class Example {
+        Consumer<Coroutine> lambda = coroutine -> {
+          while (true) {
+            coroutine.yield();
+            do {
+              // No yields
+            } while (true);
+          }
+        };
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(10, error.getLineNumber());
+  }
+
+  @Test
+  void yieldInDoWhileButNotWhileChild() {
+    String source =
+        """
+      package wpilib.robot;
+
+      import java.util.function.Consumer;
+      import org.wpilib.command3.Coroutine;
+
+      class Example {
+        Consumer<Coroutine> lambda = coroutine -> {
+          do {
+            coroutine.yield();
+            while (true) {
+              // No yields
+            }
+          } while (true);
+        };
+      }
+      """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+    assertEquals(10, error.getLineNumber());
+  }
+
+  @Test
   void noYieldsInDeeplyNestedLoops() {
     String source =
         """
@@ -452,5 +631,75 @@ class CoroutineInLoopListenerTest {
     var error7 = compilation.errors().get(6);
     assertEquals("Missing call to `coroutine.yield()` inside loop", error7.getMessage(null));
     assertEquals(16, error7.getLineNumber());
+  }
+
+  @Test
+  void yieldInDoWhileButNotFollowingWhile() {
+    String source =
+        """
+    package wpilib.robot;
+
+    import java.util.function.Consumer;
+    import org.wpilib.command3.Coroutine;
+
+    class Example {
+      Consumer<Coroutine> lambda = coroutine -> {
+        do {
+          coroutine.yield();
+        } while (coroutine != null);
+
+        while (true) {
+          // No yield
+        }
+      };
+    }
+    """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
+  }
+
+  @Test
+  void yieldInWhileButNotFollowingDoWhile() {
+    String source =
+        """
+    package wpilib.robot;
+
+    import java.util.function.Consumer;
+    import org.wpilib.command3.Coroutine;
+
+    class Example {
+      Consumer<Coroutine> lambda = coroutine -> {
+        while (coroutine != null) {
+          coroutine.yield();
+        }
+
+        do {
+          // No yield
+        } while (true);
+      };
+    }
+    """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
+                JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).failed();
+    assertEquals(1, compilation.errors().size());
+    var error = compilation.errors().get(0);
+    assertEquals("Missing call to `coroutine.yield()` inside loop", error.getMessage(null));
   }
 }
