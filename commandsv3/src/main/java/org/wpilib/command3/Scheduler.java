@@ -141,6 +141,8 @@ public final class Scheduler implements ProtobufSerializable {
   /** The scope for continuations to yield to. */
   private final ContinuationScope m_scope = new ContinuationScope("coroutine commands");
 
+  final Set<Command> m_unschedulableCommands = new HashSet<>();
+
   /** Represents a single periodic callback. Stores a coroutine and its scope. */
   private record PeriodicCallback(BindingScope scope, Coroutine coroutine) {}
 
@@ -487,7 +489,7 @@ public final class Scheduler implements ProtobufSerializable {
   private ScheduleResult isSchedulable(Binding binding) {
     var command = binding.command();
 
-    if (isScheduledOrRunning(command)) {
+    if (isScheduledOrRunning(command) || m_unschedulableCommands.contains(command)) {
       return new ScheduleResult.AlreadyRunning(command);
     }
 

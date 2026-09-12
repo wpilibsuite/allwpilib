@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A type of command that runs multiple other commands in parallel. The group will end after all
@@ -35,7 +36,6 @@ public final class ParallelGroup implements Command {
    */
   ParallelGroup(
       String name, Collection<Command> requiredCommands, Collection<Command> optionalCommands) {
-    requireNonNullParam(name, "name", "ParallelGroup");
     requireNonNullParam(requiredCommands, "requiredCommands", "ParallelGroup");
     requireNonNullParam(optionalCommands, "optionalCommands", "ParallelGroup");
 
@@ -57,9 +57,9 @@ public final class ParallelGroup implements Command {
 
     ConflictDetector.throwIfConflicts(allCommands);
 
-    m_name = name;
     m_optionalCommands.addAll(optionalCommands);
     m_requiredCommands.addAll(requiredCommands);
+    m_name = name == null ? computeAutomaticName() : name;
 
     for (var command : allCommands) {
       m_requirements.addAll(command.requirements());
@@ -103,6 +103,28 @@ public final class ParallelGroup implements Command {
   @Override
   public String toString() {
     return "ParallelGroup[name=" + m_name + "]";
+  }
+
+  private String computeAutomaticName() {
+    // eg "(CommandA & CommandB & CommandC)"
+    String required =
+        m_requiredCommands.stream().map(Command::name).collect(Collectors.joining(" & ", "(", ")"));
+
+    // eg "(CommandA | CommandB | CommandC)"
+    String optional =
+        m_optionalCommands.stream().map(Command::name).collect(Collectors.joining(" | ", "(", ")"));
+
+    if (m_requiredCommands.isEmpty()) {
+      // No required commands, pure race
+      return optional;
+    } else if (m_optionalCommands.isEmpty()) {
+      // Everything required
+      return required;
+    } else {
+      // Some form of deadline
+      // eg "[(CommandA & CommandB) * (CommandX | CommandY | ...)]"
+      return "[%s * %s]".formatted(required, optional);
+    }
   }
 
   // package-private for testing
