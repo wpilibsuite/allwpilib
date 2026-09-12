@@ -1,5 +1,5 @@
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
+load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
@@ -401,6 +401,8 @@ def package_binary_cc_project(
     pkg_files(
         name = "{}-files".format(name),
         srcs = [name],
+        # Keep the binaries executable once unzipped.
+        attributes = pkg_attributes(mode = "0755"),
         prefix = platform_prefix(""),
         renames = renames,
     )
