@@ -23,6 +23,11 @@ class CoroutineInLoopListenerTest {
       }
       """;
 
+  public static final String STANDARD_MSG =
+      "[WPILib] Missing call to `coroutine.yield()` inside loop. "
+          + "If this is intentional, the error may be silenced with "
+          + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")";
+
   @Test
   void noYieldInLoopWithoutCoroutines() {
     String source =
@@ -129,9 +134,7 @@ class CoroutineInLoopListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
   }
 
   @Test
@@ -202,7 +205,9 @@ class CoroutineInLoopListenerTest {
             + "`firstCoroutine.yield()`, "
             + "`c1.yield()`, "
             + "`next.yield()`, or "
-            + "`thisMightBeTheLastOne.yield()` inside loop. This error cannot be silenced.",
+            + "`thisMightBeTheLastOne.yield()` inside loop. "
+            + "If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
         error.getMessage(null));
   }
 
@@ -238,7 +243,8 @@ class CoroutineInLoopListenerTest {
     var error = compilation.errors().get(0);
     assertEquals(
         "[WPILib] Missing call to `innerCoroutine.yield()` inside loop."
-            + " This error cannot be silenced.",
+            + " If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
         error.getMessage(null));
   }
 
@@ -277,7 +283,8 @@ class CoroutineInLoopListenerTest {
     var error = compilation.errors().get(0);
     assertEquals(
         "[WPILib] Missing call to `innerCoroutine.yield()` inside loop."
-            + " This error cannot be silenced.",
+            + " If this is intentional, the error may be silenced with "
+            + "@SuppressWarnings(\"WPILib.CoroutineYieldInLoop\")",
         error.getMessage(null));
   }
 
@@ -313,15 +320,11 @@ class CoroutineInLoopListenerTest {
     assertEquals(2, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error1.getMessage(null));
+    assertEquals(STANDARD_MSG, error1.getMessage(null));
     assertEquals(8, error1.getLineNumber());
 
     var error2 = compilation.errors().get(1);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error2.getMessage(null));
+    assertEquals(STANDARD_MSG, error2.getMessage(null));
     assertEquals(9, error2.getLineNumber());
   }
 
@@ -356,9 +359,7 @@ class CoroutineInLoopListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
     assertEquals(10, error.getLineNumber());
   }
 
@@ -393,9 +394,7 @@ class CoroutineInLoopListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error.getMessage(null));
+    assertEquals(STANDARD_MSG, error.getMessage(null));
     assertEquals(8, error.getLineNumber());
   }
 
@@ -442,45 +441,31 @@ class CoroutineInLoopListenerTest {
     assertEquals(7, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error1.getMessage(null));
+    assertEquals(STANDARD_MSG, error1.getMessage(null));
     assertEquals(8, error1.getLineNumber());
 
     var error2 = compilation.errors().get(1);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error2.getMessage(null));
+    assertEquals(STANDARD_MSG, error2.getMessage(null));
     assertEquals(9, error2.getLineNumber());
 
     var error3 = compilation.errors().get(2);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error3.getMessage(null));
+    assertEquals(STANDARD_MSG, error3.getMessage(null));
     assertEquals(10, error3.getLineNumber());
 
     var error4 = compilation.errors().get(3);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error4.getMessage(null));
+    assertEquals(STANDARD_MSG, error4.getMessage(null));
     assertEquals(11, error4.getLineNumber());
 
     var error5 = compilation.errors().get(4);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error5.getMessage(null));
+    assertEquals(STANDARD_MSG, error5.getMessage(null));
     assertEquals(12, error5.getLineNumber());
 
     var error6 = compilation.errors().get(5);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error6.getMessage(null));
+    assertEquals(STANDARD_MSG, error6.getMessage(null));
     assertEquals(13, error6.getLineNumber());
 
     var error7 = compilation.errors().get(6);
-    assertEquals(
-        "[WPILib] Missing call to `coroutine.yield()` inside loop. This error cannot be silenced.",
-        error7.getMessage(null));
+    assertEquals(STANDARD_MSG, error7.getMessage(null));
     assertEquals(16, error7.getLineNumber());
   }
 }

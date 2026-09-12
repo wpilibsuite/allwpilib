@@ -22,16 +22,10 @@ import javax.lang.model.element.VariableElement;
 /**
  * Checks for {@code while} loops inside methods or lambda functions that accept coroutine
  * arguments. If a loop does not call {@code yield()} on one of the most local coroutine objects, a
- * compiler error will be emitted for that loop element. This check cannot be silenced.
+ * compiler error will be emitted for that loop element.
  */
-// Note: cannot be silenced because annotations cannot be placed on loops.
-// This is not legal Java:
-//   @SuppressWarnings("UnsafeCoroutineUsage")
-//   while (true) { ... }
-// Placing it at a higher level (lambda or method declaration) would silence ALL unsafe usage in
-// that expression; it's impossible to do on a case-by-case basis.
 public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
-  public static final String SUPPRESSION_KEY = "CoroutineYieldInLoop";
+  public static final String SUPPRESSION_KEY = "WPILib.CoroutineYieldInLoop";
 
   public CoroutineYieldInLoopDetector(JavacTask task) {
     super(task);
@@ -209,8 +203,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
       }
 
       if (state.m_yieldCalls.isEmpty()) {
-        // Not suppressible
-        printError(buildErrorMessageForLoop(state), state.m_loop, null);
+        printError(buildErrorMessageForLoop(state), state.m_loop, SUPPRESSION_KEY);
       }
 
       // Recurse over children
