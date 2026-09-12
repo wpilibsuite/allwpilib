@@ -156,9 +156,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was 0).",
-        error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -184,9 +182,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was -123).",
-        error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -123).", error.getMessage(null));
   }
 
   @Test
@@ -214,9 +210,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was 0).",
-        error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -244,8 +238,6 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals(
-        "[WPILib] @MaxLength value must be >= 1 (was -3).",
-        error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -3).", error.getMessage(null));
   }
 }
