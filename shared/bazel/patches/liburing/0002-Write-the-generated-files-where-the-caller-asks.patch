@@ -1,0 +1,67 @@
+Subject: [PATCH] Write the generated files where the caller asks
+
+configure writes config-host.h, config-host.mak and the two generated headers
+relative to the working directory.  Bazel runs it from the execroot, which no
+single action owns, and Bazel does not sandbox on Windows, so those files stay
+behind where every later action can see them.  That breaks the build: the
+library is compiled with a bare "-include config-host.h", and the preprocessor
+resolves an -include against its own working directory before any -I path, so
+each compile reads the stray copy rather than the declared output and fails
+with an undeclared inclusion.
+
+Honour LIBURING_CONFIG_OUTPUT_DIR so a caller can send the generated files to a
+directory it owns.  It defaults to the working directory, leaving a plain
+./configure unchanged.  liburing.spec is read from the script's own directory
+for the same reason: it removes the need to stage a copy beside the caller.
+
+--- a/configure
++++ b/configure
+@@ -100,8 +100,14 @@
+ 
+ rm -rf config.log
+ 
+-config_host_mak="config-host.mak"
+-config_host_h="config-host.h"
++# Bazel runs configure from a directory no single action owns, and on hosts
++# without sandboxing anything left behind is visible to every other action.
++# Let the caller redirect the generated files into a directory it does own.
++outdir="${LIBURING_CONFIG_OUTPUT_DIR:-.}"
++mkdir -p "${outdir}/src/include/liburing"
++
++config_host_mak="${outdir}/config-host.mak"
++config_host_h="${outdir}/config-host.h"
+ 
+ rm -rf $config_host_mak
+ rm -rf $config_host_h
+@@ -121,7 +127,7 @@
+ 
+ # Default CFLAGS
+ ENV_CFLAGS="${CFLAGS}"
+-CFLAGS="${CFLAGS:+$CFLAGS }-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -include config-host.h"
++CFLAGS="${CFLAGS:+$CFLAGS }-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -include ${config_host_h}"
+ BUILD_CFLAGS="${ENV_CFLAGS}"
+ 
+ # Print configure header at the top of $config_host_h
+@@ -602,11 +608,11 @@
+ 		liburing_version="$liburing_value"
+ 		break
+ 	fi
+-done < liburing.spec
++done < "$(dirname "$0")/liburing.spec"
+ VERSION_MAJOR="${liburing_version%%.*}"
+ VERSION_MINOR="${liburing_version#*.}"
+ VERSION_MINOR="${VERSION_MINOR%%.*}"
+-io_uring_version_h="src/include/liburing/io_uring_version.h"
++io_uring_version_h="${outdir}/src/include/liburing/io_uring_version.h"
+ cat > $io_uring_version_h << EOF
+ /* SPDX-License-Identifier: MIT */
+ #ifndef LIBURING_VERSION_H
+@@ -619,7 +625,7 @@
+ EOF
+ 
+ # generate compat.h
+-compat_h="src/include/liburing/compat.h"
++compat_h="${outdir}/src/include/liburing/compat.h"
+ cat > $compat_h << EOF
+ /* SPDX-License-Identifier: MIT */
+ #ifndef LIBURING_COMPAT_H

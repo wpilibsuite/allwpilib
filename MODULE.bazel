@@ -180,6 +180,10 @@ single_version_override(
 single_version_override(
     module_name = "liburing",
     patch_strip = 1,
-    patches = ["shared/bazel/patches/liburing/0001-Read-the-version-without-make.patch"],
+    patches = [
+        "shared/bazel/patches/liburing/0001-Read-the-version-without-make.patch",
+        "shared/bazel/patches/liburing/0002-Write-the-generated-files-where-the-caller-asks.patch",
+        "shared/bazel/patches/liburing/0003-Configure-into-the-output-directory.patch",
+    ],
     version = "2.14.bcr.2",
 )
