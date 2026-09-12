@@ -135,31 +135,35 @@ class OpModeAnnotationValidatorTest {
 
     // Autonomous
     assertEquals(
-        "@Autonomous opmode name must be <= 32 characters (was 74)",
+        "[WPILib] @Autonomous opmode name must be <= 32 characters (was 74).",
         errors.get(0).getMessage(null));
     assertEquals(
-        "@Autonomous opmode group must be <= 12 characters (was 32)",
+        "[WPILib] @Autonomous opmode group must be <= 12 characters (was 32).",
         errors.get(1).getMessage(null));
     assertEquals(
-        "@Autonomous opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Autonomous opmode description must be <= 64 characters (was 99).",
         errors.get(2).getMessage(null));
 
     // Teleop
     assertEquals(
-        "@Teleop opmode name must be <= 32 characters (was 74)", errors.get(3).getMessage(null));
+        "[WPILib] @Teleop opmode name must be <= 32 characters (was 74).",
+        errors.get(3).getMessage(null));
     assertEquals(
-        "@Teleop opmode group must be <= 12 characters (was 32)", errors.get(4).getMessage(null));
+        "[WPILib] @Teleop opmode group must be <= 12 characters (was 32).",
+        errors.get(4).getMessage(null));
     assertEquals(
-        "@Teleop opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Teleop opmode description must be <= 64 characters (was 99).",
         errors.get(5).getMessage(null));
 
-    // TestOpMode
+    // Utility
     assertEquals(
-        "@Utility opmode name must be <= 32 characters (was 74)", errors.get(6).getMessage(null));
+        "[WPILib] @Utility opmode name must be <= 32 characters (was 74).",
+        errors.get(6).getMessage(null));
     assertEquals(
-        "@Utility opmode group must be <= 12 characters (was 32)", errors.get(7).getMessage(null));
+        "[WPILib] @Utility opmode group must be <= 12 characters (was 32).",
+        errors.get(7).getMessage(null));
     assertEquals(
-        "@Utility opmode description must be <= 64 characters (was 99)",
+        "[WPILib] @Utility opmode description must be <= 64 characters (was 99).",
         errors.get(8).getMessage(null));
   }
 }

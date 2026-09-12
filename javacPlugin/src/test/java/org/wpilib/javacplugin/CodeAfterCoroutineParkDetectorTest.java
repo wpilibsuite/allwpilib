@@ -79,7 +79,10 @@ class CodeAfterCoroutineParkDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable 1\"); ", getErrorSource(error));
   }
 
@@ -143,7 +146,10 @@ class CodeAfterCoroutineParkDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("for (;;) {\n    }\n", getErrorSource(error));
   }
 
@@ -176,7 +182,10 @@ class CodeAfterCoroutineParkDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("{\n    }\n", getErrorSource(error));
   }
 
@@ -234,7 +243,10 @@ class CodeAfterCoroutineParkDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable\");\n", getErrorSource(error));
   }
 }

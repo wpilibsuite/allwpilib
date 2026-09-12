@@ -11,8 +11,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +21,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 import org.wpilib.annotation.NoDiscard;
 
 /** Checks for usages of methods that require their return values to be used. */
@@ -46,13 +43,9 @@ public class ReturnValueUsedListener implements TaskListener {
     }
   }
 
-  private final class Scanner extends TreeScanner<Void, Void> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<Void, Void> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, ReturnValueUsedListener.this.m_task);
     }
 
     @Override
@@ -74,7 +67,7 @@ public class ReturnValueUsedListener implements TaskListener {
     private void checkIgnoredExpression(Tree node) {
       var path = m_trees.getPath(m_root, node);
 
-      if (Suppressions.hasSuppression(m_trees, path, "NoDiscard")) {
+      if (Suppressions.hasSuppression(m_trees, path, NoDiscard.SUPPRESSION_KEY)) {
         return;
       }
 
@@ -97,7 +90,7 @@ public class ReturnValueUsedListener implements TaskListener {
       if (invoked != null) {
         List<String> messages = getNoDiscardMessages(invoked);
         for (String msg : messages) {
-          m_trees.printMessage(Diagnostic.Kind.ERROR, msg, node, m_root);
+          printError(msg, node, NoDiscard.SUPPRESSION_KEY);
         }
       }
     }
@@ -133,7 +126,7 @@ public class ReturnValueUsedListener implements TaskListener {
       if (methodNoDiscard != null) {
         String msg = methodNoDiscard.value();
         if (msg.isEmpty()) {
-          messages.add("Result of @NoDiscard method is ignored");
+          messages.add("Result of @NoDiscard method is ignored.");
         } else {
           messages.add(msg);
         }
@@ -181,7 +174,7 @@ public class ReturnValueUsedListener implements TaskListener {
         String message = typeNoDiscard.value();
         if (message.isEmpty()) {
           out.add(
-              "Result of method returning @NoDiscard type %s is ignored"
+              "Result of method returning @NoDiscard type %s is ignored."
                   .formatted(type.getQualifiedName()));
         } else {
           out.add(message);

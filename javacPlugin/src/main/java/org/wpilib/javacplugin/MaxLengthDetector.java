@@ -16,8 +16,6 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,7 +23,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 import org.wpilib.annotation.MaxLength;
 
 public class MaxLengthDetector implements TaskListener {
@@ -47,13 +44,9 @@ public class MaxLengthDetector implements TaskListener {
     }
   }
 
-  private final class Scanner extends TreeScanner<Void, Void> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<Void, Void> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, MaxLengthDetector.this.m_task);
     }
 
     @Override
@@ -96,14 +89,14 @@ public class MaxLengthDetector implements TaskListener {
           continue;
         }
 
-        m_trees.printMessage(
-            Diagnostic.Kind.ERROR,
+        printError(
             ("String literal exceeds maximum length: \"%s\""
-                    + " (%d characters) is longer than %d character%s")
+                    + " (%d characters) is longer than %d character%s.")
                 .formatted(
                     string, string.length(), maxLength.value(), maxLength.value() == 1 ? "" : "s"),
             literal,
-            m_root);
+            null // not suppressible
+            );
       }
 
       return super.visitMethodInvocation(node, unused);
@@ -141,11 +134,8 @@ public class MaxLengthDetector implements TaskListener {
 
       Integer constValue = evaluateIntConstant(valueExpr);
       if (constValue != null && constValue < 1) {
-        m_trees.printMessage(
-            Diagnostic.Kind.ERROR,
-            "@MaxLength value must be >= 1 (was " + constValue + ")",
-            valueExpr,
-            m_root);
+        // not suppressible
+        printError("@MaxLength value must be >= 1 (was " + constValue + ").", valueExpr, null);
       }
 
       return super.visitAnnotation(node, unused);

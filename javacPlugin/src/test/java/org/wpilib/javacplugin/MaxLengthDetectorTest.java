@@ -68,8 +68,8 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "String literal exceeds maximum length: \"abcdefghijklmnopqrstuvwxyz1234567890\""
-            + " (36 characters) is longer than 1 character",
+        "[WPILib] String literal exceeds maximum length: \"abcdefghijklmnopqrstuvwxyz1234567890\""
+            + " (36 characters) is longer than 1 character.",
         error.getMessage(null));
   }
 
@@ -101,7 +101,8 @@ class MaxLengthDetectorTest {
     assertEquals(1, errors.size());
     var error = errors.get(0);
     assertEquals(
-        "String literal exceeds maximum length: \"12\" (2 characters) is longer than 1 character",
+        "[WPILib] String literal exceeds maximum length: \"12\" (2 characters) is longer than 1"
+            + " character.",
         error.getMessage(null));
   }
 
@@ -155,7 +156,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was 0)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -181,7 +182,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was -123)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -123).", error.getMessage(null));
   }
 
   @Test
@@ -209,7 +210,7 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was 0)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was 0).", error.getMessage(null));
   }
 
   @Test
@@ -237,6 +238,6 @@ class MaxLengthDetectorTest {
     var errors = compilation.errors();
     assertEquals(1, errors.size());
     var error = errors.get(0);
-    assertEquals("@MaxLength value must be >= 1 (was -3)", error.getMessage(null));
+    assertEquals("[WPILib] @MaxLength value must be >= 1 (was -3).", error.getMessage(null));
   }
 }

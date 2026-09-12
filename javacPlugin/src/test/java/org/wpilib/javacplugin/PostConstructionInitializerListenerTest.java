@@ -69,7 +69,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        "[WPILib] Partially-initialized object `example` is missing a call to initializer"
+            + " method `init()`. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -166,7 +168,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        "[WPILib] Partially-initialized object `example` is missing a call to initializer"
+            + " method `init()`. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -225,7 +229,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        "[WPILib] Partially-initialized object `example` is missing a call to initializer"
+            + " method `init()`. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -267,8 +273,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing calls to 2 initializer methods: "
-            + "`i1Init()`, `i2Init()`",
+        "[WPILib] Partially-initialized object `example` is missing calls to 2 initializer"
+            + " methods: `i1Init()`, `i2Init()`. If this is intentional, the error may be"
+            + " silenced with @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -371,7 +378,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        "[WPILib] Partially-initialized object `example` is missing a call to initializer"
+            + " method `init()`. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -416,7 +425,9 @@ class PostConstructionInitializerListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Partially-initialized object `example` is missing a call to initializer method `init()`",
+        "[WPILib] Partially-initialized object `example` is missing a call to initializer"
+            + " method `init()`. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.PostConstructionInitializer\")",
         error.getMessage(null));
   }
 
@@ -433,7 +444,7 @@ class PostConstructionInitializerListenerTest {
           void init() { }
 
           static void usage() {
-            @SuppressWarnings("PostConstructionInitializer")
+            @SuppressWarnings("WPILib.PostConstructionInitializer")
             var example = new Example();
             // example.init();
           }
@@ -460,7 +471,7 @@ class PostConstructionInitializerListenerTest {
           @PostConstructionInitializer
           void init() { }
 
-          @SuppressWarnings("PostConstructionInitializer")
+          @SuppressWarnings("WPILib.PostConstructionInitializer")
           static void usage() {
             var example = new Example();
             // example.init();
@@ -484,7 +495,7 @@ class PostConstructionInitializerListenerTest {
 
         import org.wpilib.annotation.PostConstructionInitializer;
 
-        @SuppressWarnings("PostConstructionInitializer")
+        @SuppressWarnings("WPILib.PostConstructionInitializer")
         class Example {
           @PostConstructionInitializer
           void init() { }

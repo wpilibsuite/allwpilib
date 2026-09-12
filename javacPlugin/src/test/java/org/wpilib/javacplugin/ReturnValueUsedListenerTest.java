@@ -66,7 +66,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Result of @NoDiscard method is ignored", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Result of @NoDiscard method is ignored. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -96,7 +99,9 @@ class ReturnValueUsedListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Result of method returning @NoDiscard type wpilib.robot.Example is ignored",
+        "[WPILib] Result of method returning @NoDiscard type wpilib.robot.Example is ignored."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
         error.getMessage(null));
   }
 
@@ -126,7 +131,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Custom message", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Custom message. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -157,9 +165,14 @@ class ReturnValueUsedListenerTest {
     assertEquals(2, compilation.errors().size());
     var error1 = compilation.errors().get(0);
     var error2 = compilation.errors().get(1);
-    assertEquals("Result of @NoDiscard method is ignored", error1.getMessage(null));
     assertEquals(
-        "Result of method returning @NoDiscard type wpilib.robot.Example is ignored",
+        "[WPILib] Result of @NoDiscard method is ignored. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error1.getMessage(null));
+    assertEquals(
+        "[WPILib] Result of method returning @NoDiscard type wpilib.robot.Example is ignored."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
         error2.getMessage(null));
   }
 
@@ -191,7 +204,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Objects of type `Base` must be used", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Objects of type `Base` must be used. If this is intentional, the error may"
+            + " be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -222,7 +238,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Objects implementing `I` must be used", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Objects implementing `I` must be used. If this is intentional, the error"
+            + " may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -257,8 +276,14 @@ class ReturnValueUsedListenerTest {
     assertEquals(2, compilation.errors().size());
     var error1 = compilation.errors().get(0);
     var error2 = compilation.errors().get(1);
-    assertEquals("Objects implementing `I` must be used", error1.getMessage(null));
-    assertEquals("Objects implementing `I2` must be used", error2.getMessage(null));
+    assertEquals(
+        "[WPILib] Objects implementing `I` must be used. If this is intentional, the error"
+            + " may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error1.getMessage(null));
+    assertEquals(
+        "[WPILib] Objects implementing `I2` must be used. If this is intentional, the error"
+            + " may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error2.getMessage(null));
   }
 
   @Test
@@ -287,7 +312,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Custom message", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Custom message. If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -316,7 +344,10 @@ class ReturnValueUsedListenerTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Result of @NoDiscard method is ignored", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Result of @NoDiscard method is ignored. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -357,7 +388,7 @@ class ReturnValueUsedListenerTest {
           @NoDiscard
           Object get() { return null; }
 
-          @SuppressWarnings("NoDiscard")
+          @SuppressWarnings("WPILib.NoDiscard")
           void usage() {
             get();
           }
@@ -407,7 +438,7 @@ class ReturnValueUsedListenerTest {
 
         import org.wpilib.annotation.NoDiscard;
 
-        @SuppressWarnings("NoDiscard")
+        @SuppressWarnings("WPILib.NoDiscard")
         class Example {
           @NoDiscard
           Object get() { return null; }
@@ -570,7 +601,10 @@ class ReturnValueUsedListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
+        "[WPILib] Commands must be used! Did you mean to bind it to a trigger? If this is"
+            + " intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -603,7 +637,10 @@ class ReturnValueUsedListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
+        "[WPILib] Commands must be used! Did you mean to bind it to a trigger? If this is"
+            + " intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -633,6 +670,9 @@ class ReturnValueUsedListenerTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Commands must be used! Did you mean to bind it to a trigger?", error.getMessage(null));
+        "[WPILib] Commands must be used! Did you mean to bind it to a trigger? If this is"
+            + " intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.NoDiscard\")",
+        error.getMessage(null));
   }
 }

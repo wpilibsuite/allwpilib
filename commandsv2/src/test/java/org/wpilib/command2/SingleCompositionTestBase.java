@@ -30,7 +30,7 @@ public abstract class SingleCompositionTestBase<T extends Command> extends Comma
   }
 
   @Test
-  @SuppressWarnings("NoDiscard")
+  @SuppressWarnings("WPILib.NoDiscard")
   void commandInOtherCompositionTest() {
     var command = Commands.none();
     new WrapperCommand(command) {};

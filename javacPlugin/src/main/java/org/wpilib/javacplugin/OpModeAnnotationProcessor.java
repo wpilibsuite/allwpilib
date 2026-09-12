@@ -49,9 +49,9 @@ public class OpModeAnnotationProcessor extends AbstractProcessor {
           // Not an instantiable type
           messager.printMessage(
               Diagnostic.Kind.ERROR,
-              "The @"
+              "[WPILib] The @"
                   + annotationType.getSimpleName()
-                  + " OpMode annotation can only be used on non-abstract classes",
+                  + " OpMode annotation can only be used on non-abstract classes.",
               type);
         }
 
@@ -59,10 +59,10 @@ public class OpModeAnnotationProcessor extends AbstractProcessor {
           // Doesn't implement `OpMode` or extend a class that does
           messager.printMessage(
               Diagnostic.Kind.ERROR,
-              "The @"
+              "[WPILib] The @"
                   + annotationType.getSimpleName()
                   + " OpMode annotation can only be used on classes that implement the "
-                  + "org.wpilib.opmode.OpMode interface or extend a class that does",
+                  + "org.wpilib.opmode.OpMode interface or extend a class that does.",
               type);
         }
       }
