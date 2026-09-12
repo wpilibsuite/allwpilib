@@ -120,6 +120,8 @@ class SchedulerDisabledTests extends CommandTestBase {
     var mech = new DummyMechanism("mech", m_scheduler, true);
     var safeCommand = mech.run(Coroutine::park).named("Safe Command");
 
+    m_enabled = false;
+
     var result = m_scheduler.schedule(safeCommand);
     assertTrue(result instanceof Success(var cmd) && cmd == safeCommand);
 
