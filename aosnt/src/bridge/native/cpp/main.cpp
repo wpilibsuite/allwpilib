@@ -16,10 +16,15 @@
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/print.hpp"
 
+// The system server's NetworkTables instance, which MrcCommDaemon and MrcLib
+// connect to. The channels this bridge publishes are the ones NetworkTables
+// carried there before they moved onto AOS.
+#define ROBOT_SYSTEM_SERVER_NT_PORT 6810
+
 int main(int argc, char** argv) {
   std::string_view config_path = "aos_config.json";
   std::string_view server = "localhost";
-  unsigned int port = NT_DEFAULT_PORT;
+  unsigned int port = ROBOT_SYSTEM_SERVER_NT_PORT;
   std::string_view identity = "aosnt";
 
   // Take our options out of argv. Everything else is AOS's, and InitGoogle
