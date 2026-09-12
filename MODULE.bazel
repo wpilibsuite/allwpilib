@@ -171,9 +171,6 @@ bazel_dep(name = "abseil-cpp", version = "20260526.0")
 single_version_override(
     module_name = "abseil-cpp",
     patch_strip = 1,
-    patches = [
-        "shared/bazel/patches/abseil-cpp/0001-Suppress-pedantic-warnings-for-GNU-int128.patch",
-        "shared/bazel/patches/abseil-cpp/0002-Leave-out-the-Clang-nullability-annotations.patch",
-    ],
+    patches = ["shared/bazel/patches/abseil-cpp/0001-Suppress-pedantic-warnings-for-GNU-int128.patch"],
     version = "20260526.0",
 )
