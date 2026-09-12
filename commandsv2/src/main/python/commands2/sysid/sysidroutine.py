@@ -39,7 +39,7 @@ class SysIdRoutine(SysIdRoutineLog):
 
         :param ramp_rate:    The voltage ramp rate used for quasistatic test routines. Defaults to 1 volt
                             per second if left null.
-        :param step_voltage: The step voltage output used for dynamic test routines. Defaults to 7
+        :param step_voltage: The step voltage output used for dynamic test routines. Defaults to 4
                             volts if left null.
         :param timeout:     Safety timeout for the test routine commands. Defaults to 10 seconds if left
                             null.
@@ -49,7 +49,7 @@ class SysIdRoutine(SysIdRoutineLog):
         """
 
         ramp_rate: volts_per_second = 1.0
-        step_voltage: volts = 7.0
+        step_voltage: volts = 4.0
         timeout: seconds = 10.0
         record_state: Optional[Callable[[State], None]] = None
 
