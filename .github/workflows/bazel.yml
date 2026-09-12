@@ -38,8 +38,14 @@ jobs:
             action: "test"
           - name: "macOS"
             compilation_mode: opt
-            classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug"
-            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-12vcpu-macos-15', 'macOS-15') }}
+            classifier: "osxuniversal,headers,sources,osxuniversalstatic,linuxsystemcore,linuxsystemcorestatic"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
+            container: ""
+            action: "test"
+          - name: "macOS Debug"
+            compilation_mode: dbg
+            classifier: "osxuniversaldebug,osxuniversalstaticdebug,linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
             container: ""
             action: "test"
           - name: "Windows x86-64"
