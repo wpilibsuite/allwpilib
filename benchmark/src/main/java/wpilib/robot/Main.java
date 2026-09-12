@@ -47,14 +47,14 @@ public class Main {
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.NANOSECONDS)
   public void justNewThrowable() {
-    StackTraceGatheringBenchmark.a(false);
+    StackTraceGatheringBenchmark.run(false);
   }
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.NANOSECONDS)
   public void newThrowableGetStackTrace() {
-    StackTraceGatheringBenchmark.a(true);
+    StackTraceGatheringBenchmark.run(true);
   }
 
   @Benchmark

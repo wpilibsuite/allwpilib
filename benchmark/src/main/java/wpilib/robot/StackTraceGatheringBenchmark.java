@@ -1,24 +1,36 @@
 package wpilib.robot;
 
-public class StackTraceGatheringBenchmark {
-    public static void a(boolean getStackTrace) {
-        b(getStackTrace);
-    }
+/**
+ * A benchmark for measuring runtime of `new Throwable()` and `new Throwable().getStackTrace()`. The
+ * long line of nested methods is intended to replicate calling `Scheduler.getDefault().schedule()`
+ * in actual robot code (where the callsite is likely to be highly nested).
+ */
+public final class StackTraceGatheringBenchmark {
+  public static void run(boolean getStackTrace) {
+    method1(getStackTrace);
+  }
 
-    static void b(boolean getStackTrace) {
-        c(getStackTrace);
-    }
+  private static void method1(boolean getStackTrace) {
+    method2(getStackTrace);
+  }
 
-    static void c(boolean getStackTrace) {
-        d(getStackTrace);
-    }
+  private static void method2(boolean getStackTrace) {
+    method3(getStackTrace);
+  }
 
-    static void d(boolean getStackTrace) {
-        e(getStackTrace);
-    }
+  private static void method3(boolean getStackTrace) {
+    method4(getStackTrace);
+  }
 
-    static void e(boolean getStackTrace) {
-        var throwable = new Throwable();
-        if (getStackTrace) throwable.getStackTrace();
+  @SuppressWarnings("PMD.UselessPureMethodCall")
+  private static void method4(boolean getStackTrace) {
+    var throwable = new Throwable();
+    if (getStackTrace) {
+      throwable.getStackTrace();
     }
+  }
+
+  private StackTraceGatheringBenchmark() {
+    throw new UnsupportedOperationException("This is a utility class.");
+  }
 }
