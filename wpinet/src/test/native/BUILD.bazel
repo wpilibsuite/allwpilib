@@ -1,16 +1,47 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
+cc_library(
+    name = "main",
+    srcs = ["cpp/main.cpp"],
+    deps = [
+        "//thirdparty/catch2",
+    ],
+)
+
 cc_test(
-    name = "native",
+    name = "tests",
     size = "small",
-    srcs = glob([
-        "**/*.cpp",
-        "**/*.hpp",
-    ]),
+    srcs = glob(
+        [
+            "**/*.cpp",
+            "**/*.hpp",
+        ],
+        exclude = [
+            "cpp/main.cpp",
+            "cpp/MulticastTest.cpp",
+        ],
+    ),
     tags = ["no-asan"],
     deps = [
+        ":main",
         "//thirdparty/catch2",
         "//wpinet",
         "//wpiutil:wpiutil-testlib",
+    ],
+)
+
+cc_test(
+    name = "MulticastTest",
+    size = "small",
+    srcs = ["cpp/MulticastTest.cpp"],
+    tags = [
+        "no-asan",
+        "no-remote-exec",  # requires avahi-daemon
+    ],
+    deps = [
+        ":main",
+        "//thirdparty/catch2",
+        "//wpinet",
     ],
 )
