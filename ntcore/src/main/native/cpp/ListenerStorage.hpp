@@ -70,6 +70,7 @@ class ListenerStorage final : public IListenerStorage {
   NT_Listener DoAddListener(NT_ListenerPoller pollerHandle);
   std::vector<std::pair<NT_Listener, unsigned int>> DoRemoveListeners(
       std::span<const NT_Listener> handles);
+  void DoReset();
 
   int m_inst;
   mutable wpi::util::mutex m_mutex;
@@ -113,6 +114,7 @@ class ListenerStorage final : public IListenerStorage {
     wpi::util::DenseMap<NT_Listener, ListenerCallback> m_callbacks;
     wpi::util::Event m_waitQueueWakeup;
     wpi::util::Event m_waitQueueWaiter;
+    bool m_shutdown{false};
   };
   wpi::util::SafeThreadOwner<Thread> m_thread;
 };
