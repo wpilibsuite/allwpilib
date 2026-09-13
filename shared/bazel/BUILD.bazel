@@ -16,6 +16,9 @@ gcc_flags = [
 
 platform(
     name = "systemcore",
+    # AOS compiles its AIO backend in rather than probing for one, and defaults
+    # to epoll for any platform that does not say. A SystemCore runs 6.12.
+    constraint_values = ["@aos//tools/platforms/io_uring:has_support"],
     flags = [
     ] + gcc_flags,
     parents = [
