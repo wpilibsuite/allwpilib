@@ -28,13 +28,13 @@ public class HatchMechanism implements Mechanism, TelemetryLoggable {
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(FORWARD)).named("Grab Hatch");
+    return this.runOnce(() -> hatchSolenoid.set(FORWARD)).named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
+    return this.runOnce(() -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
   }
 
   @Override
