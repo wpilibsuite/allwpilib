@@ -53,6 +53,11 @@ import org.wpilib.units.measure.Time;
  * <td>On a rising edge</td>
  * <td>Yes</td>
  * </tr>
+ * <tr>
+ * <td>{@link #retryWhileTrue(Command)}</td>
+ * <td>On every true poll</td>
+ * <td>Yes</td>
+ * </tr>
  * </table>
  *
  * <p>Trigger bindings created inside a running command will only be active while that command is
