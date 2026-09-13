@@ -15,9 +15,18 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "wpi/datalog/DataLogReader.hpp"
+#include "wpi/util/Logger.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 
 namespace {
+
+struct MessageLog {
+  std::vector<std::string> messages;
+  wpi::util::Logger logger{
+      [this](unsigned int, const char*, unsigned int, const char* msg) {
+        messages.emplace_back(msg);
+      }};
+};
 
 struct DrainCallbackState {
   DrainCallbackState()
@@ -45,6 +54,7 @@ struct AutomaticOutputState {
 TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
           "[datalog][background-writer]") {
   std::string extraHeader(1024 * 1024, 'x');
+  MessageLog msglog;
   std::vector<uint8_t> output;
   std::promise<void> headerWrittenPromise;
   auto headerWritten = headerWrittenPromise.get_future();
@@ -52,6 +62,7 @@ TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
   int entry;
   {
     wpi::log::DataLogBackgroundWriter writer{
+        msglog.logger,
         [&](std::span<const uint8_t> data) {
           output.insert(output.end(), data.begin(), data.end());
           if (!headerWasWritten && output.size() >= extraHeader.size() + 12) {
@@ -67,9 +78,12 @@ TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
     writer.AppendInteger(entry, 42, 2);
   }
 
+  REQUIRE(msglog.messages.size() == 1);
+  CHECK(msglog.messages[0].starts_with("outgoing buffers exceeded threshold"));
   wpi::log::DataLogReader reader{
       wpi::util::MemoryBuffer::GetMemBufferCopy(output, "large-header")};
   REQUIRE(reader.IsValid());
+  CHECK(reader.GetExtraHeader() == extraHeader);
   bool found = false;
   for (const auto& record : reader) {
     int64_t value;
@@ -83,8 +97,10 @@ TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
 
 TEST_CASE("DataLogBackgroundWriterTest ConcurrentDrainDoesNotDeadlock",
           "[datalog][background-writer]") {
+  auto msglog = std::make_shared<MessageLog>();
   auto writer = std::make_unique<wpi::log::DataLogBackgroundWriter>(
-      [](std::span<const uint8_t>) {}, 0.0);
+      // Keep the logger alive if the writer is leaked on a deadlock.
+      msglog->logger, [msglog](std::span<const uint8_t>) {}, 0.0);
   auto* writerPtr = writer.get();
   int entry = writerPtr->Start("raw", "raw", {}, 1);
   auto payload = std::make_shared<std::vector<uint8_t>>(2 * 1024 * 1024);
@@ -107,6 +123,11 @@ TEST_CASE("DataLogBackgroundWriterTest ConcurrentDrainDoesNotDeadlock",
   }
   producer.join();
   writer.reset();
+  CHECK_FALSE(msglog->messages.empty());
+  CHECK(msglog->messages.size() <= 8);
+  for (const auto& message : msglog->messages) {
+    CHECK(message.starts_with("outgoing buffers exceeded threshold"));
+  }
 }
 
 TEST_CASE("DataLogBackgroundWriterTest NegativePeriodFlushesAutomatically",
