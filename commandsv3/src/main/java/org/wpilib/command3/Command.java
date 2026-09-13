@@ -134,6 +134,16 @@ public interface Command {
   }
 
   /**
+   * An optional lifecycle hook that can be implemented to execute some code whenever this command
+   * exits, regardless of exit condition (natural completion, cancellation, or interruption).
+   * Commands should be careful to do a single-shot cleanup (for example, setting a motor to zero
+   * volts) and not do any complex looping logic here.
+   */
+  default void onExit() {
+    // NOP by default
+  }
+
+  /**
    * The name of the command.
    *
    * @return the name of the command
