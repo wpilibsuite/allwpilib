@@ -59,6 +59,14 @@ public final class Twist3d implements ProtobufSerializable, StructSerializable {
   }
 
   /**
+  * Returns a Twist2d representation with the X Rotation
+  * @return The Twist2d of the robot
+  */
+  public Twist2d toTwist2d(){
+    return new Twist2d(dx, dy, rx);
+  }
+
+  /**
    * Obtain a new Transform3d from a (constant curvature) velocity.
    *
    * <p>See <a href="https://file.tavsys.net/control/controls-engineering-in-frc.pdf">Controls
