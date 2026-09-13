@@ -38,6 +38,11 @@
     <Class name="org.wpilib.framework.OpModeRobot" />
   </Match>
   <Match>
+    <!-- We explicitly call System.gc() in tests to test behavior when weak references are garbage collected. -->
+    <Bug pattern="DM_GC" />
+    <Class name="~org\.wpilib\..*Test" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />
