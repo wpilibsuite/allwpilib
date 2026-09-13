@@ -13,14 +13,11 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * Validates opmode annotations {@code @Autonomous}, {@code @Teleop}, {@code @Utility}.
@@ -61,13 +58,9 @@ public class OpModeAnnotationValidator implements TaskListener {
     }
   }
 
-  private final class Scanner extends TreeScanner<Void, Void> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<Void, Void> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, OpModeAnnotationValidator.this.m_task);
     }
 
     @Override
@@ -127,12 +120,12 @@ public class OpModeAnnotationValidator implements TaskListener {
         return;
       }
 
-      m_trees.printMessage(
-          Diagnostic.Kind.ERROR,
-          "@%s opmode %s must be <= %d characters (was %d)"
+      printError(
+          "@%s opmode %s must be <= %d characters (was %d)."
               .formatted(typeName, fieldName, max, value.length()),
           valueExpr,
-          m_root);
+          null // not suppressible
+          );
     }
 
     private String evaluateStringConstant(ExpressionTree expr) {

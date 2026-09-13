@@ -45,12 +45,14 @@ class OpModeAnnotationProcessorTest {
             .compile(JavaFileObjects.forSourceString("example.Example", source));
 
     final String nonAbstractErrorMessage =
-        "The @" + annotationName + " OpMode annotation can only be used on non-abstract classes";
+        "[WPILib] The @"
+            + annotationName
+            + " OpMode annotation can only be used on non-abstract classes.";
     final String implementationErrorMessage =
-        "The @"
+        "[WPILib] The @"
             + annotationName
             + " OpMode annotation can only be used on classes that implement the "
-            + "org.wpilib.opmode.OpMode interface or extend a class that does";
+            + "org.wpilib.opmode.OpMode interface or extend a class that does.";
 
     if (!inherit) {
       assertThat(compilation).failed();
