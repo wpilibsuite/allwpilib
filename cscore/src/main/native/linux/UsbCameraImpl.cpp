@@ -357,7 +357,10 @@ UsbCameraImpl::UsbCameraImpl(std::string_view name, wpi::util::Logger& logger,
 }
 
 UsbCameraImpl::~UsbCameraImpl() {
-  m_active = false;
+  {
+    std::scoped_lock lock(m_mutex);
+    m_active = false;
+  }
 
   // Just in case anyone is waiting...
   m_responseCv.notify_all();
