@@ -49,6 +49,8 @@ public class Trigger implements BooleanSupplier {
   private final EventLoop m_loop;
   private final Scheduler m_scheduler;
 
+  private Signal m_lastPolledSignal;
+
   /** The value of the signal before the most recent call to {@link #poll()}. May be null. */
   private Signal m_previousSignal;
 
@@ -56,6 +58,7 @@ public class Trigger implements BooleanSupplier {
   private Signal m_cachedSignal;
 
   private final Map<BindingType, List<Binding>> m_bindings = new EnumMap<>(BindingType.class);
+  private final List<Runnable> m_updateDependencies = new ArrayList<>();
   private final Runnable m_eventLoopCallback = this::poll;
   private boolean m_bound = true;
   private final BindingScope m_creationScope;
@@ -106,9 +109,15 @@ public class Trigger implements BooleanSupplier {
    */
   @SuppressWarnings("this-escape")
   public Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition) {
+    this(scheduler, loop, condition, List.of());
+  }
+
+  @SuppressWarnings("this-escape")
+  private Trigger(Scheduler scheduler, EventLoop loop, BooleanSupplier condition, List<Runnable> dependencies) {
     m_scheduler = requireNonNullParam(scheduler, "scheduler", "Trigger");
     m_loop = requireNonNullParam(loop, "loop", "Trigger");
     m_condition = requireNonNullParam(condition, "condition", "Trigger");
+    m_updateDependencies.addAll(dependencies);
 
     // Treat robot mode scopes as globals for the purposes of trigger object lifetimes.
     // Any bindings made to the trigger will still use the appropriate scopes, but this prevents
@@ -257,6 +266,17 @@ public class Trigger implements BooleanSupplier {
     return m_cachedSignal == Signal.HIGH;
   }
 
+  private List<Runnable> getDependencies(BooleanSupplier... others) {
+    List<Runnable> deps = new ArrayList<>();
+    deps.add(this::update);
+    for (BooleanSupplier other : others) {
+      if (other instanceof Trigger parent) {
+        deps.add(parent::update);
+      }
+    }
+    return deps;
+  }
+
   /**
    * Composes two triggers with logical AND.
    *
@@ -264,7 +284,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when both component triggers are active.
    */
   public Trigger and(BooleanSupplier trigger) {
-    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() && trigger.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() && trigger.getAsBoolean(), getDependencies(trigger));
   }
 
   /**
@@ -274,7 +294,7 @@ public class Trigger implements BooleanSupplier {
    * @return A trigger which is active when either component trigger is active.
    */
   public Trigger or(BooleanSupplier trigger) {
-    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() || trigger.getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> getAsBoolean() || trigger.getAsBoolean(), getDependencies(trigger));
   }
 
   /**
@@ -284,7 +304,7 @@ public class Trigger implements BooleanSupplier {
    * @return the negated trigger
    */
   public Trigger negate() {
-    return new Trigger(m_scheduler, m_loop, () -> !getAsBoolean());
+    return new Trigger(m_scheduler, m_loop, () -> !getAsBoolean(), getDependencies());
   }
 
   /**
@@ -308,7 +328,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger debounce(Time duration, Debouncer.DebounceType type) {
     var debouncer = new Debouncer(duration.in(Seconds), type);
-    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(getAsBoolean()));
+    return new Trigger(m_scheduler, m_loop, () -> debouncer.calculate(getAsBoolean()), getDependencies());
   }
 
   /**
@@ -323,7 +343,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger risingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW);
+            m_scheduler, m_loop, () -> m_cachedSignal == Signal.HIGH && m_previousSignal == Signal.LOW, getDependencies());
   }
 
   /**
@@ -338,7 +358,7 @@ public class Trigger implements BooleanSupplier {
    */
   public Trigger fallingEdge() {
     return new Trigger(
-        m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH);
+            m_scheduler, m_loop, () -> m_cachedSignal == Signal.LOW && m_previousSignal == Signal.HIGH, getDependencies());
   }
 
   /**
@@ -393,9 +413,21 @@ public class Trigger implements BooleanSupplier {
               m_timestamps.removeFirst();
             }
 
-            return m_timestamps.size() >= pressCount;
-          }
-        });
+                return m_timestamps.size() >= pressCount;
+              }
+            }, getDependencies());
+  }
+
+  /**
+   * Updates the trigger's cached signal value. This is useful if the trigger's to be used in the same loop its cached
+   * signal was updated.
+   */
+  public void update() {
+    for (int i = 0; i < m_updateDependencies.size(); i++) {
+      m_updateDependencies.get(i).run();
+    }
+    m_previousSignal = m_cachedSignal;
+    m_cachedSignal = readSignal();
   }
 
   private void poll() {
@@ -404,8 +436,9 @@ public class Trigger implements BooleanSupplier {
     // and those scopes may become inactive.
     clearStaleBindings();
 
-    m_previousSignal = m_cachedSignal;
+    m_previousSignal = m_lastPolledSignal;
     m_cachedSignal = readSignal();
+    m_lastPolledSignal = m_cachedSignal;
 
     // Always attempt to schedule bindings based on the current signal
     if (m_cachedSignal == Signal.HIGH) {
