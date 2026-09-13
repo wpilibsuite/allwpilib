@@ -20,6 +20,7 @@ class CommandTestBase {
   protected long m_opModeId = 0;
   protected String m_opModeName = "";
   protected RobotMode m_robotMode = RobotMode.UNKNOWN;
+  protected boolean m_enabled = true;
 
   @BeforeEach
   void initScheduler() {
@@ -47,14 +48,20 @@ class CommandTestBase {
           RobotMode getRobotMode() {
             return m_robotMode;
           }
+
+          @Override
+          boolean isEnabled() {
+            return m_enabled;
+          }
         });
   }
 
   @AfterEach
-  void resetOpmodeFetcher() {
+  void resetRobotState() {
     m_opModeId = 0;
     m_opModeName = "";
     m_robotMode = RobotMode.UNKNOWN;
+    m_enabled = true;
   }
 
   /**

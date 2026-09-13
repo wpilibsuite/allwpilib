@@ -151,13 +151,12 @@ public final class Coroutine {
    * forked and failed commands.
    */
   public final class ForkResult {
-    private final List<? extends Command> m_forkedCommands;
-    private final List<? extends ScheduleResult.Failure> m_failedCommands;
+    private final List<Command> m_forkedCommands;
+    private final List<ScheduleResult.Failure> m_failedCommands;
 
     // private - only the coroutine can construct these
     private ForkResult(
-        Collection<? extends Command> forkedCommands,
-        List<? extends ScheduleResult.Failure> failedCommands) {
+        Collection<Command> forkedCommands, List<ScheduleResult.Failure> failedCommands) {
       m_forkedCommands = List.copyOf(forkedCommands);
       m_failedCommands = List.copyOf(failedCommands);
     }
@@ -215,7 +214,7 @@ public final class Coroutine {
      *
      * @return The list of failed commands.
      */
-    public List<? extends ScheduleResult.Failure> getFailedCommands() {
+    public List<ScheduleResult.Failure> getFailedCommands() {
       return m_failedCommands;
     }
 
@@ -225,7 +224,7 @@ public final class Coroutine {
      *
      * @return The list of forked commands.
      */
-    public List<? extends Command> getForkedCommands() {
+    public List<Command> getForkedCommands() {
       return m_forkedCommands;
     }
   }
