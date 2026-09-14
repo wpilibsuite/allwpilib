@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <format>
 #include <memory>
@@ -350,12 +351,15 @@ struct FlatbufferToProto::Walker {
           const int64_t integer =
               flatbuffers::GetAnyFieldI(table, *field.field);
           const double real = flatbuffers::GetAnyFieldF(table, *field.field);
-          // proto3 omits a scalar equal to its default.
-          const bool isDefault =
+          // proto3 omits a scalar that is zero, and a receiver reads a missing
+          // one as zero. The flatbuffer default is not the protobuf default,
+          // so an unset field with a nonzero default is written. -0.0 is not
+          // zero here, as it is not to protobuf.
+          const bool isZero =
               flatbuffers::IsFloat(field.field->type()->base_type())
-                  ? real == field.field->default_real()
-                  : integer == field.field->default_integer();
-          if (!isDefault &&
+                  ? real == 0.0 && !std::signbit(real)
+                  : integer == 0;
+          if (!isZero &&
               (!pb_encode_tag(stream, GetWireType(field.type), number) ||
                !WriteScalar(stream, field.type, integer, real))) {
             return false;

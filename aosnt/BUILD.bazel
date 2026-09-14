@@ -87,6 +87,8 @@ cc_test(
     deps = [
         ":aosnt",
         "//aosnt/src/test/fbs:flatbuffer_to_proto_bad_attribute_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_schema",
         "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_fbs",
         "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_schema",
         "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_fbs",

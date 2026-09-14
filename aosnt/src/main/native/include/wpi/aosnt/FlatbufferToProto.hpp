@@ -46,8 +46,9 @@ namespace wpi::aosnt {
  *   sfixed64. Without it, integers are plain varints, floats are fixed32, and
  *   doubles are fixed64.
  *
- * Scalars equal to their default are omitted and repeated scalars are packed,
- * matching proto3.
+ * Scalars that are zero are omitted and repeated scalars are packed, matching
+ * proto3. A flatbuffer default is not a protobuf default, so a table field left
+ * unset at a nonzero default is written with that default.
  */
 class FlatbufferToProto {
  public:

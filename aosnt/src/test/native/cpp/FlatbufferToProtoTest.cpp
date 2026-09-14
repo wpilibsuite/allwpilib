@@ -29,6 +29,8 @@
 #include "aos/flatbuffers/builder.h"
 #include "aos/realtime.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_bad_attribute_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_generated.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_scalars_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_scalars_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_spanning_test_generated.h"
@@ -61,6 +63,10 @@ const reflection::Schema* GetSpanningSchema() {
 
 const reflection::Schema* GetBadAttributeSchema() {
   return GetSchemaFromSpan(BadAttributeSchema());
+}
+
+const reflection::Schema* GetDefaultsSchema() {
+  return GetSchemaFromSpan(DefaultsSchema());
 }
 
 // One field as it is on the wire, decoded without reference to any
@@ -534,6 +540,83 @@ TEST_CASE("FlatbufferToProtoTest OmitsDefaults",
   CHECK(Find(fields, 2) == nullptr);
   REQUIRE(Find(fields, 5) != nullptr);
   CHECK(Find(fields, 5)->value == 7u);
+}
+
+// proto3 reads a missing scalar as zero, so a flatbuffer default of anything
+// else has to be written even when the field was never set.
+TEST_CASE("FlatbufferToProtoDefaultsTest WritesAnUnsetNonzeroDefault",
+          "[aosnt][flatbuffer-to-proto]") {
+  flatbuffers::FlatBufferBuilder fbb;
+  DefaultsBuilder builder{fbb};
+  fbb.Finish(builder.Finish());
+  const flatbuffers::DetachedBuffer buffer = fbb.Release();
+
+  const FlatbufferToProto translator{GetDefaultsSchema()};
+  const std::vector<uint8_t> encoded = Encode(translator, buffer.data());
+  const std::vector<WireField> fields = Decode(encoded);
+
+  REQUIRE(Find(fields, 1) != nullptr);
+  CHECK(Find(fields, 1)->value == 5u);
+  REQUIRE(Find(fields, 2) != nullptr);
+  CHECK(Find(fields, 2)->value == DoubleBits(1.5));
+  REQUIRE(Find(fields, 3) != nullptr);
+  CHECK(Find(fields, 3)->value == 1u);
+  CHECK(Find(fields, 4) == nullptr);
+
+  UpbDecoder decoder{BuildFileDescriptorProto(
+      GetDefaultsSchema(), "flatbuffer_to_proto_defaults_test.proto")};
+  const upb_MessageDef* defaults =
+      decoder.FindMessage(GetProtoMessageName(GetDefaultsSchema()));
+  const upb_Message* message = decoder.Decode(defaults, encoded);
+  CHECK(GetField(message, defaults, "mode").int32_val == 5);
+  CHECK(GetField(message, defaults, "gain").double_val == 1.5);
+  CHECK(GetField(message, defaults, "enabled").bool_val);
+}
+
+// Zero is what a receiver assumes, so it is omitted even where the flatbuffer
+// default is something else.
+TEST_CASE("FlatbufferToProtoDefaultsTest OmitsAZeroThatOverridesADefault",
+          "[aosnt][flatbuffer-to-proto]") {
+  flatbuffers::FlatBufferBuilder fbb;
+  DefaultsBuilder builder{fbb};
+  builder.add_mode(0);
+  builder.add_gain(0.0);
+  builder.add_enabled(false);
+  fbb.Finish(builder.Finish());
+  const flatbuffers::DetachedBuffer buffer = fbb.Release();
+
+  const FlatbufferToProto translator{GetDefaultsSchema()};
+  const std::vector<uint8_t> encoded = Encode(translator, buffer.data());
+  CHECK(Decode(encoded).empty());
+
+  UpbDecoder decoder{BuildFileDescriptorProto(
+      GetDefaultsSchema(), "flatbuffer_to_proto_defaults_test.proto")};
+  const upb_MessageDef* defaults =
+      decoder.FindMessage(GetProtoMessageName(GetDefaultsSchema()));
+  const upb_Message* message = decoder.Decode(defaults, encoded);
+  CHECK(GetField(message, defaults, "mode").int32_val == 0);
+  CHECK(GetField(message, defaults, "gain").double_val == 0.0);
+  CHECK_FALSE(GetField(message, defaults, "enabled").bool_val);
+}
+
+// -0.0 compares equal to 0.0, but its bits are not zero, and protobuf writes
+// it.
+TEST_CASE("FlatbufferToProtoDefaultsTest WritesNegativeZero",
+          "[aosnt][flatbuffer-to-proto]") {
+  flatbuffers::FlatBufferBuilder fbb;
+  // The builder skips a value equal to the default, and -0.0f == 0.0f.
+  fbb.ForceDefaults(true);
+  DefaultsBuilder builder{fbb};
+  builder.add_offset(-0.0f);
+  fbb.Finish(builder.Finish());
+  const flatbuffers::DetachedBuffer buffer = fbb.Release();
+
+  const FlatbufferToProto translator{GetDefaultsSchema()};
+  const std::vector<WireField> fields =
+      Decode(Encode(translator, buffer.data()));
+  REQUIRE(Find(fields, 4) != nullptr);
+  CHECK(Find(fields, 4)->wireType == PB_WT_32BIT);
+  CHECK(Find(fields, 4)->value == FloatBits(-0.0f));
 }
 
 // aos::ScopedRealtime makes any allocation inside Encode() fatal.
