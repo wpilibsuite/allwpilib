@@ -20,6 +20,16 @@ cc_library(
 cc_binary(
     name = "aosnt-bridge",
     srcs = ["src/bridge/native/cpp/main.cpp"],
+    # The Linux toolchains export every symbol (-rdynamic), which costs 1.3 MB
+    # of symbol tables on a SystemCore and keeps every function a
+    # --gc-sections root. Nothing loads the bridge's symbols dynamically.
+    linkopts = select({
+        "@platforms//os:linux": [
+            "-Wl,--no-export-dynamic",
+            "-Wl,--gc-sections",
+        ],
+        "//conditions:default": [],
+    }),
     deps = [
         ":aosnt",
         "//ntcore",
