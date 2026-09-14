@@ -33,6 +33,9 @@ java_package_configuration(
         "-Xlint:-serial",
         # ignore unclaimed annotation warning from annotation processing
         "-Xlint:-processing",
+        # ignore module warnings for requirements on automatic modules (opencv, quickbuf)
+        "-Xlint:-requires-automatic",
+        "-Xlint:-requires-transitive-automatic",
         # ignore warnings for classes missing explicit constructors
         "-Xlint:-missing-explicit-ctor",
     ],
