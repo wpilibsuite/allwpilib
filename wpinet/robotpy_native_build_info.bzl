@@ -12,9 +12,11 @@ def define_native_wrapper(name, pyproject_toml = None):
             "src/main/native/thirdparty/tcpsockets/include/**",
         ]) + [
             "@libuv//:include_files",
+        ] + [
+            "//:LICENSE.md",
         ],
         out = "native/wpinet/include",
-        include_external_repositories = ["libuv*"],
+        include_external_repositories = ["*libuv*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
             "include": "",

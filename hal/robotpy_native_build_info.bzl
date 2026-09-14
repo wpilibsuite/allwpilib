@@ -6,11 +6,17 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]),
+        srcs = native.glob(["src/main/native/include/**"]) + [
+            "@mrclib_headers//:all_headers",
+        ] + [
+            "//:LICENSE.md",
+        ],
         out = "native/wpihal/include",
+        include_external_repositories = ["*mrclib_headers*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
             "hal/src/main/native/include": "",
+            "include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
