@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 #include <span>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -119,19 +120,42 @@ class FlatbufferToProto {
 std::string_view GetProtoMessageName(const reflection::Schema* schema);
 
 /**
- * Builds the serialized FileDescriptorProto describing a schema, for
- * NetworkTables' and DataLog's schema registries.
+ * Gets the name of the FileDescriptorProto a message is described in: its full
+ * name with the package spelled as directories, the way protobuf files are, and
+ * ".proto" on the end.
  *
- * Every object in the schema has to share the root table's namespace, since a
- * FileDescriptorProto has exactly one package.
+ * @param messageName message full name
+ * @return file name
+ */
+std::string GetProtoFileName(std::string_view messageName);
+
+/** A serialized FileDescriptorProto and the file name recorded in it. */
+struct ProtoFile {
+  /** The file name, as GetProtoFileName() gives it. */
+  std::string name;
+  /** The serialized FileDescriptorProto. */
+  std::vector<uint8_t> descriptor;
+};
+
+/**
+ * Builds the serialized FileDescriptorProtos describing a schema's root table
+ * and everything it refers to, for NetworkTables' and DataLog's schema
+ * registries.
+ *
+ * Each message is described in a file of its own, named after it, which
+ * depends on the files of the messages it refers to. Two schemas that share a
+ * message therefore describe it in the same file, which a registry loads once,
+ * rather than each defining it again. Tables that refer to each other in a
+ * cycle share the file of the first of them by name, since protobuf files
+ * cannot depend on each other in a cycle.
  *
  * @param schema schema
- * @param fileName The file name to record in the descriptor.
- * @return serialized FileDescriptorProto
- * @throws std::invalid_argument if the schema has no root table, spans
- *         namespaces, or contains something with no protobuf equivalent
+ * @return the files, each after every file it depends on
+ * @throws std::invalid_argument if the schema has no root table, contains
+ *         something with no protobuf equivalent, or has tables in different
+ *         namespaces that refer to each other in a cycle
  */
-std::vector<uint8_t> BuildFileDescriptorProto(const reflection::Schema* schema,
-                                              std::string_view fileName);
+std::vector<ProtoFile> BuildFileDescriptorProtos(
+    const reflection::Schema* schema);
 
 }  // namespace wpi::aosnt

@@ -1,4 +1,5 @@
 load("@aos//aos:flatbuffers.bzl", "cc_static_flatbuffer")
+load("@aos//aos/flatbuffers:cc.bzl", "flatbuffer_cc_library")
 load("@aos//aos/flatbuffers:generate.bzl", "static_flatbuffer")
 
 # Schemas for FlatbufferToProtoTest. They are a package of their own so the
@@ -32,6 +33,15 @@ static_flatbuffer(
 static_flatbuffer(
     name = "flatbuffer_to_proto_arrays_test_fbs",
     srcs = ["flatbuffer_to_proto_arrays_test.fbs"],
+    visibility = ["//aosnt:__pkg__"],
+)
+
+# AOS's static flatbuffer API cannot generate recursive tables, so this one is
+# plain flatc.
+flatbuffer_cc_library(
+    name = "flatbuffer_to_proto_recursive_test_fbs",
+    srcs = ["flatbuffer_to_proto_recursive_test.fbs"],
+    gen_reflections = True,
     visibility = ["//aosnt:__pkg__"],
 )
 
@@ -80,5 +90,40 @@ cc_static_flatbuffer(
     name = "flatbuffer_to_proto_arrays_test_schema",
     function = "wpi::aosnt::testing::ArraysSchema",
     target = ":flatbuffer_to_proto_arrays_test_fbs_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_recursive_test_schema",
+    function = "wpi::aosnt::testing::RecursiveSchema",
+    target = ":flatbuffer_to_proto_recursive_test_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+# Only the schema is used, so plain flatc is enough.
+flatbuffer_cc_library(
+    name = "flatbuffer_to_proto_conflict_first_test_fbs",
+    srcs = ["flatbuffer_to_proto_conflict_first_test.fbs"],
+    gen_reflections = True,
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_conflict_first_test_schema",
+    function = "wpi::aosnt::testing::conflict::ConflictFirstSchema",
+    target = ":flatbuffer_to_proto_conflict_first_test_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+# Only the schema is used, so plain flatc is enough.
+flatbuffer_cc_library(
+    name = "flatbuffer_to_proto_conflict_second_test_fbs",
+    srcs = ["flatbuffer_to_proto_conflict_second_test.fbs"],
+    gen_reflections = True,
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_conflict_second_test_schema",
+    function = "wpi::aosnt::testing::conflict::ConflictSecondSchema",
+    target = ":flatbuffer_to_proto_conflict_second_test_fbs_reflection_out",
     visibility = ["//aosnt:__pkg__"],
 )

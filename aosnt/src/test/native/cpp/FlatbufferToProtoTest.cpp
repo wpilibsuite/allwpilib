@@ -7,6 +7,7 @@
 #include <array>
 #include <cstring>
 #include <format>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -35,6 +36,8 @@
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_bad_attribute_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_recursive_test_generated.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_recursive_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_scalars_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_scalars_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_spanning_test_generated.h"
@@ -75,6 +78,10 @@ const reflection::Schema* GetDefaultsSchema() {
 
 const reflection::Schema* GetArraysSchema() {
   return GetSchemaFromSpan(ArraysSchema());
+}
+
+const reflection::Schema* GetRecursiveSchema() {
+  return GetSchemaFromSpan(RecursiveSchema());
 }
 
 // One field as it is on the wire, decoded without reference to any
@@ -188,22 +195,37 @@ uint64_t DoubleBits(double value) {
   return bits;
 }
 
-// Loads a descriptor into upb and decodes messages with it, the way DataLog
-// and Glass read protobuf topics.
+// Loads descriptors into one upb pool and decodes messages with it, the way
+// DataLog and Glass read protobuf topics.
 class UpbDecoder {
  public:
-  explicit UpbDecoder(std::span<const uint8_t> descriptor) {
-    google_protobuf_FileDescriptorProto* file =
-        google_protobuf_FileDescriptorProto_parse(
-            reinterpret_cast<const char*>(descriptor.data()), descriptor.size(),
-            m_arena.get());
-    INFO("the descriptor is not valid protobuf");
-    REQUIRE(file != nullptr);
-    upb_Status status;
-    upb_Status_Clear(&status);
-    const bool added = upb_DefPool_AddFile(m_pool.get(), file, &status);
-    INFO("upb rejected the descriptor: " << upb_Status_ErrorMessage(&status));
-    REQUIRE(added);
+  explicit UpbDecoder(const std::vector<ProtoFile>& files) { Add(files); }
+
+  // Adds files in order, skipping any already added, as NetworkTables
+  // registers a schema once. A file added again has to be identical.
+  void Add(const std::vector<ProtoFile>& files) {
+    for (const ProtoFile& file : files) {
+      auto [it, inserted] = m_added.try_emplace(file.name, file.descriptor);
+      if (!inserted) {
+        INFO(file.name << " was described differently");
+        REQUIRE(it->second == file.descriptor);
+        continue;
+      }
+      google_protobuf_FileDescriptorProto* parsed =
+          google_protobuf_FileDescriptorProto_parse(
+              reinterpret_cast<const char*>(file.descriptor.data()),
+              file.descriptor.size(), m_arena.get());
+      {
+        INFO(file.name << " is not valid protobuf");
+        REQUIRE(parsed != nullptr);
+      }
+      upb_Status status;
+      upb_Status_Clear(&status);
+      const bool added = upb_DefPool_AddFile(m_pool.get(), parsed, &status);
+      INFO("upb rejected " << file.name << ": "
+                           << upb_Status_ErrorMessage(&status));
+      REQUIRE(added);
+    }
   }
 
   const upb_MessageDef* FindMessage(std::string_view name) {
@@ -236,6 +258,7 @@ class UpbDecoder {
 
   std::unique_ptr<upb_Arena, ArenaDeleter> m_arena{upb_Arena_New()};
   std::unique_ptr<upb_DefPool, DefPoolDeleter> m_pool{upb_DefPool_New()};
+  std::map<std::string, std::vector<uint8_t>> m_added;
 };
 
 const upb_FieldDef* FindField(const upb_MessageDef* def, const char* name) {
@@ -503,23 +526,123 @@ TEST_CASE("FlatbufferToProtoTest EncodesFromTheStaticApi",
         Encode(translator, buffer.data()));
 }
 
-// The wire format has no notion of a package, so only the descriptor refuses.
-TEST_CASE("FlatbufferToProtoTest RefusesToDescribeASchemaSpanningNamespaces",
+// Each message's file carries its own package, so a schema can span namespaces.
+TEST_CASE("FlatbufferToProtoTest DescribesASchemaSpanningNamespaces",
           "[aosnt][flatbuffer-to-proto]") {
   const reflection::Schema* schema = GetSpanningSchema();
-
-  CHECK_THROWS_WITH(BuildFileDescriptorProto(schema, "spanning.proto"),
-                    Catch::Matchers::ContainsSubstring(
-                        "is not in the root table's namespace"));
+  UpbDecoder decoder{BuildFileDescriptorProtos(schema)};
+  const upb_MessageDef* spanning =
+      decoder.FindMessage(GetProtoMessageName(schema));
 
   flatbuffers::FlatBufferBuilder fbb;
+  ControlDataBuilder controlData{fbb};
+  controlData.add_match_time(135);
+  const auto controlDataOffset = controlData.Finish();
   spanning::SpanningBuilder builder{fbb};
+  builder.add_control_data(controlDataOffset);
   fbb.Finish(builder.Finish());
   const flatbuffers::DetachedBuffer buffer = fbb.Release();
 
   const FlatbufferToProto translator{schema};
-  std::vector<uint8_t> out(translator.GetEncodedSize(buffer.data()));
-  CHECK(translator.Encode(buffer.data(), out) == out.size());
+  const upb_Message* message =
+      decoder.Decode(spanning, Encode(translator, buffer.data()));
+  const upb_FieldDef* controlDataField = FindField(spanning, "control_data");
+  const upb_Message* nested =
+      upb_Message_GetFieldByDef(message, controlDataField).msg_val;
+  REQUIRE(nested != nullptr);
+  CHECK(GetField(nested, upb_FieldDef_MessageSubDef(controlDataField),
+                 "match_time")
+            .int32_val == 135);
+}
+
+// One file per message, named after it, each after the files it depends on.
+TEST_CASE("FlatbufferToProtoTest DescribesEachMessageInItsOwnFile",
+          "[aosnt][flatbuffer-to-proto]") {
+  const std::vector<ProtoFile> files =
+      BuildFileDescriptorProtos(GetControlDataSchema());
+
+  std::vector<std::string> names;
+  for (const ProtoFile& file : files) {
+    names.push_back(file.name);
+  }
+  CHECK(names ==
+        std::vector<std::string>{"wpi/aosnt/testing/FingerData.proto",
+                                 "wpi/aosnt/testing/TouchpadData.proto",
+                                 "wpi/aosnt/testing/JoystickData.proto",
+                                 "wpi/aosnt/testing/ControlData.proto"});
+
+  upb_Arena* arena = upb_Arena_New();
+  const google_protobuf_FileDescriptorProto* controlData =
+      google_protobuf_FileDescriptorProto_parse(
+          reinterpret_cast<const char*>(files.back().descriptor.data()),
+          files.back().descriptor.size(), arena);
+  REQUIRE(controlData != nullptr);
+  size_t count = 0;
+  const upb_StringView* dependencies =
+      google_protobuf_FileDescriptorProto_dependency(controlData, &count);
+  REQUIRE(count == 1u);
+  CHECK(std::string_view(dependencies[0].data, dependencies[0].size) ==
+        "wpi/aosnt/testing/JoystickData.proto");
+  size_t messages = 0;
+  google_protobuf_FileDescriptorProto_message_type(controlData, &messages);
+  CHECK(messages == 1u);
+  upb_Arena_Free(arena);
+}
+
+// Two schemas that include the same tables register them once, where
+// describing each schema in one file would define them twice and upb would
+// refuse the second.
+TEST_CASE("FlatbufferToProtoTest SharesMessagesBetweenSchemas",
+          "[aosnt][flatbuffer-to-proto]") {
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetControlDataSchema())};
+  decoder.Add(BuildFileDescriptorProtos(GetSpanningSchema()));
+
+  decoder.FindMessage(GetProtoMessageName(GetControlDataSchema()));
+  decoder.FindMessage(GetProtoMessageName(GetSpanningSchema()));
+}
+
+// A cycle of references shares one file, since protobuf files cannot depend
+// on each other in a cycle. A table referring to itself needs no dependency.
+TEST_CASE("FlatbufferToProtoTest DescribesTablesThatReferToEachOther",
+          "[aosnt][flatbuffer-to-proto]") {
+  const reflection::Schema* schema = GetRecursiveSchema();
+  const std::vector<ProtoFile> files = BuildFileDescriptorProtos(schema);
+  REQUIRE(files.size() == 2u);
+  CHECK(files[0].name == "wpi/aosnt/testing/Node.proto");
+  CHECK(files[1].name == "wpi/aosnt/testing/Tree.proto");
+
+  UpbDecoder decoder{files};
+  const upb_MessageDef* tree = decoder.FindMessage(GetProtoMessageName(schema));
+  decoder.FindMessage("wpi.aosnt.testing.Peer");
+
+  flatbuffers::FlatBufferBuilder fbb;
+  NodeBuilder leaf{fbb};
+  leaf.add_value(7);
+  const auto leafOffset = leaf.Finish();
+  const auto childrenOffset = fbb.CreateVector(&leafOffset, 1);
+  NodeBuilder node{fbb};
+  node.add_value(3);
+  node.add_children(childrenOffset);
+  const auto nodeOffset = node.Finish();
+  TreeBuilder builder{fbb};
+  builder.add_root(nodeOffset);
+  fbb.Finish(builder.Finish());
+  const flatbuffers::DetachedBuffer buffer = fbb.Release();
+
+  const FlatbufferToProto translator{schema};
+  const upb_Message* message =
+      decoder.Decode(tree, Encode(translator, buffer.data()));
+  const upb_FieldDef* rootField = FindField(tree, "root");
+  const upb_MessageDef* nodeDef = upb_FieldDef_MessageSubDef(rootField);
+  const upb_Message* root = GetField(message, tree, "root").msg_val;
+  REQUIRE(root != nullptr);
+  CHECK(GetField(root, nodeDef, "value").int32_val == 3);
+  const upb_Array* children =
+      upb_Message_GetFieldByDef(root, FindField(nodeDef, "children")).array_val;
+  REQUIRE(children != nullptr);
+  REQUIRE(upb_Array_Size(children) == 1u);
+  CHECK(GetField(upb_Array_Get(children, 0).msg_val, nodeDef, "value")
+            .int32_val == 7);
 }
 
 TEST_CASE("FlatbufferToProtoTest RejectsAProtoTypeWithNothingToPick",
@@ -528,8 +651,7 @@ TEST_CASE("FlatbufferToProtoTest RejectsAProtoTypeWithNothingToPick",
   CHECK_THROWS_WITH(
       FlatbufferToProto{schema},
       Catch::Matchers::ContainsSubstring("nothing for the attribute to pick"));
-  CHECK_THROWS_AS(BuildFileDescriptorProto(schema, "bad.proto"),
-                  std::invalid_argument);
+  CHECK_THROWS_AS(BuildFileDescriptorProtos(schema), std::invalid_argument);
 }
 
 TEST_CASE("FlatbufferToProtoTest OmitsDefaults",
@@ -581,8 +703,8 @@ TEST_CASE("FlatbufferToProtoTest AcceptsAProtoTypeMatchingItsField",
     INFO(field);
     const std::vector<uint8_t> schema = CompileSchemaWithField(field);
     CHECK_NOTHROW(FlatbufferToProto{reflection::GetSchema(schema.data())});
-    CHECK_NOTHROW(BuildFileDescriptorProto(reflection::GetSchema(schema.data()),
-                                           "t.proto"));
+    CHECK_NOTHROW(
+        BuildFileDescriptorProtos(reflection::GetSchema(schema.data())));
   }
 }
 
@@ -615,9 +737,9 @@ TEST_CASE("FlatbufferToProtoTest RejectsAProtoTypeNotMatchingItsField",
     const std::vector<uint8_t> schema = CompileSchemaWithField(field);
     CHECK_THROWS_WITH(FlatbufferToProto{reflection::GetSchema(schema.data())},
                       Catch::Matchers::ContainsSubstring(std::string{message}));
-    CHECK_THROWS_AS(BuildFileDescriptorProto(
-                        reflection::GetSchema(schema.data()), "t.proto"),
-                    std::invalid_argument);
+    CHECK_THROWS_AS(
+        BuildFileDescriptorProtos(reflection::GetSchema(schema.data())),
+        std::invalid_argument);
   }
 }
 
@@ -642,8 +764,7 @@ TEST_CASE("FlatbufferToProtoDefaultsTest WritesAnUnsetNonzeroDefault",
   CHECK(Find(fields, 3)->value == 1u);
   CHECK(Find(fields, 4) == nullptr);
 
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetDefaultsSchema(), "flatbuffer_to_proto_defaults_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetDefaultsSchema())};
   const upb_MessageDef* defaults =
       decoder.FindMessage(GetProtoMessageName(GetDefaultsSchema()));
   const upb_Message* message = decoder.Decode(defaults, encoded);
@@ -668,8 +789,7 @@ TEST_CASE("FlatbufferToProtoDefaultsTest OmitsAZeroThatOverridesADefault",
   const std::vector<uint8_t> encoded = Encode(translator, buffer.data());
   CHECK(Decode(encoded).empty());
 
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetDefaultsSchema(), "flatbuffer_to_proto_defaults_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetDefaultsSchema())};
   const upb_MessageDef* defaults =
       decoder.FindMessage(GetProtoMessageName(GetDefaultsSchema()));
   const upb_Message* message = decoder.Decode(defaults, encoded);
@@ -770,8 +890,7 @@ TEST_CASE("FlatbufferToProtoArraysTest EncodesFixedLengthArrays",
 
 TEST_CASE("FlatbufferToProtoArraysTest UpbDecodesFixedLengthArrays",
           "[aosnt][flatbuffer-to-proto]") {
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetArraysSchema(), "flatbuffer_to_proto_arrays_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetArraysSchema())};
   const upb_MessageDef* arrays =
       decoder.FindMessage(GetProtoMessageName(GetArraysSchema()));
 
@@ -843,8 +962,7 @@ TEST_CASE("FlatbufferToProtoTest RefusesASmallBuffer",
 // type and name, which only a real protobuf decoder can check.
 TEST_CASE("FlatbufferToProtoTest UpbDecodesUsingTheBuiltDescriptor",
           "[aosnt][flatbuffer-to-proto]") {
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetControlDataSchema(), "flatbuffer_to_proto_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetControlDataSchema())};
   const upb_MessageDef* controlData =
       decoder.FindMessage(GetProtoMessageName(GetControlDataSchema()));
 
@@ -883,8 +1001,7 @@ TEST_CASE("FlatbufferToProtoTest UpbDecodesUsingTheBuiltDescriptor",
 
 TEST_CASE("FlatbufferToProtoTest DeprecatedFieldsAreNotInTheDescriptor",
           "[aosnt][flatbuffer-to-proto]") {
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetControlDataSchema(), "flatbuffer_to_proto_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetControlDataSchema())};
   const upb_MessageDef* controlData =
       decoder.FindMessage(GetProtoMessageName(GetControlDataSchema()));
 
@@ -1189,8 +1306,7 @@ TEST_CASE("FlatbufferToProtoScalarsTest EncodesPackedFixedWidthVectors",
 // ControlData uses.
 TEST_CASE("FlatbufferToProtoScalarsTest UpbDecodesEveryEncoding",
           "[aosnt][flatbuffer-to-proto]") {
-  UpbDecoder decoder{BuildFileDescriptorProto(
-      GetScalarsSchema(), "flatbuffer_to_proto_scalars_test.proto")};
+  UpbDecoder decoder{BuildFileDescriptorProtos(GetScalarsSchema())};
   const upb_MessageDef* scalars =
       decoder.FindMessage(GetProtoMessageName(GetScalarsSchema()));
 

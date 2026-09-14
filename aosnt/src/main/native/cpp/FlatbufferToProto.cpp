@@ -11,6 +11,7 @@
 #include <format>
 #include <memory>
 #include <new>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -554,80 +555,221 @@ std::string_view GetProtoMessageName(const reflection::Schema* schema) {
   return schema->root_table()->name()->string_view();
 }
 
-std::vector<uint8_t> BuildFileDescriptorProto(const reflection::Schema* schema,
-                                              std::string_view fileName) {
-  const std::string_view package = GetNamespace(GetProtoMessageName(schema));
-  for (const reflection::Object* object : *schema->objects()) {
-    // Spanning namespaces would take one file per namespace, with dependency
-    // edges between them. Encoding is unaffected, since the wire format has no
-    // notion of a package.
-    if (GetNamespace(object->name()->string_view()) != package) {
-      throw std::invalid_argument(
-          std::format("{} is not in the root table's namespace ({}), and a "
-                      "FileDescriptorProto has only one package",
-                      object->name()->string_view(), package));
+std::string GetProtoFileName(std::string_view messageName) {
+  std::string fileName{messageName};
+  std::replace(fileName.begin(), fileName.end(), '.', '/');
+  fileName += ".proto";
+  return fileName;
+}
+
+namespace {
+
+const reflection::Object& GetObjectAt(const reflection::Schema& schema,
+                                      uint32_t index) {
+  return *schema.objects()->Get(index);
+}
+
+// The objects a message refers to, as indices into the schema's objects().
+std::vector<uint32_t> GetReferences(const reflection::Object& object) {
+  std::vector<uint32_t> references;
+  for (const reflection::Field* field : *object.fields()) {
+    if (field->deprecated()) {
+      continue;
+    }
+    const reflection::BaseType type = IsRepeated(*field)
+                                          ? field->type()->element()
+                                          : field->type()->base_type();
+    if (type == reflection::BaseType::Obj) {
+      references.push_back(static_cast<uint32_t>(field->type()->index()));
     }
   }
+  return references;
+}
 
-  std::unique_ptr<upb_Arena, ArenaDeleter> arena{
-      CheckAllocated(upb_Arena_New())};
-  google_protobuf_FileDescriptorProto* file =
-      CheckAllocated(google_protobuf_FileDescriptorProto_new(arena.get()));
-  google_protobuf_FileDescriptorProto_set_name(file, MakeStringView(fileName));
-  if (!package.empty()) {
-    google_protobuf_FileDescriptorProto_set_package(file,
-                                                    MakeStringView(package));
+// Groups the objects reachable from one into the sets that refer to each other
+// in a cycle, with Tarjan's algorithm. A set is finished only after every set
+// it refers to, so the sets come out with dependencies first.
+class ReferenceCycles {
+ public:
+  ReferenceCycles(const reflection::Schema& schema, uint32_t root)
+      : m_schema{schema},
+        m_index(schema.objects()->size(), -1),
+        m_lowLink(schema.objects()->size(), 0),
+        m_onStack(schema.objects()->size(), false) {
+    Visit(root);
   }
-  google_protobuf_FileDescriptorProto_set_syntax(file,
-                                                 MakeStringView("proto3"));
 
-  for (const reflection::Object* object : *schema->objects()) {
-    google_protobuf_DescriptorProto* message =
-        CheckAllocated(google_protobuf_FileDescriptorProto_add_message_type(
-            file, arena.get()));
-    google_protobuf_DescriptorProto_set_name(
-        message,
-        MakeStringView(GetLastComponent(object->name()->string_view())));
+  const std::vector<std::vector<uint32_t>>& GetSets() const { return m_sets; }
 
-    std::vector<const reflection::Field*> fields(object->fields()->begin(),
-                                                 object->fields()->end());
-    std::sort(fields.begin(), fields.end(),
-              [](const reflection::Field* a, const reflection::Field* b) {
-                return a->id() < b->id();
-              });
-
-    for (const reflection::Field* field : fields) {
-      // A deprecated field holds a place in the numbering and has no
-      // counterpart in the proto.
-      if (field->deprecated()) {
-        continue;
-      }
-      const upb_FieldType type = GetProtoType(*field);
-      google_protobuf_FieldDescriptorProto* out = CheckAllocated(
-          google_protobuf_DescriptorProto_add_field(message, arena.get()));
-      google_protobuf_FieldDescriptorProto_set_name(
-          out, MakeStringView(field->name()->string_view()));
-      google_protobuf_FieldDescriptorProto_set_number(
-          out, static_cast<int32_t>(GetFieldNumber(*field)));
-      google_protobuf_FieldDescriptorProto_set_label(
-          out, IsRepeated(*field) ? kUpb_Label_Repeated : kUpb_Label_Optional);
-      google_protobuf_FieldDescriptorProto_set_type(out, type);
-      if (type == kUpb_FieldType_Message) {
-        google_protobuf_FieldDescriptorProto_set_type_name(
-            out,
-            CopyToArena(arena.get(),
-                        std::format(".{}", schema->objects()
-                                               ->Get(field->type()->index())
-                                               ->name()
-                                               ->string_view())));
+ private:
+  void Visit(uint32_t object) {
+    m_index[object] = m_lowLink[object] = m_nextIndex++;
+    m_stack.push_back(object);
+    m_onStack[object] = true;
+    for (uint32_t reference : GetReferences(GetObjectAt(m_schema, object))) {
+      if (m_index[reference] < 0) {
+        Visit(reference);
+        m_lowLink[object] = std::min(m_lowLink[object], m_lowLink[reference]);
+      } else if (m_onStack[reference]) {
+        m_lowLink[object] = std::min(m_lowLink[object], m_index[reference]);
       }
     }
+    if (m_lowLink[object] != m_index[object]) {
+      return;
+    }
+    std::vector<uint32_t>& set = m_sets.emplace_back();
+    uint32_t member;
+    do {
+      member = m_stack.back();
+      m_stack.pop_back();
+      m_onStack[member] = false;
+      set.push_back(member);
+    } while (member != object);
   }
 
-  size_t size = 0;
-  const char* serialized = CheckAllocated(
-      google_protobuf_FileDescriptorProto_serialize(file, arena.get(), &size));
-  return std::vector<uint8_t>(serialized, serialized + size);
+  const reflection::Schema& m_schema;
+  std::vector<int> m_index;
+  std::vector<int> m_lowLink;
+  std::vector<bool> m_onStack;
+  std::vector<uint32_t> m_stack;
+  int m_nextIndex = 0;
+  std::vector<std::vector<uint32_t>> m_sets;
+};
+
+void AddMessage(google_protobuf_FileDescriptorProto* file, upb_Arena* arena,
+                const reflection::Schema& schema,
+                const reflection::Object& object) {
+  google_protobuf_DescriptorProto* message = CheckAllocated(
+      google_protobuf_FileDescriptorProto_add_message_type(file, arena));
+  google_protobuf_DescriptorProto_set_name(
+      message, MakeStringView(GetLastComponent(object.name()->string_view())));
+
+  std::vector<const reflection::Field*> fields(object.fields()->begin(),
+                                               object.fields()->end());
+  std::sort(fields.begin(), fields.end(),
+            [](const reflection::Field* a, const reflection::Field* b) {
+              return a->id() < b->id();
+            });
+
+  for (const reflection::Field* field : fields) {
+    // A deprecated field holds a place in the numbering and has no
+    // counterpart in the proto.
+    if (field->deprecated()) {
+      continue;
+    }
+    const upb_FieldType type = GetProtoType(*field);
+    google_protobuf_FieldDescriptorProto* out = CheckAllocated(
+        google_protobuf_DescriptorProto_add_field(message, arena));
+    google_protobuf_FieldDescriptorProto_set_name(
+        out, MakeStringView(field->name()->string_view()));
+    google_protobuf_FieldDescriptorProto_set_number(
+        out, static_cast<int32_t>(GetFieldNumber(*field)));
+    google_protobuf_FieldDescriptorProto_set_label(
+        out, IsRepeated(*field) ? kUpb_Label_Repeated : kUpb_Label_Optional);
+    google_protobuf_FieldDescriptorProto_set_type(out, type);
+    if (type == kUpb_FieldType_Message) {
+      google_protobuf_FieldDescriptorProto_set_type_name(
+          out, CopyToArena(
+                   arena, std::format(
+                              ".{}", GetObjectAt(schema, field->type()->index())
+                                         .name()
+                                         ->string_view())));
+    }
+  }
+}
+
+}  // namespace
+
+std::vector<ProtoFile> BuildFileDescriptorProtos(
+    const reflection::Schema* schema) {
+  const std::string_view rootName = GetProtoMessageName(schema);
+  // A copied schema's root_table() need not be one of its objects(), so find
+  // the root among them by name.
+  std::optional<uint32_t> root;
+  for (uint32_t i = 0; i < schema->objects()->size(); ++i) {
+    if (GetObjectAt(*schema, i).name()->string_view() == rootName) {
+      root = i;
+      break;
+    }
+  }
+  if (!root) {
+    throw std::invalid_argument(std::format(
+        "the root table {} is not among the schema's objects", rootName));
+  }
+
+  const ReferenceCycles cycles{*schema, *root};
+
+  // Each file is named after its first message by name, so every schema that
+  // has the message names its file the same way.
+  std::vector<std::string> fileOf(schema->objects()->size());
+  std::vector<ProtoFile> files;
+  for (std::vector<uint32_t> set : cycles.GetSets()) {
+    std::sort(set.begin(), set.end(), [&](uint32_t a, uint32_t b) {
+      return GetObjectAt(*schema, a).name()->string_view() <
+             GetObjectAt(*schema, b).name()->string_view();
+    });
+    const std::string_view firstName =
+        GetObjectAt(*schema, set.front()).name()->string_view();
+    const std::string_view package = GetNamespace(firstName);
+    for (uint32_t member : set) {
+      const std::string_view name =
+          GetObjectAt(*schema, member).name()->string_view();
+      if (GetNamespace(name) != package) {
+        throw std::invalid_argument(std::format(
+            "{} and {} refer to each other, so they share a "
+            "FileDescriptorProto, but are in different namespaces and a file "
+            "has only one package",
+            firstName, name));
+      }
+    }
+    const std::string fileName = GetProtoFileName(firstName);
+    for (uint32_t member : set) {
+      fileOf[member] = fileName;
+    }
+
+    std::vector<std::string_view> dependencies;
+    for (uint32_t member : set) {
+      for (uint32_t reference : GetReferences(GetObjectAt(*schema, member))) {
+        // Every set a member refers to came out earlier, so its file is known.
+        if (fileOf[reference] != fileName) {
+          dependencies.push_back(fileOf[reference]);
+        }
+      }
+    }
+    std::sort(dependencies.begin(), dependencies.end());
+    dependencies.erase(std::unique(dependencies.begin(), dependencies.end()),
+                       dependencies.end());
+
+    std::unique_ptr<upb_Arena, ArenaDeleter> arena{
+        CheckAllocated(upb_Arena_New())};
+    google_protobuf_FileDescriptorProto* file =
+        CheckAllocated(google_protobuf_FileDescriptorProto_new(arena.get()));
+    google_protobuf_FileDescriptorProto_set_name(file,
+                                                 MakeStringView(fileName));
+    if (!package.empty()) {
+      google_protobuf_FileDescriptorProto_set_package(file,
+                                                      MakeStringView(package));
+    }
+    google_protobuf_FileDescriptorProto_set_syntax(file,
+                                                   MakeStringView("proto3"));
+    for (std::string_view dependency : dependencies) {
+      if (!google_protobuf_FileDescriptorProto_add_dependency(
+              file, MakeStringView(dependency), arena.get())) {
+        throw std::bad_alloc{};
+      }
+    }
+    for (uint32_t member : set) {
+      AddMessage(file, arena.get(), *schema, GetObjectAt(*schema, member));
+    }
+
+    size_t size = 0;
+    const char* serialized =
+        CheckAllocated(google_protobuf_FileDescriptorProto_serialize(
+            file, arena.get(), &size));
+    files.push_back(
+        {fileName, std::vector<uint8_t>(serialized, serialized + size)});
+  }
+  return files;
 }
 
 }  // namespace wpi::aosnt

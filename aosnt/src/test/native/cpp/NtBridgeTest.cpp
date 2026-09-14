@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
 #include <upb/base/status.h>
 #include <upb/mem/arena.h>
 #include <upb/message/message.h>
@@ -23,6 +24,10 @@
 #include "aos/configuration.h"
 #include "aos/events/simulated_event_loop.h"
 #include "aos/testing/ping_pong/ping_static.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_conflict_first_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_conflict_second_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_spanning_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_test_schema.h"
 #include "aosnt/types/boolean_array_generated.h"
 #include "aosnt/types/boolean_generated.h"
 #include "aosnt/types/double_array_generated.h"
@@ -327,6 +332,91 @@ TEST_CASE_METHOD(NtBridgeTest, "NtBridgeTest PublishesADecodableMessage",
   REQUIRE(upb_Message_GetFieldByDef(
               message, upb_MessageDef_FindFieldByName(ping, "send_time"))
               .int64_val == 1234567);
+}
+
+// A configuration whose channels carry the given schemas, matched to channels
+// by root table name.
+aos::FlatbufferDetachedBuffer<aos::Configuration> MakeConfig(
+    std::string_view json,
+    std::initializer_list<flatbuffers::span<const uint8_t>> schemas) {
+  std::vector<aos::FlatbufferVector<reflection::Schema>> vectors;
+  for (flatbuffers::span<const uint8_t> schema : schemas) {
+    vectors.emplace_back(aos::FlatbufferSpan<reflection::Schema>(
+        {schema.data(), schema.size()}));
+  }
+  return aos::configuration::AddSchema(json, vectors);
+}
+
+// Two channels whose schemas include the same tables publish each table's
+// descriptor once, under one name, rather than defining the tables twice.
+TEST_CASE("NtBridgeTest SharesMessagesBetweenChannels", "[aosnt][nt-bridge]") {
+  const aos::FlatbufferDetachedBuffer<aos::Configuration> config = MakeConfig(
+      R"({
+        "channels": [
+          {
+            "name": "/control",
+            "type": "wpi.aosnt.testing.ControlData",
+            "tags": ["nt:publish"]
+          },
+          {
+            "name": "/spanning",
+            "type": "wpi.aosnt.testing.spanning.Spanning",
+            "tags": ["nt:publish"]
+          }
+        ]
+      })",
+      {testing::ControlDataSchema(), testing::spanning::SpanningSchema()});
+  aos::SimulatedEventLoopFactory factory{&config.message()};
+  std::unique_ptr<aos::EventLoop> eventLoop = factory.MakeEventLoop("bridge");
+  wpi::nt::NetworkTableInstance instance =
+      wpi::nt::NetworkTableInstance::Create();
+
+  {
+    NtBridge bridge{eventLoop.get(), instance};
+    CHECK(bridge.GetPublishedChannelCount() == 2u);
+    CHECK(instance.HasSchema("proto:wpi/aosnt/testing/ControlData.proto"));
+    CHECK(instance.HasSchema("proto:wpi/aosnt/testing/JoystickData.proto"));
+    CHECK(
+        instance.HasSchema("proto:wpi/aosnt/testing/spanning/Spanning.proto"));
+  }
+
+  wpi::nt::NetworkTableInstance::Destroy(instance);
+}
+
+// NetworkTables keeps the first descriptor registered under a name, so a
+// message two channels describe differently has to be refused up front.
+TEST_CASE("NtBridgeTest RejectsChannelsThatDescribeAMessageDifferently",
+          "[aosnt][nt-bridge]") {
+  const aos::FlatbufferDetachedBuffer<aos::Configuration> config = MakeConfig(
+      R"({
+        "channels": [
+          {
+            "name": "/first",
+            "type": "wpi.aosnt.testing.conflict.First",
+            "tags": ["nt:publish"]
+          },
+          {
+            "name": "/second",
+            "type": "wpi.aosnt.testing.conflict.Second",
+            "tags": ["nt:publish"]
+          }
+        ]
+      })",
+      {testing::conflict::ConflictFirstSchema(),
+       testing::conflict::ConflictSecondSchema()});
+  aos::SimulatedEventLoopFactory factory{&config.message()};
+  std::unique_ptr<aos::EventLoop> eventLoop = factory.MakeEventLoop("bridge");
+  wpi::nt::NetworkTableInstance instance =
+      wpi::nt::NetworkTableInstance::Create();
+
+  CHECK_THROWS_WITH(
+      NtBridge(eventLoop.get(), instance),
+      Catch::Matchers::ContainsSubstring(
+          "describe wpi/aosnt/testing/conflict/Shared.proto differently"));
+  CHECK_FALSE(
+      instance.HasSchema("proto:wpi/aosnt/testing/conflict/First.proto"));
+
+  wpi::nt::NetworkTableInstance::Destroy(instance);
 }
 
 // A topic has one type, so two tagged channels cannot share a name.

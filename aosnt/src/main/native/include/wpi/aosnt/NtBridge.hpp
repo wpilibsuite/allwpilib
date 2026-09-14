@@ -31,10 +31,29 @@ inline constexpr std::string_view PUBLISH_TAG = "nt:publish";
  * for, holding the table's `value`.
  *
  * Any other channel is published as protobuf. Every AOS channel carries its own
- * reflection schema, so the bridge builds a FileDescriptorProto from it,
- * registers that in NetworkTables' schema registry, and translates each message
- * on its way out. The result is an ordinary `proto:` topic, so dashboards and
- * DataLog decode it without knowing AOS is involved.
+ * reflection schema, so the bridge builds FileDescriptorProtos from it, one per
+ * message (see BuildFileDescriptorProtos()), registers them in NetworkTables'
+ * schema registry, and translates each message on its way out. The result is
+ * an ordinary `proto:` topic, so dashboards and DataLog decode it without
+ * knowing AOS is involved.
+ *
+ * A message's descriptor has to be the only one on the network. Each process
+ * registers a descriptor as a retained `/.schema/proto:<file>` topic, which it
+ * skips only if that process registered the same name itself, and the server
+ * keeps whichever value arrived last. Glass and DataLog load each file name
+ * once, and refuse a file that defines a message they already loaded, along
+ * with every file that depends on it. So a message the bridge publishes must
+ * not also be published by anything else with a descriptor of its own, such as
+ * robot code publishing mrc.proto.ProtobufControlData from MrcComm.proto. A
+ * viewer would decode it with whichever descriptor it saw first, and lose the
+ * other file. Only publishers register descriptors, so subscribing to a
+ * bridged topic is fine.
+ *
+ * The bridge keeps its own channels to that rule. Each message is described in
+ * a file of its own, named after it and built only from its definition, so
+ * channels whose schemas share a message register the same bytes under the
+ * same name, once. Channels whose schemas define a message differently are
+ * refused when the bridge is constructed.
  *
  * Channels are selected by tag. An untagged channel is not bridged. Each
  * channel is published under its own name, so two tagged channels may not
@@ -66,7 +85,9 @@ class NtBridge {
    * @param instance The NetworkTables instance to publish to. Must outlive
    *                 this.
    * @throws std::invalid_argument if a tagged channel has no schema, its schema
-   *         has no protobuf equivalent, or two tagged channels share a name.
+   *         has no protobuf equivalent, two tagged channels share a name, or
+   *         two tagged channels' schemas describe the same message
+   *         differently.
    */
   NtBridge(aos::EventLoop* eventLoop, wpi::nt::NetworkTableInstance instance);
 
@@ -118,8 +139,7 @@ class NtBridge {
     std::vector<uint8_t> buffer;
   };
 
-  void AddSchema(const aos::Channel* channel,
-                 std::span<const uint8_t> descriptor);
+  void AddSchema(const ProtoFile& file);
 
   aos::EventLoop* m_eventLoop;
   wpi::nt::NetworkTableInstance m_instance;

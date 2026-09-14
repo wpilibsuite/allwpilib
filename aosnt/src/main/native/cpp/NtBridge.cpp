@@ -8,6 +8,8 @@
 #include <array>
 #include <cassert>
 #include <format>
+#include <functional>
+#include <map>
 #include <memory>
 #include <span>
 #include <stdexcept>
@@ -135,16 +137,6 @@ const PrimitiveType* FindPrimitiveType(const aos::Channel* channel) {
   return nullptr;
 }
 
-// NetworkTables names a protobuf schema after the file it came from. AOS
-// schemas have no file of their own, so the message name stands in, with the
-// package spelled as directories the way protobuf files are.
-std::string ProtoFileName(const aos::Channel* channel) {
-  std::string fileName{channel->type()->string_view()};
-  std::replace(fileName.begin(), fileName.end(), '.', '/');
-  fileName += ".proto";
-  return fileName;
-}
-
 }  // namespace
 
 std::string NtBridge::GetTopicName(const aos::Channel* channel) {
@@ -169,9 +161,17 @@ NtBridge::NtBridge(aos::EventLoop* eventLoop,
   struct Pending {
     const aos::Channel* channel;
     std::unique_ptr<FlatbufferToProto> translator;
-    std::vector<uint8_t> descriptor;
+    std::vector<ProtoFile> files;
   };
   std::vector<Pending> channels;
+  // NetworkTables keeps the first schema registered under a name, so two
+  // channels that describe one message differently would leave the second
+  // decoded with the first's fields.
+  struct Described {
+    const aos::Channel* channel;
+    std::span<const uint8_t> descriptor;
+  };
+  std::map<std::string, Described, std::less<>> described;
   for (const aos::Channel* channel : *config->channels()) {
     if (!aos::configuration::ChannelHasTag(channel, PUBLISH_TAG)) {
       continue;
@@ -196,10 +196,27 @@ NtBridge::NtBridge(aos::EventLoop* eventLoop,
     if (!FindPrimitiveType(channel)) {
       pending.translator =
           std::make_unique<FlatbufferToProto>(channel->schema());
-      pending.descriptor =
-          BuildFileDescriptorProto(channel->schema(), ProtoFileName(channel));
+      pending.files = BuildFileDescriptorProtos(channel->schema());
     }
     channels.push_back(std::move(pending));
+  }
+
+  // The descriptors live in channels, which does not move again.
+  for (const Pending& pending : channels) {
+    for (const ProtoFile& file : pending.files) {
+      auto [it, inserted] =
+          described.try_emplace(file.name, pending.channel, file.descriptor);
+      if (!inserted &&
+          !std::ranges::equal(it->second.descriptor, file.descriptor)) {
+        throw std::invalid_argument(std::format(
+            "Channels {} and {} are both tagged {} and describe {} "
+            "differently. NetworkTables registers a schema once, so one of "
+            "them could not be decoded.",
+            aos::configuration::CleanedChannelToString(it->second.channel),
+            aos::configuration::CleanedChannelToString(pending.channel),
+            PUBLISH_TAG, file.name));
+      }
+    }
   }
 
   for (Pending& pending : channels) {
@@ -230,7 +247,9 @@ NtBridge::NtBridge(aos::EventLoop* eventLoop,
                                  ENCODE_SIZE_FACTOR +
                              ENCODE_SIZE_SLACK);
 
-    AddSchema(channel, pending.descriptor);
+    for (const ProtoFile& file : pending.files) {
+      AddSchema(file);
+    }
 
     publisher->publisher =
         m_instance.GetRawTopic(GetTopicName(channel))
@@ -255,14 +274,13 @@ NtBridge::NtBridge(aos::EventLoop* eventLoop,
   }
 }
 
-void NtBridge::AddSchema(const aos::Channel* channel,
-                         std::span<const uint8_t> descriptor) {
-  const std::string schemaName =
-      std::format("proto:{}", ProtoFileName(channel));
+void NtBridge::AddSchema(const ProtoFile& file) {
+  const std::string schemaName = std::format("proto:{}", file.name);
   if (m_instance.HasSchema(schemaName)) {
     return;
   }
-  m_instance.AddSchema(schemaName, "proto:FileDescriptorProto", descriptor);
+  m_instance.AddSchema(schemaName, "proto:FileDescriptorProto",
+                       file.descriptor);
 }
 
 }  // namespace wpi::aosnt
