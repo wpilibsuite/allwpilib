@@ -18,10 +18,10 @@
 // The system server's NetworkTables instance, which MrcCommDaemon and MrcLib
 // connect to. The channels this bridge publishes are the ones NetworkTables
 // carried there before they moved onto AOS.
-#define ROBOT_SYSTEM_SERVER_NT_PORT 6810
+constexpr unsigned int ROBOT_SYSTEM_SERVER_NT_PORT = 6810;
 
 int main(int argc, char** argv) {
-  std::string_view config_path = "aos_config.json";
+  std::string_view configPath = "aos_config.json";
   std::string_view server = "localhost";
   unsigned int port = ROBOT_SYSTEM_SERVER_NT_PORT;
   std::string_view identity = "aosnt";
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     }
     std::string_view value{argv[++i]};
     if (arg == "--config") {
-      config_path = value;
+      configPath = value;
     } else if (arg == "--server") {
       server = value;
     } else if (arg == "--identity") {
@@ -65,8 +65,8 @@ int main(int argc, char** argv) {
                   aos::InitOptions{.parse_command_line = false});
 
   aos::FlatbufferDetachedBuffer<aos::Configuration> config =
-      aos::configuration::ReadConfig(config_path);
-  aos::ShmEventLoop event_loop(&config.message());
+      aos::configuration::ReadConfig(configPath);
+  aos::ShmEventLoop eventLoop(&config.message());
 
   wpi::nt::NetworkTableInstance instance =
       wpi::nt::NetworkTableInstance::GetDefault();
@@ -74,8 +74,8 @@ int main(int argc, char** argv) {
   instance.StartClient(identity);
 
   try {
-    wpi::aosnt::NtBridge bridge{&event_loop, instance};
-    event_loop.Run();
+    wpi::aosnt::NtBridge bridge{&eventLoop, instance};
+    eventLoop.Run();
   } catch (const std::exception& e) {
     wpi::util::print(stderr, "{}\n", e.what());
     return 1;

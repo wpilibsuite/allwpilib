@@ -6,21 +6,22 @@
 
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "aos/configuration.h"
 #include "aos/events/event_loop.h"
-#include "aos/protobuf/flatbuffer_to_proto.h"
+#include "wpi/aosnt/FlatbufferToProto.hpp"
 #include "wpi/nt/GenericEntry.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/RawTopic.hpp"
 
 namespace wpi::aosnt {
 
-/// Tag a channel with this to publish it onto NetworkTables.
-inline constexpr std::string_view kPublishTag = "nt:publish";
+/** Tag a channel with this to publish it onto NetworkTables. */
+inline constexpr std::string_view PUBLISH_TAG = "nt:publish";
 
 /**
  * Publishes AOS channels onto NetworkTables.
@@ -59,34 +60,51 @@ class NtBridge {
   /**
    * Constructs a bridge.
    *
-   * @param event_loop The event loop to subscribe on. AOS watchers cannot be
-   *                   unregistered, so this must not be destroyed while the
-   *                   event loop can still run.
+   * @param eventLoop The event loop to subscribe on. AOS watchers cannot be
+   *                  unregistered, so this must not be destroyed while the
+   *                  event loop can still run.
    * @param instance The NetworkTables instance to publish to. Must outlive
    *                 this.
-   * @throws std::invalid_argument if a tagged channel has no schema, or two
-   *         tagged channels share a name.
+   * @throws std::invalid_argument if a tagged channel has no schema, its schema
+   *         has no protobuf equivalent, or two tagged channels share a name.
    */
-  NtBridge(aos::EventLoop* event_loop, wpi::nt::NetworkTableInstance instance);
+  NtBridge(aos::EventLoop* eventLoop, wpi::nt::NetworkTableInstance instance);
 
   NtBridge(const NtBridge&) = delete;
   NtBridge& operator=(const NtBridge&) = delete;
 
   /**
-   * Returns the topic name a channel is published under, which is the channel's
-   * name. A NetworkTables topic has one type, and NtTypeString() carries it.
+   * Gets the topic name a channel is published under, which is the channel's
+   * name. A NetworkTables topic has one type, and GetTypeString() carries it.
+   *
+   * @param channel channel
+   * @return topic name
    */
-  static std::string NtName(const aos::Channel* channel);
+  static std::string GetTopicName(const aos::Channel* channel);
 
   /**
-   * Returns the topic type string. For a table in aosnt/types/ it is the
+   * Gets the topic type string. For a table in aosnt/types/ it is the
    * NetworkTables type, such as "boolean". Otherwise it names the message in
    * the schema registry, such as "proto:mrc.proto.ProtobufControlData".
+   *
+   * @param channel channel
+   * @return topic type string
    */
-  static std::string NtTypeString(const aos::Channel* channel);
+  static std::string GetTypeString(const aos::Channel* channel);
 
-  size_t published_channels() const { return publishers_.size(); }
-  uint64_t published_messages() const { return published_messages_; }
+  /**
+   * Gets the number of channels being published.
+   *
+   * @return number of channels
+   */
+  size_t GetPublishedChannelCount() const { return m_publishers.size(); }
+
+  /**
+   * Gets the number of messages published so far, across all channels.
+   *
+   * @return number of messages
+   */
+  uint64_t GetPublishedMessageCount() const { return m_publishedMessages; }
 
  private:
   struct Publisher {
@@ -95,18 +113,19 @@ class NtBridge {
     wpi::nt::GenericPublisher primitive;
     // Set for any other channel.
     wpi::nt::RawPublisher publisher;
-    std::unique_ptr<aos::FlatbufferToProto> translator;
+    std::unique_ptr<FlatbufferToProto> translator;
     // Grown if a message does not fit.
     std::vector<uint8_t> buffer;
   };
 
-  void AddSchema(const aos::Channel* channel);
+  void AddSchema(const aos::Channel* channel,
+                 std::span<const uint8_t> descriptor);
 
-  aos::EventLoop* const event_loop_;
-  wpi::nt::NetworkTableInstance instance_;
-  std::vector<std::unique_ptr<Publisher>> publishers_;
+  aos::EventLoop* m_eventLoop;
+  wpi::nt::NetworkTableInstance m_instance;
+  std::vector<std::unique_ptr<Publisher>> m_publishers;
 
-  uint64_t published_messages_ = 0;
+  uint64_t m_publishedMessages = 0;
 };
 
 }  // namespace wpi::aosnt

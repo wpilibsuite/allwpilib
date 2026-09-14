@@ -33,8 +33,8 @@ namespace {
 // Initial encode buffer size. A flatbuffer and its protobuf encoding are not
 // related in size, so this is a guess, not a bound. Messages that do not fit
 // grow the buffer.
-constexpr size_t kEncodeSizeFactor = 2;
-constexpr size_t kEncodeSizeSlack = 512;
+constexpr size_t ENCODE_SIZE_FACTOR = 2;
+constexpr size_t ENCODE_SIZE_SLACK = 512;
 
 wpi::nt::PubSubOptions BridgeOptions(const aos::Channel* channel) {
   wpi::nt::PubSubOptions options;
@@ -57,12 +57,12 @@ std::vector<Element> ToVector(const flatbuffers::Vector<T>* vector) {
 
 // A table in aosnt/types/ and the NetworkTables type it is published as.
 struct PrimitiveType {
-  std::string_view aos_type;
-  std::string_view nt_type;
-  wpi::nt::Value (*to_value)(const uint8_t* message);
+  std::string_view aosType;
+  std::string_view ntType;
+  wpi::nt::Value (*toValue)(const uint8_t* message);
 };
 
-const std::array<PrimitiveType, 10> kPrimitiveTypes{{
+const std::array<PrimitiveType, 10> PRIMITIVE_TYPES{{
     {"wpi.aosnt.Boolean", "boolean",
      [](const uint8_t* message) {
        return wpi::nt::Value::MakeBoolean(
@@ -85,7 +85,7 @@ const std::array<PrimitiveType, 10> kPrimitiveTypes{{
      }},
     {"wpi.aosnt.String", "string",
      [](const uint8_t* message) {
-       const flatbuffers::String* const value =
+       const flatbuffers::String* value =
            flatbuffers::GetRoot<String>(message)->value();
        return wpi::nt::Value::MakeString(
            value == nullptr ? std::string_view{} : value->string_view());
@@ -112,8 +112,7 @@ const std::array<PrimitiveType, 10> kPrimitiveTypes{{
      }},
     {"wpi.aosnt.StringArray", "string[]",
      [](const uint8_t* message) {
-       const auto* const value =
-           flatbuffers::GetRoot<StringArray>(message)->value();
+       const auto* value = flatbuffers::GetRoot<StringArray>(message)->value();
        std::vector<std::string> strings;
        if (value != nullptr) {
          strings.reserve(value->size());
@@ -128,37 +127,53 @@ const std::array<PrimitiveType, 10> kPrimitiveTypes{{
 // Returns the primitive type a channel carries, or nullptr for any other type.
 const PrimitiveType* FindPrimitiveType(const aos::Channel* channel) {
   const std::string_view type = channel->type()->string_view();
-  for (const PrimitiveType& primitive : kPrimitiveTypes) {
-    if (primitive.aos_type == type) {
+  for (const PrimitiveType& primitive : PRIMITIVE_TYPES) {
+    if (primitive.aosType == type) {
       return &primitive;
     }
   }
   return nullptr;
 }
 
+// NetworkTables names a protobuf schema after the file it came from. AOS
+// schemas have no file of their own, so the message name stands in, with the
+// package spelled as directories the way protobuf files are.
+std::string ProtoFileName(const aos::Channel* channel) {
+  std::string fileName{channel->type()->string_view()};
+  std::replace(fileName.begin(), fileName.end(), '.', '/');
+  fileName += ".proto";
+  return fileName;
+}
+
 }  // namespace
 
-std::string NtBridge::NtName(const aos::Channel* channel) {
+std::string NtBridge::GetTopicName(const aos::Channel* channel) {
   return std::string{channel->name()->string_view()};
 }
 
-std::string NtBridge::NtTypeString(const aos::Channel* channel) {
-  if (const PrimitiveType* const primitive = FindPrimitiveType(channel)) {
-    return std::string{primitive->nt_type};
+std::string NtBridge::GetTypeString(const aos::Channel* channel) {
+  if (const PrimitiveType* primitive = FindPrimitiveType(channel)) {
+    return std::string{primitive->ntType};
   }
   return std::format("proto:{}", channel->type()->string_view());
 }
 
-NtBridge::NtBridge(aos::EventLoop* event_loop,
+NtBridge::NtBridge(aos::EventLoop* eventLoop,
                    wpi::nt::NetworkTableInstance instance)
-    : event_loop_(event_loop), instance_(instance) {
-  const aos::Configuration* const config = event_loop_->configuration();
+    : m_eventLoop(eventLoop), m_instance(instance) {
+  const aos::Configuration* config = m_eventLoop->configuration();
 
-  // Check every tagged channel before registering anything, so a bad
-  // configuration throws without leaving watchers behind.
-  std::vector<const aos::Channel*> channels;
+  // Check every tagged channel, including that its schema translates, before
+  // registering anything, so a bad configuration throws without leaving
+  // watchers behind.
+  struct Pending {
+    const aos::Channel* channel;
+    std::unique_ptr<FlatbufferToProto> translator;
+    std::vector<uint8_t> descriptor;
+  };
+  std::vector<Pending> channels;
   for (const aos::Channel* channel : *config->channels()) {
-    if (!aos::configuration::ChannelHasTag(channel, kPublishTag)) {
+    if (!aos::configuration::ChannelHasTag(channel, PUBLISH_TAG)) {
       continue;
     }
     if (!channel->has_schema()) {
@@ -167,56 +182,64 @@ NtBridge::NtBridge(aos::EventLoop* event_loop,
           "with. A flattened configuration always has one.",
           aos::configuration::CleanedChannelToString(channel)));
     }
-    for (const aos::Channel* other : channels) {
-      if (other->name()->string_view() == channel->name()->string_view()) {
+    for (const Pending& other : channels) {
+      if (other.channel->name()->string_view() ==
+          channel->name()->string_view()) {
         throw std::invalid_argument(std::format(
             "Channels {} and {} are both tagged {} and share a name. A "
             "NetworkTables topic has one type, so they cannot share a topic.",
-            aos::configuration::CleanedChannelToString(other),
-            aos::configuration::CleanedChannelToString(channel), kPublishTag));
+            aos::configuration::CleanedChannelToString(other.channel),
+            aos::configuration::CleanedChannelToString(channel), PUBLISH_TAG));
       }
     }
-    channels.push_back(channel);
+    Pending pending{channel, nullptr, {}};
+    if (!FindPrimitiveType(channel)) {
+      pending.translator =
+          std::make_unique<FlatbufferToProto>(channel->schema());
+      pending.descriptor =
+          BuildFileDescriptorProto(channel->schema(), ProtoFileName(channel));
+    }
+    channels.push_back(std::move(pending));
   }
 
-  for (const aos::Channel* channel : channels) {
+  for (Pending& pending : channels) {
+    const aos::Channel* channel = pending.channel;
     auto publisher = std::make_unique<Publisher>();
     publisher->channel = channel;
-    Publisher* const raw = publisher.get();
+    Publisher* raw = publisher.get();
 
-    if (const PrimitiveType* const primitive = FindPrimitiveType(channel)) {
+    if (const PrimitiveType* primitive = FindPrimitiveType(channel)) {
       publisher->primitive =
-          instance_.GetTopic(NtName(channel))
-              .GenericPublish(primitive->nt_type, BridgeOptions(channel));
-      event_loop_->MakeRawWatcher(
+          m_instance.GetTopic(GetTopicName(channel))
+              .GenericPublish(primitive->ntType, BridgeOptions(channel));
+      m_eventLoop->MakeRawWatcher(
           channel, [this, raw, primitive](const aos::Context& context,
                                           const void* data) {
             raw->primitive.Set(
-                primitive->to_value(static_cast<const uint8_t*>(data)));
-            ++published_messages_;
+                primitive->toValue(static_cast<const uint8_t*>(data)));
+            ++m_publishedMessages;
           });
-      publishers_.push_back(std::move(publisher));
+      m_publishers.push_back(std::move(publisher));
       continue;
     }
 
-    publisher->translator =
-        std::make_unique<aos::FlatbufferToProto>(channel->schema());
+    publisher->translator = std::move(pending.translator);
 
     // The watcher grows this if a message needs more.
     publisher->buffer.resize(static_cast<size_t>(channel->max_size()) *
-                                 kEncodeSizeFactor +
-                             kEncodeSizeSlack);
+                                 ENCODE_SIZE_FACTOR +
+                             ENCODE_SIZE_SLACK);
 
-    AddSchema(channel);
+    AddSchema(channel, pending.descriptor);
 
     publisher->publisher =
-        instance_.GetRawTopic(NtName(channel))
-            .Publish(NtTypeString(channel), BridgeOptions(channel));
+        m_instance.GetRawTopic(GetTopicName(channel))
+            .Publish(GetTypeString(channel), BridgeOptions(channel));
 
-    event_loop_->MakeRawWatcher(
+    m_eventLoop->MakeRawWatcher(
         channel, [this, raw](const aos::Context& context, const void* data) {
-          const uint8_t* const message = static_cast<const uint8_t*>(data);
-          const size_t needed = raw->translator->EncodedSize(message);
+          const uint8_t* message = static_cast<const uint8_t*>(data);
+          const size_t needed = raw->translator->GetEncodedSize(message);
           if (needed > raw->buffer.size()) {
             // Grow once and keep it.
             raw->buffer.resize(needed);
@@ -225,28 +248,21 @@ NtBridge::NtBridge(aos::EventLoop* event_loop,
           assert(size == needed);
           raw->publisher.Set(
               std::span<const uint8_t>(raw->buffer.data(), size));
-          ++published_messages_;
+          ++m_publishedMessages;
         });
 
-    publishers_.push_back(std::move(publisher));
+    m_publishers.push_back(std::move(publisher));
   }
 }
 
-void NtBridge::AddSchema(const aos::Channel* channel) {
-  // NetworkTables names a protobuf schema after the file it came from. AOS
-  // schemas have no file of their own, so the message name stands in, with the
-  // package spelled as directories the way protobuf files are.
-  std::string file_name{channel->type()->string_view()};
-  std::replace(file_name.begin(), file_name.end(), '.', '/');
-  file_name += ".proto";
-  const std::string schema_name = std::format("proto:{}", file_name);
-  if (instance_.HasSchema(schema_name)) {
+void NtBridge::AddSchema(const aos::Channel* channel,
+                         std::span<const uint8_t> descriptor) {
+  const std::string schemaName =
+      std::format("proto:{}", ProtoFileName(channel));
+  if (m_instance.HasSchema(schemaName)) {
     return;
   }
-
-  const std::vector<uint8_t> descriptor =
-      aos::FileDescriptorProtoForSchema(channel->schema(), file_name);
-  instance_.AddSchema(schema_name, "proto:FileDescriptorProto", descriptor);
+  m_instance.AddSchema(schemaName, "proto:FileDescriptorProto", descriptor);
 }
 
 }  // namespace wpi::aosnt

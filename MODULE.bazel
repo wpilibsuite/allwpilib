@@ -160,10 +160,15 @@ http_jar(
 bazel_dep(name = "aos")
 archive_override(
     module_name = "aos",
-    integrity = "sha256-MetxXUpspgMqlxISjllwFGCN5Su7yz8pxlUxZyWjbCQ=",
-    strip_prefix = "aos-11ca4c1a90dbc3254bef759791c9be3bed114e94",
-    urls = ["https://github.com/AustinSchuh/aos/archive/11ca4c1a90dbc3254bef759791c9be3bed114e94.tar.gz"],
+    integrity = "sha256-3wX/ZGaa9ZOKQKrp+W8BIgK1RUcOC5yZtt1hl16HXjo=",
+    strip_prefix = "aos-2a16f9332583d809bd5d9345bb416e7abc06e55e",
+    urls = ["https://github.com/AustinSchuh/aos/archive/2a16f9332583d809bd5d9345bb416e7abc06e55e.tar.gz"],
 )
+
+# The flatbuffers AOS is built against, which aosnt reads reflection schemas
+# with. AOS patches it, so it is not the registry's flatbuffers.
+aos_dependencies = use_extension("@aos//aos:extension.bzl", "dependencies")
+use_repo(aos_dependencies, "aos_flatbuffers")
 
 # Forced, because abseil dropped compatibility_level in 20260526.0 and
 # rules_java still asks for a level-1 version, which does not resolve.

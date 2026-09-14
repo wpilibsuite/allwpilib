@@ -12,6 +12,13 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <upb/base/status.h>
+#include <upb/mem/arena.h>
+#include <upb/message/message.h>
+#include <upb/reflection/def.h>
+#include <upb/reflection/message.h>
+#include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
+#include <upb/wire/decode.h>
 
 #include "aos/configuration.h"
 #include "aos/events/simulated_event_loop.h"
@@ -26,9 +33,6 @@
 #include "aosnt/types/integer_generated.h"
 #include "aosnt/types/string_array_generated.h"
 #include "aosnt/types/string_generated.h"
-#include "google/protobuf/descriptor.h"
-#include "google/protobuf/descriptor.pb.h"
-#include "google/protobuf/dynamic_message.h"
 #include "tools/cpp/runfiles/runfiles.h"
 #include "wpi/nt/BooleanArrayTopic.hpp"
 #include "wpi/nt/BooleanTopic.hpp"
@@ -89,152 +93,151 @@ const aos::Channel* PingChannel() {
 class NtBridgeTest {
  public:
   NtBridgeTest()
-      : factory_{&Config().message()},
-        bridge_loop_{factory_.MakeEventLoop("bridge")},
-        test_loop_{factory_.MakeEventLoop("test")},
-        instance_{wpi::nt::NetworkTableInstance::Create()} {
-    instance_.StartLocal();
+      : factory{&Config().message()},
+        bridgeLoop{factory.MakeEventLoop("bridge")},
+        testLoop{factory.MakeEventLoop("test")},
+        instance{wpi::nt::NetworkTableInstance::Create()} {
+    instance.StartLocal();
   }
 
   ~NtBridgeTest() {
-    bridge_.reset();
-    wpi::nt::NetworkTableInstance::Destroy(instance_);
+    bridge.reset();
+    wpi::nt::NetworkTableInstance::Destroy(instance);
   }
 
  protected:
   void MakeBridge() {
-    bridge_ = std::make_unique<NtBridge>(bridge_loop_.get(), instance_);
+    bridge = std::make_unique<NtBridge>(bridgeLoop.get(), instance);
   }
 
-  aos::SimulatedEventLoopFactory factory_;
-  std::unique_ptr<aos::EventLoop> bridge_loop_;
-  std::unique_ptr<aos::EventLoop> test_loop_;
-  wpi::nt::NetworkTableInstance instance_;
-  std::unique_ptr<NtBridge> bridge_;
+  aos::SimulatedEventLoopFactory factory;
+  std::unique_ptr<aos::EventLoop> bridgeLoop;
+  std::unique_ptr<aos::EventLoop> testLoop;
+  wpi::nt::NetworkTableInstance instance;
+  std::unique_ptr<NtBridge> bridge;
 };
 
 }  // namespace
 
 // Only tagged channels are bridged.
-TEST_CASE_METHOD(NtBridgeTest, "NtBridge only bridges tagged channels",
-                 "[NtBridge]") {
+TEST_CASE_METHOD(NtBridgeTest, "NtBridgeTest OnlyBridgesTaggedChannels",
+                 "[aosnt][nt-bridge]") {
   MakeBridge();
-  REQUIRE(bridge_->published_channels() == 11u);
+  REQUIRE(bridge->GetPublishedChannelCount() == 11u);
 }
 
 // A channel of a type in aosnt/types/ gets that NetworkTables type.
-TEST_CASE("NtBridge names primitive types", "[NtBridge]") {
-  const auto type_string = [](std::string_view name, std::string_view type) {
-    const aos::Channel* const channel = aos::configuration::GetChannel(
+TEST_CASE("NtBridgeTest NamesPrimitiveTypes", "[aosnt][nt-bridge]") {
+  const auto typeString = [](std::string_view name, std::string_view type) {
+    const aos::Channel* channel = aos::configuration::GetChannel(
         &Config().message(), name, type, "", nullptr);
     REQUIRE(channel != nullptr);
-    return NtBridge::NtTypeString(channel);
+    return NtBridge::GetTypeString(channel);
   };
 
-  REQUIRE(type_string("/types/boolean", "wpi.aosnt.Boolean") == "boolean");
-  REQUIRE(type_string("/types/integer", "wpi.aosnt.Integer") == "int");
-  REQUIRE(type_string("/types/float", "wpi.aosnt.Float") == "float");
-  REQUIRE(type_string("/types/double", "wpi.aosnt.Double") == "double");
-  REQUIRE(type_string("/types/string", "wpi.aosnt.String") == "string");
-  REQUIRE(type_string("/types/boolean_array", "wpi.aosnt.BooleanArray") ==
+  REQUIRE(typeString("/types/boolean", "wpi.aosnt.Boolean") == "boolean");
+  REQUIRE(typeString("/types/integer", "wpi.aosnt.Integer") == "int");
+  REQUIRE(typeString("/types/float", "wpi.aosnt.Float") == "float");
+  REQUIRE(typeString("/types/double", "wpi.aosnt.Double") == "double");
+  REQUIRE(typeString("/types/string", "wpi.aosnt.String") == "string");
+  REQUIRE(typeString("/types/boolean_array", "wpi.aosnt.BooleanArray") ==
           "boolean[]");
-  REQUIRE(type_string("/types/integer_array", "wpi.aosnt.IntegerArray") ==
+  REQUIRE(typeString("/types/integer_array", "wpi.aosnt.IntegerArray") ==
           "int[]");
-  REQUIRE(type_string("/types/float_array", "wpi.aosnt.FloatArray") ==
+  REQUIRE(typeString("/types/float_array", "wpi.aosnt.FloatArray") ==
           "float[]");
-  REQUIRE(type_string("/types/double_array", "wpi.aosnt.DoubleArray") ==
+  REQUIRE(typeString("/types/double_array", "wpi.aosnt.DoubleArray") ==
           "double[]");
-  REQUIRE(type_string("/types/string_array", "wpi.aosnt.StringArray") ==
+  REQUIRE(typeString("/types/string_array", "wpi.aosnt.StringArray") ==
           "string[]");
 }
 
-TEST_CASE_METHOD(NtBridgeTest, "NtBridge publishes primitive values",
-                 "[NtBridge]") {
+TEST_CASE_METHOD(NtBridgeTest, "NtBridgeTest PublishesPrimitiveValues",
+                 "[aosnt][nt-bridge]") {
   MakeBridge();
 
   wpi::nt::BooleanSubscriber boolean =
-      instance_.GetBooleanTopic("/types/boolean").Subscribe(false);
+      instance.GetBooleanTopic("/types/boolean").Subscribe(false);
   wpi::nt::IntegerSubscriber integer =
-      instance_.GetIntegerTopic("/types/integer").Subscribe(0);
+      instance.GetIntegerTopic("/types/integer").Subscribe(0);
   wpi::nt::FloatSubscriber floating =
-      instance_.GetFloatTopic("/types/float").Subscribe(0);
+      instance.GetFloatTopic("/types/float").Subscribe(0);
   wpi::nt::DoubleSubscriber real =
-      instance_.GetDoubleTopic("/types/double").Subscribe(0);
+      instance.GetDoubleTopic("/types/double").Subscribe(0);
   wpi::nt::StringSubscriber string =
-      instance_.GetStringTopic("/types/string").Subscribe("");
+      instance.GetStringTopic("/types/string").Subscribe("");
   wpi::nt::BooleanArraySubscriber booleans =
-      instance_.GetBooleanArrayTopic("/types/boolean_array").Subscribe({});
+      instance.GetBooleanArrayTopic("/types/boolean_array").Subscribe({});
   wpi::nt::IntegerArraySubscriber integers =
-      instance_.GetIntegerArrayTopic("/types/integer_array").Subscribe({});
+      instance.GetIntegerArrayTopic("/types/integer_array").Subscribe({});
   wpi::nt::FloatArraySubscriber floats =
-      instance_.GetFloatArrayTopic("/types/float_array").Subscribe({});
+      instance.GetFloatArrayTopic("/types/float_array").Subscribe({});
   wpi::nt::DoubleArraySubscriber reals =
-      instance_.GetDoubleArrayTopic("/types/double_array").Subscribe({});
+      instance.GetDoubleArrayTopic("/types/double_array").Subscribe({});
   wpi::nt::StringArraySubscriber strings =
-      instance_.GetStringArrayTopic("/types/string_array").Subscribe({});
+      instance.GetStringArrayTopic("/types/string_array").Subscribe({});
 
-  aos::Sender<Boolean> boolean_sender =
-      test_loop_->MakeSender<Boolean>("/types/boolean");
-  aos::Sender<Integer> integer_sender =
-      test_loop_->MakeSender<Integer>("/types/integer");
-  aos::Sender<Float> float_sender =
-      test_loop_->MakeSender<Float>("/types/float");
-  aos::Sender<Double> double_sender =
-      test_loop_->MakeSender<Double>("/types/double");
-  aos::Sender<String> string_sender =
-      test_loop_->MakeSender<String>("/types/string");
-  aos::Sender<BooleanArray> boolean_array_sender =
-      test_loop_->MakeSender<BooleanArray>("/types/boolean_array");
-  aos::Sender<IntegerArray> integer_array_sender =
-      test_loop_->MakeSender<IntegerArray>("/types/integer_array");
-  aos::Sender<FloatArray> float_array_sender =
-      test_loop_->MakeSender<FloatArray>("/types/float_array");
-  aos::Sender<DoubleArray> double_array_sender =
-      test_loop_->MakeSender<DoubleArray>("/types/double_array");
-  aos::Sender<StringArray> string_array_sender =
-      test_loop_->MakeSender<StringArray>("/types/string_array");
+  aos::Sender<Boolean> booleanSender =
+      testLoop->MakeSender<Boolean>("/types/boolean");
+  aos::Sender<Integer> integerSender =
+      testLoop->MakeSender<Integer>("/types/integer");
+  aos::Sender<Float> floatSender = testLoop->MakeSender<Float>("/types/float");
+  aos::Sender<Double> doubleSender =
+      testLoop->MakeSender<Double>("/types/double");
+  aos::Sender<String> stringSender =
+      testLoop->MakeSender<String>("/types/string");
+  aos::Sender<BooleanArray> booleanArraySender =
+      testLoop->MakeSender<BooleanArray>("/types/boolean_array");
+  aos::Sender<IntegerArray> integerArraySender =
+      testLoop->MakeSender<IntegerArray>("/types/integer_array");
+  aos::Sender<FloatArray> floatArraySender =
+      testLoop->MakeSender<FloatArray>("/types/float_array");
+  aos::Sender<DoubleArray> doubleArraySender =
+      testLoop->MakeSender<DoubleArray>("/types/double_array");
+  aos::Sender<StringArray> stringArraySender =
+      testLoop->MakeSender<StringArray>("/types/string_array");
 
-  test_loop_->OnRun([&]() {
-    Send(&boolean_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+  testLoop->OnRun([&]() {
+    Send(&booleanSender, [](flatbuffers::FlatBufferBuilder* fbb) {
       return CreateBoolean(*fbb, true);
     });
-    Send(&integer_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&integerSender, [](flatbuffers::FlatBufferBuilder* fbb) {
       return CreateInteger(*fbb, 1234);
     });
-    Send(&float_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&floatSender, [](flatbuffers::FlatBufferBuilder* fbb) {
       return CreateFloat(*fbb, 2.5f);
     });
-    Send(&double_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&doubleSender, [](flatbuffers::FlatBufferBuilder* fbb) {
       return CreateDouble(*fbb, 3.25);
     });
-    Send(&string_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&stringSender, [](flatbuffers::FlatBufferBuilder* fbb) {
       return CreateStringDirect(*fbb, "text");
     });
-    Send(&boolean_array_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&booleanArraySender, [](flatbuffers::FlatBufferBuilder* fbb) {
       const std::vector<uint8_t> value{1, 0, 1};
       return CreateBooleanArrayDirect(*fbb, &value);
     });
-    Send(&integer_array_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&integerArraySender, [](flatbuffers::FlatBufferBuilder* fbb) {
       const std::vector<int64_t> value{1, -2, 3};
       return CreateIntegerArrayDirect(*fbb, &value);
     });
-    Send(&float_array_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&floatArraySender, [](flatbuffers::FlatBufferBuilder* fbb) {
       const std::vector<float> value{1.5f, -2.5f};
       return CreateFloatArrayDirect(*fbb, &value);
     });
-    Send(&double_array_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&doubleArraySender, [](flatbuffers::FlatBufferBuilder* fbb) {
       const std::vector<double> value{0.125, -0.25};
       return CreateDoubleArrayDirect(*fbb, &value);
     });
-    Send(&string_array_sender, [](flatbuffers::FlatBufferBuilder* fbb) {
+    Send(&stringArraySender, [](flatbuffers::FlatBufferBuilder* fbb) {
       const std::vector<flatbuffers::Offset<flatbuffers::String>> value{
           fbb->CreateString("a"), fbb->CreateString("bc")};
       return CreateStringArrayDirect(*fbb, &value);
     });
   });
 
-  factory_.RunFor(chrono::milliseconds(100));
-  REQUIRE(bridge_->published_messages() == 10u);
+  factory.RunFor(chrono::milliseconds(100));
+  REQUIRE(bridge->GetPublishedMessageCount() == 10u);
 
   REQUIRE(boolean.Get());
   REQUIRE(integer.Get() == 1234);
@@ -249,35 +252,35 @@ TEST_CASE_METHOD(NtBridgeTest, "NtBridge publishes primitive values",
 }
 
 // The topic looks like any other protobuf topic.
-TEST_CASE_METHOD(NtBridgeTest, "NtBridge publishes a protobuf topic",
-                 "[NtBridge]") {
+TEST_CASE_METHOD(NtBridgeTest, "NtBridgeTest PublishesAProtobufTopic",
+                 "[aosnt][nt-bridge]") {
   MakeBridge();
 
-  REQUIRE(NtBridge::NtName(PingChannel()) == "/bridge");
-  REQUIRE(NtBridge::NtTypeString(PingChannel()) == "proto:aos.examples.Ping");
+  REQUIRE(NtBridge::GetTopicName(PingChannel()) == "/bridge");
+  REQUIRE(NtBridge::GetTypeString(PingChannel()) == "proto:aos.examples.Ping");
 
   INFO("the descriptor should be in NetworkTables' schema registry");
-  REQUIRE(instance_.HasSchema("proto:aos/examples/Ping.proto"));
+  REQUIRE(instance.HasSchema("proto:aos/examples/Ping.proto"));
 }
 
 // Decodes a message the way a dashboard would: read the descriptor off
 // NetworkTables, build the message type from it, then parse the topic's bytes.
 // Nothing here is compiled against aos.examples.Ping as a protobuf. It is a
 // flatbuffer, described at runtime.
-TEST_CASE_METHOD(NtBridgeTest, "NtBridge publishes a decodable message",
-                 "[NtBridge]") {
+TEST_CASE_METHOD(NtBridgeTest, "NtBridgeTest PublishesADecodableMessage",
+                 "[aosnt][nt-bridge]") {
   MakeBridge();
 
   wpi::nt::RawSubscriber data =
-      instance_.GetRawTopic(NtBridge::NtName(PingChannel()))
-          .Subscribe(NtBridge::NtTypeString(PingChannel()), {});
+      instance.GetRawTopic(NtBridge::GetTopicName(PingChannel()))
+          .Subscribe(NtBridge::GetTypeString(PingChannel()), {});
   wpi::nt::RawSubscriber schema =
-      instance_.GetRawTopic("/.schema/proto:aos/examples/Ping.proto")
+      instance.GetRawTopic("/.schema/proto:aos/examples/Ping.proto")
           .Subscribe("proto:FileDescriptorProto", {});
 
   aos::Sender<aos::examples::PingStatic> sender =
-      test_loop_->MakeSender<aos::examples::PingStatic>("/bridge");
-  test_loop_->OnRun([&]() {
+      testLoop->MakeSender<aos::examples::PingStatic>("/bridge");
+  testLoop->OnRun([&]() {
     aos::Sender<aos::examples::PingStatic>::StaticBuilder builder =
         sender.MakeStaticBuilder();
     builder->set_value(1868);
@@ -285,50 +288,59 @@ TEST_CASE_METHOD(NtBridgeTest, "NtBridge publishes a decodable message",
     builder.CheckOk(builder.Send());
   });
 
-  factory_.RunFor(chrono::milliseconds(100));
-  REQUIRE(bridge_->published_messages() == 1u);
+  factory.RunFor(chrono::milliseconds(100));
+  REQUIRE(bridge->GetPublishedMessageCount() == 1u);
 
-  const std::vector<uint8_t> schema_bytes = schema.Get();
+  const std::vector<uint8_t> schemaBytes = schema.Get();
   INFO("no descriptor was published");
-  REQUIRE_FALSE(schema_bytes.empty());
+  REQUIRE_FALSE(schemaBytes.empty());
 
-  google::protobuf::FileDescriptorProto file;
-  REQUIRE(file.ParseFromArray(schema_bytes.data(), schema_bytes.size()));
-  google::protobuf::DescriptorPool pool;
-  REQUIRE(pool.BuildFile(file) != nullptr);
-  const google::protobuf::Descriptor* const ping =
-      pool.FindMessageTypeByName("aos.examples.Ping");
+  std::unique_ptr<upb_Arena, decltype(&upb_Arena_Free)> arena{upb_Arena_New(),
+                                                              &upb_Arena_Free};
+  std::unique_ptr<upb_DefPool, decltype(&upb_DefPool_Free)> pool{
+      upb_DefPool_New(), &upb_DefPool_Free};
+  const google_protobuf_FileDescriptorProto* file =
+      google_protobuf_FileDescriptorProto_parse(
+          reinterpret_cast<const char*>(schemaBytes.data()), schemaBytes.size(),
+          arena.get());
+  REQUIRE(file != nullptr);
+  upb_Status status;
+  upb_Status_Clear(&status);
+  REQUIRE(upb_DefPool_AddFile(pool.get(), file, &status) != nullptr);
+  const upb_MessageDef* ping =
+      upb_DefPool_FindMessageByName(pool.get(), "aos.examples.Ping");
   REQUIRE(ping != nullptr);
 
-  const std::vector<uint8_t> message_bytes = data.Get();
+  const std::vector<uint8_t> messageBytes = data.Get();
   INFO("nothing arrived on the topic");
-  REQUIRE_FALSE(message_bytes.empty());
+  REQUIRE_FALSE(messageBytes.empty());
 
-  google::protobuf::DynamicMessageFactory factory{&pool};
-  std::unique_ptr<google::protobuf::Message> message{
-      factory.GetPrototype(ping)->New()};
-  REQUIRE(message->ParseFromArray(message_bytes.data(), message_bytes.size()));
+  const upb_MiniTable* table = upb_MessageDef_MiniTable(ping);
+  upb_Message* message = upb_Message_New(table, arena.get());
+  REQUIRE(upb_Decode(reinterpret_cast<const char*>(messageBytes.data()),
+                     messageBytes.size(), message, table, nullptr, 0,
+                     arena.get()) == kUpb_DecodeStatus_Ok);
 
-  const google::protobuf::Reflection* const reflection =
-      message->GetReflection();
-  REQUIRE(reflection->GetInt32(*message, ping->FindFieldByName("value")) ==
-          1868);
-  REQUIRE(reflection->GetInt64(*message, ping->FindFieldByName("send_time")) ==
-          1234567);
+  REQUIRE(upb_Message_GetFieldByDef(
+              message, upb_MessageDef_FindFieldByName(ping, "value"))
+              .int32_val == 1868);
+  REQUIRE(upb_Message_GetFieldByDef(
+              message, upb_MessageDef_FindFieldByName(ping, "send_time"))
+              .int64_val == 1234567);
 }
 
 // A topic has one type, so two tagged channels cannot share a name.
-TEST_CASE("NtBridge rejects tagged channels that share a name", "[NtBridge]") {
+TEST_CASE("NtBridgeTest RejectsTaggedChannelsThatShareAName",
+          "[aosnt][nt-bridge]") {
   const aos::FlatbufferDetachedBuffer<aos::Configuration> config =
       aos::configuration::ReadConfig(
           RunfilePath("aosnt/aos_duplicate_config.bfbs"));
   aos::SimulatedEventLoopFactory factory{&config.message()};
-  std::unique_ptr<aos::EventLoop> event_loop = factory.MakeEventLoop("bridge");
+  std::unique_ptr<aos::EventLoop> eventLoop = factory.MakeEventLoop("bridge");
   wpi::nt::NetworkTableInstance instance =
       wpi::nt::NetworkTableInstance::Create();
 
-  REQUIRE_THROWS_AS(NtBridge(event_loop.get(), instance),
-                    std::invalid_argument);
+  REQUIRE_THROWS_AS(NtBridge(eventLoop.get(), instance), std::invalid_argument);
 
   wpi::nt::NetworkTableInstance::Destroy(instance);
 }

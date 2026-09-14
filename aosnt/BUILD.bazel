@@ -4,16 +4,17 @@ load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
 
 cc_library(
     name = "aosnt",
-    srcs = ["src/main/native/cpp/NtBridge.cpp"],
-    hdrs = ["src/main/native/include/wpi/aosnt/NtBridge.hpp"],
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [
         "//aosnt/types:nt_types_fbs",
         "//ntcore",
+        "//wpiutil",
         "@aos//aos:configuration",
         "@aos//aos/events:event_loop",
-        "@aos//aos/protobuf:flatbuffer_to_proto",
+        "@aos_flatbuffers//:flatbuffers",
     ],
 )
 
@@ -79,28 +80,32 @@ cc_test(
     name = "aosnt-cpp-test",
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
-    # protobuf's headers still use absl::disjunction, which abseil deprecated.
-    # The osx_flags.rc exemptions match on the source being compiled, so they
-    # do not reach headers this test includes.
-    copts = select({
-        "@platforms//os:osx": ["-Wno-error=deprecated-declarations"],
-        "//conditions:default": [],
-    }),
     data = [
         ":aos_config",
         ":aos_duplicate_config",
     ],
     deps = [
         ":aosnt",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_bad_attribute_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_schema",
         "//aosnt/types:nt_types_fbs",
         "//ntcore",
         "//thirdparty/catch2",
+        "//wpiutil",
         "//wpiutil:wpiutil-testlib",
         "@aos//aos:configuration",
+        "@aos//aos:flatbuffer_merge",
         "@aos//aos:init",
+        "@aos//aos:realtime",
         "@aos//aos/events:simulated_event_loop",
+        "@aos//aos/flatbuffers:builder",
         "@aos//aos/testing/ping_pong:ping_fbs",
+        "@aos_flatbuffers//:flatbuffers",
         "@bazel_tools//tools/cpp/runfiles",
-        "@com_google_protobuf//:protobuf",
     ],
 )
