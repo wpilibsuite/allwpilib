@@ -201,12 +201,11 @@ subprojects {
             // ignore modules requiring automatic library modules
             "-Xlint:-requires-automatic",
             "-Xlint:-requires-transitive-automatic",
-            // Java modules warn about exposing classes without an explicitly declared constructor
-            "-Xlint:-exports", // workaround for #9350
-            "-Xlint:-missing-explicit-ctor", // workaround for #9349
             // Java modules warn about module names with trailing digits
             "-Xlint:-module",
-            "-Xlint:-classfile"
+            "-Xlint:-classfile",
+            // ignore warnings for classes missing explicit constructors
+            "-Xlint:-missing-explicit-ctor",
         ]
     }
     // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles

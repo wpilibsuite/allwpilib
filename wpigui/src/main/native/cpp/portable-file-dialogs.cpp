@@ -478,19 +478,24 @@ BOOL CALLBACK internal::executor::enum_windows_callback(HWND hwnd, LPARAM lParam
 void internal::executor::start_func(std::function<std::string(int *)> const &fun)
 {
     stop();
+    bool started = false;
 
-    auto trampoline = [fun, this]()
+    auto trampoline = [fun, this, &started]()
     {
-        // Save our thread id so that the caller can cancel us
-        m_tid = GetCurrentThreadId();
-        EnumWindows(&enum_windows_callback, (LPARAM)this);
+        {
+            std::scoped_lock lock{m_mutex};
+            // Save our thread id so that the caller can cancel us
+            m_tid = GetCurrentThreadId();
+            EnumWindows(&enum_windows_callback, (LPARAM)this);
+            started = true;
+        }
         m_cond.notify_all();
         return fun(&m_exit_code);
     };
 
     std::unique_lock<std::mutex> lock(m_mutex);
     m_future = std::async(std::launch::async, trampoline);
-    m_cond.wait(lock);
+    m_cond.wait(lock, [&started] { return started; });
     m_running = true;
 }
 

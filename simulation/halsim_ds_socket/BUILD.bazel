@@ -107,6 +107,7 @@ generate_version_file(
     name = "generate_python_version",
     output_file = "src/main/python/halsim_ds_socket/version.py",
     template = "//shared/bazel/rules/robotpy:version_template.in",
+    version_variable = "ROBOTPY_VERSION",
 )
 
 robotpy_library(

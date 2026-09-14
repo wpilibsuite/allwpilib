@@ -1,8 +1,7 @@
-
-#include "TelemetryPython.h"
+#include "rpy/MockTelemetryBackendFunctions.h"
 #include "semiwrap_init.telemetry._telemetry.hpp"
 
 SEMIWRAP_PYBIND11_MODULE(m) {
   initWrapper(m);
-  wpi::InitTelemetryPython(m);
+  wpi::telemetry::python::InitializeMockBackendValueTypes(m);
 }

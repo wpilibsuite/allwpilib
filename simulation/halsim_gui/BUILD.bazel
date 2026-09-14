@@ -1,6 +1,7 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
@@ -95,7 +96,10 @@ wpilib_cc_static_library(
 cc_test(
     name = "halsim_gui-test",
     size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
+    srcs = glob(
+        ["src/test/native/**/*.cpp"],
+        exclude = ["src/test/native/imgui/**"],
+    ),
     tags = [
         "no-asan",
         "wpi-cpp-gui",
@@ -103,6 +107,27 @@ cc_test(
     deps = [
         ":halsim_gui",
         "//thirdparty/catch2",
+    ],
+)
+
+wpilib_imgui_cc_test(
+    name = "halsim_gui-imgui-test",
+    size = "small",
+    srcs = glob([
+        "src/main/native/cpp/*",
+        "src/main/native/include/**/*.hpp",
+        "src/test/native/imgui/**",
+    ]),
+    includes = ["src/main/native/include"],
+    linkopts = [
+        "-lm",
+    ],
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        "//glass:glassnt_for_tests",
+        "//hal:wpiHal",
     ],
 )
 

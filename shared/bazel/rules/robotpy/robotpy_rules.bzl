@@ -127,6 +127,7 @@ def robotpy_library(
         python_requires = python_requires,
         license = "BSD-3-Clause",
         tags = ["robotpy"],
+        visibility = ["//visibility:public"],
     )
 
     pycross_wheel_library(

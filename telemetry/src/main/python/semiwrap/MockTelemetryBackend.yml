@@ -1,0 +1,49 @@
+extra_includes:
+- rpy/MockTelemetryBackendFunctions.h
+- rpy/MockTelemetryBackendValueCasters.h
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::telemetry::MockTelemetryBackend:
+    methods:
+      MockTelemetryBackend:
+      GetActions:
+        no_release_gil: true
+      Clear:
+      GetLastAction:
+        no_release_gil: true
+      GetLastValue:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::telemetry::MockTelemetryBackend& self,
+             std::string_view path) {
+            return wpi::telemetry::python::GetLastValue(self, path);
+          }
+      GetSchema:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::telemetry::MockTelemetryBackend& self,
+             std::string_view schemaName) {
+            return wpi::telemetry::python::GetSchema(self, schemaName);
+          }
+      GetEntry:
+      RemoveEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:
+  wpi::telemetry::MockTelemetryBackend::KeepDuplicatesValue:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::SetPropertyValue:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::LogStringValue:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::LogBooleanArrayValue:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::LogRawValue:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::Action:
+    ignore: true
+  wpi::telemetry::MockTelemetryBackend::Schema:
+    ignore: true

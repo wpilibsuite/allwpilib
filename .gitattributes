@@ -1,6 +1,7 @@
 *.adoc text eol=lf
 *.bzl text eol=lf
 *.bazel text eol=lf
+*.bat -text
 *.c text eol=lf
 *.clang-format text eol=lf
 *.clang-tidy text eol=lf

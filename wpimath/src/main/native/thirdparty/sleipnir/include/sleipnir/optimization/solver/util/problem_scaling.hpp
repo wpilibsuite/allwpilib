@@ -53,7 +53,7 @@ struct ProblemScaling {
   ///
   ///   d_f = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   explicit ProblemScaling(const DenseVector& g) {
@@ -70,7 +70,7 @@ struct ProblemScaling {
   ///   d_f     = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///   d_cₑ[j] = min(1, gₘₐₓ / ‖∇cₑⱼ(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   /// @param A_e Equality constraint Jacobian Aₑ, evaluated at the starting
@@ -90,7 +90,7 @@ struct ProblemScaling {
   ///   d_f    = min(1, gₘₐₓ / ‖∇f(x₀)‖_∞)
   ///   d_c[j] = min(1, gₘₐₓ / ‖∇cⱼ(x₀)‖_∞)
   ///
-  /// See §3.8 Automatic Scaling of the Problem Statement in [2].
+  /// See section 3.8 of [2].
   ///
   /// @param g Cost gradient ∇f, evaluated at the starting point.
   /// @param A_e Equality constraint Jacobian Aₑ, evaluated at the starting

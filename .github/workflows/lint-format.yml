@@ -14,14 +14,14 @@ concurrency:
 jobs:
   validation:
     name: "Validation"
-    runs-on: ubuntu-latest
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
       - uses: gradle/actions/wrapper-validation@v6
 
   wpiformat:
     name: "wpiformat"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -60,7 +60,7 @@ jobs:
 
   tidy:
     name: "clang-tidy"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
@@ -93,7 +93,7 @@ jobs:
         run: ${{ runner.temp }}/wpiformat/bin/wpiformat -no-format -tidy-changed -compile-commands=build/TargetedCompileCommands/linuxx86-64debug
   javaformat:
     name: "Java format"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     needs: [validation]
     container: wpilib/debian-base:trixie
     steps:
@@ -126,7 +126,7 @@ jobs:
         if: ${{ failure() }}
 
   check-spelling:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
       - name: misspell

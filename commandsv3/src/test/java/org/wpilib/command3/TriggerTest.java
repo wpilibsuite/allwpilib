@@ -10,11 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Seconds;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.system.RobotController;
 
 class TriggerTest extends CommandTestBase {
@@ -189,26 +192,8 @@ class TriggerTest extends CommandTestBase {
 
   @Test
   void bindingScopesToOpmodeIfAvailable() {
-    var fetcher =
-        new OpModeFetcher() {
-          long m_id = 12345;
-
-          void clear() {
-            m_id = 0;
-          }
-
-          @Override
-          long getOpModeId() {
-            return m_id;
-          }
-
-          @Override
-          String getOpModeName() {
-            return "This is an opmode!";
-          }
-        };
-    OpModeFetcher.setFetcher(fetcher);
-
+    m_opModeId = 12345;
+    m_opModeName = "This is an opmode!";
     var triggerSignal = new AtomicBoolean(false);
     var trigger = new Trigger(m_scheduler, triggerSignal::get);
 
@@ -219,9 +204,109 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
 
-    fetcher.clear();
+    m_opModeId = 0;
+    m_opModeName = "";
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(command), "Command should have stopped when opmode exited");
+  }
+
+  @Test
+  void bindingScopesToRobotModeIfAvailable() {
+    for (RobotMode mode : RobotMode.values()) {
+      if (mode == RobotMode.UNKNOWN) {
+        // global scope, skip
+        continue;
+      }
+
+      m_robotMode = mode;
+
+      var triggerSignal = new AtomicBoolean(false);
+      var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+      var command = Command.noRequirements(Coroutine::park).named("Command");
+      trigger.whileTrue(command);
+
+      triggerSignal.set(true);
+      m_scheduler.run();
+      assertTrue(m_scheduler.isRunning(command), "Command should have started when triggered");
+
+      m_robotMode = RobotMode.UNKNOWN;
+      m_scheduler.run();
+      assertFalse(
+          m_scheduler.isRunning(command), "Command should have stopped when robot mode exited");
+    }
+  }
+
+  @Test
+  void triggerCreatedInOneModeSurvivesTransitionsToAllOtherModes() {
+    for (RobotMode sourceMode : concreteRobotModes()) {
+      for (RobotMode destinationMode : concreteRobotModes()) {
+        if (sourceMode == destinationMode) {
+          continue;
+        }
+
+        m_robotMode = sourceMode;
+
+        var triggerSignal = new AtomicBoolean(false);
+        var trigger = new Trigger(m_scheduler, triggerSignal::get);
+
+        var sourceModeCommand = Command.noRequirements(Coroutine::park).named("SourceModeCommand");
+        trigger.whileTrue(sourceModeCommand);
+
+        triggerSignal.set(true);
+        m_scheduler.run();
+        assertTrue(
+            m_scheduler.isRunning(sourceModeCommand),
+            () ->
+                "Command should have started in source mode "
+                    + sourceMode
+                    + " before transition to "
+                    + destinationMode);
+
+        // TRANSITION SOURCE -> DESTINATION
+
+        m_robotMode = destinationMode;
+        m_scheduler.run();
+        assertFalse(
+            m_scheduler.isRunning(sourceModeCommand),
+            () ->
+                "Source mode binding should be inactive after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+
+        triggerSignal.set(false);
+        m_scheduler.run();
+
+        var destinationModeCommand =
+            Command.noRequirements(Coroutine::park).named("DestinationModeCommand");
+        trigger.whileTrue(destinationModeCommand);
+
+        triggerSignal.set(true);
+        m_scheduler.run();
+        assertTrue(
+            m_scheduler.isRunning(destinationModeCommand),
+            () ->
+                "Trigger should still be active after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+
+        triggerSignal.set(false);
+        m_scheduler.run();
+        assertFalse(
+            m_scheduler.isRunning(destinationModeCommand),
+            () ->
+                "Destination mode command should cancel on falling edge after transition "
+                    + sourceMode
+                    + " -> "
+                    + destinationMode);
+      }
+    }
+  }
+
+  private static List<RobotMode> concreteRobotModes() {
+    return List.of(RobotMode.AUTONOMOUS, RobotMode.TELEOPERATED, RobotMode.UTILITY);
   }
 
   // The scheduler lifecycle polls triggers at the start of `run()`
@@ -607,15 +692,17 @@ class TriggerTest extends CommandTestBase {
   }
 
   @Test
-  void triggerUnbindsWhenCommandScopeInactive() {
+  void triggerDoesNotUnbindWhenCommandScopeInactive() {
     var triggerSignal = new AtomicBoolean(false);
     var commandRan = new AtomicBoolean(false);
+    var triggerRef = new AtomicReference<Trigger>();
     var innerCommand = Command.noRequirements(_ -> commandRan.set(true)).named("Inner");
 
     var outerCommand =
         Command.noRequirements(
                 co -> {
                   var trigger = new Trigger(m_scheduler, triggerSignal::get);
+                  triggerRef.set(trigger);
                   trigger.onTrue(innerCommand);
                   co.park();
                 })
@@ -634,7 +721,59 @@ class TriggerTest extends CommandTestBase {
     m_scheduler.run();
     assertFalse(m_scheduler.isRunning(outerCommand));
 
-    // The trigger should have unbound itself during the last run() call.
+    // Trigger should still update even though command bindings were removed
+    assertTrue(triggerRef.get().getAsBoolean());
+    triggerSignal.set(false);
+    assertTrue(triggerRef.get().getAsBoolean());
+
+    m_scheduler.run();
+    assertFalse(triggerRef.get().getAsBoolean());
+  }
+
+  @Test
+  void oneLineWhileTrueBindingRetainsTrigger() {
+    var signal = new AtomicBoolean(false);
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+
+    var triggerRef = new WeakReference<>(new Trigger(m_scheduler, signal::get).whileTrue(command));
+
+    assertFalse(
+        waitForCollection(triggerRef),
+        "Trigger with active command bindings should be strongly retained");
+
+    signal.set(true);
+    m_scheduler.run();
+    assertTrue(
+        m_scheduler.isRunning(command),
+        "Retained trigger should continue scheduling command bindings");
+  }
+
+  @Test
+  void unscopedTriggerCanBeGarbageCollected() {
+    // Makes the trigger scoped to an opmode
+    m_opModeId = 1;
+    m_opModeName = "opmode";
+
+    var signal = new AtomicBoolean(false);
+
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    var triggerRef = new WeakReference<>(new Trigger(m_scheduler, signal::get).onTrue(command));
+
+    m_scheduler.run();
+    assertFalse(
+        waitForCollection(triggerRef),
+        "Trigger should not be garbage collected while still in scope");
+
+    // Exit the opmode scope
+    m_opModeId = 0;
+    m_opModeName = "";
+
+    signal.set(true);
+    m_scheduler.run(); // internally removes a strong reference to the trigger
+    assertEquals(List.of(), m_events, "The trigger should not have fired");
+    assertTrue(
+        waitForCollection(triggerRef),
+        "Trigger should be garbage collected after going out of scope");
   }
 
   @Test
@@ -838,5 +977,29 @@ class TriggerTest extends CommandTestBase {
       }
       return val;
     };
+  }
+
+  @SuppressWarnings("PMD.DoNotCallGarbageCollectionExplicitly")
+  private static boolean waitForCollection(WeakReference<?> reference) {
+    for (int i = 0; i < 200; i++) {
+      if (reference.get() == null) {
+        return true;
+      }
+
+      System.gc();
+      byte[] pressure = new byte[1024 * 1024];
+      pressure[0] = 1;
+
+      try {
+        Thread.sleep(5);
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+        break;
+      }
+
+      assertEquals(1, pressure[0]);
+    }
+
+    return reference.get() == null;
   }
 }

@@ -481,7 +481,8 @@ TEST_CASE("SmallPtrSetTest Reserve", "[wpiutil][llvm]") {
   CHECK_THAT(Set, UnorderedRangeEquals({&Vals[0], &Vals[1], &Vals[2],
                                         &Vals[3], &Vals[4], &Vals[5]}));
 
-  // Reserving 192 should result in 256 buckets.
+  // Reserving 192 should result in 512 buckets: 192 * 3 / 2 = 288, rounded
+  // up to the next power of two.
   Set.reserve(192);
-  CHECK(Set.capacity() == 256u);
+  CHECK(Set.capacity() == 512u);
 }

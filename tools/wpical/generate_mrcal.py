@@ -20,7 +20,8 @@ def main(argv):
 
     args.output_directory.mkdir(parents=True, exist_ok=True)
     result = subprocess.check_output(
-        f"{dirname}/src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl"
+        "./src/main/native/thirdparty/mrcal/src/minimath/minimath_generate.pl",
+        cwd=dirname,
     )
     (args.output_directory / "minimath_generated.h").write_text(
         str(result, encoding="UTF8")
