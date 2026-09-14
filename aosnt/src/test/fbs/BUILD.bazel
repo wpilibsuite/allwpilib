@@ -36,6 +36,12 @@ static_flatbuffer(
     visibility = ["//aosnt:__pkg__"],
 )
 
+static_flatbuffer(
+    name = "flatbuffer_to_proto_enums_test_fbs",
+    srcs = ["flatbuffer_to_proto_enums_test.fbs"],
+    visibility = ["//aosnt:__pkg__"],
+)
+
 # AOS's static flatbuffer API cannot generate recursive tables, so this one is
 # plain flatc.
 flatbuffer_cc_library(
@@ -94,6 +100,13 @@ cc_static_flatbuffer(
 )
 
 cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_enums_test_schema",
+    function = "wpi::aosnt::testing::EnumsSchema",
+    target = ":flatbuffer_to_proto_enums_test_fbs_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+cc_static_flatbuffer(
     name = "flatbuffer_to_proto_recursive_test_schema",
     function = "wpi::aosnt::testing::RecursiveSchema",
     target = ":flatbuffer_to_proto_recursive_test_fbs_reflection_out",
@@ -125,5 +138,33 @@ cc_static_flatbuffer(
     name = "flatbuffer_to_proto_conflict_second_test_schema",
     function = "wpi::aosnt::testing::conflict::ConflictSecondSchema",
     target = ":flatbuffer_to_proto_conflict_second_test_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+# Only the schema is used, so plain flatc is enough.
+flatbuffer_cc_library(
+    name = "flatbuffer_to_proto_clash_first_test_fbs",
+    srcs = ["flatbuffer_to_proto_clash_first_test.fbs"],
+    gen_reflections = True,
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_clash_first_test_schema",
+    function = "wpi::aosnt::testing::clash::ClashFirstSchema",
+    target = ":flatbuffer_to_proto_clash_first_test_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+# Only the schema is used, so plain flatc is enough.
+flatbuffer_cc_library(
+    name = "flatbuffer_to_proto_clash_second_test_fbs",
+    srcs = ["flatbuffer_to_proto_clash_second_test.fbs"],
+    gen_reflections = True,
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_clash_second_test_schema",
+    function = "wpi::aosnt::testing::clash::ClashSecondSchema",
+    target = ":flatbuffer_to_proto_clash_second_test_fbs_reflection_out",
     visibility = ["//aosnt:__pkg__"],
 )

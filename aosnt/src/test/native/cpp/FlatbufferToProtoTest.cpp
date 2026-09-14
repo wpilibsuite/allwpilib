@@ -36,6 +36,8 @@
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_bad_attribute_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_enums_test_generated.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_enums_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_recursive_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_recursive_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_scalars_test_generated.h"
@@ -78,6 +80,10 @@ const reflection::Schema* GetDefaultsSchema() {
 
 const reflection::Schema* GetArraysSchema() {
   return GetSchemaFromSpan(ArraysSchema());
+}
+
+const reflection::Schema* GetEnumsSchema() {
+  return GetSchemaFromSpan(EnumsSchema());
 }
 
 const reflection::Schema* GetRecursiveSchema() {
@@ -672,18 +678,26 @@ TEST_CASE("FlatbufferToProtoTest OmitsDefaults",
   CHECK(Find(fields, 5)->value == 7u);
 }
 
-// Compiles a one-field schema the way flatc would, for checking what a
-// proto_type is accepted on.
-std::vector<uint8_t> CompileSchemaWithField(std::string_view field) {
-  flatbuffers::Parser parser;
-  const std::string text = std::format(
-      "attribute \"proto_type\"; table T {{ {} }} root_type T;", field);
+// Compiles a schema the way flatc would, for checking what is refused.
+std::vector<uint8_t> CompileSchema(std::string_view text) {
+  flatbuffers::IDLOptions options;
+  // Record bit_flags, as AOS's flatc rules do.
+  options.binary_schema_builtins = true;
+  flatbuffers::Parser parser{options};
+  const std::string terminated{text};
+  const bool parsed = parser.Parse(terminated.c_str());
   INFO(parser.error_);
-  REQUIRE(parser.Parse(text.c_str()));
+  REQUIRE(parsed);
   parser.Serialize();
   return std::vector<uint8_t>(
       parser.builder_.GetBufferPointer(),
       parser.builder_.GetBufferPointer() + parser.builder_.GetSize());
+}
+
+// Compiles a one-field schema, for checking what a proto_type is accepted on.
+std::vector<uint8_t> CompileSchemaWithField(std::string_view field) {
+  return CompileSchema(std::format(
+      "attribute \"proto_type\"; table T {{ {} }} root_type T;", field));
 }
 
 // A proto_type names exactly the protobuf type its field is. Anything else
@@ -933,6 +947,139 @@ TEST_CASE("FlatbufferToProtoArraysTest UpbDecodesFixedLengthArrays",
   const upb_MessageDef* pointDef = upb_FieldDef_MessageSubDef(pointsField);
   CHECK(GetField(upb_Array_Get(points, 0).msg_val, pointDef, "y").float_val ==
         2.5f);
+}
+
+flatbuffers::DetachedBuffer MakeEnums() {
+  flatbuffers::FlatBufferBuilder fbb;
+  const std::array<Level, 2> levels{Level::High, Level::Low};
+  const auto levelsOffset = fbb.CreateVector(levels.data(), levels.size());
+  Setting setting{Mode::Stop};
+  setting.mutable_levels()->Mutate(0, Level::Low);
+  setting.mutable_levels()->Mutate(1, Level::High);
+  EnumsBuilder builder{fbb};
+  builder.add_level(Level::Low);
+  builder.add_levels(levelsOffset);
+  builder.add_setting(&setting);
+  fbb.Finish(builder.Finish());
+  return fbb.Release();
+}
+
+// An enum is a varint of its value, sign-extended as an int32 is.
+TEST_CASE("FlatbufferToProtoEnumsTest EncodesEnumsAsVarints",
+          "[aosnt][flatbuffer-to-proto]") {
+  const flatbuffers::DetachedBuffer buffer = MakeEnums();
+  const FlatbufferToProto translator{GetEnumsSchema()};
+  const std::vector<WireField> fields =
+      Decode(Encode(translator, buffer.data()));
+
+  REQUIRE(Find(fields, 1) != nullptr);
+  CHECK(Find(fields, 1)->wireType == PB_WT_VARINT);
+  CHECK(Find(fields, 1)->value == static_cast<uint64_t>(int64_t{-1}));
+  // Left unset at its default of Run.
+  REQUIRE(Find(fields, 2) != nullptr);
+  CHECK(Find(fields, 2)->value == 1u);
+  REQUIRE(Find(fields, 3) != nullptr);
+  CHECK(DecodePackedVarints(Find(fields, 3)->bytes) ==
+        std::vector<uint64_t>{1, static_cast<uint64_t>(int64_t{-1})});
+
+  REQUIRE(Find(fields, 4) != nullptr);
+  const std::vector<WireField> setting = Decode(Find(fields, 4)->bytes);
+  REQUIRE(Find(setting, 1) != nullptr);
+  CHECK(Find(setting, 1)->value == 2u);
+  REQUIRE(Find(setting, 2) != nullptr);
+  CHECK(DecodePackedVarints(Find(setting, 2)->bytes) ==
+        std::vector<uint64_t>{static_cast<uint64_t>(int64_t{-1}), 1});
+}
+
+// Each enum is described in a file of its own, ahead of the messages that use
+// it, with its 0 first as proto3 requires.
+TEST_CASE("FlatbufferToProtoEnumsTest DescribesEnums",
+          "[aosnt][flatbuffer-to-proto]") {
+  const std::vector<ProtoFile> files =
+      BuildFileDescriptorProtos(GetEnumsSchema());
+  std::vector<std::string> names;
+  for (const ProtoFile& file : files) {
+    names.push_back(file.name);
+  }
+  CHECK(names == std::vector<std::string>{"wpi/aosnt/testing/Level.proto",
+                                          "wpi/aosnt/testing/Mode.proto",
+                                          "wpi/aosnt/testing/Setting.proto",
+                                          "wpi/aosnt/testing/Enums.proto"});
+
+  UpbDecoder decoder{files};
+  const upb_MessageDef* enums =
+      decoder.FindMessage(GetProtoMessageName(GetEnumsSchema()));
+  const upb_FieldDef* levelField = FindField(enums, "level");
+  CHECK(upb_FieldDef_Type(levelField) == kUpb_FieldType_Enum);
+  const upb_EnumDef* level = upb_FieldDef_EnumSubDef(levelField);
+  REQUIRE(level != nullptr);
+  CHECK(std::string_view{upb_EnumDef_FullName(level)} ==
+        "wpi.aosnt.testing.Level");
+  REQUIRE(upb_EnumDef_ValueCount(level) == 3);
+  CHECK(upb_EnumValueDef_Number(upb_EnumDef_Value(level, 0)) == 0);
+  CHECK(std::string_view{upb_EnumValueDef_Name(
+            upb_EnumDef_FindValueByNumber(level, -1))} == "Low");
+
+  const flatbuffers::DetachedBuffer buffer = MakeEnums();
+  const FlatbufferToProto translator{GetEnumsSchema()};
+  const upb_Message* message =
+      decoder.Decode(enums, Encode(translator, buffer.data()));
+  CHECK(GetField(message, enums, "level").int32_val == -1);
+  CHECK(GetField(message, enums, "mode").int32_val == 1);
+  const upb_Array* levels = GetField(message, enums, "levels").array_val;
+  REQUIRE(levels != nullptr);
+  REQUIRE(upb_Array_Size(levels) == 2u);
+  CHECK(upb_Array_Get(levels, 1).int32_val == -1);
+}
+
+// Protobuf's limits on enums are the schema's to meet, so an enum that does not
+// fit is refused rather than described as an integer.
+TEST_CASE("FlatbufferToProtoEnumsTest RejectsEnumsProtobufCannotRepresent",
+          "[aosnt][flatbuffer-to-proto]") {
+  for (const auto& [text, message] :
+       std::vector<std::pair<std::string_view, std::string_view>>{
+           {"enum E:long { A } table T { e:E; } root_type T;",
+            "which is a Long, and a protobuf enum is an int32"},
+           {"enum E:ulong { A } table T { e:E; } root_type T;",
+            "which is a ULong, and a protobuf enum is an int32"},
+           {"enum E:uint { A } table T { e:[E]; } root_type T;",
+            "which is a UInt, and a protobuf enum is an int32"},
+           {"enum E:int { A = 1, B } table T { e:E = A; } root_type T;",
+            "which has no value of 0"},
+           {"enum E:ubyte (bit_flags) { A, B } table T { e:E; } root_type T;",
+            "is the bit_flags enum E"},
+           {R"(attribute "proto_type"; enum E:int { A }
+               table T { e:E (proto_type: "sint32"); } root_type T;)",
+            "it is the enum E, which is a protobuf enum"},
+           {"table U { a:int; } union X { U } table T { x:X; } root_type T;",
+            "is part of a union"}}) {
+    INFO(text);
+    const std::vector<uint8_t> schema = CompileSchema(text);
+    CHECK_THROWS_WITH(FlatbufferToProto{reflection::GetSchema(schema.data())},
+                      Catch::Matchers::ContainsSubstring(std::string{message}));
+    CHECK_THROWS_WITH(
+        BuildFileDescriptorProtos(reflection::GetSchema(schema.data())),
+        Catch::Matchers::ContainsSubstring(std::string{message}));
+  }
+}
+
+// Protobuf scopes an enum's values to its package, so they cannot share a name
+// with another enum's values or with a type.
+TEST_CASE("FlatbufferToProtoEnumsTest RejectsEnumValuesSharingAName",
+          "[aosnt][flatbuffer-to-proto]") {
+  for (const auto& [text, message] :
+       std::vector<std::pair<std::string_view, std::string_view>>{
+           {R"(namespace n; enum E:byte { A } enum F:byte { A }
+               table T { e:E; f:F; } root_type T;)",
+            "value A of enum n.E and value A of enum n.F are both named n.A"},
+           {"enum E:byte { T } table T { e:E; } root_type T;",
+            "table T and value T of enum E are both named T"}}) {
+    INFO(text);
+    const std::vector<uint8_t> schema = CompileSchema(text);
+    CHECK_THROWS_WITH(
+        BuildFileDescriptorProtos(reflection::GetSchema(schema.data())),
+        Catch::Matchers::ContainsSubstring(std::string{message}));
+  }
 }
 
 // aos::ScopedRealtime makes any allocation inside Encode() fatal.

@@ -24,6 +24,8 @@
 #include "aos/configuration.h"
 #include "aos/events/simulated_event_loop.h"
 #include "aos/testing/ping_pong/ping_static.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_clash_first_test_schema.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_clash_second_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_conflict_first_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_conflict_second_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_spanning_test_schema.h"
@@ -415,6 +417,43 @@ TEST_CASE("NtBridgeTest RejectsChannelsThatDescribeAMessageDifferently",
           "describe wpi/aosnt/testing/conflict/Shared.proto differently"));
   CHECK_FALSE(
       instance.HasSchema("proto:wpi/aosnt/testing/conflict/First.proto"));
+
+  wpi::nt::NetworkTableInstance::Destroy(instance);
+}
+
+// Glass and DataLog load every channel's descriptors into one pool, where an
+// enum value is named for its package. Two schemas whose enums share a package
+// and a value name each describe fine alone and cannot be loaded together.
+TEST_CASE("NtBridgeTest RejectsChannelsWhoseDescriptorsDoNotLoadTogether",
+          "[aosnt][nt-bridge]") {
+  const aos::FlatbufferDetachedBuffer<aos::Configuration> config = MakeConfig(
+      R"({
+        "channels": [
+          {
+            "name": "/first",
+            "type": "wpi.aosnt.testing.clash.First",
+            "tags": ["nt:publish"]
+          },
+          {
+            "name": "/second",
+            "type": "wpi.aosnt.testing.clash.Second",
+            "tags": ["nt:publish"]
+          }
+        ]
+      })",
+      {testing::clash::ClashFirstSchema(),
+       testing::clash::ClashSecondSchema()});
+  aos::SimulatedEventLoopFactory factory{&config.message()};
+  std::unique_ptr<aos::EventLoop> eventLoop = factory.MakeEventLoop("bridge");
+  wpi::nt::NetworkTableInstance instance =
+      wpi::nt::NetworkTableInstance::Create();
+
+  CHECK_THROWS_WITH(
+      NtBridge(eventLoop.get(), instance),
+      Catch::Matchers::ContainsSubstring(
+          "does not load alongside the other tagged channels' descriptors") &&
+          Catch::Matchers::ContainsSubstring("wpi.aosnt.testing.clash.Off"));
+  CHECK_FALSE(instance.HasSchema("proto:wpi/aosnt/testing/clash/First.proto"));
 
   wpi::nt::NetworkTableInstance::Destroy(instance);
 }

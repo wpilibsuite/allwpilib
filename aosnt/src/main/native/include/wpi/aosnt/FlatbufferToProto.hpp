@@ -51,6 +51,11 @@ namespace wpi::aosnt {
  *
  * A vector, or a fixed-length array in a struct, is a repeated field.
  *
+ * An enum is a protobuf enum, so it has to meet protobuf's rules: an underlying
+ * type no wider than int, a value of 0, and not bit_flags. Protobuf scopes an
+ * enum's values to its package rather than to the enum, so two enums in one
+ * namespace cannot share a value name, and a value cannot share a table's name.
+ *
  * Scalars that are zero are omitted and repeated scalars are packed, matching
  * proto3. A flatbuffer default is not a protobuf default, so a table field left
  * unset at a nonzero default is written with that default.
@@ -62,10 +67,10 @@ class FlatbufferToProto {
    *
    * @param schema The schema to translate. Must outlive this.
    * @throws std::invalid_argument if the schema is null or has no root table,
-   *         or contains something with no protobuf equivalent: a union, or a
-   *         proto_type attribute that is unknown, on a field with only one
-   *         protobuf type, or does not match its field's width and
-   *         signedness.
+   *         or contains something with no protobuf equivalent: a union, an
+   *         enum protobuf cannot represent, or a proto_type attribute that is
+   *         unknown, on a field with only one protobuf type, or does not match
+   *         its field's width and signedness.
    */
   explicit FlatbufferToProto(const reflection::Schema* schema);
 
@@ -120,11 +125,11 @@ class FlatbufferToProto {
 std::string_view GetProtoMessageName(const reflection::Schema* schema);
 
 /**
- * Gets the name of the FileDescriptorProto a message is described in: its full
- * name with the package spelled as directories, the way protobuf files are, and
- * ".proto" on the end.
+ * Gets the name of the FileDescriptorProto a message or enum is described in:
+ * its full name with the package spelled as directories, the way protobuf files
+ * are, and ".proto" on the end.
  *
- * @param messageName message full name
+ * @param messageName message or enum full name
  * @return file name
  */
 std::string GetProtoFileName(std::string_view messageName);
@@ -142,18 +147,19 @@ struct ProtoFile {
  * and everything it refers to, for NetworkTables' and DataLog's schema
  * registries.
  *
- * Each message is described in a file of its own, named after it, which
- * depends on the files of the messages it refers to. Two schemas that share a
- * message therefore describe it in the same file, which a registry loads once,
- * rather than each defining it again. Tables that refer to each other in a
- * cycle share the file of the first of them by name, since protobuf files
- * cannot depend on each other in a cycle.
+ * Each message and enum is described in a file of its own, named after it,
+ * which depends on the files of the messages and enums it refers to. Two
+ * schemas that share a message therefore describe it in the same file, which a
+ * registry loads once, rather than each defining it again. Tables that refer to
+ * each other in a cycle share the file of the first of them by name, since
+ * protobuf files cannot depend on each other in a cycle.
  *
  * @param schema schema
  * @return the files, each after every file it depends on
  * @throws std::invalid_argument if the schema has no root table, contains
- *         something with no protobuf equivalent, or has tables in different
- *         namespaces that refer to each other in a cycle
+ *         something with no protobuf equivalent, has tables in different
+ *         namespaces that refer to each other in a cycle, or has an enum value
+ *         sharing its protobuf name with another value or a type
  */
 std::vector<ProtoFile> BuildFileDescriptorProtos(
     const reflection::Schema* schema);

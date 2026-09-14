@@ -32,10 +32,10 @@ inline constexpr std::string_view PUBLISH_TAG = "nt:publish";
  *
  * Any other channel is published as protobuf. Every AOS channel carries its own
  * reflection schema, so the bridge builds FileDescriptorProtos from it, one per
- * message (see BuildFileDescriptorProtos()), registers them in NetworkTables'
- * schema registry, and translates each message on its way out. The result is
- * an ordinary `proto:` topic, so dashboards and DataLog decode it without
- * knowing AOS is involved.
+ * message and enum (see BuildFileDescriptorProtos()), registers them in
+ * NetworkTables' schema registry, and translates each message on its way out.
+ * The result is an ordinary `proto:` topic, so dashboards and DataLog decode it
+ * without knowing AOS is involved.
  *
  * A message's descriptor has to be the only one on the network. Each process
  * registers a descriptor as a retained `/.schema/proto:<file>` topic, which it
@@ -85,9 +85,10 @@ class NtBridge {
    * @param instance The NetworkTables instance to publish to. Must outlive
    *                 this.
    * @throws std::invalid_argument if a tagged channel has no schema, its schema
-   *         has no protobuf equivalent, two tagged channels share a name, or
-   *         two tagged channels' schemas describe the same message
-   *         differently.
+   *         has no protobuf equivalent, two tagged channels share a name, two
+   *         tagged channels' schemas describe the same message differently, or
+   *         their descriptors cannot be loaded together, such as enums in one
+   *         package that share a value name.
    */
   NtBridge(aos::EventLoop* eventLoop, wpi::nt::NetworkTableInstance instance);
 

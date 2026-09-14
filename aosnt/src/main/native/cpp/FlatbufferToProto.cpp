@@ -9,9 +9,12 @@
 #include <cmath>
 #include <cstring>
 #include <format>
+#include <functional>
+#include <map>
 #include <memory>
 #include <new>
 #include <optional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -57,12 +60,67 @@ bool IsRepeated(const reflection::Field& field) {
          field.type()->base_type() == reflection::BaseType::Array;
 }
 
-upb_FieldType GetProtoType(const reflection::Field& field) {
+// Refuses an enum protobuf cannot represent as a protobuf enum, rather than
+// describing the field as an integer or changing the enum to fit.
+void CheckEnum(const reflection::Field& field, const reflection::Enum& enumDef,
+               std::string_view attribute) {
+  const std::string_view fieldName = field.name()->string_view();
+  const std::string_view enumName = enumDef.name()->string_view();
+  if (!attribute.empty()) {
+    throw std::invalid_argument(std::format(
+        "field {} has proto_type \"{}\", but it is the enum {}, which is a "
+        "protobuf enum, so there is nothing for the attribute to pick",
+        fieldName, attribute, enumName));
+  }
+  // Only a schema compiled with --bfbs-builtins records bit_flags. Its values
+  // are single bits, so without the attribute it is refused for having no 0.
+  if (enumDef.attributes() && enumDef.attributes()->LookupByKey("bit_flags")) {
+    throw std::invalid_argument(std::format(
+        "field {} is the bit_flags enum {}, which holds combinations of its "
+        "values, and a protobuf enum holds one value",
+        fieldName, enumName));
+  }
+  const reflection::BaseType underlying =
+      enumDef.underlying_type()->base_type();
+  switch (underlying) {
+    case reflection::BaseType::Byte:
+    case reflection::BaseType::UByte:
+    case reflection::BaseType::Short:
+    case reflection::BaseType::UShort:
+    case reflection::BaseType::Int:
+      break;
+    default:
+      throw std::invalid_argument(std::format(
+          "field {} is the enum {}, which is a {}, and a protobuf enum is an "
+          "int32",
+          fieldName, enumName, reflection::EnumNameBaseType(underlying)));
+  }
+  const bool hasZero = std::any_of(
+      enumDef.values()->begin(), enumDef.values()->end(),
+      [](const reflection::EnumVal* value) { return value->value() == 0; });
+  if (!hasZero) {
+    throw std::invalid_argument(std::format(
+        "field {} is the enum {}, which has no value of 0, and a proto3 enum's "
+        "first value has to be 0",
+        fieldName, enumName));
+  }
+}
+
+upb_FieldType GetProtoType(const reflection::Schema& schema,
+                           const reflection::Field& field) {
   // A vector and a struct's fixed-length array are both a repeated field of
   // their element type.
   const reflection::BaseType type =
       IsRepeated(field) ? field.type()->element() : field.type()->base_type();
   const std::string_view attribute = GetProtoTypeAttribute(field);
+
+  if (type == reflection::BaseType::Union ||
+      type == reflection::BaseType::UType) {
+    throw std::invalid_argument(
+        std::format("field {} is part of a union, which has no protobuf "
+                    "equivalent",
+                    field.name()->string_view()));
+  }
 
   switch (type) {
     case reflection::BaseType::String:
@@ -100,6 +158,12 @@ upb_FieldType GetProtoType(const reflection::Field& field) {
     throw std::invalid_argument(
         std::format("field {} has a type with no protobuf equivalent",
                     field.name()->string_view()));
+  }
+
+  // An integer that refers to an enum is that enum.
+  if (field.type()->index() >= 0) {
+    CheckEnum(field, *schema.enums()->Get(field.type()->index()), attribute);
+    return kUpb_FieldType_Enum;
   }
 
   if (!attribute.empty()) {
@@ -473,12 +537,7 @@ FlatbufferToProto::FlatbufferToProto(const reflection::Schema* schema)
         fields.push_back({field, kUpb_FieldType_Int32});
         continue;
       }
-      if (field->type()->base_type() == reflection::BaseType::Union) {
-        throw std::invalid_argument(std::format(
-            "field {} of {} is a union, which has no protobuf equivalent",
-            field->name()->string_view(), object->name()->string_view()));
-      }
-      fields.push_back({field, GetProtoType(*field)});
+      fields.push_back({field, GetProtoType(*m_schema, *field)});
     }
     std::sort(fields.begin(), fields.end(), [](const Field& a, const Field& b) {
       return a.field->id() < b.field->id();
@@ -586,6 +645,25 @@ std::vector<uint32_t> GetReferences(const reflection::Object& object) {
   return references;
 }
 
+// The enums a message's fields are, as indices into the schema's enums(). A
+// union's type field refers to an enum too, but a union is refused.
+std::vector<uint32_t> GetEnumReferences(const reflection::Object& object) {
+  std::vector<uint32_t> references;
+  for (const reflection::Field* field : *object.fields()) {
+    if (field->deprecated()) {
+      continue;
+    }
+    const reflection::BaseType type = IsRepeated(*field)
+                                          ? field->type()->element()
+                                          : field->type()->base_type();
+    if (flatbuffers::IsInteger(type) && type != reflection::BaseType::UType &&
+        field->type()->index() >= 0) {
+      references.push_back(static_cast<uint32_t>(field->type()->index()));
+    }
+  }
+  return references;
+}
+
 // Groups the objects reachable from one into the sets that refer to each other
 // in a cycle, with Tarjan's algorithm. A set is finished only after every set
 // it refers to, so the sets come out with dependencies first.
@@ -657,7 +735,7 @@ void AddMessage(google_protobuf_FileDescriptorProto* file, upb_Arena* arena,
     if (field->deprecated()) {
       continue;
     }
-    const upb_FieldType type = GetProtoType(*field);
+    const upb_FieldType type = GetProtoType(schema, *field);
     google_protobuf_FieldDescriptorProto* out = CheckAllocated(
         google_protobuf_DescriptorProto_add_field(message, arena));
     google_protobuf_FieldDescriptorProto_set_name(
@@ -667,15 +745,110 @@ void AddMessage(google_protobuf_FileDescriptorProto* file, upb_Arena* arena,
     google_protobuf_FieldDescriptorProto_set_label(
         out, IsRepeated(*field) ? kUpb_Label_Repeated : kUpb_Label_Optional);
     google_protobuf_FieldDescriptorProto_set_type(out, type);
-    if (type == kUpb_FieldType_Message) {
+    if (type == kUpb_FieldType_Message || type == kUpb_FieldType_Enum) {
+      const std::string_view typeName =
+          type == kUpb_FieldType_Message
+              ? GetObjectAt(schema, field->type()->index())
+                    .name()
+                    ->string_view()
+              : schema.enums()
+                    ->Get(field->type()->index())
+                    ->name()
+                    ->string_view();
       google_protobuf_FieldDescriptorProto_set_type_name(
-          out, CopyToArena(
-                   arena, std::format(
-                              ".{}", GetObjectAt(schema, field->type()->index())
-                                         .name()
-                                         ->string_view())));
+          out, CopyToArena(arena, std::format(".{}", typeName)));
     }
   }
+}
+
+void AddEnum(google_protobuf_FileDescriptorProto* file, upb_Arena* arena,
+             const reflection::Enum& enumDef) {
+  google_protobuf_EnumDescriptorProto* out = CheckAllocated(
+      google_protobuf_FileDescriptorProto_add_enum_type(file, arena));
+  google_protobuf_EnumDescriptorProto_set_name(
+      out, MakeStringView(GetLastComponent(enumDef.name()->string_view())));
+  // A proto3 enum's first value has to be 0. reflection lists the values in
+  // order, so a negative one can come before it.
+  std::vector<const reflection::EnumVal*> values(enumDef.values()->begin(),
+                                                 enumDef.values()->end());
+  std::stable_partition(
+      values.begin(), values.end(),
+      [](const reflection::EnumVal* value) { return value->value() == 0; });
+  for (const reflection::EnumVal* value : values) {
+    google_protobuf_EnumValueDescriptorProto* outValue = CheckAllocated(
+        google_protobuf_EnumDescriptorProto_add_value(out, arena));
+    google_protobuf_EnumValueDescriptorProto_set_name(
+        outValue, MakeStringView(value->name()->string_view()));
+    google_protobuf_EnumValueDescriptorProto_set_number(
+        outValue, static_cast<int32_t>(value->value()));
+  }
+}
+
+// Protobuf scopes an enum's values to the enum's package rather than to the
+// enum, so a value shares names with the package's messages, its enums and the
+// values of its other enums.
+void CheckNamesAreUnique(const reflection::Schema& schema,
+                         std::span<const uint32_t> objects,
+                         std::span<const uint32_t> enums) {
+  std::map<std::string, std::string, std::less<>> names;
+  const auto add = [&names](std::string name, std::string what) {
+    auto [it, inserted] = names.try_emplace(std::move(name), what);
+    if (!inserted) {
+      throw std::invalid_argument(std::format(
+          "{} and {} are both named {} in protobuf, which scopes an enum's "
+          "values to its package rather than to the enum",
+          it->second, what, it->first));
+    }
+  };
+  for (uint32_t index : objects) {
+    const reflection::Object& object = GetObjectAt(schema, index);
+    const std::string_view name = object.name()->string_view();
+    add(std::string{name},
+        std::format("{} {}", object.is_struct() ? "struct" : "table", name));
+  }
+  for (uint32_t index : enums) {
+    const reflection::Enum& enumDef = *schema.enums()->Get(index);
+    const std::string_view name = enumDef.name()->string_view();
+    add(std::string{name}, std::format("enum {}", name));
+    const std::string_view package = GetNamespace(name);
+    for (const reflection::EnumVal* value : *enumDef.values()) {
+      const std::string_view valueName = value->name()->string_view();
+      add(package.empty() ? std::string{valueName}
+                          : std::format("{}.{}", package, valueName),
+          std::format("value {} of enum {}", valueName, name));
+    }
+  }
+}
+
+// Serializes a file holding the types add() puts in it.
+template <typename Add>
+ProtoFile MakeProtoFile(std::string fileName, std::string_view package,
+                        std::span<const std::string_view> dependencies,
+                        Add add) {
+  std::unique_ptr<upb_Arena, ArenaDeleter> arena{
+      CheckAllocated(upb_Arena_New())};
+  google_protobuf_FileDescriptorProto* file =
+      CheckAllocated(google_protobuf_FileDescriptorProto_new(arena.get()));
+  google_protobuf_FileDescriptorProto_set_name(file, MakeStringView(fileName));
+  if (!package.empty()) {
+    google_protobuf_FileDescriptorProto_set_package(file,
+                                                    MakeStringView(package));
+  }
+  google_protobuf_FileDescriptorProto_set_syntax(file,
+                                                 MakeStringView("proto3"));
+  for (std::string_view dependency : dependencies) {
+    if (!google_protobuf_FileDescriptorProto_add_dependency(
+            file, MakeStringView(dependency), arena.get())) {
+      throw std::bad_alloc{};
+    }
+  }
+  add(file, arena.get());
+
+  size_t size = 0;
+  const char* serialized = CheckAllocated(
+      google_protobuf_FileDescriptorProto_serialize(file, arena.get(), &size));
+  return {std::move(fileName),
+          std::vector<uint8_t>(serialized, serialized + size)};
 }
 
 }  // namespace
@@ -699,10 +872,42 @@ std::vector<ProtoFile> BuildFileDescriptorProtos(
 
   const ReferenceCycles cycles{*schema, *root};
 
-  // Each file is named after its first message by name, so every schema that
-  // has the message names its file the same way.
-  std::vector<std::string> fileOf(schema->objects()->size());
+  // The tables, structs and enums reachable from the root, as indices into the
+  // schema's objects() and enums().
+  std::vector<uint32_t> objects;
+  std::vector<uint32_t> enums;
+  for (const std::vector<uint32_t>& set : cycles.GetSets()) {
+    for (uint32_t member : set) {
+      objects.push_back(member);
+      for (uint32_t reference :
+           GetEnumReferences(GetObjectAt(*schema, member))) {
+        enums.push_back(reference);
+      }
+    }
+  }
+  std::sort(enums.begin(), enums.end());
+  enums.erase(std::unique(enums.begin(), enums.end()), enums.end());
+  CheckNamesAreUnique(*schema, objects, enums);
+
   std::vector<ProtoFile> files;
+
+  // An enum refers to nothing, so each is a file of its own, ahead of the
+  // messages that use it.
+  std::vector<std::string> enumFileOf(schema->enums()->size());
+  for (uint32_t index : enums) {
+    const reflection::Enum& enumDef = *schema->enums()->Get(index);
+    const std::string_view name = enumDef.name()->string_view();
+    enumFileOf[index] = GetProtoFileName(name);
+    files.push_back(MakeProtoFile(
+        enumFileOf[index], GetNamespace(name), {},
+        [&](google_protobuf_FileDescriptorProto* file, upb_Arena* arena) {
+          AddEnum(file, arena, enumDef);
+        }));
+  }
+
+  // Each message file is named after its first message by name, so every
+  // schema that has the message names its file the same way.
+  std::vector<std::string> fileOf(schema->objects()->size());
   for (std::vector<uint32_t> set : cycles.GetSets()) {
     std::sort(set.begin(), set.end(), [&](uint32_t a, uint32_t b) {
       return GetObjectAt(*schema, a).name()->string_view() <
@@ -729,45 +934,28 @@ std::vector<ProtoFile> BuildFileDescriptorProtos(
 
     std::vector<std::string_view> dependencies;
     for (uint32_t member : set) {
-      for (uint32_t reference : GetReferences(GetObjectAt(*schema, member))) {
+      const reflection::Object& object = GetObjectAt(*schema, member);
+      for (uint32_t reference : GetReferences(object)) {
         // Every set a member refers to came out earlier, so its file is known.
         if (fileOf[reference] != fileName) {
           dependencies.push_back(fileOf[reference]);
         }
+      }
+      for (uint32_t reference : GetEnumReferences(object)) {
+        dependencies.push_back(enumFileOf[reference]);
       }
     }
     std::sort(dependencies.begin(), dependencies.end());
     dependencies.erase(std::unique(dependencies.begin(), dependencies.end()),
                        dependencies.end());
 
-    std::unique_ptr<upb_Arena, ArenaDeleter> arena{
-        CheckAllocated(upb_Arena_New())};
-    google_protobuf_FileDescriptorProto* file =
-        CheckAllocated(google_protobuf_FileDescriptorProto_new(arena.get()));
-    google_protobuf_FileDescriptorProto_set_name(file,
-                                                 MakeStringView(fileName));
-    if (!package.empty()) {
-      google_protobuf_FileDescriptorProto_set_package(file,
-                                                      MakeStringView(package));
-    }
-    google_protobuf_FileDescriptorProto_set_syntax(file,
-                                                   MakeStringView("proto3"));
-    for (std::string_view dependency : dependencies) {
-      if (!google_protobuf_FileDescriptorProto_add_dependency(
-              file, MakeStringView(dependency), arena.get())) {
-        throw std::bad_alloc{};
-      }
-    }
-    for (uint32_t member : set) {
-      AddMessage(file, arena.get(), *schema, GetObjectAt(*schema, member));
-    }
-
-    size_t size = 0;
-    const char* serialized =
-        CheckAllocated(google_protobuf_FileDescriptorProto_serialize(
-            file, arena.get(), &size));
-    files.push_back(
-        {fileName, std::vector<uint8_t>(serialized, serialized + size)});
+    files.push_back(MakeProtoFile(
+        fileName, package, dependencies,
+        [&](google_protobuf_FileDescriptorProto* file, upb_Arena* arena) {
+          for (uint32_t member : set) {
+            AddMessage(file, arena, *schema, GetObjectAt(*schema, member));
+          }
+        }));
   }
   return files;
 }

@@ -11,11 +11,18 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <new>
+#include <set>
 #include <span>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <upb/base/status.h>
+#include <upb/mem/arena.h>
+#include <upb/reflection/def.h>
+#include <upb/reflection/stage0/google/protobuf/descriptor.upb.h>
 
 #include "aosnt/types/boolean_array_generated.h"
 #include "aosnt/types/boolean_generated.h"
@@ -37,6 +44,14 @@ namespace {
 // grow the buffer.
 constexpr size_t ENCODE_SIZE_FACTOR = 2;
 constexpr size_t ENCODE_SIZE_SLACK = 512;
+
+struct ArenaDeleter {
+  void operator()(upb_Arena* arena) const { upb_Arena_Free(arena); }
+};
+
+struct DefPoolDeleter {
+  void operator()(upb_DefPool* pool) const { upb_DefPool_Free(pool); }
+};
 
 wpi::nt::PubSubOptions BridgeOptions(const aos::Channel* channel) {
   wpi::nt::PubSubOptions options;
@@ -215,6 +230,42 @@ NtBridge::NtBridge(aos::EventLoop* eventLoop,
             aos::configuration::CleanedChannelToString(it->second.channel),
             aos::configuration::CleanedChannelToString(pending.channel),
             PUBLISH_TAG, file.name));
+      }
+    }
+  }
+
+  // Glass and DataLog load every descriptor into one pool, which refuses things
+  // no single schema shows, such as enums in two channels' schemas that share a
+  // package and a value name. Load them the same way first.
+  {
+    std::unique_ptr<upb_Arena, ArenaDeleter> arena{upb_Arena_New()};
+    std::unique_ptr<upb_DefPool, DefPoolDeleter> pool{upb_DefPool_New()};
+    if (!arena || !pool) {
+      throw std::bad_alloc{};
+    }
+    std::set<std::string_view> loaded;
+    for (const Pending& pending : channels) {
+      for (const ProtoFile& file : pending.files) {
+        if (!loaded.insert(file.name).second) {
+          continue;
+        }
+        const google_protobuf_FileDescriptorProto* parsed =
+            google_protobuf_FileDescriptorProto_parse(
+                reinterpret_cast<const char*>(file.descriptor.data()),
+                file.descriptor.size(), arena.get());
+        if (!parsed) {
+          throw std::bad_alloc{};
+        }
+        upb_Status status;
+        upb_Status_Clear(&status);
+        if (!upb_DefPool_AddFile(pool.get(), parsed, &status)) {
+          throw std::invalid_argument(std::format(
+              "Channel {} is tagged {}, but {} does not load alongside the "
+              "other tagged channels' descriptors, as Glass and DataLog load "
+              "them: {}",
+              aos::configuration::CleanedChannelToString(pending.channel),
+              PUBLISH_TAG, file.name, upb_Status_ErrorMessage(&status)));
+        }
       }
     }
   }
