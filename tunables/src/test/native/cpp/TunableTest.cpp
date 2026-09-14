@@ -307,6 +307,8 @@ struct MemberComplex : public wpi::tunables::ComplexTunable {
   TestStruct point{2, 3};
   int updateCount = 0;
 
+  uint32_t GetUid() const { return GetTunableUid(); }
+
   void PublishTunable(wpi::tunables::TunableTable& table) override {
     table.Publish("gain", this, &MemberComplex::gain);
     table.Publish("point", this, &MemberComplex::point);
@@ -1286,6 +1288,14 @@ TEST_CASE_METHOD(TunableTest,
 
   wpi::tunables::Publish("complexOnTune/gain", &complex, &MemberComplex::gain,
                          config);
+  auto memberUid = backend->GetUid("/complexOnTune/gain");
+  REQUIRE(memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(complex) == 0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(*memberInfo.tunable) ==
+        0);
+
   backend->SetInt32("/complexOnTune/gain", 7);
   wpi::tunables::TunableRegistry::Update();
 
@@ -1293,6 +1303,9 @@ TEST_CASE_METHOD(TunableTest,
   CHECK(calls == 1);
   CHECK(receivedMember);
   CHECK(receivedParent);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(complex) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(*memberInfo.tunable) ==
+        1);
 }
 
 TEST_CASE_METHOD(TunableTest,
@@ -1390,6 +1403,32 @@ TEST_CASE_METHOD(
   CHECK_FALSE(backend->GetUid("/changedParent/gain"));
   CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*parentUid));
   CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*gainUid));
+}
+
+TEST_CASE_METHOD(
+    TunableTest,
+    "TunableTest DestroyingDirectMemberParentUnregistersMemberTunable",
+    "[tunable]") {
+  std::optional<uint32_t> parentUid;
+  std::optional<uint32_t> gainUid;
+  {
+    MemberComplex complex;
+    wpi::tunables::Publish("destroyedDirectMember/gain", &complex,
+                           &MemberComplex::gain);
+    parentUid = complex.GetUid();
+    gainUid = backend->GetUid("/destroyedDirectMember/gain");
+
+    REQUIRE(gainUid);
+    CHECK(wpi::tunables::TunableRegistry::GetTunable(*parentUid));
+    CHECK(wpi::tunables::TunableRegistry::GetTunable(*gainUid));
+
+    backend->SetInt32("/destroyedDirectMember/gain", 7);
+  }
+
+  CHECK_FALSE(backend->GetUid("/destroyedDirectMember/gain"));
+  CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*parentUid));
+  CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*gainUid));
+  CHECK_NOTHROW(wpi::tunables::TunableRegistry::Update());
 }
 
 TEST_CASE_METHOD(TunableTest, "TunableTest TunablesGetTableFacade",
