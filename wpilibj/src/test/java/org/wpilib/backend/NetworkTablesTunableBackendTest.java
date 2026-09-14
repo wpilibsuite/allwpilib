@@ -257,6 +257,25 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void tuneRevisionCountsRobustInitialChildApplication() {
+    try (GenericPublisher publisher =
+        m_inst
+            .getTopic("/Tunables/complexInitialRevision/child/tune")
+            .genericPublishEx("double", "{\"retained\":true}")) {
+      publisher.setDouble(4.0);
+      m_inst.flush();
+
+      RobustChildComplexTunable complex = new RobustChildComplexTunable();
+      Tunables.publish("complexInitialRevision", complex);
+
+      assertEquals(4.0, complex.m_child.get());
+      assertEquals(4.0, value("complexInitialRevision/child").getDouble(0.0));
+      assertEquals(1, TunableRegistry.getTuneRevision(complex.m_child));
+      assertEquals(1, TunableRegistry.getTuneRevision(complex));
+    }
+  }
+
+  @Test
   void tuneRevisionIgnoresGetterRefreshes() {
     AtomicReference<Double> value = new AtomicReference<>(1.0);
     TunableDouble tunable =
@@ -1442,6 +1461,15 @@ class NetworkTablesTunableBackendTest {
     }
 
     private int m_updates;
+  }
+
+  private static final class RobustChildComplexTunable implements ComplexTunable {
+    @Override
+    public void publishTunable(TunableTable table) {
+      table.publish("child", m_child);
+    }
+
+    private final Tunable<Double> m_child = Tunable.createConfig(1.0, robust());
   }
 
   private static final class DefaultTypeComplexTunable implements ComplexTunable {

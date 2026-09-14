@@ -54,6 +54,8 @@ public final class TunableRegistry {
 
   private record RevisionParentLink(Object child, ComplexTunable parent) {}
 
+  private record ComplexChildPathState(String path, TunableBase previousTunable) {}
+
   private static final class WeakIdentityKey extends WeakReference<Object> {
     private final int m_hash;
 
@@ -637,10 +639,13 @@ public final class TunableRegistry {
       TunableBackend backend = getBackendForNormalizedPath(normalized);
       if (isMissingBackend(backend)) {
         missingBackend = true;
-      } else if (backend.publish(path, tunable)) {
-        addComplexChildPath(normalized, tunable);
-        recordComplexMigrationPublish(normalized);
-        return true;
+      } else {
+        ComplexChildPathState childPathState = addComplexChildPath(normalized, tunable);
+        if (backend.publish(path, tunable)) {
+          recordComplexMigrationPublish(normalized);
+          return true;
+        }
+        restoreComplexChildPath(childPathState);
       }
     }
     if (missingBackend) {
@@ -948,11 +953,27 @@ public final class TunableRegistry {
     }
   }
 
-  private static void addComplexChildPath(String path, TunableBase tunable) {
+  private static ComplexChildPathState addComplexChildPath(String path, TunableBase tunable) {
     synchronized (s_complexPathsMutex) {
       String normalized = PathUtil.normalizeName(path);
-      s_complexChildrenByPath.put(normalized, tunable);
+      TunableBase previousTunable = s_complexChildrenByPath.put(normalized, tunable);
+      if (previousTunable != null) {
+        removeRevisionParentLink(normalized);
+      }
       linkRevisionParentForPath(normalized, getRevisionOwner(tunable));
+      return new ComplexChildPathState(normalized, previousTunable);
+    }
+  }
+
+  private static void restoreComplexChildPath(ComplexChildPathState state) {
+    synchronized (s_complexPathsMutex) {
+      removeRevisionParentLink(state.path());
+      if (state.previousTunable() != null) {
+        s_complexChildrenByPath.put(state.path(), state.previousTunable());
+        linkRevisionParentForPath(state.path(), getRevisionOwner(state.previousTunable()));
+      } else {
+        s_complexChildrenByPath.remove(state.path());
+      }
     }
   }
 
