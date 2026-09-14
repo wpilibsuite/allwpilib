@@ -143,19 +143,15 @@ jobs:
         with:
           archive: false
           include-hidden-files: true
-          path: "/github/home/.bazel/command-*.profile.gz"
-        if: runner.os == 'Linux'
-
-      - uses: actions/upload-artifact@v7
-        with:
-          archive: false
-          path: "D:/bazelroot/**/command-*.profile.gz"
-        if: runner.os == 'Windows'
+          path: ${{ case(runner.os == 'Windows', 'D:/_bazel/command-*.profile.gz', runner.os == 'Linux', '/github/home/.bazel/command-*.profile.gz', '/Users/runner/.bazel/command-*.profile.gz') }}
+        if: always()
 
       - uses: actions/upload-artifact@v7
         with:
           archive: false
           path: "${{ matrix.name }} Exec Log.binpb.zst"
+        if: always()
+
       - name: Check disk free space
         if: always()
         run: df -h
