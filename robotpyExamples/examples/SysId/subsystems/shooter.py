@@ -40,8 +40,9 @@ class Shooter(Subsystem):
 
         # Create a new SysId routine for characterizing the shooter.
         self.sys_id_routine = SysIdRoutine(
-            # Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-            SysIdRoutine.Config(),
+            # Use 4 volts for the dynamic test. Change this value to suit your
+            # mechanism.
+            SysIdRoutine.Config(step_voltage=4.0),
             SysIdRoutine.Mechanism(
                 # Tell SysId how to plumb the driving voltage to the motor(s).
                 self.shooter_motor.set_voltage,
