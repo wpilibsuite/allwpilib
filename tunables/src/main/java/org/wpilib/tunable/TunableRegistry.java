@@ -4,6 +4,8 @@
 
 package org.wpilib.tunable;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -51,6 +54,89 @@ public final class TunableRegistry {
 
   private record RevisionParentLink(Object child, ComplexTunable parent) {}
 
+  private static final class WeakIdentityKey extends WeakReference<Object> {
+    private final int m_hash;
+
+    WeakIdentityKey(Object value, ReferenceQueue<Object> queue) {
+      super(Objects.requireNonNull(value), queue);
+      m_hash = System.identityHashCode(value);
+    }
+
+    WeakIdentityKey(Object value) {
+      super(Objects.requireNonNull(value));
+      m_hash = System.identityHashCode(value);
+    }
+
+    @Override
+    public int hashCode() {
+      return m_hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return this == obj
+          || obj instanceof WeakIdentityKey other && get() != null && get() == other.get();
+    }
+  }
+
+  private static final class WeakIdentityMap<K, V> {
+    private final ReferenceQueue<Object> m_queue = new ReferenceQueue<>();
+    private final Map<WeakIdentityKey, V> m_values = new HashMap<>();
+
+    private void cleanStaleEntries() {
+      WeakIdentityKey key;
+      while ((key = (WeakIdentityKey) m_queue.poll()) != null) {
+        m_values.remove(key);
+      }
+    }
+
+    V get(K key) {
+      cleanStaleEntries();
+      return m_values.get(new WeakIdentityKey(key));
+    }
+
+    V getOrDefault(K key, V defaultValue) {
+      V value = get(key);
+      return value != null ? value : defaultValue;
+    }
+
+    void put(K key, V value) {
+      cleanStaleEntries();
+      m_values.put(new WeakIdentityKey(key, m_queue), value);
+    }
+
+    void remove(K key) {
+      cleanStaleEntries();
+      m_values.remove(new WeakIdentityKey(key));
+    }
+
+    void clear() {
+      m_values.clear();
+      cleanStaleEntries();
+    }
+
+    boolean isEmpty() {
+      cleanStaleEntries();
+      return m_values.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    List<K> keySnapshot() {
+      cleanStaleEntries();
+      List<K> keys = new ArrayList<>();
+      var iterator = m_values.keySet().iterator();
+      while (iterator.hasNext()) {
+        Object key = iterator.next().get();
+        if (key == null) {
+          iterator.remove();
+        } else {
+          keys.add((K) key);
+        }
+      }
+      return keys;
+    }
+  }
+
   private static final List<TypeHandlerData<?>> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TunableBackend> s_backends = new StringPrefixMap<>();
   private static volatile TunableBackend[] s_backendSnapshot = new TunableBackend[0];
@@ -68,9 +154,9 @@ public final class TunableRegistry {
       new IdentityHashMap<>();
   private static final Map<String, ComplexTunable> s_complexByPath = new HashMap<>();
   private static final Map<String, TunableBase> s_complexChildrenByPath = new HashMap<>();
-  private static final IdentityHashMap<Object, Long> s_tuneRevisions = new IdentityHashMap<>();
-  private static final IdentityHashMap<Object, IdentityHashMap<ComplexTunable, Integer>>
-      s_revisionParents = new IdentityHashMap<>();
+  private static final WeakIdentityMap<Object, Long> s_tuneRevisions = new WeakIdentityMap<>();
+  private static final WeakIdentityMap<Object, WeakIdentityMap<ComplexTunable, Integer>>
+      s_revisionParents = new WeakIdentityMap<>();
   private static final Map<String, RevisionParentLink> s_revisionParentLinksByPath =
       new HashMap<>();
   private static final TunableBackend s_missingBackend = new NoopTunableBackend();
@@ -768,11 +854,11 @@ public final class TunableRegistry {
       return;
     }
     s_tuneRevisions.put(tunable, s_tuneRevisions.getOrDefault(tunable, 0L) + 1L);
-    IdentityHashMap<ComplexTunable, Integer> parents = s_revisionParents.get(tunable);
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(tunable);
     if (parents == null) {
       return;
     }
-    for (ComplexTunable parent : parents.keySet()) {
+    for (ComplexTunable parent : parents.keySnapshot()) {
       incrementTuneRevision(parent, visited);
     }
   }
@@ -797,13 +883,17 @@ public final class TunableRegistry {
   }
 
   private static void addRevisionParent(Object child, ComplexTunable parent) {
-    s_revisionParents
-        .computeIfAbsent(child, k -> new IdentityHashMap<>())
-        .merge(parent, 1, Integer::sum);
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(child);
+    if (parents == null) {
+      parents = new WeakIdentityMap<>();
+      s_revisionParents.put(child, parents);
+    }
+    Integer count = parents.get(parent);
+    parents.put(parent, count == null ? 1 : count + 1);
   }
 
   private static void removeRevisionParent(Object child, ComplexTunable parent) {
-    IdentityHashMap<ComplexTunable, Integer> parents = s_revisionParents.get(child);
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(child);
     if (parents == null) {
       return;
     }
