@@ -970,6 +970,65 @@ def test_tune_revision_propagates_from_complex_children(backend):
     assert tunables.TunableRegistry.get_tune_revision(value) == 2
 
 
+def test_tune_revision_finds_nested_python_complex_tunable(backend):
+    class ChildComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    class ParentComplex:
+        def __init__(self) -> None:
+            self.child = ChildComplex()
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("child", self.child)
+
+    parent = ParentComplex()
+    child = parent.child
+
+    tunables.publish("nestedPythonRevision", parent)
+    assert tunables.TunableRegistry.get_tune_revision(parent) == 0
+    assert tunables.TunableRegistry.get_tune_revision(child) == 0
+
+    backend.set_double("/nestedPythonRevision/child/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert child.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(child.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(child) == 1
+    assert tunables.TunableRegistry.get_tune_revision(parent) == 1
+
+
+def test_tune_revision_is_shared_across_python_complex_aliases(backend):
+    class AliasedComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = AliasedComplex()
+
+    tunables.publish("pythonAliasRevisionA", value)
+    tunables.publish("pythonAliasRevisionB", value)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+
+    backend.set_double("/pythonAliasRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    backend.set_double("/pythonAliasRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+
 def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):
     wrong_type = tunables.add("wrongTypeRevision", 1.0)
     immutable = tunables.add("immutableRevision", 5, mutable=False)
