@@ -12,6 +12,7 @@
 #include <imgui.h>
 
 #include "AddressableLEDGui.hpp"
+#include "AlertSimGui.hpp"
 #include "AnalogInputSimGui.hpp"
 #include "DIOSimGui.hpp"
 #include "DriverStationGui.hpp"
@@ -134,6 +135,7 @@ int HALSIM_InitExtension(void) {
 
   AddressableLEDGui::Initialize();
   AnalogInputSimGui::Initialize();
+  AlertSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();
@@ -193,6 +195,7 @@ int HALSIM_InitExtension(void) {
     }
     if (ImGui::BeginMenu("DS")) {
       DriverStationGui::dsManager->DisplayMenu();
+      AlertSimGui::DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {
