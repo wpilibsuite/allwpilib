@@ -20,6 +20,8 @@ class PyTunable;
 namespace detail {
 
 void StoreValue(std::string path, std::shared_ptr<PyTunable> value);
+std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
+    pybind11::object value, pybind11::object initialPublishTunable);
 void StoreComplex(std::string path,
                   std::shared_ptr<PyComplexTunableAdapter> value);
 void StoreNativeComplexValue(std::string path, pybind11::object value);
