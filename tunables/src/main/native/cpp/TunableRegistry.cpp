@@ -195,6 +195,40 @@ static std::optional<ComplexParentMatch> FindNearestComplexParentLocked(
       detail::NormalizeChildName(path.substr(bestPrefixSize))};
 }
 
+static std::string GetLeafChildName(std::string_view path) {
+  size_t slash = path.find_last_of('/');
+  if (slash != std::string_view::npos) {
+    path.remove_prefix(slash + 1);
+  }
+  return detail::NormalizeChildName(path);
+}
+
+static void LinkComplexParentLocked(Instance::TunableInfoImpl& parent,
+                                    Instance::TunableInfoImpl& child,
+                                    std::string_view path, std::string name,
+                                    bool ownedMember) {
+  std::string pathString{path};
+  if (std::find_if(child.parents.begin(), child.parents.end(),
+                   [&](const auto& link) {
+                     return link.parent == &parent && link.path == pathString;
+                   }) == child.parents.end()) {
+    child.parents.emplace_back(
+        Instance::TunableInfoImpl::ParentLink{&parent, pathString});
+  }
+
+  auto childLink = std::find_if(
+      parent.children.begin(), parent.children.end(), [&](const auto& link) {
+        return link.child == &child && link.path == pathString;
+      });
+  if (childLink != parent.children.end()) {
+    childLink->ownedMember = childLink->ownedMember || ownedMember;
+    childLink->name = std::move(name);
+  } else {
+    parent.children.emplace_back(Instance::TunableInfoImpl::ChildLink{
+        &child, std::move(pathString), std::move(name), ownedMember});
+  }
+}
+
 static void LinkComplexParentLocked(Instance& inst, uint32_t childUid,
                                     std::string_view path, bool ownedMember) {
   auto childIt = inst.tunables.find(childUid);
@@ -207,28 +241,8 @@ static void LinkComplexParentLocked(Instance& inst, uint32_t childUid,
     return;
   }
 
-  auto& child = *childIt->second;
-  std::string pathString{path};
-  if (std::find_if(
-          child.parents.begin(), child.parents.end(), [&](const auto& link) {
-            return link.parent == parent->parent && link.path == pathString;
-          }) == child.parents.end()) {
-    child.parents.emplace_back(
-        Instance::TunableInfoImpl::ParentLink{parent->parent, pathString});
-  }
-
-  auto childLink =
-      std::find_if(parent->parent->children.begin(),
-                   parent->parent->children.end(), [&](const auto& link) {
-                     return link.child == &child && link.path == pathString;
-                   });
-  if (childLink != parent->parent->children.end()) {
-    childLink->ownedMember = childLink->ownedMember || ownedMember;
-    childLink->name = parent->name;
-  } else {
-    parent->parent->children.emplace_back(Instance::TunableInfoImpl::ChildLink{
-        &child, std::move(pathString), std::move(parent->name), ownedMember});
-  }
+  LinkComplexParentLocked(*parent->parent, *childIt->second, path,
+                          std::move(parent->name), ownedMember);
 }
 
 static void UnlinkComplexParentPathLocked(Instance& inst, uint32_t childUid,
@@ -696,7 +710,8 @@ bool TunableRegistry::Publish(
             child.config = TunableConfig{};
           }
           child.config->parent = tunable;
-          LinkComplexParentLocked(inst, memberUid, normalizedPath, true);
+          LinkComplexParentLocked(*parentIt->second, child, normalizedPath,
+                                  GetLeafChildName(normalizedPath), true);
           config = &*child.config;
         }
       }
