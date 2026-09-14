@@ -127,6 +127,18 @@ class StructMemberComplexTunable final : public wpi::tunables::ComplexTunable {
   wpi::tunables::TunableConfig m_config;
 };
 
+class RobustChildComplexTunable final : public wpi::tunables::ComplexTunable {
+ public:
+  explicit RobustChildComplexTunable(const wpi::tunables::TunableConfig& config)
+      : child{1.0, config} {}
+
+  void PublishTunable(wpi::tunables::TunableTable& table) override {
+    table.Publish("child", child);
+  }
+
+  wpi::tunables::TunableDouble child;
+};
+
 class DashboardSelectable {
  public:
   DashboardSelectable(wpi::nt::NetworkTableInstance inst, std::string_view path)
@@ -447,6 +459,26 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   CHECK(value.Get() == 4.0);
   CHECK(4.0 == Value("initialRevision").GetDouble(0.0));
   CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(value) == 1);
+}
+
+TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
+                 "NetworkTablesTunableBackendTest "
+                 "TuneRevisionCountsRobustInitialChildApplication",
+                 "[wpilibc][tunable]") {
+  auto remote = inst.GetTopic("/Tunables/complexInitialRevision/child/tune")
+                    .GenericPublishEx(
+                        "double", wpi::util::json::object("retained", true));
+  remote.SetDouble(4.0);
+  inst.Flush();
+
+  auto config = RobustConfig();
+  RobustChildComplexTunable complex{config};
+  wpi::tunables::Publish("complexInitialRevision", complex);
+
+  CHECK(complex.child.Get() == 4.0);
+  CHECK(4.0 == Value("complexInitialRevision/child").GetDouble(0.0));
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(complex.child) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(complex) == 1);
 }
 
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,

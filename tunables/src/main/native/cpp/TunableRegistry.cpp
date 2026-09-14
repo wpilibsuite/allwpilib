@@ -301,26 +301,79 @@ static void LinkExistingComplexDescendantsLocked(Instance& inst,
   }
 }
 
-static void AddComplexPath(uint32_t uid, std::string_view path) {
+static bool AddComplexPath(uint32_t uid, std::string_view path) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.tunablesMutex};
   std::string pathString{path};
   if (inst.complexUidByPath.contains(pathString)) {
-    return;
+    return false;
   }
 
   LinkComplexParentLocked(inst, uid, pathString, false);
   inst.complexUidByPath[pathString] = uid;
   inst.complexPaths[uid].emplace_back(pathString);
   LinkExistingComplexDescendantsLocked(inst, pathString);
+  return true;
 }
 
-static void AddComplexChildPath(uint32_t uid, std::string_view path) {
+static void RemoveComplexPath(uint32_t uid, std::string_view path) {
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.tunablesMutex};
   std::string pathString{path};
+  UnlinkComplexParentPathLocked(inst, uid, pathString);
+  if (auto pathIt = inst.complexUidByPath.find(pathString);
+      pathIt != inst.complexUidByPath.end() && pathIt->second == uid) {
+    inst.complexUidByPath.erase(pathIt);
+  }
+  auto pathsIt = inst.complexPaths.find(uid);
+  if (pathsIt == inst.complexPaths.end()) {
+    return;
+  }
+  std::erase(pathsIt->second, pathString);
+  if (pathsIt->second.empty()) {
+    inst.complexPaths.erase(pathsIt);
+  }
+}
+
+struct ComplexChildPathState {
+  std::string path;
+  uint32_t uid;
+  std::optional<uint32_t> previousUid;
+};
+
+static ComplexChildPathState AddComplexChildPath(uint32_t uid,
+                                                 std::string_view path) {
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  std::string pathString{path};
+  std::optional<uint32_t> previousUid;
+  if (auto pathIt = inst.complexChildUidByPath.find(pathString);
+      pathIt != inst.complexChildUidByPath.end()) {
+    previousUid = pathIt->second;
+    if (*previousUid != uid) {
+      UnlinkComplexParentPathLocked(inst, *previousUid, pathString);
+    }
+  }
   inst.complexChildUidByPath[pathString] = uid;
   LinkComplexParentLocked(inst, uid, pathString, false);
+  return {std::move(pathString), uid, previousUid};
+}
+
+static void RestoreComplexChildPath(const ComplexChildPathState& state) {
+  Instance& inst = GetInstance();
+  std::scoped_lock lock{inst.tunablesMutex};
+  auto pathIt = inst.complexChildUidByPath.find(state.path);
+  if (pathIt == inst.complexChildUidByPath.end() ||
+      pathIt->second != state.uid) {
+    return;
+  }
+  UnlinkComplexParentPathLocked(inst, state.uid, state.path);
+  if (state.previousUid) {
+    pathIt->second = *state.previousUid;
+    LinkComplexParentLocked(inst, *state.previousUid, state.path, false);
+  } else {
+    inst.complexChildUidByPath.erase(pathIt);
+  }
 }
 
 static void RemoveComplexPaths(std::string_view path) {
@@ -624,13 +677,22 @@ bool TunableRegistry::PublishImpl(std::string_view path,
         type = info.type;
       }
       uint32_t uid = tunable.m_uid & detail::TunableBase::UID_MASK;
-      if (!backend->Publish(normalizedPath, uid, tunable, config, type)) {
-        return false;
-      }
+      bool addedComplexPath = false;
+      std::optional<ComplexChildPathState> childPathState;
       if (type == detail::TunableTypeValue::COMPLEX) {
-        AddComplexPath(uid, normalizedPath);
+        addedComplexPath = AddComplexPath(uid, normalizedPath);
       } else {
-        AddComplexChildPath(uid, normalizedPath);
+        childPathState = AddComplexChildPath(uid, normalizedPath);
+      }
+      if (!backend->Publish(normalizedPath, uid, tunable, config, type)) {
+        if (type == detail::TunableTypeValue::COMPLEX) {
+          if (addedComplexPath) {
+            RemoveComplexPath(uid, normalizedPath);
+          }
+        } else {
+          RestoreComplexChildPath(*childPathState);
+        }
+        return false;
       }
       return true;
     }
