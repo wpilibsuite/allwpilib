@@ -208,8 +208,8 @@ bool Publish(wpi::tunables::TunableTable& table, std::string_view name,
       }
     }
   } else if (auto publishTunable = GetOptionalAttr(value, "publish_tunables")) {
-    auto tunable = std::make_shared<PyComplexTunableAdapter>(
-        std::move(value), std::move(*publishTunable));
+    auto tunable = detail::GetOrCreateComplex(std::move(value),
+                                              std::move(*publishTunable));
     std::string path = NormalizeTablePath(table, name);
     auto updateLock = LockForComplexPublication();
     PendingPublication pending{path};

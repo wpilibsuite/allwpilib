@@ -118,9 +118,33 @@ GetComplexValues() {
   return values;
 }
 
+std::unordered_map<PyObject*, std::weak_ptr<PyComplexTunableAdapter>>&
+GetComplexValuesByObject() {
+  static std::unordered_map<PyObject*, std::weak_ptr<PyComplexTunableAdapter>>
+      values;
+  return values;
+}
+
 std::unordered_map<std::string, py::object>& GetNativeComplexValues() {
   static std::unordered_map<std::string, py::object> values;
   return values;
+}
+
+std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
+    py::handle value) {
+  auto& values = GetComplexValuesByObject();
+  auto it = values.find(value.ptr());
+  if (it == values.end()) {
+    return nullptr;
+  }
+
+  auto retained = it->second.lock();
+  if (!retained || !retained->IsValue(value)) {
+    values.erase(it);
+    return nullptr;
+  }
+
+  return retained;
 }
 
 void RefreshValues() {
@@ -137,6 +161,19 @@ namespace detail {
 
 void StoreValue(std::string path, std::shared_ptr<PyTunable> value) {
   GetValues().insert_or_assign(std::move(path), std::move(value));
+}
+
+std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
+    py::object value, py::object initialPublishTunable) {
+  if (auto retained = GetComplexValueByObject(value)) {
+    return retained;
+  }
+
+  PyObject* key = value.ptr();
+  auto tunable = std::make_shared<PyComplexTunableAdapter>(
+      std::move(value), std::move(initialPublishTunable));
+  GetComplexValuesByObject().insert_or_assign(key, tunable);
+  return tunable;
 }
 
 void StoreComplex(std::string path,
@@ -171,6 +208,7 @@ void ClearValues() {
   GetValues().clear();
   GetRefreshValues().clear();
   GetComplexValues().clear();
+  GetComplexValuesByObject().clear();
   GetNativeComplexValues().clear();
 }
 
@@ -257,10 +295,8 @@ void RemoveValue(py::handle value) {
 }
 
 std::optional<uint64_t> GetRetainedTuneRevision(py::handle value) {
-  for (auto&& entry : GetComplexValues()) {
-    if (entry.second->IsValue(value)) {
-      return wpi::tunables::TunableRegistry::GetTuneRevision(*entry.second);
-    }
+  if (auto retained = GetComplexValueByObject(value)) {
+    return wpi::tunables::TunableRegistry::GetTuneRevision(*retained);
   }
   return std::nullopt;
 }
