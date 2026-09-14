@@ -94,6 +94,7 @@ robotpy_library(
     },
     imports = ["src/main/python"],
     project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+    python_requires = ">=3.11",
     requires = [
         "robotpy-native-wpihal==0.0.0",
         "robotpy-native-wpinet==0.0.0",
