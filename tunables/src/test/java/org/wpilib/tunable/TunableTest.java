@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -377,6 +378,32 @@ class TunableTest {
     TunableRegistry.setReportWarning(null);
   }
 
+  private WeakReference<TunableInt> createRemovedTunedTunableReference() {
+    TunableInt tunable = TunableInt.create(1);
+    Tunables.publish("collectedRevision", tunable);
+
+    m_mock.setInt("/collectedRevision", 2);
+    TunableRegistry.update();
+    assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+
+    Tunables.remove("collectedRevision");
+    WeakReference<TunableInt> reference = new WeakReference<>(tunable);
+    return reference;
+  }
+
+  @SuppressWarnings("PMD.DoNotCallGarbageCollectionExplicitly")
+  private static void assertEventuallyCollected(WeakReference<?> reference) {
+    List<byte[]> pressure = new ArrayList<>();
+    for (int i = 0; i < 20 && reference.get() != null; i++) {
+      System.gc();
+      pressure.add(new byte[1024 * 1024]);
+      if (pressure.size() > 4) {
+        pressure.clear();
+      }
+    }
+    assertNull(reference.get());
+  }
+
   @Test
   void testIntTunable() {
     TunableInt tunable = TunableInt.create();
@@ -482,6 +509,13 @@ class TunableTest {
 
     assertEquals(5, tunable.get());
     assertEquals(4, TunableRegistry.getTuneRevision(tunable));
+  }
+
+  @Test
+  void testTuneRevisionDoesNotRetainRemovedTunable() {
+    WeakReference<TunableInt> reference = createRemovedTunedTunableReference();
+
+    assertEventuallyCollected(reference);
   }
 
   @Test
