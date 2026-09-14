@@ -30,6 +30,8 @@
 #include "aos/flatbuffer_merge.h"
 #include "aos/flatbuffers/builder.h"
 #include "aos/realtime.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_arrays_test_generated.h"
+#include "aosnt/src/test/fbs/flatbuffer_to_proto_arrays_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_bad_attribute_test_schema.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_generated.h"
 #include "aosnt/src/test/fbs/flatbuffer_to_proto_defaults_test_schema.h"
@@ -69,6 +71,10 @@ const reflection::Schema* GetBadAttributeSchema() {
 
 const reflection::Schema* GetDefaultsSchema() {
   return GetSchemaFromSpan(DefaultsSchema());
+}
+
+const reflection::Schema* GetArraysSchema() {
+  return GetSchemaFromSpan(ArraysSchema());
 }
 
 // One field as it is on the wire, decoded without reference to any
@@ -690,6 +696,124 @@ TEST_CASE("FlatbufferToProtoDefaultsTest WritesNegativeZero",
   REQUIRE(Find(fields, 4) != nullptr);
   CHECK(Find(fields, 4)->wireType == PB_WT_32BIT);
   CHECK(Find(fields, 4)->value == FloatBits(-0.0f));
+}
+
+Grid MakeGrid() {
+  Grid grid;
+  grid.mutable_cells()->Mutate(0, -1);
+  grid.mutable_cells()->Mutate(1, 0);
+  grid.mutable_cells()->Mutate(2, 7);
+  grid.mutable_zigzag()->Mutate(0, -2);
+  grid.mutable_zigzag()->Mutate(1, 3);
+  grid.mutable_weights()->Mutate(0, 1.5);
+  grid.mutable_weights()->Mutate(1, 0.0);
+  grid.mutable_points()->Mutate(0, Point{1, 2.5f});
+  grid.mutable_points()->Mutate(1, Point{0, 0.0f});
+  return grid;
+}
+
+flatbuffers::DetachedBuffer MakeArrays() {
+  flatbuffers::FlatBufferBuilder fbb;
+  const Grid grid = MakeGrid();
+  const auto gridsOffset = fbb.CreateVectorOfStructs(&grid, 1);
+  ArraysBuilder builder{fbb};
+  builder.add_grid(&grid);
+  builder.add_grids(gridsOffset);
+  fbb.Finish(builder.Finish());
+  return fbb.Release();
+}
+
+// A fixed-length array is a repeated field: scalars packed, structs one
+// submessage each, and every element written, zeros included.
+TEST_CASE("FlatbufferToProtoArraysTest EncodesFixedLengthArrays",
+          "[aosnt][flatbuffer-to-proto]") {
+  const flatbuffers::DetachedBuffer buffer = MakeArrays();
+  const FlatbufferToProto translator{GetArraysSchema()};
+  const std::vector<WireField> fields =
+      Decode(Encode(translator, buffer.data()));
+
+  const WireField* grid = Find(fields, 1);
+  REQUIRE(grid != nullptr);
+  REQUIRE(grid->wireType == PB_WT_STRING);
+  const std::vector<WireField> gridFields = Decode(grid->bytes);
+
+  const WireField* cells = Find(gridFields, 1);
+  REQUIRE(cells != nullptr);
+  REQUIRE(cells->wireType == PB_WT_STRING);
+  CHECK(DecodePackedVarints(cells->bytes) ==
+        std::vector<uint64_t>{static_cast<uint64_t>(int64_t{-1}), 0, 7});
+
+  const WireField* zigzag = Find(gridFields, 2);
+  REQUIRE(zigzag != nullptr);
+  // -2 -> 3, 3 -> 6
+  CHECK(DecodePackedVarints(zigzag->bytes) == std::vector<uint64_t>{3, 6});
+
+  const WireField* weights = Find(gridFields, 3);
+  REQUIRE(weights != nullptr);
+  CHECK(DecodePackedFixed64(weights->bytes) ==
+        std::vector<uint64_t>{DoubleBits(1.5), DoubleBits(0.0)});
+
+  std::vector<std::vector<WireField>> points;
+  for (const WireField& field : gridFields) {
+    if (field.number == 4) {
+      points.push_back(Decode(field.bytes));
+    }
+  }
+  REQUIRE(points.size() == 2u);
+  REQUIRE(Find(points[0], 1) != nullptr);
+  CHECK(Find(points[0], 1)->value == 1u);
+  REQUIRE(Find(points[0], 2) != nullptr);
+  CHECK(Find(points[0], 2)->value == FloatBits(2.5f));
+  REQUIRE(Find(points[1], 1) != nullptr);
+  CHECK(Find(points[1], 1)->value == 0u);
+}
+
+TEST_CASE("FlatbufferToProtoArraysTest UpbDecodesFixedLengthArrays",
+          "[aosnt][flatbuffer-to-proto]") {
+  UpbDecoder decoder{BuildFileDescriptorProto(
+      GetArraysSchema(), "flatbuffer_to_proto_arrays_test.proto")};
+  const upb_MessageDef* arrays =
+      decoder.FindMessage(GetProtoMessageName(GetArraysSchema()));
+
+  const flatbuffers::DetachedBuffer buffer = MakeArrays();
+  const FlatbufferToProto translator{GetArraysSchema()};
+  const upb_Message* message =
+      decoder.Decode(arrays, Encode(translator, buffer.data()));
+
+  const upb_FieldDef* gridsField = FindField(arrays, "grids");
+  const upb_Array* grids =
+      upb_Message_GetFieldByDef(message, gridsField).array_val;
+  REQUIRE(grids != nullptr);
+  REQUIRE(upb_Array_Size(grids) == 1u);
+  const upb_MessageDef* gridDef = upb_FieldDef_MessageSubDef(gridsField);
+  const upb_Message* grid = upb_Array_Get(grids, 0).msg_val;
+
+  const upb_FieldDef* cellsField = FindField(gridDef, "cells");
+  CHECK(upb_FieldDef_IsRepeated(cellsField));
+  const upb_Array* cells =
+      upb_Message_GetFieldByDef(grid, cellsField).array_val;
+  REQUIRE(cells != nullptr);
+  REQUIRE(upb_Array_Size(cells) == 3u);
+  CHECK(upb_Array_Get(cells, 0).int32_val == -1);
+  CHECK(upb_Array_Get(cells, 1).int32_val == 0);
+  CHECK(upb_Array_Get(cells, 2).int32_val == 7);
+
+  const upb_FieldDef* zigzagField = FindField(gridDef, "zigzag");
+  CHECK(upb_FieldDef_Type(zigzagField) == kUpb_FieldType_SInt32);
+  const upb_Array* zigzag =
+      upb_Message_GetFieldByDef(grid, zigzagField).array_val;
+  REQUIRE(zigzag != nullptr);
+  REQUIRE(upb_Array_Size(zigzag) == 2u);
+  CHECK(upb_Array_Get(zigzag, 0).int32_val == -2);
+
+  const upb_FieldDef* pointsField = FindField(gridDef, "points");
+  const upb_Array* points =
+      upb_Message_GetFieldByDef(grid, pointsField).array_val;
+  REQUIRE(points != nullptr);
+  REQUIRE(upb_Array_Size(points) == 2u);
+  const upb_MessageDef* pointDef = upb_FieldDef_MessageSubDef(pointsField);
+  CHECK(GetField(upb_Array_Get(points, 0).msg_val, pointDef, "y").float_val ==
+        2.5f);
 }
 
 // aos::ScopedRealtime makes any allocation inside Encode() fatal.

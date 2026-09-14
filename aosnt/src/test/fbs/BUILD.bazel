@@ -30,6 +30,12 @@ static_flatbuffer(
 )
 
 static_flatbuffer(
+    name = "flatbuffer_to_proto_arrays_test_fbs",
+    srcs = ["flatbuffer_to_proto_arrays_test.fbs"],
+    visibility = ["//aosnt:__pkg__"],
+)
+
+static_flatbuffer(
     name = "flatbuffer_to_proto_bad_attribute_test_fbs",
     srcs = ["flatbuffer_to_proto_bad_attribute_test.fbs"],
     visibility = ["//aosnt:__pkg__"],
@@ -67,5 +73,12 @@ cc_static_flatbuffer(
     name = "flatbuffer_to_proto_defaults_test_schema",
     function = "wpi::aosnt::testing::DefaultsSchema",
     target = ":flatbuffer_to_proto_defaults_test_fbs_fbs_reflection_out",
+    visibility = ["//aosnt:__pkg__"],
+)
+
+cc_static_flatbuffer(
+    name = "flatbuffer_to_proto_arrays_test_schema",
+    function = "wpi::aosnt::testing::ArraysSchema",
+    target = ":flatbuffer_to_proto_arrays_test_fbs_fbs_reflection_out",
     visibility = ["//aosnt:__pkg__"],
 )

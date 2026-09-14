@@ -13,6 +13,7 @@
 #include <new>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <upb/base/string_view.h>
@@ -50,11 +51,16 @@ std::string_view GetProtoTypeAttribute(const reflection::Field& field) {
 
 // The protobuf type a field encodes as. Everything else about the field's
 // encoding, and its descriptor, is derived from this.
+bool IsRepeated(const reflection::Field& field) {
+  return field.type()->base_type() == reflection::BaseType::Vector ||
+         field.type()->base_type() == reflection::BaseType::Array;
+}
+
 upb_FieldType GetProtoType(const reflection::Field& field) {
+  // A vector and a struct's fixed-length array are both a repeated field of
+  // their element type.
   const reflection::BaseType type =
-      field.type()->base_type() == reflection::BaseType::Vector
-          ? field.type()->element()
-          : field.type()->base_type();
+      IsRepeated(field) ? field.type()->element() : field.type()->base_type();
   const std::string_view attribute = GetProtoTypeAttribute(field);
 
   switch (type) {
@@ -242,10 +248,69 @@ struct FlatbufferToProto::Walker {
                             value.size());
   }
 
+  // Scalars are packed: one length-delimited run of the elements. get(i)
+  // returns element i as an integer and as a real, and only the one the type
+  // uses matters.
+  template <typename Get>
+  static bool WritePacked(pb_ostream_t* stream, uint32_t number,
+                          upb_FieldType type, size_t count, Get get) {
+    pb_ostream_t sizing = PB_OSTREAM_SIZING;
+    for (size_t i = 0; i < count; ++i) {
+      const auto [integer, real] = get(i);
+      WriteScalar(&sizing, type, integer, real);
+    }
+    if (!pb_encode_tag(stream, PB_WT_STRING, number) ||
+        !pb_encode_varint(stream, sizing.bytes_written)) {
+      return false;
+    }
+    for (size_t i = 0; i < count; ++i) {
+      const auto [integer, real] = get(i);
+      if (!WriteScalar(stream, type, integer, real)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // A fixed-length array lives inline in its struct, so every element is
+  // present, zeros included.
+  bool WriteArray(pb_ostream_t* stream, const Field& field,
+                  const flatbuffers::Struct& value) const {
+    const reflection::Type& type = *field.field->type();
+    const uint32_t number = GetFieldNumber(*field.field);
+    const uint8_t* data = value.GetAddressOf(field.field->offset());
+    const size_t length = type.fixed_length();
+
+    if (type.element() == reflection::BaseType::Obj) {
+      const reflection::Object& object = GetObject(*field.field);
+      for (size_t i = 0; i < length; ++i) {
+        if (!WriteSubmessage(stream, number, object,
+                             *reinterpret_cast<const flatbuffers::Struct*>(
+                                 data + i * object.bytesize()))) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    const size_t size = flatbuffers::GetTypeSize(type.element());
+    return WritePacked(stream, number, field.type, length, [&](size_t i) {
+      return std::pair{
+          flatbuffers::GetAnyValueI(type.element(), data + i * size),
+          flatbuffers::GetAnyValueF(type.element(), data + i * size)};
+    });
+  }
+
   bool WriteStruct(pb_ostream_t* stream, const reflection::Object& object,
                    const flatbuffers::Struct& value) const {
     for (const Field& field : GetFields(object)) {
       const uint32_t number = GetFieldNumber(*field.field);
+      if (field.field->type()->base_type() == reflection::BaseType::Array) {
+        if (!WriteArray(stream, field, value)) {
+          return false;
+        }
+        continue;
+      }
       if (field.type == kUpb_FieldType_Message) {
         if (!WriteSubmessage(
                 stream, number, GetObject(*field.field),
@@ -307,25 +372,11 @@ struct FlatbufferToProto::Walker {
       return true;
     }
 
-    // Scalars are packed: one length-delimited run of the elements.
-    pb_ostream_t sizing = PB_OSTREAM_SIZING;
-    for (size_t i = 0; i < vector->size(); ++i) {
-      WriteScalar(&sizing, field.type,
-                  flatbuffers::GetAnyVectorElemI(vector, element, i),
-                  flatbuffers::GetAnyVectorElemF(vector, element, i));
-    }
-    if (!pb_encode_tag(stream, PB_WT_STRING, number) ||
-        !pb_encode_varint(stream, sizing.bytes_written)) {
-      return false;
-    }
-    for (size_t i = 0; i < vector->size(); ++i) {
-      if (!WriteScalar(stream, field.type,
-                       flatbuffers::GetAnyVectorElemI(vector, element, i),
-                       flatbuffers::GetAnyVectorElemF(vector, element, i))) {
-        return false;
-      }
-    }
-    return true;
+    return WritePacked(
+        stream, number, field.type, vector->size(), [&](size_t i) {
+          return std::pair{flatbuffers::GetAnyVectorElemI(vector, element, i),
+                           flatbuffers::GetAnyVectorElemF(vector, element, i)};
+        });
   }
 
   bool WriteTable(pb_ostream_t* stream, const reflection::Object& object,
@@ -559,9 +610,7 @@ std::vector<uint8_t> BuildFileDescriptorProto(const reflection::Schema* schema,
       google_protobuf_FieldDescriptorProto_set_number(
           out, static_cast<int32_t>(GetFieldNumber(*field)));
       google_protobuf_FieldDescriptorProto_set_label(
-          out, field->type()->base_type() == reflection::BaseType::Vector
-                   ? kUpb_Label_Repeated
-                   : kUpb_Label_Optional);
+          out, IsRepeated(*field) ? kUpb_Label_Repeated : kUpb_Label_Optional);
       google_protobuf_FieldDescriptorProto_set_type(out, type);
       if (type == kUpb_FieldType_Message) {
         google_protobuf_FieldDescriptorProto_set_type_name(

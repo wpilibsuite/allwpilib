@@ -48,6 +48,8 @@ namespace wpi::aosnt {
  *   sfixed on a signed integer and fixed on an unsigned one. Without it,
  *   integers are plain varints, floats are fixed32, and doubles are fixed64.
  *
+ * A vector, or a fixed-length array in a struct, is a repeated field.
+ *
  * Scalars that are zero are omitted and repeated scalars are packed, matching
  * proto3. A flatbuffer default is not a protobuf default, so a table field left
  * unset at a nonzero default is written with that default.
