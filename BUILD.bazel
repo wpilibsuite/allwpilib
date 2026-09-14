@@ -120,6 +120,7 @@ write_source_files(
         "//wpilibj:write_wpilibj",
         "//commandsv2:write_wpilib_new_commands",
         "//commandsv3:write_commandsv3",
+        "//datalog:write_datalog",
         "//drivers:write_drivers",
         "//fields:write_fields",
         "//wpimath:write_wpimath",
