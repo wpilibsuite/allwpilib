@@ -43,8 +43,10 @@ namespace wpi::aosnt {
  *       axes:[short] (id: 4, proto_type: "sint32");
  *
  *   Accepted values are sint32, sint64, fixed32, fixed64, sfixed32 and
- *   sfixed64. Without it, integers are plain varints, floats are fixed32, and
- *   doubles are fixed64.
+ *   sfixed64, and the value has to match the field's type exactly: the 64-bit
+ *   ones on a long or ulong and the 32-bit ones on anything narrower, sint and
+ *   sfixed on a signed integer and fixed on an unsigned one. Without it,
+ *   integers are plain varints, floats are fixed32, and doubles are fixed64.
  *
  * Scalars that are zero are omitted and repeated scalars are packed, matching
  * proto3. A flatbuffer default is not a protobuf default, so a table field left
@@ -58,8 +60,9 @@ class FlatbufferToProto {
    * @param schema The schema to translate. Must outlive this.
    * @throws std::invalid_argument if the schema is null or has no root table,
    *         or contains something with no protobuf equivalent: a union, or a
-   *         proto_type attribute that is unknown or on a field with only one
-   *         protobuf type.
+   *         proto_type attribute that is unknown, on a field with only one
+   *         protobuf type, or does not match its field's width and
+   *         signedness.
    */
   explicit FlatbufferToProto(const reflection::Schema* schema);
 

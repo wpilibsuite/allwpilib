@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cstring>
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -16,6 +17,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <flatbuffers/flatbuffers.h>
+#include <flatbuffers/idl.h>
 #include <upb/base/status.h>
 #include <upb/mem/arena.h>
 #include <upb/message/array.h>
@@ -540,6 +542,77 @@ TEST_CASE("FlatbufferToProtoTest OmitsDefaults",
   CHECK(Find(fields, 2) == nullptr);
   REQUIRE(Find(fields, 5) != nullptr);
   CHECK(Find(fields, 5)->value == 7u);
+}
+
+// Compiles a one-field schema the way flatc would, for checking what a
+// proto_type is accepted on.
+std::vector<uint8_t> CompileSchemaWithField(std::string_view field) {
+  flatbuffers::Parser parser;
+  const std::string text = std::format(
+      "attribute \"proto_type\"; table T {{ {} }} root_type T;", field);
+  INFO(parser.error_);
+  REQUIRE(parser.Parse(text.c_str()));
+  parser.Serialize();
+  return std::vector<uint8_t>(
+      parser.builder_.GetBufferPointer(),
+      parser.builder_.GetBufferPointer() + parser.builder_.GetSize());
+}
+
+// A proto_type names exactly the protobuf type its field is. Anything else
+// would widen, truncate, or read the value with the other signedness.
+TEST_CASE("FlatbufferToProtoTest AcceptsAProtoTypeMatchingItsField",
+          "[aosnt][flatbuffer-to-proto]") {
+  for (std::string_view field :
+       {R"(f:byte (id: 0, proto_type: "sint32");)",
+        R"(f:int (id: 0, proto_type: "sint32");)",
+        R"(f:long (id: 0, proto_type: "sint64");)",
+        R"(f:ushort (id: 0, proto_type: "fixed32");)",
+        R"(f:uint (id: 0, proto_type: "fixed32");)",
+        R"(f:int (id: 0, proto_type: "sfixed32");)",
+        R"(f:ulong (id: 0, proto_type: "fixed64");)",
+        R"(f:long (id: 0, proto_type: "sfixed64");)",
+        R"(f:[short] (id: 0, proto_type: "sint32");)"}) {
+    INFO(field);
+    const std::vector<uint8_t> schema = CompileSchemaWithField(field);
+    CHECK_NOTHROW(FlatbufferToProto{reflection::GetSchema(schema.data())});
+    CHECK_NOTHROW(BuildFileDescriptorProto(reflection::GetSchema(schema.data()),
+                                           "t.proto"));
+  }
+}
+
+TEST_CASE("FlatbufferToProtoTest RejectsAProtoTypeNotMatchingItsField",
+          "[aosnt][flatbuffer-to-proto]") {
+  for (const auto& [field, message] :
+       std::vector<std::pair<std::string_view, std::string_view>>{
+           // Truncating.
+           {R"(f:ulong (id: 0, proto_type: "fixed32");)",
+            R"(its ULong type calls for "fixed64")"},
+           {R"(f:long (id: 0, proto_type: "sfixed32");)",
+            R"(its Long type calls for "sfixed64")"},
+           {R"(f:[ulong] (id: 0, proto_type: "fixed32");)",
+            R"(its ULong type calls for "fixed64")"},
+           // Widening.
+           {R"(f:long (id: 0, proto_type: "sint32");)",
+            R"(its Long type calls for "sint64")"},
+           {R"(f:int (id: 0, proto_type: "sint64");)",
+            R"(its Int type calls for "sint32")"},
+           {R"(f:uint (id: 0, proto_type: "fixed64");)",
+            R"(its UInt type calls for "fixed32")"},
+           // The other signedness.
+           {R"(f:int (id: 0, proto_type: "fixed32");)",
+            R"(its Int type calls for "sfixed32")"},
+           {R"(f:ulong (id: 0, proto_type: "sfixed64");)",
+            R"(its ULong type calls for "fixed64")"},
+           {R"(f:uint (id: 0, proto_type: "sint32");)",
+            "zigzag encoding is for signed integers"}}) {
+    INFO(field);
+    const std::vector<uint8_t> schema = CompileSchemaWithField(field);
+    CHECK_THROWS_WITH(FlatbufferToProto{reflection::GetSchema(schema.data())},
+                      Catch::Matchers::ContainsSubstring(std::string{message}));
+    CHECK_THROWS_AS(BuildFileDescriptorProto(
+                        reflection::GetSchema(schema.data()), "t.proto"),
+                    std::invalid_argument);
+  }
 }
 
 // proto3 reads a missing scalar as zero, so a flatbuffer default of anything

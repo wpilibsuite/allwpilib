@@ -95,24 +95,46 @@ upb_FieldType GetProtoType(const reflection::Field& field) {
                     field.name()->string_view()));
   }
 
-  // The width comes from the flatbuffer type rather than from the attribute,
-  // so that sint32 on a long is a sint64 rather than a type the value does not
-  // fit in.
-  if (attribute == "sint32" || attribute == "sint64") {
-    return flatbuffers::IsLong(type) ? kUpb_FieldType_SInt64
-                                     : kUpb_FieldType_SInt32;
-  }
-  if (attribute == "fixed32" || attribute == "sfixed32") {
-    return IsSigned(type) ? kUpb_FieldType_SFixed32 : kUpb_FieldType_Fixed32;
-  }
-  if (attribute == "fixed64" || attribute == "sfixed64") {
-    return IsSigned(type) ? kUpb_FieldType_SFixed64 : kUpb_FieldType_Fixed64;
-  }
   if (!attribute.empty()) {
-    throw std::invalid_argument(std::format(
-        "field {} has proto_type \"{}\", which is not one of sint32, sint64, "
-        "fixed32, fixed64, sfixed32 or sfixed64",
-        field.name()->string_view(), attribute));
+    // The attribute has to name exactly the protobuf type the flatbuffer type
+    // is, so that nothing is widened, truncated or read with the other
+    // signedness without the schema saying so.
+    const bool isLong = flatbuffers::IsLong(type);
+    const bool isSigned = IsSigned(type);
+    std::string_view expected;
+    upb_FieldType protoType;
+    if (attribute == "sint32" || attribute == "sint64") {
+      if (!isSigned) {
+        throw std::invalid_argument(std::format(
+            "field {} has proto_type \"{}\", but zigzag encoding is for signed "
+            "integers and the field is a {}",
+            field.name()->string_view(), attribute,
+            reflection::EnumNameBaseType(type)));
+      }
+      expected = isLong ? "sint64" : "sint32";
+      protoType = isLong ? kUpb_FieldType_SInt64 : kUpb_FieldType_SInt32;
+    } else if (attribute == "fixed32" || attribute == "sfixed32" ||
+               attribute == "fixed64" || attribute == "sfixed64") {
+      if (isSigned) {
+        expected = isLong ? "sfixed64" : "sfixed32";
+        protoType = isLong ? kUpb_FieldType_SFixed64 : kUpb_FieldType_SFixed32;
+      } else {
+        expected = isLong ? "fixed64" : "fixed32";
+        protoType = isLong ? kUpb_FieldType_Fixed64 : kUpb_FieldType_Fixed32;
+      }
+    } else {
+      throw std::invalid_argument(std::format(
+          "field {} has proto_type \"{}\", which is not one of sint32, sint64, "
+          "fixed32, fixed64, sfixed32 or sfixed64",
+          field.name()->string_view(), attribute));
+    }
+    if (attribute != expected) {
+      throw std::invalid_argument(std::format(
+          "field {} has proto_type \"{}\", but its {} type calls for \"{}\"",
+          field.name()->string_view(), attribute,
+          reflection::EnumNameBaseType(type), expected));
+    }
+    return protoType;
   }
 
   if (flatbuffers::IsLong(type)) {
