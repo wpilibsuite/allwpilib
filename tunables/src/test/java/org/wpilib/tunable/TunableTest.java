@@ -216,6 +216,15 @@ class TunableTest {
     }
   }
 
+  private static final class NestedChildComplex implements ComplexTunable {
+    private final TunableDouble m_child = TunableDouble.create(1.0);
+
+    @Override
+    public void publishTunable(TunableTable table) {
+      table.publish("blocked/child", m_child);
+    }
+  }
+
   private static final class UpdatingDynamicComplex implements ComplexTunable {
     private final TunableDouble m_initial = TunableDouble.create(1.0);
     private final TunableDouble m_dynamic = TunableDouble.create(2.0);
@@ -1376,6 +1385,32 @@ class TunableTest {
     assertSame(existing, m_mock.getTunable("/complex"));
     assertEquals(1.0, m_mock.getDouble("/complex"));
     assertThrows(IllegalArgumentException.class, () -> m_mock.getInteger("/complex/counter"));
+  }
+
+  @Test
+  void testRejectedComplexTunableRestoresDescendantRevisionParents() {
+    NestedChildComplex outer = new NestedChildComplex();
+    TunableDouble blocker = TunableDouble.create(9.0);
+    CountingComplex rejected = new CountingComplex();
+
+    Tunables.publish("outer", outer);
+    Tunables.publish("outer/blocked", blocker);
+
+    m_mock.setDouble("/outer/blocked/child", 2.0);
+    TunableRegistry.update();
+
+    assertEquals(1, TunableRegistry.getTuneRevision(outer.m_child));
+    assertEquals(1, TunableRegistry.getTuneRevision(outer));
+    assertEquals(0, TunableRegistry.getTuneRevision(rejected));
+
+    assertFalse(Tunables.publish("outer/blocked", rejected));
+
+    m_mock.setDouble("/outer/blocked/child", 3.0);
+    TunableRegistry.update();
+
+    assertEquals(2, TunableRegistry.getTuneRevision(outer.m_child));
+    assertEquals(2, TunableRegistry.getTuneRevision(outer));
+    assertEquals(0, TunableRegistry.getTuneRevision(rejected));
   }
 
   @Test
