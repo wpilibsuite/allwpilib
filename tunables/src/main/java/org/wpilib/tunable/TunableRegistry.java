@@ -54,6 +54,14 @@ public final class TunableRegistry {
 
   private record RevisionParentLink(Object child, ComplexTunable parent) {}
 
+  private record RevisionParentLinkState(String path, RevisionParentLink link) {}
+
+  private record ComplexPathState(
+      String path,
+      ComplexTunable tunable,
+      boolean addedPath,
+      List<RevisionParentLinkState> descendantLinks) {}
+
   private record ComplexChildPathState(String path, TunableBase previousTunable) {}
 
   private static final class WeakIdentityKey extends WeakReference<Object> {
@@ -669,12 +677,12 @@ public final class TunableRegistry {
       if (isMissingBackend(backend)) {
         missingBackend = true;
       } else {
-        boolean addedPath = addComplexPath(normalized, tunable);
+        ComplexPathState pathState = addComplexPath(normalized, tunable);
         if (backend.publishComplex(path, tunable)) {
           recordComplexMigrationPublish(normalized);
           return true;
-        } else if (addedPath) {
-          removeComplexPath(normalized, tunable);
+        } else if (pathState.addedPath()) {
+          restoreComplexPath(pathState);
         }
       }
     }
@@ -939,18 +947,37 @@ public final class TunableRegistry {
     }
   }
 
-  private static void linkExistingComplexDescendants(String path) {
+  private static void restoreRevisionParentLinks(List<RevisionParentLinkState> states) {
+    for (int i = states.size() - 1; i >= 0; i--) {
+      RevisionParentLinkState state = states.get(i);
+      removeRevisionParentLink(state.path());
+      if (state.link() != null) {
+        s_revisionParentLinksByPath.put(state.path(), state.link());
+        addRevisionParent(state.link().child(), state.link().parent());
+      }
+    }
+  }
+
+  private static List<RevisionParentLinkState> linkExistingComplexDescendants(String path) {
+    List<RevisionParentLinkState> previousLinks = new ArrayList<>();
     String childPrefix = PathUtil.childTablePath(path);
     for (var entry : s_complexChildrenByPath.entrySet()) {
       if (entry.getKey().startsWith(childPrefix)) {
+        previousLinks.add(
+            new RevisionParentLinkState(
+                entry.getKey(), s_revisionParentLinksByPath.get(entry.getKey())));
         linkRevisionParentForPath(entry.getKey(), getRevisionOwner(entry.getValue()));
       }
     }
     for (var entry : s_complexByPath.entrySet()) {
       if (!entry.getKey().equals(path) && entry.getKey().startsWith(childPrefix)) {
+        previousLinks.add(
+            new RevisionParentLinkState(
+                entry.getKey(), s_revisionParentLinksByPath.get(entry.getKey())));
         linkRevisionParentForPath(entry.getKey(), entry.getValue());
       }
     }
+    return previousLinks;
   }
 
   private static ComplexChildPathState addComplexChildPath(String path, TunableBase tunable) {
@@ -977,17 +1004,24 @@ public final class TunableRegistry {
     }
   }
 
-  private static boolean addComplexPath(String path, ComplexTunable tunable) {
+  private static ComplexPathState addComplexPath(String path, ComplexTunable tunable) {
     synchronized (s_complexPathsMutex) {
       String normalized = PathUtil.normalizeName(path);
       if (s_complexByPath.containsKey(normalized)) {
-        return false;
+        return new ComplexPathState(normalized, tunable, false, List.of());
       }
       linkRevisionParentForPath(normalized, tunable);
       s_complexByPath.put(normalized, tunable);
       s_complexPaths.computeIfAbsent(tunable, k -> new ArrayList<>()).add(normalized);
-      linkExistingComplexDescendants(normalized);
-      return true;
+      List<RevisionParentLinkState> descendantLinks = linkExistingComplexDescendants(normalized);
+      return new ComplexPathState(normalized, tunable, true, descendantLinks);
+    }
+  }
+
+  private static void restoreComplexPath(ComplexPathState state) {
+    synchronized (s_complexPathsMutex) {
+      removeComplexPath(state.path(), state.tunable());
+      restoreRevisionParentLinks(state.descendantLinks());
     }
   }
 
