@@ -220,6 +220,8 @@ bool Publish(wpi::tunables::TunableTable& table, std::string_view name,
       } else {
         detail::StoreComplex(std::move(path), std::move(tunable));
       }
+    } else {
+      tunable->ReleaseValueIfUnpublished();
     }
   } else {
     throw py::type_error(

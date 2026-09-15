@@ -1029,6 +1029,47 @@ def test_tune_revision_is_shared_across_python_complex_aliases(backend):
     assert tunables.TunableRegistry.get_tune_revision(value) == 2
 
 
+def test_tune_revision_survives_python_complex_unpublish_republish(backend):
+    class RepublishedComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = RepublishedComplex()
+
+    tunables.publish("pythonRepublishRevisionA", value)
+    backend.set_double("/pythonRepublishRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.remove("pythonRepublishRevisionA")
+
+    assert backend.get_uid("/pythonRepublishRevisionA") is None
+    assert backend.get_uid("/pythonRepublishRevisionA/value") is None
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.publish("pythonRepublishRevisionB", value)
+
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+    backend.set_double("/pythonRepublishRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    ref = weakref.ref(value)
+    tunables.remove("pythonRepublishRevisionB")
+    del value
+
+    assert ref() is None
+
+
 def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):
     wrong_type = tunables.add("wrongTypeRevision", 1.0)
     immutable = tunables.add("immutableRevision", 5, mutable=False)

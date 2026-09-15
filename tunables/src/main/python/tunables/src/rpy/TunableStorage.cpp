@@ -1,6 +1,7 @@
 #include "TunableStorage.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -118,10 +119,20 @@ GetComplexValues() {
   return values;
 }
 
-std::unordered_map<PyObject*, std::weak_ptr<PyComplexTunableAdapter>>&
+struct ComplexIdentityEntry {
+  std::shared_ptr<PyComplexTunableAdapter> tunable;
+  py::weakref valueRef;
+  uint64_t generation;
+};
+
+uint64_t NextComplexIdentityGeneration() {
+  static uint64_t generation = 0;
+  return ++generation;
+}
+
+std::unordered_map<PyObject*, ComplexIdentityEntry>&
 GetComplexValuesByObject() {
-  static std::unordered_map<PyObject*, std::weak_ptr<PyComplexTunableAdapter>>
-      values;
+  static std::unordered_map<PyObject*, ComplexIdentityEntry> values;
   return values;
 }
 
@@ -138,8 +149,9 @@ std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
     return nullptr;
   }
 
-  auto retained = it->second.lock();
-  if (!retained || !retained->IsValue(value)) {
+  auto retained = it->second.tunable;
+  if (!retained || it->second.valueRef().is_none() ||
+      !retained->IsValue(value)) {
     values.erase(it);
     return nullptr;
   }
@@ -166,19 +178,41 @@ void StoreValue(std::string path, std::shared_ptr<PyTunable> value) {
 std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
     py::object value, py::object initialPublishTunable) {
   if (auto retained = GetComplexValueByObject(value)) {
+    retained->RetainValue(std::move(value), std::move(initialPublishTunable));
     return retained;
   }
 
   PyObject* key = value.ptr();
+  uint64_t generation = NextComplexIdentityGeneration();
+  py::cpp_function cleanup{[key, generation](py::handle) {
+    auto& values = GetComplexValuesByObject();
+    auto it = values.find(key);
+    if (it != values.end() && it->second.generation == generation) {
+      values.erase(it);
+    }
+  }};
+  py::weakref valueRef{value, cleanup};
   auto tunable = std::make_shared<PyComplexTunableAdapter>(
       std::move(value), std::move(initialPublishTunable));
-  GetComplexValuesByObject().insert_or_assign(key, tunable);
+  GetComplexValuesByObject().insert_or_assign(
+      key, ComplexIdentityEntry{tunable, std::move(valueRef), generation});
   return tunable;
 }
 
 void StoreComplex(std::string path,
                   std::shared_ptr<PyComplexTunableAdapter> value) {
-  GetComplexValues().insert_or_assign(std::move(path), std::move(value));
+  auto& values = GetComplexValues();
+  auto it = values.find(path);
+  if (it != values.end()) {
+    if (it->second != value) {
+      it->second->ReleasePublication();
+      value->RetainPublication();
+      it->second = std::move(value);
+    }
+  } else {
+    value->RetainPublication();
+    values.emplace(std::move(path), std::move(value));
+  }
 }
 
 void StoreNativeComplexValue(std::string path, py::object value) {
@@ -242,6 +276,8 @@ void RemoveRetainedPath(std::string_view path) {
   auto& complexValues = GetComplexValues();
   for (auto it = complexValues.begin(); it != complexValues.end();) {
     if (IsPathOrDescendant(it->first, path, childPrefix)) {
+      it->second->RemoveRetainedPath(path);
+      it->second->ReleasePublication();
       it = complexValues.erase(it);
     } else if (IsPathOrDescendant(path, it->first)) {
       it->second->RemoveRetainedPath(path);
