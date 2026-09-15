@@ -1758,6 +1758,46 @@ TEST_CASE_METHOD(TunableTest,
 
 TEST_CASE_METHOD(
     TunableTest,
+    "TunableTest RejectedComplexTunableRestoresDescendantRevisionParents",
+    "[tunable]") {
+  struct NestedChildComplex : wpi::tunables::ComplexTunable {
+    wpi::tunables::TunableDouble child{1.0};
+
+    void PublishTunable(wpi::tunables::TunableTable& table) override {
+      table.Publish("blocked/child", child);
+    }
+  };
+
+  struct EmptyComplex : wpi::tunables::ComplexTunable {
+    void PublishTunable(wpi::tunables::TunableTable&) override {}
+  };
+
+  NestedChildComplex outer;
+  wpi::tunables::TunableDouble blocker{9.0};
+  EmptyComplex rejected;
+
+  wpi::tunables::Publish("outer", outer);
+  wpi::tunables::Publish("outer/blocked", blocker);
+
+  backend->SetDouble("/outer/blocked/child", 2.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer.child) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(rejected) == 0);
+
+  CHECK_FALSE(wpi::tunables::Publish("outer/blocked", rejected));
+
+  backend->SetDouble("/outer/blocked/child", 3.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer.child) == 2);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer) == 2);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(rejected) == 0);
+}
+
+TEST_CASE_METHOD(
+    TunableTest,
     "TunableTest ComplexTunableAliasesUpdateOncePerRegistryCycleAcrossBackends",
     "[tunable]") {
   struct CountingComplex : wpi::tunables::ComplexTunable {
