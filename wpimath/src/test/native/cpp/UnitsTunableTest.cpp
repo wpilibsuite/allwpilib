@@ -3,8 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -20,6 +23,21 @@
 
 using namespace wpi;
 using namespace wpi::tunables;
+
+static_assert(
+    std::same_as<
+        decltype(std::declval<wpi::tunables::Tunable<wpi::units::meter_t>&>()
+                     .GetInnerTunable()),
+        wpi::tunables::Tunable<double>&>);
+static_assert(std::same_as<decltype(std::declval<const wpi::tunables::Tunable<
+                                        wpi::units::meter_t>&>()
+                                        .GetInnerTunable()),
+                           const wpi::tunables::Tunable<double>&>);
+static_assert(
+    std::same_as<decltype(wpi::tunables::TunableRegistry::GetTuneRevision(
+                     std::declval<const wpi::tunables::Tunable<
+                         wpi::units::meter_t>&>())),
+                 uint64_t>);
 
 namespace {
 class RecordingDirtyBackend : public TunableBackend {
@@ -62,6 +80,29 @@ struct UnitMemberComplex : public ComplexTunable {
 };
 }  // namespace
 
+TEST_CASE_METHOD(UnitsTunableTest, "UnitsTunableTest RevisionForUnitTunable",
+                 "[tunable]") {
+  wpi::tunables::Tunable<wpi::units::meter_t> distance{
+      wpi::units::meter_t{1.0}};
+  const auto& constDistance = distance;
+
+  auto revision = wpi::tunables::TunableRegistry::GetTuneRevision(distance);
+  CHECK(revision == 0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(constDistance) == 0);
+
+  distance = wpi::units::meter_t{2.0};
+  CHECK(distance.Get().to<double>() == 2.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(distance) == 0);
+
+  Publish("distance", distance);
+  backend->SetDouble("/distance", 3.0);
+  TunableRegistry::Update();
+
+  CHECK(distance.Get().to<double>() == 3.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(distance) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(constDistance) == 1);
+}
+
 TEST_CASE_METHOD(UnitsTunableTest,
                  "UnitsTunableTest MemberRemoteTuneMarksDirty", "[tunable]") {
   auto recordingBackend = std::make_shared<RecordingDirtyBackend>();
@@ -71,11 +112,13 @@ TEST_CASE_METHOD(UnitsTunableTest,
   Publish("unit", complex);
   auto uid = backend->GetUid("/unit/distance");
   REQUIRE(uid);
+  CHECK(TunableRegistry::GetTuneRevision(complex) == 0);
 
   backend->SetDouble("/unit/distance", 2.0);
   TunableRegistry::Update();
 
   CHECK(complex.distance.to<double>() == 2.0);
+  CHECK(TunableRegistry::GetTuneRevision(complex) == 1);
   CHECK(std::find(recordingBackend->dirtyUids.begin(),
                   recordingBackend->dirtyUids.end(),
                   *uid) != recordingBackend->dirtyUids.end());
