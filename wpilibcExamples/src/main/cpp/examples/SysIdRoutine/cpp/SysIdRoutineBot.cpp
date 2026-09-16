@@ -18,27 +18,25 @@ void SysIdRoutineBot::ConfigureBindings() {
   // Using bumpers as a modifier and combining it with the buttons so that we
   // can have both sets of bindings at once
   (driverController.FaceDown() && driverController.RightBumper())
-      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::FORWARD));
   (driverController.FaceRight() && driverController.RightBumper())
-      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(drive.SysIdQuasistatic(wpi::cmd::sysid::Direction::REVERSE));
   (driverController.FaceLeft() && driverController.RightBumper())
-      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::FORWARD));
   (driverController.FaceUp() && driverController.RightBumper())
-      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(drive.SysIdDynamic(wpi::cmd::sysid::Direction::REVERSE));
 
   shooter.SetDefaultCommand(shooter.RunShooterCommand(
       [this] { return driverController.GetLeftTrigger(); }));
 
   (driverController.FaceDown() && driverController.LeftBumper())
-      .WhileTrue(
-          shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::FORWARD));
   (driverController.FaceRight() && driverController.LeftBumper())
-      .WhileTrue(
-          shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(shooter.SysIdQuasistatic(wpi::cmd::sysid::Direction::REVERSE));
   (driverController.FaceLeft() && driverController.LeftBumper())
-      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kForward));
+      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::FORWARD));
   (driverController.FaceUp() && driverController.LeftBumper())
-      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::kReverse));
+      .WhileTrue(shooter.SysIdDynamic(wpi::cmd::sysid::Direction::REVERSE));
 }
 
 wpi::cmd::CommandPtr SysIdRoutineBot::GetAutonomousCommand() {

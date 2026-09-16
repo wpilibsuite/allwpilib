@@ -24,17 +24,17 @@
  * to control an elevator.
  */
 class Robot : public wpi::TimedRobot {
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  static constexpr wpi::units::meter_t kRaisedPosition = 2_ft;
-  static constexpr wpi::units::meter_t kLoweredPosition = 0_ft;
+  static constexpr wpi::units::meter_t RAISED_POSITION = 2_ft;
+  static constexpr wpi::units::meter_t LOWERED_POSITION = 0_ft;
 
-  static constexpr wpi::units::meter_t kDrumRadius = 0.75_in;
-  static constexpr wpi::units::kilogram_t kCarriageMass = 4.5_kg;
-  static constexpr double kGearRatio = 6.0;
+  static constexpr wpi::units::meter_t DRUM_RADIUS = 0.75_in;
+  static constexpr wpi::units::kilogram_t CARRIAGE_MASS = 4.5_kg;
+  static constexpr double GEAR_RATIO = 6.0;
 
   // The plant holds a state-space model of our elevator. This system has the
   // following properties:
@@ -44,7 +44,7 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [position], in meters.
   wpi::math::LinearSystem<2, 1, 1> elevatorPlant =
       wpi::math::Models::ElevatorFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), kCarriageMass, kDrumRadius, kGearRatio)
+          wpi::math::DCMotor::NEO(2), CARRIAGE_MASS, DRUM_RADIUS, GEAR_RATIO)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -81,10 +81,10 @@ class Robot : public wpi::TimedRobot {
                                             12_V, 20_ms};
 
   // An encoder set up to measure elevator height in meters.
-  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
-  wpi::PWMSparkMax motor{kMotorPort};
-  wpi::Gamepad joystick{kJoystickPort};
+  wpi::PWMSparkMax motor{MOTOR_PORT};
+  wpi::Gamepad joystick{JOYSTICK_PORT};
 
   wpi::math::TrapezoidProfile<wpi::units::meters> profile{{3_fps, 6_fps_sq}};
 
@@ -93,7 +93,7 @@ class Robot : public wpi::TimedRobot {
  public:
   Robot() {
     // Circumference = pi * d, so distance per click = pi * d / counts
-    encoder.SetDistancePerPulse(2.0 * std::numbers::pi * kDrumRadius.value() /
+    encoder.SetDistancePerPulse(2.0 * std::numbers::pi * DRUM_RADIUS.value() /
                                 4096.0);
   }
 
@@ -112,10 +112,10 @@ class Robot : public wpi::TimedRobot {
     wpi::math::TrapezoidProfile<wpi::units::meters>::State goal;
     if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      goal = {kRaisedPosition, 0_fps};
+      goal = {RAISED_POSITION, 0_fps};
     } else {
       // We released the bumper, so let's spin down
-      goal = {kLoweredPosition, 0_fps};
+      goal = {LOWERED_POSITION, 0_fps};
     }
     lastProfiledReference =
         profile.Calculate(20_ms, lastProfiledReference, goal);

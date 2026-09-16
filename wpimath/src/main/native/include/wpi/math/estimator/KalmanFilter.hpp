@@ -19,6 +19,7 @@
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -119,7 +120,7 @@ class KalmanFilter {
     }
 
     Reset();
-    wpi::math::MathSharedStore::ReportUsage("KalmanFilter", "");
+    wpi::util::ReportUsage("KalmanFilter", "");
   }
 
   /**

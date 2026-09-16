@@ -672,4 +672,19 @@ TEMPLATE_TEST_CASE_METHOD(OverflowTest, "OverflowTest MulResultZero", "[wpiutil]
   CHECK_FALSE(MulOverflow < TestType>(0, -5, Result));
   CHECK(Result == TestType(0));
 }
+
+TEST_CASE("MathExtras NumDigitsBase10", "[wpiutil][llvm]") {
+  CHECK(NumDigitsBase10(0) == 1);
+  CHECK(NumDigitsBase10(1) == 1);
+
+  uint64_t Val = 10;
+  for (int i = 2; i <= 20; i++) {
+    CHECK(NumDigitsBase10(Val - 1) == i - 1);
+    CHECK(NumDigitsBase10(Val) == i);
+    Val *= 10;
+  }
+
+  CHECK(NumDigitsBase10(std::numeric_limits<uint64_t>::max()) == 20);
+}
+
 } // namespace

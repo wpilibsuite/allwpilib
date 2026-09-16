@@ -45,49 +45,49 @@ TEST_CASE("Ellipse2dTest Contains", "[wpimath]") {
 }
 
 TEST_CASE("Ellipse2dTest Distance", "[wpimath]") {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr wpi::math::Pose2d center{1_m, 2_m, 270_deg};
   constexpr wpi::math::Ellipse2d ellipse{center, 1_m, 2_m};
 
   constexpr wpi::math::Translation2d point1{2.5_m, 2_m};
-  CHECK_NEAR(0, ellipse.Distance(point1).value(), kEpsilon);
+  CHECK_NEAR(0, ellipse.Distance(point1).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point2{1_m, 2_m};
-  CHECK_NEAR(0, ellipse.Distance(point2).value(), kEpsilon);
+  CHECK_NEAR(0, ellipse.Distance(point2).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point3{1_m, 1_m};
-  CHECK_NEAR(0, ellipse.Distance(point3).value(), kEpsilon);
+  CHECK_NEAR(0, ellipse.Distance(point3).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point4{-1_m, 2.5_m};
-  CHECK_NEAR(0.19210128384806818, ellipse.Distance(point4).value(), kEpsilon);
+  CHECK_NEAR(0.19210128384806818, ellipse.Distance(point4).value(), EPSILON);
 }
 
 TEST_CASE("Ellipse2dTest Nearest", "[wpimath]") {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr wpi::math::Pose2d center{1_m, 2_m, 270_deg};
   constexpr wpi::math::Ellipse2d ellipse{center, 1_m, 2_m};
 
   constexpr wpi::math::Translation2d point1{2.5_m, 2_m};
   auto nearestPoint1 = ellipse.Nearest(point1);
-  CHECK_NEAR(2.5, nearestPoint1.X().value(), kEpsilon);
-  CHECK_NEAR(2.0, nearestPoint1.Y().value(), kEpsilon);
+  CHECK_NEAR(2.5, nearestPoint1.X().value(), EPSILON);
+  CHECK_NEAR(2.0, nearestPoint1.Y().value(), EPSILON);
 
   constexpr wpi::math::Translation2d point2{1_m, 2_m};
   auto nearestPoint2 = ellipse.Nearest(point2);
-  CHECK_NEAR(1.0, nearestPoint2.X().value(), kEpsilon);
-  CHECK_NEAR(2.0, nearestPoint2.Y().value(), kEpsilon);
+  CHECK_NEAR(1.0, nearestPoint2.X().value(), EPSILON);
+  CHECK_NEAR(2.0, nearestPoint2.Y().value(), EPSILON);
 
   constexpr wpi::math::Translation2d point3{1_m, 1_m};
   auto nearestPoint3 = ellipse.Nearest(point3);
-  CHECK_NEAR(1.0, nearestPoint3.X().value(), kEpsilon);
-  CHECK_NEAR(1.0, nearestPoint3.Y().value(), kEpsilon);
+  CHECK_NEAR(1.0, nearestPoint3.X().value(), EPSILON);
+  CHECK_NEAR(1.0, nearestPoint3.Y().value(), EPSILON);
 
   constexpr wpi::math::Translation2d point4{-1_m, 2.5_m};
   auto nearestPoint4 = ellipse.Nearest(point4);
-  CHECK_NEAR(-0.8512799937611617, nearestPoint4.X().value(), kEpsilon);
-  CHECK_NEAR(2.378405333174535, nearestPoint4.Y().value(), kEpsilon);
+  CHECK_NEAR(-0.8512799937611617, nearestPoint4.X().value(), EPSILON);
+  CHECK_NEAR(2.378405333174535, nearestPoint4.Y().value(), EPSILON);
 }
 
 TEST_CASE("Ellipse2dTest Equals", "[wpimath]") {

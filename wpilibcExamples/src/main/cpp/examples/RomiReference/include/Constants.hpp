@@ -14,6 +14,6 @@
  */
 
 namespace DriveConstants {
-inline constexpr double kCountsPerRevolution = 1440.0;
-inline constexpr double kWheelDiameterInch = 2.75;
+inline constexpr double COUNTS_PER_REVOLUTION = 1440.0;
+inline constexpr double WHEEL_DIAMETER_INCH = 2.75;
 }  // namespace DriveConstants

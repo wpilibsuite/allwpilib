@@ -7,6 +7,8 @@
 #include <format>
 #include <utility>
 
+#include "wpi/util/StringExtras.hpp"
+
 using namespace wpi::glass;
 
 NTSubsystemModel::NTSubsystemModel(std::string_view path)
@@ -15,17 +17,13 @@ NTSubsystemModel::NTSubsystemModel(std::string_view path)
 NTSubsystemModel::NTSubsystemModel(wpi::nt::NetworkTableInstance inst,
                                    std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
       m_defaultCommand{
           inst.GetStringTopic(std::format("{}/.default", path)).Subscribe("")},
       m_currentCommand{
-          inst.GetStringTopic(std::format("{}/.command", path)).Subscribe("")} {
-}
+          inst.GetStringTopic(std::format("{}/.command", path)).Subscribe("")},
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTSubsystemModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_defaultCommand.ReadQueue()) {
     m_defaultCommandValue = std::move(v.value);
   }

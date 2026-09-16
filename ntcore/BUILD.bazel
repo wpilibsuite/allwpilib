@@ -191,7 +191,7 @@ cc_test(
         "src/test/native/**/*.hpp",
     ]),
     tags = [
-        "exclusive",
+        "exclusive-if-local",
         "no-asan",
         "no-tsan",
     ],
@@ -205,7 +205,7 @@ cc_test(
 wpilib_java_junit5_test(
     name = "ntcore-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
-    tags = ["exclusive"],
+    tags = ["exclusive-if-local"],
     deps = [
         ":ntcore-java",
         "//wpiutil:wpiutil-java",

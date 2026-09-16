@@ -29,7 +29,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 0.1;
+static constexpr double EPSILON = 0.1;
 
 class SwerveDriveKinematicsTest {
  protected:
@@ -48,15 +48,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
 
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleVelocities(velocities);
 
-  CHECK_NEAR(fl.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 5.0, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 5.0, EPSILON);
 
-  CHECK_NEAR(fl.angle.Radians().value(), 0.0, kEpsilon);
-  CHECK_NEAR(fr.angle.Radians().value(), 0.0, kEpsilon);
-  CHECK_NEAR(bl.angle.Radians().value(), 0.0, kEpsilon);
-  CHECK_NEAR(br.angle.Radians().value(), 0.0, kEpsilon);
+  CHECK_NEAR(fl.angle.Radians().value(), 0.0, EPSILON);
+  CHECK_NEAR(fr.angle.Radians().value(), 0.0, EPSILON);
+  CHECK_NEAR(bl.angle.Radians().value(), 0.0, EPSILON);
+  CHECK_NEAR(br.angle.Radians().value(), 0.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -67,9 +67,9 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto chassisVelocities =
       m_kinematics.ToChassisVelocities(state, state, state, state);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 5.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 0.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 0.0, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 5.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0.0, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -80,9 +80,9 @@ TEST_CASE_METHOD(
 
   auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
 
-  CHECK_NEAR(twist.dx.value(), 5.0, kEpsilon);
-  CHECK_NEAR(twist.dy.value(), 0.0, kEpsilon);
-  CHECK_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+  CHECK_NEAR(twist.dx.value(), 5.0, EPSILON);
+  CHECK_NEAR(twist.dy.value(), 0.0, EPSILON);
+  CHECK_NEAR(twist.dtheta.value(), 0.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -91,15 +91,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   ChassisVelocities velocities{0_mps, 5_mps, 0_rad_per_s};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleVelocities(velocities);
 
-  CHECK_NEAR(fl.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 5.0, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 5.0, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 5.0, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 5.0, EPSILON);
 
-  CHECK_NEAR(fl.angle.Degrees().value(), 90.0, kEpsilon);
-  CHECK_NEAR(fr.angle.Degrees().value(), 90.0, kEpsilon);
-  CHECK_NEAR(bl.angle.Degrees().value(), 90.0, kEpsilon);
-  CHECK_NEAR(br.angle.Degrees().value(), 90.0, kEpsilon);
+  CHECK_NEAR(fl.angle.Degrees().value(), 90.0, EPSILON);
+  CHECK_NEAR(fr.angle.Degrees().value(), 90.0, EPSILON);
+  CHECK_NEAR(bl.angle.Degrees().value(), 90.0, EPSILON);
+  CHECK_NEAR(br.angle.Degrees().value(), 90.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -109,9 +109,9 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto chassisVelocities =
       m_kinematics.ToChassisVelocities(state, state, state, state);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 5.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 0.0, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 5.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 0.0, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -122,9 +122,9 @@ TEST_CASE_METHOD(
 
   auto twist = m_kinematics.ToTwist2d(delta, delta, delta, delta);
 
-  CHECK_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(twist.dy.value(), 5.0, kEpsilon);
-  CHECK_NEAR(twist.dtheta.value(), 0.0, kEpsilon);
+  CHECK_NEAR(twist.dx.value(), 0.0, EPSILON);
+  CHECK_NEAR(twist.dy.value(), 5.0, EPSILON);
+  CHECK_NEAR(twist.dtheta.value(), 0.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -134,15 +134,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
       0_mps, 0_mps, wpi::units::radians_per_second_t{2 * std::numbers::pi}};
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleVelocities(velocities);
 
-  CHECK_NEAR(fl.velocity.value(), 106.63, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 106.63, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 106.63, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 106.63, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 106.63, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 106.63, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 106.63, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 106.63, EPSILON);
 
-  CHECK_NEAR(fl.angle.Degrees().value(), 135.0, kEpsilon);
-  CHECK_NEAR(fr.angle.Degrees().value(), 45.0, kEpsilon);
-  CHECK_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
-  CHECK_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  CHECK_NEAR(fl.angle.Degrees().value(), 135.0, EPSILON);
+  CHECK_NEAR(fr.angle.Degrees().value(), 45.0, EPSILON);
+  CHECK_NEAR(bl.angle.Degrees().value(), -135.0, EPSILON);
+  CHECK_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -153,15 +153,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto [fl, fr, bl, br] =
       m_kinematics.ToSwerveModuleVelocities(ChassisVelocities{});
 
-  CHECK_NEAR(fl.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 0.0, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 0.0, EPSILON);
 
-  CHECK_NEAR(fl.angle.Degrees().value(), 135.0, kEpsilon);
-  CHECK_NEAR(fr.angle.Degrees().value(), 45.0, kEpsilon);
-  CHECK_NEAR(bl.angle.Degrees().value(), -135.0, kEpsilon);
-  CHECK_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  CHECK_NEAR(fl.angle.Degrees().value(), 135.0, EPSILON);
+  CHECK_NEAR(fr.angle.Degrees().value(), 45.0, EPSILON);
+  CHECK_NEAR(bl.angle.Degrees().value(), -135.0, EPSILON);
+  CHECK_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
                  "SwerveDriveKinematicsTest ResetWheelAngle", "[wpimath]") {
@@ -173,15 +173,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto [flMod, frMod, blMod, brMod] =
       m_kinematics.ToSwerveModuleVelocities(ChassisVelocities{});
 
-  CHECK_NEAR(flMod.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(frMod.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(blMod.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(brMod.velocity.value(), 0.0, kEpsilon);
+  CHECK_NEAR(flMod.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(frMod.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(blMod.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(brMod.velocity.value(), 0.0, EPSILON);
 
-  CHECK_NEAR(flMod.angle.Degrees().value(), 0.0, kEpsilon);
-  CHECK_NEAR(frMod.angle.Degrees().value(), 90.0, kEpsilon);
-  CHECK_NEAR(blMod.angle.Degrees().value(), 180.0, kEpsilon);
-  CHECK_NEAR(brMod.angle.Degrees().value(), -90.0, kEpsilon);
+  CHECK_NEAR(flMod.angle.Degrees().value(), 0.0, EPSILON);
+  CHECK_NEAR(frMod.angle.Degrees().value(), 90.0, EPSILON);
+  CHECK_NEAR(blMod.angle.Degrees().value(), 180.0, EPSILON);
+  CHECK_NEAR(brMod.angle.Degrees().value(), -90.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -194,9 +194,9 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
 
   auto chassisVelocities = m_kinematics.ToChassisVelocities(fl, fr, bl, br);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), 0.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 2 * std::numbers::pi, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), 0.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -210,9 +210,9 @@ TEST_CASE_METHOD(
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  CHECK_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(twist.dy.value(), 0.0, kEpsilon);
-  CHECK_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
+  CHECK_NEAR(twist.dx.value(), 0.0, EPSILON);
+  CHECK_NEAR(twist.dy.value(), 0.0, EPSILON);
+  CHECK_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -224,15 +224,15 @@ TEST_CASE_METHOD(
   auto [fl, fr, bl, br] =
       m_kinematics.ToSwerveModuleVelocities(velocities, m_fl);
 
-  CHECK_NEAR(fl.velocity.value(), 0.0, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 150.796, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 150.796, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 213.258, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 0.0, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 150.796, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 150.796, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 213.258, EPSILON);
 
-  CHECK_NEAR(fl.angle.Degrees().value(), 0.0, kEpsilon);
-  CHECK_NEAR(fr.angle.Degrees().value(), 0.0, kEpsilon);
-  CHECK_NEAR(bl.angle.Degrees().value(), -90.0, kEpsilon);
-  CHECK_NEAR(br.angle.Degrees().value(), -45.0, kEpsilon);
+  CHECK_NEAR(fl.angle.Degrees().value(), 0.0, EPSILON);
+  CHECK_NEAR(fr.angle.Degrees().value(), 0.0, EPSILON);
+  CHECK_NEAR(bl.angle.Degrees().value(), -90.0, EPSILON);
+  CHECK_NEAR(br.angle.Degrees().value(), -45.0, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -246,9 +246,9 @@ TEST_CASE_METHOD(
 
   auto chassisVelocities = m_kinematics.ToChassisVelocities(fl, fr, bl, br);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 75.398, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), -75.398, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 2 * std::numbers::pi, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 75.398, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), -75.398, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -262,9 +262,9 @@ TEST_CASE_METHOD(
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  CHECK_NEAR(twist.dx.value(), 75.398, kEpsilon);
-  CHECK_NEAR(twist.dy.value(), -75.398, kEpsilon);
-  CHECK_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, kEpsilon);
+  CHECK_NEAR(twist.dx.value(), 75.398, EPSILON);
+  CHECK_NEAR(twist.dy.value(), -75.398, EPSILON);
+  CHECK_NEAR(twist.dtheta.value(), 2 * std::numbers::pi, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -275,15 +275,15 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto [fl, fr, bl, br] = m_kinematics.ToSwerveModuleVelocities(
       velocities, Translation2d{24_m, 0_m});
 
-  CHECK_NEAR(fl.velocity.value(), 23.43, kEpsilon);
-  CHECK_NEAR(fr.velocity.value(), 23.43, kEpsilon);
-  CHECK_NEAR(bl.velocity.value(), 54.08, kEpsilon);
-  CHECK_NEAR(br.velocity.value(), 54.08, kEpsilon);
+  CHECK_NEAR(fl.velocity.value(), 23.43, EPSILON);
+  CHECK_NEAR(fr.velocity.value(), 23.43, EPSILON);
+  CHECK_NEAR(bl.velocity.value(), 54.08, EPSILON);
+  CHECK_NEAR(br.velocity.value(), 54.08, EPSILON);
 
-  CHECK_NEAR(fl.angle.Degrees().value(), -140.19, kEpsilon);
-  CHECK_NEAR(fr.angle.Degrees().value(), -39.81, kEpsilon);
-  CHECK_NEAR(bl.angle.Degrees().value(), -109.44, kEpsilon);
-  CHECK_NEAR(br.angle.Degrees().value(), -70.56, kEpsilon);
+  CHECK_NEAR(fl.angle.Degrees().value(), -140.19, EPSILON);
+  CHECK_NEAR(fr.angle.Degrees().value(), -39.81, EPSILON);
+  CHECK_NEAR(bl.angle.Degrees().value(), -109.44, EPSILON);
+  CHECK_NEAR(br.angle.Degrees().value(), -70.56, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -297,9 +297,9 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
 
   auto chassisVelocities = m_kinematics.ToChassisVelocities(fl, fr, bl, br);
 
-  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.vy.value(), -33.0, kEpsilon);
-  CHECK_NEAR(chassisVelocities.omega.value(), 1.5, kEpsilon);
+  CHECK_NEAR(chassisVelocities.vx.value(), 0.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.vy.value(), -33.0, EPSILON);
+  CHECK_NEAR(chassisVelocities.omega.value(), 1.5, EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -314,9 +314,9 @@ TEST_CASE_METHOD(
 
   auto twist = m_kinematics.ToTwist2d(fl, fr, bl, br);
 
-  CHECK_NEAR(twist.dx.value(), 0.0, kEpsilon);
-  CHECK_NEAR(twist.dy.value(), -33.0, kEpsilon);
-  CHECK_NEAR(twist.dtheta.value(), 1.5, kEpsilon);
+  CHECK_NEAR(twist.dx.value(), 0.0, EPSILON);
+  CHECK_NEAR(twist.dy.value(), -33.0, EPSILON);
+  CHECK_NEAR(twist.dtheta.value(), 1.5, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -329,12 +329,12 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   wpi::util::array<SwerveModuleVelocity, 4> arr{state1, state2, state3, state4};
   arr = SwerveDriveKinematics<4>::DesaturateWheelVelocities(arr, 5.5_mps);
 
-  double kFactor = 5.5 / 7.0;
+  double FACTOR = 5.5 / 7.0;
 
-  CHECK_NEAR(arr[0].velocity.value(), 5.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[1].velocity.value(), 6.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[2].velocity.value(), 4.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[3].velocity.value(), 7.0 * kFactor, kEpsilon);
+  CHECK_NEAR(arr[0].velocity.value(), 5.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[1].velocity.value(), 6.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[2].velocity.value(), 4.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[3].velocity.value(), 7.0 * FACTOR, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -349,12 +349,12 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
       arr, m_kinematics.ToChassisVelocities(arr), 5.5_mps, 5.5_mps,
       3.5_rad_per_s);
 
-  double kFactor = 5.5 / 7.0;
+  double FACTOR = 5.5 / 7.0;
 
-  CHECK_NEAR(arr[0].velocity.value(), 5.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[1].velocity.value(), 6.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[2].velocity.value(), 4.0 * kFactor, kEpsilon);
-  CHECK_NEAR(arr[3].velocity.value(), 7.0 * kFactor, kEpsilon);
+  CHECK_NEAR(arr[0].velocity.value(), 5.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[1].velocity.value(), 6.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[2].velocity.value(), 4.0 * FACTOR, EPSILON);
+  CHECK_NEAR(arr[3].velocity.value(), 7.0 * FACTOR, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -368,10 +368,10 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   wpi::util::array<SwerveModuleVelocity, 4> arr{state1, state2, state3, state4};
   arr = SwerveDriveKinematics<4>::DesaturateWheelVelocities(arr, 1.0_mps);
 
-  CHECK_NEAR(arr[0].velocity.value(), 0.5, kEpsilon);
-  CHECK_NEAR(arr[1].velocity.value(), 0.5, kEpsilon);
-  CHECK_NEAR(arr[2].velocity.value(), -1.0, kEpsilon);
-  CHECK_NEAR(arr[3].velocity.value(), -1.0, kEpsilon);
+  CHECK_NEAR(arr[0].velocity.value(), 0.5, EPSILON);
+  CHECK_NEAR(arr[1].velocity.value(), 0.5, EPSILON);
+  CHECK_NEAR(arr[2].velocity.value(), -1.0, EPSILON);
+  CHECK_NEAR(arr[3].velocity.value(), -1.0, EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -448,18 +448,18 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
     expectedAngles[i] = Rotation2d{totalX, totalY};
   }
 
-  CHECK_NEAR(totalAccel, flAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(totalAccel, frAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(totalAccel, blAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(totalAccel, brAccel.acceleration.value(), kEpsilon);
+  CHECK_NEAR(totalAccel, flAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(totalAccel, frAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(totalAccel, blAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(totalAccel, brAccel.acceleration.value(), EPSILON);
   CHECK_NEAR(expectedAngles[0].Degrees().value(),
-             flAccel.angle.Degrees().value(), kEpsilon);
+             flAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[1].Degrees().value(),
-             frAccel.angle.Degrees().value(), kEpsilon);
+             frAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[2].Degrees().value(),
-             blAccel.angle.Degrees().value(), kEpsilon);
+             blAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[3].Degrees().value(),
-             brAccel.angle.Degrees().value(), kEpsilon);
+             brAccel.angle.Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveKinematicsTest,
@@ -473,10 +473,9 @@ TEST_CASE_METHOD(SwerveDriveKinematicsTest,
   auto chassisAccelerations =
       m_kinematics.ToChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
-  CHECK_NEAR(0.0, chassisAccelerations.ax.value(), kEpsilon);
-  CHECK_NEAR(0.0, chassisAccelerations.ay.value(), kEpsilon);
-  CHECK_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(),
-             kEpsilon);
+  CHECK_NEAR(0.0, chassisAccelerations.ax.value(), EPSILON);
+  CHECK_NEAR(0.0, chassisAccelerations.ay.value(), EPSILON);
+  CHECK_NEAR(2 * std::numbers::pi, chassisAccelerations.alpha.value(), EPSILON);
 }
 
 TEST_CASE_METHOD(
@@ -548,16 +547,16 @@ TEST_CASE_METHOD(
     }
   }
 
-  CHECK_NEAR(expectedAccelerations[0], flAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(expectedAccelerations[1], frAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(expectedAccelerations[2], blAccel.acceleration.value(), kEpsilon);
-  CHECK_NEAR(expectedAccelerations[3], brAccel.acceleration.value(), kEpsilon);
+  CHECK_NEAR(expectedAccelerations[0], flAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(expectedAccelerations[1], frAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(expectedAccelerations[2], blAccel.acceleration.value(), EPSILON);
+  CHECK_NEAR(expectedAccelerations[3], brAccel.acceleration.value(), EPSILON);
   CHECK_NEAR(expectedAngles[0].Degrees().value(),
-             flAccel.angle.Degrees().value(), kEpsilon);
+             flAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[1].Degrees().value(),
-             frAccel.angle.Degrees().value(), kEpsilon);
+             frAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[2].Degrees().value(),
-             blAccel.angle.Degrees().value(), kEpsilon);
+             blAccel.angle.Degrees().value(), EPSILON);
   CHECK_NEAR(expectedAngles[3].Degrees().value(),
-             brAccel.angle.Degrees().value(), kEpsilon);
+             brAccel.angle.Degrees().value(), EPSILON);
 }

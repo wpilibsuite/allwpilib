@@ -22,9 +22,24 @@ except ImportError:
     _reset_command_generic_hid_data = None
 
 from .controller import RobotTestController
+from ._opmode import OpModeTestingPlugin
 
 
-class RobotTestingPlugin:
+def _create_robot(robot_class: type[wpilib.RobotBase]) -> wpilib.RobotBase:
+    """Initialize simulation identically for discovery and individual tests."""
+    ntcore.NetworkTableInstance.get_default().start_local()
+    pause_timing()
+    restart_timing()
+    wpilib.simulation.set_program_started(False)
+    wpilib.DriverStationBackend.silence_joystick_connection_alert(True)
+    DriverStationSim.set_robot_mode(RobotMode.AUTONOMOUS)
+    DriverStationSim.set_opmode(0)
+    DriverStationSim.set_enabled(False)
+    DriverStationSim.notify_new_data()
+    return robot_class()
+
+
+class RobotTestingPlugin(OpModeTestingPlugin):
     """
     Pytest plugin. Each documented member function name can be an argument
     to your test functions, and the data that these functions return will
@@ -70,18 +85,9 @@ class RobotTestingPlugin:
         #
 
         nt_inst = ntcore.NetworkTableInstance.get_default()
-        nt_inst.start_local()
-
-        pause_timing()
-        restart_timing()
-
-        wpilib.DriverStationBackend.silence_joystick_connection_alert(True)
-        DriverStationSim.set_robot_mode(RobotMode.AUTONOMOUS)
-        DriverStationSim.set_enabled(False)
-        DriverStationSim.notify_new_data()
 
         # Create the user's robot instance
-        robot = self._robot_class()
+        robot = _create_robot(self._robot_class)
 
         # Tests only get a proxy to ensure cleanup is more reliable
         yield weakref.proxy(robot)
@@ -116,10 +122,13 @@ class RobotTestingPlugin:
         nt_inst.stop_local()
         nt_inst._reset()
 
+        # Clear the native registration map too, not just the HAL options list.
+        # Otherwise subsequent robots cannot register modes with the same names.
+        wpilib.RobotState.clear_opmodes()
+
         # Cleanup WPILib globals
-        # -> preferences, SmartDashboard, MotorSafety
+        # -> preferences and MotorSafety
         wpilib.simulation._simulation._reset_wpilib_simulation_data()
-        wpilib._wpilib._clear_smart_dashboard_data()
 
         # Cancel all periodic callbacks
         hal.simulation.cancel_all_sim_periodic_callbacks()

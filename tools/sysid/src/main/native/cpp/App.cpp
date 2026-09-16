@@ -20,6 +20,9 @@
 #include "wpi/glass/Window.hpp"
 #include "wpi/glass/WindowManager.hpp"
 #include "wpi/glass/other/Log.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/sysid/view/Analyzer.hpp"
@@ -58,6 +61,9 @@ void Application(std::string_view saveDir) {
   // Create the wpigui (along with Dear ImGui) and Glass contexts.
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   // Add icons
   gui::AddIcon(sysid::GetResource_sysid_16_png());
@@ -127,32 +133,34 @@ void Application(std::string_view saveDir) {
   // Set default positions and sizes for windows.
 
   // Logger window position/size
-  gLogLoaderWindow->SetDefaultPos(sysid::kLogLoaderWindowPos.x,
-                                  sysid::kLogLoaderWindowPos.y);
-  gLogLoaderWindow->SetDefaultSize(sysid::kLogLoaderWindowSize.x,
-                                   sysid::kLogLoaderWindowSize.y);
+  gLogLoaderWindow->SetDefaultPos(sysid::LOG_LOADER_WINDOW_POS.x,
+                                  sysid::LOG_LOADER_WINDOW_POS.y);
+  gLogLoaderWindow->SetDefaultSize(sysid::LOG_LOADER_WINDOW_SIZE.x,
+                                   sysid::LOG_LOADER_WINDOW_SIZE.y);
 
   // Data selector window position/size
-  gDataSelectorWindow->SetDefaultPos(sysid::kDataSelectorWindowPos.x,
-                                     sysid::kDataSelectorWindowPos.y);
-  gDataSelectorWindow->SetDefaultSize(sysid::kDataSelectorWindowSize.x,
-                                      sysid::kDataSelectorWindowSize.y);
+  gDataSelectorWindow->SetDefaultPos(sysid::DATA_SELECTOR_WINDOW_POS.x,
+                                     sysid::DATA_SELECTOR_WINDOW_POS.y);
+  gDataSelectorWindow->SetDefaultSize(sysid::DATA_SELECTOR_WINDOW_SIZE.x,
+                                      sysid::DATA_SELECTOR_WINDOW_SIZE.y);
 
   // Analyzer window position/size
-  gAnalyzerWindow->SetDefaultPos(sysid::kAnalyzerWindowPos.x,
-                                 sysid::kAnalyzerWindowPos.y);
-  gAnalyzerWindow->SetDefaultSize(sysid::kAnalyzerWindowSize.x,
-                                  sysid::kAnalyzerWindowSize.y);
+  gAnalyzerWindow->SetDefaultPos(sysid::ANALYZER_WINDOW_POS.x,
+                                 sysid::ANALYZER_WINDOW_POS.y);
+  gAnalyzerWindow->SetDefaultSize(sysid::ANALYZER_WINDOW_SIZE.x,
+                                  sysid::ANALYZER_WINDOW_SIZE.y);
 
   // Program log window position/size
-  gProgramLogWindow->SetDefaultPos(sysid::kProgramLogWindowPos.x,
-                                   sysid::kProgramLogWindowPos.y);
-  gProgramLogWindow->SetDefaultSize(sysid::kProgramLogWindowSize.x,
-                                    sysid::kProgramLogWindowSize.y);
+  gProgramLogWindow->SetDefaultPos(sysid::PROGRAM_LOG_WINDOW_POS.x,
+                                   sysid::PROGRAM_LOG_WINDOW_POS.y);
+  gProgramLogWindow->SetDefaultSize(sysid::PROGRAM_LOG_WINDOW_SIZE.x,
+                                    sysid::PROGRAM_LOG_WINDOW_SIZE.y);
   gProgramLogWindow->DisableRenamePopup();
 
+#ifndef RUNNING_IMGUI_TESTS
   // Configure save file.
   gui::ConfigurePlatformSaveFile("sysid.ini");
+#endif
 
   // Add menu bar.
   gui::AddLateExecute([] {
@@ -203,8 +211,8 @@ void Application(std::string_view saveDir) {
     }
   });
 
-  gui::Initialize("System Identification", sysid::kAppWindowSize.x,
-                  sysid::kAppWindowSize.y, gui::RendererPreference::PREFER_2D);
+  gui::Initialize("System Identification", sysid::APP_WINDOW_SIZE.x,
+                  sysid::APP_WINDOW_SIZE.y, gui::RendererPreference::PREFER_2D);
   gui::Main();
 
   wpi::glass::DestroyContext();

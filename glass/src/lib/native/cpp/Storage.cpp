@@ -45,30 +45,30 @@ bool ConvertFromString(To* out, std::string_view str) {
   return true;
 }
 
-#define CONVERT(CapsName, LowerName, CType)                                 \
+#define CONVERT(CapsName, LowerName, CType, EnumName)                       \
   static bool Convert##CapsName(Storage::Value* value) {                    \
     switch (value->type) {                                                  \
-      case Storage::Value::kBool:                                           \
+      case Storage::Value::BOOL:                                            \
         value->LowerName##Val = value->boolVal;                             \
         value->LowerName##Default = value->boolDefault;                     \
         break;                                                              \
-      case Storage::Value::kDouble:                                         \
+      case Storage::Value::DOUBLE:                                          \
         value->LowerName##Val = value->doubleVal;                           \
         value->LowerName##Default = value->doubleDefault;                   \
         break;                                                              \
-      case Storage::Value::kFloat:                                          \
+      case Storage::Value::FLOAT:                                           \
         value->LowerName##Val = value->floatVal;                            \
         value->LowerName##Default = value->floatDefault;                    \
         break;                                                              \
-      case Storage::Value::kInt:                                            \
+      case Storage::Value::INT:                                             \
         value->LowerName##Val = value->intVal;                              \
         value->LowerName##Default = value->intDefault;                      \
         break;                                                              \
-      case Storage::Value::kInt64:                                          \
+      case Storage::Value::INT64:                                           \
         value->LowerName##Val = value->int64Val;                            \
         value->LowerName##Default = value->int64Default;                    \
         break;                                                              \
-      case Storage::Value::kString:                                         \
+      case Storage::Value::STRING:                                          \
         if (!ConvertFromString(&value->LowerName##Val, value->stringVal)) { \
           return false;                                                     \
         }                                                                   \
@@ -80,15 +80,15 @@ bool ConvertFromString(To* out, std::string_view str) {
       default:                                                              \
         return false;                                                       \
     }                                                                       \
-    value->type = Storage::Value::k##CapsName;                              \
+    value->type = Storage::Value::EnumName;                                 \
     return true;                                                            \
   }
 
-CONVERT(Int, int, int)
-CONVERT(Int64, int64, int64_t)
-CONVERT(Float, float, float)
-CONVERT(Double, double, double)
-CONVERT(Bool, bool, bool)
+CONVERT(Int, int, int, INT)
+CONVERT(Int64, int64, int64_t, INT64)
+CONVERT(Float, float, float, FLOAT)
+CONVERT(Double, double, double, DOUBLE)
+CONVERT(Bool, bool, bool, BOOL)
 
 static inline bool ConvertString(Storage::Value* value) {
   return false;
@@ -113,25 +113,25 @@ static void ConvertArray(std::vector<To>** outPtr, std::vector<From>** inPtr) {
   }
 }
 
-#define CONVERT_ARRAY(CapsName, LowerName)                           \
+#define CONVERT_ARRAY(CapsName, LowerName, EnumName)                 \
   static bool Convert##CapsName##Array(Storage::Value* value) {      \
     switch (value->type) {                                           \
-      case Storage::Value::kDoubleArray:                             \
+      case Storage::Value::DOUBLE_ARRAY:                             \
         ConvertArray(&value->LowerName##Array, &value->doubleArray); \
         ConvertArray(&value->LowerName##ArrayDefault,                \
                      &value->doubleArrayDefault);                    \
         break;                                                       \
-      case Storage::Value::kFloatArray:                              \
+      case Storage::Value::FLOAT_ARRAY:                              \
         ConvertArray(&value->LowerName##Array, &value->floatArray);  \
         ConvertArray(&value->LowerName##ArrayDefault,                \
                      &value->floatArrayDefault);                     \
         break;                                                       \
-      case Storage::Value::kIntArray:                                \
+      case Storage::Value::INT_ARRAY:                                \
         ConvertArray(&value->LowerName##Array, &value->intArray);    \
         ConvertArray(&value->LowerName##ArrayDefault,                \
                      &value->intArrayDefault);                       \
         break;                                                       \
-      case Storage::Value::kInt64Array:                              \
+      case Storage::Value::INT64ARRAY:                               \
         ConvertArray(&value->LowerName##Array, &value->int64Array);  \
         ConvertArray(&value->LowerName##ArrayDefault,                \
                      &value->int64ArrayDefault);                     \
@@ -139,14 +139,14 @@ static void ConvertArray(std::vector<To>** outPtr, std::vector<From>** inPtr) {
       default:                                                       \
         return false;                                                \
     }                                                                \
-    value->type = Storage::Value::k##CapsName##Array;                \
+    value->type = Storage::Value::EnumName;                          \
     return true;                                                     \
   }
 
-CONVERT_ARRAY(Int, int)
-CONVERT_ARRAY(Int64, int64)
-CONVERT_ARRAY(Float, float)
-CONVERT_ARRAY(Double, double)
+CONVERT_ARRAY(Int, int, INT_ARRAY)
+CONVERT_ARRAY(Int64, int64, INT64ARRAY)
+CONVERT_ARRAY(Float, float, FLOAT_ARRAY)
+CONVERT_ARRAY(Double, double, DOUBLE_ARRAY)
 
 static inline bool ConvertBoolArray(Storage::Value* value) {
   return false;
@@ -158,34 +158,34 @@ static inline bool ConvertStringArray(Storage::Value* value) {
 
 void Storage::Value::Reset(Type newType) {
   switch (type) {
-    case kChild:
+    case CHILD:
       delete child;
       break;
-    case kIntArray:
+    case INT_ARRAY:
       delete intArray;
       delete intArrayDefault;
       break;
-    case kInt64Array:
+    case INT64ARRAY:
       delete int64Array;
       delete int64ArrayDefault;
       break;
-    case kBoolArray:
+    case BOOL_ARRAY:
       delete boolArray;
       delete boolArrayDefault;
       break;
-    case kFloatArray:
+    case FLOAT_ARRAY:
       delete floatArray;
       delete floatArrayDefault;
       break;
-    case kDoubleArray:
+    case DOUBLE_ARRAY:
       delete doubleArray;
       delete doubleArrayDefault;
       break;
-    case kStringArray:
+    case STRING_ARRAY:
       delete stringArray;
       delete stringArrayDefault;
       break;
-    case kChildArray:
+    case CHILD_ARRAY:
       delete childArray;
       break;
     default:
@@ -210,7 +210,8 @@ Storage::Value& Storage::GetValue(std::string_view key) {
   return *val;
 }
 
-#define DEFUN(CapsName, LowerName, CType, CParamType, ArrCType)                \
+#define DEFUN(CapsName, LowerName, EnumName, EnumArrayName, CType, CParamType, \
+              ArrCType)                                                        \
   CType Storage::Read##CapsName(std::string_view key, CParamType defaultVal)   \
       const {                                                                  \
     auto it = m_values.find(key);                                              \
@@ -218,9 +219,9 @@ Storage::Value& Storage::GetValue(std::string_view key) {
       return CType{defaultVal};                                                \
     }                                                                          \
     Value& value = *it->second;                                                \
-    if (value.type != Value::k##CapsName) {                                    \
+    if (value.type != Value::EnumName) {                                       \
       if (!Convert##CapsName(&value)) {                                        \
-        value.Reset(Value::k##CapsName);                                       \
+        value.Reset(Value::EnumName);                                          \
         value.LowerName##Val = defaultVal;                                     \
         value.LowerName##Default = defaultVal;                                 \
         value.hasDefault = true;                                               \
@@ -232,9 +233,9 @@ Storage::Value& Storage::GetValue(std::string_view key) {
   void Storage::Set##CapsName(std::string_view key, CParamType val) {          \
     auto& valuePtr = m_values[key];                                            \
     if (!valuePtr) {                                                           \
-      valuePtr = std::make_unique<Value>(Value::k##CapsName);                  \
+      valuePtr = std::make_unique<Value>(Value::EnumName);                     \
     } else {                                                                   \
-      valuePtr->Reset(Value::k##CapsName);                                     \
+      valuePtr->Reset(Value::EnumName);                                        \
     }                                                                          \
     valuePtr->LowerName##Val = val;                                            \
     valuePtr->LowerName##Default = {};                                         \
@@ -244,11 +245,11 @@ Storage::Value& Storage::GetValue(std::string_view key) {
     auto& valuePtr = m_values[key];                                            \
     bool setValue = false;                                                     \
     if (!valuePtr) {                                                           \
-      valuePtr = std::make_unique<Value>(Value::k##CapsName);                  \
+      valuePtr = std::make_unique<Value>(Value::EnumName);                     \
       setValue = true;                                                         \
-    } else if (valuePtr->type != Value::k##CapsName) {                         \
+    } else if (valuePtr->type != Value::EnumName) {                            \
       if (!Convert##CapsName(valuePtr.get())) {                                \
-        valuePtr->Reset(Value::k##CapsName);                                   \
+        valuePtr->Reset(Value::EnumName);                                      \
         setValue = true;                                                       \
       }                                                                        \
     }                                                                          \
@@ -267,11 +268,11 @@ Storage::Value& Storage::GetValue(std::string_view key) {
     auto& valuePtr = m_values[key];                                            \
     bool setValue = false;                                                     \
     if (!valuePtr) {                                                           \
-      valuePtr = std::make_unique<Value>(Value::k##CapsName##Array);           \
+      valuePtr = std::make_unique<Value>(Value::EnumArrayName);                \
       setValue = true;                                                         \
-    } else if (valuePtr->type != Value::k##CapsName##Array) {                  \
+    } else if (valuePtr->type != Value::EnumArrayName) {                       \
       if (!Convert##CapsName##Array(valuePtr.get())) {                         \
-        valuePtr->Reset(Value::k##CapsName##Array);                            \
+        valuePtr->Reset(Value::EnumArrayName);                                 \
         setValue = true;                                                       \
       }                                                                        \
     }                                                                          \
@@ -292,12 +293,13 @@ Storage::Value& Storage::GetValue(std::string_view key) {
     return *valuePtr->LowerName##Array;                                        \
   }
 
-DEFUN(Int, int, int, int, int)
-DEFUN(Int64, int64, int64_t, int64_t, int64_t)
-DEFUN(Bool, bool, bool, bool, int)
-DEFUN(Float, float, float, float, float)
-DEFUN(Double, double, double, double, double)
-DEFUN(String, string, std::string, std::string_view, std::string)
+DEFUN(Int, int, INT, INT_ARRAY, int, int, int)
+DEFUN(Int64, int64, INT64, INT64ARRAY, int64_t, int64_t, int64_t)
+DEFUN(Bool, bool, BOOL, BOOL_ARRAY, bool, bool, int)
+DEFUN(Float, float, FLOAT, FLOAT_ARRAY, float, float, float)
+DEFUN(Double, double, DOUBLE, DOUBLE_ARRAY, double, double, double)
+DEFUN(String, string, STRING, STRING_ARRAY, std::string, std::string_view,
+      std::string)
 
 Storage& Storage::GetChild(std::string_view label_id) {
   auto [label, id] = wpi::util::split(label_id, "###");
@@ -308,8 +310,8 @@ Storage& Storage::GetChild(std::string_view label_id) {
   if (!childPtr) {
     childPtr = std::make_unique<Value>();
   }
-  if (childPtr->type != Value::kChild) {
-    childPtr->Reset(Value::kChild);
+  if (childPtr->type != Value::CHILD) {
+    childPtr->Reset(Value::CHILD);
     childPtr->child = new Storage;
   }
   return *childPtr->child;
@@ -319,10 +321,10 @@ std::vector<std::unique_ptr<Storage>>& Storage::GetChildArray(
     std::string_view key) {
   auto& valuePtr = m_values[key];
   if (!valuePtr) {
-    valuePtr = std::make_unique<Value>(Value::kChildArray);
+    valuePtr = std::make_unique<Value>(Value::CHILD_ARRAY);
     valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
-  } else if (valuePtr->type != Value::kChildArray) {
-    valuePtr->Reset(Value::kChildArray);
+  } else if (valuePtr->type != Value::CHILD_ARRAY) {
+    valuePtr->Reset(Value::CHILD_ARRAY);
     valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
   }
 
@@ -340,9 +342,8 @@ std::unique_ptr<Storage::Value> Storage::Erase(std::string_view key) {
 }
 
 void Storage::EraseChildren() {
-  std::erase_if(m_values, [](const auto& kv) {
-    return kv.second->type == Value::kChild;
-  });
+  std::erase_if(m_values,
+                [](const auto& kv) { return kv.second->type == Value::CHILD; });
 }
 
 static bool JsonArrayToStorage(Storage::Value* valuePtr,
@@ -357,23 +358,23 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
   // guess array type from first element
   switch (arr[0].type()) {
     case wpi::util::json::Type::Bool:
-      if (valuePtr->type != Storage::Value::kBoolArray) {
-        valuePtr->Reset(Storage::Value::kBoolArray);
+      if (valuePtr->type != Storage::Value::BOOL_ARRAY) {
+        valuePtr->Reset(Storage::Value::BOOL_ARRAY);
         valuePtr->boolArray = new std::vector<int>();
         valuePtr->boolArrayDefault = nullptr;
       }
       break;
     case wpi::util::json::Type::Float:
     case wpi::util::json::Type::Double:
-      if (valuePtr->type != Storage::Value::kDoubleArray) {
-        valuePtr->Reset(Storage::Value::kDoubleArray);
+      if (valuePtr->type != Storage::Value::DOUBLE_ARRAY) {
+        valuePtr->Reset(Storage::Value::DOUBLE_ARRAY);
         valuePtr->doubleArray = new std::vector<double>();
         valuePtr->doubleArrayDefault = nullptr;
       }
       break;
     case wpi::util::json::Type::Int:
-      if (valuePtr->type != Storage::Value::kInt64Array) {
-        valuePtr->Reset(Storage::Value::kInt64Array);
+      if (valuePtr->type != Storage::Value::INT64ARRAY) {
+        valuePtr->Reset(Storage::Value::INT64ARRAY);
         valuePtr->int64Array = new std::vector<int64_t>();
         valuePtr->int64ArrayDefault = nullptr;
       }
@@ -382,15 +383,15 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
       ImGui::LogText("too large of integer in %s, ignoring", filename);
       return false;
     case wpi::util::json::Type::String:
-      if (valuePtr->type != Storage::Value::kStringArray) {
-        valuePtr->Reset(Storage::Value::kStringArray);
+      if (valuePtr->type != Storage::Value::STRING_ARRAY) {
+        valuePtr->Reset(Storage::Value::STRING_ARRAY);
         valuePtr->stringArray = new std::vector<std::string>();
         valuePtr->stringArrayDefault = nullptr;
       }
       break;
     case wpi::util::json::Type::Object:
-      if (valuePtr->type != Storage::Value::kChildArray) {
-        valuePtr->Reset(Storage::Value::kChildArray);
+      if (valuePtr->type != Storage::Value::CHILD_ARRAY) {
+        valuePtr->Reset(Storage::Value::CHILD_ARRAY);
         valuePtr->childArray = new std::vector<std::unique_ptr<Storage>>();
       }
       break;
@@ -406,30 +407,30 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
   for (auto jvalue : arr) {
     switch (jvalue.type()) {
       case wpi::util::json::Type::Bool:
-        if (valuePtr->type == Storage::Value::kBoolArray) {
+        if (valuePtr->type == Storage::Value::BOOL_ARRAY) {
           valuePtr->boolArray->push_back(jvalue.get_bool());
         } else {
           goto error;
         }
         break;
       case wpi::util::json::Type::Float:
-        if (valuePtr->type == Storage::Value::kDoubleArray) {
+        if (valuePtr->type == Storage::Value::DOUBLE_ARRAY) {
           valuePtr->doubleArray->push_back(jvalue.get_float());
         } else {
           goto error;
         }
         break;
       case wpi::util::json::Type::Double:
-        if (valuePtr->type == Storage::Value::kDoubleArray) {
+        if (valuePtr->type == Storage::Value::DOUBLE_ARRAY) {
           valuePtr->doubleArray->push_back(jvalue.get_double());
         } else {
           goto error;
         }
         break;
       case wpi::util::json::Type::Int:
-        if (valuePtr->type == Storage::Value::kInt64Array) {
+        if (valuePtr->type == Storage::Value::INT64ARRAY) {
           valuePtr->int64Array->push_back(jvalue.get_int());
-        } else if (valuePtr->type == Storage::Value::kDoubleArray) {
+        } else if (valuePtr->type == Storage::Value::DOUBLE_ARRAY) {
           valuePtr->doubleArray->push_back(jvalue.get_int());
         } else {
           goto error;
@@ -439,14 +440,14 @@ static bool JsonArrayToStorage(Storage::Value* valuePtr,
         ImGui::LogText("too large of integer in %s, ignoring", filename);
         return false;
       case wpi::util::json::Type::String:
-        if (valuePtr->type == Storage::Value::kStringArray) {
+        if (valuePtr->type == Storage::Value::STRING_ARRAY) {
           valuePtr->stringArray->emplace_back(jvalue.get_string());
         } else {
           goto error;
         }
         break;
       case wpi::util::json::Type::Object:
-        if (valuePtr->type == Storage::Value::kChildArray) {
+        if (valuePtr->type == Storage::Value::CHILD_ARRAY) {
           valuePtr->childArray->emplace_back(std::make_unique<Storage>());
           valuePtr->childArray->back()->FromJson(jvalue, filename);
         } else {
@@ -486,28 +487,28 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
     }
     switch (jvalue.type()) {
       case wpi::util::json::Type::Bool:
-        valuePtr->Reset(Value::kBool);
+        valuePtr->Reset(Value::BOOL);
         valuePtr->boolVal = jvalue.get_bool();
         break;
       case wpi::util::json::Type::Float:
-        valuePtr->Reset(Value::kDouble);
+        valuePtr->Reset(Value::DOUBLE);
         valuePtr->doubleVal = jvalue.get_float();
         break;
       case wpi::util::json::Type::Double:
-        valuePtr->Reset(Value::kDouble);
+        valuePtr->Reset(Value::DOUBLE);
         valuePtr->doubleVal = jvalue.get_double();
         break;
       case wpi::util::json::Type::Int:
-        valuePtr->Reset(Value::kInt64);
+        valuePtr->Reset(Value::INT64);
         valuePtr->int64Val = jvalue.get_int();
         break;
       case wpi::util::json::Type::String:
-        valuePtr->Reset(Value::kString);
+        valuePtr->Reset(Value::STRING);
         valuePtr->stringVal = jvalue.get_string();
         break;
       case wpi::util::json::Type::Object:
-        if (valuePtr->type != Value::kChild) {
-          valuePtr->Reset(Value::kChild);
+        if (valuePtr->type != Value::CHILD) {
+          valuePtr->Reset(Value::CHILD);
           valuePtr->child = new Storage;
         }
         valuePtr->child->FromJson(jvalue, filename);  // recurse
@@ -564,15 +565,15 @@ wpi::util::json Storage::ToJson() const {
     wpi::util::json jelem;
     auto& value = *kv.second;
     switch (value.type) {
-#define CASE(CapsName, LowerName)                                        \
-  case Value::k##CapsName:                                               \
+#define CASE(CapsName, LowerName, EnumName, EnumArrayName)               \
+  case Value::EnumName:                                                  \
     if (value.hasDefault &&                                              \
         value.LowerName##Val == value.LowerName##Default) {              \
       continue;                                                          \
     }                                                                    \
     jelem = value.LowerName##Val;                                        \
     break;                                                               \
-  case Value::k##CapsName##Array:                                        \
+  case Value::EnumArrayName:                                             \
     if (value.hasDefault &&                                              \
         ((!value.LowerName##ArrayDefault &&                              \
           value.LowerName##Array->empty()) ||                            \
@@ -583,20 +584,20 @@ wpi::util::json Storage::ToJson() const {
     jelem = StorageToJsonArray(*value.LowerName##Array);                 \
     break;
 
-      CASE(Int, int)
-      CASE(Int64, int64)
-      CASE(Bool, bool)
-      CASE(Float, float)
-      CASE(Double, double)
-      CASE(String, string)
+      CASE(Int, int, INT, INT_ARRAY)
+      CASE(Int64, int64, INT64, INT64ARRAY)
+      CASE(Bool, bool, BOOL, BOOL_ARRAY)
+      CASE(Float, float, FLOAT, FLOAT_ARRAY)
+      CASE(Double, double, DOUBLE, DOUBLE_ARRAY)
+      CASE(String, string, STRING, STRING_ARRAY)
 
-      case Value::kChild:
+      case Value::CHILD:
         jelem = value.child->ToJson();  // recurse
         if (jelem.empty()) {
           continue;
         }
         break;
-      case Value::kChildArray:
+      case Value::CHILD_ARRAY:
         jelem = StorageToJsonArray(*value.childArray);
         if (jelem.empty()) {
           continue;
@@ -622,70 +623,70 @@ void Storage::ClearValues() {
   for (auto&& kv : m_values) {
     auto& value = *kv.second;
     switch (value.type) {
-      case Value::kInt:
+      case Value::INT:
         value.intVal = value.intDefault;
         break;
-      case Value::kInt64:
+      case Value::INT64:
         value.int64Val = value.int64Default;
         break;
-      case Value::kBool:
+      case Value::BOOL:
         value.boolVal = value.boolDefault;
         break;
-      case Value::kFloat:
+      case Value::FLOAT:
         value.floatVal = value.floatDefault;
         break;
-      case Value::kDouble:
+      case Value::DOUBLE:
         value.doubleVal = value.doubleDefault;
         break;
-      case Value::kString:
+      case Value::STRING:
         value.stringVal = value.stringDefault;
         break;
-      case Value::kIntArray:
+      case Value::INT_ARRAY:
         if (value.intArrayDefault) {
           *value.intArray = *value.intArrayDefault;
         } else {
           value.intArray->clear();
         }
         break;
-      case Value::kInt64Array:
+      case Value::INT64ARRAY:
         if (value.int64ArrayDefault) {
           *value.int64Array = *value.int64ArrayDefault;
         } else {
           value.int64Array->clear();
         }
         break;
-      case Value::kBoolArray:
+      case Value::BOOL_ARRAY:
         if (value.boolArrayDefault) {
           *value.boolArray = *value.boolArrayDefault;
         } else {
           value.boolArray->clear();
         }
         break;
-      case Value::kFloatArray:
+      case Value::FLOAT_ARRAY:
         if (value.floatArrayDefault) {
           *value.floatArray = *value.floatArrayDefault;
         } else {
           value.floatArray->clear();
         }
         break;
-      case Value::kDoubleArray:
+      case Value::DOUBLE_ARRAY:
         if (value.doubleArrayDefault) {
           *value.doubleArray = *value.doubleArrayDefault;
         } else {
           value.doubleArray->clear();
         }
         break;
-      case Value::kStringArray:
+      case Value::STRING_ARRAY:
         if (value.stringArrayDefault) {
           *value.stringArray = *value.stringArrayDefault;
         } else {
           value.stringArray->clear();
         }
         break;
-      case Value::kChild:
+      case Value::CHILD:
         value.child->Clear();
         break;
-      case Value::kChildArray:
+      case Value::CHILD_ARRAY:
         for (auto&& child : *value.childArray) {
           child->Clear();
         }
@@ -708,10 +709,10 @@ void Storage::ApplyChildren() {
   for (auto&& kv : m_values) {
     auto& value = *kv.second;
     switch (value.type) {
-      case Value::kChild:
+      case Value::CHILD:
         value.child->Apply();
         break;
-      case Value::kChildArray:
+      case Value::CHILD_ARRAY:
         for (auto&& child : *value.childArray) {
           child->Apply();
         }

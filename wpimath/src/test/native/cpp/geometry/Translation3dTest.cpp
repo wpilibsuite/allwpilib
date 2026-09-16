@@ -17,7 +17,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("Translation3dTest Sum", "[wpimath]") {
   const Translation3d one{1_m, 3_m, 5_m};
@@ -25,9 +25,9 @@ TEST_CASE("Translation3dTest Sum", "[wpimath]") {
 
   const auto sum = one + two;
 
-  CHECK_NEAR(3.0, sum.X().value(), kEpsilon);
-  CHECK_NEAR(8.0, sum.Y().value(), kEpsilon);
-  CHECK_NEAR(13.0, sum.Z().value(), kEpsilon);
+  CHECK_NEAR(3.0, sum.X().value(), EPSILON);
+  CHECK_NEAR(8.0, sum.Y().value(), EPSILON);
+  CHECK_NEAR(13.0, sum.Z().value(), EPSILON);
 }
 
 TEST_CASE("Translation3dTest Difference", "[wpimath]") {
@@ -36,9 +36,9 @@ TEST_CASE("Translation3dTest Difference", "[wpimath]") {
 
   const auto difference = one - two;
 
-  CHECK_NEAR(difference.X().value(), -1.0, kEpsilon);
-  CHECK_NEAR(difference.Y().value(), -2.0, kEpsilon);
-  CHECK_NEAR(difference.Z().value(), -3.0, kEpsilon);
+  CHECK_NEAR(difference.X().value(), -1.0, EPSILON);
+  CHECK_NEAR(difference.Y().value(), -2.0, EPSILON);
+  CHECK_NEAR(difference.Z().value(), -3.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest RotateBy", "[wpimath]") {
@@ -49,19 +49,19 @@ TEST_CASE("Translation3dTest RotateBy", "[wpimath]") {
   const Translation3d translation{1_m, 2_m, 3_m};
 
   const auto rotated1 = translation.RotateBy(Rotation3d{xAxis, 90_deg});
-  CHECK_NEAR(rotated1.X().value(), 1.0, kEpsilon);
-  CHECK_NEAR(rotated1.Y().value(), -3.0, kEpsilon);
-  CHECK_NEAR(rotated1.Z().value(), 2.0, kEpsilon);
+  CHECK_NEAR(rotated1.X().value(), 1.0, EPSILON);
+  CHECK_NEAR(rotated1.Y().value(), -3.0, EPSILON);
+  CHECK_NEAR(rotated1.Z().value(), 2.0, EPSILON);
 
   const auto rotated2 = translation.RotateBy(Rotation3d{yAxis, 90_deg});
-  CHECK_NEAR(rotated2.X().value(), 3.0, kEpsilon);
-  CHECK_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
-  CHECK_NEAR(rotated2.Z().value(), -1.0, kEpsilon);
+  CHECK_NEAR(rotated2.X().value(), 3.0, EPSILON);
+  CHECK_NEAR(rotated2.Y().value(), 2.0, EPSILON);
+  CHECK_NEAR(rotated2.Z().value(), -1.0, EPSILON);
 
   const auto rotated3 = translation.RotateBy(Rotation3d{zAxis, 90_deg});
-  CHECK_NEAR(rotated3.X().value(), -2.0, kEpsilon);
-  CHECK_NEAR(rotated3.Y().value(), 1.0, kEpsilon);
-  CHECK_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+  CHECK_NEAR(rotated3.X().value(), -2.0, EPSILON);
+  CHECK_NEAR(rotated3.Y().value(), 1.0, EPSILON);
+  CHECK_NEAR(rotated3.Z().value(), 3.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest RotateAround", "[wpimath]") {
@@ -74,21 +74,21 @@ TEST_CASE("Translation3dTest RotateAround", "[wpimath]") {
 
   const auto rotated1 =
       translation.RotateAround(around, Rotation3d{xAxis, 90_deg});
-  CHECK_NEAR(rotated1.X().value(), 1.0, kEpsilon);
-  CHECK_NEAR(rotated1.Y().value(), 0.0, kEpsilon);
-  CHECK_NEAR(rotated1.Z().value(), 1.0, kEpsilon);
+  CHECK_NEAR(rotated1.X().value(), 1.0, EPSILON);
+  CHECK_NEAR(rotated1.Y().value(), 0.0, EPSILON);
+  CHECK_NEAR(rotated1.Z().value(), 1.0, EPSILON);
 
   const auto rotated2 =
       translation.RotateAround(around, Rotation3d{yAxis, 90_deg});
-  CHECK_NEAR(rotated2.X().value(), 5.0, kEpsilon);
-  CHECK_NEAR(rotated2.Y().value(), 2.0, kEpsilon);
-  CHECK_NEAR(rotated2.Z().value(), 3.0, kEpsilon);
+  CHECK_NEAR(rotated2.X().value(), 5.0, EPSILON);
+  CHECK_NEAR(rotated2.Y().value(), 2.0, EPSILON);
+  CHECK_NEAR(rotated2.Z().value(), 3.0, EPSILON);
 
   const auto rotated3 =
       translation.RotateAround(around, Rotation3d{zAxis, 90_deg});
-  CHECK_NEAR(rotated3.X().value(), 3.0, kEpsilon);
-  CHECK_NEAR(rotated3.Y().value(), 0.0, kEpsilon);
-  CHECK_NEAR(rotated3.Z().value(), 3.0, kEpsilon);
+  CHECK_NEAR(rotated3.X().value(), 3.0, EPSILON);
+  CHECK_NEAR(rotated3.Y().value(), 0.0, EPSILON);
+  CHECK_NEAR(rotated3.Z().value(), 3.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest ToTranslation2d", "[wpimath]") {
@@ -102,49 +102,49 @@ TEST_CASE("Translation3dTest Multiplication", "[wpimath]") {
   const Translation3d original{3_m, 5_m, 7_m};
   const auto mult = original * 3;
 
-  CHECK_NEAR(mult.X().value(), 9.0, kEpsilon);
-  CHECK_NEAR(mult.Y().value(), 15.0, kEpsilon);
-  CHECK_NEAR(mult.Z().value(), 21.0, kEpsilon);
+  CHECK_NEAR(mult.X().value(), 9.0, EPSILON);
+  CHECK_NEAR(mult.Y().value(), 15.0, EPSILON);
+  CHECK_NEAR(mult.Z().value(), 21.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest Division", "[wpimath]") {
   const Translation3d original{3_m, 5_m, 7_m};
   const auto div = original / 2;
 
-  CHECK_NEAR(div.X().value(), 1.5, kEpsilon);
-  CHECK_NEAR(div.Y().value(), 2.5, kEpsilon);
-  CHECK_NEAR(div.Z().value(), 3.5, kEpsilon);
+  CHECK_NEAR(div.X().value(), 1.5, EPSILON);
+  CHECK_NEAR(div.Y().value(), 2.5, EPSILON);
+  CHECK_NEAR(div.Z().value(), 3.5, EPSILON);
 }
 
 TEST_CASE("Translation3dTest Norm", "[wpimath]") {
   const Translation3d one{3_m, 5_m, 7_m};
-  CHECK_NEAR(one.Norm().value(), std::hypot(3, 5, 7), kEpsilon);
+  CHECK_NEAR(one.Norm().value(), std::hypot(3, 5, 7), EPSILON);
 }
 
 TEST_CASE("Translation3dTest SquaredNorm", "[wpimath]") {
   const Translation3d one{3_m, 5_m, 7_m};
-  CHECK_NEAR(one.SquaredNorm().value(), 83.0, kEpsilon);
+  CHECK_NEAR(one.SquaredNorm().value(), 83.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest Distance", "[wpimath]") {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
-  CHECK_NEAR(one.Distance(two).value(), 5 * std::sqrt(3), kEpsilon);
+  CHECK_NEAR(one.Distance(two).value(), 5 * std::sqrt(3), EPSILON);
 }
 
 TEST_CASE("Translation3dTest SquaredDistance", "[wpimath]") {
   const Translation3d one{1_m, 1_m, 1_m};
   const Translation3d two{6_m, 6_m, 6_m};
-  CHECK_NEAR(one.SquaredDistance(two).value(), 75.0, kEpsilon);
+  CHECK_NEAR(one.SquaredDistance(two).value(), 75.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest UnaryMinus", "[wpimath]") {
   const Translation3d original{-4.5_m, 7_m, 9_m};
   const auto inverted = -original;
 
-  CHECK_NEAR(inverted.X().value(), 4.5, kEpsilon);
-  CHECK_NEAR(inverted.Y().value(), -7, kEpsilon);
-  CHECK_NEAR(inverted.Z().value(), -9, kEpsilon);
+  CHECK_NEAR(inverted.X().value(), 4.5, EPSILON);
+  CHECK_NEAR(inverted.Y().value(), -7, EPSILON);
+  CHECK_NEAR(inverted.Z().value(), -9, EPSILON);
 }
 
 TEST_CASE("Translation3dTest Equality", "[wpimath]") {
@@ -163,14 +163,14 @@ TEST_CASE("Translation3dTest PolarConstructor", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
   Translation3d one{std::sqrt(2) * 1_m, Rotation3d{zAxis, 45_deg}};
-  CHECK_NEAR(one.X().value(), 1.0, kEpsilon);
-  CHECK_NEAR(one.Y().value(), 1.0, kEpsilon);
-  CHECK_NEAR(one.Z().value(), 0.0, kEpsilon);
+  CHECK_NEAR(one.X().value(), 1.0, EPSILON);
+  CHECK_NEAR(one.Y().value(), 1.0, EPSILON);
+  CHECK_NEAR(one.Z().value(), 0.0, EPSILON);
 
   Translation3d two{2_m, Rotation3d{zAxis, 60_deg}};
-  CHECK_NEAR(two.X().value(), 1.0, kEpsilon);
-  CHECK_NEAR(two.Y().value(), std::sqrt(3.0), kEpsilon);
-  CHECK_NEAR(two.Z().value(), 0.0, kEpsilon);
+  CHECK_NEAR(two.X().value(), 1.0, EPSILON);
+  CHECK_NEAR(two.Y().value(), std::sqrt(3.0), EPSILON);
+  CHECK_NEAR(two.Z().value(), 0.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest ToVector", "[wpimath]") {
@@ -236,7 +236,7 @@ TEST_CASE("Translation3dTest Nearest", "[wpimath]") {
 TEST_CASE("Translation3dTest Dot", "[wpimath]") {
   const Translation3d one{1_m, 2_m, 3_m};
   const Translation3d two{4_m, 5_m, 6_m};
-  CHECK_NEAR(one.Dot(two).value(), 32.0, kEpsilon);
+  CHECK_NEAR(one.Dot(two).value(), 32.0, EPSILON);
 }
 
 TEST_CASE("Translation3dTest Cross", "[wpimath]") {
@@ -244,7 +244,7 @@ TEST_CASE("Translation3dTest Cross", "[wpimath]") {
   const Translation3d two{4_m, 5_m, 6_m};
 
   auto cross = one.Cross(two);
-  CHECK_NEAR(cross[0].value(), -3.0, kEpsilon);
-  CHECK_NEAR(cross[1].value(), 6.0, kEpsilon);
-  CHECK_NEAR(cross[2].value(), -3.0, kEpsilon);
+  CHECK_NEAR(cross[0].value(), -3.0, EPSILON);
+  CHECK_NEAR(cross[1].value(), 6.0, EPSILON);
+  CHECK_NEAR(cross[2].value(), -3.0, EPSILON);
 }

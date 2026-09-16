@@ -9,11 +9,11 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.drivers.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.romi.RomiGyro;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryTable;
 
 public class Drivetrain extends SubsystemBase {
-  private static final double kCountsPerRevolution = 1440.0;
-  private static final double kWheelDiameterInch = 2.75591; // 70 mm
+  private static final double COUNTS_PER_REVOLUTION = 1440.0;
+  private static final double WHEEL_DIAMETER_INCH = 2.75591; // 70 mm
 
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively
@@ -34,17 +34,14 @@ public class Drivetrain extends SubsystemBase {
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
-    SendableRegistry.addChild(diffDrive, leftMotor);
-    SendableRegistry.addChild(diffDrive, rightMotor);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     rightMotor.setInverted(true);
 
     // Use inches as unit for encoder distances
-    leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
-    rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    leftEncoder.setDistancePerPulse((Math.PI * WHEEL_DIAMETER_INCH) / COUNTS_PER_REVOLUTION);
+    rightEncoder.setDistancePerPulse((Math.PI * WHEEL_DIAMETER_INCH) / COUNTS_PER_REVOLUTION);
     resetEncoders();
   }
 
@@ -112,5 +109,14 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("drive", diffDrive);
+    table.log("gyro", gyro);
+    table.log("left distance", getLeftDistanceInch());
+    table.log("right distance", getRightDistanceInch());
   }
 }

@@ -7,11 +7,13 @@ package org.wpilib.command2;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.wpilib.event.EventLoop;
 
 class CommandSchedulerTest extends CommandTestBase {
   @Test
@@ -185,5 +187,40 @@ class CommandSchedulerTest extends CommandTestBase {
 
       assertEquals(counter.get(), 1);
     }
+  }
+
+  @Test
+  void schedulerCloseTest() {
+    CommandScheduler scheduler = CommandScheduler.getInstance();
+
+    AtomicInteger initCounter = new AtomicInteger();
+    AtomicInteger endCounter = new AtomicInteger();
+    AtomicInteger buttonCounter = new AtomicInteger();
+    Subsystem subsystem = new Subsystem() {};
+    final Command command = Commands.startEnd(() -> {}, endCounter::incrementAndGet, subsystem);
+    final Command defaultCommand = subsystem.run(() -> {});
+
+    scheduler.onCommandInitialize(commandToInitialize -> initCounter.incrementAndGet());
+    scheduler.getDefaultButtonLoop().bind(buttonCounter::incrementAndGet);
+    scheduler.setActiveButtonLoop(new EventLoop());
+    scheduler.setDefaultCommand(subsystem, defaultCommand);
+    scheduler.schedule(command);
+
+    assertTrue(scheduler.isScheduled(command));
+    assertEquals(1, initCounter.get());
+
+    scheduler.close();
+
+    assertFalse(scheduler.isScheduled(command));
+    assertEquals(1, endCounter.get());
+    assertSame(scheduler.getDefaultButtonLoop(), scheduler.getActiveButtonLoop());
+
+    scheduler.schedule(Commands.none());
+    scheduler.run();
+
+    assertEquals(1, initCounter.get());
+    assertEquals(0, buttonCounter.get());
+    assertFalse(scheduler.isScheduled(defaultCommand));
+    assertNotSame(scheduler, CommandScheduler.getInstance());
   }
 }

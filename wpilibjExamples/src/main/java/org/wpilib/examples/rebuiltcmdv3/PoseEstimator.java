@@ -17,14 +17,14 @@ public class PoseEstimator {
   private final SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(
           DriveConstants.KINEMATICS,
-          Rotation2d.kZero,
+          Rotation2d.ZERO,
           new SwerveModulePosition[] {
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition(),
             new SwerveModulePosition()
           },
-          Pose2d.kZero);
+          Pose2d.ZERO);
 
   /**
    * Updates the pose estimator with the current gyro heading and swerve module positions.

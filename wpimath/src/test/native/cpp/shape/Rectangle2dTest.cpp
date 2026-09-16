@@ -44,39 +44,39 @@ TEST_CASE("Rectangle2dTest Contains", "[wpimath]") {
 }
 
 TEST_CASE("Rectangle2dTest Distance", "[wpimath]") {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr wpi::math::Pose2d center{1_m, 2_m, 270_deg};
   constexpr wpi::math::Rectangle2d rect{center, 1_m, 2_m};
 
   constexpr wpi::math::Translation2d point1{2.5_m, 2_m};
-  CHECK_NEAR(0.5, rect.Distance(point1).value(), kEpsilon);
+  CHECK_NEAR(0.5, rect.Distance(point1).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point2{1_m, 2_m};
-  CHECK_NEAR(0, rect.Distance(point2).value(), kEpsilon);
+  CHECK_NEAR(0, rect.Distance(point2).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point3{1_m, 1_m};
-  CHECK_NEAR(0.5, rect.Distance(point3).value(), kEpsilon);
+  CHECK_NEAR(0.5, rect.Distance(point3).value(), EPSILON);
 
   constexpr wpi::math::Translation2d point4{-1_m, 2.5_m};
-  CHECK_NEAR(1, rect.Distance(point4).value(), kEpsilon);
+  CHECK_NEAR(1, rect.Distance(point4).value(), EPSILON);
 }
 
 TEST_CASE("Rectangle2dTest Nearest", "[wpimath]") {
-  constexpr double kEpsilon = 1E-9;
+  constexpr double EPSILON = 1E-9;
 
   constexpr wpi::math::Pose2d center{1_m, 1_m, 90_deg};
   constexpr wpi::math::Rectangle2d rect{center, 3_m, 4_m};
 
   constexpr wpi::math::Translation2d point1{1_m, 3_m};
   auto nearestPoint1 = rect.Nearest(point1);
-  CHECK_NEAR(1.0, nearestPoint1.X().value(), kEpsilon);
-  CHECK_NEAR(2.5, nearestPoint1.Y().value(), kEpsilon);
+  CHECK_NEAR(1.0, nearestPoint1.X().value(), EPSILON);
+  CHECK_NEAR(2.5, nearestPoint1.Y().value(), EPSILON);
 
   constexpr wpi::math::Translation2d point2{0_m, 0_m};
   auto nearestPoint2 = rect.Nearest(point2);
-  CHECK_NEAR(0.0, nearestPoint2.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, nearestPoint2.Y().value(), kEpsilon);
+  CHECK_NEAR(0.0, nearestPoint2.X().value(), EPSILON);
+  CHECK_NEAR(0.0, nearestPoint2.Y().value(), EPSILON);
 }
 
 TEST_CASE("Rectangle2dTest Equals", "[wpimath]") {

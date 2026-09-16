@@ -7,12 +7,11 @@
 #include <string>
 
 #include "wpi/hal/DIO.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -25,8 +24,7 @@ DigitalOutput::DigitalOutput(int channel) {
   m_handle = HAL_InitializeDIOPort(channel, false, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("IO", channel, "DigitalOutput");
-  wpi::util::SendableRegistry::Add(this, "DigitalOutput", channel);
+  wpi::util::ReportUsage("IO", channel, "DigitalOutput");
 }
 
 DigitalOutput::~DigitalOutput() {
@@ -134,9 +132,10 @@ void DigitalOutput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetDIOSimDevice(m_handle, device);
 }
 
-void DigitalOutput::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Digital Output");
-  builder.AddBooleanProperty(
-      "Value", [=, this] { return Get(); },
-      [=, this](bool value) { Set(value); });
+void DigitalOutput::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", Get());
+}
+
+std::string_view DigitalOutput::GetTelemetryType() const {
+  return "Digital Output";
 }

@@ -28,23 +28,23 @@ class SlewRateLimiterTest {
   @Test
   void slewRateLimitTest() {
     var limiter = new SlewRateLimiter(1);
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
     assertTrue(limiter.calculate(2) < 2);
   }
 
   @Test
   void slewRateNoLimitTest() {
     var limiter = new SlewRateLimiter(1);
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
     assertEquals(limiter.calculate(0.5), 0.5);
   }
 
   @Test
   void slewRatePositiveNegativeTest() {
     var limiter = new SlewRateLimiter(1, -0.5, 0);
-    WPIUtilJNI.setMockTime(1000000L);
+    WPIUtilJNI.setMockTime(1_000_000_000L);
     assertEquals(limiter.calculate(2), 1);
-    WPIUtilJNI.setMockTime(2000000L);
+    WPIUtilJNI.setMockTime(2_000_000_000L);
     assertEquals(limiter.calculate(0), 0.5);
   }
 }

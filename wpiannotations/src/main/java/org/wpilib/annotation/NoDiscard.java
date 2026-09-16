@@ -19,6 +19,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS) // needs to be stored in the class for use by libraries
 public @interface NoDiscard {
   /**
+   * The string key to use in {@link SuppressWarnings} annotations to suppress compiler error
+   * messages related to this annotation.
+   */
+  String SUPPRESSION_KEY = "WPILib.NoDiscard";
+
+  /**
    * An error message to display if the return value is not used.
    *
    * @return The error message.

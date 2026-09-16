@@ -36,30 +36,31 @@ class Elevator {
   // Standard classes for controlling our elevator
   wpi::math::ExponentialProfile<wpi::units::meters,
                                 wpi::units::volts>::Constraints constraints{
-      Constants::kElevatorMaxV, Constants::kElevatorkV, Constants::kElevatorkA};
+      Constants::ELEVATOR_MAX_V, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts> profile{
       constraints};
   wpi::math::ExponentialProfile<wpi::units::meters, wpi::units::volts>::State
       setpoint;
 
   wpi::math::PIDController controller{
-      Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd};
+      Constants::ELEVATOR_KP, Constants::ELEVATOR_KI, Constants::ELEVATOR_KD};
 
   wpi::math::ElevatorFeedforward feedforward{
-      Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
-      Constants::kElevatorkA};
-  wpi::Encoder encoder{Constants::kEncoderAChannel,
-                       Constants::kEncoderBChannel};
-  wpi::PWMSparkMax motor{Constants::kMotorPort};
+      Constants::ELEVATOR_KS, Constants::ELEVATOR_KG, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
+  wpi::Encoder encoder{Constants::ENCODER_A_CHANNEL,
+                       Constants::ENCODER_B_CHANNEL};
+  wpi::PWMSparkMax motor{Constants::MOTOR_PORT};
   wpi::sim::PWMMotorControllerSim motorSim{motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
   wpi::sim::ElevatorSim elevatorSim{elevatorGearbox,
-                                    Constants::kElevatorGearing,
-                                    Constants::kCarriageMass,
-                                    Constants::kElevatorDrumRadius,
-                                    Constants::kMinElevatorHeight,
-                                    Constants::kMaxElevatorHeight,
+                                    Constants::ELEVATOR_GEARING,
+                                    Constants::CARRIAGE_MASS,
+                                    Constants::ELEVATOR_DRUM_RADIUS,
+                                    Constants::MIN_ELEVATOR_HEIGHT,
+                                    Constants::MAX_ELEVATOR_HEIGHT,
                                     true,
                                     0_m,
                                     {0.005}};

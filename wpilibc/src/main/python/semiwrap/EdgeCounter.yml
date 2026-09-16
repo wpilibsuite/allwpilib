@@ -1,7 +1,5 @@
 classes:
   wpi::EdgeCounter:
-    ignored_bases:
-    - wpi::util::SendableHelper<EdgeCounter>
     methods:
       EdgeCounter:
         overloads:
@@ -9,5 +7,6 @@ classes:
           std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>:
       GetCount:
       Reset:
-      InitSendable:
       SetEdgeConfiguration:
+      LogTo:
+      GetTelemetryType:

@@ -20,11 +20,11 @@
  */
 
 namespace DriveConstants {
-inline constexpr wpi::units::second_t kDt{0.02};
-inline constexpr int kLeftMotor1Port = 0;
-inline constexpr int kLeftMotor2Port = 1;
-inline constexpr int kRightMotor1Port = 2;
-inline constexpr int kRightMotor2Port = 3;
+inline constexpr wpi::units::second_t DT{0.02};
+inline constexpr int LEFT_MOTOR1_PORT = 0;
+inline constexpr int LEFT_MOTOR2_PORT = 1;
+inline constexpr int RIGHT_MOTOR1_PORT = 2;
+inline constexpr int RIGHT_MOTOR2_PORT = 3;
 
 // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
 // These characterization values MUST be determined either experimentally or
@@ -36,11 +36,11 @@ inline constexpr auto ka = 0.15_V * 1_s * 1_s / 1_m;
 
 inline constexpr double kp = 1;
 
-inline constexpr auto kMaxVelocity = 3_mps;
-inline constexpr auto kMaxAcceleration = 3_mps_sq;
+inline constexpr auto MAX_VELOCITY = 3_mps;
+inline constexpr auto MAX_ACCELERATION = 3_mps_sq;
 
 }  // namespace DriveConstants
 
 namespace OIConstants {
-inline constexpr int kDriverControllerPort = 0;
+inline constexpr int DRIVER_CONTROLLER_PORT = 0;
 }  // namespace OIConstants

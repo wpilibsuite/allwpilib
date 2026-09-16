@@ -1,0 +1,27 @@
+ext {
+    nativeName = 'telemetry'
+    devMain = 'edu.wpi.first.telemetry.DevMain'
+    nativeTestSuiteName = "${nativeName}Catch2Test"
+}
+
+apply from: "${rootDir}/shared/javacpp/setupBuild.gradle"
+
+nativeUtils.exportsConfigs {
+    telemetry {
+    }
+}
+
+model {
+    binaries {
+        all {
+            if (!it.buildable || !(it instanceof NativeBinarySpec)) {
+                return
+            }
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+        }
+    }
+}
+
+dependencies {
+    api project(":wpiutil")
+}

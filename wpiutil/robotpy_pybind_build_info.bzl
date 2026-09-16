@@ -150,34 +150,12 @@ def wpiutil_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "Sendable",
-            yml_file = "semiwrap/Sendable.yml",
+            class_name = "UsageReporting",
+            yml_file = "semiwrap/UsageReporting.yml",
             header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/Sendable.hpp",
+            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/UsageReporting.hpp",
             tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::Sendable", "wpi__util__Sendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableBuilder",
-            yml_file = "semiwrap/SendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::SendableBuilder", "wpi__util__SendableBuilder.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "SendableRegistry",
-            yml_file = "semiwrap/SendableRegistry.yml",
-            header_root = "$(execpath :robotpy-native-wpiutil.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpiutil.copy_headers)/wpi/util/sendable/SendableRegistry.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::util::SendableRegistry", "wpi__util__SendableRegistry.hpp"),
-            ],
+            trampolines = [],
         ),
         struct(
             class_name = "WPyStruct",
@@ -316,6 +294,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/wpiutil/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(

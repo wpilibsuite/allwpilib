@@ -76,13 +76,13 @@ class SysIdRoutineTest {
           &m_subsystem}};
 
   wpi::cmd::CommandPtr m_quasistaticForward{
-      m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kForward)};
+      m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::FORWARD)};
   wpi::cmd::CommandPtr m_quasistaticReverse{
-      m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kReverse)};
+      m_sysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::REVERSE)};
   wpi::cmd::CommandPtr m_dynamicForward{
-      m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::kForward)};
+      m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::FORWARD)};
   wpi::cmd::CommandPtr m_dynamicReverse{
-      m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::kReverse)};
+      m_sysidRoutine.Dynamic(wpi::cmd::sysid::Direction::REVERSE)};
 
   wpi::cmd::sysid::SysIdRoutine m_emptySysidRoutine{
       wpi::cmd::sysid::Config{std::nullopt, std::nullopt, std::nullopt,
@@ -91,7 +91,7 @@ class SysIdRoutineTest {
                                  nullptr, &m_subsystem}};
 
   wpi::cmd::CommandPtr m_emptyRoutineForward{
-      m_emptySysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::kForward)};
+      m_emptySysidRoutine.Quasistatic(wpi::cmd::sysid::Direction::FORWARD)};
 
   void RunCommand(wpi::cmd::CommandPtr command) {
     command.get()->Initialize();

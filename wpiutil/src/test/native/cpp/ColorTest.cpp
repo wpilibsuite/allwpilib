@@ -112,7 +112,7 @@ TEST_CASE("ColorTest FromHSVExactRgbValues", "[wpiutil]") {
     int b;
   };
 
-  constexpr TestCase kCases[] = {
+  constexpr TestCase CASES[] = {
       {0, 0, 0, 0, 0, 0},          {0, 0, 255, 255, 255, 255},
       {0, 255, 255, 255, 0, 0},    {60, 255, 255, 0, 255, 0},
       {120, 255, 255, 0, 0, 255},  {30, 255, 255, 255, 255, 0},
@@ -121,7 +121,7 @@ TEST_CASE("ColorTest FromHSVExactRgbValues", "[wpiutil]") {
       {120, 255, 128, 0, 0, 128},
   };
 
-  for (const auto& test : kCases) {
+  for (const auto& test : CASES) {
     UNSCOPED_INFO("FromHSV(" << test.h << ", " << test.s << ", " << test.v
                              << ")");
     wpi::util::Color8Bit color{

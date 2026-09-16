@@ -7,5 +7,5 @@
 #include <stdint.h>
 
 namespace wpi::hal {
-uint64_t GetDSInitializeTime();
+int64_t GetDSInitializeTime();
 }  // namespace wpi::hal

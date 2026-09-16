@@ -40,7 +40,7 @@ Downloader::Downloader(wpi::glass::Storage& storage)
 Downloader::~Downloader() {
   {
     std::scoped_lock lock{m_mutex};
-    m_state = kExit;
+    m_state = STATE_EXIT;
   }
   m_cv.notify_all();
   m_thread.join();
@@ -59,14 +59,14 @@ void Downloader::DisplayConnect() {
 
   // Connect button
   if (ImGui::Button("Connect")) {
-    m_state = kConnecting;
+    m_state = STATE_CONNECTING;
     m_cv.notify_all();
   }
 }
 
 void Downloader::DisplayDisconnectButton() {
   if (ImGui::Button("Disconnect")) {
-    m_state = kDisconnecting;
+    m_state = STATE_DISCONNECTING;
     m_cv.notify_all();
   }
 }
@@ -74,7 +74,7 @@ void Downloader::DisplayDisconnectButton() {
 void Downloader::DisplayRemoteDirSelector() {
   ImGui::SameLine();
   if (ImGui::Button("Refresh")) {
-    m_state = kGetFiles;
+    m_state = STATE_GET_FILES;
     m_cv.notify_all();
   }
 
@@ -96,7 +96,7 @@ void Downloader::DisplayRemoteDirSelector() {
   ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
   if (ImGui::InputText("Remote Dir", &m_remoteDir,
                        ImGuiInputTextFlags_EnterReturnsTrue)) {
-    m_state = kGetFiles;
+    m_state = STATE_GET_FILES;
     m_cv.notify_all();
   }
 
@@ -117,7 +117,7 @@ void Downloader::DisplayRemoteDirSelector() {
         }
         m_remoteDir += dir;
       }
-      m_state = kGetFiles;
+      m_state = STATE_GET_FILES;
       m_cv.notify_all();
     }
   }
@@ -137,7 +137,7 @@ void Downloader::DisplayLocalDirSelector() {
   // Download button
   if (!m_localDir.empty()) {
     if (ImGui::Button("Download")) {
-      m_state = kDownload;
+      m_state = STATE_DOWNLOAD;
       m_cv.notify_all();
     }
   }
@@ -152,7 +152,7 @@ void Downloader::DisplayLocalDirSelector() {
   if (ImGui::BeginPopup("DeleteConfirm")) {
     ImGui::TextUnformatted("Are you sure? This will NOT download the files");
     if (ImGui::Button("DELETE")) {
-      m_state = kDelete;
+      m_state = STATE_DELETE;
       m_cv.notify_all();
       ImGui::CloseCurrentPopup();
     }
@@ -172,14 +172,15 @@ size_t Downloader::DisplayFiles() {
           ImGuiTableFlags_Borders | ImGuiTableFlags_SizingStretchProp)) {
     ImGui::TableSetupColumn("File");
     ImGui::TableSetupColumn("Size");
-    ImGui::TableSetupColumn((m_state == kDownload || m_state == kDownloadDone ||
-                             m_state == kDelete || m_state == kDeleteDone)
-                                ? "Status"
-                                : "Selected");
+    ImGui::TableSetupColumn(
+        (m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE ||
+         m_state == STATE_DELETE || m_state == STATE_DELETE_DONE)
+            ? "Status"
+            : "Selected");
     ImGui::TableHeadersRow();
     for (auto&& file : m_fileList) {
-      if ((m_state == kDownload || m_state == kDownloadDone ||
-           m_state == kDelete || m_state == kDeleteDone) &&
+      if ((m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE ||
+           m_state == STATE_DELETE || m_state == STATE_DELETE_DONE) &&
           !file.selected) {
         continue;
       }
@@ -193,13 +194,13 @@ size_t Downloader::DisplayFiles() {
       auto sizeText = std::format("{}", file.size);
       ImGui::TextUnformatted(sizeText.c_str());
       ImGui::TableNextColumn();
-      if (m_state == kDownload || m_state == kDownloadDone) {
+      if (m_state == STATE_DOWNLOAD || m_state == STATE_DOWNLOAD_DONE) {
         if (!file.status.empty()) {
           ImGui::TextUnformatted(file.status.c_str());
         } else {
           ImGui::ProgressBar(file.complete);
         }
-      } else if (m_state == kDelete || m_state == kDeleteDone) {
+      } else if (m_state == STATE_DELETE || m_state == STATE_DELETE_DONE) {
         if (!file.status.empty()) {
           ImGui::TextUnformatted(file.status.c_str());
         }
@@ -227,42 +228,42 @@ void Downloader::Display() {
   }
 
   switch (m_state) {
-    case kDisconnected:
+    case STATE_DISCONNECTED:
       DisplayConnect();
       break;
-    case kConnecting:
+    case STATE_CONNECTING:
       DisplayDisconnectButton();
       ImGui::Text("Connecting to %s...", m_serverTeam.c_str());
       break;
-    case kDisconnecting:
+    case STATE_DISCONNECTING:
       ImGui::TextUnformatted("Disconnecting...");
       break;
-    case kConnected:
-    case kGetFiles:
+    case STATE_CONNECTED:
+    case STATE_GET_FILES:
       DisplayDisconnectButton();
       DisplayRemoteDirSelector();
       if (DisplayFiles() > 0) {
         DisplayLocalDirSelector();
       }
       break;
-    case kDownload:
-    case kDownloadDone:
+    case STATE_DOWNLOAD:
+    case STATE_DOWNLOAD_DONE:
       DisplayDisconnectButton();
       DisplayFiles();
-      if (m_state == kDownloadDone) {
+      if (m_state == STATE_DOWNLOAD_DONE) {
         if (ImGui::Button("Download complete!")) {
-          m_state = kGetFiles;
+          m_state = STATE_GET_FILES;
           m_cv.notify_all();
         }
       }
       break;
-    case kDelete:
-    case kDeleteDone:
+    case STATE_DELETE:
+    case STATE_DELETE_DONE:
       DisplayDisconnectButton();
       DisplayFiles();
-      if (m_state == kDeleteDone) {
+      if (m_state == STATE_DELETE_DONE) {
         if (ImGui::Button("Deletion complete!")) {
-          m_state = kGetFiles;
+          m_state = STATE_GET_FILES;
           m_cv.notify_all();
         }
       }
@@ -275,17 +276,17 @@ void Downloader::Display() {
 void Downloader::ThreadMain() {
   std::unique_ptr<sftp::Session> session;
 
-  static constexpr size_t kBufSize = 32 * 1024;
-  std::unique_ptr<uint8_t[]> copyBuf = std::make_unique<uint8_t[]>(kBufSize);
+  static constexpr size_t BUF_SIZE = 32 * 1024;
+  std::unique_ptr<uint8_t[]> copyBuf = std::make_unique<uint8_t[]>(BUF_SIZE);
 
   std::unique_lock lock{m_mutex};
-  while (m_state != kExit) {
+  while (m_state != STATE_EXIT) {
     State prev = m_state;
     m_cv.wait(lock, [&] { return m_state != prev; });
     m_error.clear();
     try {
       switch (m_state) {
-        case kConnecting:
+        case STATE_CONNECTING:
           if (auto team =
                   wpi::util::parse_integer<unsigned int>(m_serverTeam, 10)) {
             // team number
@@ -304,7 +305,7 @@ void Downloader::ThreadMain() {
           }
           lock.lock();
           // FALLTHROUGH
-        case kGetFiles: {
+        case STATE_GET_FILES: {
           std::string dir = m_remoteDir;
           std::vector<sftp::Attributes> fileList;
           lock.unlock();
@@ -318,7 +319,7 @@ void Downloader::ThreadMain() {
             m_error = ex.what();
             m_dirList.clear();
             m_fileList.clear();
-            m_state = kConnected;
+            m_state = STATE_CONNECTED;
             break;
           }
           std::sort(
@@ -340,16 +341,16 @@ void Downloader::ThreadMain() {
             }
           }
 
-          m_state = kConnected;
+          m_state = STATE_CONNECTED;
           break;
         }
-        case kDisconnecting:
+        case STATE_DISCONNECTING:
           session.reset();
-          m_state = kDisconnected;
+          m_state = STATE_DISCONNECTED;
           break;
-        case kDownload: {
+        case STATE_DOWNLOAD: {
           for (auto&& file : m_fileList) {
-            if (m_state != kDownload) {
+            if (m_state != STATE_DOWNLOAD) {
               // user aborted
               break;
             }
@@ -391,7 +392,7 @@ void Downloader::ThreadMain() {
               uint64_t total = 0;
               while (total < fileSize) {
                 uint64_t toCopy = (std::min)(fileSize - total,
-                                             static_cast<uint64_t>(kBufSize));
+                                             static_cast<uint64_t>(BUF_SIZE));
                 auto copied = f.Read(copyBuf.get(), toCopy);
                 if (write(ofd, copyBuf.get(), copied) !=
                     static_cast<int64_t>(copied)) {
@@ -433,14 +434,14 @@ void Downloader::ThreadMain() {
             lock.lock();
           err: {}
           }
-          if (m_state == kDownload) {
-            m_state = kDownloadDone;
+          if (m_state == STATE_DOWNLOAD) {
+            m_state = STATE_DOWNLOAD_DONE;
           }
           break;
         }
-        case kDelete: {
+        case STATE_DELETE: {
           for (auto&& file : m_fileList) {
-            if (m_state != kDelete) {
+            if (m_state != STATE_DELETE) {
               // user aborted
               break;
             }
@@ -466,8 +467,8 @@ void Downloader::ThreadMain() {
             lock.lock();
             file.status = "Deleted";
           }
-          if (m_state == kDelete) {
-            m_state = kDeleteDone;
+          if (m_state == STATE_DELETE) {
+            m_state = STATE_DELETE_DONE;
           }
           break;
         }
@@ -477,7 +478,7 @@ void Downloader::ThreadMain() {
     } catch (sftp::Exception& ex) {
       m_error = ex.what();
       session.reset();
-      m_state = kDisconnected;
+      m_state = STATE_DISCONNECTED;
     }
   }
 }

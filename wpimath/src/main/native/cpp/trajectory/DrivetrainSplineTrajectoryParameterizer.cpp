@@ -98,7 +98,7 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // Now enforce all acceleration limits.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.value() < kEpsilon) {
+      if (ds.value() < EPSILON) {
         break;
       }
 
@@ -154,7 +154,7 @@ DrivetrainSplineTrajectoryParameterizer::Parameterize(
       // Check all acceleration constraints with the new max velocity.
       EnforceAccelerationLimits(reversed, constraints, &constrainedState);
 
-      if (ds.value() > -kEpsilon) {
+      if (ds.value() > -EPSILON) {
         break;
       }
 

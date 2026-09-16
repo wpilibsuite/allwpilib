@@ -58,7 +58,7 @@ TEST_CASE_METHOD(CommandRequirementsTest,
                         [&endCounter](bool interruptible) { endCounter++; },
                         [] { return false; }, {&requirement})
           .WithInterruptBehavior(
-              Command::InterruptionBehavior::kCancelIncoming);
+              Command::InterruptionBehavior::CANCEL_INCOMING);
   MockCommand command2({&requirement});
 
   command2.ExpectInitialize(0);

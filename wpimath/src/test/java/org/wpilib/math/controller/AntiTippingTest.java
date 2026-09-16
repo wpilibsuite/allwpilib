@@ -12,7 +12,7 @@ import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 
 class AntiTippingTest {
-  private static final double kTolerance = 1e-6;
+  private static final double TOLERANCE = 1e-6;
 
   @Test
   void testBelowThresholdGeneratesNoCorrection() {
@@ -20,8 +20,8 @@ class AntiTippingTest {
     Rotation3d flat = new Rotation3d(Math.toRadians(1.0), Math.toRadians(1.0), 0.0);
     ChassisVelocities correction = antiTipping.calculate(flat);
 
-    assertEquals(0.0, correction.vx, kTolerance);
-    assertEquals(0.0, correction.vy, kTolerance);
+    assertEquals(0.0, correction.vx, TOLERANCE);
+    assertEquals(0.0, correction.vy, TOLERANCE);
   }
 
   @Test
@@ -31,7 +31,7 @@ class AntiTippingTest {
     ChassisVelocities correction = antiTipping.calculate(tippingForward);
 
     assertTrue(correction.vx > 0.0);
-    assertEquals(0.0, correction.vy, kTolerance);
+    assertEquals(0.0, correction.vy, TOLERANCE);
   }
 
   @Test
@@ -41,7 +41,7 @@ class AntiTippingTest {
     ChassisVelocities correction = antiTipping.calculate(tippingBackward);
 
     assertTrue(correction.vx < 0.0);
-    assertEquals(0.0, correction.vy, kTolerance);
+    assertEquals(0.0, correction.vy, TOLERANCE);
   }
 
   @Test
@@ -50,7 +50,7 @@ class AntiTippingTest {
     Rotation3d rollingRight = new Rotation3d(Math.toRadians(15.0), 0.0, 0.0);
     ChassisVelocities correction = antiTipping.calculate(rollingRight);
 
-    assertEquals(0.0, correction.vx, kTolerance);
+    assertEquals(0.0, correction.vx, TOLERANCE);
     assertTrue(correction.vy < 0.0);
   }
 
@@ -60,7 +60,7 @@ class AntiTippingTest {
     Rotation3d rollingLeft = new Rotation3d(Math.toRadians(-15.0), 0.0, 0.0);
     ChassisVelocities correction = antiTipping.calculate(rollingLeft);
 
-    assertEquals(0.0, correction.vx, kTolerance);
+    assertEquals(0.0, correction.vx, TOLERANCE);
     assertTrue(correction.vy > 0.0);
   }
 }

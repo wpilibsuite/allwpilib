@@ -16,12 +16,12 @@ import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxVelocity = 3.0; // meters per second
-  public static final double kMaxAngularVelocity = 2 * Math.PI; // one rotation per second
+  public static final double MAX_VELOCITY = 3.0; // meters per second
+  public static final double MAX_ANGULAR_VELOCITY = 2 * Math.PI; // one rotation per second
 
-  private static final double kTrackwidth = 0.381 * 2; // meters
-  private static final double kWheelRadius = 0.0508; // meters
-  private static final int kEncoderResolution = 4096;
+  private static final double TRACKWIDTH = 0.381 * 2; // meters
+  private static final double WHEEL_RADIUS = 0.0508; // meters
+  private static final int ENCODER_RESOLUTION = 4096;
 
   private final PWMSparkMax leftLeader = new PWMSparkMax(1);
   private final PWMSparkMax leftFollower = new PWMSparkMax(2);
@@ -37,7 +37,7 @@ public class Drivetrain {
   private final PIDController rightPIDController = new PIDController(1, 0, 0);
 
   private final DifferentialDriveKinematics kinematics =
-      new DifferentialDriveKinematics(kTrackwidth);
+      new DifferentialDriveKinematics(TRACKWIDTH);
 
   private final DifferentialDriveOdometry odometry;
 
@@ -62,8 +62,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    leftEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
+    rightEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
 
     leftEncoder.reset();
     rightEncoder.reset();

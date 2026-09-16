@@ -23,7 +23,7 @@ import org.wpilib.util.Color;
 
 @ResourceLock("timing")
 class OpModeRobotTest {
-  static final double kPeriod = 0.02;
+  static final double PERIOD = 0.02;
 
   @SuppressWarnings("PMD.PublicFieldNamingConvention")
   public static class MockOpMode implements OpMode {
@@ -271,11 +271,11 @@ class OpModeRobotTest {
     assertEquals(0, robot.m_robotPeriodicCount.get());
 
     // Step timing to allow callbacks to execute
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, robot.m_robotPeriodicCount.get());
 
     // Additional time steps should continue calling robotPeriodic
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(2, robot.m_robotPeriodicCount.get());
 
     robot.endCompetition();

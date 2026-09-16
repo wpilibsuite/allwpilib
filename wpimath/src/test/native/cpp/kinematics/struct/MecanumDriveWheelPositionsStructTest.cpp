@@ -11,19 +11,19 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::MecanumDriveWheelPositions>;
-const MecanumDriveWheelPositions kExpectedData{
+const MecanumDriveWheelPositions EXPECTED_DATA{
     MecanumDriveWheelPositions{17.4_m, 2.29_m, 22.9_m, 1.74_m}};
 }  // namespace
 
 TEST_CASE("MecanumDriveWheelPositionsStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   MecanumDriveWheelPositions unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.frontLeft.value() == unpacked_data.frontLeft.value());
-  CHECK(kExpectedData.frontRight.value() == unpacked_data.frontRight.value());
-  CHECK(kExpectedData.rearLeft.value() == unpacked_data.rearLeft.value());
-  CHECK(kExpectedData.rearRight.value() == unpacked_data.rearRight.value());
+  CHECK(EXPECTED_DATA.frontLeft.value() == unpacked_data.frontLeft.value());
+  CHECK(EXPECTED_DATA.frontRight.value() == unpacked_data.frontRight.value());
+  CHECK(EXPECTED_DATA.rearLeft.value() == unpacked_data.rearLeft.value());
+  CHECK(EXPECTED_DATA.rearRight.value() == unpacked_data.rearRight.value());
 }

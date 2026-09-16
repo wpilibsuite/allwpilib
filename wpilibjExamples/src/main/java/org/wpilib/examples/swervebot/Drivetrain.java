@@ -13,8 +13,8 @@ import org.wpilib.math.kinematics.SwerveModulePosition;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxVelocity = 3.0; // 3 meters per second
-  public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
+  public static final double MAX_VELOCITY = 3.0; // 3 meters per second
+  public static final double MAX_ANGULAR_VELOCITY = Math.PI; // 1/2 rotation per second
 
   private final Translation2d frontLeftLocation = new Translation2d(0.381, 0.381);
   private final Translation2d frontRightLocation = new Translation2d(0.381, -0.381);
@@ -65,7 +65,7 @@ public class Drivetrain {
 
     var velocities =
         SwerveDriveKinematics.desaturateWheelVelocities(
-            kinematics.toWheelVelocities(chassisVelocities), kMaxVelocity);
+            kinematics.toWheelVelocities(chassisVelocities), MAX_VELOCITY);
 
     frontLeft.setDesiredVelocity(velocities[0]);
     frontRight.setDesiredVelocity(velocities[1]);

@@ -1,17 +1,12 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-
 classes:
   wpi::DoubleSolenoid:
-    ignored_bases:
-    - wpi::util::SendableHelper<DoubleSolenoid>
     enums:
       Value:
     methods:
       DoubleSolenoid:
         overloads:
-          CANBus, PneumaticsModuleType, int, int:
-          CANBus, int, PneumaticsModuleType, int, int:
+          CANPort, PneumaticsModuleType, int, int:
+          CANPort, int, PneumaticsModuleType, int, int:
       Set:
       Get:
       Toggle:
@@ -19,4 +14,5 @@ classes:
       GetRevChannel:
       IsFwdSolenoidDisabled:
       IsRevSolenoidDisabled:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

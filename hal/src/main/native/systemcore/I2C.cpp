@@ -23,8 +23,8 @@
 using namespace wpi::hal;
 
 namespace {
-constexpr const char* physicalPorts[kNumI2cBuses] = {"/dev/i2c-10",
-                                                     "/dev/i2c-1"};
+constexpr const char* physicalPorts[NUM_I2C_BUSES] = {"/dev/i2c-10",
+                                                      "/dev/i2c-1"};
 
 struct I2C {
   wpi::util::mutex initMutex;
@@ -32,7 +32,7 @@ struct I2C {
   int fd = -1;
 };
 
-static I2C i2cObjs[kNumI2cBuses];
+static I2C i2cObjs[NUM_I2C_BUSES];
 }  // namespace
 
 namespace wpi::hal::init {

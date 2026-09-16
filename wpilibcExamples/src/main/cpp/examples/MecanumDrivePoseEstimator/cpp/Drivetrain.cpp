@@ -58,7 +58,7 @@ void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
   }
   SetVelocities(
       kinematics.ToWheelVelocities(chassisVelocities.Discretize(period))
-          .Desaturate(kMaxVelocity));
+          .Desaturate(MAX_VELOCITY));
 }
 
 void Drivetrain::UpdateOdometry() {

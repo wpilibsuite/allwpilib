@@ -151,7 +151,7 @@ def test_scroll_forward():
     pattern = make_grayscale_pattern().scroll_at_relative_speed(units.hertz(1 / 256.0))
 
     for time in range(10):
-        RobotController.set_time_source(lambda t=time: t)
+        RobotController.set_time_source(lambda t=time: t * 1_000_000_000)
         pattern.apply_to(buffer[:])
 
         for led in range(len(buffer)):
@@ -165,7 +165,7 @@ def test_scroll_backward():
     pattern = make_grayscale_pattern().scroll_at_relative_speed(units.hertz(-1 / 256.0))
 
     for time in range(10):
-        RobotController.set_time_source(lambda t=time: t)
+        RobotController.set_time_source(lambda t=time: t * 1_000_000_000)
         pattern.apply_to(buffer[:])
 
         for led in range(len(buffer)):
@@ -247,7 +247,7 @@ def test_blink_symmetric():
     buffer = AddressableLEDBuffer(1)
 
     for t in range(8):
-        RobotController.set_time_source(lambda tick=t: tick * 1_000_000)
+        RobotController.set_time_source(lambda tick=t: tick * 1_000_000_000)
         pattern.apply_to(buffer[:])
         expected = Color8Bit(Color.WHITE if t % 4 < 2 else Color.BLACK)
         assert buffer.get_led_8bit(0) == expected
@@ -279,11 +279,11 @@ def test_breathe():
     pattern.apply_to(buffer[:])
     assert buffer.get_led_8bit(0) == Color8Bit(Color.WHITE)
 
-    RobotController.set_time_source(lambda: 1)
+    RobotController.set_time_source(lambda: 1_000)
     pattern.apply_to(buffer[:])
     assert buffer.get_led_8bit(0) == Color8Bit(Color(0.5, 0.5, 0.5))
 
-    RobotController.set_time_source(lambda: 2)
+    RobotController.set_time_source(lambda: 2_000)
     pattern.apply_to(buffer[:])
     assert buffer.get_led_8bit(0) == Color8Bit(Color.BLACK)
 

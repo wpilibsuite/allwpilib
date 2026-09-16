@@ -1,15 +1,10 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-
 classes:
   wpi::Solenoid:
-    ignored_bases:
-    - wpi::util::SendableHelper<Solenoid>
     methods:
       Solenoid:
         overloads:
-          CANBus, PneumaticsModuleType, int:
-          CANBus, int, PneumaticsModuleType, int:
+          CANPort, PneumaticsModuleType, int:
+          CANPort, int, PneumaticsModuleType, int:
       Set:
       Get:
       Toggle:
@@ -17,4 +12,5 @@ classes:
       IsDisabled:
       SetPulseDuration:
       StartPulse:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:

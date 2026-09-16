@@ -16,6 +16,9 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 
@@ -134,6 +137,9 @@ void Application(std::string_view saveDir) {
 
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   // Add icons
   gui::AddIcon(dlt::GetResource_dlt_16_png());

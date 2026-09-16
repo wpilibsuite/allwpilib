@@ -16,11 +16,6 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot() {
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &frontLeft);
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &rearLeft);
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &frontRight);
-    wpi::util::SendableRegistry::AddChild(&robotDrive, &rearRight);
-
     // Invert the right side motors. You may need to change or remove this to
     // match your robot.
     frontRight.SetInverted(true);
@@ -39,26 +34,26 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  static constexpr int kFrontLeftMotorPort = 0;
-  static constexpr int kRearLeftMotorPort = 1;
-  static constexpr int kFrontRightMotorPort = 2;
-  static constexpr int kRearRightMotorPort = 3;
-  static constexpr wpi::OnboardIMU::MountOrientation kIMUMountOrientation =
+  static constexpr int FRONT_LEFT_MOTOR_PORT = 0;
+  static constexpr int REAR_LEFT_MOTOR_PORT = 1;
+  static constexpr int FRONT_RIGHT_MOTOR_PORT = 2;
+  static constexpr int REAR_RIGHT_MOTOR_PORT = 3;
+  static constexpr wpi::OnboardIMU::MountOrientation IMU_MOUNT_ORIENTATION =
       wpi::OnboardIMU::FLAT;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  wpi::PWMSparkMax frontLeft{kFrontLeftMotorPort};
-  wpi::PWMSparkMax rearLeft{kRearLeftMotorPort};
-  wpi::PWMSparkMax frontRight{kFrontRightMotorPort};
-  wpi::PWMSparkMax rearRight{kRearRightMotorPort};
+  wpi::PWMSparkMax frontLeft{FRONT_LEFT_MOTOR_PORT};
+  wpi::PWMSparkMax rearLeft{REAR_LEFT_MOTOR_PORT};
+  wpi::PWMSparkMax frontRight{FRONT_RIGHT_MOTOR_PORT};
+  wpi::PWMSparkMax rearRight{REAR_RIGHT_MOTOR_PORT};
   wpi::MecanumDrive robotDrive{
       [&](double output) { frontLeft.SetThrottle(output); },
       [&](double output) { rearLeft.SetThrottle(output); },
       [&](double output) { frontRight.SetThrottle(output); },
       [&](double output) { rearRight.SetThrottle(output); }};
 
-  wpi::OnboardIMU imu{kIMUMountOrientation};
-  wpi::Joystick joystick{kJoystickPort};
+  wpi::OnboardIMU imu{IMU_MOUNT_ORIENTATION};
+  wpi::Joystick joystick{JOYSTICK_PORT};
 };
 
 #ifndef RUNNING_WPILIB_TESTS

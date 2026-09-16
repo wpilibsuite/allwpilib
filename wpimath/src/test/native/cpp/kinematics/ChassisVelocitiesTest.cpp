@@ -17,7 +17,7 @@
 #include "wpi/units/time.hpp"
 #include "wpi/units/velocity.hpp"
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("ChassisVelocitiesTest Discretize", "[wpimath]") {
   constexpr wpi::math::ChassisVelocities target{1_mps, 0_mps, 0.5_rad_per_s};
@@ -33,10 +33,10 @@ TEST_CASE("ChassisVelocitiesTest Discretize", "[wpimath]") {
     pose = pose + twist.Exp();
   }
 
-  CHECK_NEAR((target.vx * duration).value(), pose.X().value(), kEpsilon);
-  CHECK_NEAR((target.vy * duration).value(), pose.Y().value(), kEpsilon);
+  CHECK_NEAR((target.vx * duration).value(), pose.X().value(), EPSILON);
+  CHECK_NEAR((target.vy * duration).value(), pose.Y().value(), EPSILON);
   CHECK_NEAR((target.omega * duration).value(),
-             pose.Rotation().Radians().value(), kEpsilon);
+             pose.Rotation().Radians().value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest ToRobotRelative", "[wpimath]") {
@@ -44,9 +44,9 @@ TEST_CASE("ChassisVelocitiesTest ToRobotRelative", "[wpimath]") {
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0.5_rad_per_s}.ToRobotRelative(
           -90.0_deg);
 
-  CHECK_NEAR(0.0, chassisVelocities.vx.value(), kEpsilon);
-  CHECK_NEAR(1.0, chassisVelocities.vy.value(), kEpsilon);
-  CHECK_NEAR(0.5, chassisVelocities.omega.value(), kEpsilon);
+  CHECK_NEAR(0.0, chassisVelocities.vx.value(), EPSILON);
+  CHECK_NEAR(1.0, chassisVelocities.vy.value(), EPSILON);
+  CHECK_NEAR(0.5, chassisVelocities.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest ToFieldRelative", "[wpimath]") {
@@ -54,9 +54,9 @@ TEST_CASE("ChassisVelocitiesTest ToFieldRelative", "[wpimath]") {
       wpi::math::ChassisVelocities{1_mps, 0_mps, 0.5_rad_per_s}.ToFieldRelative(
           45.0_deg);
 
-  CHECK_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vx.value(), kEpsilon);
-  CHECK_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vy.value(), kEpsilon);
-  CHECK_NEAR(0.5, chassisVelocities.omega.value(), kEpsilon);
+  CHECK_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vx.value(), EPSILON);
+  CHECK_NEAR(1.0 / std::sqrt(2.0), chassisVelocities.vy.value(), EPSILON);
+  CHECK_NEAR(0.5, chassisVelocities.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest Plus", "[wpimath]") {
@@ -65,9 +65,9 @@ TEST_CASE("ChassisVelocitiesTest Plus", "[wpimath]") {
 
   const wpi::math::ChassisVelocities result = left + right;
 
-  CHECK_NEAR(3.0, result.vx.value(), kEpsilon);
-  CHECK_NEAR(2.0, result.vy.value(), kEpsilon);
-  CHECK_NEAR(1.0, result.omega.value(), kEpsilon);
+  CHECK_NEAR(3.0, result.vx.value(), EPSILON);
+  CHECK_NEAR(2.0, result.vy.value(), EPSILON);
+  CHECK_NEAR(1.0, result.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest Minus", "[wpimath]") {
@@ -76,9 +76,9 @@ TEST_CASE("ChassisVelocitiesTest Minus", "[wpimath]") {
 
   const wpi::math::ChassisVelocities result = left - right;
 
-  CHECK_NEAR(-1.0, result.vx.value(), kEpsilon);
-  CHECK_NEAR(0, result.vy.value(), kEpsilon);
-  CHECK_NEAR(0.5, result.omega.value(), kEpsilon);
+  CHECK_NEAR(-1.0, result.vx.value(), EPSILON);
+  CHECK_NEAR(0, result.vy.value(), EPSILON);
+  CHECK_NEAR(0.5, result.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest UnaryMinus", "[wpimath]") {
@@ -87,9 +87,9 @@ TEST_CASE("ChassisVelocitiesTest UnaryMinus", "[wpimath]") {
 
   const wpi::math::ChassisVelocities result = -velocities;
 
-  CHECK_NEAR(-1.0, result.vx.value(), kEpsilon);
-  CHECK_NEAR(-0.5, result.vy.value(), kEpsilon);
-  CHECK_NEAR(-0.75, result.omega.value(), kEpsilon);
+  CHECK_NEAR(-1.0, result.vx.value(), EPSILON);
+  CHECK_NEAR(-0.5, result.vy.value(), EPSILON);
+  CHECK_NEAR(-0.75, result.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest Multiplication", "[wpimath]") {
@@ -98,9 +98,9 @@ TEST_CASE("ChassisVelocitiesTest Multiplication", "[wpimath]") {
 
   const wpi::math::ChassisVelocities result = velocities * 2;
 
-  CHECK_NEAR(2.0, result.vx.value(), kEpsilon);
-  CHECK_NEAR(1.0, result.vy.value(), kEpsilon);
-  CHECK_NEAR(1.5, result.omega.value(), kEpsilon);
+  CHECK_NEAR(2.0, result.vx.value(), EPSILON);
+  CHECK_NEAR(1.0, result.vy.value(), EPSILON);
+  CHECK_NEAR(1.5, result.omega.value(), EPSILON);
 }
 
 TEST_CASE("ChassisVelocitiesTest Division", "[wpimath]") {
@@ -109,7 +109,7 @@ TEST_CASE("ChassisVelocitiesTest Division", "[wpimath]") {
 
   const wpi::math::ChassisVelocities result = velocities / 2;
 
-  CHECK_NEAR(0.5, result.vx.value(), kEpsilon);
-  CHECK_NEAR(0.25, result.vy.value(), kEpsilon);
-  CHECK_NEAR(0.375, result.omega.value(), kEpsilon);
+  CHECK_NEAR(0.5, result.vx.value(), EPSILON);
+  CHECK_NEAR(0.25, result.vy.value(), EPSILON);
+  CHECK_NEAR(0.375, result.omega.value(), EPSILON);
 }

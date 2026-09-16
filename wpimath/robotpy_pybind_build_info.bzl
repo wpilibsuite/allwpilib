@@ -407,6 +407,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "TwoDeadWheelPoseEstimator",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator", "wpi__math__TwoDeadWheelPoseEstimator.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelPoseEstimator3d",
+            yml_file = "semiwrap/TwoDeadWheelPoseEstimator3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelPoseEstimator3d", "wpi__math__TwoDeadWheelPoseEstimator3d.hpp"),
+            ],
+        ),
+        struct(
             class_name = "BiquadFilter",
             yml_file = "semiwrap/BiquadFilter.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -908,6 +928,26 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "TwoDeadWheelOdometry",
+            yml_file = "semiwrap/TwoDeadWheelOdometry.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry", "wpi__math__TwoDeadWheelOdometry.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TwoDeadWheelOdometry3d",
+            yml_file = "semiwrap/TwoDeadWheelOdometry3d.yml",
+            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::math::TwoDeadWheelOdometry3d", "wpi__math__TwoDeadWheelOdometry3d.hpp"),
+            ],
+        ),
+        struct(
             class_name = "SimulatedAnnealing",
             yml_file = "semiwrap/SimulatedAnnealing.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
@@ -1193,12 +1233,14 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrapezoidProfile.hpp",
             tmpl_class_names = [
-                ("TrapezoidProfile_tmpl1", "TrapezoidProfile"),
-                ("TrapezoidProfile_tmpl2", "TrapezoidProfileRadians"),
+                ("TrapezoidProfile_tmpl1", "TrapezoidProfileConstraints"),
+                ("TrapezoidProfile_tmpl2", "TrapezoidProfileRadiansConstraints"),
+                ("TrapezoidProfile_tmpl3", "TrapezoidProfile"),
+                ("TrapezoidProfile_tmpl4", "TrapezoidProfileRadians"),
             ],
             trampolines = [
                 ("wpi::math::TrapezoidProfile", "wpi__math__TrapezoidProfile.hpp"),
-                ("wpi::math::TrapezoidProfile::Constraints", "wpi__math__TrapezoidProfile__Constraints.hpp"),
+                ("wpi::math::detail::TrapezoidProfileConstraints", "wpi__math__detail__TrapezoidProfileConstraints.hpp"),
                 ("wpi::math::TrapezoidProfile::State", "wpi__math__TrapezoidProfile__State.hpp"),
                 ("wpi::math::TrapezoidProfile::ProfileTiming", "wpi__math__TrapezoidProfile__ProfileTiming.hpp"),
             ],
@@ -1315,7 +1357,7 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
     gen_libinit(
         name = "wpimath.gen_lib_init",
         output_file = "src/main/python/wpimath/_init__wpimath.py",
-        modules = ["native.wpimath._init_robotpy_native_wpimath", "wpiutil._init__wpiutil"],
+        modules = ["native.wpimath._init_robotpy_native_wpimath", "telemetry._init__telemetry", "tunables._init__tunables", "wpiutil._init__wpiutil"],
     )
 
     gen_pkgconf(
@@ -1343,6 +1385,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         trampoline_subpath = "src/main/python/wpimath",
         deps = header_to_dat_deps,
         local_native_libraries = [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -1358,12 +1402,18 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
         deps = [
             ":wpimath.tmpl_hdrs",
             ":wpimath.trampoline_hdrs",
+            "//telemetry:telemetry",
+            "//telemetry:telemetry_pybind_library",
+            "//tunables:tunables",
+            "//tunables:tunables_pybind_library",
             "//wpimath:wpimath",
             "//wpimath:wpimath-casters",
             "//wpiutil:wpiutil",
             "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
+            "//telemetry:shared/telemetry",
+            "//tunables:shared/tunables",
             "//wpimath:shared/wpimath",
             "//wpiutil:shared/wpiutil",
         ],
@@ -1436,6 +1486,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/wpimath/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(
@@ -1453,6 +1504,8 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         ],
         imports = ["src/main/python"],
         deps = [
+            "//telemetry:robotpy-telemetry",
+            "//tunables:robotpy-tunables",
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],
@@ -1460,7 +1513,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         summary = "Binary wrapper for WPILib Math library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
-        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-wpiutil==0.0.0"],
+        requires = ["robotpy-native-wpimath==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0"],
         python_requires = ">=3.11",
         entry_points = {
             "pkg_config": ["wpimath-casters = wpimath", "wpimath = wpimath"],
@@ -1472,6 +1525,8 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],

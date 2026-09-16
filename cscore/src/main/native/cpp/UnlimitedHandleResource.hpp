@@ -24,7 +24,7 @@ namespace wpi::cs {
 //
 // THandle needs to have the following attributes:
 //  Type : enum or typedef
-//  kIndexMax : static, constexpr, or enum value for the maximum index value
+//  INDEX_MAX : static, constexpr, or enum value for the maximum index value
 //  int GetTypedIndex() const : function that returns the index of the handle
 //  THandle(int index, HandleType[int] type) : constructor for index and type
 //
@@ -82,7 +82,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) {
+  if (i >= THandle::INDEX_MAX) {
     return 0;
   }
 
@@ -102,7 +102,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
       return MakeHandle(i);
     }
   }
-  if (i >= THandle::kIndexMax) {
+  if (i >= THandle::INDEX_MAX) {
     return 0;
   }
 

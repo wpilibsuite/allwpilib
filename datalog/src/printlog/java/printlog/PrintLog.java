@@ -55,7 +55,7 @@ public final class PrintLog {
                   + "', metadata='"
                   + data.metadata
                   + "') ["
-                  + (record.getTimestamp() / 1000000.0)
+                  + (record.getTimestamp() / 1_000_000_000.0)
                   + "]");
           if (entries.containsKey(data.entry)) {
             System.out.println("...DUPLICATE entry ID, overriding");
@@ -67,7 +67,8 @@ public final class PrintLog {
       } else if (record.isFinish()) {
         try {
           int entry = record.getFinishEntry();
-          System.out.println("Finish(" + entry + ") [" + (record.getTimestamp() / 1000000.0) + "]");
+          System.out.println(
+              "Finish(" + entry + ") [" + (record.getTimestamp() / 1_000_000_000.0) + "]");
           if (!entries.containsKey(entry)) {
             System.out.println("...ID not found");
           } else {
@@ -85,7 +86,7 @@ public final class PrintLog {
                   + ", '"
                   + data.metadata
                   + "') ["
-                  + (record.getTimestamp() / 1000000.0)
+                  + (record.getTimestamp() / 1_000_000_000.0)
                   + "]");
           if (!entries.containsKey(data.entry)) {
             System.out.println("...ID not found");
@@ -108,7 +109,7 @@ public final class PrintLog {
                 + "', type='"
                 + entry.type
                 + "'> ["
-                + (record.getTimestamp() / 1000000.0)
+                + (record.getTimestamp() / 1_000_000_000.0)
                 + "]");
 
         try {
@@ -118,9 +119,10 @@ public final class PrintLog {
             System.out.println(
                 "  "
                     + m_timeFormatter.format(
-                        LocalDateTime.ofEpochSecond(val / 1000000, 0, ZoneOffset.UTC))
+                        LocalDateTime.ofEpochSecond(
+                            val / 1_000_000, (int) ((val % 1_000_000) * 1000), ZoneOffset.UTC))
                     + "."
-                    + String.format("%06d", val % 1000000));
+                    + String.format("%06d", val % 1_000_000));
             continue;
           }
 

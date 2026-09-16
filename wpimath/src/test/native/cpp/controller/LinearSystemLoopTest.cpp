@@ -26,8 +26,8 @@
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
-inline constexpr wpi::units::second_t kDt = 5_ms;
-inline constexpr double kPositionStddev = 0.0001;
+inline constexpr wpi::units::second_t DT = 5_ms;
+inline constexpr double POSITION_STDDEV = 0.0001;
 
 namespace {
 std::default_random_engine generator;
@@ -42,13 +42,13 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 1> slicedPlant{plant.Slice(0)};
 
   wpi::math::KalmanFilter<2, 1, 1> observer{
-      slicedPlant, {0.05, 1.0}, {kPositionStddev}, kDt};
+      slicedPlant, {0.05, 1.0}, {POSITION_STDDEV}, DT};
 
   wpi::math::LinearQuadraticRegulator<2, 1> controller{
-      slicedPlant, {0.02, 0.4}, {12.0}, kDt};
+      slicedPlant, {0.02, 0.4}, {12.0}, DT};
 
   wpi::math::LinearSystemLoop<2, 1, 1> loop{slicedPlant, controller, observer,
-                                            12_V, kDt};
+                                            12_V, DT};
   loop.Reset({0, 0});
 
   wpi::math::Vectord<2> references{2.0, 0.0};
@@ -62,17 +62,17 @@ TEST_CASE("LinearSystemLoopTest StateSpaceEnabled", "[wpimath]") {
       wpi::units::meter_t{loop.Xhat(0)},
       wpi::units::meters_per_second_t{loop.Xhat(1)}};
   for (int i = 0; i < 1000; ++i) {
-    state = profile.Calculate(kDt, state,
+    state = profile.Calculate(DT, state,
                               {wpi::units::meter_t{references(0)},
                                wpi::units::meters_per_second_t{references(1)}});
     loop.SetNextR({state.position.value(), state.velocity.value()});
 
     wpi::math::Matrixd<1, 1> y{
         slicedPlant.CalculateY(loop.Xhat(), loop.U()) +
-        wpi::math::Vectord<1>{distribution(generator) * kPositionStddev}};
+        wpi::math::Vectord<1>{distribution(generator) * POSITION_STDDEV}};
 
     loop.Correct(y);
-    loop.Predict(kDt);
+    loop.Predict(DT);
 
     double u = loop.U(0);
 
@@ -90,12 +90,12 @@ TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
           wpi::math::DCMotor::NEO(2), 0.00289_kg_sq_m, 1.0)};
 
   wpi::math::KalmanFilter<1, 1, 1> observer{
-      plant, {1.0}, {kPositionStddev}, kDt};
+      plant, {1.0}, {POSITION_STDDEV}, DT};
 
   wpi::math::LinearQuadraticRegulator<1, 1> controller{
-      plant, {9.0}, {12.0}, kDt};
+      plant, {9.0}, {12.0}, DT};
 
-  wpi::math::LinearPlantInversionFeedforward feedforward{plant, kDt};
+  wpi::math::LinearPlantInversionFeedforward feedforward{plant, DT};
 
   wpi::math::LinearSystemLoop<1, 1, 1> loop{controller, feedforward, observer,
                                             12_V};
@@ -109,17 +109,17 @@ TEST_CASE("LinearSystemLoopTest FlywheelEnabled", "[wpimath]") {
     loop.SetNextR(references);
     wpi::math::Matrixd<1, 1> y{
         plant.CalculateY(loop.Xhat(), loop.U()) +
-        wpi::math::Vectord<1>{distribution(generator) * kPositionStddev}};
+        wpi::math::Vectord<1>{distribution(generator) * POSITION_STDDEV}};
 
     loop.Correct(y);
-    loop.Predict(kDt);
+    loop.Predict(DT);
 
     double u = loop.U(0);
 
     CHECK(u > -12.1);
     CHECK(u <= 12.1);
 
-    time += kDt;
+    time += DT;
   }
 
   CHECK_NEAR(0.0, loop.Error().value(), 0.1);
@@ -133,13 +133,13 @@ TEST_CASE("LinearSystemLoopTest AtReference", "[wpimath]") {
   wpi::math::LinearSystem<2, 1, 1> slicedPlant{plant.Slice(0)};
 
   wpi::math::KalmanFilter<2, 1, 1> observer{
-      slicedPlant, {0.05, 1.0}, {kPositionStddev}, kDt};
+      slicedPlant, {0.05, 1.0}, {POSITION_STDDEV}, DT};
 
   wpi::math::LinearQuadraticRegulator<2, 1> controller{
-      slicedPlant, {0.02, 0.4}, {12.0}, kDt};
+      slicedPlant, {0.02, 0.4}, {12.0}, DT};
 
   wpi::math::LinearSystemLoop<2, 1, 1> loop{slicedPlant, controller, observer,
-                                            12_V, kDt};
+                                            12_V, DT};
   loop.Reset({0, 0});
 
   // Default tolerance is zero and the error is zero, so the loop is at
@@ -152,15 +152,15 @@ TEST_CASE("LinearSystemLoopTest AtReference", "[wpimath]") {
   // AtReference() delegates to the controller, whose error is snapshotted
   // during Predict() as nextR - xHat.
   loop.SetXhat({0.05, 0.1});
-  loop.Predict(kDt);
+  loop.Predict(DT);
   CHECK(loop.AtReference());
 
   loop.SetXhat({0.2, 0.1});
-  loop.Predict(kDt);
+  loop.Predict(DT);
   CHECK_FALSE(loop.AtReference());
 
   // Error exactly at the tolerance boundary is considered at reference.
   loop.SetXhat({0.1, 0.2});
-  loop.Predict(kDt);
+  loop.Predict(DT);
   CHECK(loop.AtReference());
 }

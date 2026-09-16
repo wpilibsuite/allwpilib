@@ -176,7 +176,7 @@ enum NT_Type NT_GetEntryType(NT_Entry entry) {
   return wpi::nt::GetEntryType(entry);
 }
 
-uint64_t NT_GetEntryLastChange(NT_Entry entry) {
+int64_t NT_GetEntryLastChange(NT_Entry entry) {
   return wpi::nt::GetEntryLastChange(entry);
 }
 
@@ -853,7 +853,7 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value) {
   return value->type;
 }
 
-NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueBoolean(const struct NT_Value* value, int64_t* last_change,
                            NT_Bool* v_boolean) {
   if (!value || value->type != NT_Type::NT_BOOLEAN) {
     return 0;
@@ -863,7 +863,7 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
   return 1;
 }
 
-NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueInteger(const struct NT_Value* value, int64_t* last_change,
                            int64_t* v_int) {
   if (!value || value->type != NT_Type::NT_INTEGER) {
     return 0;
@@ -873,7 +873,7 @@ NT_Bool NT_GetValueInteger(const struct NT_Value* value, uint64_t* last_change,
   return 1;
 }
 
-NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueFloat(const struct NT_Value* value, int64_t* last_change,
                          float* v_float) {
   if (!value || value->type != NT_Type::NT_FLOAT) {
     return 0;
@@ -883,7 +883,7 @@ NT_Bool NT_GetValueFloat(const struct NT_Value* value, uint64_t* last_change,
   return 1;
 }
 
-NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
+NT_Bool NT_GetValueDouble(const struct NT_Value* value, int64_t* last_change,
                           double* v_double) {
   if (!value || value->type != NT_Type::NT_DOUBLE) {
     return 0;
@@ -893,7 +893,7 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
   return 1;
 }
 
-char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
+char* NT_GetValueString(const struct NT_Value* value, int64_t* last_change,
                         size_t* str_len) {
   if (!value || value->type != NT_Type::NT_STRING) {
     return nullptr;
@@ -906,7 +906,7 @@ char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
   return str;
 }
 
-uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
+uint8_t* NT_GetValueRaw(const struct NT_Value* value, int64_t* last_change,
                         size_t* raw_len) {
   if (!value || value->type != NT_Type::NT_RAW) {
     return nullptr;
@@ -920,7 +920,7 @@ uint8_t* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
 }
 
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size) {
+                                 int64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) {
     return nullptr;
   }
@@ -934,7 +934,7 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
 }
 
 int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
-                                 uint64_t* last_change, size_t* arr_size) {
+                                 int64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_INTEGER_ARRAY) {
     return nullptr;
   }
@@ -947,8 +947,8 @@ int64_t* NT_GetValueIntegerArray(const struct NT_Value* value,
   return arr;
 }
 
-float* NT_GetValueFloatArray(const struct NT_Value* value,
-                             uint64_t* last_change, size_t* arr_size) {
+float* NT_GetValueFloatArray(const struct NT_Value* value, int64_t* last_change,
+                             size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_FLOAT_ARRAY) {
     return nullptr;
   }
@@ -962,7 +962,7 @@ float* NT_GetValueFloatArray(const struct NT_Value* value,
 }
 
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
-                               uint64_t* last_change, size_t* arr_size) {
+                               int64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) {
     return nullptr;
   }
@@ -976,7 +976,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
 }
 
 struct WPI_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                          uint64_t* last_change,
+                                          int64_t* last_change,
                                           size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) {
     return nullptr;

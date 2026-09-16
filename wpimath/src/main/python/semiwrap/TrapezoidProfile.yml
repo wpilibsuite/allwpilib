@@ -1,3 +1,6 @@
+extra_includes:
+- format
+
 classes:
   wpi::math::TrapezoidProfile:
     force_type_casters:
@@ -48,12 +51,7 @@ classes:
       {
       std::string clsNameCopy = clsName;
 
-      cls_Constraints
-        .def("__repr__", [clsNameCopy](const Constraints &self) {
-          return clsNameCopy + ".Constraints("
-            "max_velocity=" + std::to_string(self.maxVelocity()) + ", "
-            "max_acceleration=" + std::to_string(self.maxAcceleration()) + ")";
-        });
+      cls_TrapezoidProfile.attr("Constraints") = py::type::of<Constraints>();
 
       cls_State
         .def(
@@ -62,26 +60,38 @@ classes:
           py::arg("velocity") = 0
         )
         .def("__repr__", [clsNameCopy](const State &self) {
-          return clsNameCopy + ".State("
-            "position=" + std::to_string(self.position()) + ", "
-            "velocity=" + std::to_string(self.velocity()) + ")";
+          return std::format("{}.State(position={}, velocity={})",
+            clsNameCopy,
+            self.position(),
+            self.velocity());
         });
       }
-  wpi::math::TrapezoidProfile::Constraints:
+  wpi::math::detail::TrapezoidProfileConstraints:
+    template_params:
+    - Distance
     attributes:
       maxVelocity:
       maxAcceleration:
     methods:
-      Constraints:
+      TrapezoidProfileConstraints:
         overloads:
           '':
-            ignore: true
           Velocity_t, Acceleration_t:
             param_override:
               maxVelocity:
                 default: '0'
               maxAcceleration:
                 default: '0'
+    template_inline_code: |
+      std::string clsNameCopy = clsName;
+
+      cls_TrapezoidProfileConstraints
+        .def("__repr__", [clsNameCopy](const wpi::math::detail::TrapezoidProfileConstraints<Distance>& self) {
+          return std::format("{}(max_velocity={}, max_acceleration={})",
+            clsNameCopy,
+            self.maxVelocity(),
+            self.maxAcceleration());
+        });
   wpi::math::TrapezoidProfile::State:
     force_no_default_constructor: true
     attributes:
@@ -97,7 +107,18 @@ classes:
       t_3:
     methods:
       operator==:
+
 templates:
+  TrapezoidProfileConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::dimensionless::scalar
+
+  TrapezoidProfileRadiansConstraints:
+    qualname: wpi::math::detail::TrapezoidProfileConstraints
+    params:
+    - wpi::units::radian
+
   TrapezoidProfile:
     qualname: wpi::math::TrapezoidProfile
     params:

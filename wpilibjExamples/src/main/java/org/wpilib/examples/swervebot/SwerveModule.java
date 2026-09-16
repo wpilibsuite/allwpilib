@@ -15,11 +15,11 @@ import org.wpilib.math.kinematics.SwerveModuleVelocity;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 
 public class SwerveModule {
-  private static final double kWheelRadius = 0.0508;
-  private static final int kEncoderResolution = 4096;
+  private static final double WHEEL_RADIUS = 0.0508;
+  private static final int ENCODER_RESOLUTION = 4096;
 
-  private static final double kModuleMaxAngularVelocity = Drivetrain.kMaxAngularVelocity;
-  private static final double kModuleMaxAngularAcceleration =
+  private static final double MODULE_MAX_ANGULAR_VELOCITY = Drivetrain.MAX_ANGULAR_VELOCITY;
+  private static final double MODULE_MAX_ANGULAR_ACCELERATION =
       2 * Math.PI; // radians per second squared
 
   private final PWMSparkMax driveMotor;
@@ -38,7 +38,7 @@ public class SwerveModule {
           0,
           0,
           new TrapezoidProfile.Constraints(
-              kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration));
+              MODULE_MAX_ANGULAR_VELOCITY, MODULE_MAX_ANGULAR_ACCELERATION));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(1, 3);
@@ -70,12 +70,12 @@ public class SwerveModule {
     // Set the distance per pulse for the drive encoder. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    driveEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    driveEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
 
     // Set the distance (in this case, angle) in radians per pulse for the turning encoder.
     // This is the the angle through an entire rotation (2 * pi) divided by the
     // encoder resolution.
-    turningEncoder.setDistancePerPulse(2 * Math.PI / kEncoderResolution);
+    turningEncoder.setDistancePerPulse(2 * Math.PI / ENCODER_RESOLUTION);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.

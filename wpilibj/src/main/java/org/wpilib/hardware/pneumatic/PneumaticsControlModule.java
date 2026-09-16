@@ -6,24 +6,24 @@ package org.wpilib.hardware.pneumatic;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.CTREPCMJNI;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.PortsJNI;
 import org.wpilib.system.SensorUtil;
+import org.wpilib.util.UsageReporting;
 
 /** Module class for controlling a Cross The Road Electronics Pneumatics Control Module. */
 public class PneumaticsControlModule implements PneumaticsBase {
   private static class DataStore implements AutoCloseable {
     private final int m_module;
     private final int m_handle;
-    private final CANBus m_busId;
+    private final CANPort m_busId;
     private int m_refCount;
     private int m_reservedMask;
     private boolean m_compressorReserved;
     private final Object m_reserveLock = new Object();
 
-    DataStore(CANBus busId, int module) {
+    DataStore(CANPort busId, int module) {
       m_handle = CTREPCMJNI.initialize(busId.value, module);
       m_module = module;
       m_busId = busId;
@@ -54,7 +54,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   private static final Object m_handleLock = new Object();
 
-  private static DataStore getForModule(CANBus busId, int module) {
+  private static DataStore getForModule(CANPort busId, int module) {
     synchronized (m_handleLock) {
       Map<Integer, DataStore> handleMap = m_handleMaps[busId.value];
       if (handleMap == null) {
@@ -85,7 +85,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
    *
    * @param busId The bus ID
    */
-  public PneumaticsControlModule(CANBus busId) {
+  public PneumaticsControlModule(CANPort busId) {
     this(busId, SensorUtil.getDefaultCTREPCMModule());
   }
 
@@ -95,7 +95,7 @@ public class PneumaticsControlModule implements PneumaticsBase {
    * @param busId The bus ID
    * @param module module number to construct
    */
-  public PneumaticsControlModule(CANBus busId, int module) {
+  public PneumaticsControlModule(CANPort busId, int module) {
     m_dataStore = getForModule(busId, module);
     m_handle = m_dataStore.m_handle;
   }
@@ -372,6 +372,11 @@ public class PneumaticsControlModule implements PneumaticsBase {
 
   @Override
   public void reportUsage(String device, String data) {
-    HAL.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
+    UsageReporting.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, data);
+  }
+
+  @Override
+  public void reportUsage(String device, int instanceNumber, String data) {
+    UsageReporting.reportUsage("PCM[" + m_dataStore.m_module + "]/" + device, instanceNumber, data);
   }
 }

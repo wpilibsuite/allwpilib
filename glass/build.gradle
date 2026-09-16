@@ -111,6 +111,8 @@ model {
                 lib project: ':fields', library: 'fieldimages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -142,6 +144,8 @@ model {
                 lib project: ':fields', library: 'fieldimages', linkage: 'shared'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -183,6 +187,8 @@ model {
                 nativeUtils.useRequiredLibrary(it, 'opencv_static')
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 project.addLibSdlGpuDependency(it)
                 if (it.targetPlatform.operatingSystem.isWindows()) {
                     it.linker.args << '/DELAYLOAD:MF.dll' << '/DELAYLOAD:MFReadWrite.dll' << '/DELAYLOAD:MFPlat.dll' << '/delay:nobind'
@@ -224,6 +230,8 @@ model {
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
             project.addLibSdlGpuDependency(it)
             if (it.targetPlatform.operatingSystem.isWindows()) {
                 it.cppCompiler.args.add("/I${mrccommIncludeDir}".toString())

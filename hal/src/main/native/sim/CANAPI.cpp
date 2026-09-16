@@ -69,7 +69,7 @@ HAL_CANHandle HAL_InitializeCAN(int32_t busId, HAL_CANManufacturer manufacturer,
                                 int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (busId < 0 || busId > wpi::hal::kNumCanBuses) {
+  if (busId < 0 || busId > wpi::hal::NUM_CAN_BUSES) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return HAL_INVALID_HANDLE;
   }
@@ -242,9 +242,9 @@ void HAL_ReadCANPacketTimeout(HAL_CANHandle handle, int32_t apiId,
     auto i = can->receives.find(messageId);
     if (i != can->receives.end()) {
       // Found, check if new enough
-      uint64_t now = wpi::util::Now();
+      int64_t now = wpi::util::Now();
       if (now - i->second.timeStamp >
-          (static_cast<uint64_t>(timeoutMs) * 1000)) {
+          (static_cast<int64_t>(timeoutMs) * 1'000'000)) {
         // Timeout, return bad status
         *status = HAL_CAN_TIMEOUT;
         return;

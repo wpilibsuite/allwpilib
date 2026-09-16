@@ -74,7 +74,7 @@ public final class Rotation3d
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation3d kZero = new Rotation3d();
+  public static final Rotation3d ZERO = new Rotation3d();
 
   @Json.Property("quaternion")
   private final Quaternion m_q;
@@ -382,7 +382,7 @@ public final class Rotation3d
    * @return The new scaled Rotation3d.
    */
   public Rotation3d times(double scalar) {
-    return Rotation3d.kZero.interpolate(this, scalar);
+    return Rotation3d.ZERO.interpolate(this, scalar);
   }
 
   /**

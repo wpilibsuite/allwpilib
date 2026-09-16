@@ -150,7 +150,7 @@ class MockWireConnection : public WireConnection {
     return defaultFlushReturn;
   }
 
-  uint64_t GetLastFlushTime() const override { return lastFlushTime; }
+  int64_t GetLastFlushTime() const override { return lastFlushTime; }
 
   uint64_t GetLastReceivedTime() const override {
     ++lastReceivedTimeCalls;
@@ -180,7 +180,7 @@ class MockWireConnection : public WireConnection {
   int defaultWriteBinaryReturn = 0;
   std::deque<int> flushReturns;
   int defaultFlushReturn = 0;
-  uint64_t lastFlushTime = 0;
+  int64_t lastFlushTime = 0;
   mutable std::deque<uint64_t> lastReceivedTimeReturns;
   uint64_t defaultLastReceivedTime = 0;
   std::function<int(std::string_view)> onWriteText;

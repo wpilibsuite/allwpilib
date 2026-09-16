@@ -4,6 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+import telemetry
 import wpilib
 import wpilib_drivers
 import wpilib.simulation
@@ -61,10 +62,6 @@ class Elevator:
 
         self.encoder.set_distance_per_pulse(constants.ELEVATOR_ENCODER_DIST_PER_PULSE)
 
-        # Publish Mechanism2d to SmartDashboard
-        # To view the Elevator visualization, select Network Tables -> SmartDashboard -> Elevator Sim
-        wpilib.SmartDashboard.put_data("Elevator Sim", self.mech2d)
-
     def simulation_periodic(self) -> None:
         # In this method, we update our simulation of what our elevator is doing
         # First, we set our "inputs" (voltages)
@@ -108,3 +105,7 @@ class Elevator:
         """Update telemetry, including the mechanism visualization."""
         # Update elevator visualization with position
         self.elevator_mech2d.set_length(self.encoder.get_distance())
+
+        # Publish the Mechanism2d visualization through telemetry.
+        # To view the Elevator visualization, select Network Tables -> Telemetry -> Elevator Sim
+        telemetry.log("Elevator Sim", self.mech2d)

@@ -8,29 +8,29 @@
 
 namespace wpi::hal {
 
-constexpr int32_t kNumCanBuses = 25;
-constexpr int32_t kNumSmartIo = 6;
-constexpr int32_t kNumI2cBuses = 2;
-constexpr int32_t kNumAccumulators = 0;
-constexpr int32_t kNumAnalogInputs = kNumSmartIo;
-constexpr int32_t kNumAnalogOutputs = 0;
-constexpr int32_t kNumCounters = 0;
-constexpr int32_t kNumDigitalSPIPortChannels = 0;
-constexpr int32_t kNumDigitalChannels = kNumSmartIo;
-constexpr int32_t kNumPWMChannels = kNumSmartIo;
-constexpr int32_t kNumDigitalPWMOutputs = 0;
-constexpr int32_t kNumEncoders = kNumSmartIo / 2;
-constexpr int32_t kNumInterrupts = 0;
-constexpr int32_t kNumRelayChannels = 0;
-constexpr int32_t kNumCTREPCMModules = 63;
-constexpr int32_t kNumCTRESolenoidChannels = 8;
-constexpr int32_t kNumCTREPDPModules = 63;
-constexpr int32_t kNumCTREPDPChannels = 16;
-constexpr int32_t kNumREVPDHModules = 63;
-constexpr int32_t kNumREVPDHChannels = 24;
-constexpr int32_t kNumDutyCycles = 0;
-constexpr int32_t kNumAddressableLEDs = 6;
-constexpr int32_t kNumREVPHModules = 63;
-constexpr int32_t kNumREVPHChannels = 16;
+constexpr int32_t NUM_CAN_BUSES = 25;
+constexpr int32_t NUM_SMART_IO = 6;
+constexpr int32_t NUM_I2C_BUSES = 2;
+constexpr int32_t NUM_ACCUMULATORS = 0;
+constexpr int32_t NUM_ANALOG_INPUTS = NUM_SMART_IO;
+constexpr int32_t NUM_ANALOG_OUTPUTS = 0;
+constexpr int32_t NUM_COUNTERS = 0;
+constexpr int32_t NUM_DIGITAL_SPI_PORT_CHANNELS = 0;
+constexpr int32_t NUM_DIGITAL_CHANNELS = NUM_SMART_IO;
+constexpr int32_t NUM_PWM_CHANNELS = NUM_SMART_IO;
+constexpr int32_t NUM_DIGITAL_PWM_OUTPUTS = 0;
+constexpr int32_t NUM_ENCODERS = NUM_SMART_IO / 2;
+constexpr int32_t NUM_INTERRUPTS = 0;
+constexpr int32_t NUM_RELAY_CHANNELS = 0;
+constexpr int32_t NUM_CTREPCM_MODULES = 63;
+constexpr int32_t NUM_CTRE_SOLENOID_CHANNELS = 8;
+constexpr int32_t NUM_CTREPDP_MODULES = 63;
+constexpr int32_t NUM_CTREPDP_CHANNELS = 16;
+constexpr int32_t NUM_REVPDH_MODULES = 63;
+constexpr int32_t NUM_REVPDH_CHANNELS = 24;
+constexpr int32_t NUM_DUTY_CYCLES = 0;
+constexpr int32_t NUM_ADDRESSABLE_LE_DS = 6;
+constexpr int32_t NUM_REVPH_MODULES = 63;
+constexpr int32_t NUM_REVPH_CHANNELS = 16;
 
 }  // namespace wpi::hal

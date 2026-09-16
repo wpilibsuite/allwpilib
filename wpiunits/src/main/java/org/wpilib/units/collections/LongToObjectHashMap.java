@@ -16,24 +16,24 @@ import java.util.List;
  * @param <V> the type of the values stored in the map
  */
 public class LongToObjectHashMap<V> {
-  private static final int kInitialSize = 0;
-  private static final int kInitialCapacity = 8; // NOTE: must be a power of two
+  private static final int INITIAL_SIZE = 0;
+  private static final int INITIAL_CAPACITY = 8; // NOTE: must be a power of two
 
   /**
    * The default load factor of the hashmap. If the ratio of the number of entries to the map's
    * capacity exceeds this value, the map will be resized (doubled capacity) in order for more
    * values to be easily inserted.
    */
-  private static final double kLoadFactor = 75.00 / 100;
+  private static final double LOAD_FACTOR = 75.00 / 100;
 
   /** The current number of key-value pairs in the map. */
-  private int m_size = kInitialSize;
+  private int m_size = INITIAL_SIZE;
 
   /**
    * The current maximum capacity of the map. Note that it will be resized before m_size reaches
    * this value.
    */
-  private int m_capacity = kInitialCapacity;
+  private int m_capacity = INITIAL_CAPACITY;
 
   /**
    * The keys in the map. This is a sparse array, and the location of a key may not be equal to the
@@ -257,7 +257,7 @@ public class LongToObjectHashMap<V> {
   private void grow() {
     final int currentSize = m_size;
     final int oldCapacity = m_capacity;
-    if (oldCapacity * kLoadFactor >= currentSize) {
+    if (oldCapacity * LOAD_FACTOR >= currentSize) {
       // We're below the maximum allowed size for the current capacity
       // Nothing to do
       return;
@@ -300,7 +300,7 @@ public class LongToObjectHashMap<V> {
   }
 
   private int maxSize() {
-    return (int) (m_capacity * kLoadFactor);
+    return (int) (m_capacity * LOAD_FACTOR);
   }
 
   /**

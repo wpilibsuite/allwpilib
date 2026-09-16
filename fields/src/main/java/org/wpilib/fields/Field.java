@@ -99,7 +99,7 @@ public final class Field {
   /** JSON resource path for this field, or null if this field was loaded from a file. */
   @Json.Ignore public String resourceFile;
 
-  @Json.Ignore private Pose3d m_origin = Pose3d.kZero;
+  @Json.Ignore private Pose3d m_origin = Pose3d.ZERO;
   @Json.Ignore private String m_json;
   @Json.Ignore private Supplier<String> m_jsonSupplier;
 
@@ -349,7 +349,7 @@ public final class Field {
   public void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
-          case BLUE_ALLIANCE_WALL_RIGHT_SIDE -> Pose3d.kZero;
+          case BLUE_ALLIANCE_WALL_RIGHT_SIDE -> Pose3d.ZERO;
           case RED_ALLIANCE_WALL_RIGHT_SIDE ->
               new Pose3d(new Translation3d(length, width, 0), new Rotation3d(0, 0, Math.PI));
         };

@@ -13,7 +13,7 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<DifferentialSample>;
-const DifferentialSample kExpectedData{
+const DifferentialSample EXPECTED_DATA{
     1.23_s,
     Pose2d{1.1_m, 2.2_m, Rotation2d{33.3_deg}},
     ChassisVelocities{3.3_mps, 4.4_mps, 5.5_rad_per_s},
@@ -25,24 +25,24 @@ const DifferentialSample kExpectedData{
 TEST_CASE("DifferentialSampleStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialSample unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.time.value() == unpacked_data.time.value());
-  CHECK(kExpectedData.pose == unpacked_data.pose);
-  CHECK(kExpectedData.velocity.vx.value() == unpacked_data.velocity.vx.value());
-  CHECK(kExpectedData.velocity.vy.value() == unpacked_data.velocity.vy.value());
-  CHECK(kExpectedData.velocity.omega.value() ==
+  CHECK(EXPECTED_DATA.time.value() == unpacked_data.time.value());
+  CHECK(EXPECTED_DATA.pose == unpacked_data.pose);
+  CHECK(EXPECTED_DATA.velocity.vx.value() == unpacked_data.velocity.vx.value());
+  CHECK(EXPECTED_DATA.velocity.vy.value() == unpacked_data.velocity.vy.value());
+  CHECK(EXPECTED_DATA.velocity.omega.value() ==
         unpacked_data.velocity.omega.value());
-  CHECK(kExpectedData.acceleration.ax.value() ==
+  CHECK(EXPECTED_DATA.acceleration.ax.value() ==
         unpacked_data.acceleration.ax.value());
-  CHECK(kExpectedData.acceleration.ay.value() ==
+  CHECK(EXPECTED_DATA.acceleration.ay.value() ==
         unpacked_data.acceleration.ay.value());
-  CHECK(kExpectedData.acceleration.alpha.value() ==
+  CHECK(EXPECTED_DATA.acceleration.alpha.value() ==
         unpacked_data.acceleration.alpha.value());
-  CHECK(kExpectedData.leftVelocity.value() ==
+  CHECK(EXPECTED_DATA.leftVelocity.value() ==
         unpacked_data.leftVelocity.value());
-  CHECK(kExpectedData.rightVelocity.value() ==
+  CHECK(EXPECTED_DATA.rightVelocity.value() ==
         unpacked_data.rightVelocity.value());
 }

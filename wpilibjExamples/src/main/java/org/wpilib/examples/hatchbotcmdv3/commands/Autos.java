@@ -14,7 +14,7 @@ public final class Autos {
   /** A simple auto routine that drives forward a specified distance and then stops. */
   public static Command simpleAuto(DriveMechanism drive) {
     return drive.driveDistance(
-        AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed);
+        AutoConstants.AUTO_DRIVE_DISTANCE_INCHES, AutoConstants.AUTO_DRIVE_SPEED);
   }
 
   /** A complex auto routine that drives forward, drops a hatch, and then drives backward. */
@@ -27,7 +27,7 @@ public final class Autos {
               // Drive forward up to the front of the cargo ship
               coro.await(
                   driveMechanism.driveDistance(
-                      AutoConstants.kAutoDriveDistanceInches, AutoConstants.kAutoDriveSpeed));
+                      AutoConstants.AUTO_DRIVE_DISTANCE_INCHES, AutoConstants.AUTO_DRIVE_SPEED));
 
               // Release the hatch
               coro.await(hatchMechanism.releaseHatchCommand());
@@ -35,7 +35,7 @@ public final class Autos {
               // Drive backward the specified distance
               coro.await(
                   driveMechanism.driveDistance(
-                      AutoConstants.kAutoBackupDistanceInches, AutoConstants.kAutoDriveSpeed));
+                      AutoConstants.AUTO_BACKUP_DISTANCE_INCHES, AutoConstants.AUTO_DRIVE_SPEED));
             })
         .named("Complex Auto");
   }

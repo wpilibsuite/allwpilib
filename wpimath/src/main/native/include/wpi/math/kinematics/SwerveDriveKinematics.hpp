@@ -32,6 +32,7 @@
 #include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -99,7 +100,7 @@ class SwerveDriveKinematics
     m_secondOrderForwardKinematics =
         m_secondOrderInverseKinematics.householderQr();
 
-    wpi::math::MathSharedStore::ReportUsage("SwerveDriveKinematics", "");
+    wpi::util::ReportUsage("SwerveDriveKinematics", "");
   }
 
   explicit SwerveDriveKinematics(
@@ -122,7 +123,7 @@ class SwerveDriveKinematics
     m_secondOrderForwardKinematics =
         m_secondOrderInverseKinematics.householderQr();
 
-    wpi::math::MathSharedStore::ReportUsage("Kinematics_SwerveDrive", "");
+    wpi::util::ReportUsage("Kinematics_SwerveDrive", "");
   }
 
   SwerveDriveKinematics(const SwerveDriveKinematics&) = default;

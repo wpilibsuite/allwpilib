@@ -383,7 +383,7 @@ class Subscriber {
    * Note: this is not atomic with Get(); use GetAtomic() to get
    * both the value and last change as an atomic operation.
    *
-   * @return Topic last change time
+   * @return Topic last change time, in nanoseconds
    */
   int64_t GetLastChange() const {
     return ::wpi::nt::GetEntryLastChange(m_subHandle);

@@ -11,7 +11,6 @@
 #include <thread>
 
 #include "wpi/framework/RobotBase.hpp"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubCRServo.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubMotor.hpp"
 #include "wpi/hardware/expansionhub/ExpansionHubServo.hpp"
@@ -19,6 +18,7 @@
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/SystemServer.hpp"
 #include "wpi/system/Timer.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -138,8 +138,15 @@ void ExpansionHub::UnreserveMotor(int channel) {
 }
 
 void ExpansionHub::ReportUsage(std::string_view device, std::string_view data) {
-  HAL_ReportUsage(
+  wpi::util::ReportUsage(
       std::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device), data);
+}
+
+void ExpansionHub::ReportUsage(std::string_view device, int instanceNumber,
+                               std::string_view data) {
+  wpi::util::ReportUsage(
+      std::format("ExpansionHub[{}]/{}", m_dataStore->m_usbId, device),
+      instanceNumber, data);
 }
 
 std::string ExpansionHub::DataStore::getFollowerStringCycle(

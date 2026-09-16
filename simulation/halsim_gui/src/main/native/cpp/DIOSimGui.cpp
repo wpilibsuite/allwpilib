@@ -94,8 +94,6 @@ class DIOSimModel : public wpi::glass::DIOModel {
 
   bool IsReadOnly() override { return !IsInput(); }
 
-  const char* GetName() const override { return ""; }
-
   const char* GetSimDevice() const override {
     if (auto simDevice = HALSIM_GetDIOSimDevice(m_channel)) {
       return HALSIM_GetSimDeviceName(simDevice);

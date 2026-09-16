@@ -125,7 +125,7 @@ class WPILIB_DLLEXPORT DrivetrainSplineTrajectoryGenerator {
  private:
   static void ReportError(const char* error);
 
-  static const DrivetrainSplineTrajectory kDoNothingTrajectory;
+  static const DrivetrainSplineTrajectory DO_NOTHING_TRAJECTORY;
   static std::function<void(const char*)> s_errorFunc;
 };
 }  // namespace wpi::math

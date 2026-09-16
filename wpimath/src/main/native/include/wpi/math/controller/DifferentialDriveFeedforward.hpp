@@ -29,48 +29,48 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per
    * second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per
+   * @param kvAngular The angular velocity gain in volts per (radians per
    * second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per
+   * @param kaAngular The angular acceleration gain in volts per (radians per
    * second squared).
    * @param trackwidth The distance between the differential drive's left and
    * right wheels, in meters.
    */
   constexpr DifferentialDriveFeedforward(
-      decltype(1_V / 1_mps) kVLinear, decltype(1_V / 1_mps_sq) kALinear,
-      decltype(1_V / 1_rad_per_s) kVAngular,
-      decltype(1_V / 1_rad_per_s_sq) kAAngular, wpi::units::meter_t trackwidth)
+      decltype(1_V / 1_mps) kvLinear, decltype(1_V / 1_mps_sq) kaLinear,
+      decltype(1_V / 1_rad_per_s) kvAngular,
+      decltype(1_V / 1_rad_per_s_sq) kaAngular, wpi::units::meter_t trackwidth)
       // See Models::DifferentialDriveFromSysId(decltype(1_V / 1_mps),
       // decltype(1_V / 1_mps_sq), decltype(1_V / 1_rad_per_s), decltype(1_V /
       // 1_rad_per_s_sq))
-      : DifferentialDriveFeedforward{kVLinear, kALinear,
-                                     kVAngular * 2.0 / trackwidth * 1_rad,
-                                     kAAngular * 2.0 / trackwidth * 1_rad} {}
+      : DifferentialDriveFeedforward{kvLinear, kaLinear,
+                                     kvAngular * 2.0 / trackwidth * 1_rad,
+                                     kaAngular * 2.0 / trackwidth * 1_rad} {}
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per
    * second squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per
+   * @param kvAngular The angular velocity gain in volts per (meters per
    * second).
-   * @param kAAngular The angular acceleration gain in volts per (meters per
+   * @param kaAngular The angular acceleration gain in volts per (meters per
    * second squared).
    */
-  constexpr DifferentialDriveFeedforward(decltype(1_V / 1_mps) kVLinear,
-                                         decltype(1_V / 1_mps_sq) kALinear,
-                                         decltype(1_V / 1_mps) kVAngular,
-                                         decltype(1_V / 1_mps_sq) kAAngular)
+  constexpr DifferentialDriveFeedforward(decltype(1_V / 1_mps) kvLinear,
+                                         decltype(1_V / 1_mps_sq) kaLinear,
+                                         decltype(1_V / 1_mps) kvAngular,
+                                         decltype(1_V / 1_mps_sq) kaAngular)
       : m_plant{wpi::math::Models::DifferentialDriveFromSysId(
-            kVLinear, kALinear, kVAngular, kAAngular)},
-        kVLinear{kVLinear},
-        kALinear{kALinear},
-        kVAngular{kVAngular},
-        kAAngular{kAAngular} {}
+            kvLinear, kaLinear, kvAngular, kaAngular)},
+        kvLinear{kvLinear},
+        kaLinear{kaLinear},
+        kvAngular{kvAngular},
+        kaAngular{kaAngular} {}
 
   /**
    * Calculates the differential drive feedforward inputs given velocity
@@ -93,10 +93,10 @@ class WPILIB_DLLEXPORT DifferentialDriveFeedforward {
       wpi::units::meters_per_second_t nextRightVelocity,
       wpi::units::second_t dt);
 
-  decltype(1_V / 1_mps) kVLinear;
-  decltype(1_V / 1_mps_sq) kALinear;
-  decltype(1_V / 1_mps) kVAngular;
-  decltype(1_V / 1_mps_sq) kAAngular;
+  decltype(1_V / 1_mps) kvLinear;
+  decltype(1_V / 1_mps_sq) kaLinear;
+  decltype(1_V / 1_mps) kvAngular;
+  decltype(1_V / 1_mps_sq) kaAngular;
 };
 }  // namespace wpi::math
 

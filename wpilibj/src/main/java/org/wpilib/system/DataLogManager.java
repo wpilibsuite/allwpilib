@@ -26,8 +26,8 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.Event;
 
@@ -251,7 +251,7 @@ public final class DataLogManager {
           if (!new File("/u/logs").mkdir()) {
             // ignored
           }
-          HAL.reportUsage("DataLogManager", "USB");
+          UsageReporting.reportUsage("DataLogManager", "USB");
           return "/u/logs";
         }
       } catch (IOException ex) {
@@ -260,7 +260,7 @@ public final class DataLogManager {
       if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
       }
-      HAL.reportUsage("DataLogManager", "Onboard");
+      UsageReporting.reportUsage("DataLogManager", "Onboard");
       return "/home/systemcore/logs";
     }
     String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
@@ -450,7 +450,7 @@ public final class DataLogManager {
       if (sysTimeCount >= 250) {
         sysTimeCount = 0;
         if (RobotController.isSystemTimeValid()) {
-          sysTimeEntry.append(WPIUtilJNI.getSystemTime(), WPIUtilJNI.now());
+          sysTimeEntry.append(WPIUtilJNI.getSystemTime() / 1000L, WPIUtilJNI.now());
         }
       }
     }

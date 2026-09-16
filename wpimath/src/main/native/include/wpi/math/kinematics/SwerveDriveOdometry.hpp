@@ -15,6 +15,7 @@
 #include "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -50,7 +51,7 @@ class SwerveDriveOdometry
       const Pose2d& initialPose = Pose2d{})
       : SwerveDriveOdometry::Odometry(kinematics, gyroAngle, modulePositions,
                                       initialPose) {
-    wpi::math::MathSharedStore::ReportUsage("SwerveDriveOdometry", "");
+    wpi::util::ReportUsage("SwerveDriveOdometry", "");
   }
 };
 

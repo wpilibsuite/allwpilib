@@ -10,8 +10,8 @@
 
 namespace wpi::hal::detail {
 
-constexpr size_t kPixelSize = 3;
-static_assert(sizeof(HAL_AddressableLEDData) == kPixelSize);
+constexpr size_t PIXEL_SIZE = 3;
+static_assert(sizeof(HAL_AddressableLEDData) == PIXEL_SIZE);
 static_assert(offsetof(HAL_AddressableLEDData, r) == 0);
 static_assert(offsetof(HAL_AddressableLEDData, g) == 1);
 static_assert(offsetof(HAL_AddressableLEDData, b) == 2);
@@ -153,8 +153,8 @@ void Convert8Pixels(const uint8_t* src, uint8_t* dst) {
  */
 inline void Convert1Pixel(HAL_AddressableLEDColorOrder order,
                           const uint8_t* src, uint8_t* dst) {
-  uint8_t tmp[kPixelSize];
-  std::memcpy(tmp, src, kPixelSize);  // Load 3 bytes
+  uint8_t tmp[PIXEL_SIZE];
+  std::memcpy(tmp, src, PIXEL_SIZE);  // Load 3 bytes
   // convert based on order
   switch (order) {
     case HAL_ALED_RGB:
@@ -176,7 +176,7 @@ inline void Convert1Pixel(HAL_AddressableLEDColorOrder order,
       ToGRB(tmp);
       break;
   }
-  std::memcpy(dst, tmp, kPixelSize);  // Store 3 bytes
+  std::memcpy(dst, tmp, PIXEL_SIZE);  // Store 3 bytes
 }
 
 /**
@@ -191,9 +191,9 @@ template <HAL_AddressableLEDColorOrder order>
 void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t len) {
   if (len >= 16) {
     // Stride of 1 16-pixel conversion operation. (3 NEON Q registers)
-    constexpr size_t stride = A * kPixelSize;
+    constexpr size_t stride = A * PIXEL_SIZE;
     // size of whole copy in bytes
-    const size_t size = len * kPixelSize;
+    const size_t size = len * PIXEL_SIZE;
     // number of bytes we can copy with whole 16-pixel strides
     const size_t aligned = Simd::AlignLo(size, stride);
     for (size_t i = 0; i < aligned; i += stride) {
@@ -209,14 +209,14 @@ void ConvertPixels(const uint8_t* src, uint8_t* dst, size_t len) {
     // If len between 8 and 16, we can do 1 or 2 8-pixel copies
     Convert8Pixels<order>(src, dst);
     if (len > 8) {
-      const size_t recopyOffset = (len - HA) * kPixelSize;
+      const size_t recopyOffset = (len - HA) * PIXEL_SIZE;
       Convert8Pixels<order>(
           src + recopyOffset,
           dst + recopyOffset);  // copy last 8 pixels, possibly recopying
     }
   } else {
     // Just copy pixel-by-pixel for <8
-    for (size_t i = 0; i < len; i += kPixelSize) {
+    for (size_t i = 0; i < len; i += PIXEL_SIZE) {
       Convert1Pixel(order, src + i, dst + i);
     }
   }

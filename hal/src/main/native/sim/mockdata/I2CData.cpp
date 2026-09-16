@@ -9,7 +9,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeI2CData() {
-  static I2CData sid[kI2CPorts];
+  static I2CData sid[I2C_PORTS];
   ::wpi::hal::SimI2CData = sid;
 }
 }  // namespace wpi::hal::init

@@ -6,7 +6,7 @@ gson = "2.13.1"
 libsdlgpu = "3.4.12-6"
 libssh = "2027-0.120-1"
 jmh = "1.37"
-mrclib = "2027.1.0-alpha-1-112-g3f8f56e"
+mrclib = "2027.1.0-alpha-1-116-g5288562"
 opencv = "2027-4.13.0-3"
 quickbuf = "1.4"
 

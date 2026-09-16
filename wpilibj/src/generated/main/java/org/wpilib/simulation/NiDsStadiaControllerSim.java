@@ -42,7 +42,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftX(double value) {
-    setRawAxis(NiDsStadiaController.Axis.kLeftX.value, value);
+    setRawAxis(NiDsStadiaController.Axis.LEFT_X.value, value);
   }
 
   /**
@@ -51,7 +51,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightX(double value) {
-    setRawAxis(NiDsStadiaController.Axis.kRightX.value, value);
+    setRawAxis(NiDsStadiaController.Axis.RIGHT_X.value, value);
   }
 
   /**
@@ -60,7 +60,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftY(double value) {
-    setRawAxis(NiDsStadiaController.Axis.kLeftY.value, value);
+    setRawAxis(NiDsStadiaController.Axis.LEFT_Y.value, value);
   }
 
   /**
@@ -69,7 +69,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightY(double value) {
-    setRawAxis(NiDsStadiaController.Axis.kRightY.value, value);
+    setRawAxis(NiDsStadiaController.Axis.RIGHT_Y.value, value);
   }
 
   /**
@@ -78,7 +78,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setAButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kA.value, value);
+    setRawButton(NiDsStadiaController.Button.A.value, value);
   }
 
   /**
@@ -87,7 +87,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setBButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kB.value, value);
+    setRawButton(NiDsStadiaController.Button.B.value, value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setXButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kX.value, value);
+    setRawButton(NiDsStadiaController.Button.X.value, value);
   }
 
   /**
@@ -105,7 +105,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setYButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kY.value, value);
+    setRawButton(NiDsStadiaController.Button.Y.value, value);
   }
 
   /**
@@ -114,7 +114,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftBumperButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kLeftBumper.value, value);
+    setRawButton(NiDsStadiaController.Button.LEFT_BUMPER.value, value);
   }
 
   /**
@@ -123,7 +123,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightBumperButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kRightBumper.value, value);
+    setRawButton(NiDsStadiaController.Button.RIGHT_BUMPER.value, value);
   }
 
   /**
@@ -132,7 +132,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftStickButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kLeftStick.value, value);
+    setRawButton(NiDsStadiaController.Button.LEFT_STICK.value, value);
   }
 
   /**
@@ -141,7 +141,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightStickButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kRightStick.value, value);
+    setRawButton(NiDsStadiaController.Button.RIGHT_STICK.value, value);
   }
 
   /**
@@ -150,7 +150,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setEllipsesButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kEllipses.value, value);
+    setRawButton(NiDsStadiaController.Button.ELLIPSES.value, value);
   }
 
   /**
@@ -159,7 +159,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setHamburgerButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kHamburger.value, value);
+    setRawButton(NiDsStadiaController.Button.HAMBURGER.value, value);
   }
 
   /**
@@ -168,7 +168,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setStadiaButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kStadia.value, value);
+    setRawButton(NiDsStadiaController.Button.STADIA.value, value);
   }
 
   /**
@@ -177,7 +177,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setRightTriggerButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kRightTrigger.value, value);
+    setRawButton(NiDsStadiaController.Button.RIGHT_TRIGGER.value, value);
   }
 
   /**
@@ -186,7 +186,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setLeftTriggerButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kLeftTrigger.value, value);
+    setRawButton(NiDsStadiaController.Button.LEFT_TRIGGER.value, value);
   }
 
   /**
@@ -195,7 +195,7 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setGoogleButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kGoogle.value, value);
+    setRawButton(NiDsStadiaController.Button.GOOGLE.value, value);
   }
 
   /**
@@ -204,6 +204,6 @@ public class NiDsStadiaControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void setFrameButton(boolean value) {
-    setRawButton(NiDsStadiaController.Button.kFrame.value, value);
+    setRawButton(NiDsStadiaController.Button.FRAME.value, value);
   }
 }

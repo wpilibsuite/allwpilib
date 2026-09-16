@@ -19,11 +19,11 @@ wpi::Joystick& CommandJoystick::GetJoystick() {
 }
 
 Trigger CommandJoystick::Trigger(wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Joystick::ButtonType::kTriggerButton, loop);
+  return m_hid->Button(wpi::Joystick::ButtonType::TRIGGER_BUTTON, loop);
 }
 
 Trigger CommandJoystick::Top(wpi::EventLoop* loop) const {
-  return m_hid->Button(wpi::Joystick::ButtonType::kTopButton, loop);
+  return m_hid->Button(wpi::Joystick::ButtonType::TOP_BUTTON, loop);
 }
 
 double CommandJoystick::GetMagnitude() const {

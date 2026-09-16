@@ -14,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Rotation2d;
 
 class SwerveModuleAccelerationTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   @Test
   void testDefaultConstructor() {
     var moduleAccelerations = new SwerveModuleAcceleration();
 
     assertAll(
-        () -> assertEquals(0.0, moduleAccelerations.acceleration, kEpsilon),
-        () -> assertEquals(0.0, moduleAccelerations.angle.getRadians(), kEpsilon));
+        () -> assertEquals(0.0, moduleAccelerations.acceleration, EPSILON),
+        () -> assertEquals(0.0, moduleAccelerations.angle.getRadians(), EPSILON));
   }
 
   @Test
@@ -30,8 +30,8 @@ class SwerveModuleAccelerationTest {
     var moduleAccelerations = new SwerveModuleAcceleration(2.5, new Rotation2d(1.5));
 
     assertAll(
-        () -> assertEquals(2.5, moduleAccelerations.acceleration, kEpsilon),
-        () -> assertEquals(1.5, moduleAccelerations.angle.getRadians(), kEpsilon));
+        () -> assertEquals(2.5, moduleAccelerations.acceleration, EPSILON),
+        () -> assertEquals(1.5, moduleAccelerations.angle.getRadians(), EPSILON));
   }
 
   @Test
@@ -41,8 +41,8 @@ class SwerveModuleAccelerationTest {
     var moduleAccelerations = new SwerveModuleAcceleration(acceleration, angle);
 
     assertAll(
-        () -> assertEquals(3.0, moduleAccelerations.acceleration, kEpsilon),
-        () -> assertEquals(2.0, moduleAccelerations.angle.getRadians(), kEpsilon));
+        () -> assertEquals(3.0, moduleAccelerations.acceleration, EPSILON),
+        () -> assertEquals(2.0, moduleAccelerations.angle.getRadians(), EPSILON));
   }
 
   @Test
@@ -73,37 +73,37 @@ class SwerveModuleAccelerationTest {
     // Test interpolation at t=0 (should return start)
     final var atStart = start.interpolate(end, 0.0);
     assertAll(
-        () -> assertEquals(1.0, atStart.acceleration, kEpsilon),
-        () -> assertEquals(0.0, atStart.angle.getRadians(), kEpsilon));
+        () -> assertEquals(1.0, atStart.acceleration, EPSILON),
+        () -> assertEquals(0.0, atStart.angle.getRadians(), EPSILON));
 
     // Test interpolation at t=1 (should return end)
     final var atEnd = start.interpolate(end, 1.0);
     assertAll(
-        () -> assertEquals(5.0, atEnd.acceleration, kEpsilon),
-        () -> assertEquals(Math.PI / 2, atEnd.angle.getRadians(), kEpsilon));
+        () -> assertEquals(5.0, atEnd.acceleration, EPSILON),
+        () -> assertEquals(Math.PI / 2, atEnd.angle.getRadians(), EPSILON));
 
     // Test interpolation at t=0.5 (should return midpoint)
     final var atMidpoint = start.interpolate(end, 0.5);
     assertAll(
-        () -> assertEquals(3.0, atMidpoint.acceleration, kEpsilon),
-        () -> assertEquals(Math.PI / 4, atMidpoint.angle.getRadians(), kEpsilon));
+        () -> assertEquals(3.0, atMidpoint.acceleration, EPSILON),
+        () -> assertEquals(Math.PI / 4, atMidpoint.angle.getRadians(), EPSILON));
 
     // Test interpolation at t=0.25
     final var atQuarter = start.interpolate(end, 0.25);
     assertAll(
-        () -> assertEquals(2.0, atQuarter.acceleration, kEpsilon),
-        () -> assertEquals(Math.PI / 8, atQuarter.angle.getRadians(), kEpsilon));
+        () -> assertEquals(2.0, atQuarter.acceleration, EPSILON),
+        () -> assertEquals(Math.PI / 8, atQuarter.angle.getRadians(), EPSILON));
 
     // Test clamping: t < 0 should clamp to 0
     final var belowRange = start.interpolate(end, -0.5);
     assertAll(
-        () -> assertEquals(1.0, belowRange.acceleration, kEpsilon),
-        () -> assertEquals(0.0, belowRange.angle.getRadians(), kEpsilon));
+        () -> assertEquals(1.0, belowRange.acceleration, EPSILON),
+        () -> assertEquals(0.0, belowRange.angle.getRadians(), EPSILON));
 
     // Test clamping: t > 1 should clamp to 1
     final var aboveRange = start.interpolate(end, 1.5);
     assertAll(
-        () -> assertEquals(5.0, aboveRange.acceleration, kEpsilon),
-        () -> assertEquals(Math.PI / 2, aboveRange.angle.getRadians(), kEpsilon));
+        () -> assertEquals(5.0, aboveRange.acceleration, EPSILON),
+        () -> assertEquals(Math.PI / 2, aboveRange.angle.getRadians(), EPSILON));
   }
 }

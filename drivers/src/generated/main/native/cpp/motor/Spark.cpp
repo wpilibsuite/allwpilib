@@ -6,14 +6,14 @@
 
 #include "wpi/drivers/motor/Spark.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
-Spark::Spark(int channel) : PWMMotorController("Spark", channel) {
+Spark::Spark(int channel) : PWMMotorController(channel) {
   SetBounds(2.003_ms, 1.55_ms, 1.5_ms, 1.46_ms, 0.999_ms);
   m_pwm.SetOutputPeriod(5_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "RevSPARK");
+  wpi::util::ReportUsage("IO", GetChannel(), "RevSPARK");
 }

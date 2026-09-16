@@ -6,11 +6,11 @@ package org.wpilib.hardware.expansionhub;
 
 import java.util.OptionalInt;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.SystemServer;
 import org.wpilib.system.Timer;
+import org.wpilib.util.UsageReporting;
 
 /** This class controls a REV ExpansionHub plugged in over USB to Systemcore. */
 public class ExpansionHub implements AutoCloseable {
@@ -164,7 +164,12 @@ public class ExpansionHub implements AutoCloseable {
   }
 
   void reportUsage(String device, String data) {
-    HAL.reportUsage("ExpansionHub[" + m_dataStore.m_usbId + "]/" + device, data);
+    UsageReporting.reportUsage("ExpansionHub[" + m_dataStore.m_usbId + "]/" + device, data);
+  }
+
+  void reportUsage(String device, int instanceNumber, String data) {
+    UsageReporting.reportUsage(
+        "ExpansionHub[" + m_dataStore.m_usbId + "]/" + device, instanceNumber, data);
   }
 
   /**

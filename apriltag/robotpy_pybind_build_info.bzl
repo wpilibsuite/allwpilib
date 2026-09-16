@@ -156,6 +156,8 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//apriltag:robotpy-native-apriltag.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
@@ -230,6 +232,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/robotpy_apriltag/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(
@@ -268,6 +271,8 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         yaml_output_directory = "src/main/python/semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//apriltag:robotpy-native-apriltag.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],

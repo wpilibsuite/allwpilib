@@ -8,6 +8,8 @@ import typing
 
 import commands2
 import commands2.button
+import telemetry
+import tunables
 import wpilib
 import romi
 
@@ -36,8 +38,8 @@ class RobotContainer:
         # Assumes a gamepad plugged into channnel 0
         self.controller = wpilib.Joystick(0)
 
-        # Create SmartDashboard chooser for autonomous routines
-        self.chooser = wpilib.SendableChooser()
+        # Create a tunable selector for autonomous routines.
+        self.chooser = tunables.Selectable()
 
         # NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
         # that is specified when launching the wpilib-ws server on the Romi raspberry pi.
@@ -70,12 +72,12 @@ class RobotContainer:
             commands2.PrintCommand("Button A Released")
         )
 
-        # Setup SmartDashboard options
-        self.chooser.set_default_option(
+        # Set up autonomous options.
+        self.chooser.add_default(
             "Auto Routine Distance", AutonomousDistance(self.drivetrain)
         )
-        self.chooser.add_option("Auto Routine Time", AutonomousTime(self.drivetrain))
-        wpilib.SmartDashboard.put_data(self.chooser)
+        self.chooser.add("Auto Routine Time", AutonomousTime(self.drivetrain))
+        tunables.publish("Autonomous", self.chooser)
 
     def get_autonomous_command(self) -> typing.Optional[commands2.Command]:
         return self.chooser.get_selected()
@@ -90,3 +92,6 @@ class RobotContainer:
             lambda: -self.controller.get_raw_axis(1),
             lambda: -self.controller.get_raw_axis(2),
         )
+
+    def log_to(self, table: telemetry.TelemetryTable) -> None:
+        table.log("drivetrain", self.drivetrain)

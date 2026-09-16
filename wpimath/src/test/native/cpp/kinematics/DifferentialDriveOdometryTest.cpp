@@ -12,7 +12,7 @@
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 using namespace wpi::math;
 
@@ -22,7 +22,7 @@ TEST_CASE("DifferentialDriveOdometryTest EncoderDistances", "[wpimath]") {
   const auto& pose =
       odometry.Update(135_deg, 0_m, wpi::units::meter_t{5 * std::numbers::pi});
 
-  CHECK_NEAR(pose.X().value(), 5.0, kEpsilon);
-  CHECK_NEAR(pose.Y().value(), 5.0, kEpsilon);
-  CHECK_NEAR(pose.Rotation().Degrees().value(), 90.0, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 5.0, EPSILON);
+  CHECK_NEAR(pose.Y().value(), 5.0, EPSILON);
+  CHECK_NEAR(pose.Rotation().Degrees().value(), 90.0, EPSILON);
 }

@@ -10,9 +10,9 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -28,7 +28,7 @@ DualSenseEdgeController::DualSenseEdgeController(int port)
 
 DualSenseEdgeController::DualSenseEdgeController(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "DualSenseEdgeController");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "DualSenseEdgeController");
 }
 
 GenericHID& DualSenseEdgeController::GetHID() {
@@ -487,34 +487,36 @@ TouchpadFinger DualSenseEdgeController::GetTouchpadFinger(int finger) const {
 }
 
 
-void DualSenseEdgeController::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "DualSenseEdge");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddDoubleProperty("L2", [this] { return GetL2(); }, nullptr);
-  builder.AddDoubleProperty("R2", [this] { return GetR2(); }, nullptr);
-  builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
-  builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
-  builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);
-  builder.AddBooleanProperty("Triangle", [this] { return GetTriangleButton(); }, nullptr);
-  builder.AddBooleanProperty("Create", [this] { return GetCreateButton(); }, nullptr);
-  builder.AddBooleanProperty("PS", [this] { return GetPSButton(); }, nullptr);
-  builder.AddBooleanProperty("Options", [this] { return GetOptionsButton(); }, nullptr);
-  builder.AddBooleanProperty("L3", [this] { return GetL3Button(); }, nullptr);
-  builder.AddBooleanProperty("R3", [this] { return GetR3Button(); }, nullptr);
-  builder.AddBooleanProperty("L1", [this] { return GetL1Button(); }, nullptr);
-  builder.AddBooleanProperty("R1", [this] { return GetR1Button(); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetDpadUpButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetDpadDownButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetDpadLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetDpadRightButton(); }, nullptr);
-  builder.AddBooleanProperty("Microphone", [this] { return GetMicrophoneButton(); }, nullptr);
-  builder.AddBooleanProperty("RightPaddle1", [this] { return GetRightPaddle1Button(); }, nullptr);
-  builder.AddBooleanProperty("LeftPaddle1", [this] { return GetLeftPaddle1Button(); }, nullptr);
-  builder.AddBooleanProperty("Touchpad", [this] { return GetTouchpadButton(); }, nullptr);
-  builder.AddBooleanProperty("LeftFunction", [this] { return GetLeftFunctionButton(); }, nullptr);
-  builder.AddBooleanProperty("RightFunction", [this] { return GetRightFunctionButton(); }, nullptr);
+std::string_view DualSenseEdgeController::GetTelemetryType() const {
+  return "HID:DualSenseEdge";
+}
+
+void DualSenseEdgeController::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("L2", GetL2());
+  table.Log("R2", GetR2());
+  table.Log("Cross", GetCrossButton());
+  table.Log("Circle", GetCircleButton());
+  table.Log("Square", GetSquareButton());
+  table.Log("Triangle", GetTriangleButton());
+  table.Log("Create", GetCreateButton());
+  table.Log("PS", GetPSButton());
+  table.Log("Options", GetOptionsButton());
+  table.Log("L3", GetL3Button());
+  table.Log("R3", GetR3Button());
+  table.Log("L1", GetL1Button());
+  table.Log("R1", GetR1Button());
+  table.Log("DpadUp", GetDpadUpButton());
+  table.Log("DpadDown", GetDpadDownButton());
+  table.Log("DpadLeft", GetDpadLeftButton());
+  table.Log("DpadRight", GetDpadRightButton());
+  table.Log("Microphone", GetMicrophoneButton());
+  table.Log("RightPaddle1", GetRightPaddle1Button());
+  table.Log("LeftPaddle1", GetLeftPaddle1Button());
+  table.Log("Touchpad", GetTouchpadButton());
+  table.Log("LeftFunction", GetLeftFunctionButton());
+  table.Log("RightFunction", GetRightFunctionButton());
 }

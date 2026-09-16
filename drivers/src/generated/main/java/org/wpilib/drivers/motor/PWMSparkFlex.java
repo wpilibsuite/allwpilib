@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * REV Robotics SPARK Flex Motor Controller.
@@ -34,12 +34,12 @@ public class PWMSparkFlex extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMSparkFlex(final int channel) {
-    super("PWMSparkFlex", channel);
+    super(channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "RevSparkFlexPWM");
+    UsageReporting.reportUsage("IO", getChannel(), "RevSparkFlexPWM");
   }
 }

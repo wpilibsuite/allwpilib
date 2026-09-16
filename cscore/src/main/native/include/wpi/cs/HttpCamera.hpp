@@ -25,11 +25,11 @@ class HttpCamera : public VideoCamera {
    */
   enum HttpCameraKind {
     /// Unknown camera kind.
-    kUnknown = CS_HTTP_UNKNOWN,
+    UNKNOWN = CS_HTTP_UNKNOWN,
     /// MJPG Streamer camera.
-    kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
+    MJPG_STREAMER = CS_HTTP_MJPGSTREAMER,
     /// CS Core camera.
-    kCSCore = CS_HTTP_CSCORE,
+    CS_CORE = CS_HTTP_CSCORE,
   };
 
   /**
@@ -37,10 +37,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. MJPG_STREAMER)
    */
   HttpCamera(std::string_view name, std::string_view url,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -51,10 +51,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. MJPG_STREAMER)
    */
   HttpCamera(std::string_view name, const char* url,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -65,10 +65,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. MJPG_STREAMER)
    */
   HttpCamera(std::string_view name, const std::string& url,
-             HttpCameraKind kind = kUnknown)
+             HttpCameraKind kind = UNKNOWN)
       : HttpCamera(name, std::string_view{url}, kind) {}
 
   /**
@@ -76,10 +76,10 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. MJPG_STREAMER)
    */
   HttpCamera(std::string_view name, std::span<const std::string> urls,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     m_handle = CreateHttpCamera(
         name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
         &m_status);
@@ -90,11 +90,11 @@ class HttpCamera : public VideoCamera {
    *
    * @param name Source name (arbitrary unique identifier)
    * @param urls Array of Camera URLs
-   * @param kind Camera kind (e.g. kAxis)
+   * @param kind Camera kind (e.g. MJPG_STREAMER)
    */
   template <typename T>
   HttpCamera(std::string_view name, std::initializer_list<T> urls,
-             HttpCameraKind kind = kUnknown) {
+             HttpCameraKind kind = UNKNOWN) {
     std::vector<std::string> vec;
     vec.reserve(urls.size());
     for (const auto& url : urls) {

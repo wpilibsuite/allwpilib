@@ -27,10 +27,10 @@ class ElevatorSimulationTest {
   std::optional<std::thread> thread;
 
  public:
-  wpi::sim::PWMMotorControllerSim motorSim{Constants::kMotorPort};
+  wpi::sim::PWMMotorControllerSim motorSim{Constants::MOTOR_PORT};
   wpi::sim::EncoderSim encoderSim =
-      wpi::sim::EncoderSim::CreateForChannel(Constants::kEncoderAChannel);
-  wpi::sim::JoystickSim joystickSim{Constants::kJoystickPort};
+      wpi::sim::EncoderSim::CreateForChannel(Constants::ENCODER_A_CHANNEL);
+  wpi::sim::JoystickSim joystickSim{Constants::JOYSTICK_PORT};
 
   ElevatorSimulationTest() {
     wpi::sim::PauseTiming();
@@ -77,13 +77,13 @@ TEST_CASE_METHOD(ElevatorSimulationTest, "ElevatorSimulationTest teleop",
     wpi::sim::StepTiming(1.5_s);
 
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
+               Catch::Matchers::WithinAbs(SETPOINT.value(), 0.05));
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
+               Catch::Matchers::WithinAbs(SETPOINT.value(), 0.05));
   }
 
   {
@@ -106,13 +106,13 @@ TEST_CASE_METHOD(ElevatorSimulationTest, "ElevatorSimulationTest teleop",
     wpi::sim::StepTiming(1.5_s);
 
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
+               Catch::Matchers::WithinAbs(SETPOINT.value(), 0.05));
 
     // advance 25 timesteps to see setpoint is held.
     wpi::sim::StepTiming(0.5_s);
 
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kSetpoint.value(), 0.05));
+               Catch::Matchers::WithinAbs(SETPOINT.value(), 0.05));
   }
 
   {

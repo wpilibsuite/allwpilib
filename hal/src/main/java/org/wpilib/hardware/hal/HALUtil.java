@@ -56,9 +56,9 @@ public final class HALUtil extends JNIWrapper {
   public static native int getTeamNumber();
 
   /**
-   * Reads the microsecond-resolution monotonic timer.
+   * Reads the nanosecond-resolution monotonic timer.
    *
-   * @return The current monotonic time in microseconds.
+   * @return The current monotonic time in nanoseconds.
    */
   public static native long getMonotonicTime();
 

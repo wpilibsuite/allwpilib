@@ -39,6 +39,10 @@ class MyRobot(commands2.TimedCommandRobot):
         # Change to `false` to not record joystick data.
         wpilib.DriverStation.start_data_log(wpilib.DataLogManager.get_log(), True)
 
+    def robot_periodic(self) -> None:
+        super().robot_periodic()
+        self.container.update_telemetry()
+
     def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""
 

@@ -154,6 +154,8 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
             "//romiVendordep:robotpy-native-romi.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpilibc:robotpy-native-wpilib.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -230,6 +232,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/romi/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(
@@ -272,6 +275,8 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
             "//romiVendordep:robotpy-native-romi.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpilibc:robotpy-native-wpilib.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",

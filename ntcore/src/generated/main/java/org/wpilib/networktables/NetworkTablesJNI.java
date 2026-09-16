@@ -154,10 +154,10 @@ public final class NetworkTablesJNI {
   public static native String getEntryName(int entry);
 
   /**
-   * Returns NT entry last change time in microseconds.
+   * Returns NT entry last change time in nanoseconds.
    *
    * @param entry NT entry handle.
-   * @return NT entry last change time in microseconds.
+   * @return NT entry last change time in nanoseconds.
    */
   public static native long getEntryLastChange(int entry);
 
@@ -521,7 +521,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -540,7 +540,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -577,7 +577,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -596,7 +596,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -633,7 +633,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -652,7 +652,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -689,7 +689,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -708,7 +708,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -745,7 +745,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -764,7 +764,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -801,7 +801,7 @@ public final class NetworkTablesJNI {
    * Sets raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Raw value buffer.
    * @return True if set succeeded.
    */
@@ -813,7 +813,7 @@ public final class NetworkTablesJNI {
    * Sets raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Raw value buffer.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -825,7 +825,7 @@ public final class NetworkTablesJNI {
    * Sets raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Raw value buffer.
    * @return True if set succeeded.
    */
@@ -838,7 +838,7 @@ public final class NetworkTablesJNI {
    * Sets raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Raw value buffer.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -867,7 +867,7 @@ public final class NetworkTablesJNI {
    * Sets raw topic value buffer.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Raw value buffer.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -888,7 +888,7 @@ public final class NetworkTablesJNI {
    * Sets default raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -900,7 +900,7 @@ public final class NetworkTablesJNI {
    * Sets default raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -912,7 +912,7 @@ public final class NetworkTablesJNI {
    * Sets default raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -925,7 +925,7 @@ public final class NetworkTablesJNI {
    * Sets default raw topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -954,7 +954,7 @@ public final class NetworkTablesJNI {
    * Sets default raw topic value buffer.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @param start Value's offset into buffer.
    * @param len Length of value in buffer.
@@ -993,7 +993,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -1012,7 +1012,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -1049,7 +1049,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -1068,7 +1068,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -1105,7 +1105,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -1124,7 +1124,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -1161,7 +1161,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -1180,7 +1180,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -1217,7 +1217,7 @@ public final class NetworkTablesJNI {
    * Sets topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param value Topic value.
    * @return True if set succeeded.
    */
@@ -1236,7 +1236,7 @@ public final class NetworkTablesJNI {
    * Sets default topic value.
    *
    * @param entry Entry handle.
-   * @param time Time in microseconds.
+   * @param time Time in nanoseconds.
    * @param defaultValue Default value.
    * @return True if set succeeded.
    */
@@ -1609,14 +1609,14 @@ public final class NetworkTablesJNI {
    * updated; to receive updates as events, add a listener to the "time sync" event.
    *
    * @param inst NT instance handle.
-   * @return Time offset in microseconds (optional)
+   * @return Time offset in nanoseconds (optional)
    */
   public static native OptionalLong getServerTimeOffset(int inst);
 
   /**
-   * Returns the current timestamp in microseconds.
+   * Returns the current timestamp in nanoseconds.
    *
-   * @return The current timestamp in microseconds.
+   * @return The current timestamp in nanoseconds.
    */
   public static native long now();
 

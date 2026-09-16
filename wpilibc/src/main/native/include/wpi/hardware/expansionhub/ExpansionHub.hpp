@@ -83,6 +83,8 @@ class ExpansionHub {
   void RemoveFollower(int followerChannel);
 
   void ReportUsage(std::string_view device, std::string_view data);
+  void ReportUsage(std::string_view device, int instanceNumber,
+                   std::string_view data);
 
   class DataStore;
   friend class DataStore;

@@ -29,7 +29,7 @@ static std::atomic<int64_t> gNowTime;
 
 namespace wpi::nt {
 
-static constexpr unsigned int kMaxTeamNumber = 25599;
+static constexpr unsigned int MAX_TEAM_NUMBER = 25599;
 
 wpi::util::json TopicInfo::GetProperties() const {
   return wpi::util::json::parse(properties).value_or(wpi::util::json::object());
@@ -720,7 +720,7 @@ static void AddTeamServer(
     std::string_view team, unsigned int port) {
   auto parsedTeam =
       wpi::util::parse_integer<unsigned int>(wpi::util::trim(team), 10);
-  if (!parsedTeam || *parsedTeam > kMaxTeamNumber) {
+  if (!parsedTeam || *parsedTeam > MAX_TEAM_NUMBER) {
     return;
   }
 
@@ -734,7 +734,7 @@ static void AddTeamServer(
 static INetworkClient::ServerResolver MakeSystemCoreResolver(
     unsigned int port) {
   INetworkClient::ServerResolver resolver;
-  resolver.kind = INetworkClient::ServerResolver::Kind::kSystemCore;
+  resolver.kind = INetworkClient::ServerResolver::Kind::SYSTEMCORE;
   resolver.port = port;
   return resolver;
 }

@@ -211,6 +211,10 @@ LLVM_ABI Boolean isLegalUTF8String(const UTF8 **source, const UTF8 *sourceEnd);
 LLVM_ABI unsigned getUTF8SequenceSize(const UTF8 *source,
                                       const UTF8 *sourceEnd);
 
+LLVM_ABI unsigned
+findMaximalSubpartOfIllFormedUTF8Sequence(const UTF8 *source,
+                                          const UTF8 *sourceEnd);
+
 LLVM_ABI unsigned getNumBytesForUTF8(UTF8 firstByte);
 
 /*************************************************************************/
@@ -243,10 +247,10 @@ LLVM_ABI bool ConvertUTF8toWide(std::string_view Source, std::wstring &Result);
 LLVM_ABI bool ConvertUTF8toWide(const char *Source, std::wstring &Result);
 
 /**
-* Converts a std::wstring to a UTF-8 encoded std::string.
-* \return true on success.
-*/
-LLVM_ABI bool convertWideToUTF8(const std::wstring &Source,
+ * Converts a wide string view to a UTF-8 encoded std::string.
+ * \return true on success.
+ */
+LLVM_ABI bool convertWideToUTF8(std::wstring_view Source,
                                 SmallVectorImpl<char> &Result);
 
 /**

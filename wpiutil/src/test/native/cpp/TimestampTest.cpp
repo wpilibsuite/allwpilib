@@ -14,9 +14,9 @@
 
 namespace {
 
-uint64_t mockTime = 0;
+int64_t mockTime = 0;
 
-uint64_t MockNow() {
+int64_t MockNow() {
   return mockTime;
 }
 
@@ -28,7 +28,7 @@ class ResetNowImpl {
 }  // namespace
 
 TEST_CASE("TimestampTest ProgramStartTimeIsStable", "[wpiutil]") {
-  uint64_t startTime = wpi::util::GetProgramStartTime();
+  int64_t startTime = wpi::util::GetProgramStartTime();
 
   CHECK(startTime == wpi::util::GetProgramStartTime());
   CHECK(startTime == WPI_GetProgramStartTime());
@@ -37,7 +37,7 @@ TEST_CASE("TimestampTest ProgramStartTimeIsStable", "[wpiutil]") {
 
 TEST_CASE("TimestampTest SetNowImplUpdatesProgramStartTime", "[wpiutil]") {
   ResetNowImpl reset;
-  uint64_t originalStartTime = wpi::util::GetProgramStartTime();
+  int64_t originalStartTime = wpi::util::GetProgramStartTime();
 
   mockTime = 1234;
   wpi::util::SetNowImpl(MockNow);
@@ -58,7 +58,7 @@ TEST_CASE("TimestampTest SetNowImplUpdatesProgramStartTime", "[wpiutil]") {
 TEST_CASE("TimestampTest WPISetNowImplNullRestoresProgramStartTime",
           "[wpiutil]") {
   ResetNowImpl reset;
-  uint64_t originalStartTime = WPI_GetProgramStartTime();
+  int64_t originalStartTime = WPI_GetProgramStartTime();
 
   mockTime = 4321;
   WPI_SetNowImpl(MockNow);

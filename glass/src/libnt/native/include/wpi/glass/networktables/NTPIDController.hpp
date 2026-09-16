@@ -9,15 +9,13 @@
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/other/PIDController.hpp"
-#include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
 #include "wpi/nt/NetworkTableInstance.hpp"
-#include "wpi/nt/StringTopic.hpp"
 
 namespace wpi::glass {
 class NTPIDControllerModel : public PIDControllerModel {
  public:
-  static constexpr const char* kType = "PIDController";
+  static constexpr const char* TYPE = "PIDController";
 
   explicit NTPIDControllerModel(std::string_view path);
   NTPIDControllerModel(wpi::nt::NetworkTableInstance inst,
@@ -39,12 +37,10 @@ class NTPIDControllerModel : public PIDControllerModel {
 
   void Update() override;
   bool Exists() override;
-  bool IsReadOnly() override { return !m_controllableValue; }
+  bool IsReadOnly() override;
 
  private:
   wpi::nt::NetworkTableInstance m_inst;
-  wpi::nt::StringSubscriber m_name;
-  wpi::nt::BooleanSubscriber m_controllable;
   wpi::nt::DoubleEntry m_p;
   wpi::nt::DoubleEntry m_i;
   wpi::nt::DoubleEntry m_d;
@@ -58,6 +54,5 @@ class NTPIDControllerModel : public PIDControllerModel {
   DoubleSource m_iZoneData;
 
   std::string m_nameValue;
-  bool m_controllableValue = false;
 };
 }  // namespace wpi::glass

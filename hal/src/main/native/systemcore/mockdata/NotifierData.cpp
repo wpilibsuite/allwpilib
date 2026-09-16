@@ -6,7 +6,7 @@
 
 extern "C" {
 
-uint64_t HALSIM_GetNextNotifierTimeout(void) {
+int64_t HALSIM_GetNextNotifierTimeout(void) {
   return 0;
 }
 

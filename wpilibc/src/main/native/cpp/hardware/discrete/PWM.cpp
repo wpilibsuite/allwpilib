@@ -5,16 +5,15 @@
 #include "wpi/hardware/discrete/PWM.hpp"
 
 #include "wpi/hal/PWM.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
-PWM::PWM(int channel, bool registerSendable) {
+PWM::PWM(int channel) {
   auto stack = wpi::util::GetStackTrace(1);
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(channel, stack.c_str(), &status);
@@ -24,10 +23,7 @@ PWM::PWM(int channel, bool registerSendable) {
 
   SetDisabled();
 
-  HAL_ReportUsage("IO", channel, "PWM");
-  if (registerSendable) {
-    wpi::util::SendableRegistry::Add(this, "PWM", channel);
-  }
+  wpi::util::ReportUsage("IO", channel, "PWM");
 }
 
 PWM::~PWM() {
@@ -86,12 +82,10 @@ void PWM::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetPWMSimDevice(m_handle, device);
 }
 
-void PWM::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("PWM");
-  builder.SetActuator(true);
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetPulseTime().value(); },
-      [=, this](double value) {
-        SetPulseTime(wpi::units::microsecond_t{value});
-      });
+void PWM::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", GetPulseTime());
+}
+
+std::string_view PWM::GetTelemetryType() const {
+  return "PWM";
 }

@@ -2,10 +2,49 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_plugin.bzl", "java_plugin")
+load("@rules_java//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
+load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
+
+default_java_toolchain(
+    name = "java_toolchain",
+    java_runtime = "@rules_java//toolchains:remotejdk_25",
+    package_configuration = [
+        ":allwpilib_toolchain_config",
+        "//wpilibjExamples:toolchain_config",
+    ],
+    source_version = "25",
+    target_version = "25",
+)
+
+java_package_configuration(
+    name = "allwpilib_toolchain_config",
+    javacopts = [
+        "-Werror",
+        "-XDstringConcat=inline",
+        "-Xlint:all",
+        # ignore AutoCloseable warnings
+        "-Xlint:-try",
+        # ignore missing serialVersionUID warnings
+        "-Xlint:-serial",
+        # ignore unclaimed annotation warning from annotation processing
+        "-Xlint:-processing",
+        # ignore warnings for classes missing explicit constructors
+        "-Xlint:-missing-explicit-ctor",
+    ],
+    # Apply our flags to just our repository. Otherwise, Bazel will compile its
+    # tools with our flags, and not all of them are warning-free.
+    packages = ["allwpilib_packages"],
+)
+
+package_group(
+    name = "allwpilib_packages",
+    packages = ["//..."],
+)
 
 java_plugin(
     name = "avaje_jsonb_generator",
@@ -86,7 +125,6 @@ write_source_files(
         "//wpimath:write_wpimath",
         "//wpiunits:write_wpiunits",
         "//wpiutil:write_wpiutil",
-        "//robotpyExamples:write_example_project_list",
     ],
     tags = ["pregeneration"],
 )
@@ -94,6 +132,7 @@ write_source_files(
 publish_all(
     name = "publish",
     targets = [
+        "//aosnt:aosnt-bridge_publish.publish",
         "//apriltag:apriltag-cpp_publish.publish",
         "//apriltag:apriltag-java_publish.publish",
         "//cameraserver:cameraserver-cpp_publish.publish",
@@ -132,12 +171,15 @@ publish_all(
         "//simulation/halsim_ws_core:halsim_ws_core-cpp_publish.publish",
         "//simulation/halsim_ws_server:halsim_ws_server-cpp_publish.publish",
         "//simulation/halsim_xrp:halsim_xrp-cpp_publish.publish",
+        "//telemetry:telemetry-cpp_publish.publish",
+        "//telemetry:telemetry-java_publish.publish",
         "//thirdparty/catch2:catch2-cpp_publish.publish",
         "//thirdparty/imgui_suite:imguiSuite-cpp_publish.publish",
         "//tools/datalogtool:datalogtool_publish.publish",
         "//tools/outlineviewer:outlineviewer_publish.publish",
-        "//tools/processstarter:processstarter_publish.publish",
         "//tools/sysid:sysid_publish.publish",
+        "//tunables:tunables-cpp_publish.publish",
+        "//tunables:tunables-java_publish.publish",
         "//tools/wpical:wpical_publish.publish",
         "//wpiannotations:wpiannotations_publish.publish",
         "//wpigui:wpigui-cpp_publish.publish",
@@ -176,6 +218,9 @@ write_source_files(
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
+        "//simulation/halsim_gui:robotpy-native-halsim-gui-generator.generate_build_info",
+        "//telemetry:robotpy-native-telemetry-generator.generate_build_info",
+        "//tunables:robotpy-native-tunables-generator.generate_build_info",
         "//wpilibc:robotpy-native-wpilib-generator.generate_build_info",
         "//wpinet:robotpy-native-wpinet-generator.generate_build_info",
         "//wpimath:robotpy-native-wpimath-generator.generate_build_info",
@@ -199,6 +244,9 @@ write_source_files(
         "//hal:robotpy-hal-generator.generate_build_info",
         "//ntcore:pyntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-romi-generator.generate_build_info",
+        "//simulation/halsim_gui:robotpy-halsim-gui-generator.generate_build_info",
+        "//telemetry:robotpy-telemetry-generator.generate_build_info",
+        "//tunables:robotpy-tunables-generator.generate_build_info",
         "//wpilibc:robotpy-wpilib-generator.generate_build_info",
         "//wpinet:robotpy-wpinet-generator.generate_build_info",
         "//wpimath:robotpy-wpimath-generator.generate_build_info",
@@ -223,6 +271,8 @@ write_source_files(
         "//hal:write_robotpy-hal-update-yaml",
         "//ntcore:write_pyntcore-update-yaml",
         "//romiVendordep:write_robotpy-romi-update-yaml",
+        "//telemetry:write_robotpy-telemetry-update-yaml",
+        "//tunables:write_robotpy-tunables-update-yaml",
         "//wpilibc:write_robotpy-wpilib-update-yaml",
         "//wpinet:write_robotpy-wpinet-update-yaml",
         "//wpimath:write_robotpy-wpimath-update-yaml",
@@ -305,5 +355,49 @@ filegroup(
         "//wpiutil:robotpy-wpiutil.generated_files",
     ],
     tags = ["manual"],
+    target_compatible_with = robotpy_compatibility_select(),
+)
+
+pkg_zip(
+    name = "robotpy_wheels_zip",
+    srcs = [
+        "//apriltag:robotpy-apriltag-wheel",
+        "//apriltag:robotpy-native-apriltag-wheel",
+        "//commandsv2:commandsv2-py-wheel",
+        "//datalog:robotpy-native-datalog-wheel",
+        "//datalog:robotpy-wpilog-wheel",
+        "//drivers:robotpy-native-wpilib-drivers-wheel",
+        "//drivers:wpilib-drivers-wheel",
+        "//fields:robotpy-fields-wheel",
+        "//fields:robotpy-native-fields-wheel",
+        "//hal:robotpy-hal-wheel",
+        "//hal:robotpy-native-wpihal-wheel",
+        "//ntcore:pyntcore-wheel",
+        "//ntcore:robotpy-native-ntcore-wheel",
+        "//romiVendordep:robotpy-native-romi-wheel",
+        "//romiVendordep:robotpy-romi-wheel",
+        "//simulation/halsim_ds_socket:robotpy-halsim-ds-socket-wheel",
+        "//simulation/halsim_gui:robotpy-halsim-gui-wheel",
+        "//simulation/halsim_gui:robotpy-native-halsim-gui-wheel",
+        "//simulation/halsim_ws_core:robotpy-halsim-ws-wheel",
+        "//telemetry:robotpy-native-telemetry-wheel",
+        "//telemetry:robotpy-telemetry-wheel",
+        "//tunables:robotpy-native-tunables-wheel",
+        "//tunables:robotpy-tunables-wheel",
+        "//wpilibc:robotpy-native-wpilib-wheel",
+        "//wpilibc:robotpy-wpilib-wheel",
+        "//wpimath:robotpy-native-wpimath-wheel",
+        "//wpimath:robotpy-wpimath-wheel",
+        "//wpinet:robotpy-native-wpinet-wheel",
+        "//wpinet:robotpy-wpinet-wheel",
+        "//wpiutil:robotpy-native-wpiutil-wheel",
+        "//wpiutil:robotpy-wpiutil-wheel",
+        "//xrpVendordep:robotpy-native-xrp-wheel",
+        "//xrpVendordep:robotpy-xrp-wheel",
+    ],
+    tags = [
+        "manual",
+        "robotpy",
+    ],
     target_compatible_with = robotpy_compatibility_select(),
 )

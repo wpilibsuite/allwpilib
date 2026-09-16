@@ -19,7 +19,7 @@
 
 class Robot : public wpi::TimedRobot {
  public:
-  static constexpr wpi::units::second_t kDt = 20_ms;
+  static constexpr wpi::units::second_t DT = 20_ms;
 
   Robot() {
     encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * std::numbers::pi * 1.5);
@@ -39,8 +39,8 @@ class Robot : public wpi::TimedRobot {
   }
 
  private:
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity = 1.75_mps;
-  static constexpr wpi::units::meters_per_second_squared_t kMaxAcceleration =
+  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY = 1.75_mps;
+  static constexpr wpi::units::meters_per_second_squared_t MAX_ACCELERATION =
       0.75_mps_sq;
   static constexpr double kP = 1.3;
   static constexpr double kI = 0.0;
@@ -56,9 +56,9 @@ class Robot : public wpi::TimedRobot {
   // Create a PID controller whose setpoint's change is subject to maximum
   // velocity and acceleration constraints.
   wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
-      kMaxVelocity, kMaxAcceleration};
+      MAX_VELOCITY, MAX_ACCELERATION};
   wpi::math::ProfiledPIDController<wpi::units::meters> controller{
-      kP, kI, kD, constraints, kDt};
+      kP, kI, kD, constraints, DT};
   wpi::math::ElevatorFeedforward feedforward{kS, kG, kV};
 };
 

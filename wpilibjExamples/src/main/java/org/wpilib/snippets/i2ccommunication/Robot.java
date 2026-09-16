@@ -17,10 +17,10 @@ import org.wpilib.hardware.bus.I2C.Port;
  * code using the roboRIO's I2C port.
  */
 public class Robot extends TimedRobot {
-  static final Port kPort = Port.PORT_0;
-  private static final int kDeviceAddress = 4;
+  static final Port PORT = Port.PORT_0;
+  private static final int DEVICE_ADDRESS = 4;
 
-  private final I2C arduino = new I2C(kPort, kDeviceAddress);
+  private final I2C arduino = new I2C(PORT, DEVICE_ADDRESS);
 
   private void writeString(String input) {
     // Creates a char array from the input string

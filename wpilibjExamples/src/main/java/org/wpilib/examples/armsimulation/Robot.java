@@ -11,7 +11,7 @@ import org.wpilib.framework.TimedRobot;
 /** This is a sample program to demonstrate the use of arm simulation with existing code. */
 public class Robot extends TimedRobot {
   private final Arm arm = new Arm();
-  private final Joystick joystick = new Joystick(Constants.kJoystickPort);
+  private final Joystick joystick = new Joystick(Constants.JOYSTICK_PORT);
 
   public Robot() {}
 

@@ -12,8 +12,8 @@
 
 namespace wpi::hal {
 
-constexpr int32_t kPwmDisabled = 0;
-constexpr int32_t kPwmAlwaysHigh = 0xFFFF;
+constexpr int32_t PWM_DISABLED = 0;
+constexpr int32_t PWM_ALWAYS_HIGH = 0xFFFF;
 
 struct SmartIo {
   ~SmartIo() noexcept;
@@ -52,7 +52,7 @@ struct SmartIo {
   int32_t SetLedLength(int32_t length);
 };
 
-extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>*
+extern DigitalHandleResource<HAL_DigitalHandle, SmartIo, NUM_SMART_IO>*
     smartIoHandles;
 
 extern wpi::util::mutex smartIoMutex;

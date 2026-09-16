@@ -7,9 +7,9 @@ package org.wpilib.hardware.bus;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.nio.ByteBuffer;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.I2CJNI;
 import org.wpilib.hardware.hal.util.BoundaryException;
+import org.wpilib.util.UsageReporting;
 
 /**
  * I2C bus interface class.
@@ -49,7 +49,7 @@ public class I2C implements AutoCloseable {
 
     I2CJNI.i2CInitialize((byte) port.value);
 
-    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "");
+    UsageReporting.reportUsage("I2C[" + port.value + "]", deviceAddress, "");
   }
 
   /**

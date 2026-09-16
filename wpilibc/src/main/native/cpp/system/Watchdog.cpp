@@ -75,10 +75,10 @@ void Watchdog::Impl::UpdateAlarm() {
   if (m_watchdogs.empty()) {
     HAL_CancelNotifierAlarm(notifier, true, &status);
   } else {
-    HAL_SetNotifierAlarm(notifier,
-                         static_cast<uint64_t>(
-                             m_watchdogs.top()->m_expirationTime.value() * 1e6),
-                         0, true, true, &status);
+    HAL_SetNotifierAlarm(
+        notifier,
+        static_cast<int64_t>(m_watchdogs.top()->m_expirationTime.value() * 1e9),
+        0, true, true, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
@@ -92,7 +92,7 @@ void Watchdog::Impl::Main() {
     if (WPI_WaitForObject(notifier) == 0) {
       break;
     }
-    uint64_t curTime = HAL_GetMonotonicTime();
+    int64_t curTime = HAL_GetMonotonicTime();
 
     std::unique_lock lock(m_mutex);
 
@@ -104,7 +104,7 @@ void Watchdog::Impl::Main() {
     // has occurred, so call its timeout function.
     auto watchdog = m_watchdogs.pop();
 
-    wpi::units::second_t now{curTime * 1e-6};
+    wpi::units::second_t now{curTime * 1e-9};
     if (now - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
       watchdog->m_lastTimeoutPrintTime = now;
       if (!watchdog->m_suppressTimeoutMessage) {

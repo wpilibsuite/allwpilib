@@ -30,7 +30,7 @@ class Pneumatics(Subsystem):
 
         # Compressor connected to a PCM with a default CAN ID (0)
         self.compressor = wpilib.Compressor(
-            wpilib.CANBus.CAN_S0, wpilib.PneumaticsModuleType.CTRE_PCM
+            wpilib.CANPort.CAN_S0, wpilib.PneumaticsModuleType.CTRE_PCM
         )
 
     def get_pressure(self) -> float:

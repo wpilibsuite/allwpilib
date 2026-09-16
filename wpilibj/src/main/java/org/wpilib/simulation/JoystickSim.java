@@ -45,7 +45,7 @@ public class JoystickSim extends GenericHIDSim {
    * @param value the new X value
    */
   public void setX(double value) {
-    setRawAxis(m_joystick != null ? m_joystick.getXChannel() : Joystick.kDefaultXChannel, value);
+    setRawAxis(m_joystick != null ? m_joystick.getXChannel() : Joystick.DEFAULT_X_CHANNEL, value);
   }
 
   /**
@@ -54,7 +54,7 @@ public class JoystickSim extends GenericHIDSim {
    * @param value the new Y value
    */
   public void setY(double value) {
-    setRawAxis(m_joystick != null ? m_joystick.getYChannel() : Joystick.kDefaultYChannel, value);
+    setRawAxis(m_joystick != null ? m_joystick.getYChannel() : Joystick.DEFAULT_Y_CHANNEL, value);
   }
 
   /**
@@ -63,7 +63,7 @@ public class JoystickSim extends GenericHIDSim {
    * @param value the new Z value
    */
   public void setZ(double value) {
-    setRawAxis(m_joystick != null ? m_joystick.getZChannel() : Joystick.kDefaultZChannel, value);
+    setRawAxis(m_joystick != null ? m_joystick.getZChannel() : Joystick.DEFAULT_Z_CHANNEL, value);
   }
 
   /**
@@ -73,7 +73,7 @@ public class JoystickSim extends GenericHIDSim {
    */
   public void setTwist(double value) {
     setRawAxis(
-        m_joystick != null ? m_joystick.getTwistChannel() : Joystick.kDefaultTwistChannel, value);
+        m_joystick != null ? m_joystick.getTwistChannel() : Joystick.DEFAULT_TWIST_CHANNEL, value);
   }
 
   /**
@@ -83,7 +83,7 @@ public class JoystickSim extends GenericHIDSim {
    */
   public void setThrottle(double value) {
     setRawAxis(
-        m_joystick != null ? m_joystick.getThrottleChannel() : Joystick.kDefaultThrottleChannel,
+        m_joystick != null ? m_joystick.getThrottleChannel() : Joystick.DEFAULT_THROTTLE_CHANNEL,
         value);
   }
 

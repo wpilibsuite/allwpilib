@@ -6,13 +6,11 @@
 
 #include <memory>
 
-#include "wpi/hal/Types.h"
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -23,8 +21,7 @@ namespace wpi {
  * The Solenoid class is typically used for pneumatics solenoids, but could be
  * used for any device within the current spec of the module.
  */
-class Solenoid : public wpi::util::Sendable,
-                 public wpi::util::SendableHelper<Solenoid> {
+class Solenoid : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a solenoid for a specified module and type.
@@ -34,7 +31,7 @@ class Solenoid : public wpi::util::Sendable,
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(CANBus busId, int module, PneumaticsModuleType moduleType,
+  Solenoid(CANPort busId, int module, PneumaticsModuleType moduleType,
            int channel);
 
   /**
@@ -44,7 +41,7 @@ class Solenoid : public wpi::util::Sendable,
    * @param moduleType The module type to use.
    * @param channel The channel the solenoid is on.
    */
-  Solenoid(CANBus busId, PneumaticsModuleType moduleType, int channel);
+  Solenoid(CANPort busId, PneumaticsModuleType moduleType, int channel);
 
   ~Solenoid() override;
 
@@ -113,7 +110,9 @@ class Solenoid : public wpi::util::Sendable,
    */
   void StartPulse();
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<PneumaticsBase> m_module;

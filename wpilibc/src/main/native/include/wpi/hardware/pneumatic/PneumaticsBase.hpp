@@ -7,7 +7,7 @@
 #include <memory>
 #include <string_view>
 
-#include "wpi/hardware/bus/CANBus.hpp"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/hardware/pneumatic/CompressorConfigType.hpp"
 #include "wpi/hardware/pneumatic/PneumaticsModuleType.hpp"
 #include "wpi/units/current.hpp"
@@ -266,6 +266,16 @@ class PneumaticsBase {
   virtual void ReportUsage(std::string_view device, std::string_view data) = 0;
 
   /**
+   * Report usage.
+   *
+   * @param device device name
+   * @param instanceNumber an index that identifies the device instance
+   * @param data arbitrary usage data
+   */
+  virtual void ReportUsage(std::string_view device, int instanceNumber,
+                           std::string_view data);
+
+  /**
    * For internal use to get a module for a specific type.
    *
    * @param busId The bus ID.
@@ -274,7 +284,7 @@ class PneumaticsBase {
    * @return module
    */
   static std::shared_ptr<PneumaticsBase> GetForType(
-      CANBus busId, int module, PneumaticsModuleType moduleType);
+      CANPort busId, int module, PneumaticsModuleType moduleType);
 
   /**
    * For internal use to get the default for a specific type.

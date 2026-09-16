@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * REV Robotics SPARKMini Motor Controller.
@@ -34,12 +34,12 @@ public class SparkMini extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public SparkMini(final int channel) {
-    super("SparkMini", channel);
+    super(channel);
 
     setBoundsMicroseconds(2500, 1510, 1500, 1490, 500);
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "RevSPARK");
+    UsageReporting.reportUsage("IO", getChannel(), "RevSPARK");
   }
 }

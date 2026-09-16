@@ -10,8 +10,7 @@
 
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -27,10 +26,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class NiDsXboxController
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<NiDsXboxController> {
+class NiDsXboxController : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -469,41 +465,41 @@ class NiDsXboxController
   /** Represents a digital button on an NiDsXboxController. */
   struct Button {
     /// A button.
-    static constexpr int kA = 0;
+    static constexpr int A = 0;
     /// B button.
-    static constexpr int kB = 1;
+    static constexpr int B = 1;
     /// X button.
-    static constexpr int kX = 2;
+    static constexpr int X = 2;
     /// Y button.
-    static constexpr int kY = 3;
+    static constexpr int Y = 3;
     /// Left bumper button.
-    static constexpr int kLeftBumper = 4;
+    static constexpr int LEFT_BUMPER = 4;
     /// Right bumper button.
-    static constexpr int kRightBumper = 5;
+    static constexpr int RIGHT_BUMPER = 5;
     /// Back button.
-    static constexpr int kBack = 6;
+    static constexpr int BACK = 6;
     /// Start button.
-    static constexpr int kStart = 7;
+    static constexpr int START = 7;
     /// Left stick button.
-    static constexpr int kLeftStick = 8;
+    static constexpr int LEFT_STICK = 8;
     /// Right stick button.
-    static constexpr int kRightStick = 9;
+    static constexpr int RIGHT_STICK = 9;
   };
 
   /** Represents an axis on an NiDsXboxController. */
   struct Axis {
     /// Left X axis.
-    static constexpr int kLeftX = 0;
+    static constexpr int LEFT_X = 0;
     /// Right X axis.
-    static constexpr int kRightX = 4;
+    static constexpr int RIGHT_X = 4;
     /// Left Y axis.
-    static constexpr int kLeftY = 1;
+    static constexpr int LEFT_Y = 1;
     /// Right Y axis.
-    static constexpr int kRightY = 5;
+    static constexpr int RIGHT_Y = 5;
     /// Left trigger.
-    static constexpr int kLeftTrigger = 2;
+    static constexpr int LEFT_TRIGGER = 2;
     /// Right trigger.
-    static constexpr int kRightTrigger = 3;
+    static constexpr int RIGHT_TRIGGER = 3;
   };
 
   /**
@@ -552,7 +548,8 @@ class NiDsXboxController
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   GenericHID* m_hid;

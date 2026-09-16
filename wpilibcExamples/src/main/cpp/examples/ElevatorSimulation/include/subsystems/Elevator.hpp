@@ -36,24 +36,24 @@ class Elevator {
   wpi::math::TrapezoidProfile<wpi::units::meters>::Constraints constraints{
       2.45_mps, 2.45_mps_sq};
   wpi::math::ProfiledPIDController<wpi::units::meters> controller{
-      Constants::kElevatorKp, Constants::kElevatorKi, Constants::kElevatorKd,
+      Constants::ELEVATOR_KP, Constants::ELEVATOR_KI, Constants::ELEVATOR_KD,
       constraints};
 
   wpi::math::ElevatorFeedforward feedforward{
-      Constants::kElevatorkS, Constants::kElevatorkG, Constants::kElevatorkV,
-      Constants::kElevatorkA};
-  wpi::Encoder encoder{Constants::kEncoderAChannel,
-                       Constants::kEncoderBChannel};
-  wpi::PWMSparkMax motor{Constants::kMotorPort};
+      Constants::ELEVATOR_KS, Constants::ELEVATOR_KG, Constants::ELEVATOR_KV,
+      Constants::ELEVATOR_KA};
+  wpi::Encoder encoder{Constants::ENCODER_A_CHANNEL,
+                       Constants::ENCODER_B_CHANNEL};
+  wpi::PWMSparkMax motor{Constants::MOTOR_PORT};
   wpi::sim::PWMMotorControllerSim motorSim{motor};
 
   // Simulation classes help us simulate what's going on, including gravity.
   wpi::sim::ElevatorSim elevatorSim{elevatorGearbox,
-                                    Constants::kElevatorGearing,
-                                    Constants::kCarriageMass,
-                                    Constants::kElevatorDrumRadius,
-                                    Constants::kMinElevatorHeight,
-                                    Constants::kMaxElevatorHeight,
+                                    Constants::ELEVATOR_GEARING,
+                                    Constants::CARRIAGE_MASS,
+                                    Constants::ELEVATOR_DRUM_RADIUS,
+                                    Constants::MIN_ELEVATOR_HEIGHT,
+                                    Constants::MAX_ELEVATOR_HEIGHT,
                                     true,
                                     0_m,
                                     {0.01}};

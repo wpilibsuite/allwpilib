@@ -16,7 +16,7 @@ from wpimath import (
     Translation2d,
 )
 
-kEpsilon = 0.01
+EPSILON = 0.01
 
 
 @pytest.fixture
@@ -55,10 +55,10 @@ def test_initialize(odometry3d_test):
 
     pose = odometry.get_pose()
 
-    assert pose.x == pytest.approx(1, abs=kEpsilon)
-    assert pose.y == pytest.approx(2, abs=kEpsilon)
-    assert pose.z == pytest.approx(0, abs=kEpsilon)
-    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(45, abs=kEpsilon)
+    assert pose.x == pytest.approx(1, abs=EPSILON)
+    assert pose.y == pytest.approx(2, abs=EPSILON)
+    assert pose.z == pytest.approx(0, abs=EPSILON)
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(45, abs=EPSILON)
 
 
 def test_two_iterations(odometry3d_test):
@@ -89,10 +89,10 @@ def test_two_iterations(odometry3d_test):
         Rotation3d(), [position, position, position, position]
     )
 
-    assert pose.x == pytest.approx(0.5, abs=kEpsilon)
-    assert pose.y == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.z == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(0.0, abs=kEpsilon)
+    assert pose.x == pytest.approx(0.5, abs=EPSILON)
+    assert pose.y == pytest.approx(0.0, abs=EPSILON)
+    assert pose.z == pytest.approx(0.0, abs=EPSILON)
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_90_degree_turn(odometry3d_test):
@@ -115,12 +115,10 @@ def test_90_degree_turn(odometry3d_test):
         Rotation3d.from_degrees(0, 0, 90), [fl, fr, bl, br]
     )
 
-    assert pose.x == pytest.approx(12.0, abs=kEpsilon)
-    assert pose.y == pytest.approx(12.0, abs=kEpsilon)
-    assert pose.z == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(
-        90.0, abs=kEpsilon
-    )
+    assert pose.x == pytest.approx(12.0, abs=EPSILON)
+    assert pose.y == pytest.approx(12.0, abs=EPSILON)
+    assert pose.z == pytest.approx(0.0, abs=EPSILON)
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(90.0, abs=EPSILON)
 
 
 def test_gyro_angle_reset(odometry3d_test):
@@ -142,10 +140,10 @@ def test_gyro_angle_reset(odometry3d_test):
         [position, position, position, position],
     )
 
-    assert pose.x == pytest.approx(0.5, abs=kEpsilon)
-    assert pose.y == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.z == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(0.0, abs=kEpsilon)
+    assert pose.x == pytest.approx(0.5, abs=EPSILON)
+    assert pose.y == pytest.approx(0.0, abs=EPSILON)
+    assert pose.z == pytest.approx(0.0, abs=EPSILON)
+    assert pose.rotation().to_rotation2d().degrees() == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_accuracy_facing_x_axis():

@@ -37,7 +37,7 @@ def test_rotate_by():
 
 
 def test_test_transform_by_rotations():
-    kEpsilon = 1e-9
+    EPSILON = 1e-9
 
     initial_pose = Pose3d(x=0, y=0, z=0, rotation=Rotation3d())
     transform1 = Transform3d(Translation3d(), Rotation3d.from_degrees(90, 45, 0))
@@ -51,13 +51,13 @@ def test_test_transform_by_rotations():
     )
 
     assert final_pose.rotation().x == pytest.approx(
-        initial_pose.rotation().x, abs=kEpsilon
+        initial_pose.rotation().x, abs=EPSILON
     )
     assert final_pose.rotation().y == pytest.approx(
-        initial_pose.rotation().y, abs=kEpsilon
+        initial_pose.rotation().y, abs=EPSILON
     )
     assert final_pose.rotation().z == pytest.approx(
-        initial_pose.rotation().z, abs=kEpsilon
+        initial_pose.rotation().z, abs=EPSILON
     )
 
 

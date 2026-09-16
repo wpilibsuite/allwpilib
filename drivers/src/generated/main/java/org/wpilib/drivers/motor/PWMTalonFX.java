@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Cross the Road Electronics (CTRE) Talon FX Motor Controller.
@@ -34,12 +34,12 @@ public class PWMTalonFX extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMTalonFX(final int channel) {
-    super("PWMTalonFX", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "TalonFX");
+    UsageReporting.reportUsage("IO", getChannel(), "TalonFX");
   }
 }

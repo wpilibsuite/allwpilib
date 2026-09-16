@@ -843,7 +843,7 @@ class NetworkTableInstance final {
    * updated; to receive updates as events, add a listener to the "time sync"
    * event.
    *
-   * @return Time offset in microseconds (optional)
+   * @return Time offset in nanoseconds (optional)
    */
   std::optional<int64_t> GetServerTimeOffset() const {
     return ::wpi::nt::GetServerTimeOffset(m_handle);

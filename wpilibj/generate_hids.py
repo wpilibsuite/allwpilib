@@ -5,6 +5,7 @@
 # the WPILib BSD license file in the root directory of this project.
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -17,9 +18,52 @@ from jinja2 import Environment, FileSystemLoader
 from shared.generation import add_jinja_args, make_arg_parser, write_file
 
 
+def _capitalize_first(name: str):
+    return name[0].upper() + name[1:]
+
+
+def _constant_name(name: str):
+    name = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", name)
+    name = re.sub(r"([a-z])([0-9])", r"\1_\2", name)
+    return name.upper()
+
+
+def _with_constant_name(entry: dict):
+    normalized = dict(entry)
+    normalized["ConstantName"] = _constant_name(entry["name"])
+    normalized["MethodName"] = _capitalize_first(entry["name"])
+    return normalized
+
+
+def _normalize_controller(controller: dict):
+    normalized = dict(controller)
+    normalized["buttons"] = [
+        _with_constant_name(button) for button in controller["buttons"]
+    ]
+    normalized["triggers"] = [
+        _with_constant_name(trigger) for trigger in controller.get("triggers", [])
+    ]
+    for trigger in normalized["triggers"]:
+        trigger["StringName"] = trigger["MethodName"]
+        if trigger["name"].endswith(controller["AxisNameSuffix"]):
+            trigger["StringName"] += "Axis"
+    normalized["sticks"] = [
+        {
+            **stick,
+            "ConstantName": "_".join(part.upper() for part in stick["NameParts"]),
+            "MethodName": "".join(
+                _capitalize_first(part) for part in stick["NameParts"]
+            ),
+        }
+        for stick in controller["sticks"]
+    ]
+    return normalized
+
+
 def generate_hids(output_directory: Path, template_directory: Path):
     with (template_directory / "hids.json").open(encoding="utf-8") as f:
-        controllers = json.load(f)
+        controllers = [_normalize_controller(controller) for controller in json.load(f)]
 
     # Java files
     env = Environment(

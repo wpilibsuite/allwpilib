@@ -9,23 +9,23 @@
 
 #include "wpi/util/timestamp.h"
 
-static uint64_t timestamp() noexcept {
-  // 1-us intervals
-  return std::chrono::duration_cast<std::chrono::microseconds>(
+static int64_t timestamp() noexcept {
+  // 1-ns intervals
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
              std::chrono::steady_clock::now().time_since_epoch())
       .count();
 }
 
-static const uint64_t original_program_start_time = timestamp();
-static std::atomic<uint64_t> program_start_time{original_program_start_time};
+static const int64_t original_program_start_time = timestamp();
+static std::atomic<int64_t> program_start_time{original_program_start_time};
 
-uint64_t wpi::util::NowDefault() {
+int64_t wpi::util::NowDefault() {
   return timestamp();
 }
 
-static std::atomic<uint64_t (*)()> now_impl{wpi::util::NowDefault};
+static std::atomic<int64_t (*)()> now_impl{wpi::util::NowDefault};
 
-void wpi::util::SetNowImpl(uint64_t (*func)(void)) {
+void wpi::util::SetNowImpl(int64_t (*func)(void)) {
   if (!func) {
     now_impl = wpi::util::NowDefault;
     program_start_time = original_program_start_time;
@@ -35,40 +35,40 @@ void wpi::util::SetNowImpl(uint64_t (*func)(void)) {
   }
 }
 
-uint64_t wpi::util::Now() {
+int64_t wpi::util::Now() {
   return (now_impl.load())();
 }
 
-uint64_t wpi::util::GetProgramStartTime() {
+int64_t wpi::util::GetProgramStartTime() {
   return program_start_time;
 }
 
-uint64_t wpi::util::GetSystemTime() {
-  // 1-us intervals
-  return std::chrono::duration_cast<std::chrono::microseconds>(
+int64_t wpi::util::GetSystemTime() {
+  // 1-ns intervals
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
              std::chrono::system_clock::now().time_since_epoch())
       .count();
 }
 
 extern "C" {
 
-uint64_t WPI_NowDefault(void) {
+int64_t WPI_NowDefault(void) {
   return wpi::util::NowDefault();
 }
 
-void WPI_SetNowImpl(uint64_t (*func)(void)) {
+void WPI_SetNowImpl(int64_t (*func)(void)) {
   wpi::util::SetNowImpl(func);
 }
 
-uint64_t WPI_Now(void) {
+int64_t WPI_Now(void) {
   return wpi::util::Now();
 }
 
-uint64_t WPI_GetProgramStartTime(void) {
+int64_t WPI_GetProgramStartTime(void) {
   return wpi::util::GetProgramStartTime();
 }
 
-uint64_t WPI_GetSystemTime(void) {
+int64_t WPI_GetSystemTime(void) {
   return wpi::util::GetSystemTime();
 }
 

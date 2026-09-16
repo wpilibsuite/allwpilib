@@ -8,8 +8,7 @@
 #include "wpi/driverstation/GenericHID.hpp"
 #include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/TouchpadFinger.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -22,10 +21,7 @@ class EventLoop;
  * This class handles SwitchN64 input that comes from the Driver Station.
  * Each time a value is requested the most recent value is returned.
  */
-class SwitchN64Controller
-    : public HIDDevice,
-      public wpi::util::Sendable,
-      public wpi::util::SendableHelper<SwitchN64Controller> {
+class SwitchN64Controller : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /** The number of touchpads supported by this controller. */
   static constexpr int TOUCHPAD_COUNT = 0;
@@ -767,7 +763,8 @@ class SwitchN64Controller
    */
   void SetRumble(GenericHID::RumbleType type, double value);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   double m_leftXDeadband = 0.1;

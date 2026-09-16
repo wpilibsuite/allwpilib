@@ -197,26 +197,6 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ],
         ),
         struct(
-            class_name = "NTSendable",
-            yml_file = "semiwrap/NTSendable.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendable.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendable", "wpi__nt__NTSendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NTSendableBuilder",
-            yml_file = "semiwrap/NTSendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendableBuilder", "wpi__nt__NTSendableBuilder.hpp"),
-            ],
-        ),
-        struct(
             class_name = "NetworkTable",
             yml_file = "semiwrap/NetworkTable.yml",
             header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
@@ -528,6 +508,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/ntcore/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(

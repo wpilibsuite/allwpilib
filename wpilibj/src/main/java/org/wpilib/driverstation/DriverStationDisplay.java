@@ -19,14 +19,14 @@ import org.wpilib.util.WPIUtilJNI;
  * <p>Line mode is the default display mode.
  */
 public final class DriverStationDisplay {
-  private static final long UPDATE_PERIOD_MICROS = 230_000L;
+  private static final long UPDATE_PERIOD_NANOS = 230_000_000L;
   private static final String CLEAR_DISPLAY = "\033[0m\033[2J\033[H";
 
   private static final Lock m_displayLock = new ReentrantLock();
   private static boolean rawMode;
   private static final Map<String, Integer> lineMap = new HashMap<>();
   private static final List<String> lines = new ArrayList<>();
-  private static long lastDisplayUpdate = WPIUtilJNI.now() - UPDATE_PERIOD_MICROS;
+  private static long lastDisplayUpdate = WPIUtilJNI.now() - UPDATE_PERIOD_NANOS;
 
   private DriverStationDisplay() {}
 
@@ -189,7 +189,7 @@ public final class DriverStationDisplay {
       }
 
       long now = WPIUtilJNI.now();
-      if (now - lastDisplayUpdate < UPDATE_PERIOD_MICROS) {
+      if (now - lastDisplayUpdate < UPDATE_PERIOD_NANOS) {
         lineMap.clear();
         lines.clear();
         return;

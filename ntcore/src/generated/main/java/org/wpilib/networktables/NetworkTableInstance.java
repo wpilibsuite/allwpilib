@@ -1544,7 +1544,7 @@ public final class NetworkTableInstance implements AutoCloseable {
    * synchronization messages. Note the time offset may change over time as it is periodically
    * updated; to receive updates as events, add a listener to the "time sync" event.
    *
-   * @return Time offset in microseconds (optional)
+   * @return Time offset in nanoseconds (optional)
    */
   public OptionalLong getServerTimeOffset() {
     return NetworkTablesJNI.getServerTimeOffset(m_handle);

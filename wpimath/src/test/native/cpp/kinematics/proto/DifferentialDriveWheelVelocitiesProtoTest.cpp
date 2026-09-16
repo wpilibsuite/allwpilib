@@ -11,18 +11,18 @@ using namespace wpi::math;
 
 namespace {
 
-const DifferentialDriveWheelVelocities kExpectedData =
+const DifferentialDriveWheelVelocities EXPECTED_DATA =
     DifferentialDriveWheelVelocities{1.74_mps, 35.04_mps};
 }  // namespace
 
 TEST_CASE("DifferentialDriveWheelVelocitiesProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.left.value() == unpacked_data->left.value());
-  CHECK(kExpectedData.right.value() == unpacked_data->right.value());
+  CHECK(EXPECTED_DATA.left.value() == unpacked_data->left.value());
+  CHECK(EXPECTED_DATA.right.value() == unpacked_data->right.value());
 }

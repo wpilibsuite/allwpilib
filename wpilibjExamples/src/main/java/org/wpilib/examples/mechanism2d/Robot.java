@@ -12,7 +12,7 @@ import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
 import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 
@@ -24,8 +24,8 @@ import org.wpilib.util.Color8Bit;
  * Mechanism2d object.
  */
 public class Robot extends TimedRobot {
-  private static final double kMetersPerPulse = 0.01;
-  private static final double kElevatorMinimumLength = 0.5;
+  private static final double METERS_PER_PULSE = 0.01;
+  private static final double ELEVATOR_MINIMUM_LENGTH = 0.5;
 
   private final PWMSparkMax elevatorMotor = new PWMSparkMax(0);
   private final PWMSparkMax wristMotor = new PWMSparkMax(1);
@@ -33,33 +33,33 @@ public class Robot extends TimedRobot {
   private final Encoder elevatorEncoder = new Encoder(0, 1);
   private final Joystick joystick = new Joystick(0);
 
+  // the main mechanism object
+  private final Mechanism2d mech = new Mechanism2d(3, 3);
   private final MechanismLigament2d elevator;
   private final MechanismLigament2d wrist;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    elevatorEncoder.setDistancePerPulse(kMetersPerPulse);
+    elevatorEncoder.setDistancePerPulse(METERS_PER_PULSE);
 
-    // the main mechanism object
-    Mechanism2d mech = new Mechanism2d(3, 3);
     // the mechanism root node
     MechanismRoot2d root = mech.getRoot("climber", 2, 0);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
-    elevator = root.append(new MechanismLigament2d("elevator", kElevatorMinimumLength, 90));
+    elevator = root.append(new MechanismLigament2d("elevator", ELEVATOR_MINIMUM_LENGTH, 90));
     wrist =
         elevator.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.PURPLE)));
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("Mech2d", mech);
   }
 
   @Override
   public void robotPeriodic() {
     // update the dashboard mechanism's state
-    elevator.setLength(kElevatorMinimumLength + elevatorEncoder.getDistance());
+    elevator.setLength(ELEVATOR_MINIMUM_LENGTH + elevatorEncoder.getDistance());
     wrist.setAngle(wristPot.get());
+
+    // post the mechanism to telemetry
+    Telemetry.log("Mech2d", mech);
   }
 
   @Override

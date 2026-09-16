@@ -124,10 +124,10 @@ public class PowerDistributionJNI extends JNIWrapper {
    * <p>The array must be large enough to hold all channels.
    *
    * @param handle the module handle
-   * @param currents the currents
+   * @return the currents
    * @see "HAL_GetPowerDistributionAllChannelCurrents"
    */
-  public static native void getAllCurrents(int handle, double[] currents);
+  public static native double[] getAllCurrents(int handle);
 
   /**
    * Gets the total current of the PowerDistribution.
@@ -218,6 +218,15 @@ public class PowerDistributionJNI extends JNIWrapper {
    * @see "HAL_GetPowerDistributionChannelCurrent"
    */
   public static native double getChannelCurrentNoError(int handle, int channel);
+
+  /**
+   * Gets the current of all channels on the PowerDistribution.
+   *
+   * @param handle the module handle
+   * @return the currents
+   * @see "HAL_GetPowerDistributionAllChannelCurrents"
+   */
+  public static native double[] getAllCurrentsNoError(int handle);
 
   /**
    * Gets the total current of the PowerDistribution without throwing any errors.

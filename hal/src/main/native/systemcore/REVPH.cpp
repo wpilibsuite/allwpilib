@@ -33,10 +33,10 @@ static constexpr HAL_CANManufacturer manufacturer =
 static constexpr HAL_CANDeviceType deviceType =
     HAL_CANDeviceType::HAL_CAN_DEV_PNEUMATICS;
 
-static constexpr int32_t kDefaultControlPeriod = 20;
-static constexpr uint8_t kDefaultCompressorDuty = 255;
-static constexpr uint8_t kDefaultPressureTarget = 120;
-static constexpr uint8_t kDefaultPressureHysteresis = 60;
+static constexpr int32_t DEFAULT_CONTROL_PERIOD = 20;
+static constexpr uint8_t DEFAULT_COMPRESSOR_DUTY = 255;
+static constexpr uint8_t DEFAULT_PRESSURE_TARGET = 120;
+static constexpr uint8_t DEFAULT_PRESSURE_HYSTERESIS = 60;
 
 #define HAL_REVPH_MAX_PULSE_TIME 65534
 
@@ -63,8 +63,8 @@ static constexpr uint32_t PH_CLEAR_FAULTS_FRAME_API =
 static constexpr uint32_t PH_VERSION_FRAME_API =
     APIFromExtId(PH_VERSION_FRAME_ID);
 
-static constexpr int32_t kPHFrameStatus0Timeout = 50;
-static constexpr int32_t kPHFrameStatus1Timeout = 50;
+static constexpr int32_t PH_FRAME_STATUS0TIMEOUT = 50;
+static constexpr int32_t PH_FRAME_STATUS1TIMEOUT = 50;
 
 namespace {
 
@@ -84,7 +84,7 @@ static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, 63,
 
 namespace wpi::hal::init {
 void InitializeREVPH() {
-  static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, kNumREVPHModules,
+  static IndexedHandleResource<HAL_REVPHHandle, REV_PHObj, NUM_REVPH_MODULES,
                                HAL_HandleEnum::REV_PH>
       rH;
   REVPHHandles = &rH;
@@ -96,7 +96,7 @@ static PH_status_0_t HAL_ReadREVPHStatus0(HAL_CANHandle hcan, int32_t* status) {
   PH_status_0_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PH_STATUS_0_FRAME_API, &message,
-                           kPHFrameStatus0Timeout * 2, status);
+                           PH_FRAME_STATUS0TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -112,7 +112,7 @@ static PH_status_1_t HAL_ReadREVPHStatus1(HAL_CANHandle hcan, int32_t* status) {
   PH_status_1_t result = {};
 
   HAL_ReadCANPacketTimeout(hcan, PH_STATUS_1_FRAME_API, &message,
-                           kPHFrameStatus1Timeout * 2, status);
+                           PH_FRAME_STATUS1TIMEOUT * 2, status);
 
   if (*status != 0) {
     return result;
@@ -124,9 +124,9 @@ static PH_status_1_t HAL_ReadREVPHStatus1(HAL_CANHandle hcan, int32_t* status) {
 }
 
 enum REV_SolenoidState {
-  kSolenoidDisabled = 0,
-  kSolenoidEnabled,
-  kSolenoidControlledViaPulse
+  SOLENOID_DISABLED = 0,
+  SOLENOID_ENABLED,
+  SOLENOID_CONTROLLED_VIA_PULSE
 };
 
 static void HAL_UpdateDesiredREVPHSolenoidState(REV_PHObj* hph,
@@ -206,7 +206,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
   if (!HAL_CheckREVPHModuleNumber(module)) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for REV PH", 1,
-                                       kNumREVPHModules, module);
+                                       NUM_REVPH_MODULES, module);
     return HAL_INVALID_HANDLE;
   }
 
@@ -228,7 +228,7 @@ HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
 
   hph->previousAllocation = allocationLocation ? allocationLocation : "";
   hph->hcan = hcan;
-  hph->controlPeriod = kDefaultControlPeriod;
+  hph->controlPeriod = DEFAULT_CONTROL_PERIOD;
   std::memset(&hph->desiredSolenoidsState, 0,
               sizeof(hph->desiredSolenoidsState));
   std::memset(&hph->versionInfo, 0, sizeof(hph->versionInfo));
@@ -251,11 +251,11 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module <= kNumREVPHModules;
+  return module >= 1 && module <= NUM_REVPH_MODULES;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
-  return channel >= 0 && channel < kNumREVPHChannels;
+  return channel >= 0 && channel < NUM_REVPH_CHANNELS;
 }
 
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
@@ -580,11 +580,11 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
   }
 
   std::scoped_lock lock{ph->solenoidLock};
-  for (int solenoid = 0; solenoid < kNumREVPHChannels; solenoid++) {
+  for (int solenoid = 0; solenoid < NUM_REVPH_CHANNELS; solenoid++) {
     if (mask & (1 << solenoid)) {
       // The mask bit for the solenoid is set, so we update the solenoid state
       REV_SolenoidState desiredSolenoidState =
-          values & (1 << solenoid) ? kSolenoidEnabled : kSolenoidDisabled;
+          values & (1 << solenoid) ? SOLENOID_ENABLED : SOLENOID_DISABLED;
       HAL_UpdateDesiredREVPHSolenoidState(ph.get(), solenoid,
                                           desiredSolenoidState);
     }
@@ -600,7 +600,7 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
     return;
   }
 
-  if (index >= kNumREVPHChannels || index < 0) {
+  if (index >= NUM_REVPH_CHANNELS || index < 0) {
     *status = MakeError(
         HAL_PARAMETER_OUT_OF_RANGE,
         std::format("Only [0-15] are valid index values. Requested {}", index));
@@ -618,7 +618,7 @@ void HAL_FireREVPHOneShot(HAL_REVPHHandle handle, int32_t index, int32_t durMs,
   {
     std::scoped_lock lock{ph->solenoidLock};
     HAL_UpdateDesiredREVPHSolenoidState(ph.get(), index,
-                                        kSolenoidControlledViaPulse);
+                                        SOLENOID_CONTROLLED_VIA_PULSE);
     HAL_SendREVPHSolenoidsState(ph.get(), status);
   }
 

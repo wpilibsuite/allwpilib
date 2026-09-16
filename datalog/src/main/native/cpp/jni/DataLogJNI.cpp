@@ -22,7 +22,7 @@ using namespace wpi::util::java;
 using namespace wpi::log;
 
 static bool mockTimeEnabled = false;
-static uint64_t mockNow = 0;
+static int64_t mockNow = 0;
 
 static JException illegalArgEx;
 static JException indexOobEx;

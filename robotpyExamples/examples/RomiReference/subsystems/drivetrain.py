@@ -7,6 +7,7 @@
 import math
 
 import commands2
+import telemetry
 import wpilib
 import wpilib_drivers
 import romi
@@ -101,3 +102,10 @@ class Drivetrain(commands2.Subsystem):
     def reset_gyro(self) -> None:
         """Reset the gyro"""
         self.gyro.reset()
+
+    def log_to(self, table: telemetry.TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("drive", self.drive)
+        table.log("gyro", self.gyro)
+        table.log("left distance", self.get_left_distance_inch())
+        table.log("right distance", self.get_right_distance_inch())

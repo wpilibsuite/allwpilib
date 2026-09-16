@@ -14,7 +14,7 @@ concurrency:
 jobs:
   update:
     name: "Update"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -73,6 +73,12 @@ jobs:
           ./gcem.py clone
           ./gcem.py copy-src
           ./gcem.py format-patch
+      - name: Run htrie.py
+        run: |
+          cd upstream_utils
+          ./htrie.py clone
+          ./htrie.py copy-src
+          ./htrie.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils

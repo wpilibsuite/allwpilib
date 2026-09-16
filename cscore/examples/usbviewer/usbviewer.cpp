@@ -39,7 +39,7 @@ int main() {
     cv::Mat frame;
     while (!stopCamera) {
       // get frame from camera
-      uint64_t time = cvsink.GrabFrame(frame);
+      int64_t time = cvsink.GrabFrame(frame);
       if (time == 0) {
         wpi::util::print("error: {}\n", cvsink.GetError());
         continue;

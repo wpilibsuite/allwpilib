@@ -88,10 +88,14 @@ wpilib_java_library(
         "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
         "@maven//:org_ejml_ejml_java9module",
     ],
 )
@@ -114,11 +118,15 @@ wpilib_java_junit5_test(
     resources = glob(["src/test/resources/**"]),
     deps = [
         ":wpilibj-java",
+        "//datalog:datalog-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiunits:wpiunits-java",
         "//wpiutil:wpiutil-java",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 
@@ -136,6 +144,8 @@ java_binary(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],

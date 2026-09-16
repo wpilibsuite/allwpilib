@@ -11,14 +11,14 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest DefaultConstructor",
           "[wpimath]") {
   DifferentialDriveWheelAccelerations wheelAccelerations;
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 0.0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 0.0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 0.0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest ParameterizedConstructor",
@@ -26,8 +26,8 @@ TEST_CASE("DifferentialDriveWheelAccelerationsTest ParameterizedConstructor",
   DifferentialDriveWheelAccelerations wheelAccelerations{1.5_mps_sq,
                                                          2.5_mps_sq};
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 1.5, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 2.5, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 1.5, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 2.5, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest Plus", "[wpimath]") {
@@ -36,8 +36,8 @@ TEST_CASE("DifferentialDriveWheelAccelerationsTest Plus", "[wpimath]") {
 
   const auto wheelAccelerations = left + right;
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 3.0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 2.0, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 3.0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 2.0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest Minus", "[wpimath]") {
@@ -46,16 +46,16 @@ TEST_CASE("DifferentialDriveWheelAccelerationsTest Minus", "[wpimath]") {
 
   const auto wheelAccelerations = left - right;
 
-  CHECK_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 0.0, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), -1.0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 0.0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest UnaryMinus", "[wpimath]") {
   const auto wheelAccelerations =
       -DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq};
 
-  CHECK_NEAR(wheelAccelerations.left.value(), -1.0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), -0.5, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), -1.0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), -0.5, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest Multiplication",
@@ -63,14 +63,14 @@ TEST_CASE("DifferentialDriveWheelAccelerationsTest Multiplication",
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} * 2.0;
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 2.0, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 1.0, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 2.0, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 1.0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveWheelAccelerationsTest Division", "[wpimath]") {
   const auto wheelAccelerations =
       DifferentialDriveWheelAccelerations{1.0_mps_sq, 0.5_mps_sq} / 2.0;
 
-  CHECK_NEAR(wheelAccelerations.left.value(), 0.5, kEpsilon);
-  CHECK_NEAR(wheelAccelerations.right.value(), 0.25, kEpsilon);
+  CHECK_NEAR(wheelAccelerations.left.value(), 0.5, EPSILON);
+  CHECK_NEAR(wheelAccelerations.right.value(), 0.25, EPSILON);
 }

@@ -24,12 +24,12 @@ class HolonomicSampleTest {
   void testKinematicInterpolateAtStart() {
     var start =
         new HolonomicSample(
-            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.ZERO, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
@@ -45,12 +45,12 @@ class HolonomicSampleTest {
   void testKinematicInterpolateAtEnd() {
     var start =
         new HolonomicSample(
-            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.ZERO, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
@@ -67,14 +67,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
         new HolonomicSample(
             2,
-            new Pose2d(2, 0, Rotation2d.kZero),
+            new Pose2d(2, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.6, 0.0, 0.0));
 
@@ -119,14 +119,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(0, 0, 0),
             new ChassisAccelerations(1.0, 0, 0)); // 1 m/s²
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(0.5, 0, Rotation2d.kZero),
+            new Pose2d(0.5, 0, Rotation2d.ZERO),
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations());
 
@@ -161,7 +161,7 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.0, 0.0, 0.1));
 
@@ -202,14 +202,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(0.2, 0.0, 0.0));
 
     var end =
         new HolonomicSample(
             2,
-            new Pose2d(2, 0, Rotation2d.kZero),
+            new Pose2d(2, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations(0.4, 0.0, 0.0));
 
@@ -247,14 +247,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(-1, 0, 0),
             new ChassisAccelerations(-0.5, 0.0, 0.0));
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(0, 0, Rotation2d.kZero),
+            new Pose2d(0, 0, Rotation2d.ZERO),
             new ChassisVelocities(-2, 0, 0),
             new ChassisAccelerations());
 
@@ -281,14 +281,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             0,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(0, 1, 0),
             new ChassisAccelerations(0.0, 0.2, 0.0));
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(0, 1, Rotation2d.kZero),
+            new Pose2d(0, 1, Rotation2d.ZERO),
             new ChassisVelocities(0, 2, 0),
             new ChassisAccelerations(0.0, 0.6, 0.0));
 
@@ -323,12 +323,12 @@ class HolonomicSampleTest {
   void testKinematicInterpolateMonotonicity() {
     var start =
         new HolonomicSample(
-            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.ZERO, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
@@ -347,12 +347,12 @@ class HolonomicSampleTest {
   void testKinematicInterpolateContinuity() {
     var start =
         new HolonomicSample(
-            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.ZERO, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new HolonomicSample(
             1,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
@@ -375,14 +375,14 @@ class HolonomicSampleTest {
     var start =
         new HolonomicSample(
             10,
-            Pose2d.kZero,
+            Pose2d.ZERO,
             new ChassisVelocities(1, 0, 0),
             new ChassisAccelerations(2.0, 0.0, 0.0));
 
     var end =
         new HolonomicSample(
             12,
-            new Pose2d(8, 0, Rotation2d.kZero),
+            new Pose2d(8, 0, Rotation2d.ZERO),
             new ChassisVelocities(5, 0, 0),
             new ChassisAccelerations(2.0, 0.0, 0.0));
 
@@ -415,12 +415,12 @@ class HolonomicSampleTest {
   void testKinematicInterpolateZeroTime() {
     var start =
         new HolonomicSample(
-            0, Pose2d.kZero, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
+            0, Pose2d.ZERO, new ChassisVelocities(1, 0, 0), new ChassisAccelerations());
 
     var end =
         new HolonomicSample(
             0,
-            new Pose2d(1, 0, Rotation2d.kZero),
+            new Pose2d(1, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0),
             new ChassisAccelerations());
 
@@ -440,7 +440,7 @@ class HolonomicSampleTest {
     var sample =
         new DrivetrainSplineSample(
             0.0,
-            new Pose2d(0, 0, Rotation2d.kCCW_Pi_2),
+            new Pose2d(0, 0, Rotation2d.CCW_PI_2),
             forwardVelocity,
             forwardAcceleration,
             curvature);
@@ -465,12 +465,12 @@ class HolonomicSampleTest {
     var sample =
         new HolonomicSample(
             0,
-            new Pose2d(0, 0, Rotation2d.kZero),
+            new Pose2d(0, 0, Rotation2d.ZERO),
             new ChassisVelocities(1, 0, 0.5),
             new ChassisAccelerations(2, 0, 0.3));
 
     var transformed =
-        sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.kCCW_Pi_2));
+        sample.transform(new Transform2d(new Translation2d(3, 4), Rotation2d.CCW_PI_2));
 
     // Pose is transformed.
     assertEquals(3.0, transformed.pose.getX(), EPSILON);
@@ -493,11 +493,11 @@ class HolonomicSampleTest {
     var sample =
         new HolonomicSample(
             0,
-            new Pose2d(1, 2, Rotation2d.kCCW_Pi_2),
+            new Pose2d(1, 2, Rotation2d.CCW_PI_2),
             new ChassisVelocities(0, 1, 0.5),
             new ChassisAccelerations(0, 2, 0.3));
 
-    var relative = sample.relativeTo(new Pose2d(1, 2, Rotation2d.kCCW_Pi_2));
+    var relative = sample.relativeTo(new Pose2d(1, 2, Rotation2d.CCW_PI_2));
 
     // Pose becomes the origin.
     assertEquals(0.0, relative.pose.getX(), EPSILON);
@@ -540,13 +540,13 @@ class HolonomicSampleTest {
     var sample =
         new DifferentialSample(
             0.0,
-            new Pose2d(0, 0, Rotation2d.kZero),
+            new Pose2d(0, 0, Rotation2d.ZERO),
             new ChassisVelocities(2, 0, 0.5),
             new ChassisAccelerations(1, 0, 0.2),
             kinematics);
 
     var transformed =
-        sample.transform(new Transform2d(new Translation2d(0, 0), Rotation2d.kCCW_Pi_2));
+        sample.transform(new Transform2d(new Translation2d(0, 0), Rotation2d.CCW_PI_2));
 
     assertEquals(sample.leftVelocity, transformed.leftVelocity, EPSILON);
     assertEquals(sample.rightVelocity, transformed.rightVelocity, EPSILON);

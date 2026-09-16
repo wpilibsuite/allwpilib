@@ -10,9 +10,11 @@
 #include <gcem.hpp>
 
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
+#include "wpi/tunables/Tunable.hpp"
 #include "wpi/util/SymbolExports.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -30,8 +32,8 @@ namespace wpi::math {
  * control them with a bang-bang controller.
  */
 class WPILIB_DLLEXPORT BangBangController
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<BangBangController> {
+    : public wpi::telemetry::TelemetryLoggable,
+      public wpi::tunables::ComplexTunable {
  public:
   /**
    * Creates a new bang-bang controller.
@@ -46,8 +48,7 @@ class WPILIB_DLLEXPORT BangBangController
       : m_tolerance(tolerance) {
     if !consteval {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsage("BangBangController",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("BangBangController", std::to_string(instances));
     }
   }
 
@@ -129,12 +130,18 @@ class WPILIB_DLLEXPORT BangBangController
     return Calculate(measurement, m_setpoint);
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
+
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
+
+  std::string_view GetTunableType() const override;
 
  private:
-  double m_tolerance;
+  wpi::tunables::Tunable<double> m_tolerance;
 
-  double m_setpoint = 0;
+  wpi::tunables::Tunable<double> m_setpoint;
   double m_measurement = 0;
 
   // Usage reporting instances

@@ -11,8 +11,8 @@ import static org.wpilib.hardware.led.LEDPattern.GradientType.DISCONTINUOUS;
 import static org.wpilib.units.Units.Centimeters;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.MetersPerSecond;
-import static org.wpilib.units.Units.Microsecond;
-import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Nanosecond;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Percent;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.units.Units.Value;
@@ -220,8 +220,8 @@ class LEDPatternTest {
           }
         };
 
-    // scroll forwards 1/256th (1 LED) per microsecond - this makes mock time easier
-    var scroll = base.scrollAtRelativeVelocity(Value.per(Microsecond).of(1 / 256.0));
+    // scroll forwards 1/256th (1 LED) per nanosecond - this makes mock time easier
+    var scroll = base.scrollAtRelativeVelocity(Value.per(Nanosecond).of(1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time;
@@ -254,8 +254,8 @@ class LEDPatternTest {
           }
         };
 
-    // scroll backwards 1/256th (1 LED) per microsecond - this makes mock time easier
-    var scroll = base.scrollAtRelativeVelocity(Value.per(Microsecond).of(-1 / 256.0));
+    // scroll backwards 1/256th (1 LED) per nanosecond - this makes mock time easier
+    var scroll = base.scrollAtRelativeVelocity(Value.per(Nanosecond).of(-1 / 256.0));
 
     for (int time = 0; time < 500; time++) {
       m_mockTime = time;
@@ -294,7 +294,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      m_mockTime = time * 1_250; // 1.25ms per LED
+      m_mockTime = time * 1_250_000L; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -330,7 +330,7 @@ class LEDPatternTest {
     var scroll = base.scrollAtAbsoluteVelocity(MetersPerSecond.of(-16), Centimeters.of(2));
 
     for (int time = 0; time < 500; time++) {
-      m_mockTime = time * 1_250; // 1.25ms per LED
+      m_mockTime = time * 1_250_000L; // 1.25ms per LED
       scroll.applyTo(buffer);
 
       for (int led = 0; led < buffer.getLength(); led++) {
@@ -543,7 +543,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      m_mockTime = t * 1_000_000L; // time travel 1 second
+      m_mockTime = t * 1_000_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -575,7 +575,7 @@ class LEDPatternTest {
     var buffer = new AddressableLEDBuffer(1);
 
     for (int t = 0; t < 8; t++) {
-      m_mockTime = t * 1_000_000L; // time travel 1 second
+      m_mockTime = t * 1_000_000_000L; // time travel 1 second
       pattern.applyTo(buffer);
 
       Color color = buffer.getLED(0);
@@ -622,7 +622,7 @@ class LEDPatternTest {
   void breathe() {
     final Color midGray = new Color(0.5, 0.5, 0.5);
 
-    var pattern = LEDPattern.solid(WHITE).breathe(Microseconds.of(4));
+    var pattern = LEDPattern.solid(WHITE).breathe(Nanoseconds.of(4));
 
     var buffer = new AddressableLEDBuffer(1);
 
@@ -863,11 +863,11 @@ class LEDPatternTest {
     // [red, red, blue, blue, yellow, yellow, green, green]
     // under a mask of first 50% on, last 50% off
     // [red, red, blue, blue, black, black, black, black]
-    // all scrolling at 1 LED per microsecond
+    // all scrolling at 1 LED per nanosecond
     var pattern =
         LEDPattern.steps(Map.of(0, RED, 0.25, BLUE, 0.5, YELLOW, 0.75, GREEN))
             .mask(LEDPattern.steps(Map.of(0, WHITE, 0.5, BLACK)))
-            .scrollAtRelativeVelocity(Percent.per(Microsecond).of(12.5));
+            .scrollAtRelativeVelocity(Percent.per(Nanosecond).of(12.5));
     var buffer = new AddressableLEDBuffer(8);
 
     {
@@ -928,11 +928,11 @@ class LEDPatternTest {
     // [red, red, blue, blue, yellow, yellow, green, green]
     // under a mask of first 50% on, last 50% off
     // [red, red, blue, blue, black, black, black, black]
-    // all scrolling at 1 LED per microsecond
+    // all scrolling at 1 LED per nanosecond
     var pattern =
         LEDPattern.steps(Map.of(0, RED, 0.25, BLUE, 0.5, YELLOW, 0.75, GREEN))
             .mask(LEDPattern.steps(Map.of(0, WHITE, 0.5, BLACK)))
-            .scrollAtAbsoluteVelocity(Meters.per(Microsecond).of(1), Meters.one());
+            .scrollAtAbsoluteVelocity(Meters.per(Nanosecond).of(1), Meters.one());
     var buffer = new AddressableLEDBuffer(8);
 
     {

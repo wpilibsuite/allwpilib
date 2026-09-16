@@ -49,29 +49,29 @@ class Drive : public wpi::cmd::SubsystemBase {
   wpi::cmd::CommandPtr TurnToAngleCommand(wpi::units::degree_t angle);
 
  private:
-  wpi::PWMSparkMax leftLeader{DriveConstants::kLeftMotor1Port};
-  wpi::PWMSparkMax leftFollower{DriveConstants::kLeftMotor2Port};
-  wpi::PWMSparkMax rightLeader{DriveConstants::kRightMotor1Port};
-  wpi::PWMSparkMax rightFollower{DriveConstants::kRightMotor2Port};
+  wpi::PWMSparkMax leftLeader{DriveConstants::LEFT_MOTOR1_PORT};
+  wpi::PWMSparkMax leftFollower{DriveConstants::LEFT_MOTOR2_PORT};
+  wpi::PWMSparkMax rightLeader{DriveConstants::RIGHT_MOTOR1_PORT};
+  wpi::PWMSparkMax rightFollower{DriveConstants::RIGHT_MOTOR2_PORT};
 
   wpi::DifferentialDrive drive{
       [&](double output) { leftLeader.SetThrottle(output); },
       [&](double output) { rightLeader.SetThrottle(output); }};
 
-  wpi::Encoder leftEncoder{DriveConstants::kLeftEncoderPorts[0],
-                           DriveConstants::kLeftEncoderPorts[1],
-                           DriveConstants::kLeftEncoderReversed};
-  wpi::Encoder rightEncoder{DriveConstants::kRightEncoderPorts[0],
-                            DriveConstants::kRightEncoderPorts[1],
-                            DriveConstants::kRightEncoderReversed};
+  wpi::Encoder leftEncoder{DriveConstants::LEFT_ENCODER_PORTS[0],
+                           DriveConstants::LEFT_ENCODER_PORTS[1],
+                           DriveConstants::LEFT_ENCODER_REVERSED};
+  wpi::Encoder rightEncoder{DriveConstants::RIGHT_ENCODER_PORTS[0],
+                            DriveConstants::RIGHT_ENCODER_PORTS[1],
+                            DriveConstants::RIGHT_ENCODER_REVERSED};
 
   wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
   wpi::math::ProfiledPIDController<wpi::units::radians> controller{
-      DriveConstants::kTurnP,
-      DriveConstants::kTurnI,
-      DriveConstants::kTurnD,
-      {DriveConstants::kMaxTurnRate, DriveConstants::kMaxTurnAcceleration}};
+      DriveConstants::TURN_P,
+      DriveConstants::TURN_I,
+      DriveConstants::TURN_D,
+      {DriveConstants::MAX_TURN_RATE, DriveConstants::MAX_TURN_ACCELERATION}};
   wpi::math::SimpleMotorFeedforward<wpi::units::radians> feedforward{
       DriveConstants::ks, DriveConstants::kv, DriveConstants::ka};
 };

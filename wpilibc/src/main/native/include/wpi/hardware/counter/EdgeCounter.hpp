@@ -6,14 +6,12 @@
 
 #include "wpi/hal/Counter.h"
 #include "wpi/hardware/counter/EdgeConfiguration.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/util/Handle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 /** Counts rising or falling edges on a single digital input. */
-class EdgeCounter : public wpi::util::Sendable,
-                    public wpi::util::SendableHelper<EdgeCounter> {
+class EdgeCounter : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Constructs a new edge counter.
@@ -50,8 +48,9 @@ class EdgeCounter : public wpi::util::Sendable,
    */
   void SetEdgeConfiguration(EdgeConfiguration configuration);
 
- protected:
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   wpi::util::Handle<HAL_CounterHandle, HAL_FreeCounter> m_handle;

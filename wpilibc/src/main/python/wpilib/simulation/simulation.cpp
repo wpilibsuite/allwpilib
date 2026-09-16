@@ -4,18 +4,11 @@
 #ifndef __FIRST_SYSTEMCORE__
 
 namespace wpi::impl {
-void ResetSmartDashboardInstance();
 void ResetMotorSafety();
 }  // namespace wpi::impl
 
-namespace wpi::util::impl {
-void ResetSendableRegistry();
-}  // namespace wpi::util::impl
-
 void resetWpilibSimulationData() {
-  wpi::impl::ResetSmartDashboardInstance();
   wpi::impl::ResetMotorSafety();
-  wpi::util::impl::ResetSendableRegistry();
 }
 
 void resetMotorSafety() {

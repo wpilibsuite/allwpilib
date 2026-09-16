@@ -21,6 +21,6 @@ class Storage : wpi::cmd::SubsystemBase {
   wpi::cmd::Trigger HasCargo{[this] { return ballSensor.Get(); }};
 
  private:
-  wpi::PWMSparkMax motor{StorageConstants::kMotorPort};
-  wpi::DigitalInput ballSensor{StorageConstants::kBallSensorPort};
+  wpi::PWMSparkMax motor{StorageConstants::MOTOR_PORT};
+  wpi::DigitalInput ballSensor{StorageConstants::BALL_SENSOR_PORT};
 };

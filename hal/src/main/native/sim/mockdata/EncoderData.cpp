@@ -9,7 +9,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeEncoderData() {
-  static EncoderData sed[kNumEncoders];
+  static EncoderData sed[NUM_ENCODERS];
   ::wpi::hal::SimEncoderData = sed;
 }
 }  // namespace wpi::hal::init
@@ -30,7 +30,7 @@ void EncoderData::ResetData() {
 
 extern "C" {
 int32_t HALSIM_FindEncoderForChannel(int32_t channel) {
-  for (int i = 0; i < kNumEncoders; ++i) {
+  for (int i = 0; i < NUM_ENCODERS; ++i) {
     if (!SimEncoderData[i].initialized) {
       continue;
     }

@@ -18,10 +18,10 @@
 
 class DigitalCommunicationTest {
  public:
-  wpi::sim::DIOSim allianceOutput{Robot::kAlliancePort};
-  wpi::sim::DIOSim enabledOutput{Robot::kEnabledPort};
-  wpi::sim::DIOSim autonomousOutput{Robot::kAutonomousPort};
-  wpi::sim::DIOSim alertOutput{Robot::kAlertPort};
+  wpi::sim::DIOSim allianceOutput{Robot::ALLIANCE_PORT};
+  wpi::sim::DIOSim enabledOutput{Robot::ENABLED_PORT};
+  wpi::sim::DIOSim autonomousOutput{Robot::AUTONOMOUS_PORT};
+  wpi::sim::DIOSim alertOutput{Robot::ALERT_PORT};
   Robot robot;
   std::optional<std::thread> thread;
 

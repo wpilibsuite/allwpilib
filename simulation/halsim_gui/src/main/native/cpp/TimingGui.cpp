@@ -6,6 +6,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -30,7 +31,7 @@ class TimingModel : public wpi::glass::Model {
 }  // namespace
 
 static void DisplayTiming() {
-  uint64_t curTime = HAL_GetMonotonicTime();
+  int64_t curTime = HAL_GetMonotonicTime();
 
   if (ImGui::Button("Run")) {
     HALSIM_ResumeTiming();
@@ -43,8 +44,8 @@ static void DisplayTiming() {
   ImGui::PushButtonRepeat(true);
   if (ImGui::Button("Step")) {
     HALSIM_PauseTiming();
-    uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    if (nextTimeout != UINT64_MAX) {
+    int64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
+    if (nextTimeout != std::numeric_limits<int64_t>::max()) {
       HALSIM_StepTimingAsync(nextTimeout - curTime);
     }
   }
@@ -55,7 +56,7 @@ static void DisplayTiming() {
 
   static std::vector<HALSIM_NotifierInfo> notifiers;
   struct NotifierLastValue {
-    uint64_t alarmTime = UINT64_MAX;
+    int64_t alarmTime = std::numeric_limits<int64_t>::max();
     double displayTime = 0;
   };
   constexpr double fadeDuration = 0.25;
@@ -69,11 +70,11 @@ static void DisplayTiming() {
     num = HALSIM_GetNotifierInfo(notifiers.data(), notifiers.size());
   }
   for (int32_t i = 0; i < num; ++i) {
-    if (notifiers[i].alarmTime != UINT64_MAX) {
+    if (notifiers[i].alarmTime != std::numeric_limits<int64_t>::max()) {
       notifierFades[i].alarmTime = notifiers[i].alarmTime;
       notifierFades[i].displayTime = curGuiTime;
     } else if (curGuiTime > (notifierFades[i].displayTime + fadeDuration)) {
-      notifierFades[i].alarmTime = UINT64_MAX;
+      notifierFades[i].alarmTime = std::numeric_limits<int64_t>::max();
       notifierFades[i].displayTime = 0;
     }
   }
@@ -93,7 +94,7 @@ static void DisplayTiming() {
       ImGui::TableNextColumn();
       ImGui::TextUnformatted(notifiers[i].name);
       ImGui::TableNextColumn();
-      if (notifierFades[i].alarmTime != UINT64_MAX) {
+      if (notifierFades[i].alarmTime != std::numeric_limits<int64_t>::max()) {
         ImGui::PushStyleVar(
             ImGuiStyleVar_Alpha,
             1.0 - (curGuiTime - notifierFades[i].displayTime) / fadeDuration);
@@ -103,7 +104,7 @@ static void DisplayTiming() {
       }
       ImGui::TableNextColumn();
       if (notifiers[i].intervalTime != 0) {
-        ImGui::Text("%.3f", notifiers[i].intervalTime / 1000000.0);
+        ImGui::Text("%.3f", notifiers[i].intervalTime / 1'000'000'000.0);
       }
       ImGui::TableNextColumn();
       ImGui::Text("%d", notifiers[i].overrunCount);

@@ -38,7 +38,7 @@ int main(int argc, const char** argv) {
         wpi::util::print(
             "Start({}, name='{}', type='{}', metadata='{}') [{}]\n", data.entry,
             data.name, data.type, data.metadata,
-            record.GetTimestamp() / 1000000.0);
+            record.GetTimestamp() / 1'000'000'000.0);
         if (entries.find(data.entry) != entries.end()) {
           wpi::util::print("...DUPLICATE entry ID, overriding\n");
         }
@@ -50,7 +50,7 @@ int main(int argc, const char** argv) {
       int entry;
       if (record.GetFinishEntry(&entry)) {
         wpi::util::print("Finish({}) [{}]\n", entry,
-                         record.GetTimestamp() / 1000000.0);
+                         record.GetTimestamp() / 1'000'000'000.0);
         auto it = entries.find(entry);
         if (it == entries.end()) {
           wpi::util::print("...ID not found\n");
@@ -64,7 +64,8 @@ int main(int argc, const char** argv) {
       wpi::log::MetadataRecordData data;
       if (record.GetSetMetadataData(&data)) {
         wpi::util::print("SetMetadata({}, '{}') [{}]\n", data.entry,
-                         data.metadata, record.GetTimestamp() / 1000000.0);
+                         data.metadata,
+                         record.GetTimestamp() / 1'000'000'000.0);
         auto it = entries.find(data.entry);
         if (it == entries.end()) {
           wpi::util::print("...ID not found\n");
@@ -85,16 +86,17 @@ int main(int argc, const char** argv) {
         continue;
       }
       wpi::util::print("<name='{}', type='{}'> [{}]\n", entry->second.name,
-                       entry->second.type, record.GetTimestamp() / 1000000.0);
+                       entry->second.type,
+                       record.GetTimestamp() / 1'000'000'000.0);
 
       // handle systemTime specially
       if (entry->second.name == "systemTime" && entry->second.type == "int64") {
         int64_t val;
         if (record.GetInteger(&val)) {
           auto timeval = std::chrono::system_clock::time_point(
-              std::chrono::microseconds(val));
-          wpi::util::print("  {:%Y-%m-%d %H:%M:%OS}.{:06}\n", timeval,
-                           val % 1000000);
+              std::chrono::seconds(val / 1'000'000));
+          wpi::util::print("  {:%Y-%m-%d %H:%M:%S}.{:06}\n", timeval,
+                           val % 1'000'000);
         } else {
           wpi::util::print("  invalid\n");
         }

@@ -10,9 +10,9 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 public final class CompileTestUtils {
-  public static final int kJavaVersion = 17;
-  public static final List<Object> kJavaVersionOptions =
-      List.of("-source", kJavaVersion, "-target", kJavaVersion);
+  public static final int JAVA_VERSION = 17;
+  public static final List<Object> JAVA_VERSION_OPTIONS =
+      List.of("-source", JAVA_VERSION, "-target", JAVA_VERSION);
 
   private CompileTestUtils() {
     // Utility class

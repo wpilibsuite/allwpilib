@@ -6,7 +6,6 @@
 
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/driverstation/DriverStation.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/system/DataLogManager.hpp"
 
 Robot::Robot() {
@@ -22,12 +21,10 @@ Robot::Robot() {
  * This function is called every 20 ms, no matter the mode. Use
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and utility.
- *
- * <p> This runs after the mode specific periodic functions, but before
- * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
+  container.UpdateTelemetry();
 }
 
 /**

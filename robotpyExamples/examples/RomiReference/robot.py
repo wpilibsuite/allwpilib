@@ -40,6 +40,7 @@
 
 import typing
 
+import telemetry
 import wpilib
 import commands2
 
@@ -64,6 +65,10 @@ class MyRobot(commands2.TimedCommandRobot):
         # Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         # autonomous chooser on the dashboard.
         self.container = RobotContainer()
+
+    def robot_periodic(self) -> None:
+        super().robot_periodic()
+        telemetry.log("", self.container)
 
     def disabled_init(self) -> None:
         """This function is called once each time the robot enters Disabled mode."""

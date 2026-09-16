@@ -10,7 +10,7 @@ import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.ExponentialProfile;
 
 public class Robot extends TimedRobot {
-  private static double kDt = 0.02;
+  private static double DT = 0.02;
 
   private final Joystick joystick = new Joystick(1);
   private final ExampleSmartMotorController motor = new ExampleSmartMotorController(1);
@@ -39,11 +39,11 @@ public class Robot extends TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    ExponentialProfile.State next = profile.calculate(kDt, setpoint, goal);
+    ExponentialProfile.State next = profile.calculate(DT, setpoint, goal);
 
     // Send setpoint to offboard controller PID
     motor.setSetpoint(
-        ExampleSmartMotorController.PIDMode.kPosition,
+        ExampleSmartMotorController.PIDMode.POSITION,
         setpoint.position,
         feedforward.calculate(next.velocity) / 12.0);
 

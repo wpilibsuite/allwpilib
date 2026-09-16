@@ -15,9 +15,8 @@ filegroup(
     name = "doxygen-files",
     srcs = glob([
         "src/main/native/include/**/*",
-        "src/main/native/thirdparty/libuv/include/**/*",
         "src/main/native/thirdparty/tcpsockets/include/**/*",
-    ]),
+    ]) + ["@libuv//:include_files"],
     visibility = ["//visibility:public"],
 )
 
@@ -53,83 +52,16 @@ pkg_files(
     strip_prefix = "src/main/native/thirdparty/ada/src",
 )
 
-WIN_UV_SRCS = glob([
-    "src/main/native/thirdparty/libuv/src/win/*.cpp",
-    "src/main/native/thirdparty/libuv/src/win/*.h",
-])
-
-UNIX_UV_SRCS = [
-    "src/main/native/thirdparty/libuv/src/unix/async.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/core.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/dl.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/fs.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/getaddrinfo.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/getnameinfo.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/loop-watcher.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/loop.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/pipe.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/poll.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/process.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/random-devurandom.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/random-getentropy.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/random-getrandom.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/signal.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/stream.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/tcp.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/thread.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/tty.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/udp.cpp",
-] + glob(["src/main/native/thirdparty/libuv/src/unix/*.h"])
-
-MAC_UV_SRCS = [
-    "src/main/native/thirdparty/libuv/src/unix/bsd-ifaddrs.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/darwin.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/darwin-proctitle.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/fsevents.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/kqueue.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/proctitle.cpp",
-]
-
-LINUX_UV_SRCS = [
-    "src/main/native/thirdparty/libuv/src/unix/linux.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/procfs-exepath.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/proctitle.cpp",
-    "src/main/native/thirdparty/libuv/src/unix/random-sysctl-linux.cpp",
-]
-
-cc_library(
-    name = "libuv-headers",
-    hdrs = glob([
-        "src/main/native/thirdparty/libuv/include/**/*.h",
-    ]),
-    includes = ["src/main/native/thirdparty/libuv/src"],
-    strip_include_prefix = "src/main/native/thirdparty/libuv/include",
-)
-
-filegroup(
-    name = "libuv-srcs",
-    srcs = select({
-               "@wpilib_toolchains//constraints/combined:is_unix": UNIX_UV_SRCS,
-               "//conditions:default": [],
-           }) +
-           select({
-               "@platforms//os:osx": MAC_UV_SRCS,
-               "@platforms//os:windows": WIN_UV_SRCS,
-               "@wpilib_toolchains//constraints/combined:is_linux": LINUX_UV_SRCS,
-           }) + glob(["src/main/native/thirdparty/libuv/src/*"]),
-    visibility = ["//wpinet:__subpackages__"],
-)
-
 pkg_files(
     name = "thirdparty-libuv-hdr-pkg",
-    srcs = glob(["src/main/native/thirdparty/libuv/include/**"]),
-    strip_prefix = "src/main/native/thirdparty/libuv/include",
+    srcs = ["@libuv//:include_files"],
+    strip_prefix = "include",
 )
 
 pkg_files(
     name = "thirdparty-libuv-src-pkg",
-    srcs = glob(["src/main/native/thirdparty/libuv/src/**"]),
-    strip_prefix = "src/main/native/thirdparty/libuv/src",
+    srcs = ["@libuv//:src_files"],
+    strip_prefix = "src",
 )
 
 third_party_cc_lib_helper(
@@ -166,9 +98,7 @@ wpilib_cc_library(
     srcs = glob(
         ["src/main/native/cpp/**"],
         exclude = ["src/main/native/cpp/jni/**"],
-    ) + [
-        ":libuv-srcs",
-    ] + ["native-srcs"],
+    ) + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
     copts = select({
         "@platforms//os:windows": [],
@@ -201,9 +131,9 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":ada",
-        ":libuv-headers",
         ":private_includes",
         "//wpiutil",
+        "@libuv",
     ],
 )
 
@@ -353,10 +283,12 @@ cc_binary(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpinet-generator",
+    module_include_targets = {
+        "@libuv//:include_files": "include",
+    },
     pyproject_toml = "src/main/python/native-pyproject.toml",
     third_party_dirs = [
         "ada",
-        "libuv",
         "llhttp",
         "tcpsockets",
     ],

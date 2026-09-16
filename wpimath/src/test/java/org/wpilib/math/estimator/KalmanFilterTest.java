@@ -200,7 +200,7 @@ class KalmanFilterTest {
 
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
-            List.of(new Pose2d(0.0, 0.0, Rotation2d.kZero), new Pose2d(5.0, 5.0, Rotation2d.kZero)),
+            List.of(new Pose2d(0.0, 0.0, Rotation2d.ZERO), new Pose2d(5.0, 5.0, Rotation2d.ZERO)),
             new TrajectoryConfig(2.0, 2.0));
 
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);

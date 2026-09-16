@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.wpilib.hardware.hal.RobotMode;
+import org.wpilib.math.util.MathShared;
+import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.system.RobotController;
 
 public class CommandTestBase {
@@ -18,10 +21,12 @@ public class CommandTestBase {
   protected List<SchedulerEvent> m_events;
   protected long m_opModeId = 0;
   protected String m_opModeName = "";
+  protected RobotMode m_robotMode = RobotMode.UNKNOWN;
+  protected boolean m_enabled = true;
 
   @BeforeEach
   void initScheduler() {
-    RobotController.setTimeSource(() -> System.nanoTime() / 1000L);
+    RobotController.setTimeSource(System::nanoTime);
     m_scheduler = Scheduler.createIndependentScheduler();
     m_events = new ArrayList<>();
     m_scheduler.addEventListener(m_events::add);
@@ -29,8 +34,8 @@ public class CommandTestBase {
 
   @BeforeEach
   void initOpmodeFetcher() {
-    OpModeFetcher.setFetcher(
-        new OpModeFetcher() {
+    RobotStateFetcher.setFetcher(
+        new RobotStateFetcher() {
           @Override
           long getOpModeId() {
             return m_opModeId;
@@ -40,13 +45,39 @@ public class CommandTestBase {
           String getOpModeName() {
             return m_opModeName;
           }
+
+          @Override
+          RobotMode getRobotMode() {
+            return m_robotMode;
+          }
+
+          @Override
+          boolean isEnabled() {
+            return m_enabled;
+          }
+        });
+  }
+
+  @BeforeEach
+  void initTime() {
+    MathSharedStore.setMathShared(
+        new MathShared() {
+          @Override
+          public void reportError(String error, StackTraceElement[] stackTrace) {}
+
+          @Override
+          public double getTimestamp() {
+            return RobotController.getTime() / 1e9;
+          }
         });
   }
 
   @AfterEach
-  void resetOpmodeFetcher() {
+  void resetRobotState() {
     m_opModeId = 0;
     m_opModeName = "";
+    m_robotMode = RobotMode.UNKNOWN;
+    m_enabled = true;
   }
 
   /**

@@ -9,13 +9,37 @@ build --experimental_cc_static_library
 build --experimental_cc_shared_library
 build --incompatible_strict_action_env
 
+# Actions get a fixed environment from the flag above, but repository rules and
+# module extensions still see the client environment in full, and that is where
+# the C++ toolchain gets configured -- rules_cc declares roughly thirty
+# variables as inputs to cc_autoconf.
+common:windows --experimental_strict_repo_env
+common:windows --repo_env=BAZEL_SH
+# publishing_rule.bzl declares this as an environ input and reads it straight out
+# of the environment, which is how a developer picks a subset of the artifact
+# variants to build.
+common:windows --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER
+# Escape hatches for a Visual Studio install outside the default location.
+common:windows --repo_env=BAZEL_VC
+common:windows --repo_env=BAZEL_VS
+common:windows --repo_env=BAZEL_VC_FULL_VERSION
+common:windows --repo_env=BAZEL_WINSDK_FULL_VERSION
+# Keep the pinned git away from the developer's ~/.gitconfig, where settings
+# like core.autocrlf or url.*.insteadOf would make a fetch machine dependent. A
+# nonexistent config path reads as an empty config. This has to live here rather
+# than in the wrapper: exported to every process Bazel launches it would also
+# reach `bazel run //:copybara`, which needs the real configuration to find a
+# credential helper and an identity to push with.
+common:windows --repo_env=GIT_CONFIG_GLOBAL=/dev/null
+common:windows --repo_env=GIT_CONFIG_SYSTEM=/dev/null
+
 build --java_language_version=25
 build --java_runtime_version=remotejdk_25
 build --tool_java_language_version=25
 build --tool_java_runtime_version=remotejdk_25
 
 test --test_output=errors
-test --test_verbose_timeout_warnings
+test --notest_verbose_timeout_warnings
 
 import %workspace%/shared/bazel/compiler_flags/sanitizers.rc
 import %workspace%/shared/bazel/compiler_flags/linux_flags.rc
@@ -29,6 +53,7 @@ build:build_cpp --test_tag_filters=+allwpilib-build-cpp --build_tag_filters=+all
 build:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
+common:imgui_tests --//shared/bazel/rules:with_imgui_tests=true
 
 # Build Buddy BES Setup
 build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/
@@ -37,7 +62,6 @@ build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 # Common Cache Settings
 build:common_cache --remote_timeout=3600
 build:common_cache --remote_cache_compression
-build:common_cache --experimental_remote_cache_compression_threshold=100
 common:common_cache --experimental_remote_merkle_tree_cache
 
 # Build Buddy Cache Setup
@@ -59,20 +83,20 @@ common:remote_cache_readonly --noremote_upload_local_results
 
 # Stubs for remote execution.
 build:remote --strategy=TsProject=remote,sandboxed
-build --strategy=CopyFile=remote,standalone
-build --strategy=CopyDirectory=remote,standalone
-build --strategy=CopyToDirectory=remote,standalone
-build --strategy=PyWriteBuildData=remote,standalone
-# All tests have a strategy of TestRunner.  Enable standalone for only tests.
+build --strategy=CopyFile=remote,local
+build --strategy=CopyDirectory=remote,local
+build --strategy=CopyToDirectory=remote,local
+build --strategy=PyWriteBuildData=remote,local
+# All tests have a strategy of TestRunner.  Enable local for only tests.
 # See the following for more details:
 # https://github.com/bazelbuild/bazel/issues/7480
-build:linux --strategy=TestRunner=remote,sandboxed,standalone
-build:macos --strategy=TestRunner=remote,sandboxed,standalone
-build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
-build:macos --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:linux --strategy=TestRunner=remote,sandboxed,local
+build:macos --strategy=TestRunner=remote,sandboxed,local
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,local
+build:macos --strategy=NpmLifecycleHook=remote,sandboxed,local
 
 common:remote --config=common_cache
-build:remote --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
+build:remote --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
 # Specify your cluster as follows:
 # build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
 build:remote --jobs=100
@@ -106,5 +130,9 @@ common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,
 
 build --@rules_python//python/config_settings:bootstrap_impl=script
 build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
+# AOS has both aos/flatbuffers/ and aos/flatbuffers.py; without this Bazel
+# synthesizes an aos/flatbuffers/__init__.py that shadows the module.
+build --incompatible_default_to_explicit_init_py
 
 try-import %workspace%/bazel_auth.rc

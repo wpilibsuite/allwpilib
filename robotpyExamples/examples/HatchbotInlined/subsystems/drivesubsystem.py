@@ -5,6 +5,7 @@
 #
 
 import commands2
+import telemetry
 import wpilib
 import wpilib_drivers
 import constants
@@ -68,3 +69,8 @@ class DriveSubsystem(commands2.Subsystem):
         drive to drive more slowly.
         """
         self.drive.set_max_output(max_output)
+
+    def log_to(self, table: telemetry.TelemetryTable) -> None:
+        super().log_to(table)
+        table.log("leftDistance", self.left_encoder.get_distance())
+        table.log("rightDistance", self.right_encoder.get_distance())

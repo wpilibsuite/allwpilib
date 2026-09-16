@@ -17,7 +17,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 1E-9;
+static constexpr double EPSILON = 1E-9;
 
 TEST_CASE("DifferentialDriveOdometry3dTest Initialize", "[wpimath]") {
   DifferentialDriveOdometry3d odometry{
@@ -27,10 +27,10 @@ TEST_CASE("DifferentialDriveOdometry3dTest Initialize", "[wpimath]") {
 
   const wpi::math::Pose3d& pose = odometry.GetPose();
 
-  CHECK_NEAR(pose.X().value(), 1, kEpsilon);
-  CHECK_NEAR(pose.Y().value(), 2, kEpsilon);
-  CHECK_NEAR(pose.Z().value(), 0, kEpsilon);
-  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 1, EPSILON);
+  CHECK_NEAR(pose.Y().value(), 2, EPSILON);
+  CHECK_NEAR(pose.Z().value(), 0, EPSILON);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 45, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveOdometry3dTest EncoderDistances", "[wpimath]") {
@@ -41,10 +41,10 @@ TEST_CASE("DifferentialDriveOdometry3dTest EncoderDistances", "[wpimath]") {
       odometry.Update(wpi::math::Rotation3d{0_deg, 0_deg, 135_deg}, 0_m,
                       wpi::units::meter_t{5 * std::numbers::pi});
 
-  CHECK_NEAR(pose.X().value(), 5.0, kEpsilon);
-  CHECK_NEAR(pose.Y().value(), 5.0, kEpsilon);
-  CHECK_NEAR(pose.Z().value(), 0.0, kEpsilon);
-  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 5.0, EPSILON);
+  CHECK_NEAR(pose.Y().value(), 5.0, EPSILON);
+  CHECK_NEAR(pose.Z().value(), 0.0, EPSILON);
+  CHECK_NEAR(pose.Rotation().ToRotation2d().Degrees().value(), 90.0, EPSILON);
 }
 
 TEST_CASE("DifferentialDriveOdometry3dTest GyroOffset", "[wpimath]") {
@@ -55,10 +55,10 @@ TEST_CASE("DifferentialDriveOdometry3dTest GyroOffset", "[wpimath]") {
   const auto& pose =
       odometry.Update(wpi::math::Rotation3d{0_deg, 10_deg, 0_deg}, 0_m, 0_m);
 
-  CHECK_NEAR(pose.X().value(), 0.0, kEpsilon);
-  CHECK_NEAR(pose.Y().value(), 0.0, kEpsilon);
-  CHECK_NEAR(pose.Z().value(), 0.0, kEpsilon);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, kEpsilon);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, kEpsilon);
-  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, kEpsilon);
+  CHECK_NEAR(pose.X().value(), 0.0, EPSILON);
+  CHECK_NEAR(pose.Y().value(), 0.0, EPSILON);
+  CHECK_NEAR(pose.Z().value(), 0.0, EPSILON);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().X()}.value(), 0.0, EPSILON);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Y()}.value(), 5.0, EPSILON);
+  CHECK_NEAR(wpi::units::degree_t{pose.Rotation().Z()}.value(), 90.0, EPSILON);
 }

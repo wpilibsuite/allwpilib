@@ -19,7 +19,8 @@
 
 #include "wpi/commands2/Command.hpp"
 #include "wpi/commands2/PrintCommand.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 namespace wpi::cmd {
 /**
@@ -64,8 +65,8 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       if (command.second->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+          Command::InterruptionBehavior::CANCEL_SELF) {
+        m_interruptBehavior = Command::InterruptionBehavior::CANCEL_SELF;
       }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
@@ -86,8 +87,8 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
       this->AddRequirements(command.second->GetRequirements());
       m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       if (command.second->GetInterruptionBehavior() ==
-          Command::InterruptionBehavior::kCancelSelf) {
-        m_interruptBehavior = Command::InterruptionBehavior::kCancelSelf;
+          Command::InterruptionBehavior::CANCEL_SELF) {
+        m_interruptBehavior = Command::InterruptionBehavior::CANCEL_SELF;
       }
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
@@ -117,19 +118,11 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
     return m_interruptBehavior;
   }
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override {
-    Command::InitSendable(builder);
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override {
+    Command::LogTo(table);
 
-    builder.AddStringProperty(
-        "selected",
-        [this] {
-          if (m_selectedCommand) {
-            return m_selectedCommand->GetName();
-          } else {
-            return std::string{"null"};
-          }
-        },
-        nullptr);
+    table.Log("selected", m_selectedCommand ? m_selectedCommand->GetName()
+                                            : std::string{"null"});
   }
 
  private:
@@ -138,7 +131,7 @@ class SelectCommand : public CommandHelper<Command, SelectCommand<Key>> {
   Command* m_selectedCommand;
   bool m_runsWhenDisabled = true;
   Command::InterruptionBehavior m_interruptBehavior{
-      Command::InterruptionBehavior::kCancelIncoming};
+      Command::InterruptionBehavior::CANCEL_INCOMING};
 
   PrintCommand m_defaultCommand{
       "SelectCommand selector value does not correspond to any command!"};

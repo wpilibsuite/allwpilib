@@ -15,12 +15,12 @@ namespace wpi::hal {
 /**
  * MXP channels when used as digital output PWM are offset from actual value
  */
-constexpr int32_t kMXPDigitalPWMOffset = 6;
+constexpr int32_t MXP_DIGITAL_PWM_OFFSET = 6;
 
-constexpr int32_t kExpectedLoopTiming = 40;
+constexpr int32_t EXPECTED_LOOP_TIMING = 40;
 
 /**
- * kDefaultPwmPeriod is in ms
+ * DEFAULT_PWM_PERIOD is in ms
  *
  * - 20ms periods (50 Hz) are the "safest" setting in that this works for all
  *   devices
@@ -31,12 +31,12 @@ constexpr int32_t kExpectedLoopTiming = 40;
  * - 10ms periods work well for Victor 884
  * - 5ms periods allows higher update rates for modern motor controllers.
  *
- * kDefaultPwmPeriod is the 1x period (5.05 ms).  In hardware, the period
+ * DEFAULT_PWM_PERIOD is the 1x period (5.05 ms).  In hardware, the period
  * scaling is implemented as an output squelch to get longer periods for old
  * devices.
  */
-constexpr float kDefaultPwmPeriod = 5.05f;
-constexpr int32_t kPwmDisabled = 0;
+constexpr float DEFAULT_PWM_PERIOD = 5.05f;
+constexpr int32_t PWM_DISABLED = 0;
 
 struct DigitalPort {
   uint8_t channel;
@@ -45,7 +45,7 @@ struct DigitalPort {
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                             kNumDigitalChannels + kNumPWMHeaders>*
+                             NUM_DIGITAL_CHANNELS + NUM_PWM_HEADERS>*
     digitalChannelHandles;
 
 /**

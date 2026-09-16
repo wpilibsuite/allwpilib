@@ -17,10 +17,10 @@ message ProtobufArmFeedforward {
 }
 
 message ProtobufDifferentialDriveFeedforward {
-  double kv_linear = 1;
-  double ka_linear = 2;
-  double kv_angular = 3;
-  double ka_angular = 4;
+  double kvLinear = 1;
+  double kaLinear = 2;
+  double kvAngular = 3;
+  double kaAngular = 4;
 }
 
 message ProtobufElevatorFeedforward {

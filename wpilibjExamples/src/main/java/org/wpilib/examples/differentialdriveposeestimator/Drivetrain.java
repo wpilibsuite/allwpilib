@@ -34,18 +34,18 @@ import org.wpilib.simulation.DifferentialDrivetrainSim;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.OnboardIMUSim;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxVelocity = 3.0; // meters per second
-  public static final double kMaxAngularVelocity = 2 * Math.PI; // one rotation per second
+  public static final double MAX_VELOCITY = 3.0; // meters per second
+  public static final double MAX_ANGULAR_VELOCITY = 2 * Math.PI; // one rotation per second
 
-  private static final double kTrackwidth = 0.381 * 2; // meters
-  private static final double kWheelRadius = 0.0508; // meters
-  private static final int kEncoderResolution = 4096;
+  private static final double TRACKWIDTH = 0.381 * 2; // meters
+  private static final double WHEEL_RADIUS = 0.0508; // meters
+  private static final int ENCODER_RESOLUTION = 4096;
 
   private final PWMSparkMax leftLeader = new PWMSparkMax(1);
   private final PWMSparkMax leftFollower = new PWMSparkMax(2);
@@ -61,7 +61,7 @@ public class Drivetrain {
   private final PIDController rightPIDController = new PIDController(1, 0, 0);
 
   private final DifferentialDriveKinematics kinematics =
-      new DifferentialDriveKinematics(kTrackwidth);
+      new DifferentialDriveKinematics(TRACKWIDTH);
 
   private final Pose3d objectInField;
 
@@ -82,7 +82,7 @@ public class Drivetrain {
           imu.getRotation2d(),
           leftEncoder.getDistance(),
           rightEncoder.getDistance(),
-          Pose2d.kZero,
+          Pose2d.ZERO,
           VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
@@ -96,7 +96,7 @@ public class Drivetrain {
       Models.differentialDriveFromSysId(1.98, 0.2, 1.5, 0.3);
   private final DifferentialDrivetrainSim drivetrainSimulator =
       new DifferentialDrivetrainSim(
-          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackwidth, kWheelRadius, null);
+          drivetrainSystem, DCMotor.getCIM(2), 8, TRACKWIDTH, WHEEL_RADIUS, null);
 
   /**
    * Constructs a differential drive object. Sets the encoder distance per pulse and resets the
@@ -116,8 +116,8 @@ public class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    leftEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
-    rightEncoder.setDistancePerPulse(2 * Math.PI * kWheelRadius / kEncoderResolution);
+    leftEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
+    rightEncoder.setDistancePerPulse(2 * Math.PI * WHEEL_RADIUS / ENCODER_RESOLUTION);
 
     leftEncoder.reset();
     rightEncoder.reset();
@@ -125,9 +125,6 @@ public class Drivetrain {
     cameraToObjectEntry = cameraToObjectTopic.getEntry(defaultVal);
 
     objectInField = Field.loadField(Fields.FRC_2024_CRESCENDO).getTagPose(1).get();
-
-    SmartDashboard.putData("Field", fieldSim);
-    SmartDashboard.putData("FieldEstimation", fieldApproximation);
   }
 
   /**
@@ -260,5 +257,8 @@ public class Drivetrain {
     updateOdometry();
     fieldSim.setRobotPose(drivetrainSimulator.getPose());
     fieldApproximation.setRobotPose(poseEstimator.getEstimatedPosition());
+
+    Telemetry.log("Field", fieldSim);
+    Telemetry.log("FieldEstimation", fieldApproximation);
   }
 }

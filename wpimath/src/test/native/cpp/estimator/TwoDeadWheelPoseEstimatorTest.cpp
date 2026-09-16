@@ -1,0 +1,507 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp"
+
+#include <cstddef>
+#include <functional>
+#include <limits>
+#include <numbers>
+#include <optional>
+#include <random>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <catch2/catch_test_macros.hpp>
+
+#include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/geometry/Translation2d.hpp"
+#include "wpi/math/kinematics/ChassisVelocities.hpp"
+#include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/util/MathShared.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/util/array.hpp"
+#include "wpi/util/print.hpp"
+
+void testFollowTrajectory(
+    wpi::math::TwoDeadWheelPoseEstimator& estimator,
+    const wpi::math::DrivetrainSplineTrajectory& trajectory,
+    std::function<
+        wpi::math::ChassisVelocities(wpi::math::DrivetrainSplineSample&)>
+        chassisVelocitiesGenerator,
+    std::function<wpi::math::Pose2d(wpi::math::DrivetrainSplineSample&)>
+        visionMeasurementGenerator,
+    const wpi::math::Pose2d& startingPose, const wpi::math::Pose2d& endingPose,
+    const wpi::units::second_t dt, const wpi::units::second_t kVisionUpdateRate,
+    const wpi::units::second_t kVisionUpdateDelay, const bool checkError,
+    const bool debug) {
+  auto xWheelPos = 0_m;
+  auto yWheelPos = 0_m;
+
+  estimator.ResetPosition(xWheelPos, yWheelPos, wpi::math::Rotation2d{},
+                          startingPose);
+
+  std::mt19937 generator{5190};
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  wpi::units::second_t t = 0_s;
+
+  std::vector<std::pair<wpi::units::second_t, wpi::math::Pose2d>> visionPoses;
+  std::vector<
+      std::tuple<wpi::units::second_t, wpi::units::second_t, wpi::math::Pose2d>>
+      visionLog;
+
+  double maxError = -std::numeric_limits<double>::max();
+  double errorSum = 0;
+
+  if (debug) {
+    wpi::util::print(
+        "time, est_x, est_y, est_theta, true_x, true_y, true_theta\n");
+  }
+
+  wpi::math::Matrixd<2, 3> inverseKinematicsMatrix =
+      wpi::math::Matrixd<2, 3>{{1, 0, -1}, {0, 1, 1}};
+
+  while (t < trajectory.Duration()) {
+    wpi::math::DrivetrainSplineSample groundTruthState = trajectory.SampleAt(t);
+
+    // We are due for a new vision measurement if it's been `visionUpdateRate`
+    // seconds since the last vision measurement
+    if (visionPoses.empty() ||
+        visionPoses.back().first + kVisionUpdateRate < t) {
+      auto visionPose =
+          visionMeasurementGenerator(groundTruthState) +
+          wpi::math::Transform2d{
+              wpi::math::Translation2d{distribution(generator) * 0.1_m,
+                                       distribution(generator) * 0.1_m},
+              wpi::math::Rotation2d{distribution(generator) * 0.05_rad}};
+      visionPoses.push_back({t, visionPose});
+    }
+
+    // We should apply the oldest vision measurement if it has been
+    // `visionUpdateDelay` seconds since it was measured
+    if (!visionPoses.empty() &&
+        visionPoses.front().first + kVisionUpdateDelay < t) {
+      auto visionEntry = visionPoses.front();
+      estimator.AddVisionMeasurement(visionEntry.second, visionEntry.first);
+      visionPoses.erase(visionPoses.begin());
+      visionLog.push_back({t, visionEntry.first, visionEntry.second});
+    }
+
+    auto chassisVelocities = chassisVelocitiesGenerator(groundTruthState);
+
+    Eigen::Vector2d wheelVelocities =
+        inverseKinematicsMatrix *
+        Eigen::Vector3d{chassisVelocities.vx.value(),
+                        chassisVelocities.vy.value(),
+                        chassisVelocities.omega.value()};
+
+    auto xWheelVel = wpi::units::meters_per_second_t{wheelVelocities(0, 0)} +
+                     distribution(generator) * 0.05_mps;
+    auto yWheelVel = wpi::units::meters_per_second_t{wheelVelocities(1, 0)} +
+                     distribution(generator) * 0.05_mps;
+
+    xWheelPos += xWheelVel * dt;
+    yWheelPos += yWheelVel * dt;
+
+    auto xhat = estimator.UpdateWithTime(
+        t, xWheelPos, yWheelPos,
+        groundTruthState.pose.Rotation() +
+            wpi::math::Rotation2d{distribution(generator) * 0.001_rad} -
+            trajectory.InitialPose().Rotation());
+
+    if (debug) {
+      wpi::util::print(
+          "{}, {}, {}, {}, {}, {}, {}\n", t.value(), xhat.X().value(),
+          xhat.Y().value(), xhat.Rotation().Radians().value(),
+          groundTruthState.pose.X().value(), groundTruthState.pose.Y().value(),
+          groundTruthState.pose.Rotation().Radians().value());
+    }
+
+    double error = groundTruthState.pose.Translation()
+                       .Distance(xhat.Translation())
+                       .value();
+
+    if (error > maxError) {
+      maxError = error;
+    }
+    errorSum += error;
+
+    t += dt;
+  }
+
+  if (debug) {
+    wpi::util::print(
+        "apply_time, measured_time, vision_x, vision_y, vision_theta\n");
+
+    wpi::units::second_t apply_time;
+    wpi::units::second_t measure_time;
+    wpi::math::Pose2d vision_pose;
+    for (auto record : visionLog) {
+      std::tie(apply_time, measure_time, vision_pose) = record;
+      wpi::util::print("{}, {}, {}, {}, {}\n", apply_time.value(),
+                       measure_time.value(), vision_pose.X().value(),
+                       vision_pose.Y().value(),
+                       vision_pose.Rotation().Radians().value());
+    }
+  }
+
+  CHECK_NEAR(endingPose.X().value(),
+             estimator.GetEstimatedPosition().X().value(), 0.08);
+  CHECK_NEAR(endingPose.Y().value(),
+             estimator.GetEstimatedPosition().Y().value(), 0.08);
+  CHECK_NEAR(endingPose.Rotation().Radians().value(),
+             estimator.GetEstimatedPosition().Rotation().Radians().value(),
+             0.15);
+
+  if (checkError) {
+    // NOLINTNEXTLINE(bugprone-integer-division)
+    CHECK(errorSum / (trajectory.Duration() / dt) < 0.058);
+    CHECK(maxError < 0.2);
+  }
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest AccuracyFacingTrajectory",
+          "[wpimath]") {
+  wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
+                                                 1_m,
+                                                 0_m,
+                                                 0_m,
+                                                 wpi::math::Rotation2d{},
+                                                 wpi::math::Pose2d{},
+                                                 {0.1, 0.1, 0.1},
+                                                 {0.45, 0.45, 0.45}};
+
+  wpi::math::DrivetrainSplineTrajectory trajectory =
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+
+  testFollowTrajectory(
+      estimator, trajectory,
+      [&](wpi::math::DrivetrainSplineSample& state) {
+        return wpi::math::ChassisVelocities{
+            state.ForwardVelocity(), 0_mps,
+            state.ForwardVelocity() * state.curvature};
+      },
+      [&](wpi::math::DrivetrainSplineSample& state) { return state.pose; },
+      {0_m, 0_m, wpi::math::Rotation2d{45_deg}},
+      {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms, 100_ms, 250_ms, true,
+      false);
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest BadInitialPose", "[wpimath]") {
+  wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
+                                                 1_m,
+                                                 0_m,
+                                                 0_m,
+                                                 wpi::math::Rotation2d{},
+                                                 wpi::math::Pose2d{},
+                                                 {0.1, 0.1, 0.1},
+                                                 {0.9, 0.9, 0.9}};
+
+  wpi::math::DrivetrainSplineTrajectory trajectory =
+      wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
+          std::vector{wpi::math::Pose2d{0_m, 0_m, 45_deg},
+                      wpi::math::Pose2d{3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 135_deg},
+                      wpi::math::Pose2d{-3_m, 0_m, -90_deg},
+                      wpi::math::Pose2d{0_m, 0_m, 45_deg}},
+          wpi::math::TrajectoryConfig(2_mps, 2.0_mps_sq));
+
+  for (wpi::units::degree_t offset_direction_degs = 0_deg;
+       offset_direction_degs < 360_deg; offset_direction_degs += 45_deg) {
+    for (wpi::units::degree_t offset_heading_degs = 0_deg;
+         offset_heading_degs < 360_deg; offset_heading_degs += 45_deg) {
+      auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
+      auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
+
+      auto initial_pose = trajectory.InitialPose() +
+                          wpi::math::Transform2d{
+                              wpi::math::Translation2d{pose_offset.Cos() * 1_m,
+                                                       pose_offset.Sin() * 1_m},
+                              heading_offset};
+
+      testFollowTrajectory(
+          estimator, trajectory,
+          [&](wpi::math::DrivetrainSplineSample& state) {
+            return wpi::math::ChassisVelocities{
+                state.ForwardVelocity(), 0_mps,
+                state.ForwardVelocity() * state.curvature};
+          },
+          [&](wpi::math::DrivetrainSplineSample& state) { return state.pose; },
+          initial_pose, {0_m, 0_m, wpi::math::Rotation2d{45_deg}}, 20_ms,
+          100_ms, 250_ms, false, false);
+    }
+  }
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest SimultaneousVisionMeasurements",
+          "[wpimath]") {
+  // This tests for multiple vision measurements applied at the same time.
+  // The expected behavior is that all measurements affect the estimated pose.
+  // The alternative result is that only one vision measurement affects the
+  // outcome. If that were the case, after 1000 measurements, the estimated
+  // pose would converge to that measurement.
+  wpi::math::TwoDeadWheelPoseEstimator estimator{
+      1_m,
+      1_m,
+      0_m,
+      0_m,
+      wpi::math::Rotation2d{},
+      wpi::math::Pose2d{1_m, 2_m, wpi::math::Rotation2d{270_deg}},
+      {0.1, 0.1, 0.1},
+      {0.45, 0.45, 0.45}};
+
+  estimator.UpdateWithTime(0_s, 0_m, 0_m, wpi::math::Rotation2d{});
+
+  for (int i = 0; i < 1000; i++) {
+    estimator.AddVisionMeasurement(
+        wpi::math::Pose2d{0_m, 0_m, wpi::math::Rotation2d{0_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        wpi::math::Pose2d{3_m, 1_m, wpi::math::Rotation2d{90_deg}}, 0_s);
+    estimator.AddVisionMeasurement(
+        wpi::math::Pose2d{2_m, 4_m, wpi::math::Rotation2d{180_deg}}, 0_s);
+  }
+
+  {
+    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 0_m);
+    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 0_m);
+    auto dtheta = wpi::units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 0_deg);
+
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
+  }
+
+  {
+    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 3_m);
+    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 1_m);
+    auto dtheta = wpi::units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 90_deg);
+
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
+  }
+
+  {
+    auto dx = wpi::units::math::abs(estimator.GetEstimatedPosition().X() - 2_m);
+    auto dy = wpi::units::math::abs(estimator.GetEstimatedPosition().Y() - 4_m);
+    auto dtheta = wpi::units::math::abs(
+        estimator.GetEstimatedPosition().Rotation().Radians() - 180_deg);
+
+    CHECK((dx > 0.08_m || dy > 0.08_m || dtheta > 0.08_rad));
+  }
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestDiscardStaleVisionMeasurements",
+          "[wpimath]") {
+  wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
+                                                 1_m,
+                                                 0_m,
+                                                 0_m,
+                                                 wpi::math::Rotation2d{},
+                                                 wpi::math::Pose2d{},
+                                                 {0.1, 0.1, 0.1},
+                                                 {0.45, 0.45, 0.45}};
+
+  // Add enough measurements to fill up the buffer
+  for (auto time = 0_s; time < 4_s; time += 20_ms) {
+    estimator.UpdateWithTime(time, 0_m, 0_m, wpi::math::Rotation2d{});
+  }
+
+  auto odometryPose = estimator.GetEstimatedPosition();
+
+  // Apply a vision measurement from 3 seconds ago
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{wpi::math::Translation2d{10_m, 10_m},
+                        wpi::math::Rotation2d{0.1_rad}},
+      1_s, {0.1, 0.1, 0.1});
+
+  CHECK_NEAR(odometryPose.X().value(),
+             estimator.GetEstimatedPosition().X().value(), 1e-6);
+  CHECK_NEAR(odometryPose.Y().value(),
+             estimator.GetEstimatedPosition().Y().value(), 1e-6);
+  CHECK_NEAR(odometryPose.Rotation().Radians().value(),
+             estimator.GetEstimatedPosition().Rotation().Radians().value(),
+             1e-6);
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestSampleAt", "[wpimath]") {
+  wpi::math::TwoDeadWheelPoseEstimator estimator{1_m,
+                                                 1_m,
+                                                 0_m,
+                                                 0_m,
+                                                 wpi::math::Rotation2d{},
+                                                 wpi::math::Pose2d{},
+                                                 {1.0, 1.0, 1.0},
+                                                 {1.0, 1.0, 1.0}};
+
+  // Returns empty when null
+  CHECK(std::nullopt == estimator.SampleAt(1_s));
+
+  // Add odometry measurements, but don't fill up the buffer
+  // Add a tiny tolerance for the upper bound because of floating point rounding
+  // error
+  for (double time = 1; time <= 2 + 1e-9; time += 0.02) {
+    estimator.UpdateWithTime(wpi::units::second_t{time},
+                             wpi::units::meter_t{time}, 0_m,
+                             wpi::math::Rotation2d{});
+  }
+
+  // Sample at an added time
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}) ==
+      estimator.SampleAt(1.02_s));
+  // Sample between updates (test interpolation)
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}) ==
+      estimator.SampleAt(1.01_s));
+  // Sampling before the oldest value returns the oldest value
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
+  // Sampling after the newest value returns the newest value
+  CHECK(std::optional(wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(2.5_s));
+
+  // Add a vision measurement after the odometry measurements (while keeping all
+  // of the old odometry measurements)
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{2_m, 0_m, wpi::math::Rotation2d{1_rad}}, 2.2_s);
+
+  // Make sure nothing changed (except the newest value)
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.02_m, 0_m, wpi::math::Rotation2d{}}) ==
+      estimator.SampleAt(1.02_s));
+  CHECK(
+      std::optional(wpi::math::Pose2d{1.01_m, 0_m, wpi::math::Rotation2d{}}) ==
+      estimator.SampleAt(1.01_s));
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
+
+  // Add a vision measurement before the odometry measurements that's still in
+  // the buffer
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{1_m, 0.2_m, wpi::math::Rotation2d{}}, 0.9_s);
+
+  // Everything should be the same except Y is 0.1 (halfway between 0 and 0.2)
+  CHECK(std::optional(
+            wpi::math::Pose2d{1.02_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(1.02_s));
+  CHECK(std::optional(
+            wpi::math::Pose2d{1.01_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(1.01_s));
+  CHECK(std::optional(wpi::math::Pose2d{1_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(0.5_s));
+  CHECK(std::optional(wpi::math::Pose2d{2_m, 0.1_m, wpi::math::Rotation2d{}}) ==
+        estimator.SampleAt(2.5_s));
+}
+
+TEST_CASE("TwoDeadWheelPoseEstimatorTest TestReset", "[wpimath]") {
+  wpi::math::TwoDeadWheelPoseEstimator estimator{
+      1_m,
+      1_m,
+      0_m,
+      0_m,
+      wpi::math::Rotation2d{},
+      wpi::math::Pose2d{-1_m, -1_m, wpi::math::Rotation2d{1_rad}},
+      {1.0, 1.0, 1.0},
+      {1.0, 1.0, 1.0}};
+
+  // Test initial pose
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      1, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset position
+
+  estimator.ResetPosition(1_m, 0_m, wpi::math::Rotation2d{},
+                          wpi::math::Pose2d{1_m, 0_m, wpi::math::Rotation2d{}});
+
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation and wheel positions
+
+  estimator.Update(2_m, 0_m, wpi::math::Rotation2d{});
+
+  CHECK_DOUBLE_EQ(2, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Add a vision measurement with a different translation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{3_m, 0_m, wpi::math::Rotation2d{}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset rotation
+  estimator.ResetRotation(wpi::math::Rotation2d{90_deg});
+
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test orientation
+  estimator.Update(3_m, 0_m, wpi::math::Rotation2d{});
+
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      std::numbers::pi / 2,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Add a vision measurement with a different rotation
+  estimator.AddVisionMeasurement(
+      wpi::math::Pose2d{2.5_m, 1_m, wpi::math::Rotation2d{180_deg}},
+      wpi::math::MathSharedStore::GetTimestamp());
+
+  CHECK_DOUBLE_EQ(2.5, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      std::numbers::pi * 3.0 / 4,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset translation
+  estimator.ResetTranslation(wpi::math::Translation2d{-1_m, -1_m});
+
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(-1, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      std::numbers::pi * 3.0 / 4,
+      estimator.GetEstimatedPosition().Rotation().Radians().value());
+
+  // Test reset pose
+  estimator.ResetPose(wpi::math::Pose2d{});
+
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().X().value());
+  CHECK_DOUBLE_EQ(0, estimator.GetEstimatedPosition().Y().value());
+  CHECK_DOUBLE_EQ(
+      0, estimator.GetEstimatedPosition().Rotation().Radians().value());
+}

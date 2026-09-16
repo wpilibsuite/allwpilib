@@ -17,7 +17,7 @@ class Twist3dTest {
     var straight = new Twist3d(5.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     var straightTransform = straight.exp();
 
-    var expected = new Transform3d(5.0, 0.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(5.0, 0.0, 0.0, Rotation3d.ZERO);
     assertEquals(expected, straightTransform);
   }
 
@@ -26,7 +26,7 @@ class Twist3dTest {
     var straight = new Twist3d(0.0, 5.0, 0.0, 0.0, 0.0, 0.0);
     var straightTransform = straight.exp();
 
-    var expected = new Transform3d(0.0, 5.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(0.0, 5.0, 0.0, Rotation3d.ZERO);
     assertEquals(expected, straightTransform);
   }
 
@@ -35,7 +35,7 @@ class Twist3dTest {
     var straight = new Twist3d(0.0, 0.0, 5.0, 0.0, 0.0, 0.0);
     var straightTransform = straight.exp();
 
-    var expected = new Transform3d(0.0, 0.0, 5.0, Rotation3d.kZero);
+    var expected = new Transform3d(0.0, 0.0, 5.0, Rotation3d.ZERO);
     assertEquals(expected, straightTransform);
   }
 
@@ -56,7 +56,7 @@ class Twist3dTest {
     var diagonal = new Twist3d(2.0, 2.0, 0.0, 0.0, 0.0, 0.0);
     var diagonalTransform = diagonal.exp();
 
-    var expected = new Transform3d(2.0, 2.0, 0.0, Rotation3d.kZero);
+    var expected = new Transform3d(2.0, 2.0, 0.0, Rotation3d.ZERO);
     assertEquals(expected, diagonalTransform);
   }
 
@@ -76,7 +76,7 @@ class Twist3dTest {
 
   @Test
   void testPose3dLogX() {
-    final var start = Pose3d.kZero;
+    final var start = Pose3d.ZERO;
     final var end =
         new Pose3d(0.0, 5.0, 5.0, new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
 
@@ -93,7 +93,7 @@ class Twist3dTest {
 
   @Test
   void testPose3dLogY() {
-    final var start = Pose3d.kZero;
+    final var start = Pose3d.ZERO;
     final var end =
         new Pose3d(5.0, 0.0, 5.0, new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
 
@@ -109,7 +109,7 @@ class Twist3dTest {
 
   @Test
   void testPose3dLogZ() {
-    final var start = Pose3d.kZero;
+    final var start = Pose3d.ZERO;
     final var end =
         new Pose3d(5.0, 5.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
 

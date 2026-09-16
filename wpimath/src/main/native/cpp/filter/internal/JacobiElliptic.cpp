@@ -24,7 +24,7 @@ namespace wpi::math::filter::internal {
 
 namespace {
 
-constexpr int kMaxIter = 60;
+constexpr int MAX_ITER = 60;
 
 // sqrt(1 - k^2) computed as sqrt((1-k)(1+k)) — preserves precision when k is
 // small. Real-valued path used by Ellipj/InverseJacobiSn.
@@ -48,7 +48,7 @@ double EllipticK(double m) {
   // AGM: K(m) = π / (2 · AGM(1, sqrt(1-m))).
   double a = 1.0;
   double b = std::sqrt(1.0 - m);
-  for (int i = 0; i < kMaxIter; ++i) {
+  for (int i = 0; i < MAX_ITER; ++i) {
     if (std::abs(a - b) <= std::numeric_limits<double>::epsilon() * a) {
       break;
     }
@@ -78,7 +78,7 @@ JacobiResult Ellipj(double u, double m) {
   c.push_back(std::sqrt(m));
 
   int n = 0;
-  while (n < kMaxIter) {
+  while (n < MAX_ITER) {
     if (std::abs(c.back()) <=
         std::numeric_limits<double>::epsilon() * std::abs(a.back())) {
       break;
@@ -119,7 +119,7 @@ cplx InverseJacobiSn(cplx w, double m) {
 
   std::vector<double> ks;
   ks.push_back(k);
-  for (int i = 0; i < kMaxIter; ++i) {
+  for (int i = 0; i < MAX_ITER; ++i) {
     if (ks.back() == 0.0) {
       break;
     }
@@ -160,18 +160,18 @@ double EllipticDegree(int N, double m1) {
   // Solve N · K(m)/K'(m) = K(m1)/K'(m1) for m using the q-nome series:
   //   q1 = exp(-π · K'(m1) / K(m1)),  q = q1^(1/N),
   //   m  = 16q · (Σ q^{i(i+1)})⁴ / (1 + 2 Σ q^{i²})⁴
-  constexpr int kMmax = 7;
+  constexpr int MMAX = 7;
   double K1 = EllipticK(m1);
   double K1p = EllipticK(1.0 - m1);
   double q1 = std::exp(-std::numbers::pi * K1p / K1);
   double q = std::pow(q1, 1.0 / N);
 
   double num = 0.0;
-  for (int i = 0; i <= kMmax; ++i) {
+  for (int i = 0; i <= MMAX; ++i) {
     num += std::pow(q, static_cast<double>(i) * (i + 1));
   }
   double den = 1.0;
-  for (int i = 1; i <= kMmax + 1; ++i) {
+  for (int i = 1; i <= MMAX + 1; ++i) {
     den += 2.0 * std::pow(q, static_cast<double>(i) * i);
   }
 

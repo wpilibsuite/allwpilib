@@ -29,7 +29,7 @@ jobs:
             ctest-env: ""
             ctest-flags: ""
     name: "${{ matrix.name }}"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     container: wpilib/debian-base:trixie
     steps:
       - name: Install Dependencies

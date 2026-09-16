@@ -67,7 +67,7 @@ class Context {
   wpi::util::StringMap<DataSource*> sources;
   Storage& sourceNameStorage;
   std::string& timestampDisplayModeStorage;
-  uint64_t timestampDisplayStartTime = 0;
+  int64_t timestampDisplayStartTime = 0;
   bool timestampDisplayStartTimeOverride = false;
   std::optional<int64_t> timestampDisplayServerTimeOffset;
   std::optional<int64_t> timestampDisplayServerStartTime;

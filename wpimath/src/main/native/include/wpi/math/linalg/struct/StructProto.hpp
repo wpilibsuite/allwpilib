@@ -12,21 +12,21 @@ template <int Rows, int Cols, int Options, int MaxRows, int MaxCols>
   requires(Cols != 1)
 struct wpi::util::Struct<
     wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>> {
-  static constexpr ct_string kTypeName =
+  static constexpr ct_string TYPE_NAME =
       wpi::util::Concat("Matrix__"_ct_string, wpi::util::NumToCtString<Rows>(),
                         "_"_ct_string, wpi::util::NumToCtString<Cols>());
-  static constexpr std::string_view GetTypeName() { return kTypeName; }
+  static constexpr std::string_view GetTypeName() { return TYPE_NAME; }
   static constexpr size_t GetSize() { return Rows * Cols * 8; }
-  static constexpr ct_string kSchema =
+  static constexpr ct_string SCHEMA =
       wpi::util::Concat("double data["_ct_string,
                         wpi::util::NumToCtString<Rows * Cols>(), "]"_ct_string);
-  static constexpr std::string_view GetSchema() { return kSchema; }
+  static constexpr std::string_view GetSchema() { return SCHEMA; }
 
   static wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> Unpack(
       std::span<const uint8_t> data) {
-    constexpr size_t kDataOff = 0;
+    constexpr size_t DATA_OFF = 0;
     wpi::util::array<double, Rows * Cols> mat_data =
-        wpi::util::UnpackStructArray<double, kDataOff, Rows * Cols>(data);
+        wpi::util::UnpackStructArray<double, DATA_OFF, Rows * Cols>(data);
     wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols> mat;
     for (int i = 0; i < Rows * Cols; i++) {
       mat(i) = mat_data[i];
@@ -37,12 +37,12 @@ struct wpi::util::Struct<
   static void Pack(
       std::span<uint8_t> data,
       const wpi::math::Matrixd<Rows, Cols, Options, MaxRows, MaxCols>& value) {
-    constexpr size_t kDataOff = 0;
+    constexpr size_t DATA_OFF = 0;
     wpi::util::array<double, Rows * Cols> mat_data(wpi::util::empty_array);
     for (int i = 0; i < Rows * Cols; i++) {
       mat_data[i] = value(i);
     }
-    wpi::util::PackStructArray<kDataOff, Rows * Cols>(data, mat_data);
+    wpi::util::PackStructArray<DATA_OFF, Rows * Cols>(data, mat_data);
   }
 };
 

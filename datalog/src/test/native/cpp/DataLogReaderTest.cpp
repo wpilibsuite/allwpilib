@@ -36,3 +36,20 @@ TEST_CASE("DataLogReaderTest RejectsTruncatedExtraHeader",
   CHECK(reader.GetExtraHeader().empty());
   CHECK(reader.begin() == reader.end());
 }
+
+TEST_CASE("DataLogReaderTest ConvertsFileTimestampToNanoseconds",
+          "[datalog][data-log]") {
+  constexpr std::array<uint8_t, 20> data{
+      'W',  'P',  'I',  'L', 'O', 'G', 0x00, 0x01, 0x00, 0x00,
+      0x00, 0x00, 0x00, 1,   4,   4,   'D',  'A',  'T',  'A'};
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(data)};
+
+  REQUIRE(reader.IsValid());
+  auto it = reader.begin();
+  REQUIRE(it != reader.end());
+  CHECK(it->GetEntry() == 1);
+  CHECK(it->GetTimestamp() == 4000);
+  CHECK(it->GetSize() == 4);
+  CHECK(it->GetRaw()[0] == 'D');
+}

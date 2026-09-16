@@ -5,8 +5,8 @@
 #include "wpi/glass/networktables/NTPIDController.hpp"
 
 #include <format>
-#include <utility>
 
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -17,9 +17,6 @@ NTPIDControllerModel::NTPIDControllerModel(std::string_view path)
 NTPIDControllerModel::NTPIDControllerModel(wpi::nt::NetworkTableInstance inst,
                                            std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(std::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(std::format("{}/.controllable", path))
-                         .Subscribe(false)},
       m_p{inst.GetDoubleTopic(std::format("{}/p", path)).GetEntry(0)},
       m_i{inst.GetDoubleTopic(std::format("{}/i", path)).GetEntry(0)},
       m_d{inst.GetDoubleTopic(std::format("{}/d", path)).GetEntry(0)},
@@ -53,9 +50,6 @@ void NTPIDControllerModel::SetIZone(double value) {
 }
 
 void NTPIDControllerModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_p.ReadQueue()) {
     m_pData.SetValue(v.value, v.time);
   }
@@ -71,11 +65,16 @@ void NTPIDControllerModel::Update() {
   for (auto&& v : m_iZone.ReadQueue()) {
     m_iZoneData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
-  }
 }
 
 bool NTPIDControllerModel::Exists() {
   return m_setpoint.Exists();
+}
+
+bool NTPIDControllerModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_p.GetTopic()) ||
+         !IsTunableTopicMutable(m_i.GetTopic()) ||
+         !IsTunableTopicMutable(m_d.GetTopic()) ||
+         !IsTunableTopicMutable(m_setpoint.GetTopic()) ||
+         !IsTunableTopicMutable(m_iZone.GetTopic());
 }

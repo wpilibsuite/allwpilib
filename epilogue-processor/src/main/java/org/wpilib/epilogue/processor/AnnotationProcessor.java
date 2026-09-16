@@ -39,10 +39,10 @@ import org.wpilib.epilogue.NotLogged;
 @SupportedAnnotationTypes({"org.wpilib.epilogue.CustomLoggerFor", "org.wpilib.epilogue.Logged"})
 @SupportedSourceVersion(SourceVersion.RELEASE_25)
 public class AnnotationProcessor extends AbstractProcessor {
-  private static final String kCustomLoggerFqn = "org.wpilib.epilogue.CustomLoggerFor";
-  private static final String kClassSpecificLoggerFqn =
+  private static final String CUSTOM_LOGGER_FQN = "org.wpilib.epilogue.CustomLoggerFor";
+  private static final String CLASS_SPECIFIC_LOGGER_FQN =
       "org.wpilib.epilogue.logging.ClassSpecificLogger";
-  private static final String kLoggedFqn = "org.wpilib.epilogue.Logged";
+  private static final String LOGGED_FQN = "org.wpilib.epilogue.Logged";
 
   private EpilogueGenerator m_epilogueGenerator;
   private LoggerGenerator m_loggerGenerator;
@@ -58,7 +58,7 @@ public class AnnotationProcessor extends AbstractProcessor {
     Map<TypeMirror, DeclaredType> customLoggers = new HashMap<>();
 
     annotations.stream()
-        .filter(ann -> kCustomLoggerFqn.contentEquals(ann.getQualifiedName()))
+        .filter(ann -> CUSTOM_LOGGER_FQN.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             customLogger -> {
@@ -79,7 +79,7 @@ public class AnnotationProcessor extends AbstractProcessor {
                             .erasure(
                                 processingEnv
                                     .getElementUtils()
-                                    .getTypeElement(kClassSpecificLoggerFqn)
+                                    .getTypeElement(CLASS_SPECIFIC_LOGGER_FQN)
                                     .asType())))
         .filter(e -> e.getAnnotation(CustomLoggerFor.class) == null)
         .forEach(
@@ -95,12 +95,12 @@ public class AnnotationProcessor extends AbstractProcessor {
     var loggedTypes = getLoggedTypes(roundEnv);
 
     // Handlers are declared in order of priority. If an element could be logged in more than one
-    // way (eg a class implements both Sendable and StructSerializable), the order of the handlers
-    // in this list will determine how it gets logged.
+    // way (eg a class implements both TelemetryLoggable and StructSerializable), the order of the
+    // handlers in this list will determine how it gets logged.
     m_handlers =
         List.of(
             new LoggableHandler(
-                processingEnv, loggedTypes), // prioritize epilogue logging over Sendable
+                processingEnv, loggedTypes), // prioritize epilogue logging over telemetry
             new ConfiguredLoggerHandler(
                 processingEnv, customLoggers), // then customized logging configs
             new ArrayHandler(processingEnv),
@@ -109,15 +109,15 @@ public class AnnotationProcessor extends AbstractProcessor {
             new MeasureHandler(processingEnv),
             new PrimitiveHandler(processingEnv),
             new SupplierHandler(processingEnv),
-            new StructHandler(processingEnv), // prioritize struct over sendable and protobuf
+            new StructHandler(processingEnv), // prioritize struct over telemetry and protobuf
             new ProtobufHandler(processingEnv), // then protobuf
-            new SendableHandler(processingEnv));
+            new TelemetryHandler(processingEnv));
 
     m_epilogueGenerator = new EpilogueGenerator(processingEnv, customLoggers);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
-        .filter(ann -> kLoggedFqn.contentEquals(ann.getQualifiedName()))
+        .filter(ann -> LOGGED_FQN.contentEquals(ann.getQualifiedName()))
         .findAny()
         .ifPresent(
             epilogue -> {

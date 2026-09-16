@@ -1,19 +1,14 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-
 classes:
   wpi::PowerDistribution:
-    ignored_bases:
-    - wpi::util::SendableHelper<PowerDistribution>
     attributes:
-      kDefaultModule:
+      DEFAULT_MODULE:
     enums:
       ModuleType:
     methods:
       PowerDistribution:
         overloads:
-          CANBus:
-          CANBus, int, ModuleType:
+          CANPort:
+          CANPort, int, ModuleType:
       GetVoltage:
       GetTemperature:
       GetCurrent:
@@ -31,7 +26,8 @@ classes:
       GetStickyFaults:
       GetNumChannels:
       GetAllCurrents:
-      InitSendable:
+      LogTo:
+      GetTelemetryType:
   wpi::PowerDistribution::Version:
     attributes:
       FirmwareMajor:

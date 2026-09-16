@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from Switch2GC controllers connected to the Driver Station.
@@ -21,7 +21,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Switch2GC input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class Switch2GCController implements HIDDevice, Sendable {
+public class Switch2GCController implements HIDDevice, TelemetryLoggable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** The number of touchpads supported by this controller. */
@@ -153,7 +153,7 @@ public class Switch2GCController implements HIDDevice, Sendable {
    */
   public Switch2GCController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "Switch2GCController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "Switch2GCController");
   }
 
   /**
@@ -1037,30 +1037,33 @@ public class Switch2GCController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Switch2GC");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("CStickX", this::getCStickX, null);
-    builder.addDoubleProperty("CStickY", this::getCStickY, null);
-    builder.addDoubleProperty("LTrigger", this::getLTrigger, null);
-    builder.addDoubleProperty("RTrigger", this::getRTrigger, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("Home", this::getHomeButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("ZL", this::getZLButton, null);
-    builder.addBooleanProperty("Z", this::getZButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Capture", this::getCaptureButton, null);
-    builder.addBooleanProperty("C", this::getCButton, null);
-    builder.addBooleanProperty("L", this::getLButton, null);
-    builder.addBooleanProperty("R", this::getRButton, null);
+  public String getTelemetryType() {
+    return "HID:Switch2GC";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("CStickX", getCStickX());
+    table.log("CStickY", getCStickY());
+    table.log("LTrigger", getLTrigger());
+    table.log("RTrigger", getRTrigger());
+    table.log("A", getAButton());
+    table.log("X", getXButton());
+    table.log("B", getBButton());
+    table.log("Y", getYButton());
+    table.log("Home", getHomeButton());
+    table.log("Start", getStartButton());
+    table.log("ZL", getZLButton());
+    table.log("Z", getZButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Capture", getCaptureButton());
+    table.log("C", getCButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
   }
 }

@@ -22,6 +22,9 @@
 #include "wpi/glass/other/Plot.hpp"
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/timestamp.hpp"
@@ -169,7 +172,7 @@ static void NtInitialize() {
 
   gNetworkTablesLogWindow = std::make_unique<wpi::glass::Window>(
       wpi::glass::GetStorageRoot().GetChild("NetworkTables Log"),
-      "NetworkTables Log", wpi::glass::Window::kHide);
+      "NetworkTables Log", wpi::glass::Window::HIDE);
   gNetworkTablesLogWindow->SetView(
       std::make_unique<wpi::glass::LogView>(&gNetworkTablesLog));
   gNetworkTablesLogWindow->SetDefaultPos(250, 615);
@@ -200,7 +203,7 @@ static void NtInitialize() {
   }));
   gNetworkTablesInfoWindow->SetDefaultPos(250, 130);
   gNetworkTablesInfoWindow->SetDefaultSize(750, 145);
-  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::kHide);
+  gNetworkTablesInfoWindow->SetDefaultVisibility(wpi::glass::Window::HIDE);
   gNetworkTablesInfoWindow->DisableRenamePopup();
   gui::AddLateExecute([] { gNetworkTablesInfoWindow->Display(); });
 
@@ -227,21 +230,12 @@ static void NtInitialize() {
   });
 }
 
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-  int argc = __argc;
-  char** argv = __argv;
-#else
-int main(int argc, char** argv) {
-#endif
-  std::string_view saveDir;
-  if (argc == 2) {
-    saveDir = argv[1];
-  }
-
+void Application(std::string_view saveDir) {
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   gui::AddIcon(wpi::glass::GetResource_glass_16_png());
   gui::AddIcon(wpi::glass::GetResource_glass_32_png());
@@ -412,6 +406,23 @@ int main(int argc, char** argv) {
 
   wpi::glass::DestroyContext();
   gui::DestroyContext();
+}
 
+#ifndef RUNNING_IMGUI_TESTS
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
+#else
+int main(int argc, char** argv) {
+#endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
+  Application(saveDir);
   return 0;
 }
+#endif

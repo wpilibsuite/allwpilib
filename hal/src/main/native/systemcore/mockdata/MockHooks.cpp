@@ -32,9 +32,9 @@ HAL_Bool HALSIM_IsTimingPaused(void) {
   return false;
 }
 
-void HALSIM_StepTiming(uint64_t delta) {}
+void HALSIM_StepTiming(int64_t delta) {}
 
-void HALSIM_StepTimingAsync(uint64_t delta) {}
+void HALSIM_StepTimingAsync(int64_t delta) {}
 
 void HALSIM_SetSendError(HALSIM_SendErrorHandler handler) {}
 

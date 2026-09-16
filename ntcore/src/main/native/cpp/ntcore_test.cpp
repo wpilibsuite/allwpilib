@@ -40,7 +40,7 @@ void NT_FreeTopicInfoForTesting(struct NT_TopicInfo* info) {
 
 struct NT_ConnectionInfo* NT_GetConnectionInfoForTesting(
     const char* remote_id, const char* remote_ip, unsigned int remote_port,
-    uint64_t last_update, unsigned int protocol_version, int* struct_size) {
+    int64_t last_update, unsigned int protocol_version, int* struct_size) {
   struct NT_ConnectionInfo* conn_info = static_cast<NT_ConnectionInfo*>(
       wpi::util::safe_calloc(1, sizeof(NT_ConnectionInfo)));
   wpi::nt::ConvertToC(remote_id, &conn_info->remote_id);
@@ -58,7 +58,7 @@ void NT_FreeConnectionInfoForTesting(struct NT_ConnectionInfo* info) {
   std::free(info);
 }
 
-struct NT_Value* NT_GetValueBooleanForTesting(uint64_t last_change, int val,
+struct NT_Value* NT_GetValueBooleanForTesting(int64_t last_change, int val,
                                               int* struct_size) {
   struct NT_Value* value =
       static_cast<NT_Value*>(wpi::util::safe_calloc(1, sizeof(NT_Value)));
@@ -69,7 +69,7 @@ struct NT_Value* NT_GetValueBooleanForTesting(uint64_t last_change, int val,
   return value;
 }
 
-struct NT_Value* NT_GetValueDoubleForTesting(uint64_t last_change, double val,
+struct NT_Value* NT_GetValueDoubleForTesting(int64_t last_change, double val,
                                              int* struct_size) {
   struct NT_Value* value =
       static_cast<NT_Value*>(wpi::util::safe_calloc(1, sizeof(NT_Value)));
@@ -80,7 +80,7 @@ struct NT_Value* NT_GetValueDoubleForTesting(uint64_t last_change, double val,
   return value;
 }
 
-struct NT_Value* NT_GetValueStringForTesting(uint64_t last_change,
+struct NT_Value* NT_GetValueStringForTesting(int64_t last_change,
                                              const char* str,
                                              int* struct_size) {
   struct NT_Value* value =
@@ -92,7 +92,7 @@ struct NT_Value* NT_GetValueStringForTesting(uint64_t last_change,
   return value;
 }
 
-struct NT_Value* NT_GetValueRawForTesting(uint64_t last_change, const char* raw,
+struct NT_Value* NT_GetValueRawForTesting(int64_t last_change, const char* raw,
                                           int raw_len, int* struct_size) {
   struct NT_Value* value =
       static_cast<NT_Value*>(wpi::util::safe_calloc(1, sizeof(NT_Value)));
@@ -103,7 +103,7 @@ struct NT_Value* NT_GetValueRawForTesting(uint64_t last_change, const char* raw,
   return value;
 }
 
-struct NT_Value* NT_GetValueBooleanArrayForTesting(uint64_t last_change,
+struct NT_Value* NT_GetValueBooleanArrayForTesting(int64_t last_change,
                                                    const int* arr,
                                                    size_t array_len,
                                                    int* struct_size) {
@@ -119,7 +119,7 @@ struct NT_Value* NT_GetValueBooleanArrayForTesting(uint64_t last_change,
   return value;
 }
 
-struct NT_Value* NT_GetValueDoubleArrayForTesting(uint64_t last_change,
+struct NT_Value* NT_GetValueDoubleArrayForTesting(int64_t last_change,
                                                   const double* arr,
                                                   size_t array_len,
                                                   int* struct_size) {
@@ -135,7 +135,7 @@ struct NT_Value* NT_GetValueDoubleArrayForTesting(uint64_t last_change,
   return value;
 }
 
-struct NT_Value* NT_GetValueStringArrayForTesting(uint64_t last_change,
+struct NT_Value* NT_GetValueStringArrayForTesting(int64_t last_change,
                                                   const struct WPI_String* arr,
                                                   size_t array_len,
                                                   int* struct_size) {

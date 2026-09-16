@@ -32,10 +32,10 @@ typedef struct _wpi_proto_ProtobufDifferentialDriveFeedforward {
     static std::string_view msg_name(void) noexcept;
     static pb_filedesc_t file_descriptor(void) noexcept;
 
-    double kv_linear;
-    double ka_linear;
-    double kv_angular;
-    double ka_angular;
+    double kvLinear;
+    double kaLinear;
+    double kvAngular;
+    double kaAngular;
 } wpi_proto_ProtobufDifferentialDriveFeedforward;
 
 typedef struct _wpi_proto_ProtobufElevatorFeedforward {
@@ -89,10 +89,10 @@ typedef struct _wpi_proto_ProtobufDifferentialDriveWheelVoltages {
 #define wpi_proto_ProtobufArmFeedforward_kv_tag  3
 #define wpi_proto_ProtobufArmFeedforward_ka_tag  4
 #define wpi_proto_ProtobufArmFeedforward_dt_tag  5
-#define wpi_proto_ProtobufDifferentialDriveFeedforward_kv_linear_tag 1
-#define wpi_proto_ProtobufDifferentialDriveFeedforward_ka_linear_tag 2
-#define wpi_proto_ProtobufDifferentialDriveFeedforward_kv_angular_tag 3
-#define wpi_proto_ProtobufDifferentialDriveFeedforward_ka_angular_tag 4
+#define wpi_proto_ProtobufDifferentialDriveFeedforward_kvLinear_tag 1
+#define wpi_proto_ProtobufDifferentialDriveFeedforward_kaLinear_tag 2
+#define wpi_proto_ProtobufDifferentialDriveFeedforward_kvAngular_tag 3
+#define wpi_proto_ProtobufDifferentialDriveFeedforward_kaAngular_tag 4
 #define wpi_proto_ProtobufElevatorFeedforward_ks_tag 1
 #define wpi_proto_ProtobufElevatorFeedforward_kg_tag 2
 #define wpi_proto_ProtobufElevatorFeedforward_kv_tag 3
@@ -116,10 +116,10 @@ X(a, STATIC,   SINGULAR, DOUBLE,   dt,                5)
 #define wpi_proto_ProtobufArmFeedforward_DEFAULT NULL
 
 #define wpi_proto_ProtobufDifferentialDriveFeedforward_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   kv_linear,         1) \
-X(a, STATIC,   SINGULAR, DOUBLE,   ka_linear,         2) \
-X(a, STATIC,   SINGULAR, DOUBLE,   kv_angular,        3) \
-X(a, STATIC,   SINGULAR, DOUBLE,   ka_angular,        4)
+X(a, STATIC,   SINGULAR, DOUBLE,   kvLinear,          1) \
+X(a, STATIC,   SINGULAR, DOUBLE,   kaLinear,          2) \
+X(a, STATIC,   SINGULAR, DOUBLE,   kvAngular,         3) \
+X(a, STATIC,   SINGULAR, DOUBLE,   kaAngular,         4)
 #define wpi_proto_ProtobufDifferentialDriveFeedforward_CALLBACK NULL
 #define wpi_proto_ProtobufDifferentialDriveFeedforward_DEFAULT NULL
 

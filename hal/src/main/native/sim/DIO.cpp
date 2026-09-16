@@ -17,13 +17,13 @@
 using namespace wpi::hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             kNumDigitalPWMOutputs,
+                             NUM_DIGITAL_PWM_OUTPUTS,
                              HAL_HandleEnum::DIGITAL_PWM>* digitalPWMHandles;
 
 namespace wpi::hal::init {
 void InitializeDIO() {
   static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                               kNumDigitalPWMOutputs,
+                               NUM_DIGITAL_PWM_OUTPUTS,
                                HAL_HandleEnum::DIGITAL_PWM>
       dpH;
   digitalPWMHandles = &dpH;
@@ -37,10 +37,10 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
                                         int32_t* status) {
   wpi::hal::init::CheckInit();
 
-  if (channel < 0 || channel >= kNumDigitalChannels) {
+  if (channel < 0 || channel >= NUM_DIGITAL_CHANNELS) {
     *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
                                        "Invalid Index for DIO", 0,
-                                       kNumDigitalChannels - 1, channel);
+                                       NUM_DIGITAL_CHANNELS - 1, channel);
     return HAL_INVALID_HANDLE;
   }
 
@@ -65,7 +65,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(int32_t channel, HAL_Bool input,
 }
 
 HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
-  return channel < kNumDigitalChannels && channel >= 0;
+  return channel < NUM_DIGITAL_CHANNELS && channel >= 0;
 }
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
@@ -120,7 +120,7 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // higher freq.
   // TODO: Round in the linear rate domain.
   // uint8_t pwmPeriodPower = static_cast<uint8_t>(
-  //     std::log2(1.0 / (kExpectedLoopTiming * 0.25E-6 * rate)) + 0.5);
+  //     std::log2(1.0 / (EXPECTED_LOOP_TIMING * 0.25E-6 * rate)) + 0.5);
   // TODO(THAD) : Add a case to set this in the simulator
   // digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }

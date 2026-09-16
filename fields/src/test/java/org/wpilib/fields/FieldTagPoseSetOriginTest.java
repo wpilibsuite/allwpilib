@@ -26,7 +26,7 @@ class FieldTagPoseSetOriginTest {
             Units.feetToMeters(27.0),
             "frc",
             List.of(
-                new FieldTag(1, Pose3d.kZero),
+                new FieldTag(1, Pose3d.ZERO),
                 new FieldTag(
                     2,
                     new Pose3d(
@@ -45,7 +45,7 @@ class FieldTagPoseSetOriginTest {
         new Pose3d(
             new Translation3d(
                 Units.feetToMeters(50.0), Units.feetToMeters(23.0), Units.feetToMeters(4)),
-            Rotation3d.kZero),
+            Rotation3d.ZERO),
         field.getTagPose(2).orElse(null));
   }
 }

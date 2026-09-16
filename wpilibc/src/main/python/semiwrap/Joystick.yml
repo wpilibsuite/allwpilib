@@ -5,11 +5,11 @@ classes:
   wpi::Joystick:
     force_no_trampoline: true
     attributes:
-      kDefaultXChannel:
-      kDefaultYChannel:
-      kDefaultZChannel:
-      kDefaultTwistChannel:
-      kDefaultThrottleChannel:
+      DEFAULT_X_CHANNEL:
+      DEFAULT_Y_CHANNEL:
+      DEFAULT_Z_CHANNEL:
+      DEFAULT_TWIST_CHANNEL:
+      DEFAULT_THROTTLE_CHANNEL:
     enums:
       AxisType:
       ButtonType:

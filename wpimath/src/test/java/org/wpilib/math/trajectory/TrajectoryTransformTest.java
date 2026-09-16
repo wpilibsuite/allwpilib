@@ -19,7 +19,7 @@ class TrajectoryTransformTest {
     var config = new TrajectoryConfig(3, 3);
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.kZero, List.of(), new Pose2d(1, 1, Rotation2d.kCCW_Pi_2), config);
+            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.CCW_PI_2), config);
 
     var transformedTrajectory =
         trajectory.transformBy(
@@ -40,13 +40,13 @@ class TrajectoryTransformTest {
         DrivetrainSplineTrajectoryGenerator.generate(
             new Pose2d(1, 2, Rotation2d.fromDegrees(30.0)),
             List.of(),
-            new Pose2d(5, 7, Rotation2d.kCCW_Pi_2),
+            new Pose2d(5, 7, Rotation2d.CCW_PI_2),
             config);
 
     var transformedTrajectory = trajectory.relativeTo(new Pose2d(1, 2, Rotation2d.fromDegrees(30)));
 
     // Test initial pose.
-    assertEquals(Pose2d.kZero, transformedTrajectory.sampleAt(0).pose);
+    assertEquals(Pose2d.ZERO, transformedTrajectory.sampleAt(0).pose);
 
     testSameShapedTrajectory(trajectory.samples, transformedTrajectory.samples);
     testSameForwardScalars(trajectory.samples, transformedTrajectory.samples);

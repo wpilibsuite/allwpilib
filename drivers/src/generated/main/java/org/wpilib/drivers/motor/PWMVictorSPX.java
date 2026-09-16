@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Cross the Road Electronics (CTRE) Victor SPX Motor Controller.
@@ -34,12 +34,12 @@ public class PWMVictorSPX extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMVictorSPX(final int channel) {
-    super("PWMVictorSPX", channel);
+    super(channel);
 
     setBoundsMicroseconds(2004, 1520, 1500, 1480, 997);
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "PWMVictorSPX");
+    UsageReporting.reportUsage("IO", getChannel(), "PWMVictorSPX");
   }
 }

@@ -21,6 +21,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/math/util/StateSpaceUtil.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -140,7 +141,7 @@ class ExtendedKalmanFilter {
       m_initP = StateMatrix::Zero();
     }
     m_P = m_initP;
-    wpi::math::MathSharedStore::ReportUsage("ExtendedKalmanFilter", "");
+    wpi::util::ReportUsage("ExtendedKalmanFilter", "");
   }
 
   /**
@@ -225,7 +226,7 @@ class ExtendedKalmanFilter {
       m_initP = StateMatrix::Zero();
     }
     m_P = m_initP;
-    wpi::math::MathSharedStore::ReportUsage("ExtendedKalmanFilter", "");
+    wpi::util::ReportUsage("ExtendedKalmanFilter", "");
   }
 
   /**

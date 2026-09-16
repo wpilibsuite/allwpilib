@@ -6,17 +6,16 @@ from ._wpiutil import (
     Color,
     Color8Bit,
     PixelFormat,
-    Sendable,
-    SendableBuilder,
-    SendableRegistry,
     TimestampSource,
     get_program_start_time,
     get_stack_trace,
-    set_now_impl,
     get_stack_trace_default,
     get_system_time,
     now,
     now_default,
+    report_usage,
+    set_now_impl,
+    set_report_usage_impl,
 )
 
 __all__ = [
@@ -24,17 +23,16 @@ __all__ = [
     "Color",
     "Color8Bit",
     "PixelFormat",
-    "Sendable",
-    "SendableBuilder",
-    "SendableRegistry",
     "TimestampSource",
     "get_program_start_time",
     "get_stack_trace",
-    "set_now_impl",
     "get_stack_trace_default",
     "get_system_time",
     "now",
     "now_default",
+    "report_usage",
+    "set_now_impl",
+    "set_report_usage_impl",
 ]
 
 # Imported for side effects only

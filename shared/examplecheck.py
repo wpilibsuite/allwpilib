@@ -36,6 +36,8 @@ TAGS = {
     "Sendable",
     "DataLog",
     "Driver Station",
+    "Telemetry",
+    "Tunable",
     # --- Controls ---
     "Exponential Profile",
     "PID",

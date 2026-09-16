@@ -59,6 +59,7 @@ wpilib_java_library(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -88,6 +89,8 @@ wpilib_java_junit5_test(
         "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",

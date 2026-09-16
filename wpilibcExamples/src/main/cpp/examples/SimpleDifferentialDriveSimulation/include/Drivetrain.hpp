@@ -17,7 +17,6 @@
 #include "wpi/simulation/DifferentialDrivetrainSim.hpp"
 #include "wpi/simulation/EncoderSim.hpp"
 #include "wpi/smartdashboard/Field2d.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 #include "wpi/units/angular_velocity.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
@@ -41,22 +40,20 @@ class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                    kEncoderResolution);
-    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                     kEncoderResolution);
+    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                    ENCODER_RESOLUTION);
+    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                     ENCODER_RESOLUTION);
 
     leftEncoder.Reset();
     rightEncoder.Reset();
 
     rightLeader.SetInverted(true);
-
-    wpi::SmartDashboard::PutData("Field", &fieldSim);
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
+  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetVelocities(
@@ -72,9 +69,9 @@ class Drivetrain {
   void Periodic();
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr double kWheelRadius = 0.0508;  // meters
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
+  static constexpr double WHEEL_RADIUS = 0.0508;  // meters
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};
@@ -89,7 +86,7 @@ class Drivetrain {
 
   wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveKinematics kinematics{TRACKWIDTH};
   wpi::math::DifferentialDriveOdometry odometry{
       imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()}};
@@ -107,5 +104,5 @@ class Drivetrain {
       wpi::math::Models::DifferentialDriveFromSysId(
           1.98_V / 1_mps, 0.2_V / 1_mps_sq, 1.5_V / 1_mps, 0.3_V / 1_mps_sq);
   wpi::sim::DifferentialDrivetrainSim drivetrainSimulator{
-      drivetrainSystem, kTrackwidth, wpi::math::DCMotor::CIM(2), 8, 2_in};
+      drivetrainSystem, TRACKWIDTH, wpi::math::DCMotor::CIM(2), 8, 2_in};
 };

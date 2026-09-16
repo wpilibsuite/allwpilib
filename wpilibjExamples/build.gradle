@@ -25,6 +25,8 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':commandsv2')
     implementation project(':commandsv3')
+    implementation project(':telemetry')
+    implementation project(':tunables')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
@@ -138,6 +140,8 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
 
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {
@@ -197,7 +201,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
@@ -245,7 +249,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->

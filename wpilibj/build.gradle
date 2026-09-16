@@ -1,5 +1,7 @@
 evaluationDependsOn(':hal')
 evaluationDependsOn(':ntcore')
+evaluationDependsOn(':telemetry')
+evaluationDependsOn(':tunables')
 
 ext {
     baseId = 'wpilibj'
@@ -67,7 +69,9 @@ dependencies {
     implementation project(':wpinet')
     implementation project(':wpimath')
     implementation project(':ntcore')
-    api project(':datalog')
+    implementation project(':telemetry')
+    implementation project(':tunables')
+    implementation project(':datalog')
     testImplementation(libs.bundles.mockito)
     devImplementation sourceSets.main.output
 }
@@ -101,6 +105,9 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimathJNIShared', linkage: 'shared'

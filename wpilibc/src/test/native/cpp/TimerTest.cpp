@@ -15,7 +15,7 @@
 using namespace wpi;
 
 namespace {
-uint64_t mockTime = 0;
+int64_t mockTime = 0;
 
 class ScopedMockTimeSource {
  public:
@@ -96,18 +96,18 @@ TEST_CASE_METHOD(TimerTest, "TimerTest Reset", "[wpilibc]") {
 
 TEST_CASE_METHOD(TimerTest, "TimerTest ResetWithLargeTimestamp", "[wpilibc]") {
   ScopedMockTimeSource timeSource;
-  mockTime = 1'000'002;
+  mockTime = 1'000'000'000LL;
 
   Timer timer;
   timer.Start();
 
-  mockTime += 500'000;
+  mockTime += 500'000'000;
   CHECK(timer.Get() == 500_ms);
 
   timer.Reset();
   CHECK(timer.Get() == 0_s);
 
-  mockTime += 500'000;
+  mockTime += 500'000'000;
   CHECK(timer.Get() == 500_ms);
 }
 
@@ -164,18 +164,18 @@ TEST_CASE_METHOD(TimerTest,
 
   auto period = wpi::units::second_t{1.0 / 60.0};
 
-  for (uint64_t i = 1; i <= 60; ++i) {
-    mockTime = (i * 1'000'000 + 59) / 60 + 100;
+  for (int64_t i = 1; i <= 60; ++i) {
+    mockTime = (i * 1'000'000'000LL + 59) / 60 + 100;
 
     CHECK(timer.AdvanceIfElapsed(period));
     CHECK_FALSE(timer.AdvanceIfElapsed(period));
   }
 
-  CHECK_THAT(timer.Get().value(), Catch::Matchers::WithinAbs(100e-6, 1e-12));
+  CHECK_THAT(timer.Get().value(), Catch::Matchers::WithinAbs(100e-9, 1e-12));
 }
 
 TEST_CASE_METHOD(TimerTest,
-                 "TimerTest AdvanceIfElapsedProgressesWithSubMicrosecondPeriod",
+                 "TimerTest AdvanceIfElapsedProgressesWithSubNanosecondPeriod",
                  "[wpilibc]") {
   ScopedMockTimeSource timeSource;
   mockTime = 0;
@@ -184,7 +184,7 @@ TEST_CASE_METHOD(TimerTest,
   timer.Start();
 
   mockTime = 1;
-  auto period = wpi::units::microsecond_t{0.1};
+  auto period = wpi::units::nanosecond_t{0.1};
 
   for (int i = 0; i < 10; ++i) {
     CHECK(timer.AdvanceIfElapsed(period));

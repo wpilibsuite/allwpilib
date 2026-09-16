@@ -6,14 +6,14 @@
 
 #include "wpi/drivers/motor/PWMTalonFX.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
-PWMTalonFX::PWMTalonFX(int channel) : PWMMotorController("PWMTalonFX", channel) {
+PWMTalonFX::PWMTalonFX(int channel) : PWMMotorController(channel) {
   SetBounds(2.004_ms, 1.52_ms, 1.5_ms, 1.48_ms, 0.997_ms);
   m_pwm.SetOutputPeriod(5_ms);
   SetThrottle(0.0);
 
-  HAL_ReportUsage("IO", GetChannel(), "TalonFX");
+  wpi::util::ReportUsage("IO", GetChannel(), "TalonFX");
 }

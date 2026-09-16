@@ -38,7 +38,6 @@ allprojects {
             url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
         }
     }
-    wpilibRepositories.use2027Repos()
     if (project.hasProperty('releaseMode')) {
         wpilibRepositories.addAllReleaseRepositories(it)
     } else {
@@ -198,6 +197,8 @@ subprojects {
             "-Xlint:-serial",
             // ignore unclaimed annotation warning from annotation processing
             "-Xlint:-processing",
+            // ignore warnings for classes missing explicit constructors
+            "-Xlint:-missing-explicit-ctor",
         ]
     }
     // Enables UTF-8 support in Javadoc, disables 4 MB of fonts being added to every Javadoc JAR, add our styles

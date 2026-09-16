@@ -111,6 +111,8 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 lib project: ':datalog', library: 'datalog', linkage: 'shared'
             }
         }
@@ -135,6 +137,9 @@ model {
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
             }
             appendDebugPathToBinaries(binaries)
         }
@@ -162,6 +167,9 @@ model {
                 lib project: ':hal', library: 'hal', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
+                lib project: ':datalog', library: 'datalog', linkage: 'shared'
                 lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
             }
         }
@@ -225,6 +233,9 @@ model {
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
+            lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+            lib project: ':tunables', library: 'tunables', linkage: 'shared'
+            lib project: ':datalog', library: 'datalog', linkage: 'shared'
             lib library: nativeName, linkage: 'shared'
         }
     }

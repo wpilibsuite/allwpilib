@@ -274,56 +274,57 @@ TEST_CASE_METHOD(WireEncoderTextTest, "WireEncoderTextTest ServerMessageValue",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Boolean",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeBoolean(true));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeBoolean(true));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x00\xc3"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Integer",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeInteger(7));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeInteger(7));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x02\x07"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Float",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeFloat(2.5));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloat(2.5));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x03\xca\x40\x20\x00\x00"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Double",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeDouble(2.5));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeDouble(2.5));
   REQUIRE(SpanEquals(
       out, "\x94\x05\x06\x01\xcb\x40\x04\x00\x00\x00\x00\x00\x00"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest String",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeString("hello"));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeString("hello"));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x04\xa5hello"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Raw",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeRaw("hello"_us));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeRaw("hello"_us));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x05\xc4\x05hello"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest BooleanArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeBooleanArray({true, false, true}));
+  net::WireEncodeBinary(os, 5, 6000,
+                        Value::MakeBooleanArray({true, false, true}));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x10\x93\xc3\xc2\xc3"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest IntegerArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeIntegerArray({1, 2, 4}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeIntegerArray({1, 2, 4}));
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x12\x93\x01\x02\x04"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest FloatArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeFloatArray({1, 2, 3}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloatArray({1, 2, 3}));
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x13\x93"
                      "\xca\x3f\x80\x00\x00"
@@ -333,7 +334,7 @@ TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest FloatArray",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest DoubleArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeDoubleArray({1, 2, 3}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeDoubleArray({1, 2, 3}));
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x11\x93"
                      "\xcb\x3f\xf0\x00\x00\x00\x00\x00\x00"
@@ -343,7 +344,7 @@ TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest DoubleArray",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest StringArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6, Value::MakeStringArray({"hello", "bye"}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeStringArray({"hello", "bye"}));
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x14\x92\xa5hello\xa3"
                      "bye"_us));

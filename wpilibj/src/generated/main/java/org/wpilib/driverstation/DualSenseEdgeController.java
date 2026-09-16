@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from DualSenseEdge controllers connected to the Driver Station.
@@ -21,7 +21,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles DualSenseEdge input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class DualSenseEdgeController implements HIDDevice, Sendable {
+public class DualSenseEdgeController implements HIDDevice, TelemetryLoggable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** The number of touchpads supported by this controller. */
@@ -163,7 +163,7 @@ public class DualSenseEdgeController implements HIDDevice, Sendable {
    */
   public DualSenseEdgeController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "DualSenseEdgeController");
   }
 
   /**
@@ -1259,35 +1259,38 @@ public class DualSenseEdgeController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "DualSenseEdge");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("L2", this::getL2, null);
-    builder.addDoubleProperty("R2", this::getR2, null);
-    builder.addBooleanProperty("Cross", this::getCrossButton, null);
-    builder.addBooleanProperty("Circle", this::getCircleButton, null);
-    builder.addBooleanProperty("Square", this::getSquareButton, null);
-    builder.addBooleanProperty("Triangle", this::getTriangleButton, null);
-    builder.addBooleanProperty("Create", this::getCreateButton, null);
-    builder.addBooleanProperty("PS", this::getPSButton, null);
-    builder.addBooleanProperty("Options", this::getOptionsButton, null);
-    builder.addBooleanProperty("L3", this::getL3Button, null);
-    builder.addBooleanProperty("R3", this::getR3Button, null);
-    builder.addBooleanProperty("L1", this::getL1Button, null);
-    builder.addBooleanProperty("R1", this::getR1Button, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Microphone", this::getMicrophoneButton, null);
-    builder.addBooleanProperty("RightPaddle1", this::getRightPaddle1Button, null);
-    builder.addBooleanProperty("LeftPaddle1", this::getLeftPaddle1Button, null);
-    builder.addBooleanProperty("Touchpad", this::getTouchpadButton, null);
-    builder.addBooleanProperty("LeftFunction", this::getLeftFunctionButton, null);
-    builder.addBooleanProperty("RightFunction", this::getRightFunctionButton, null);
+  public String getTelemetryType() {
+    return "HID:DualSenseEdge";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("L2", getL2());
+    table.log("R2", getR2());
+    table.log("Cross", getCrossButton());
+    table.log("Circle", getCircleButton());
+    table.log("Square", getSquareButton());
+    table.log("Triangle", getTriangleButton());
+    table.log("Create", getCreateButton());
+    table.log("PS", getPSButton());
+    table.log("Options", getOptionsButton());
+    table.log("L3", getL3Button());
+    table.log("R3", getR3Button());
+    table.log("L1", getL1Button());
+    table.log("R1", getR1Button());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Microphone", getMicrophoneButton());
+    table.log("RightPaddle1", getRightPaddle1Button());
+    table.log("LeftPaddle1", getLeftPaddle1Button());
+    table.log("Touchpad", getTouchpadButton());
+    table.log("LeftFunction", getLeftFunctionButton());
+    table.log("RightFunction", getRightFunctionButton());
   }
 }

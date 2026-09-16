@@ -23,72 +23,72 @@ CommandNiDsPS4Controller::GetNiDsPS4Controller() {
 
 Trigger CommandNiDsPS4Controller::Square(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kSquare, loop);
+      wpi::NiDsPS4Controller::Button::SQUARE, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Cross(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kCross, loop);
+      wpi::NiDsPS4Controller::Button::CROSS, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Circle(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kCircle, loop);
+      wpi::NiDsPS4Controller::Button::CIRCLE, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Triangle(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kTriangle, loop);
+      wpi::NiDsPS4Controller::Button::TRIANGLE, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L1(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kL1, loop);
+      wpi::NiDsPS4Controller::Button::L1, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R1(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kR1, loop);
+      wpi::NiDsPS4Controller::Button::R1, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L2(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kL2, loop);
+      wpi::NiDsPS4Controller::Button::L2, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R2(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kR2, loop);
+      wpi::NiDsPS4Controller::Button::R2, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Share(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kShare, loop);
+      wpi::NiDsPS4Controller::Button::SHARE, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Options(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kOptions, loop);
+      wpi::NiDsPS4Controller::Button::OPTIONS, loop);
 }
 
 Trigger CommandNiDsPS4Controller::L3(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kL3, loop);
+      wpi::NiDsPS4Controller::Button::L3, loop);
 }
 
 Trigger CommandNiDsPS4Controller::R3(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kR3, loop);
+      wpi::NiDsPS4Controller::Button::R3, loop);
 }
 
 Trigger CommandNiDsPS4Controller::PS(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kPS, loop);
+      wpi::NiDsPS4Controller::Button::PS, loop);
 }
 
 Trigger CommandNiDsPS4Controller::Touchpad(wpi::EventLoop* loop) const {
   return m_hid->Button(
-      wpi::NiDsPS4Controller::Button::kTouchpad, loop);
+      wpi::NiDsPS4Controller::Button::TOUCHPAD, loop);
 }
 
 double CommandNiDsPS4Controller::GetLeftX() const {

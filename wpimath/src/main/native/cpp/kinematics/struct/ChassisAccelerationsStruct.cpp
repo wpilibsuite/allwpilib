@@ -9,25 +9,25 @@
 
 wpi::math::ChassisAccelerations wpi::util::Struct<
     wpi::math::ChassisAccelerations>::Unpack(std::span<const uint8_t> data) {
-  constexpr size_t kAxOff = 0;
-  constexpr size_t kAyOff = kAxOff + 8;
-  constexpr size_t kAlphaOff = kAyOff + 8;
+  constexpr size_t AX_OFF = 0;
+  constexpr size_t AY_OFF = AX_OFF + 8;
+  constexpr size_t ALPHA_OFF = AY_OFF + 8;
   return wpi::math::ChassisAccelerations{
       units::meters_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kAxOff>(data)},
+          wpi::util::UnpackStruct<double, AX_OFF>(data)},
       units::meters_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kAyOff>(data)},
+          wpi::util::UnpackStruct<double, AY_OFF>(data)},
       units::radians_per_second_squared_t{
-          wpi::util::UnpackStruct<double, kAlphaOff>(data)},
+          wpi::util::UnpackStruct<double, ALPHA_OFF>(data)},
   };
 }
 
 void wpi::util::Struct<wpi::math::ChassisAccelerations>::Pack(
     std::span<uint8_t> data, const wpi::math::ChassisAccelerations& value) {
-  constexpr size_t kAxOff = 0;
-  constexpr size_t kAyOff = kAxOff + 8;
-  constexpr size_t kAlphaOff = kAyOff + 8;
-  wpi::util::PackStruct<kAxOff>(data, value.ax.value());
-  wpi::util::PackStruct<kAyOff>(data, value.ay.value());
-  wpi::util::PackStruct<kAlphaOff>(data, value.alpha.value());
+  constexpr size_t AX_OFF = 0;
+  constexpr size_t AY_OFF = AX_OFF + 8;
+  constexpr size_t ALPHA_OFF = AY_OFF + 8;
+  wpi::util::PackStruct<AX_OFF>(data, value.ax.value());
+  wpi::util::PackStruct<AY_OFF>(data, value.ay.value());
+  wpi::util::PackStruct<ALPHA_OFF>(data, value.alpha.value());
 }

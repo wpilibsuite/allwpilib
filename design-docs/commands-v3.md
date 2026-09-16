@@ -141,7 +141,7 @@ void bindDriveButtons() {
   controller.a().onTrue(...)
 }
 
-Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(kScoringPosition));
+Trigger atScoringPosition = new Trigger(() -> getPosition().isNear(SCORING_POSITION));
 
 Command autonomous() {
   return Command.noRequirements(coroutine -> {

@@ -164,6 +164,8 @@ wpilib_cc_library(
 wpilib_cc_shared_library(
     name = "shared/fields",
     dynamic_deps = [
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
@@ -195,6 +197,12 @@ wpilib_cc_library(
 
 wpilib_cc_static_library(
     name = "static/fields",
+    static_deps = [
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
+        "//wpimath:static/wpimath",
+        "//wpiutil:static/wpiutil",
+    ],
     static_lib_name = select({
         "@platforms//os:windows": "static/fields.lib",
         "//conditions:default": "static/libfields.a",
@@ -301,6 +309,7 @@ package_default_cc_project(
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-fields-generator",
     generated_include_target = "//fields:generated-native-include-files",
+    include_third_party_notices = True,
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -311,6 +320,10 @@ define_native_wrapper(
 
 PYBIND_PKGCFG_DEPS = [
     "//fields:native/fields/robotpy-native-fields.pc",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
     "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",

@@ -25,7 +25,7 @@ class Handle {
     SINK_PROPERTY,
     LISTENER_POLLER
   };
-  enum { kIndexMax = 0xffff };
+  enum { INDEX_MAX = 0xffff };
 
   Handle(CS_Handle handle) : m_handle(handle) {}   // NOLINT
   operator CS_Handle() const { return m_handle; }  // NOLINT

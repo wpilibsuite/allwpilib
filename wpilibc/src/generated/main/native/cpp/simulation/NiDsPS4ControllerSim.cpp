@@ -25,81 +25,81 @@ NiDsPS4ControllerSim::NiDsPS4ControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void NiDsPS4ControllerSim::SetLeftX(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kLeftX, value);
+  SetRawAxis(NiDsPS4Controller::Axis::LEFT_X, value);
 }
 
 void NiDsPS4ControllerSim::SetLeftY(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kLeftY, value);
+  SetRawAxis(NiDsPS4Controller::Axis::LEFT_Y, value);
 }
 
 void NiDsPS4ControllerSim::SetRightX(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kRightX, value);
+  SetRawAxis(NiDsPS4Controller::Axis::RIGHT_X, value);
 }
 
 void NiDsPS4ControllerSim::SetRightY(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kRightY, value);
+  SetRawAxis(NiDsPS4Controller::Axis::RIGHT_Y, value);
 }
 
 void NiDsPS4ControllerSim::SetL2Axis(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kL2, value);
+  SetRawAxis(NiDsPS4Controller::Axis::L2, value);
 }
 
 void NiDsPS4ControllerSim::SetR2Axis(double value) {
-  SetRawAxis(NiDsPS4Controller::Axis::kR2, value);
+  SetRawAxis(NiDsPS4Controller::Axis::R2, value);
 }
 
 void NiDsPS4ControllerSim::SetSquareButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kSquare, value);
+  SetRawButton(NiDsPS4Controller::Button::SQUARE, value);
 }
 
 void NiDsPS4ControllerSim::SetCrossButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kCross, value);
+  SetRawButton(NiDsPS4Controller::Button::CROSS, value);
 }
 
 void NiDsPS4ControllerSim::SetCircleButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kCircle, value);
+  SetRawButton(NiDsPS4Controller::Button::CIRCLE, value);
 }
 
 void NiDsPS4ControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kTriangle, value);
+  SetRawButton(NiDsPS4Controller::Button::TRIANGLE, value);
 }
 
 void NiDsPS4ControllerSim::SetL1Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kL1, value);
+  SetRawButton(NiDsPS4Controller::Button::L1, value);
 }
 
 void NiDsPS4ControllerSim::SetR1Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kR1, value);
+  SetRawButton(NiDsPS4Controller::Button::R1, value);
 }
 
 void NiDsPS4ControllerSim::SetL2Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kL2, value);
+  SetRawButton(NiDsPS4Controller::Button::L2, value);
 }
 
 void NiDsPS4ControllerSim::SetR2Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kR2, value);
+  SetRawButton(NiDsPS4Controller::Button::R2, value);
 }
 
 void NiDsPS4ControllerSim::SetShareButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kShare, value);
+  SetRawButton(NiDsPS4Controller::Button::SHARE, value);
 }
 
 void NiDsPS4ControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kOptions, value);
+  SetRawButton(NiDsPS4Controller::Button::OPTIONS, value);
 }
 
 void NiDsPS4ControllerSim::SetL3Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kL3, value);
+  SetRawButton(NiDsPS4Controller::Button::L3, value);
 }
 
 void NiDsPS4ControllerSim::SetR3Button(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kR3, value);
+  SetRawButton(NiDsPS4Controller::Button::R3, value);
 }
 
 void NiDsPS4ControllerSim::SetPSButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kPS, value);
+  SetRawButton(NiDsPS4Controller::Button::PS, value);
 }
 
 void NiDsPS4ControllerSim::SetTouchpadButton(bool value) {
-  SetRawButton(NiDsPS4Controller::Button::kTouchpad, value);
+  SetRawButton(NiDsPS4Controller::Button::TOUCHPAD, value);
 }

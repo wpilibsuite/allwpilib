@@ -17,57 +17,58 @@ import org.wpilib.math.system.Models;
 import org.wpilib.math.util.Units;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.FlywheelSim;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Tunables;
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with a flywheel to
  * control RPM.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
 
   // Max setpoint for joystick control in RPM
-  private static final double kMaxSetpointValue = 6000.0;
+  private static final double MAX_SETPOINT_VALUE = 6000.0;
 
   // Joystick to control setpoint
   private final Joystick joystick = new Joystick(0);
 
-  private final PWMSparkMax flywheelMotor = new PWMSparkMax(kMotorPort);
-  private final Encoder encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final PWMSparkMax flywheelMotor = new PWMSparkMax(MOTOR_PORT);
+  private final Encoder encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
   private final BangBangController bangBangController = new BangBangController();
 
   // Gains are for example purposes only - must be determined for your own robot!
-  public static final double kFlywheelKs = 0.0001; // V
-  public static final double kFlywheelKv = 0.000195; // V/RPM
-  public static final double kFlywheelKa = 0.0003; // V/(RPM/s)
+  public static final double FLYWHEEL_KS = 0.0001; // V
+  public static final double FLYWHEEL_KV = 0.000195; // V/RPM
+  public static final double FLYWHEEL_KA = 0.0003; // V/(RPM/s)
   private final SimpleMotorFeedforward feedforward =
-      new SimpleMotorFeedforward(kFlywheelKs, kFlywheelKv, kFlywheelKa);
+      new SimpleMotorFeedforward(FLYWHEEL_KS, FLYWHEEL_KV, FLYWHEEL_KA);
 
   // Simulation classes help us simulate our robot
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
-  private static final double kFlywheelGearing = 1.0;
+  private static final double FLYWHEEL_GEARING = 1.0;
 
   // 1/2 MR²
-  private static final double kFlywheelMomentOfInertia =
+  private static final double FLYWHEEL_MOMENT_OF_INERTIA =
       0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
 
   private final DCMotor gearbox = DCMotor.getNEO(1);
 
   private final LinearSystem<N1, N1, N1> plant =
-      Models.flywheelFromPhysicalConstants(gearbox, kFlywheelGearing, kFlywheelMomentOfInertia);
+      Models.flywheelFromPhysicalConstants(gearbox, FLYWHEEL_GEARING, FLYWHEEL_MOMENT_OF_INERTIA);
 
   private final FlywheelSim flywheelSim = new FlywheelSim(plant, gearbox);
   private final EncoderSim encoderSim = new EncoderSim(encoder);
 
   public Robot() {
-    // Add bang-bang controller to SmartDashboard and networktables.
-    SmartDashboard.putData(bangBangController);
+    // Add bang-bang controller to tunables.
+    Tunables.publish("BangBang Controller", bangBangController);
   }
 
   /** Controls flywheel to a set velocity (RPM) controlled by a joystick. */
@@ -77,7 +78,8 @@ public class Robot extends TimedRobot {
     double setpoint =
         Math.max(
             0.0,
-            joystick.getRawAxis(0) * Units.rotationsPerMinuteToRadiansPerSecond(kMaxSetpointValue));
+            joystick.getRawAxis(0)
+                * Units.rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
 
     // Set setpoint and measurement of the bang-bang controller
     double bangOutput = bangBangController.calculate(encoder.getRate(), setpoint) * 12.0;
@@ -86,6 +88,9 @@ public class Robot extends TimedRobot {
     // feedforward. The feedforward is reduced slightly to avoid overspeeding
     // the shooter.
     flywheelMotor.setVoltage(bangOutput + 0.9 * feedforward.calculate(setpoint));
+
+    // Log bang-bang controller to telemetry
+    Telemetry.log("BangBang Controller", bangBangController);
   }
 
   /** Update our simulation. This should be run every robot loop in simulation. */

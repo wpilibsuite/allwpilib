@@ -20,18 +20,18 @@
  * to control a flywheel.
  */
 class Robot : public wpi::TimedRobot {
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
-  static constexpr int kJoystickPort = 0;
-  static constexpr wpi::units::radians_per_second_t kSpinup = 500_rpm;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
+  static constexpr int JOYSTICK_PORT = 0;
+  static constexpr wpi::units::radians_per_second_t SPINUP = 500_rpm;
 
   static constexpr wpi::units::kilogram_square_meter_t
-      kFlywheelMomentOfInertia = 0.00032_kg_sq_m;
+      FLYWHEEL_MOMENT_OF_INERTIA = 0.00032_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the flywheel
   // spins slower than the motors, this number should be greater than one.
-  static constexpr double kFlywheelGearing = 1.0;
+  static constexpr double FLYWHEEL_GEARING = 1.0;
 
   // The plant holds a state-space model of our flywheel. This system has the
   // following properties:
@@ -41,8 +41,8 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [velocity], in radians per second.
   wpi::math::LinearSystem<1, 1, 1> flywheelPlant =
       wpi::math::Models::FlywheelFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), kFlywheelMomentOfInertia,
-          kFlywheelGearing);
+          wpi::math::DCMotor::NEO(2), FLYWHEEL_MOMENT_OF_INERTIA,
+          FLYWHEEL_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   wpi::math::KalmanFilter<1, 1, 1> observer{
@@ -73,10 +73,10 @@ class Robot : public wpi::TimedRobot {
                                             12_V, 20_ms};
 
   // An encoder set up to measure flywheel velocity in radians per second.
-  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
-  wpi::PWMSparkMax motor{kMotorPort};
-  wpi::Gamepad joystick{kJoystickPort};
+  wpi::PWMSparkMax motor{MOTOR_PORT};
+  wpi::Gamepad joystick{JOYSTICK_PORT};
 
  public:
   Robot() {
@@ -93,7 +93,7 @@ class Robot : public wpi::TimedRobot {
     // setpoint of a PID controller.
     if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      loop.SetNextR(wpi::math::Vectord<1>{kSpinup.value()});
+      loop.SetNextR(wpi::math::Vectord<1>{SPINUP.value()});
     } else {
       // We released the bumper, so let's spin down
       loop.SetNextR(wpi::math::Vectord<1>{0.0});

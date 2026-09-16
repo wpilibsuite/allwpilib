@@ -77,6 +77,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore",
+        "//telemetry",
+        "//tunables",
         "//wpilibc",
         "//wpinet",
     ],
@@ -87,6 +89,8 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpilibc:shared/wpilibc",
         "//wpimath:shared/wpimath",
         "//wpinet:shared/wpinet",
@@ -100,6 +104,8 @@ wpilib_cc_static_library(
     name = "static/commandsv2",
     static_deps = [
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
@@ -118,6 +124,8 @@ wpilib_java_library(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -153,6 +161,8 @@ wpilib_java_junit5_test(
         ":commandsv2-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -195,9 +205,10 @@ robotpy_library(
     author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
     description_file = "src/main/python/README.md",
     distribution = "robotpy-commands-v2",
+    extra_distinfo_files = {"src/main/python/LICENSE": "licenses/LICENSE"},
     imports = ["src/main/python"],
     project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
-    python_requires = ">=3.10",
+    python_requires = ">=3.11",
     requires = [
         "wpilib==0.0.0",
         "typing_extensions>=4.1.0,<5",
