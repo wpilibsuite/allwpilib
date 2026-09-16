@@ -145,11 +145,7 @@ if(NOT TARGET aos::aos)
     # express. Linking them whole restores what a Bazel-built AOS binary does.
     # The cost is small; this archive holds only what Bazel already
     # force-links.
-    file(
-        GLOB _aos_alwayslink_archives
-        "${AOS_ALWAYSLINK_DIR}/*.a"
-        "${AOS_ALWAYSLINK_DIR}/*.lib"
-    )
+    file(GLOB _aos_alwayslink_archives "${AOS_ALWAYSLINK_DIR}/*.a" "${AOS_ALWAYSLINK_DIR}/*.lib")
 
     set(_aos_alwayslink_targets "")
     foreach(_archive ${_aos_alwayslink_archives})

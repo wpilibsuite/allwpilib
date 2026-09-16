@@ -174,12 +174,7 @@ function(_aos_config_imports FILE IMPORT_DIR OUT_FILES)
         list(POP_FRONT _queue _config)
         get_filename_component(_config_dir "${_config}" DIRECTORY)
         file(READ "${_config}" _contents)
-        string(
-            REGEX MATCH
-            "\"imports\"[ \t\r\n]*:[ \t\r\n]*\\[([^]]*)\\]"
-            _imports
-            "${_contents}"
-        )
+        string(REGEX MATCH "\"imports\"[ \t\r\n]*:[ \t\r\n]*\\[([^]]*)\\]" _imports "${_contents}")
         string(REGEX MATCHALL "\"[^\"]+\"" _imports "${CMAKE_MATCH_1}")
         foreach(_import IN LISTS _imports)
             string(REGEX REPLACE "^\"(.*)\"$" "\\1" _import "${_import}")
