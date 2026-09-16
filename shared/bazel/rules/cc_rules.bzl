@@ -691,8 +691,8 @@ def wpilib_cc_static_library_files(name):
     """
     _folder, lib = _folder_prefix(name)
     return select({
-        "@wpilib_toolchains//conditions:osx_debug": [":universal/lib" + lib + "d.a"],
         "@wpilib_toolchains//conditions:osx": [":universal/lib" + lib + ".a"],
+        "@wpilib_toolchains//conditions:osx_debug": [":universal/lib" + lib + "d.a"],
         "//conditions:default": [":" + name],
     })
 
