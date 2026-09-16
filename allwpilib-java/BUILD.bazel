@@ -11,9 +11,6 @@ wpilib_java_library(
     maven_group_id = "org.wpilib.allwpilib",
     visibility = ["//visibility:public"],
     deps = [
-        "//apriltag:apriltag-java",
-        "//cameraserver:cameraserver-java",
-        "//cscore:cscore-java",
         "//datalog:datalog-java",
         "//epilogue-runtime:epilogue-java",
         "//hal:hal-java",
