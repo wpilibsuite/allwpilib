@@ -1070,6 +1070,40 @@ def test_tune_revision_survives_python_complex_unpublish_republish(backend):
     assert ref() is None
 
 
+def test_tune_revision_supports_non_weakrefable_python_complex(backend):
+    class SlottedComplex:
+        __slots__ = ("value",)
+
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = SlottedComplex()
+    with pytest.raises(TypeError):
+        weakref.ref(value)
+
+    tunables.publish("slottedRevisionA", value)
+    backend.set_double("/slottedRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.remove("slottedRevisionA")
+    tunables.publish("slottedRevisionB", value)
+
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+    backend.set_double("/slottedRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+
 def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):
     wrong_type = tunables.add("wrongTypeRevision", 1.0)
     immutable = tunables.add("immutableRevision", 5, mutable=False)

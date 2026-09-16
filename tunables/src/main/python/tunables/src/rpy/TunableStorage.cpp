@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -121,7 +122,7 @@ GetComplexValues() {
 
 struct ComplexIdentityEntry {
   std::shared_ptr<PyComplexTunableAdapter> tunable;
-  py::weakref valueRef;
+  std::optional<py::weakref> valueRef;
   uint64_t generation;
 };
 
@@ -141,6 +142,20 @@ std::unordered_map<std::string, py::object>& GetNativeComplexValues() {
   return values;
 }
 
+std::optional<py::weakref> TryCreateWeakref(py::handle value,
+                                            py::object callback = py::none()) {
+  PyObject* callbackPtr = callback.is_none() ? nullptr : callback.ptr();
+  PyObject* ref = PyWeakref_NewRef(value.ptr(), callbackPtr);
+  if (!ref) {
+    if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    throw py::error_already_set();
+  }
+  return py::reinterpret_steal<py::weakref>(ref);
+}
+
 std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
     py::handle value) {
   auto& values = GetComplexValuesByObject();
@@ -150,7 +165,8 @@ std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
   }
 
   auto retained = it->second.tunable;
-  if (!retained || it->second.valueRef().is_none() ||
+  if (!retained ||
+      (it->second.valueRef && (*it->second.valueRef)().is_none()) ||
       !retained->IsValue(value)) {
     values.erase(it);
     return nullptr;
@@ -191,7 +207,7 @@ std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
       values.erase(it);
     }
   }};
-  py::weakref valueRef{value, cleanup};
+  auto valueRef = TryCreateWeakref(value, std::move(cleanup));
   auto tunable = std::make_shared<PyComplexTunableAdapter>(
       std::move(value), std::move(initialPublishTunable));
   GetComplexValuesByObject().insert_or_assign(
