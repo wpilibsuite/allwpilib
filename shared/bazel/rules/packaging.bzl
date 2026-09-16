@@ -115,11 +115,19 @@ def package_default_jni_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = select({
+            "@wpilib_toolchains//conditions:osx": [
+                ":universal/lib{}.a".format(name),
+            ],
+            "//conditions:default": [
+                ":static/{}".format(name),
+            ],
+        }),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = select({
+            "@wpilib_toolchains//conditions:osx": "universal",
+            "//conditions:default": "static",
+        }),
     )
 
     pkg_filegroup(
@@ -171,11 +179,19 @@ def package_default_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = select({
+            "@wpilib_toolchains//conditions:osx": [
+                ":universal/lib{}.a".format(name),
+            ],
+            "//conditions:default": [
+                ":static/{}".format(name),
+            ],
+        }),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = select({
+            "@wpilib_toolchains//conditions:osx": "universal",
+            "//conditions:default": "static",
+        }),
     )
 
     pkg_filegroup(
@@ -342,11 +358,19 @@ def package_static_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = select({
+            "@wpilib_toolchains//conditions:osx": [
+                ":universal/lib{}.a".format(name),
+            ],
+            "//conditions:default": [
+                ":static/{}".format(name),
+            ],
+        }),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = select({
+            "@wpilib_toolchains//conditions:osx": "universal",
+            "//conditions:default": "static",
+        }),
     )
 
     architectures_pkg_zip(

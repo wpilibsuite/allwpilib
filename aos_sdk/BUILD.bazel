@@ -1,0 +1,228 @@
+# Copyright (c) FIRST and other WPILib contributors.
+# Open Source Software; you can modify and/or share it under the terms of
+# the WPILib BSD license file in the root directory of this project.
+
+load("@aos//aos/flatbuffers:defs.bzl", "DEFAULT_FLATC_ARGS")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
+load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load(
+    "//aos_sdk:sdk.bzl",
+    "aos_sdk_alwayslink_libraries",
+    "aos_sdk_cmake_settings",
+    "aos_sdk_headers",
+    "aos_sdk_link_options",
+)
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_library")
+load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
+load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
+
+package(default_visibility = ["//visibility:public"])
+
+# The AOS SDK: what a CMake consumer builds robot code against. README.md
+# documents the layout.
+
+# Everything reachable from here has its headers shipped and its objects rolled
+# into the static archive. Adding a dep widens the SDK, so do it deliberately.
+cc_library(
+    name = "aos_runtime",
+    deps = [
+        "//aosnt/types:nt_types_fbs",
+        "@aos//aos:configuration",
+        "@aos//aos:flatbuffers",
+        "@aos//aos:init",
+        "@aos//aos:json_to_flatbuffer",
+        "@aos//aos:realtime",
+        "@aos//aos/events:aio_uv",
+        "@aos//aos/events:event_loop",
+        "@aos//aos/events:shm_event_loop",
+        "@aos//aos/events:simulated_event_loop",
+        "@aos//aos/events:thread_event_loop",
+        "@aos//aos/logging",
+        "@aos//aos/util:file",
+    ],
+)
+
+# libuv's objects are already in wpinet's archive, which a libuv application
+# links, and the alwayslink objects ship in their own archives. A second copy of
+# either would put two definitions of the same symbols in one link.
+wpilib_cc_static_library(
+    name = "static/aos",
+    static_deps = [
+        ":alwayslink_libraries",
+        "//wpinet:static/wpinet",
+    ],
+    deps = [":aos_runtime"],
+)
+
+pkg_files(
+    name = "aos-sdk-static-files",
+    srcs = select({
+        "@wpilib_toolchains//conditions:osx": [":universal/libaos.a"],
+        "//conditions:default": [":static/aos"],
+    }),
+    prefix = platform_prefix("static"),
+    strip_prefix = select({
+        "@wpilib_toolchains//conditions:osx": "universal",
+        "//conditions:default": "static",
+    }),
+)
+
+# Rolling everything into one archive drops the alwayslink attribute, so these
+# ship separately for the CMake side to link whole.
+aos_sdk_alwayslink_libraries(
+    name = "alwayslink_libraries",
+    prefix = platform_prefix("static/alwayslink"),
+    deps = [":aos_runtime"],
+)
+
+# What a consumer has to link besides the archives. It depends on the platform,
+# so it ships next to them rather than in the headers zip.
+aos_sdk_link_options(
+    name = "link_options",
+    out = "AosLinkOptions.cmake",
+    prefix = platform_prefix("static"),
+    deps = [":aos_runtime"],
+)
+
+architectures_pkg_zip(
+    name = "aos-sdk_static_zip",
+    srcs = [
+        ":alwayslink_libraries",
+        ":aos-sdk-static-files",
+        ":link_options",
+        "//:license_pkg_files",
+    ],
+)
+
+# wpinet's headers zip already ships libuv's. liburing is an implementation
+# detail of the Linux io_uring backend that no AOS header includes, and its
+# private headers would unpack to src/lib.h, src/setup.h and config-host.h at
+# the root of the consumer's include path.
+aos_sdk_headers(
+    name = "headers",
+    exclude = [
+        "@liburing",
+        "@libuv",
+    ],
+    deps = [":aos_runtime"],
+)
+
+# The two things the CMake side has to keep in step with Bazel.
+aos_sdk_cmake_settings(
+    name = "cmake_settings",
+    out = "AosGeneratedSettings.cmake",
+    flatc_args = DEFAULT_FLATC_ARGS,
+    deps = [":aos_runtime"],
+)
+
+pkg_files(
+    name = "cmake_files",
+    srcs = [
+        "cmake/AosConfig.cmake",
+        "cmake/AosFunctions.cmake",
+    ],
+    prefix = "cmake",
+    strip_prefix = strip_prefix.files_only(),
+)
+
+# flatc resolves `include "reflection/reflection.fbs"` against its -I paths and
+# nothing embeds a copy. Without this the SDK cannot compile
+# aos/configuration.fbs or anything that includes it.
+pkg_files(
+    name = "flatbuffers_include_files",
+    srcs = ["@aos_flatbuffers//reflection:reflection_fbs_schema"],
+    prefix = "share/aos/flatbuffers-include/reflection",
+    strip_prefix = strip_prefix.files_only(),
+)
+
+# Prebuilt schemas for AOS's own channels and aosnt's NetworkTables types. Every
+# downstream aos_config() passes these to config_flattener, and they only exist
+# as build outputs.
+pkg_files(
+    name = "schema_files",
+    srcs = [
+        "//aosnt/types:nt_types_fbs_reflection_out",
+        "@aos//aos/events:event_loop_fbs_reflection_out",
+        "@aos//aos/logging:dynamic_log_command_fbs_reflection_out",
+        "@aos//aos/logging:log_message_fbs_reflection_out",
+        "@aos//aos/starter:starter_fbs_reflection_out",
+        "@aos//aos/starter:starter_rpc_fbs_reflection_out",
+    ],
+    prefix = "share/aos/schemas",
+    strip_prefix = strip_prefix.files_only(),
+)
+
+pkg_files(
+    name = "config_files",
+    srcs = ["aos.json"],
+    prefix = "share/aos",
+    strip_prefix = strip_prefix.from_pkg(),
+)
+
+pkg_files(
+    name = "doc_files",
+    srcs = [
+        "README.md",
+        "@aos//:LICENSE.txt",
+    ],
+    prefix = "share/aos",
+    strip_prefix = strip_prefix.files_only(),
+)
+
+# The CMake glue and schemas are the same on every platform, so they ride along
+# with the headers.
+pkg_zip(
+    name = "aos-sdk-hdrs-zip",
+    srcs = [
+        ":cmake_files",
+        ":cmake_settings",
+        ":config_files",
+        ":doc_files",
+        ":flatbuffers_include_files",
+        ":headers",
+        ":schema_files",
+        "//:license_pkg_files",
+    ],
+)
+
+wpilib_maven_export(
+    name = "aos-sdk_publish",
+    classifier_artifacts = {
+        "headers": ":aos-sdk-hdrs-zip",
+        "linuxsystemcorestatic": ":aos-sdk_static_zip-opt-systemcore",
+        "linuxsystemcorestaticdebug": ":aos-sdk_static_zip-dbg-systemcore",
+    },
+    linux_artifacts = {
+        "linuxx86-64static": ":aos-sdk_static_zip-opt-linux-x86-64",
+        "linuxx86-64staticdebug": ":aos-sdk_static_zip-dbg-linux-x86-64",
+    },
+    maven_coordinates = "org.wpilib.aos:aos-sdk:$(WPILIB_VERSION)",
+    osx_artifacts = {
+        "osxuniversalstatic": ":aos-sdk_static_zip-opt-osxuniversal",
+        "osxuniversalstaticdebug": ":aos-sdk_static_zip-dbg-osxuniversal",
+    },
+    visibility = ["//visibility:public"],
+    windows_artifacts = {
+        "windowsarm64static": ":aos-sdk_static_zip-opt-windows-arm64",
+        "windowsarm64staticdebug": ":aos-sdk_static_zip-dbg-windows-arm64",
+        "windowsx86-64static": ":aos-sdk_static_zip-opt-windows-x86-64",
+        "windowsx86-64staticdebug": ":aos-sdk_static_zip-dbg-windows-x86-64",
+    },
+)
+
+# The code generators, published like wpilib's other binaries.
+filegroup(
+    name = "aos-tools",
+    srcs = [
+        "@aos//aos:config_flattener",
+        "@aos//aos/flatbuffers:generate",
+        "@aos_flatbuffers//:flatc",
+    ],
+)
+
+package_binary_cc_project(
+    name = "aos-tools",
+    maven_artifact_name = "aos-tools",
+    maven_group_id = "org.wpilib.aos",
+)

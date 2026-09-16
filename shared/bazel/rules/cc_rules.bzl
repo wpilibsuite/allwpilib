@@ -654,8 +654,8 @@ def wpilib_cc_static_library(
         name,
         static_lib_name = None,
         **kwargs):
+    folder, lib = _folder_prefix(name)
     if not static_lib_name:
-        folder, lib = _folder_prefix(name)
         static_lib_name = select({
             "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
             "//shared/bazel/rules:compilation_mode_windows_dbg": folder + "/" + lib + ".lib",
@@ -667,6 +667,17 @@ def wpilib_cc_static_library(
         name = name,
         static_lib_name = static_lib_name,
         **kwargs
+    )
+
+    # macOS ships one archive covering both CPUs, and a single build only
+    # produces the CPU it was built for. The same universal_binary
+    # wpilib_cc_shared_library makes.
+    universal_binary(
+        name = "universal/lib" + lib + ".a",
+        binary = name,
+        target_compatible_with = [
+            "@platforms//os:osx",
+        ],
     )
 
 def _generate_def_windows_impl(ctx):
