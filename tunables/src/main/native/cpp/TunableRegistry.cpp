@@ -1139,11 +1139,13 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
   {
     std::scoped_lock lock{inst.tunablesMutex};
     for (auto eraseUid : uidsToErase) {
+      std::vector<std::string> removedComplexPaths;
       if (auto pathsIt = inst.complexPaths.find(eraseUid);
           pathsIt != inst.complexPaths.end()) {
         for (auto&& path : pathsIt->second) {
           UnlinkComplexParentPathLocked(inst, eraseUid, path);
           inst.complexUidByPath.erase(path);
+          removedComplexPaths.emplace_back(path);
         }
         inst.complexPaths.erase(pathsIt);
       }
@@ -1159,10 +1161,16 @@ void TunableRegistry::UnregisterTunable(uint32_t uid) {
       }
       auto it = inst.tunables.find(eraseUid);
       if (it == inst.tunables.end()) {
+        for (auto&& path : removedComplexPaths) {
+          LinkExistingComplexDescendantsLocked(inst, path);
+        }
         continue;
       }
       auto& info = *it->second;
       UnlinkAllComplexRelationsLocked(info);
+      for (auto&& path : removedComplexPaths) {
+        LinkExistingComplexDescendantsLocked(inst, path);
+      }
       info.tunable->m_uid = detail::TunableBase::TYPE_FLAG | (eraseUid >> 24);
       auto& uidInfo = inst.uidInfo[eraseUid >> 24];
       uidInfo.freeUids.push_back(eraseUid & 0x00ffffff);
