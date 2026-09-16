@@ -135,6 +135,7 @@ write_source_files(
 publish_all(
     name = "publish",
     targets = [
+        "//aosnt:aosnt-bridge_publish.publish",
         "//apriltag:apriltag-cpp_publish.publish",
         "//apriltag:apriltag-java_publish.publish",
         "//cameraserver:cameraserver-cpp_publish.publish",
@@ -220,6 +221,7 @@ write_source_files(
         "//hal:robotpy-native-wpihal-generator.generate_build_info",
         "//ntcore:robotpy-native-ntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-native-xrp-generator.generate_build_info",
+        "//simulation/halsim_gui:robotpy-native-halsim-gui-generator.generate_build_info",
         "//telemetry:robotpy-native-telemetry-generator.generate_build_info",
         "//tunables:robotpy-native-tunables-generator.generate_build_info",
         "//wpilibc:robotpy-native-wpilib-generator.generate_build_info",
@@ -245,6 +247,7 @@ write_source_files(
         "//hal:robotpy-hal-generator.generate_build_info",
         "//ntcore:pyntcore-generator.generate_build_info",
         "//romiVendordep:robotpy-romi-generator.generate_build_info",
+        "//simulation/halsim_gui:robotpy-halsim-gui-generator.generate_build_info",
         "//telemetry:robotpy-telemetry-generator.generate_build_info",
         "//tunables:robotpy-tunables-generator.generate_build_info",
         "//wpilibc:robotpy-wpilib-generator.generate_build_info",

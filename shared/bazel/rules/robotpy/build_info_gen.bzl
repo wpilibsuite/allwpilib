@@ -8,7 +8,9 @@ def generate_robotpy_native_wrapper_build_info(
         module_include_targets = {},
         native_srcs_root = "src/main/native/",
         generated_include_target = None,
-        generated_include_root = "src/generated/main/native/include"):
+        generated_include_root = "src/generated/main/native/include",
+        include_license_file = True,
+        include_third_party_notices = False):
     """
     This function will generate the bazel file necessary to declare a library that wraps a standard allwpilib library.
 
@@ -28,6 +30,12 @@ def generate_robotpy_native_wrapper_build_info(
             include directory; override when generated_include_target's sources live elsewhere (e.g.
             wpimath's generated protobuf headers live under src/generated/main/native/cpp).
     """
+    extra_include_root_files = []
+    if include_license_file:
+        extra_include_root_files.append("//:LICENSE.md")
+    if include_third_party_notices:
+        extra_include_root_files.append("//:ThirdPartyNotices.txt")
+
     cmd = "$(location //shared/bazel/rules/robotpy:generate_native_build_file) --output_file=$(OUTS)"
     cmd += " --project_cfg=$(location " + pyproject_toml + ")"
     if native_srcs_root:
@@ -36,6 +44,10 @@ def generate_robotpy_native_wrapper_build_info(
     if generated_include_target:
         cmd += " --generated_include_target=" + generated_include_target
         cmd += " --generated_include_root=" + generated_include_root
+    if extra_include_root_files:
+        cmd += " --extra_include_root_files "
+        for f in extra_include_root_files:
+            cmd += " " + f
     if third_party_dirs:
         cmd += " --third_party_dirs "
         for d in third_party_dirs:

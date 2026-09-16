@@ -65,7 +65,6 @@ build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 # Common Cache Settings
 build:common_cache --remote_timeout=3600
 build:common_cache --remote_cache_compression
-build:common_cache --experimental_remote_cache_compression_threshold=100
 common:common_cache --experimental_remote_merkle_tree_cache
 
 # Build Buddy Cache Setup
@@ -87,20 +86,20 @@ common:remote_cache_readonly --noremote_upload_local_results
 
 # Stubs for remote execution.
 build:remote --strategy=TsProject=remote,sandboxed
-build --strategy=CopyFile=remote,standalone
-build --strategy=CopyDirectory=remote,standalone
-build --strategy=CopyToDirectory=remote,standalone
-build --strategy=PyWriteBuildData=remote,standalone
-# All tests have a strategy of TestRunner.  Enable standalone for only tests.
+build --strategy=CopyFile=remote,local
+build --strategy=CopyDirectory=remote,local
+build --strategy=CopyToDirectory=remote,local
+build --strategy=PyWriteBuildData=remote,local
+# All tests have a strategy of TestRunner.  Enable local for only tests.
 # See the following for more details:
 # https://github.com/bazelbuild/bazel/issues/7480
-build:linux --strategy=TestRunner=remote,sandboxed,standalone
-build:macos --strategy=TestRunner=remote,sandboxed,standalone
-build:linux --strategy=NpmLifecycleHook=remote,sandboxed,standalone
-build:macos --strategy=NpmLifecycleHook=remote,sandboxed,standalone
+build:linux --strategy=TestRunner=remote,sandboxed,local
+build:macos --strategy=TestRunner=remote,sandboxed,local
+build:linux --strategy=NpmLifecycleHook=remote,sandboxed,local
+build:macos --strategy=NpmLifecycleHook=remote,sandboxed,local
 
 common:remote --config=common_cache
-build:remote --experimental_inmemory_dotd_files --experimental_inmemory_jdeps_files --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
+build:remote --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
 # Specify your cluster as follows:
 # build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
 build:remote --jobs=100
@@ -134,5 +133,9 @@ common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,
 
 build --@rules_python//python/config_settings:bootstrap_impl=script
 build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
+# AOS has both aos/flatbuffers/ and aos/flatbuffers.py; without this Bazel
+# synthesizes an aos/flatbuffers/__init__.py that shadows the module.
+build --incompatible_default_to_explicit_init_py
 
 try-import %workspace%/bazel_auth.rc

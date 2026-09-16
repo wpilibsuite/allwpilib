@@ -237,13 +237,10 @@ class BazelExtensionModule:
                 base_library = dep_name.split("-")[0]
                 local_extension_dependencies.add(f"//{base_library}:{dep_name}")
             else:
-                base_library = fixup_root_package_name(dep_name.split("_")[0])
-                local_extension_dependencies.add(
-                    f"//{base_library}:{fixup_shared_lib_name(base_library)}"
-                )
-                dynamic_dependencies.add(
-                    f"//{base_library}:shared/{fixup_shared_lib_name(base_library)}"
-                )
+                base_library = fixup_root_package_name(dep_name.rsplit("_", 1)[0])
+                shared_lib_name = fixup_shared_lib_name(base_library.rsplit("/", 1)[-1])
+                local_extension_dependencies.add(f"//{base_library}:{shared_lib_name}")
+                dynamic_dependencies.add(f"//{base_library}:shared/{shared_lib_name}")
                 if dep_name != self.name:
                     local_extension_dependencies.add(
                         f"//{base_library}:{dep_name}_pybind_library"
@@ -448,6 +445,12 @@ def generate_pybind_build_file(
         f"{fixup_root_package_name(top_level_name)}",
     ]
 
+    has_semiwrap_files = False
+    for em in extension_modules:
+        if em.generation_data:
+            has_semiwrap_files = True
+            break
+
     with open(output_file, "w", newline="\n") as f:
         f.write(
             template.render(
@@ -464,6 +467,7 @@ def generate_pybind_build_file(
                 entry_points=entry_points,
                 version_file=version_file,
                 has_external_python_deps=has_external_python_deps,
+                has_semiwrap_files=has_semiwrap_files,
             )
             + "\n"
         )

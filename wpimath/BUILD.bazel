@@ -364,6 +364,9 @@ generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpimath-generator",
     generated_include_root = "src/generated/main/native/cpp",
     generated_include_target = "//wpimath:generated-native-include-files",
+    module_include_targets = {
+        "@eigen//:all_files": "include",
+    },
     pyproject_toml = "src/main/python/native-pyproject.toml",
     third_party_dirs = [
         "gcem",
