@@ -146,6 +146,9 @@ def build_templates(folders):
             ],
             deps = [
                 "//allwpilib-java:allwpilib-java",
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
@@ -182,6 +185,9 @@ def build_tests(example_test_folders, snippet_test_folders):
             deps = [
                 ":" + folder + "-example",
                 "//allwpilib-java:allwpilib-java",
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
@@ -217,6 +223,9 @@ def build_tests(example_test_folders, snippet_test_folders):
             deps = [
                 ":" + folder + "-snippet",
                 "//allwpilib-java:allwpilib-java",
+                "//apriltag:apriltag-java",
+                "//cameraserver:cameraserver-java",
+                "//cscore:cscore-java",
                 "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
