@@ -1,0 +1,63 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// Every encoding FlatbufferToProto can emit, and structs.
+
+namespace wpi.aosnt.testing;
+
+attribute "proto_type";
+
+struct Inner {
+  a:int;
+  b:float;
+}
+
+struct Outer {
+  inner:Inner;
+  c:double;
+}
+
+table Scalars {
+  the_bool:bool (id: 0);
+  the_byte:byte (id: 1);
+  the_ubyte:ubyte (id: 2);
+  the_short:short (id: 3);
+  the_ushort:ushort (id: 4);
+  the_int:int (id: 5);
+  the_uint:uint (id: 6);
+  the_long:long (id: 7);
+  the_ulong:ulong (id: 8);
+  the_float:float (id: 9);
+  the_double:double (id: 10);
+  the_string:string (id: 11);
+  zigzag_int:int (id: 12, proto_type: "sint32");
+  zigzag_long:long (id: 13, proto_type: "sint64");
+  fixed_uint:uint (id: 14, proto_type: "fixed32");
+  fixed_int:int (id: 15, proto_type: "sfixed32");
+  fixed_ulong:ulong (id: 16, proto_type: "fixed64");
+  fixed_long:long (id: 17, proto_type: "sfixed64");
+  outer:Outer (id: 18);
+  inners:[Inner] (id: 19);
+
+  bools:[bool] (id: 20);
+  bytes_:[byte] (id: 21);
+  ubytes:[ubyte] (id: 22);
+  shorts:[short] (id: 23);
+  ushorts:[ushort] (id: 24);
+  ints:[int] (id: 25);
+  uints:[uint] (id: 26);
+  longs:[long] (id: 27);
+  ulongs:[ulong] (id: 28);
+  floats:[float] (id: 29);
+  doubles:[double] (id: 30);
+  strings:[string] (id: 31);
+  zigzag_ints:[int] (id: 32, proto_type: "sint32");
+  zigzag_longs:[long] (id: 33, proto_type: "sint64");
+  fixed_uints:[uint] (id: 34, proto_type: "fixed32");
+  fixed_ints:[int] (id: 35, proto_type: "sfixed32");
+  fixed_ulongs:[ulong] (id: 36, proto_type: "fixed64");
+  fixed_longs:[long] (id: 37, proto_type: "sfixed64");
+}
+
+root_type Scalars;
