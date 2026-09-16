@@ -49,7 +49,7 @@ class PyComplexTunableAdapter
 
   std::shared_ptr<TunableTableOwnerContext> m_tableOwnerContext;
   std::optional<pybind11::object> m_value;
-  pybind11::weakref m_valueRef;
+  std::optional<pybind11::weakref> m_valueRef;
   std::optional<pybind11::object> m_initialPublishTunable;
   std::string m_type;
   int m_retainCount = 0;

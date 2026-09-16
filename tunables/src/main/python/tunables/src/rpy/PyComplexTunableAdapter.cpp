@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -33,13 +34,25 @@ bool IsPathOrDescendant(std::string_view candidate, std::string_view path) {
   return IsPathOrDescendant(candidate, path, MakeChildPrefix(path));
 }
 
+std::optional<py::weakref> TryCreateWeakref(py::handle value) {
+  PyObject* ref = PyWeakref_NewRef(value.ptr(), nullptr);
+  if (!ref) {
+    if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    throw py::error_already_set();
+  }
+  return py::reinterpret_steal<py::weakref>(ref);
+}
+
 }  // namespace
 
 PyComplexTunableAdapter::PyComplexTunableAdapter(
     py::object value, py::object initialPublishTunable)
     : m_tableOwnerContext{std::make_shared<TunableTableOwnerContext>()},
       m_value{std::move(value)},
-      m_valueRef{*m_value},
+      m_valueRef{TryCreateWeakref(*m_value)},
       m_initialPublishTunable{std::move(initialPublishTunable)} {
   if (auto getTunableType = GetOptionalAttr(*m_value, "get_tunable_type")) {
     py::object typeObj = (*getTunableType)();
@@ -57,7 +70,7 @@ bool PyComplexTunableAdapter::IsValue(py::handle value) const {
   if (m_value) {
     return m_value->is(value);
   }
-  return m_valueRef().is(value);
+  return m_valueRef && (*m_valueRef)().is(value);
 }
 
 void PyComplexTunableAdapter::RetainValue(py::object value,
@@ -85,7 +98,9 @@ void PyComplexTunableAdapter::ReleaseValueIfUnpublished() {
     ReleaseRetainedValues();
     m_tableOwnerContext->owner.reset();
     m_initialPublishTunable.reset();
-    m_value.reset();
+    if (m_valueRef) {
+      m_value.reset();
+    }
   }
 }
 
@@ -93,7 +108,10 @@ py::object PyComplexTunableAdapter::GetValue() const {
   if (m_value) {
     return *m_value;
   }
-  py::object value = m_valueRef();
+  if (!m_valueRef) {
+    throw std::runtime_error("complex tunable object is no longer valid");
+  }
+  py::object value = (*m_valueRef)();
   if (value.is_none()) {
     throw std::runtime_error("complex tunable object is no longer valid");
   }
