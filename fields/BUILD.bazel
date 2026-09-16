@@ -309,6 +309,7 @@ package_default_cc_project(
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-fields-generator",
     generated_include_target = "//fields:generated-native-include-files",
+    include_third_party_notices = True,
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 

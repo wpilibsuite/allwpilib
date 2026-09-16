@@ -215,6 +215,7 @@ package_default_cc_project(
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-generator",
     generated_include_target = "//wpilibc:generated-native-include-files",
+    include_third_party_notices = True,
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 

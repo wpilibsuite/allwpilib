@@ -120,6 +120,7 @@ robotpy_library(
         "robotpy_sim.2027": ["ds-socket = halsim_ds_socket"],
     },
     imports = ["src/main/python"],
+    python_requires = ">=3.11",
     requires = [
         "robotpy-native-wpihal==0.0.0",
         "robotpy-native-wpinet==0.0.0",

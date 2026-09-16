@@ -205,9 +205,10 @@ robotpy_library(
     author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
     description_file = "src/main/python/README.md",
     distribution = "robotpy-commands-v2",
+    extra_distinfo_files = {"src/main/python/LICENSE": "licenses/LICENSE"},
     imports = ["src/main/python"],
     project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
-    python_requires = ">=3.10",
+    python_requires = ">=3.11",
     requires = [
         "wpilib==0.0.0",
         "typing_extensions>=4.1.0,<5",
