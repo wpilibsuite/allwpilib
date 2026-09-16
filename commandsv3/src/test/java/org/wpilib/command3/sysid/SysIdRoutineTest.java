@@ -13,7 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.wpilib.command3.sysid.SysIdRoutine.Direction.FORWARD;
 import static org.wpilib.command3.sysid.SysIdRoutine.Direction.REVERSE;
-import static org.wpilib.units.Units.Microseconds;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Volts;
 
@@ -50,7 +50,7 @@ class SysIdRoutineTest extends CommandTestBase {
     m_scheduler.schedule(command);
     m_scheduler.run();
     m_scheduler.run();
-    m_time.addAndGet((long) Microseconds.convertFrom(1, Second));
+    m_time.addAndGet((long) Nanoseconds.convertFrom(1, Second));
     m_scheduler.run();
     m_scheduler.cancel(command);
   }
