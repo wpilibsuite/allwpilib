@@ -13,7 +13,7 @@ load(
     "aos_sdk_headers",
     "aos_sdk_link_options",
 )
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_library")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_library", "wpilib_cc_static_library_files", "wpilib_cc_static_library_strip_prefix")
 load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
@@ -57,15 +57,9 @@ wpilib_cc_static_library(
 
 pkg_files(
     name = "aos-sdk-static-files",
-    srcs = select({
-        "@wpilib_toolchains//conditions:osx": [":universal/libaos.a"],
-        "//conditions:default": [":static/aos"],
-    }),
+    srcs = wpilib_cc_static_library_files("static/aos"),
     prefix = platform_prefix("static"),
-    strip_prefix = select({
-        "@wpilib_toolchains//conditions:osx": "universal",
-        "//conditions:default": "static",
-    }),
+    strip_prefix = wpilib_cc_static_library_strip_prefix("static/aos"),
 )
 
 # Rolling everything into one archive drops the alwayslink attribute, so those
@@ -83,15 +77,9 @@ wpilib_cc_static_library(
 
 pkg_files(
     name = "aos-sdk-alwayslink-files",
-    srcs = select({
-        "@wpilib_toolchains//conditions:osx": [":universal/libaos_alwayslink.a"],
-        "//conditions:default": [":static/alwayslink/aos_alwayslink"],
-    }),
+    srcs = wpilib_cc_static_library_files("static/alwayslink/aos_alwayslink"),
     prefix = platform_prefix("static/alwayslink"),
-    strip_prefix = select({
-        "@wpilib_toolchains//conditions:osx": "universal",
-        "//conditions:default": "static/alwayslink",
-    }),
+    strip_prefix = wpilib_cc_static_library_strip_prefix("static/alwayslink/aos_alwayslink"),
 )
 
 # What a consumer has to link besides the archives. It depends on the platform,

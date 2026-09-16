@@ -9,7 +9,10 @@ wpilib's maven pipeline like wpilib's other C++ libraries:
 | `org.wpilib.aos:aos-sdk` | `linuxsystemcorestatic`, `linuxx86-64static`, `osxuniversalstatic`, `windowsx86-64static`, `windowsarm64static`, and their `debug` variants | `<os>/<arch>/static/libaos.a`, and `<os>/<arch>/static/alwayslink/`.                                                                                                                             |
 | `org.wpilib.aos:aos-tools` | `linuxx86-64`, `osxuniversalstatic`, `windowsx86-64static`, `windowsarm64static`                                                          | `<os>/<arch>/flatc`, `generate` and `config_flattener`.                                                                                                                                          |
 
-libuv is in neither the archive nor the headers. It comes from wpinet.
+libuv is in neither the archive nor the headers. It comes from wpinet, which
+`aos::aos` links: a project building allwpilib alongside has the `wpinet`
+target already, and one on an installed wpilib gets it through wpinet's
+package config.
 
 ## Using it
 

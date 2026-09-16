@@ -39,22 +39,28 @@ function(_aos_platform_dir system processor out)
 endfunction()
 
 # The archive is for the platform being built for, and the code generators are
-# for the platform CMake runs on. The two differ when cross-compiling.
+# for the platform CMake runs on. The two differ when cross-compiling. Either
+# can be set on the command line, and then it is not detected at all, so a
+# toolchain this file does not know is still usable.
 #
 # MSVC cross-compiles to arm64 without changing CMAKE_SYSTEM_PROCESSOR, so ask
 # the compiler what it targets when it says.
-set(_aos_target_processor "${CMAKE_SYSTEM_PROCESSOR}")
-if(MSVC AND CMAKE_CXX_COMPILER_ARCHITECTURE_ID)
-    set(_aos_target_processor "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
+if(NOT DEFINED AOS_PLATFORM)
+    set(_aos_target_processor "${CMAKE_SYSTEM_PROCESSOR}")
+    if(MSVC AND CMAKE_CXX_COMPILER_ARCHITECTURE_ID)
+        set(_aos_target_processor "${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}")
+    endif()
+    _aos_platform_dir("${CMAKE_SYSTEM_NAME}" "${_aos_target_processor}" _aos_platform)
+    set(AOS_PLATFORM "${_aos_platform}" CACHE STRING "Platform directory of the AOS archive")
 endif()
-_aos_platform_dir("${CMAKE_SYSTEM_NAME}" "${_aos_target_processor}" _aos_platform)
-_aos_platform_dir("${CMAKE_HOST_SYSTEM_NAME}" "${CMAKE_HOST_SYSTEM_PROCESSOR}" _aos_host_platform)
-set(AOS_PLATFORM "${_aos_platform}" CACHE STRING "Platform directory of the AOS archive")
-set(AOS_HOST_PLATFORM
-    "${_aos_host_platform}"
-    CACHE STRING
-    "Platform directory of the AOS code generators"
-)
+if(NOT DEFINED AOS_HOST_PLATFORM)
+    _aos_platform_dir("${CMAKE_HOST_SYSTEM_NAME}" "${CMAKE_HOST_SYSTEM_PROCESSOR}" _aos_host_platform)
+    set(AOS_HOST_PLATFORM
+        "${_aos_host_platform}"
+        CACHE STRING
+        "Platform directory of the AOS code generators"
+    )
+endif()
 
 set(AOS_INCLUDE_DIR "${AOS_SDK_ROOT}")
 set(AOS_LIBRARY_DIR "${AOS_SDK_ROOT}/${AOS_PLATFORM}/static")
@@ -178,9 +184,18 @@ if(NOT TARGET aos::aos)
 
     set_target_properties(aos::aos PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${AOS_INCLUDE_DIR}")
 
+    # libuv is wpinet's: its objects are in libwpinet.a and its headers ship
+    # with wpinet's, so aos::aos links wpinet rather than carrying a second
+    # copy of either. A project that builds allwpilib alongside has the target
+    # already; one on an installed wpilib gets it from wpinet's package config.
+    if(NOT TARGET wpinet)
+        include(CMakeFindDependencyMacro)
+        find_dependency(wpinet)
+    endif()
+
     target_link_libraries(
         aos::aos
-        INTERFACE ${_aos_alwayslink_targets} aos::archive ${AOS_LINK_OPTIONS}
+        INTERFACE ${_aos_alwayslink_targets} aos::archive wpinet ${AOS_LINK_OPTIONS}
     )
 
     # Not optional, and not only about aos/macros.h hard-erroring without

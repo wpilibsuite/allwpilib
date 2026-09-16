@@ -221,10 +221,10 @@ function(aos_config NAME)
 
     _aos_collect_schemas(_user_bfbs _schema_targets _user_srcs ${ARG_FLATBUFFERS})
 
-    # The imports are read at configure time, so a change to the list itself
-    # has to configure again to be seen.
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_src_abs}")
+    # The imports are read at configure time, so a change to any config's list
+    # of them has to configure again to be seen.
     _aos_config_imports("${_src_abs}" "${ARG_IMPORT_DIR}" _imported)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_src_abs}" ${_imported})
 
     file(GLOB _core_bfbs "${AOS_SCHEMA_DIR}/*.bfbs")
     if(NOT _core_bfbs)

@@ -671,14 +671,38 @@ def wpilib_cc_static_library(
 
     # macOS ships one archive covering both CPUs, and a single build only
     # produces the CPU it was built for. The same universal_binary
-    # wpilib_cc_shared_library makes.
-    universal_binary(
-        name = "universal/lib" + lib + ".a",
-        binary = name,
-        target_compatible_with = [
-            "@platforms//os:osx",
-        ],
-    )
+    # wpilib_cc_shared_library makes, once per name the archive can have: a
+    # rule's name cannot select on the compilation mode the way static_lib_name
+    # does, so the debug build gets a target of its own.
+    for universal_lib in ["lib" + lib + ".a", "lib" + lib + "d.a"]:
+        universal_binary(
+            name = "universal/" + universal_lib,
+            binary = name,
+            target_compatible_with = [
+                "@platforms//os:osx",
+            ],
+        )
+
+def wpilib_cc_static_library_files(name):
+    """The archive wpilib_cc_static_library(name) built, for packaging.
+
+    On macOS that is the universal one, carrying the debug suffix in a debug
+    build the way static_lib_name does everywhere else.
+    """
+    _folder, lib = _folder_prefix(name)
+    return select({
+        "@wpilib_toolchains//conditions:osx_debug": [":universal/lib" + lib + "d.a"],
+        "@wpilib_toolchains//conditions:osx": [":universal/lib" + lib + ".a"],
+        "//conditions:default": [":" + name],
+    })
+
+def wpilib_cc_static_library_strip_prefix(name):
+    """The strip_prefix that pairs with wpilib_cc_static_library_files(name)."""
+    folder, _lib = _folder_prefix(name)
+    return select({
+        "@wpilib_toolchains//conditions:osx": "universal",
+        "//conditions:default": folder,
+    })
 
 def _generate_def_windows_impl(ctx):
     # Generate the .def file for Windows.  Do this by finding the .obj files
