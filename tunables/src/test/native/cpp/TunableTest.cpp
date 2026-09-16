@@ -799,6 +799,61 @@ TEST_CASE_METHOD(TunableTest,
   CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(complex) == 2);
 }
 
+TEST_CASE_METHOD(
+    TunableTest,
+    "TunableTest "
+    "TuneRevisionRelinksSurvivingChildrenWhenNestedComplexDestroyed",
+    "[tunable]") {
+  struct EmptyComplex : wpi::tunables::ComplexTunable {
+    void PublishTunable(wpi::tunables::TunableTable&) override {}
+  };
+
+  struct ChildPublishingComplex : wpi::tunables::ComplexTunable {
+    explicit ChildPublishingComplex(wpi::tunables::TunableDouble& child)
+        : child{child} {}
+
+    void PublishTunable(wpi::tunables::TunableTable& table) override {
+      table.Publish("value", child);
+    }
+
+    wpi::tunables::TunableDouble& child;
+  };
+
+  EmptyComplex outer;
+  wpi::tunables::TunableDouble child{1.0};
+  std::optional<uint32_t> nestedUid;
+  std::optional<uint32_t> childUid;
+
+  wpi::tunables::Publish("outerRelink", outer);
+  {
+    ChildPublishingComplex nested{child};
+    wpi::tunables::Publish("outerRelink/nested", nested);
+    nestedUid = backend->GetUid("/outerRelink/nested");
+    childUid = backend->GetUid("/outerRelink/nested/value");
+    REQUIRE(nestedUid);
+    REQUIRE(childUid);
+
+    backend->SetDouble("/outerRelink/nested/value", 2.0);
+    wpi::tunables::TunableRegistry::Update();
+
+    CHECK(child.Get() == 2.0);
+    CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(child) == 1);
+    CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(nested) == 1);
+    CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer) == 1);
+  }
+
+  CHECK_FALSE(backend->GetUid("/outerRelink/nested"));
+  CHECK(backend->GetUid("/outerRelink/nested/value") == childUid);
+  CHECK_FALSE(wpi::tunables::TunableRegistry::GetTunable(*nestedUid));
+
+  backend->SetDouble("/outerRelink/nested/value", 3.0);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(child.Get() == 3.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(child) == 2);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(outer) == 2);
+}
+
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest TuneRevisionIgnoresRejectedAndImmutableInputs",
                  "[tunable]") {
