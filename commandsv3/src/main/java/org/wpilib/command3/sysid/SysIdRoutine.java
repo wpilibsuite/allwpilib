@@ -242,14 +242,8 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 m_recordState.accept(state);
                 co.yield();
               }
-              m_mechanism.drive.accept(Volts.of(0));
-              m_recordState.accept(State.NONE);
             })
-        .whenCanceled(
-            () -> {
-              m_mechanism.drive.accept(Volts.of(0));
-              m_recordState.accept(State.NONE);
-            })
+        .whenExited(this::stopRoutine)
         .named("sysid-" + state + "-" + m_mechanism.name);
   }
 
@@ -287,14 +281,13 @@ public class SysIdRoutine extends SysIdRoutineLog {
                 m_recordState.accept(state);
                 co.yield();
               }
-              m_mechanism.drive.accept(Volts.of(0));
-              m_recordState.accept(State.NONE);
             })
-        .whenCanceled(
-            () -> {
-              m_mechanism.drive.accept(Volts.of(0));
-              m_recordState.accept(State.NONE);
-            })
+        .whenExited(this::stopRoutine)
         .named("sysid-" + state + "-" + m_mechanism.name);
+  }
+
+  private void stopRoutine() {
+    m_mechanism.drive.accept(Volts.of(0));
+    m_recordState.accept(State.NONE);
   }
 }
