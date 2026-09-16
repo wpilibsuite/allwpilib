@@ -44,12 +44,12 @@ cc_library(
 )
 
 # libuv's objects are already in wpinet's archive, which a libuv application
-# links, and the alwayslink objects ship in their own archives. A second copy of
+# links, and the alwayslink objects ship in their own archive. A second copy of
 # either would put two definitions of the same symbols in one link.
 wpilib_cc_static_library(
     name = "static/aos",
     static_deps = [
-        ":alwayslink_libraries",
+        ":static/alwayslink/aos_alwayslink",
         "//wpinet:static/wpinet",
     ],
     deps = [":aos_runtime"],
@@ -68,12 +68,30 @@ pkg_files(
     }),
 )
 
-# Rolling everything into one archive drops the alwayslink attribute, so these
-# ship separately for the CMake side to link whole.
+# Rolling everything into one archive drops the alwayslink attribute, so those
+# objects get an archive of their own for the CMake side to link whole. It is
+# built by the same rule as libaos.a, so on macOS it is universal the same way.
 aos_sdk_alwayslink_libraries(
     name = "alwayslink_libraries",
-    prefix = platform_prefix("static/alwayslink"),
     deps = [":aos_runtime"],
+)
+
+wpilib_cc_static_library(
+    name = "static/alwayslink/aos_alwayslink",
+    deps = [":alwayslink_libraries"],
+)
+
+pkg_files(
+    name = "aos-sdk-alwayslink-files",
+    srcs = select({
+        "@wpilib_toolchains//conditions:osx": [":universal/libaos_alwayslink.a"],
+        "//conditions:default": [":static/alwayslink/aos_alwayslink"],
+    }),
+    prefix = platform_prefix("static/alwayslink"),
+    strip_prefix = select({
+        "@wpilib_toolchains//conditions:osx": "universal",
+        "//conditions:default": "static/alwayslink",
+    }),
 )
 
 # What a consumer has to link besides the archives. It depends on the platform,
@@ -88,7 +106,7 @@ aos_sdk_link_options(
 architectures_pkg_zip(
     name = "aos-sdk_static_zip",
     srcs = [
-        ":alwayslink_libraries",
+        ":aos-sdk-alwayslink-files",
         ":aos-sdk-static-files",
         ":link_options",
         "//:license_pkg_files",

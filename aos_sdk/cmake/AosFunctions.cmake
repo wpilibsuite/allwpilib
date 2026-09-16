@@ -36,12 +36,19 @@ function(aos_static_flatbuffer NAME)
         message(FATAL_ERROR "aos_static_flatbuffer(${NAME}): SRCS is required")
     endif()
 
+    # A schema that includes one from DEPS has to regenerate when that one
+    # changes, and flatc writes no depfile, so depend on every schema DEPS
+    # reaches.
+    _aos_collect_schemas(_dep_bfbs _dep_targets _dep_srcs ${ARG_DEPS})
+
     set(_generated_headers "")
     set(_bfbs_files "")
+    set(_src_files "")
 
     foreach(_src ${ARG_SRCS})
         get_filename_component(_src_abs "${_src}" ABSOLUTE)
         get_filename_component(_stem "${_src}" NAME_WE)
+        list(APPEND _src_files "${_src_abs}")
 
         # Where this schema sits relative to the project root, which is both the
         # name flatc records in the reflection data and the subdirectory the
@@ -72,7 +79,7 @@ function(aos_static_flatbuffer NAME)
                 # Without this the schema records no declaration filename, and
                 # the static generator dereferences a null instead of erroring.
                 --bfbs-filenames "${AOS_FBS_ROOT}" -o "${_out_dir}" "${_src_abs}"
-            DEPENDS "${_src_abs}" "${AOS_FLATC}"
+            DEPENDS "${_src_abs}" ${_dep_srcs} "${AOS_FLATC}"
             COMMENT "flatc ${_src_rel}"
             VERBATIM
         )
@@ -100,15 +107,20 @@ function(aos_static_flatbuffer NAME)
 
     set_target_properties(
         ${NAME}
-        PROPERTIES AOS_FBS_BFBS "${_bfbs_files}" AOS_FBS_DEPS "${ARG_DEPS}"
+        PROPERTIES
+            AOS_FBS_BFBS "${_bfbs_files}"
+            AOS_FBS_SRCS "${_src_files}"
+            AOS_FBS_DEPS "${ARG_DEPS}"
     )
 endfunction()
 
-# Walks FLATBUFFERS and their transitive AOS_FBS_DEPS, accumulating .bfbs paths
-# and the targets that produce them.
-function(_aos_collect_schemas OUT_BFBS OUT_TARGETS)
+# Walks aos_static_flatbuffer() targets and their transitive AOS_FBS_DEPS,
+# accumulating their .bfbs paths, the targets themselves, and their schema
+# sources.
+function(_aos_collect_schemas OUT_BFBS OUT_TARGETS OUT_SRCS)
     set(_bfbs "")
     set(_targets "")
+    set(_srcs "")
     set(_queue ${ARGN})
 
     while(_queue)
@@ -121,7 +133,7 @@ function(_aos_collect_schemas OUT_BFBS OUT_TARGETS)
         if(NOT TARGET ${_target})
             message(
                 FATAL_ERROR
-                "aos_config: '${_target}' is not a target. FLATBUFFERS takes "
+                "'${_target}' is not a target. FLATBUFFERS and DEPS take "
                 "aos_static_flatbuffer() targets, not file paths."
             )
         endif()
@@ -130,13 +142,15 @@ function(_aos_collect_schemas OUT_BFBS OUT_TARGETS)
         if(NOT _target_bfbs)
             message(
                 FATAL_ERROR
-                "aos_config: target '${_target}' was not created by "
-                "aos_static_flatbuffer(), so it has no schemas to contribute."
+                "target '${_target}' was not created by aos_static_flatbuffer(), "
+                "so it has no schemas to contribute."
             )
         endif()
 
         list(APPEND _targets ${_target})
         list(APPEND _bfbs ${_target_bfbs})
+        get_target_property(_target_srcs ${_target} AOS_FBS_SRCS)
+        list(APPEND _srcs ${_target_srcs})
 
         get_target_property(_target_deps ${_target} AOS_FBS_DEPS)
         if(_target_deps)
@@ -146,6 +160,44 @@ function(_aos_collect_schemas OUT_BFBS OUT_TARGETS)
 
     set(${OUT_BFBS} "${_bfbs}" PARENT_SCOPE)
     set(${OUT_TARGETS} "${_targets}" PARENT_SCOPE)
+    set(${OUT_SRCS} "${_srcs}" PARENT_SCOPE)
+endfunction()
+
+# Sets OUT_FILES to every config FILE imports, transitively. An import is
+# resolved the way config_flattener resolves it: against the importing file's
+# directory first, then IMPORT_DIR. AOS configs may carry comments, which
+# CMake's JSON parser rejects, so the imports list is found with a pattern.
+function(_aos_config_imports FILE IMPORT_DIR OUT_FILES)
+    set(_found "")
+    set(_queue "${FILE}")
+    while(_queue)
+        list(POP_FRONT _queue _config)
+        get_filename_component(_config_dir "${_config}" DIRECTORY)
+        file(READ "${_config}" _contents)
+        string(
+            REGEX MATCH
+            "\"imports\"[ \t\r\n]*:[ \t\r\n]*\\[([^]]*)\\]"
+            _imports
+            "${_contents}"
+        )
+        string(REGEX MATCHALL "\"[^\"]+\"" _imports "${CMAKE_MATCH_1}")
+        foreach(_import IN LISTS _imports)
+            string(REGEX REPLACE "^\"(.*)\"$" "\\1" _import "${_import}")
+            set(_path "${_config_dir}/${_import}")
+            if(NOT EXISTS "${_path}")
+                set(_path "${IMPORT_DIR}/${_import}")
+            endif()
+            if(NOT EXISTS "${_path}")
+                # config_flattener reports the missing file itself.
+                continue()
+            endif()
+            if(NOT _path IN_LIST _found)
+                list(APPEND _found "${_path}")
+                list(APPEND _queue "${_path}")
+            endif()
+        endforeach()
+    endwhile()
+    set(${OUT_FILES} "${_found}" PARENT_SCOPE)
 endfunction()
 
 # aos_config(<name> SRC <config.json> [FLATBUFFERS <target>...] [IMPORT_DIR <dir>])
@@ -172,7 +224,12 @@ function(aos_config NAME)
     get_filename_component(_src_dir "${_src_abs}" DIRECTORY)
     get_filename_component(_src_name "${_src_abs}" NAME)
 
-    _aos_collect_schemas(_user_bfbs _schema_targets ${ARG_FLATBUFFERS})
+    _aos_collect_schemas(_user_bfbs _schema_targets _user_srcs ${ARG_FLATBUFFERS})
+
+    # The imports are read at configure time, so a change to the list itself
+    # has to configure again to be seen.
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_src_abs}")
+    _aos_config_imports("${_src_abs}" "${ARG_IMPORT_DIR}" _imported)
 
     file(GLOB _core_bfbs "${AOS_SCHEMA_DIR}/*.bfbs")
     if(NOT _core_bfbs)
@@ -196,6 +253,7 @@ function(aos_config NAME)
             ${_user_bfbs}
         DEPENDS
             "${_src_abs}"
+            ${_imported}
             "${AOS_CONFIG_FLATTENER}"
             ${_schema_targets}
             ${_core_bfbs}

@@ -5,7 +5,7 @@ The SDK ships in wpilib's usual artifact layout:
     headers zip   every header AOS's public libraries need (aos, flatbuffers,
                   abseil, tl::expected, and generated headers) at the root,
                   plus cmake/ and share/aos/.
-    static zips   <os>/<arch>/static/libaos.a and the alwayslink archives, one
+    static zips   <os>/<arch>/static/libaos.a and the alwayslink archive, one
                   zip per platform.
     aos-tools     <os>/<arch>/flatc, generate and config_flattener.
 
@@ -18,7 +18,6 @@ load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cpp_toolchain", "use_cc_toolch
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
-load("//shared/bazel/rules:cc_rules.bzl", "CcStaticLibraryInfo")
 
 def _include_roots(compilation_context):
     """Returns the -I/-iquote/-isystem roots, longest first.
@@ -344,65 +343,39 @@ aos_sdk_link_options = rule(
     provides = [PackageFilesInfo],
 )
 
-def _sanitize_label(label):
-    """Turns a label into something usable as a filename."""
-    result = ""
-    for character in str(label).elems():
-        if character.isalnum() or character == "_":
-            result += character
-        else:
-            result += "_"
-    return result.strip("_")
-
 def _aos_sdk_alwayslink_libraries_impl(ctx):
     linking_context = cc_common.merge_cc_infos(
         cc_infos = [dep[CcInfo] for dep in ctx.attr.deps],
     ).linking_context
 
-    dest_src_map = {}
-    objects = []
+    linker_inputs = []
     for linker_input in linking_context.linker_inputs.to_list():
-        for library in linker_input.libraries:
-            if not library.alwayslink:
-                continue
+        libraries = [
+            library
+            for library in linker_input.libraries
+            if library.alwayslink
+        ]
+        if libraries:
+            linker_inputs.append(cc_common.create_linker_input(
+                owner = linker_input.owner,
+                libraries = depset(libraries),
+            ))
 
-            # Prefer the PIC variant. It links into both executables and
-            # shared libraries; the non-PIC one is only safe in executables.
-            archive = library.pic_static_library or library.static_library
-            if archive == None:
-                fail(("%s is alwayslink but exposes no static library, so its " +
-                      "objects cannot be shipped in the SDK.") % linker_input.owner)
-
-            # Named after the owning label, not the file. Basenames collide
-            # across repositories and an overwrite would drop a library.
-            dest = "%s/lib%s.a" % (
-                ctx.attr.prefix,
-                _sanitize_label(linker_input.owner),
-            )
-            dest_src_map[dest] = archive
-
-            # The same choice wpilib_cc_static_library makes, so its static_deps
-            # filter matches these objects.
-            objects.extend(library.pic_objects if library.pic_objects else library.objects)
-
-    return [
-        PackageFilesInfo(dest_src_map = dest_src_map, attributes = {}),
-        DefaultInfo(files = depset(dest_src_map.values())),
-        CcStaticLibraryInfo(used_objects = depset(objects)),
-    ]
+    return [CcInfo(linking_context = cc_common.create_linking_context(
+        linker_inputs = depset(linker_inputs, order = "topological"),
+    ))]
 
 aos_sdk_alwayslink_libraries = rule(
     implementation = _aos_sdk_alwayslink_libraries_impl,
-    doc = """Collects the libraries that must be linked whole.
+    doc = """The libraries among `deps` that Bazel links whole.
 
     Bazel links an `alwayslink = 1` library with --whole-archive, which is how a
     translation unit that only registers command line flags reaches the final
-    binary. Rolling everything into one archive loses that, and with it flags
-    like `--v` and `--vmodule` from absl/log:flags. Shipping these separately
-    lets the CMake side link them whole.
-
-    List this in a wpilib_cc_static_library's static_deps so the main archive
-    does not carry a second copy of the same objects.
+    binary. One archive cannot say which of its members that applies to, so
+    these are rolled into an archive of their own for the CMake side to link
+    whole: give this target to a wpilib_cc_static_library as its deps, and to
+    the main archive's as static_deps so it does not carry a second copy of
+    the same objects.
     """,
     attrs = {
         "deps": attr.label_list(
@@ -410,10 +383,6 @@ aos_sdk_alwayslink_libraries = rule(
             mandatory = True,
             doc = "Libraries whose transitive alwayslink deps should ship.",
         ),
-        "prefix": attr.string(
-            mandatory = True,
-            doc = "Directory to place the archives under.",
-        ),
     },
-    provides = [CcStaticLibraryInfo, PackageFilesInfo],
+    provides = [CcInfo],
 )

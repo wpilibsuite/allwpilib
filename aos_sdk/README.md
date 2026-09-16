@@ -85,11 +85,12 @@ bazel build -c opt --config=systemcore \
 
 ## Linking whole archives
 
-`static/alwayslink/` holds the libraries Bazel marks `alwayslink = 1`, which a
-single static archive cannot express. `AosConfig.cmake` links these whole so a
-consumer's binaries behave the way Bazel-built AOS binaries do. The set is
-walked out of `CcInfo.linking_context`, so a new alwayslink dependency comes
-along on its own.
+`static/alwayslink/` holds an archive of the objects from libraries Bazel marks
+`alwayslink = 1`, which one archive cannot express. `AosConfig.cmake` links it
+whole so a consumer's binaries behave the way Bazel-built AOS binaries do. The
+set is walked out of `CcInfo.linking_context`, so a new alwayslink dependency
+comes along on its own, and the archive is built by the same rule as
+`libaos.a`, so on macOS it is universal the same way.
 
 ## Keeping it honest
 

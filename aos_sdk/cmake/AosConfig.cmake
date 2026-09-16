@@ -141,10 +141,15 @@ if(NOT TARGET aos::aos)
     add_library(aos::archive STATIC IMPORTED GLOBAL)
     set_target_properties(aos::archive PROPERTIES IMPORTED_LOCATION "${AOS_LIBRARY}")
 
-    # Libraries Bazel marks alwayslink, which cc_static_library cannot express.
-    # Linking them whole restores what a Bazel-built AOS binary does. The cost
-    # is small; these archives hold only the objects Bazel already force-links.
-    file(GLOB _aos_alwayslink_archives "${AOS_ALWAYSLINK_DIR}/*.a")
+    # The objects Bazel marks alwayslink, which cc_static_library cannot
+    # express. Linking them whole restores what a Bazel-built AOS binary does.
+    # The cost is small; this archive holds only what Bazel already
+    # force-links.
+    file(
+        GLOB _aos_alwayslink_archives
+        "${AOS_ALWAYSLINK_DIR}/*.a"
+        "${AOS_ALWAYSLINK_DIR}/*.lib"
+    )
 
     set(_aos_alwayslink_targets "")
     foreach(_archive ${_aos_alwayslink_archives})
