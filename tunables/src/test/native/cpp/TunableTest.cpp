@@ -1308,6 +1308,41 @@ TEST_CASE_METHOD(TunableTest,
         1);
 }
 
+TEST_CASE_METHOD(
+    TunableTest,
+    "TunableTest MovingEnclosingComplexDoesNotRetargetDirectMemberParent",
+    "[tunable]") {
+  struct EmptyComplex : wpi::tunables::ComplexTunable {
+    void PublishTunable(wpi::tunables::TunableTable&) override {}
+  };
+
+  EmptyComplex enclosing;
+  MemberComplex owner;
+
+  wpi::tunables::Publish("enclosing", enclosing);
+  wpi::tunables::Publish("enclosing/member/gain", &owner, &MemberComplex::gain);
+
+  auto memberUid = backend->GetUid("/enclosing/member/gain");
+  REQUIRE(memberUid);
+  auto memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo);
+  REQUIRE(memberInfo.config);
+  REQUIRE(memberInfo.config->parent == &owner);
+
+  EmptyComplex movedEnclosing{std::move(enclosing)};
+
+  memberInfo = wpi::tunables::TunableRegistry::GetTunable(*memberUid);
+  REQUIRE(memberInfo);
+  REQUIRE(memberInfo.config);
+  REQUIRE(memberInfo.config->parent == &owner);
+
+  backend->SetInt32("/enclosing/member/gain", 7);
+  wpi::tunables::TunableRegistry::Update();
+
+  CHECK(owner.gain == 7);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(movedEnclosing) == 1);
+}
+
 TEST_CASE_METHOD(TunableTest,
                  "TunableTest ComplexUpdateRunsBeforeBackendTuning",
                  "[tunable]") {

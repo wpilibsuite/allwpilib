@@ -1179,7 +1179,8 @@ void TunableRegistry::MoveTunable(uint32_t uid, detail::TunableBase* tunable) {
     it->second->tunable = tunable;
     if (it->second->type == detail::TunableTypeValue::COMPLEX) {
       for (auto&& child : it->second->children) {
-        if (child.child->config && child.child->config->parent) {
+        if (child.ownedMember && child.child->config &&
+            child.child->config->parent) {
           child.child->config->parent = static_cast<ComplexTunable*>(tunable);
         }
       }
