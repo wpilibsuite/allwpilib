@@ -1,4 +1,6 @@
+import contextlib
 import importlib
+import io
 import os
 import pathlib
 import sys
@@ -78,6 +80,18 @@ Please see this readme for more information:
         print(f"Please see the robotpy readme: {README_LINK}")
 
 
+def run_update_yaml(tool_main):
+    """Runs update-yaml, dropping its report when it changed nothing."""
+    output = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(output):
+            tool_main()
+    finally:
+        text = output.getvalue()
+        if text.strip() != "0 files were updated":
+            sys.stdout.write(text)
+
+
 def main():
     tool = sys.argv[1]
 
@@ -96,7 +110,10 @@ def main():
 
     sys.argv = [""] + args
     try:
-        tool_main()
+        if tool == "semiwrap.tool" and args[:1] == ["update-yaml"]:
+            run_update_yaml(tool_main)
+        else:
+            tool_main()
     except SystemExit as e:
         if e.code != 0:
             print_failure_message(tool, args)
