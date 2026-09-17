@@ -7,7 +7,6 @@
 #include <dlfcn.h>
 #include <signal.h>  // linux for kill
 #include <sys/prctl.h>
-#include <unistd.h>
 
 #include <atomic>
 #include <cstdio>
@@ -17,6 +16,7 @@
 #include "HALInitializer.hpp"
 #include "HALInternal.hpp"
 #include "SystemServerInternal.hpp"
+#include "mrclib/MrcString.hpp"
 #include "mrclib/Systemcore.h"
 #include "wpi/hal/CAN.h"
 #include "wpi/hal/Errors.h"
@@ -28,6 +28,7 @@ using namespace wpi::hal;
 
 static int64_t dsStartTime;
 
+// -1 means the team number has not been successfully read from mrclib yet.
 static int32_t teamNumber = -1;
 
 using namespace wpi::hal;
@@ -148,32 +149,24 @@ void HAL_GetComments(struct WPI_String* comments) {
   comments->str = nullptr;
 }
 
-void InitializeTeamNumber(void) {
-  char hostnameBuf[25];
-  auto status = gethostname(hostnameBuf, sizeof(hostnameBuf));
-  if (status != 0) {
-    teamNumber = 0;
-    return;
-  }
-
-  std::string_view hostname{hostnameBuf, sizeof(hostnameBuf)};
-
-  // hostname is frc-{TEAM}-roborio
-  // Split string around '-' (max of 2 splits), take the second element
-  teamNumber = 0;
-  int i = 0;
-  wpi::util::split(hostname, '-', 2, false, [&](auto part) {
-    if (i == 1) {
-      teamNumber = wpi::util::parse_integer<int32_t>(part, 10).value_or(0);
-    }
-    ++i;
-  });
-}
-
 int32_t HAL_GetTeamNumber(void) {
-  if (teamNumber == -1) {
-    InitializeTeamNumber();
+  if (teamNumber != -1) {
+    return teamNumber;
   }
+
+  MRC_String mrcTeamNumber;
+  MRC_Status mrcStatus = MRC_Systemcore_GetTeamNumber(&mrcTeamNumber);
+  if (mrcStatus != MRC_STATUS_SUCCESS) {
+    // The team number has not been published yet. Don't cache the failure, so
+    // a later call can pick it up once it becomes available.
+    return 0;
+  }
+
+  teamNumber = wpi::util::parse_integer<int32_t>(
+                   mrclib::to_string_view(&mrcTeamNumber), 10)
+                   .value_or(0);
+  MRC_FreeString(&mrcTeamNumber);
+
   return teamNumber;
 }
 
