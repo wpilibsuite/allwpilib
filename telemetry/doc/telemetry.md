@@ -104,7 +104,7 @@ The Java frontend API is centered on `Telemetry` and `TelemetryTable`.
 
 `Telemetry` is a static facade over the root telemetry table (`/`). `Telemetry.getTable()` returns the root table, and `Telemetry.getTable(String name)` returns a child table. The logging methods on `Telemetry` delegate to the root table.
 
-`TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries. Table paths are normalized to start with `/` and end with `/`; for example, `TelemetryRegistry.getTable("drive")` has path `/drive/`. Entries under a table append the entry name to the table path, so `Telemetry.getTable("drive").log("speed", 1.0)` logs `/drive/speed`.
+`TelemetryTable` represents a path in a hierarchical namespace and caches child tables and entries. Table paths are normalized to start with `/` and end with `/`; for example, `TelemetryRegistry.getTable("drive")` has path `/drive/`. Entries under a table append the entry name to the table path, so `Telemetry.getTable("drive").log("velocity", 1.0)` logs `/drive/velocity`.
 
 The frontend supports logging the following value categories:
 
@@ -316,9 +316,9 @@ public final class Shooter {
   private final TelemetryTable telemetry = Telemetry.getTable("Shooter");
 
   public void periodic() {
-    telemetry.log("wheelSpeedRps", m_encoder.getRate());
+    telemetry.log("wheelVelocity", m_encoder.getRate());
     telemetry.log("commandedVoltage", m_lastVoltage);
-    telemetry.log("ready", atSpeed());
+    telemetry.log("ready", atVelocity());
   }
 }
 ```
@@ -340,7 +340,7 @@ Publishing arrays and collections with explicit element types:
 TelemetryTable drive = Telemetry.getTable("Drive");
 
 drive.log(
-    "moduleSpeedsMetersPerSecond",
+    "moduleVelocities",
     new double[] {
       frontLeft.getDriveVelocity(),
       frontRight.getDriveVelocity(),
@@ -382,13 +382,13 @@ Publishing a subsystem snapshot:
 
 ```java
 public final class DriveSnapshot implements TelemetryLoggable {
-  private final DifferentialDriveWheelSpeeds m_wheelSpeeds;
+  private final DifferentialDriveWheelVelocities m_wheelVelocities;
   private final Pose2d m_pose;
   private final boolean m_closedLoop;
 
   public DriveSnapshot(
-      DifferentialDriveWheelSpeeds wheelSpeeds, Pose2d pose, boolean closedLoop) {
-    m_wheelSpeeds = wheelSpeeds;
+      DifferentialDriveWheelVelocities wheelVelocities, Pose2d pose, boolean closedLoop) {
+    m_wheelVelocities = wheelVelocities;
     m_pose = pose;
     m_closedLoop = closedLoop;
   }
@@ -400,8 +400,8 @@ public final class DriveSnapshot implements TelemetryLoggable {
 
   @Override
   public void logTo(TelemetryTable table) {
-    table.log("leftMetersPerSecond", m_wheelSpeeds.leftMetersPerSecond);
-    table.log("rightMetersPerSecond", m_wheelSpeeds.rightMetersPerSecond);
+    table.log("left", m_wheelVelocities.left);
+    table.log("right", m_wheelVelocities.right);
     table.log("pose", m_pose);
     table.log("closedLoop", m_closedLoop);
   }
@@ -413,7 +413,7 @@ Logging it from robot code:
 ```java
 Telemetry.log(
     "drive",
-    new DriveSnapshot(m_drive.getWheelSpeeds(), m_drive.getPose(), m_drive.isClosedLoop()));
+    new DriveSnapshot(m_drive.getWheelVelocities(), m_drive.getPose(), m_drive.isClosedLoop()));
 ```
 
 That call creates or reuses the `/drive/` table and populates entries under it.
@@ -422,20 +422,20 @@ Using `TelemetryRegistry.registerTypeHandler()` for a third-party type:
 
 ```java
 TelemetryRegistry.registerTypeHandler(
-    ChassisSpeeds.class,
-    (table, name, speeds) -> {
+    ChassisVelocities.class,
+    (table, name, velocities) -> {
       TelemetryTable subtable = table.getTable(name);
-      subtable.setType("ChassisSpeeds");
-      subtable.log("vxMetersPerSecond", speeds.vxMetersPerSecond);
-      subtable.log("vyMetersPerSecond", speeds.vyMetersPerSecond);
-      subtable.log("omegaRadiansPerSecond", speeds.omegaRadiansPerSecond);
+      subtable.setType("ChassisVelocities");
+      subtable.log("vx", velocities.vx);
+      subtable.log("vy", velocities.vy);
+      subtable.log("omega", velocities.omega);
     });
 ```
 
 After registration, callers can write:
 
 ```java
-Telemetry.log("commandedSpeeds", chassisSpeeds);
+Telemetry.log("commandedVelocities", chassisVelocities);
 ```
 
 Type handlers can also log a value directly to the provided entry name instead of creating a subtable. This is how `RobotBase` registers unit `Measure` telemetry:
@@ -765,7 +765,7 @@ public void robotPeriodic() {
       "Drive/leftVelocity", m_leftEncoder.getRate());
   SmartDashboard.putNumber(
       "Drive/rightVelocity", m_rightEncoder.getRate());
-  SmartDashboard.putBoolean("Drive/ready", atSpeed());
+  SmartDashboard.putBoolean("Drive/ready", atVelocity());
 }
 ```
 
@@ -778,7 +778,7 @@ private final TelemetryTable m_driveTelemetry =
 public void robotPeriodic() {
   m_driveTelemetry.log("leftVelocity", m_leftEncoder.getRate());
   m_driveTelemetry.log("rightVelocity", m_rightEncoder.getRate());
-  m_driveTelemetry.log("ready", atSpeed());
+  m_driveTelemetry.log("ready", atVelocity());
 }
 ```
 
@@ -858,11 +858,11 @@ public void robotPeriodic() {
 **Is (Tunable):**
 
 ```java
-private final TunableDouble m_intakeSpeed =
-    Tunables.addDouble("Intake/speed", 0.65);
+private final TunableDouble m_intakeThrottle =
+    Tunables.addDouble("Intake/throttle", 0.65);
 
 public void robotPeriodic() {
-  m_intakeMotor.set(m_intakeSpeed.get());
+  m_intakeMotor.set(m_intakeThrottle.get());
 }
 ```
 
