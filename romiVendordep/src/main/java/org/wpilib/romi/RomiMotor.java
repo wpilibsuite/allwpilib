@@ -4,6 +4,7 @@
 
 package org.wpilib.romi;
 
+import java.util.ArrayList;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
@@ -17,6 +18,7 @@ import org.wpilib.hardware.motor.MotorController;
 public class RomiMotor implements MotorController {
   private final SimDouble m_simSpeed;
   private boolean m_inverted;
+  private final ArrayList<RomiMotor> m_followers = new ArrayList<>();
 
   /**
    * Constructor.
@@ -44,6 +46,10 @@ public class RomiMotor implements MotorController {
     if (m_simSpeed != null) {
       m_simSpeed.set(m_inverted ? -throttle : throttle);
     }
+
+    for (var follower : m_followers) {
+      follower.setThrottle(throttle);
+    }
   }
 
   @Override
@@ -68,5 +74,14 @@ public class RomiMotor implements MotorController {
   @Override
   public void disable() {
     setThrottle(0.0);
+  }
+
+  /**
+   * Make the given Romi motor follow the output of this one.
+   *
+   * @param follower The motor follower.
+   */
+  public void addFollower(RomiMotor follower) {
+    m_followers.add(follower);
   }
 }
