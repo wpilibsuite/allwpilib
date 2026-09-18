@@ -655,6 +655,10 @@ def wpilib_cc_static_library(
         static_lib_name = None,
         **kwargs):
     folder, lib = _folder_prefix(name)
+
+    # A caller-supplied name is the archive's name in every configuration, so
+    # the debug build keeps the release name rather than adding a "d".
+    renamed_in_debug = not static_lib_name
     if not static_lib_name:
         static_lib_name = select({
             "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
@@ -673,8 +677,11 @@ def wpilib_cc_static_library(
     # produces the CPU it was built for. The same universal_binary
     # wpilib_cc_shared_library makes, once per name the archive can have: a
     # rule's name cannot select on the compilation mode the way static_lib_name
-    # does, so the debug build gets a target of its own.
-    for universal_lib in ["lib" + lib + ".a", "lib" + lib + "d.a"]:
+    # does, so a debug build that renames the archive gets a target of its own.
+    universal_libs = ["lib" + lib + ".a"]
+    if renamed_in_debug:
+        universal_libs.append("lib" + lib + "d.a")
+    for universal_lib in universal_libs:
         universal_binary(
             name = "universal/" + universal_lib,
             binary = name,
@@ -683,18 +690,27 @@ def wpilib_cc_static_library(
             ],
         )
 
+    # What to package. The choice lives here because this is the only place
+    # that knows whether static_lib_name renames the archive in a debug build;
+    # wpilib_cc_static_library_files() is called from packaging macros that
+    # never see it.
+    native.alias(
+        name = name + ".package_archive",
+        actual = select({
+            "@wpilib_toolchains//conditions:osx": ":universal/" + universal_libs[0],
+            "@wpilib_toolchains//conditions:osx_debug": ":universal/" + universal_libs[-1],
+            "//conditions:default": ":" + name,
+        }),
+        visibility = kwargs.get("visibility"),
+    )
+
 def wpilib_cc_static_library_files(name):
     """The archive wpilib_cc_static_library(name) built, for packaging.
 
-    On macOS that is the universal one, carrying the debug suffix in a debug
-    build the way static_lib_name does everywhere else.
+    On macOS that is the universal one, under whatever name static_lib_name
+    gave the archive.
     """
-    _folder, lib = _folder_prefix(name)
-    return select({
-        "@wpilib_toolchains//conditions:osx": [":universal/lib" + lib + ".a"],
-        "@wpilib_toolchains//conditions:osx_debug": [":universal/lib" + lib + "d.a"],
-        "//conditions:default": [":" + name],
-    })
+    return [":" + name + ".package_archive"]
 
 def wpilib_cc_static_library_strip_prefix(name):
     """The strip_prefix that pairs with wpilib_cc_static_library_files(name)."""
