@@ -6,6 +6,7 @@
 
 #include <cinttypes>
 #include <string>
+#include <string_view>
 
 #include <imgui.h>
 
@@ -45,7 +46,16 @@ void wpi::glass::HideDevice(const char* id) {
   gContext->deviceHidden[id] = true;
 }
 
+bool wpi::glass::IsDeviceHidden(std::string_view id) {
+  return gContext->deviceHidden[id];
+}
+
 bool wpi::glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
+  return BeginDevice(std::string_view{id}, std::string_view{id}, flags);
+}
+
+bool wpi::glass::BeginDevice(std::string_view id, std::string_view labelText,
+                             ImGuiTreeNodeFlags flags) {
   if (gContext->deviceHidden[id]) {
     return false;
   }
@@ -56,7 +66,8 @@ bool wpi::glass::BeginDevice(const char* id, ImGuiTreeNodeFlags flags) {
   std::string& name = GetStorage().GetString("name");
   char label[128];
   if (name.empty()) {
-    wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header", id);
+    wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header",
+                                 labelText);
   } else {
     wpi::util::format_to_n_c_str(label, sizeof(label), "{}###header", name);
   }
