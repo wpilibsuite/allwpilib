@@ -24,11 +24,6 @@ FIELD_IMAGES = glob(
     ],
 )
 
-NO_SYSTEMCORE = select({
-    "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
-    "//conditions:default": [],
-})
-
 filegroup(
     name = "generated-native-include-files",
     srcs = glob(["src/generated/main/native/include/**/*"]),
@@ -189,7 +184,10 @@ wpilib_cc_library(
     local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fieldimages",
     strip_include_prefix = "src/main/native/include",
-    target_compatible_with = NO_SYSTEMCORE,
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil",
@@ -220,7 +218,10 @@ wpilib_cc_static_library(
         "@platforms//os:windows": "static/fieldimages.lib",
         "//conditions:default": "static/libfieldimages.a",
     }),
-    target_compatible_with = NO_SYSTEMCORE,
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     visibility = ["//visibility:public"],
     deps = [
         ":fieldimages",
