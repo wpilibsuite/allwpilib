@@ -214,6 +214,11 @@ function(aos_config NAME)
     if(NOT ARG_IMPORT_DIR)
         set(ARG_IMPORT_DIR "${AOS_SHARE_DIR}")
     endif()
+    # The command below runs in the config's directory, while the import walk
+    # resolves a relative path against wherever CMake was started. Making it
+    # absolute here, relative to the caller the way SRC is, keeps the directory
+    # config_flattener searches and the one the dependencies come from the same.
+    get_filename_component(ARG_IMPORT_DIR "${ARG_IMPORT_DIR}" ABSOLUTE)
 
     get_filename_component(_src_abs "${ARG_SRC}" ABSOLUTE)
     get_filename_component(_src_dir "${_src_abs}" DIRECTORY)
