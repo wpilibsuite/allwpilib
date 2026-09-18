@@ -9,7 +9,14 @@
  * distributed as vendor deps - like the command frameworks - are <i>not</i> included, and must be
  * required separately.
  *
- * <p>An example robot program's {@code module-info.java} file could look like this:
+ * <p>Note that robot programs do not need a {@code module-info.java} file to access WPILib APIs.
+ * GradleRIO automatically places the WPILib libraries - and any other library that has Java module
+ * information - onto the module path at compile time. <strong>Robot programs can still use import
+ * statements like {@code import module wpilib} or {@code import module wpilib.command3} without a
+ * {@code module-info.java} file.</strong>
+ *
+ * <p>However, adding a {@code module-info.java} file allows team code to be imported as well. An
+ * example robot program's {@code module-info.java} file could look like this:
  *
  * {@snippet lang="java":
  * module robot {
