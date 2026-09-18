@@ -17,9 +17,9 @@
  *   requires transitive wpilib.command2; // if using the v2 framework
  *   requires transitive wpilib.command3; // if using the v3 framework
  *
- *   exports frc.robot;
- *   exports frc.robot.constants;
- *   exports frc.robot.subsystems;
+ *   exports first.robot;
+ *   exports first.robot.constants;
+ *   exports first.robot.subsystems;
  * }
  * }
  *
@@ -29,8 +29,8 @@
  * {@snippet lang="java":
  * import module robot;
  *
- * public class Robot extends TimedRobot { // imported from org.wpilib.wpilibj
- *   private Drivetrain drivetrain; // imported from frc.robot.subsystems
+ * public class Robot extends TimedRobot { // imported from org.wpilib.framework
+ *   private Drivetrain drivetrain; // imported from first.robot.mechanisms
  * }
  * }
  */
