@@ -18,7 +18,7 @@ jobs:
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "build"
-          - name: "Linux System Core Debug"
+          - name: "Linux System Core"
             compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
@@ -30,7 +30,7 @@ jobs:
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "test"
-          - name: "Linux x86-64 Debug"
+          - name: "Linux x86-64"
             compilation_mode: dbg
             classifier: "linuxx86-64debug,linuxx86-64staticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
@@ -42,7 +42,7 @@ jobs:
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
             container: ""
             action: "test"
-          - name: "macOS Debug"
+          - name: "macOS"
             compilation_mode: dbg
             classifier: "osxuniversaldebug,osxuniversalstaticdebug,linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
@@ -54,7 +54,7 @@ jobs:
             os: windows-2025
             container: ""
             action: "test"
-          - name: "Windows x86-64 Debug"
+          - name: "Windows x86-64"
             compilation_mode: dbg
             classifier: "windowsx86-64debug,windowsx86-64staticdebug"
             os: windows-2025
@@ -66,7 +66,7 @@ jobs:
             os: windows-2025
             container: ""
             action: "build"
-          - name: "Windows ARM64 Debug"
+          - name: "Windows ARM64"
             compilation_mode: dbg
             classifier: "windowsarm64debug,windowsarm64staticdebug"
             os: windows-2025
@@ -78,14 +78,14 @@ jobs:
             os: windows-2025
             container: ""
             action: "build"
-          - name: "Windows System Core Debug"
+          - name: "Windows System Core"
             compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: windows-2025
             container: ""
             action: "build"
 
-    name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
+    name: "${{ matrix.name }} ${{ matrix.action }} (${{ matrix.compilation_mode }})"
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
