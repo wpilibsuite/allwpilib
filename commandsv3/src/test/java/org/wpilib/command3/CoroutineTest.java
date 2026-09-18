@@ -220,7 +220,7 @@ class CoroutineTest extends CommandTestBase {
   }
 
   @Test
-  @SuppressWarnings("CoroutineMayNotBeInScope")
+  @SuppressWarnings("WPILib.CoroutineMayNotBeInScope")
   void usingParentCoroutineInChildThrows() {
     var parent =
         Command.noRequirements(

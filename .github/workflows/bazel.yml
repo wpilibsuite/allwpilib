@@ -153,8 +153,21 @@ jobs:
           else
             TARGETS=...
           fi
-          bazel ${ACTION} -c ${{ matrix.compilation_mode }} ${TARGETS} --config=ci --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
+          bazel ${ACTION} -c ${{ matrix.compilation_mode }} ${TARGETS} --config=ci --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'--execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
         shell: bash
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          include-hidden-files: true
+          path: ${{ case(runner.os == 'Windows', 'D:/_bazel/command-*.profile.gz', runner.os == 'Linux', '/github/home/.bazel/command-*.profile.gz', '/Users/runner/.bazel/command-*.profile.gz') }}
+        if: always()
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: "${{ matrix.name }} Exec Log.binpb.zst"
+        if: always()
 
       - name: Check disk free space
         if: always()

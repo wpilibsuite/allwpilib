@@ -71,6 +71,36 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     TUNABLES_HEADER_GEN = [
         struct(
+            class_name = "TunableBase",
+            yml_file = "semiwrap/TunableBase.yml",
+            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableBase.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::tunables::detail::TunableBase", "wpi__tunables__detail__TunableBase.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TunableTable",
+            yml_file = "semiwrap/TunableTable.yml",
+            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/TunableTable.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::tunables::TunableTable", "wpi__tunables__TunableTable.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "PyTunable",
+            yml_file = "semiwrap/PyTunable.yml",
+            header_root = "tunables/src/main/python/tunables/src",
+            header_file = "tunables/src/main/python/tunables/src/rpy/PyTunable.h",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::tunables::python::PyTunable", "wpi__tunables__python__PyTunable.hpp"),
+            ],
+        ),
+        struct(
             class_name = "ComplexTunable",
             yml_file = "semiwrap/ComplexTunable.yml",
             header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
@@ -79,6 +109,14 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
             trampolines = [
                 ("wpi::tunables::ComplexTunable", "wpi__tunables__ComplexTunable.hpp"),
             ],
+        ),
+        struct(
+            class_name = "TunableTypeValue",
+            yml_file = "semiwrap/TunableTypeValue.yml",
+            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableTypeValue.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
         ),
         struct(
             class_name = "TunableBackend",
@@ -90,6 +128,34 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
                 ("wpi::tunables::TunableBackend", "wpi__tunables__TunableBackend.hpp"),
                 ("wpi::tunables::TunableBackend::PublishedTunable", "wpi__tunables__TunableBackend__PublishedTunable.hpp"),
             ],
+        ),
+        struct(
+            class_name = "MockTunableBackend",
+            yml_file = "semiwrap/MockTunableBackend.yml",
+            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/MockTunableBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::tunables::MockTunableBackend", "wpi__tunables__MockTunableBackend.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TunableRegistry",
+            yml_file = "semiwrap/TunableRegistry.yml",
+            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/TunableRegistry.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::tunables::TunableRegistry", "wpi__tunables__TunableRegistry.hpp"),
+            ],
+        ),
+        struct(
+            class_name = "TunableFunctions",
+            yml_file = "semiwrap/TunableFunctions.yml",
+            header_root = "tunables/src/main/python/tunables/src",
+            header_file = "tunables/src/main/python/tunables/src/rpy/TunableFunctions.h",
+            tmpl_class_names = [],
+            trampolines = [],
         ),
     ]
 

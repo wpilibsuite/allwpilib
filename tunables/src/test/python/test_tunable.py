@@ -1,4 +1,7 @@
+import array
 import dataclasses
+import gc
+import inspect
 import subprocess
 import sys
 import weakref
@@ -28,6 +31,116 @@ def backend():
         tunables.TunableRegistry.reset()
 
 
+def test_mock_backend_registry_publication_uses_native_implementation():
+    class Backend(tunables.MockTunableBackend):
+        def publish(self, *args):
+            return False
+
+    tunables.TunableRegistry.reset()
+    backend = Backend()
+    try:
+        tunables.TunableRegistry.register_backend("", backend)
+        calls = []
+        value = tunables.Tunable(1, on_tune=calls.append)
+
+        assert tunables.publish("value", value) is True
+        assert backend.get_int64("/value") == 1
+
+        backend.set_int64("/value", 3)
+        tunables.TunableRegistry.update()
+        assert value.get() == 3
+        assert calls == [3]
+
+        tunables.remove("value")
+        assert backend.get_uid("/value") is None
+    finally:
+        tunables.TunableRegistry.reset()
+
+
+def test_mock_backend_exposes_non_protobuf_typed_and_struct_getters(backend):
+    tunables.add("boolean", True)
+    tunables.add("integer", 1)
+    tunables.add_int("int32", 3)
+    tunables.add("double", 2.5)
+    tunables.add_float("float", 4.5)
+    tunables.add("string", "initial")
+    tunables.add("raw", b"\x01\x02")
+    tunables.add("booleans", [True, False])
+    tunables.add("integers", [1, 2])
+    tunables.add("doubles", [1.5, 2.5])
+    tunables.add("strings", ["one", "two"])
+    tunables.add("point", TunablePoint(1, 2))
+    tunables.add("points", [TunablePoint(3, 4), TunablePoint(5, 6)])
+
+    assert backend.get_bool("/boolean") is True
+    assert type(backend.get_int64("/integer")) is int
+    assert backend.get_int32("/int32") == 3
+    assert type(backend.get_double("/double")) is float
+    assert backend.get_float("/float") == pytest.approx(4.5)
+    assert type(backend.get_string("/string")) is str
+    assert backend.get_raw("/raw") == b"\x01\x02"
+    assert backend.get_bool_vector("/booleans") == [True, False]
+    assert backend.get_int64_vector("/integers") == [1, 2]
+    assert backend.get_double_vector("/doubles") == [1.5, 2.5]
+    assert backend.get_string_vector("/strings") == ["one", "two"]
+
+    with pytest.raises(ValueError):
+        backend.get_int32("/integer")
+    with pytest.raises(ValueError):
+        backend.get_float("/double")
+    with pytest.raises(ValueError):
+        backend.get_int32_vector("/integers")
+    with pytest.raises(ValueError):
+        backend.get_float_vector("/doubles")
+
+    assert backend.get_struct_type_name("/point") == "TunablePoint"
+    assert backend.get_struct_data("/point") == wpistruct.pack(TunablePoint(1, 2))
+    point = backend.get_struct("/point", TunablePoint)
+    points = backend.get_struct_vector("/points", TunablePoint)
+    assert type(point) is TunablePoint
+    assert point == TunablePoint(1, 2)
+    assert type(points) is list
+    assert all(type(value) is TunablePoint for value in points)
+    assert points == [TunablePoint(3, 4), TunablePoint(5, 6)]
+    with pytest.raises(TypeError, match="not struct serializable"):
+        backend.get_struct("/point", int)
+    with pytest.raises(TypeError, match="not struct serializable"):
+        backend.get_struct_vector("/points", int)
+
+    backend.set_bool("/boolean", False)
+    backend.set_int64("/integer", 7)
+    backend.set_double("/double", 8.5)
+    backend.set_string("/string", "updated")
+    backend.set_raw("/raw", b"\x03\x04")
+    backend.set_bool_vector("/booleans", [False, True])
+    backend.set_int64_vector("/integers", [7, 8])
+    backend.set_double_vector("/doubles", [7.5, 8.5])
+    backend.set_string_vector("/strings", ["three", "four"])
+    backend.set_struct("/point", TunablePoint(7, 8))
+    backend.set_struct_vector("/points", [TunablePoint(9, 10)])
+    tunables.TunableRegistry.update()
+
+    assert backend.get_bool("/boolean") is False
+    assert backend.get_int64("/integer") == 7
+    assert backend.get_double("/double") == pytest.approx(8.5)
+    assert backend.get_string("/string") == "updated"
+    assert backend.get_raw("/raw") == b"\x03\x04"
+    assert backend.get_bool_vector("/booleans") == [False, True]
+    assert backend.get_int64_vector("/integers") == [7, 8]
+    assert backend.get_double_vector("/doubles") == [7.5, 8.5]
+    assert backend.get_string_vector("/strings") == ["three", "four"]
+    assert backend.get_struct("/point", TunablePoint) == TunablePoint(7, 8)
+    assert backend.get_struct_vector("/points", TunablePoint) == [TunablePoint(9, 10)]
+
+    for protobuf_name in (
+        "get_protobuf_type_string",
+        "get_protobuf_data",
+        "get_protobuf",
+        "set_protobuf",
+    ):
+        assert not hasattr(backend, protobuf_name)
+
+
 def test_tunable_get_set():
     value = tunables.Tunable(1)
 
@@ -36,21 +149,66 @@ def test_tunable_get_set():
     assert value.get() == 2
 
 
-def test_tunable_type_selectors_use_python_types():
-    integer = tunables.Tunable(1, value_type=int)
-    strings = tunables.Tunable([], element_type=str)
+@pytest.fixture(params=["constructor", "add", "table_add", "publish_value"])
+def create_tunable(backend, request):
+    count = 0
+
+    def create(value, **kwargs):
+        nonlocal count
+        count += 1
+        name = f"value{count}"
+        if request.param == "constructor":
+            return tunables.Tunable(value, **kwargs)
+        if request.param == "add":
+            return tunables.add(name, value, **kwargs)
+        table = tunables.get_table("table")
+        if request.param == "table_add":
+            return table.add(name, value, **kwargs)
+        return table.publish_value(name, lambda: value, lambda value: None, **kwargs)
+
+    return create
+
+
+def test_tunable_type_selectors_use_python_types(create_tunable):
+    integer = create_tunable(1, value_type=int)
+    strings = create_tunable([], element_type=str)
 
     assert integer.get() == 1
     assert strings.get() == []
 
     with pytest.raises(TypeError, match="value_type must be a Python type"):
-        tunables.Tunable(1, value_type="integer")
+        create_tunable(1, value_type="integer")
 
     with pytest.raises(TypeError, match="element_type must be a Python type"):
-        tunables.Tunable([], element_type="string")
+        create_tunable([], element_type="string")
 
     with pytest.raises(TypeError, match="use element_type for sequences"):
-        tunables.Tunable([], value_type=str)
+        create_tunable([], value_type=str)
+
+
+@pytest.mark.parametrize("initial", [1, [1, 2], TunablePoint(1, 2)])
+def test_none_type_selectors_infer_tunable_type(create_tunable, initial):
+    value = create_tunable(initial, value_type=None, element_type=None)
+
+    assert value.get() == initial
+
+
+def test_tunable_type_selectors_are_mutually_exclusive(create_tunable):
+    with pytest.raises(
+        TypeError, match="value_type and element_type are mutually exclusive"
+    ):
+        create_tunable([1], value_type=int, element_type=int)
+
+
+def test_tunable_type_selector_annotations():
+    for method in (
+        tunables.Tunable.__init__,
+        tunables.add,
+        tunables.TunableTable.add,
+        tunables.TunableTable.publish_value,
+    ):
+        assert "value_type: type[object] | None = None" in method.__doc__
+        assert "element_type: type[object] | None = None" in method.__doc__
 
 
 def test_backend_updates_tunables(backend):
@@ -78,6 +236,256 @@ def test_report_warning_allows_reentry(backend):
     assert warnings == ["outer warning", "nested warning"]
 
 
+def test_update_mutex_context_is_fresh_and_returns_self():
+    first = tunables.TunableRegistry.with_update_mutex()
+    second = tunables.TunableRegistry.with_update_mutex()
+
+    assert first is not second
+    assert first.__enter__() is first
+    first.__exit__(None, None, None)
+    with first as entered:
+        assert entered is first
+
+
+def test_update_mutex_contexts_nest_on_same_thread():
+    with tunables.TunableRegistry.with_update_mutex():
+        with tunables.TunableRegistry.with_update_mutex():
+            tunables.TunableRegistry.update()
+
+
+def test_update_mutex_context_rejects_reentering_same_object():
+    context = tunables.TunableRegistry.with_update_mutex()
+
+    with context:
+        with pytest.raises(RuntimeError, match="already entered"):
+            context.__enter__()
+
+
+def test_update_mutex_context_rejects_cross_thread_enter_without_blocking():
+    code = """
+import threading
+
+import tunables
+
+
+context = tunables.TunableRegistry.with_update_mutex()
+owner_entered = threading.Event()
+allow_owner_exit = threading.Event()
+errors = []
+
+
+def owner():
+    try:
+        with context:
+            owner_entered.set()
+            assert allow_owner_exit.wait(1.0), "owner was not allowed to exit"
+    except BaseException as exc:
+        errors.append(exc)
+
+
+owner_thread = threading.Thread(target=owner)
+owner_thread.start()
+assert owner_entered.wait(1.0), "owner did not enter"
+try:
+    context.__enter__()
+except RuntimeError as exc:
+    assert "already entered" in str(exc)
+else:
+    raise AssertionError("cross-thread enter unexpectedly succeeded")
+finally:
+    allow_owner_exit.set()
+
+owner_thread.join(2.0)
+assert not owner_thread.is_alive(), "owner thread hung"
+assert errors == []
+with tunables.TunableRegistry.with_update_mutex():
+    pass
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_update_mutex_context_rejects_enter_while_same_object_is_acquiring():
+    code = """
+import sys
+import threading
+
+import tunables
+
+
+sys.setswitchinterval(10.0)
+blocker = tunables.TunableRegistry.with_update_mutex()
+blocker.__enter__()
+context = tunables.TunableRegistry.with_update_mutex()
+owner_attempting = threading.Event()
+owner_acquired = threading.Event()
+errors = []
+
+
+def owner():
+    try:
+        owner_attempting.set()
+        context.__enter__()
+        owner_acquired.set()
+        context.__exit__(None, None, None)
+    except BaseException as exc:
+        errors.append(exc)
+
+
+owner_thread = threading.Thread(target=owner)
+owner_thread.start()
+assert owner_attempting.wait(1.0), "owner did not attempt entry"
+assert not owner_acquired.is_set(), "owner acquired while blocker held the mutex"
+try:
+    context.__enter__()
+except RuntimeError as exc:
+    assert "already entered" in str(exc)
+else:
+    raise AssertionError("concurrent enter unexpectedly succeeded")
+
+blocker.__exit__(None, None, None)
+owner_thread.join(2.0)
+assert not owner_thread.is_alive(), "owner thread hung"
+assert owner_acquired.is_set()
+assert errors == []
+with context:
+    pass
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_update_mutex_context_wrong_thread_exit_preserves_owner_recovery():
+    code = """
+import threading
+
+import tunables
+
+
+context = tunables.TunableRegistry.with_update_mutex()
+owner_entered = threading.Event()
+wrong_exit_finished = threading.Event()
+errors = []
+
+
+def owner():
+    try:
+        context.__enter__()
+        owner_entered.set()
+        assert wrong_exit_finished.wait(1.0), "wrong-thread exit did not finish"
+        context.__exit__(None, None, None)
+    except BaseException as exc:
+        errors.append(exc)
+
+
+owner_thread = threading.Thread(target=owner)
+owner_thread.start()
+assert owner_entered.wait(1.0), "owner did not enter"
+try:
+    context.__exit__(None, None, None)
+except RuntimeError as exc:
+    assert "owning thread" in str(exc)
+else:
+    raise AssertionError("wrong-thread exit unexpectedly succeeded")
+finally:
+    wrong_exit_finished.set()
+
+owner_thread.join(2.0)
+assert not owner_thread.is_alive(), "owner thread hung"
+assert errors == []
+with tunables.TunableRegistry.with_update_mutex():
+    pass
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_update_mutex_context_propagates_exception_and_unlocks():
+    code = """
+import threading
+
+import tunables
+
+
+class ExpectedError(Exception):
+    pass
+
+
+context = tunables.TunableRegistry.with_update_mutex()
+try:
+    with context:
+        raise ExpectedError
+except ExpectedError:
+    pass
+else:
+    raise AssertionError("with statement suppressed the exception")
+
+acquired = threading.Event()
+
+
+def acquire():
+    with tunables.TunableRegistry.with_update_mutex():
+        acquired.set()
+
+
+thread = threading.Thread(target=acquire, daemon=True)
+thread.start()
+thread.join(2.0)
+assert not thread.is_alive(), "mutex remained locked after exceptional exit"
+assert acquired.is_set()
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_update_mutex_rejects_obsolete_callback_form():
+    with pytest.raises(TypeError):
+        tunables.TunableRegistry.with_update_mutex(lambda: None)
+
+
+def test_update_mutex_is_held_through_with_body():
+    code = """
+import threading
+
+import tunables
+
+
+holder_entered = threading.Event()
+waiter_attempted = threading.Event()
+waiter_entered = threading.Event()
+errors = []
+
+
+def holder():
+    try:
+        with tunables.TunableRegistry.with_update_mutex():
+            holder_entered.set()
+            assert waiter_attempted.wait(1.0), "waiter did not attempt acquisition"
+            assert not waiter_entered.wait(0.1), "waiter entered before holder exited"
+    except BaseException as exc:
+        errors.append(exc)
+
+
+def waiter():
+    try:
+        waiter_attempted.set()
+        with tunables.TunableRegistry.with_update_mutex():
+            waiter_entered.set()
+    except BaseException as exc:
+        errors.append(exc)
+
+
+holder_thread = threading.Thread(target=holder)
+holder_thread.start()
+assert holder_entered.wait(1.0), "holder did not acquire mutex"
+waiter_thread = threading.Thread(target=waiter)
+waiter_thread.start()
+holder_thread.join(2.0)
+waiter_thread.join(2.0)
+assert not holder_thread.is_alive(), "holder thread hung"
+assert not waiter_thread.is_alive(), "waiter thread hung"
+assert waiter_entered.is_set(), "waiter did not acquire after holder exited"
+assert errors == []
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
 def test_update_mutex_waits_do_not_hold_gil():
     code = """
 import threading
@@ -86,16 +494,19 @@ import time
 import tunables
 
 
+def acquire_context():
+    with tunables.TunableRegistry.with_update_mutex():
+        pass
+
+
 def run_waiting_call(waiting_call):
     entered = threading.Event()
     done = threading.Event()
 
     def holder():
-        def hold():
+        with tunables.TunableRegistry.with_update_mutex():
             entered.set()
             time.sleep(0.2)
-
-        tunables.TunableRegistry.with_update_mutex(hold)
 
     def waiter():
         waiting_call()
@@ -110,13 +521,297 @@ def run_waiting_call(waiting_call):
     waiter_thread.start()
     holder_thread.join(2.0)
     waiter_thread.join(2.0)
+    assert not holder_thread.is_alive(), "holder thread hung"
+    assert not waiter_thread.is_alive(), "waiter thread hung"
     assert done.is_set()
 
 
-run_waiting_call(lambda: tunables.TunableRegistry.with_update_mutex(lambda: None))
+run_waiting_call(acquire_context)
 run_waiting_call(tunables.TunableRegistry.update)
 """
     subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_update_mutex_context_retains_self_until_owner_thread_exit():
+    code = """
+import gc
+import threading
+import weakref
+
+import tunables
+
+
+context = tunables.TunableRegistry.with_update_mutex()
+context_ref = weakref.ref(context)
+shared = [context]
+del context
+owner_entered = threading.Event()
+external_reference_dropped = threading.Event()
+errors = []
+
+
+def owner():
+    try:
+        current = shared[0]
+        current.__enter__()
+        owner_entered.set()
+        del current
+        assert external_reference_dropped.wait(1.0), "external reference was not dropped"
+        retained = context_ref()
+        assert retained is not None, "entered context was destroyed on the nonowner thread"
+        retained.__exit__(None, None, None)
+    except BaseException as exc:
+        errors.append(exc)
+
+
+owner_thread = threading.Thread(target=owner)
+owner_thread.start()
+assert owner_entered.wait(1.0), "owner did not enter"
+shared.clear()
+gc.collect()
+external_reference_dropped.set()
+
+owner_thread.join(2.0)
+assert not owner_thread.is_alive(), "owner thread hung"
+assert errors == []
+gc.collect()
+assert context_ref() is None, "normal exit did not break self-retention"
+with tunables.TunableRegistry.with_update_mutex():
+    pass
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+def test_concurrent_complex_rejection_preserves_accepted_retention():
+    code = """
+import gc
+import threading
+import weakref
+
+import tunables
+from tunables import _tunables
+
+
+tunables.TunableRegistry.reset()
+backend = tunables.MockTunableBackend()
+tunables.TunableRegistry.register_backend("", backend)
+
+first_callback_entered = threading.Event()
+second_descriptor_seen = threading.Event()
+rejection_warning_entered = threading.Event()
+allow_rejection = threading.Event()
+errors = []
+results = {}
+
+
+class First(_tunables.ComplexTunable):
+    def __init__(self):
+        super().__init__()
+        self.update_count = 0
+
+    def publish_tunable(self, table):
+        table.add_int("value", 1)
+        first_callback_entered.set()
+        if not second_descriptor_seen.wait(1.0):
+            errors.append("second publisher did not enter the helper")
+
+    def update_tunable(self):
+        self.update_count += 1
+
+
+class Second:
+    def get_tunable_type(self):
+        second_descriptor_seen.set()
+        return "Second"
+
+    def publish_tunables(self, table):
+        raise AssertionError("rejected publisher callback must not run")
+
+
+def report_warning(message):
+    if message == "Tunable already exists: /same":
+        rejection_warning_entered.set()
+        if not allow_rejection.wait(1.0):
+            errors.append("accepted publisher did not return")
+
+
+tunables.TunableRegistry.set_report_warning(report_warning)
+first = First()
+first_ref = weakref.ref(first)
+
+
+def publish_first():
+    results["first"] = tunables.publish("same", first)
+    allow_rejection.set()
+
+
+def publish_second():
+    if not first_callback_entered.wait(1.0):
+        errors.append("first publisher callback did not run")
+        return
+    results["second"] = tunables.publish("same", Second())
+
+
+first_thread = threading.Thread(target=publish_first)
+second_thread = threading.Thread(target=publish_second)
+first_thread.start()
+second_thread.start()
+first_thread.join(2.0)
+second_thread.join(2.0)
+tunables.TunableRegistry.set_report_warning(None)
+
+assert not first_thread.is_alive(), "accepted publisher thread hung"
+assert not second_thread.is_alive(), "rejected publisher thread hung"
+assert rejection_warning_entered.is_set(), "rejected publisher never reached backend"
+assert errors == []
+assert results == {"first": True, "second": False}
+
+del first
+gc.collect()
+retained = first_ref()
+assert retained is not None, "accepted first publication was not retained"
+assert backend.get_uid("/same") is not None
+assert backend.get_value("/same/value") == 1
+
+tunables.TunableRegistry.update()
+assert retained.update_count == 1
+
+tunables.TunableRegistry.reset()
+"""
+    subprocess.run([sys.executable, "-c", code], check=True, timeout=5)
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (b"a\x00\xff", b"a\x00\xff"),
+        (bytearray(b"a\x00\xff"), b"a\x00\xff"),
+        (memoryview(b"abcdef"), b"abcdef"),
+        (memoryview(b"abcdef")[::2], b"ace"),
+        (memoryview(b"abcdef")[::-1], b"fedcba"),
+        (memoryview(b"abcdef").cast("B", shape=(2, 3)), b"abcdef"),
+        (memoryview(array.array("H", [0x0101, 0xFEFE])), b"\x01\x01\xfe\xfe"),
+        (b"", b""),
+        (memoryview(array.array("B")), b""),
+    ],
+)
+@pytest.mark.parametrize("operation", ["add", "set", "backend"])
+def test_raw_tunable_buffer(backend, value, expected, operation):
+    if operation == "add":
+        raw = tunables.add("raw", value)
+    else:
+        raw = tunables.add("raw", b"initial")
+        if operation == "set":
+            raw.set(value)
+        else:
+            backend.set_raw("/raw", value)
+            tunables.TunableRegistry.update()
+
+    assert raw.get() == expected
+    assert backend.get_raw("/raw") == expected
+
+
+@pytest.mark.parametrize("layout", ["c", "fortran", "strided", "scalar", "empty"])
+@pytest.mark.parametrize("operation", ["add", "set", "backend"])
+def test_raw_tunable_numpy_memoryview(backend, layout, operation):
+    np = pytest.importorskip("numpy")
+    value = np.array(
+        [[1, 2], [3, 4]], dtype="<u2", order="F" if layout == "fortran" else "C"
+    )
+    expected = b"\x01\x00\x02\x00\x03\x00\x04\x00"
+    if layout == "strided":
+        value = value[::-1, ::-1]
+        expected = b"\x04\x00\x03\x00\x02\x00\x01\x00"
+    elif layout == "scalar":
+        value = np.array(258, dtype="<u2")
+        expected = b"\x02\x01"
+    elif layout == "empty":
+        value = value[:0]
+        expected = b""
+
+    view = memoryview(value)
+    if operation == "add":
+        raw = tunables.add("raw", view)
+    else:
+        raw = tunables.add("raw", b"initial")
+        if operation == "set":
+            raw.set(view)
+        else:
+            backend.set_raw("/raw", view)
+            tunables.TunableRegistry.update()
+
+    value[...] = 0
+    assert raw.get() == expected
+    assert backend.get_raw("/raw") == expected
+
+
+@pytest.mark.parametrize("operation", ["add", "set", "backend"])
+def test_raw_tunable_indirect_memoryview(backend, operation):
+    tb = pytest.importorskip("_testbuffer")
+    value = memoryview(tb.ndarray(list(b"abcdef"), shape=[2, 3], flags=tb.ND_PIL))
+    if operation == "add":
+        raw = tunables.add("raw", value)
+    else:
+        raw = tunables.add("raw", b"initial")
+        if operation == "set":
+            raw.set(value)
+        else:
+            backend.set_raw("/raw", value)
+            tunables.TunableRegistry.update()
+
+    assert raw.get() == b"abcdef"
+    assert backend.get_raw("/raw") == b"abcdef"
+
+
+def test_raw_tunable_buffer_with_explicit_value_type():
+    raw = tunables.Tunable(memoryview(array.array("H", [0x0101])), value_type=bytes)
+    assert raw.get() == b"\x01\x01"
+
+
+def test_buffer_rejects_tunable_sequence_element_type():
+    with pytest.raises(TypeError, match="element_type.*sequences"):
+        tunables.Tunable(memoryview(array.array("B", [1, 2])), element_type=int)
+
+
+@pytest.mark.parametrize("explicit", [False, True])
+def test_numpy_array_keeps_tunable_sequence_dispatch(explicit):
+    np = pytest.importorskip("numpy")
+    value = np.array([1.5, 2.5], dtype=np.float64)
+    options = {"element_type": float} if explicit else {}
+    raw = tunables.Tunable(value, **options)
+    assert raw.get() == [1.5, 2.5]
+
+
+@pytest.mark.parametrize("operation", ["add", "set", "backend"])
+def test_array_exporter_keeps_tunable_sequence_dispatch(backend, operation):
+    value = array.array("H", [1, 255])
+    if operation == "add":
+        tunable = tunables.add("value", value)
+        assert tunable.get() == [1, 255]
+    else:
+        raw = tunables.add("raw", b"initial")
+        if operation == "set":
+            raw.set(value)
+        else:
+            backend.set_raw("/raw", value)
+            tunables.TunableRegistry.update()
+        assert raw.get() == b"\x01\xff"
+
+
+def test_raw_backend_still_accepts_integer_iterables(backend):
+    raw = tunables.add("raw", b"initial")
+    backend.set_raw("/raw", iter([0, 255, 1]))
+    tunables.TunableRegistry.update()
+    assert raw.get() == b"\x00\xff\x01"
+    with pytest.raises(ValueError, match="range 0-255"):
+        backend.set_raw("/raw", [256])
+
+
+def test_raw_tunable_buffer_export_released_after_copy():
+    value = bytearray(b"abc")
+    raw = tunables.Tunable(value)
+    value.extend(b"d")
+    assert raw.get() == b"abc"
 
 
 def test_primitive_and_array_tunables_update_from_backend(backend):
@@ -152,35 +847,96 @@ def test_primitive_and_array_tunables_update_from_backend(backend):
     assert strings.get() == ["c", "d"]
 
 
-def test_mutate_updates_stored_primitive_array_tunables(backend):
-    raw = tunables.add("raw", b"abc")
-    booleans = tunables.add("booleans", [True, False])
-    integers = tunables.add("integers", [1, 2])
-    doubles = tunables.add("doubles", [1.0, 2.0])
-    strings = tunables.add("strings", ["a", "b"])
+@pytest.mark.parametrize(
+    "initial, options",
+    [
+        (True, {}),
+        (1, {}),
+        (1.5, {}),
+        ("hello", {}),
+        (b"abc", {}),
+        ([True, False], {}),
+        ([1, 2], {}),
+        ([1.0, 2.0], {}),
+        (["a", "b"], {}),
+        ([TunablePoint(1, 2)], {}),
+        ([], {"element_type": int}),
+        ([], {"element_type": TunablePoint}),
+    ],
+)
+@pytest.mark.parametrize("getter_backed", [False, True])
+def test_mutate_rejects_non_struct_values(initial, options, getter_backed):
+    getter_calls = []
 
-    raw_values = raw.mutate()
-    raw_values[0] = ord("z")
-    booleans.mutate()[1] = True
-    integers.mutate()[0] += 2
-    doubles.mutate().append(3.5)
-    string_values = strings.mutate()
-    string_values[1] = "c"
-    string_values += ["d"]
+    def getter():
+        getter_calls.append(None)
+        return initial
 
-    assert raw.get() == b"zbc"
-    assert booleans.get() == [True, True]
-    assert integers.get() == [3, 2]
-    assert doubles.get() == [1.0, 2.0, 3.5]
-    assert strings.get() == ["a", "c", "d"]
+    value = tunables.Tunable(
+        initial, getter=getter if getter_backed else None, **options
+    )
+    getter_calls.clear()
+    with pytest.raises(TypeError, match="mutate.*struct"):
+        value.mutate()
+    assert getter_calls == []
+    assert value.get() == initial
 
+
+def test_publish_int_getter_setter_lifecycle_uses_int32(backend):
+    state = {"value": 1, "set_values": []}
+
+    def setter(value: int) -> None:
+        state["set_values"].append(value)
+        state["value"] = value
+
+    published = tunables.get_table().publish_int(
+        "intGetter", lambda: state["value"], setter, robust=True
+    )
+
+    assert backend.get_int32("/intGetter") == 1
+
+    backend.set_int32("/intGetter", 3)
     tunables.TunableRegistry.update()
 
-    assert backend.get_value("/raw") == b"zbc"
-    assert backend.get_value("/booleans") == [True, True]
-    assert backend.get_value("/integers") == [3, 2]
-    assert backend.get_value("/doubles") == [1.0, 2.0, 3.5]
-    assert backend.get_value("/strings") == ["a", "c", "d"]
+    assert state == {"value": 3, "set_values": [3]}
+    assert backend.get_int32("/intGetter") == 3
+
+    del published
+    gc.collect()
+
+    state["value"] = 5
+    tunables.TunableRegistry.update()
+
+    assert backend.get_int32("/intGetter") == 5
+
+
+def test_publish_float_getter_setter_lifecycle_uses_float(backend):
+    state = {"value": 1.25, "set_values": []}
+
+    def setter(value: float) -> None:
+        state["set_values"].append(value)
+        state["value"] = value
+
+    published = tunables.get_table().publish_float(
+        "floatGetter", lambda: state["value"], setter, robust=True
+    )
+
+    assert backend.get_float("/floatGetter") == pytest.approx(1.25)
+
+    backend.set_float("/floatGetter", 3.5)
+    tunables.TunableRegistry.update()
+
+    assert state["value"] == pytest.approx(3.5)
+    assert state["set_values"] == pytest.approx([3.5])
+    assert backend.get_float("/floatGetter") == pytest.approx(3.5)
+
+    del published
+    gc.collect()
+
+    state["value"] = 5.75
+    tunables.TunableRegistry.update()
+
+    assert backend.get_float("/floatGetter") == pytest.approx(5.75)
 
 
 def test_publish_value_uses_getter(backend):
@@ -201,7 +957,7 @@ def test_publish_value_uses_getter(backend):
     tunables.TunableRegistry.update()
     assert published.get() == 5
 
-    backend.set_int64("/getter", 6)
+    backend.set_int32("/getter", 6)
     tunables.TunableRegistry.update()
     assert value[0] == 6
     tunables.remove("getter")
@@ -216,7 +972,7 @@ def test_publish_value_remote_setter_updates_cached_value_before_echo(backend):
         lambda tuned: value.__setitem__(0, min(tuned, 5)),
     )
 
-    backend.set_int64("/clamped", 10)
+    backend.set_int32("/clamped", 10)
     tunables.TunableRegistry.update()
 
     assert value[0] == 5
@@ -301,6 +1057,19 @@ def test_table_remove_cleans_normalized_published_value_storage(backend):
     assert ref() is None
 
 
+def test_removed_nested_getter_is_not_refreshed(backend):
+    calls = []
+    table = tunables.get_table("outer")
+    table.publish_int("child//value", lambda: calls.append(1) or 1, lambda _: None)
+    assert calls == [1]
+
+    table.remove("child")
+    tunables.TunableRegistry.update()
+
+    assert calls == [1]
+    assert backend.get_uid("/outer/child/value") is None
+
+
 def test_duplicate_publication_preserves_retained_original(backend):
     warnings = []
     tunables.TunableRegistry.set_report_warning(warnings.append)
@@ -350,13 +1119,21 @@ def test_config_immutable_and_on_tune(backend):
     assert calls == [1]
 
 
+def test_root_get_table_defaults_to_root():
+    assert tunables.get_table().get_path() == "/"
+
+
+def test_root_get_table_accepts_positional_name():
+    assert tunables.get_table("drive").get_path() == "/drive/"
+
+
 def test_table_paths_route_migrate_and_remove(backend):
     child_backend = tunables.MockTunableBackend()
     tunables.TunableRegistry.register_backend("/child", child_backend)
 
-    assert tunables.get_table().path == "/"
-    assert tunables.get_table("drive").path == "/drive/"
-    assert tunables.get_table("drive").get_table("left").path == ("/drive/left/")
+    assert tunables.get_table().get_path() == "/"
+    assert tunables.get_table("drive").get_path() == "/drive/"
+    assert tunables.get_table("drive").get_table("left").get_path() == ("/drive/left/")
     assert tunables.TunableRegistry.normalize_name("///drive//left") == "/drive/left"
 
     root = tunables.add("root", 1.0)
@@ -437,6 +1214,36 @@ def test_publish_retains_complex_tunables(backend):
     tunables.remove("selectable")
 
 
+def test_native_complex_tunable_receives_public_native_table(backend):
+    from tunables import _tunables
+
+    assert not hasattr(_tunables, "_NativeTunableTable")
+    received: list[tunables.TunableTable] = []
+
+    class NativeComplex(_tunables.ComplexTunable):
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
+            received.append(table)
+            table.add_int("value", 7)
+
+    value = NativeComplex()
+    assert tunables.publish("native", value) is True
+    assert type(received[0]) is tunables.TunableTable
+    assert received[0].get_path() == "/native/"
+    assert backend.get_value("/native/value") == 7
+
+
+def test_native_tunable_table_constructor_and_child(backend):
+    table = tunables.TunableTable("/manual/")
+    child = table.get_table("child")
+
+    assert type(table) is tunables.TunableTable
+    assert type(child) is tunables.TunableTable
+    assert table.get_path() == "/manual/"
+    assert child.get_path() == "/manual/child/"
+    assert child.add_double("value", 1.5).get() == pytest.approx(1.5)
+    assert backend.get_value("/manual/child/value") == pytest.approx(1.5)
+
+
 def test_complex_tunable_publishes_members_and_updates(backend):
     class UpdatingComplex(tunables.ComplexTunable):
         def __init__(self) -> None:
@@ -464,6 +1271,82 @@ def test_complex_tunable_publishes_members_and_updates(backend):
     assert value.update_count == 2
     assert value.value.get() == 2
     assert backend.get_value("/complex/value") == 2
+
+
+def test_reentrant_global_complex_replacement_retains_newer_value(backend):
+    replacement_refs = []
+
+    class Replacement:
+        def __init__(self) -> None:
+            self.update_count = 0
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.add_int("value", 11)
+
+        def update_tunables(self) -> None:
+            self.update_count += 1
+
+    class ReentrantComplex:
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            replacement = Replacement()
+            replacement_refs.append(weakref.ref(replacement))
+            tunables.remove("same")
+            assert tunables.publish("same", replacement) is True
+
+    obsolete = ReentrantComplex()
+    obsolete_ref = weakref.ref(obsolete)
+
+    assert tunables.publish("same", obsolete) is True
+    del obsolete
+
+    assert obsolete_ref() is None
+    replacement = replacement_refs[0]()
+    assert replacement is not None
+    assert backend.get_value("/same/value") == 11
+
+    tunables.TunableRegistry.update()
+    assert replacement.update_count == 1
+
+
+def test_reentrant_owner_scoped_complex_replacement_retains_newer_value(backend):
+    obsolete_refs = []
+    replacement_refs = []
+
+    class Replacement:
+        def __init__(self) -> None:
+            self.update_count = 0
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.add_int("value", 12)
+
+        def update_tunables(self) -> None:
+            self.update_count += 1
+
+    class ReentrantChild:
+        def __init__(self, parent_table: tunables.TunableTable) -> None:
+            self.parent_table = parent_table
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            replacement = Replacement()
+            replacement_refs.append(weakref.ref(replacement))
+            self.parent_table.remove("child")
+            assert self.parent_table.publish("child", replacement) is True
+
+    class Parent:
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            obsolete = ReentrantChild(table)
+            obsolete_refs.append(weakref.ref(obsolete))
+            assert table.publish("child", obsolete) is True
+
+    assert tunables.publish("parent", Parent()) is True
+
+    assert obsolete_refs[0]() is None
+    replacement = replacement_refs[0]()
+    assert replacement is not None
+    assert backend.get_value("/parent/child/value") == 12
+
+    tunables.TunableRegistry.update()
+    assert replacement.update_count == 1
 
 
 def test_remove_complex_tunable_removes_members(backend):
@@ -523,6 +1406,15 @@ def test_registry_remove_path_string(backend):
     assert backend.get_uid("/value") is None
 
 
+def test_registry_remove_accepts_path_or_bound_value(backend):
+    first = tunables.add("first", 1)
+    second = tunables.add("second", 2)
+    tunables.TunableRegistry.remove("first")
+    tunables.TunableRegistry.remove(second)
+    assert backend.get_uid("/first") is None
+    assert backend.get_uid("/second") is None
+
+
 def test_table_remove_releases_complex_tunables(backend):
     class RemovedComplex(tunables.ComplexTunable):
         def __init__(self) -> None:
@@ -578,6 +1470,99 @@ def test_remove_normalized_complex_tunable_releases_storage(backend):
 
     del value
     assert ref() is None
+
+
+def test_retained_duck_complex_table_rejects_remove_after_parent_removal(backend):
+    class RetainingComplex:
+        def __init__(self) -> None:
+            self.table: tunables.TunableTable | None = None
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            self.table = table
+
+    value = RetainingComplex()
+    assert tunables.publish("complex", value) is True
+    assert value.table is not None
+    retained_table = value.table
+
+    tunables.remove("complex")
+
+    retained_child = retained_table.get_table("nested")
+    assert retained_child.get_path() == "/complex/nested/"
+    tunables.add_int("complex/nested/value", 7)
+    replacement_uid = backend.get_uid("/complex/nested/value")
+    assert replacement_uid is not None
+
+    error = None
+    try:
+        retained_child.remove("value")
+    except RuntimeError as exc:
+        error = exc
+
+    assert backend.get_uid("/complex/nested/value") == replacement_uid
+    assert error is not None
+    assert str(error) == "callback TunableTable owner is no longer valid"
+
+
+def test_manual_table_in_weakref_callback_does_not_inherit_owner(backend):
+    class RetainingComplex:
+        def __init__(self) -> None:
+            self.table: tunables.TunableTable | None = None
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            self.table = table
+
+    owner = RetainingComplex()
+    assert tunables.publish("owner", owner) is True
+    assert owner.table is not None
+
+    manual_tables = []
+
+    def allocate_manual_table(_ref: weakref.ReferenceType) -> None:
+        table = tunables.TunableTable("/manual/")
+        table.add_int("value", 7)
+        manual_tables.append(table)
+
+    table_ref = weakref.ref(owner.table, allocate_manual_table)
+    owner.table = None
+
+    assert table_ref() is None
+    assert len(manual_tables) == 1
+    manual_uid = backend.get_uid("/manual/value")
+    assert manual_uid is not None
+
+    tunables.remove("owner")
+
+    assert backend.get_uid("/manual/value") == manual_uid
+    assert backend.get_value("/manual/value") == 7
+
+
+def test_stale_duck_table_is_not_revived_by_path_reuse(backend):
+    class RetainingComplex:
+        def __init__(self) -> None:
+            self.table: tunables.TunableTable | None = None
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            self.table = table
+
+    first = RetainingComplex()
+    assert tunables.publish("same", first) is True
+    stale = first.table
+    assert stale is not None
+    tunables.remove("same")
+
+    second = RetainingComplex()
+    assert tunables.publish("same", second) is True
+    second_table = second.table
+    assert second_table is not None
+    second_table.add_int("live", 9)
+
+    with pytest.raises(
+        RuntimeError, match="callback TunableTable owner is no longer valid"
+    ):
+        stale.remove("live")
+
+    assert backend.get_value("/same/live") == 9
 
 
 def test_complex_table_remove_releases_published_value_child(backend):
@@ -816,16 +1801,22 @@ def test_struct_tunable_and_struct_array_update_from_backend(backend):
     assert points.get() == [TunablePoint(7, 8), TunablePoint(9, 10)]
 
 
-def test_mutate_marks_struct_tunables_changed(backend):
-    point = tunables.add("point", TunablePoint(1, 2))
-    points = tunables.add("points", [TunablePoint(3, 4)])
-
-    point.mutate().a = 5
-    points.mutate()[0].a = 6
+@pytest.mark.parametrize("getter_backed", [False, True])
+def test_mutate_marks_struct_tunables_changed(backend, getter_backed):
+    original = TunablePoint(1, 2)
+    point = tunables.Tunable(
+        original, getter=(lambda: original) if getter_backed else None
+    )
+    tunables.publish("point", point)
     tunables.TunableRegistry.update()
 
+    edited = point.mutate()
+    assert edited is original
+    edited.a = 5
+    tunables.TunableRegistry.update()
+
+    assert point.get() is original
     assert backend.get_value("/point") == wpistruct.pack(TunablePoint(5, 2))
-    assert backend.get_value("/points") == wpistruct.pack_array([TunablePoint(6, 4)])
 
 
 def test_empty_tunable_array_requires_element_type(backend):

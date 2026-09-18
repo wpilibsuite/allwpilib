@@ -1,0 +1,23 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// Tables that refer to themselves and to each other.
+
+namespace wpi.aosnt.testing;
+
+table Peer {
+  node:Node (id: 0);
+}
+
+table Node {
+  value:int (id: 0);
+  children:[Node] (id: 1);
+  peer:Peer (id: 2);
+}
+
+table Tree {
+  root:Node (id: 0);
+}
+
+root_type Tree;

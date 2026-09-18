@@ -24,6 +24,7 @@ def main():
     parser.add_argument("--native_srcs_root")
     parser.add_argument("--generated_include_target", default=None)
     parser.add_argument("--generated_include_root")
+    parser.add_argument("--extra_include_root_files", nargs="+", default=[])
     parser.add_argument("--package_name", required=True)
     args = parser.parse_args()
 
@@ -93,7 +94,7 @@ def main():
     for entry in args.module_include_targets or []:
         label = entry.partition("=")[0]
         module_include_targets.append(label)
-        module_include_repos.add(label.removeprefix("@").split("//")[0] + "*")
+        module_include_repos.add("*" + label.removeprefix("@").split("//")[0] + "*")
 
     third_party_dirs = args.third_party_dirs or []
     replace_prefix_keys = []
@@ -128,6 +129,7 @@ def main():
                 pc_files=pc_files,
                 requires=requires,
                 project_name=project_name,
+                extra_include_root_files=args.extra_include_root_files,
                 generated_include_target=args.generated_include_target,
                 native_srcs_root=args.native_srcs_root,
                 replace_prefix_keys=replace_prefix_keys,
@@ -152,6 +154,10 @@ def define_native_wrapper(name, pyproject_toml = None):
         ]){%- endif %}{% if module_include_targets %} + [
         {%- for target in module_include_targets %}
             "{{target}}",
+        {%- endfor %}
+        ]{%- endif %}{% if extra_include_root_files %} + [
+        {%- for f in extra_include_root_files %}
+            "{{f}}",
         {%- endfor %}
         ]{%- endif %},
         out = "native/{{project_name}}/include",
