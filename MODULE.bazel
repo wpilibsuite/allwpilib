@@ -66,6 +66,7 @@ bazel_dep(name = "rules_jvm_external", version = "6.8")
 
 register_toolchains("//:java_toolchain_definition")
 
+# Repin with `bazel run @maven//:pin`.
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",
@@ -86,8 +87,10 @@ maven.install(
         "org.apache.ant:ant-junit:1.10.12",
         "org.mockito:mockito-core:4.1.0",
         "com.google.testing.compile:compile-testing:0.21.0",
+        "com.google.errorprone:error_prone_annotations:2.38.0",
+        "junit:junit:4.13.2",
+        "org.checkerframework:checker-qual:3.33.0",
     ],
-    # bzlmodrio-opencv adds the opencv-java above, protobuf its Java runtime.
     known_contributing_modules = [
         "allwpilib",
         "bzlmodrio-opencv",
@@ -98,8 +101,9 @@ maven.install(
         "https://repo1.maven.org/maven2",
         "https://frcmaven.wpi.edu/artifactory/release/",
     ],
+    resolver = "maven",
 )
-use_repo(maven, "maven", "unpinned_maven")
+use_repo(maven, "maven")
 
 bazel_dep(name = "caseyduquettesc_rules_python_pytest", version = "1.1.1", repo_name = "rules_python_pytest")
 bazel_dep(name = "eigen", version = "5.0.1")
