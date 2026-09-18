@@ -17,6 +17,7 @@ open module wpilib.core {
   requires io.avaje.json;
   requires io.avaje.jsonb;
 
+  exports org.wpilib.backend;
   exports org.wpilib.event;
   exports org.wpilib.sysid;
   exports org.wpilib.framework;
@@ -27,6 +28,7 @@ open module wpilib.core {
   exports org.wpilib.hardware.expansionhub;
   exports org.wpilib.hardware.discrete;
   exports org.wpilib.hardware.bus;
+  exports org.wpilib.hardware.counter;
   exports org.wpilib.hardware.range;
   exports org.wpilib.hardware.pneumatic;
   exports org.wpilib.hardware.motor;

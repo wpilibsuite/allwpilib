@@ -17,7 +17,9 @@ open module wpilib.util {
   exports org.wpilib.util.concurrent;
   exports org.wpilib.util.container;
   exports org.wpilib.util.function;
+  exports org.wpilib.util.option;
   exports org.wpilib.util.protobuf;
   exports org.wpilib.util.runtime;
   exports org.wpilib.util.struct;
+  exports org.wpilib.util.struct.parser;
 }
