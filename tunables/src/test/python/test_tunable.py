@@ -847,6 +847,328 @@ def test_primitive_and_array_tunables_update_from_backend(backend):
     assert strings.get() == ["c", "d"]
 
 
+def test_tune_revision_tracks_mock_backend_applications(backend):
+    value = tunables.add("revision", 1)
+
+    observer_one_revision = tunables.TunableRegistry.get_tune_revision(value)
+    observer_two_revision = tunables.TunableRegistry.get_tune_revision(value)
+    assert observer_one_revision == 0
+    assert observer_two_revision == 0
+    assert tunables.TunableRegistry.get_tune_revision(value) == observer_one_revision
+
+    value.set(2)
+    local_struct = tunables.add("localStructRevision", TunablePoint(1, 2))
+    local_struct.mutate().a = 3
+    tunables.TunableRegistry.update()
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+    assert tunables.TunableRegistry.get_tune_revision(local_struct) == 0
+
+    backend.set_int64("/revision", 3)
+    backend.set_int64("/revision", 3)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == 3
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+    assert observer_one_revision != tunables.TunableRegistry.get_tune_revision(value)
+    assert observer_two_revision != tunables.TunableRegistry.get_tune_revision(value)
+
+    observer_one_revision = tunables.TunableRegistry.get_tune_revision(value)
+    observer_two_revision = tunables.TunableRegistry.get_tune_revision(value)
+    assert observer_one_revision == observer_two_revision
+
+    tunables.publish("revisionAlias", value)
+    backend.set_int64("/revisionAlias", 4)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == 4
+    assert tunables.TunableRegistry.get_tune_revision(value) == 3
+
+
+def test_tune_revision_registry_notification_is_exposed(backend):
+    from tunables import _tunables
+
+    value = tunables.add("registryRevision", 1)
+    uid = backend.get_uid("/registryRevision")
+
+    assert uid is not None
+    assert not hasattr(_tunables._TunableBase, "get_tune_revision")
+    assert hasattr(tunables.TunableRegistry, "get_tune_revision")
+    assert hasattr(tunables.TunableRegistry, "record_tune_applied")
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+
+    tunables.TunableRegistry.record_tune_applied(uid)
+
+    assert value.get() == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+
+def test_tune_revision_covers_struct_arrays_and_getter_setter_tunables(backend):
+    integers = tunables.add("integerArrayRevision", [1, 2])
+    point = tunables.add("pointRevision", TunablePoint(3, 4))
+    retained = [7]
+    getter_setter = tunables.get_table().publish_int(
+        "getterSetterRevision",
+        lambda: retained[0],
+        lambda _value: None,
+    )
+
+    integers.set([5, 2])
+    point.mutate().a = 6
+    retained[0] = 8
+    tunables.TunableRegistry.update()
+
+    assert tunables.TunableRegistry.get_tune_revision(integers) == 0
+    assert tunables.TunableRegistry.get_tune_revision(point) == 0
+    assert tunables.TunableRegistry.get_tune_revision(getter_setter) == 0
+
+    backend.set_int64_vector("/integerArrayRevision", [5, 2])
+    backend.set_struct("/pointRevision", TunablePoint(6, 4))
+    backend.set_int32("/getterSetterRevision", 99)
+    tunables.TunableRegistry.update()
+
+    assert tunables.TunableRegistry.get_tune_revision(integers) == 1
+    assert tunables.TunableRegistry.get_tune_revision(point) == 1
+    assert tunables.TunableRegistry.get_tune_revision(getter_setter) == 1
+    assert getter_setter.get() == 8
+
+
+def test_tune_revision_propagates_from_complex_children(backend):
+    class RevisionComplex(tunables.ComplexTunable):
+        def __init__(self) -> None:
+            self.initial = tunables.Tunable(1.0)
+            self.dynamic = tunables.Tunable(2.0)
+            self.table: tunables.TunableTable | None = None
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            self.table = table
+            table.publish("initial", self.initial)
+
+        def publish_dynamic(self) -> None:
+            assert self.table is not None
+            self.table.publish("dynamic", self.dynamic)
+
+    value = RevisionComplex()
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+
+    tunables.publish("complexRevision", value)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+    assert tunables.TunableRegistry.get_tune_revision(value.initial) == 0
+
+    backend.set_double("/complexRevision/initial", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.initial.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.initial) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    value.publish_dynamic()
+    backend.set_double("/complexRevision/dynamic", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.dynamic.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.dynamic) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+
+def test_tune_revision_finds_nested_python_complex_tunable(backend):
+    class ChildComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    class ParentComplex:
+        def __init__(self) -> None:
+            self.child = ChildComplex()
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("child", self.child)
+
+    parent = ParentComplex()
+    child = parent.child
+
+    tunables.publish("nestedPythonRevision", parent)
+    assert tunables.TunableRegistry.get_tune_revision(parent) == 0
+    assert tunables.TunableRegistry.get_tune_revision(child) == 0
+
+    backend.set_double("/nestedPythonRevision/child/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert child.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(child.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(child) == 1
+    assert tunables.TunableRegistry.get_tune_revision(parent) == 1
+
+
+def test_tune_revision_is_shared_across_python_complex_aliases(backend):
+    class AliasedComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = AliasedComplex()
+
+    tunables.publish("pythonAliasRevisionA", value)
+    tunables.publish("pythonAliasRevisionB", value)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+
+    backend.set_double("/pythonAliasRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    backend.set_double("/pythonAliasRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+
+def test_tune_revision_survives_python_complex_unpublish_republish(backend):
+    class RepublishedComplex:
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = RepublishedComplex()
+
+    tunables.publish("pythonRepublishRevisionA", value)
+    backend.set_double("/pythonRepublishRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.remove("pythonRepublishRevisionA")
+
+    assert backend.get_uid("/pythonRepublishRevisionA") is None
+    assert backend.get_uid("/pythonRepublishRevisionA/value") is None
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.publish("pythonRepublishRevisionB", value)
+
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+    backend.set_double("/pythonRepublishRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    ref = weakref.ref(value)
+    tunables.remove("pythonRepublishRevisionB")
+    del value
+
+    assert ref() is None
+
+
+def test_tune_revision_supports_non_weakrefable_python_complex(backend):
+    class SlottedComplex:
+        __slots__ = ("value",)
+
+        def __init__(self) -> None:
+            self.value = tunables.Tunable(1.0)
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.publish("value", self.value)
+
+    value = SlottedComplex()
+    with pytest.raises(TypeError):
+        weakref.ref(value)
+
+    tunables.publish("slottedRevisionA", value)
+    backend.set_double("/slottedRevisionA/value", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(2.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.remove("slottedRevisionA")
+    tunables.publish("slottedRevisionB", value)
+
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+    backend.set_double("/slottedRevisionB/value", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+
+def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):
+    wrong_type = tunables.add("wrongTypeRevision", 1.0)
+    immutable = tunables.add("immutableRevision", 5, mutable=False)
+
+    with pytest.raises(ValueError):
+        backend.set_int64("/wrongTypeRevision", 2)
+    backend.set_int64("/immutableRevision", 42)
+    tunables.TunableRegistry.update()
+
+    assert tunables.TunableRegistry.get_tune_revision(wrong_type) == 0
+    assert tunables.TunableRegistry.get_tune_revision(immutable) == 0
+    assert immutable.get() == 5
+
+
+def test_tune_revision_is_visible_inside_on_tune(backend):
+    calls = []
+    value = None
+
+    def on_tune(_tuned_value):
+        calls.append(tunables.TunableRegistry.get_tune_revision(value))
+        value.set(3.0)
+
+    value = tunables.add("callbackRevision", 1.0, on_tune=on_tune)
+
+    backend.set_double("/callbackRevision", 2.0)
+    tunables.TunableRegistry.update()
+
+    assert calls == [1]
+    assert value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+    tunables.TunableRegistry.update()
+
+    assert calls == [1]
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+
+
+def test_tune_revision_is_shared_across_aliases_and_migration(backend):
+    value = tunables.add("sharedRevision", 1.0)
+    tunables.publish("sharedRevisionAlias", value)
+
+    backend.set_double("/sharedRevision", 2.0)
+    backend.set_double("/sharedRevisionAlias", 3.0)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == pytest.approx(3.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    tunables.remove("sharedRevision")
+    tunables.publish("sharedRevisionRepublished", value)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    replacement_backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.register_backend(
+        "/sharedRevisionRepublished", replacement_backend
+    )
+    assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    replacement_backend.set_double("/sharedRevisionRepublished", 4.0)
+    tunables.TunableRegistry.update()
+
+    assert value.get() == pytest.approx(4.0)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 3
+
+
 @pytest.mark.parametrize(
     "initial, options",
     [
