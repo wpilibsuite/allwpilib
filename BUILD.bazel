@@ -1,7 +1,6 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
-load("@rules_java//java:java_plugin.bzl", "java_plugin")
 load("@rules_java//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
 load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
@@ -47,15 +46,6 @@ java_package_configuration(
 package_group(
     name = "allwpilib_packages",
     packages = ["//..."],
-)
-
-java_plugin(
-    name = "avaje_jsonb_generator",
-    processor_class = "io.avaje.jsonb.generator.JsonbProcessor",
-    visibility = ["//visibility:public"],
-    deps = [
-        "@maven//:io_avaje_avaje_jsonb_generator",
-    ],
 )
 
 exports_files([

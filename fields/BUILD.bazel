@@ -2,6 +2,7 @@ load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_test")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//fields:generate_fields.bzl", "generate_fields")
@@ -240,7 +241,7 @@ wpilib_java_library(
     maven_artifact_name = "fields-java",
     maven_group_id = "org.wpilib.fields",
     plugins = [
-        "//:avaje_jsonb_generator",
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
     ],
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = FIELD_JSONS,
