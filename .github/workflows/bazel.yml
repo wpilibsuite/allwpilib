@@ -12,13 +12,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Linux System Core"
+          - name: "Linux Systemcore"
             compilation_mode: opt
             classifier: "linuxsystemcore,linuxsystemcorestatic"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             container: wpilib/debian-base:trixie
             action: "build"
-          - name: "Linux System Core"
+          - name: "Linux Systemcore"
             compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
@@ -72,13 +72,13 @@ jobs:
             os: windows-2025
             container: ""
             action: "build"
-          - name: "Windows System Core"
+          - name: "Windows Systemcore"
             compilation_mode: opt
             classifier: "linuxsystemcore,linuxsystemcorestatic"
             os: windows-2025
             container: ""
             action: "build"
-          - name: "Windows System Core"
+          - name: "Windows Systemcore"
             compilation_mode: dbg
             classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
             os: windows-2025
