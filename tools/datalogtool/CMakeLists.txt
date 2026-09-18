@@ -1,6 +1,7 @@
 project(datalogtool)
 
 include(CompileWarnings)
+include(AddTest)
 include(GenResources)
 include(LinkMacOSGUI)
 
@@ -31,4 +32,14 @@ if(WIN32)
     set_target_properties(datalogtool PROPERTIES WIN32_EXECUTABLE YES)
 elseif(APPLE)
     set_target_properties(datalogtool PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "datalogTool")
+endif()
+
+if(WPILIB_WITH_IMGUI_TESTS)
+    wpilib_add_imgui_test(datalogtool src/test/native/imgui)
+    wpilib_link_macos_gui(datalogtool_imgui_test)
+    target_sources(
+        datalogtool_imgui_test
+        PRIVATE ${datalogtool_src} ${datalogtool_resources_src} ${datalogtool_rc} ${APP_ICON_MACOSX}
+    )
+    target_link_libraries(datalogtool_imgui_test libglass_for_tests ssh datalog wpiutil)
 endif()

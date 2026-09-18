@@ -16,11 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
             name: Linux
             container: wpilib/systemcore-cross-debian:trixie
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON"
-          - os: macOS-15
+          - os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
             name: macOS
             container: ""
             flags: "--preset with-sccache -DCMAKE_BUILD_TYPE=Release -DWPILIB_WITH_EXAMPLES=ON -DWPILIB_WITH_GUI=ON -DWPILIB_WITH_WPICAL=ON -DWPILIB_USE_SYSTEM_EIGEN=ON"

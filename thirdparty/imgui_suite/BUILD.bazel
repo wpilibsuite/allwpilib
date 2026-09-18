@@ -2,6 +2,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:imgui_test.bzl", "IMGUI_TEST_ENGINE_DEFINES")
 load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
@@ -37,6 +38,10 @@ cc_library(
     name = "imgui",
     srcs = IMGUI_SOURCES,
     hdrs = IMGUI_HEADERS,
+    defines = select({
+        "//shared/bazel/rules:with_imgui_test_engine_hooks_enabled": IMGUI_TEST_ENGINE_DEFINES,
+        "//conditions:default": [],
+    }),
     includes = [
         "imgui/include",
         "imgui/include/backends",
@@ -48,6 +53,7 @@ cc_library(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
+    visibility = ["//shared/bazel/thirdparty/imgui_test_engine:__pkg__"],
     deps = [
         "//shared/bazel/thirdparty/libsdlgpu",
     ],

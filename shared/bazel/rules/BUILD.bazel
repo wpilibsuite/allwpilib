@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 
@@ -65,4 +66,35 @@ config_setting(
     values = {
         "compilation_mode": "dbg",
     },
+)
+
+bool_flag(
+    name = "with_imgui_tests",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "with_imgui_tests_enabled",
+    flag_values = {
+        ":with_imgui_tests": "true",
+    },
+    visibility = ["//visibility:public"],
+)
+
+# Internal flag set by wpilib_imgui_cc_test() for its transitioned C++ binary.
+# with_imgui_tests remains the user-facing opt-in gate for the dependency.
+bool_flag(
+    name = "with_imgui_test_engine_hooks",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "with_imgui_test_engine_hooks_enabled",
+    flag_values = {
+        ":with_imgui_test_engine_hooks": "true",
+        ":with_imgui_tests": "true",
+    },
+    visibility = ["//visibility:public"],
 )

@@ -1,14 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Thu, 5 May 2022 18:09:45 -0400
-Subject: [PATCH 11/34] MathExtras: delete numbers
+Subject: [PATCH 11/32] MathExtras: delete numbers
 
 ---
  llvm/include/llvm/Support/MathExtras.h | 31 --------------------------
  1 file changed, 31 deletions(-)
 
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 78c500e18c7639afc02b595b788333b6b9a4e69b..b8e858f9c530e31430f824cc2d93ff1cc78a92f7 100644
+index de6905fff10dd4aca8e8eb722c5129a138185f22..98ae88f177454a639fb9b565cf75a5e336042c29 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -41,37 +41,6 @@ template <typename T, typename U, typename = enableif_int<T, U>>

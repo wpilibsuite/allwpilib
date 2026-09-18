@@ -3,18 +3,17 @@
 #include <algorithm>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include <pybind11/pybind11.h>
-#include <wpi/tunables/TunableRegistry.hpp>
-#include <wpi/tunables/detail/PathUtil.hpp>
-#include <wpi/tunables/detail/TunableDetail.hpp>
-
 #include "PyComplexTunableAdapter.h"
 #include "PyTunable.h"
+#include "PyTunableTable.h"
+#include "wpi/tunables/TunableRegistry.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/detail/PathUtil.hpp"
+#include "wpi/tunables/detail/TunableDetail.hpp"
 
 namespace py = pybind11;
 
@@ -136,18 +135,17 @@ void RefreshValues() {
 
 namespace detail {
 
-void StoreValue(std::string path, std::shared_ptr<PyTunable> tunable) {
-  GetValues().insert_or_assign(std::move(path), std::move(tunable));
+void StoreValue(std::string path, std::shared_ptr<PyTunable> value) {
+  GetValues().insert_or_assign(std::move(path), std::move(value));
 }
 
-void StoreComplexValue(std::string path,
-                       std::shared_ptr<PyComplexTunableAdapter> tunable) {
-  GetComplexValues().insert_or_assign(std::move(path), std::move(tunable));
+void StoreComplex(std::string path,
+                  std::shared_ptr<PyComplexTunableAdapter> value) {
+  GetComplexValues().insert_or_assign(std::move(path), std::move(value));
 }
 
-void StoreNativeComplexValue(std::string path, py::object tunable) {
-  GetNativeComplexValues().insert_or_assign(std::move(path),
-                                            std::move(tunable));
+void StoreNativeComplexValue(std::string path, py::object value) {
+  GetNativeComplexValues().insert_or_assign(std::move(path), std::move(value));
 }
 
 }  // namespace detail
@@ -183,6 +181,7 @@ void RegisterPreUpdateCallback() {
 
 void CleanupPythonStorage() {
   wpi::tunables::detail::SetTunableRegistryPreUpdateCallback(nullptr);
+  table::ClearContexts();
   ClearValues();
 }
 
@@ -220,6 +219,7 @@ void RemoveRetainedPath(std::string_view path) {
 
 void RemovePath(std::string_view path) {
   std::string normalized = NormalizePath(path);
+  table::InvalidatePendingPublications(normalized);
   {
     py::gil_scoped_release release;
     wpi::tunables::TunableRegistry::Remove(normalized);
@@ -256,8 +256,15 @@ void RemoveValue(py::handle value) {
   }
 }
 
-void RemoveRootValue(std::string_view name) {
-  RemovePath("/" + std::string{name});
+void InitializeTunablePython(py::module_& module) {
+  RegisterPreUpdateCallback();
+
+  static int unused;
+  py::capsule cleanup(&unused, [](void*) {
+    py::gil_scoped_acquire gil;
+    CleanupPythonStorage();
+  });
+  module.add_object("_tunable_cleanup", cleanup);
 }
 
 }  // namespace wpi::tunables::python

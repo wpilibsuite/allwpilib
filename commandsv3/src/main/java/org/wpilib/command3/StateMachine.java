@@ -60,6 +60,10 @@ public final class StateMachine implements Command {
   private State m_initialState = null;
   private final List<State> m_states = new ArrayList<>();
 
+  // Marks the state machine as no longer accepting new states. Used when a no-arg switchFromAny()
+  // is called to prevent surprising behavior if users try to define new states afterward
+  private boolean m_closedForNewStates = false;
+
   /**
    * Creates a new state machine.
    *
@@ -89,10 +93,17 @@ public final class StateMachine implements Command {
    *
    * @param command The command for the state to execute. Cannot be null.
    * @return The newly created state.
+   * @throws IllegalStateException if {@link #switchFromAny(State...)} has already been called with
+   *     no arguments.
    */
   @NoDiscard
   public State addState(Command command) {
     requireNonNullParam(command, "command", "StateMachine.addState");
+    if (m_closedForNewStates) {
+      throw new IllegalStateException(
+          "Cannot add new states to a state machine after switchFromAny() has been called with no"
+              + " arguments");
+    }
     var state = new State(this, command);
     m_states.add(state);
     return state;
@@ -101,7 +112,7 @@ public final class StateMachine implements Command {
   /**
    * Sets up a transition from any of the given states to a specific state. If no states are given,
    * the transition will apply to all states in the state machine <i>at the time this method is
-   * called</i>.
+   * called</i> and the state machine will no longer permit states to be added.
    *
    * <pre>{@code
    * stateMachine.switchFromAny(state1, state2, state3).to(state4).when(() -> foo == true);
@@ -111,7 +122,8 @@ public final class StateMachine implements Command {
    * state2.switchTo(state4).when(() -> foo == true);
    * state3.switchTo(state4).when(() -> foo == true);
    *
-   * // Set up an early exit condition from any state
+   * // Set up an early exit condition from any state.
+   * // Using this no-arg variant will prevent states from being added later!
    * stateMachine.switchFromAny().toExitStateMachine().when(() -> bar == true);
    *
    * // Functionally equivalent to:
@@ -126,6 +138,7 @@ public final class StateMachine implements Command {
    */
   public TransitionNeedsTargetStage switchFromAny(State... states) {
     if (states.length == 0) {
+      m_closedForNewStates = true;
       return new TransitionNeedsTargetStage(List.copyOf(m_states));
     } else {
       return new TransitionNeedsTargetStage(List.of(states));

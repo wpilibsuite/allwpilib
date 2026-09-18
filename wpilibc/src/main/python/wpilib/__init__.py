@@ -17,6 +17,7 @@ from ._wpilib import (
     Compressor,
     CompressorConfigType,
     CounterBase,
+    DSGamepadChooser,
     DataLogManager,
     DataLogTelemetryBackend,
     DifferentialDrive,
@@ -26,8 +27,8 @@ from ._wpilib import (
     DriverStation,
     DriverStationBackend,
     DriverStationDisplay,
-    DualSenseEdgeController,
     DualSenseController,
+    DualSenseEdgeController,
     DualShock4Controller,
     DutyCycle,
     DutyCycleEncoder,
@@ -45,7 +46,6 @@ from ._wpilib import (
     FieldObject2d,
     GameCubeController,
     Gamepad,
-    DSGamepadChooser,
     GenericHID,
     HIDDevice,
     I2C,
@@ -118,39 +118,6 @@ from ._wpilib import (
     wait,
 )
 
-
-def _register_networktables_telemetry_backend() -> None:
-    import telemetry as _telemetry
-    from ntcore import NetworkTableInstance
-
-    _telemetry.TelemetryRegistry.register_backend(
-        "",
-        NetworkTablesTelemetryBackend(NetworkTableInstance.get_default(), "/Telemetry"),
-    )
-
-
-def _register_networktables_tunable_backend() -> None:
-    import tunables as _tunables
-    from ntcore import NetworkTableInstance
-
-    _tunables.TunableRegistry.register_backend(
-        "",
-        NetworkTablesTunableBackend(NetworkTableInstance.get_default(), "/Tunables"),
-    )
-
-
-import telemetry as _telemetry
-import tunables as _tunables
-
-_telemetry.TelemetryRegistry.register_networktables_backend = staticmethod(
-    _register_networktables_telemetry_backend
-)
-_tunables.TunableRegistry.register_networktables_backend = staticmethod(
-    _register_networktables_tunable_backend
-)
-
-del _telemetry, _tunables
-
 __all__ = [
     "ADXL345_I2C",
     "AddressableLED",
@@ -167,6 +134,7 @@ __all__ = [
     "Compressor",
     "CompressorConfigType",
     "CounterBase",
+    "DSGamepadChooser",
     "DataLogManager",
     "DataLogTelemetryBackend",
     "DifferentialDrive",
@@ -176,8 +144,8 @@ __all__ = [
     "DriverStation",
     "DriverStationBackend",
     "DriverStationDisplay",
-    "DualSenseEdgeController",
     "DualSenseController",
+    "DualSenseEdgeController",
     "DualShock4Controller",
     "DutyCycle",
     "DutyCycleEncoder",
@@ -195,7 +163,6 @@ __all__ = [
     "FieldObject2d",
     "GameCubeController",
     "Gamepad",
-    "DSGamepadChooser",
     "GenericHID",
     "HIDDevice",
     "I2C",
@@ -275,9 +242,9 @@ __all__ += ["report_error", "report_warning"]
 
 del _init__wpilib
 
-from .opmoderobot import OpModeRobot
+from .opmodes import OpModeRobot, autonomous, teleop, utility
 
-__all__ += ["OpModeRobot"]
+__all__ += ["OpModeRobot", "autonomous", "teleop", "utility"]
 
 from .cameraserver import CameraServer
 from .deployinfo import get_deploy_data

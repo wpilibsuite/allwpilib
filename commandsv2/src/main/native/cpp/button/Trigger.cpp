@@ -62,6 +62,24 @@ Trigger Trigger::OnTrue(CommandPtr&& command) {
   return *this;
 }
 
+Trigger Trigger::IfTrue(Command* command) {
+  AddBinding([command](bool, bool current) {
+    if (current) {
+      wpi::cmd::CommandScheduler::GetInstance().Schedule(command);
+    }
+  });
+  return *this;
+}
+
+Trigger Trigger::IfTrue(CommandPtr&& command) {
+  AddBinding([command = std::move(command)](bool, bool current) {
+    if (current) {
+      wpi::cmd::CommandScheduler::GetInstance().Schedule(command);
+    }
+  });
+  return *this;
+}
+
 Trigger Trigger::OnFalse(Command* command) {
   AddBinding([command](bool previous, bool current) {
     if (previous && !current) {

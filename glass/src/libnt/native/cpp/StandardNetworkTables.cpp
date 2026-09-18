@@ -33,8 +33,8 @@ void wpi::glass::AddStandardNetworkTablesViews(
       },
       [](Window* win, Model* model, const char*) {
         win->SetDefaultSize(300, 150);
-        return MakeFunctionView(
-            [=] { DisplayAlerts(static_cast<NTAlertsModel*>(model)); });
+        return std::make_unique<AlertsView>(static_cast<NTAlertsModel*>(model),
+                                            win->GetStorage());
       });
   provider.Register(
       NTCommandSchedulerModel::TYPE,

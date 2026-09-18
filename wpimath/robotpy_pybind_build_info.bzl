@@ -1233,8 +1233,8 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
             header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrapezoidProfile.hpp",
             tmpl_class_names = [
-                ("TrapezoidProfile_tmpl1", "_TrapezoidProfileConstraints"),
-                ("TrapezoidProfile_tmpl2", "_TrapezoidProfileRadiansConstraints"),
+                ("TrapezoidProfile_tmpl1", "TrapezoidProfileConstraints"),
+                ("TrapezoidProfile_tmpl2", "TrapezoidProfileRadiansConstraints"),
                 ("TrapezoidProfile_tmpl3", "TrapezoidProfile"),
                 ("TrapezoidProfile_tmpl4", "TrapezoidProfileRadians"),
             ],
@@ -1486,6 +1486,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/wpimath/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(

@@ -1,1 +1,2 @@
+org.wpilib.javacplugin.OpModeAnnotationProcessor
 org.wpilib.javacplugin.PostConstructionInitializerProcessor

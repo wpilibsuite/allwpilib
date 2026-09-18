@@ -25,6 +25,9 @@
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
@@ -799,21 +802,12 @@ static void DisplayGui() {
 }
 
 #ifndef RUNNING_WPICAL_TESTS
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-  int argc = __argc;
-  char** argv = __argv;
-#else
-int main(int argc, char** argv) {
-#endif
-  std::string_view saveDir;
-  if (argc == 2) {
-    saveDir = argv[1];
-  }
-
+void Application(std::string_view saveDir) {
   wpi::gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   wpi::gui::AddIcon(wpical::GetResource_wpical_16_png());
   wpi::gui::AddIcon(wpical::GetResource_wpical_32_png());
@@ -835,7 +829,24 @@ int main(int argc, char** argv) {
 
   wpi::glass::DestroyContext();
   wpi::gui::DestroyContext();
+}
+#endif
 
+#if !defined(RUNNING_WPICAL_TESTS) && !defined(RUNNING_IMGUI_TESTS)
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
+#else
+int main(int argc, char** argv) {
+#endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
+  Application(saveDir);
   return 0;
 }
 #endif

@@ -37,7 +37,7 @@ version_file = "wpilib_drivers/version.py"
 packages = ["wpilib_drivers"]
 
 [tool.semiwrap]
-update_init = ["wpilib_drivers"]
+update_init = ["wpilib_drivers wpilib_drivers._drivers"]
 
 [tool.semiwrap.name_transform]
 default = "snake_case"

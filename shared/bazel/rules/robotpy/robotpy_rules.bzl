@@ -95,6 +95,7 @@ def robotpy_library(
         requires = None,
         description_file = None,
         python_requires = None,
+        extra_distinfo_files = None,
         **kwargs):
     """
     Defines a python library that is wrapping a series of pybind extensions.
@@ -126,7 +127,9 @@ def robotpy_library(
         description_file = description_file,
         python_requires = python_requires,
         license = "BSD-3-Clause",
+        extra_distinfo_files = extra_distinfo_files,
         tags = ["robotpy"],
+        visibility = ["//visibility:public"],
     )
 
     pycross_wheel_library(
