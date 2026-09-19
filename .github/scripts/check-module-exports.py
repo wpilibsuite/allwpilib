@@ -5,7 +5,6 @@
 # the WPILib BSD license file in the root directory of this project.
 
 import argparse
-import os
 import re
 import sys
 from pathlib import Path
@@ -87,7 +86,9 @@ def get_declared_packages(project_dir: Path) -> set[str]:
                     line = line.strip()
                     if line.startswith("package ") and line.endswith(";"):
                         pkg = line[len("package ") : -1].strip()
-                        if pkg and not (pkg.endswith(".internal") or ".internal." in pkg):
+                        if pkg and not (
+                            pkg.endswith(".internal") or ".internal." in pkg
+                        ):
                             # Add this package unless it's internal (including subpackages of internal packages).
                             # They can still be exported, but won't be treated as required.
                             declared_packages.add(pkg)
@@ -98,7 +99,9 @@ def get_declared_packages(project_dir: Path) -> set[str]:
     return declared_packages
 
 
-def check_subproject(module_info_path: Path, root_dir: Path) -> tuple[str, str, list[str]]:
+def check_subproject(
+    module_info_path: Path, root_dir: Path
+) -> tuple[str, str, list[str]]:
     """
     Checks if a subproject exports all of its declared packages.
     Internal packages are not required for the check to pass, though projects may still decide to export them.
@@ -130,10 +133,7 @@ def find_module_info_files(root_dir: Path) -> list[Path]:
     for path in root_dir.glob("**/src/main/java/module-info.java"):
         parts = path.parts
         # Skip bazel and gradle build outputs, excluded directories
-        if any(
-            p.startswith("bazel-") or p in EXCLUDED_DIR_NAMES
-            for p in parts
-        ):
+        if any(p.startswith("bazel-") or p in EXCLUDED_DIR_NAMES for p in parts):
             continue
         # Skip explicitly ignored projects
         if any(ignored in parts for ignored in IGNORED_PROJECTS):
@@ -167,25 +167,41 @@ def main() -> int:
     checked_count = 0
 
     for module_info_path in module_info_files:
-        project_name, module_name, missing_packages = check_subproject(module_info_path, root_dir)
+        project_name, module_name, missing_packages = check_subproject(
+            module_info_path, root_dir
+        )
         checked_count += 1
         if missing_packages:
             failures.append((project_name, module_name, missing_packages))
 
     if failures:
         print("=" * 70, file=sys.stderr)
-        print("ERROR: Java packages are missing from module-info.java exports!", file=sys.stderr)
-        print("       (note: `.internal` packages are not required to be exported)", file=sys.stderr)
+        print(
+            "ERROR: Java packages are missing from module-info.java exports!",
+            file=sys.stderr,
+        )
+        print(
+            "       (note: `.internal` packages are not required to be exported)",
+            file=sys.stderr,
+        )
         print("=" * 70, file=sys.stderr)
         failures.sort(key=lambda x: (x[0], x[1]))
         for proj, mod, pkgs in failures:
-            print(f"\nModule '{mod}' in project '{proj}' is missing exports for {len(pkgs)} package(s):", file=sys.stderr)
+            print(
+                f"\nModule '{mod}' in project '{proj}' is missing exports for {len(pkgs)} package(s):",
+                file=sys.stderr,
+            )
             for pkg in pkgs:
                 print(f"  - {pkg}", file=sys.stderr)
-        print("\nPlease add the missing 'exports <package>;' directives to their respective module-info.java files.\n", file=sys.stderr)
+        print(
+            "\nPlease add the missing 'exports <package>;' directives to their respective module-info.java files.\n",
+            file=sys.stderr,
+        )
         return 1
 
-    print(f"Success: All {checked_count} subprojects export their declared Java packages.")
+    print(
+        f"Success: All {checked_count} subprojects export their declared Java packages."
+    )
     return 0
 
 
