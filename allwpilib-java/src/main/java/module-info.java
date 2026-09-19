@@ -9,7 +9,14 @@
  * distributed as vendor deps - like the command frameworks - are <i>not</i> included, and must be
  * required separately.
  *
- * <p>An example robot program's {@code module-info.java} file could look like this:
+ * <p>Note that robot programs do not need a {@code module-info.java} file to access WPILib APIs.
+ * GradleRIO automatically places the WPILib libraries - and any other library that has Java module
+ * information - onto the module path at compile time. <strong>Robot programs can still use import
+ * statements like {@code import module wpilib} or {@code import module wpilib.command3} without a
+ * {@code module-info.java} file.</strong>
+ *
+ * <p>However, adding a {@code module-info.java} file allows team code to be imported as well. An
+ * example robot program's {@code module-info.java} file could look like this:
  *
  * {@snippet lang="java":
  * module robot {
@@ -17,9 +24,9 @@
  *   requires transitive wpilib.command2; // if using the v2 framework
  *   requires transitive wpilib.command3; // if using the v3 framework
  *
- *   exports frc.robot;
- *   exports frc.robot.constants;
- *   exports frc.robot.subsystems;
+ *   exports first.robot;
+ *   exports first.robot.constants;
+ *   exports first.robot.subsystems;
  * }
  * }
  *
@@ -29,8 +36,8 @@
  * {@snippet lang="java":
  * import module robot;
  *
- * public class Robot extends TimedRobot { // imported from org.wpilib.wpilibj
- *   private Drivetrain drivetrain; // imported from frc.robot.subsystems
+ * public class Robot extends TimedRobot { // imported from org.wpilib.framework
+ *   private Drivetrain drivetrain; // imported from first.robot.mechanisms
  * }
  * }
  */

@@ -7,11 +7,11 @@ open module wpilib.command2 {
   requires transitive wpilib.core;
   requires transitive wpilib.units;
   requires wpilib.annotation;
-  requires wpilib.util;
-  requires wpilib.ntcore;
   requires wpilib.hal;
+  requires wpilib.ntcore;
   requires wpilib.telemetry;
   requires wpilib.tunable;
+  requires wpilib.util;
 
   exports org.wpilib.command2;
   exports org.wpilib.command2.button;

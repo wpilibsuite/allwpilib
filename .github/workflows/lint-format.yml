@@ -125,6 +125,18 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
         if: ${{ failure() }}
 
+  java-module-exports:
+    name: "Check Java packages are exported"
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+    needs: [validation]
+    container: wpilib/debian-base:trixie
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check Java module exports
+        run: ./.github/scripts/check-module-exports.py
+
   check-spelling:
     runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
