@@ -23,8 +23,7 @@ import org.wpilib.util.Pair;
  */
 public final class CommandGenericHID {
   private static final Lock m_hidsLock = new ReentrantLock();
-  private static final CommandGenericHID[] m_hids =
-      new CommandGenericHID[HIDDevice.MAX_DEVICES];
+  private static final CommandGenericHID[] m_hids = new CommandGenericHID[HIDDevice.MAX_DEVICES];
 
   private final GenericHID m_hid;
   private final Map<EventLoop, Map<Integer, Trigger>> m_buttonCache = new HashMap<>();

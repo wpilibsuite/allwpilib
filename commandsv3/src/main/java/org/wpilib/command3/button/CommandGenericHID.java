@@ -82,8 +82,7 @@ public final class CommandGenericHID {
     m_hidsLock.lock();
     try {
       CommandGenericHID[] hids =
-          m_hids.computeIfAbsent(
-              scheduler, k -> new CommandGenericHID[HIDDevice.MAX_DEVICES]);
+          m_hids.computeIfAbsent(scheduler, k -> new CommandGenericHID[HIDDevice.MAX_DEVICES]);
       CommandGenericHID toRet = hids[port];
       if (toRet == null) {
         toRet = new CommandGenericHID(scheduler, port);
