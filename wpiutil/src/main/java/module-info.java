@@ -7,10 +7,9 @@
  * and deserialization, native library interactions, and error reporting.
  */
 open module wpilib.util {
-  requires io.avaje.json;
   requires transitive us.hebi.quickbuf.runtime;
+  requires io.avaje.json;
 
-  exports org.wpilib.util;
   exports org.wpilib.util.cleanup;
   exports org.wpilib.util.collections.prefixmap;
   exports org.wpilib.util.collections;
@@ -20,6 +19,7 @@ open module wpilib.util {
   exports org.wpilib.util.option;
   exports org.wpilib.util.protobuf;
   exports org.wpilib.util.runtime;
-  exports org.wpilib.util.struct;
   exports org.wpilib.util.struct.parser;
+  exports org.wpilib.util.struct;
+  exports org.wpilib.util;
 }
