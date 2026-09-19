@@ -68,7 +68,7 @@ Lines EmitJavaFile(const Sections& sections, std::string_view className,
   out.emplace_back("//");
   Append(out, PrefixLines(SplitLines(spec.description), "// "));
   out.emplace_back("");
-  out.emplace_back("package frc.robot.filters;");
+  out.emplace_back("package first.robot.filters;");
   out.emplace_back("");
   out.emplace_back("import org.wpilib.math.filter.BiquadFilter;");
   out.emplace_back("");
