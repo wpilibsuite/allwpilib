@@ -195,7 +195,7 @@ TEST_CASE("ExportBuildContentsTest JavaHasPackageAndClassAndImport",
   auto out = BuildExportFileContents(sections, Language::Java, "ShooterFilter",
                                      SimpleSpec());
   CHECK(out.find("DO NOT EDIT") != std::string::npos);
-  CHECK(out.find("package frc.robot.filters;") != std::string::npos);
+  CHECK(out.find("package first.robot.filters;") != std::string::npos);
   CHECK(out.find("import org.wpilib.math.filter.BiquadFilter;") !=
         std::string::npos);
   CHECK(out.find("public final class ShooterFilter") != std::string::npos);
@@ -254,7 +254,7 @@ TEST_CASE("ExportBuildContentsTest JavaGoldenFile", "[filterdesigner]") {
       "// Stages:\n"
       "//   1. Low pass  order=4  cutoff=50 Hz\n"
       "\n"
-      "package frc.robot.filters;\n"
+      "package first.robot.filters;\n"
       "\n"
       "import org.wpilib.math.filter.BiquadFilter;\n"
       "\n"
