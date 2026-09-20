@@ -140,7 +140,7 @@ TEST_CASE("ExportNormalizeRootTest RelativePathBecomesAbsolute",
 
 TEST_CASE("ExportResolvePathTest JavaPathLayout", "[filterdesigner]") {
   auto p = ResolveExportPath("/work/robot", Language::Java, "ShooterFilter");
-  // `/work/robot/src/main/java/frc/robot/filters/ShooterFilter.java`
+  // `/work/robot/src/main/java/first/robot/filters/ShooterFilter.java`
   CHECK(p.filename() == "ShooterFilter.java");
   CHECK(p.parent_path().filename() == "filters");
   CHECK(p.parent_path().parent_path().filename() == "robot");
