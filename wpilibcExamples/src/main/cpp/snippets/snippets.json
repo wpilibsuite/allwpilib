@@ -338,5 +338,14 @@
     "foldername": "DifferentialDrive",
     "gradlebase": "java",
     "robotclass": "Robot"
+  },
+  {
+    "name": "Game Data 2026",
+    "description": "Demonstrate the use of game data for the 2026 season.",
+    "tags": [
+      "Driver Station"
+    ],
+    "foldername": "gamedata2026",
+    "gradlebase": "cpp"
   }
 ]
