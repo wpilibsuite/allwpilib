@@ -19,8 +19,8 @@ open module wpilib.core {
 
   exports org.wpilib.backend;
   exports org.wpilib.drive;
-  exports org.wpilib.driverstation.internal;
   exports org.wpilib.driverstation;
+  exports org.wpilib.driverstation.internal;
   exports org.wpilib.event;
   exports org.wpilib.framework;
   exports org.wpilib.hardware.accelerometer;
