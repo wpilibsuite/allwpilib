@@ -15,7 +15,7 @@ wpilib_cc_library(
         "src/main/native/cpp/*",
         "src/main/native/include/**/*.hpp",
     ]),
-    include_license_files = True,
+    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     linkopts = [
         "-lm",
@@ -43,7 +43,7 @@ wpilib_cc_library(
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_GUI",
     ],
-    include_license_files = True,
+    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     linkopts = [
         "-lm",

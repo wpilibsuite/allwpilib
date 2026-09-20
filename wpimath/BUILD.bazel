@@ -7,7 +7,7 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "pkg_files_headers")
+load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//wpimath:generate.bzl", "generate_wpimath")
@@ -117,15 +117,11 @@ filegroup(
     srcs = glob(["src/generated/main/java/**/*.java"]),
 )
 
-alias(
-    name = "eigen-headers",
-    actual = "@eigen",
+pkg_files(
+    name = "eigen-pkg",
+    srcs = ["@eigen//:all_files"],
+    strip_prefix = "",
     visibility = ["//visibility:public"],
-)
-
-pkg_files_headers(
-    name = "eigen-hdrs-pkg",
-    dep = "@eigen",
 )
 
 third_party_cc_lib_helper(
@@ -162,7 +158,10 @@ wpilib_cc_library(
         exclude = ["src/main/native/cpp/jni/**"],
     ),
     hdrs = glob(["src/main/native/include/**"]),
-    extra_hdr_pkg_files = [":protobuf_hdr_pkg"],
+    extra_hdr_pkg_files = [
+        ":protobuf_hdr_pkg",
+        ":eigen-pkg",
+    ],
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
     ],
@@ -176,7 +175,6 @@ wpilib_cc_library(
     ],
     strip_include_prefix = "src/main/native/include",
     third_party_header_only_libraries = [
-        ":eigen",
         ":gcem",
     ],
     third_party_libraries = [
@@ -188,6 +186,7 @@ wpilib_cc_library(
         "//telemetry",
         "//tunables",
         "//wpiutil",
+        "@eigen",
     ],
 )
 

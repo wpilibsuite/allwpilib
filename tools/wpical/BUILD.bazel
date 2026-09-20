@@ -161,7 +161,7 @@ wpilib_cc_library(
     copts = copts,
     cxxopts = cxxopts,
     defines = ["OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT"],
-    include_license_files = True,
+    include_third_party_notice = True,
     linkopts = linkopts,
     linkstatic = True,
     strip_include_prefix = "include",

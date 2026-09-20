@@ -13,7 +13,7 @@ cc_library(
 wpilib_cc_library(
     name = "wpigui",
     srcs = glob(["src/main/native/cpp/**/*.cpp"]),
-    include_license_files = True,
+    include_third_party_notice = True,
     strip_include_prefix = "include",
     tags = [
         "wpi-cpp-gui",

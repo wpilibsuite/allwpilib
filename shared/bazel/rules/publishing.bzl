@@ -137,6 +137,7 @@ def _wpilib_maven_export_impl(
         osx_artifacts,
         windows_artifacts,
         lib_name = None,
+        no_javadocs = False,
         visibility = None):
     """Implementation of wpilib_maven_export."""
     all_artifacts = {}
@@ -164,6 +165,7 @@ def _wpilib_maven_export_impl(
         maven_coordinates = maven_coordinates,
         classifier_artifacts = filtered_artifacts,
         lib_name = lib_name,
+        tags = (["no-javadocs"] if no_javadocs else []),
         visibility = visibility,
         # Exclude files in the root (unnamed) package, which should only be module-info files
         doc_excluded_packages = [""],
@@ -176,6 +178,7 @@ wpilib_maven_export = macro(
         "lib_name": attr.string(configurable = False),
         "linux_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
         "maven_coordinates": attr.string(mandatory = True, configurable = False),
+        "no_javadocs": attr.bool(default = False, configurable = False),
         "osx_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
         "windows_artifacts": attr.string_keyed_label_dict(default = {}, configurable = False),
     },

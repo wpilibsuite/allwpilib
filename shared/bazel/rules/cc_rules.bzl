@@ -248,7 +248,8 @@ def wpilib_cc_library(
         third_party_header_only_libraries = [],
         extra_src_pkg_files = [],
         extra_hdr_pkg_files = [],
-        include_license_files = False,
+        include_license_file = True,
+        include_third_party_notice = False,
         srcs_pkg_root = "src/main/native/cpp",
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,
@@ -276,10 +277,13 @@ def wpilib_cc_library(
                 extra, customized sources to be added to the published zip file
         extra_hdr_pkg_files: Extra pkg_files to add to the headers bundle. This is useful in the event that a library is complicated and requires
                 extra, customized headers to be added to the published zip file
-        include_license_files: If the header / source / library zip files should automatically includes the license files. This is used to maintain
-                consistency with the gradle publishing, as not all of them export the license files.
+        include_license_file: If the header / source / library zip files should automatically include the license files. This is used to maintain
+                consistency with the gradle publishing, as not all of them export the license file.
+        include_third_party_notice: If the header / source / library zip files should automatically include the third party notices file. This is
+                used to maintain consistency with the gradle publishing, as not all of them export it.
     """
-    maybe_license_pkg = ["//:license_pkg_files"] if include_license_files else []
+    maybe_license_pkg = ["//:license_pkg_file"] if include_license_file else []
+    maybe_third_party_notice_pkg = ["//:third_party_notice_pkg_file"] if include_third_party_notice else []
 
     cc_library(
         name = name + "-headers",
@@ -311,7 +315,7 @@ def wpilib_cc_library(
 
         pkg_zip(
             name = name + "-srcs-zip",
-            srcs = maybe_license_pkg + extra_src_pkg_files + [name + "-srcs-pkg"] + [lib + "-srcs-pkg" for lib in third_party_libraries],
+            srcs = maybe_license_pkg + maybe_third_party_notice_pkg + extra_src_pkg_files + [name + "-srcs-pkg"] + [lib + "-srcs-pkg" for lib in third_party_libraries],
             tags = ["manual"],
         )
 
@@ -325,7 +329,7 @@ def wpilib_cc_library(
 
         pkg_zip(
             name = name + "-hdrs-zip",
-            srcs = extra_hdr_pkg_files + maybe_license_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
+            srcs = extra_hdr_pkg_files + maybe_license_pkg + maybe_third_party_notice_pkg + [name + "-hdrs-pkg"] + [lib + "-hdrs-pkg" for lib in third_party_libraries + third_party_header_only_libraries],
             tags = ["manual"],
         )
 

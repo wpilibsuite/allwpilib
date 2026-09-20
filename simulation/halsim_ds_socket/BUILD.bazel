@@ -16,7 +16,7 @@ cc_library(
 wpilib_cc_library(
     name = "halsim_ds_socket",
     srcs = glob(["src/main/native/cpp/**"]),
-    include_license_files = True,
+    include_third_party_notice = True,
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -36,7 +36,7 @@ wpilib_cc_library(
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_DS_SOCKET",
     ],
-    include_license_files = True,
+    include_third_party_notice = True,
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],

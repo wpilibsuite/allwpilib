@@ -16,7 +16,7 @@ def _package_type(package_type):
         strip_prefix = "src/main/cpp",
     )
 
-    pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
+    pkgs = ["//:license_pkg_file", "//:third_party_notice_pkg_file", ":" + package_type + "-pkg"]
     if package_type == "examples":
         pkg_files(
             name = package_type + "-tests-pkg",

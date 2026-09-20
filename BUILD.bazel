@@ -70,9 +70,16 @@ alias(
 )
 
 pkg_files(
-    name = "license_pkg_files",
+    name = "license_pkg_file",
     srcs = [
         "LICENSE.md",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+pkg_files(
+    name = "third_party_notice_pkg_file",
+    srcs = [
         "ThirdPartyNotices.txt",
     ],
     visibility = ["//visibility:public"],
@@ -135,6 +142,7 @@ write_source_files(
 publish_all(
     name = "publish",
     targets = [
+        "//allwpilib-java:allwpilib-java_publish.publish",
         "//aosnt:aosnt-bridge_publish.publish",
         "//apriltag:apriltag-cpp_publish.publish",
         "//apriltag:apriltag-java_publish.publish",

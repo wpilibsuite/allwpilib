@@ -109,6 +109,8 @@ wpilib_cc_library(
         ":thirdparty-libuv-hdr-pkg",
     ],
     extra_src_pkg_files = [
+        ":thirdparty-ada-src-pkg",
+        ":thirdparty-libuv-src-pkg",
         ":wpinet-java-jni-hdrs-pkg",
     ],
     includes = ["src/main/native/include"],
