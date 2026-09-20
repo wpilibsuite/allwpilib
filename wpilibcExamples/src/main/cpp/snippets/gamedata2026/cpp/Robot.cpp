@@ -6,6 +6,10 @@
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
 
+/**
+ * Game Data from 2026 snippets for wpilib-docs.
+ * https://docs.wpilib.org/en/latest/docs/yearly-overview/2026-game-data.html
+ */
 class Robot : public wpi::TimedRobot {
  public:
   bool IsHubActive() {
