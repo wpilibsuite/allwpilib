@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.hardware.hal.simulation.DriverStationDataJNI;
 import org.wpilib.simulation.AlertSim;
 import org.wpilib.simulation.DriverStationSim;
@@ -24,6 +25,11 @@ import org.wpilib.simulation.SimHooks;
 import org.wpilib.util.Alert;
 
 class DriverStationTest {
+  @AfterEach
+  void tearDown() {
+    DriverStationBackend.clearUserProgramStarted();
+  }
+
   @ParameterizedTest
   @MethodSource("isConnectedProvider")
   void testIsConnected(int axisCount, int buttonCount, int povCount, boolean expected) {
@@ -62,6 +68,31 @@ class DriverStationTest {
         "0x1234",
         String.format(
             "0x%x", Long.parseLong(opmodeName.substring(1, opmodeName.length() - 1)) & 0xFFFF));
+  }
+
+  @Test
+  void getRobotModeAndChecksAreGatedUntilUserProgramStarts() {
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
+    DriverStationSim.notifyNewData();
+
+    assertEquals(RobotMode.UNKNOWN, RobotState.getRobotMode());
+    assertFalse(RobotState.isAutonomous());
+    assertFalse(RobotState.isAutonomousEnabled());
+    assertFalse(RobotState.isTeleop());
+    assertFalse(RobotState.isTeleopEnabled());
+    assertFalse(RobotState.isUtility());
+    assertFalse(RobotState.isUtilityEnabled());
+
+    DriverStationBackend.observeUserProgramStarting();
+
+    assertEquals(RobotMode.AUTONOMOUS, RobotState.getRobotMode());
+    assertTrue(RobotState.isAutonomous());
+    assertTrue(RobotState.isAutonomousEnabled());
+    assertFalse(RobotState.isTeleop());
+    assertFalse(RobotState.isTeleopEnabled());
+    assertFalse(RobotState.isUtility());
+    assertFalse(RobotState.isUtilityEnabled());
   }
 
   static Stream<Arguments> isConnectedProvider() {

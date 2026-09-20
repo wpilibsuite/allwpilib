@@ -2,6 +2,7 @@ import dataclasses
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
+from time import monotonic, sleep
 
 import pytest
 import wpilog
@@ -40,6 +41,37 @@ def test_datalog_writer_context_manager_stops_writer(tmp_path: Path):
         assert path.stat().st_size == 0
 
     assert path.stat().st_size == 54
+
+
+def test_background_overflow_reported_once_until_drain(tmp_path: Path, capfd):
+    path = tmp_path / "overflow.wpilog"
+    payload = b"\x5a" * (2 * 1024 * 1024 - 1) + b"\xa5"
+    log = wpilog.DataLogBackgroundWriter(str(tmp_path), path.name, 30.0)
+    try:
+        entry = log.start("raw", "raw", "", 1000)
+        for i in range(1, 3):
+            log.append_raw(entry, payload, i * 1000)
+            assert (
+                capfd.readouterr().err.count("outgoing buffers exceeded threshold") == 1
+            )
+            log.flush()
+
+            # Wait for output so the next append starts a new overflow episode.
+            deadline = monotonic() + 2.0
+            while not path.exists() or path.stat().st_size < i * len(payload):
+                assert monotonic() < deadline, "background writer did not drain"
+                sleep(0.01)
+    finally:
+        del log
+
+    reader = wpilog.DataLogReader(str(path))
+    assert reader.is_valid()
+    records = [
+        (record.get_timestamp(), record.get_raw())
+        for record in reader
+        if record.get_entry() == entry
+    ]
+    assert records == [(1000, payload), (2000, payload)]
 
 
 def test_simple_int(tmp_path: Path):

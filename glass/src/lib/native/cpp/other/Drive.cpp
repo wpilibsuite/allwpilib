@@ -18,7 +18,8 @@ using namespace wpi::glass;
 void wpi::glass::DisplayDrive(DriveModel* m) {
   // Check if the model exists.
   if (!m->Exists()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Drive");
     ImGui::PopStyleColor();
     return;
@@ -116,7 +117,8 @@ void wpi::glass::DisplayDrive(DriveModel* m) {
   // Set the buttons and sliders to read-only if the model is read-only.
   if (m->IsReadOnly()) {
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(210, 210, 210, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_Text));
   }
 
   // Add sliders for the wheel percentages.

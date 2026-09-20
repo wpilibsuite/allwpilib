@@ -91,32 +91,6 @@
     }
   },
   {
-    "name": "Talon",
-    "Manufacturer": "Cross the Road Electronics (CTRE)",
-    "DisplayName": "Talon",
-    "ResourceName": "Talon",
-    "pulse_width_ms": {
-      "max": 2.037,
-      "deadbandMax": 1.539,
-      "center": 1.513,
-      "deadbandMin": 1.487,
-      "min": 0.989
-    }
-  },
-  {
-    "name": "VictorSP",
-    "Manufacturer": "Vex Robotics",
-    "DisplayName": "Victor SP",
-    "ResourceName": "VictorSP",
-    "pulse_width_ms": {
-      "max": 2.004,
-      "deadbandMax": 1.520,
-      "center": 1.500,
-      "deadbandMin": 1.480,
-      "min": 0.997
-    }
-  },
-  {
     "name": "Koors40",
     "Manufacturer": "AndyMark",
     "DisplayName": "Koors40",

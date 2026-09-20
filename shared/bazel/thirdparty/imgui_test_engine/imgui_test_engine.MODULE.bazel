@@ -1,0 +1,11 @@
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "imgui_test_engine",
+    build_file = "//shared/bazel/thirdparty/imgui_test_engine:imgui_test_engine.BUILD.bazel",
+    sha256 = "c108405522b26e3a178e27e3a70cd1803523fdde452eeef34cc0b80b98059d3b",
+    strip_prefix = "imgui_test_engine-fdc1cb0930fa9bc2bef1d884bf2c10b570d29170",
+    urls = [
+        "https://github.com/ocornut/imgui_test_engine/archive/fdc1cb0930fa9bc2bef1d884bf2c10b570d29170.tar.gz",
+    ],
+)

@@ -88,7 +88,10 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
           }
         }
       }
-      ++result->count;
+      {
+        std::scoped_lock lock(result->mtx);
+        ++result->count;
+      }
       result->cv.notify_all();
     }).detach();
   }

@@ -13,7 +13,8 @@
 using namespace wpi::glass;
 
 static void LabelSimDevice(const char* name, const char* simDeviceName) {
-  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+  ImGui::PushStyleColor(ImGuiCol_Text,
+                        ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
   ImGui::LabelText(name, "%s", simDeviceName);
   ImGui::PopStyleColor();
 }
@@ -43,7 +44,8 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
     if (auto simDevice = encoder->GetSimDevice()) {
       LabelSimDevice(label, simDevice);
     } else {
-      ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+      ImGui::PushStyleColor(ImGuiCol_Text,
+                            ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
       ImGui::LabelText(label, "Encoder[%d,%d]", encoder->GetChannelA(),
                        encoder->GetChannelB());
       ImGui::PopStyleColor();
@@ -66,7 +68,8 @@ void DisplayDIOImpl(DIOModel* model, int index, bool outputsEnabled) {
       LabelSimDevice(label, simDevice);
     } else {
       if (!exists) {
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+        ImGui::PushStyleColor(ImGuiCol_Text,
+                              ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
         dioData->LabelText(label, "unknown");
         ImGui::PopStyleColor();
       } else if (model->IsReadOnly()) {

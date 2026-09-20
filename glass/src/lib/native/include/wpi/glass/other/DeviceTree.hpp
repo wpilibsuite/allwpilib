@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -58,6 +59,14 @@ class DeviceTreeModel : public Model {
 void HideDevice(const char* id);
 
 /**
+ * Returns true if a device is hidden on the tree.
+ *
+ * @param id device name
+ * @return True if hidden
+ */
+bool IsDeviceHidden(std::string_view id);
+
+/**
  * Wraps CollapsingHeader() to provide both hiding functionality and open
  * persistence.  As with the ImGui function, returns true if the tree node
  * is visible and expanded.  If returns true, call EndDevice() to finish
@@ -68,6 +77,20 @@ void HideDevice(const char* id);
  * @return True if expanded
  */
 bool BeginDevice(const char* id, ImGuiTreeNodeFlags flags = 0);
+
+/**
+ * Wraps CollapsingHeader() to provide both hiding functionality and open
+ * persistence while using a different visible label from the storage ID. As
+ * with the ImGui function, returns true if the tree node is visible and
+ * expanded. If returns true, call EndDevice() to finish the block.
+ *
+ * @param id storage and hide device name
+ * @param label visible label
+ * @param flags ImGuiTreeNodeFlags flags
+ * @return True if expanded
+ */
+bool BeginDevice(std::string_view id, std::string_view label,
+                 ImGuiTreeNodeFlags flags = 0);
 
 /**
  * Finish a device block started with BeginDevice().

@@ -36,6 +36,8 @@ OpenCV needs to be findable by CMake. On systems like the Jetson, this is instal
 
 To build GUI apps (`WPILIB_WITH_GUI`), SDL3 needs to be findable by CMake.
 
+To build ImGui GUI tests (`WPILIB_WITH_IMGUI_TESTS`), CMake needs internet access to download `imgui_test_engine`.
+
 To build wpical (`WPILIB_WITH_WPICAL`), libsuitesparse-dev and libceres-dev are required.
 
 ## Build Options
@@ -50,6 +52,10 @@ The following build options are available:
   * This option will build C++ examples.
 * `WPILIB_WITH_GUI` (OFF Default)
   * This option will build GUI items. If this is off, and `WPILIB_WITH_SIMULATION_MODULES` is on, the simulation GUI will not be built. If this is off, the SDL3 build requirement is removed.
+* `WPILIB_WITH_IMGUI_TESTS` (OFF Default)
+  * This option will build imgui_test_engine-based GUI tests. It requires `WPILIB_WITH_GUI` and `WPILIB_WITH_TESTS`. When enabled, CMake downloads imgui_test_engine during configure. The tests run headless by default.
+* `WPILIB_IMGUI_TESTS_HEADLESS` (ON Default when `WPILIB_WITH_IMGUI_TESTS` is enabled)
+  * This option will run ImGui GUI tests with SDL's dummy video backend and software renderer so no GUI windows are shown. Set this to `OFF` to show windows while debugging GUI tests locally.
 * `WPILIB_WITH_NTCORE` (ON Default)
   * This option will cause ntcore to be built. Turning this off will implicitly disable wpinet, and will cause an error if `WPILIB_WITH_WPILIB` is enabled.
 * `WPILIB_WITH_SIMULATION_MODULES` (ON Default)

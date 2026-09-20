@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Tyler Veness <calcmogul@gmail.com>
 Date: Thu, 16 Jul 2026 21:49:36 -0700
-Subject: [PATCH 6/6] Suppress unused-but-set warning
+Subject: [PATCH 6/7] Suppress unused-but-set warning
 
 ---
  mrcal.cpp | 2 +-

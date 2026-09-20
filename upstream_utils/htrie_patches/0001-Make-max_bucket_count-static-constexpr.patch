@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Tyler Veness <calcmogul@gmail.com>
+Date: Sun, 6 Sep 2026 09:22:49 -0700
+Subject: [PATCH] Make max_bucket_count() static constexpr
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This fixes a warning from GCC 16 about calling a member function in the
+constructor.
+```
+In file included from /work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/array-hash/array_hash.hpp:42,
+                 from /work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/array-hash/array_map.hpp:35,
+                 from /work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/htrie_hash.hpp:42,
+                 from /work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/htrie_map.hpp:33,
+                 from /work/tunables/src/main/native/cpp/TunableRegistry.cpp:29:
+/work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/array-hash/array_growth_policy.hpp: In constructor ‘wpi::util::ah::power_of_two_growth_policy<GrowthFactor>::power_of_two_growth_policy(std::size_t&) [with long unsigned int GrowthFactor = 4]’:
+/work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/array-hash/array_growth_policy.hpp:60:51: error: ‘<unknown>’ may be used uninitialized [-Werror=maybe-uninitialized]
+   60 |     if (min_bucket_count_in_out > max_bucket_count()) {
+      |                                   ~~~~~~~~~~~~~~~~^~
+/work/wpiutil/src/main/native/thirdparty/htrie/include/wpi/util/array-hash/array_growth_policy.hpp:95:15: note: by argument 1 of type ‘const wpi::util::ah::power_of_two_growth_policy<4>*’ to ‘std::size_t wpi::util::ah::power_of_two_growth_policy<GrowthFactor>::max_bucket_count() const [with long unsigned int GrowthFactor = 4]’ declared here
+   95 |   std::size_t max_bucket_count() const {
+      |               ^~~~~~~~~~~~~~~~
+```
+---
+ include/tsl/array-hash/array_growth_policy.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/include/tsl/array-hash/array_growth_policy.h b/include/tsl/array-hash/array_growth_policy.h
+index ef310b98cc9a352c5797e9ddd721fbeef2ae1650..54556f016ca1d71c93a843e20529867e1002b196 100644
+--- a/include/tsl/array-hash/array_growth_policy.h
++++ b/include/tsl/array-hash/array_growth_policy.h
+@@ -92,7 +92,7 @@ class power_of_two_growth_policy {
+   /**
+    * Return the maximum number of buckets supported by the policy.
+    */
+-  std::size_t max_bucket_count() const {
++  static constexpr std::size_t max_bucket_count() {
+     // Largest power of two.
+     return (std::numeric_limits<std::size_t>::max() / 2) + 1;
+   }
+@@ -175,14 +175,14 @@ class mod_growth_policy {
+     }
+   }
+ 
+-  std::size_t max_bucket_count() const { return MAX_BUCKET_COUNT; }
++  static constexpr std::size_t max_bucket_count() { return MAX_BUCKET_COUNT; }
+ 
+   void clear() noexcept { m_mod = 1; }
+ 
+  private:
+   static constexpr double REHASH_SIZE_MULTIPLICATION_FACTOR =
+       1.0 * GrowthFactor::num / GrowthFactor::den;
+-  static const std::size_t MAX_BUCKET_COUNT =
++  static constexpr std::size_t MAX_BUCKET_COUNT =
+       std::size_t(double(std::numeric_limits<std::size_t>::max() /
+                          REHASH_SIZE_MULTIPLICATION_FACTOR));
+ 
+@@ -345,7 +345,9 @@ class prime_growth_policy {
+     return detail::PRIMES[m_iprime + 1];
+   }
+ 
+-  std::size_t max_bucket_count() const { return detail::PRIMES.back(); }
++  static constexpr std::size_t max_bucket_count() {
++    return detail::PRIMES.back();
++  }
+ 
+   void clear() noexcept { m_iprime = 0; }
+ 

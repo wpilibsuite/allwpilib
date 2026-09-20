@@ -10,6 +10,7 @@ namespace wpi::util {
 namespace detail {
 
 PromiseFactoryBase::~PromiseFactoryBase() {
+  std::scoped_lock lock(m_resultMutex);
   m_active = false;
   m_resultCv.notify_all();  // wake up any waiters
 }

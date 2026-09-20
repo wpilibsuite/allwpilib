@@ -18,6 +18,7 @@ dependencies {
     implementation project(':hal')
     implementation project(':telemetry')
     implementation project(':tunables')
+    api project(':ntcore')
     api project(':wpilibj')
     api project(':wpimath')
     api project(':wpiunits')

@@ -147,7 +147,7 @@ void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length) {
   static jmethodID constructor =
       env->GetMethodID(canStreamOverflowExCls, "<init>",
-                       "([Lorg/wpilib/hardware/hal/CANStreamMessage;I)V");
+                       "([Lorg/wpilib/hardware/hal/can/CANStreamMessage;I)V");
   jobject exception =
       env->NewObject(canStreamOverflowExCls, constructor, messages, length);
   env->Throw(static_cast<jthrowable>(exception));

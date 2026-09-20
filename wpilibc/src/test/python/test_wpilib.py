@@ -7,6 +7,51 @@ import wpilib
 import wpilib.simulation
 
 
+@pytest.fixture
+def mock_tunable_backend():
+    tunables.TunableRegistry.reset()
+    backend = tunables.MockTunableBackend()
+    tunables.TunableRegistry.register_backend("", backend)
+    try:
+        yield backend
+    finally:
+        tunables.TunableRegistry.reset()
+
+
+def _register_networktables_telemetry_backend(nt) -> None:
+    telemetry.TelemetryRegistry.register_backend(
+        "", wpilib.NetworkTablesTelemetryBackend(nt, "/Telemetry")
+    )
+
+
+def _register_networktables_tunable_backend(nt) -> None:
+    tunables.TunableRegistry.register_backend(
+        "", wpilib.NetworkTablesTunableBackend(nt, "/Tunables")
+    )
+
+
+def test_networktables_backend_registry_publication_uses_native_implementation(nt):
+    class Backend(wpilib.NetworkTablesTunableBackend):
+        def publish(self, *args):
+            return False
+
+    tunables.TunableRegistry.reset()
+    backend = Backend(nt, "/Tunables")
+    subscriber = nt.get_topic("/Tunables/value").generic_subscribe("int")
+    try:
+        tunables.TunableRegistry.register_backend("", backend)
+        value = tunables.Tunable(1)
+
+        assert tunables.publish("value", value) is True
+        assert subscriber.get_integer(0) == 1
+
+        value.set(2)
+        tunables.TunableRegistry.update()
+        assert subscriber.get_integer(0) == 2
+    finally:
+        tunables.TunableRegistry.reset()
+
+
 class DashboardSelectable:
     def __init__(self, nt, path: str) -> None:
         self._default = nt.get_topic(f"{path}/default").generic_subscribe("string")
@@ -83,9 +128,38 @@ def test_telemetry_tunable_flat_namespace():
         assert not hasattr(wpilib, name)
 
 
+def test_field2d_python_publish_override_receives_native_table(
+    mock_tunable_backend,
+):
+    received: list[tunables.TunableTable] = []
+
+    class CustomField(wpilib.Field2d):
+        def publish_tunable(self, table: tunables.TunableTable) -> None:
+            received.append(table)
+            table.add_int("custom", 3)
+
+    tunables.publish("field", CustomField())
+
+    assert len(received) == 1
+    assert type(received[0]) is tunables.TunableTable
+    assert mock_tunable_backend.get_value("/field/custom") == 3
+
+
+def test_field2d_python_subclass_uses_native_tunable_fallback(
+    mock_tunable_backend,
+):
+    class DerivedField2d(wpilib.Field2d):
+        pass
+
+    field = DerivedField2d()
+
+    assert tunables.publish("derivedField", field) is True
+    assert mock_tunable_backend.get_value("/derivedField/Robot") == bytes(24)
+
+
 def test_register_networktables_telemetry_backend(nt):
     telemetry.TelemetryRegistry.reset()
-    telemetry.TelemetryRegistry.register_networktables_backend()
+    _register_networktables_telemetry_backend(nt)
 
     telemetry.log("helperTelemetry", 2.5)
 
@@ -96,7 +170,7 @@ def test_register_networktables_telemetry_backend(nt):
 
 def test_register_networktables_tunable_backend(nt):
     tunables.TunableRegistry.reset()
-    tunables.TunableRegistry.register_networktables_backend()
+    _register_networktables_tunable_backend(nt)
 
     value = tunables.Tunable(1.0)
     tunables.publish("helperTunable", value)

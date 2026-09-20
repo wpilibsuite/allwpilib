@@ -19,12 +19,9 @@ import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
 
 /**
  * Detects integer division operations in Java source code and marks them as errors.
@@ -39,6 +36,8 @@ import javax.tools.Diagnostic;
 public class IntegerDivisionDetector implements TaskListener {
   private final JavacTask m_task;
   private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
+
+  public static final String SUPPRESSION_KEY = "WPILib.IntegerDivision";
 
   public IntegerDivisionDetector(JavacTask task) {
     m_task = task;
@@ -55,13 +54,9 @@ public class IntegerDivisionDetector implements TaskListener {
     }
   }
 
-  private final class Scanner extends TreeScanner<Void, Void> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<Void, Void> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, IntegerDivisionDetector.this.m_task);
     }
 
     @Override
@@ -77,12 +72,10 @@ public class IntegerDivisionDetector implements TaskListener {
 
       // It's integer division. Now check the context.
       if (isFloatContext(m_trees.getPath(m_root, node))) {
-        if (Suppressions.hasSuppression(
-            m_trees, m_trees.getPath(m_root, node), "IntegerDivision")) {
+        if (Suppressions.hasSuppression(m_trees, m_trees.getPath(m_root, node), SUPPRESSION_KEY)) {
           return super.visitBinary(node, unused);
         }
-        m_trees.printMessage(
-            Diagnostic.Kind.ERROR, "integer division in a floating-point context", node, m_root);
+        printError("Integer division in a floating-point context.", node, SUPPRESSION_KEY);
       }
 
       return super.visitBinary(node, unused);

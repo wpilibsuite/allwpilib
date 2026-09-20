@@ -391,7 +391,7 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "llvm"
     url = "https://github.com/llvm/llvm-project"
-    tag = "llvmorg-22.1.6"
+    tag = "llvmorg-23.1.1"
 
     patch_options = {
         "use_threeway": True,

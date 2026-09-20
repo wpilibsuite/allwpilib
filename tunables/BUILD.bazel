@@ -41,7 +41,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
-        "exclusive",
         "no-asan",
         "no-tsan",
     ],
@@ -83,7 +82,6 @@ package_default_cc_project(
 wpilib_java_junit5_test(
     name = "tunables-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
-    tags = ["exclusive"],
     deps = [
         ":tunables-java",
         "//wpiutil:wpiutil-java",
@@ -109,7 +107,7 @@ PYBIND_PKGCFG_DEPS = [
 
 generate_robotpy_pybind_build_info(
     name = "robotpy-tunables-generator",
-    additional_srcs = [":robotpy-native-tunables.copy_headers"],
+    additional_srcs = [":robotpy-native-tunables.copy_headers"] + glob(["src/main/python/tunables/src/rpy/*.h"]),
     package_root_file = "src/main/python/tunables/__init__.py",
     pkgcfgs = PYBIND_PKGCFG_DEPS,
     yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
@@ -118,6 +116,7 @@ generate_robotpy_pybind_build_info(
 tunables_extension(
     srcs = glob(["src/main/python/tunables/src/**/*.cpp"]),
     extra_hdrs = glob(["src/main/python/tunables/src/**/*.h"]),
+    header_to_dat_deps = glob(["src/main/python/tunables/src/**"]),
     includes = [
         "src/main/python/tunables",
         "src/main/python/tunables/src",
@@ -126,13 +125,13 @@ tunables_extension(
 
 define_pybind_library(
     name = "robotpy-tunables",
+    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
 )
 
 robotpy_py_test(
     "python_tests",
     srcs = glob(["src/test/python/**/*.py"]),
-    tags = ["exclusive"],
     deps = [
         ":robotpy-tunables",
         "//wpiutil:robotpy-wpiutil",

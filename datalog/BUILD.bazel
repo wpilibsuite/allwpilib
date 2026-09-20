@@ -142,7 +142,6 @@ cc_test(
     size = "small",
     srcs = glob(["src/test/native/**/*.cpp"]),
     tags = [
-        "exclusive",
         "no-asan",
         "no-tsan",
     ],
@@ -156,7 +155,6 @@ cc_test(
 wpilib_java_junit5_test(
     name = "datalog-java-test",
     srcs = glob(["src/test/java/**/*.java"]),
-    tags = ["exclusive"],
     deps = [
         ":datalog-java",
         "//wpiutil:wpiutil-java",

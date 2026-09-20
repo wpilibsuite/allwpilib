@@ -215,6 +215,7 @@ package_default_cc_project(
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpilib-generator",
     generated_include_target = "//wpilibc:generated-native-include-files",
+    include_third_party_notices = True,
     pyproject_toml = "src/main/python/native-pyproject.toml",
 )
 
@@ -286,10 +287,12 @@ define_pybind_library(
 
 robotpy_py_test(
     "python_tests",
+    size = "medium",
     srcs = glob(["src/test/python/**/*.py"]),
-    tags = ["exclusive"],
+    tags = ["exclusive-if-local"],
     deps = [
         ":robotpy-wpilib",
         requirement("pytest"),
+        requirement("pytest-order"),
     ],
 )

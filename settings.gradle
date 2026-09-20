@@ -20,6 +20,7 @@ plugins {
 Properties props = System.getProperties();
 props.setProperty("org.gradle.internal.native.headers.unresolved.dependencies.ignore", "true");
 
+include 'allwpilib-java'
 include 'wpiutil'
 include 'wpinet'
 include 'ntcore'
@@ -57,7 +58,6 @@ include 'docs'
 include 'msvcruntime'
 include 'ntcoreffi'
 include 'apriltag'
-include 'tools:processstarter'
 include 'epilogue-processor'
 include 'epilogue-runtime'
 include 'thirdparty:catch2'
