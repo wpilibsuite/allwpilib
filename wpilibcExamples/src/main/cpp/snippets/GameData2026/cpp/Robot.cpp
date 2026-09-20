@@ -4,6 +4,7 @@
 
 #include "wpi/driverstation/MatchState.hpp"
 #include "wpi/driverstation/RobotState.hpp"
+#include "wpi/framework/TimedRobot.hpp"
 #include "wpi/telemetry/Telemetry.hpp"
 
 /**
@@ -60,7 +61,7 @@ class Robot : public wpi::TimedRobot {
     }
   }
 
-  void TeleopPeriodic() {
+  void TeleopPeriodic() override {
     auto gameData = wpi::MatchState::GetGameData();
     auto alliance = wpi::MatchState::GetAlliance();
     wpi::telemetry::Log("Hub active", IsHubActive());
@@ -76,9 +77,9 @@ class Robot : public wpi::TimedRobot {
   /** Example of Handling the game data received from the driver station for
    * 2026 game. */
   void HandleGameData() {
-    auto gameData = wpi::DriverStation::GetGameData();
-    if (gameData.length() > 0) {
-      switch (gameData[0]) {
+    auto gameData = wpi::MatchState::GetGameData();
+    if (gameData.has_value() && gameData->length() > 0) {
+      switch (gameData->at(0)) {
         case 'B':
           // Blue case code
           break;
@@ -93,7 +94,8 @@ class Robot : public wpi::TimedRobot {
       // Code for no data received yet
     }
   }
-}
+};
+
 #ifndef RUNNING_WPILIB_TESTS
 int main() {
   return wpi::StartRobot<Robot>();
