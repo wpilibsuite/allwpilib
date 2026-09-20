@@ -336,7 +336,7 @@
       "Gamepad"
     ],
     "foldername": "DifferentialDrive",
-    "gradlebase": "java",
+    "gradlebase": "cpp",
     "robotclass": "Robot"
   },
   {
@@ -345,7 +345,7 @@
     "tags": [
       "Driver Station"
     ],
-    "foldername": "gamedata2026",
+    "foldername": "GameData2026",
     "gradlebase": "cpp"
   }
 ]
