@@ -68,7 +68,7 @@ std::filesystem::path NormalizeProjectRoot(const std::filesystem::path& raw);
  * to the picked WPILib robot project root. The root is normalized via
  * @ref NormalizeProjectRoot first.
  *
- *   Java:   <root>/src/main/java/frc/robot/filters/<ClassName>.java
+ *   Java:   <root>/src/main/java/first/robot/filters/<ClassName>.java
  *   C++:    <root>/src/main/include/filters/<ClassName>.h
  *   Python: <root>/filters/<snake_case>.py
  */
