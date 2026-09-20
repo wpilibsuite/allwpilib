@@ -35,128 +35,128 @@ jobs:
         id: llvm
         run: |
           cd upstream_utils
-          ./llvm.py clone
+          ./llvm.py clone --shallow
           ./llvm.py copy-src
           ./llvm.py format-patch
         background: true # LLVM takes the longest amount of time, so let's run this in parallel with everything else.
       - name: Run ada.py
         run: |
           cd upstream_utils
-          ./ada.py clone
+          ./ada.py clone --shallow
           ./ada.py copy-src
           ./ada.py format-patch
       - name: Run apriltag.py
         run: |
           cd upstream_utils
-          ./apriltag.py clone
+          ./apriltag.py clone --shallow
           ./apriltag.py copy-src
           ./apriltag.py format-patch
       - name: Run argparse_lib.py
         run: |
           cd upstream_utils
-          ./argparse_lib.py clone
+          ./argparse_lib.py clone --shallow
           ./argparse_lib.py copy-src
           ./argparse_lib.py format-patch
       - name: Run benchmark.py
         run: |
           cd upstream_utils
-          ./benchmark.py clone
+          ./benchmark.py clone --shallow
           ./benchmark.py copy-src
           ./benchmark.py format-patch
       - name: Run double-conversion.py
         run: |
           cd upstream_utils
-          ./double-conversion.py clone
+          ./double-conversion.py clone --shallow
           ./double-conversion.py copy-src
           ./double-conversion.py format-patch
       - name: Run eigen.py
         run: |
           cd upstream_utils
-          ./eigen.py clone
+          ./eigen.py clone --shallow
           ./eigen.py copy-src
           ./eigen.py format-patch
       - name: Run gcem.py
         run: |
           cd upstream_utils
-          ./gcem.py clone
+          ./gcem.py clone --shallow
           ./gcem.py copy-src
           ./gcem.py format-patch
       - name: Run htrie.py
         run: |
           cd upstream_utils
-          ./htrie.py clone
+          ./htrie.py clone --shallow
           ./htrie.py copy-src
           ./htrie.py format-patch
       - name: Run imgui.py
         run: |
           cd upstream_utils
-          ./imgui.py clone
+          ./imgui.py clone --shallow
           ./imgui.py copy-src
           ./imgui.py format-patch
       - name: Run implot.py
         run: |
           cd upstream_utils
-          ./implot.py clone
+          ./implot.py clone --shallow
           ./implot.py copy-src
           ./implot.py format-patch
       - name: Run json.py
         run: |
           cd upstream_utils
-          ./json.py clone
+          ./json.py clone --shallow
           ./json.py copy-src
           ./json.py format-patch
       - name: Run libdogleg.py
         run: |
           cd upstream_utils
-          ./libdogleg.py clone
+          ./libdogleg.py clone --shallow
           ./libdogleg.py copy-src
           ./libdogleg.py format-patch
       - name: Run libuv.py
         run: |
           cd upstream_utils
-          ./libuv.py clone
+          ./libuv.py clone --shallow
           ./libuv.py copy-src
           ./libuv.py format-patch
       - name: Run llhttp.py
         run: |
           cd upstream_utils
-          ./llhttp.py clone
+          ./llhttp.py clone --shallow
           ./llhttp.py copy-src
           ./llhttp.py format-patch
       - name: Run mpack.py
         run: |
           cd upstream_utils
-          ./mpack.py clone
+          ./mpack.py clone --shallow
           ./mpack.py copy-src
           ./mpack.py format-patch
       - name: Run mrcal.py
         run: |
           cd upstream_utils
-          ./mrcal.py clone
+          ./mrcal.py clone --shallow
           ./mrcal.py copy-src
           ./mrcal.py format-patch
       - name: Run mrcal_java.py
         run: |
           cd upstream_utils
-          ./mrcal_java.py clone
+          ./mrcal_java.py clone --shallow
           ./mrcal_java.py copy-src
           ./mrcal_java.py format-patch
       - name: Run sleipnir.py
         run: |
           cd upstream_utils
-          ./sleipnir.py clone
+          ./sleipnir.py clone --shallow
           ./sleipnir.py copy-src
           ./sleipnir.py format-patch
       - name: Run stb.py
         run: |
           cd upstream_utils
-          ./stb.py clone
+          ./stb.py clone --shallow
           ./stb.py copy-src
           ./stb.py format-patch
       - name: Run upb.py
         run: |
           cd upstream_utils
-          ./upb.py clone
+          ./upb.py clone --shallow
           ./upb.py copy-src
           ./upb.py format-patch
       - name: Wait for LLVM
