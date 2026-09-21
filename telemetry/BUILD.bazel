@@ -1,10 +1,7 @@
-load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
-load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//telemetry:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//telemetry:robotpy_pybind_build_info.bzl", "define_pybind_library", "telemetry_extension")
 
@@ -62,30 +59,6 @@ wpilib_java_library(
     ],
 )
 
-cc_test(
-    name = "telemetry-cpp-test",
-    size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
-    tags = [
-        "no-asan",
-        "no-tsan",
-    ],
-    deps = [
-        ":telemetry",
-        "//thirdparty/catch2",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "telemetry-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    deps = [
-        ":telemetry-java",
-        "//wpiutil:wpiutil-java",
-        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
-    ],
-)
-
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-telemetry-generator",
     pyproject_toml = "src/main/python/native-pyproject.toml",
@@ -124,14 +97,4 @@ define_pybind_library(
     name = "robotpy-telemetry",
     extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
     pkgcfgs = PYBIND_PKGCFG_DEPS,
-)
-
-robotpy_py_test(
-    "python_tests",
-    srcs = glob(["src/test/python/**/*.py"]),
-    deps = [
-        ":robotpy-telemetry",
-        "//wpiutil:robotpy-wpiutil",
-        requirement("pytest"),
-    ],
 )

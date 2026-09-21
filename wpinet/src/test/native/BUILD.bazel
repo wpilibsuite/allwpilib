@@ -27,7 +27,7 @@ cc_test(
         ":main",
         "//thirdparty/catch2",
         "//wpinet",
-        "//wpiutil:wpiutil-testlib",
+        "//wpiutil/src/test/native:wpiutil-testlib",
     ],
 )
 

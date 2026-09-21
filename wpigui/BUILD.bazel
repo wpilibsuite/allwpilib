@@ -61,20 +61,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "wpigui_test_runner",
-    testonly = True,
-    srcs = ["src/test/native/cpp/GuiTestEngineRunner.cpp"],
-    hdrs = ["src/test/native/include/wpi/gui/test/GuiTestEngineRunner.hpp"],
-    strip_include_prefix = "src/test/native/include",
-    target_compatible_with = imgui_test_target_compatible_with(),
-    visibility = ["//visibility:public"],
-    deps = [
-        ":wpigui_for_tests",
-        "//shared/bazel/thirdparty/imgui_test_engine",
-    ],
-)
-
 package_static_cc_project(
     name = "wpigui",
     architectures = host_architectures,

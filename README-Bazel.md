@@ -20,7 +20,7 @@ Consequences worth knowing about:
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
 Other examples:
 - `bazel build //wpimath/...` - Builds every target in the wpimath folder
-- `bazel test //wpiutil:wpiutil-cpp-test` - Runs only the cpp test target in the wpiutil folder
+- `bazel test //wpiutil/src/test/native:tests` - Runs only the cpp test target in the wpiutil folder
 - `bazel coverage //wpiutil/...` - (*Nix only) - Runs a code coverage report for both C++ and Java on all the targets under wpiutil
 
 ## Optional ImGui GUI tests

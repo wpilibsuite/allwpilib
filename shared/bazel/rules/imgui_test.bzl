@@ -111,7 +111,7 @@ def wpilib_imgui_cc_test(
         testonly = True,
         srcs = srcs,
         defines = defines + ["RUNNING_IMGUI_TESTS"],
-        deps = deps + ["//wpigui:wpigui_test_runner"],
+        deps = deps + ["//wpigui/src/test/native:wpigui_test_runner"],
         tags = test_tags + ["manual"],
         target_compatible_with = imgui_test_target_compatible_with(),
         **kwargs

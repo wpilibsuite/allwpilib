@@ -1,0 +1,10 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["org/wpilib/vision/apriltag/DevMain.java"],
+    main_class = "org.wpilib.vision.apriltag.DevMain",
+    deps = [
+        "//apriltag:apriltag-java",
+    ],
+)

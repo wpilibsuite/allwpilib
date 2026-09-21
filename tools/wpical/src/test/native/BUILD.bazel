@@ -1,0 +1,48 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+load("//tools/wpical:copts.bzl", "COPTS", "CXXOPTS")
+
+cc_test(
+    name = "tests",
+    size = "medium",
+    srcs = glob(
+        ["**"],
+        exclude = [
+            "imgui/**",
+            "BUILD.bazel",
+        ],
+    ),
+    copts = COPTS,
+    cxxopts = CXXOPTS,
+    data = ["//tools/wpical:test-assets"],
+    defines = [
+        'PROJECT_ROOT_PATH=\\"tools/wpical/src/main/native/assets\\"',
+        "__BAZEL__=1",
+    ],
+    deps = [
+        "//shared/bazel/thirdparty/ceres",
+        "//thirdparty/catch2",
+        "//tools/wpical:wpical_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
+
+wpilib_imgui_cc_test(
+    name = "wpical-imgui-test",
+    size = "small",
+    srcs = [
+        "//tools/wpical:wpical-main-cpp",
+    ] + glob(["imgui/**"]),
+    copts = COPTS,
+    cxxopts = CXXOPTS,
+    defines = [
+        "OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT",
+        "__BAZEL__=1",
+    ],
+    deps = [
+        "//glass:glass_for_tests",
+        "//shared/bazel/thirdparty/ceres",
+        "//tools/wpical:wpical_lib_for_tests",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)

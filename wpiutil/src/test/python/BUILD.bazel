@@ -1,0 +1,40 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_python//python:defs.bzl", "py_library")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "create_pybind_library")
+
+create_pybind_library(
+    name = "module",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    extension_name = "module",
+    extra_srcs = glob(["cpp/wpiutil_test/*.cpp"]),
+    install_path = "cpp/wpiutil_test/",
+    deps = [
+        "//wpiutil:wpiutil_pybind_library",
+    ],
+)
+
+py_library(
+    name = "wpiutil_test",
+    srcs = glob(["cpp/wpiutil_test/*.py"]),
+    data = [
+        ":cpp/wpiutil_test/module",
+    ],
+    imports = ["cpp"],
+    visibility = ["//visibility:public"],
+)
+
+robotpy_py_test(
+    "python",
+    srcs = glob(
+        ["**/*.py"],
+        exclude = ["cpp/**"],
+    ),
+    deps = [
+        ":wpiutil_test",
+        "//wpiutil:robotpy-wpiutil",
+        requirement("pytest"),
+    ],
+)

@@ -1,8 +1,5 @@
 load("@bzlmodrio-opencv//libraries/cpp/opencv:libraries.bzl", "opencv_shared_libraries")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:objectivec_rules.bzl", "wpilib_objc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project", "package_shared_cc_project")
@@ -217,43 +214,6 @@ wpilib_jni_java_library(
     deps = [
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
-    ],
-)
-
-cc_test(
-    name = "cscore-cpp-test",
-    size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
-    deps = [
-        ":cscore",
-        "//thirdparty/catch2",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "cscore-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    deps = [
-        ":cscore-java",
-        "//wpiutil:wpiutil-java",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":cscore",
-    ],
-)
-
-java_binary(
-    name = "DevMain-Java",
-    srcs = ["src/dev/java/org/wpilib/vision/camera/DevMain.java"],
-    main_class = "org.wpilib.vision.camera.DevMain",
-    deps = [
-        ":cscore-java",
-        "//wpiutil:wpiutil-java",
     ],
 )
 

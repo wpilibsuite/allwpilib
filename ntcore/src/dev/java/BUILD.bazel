@@ -1,0 +1,11 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["org/wpilib/networktables/DevMain.java"],
+    main_class = "org.wpilib.networktables.DevMain",
+    deps = [
+        "//ntcore:ntcore-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

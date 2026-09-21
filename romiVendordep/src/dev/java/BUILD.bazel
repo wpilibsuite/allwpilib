@@ -1,0 +1,15 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "DevMain-Java",
+    srcs = ["org/wpilib/romi/DevMain.java"],
+    main_class = "org.wpilib.romi.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpilibj:wpilibj-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

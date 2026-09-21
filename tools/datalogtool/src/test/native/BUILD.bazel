@@ -1,0 +1,31 @@
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+wpilib_imgui_cc_test(
+    name = "datalogtool-imgui-test",
+    size = "small",
+    srcs = [
+        "//tools/datalogtool:generate-resources",
+        "//tools/datalogtool:generate-version",
+        "//tools/datalogtool:main-native-srcs",
+    ] + glob(["imgui/**"]),
+    defines = ["LIBSSH_STATIC"],
+    linkopts = select({
+        "@platforms//os:osx": [
+            "-framework",
+            "Kerberos",
+        ],
+        "@platforms//os:windows": [
+            "-DEFAULTLIB:ws2_32.lib",
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+            "-DEFAULTLIB:user32.lib",
+        ],
+        "@wpilib_toolchains//conditions:linux_x86_64": [],
+        "@wpilib_toolchains//constraints/combined:is_cross_compiler": [],
+    }),
+    deps = [
+        "//datalog",
+        "//glass:glass_for_tests",
+        "//shared/bazel/thirdparty/libssh",
+    ],
+)
