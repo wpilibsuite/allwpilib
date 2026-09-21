@@ -19,9 +19,13 @@ public class Robot extends TimedRobot {
   /**
    * Determines if the hub is active based on the current match state.
    *
+   * <p>Uses the alliance, Game Data and Match Time to determine if the hub is active. The hub is
+   * always active in autonomous, and in teleop it is active based on the game data and match time
+   * to computer the shifts.
+   *
    * @return true if the hub is active, false otherwise
    */
-  public boolean isHubActive() {
+  public static boolean isHubActive() {
     Optional<Alliance> alliance = MatchState.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
