@@ -201,7 +201,12 @@ public final class Coroutine {
      * <p>This method does nothing if no commands were successfully forked.
      */
     public void awaitCompletion() {
-      while (m_forkedCommands.stream().anyMatch(m_scheduler::isRunning)) {
+      if (m_forkedCommands.isEmpty()) {
+        // Nothing to do; exit early
+        return;
+      }
+      var tracker = CommandRunTracker.of(m_scheduler, m_forkedCommands);
+      while (tracker.isAnyRunning()) {
         Coroutine.this.yield();
       }
     }
@@ -437,7 +442,8 @@ public final class Coroutine {
     // Don't need doFork() because there's no chance of sibling conflicts
     m_scheduler.schedule(command);
 
-    while (m_scheduler.isScheduledOrRunning(command)) {
+    var tracker = CommandRunTracker.of(m_scheduler, command);
+    while (tracker.isAnyRunning()) {
       // If the command is a one-shot, then the schedule call will completely execute the command.
       // There would be nothing to await
       this.yield();
@@ -483,7 +489,8 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, commands);
+    while (tracker.isAnyRunning()) {
       this.yield();
     }
 
@@ -548,7 +555,8 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, commands);
+    while (tracker.areAllRunning()) {
       this.yield();
     }
 
