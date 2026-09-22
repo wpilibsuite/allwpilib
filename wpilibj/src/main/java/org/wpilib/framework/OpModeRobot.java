@@ -85,6 +85,8 @@ public abstract class OpModeRobot extends RobotBase {
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
   private final Alert m_loopOverrunAlert;
+  private final Watchdog m_opModeWatchdog;
+  private final Alert m_opModePeriodicOverrunAlert;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStationErrors.reportError(
@@ -525,6 +527,13 @@ public abstract class OpModeRobot extends RobotBase {
         new Alert(
             "opmode-loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
+    m_opModePeriodicOverrunAlert =
+        new Alert(
+            "opmode-periodic-overrun",
+            "OpMode periodic() time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
+    m_opModeWatchdog =
+        new Watchdog(Seconds.of(m_period), () -> m_opModePeriodicOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
     addPeriodic(this::loopFunc, period);
@@ -736,10 +745,21 @@ public abstract class OpModeRobot extends RobotBase {
     System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
 
     // Register the main opmode periodic callback
-    m_currentOpModePeriodic = m_callbacks.add(m_currentOpMode::periodic, m_startTimeNs, m_period);
+    final OpMode opMode = m_currentOpMode;
+    m_currentOpModePeriodic =
+        m_callbacks.add(() -> runOpModePeriodic(opMode), m_startTimeNs, m_period);
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
+  }
+
+  private void runOpModePeriodic(OpMode opMode) {
+    m_opModeWatchdog.reset();
+    opMode.periodic();
+    m_opModeWatchdog.disable();
+
+    // Alert on opmode periodic() overruns, and clear the alert once it's back on time
+    m_opModePeriodicOverrunAlert.set(m_opModeWatchdog.isExpired());
   }
 
   private void endCurrentOpMode() {
@@ -752,6 +772,7 @@ public abstract class OpModeRobot extends RobotBase {
 
       m_callbacks.remove(m_currentOpModePeriodic);
       m_currentOpModePeriodic = null;
+      m_opModePeriodicOverrunAlert.set(false);
     }
 
     // The additional getCallbacks() callbacks are registered immediately on construction (even
@@ -789,6 +810,7 @@ public abstract class OpModeRobot extends RobotBase {
   @Override
   public void close() {
     m_loopOverrunAlert.close();
+    m_opModePeriodicOverrunAlert.close();
     NotifierJNI.destroyNotifier(m_notifier);
     super.close();
   }

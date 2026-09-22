@@ -260,6 +260,8 @@ class OpModeRobotBase : public RobotBase {
   std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
+  wpi::util::Alert m_opModePeriodicOverrunAlert;
+  Watchdog m_opModeWatchdog;
 
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;

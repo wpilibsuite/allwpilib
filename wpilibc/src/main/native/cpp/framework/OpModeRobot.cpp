@@ -34,7 +34,14 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
           "opmode-loop-overrun",
           std::format("Loop time of {:.6f}s overrun", m_period.value()),
           wpi::util::Alert::Level::MEDIUM},
-      m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }} {
+      m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }},
+      m_opModePeriodicOverrunAlert{
+          "opmode-periodic-overrun",
+          std::format("OpMode Periodic() time of {:.6f}s overrun",
+                      m_period.value()),
+          wpi::util::Alert::Level::MEDIUM},
+      m_opModeWatchdog{period,
+                       [this] { m_opModePeriodicOverrunAlert.Set(true); }} {
   // Create our own notifier and callback queue
   int32_t status = 0;
   m_notifier = HAL_CreateNotifier(&status);
@@ -265,9 +272,15 @@ void OpModeRobotBase::StartCurrentOpMode() {
   // Register the main opmode periodic callback. Capture a weak_ptr so a queued
   // callback can never resurrect or outlive a destroyed opmode.
   m_opmodePeriodic = wpi::internal::PeriodicPriorityQueue::Callback{
-      [op = std::weak_ptr<OpMode>{m_currentOpMode}] {
+      [this, op = std::weak_ptr<OpMode>{m_currentOpMode}] {
         if (auto shared_op = op.lock()) {
+          m_opModeWatchdog.Reset();
           shared_op->Periodic();
+          m_opModeWatchdog.Disable();
+
+          // Alert on opmode Periodic() overruns, and clear the alert once it's
+          // back on time
+          m_opModePeriodicOverrunAlert.Set(m_opModeWatchdog.IsExpired());
         }
       },
       m_startTime, m_period};
@@ -291,6 +304,7 @@ void OpModeRobotBase::EndCurrentOpMode() {
 
     m_callbacks.Remove(*m_opmodePeriodic);
     m_opmodePeriodic.reset();
+    m_opModePeriodicOverrunAlert.Set(false);
   }
 
   // The additional GetCallbacks() callbacks are registered immediately on
