@@ -4,6 +4,7 @@
 
 #include "wpi/framework/OpModeRobot.hpp"
 
+#include <cstdio>
 #include <cstdlib>
 #include <format>
 #include <memory>
@@ -31,7 +32,7 @@ using namespace wpi;
 OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
     : m_period{period},
       m_loopOverrunAlert{
-          "opmode-loop-overrun",
+          "loop-overrun",
           std::format("Loop time of {:.6f}s overrun", m_period.value()),
           wpi::util::Alert::Level::MEDIUM},
       m_watchdog{period, [this] { m_loopOverrunAlert.Set(true); }},
@@ -55,11 +56,19 @@ OpModeRobotBase::OpModeRobotBase(wpi::units::second_t period)
   wpi::util::ReportUsage("Framework", "OpModeRobot");
 }
 
+OpModeRobotBase::OpModeRobotBase(wpi::units::hertz_t frequency)
+    : OpModeRobotBase{1 / frequency} {}
+
 OpModeRobotBase::OpModeRobotBase() : OpModeRobotBase(DEFAULT_PERIOD) {}
 
 void OpModeRobotBase::AddPeriodic(std::function<void()> callback,
-                                  wpi::units::second_t period) {
-  m_callbacks.Add(std::move(callback), m_startTime, period);
+                                  wpi::units::second_t period,
+                                  wpi::units::second_t offset) {
+  m_callbacks.Add(std::move(callback), m_startTime, period, offset);
+}
+
+void OpModeRobotBase::PrintWatchdogEpochs() {
+  m_watchdog.PrintEpochs();
 }
 
 void OpModeRobotBase::LoopFunc() {
@@ -80,7 +89,6 @@ void OpModeRobotBase::LoopFunc() {
   if (!m_calledDriverStationConnected && word.IsDSAttached()) {
     m_calledDriverStationConnected = true;
     DriverStationConnected();
-    m_watchdog.AddEpoch("DriverStationConnected()");
   }
 
   // Handle OpMode changes
@@ -123,7 +131,6 @@ void OpModeRobotBase::LoopFunc() {
     if (m_lastMode == RobotMode::UNKNOWN) {
       // Transitioning out of disabled
       DisabledExit();
-      m_watchdog.AddEpoch("DisabledExit()");
     }
     if (mode == RobotMode::UNKNOWN) {
       // Transitioning to disabled. Only tear down an opmode that was actually
@@ -147,6 +154,7 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Call periodic functions based on current state
+  HAL_ObserveUserProgram(word.GetValue());
   if (!enabled) {
     DisabledPeriodic();
     m_watchdog.AddEpoch("DisabledPeriodic()");
@@ -167,9 +175,6 @@ void OpModeRobotBase::LoopFunc() {
   // Always call RobotPeriodic
   RobotPeriodic();
   m_watchdog.AddEpoch("RobotPeriodic()");
-
-  // Always observe user program state
-  HAL_ObserveUserProgram(word.GetValue());
 
   wpi::tunables::TunableRegistry::Update();
   m_watchdog.AddEpoch("TunableRegistry::Update()");
@@ -195,13 +200,12 @@ void OpModeRobotBase::LoopFunc() {
 }
 
 void OpModeRobotBase::StartCompetition() {
-  wpi::util::print("********** Robot program startup complete **********\n");
-
   if constexpr (IsSimulation()) {
     SimulationInit();
   }
 
   // Tell the DS that the robot is ready to be enabled
+  std::puts("\n********** Robot program startup complete **********");
   wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   // Loop forever, calling the callback system which handles periodic functions
