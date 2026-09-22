@@ -75,11 +75,11 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
 
   MockRobot() = default;
 
-  void DriverStationConnected() { m_driverStationConnectedCount++; }
+  void DriverStationConnected() override { m_driverStationConnectedCount++; }
 
-  void NonePeriodic() { m_nonePeriodicCount++; }
+  void NonePeriodic() override { m_nonePeriodicCount++; }
 
-  void RobotPeriodic() { m_robotPeriodicCount++; }
+  void RobotPeriodic() override { m_robotPeriodicCount++; }
 
   void DisabledInit() override { m_disabledInitCount++; }
 

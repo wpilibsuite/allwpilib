@@ -4,7 +4,6 @@
 
 package org.wpilib.framework;
 
-import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.ControlWord;
 import org.wpilib.hardware.hal.DriverStationJNI;
@@ -13,6 +12,7 @@ import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.system.Watchdog;
 import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.util.Alert;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -61,6 +61,7 @@ public abstract class IterativeRobotBase extends RobotBase {
   private RobotMode m_lastMode;
   private final double m_period;
   private final Watchdog m_watchdog;
+  private final Alert m_loopOverrunAlert;
   private boolean m_calledDsConnected;
 
   /**
@@ -70,7 +71,9 @@ public abstract class IterativeRobotBase extends RobotBase {
    */
   protected IterativeRobotBase(double period) {
     m_period = period;
-    m_watchdog = new Watchdog(period, this::printLoopOverrunMessage);
+    m_loopOverrunAlert =
+        new Alert("loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
+    m_watchdog = new Watchdog(period, () -> m_loopOverrunAlert.set(true));
   }
 
   /** Provide an alternate "main loop" via startCompetition(). */
@@ -333,10 +336,11 @@ public abstract class IterativeRobotBase extends RobotBase {
     // Flush NetworkTables
     NetworkTableInstance.getDefault().flushLocal();
 
-    // Warn on loop time overruns
+    // Warn on loop time overruns, and clear the alert once the loop is back on time
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+    m_loopOverrunAlert.set(m_watchdog.isExpired());
   }
 
   /** Prints list of epochs added so far and their times. */
@@ -344,7 +348,9 @@ public abstract class IterativeRobotBase extends RobotBase {
     m_watchdog.printEpochs();
   }
 
-  private void printLoopOverrunMessage() {
-    DriverStationErrors.reportWarning("Loop time of " + m_period + "s overrun\n", false);
+  @Override
+  public void close() {
+    m_loopOverrunAlert.close();
+    super.close();
   }
 }

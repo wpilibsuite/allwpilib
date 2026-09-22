@@ -179,10 +179,12 @@ void OpModeRobotBase::LoopFunc() {
   // Flush NetworkTables
   wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
 
-  // Warn on loop time overruns
+  // Warn on loop time overruns, and clear the alert once the loop is back on
+  // time
   if (m_watchdog.IsExpired()) {
     m_watchdog.PrintEpochs();
   }
+  m_loopOverrunAlert.Set(m_watchdog.IsExpired());
 }
 
 void OpModeRobotBase::StartCompetition() {

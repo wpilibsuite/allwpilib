@@ -523,9 +523,7 @@ public abstract class OpModeRobot extends RobotBase {
 
     m_loopOverrunAlert =
         new Alert(
-            "opmode-loop-overrun",
-            "Loop time of \"" + m_period + "\"s overrun",
-            Alert.Level.MEDIUM);
+            "opmode-loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
@@ -723,10 +721,11 @@ public abstract class OpModeRobot extends RobotBase {
     // Flush NetworkTables
     NetworkTableInstance.getDefault().flushLocal();
 
-    // Warn on loop time overruns
+    // Warn on loop time overruns, and clear the alert once the loop is back on time
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+    m_loopOverrunAlert.set(m_watchdog.isExpired());
   }
 
   private void startCurrentOpMode() {
