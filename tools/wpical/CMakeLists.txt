@@ -156,27 +156,13 @@ if(WPILIB_WITH_IMGUI_TESTS)
     wpilib_link_macos_gui(wpical_imgui_test)
     target_sources(
         wpical_imgui_test
-        PRIVATE
-            ${wpical_src}
-            ${wpical_thirdparty_src}
-            ${wpical_resources_src}
-            ${wpical_rc}
-            ${APP_ICON_MACOSX}
+        PRIVATE ${wpical_src} ${wpical_resources_src} ${wpical_rc} ${APP_ICON_MACOSX}
     )
     if(MSVC)
         target_compile_options(wpical_imgui_test PRIVATE /utf-8)
     endif()
     target_compile_options(wpical_imgui_test PRIVATE ${compile_flags})
-    target_include_directories(
-        wpical_imgui_test
-        SYSTEM
-        PRIVATE
-            src/main/native/include
-            src/main/native/thirdparty/libdogleg/include
-            src/main/native/thirdparty/mrcal/include
-            src/main/native/thirdparty/mrcal/generated
-            src/main/native/thirdparty/mrcal_java/include
-    )
+    target_include_directories(wpical_imgui_test SYSTEM PRIVATE src/main/native/include)
     target_compile_definitions(wpical_imgui_test PUBLIC OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT)
     target_compile_definitions(
         wpical_imgui_test
@@ -186,6 +172,7 @@ if(WPILIB_WITH_IMGUI_TESTS)
         wpical_imgui_test
         apriltag
         fields
+        mrcal
         wpimath
         opencv_highgui
         opencv_objdetect

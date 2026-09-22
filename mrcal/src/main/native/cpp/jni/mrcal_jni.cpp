@@ -5,6 +5,7 @@
 #include "jni/mrcal_jni.hpp"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <exception>
 #include <iostream>
@@ -31,6 +32,23 @@ static constexpr std::string_view JNI_INT{"I"};
 static constexpr std::string_view JNI_DOUBLE{"D"};
 static constexpr std::string_view JNI_DOUBLEARR{"[D"};
 static constexpr std::string_view JNI_BOOLARR{"[Z"};
+
+/**
+ * Converts decimation levels to point weights using `weight=0.5^level`.
+ * Negative weights correspond to ignored points.
+ *
+ * @param observations Input as [x, y, level], output as [x, y, weight]
+ */
+static void levels_to_weights(std::span<mrcal_point3_t> observations) {
+  for (auto& o : observations) {
+    double& level = o.z;
+    if (level < 0) {
+      o.z = -1;
+    } else {
+      o.z = std::pow(0.5, level);
+    }
+  }
+}
 
 template <typename... Args>
 constexpr std::string jni_make_method_sig(std::string_view retval,
@@ -184,15 +202,7 @@ Java_org_wpilib_mrcal_MrCalJNI_mrcal_1calibrate_1camera
       total_frames_rt_toref.push_back(seed_pose);
     }
 
-    // Convert detection level to weights
-    for (auto& o : observations) {
-      double& level = o.z;
-      if (level < 0) {
-        o.z = -1;
-      } else {
-        o.z = std::pow(0.5, level);
-      }
-    }
+    levels_to_weights(observations);
 
     auto statsptr = mrcal_main(observations, total_frames_rt_toref, boardSize,
                                static_cast<double>(boardSpacing), imagerSize,
@@ -290,6 +300,8 @@ Java_org_wpilib_mrcal_MrCalJNI_compute_1uncertainty
   cv::Size imagerSize(imageWidth, imageHeight);
   cv::Size calobjectSize(boardWidth, boardHeight);
   cv::Size sampleRes(sampleGridWidth, sampleGridHeight);
+
+  levels_to_weights(observations.asSpan<mrcal_point3_t>());
 
   std::vector<mrcal_point3_t> result;
   try {

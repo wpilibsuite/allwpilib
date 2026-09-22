@@ -145,10 +145,6 @@ cc_library(
     srcs = glob(
         [
             "src/main/native/cpp/**/*.cpp",
-            "src/main/native/thirdparty/libdogleg/src/**/*.c",
-            "src/main/native/thirdparty/mrcal/src/**/*.cpp",
-            "src/main/native/thirdparty/mrcal/src/**/*.c",
-            "src/main/native/thirdparty/mrcal_java/src/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/WPIcal.cpp"],
     ) + [
@@ -165,6 +161,7 @@ cc_library(
         ":headers",
         "//apriltag",
         "//fields",
+        "//mrcal",
         "//shared/bazel/thirdparty/ceres",
         "//wpigui:wpigui_for_tests",
         "//wpiutil",

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
@@ -380,5 +381,102 @@ public class MrCalJNI {
     }
 
     return results;
+  }
+
+  /**
+   * Convert from WPILib poses to a raw RT array.
+   *
+   * @param observationPoses Estimated pose of the calibration board in each snapshot
+   * @return Array of size [numObservations * 6] where each group of 6 is (rvec[0], rvec[1],
+   *     rvec[2], tvec[0], tvec[1], tvec[2])
+   */
+  private static double[] observationPosesToRtRef(List<Pose3d> observationPoses) {
+    double[] ret = new double[observationPoses.size() * 6];
+
+    for (int i = 0; i < observationPoses.size(); i++) {
+      var pose = observationPoses.get(i);
+      var r = pose.getRotation().toVector();
+      ret[i * 6 + 0] = r.get(0);
+      ret[i * 6 + 1] = r.get(1);
+      ret[i * 6 + 2] = r.get(2);
+      var t = pose.getTranslation().toVector();
+      ret[i * 6 + 3] = t.get(0);
+      ret[i * 6 + 4] = t.get(1);
+      ret[i * 6 + 5] = t.get(2);
+    }
+
+    return ret;
+  }
+
+  /**
+   * High-level wrapper for computing projection uncertainty using mrcal.
+   *
+   * <p>Converts detected chessboard corners and their detection levels into a packed double array,
+   * converts the observation poses into a packed double array, then calls {@link
+   * #compute_uncertainty}. Each corner's detection level is converted to a weight (0.5^level), and
+   * negative levels indicate undetected corners.
+   *
+   * @param observations A list of observations, each containing a list of corner locations,
+   *     decimation levels, and optional corner ids
+   * @param intrinsics Lens intrinsics from the calibration
+   * @param observationPoses Estimated pose of the calibration board in each snapshot
+   * @param boardWidth Number of internal corners horizontally
+   * @param boardHeight Number of internal corners vertically
+   * @param boardSpacing Physical spacing between corners (meters)
+   * @param imageWidth Image width in pixels
+   * @param imageHeight Image height in pixels
+   * @param sampleGridWidth Width of the generated sample grid
+   * @param sampleGridHeight Height of the generated sample grid
+   * @param warpX The x-component of lens distortion warp, or zero if no warp was estimated
+   * @param warpY The y-component of lens distortion warp
+   * @return Uncertainty at each sampled grid point as (u, v, uncertainty), or null if the
+   *     computation failed or the observation and pose counts disagree
+   */
+  public static Point3[] computeUncertainty(
+      List<MrCalObservation> observations,
+      double[] intrinsics,
+      List<Pose3d> observationPoses,
+      int boardWidth,
+      int boardHeight,
+      double boardSpacing,
+      int imageWidth,
+      int imageHeight,
+      int sampleGridWidth,
+      int sampleGridHeight,
+      double warpX,
+      double warpY) {
+    if (observations.size() != observationPoses.size()) {
+      // Mismatched sizes
+      return null;
+    }
+
+    var packedObservations = makeObservations(observations, boardWidth, boardHeight);
+
+    var packedResult =
+        compute_uncertainty(
+            packedObservations,
+            intrinsics,
+            observationPosesToRtRef(observationPoses),
+            boardWidth,
+            boardHeight,
+            boardSpacing,
+            imageWidth,
+            imageHeight,
+            sampleGridWidth,
+            sampleGridHeight,
+            warpX,
+            warpY);
+
+    if (packedResult == null) {
+      return null;
+    }
+
+    var result = new Point3[sampleGridWidth * sampleGridHeight];
+
+    for (int i = 0; i < result.length; i++) {
+      result[i] = new Point3(packedResult[i * 3], packedResult[i * 3 + 1], packedResult[i * 3 + 2]);
+    }
+
+    return result;
   }
 }
