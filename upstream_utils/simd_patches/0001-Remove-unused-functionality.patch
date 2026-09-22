@@ -1,0 +1,1277 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Fri, 16 May 2025 22:52:22 -0700
+Subject: [PATCH] Remove unused functionality
+
+---
+ src/Simd/SimdAvx2ImageLoad.cpp           |  9 +--
+ src/Simd/SimdAvx2ImageLoadJpeg.cpp       |  6 --
+ src/Simd/SimdAvx2ImageSave.cpp           |  9 +--
+ src/Simd/SimdAvx2Resizer.cpp             |  6 --
+ src/Simd/SimdAvx2ResizerBilinear.cpp     |  4 +-
+ src/Simd/SimdAvx512bwImageLoad.cpp       |  9 +--
+ src/Simd/SimdAvx512bwImageSave.cpp       |  9 +--
+ src/Simd/SimdAvx512bwResizer.cpp         |  6 --
+ src/Simd/SimdAvx512bwResizerBilinear.cpp |  4 +-
+ src/Simd/SimdBaseImageLoad.cpp           |  9 +--
+ src/Simd/SimdBaseImageLoadJpeg.cpp       | 11 ----
+ src/Simd/SimdBaseImageSave.cpp           |  9 +--
+ src/Simd/SimdBaseResizer.cpp             |  6 --
+ src/Simd/SimdBaseResizerBilinear.cpp     |  4 +-
+ src/Simd/SimdConfig.h                    |  6 +-
+ src/Simd/SimdImageLoad.h                 | 27 +++++----
+ src/Simd/SimdImageSave.h                 | 35 ++++++-----
+ src/Simd/SimdLib.cpp                     | 75 +++++++++---------------
+ src/Simd/SimdNeonImageLoad.cpp           |  9 +--
+ src/Simd/SimdNeonImageSave.cpp           |  9 +--
+ src/Simd/SimdNeonResizer.cpp             |  4 --
+ src/Simd/SimdNeonResizerBilinear.cpp     |  3 +-
+ src/Simd/SimdSse41ImageLoad.cpp          |  9 +--
+ src/Simd/SimdSse41ImageLoadJpeg.cpp      | 11 ----
+ src/Simd/SimdSse41ImageSave.cpp          |  9 +--
+ src/Simd/SimdSse41Resizer.cpp            |  6 --
+ src/Simd/SimdSse41ResizerBilinear.cpp    |  4 +-
+ 27 files changed, 96 insertions(+), 212 deletions(-)
+
+diff --git a/src/Simd/SimdAvx2ImageLoad.cpp b/src/Simd/SimdAvx2ImageLoad.cpp
+index 23b357098a3c211e68036804447bb2e0b13ef497..b61b61d4ec67438377a6ec0c80d53d81a14f5318 100644
+--- a/src/Simd/SimdAvx2ImageLoad.cpp
++++ b/src/Simd/SimdAvx2ImageLoad.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_AVX2_ENABLE    
+     namespace Avx2
+     {
++#if 0
+         ImagePgmTxtLoader::ImagePgmTxtLoader(const ImageLoaderParam& param)
+             : Sse41::ImagePgmTxtLoader(param)
+         {
+@@ -146,20 +147,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageLoader* CreateImageLoader(const ImageLoaderParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtLoader(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinLoader(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtLoader(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
+-            case SimdImageFilePng: return new Sse41::ImagePngLoader(param);
+             case SimdImageFileJpeg: return new Avx2::ImageJpegLoader(param);
+-            case SimdImageFileBmp: return new ImageBmpLoader(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdAvx2ImageLoadJpeg.cpp b/src/Simd/SimdAvx2ImageLoadJpeg.cpp
+index 50dfeb1ebaec81d78c64bc61ac1d570456ef5015..06b06fbaf07ca20cac8cb7d3644c9fbdda393578 100644
+--- a/src/Simd/SimdAvx2ImageLoadJpeg.cpp
++++ b/src/Simd/SimdAvx2ImageLoadJpeg.cpp
+@@ -2207,12 +2207,6 @@ namespace Simd
+                 case SimdPixelFormatBgra32:
+                     Avx2::BgraToRgba(data, x, y, stride, _image.data, _image.stride);
+                     break;
+-                case SimdPixelFormatRgb24:
+-                    Avx2::BgraToBgr(data, x, y, stride, _image.data, _image.stride);
+-                    break;
+-                case SimdPixelFormatRgba32:
+-                    Base::Copy(data, stride, x, y, 4, _image.data, _image.stride);
+-                    break;
+                 default:
+                     break;
+                 }
+diff --git a/src/Simd/SimdAvx2ImageSave.cpp b/src/Simd/SimdAvx2ImageSave.cpp
+index 2b45cce9a67eabfd14056b9a92759e8b25373912..738ae2687a5248ed4e9ad9c848a416c8730f89fb 100644
+--- a/src/Simd/SimdAvx2ImageSave.cpp
++++ b/src/Simd/SimdAvx2ImageSave.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_AVX2_ENABLE    
+     namespace Avx2
+     {
++#if 0
+         ImagePgmTxtSaver::ImagePgmTxtSaver(const ImageSaverParam& param)
+             : Sse41::ImagePgmTxtSaver(param)
+         {
+@@ -115,20 +116,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtSaver(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinSaver(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtSaver(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
+-            case SimdImageFilePng: return new ImagePngSaver(param);
+             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+-            case SimdImageFileBmp: return new ImageBmpSaver(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdAvx2Resizer.cpp b/src/Simd/SimdAvx2Resizer.cpp
+index 620b3553f166a5e2200c402bc5bc3b5317c5a4b8..24c99751a5d9edcb4b9b28fa3cba949fc1cce227 100644
+--- a/src/Simd/SimdAvx2Resizer.cpp
++++ b/src/Simd/SimdAvx2Resizer.cpp
+@@ -40,12 +40,6 @@ namespace Simd
+                 return new ResizerNearest(param);
+             else if (param.IsByteBilinear() && dstX >= A)
+                 return new ResizerByteBilinear(param);
+-            else if (param.IsShortBilinear() && dstX >= F)
+-                return new ResizerShortBilinear(param);
+-            else if (param.IsFloatBilinear())
+-                return new ResizerFloatBilinear(param);
+-            else if (param.IsBf16Bilinear())
+-                return new ResizerBf16Bilinear(param);
+             else if (param.IsByteBicubic())
+                 return new ResizerByteBicubic(param);
+             else if (param.IsByteArea2x2())
+diff --git a/src/Simd/SimdAvx2ResizerBilinear.cpp b/src/Simd/SimdAvx2ResizerBilinear.cpp
+index 222b8230dbc81b01d0896632bc84dcf2af7a4a63..742a1be1cf2fe235dcb343e0a776f7644b9a2175 100644
+--- a/src/Simd/SimdAvx2ResizerBilinear.cpp
++++ b/src/Simd/SimdAvx2ResizerBilinear.cpp
+@@ -28,7 +28,6 @@
+ #include "Simd/SimdSet.h"
+ #include "Simd/SimdUpdate.h"
+ #include "Simd/SimdEnable.h"
+-#include "Simd/SimdBFloat16.h"
+ 
+ namespace Simd
+ {
+@@ -348,7 +347,7 @@ namespace Simd
+         }
+ 
+         //---------------------------------------------------------------------
+-
++#if 0
+         ResizerShortBilinear::ResizerShortBilinear(const ResParam& param)
+             : Sse41::ResizerShortBilinear(param)
+         {
+@@ -1582,6 +1581,7 @@ namespace Simd
+                 }
+             }
+         }
++#endif
+     }
+ #endif 
+ }
+diff --git a/src/Simd/SimdAvx512bwImageLoad.cpp b/src/Simd/SimdAvx512bwImageLoad.cpp
+index 2891429efd841d3c7a3ca4ef28bc2e15a199f757..f1fa1120fcc8fd0ff42bfe3fe365814e07711da7 100644
+--- a/src/Simd/SimdAvx512bwImageLoad.cpp
++++ b/src/Simd/SimdAvx512bwImageLoad.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_AVX512BW_ENABLE    
+     namespace Avx512bw
+     {
++#if 0
+         ImagePgmTxtLoader::ImagePgmTxtLoader(const ImageLoaderParam& param)
+             : Avx2::ImagePgmTxtLoader(param)
+         {
+@@ -142,20 +143,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageLoader* CreateImageLoader(const ImageLoaderParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtLoader(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinLoader(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtLoader(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
+-            case SimdImageFilePng: return new Sse41::ImagePngLoader(param);
+             case SimdImageFileJpeg: return new Avx2::ImageJpegLoader(param);
+-            case SimdImageFileBmp: return new ImageBmpLoader(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdAvx512bwImageSave.cpp b/src/Simd/SimdAvx512bwImageSave.cpp
+index 11c7abbfd915f39e165ec201efa3d6bced3f0628..6a79372cc2c5144406ecf9c8abf82fd789f4ba9f 100644
+--- a/src/Simd/SimdAvx512bwImageSave.cpp
++++ b/src/Simd/SimdAvx512bwImageSave.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_AVX512BW_ENABLE    
+     namespace Avx512bw
+     {
++#if 0
+         ImagePgmTxtSaver::ImagePgmTxtSaver(const ImageSaverParam& param)
+             : Avx2::ImagePgmTxtSaver(param)
+         {
+@@ -103,20 +104,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtSaver(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinSaver(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtSaver(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
+-            case SimdImageFilePng: return new ImagePngSaver(param);
+             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+-            case SimdImageFileBmp: return new ImageBmpSaver(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdAvx512bwResizer.cpp b/src/Simd/SimdAvx512bwResizer.cpp
+index 5983993559c01ab0b343a90c7d7a2e592d39a61b..ca82f2c70a7a85ec42c7748a13e87119ef7eff9c 100644
+--- a/src/Simd/SimdAvx512bwResizer.cpp
++++ b/src/Simd/SimdAvx512bwResizer.cpp
+@@ -39,12 +39,6 @@ namespace Simd
+                 return new ResizerNearest(param);
+             else if (param.IsByteBilinear() && dstX >= A)
+                 return new ResizerByteBilinear(param);
+-            else if (param.IsShortBilinear() && dstX > F)
+-                return new ResizerShortBilinear(param);
+-            else if (param.IsFloatBilinear())
+-                return new ResizerFloatBilinear(param);
+-            else if (param.IsBf16Bilinear())
+-                return new ResizerBf16Bilinear(param);
+             else if (param.IsByteBicubic())
+                 return new ResizerByteBicubic(param);
+             else if (param.IsByteArea2x2())
+diff --git a/src/Simd/SimdAvx512bwResizerBilinear.cpp b/src/Simd/SimdAvx512bwResizerBilinear.cpp
+index 0c281b09705866d700e5c627807771bd54899700..d7fd87c70e5185377a91ab743b7316988f0c557d 100644
+--- a/src/Simd/SimdAvx512bwResizerBilinear.cpp
++++ b/src/Simd/SimdAvx512bwResizerBilinear.cpp
+@@ -27,7 +27,6 @@
+ #include "Simd/SimdStore.h"
+ #include "Simd/SimdSet.h"
+ #include "Simd/SimdUpdate.h"
+-#include "Simd/SimdBFloat16.h"
+ 
+ namespace Simd
+ {
+@@ -321,7 +320,7 @@ namespace Simd
+         }
+ 
+         //-----------------------------------------------------------------------------------------
+-
++#if 0
+         ResizerShortBilinear::ResizerShortBilinear(const ResParam& param)
+             : Avx2::ResizerShortBilinear(param)
+         {
+@@ -1251,6 +1250,7 @@ namespace Simd
+                 }
+             }
+         }
++#endif
+     }
+ #endif 
+ }
+diff --git a/src/Simd/SimdBaseImageLoad.cpp b/src/Simd/SimdBaseImageLoad.cpp
+index ce838ff36ce58ad9f05314fe04ab0fa49b599ce5..f0380abf4beea0c3e3a001ae9b6b5736859277be 100644
+--- a/src/Simd/SimdBaseImageLoad.cpp
++++ b/src/Simd/SimdBaseImageLoad.cpp
+@@ -35,6 +35,7 @@
+ 
+ namespace Simd
+ {
++#if 0
+     uint8_t* ImageLoadFromFile(const ImageLoadFromMemoryPtr loader, const char* path, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format)
+     {
+         uint8_t* data = NULL;
+@@ -50,7 +51,7 @@ namespace Simd
+         }
+         return data;
+     }
+-
++#endif
+     //-------------------------------------------------------------------------------------------------
+ 
+     ImageLoaderParam::ImageLoaderParam(const uint8_t* d, size_t s, SimdPixelFormatType f)
+@@ -105,13 +106,7 @@ namespace Simd
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtLoader(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinLoader(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtLoader(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
+-            case SimdImageFilePng: return new ImagePngLoader(param);
+             case SimdImageFileJpeg: return new ImageJpegLoader(param);
+-            case SimdImageFileBmp: return new ImageBmpLoader(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdBaseImageLoadJpeg.cpp b/src/Simd/SimdBaseImageLoadJpeg.cpp
+index d930cbe3bf086e8139e5d392652d92b8d57260d0..8d4a412914e0fe9ebce13741415bcd0f8612f272 100644
+--- a/src/Simd/SimdBaseImageLoadJpeg.cpp
++++ b/src/Simd/SimdBaseImageLoadJpeg.cpp
+@@ -1355,17 +1355,6 @@ namespace Simd
+                 _context->yuv420pToBgra = Base::JpegYuv420pToBgra;
+                 _context->rgbaToAny = Base::BgraToRgba;
+             }
+-            if (_param.format == SimdPixelFormatRgb24)
+-            {
+-                _context->yuv444pToBgr = Base::Yuv444pToRgbV2;
+-                _context->yuv420pToBgr = Base::JpegYuv420pToRgb;
+-                _context->rgbaToAny = Base::BgraToBgr;
+-            }
+-            if (_param.format == SimdPixelFormatRgba32)
+-            {
+-                _context->yuv444pToBgra = Base::Yuv444pToRgbaV2;
+-                _context->yuv420pToBgra = Base::JpegYuv420pToRgba;
+-            }
+         }
+ 
+         ImageJpegLoader::~ImageJpegLoader()
+diff --git a/src/Simd/SimdBaseImageSave.cpp b/src/Simd/SimdBaseImageSave.cpp
+index 1532fb9e1b82e063b13e7d961801a734f9cc742d..9f9cd493289f16c7115a68ccc20bed1bb03d9456 100644
+--- a/src/Simd/SimdBaseImageSave.cpp
++++ b/src/Simd/SimdBaseImageSave.cpp
+@@ -38,6 +38,7 @@
+ 
+ namespace Simd
+ { 
++#if 0
+     SIMD_INLINE String ToLower(const String& src)
+     {
+         String dst(src);
+@@ -90,7 +91,7 @@ namespace Simd
+         }
+         return result;
+     }
+-
++#endif
+     //-------------------------------------------------------------------------------------------------
+ 
+     namespace Base
+@@ -99,13 +100,7 @@ namespace Simd
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtSaver(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinSaver(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtSaver(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
+-            case SimdImageFilePng:    return new ImagePngSaver(param);
+             case SimdImageFileJpeg:   return new ImageJpegSaver(param);
+-            case SimdImageFileBmp:   return new ImageBmpSaver(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdBaseResizer.cpp b/src/Simd/SimdBaseResizer.cpp
+index 5a9bc7bcb0c7c254aacfcae7ad16c3df32c99519..d3295a261f4c7d22074c04f24c17920357e17c7a 100644
+--- a/src/Simd/SimdBaseResizer.cpp
++++ b/src/Simd/SimdBaseResizer.cpp
+@@ -35,12 +35,6 @@ namespace Simd
+                 return new ResizerNearest(param);
+             else if (param.IsByteBilinear())
+                 return new ResizerByteBilinear(param);
+-            else if (param.IsShortBilinear())
+-                return new ResizerShortBilinear(param);
+-            else if (param.IsFloatBilinear())
+-                return new ResizerFloatBilinear(param);
+-            else if (param.IsBf16Bilinear())
+-                return new ResizerBf16Bilinear(param);
+             else if (param.IsByteBicubic())
+                 return new ResizerByteBicubic(param);
+             else if (param.IsByteArea2x2())
+diff --git a/src/Simd/SimdBaseResizerBilinear.cpp b/src/Simd/SimdBaseResizerBilinear.cpp
+index 4a5299d9432461eab59a7bb0efda5bb05c0c5075..8fea806c77a7aa79a68a48562b991a887d2bb8fd 100644
+--- a/src/Simd/SimdBaseResizerBilinear.cpp
++++ b/src/Simd/SimdBaseResizerBilinear.cpp
+@@ -24,7 +24,6 @@
+ #include "Simd/SimdMemory.h"
+ #include "Simd/SimdResizer.h"
+ #include "Simd/SimdCopy.h"
+-#include "Simd/SimdBFloat16.h"
+ 
+ namespace Simd
+ {
+@@ -130,7 +129,7 @@ namespace Simd
+         }
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#if 0
+         ResizerShortBilinear::ResizerShortBilinear(const ResParam& param)
+             : Resizer(param)
+         {
+@@ -461,6 +460,7 @@ namespace Simd
+                     dst[dx] = Float32ToBFloat16(pbx[0][dx] * fy0 + pbx[1][dx] * fy1);
+             }
+         }
++#endif
+     }
+ }
+ 
+diff --git a/src/Simd/SimdConfig.h b/src/Simd/SimdConfig.h
+index 854cb556a9313e7697c9853986af224ad8ef7807..6e0a2c5080dca6804fc8adf9ea62be59a1db8e4d 100644
+--- a/src/Simd/SimdConfig.h
++++ b/src/Simd/SimdConfig.h
+@@ -30,15 +30,15 @@
+ 
+ //#define SIMD_AVX512BW_DISABLE
+ 
+-//#define SIMD_AVX512VNNI_DISABLE
++#define SIMD_AVX512VNNI_DISABLE
+  
+-//#define SIMD_AMXBF16_DISABLE
++#define SIMD_AMXBF16_DISABLE
+ 
+ //#define SIMD_NEON_DISABLE
+ 
+ //#define SIMD_NEON_FP16_DISABLE
+ 
+-//#define SIMD_STATIC
++#define SIMD_STATIC
+ 
+ #define SIMD_LOG_ENABLE
+ 
+diff --git a/src/Simd/SimdImageLoad.h b/src/Simd/SimdImageLoad.h
+index 29b288b14619fa8f6a9ab25e22e1d1d24375d8c9..d55457f5b488aefdec07ac5facbfd998ad88d62d 100644
+--- a/src/Simd/SimdImageLoad.h
++++ b/src/Simd/SimdImageLoad.h
+@@ -90,6 +90,7 @@ namespace Simd
+ 
+     namespace Base
+     {
++#if 0
+         class ImagePxmLoader : public ImageLoader
+         {
+         public:
+@@ -200,7 +201,7 @@ namespace Simd
+             void ExpandPalette();
+             void ConvertImage();
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         class ImageJpegLoader : public ImageLoader
+@@ -217,7 +218,7 @@ namespace Simd
+         };
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#if 0
+         class ImageBmpLoader : public ImageLoader
+         {
+         public:
+@@ -237,7 +238,7 @@ namespace Simd
+             ToBgraPtr _toBgra;
+             uint32_t _width, _height, _bpp, _size, _pad, _mr, _mg, _mb, _ma;
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageLoadFromMemory(const uint8_t* data, size_t size, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format);
+@@ -246,6 +247,7 @@ namespace Simd
+ #ifdef SIMD_SSE41_ENABLE    
+     namespace Sse41
+     {
++#if 0
+         class ImagePgmTxtLoader : public Base::ImagePgmTxtLoader
+         {
+         public:
+@@ -289,13 +291,13 @@ namespace Simd
+ 
+             virtual bool FromStream();
+         };
+-
++#endif
+         class ImageJpegLoader : public Base::ImageJpegLoader
+         {
+         public:
+             ImageJpegLoader(const ImageLoaderParam& param);
+         };
+-
++#if 0
+         class ImageBmpLoader : public Base::ImageBmpLoader
+         {
+         public:
+@@ -304,7 +306,7 @@ namespace Simd
+         protected:
+             virtual void SetConverters();
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageLoadFromMemory(const uint8_t* data, size_t size, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format);
+@@ -314,6 +316,7 @@ namespace Simd
+ #ifdef SIMD_AVX2_ENABLE    
+     namespace Avx2
+     {
++#if 0
+         class ImagePgmTxtLoader : public Sse41::ImagePgmTxtLoader
+         {
+         public:
+@@ -349,7 +352,7 @@ namespace Simd
+         protected:
+             virtual void SetConverters();
+         };
+-
++#endif
+         class ImageJpegLoader : public Sse41::ImageJpegLoader
+         {
+         public:
+@@ -357,7 +360,7 @@ namespace Simd
+ 
+             virtual bool FromStream();
+         };
+-
++#if 0
+         class ImageBmpLoader : public Sse41::ImageBmpLoader
+         {
+         public:
+@@ -366,7 +369,7 @@ namespace Simd
+         protected:
+             virtual void SetConverters();
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageLoadFromMemory(const uint8_t* data, size_t size, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format);
+@@ -376,6 +379,7 @@ namespace Simd
+ #ifdef SIMD_AVX512BW_ENABLE    
+     namespace Avx512bw
+     {
++#if 0
+         class ImagePgmTxtLoader : public Avx2::ImagePgmTxtLoader
+         {
+         public:
+@@ -420,7 +424,7 @@ namespace Simd
+         protected:
+             virtual void SetConverters();
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageLoadFromMemory(const uint8_t* data, size_t size, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format);
+@@ -430,6 +434,7 @@ namespace Simd
+ #ifdef SIMD_NEON_ENABLE    
+     namespace Neon
+     {
++#if 0
+         class ImagePgmTxtLoader : public Base::ImagePgmTxtLoader
+         {
+         public:
+@@ -474,7 +479,7 @@ namespace Simd
+         protected:
+             virtual void SetConverters();
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageLoadFromMemory(const uint8_t* data, size_t size, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format);
+diff --git a/src/Simd/SimdImageSave.h b/src/Simd/SimdImageSave.h
+index 2a98aba6653d949a39a4509c3b78331ff37772a9..102241d7ad4769aec4f7487fda0bf9b86466e97c 100644
+--- a/src/Simd/SimdImageSave.h
++++ b/src/Simd/SimdImageSave.h
+@@ -122,6 +122,7 @@ namespace Simd
+        
+     namespace Base
+     {
++#if 0
+         class ImagePxmSaver : public ImageSaver
+         {
+         public:
+@@ -194,7 +195,7 @@ namespace Simd
+         };
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#endif
+         class ImageJpegSaver : public ImageSaver
+         {
+         public:
+@@ -235,7 +236,7 @@ namespace Simd
+         };
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#if 0
+         class ImageBmpSaver : public ImageSaver
+         {
+         public:
+@@ -250,7 +251,7 @@ namespace Simd
+             ConvertPtr _convert;
+             size_t _pixel, _size, _pad;
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size);
+@@ -263,6 +264,7 @@ namespace Simd
+ #ifdef SIMD_SSE41_ENABLE    
+     namespace Sse41
+     {
++#if 0
+         class ImagePgmTxtSaver : public Base::ImagePgmTxtSaver
+         {
+         public:
+@@ -292,7 +294,7 @@ namespace Simd
+         public:
+             ImagePngSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         class ImageJpegSaver : public Base::ImageJpegSaver
+         {
+         public:
+@@ -301,13 +303,13 @@ namespace Simd
+         protected:
+             virtual void Init();
+         };
+-
++#if 0
+         class ImageBmpSaver : public Base::ImageBmpSaver
+         {
+         public:
+             ImageBmpSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size);
+@@ -321,6 +323,7 @@ namespace Simd
+ #ifdef SIMD_AVX2_ENABLE    
+     namespace Avx2
+     {
++#if 0
+         class ImagePgmTxtSaver : public Sse41::ImagePgmTxtSaver
+         {
+         public:
+@@ -350,7 +353,7 @@ namespace Simd
+         public:
+             ImagePngSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         class ImageJpegSaver : public Sse41::ImageJpegSaver
+         {
+         public:
+@@ -359,13 +362,13 @@ namespace Simd
+         protected:
+             virtual void Init();
+         };
+-
++#if 0
+         class ImageBmpSaver : public Sse41::ImageBmpSaver
+         {
+         public:
+             ImageBmpSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size);
+@@ -379,6 +382,7 @@ namespace Simd
+ #ifdef SIMD_AVX512BW_ENABLE    
+     namespace Avx512bw
+     {
++#if 0
+         class ImagePgmTxtSaver : public Avx2::ImagePgmTxtSaver
+         {
+         public:
+@@ -408,7 +412,7 @@ namespace Simd
+         public:
+             ImagePngSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         class ImageJpegSaver : public Avx2::ImageJpegSaver
+         {
+         public:
+@@ -417,13 +421,13 @@ namespace Simd
+         protected:
+             virtual void Init();
+         };
+-
++#if 0
+         class ImageBmpSaver : public Avx2::ImageBmpSaver
+         {
+         public:
+             ImageBmpSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size);
+@@ -437,6 +441,7 @@ namespace Simd
+ #ifdef SIMD_NEON_ENABLE    
+     namespace Neon
+     {
++#if 0
+         class ImagePgmTxtSaver : public Base::ImagePgmTxtSaver
+         {
+         public:
+@@ -466,7 +471,7 @@ namespace Simd
+         public:
+             ImagePngSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         class ImageJpegSaver : public Base::ImageJpegSaver
+         {
+         public:
+@@ -475,13 +480,13 @@ namespace Simd
+         protected:
+             virtual void Init();
+         };
+-
++#if 0
+         class ImageBmpSaver : public Base::ImageBmpSaver
+         {
+         public:
+             ImageBmpSaver(const ImageSaverParam& param);
+         };
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         uint8_t* ImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size);
+diff --git a/src/Simd/SimdLib.cpp b/src/Simd/SimdLib.cpp
+index 6bd16aff49f95e9dc9253c5991bd9170cda8783b..cdecdd1dbdbecadb0f321cd96cc83f34169d27ce 100644
+--- a/src/Simd/SimdLib.cpp
++++ b/src/Simd/SimdLib.cpp
+@@ -62,37 +62,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID lpReserved)
+ #include "Simd/SimdLog.h"
+ #include "Simd/SimdPerformance.h"
+ #include "Simd/SimdEmpty.h"
+-#include "Simd/SimdTile.h"
+ 
+-#include "Simd/SimdDescrInt.h"
+-#include "Simd/SimdGaussianBlur.h"
+ #include "Simd/SimdImageLoad.h"
+ #include "Simd/SimdImageSave.h"
+-#include "Simd/SimdRecursiveBilateralFilter.h"
+ #include "Simd/SimdResizer.h"
+-#include "Simd/SimdSynetAdd16b.h"
+-#include "Simd/SimdSynetConvolution32f.h"
+-#include "Simd/SimdSynetConvolution16b.h"
+-#include "Simd/SimdSynetConvolution8i.h"
+-#include "Simd/SimdSynetDeconvolution32f.h"
+-#include "Simd/SimdSynetDeconvolution16b.h"
+-#include "Simd/SimdSynetGridSample.h"
+-#include "Simd/SimdSynetInnerProduct32f.h"
+-#include "Simd/SimdSynetInnerProduct16b.h"
+-#include "Simd/SimdSynetMergedConvolution32f.h"
+-#include "Simd/SimdSynetMergedConvolution16b.h"
+-#include "Simd/SimdSynetMergedConvolution8i.h"
+-#include "Simd/SimdSynetPermute.h"
+-#include "Simd/SimdSynetScale8i.h"
+-#include "Simd/SimdSynetScale16b.h"
+-#include "Simd/SimdWarpAffine.h"
+ 
+ #include "Simd/SimdBase.h"
+ #include "Simd/SimdSse41.h"
+ #include "Simd/SimdAvx2.h"
+ #include "Simd/SimdAvx512bw.h"
+-#include "Simd/SimdAvx512vnni.h"
+-#include "Simd/SimdAmxBf16.h"
+ #include "Simd/SimdNeon.h"
+ 
+ #if !defined(SIMD_VERSION)
+@@ -226,7 +204,7 @@ SIMD_API void SimdSetFastMode(SimdBool value)
+         Neon::SetFastMode(value);
+ #endif
+ }
+-
++#if 0
+ SIMD_API void SimdEmpty()
+ {
+ #ifdef SIMD_SSE41_ENABLE
+@@ -983,7 +961,7 @@ SIMD_API void SimdBgraToBayer(const uint8_t * bgra, size_t width, size_t height,
+ #endif
+         Base::BgraToBayer(bgra, width, height, bgraStride, bayer, bayerStride, bayerFormat);
+ }
+-
++#endif
+ SIMD_API void SimdBgraToBgr(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * bgr, size_t bgrStride)
+ {
+     SIMD_EMPTY();
+@@ -1195,7 +1173,7 @@ SIMD_API void SimdBgraToYuva420pV2(const uint8_t* bgra, size_t bgraStride, size_
+ #endif
+         Base::BgraToYuva420pV2(bgra, bgraStride, width, height, y, yStride, u, uStride, v, vStride, a, aStride, yuvType);
+ }
+-
++#if 0
+ SIMD_API void SimdBgrToBayer(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * bayer, size_t bayerStride, SimdPixelFormatType bayerFormat)
+ {
+     SIMD_EMPTY();
+@@ -1216,7 +1194,7 @@ SIMD_API void SimdBgrToBayer(const uint8_t * bgr, size_t width, size_t height, s
+ #endif
+         Base::BgrToBayer(bgr, width, height, bgrStride, bayer, bayerStride, bayerFormat);
+ }
+-
++#endif
+ SIMD_API void SimdBgrToBgra(const uint8_t *bgr, size_t width, size_t height, size_t bgrStride, uint8_t *bgra, size_t bgraStride, uint8_t alpha)
+ {
+     SIMD_EMPTY();
+@@ -1307,7 +1285,7 @@ SIMD_API void SimdBgrToHsv(const uint8_t * bgr, size_t width, size_t height, siz
+     SIMD_EMPTY();
+     Base::BgrToHsv(bgr, width, height, bgrStride, hsv, hsvStride);
+ }
+-
++#if 0
+ SIMD_API void SimdBgrToLab(const uint8_t* bgr, size_t bgrStride, size_t width, size_t height, uint8_t* lab, size_t labStride)
+ {
+     SIMD_EMPTY();
+@@ -1328,7 +1306,7 @@ SIMD_API void SimdBgrToLab(const uint8_t* bgr, size_t bgrStride, size_t width, s
+ #endif
+         Base::BgrToLab(bgr, bgrStride, width, height, lab, labStride);
+ }
+-
++#endif
+ SIMD_API void SimdBgrToRgb(const uint8_t *bgr, size_t width, size_t height, size_t bgrStride, uint8_t * rgb, size_t rgbStride)
+ {
+     SIMD_EMPTY();
+@@ -1435,7 +1413,7 @@ SIMD_API void SimdBgrToYuv444pV2(const uint8_t* bgr, size_t bgrStride, size_t wi
+ #endif
+         Base::BgrToYuv444pV2(bgr, bgrStride, width, height, y, yStride, u, uStride, v, vStride, yuvType);
+ }
+-
++#if 0
+ SIMD_API void SimdBinarization(const uint8_t * src, size_t srcStride, size_t width, size_t height,
+                   uint8_t value, uint8_t positive, uint8_t negative, uint8_t * dst, size_t dstStride, SimdCompareType compareType)
+ {
+@@ -1658,7 +1636,7 @@ SIMD_API void SimdConditionalFill(const uint8_t * src, size_t srcStride, size_t
+ #endif
+         Base::ConditionalFill(src, srcStride, width, height, threshold, compareType, value, dst, dstStride);
+ }
+-
++#endif
+ SIMD_API void SimdCopy(const uint8_t * src, size_t srcStride, size_t width, size_t height, size_t pixelSize, uint8_t * dst, size_t dstStride)
+ {
+     SIMD_EMPTY();
+@@ -1671,7 +1649,7 @@ SIMD_API void SimdCopyFrame(const uint8_t * src, size_t srcStride, size_t width,
+     SIMD_EMPTY();
+     Base::CopyFrame(src, srcStride, width, height, pixelSize, frameLeft, frameTop, frameRight, frameBottom, dst, dstStride);
+ }
+-
++#if 0
+ SIMD_API void* SimdDescrIntInit(size_t size, size_t depth)
+ {
+     SIMD_EMPTY();
+@@ -1740,7 +1718,7 @@ SIMD_API void SimdDescrIntVectorNorm(const void* context, const uint8_t* a, floa
+     SIMD_EMPTY();
+     return ((Base::DescrInt*)context)->VectorNorm(a, norm);
+ }
+-
++#endif
+ SIMD_API void SimdDeinterleaveUv(const uint8_t * uv, size_t uvStride, size_t width, size_t height,
+                     uint8_t * u, size_t uStride, uint8_t * v, size_t vStride)
+ {
+@@ -1836,7 +1814,7 @@ SIMD_API void SimdDeinterleaveBgra(const uint8_t * bgra, size_t bgraStride, size
+ #endif
+         Base::DeinterleaveBgra(bgra, bgraStride, width, height, b, bStride, g, gStride, r, rStride, a, aStride);
+ }
+-
++#if 0
+ SIMD_API void * SimdDetectionLoadStringXml(char * xml)
+ {
+     SIMD_EMPTY();
+@@ -2035,7 +2013,7 @@ SIMD_API void SimdDetectionLbpDetect16ii(const void * hid, const uint8_t * mask,
+ #endif
+         Base::DetectionLbpDetect16ii(hid, mask, maskStride, left, top, right, bottom, dst, dstStride);
+ }
+-
++#endif
+ SIMD_API void SimdFill(uint8_t * dst, size_t stride, size_t width, size_t height, size_t pixelSize, uint8_t value)
+ {
+     SIMD_EMPTY();
+@@ -2126,7 +2104,7 @@ SIMD_API void SimdFillPixel(uint8_t * dst, size_t stride, size_t width, size_t h
+ #endif
+         Base::FillPixel(dst, stride, width, height, pixel, pixelSize);
+ }
+-
++#if 0
+ SIMD_API void SimdFill32f(float * dst, size_t size, const float * value)
+ {
+     SIMD_EMPTY();
+@@ -2452,7 +2430,7 @@ SIMD_API void SimdGemm32fNT(size_t M, size_t N, size_t K, const float * alpha, c
+ 
+     simdGemm32fNT(M, N, K, alpha, A, lda, B, ldb, beta, C, ldc);
+ }
+-
++#endif
+ SIMD_API void SimdGrayToBgr(const uint8_t * gray, size_t width, size_t height, size_t grayStride, uint8_t * bgr, size_t bgrStride)
+ {
+     SIMD_EMPTY();
+@@ -2530,7 +2508,7 @@ SIMD_API void SimdGrayToY(const uint8_t * gray, size_t grayStride, size_t width,
+ //#endif
+         Base::GrayToY(gray, grayStride, width, height, y, yStride);
+ }
+-
++#if 0
+ SIMD_API void SimdAbsSecondDerivativeHistogram(const uint8_t *src, size_t width, size_t height, size_t stride, size_t step, size_t indent, uint32_t * histogram)
+ {
+     SIMD_EMPTY();
+@@ -2760,7 +2738,7 @@ SIMD_API void SimdHogFilterSeparable(const float * src, size_t srcStride, size_t
+ #endif
+         Base::HogFilterSeparable(src, srcStride, width, height, rowFilter, rowSize, colFilter, colSize, dst, dstStride, add);
+ }
+-
++#endif
+ SIMD_API uint8_t* SimdImageSaveToMemory(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, size_t* size)
+ {
+     SIMD_EMPTY();
+@@ -2768,7 +2746,7 @@ SIMD_API uint8_t* SimdImageSaveToMemory(const uint8_t* src, size_t stride, size_
+ 
+     return imageSaveToMemory(src, stride, width, height, format, file, quality, size);
+ }
+-
++#if 0
+ SIMD_API SimdBool SimdImageSaveToFile(const uint8_t* src, size_t stride, size_t width, size_t height, SimdPixelFormatType format, SimdImageFileType file, int quality, const char* path)
+ {
+     SIMD_EMPTY();
+@@ -2776,7 +2754,7 @@ SIMD_API SimdBool SimdImageSaveToFile(const uint8_t* src, size_t stride, size_t
+ 
+     return ImageSaveToFile(imageSaveToMemory, src, stride, width, height, format, file, quality, path);
+ }
+-
++#endif
+ SIMD_API uint8_t* SimdNv12SaveAsJpegToMemory(const uint8_t* y, size_t yStride, const uint8_t* uv, size_t uvStride, size_t width, size_t height, SimdYuvType yuvType, int quality, size_t* size)
+ {
+     SIMD_EMPTY();
+@@ -2804,7 +2782,7 @@ SIMD_API uint8_t* SimdImageLoadFromMemory(const uint8_t* data, size_t size, size
+ 
+     return imageLoadFromMemory(data, size, stride, width, height, format);
+ }
+-
++#if 0
+ SIMD_API uint8_t* SimdImageLoadFromFile(const char* path, size_t* stride, size_t* width, size_t* height, SimdPixelFormatType* format)
+ {
+     SIMD_EMPTY();
+@@ -2812,7 +2790,7 @@ SIMD_API uint8_t* SimdImageLoadFromFile(const char* path, size_t* stride, size_t
+ 
+     return ImageLoadFromFile(imageLoadFromMemory, path, stride, width, height, format);
+ }
+-
++#endif
+ SIMD_API void SimdInt16ToGray(const uint8_t * src, size_t width, size_t height, size_t srcStride, uint8_t * dst, size_t dstStride)
+ {
+     SIMD_EMPTY();
+@@ -2838,7 +2816,7 @@ SIMD_API void SimdInt16ToGray(const uint8_t * src, size_t width, size_t height,
+ #endif
+         Base::Int16ToGray(src, width, height, srcStride, dst, dstStride);
+ }
+-
++#if 0
+ SIMD_API void SimdIntegral(const uint8_t * src, size_t srcStride, size_t width, size_t height,
+                       uint8_t * sum, size_t sumStride, uint8_t * sqsum, size_t sqsumStride, uint8_t * tilted, size_t tiltedStride,
+                       SimdPixelFormatType sumFormat, SimdPixelFormatType sqsumFormat)
+@@ -3929,7 +3907,7 @@ SIMD_API void SimdReorder64bit(const uint8_t * src, size_t size, uint8_t * dst)
+ #endif
+         Base::Reorder64bit(src, size, dst);
+ }
+-
++#endif
+ SIMD_API void * SimdResizerInit(size_t srcX, size_t srcY, size_t dstX, size_t dstY, size_t channels, SimdResizeChannelType type, SimdResizeMethodType method)
+ {
+     SIMD_EMPTY();
+@@ -4022,7 +4000,7 @@ SIMD_API void SimdRgbaToGray(const uint8_t* rgba, size_t width, size_t height, s
+ #endif
+         Base::RgbaToGray(rgba, width, height, rgbaStride, gray, grayStride);
+ }
+-
++#if 0
+ SIMD_API void SimdSegmentationChangeIndex(uint8_t * mask, size_t stride, size_t width, size_t height, uint8_t oldIndex, uint8_t newIndex)
+ {
+     SIMD_EMPTY();
+@@ -4818,6 +4796,7 @@ SIMD_API void SimdStretchGray2x2(const uint8_t *src, size_t srcWidth, size_t src
+         Base::StretchGray2x2(src, srcWidth, srcHeight, srcStride, dst, dstWidth, dstHeight, dstStride);
+ }
+ 
++
+ SIMD_API void* SimdSynetAdd16bInit(const size_t* aShape, size_t aCount, SimdTensorDataType aType, const size_t* bShape, size_t bCount, SimdTensorDataType bType, SimdTensorDataType dstType, SimdTensorFormatType format)
+ {
+     SIMD_EMPTY();
+@@ -6277,7 +6256,7 @@ SIMD_API void SimdTransformImage(const uint8_t * src, size_t srcStride, size_t w
+ #endif
+         Base::TransformImage(src, srcStride, width, height, pixelSize, transform, dst, dstStride);
+ }
+-
++#endif
+ SIMD_API void SimdUyvy422ToBgr(const uint8_t* uyvy, size_t uyvyStride, size_t width, size_t height, uint8_t* bgr, size_t bgrStride, SimdYuvType yuvType)
+ {
+     SIMD_EMPTY();
+@@ -6329,7 +6308,7 @@ SIMD_API void SimdUyvy422ToYuv420p(const uint8_t* uyvy, size_t uyvyStride, size_
+ #endif
+         Base::Uyvy422ToYuv420p(uyvy, uyvyStride, width, height, y, yStride, u, uStride, v, vStride);
+ }
+-
++#if 0
+ SIMD_API void* SimdWarpAffineInit(size_t srcW, size_t srcH, size_t srcS, size_t dstW, size_t dstH, size_t dstS, size_t channels, const float* mat, SimdWarpAffineFlags flags, const uint8_t* border)
+ {
+     SIMD_EMPTY();    
+@@ -6606,7 +6585,7 @@ SIMD_API void SimdWinogradKernel3x3Block4x4SetOutput(const float * src, size_t s
+     assert(0);
+ #endif
+ }
+-
++#endif
+ SIMD_API void SimdYToGray(const uint8_t* y, size_t yStride, size_t width, size_t height, uint8_t* gray, size_t grayStride)
+ {
+     SIMD_EMPTY();
+diff --git a/src/Simd/SimdNeonImageLoad.cpp b/src/Simd/SimdNeonImageLoad.cpp
+index d4d44e00fbc1321ccb216ce808c7ba0d9ea90634..5814865d6acbb8562ae80918648c81a4409808d1 100644
+--- a/src/Simd/SimdNeonImageLoad.cpp
++++ b/src/Simd/SimdNeonImageLoad.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_NEON_ENABLE    
+     namespace Neon
+     {
++#if 0
+         ImagePgmTxtLoader::ImagePgmTxtLoader(const ImageLoaderParam& param)
+             : Base::ImagePgmTxtLoader(param)
+         {
+@@ -142,20 +143,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageLoader* CreateImageLoader(const ImageLoaderParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtLoader(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinLoader(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtLoader(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
+-            case SimdImageFilePng: return new Base::ImagePngLoader(param);
+             case SimdImageFileJpeg: return new Base::ImageJpegLoader(param);
+-            case SimdImageFileBmp: return new ImageBmpLoader(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdNeonImageSave.cpp b/src/Simd/SimdNeonImageSave.cpp
+index a597f7fd24c1427ce9d9210ee91fa5ffba2cf71c..059f39427aac631dc9470451e69a69db138d1bf5 100644
+--- a/src/Simd/SimdNeonImageSave.cpp
++++ b/src/Simd/SimdNeonImageSave.cpp
+@@ -32,6 +32,7 @@ namespace Simd
+ #ifdef SIMD_NEON_ENABLE    
+     namespace Neon
+     {
++#if 0
+         ImagePgmTxtSaver::ImagePgmTxtSaver(const ImageSaverParam& param)
+             : Base::ImagePgmTxtSaver(param)
+         {
+@@ -111,20 +112,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtSaver(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinSaver(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtSaver(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
+-            case SimdImageFilePng: return new ImagePngSaver(param);
+             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+-            case SimdImageFileBmp: return new ImageBmpSaver(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdNeonResizer.cpp b/src/Simd/SimdNeonResizer.cpp
+index 80b394dbed96b014e361e4a81e55bd42c8bd2ec1..60f8cc5c62f23c86c5767194d791f700b9a9a9ce 100644
+--- a/src/Simd/SimdNeonResizer.cpp
++++ b/src/Simd/SimdNeonResizer.cpp
+@@ -41,10 +41,6 @@ namespace Simd
+                 return new ResizerByteBilinear(param);
+             else if (param.IsByteArea1x1())
+                 return new ResizerByteArea1x1(param);
+-            else if (param.IsShortBilinear() && channels == 1)
+-                return new ResizerShortBilinear(param);
+-            else if (param.IsFloatBilinear())
+-                return new ResizerFloatBilinear(param);
+             else
+                 return Base::ResizerInit(srcX, srcY, dstX, dstY, channels, type, method);
+         }
+diff --git a/src/Simd/SimdNeonResizerBilinear.cpp b/src/Simd/SimdNeonResizerBilinear.cpp
+index 3ba501352674ad46143e6fe03bd6fc8f22dfc4d1..33b0898567c39c8fa3c11021a6fbdbb8a182e481 100644
+--- a/src/Simd/SimdNeonResizerBilinear.cpp
++++ b/src/Simd/SimdNeonResizerBilinear.cpp
+@@ -359,7 +359,7 @@ namespace Simd
+         }
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#if 0
+         ResizerShortBilinear::ResizerShortBilinear(const ResParam& param)
+             : Base::ResizerShortBilinear(param)
+         {
+@@ -712,6 +712,7 @@ namespace Simd
+                     dst[dx] = pbx[0][dx] * fy0 + pbx[1][dx] * fy1;
+             }
+         }
++#endif
+     }
+ #endif// SIMD_NEON_ENABLE
+ }
+diff --git a/src/Simd/SimdSse41ImageLoad.cpp b/src/Simd/SimdSse41ImageLoad.cpp
+index 179f3db79aa6dd53bcc5ca093fcbb93a8e251ea3..6915b529238af088059c6d0667919dcb75652c5f 100644
+--- a/src/Simd/SimdSse41ImageLoad.cpp
++++ b/src/Simd/SimdSse41ImageLoad.cpp
+@@ -33,6 +33,7 @@ namespace Simd
+ #ifdef SIMD_SSE41_ENABLE
+     namespace Sse41
+     {
++#if 0
+         ImagePgmTxtLoader::ImagePgmTxtLoader(const ImageLoaderParam& param)
+             : Base::ImagePgmTxtLoader(param)
+         {
+@@ -147,20 +148,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageLoader* CreateImageLoader(const ImageLoaderParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtLoader(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinLoader(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtLoader(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinLoader(param);
+-            case SimdImageFilePng: return new ImagePngLoader(param);
+             case SimdImageFileJpeg: return new ImageJpegLoader(param);
+-            case SimdImageFileBmp: return new ImageBmpLoader(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdSse41ImageLoadJpeg.cpp b/src/Simd/SimdSse41ImageLoadJpeg.cpp
+index e815fa93f560b7976c6aa448f7584431c8bafb82..312860770444678508db914e75ec504e03edb4f5 100644
+--- a/src/Simd/SimdSse41ImageLoadJpeg.cpp
++++ b/src/Simd/SimdSse41ImageLoadJpeg.cpp
+@@ -434,17 +434,6 @@ namespace Simd
+                 _context->yuv420pToBgra = Sse41::JpegYuv420pToBgra;
+                 _context->rgbaToAny = Sse41::BgraToRgba;
+             }
+-            if (_param.format == SimdPixelFormatRgb24)
+-            {
+-                _context->yuv444pToBgr = Sse41::Yuv444pToRgbV2;
+-                _context->yuv420pToBgr = Sse41::JpegYuv420pToRgb;
+-                _context->rgbaToAny = Sse41::BgraToBgr;
+-            }
+-            if (_param.format == SimdPixelFormatRgba32)
+-            {
+-                _context->yuv444pToBgra = Sse41::Yuv444pToRgbaV2;
+-                _context->yuv420pToBgra = Sse41::JpegYuv420pToRgba;
+-            }
+         }
+     }
+ #endif
+diff --git a/src/Simd/SimdSse41ImageSave.cpp b/src/Simd/SimdSse41ImageSave.cpp
+index f050bdab017ff31ecab255b4b639e71c968423af..a5bce7935dd32f9153d0d1f6a8479e7086eba775 100644
+--- a/src/Simd/SimdSse41ImageSave.cpp
++++ b/src/Simd/SimdSse41ImageSave.cpp
+@@ -33,6 +33,7 @@ namespace Simd
+ #ifdef SIMD_SSE41_ENABLE
+     namespace Sse41
+     {
++#if 0
+         ImagePgmTxtSaver::ImagePgmTxtSaver(const ImageSaverParam& param)
+             : Base::ImagePgmTxtSaver(param)
+         {
+@@ -116,20 +117,14 @@ namespace Simd
+             default: break;
+             }
+         }
+-
++#endif
+         //-------------------------------------------------------------------------------------------------
+ 
+         ImageSaver* CreateImageSaver(const ImageSaverParam& param)
+         {
+             switch (param.file)
+             {
+-            case SimdImageFilePgmTxt: return new ImagePgmTxtSaver(param);
+-            case SimdImageFilePgmBin: return new ImagePgmBinSaver(param);
+-            case SimdImageFilePpmTxt: return new ImagePpmTxtSaver(param);
+-            case SimdImageFilePpmBin: return new ImagePpmBinSaver(param);
+-            case SimdImageFilePng: return new ImagePngSaver(param);
+             case SimdImageFileJpeg: return new ImageJpegSaver(param);
+-            case SimdImageFileBmp: return new ImageBmpSaver(param);
+             default:
+                 return NULL;
+             }
+diff --git a/src/Simd/SimdSse41Resizer.cpp b/src/Simd/SimdSse41Resizer.cpp
+index 1a7ae6639789b7da2db3b8f4a0fa2adb1e3c4876..446d90f05d640b5372b8c000b900e44e933e307d 100644
+--- a/src/Simd/SimdSse41Resizer.cpp
++++ b/src/Simd/SimdSse41Resizer.cpp
+@@ -37,12 +37,6 @@ namespace Simd
+                 return new ResizerNearest(param);
+             else if (param.IsByteBilinear() && dstX >= A)
+                 return new ResizerByteBilinear(param);
+-            else if (param.IsShortBilinear())
+-                return new ResizerShortBilinear(param);
+-            else if (param.IsFloatBilinear())
+-                return new ResizerFloatBilinear(param);
+-            else if (param.IsBf16Bilinear())
+-                return new ResizerBf16Bilinear(param);
+             else if (param.IsByteBicubic())
+                 return new ResizerByteBicubic(param);
+             else if (param.IsByteArea2x2())
+diff --git a/src/Simd/SimdSse41ResizerBilinear.cpp b/src/Simd/SimdSse41ResizerBilinear.cpp
+index 1669c3c0b50c505344b98d4395f65a72880383f8..9f5ea82260b140d1d5cc5a0c35c209b0737adec6 100644
+--- a/src/Simd/SimdSse41ResizerBilinear.cpp
++++ b/src/Simd/SimdSse41ResizerBilinear.cpp
+@@ -25,7 +25,6 @@
+ #include "Simd/SimdStore.h"
+ #include "Simd/SimdResizer.h"
+ #include "Simd/SimdResizerCommon.h"
+-#include "Simd/SimdBFloat16.h"
+ 
+ namespace Simd
+ {
+@@ -334,7 +333,7 @@ namespace Simd
+         }
+ 
+         //-------------------------------------------------------------------------------------------------
+-
++#if 0
+         ResizerShortBilinear::ResizerShortBilinear(const ResParam& param)
+             : Base::ResizerShortBilinear(param)
+         {
+@@ -1024,6 +1023,7 @@ namespace Simd
+                 }
+             }
+         }
++#endif
+     }
+ #endif
+ }
