@@ -1122,10 +1122,17 @@ class VariableMatrix : public SleipnirBase {
         Eigen::Vector<Scalar, Eigen::Dynamic>::Constant(rows(), q[0])
             .asDiagonal()};
     auto A_pow = *this;
-    for (size_t k = 1; k < NUM_COEFFS; ++k) {
+    size_t k = 1;
+    while (true) {
       P += p[k] * A_pow;
       Q += q[k] * A_pow;
-      A_pow *= *this;
+
+      ++k;
+      if (k < NUM_COEFFS) {
+        A_pow *= *this;
+      } else {
+        break;
+      }
     }
 
     // https://mpmath.org/doc/current/calculus/approximation.html#mpmath.pade

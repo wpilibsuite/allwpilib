@@ -1,0 +1,14 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "UnitTest",
+    srcs = glob(
+        ["**/*.py"],
+        exclude = ["tests/**"],
+    ),
+    main = "robot.py",
+    test_srcs = glob(["tests/**/*.py"]),
+    deps = [
+        "//drivers:wpilib-drivers",
+    ],
+)

@@ -11,8 +11,8 @@ import org.wpilib.command3.Command;
 import org.wpilib.command3.Scheduler;
 import org.wpilib.command3.Trigger;
 import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.epilogue.Epilogue;
 import org.wpilib.epilogue.Logged;
+import org.wpilib.epilogue.generated.Epilogue;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Intake;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Shooter;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.SwerveDrive;
@@ -29,6 +29,9 @@ public class Robot extends OpModeRobot {
 
   public final Trigger inNeutralZone = new Trigger(() -> poseEstimator.inZone(NEUTRAL_ZONE));
 
+  // Store the scheduler in a field for Epilogue to pick up and log for us
+  private final Scheduler scheduler = Scheduler.getDefault();
+
   /** Initializes the robot class and sets safe default commands for all its mechanisms. */
   public Robot() {
     swerveDrive.setDefaultCommand(swerveDrive.idle());
@@ -42,7 +45,7 @@ public class Robot extends OpModeRobot {
     poseEstimator.odometryUpdate(swerveDrive.getGyroHeading(), swerveDrive.getModulePositions());
 
     // 2. Run the scheduler to poll triggers and execute our commands.
-    Scheduler.getDefault().run();
+    scheduler.run();
 
     // 3. Update telemetry.
     Epilogue.update(this);

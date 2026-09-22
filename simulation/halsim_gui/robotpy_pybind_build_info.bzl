@@ -53,6 +53,8 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
             "//hal:robotpy-native-wpihal.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
             "//simulation/halsim_gui:robotpy-native-halsim-gui.copy_headers",
+            "//telemetry:robotpy-native-telemetry.copy_headers",
+            "//tunables:robotpy-native-tunables.copy_headers",
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
@@ -79,10 +81,8 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         ],
         dynamic_deps = [
             "//hal:shared/wpiHal",
-            "//simulation/halsim_gui:shared/halsim_gui",
             "//ntcore:shared/ntcore",
-            "//telemetry:shared/telemetry",
-            "//tunables:shared/tunables",
+            "//simulation/halsim_gui:shared/halsim_gui",
             "//wpimath:shared/wpimath",
         ],
         extra_hdrs = extra_hdrs,
@@ -101,7 +101,7 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -133,6 +133,7 @@ def define_pybind_library(name, pkgcfgs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/halsim_gui/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(
@@ -151,8 +152,8 @@ def define_pybind_library(name, pkgcfgs = []):
         imports = ["src/main/python"],
         deps = [
             "//hal:robotpy-hal",
-            "//simulation/halsim_gui:robotpy-native-halsim-gui",
             "//ntcore:pyntcore",
+            "//simulation/halsim_gui:robotpy-native-halsim-gui",
             "//wpimath:robotpy-wpimath",
             "//wpiutil:robotpy-wpiutil",
         ],

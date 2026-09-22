@@ -95,6 +95,18 @@ option(WPILIB_WITH_WPILIB "Build hal, wpilibc/j, drivers, and developerRobot (ne
 option(WPILIB_WITH_EXAMPLES "Build examples" OFF)
 option(WPILIB_WITH_TESTS "Build unit tests (requires internet connection)" ${PROJECT_IS_TOP_LEVEL})
 option(WPILIB_WITH_GUI "Build GUI items (needs SDL3)" OFF)
+option(
+    WPILIB_WITH_IMGUI_TESTS
+    "Build ImGui GUI tests (clones imgui_test_engine; see its license)"
+    OFF
+)
+cmake_dependent_option(
+    WPILIB_IMGUI_TESTS_HEADLESS
+    "Run ImGui GUI tests with SDL's dummy video backend"
+    ON
+    WPILIB_WITH_IMGUI_TESTS
+    OFF
+)
 cmake_dependent_option(
     WPILIB_WITH_FIELDS
     "Build the fields target"
@@ -127,6 +139,8 @@ wpilib_config(OPTIONS WPILIB_WITH_GUI REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WP
 wpilib_config(OPTIONS WPILIB_WITH_WPILIB REQUIRES WPILIB_WITH_NTCORE WPILIB_WITH_WPIMATH)
 
 wpilib_config(OPTIONS WPILIB_WITH_FIELDS REQUIRES WPILIB_WITH_WPIMATH)
+
+wpilib_config(OPTIONS WPILIB_WITH_IMGUI_TESTS REQUIRES WPILIB_WITH_GUI WPILIB_WITH_TESTS)
 
 # These projects build executables
 wpilib_config(OPTIONS WPILIB_WITH_WPICAL REQUIRES WPILIB_WITH_EXECUTABLES)
@@ -265,6 +279,17 @@ if(WPILIB_WITH_TESTS)
     include(Catch)
 endif()
 
+if(WPILIB_WITH_IMGUI_TESTS)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        imgui_test_engine
+        GIT_REPOSITORY https://github.com/ocornut/imgui_test_engine.git
+        GIT_TAG fdc1cb0930fa9bc2bef1d884bf2c10b570d29170
+    )
+    FetchContent_MakeAvailable(imgui_test_engine)
+endif()
+
 if(WPILIB_USE_SYSTEM_LIBUV)
     set(LIBUV_SYSTEM_REPLACE "find_dependency(libuv CONFIG)")
 endif()
@@ -298,6 +323,10 @@ endif()
 if(WPILIB_WITH_WPIMATH)
     set(WPIMATH_DEP_REPLACE "find_dependency(wpimath)")
     add_subdirectory(wpimath)
+endif()
+
+if(WPILIB_WITH_WPILIB OR WPILIB_WITH_WPICAL)
+    add_subdirectory(apriltag)
 endif()
 
 if(WPILIB_WITH_FIELDS)
@@ -337,7 +366,6 @@ if(WPILIB_WITH_WPILIB)
     set(DRIVERS_DEP_REPLACE "find_dependency(drivers)")
     set(WPILIBC_DEP_REPLACE "find_dependency(wpilibc)")
     set(COMMAND_DEP_REPLACE "find_dependency(commandsv2)")
-    add_subdirectory(apriltag)
     add_subdirectory(wpilibc)
     add_subdirectory(drivers)
     if(WPILIB_WITH_CSCORE)

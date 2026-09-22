@@ -6,6 +6,7 @@
 #include <array>
 #include <cmath>
 #include <concepts>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <memory>
@@ -24,11 +25,14 @@
 #include "sleipnir/autodiff/variable.hpp"
 #include "sleipnir/autodiff/variable_matrix.hpp"
 #include "sleipnir/optimization/solver/exit_status.hpp"
-#include "sleipnir/optimization/solver/interior_point.hpp"
+#include "sleipnir/optimization/solver/ipm.hpp"
+#include "sleipnir/optimization/solver/ipm_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/iteration_info.hpp"
 #include "sleipnir/optimization/solver/newton.hpp"
+#include "sleipnir/optimization/solver/newton_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/options.hpp"
 #include "sleipnir/optimization/solver/sqp.hpp"
+#include "sleipnir/optimization/solver/sqp_matrix_callbacks.hpp"
 #include "sleipnir/optimization/solver/util/bounds.hpp"
 #include "sleipnir/optimization/solver/util/problem_scaling.hpp"
 #include "sleipnir/util/empty.hpp"
@@ -278,56 +282,26 @@ class Problem {
   ///     named H.spy, A_e.spy, and A_i.spy respectively during solve. Use
   ///     tools/spy.py to plot them.
   /// @return The solver status.
-  ExitStatus solve(const Options& options = Options{},
-                   [[maybe_unused]] bool spy = false) {
-    using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
-    using SparseMatrix = Eigen::SparseMatrix<Scalar>;
-    using SparseVector = Eigen::SparseVector<Scalar>;
-
-    // Create the initial value column vector
-    DenseVector x{m_decision_variables.size()};
-    for (size_t i = 0; i < m_decision_variables.size(); ++i) {
-      x[i] = m_decision_variables[i].value();
-    }
-
+  ExitStatus solve(const Options& options = Options{}, bool spy = false) {
     if (options.diagnostics) {
       print_exit_conditions(options);
       print_problem_analysis();
     }
 
-    // Get the highest order constraint expression types
-    auto f_type = cost_function_type();
-    auto c_e_type = equality_constraint_type();
-    auto c_i_type = inequality_constraint_type();
-
     // If the problem is empty or constant, there's nothing to do
-    if (f_type <= ExpressionType::CONSTANT &&
-        c_e_type <= ExpressionType::CONSTANT &&
-        c_i_type <= ExpressionType::CONSTANT) {
-#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    if (cost_function_type() <= ExpressionType::CONSTANT &&
+        equality_constraint_type() <= ExpressionType::CONSTANT &&
+        inequality_constraint_type() <= ExpressionType::CONSTANT) {
       if (options.diagnostics) {
         slp::println("\nInvoking no-op solver\n");
       }
-#endif
       return ExitStatus::SUCCESS;
     }
 
-    VariableMatrix<Scalar> x_ad{m_decision_variables};
-
-    // Set up cost function
-    Variable f = m_f.value_or(Scalar(0));
-
-    int num_decision_variables = m_decision_variables.size();
-    int num_equality_constraints = m_equality_constraints.size();
-    int num_inequality_constraints = m_inequality_constraints.size();
-
-    gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
-        iteration_callbacks;
-    for (const auto& callback : m_iteration_callbacks) {
-      iteration_callbacks.emplace_back(callback);
-    }
-    for (const auto& callback : m_persistent_iteration_callbacks) {
-      iteration_callbacks.emplace_back(callback);
+    // Create the initial value column vector
+    DenseVector x{m_decision_variables.size()};
+    for (size_t i = 0; i < m_decision_variables.size(); ++i) {
+      x[i] = m_decision_variables[i].value();
     }
 
     // Solve the optimization problem
@@ -337,335 +311,19 @@ class Problem {
         slp::println("\nInvoking Newton solver\n");
       }
 
-      gch::small_vector<SetupProfiler> ad_setup_profilers;
-      ad_setup_profilers.emplace_back("setup");
-      ad_setup_profilers.emplace_back("↳ ∇f(x)");
-      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
-
-      ad_setup_profilers[0].start();
-
-      // Set up gradient autodiff
-      ad_setup_profilers[1].start();
-      Gradient g{f, x_ad};
-      ad_setup_profilers[1].stop();
-
-      // Set up Lagrangian Hessian autodiff
-      ad_setup_profilers[2].start();
-      Hessian<Scalar, Eigen::Lower> H{f, x_ad};
-      ad_setup_profilers[2].stop();
-
-      ad_setup_profilers[0].stop();
-
-      if (options.diagnostics) {
-        print_setup_diagnostics(ad_setup_profilers);
-      }
-
-#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-      // Sparsity pattern files written when spy flag is set
-      std::unique_ptr<Spy<Scalar>> H_spy;
-
-      if (spy) {
-        H_spy = std::make_unique<Spy<Scalar>>(
-            "H.spy", "Hessian", "Decision variables", "Decision variables",
-            num_decision_variables, num_decision_variables);
-        iteration_callbacks.push_back(
-            [&](const IterationInfo<Scalar>& info) -> bool {
-              H_spy->add(info.H);
-              return false;
-            });
-      }
-#endif
-
-      // Automatically scale the cost. The problem scaling procedure is
-      // described in more detail in docs/algorithms.md#problem-scaling.
-      x_ad.set_value(x);
-      const ProblemScaling<Scalar> scaling{g.value()};
-
-      NewtonMatrixCallbacks<Scalar> matrix_callbacks{
-          num_decision_variables,
-          [&](const DenseVector& x) -> Scalar {
-            x_ad.set_value(x);
-            return scaling.f * f.value();
-          },
-          [&](const DenseVector& x) -> SparseVector {
-            x_ad.set_value(x);
-            return scaling.f * g.value();
-          },
-          [&](const DenseVector& x) -> SparseMatrix {
-            x_ad.set_value(x);
-            return scaling.f * H.value();
-          },
-          scaling};
-
-      // Invoke Newton solver
-      status =
-          newton<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
+      status = solve_newton(options, spy, x);
     } else if (m_inequality_constraints.empty()) {
       if (options.diagnostics) {
         slp::println("\nInvoking SQP solver\n");
       }
 
-      VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
-      VariableMatrix<Scalar> y_ad(num_equality_constraints);
-
-      gch::small_vector<SetupProfiler> ad_setup_profilers;
-      ad_setup_profilers.emplace_back("setup");
-      ad_setup_profilers.emplace_back("↳ ∇f(x)");
-      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
-      ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
-
-      ad_setup_profilers[0].start();
-
-      // Set up gradient autodiff
-      ad_setup_profilers[1].start();
-      Gradient g{f, x_ad};
-      ad_setup_profilers[1].stop();
-
-      ad_setup_profilers[2].start();
-
-      // Set up cost part of Lagrangian Hessian autodiff
-      ad_setup_profilers[3].start();
-      Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
-      ad_setup_profilers[3].stop();
-
-      // Set up constraint part of Lagrangian Hessian autodiff
-      ad_setup_profilers[4].start();
-      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad, x_ad};
-      ad_setup_profilers[4].stop();
-
-      ad_setup_profilers[2].stop();
-
-      // Set up equality constraint Jacobian autodiff
-      ad_setup_profilers[5].start();
-      Jacobian A_e{c_e_ad, x_ad};
-      ad_setup_profilers[5].stop();
-
-      ad_setup_profilers[0].stop();
-
-      if (options.diagnostics) {
-        print_setup_diagnostics(ad_setup_profilers);
-      }
-
-#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-      // Sparsity pattern files written when spy flag is set
-      std::unique_ptr<Spy<Scalar>> H_spy;
-      std::unique_ptr<Spy<Scalar>> A_e_spy;
-
-      if (spy) {
-        H_spy = std::make_unique<Spy<Scalar>>(
-            "H.spy", "Hessian", "Decision variables", "Decision variables",
-            num_decision_variables, num_decision_variables);
-        A_e_spy = std::make_unique<Spy<Scalar>>(
-            "A_e.spy", "Equality constraint Jacobian", "Constraints",
-            "Decision variables", num_equality_constraints,
-            num_decision_variables);
-        iteration_callbacks.push_back(
-            [&](const IterationInfo<Scalar>& info) -> bool {
-              H_spy->add(info.H);
-              A_e_spy->add(info.A_e);
-              return false;
-            });
-      }
-#endif
-
-      // Automatically scale the cost and constraints. The problem scaling
-      // procedure is described in more detail in
-      // docs/algorithms.md#problem-scaling.
-      x_ad.set_value(x);
-      const ProblemScaling<Scalar> scaling{g.value(), A_e.value()};
-
-      SQPMatrixCallbacks<Scalar> matrix_callbacks{
-          num_decision_variables,
-          num_equality_constraints,
-          [&](const DenseVector& x) -> Scalar {
-            x_ad.set_value(x);
-            return scaling.f * f.value();
-          },
-          [&](const DenseVector& x) -> SparseVector {
-            x_ad.set_value(x);
-            return scaling.f * g.value();
-          },
-          [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
-            x_ad.set_value(x);
-            y_ad.set_value(scaling.c_e.cwiseProduct(y));
-            return scaling.f * H_f.value() + H_c.value();
-          },
-          [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
-            x_ad.set_value(x);
-            y_ad.set_value(scaling.c_e.cwiseProduct(y));
-            return H_c.value();
-          },
-          [&](const DenseVector& x) -> DenseVector {
-            x_ad.set_value(x);
-            return scaling.c_e.cwiseProduct(c_e_ad.value());
-          },
-          [&](const DenseVector& x) -> SparseMatrix {
-            x_ad.set_value(x);
-            return scaling.c_e.asDiagonal() * A_e.value();
-          },
-          scaling};
-
-      // Invoke SQP solver
-      status = sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
+      status = solve_sqp(options, spy, x);
     } else {
       if (options.diagnostics) {
         slp::println("\nInvoking IPM solver\n");
       }
 
-      VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
-      VariableMatrix<Scalar> c_i_ad{m_inequality_constraints};
-      VariableMatrix<Scalar> y_ad(num_equality_constraints);
-      VariableMatrix<Scalar> z_ad(num_inequality_constraints);
-
-      gch::small_vector<SetupProfiler> ad_setup_profilers;
-      ad_setup_profilers.emplace_back("setup");
-      ad_setup_profilers.emplace_back("↳ ∇f(x)");
-      ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
-      ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
-      ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
-      ad_setup_profilers.emplace_back("↳ ∂cᵢ/∂x");
-
-      ad_setup_profilers[0].start();
-
-      // Set up gradient autodiff
-      ad_setup_profilers[1].start();
-      Gradient g{f, x_ad};
-      ad_setup_profilers[1].stop();
-
-      ad_setup_profilers[2].start();
-
-      // Set up cost part of Lagrangian Hessian autodiff
-      ad_setup_profilers[3].start();
-      Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
-      ad_setup_profilers[3].stop();
-
-      // Set up constraint part of Lagrangian Hessian autodiff
-      ad_setup_profilers[4].start();
-      Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad - z_ad.T() * c_i_ad,
-                                        x_ad};
-      ad_setup_profilers[4].stop();
-
-      ad_setup_profilers[2].stop();
-
-      // Set up equality constraint Jacobian autodiff
-      ad_setup_profilers[5].start();
-      Jacobian A_e{c_e_ad, x_ad};
-      ad_setup_profilers[5].stop();
-
-      // Set up inequality constraint Jacobian autodiff
-      ad_setup_profilers[6].start();
-      Jacobian A_i{c_i_ad, x_ad};
-      ad_setup_profilers[6].stop();
-
-      ad_setup_profilers[0].stop();
-
-      if (options.diagnostics) {
-        print_setup_diagnostics(ad_setup_profilers);
-      }
-
-#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
-      // Sparsity pattern files written when spy flag is set
-      std::unique_ptr<Spy<Scalar>> H_spy;
-      std::unique_ptr<Spy<Scalar>> A_e_spy;
-      std::unique_ptr<Spy<Scalar>> A_i_spy;
-
-      if (spy) {
-        H_spy = std::make_unique<Spy<Scalar>>(
-            "H.spy", "Hessian", "Decision variables", "Decision variables",
-            num_decision_variables, num_decision_variables);
-        A_e_spy = std::make_unique<Spy<Scalar>>(
-            "A_e.spy", "Equality constraint Jacobian", "Constraints",
-            "Decision variables", num_equality_constraints,
-            num_decision_variables);
-        A_i_spy = std::make_unique<Spy<Scalar>>(
-            "A_i.spy", "Inequality constraint Jacobian", "Constraints",
-            "Decision variables", num_inequality_constraints,
-            num_decision_variables);
-        iteration_callbacks.push_back(
-            [&](const IterationInfo<Scalar>& info) -> bool {
-              H_spy->add(info.H);
-              A_e_spy->add(info.A_e);
-              A_i_spy->add(info.A_i);
-              return false;
-            });
-      }
-#endif
-
-      const auto [bound_constraint_mask, bounds, conflicting_bound_indices] =
-          get_bounds<Scalar>(m_decision_variables, m_inequality_constraints,
-                             A_i.value());
-      if (!conflicting_bound_indices.empty()) {
-        if (options.diagnostics) {
-          print_bound_constraint_global_infeasibility_error(
-              conflicting_bound_indices);
-        }
-        return ExitStatus::GLOBALLY_INFEASIBLE;
-      }
-
-#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
-      project_onto_bounds(x, bounds);
-#endif
-
-      // Automatically scale the cost and constraints. The problem scaling
-      // procedure is described in more detail in
-      // docs/algorithms.md#problem-scaling.
-      x_ad.set_value(x);
-      const ProblemScaling<Scalar> scaling{g.value(), A_e.value(), A_i.value()};
-
-      InteriorPointMatrixCallbacks<Scalar> matrix_callbacks{
-          num_decision_variables,
-          num_equality_constraints,
-          num_inequality_constraints,
-          [&](const DenseVector& x) -> Scalar {
-            x_ad.set_value(x);
-            return scaling.f * f.value();
-          },
-          [&](const DenseVector& x) -> SparseVector {
-            x_ad.set_value(x);
-            return scaling.f * g.value();
-          },
-          [&](const DenseVector& x, const DenseVector& y,
-              const DenseVector& z) -> SparseMatrix {
-            x_ad.set_value(x);
-            y_ad.set_value(scaling.c_e.cwiseProduct(y));
-            z_ad.set_value(scaling.c_i.cwiseProduct(z));
-            return scaling.f * H_f.value() + H_c.value();
-          },
-          [&](const DenseVector& x, const DenseVector& y,
-              const DenseVector& z) -> SparseMatrix {
-            x_ad.set_value(x);
-            y_ad.set_value(scaling.c_e.cwiseProduct(y));
-            z_ad.set_value(scaling.c_i.cwiseProduct(z));
-            return H_c.value();
-          },
-          [&](const DenseVector& x) -> DenseVector {
-            x_ad.set_value(x);
-            return scaling.c_e.cwiseProduct(c_e_ad.value());
-          },
-          [&](const DenseVector& x) -> SparseMatrix {
-            x_ad.set_value(x);
-            return scaling.c_e.asDiagonal() * A_e.value();
-          },
-          [&](const DenseVector& x) -> DenseVector {
-            x_ad.set_value(x);
-            return scaling.c_i.cwiseProduct(c_i_ad.value());
-          },
-          [&](const DenseVector& x) -> SparseMatrix {
-            x_ad.set_value(x);
-            return scaling.c_i.asDiagonal() * A_i.value();
-          },
-          scaling};
-
-      // Invoke interior-point method solver
-      status =
-          interior_point<Scalar>(matrix_callbacks, iteration_callbacks, options,
-#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
-                                 bound_constraint_mask,
-#endif
-                                 x);
+      status = solve_ipm(options, spy, x);
     }
 
     if (options.diagnostics) {
@@ -730,6 +388,8 @@ class Problem {
   }
 
  private:
+  using DenseVector = Eigen::Vector<Scalar, Eigen::Dynamic>;
+
   // The list of decision variables, which are the root of the problem's
   // expression tree
   gch::small_vector<Variable<Scalar>> m_decision_variables;
@@ -749,7 +409,396 @@ class Problem {
   gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
       m_persistent_iteration_callbacks;
 
-  void print_exit_conditions([[maybe_unused]] const Options& options) {
+  ExitStatus solve_newton(const Options& options, [[maybe_unused]] bool spy,
+                          DenseVector& x) {
+    using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+    using SparseVector = Eigen::SparseVector<Scalar>;
+
+    VariableMatrix<Scalar> x_ad{m_decision_variables};
+
+    // Set up cost function
+    Variable f = m_f.value_or(Scalar(0));
+
+    int num_decision_variables = m_decision_variables.size();
+
+    gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
+        iteration_callbacks;
+    for (const auto& callback : m_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+    for (const auto& callback : m_persistent_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+
+    gch::small_vector<SetupProfiler> ad_setup_profilers;
+    ad_setup_profilers.emplace_back("setup");
+    ad_setup_profilers.emplace_back("↳ ∇f(x)");
+    ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+
+    ad_setup_profilers[0].start();
+
+    // Set up gradient autodiff
+    ad_setup_profilers[1].start();
+    Gradient g{f, x_ad};
+    ad_setup_profilers[1].stop();
+
+    // Set up Lagrangian Hessian autodiff
+    ad_setup_profilers[2].start();
+    Hessian<Scalar, Eigen::Lower> H{f, x_ad};
+    ad_setup_profilers[2].stop();
+
+    ad_setup_profilers[0].stop();
+
+    if (options.diagnostics) {
+      print_setup_diagnostics(ad_setup_profilers);
+    }
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    // Sparsity pattern files written when spy flag is set
+    std::unique_ptr<Spy<Scalar>> H_spy;
+
+    if (spy) {
+      H_spy = std::make_unique<Spy<Scalar>>(
+          "H.spy", "Hessian", "Decision variables", "Decision variables",
+          num_decision_variables, num_decision_variables);
+      iteration_callbacks.push_back(
+          [&](const IterationInfo<Scalar>& info) -> bool {
+            H_spy->add(info.H);
+            return false;
+          });
+    }
+#endif
+
+    // Automatically scale the cost. The problem scaling procedure is
+    // described in more detail in docs/algorithms.md#problem-scaling.
+    x_ad.set_value(x);
+    const ProblemScaling<Scalar> scaling{g.value()};
+
+    NewtonMatrixCallbacks<Scalar> matrix_callbacks{
+        num_decision_variables,
+        [&](const DenseVector& x) -> Scalar {
+          x_ad.set_value(x);
+          return scaling.f * f.value();
+        },
+        [&](const DenseVector& x) -> SparseVector {
+          x_ad.set_value(x);
+          return scaling.f * g.value();
+        },
+        [&](const DenseVector& x) -> SparseMatrix {
+          x_ad.set_value(x);
+          return scaling.f * H.value();
+        },
+        scaling};
+
+    // Invoke Newton solver
+    return newton<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
+  }
+
+  ExitStatus solve_sqp(const Options& options, [[maybe_unused]] bool spy,
+                       DenseVector& x) {
+    using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+    using SparseVector = Eigen::SparseVector<Scalar>;
+
+    VariableMatrix<Scalar> x_ad{m_decision_variables};
+
+    // Set up cost function
+    Variable f = m_f.value_or(Scalar(0));
+
+    int num_decision_variables = m_decision_variables.size();
+    int num_equality_constraints = m_equality_constraints.size();
+
+    gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
+        iteration_callbacks;
+    for (const auto& callback : m_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+    for (const auto& callback : m_persistent_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+
+    VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
+    VariableMatrix<Scalar> y_ad(num_equality_constraints);
+
+    gch::small_vector<SetupProfiler> ad_setup_profilers;
+    ad_setup_profilers.emplace_back("setup");
+    ad_setup_profilers.emplace_back("↳ ∇f(x)");
+    ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+    ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
+    ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
+    ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
+
+    ad_setup_profilers[0].start();
+
+    // Set up gradient autodiff
+    ad_setup_profilers[1].start();
+    Gradient g{f, x_ad};
+    ad_setup_profilers[1].stop();
+
+    ad_setup_profilers[2].start();
+
+    // Set up cost part of Lagrangian Hessian autodiff
+    ad_setup_profilers[3].start();
+    Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
+    ad_setup_profilers[3].stop();
+
+    // Set up constraint part of Lagrangian Hessian autodiff
+    ad_setup_profilers[4].start();
+    Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad, x_ad};
+    ad_setup_profilers[4].stop();
+
+    ad_setup_profilers[2].stop();
+
+    // Set up equality constraint Jacobian autodiff
+    ad_setup_profilers[5].start();
+    Jacobian A_e{c_e_ad, x_ad};
+    ad_setup_profilers[5].stop();
+
+    ad_setup_profilers[0].stop();
+
+    if (options.diagnostics) {
+      print_setup_diagnostics(ad_setup_profilers);
+    }
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    // Sparsity pattern files written when spy flag is set
+    std::unique_ptr<Spy<Scalar>> H_spy;
+    std::unique_ptr<Spy<Scalar>> A_e_spy;
+
+    if (spy) {
+      H_spy = std::make_unique<Spy<Scalar>>(
+          "H.spy", "Hessian", "Decision variables", "Decision variables",
+          num_decision_variables, num_decision_variables);
+      A_e_spy = std::make_unique<Spy<Scalar>>(
+          "A_e.spy", "Equality constraint Jacobian", "Constraints",
+          "Decision variables", num_equality_constraints,
+          num_decision_variables);
+      iteration_callbacks.push_back(
+          [&](const IterationInfo<Scalar>& info) -> bool {
+            H_spy->add(info.H);
+            A_e_spy->add(info.A_e);
+            return false;
+          });
+    }
+#endif
+
+    // Automatically scale the cost and constraints. The problem scaling
+    // procedure is described in more detail in
+    // docs/algorithms.md#problem-scaling.
+    x_ad.set_value(x);
+    const ProblemScaling<Scalar> scaling{g.value(), A_e.value()};
+
+    SQPMatrixCallbacks<Scalar> matrix_callbacks{
+        num_decision_variables,
+        num_equality_constraints,
+        [&](const DenseVector& x) -> Scalar {
+          x_ad.set_value(x);
+          return scaling.f * f.value();
+        },
+        [&](const DenseVector& x) -> SparseVector {
+          x_ad.set_value(x);
+          return scaling.f * g.value();
+        },
+        [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
+          x_ad.set_value(x);
+          y_ad.set_value(scaling.c_e.cwiseProduct(y));
+          return scaling.f * H_f.value() + H_c.value();
+        },
+        [&](const DenseVector& x, const DenseVector& y) -> SparseMatrix {
+          x_ad.set_value(x);
+          y_ad.set_value(scaling.c_e.cwiseProduct(y));
+          return H_c.value();
+        },
+        [&](const DenseVector& x) -> DenseVector {
+          x_ad.set_value(x);
+          return scaling.c_e.cwiseProduct(c_e_ad.value());
+        },
+        [&](const DenseVector& x) -> SparseMatrix {
+          x_ad.set_value(x);
+          return scaling.c_e.asDiagonal() * A_e.value();
+        },
+        scaling};
+
+    // Invoke SQP solver
+    return sqp<Scalar>(matrix_callbacks, iteration_callbacks, options, x);
+  }
+
+  ExitStatus solve_ipm(const Options& options, [[maybe_unused]] bool spy,
+                       DenseVector& x) {
+    using SparseMatrix = Eigen::SparseMatrix<Scalar>;
+    using SparseVector = Eigen::SparseVector<Scalar>;
+
+    VariableMatrix<Scalar> x_ad{m_decision_variables};
+
+    // Set up cost function
+    Variable f = m_f.value_or(Scalar(0));
+
+    int num_decision_variables = m_decision_variables.size();
+    int num_equality_constraints = m_equality_constraints.size();
+    int num_inequality_constraints = m_inequality_constraints.size();
+
+    gch::small_vector<std::function<bool(const IterationInfo<Scalar>& info)>>
+        iteration_callbacks;
+    for (const auto& callback : m_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+    for (const auto& callback : m_persistent_iteration_callbacks) {
+      iteration_callbacks.emplace_back(callback);
+    }
+
+    VariableMatrix<Scalar> c_e_ad{m_equality_constraints};
+    VariableMatrix<Scalar> c_i_ad{m_inequality_constraints};
+    VariableMatrix<Scalar> y_ad(num_equality_constraints);
+    VariableMatrix<Scalar> z_ad(num_inequality_constraints);
+
+    gch::small_vector<SetupProfiler> ad_setup_profilers;
+    ad_setup_profilers.emplace_back("setup");
+    ad_setup_profilers.emplace_back("↳ ∇f(x)");
+    ad_setup_profilers.emplace_back("↳ ∇²ₓₓL");
+    ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_f");
+    ad_setup_profilers.emplace_back("  ↳ ∇²ₓₓL_c");
+    ad_setup_profilers.emplace_back("↳ ∂cₑ/∂x");
+    ad_setup_profilers.emplace_back("↳ ∂cᵢ/∂x");
+
+    ad_setup_profilers[0].start();
+
+    // Set up gradient autodiff
+    ad_setup_profilers[1].start();
+    Gradient g{f, x_ad};
+    ad_setup_profilers[1].stop();
+
+    ad_setup_profilers[2].start();
+
+    // Set up cost part of Lagrangian Hessian autodiff
+    ad_setup_profilers[3].start();
+    Hessian<Scalar, Eigen::Lower> H_f{f, x_ad};
+    ad_setup_profilers[3].stop();
+
+    // Set up constraint part of Lagrangian Hessian autodiff
+    ad_setup_profilers[4].start();
+    Hessian<Scalar, Eigen::Lower> H_c{-y_ad.T() * c_e_ad - z_ad.T() * c_i_ad,
+                                      x_ad};
+    ad_setup_profilers[4].stop();
+
+    ad_setup_profilers[2].stop();
+
+    // Set up equality constraint Jacobian autodiff
+    ad_setup_profilers[5].start();
+    Jacobian A_e{c_e_ad, x_ad};
+    ad_setup_profilers[5].stop();
+
+    // Set up inequality constraint Jacobian autodiff
+    ad_setup_profilers[6].start();
+    Jacobian A_i{c_i_ad, x_ad};
+    ad_setup_profilers[6].stop();
+
+    ad_setup_profilers[0].stop();
+
+    if (options.diagnostics) {
+      print_setup_diagnostics(ad_setup_profilers);
+    }
+
+#ifndef SLEIPNIR_DISABLE_DIAGNOSTICS
+    // Sparsity pattern files written when spy flag is set
+    std::unique_ptr<Spy<Scalar>> H_spy;
+    std::unique_ptr<Spy<Scalar>> A_e_spy;
+    std::unique_ptr<Spy<Scalar>> A_i_spy;
+
+    if (spy) {
+      H_spy = std::make_unique<Spy<Scalar>>(
+          "H.spy", "Hessian", "Decision variables", "Decision variables",
+          num_decision_variables, num_decision_variables);
+      A_e_spy = std::make_unique<Spy<Scalar>>(
+          "A_e.spy", "Equality constraint Jacobian", "Constraints",
+          "Decision variables", num_equality_constraints,
+          num_decision_variables);
+      A_i_spy = std::make_unique<Spy<Scalar>>(
+          "A_i.spy", "Inequality constraint Jacobian", "Constraints",
+          "Decision variables", num_inequality_constraints,
+          num_decision_variables);
+      iteration_callbacks.push_back(
+          [&](const IterationInfo<Scalar>& info) -> bool {
+            H_spy->add(info.H);
+            A_e_spy->add(info.A_e);
+            A_i_spy->add(info.A_i);
+            return false;
+          });
+    }
+#endif
+
+    const auto [bound_constraint_mask, bounds, conflicting_bound_indices] =
+        get_bounds<Scalar>(m_decision_variables, m_inequality_constraints,
+                           A_i.value());
+    if (!conflicting_bound_indices.empty()) {
+      if (options.diagnostics) {
+        print_bound_constraint_global_infeasibility_error(
+            conflicting_bound_indices);
+      }
+      return ExitStatus::GLOBALLY_INFEASIBLE;
+    }
+
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+    project_onto_bounds(x, bounds);
+#endif
+
+    // Automatically scale the cost and constraints. The problem scaling
+    // procedure is described in more detail in
+    // docs/algorithms.md#problem-scaling.
+    x_ad.set_value(x);
+    const ProblemScaling<Scalar> scaling{g.value(), A_e.value(), A_i.value()};
+
+    IPMMatrixCallbacks<Scalar> matrix_callbacks{
+        num_decision_variables,
+        num_equality_constraints,
+        num_inequality_constraints,
+        [&](const DenseVector& x) -> Scalar {
+          x_ad.set_value(x);
+          return scaling.f * f.value();
+        },
+        [&](const DenseVector& x) -> SparseVector {
+          x_ad.set_value(x);
+          return scaling.f * g.value();
+        },
+        [&](const DenseVector& x, const DenseVector& y,
+            const DenseVector& z) -> SparseMatrix {
+          x_ad.set_value(x);
+          y_ad.set_value(scaling.c_e.cwiseProduct(y));
+          z_ad.set_value(scaling.c_i.cwiseProduct(z));
+          return scaling.f * H_f.value() + H_c.value();
+        },
+        [&](const DenseVector& x, const DenseVector& y,
+            const DenseVector& z) -> SparseMatrix {
+          x_ad.set_value(x);
+          y_ad.set_value(scaling.c_e.cwiseProduct(y));
+          z_ad.set_value(scaling.c_i.cwiseProduct(z));
+          return H_c.value();
+        },
+        [&](const DenseVector& x) -> DenseVector {
+          x_ad.set_value(x);
+          return scaling.c_e.cwiseProduct(c_e_ad.value());
+        },
+        [&](const DenseVector& x) -> SparseMatrix {
+          x_ad.set_value(x);
+          return scaling.c_e.asDiagonal() * A_e.value();
+        },
+        [&](const DenseVector& x) -> DenseVector {
+          x_ad.set_value(x);
+          return scaling.c_i.cwiseProduct(c_i_ad.value());
+        },
+        [&](const DenseVector& x) -> SparseMatrix {
+          x_ad.set_value(x);
+          return scaling.c_i.asDiagonal() * A_i.value();
+        },
+        scaling};
+
+    // Invoke interior-point method solver
+    return ipm<Scalar>(matrix_callbacks, iteration_callbacks, options,
+#ifdef SLEIPNIR_ENABLE_BOUND_PROJECTION
+                       bound_constraint_mask,
+#endif
+                       x);
+  }
+
+  void print_exit_conditions(const Options& options) {
     // Print possible exit conditions
     slp::println("User-configured exit conditions:");
     slp::println("  ↳ error below {}", options.tolerance);

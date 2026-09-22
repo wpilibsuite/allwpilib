@@ -5,6 +5,7 @@
 #include <format>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <SDL3/SDL.h>
 #include <imgui.h>
@@ -16,6 +17,9 @@
 #include "wpi/glass/networktables/NetworkTables.hpp"
 #include "wpi/glass/networktables/NetworkTablesSettings.hpp"
 #include "wpi/glass/other/Log.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
@@ -231,21 +235,12 @@ static void DisplayGui() {
   ImGui::End();
 }
 
-#ifdef _WIN32
-int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
-                      int nCmdShow) {
-  int argc = __argc;
-  char** argv = __argv;
-#else
-int main(int argc, char** argv) {
-#endif
-  std::string_view saveDir;
-  if (argc == 2) {
-    saveDir = argv[1];
-  }
-
+void Application(std::string_view saveDir) {
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   gui::AddIcon(ov::GetResource_ov_16_png());
   gui::AddIcon(ov::GetResource_ov_32_png());
@@ -272,6 +267,23 @@ int main(int argc, char** argv) {
 
   wpi::glass::DestroyContext();
   gui::DestroyContext();
+}
 
+#ifndef RUNNING_IMGUI_TESTS
+#ifdef _WIN32
+int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
+                      int nCmdShow) {
+  int argc = __argc;
+  char** argv = __argv;
+#else
+int main(int argc, char** argv) {
+#endif
+  std::string_view saveDir;
+  if (argc == 2) {
+    saveDir = argv[1];
+  }
+
+  Application(saveDir);
   return 0;
 }
+#endif

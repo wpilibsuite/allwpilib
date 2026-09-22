@@ -22,6 +22,30 @@ import org.wpilib.math.filter.EdgeCounterFilter;
  * <p>Triggers can easily be composed for advanced functionality using the {@link
  * #and(BooleanSupplier)}, {@link #or(BooleanSupplier)}, {@link #negate()} operators.
  *
+ * <table>
+ * <caption>Positive trigger command bindings</caption>
+ * <tr>
+ * <th>Method</th>
+ * <th>Schedules</th>
+ * <th>Cancels on false</th>
+ * </tr>
+ * <tr>
+ * <td>{@link #onTrue(Command)}</td>
+ * <td>On a rising edge</td>
+ * <td>No</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #ifTrue(Command)}</td>
+ * <td>On every true poll</td>
+ * <td>No</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #whileTrue(Command)}</td>
+ * <td>On a rising edge</td>
+ * <td>Yes</td>
+ * </tr>
+ * </table>
+ *
  * <p>This class is provided by the Commands v2 VendorDep
  */
 public class Trigger implements BooleanSupplier {
@@ -111,6 +135,27 @@ public class Trigger implements BooleanSupplier {
     addBinding(
         (previous, current) -> {
           if (!previous && current) {
+            CommandScheduler.getInstance().schedule(command);
+          }
+        });
+    return this;
+  }
+
+  /**
+   * Starts the given command on every event-loop poll where the condition is {@code true}.
+   *
+   * <p>This does not cancel the command when the condition becomes {@code false}; use {@link
+   * #whileTrue(Command)} for that behavior. Scheduling an already-running command follows ordinary
+   * scheduler behavior and does not restart it.
+   *
+   * @param command the command to start
+   * @return this trigger, so calls can be chained
+   */
+  public Trigger ifTrue(Command command) {
+    requireNonNullParam(command, "command", "ifTrue");
+    addBinding(
+        (previous, current) -> {
+          if (current) {
             CommandScheduler.getInstance().schedule(command);
           }
         });

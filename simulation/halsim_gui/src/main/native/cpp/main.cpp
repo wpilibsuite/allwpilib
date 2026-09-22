@@ -6,11 +6,13 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include <imgui.h>
 
 #include "AddressableLEDGui.hpp"
+#include "AlertSimGui.hpp"
 #include "AnalogInputSimGui.hpp"
 #include "DIOSimGui.hpp"
 #include "DriverStationGui.hpp"
@@ -27,6 +29,9 @@
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/hardware/Pneumatic.hpp"
 #include "wpi/glass/other/Plot.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/gui/HALSimGui.hpp"
@@ -39,6 +44,9 @@ namespace gui = wpi::gui;
 
 static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
 static bool gAbout = false;
+#ifdef RUNNING_IMGUI_TESTS
+static std::string gTestStorageDir;
+#endif
 
 static void SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode mode,
                                     std::string_view storageMode) {
@@ -65,6 +73,14 @@ static void DisplayTimestampMenu() {
   }
 }
 
+#ifdef RUNNING_IMGUI_TESTS
+namespace halsimgui {
+void SetTestStorageDir(std::string_view saveDir) {
+  gTestStorageDir = saveDir;
+}
+}  // namespace halsimgui
+#endif
+
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
@@ -76,6 +92,10 @@ int HALSIM_InitExtension(void) {
   wpi::glass::CreateContext();
 
   wpi::glass::SetStorageName("simgui");
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::glass::SetStorageDir(gTestStorageDir);
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
   wpi::glass::AddWorkspaceInit([] {
     if (wpi::glass::gContext->timestampDisplayMode ==
         wpi::glass::TimestampDisplayMode::SERVER) {
@@ -115,6 +135,7 @@ int HALSIM_InitExtension(void) {
 
   AddressableLEDGui::Initialize();
   AnalogInputSimGui::Initialize();
+  AlertSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();
@@ -174,6 +195,7 @@ int HALSIM_InitExtension(void) {
     }
     if (ImGui::BeginMenu("DS")) {
       DriverStationGui::dsManager->DisplayMenu();
+      AlertSimGui::DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {

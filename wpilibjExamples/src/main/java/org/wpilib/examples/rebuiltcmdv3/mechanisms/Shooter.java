@@ -7,15 +7,12 @@ package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 import static org.wpilib.units.Units.Degrees;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.RPM;
-import static org.wpilib.units.Units.Radians;
 
 import java.util.function.Supplier;
 import org.wpilib.command3.Command;
 import org.wpilib.command3.Mechanism;
 import org.wpilib.epilogue.Logged;
-import org.wpilib.examples.rebuiltcmdv3.constants.ShooterConstants;
 import org.wpilib.examples.rebuiltcmdv3.lookup.LookupTables;
-import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
 import org.wpilib.math.interpolation.InterpolatingTreeMap;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularVelocity;
@@ -45,44 +42,19 @@ public class Shooter implements Mechanism {
     FLYWHEEL_LUT.put(Meters.of(4), RPM.of(4000));
   }
 
-  private final ExampleSmartMotorController hoodMotor;
+  private final ShooterHood hood = new ShooterHood();
+  private final ShooterFlywheel flywheel = new ShooterFlywheel();
 
-  private final ExampleSmartMotorController flywheelMotorPrimary;
-  private final ExampleSmartMotorController flywheelMotorSecondary;
-  private final ExampleSmartMotorController flywheelMotorTertiary;
-  private final ExampleSmartMotorController flywheelMotorQuatenary;
-
-  /**
-   * Creates a new shooter mechanism object and initializes its motors. Only one shooter mechanism
-   * should exist at a time.
-   */
+  /** Creates a new shooter mechanism object. Only one shooter mechanism should exist at a time. */
   public Shooter() {
-    hoodMotor = new ExampleSmartMotorController(ShooterConstants.HOOD_MOTOR_ID);
-    flywheelMotorPrimary =
-        new ExampleSmartMotorController(ShooterConstants.PRIMARY_SHOOTER_MOTOR_ID);
-    flywheelMotorSecondary =
-        new ExampleSmartMotorController(ShooterConstants.SECONDARY_SHOOTER_MOTOR_ID);
-    flywheelMotorTertiary =
-        new ExampleSmartMotorController(ShooterConstants.TERTIARY_SHOOTER_MOTOR_ID);
-    flywheelMotorQuatenary =
-        new ExampleSmartMotorController(ShooterConstants.QUATERNARY_SHOOTER_MOTOR_ID);
-
-    flywheelMotorSecondary.follow(flywheelMotorPrimary);
-    flywheelMotorTertiary.follow(flywheelMotorPrimary);
-    flywheelMotorQuatenary.follow(flywheelMotorPrimary);
-
-    hoodMotor.setPID(ShooterConstants.HOOD_KP, 0, 0);
-    flywheelMotorPrimary.setPID(ShooterConstants.FLYWHEEL_KP, 0, 0);
-
     setDefaultCommand(idle());
   }
 
   @Override
   public Command idle() {
     return run(coroutine -> {
-          coroutine.awaitAll(runHoodAngle(Degrees::zero), runFlywheelSpeed(RPM::zero));
+          coroutine.awaitAll(hood.idle(), flywheel.idle());
         })
-        .withPriority(Command.LOWEST_PRIORITY)
         .named("Shooter.Idle");
   }
 
@@ -104,42 +76,9 @@ public class Shooter implements Mechanism {
     Supplier<AngularVelocity> flywheelSpeed = () -> FLYWHEEL_LUT.get(targetDistance.get());
 
     return run(coroutine -> {
-          coroutine.awaitAll(runHoodAngle(hoodAngle), runFlywheelSpeed(flywheelSpeed));
+          coroutine.awaitAll(
+              hood.runHoodAngle(hoodAngle), flywheel.runFlywheelSpeed(flywheelSpeed));
         })
         .named("Shooter.ShootAtHub");
-  }
-
-  // Private commands to be used by compositions
-
-  /**
-   * Moves the hood to the specified angle and holds it. This command will run forever unless
-   * interrupted.
-   *
-   * @param angle A dynamic supplier for the desired hood angle.
-   * @return The hood angle command
-   */
-  private Command runHoodAngle(Supplier<Angle> angle) {
-    return runRepeatedly(
-            () -> {
-              hoodMotor.setSetpoint(
-                  ExampleSmartMotorController.PIDMode.POSITION, angle.get().in(Radians));
-            })
-        .named("Shooter.RunHoodAngle");
-  }
-
-  /**
-   * Runs the flywheel at the specified speed and holds it. This command will run forever unless
-   * interrupted.
-   *
-   * @param speed A dynamic supplier for the desired flywheel speed.
-   * @return The flywheel speed command
-   */
-  private Command runFlywheelSpeed(Supplier<AngularVelocity> speed) {
-    return runRepeatedly(
-            () -> {
-              flywheelMotorPrimary.setSetpoint(
-                  ExampleSmartMotorController.PIDMode.VELOCITY, speed.get().in(RPM));
-            })
-        .named("Shooter.RunFlywheelSpeed");
   }
 }

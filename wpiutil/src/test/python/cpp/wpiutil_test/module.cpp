@@ -178,8 +178,11 @@ StructWithWPI_String cast_struct_with_wpi_string() {
     return output;
 }
 
+void span_safety_test(py::module_& m);
+
 PYBIND11_MODULE(module, m) {
     struct_test(m);
+    span_safety_test(m);
 
     // array
     m.def("load_array_int", &load_array_int);

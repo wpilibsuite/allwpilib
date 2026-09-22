@@ -44,7 +44,10 @@ def build_examples(folders, halsim_deps = []):
         )
         cc_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/cpp/examples/" + folder + "/cpp/**/*.cpp", "src/main/cpp/examples/" + folder + "/c/**/*.c"], allow_empty = True),
+            srcs = native.glob([
+                "src/main/cpp/examples/" + folder + "/cpp/**/*.cpp",
+                "src/main/cpp/examples/" + folder + "/c/**/*.c",
+            ], allow_empty = True),
             deps = [
                 "//apriltag",
                 "//fields",
@@ -121,7 +124,11 @@ def build_tests(example_test_folders, snippet_test_folders):
         cc_test(
             name = folder + "-test",
             size = "small",
-            srcs = native.glob([example_test_folder + "/**/*.cpp", example_src_folder + "/cpp/**/*.cpp", example_src_folder + "/c/**/*.c"], allow_empty = True),
+            srcs = native.glob([
+                example_test_folder + "/**/*.cpp",
+                example_src_folder + "/cpp/**/*.cpp",
+                example_src_folder + "/c/**/*.c",
+            ], allow_empty = True),
             deps = [
                 "//commandsv2",
                 "//drivers",
@@ -129,7 +136,13 @@ def build_tests(example_test_folders, snippet_test_folders):
                 "//thirdparty/catch2",
             ],
             defines = ["RUNNING_WPILIB_TESTS=1"],
-            tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
+            tags = [
+                "wpi-example",
+                "no-tsan",
+                "no-asan",
+                "no-ubsan",
+                "exclusive-if-local",
+            ],
         )
     for folder in snippet_test_folders:
         snippet_src_folder = "src/main/cpp/snippets/" + folder
@@ -137,7 +150,10 @@ def build_tests(example_test_folders, snippet_test_folders):
         cc_test(
             name = folder + "-test",
             size = "small",
-            srcs = native.glob([snippet_test_folder + "/**/*.cpp", snippet_src_folder + "/**/*.cpp"], allow_empty = True),
+            srcs = native.glob([
+                snippet_test_folder + "/**/*.cpp",
+                snippet_src_folder + "/**/*.cpp",
+            ], allow_empty = True),
             deps = [
                 "//commandsv2",
                 "//drivers",
@@ -145,5 +161,11 @@ def build_tests(example_test_folders, snippet_test_folders):
                 "//thirdparty/catch2",
             ],
             defines = ["RUNNING_WPILIB_TESTS=1"],
-            tags = ["wpi-example", "no-tsan", "no-asan", "no-ubsan", "exclusive"],
+            tags = [
+                "wpi-example",
+                "no-tsan",
+                "no-asan",
+                "no-ubsan",
+                "exclusive-if-local",
+            ],
         )

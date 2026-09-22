@@ -1,0 +1,28 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// Fixed-length arrays, which flatbuffers allows only in structs.
+
+namespace wpi.aosnt.testing;
+
+attribute "proto_type";
+
+struct Point {
+  x:int;
+  y:float;
+}
+
+struct Grid {
+  cells:[int:3];
+  zigzag:[short:2] (proto_type: "sint32");
+  weights:[double:2];
+  points:[Point:2];
+}
+
+table Arrays {
+  grid:Grid (id: 0);
+  grids:[Grid] (id: 1);
+}
+
+root_type Arrays;

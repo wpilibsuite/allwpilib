@@ -92,7 +92,8 @@ void NetworkTablesProvider::DisplayMenu() {
         auto typeEntry = m_typeCache.FindValue(entry->name);
         if (typeEntry) {
           ImGui::SameLine();
-          ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+          ImGui::PushStyleColor(
+              ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
           ImGui::Text("%s", typeEntry->stringVal.c_str());
           ImGui::PopStyleColor();
           ImGui::SameLine();

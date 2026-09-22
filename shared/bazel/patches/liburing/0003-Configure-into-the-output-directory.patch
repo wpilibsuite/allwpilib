@@ -1,0 +1,102 @@
+Subject: [PATCH] Configure into the output directory
+
+The action ran configure from the execroot and copied the generated headers out
+afterwards, leaving config-host.h behind where every later compile's
+"-include config-host.h" found it first.  Point configure at the package's
+output directory instead, so it writes the declared outputs in place and leaves
+the execroot untouched.
+
+The working directory has to stay the execroot regardless: the toolchain hands
+us an execroot-relative compiler, and on Windows that is a .bat which invokes
+the real binary by a relative path of its own, so a cd would break every probe.
+Redirecting configure's output side is what lets the two coexist.
+
+configure's log is the one thing still written beside the working directory, so
+delete it once configure has succeeded.  A failure exits under set -e before
+that, leaving the log in place for whoever has to read it.
+
+--- a/liburing_configure.bzl
++++ b/liburing_configure.bzl
+@@ -48,20 +48,18 @@
+             return False
+     return True
+ 
+-def _output_relative_path(ctx, output):
+-    """Returns output's path relative to this package's output directory.
++def _package_output_dir(ctx):
++    """Returns the directory Bazel declares this package's outputs in.
+ 
+-    That is where configure writes it, since the action runs from the execroot.
++    configure is pointed at it so it writes them in place, rather than into the
++    execroot the action runs from.
+     """
+-    prefix_parts = [ctx.bin_dir.path]
++    parts = [ctx.bin_dir.path]
+     if ctx.label.workspace_root:
+-        prefix_parts.append(ctx.label.workspace_root)
++        parts.append(ctx.label.workspace_root)
+     if ctx.label.package:
+-        prefix_parts.append(ctx.label.package)
+-    prefix = "/".join(prefix_parts) + "/"
+-    if not output.path.startswith(prefix):
+-        fail("Expected {} to be under {}".format(output.path, prefix))
+-    return output.path[len(prefix):]
++        parts.append(ctx.label.package)
++    return "/".join(parts)
+ 
+ def _liburing_configure_impl(ctx):
+     cc_toolchain = find_cc_toolchain(ctx)
+@@ -92,10 +90,11 @@
+ 
+     outputs = ctx.outputs.outs
+ 
+-    # configure writes its outputs relative to the working directory, and the
+-    # sysroot in the compile flags is relative to the execroot, so stay in the
+-    # execroot and fake an out-of-source build with symlinks the way liburing's
+-    # own packaging does.
++    # The working directory has to stay the execroot: the toolchain hands us an
++    # execroot-relative compiler, and on Windows that is a .bat which invokes
++    # the real binary by a relative path of its own, so a cd would break every
++    # probe.  configure writes relative to the working directory, so point it
++    # at the output directory instead of letting it litter the execroot.
+     ctx.actions.run_shell(
+         outputs = outputs,
+         inputs = depset(
+@@ -109,27 +108,24 @@
+ export CFLAGS="$2"
+ export LDFLAGS="-c"
+ configure="$3"
+-shift 3
+ 
+-package_dir="$(dirname "${configure}")"
+-ln -sf "${package_dir}/Makefile.common" Makefile.common
+-ln -sf "${package_dir}/liburing.spec" liburing.spec
+-mkdir -p src/include/liburing
++# Nothing may be left in the execroot: Bazel does not sandbox on Windows, so a
++# stray config-host.h there shadows the declared one for every compile that
++# uses "-include config-host.h", which the preprocessor resolves against its
++# working directory before any -I path.
++export LIBURING_CONFIG_OUTPUT_DIR="$4"
+ "${configure}" --use-libc
+ 
+-# configure wrote each header relative to the working directory; move it to
+-# where Bazel declared it.
+-for pair in "$@"; do
+-  cp "${pair%%=*}" "${pair#*=}"
+-done
++# configure writes its log beside the working directory, which is the execroot.
++# Nothing reads it once configure has succeeded, and set -e leaves it in place
++# on failure, which is when it is worth reading.
++rm -f config.log
+ """,
+         arguments = [
+             compiler,
+             " ".join(compiler_options),
+             ctx.executable.configure.path,
+-        ] + [
+-            "{}={}".format(_output_relative_path(ctx, output), output.path)
+-            for output in outputs
++            _package_output_dir(ctx),
+         ],
+         # configure shells out to make, awk, sed and friends, so it needs a PATH
+         # to find them.  Actions get a scrubbed environment by default, which

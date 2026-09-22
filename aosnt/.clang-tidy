@@ -1,0 +1,8 @@
+# aosnt/ is Bazel-only, so gradle's generateCompileCommands never emits a compile
+# command for these files and clang-tidy cannot analyze them meaningfully.
+#
+# The Objective-C checks are enabled solely to keep the list non-empty: they
+# never match C++ code, but clang-tidy 19+ treats "no checks enabled" as a fatal
+# error and prints its usage text. The escape hatch for that is --allow-no-checks,
+# which wpiformat does not pass, so a plain '-*' fails the clang-tidy CI job.
+Checks: '-*,objc-*'

@@ -1,5 +1,5 @@
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("@rules_pkg//:mappings.bzl", "pkg_filegroup", "pkg_files")
+load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
@@ -389,18 +389,35 @@ def package_binary_cc_project(
         maven_group_id,
         maven_artifact_name,
         extra_files = [],
+        extra_binaries = [],
         architectures = None,
-        renames = None):
+        renames = None,
+        systemcore = False):
     """Packages the C++ binary targets for a project.
 
     This assumes that static libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
-    transitions, packages them up, and deploys them for just the native
-    platforms.
+    transitions, packages them up, and deploys them for the native platforms,
+    and for the SystemCore too if `systemcore` is set.
+
+    `extra_binaries` ship beside `name` in the same directory, for tools that
+    are only useful next to the binary they are packaged with.
     """
+    linux_artifacts = {
+        "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
+    }
+
+    # wpilib_maven_export keeps linux_artifacts only on a Linux host, and the
+    # SystemCore is cross compiled from every host.
+    classifier_artifacts = {}
+    if systemcore:
+        classifier_artifacts["linuxsystemcore"] = ":{}_zip-opt-systemcore".format(name)
+
     pkg_files(
         name = "{}-files".format(name),
-        srcs = [name],
+        srcs = [name] + extra_binaries,
+        # Keep the binaries executable once unzipped.
+        attributes = pkg_attributes(mode = "0755"),
         prefix = platform_prefix(""),
         renames = renames,
     )
@@ -417,10 +434,8 @@ def package_binary_cc_project(
     wpilib_maven_export(
         name = "{}_publish".format(name),
         maven_coordinates = "{}:{}:$(WPILIB_VERSION)".format(maven_group_id, maven_artifact_name),
-        classifier_artifacts = {},
-        linux_artifacts = _filter_artifacts(architectures, {
-            "linuxx86-64": ":{}_zip-opt-linux-x86-64".format(name),
-        }),
+        classifier_artifacts = _filter_artifacts(architectures, classifier_artifacts),
+        linux_artifacts = _filter_artifacts(architectures, linux_artifacts),
         osx_artifacts = _filter_artifacts(architectures, {
             "osxuniversalstatic": ":{}_zip-opt-osxuniversal".format(name),
         }),

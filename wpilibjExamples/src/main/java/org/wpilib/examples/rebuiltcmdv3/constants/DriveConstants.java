@@ -5,16 +5,32 @@
 package org.wpilib.examples.rebuiltcmdv3.constants;
 
 import static org.wpilib.units.Units.FeetPerSecond;
+import static org.wpilib.units.Units.Inches;
 import static org.wpilib.units.Units.RotationsPerSecond;
 
+import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.SwerveDriveKinematics;
 import org.wpilib.units.measure.AngularVelocity;
 import org.wpilib.units.measure.LinearVelocity;
 
 public final class DriveConstants {
-  public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics();
+  // +X is front, +Y is left
+  public static final Translation2d FRONT_LEFT_MODULE_POSITION =
+      new Translation2d(Inches.of(10.5), Inches.of(10.5));
+  public static final Translation2d FRONT_RIGHT_MODULE_POSITION =
+      new Translation2d(Inches.of(10.5), Inches.of(-10.5));
+  public static final Translation2d BACK_LEFT_MODULE_POSITION =
+      new Translation2d(Inches.of(-10.5), Inches.of(10.5));
+  public static final Translation2d BACK_RIGHT_MODULE_POSITION =
+      new Translation2d(Inches.of(-10.5), Inches.of(-10.5));
+
+  public static final SwerveDriveKinematics KINEMATICS =
+      new SwerveDriveKinematics(
+          FRONT_LEFT_MODULE_POSITION, FRONT_RIGHT_MODULE_POSITION,
+          BACK_LEFT_MODULE_POSITION, BACK_RIGHT_MODULE_POSITION);
+
   public static final LinearVelocity MAX_VELOCITY = FeetPerSecond.of(15);
-  public static final AngularVelocity MAX_TURN_RATE = RotationsPerSecond.of(3);
+  public static final AngularVelocity MAX_TURN_RATE = RotationsPerSecond.of(1.5);
 
   // All drive IDs are odd, all turn IDs are even
   public static final int FRONT_LEFT_DRIVE_ID = 1;

@@ -291,9 +291,9 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return a gearbox of Kraken X60 motors.
    */
   public static DCMotor getKrakenX60(int numMotors) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return new DCMotor(
-        12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+        12, 7.157, 374.4, 2, Units.rotationsPerMinuteToRadiansPerSecond(6065), numMotors);
   }
 
   /**
@@ -303,9 +303,9 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Kraken X60 FOC enabled motors.
    */
   public static DCMotor getKrakenX60Foc(int numMotors) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return new DCMotor(
-        12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
+        12, 9.362, 476.1, 2, Units.rotationsPerMinuteToRadiansPerSecond(5785), numMotors);
   }
 
   /**
@@ -317,7 +317,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   public static DCMotor getKrakenX44(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return new DCMotor(
-        12, 4.11, 279, 2, Units.rotationsPerMinuteToRadiansPerSecond(7758), numMotors);
+        12, 4.113, 279.1, 2, Units.rotationsPerMinuteToRadiansPerSecond(7758), numMotors);
   }
 
   /**
@@ -329,7 +329,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   public static DCMotor getKrakenX44Foc(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return new DCMotor(
-        12, 5.01, 329, 2, Units.rotationsPerMinuteToRadiansPerSecond(7368), numMotors);
+        12, 5.011, 329.2, 2, Units.rotationsPerMinuteToRadiansPerSecond(7368), numMotors);
   }
 
   /**
@@ -341,7 +341,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   public static DCMotor getMinion(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
     return new DCMotor(
-        12, 3.17, 211, 2, Units.rotationsPerMinuteToRadiansPerSecond(7704), numMotors);
+        12, 3.173, 211.6, 2, Units.rotationsPerMinuteToRadiansPerSecond(7704), numMotors);
   }
 
   /**

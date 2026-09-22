@@ -13,27 +13,19 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * Checks for {@code while} loops inside methods or lambda functions that accept coroutine
  * arguments. If a loop does not call {@code yield()} on one of the most local coroutine objects, a
- * compiler error will be emitted for that loop element. This check cannot be silenced.
+ * compiler error will be emitted for that loop element.
  */
-// Note: cannot be silenced because annotations cannot be placed on loops.
-// This is not legal Java:
-//   @SuppressWarnings("UnsafeCoroutineUsage")
-//   while (true) { ... }
-// Placing it at a higher level (lambda or method declaration) would silence ALL unsafe usage in
-// that expression; it's impossible to do on a case-by-case basis.
 public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
-  public static final String SUPPRESSION_KEY = "CoroutineYieldInLoop";
+  public static final String SUPPRESSION_KEY = "WPILib.CoroutineYieldInLoop";
 
   public CoroutineYieldInLoopDetector(JavacTask task) {
     super(task);
@@ -91,13 +83,9 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
     final List<LoopState> m_children = new ArrayList<>();
   }
 
-  private final class Scanner extends TreeScanner<LoopState, LoopState> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees;
-
+  private final class Scanner extends WPILibTreeScanner<LoopState, LoopState> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
-      m_trees = Trees.instance(m_task);
+      super(compilationUnit, CoroutineYieldInLoopDetector.this.m_task);
     }
 
     @Override
@@ -215,8 +203,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
       }
 
       if (state.m_yieldCalls.isEmpty()) {
-        m_trees.printMessage(
-            Diagnostic.Kind.ERROR, buildErrorMessageForLoop(state), state.m_loop, m_root);
+        printError(buildErrorMessageForLoop(state), state.m_loop, SUPPRESSION_KEY);
       }
 
       // Recurse over children
@@ -257,7 +244,7 @@ public class CoroutineYieldInLoopDetector extends CoroutineBasedDetector {
         }
       }
 
-      messageBuilder.append(" inside loop");
+      messageBuilder.append(" inside loop.");
 
       return messageBuilder;
     }

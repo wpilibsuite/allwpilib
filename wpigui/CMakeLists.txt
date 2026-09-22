@@ -25,6 +25,27 @@ if(WPILIB_WITH_EXECUTABLES)
     target_link_libraries(wpiguidev wpigui)
 endif()
 
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(wpigui_for_tests STATIC ${wpigui_src})
+    set_target_properties(wpigui_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET wpigui_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(wpigui_for_tests)
+    target_link_libraries(wpigui_for_tests PUBLIC imgui_test_engine)
+    target_include_directories(
+        wpigui_for_tests
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+    )
+
+    add_library(wpigui_test_runner STATIC src/test/native/cpp/GuiTestEngineRunner.cpp)
+    set_property(TARGET wpigui_test_runner PROPERTY FOLDER "tests")
+    wpilib_target_warnings(wpigui_test_runner)
+    target_link_libraries(wpigui_test_runner PUBLIC wpigui_for_tests imgui_test_engine)
+    target_include_directories(
+        wpigui_test_runner
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/test/native/include>
+    )
+endif()
+
 install(TARGETS wpigui EXPORT wpigui)
 export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpigui")
