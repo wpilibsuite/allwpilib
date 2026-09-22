@@ -63,6 +63,8 @@ void OpModeRobotBase::LoopFunc() {
       wpi::internal::DriverStationBackend::GetControlWord();
   m_watchdog.Reset();
   const bool enabled = word.IsEnabled();
+  // Treat disabled as unknown
+  const RobotMode mode = enabled ? word.GetRobotMode() : RobotMode::UNKNOWN;
   int64_t modeId = word.IsDSAttached() ? word.GetOpModeId() : 0;
 
   bool modeChanged = modeId != m_lastModeId;
@@ -80,7 +82,6 @@ void OpModeRobotBase::LoopFunc() {
   }
 
   // Set up new opmode
-  bool justCreatedOpMode = false;
   if (modeId != 0 && !m_currentOpMode && modeChanged) {
     auto data = m_opModes.lookup(modeId);
     if (data.factory) {
@@ -97,24 +98,27 @@ void OpModeRobotBase::LoopFunc() {
           m_callbacks.Add(cb);
         }
 
-        // Call DisabledPeriodic immediately for newly created OpMode
-        m_currentOpMode->DisabledPeriodic();
-        m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-        justCreatedOpMode = true;
+        // An opmode created while enabled still gets one DisabledPeriodic call
+        // before starting, as it may contain setup code. When disabled, it is
+        // called below with the rest of the disabled periodic functions.
+        if (enabled) {
+          m_currentOpMode->DisabledPeriodic();
+          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        }
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
     }
   }
 
-  // Handle enabled state changes
-  bool justCalledDisabledInit = false;
-  if (m_lastEnabledState != enabled) {
-    if (enabled) {
-      // Transitioning to enabled
+  // If mode changed, call disabled exit and entry functions
+  if (m_lastMode != mode) {
+    if (m_lastMode == RobotMode::UNKNOWN) {
+      // Transitioning out of disabled
       DisabledExit();
       m_watchdog.AddEpoch("DisabledExit()");
-    } else {
+    }
+    if (mode == RobotMode::UNKNOWN) {
       // Transitioning to disabled. Only tear down an opmode that was actually
       // running; a freshly selected opmode entering its disabled phase must
       // persist so it can be started on the next enable.
@@ -124,9 +128,8 @@ void OpModeRobotBase::LoopFunc() {
       }
       DisabledInit();
       m_watchdog.AddEpoch("DisabledInit()");
-      justCalledDisabledInit = true;
     }
-    m_lastEnabledState = enabled;
+    m_lastMode = mode;
   }
 
   // Start the opmode if enabled and not already started. This single check
@@ -138,14 +141,11 @@ void OpModeRobotBase::LoopFunc() {
 
   // Call periodic functions based on current state
   if (!enabled) {
-    // Only call DisabledPeriodic if we didn't just call DisabledInit
-    if (!justCalledDisabledInit) {
-      DisabledPeriodic();
-      m_watchdog.AddEpoch("DisabledPeriodic()");
-    }
+    DisabledPeriodic();
+    m_watchdog.AddEpoch("DisabledPeriodic()");
 
     // Call opmode DisabledPeriodic if we have one
-    if (m_currentOpMode && !justCreatedOpMode) {
+    if (m_currentOpMode) {
       m_currentOpMode->DisabledPeriodic();
       m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
     }

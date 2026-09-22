@@ -7,6 +7,7 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -263,7 +264,8 @@ class OpModeRobotBase : public RobotBase {
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;
   bool m_calledDriverStationConnected = false;
-  bool m_lastEnabledState = false;
+  // Empty until the first loop, so that DisabledInit() runs on startup
+  std::optional<RobotMode> m_lastMode;
   std::shared_ptr<OpMode> m_currentOpMode;
   std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
