@@ -197,6 +197,13 @@ subprojects {
             "-Xlint:-serial",
             // ignore unclaimed annotation warning from annotation processing
             "-Xlint:-processing",
+            "-Xlint:-preview",
+            // ignore modules requiring automatic library modules
+            "-Xlint:-requires-automatic",
+            "-Xlint:-requires-transitive-automatic",
+            // Java modules warn about module names with trailing digits
+            "-Xlint:-module",
+            "-Xlint:-classfile",
             // ignore warnings for classes missing explicit constructors
             "-Xlint:-missing-explicit-ctor",
         ]

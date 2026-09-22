@@ -12,6 +12,9 @@ import static org.wpilib.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTI
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
@@ -29,10 +32,11 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
+        import org.wpilib.epilogue.*;
         import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
@@ -72,7 +76,7 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class Example extends org.wpilib.framework.RobotBase {
+          public class Example extends org.wpilib.framework.RobotBase {
             @Override
             public void startCompetition() {}
             @Override
@@ -82,10 +86,11 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
+        import org.wpilib.epilogue.*;
         import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
@@ -135,16 +140,17 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class Example extends org.wpilib.framework.TimedRobot {
+          public class Example extends org.wpilib.framework.TimedRobot {
           }
           """;
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
+        import org.wpilib.epilogue.*;
         import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
@@ -210,23 +216,28 @@ class EpilogueGeneratorTest {
 
   @Test
   void multipleRobots() {
-    String source =
+    String alphaSource =
         """
           package org.wpilib.epilogue;
 
           @Logged
-          class AlphaBot extends org.wpilib.framework.TimedRobot { }
+          public class AlphaBot extends org.wpilib.framework.TimedRobot { }
+          """;
+    String betaSource =
+        """
+          package org.wpilib.epilogue;
 
           @Logged
-          class BetaBot extends org.wpilib.framework.TimedRobot { }
+          public class BetaBot extends org.wpilib.framework.TimedRobot { }
           """;
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
+        import org.wpilib.epilogue.*;
         import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
@@ -320,44 +331,66 @@ class EpilogueGeneratorTest {
         }
         """;
 
-    assertGeneratedEpilogueContents(source, expected);
+    assertGeneratedEpilogueContents(
+        List.of(
+            JavaFileObjects.forSourceString("org.wpilib.epilogue.AlphaBot", alphaSource),
+            JavaFileObjects.forSourceString("org.wpilib.epilogue.BetaBot", betaSource)),
+        expected);
   }
 
   @Test
   void genericCustomLogger() {
-    String source =
-        """
+    JavaFileObject classA =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.A", "package org.wpilib.epilogue; class A {}");
+
+    JavaFileObject classB =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.B", "package org.wpilib.epilogue; class B extends A {}");
+
+    JavaFileObject classC =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.C", "package org.wpilib.epilogue; class C extends A {}");
+
+    JavaFileObject loggedClass =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.Example",
+            """
         package org.wpilib.epilogue;
 
-        import org.wpilib.epilogue.logging.*;
-        import org.wpilib.telemetry.TelemetryTable;
-
-        class A {}
-        class B extends A {}
-        class C extends A {}
-
-        @CustomLoggerFor({A.class, B.class, C.class})
-        class CustomLogger extends ClassSpecificLogger<A> {
-          public CustomLogger() { super(A.class); }
-
-          @Override
-          public void update(TelemetryTable table, A object) {} // implementation is irrelevant
-        }
-
         @Logged
-        class Example {
+        public class Example {
           A a_b_or_c;
           B b;
           C c;
         }
-        """;
+        """);
+
+    JavaFileObject logger =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.CustomLogger",
+            """
+            package org.wpilib.epilogue;
+
+            import org.wpilib.epilogue.logging.*;
+            import org.wpilib.telemetry.TelemetryTable;
+
+            @CustomLoggerFor({A.class, B.class, C.class})
+            public class CustomLogger extends ClassSpecificLogger<A> {
+              public CustomLogger() { super(A.class); }
+
+              @Override
+              public void update(TelemetryTable table, A object) {} // implementation is irrelevant
+            }
+            """);
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
+        import org.wpilib.epilogue.*;
         import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
@@ -387,16 +420,16 @@ class EpilogueGeneratorTest {
         }
         """;
 
-    assertGeneratedEpilogueContents(source, expected);
+    assertGeneratedEpilogueContents(List.of(classA, classB, classC, loggedClass, logger), expected);
   }
 
   private void assertGeneratedEpilogueContents(
-      String loggedClassContent, String loggerClassContent) {
+      Collection<JavaFileObject> jfos, String loggerClassContent) {
     Compilation compilation =
         javac()
             .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("", loggedClassContent));
+            .compile(jfos);
 
     assertThat(compilation).succeededWithoutWarnings();
     var generatedFiles = compilation.generatedSourceFiles();
@@ -412,5 +445,12 @@ class EpilogueGeneratorTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void assertGeneratedEpilogueContents(
+      String loggedClassContent, String loggerClassContent) {
+    assertGeneratedEpilogueContents(
+        List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", loggedClassContent)),
+        loggerClassContent);
   }
 }
