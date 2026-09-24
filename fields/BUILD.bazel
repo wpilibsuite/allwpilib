@@ -266,7 +266,7 @@ wpilib_maven_export(
     name = "field-images-java_publish",
     lib_name = "field-images-java",
     maven_coordinates = "org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
-    no_javadocs = True,
+    tags = ["no-javadocs"],
     visibility = ["//visibility:public"],
 )
 
