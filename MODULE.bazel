@@ -161,9 +161,9 @@ http_jar(
 bazel_dep(name = "aos")
 archive_override(
     module_name = "aos",
-    integrity = "sha256-Ot3kM0FlYmBPoA1/4YZwlavzWyuZwsDYj1fRdo2V37Y=",
-    strip_prefix = "aos-51ff3f81314f07d0f3da88d65e5336ef827687af",
-    urls = ["https://github.com/AustinSchuh/aos/archive/51ff3f81314f07d0f3da88d65e5336ef827687af.tar.gz"],
+    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
+    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
+    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
 )
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas
@@ -182,8 +182,8 @@ single_version_override(
 )
 
 # liburing comes in through AOS; //aos_sdk names it to keep its headers out of
-# the SDK. Its configure needs make only to print two version numbers, and the
-# Windows SystemCore builds have no make.
+# the SDK. It's configure needs make only to print two version numbers, and the
+# Windows Systemcore builds have no make.
 bazel_dep(name = "liburing", version = "2.14.bcr.2")
 single_version_override(
     module_name = "liburing",
