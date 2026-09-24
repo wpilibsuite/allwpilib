@@ -112,6 +112,7 @@ common:build_buddy_rbe --config=build_buddy_readonly
 common:build_buddy_rbe --config=build_buddy_rbe_enable
 common:build_buddy_rbe_enable --config=remote
 build:build_buddy_rbe_enable --remote_executor=grpcs://remote.buildbuddy.io
+common:build_buddy_rbe_enable --experimental_remote_downloader=grpcs://remote.buildbuddy.io
 
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote_cache
