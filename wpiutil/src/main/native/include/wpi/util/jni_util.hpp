@@ -327,7 +327,7 @@ class JSpanBase {
         m_elements{static_cast<std::remove_cv_t<T>*>(
             bb ? env->GetDirectBufferAddress(bb) : nullptr)} {
     if (!bb) {
-      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
   }
@@ -346,7 +346,7 @@ class JSpanBase {
         m_elements = ArrHelper::GetArrayElements(env, jarr);
       }
     } else {
-      wpi::util::print(stderr, "JSpan was passed a null pointer at\n",
+      wpi::util::print(stderr, "JSpan was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
   }
