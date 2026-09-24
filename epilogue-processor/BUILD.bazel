@@ -1,6 +1,6 @@
 load("@rules_java//java:defs.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 
 wpilib_java_library(
     name = "processor-java",
@@ -32,18 +32,5 @@ java_plugin(
     visibility = ["//visibility:public"],
     deps = [
         ":processor-java",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "processor-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    plugins = [
-        ":plugin",
-    ],
-    deps = [
-        ":processor-java",
-        "//telemetry:telemetry-java",
-        "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

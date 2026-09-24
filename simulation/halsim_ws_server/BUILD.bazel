@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -67,35 +67,6 @@ wpilib_cc_static_library(
     visibility = ["//visibility:public"],
     deps = [
         ":halsim_ws_server_static",
-    ],
-)
-
-cc_library(
-    name = "test_headers",
-    srcs = glob(["src/test/native/include/*.hpp"]),
-    includes = ["src/test/native/include"],
-    strip_include_prefix = "src/test/native/include",
-)
-
-cc_test(
-    name = "halsim_ws_server-test",
-    size = "small",
-    srcs = glob(["src/test/native/**/*.cpp"]),
-    tags = [
-        "no-asan",
-    ],
-    deps = [
-        ":halsim_ws_server",
-        ":test_headers",
-        "//thirdparty/catch2",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":halsim_ws_server",
     ],
 )
 

@@ -1,0 +1,24 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+cc_test(
+    name = "native",
+    size = "medium",
+    srcs = glob(["cpp/**"]),
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        "//thirdparty/catch2",
+        "//tools/sysid:sysid-lib",
+    ],
+)
+
+wpilib_imgui_cc_test(
+    name = "sysid-imgui-test",
+    size = "small",
+    srcs = glob(["imgui/**"]),
+    deps = [
+        "//tools/sysid:sysid_lib_for_tests",
+    ],
+)

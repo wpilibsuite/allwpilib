@@ -1,15 +1,17 @@
-load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//apriltag:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//apriltag:robotpy_pybind_build_info.bzl", "apriltag_extension", "define_pybind_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
-load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+
+filegroup(
+    name = "test-resources",
+    srcs = glob(["src/test/resources/**"]),
+    visibility = ["//apriltag/src/test/java:__pkg__"],
+)
 
 filegroup(
     name = "doxygen-files",
@@ -146,52 +148,6 @@ wpilib_jni_java_library(
     ],
 )
 
-cc_test(
-    name = "apriltag-cpp-test",
-    size = "small",
-    srcs = glob(["src/test/native/cpp/**/*.cpp"]),
-    tags = [
-        "no-asan",
-    ],
-    deps = [
-        ":apriltag",
-        "//thirdparty/catch2",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "apriltag-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    resource_strip_prefix = "apriltag/src/test/resources",
-    resources = glob(["src/test/resources/**"]),
-    deps = [
-        ":apriltag-java",
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/java/opencv",
-        "@maven//:io_avaje_avaje_jsonb",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":apriltag",
-    ],
-)
-
-java_binary(
-    name = "DevMain-Java",
-    srcs = ["src/dev/java/org/wpilib/vision/apriltag/DevMain.java"],
-    main_class = "org.wpilib.vision.apriltag.DevMain",
-    deps = [
-        ":apriltag-java",
-    ],
-)
-
 package_default_jni_project(
     name = "apriltag",
     maven_artifact_name = "apriltag-cpp",
@@ -239,18 +195,4 @@ apriltag_extension(
 define_pybind_library(
     name = "robotpy-apriltag",
     pkgcfgs = PYBIND_PKGCFG_DEPS,
-)
-
-robotpy_py_test(
-    "python_tests",
-    srcs = glob(["src/test/python/**/*.py"]),
-    data = glob([
-        "src/test/python/*.png",
-        "src/test/python/*.jpg",
-    ]),
-    deps = [
-        ":robotpy-apriltag",
-        requirement("pytest"),
-        requirement("opencv-python"),
-    ],
 )

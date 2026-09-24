@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -68,11 +67,6 @@ wpilib_cc_static_library(
     deps = [
         ":halsim_xrp_static",
     ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
 )
 
 package_default_cc_project(

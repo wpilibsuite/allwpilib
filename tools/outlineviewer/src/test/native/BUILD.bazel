@@ -1,0 +1,14 @@
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+wpilib_imgui_cc_test(
+    name = "native",
+    size = "small",
+    srcs = [
+        "//tools/outlineviewer:generate-resources",
+        "//tools/outlineviewer:generate-version",
+        "//tools/outlineviewer:main-native-srcs",
+    ] + glob(["imgui/**"]),
+    deps = [
+        "//glass:glassnt_for_tests",
+    ],
+)

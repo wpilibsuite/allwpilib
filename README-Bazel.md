@@ -20,7 +20,7 @@ Consequences worth knowing about:
 To build the entire repository, simply run `bazel build //...`. To run all of the unit tests, run `bazel test //...`
 Other examples:
 - `bazel build //wpimath/...` - Builds every target in the wpimath folder
-- `bazel test //wpiutil:wpiutil-cpp-test` - Runs only the cpp test target in the wpiutil folder
+- `bazel test //wpiutil/src/test/native` - Runs only the cpp test target in the wpiutil folder
 - `bazel coverage //wpiutil/...` - (*Nix only) - Runs a code coverage report for both C++ and Java on all the targets under wpiutil
 
 ## Optional ImGui GUI tests
@@ -31,12 +31,12 @@ To enable the tests, pass `--config=imgui_tests` or the underlying build setting
 The ImGui GUI test macro transitions an internal hook flag for the generated C++ test binary so the ImGui test-engine macros apply only to the GUI test dependency graph, not to ordinary GUI executables built under `--config=imgui_tests`.
 
 The ImGui GUI test targets are:
-- `//glass:glass-imgui-test`
-- `//simulation/halsim_gui:halsim_gui-imgui-test`
-- `//tools/datalogtool:datalogtool-imgui-test`
-- `//tools/outlineviewer:outlineviewer-imgui-test`
-- `//tools/sysid:sysid-imgui-test`
-- `//tools/wpical:wpical-imgui-test`
+- `//glass/src/test/native:glass-imgui-test`
+- `//simulation/halsim_gui/src/test/native:halsim_gui-imgui-test`
+- `//tools/datalogtool/src/test/native`
+- `//tools/outlineviewer/src/test/native`
+- `//tools/sysid/src/test/native:sysid-imgui-test`
+- `//tools/wpical/src/test/native:wpical-imgui-test`
 
 These tests run headless by default using SDL's dummy video driver, the software SDL renderer, and `WPIGUI_FORCE_RENDERER=2d`.
 

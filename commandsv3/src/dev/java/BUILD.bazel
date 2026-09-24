@@ -1,0 +1,13 @@
+load("@rules_java//java:defs.bzl", "java_binary")
+
+java_binary(
+    name = "java",
+    srcs = ["org/wpilib/command3/DevMain.java"],
+    main_class = "org.wpilib.command3.DevMain",
+    deps = [
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

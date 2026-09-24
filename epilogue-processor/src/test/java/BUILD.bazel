@@ -1,0 +1,14 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]),
+    plugins = [
+        "//epilogue-processor:plugin",
+    ],
+    deps = [
+        "//epilogue-processor:processor-java",
+        "//telemetry:telemetry-java",
+        "@maven//:com_google_testing_compile_compile_testing",
+    ],
+)

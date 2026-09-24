@@ -1,4 +1,4 @@
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 
 wpilib_java_library(
     name = "epilogue-java",
@@ -7,16 +7,6 @@ wpilib_java_library(
     maven_group_id = "org.wpilib.epilogue",
     visibility = ["//visibility:public"],
     deps = [
-        "//telemetry:telemetry-java",
-        "//wpiunits:wpiunits-java",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "epilogue-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    deps = [
-        ":epilogue-java",
         "//telemetry:telemetry-java",
         "//wpiunits:wpiunits-java",
     ],

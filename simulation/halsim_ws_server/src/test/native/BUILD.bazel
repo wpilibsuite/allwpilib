@@ -1,0 +1,23 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "test_headers",
+    srcs = glob(["include/*.hpp"]),
+    includes = ["include"],
+    strip_include_prefix = "include",
+)
+
+cc_test(
+    name = "native",
+    size = "small",
+    srcs = glob(["**/*.cpp"]),
+    tags = [
+        "no-asan",
+    ],
+    deps = [
+        ":test_headers",
+        "//simulation/halsim_ws_server",
+        "//thirdparty/catch2",
+    ],
+)

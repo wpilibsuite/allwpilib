@@ -1,5 +1,4 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
@@ -189,24 +188,6 @@ wpilib_jni_java_library(
     native_libs = [":shared/wpinetjni"],
     visibility = ["//visibility:public"],
     deps = [
-        "//wpiutil:wpiutil-java",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":wpinet",
-    ],
-)
-
-java_binary(
-    name = "DevMain-java",
-    srcs = ["src/dev/java/org/wpilib/net/DevMain.java"],
-    main_class = "org.wpilib.net.DevMain",
-    deps = [
-        ":wpinet-java",
         "//wpiutil:wpiutil-java",
     ],
 )

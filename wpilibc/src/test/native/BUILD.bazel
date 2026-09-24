@@ -1,0 +1,24 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "test-headers",
+    testonly = True,
+    hdrs = glob(["include/**"]),
+    includes = ["include"],
+)
+
+cc_test(
+    name = "native",
+    size = "small",
+    srcs = glob(["cpp/**"]) + ["//wpilibc:generated-test-native-srcs"],
+    tags = [
+        "no-tsan",
+        "no-ubsan",
+    ],
+    deps = [
+        ":test-headers",
+        "//thirdparty/catch2",
+        "//wpilibc",
+    ],
+)

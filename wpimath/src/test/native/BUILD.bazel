@@ -1,0 +1,27 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "test_headers",
+    hdrs = glob([
+        "include/**",
+    ]),
+    strip_include_prefix = "include",
+)
+
+cc_test(
+    name = "native",
+    size = "medium",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "cpp/**/*.hpp",
+    ]),
+    tags = [
+        "no-raspi",
+    ],
+    deps = [
+        ":test_headers",
+        "//thirdparty/catch2",
+        "//wpimath",
+    ],
+)
