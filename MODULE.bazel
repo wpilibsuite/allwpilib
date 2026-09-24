@@ -167,9 +167,9 @@ http_jar(
 bazel_dep(name = "aos")
 archive_override(
     module_name = "aos",
-    integrity = "sha256-3wX/ZGaa9ZOKQKrp+W8BIgK1RUcOC5yZtt1hl16HXjo=",
-    strip_prefix = "aos-2a16f9332583d809bd5d9345bb416e7abc06e55e",
-    urls = ["https://github.com/AustinSchuh/aos/archive/2a16f9332583d809bd5d9345bb416e7abc06e55e.tar.gz"],
+    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
+    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
+    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
 )
 
 # The flatbuffers AOS is built against, which aosnt reads reflection schemas
