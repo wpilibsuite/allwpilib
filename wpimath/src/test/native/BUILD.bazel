@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_test(
-    name = "tests",
+    name = "native",
     size = "medium",
     srcs = glob([
         "cpp/**/*.cpp",

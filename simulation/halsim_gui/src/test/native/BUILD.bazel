@@ -2,7 +2,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 
 cc_test(
-    name = "tests",
+    name = "native",
     size = "small",
     srcs = glob(
         ["**/*.cpp"],

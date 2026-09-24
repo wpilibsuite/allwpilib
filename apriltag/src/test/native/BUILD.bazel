@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "tests",
+    name = "native",
     size = "small",
     srcs = glob(["cpp/**/*.cpp"]),
     tags = [

@@ -3,7 +3,7 @@ load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 load("//tools/wpical:copts.bzl", "COPTS", "CXXOPTS")
 
 cc_test(
-    name = "tests",
+    name = "native",
     size = "medium",
     srcs = glob(
         ["**"],

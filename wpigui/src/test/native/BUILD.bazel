@@ -2,7 +2,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
 
 cc_library(
-    name = "wpigui_test_runner",
+    name = "native",
     testonly = True,
     srcs = ["cpp/GuiTestEngineRunner.cpp"],
     hdrs = ["include/wpi/gui/test/GuiTestEngineRunner.hpp"],

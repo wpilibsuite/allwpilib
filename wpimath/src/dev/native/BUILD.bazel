@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 
 cc_binary(
-    name = "DevMain-Cpp",
+    name = "native",
     srcs = ["cpp/main.cpp"],
     deps = [
         "//wpimath",

@@ -60,7 +60,7 @@ cc_library(
     deps = [
         "//datalog",
         "//glass:glass_for_tests",
-        "//wpigui/src/test/native:wpigui_test_runner",
+        "//wpigui/src/test/native",
         "//wpinet",
     ],
 )
