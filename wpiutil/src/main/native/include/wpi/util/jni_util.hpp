@@ -159,7 +159,7 @@ class JStringRef {
         env->ReleaseStringCritical(str, chars);
       }
     } else {
-      wpi::util::print(stderr, "JStringRef was passed a null pointer at\n",
+      wpi::util::print(stderr, "JStringRef was passed a null pointer at\n{}",
                        GetJavaStackTrace(env));
     }
     // Ensure str is null-terminated.
