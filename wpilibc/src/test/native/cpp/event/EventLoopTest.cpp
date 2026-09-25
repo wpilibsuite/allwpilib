@@ -16,10 +16,7 @@ TEST_CASE("EventLoopTest BindUnbind", "[wpilibc][event]") {
   int pollCount = 0;
 
   auto& task = loop.Bind([&pollCount] { pollCount++; });
-
-  loop.Poll();
-
-  REQUIRE(pollCount == 1);
+  auto& task2 = loop.Bind([&pollCount] { pollCount++; });
 
   loop.Poll();
 
@@ -29,7 +26,13 @@ TEST_CASE("EventLoopTest BindUnbind", "[wpilibc][event]") {
 
   loop.Poll();
 
-  REQUIRE(pollCount == 2);
+  REQUIRE(pollCount == 3);
+
+  loop.Unbind(task2);
+
+  loop.Poll();
+
+  REQUIRE(pollCount == 3);
 }
 
 TEST_CASE("EventLoopTest ConcurrentModification", "[wpilibc][event]") {
