@@ -1391,7 +1391,7 @@ class TunableTest {
   void testRejectedComplexTunableRestoresDescendantRevisionParents() {
     NestedChildComplex outer = new NestedChildComplex();
     TunableDouble blocker = TunableDouble.create(9.0);
-    CountingComplex rejected = new CountingComplex();
+    final CountingComplex rejected = new CountingComplex();
 
     Tunables.publish("outer", outer);
     Tunables.publish("outer/blocked", blocker);
