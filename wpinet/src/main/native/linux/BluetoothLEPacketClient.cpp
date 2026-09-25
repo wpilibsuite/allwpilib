@@ -766,13 +766,12 @@ class BluetoothLEPacketClient::Impl
     if (m_poll) {
       m_poll->Start(UV_READABLE | UV_DISCONNECT);
     }
-    StopConnectTimer();
-
     if (m_activeTransport == LinuxBluetoothTransport::GATT) {
       StartGattDiscovery();
       return;
     }
 
+    StopConnectTimer();
     UpdateStatus([](auto& status) {
       status.connecting = false;
       status.connected = true;
@@ -1137,6 +1136,7 @@ class BluetoothLEPacketClient::Impl
     }
 
     m_gattState = GattDiscoveryState::CONNECTED;
+    StopConnectTimer();
     UpdateStatus([](auto& status) {
       status.connecting = false;
       status.connected = true;
