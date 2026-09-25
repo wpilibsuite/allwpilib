@@ -29,6 +29,7 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Poll.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 namespace uv = wpi::net::uv;
 
@@ -100,19 +101,6 @@ uint16_t HostToLe16(uint16_t value) {
 #endif
 }
 
-int HexDigit(char ch) {
-  if (ch >= '0' && ch <= '9') {
-    return ch - '0';
-  }
-  if (ch >= 'a' && ch <= 'f') {
-    return ch - 'a' + 10;
-  }
-  if (ch >= 'A' && ch <= 'F') {
-    return ch - 'A' + 10;
-  }
-  return -1;
-}
-
 bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
   if (address.size() != 17) {
     return false;
@@ -125,14 +113,13 @@ bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
       return false;
     }
 
-    int high = HexDigit(address[pos]);
-    int low = HexDigit(address[pos + 1]);
-    if (high < 0 || low < 0) {
+    auto byte = wpi::util::parse_integer<uint8_t>(address.substr(pos, 2), 16);
+    if (!byte) {
       return false;
     }
 
     // BlueZ stores Bluetooth addresses least-significant octet first.
-    parsed.b[5 - i] = static_cast<uint8_t>((high << 4) | low);
+    parsed.b[5 - i] = *byte;
   }
 
   *out = parsed;
@@ -159,13 +146,12 @@ bool ParseUuid128(std::string_view uuid, std::array<uint8_t, 16>* out) {
       return false;
     }
 
-    int high = HexDigit(uuid[i]);
-    int low = HexDigit(uuid[i + 1]);
-    if (high < 0 || low < 0) {
+    auto byte = wpi::util::parse_integer<uint8_t>(uuid.substr(i, 2), 16);
+    if (!byte) {
       return false;
     }
 
-    bigEndian[byteIndex++] = static_cast<uint8_t>((high << 4) | low);
+    bigEndian[byteIndex++] = *byte;
     i += 2;
   }
 
