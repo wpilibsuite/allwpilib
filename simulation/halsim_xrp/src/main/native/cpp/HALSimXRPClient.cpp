@@ -23,12 +23,13 @@ bool HALSimXRPClient::Initialize() {
   bool result = true;
   runner.ExecSync([&](wpi::net::uv::Loop& loop) {
     simxrp = std::make_shared<HALSimXRP>(loop, providers, simDevices);
-    InitializeXRPBluetoothGui(simxrp);
 
     if (!simxrp->Initialize()) {
       result = false;
       return;
     }
+
+    InitializeXRPBluetoothGui(simxrp);
 
     WSRegisterFunc registerFunc = [&](auto key, auto provider) {
       providers.Add(key, provider);
