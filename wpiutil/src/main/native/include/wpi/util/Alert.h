@@ -35,7 +35,7 @@ enum WPI_AlertLevel {
   WPI_ALERT_MEDIUM = 1,
 
   /**
-   * Low priority alert - displayed last with a green "i" symbol. Use this type
+   * Low priority alert - displayed last with a blue "i" symbol. Use this type
    * for problems which are unlikely to affect the robot's functionality, or any
    * other alerts which do not fall under the other categories.
    */
