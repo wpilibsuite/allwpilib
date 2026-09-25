@@ -9,7 +9,7 @@ load("//fields:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//fields:robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test", "wpilib_java_library")
-load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project", "package_static_cc_project")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures", "wpilib_maven_export")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
@@ -147,7 +147,7 @@ wpilib_cc_library(
         ":field-handwritten-srcs-pkg",
         ":field-resource-srcs-pkg",
     ],
-    include_license_files = True,
+    include_third_party_notice = True,
     local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fields",
     strip_include_prefix = "src/main/native/include",
@@ -185,7 +185,7 @@ wpilib_cc_library(
     extra_src_pkg_files = [
         ":field-image-resource-srcs-pkg",
     ],
-    include_license_files = True,
+    include_third_party_notice = True,
     local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fieldimages",
     strip_include_prefix = "src/main/native/include",
@@ -193,6 +193,14 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//wpiutil",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/fieldimages",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":fieldimages",
     ],
 )
 
@@ -204,10 +212,6 @@ wpilib_cc_static_library(
         "//wpimath:static/wpimath",
         "//wpiutil:static/wpiutil",
     ],
-    static_lib_name = select({
-        "@platforms//os:windows": "static/fields.lib",
-        "//conditions:default": "static/libfields.a",
-    }),
     visibility = ["//visibility:public"],
     deps = [
         ":fields",
@@ -216,10 +220,6 @@ wpilib_cc_static_library(
 
 wpilib_cc_static_library(
     name = "static/fieldimages",
-    static_lib_name = select({
-        "@platforms//os:windows": "static/fieldimages.lib",
-        "//conditions:default": "static/libfieldimages.a",
-    }),
     target_compatible_with = NO_SYSTEMCORE,
     visibility = ["//visibility:public"],
     deps = [
@@ -267,6 +267,7 @@ wpilib_maven_export(
     name = "field-images-java_publish",
     lib_name = "field-images-java",
     maven_coordinates = "org.wpilib.fields:field-images-java:$(WPILIB_VERSION)",
+    tags = ["no-javadocs"],
     visibility = ["//visibility:public"],
 )
 
@@ -298,7 +299,7 @@ cc_test(
     ],
 )
 
-package_static_cc_project(
+package_default_cc_project(
     name = "fieldimages",
     architectures = host_architectures,
     maven_artifact_name = "field-images-cpp",

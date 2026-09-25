@@ -263,18 +263,10 @@ package_default_jni_project(
     maven_group_id = "org.wpilib.cscore",
 )
 
-alias(
-    name = "cscorejnicvstatic-hdrs-zip",
-    actual = "cscore-hdrs-zip",
-)
-
-alias(
-    name = "cscorejnicvstatic-srcs-zip",
-    actual = "cscore-srcs-zip",
-)
-
 package_shared_cc_project(
     name = "cscorejnicvstatic",
+    include_headers = False,
+    include_sources = False,
     maven_artifact_name = "cscore-jnicvstatic",
     maven_group_id = "org.wpilib.cscore",
 )

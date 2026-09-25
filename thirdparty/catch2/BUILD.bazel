@@ -1,25 +1,38 @@
-load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:packaging.bzl", "package_static_cc_project")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 
 wpilib_cc_library(
     name = "catch2",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
-    include_license_files = True,
+    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
 )
 
-wpilib_cc_static_library(
-    name = "static/catch2",
+wpilib_cc_shared_library(
+    name = "shared/catch2",
+    use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [
         ":catch2",
     ],
 )
 
-package_static_cc_project(
+wpilib_cc_static_library(
+    name = "static/catch2",
+    static_lib_name = select({
+        "@platforms//os:windows": "static/catch2.lib",
+        "//conditions:default": "static/libcatch2.a",
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":catch2",
+    ],
+)
+
+package_default_cc_project(
     name = "catch2",
     maven_artifact_name = "catch2-cpp",
     maven_group_id = "org.wpilib.thirdparty.catch2",

@@ -17,7 +17,7 @@ def generate_file(resource_file, output_file, prefix, namespace):
     output = f"""#include <stddef.h>
 #include <string_view>
 extern "C" {{
-static const unsigned char contents[] = {{ {data} }};
+static const unsigned char contents[] = {{ {data}, }};
 const unsigned char* {prefix}_{func_name}(size_t* len) {{
   *len = {data_size};
   return contents;

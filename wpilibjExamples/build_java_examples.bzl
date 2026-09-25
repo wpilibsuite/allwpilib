@@ -17,7 +17,15 @@ def _package_type(package_type):
         strip_prefix = "src/main/java/org/wpilib",
     )
 
-    pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
+    pkgs = ["//:license_pkg_file", "//:third_party_notice_pkg_file", ":" + package_type + "-pkg"]
+    if package_type in ["examples", "templates"]:
+        pkg_files(
+            name = package_type + "-main-pkg",
+            srcs = ["src/main/java/org/wpilib/Main.java"],
+            strip_prefix = "src/main/java/org/wpilib",
+        )
+        pkgs.append(package_type + "-main-pkg")
+
     if package_type == "examples":
         pkg_files(
             name = package_type + "-tests-pkg",

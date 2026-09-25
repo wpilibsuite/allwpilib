@@ -9,7 +9,7 @@ wpilib_cc_library(
         "src/main/native/cpp/*",
         "src/main/native/include/**/*.hpp",
     ]),
-    include_license_files = True,
+    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
@@ -31,7 +31,7 @@ wpilib_cc_library(
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_XRP",
     ],
-    include_license_files = True,
+    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],

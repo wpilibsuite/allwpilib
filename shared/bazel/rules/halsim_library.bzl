@@ -9,7 +9,7 @@ def wpilib_halsim_extension(
     wpilib_cc_library(
         name = name,
         includes = ["src/main/native/include"],
-        include_license_files = True,
+        include_third_party_notice = True,
         target_compatible_with = select({
             "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
             "//conditions:default": [],
