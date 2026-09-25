@@ -98,9 +98,10 @@ void PyComplexTunableAdapter::ReleaseValueIfUnpublished() {
     ReleaseRetainedValues();
     m_tableOwnerContext->owner.reset();
     m_initialPublishTunable.reset();
-    if (m_valueRef) {
-      m_value.reset();
+    if (!m_valueRef && m_value) {
+      detail::ForgetComplex(*m_value, this);
     }
+    m_value.reset();
   }
 }
 

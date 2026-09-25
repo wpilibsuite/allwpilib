@@ -1085,23 +1085,66 @@ def test_tune_revision_supports_non_weakrefable_python_complex(backend):
         weakref.ref(value)
 
     tunables.publish("slottedRevisionA", value)
+    tunables.publish("slottedRevisionB", value)
     backend.set_double("/slottedRevisionA/value", 2.0)
     tunables.TunableRegistry.update()
 
     assert value.value.get() == pytest.approx(2.0)
-    assert tunables.TunableRegistry.get_tune_revision(value.value) == 1
     assert tunables.TunableRegistry.get_tune_revision(value) == 1
 
     tunables.remove("slottedRevisionA")
-    tunables.publish("slottedRevisionB", value)
-
     assert tunables.TunableRegistry.get_tune_revision(value) == 1
     backend.set_double("/slottedRevisionB/value", 3.0)
     tunables.TunableRegistry.update()
-
-    assert value.value.get() == pytest.approx(3.0)
-    assert tunables.TunableRegistry.get_tune_revision(value.value) == 2
     assert tunables.TunableRegistry.get_tune_revision(value) == 2
+
+    tunables.remove("slottedRevisionB")
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+    tunables.publish("slottedRevisionC", value)
+    assert tunables.TunableRegistry.get_tune_revision(value) == 0
+    backend.set_double("/slottedRevisionC/value", 4.0)
+    tunables.TunableRegistry.update()
+    assert tunables.TunableRegistry.get_tune_revision(value) == 1
+    assert tunables.TunableRegistry.get_tune_revision(value.value) == 3
+
+
+@pytest.mark.parametrize("publication", ["root", "nested", "rejected"])
+def test_non_weakrefable_complex_is_released(backend, publication):
+    destroyed = []
+
+    class SlottedComplex:
+        __slots__ = ()
+
+        def publish_tunables(self, table: tunables.TunableTable) -> None:
+            table.add("value", 1.0)
+
+        def __del__(self):
+            destroyed.append(True)
+
+    class Parent:
+        def __init__(self, child):
+            self.child = child
+
+        def publish_tunables(self, table):
+            table.publish("child", self.child)
+
+    value = SlottedComplex()
+    if publication == "nested":
+        parent = Parent(value)
+        assert tunables.publish("slotted", parent)
+        del parent
+    elif publication == "rejected":
+        tunables.add("slotted", 0.0)
+        assert not tunables.publish("slotted", value)
+    else:
+        assert tunables.publish("slotted", value)
+        assert tunables.publish("slottedAlias", value)
+        tunables.remove("slottedAlias")
+
+    del value
+    tunables.remove("slotted")
+    gc.collect()
+    assert destroyed == [True]
 
 
 def test_tune_revision_ignores_rejected_and_immutable_inputs(backend):

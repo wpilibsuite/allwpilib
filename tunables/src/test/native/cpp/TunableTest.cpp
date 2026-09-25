@@ -1886,6 +1886,30 @@ TEST_CASE_METHOD(
   CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(rejected) == 0);
 }
 
+TEST_CASE_METHOD(TunableTest,
+                 "TunableTest RejectedChildPublicationPreservesMemberOwner",
+                 "[tunable]") {
+  wpi::tunables::TunableInt32 rejected{0};
+  {
+    MemberComplex owner;
+    REQUIRE(
+        wpi::tunables::Publish("direct/gain", &owner, &MemberComplex::gain));
+    SECTION("value publication") {
+      CHECK_FALSE(wpi::tunables::Publish("direct/gain", rejected));
+    }
+    SECTION("member publication") {
+      MemberComplex other;
+      CHECK_FALSE(
+          wpi::tunables::Publish("direct/gain", &other, &MemberComplex::gain));
+    }
+    backend->SetInt32("/direct/gain", 7);
+    wpi::tunables::TunableRegistry::Update();
+    CHECK(owner.gain == 7);
+    CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(owner) == 1);
+  }
+  CHECK_FALSE(backend->GetUid("/direct/gain"));
+}
+
 TEST_CASE_METHOD(
     TunableTest,
     "TunableTest ComplexTunableAliasesUpdateOncePerRegistryCycleAcrossBackends",

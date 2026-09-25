@@ -483,6 +483,68 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
 
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
+                 "InitialDirectMemberUpdatesOwnerAndEnclosingComplex",
+                 "[wpilibc][tunable]") {
+  class MemberComplex : public wpi::tunables::ComplexTunable {
+   public:
+    void PublishTunable(wpi::tunables::TunableTable&) override {}
+    double value = 1.0;
+  } owner;
+  CountingComplexTunable enclosing;
+  wpi::tunables::Publish("enclosing", enclosing);
+  auto pub = Tune("enclosing/member", "double");
+  pub.SetDouble(4.0);
+
+  REQUIRE(wpi::tunables::Publish("enclosing/member", &owner,
+                                 &MemberComplex::value, RobustConfig()));
+  CHECK(owner.value == 4.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(owner) == 1);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(enclosing) == 1);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(enclosing) == 1);
+}
+
+TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
+                 "NetworkTablesTunableBackendTest "
+                 "InitialSnapshotPreservesOtherQueuedTunes",
+                 "[wpilibc][tunable]") {
+  wpi::tunables::TunableDouble existing{1.0};
+  wpi::tunables::Publish("existingRevision", existing);
+  auto existingPub =
+      inst.GetDoubleTopic("/Tunables/existingRevision").Publish();
+  auto initialPub = Tune("snapshotRevision", "double");
+  existingPub.Set(2.0);
+  initialPub.SetDouble(4.0);
+  wpi::tunables::TunableDouble initial{1.0, RobustConfig()};
+  wpi::tunables::Publish("snapshotRevision", initial);
+  CHECK(initial.Get() == 4.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(initial) == 1);
+
+  initialPub.SetDouble(5.0);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(existing.Get() == 2.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(existing) == 1);
+  CHECK(initial.Get() == 5.0);
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(initial) == 2);
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(initial) == 2);
+}
+
+TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
+                 "NetworkTablesTunableBackendTest "
+                 "InitialSnapshotIgnoresMismatchedType",
+                 "[wpilibc][tunable]") {
+  auto publisher = Tune("wrongInitialType", "otherRawType");
+  publisher.SetRaw(std::vector<uint8_t>{2, 3});
+  wpi::tunables::TunableRaw value{std::vector<uint8_t>{1}, RobustConfig()};
+  REQUIRE(wpi::tunables::Publish("wrongInitialType", value));
+  wpi::tunables::TunableRegistry::Update();
+  CHECK(value.Get() == std::vector<uint8_t>{1});
+  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(value) == 0);
+}
+
+TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
+                 "NetworkTablesTunableBackendTest "
                  "TuneRevisionIgnoresLocalNetworkPublishes",
                  "[wpilibc][tunable]") {
   auto config = RobustConfig();

@@ -223,10 +223,7 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
   ValueEntry(NetworkTablesTunableBackend* backend, std::string_view path,
              uint32_t uid, const TunableConfig* config,
              std::string_view typeString)
-      : m_backend{backend},
-        m_path{path},
-        m_uid{uid},
-        m_applyInitialValue{config && config->robust && config->isMutable} {
+      : m_backend{backend}, m_path{path}, m_uid{uid} {
     typeString = GetTypeString(typeString, config);
     if (config && config->robust) {
       m_publisher = backend->m_inst.GetTopic(std::format("{}/value", path))
@@ -243,8 +240,27 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
       m_subscriber = topic.GenericSubscribe(typeString, subscriberOptions);
     }
     if (!config || config->isMutable) {
+      bool applyInitialValue = config && config->robust;
       m_listener = backend->m_poller.AddListener(
-          m_subscriber, wpi::nt::EventFlags::VALUE_ALL);
+          m_subscriber,
+          wpi::nt::EventFlags::VALUE_ALL |
+              (applyInitialValue ? wpi::nt::EventFlags::IMMEDIATE : 0));
+      if (applyInitialValue) {
+        // The immediate event and subsequent writes are queued atomically by
+        // NT. Reading the subscriber separately could apply one write twice.
+        for (auto&& event : backend->m_poller.ReadQueue()) {
+          if (event.listener == m_listener &&
+              event.Is(wpi::nt::EventFlags::IMMEDIATE)) {
+            // Immediate events are sent even for an inactive subscription.
+            if (auto data = event.GetValueEventData();
+                data && m_subscriber.GetTopic().GetTypeString() == typeString) {
+              m_initialValue = std::move(data->value);
+            }
+          } else {
+            backend->m_pendingTuneEvents.emplace_back(std::move(event));
+          }
+        }
+      }
     }
   }
 
@@ -282,10 +298,8 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
   }
 
   bool UpdateInitialTunable() {
-    if (!m_applyInitialValue) {
-      return false;
-    }
-    return UpdateTunable(m_subscriber.Get());
+    auto value = std::move(m_initialValue);
+    return value && UpdateTunable(value);
   }
 
  protected:
@@ -317,7 +331,7 @@ class NetworkTablesTunableBackend::ValueEntry : public Entry {
   uint32_t m_uid;
   wpi::nt::GenericSubscriber m_subscriber;
   NT_Listener m_listener = 0;
-  bool m_applyInitialValue;
+  wpi::nt::Value m_initialValue;
   bool m_forceUpdate = false;
 };
 
@@ -836,6 +850,7 @@ void NetworkTablesTunableBackend::Retire() {
   m_entries.clear();
   m_uids.clear();
   m_subscribers.clear();
+  m_pendingTuneEvents.clear();
   m_deferredErases.clear();
   if (m_updateDepth > 0) {
     m_deferredUntracks.clear();
@@ -1112,7 +1127,10 @@ void NetworkTablesTunableBackend::Update() {
     if (m_retired) {
       return;
     }
-    events = m_poller.ReadQueue();
+    events.swap(m_pendingTuneEvents);
+    for (auto&& event : m_poller.ReadQueue()) {
+      events.emplace_back(std::move(event));
+    }
   }
   processEvents(events);
 
