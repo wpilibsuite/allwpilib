@@ -11,11 +11,11 @@ import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.trajectory.DrivetrainSplineSample;
-import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
+import org.wpilib.math.trajectory.HolonomicSample;
+import org.wpilib.math.trajectory.HolonomicTrajectory;
 import org.wpilib.math.trajectory.Trajectory;
-import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
@@ -29,16 +29,19 @@ public class Robot extends TimedRobot {
   private final Drivetrain drive = new Drivetrain();
   private final LTVUnicycleController feedback = new LTVUnicycleController(0.020);
   private final Timer timer = new Timer();
-  private final Trajectory<DrivetrainSplineSample> trajectory;
+  private final Trajectory<HolonomicSample> trajectory;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
+    // Replace this with a call to a trajectory generator
     trajectory =
-        DrivetrainSplineTrajectoryGenerator.generate(
-            new Pose2d(2, 2, Rotation2d.ZERO),
-            List.of(),
-            new Pose2d(6, 4, Rotation2d.ZERO),
-            new TrajectoryConfig(2, 2));
+        new HolonomicTrajectory(
+            List.of(
+                new HolonomicSample(
+                    0.0,
+                    new Pose2d(0.0, 0.0, Rotation2d.ZERO),
+                    new ChassisVelocities(0.0, 0.0, 0.0),
+                    new ChassisAccelerations(0.0, 0.0, 0.0))));
   }
 
   @Override
@@ -55,7 +58,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     double elapsed = timer.get();
-    DrivetrainSplineSample reference = trajectory.sampleAt(elapsed);
+    HolonomicSample reference = trajectory.sampleAt(elapsed);
     ChassisVelocities velocities = feedback.calculate(drive.getPose(), reference);
     drive.drive(velocities.vx, velocities.omega);
   }
