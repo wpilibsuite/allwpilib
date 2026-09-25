@@ -19,6 +19,18 @@ public final class ConnectionInfo {
   public final int remotePort;
 
   /**
+   * The IP address we connected to the remote server using. Empty if this NetworkTable instance is
+   * a server.
+   */
+  public final String localIp;
+
+  /**
+   * The port number we connected to the remote server using. Zero if this NetworkTable instance is
+   * a server.
+   */
+  public final int localPort;
+
+  /**
    * The last time any update was received from the remote node (same scale as returned by {@link
    * NetworkTablesJNI#now()}).
    */
@@ -36,14 +48,24 @@ public final class ConnectionInfo {
    * @param remoteId Remote identifier
    * @param remoteIp Remote IP address
    * @param remotePort Remote port number
+   * @param localIp Local IP address, if a client
+   * @param localPort Local port number, if a client
    * @param lastUpdate Last time an update was received
    * @param protocolVersion The protocol version used for the connection
    */
   public ConnectionInfo(
-      String remoteId, String remoteIp, int remotePort, long lastUpdate, int protocolVersion) {
+      String remoteId,
+      String remoteIp,
+      int remotePort,
+      String localIp,
+      int localPort,
+      long lastUpdate,
+      int protocolVersion) {
     this.remoteId = remoteId;
     this.remoteIp = remoteIp;
     this.remotePort = remotePort;
+    this.localIp = localIp;
+    this.localPort = localPort;
     this.lastUpdate = lastUpdate;
     this.protocolVersion = protocolVersion;
   }
