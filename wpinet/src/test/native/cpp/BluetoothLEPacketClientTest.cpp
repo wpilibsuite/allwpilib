@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#ifdef __linux__
-
 #include "wpi/net/BluetoothLEPacketClient.hpp"
 
 #include <memory>
@@ -35,6 +33,7 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
 
   bool firstAccepted = true;
   bool secondAccepted = true;
+  std::string expectedError;
   auto timer = uv::Timer::Create(loop);
   REQUIRE(timer);
   timer->timeout.connect([&] {
@@ -47,6 +46,7 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
     BluetoothLEPacketClientConfig config;
     config.address = "AA:BB:CC:DD:EE:FF";
     secondAccepted = client->Connect(config);
+    expectedError = client->GetStatus().error;
     timer->Close();
   });
   timer->Start(uv::Timer::Time{0});
@@ -67,7 +67,6 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
   CHECK_FALSE(secondAccepted);
   CHECK(callbacksOnLoop);
   REQUIRE(errors.size() == 1);
-  CHECK(errors[0] == "No Bluetooth L2CAP PSM configured");
+  CHECK_FALSE(expectedError.empty());
+  CHECK(errors[0] == expectedError);
 }
-
-#endif

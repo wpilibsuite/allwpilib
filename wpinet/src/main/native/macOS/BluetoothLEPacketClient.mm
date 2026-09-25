@@ -56,16 +56,19 @@ class BluetoothLEPacketClient::Impl
  private:
   template <typename F>
   void UpdateStatus(F&& func) {
+    uint64_t sequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       func(m_status);
       snapshot = m_status;
+      sequence = ++m_statusSequence;
     }
-    PostStatus(snapshot);
+    QueueStatus(snapshot, sequence);
   }
 
-  void PostStatus(const BluetoothLEPacketConnectionStatus& status);
+  void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot,
+                   uint64_t sequence);
 
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
@@ -75,6 +78,8 @@ class BluetoothLEPacketClient::Impl
 
   mutable std::mutex m_statusMutex;
   BluetoothLEPacketConnectionStatus m_status;
+  uint64_t m_statusSequence = 0;
+  uint64_t m_publishedStatusSequence = 0;
   BluetoothLEPacketClientConfig m_config;
   bool m_queuedPacket = false;
 };
@@ -831,6 +836,8 @@ bool BluetoothLEPacketClient::Impl::Connect(
     return false;
   }
 
+  uint64_t statusSequence;
+  BluetoothLEPacketConnectionStatus snapshot;
   {
     std::scoped_lock lock{m_statusMutex};
     m_config = config;
@@ -842,8 +849,10 @@ bool BluetoothLEPacketClient::Impl::Connect(
     m_status.status = "Connecting";
     m_status.connecting = true;
     m_status.connected = false;
+    snapshot = m_status;
+    statusSequence = ++m_statusSequence;
   }
-  PostStatus(GetStatus());
+  QueueStatus(snapshot, statusSequence);
 
   [m_client connectWithTarget:ToNSString(config.address)
                   serviceUuid:ToNSString(config.gattServiceUuid)
@@ -954,10 +963,19 @@ void BluetoothLEPacketClient::Impl::DidSendPacket() {
   UpdateStatus([](auto& status) { ++status.packetsSent; });
 }
 
-void BluetoothLEPacketClient::Impl::PostStatus(
-    const BluetoothLEPacketConnectionStatus& status) {
+void BluetoothLEPacketClient::Impl::QueueStatus(
+    const BluetoothLEPacketConnectionStatus& snapshot, uint64_t sequence) {
   if (m_statusCallback) {
-    m_exec->Send([callback = m_statusCallback, status] { callback(status); });
+    m_exec->Send([weakSelf = weak_from_this(), snapshot, sequence] {
+      auto self = weakSelf.lock();
+      if (!self || sequence <= self->m_publishedStatusSequence) {
+        return;
+      }
+      // Updates can enqueue out of order after releasing m_statusMutex.
+      // Only the loop accesses the last published sequence.
+      self->m_publishedStatusSequence = sequence;
+      self->m_statusCallback(snapshot);
+    });
   }
 }
 
