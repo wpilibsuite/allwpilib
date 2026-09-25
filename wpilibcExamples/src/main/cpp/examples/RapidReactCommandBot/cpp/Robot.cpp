@@ -18,11 +18,11 @@ void Robot::RobotPeriodic() {
   wpi::cmd::CommandScheduler::GetInstance().Run();
 }
 
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 
 void Robot::DisabledPeriodic() {}
 
-void Robot::AutonomousInit() {
+void Robot::AutonomousEnter() {
   autonomousCommand = robot.GetAutonomousCommand();
 
   if (autonomousCommand) {
@@ -43,11 +43,11 @@ void Robot::AutonomousExit() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopEnter() {}
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::UtilityInit() {
+void Robot::UtilityEnter() {
   // Cancels all running commands at the start of utility mode.
   wpi::cmd::CommandScheduler::GetInstance().CancelAll();
 }

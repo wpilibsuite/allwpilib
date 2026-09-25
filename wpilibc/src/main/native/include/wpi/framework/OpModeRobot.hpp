@@ -115,9 +115,9 @@ class OpModeRobotBase : public RobotBase {
   virtual void SimulationPeriodic() {}
 
   /**
-   * Function called once when the robot becomes disabled.
+   * Function called each time the robot enters disabled state.
    */
-  virtual void DisabledInit() {}
+  virtual void DisabledEnter() {}
 
   /**
    * Function called periodically while the robot is disabled.
@@ -125,7 +125,7 @@ class OpModeRobotBase : public RobotBase {
   virtual void DisabledPeriodic() {}
 
   /**
-   * Function called once when the robot exits disabled state.
+   * Function called each time the robot exits disabled state.
    */
   virtual void DisabledExit() {}
 

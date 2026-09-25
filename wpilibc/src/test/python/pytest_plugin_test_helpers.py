@@ -22,26 +22,26 @@ class TeleopPeriodicFailed(wpilib.TimedRobot):
         assert False
 
 
-class TeleopInitFailed(wpilib.TimedRobot):
-    def teleop_init(self):
+class TeleopEnterFailed(wpilib.TimedRobot):
+    def teleop_enter(self):
         assert False
 
 
 class IterativeStateRobot(wpilib.TimedRobot):
-    def disabled_init(self):
-        self.did_disabled_init = True
+    def disabled_enter(self):
+        self.did_disabled_enter = True
 
     def disabled_periodic(self):
         self.did_disabled_periodic = True
 
-    def autonomous_init(self):
-        self.did_auto_init = True
+    def autonomous_enter(self):
+        self.did_auto_enter = True
 
     def autonomous_periodic(self):
         self.did_auto_periodic = True
 
-    def teleop_init(self):
-        self.did_teleop_init = True
+    def teleop_enter(self):
+        self.did_teleop_enter = True
 
     def teleop_periodic(self):
         self.did_teleop_periodic = True
