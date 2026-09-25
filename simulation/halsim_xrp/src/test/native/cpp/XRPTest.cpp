@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -184,4 +185,32 @@ TEST_CASE("XRP control and rename use the firmware wire format", "[xrp]") {
   auto next = MakeControl(xrp);
   CHECK(next[0] == 0);
   CHECK(next[1] == 2);
+}
+
+TEST_CASE("XRP encodes non-finite actuator values as zero", "[xrp]") {
+  XRP xrp;
+  for (double value : {std::numeric_limits<double>::quiet_NaN(),
+                       std::numeric_limits<double>::infinity(),
+                       -std::numeric_limits<double>::infinity()}) {
+    xrp.HandleWPILibUpdate(json::object("type", "XRPMotor", "device", "motorL",
+                                        "data",
+                                        json::object("<throttle", value)));
+    xrp.HandleWPILibUpdate(json::object("type", "XRPServo", "device", "servo1",
+                                        "data",
+                                        json::object("<position", value)));
+    auto packet = MakeControl(xrp);
+    REQUIRE(packet.size() == PACKET_HEADER_SIZE + 4 * 2 + 2);
+    CHECK(packet[5] == 0);
+    CHECK(packet[6] == 0);
+    CHECK(packet[13] == 0);
+  }
+
+  xrp.HandleWPILibUpdate(json::object("type", "XRPMotor", "device", "motorL",
+                                      "data", json::object("<throttle", 0.5)));
+  xrp.HandleWPILibUpdate(json::object("type", "XRPServo", "device", "servo1",
+                                      "data", json::object("<position", 0.5)));
+  auto packet = MakeControl(xrp);
+  CHECK(packet[5] == 0);
+  CHECK(packet[6] == 127);
+  CHECK(packet[13] == 90);
 }

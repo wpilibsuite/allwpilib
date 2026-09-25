@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <bit>
 #include <chrono>
+#include <cmath>
 #include <limits>
 #include <mutex>
 #include <string>
@@ -76,10 +77,16 @@ float ReadFloat(std::span<const uint8_t> packet, size_t offset = 0) {
 }
 
 int16_t EncodeMotorOutput(float value) {
+  if (!std::isfinite(value)) {
+    return 0;
+  }
   return static_cast<int16_t>(std::clamp(value, -1.0f, 1.0f) * MOTOR_MAX_PWM);
 }
 
 uint8_t EncodeServoOutput(float value) {
+  if (!std::isfinite(value)) {
+    return 0;
+  }
   return static_cast<uint8_t>(std::clamp(value, 0.0f, 1.0f) *
                               SERVO_MAX_DEGREES);
 }
