@@ -6,6 +6,8 @@
 
 #include <sys/types.h>
 
+#include <memory>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
@@ -66,14 +68,47 @@ class MockRobot : public wpi::OpModeRobot<MockRobot> {
   // RobotPeriodic method counter
   std::atomic<uint32_t> m_robotPeriodicCount{0};
 
+  // Disabled method counters
+  std::atomic<uint32_t> m_disabledInitCount{0};
+  std::atomic<uint32_t> m_disabledPeriodicCount{0};
+  std::atomic<uint32_t> m_disabledExitCount{0};
+
   MockRobot() = default;
 
-  void DriverStationConnected() { m_driverStationConnectedCount++; }
+  void DriverStationConnected() override { m_driverStationConnectedCount++; }
 
-  void NonePeriodic() { m_nonePeriodicCount++; }
+  void NonePeriodic() override { m_nonePeriodicCount++; }
 
-  void RobotPeriodic() { m_robotPeriodicCount++; }
+  void RobotPeriodic() override { m_robotPeriodicCount++; }
+
+  void DisabledInit() override { m_disabledInitCount++; }
+
+  void DisabledPeriodic() override { m_disabledPeriodicCount++; }
+
+  void DisabledExit() override { m_disabledExitCount++; }
 };
+
+// Robot with a single teleop MockOpMode that exposes the most recently created
+// instance. The pointer is only valid until the opmode is destroyed.
+class SingleOpModeRobot : public MockRobot {
+ public:
+  std::atomic<MockOpMode*> m_opMode{nullptr};
+
+  SingleOpModeRobot() {
+    AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "MockOpMode", [this] {
+      auto opMode = std::make_unique<MockOpMode>();
+      m_opMode = opMode.get();
+      return opMode;
+    });
+    PublishOpModes();
+  }
+};
+
+int64_t GetOnlyOpModeId() {
+  auto options = wpi::sim::DriverStationSim::GetOpModeOptions();
+  REQUIRE(options.size() == 1u);
+  return options[0].id;
+}
 }  // namespace
 
 static_assert(wpi::ConstructibleOpMode<MockOpMode, MockRobot>);
@@ -216,6 +251,111 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest RobotPeriodic",
   // Additional time steps should continue calling RobotPeriodic
   wpi::sim::StepTiming(PERIOD);
   CHECK(robot.m_robotPeriodicCount.load() == 2u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest DisabledOnStartup",
+                 "[wpilibc]") {
+  MockRobot robot;
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
+
+  CHECK(robot.m_disabledInitCount.load() == 0u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 0u);
+
+  // DisabledInit and DisabledPeriodic both run on the first loop
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 1u);
+  CHECK(robot.m_disabledExitCount.load() == 0u);
+
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 2u);
+  CHECK(robot.m_disabledExitCount.load() == 0u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeLifecycle",
+                 "[wpilibc]") {
+  SingleOpModeRobot robot;
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
+  wpi::sim::DriverStationSim::NotifyNewData();
+
+  // First loop: opmode is created and both disabled periodics run once
+  wpi::sim::StepTiming(PERIOD);
+  MockOpMode* opMode = robot.m_opMode.load();
+  REQUIRE(opMode != nullptr);
+  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 1u);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
+  CHECK(opMode->m_startCount.load() == 0u);
+
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(robot.m_disabledInitCount.load() == 1u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 2u);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 2u);
+
+  // Enable: DisabledExit runs and the opmode starts
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(robot.m_disabledExitCount.load() == 1u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 2u);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 2u);
+  CHECK(opMode->m_startCount.load() == 1u);
+  CHECK(opMode->m_endCount.load() == 0u);
+
+  // Disable: the opmode ends and DisabledInit runs again
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(robot.m_disabledInitCount.load() == 2u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 3u);
+  CHECK(robot.m_disabledExitCount.load() == 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
+                 "[wpilibc]") {
+  SingleOpModeRobot robot;
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
+  wpi::sim::DriverStationSim::NotifyNewData();
+
+  // Opmode gets one DisabledPeriodic call, then starts on the same loop; the
+  // robot's disabled functions do not run
+  wpi::sim::StepTiming(PERIOD);
+  MockOpMode* opMode = robot.m_opMode.load();
+  REQUIRE(opMode != nullptr);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
+  CHECK(opMode->m_startCount.load() == 1u);
+  CHECK(robot.m_disabledInitCount.load() == 0u);
+  CHECK(robot.m_disabledPeriodicCount.load() == 0u);
+  CHECK(robot.m_disabledExitCount.load() == 0u);
 
   robot.EndCompetition();
   robotThread.join();

@@ -40,6 +40,8 @@ import org.wpilib.opmode.Utility;
 import org.wpilib.system.RobotController;
 import org.wpilib.system.Watchdog;
 import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.units.measure.Frequency;
+import org.wpilib.units.measure.Time;
 import org.wpilib.util.Alert;
 import org.wpilib.util.Color;
 import org.wpilib.util.ConstructorMatch;
@@ -77,13 +79,16 @@ public abstract class OpModeRobot extends RobotBase {
   // OpMode lifecycle state
   private long m_lastModeId = -1;
   private boolean m_calledDriverStationConnected = false;
-  private boolean m_lastEnabledState = false;
+  // null until the first loop, so that disabledInit() runs on startup
+  private RobotMode m_lastMode;
   private OpMode m_currentOpMode;
   private String m_currentOpModeName;
   private Callback m_currentOpModePeriodic;
   private final Set<Callback> m_activeOpModeCallbacks = new HashSet<>();
   private final Watchdog m_watchdog;
   private final Alert m_loopOverrunAlert;
+  private final Watchdog m_opModeWatchdog;
+  private final Alert m_opModePeriodicOverrunAlert;
 
   private static void reportAddOpModeError(Class<?> cls, String message) {
     DriverStationErrors.reportError(
@@ -521,11 +526,15 @@ public abstract class OpModeRobot extends RobotBase {
     m_startTimeNs = RobotController.getMonotonicTime();
 
     m_loopOverrunAlert =
-        new Alert(
-            "opmode-loop-overrun",
-            "Loop time of \"" + m_period + "\"s overrun",
-            Alert.Level.MEDIUM);
+        new Alert("loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
+    m_opModePeriodicOverrunAlert =
+        new Alert(
+            "opmode-periodic-overrun",
+            "OpMode periodic() time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
+    m_opModeWatchdog =
+        new Watchdog(Seconds.of(m_period), () -> m_opModePeriodicOverrunAlert.set(true));
 
     // Add LoopFunc as periodic callback (match C++)
     addPeriodic(this::loopFunc, period);
@@ -538,16 +547,49 @@ public abstract class OpModeRobot extends RobotBase {
   }
 
   /**
+   * Constructor with specified period.
+   *
+   * @param period the period at which to run the robot and opmode periodic callbacks.
+   */
+  public OpModeRobot(Time period) {
+    this(period.in(Seconds));
+  }
+
+  /**
+   * Constructor with specified frequency.
+   *
+   * @param frequency the frequency at which to run the robot and opmode periodic callbacks.
+   */
+  public OpModeRobot(Frequency frequency) {
+    this(frequency.asPeriod());
+  }
+
+  /**
    * Add a callback to run at a specific period.
    *
    * <p>This callback will be registered with the framework immediately when this method is called
    * and will begin executing as soon as it is registered.
    *
    * @param callback The callback to run.
-   * @param period The period at which to run the callback.
+   * @param period The period at which to run the callback in seconds.
    */
-  public void addPeriodic(Runnable callback, double period) {
-    m_callbacks.add(callback, m_startTimeNs, period);
+  public final void addPeriodic(Runnable callback, double period) {
+    addPeriodic(callback, period, 0);
+  }
+
+  /**
+   * Add a callback to run at a specific period with a starting time offset.
+   *
+   * <p>This callback will be registered with the framework immediately when this method is called
+   * and will begin executing as soon as it is registered.
+   *
+   * @param callback The callback to run.
+   * @param period The period at which to run the callback in seconds.
+   * @param offset The offset from the common starting time in seconds. This is useful for
+   *     scheduling a callback in a different timeslot relative to OpModeRobot.
+   */
+  public final void addPeriodic(Runnable callback, double period, double offset) {
+    m_callbacks.add(callback, m_startTimeNs, period, offset);
   }
 
   /**
@@ -610,6 +652,8 @@ public abstract class OpModeRobot extends RobotBase {
     DriverStationBackend.refreshControlWordFromCache(m_word);
     m_watchdog.reset();
     final boolean enabled = m_word.isEnabled();
+    // Treat disabled as unknown
+    final RobotMode mode = enabled ? m_word.getRobotMode() : RobotMode.UNKNOWN;
     long modeId = m_word.isDSAttached() ? m_word.getOpModeId() : 0;
 
     boolean modeChanged = modeId != m_lastModeId;
@@ -618,7 +662,6 @@ public abstract class OpModeRobot extends RobotBase {
     if (!m_calledDriverStationConnected && m_word.isDSAttached()) {
       m_calledDriverStationConnected = true;
       driverStationConnected();
-      m_watchdog.addEpoch("driverStationConnected()");
     }
 
     // Handle opmode changes: tear down the old opmode if the selection changed
@@ -627,7 +670,6 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Set up new opmode
-    boolean justCreatedOpMode = false;
     if (modeId != 0 && m_currentOpMode == null && modeChanged) {
       OpModeFactory factory = m_opModes.get(modeId);
       if (factory != null) {
@@ -639,24 +681,26 @@ public abstract class OpModeRobot extends RobotBase {
           m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
           m_callbacks.addAll(m_activeOpModeCallbacks);
 
-          // Call disabledPeriodic immediately for newly created OpMode
-          m_currentOpMode.disabledPeriodic();
-          m_watchdog.addEpoch("opMode.disabledPeriodic()");
-          justCreatedOpMode = true;
+          // An opmode created while enabled still gets one disabledPeriodic call before
+          // starting, as it may contain setup code. When disabled, it is called below with the
+          // rest of the disabled periodic functions.
+          if (enabled) {
+            m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("opMode.disabledPeriodic()");
+          }
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);
       }
     }
 
-    // Handle enabled state changes
-    boolean justCalledDisabledInit = false;
-    if (m_lastEnabledState != enabled) {
-      if (enabled) {
-        // Transitioning to enabled
+    // If mode changed, call disabled exit and entry functions
+    if (m_lastMode != mode) {
+      if (m_lastMode == RobotMode.UNKNOWN) {
+        // Transitioning out of disabled
         disabledExit();
-        m_watchdog.addEpoch("disabledExit()");
-      } else {
+      }
+      if (mode == RobotMode.UNKNOWN) {
         // Transitioning to disabled. Only tear down an opmode that was actually
         // running; a freshly selected opmode entering its disabled phase must
         // persist so it can be started on the next enable.
@@ -666,9 +710,8 @@ public abstract class OpModeRobot extends RobotBase {
         }
         disabledInit();
         m_watchdog.addEpoch("disabledInit()");
-        justCalledDisabledInit = true;
       }
-      m_lastEnabledState = enabled;
+      m_lastMode = mode;
     }
 
     // Start the opmode if enabled and not already started. This single check
@@ -679,15 +722,13 @@ public abstract class OpModeRobot extends RobotBase {
     }
 
     // Call periodic functions based on current state
+    DriverStationJNI.observeUserProgram(m_word.getNative());
     if (!enabled) {
-      // Only call disabledPeriodic if we didn't just call disabledInit
-      if (!justCalledDisabledInit) {
-        disabledPeriodic();
-        m_watchdog.addEpoch("disabledPeriodic()");
-      }
+      disabledPeriodic();
+      m_watchdog.addEpoch("disabledPeriodic()");
 
       // Call opmode disabledPeriodic if we have one
-      if (m_currentOpMode != null && !justCreatedOpMode) {
+      if (m_currentOpMode != null) {
         m_currentOpMode.disabledPeriodic();
         m_watchdog.addEpoch("opMode.disabledPeriodic()");
       }
@@ -702,9 +743,6 @@ public abstract class OpModeRobot extends RobotBase {
     // Always call robotPeriodic
     robotPeriodic();
     m_watchdog.addEpoch("robotPeriodic()");
-
-    // Always observe user program state
-    DriverStationJNI.observeUserProgram(m_word.getNative());
 
     TunableRegistry.update();
     m_watchdog.addEpoch("TunableRegistry.update()");
@@ -722,10 +760,11 @@ public abstract class OpModeRobot extends RobotBase {
     // Flush NetworkTables
     NetworkTableInstance.getDefault().flushLocal();
 
-    // Warn on loop time overruns
+    // Warn on loop time overruns, and clear the alert once the loop is back on time
     if (m_watchdog.isExpired()) {
       m_watchdog.printEpochs();
     }
+    m_loopOverrunAlert.set(m_watchdog.isExpired());
   }
 
   private void startCurrentOpMode() {
@@ -736,10 +775,21 @@ public abstract class OpModeRobot extends RobotBase {
     System.out.println("********** Starting OpMode " + m_currentOpModeName + " **********");
 
     // Register the main opmode periodic callback
-    m_currentOpModePeriodic = m_callbacks.add(m_currentOpMode::periodic, m_startTimeNs, m_period);
+    final OpMode opMode = m_currentOpMode;
+    m_currentOpModePeriodic =
+        m_callbacks.add(() -> runOpModePeriodic(opMode), m_startTimeNs, m_period);
 
     m_currentOpMode.start();
     m_watchdog.addEpoch("opMode.start()");
+  }
+
+  private void runOpModePeriodic(OpMode opMode) {
+    m_opModeWatchdog.reset();
+    opMode.periodic();
+    m_opModeWatchdog.disable();
+
+    // Alert on opmode periodic() overruns, and clear the alert once it's back on time
+    m_opModePeriodicOverrunAlert.set(m_opModeWatchdog.isExpired());
   }
 
   private void endCurrentOpMode() {
@@ -752,6 +802,7 @@ public abstract class OpModeRobot extends RobotBase {
 
       m_callbacks.remove(m_currentOpModePeriodic);
       m_currentOpModePeriodic = null;
+      m_opModePeriodicOverrunAlert.set(false);
     }
 
     // The additional getCallbacks() callbacks are registered immediately on construction (even
@@ -769,13 +820,12 @@ public abstract class OpModeRobot extends RobotBase {
   /** Provide an alternate "main loop" via startCompetition(). */
   @Override
   public final void startCompetition() {
-    System.out.println("********** Robot program startup complete **********");
-
     if (isSimulation()) {
       simulationInit();
     }
 
     // Tell the DS that the robot is ready to be enabled
+    System.out.println("********** Robot program startup complete **********");
     DriverStationBackend.observeUserProgramStarting();
 
     // Loop forever, calling the callback system which handles periodic functions
@@ -789,6 +839,7 @@ public abstract class OpModeRobot extends RobotBase {
   @Override
   public void close() {
     m_loopOverrunAlert.close();
+    m_opModePeriodicOverrunAlert.close();
     NotifierJNI.destroyNotifier(m_notifier);
     super.close();
   }
