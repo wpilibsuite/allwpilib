@@ -434,6 +434,8 @@ class BluetoothLEPacketClient::Impl
 
     Disconnect({});
     uint64_t generation;
+    uint64_t statusSequence;
+    BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       m_cancelConnect = false;
@@ -447,8 +449,10 @@ class BluetoothLEPacketClient::Impl
       m_status.transport = BluetoothPacketTransport::NONE;
       m_status.error.clear();
       m_status.status = "Connecting (GATT)";
+      snapshot = m_status;
+      statusSequence = ++m_statusSequence;
     }
-    PublishStatus();
+    QueueStatus(snapshot, statusSequence);
 
     auto self = shared_from_this();
     m_connectThread = std::thread{
@@ -460,6 +464,7 @@ class BluetoothLEPacketClient::Impl
 
   void Disconnect(std::string_view reason) {
     bool publishStatus = false;
+    uint64_t statusSequence = 0;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
@@ -471,6 +476,7 @@ class BluetoothLEPacketClient::Impl
         m_status.transport = BluetoothPacketTransport::NONE;
         m_status.status = reason;
         snapshot = m_status;
+        statusSequence = ++m_statusSequence;
         publishStatus = true;
       }
     }
@@ -485,7 +491,7 @@ class BluetoothLEPacketClient::Impl
     ClearGattState();
 
     if (publishStatus) {
-      QueueStatus(snapshot);
+      QueueStatus(snapshot, statusSequence);
     }
   }
 
@@ -798,6 +804,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void FailGeneration(std::string_view error, uint64_t generation) {
+    uint64_t statusSequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
@@ -812,10 +819,11 @@ class BluetoothLEPacketClient::Impl
       m_status.connected = false;
       m_status.transport = BluetoothPacketTransport::NONE;
       snapshot = m_status;
+      statusSequence = ++m_statusSequence;
     }
 
     ClearGattState(generation);
-    QueueStatus(snapshot);
+    QueueStatus(snapshot, statusSequence);
   }
 
   void ClearGattState() { ClearGattStateForGeneration(0, false); }
@@ -865,31 +873,33 @@ class BluetoothLEPacketClient::Impl
     });
   }
 
-  void PublishStatus() {
-    BluetoothLEPacketConnectionStatus snapshot;
-    {
-      std::scoped_lock lock{m_statusMutex};
-      snapshot = m_status;
-    }
-    QueueStatus(snapshot);
-  }
-
-  void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot) {
+  void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot,
+                   uint64_t sequence) {
     if (m_statusCallback) {
-      m_exec->Send(
-          [callback = m_statusCallback, snapshot] { callback(snapshot); });
+      m_exec->Send([weakSelf = weak_from_this(), snapshot, sequence] {
+        auto self = weakSelf.lock();
+        if (!self || sequence <= self->m_publishedStatusSequence) {
+          return;
+        }
+        // Updates can enqueue out of order after releasing m_statusMutex.
+        // Only the loop accesses the last published sequence.
+        self->m_publishedStatusSequence = sequence;
+        self->m_statusCallback(snapshot);
+      });
     }
   }
 
   template <typename F>
   void UpdateStatus(F&& func) {
+    uint64_t sequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       func(m_status);
       snapshot = m_status;
+      sequence = ++m_statusSequence;
     }
-    QueueStatus(snapshot);
+    QueueStatus(snapshot, sequence);
   }
 
   uv::Loop& m_loop;
@@ -899,6 +909,8 @@ class BluetoothLEPacketClient::Impl
 
   mutable std::mutex m_statusMutex;
   BluetoothLEPacketConnectionStatus m_status;
+  uint64_t m_statusSequence = 0;
+  uint64_t m_publishedStatusSequence = 0;
   BluetoothLEPacketClientConfig m_config;
 
   std::mutex m_gattMutex;
