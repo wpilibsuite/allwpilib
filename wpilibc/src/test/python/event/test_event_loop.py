@@ -7,6 +7,7 @@ def test_bind_unbind():
     loop = EventLoop()
 
     pollCount = 0
+
     def count_poll():
         nonlocal pollCount
         pollCount += 1
@@ -27,6 +28,7 @@ def test_bind_unbind():
     loop.poll()
 
     assert pollCount == 3
+
 
 def test_concurrent_modification():
     loop = EventLoop()

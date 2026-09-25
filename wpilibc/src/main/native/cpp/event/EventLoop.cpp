@@ -22,8 +22,7 @@ struct RunningSetter {
 
 EventLoop::EventLoop() {}
 
-size_t EventLoop::Bind(
-    wpi::util::unique_function<void()>&& action) {
+size_t EventLoop::Bind(wpi::util::unique_function<void()>&& action) {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
                            "Cannot bind EventLoop while it is running");
