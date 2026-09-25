@@ -13,8 +13,9 @@ filegroup(
     name = "doxygen-files",
     srcs = glob([
         "src/main/native/include/**/*",
+        "src/main/native/thirdparty/ada/include/**/*",
         "src/main/native/thirdparty/tcpsockets/include/**/*",
-    ]) + ["@libuv//:include_files"],
+    ]),
     visibility = ["//visibility:public"],
 )
 

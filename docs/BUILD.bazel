@@ -5,32 +5,39 @@ load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 paths = [
     "apriltag/src/main/native/include",
-    "cameraserver/src/generated/main/native/include",
     "cameraserver/src/main/native/include",
+    "commandsv2/src/generated/main/native/include",
+    "commandsv2/src/main/native/include",
     "cscore/src/main/native/include",
+    "datalog/src/main/native/include",
+    "drivers/src/main/native/include",
+    "drivers/src/generated/main/native/include",
     "fields/src/generated/main/native/include",
     "fields/src/main/native/include",
     "hal/src/main/native/include",
+    "ntcore/src/generated/main/native/include",
     "ntcore/src/main/native/include",
-    "romiVendordep/src/generated/main/native/include",
     "romiVendordep/src/main/native/include",
-    "commandsv2/src/generated/main/native/include",
-    "commandsv2/src/main/native/include",
+    "telemetry/src/main/native/include",
+    "tunables/src/main/native/include",
     "wpilibc/src/generated/main/native/include",
     "wpilibc/src/main/native/include",
     "wpimath/src/main/native/include",
+    "wpimath/src/generated/main/native/cpp",
+    "wpimath/src/main/native/thirdparty/gcem/include",
+    "wpimath/src/main/native/thirdparty/sleipnir/include",
     "wpinet/src/main/native/include",
+    "wpinet/src/main/native/thirdparty/ada/include",
+    "wpinet/src/main/native/thirdparty/tcpsockets/include",
     "wpiutil/src/main/native/include",
     "wpiutil/src/main/native/thirdparty/argparse/include",
     "wpiutil/src/main/native/thirdparty/debugging/include",
-    "wpiutil/src/main/native/thirdparty/htrie/include",
+    "wpiutil/src/main/native/thirdparty/double-conversion/include",
     "wpiutil/src/main/native/thirdparty/json/include",
     "wpiutil/src/main/native/thirdparty/llvm/include",
-    "wpiutil/src/main/native/thirdparty/mpack/include",
     "wpiutil/src/main/native/thirdparty/nanopb/include",
     "wpiutil/src/main/native/thirdparty/sigslot/include",
     "wpiutil/src/main/native/thirdparty/upb/include",
-    "xrpVendordep/src/generated/main/native/include",
     "xrpVendordep/src/main/native/include",
 ]
 
@@ -63,11 +70,14 @@ doxygen(
         "//cameraserver:doxygen-files",
         "//commandsv2:doxygen-files",
         "//cscore:doxygen-files",
+        "//datalog:doxygen-files",
         "//drivers:doxygen-files",
         "//fields:doxygen-files",
         "//hal:doxygen-files",
         "//ntcore:doxygen-files",
         "//romiVendordep:doxygen-files",
+        "//telemetry:doxygen-files",
+        "//tunables:doxygen-files",
         "//wpilibc:doxygen-files",
         "//wpimath:doxygen-files",
         "//wpinet:doxygen-files",
@@ -84,8 +94,6 @@ doxygen(
     exclude_patterns = [
         "**/.clang-tidy",
         "**/.clang-format",
-        # Save space by excluding eigen
-        "*/Eigen/**",
         "*/bazel-out/**",
         # LLVM
         "*/wpi/util/Compiler.hpp",
@@ -97,18 +105,12 @@ doxygen(
         "*/sleipnir/optimization/solver/ipm.hpp",
         "*/sleipnir/optimization/solver/newton.hpp",
         "*/sleipnir/optimization/solver/sqp.hpp",
+        "*/sleipnir/optimization/solver/util/feasibility_restoration.hpp",
         # apriltag
         "*/apriltag_pose.h",
-        # libuv
-        "*/uv/**",
-        # mpack
-        "*/wpi/util/mpack.h",
-        # hat-trie internal helpers
-        "*/wpi/util/array-hash/**",
-        # units
-        "*/wpi/units/**",
     ],
     html_extra_stylesheet = "docs/theme.css",
+    include_path = paths,
     project_logo = "wpiutil/src/main/native/resources/wpilib-128.png",
     project_name = "WPILibC++",
     project_number = "$(WPILIB_VERSION)",
@@ -140,18 +142,70 @@ javadoc(
     included_packages = [
         "org.wpilib.*",
     ],
+    javadocopts = [
+        "-link",
+        "https://docs.oracle.com/en/java/javase/25/docs/api/",
+        "-linksource",
+        "-notimestamp",
+        "-quiet",
+        "-tag",
+        "pre:a:Pre-Condition",
+        "-use",
+        "-Xdoclint:html,missing,reference,syntax",
+        "-Xdoclint/package:" +
+        # TODO: v Document these, then remove them from the list
+        "-org.wpilib.hardware.hal," +
+        "-org.wpilib.hardware.hal.simulation," +
+        # TODO: ^ Document these, then remove them from the list
+        "-org.wpilib.hardware.hal.struct," +
+        "-org.wpilib.math.struct," +
+        "-org.wpilib.math.controller.proto," +
+        "-org.wpilib.math.controller.proto.detail," +
+        "-org.wpilib.math.controller.struct," +
+        "-org.wpilib.math.geometry.proto," +
+        "-org.wpilib.math.geometry.proto.detail," +
+        "-org.wpilib.math.geometry.struct," +
+        "-org.wpilib.math.kinematics.proto," +
+        "-org.wpilib.math.kinematics.proto.detail," +
+        "-org.wpilib.math.kinematics.struct," +
+        "-org.wpilib.math.linalg.proto," +
+        "-org.wpilib.math.linalg.proto.detail," +
+        "-org.wpilib.math.linalg.struct," +
+        "-org.wpilib.math.shape.proto," +
+        "-org.wpilib.math.shape.proto.detail," +
+        "-org.wpilib.math.shape.struct," +
+        "-org.wpilib.math.spline.proto," +
+        "-org.wpilib.math.spline.proto.detail," +
+        "-org.wpilib.math.spline.struct," +
+        "-org.wpilib.math.system.proto," +
+        "-org.wpilib.math.system.proto.detail," +
+        "-org.wpilib.math.system.struct," +
+        "-org.wpilib.math.trajectory.proto," +
+        "-org.wpilib.math.trajectory.proto.detail," +
+        "-org.wpilib.math.trajectory.struct," +
+        "-org.wpilib.command3.proto," +
+        # The .measure package contains generated source files for which automatic javadoc
+        # generation is very difficult to do meaningfully.
+        "-org.wpilib.units.measure",
+        "-encoding",
+        "UTF8",
+    ],
     deps = [
         "//apriltag:apriltag-java",
         "//cameraserver:cameraserver-java",
         "//commandsv2:commandsv2-java",
         "//commandsv3:commandsv3-java",
         "//cscore:cscore-java",
+        "//datalog:datalog-java",
         "//drivers:drivers-java",
         "//epilogue-runtime:epilogue-java",
         "//fields:fields-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
         "//romiVendordep:romiVendordep-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
         "//wpinet:wpinet-java",
