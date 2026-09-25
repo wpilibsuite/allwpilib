@@ -5,7 +5,7 @@
 #pragma once
 
 #include <functional>
-#include <vector>
+#include <list>
 
 #include "wpi/util/FunctionExtras.hpp"
 
@@ -23,8 +23,19 @@ class EventLoop {
    * Bind a new action to run when the loop is polled.
    *
    * @param action the action to run.
+   * @returns A reference to the bound action, so that it may be later unbound.
    */
-  void Bind(wpi::util::unique_function<void()> action);
+  wpi::util::unique_function<void()>& Bind(
+      wpi::util::unique_function<void()>&& action);
+
+  /**
+   * Unbinds an action so that is no longer ran when the loop is polled.
+   * This must be provided the same reference that was returned from `Bind`.
+   * The reference will no longer be valid after this is called.
+   *
+   * @param action the action to unbind.
+   */
+  void Unbind(wpi::util::unique_function<void()>& action);
 
   /**
    * Poll all bindings.
@@ -37,7 +48,7 @@ class EventLoop {
   void Clear();
 
  private:
-  std::vector<wpi::util::unique_function<void()>> m_bindings;
+  std::list<wpi::util::unique_function<void()>> m_bindings;
   bool m_running{false};
 };
 }  // namespace wpi

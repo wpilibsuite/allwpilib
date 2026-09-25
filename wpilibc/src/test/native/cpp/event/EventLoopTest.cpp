@@ -11,11 +11,40 @@
 
 using namespace wpi;
 
+TEST_CASE("EventLoopTest BindUnbind", "[wpilibc][event]") {
+  EventLoop loop;
+  int pollCount = 0;
+
+  auto& task = loop.Bind([&pollCount] { pollCount++; });
+
+  loop.Poll();
+
+  REQUIRE(pollCount == 1);
+
+  loop.Poll();
+
+  REQUIRE(pollCount == 2);
+
+  loop.Unbind(task);
+
+  loop.Poll();
+
+  REQUIRE(pollCount == 2);
+}
+
 TEST_CASE("EventLoopTest ConcurrentModification", "[wpilibc][event]") {
   EventLoop loop;
 
   loop.Bind(
       [&loop] { REQUIRE_THROWS_AS(loop.Bind([] {}), wpi::RuntimeError); });
+
+  loop.Poll();
+
+  loop.Clear();
+
+  util::unique_function<void()>* task = &loop.Bind([&loop, &task] {
+    REQUIRE_THROWS_AS(loop.Unbind(*task), wpi::RuntimeError);
+  });
 
   loop.Poll();
 

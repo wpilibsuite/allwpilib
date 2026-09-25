@@ -9,5 +9,7 @@ classes:
           [](EventLoop *self, std::function<void()> action) {
             self->Bind(std::move(action));
           }
+      Unbind:
+        ignore: true # Handling references from Python still needs to be figured out
       Poll:
       Clear:
