@@ -261,6 +261,8 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    uint64_t statusSequence;
+    BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       if ((m_status.connecting || m_status.connected) &&
@@ -278,8 +280,10 @@ class BluetoothLEPacketClient::Impl
       m_status.connecting = true;
       m_status.connected = false;
       m_status.transport = BluetoothPacketTransport::NONE;
+      snapshot = m_status;
+      statusSequence = ++m_statusSequence;
     }
-    PublishStatus();
+    QueueStatus(snapshot, statusSequence);
 
     auto self = shared_from_this();
     m_exec->Send(
@@ -1316,33 +1320,33 @@ class BluetoothLEPacketClient::Impl
     });
   }
 
-  void PublishStatus() {
-    BluetoothLEPacketConnectionStatus snapshot;
-    {
-      std::scoped_lock lock{m_statusMutex};
-      snapshot = m_status;
-    }
-    PublishStatusSnapshot(snapshot);
-  }
-
-  void PublishStatusSnapshot(
-      const BluetoothLEPacketConnectionStatus& snapshot) {
-    StatusCallback callback = m_statusCallback;
-    if (callback) {
-      m_exec->Send(
-          [callback = std::move(callback), snapshot] { callback(snapshot); });
+  void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot,
+                   uint64_t sequence) {
+    if (m_statusCallback) {
+      m_exec->Send([weakSelf = weak_from_this(), snapshot, sequence] {
+        auto self = weakSelf.lock();
+        if (!self || sequence <= self->m_publishedStatusSequence) {
+          return;
+        }
+        // Updates can enqueue out of order after releasing m_statusMutex.
+        // Only the loop accesses the last published sequence.
+        self->m_publishedStatusSequence = sequence;
+        self->m_statusCallback(snapshot);
+      });
     }
   }
 
   template <typename F>
   void UpdateStatus(F&& func) {
+    uint64_t sequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
       func(m_status);
       snapshot = m_status;
+      sequence = ++m_statusSequence;
     }
-    PublishStatusSnapshot(snapshot);
+    QueueStatus(snapshot, sequence);
   }
 
   uv::Loop& m_loop;
@@ -1354,6 +1358,8 @@ class BluetoothLEPacketClient::Impl
 
   mutable std::mutex m_statusMutex;
   BluetoothLEPacketConnectionStatus m_status;
+  uint64_t m_statusSequence = 0;
+  uint64_t m_publishedStatusSequence = 0;
   BluetoothLEPacketClientConfig m_config;
 
   std::shared_ptr<uv::Poll> m_poll;
