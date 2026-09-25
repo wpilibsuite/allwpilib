@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "DBusRuntime.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 namespace wpi::net::linuxbluetooth {
 namespace {
@@ -724,7 +725,8 @@ const BlueZDeviceInfo* FindBluetoothDevice(
     const std::vector<BlueZDeviceInfo>& devices, std::string_view target) {
   auto device =
       std::find_if(devices.begin(), devices.end(), [&](const auto& info) {
-        return info.device.target == target || info.path == target;
+        return wpi::util::equals_lower(info.device.target, target) ||
+               info.path == target;
       });
   return device != devices.end() ? &*device : nullptr;
 }
