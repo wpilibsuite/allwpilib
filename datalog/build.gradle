@@ -11,6 +11,8 @@ ext {
 
 apply from: "${rootDir}/shared/jni/setupBuild.gradle"
 
+sourceSets.main.java.srcDir "${projectDir}/src/generated/main/java"
+
 nativeUtils.exportsConfigs {
     datalog {
     }
