@@ -25,8 +25,7 @@ class EventLoop {
    * @param action the action to run.
    * @returns An id for the bound action, so that it may be later unbound.
    */
-  size_t Bind(
-      wpi::util::unique_function<void()>&& action);
+  size_t Bind(wpi::util::unique_function<void()>&& action);
 
   /**
    * Unbinds an action so that is no longer ran when the loop is polled.
@@ -48,7 +47,7 @@ class EventLoop {
   void Clear();
 
  private:
-  static size_t nextId;
+  size_t nextId = 1;  // Skip id 0 in case it is needed for null later
   struct Binding {
     size_t id;
     wpi::util::unique_function<void()> handler;

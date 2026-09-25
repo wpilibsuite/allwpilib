@@ -20,8 +20,6 @@ struct RunningSetter {
 };
 }  // namespace
 
-size_t EventLoop::nextId = 1; // Skip id 0 in case it is needed for null later
-
 EventLoop::EventLoop() {}
 
 size_t EventLoop::Bind(
