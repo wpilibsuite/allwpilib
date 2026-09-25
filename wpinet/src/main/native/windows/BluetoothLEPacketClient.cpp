@@ -184,7 +184,7 @@ BluetoothAddressType GetDeviceAddressType(dev::DeviceInformation const& info) {
 bool DeviceMatchesTarget(dev::DeviceInformation const& info,
                          std::string_view target) {
   std::string deviceTarget = GetDeviceTarget(info);
-  if (!deviceTarget.empty() && deviceTarget == target) {
+  if (!deviceTarget.empty() && wpi::util::equals_lower(deviceTarget, target)) {
     return true;
   }
   return winrt::to_string(info.Id()) == target ||
