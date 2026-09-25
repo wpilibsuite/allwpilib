@@ -183,6 +183,7 @@ ext {
                 }
             }
         } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+            it.objcppCompiler.args << "-fobjc-arc"
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {
