@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
@@ -95,11 +96,7 @@ struct bt_security {
 };
 
 uint16_t HostToLe16(uint16_t value) {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-  return value;
-#else
-  return static_cast<uint16_t>((value >> 8) | (value << 8));
-#endif
+  return wpi::util::support::endian::byte_swap(value, std::endian::little);
 }
 
 bool ParseBluetoothAddress(std::string_view address, bdaddr_t* out) {
