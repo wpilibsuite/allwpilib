@@ -15,8 +15,8 @@ TEST_CASE("EventLoopTest BindUnbind", "[wpilibc][event]") {
   EventLoop loop;
   int pollCount = 0;
 
-  auto& task = loop.Bind([&pollCount] { pollCount++; });
-  auto& task2 = loop.Bind([&pollCount] { pollCount++; });
+  size_t task = loop.Bind([&pollCount] { pollCount++; });
+  size_t task2 = loop.Bind([&pollCount] { pollCount++; });
 
   loop.Poll();
 
@@ -45,8 +45,8 @@ TEST_CASE("EventLoopTest ConcurrentModification", "[wpilibc][event]") {
 
   loop.Clear();
 
-  util::unique_function<void()>* task = &loop.Bind([&loop, &task] {
-    REQUIRE_THROWS_AS(loop.Unbind(*task), wpi::RuntimeError);
+  size_t task = loop.Bind([&loop, &task] {
+    REQUIRE_THROWS_AS(loop.Unbind(task), wpi::RuntimeError);
   });
 
   loop.Poll();

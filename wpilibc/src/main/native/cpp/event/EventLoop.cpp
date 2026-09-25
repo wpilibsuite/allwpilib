@@ -20,25 +20,28 @@ struct RunningSetter {
 };
 }  // namespace
 
+size_t EventLoop::nextId = 1; // Skip id 0 in case it is needed for null later
+
 EventLoop::EventLoop() {}
 
-wpi::util::unique_function<void()>& EventLoop::Bind(
+size_t EventLoop::Bind(
     wpi::util::unique_function<void()>&& action) {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
                            "Cannot bind EventLoop while it is running");
   }
-  return m_bindings.emplace_back(std::move(action));
+  return m_bindings.emplace_back(nextId++, std::move(action)).id;
 }
 
-void EventLoop::Unbind(wpi::util::unique_function<void()>& action) {
+void EventLoop::Unbind(size_t actionId) {
   if (m_running) {
     throw WPILIB_MakeError(err::Error,
                            "Cannot unbind EventLoop while it is running");
   }
   for (auto iter = m_bindings.begin(); iter != m_bindings.end(); iter++) {
-    if (&*iter == &action) {
-      m_bindings.erase(iter);
+    if (iter->id == actionId) {
+      std::swap(*iter, m_bindings.back());
+      m_bindings.pop_back();
       break;
     }
   }
@@ -46,8 +49,8 @@ void EventLoop::Unbind(wpi::util::unique_function<void()>& action) {
 
 void EventLoop::Poll() {
   RunningSetter runSetter{m_running};
-  for (wpi::util::unique_function<void()>& action : m_bindings) {
-    action();
+  for (Binding& action : m_bindings) {
+    action.handler();
   }
 }
 
