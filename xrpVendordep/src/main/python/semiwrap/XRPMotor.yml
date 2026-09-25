@@ -9,3 +9,10 @@ classes:
       Disable:
       StopMotor:
       GetDescription:
+      AddFollower:
+        overloads:
+          XRPMotor&:
+            keepalive:
+            - [1, 2]
+          T&&:
+            ignore: true
