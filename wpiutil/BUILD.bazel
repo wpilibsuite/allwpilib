@@ -197,9 +197,6 @@ wpilib_cc_library(
         ":upb",
     ],
     visibility = ["//visibility:public"],
-    deps = select({
-        "//conditions:default": [],
-    }),
 )
 
 wpilib_cc_shared_library(

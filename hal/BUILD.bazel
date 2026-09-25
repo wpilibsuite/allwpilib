@@ -93,9 +93,7 @@ wpilib_cc_shared_library(
         "//ntcore:shared/ntcore",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ] + select({
-        "//conditions:default": [],
-    }),
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal",
@@ -108,9 +106,7 @@ wpilib_cc_static_library(
         "//ntcore:static/ntcore",
         "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
-    ] + select({
-        "//conditions:default": [],
-    }),
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal",
