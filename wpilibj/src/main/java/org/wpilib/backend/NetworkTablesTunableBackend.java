@@ -60,6 +60,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final List<StoredEntry> m_polledEntries = new ArrayList<>();
   private final Map<Integer, TunableValueEntry> m_subscriberMap = new HashMap<>();
   private final NetworkTableListenerPoller m_poller;
+  private final List<NetworkTableEvent> m_pendingTuneEvents = new ArrayList<>();
   private final List<Runnable> m_pendingMutations = new ArrayList<>();
   private final Map<String, Boolean> m_pendingPathStates = new HashMap<>();
   private final List<Runnable> m_onChangeCallbacks = new ArrayList<>();
@@ -113,8 +114,9 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private record InitialUpdate(Runnable callback) {}
 
   private abstract class TunableValueEntry implements TunableEntry {
-    TunableValueEntry(String path, TunableConfig config, String typeString) {
+    TunableValueEntry(String path, TunableBase tunable, TunableConfig config, String typeString) {
       m_path = path;
+      m_tunable = tunable;
       if (config != null && config.getTypeString() != null) {
         typeString = config.getTypeString();
       }
@@ -133,13 +135,32 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       }
       m_subscriberMap.put(m_subscriber.getHandle(), this);
       if (config == null || config.isMutable()) {
-        m_listener =
-            m_poller.addListener(m_subscriber, EnumSet.of(NetworkTableEvent.Kind.VALUE_ALL));
+        boolean applyInitialValue = config != null && config.isRobust();
+        var eventKinds = EnumSet.of(NetworkTableEvent.Kind.VALUE_ALL);
+        if (applyInitialValue) {
+          eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
+        }
+        m_listener = m_poller.addListener(m_subscriber, eventKinds);
+        if (applyInitialValue) {
+          // NT queues the initial snapshot atomically with listener registration.
+          // A separate subscriber read could apply a racing write twice.
+          for (var event : m_poller.readQueue()) {
+            if (event.listener == m_listener && event.is(NetworkTableEvent.Kind.IMMEDIATE)) {
+              // Immediate events include the topic's value even if the subscription
+              // is inactive because another type is already published.
+              if (event.valueData != null
+                  && typeString.equals(m_subscriber.getTopic().getTypeString())) {
+                m_initialValue = event.valueData.value;
+              }
+            } else {
+              m_pendingTuneEvents.add(event);
+            }
+          }
+        }
       } else {
         m_listener = 0;
       }
       m_onChange = config == null ? null : config.getOnTune();
-      m_applyInitialValue = config != null && config.isRobust() && config.isMutable();
     }
 
     @Override
@@ -161,16 +182,15 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       if (!doUpdateTunable(value)) {
         return null;
       }
+      TunableRegistry.recordTuneApplied(m_tunable);
       m_forcePublish = true;
       return m_onChange;
     }
 
     public InitialUpdate updateInitialTunable() {
-      if (!m_applyInitialValue) {
-        return null;
-      }
-      NetworkTableValue value = m_subscriber.get();
-      if (!value.isValid()) {
+      NetworkTableValue value = m_initialValue;
+      m_initialValue = null;
+      if (value == null || !value.isValid()) {
         return null;
       }
       return new InitialUpdate(updateTunable(value));
@@ -200,16 +220,21 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     protected final String m_path;
     protected final GenericPublisher m_publisher;
     protected final GenericSubscriber m_subscriber;
+    private final TunableBase m_tunable;
     private final int m_listener;
     private final Runnable m_onChange;
-    private final boolean m_applyInitialValue;
+    private NetworkTableValue m_initialValue;
     private boolean m_forcePublish;
   }
 
   private final class TunableBooleanEntry extends TunableValueEntry {
     TunableBooleanEntry(
-        String path, TunableConfig config, BooleanSupplier getter, BooleanConsumer setter) {
-      super(path, config, "boolean");
+        String path,
+        TunableBase tunable,
+        TunableConfig config,
+        BooleanSupplier getter,
+        BooleanConsumer setter) {
+      super(path, tunable, config, "boolean");
       m_getter = getter;
       m_setter = setter;
       updateNetwork();
@@ -238,8 +263,13 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   }
 
   private final class TunableIntEntry extends TunableValueEntry {
-    TunableIntEntry(String path, TunableConfig config, IntSupplier getter, IntConsumer setter) {
-      super(path, config, "int");
+    TunableIntEntry(
+        String path,
+        TunableBase tunable,
+        TunableConfig config,
+        IntSupplier getter,
+        IntConsumer setter) {
+      super(path, tunable, config, "int");
       m_getter = getter;
       m_setter = setter;
       updateNetwork();
@@ -268,8 +298,13 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   }
 
   private final class TunableLongEntry extends TunableValueEntry {
-    TunableLongEntry(String path, TunableConfig config, LongSupplier getter, LongConsumer setter) {
-      super(path, config, "int");
+    TunableLongEntry(
+        String path,
+        TunableBase tunable,
+        TunableConfig config,
+        LongSupplier getter,
+        LongConsumer setter) {
+      super(path, tunable, config, "int");
       m_getter = getter;
       m_setter = setter;
       updateNetwork();
@@ -299,8 +334,12 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableFloatEntry extends TunableValueEntry {
     TunableFloatEntry(
-        String path, TunableConfig config, FloatSupplier getter, FloatConsumer setter) {
-      super(path, config, "float");
+        String path,
+        TunableBase tunable,
+        TunableConfig config,
+        FloatSupplier getter,
+        FloatConsumer setter) {
+      super(path, tunable, config, "float");
       m_getter = getter;
       m_setter = setter;
       updateNetwork();
@@ -330,8 +369,12 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableDoubleEntry extends TunableValueEntry {
     TunableDoubleEntry(
-        String path, TunableConfig config, DoubleSupplier getter, DoubleConsumer setter) {
-      super(path, config, "double");
+        String path,
+        TunableBase tunable,
+        TunableConfig config,
+        DoubleSupplier getter,
+        DoubleConsumer setter) {
+      super(path, tunable, config, "double");
       m_getter = getter;
       m_setter = setter;
       updateNetwork();
@@ -376,7 +419,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         String typeString,
         ValuePublisher<T> valuePublisher,
         ValueReader<T> valueReader) {
-      super(path, tunable.getConfig(), typeString);
+      super(path, tunable, tunable.getConfig(), typeString);
       m_tunables = tunable;
       m_valueDescription = typeString;
       m_valuePublisher = valuePublisher;
@@ -413,7 +456,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableRawEntry extends TunableValueEntry {
     TunableRawEntry(String path, Tunable<byte[]> tunable) {
-      super(path, tunable.getConfig(), "raw");
+      super(path, tunable, tunable.getConfig(), "raw");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -444,7 +487,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableBooleanArrayEntry extends TunableValueEntry {
     TunableBooleanArrayEntry(String path, Tunable<boolean[]> tunable) {
-      super(path, tunable.getConfig(), "boolean[]");
+      super(path, tunable, tunable.getConfig(), "boolean[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -475,7 +518,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableIntArrayEntry extends TunableValueEntry {
     TunableIntArrayEntry(String path, Tunable<int[]> tunable) {
-      super(path, tunable.getConfig(), "int[]");
+      super(path, tunable, tunable.getConfig(), "int[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -523,7 +566,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableLongArrayEntry extends TunableValueEntry {
     TunableLongArrayEntry(String path, Tunable<long[]> tunable) {
-      super(path, tunable.getConfig(), "int[]");
+      super(path, tunable, tunable.getConfig(), "int[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -554,7 +597,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableFloatArrayEntry extends TunableValueEntry {
     TunableFloatArrayEntry(String path, Tunable<float[]> tunable) {
-      super(path, tunable.getConfig(), "float[]");
+      super(path, tunable, tunable.getConfig(), "float[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -585,7 +628,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableDoubleArrayEntry extends TunableValueEntry {
     TunableDoubleArrayEntry(String path, Tunable<double[]> tunable) {
-      super(path, tunable.getConfig(), "double[]");
+      super(path, tunable, tunable.getConfig(), "double[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -616,7 +659,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableStringArrayEntry extends TunableValueEntry {
     TunableStringArrayEntry(String path, Tunable<String[]> tunable) {
-      super(path, tunable.getConfig(), "string[]");
+      super(path, tunable, tunable.getConfig(), "string[]");
       m_tunables = tunable;
       updateNetwork();
     }
@@ -647,7 +690,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableStructEntry<T> extends TunableValueEntry {
     TunableStructEntry(String path, Tunable.TunableStruct<T> tunable) {
-      super(path, tunable.getConfig(), tunable.getStruct().getTypeString());
+      super(path, tunable, tunable.getConfig(), tunable.getStruct().getTypeString());
       m_tunables = tunable;
       m_buf = StructBuffer.create(tunable.getStruct());
       updateNetwork();
@@ -711,7 +754,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableStructArrayEntry<T> extends TunableValueEntry {
     TunableStructArrayEntry(String path, Tunable.TunableStructArray<T> tunable) {
-      super(path, tunable.getConfig(), tunable.getStruct().getTypeString() + "[]");
+      super(path, tunable, tunable.getConfig(), tunable.getStruct().getTypeString() + "[]");
       m_tunables = tunable;
       m_buf = StructBuffer.create(tunable.getStruct());
       updateNetwork();
@@ -776,7 +819,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
   private final class TunableProtobufEntry<T> extends TunableValueEntry {
     TunableProtobufEntry(String path, Tunable.TunableProtobuf<T> tunable) {
-      super(path, tunable.getConfig(), tunable.getProtobuf().getTypeString());
+      super(path, tunable, tunable.getConfig(), tunable.getProtobuf().getTypeString());
       m_tunables = tunable;
       m_buf = ProtobufBuffer.create(tunable.getProtobuf());
       updateNetwork();
@@ -1009,6 +1052,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         clearTrackedEntries();
       }
       m_subscriberMap.clear();
+      m_pendingTuneEvents.clear();
       m_poller.close();
     }
   }
@@ -1033,11 +1077,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       String ntPath = m_prefix + path;
       TunableValueEntry entry;
       switch (tunable) {
-        case TunableBoolean v -> entry = new TunableBooleanEntry(ntPath, v.getConfig(), v, v);
-        case TunableInt v -> entry = new TunableIntEntry(ntPath, v.getConfig(), v, v);
-        case TunableLong v -> entry = new TunableLongEntry(ntPath, v.getConfig(), v, v);
-        case TunableFloat v -> entry = new TunableFloatEntry(ntPath, v.getConfig(), v, v);
-        case TunableDouble v -> entry = new TunableDoubleEntry(ntPath, v.getConfig(), v, v);
+        case TunableBoolean v -> entry = new TunableBooleanEntry(ntPath, v, v.getConfig(), v, v);
+        case TunableInt v -> entry = new TunableIntEntry(ntPath, v, v.getConfig(), v, v);
+        case TunableLong v -> entry = new TunableLongEntry(ntPath, v, v.getConfig(), v, v);
+        case TunableFloat v -> entry = new TunableFloatEntry(ntPath, v, v.getConfig(), v, v);
+        case TunableDouble v -> entry = new TunableDoubleEntry(ntPath, v, v.getConfig(), v, v);
         case Tunable.TunableStruct<?> v -> entry = new TunableStructEntry<>(ntPath, v);
         case Tunable.TunableStructArray<?> v -> entry = new TunableStructArrayEntry<>(ntPath, v);
         case Tunable.TunableProtobuf<?> v -> entry = new TunableProtobufEntry<>(ntPath, v);
@@ -1379,7 +1423,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
           return;
         }
         // update tunables from network changes
-        processTuneEvents(m_poller.readQueue(), onChangeCallbacks);
+        var pendingEvents = m_pendingTuneEvents.toArray(NetworkTableEvent[]::new);
+        m_pendingTuneEvents.clear();
+        var events = m_poller.readQueue();
+        processTuneEvents(pendingEvents, onChangeCallbacks);
+        processTuneEvents(events, onChangeCallbacks);
 
         // update network from tunable changes
         // updateNetwork() can run user getters or complex update code that re-enters this backend.
