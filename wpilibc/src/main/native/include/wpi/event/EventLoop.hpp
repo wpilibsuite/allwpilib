@@ -30,7 +30,7 @@ class EventLoop {
 
   /**
    * Unbinds an action so that is no longer ran when the loop is polled.
-   * This must be provided the same id that was returned from `Bind`.
+   * This may change the call order of the remaining events.
    *
    * @param actionId the id of the action to unbind.
    */
