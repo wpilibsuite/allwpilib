@@ -23,16 +23,16 @@ class EventLoop {
    * Bind a new action to run when the loop is polled.
    *
    * @param action the action to run.
-   * @returns An id for the bound action, so that it may be later unbound.
+   * @returns An id for the bound action, so that it may be later unbound. Only
+   * valid within this event loop.
    */
   size_t Bind(wpi::util::unique_function<void()>&& action);
 
   /**
    * Unbinds an action so that is no longer ran when the loop is polled.
-   * This must be provided the same reference that was returned from `Bind`.
-   * The reference will no longer be valid after this is called.
+   * This must be provided the same id that was returned from `Bind`.
    *
-   * @param action the action to unbind.
+   * @param actionId the id of the action to unbind.
    */
   void Unbind(size_t actionId);
 
