@@ -29,6 +29,7 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Poll.hpp"
 #include "wpi/net/uv/Timer.hpp"
+#include "wpi/util/Endian.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 namespace uv = wpi::net::uv;
@@ -184,13 +185,10 @@ std::string ErrnoString(std::string_view prefix) {
   return error;
 }
 
-uint16_t ReadLe16(const uint8_t* data) {
-  return static_cast<uint16_t>(data[0]) | static_cast<uint16_t>(data[1] << 8);
-}
-
 void AppendLe16(std::vector<uint8_t>* data, uint16_t value) {
-  data->push_back(static_cast<uint8_t>(value & 0xff));
-  data->push_back(static_cast<uint8_t>(value >> 8));
+  size_t offset = data->size();
+  data->resize(offset + sizeof(value));
+  wpi::util::support::endian::write16le(data->data() + offset, value);
 }
 
 void AppendUuid16(std::vector<uint8_t>* data, uint16_t uuid) {
@@ -959,7 +957,7 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
-    uint16_t serverMtu = ReadLe16(pdu.data() + 1);
+    uint16_t serverMtu = wpi::util::support::endian::read16le(pdu.data() + 1);
     m_gattMtu = std::max<uint16_t>(
         DEFAULT_ATT_MTU, std::min<uint16_t>(m_gattRequestedMtu, serverMtu));
     SendGattFindServiceRequest();
@@ -974,8 +972,10 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
-    m_gattServiceStartHandle = ReadLe16(pdu.data() + 1);
-    m_gattServiceEndHandle = ReadLe16(pdu.data() + 3);
+    m_gattServiceStartHandle =
+        wpi::util::support::endian::read16le(pdu.data() + 1);
+    m_gattServiceEndHandle =
+        wpi::util::support::endian::read16le(pdu.data() + 3);
     if (m_gattServiceStartHandle == 0 ||
         m_gattServiceStartHandle > m_gattServiceEndHandle) {
       FailGatt("Bluetooth GATT service has an invalid handle range");
@@ -1005,8 +1005,10 @@ class BluetoothLEPacketClient::Impl
     for (size_t offset = 2; offset + entryLength <= pdu.size();
          offset += entryLength) {
       GattCharacteristicInfo characteristic;
-      characteristic.declarationHandle = ReadLe16(pdu.data() + offset);
-      characteristic.valueHandle = ReadLe16(pdu.data() + offset + 3);
+      characteristic.declarationHandle =
+          wpi::util::support::endian::read16le(pdu.data() + offset);
+      characteristic.valueHandle =
+          wpi::util::support::endian::read16le(pdu.data() + offset + 3);
       if (entryLength == 21) {
         characteristic.hasUuid128 = true;
         std::copy_n(pdu.begin() + offset + 5, characteristic.uuid128.size(),
@@ -1094,9 +1096,11 @@ class BluetoothLEPacketClient::Impl
     uint16_t lastHandle = 0;
     for (size_t offset = 2; offset + entryLength <= pdu.size();
          offset += entryLength) {
-      uint16_t handle = ReadLe16(pdu.data() + offset);
+      uint16_t handle =
+          wpi::util::support::endian::read16le(pdu.data() + offset);
       if (format == 0x01) {
-        uint16_t uuid = ReadLe16(pdu.data() + offset + 2);
+        uint16_t uuid =
+            wpi::util::support::endian::read16le(pdu.data() + offset + 2);
         if (uuid == GATT_CLIENT_CHARACTERISTIC_CONFIG_UUID) {
           m_gattStatusCccdHandle = handle;
           SendGattWriteCccdRequest();
@@ -1136,7 +1140,7 @@ class BluetoothLEPacketClient::Impl
     if (pdu.size() < 3) {
       return;
     }
-    uint16_t handle = ReadLe16(pdu.data() + 1);
+    uint16_t handle = wpi::util::support::endian::read16le(pdu.data() + 1);
     if (handle != m_gattStatusValueHandle) {
       return;
     }
