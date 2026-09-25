@@ -257,6 +257,77 @@ class NetworkTablesTunableBackendTest {
   }
 
   @Test
+  void tuneRevisionCountsWriteDuringInitialPublicationOnce() {
+    AtomicReference<Double> stored = new AtomicReference<>(1.0);
+    AtomicInteger gets = new AtomicInteger();
+    AtomicInteger tunes = new AtomicInteger();
+    try (var publisher = m_inst.getDoubleTopic("/Tunables/racingRevision/tune").publish()) {
+      Tunable<Double> tunable =
+          Tunable.createConfig(
+              () -> {
+                if (gets.getAndIncrement() == 0) {
+                  // The backend has registered its listener before invoking this getter.
+                  publisher.set(4.0);
+                }
+                return stored.get();
+              },
+              stored::set,
+              Double.class,
+              robust().withOnTune(tunes::incrementAndGet));
+      Tunables.publish("racingRevision", tunable);
+      TunableRegistry.update();
+
+      assertEquals(4.0, stored.get());
+      assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+      assertEquals(1, tunes.get());
+      TunableRegistry.update();
+      assertEquals(1, TunableRegistry.getTuneRevision(tunable));
+
+      publisher.set(5.0);
+      TunableRegistry.update();
+      assertEquals(5.0, stored.get());
+      assertEquals(2, TunableRegistry.getTuneRevision(tunable));
+      assertEquals(2, tunes.get());
+    }
+  }
+
+  @Test
+  void initialSnapshotPreservesOtherQueuedTunes() {
+    var existing = Tunable.create(1.0);
+    Tunables.publish("existingRevision", existing);
+    try (var existingPub = m_inst.getDoubleTopic("/Tunables/existingRevision").publish();
+        var initialPub = m_inst.getDoubleTopic("/Tunables/snapshotRevision/tune").publish()) {
+      existingPub.set(2.0);
+      initialPub.set(4.0);
+      var initial = Tunable.createConfig(1.0, robust());
+      Tunables.publish("snapshotRevision", initial);
+      assertEquals(4.0, initial.get());
+      assertEquals(1, TunableRegistry.getTuneRevision(initial));
+
+      initialPub.set(5.0);
+      TunableRegistry.update();
+      assertEquals(2.0, existing.get());
+      assertEquals(1, TunableRegistry.getTuneRevision(existing));
+      assertEquals(5.0, initial.get());
+      assertEquals(2, TunableRegistry.getTuneRevision(initial));
+      TunableRegistry.update();
+      assertEquals(2, TunableRegistry.getTuneRevision(initial));
+    }
+  }
+
+  @Test
+  void initialSnapshotIgnoresMismatchedType() {
+    try (var publisher = m_inst.getStringTopic("/Tunables/wrongInitialType/tune").publish()) {
+      publisher.set("wrong type");
+      var tunable = Tunable.createConfig(1.0, robust());
+      Tunables.publish("wrongInitialType", tunable);
+      TunableRegistry.update();
+      assertEquals(1.0, tunable.get());
+      assertEquals(0, TunableRegistry.getTuneRevision(tunable));
+    }
+  }
+
+  @Test
   void tuneRevisionCountsRobustInitialChildApplication() {
     try (GenericPublisher publisher =
         m_inst

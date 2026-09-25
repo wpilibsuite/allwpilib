@@ -60,6 +60,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   private final List<StoredEntry> m_polledEntries = new ArrayList<>();
   private final Map<Integer, TunableValueEntry> m_subscriberMap = new HashMap<>();
   private final NetworkTableListenerPoller m_poller;
+  private final List<NetworkTableEvent> m_pendingTuneEvents = new ArrayList<>();
   private final List<Runnable> m_pendingMutations = new ArrayList<>();
   private final Map<String, Boolean> m_pendingPathStates = new HashMap<>();
   private final List<Runnable> m_onChangeCallbacks = new ArrayList<>();
@@ -134,13 +135,32 @@ public class NetworkTablesTunableBackend implements TunableBackend {
       }
       m_subscriberMap.put(m_subscriber.getHandle(), this);
       if (config == null || config.isMutable()) {
-        m_listener =
-            m_poller.addListener(m_subscriber, EnumSet.of(NetworkTableEvent.Kind.VALUE_ALL));
+        boolean applyInitialValue = config != null && config.isRobust();
+        var eventKinds = EnumSet.of(NetworkTableEvent.Kind.VALUE_ALL);
+        if (applyInitialValue) {
+          eventKinds.add(NetworkTableEvent.Kind.IMMEDIATE);
+        }
+        m_listener = m_poller.addListener(m_subscriber, eventKinds);
+        if (applyInitialValue) {
+          // NT queues the initial snapshot atomically with listener registration.
+          // A separate subscriber read could apply a racing write twice.
+          for (var event : m_poller.readQueue()) {
+            if (event.listener == m_listener && event.is(NetworkTableEvent.Kind.IMMEDIATE)) {
+              // Immediate events include the topic's value even if the subscription
+              // is inactive because another type is already published.
+              if (event.valueData != null
+                  && typeString.equals(m_subscriber.getTopic().getTypeString())) {
+                m_initialValue = event.valueData.value;
+              }
+            } else {
+              m_pendingTuneEvents.add(event);
+            }
+          }
+        }
       } else {
         m_listener = 0;
       }
       m_onChange = config == null ? null : config.getOnTune();
-      m_applyInitialValue = config != null && config.isRobust() && config.isMutable();
     }
 
     @Override
@@ -168,11 +188,9 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     }
 
     public InitialUpdate updateInitialTunable() {
-      if (!m_applyInitialValue) {
-        return null;
-      }
-      NetworkTableValue value = m_subscriber.get();
-      if (!value.isValid()) {
+      NetworkTableValue value = m_initialValue;
+      m_initialValue = null;
+      if (value == null || !value.isValid()) {
         return null;
       }
       return new InitialUpdate(updateTunable(value));
@@ -205,7 +223,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
     private final TunableBase m_tunable;
     private final int m_listener;
     private final Runnable m_onChange;
-    private final boolean m_applyInitialValue;
+    private NetworkTableValue m_initialValue;
     private boolean m_forcePublish;
   }
 
@@ -1034,6 +1052,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         clearTrackedEntries();
       }
       m_subscriberMap.clear();
+      m_pendingTuneEvents.clear();
       m_poller.close();
     }
   }
@@ -1404,7 +1423,11 @@ public class NetworkTablesTunableBackend implements TunableBackend {
           return;
         }
         // update tunables from network changes
-        processTuneEvents(m_poller.readQueue(), onChangeCallbacks);
+        var pendingEvents = m_pendingTuneEvents.toArray(NetworkTableEvent[]::new);
+        m_pendingTuneEvents.clear();
+        var events = m_poller.readQueue();
+        processTuneEvents(pendingEvents, onChangeCallbacks);
+        processTuneEvents(events, onChangeCallbacks);
 
         // update network from tunable changes
         // updateNetwork() can run user getters or complex update code that re-enters this backend.

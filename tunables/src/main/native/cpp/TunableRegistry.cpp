@@ -438,7 +438,7 @@ static void RestoreComplexPath(const ComplexPathState& state) {
 struct ComplexChildPathState {
   std::string path;
   uint32_t uid;
-  std::optional<uint32_t> previousUid;
+  std::optional<ComplexParentPathState> previousPath;
 };
 
 static ComplexChildPathState AddComplexChildPath(uint32_t uid,
@@ -446,17 +446,18 @@ static ComplexChildPathState AddComplexChildPath(uint32_t uid,
   Instance& inst = GetInstance();
   std::scoped_lock lock{inst.tunablesMutex};
   std::string pathString{path};
-  std::optional<uint32_t> previousUid;
+  std::optional<ComplexParentPathState> previousPath;
   if (auto pathIt = inst.complexChildUidByPath.find(pathString);
       pathIt != inst.complexChildUidByPath.end()) {
-    previousUid = pathIt->second;
-    if (*previousUid != uid) {
-      UnlinkComplexParentPathLocked(inst, *previousUid, pathString);
+    previousPath =
+        SnapshotComplexParentPathLocked(inst, pathIt->second, pathString);
+    if (pathIt->second != uid) {
+      UnlinkComplexParentPathLocked(inst, pathIt->second, pathString);
     }
   }
   inst.complexChildUidByPath[pathString] = uid;
   LinkComplexParentLocked(inst, uid, pathString, false);
-  return {std::move(pathString), uid, previousUid};
+  return {std::move(pathString), uid, std::move(previousPath)};
 }
 
 static void RestoreComplexChildPath(const ComplexChildPathState& state) {
@@ -468,9 +469,10 @@ static void RestoreComplexChildPath(const ComplexChildPathState& state) {
     return;
   }
   UnlinkComplexParentPathLocked(inst, state.uid, state.path);
-  if (state.previousUid) {
-    pathIt->second = *state.previousUid;
-    LinkComplexParentLocked(inst, *state.previousUid, state.path, false);
+  if (state.previousPath) {
+    pathIt->second = state.previousPath->childUid;
+    // Restore ownership as well as path ancestry for direct member tunables.
+    RestoreComplexParentPathLocked(inst, *state.previousPath);
   } else {
     inst.complexChildUidByPath.erase(pathIt);
   }
@@ -878,9 +880,11 @@ bool TunableRegistry::Publish(
         }
       }
 
+      auto childPathState = AddComplexChildPath(memberUid, normalizedPath);
       auto memberPtr = member.get();
       if (!backend->Publish(normalizedPath, memberUid, *memberPtr, config,
                             type)) {
+        RestoreComplexChildPath(childPathState);
         UnregisterTunable(memberUid);
         return false;
       }
@@ -893,7 +897,6 @@ bool TunableRegistry::Publish(
         }
       }
 
-      AddComplexChildPath(memberUid, normalizedPath);
       return true;
     }
   }

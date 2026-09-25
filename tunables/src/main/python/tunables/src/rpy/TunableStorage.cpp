@@ -122,6 +122,7 @@ GetComplexValues() {
 
 struct ComplexIdentityEntry {
   std::shared_ptr<PyComplexTunableAdapter> tunable;
+  std::weak_ptr<PyComplexTunableAdapter> publishedTunable;
   std::optional<py::weakref> valueRef;
   uint64_t generation;
 };
@@ -164,7 +165,8 @@ std::shared_ptr<PyComplexTunableAdapter> GetComplexValueByObject(
     return nullptr;
   }
 
-  auto retained = it->second.tunable;
+  auto retained = it->second.tunable ? it->second.tunable
+                                     : it->second.publishedTunable.lock();
   if (!retained ||
       (it->second.valueRef && (*it->second.valueRef)().is_none()) ||
       !retained->IsValue(value)) {
@@ -210,9 +212,21 @@ std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
   auto valueRef = TryCreateWeakref(value, std::move(cleanup));
   auto tunable = std::make_shared<PyComplexTunableAdapter>(
       std::move(value), std::move(initialPublishTunable));
+  // Without a Python weak reference, retaining the adapter here would keep
+  // the Python object alive forever. Keep its identity only while published.
   GetComplexValuesByObject().insert_or_assign(
-      key, ComplexIdentityEntry{tunable, std::move(valueRef), generation});
+      key, ComplexIdentityEntry{valueRef ? tunable : nullptr, tunable,
+                                std::move(valueRef), generation});
   return tunable;
+}
+
+void ForgetComplex(py::handle value, const PyComplexTunableAdapter* tunable) {
+  auto& values = GetComplexValuesByObject();
+  auto it = values.find(value.ptr());
+  if (it != values.end() && !it->second.valueRef &&
+      it->second.publishedTunable.lock().get() == tunable) {
+    values.erase(it);
+  }
 }
 
 void StoreComplex(std::string path,
