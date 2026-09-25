@@ -45,6 +45,20 @@ public class Main {
 
   @Benchmark
   @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void justNewThrowable() {
+    StackTraceGatheringBenchmark.run(false);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void newThrowableGetStackTrace() {
+    StackTraceGatheringBenchmark.run(true);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public void cartPole() {
     CartPoleBenchmark.cartPole();
