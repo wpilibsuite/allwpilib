@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -397,8 +398,11 @@ static void StartCommand(CommandKind kind, std::string status,
     gGui.commandStatus = std::move(status);
   }
   gGui.commandOutput.clear();
-  gGui.pendingCommand = std::async(
-      std::launch::async, [command = std::move(command)] { return command(); });
+  // The worker owns its task; destroying the result future must not wait for
+  // a platform scan or pairing call during simulator shutdown.
+  std::packaged_task<CommandResult()> task{std::move(command)};
+  gGui.pendingCommand = task.get_future();
+  std::thread{std::move(task)}.detach();
 }
 
 static void UpdatePendingCommand(HALSimXRP& simXRP) {
