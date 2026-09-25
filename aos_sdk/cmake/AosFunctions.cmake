@@ -5,10 +5,12 @@
 # root, and generated headers land in a mirrored tree, so a schema that includes
 # another schema resolves the same way it does under Bazel.
 
-include_guard(GLOBAL)
+# Included by AosConfig.cmake once per directory that calls find_package(Aos),
+# for the same reason that has no include guard: the variables below are scoped
+# to that directory.
 
-# AOS_FLATC_ARGS comes from here. AosConfig.cmake includes it too; the guard in
-# that file makes the double include free.
+# AOS_FLATC_ARGS comes from here. AosConfig.cmake has already included it, and
+# including it again only sets the same variables.
 include("${CMAKE_CURRENT_LIST_DIR}/AosGeneratedSettings.cmake")
 
 # Root that schema names are recorded relative to. Every aos_static_flatbuffer()
@@ -36,19 +38,23 @@ function(aos_static_flatbuffer NAME)
         message(FATAL_ERROR "aos_static_flatbuffer(${NAME}): SRCS is required")
     endif()
 
-    # A schema that includes one from DEPS has to regenerate when that one
-    # changes, and flatc writes no depfile, so depend on every schema DEPS
-    # reaches.
+    set(_src_files "")
+    foreach(_src ${ARG_SRCS})
+        get_filename_component(_src_abs "${_src}" ABSOLUTE)
+        list(APPEND _src_files "${_src_abs}")
+    endforeach()
+
+    # A schema that includes another has to regenerate when that one changes,
+    # and flatc writes no depfile, so every schema depends on all of SRCS and
+    # every schema DEPS reaches.
     _aos_collect_schemas(_dep_bfbs _dep_targets _dep_srcs ${ARG_DEPS})
 
     set(_generated_headers "")
     set(_bfbs_files "")
-    set(_src_files "")
 
     foreach(_src ${ARG_SRCS})
         get_filename_component(_src_abs "${_src}" ABSOLUTE)
         get_filename_component(_stem "${_src}" NAME_WE)
-        list(APPEND _src_files "${_src_abs}")
 
         # Where this schema sits relative to the project root, which is both the
         # name flatc records in the reflection data and the subdirectory the
@@ -79,7 +85,7 @@ function(aos_static_flatbuffer NAME)
                 # Without this the schema records no declaration filename, and
                 # the static generator dereferences a null instead of erroring.
                 --bfbs-filenames "${AOS_FBS_ROOT}" -o "${_out_dir}" "${_src_abs}"
-            DEPENDS "${_src_abs}" ${_dep_srcs} "${AOS_FLATC}"
+            DEPENDS ${_src_files} ${_dep_srcs} "${AOS_FLATC}"
             COMMENT "flatc ${_src_rel}"
             VERBATIM
         )

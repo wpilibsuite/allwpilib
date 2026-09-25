@@ -27,6 +27,9 @@ unzip aos-tools-<version>-linuxx86-64.zip -d aos
 cmake -S . -B build -DAos_DIR=$PWD/aos/cmake
 ```
 
+The `debug` static zip can be unzipped alongside, and then a Debug build links
+its archives and every other configuration the release ones.
+
 ```cmake
 find_package(Aos REQUIRED)
 

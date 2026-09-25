@@ -15,7 +15,9 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-include_guard(GLOBAL)
+# find_package(Aos) includes this once per directory that calls it, and the
+# variables below are scoped to that directory, so it has no include guard.
+# What it defines globally, it defines only once.
 
 get_filename_component(AOS_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 
@@ -78,23 +80,35 @@ if(NOT EXISTS "${AOS_INCLUDE_DIR}/aos")
     )
 endif()
 
-# The archive is named the way the platform names archives: libaos.a, aos.lib,
-# and a "d" suffix in a debug build. A cross-compiling toolchain file confines
-# library searches to its sysroot, hence NO_CMAKE_FIND_ROOT_PATH.
-find_library(
-    AOS_LIBRARY
-    NAMES aos aosd
-    PATHS "${AOS_LIBRARY_DIR}"
-    NO_DEFAULT_PATH
-    NO_CMAKE_FIND_ROOT_PATH
-)
-if(NOT AOS_LIBRARY)
-    message(
-        FATAL_ERROR
-        "No AOS archive in ${AOS_LIBRARY_DIR}. Unzip the aos-sdk static zip for "
-        "${AOS_PLATFORM} into ${AOS_SDK_ROOT}."
+# The archive is named the way the platform names archives: libaos.a or aos.lib,
+# with a "d" suffix in a debug build. The release and debug static zips can both
+# be unzipped here, and then a Debug build links the debug archives and every
+# other configuration the release ones. A cross-compiling toolchain file
+# confines library searches to its sysroot, hence NO_CMAKE_FIND_ROOT_PATH.
+foreach(_aos_name aos aos_alwayslink)
+    string(TOUPPER "${_aos_name}" _aos_var)
+    find_library(
+        ${_aos_var}_LIBRARY_RELEASE
+        NAMES ${_aos_name}
+        PATHS "${AOS_LIBRARY_DIR}" "${AOS_ALWAYSLINK_DIR}"
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
     )
-endif()
+    find_library(
+        ${_aos_var}_LIBRARY_DEBUG
+        NAMES ${_aos_name}d
+        PATHS "${AOS_LIBRARY_DIR}" "${AOS_ALWAYSLINK_DIR}"
+        NO_DEFAULT_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+    if(NOT ${_aos_var}_LIBRARY_RELEASE AND NOT ${_aos_var}_LIBRARY_DEBUG)
+        message(
+            FATAL_ERROR
+            "No ${_aos_name} archive in ${AOS_LIBRARY_DIR}. Unzip the aos-sdk "
+            "static zip for ${AOS_PLATFORM} into ${AOS_SDK_ROOT}."
+        )
+    endif()
+endforeach()
 
 # The linker options AOS's dependencies declare, generated out of the Bazel
 # build for this platform. It ships in the same zip as the archive.
@@ -143,38 +157,43 @@ find_program(
     REQUIRED
 )
 
+# Defines an imported archive that links the debug archive in a Debug build and
+# the release one otherwise. With only one of them unzipped, every configuration
+# links that one.
+function(_aos_imported_archive target release debug)
+    add_library(${target} STATIC IMPORTED GLOBAL)
+    if(release)
+        set_target_properties(${target} PROPERTIES IMPORTED_LOCATION "${release}")
+    else()
+        set_target_properties(${target} PROPERTIES IMPORTED_LOCATION "${debug}")
+    endif()
+    if(debug)
+        set_property(TARGET ${target} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+        set_target_properties(${target} PROPERTIES IMPORTED_LOCATION_DEBUG "${debug}")
+    endif()
+endfunction()
+
 if(NOT TARGET aos::aos)
-    add_library(aos::archive STATIC IMPORTED GLOBAL)
-    set_target_properties(aos::archive PROPERTIES IMPORTED_LOCATION "${AOS_LIBRARY}")
+    _aos_imported_archive(aos::archive "${AOS_LIBRARY_RELEASE}" "${AOS_LIBRARY_DEBUG}")
 
     # The objects Bazel marks alwayslink, which cc_static_library cannot
     # express. Linking them whole restores what a Bazel-built AOS binary does.
     # The cost is small; this archive holds only what Bazel already
     # force-links.
-    file(GLOB _aos_alwayslink_archives "${AOS_ALWAYSLINK_DIR}/*.a" "${AOS_ALWAYSLINK_DIR}/*.lib")
-
-    set(_aos_alwayslink_targets "")
-    foreach(_archive ${_aos_alwayslink_archives})
-        get_filename_component(_archive_name "${_archive}" NAME_WE)
-        set(_target "aos::${_archive_name}")
-        add_library(${_target} STATIC IMPORTED GLOBAL)
-        set_target_properties(${_target} PROPERTIES IMPORTED_LOCATION "${_archive}")
-
-        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-            list(APPEND _aos_alwayslink_targets "$<LINK_LIBRARY:WHOLE_ARCHIVE,${_target}>")
-        elseif(APPLE)
-            list(APPEND _aos_alwayslink_targets "-Wl,-force_load,${_archive}")
-        elseif(MSVC)
-            list(APPEND _aos_alwayslink_targets "/WHOLEARCHIVE:${_archive}")
-        else()
-            list(
-                APPEND _aos_alwayslink_targets
-                "-Wl,--whole-archive"
-                "${_target}"
-                "-Wl,--no-whole-archive"
-            )
-        endif()
-    endforeach()
+    _aos_imported_archive(
+        aos::aos_alwayslink
+        "${AOS_ALWAYSLINK_LIBRARY_RELEASE}"
+        "${AOS_ALWAYSLINK_LIBRARY_DEBUG}"
+    )
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+        set(_aos_alwayslink "$<LINK_LIBRARY:WHOLE_ARCHIVE,aos::aos_alwayslink>")
+    elseif(APPLE)
+        set(_aos_alwayslink "-Wl,-force_load,$<TARGET_FILE:aos::aos_alwayslink>")
+    elseif(MSVC)
+        set(_aos_alwayslink "/WHOLEARCHIVE:$<TARGET_FILE:aos::aos_alwayslink>")
+    else()
+        set(_aos_alwayslink "-Wl,--whole-archive" aos::aos_alwayslink "-Wl,--no-whole-archive")
+    endif()
 
     # An INTERFACE target rather than the imported archive itself, so the
     # whole-archive libraries can be ordered ahead of libaos.a. They reference
@@ -195,7 +214,7 @@ if(NOT TARGET aos::aos)
 
     target_link_libraries(
         aos::aos
-        INTERFACE ${_aos_alwayslink_targets} aos::archive wpinet ${AOS_LINK_OPTIONS}
+        INTERFACE ${_aos_alwayslink} aos::archive wpinet ${AOS_LINK_OPTIONS}
     )
 
     # Not optional, and not only about aos/macros.h hard-erroring without
