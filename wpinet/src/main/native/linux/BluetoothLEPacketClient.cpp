@@ -307,7 +307,9 @@ class BluetoothLEPacketClient::Impl
       tooLarge = packet.size() > m_config.maxPacketSize;
     }
     if (tooLarge) {
-      SetError("Packet is larger than Bluetooth transport MTU");
+      UpdateStatus([](auto& status) {
+        status.error = "Packet is larger than Bluetooth transport MTU";
+      });
       return false;
     }
 
