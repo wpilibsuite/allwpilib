@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <bit>
 #include <cerrno>
 #include <chrono>
@@ -32,6 +33,7 @@
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/scope"
 
 namespace uv = wpi::net::uv;
 
@@ -310,6 +312,12 @@ class BluetoothLEPacketClient::Impl
       UpdateStatus([](auto& status) {
         status.error = "Packet is larger than Bluetooth transport MTU";
       });
+      return false;
+    }
+
+    // Reserve before dispatch so another caller cannot be told its packet
+    // was retained while this one is waiting for the loop or socket.
+    if (m_sendPending.exchange(true)) {
       return false;
     }
 
@@ -610,7 +618,10 @@ class BluetoothLEPacketClient::Impl
   }
 
   void CloseSocket() {
-    m_pendingPacket.clear();
+    if (!m_pendingPacket.empty()) {
+      m_pendingPacket.clear();
+      m_sendPending = false;
+    }
     StopConnectTimer();
 
     if (m_poll) {
@@ -1220,6 +1231,11 @@ class BluetoothLEPacketClient::Impl
 
   bool SendOnLoop(std::span<const uint8_t> packet,
                   BluetoothPacketSendMode mode) {
+    wpi::util::scope_exit releaseSlot{[&] {
+      if (m_pendingPacket.empty()) {
+        m_sendPending = false;
+      }
+    }};
     if (m_socket < 0 || !m_pendingPacket.empty()) {
       return false;
     }
@@ -1276,6 +1292,9 @@ class BluetoothLEPacketClient::Impl
     m_pendingPacket.clear();
     m_poll->Start(UV_READABLE | UV_DISCONNECT);
     SendPdu(pending, BluetoothPacketSendMode::QUEUED);
+    if (m_pendingPacket.empty()) {
+      m_sendPending = false;
+    }
   }
 
   void SetConnecting(std::string_view text) {
@@ -1328,6 +1347,7 @@ class BluetoothLEPacketClient::Impl
 
   uv::Loop& m_loop;
   std::vector<uint8_t> m_pendingPacket;
+  std::atomic_bool m_sendPending{false};
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
