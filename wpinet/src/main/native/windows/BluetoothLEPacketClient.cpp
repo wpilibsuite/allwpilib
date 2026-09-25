@@ -43,6 +43,7 @@
 
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Loop.hpp"
+#include "wpi/util/StringExtras.hpp"
 
 #pragma comment(lib, "windowsapp")
 
@@ -63,19 +64,6 @@ constexpr const wchar_t* BLUETOOTH_LE_ADDRESS_TYPE_PROPERTY =
     L"System.Devices.Aep.Bluetooth.Le.AddressType";
 constexpr uint8_t BLUETOOTH_LE_ADDRESS_TYPE_PUBLIC = 0;
 
-uint8_t HexDigit(char ch) {
-  if (ch >= '0' && ch <= '9') {
-    return ch - '0';
-  }
-  if (ch >= 'a' && ch <= 'f') {
-    return ch - 'a' + 10;
-  }
-  if (ch >= 'A' && ch <= 'F') {
-    return ch - 'A' + 10;
-  }
-  return 0xff;
-}
-
 bool ParseBluetoothAddress(std::string_view address, uint64_t* out) {
   if (address.size() != 17) {
     return false;
@@ -88,13 +76,12 @@ bool ParseBluetoothAddress(std::string_view address, uint64_t* out) {
       return false;
     }
 
-    uint8_t high = HexDigit(address[pos]);
-    uint8_t low = HexDigit(address[pos + 1]);
-    if (high == 0xff || low == 0xff) {
+    auto byte = wpi::util::parse_integer<uint8_t>(address.substr(pos, 2), 16);
+    if (!byte) {
       return false;
     }
 
-    parsed = (parsed << 8) | static_cast<uint64_t>((high << 4) | low);
+    parsed = (parsed << 8) | *byte;
   }
 
   *out = parsed;
@@ -122,25 +109,16 @@ std::string ExtractBluetoothAddress(std::string_view value) {
   }
 
   for (size_t i = 0; i + 12 <= value.size(); ++i) {
-    if (i > 0 && HexDigit(value[i - 1]) != 0xff) {
+    if (i > 0 && wpi::util::isHexDigit(value[i - 1])) {
       continue;
     }
-    if (i + 12 < value.size() && HexDigit(value[i + 12]) != 0xff) {
+    if (i + 12 < value.size() && wpi::util::isHexDigit(value[i + 12])) {
       continue;
     }
 
-    uint64_t address = 0;
-    bool valid = true;
-    for (size_t j = 0; j < 12; ++j) {
-      uint8_t digit = HexDigit(value[i + j]);
-      if (digit == 0xff) {
-        valid = false;
-        break;
-      }
-      address = (address << 4) | digit;
-    }
-    if (valid) {
-      return FormatBluetoothAddress(address);
+    if (auto address =
+            wpi::util::parse_integer<uint64_t>(value.substr(i, 12), 16)) {
+      return FormatBluetoothAddress(*address);
     }
   }
 
