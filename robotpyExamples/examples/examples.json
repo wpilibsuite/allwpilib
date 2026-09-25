@@ -1,0 +1,538 @@
+[
+  {
+    "name": "Arcade Drive", 
+    "description": "Control a differential drive with split-stick arcade drive in teleop.",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive"
+    ],
+    "foldername": "ArcadeDrive",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Arcade Drive Xbox Controller",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "ArcadeDriveXboxController",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ArmSimulation",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Preferences"
+    ],
+    "foldername": "ArmSimulation",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DifferentialDriveBot",
+    "description": "",
+    "tags": [
+      "Differential Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "Gamepad"
+    ],
+    "foldername": "DifferentialDriveBot",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2 
+  },
+  {
+    "name": "DifferentialDrivePoseEstimator",
+    "description": "",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "DifferentialDrivePoseEstimator",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DriveDistanceOffboard",
+    "description": "",
+    "tags": [
+      "Commandv2",
+      "Differential Drive",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "Gamepad"
+    ],
+    "foldername": "DriveDistanceOffboard",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DutyCycleEncoder",
+    "description": "",
+    "tags": [
+      "Hardware",
+      "Duty Cycle",
+      "Encoder",
+      "SmartDashboard"
+    ],
+    "foldername": "DutyCycleEncoder",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorExponentialProfile",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Exponential Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "ElevatorExponentialProfile",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorExponentialSimulation",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "PID",
+      "Exponential Profile"
+    ],
+    "foldername": "ElevatorExponentialSimulation",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorProfiledPID",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Profiled PID",
+      "Joystick"
+    ],
+    "foldername": "ElevatorProfiledPID",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorSimulation",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "Simulation",
+      "Mechanism2d",
+      "Profiled PID"
+    ],
+    "foldername": "ElevatorSimulation",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "ElevatorTrapezoidProfile",
+    "description": "",
+    "tags": [],
+    "foldername": "ElevatorTrapezoidProfile",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Encoder",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Trapezoid Profile",
+      "Smart Motor Controller",
+      "Joystick"
+    ],
+    "foldername": "Encoder",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "GettingStarted",
+    "description": "",
+    "tags": [
+      "Basic Robot"
+    ],
+    "foldername": "GettingStarted",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Gyro",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "PID",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "Gyro",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "DSGamepadChooser",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Driver Station",
+      "Gamepad",
+      "OpMode"
+    ],
+    "foldername": "DSGamepadChooser",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "HatchbotInlined",
+    "description": "",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "HatchbotInlined",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "HatchbotTraditional",
+    "description": "",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Encoder",
+      "Pneumatics",
+      "Sendable",
+      "DataLog",
+      "Gamepad"
+    ],
+    "foldername": "HatchbotTraditional",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumBot",
+    "description": "",
+    "tags": [
+      "Mecanum Drive",
+      "Odometry",
+      "Encoder",
+      "Gyro",
+      "Gamepad"
+    ],
+    "foldername": "MecanumBot",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumDrive",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Mecanum Drive",
+      "Gyro",
+      "Joystick"
+    ],
+    "foldername": "MecanumDrive",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "MecanumDrivePoseEstimator",
+    "description": "",
+    "tags": [
+      "Mecanum Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "MecanumDrivePoseEstimator",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "Mechanism2d",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "Arm",
+      "Analog",
+      "Joystick",
+      "SmartDashboard",
+      "Mechanism2d"
+    ],
+    "foldername": "Mechanism2d",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "RapidReactCommandBot",
+    "description": "",
+    "tags": [],
+    "foldername": "RapidReactCommandBot",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "RomiReference",
+    "description": "",
+    "tags": [
+      "Complete Robot",
+      "Commandv2",
+      "Differential Drive",
+      "Intake",
+      "Flywheel",
+      "Encoder",
+      "Pneumatics",
+      "Digital Input",
+      "PID",
+      "Gyro",
+      "Profiled PID",
+      "Gamepad"
+    ],
+    "foldername": "RomiReference",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SimpleDifferentialDriveSimulation",
+    "description": "",
+    "tags": [
+      "Differential Drive",
+      "State-Space",
+      "LTVUnicycleController",
+      "Path Following",
+      "Trajectory",
+      "Encoder",
+      "Gamepad",
+      "Simulation"
+    ],
+    "foldername": "SimpleDifferentialDriveSimulation",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceArm",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Arm",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceArm",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Elevator",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceElevator",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceFlywheel",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "StateSpaceFlywheelSysId",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Flywheel",
+      "SysId",
+      "State-Space",
+      "LQR",
+      "Encoder",
+      "Joystick"
+    ],
+    "foldername": "StateSpaceFlywheelSysId",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveBot",
+    "description": "",
+    "tags": [
+      "Swerve Drive",
+      "Odometry",
+      "Gamepad",
+      "Gyro",
+      "Encoder"
+    ],
+    "foldername": "SwerveBot",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SwerveDrivePoseEstimator",
+    "description": "",
+    "tags": [
+      "Swerve Drive",
+      "State-Space",
+      "Pose Estimator",
+      "Vision",
+      "PID",
+      "Gamepad"
+    ],
+    "foldername": "SwerveDrivePoseEstimator",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "SysId",
+    "description": "",
+    "tags": [
+      "SysId",
+      "Commandv2",
+      "DataLog"
+    ],
+    "foldername": "SysId",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "TankDrive",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "TankDrive",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "TankDriveXboxController",
+    "description": "",
+    "tags": [
+      "Basic Robot",
+      "Differential Drive",
+      "Gamepad"
+    ],
+    "foldername": "TankDriveXboxController",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "UnitTest",
+    "description": "",
+    "tags": [
+      "Intake",
+      "Pneumatics"
+    ],
+    "foldername": "UnitTest",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  },
+  {
+    "name": "XrpReference",
+    "description": "",
+    "tags": [
+      "XRP",
+      "Commandv2",
+      "Differential Drive",
+      "Digital Input",
+      "Joystick"
+    ],
+    "foldername": "XrpReference",
+    "gradlebase": "python",
+    "robotclass": "robot",
+    "commandversion": 2
+  }
+]
