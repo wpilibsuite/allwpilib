@@ -674,7 +674,7 @@ class BluetoothLEPacketClient::Impl
                              gatt::GattValueChangedEventArgs const& args) {
             if (auto self = weak.lock();
                 self && !self->IsConnectCanceled(generation)) {
-              self->DidReceivePacket(args.CharacteristicValue());
+              self->DidReceivePacket(args.CharacteristicValue(), generation);
             }
           });
 
@@ -752,15 +752,24 @@ class BluetoothLEPacketClient::Impl
     }
   }
 
-  void DidReceivePacket(streams::IBuffer const& buffer) {
+  void DidReceivePacket(streams::IBuffer const& buffer, uint64_t generation) {
     std::vector<uint8_t> packet = FromBuffer(buffer);
     if (packet.empty()) {
       return;
     }
-    UpdateStatus([](auto& status) { ++status.packetsReceived; });
+    UpdateStatus([&](auto& status) {
+      if (!IsConnectCanceled(generation)) {
+        ++status.packetsReceived;
+      }
+    });
     if (m_packetCallback) {
-      m_exec->Send([callback = m_packetCallback, packet = std::move(packet)] {
-        callback(packet);
+      m_exec->Send([weakSelf = weak_from_this(), packet = std::move(packet),
+                    generation] {
+        // Reconnect can overtake a notification queued on the loop.
+        if (auto self = weakSelf.lock();
+            self && !self->IsConnectCanceled(generation)) {
+          self->m_packetCallback(packet);
+        }
       });
     }
   }
