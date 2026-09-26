@@ -15,6 +15,8 @@
 #include <cerrno>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <format>
 #include <functional>
@@ -33,6 +35,7 @@
 #include "wpi/net/uv/Timer.hpp"
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/print.hpp"
 #include "wpi/util/scope"
 
 namespace uv = wpi::net::uv;
@@ -75,6 +78,7 @@ constexpr uint16_t GATT_PRIMARY_SERVICE_UUID = 0x2800;
 constexpr uint16_t GATT_CHARACTERISTIC_UUID = 0x2803;
 constexpr uint16_t GATT_CLIENT_CHARACTERISTIC_CONFIG_UUID = 0x2902;
 constexpr uv::Timer::Time BLUETOOTH_CONNECT_TIMEOUT{8000};
+constexpr uv::Timer::Time GATT_SOCKET_RETRY_DELAY{250};
 
 #ifndef MSG_NOSIGNAL
 constexpr int MSG_NOSIGNAL = 0;
@@ -212,6 +216,38 @@ enum class GattDiscoveryState {
   CONNECTED
 };
 
+std::string_view TransportName(LinuxBluetoothTransport transport) {
+  switch (transport) {
+    case LinuxBluetoothTransport::NONE:
+      return "none";
+    case LinuxBluetoothTransport::L2CAP:
+      return "L2CAP";
+    case LinuxBluetoothTransport::GATT:
+      return "GATT";
+  }
+  return "unknown";
+}
+
+std::string_view GattStateName(GattDiscoveryState state) {
+  switch (state) {
+    case GattDiscoveryState::IDLE:
+      return "idle";
+    case GattDiscoveryState::WAIT_MTU_RESPONSE:
+      return "wait_mtu";
+    case GattDiscoveryState::WAIT_SERVICE_RESPONSE:
+      return "wait_service";
+    case GattDiscoveryState::WAIT_CHARACTERISTIC_RESPONSE:
+      return "wait_characteristics";
+    case GattDiscoveryState::WAIT_DESCRIPTOR_RESPONSE:
+      return "wait_descriptor";
+    case GattDiscoveryState::WAIT_CCCD_WRITE_RESPONSE:
+      return "wait_cccd";
+    case GattDiscoveryState::CONNECTED:
+      return "connected";
+  }
+  return "unknown";
+}
+
 struct GattCharacteristicInfo {
   uint16_t declarationHandle = 0;
   uint16_t valueHandle = 0;
@@ -252,6 +288,11 @@ class BluetoothLEPacketClient::Impl
   ~Impl() { CloseOnLoop({}); }
 
   bool Connect(BluetoothLEPacketClientConfig config) {
+    Trace("connect requested address={} type={} psm=0x{:04x} prefer_l2cap={}",
+          config.address,
+          config.addressType == BluetoothAddressType::PUBLIC ? "public"
+                                                             : "random",
+          config.psm, config.preferL2CAP);
     if (config.address.empty()) {
       SetError("No Bluetooth address configured");
       return false;
@@ -268,6 +309,7 @@ class BluetoothLEPacketClient::Impl
       if ((m_status.connecting || m_status.connected) &&
           m_status.targetAddress == config.address &&
           m_status.addressType == config.addressType) {
+        Trace("connect ignored: target already connected or connecting");
         return true;
       }
       m_config = config;
@@ -292,6 +334,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void Disconnect(std::string_view reason) {
+    Trace("disconnect requested reason={}", reason);
     auto self = shared_from_this();
     std::string reasonString{reason};
     m_exec->Send([self, reasonString = std::move(reasonString)] {
@@ -342,9 +385,102 @@ class BluetoothLEPacketClient::Impl
   }
 
  private:
+  // Trace() is safe for caller-thread errors too; connection/traffic state is
+  // logged only on the event loop. Preserve errno across all diagnostic I/O.
+  template <typename... Args>
+  void Trace(std::format_string<Args...> fmt, Args&&... args) const {
+    if (!m_traceEnabled)
+      return;
+    int savedErrno = errno;
+    wpi::util::scope_exit restoreErrno{[&] { errno = savedErrno; }};
+    auto now = std::chrono::floor<std::chrono::milliseconds>(
+        std::chrono::system_clock::now());
+    wpi::util::print(stderr, "[BT client={} utc={:%F %T}Z] {}\n",
+                     static_cast<const void*>(this), now,
+                     std::format(fmt, std::forward<Args>(args)...));
+  }
+
+  void TraceConnection(std::string_view event) const {
+    if (!m_traceEnabled)
+      return;
+    int savedErrno = errno;
+    wpi::util::scope_exit restoreErrno{[&] { errno = savedErrno; }};
+    auto now = std::chrono::steady_clock::now();
+    auto age = [now](auto time) {
+      return std::chrono::duration_cast<std::chrono::milliseconds>(now - time)
+          .count();
+    };
+    Trace(
+        "{} gen={} fd={} transport={} gatt={} socket_ms={} tx={} rx={} "
+        "rx_age_ms={} would_block={} ignored_notifications={} pending_bytes={}",
+        event, m_connectGeneration, m_socket, TransportName(m_activeTransport),
+        GattStateName(m_gattState), age(m_traceSocketStart), m_traceTxPackets,
+        m_traceRxPackets, m_traceRxPackets ? age(m_traceLastRx) : -1,
+        m_traceWouldBlock, m_traceIgnoredNotifications, m_pendingPacket.size());
+  }
+
+  void TraceSocket(std::string_view event) const {
+    if (!m_traceEnabled)
+      return;
+    int savedErrno = errno;
+    wpi::util::scope_exit restoreErrno{[&] { errno = savedErrno; }};
+    TraceConnection(event);
+    if (m_socket < 0)
+      return;
+    sockaddr_l2 local{};
+    sockaddr_l2 peer{};
+    socklen_t size = sizeof(local);
+    int localError =
+        ::getsockname(m_socket, reinterpret_cast<sockaddr*>(&local), &size) < 0
+            ? errno
+            : 0;
+    size = sizeof(peer);
+    int peerError =
+        ::getpeername(m_socket, reinterpret_cast<sockaddr*>(&peer), &size) < 0
+            ? errno
+            : 0;
+    // Do not query SO_ERROR here: reading it clears the pending socket error.
+    Trace(
+        "socket gen={} fd={} local_cid=0x{:04x} local_psm=0x{:04x} "
+        "peer_cid=0x{:04x} peer_psm=0x{:04x} getsockname_errno={} "
+        "getpeername_errno={}",
+        m_connectGeneration, m_socket, HostToLe16(local.l2_cid),
+        HostToLe16(local.l2_psm), HostToLe16(peer.l2_cid),
+        HostToLe16(peer.l2_psm), localError, peerError);
+  }
+
+  void ResetTraceTraffic() {
+    if (!m_traceEnabled)
+      return;
+    m_traceTxPackets = 0;
+    m_traceRxPackets = 0;
+    m_traceWouldBlock = 0;
+    m_traceIgnoredNotifications = 0;
+    m_traceSocketStart = std::chrono::steady_clock::now();
+    m_traceLastSummary = m_traceSocketStart;
+  }
+
+  void TraceTraffic(bool received, size_t size) {
+    if (!m_traceEnabled)
+      return;
+    auto now = std::chrono::steady_clock::now();
+    auto count = received ? ++m_traceRxPackets : ++m_traceTxPackets;
+    if (received)
+      m_traceLastRx = now;
+    if (count == 1) {
+      Trace("first {} packet gen={} fd={} bytes={}", received ? "rx" : "tx",
+            m_connectGeneration, m_socket, size);
+    }
+    if (count == 1 || now - m_traceLastSummary >= std::chrono::seconds{5}) {
+      TraceConnection("traffic");
+      m_traceLastSummary = now;
+    }
+  }
+
   void ConnectOnLoop(const BluetoothLEPacketClientConfig& config) {
     CloseOnLoop("Connecting");
     uint64_t generation = ++m_connectGeneration;
+    Trace("begin attempt gen={} address={}", generation, config.address);
 
     bdaddr_t remoteAddress{};
     if (!ParseBluetoothAddress(config.address, &remoteAddress)) {
@@ -398,7 +534,25 @@ class BluetoothLEPacketClient::Impl
     }
 
     auto self = shared_from_this();
-    m_poll->pollEvent.connect([self](int events) {
+    std::weak_ptr<uv::Poll> weakPoll = m_poll;
+    m_poll->error.connect([self, weakPoll](uv::Error error) {
+      auto poll = weakPoll.lock();
+      if (poll && poll == self->m_poll) {
+        self->HandlePollError(error);
+      }
+    });
+    m_poll->pollEvent.connect([self, weakPoll](int events) {
+      auto poll = weakPoll.lock();
+      if (!poll || poll != self->m_poll) {
+        return;
+      }
+      if (self->m_traceEnabled &&
+          (self->IsConnecting() || (events & UV_DISCONNECT) != 0)) {
+        self->Trace("poll gen={} fd={} events=0x{:x} transport={} gatt={}",
+                    self->m_connectGeneration, self->m_socket, events,
+                    TransportName(self->m_activeTransport),
+                    GattStateName(self->m_gattState));
+      }
       if ((events & UV_DISCONNECT) != 0) {
         self->HandleSocketDisconnect();
         return;
@@ -409,6 +563,10 @@ class BluetoothLEPacketClient::Impl
         } else {
           self->FlushPendingPacket();
         }
+      }
+      // Handling a writable event can replace the socket during fallback.
+      if (poll != self->m_poll) {
+        return;
       }
       if ((events & UV_READABLE) != 0) {
         if (self->m_activeTransport == LinuxBluetoothTransport::GATT) {
@@ -435,6 +593,8 @@ class BluetoothLEPacketClient::Impl
     }
 
     m_socket = fd;
+    ResetTraceTraffic();
+    TraceConnection("socket created");
 
     if (!ConfigureBluetoothSocket(fd, "L2CAP")) {
       BeginGattFallback(GetStatus().error, config, remoteAddress, generation);
@@ -452,6 +612,9 @@ class BluetoothLEPacketClient::Impl
 
     int result = ::connect(fd, reinterpret_cast<sockaddr*>(&remoteAddr),
                            sizeof(remoteAddr));
+    Trace("connect() gen={} fd={} result={} errno={}", m_connectGeneration, fd,
+          result, result < 0 ? errno : 0);
+    TraceSocket("connect submitted");
     if (result < 0 && errno != EINPROGRESS) {
       BeginGattFallback(ErrnoString("Failed to connect Bluetooth L2CAP socket"),
                         config, remoteAddress, generation);
@@ -490,6 +653,7 @@ class BluetoothLEPacketClient::Impl
     m_activeTransport = LinuxBluetoothTransport::GATT;
     ResetGattDiscovery();
     m_gattBlueZDisconnectAttempted = false;
+    m_gattSocketRetryAttempted = false;
 
     ConnectGattSocketOnLoop(config, remoteAddress, generation);
   }
@@ -501,6 +665,7 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    TraceSocket("GATT EBUSY: requesting BlueZ disconnect before retry");
     m_gattBlueZDisconnectAttempted = true;
     CloseSocket();
     m_activeTransport = LinuxBluetoothTransport::GATT;
@@ -522,11 +687,15 @@ class BluetoothLEPacketClient::Impl
     std::weak_ptr<Impl> weakSelf = weak_from_this();
     std::thread{[weakSelf, config, remoteAddress, generation] {
       std::string bluezDisconnectError;
-      linuxbluetooth::DisconnectBlueZDevice(config.address,
-                                            &bluezDisconnectError);
+      bool disconnected = linuxbluetooth::DisconnectBlueZDevice(
+          config.address, &bluezDisconnectError);
 
       if (auto self = weakSelf.lock()) {
-        self->m_exec->Send([self, config, remoteAddress, generation] {
+        self->m_exec->Send([self, config, remoteAddress, generation,
+                            disconnected,
+                            error = std::move(bluezDisconnectError)] {
+          self->Trace("BlueZ disconnect gen={} success={} error={}", generation,
+                      disconnected, error);
           self->FinishGattBlueZDisconnectOnLoop(config, remoteAddress,
                                                 generation);
         });
@@ -540,11 +709,50 @@ class BluetoothLEPacketClient::Impl
       const bdaddr_t& remoteAddress, uint64_t generation) {
     if (generation != m_connectGeneration || !m_gattBlueZDisconnectPending ||
         m_activeTransport != LinuxBluetoothTransport::GATT) {
+      Trace("ignoring stale BlueZ retry gen={} current_gen={}", generation,
+            m_connectGeneration);
       return;
     }
 
+    TraceConnection("retrying GATT socket after BlueZ disconnect");
     m_gattBlueZDisconnectPending = false;
     ConnectGattSocketOnLoop(config, remoteAddress, generation);
+  }
+
+  bool StartGattSocketRetryOnLoop(const BluetoothLEPacketClientConfig& config,
+                                  const bdaddr_t& remoteAddress,
+                                  uint64_t generation) {
+    if (m_gattSocketRetryAttempted) {
+      return false;
+    }
+    auto timer = uv::Timer::Create(m_loop);
+    if (!timer) {
+      return false;
+    }
+
+    // Linux can report ENOMEM when hci_chan_create() refuses a connection
+    // marked HCI_CONN_DROP. Allow teardown to finish, but retry only once.
+    TraceSocket("GATT connect ENOMEM: retrying in 250 ms");
+    m_gattSocketRetryAttempted = true;
+    CloseSocket();
+    m_activeTransport = LinuxBluetoothTransport::GATT;
+    m_gattSocketRetryTimer = timer;
+    SetConnecting("Retrying Bluetooth GATT connection");
+
+    std::weak_ptr<Impl> weakSelf = weak_from_this();
+    timer->timeout.connect([weakSelf, config, remoteAddress, generation] {
+      auto self = weakSelf.lock();
+      if (!self || generation != self->m_connectGeneration ||
+          !self->m_gattSocketRetryTimer) {
+        return;
+      }
+      self->m_gattSocketRetryTimer->Close();
+      self->m_gattSocketRetryTimer.reset();
+      self->TraceConnection("retrying GATT socket after ENOMEM");
+      self->ConnectGattSocketOnLoop(config, remoteAddress, generation);
+    });
+    timer->Start(GATT_SOCKET_RETRY_DELAY);
+    return true;
   }
 
   void ConnectGattSocketOnLoop(const BluetoothLEPacketClientConfig& config,
@@ -559,6 +767,8 @@ class BluetoothLEPacketClient::Impl
     }
 
     m_socket = fd;
+    ResetTraceTraffic();
+    TraceConnection("socket created");
 
     if (!ConfigureBluetoothSocket(fd, "GATT")) {
       CloseSocket();
@@ -576,8 +786,15 @@ class BluetoothLEPacketClient::Impl
 
     int result = ::connect(fd, reinterpret_cast<sockaddr*>(&remoteAddr),
                            sizeof(remoteAddr));
+    Trace("connect() gen={} fd={} result={} errno={}", m_connectGeneration, fd,
+          result, result < 0 ? errno : 0);
+    TraceSocket("connect submitted");
     if (result < 0 && errno != EINPROGRESS) {
       int connectError = errno;
+      if (connectError == ENOMEM &&
+          StartGattSocketRetryOnLoop(config, remoteAddress, generation)) {
+        return;
+      }
       if (connectError == EBUSY && StartGattBlueZDisconnectRetryOnLoop(
                                        config, remoteAddress, generation)) {
         return;
@@ -610,6 +827,7 @@ class BluetoothLEPacketClient::Impl
   void BeginGattFallback(std::string_view l2capError,
                          const BluetoothLEPacketClientConfig& config,
                          const bdaddr_t& remoteAddress, uint64_t generation) {
+    Trace("L2CAP -> GATT fallback gen={} reason={}", generation, l2capError);
     CloseSocket();
     UpdateStatus([&](auto& status) {
       status.connecting = true;
@@ -622,11 +840,18 @@ class BluetoothLEPacketClient::Impl
   }
 
   void CloseSocket() {
+    if (m_socket >= 0)
+      TraceSocket("closing socket");
     if (!m_pendingPacket.empty()) {
       m_pendingPacket.clear();
       m_sendPending = false;
     }
     StopConnectTimer();
+    if (m_gattSocketRetryTimer) {
+      m_gattSocketRetryTimer->Stop();
+      m_gattSocketRetryTimer->Close();
+      m_gattSocketRetryTimer.reset();
+    }
 
     if (m_poll) {
       if (!m_poll->IsClosing()) {
@@ -661,6 +886,7 @@ class BluetoothLEPacketClient::Impl
       });
     }
 
+    TraceConnection("starting 8000 ms connect timer");
     m_connectTimer->Start(BLUETOOTH_CONNECT_TIMEOUT);
     return true;
   }
@@ -674,6 +900,43 @@ class BluetoothLEPacketClient::Impl
   bool IsConnecting() const {
     std::scoped_lock lock{m_statusMutex};
     return m_status.connecting && !m_status.connected;
+  }
+
+  void HandlePollError(uv::Error pollError) {
+    Trace("poll error gen={} fd={} code={} name={} message={}",
+          m_connectGeneration, m_socket, pollError.code(), pollError.name(),
+          pollError.str());
+
+    // libuv reports POLLERR as UV_EBADF and stops polling. The descriptor can
+    // still be valid; SO_ERROR gives the actual Bluetooth connection failure.
+    int socketError = 0;
+    socklen_t size = sizeof(socketError);
+    int result =
+        ::getsockopt(m_socket, SOL_SOCKET, SO_ERROR, &socketError, &size);
+    int queryError = result < 0 ? errno : 0;
+    Trace("poll SO_ERROR gen={} fd={} error={} query_errno={}",
+          m_connectGeneration, m_socket, socketError, queryError);
+
+    if (IsConnecting() && m_activeTransport == LinuxBluetoothTransport::GATT &&
+        socketError == EBUSY &&
+        StartGattBlueZDisconnectRetryOnLoop(m_config, m_remoteAddress,
+                                            m_connectGeneration)) {
+      return;
+    }
+
+    // A zero SO_ERROR must not turn a failed/stopped poll into a connection.
+    std::string error = std::format(
+        "Bluetooth {} socket poll failed: {}", TransportName(m_activeTransport),
+        socketError != 0 ? std::strerror(socketError) : pollError.str());
+    if (m_activeTransport == LinuxBluetoothTransport::L2CAP && IsConnecting()) {
+      BeginGattFallback(error, m_config, m_remoteAddress, m_connectGeneration);
+      return;
+    }
+
+    ++m_connectGeneration;
+    m_gattBlueZDisconnectPending = false;
+    CloseSocket();
+    SetError(error);
   }
 
   void HandleSocketDisconnect() {
@@ -691,6 +954,7 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    TraceSocket("connect timeout");
     if (m_activeTransport == LinuxBluetoothTransport::L2CAP) {
       BeginGattFallback("Bluetooth L2CAP connection timed out", m_config,
                         m_remoteAddress, m_connectGeneration);
@@ -704,6 +968,8 @@ class BluetoothLEPacketClient::Impl
   }
 
   void CloseOnLoop(std::string_view reason) {
+    Trace("close requested on loop gen={} reason={}", m_connectGeneration,
+          reason);
     ++m_connectGeneration;
     m_gattBlueZDisconnectPending = false;
     CloseSocket();
@@ -738,6 +1004,9 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    Trace("SO_ERROR gen={} fd={} error={}", m_connectGeneration, m_socket,
+          socketError);
+    TraceSocket("connect completion");
     if (socketError != 0) {
       if (m_activeTransport == LinuxBluetoothTransport::GATT &&
           socketError == EBUSY &&
@@ -761,8 +1030,11 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
-    if (m_poll) {
-      m_poll->Start(UV_READABLE | UV_DISCONNECT);
+    if (auto poll = m_poll) {
+      poll->Start(UV_READABLE | UV_DISCONNECT);
+      if (poll != m_poll) {
+        return;
+      }
     }
     if (m_activeTransport == LinuxBluetoothTransport::GATT) {
       StartGattDiscovery();
@@ -789,6 +1061,7 @@ class BluetoothLEPacketClient::Impl
     while (generation == m_connectGeneration && m_socket >= 0) {
       ssize_t received = ::recv(m_socket, packet.data(), packet.size(), 0);
       if (received > 0) {
+        TraceTraffic(true, received);
         UpdateStatus([](auto& status) { ++status.packetsReceived; });
         // A status callback may disconnect or replace the connection.
         if (generation != m_connectGeneration) {
@@ -842,6 +1115,11 @@ class BluetoothLEPacketClient::Impl
     }
 
     ssize_t sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
+    Trace(
+        "ATT request gen={} fd={} state={} opcode=0x{:02x} bytes={} "
+        "send_result={} errno={}",
+        m_connectGeneration, m_socket, GattStateName(m_gattState),
+        pdu.empty() ? 0 : pdu[0], pdu.size(), sent, sent < 0 ? errno : 0);
     if (sent == static_cast<ssize_t>(pdu.size())) {
       return true;
     }
@@ -942,6 +1220,9 @@ class BluetoothLEPacketClient::Impl
 
     uint8_t requestOpcode = pdu[1];
     uint8_t errorCode = pdu[4];
+    Trace("ATT error gen={} request=0x{:02x} handle=0x{:04x} error=0x{:02x}",
+          m_connectGeneration, requestOpcode,
+          wpi::util::support::endian::read16le(pdu.data() + 2), errorCode);
     if (m_gattState == GattDiscoveryState::WAIT_MTU_RESPONSE &&
         requestOpcode == ATT_OP_EXCHANGE_MTU_REQUEST) {
       m_gattMtu = DEFAULT_ATT_MTU;
@@ -979,6 +1260,8 @@ class BluetoothLEPacketClient::Impl
     uint16_t serverMtu = wpi::util::support::endian::read16le(pdu.data() + 1);
     m_gattMtu = std::max<uint16_t>(
         DEFAULT_ATT_MTU, std::min<uint16_t>(m_gattRequestedMtu, serverMtu));
+    Trace("GATT MTU gen={} requested={} server={} negotiated={}",
+          m_connectGeneration, m_gattRequestedMtu, serverMtu, m_gattMtu);
     SendGattFindServiceRequest();
   }
 
@@ -1145,6 +1428,12 @@ class BluetoothLEPacketClient::Impl
     }
 
     m_gattState = GattDiscoveryState::CONNECTED;
+    Trace(
+        "GATT ready gen={} service=0x{:04x}-0x{:04x} control=0x{:04x} "
+        "status=0x{:04x} cccd=0x{:04x} mtu={}",
+        m_connectGeneration, m_gattServiceStartHandle, m_gattServiceEndHandle,
+        m_gattControlValueHandle, m_gattStatusValueHandle,
+        m_gattStatusCccdHandle, m_gattMtu);
     StopConnectTimer();
     UpdateStatus([](auto& status) {
       status.connecting = false;
@@ -1161,6 +1450,10 @@ class BluetoothLEPacketClient::Impl
     }
     uint16_t handle = wpi::util::support::endian::read16le(pdu.data() + 1);
     if (handle != m_gattStatusValueHandle) {
+      if (m_traceEnabled && ++m_traceIgnoredNotifications == 1) {
+        Trace("ignoring notification gen={} handle=0x{:04x} expected=0x{:04x}",
+              m_connectGeneration, handle, m_gattStatusValueHandle);
+      }
       return;
     }
 
@@ -1169,6 +1462,7 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    TraceTraffic(true, packet.size());
     uint64_t generation = m_connectGeneration;
     UpdateStatus([](auto& status) { ++status.packetsReceived; });
     // A status callback may disconnect or replace the connection.
@@ -1183,6 +1477,11 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    if (pdu[0] != ATT_OP_NOTIFICATION) {
+      Trace("ATT response gen={} fd={} state={} opcode=0x{:02x} bytes={}",
+            m_connectGeneration, m_socket, GattStateName(m_gattState), pdu[0],
+            pdu.size());
+    }
     switch (pdu[0]) {
       case ATT_OP_ERROR_RESPONSE:
         HandleGattError(pdu);
@@ -1282,10 +1581,14 @@ class BluetoothLEPacketClient::Impl
       sent = ::send(m_socket, pdu.data(), pdu.size(), MSG_NOSIGNAL);
     } while (sent < 0 && errno == EINTR);
     if (sent == static_cast<ssize_t>(pdu.size())) {
+      TraceTraffic(false, pdu.size());
       UpdateStatus([](auto& status) { ++status.packetsSent; });
       return true;
     }
     if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+      if (m_traceEnabled && ++m_traceWouldBlock == 1) {
+        TraceConnection("send would block");
+      }
       if (mode == BluetoothPacketSendMode::QUEUED) {
         m_pendingPacket.assign(pdu.begin(), pdu.end());
         m_poll->Start(UV_READABLE | UV_WRITABLE | UV_DISCONNECT);
@@ -1305,7 +1608,11 @@ class BluetoothLEPacketClient::Impl
     }
     auto pending = std::move(m_pendingPacket);
     m_pendingPacket.clear();
-    m_poll->Start(UV_READABLE | UV_DISCONNECT);
+    auto poll = m_poll;
+    poll->Start(UV_READABLE | UV_DISCONNECT);
+    if (poll != m_poll) {
+      return;
+    }
     SendPdu(pending, BluetoothPacketSendMode::QUEUED);
     if (m_pendingPacket.empty()) {
       m_sendPending = false;
@@ -1322,6 +1629,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void SetError(std::string_view error) {
+    Trace("error: {}", error);
     UpdateStatus([&](auto& status) {
       status.error = error;
       status.status = error;
@@ -1360,6 +1668,19 @@ class BluetoothLEPacketClient::Impl
     QueueStatus(snapshot, sequence);
   }
 
+  const bool m_traceEnabled = [] {
+    const char* value = std::getenv("WPI_BLUETOOTH_DEBUG");
+    return value && std::string_view{value} == "1";
+  }();
+  uint64_t m_traceTxPackets = 0;
+  uint64_t m_traceRxPackets = 0;
+  uint64_t m_traceWouldBlock = 0;
+  uint64_t m_traceIgnoredNotifications = 0;
+  std::chrono::steady_clock::time_point m_traceSocketStart =
+      std::chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point m_traceLastRx{};
+  std::chrono::steady_clock::time_point m_traceLastSummary{};
+
   uv::Loop& m_loop;
   std::vector<uint8_t> m_pendingPacket;
   std::atomic_bool m_sendPending{false};
@@ -1375,11 +1696,13 @@ class BluetoothLEPacketClient::Impl
 
   std::shared_ptr<uv::Poll> m_poll;
   std::shared_ptr<uv::Timer> m_connectTimer;
+  std::shared_ptr<uv::Timer> m_gattSocketRetryTimer;
   int m_socket = -1;
   bdaddr_t m_remoteAddress{};
   LinuxBluetoothTransport m_activeTransport = LinuxBluetoothTransport::NONE;
   bool m_gattBlueZDisconnectPending = false;
   bool m_gattBlueZDisconnectAttempted = false;
+  bool m_gattSocketRetryAttempted = false;
   uint64_t m_connectGeneration = 0;
 
   std::array<uint8_t, 16> m_gattServiceUuid{};

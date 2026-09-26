@@ -26,6 +26,87 @@ GATT connections must support at least 85 bytes per notification (ATT MTU 88). T
 
 Periodic control packets are best effort and are not retried when the transport is busy. macOS submits these writes without waiting for CoreBluetooth write readiness; Windows submits them without waiting for earlier WinRT writes to complete. A one-shot rename request is retained until the transport is ready (after outstanding writes complete on Windows); newer control packets are dropped while it is pending so they cannot make the rename's sequence stale. The firmware replies to the rename with an ACK-only status packet that reports whether the name was saved.
 
+### Linux connection diagnostics
+
+Set `WPI_BLUETOOTH_DEBUG=1` before starting the simulator to enable Bluetooth
+client diagnostics on stderr. For example, prefix your normal launch command:
+
+```sh
+WPI_BLUETOOTH_DEBUG=1 ./your-simulator-command 2>&1 | tee /tmp/xrp-client.log
+```
+
+The Linux transport logs UTC timestamps, a client identifier, connection
+generations, socket descriptors and CIDs, `connect()`/`SO_ERROR` results,
+L2CAP-to-GATT fallback, BlueZ disconnect retry results, and GATT discovery stages.
+A GATT timeout includes the stage still awaiting a response. Successful discovery
+reports the negotiated MTU and characteristic/notification descriptor handles.
+
+Traffic diagnostics log the first transmit and receive packet on each socket,
+then summarize counts at most once every five seconds while packets are flowing.
+The first transmit/receive can also trigger a summary. Counts reset when a new
+socket opens; `rx_age_ms=-1` means no status packet has arrived on that socket.
+Sends count packets accepted by the local socket, not delivery acknowledgments.
+No control or status payload contents are logged. Diagnostics are off by default.
+
+For reconnect problems, capture this output alongside the device's USB Serial
+log and a Bluetooth monitor capture:
+
+```sh
+sudo btmon -C 200 -P -T -w /tmp/xrp-reconnect.btsnoop 2>&1 | tee /tmp/xrp-reconnect.btmon.txt
+```
+
+Include a successful connection, the disconnect, and a failing reconnect before
+resetting the device. The explicit width avoids a narrow-output formatting crash
+in older btmon versions; BlueZ fixes the bounds check in
+[commit dca0f10fd560](https://kernel.googlesource.com/pub/scm/bluetooth/bluez/+/dca0f10fd560f8095493021ca2ac20236fde026e).
+
+If the kernel journal reports `Bluetooth: Unable to allocate ident: -28` and
+btmon shows L2CAP signaling requests with identifier zero, check for the Linux
+kernel identifier leak fixed by
+[commit 6e1930ece855](https://github.com/torvalds/linux/commit/6e1930ece855a4c256f1c7e6632d634cfb9888b5).
+On affected kernels, receiving status packets eventually exhausts signaling
+identifiers and reconnects can time out despite replies from the device. These
+are kernel signaling identifiers, separate from XRP packet sequence numbers.
+Use a kernel containing the fix when evaluating L2CAP reconnect reliability.
+
+An immediate Linux GATT `connect()` failure with `ENOMEM` can also occur when
+Linux refuses a channel on an underlying connection marked for teardown. The
+client waits 250 ms and retries this specific failure once; disconnecting or
+starting another connection cancels the pending retry. A second failure is
+reported normally. This is separate from GATT discovery or firmware allocation.
+
+If btmon shows repeated classic `Inquiry` commands during an LE connection
+attempt, check for other discovery clients. The XRP scanner requests LE-only
+discovery. Classic inquiry can delay the controller's LE connection setup beyond
+the client's connection timeout. KDE Connect 25.12.3 can leave an existing
+scan alive after its Bluetooth backend reports disabled: its
+[`disable()` implementation](https://github.com/KDE/kdeconnect-kde/blob/v25.12.3/core/backends/bluetooth/bluetoothlinkprovider.cpp#L80)
+drops the discovery-agent pointer without stopping it. That version also
+[checks `AsyncLinkProvider` at startup](https://github.com/KDE/kdeconnect-kde/blob/v25.12.3/core/daemon.cpp#L81),
+while the CLI stores `BluetoothLinkProvider`. Repeating the disable command or
+restarting alone may therefore leave scanning enabled. For this version, append
+`AsyncLinkProvider` to the existing `[General] disabled_providers` list in
+`~/.config/kdeconnect/config`, retaining `BluetoothLinkProvider` and other entries,
+and restart KDE Connect. Verify discovery stays off beyond its 30-second scan
+interval; do not rely only on the CLI's reported state. Remove both Bluetooth
+entries and restart when intentionally re-enabling that backend. Check the
+adapter's actual discovery state with:
+
+```sh
+busctl --system get-property org.bluez /org/bluez/hci0 org.bluez.Adapter1 Discovering
+```
+
+To identify other discovery clients, capture BlueZ adapter calls (requires
+system-bus monitoring privileges) and match each `sender=:1.N` to
+`busctl --system list`. Start the capture before triggering a fresh discovery
+request: an existing session can keep scanning without any further D-Bus calls,
+so a quiet trace alone does not establish that discovery has stopped.
+
+```sh
+sudo timeout 20s dbus-monitor --system "type='method_call',destination='org.bluez',interface='org.bluez.Adapter1'" > /tmp/xrp-discovery-dbus.log
+busctl --system list --no-pager > /tmp/xrp-discovery-clients.txt
+```
+
 ### macOS application permissions
 
 The application hosting HALSim XRP must provide `NSBluetoothAlwaysUsageDescription` in its `Info.plist`, for example:
