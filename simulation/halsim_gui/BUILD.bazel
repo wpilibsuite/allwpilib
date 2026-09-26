@@ -17,9 +17,6 @@ wpilib_cc_library(
     ]),
     include_license_files = True,
     includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "wpi-cpp-gui",
     ],
@@ -45,9 +42,6 @@ wpilib_cc_library(
     ],
     include_license_files = True,
     includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "wpi-cpp-gui",
     ],
@@ -119,9 +113,6 @@ wpilib_imgui_cc_test(
         "src/test/native/imgui/**",
     ]),
     includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "no-asan",
     ],

@@ -169,6 +169,7 @@ def generate_nanopb(
                 *extra_search_dirs,
                 f"-I{proto_dir.absolute()}",
                 f"-D{output_directory.absolute()}",
+                "-q",
                 "-S.cpp",
                 "-e.npb",
                 str(path.absolute()),

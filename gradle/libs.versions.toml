@@ -7,7 +7,7 @@ libsdlgpu = "3.4.12-6"
 libssh = "2027-0.120-1"
 jmh = "1.37"
 mrclib = "2027.1.0-alpha-1-116-g5288562"
-opencv = "2027-4.13.0-3"
+opencv = "2027-4.13.0-4"
 quickbuf = "1.4"
 
 [libraries]
@@ -24,7 +24,7 @@ compile-testing = { module = "com.google.testing.compile:compile-testing", versi
 jmh-annotationprocessor = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
 jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
 junit-api = { module = "org.junit.jupiter:junit-jupiter", version = "5.13.4" }
-junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.10.1" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "1.13.4" }
 mockito-core = { module = "org.mockito:mockito-core", version = "4.1.0" }
 
 # buildsrc dependencies
