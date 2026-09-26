@@ -13,11 +13,8 @@
 #include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
 #include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
 #include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
-#include "wpi/net/EventLoopRunner.hpp"
-
-#ifdef HALSIM_XRP_WITH_GUI
 #include "wpi/halsim/xrp/HALSimXRPGui.hpp"
-#endif
+#include "wpi/net/EventLoopRunner.hpp"
 
 using namespace wpilibxrp;
 using namespace wpilibws;
@@ -32,9 +29,7 @@ bool HALSimXRPClient::Initialize() {
       return;
     }
 
-#ifdef HALSIM_XRP_WITH_GUI
     InitializeXRPBluetoothGui(simxrp);
-#endif
 
     WSRegisterFunc registerFunc = [&](auto key, auto provider) {
       providers.Add(key, provider);

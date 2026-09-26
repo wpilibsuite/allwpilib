@@ -42,7 +42,6 @@ model {
                 return
             }
 
-            it.cppCompiler.define 'HALSIM_XRP_WITH_GUI'
             project(':ntcore').addNtcoreDependency(it, 'shared')
             lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'

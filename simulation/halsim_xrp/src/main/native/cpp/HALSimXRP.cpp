@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/gui/wpigui.hpp"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -80,23 +81,7 @@ XRPBluetoothAddressType ParseAddressType(std::string_view type) {
 }
 
 std::string GetBluetoothSettingsPath() {
-  // Match the GUI settings directory without requiring the GUI library.
-  std::string dir;
-#if defined(_WIN32)
-  if (const char* env = std::getenv("APPDATA")) {
-    dir = env + std::string{"/"};
-  }
-#elif defined(__APPLE__)
-  if (const char* env = std::getenv("HOME")) {
-    dir = env + std::string{"/Library/Preferences/"};
-  }
-#else
-  if (const char* xdg = std::getenv("XDG_CONFIG_HOME")) {
-    dir = xdg + std::string{"/"};
-  } else if (const char* env = std::getenv("HOME")) {
-    dir = env + std::string{"/.config/"};
-  }
-#endif
+  std::string dir = wpi::gui::GetPlatformSaveFileDir();
   if (dir.empty()) {
     return {};
   }
