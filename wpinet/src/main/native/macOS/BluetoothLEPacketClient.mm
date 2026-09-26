@@ -5,6 +5,7 @@
 #include "wpi/net/BluetoothLEPacketClient.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <format>
 #include <memory>
@@ -49,7 +50,7 @@ class BluetoothLEPacketClient::Impl
   void SetError(std::string_view error);
   void SetConnected(BluetoothPacketTransport transport);
   void SetDisconnected(std::string_view reason);
-  void DidReceivePacket(std::span<const uint8_t> packet);
+  void DidReceivePacket(std::span<const uint8_t> packet, uint64_t generation);
   void DidSendPacket();
   void FinishQueuedPacket();
 
@@ -81,6 +82,7 @@ class BluetoothLEPacketClient::Impl
   uint64_t m_statusSequence = 0;
   uint64_t m_publishedStatusSequence = 0;
   BluetoothLEPacketClientConfig m_config;
+  std::atomic<uint64_t> m_connectGeneration{0};
   bool m_queuedPacket = false;
 };
 
@@ -95,8 +97,8 @@ struct MacBluetoothLEPacketClientBridge {
   void (*setConnected)(void* context, BluetoothPacketTransport transport) =
       nullptr;
   void (*setDisconnected)(void* context, std::string_view reason) = nullptr;
-  void (*didReceivePacket)(void* context, std::span<const uint8_t> packet) =
-      nullptr;
+  void (*didReceivePacket)(void* context, std::span<const uint8_t> packet,
+                            uint64_t generation) = nullptr;
   void (*didSendPacket)(void* context) = nullptr;
   void (*finishQueuedPacket)(void* context) = nullptr;
 
@@ -126,9 +128,10 @@ struct MacBluetoothLEPacketClientBridge {
     }
   }
 
-  void DidReceivePacket(std::span<const uint8_t> packet) const {
+  void DidReceivePacket(std::span<const uint8_t> packet,
+                        uint64_t generation) const {
     if (didReceivePacket != nullptr) {
-      didReceivePacket(context, packet);
+      didReceivePacket(context, packet, generation);
     }
   }
 
@@ -310,7 +313,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
-     minReceivePacketSize:(NSUInteger)minReceivePacketSize;
+     minReceivePacketSize:(NSUInteger)minReceivePacketSize
+               generation:(uint64_t)generation;
 - (void)disconnectWithReason:(NSString*)reason;
 - (void)cancelCurrentConnection;
 - (void)sendPacket:(NSData*)packet mode:(BluetoothPacketSendMode)mode;
@@ -330,6 +334,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   CBUUID* _controlUuid;
   CBUUID* _statusUuid;
   NSUInteger _minReceivePacketSize;
+  uint64_t _connectGeneration;
   NSData* _pendingPacket;
   BOOL _connectRequested;
 }
@@ -352,8 +357,10 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
               serviceUuid:(NSString*)serviceUuid
               controlUuid:(NSString*)controlUuid
                statusUuid:(NSString*)statusUuid
-     minReceivePacketSize:(NSUInteger)minReceivePacketSize {
+     minReceivePacketSize:(NSUInteger)minReceivePacketSize
+               generation:(uint64_t)generation {
   dispatch_async(_queue, ^{
+    _connectGeneration = generation;
     _target = [target copy];
     _serviceUuid = [CBUUID UUIDWithString:serviceUuid];
     _controlUuid = [CBUUID UUIDWithString:controlUuid];
@@ -763,7 +770,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   NSData* value = characteristic.value;
   if (value.length > 0 && _bridge) {
     _bridge.DidReceivePacket(
-        {static_cast<const uint8_t*>(value.bytes), value.length});
+        {static_cast<const uint8_t*>(value.bytes), value.length},
+        _connectGeneration);
   }
 }
 
@@ -794,8 +802,9 @@ std::shared_ptr<BluetoothLEPacketClient::Impl> BluetoothLEPacketClient::Impl::Cr
     static_cast<Impl*>(context)->SetDisconnected(reason);
   };
   bridge.didReceivePacket = [](void* context,
-                               std::span<const uint8_t> packet) {
-    static_cast<Impl*>(context)->DidReceivePacket(packet);
+                               std::span<const uint8_t> packet,
+                               uint64_t generation) {
+    static_cast<Impl*>(context)->DidReceivePacket(packet, generation);
   };
   bridge.didSendPacket = [](void* context) {
     static_cast<Impl*>(context)->DidSendPacket();
@@ -836,10 +845,12 @@ bool BluetoothLEPacketClient::Impl::Connect(
     return false;
   }
 
+  uint64_t generation;
   uint64_t statusSequence;
   BluetoothLEPacketConnectionStatus snapshot;
   {
     std::scoped_lock lock{m_statusMutex};
+    generation = ++m_connectGeneration;
     m_config = config;
     m_queuedPacket = false;
     m_status.targetAddress = config.address;
@@ -858,11 +869,13 @@ bool BluetoothLEPacketClient::Impl::Connect(
                   serviceUuid:ToNSString(config.gattServiceUuid)
                   controlUuid:ToNSString(config.gattControlCharacteristicUuid)
                    statusUuid:ToNSString(config.gattStatusCharacteristicUuid)
-         minReceivePacketSize:config.minReceivePacketSize];
+         minReceivePacketSize:config.minReceivePacketSize
+                   generation:generation];
   return true;
 }
 
 void BluetoothLEPacketClient::Impl::Disconnect(std::string_view reason) {
+  ++m_connectGeneration;
   [m_client disconnectWithReason:ToNSString(reason)];
 }
 
@@ -943,13 +956,21 @@ void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason) {
 }
 
 void BluetoothLEPacketClient::Impl::DidReceivePacket(
-    std::span<const uint8_t> packet) {
+    std::span<const uint8_t> packet, uint64_t generation) {
   std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
-  UpdateStatus([](auto& status) { ++status.packetsReceived; });
+  UpdateStatus([&](auto& status) {
+    if (generation == m_connectGeneration) {
+      ++status.packetsReceived;
+    }
+  });
   if (m_packetCallback) {
-    m_exec->Send([callback = m_packetCallback,
-                  packetCopy = std::move(packetCopy)] {
-      callback(packetCopy);
+    m_exec->Send([weakSelf = weak_from_this(),
+                  packetCopy = std::move(packetCopy), generation] {
+      // Reconnect can overtake a notification queued on the loop.
+      if (auto self = weakSelf.lock();
+          self && generation == self->m_connectGeneration) {
+        self->m_packetCallback(packetCopy);
+      }
     });
   }
 }
