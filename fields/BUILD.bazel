@@ -163,6 +163,7 @@ wpilib_cc_library(
 
 wpilib_cc_shared_library(
     name = "shared/fields",
+    auto_export_windows_symbols = False,
     dynamic_deps = [
         "//telemetry:shared/telemetry",
         "//tunables:shared/tunables",

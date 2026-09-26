@@ -12,8 +12,12 @@ the real binary by a relative path of its own, so a cd would break every probe.
 Redirecting configure's output side is what lets the two coexist.
 
 configure's log is the one thing still written beside the working directory, so
-delete it once configure has succeeded.  A failure exits under set -e before
-that, leaving the log in place for whoever has to read it.
+delete it once configure has succeeded.  A failure exits before that, leaving
+the log in place for whoever has to read it.
+
+configure also reports every probe on stdout, which Bazel echoes on every
+build without adding anything.  Capture it, and only show it when configure
+fails.
 
 --- a/liburing_configure.bzl
 +++ b/liburing_configure.bzl
@@ -62,7 +66,7 @@ that, leaving the log in place for whoever has to read it.
      ctx.actions.run_shell(
          outputs = outputs,
          inputs = depset(
-@@ -109,27 +108,24 @@
+@@ -109,27 +108,32 @@
  export CFLAGS="$2"
  export LDFLAGS="-c"
  configure="$3"
@@ -72,21 +76,30 @@ that, leaving the log in place for whoever has to read it.
 -ln -sf "${package_dir}/Makefile.common" Makefile.common
 -ln -sf "${package_dir}/liburing.spec" liburing.spec
 -mkdir -p src/include/liburing
+-"${configure}" --use-libc
 +# Nothing may be left in the execroot: Bazel does not sandbox on Windows, so a
 +# stray config-host.h there shadows the declared one for every compile that
 +# uses "-include config-host.h", which the preprocessor resolves against its
 +# working directory before any -I path.
 +export LIBURING_CONFIG_OUTPUT_DIR="$4"
- "${configure}" --use-libc
  
 -# configure wrote each header relative to the working directory; move it to
 -# where Bazel declared it.
 -for pair in "$@"; do
 -  cp "${pair%%=*}" "${pair#*=}"
 -done
++# configure reports every probe on stdout.  Only show it if configure fails.
++configure_output="$(mktemp)"
++if ! "${configure}" --use-libc > "${configure_output}" 2>&1; then
++  cat "${configure_output}" >&2
++  rm -f "${configure_output}"
++  exit 1
++fi
++rm -f "${configure_output}"
++
 +# configure writes its log beside the working directory, which is the execroot.
-+# Nothing reads it once configure has succeeded, and set -e leaves it in place
-+# on failure, which is when it is worth reading.
++# Nothing reads it once configure has succeeded, and a failure exits above,
++# leaving it in place for when it is worth reading.
 +rm -f config.log
  """,
          arguments = [
