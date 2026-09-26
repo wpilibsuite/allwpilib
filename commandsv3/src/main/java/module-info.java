@@ -14,6 +14,7 @@ open module wpilib.command3 {
   requires wpilib.math;
 
   exports org.wpilib.command3;
-  exports org.wpilib.command3.proto;
   exports org.wpilib.command3.button;
+  exports org.wpilib.command3.proto;
+  exports org.wpilib.command3.sysid;
 }
