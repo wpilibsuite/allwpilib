@@ -784,11 +784,16 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    uint64_t generation = m_connectGeneration;
     std::vector<uint8_t> packet(m_config.maxPacketSize);
-    while (true) {
+    while (generation == m_connectGeneration && m_socket >= 0) {
       ssize_t received = ::recv(m_socket, packet.data(), packet.size(), 0);
       if (received > 0) {
         UpdateStatus([](auto& status) { ++status.packetsReceived; });
+        // A status callback may disconnect or replace the connection.
+        if (generation != m_connectGeneration) {
+          return;
+        }
         m_packetCallback({packet.data(), static_cast<size_t>(received)});
         continue;
       }
@@ -1164,7 +1169,12 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    uint64_t generation = m_connectGeneration;
     UpdateStatus([](auto& status) { ++status.packetsReceived; });
+    // A status callback may disconnect or replace the connection.
+    if (generation != m_connectGeneration) {
+      return;
+    }
     m_packetCallback(packet);
   }
 
@@ -1206,9 +1216,10 @@ class BluetoothLEPacketClient::Impl
       return;
     }
 
+    uint64_t generation = m_connectGeneration;
     std::vector<uint8_t> pdu(
         std::max<size_t>(m_gattMtu, m_config.maxPacketSize + 3));
-    while (true) {
+    while (generation == m_connectGeneration && m_socket >= 0) {
       ssize_t received = ::recv(m_socket, pdu.data(), pdu.size(), 0);
       if (received > 0) {
         HandleGattPdu({pdu.data(), static_cast<size_t>(received)});
