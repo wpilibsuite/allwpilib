@@ -9,9 +9,32 @@ ext {
     pluginName = 'halsim_xrp'
 }
 
+apply plugin: 'google-test-test-suite'
+apply from: "${rootDir}/shared/catch2.gradle"
 apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
 
 model {
+    testSuites {
+        "${pluginName}Test"(GoogleTestTestSuiteSpec) {
+            for (NativeComponentSpec c : $.components) {
+                if (c.name == pluginName) {
+                    testing c
+                    break
+                }
+            }
+            sources.cpp {
+                source {
+                    srcDirs 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include'
+                }
+            }
+        }
+    }
+
     binaries {
         all {
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
@@ -20,9 +43,14 @@ model {
             }
 
             project(':ntcore').addNtcoreDependency(it, 'shared')
+            lib project: ':hal', library: 'hal', linkage: 'shared'
             lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib project: ':glass', library: 'glass', linkage: 'static'
+            lib project: ':wpigui', library: 'wpigui', linkage: 'static'
             lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
+            lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+            project.addLibSdlGpuDependency(it)
         }
     }
 }
