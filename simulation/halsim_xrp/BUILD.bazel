@@ -9,6 +9,7 @@ wpilib_cc_library(
         "src/main/native/cpp/*",
         "src/main/native/include/**/*.hpp",
     ]),
+    local_defines = ["HALSIM_XRP_WITH_GUI"],
     include_license_files = True,
     includes = ["src/main/native/include"],
     target_compatible_with = select({
@@ -34,6 +35,7 @@ wpilib_cc_library(
     copts = [
         "-DHALSIM_InitExtension=HALSIM_InitExtension_XRP",
     ],
+    local_defines = ["HALSIM_XRP_WITH_GUI"],
     include_license_files = True,
     includes = ["src/main/native/include"],
     target_compatible_with = select({
