@@ -522,7 +522,8 @@ static void UpdateRenameReconnect(HALSimXRP& simXRP) {
   simXRP.ConnectBluetooth(gGui.renameReconnectTarget,
                           gGui.renameReconnectAddressType,
                           gGui.renameReconnectName);
-  gGui.commandStatus = "Reconnecting to renamed XRP";
+  // Use the live connection status for reconnect progress from here on.
+  gGui.commandStatus.clear();
   gGui.commandOutput.clear();
 }
 
