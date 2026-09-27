@@ -29,8 +29,8 @@ build:linux --host_cxxopt=-Wno-missing-requires
 build:linux --host_cxxopt=-Wno-implicit-fallthrough
 
 build:linux --host_per_file_copt=external/zlib/.*\.c@-Wno-deprecated-non-prototype
-build:linux --host_per_file_copt=external/.*@-Wno-pedantic,-Wno-implicit-fallthrough,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations
-build:linux --host_per_file_copt=external/.*\.cpp$,external/.*\.cc$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra
+build:linux --host_per_file_copt=external/.*,third_party/.*@-Wno-pedantic,-Wno-format-nonliteral,-Wno-sign-compare,-Wno-type-limits,-Wno-maybe-uninitialized,-Wno-missing-field-initializers,-Wno-trigraphs,-Wno-attributes,-Wno-return-type,-Wno-unused-function,-Wno-format-y2k,-Wno-deprecated-declarations,-Wno-cast-function-type,-Wno-implicit-fallthrough,-Wno-empty-body,-Wno-error
+build:linux --host_per_file_copt=external/.*\.cpp$,external/.*\.cc$,external/.*\.h$,third_party/.*\.cpp$,third_party/.*\.cc$,third_party/.*\.h$@-Wno-missing-requires,-Wno-volatile,-Wno-redundant-move,-Wno-class-memaccess,-Wno-ignored-qualifiers,-Wno-stringop-overflow,-Wno-extra,-Wno-pessimizing-move
 
 build:linux --force_pic
 # Set soname. Needed for robotpy

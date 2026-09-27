@@ -16,7 +16,7 @@ import org.wpilib.math.util.MathShared;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.system.RobotController;
 
-class CommandTestBase {
+public class CommandTestBase {
   protected Scheduler m_scheduler;
   protected List<SchedulerEvent> m_events;
   protected long m_opModeId = 0;

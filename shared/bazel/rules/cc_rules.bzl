@@ -214,7 +214,6 @@ def third_party_cc_lib_helper(
         ]),
         includes = [include_root],
         defines = defines,
-        strip_include_prefix = include_root,
         visibility = visibility,
     )
 
