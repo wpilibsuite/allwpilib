@@ -358,7 +358,6 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 }
 
 void ListenerStorage::Reset() {
-  // If a callback is currently running, wait for it to complete.
   {
     std::scoped_lock lock{m_mutex};
     if (m_resetting) {
@@ -368,6 +367,8 @@ void ListenerStorage::Reset() {
       DoReset();
       return;
     }
+
+    // A callback may be running; wait for it to complete.
     m_resetting = true;
   }
 
@@ -375,7 +376,6 @@ void ListenerStorage::Reset() {
 
   std::scoped_lock lock{m_mutex};
   DoReset();
-  m_resetting = false;
 }
 
 void ListenerStorage::DoReset() {
@@ -386,6 +386,7 @@ void ListenerStorage::DoReset() {
   m_valueListeners.clear();
   m_logListeners.clear();
   m_timeSyncListeners.clear();
+  m_resetting = false;
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>
