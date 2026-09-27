@@ -21,7 +21,7 @@ filegroup(
 filegroup(
     name = "wpical-main-cpp",
     srcs = ["src/main/native/cpp/WPIcal.cpp"],
-    visibility = ["//tools/wpical/src/test/native:__pkg__"],
+    visibility = ["//tools/wpical/src/test/native/imgui:__pkg__"],
 )
 
 pkg_files(
@@ -146,7 +146,7 @@ cc_library(
     linkopts = LINKOPTS,
     linkstatic = True,
     target_compatible_with = imgui_test_target_compatible_with(),
-    visibility = ["//tools/wpical/src/test/native:__pkg__"],
+    visibility = ["//tools/wpical/src/test/native/imgui:__pkg__"],
     deps = [
         ":headers",
         "//apriltag",

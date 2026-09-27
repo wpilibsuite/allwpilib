@@ -10,13 +10,13 @@ cc_library(
     name = "headers",
     hdrs = glob(["src/main/native/include/**/*.hpp"]),
     strip_include_prefix = "src/main/native/include",
-    visibility = ["//simulation/halsim_gui/src/test/native:__pkg__"],
+    visibility = ["//simulation/halsim_gui/src/test/native/imgui:__pkg__"],
 )
 
 filegroup(
     name = "main-native-srcs",
     srcs = glob(["src/main/native/cpp/*"]),
-    visibility = ["//simulation/halsim_gui/src/test/native:__pkg__"],
+    visibility = ["//simulation/halsim_gui/src/test/native/imgui:__pkg__"],
 )
 
 wpilib_cc_library(

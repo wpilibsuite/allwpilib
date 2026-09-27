@@ -8,20 +8,20 @@ generate_resources(
     namespace = "ov",
     prefix = "OV",
     resource_files = glob(["src/main/native/resources/*"]),
-    visibility = ["//tools/outlineviewer/src/test/native:__pkg__"],
+    visibility = ["//tools/outlineviewer/src/test/native/imgui:__pkg__"],
 )
 
 generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.cpp",
     template = "src/main/generate/WPILibVersion.cpp.in",
-    visibility = ["//tools/outlineviewer/src/test/native:__pkg__"],
+    visibility = ["//tools/outlineviewer/src/test/native/imgui:__pkg__"],
 )
 
 filegroup(
     name = "main-native-srcs",
     srcs = glob(["src/main/native/cpp/*"]),
-    visibility = ["//tools/outlineviewer/src/test/native:__pkg__"],
+    visibility = ["//tools/outlineviewer/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(

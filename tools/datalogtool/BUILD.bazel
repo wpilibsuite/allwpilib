@@ -8,20 +8,20 @@ generate_resources(
     namespace = "dlt",
     prefix = "DLT",
     resource_files = glob(["src/main/native/resources/*"]),
-    visibility = ["//tools/datalogtool/src/test/native:__pkg__"],
+    visibility = ["//tools/datalogtool/src/test/native/imgui:__pkg__"],
 )
 
 generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.cpp",
     template = "src/main/generate/WPILibVersion.cpp.in",
-    visibility = ["//tools/datalogtool/src/test/native:__pkg__"],
+    visibility = ["//tools/datalogtool/src/test/native/imgui:__pkg__"],
 )
 
 filegroup(
     name = "main-native-srcs",
     srcs = glob(["src/main/native/cpp/*"]),
-    visibility = ["//tools/datalogtool/src/test/native:__pkg__"],
+    visibility = ["//tools/datalogtool/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(

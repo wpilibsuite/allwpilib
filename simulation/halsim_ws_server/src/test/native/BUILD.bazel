@@ -9,7 +9,7 @@ cc_library(
 )
 
 cc_test(
-    name = "native",
+    name = "halsim_ws_server_tests",
     size = "small",
     srcs = glob(["**/*.cpp"]),
     tags = [
@@ -20,4 +20,9 @@ cc_test(
         "//simulation/halsim_ws_server",
         "//thirdparty/catch2",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":halsim_ws_server_tests",
 )

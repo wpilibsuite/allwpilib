@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "native",
+    name = "ntcore_tests",
     size = "small",
     srcs = glob([
         "**/*.cpp",
@@ -17,4 +17,9 @@ cc_test(
         "//thirdparty/catch2",
         "//wpiutil/src/test/native:wpiutil-testlib",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":ntcore_tests",
 )

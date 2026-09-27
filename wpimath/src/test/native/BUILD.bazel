@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_test(
-    name = "native",
+    name = "wpimath_tests",
     size = "medium",
     srcs = glob([
         "cpp/**/*.cpp",
@@ -24,4 +24,9 @@ cc_test(
         "//thirdparty/catch2",
         "//wpimath",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":wpimath_tests",
 )

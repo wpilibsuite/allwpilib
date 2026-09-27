@@ -1,11 +1,16 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "native",
+    name = "cscore_tests",
     size = "small",
     srcs = glob(["**/*.cpp"]),
     deps = [
         "//cscore",
         "//thirdparty/catch2",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":cscore_tests",
 )

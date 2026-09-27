@@ -1,13 +1,13 @@
 load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 
 wpilib_imgui_cc_test(
-    name = "native",
+    name = "datalogtool_imgui_tests",
     size = "small",
     srcs = [
         "//tools/datalogtool:generate-resources",
         "//tools/datalogtool:generate-version",
         "//tools/datalogtool:main-native-srcs",
-    ] + glob(["imgui/**"]),
+    ] + glob(["*.cpp"]),
     defines = ["LIBSSH_STATIC"],
     linkopts = select({
         "@platforms//os:osx": [
@@ -28,4 +28,9 @@ wpilib_imgui_cc_test(
         "//glass:glass_for_tests",
         "//shared/bazel/thirdparty/libssh",
     ],
+)
+
+alias(
+    name = "imgui",
+    actual = ":datalogtool_imgui_tests",
 )

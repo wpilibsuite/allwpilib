@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "native",
+    name = "commandsv2_tests",
     size = "small",
     srcs = glob([
         "**/*.cpp",
@@ -15,4 +15,9 @@ cc_test(
         "//commandsv2",
         "//thirdparty/catch2",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":commandsv2_tests",
 )

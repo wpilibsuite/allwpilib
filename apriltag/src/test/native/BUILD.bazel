@@ -1,7 +1,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "native",
+    name = "apriltag_tests",
     size = "small",
     srcs = glob(["cpp/**/*.cpp"]),
     tags = [
@@ -11,4 +11,9 @@ cc_test(
         "//apriltag",
         "//thirdparty/catch2",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":apriltag_tests",
 )

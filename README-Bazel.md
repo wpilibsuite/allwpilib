@@ -31,12 +31,12 @@ To enable the tests, pass `--config=imgui_tests` or the underlying build setting
 The ImGui GUI test macro transitions an internal hook flag for the generated C++ test binary so the ImGui test-engine macros apply only to the GUI test dependency graph, not to ordinary GUI executables built under `--config=imgui_tests`.
 
 The ImGui GUI test targets are:
-- `//glass/src/test/native:glass-imgui-test`
-- `//simulation/halsim_gui/src/test/native:halsim_gui-imgui-test`
-- `//tools/datalogtool/src/test/native`
-- `//tools/outlineviewer/src/test/native`
-- `//tools/sysid/src/test/native:sysid-imgui-test`
-- `//tools/wpical/src/test/native:wpical-imgui-test`
+- `//glass/src/test/native/imgui`
+- `//simulation/halsim_gui/src/test/native/imgui`
+- `//tools/datalogtool/src/test/native/imgui`
+- `//tools/outlineviewer/src/test/native/imgui`
+- `//tools/sysid/src/test/native/imgui`
+- `//tools/wpical/src/test/native/imgui`
 
 These tests run headless by default using SDL's dummy video driver, the software SDL renderer, and `WPIGUI_FORCE_RENDERER=2d`.
 

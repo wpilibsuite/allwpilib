@@ -9,7 +9,7 @@ cc_library(
 )
 
 cc_test(
-    name = "native",
+    name = "wpilibc_tests",
     size = "small",
     srcs = glob(["cpp/**"]) + ["//wpilibc:generated-test-native-srcs"],
     tags = [
@@ -21,4 +21,9 @@ cc_test(
         "//thirdparty/catch2",
         "//wpilibc",
     ],
+)
+
+alias(
+    name = "native",
+    actual = ":wpilibc_tests",
 )

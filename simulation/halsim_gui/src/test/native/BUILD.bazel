@@ -1,13 +1,9 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
-load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 
 cc_test(
-    name = "native",
+    name = "halsim_gui_tests",
     size = "small",
-    srcs = glob(
-        ["**/*.cpp"],
-        exclude = ["imgui/**"],
-    ),
+    srcs = glob(["cpp/**"]),
     tags = [
         "no-asan",
         "wpi-cpp-gui",
@@ -18,21 +14,7 @@ cc_test(
     ],
 )
 
-wpilib_imgui_cc_test(
-    name = "halsim_gui-imgui-test",
-    size = "small",
-    srcs = [
-        "//simulation/halsim_gui:main-native-srcs",
-    ] + glob(["imgui/**"]),
-    linkopts = [
-        "-lm",
-    ],
-    tags = [
-        "no-asan",
-    ],
-    deps = [
-        "//glass:glassnt_for_tests",
-        "//hal:wpiHal",
-        "//simulation/halsim_gui:headers",
-    ],
+alias(
+    name = "native",
+    actual = ":halsim_gui_tests",
 )

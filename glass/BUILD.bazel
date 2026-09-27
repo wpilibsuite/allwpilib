@@ -127,7 +127,7 @@ generate_version_file(
     name = "generate-version",
     output_file = "WPILibVersion.cpp",
     template = "src/app/generate/WPILibVersion.cpp.in",
-    visibility = ["//glass/src/test/native:__pkg__"],
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 generate_resources(
@@ -135,13 +135,13 @@ generate_resources(
     namespace = "wpi::glass",
     prefix = "GLASS",
     resource_files = glob(["src/app/native/resources/*"]),
-    visibility = ["//glass/src/test/native:__pkg__"],
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 filegroup(
     name = "app-native-srcs",
     srcs = glob(["src/app/native/cpp/**"]),
-    visibility = ["//glass/src/test/native:__pkg__"],
+    visibility = ["//glass/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(

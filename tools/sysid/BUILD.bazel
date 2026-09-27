@@ -56,7 +56,7 @@ cc_library(
     defines = ["RUNNING_IMGUI_TESTS"],
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = imgui_test_target_compatible_with(),
-    visibility = ["//tools/sysid/src/test/native:__pkg__"],
+    visibility = ["//tools/sysid/src/test/native/imgui:__pkg__"],
     deps = [
         "//datalog",
         "//glass:glass_for_tests",

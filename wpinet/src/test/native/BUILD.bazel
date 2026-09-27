@@ -10,7 +10,7 @@ cc_library(
 )
 
 cc_test(
-    name = "native",
+    name = "wpinet_tests",
     size = "small",
     srcs = glob(
         [
