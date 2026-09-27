@@ -4,7 +4,30 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
+# This script is intended to be used by a GitHub action and is designed foremost for execution
+# in that environment. However, it can be run manually from the root directory to manually verify
+# package exports prior to running in CI.
+#
+# From the root project directory, run `./.github/scripts/check-module-exports.py`.
+# The script doesn't take any arguments and will print out any projects that have Java packages
+# that aren't exported from their module-info.java files.
+#
+# Happy path example:
+# $ ./.github/scripts/check-module-exports.py
+# Success: All 23 subprojects export their declared Java packages.
+#
+# Unhappy path example with wpilibj missing export statements:
+# $ ./.github/scripts/check-module-exports.py
+# ======================================================================
+# ERROR: Java packages are missing from module-info.java exports!
+#        (note: `.internal` packages are not required to be exported)
+# ======================================================================
+#
+# Module 'wpilib.core' in project 'wpilibj' is missing exports for 1 package(s):
+#   - org.wpilib.framework
+#
+# Please add the missing 'exports <package>;' directives to their respective module-info.java files.
+
 import re
 import sys
 from pathlib import Path
@@ -99,9 +122,7 @@ def get_declared_packages(project_dir: Path) -> set[str]:
     return declared_packages
 
 
-def check_subproject(
-    module_info_path: Path, root_dir: Path
-) -> tuple[str, str, list[str]]:
+def check_subproject(module_info_path: Path) -> tuple[str, str, list[str]]:
     """
     Checks if a subproject exports all of its declared packages.
     Internal packages are not required for the check to pass, though projects may still decide to export them.
@@ -116,7 +137,7 @@ def check_subproject(
         project_dir = module_info_path.parent
 
     try:
-        project_name = str(project_dir.resolve().relative_to(root_dir.resolve()))
+        project_name = str(project_dir.resolve().relative_to(Path.cwd()))
     except ValueError:
         project_name = str(project_dir)
 
@@ -127,11 +148,11 @@ def check_subproject(
     return project_name, module_name, missing
 
 
-def find_module_info_files(root_dir: Path) -> list[Path]:
+def find_module_info_files() -> list[Path]:
     """Finds all module-info.java files in the repository, excluding ignored projects/dirs."""
     module_info_files = []
-    for path in root_dir.glob("**/src/main/java/module-info.java"):
-        path = path.relative_to(root_dir)
+    for path in Path.cwd().glob("**/src/main/java/module-info.java"):
+        path = path.relative_to(Path.cwd())
         parts = path.parts
         # Skip bazel and gradle build outputs, excluded directories
         if any(p.startswith("bazel-") or p in EXCLUDED_DIR_NAMES for p in parts):
@@ -146,19 +167,7 @@ def find_module_info_files(root_dir: Path) -> list[Path]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Verify that all Java packages in subprojects are exported in module-info.java"
-    )
-    parser.add_argument(
-        "--root",
-        type=Path,
-        default=Path.cwd(),
-        help="Root directory of the repository (default: current working directory)",
-    )
-    args = parser.parse_args()
-
-    root_dir = args.root.resolve()
-    module_info_files = find_module_info_files(root_dir)
+    module_info_files = find_module_info_files()
 
     if not module_info_files:
         print("No module-info.java files found to check.", file=sys.stderr)
@@ -168,9 +177,7 @@ def main() -> int:
     checked_count = 0
 
     for module_info_path in module_info_files:
-        project_name, module_name, missing_packages = check_subproject(
-            module_info_path, root_dir
-        )
+        project_name, module_name, missing_packages = check_subproject(module_info_path)
         checked_count += 1
         if missing_packages:
             failures.append((project_name, module_name, missing_packages))
