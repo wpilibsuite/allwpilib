@@ -131,6 +131,7 @@ def find_module_info_files(root_dir: Path) -> list[Path]:
     """Finds all module-info.java files in the repository, excluding ignored projects/dirs."""
     module_info_files = []
     for path in root_dir.glob("**/src/main/java/module-info.java"):
+        path = path.relative_to(root_dir)
         parts = path.parts
         # Skip bazel and gradle build outputs, excluded directories
         if any(p.startswith("bazel-") or p in EXCLUDED_DIR_NAMES for p in parts):
