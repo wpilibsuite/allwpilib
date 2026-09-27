@@ -337,3 +337,56 @@ TEST_CASE_METHOD(TableListenerTest,
   T_CHECK(destroyerSuccessful, "[Test thread] destroyerSuccessfull");
   T_CHECK(!m_inst, "[Test thread] !m_inst");
 }
+
+TEST_CASE_METHOD(TableListenerTest,
+                 "TableListenerTest ResetInstanceWhileInCallback",
+                 "[ntcore][table-listener]") {
+  auto listenerCalledEvent = wpi::util::MakeEvent(false, false);
+  auto listenerDoneEvent = wpi::util::MakeEvent(false, false);
+  auto resetThreadStartedEvent = wpi::util::MakeEvent(false, false);
+  auto resetThreadDoneEvent = wpi::util::MakeEvent(false, false);
+  auto exitListenerEvent = wpi::util::MakeEvent(false, false);
+  auto table = m_inst.GetTable("/ResetTest");
+
+  table->AddListener(
+      NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE, [&](auto, auto, auto&) {
+        wpi::util::SetEvent(listenerCalledEvent);
+        bool timedOut;
+        wpi::util::WaitForObject(exitListenerEvent, 2.0, &timedOut);
+        wpi::util::SetEvent(listenerDoneEvent);
+      });
+
+  auto publisher = m_inst.GetIntegerTopic("/ResetTest/key").Publish();
+  CHECK(wpi::util::WaitForObject(listenerCalledEvent, 1.0, NULL));
+
+  // Reset the instance from another thread while the listener is blocked.
+  auto resetThread = std::thread([&] {
+    wpi::util::SetEvent(resetThreadStartedEvent);
+    wpi::nt::ResetInstance(m_inst.GetHandle());
+    wpi::util::SetEvent(resetThreadDoneEvent);
+  });
+
+  CHECK(wpi::util::WaitForObject(resetThreadStartedEvent, 1.0, NULL));
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+  // Attempting to add a listener during Reset() should be rejected and not
+  // start an orphaned thread with a dangling poller.
+  auto duringResetListener =
+      m_inst.AddConnectionListener(false, [](const auto&) {});
+  CHECK(duringResetListener == 0);
+
+  // Unblock the listener and let Reset() complete.
+  wpi::util::SetEvent(exitListenerEvent);
+  CHECK(wpi::util::WaitForObject(listenerDoneEvent, 3.0, NULL));
+  CHECK(wpi::util::WaitForObject(resetThreadDoneEvent, 3.0, NULL));
+
+  if (resetThread.joinable()) {
+    resetThread.join();
+  }
+
+  // Adding a listener after Reset() must succeed and return a valid handle.
+  auto postResetListener =
+      m_inst.AddConnectionListener(false, [](const auto&) {});
+  CHECK(postResetListener != 0);
+  m_inst.RemoveListener(postResetListener);
+}

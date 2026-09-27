@@ -27,7 +27,7 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
-        if (m_shutdown) {
+        if (!m_active) {
           break;
         }
         auto callbackIt = m_callbacks.find(event.listener);
@@ -265,6 +265,9 @@ void ListenerStorage::NotifyTimeSync(std::span<const NT_Listener> handles,
 
 NT_Listener ListenerStorage::AddListener(ListenerCallback callback) {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   if (!m_thread) {
     m_thread.Start(m_pollers.Add(m_inst)->handle);
   }
@@ -281,6 +284,9 @@ NT_Listener ListenerStorage::AddListener(ListenerCallback callback) {
 
 NT_Listener ListenerStorage::AddListener(NT_ListenerPoller pollerHandle) {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   return DoAddListener(pollerHandle);
 }
 
@@ -294,6 +300,9 @@ NT_Listener ListenerStorage::DoAddListener(NT_ListenerPoller pollerHandle) {
 
 NT_ListenerPoller ListenerStorage::CreateListenerPoller() {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   return m_pollers.Add(m_inst)->handle;
 }
 
@@ -352,19 +361,21 @@ void ListenerStorage::Reset() {
   // If a callback is currently running, wait for it to complete.
   {
     std::scoped_lock lock{m_mutex};
-    if (auto thr = m_thread.GetThread()) {
-      // Prevent future callbacks from running.
-      thr->m_shutdown = true;
-    } else {
+    if (m_resetting) {
+      return;
+    }
+    if (!m_thread) {
       DoReset();
       return;
     }
+    m_resetting = true;
   }
 
   m_thread.Join();
 
   std::scoped_lock lock{m_mutex};
   DoReset();
+  m_resetting = false;
 }
 
 void ListenerStorage::DoReset() {
