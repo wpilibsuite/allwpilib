@@ -26,7 +26,7 @@
  *
  *   exports first.robot;
  *   exports first.robot.constants;
- *   exports first.robot.subsystems;
+ *   exports first.robot.mechanisms;
  * }
  * }
  *
