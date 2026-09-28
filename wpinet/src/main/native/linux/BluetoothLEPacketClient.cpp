@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <array>
-#include <atomic>
 #include <bit>
 #include <cerrno>
 #include <chrono>
@@ -343,12 +342,20 @@ class BluetoothLEPacketClient::Impl
     }
 
     bool tooLarge = false;
+    uint64_t generation;
     {
       std::scoped_lock lock{m_statusMutex};
       if (!m_status.connected) {
         return false;
       }
       tooLarge = packet.size() > m_config.maxPacketSize;
+      if (!tooLarge) {
+        if (m_sendPending) {
+          return false;
+        }
+        m_sendPending = true;
+        generation = m_sendGeneration;
+      }
     }
     if (tooLarge) {
       UpdateStatus([](auto& status) {
@@ -357,19 +364,13 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
-    // Reserve before dispatch so another caller cannot be told its packet
-    // was retained while this one is waiting for the loop or socket.
-    if (m_sendPending.exchange(true)) {
-      return false;
-    }
-
     if (m_loop.GetThreadId() == std::this_thread::get_id()) {
-      return SendOnLoop(packet, mode);
+      return SendOnLoop(packet, mode, generation);
     }
     std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
     auto self = shared_from_this();
-    m_exec->Send([self, packetCopy = std::move(packetCopy), mode] {
-      self->SendOnLoop(packetCopy, mode);
+    m_exec->Send([self, packetCopy = std::move(packetCopy), mode, generation] {
+      self->SendOnLoop(packetCopy, mode, generation);
     });
     return true;
   }
@@ -866,8 +867,11 @@ class BluetoothLEPacketClient::Impl
     if (m_socket >= 0) {
       TraceSocket("closing socket");
     }
-    if (!m_pendingPacket.empty()) {
-      m_pendingPacket.clear();
+    m_pendingPacket.clear();
+    {
+      std::scoped_lock lock{m_statusMutex};
+      // Invalidate both socket-buffered packets and sends waiting for the loop.
+      ++m_sendGeneration;
       m_sendPending = false;
     }
     StopConnectTimer();
@@ -1574,13 +1578,22 @@ class BluetoothLEPacketClient::Impl
     }
   }
 
-  bool SendOnLoop(std::span<const uint8_t> packet,
-                  BluetoothPacketSendMode mode) {
-    wpi::util::scope_exit releaseSlot{[&] {
-      if (m_pendingPacket.empty()) {
-        m_sendPending = false;
+  void ReleaseSendSlot(uint64_t generation) {
+    std::scoped_lock lock{m_statusMutex};
+    if (generation == m_sendGeneration && m_pendingPacket.empty()) {
+      m_sendPending = false;
+    }
+  }
+
+  bool SendOnLoop(std::span<const uint8_t> packet, BluetoothPacketSendMode mode,
+                  uint64_t generation) {
+    wpi::util::scope_exit releaseSlot{[&] { ReleaseSendSlot(generation); }};
+    {
+      std::scoped_lock lock{m_statusMutex};
+      if (generation != m_sendGeneration || !m_status.connected) {
+        return false;
       }
-    }};
+    }
     if (m_socket < 0 || !m_pendingPacket.empty()) {
       return false;
     }
@@ -1636,6 +1649,12 @@ class BluetoothLEPacketClient::Impl
     if (m_pendingPacket.empty() || m_socket < 0) {
       return;
     }
+    uint64_t generation;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      generation = m_sendGeneration;
+    }
+    wpi::util::scope_exit releaseSlot{[&] { ReleaseSendSlot(generation); }};
     auto pending = std::move(m_pendingPacket);
     m_pendingPacket.clear();
     auto poll = m_poll;
@@ -1644,9 +1663,6 @@ class BluetoothLEPacketClient::Impl
       return;
     }
     SendPdu(pending, BluetoothPacketSendMode::QUEUED);
-    if (m_pendingPacket.empty()) {
-      m_sendPending = false;
-    }
   }
 
   bool SetConnecting(std::string_view text) {
@@ -1721,12 +1737,13 @@ class BluetoothLEPacketClient::Impl
 
   uv::Loop& m_loop;
   std::vector<uint8_t> m_pendingPacket;
-  std::atomic_bool m_sendPending{false};
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
 
   mutable std::mutex m_statusMutex;
+  bool m_sendPending = false;
+  uint64_t m_sendGeneration = 0;
   BluetoothLEPacketConnectionStatus m_status;
   uint64_t m_statusSequence = 0;
   uint64_t m_publishedStatusSequence = 0;

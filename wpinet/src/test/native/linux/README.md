@@ -27,6 +27,7 @@ Coverage:
 - no retries for a fatal permission error;
 - cancellation and replacement while a retry timer is pending;
 - cancellation and replacement from connection, discovery, and error callbacks;
+- discarding old sends on reconnect while preserving the new send reservation;
 - silent default logging and unchanged outcomes with debug output enabled.
 
 They run in separate processes because their socket symbol interposition must

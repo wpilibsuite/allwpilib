@@ -317,7 +317,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                generation:(uint64_t)generation;
 - (void)disconnectWithReason:(NSString*)reason;
 - (void)cancelCurrentConnection;
-- (void)sendPacket:(NSData*)packet mode:(BluetoothPacketSendMode)mode;
+- (void)sendPacket:(NSData*)packet
+              mode:(BluetoothPacketSendMode)mode
+        generation:(uint64_t)generation;
 - (void)flushPendingPacket;
 - (void)invalidate;
 @end
@@ -416,8 +418,14 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
 }
 
-- (void)sendPacket:(NSData*)packet mode:(BluetoothPacketSendMode)mode {
+- (void)sendPacket:(NSData*)packet
+              mode:(BluetoothPacketSendMode)mode
+        generation:(uint64_t)generation {
   dispatch_async(_queue, ^{
+    // A caller can enqueue a send after a reconnect has overtaken it.
+    if (generation != _connectGeneration) {
+      return;
+    }
     if (_peripheral == nil || _controlCharacteristic == nil ||
         !_statusCharacteristic.isNotifying) {
       if (mode == BluetoothPacketSendMode::QUEUED && _bridge) {
@@ -458,7 +466,9 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   }
   NSData* packet = _pendingPacket;
   _pendingPacket = nil;
-  [self sendPacket:packet mode:BluetoothPacketSendMode::QUEUED];
+  [self sendPacket:packet
+              mode:BluetoothPacketSendMode::QUEUED
+        generation:_connectGeneration];
 }
 
 - (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
@@ -886,6 +896,7 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
   }
 
   bool tooLarge = false;
+  uint64_t generation;
   {
     std::scoped_lock lock{m_statusMutex};
     if (!m_status.connected) {
@@ -899,6 +910,7 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
       if (mode == BluetoothPacketSendMode::QUEUED) {
         m_queuedPacket = true;
       }
+      generation = m_connectGeneration;
     }
   }
   if (tooLarge) {
@@ -907,7 +919,7 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
   }
 
   NSData* data = [NSData dataWithBytes:packet.data() length:packet.size()];
-  [m_client sendPacket:data mode:mode];
+  [m_client sendPacket:data mode:mode generation:generation];
   return true;
 }
 

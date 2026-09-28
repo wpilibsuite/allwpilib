@@ -12,6 +12,7 @@
 #include <memory>
 #include <span>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "wpi/net/BluetoothLEPacketClient.hpp"
@@ -36,6 +37,7 @@ struct BluetoothAddress {
 
 static std::vector<Connection> connections;
 static std::string scenario;
+static bool blockSend;
 
 extern "C" int socket(int domain, int type, int protocol) {
   auto real =
@@ -65,6 +67,9 @@ extern "C" int connect(int fd, const sockaddr* address, socklen_t size) {
   }
   connections.back().gatt =
       reinterpret_cast<const BluetoothAddress*>(address)->cid == 4;
+  if (scenario.starts_with("send-")) {
+    return 0;
+  }
   errno = scenario.ends_with("fallback") && connections.size() == 1
               ? EPROTONOSUPPORT
               : EINPROGRESS;
@@ -79,6 +84,11 @@ extern "C" int setsockopt(int fd, int level, int option, const void* value,
 }
 
 extern "C" ssize_t send(int fd, const void* data, size_t size, int flags) {
+  if (blockSend) {
+    blockSend = false;
+    errno = EAGAIN;
+    return -1;
+  }
   auto real = reinterpret_cast<ssize_t (*)(int, const void*, size_t, int)>(
       dlsym(RTLD_NEXT, "send"));
   auto connection = std::find_if(connections.rbegin(), connections.rend(),
@@ -126,9 +136,88 @@ extern "C" ssize_t send(int fd, const void* data, size_t size, int flags) {
   return result;
 }
 
+static int RunSendRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  auto client = BluetoothLEPacketClient::Create(*loop, [](auto) {});
+  auto timer = uv::Timer::Create(loop);
+  bool oldAccepted = false;
+  bool newAccepted = false;
+  bool full = false;
+  timer->timeout.connect([&] {
+    BluetoothLEPacketClientConfig config;
+    config.address = "AA:BB:CC:DD:EE:01";
+    config.psm = 0x81;
+    client->Connect(config);
+    const uint8_t oldPacket[] = {0x12, 0x34};
+    if (scenario == "send-blocked") {
+      blockSend = true;
+      oldAccepted = client->Send(oldPacket, BluetoothPacketSendMode::QUEUED);
+    } else {
+      // Keep the loop busy while the old send waits in its async queue.
+      std::thread worker{[&] {
+        oldAccepted =
+            client->Send(oldPacket, scenario == "send-queued"
+                                        ? BluetoothPacketSendMode::QUEUED
+                                        : BluetoothPacketSendMode::BEST_EFFORT);
+      }};
+      worker.join();
+    }
+
+    config.address = "AA:BB:CC:DD:EE:02";
+    client->Connect(config);
+    const uint8_t newPacket[] = {0x56, 0x78};
+    std::thread worker{[&] {
+      newAccepted = client->Send(newPacket, BluetoothPacketSendMode::QUEUED);
+      full = !client->Send(newPacket, BluetoothPacketSendMode::QUEUED);
+    }};
+    worker.join();
+    timer->Close();
+  });
+  timer->Start(uv::Timer::Time{0});
+  auto deadline = uv::Timer::Create(loop);
+  deadline->timeout.connect([&] { loop->Stop(); });
+  deadline->Start(uv::Timer::Time{50});
+  loop->Run();
+
+  bool passed = oldAccepted && newAccepted && full && connections.size() == 2 &&
+                client->GetStatus().connected;
+  if (connections.size() == 2) {
+    uint8_t packet[32];
+    passed &= recv(connections[0].peer, packet, sizeof(packet), 0) == 0;
+    auto received = recv(connections[1].peer, packet, sizeof(packet), 0);
+    passed &= received == 2 && packet[0] == 0x56 && packet[1] == 0x78;
+    received = recv(connections[1].peer, packet, sizeof(packet), 0);
+    passed &= received < 0 && (errno == EAGAIN || errno == EWOULDBLOCK);
+    // Draining the current send must also release its queue reservation.
+    const uint8_t finalPacket[] = {0x9a};
+    passed &= client->Send(finalPacket, BluetoothPacketSendMode::QUEUED);
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+    passed &= recv(connections[1].peer, packet, sizeof(packet), 0) == 1 &&
+              packet[0] == 0x9a;
+  }
+  std::printf("%s: old_accepted=%d new_accepted=%d full=%d passed=%d\n",
+              scenario.c_str(), oldAccepted, newAccepted, full, passed);
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  return passed ? 0 : 1;
+}
+
 int main(int argc, char** argv) {
   using namespace wpi::net;
   scenario = argc > 1 ? argv[1] : "cancel-l2cap";
+  if (scenario.starts_with("send-")) {
+    return RunSendRegression();
+  }
   bool replace = scenario.starts_with("replace-");
   std::string stage = scenario.substr(scenario.find('-') + 1);
   std::string trigger;

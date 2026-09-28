@@ -78,7 +78,8 @@ def main():
                 "notifications",
                 "error",
             )
-        ],
+        ]
+        + ["send-queued", "send-best-effort", "send-blocked"],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [
             "fallback",
