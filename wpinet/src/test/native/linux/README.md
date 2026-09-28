@@ -2,7 +2,8 @@
 
 These standalone programs exercise the built Linux Bluetooth client and real
 libuv without a Bluetooth adapter. Only Bluetooth socket operations are
-redirected to local TCP sockets; selected connection errors are injected.
+redirected to local TCP sockets or Unix packet socket pairs; selected connection
+errors are injected. A minimal ATT server exercises discovery callbacks.
 
 From the repository root, after configuring a shared-library CMake build with
 `-DBUILD_SHARED_LIBS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`:
@@ -25,9 +26,10 @@ Coverage:
 - one delayed GATT retry after an immediate ENOMEM, including persistent error;
 - no retries for a fatal permission error;
 - cancellation and replacement while a retry timer is pending;
+- cancellation and replacement from connection, discovery, and error callbacks;
 - silent default logging and unchanged outcomes with debug output enabled.
 
 They run in separate processes because their socket symbol interposition must
-not affect the other wpinet networking tests. The final TCP connection is
-intentionally refused: these tests check error and retry lifecycle behavior,
-not ATT discovery or Bluetooth radio reliability.
+not affect the other wpinet networking tests. The TCP connections are
+intentionally refused; the packet socket pairs emulate successful connections.
+These tests check lifecycle behavior without testing Bluetooth radio reliability.

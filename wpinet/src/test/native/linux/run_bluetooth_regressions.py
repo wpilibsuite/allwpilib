@@ -64,6 +64,21 @@ def main():
     compiler = shlex.split(os.environ.get("CXX", arguments[0]))
     source_dir = Path(__file__).resolve().parent
     suites = {
+        "BluetoothCallbackRegression": [
+            f"{action}-{stage}"
+            for action in ("cancel", "replace")
+            for stage in (
+                "l2cap",
+                "gatt",
+                "fallback",
+                "mtu",
+                "service",
+                "characteristics",
+                "descriptor",
+                "notifications",
+                "error",
+            )
+        ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [
             "fallback",
