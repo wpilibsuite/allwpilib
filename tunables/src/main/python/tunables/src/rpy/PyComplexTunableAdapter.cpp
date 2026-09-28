@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "PyTunableTable.h"
 #include "TunableStorage.h"
@@ -202,24 +203,39 @@ void PyComplexTunableAdapter::RemovePath(std::string_view path) {
 void PyComplexTunableAdapter::RemoveRetainedPath(std::string_view path) {
   RemoveRefreshPath(path);
   std::string childPrefix = MakeChildPrefix(path);
-  std::erase_if(m_values, [&](auto&& child) {
-    return IsPathOrDescendant(child.first, path, childPrefix);
-  });
-  for (auto it = m_complex.begin(); it != m_complex.end();) {
-    if (IsPathOrDescendant(it->first, path, childPrefix)) {
-      it->second->RemoveRetainedPath(path);
-      it->second->ReleasePublication();
-      it = m_complex.erase(it);
-    } else if (IsPathOrDescendant(path, it->first)) {
-      it->second->RemoveRetainedPath(path);
-      ++it;
-    } else {
-      ++it;
+  std::vector<std::shared_ptr<PyComplexTunableAdapter>> pending{
+      shared_from_this()};
+  std::vector<std::shared_ptr<PyComplexTunableAdapter>> removed;
+  // Aliases can form cycles. Visit each adapter once and detach all matching
+  // links before releasing publications, which can release more child state.
+  for (size_t i = 0; i < pending.size(); ++i) {
+    auto tunable = pending[i];
+    std::erase_if(tunable->m_values, [&](auto&& child) {
+      return IsPathOrDescendant(child.first, path, childPrefix);
+    });
+    for (auto it = tunable->m_complex.begin();
+         it != tunable->m_complex.end();) {
+      bool remove = IsPathOrDescendant(it->first, path, childPrefix);
+      if (remove || IsPathOrDescendant(path, it->first)) {
+        if (std::find(pending.begin(), pending.end(), it->second) ==
+            pending.end()) {
+          pending.emplace_back(it->second);
+        }
+      }
+      if (remove) {
+        removed.emplace_back(std::move(it->second));
+        it = tunable->m_complex.erase(it);
+      } else {
+        ++it;
+      }
     }
+    std::erase_if(tunable->m_nativeComplex, [&](auto&& child) {
+      return IsPathOrDescendant(child.first, path, childPrefix);
+    });
   }
-  std::erase_if(m_nativeComplex, [&](auto&& child) {
-    return IsPathOrDescendant(child.first, path, childPrefix);
-  });
+  for (auto&& child : removed) {
+    child->ReleasePublication();
+  }
 }
 
 }  // namespace wpi::tunables::python

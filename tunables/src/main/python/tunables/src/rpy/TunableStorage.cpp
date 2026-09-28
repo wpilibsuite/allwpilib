@@ -269,6 +269,8 @@ void RemoveRefreshPath(std::string_view path) {
 }
 
 void ClearValues() {
+  // Break cycles between aliased adapters before discarding their identities.
+  RemoveRetainedPath("");
   GetValues().clear();
   GetRefreshValues().clear();
   GetComplexValues().clear();

@@ -1070,6 +1070,64 @@ def test_tune_revision_survives_python_complex_unpublish_republish(backend):
     assert ref() is None
 
 
+@pytest.mark.parametrize("cycle", ["self", "mutual"])
+@pytest.mark.parametrize("removal", ["alias", "root", "reset"])
+def test_complex_alias_cycles_can_be_removed(cycle, removal):
+    code = """
+import gc
+import sys
+import weakref
+
+import tunables
+
+
+class Complex:
+    def __init__(self):
+        self.value = tunables.Tunable(1.0)
+
+    def publish_tunables(self, table):
+        self.table = table
+        table.publish("value", self.value)
+
+
+backend = tunables.MockTunableBackend()
+tunables.TunableRegistry.register_backend("", backend)
+first = Complex()
+second = Complex() if sys.argv[1] == "mutual" else first
+refs = [weakref.ref(first), weakref.ref(second)]
+assert tunables.publish("root", first)
+assert first.table.publish("child", second)
+alias = "root/child"
+if sys.argv[1] == "mutual":
+    assert second.table.publish("back", first)
+    alias += "/back"
+
+# Removing a descendant must also terminate when the cycle stays published.
+tunables.remove(alias + "/value")
+assert backend.get_uid("/" + alias + "/value") is None
+backend.set_double("/root/value", 2.0)
+tunables.TunableRegistry.update()
+assert first.value.get() == 2.0
+assert tunables.TunableRegistry.get_tune_revision(first) == 1
+
+if sys.argv[2] == "reset":
+    tunables.TunableRegistry.reset()
+else:
+    tunables.remove("root" if sys.argv[2] == "root" else alias)
+assert backend.get_uid("/" + alias) is None
+if sys.argv[2] == "alias":
+    assert backend.get_double("/root/value") == 2.0
+    tunables.remove("root")
+assert backend.get_uid("/root") is None
+assert backend.get_uid("/root/child") is None
+del first, second
+gc.collect()
+assert all(ref() is None for ref in refs)
+tunables.TunableRegistry.reset()
+"""
+    subprocess.run([sys.executable, "-c", code, cycle, removal], check=True, timeout=5)
+
+
 def test_tune_revision_supports_non_weakrefable_python_complex(backend):
     class SlottedComplex:
         __slots__ = ("value",)
