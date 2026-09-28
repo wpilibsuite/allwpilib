@@ -51,8 +51,7 @@ std::optional<py::weakref> TryCreateWeakref(py::handle value) {
 
 PyComplexTunableAdapter::PyComplexTunableAdapter(
     py::object value, py::object initialPublishTunable)
-    : m_tableOwnerContext{std::make_shared<TunableTableOwnerContext>()},
-      m_value{std::move(value)},
+    : m_value{std::move(value)},
       m_valueRef{TryCreateWeakref(*m_value)},
       m_initialPublishTunable{std::move(initialPublishTunable)} {
   if (auto getTunableType = GetOptionalAttr(*m_value, "get_tunable_type")) {
@@ -97,7 +96,6 @@ void PyComplexTunableAdapter::ReleasePublication() {
 void PyComplexTunableAdapter::ReleaseValueIfUnpublished() {
   if (m_retainCount == 0) {
     ReleaseRetainedValues();
-    m_tableOwnerContext->owner.reset();
     m_initialPublishTunable.reset();
     if (!m_valueRef && m_value) {
       detail::ForgetComplex(*m_value, this);
@@ -139,9 +137,13 @@ void PyComplexTunableAdapter::PublishTunable(
   } else {
     publishTunable = GetValue().attr("publish_tunables");
   }
-  m_tableOwnerContext->owner = shared_from_this();
+  // Revision identity is shared across aliases, but table validity belongs to
+  // this publication. Removed table contexts must never be reused.
+  auto ownerContext = std::make_shared<TunableTableOwnerContext>();
+  ownerContext->owner = shared_from_this();
+  ownerContext->path = NormalizePath(table.GetPath());
   publishTunable(table::MakePythonTable(wpi::tunables::TunableTable{table},
-                                        m_tableOwnerContext));
+                                        std::move(ownerContext)));
 }
 
 void PyComplexTunableAdapter::UpdateTunable() const {
@@ -192,7 +194,7 @@ void PyComplexTunableAdapter::AddNativeComplex(std::string path,
 }
 
 void PyComplexTunableAdapter::RemovePath(std::string_view path) {
-  table::InvalidatePendingPublications(path);
+  table::InvalidatePublications(path);
   {
     py::gil_scoped_release release;
     wpi::tunables::TunableRegistry::Remove(path);

@@ -1988,6 +1988,70 @@ def test_stale_duck_table_is_not_revived_by_path_reuse(backend):
     assert backend.get_value("/same/live") == 9
 
 
+@pytest.mark.parametrize("publication", ["same_path", "new_path", "active_alias"])
+@pytest.mark.parametrize("nested", [False, True])
+def test_removed_complex_alias_table_stays_invalid(backend, publication, nested):
+    class RetainingComplex:
+        def publish_tunables(self, table):
+            self.table = table
+
+    parent = RetainingComplex()
+    if nested:
+        assert tunables.publish("parent", parent)
+        parent_table = parent.table
+    else:
+        parent_table = tunables.get_table("")
+
+    value = RetainingComplex()
+    assert parent_table.publish("old", value)
+    stale = value.table
+    stale_child = stale.get_table("child")
+    if publication == "active_alias":
+        assert parent_table.publish("new", value)
+    parent_table.remove("old")
+    if publication != "active_alias":
+        assert parent_table.publish(
+            "old" if publication == "same_path" else "new", value
+        )
+
+    replacement = parent_table.get_table("old/child").add_int("live", 9)
+    path = parent_table.get_path() + "old/child/"
+    replacement_uid = backend.get_uid(path + "live")
+    for table in (stale_child, stale.get_table("child")):
+        with pytest.raises(RuntimeError, match="owner is no longer valid"):
+            table.remove("live")
+        with pytest.raises(RuntimeError, match="owner is no longer valid"):
+            table.add_int("extra", 1)
+        with pytest.raises(RuntimeError, match="owner is no longer valid"):
+            table.publish("extra", replacement)
+
+    assert backend.get_uid(path + "live") == replacement_uid
+    assert backend.get_value(path + "live") == 9
+    assert backend.get_uid(path + "extra") is None
+    value.table.add_int("valid", 7)
+    assert backend.get_value(value.table.get_path() + "valid") == 7
+
+
+def test_reentrant_complex_alias_removal_invalidates_its_table(backend):
+    class RetainingComplex:
+        def __init__(self):
+            self.tables = {}
+
+        def publish_tunables(self, table):
+            self.tables[table.get_path()] = table
+            if table.get_path() == "/removed/":
+                tunables.remove("removed")
+
+    value = RetainingComplex()
+    assert tunables.publish("live", value)
+    assert tunables.publish("removed", value)
+    assert backend.get_uid("/removed") is None
+    with pytest.raises(RuntimeError, match="owner is no longer valid"):
+        value.tables["/removed/"].add_int("value", 1)
+    value.tables["/live/"].add_int("value", 2)
+    assert backend.get_value("/live/value") == 2
+
+
 def test_complex_table_remove_releases_published_value_child(backend):
     calls = []
 

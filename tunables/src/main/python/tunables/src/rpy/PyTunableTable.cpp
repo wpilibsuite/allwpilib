@@ -496,7 +496,7 @@ void Remove(wpi::tunables::TunableTable& table, std::string_view name) {
   }
 }
 
-void InvalidatePendingPublications(std::string_view path) {
+void InvalidatePublications(std::string_view path) {
   std::string childPrefix{path};
   if (childPrefix.empty() || childPrefix.back() != '/') {
     childPrefix.push_back('/');
@@ -505,6 +505,13 @@ void InvalidatePendingPublications(std::string_view path) {
     return publication.first == path ||
            publication.first.starts_with(childPrefix);
   });
+  for (auto&& [table, context] : GetContexts()) {
+    auto& ownerContext = *context.ownerContext;
+    if (ownerContext.path == path ||
+        ownerContext.path.starts_with(childPrefix)) {
+      ownerContext.owner.reset();
+    }
+  }
 }
 
 void ClearContexts() {

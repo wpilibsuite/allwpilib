@@ -325,7 +325,7 @@ void RemoveRetainedPath(std::string_view path) {
 
 void RemovePath(std::string_view path) {
   std::string normalized = NormalizePath(path);
-  table::InvalidatePendingPublications(normalized);
+  table::InvalidatePublications(normalized);
   {
     py::gil_scoped_release release;
     wpi::tunables::TunableRegistry::Remove(normalized);

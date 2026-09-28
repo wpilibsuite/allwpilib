@@ -14,7 +14,6 @@
 namespace wpi::tunables::python {
 
 class PyTunable;
-struct TunableTableOwnerContext;
 
 class PyComplexTunableAdapter
     : public wpi::tunables::ComplexTunable,
@@ -47,7 +46,6 @@ class PyComplexTunableAdapter
   pybind11::object GetValue() const;
   void ReleaseRetainedValues();
 
-  std::shared_ptr<TunableTableOwnerContext> m_tableOwnerContext;
   std::optional<pybind11::object> m_value;
   std::optional<pybind11::weakref> m_valueRef;
   std::optional<pybind11::object> m_initialPublishTunable;
