@@ -284,7 +284,17 @@ class BluetoothLEPacketClient::Impl
     m_status.status = "Waiting for Bluetooth address";
   }
 
-  ~Impl() { CloseOnLoop({}); }
+  ~Impl() {
+    CloseOnLoop({});
+    if (m_connectTimer) {
+      m_connectTimer->Close();
+    }
+    if (m_exec && !m_exec->IsClosing()) {
+      // The callback handle retains itself until closed on its owning loop.
+      auto exec = std::move(m_exec);
+      exec->Send([exec] { exec->Close(); });
+    }
+  }
 
   bool Connect(BluetoothLEPacketClientConfig config) {
     Trace("connect requested address={} type={} psm=0x{:04x} prefer_l2cap={}",
@@ -538,17 +548,19 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
-    auto self = shared_from_this();
+    std::weak_ptr<Impl> weakSelf = weak_from_this();
     std::weak_ptr<uv::Poll> weakPoll = m_poll;
-    m_poll->error.connect([self, weakPoll](uv::Error error) {
+    m_poll->error.connect([weakSelf, weakPoll](uv::Error error) {
+      auto self = weakSelf.lock();
       auto poll = weakPoll.lock();
-      if (poll && poll == self->m_poll) {
+      if (self && poll && poll == self->m_poll) {
         self->HandlePollError(error);
       }
     });
-    m_poll->pollEvent.connect([self, weakPoll](int events) {
+    m_poll->pollEvent.connect([weakSelf, weakPoll](int events) {
+      auto self = weakSelf.lock();
       auto poll = weakPoll.lock();
-      if (!poll || poll != self->m_poll) {
+      if (!self || !poll || poll != self->m_poll) {
         return;
       }
       if (self->m_traceEnabled &&

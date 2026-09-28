@@ -434,7 +434,13 @@ class BluetoothLEPacketClient::Impl
     m_status.status = "Waiting for Bluetooth address";
   }
 
-  ~Impl() { Disconnect({}); }
+  ~Impl() {
+    Disconnect({});
+    if (m_exec && !m_exec->IsClosing()) {
+      auto exec = std::move(m_exec);
+      exec->Send([exec] { exec->Close(); });
+    }
+  }
 
   bool Connect(BluetoothLEPacketClientConfig config) {
     if (config.address.empty()) {

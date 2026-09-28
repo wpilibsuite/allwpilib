@@ -79,7 +79,13 @@ def main():
                 "error",
             )
         ]
-        + ["send-queued", "send-best-effort", "send-blocked"],
+        + [
+            "send-queued",
+            "send-best-effort",
+            "send-blocked",
+            "destroy-connected",
+            "destroy-after-loop",
+        ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [
             "fallback",

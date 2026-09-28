@@ -840,6 +840,10 @@ BluetoothLEPacketClient::Impl::Impl(uv::Loop& loop,
 BluetoothLEPacketClient::Impl::~Impl() {
   [m_client invalidate];
   m_client = nil;
+  if (m_exec && !m_exec->IsClosing()) {
+    auto exec = std::move(m_exec);
+    exec->Send([exec] { exec->Close(); });
+  }
 }
 
 bool BluetoothLEPacketClient::Impl::Connect(

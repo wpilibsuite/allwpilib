@@ -67,7 +67,7 @@ extern "C" int connect(int fd, const sockaddr* address, socklen_t size) {
   }
   connections.back().gatt =
       reinterpret_cast<const BluetoothAddress*>(address)->cid == 4;
-  if (scenario.starts_with("send-")) {
+  if (scenario.starts_with("send-") || scenario.starts_with("destroy-")) {
     return 0;
   }
   errno = scenario.ends_with("fallback") && connections.size() == 1
@@ -212,11 +212,59 @@ static int RunSendRegression() {
   return passed ? 0 : 1;
 }
 
+static int RunTeardownRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  auto client = BluetoothLEPacketClient::Create(*loop, [](auto) {});
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.psm = 0x81;
+  client->Connect(config);
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  bool passed = client->GetStatus().connected && connections.size() == 1;
+
+  if (scenario == "destroy-after-loop") {
+    loop->SetClosing();
+    loop->Walk([](auto& handle) { handle.Close(); });
+    loop->Run();
+    loop.reset();
+    client.reset();
+  } else {
+    client.reset();
+    for (int i = 0; i < 3; ++i) {
+      loop->Run(uv::Loop::Mode::NO_WAIT);
+    }
+    passed &= !loop->IsAlive();
+    int handles = 0;
+    loop->Walk([&](auto& handle) {
+      ++handles;
+      if (!handle.IsClosing()) {
+        handle.Close();
+      }
+    });
+    passed &= handles == 0;
+    loop->Run();
+  }
+  if (connections.size() == 1) {
+    uint8_t packet[32];
+    // The native connection must close even if the loop closes first.
+    passed &= recv(connections[0].peer, packet, sizeof(packet), 0) == 0;
+  }
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
 int main(int argc, char** argv) {
   using namespace wpi::net;
   scenario = argc > 1 ? argv[1] : "cancel-l2cap";
   if (scenario.starts_with("send-")) {
     return RunSendRegression();
+  }
+  if (scenario.starts_with("destroy-")) {
+    return RunTeardownRegression();
   }
   bool replace = scenario.starts_with("replace-");
   std::string stage = scenario.substr(scenario.find('-') + 1);

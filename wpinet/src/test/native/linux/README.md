@@ -28,6 +28,7 @@ Coverage:
 - cancellation and replacement while a retry timer is pending;
 - cancellation and replacement from connection, discovery, and error callbacks;
 - discarding old sends on reconnect while preserving the new send reservation;
+- releasing a connected client's handles and socket, including after loop teardown;
 - silent default logging and unchanged outcomes with debug output enabled.
 
 They run in separate processes because their socket symbol interposition must
