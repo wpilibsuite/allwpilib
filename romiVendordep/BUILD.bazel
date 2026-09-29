@@ -23,6 +23,7 @@ wpilib_cc_library(
         "src/main/native/cpp/**",
     ]),
     hdrs = glob(["src/main/native/include/**"]),
+    include_third_party_notice = False,
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [

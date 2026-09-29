@@ -93,6 +93,7 @@ cc_library(
 wpilib_cc_library(
     name = "imgui_suite",
     hdrs_pkg_root = None,
+    include_third_party_notice = False,
     linkstatic = True,
     srcs_pkg_root = None,
     visibility = ["//visibility:public"],

@@ -248,7 +248,7 @@ def wpilib_cc_library(
         extra_src_pkg_files = [],
         extra_hdr_pkg_files = [],
         include_license_file = True,
-        include_third_party_notice = False,
+        include_third_party_notice = True,
         srcs_pkg_root = "src/main/native/cpp",
         hdrs_pkg_root = "src/main/native/include",
         strip_include_prefix = None,

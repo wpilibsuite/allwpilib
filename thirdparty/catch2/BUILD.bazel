@@ -5,7 +5,6 @@ wpilib_cc_library(
     name = "catch2",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
-    include_third_party_notice = True,
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],

@@ -147,7 +147,6 @@ wpilib_cc_library(
         ":field-handwritten-srcs-pkg",
         ":field-resource-srcs-pkg",
     ],
-    include_third_party_notice = True,
     local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fields",
     strip_include_prefix = "src/main/native/include",
@@ -185,7 +184,6 @@ wpilib_cc_library(
     extra_src_pkg_files = [
         ":field-image-resource-srcs-pkg",
     ],
-    include_third_party_notice = True,
     local_defines = ["WPILIB_EXPORTS"],
     srcs_pkg_root = "src/generated/main/native/cpp/fieldimages",
     strip_include_prefix = "src/main/native/include",

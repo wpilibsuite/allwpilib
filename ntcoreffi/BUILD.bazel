@@ -48,7 +48,6 @@ wpilib_cc_library(
         "//ntcore:ntcore-hdrs-pkg",
         "//ntcore:generated_cc-hdrs-pkg",
     ],
-    include_third_party_notice = True,
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
     deps = [

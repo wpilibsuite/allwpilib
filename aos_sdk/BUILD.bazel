@@ -188,7 +188,8 @@ pkg_zip(
         ":flatbuffers_include_files",
         ":headers",
         ":schema_files",
-        "//:license_pkg_files",
+        "//:license_pkg_file",
+        "//:third_party_notice_pkg_file",
     ],
 )
 

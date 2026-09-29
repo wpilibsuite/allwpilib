@@ -65,6 +65,7 @@ wpilib_cc_library(
     hdrs = glob(["src/main/native/include/**/*"]),
     extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
     extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
+    include_third_party_notice = False,
     local_defines = ["WPILIB_EXPORTS"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
