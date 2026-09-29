@@ -8,12 +8,12 @@
  */
 open module wpilib.math {
   requires transitive ejml.java9module;
-  requires transitive us.hebi.quickbuf.runtime;
-  requires transitive wpilib.units;
   requires transitive io.avaje.jsonb;
-  requires wpilib.annotation;
+  requires transitive us.hebi.quickbuf.runtime;
   requires transitive wpilib.telemetry;
   requires transitive wpilib.tunable;
+  requires transitive wpilib.units;
+  requires wpilib.annotation;
   requires wpilib.util;
 
   exports org.wpilib.math.autodiff;
@@ -22,8 +22,8 @@ open module wpilib.math {
   exports org.wpilib.math.controller.proto.detail;
   exports org.wpilib.math.controller.struct;
   exports org.wpilib.math.estimator;
-  exports org.wpilib.math.filter;
   // org.wpilib.math.filter.internal is not exported
+  exports org.wpilib.math.filter;
   exports org.wpilib.math.geometry;
   exports org.wpilib.math.geometry.proto;
   exports org.wpilib.math.geometry.proto.detail;

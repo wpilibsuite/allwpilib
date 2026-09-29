@@ -7,8 +7,8 @@
  * coprocessors and the driver station.
  */
 open module wpilib.ntcore {
-  requires wpilib.util;
   requires transitive wpilib.datalog; // Part of the public API
+  requires wpilib.util;
 
   exports org.wpilib.networktables;
 }
