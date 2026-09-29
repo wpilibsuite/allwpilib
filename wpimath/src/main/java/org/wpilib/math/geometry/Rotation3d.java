@@ -4,6 +4,7 @@
 
 package org.wpilib.math.geometry;
 
+import static org.wpilib.math.util.UnitConversions.rotationsToRadians;
 import static org.wpilib.units.Units.Radians;
 
 import io.avaje.jsonb.Json;
@@ -18,7 +19,6 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
@@ -361,9 +361,7 @@ public final class Rotation3d
    */
   public static Rotation3d fromRotations(double roll, double pitch, double yaw) {
     return new Rotation3d(
-        Units.rotationsToRadians(roll),
-        Units.rotationsToRadians(pitch),
-        Units.rotationsToRadians(yaw));
+        rotationsToRadians(roll), rotationsToRadians(pitch), rotationsToRadians(yaw));
   }
 
   /**
@@ -398,10 +396,9 @@ public final class Rotation3d
   /**
    * Adds the new rotation to the current rotation. The other rotation is applied extrinsically,
    * which means that it rotates around the global axes. For example, {@code new
-   * Rotation3d(Units.degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0,
-   * Units.degreesToRadians(45), 0))} rotates by 90 degrees around the +X axis and then by 45
-   * degrees around the global +Y axis. (This is equivalent to {@code new
-   * Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(45), 0)})
+   * Rotation3d(degreesToRadians(90), 0, 0).rotateBy(new Rotation3d(0, degreesToRadians(45), 0))}
+   * rotates by 90 degrees around the +X axis and then by 45 degrees around the global +Y axis.
+   * (This is equivalent to {@code new Rotation3d(degreesToRadians(90), degreesToRadians(45), 0)})
    *
    * @param other The extrinsic rotation to rotate by.
    * @return The new rotated Rotation3d.
