@@ -26,11 +26,10 @@ public final class StackTraceGatheringBenchmark {
     method4(getStackTrace);
   }
 
-  @SuppressWarnings("PMD.UselessPureMethodCall")
   private static void method4(boolean getStackTrace) {
     var throwable = new Throwable();
     if (getStackTrace) {
-      throwable.getStackTrace();
+      var unused = throwable.getStackTrace();
     }
   }
 
