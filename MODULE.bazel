@@ -190,8 +190,10 @@ single_version_override(
     version = "20260526.0",
 )
 
-# liburing comes in through AOS. Its configure needs make only to print two
-# version numbers, and the Windows SystemCore builds have no make.
+# liburing comes in through AOS; //aos_sdk names it to keep its headers out of
+# the SDK. It's configure needs make only to print two version numbers, and the
+# Windows Systemcore builds have no make.
+bazel_dep(name = "liburing", version = "2.14.bcr.2")
 single_version_override(
     module_name = "liburing",
     patch_strip = 1,

@@ -60,7 +60,7 @@ tasks.withType(JavaExec).configureEach {
         '--add-opens',
         'java.base/java.lang=wpilib.command3',
         // Explicitly permit native access to WPILib JNI wrappers
-        '--enabled-native-access=wpilib.util,wpilib.hal,wpilib.ntcore'
+        '--enable-native-access=wpilib.util,wpilib.hal,wpilib.ntcore'
     ]
 }
 

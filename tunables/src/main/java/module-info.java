@@ -8,9 +8,9 @@
  * chooser-style selections while routing storage and updates through pluggable backends.
  */
 module wpilib.tunable {
+  requires transitive wpilib.util;
   requires io.avaje.json;
   requires io.avaje.jsonb;
-  requires transitive wpilib.util;
 
   exports org.wpilib.tunable;
   exports org.wpilib.tunable.util;

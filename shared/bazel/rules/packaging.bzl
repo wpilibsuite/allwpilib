@@ -1,6 +1,7 @@
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("@rules_pkg//:mappings.bzl", "pkg_attributes", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:zip.bzl", "pkg_zip")
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_static_library_files", "wpilib_cc_static_library_strip_prefix")
 load("//shared/bazel/rules:publishing.bzl", "architectures_pkg_zip", "platform_prefix", "wpilib_maven_export")
 
 def _headers_impl(ctx):
@@ -122,11 +123,9 @@ def package_default_jni_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     pkg_filegroup(
@@ -180,11 +179,9 @@ def package_default_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     pkg_filegroup(
@@ -363,11 +360,9 @@ def package_static_cc_project(
     """
     pkg_files(
         name = "{}-static-files".format(name),
-        srcs = [
-            ":static/{}".format(name),
-        ],
+        srcs = wpilib_cc_static_library_files("static/" + name),
         prefix = platform_prefix("static"),
-        strip_prefix = "static",
+        strip_prefix = wpilib_cc_static_library_strip_prefix("static/" + name),
     )
 
     architectures_pkg_zip(

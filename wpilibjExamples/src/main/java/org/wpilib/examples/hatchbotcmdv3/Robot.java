@@ -52,6 +52,10 @@ public class Robot extends TimedRobot {
         robotDrive.arcadeDrive(
             () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
 
+    // The hatch mechanism does nothing until the driver presses the Circle or Square button to
+    // actuate it.
+    hatchMechanism.setDefaultCommand(hatchMechanism.idle());
+
     // Add commands to the autonomous command chooser
     autonomousChooser.addDefault("Simple Auto", Autos.simpleAuto(robotDrive));
     autonomousChooser.add("Complex Auto", Autos.complexAuto(robotDrive, hatchMechanism));
