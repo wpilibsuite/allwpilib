@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.elevatorexponentialsimulation.subsystems;
 
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.elevatorexponentialsimulation.Constants;
 import org.wpilib.hardware.rotation.Encoder;
@@ -11,7 +13,6 @@ import org.wpilib.math.controller.ElevatorFeedforward;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.trajectory.ExponentialProfile;
-import org.wpilib.math.util.Units;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.ElevatorSim;
 import org.wpilib.simulation.EncoderSim;
@@ -65,10 +66,9 @@ public class Elevator implements AutoCloseable {
   private final PWMMotorControllerSim motorSim = new PWMMotorControllerSim(motor);
 
   // Create a Mechanism2d visualization of the elevator
-  private final Mechanism2d mech2d =
-      new Mechanism2d(Units.inchesToMeters(10), Units.inchesToMeters(51));
+  private final Mechanism2d mech2d = new Mechanism2d(inchesToMeters(10), inchesToMeters(51));
   private final MechanismRoot2d mech2dRoot =
-      mech2d.getRoot("Elevator Root", Units.inchesToMeters(5), Units.inchesToMeters(0.5));
+      mech2d.getRoot("Elevator Root", inchesToMeters(5), inchesToMeters(0.5));
   private final MechanismLigament2d elevatorMech2d =
       mech2dRoot.append(new MechanismLigament2d("Elevator", elevatorSim.getPosition(), 90));
 

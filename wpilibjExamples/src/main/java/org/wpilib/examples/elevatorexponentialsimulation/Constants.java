@@ -4,7 +4,8 @@
 
 package org.wpilib.examples.elevatorexponentialsimulation;
 
-import org.wpilib.math.util.Units;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+import static org.wpilib.math.util.UnitConversions.lbsToKilograms;
 
 public class Constants {
   public static final int MOTOR_PORT = 0;
@@ -23,14 +24,14 @@ public class Constants {
   public static final double ELEVATOR_KA = 0.06; // volts (V)
 
   public static final double ELEVATOR_GEARING = 5.0;
-  public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(1.0);
-  public static final double CARRIAGE_MASS = Units.lbsToKilograms(12); // kg
+  public static final double ELEVATOR_DRUM_RADIUS = inchesToMeters(1.0);
+  public static final double CARRIAGE_MASS = lbsToKilograms(12); // kg
 
-  public static final double SETPOINT = Units.inchesToMeters(42.875);
-  public static final double LOWERK_SETPOINT = Units.inchesToMeters(15);
+  public static final double SETPOINT = inchesToMeters(42.875);
+  public static final double LOWERK_SETPOINT = inchesToMeters(15);
   // Encoder is reset to measure 0 at the bottom, so minimum height is 0.
   public static final double MIN_ELEVATOR_HEIGHT = 0.0; // m
-  public static final double MAX_ELEVATOR_HEIGHT = Units.inchesToMeters(50);
+  public static final double MAX_ELEVATOR_HEIGHT = inchesToMeters(50);
 
   // distance per pulse = (distance per revolution) / (pulses per revolution)
   //  = (Pi * D) / ppr
