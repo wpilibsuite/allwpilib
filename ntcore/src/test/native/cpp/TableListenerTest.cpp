@@ -70,7 +70,7 @@ HasHandleMatcher HasHandle() {
 struct MapsToInstanceImplMatcher
     : public Matcher<wpi::nt::NetworkTableInstance> {
   bool match(const wpi::nt::NetworkTableInstance& arg) const override {
-    auto handle = arg.GetHandle();
+    NT_Inst handle = arg.GetHandle();
     if (!handle) {
       return false;
     }
@@ -184,7 +184,7 @@ class Assertions {
   void LogEvents() {
     std::unique_lock lock{m_shared->m_mutex};
     bool hasFailures = false;
-    for (auto& event : m_shared->m_events) {
+    for (Event& event : m_shared->m_events) {
       if (event.m_isFailure) {
         WARN("CHECK failed: " + event.m_msg);
         hasFailures = true;
@@ -257,8 +257,9 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
   // - Sets listenerDoneEvent before exiting
   table->AddListener(
       NT_EVENT_TOPIC | NT_EVENT_IMMEDIATE,
-      [state](auto table, auto key, auto& event) mutable {
-        auto& assertions = state->assertions;
+      [state](wpi::nt::NetworkTable* callbackTable, std::string_view key,
+              const wpi::nt::Event&) mutable {
+        Assertions& assertions = state->assertions;
         T_CHECK_THAT(state->inst, HasHandle());
         T_CHECK_THAT(state->inst, MapsToInstanceImpl());
         wpi::util::SetEvent(state->listenerCalledEvent);
@@ -291,7 +292,8 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
         state->callbackSuccessful = true;
       });
 
-  auto publisher = state->inst.GetIntegerTopic("/Preferences/key").Publish();
+  wpi::nt::IntegerPublisher publisher =
+      state->inst.GetIntegerTopic("/Preferences/key").Publish();
   T_CHECK(wpi::util::WaitForObject(state->listenerCalledEvent, 1.0, NULL),
           "[Test thread] WaitForObject(listenerCalledEvent)");
 
@@ -306,7 +308,7 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
   // - Sets destroyerThreadDoneEvent before exiting
   T_INFO("[Test thread] Starting destroyer thread");
   auto destroyerThread = std::thread([state]() mutable {
-    auto& assertions = state->assertions;
+    Assertions& assertions = state->assertions;
     T_CHECK(!state->callbackWokeUp, "[Destroyer thread] !callbackWokeUp");
     state->destroyCalled = true;
     wpi::util::SetEvent(state->destroyerThreadReadyEvent);
@@ -367,11 +369,11 @@ TEST_CASE("TableListenerTest DestroyInstanceWhileInCallback",
 TEST_CASE_METHOD(TableListenerTest,
                  "TableListenerTest ResetInstanceWhileInCallback",
                  "[ntcore][table-listener]") {
-  auto listenerCalledEvent = wpi::util::MakeEvent(false, false);
-  auto listenerDoneEvent = wpi::util::MakeEvent(false, false);
-  auto resetThreadStartedEvent = wpi::util::MakeEvent(false, false);
-  auto resetThreadDoneEvent = wpi::util::MakeEvent(false, false);
-  auto exitListenerEvent = wpi::util::MakeEvent(false, false);
+  WPI_EventHandle listenerCalledEvent = wpi::util::MakeEvent(false, false);
+  WPI_EventHandle listenerDoneEvent = wpi::util::MakeEvent(false, false);
+  WPI_EventHandle resetThreadStartedEvent = wpi::util::MakeEvent(false, false);
+  WPI_EventHandle resetThreadDoneEvent = wpi::util::MakeEvent(false, false);
+  WPI_EventHandle exitListenerEvent = wpi::util::MakeEvent(false, false);
   auto table = m_inst.GetTable("/ResetTest");
 
   table->AddListener(
@@ -382,7 +384,8 @@ TEST_CASE_METHOD(TableListenerTest,
         wpi::util::SetEvent(listenerDoneEvent);
       });
 
-  auto publisher = m_inst.GetIntegerTopic("/ResetTest/key").Publish();
+  wpi::nt::IntegerPublisher publisher =
+      m_inst.GetIntegerTopic("/ResetTest/key").Publish();
   CHECK(wpi::util::WaitForObject(listenerCalledEvent, 1.0, NULL));
 
   // Reset the instance from another thread while the listener is blocked.
@@ -397,7 +400,7 @@ TEST_CASE_METHOD(TableListenerTest,
 
   // Attempting to add a listener during Reset() should be rejected and not
   // start an orphaned thread with a dangling poller.
-  auto duringResetListener =
+  NT_Listener duringResetListener =
       m_inst.AddConnectionListener(false, [](const auto&) {});
   CHECK(duringResetListener == 0);
 
@@ -411,7 +414,7 @@ TEST_CASE_METHOD(TableListenerTest,
   }
 
   // Adding a listener after Reset() must succeed and return a valid handle.
-  auto postResetListener =
+  NT_Listener postResetListener =
       m_inst.AddConnectionListener(false, [](const auto&) {});
   CHECK(postResetListener != 0);
   m_inst.RemoveListener(postResetListener);
