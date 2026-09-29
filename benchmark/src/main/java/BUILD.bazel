@@ -1,0 +1,33 @@
+load("@rules_java//java:defs.bzl", "java_binary", "java_plugin")
+
+java_binary(
+    name = "benchmark",
+    testonly = True,
+    srcs = glob(["wpilib/robot/*.java"]),
+    main_class = "wpilib.robot.Main",
+    plugins = [":jmh_annotation_processor"],
+    deps = [
+        "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_ejml_ejml_java9module",
+        "@maven//:org_openjdk_jmh_jmh_core",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":benchmark",
+)
+
+java_plugin(
+    name = "jmh_annotation_processor",
+    testonly = True,
+    processor_class = "org.openjdk.jmh.generators.BenchmarkProcessor",
+    deps = [
+        "@maven//:org_openjdk_jmh_jmh_generator_annprocess",
+    ],
+)
