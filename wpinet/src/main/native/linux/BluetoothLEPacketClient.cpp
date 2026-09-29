@@ -352,7 +352,7 @@ class BluetoothLEPacketClient::Impl
     }
 
     bool tooLarge = false;
-    uint64_t generation;
+    uint64_t generation = 0;
     {
       std::scoped_lock lock{m_statusMutex};
       if (!m_status.connected) {
