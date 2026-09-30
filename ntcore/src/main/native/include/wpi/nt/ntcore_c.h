@@ -198,6 +198,14 @@ struct NT_ConnectionInfo {
   /** The port number of the remote node. */
   unsigned int remote_port;
 
+  /** The IP address we connected to the remote server using. Empty if this
+   * NetworkTable instance is a server */
+  struct WPI_String local_ip;
+
+  /** The port number we connected to the remote server using. Zero if this
+   * NetworkTable instance is a server */
+  unsigned int local_port;
+
   /**
    * The last time any update was received from the remote node (same scale as
    * returned by wpi::nt::Now()).
