@@ -371,8 +371,6 @@ TEST_CASE_METHOD(TableListenerTest,
                  "[ntcore][table-listener]") {
   WPI_EventHandle listenerCalledEvent = wpi::util::MakeEvent(false, false);
   WPI_EventHandle listenerDoneEvent = wpi::util::MakeEvent(false, false);
-  WPI_EventHandle resetThreadStartedEvent = wpi::util::MakeEvent(false, false);
-  WPI_EventHandle resetThreadDoneEvent = wpi::util::MakeEvent(false, false);
   WPI_EventHandle exitListenerEvent = wpi::util::MakeEvent(false, false);
   auto table = m_inst.GetTable("/ResetTest");
 
@@ -389,29 +387,34 @@ TEST_CASE_METHOD(TableListenerTest,
   CHECK(wpi::util::WaitForObject(listenerCalledEvent, 1.0, NULL));
 
   // Reset the instance from another thread while the listener is blocked.
-  auto resetThread = std::thread([&] {
-    wpi::util::SetEvent(resetThreadStartedEvent);
-    wpi::nt::ResetInstance(m_inst.GetHandle());
-    wpi::util::SetEvent(resetThreadDoneEvent);
-  });
+  auto resetThread =
+      std::thread([&] { wpi::nt::ResetInstance(m_inst.GetHandle()); });
 
-  CHECK(wpi::util::WaitForObject(resetThreadStartedEvent, 1.0, NULL));
-  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  // Retry calling AddConnectionListener() to ensure it rejects the call.
+  std::chrono::steady_clock::time_point deadline =
+      std::chrono::steady_clock::now() + std::chrono::seconds(2);
+  bool registrationRejected = false;
 
-  // Attempting to add a listener during Reset() should be rejected and not
-  // start an orphaned thread with a dangling poller.
-  NT_Listener duringResetListener =
-      m_inst.AddConnectionListener(false, [](const auto&) {});
-  CHECK(duringResetListener == 0);
+  while (std::chrono::steady_clock::now() < deadline) {
+    NT_Listener listener =
+        m_inst.AddConnectionListener(false, [](const auto&) {});
+    if (listener == 0) {
+      registrationRejected = true;
+      break;
+    }
+
+    m_inst.RemoveListener(listener);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+
+  CHECK(registrationRejected);
 
   // Unblock the listener and let Reset() complete.
   wpi::util::SetEvent(exitListenerEvent);
-  CHECK(wpi::util::WaitForObject(listenerDoneEvent, 3.0, NULL));
-  CHECK(wpi::util::WaitForObject(resetThreadDoneEvent, 3.0, NULL));
-
   if (resetThread.joinable()) {
     resetThread.join();
   }
+  CHECK(wpi::util::WaitForObject(listenerDoneEvent, 1.0, NULL));
 
   // Adding a listener after Reset() must succeed and return a valid handle.
   NT_Listener postResetListener =
