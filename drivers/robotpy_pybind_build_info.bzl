@@ -151,6 +151,16 @@ def drivers_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
+            class_name = "RevColorSensorV2",
+            yml_file = "semiwrap/RevColorSensorV2.yml",
+            header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",
+            header_file = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)/wpi/drivers/range/RevColorSensorV2.hpp",
+            tmpl_class_names = [],
+            trampolines = [
+                ("wpi::RevColorSensorV2", "wpi__RevColorSensorV2.hpp"),
+            ],
+        ),
+        struct(
             class_name = "Spark",
             yml_file = "semiwrap/Spark.yml",
             header_root = "$(execpath :robotpy-native-wpilib-drivers.copy_headers)",

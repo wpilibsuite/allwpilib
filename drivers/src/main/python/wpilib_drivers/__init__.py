@@ -10,6 +10,7 @@ from ._drivers import (
     PWMTalonSRX,
     PWMVenom,
     PWMVictorSPX,
+    RevColorSensorV2,
     Spark,
     SparkMini,
 )
@@ -23,6 +24,7 @@ __all__ = [
     "PWMTalonSRX",
     "PWMVenom",
     "PWMVictorSPX",
+    "RevColorSensorV2",
     "Spark",
     "SparkMini",
 ]
