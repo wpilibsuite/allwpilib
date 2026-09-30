@@ -56,6 +56,14 @@ if(ATOMIC)
     target_link_libraries(wpiutil ${ATOMIC})
 endif()
 
+if(MINGW)
+    target_link_libraries(wpiutil version)
+
+    # needed for std::print
+    find_library(STDCPPEXP_LIB NAMES stdc++exp REQUIRED)
+    target_link_libraries(wpiutil ${STDCPPEXP_LIB})
+endif()
+
 if(MSVC)
     target_sources(wpiutil PRIVATE ${wpiutil_windows_src})
 else()
