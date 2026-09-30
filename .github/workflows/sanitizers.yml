@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: configure
-        run: mkdir build && cd build && cmake -G Ninja -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang-19 -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++-19 ${{ matrix.cmake-flags }} ..
+        run: cmake --preset with-sccache -DCMAKE_C_COMPILER=/usr/bin/clang-19 -DCMAKE_CXX_COMPILER=/usr/bin/clang++-19 ${{ matrix.cmake-flags }}
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
@@ -52,12 +52,12 @@ jobs:
           sudo avahi-daemon -D
 
       - name: build
-        working-directory: build
+        working-directory: build-cmake
         run: cmake --build . --parallel $(nproc)
         env:
           SCCACHE_WEBDAV_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           SCCACHE_WEBDAV_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
 
       - name: test
-        working-directory: build
+        working-directory: build-cmake
         run: ${{ matrix.ctest-env }} ctest --output-on-failure ${{ matrix.ctest-flags }}
