@@ -36,9 +36,7 @@ __all__ = [
 ]
 
 # Imported for side effects only
-from . import _stacktrace
+from . import _stacktrace  # noqa: F401
 
 # Type alias
-import typing
-
-json = typing.Union[None, bool, int, float, str, typing.List, typing.Dict]
+type json = bool | int | float | str | list | dict | None

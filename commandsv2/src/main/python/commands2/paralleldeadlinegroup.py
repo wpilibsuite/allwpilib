@@ -1,8 +1,6 @@
 # validated: 2024-01-19 DS e07de37e64f2 ParallelDeadlineGroup.java
 from __future__ import annotations
 
-from typing import Dict
-
 from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
@@ -36,7 +34,7 @@ class ParallelDeadlineGroup(Command):
         :raises IllegalCommandUse: if the deadline command is also in the commands argument
         """
         super().__init__()
-        self._commands: Dict[Command, bool] = {}
+        self._commands: dict[Command, bool] = {}
         self._runs_when_disabled = True
         self._finished = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING

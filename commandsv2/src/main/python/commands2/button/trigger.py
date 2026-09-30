@@ -1,8 +1,8 @@
 # validated: 2024-04-02 DS 0b1345946950 button/Trigger.java
+from collections.abc import Callable
 from types import SimpleNamespace
-from typing import Callable, overload
+from typing import Self, overload
 
-from typing_extensions import Self
 from wpilib import EventLoop
 from wpimath import Debouncer
 

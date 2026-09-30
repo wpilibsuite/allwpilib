@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 import wpilib_drivers
 
@@ -39,6 +41,7 @@ class MyRobot(wpilib.TimedRobot):
         # gearbox is constructed, you might have to invert the left side instead.
         self.right_drive.set_inverted(True)
 
+    @override
     def teleop_periodic(self) -> None:
         # The motor velocity is set from the joystick while the DifferentialDrive turning value is assigned
         # from the error between the setpoint and the gyro angle.

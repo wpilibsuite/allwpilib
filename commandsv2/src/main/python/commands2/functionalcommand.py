@@ -1,7 +1,8 @@
 # validated: 2024-01-19 DS 6e58db398d63 FunctionalCommand.java
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from .command import Command
 from .subsystem import Subsystem

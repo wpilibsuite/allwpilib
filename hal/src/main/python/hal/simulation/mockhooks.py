@@ -1,11 +1,10 @@
 import time
-import typing as T
 
 from ._simulation import get_next_notifier_timeout, get_program_started
 
 
 def wait_for_program_start(
-    timeout: T.Optional[float] = None,
+    timeout: float | None = None,
     delta: float = 0.001,
     wait_for_first_notifier: bool = True,
 ):

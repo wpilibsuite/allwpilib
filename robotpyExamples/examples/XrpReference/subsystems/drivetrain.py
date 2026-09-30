@@ -5,10 +5,10 @@
 #
 
 import math
+from typing import override
 
 import commands2
 import wpilib
-import wpiutil
 import xrp
 
 
@@ -107,5 +107,6 @@ class Drivetrain(commands2.Subsystem):
         """Reset the gyro"""
         self.gyro.reset()
 
+    @override
     def periodic(self) -> None:
         """This method will be called once per scheduler run"""

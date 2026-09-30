@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import Optional, TypeVar, overload
+from typing import TypeVar, overload
 
 from hal import RobotMode
 from wpiutil import Color
@@ -226,10 +226,10 @@ class OpModeRobot(OpModeRobotBase):
         opmode_cls: type,
         mode: RobotMode,
         name: str,
-        group: Optional[str] = None,
-        description: Optional[str] = None,
-        text_color: Optional[Color] = None,
-        background_color: Optional[Color] = None,
+        group: str | None = None,
+        description: str | None = None,
+        text_color: Color | None = None,
+        background_color: Color | None = None,
     ) -> None:
         """
         Adds an operating mode option. It's necessary to call publish_opmodes() to

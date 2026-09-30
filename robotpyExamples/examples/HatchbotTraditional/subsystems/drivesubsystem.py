@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 import telemetry
 import wpilib
@@ -67,6 +69,7 @@ class DriveSubsystem(commands2.Subsystem):
         """
         self.drive.set_max_output(max_output)
 
+    @override
     def log_to(self, table: telemetry.TelemetryTable) -> None:
         super().log_to(table)
         table.log("leftDistance", self.left_encoder.get_distance())

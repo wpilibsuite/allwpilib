@@ -5,7 +5,6 @@ import inspect
 import pathlib
 import sys
 import tomllib
-import typing
 
 import wpilib
 
@@ -78,12 +77,12 @@ class RobotTest:
         self,
         main_file: pathlib.Path,
         project_path: pathlib.Path,
-        robot_class: typing.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
         builtin: bool,
-        isolated: typing.Optional[bool],
+        isolated: bool | None,
         coverage_mode: bool,
         verbose: bool,
-        pytest_args: typing.List[str],
+        pytest_args: list[str],
         jobs: int,
     ):
         if isolated is None:
@@ -143,12 +142,12 @@ class RobotTest:
         self,
         main_file: pathlib.Path,
         project_path: pathlib.Path,
-        robot_class: typing.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
         builtin: bool,
         isolated: bool,
         coverage_mode: bool,
         verbose: bool,
-        pytest_args: typing.List[str],
+        pytest_args: list[str],
         jobs: int,
     ):
         # find test directory, change current directory so pytest can find the tests

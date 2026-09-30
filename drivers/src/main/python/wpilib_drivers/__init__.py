@@ -12,6 +12,8 @@ from ._drivers import (
     PWMVictorSPX,
     Spark,
     SparkMini,
+    Talon,
+    VictorSP,
 )
 
 __all__ = [
@@ -25,6 +27,8 @@ __all__ = [
     "PWMVictorSPX",
     "Spark",
     "SparkMini",
+    "Talon",
+    "VictorSP",
 ]
 
 del _init__drivers

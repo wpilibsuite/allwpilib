@@ -6,10 +6,12 @@
 #
 
 import math
+from typing import override
+
 import wpilib
 import wpilib_drivers
-import wpimath.units
 import wpimath
+import wpimath.units
 
 MOTOR_PORT = 0
 ENCODER_A_CHANNEL = 0
@@ -104,6 +106,7 @@ class MyRobot(wpilib.TimedRobot):
         # We go 2 pi radians in 1 rotation, or 4096 counts.
         self.encoder.set_distance_per_pulse(math.tau / 4096)
 
+    @override
     def teleop_init(self) -> None:
         # Reset our loop to make sure it's in a known state.
         self.loop.reset([self.encoder.get_distance(), self.encoder.get_rate()])
@@ -113,6 +116,7 @@ class MyRobot(wpilib.TimedRobot):
             self.encoder.get_distance(), self.encoder.get_rate()
         )
 
+    @override
     def teleop_periodic(self) -> None:
         # Sets the target position of our arm. This is similar to setting the setpoint of a
         # PID controller.

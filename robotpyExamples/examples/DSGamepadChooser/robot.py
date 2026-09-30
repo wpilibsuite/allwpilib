@@ -5,8 +5,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-from hal import RobotMode
+from typing import override
+
 import wpilib
+from hal import RobotMode
 from wpilib.opmodes import OpModeRobot
 
 
@@ -28,15 +30,18 @@ class ScoreAuto(wpilib.PeriodicOpMode):
         self.delay = 0
         self.speed = 0.25
 
-    def disabledPeriodic(self) -> None:
+    @override
+    def disabled_periodic(self) -> None:
         self.chooser.update()
         wpilib.DriverStationDisplay.update_lines()
 
+    @override
     def start(self) -> None:
         self.target = self.chooser.get_selected("Target")
         self.delay = self.chooser.get_selected_integer("Delay")
         self.speed = self.chooser.get_selected_double("Speed")
 
+    @override
     def periodic(self) -> None:
         wpilib.DriverStationDisplay.add_data("Selected Auto", "Score")
         wpilib.DriverStationDisplay.add_data("Target", self.target)
@@ -59,15 +64,18 @@ class BalanceAuto(wpilib.PeriodicOpMode):
         self.attempts = 1
         self.turnScale = 0.5
 
-    def disabledPeriodic(self) -> None:
+    @override
+    def disabled_periodic(self) -> None:
         self.chooser.update()
         wpilib.DriverStationDisplay.update_lines()
 
+    @override
     def start(self) -> None:
         self.approach = self.chooser.get_selected("Approach")
         self.attempts = self.chooser.get_selected_integer("Attempts")
         self.turnScale = self.chooser.get_selected_double("Turn Scale")
 
+    @override
     def periodic(self) -> None:
         wpilib.DriverStationDisplay.add_data("Selected Auto", "Balance")
         wpilib.DriverStationDisplay.add_data("Approach", self.approach)

@@ -1,6 +1,5 @@
 import gc
 import pathlib
-import typing as T
 import weakref
 
 import pytest
@@ -48,7 +47,7 @@ class RobotTestingPlugin(OpModeTestingPlugin):
 
     def __init__(
         self,
-        robot_class: T.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
         robot_file: pathlib.Path,
         isolated: bool,
     ):

@@ -1,8 +1,6 @@
 # validated: 2024-01-19 DS aaea85ff1656 ParallelRaceGroup.java
 from __future__ import annotations
 
-from typing import Set
-
 from .command import Command, InterruptionBehavior
 from .commandscheduler import CommandScheduler
 from .exceptions import IllegalCommandUse
@@ -28,7 +26,7 @@ class ParallelRaceGroup(Command):
         :param commands: the commands to include in this composition.
         """
         super().__init__()
-        self._commands: Set[Command] = set()
+        self._commands: set[Command] = set()
         self._runs_when_disabled = True
         self._finished = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING

@@ -1,7 +1,5 @@
-from typing import Callable, Union
-
-from typing_extensions import TypeAlias
+from collections.abc import Callable
 
 # Type Aliases
-FloatSupplier: TypeAlias = Callable[[], float]
-FloatOrFloatSupplier: TypeAlias = Union[float, Callable[[], float]]
+type FloatSupplier = Callable[[], float]
+type FloatOrFloatSupplier = float | FloatSupplier
