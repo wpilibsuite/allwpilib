@@ -1321,17 +1321,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * Returns the measure with the absolute value closest to positive infinity.
    *
    * @param <U> the type of the units of the measures
+   * @param <T> the common type of the measures
    * @param measures the set of measures to compare
    * @return the measure with the greatest positive magnitude, or null if no measures were provided
    */
   @SafeVarargs
-  static <U extends Unit> Measure<U> max(Measure<U>... measures) {
+  static <U extends Unit, T extends Measure<U>> T max(T... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }
 
-    Measure<U> max = null;
-    for (Measure<U> measure : measures) {
+    T max = null;
+    for (T measure : measures) {
       if (max == null || measure.gt(max)) {
         max = measure;
       }
@@ -1344,17 +1345,18 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * Returns the measure with the absolute value closest to negative infinity.
    *
    * @param <U> the type of the units of the measures
+   * @param <T> the common type of the measures
    * @param measures the set of measures to compare
    * @return the measure with the greatest negative magnitude
    */
   @SafeVarargs
-  static <U extends Unit> Measure<U> min(Measure<U>... measures) {
+  static <U extends Unit, T extends Measure<U>> T min(T... measures) {
     if (measures.length == 0) {
       return null; // nothing to compare
     }
 
-    Measure<U> max = null;
-    for (Measure<U> measure : measures) {
+    T max = null;
+    for (T measure : measures) {
       if (max == null || measure.lt(max)) {
         max = measure;
       }
