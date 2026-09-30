@@ -11,6 +11,7 @@
 #include <future>
 #include <limits>
 #include <memory>
+#include <numbers>
 #include <string>
 #include <vector>
 
@@ -19,12 +20,14 @@
 
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/HAL.h"
+#include "wpi/hal/IMU.h"
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/IMUData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
@@ -36,6 +39,7 @@ namespace {
 
 struct HALSimulationTest {
   HALSimulationTest() {
+    ResetIMU();
     HALSIM_ResetSimDeviceData();
     HALSIM_ResetDriverStationData();
     for (int i = 0; i < HAL_GetNumDigitalChannels(); ++i) {
@@ -49,7 +53,23 @@ struct HALSimulationTest {
     }
   }
 
-  ~HALSimulationTest() { HALSIM_ResetSimDeviceData(); }
+  ~HALSimulationTest() {
+    HALSIM_ResetSimDeviceData();
+    ResetIMU();
+  }
+
+  void ResetIMU() {
+    HALSIM_SetIMUAngleX(0);
+    HALSIM_SetIMUAngleY(0);
+    HALSIM_SetIMUAngleZ(0);
+    HALSIM_SetIMUGyroRateX(0);
+    HALSIM_SetIMUGyroRateY(0);
+    HALSIM_SetIMUGyroRateZ(0);
+    HALSIM_SetIMUAccelX(0);
+    HALSIM_SetIMUAccelY(0);
+    HALSIM_SetIMUAccelZ(0);
+    HALSIM_SetIMUYaw(0);
+  }
 };
 
 struct TestEncoder {
@@ -395,43 +415,52 @@ TEST_CASE_METHOD(HALSimulationTest,
 }
 
 TEST_CASE_METHOD(HALSimulationTest,
-                 "XRP gyro status updates only the XRP SimDevice", "[xrp]") {
+                 "XRP Bluetooth sensor status reaches the onboard IMU",
+                 "[xrp]") {
   XRP xrp;
-  auto packet = MakeStatus(1, STATUS_GYRO, {});
-  const std::array values{1.5f, -2.0f, 3.0f, 45.0f, -90.0f, 180.0f};
-  for (float value : values) {
+  auto other = HAL_CreateSimDevice("Gyro:Other");
+  auto otherAngle =
+      HAL_CreateSimValueDouble(other, "angle_z", HAL_SIM_VALUE_INPUT, 7.0);
+  auto packet = MakeStatus(1, STATUS_GYRO | STATUS_ACCEL, {});
+  for (float value :
+       {90.0f, -180.0f, 270.0f, 30.0f, -45.0f, 450.0f, -0.5f, 0.25f, 1.0f}) {
     std::array<uint8_t, 4> bytes;
     wpi::util::support::endian::write32be(bytes.data(),
                                           std::bit_cast<uint32_t>(value));
     packet.insert(packet.end(), bytes.begin(), bytes.end());
   }
-  // Sensor packets may arrive before the robot program creates its devices.
+  auto truncated = packet;
+  truncated.pop_back();
+  CHECK_FALSE(xrp.HandleXRPUpdate(truncated));
+  int32_t status = 0;
+  HAL_EulerAngles3d angles;
+  HAL_Acceleration3d accel;
+  HAL_GetIMUEulerAnglesFlat(&angles, &status);
+  HAL_GetIMUAcceleration(&accel, &status);
+  CHECK(angles.x == 0);
+  CHECK(accel.x == 0);
+  // Onboard sensor data does not require allocating a SimDevice.
   REQUIRE(xrp.HandleXRPUpdate(packet));
-  auto gyro = HAL_CreateSimDevice("Gyro:XRPGyro");
-  const std::array names{"rate_x",  "rate_y",  "rate_z",
-                         "angle_x", "angle_y", "angle_z"};
-  std::array<HAL_SimValueHandle, 6> handles;
-  for (size_t i = 0; i < handles.size(); ++i) {
-    handles[i] =
-        HAL_CreateSimValueDouble(gyro, names[i], HAL_SIM_VALUE_INPUT, 0.0);
-  }
-  auto other = HAL_CreateSimDevice("Gyro:Other");
-  auto otherAngle =
-      HAL_CreateSimValueDouble(other, "angle_z", HAL_SIM_VALUE_INPUT, 7.0);
-  packet[1] = 2;
-  REQUIRE(xrp.HandleXRPUpdate(packet));
-  for (size_t i = 0; i < handles.size(); ++i) {
-    CHECK(HAL_GetSimValueDouble(handles[i]) == values[i]);
-  }
+  HAL_GetIMUEulerAnglesFlat(&angles, &status);
+  CHECK(angles.x == Catch::Approx(std::numbers::pi / 6));
+  CHECK(angles.y == Catch::Approx(-std::numbers::pi / 4));
+  CHECK(angles.z == Catch::Approx(2.5 * std::numbers::pi));
+  int64_t timestamp = 0;
+  CHECK(HAL_GetIMUYawFlat(&timestamp) == angles.z);
+  HAL_GyroRate3d rates;
+  HAL_GetIMUGyroRates(&rates, &status);
+  CHECK(rates.x == Catch::Approx(std::numbers::pi / 2));
+  CHECK(rates.y == Catch::Approx(-std::numbers::pi));
+  CHECK(rates.z == Catch::Approx(1.5 * std::numbers::pi));
+  HAL_GetIMUAcceleration(&accel, &status);
+  CHECK(accel.x == Catch::Approx(-4.903325));
+  CHECK(accel.y == Catch::Approx(2.4516625));
+  CHECK(accel.z == Catch::Approx(9.80665));
+  auto snapshot = xrp.GetDataSnapshot();
+  CHECK(snapshot.status.gyro.value.angle.z == 450.0f);
+  CHECK(snapshot.status.accel.value.z == 1.0f);
   CHECK(HAL_GetSimValueDouble(otherAngle) == 7.0);
-
-  HAL_FreeSimDevice(gyro);
-  auto replacement = HAL_CreateSimDevice("Gyro:XRPGyro");
-  auto angle = HAL_CreateSimValueDouble(replacement, "angle_z",
-                                        HAL_SIM_VALUE_INPUT, 0.0);
-  packet[1] = 3;
-  REQUIRE(xrp.HandleXRPUpdate(packet));
-  CHECK(HAL_GetSimValueDouble(angle) == 180.0);
+  CHECK(status == 0);
 }
 
 TEST_CASE_METHOD(HALSimulationTest,

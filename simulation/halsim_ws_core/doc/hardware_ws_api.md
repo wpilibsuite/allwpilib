@@ -179,11 +179,35 @@ A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 | ``">rate"``              | Float   | Encoder rate in distance units per second           |
 | ``"<reverse_direction"`` | Boolean | If the encoder direction should be inverted         |
 
+#### Onboard accelerometer ("Accel")
+
+[``"Accel"``]:#onboard-accelerometer-accel
+
+The ``BuiltInAccel`` device supplies the Romi onboard IMU acceleration.
+The extension sends ``<init: true`` and ``<range: 8`` on each connection, so
+existing Romi firmware streams acceleration without a separate accelerometer object.
+The wire values are in g; ``OnboardIMU`` returns meters per second squared,
+including gravity.
+
+| Data Key       | Type    | Description                  |
+| -------------- | ------- | ---------------------------- |
+| ``"<init"``    | Boolean | Sensor is initialized        |
+| ``"<range"``   | Float   | Accelerometer range in g     |
+| ``">x"``       | Float   | X-axis acceleration in g     |
+| ``">y"``       | Float   | Y-axis acceleration in g     |
+| ``">z"``       | Float   | Z-axis acceleration in g     |
+
 #### Gyro ("Gyro")
 
 [``"Gyro"``]:#gyro-gyro
 
 A single axis or 3-axis gyro.  Single axis gyros only use the X angle parameter.
+
+The ``RomiGyro`` device feeds ``OnboardIMU``. The extension
+initializes the device on connection and converts degrees and
+degrees/second to radians and radians/second. The continuous Z angle also
+supplies yaw. Use the ``FLAT`` mount orientation for Romi; sensor axes
+retain the firmware convention.
 
 C++/Java implementation note: these can be created created as SimDevice nodes where the device name is prefixed by ``"Gyro:"``. For example, the device ``"Gyro:ADXRS450[1]"`` would have a device value of ``ADXRS450[1]``.
 

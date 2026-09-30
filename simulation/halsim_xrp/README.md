@@ -4,9 +4,9 @@ This is an extension that provides a client version of the XRP protocol for tran
 
 The client reads simulated HAL outputs after each simulation periodic cycle and
 writes incoming sensor data directly to HAL simulation. It does not require the
-HALSim websocket providers. XRP motor, servo, and gyro values use the SimDevices
-created by the XRP vendor library; digital I/O, analog inputs, and encoders use
-the corresponding HAL simulation data.
+HALSim websocket providers. XRP motor and servo values use the SimDevices
+created by the XRP vendor library; digital I/O, analog inputs, encoders, and the
+onboard IMU use the corresponding HAL simulation data.
 
 ## Configuration
 
@@ -191,6 +191,15 @@ A device name control packet must use only field bit 15. The payload may contain
 | 9     | AnalogIn 2   | _uint16_t_ value |
 | 10    | Timing       | _uint16_t_ last control sequence, _uint16_t_ control receive age in 10 us units |
 | 11    | Command ACK  | _uint16_t_ control sequence, _uint16_t_ control field mask, _uint8_t_ result |
+
+The gyro and accelerometer status fields update `OnboardIMU` as well as the
+Bluetooth GUI. Use `OnboardIMU` with the `FLAT` mount orientation to read
+angles, angular rates, and acceleration.
+Wire angles and rates are in degrees and degrees/second, and acceleration is
+in g. `OnboardIMU` returns radians, radians/second, and meters/second squared,
+respectively. Sensor axes retain the firmware convention, and the continuous
+Z angle supplies yaw. Call `resetYaw()` / `ResetYaw()` / `reset_yaw()` to reset
+the heading without changing the raw X/Y/Z angles.
 
 XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`. Command ACKs use bit 11; result `0` is success and result `1` is rejected. Rename ACKs are sent alone; identify ACKs are appended to normal sensor status.
 

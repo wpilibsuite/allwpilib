@@ -9,7 +9,14 @@ import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 
-/** Systemcore onboard IMU. */
+/**
+ * Onboard IMU for Systemcore, Romi, and XRP.
+ *
+ * <p>For Romi and XRP, use {@link MountOrientation#FLAT}. Sensor axes follow the firmware's
+ * convention, with yaw taken from the continuous Z angle. The simulation extension supplies the
+ * sensor data; no separate gyro object is required. Acceleration is in meters per second squared,
+ * including gravity.
+ */
 public class OnboardIMU {
   /** A mount orientation of Systemcore. */
   public enum MountOrientation {
@@ -22,9 +29,10 @@ public class OnboardIMU {
   }
 
   /**
-   * Constructs a handle to the Systemcore onboard IMU.
+   * Constructs a handle to the onboard IMU.
    *
-   * @param mountOrientation the mount orientation of Systemcore to determine yaw.
+   * @param mountOrientation the mount orientation of Systemcore to determine yaw; use FLAT for Romi
+   *     and XRP.
    */
   public OnboardIMU(MountOrientation mountOrientation) {
     m_mountOrientation = mountOrientation;
@@ -140,18 +148,18 @@ public class OnboardIMU {
   }
 
   /**
-   * Get the acceleration along the X axis of the IMU in meters per second squared.
+   * Get the acceleration along the Y axis of the IMU in meters per second squared.
    *
-   * @return acceleration along the X axis in meters per second squared
+   * @return acceleration along the Y axis in meters per second squared
    */
   public double getAccelY() {
     return getRawAccels()[1];
   }
 
   /**
-   * Get the acceleration along the X axis of the IMU in meters per second squared.
+   * Get the acceleration along the Z axis of the IMU in meters per second squared.
    *
-   * @return acceleration along the X axis in meters per second squared
+   * @return acceleration along the Z axis in meters per second squared
    */
   public double getAccelZ() {
     return getRawAccels()[2];

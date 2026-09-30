@@ -10,6 +10,7 @@
 #include <cmath>
 #include <limits>
 #include <mutex>
+#include <numbers>
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/SimDevice.h"
@@ -17,6 +18,7 @@
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/IMUData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/Endian.hpp"
 
@@ -100,13 +102,6 @@ float GetSimDouble(const char* deviceName, const char* valueName,
   auto device = HALSIM_GetSimDeviceHandle(deviceName);
   auto value = HALSIM_GetSimValueHandle(device, valueName);
   return value ? HAL_GetSimValueDouble(value) : defaultValue;
-}
-
-void SetSimDouble(HAL_SimDeviceHandle device, const char* valueName,
-                  double value) {
-  if (auto handle = HALSIM_GetSimValueHandle(device, valueName)) {
-    HAL_SetSimValueDouble(handle, value);
-  }
 }
 
 }  // namespace
@@ -433,13 +428,14 @@ void XRP::ReadGyroData(std::span<const uint8_t> packet) {
     gyro.lastUpdate = std::chrono::steady_clock::now();
   }
 
-  auto device = HALSIM_GetSimDeviceHandle("Gyro:XRPGyro");
-  SetSimDouble(device, "rate_x", rate_x);
-  SetSimDouble(device, "rate_y", rate_y);
-  SetSimDouble(device, "rate_z", rate_z);
-  SetSimDouble(device, "angle_x", angle_x);
-  SetSimDouble(device, "angle_y", angle_y);
-  SetSimDouble(device, "angle_z", angle_z);
+  constexpr double DEGREES_TO_RADIANS = std::numbers::pi / 180.0;
+  HALSIM_SetIMUGyroRateX(rate_x * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUGyroRateY(rate_y * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUGyroRateZ(rate_z * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUAngleX(angle_x * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUAngleY(angle_y * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUAngleZ(angle_z * DEGREES_TO_RADIANS);
+  HALSIM_SetIMUYaw(angle_z * DEGREES_TO_RADIANS);
 }
 
 void XRP::ReadAccelData(std::span<const uint8_t> packet) {
@@ -447,12 +443,21 @@ void XRP::ReadAccelData(std::span<const uint8_t> packet) {
     return;
   }
 
-  std::scoped_lock lock(m_data_snapshot_mutex);
-  auto& accel = m_data_snapshot.status.accel;
-  accel.value = {ReadFloat(packet, 0), ReadFloat(packet, 4),
-                 ReadFloat(packet, 8)};
-  accel.present = true;
-  accel.lastUpdate = std::chrono::steady_clock::now();
+  float accel_x = ReadFloat(packet, 0);
+  float accel_y = ReadFloat(packet, 4);
+  float accel_z = ReadFloat(packet, 8);
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    auto& accel = m_data_snapshot.status.accel;
+    accel.value = {accel_x, accel_y, accel_z};
+    accel.present = true;
+    accel.lastUpdate = std::chrono::steady_clock::now();
+  }
+
+  constexpr double STANDARD_GRAVITY = 9.80665;
+  HALSIM_SetIMUAccelX(accel_x * STANDARD_GRAVITY);
+  HALSIM_SetIMUAccelY(accel_y * STANDARD_GRAVITY);
+  HALSIM_SetIMUAccelZ(accel_z * STANDARD_GRAVITY);
 }
 
 void XRP::ReadDIOData(uint8_t presentMask, uint8_t valueMask) {

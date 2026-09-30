@@ -64,6 +64,37 @@ components:
             - $ref: "#/components/schemas/simdeviceData"
 
   schemas:
+    accelData:
+      type: object
+      required:
+      - type
+      - device
+      properties:
+        type:
+          type: string
+          const: Accel
+        device:
+          type: string
+          description: "Accelerometer device name; BuiltInAccel feeds OnboardIMU"
+        data:
+          type: object
+          properties:
+            <init:
+              type: boolean
+              description: "If the sensor is initialized"
+            <range:
+              type: number
+              description: "Accelerometer range in g"
+            ">x":
+              type: number
+              description: "X-axis acceleration in g, including gravity"
+            ">y":
+              type: number
+              description: "Y-axis acceleration in g, including gravity"
+            ">z":
+              type: number
+              description: "Z-axis acceleration in g, including gravity"
+
     addressableLEDData:
       type: object
       required:

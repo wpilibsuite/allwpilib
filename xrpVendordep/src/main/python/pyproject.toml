@@ -67,7 +67,6 @@ depends = ["wpilib", "wpimath"]
 
 [tool.semiwrap.extension_modules."xrp._xrp".headers]
 # wpi/xrp
-XRPGyro = "wpi/xrp/XRPGyro.hpp"
 XRPMotor = "wpi/xrp/XRPMotor.hpp"
 XRPOnBoardIO = "wpi/xrp/XRPOnBoardIO.hpp"
 XRPRangefinder = "wpi/xrp/XRPRangefinder.hpp"

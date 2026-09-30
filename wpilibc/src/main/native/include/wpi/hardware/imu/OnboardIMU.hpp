@@ -13,7 +13,12 @@
 namespace wpi {
 
 /**
- * Systemcore onboard IMU
+ * Onboard IMU for Systemcore, Romi, and XRP.
+ *
+ * For Romi and XRP, use FLAT. Sensor axes follow the firmware's convention,
+ * with yaw taken from the continuous Z angle. The simulation extension
+ * supplies the sensor data; no separate gyro object is required.
+ * Acceleration includes gravity.
  */
 class OnboardIMU {
  public:
@@ -32,9 +37,9 @@ class OnboardIMU {
   };
 
   /**
-   * Constructs a handle to the Systemcore onboard IMU.
+   * Constructs a handle to the onboard IMU.
    * @param mountOrientation the mount orientation of Systemcore to determine
-   * yaw.
+   * yaw; use FLAT for Romi and XRP.
    */
   explicit OnboardIMU(MountOrientation mountOrientation);
 
@@ -114,8 +119,8 @@ class OnboardIMU {
   wpi::units::meters_per_second_squared_t GetAccelX();
 
   /**
-   * Get the acceleration along the Z axis of the IMU.
-   * @return acceleration along the Z axis
+   * Get the acceleration along the Y axis of the IMU.
+   * @return acceleration along the Y axis
    */
   wpi::units::meters_per_second_squared_t GetAccelY();
 
