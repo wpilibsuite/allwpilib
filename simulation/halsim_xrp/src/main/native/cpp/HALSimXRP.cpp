@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <memory>
 #include <optional>
-#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -18,9 +17,9 @@
 #include <vector>
 
 #include "wpi/gui/wpigui.hpp"
+#include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 #include "wpi/util/print.hpp"
@@ -242,12 +241,7 @@ std::optional<CommandAck> ReadCommandAck(std::span<const uint8_t> packet) {
 
 }  // namespace
 
-HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
-                     wpilibws::ProviderContainer& providers,
-                     wpilibws::HALSimWSProviderSimDevices& simDevicesProvider)
-    : m_loop(loop),
-      m_providers(providers),
-      m_simDevicesProvider(simDevicesProvider) {
+HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop) : m_loop(loop) {
   m_loop.error.connect([](uv::Error err) {
     wpi::util::print(stderr, "HALSim XRP Client libuv Error: {}\n", err.str());
   });
@@ -259,6 +253,7 @@ HALSimXRP::HALSimXRP(wpi::net::uv::Loop& loop,
 }
 
 HALSimXRP::~HALSimXRP() {
+  HALSIM_CancelSimPeriodicAfterCallback(m_simPeriodicAfterCallback);
   CompletePendingCommand(false);
 }
 
@@ -333,12 +328,6 @@ bool HALSimXRP::Initialize() {
     }
   }
 
-  wpilibxrp::WPILibUpdateFunc func = [&](const wpi::util::json& data) {
-    OnNetValueChanged(data);
-  };
-
-  m_xrp.SetWPILibUpdateFunc(func);
-
   wpi::util::println(
       "HALSimXRP Bluetooth transport: LE L2CAP Credit-Based Mode PSM 0x{:04x} "
       "with GATT fallback",
@@ -362,7 +351,17 @@ bool HALSimXRP::Initialize() {
 }
 
 void HALSimXRP::Start() {
-  RegisterSimProviders();
+  if (m_simPeriodicAfterCallback == 0) {
+    m_simPeriodicAfterCallback = HALSIM_RegisterSimPeriodicAfterCallback(
+        [](void* param) {
+          if (auto self =
+                  static_cast<HALSimXRP*>(param)->weak_from_this().lock()) {
+            // Keep control packets and device commands ordered on the loop.
+            self->m_exec->Send([self] { self->SendStateToXRP(); });
+          }
+        },
+        this);
+  }
 
   if (!m_targetAddress.empty() && m_bluetoothClient &&
       m_bluetoothClient->GetStatus().supported) {
@@ -370,20 +369,6 @@ void HALSimXRP::Start() {
   }
 
   std::puts("HALSimXRP Initialized");
-}
-
-void HALSimXRP::RegisterSimProviders() {
-  if (m_providersConnected) {
-    return;
-  }
-
-  auto hws = shared_from_this();
-  m_simDevicesProvider.OnNetworkConnected(hws);
-  m_providers.ForEach(
-      [hws](std::shared_ptr<wpilibws::HALSimWSBaseProvider> provider) {
-        provider->OnNetworkConnected(hws);
-      });
-  m_providersConnected = true;
 }
 
 void HALSimXRP::ConnectBluetooth(std::string address,
@@ -553,43 +538,6 @@ void HALSimXRP::ParsePacket(std::span<const uint8_t> packet) {
   UpdateLatencyFromXRP(packet);
   UpdateCommandAckFromXRP(packet);
   CheckPendingCommandTimeout();
-}
-
-void HALSimXRP::OnNetValueChanged(const wpi::util::json& msg) {
-  try {
-    auto& type = msg.at("type").get_string();
-    auto& device = msg.at("device").get_string();
-
-    wpi::util::SmallString<64> key;
-    key.append(type);
-    if (!device.empty()) {
-      key.append("/");
-      key.append(device);
-    }
-
-    auto provider = m_providers.Get(key.str());
-    if (provider) {
-      provider->OnNetValueChanged(msg.at("data"));
-    }
-  } catch (std::logic_error& e) {
-    wpi::util::print(stderr, "Error with incoming message: {}\n", e.what());
-  }
-}
-
-void HALSimXRP::OnSimValueChanged(const wpi::util::json& simData) {
-  // HAL callbacks may originate on several threads. Keep XRP state and all
-  // packet generation on the loop so commands and control packets stay ordered.
-  m_exec->Send([self = shared_from_this(), simData] {
-    auto type = simData.lookup("type");
-    if (type && type->is_string() && type->get_string() == "HAL") {
-      auto halData = simData.lookup("data");
-      if (halData && halData->contains(">sim_periodic_after")) {
-        self->SendStateToXRP();
-      }
-    } else {
-      self->m_xrp.HandleWPILibUpdate(simData);
-    }
-  });
 }
 
 uv::SimpleBufferPool<4>& HALSimXRP::GetBufferPool() {

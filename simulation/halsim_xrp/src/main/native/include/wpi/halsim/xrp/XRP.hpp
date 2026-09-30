@@ -5,23 +5,18 @@
 #pragma once
 
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstdint>
-#include <functional>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <span>
-#include <string>
+#include <string_view>
 
 #include "wpi/net/raw_uv_ostream.hpp"
 
-namespace wpi::util {
-class json;
-}  // namespace wpi::util
-
 namespace wpilibxrp {
-
-using WPILibUpdateFunc = std::function<void(const wpi::util::json&)>;
 
 constexpr int PACKET_HEADER_SIZE = 5;
 constexpr uint32_t ENCODER_PERIOD_DENOMINATOR = 1000000;
@@ -130,16 +125,34 @@ struct XRPDataSnapshot {
 
 class XRP {
  public:
+  /** Registers HAL simulation callbacks for encoder reset offsets. */
   XRP();
+  /** Cancels HAL simulation callbacks. */
+  ~XRP();
+  XRP(const XRP&) = delete;
+  XRP& operator=(const XRP&) = delete;
 
-  void SetWPILibUpdateFunc(WPILibUpdateFunc func) {
-    m_wpilib_update_func = func;
-  }
-
-  void HandleWPILibUpdate(const wpi::util::json& data);
+  /**
+   * Applies an XRP status packet directly to HAL simulation.
+   *
+   * @param packet XRP status packet.
+   * @return True if the packet is valid and newer than the last status packet.
+   */
   bool HandleXRPUpdate(std::span<const uint8_t> packet);
 
+  /**
+   * Reads HAL simulation outputs and encodes an XRP control packet.
+   *
+   * @param buf output stream for the control packet.
+   */
   void SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf);
+  /**
+   * Encodes a request to rename the connected XRP.
+   *
+   * @param buf output stream for the rename command.
+   * @param deviceName Bluetooth name or suffix to send to the firmware.
+   * @return Control sequence number used for the command acknowledgement.
+   */
   uint16_t SetupRenameDeviceBuffer(wpi::net::raw_uv_ostream& buf,
                                    std::string_view deviceName);
 
@@ -172,13 +185,7 @@ class XRP {
   void SetupDigitalOutFields(wpi::net::raw_uv_ostream& buf, uint16_t fieldMask);
   void RecordControlData(uint16_t fieldMask);
 
-  // WPILib Sim Update Handlers
-  void HandleDriverStationSimValueChanged(const wpi::util::json& data);
-  void HandleMotorSimValueChanged(const wpi::util::json& data);
-  void HandleServoSimValueChanged(const wpi::util::json& data);
-  void HandleDIOSimValueChanged(const wpi::util::json& data);
-  void HandleGyroSimValueChanged(const wpi::util::json& data);
-  void HandleEncoderSimValueChanged(const wpi::util::json& data);
+  void ReadHALOutputs();
 
   // XRP Packet Update Handlers
   void ReadGyroData(std::span<const uint8_t> packet);
@@ -193,16 +200,13 @@ class XRP {
   std::map<uint8_t, float> m_motor_outputs;
   std::map<uint8_t, float> m_servo_outputs;
 
-  // Might not need these
-  std::map<uint8_t, bool> m_digital_inputs;
-  std::map<uint8_t, float> m_analog_inputs;
-  std::map<uint8_t, int32_t> m_encoder_inputs;
-
-  // We need a map from XRP encoder channels (0=left, 1=right etc)
-  // to WPILib device ID
-  // Key: XRP encoder number, Value: WPILib channel
-  // If no encoders are init-ed, this map is empty
-  std::map<uint8_t, uint8_t> m_encoder_channel_map;
+  struct EncoderSimData {
+    int32_t index = 0;
+    int32_t initializedCallback = 0;
+    int32_t resetCallback = 0;
+    std::atomic<int32_t> countOffset{0};
+  };
+  std::unique_ptr<EncoderSimData[]> m_encoders;
 
   uint16_t m_wpilib_bound_seq = 0;
   bool m_have_wpilib_bound_seq = false;
@@ -210,12 +214,8 @@ class XRP {
 
   bool m_robot_enabled = false;
 
-  std::string m_gyro_name;
-
   mutable std::mutex m_data_snapshot_mutex;
   XRPDataSnapshot m_data_snapshot;
-
-  WPILibUpdateFunc m_wpilib_update_func;
 };
 
 }  // namespace wpilibxrp

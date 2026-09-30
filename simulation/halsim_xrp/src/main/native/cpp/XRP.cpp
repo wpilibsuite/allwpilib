@@ -10,11 +10,15 @@
 #include <cmath>
 #include <limits>
 #include <mutex>
-#include <string>
-#include <utility>
 
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/AnalogInData.h"
+#include "wpi/hal/simulation/DIOData.h"
+#include "wpi/hal/simulation/DriverStationData.h"
+#include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/Endian.hpp"
-#include "wpi/util/json.hpp"
 
 using namespace wpilibxrp;
 
@@ -91,45 +95,52 @@ uint8_t EncodeServoOutput(float value) {
                               SERVO_MAX_DEGREES);
 }
 
+float GetSimDouble(const char* deviceName, const char* valueName,
+                   float defaultValue) {
+  auto device = HALSIM_GetSimDeviceHandle(deviceName);
+  auto value = HALSIM_GetSimValueHandle(device, valueName);
+  return value ? HAL_GetSimValueDouble(value) : defaultValue;
+}
+
+void SetSimDouble(HAL_SimDeviceHandle device, const char* valueName,
+                  double value) {
+  if (auto handle = HALSIM_GetSimValueHandle(device, valueName)) {
+    HAL_SetSimValueDouble(handle, value);
+  }
+}
+
 }  // namespace
 
 XRP::XRP()
-    : m_gyro_name{"XRPGyro"},
-      m_wpilib_update_func([](const wpi::util::json&) {}) {
-  // Set up the inputs and outputs
-  m_motor_outputs.emplace(0, 0.0f);
-  m_motor_outputs.emplace(1, 0.0f);
-  m_motor_outputs.emplace(2, 0.0f);
-  m_motor_outputs.emplace(3, 0.0f);
-
-  m_servo_outputs.emplace(4, 0.5f);
-  m_servo_outputs.emplace(5, 0.5f);
-
-  m_encoder_inputs.emplace(1, 0);
-  m_encoder_inputs.emplace(2, 0);
-  m_encoder_inputs.emplace(0, 0);
-  m_encoder_inputs.emplace(3, 0);
+    : m_encoders{std::make_unique<EncoderSimData[]>(HAL_GetNumEncoders())} {
+  for (int i = 0; i < HAL_GetNumEncoders(); ++i) {
+    auto& encoder = m_encoders[i];
+    encoder.index = i;
+    encoder.initializedCallback = HALSIM_RegisterEncoderInitializedCallback(
+        i,
+        [](const char*, void* param, const HAL_Value*) {
+          static_cast<EncoderSimData*>(param)->countOffset = 0;
+        },
+        &encoder, false);
+    encoder.resetCallback = HALSIM_RegisterEncoderResetCallback(
+        i,
+        [](const char*, void* param, const HAL_Value* value) {
+          if (value->data.v_boolean) {
+            auto& encoder = *static_cast<EncoderSimData*>(param);
+            // HAL calls this before zeroing the simulated encoder count.
+            encoder.countOffset.fetch_add(
+                HALSIM_GetEncoderCount(encoder.index));
+          }
+        },
+        &encoder, false);
+  }
 }
 
-void XRP::HandleWPILibUpdate(const wpi::util::json& data) {
-  auto type = data.lookup("type");
-  if (!type || !type->is_string()) {
-    return;
-  }
-
-  auto& typeStr = type->get_string();
-  if (typeStr == "DriverStation") {
-    HandleDriverStationSimValueChanged(data);
-  } else if (typeStr == "XRPMotor") {
-    HandleMotorSimValueChanged(data);
-  } else if (typeStr == "XRPServo") {
-    HandleServoSimValueChanged(data);
-  } else if (typeStr == "DIO") {
-    HandleDIOSimValueChanged(data);
-  } else if (typeStr == "Gyro") {
-    HandleGyroSimValueChanged(data);
-  } else if (typeStr == "Encoder") {
-    HandleEncoderSimValueChanged(data);
+XRP::~XRP() {
+  for (int i = 0; i < HAL_GetNumEncoders(); ++i) {
+    HALSIM_CancelEncoderInitializedCallback(i,
+                                            m_encoders[i].initializedCallback);
+    HALSIM_CancelEncoderResetCallback(i, m_encoders[i].resetCallback);
   }
 }
 
@@ -206,6 +217,7 @@ bool XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
 }
 
 void XRP::SetupXRPSendBuffer(wpi::net::raw_uv_ostream& buf) {
+  ReadHALOutputs();
   uint16_t fieldMask = GetControlFieldMask();
   SetupSendHeader(buf, fieldMask);
   SetupMotorFields(buf, fieldMask);
@@ -245,166 +257,30 @@ XRPDataSnapshot XRP::GetDataSnapshot() const {
   return m_data_snapshot;
 }
 
-// WPILib Sim Handlers
-void XRP::HandleDriverStationSimValueChanged(const wpi::util::json& data) {
-  auto dsData = data.lookup("data");
-  if (!dsData || !dsData->is_object()) {
-    return;
-  }
-  auto enabled = dsData->lookup(">enabled");
-  if (enabled && enabled->is_bool()) {
-    m_robot_enabled = enabled->get_bool();
-  }
-}
-
-void XRP::HandleMotorSimValueChanged(const wpi::util::json& data) {
-  int deviceId = -1;
-  auto motorData = data.lookup("data");
-  if (!motorData || !motorData->is_object()) {
-    return;
+void XRP::ReadHALOutputs() {
+  constexpr std::array MOTOR_NAMES{"XRPMotor:motorL", "XRPMotor:motorR",
+                                   "XRPMotor:motor3", "XRPMotor:motor4"};
+  constexpr std::array SERVO_NAMES{"XRPServo:servo1", "XRPServo:servo2",
+                                   "XRPServo:servo3", "XRPServo:servo4"};
+  for (int channel = 0; channel < 4; ++channel) {
+    m_motor_outputs[channel] =
+        GetSimDouble(MOTOR_NAMES[channel], "throttle", 0.0f);
   }
 
-  auto device = data.lookup("device");
-  if (!device || !device->is_string()) {
-    return;
+  m_servo_outputs.clear();
+  for (int channel = 0; channel < 4; ++channel) {
+    // Preserve the two onboard servos' neutral defaults without requiring a
+    // robot program to allocate them. Additional servos are sent when present.
+    if (channel < 2 || HALSIM_GetSimDeviceHandle(SERVO_NAMES[channel])) {
+      m_servo_outputs[channel + 4] =
+          GetSimDouble(SERVO_NAMES[channel], "position", 0.5f);
+    }
   }
 
-  auto& deviceStr = device->get_string();
-  if (deviceStr == "motorL") {
-    deviceId = 0;
-  } else if (deviceStr == "motorR") {
-    deviceId = 1;
-  } else if (deviceStr == "motor3") {
-    deviceId = 2;
-  } else if (deviceStr == "motor4") {
-    deviceId = 3;
-  }
-
-  auto throttle = motorData->lookup("<throttle");
-  if (deviceId != -1 && throttle && throttle->is_number()) {
-    m_motor_outputs[deviceId] = throttle->get_number();
-  }
-}
-
-void XRP::HandleServoSimValueChanged(const wpi::util::json& data) {
-  int deviceId = -1;
-  auto servoData = data.lookup("data");
-  if (!servoData || !servoData->is_object()) {
-    return;
-  }
-
-  auto device = data.lookup("device");
-  if (!device || !device->is_string()) {
-    return;
-  }
-
-  auto& deviceStr = device->get_string();
-  if (deviceStr == "servo1") {
-    deviceId = 4;
-  } else if (deviceStr == "servo2") {
-    deviceId = 5;
-  } else if (deviceStr == "servo3") {
-    deviceId = 6;
-  } else if (deviceStr == "servo4") {
-    deviceId = 7;
-  }
-
-  auto position = servoData->lookup("<position");
-  if (deviceId != -1 && position && position->is_number()) {
-    m_servo_outputs[deviceId] = position->get_number();
-  }
-}
-
-void XRP::HandleDIOSimValueChanged(const wpi::util::json& data) {
-  int deviceId = -1;
-  auto dioData = data.lookup("data");
-
-  auto device = data.lookup("device");
-  if (!device || !device->is_string()) {
-    return;
-  }
-  try {
-    deviceId = std::stoi(device->get_string());
-  } catch (const std::invalid_argument&) {
-    deviceId = -1;
-  }
-
-  // Bail out early if device ID is invalid or if it's "spoken for"
-  if (deviceId == -1) {
-    return;
-  }
-
-  auto init = dioData->lookup("<init");
-  if (init && init->is_bool() && init->get_bool()) {
-    // All DIOs are initialized as inputs by default
-    m_digital_inputs.emplace(deviceId, false);
-  }
-
-  auto input = dioData->lookup("<input");
-  if (input && input->is_bool() && !input->get_bool()) {
-    // We're registering an output device
-    // Remove from the digital inputs list (if present)
-    m_digital_inputs.erase(deviceId);
-    m_digital_outputs.emplace(deviceId, false);
-  }
-
-  auto value = dioData->lookup("<>value");
-  if (value && value->is_bool() && m_digital_outputs.count(deviceId) > 0) {
-    m_digital_outputs[deviceId] = value->get_bool();
-  }
-}
-
-void XRP::HandleGyroSimValueChanged(const wpi::util::json& data) {
-  auto name = data.lookup("device");
-  if (name && name->is_string()) {
-    m_gyro_name = name->get_string();
-  }
-}
-
-void XRP::HandleEncoderSimValueChanged(const wpi::util::json& data) {
-  // We need to handle the various encoder cases
-  // 4/5 -> Encoder 0
-  // 6/7 -> Encoder 1
-  // 8/9 -> Encoder 2
-  // 10/11 -> Encoder 3
-  int deviceId = -1;
-  auto encData = data.lookup("data");
-  if (!encData || !encData->is_object()) {
-    return;
-  }
-
-  auto device = data.lookup("device");
-  if (!device || !device->is_string()) {
-    return;
-  }
-
-  try {
-    deviceId = std::stoi(device->get_string());
-  } catch (const std::invalid_argument&) {
-    deviceId = -1;
-  }
-
-  if (deviceId == -1) {
-    return;
-  }
-
-  auto init = encData->lookup("<init");
-  auto jchA = encData->lookup("<channel_a");
-  auto jchB = encData->lookup("<channel_b");
-  if (init && init->is_bool() && init->get_bool() && jchA && jchA->is_int() &&
-      jchB && jchB->is_int()) {
-    // The <channel_a and <channel_b values come with the init message
-    int chA = jchA->get_int();
-    int chB = jchB->get_int();
-
-    if ((chA == 4 && chB == 5) || (chA == 5 && chB == 4)) {
-      m_encoder_channel_map.emplace(0, deviceId);
-    } else if ((chA == 6 && chB == 7) || (chA == 7 && chB == 6)) {
-      m_encoder_channel_map.emplace(1, deviceId);
-    } else if ((chA == 8 && chB == 9) || (chA == 9 && chB == 8)) {
-      m_encoder_channel_map.emplace(2, deviceId);
-    } else if ((chA == 10 && chB == 11) || (chA == 11 && chB == 10)) {
-      m_encoder_channel_map.emplace(3, deviceId);
+  m_digital_outputs.clear();
+  for (int channel = 0; channel < 8; ++channel) {
+    if (HALSIM_GetDIOInitialized(channel) && !HALSIM_GetDIOIsInput(channel)) {
+      m_digital_outputs[channel] = HALSIM_GetDIOValue(channel);
     }
   }
 }
@@ -442,6 +318,7 @@ uint16_t XRP::GetControlFieldMask() const {
 }
 
 void XRP::SetupSendHeader(wpi::net::raw_uv_ostream& buf, uint16_t fieldMask) {
+  m_robot_enabled = HALSIM_GetDriverStationEnabled();
   uint8_t pktSeq[2];
   wpi::util::support::endian::write16be(pktSeq, m_xrp_bound_seq);
 
@@ -556,21 +433,13 @@ void XRP::ReadGyroData(std::span<const uint8_t> packet) {
     gyro.lastUpdate = std::chrono::steady_clock::now();
   }
 
-  // Make the json object
-  wpi::util::json gyroJson;
-  gyroJson["type"] = "Gyro";
-  gyroJson["device"] = m_gyro_name;
-  auto data = wpi::util::json::object();
-  data[">rate_x"] = rate_x;
-  data[">rate_y"] = rate_y;
-  data[">rate_z"] = rate_z;
-  data[">angle_x"] = angle_x;
-  data[">angle_y"] = angle_y;
-  data[">angle_z"] = angle_z;
-  gyroJson["data"] = std::move(data);
-
-  // Update WPILib
-  m_wpilib_update_func(gyroJson);
+  auto device = HALSIM_GetSimDeviceHandle("Gyro:XRPGyro");
+  SetSimDouble(device, "rate_x", rate_x);
+  SetSimDouble(device, "rate_y", rate_y);
+  SetSimDouble(device, "rate_z", rate_z);
+  SetSimDouble(device, "angle_x", angle_x);
+  SetSimDouble(device, "angle_y", angle_y);
+  SetSimDouble(device, "angle_z", angle_z);
 }
 
 void XRP::ReadAccelData(std::span<const uint8_t> packet) {
@@ -607,13 +476,9 @@ void XRP::ReadDIOData(uint8_t presentMask, uint8_t valueMask) {
     if ((presentMask & bit) == 0) {
       continue;
     }
-    wpi::util::json dioJson;
-    dioJson["type"] = "DIO";
-    dioJson["device"] = std::to_string(channel);
-    dioJson["data"] =
-        wpi::util::json::object("<>value", (valueMask & bit) != 0);
-
-    m_wpilib_update_func(dioJson);
+    if (HALSIM_GetDIOInitialized(channel) && HALSIM_GetDIOIsInput(channel)) {
+      HALSIM_SetDIOValue(channel, (valueMask & bit) != 0);
+    }
   }
 }
 
@@ -647,22 +512,26 @@ void XRP::ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet) {
     encoder.lastUpdate = std::chrono::steady_clock::now();
   }
 
-  // Look up the registered encoders
-  if (m_encoder_channel_map.count(encoderId) == 0) {
+  int channelA = 4 + 2 * encoderId;
+  int channelB = channelA + 1;
+  int index = HALSIM_FindEncoderForChannel(channelA);
+  if (index < 0) {
+    return;
+  }
+  int a = HALSIM_GetEncoderDigitalChannelA(index);
+  int b = HALSIM_GetEncoderDigitalChannelB(index);
+  if (!((a == channelA && b == channelB) || (a == channelB && b == channelA))) {
     return;
   }
 
-  uint8_t wpilibEncoderChannel = m_encoder_channel_map[encoderId];
-
-  wpi::util::json encJson;
-  encJson["type"] = "Encoder";
-  encJson["device"] = std::to_string(wpilibEncoderChannel);
-  encJson["data"] = wpi::util::json::object(">count", count);
-
+  auto offset = m_encoders[index].countOffset.load();
+  HALSIM_SetEncoderCount(index,
+                         static_cast<int32_t>(static_cast<uint32_t>(count) -
+                                              static_cast<uint32_t>(offset)));
   if (encoderData.periodValid) {
-    encJson["data"][">period"] = encoderData.period;
+    HALSIM_SetEncoderRate(
+        index, HALSIM_GetEncoderDistancePerPulse(index) / encoderData.period);
   }
-  m_wpilib_update_func(encJson);
 }
 
 void XRP::ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet) {
@@ -681,12 +550,7 @@ void XRP::ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet) {
     analogInput.lastUpdate = std::chrono::steady_clock::now();
   }
 
-  wpi::util::json analogJson;
-  analogJson["type"] = "AI";
-  analogJson["device"] = std::to_string(analogId);
-  analogJson["data"] = wpi::util::json::object(">voltage", voltage);
-
-  m_wpilib_update_func(analogJson);
+  HALSIM_SetAnalogInVoltage(analogId, voltage);
 }
 
 void XRP::ReadCommandAckData(std::span<const uint8_t> packet) {

@@ -2,6 +2,12 @@
 
 This is an extension that provides a client version of the XRP protocol for transmitting robot hardware interface state to an XRP robot over Bluetooth LE.
 
+The client reads simulated HAL outputs after each simulation periodic cycle and
+writes incoming sensor data directly to HAL simulation. It does not require the
+HALSim websocket providers. XRP motor, servo, and gyro values use the SimDevices
+created by the XRP vendor library; digital I/O, analog inputs, and encoders use
+the corresponding HAL simulation data.
+
 ## Configuration
 
 The XRP client can be configured through the XRP Bluetooth window in the simulator GUI. The window can scan for nearby XRP Bluetooth LE devices on supported platforms and pair with the selected target where the platform exposes explicit pairing.

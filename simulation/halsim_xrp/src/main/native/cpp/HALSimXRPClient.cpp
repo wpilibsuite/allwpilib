@@ -6,23 +6,15 @@
 
 #include <memory>
 
-#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
-#include "wpi/halsim/ws_core/WSProvider_Analog.hpp"
-#include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
-#include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
-#include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
-#include "wpi/halsim/ws_core/WSProvider_HAL.hpp"
-#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/HALSimXRPGui.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 
 using namespace wpilibxrp;
-using namespace wpilibws;
 
 bool HALSimXRPClient::Initialize() {
   bool result = true;
   runner.ExecSync([&](wpi::net::uv::Loop& loop) {
-    simxrp = std::make_shared<HALSimXRP>(loop, providers, simDevices);
+    simxrp = std::make_shared<HALSimXRP>(loop);
 
     if (!simxrp->Initialize()) {
       result = false;
@@ -30,19 +22,6 @@ bool HALSimXRPClient::Initialize() {
     }
 
     InitializeXRPBluetoothGui(simxrp);
-
-    WSRegisterFunc registerFunc = [&](auto key, auto provider) {
-      providers.Add(key, provider);
-    };
-
-    // Minimized set of HAL providers
-    HALSimWSProviderAnalogIn::Initialize(registerFunc);
-    HALSimWSProviderDIO::Initialize(registerFunc);
-    HALSimWSProviderDriverStation::Initialize(registerFunc);
-    HALSimWSProviderEncoder::Initialize(registerFunc);
-    HALSimWSProviderHAL::Initialize(registerFunc);
-
-    simDevices.Initialize(loop);
 
     simxrp->Start();
   });

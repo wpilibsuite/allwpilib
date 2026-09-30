@@ -16,9 +16,6 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
-#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
-#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/XRP.hpp"
 #include "wpi/halsim/xrp/XRPConnectionStatus.hpp"
 #include "wpi/net/BluetoothLEPacketClient.hpp"
@@ -26,29 +23,31 @@
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::util {
-class json;
-}  // namespace wpi::util
-
 namespace wpilibxrp {
 
 using XRPBluetoothAddressType = wpi::net::BluetoothAddressType;
 
-// This masquerades as a "WebSocket" so that we can reuse the
-// stuff in halsim_ws_core
-class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
-                  public std::enable_shared_from_this<HALSimXRP> {
+class HALSimXRP : public std::enable_shared_from_this<HALSimXRP> {
  public:
   using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::net::uv::Async<LoopFunc>;
 
-  HALSimXRP(wpi::net::uv::Loop& loop, wpilibws::ProviderContainer& providers,
-            wpilibws::HALSimWSProviderSimDevices& simDevicesProvider);
-  ~HALSimXRP() override;
+  /**
+   * Creates an XRP client that communicates directly with HAL simulation.
+   *
+   * @param loop event loop for Bluetooth communication and packet generation.
+   */
+  explicit HALSimXRP(wpi::net::uv::Loop& loop);
+  /** Cancels HAL simulation callbacks and outstanding device commands. */
+  ~HALSimXRP();
   HALSimXRP(const HALSimXRP&) = delete;
   HALSimXRP& operator=(const HALSimXRP&) = delete;
 
   bool Initialize();
+  /**
+   * Starts sending HAL outputs after each simulation periodic cycle and
+   * connects to the configured Bluetooth target, if available.
+   */
   void Start();
   void ConnectBluetooth(std::string address, XRPBluetoothAddressType type,
                         std::string name = {});
@@ -91,8 +90,6 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
                                std::string name = {});
 
   void ParsePacket(std::span<const uint8_t> packet);
-  void OnNetValueChanged(const wpi::util::json& msg);
-  void OnSimValueChanged(const wpi::util::json& simData) override;
 
   const std::string& GetTargetAddress() const { return m_targetAddress; }
   XRPBluetoothAddressType GetTargetAddressType() const {
@@ -110,9 +107,6 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   std::shared_ptr<UvExecFunc> m_exec;
   std::shared_ptr<wpi::net::BluetoothLEPacketClient> m_bluetoothClient;
 
-  wpilibws::ProviderContainer& m_providers;
-  wpilibws::HALSimWSProviderSimDevices& m_simDevicesProvider;
-
   mutable std::mutex m_statusMutex;
   XRPConnectionStatus m_status;
 
@@ -120,7 +114,7 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   std::string m_targetName;
   XRPBluetoothAddressType m_targetAddressType = XRPBluetoothAddressType::RANDOM;
 
-  bool m_providersConnected = false;
+  int32_t m_simPeriodicAfterCallback = 0;
 
   void RecordControlPacketSent(std::span<const uint8_t> packet);
   void UpdateLatencyFromXRP(std::span<const uint8_t> packet);
@@ -134,7 +128,6 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   void CompletePendingCommand(bool success);
   void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
   void SetError(std::string_view error);
-  void RegisterSimProviders();
   wpi::net::uv::SimpleBufferPool<4>& GetBufferPool();
   std::mutex m_buffer_mutex;
   std::unordered_map<uint16_t, std::chrono::steady_clock::time_point>

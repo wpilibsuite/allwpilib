@@ -48,7 +48,6 @@ model {
             lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
             lib project: ':glass', library: 'glass', linkage: 'static'
             lib project: ':wpigui', library: 'wpigui', linkage: 'static'
-            lib project: ":simulation:halsim_ws_core", library: "halsim_ws_core", linkage: "static"
             lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
             project.addLibSdlGpuDependency(it)
         }

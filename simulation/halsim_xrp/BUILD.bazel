@@ -18,7 +18,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//glass",
-        "//simulation/halsim_ws_core",
+        "//hal:wpiHal",
         "//thirdparty/imgui_suite",
         "//wpigui",
         "//wpinet",
@@ -43,7 +43,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//glass",
-        "//simulation/halsim_ws_core",
+        "//hal:wpiHal",
         "//thirdparty/imgui_suite",
         "//wpigui",
         "//wpinet",
@@ -71,7 +71,6 @@ wpilib_cc_static_library(
         "//wpinet:static/wpinet",
         "//wpigui:static/wpigui",
         "//hal:static/wpiHal",
-        "//simulation/halsim_ws_core:static/halsim_ws_core",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -83,13 +82,21 @@ cc_test(
     name = "halsim_xrp-test",
     size = "small",
     srcs = glob(["src/test/native/cpp/*.cpp"]) + [
+        "src/main/native/cpp/HALSimXRP.cpp",
         "src/main/native/cpp/XRP.cpp",
+        "src/main/native/include/wpi/halsim/xrp/HALSimXRP.hpp",
         "src/main/native/include/wpi/halsim/xrp/XRP.hpp",
         "src/main/native/include/wpi/halsim/xrp/XRPConnectionStatus.hpp",
     ],
     includes = ["src/main/native/include"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
+        "//hal:wpiHal",
         "//thirdparty/catch2",
+        "//wpigui",
         "//wpinet",
     ],
 )
