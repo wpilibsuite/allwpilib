@@ -4,9 +4,7 @@
 
 package org.wpilib.examples.expansionhubsample;
 
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.system.Timer;
+import module wpilib;
 
 @Autonomous
 public class DefaultAutoMode extends PeriodicOpMode {

@@ -4,13 +4,8 @@
 
 package org.wpilib.examples.elevatorprofiledpid;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.ElevatorFeedforward;
-import org.wpilib.math.controller.ProfiledPIDController;
-import org.wpilib.math.trajectory.TrapezoidProfile;
+import module wpilib;
+import module wpilib.drivers;
 
 public class Robot extends TimedRobot {
   private static double DT = 0.02;

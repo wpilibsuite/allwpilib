@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.driverstationdisplaylines;
 
-import org.wpilib.framework.OpModeRobot;
+import module wpilib;
 
 /**
  * Demonstrates DriverStationDisplay line mode. The default teleop opmode adds all lines each loop

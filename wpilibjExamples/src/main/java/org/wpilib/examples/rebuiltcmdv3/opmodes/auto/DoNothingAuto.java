@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.rebuiltcmdv3.opmodes.auto;
 
+import module wpilib;
+
 import org.wpilib.examples.rebuiltcmdv3.Robot;
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.OpMode;
 
 @Autonomous
 public class DoNothingAuto implements OpMode {

@@ -6,38 +6,9 @@ package org.wpilib.examples.differentialdriveposeestimator;
 
 import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.fields.Field;
-import org.wpilib.fields.Fields;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.estimator.DifferentialDrivePoseEstimator;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Pose3d;
-import org.wpilib.math.geometry.Quaternion;
-import org.wpilib.math.geometry.Rotation3d;
-import org.wpilib.math.geometry.Transform3d;
-import org.wpilib.math.geometry.Translation3d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.numbers.N2;
-import org.wpilib.math.system.DCMotor;
-import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.Models;
-import org.wpilib.math.util.ComputerVisionUtil;
-import org.wpilib.networktables.DoubleArrayEntry;
-import org.wpilib.networktables.DoubleArrayTopic;
-import org.wpilib.simulation.DifferentialDrivetrainSim;
-import org.wpilib.simulation.EncoderSim;
-import org.wpilib.simulation.OnboardIMUSim;
-import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.system.RobotController;
-import org.wpilib.system.Timer;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
+import module wpilib.drivers;
+import module wpilib.gamefields;
 
 /** Represents a differential drive style drivetrain. */
 public class Drivetrain {

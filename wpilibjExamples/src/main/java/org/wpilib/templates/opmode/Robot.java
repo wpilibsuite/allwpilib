@@ -4,7 +4,7 @@
 
 package org.wpilib.templates.opmode;
 
-import org.wpilib.framework.OpModeRobot;
+import module wpilib;
 
 /**
  * The methods in this class are called automatically as described in the OpModeRobot documentation.

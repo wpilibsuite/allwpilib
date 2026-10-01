@@ -4,8 +4,7 @@
 
 package org.wpilib.templates.commandv2skeleton;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
+import module wpilib.command2;
 
 public class RobotContainer {
   public RobotContainer() {

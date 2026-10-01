@@ -4,12 +4,9 @@
 
 package org.wpilib.snippets.i2ccommunication;
 
+import module wpilib;
+
 import java.util.Optional;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.bus.I2C;
 import org.wpilib.hardware.bus.I2C.Port;
 
 /**

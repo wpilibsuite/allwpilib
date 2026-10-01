@@ -4,9 +4,8 @@
 
 package org.wpilib.templates.xrpcommandv2;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.framework.TimedRobot;
+import module wpilib;
+import module wpilib.command2;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

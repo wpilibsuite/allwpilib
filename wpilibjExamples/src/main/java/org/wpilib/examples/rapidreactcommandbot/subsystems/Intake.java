@@ -6,14 +6,11 @@ package org.wpilib.examples.rapidreactcommandbot.subsystems;
 
 import static org.wpilib.examples.rapidreactcommandbot.Constants.IntakeConstants;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.drivers;
+
 import org.wpilib.examples.rapidreactcommandbot.Constants.IntakeConstants;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.DoubleSolenoid;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 @Logged
 public class Intake extends SubsystemBase {

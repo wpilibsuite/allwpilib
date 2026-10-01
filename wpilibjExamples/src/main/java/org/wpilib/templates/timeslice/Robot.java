@@ -4,9 +4,7 @@
 
 package org.wpilib.templates.timeslice;
 
-import org.wpilib.framework.TimesliceRobot;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
+import module wpilib;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

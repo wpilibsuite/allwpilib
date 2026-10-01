@@ -4,22 +4,15 @@
 
 package org.wpilib.examples.romireference;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.PrintCommand;
-import org.wpilib.command2.button.Trigger;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.Joystick;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.romi;
+
 import org.wpilib.examples.romireference.commands.ArcadeDrive;
 import org.wpilib.examples.romireference.commands.AutonomousDistance;
 import org.wpilib.examples.romireference.commands.AutonomousTime;
 import org.wpilib.examples.romireference.subsystems.Drivetrain;
-import org.wpilib.romi.OnBoardIO;
 import org.wpilib.romi.OnBoardIO.ChannelMode;
-import org.wpilib.telemetry.TelemetryLoggable;
-import org.wpilib.telemetry.TelemetryTable;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

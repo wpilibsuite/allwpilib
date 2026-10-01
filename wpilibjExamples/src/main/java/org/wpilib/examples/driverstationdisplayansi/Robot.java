@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.driverstationdisplayansi;
 
-import org.wpilib.framework.OpModeRobot;
+import module wpilib;
 
 /**
  * Demonstrates DriverStationDisplay raw ANSI mode. The default teleop opmode writes static display

@@ -4,10 +4,8 @@
 
 package org.wpilib.snippets.encoderhoming;
 
-import org.wpilib.drivers.motor.Spark;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.DigitalInput;
-import org.wpilib.hardware.rotation.Encoder;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * Encoder mechanism homing snippets for wpilib-docs.

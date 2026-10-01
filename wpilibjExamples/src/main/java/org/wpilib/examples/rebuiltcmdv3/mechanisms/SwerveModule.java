@@ -4,11 +4,9 @@
 
 package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleVelocity;
 
 @Logged
 public final class SwerveModule {

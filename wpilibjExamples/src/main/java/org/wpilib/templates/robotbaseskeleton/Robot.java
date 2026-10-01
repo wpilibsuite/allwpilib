@@ -4,13 +4,7 @@
 
 package org.wpilib.templates.robotbaseskeleton;
 
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.internal.DriverStationBackend;
-import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.ControlWord;
-import org.wpilib.hardware.hal.RobotMode;
-import org.wpilib.internal.DriverStationModeThread;
-import org.wpilib.util.WPIUtilJNI;
+import module wpilib;
 
 /**
  * This class is run automatically. If you change the name of this class or the package after

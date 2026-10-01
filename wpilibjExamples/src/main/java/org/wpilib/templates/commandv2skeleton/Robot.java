@@ -4,9 +4,8 @@
 
 package org.wpilib.templates.commandv2skeleton;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.framework.TimedRobot;
+import module wpilib;
+import module wpilib.command2;
 
 public class Robot extends TimedRobot {
   private Command autonomousCommand;

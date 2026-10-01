@@ -4,11 +4,9 @@
 
 package org.wpilib.examples.rebuiltcmdv3.constants;
 
+import module wpilib;
+
 import java.util.Optional;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.shape.Rectangle2d;
 
 public final class FieldConstants {
   // TODO: Measurements

@@ -4,10 +4,7 @@
 
 package org.wpilib.snippets.canpdp;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.power.PowerDistribution;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
 
 /**
  * This is a sample program showing how to retrieve information from the Power Distribution Panel

@@ -4,10 +4,8 @@
 
 package org.wpilib.snippets.encoderdrive;
 
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.Spark;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * Encoder drive to distance snippets for wpilib-docs.

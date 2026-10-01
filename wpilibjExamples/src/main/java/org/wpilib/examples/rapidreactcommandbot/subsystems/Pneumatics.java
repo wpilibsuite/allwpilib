@@ -4,13 +4,8 @@
 
 package org.wpilib.examples.rapidreactcommandbot.subsystems;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.epilogue.Logged;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.Compressor;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.hardware.rotation.AnalogPotentiometer;
+import module wpilib;
+import module wpilib.command2;
 
 /** Subsystem for managing the compressor, pressure sensor, etc. */
 @Logged

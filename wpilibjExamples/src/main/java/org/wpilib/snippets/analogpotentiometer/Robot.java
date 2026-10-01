@@ -4,9 +4,7 @@
 
 package org.wpilib.snippets.analogpotentiometer;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.hardware.rotation.AnalogPotentiometer;
+import module wpilib;
 
 /**
  * AnalogPotentiometer snippets for wpilib-docs.

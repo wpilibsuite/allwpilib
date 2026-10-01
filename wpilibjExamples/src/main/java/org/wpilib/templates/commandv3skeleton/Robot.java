@@ -4,10 +4,10 @@
 
 package org.wpilib.templates.commandv3skeleton;
 
-import org.wpilib.command3.Scheduler;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.epilogue.generated.Epilogue;
-import org.wpilib.framework.OpModeRobot;
 
 @Logged
 public class Robot extends OpModeRobot {

@@ -4,14 +4,7 @@
 
 package org.wpilib.snippets.solenoid;
 
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.Compressor;
-import org.wpilib.hardware.pneumatic.DoubleSolenoid;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.hardware.pneumatic.Solenoid;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
 
 /**
  * This is a sample program showing the use of the solenoid classes during operator control. Three

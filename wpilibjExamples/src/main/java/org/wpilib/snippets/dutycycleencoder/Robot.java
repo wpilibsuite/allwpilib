@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.dutycycleencoder;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.DutyCycleEncoder;
+import module wpilib;
 
 /**
  * DutyCycleEncoder snippets for wpilib-docs.

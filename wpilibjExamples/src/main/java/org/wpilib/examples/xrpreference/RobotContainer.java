@@ -4,22 +4,15 @@
 
 package org.wpilib.examples.xrpreference;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.PrintCommand;
-import org.wpilib.command2.button.JoystickButton;
-import org.wpilib.command2.button.Trigger;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.driverstation.GenericHID;
-import org.wpilib.driverstation.Joystick;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.xrp;
+
 import org.wpilib.examples.xrpreference.commands.ArcadeDrive;
 import org.wpilib.examples.xrpreference.commands.AutonomousDistance;
 import org.wpilib.examples.xrpreference.commands.AutonomousTime;
 import org.wpilib.examples.xrpreference.subsystems.Arm;
 import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
-import org.wpilib.xrp.XRPOnBoardIO;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
