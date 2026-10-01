@@ -18,14 +18,14 @@ filegroup(
 filegroup(
     name = "native-srcs",
     srcs = select({
+        "@platforms//os:linux": glob([
+            "src/main/native/linux/**/*.cpp",
+            "src/main/native/linux/**/*.hpp",
+        ]),
         "@platforms//os:osx": glob(["src/main/native/osx/**/*.cpp"]),
         "@platforms//os:windows": glob([
             "src/main/native/windows/**/*.cpp",
             "src/main/native/windows/**/*.hpp",
-        ]),
-        "@wpilib_toolchains//constraints/combined:is_linux": glob([
-            "src/main/native/linux/**/*.cpp",
-            "src/main/native/linux/**/*.hpp",
         ]),
     }),
 )
