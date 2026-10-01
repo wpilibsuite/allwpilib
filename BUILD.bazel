@@ -68,7 +68,7 @@ pkg_files(
     visibility = ["//visibility:public"],
 )
 
-# bazel build //:requirements.lock
+# https://rules-python.readthedocs.io/en/latest/pypi/lock.html
 compile_pip_requirements(
     name = "requirements",
     extra_args = ["--allow-unsafe"],
