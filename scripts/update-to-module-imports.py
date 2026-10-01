@@ -33,7 +33,7 @@ EXCLUDED_DIR_NAMES = {
 # Types that we should NOT update to module imports due to identical class names appearing
 # in more than one package.
 AMBIGUOUS_TYPES = {
-    "org.wpilib.math.estimator.KalmanFilter", # conflicts with org.opencv.video.KalmanFilter
+    "org.wpilib.math.estimator.KalmanFilter",  # conflicts with org.opencv.video.KalmanFilter
 }
 
 
@@ -65,7 +65,12 @@ def parse_module_info(module_info_path: Path) -> tuple[str, set[str], set[str]]:
         content = module_info_path.read_text(encoding="utf-8")
     except OSError as e:
         print(f"Warning: Failed to read {module_info_path}: {e}", file=sys.stderr)
-        return { "name": "unknown", "exports": set(), "requirements": set(), "transitive_requirements": set() }
+        return {
+            "name": "unknown",
+            "exports": set(),
+            "requirements": set(),
+            "transitive_requirements": set(),
+        }
 
     clean_content = strip_comments(content)
     module_match = re.search(r"\b(?:open\s+)?module\s+([a-zA-Z0-9_.]+)", clean_content)
@@ -83,15 +88,13 @@ def parse_module_info(module_info_path: Path) -> tuple[str, set[str], set[str]]:
     transitive_requirements = set(
         re.findall(r"requires transitive\s+([a-zA-Z0-9_.]+)\s*;", clean_content)
     )
-    requirements = set(
-        re.findall(r"requires\s+([a-zA-Z0-9_.]+)\s*;", clean_content)
-    )
+    requirements = set(re.findall(r"requires\s+([a-zA-Z0-9_.]+)\s*;", clean_content))
 
     return {
         "name": module_name,
         "exports": exports,
         "requirements": requirements,
-        "transitive_requirements": transitive_requirements
+        "transitive_requirements": transitive_requirements,
     }
 
 
@@ -216,7 +219,8 @@ def main():
                 # is present in the LUT. Otherwise replace with the source import; essentially a no-op
                 lambda m: (
                     f"import module {modules_by_package.get(m.group(2))};"
-                    if m.group(2) in modules_by_package and not m.group(1) in AMBIGUOUS_TYPES
+                    if m.group(2) in modules_by_package
+                    and not m.group(1) in AMBIGUOUS_TYPES
                     else m.group(0)
                 ),
                 content,
