@@ -212,7 +212,7 @@ model {
                     }
                     exportedHeaders {
                         srcDirs 'src/test/native/include',
-                                'src/lib/native/include'
+                        'src/lib/native/include'
                     }
                 }
             }

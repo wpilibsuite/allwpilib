@@ -30,7 +30,7 @@ dependencies {
 }
 
 ext {
-    sharedCvConfigs = [cameraserver    : [],
+    sharedCvConfigs = [cameraserver : [],
         cameraserverBase: [],
         cameraserverDev : [],
         cameraserverTest: []]

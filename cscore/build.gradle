@@ -68,7 +68,7 @@ model {
 
 
 ext {
-    sharedCvConfigs = [cscore    : [],
+    sharedCvConfigs = [cscore : [],
         cscoreBase: [],
         cscoreDev : [],
         (nativeTestSuiteName): [],

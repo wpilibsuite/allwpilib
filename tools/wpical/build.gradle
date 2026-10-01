@@ -21,7 +21,7 @@ ext {
     useCpp = true
     nativeTestSuiteName = "${nativeName}Test"
     sharedCvConfigs = []
-    staticCvConfigs = [ (nativeName): [],
+    staticCvConfigs = [(nativeName): [],
         (nativeTestSuiteName): []]
 }
 
