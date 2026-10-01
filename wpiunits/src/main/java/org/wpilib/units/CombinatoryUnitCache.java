@@ -46,7 +46,7 @@ public final class CombinatoryUnitCache<A extends Unit, B extends Unit, Out exte
    * @return the combined unit
    */
   public Out combine(A a, B b) {
-    final long key = ((long) a.hashCode()) << 32L | (b.hashCode() & 0xFFFFFFFFL);
+    final long key = (long) a.hashCode() << 32L | (b.hashCode() & 0xFFFFFFFFL);
 
     var existing = m_cache.get(key);
     if (existing != null) {

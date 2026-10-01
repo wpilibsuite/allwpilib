@@ -105,9 +105,9 @@ class LinearQuadraticRegulatorTest {
     var discAref = Discretization.discretizeA(Aref, dt);
 
     Matrix<States, States> Qimf =
-        (discA.minus(discAref)).transpose().times(Q).times(discA.minus(discAref));
+        discA.minus(discAref).transpose().times(Q).times(discA.minus(discAref));
     Matrix<Inputs, Inputs> Rimf = discB.transpose().times(Q).times(discB).plus(R);
-    Matrix<States, Inputs> Nimf = (discA.minus(discAref)).transpose().times(Q).times(discB);
+    Matrix<States, Inputs> Nimf = discA.minus(discAref).transpose().times(Q).times(discB);
 
     return new LinearQuadraticRegulator<>(A, B, Qimf, Rimf, Nimf, dt).getK();
   }

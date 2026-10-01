@@ -108,7 +108,7 @@ public class DataLogReader implements Iterable<DataLogRecord> {
   private long readVarInt(int pos, int len) {
     long val = 0;
     for (int i = 0; i < len; i++) {
-      val |= ((long) (m_buf.get(pos + i) & 0xff)) << (i * 8);
+      val |= (long) (m_buf.get(pos + i) & 0xff) << (i * 8);
     }
     return val;
   }

@@ -82,7 +82,7 @@ class LinearSystemLoopTest {
       updateTwoState(
           (LinearSystem<N2, N1, N1>) m_plant.slice(0),
           m_loop,
-          (random.nextGaussian()) * POSITION_STDDEV);
+          random.nextGaussian() * POSITION_STDDEV);
       var u = m_loop.getU(0);
 
       assertTrue(u >= -12.1 && u <= 12.1, "U out of bounds! Got " + u);

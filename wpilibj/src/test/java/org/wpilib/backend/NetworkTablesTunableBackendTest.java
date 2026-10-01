@@ -467,9 +467,9 @@ class NetworkTablesTunableBackendTest {
 
   @Test
   void ignoresInvalidStructTunePayloads() {
-    Translation2d initial = new Translation2d(1.25, 2.5);
-    AtomicInteger calls = new AtomicInteger();
-    List<String> warnings = new ArrayList<>();
+    final Translation2d initial = new Translation2d(1.25, 2.5);
+    final AtomicInteger calls = new AtomicInteger();
+    final List<String> warnings = new ArrayList<>();
     final Tunable<Translation2d> tunable =
         Tunable.createConfig(
             initial, Translation2d.struct, robust().withOnTune(calls::incrementAndGet));
@@ -532,9 +532,9 @@ class NetworkTablesTunableBackendTest {
 
   @Test
   void ignoresInvalidStructArrayTunePayloads() {
-    Translation2d[] initial = {new Translation2d(1.25, 2.5), new Translation2d(3.5, 4.75)};
-    AtomicInteger calls = new AtomicInteger();
-    List<String> warnings = new ArrayList<>();
+    final Translation2d[] initial = {new Translation2d(1.25, 2.5), new Translation2d(3.5, 4.75)};
+    final AtomicInteger calls = new AtomicInteger();
+    final List<String> warnings = new ArrayList<>();
     Tunable<Translation2d[]> tunable =
         Tunable.createConfig(initial, robust().withOnTune(calls::incrementAndGet));
 
@@ -743,9 +743,9 @@ class NetworkTablesTunableBackendTest {
 
   @Test
   void rejectsMalformedProtobufTunePayloads() throws IOException {
-    Translation2d initial = new Translation2d(5.25, 6.5);
-    AtomicInteger calls = new AtomicInteger();
-    List<String> warnings = new ArrayList<>();
+    final Translation2d initial = new Translation2d(5.25, 6.5);
+    final AtomicInteger calls = new AtomicInteger();
+    final List<String> warnings = new ArrayList<>();
     Tunable<Translation2d> tunable =
         Tunable.createConfig(
             initial, Translation2d.proto, robust().withOnTune(calls::incrementAndGet));

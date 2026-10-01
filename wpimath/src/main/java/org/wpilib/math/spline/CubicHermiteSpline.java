@@ -58,8 +58,8 @@ public class CubicHermiteSpline extends Spline implements ProtobufSerializable, 
     final var x = getControlVectorFromArrays(xInitialControlVector, xFinalControlVector);
     final var y = getControlVectorFromArrays(yInitialControlVector, yFinalControlVector);
 
-    final var xCoeffs = (hermite.mult(x)).transpose();
-    final var yCoeffs = (hermite.mult(y)).transpose();
+    final var xCoeffs = hermite.mult(x).transpose();
+    final var yCoeffs = hermite.mult(y).transpose();
 
     m_coefficients = new SimpleMatrix(6, 4);
 

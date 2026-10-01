@@ -392,7 +392,7 @@ class HessianTest {
       x.get(1).setValue(4);
 
       // y = (x₀sin(x₁)) x₀
-      var y = (x.get(0).times(sin(x.get(1)))).times(x.get(0));
+      var y = x.get(0).times(sin(x.get(1))).times(x.get(0));
 
       // dy/dx = [2x₀sin(x₁)  x₀²cos(x₁)]
       // dy/dx = [ 6sin(4)     9cos(4)  ]
