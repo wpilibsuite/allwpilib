@@ -1,0 +1,39 @@
+= NetworkTables Web Outline Viewer
+
+While an NT4 server is running, open `http://<server>:5810/` in a browser.
+If the server uses a custom NT4 port, use that port instead.
+The viewer is served directly by ntcore and requires no separate installation
+or internet access. It is available with servers started from C++, Java, or Python.
+
+The viewer displays published topics in an expandable hierarchy, with their
+types and current values. Filter by any part of a topic's path; matching paths
+expand automatically. Topic additions, removals, and value changes appear live.
+The connection status is shown at the top, and the viewer reconnects automatically
+after losing its connection. Values are cleared while disconnected.
+
+The viewer only subscribes; it does not publish values or change properties.
+It uses the existing NT4 WebSocket endpoint on the same host and port. The empty
+prefix subscription excludes internal `$` metatopics. Raw values (including
+structured data) are displayed as hexadecimal bytes. Long strings, arrays, and
+raw values are abbreviated with an ellipsis to keep the display manageable.
+
+== Development
+
+The page, styles, and JavaScript are embedded in
+`src/main/native/cpp/WebServerPage.hpp`, so all native build systems include the
+viewer without an asset generation step. The JavaScript uses browser APIs and
+has no package dependencies.
+
+From the repository root, run the decoder, formatting, and hierarchy tests with:
+
+[source,sh]
+----
+node --test ntcore/src/test/js/WebServerPageTest.js
+----
+
+HTTP serving is also covered by the native and RobotPy tests:
+
+[source,sh]
+----
+bazel test //ntcore:ntcore-cpp-test //ntcore:python_tests
+----
