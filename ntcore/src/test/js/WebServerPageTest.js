@@ -13,7 +13,8 @@ const PAGE = fs.readFileSync(path.join(__dirname,
   "../../main/native/cpp/WebServerPage.hpp"), "utf8");
 const CONTEXT = vm.createContext({ TextDecoder, Uint8Array, DataView });
 vm.runInContext(PAGE.match(/<script>([\s\S]*?)<\/script>/)[1], CONTEXT);
-const { decodeMessages, formatValue, buildTree } = CONTEXT;
+const { decodeMessages, formatValue, buildTree, createStructDatabase,
+  parseStructSchema, topicValueNode } = CONTEXT;
 
 function decodeValue(bytes) {
   // [topic ID, timestamp, type, value]; value decoding is independent of type.
@@ -99,4 +100,164 @@ test("builds a filtered hierarchy without conflating topic paths", () => {
   assert.equal(filtered.children.size, 1);
   assert.equal(filtered.children.get("Other").topic.name, "/Other");
   assert.equal(buildTree(topics, "missing").children.size, 0);
+});
+
+function database(entries) {
+  const schemas = createStructDatabase();
+  for (const [name, schema] of entries) schemas.set(name, schema);
+  return schemas;
+}
+
+function packed(...fields) {
+  const bytes = new Uint8Array(fields.reduce((size, [, length]) => size + length, 0));
+  const view = new DataView(bytes.buffer);
+  let offset = 0;
+  for (const [method, length, value] of fields) {
+    view[method](offset, value, true);
+    offset += length;
+  }
+  return bytes;
+}
+
+function structValue(schemas, name, value) {
+  return topicValueNode({ type: `struct:${name}`, value }, schemas);
+}
+
+function field(node, name) {
+  return node.children().find(child => child.name === name).node;
+}
+
+test("decodes nested structs and arrays using unaligned little-endian layouts", () => {
+  const schemas = database([
+    ["Pose", "Translation translation; Rotation rotation"],
+    ["Translation", "double x; double y;"],
+    ["Rotation", "double value"],
+    ["Sample", "bool valid; Pose poses[2]; int16 ids[2]"],
+  ]);
+  const poseBytes = packed(...[1.25, -2.5, 3].map(value => ["setFloat64", 8, value]));
+  const bytes = Uint8Array.from([1, ...poseBytes, ...poseBytes, 0xff, 0xff, 0, 0x80]);
+  const sample = structValue(schemas, "Sample", bytes);
+  assert.equal(sample.text, "Sample");
+  assert.equal(schemas.get("Sample").size, 53);
+  assert.equal(field(sample, "valid").text, "true");
+  const poses = field(sample, "poses");
+  assert.equal(poses.text, "Pose[2]");
+  for (const { node } of poses.children()) {
+    assert.equal(field(field(node, "translation"), "x").text, "1.25");
+    assert.equal(field(field(node, "translation"), "y").text, "-2.5");
+    assert.equal(field(field(node, "rotation"), "value").text, "3");
+  }
+  assert.equal(field(field(sample, "ids"), "[0]").text, "-1");
+  assert.equal(field(field(sample, "ids"), "[1]").text, "-32768");
+  for (const type of ["Pose[]", "Pose[2]"]) {
+    const array = structValue(schemas, type, Uint8Array.from([...poseBytes, ...poseBytes]));
+    assert.equal(array.text, "Pose[2]");
+    assert.equal(array.children().length, 2);
+  }
+  assert.equal(structValue(schemas, "Pose[]", new Uint8Array()).children().length, 0);
+});
+
+test("decodes all numeric struct primitives without losing integer precision", () => {
+  const cases = [
+    ["int8", "setInt8", 1, -128], ["uint8", "setUint8", 1, 255],
+    ["int16", "setInt16", 2, -32768], ["uint16", "setUint16", 2, 65535],
+    ["int32", "setInt32", 4, -2147483648], ["uint32", "setUint32", 4, 4294967295],
+    ["int64", "setBigInt64", 8, -9223372036854775808n],
+    ["uint64", "setBigUint64", 8, 18446744073709551615n],
+    ["float", "setFloat32", 4, 1.25], ["float32", "setFloat32", 4, Infinity],
+    ["double", "setFloat64", 8, -2.5], ["float64", "setFloat64", 8, NaN],
+  ];
+  const schemas = database([["Numbers", cases.map(([type], i) => `${type} v${i}`).join(";")]]);
+  const node = structValue(schemas, "Numbers", packed(...cases.map(([, ...rest]) => rest)));
+  cases.forEach(([, , , value], i) => assert.equal(field(node, `v${i}`).text, String(value)));
+});
+
+test("packs bitfields by storage width and sign extends signed fields", () => {
+  const schemas = database([["Bits",
+    "uint16 a:4; int16 b:5; bool c:1; int16 d:7; uint8 tail; bool ready"]]);
+  const node = structValue(schemas, "Bits", new Uint8Array([0xfa, 3, 0x7e, 0, 255, 128]));
+  const expected = { a: "10", b: "-1", c: "true", d: "-2", tail: "255", ready: "true" };
+  for (const [name, value] of Object.entries(expected)) assert.equal(field(node, name).text, value);
+  schemas.set("Bits", "bool a:1; bool b:1; int8 c:2; int16 d:1");
+  const mixed = structValue(schemas, "Bits", new Uint8Array([13, 1, 0]));
+  assert.equal(field(mixed, "a").text, "true");
+  assert.equal(field(mixed, "b").text, "false");
+  assert.equal(field(mixed, "c").text, "-1");
+  assert.equal(field(mixed, "d").text, "-1");
+  schemas.set("Bits", "int64 a:63; bool b:1; uint64 c:64");
+  const wide = structValue(schemas, "Bits", new Uint8Array(16).fill(255));
+  assert.equal(field(wide, "a").text, "-1");
+  assert.equal(field(wide, "b").text, "true");
+  assert.equal(field(wide, "c").text, "18446744073709551615");
+});
+
+test("decodes enums, UTF-8 char arrays, and schema values as text", () => {
+  const schemas = database([["Text",
+    "enum {Off=0, On=1,} uint8 mode; {Negative=-1} int8 codes[2]; char name[6]; char c"]]);
+  const node = structValue(schemas, "Text", new Uint8Array([1, 255, 7, 0xc2, 0xb5, 0, 65, 0, 0, 90]));
+  assert.equal(field(node, "mode").text, "On");
+  assert.equal(field(field(node, "codes"), "[0]").text, "Negative");
+  assert.equal(field(field(node, "codes"), "[1]").text, "<7>");
+  assert.equal(field(node, "name").text, '"µ\\u0000A"');
+  assert.equal(field(node, "c").text, '"Z"');
+  schemas.set("Text", "char text[2]");
+  assert.equal(field(structValue(schemas, "Text", new Uint8Array([65, 0xc2])), "text").text, '"A"');
+  const schema = topicValueNode({ type: "structschema", value: new TextEncoder().encode("double x; double y;") }, schemas);
+  assert.equal(schema.text, '"double x; double y;"');
+  assert.equal(schema.children, undefined);
+});
+
+test("invalidates dependent layouts for late, changed, and removed schemas", () => {
+  const schemas = database([["Parent", "Child child"]]);
+  const bytes = new Uint8Array([42]);
+  assert.match(structValue(schemas, "Parent", bytes).text, /Missing schema 'Child'/);
+  schemas.set("Child", "uint8 value");
+  assert.equal(field(field(structValue(schemas, "Parent", bytes), "child"), "value").text, "42");
+  schemas.set("Child", "uint16 value");
+  assert.match(structValue(schemas, "Parent", bytes).text, /Invalid struct size/);
+  const changed = structValue(schemas, "Parent", new Uint8Array([0, 1]));
+  assert.equal(field(field(changed, "child"), "value").text, "256");
+  schemas.remove("Child");
+  assert.match(structValue(schemas, "Parent", bytes).text, /Missing schema/);
+  schemas.clear();
+  assert.match(structValue(schemas, "Parent", bytes).text, /Missing schema 'Parent'/);
+});
+
+test("rejects invalid schemas and cyclic definitions without decoding bad data", () => {
+  for (const schema of ["double x:2", "bool x:2", "int8 x:9", "int8 x:0",
+    "int8 x[-1]", "int8 x[0]", "int8 x[2]:1", "int8 x[9007199254740992]",
+    "int8 x; int8 x", "enum int8 x", "enum {a=1 b=2} int8 x",
+    "enum {a=9223372036854775808} int8 x", "enum{a=1} double x", "int8 x@", "int8"]) {
+    assert.throws(() => parseStructSchema(schema), undefined, schema);
+  }
+  const schemas = database([["A", "B b"], ["B", "A a"]]);
+  const cycle = structValue(schemas, "A", new Uint8Array(1));
+  assert.equal(cycle.children, undefined);
+  assert.match(cycle.text, /Circular schema/);
+  schemas.set("B", "double x");
+  for (const type of ["A", "A[]", "A[2]"]) {
+    const bad = structValue(schemas, type, new Uint8Array(7));
+    assert.equal(bad.children, undefined);
+    assert.match(bad.text, /7 bytes:.*Invalid struct/);
+  }
+  assert.match(structValue(schemas, "A[2]", new Uint8Array(8)).text, /Invalid struct array size/);
+  assert.match(structValue(schemas, "A", new Uint8Array(9)).text, /Invalid struct size/);
+  schemas.set("Huge", "A values[9007199254740991]");
+  assert.match(structValue(schemas, "Huge", new Uint8Array()).text, /too large/);
+});
+
+test("handles empty structs and bounds large previews without eager decoding", () => {
+  const schemas = database([["Empty", " ; ; "], ["Item", "uint8 value"],
+    ["Holder", "Empty empty[1000000]; Item items[100]"]]);
+  assert.equal(structValue(schemas, "Empty", new Uint8Array()).children().length, 0);
+  assert.match(structValue(schemas, "Empty[]", new Uint8Array()).text, /Invalid struct array size/);
+  const large = structValue(schemas, "Holder", new Uint8Array(100));
+  assert.equal(field(large, "empty").text, "Empty[1000000]");
+  assert.equal(field(large, "empty").children().length, 65);
+  assert.equal(field(large, "items").children().length, 65);
+  assert.equal(field(large, "items").children()[64].node.text, "36 more items");
+  schemas.set("Unicode", "int8 µ; uint8 __proto__");
+  const names = structValue(schemas, "Unicode", new Uint8Array([255, 42]));
+  assert.equal(field(names, "µ").text, "-1");
+  assert.equal(field(names, "__proto__").text, "42");
 });
