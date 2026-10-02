@@ -308,7 +308,12 @@ add_subdirectory(wpiutil)
 
 add_subdirectory(telemetry)
 add_subdirectory(tunables)
-if(WPILIB_WITH_NTCORE OR WPILIB_WITH_GUI OR WPILIB_WITH_WPILIB)
+if(
+    WPILIB_WITH_NTCORE
+    OR WPILIB_WITH_GUI
+    OR WPILIB_WITH_WPILIB
+    OR (WPILIB_WITH_EXECUTABLES AND LIBSSH_FOUND)
+)
     set(DATALOG_DEP_REPLACE "find_dependency(datalog)")
     add_subdirectory(datalog)
 endif()
@@ -345,10 +350,11 @@ if(WPILIB_WITH_GUI)
     if(WPILIB_WITH_EXECUTABLES)
         add_subdirectory(tools/outlineviewer)
         add_subdirectory(tools/sysid)
-        if(LIBSSH_FOUND)
-            add_subdirectory(tools/datalogtool)
-        endif()
     endif()
+endif()
+
+if(WPILIB_WITH_EXECUTABLES AND LIBSSH_FOUND)
+    add_subdirectory(tools/datalogtool)
 endif()
 
 if(WPILIB_WITH_WPILIB OR WPILIB_WITH_SIMULATION_MODULES)

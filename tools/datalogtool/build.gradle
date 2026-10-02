@@ -120,6 +120,33 @@ model {
                 }
             }
         }
+        datalogtoolCli(NativeExecutableSpec) {
+            baseName = 'datalogtool-cli'
+            sources.cpp {
+                source {
+                    srcDirs 'src/main/native', "$buildDir/generated/mainVersion/cpp"
+                    include 'cli/*.cpp', 'cpp/CsvExport.cpp', 'cpp/Sftp.cpp', 'WPILibVersion.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/cpp', 'src/main/native/cli'
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+                it.cppCompiler.define('LIBSSH_STATIC')
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'libssh')
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'ws2_32.lib' << 'advapi32.lib' << 'crypt32.lib' << 'user32.lib' << 'Iphlpapi.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Kerberos'
+                }
+            }
+        }
     }
     testSuites {
         "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
@@ -131,11 +158,11 @@ model {
             }
             sources.cpp {
                 source {
-                    srcDirs 'src/test/native/cpp'
+                    srcDirs 'src/test/native/cpp', 'src/main/native/cli'
                     include '**/*.cpp'
                 }
                 exportedHeaders {
-                    srcDirs 'src/main/native/cpp'
+                    srcDirs 'src/main/native/cpp', 'src/main/native/cli'
                 }
             }
             binaries.all {

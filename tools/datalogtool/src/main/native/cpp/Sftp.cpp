@@ -179,7 +179,14 @@ std::vector<Attributes> Session::ReadDir(const std::string& path) {
     rv.emplace_back(std::move(attr));
   }
 
-  sftp_closedir(dir);
+  if (!sftp_dir_eof(dir)) {
+    Exception error{m_sftp};
+    sftp_closedir(dir);
+    throw error;
+  }
+  if (sftp_closedir(dir) != SSH_OK) {
+    throw Exception{m_sftp};
+  }
   return rv;
 }
 

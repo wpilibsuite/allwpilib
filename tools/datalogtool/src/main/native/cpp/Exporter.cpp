@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <atomic>
-#include <chrono>
 #include <cmath>
 #include <format>
 #include <functional>
@@ -28,19 +27,16 @@
 #include <imgui_stdlib.h>
 
 #include "App.hpp"
-#include "CsvTable.hpp"
+#include "CsvExport.hpp"
 #include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
-#include "wpi/util/DenseMap.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/SpanExtras.hpp"
 #include "wpi/util/StringExtras.hpp"
-#include "wpi/util/fmt/raw_ostream.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/mutex.hpp"
-#include "wpi/util/print.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
 namespace {
@@ -72,9 +68,6 @@ struct Entry {
   bool typeConflict = false;
   bool metadataConflict = false;
   bool selected = true;
-
-  // used only during export
-  int column = -1;
 };
 
 struct EntryTreeNode {
@@ -445,168 +438,17 @@ void DisplayEntries() {
 static wpi::util::mutex gExportMutex;
 static std::vector<std::string> gExportErrors;
 
-static void PrintEscapedCsvString(wpi::util::raw_ostream& os,
-                                  std::string_view str) {
-  auto s = str;
-  while (!s.empty()) {
-    std::string_view fragment;
-    std::tie(fragment, s) = wpi::util::split(s, '"');
-    os << fragment;
-    if (!s.empty()) {
-      os << '"' << '"';
-    }
-  }
-  if (wpi::util::ends_with(str, '"')) {
-    os << '"' << '"';
-  }
-}
-
-static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
-                       const wpi::log::DataLogRecord& record) {
-  // handle systemTime specially
-  if (entry.name == "systemTime" && entry.type == "int64") {
-    int64_t val;
-    if (record.GetInteger(&val)) {
-      auto timeval =
-          std::chrono::system_clock::time_point(std::chrono::microseconds(val));
-      wpi::util::print(os, "{:%Y-%m-%d %H:%M:%OS}.{:06}", timeval,
-                       val % 1000000);
-      return;
-    }
-  } else if (entry.type == "double") {
-    double val;
-    if (record.GetDouble(&val)) {
-      wpi::util::print(os, "{}", val);
-      return;
-    }
-  } else if (entry.type == "int64" || entry.type == "int") {
-    // support "int" for compatibility with old NT4 datalogs
-    int64_t val;
-    if (record.GetInteger(&val)) {
-      wpi::util::print(os, "{}", val);
-      return;
-    }
-  } else if (entry.type == "string" || entry.type == "json") {
-    std::string_view val;
-    record.GetString(&val);
-    os << '"';
-    PrintEscapedCsvString(os, val);
-    os << '"';
-    return;
-  } else if (entry.type == "boolean") {
-    bool val;
-    if (record.GetBoolean(&val)) {
-      wpi::util::print(os, "{}", val);
-      return;
-    }
-  } else if (entry.type == "boolean[]") {
-    std::vector<int> val;
-    if (record.GetBooleanArray(&val)) {
-      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
-      return;
-    }
-  } else if (entry.type == "double[]") {
-    std::vector<double> val;
-    if (record.GetDoubleArray(&val)) {
-      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
-      return;
-    }
-  } else if (entry.type == "float[]") {
-    std::vector<float> val;
-    if (record.GetFloatArray(&val)) {
-      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
-      return;
-    }
-  } else if (entry.type == "int64[]") {
-    std::vector<int64_t> val;
-    if (record.GetIntegerArray(&val)) {
-      wpi::util::print(os, "{}", wpi::util::join(val, ";"));
-      return;
-    }
-  } else if (entry.type == "string[]") {
-    std::vector<std::string_view> val;
-    if (record.GetStringArray(&val)) {
-      os << '"';
-      bool first = true;
-      for (auto&& v : val) {
-        if (!first) {
-          os << ';';
-        }
-        first = false;
-        PrintEscapedCsvString(os, v);
-      }
-      os << '"';
-      return;
-    }
-  }
-  wpi::util::print(os, "<invalid>");
-}
-
-static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style,
-                          int64_t timestampFuzziness) {
-  int columnNum = 0;
-  // header
-  if (style == 0) {
-    os << "Timestamp,Name,Value\n";
-  } else if (style == 1) {
-    // scan for exported fields for this file to print header and assign columns
-    os << "Timestamp";
-    for (auto&& entry : gEntries) {
-      if (entry.second->selected &&
-          entry.second->inputFiles.find(&f) != entry.second->inputFiles.end()) {
-        os << ',' << '"';
-        PrintEscapedCsvString(os, entry.first);
-        os << '"';
-        entry.second->column = columnNum++;
-      } else {
-        entry.second->column = -1;
-      }
-    }
-    os << '\n';
-  }
-
-  CsvTable table{os, static_cast<size_t>(columnNum), timestampFuzziness};
-  wpi::util::DenseMap<int, Entry*> nameMap;
-  for (auto&& record : f.datalog->GetReader()) {
-    if (record.IsStart()) {
-      wpi::log::StartRecordData data;
-      if (record.GetStartData(&data)) {
-        auto it = gEntries.find(data.name);
-        if (it != gEntries.end() && it->second->selected) {
-          nameMap[data.entry] = it->second.get();
-        }
-      }
-    } else if (record.IsFinish()) {
-      int entry;
-      if (record.GetFinishEntry(&entry)) {
-        nameMap.erase(entry);
-      }
-    } else if (!record.IsControl()) {
-      auto entryIt = nameMap.find(record.GetEntry());
-      if (entryIt == nameMap.end()) {
-        continue;
-      }
-      Entry* entry = entryIt->second;
-
-      if (style == 0) {
-        wpi::util::print(os, "{},\"", record.GetTimestamp() / 1'000'000'000.0);
-        PrintEscapedCsvString(os, entry->name);
-        os << '"' << ',';
-        ValueToCsv(os, *entry, record);
-        os << '\n';
-      } else if (style == 1 && entry->column != -1) {
-        std::string value;
-        wpi::util::raw_string_ostream valueStream{value};
-        ValueToCsv(valueStream, *entry, record);
-        table.Add(record.GetTimestamp(), entry->column, value);
-      }
-    }
-  }
-  table.Flush();
-}
-
 static void ExportCsv(std::string_view outputFolder, int style,
                       int64_t timestampFuzziness) {
+  std::set<std::string, std::less<>> selected;
+  {
+    std::scoped_lock lock{gEntriesMutex};
+    for (auto&& [name, entry] : gEntries) {
+      if (entry->selected) {
+        selected.emplace(name);
+      }
+    }
+  }
   fs::path outPath{outputFolder};
   for (auto&& f : gInputFiles) {
     if (f.second->datalog) {
@@ -622,7 +464,11 @@ static void ExportCsv(std::string_view outputFolder, int style,
         continue;
       }
       wpi::util::raw_fd_ostream os{fs::FileToFd(of, ec, fs::OF_Text), true};
-      ExportCsvFile(*f.second, os, style, timestampFuzziness);
+      dlt::ExportCsv(f.second->datalog->GetReader(), os,
+                     style == 0 ? dlt::CsvStyle::LIST : dlt::CsvStyle::TABLE,
+                     timestampFuzziness, [&](std::string_view name) {
+                       return selected.contains(name);
+                     });
     }
     ++gExportCount;
   }
