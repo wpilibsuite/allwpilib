@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 07:32:33 -0700
+Subject: [PATCH 05/25] Suppress type limits warning
+
+---
+ json.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index 939efbcf8e550e7c48d180f81be39b476c5990fe..8f45bb573deed5b8c7afaf3fe2b6b40fa21555c1 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -28,6 +28,10 @@
+ #include "double-conversion/double-to-string.h"
+ #include "double-conversion/string-to-double.h"
+ 
++#ifdef __GNUC__
++#pragma GCC diagnostic ignored "-Wtype-limits"
++#endif
++
+ #define KEY 1
+ #define COMMA 2
+ #define COLON 4

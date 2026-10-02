@@ -1,0 +1,35 @@
+classes:
+  wpi::Encoder:
+    typealias:
+    - wpi::Encoder::EncodingType
+    methods:
+      Encoder:
+        overloads:
+          int, int, bool, EncodingType:
+            param_override:
+              encodingType:
+                default: wpi::Encoder::EncodingType::X4
+          DigitalSource*, DigitalSource*, bool, EncodingType:
+            ignore: true
+          DigitalSource&, DigitalSource&, bool, EncodingType:
+            ignore: true
+          std::shared_ptr<DigitalSource>, std::shared_ptr<DigitalSource>, bool, EncodingType:
+            param_override:
+              encodingType:
+                default: wpi::Encoder::EncodingType::X4
+      Get:
+      Reset:
+      GetStopped:
+      GetDirection:
+      GetRaw:
+      GetEncodingScale:
+      GetDistance:
+      GetRate:
+      SetRateWindow:
+      SetDistancePerPulse:
+      GetDistancePerPulse:
+      SetReverseDirection:
+      SetSimDevice:
+      GetFPGAIndex:
+      LogTo:
+      GetTelemetryType:

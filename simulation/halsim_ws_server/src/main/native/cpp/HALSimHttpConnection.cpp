@@ -2,25 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "HALSimHttpConnection.h"
-
-#include <uv.h>
+#include "wpi/halsim/ws_server/HALSimHttpConnection.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
 #include <string_view>
 
-#include <wpi/MemoryBuffer.h>
-#include <wpi/SmallVector.h>
-#include <wpi/StringExtras.h>
-#include <wpi/fs.h>
-#include <wpi/print.h>
-#include <wpinet/MimeTypes.h>
-#include <wpinet/UrlParser.h>
-#include <wpinet/raw_uv_ostream.h>
-#include <wpinet/uv/Request.h>
+#include <llhttp.h>
+#include <uv.h>
 
-namespace uv = wpi::uv;
+#include "wpi/net/HttpUtil.hpp"
+#include "wpi/net/MimeTypes.hpp"
+#include "wpi/net/raw_uv_ostream.hpp"
+#include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/SmallVector.hpp"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
+#include "wpi/util/print.hpp"
+
+namespace uv = wpi::net::uv;
 
 using namespace wpilibws;
 
@@ -54,16 +55,12 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
       return;
     }
 
-    wpi::json j;
-    try {
-      j = wpi::json::parse(msg);
-    } catch (const wpi::json::parse_error& e) {
-      std::string err("JSON parse failed: ");
-      err += e.what();
-      m_websocket->Fail(400, err);
+    auto j = wpi::util::json::parse(msg);
+    if (!j) {
+      m_websocket->Fail(400, std::format("JSON parse failed: {}", j.error()));
       return;
     }
-    m_server->OnNetValueChanged(j);
+    m_server->OnNetValueChanged(*j);
   });
 
   m_websocket->closed.connect([this](uint16_t, auto) {
@@ -77,36 +74,36 @@ void HALSimHttpConnection::ProcessWsUpgrade() {
   });
 }
 
-void HALSimHttpConnection::OnSimValueChanged(const wpi::json& msg) {
+void HALSimHttpConnection::OnSimValueChanged(const wpi::util::json& msg) {
   // Skip sending if this message is not in the allowed filter list
   try {
-    auto& type = msg.at("type").get_ref<const std::string&>();
+    auto& type = msg.at("type").get_string();
     if (!m_server->CanSendMessage(type)) {
       return;
     }
-  } catch (wpi::json::exception& e) {
-    wpi::print(stderr, "Error with message: {}\n", e.what());
+  } catch (std::logic_error& e) {
+    wpi::util::print(stderr, "Error with message: {}\n", e.what());
   }
 
   // render json to buffers
-  wpi::SmallVector<uv::Buffer, 4> sendBufs;
-  wpi::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
-                           std::lock_guard lock(m_buffers_mutex);
-                           return m_buffers.Allocate();
-                         }};
+  wpi::util::SmallVector<uv::Buffer, 4> sendBufs;
+  wpi::net::raw_uv_ostream os{sendBufs, [this]() -> uv::Buffer {
+                                std::lock_guard lock(m_buffers_mutex);
+                                return m_buffers.Allocate();
+                              }};
   os << msg;
 
   // call the websocket send function on the uv loop
   m_server->GetExec().Send([self = shared_from_this(), sendBufs] {
     self->m_websocket->SendText(sendBufs,
-                                [self](auto bufs, wpi::uv::Error err) {
+                                [self](auto bufs, wpi::net::uv::Error err) {
                                   {
                                     std::lock_guard lock(self->m_buffers_mutex);
                                     self->m_buffers.Release(bufs);
                                   }
 
                                   if (err) {
-                                    wpi::print(stderr, "{}\n", err.str());
+                                    wpi::util::print(stderr, "{}\n", err.str());
                                     std::fflush(stderr);
                                   }
                                 });
@@ -127,22 +124,22 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
   }
 
   // open file
-  auto fileBuffer = wpi::MemoryBuffer::GetFile(filename);
+  auto fileBuffer = wpi::util::MemoryBuffer::GetFile(filename);
   if (!fileBuffer) {
     MySendError(404, "error opening file");
     return;
   }
 
-  wpi::SmallVector<uv::Buffer, 4> toSend;
-  wpi::raw_uv_ostream os{toSend, 4096};
+  wpi::util::SmallVector<uv::Buffer, 4> toSend;
+  wpi::net::raw_uv_ostream os{toSend, 4096};
   BuildHeader(os, code, codeText, contentType, size, extraHeader);
   SendData(os.bufs(), false);
 
   Log(code);
 
   // Read the file byte by byte
-  wpi::SmallVector<uv::Buffer, 4> bodyData;
-  wpi::raw_uv_ostream bodyOs{bodyData, 4096};
+  wpi::util::SmallVector<uv::Buffer, 4> bodyData;
+  wpi::net::raw_uv_ostream bodyOs{bodyData, 4096};
 
   bodyOs << fileBuffer.value()->GetBuffer();
 
@@ -153,30 +150,29 @@ void HALSimHttpConnection::SendFileResponse(int code, std::string_view codeText,
 }
 
 void HALSimHttpConnection::ProcessRequest() {
-  wpi::UrlParser url{m_request.GetUrl(),
-                     m_request.GetMethod() == wpi::HTTP_CONNECT};
-  if (!url.IsValid()) {
+  auto url = wpi::net::ParseUrl(m_request.GetUrl());
+  if (!url) {
     // failed to parse URL
     MySendError(400, "Invalid URL");
     return;
   }
 
   std::string_view path;
-  if (url.HasPath()) {
-    path = url.GetPath();
+  if (url->get_pathname_length() > 0) {
+    path = url->get_pathname();
   }
 
-  if (m_request.GetMethod() == wpi::HTTP_GET && wpi::starts_with(path, '/') &&
-      !wpi::contains(path, "..") && !wpi::contains(path, "//")) {
+  if (m_request.GetMethod() == HTTP_GET && wpi::util::starts_with(path, '/') &&
+      !wpi::util::contains(path, "..") && !wpi::util::contains(path, "//")) {
     // convert to fs native representation
     fs::path nativePath;
-    if (auto userPath = wpi::remove_prefix(path, "/user/")) {
+    if (auto userPath = wpi::util::remove_prefix(path, "/user/")) {
       nativePath = fs::path{m_server->GetWebrootSys()} /
                    fs::path{*userPath, fs::path::format::generic_format};
     } else {
-      nativePath =
-          fs::path{m_server->GetWebrootSys()} /
-          fs::path{wpi::drop_front(path), fs::path::format::generic_format};
+      nativePath = fs::path{m_server->GetWebrootSys()} /
+                   fs::path{wpi::util::drop_front(path),
+                            fs::path::format::generic_format};
     }
 
     if (fs::is_directory(nativePath)) {
@@ -184,9 +180,9 @@ void HALSimHttpConnection::ProcessRequest() {
     }
 
     if (!fs::exists(nativePath) || fs::is_directory(nativePath)) {
-      MySendError(404, fmt::format("Resource '{}' not found", path));
+      MySendError(404, std::format("Resource '{}' not found", path));
     } else {
-      auto contentType = wpi::MimeTypeFromPath(nativePath.string());
+      auto contentType = wpi::net::MimeTypeFromPath(nativePath.string());
       SendFileResponse(200, "OK", contentType, nativePath.string());
     }
   } else {
@@ -200,7 +196,7 @@ void HALSimHttpConnection::MySendError(int code, std::string_view message) {
 }
 
 void HALSimHttpConnection::Log(int code) {
-  auto method = wpi::http_method_str(m_request.GetMethod());
-  wpi::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
-             m_request.GetMajor(), m_request.GetMinor(), code);
+  auto method = llhttp_method_name(m_request.GetMethod());
+  wpi::util::print(stderr, "{} {} HTTP/{}.{} {}\n", method, m_request.GetUrl(),
+                   m_request.GetMajor(), m_request.GetMinor(), code);
 }

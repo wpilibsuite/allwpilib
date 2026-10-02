@@ -1,0 +1,28 @@
+classes:
+  wpi::PWMMotorController:
+    attributes:
+      m_pwm:
+    methods:
+      SetThrottle:
+      GetThrottle:
+      GetVoltage:
+      SetInverted:
+      GetInverted:
+      Disable:
+      StopMotor:
+      GetDescription:
+      GetChannel:
+      EnableDeadbandElimination:
+      AddFollower:
+        overloads:
+          PWMMotorController&:
+            keepalive:
+            - [1, 2]
+          T&&:
+            ignore: true
+      PWMMotorController:
+      SetDutyCycleInternal:
+      GetDutyCycleInternal:
+      SetBounds:
+      LogTo:
+      GetTelemetryType:

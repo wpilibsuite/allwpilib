@@ -4,7 +4,7 @@ apply plugin: 'jacoco'
 
 def baseArtifactId = project.baseId
 def artifactGroupId = project.groupId
-def javaBaseName = "_GROUP_${project.groupId.replace('.', '_')}_ID_${project.baseId}-java_CLS"
+def javaBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-java")
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -56,6 +56,13 @@ build.dependsOn outputSourcesJar
 build.dependsOn outputJavadocJar
 build.dependsOn outputJar
 
+// Projects that generate source code with annotation processors (such as avaje serde classes)
+// need to have those generated files on the source path so javadoc can pick them up.
+tasks.named('javadoc').configure {
+    it.dependsOn('compileJava')
+}
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
+
 project(':').libraryBuild.dependsOn build
 
 publishing {
@@ -74,7 +81,7 @@ publishing {
 }
 
 test {
-    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=org.opencv,wpilib.apriltag,wpilib.hal,wpilib.math,wpilib.ntcore,wpilib.util,ALL-UNNAMED'
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
@@ -84,7 +91,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+if (project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
     test.enabled = false
 }
 
@@ -101,33 +108,22 @@ sourceSets {
 
 configurations {
     devImplementation.extendsFrom(implementation)
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-        '--release',
-        '17',
-        '-encoding',
-        'UTF8',
-        "-Werror",
-        "-Xlint:all",
-        // ignore AutoCloseable warnings
-        "-Xlint:-try",
-        // ignore missing serialVersionUID warnings
-        "-Xlint:-serial",
-        // ignore unclaimed annotation warning from annotation processing
-        "-Xlint:-processing",
-    ]
+    configureEach {
+        // avaje has incorrectly listed io.avaje:avaje-jsonb-inject-plugin as a dependency of io.avaje:avaje-jsonb,
+        // which results in runtime crashes when `--add-modules ALL-MODULE-PATH` is used.
+        // We don't use or care about avaje's dependency injection library, so we manually exclude the bridge library.
+        exclude(group: 'io.avaje', module: 'avaje-jsonb-inject-plugin')
+    }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation libs.junit.api
+    testRuntimeOnly libs.junit.launcher
 
     devImplementation sourceSets.main.output
 }
 
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
     mainClass = project.devMain
@@ -136,7 +132,7 @@ task run(type: JavaExec) {
 build.dependsOn devClasses
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {

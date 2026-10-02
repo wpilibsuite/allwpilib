@@ -27,21 +27,17 @@ def copy_upstream_src(wpilib_root: Path):
         Path("imstb_rectpack.h"),
         Path("imconfig.h"),
         Path("imstb_textedit.h"),
-        Path("backends/imgui_impl_glfw.h"),
-        Path("backends/imgui_impl_metal.h"),
-        Path("backends/imgui_impl_opengl3.h"),
-        Path("backends/imgui_impl_dx11.h"),
-        Path("backends/imgui_impl_opengl3_loader.h"),
-        Path("backends/imgui_impl_opengl2.h"),
+        Path("backends/imgui_impl_sdl3.h"),
+        Path("backends/imgui_impl_sdlgpu3.h"),
+        Path("backends/imgui_impl_sdlrenderer3.h"),
         Path("misc/cpp/imgui_stdlib.h"),
     ]
 
     src_allow_list = [
-        Path("backends/imgui_impl_dx11.cpp"),
-        Path("backends/imgui_impl_glfw.cpp"),
-        Path("backends/imgui_impl_metal.mm"),
-        Path("backends/imgui_impl_opengl2.cpp"),
-        Path("backends/imgui_impl_opengl3.cpp"),
+        Path("backends/imgui_impl_sdl3.cpp"),
+        Path("backends/imgui_impl_sdlgpu3.cpp"),
+        Path("backends/imgui_impl_sdlgpu3_shaders.h"),
+        Path("backends/imgui_impl_sdlrenderer3.cpp"),
         Path("imgui.cpp"),
         Path("imgui_demo.cpp"),
         Path("imgui_draw.cpp"),
@@ -57,8 +53,8 @@ def copy_upstream_src(wpilib_root: Path):
 def main():
     name = "imgui"
     url = "https://github.com/ocornut/imgui.git"
-    # docking on 2023-09-18
-    tag = "64b1e448d20c9be9275af731c34b4c7bf14a8e95"
+    # docking on 2026-05-04
+    tag = "ed9d1e742793f7e4333565f891b4e3821b205f09"
 
     imgui = Lib(name, url, tag, copy_upstream_src)
     imgui.main()

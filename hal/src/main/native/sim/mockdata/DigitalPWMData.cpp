@@ -2,19 +2,19 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "../PortsInternal.h"
-#include "DigitalPWMDataInternal.h"
+#include "../PortsInternal.hpp"
+#include "DigitalPWMDataInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeDigitalPWMData() {
-  static DigitalPWMData sdpd[kNumDigitalPWMOutputs];
-  ::hal::SimDigitalPWMData = sdpd;
+  static DigitalPWMData sdpd[NUM_DIGITAL_PWM_OUTPUTS];
+  ::wpi::hal::SimDigitalPWMData = sdpd;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-DigitalPWMData* hal::SimDigitalPWMData;
+DigitalPWMData* wpi::hal::SimDigitalPWMData;
 void DigitalPWMData::ResetData() {
   initialized.Reset(false);
   dutyCycle.Reset(0.0);
@@ -23,7 +23,7 @@ void DigitalPWMData::ResetData() {
 
 extern "C" {
 int32_t HALSIM_FindDigitalPWMForChannel(int32_t channel) {
-  for (int i = 0; i < kNumDigitalPWMOutputs; ++i) {
+  for (int i = 0; i < NUM_DIGITAL_PWM_OUTPUTS; ++i) {
     if (SimDigitalPWMData[i].initialized &&
         SimDigitalPWMData[i].pin == channel) {
       return i;

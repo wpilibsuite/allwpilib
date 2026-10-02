@@ -7,26 +7,22 @@ on:
 
 jobs:
   wpilib-mvn-development_unused_cleanup:
-    runs-on: ubuntu-latest
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: jfrog/setup-jfrog-cli@v4
+      - uses: actions/checkout@v7
+      - uses: jfrog/setup-jfrog-cli@v5
         env:
           JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup
         run: jf rt del --spec=.github/workflows/aql/wpilib-mvn-development_unused.aql
 
   wpilib-generic-gradle-cache_unused_cleanup:
-    runs-on: ubuntu-latest
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     if: github.repository == 'wpilibsuite/allwpilib' && github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: jfrog/setup-jfrog-cli@v4
+      - uses: actions/checkout@v7
+      - uses: jfrog/setup-jfrog-cli@v5
         env:
           JF_ENV_1: ${{ secrets.ARTIFACTORY_CLI_SECRET }}
       - name: Cleanup

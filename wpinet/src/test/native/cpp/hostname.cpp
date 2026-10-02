@@ -2,22 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/hostname.h"
+#include "wpi/net/hostname.hpp"
 
-#include <gtest/gtest.h>
-#include <wpi/SmallString.h>
-#include <wpi/SmallVector.h>
+#include <catch2/catch_test_macros.hpp>
 
-namespace wpi {
-TEST(HostNameTest, HostNameNotEmpty) {
-  ASSERT_NE(GetHostname(), "");
+#include "wpi/util/SmallString.hpp"
+#include "wpi/util/SmallVector.hpp"
+
+namespace wpi::net {
+TEST_CASE("HostNameTest HostNameNotEmpty", "[hostname]") {
+  REQUIRE(GetHostname() != "");
 }
-TEST(HostNameTest, HostNameNotEmptySmallVector) {
-  SmallVector<char, 256> name;
-  ASSERT_NE(GetHostname(name), "");
+TEST_CASE("HostNameTest HostNameNotEmptySmallVector", "[hostname]") {
+  wpi::util::SmallVector<char, 256> name;
+  REQUIRE(GetHostname(name) != "");
 }
-TEST(HostNameTest, HostNameEq) {
-  SmallVector<char, 256> nameBuf;
-  ASSERT_EQ(GetHostname(nameBuf), GetHostname());
+TEST_CASE("HostNameTest HostNameEq", "[hostname]") {
+  wpi::util::SmallVector<char, 256> nameBuf;
+  REQUIRE(GetHostname(nameBuf) == GetHostname());
 }
-}  // namespace wpi
+}  // namespace wpi::net

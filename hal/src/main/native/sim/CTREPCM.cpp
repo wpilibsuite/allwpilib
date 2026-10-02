@@ -2,58 +2,51 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/CTREPCM.h"
+#include "wpi/hal/CTREPCM.h"
 
 #include <string>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/IndexedHandleResource.h"
-#include "mockdata/CTREPCMDataInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/CTREPCMDataInternal.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct PCM {
   int32_t module;
-  wpi::mutex lock;
+  wpi::util::mutex lock;
   std::string previousAllocation;
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                             HAL_HandleEnum::CTREPCM>* pcmHandles;
+static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTREPCM_MODULES,
+                             HAL_HandleEnum::CTRE_PCM>* pcmHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeCTREPCM() {
-  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, kNumCTREPCMModules,
-                               HAL_HandleEnum::CTREPCM>
+  static IndexedHandleResource<HAL_CTREPCMHandle, PCM, NUM_CTREPCM_MODULES,
+                               HAL_HandleEnum::CTRE_PCM>
       pH;
   pcmHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t module,
+HAL_CTREPCMHandle HAL_InitializeCTREPCM(int32_t busId, int32_t module,
                                         const char* allocationLocation,
                                         int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
-  HAL_CTREPCMHandle handle;
-  auto pcm = pcmHandles->Allocate(module, &handle, status);
+  auto resource = pcmHandles->Allocate(module, "CTRE PCM");
 
-  if (*status != 0) {
-    if (pcm) {
-      hal::SetLastErrorPreviouslyAllocated(status, "CTRE PCM", module,
-                                           pcm->previousAllocation);
-    } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for CTRE PCM", 0,
-                                       kNumCTREPCMModules - 1, module);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 
@@ -75,7 +68,7 @@ void HAL_FreeCTREPCM(HAL_CTREPCMHandle handle) {
 }
 
 HAL_Bool HAL_CheckCTREPCMSolenoidChannel(int32_t channel) {
-  return channel < kNumCTRESolenoidChannels && channel >= 0;
+  return channel < NUM_CTRE_SOLENOID_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetCTREPCMCompressor(HAL_CTREPCMHandle handle, int32_t* status) {
@@ -172,7 +165,7 @@ int32_t HAL_GetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t* status) {
   std::scoped_lock lock{pcm->lock};
   auto& data = SimCTREPCMData[pcm->module].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   return ret;
@@ -187,7 +180,7 @@ void HAL_SetCTREPCMSolenoids(HAL_CTREPCMHandle handle, int32_t mask,
 
   auto& data = SimCTREPCMData[pcm->module].solenoidOutput;
   std::scoped_lock lock{pcm->lock};
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     auto indexMask = (1 << i);
     if ((mask & indexMask) != 0) {
       data[i] = (values & indexMask) != 0;

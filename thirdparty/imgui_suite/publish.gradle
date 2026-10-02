@@ -1,8 +1,8 @@
 apply plugin: 'maven-publish'
 
 def baseArtifactId = 'imguiSuite-cpp'
-def artifactGroupId = 'edu.wpi.first.thirdparty.imguiSuite'
-def zipBaseName = '_GROUP_edu_wpi_first_thirdparty_imguiSuite_ID_imguiSuite-cpp_CLS'
+def artifactGroupId = 'org.wpilib.thirdparty.imguiSuite'
+def zipBaseName = makeZipBaseName(artifactGroupId, baseArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
 
@@ -16,13 +16,6 @@ task cppSourcesZip(type: Zip) {
     }
 
     from('generated/fonts/src') {
-        into '/'
-    }
-    from('generated/gl3w/src') {
-        into '/'
-    }
-
-    from('glfw/src') {
         into '/'
     }
     from('imgui/cpp') {
@@ -46,12 +39,6 @@ task cppHeadersZip(type: Zip) {
     }
 
     from('generated/fonts/include') {
-        into '/'
-    }
-    from('generated/gl3w/include') {
-        into '/'
-    }
-    from('glfw/include') {
         into '/'
     }
     from('imgui/include') {

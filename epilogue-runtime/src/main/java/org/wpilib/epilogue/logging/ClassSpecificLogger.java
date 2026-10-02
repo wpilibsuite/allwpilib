@@ -1,0 +1,89 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.epilogue.logging;
+
+import org.wpilib.epilogue.CustomLoggerFor;
+import org.wpilib.epilogue.logging.errors.ErrorHandler;
+import org.wpilib.telemetry.TelemetryTable;
+
+/**
+ * Base class for class-specific generated loggers. Loggers are generated at compile time by the
+ * Epilogue annotation processor and are used at runtime for zero-overhead data logging. Users may
+ * also declare custom loggers, annotated with {@link CustomLoggerFor @CustomLoggerFor}, for
+ * Epilogue to pull in during compile time to use for logging third party types.
+ *
+ * @param <T> the type of data supported by the logger
+ */
+@SuppressWarnings("unused") // Used by generated subclasses
+public abstract class ClassSpecificLogger<T> {
+  private final Class<T> m_clazz;
+
+  private boolean m_disabled = false;
+
+  /**
+   * Instantiates the logger.
+   *
+   * @param clazz the Java class of objects that can be logged
+   */
+  protected ClassSpecificLogger(Class<T> clazz) {
+    this.m_clazz = clazz;
+  }
+
+  /**
+   * Updates an object's fields in telemetry.
+   *
+   * @param table the telemetry table to update
+   * @param object the object to update in the log
+   */
+  protected abstract void update(TelemetryTable table, T object);
+
+  /**
+   * Attempts to update telemetry. Will do nothing if the logger is {@link #disable() disabled}.
+   *
+   * @param table the telemetry table to log data to
+   * @param object the data object to log
+   * @param errorHandler the handler to use if logging raised an exception
+   */
+  @SuppressWarnings("PMD.AvoidCatchingGenericException")
+  public final void tryUpdate(TelemetryTable table, T object, ErrorHandler errorHandler) {
+    if (m_disabled) {
+      return;
+    }
+
+    try {
+      update(table, object);
+    } catch (Exception e) {
+      errorHandler.handle(e, this);
+    }
+  }
+
+  /**
+   * Checks if this logger has been disabled.
+   *
+   * @return true if this logger has been disabled by {@link #disable()}, false if not
+   */
+  public final boolean isDisabled() {
+    return m_disabled;
+  }
+
+  /** Disables this logger. Any log calls made while disabled will be ignored. */
+  public final void disable() {
+    m_disabled = true;
+  }
+
+  /** Reenables this logger after being disabled. Has no effect if the logger is already enabled. */
+  public final void reenable() {
+    m_disabled = false;
+  }
+
+  /**
+   * Gets the type of the data this logger accepts.
+   *
+   * @return the logged data type
+   */
+  public final Class<T> getLoggedType() {
+    return m_clazz;
+  }
+}

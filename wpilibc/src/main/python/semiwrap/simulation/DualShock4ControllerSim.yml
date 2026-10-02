@@ -1,0 +1,35 @@
+extra_includes:
+- wpi/driverstation/DualShock4Controller.hpp
+
+classes:
+  wpi::sim::DualShock4ControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::DualShock4Controller
+    methods:
+      DualShock4ControllerSim:
+        overloads:
+          const DualShock4Controller&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetL2:
+      SetR2:
+      SetCrossButton:
+      SetCircleButton:
+      SetSquareButton:
+      SetTriangleButton:
+      SetShareButton:
+      SetPSButton:
+      SetOptionsButton:
+      SetL3Button:
+      SetR3Button:
+      SetL1Button:
+      SetR1Button:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetTouchpadButton:

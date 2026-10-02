@@ -1,0 +1,4 @@
+classes:
+  wpi::SystemServer:
+    methods:
+      GetSystemServer:

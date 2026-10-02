@@ -2,25 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTAlerts.h"
+#include "wpi/glass/networktables/NTAlerts.hpp"
 
+#include <format>
+#include <string>
 #include <utility>
+#include <vector>
 
-#include <fmt/format.h>
+using namespace wpi::glass;
 
-using namespace glass;
+namespace {
+
+void AddAlerts(std::vector<AlertData>* alerts,
+               const std::vector<std::string>& texts, AlertData::Level level) {
+  for (auto&& text : texts) {
+    alerts->emplace_back("", "", text, 0, level);
+  }
+}
+
+}  // namespace
 
 NTAlertsModel::NTAlertsModel(std::string_view path)
-    : NTAlertsModel{nt::NetworkTableInstance::GetDefault(), path} {}
+    : NTAlertsModel{wpi::nt::NetworkTableInstance::GetDefault(), path} {}
 
-NTAlertsModel::NTAlertsModel(nt::NetworkTableInstance inst,
+NTAlertsModel::NTAlertsModel(wpi::nt::NetworkTableInstance inst,
                              std::string_view path)
     : m_inst{inst},
-      m_infos{m_inst.GetStringArrayTopic(fmt::format("{}/infos", path))
+      m_infos{m_inst.GetStringArrayTopic(std::format("{}/infos", path))
                   .Subscribe({})},
-      m_warnings{m_inst.GetStringArrayTopic(fmt::format("{}/warnings", path))
+      m_warnings{m_inst.GetStringArrayTopic(std::format("{}/warnings", path))
                      .Subscribe({})},
-      m_errors{m_inst.GetStringArrayTopic(fmt::format("{}/errors", path))
+      m_errors{m_inst.GetStringArrayTopic(std::format("{}/errors", path))
                    .Subscribe({})} {}
 
 void NTAlertsModel::Update() {
@@ -44,8 +56,15 @@ void NTAlertsModel::Update() {
   for (auto&& v : m_errors.ReadQueue()) {
     m_errorsValue = std::move(v.value);
   }
+
+  m_alerts.clear();
+  m_alerts.reserve(m_errorsValue.size() + m_warningsValue.size() +
+                   m_infosValue.size());
+  AddAlerts(&m_alerts, m_errorsValue, AlertData::Level::HIGH);
+  AddAlerts(&m_alerts, m_warningsValue, AlertData::Level::MEDIUM);
+  AddAlerts(&m_alerts, m_infosValue, AlertData::Level::LOW);
 }
 
 bool NTAlertsModel::Exists() {
-  return m_infos.Exists();
+  return m_infos.Exists() || m_warnings.Exists() || m_errors.Exists();
 }

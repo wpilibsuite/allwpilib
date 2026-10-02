@@ -1,0 +1,4 @@
+classes:
+  wpi::SparkMini:
+    methods:
+      SparkMini:

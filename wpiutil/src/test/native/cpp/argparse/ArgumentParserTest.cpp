@@ -2,17 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
-#include "wpi/argparse.h"
+#include "wpi/util/argparse.hpp"
 
-TEST(ArgparseTest, Basic) {
-  wpi::ArgumentParser program("ArgparseTest");
+TEST_CASE("ArgparseTest Basic", "[wpiutil]") {
+  wpi::util::ArgumentParser program("ArgparseTest");
 
   program.add_argument("test").help("Test argument").scan<'i', int>();
 
   constexpr const char* args[] = {"foo", "42"};
-  EXPECT_NO_THROW(program.parse_args(2, args));
+  CHECK_NOTHROW(program.parse_args(2, args));
   auto result = program.get<int>("test");
-  EXPECT_EQ(42, result);
+  CHECK(42 == result);
 }

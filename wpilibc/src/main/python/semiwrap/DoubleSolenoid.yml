@@ -1,0 +1,18 @@
+classes:
+  wpi::DoubleSolenoid:
+    enums:
+      Value:
+    methods:
+      DoubleSolenoid:
+        overloads:
+          CANPort, PneumaticsModuleType, int, int:
+          CANPort, int, PneumaticsModuleType, int, int:
+      Set:
+      Get:
+      Toggle:
+      GetFwdChannel:
+      GetRevChannel:
+      IsFwdSolenoidDisabled:
+      IsRevSolenoidDisabled:
+      LogTo:
+      GetTelemetryType:

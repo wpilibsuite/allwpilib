@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 3 May 2022 22:50:24 -0400
+Subject: [PATCH 12/32] MathExtras: add Lerp() and sgn()
+
+---
+ llvm/include/llvm/Support/MathExtras.h | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
+index 98ae88f177454a639fb9b565cf75a5e336042c29..1cd3923b7ee022c3a196079c295a735b0337b365 100644
+--- a/llvm/include/llvm/Support/MathExtras.h
++++ b/llvm/include/llvm/Support/MathExtras.h
+@@ -767,6 +767,27 @@ using stack_float_t = float;
+ /// Returns the number of digits in the given integer.
+ LLVM_ABI int NumDigitsBase10(uint64_t X);
+ 
++// Typesafe implementation of the signum function.
++// Returns -1 if negative, 1 if positive, 0 if 0.
++template <typename T>
++constexpr int sgn(T val) {
++  return (T(0) < val) - (val < T(0));
++}
++
++/**
++ * Linearly interpolates between two values.
++ *
++ * @param startValue The start value.
++ * @param endValue The end value.
++ * @param t The fraction for interpolation.
++ *
++ * @return The interpolated value.
++ */
++template <typename T>
++constexpr T Lerp(const T& startValue, const T& endValue, double t) {
++  return startValue + (endValue - startValue) * t;
++}
++
+ } // namespace llvm
+ 
+ #endif

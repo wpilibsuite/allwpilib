@@ -1,0 +1,102 @@
+classes:
+  wpi::math::SwerveDriveKinematics:
+    force_type_casters:
+    - wpi::util::array
+    template_params:
+    - size_t NumModules
+    methods:
+      SwerveDriveKinematics:
+        overloads:
+          ModuleTranslations&&...:
+            ignore: true
+          const wpi::util::array<Translation2d, NumModules>&:
+            ignore: true
+
+      ResetHeadings:
+        overloads:
+          ModuleHeadings&&...:
+            ignore: true
+          wpi::util::array<Rotation2d, NumModules>:
+
+      ToSwerveModuleVelocities:
+        doc: |
+          Performs inverse kinematics to return the module states from a desired
+          chassis velocity. This method is often used to convert joystick values into
+          module velocities and angles.
+
+          This function also supports variable centers of rotation. During normal
+          operations, the center of rotation is usually the same as the physical
+          center of the robot; therefore, the argument is defaulted to that use case.
+          However, if you wish to change the center of rotation for evasive
+          maneuvers, vision alignment, or for any other use case, you can do so.
+
+          :param chassisVelocities:    The desired chassis velocity.
+          :param centerOfRotation: The center of rotation. For example, if you set the
+           center of rotation at one corner of the robot and provide a chassis velocity
+           that only has a dtheta component, the robot will rotate around that corner.
+
+          :returns: An array containing the module states. Use caution because these
+                    module states are not normalized. Sometimes, a user input may cause one of
+                    the module velocities to go above the attainable max velocity. Use the
+                    :meth:`desaturateWheelVelocities` function to rectify this issue.
+                    In addition, you can use Python unpacking syntax
+                    to directly assign the module states to variables::
+
+                      fl, fr, bl, br = kinematics.toSwerveModuleVelocities(chassisVelocities)
+      ToWheelVelocities:
+      ToChassisVelocities:
+        overloads:
+          ModuleVelocities&&... [const]:
+            ignore: true
+          const wpi::util::array<SwerveModuleVelocity, NumModules>& [const]:
+      ToTwist2d:
+        overloads:
+          ModuleDeltas&&... [const]:
+            ignore: true
+          wpi::util::array<SwerveModulePosition, NumModules> [const]:
+          ? const wpi::util::array<SwerveModulePosition, NumModules>&, const wpi::util::array<SwerveModulePosition, NumModules>& [const]
+          :
+      DesaturateWheelVelocities:
+        overloads:
+          wpi::util::array<SwerveModuleVelocity, NumModules>, wpi::units::meters_per_second_t:
+          ? wpi::util::array<SwerveModuleVelocity, NumModules>, ChassisVelocities, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, wpi::units::radians_per_second_t
+          :
+      Interpolate:
+      GetModules:
+      ToSwerveModuleAccelerations:
+      ToWheelAccelerations:
+      ToChassisAccelerations:
+        overloads:
+          ModuleAccelerations&&... [const]:
+            ignore: true
+          const wpi::util::array<SwerveModuleAcceleration, NumModules>& [const]:
+
+    template_inline_code: |
+      if constexpr (NumModules == 2) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 3) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 4) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d, Translation2d>());
+      } else if constexpr (NumModules == 6) {
+        cls_SwerveDriveKinematics.def(py::init<Translation2d, Translation2d, Translation2d, Translation2d, Translation2d, Translation2d>());
+      }
+
+
+templates:
+  SwerveDrive2Kinematics:
+    qualname: wpi::math::SwerveDriveKinematics
+    params:
+    - 2
+  SwerveDrive3Kinematics:
+    qualname: wpi::math::SwerveDriveKinematics
+    params:
+    - 3
+  SwerveDrive4Kinematics:
+    qualname: wpi::math::SwerveDriveKinematics
+    params:
+    - 4
+  SwerveDrive6Kinematics:
+    qualname: wpi::math::SwerveDriveKinematics
+    params:
+    - 6

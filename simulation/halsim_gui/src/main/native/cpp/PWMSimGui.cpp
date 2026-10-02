@@ -2,46 +2,43 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "PWMSimGui.h"
+#include "PWMSimGui.hpp"
 
 #include <memory>
 #include <vector>
 
-#include <glass/hardware/PWM.h>
-#include <hal/Ports.h>
-#include <hal/simulation/AddressableLEDData.h>
-#include <hal/simulation/PWMData.h>
-
-#include "HALDataSource.h"
-#include "HALSimGui.h"
+#include "wpi/glass/hardware/PWM.hpp"
+#include "wpi/hal/Ports.h"
+#include "wpi/hal/simulation/AddressableLEDData.h"
+#include "wpi/hal/simulation/PWMData.h"
+#include "wpi/halsim/gui/HALDataSource.hpp"
+#include "wpi/halsim/gui/HALSimGui.hpp"
 
 using namespace halsimgui;
 
 namespace {
-HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMSpeed, "PWM");
+HALSIMGUI_DATASOURCE_DOUBLE_INDEXED(PWMPulseMicrosecond, "PWM");
 
-class PWMSimModel : public glass::PWMModel {
+class PWMSimModel : public wpi::glass::PWMModel {
  public:
-  explicit PWMSimModel(int32_t index) : m_index{index}, m_speed{m_index} {}
+  explicit PWMSimModel(int32_t index) : m_index{index}, m_dutyCycle{m_index} {}
 
   void Update() override {}
 
   bool Exists() override { return HALSIM_GetPWMInitialized(m_index); }
 
-  void SetAddressableLED(int led) { m_led = led; }
-  int GetAddressableLED() const override { return m_led; }
+  wpi::glass::DoubleSource* GetDutyCycleData() override { return &m_dutyCycle; }
 
-  glass::DataSource* GetSpeedData() override { return &m_speed; }
-
-  void SetSpeed(double val) override { HALSIM_SetPWMSpeed(m_index, val); }
+  void SetDutyCycle(double dutyCycle) override {
+    HALSIM_SetPWMPulseMicrosecond(m_index, dutyCycle);
+  }
 
  private:
   int32_t m_index;
-  int m_led = -1;
-  PWMSpeedSource m_speed;
+  PWMPulseMicrosecondSource m_dutyCycle;
 };
 
-class PWMsSimModel : public glass::PWMsModel {
+class PWMsSimModel : public wpi::glass::PWMsModel {
  public:
   PWMsSimModel() : m_sources(HAL_GetNumPWMChannels()) {}
 
@@ -50,7 +47,8 @@ class PWMsSimModel : public glass::PWMsModel {
   bool Exists() override { return true; }
 
   void ForEachPWM(
-      wpi::function_ref<void(glass::PWMModel& model, int index)> func) override;
+      wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)>
+          func) override;
 
  private:
   // indexed by channel
@@ -66,25 +64,15 @@ void PWMsSimModel::Update() {
       if (!model) {
         model = std::make_unique<PWMSimModel>(i);
       }
-      model->SetAddressableLED(-1);
     } else {
       model.reset();
-    }
-  }
-
-  static const int32_t numLED = HAL_GetNumAddressableLEDs();
-  for (int32_t i = 0; i < numLED; ++i) {
-    if (HALSIM_GetAddressableLEDInitialized(i)) {
-      int32_t channel = HALSIM_GetAddressableLEDOutputPort(i);
-      if (channel >= 0 && channel < numPWM && m_sources[channel]) {
-        m_sources[channel]->SetAddressableLED(i);
-      }
     }
   }
 }
 
 void PWMsSimModel::ForEachPWM(
-    wpi::function_ref<void(glass::PWMModel& model, int index)> func) {
+    wpi::util::function_ref<void(wpi::glass::PWMModel& model, int index)>
+        func) {
   const int32_t numPWM = m_sources.size();
   for (int32_t i = 0; i < numPWM; ++i) {
     if (auto model = m_sources[i].get()) {
@@ -107,12 +95,12 @@ void PWMSimGui::Initialize() {
   HALSimGui::halProvider->Register(
       "PWM Outputs", PWMsAnyInitialized,
       [] { return std::make_unique<PWMsSimModel>(); },
-      [](glass::Window* win, glass::Model* model) {
+      [](wpi::glass::Window* win, wpi::glass::Model* model) {
         win->SetFlags(ImGuiWindowFlags_AlwaysAutoResize);
         win->SetDefaultPos(910, 20);
-        return glass::MakeFunctionView([=] {
-          glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
-                             HALSimGui::halProvider->AreOutputsEnabled());
+        return wpi::glass::MakeFunctionView([=] {
+          wpi::glass::DisplayPWMs(static_cast<PWMsSimModel*>(model),
+                                  HALSimGui::halProvider->AreOutputsEnabled());
         });
       });
 }

@@ -25,8 +25,9 @@ wget -O droid-fonts.zip https://github.com/grays/droid-fonts/archive/${DROID_COM
 wget -O fira-code.zip https://github.com/tonsky/FiraCode/releases/download/${FIRACODE_VERSION}/Fira_Code_v${FIRACODE_VERSION}.zip
 wget -O roboto.zip https://github.com/googlefonts/roboto/releases/download/v${ROBOTO_VERSION}/roboto-android.zip
 
-# Download C++ icon font header
+# Download C++ icon font headers
 wget https://github.com/juliettef/IconFontCppHeaders/raw/${ICONFONTCPPHEADERS_COMMIT}/IconsFontAwesome6.h
+wget https://github.com/juliettef/IconFontCppHeaders/raw/${ICONFONTCPPHEADERS_COMMIT}/IconsFontAwesome6Brands.h
 
 popd
 
@@ -51,8 +52,9 @@ rm -rf fonts
 mkdir -p fonts/src
 mkdir -p fonts/include
 
-# Copy C++ icon font header
+# Copy C++ icon font headers
 cp -p download/IconsFontAwesome6.h fonts/include/
+cp -p download/IconsFontAwesome6Brands.h fonts/include/
 
 # Copy license files
 cp -p extract/proggyfonts-${PROGGYFONTS_VERSION}/LICENSE fonts/LICENSE-proggyfonts.txt
@@ -65,6 +67,7 @@ g++ -o imgui_font_bin2c download/binary_to_compressed_c.cpp
 ./imgui_font_bin2c "extract/proggyfonts-${PROGGYFONTS_VERSION}/ProggyDotted/ProggyDotted Regular.ttf" ProggyDotted > fonts/src/ProggyDotted.inc
 ./imgui_font_bin2c "extract/fontawesome-free-${FONTAWESOME_VERSION}-web/webfonts/fa-regular-400.ttf" FontAwesomeRegular > fonts/src/FontAwesomeRegular.inc
 ./imgui_font_bin2c "extract/fontawesome-free-${FONTAWESOME_VERSION}-web/webfonts/fa-solid-900.ttf" FontAwesomeSolid > fonts/src/FontAwesomeSolid.inc
+./imgui_font_bin2c "extract/fontawesome-free-${FONTAWESOME_VERSION}-web/webfonts/fa-brands-400.ttf" FontAwesomeBrands > fonts/src/FontAwesomeBrands.inc
 ./imgui_font_bin2c "extract/droid-fonts-${DROID_COMMIT}/droid/DroidSans.ttf" DroidSans > fonts/src/DroidSans.inc
 ./imgui_font_bin2c "extract/fira-code/ttf/FiraCode-Retina.ttf" FiraCodeRetina > fonts/src/FiraCodeRetina.inc
 ./imgui_font_bin2c "extract/roboto/Roboto-Light.ttf" RobotoLight > fonts/src/RobotoLight.inc
@@ -75,7 +78,7 @@ g++ -o imgui_font_bin2c download/binary_to_compressed_c.cpp
 ./imgui_font_bin2c "extract/roboto/RobotoCondensed-Bold.ttf" RobotoCondensedBold > fonts/src/RobotoCondensedBold.inc
 
 # Generate C wrapper source/headers
-for font in ProggyDotted FontAwesomeRegular FontAwesomeSolid DroidSans FiraCodeRetina RobotoLight RobotoRegular RobotoBold RobotoCondensedLight RobotoCondensedRegular RobotoCondensedBold
+for font in ProggyDotted FontAwesomeRegular FontAwesomeSolid FontAwesomeBrands DroidSans FiraCodeRetina RobotoLight RobotoRegular RobotoBold RobotoCondensedLight RobotoCondensedRegular RobotoCondensedBold
 do
 cat >fonts/src/imgui_${font}.cpp <<END
 #include "imgui_${font}.h"

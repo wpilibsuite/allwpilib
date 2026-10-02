@@ -1,0 +1,828 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.command3;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.Test;
+
+class SchedulerCancellationTests extends CommandTestBase {
+  @Test
+  void cancelOnInterruptDoesNotResume() {
+    var count = new AtomicInteger(0);
+
+    var mechanism = new DummyMechanism("mechanism", m_scheduler);
+
+    var interrupter =
+        Command.requiring(mechanism)
+            .executing(coroutine -> {})
+            .withPriority(2)
+            .named("Interrupter");
+
+    var canceledCommand =
+        Command.requiring(mechanism)
+            .executing(
+                coroutine -> {
+                  count.set(1);
+                  coroutine.yield();
+                  count.set(2);
+                })
+            .withPriority(1)
+            .named("Cancel By Default");
+
+    m_scheduler.schedule(canceledCommand);
+    m_scheduler.run();
+
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+    assertEquals(1, count.get()); // the second "set" call should not have run
+  }
+
+  @Test
+  void defaultCommandResumesAfterInterruption() {
+    var count = new AtomicInteger(0);
+
+    var mechanism = new DummyMechanism("mechanism", m_scheduler);
+    var defaultCmd =
+        mechanism
+            .run(
+                coroutine -> {
+                  while (true) {
+                    count.incrementAndGet();
+                    coroutine.yield();
+                  }
+                })
+            .withPriority(-1)
+            .named("Default Command");
+
+    final var newerCmd = mechanism.run(coroutine -> {}).named("Newer Command");
+    mechanism.setDefaultCommand(defaultCmd);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(defaultCmd), "Default command should be running");
+
+    m_scheduler.schedule(newerCmd);
+    m_scheduler.run();
+    assertFalse(m_scheduler.isRunning(defaultCmd), "Default command should have been interrupted");
+    assertEquals(1, count.get(), "Default command should have run once");
+
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(defaultCmd), "Default command should have resumed");
+    assertEquals(2, count.get());
+  }
+
+  @Test
+  void cancelsEvictsOnDeck() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancel(command);
+    assertFalse(m_scheduler.isScheduledOrRunning(command));
+  }
+
+  @Test
+  void cancelRunningEmitsEvent() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    m_scheduler.cancel(command);
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        e -> e.command().equals(command),
+        "Cancellation did not emit an event");
+  }
+
+  @Test
+  void cancelQueuedEmitsEvent() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancel(command);
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        e -> e.command().equals(command),
+        "Cancellation did not emit an event");
+  }
+
+  @Test
+  void cancelUnknownDoesNotEmitEvent() {
+    // Create a command but do not schedule it.
+    // The scheduler won't know about it and should not emit an event.
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.cancel(command);
+    assertEquals(
+        List.of(), m_events, "Cancellation of an unknown command should not emit an event");
+  }
+
+  @Test
+  void cancelNullDoesNothing() {
+    m_scheduler.cancel(null);
+    assertEquals(
+        List.of(),
+        m_events,
+        "Cancellation of null should not emit an event and should not throw an exception");
+  }
+
+  @Test
+  void commandCancelingSelf() {
+    var ranAfterCancel = new AtomicBoolean(false);
+    var commandRef = new AtomicReference<Command>(null);
+    var command =
+        Command.noRequirements(
+                co -> {
+                  co.scheduler().cancel(commandRef.get());
+                  ranAfterCancel.set(true);
+                })
+            .named("Self-Canceling Command");
+    commandRef.set(command);
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    assertFalse(ranAfterCancel.get(), "Command should have stopped after canceling itself");
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command().equals(command),
+        "Command should have been canceled");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(command),
+        "Command should have been removed from the scheduler");
+  }
+
+  @Test
+  void requestCancellation() {
+    var ranAfterCancel = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(
+                co -> {
+                  co.requestCancellation();
+                  ranAfterCancel.set(true);
+                })
+            .named("Self-Canceling Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    assertFalse(ranAfterCancel.get(), "Command should have stopped after requesting cancellation");
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command().equals(command),
+        "Command should have been canceled");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(command),
+        "Command should have been removed from the scheduler");
+  }
+
+  @Test
+  void requestCancellationBubblesDown() {
+    var child = new PriorityCommand(0);
+    var command =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child);
+                  co.requestCancellation();
+                })
+            .named("Self-Canceling Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command().equals(command),
+        "Command should have been canceled");
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command().equals(child),
+        "Child command should have been canceled");
+    assertFalse(
+        m_scheduler.isScheduledOrRunning(child),
+        "Child command should have been removed from the scheduler");
+  }
+
+  @Test
+  void requestCancellationDoesNotBubbleUp() {
+    var selfCanceller =
+        Command.noRequirements(Coroutine::requestCancellation).named("Self-Canceling Command");
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  co.await(selfCanceller);
+                  co.park();
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command().equals(selfCanceller),
+        "Self-cancelling command should have been canceled");
+    assertEquals(List.of(parent), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void requestCancellationCallsOnCancel() {
+    AtomicBoolean callbackRan = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::requestCancellation)
+            .whenCanceled(() -> callbackRan.set(true))
+            .named("Self-Cancelling Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertTrue(callbackRan.get(), "OnCancel callback should have been called");
+  }
+
+  @Test
+  void requestCancellationCallsOnExit() {
+    AtomicBoolean callbackRan = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::requestCancellation)
+            .whenExited(() -> callbackRan.set(true))
+            .named("Self-Cancelling Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    assertTrue(callbackRan.get(), "OnExit callback should have been called");
+  }
+
+  @Test
+  void cancelAllEvictsOnDeck() {
+    var command = Command.noRequirements(Coroutine::park).named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.cancelAll();
+    assertFalse(m_scheduler.isScheduledOrRunning(command));
+  }
+
+  @Test
+  void cancelAllCancelsAll() {
+    var commands = new ArrayList<Command>(10);
+    for (int i = 1; i <= 10; i++) {
+      commands.add(Command.noRequirements(Coroutine::yield).named("Command " + i));
+    }
+    commands.forEach(m_scheduler::schedule);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
+    for (Command command : commands) {
+      if (m_scheduler.isRunning(command)) {
+        fail(command.name() + " was not canceled by cancelAll()");
+      }
+    }
+  }
+
+  @Test
+  void cancelAllCallsOnCancelHookForRunningCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
+    assertTrue(ranHook.get(), "onCancel hook was not called");
+  }
+
+  @Test
+  void cancelAllDoesNotCallOnCancelHookForQueuedCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::park)
+            .whenCanceled(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    // no call to run before cancelAll()
+    m_scheduler.cancelAll();
+    assertFalse(ranHook.get(), "onCancel hook was not called");
+  }
+
+  @Test
+  void cancelAllCallsOnExitHookForRunningCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::park)
+            .whenExited(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
+    assertTrue(ranHook.get(), "onExit hook was not called");
+  }
+
+  @Test
+  void cancelAllDoesNotCallOnExitHookForQueuedCommands() {
+    AtomicBoolean ranHook = new AtomicBoolean(false);
+    var command =
+        Command.noRequirements(Coroutine::park)
+            .whenExited(() -> ranHook.set(true))
+            .named("Command");
+    m_scheduler.schedule(command);
+    // no call to run before cancelAll()
+    m_scheduler.cancelAll();
+    assertFalse(ranHook.get(), "onExit hook was called when it shouldn't have been");
+  }
+
+  @Test
+  void cancelAllStartsDefaults() {
+    var mechanisms = new ArrayList<Mechanism>(10);
+    for (int i = 1; i <= 10; i++) {
+      var mechanism = new DummyMechanism("System " + i, m_scheduler);
+      mechanism.setDefaultCommand(mechanism.idle());
+      mechanisms.add(mechanism);
+    }
+
+    var command = Command.requiring(mechanisms).executing(Coroutine::yield).named("Big Command");
+
+    // Scheduling the command should evict the on-deck default commands
+    m_scheduler.schedule(command);
+
+    // Then running should get it into the set of running commands
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(command));
+    for (Mechanism mechanism : mechanisms) {
+      assertEquals(List.of(command), m_scheduler.getRunningCommandsFor(mechanism));
+    }
+
+    // Canceling should clear out the set of running commands
+    m_scheduler.cancelAll();
+    assertFalse(m_scheduler.isRunning(command), "Command was not canceled by cancelAll()");
+
+    // Then ticking the scheduler once to fully remove the command and schedule the defaults
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isRunning(command), "Command was not canceled by cancelAll()");
+
+    for (var mechanism : mechanisms) {
+      var runningCommands = m_scheduler.getRunningCommandsFor(mechanism);
+      assertEquals(
+          1,
+          runningCommands.size(),
+          "mechanism " + mechanism + " should have exactly one running command");
+      assertEquals(
+          mechanism.getDefaultCommand(),
+          runningCommands.getFirst(),
+          "mechanism " + mechanism + " is not running the default command");
+    }
+  }
+
+  @Test
+  void cancelDeeplyNestedCompositions() {
+    Command root =
+        Command.noRequirements(
+                co -> {
+                  co.await(
+                      Command.noRequirements(
+                              co2 -> {
+                                co2.await(
+                                    Command.noRequirements(
+                                            co3 -> {
+                                              co3.await(
+                                                  Command.noRequirements(Coroutine::park)
+                                                      .named("Park"));
+                                            })
+                                        .named("C3"));
+                              })
+                          .named("C2"));
+                })
+            .named("Root");
+
+    m_scheduler.schedule(root);
+
+    m_scheduler.run();
+    assertEquals(4, m_scheduler.getRunningCommands().size());
+
+    m_scheduler.cancel(root);
+    assertEquals(0, m_scheduler.getRunningCommands().size());
+  }
+
+  @Test
+  void compositionsDoNotSelfCancel() {
+    var mech = new DummyMechanism("The mechanism", m_scheduler);
+    var group =
+        mech.run(
+                co -> {
+                  co.await(
+                      mech.run(
+                              co2 -> {
+                                co2.await(
+                                    mech.run(
+                                            co3 -> {
+                                              co3.await(mech.run(Coroutine::park).named("Park"));
+                                            })
+                                        .named("C3"));
+                              })
+                          .named("C2"));
+                })
+            .named("Group");
+
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    assertEquals(4, m_scheduler.getRunningCommands().size());
+    assertTrue(m_scheduler.isRunning(group));
+  }
+
+  @Test
+  void compositionsDoNotCancelParent() {
+    var mech = new DummyMechanism("The mechanism", m_scheduler);
+    var group =
+        mech.run(
+                co -> {
+                  co.fork(mech.run(Coroutine::park).named("First Child"));
+                  co.fork(mech.run(Coroutine::park).named("Second Child"));
+                  co.park();
+                })
+            .named("Group");
+
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+
+    // second child interrupts first child
+    assertEquals(
+        List.of("Group", "Second Child"),
+        m_scheduler.getRunningCommands().stream().map(Command::name).toList());
+  }
+
+  @Test
+  void compositionsWithSharedCommandsDoNotSelfCancel() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+
+    var count = new AtomicInteger(0);
+    var cancellationCount = new AtomicInteger(0);
+    var innerCommand =
+        mech.run(
+                coroutine -> {
+                  count.set(0);
+
+                  while (true) {
+                    count.incrementAndGet();
+                    coroutine.yield();
+                  }
+                })
+            .whenCanceled(cancellationCount::incrementAndGet)
+            .named("Inner Command");
+
+    // two compositions with conflicting requirements (mech) running the same command object
+    final var parent1 =
+        Command.requiring(mech).executing(c -> c.await(innerCommand)).named("Parent 1");
+    final var parent2 =
+        Command.requiring(mech).executing(c -> c.await(innerCommand)).named("Parent 2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, innerCommand), m_scheduler.getRunningCommands());
+    assertEquals(1, count.get());
+    m_scheduler.run();
+    assertEquals(2, count.get());
+
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+    assertEquals(
+        List.of(parent2, innerCommand),
+        m_scheduler.getRunningCommands(),
+        "parent2 should have started");
+    assertEquals(1, cancellationCount.get(), "Inner command should have been canceled");
+    assertEquals(1, count.get(), "Inner command should have restarted");
+
+    m_scheduler.run();
+    assertEquals(
+        List.of(parent2, innerCommand),
+        m_scheduler.getRunningCommands(),
+        "parent2 and inner command should still be running");
+    assertEquals(1, cancellationCount.get(), "Inner command should not have been canceled again");
+    assertEquals(2, count.get(), "Inner command should have continued running");
+  }
+
+  @Test
+  void compositionsAwaitingSameCommandDoNotInterrupt() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var sharedCommand = mech.run(Coroutine::park).named("Shared Command");
+
+    // Both compositions await the same command instance, so parent2's `await` call just waits
+    // for the already-running process to exit instead of restarting it and interrupting parent1
+    final var parent1 = Command.noRequirements(c -> c.await(sharedCommand)).named("Parent 1");
+    final var parent2 = Command.noRequirements(c -> c.await(sharedCommand)).named("Parent 2");
+
+    m_scheduler.schedule(parent1);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, sharedCommand), m_scheduler.getRunningCommands());
+
+    m_scheduler.schedule(parent2);
+    m_scheduler.run();
+    assertEquals(List.of(parent1, sharedCommand, parent2), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void doesNotRunOnCancelWhenInterruptingOnDeck() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
+    var interrupter = mechanism.run(Coroutine::yield).named("Interrupter");
+    m_scheduler.schedule(cmd);
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+
+    assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
+  }
+
+  @Test
+  void doesNotRunOnCancelWhenCancelingOnDeck() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
+    m_scheduler.schedule(cmd);
+    // canceling before calling .run()
+    m_scheduler.cancel(cmd);
+    m_scheduler.run();
+
+    assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
+  }
+
+  @Test
+  void runsOnCancelWhenInterruptingCommand() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::park).whenCanceled(() -> ran.set(true)).named("cmd");
+    var interrupter = mechanism.run(Coroutine::park).named("Interrupter");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+
+    assertTrue(ran.get(), "onCancel should have run!");
+  }
+
+  @Test
+  void doesNotRunOnCancelWhenCompleting() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isScheduledOrRunning(cmd));
+    assertFalse(ran.get(), "onCancel ran when it shouldn't have!");
+  }
+
+  @Test
+  void runsOnCancelWhenCanceling() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.cancel(cmd);
+
+    assertTrue(ran.get(), "onCancel should have run!");
+  }
+
+  @Test
+  void runsOnCancelWhenCancelingParent() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenCanceled(() -> ran.set(true)).named("cmd");
+
+    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    m_scheduler.cancel(group);
+
+    assertTrue(ran.get(), "onCancel should have run!");
+  }
+
+  @Test
+  void doesNotRunOnExitWhenInterruptingOnDeck() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenExited(() -> ran.set(true)).named("cmd");
+    var interrupter = mechanism.run(Coroutine::yield).named("Interrupter");
+    m_scheduler.schedule(cmd);
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+
+    assertFalse(ran.get(), "onExit ran when it shouldn't have!");
+  }
+
+  @Test
+  void doesNotRunOnExitWhenCancelingOnDeck() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenExited(() -> ran.set(true)).named("cmd");
+    m_scheduler.schedule(cmd);
+    // canceling before calling .run()
+    m_scheduler.cancel(cmd);
+    m_scheduler.run();
+
+    assertFalse(ran.get(), "onExit ran when it shouldn't have!");
+  }
+
+  @Test
+  void runsOnExitWhenInterruptingCommand() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::park).whenExited(() -> ran.set(true)).named("cmd");
+    var interrupter = mechanism.run(Coroutine::park).named("Interrupter");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+
+    assertTrue(ran.get(), "onExit should have run!");
+  }
+
+  @Test
+  void runsOnExitWhenCompleting() {
+    var exitRan = new AtomicBoolean(false);
+    var cancelRan = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd =
+        mechanism
+            .run(Coroutine::yield)
+            .whenExited(() -> exitRan.set(true))
+            .whenCanceled(() -> cancelRan.set(true))
+            .named("cmd");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isScheduledOrRunning(cmd));
+    assertTrue(exitRan.get(), "onExit should have run on natural completion!");
+    assertFalse(cancelRan.get(), "onCancel should not have run on natural completion!");
+  }
+
+  @Test
+  void runsOnExitWhenCanceling() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenExited(() -> ran.set(true)).named("cmd");
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.cancel(cmd);
+
+    assertTrue(ran.get(), "onExit should have run!");
+  }
+
+  @Test
+  void runsOnExitWhenCancelingParent() {
+    var ran = new AtomicBoolean(false);
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd = mechanism.run(Coroutine::yield).whenExited(() -> ran.set(true)).named("cmd");
+
+    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    m_scheduler.cancel(group);
+
+    assertTrue(ran.get(), "onExit should have run!");
+  }
+
+  @Test
+  void onExitInvokedDirectlyBeforeOnCancelWhenCanceling() {
+    List<String> invocations = new ArrayList<>();
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd =
+        mechanism
+            .run(Coroutine::park)
+            .whenExited(() -> invocations.add("onExit"))
+            .whenCanceled(() -> invocations.add("onCancel"))
+            .named("cmd");
+
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.cancel(cmd);
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+
+  @Test
+  void onExitInvokedDirectlyBeforeOnCancelWhenRequestingCancellation() {
+    List<String> invocations = new ArrayList<>();
+
+    var cmd =
+        Command.noRequirements(Coroutine::requestCancellation)
+            .whenExited(() -> invocations.add("onExit"))
+            .whenCanceled(() -> invocations.add("onCancel"))
+            .named("cmd");
+
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+
+  @Test
+  void onExitInvokedDirectlyBeforeOnCancelWhenInterrupted() {
+    List<String> invocations = new ArrayList<>();
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd =
+        mechanism
+            .run(Coroutine::park)
+            .whenExited(() -> invocations.add("onExit"))
+            .whenCanceled(() -> invocations.add("onCancel"))
+            .named("cmd");
+    var interrupter = mechanism.run(Coroutine::park).named("Interrupter");
+
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.schedule(interrupter);
+    m_scheduler.run();
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+
+  @Test
+  void onExitInvokedDirectlyBeforeOnCancelWhenCancelAll() {
+    List<String> invocations = new ArrayList<>();
+
+    var cmd =
+        Command.noRequirements(Coroutine::park)
+            .whenExited(() -> invocations.add("onExit"))
+            .whenCanceled(() -> invocations.add("onCancel"))
+            .named("cmd");
+
+    m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    m_scheduler.cancelAll();
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+
+  @Test
+  void onExitInvokedDirectlyBeforeOnCancelWhenParentCanceled() {
+    List<String> invocations = new ArrayList<>();
+
+    var mechanism = new DummyMechanism("The mechanism", m_scheduler);
+    var cmd =
+        mechanism
+            .run(Coroutine::park)
+            .whenExited(() -> invocations.add("onExit"))
+            .whenCanceled(() -> invocations.add("onCancel"))
+            .named("cmd");
+
+    var group = new SequentialGroup("Seq", Collections.singletonList(cmd));
+    m_scheduler.schedule(group);
+    m_scheduler.run();
+    m_scheduler.cancel(group);
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+
+  @Test
+  void customCommandOnExitInvokedBeforeOnCancel() {
+    List<String> invocations = new ArrayList<>();
+
+    Command customCmd =
+        new Command() {
+          @Override
+          public void run(Coroutine coroutine) {
+            coroutine.park();
+          }
+
+          @Override
+          public void onExit() {
+            invocations.add("onExit");
+          }
+
+          @Override
+          public void onCancel() {
+            invocations.add("onCancel");
+          }
+
+          @Override
+          public String name() {
+            return "Custom";
+          }
+
+          @Override
+          public Set<Mechanism> requirements() {
+            return Set.of();
+          }
+        };
+
+    m_scheduler.schedule(customCmd);
+    m_scheduler.run();
+    m_scheduler.cancel(customCmd);
+
+    assertEquals(List.of("onExit", "onCancel"), invocations);
+  }
+}

@@ -1,0 +1,183 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:02:21 -0700
+Subject: [PATCH 09/25] Rename long to int
+
+---
+ json.cpp | 24 ++++++++++++------------
+ json.h   | 18 +++++++++---------
+ 2 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 88ce30f8669a02cdc54e741a2a5a0663953d4acb..1266aa36b43155cbab6fe8d918fed2c56596f7a8 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -249,7 +249,7 @@ LongToString(char* p, long long x)
+ json::json(unsigned long value)
+ {
+     if (value <= LLONG_MAX) {
+-        type_ = Type::Long;
++        type_ = Type::Int;
+         long_value = value;
+     } else {
+         type_ = Type::Double;
+@@ -260,7 +260,7 @@ json::json(unsigned long value)
+ json::json(unsigned long long value)
+ {
+     if (value <= LLONG_MAX) {
+-        type_ = Type::Long;
++        type_ = Type::Int;
+         long_value = value;
+     } else {
+         type_ = Type::Double;
+@@ -315,7 +315,7 @@ json::json(const json& other) : type_(other.type_)
+         case Type::Bool:
+             bool_value = other.bool_value;
+             break;
+-        case Type::Long:
++        case Type::Int:
+             long_value = other.long_value;
+             break;
+         case Type::Float:
+@@ -351,7 +351,7 @@ json::operator=(const json& other)
+             case Type::Bool:
+                 bool_value = other.bool_value;
+                 break;
+-            case Type::Long:
++            case Type::Int:
+                 long_value = other.long_value;
+                 break;
+             case Type::Float:
+@@ -384,7 +384,7 @@ json::json(json&& other) : type_(other.type_)
+         case Type::Bool:
+             bool_value = other.bool_value;
+             break;
+-        case Type::Long:
++        case Type::Int:
+             long_value = other.long_value;
+             break;
+         case Type::Float:
+@@ -421,7 +421,7 @@ json::operator=(json&& other)
+             case Type::Bool:
+                 bool_value = other.bool_value;
+                 break;
+-            case Type::Long:
++            case Type::Int:
+                 long_value = other.long_value;
+                 break;
+             case Type::Float:
+@@ -451,7 +451,7 @@ double
+ json::get_number() const
+ {
+     switch (type_) {
+-        case Type::Long:
++        case Type::Int:
+             return long_value;
+         case Type::Float:
+             return float_value;
+@@ -463,10 +463,10 @@ json::get_number() const
+ }
+ 
+ long long
+-json::get_long() const
++json::get_int() const
+ {
+     switch (type_) {
+-        case Type::Long:
++        case Type::Int:
+             return long_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a long.");
+@@ -617,7 +617,7 @@ json::marshal(std::string& b, bool pretty, int indent) const
+         case Type::Bool:
+             b += bool_value ? "true" : "false";
+             break;
+-        case Type::Long: {
++        case Type::Int: {
+             char buf[64];
+             b.append(buf, LongToString(buf, long_value) - buf);
+             break;
+@@ -873,7 +873,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                         return unexpected_octal;
+                     }
+                 }
+-                j.type_ = Type::Long;
++                j.type_ = Type::Int;
+                 j.long_value = 0;
+                 return success;
+ 
+@@ -905,7 +905,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                         break;
+                     }
+                 }
+-                j.type_ = Type::Long;
++                j.type_ = Type::Int;
+                 j.long_value = x;
+                 return success;
+ 
+diff --git a/json.h b/json.h
+index 3d2cb52a1bfeafb5f1a8a1e9c6057a2611cbb41e..d9fdfe40c5cce5b306eee42668f9944e11f6aacd 100644
+--- a/json.h
++++ b/json.h
+@@ -32,7 +32,7 @@ class json
+     {
+         Null,
+         Bool,
+-        Long,
++        Int,
+         Float,
+         Double,
+         String,
+@@ -110,7 +110,7 @@ class json
+     {
+     }
+ 
+-    json(int value) : type_(Type::Long), long_value(value)
++    json(int value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+@@ -118,15 +118,15 @@ class json
+     {
+     }
+ 
+-    json(unsigned value) : type_(Type::Long), long_value(value)
++    json(unsigned value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(long value) : type_(Type::Long), long_value(value)
++    json(long value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(long long value) : type_(Type::Long), long_value(value)
++    json(long long value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+@@ -155,12 +155,12 @@ class json
+ 
+     bool is_number() const
+     {
+-        return is_float() || is_double() || is_long();
++        return is_float() || is_double() || is_int();
+     }
+ 
+-    bool is_long() const
++    bool is_int() const
+     {
+-        return type_ == Type::Long;
++        return type_ == Type::Int;
+     }
+ 
+     bool is_float() const
+@@ -192,7 +192,7 @@ class json
+     float get_float() const;
+     double get_double() const;
+     double get_number() const;
+-    long long get_long() const;
++    long long get_int() const;
+     std::string& get_string();
+     array_t& get_array();
+     object_t& get_object();

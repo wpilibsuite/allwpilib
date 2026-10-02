@@ -1,0 +1,12 @@
+strip_prefixes:
+- HAL_
+
+functions:
+  HAL_GetThreadPriority:
+    # no way to get native handle
+    ignore: true
+  HAL_GetCurrentThreadPriority:
+  HAL_SetThreadPriority:
+    # no way to get native handle
+    ignore: true
+  HAL_SetCurrentThreadPriority:

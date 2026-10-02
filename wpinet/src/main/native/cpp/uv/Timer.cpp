@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Timer.h"
+#include "wpi/net/uv/Timer.hpp"
 
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Timer> Timer::Create(Loop& loop) {
   if (loop.IsClosing()) {
@@ -51,4 +51,4 @@ void Timer::Start(Time timeout, Time repeat) {
       timeout.count(), repeat.count());
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

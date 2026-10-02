@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "RobotContainer.h"
+#include "RobotContainer.hpp"
 
-#include <frc2/command/Commands.h>
+#include "wpi/commands2/Commands.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -13,34 +13,34 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
-  m_drive.SetDefaultCommand(frc2::cmd::Run(
+  drive.SetDefaultCommand(wpi::cmd::Run(
       [this] {
-        m_drive.ArcadeDrive(-m_driverController.GetLeftY(),
-                            -m_driverController.GetRightX());
+        drive.ArcadeDrive(-driverController.GetLeftY(),
+                          -driverController.GetRightX());
       },
-      {&m_drive}));
+      {&drive}));
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // While holding the shoulder button, drive at half speed
-  m_driverController.RightBumper()
-      .OnTrue(m_driveHalfSpeed.get())
-      .OnFalse(m_driveFullSpeed.get());
+  // While holding the bumper button, drive at half velocity
+  driverController.RightBumper()
+      .OnTrue(driveHalfVelocity.get())
+      .OnFalse(driveFullVelocity.get());
 
-  // Drive forward by 3 meters when the 'A' button is pressed, with a timeout of
-  // 10 seconds
-  m_driverController.A().OnTrue(
-      m_drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
+  // Drive forward by 3 meters when the 'Face Down' button is pressed, with a
+  // timeout of 10 seconds
+  driverController.FaceDown().OnTrue(
+      drive.ProfiledDriveDistance(3_m).WithTimeout(10_s));
 
-  // Do the same thing as above when the 'B' button is pressed, but without
-  // resetting the encoders
-  m_driverController.B().OnTrue(
-      m_drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
+  // Do the same thing as above when the 'Face Right' button is pressed, but
+  // without resetting the encoders
+  driverController.FaceRight().OnTrue(
+      drive.DynamicProfiledDriveDistance(3_m).WithTimeout(10_s));
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
+wpi::cmd::CommandPtr RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
-  return frc2::cmd::None();
+  return wpi::cmd::None();
 }

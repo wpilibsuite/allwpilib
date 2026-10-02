@@ -1,12 +1,8 @@
 project(wpigui)
 
 include(CompileWarnings)
-include(LinkMacOSGUI)
 
 file(GLOB wpigui_src src/main/native/cpp/*.cpp)
-file(GLOB wpigui_windows_src src/main/native/directx11/*.cpp)
-file(GLOB wpigui_mac_src src/main/native/metal/*.mm)
-file(GLOB wpigui_unix_src src/main/native/opengl3/*.cpp)
 
 add_library(wpigui STATIC ${wpigui_src})
 set_target_properties(wpigui PROPERTIES DEBUG_POSTFIX "d")
@@ -23,20 +19,32 @@ target_include_directories(
         $<INSTALL_INTERFACE:${include_dest}/wpigui>
 )
 
-if(MSVC)
-    target_sources(wpigui PRIVATE ${wpigui_windows_src})
-elseif(APPLE)
-    target_compile_options(wpigui PRIVATE -fobjc-arc)
-    wpilib_link_macos_gui(wpigui)
-    target_sources(wpigui PRIVATE ${wpigui_mac_src})
-else()
-    target_sources(wpigui PRIVATE ${wpigui_unix_src})
+if(WPILIB_WITH_EXECUTABLES)
+    add_executable(wpiguidev src/dev/native/cpp/main.cpp)
+    wpilib_target_warnings(wpiguidev)
+    target_link_libraries(wpiguidev wpigui)
 endif()
 
-add_executable(wpiguidev src/dev/native/cpp/main.cpp)
-wpilib_link_macos_gui(wpiguidev)
-wpilib_target_warnings(wpiguidev)
-target_link_libraries(wpiguidev wpigui)
+if(WPILIB_WITH_IMGUI_TESTS)
+    add_library(wpigui_for_tests STATIC ${wpigui_src})
+    set_target_properties(wpigui_for_tests PROPERTIES DEBUG_POSTFIX "d")
+    set_property(TARGET wpigui_for_tests PROPERTY FOLDER "tests")
+    wpilib_target_warnings(wpigui_for_tests)
+    target_link_libraries(wpigui_for_tests PUBLIC imgui_test_engine)
+    target_include_directories(
+        wpigui_for_tests
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+    )
+
+    add_library(wpigui_test_runner STATIC src/test/native/cpp/GuiTestEngineRunner.cpp)
+    set_property(TARGET wpigui_test_runner PROPERTY FOLDER "tests")
+    wpilib_target_warnings(wpigui_test_runner)
+    target_link_libraries(wpigui_test_runner PUBLIC wpigui_for_tests imgui_test_engine)
+    target_include_directories(
+        wpigui_test_runner
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/test/native/include>
+    )
+endif()
 
 install(TARGETS wpigui EXPORT wpigui)
 export(TARGETS wpigui FILE wpigui.cmake NAMESPACE wpigui::)

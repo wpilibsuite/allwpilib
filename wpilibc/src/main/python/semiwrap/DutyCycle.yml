@@ -1,0 +1,22 @@
+classes:
+  wpi::DutyCycle:
+    methods:
+      DutyCycle:
+        overloads:
+          DigitalSource&:
+            ignore: true
+          DigitalSource*:
+            ignore: true
+          std::shared_ptr<DigitalSource>:
+      GetFrequency:
+      GetOutput:
+      GetHighTime:
+      GetSourceChannel:
+      LogTo:
+      GetTelemetryType:
+
+inline_code: |
+  cls_DutyCycle
+    .def("__repr__", [](const DutyCycle &self) {
+      return py::str("<DutyCycle {}>").format(self.GetSourceChannel());
+    });

@@ -1,0 +1,26 @@
+extra_includes:
+- wpi/hardware/discrete/AnalogInput.hpp
+
+classes:
+  wpi::AnalogEncoder:
+    methods:
+      AnalogEncoder:
+        overloads:
+          int:
+          AnalogInput&:
+            ignore: true
+          AnalogInput*:
+            ignore: true
+          std::shared_ptr<AnalogInput>:
+          int, double, double:
+          AnalogInput&, double, double:
+            ignore: true
+          AnalogInput*, double, double:
+            ignore: true
+          std::shared_ptr<AnalogInput>, double, double:
+      Get:
+      GetChannel:
+      SetVoltagePercentageRange:
+      SetInverted:
+      LogTo:
+      GetTelemetryType:

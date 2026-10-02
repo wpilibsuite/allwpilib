@@ -2,122 +2,131 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <cmath>
+#include "wpi/math/geometry/Twist3d.hpp"
+
 #include <numbers>
 
-#include <gtest/gtest.h>
+#include <Eigen/Core>
+#include <catch2/catch_test_macros.hpp>
 
-#include "frc/geometry/Pose3d.h"
+#include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
-TEST(Twist3dTest, StraightX) {
+TEST_CASE("Twist3dTest StraightX", "[wpimath]") {
   const Twist3d straight{5_m, 0_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d{}.Exp(straight);
+  const auto straightTransform = straight.Exp();
 
-  Pose3d expected{5_m, 0_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  Transform3d expected{5_m, 0_m, 0_m, Rotation3d{}};
+  CHECK(expected == straightTransform);
 }
 
-TEST(Twist3dTest, StraightY) {
+TEST_CASE("Twist3dTest StraightY", "[wpimath]") {
   const Twist3d straight{0_m, 5_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d{}.Exp(straight);
+  const auto straightTransform = straight.Exp();
 
-  Pose3d expected{0_m, 5_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  Transform3d expected{0_m, 5_m, 0_m, Rotation3d{}};
+  CHECK(expected == straightTransform);
 }
 
-TEST(Twist3dTest, StraightZ) {
+TEST_CASE("Twist3dTest StraightZ", "[wpimath]") {
   const Twist3d straight{0_m, 0_m, 5_m, 0_rad, 0_rad, 0_rad};
-  const auto straightPose = Pose3d{}.Exp(straight);
+  const auto straightTransform = straight.Exp();
 
-  Pose3d expected{0_m, 0_m, 5_m, Rotation3d{}};
-  EXPECT_EQ(expected, straightPose);
+  Transform3d expected{0_m, 0_m, 5_m, Rotation3d{}};
+  CHECK(expected == straightTransform);
 }
 
-TEST(Twist3dTest, QuarterCircle) {
+TEST_CASE("Twist3dTest QuarterCircle", "[wpimath]") {
   Eigen::Vector3d zAxis{0.0, 0.0, 1.0};
 
-  const Twist3d quarterCircle{
-      5_m / 2.0 * std::numbers::pi,           0_m, 0_m, 0_rad, 0_rad,
-      units::radian_t{std::numbers::pi / 2.0}};
-  const auto quarterCirclePose = Pose3d{}.Exp(quarterCircle);
+  const Twist3d quarterCircle{5_m / 2.0 * std::numbers::pi,
+                              0_m,
+                              0_m,
+                              0_rad,
+                              0_rad,
+                              wpi::units::radian_t{std::numbers::pi / 2.0}};
+  const auto quarterCircleTransform = quarterCircle.Exp();
 
-  Pose3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
-  EXPECT_EQ(expected, quarterCirclePose);
+  Transform3d expected{5_m, 5_m, 0_m, Rotation3d{zAxis, 90_deg}};
+  CHECK(expected == quarterCircleTransform);
 }
 
-TEST(Twist3dTest, DiagonalNoDtheta) {
+TEST_CASE("Twist3dTest DiagonalNoDtheta", "[wpimath]") {
   const Twist3d diagonal{2_m, 2_m, 0_m, 0_rad, 0_rad, 0_rad};
-  const auto diagonalPose = Pose3d{}.Exp(diagonal);
+  const auto diagonalTransform = diagonal.Exp();
 
-  Pose3d expected{2_m, 2_m, 0_m, Rotation3d{}};
-  EXPECT_EQ(expected, diagonalPose);
+  Transform3d expected{2_m, 2_m, 0_m, Rotation3d{}};
+  CHECK(expected == diagonalTransform);
 }
 
-TEST(Twist3dTest, Equality) {
+TEST_CASE("Twist3dTest Equality", "[wpimath]") {
   const Twist3d one{5_m, 1_m, 0_m, 0_rad, 0_rad, 3_rad};
   const Twist3d two{5_m, 1_m, 0_m, 0_rad, 0_rad, 3_rad};
-  EXPECT_TRUE(one == two);
+  CHECK(one == two);
 }
 
-TEST(Twist3dTest, Inequality) {
+TEST_CASE("Twist3dTest Inequality", "[wpimath]") {
   const Twist3d one{5_m, 1_m, 0_m, 0_rad, 0_rad, 3_rad};
   const Twist3d two{5_m, 1.2_m, 0_m, 0_rad, 0_rad, 3_rad};
-  EXPECT_TRUE(one != two);
+  CHECK(one != two);
 }
 
-TEST(Twist3dTest, Pose3dLogX) {
+TEST_CASE("Twist3dTest Pose3dLogX", "[wpimath]") {
   const Pose3d end{0_m, 5_m, 5_m, Rotation3d{90_deg, 0_deg, 0_deg}};
   const Pose3d start;
 
-  const auto twist = start.Log(end);
+  const auto twist = (end - start).Log();
 
-  Twist3d expected{0_m,   units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{0_m,   wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,   90_deg,
                    0_deg, 0_deg};
-  EXPECT_EQ(expected, twist);
+  CHECK(expected == twist);
 
   // Make sure computed twist gives back original end pose
-  const auto reapplied = start.Exp(twist);
-  EXPECT_EQ(end, reapplied);
+  const auto reapplied = start + twist.Exp();
+  CHECK(end == reapplied);
 }
 
-TEST(Twist3dTest, Pose3dLogY) {
+TEST_CASE("Twist3dTest Pose3dLogY", "[wpimath]") {
   const Pose3d end{5_m, 0_m, 5_m, Rotation3d{0_deg, 90_deg, 0_deg}};
   const Pose3d start;
 
-  const auto twist = start.Log(end);
+  const auto twist = (end - start).Log();
 
-  Twist3d expected{0_m,   0_m,    units::meter_t{5.0 / 2.0 * std::numbers::pi},
-                   0_deg, 90_deg, 0_deg};
-  EXPECT_EQ(expected, twist);
+  Twist3d expected{
+      0_m,   0_m,    wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
+      0_deg, 90_deg, 0_deg};
+  CHECK(expected == twist);
 
   // Make sure computed twist gives back original end pose
-  const auto reapplied = start.Exp(twist);
-  EXPECT_EQ(end, reapplied);
+  const auto reapplied = start + twist.Exp();
+  CHECK(end == reapplied);
 }
 
-TEST(Twist3dTest, Pose3dLogZ) {
+TEST_CASE("Twist3dTest Pose3dLogZ", "[wpimath]") {
   const Pose3d end{5_m, 5_m, 0_m, Rotation3d{0_deg, 0_deg, 90_deg}};
   const Pose3d start;
 
-  const auto twist = start.Log(end);
+  const auto twist = (end - start).Log();
 
-  Twist3d expected{units::meter_t{5.0 / 2.0 * std::numbers::pi},
+  Twist3d expected{wpi::units::meter_t{5.0 / 2.0 * std::numbers::pi},
                    0_m,
                    0_m,
                    0_deg,
                    0_deg,
                    90_deg};
-  EXPECT_EQ(expected, twist);
+  CHECK(expected == twist);
 
   // Make sure computed twist gives back original end pose
-  const auto reapplied = start.Exp(twist);
-  EXPECT_EQ(end, reapplied);
+  const auto reapplied = start + twist.Exp();
+  CHECK(end == reapplied);
 }
 
-TEST(Twist3dTest, Constexpr) {
+TEST_CASE("Twist3dTest Constexpr", "[wpimath]") {
   constexpr Twist3d defaultCtor;
   constexpr Twist3d componentCtor{1_m, 2_m, 3_m, 4_rad, 5_rad, 6_rad};
   constexpr auto multiplied = componentCtor * 2;

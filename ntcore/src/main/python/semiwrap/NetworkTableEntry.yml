@@ -1,0 +1,97 @@
+extra_includes:
+- wpi/nt/NetworkTableInstance.hpp
+- wpi/nt/Topic.hpp
+- src/py2value.h
+- src/pyentry.h
+
+inline_code: |
+  #include <src/NetworkTableEntry.cpp.inl>
+classes:
+  wpi::nt::NetworkTableEntry:
+    methods:
+      NetworkTableEntry:
+        overloads:
+          '':
+            ignore: true
+          NT_Entry:
+            ignore: true
+      GetHandle:
+        ignore: true
+      GetInstance:
+      Exists:
+      GetName:
+      GetType:
+      GetLastChange:
+      GetValue:
+      GetBoolean:
+        cpp_code: |
+          &pyntcore::GetBooleanEntry
+      GetInteger:
+        cpp_code: |
+          &pyntcore::GetIntegerEntry
+      GetFloat:
+        cpp_code: |
+          &pyntcore::GetFloatEntry
+      GetDouble:
+        cpp_code: |
+          &pyntcore::GetDoubleEntry
+      GetString:
+        cpp_code: |
+          &pyntcore::GetStringEntry
+      GetRaw:
+        cpp_code: |
+          &pyntcore::GetRawEntry
+      GetBooleanArray:
+        cpp_code: |
+          &pyntcore::GetBooleanArrayEntry
+      GetIntegerArray:
+        cpp_code: |
+          &pyntcore::GetIntegerArrayEntry
+      GetFloatArray:
+        cpp_code: |
+          &pyntcore::GetFloatArrayEntry
+      GetDoubleArray:
+        cpp_code: |
+          &pyntcore::GetDoubleArrayEntry
+      GetStringArray:
+        cpp_code: |
+          &pyntcore::GetStringArrayEntry
+      ReadQueue:
+      SetDefaultValue:
+      SetDefaultBoolean:
+      SetDefaultInteger:
+      SetDefaultFloat:
+      SetDefaultDouble:
+      SetDefaultString:
+      SetDefaultRaw:
+      SetDefaultBooleanArray:
+      SetDefaultIntegerArray:
+      SetDefaultFloatArray:
+      SetDefaultDoubleArray:
+      SetDefaultStringArray:
+      SetValue:
+      SetBoolean:
+      SetInteger:
+      SetFloat:
+      SetDouble:
+      SetString:
+      SetRaw:
+      SetBooleanArray:
+        overloads:
+          std::span<const bool>, int64_t:
+          std::span<const int>, int64_t:
+            ignore: true
+      SetIntegerArray:
+      SetFloatArray:
+      SetDoubleArray:
+      SetStringArray:
+      SetPersistent:
+      ClearPersistent:
+      IsPersistent:
+      Unpublish:
+      GetTopic:
+      operator==:
+    inline_code: |
+      .def("__repr__", [](NetworkTableEntry self) {
+        return py::str("<NetworkTableEntry {!r}>").format(self.GetName());
+      })

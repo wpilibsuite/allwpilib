@@ -1,0 +1,47 @@
+extra_includes:
+- wpystruct.h
+
+classes:
+  wpi::math::DifferentialDriveFeedforward:
+    force_type_casters:
+    - wpi::units::meters_per_second
+    - wpi::units::meters_per_second_squared
+    - wpi::units::radians_per_second
+    - wpi::units::radians_per_second_squared
+    - wpi::units::compound_unit
+    attributes:
+      kvLinear:
+      kaLinear:
+      kvAngular:
+      kaAngular:
+    methods:
+      DifferentialDriveFeedforward:
+        overloads:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_rad_per_s), decltype(1_V/1_rad_per_s_sq), wpi::units::meter_t:
+          decltype(1_V/1_mps), decltype(1_V/1_mps_sq), decltype(1_V/1_mps), decltype(1_V/1_mps_sq):
+          # ? decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype (
+          #   1 _V / 1 _rad_per_s ), decltype ( 1 _V / 1 _rad_per_s_sq ), wpi::units::meter_t
+          # :
+          #   param_override:
+          #     kvLinear:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kaLinear:
+          #       x_type: decltype(1_V / 1_mps_sq)
+          #     kvAngular:
+          #       x_type: decltype(1_V / 1_rad_per_s)
+          #     kaAngular:
+          #       x_type: decltype(1_V / 1_rad_per_s_sq)
+          # decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ), decltype ( 1 _V / 1 _mps ), decltype ( 1 _V / 1 _mps_sq ):
+          #   param_override:
+          #     kvLinear:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kaLinear:
+          #       x_type: decltype(1_V / 1_mps_sq)
+          #     kvAngular:
+          #       x_type: decltype(1_V / 1_mps)
+          #     kaAngular:
+          #       x_type: decltype(1_V / 1_mps_sq)
+      Calculate:
+
+inline_code: |
+  SetupWPyStruct<wpi::math::DifferentialDriveFeedforward>(cls_DifferentialDriveFeedforward);

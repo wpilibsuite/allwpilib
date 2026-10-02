@@ -1,0 +1,17 @@
+classes:
+  wpi::Tachometer:
+    methods:
+      Tachometer:
+        overloads:
+          DigitalSource&:
+          std::shared_ptr<DigitalSource>:
+      GetFrequency:
+      GetEdgesPerRevolution:
+      SetEdgesPerRevolution:
+      GetRevolutionsPerSecond:
+      GetRevolutionsPerMinute:
+      GetStopped:
+      SetRateWindow:
+      SetEdgeConfiguration:
+      LogTo:
+      GetTelemetryType:

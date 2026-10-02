@@ -1,0 +1,9 @@
+classes:
+  wpi::Mechanism2d:
+    methods:
+      Mechanism2d:
+      GetRoot:
+        return_value_policy: reference_internal
+      SetBackgroundColor:
+      LogTo:
+      GetTelemetryType:

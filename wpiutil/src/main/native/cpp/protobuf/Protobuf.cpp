@@ -2,19 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/protobuf/Protobuf.h"
+#include "wpi/util/protobuf/Protobuf.hpp"
 
+#include <format>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
+#include "wpi/util/SmallVector.hpp"
 
-#include "wpi/SmallVector.h"
-
-using namespace wpi;
+using namespace wpi::util;
 
 std::string detail::GetTypeString(const pb_msgdesc_t* msg) {
-  return fmt::format("proto:{}", msg->proto_name);
+  return std::format("proto:{}", msg->proto_name);
 }
 
 void detail::ForEachProtobufDescriptor(
@@ -23,7 +22,7 @@ void detail::ForEachProtobufDescriptor(
     function_ref<void(std::string_view filename,
                       std::span<const uint8_t> descriptor)>
         fn) {
-  std::string name = fmt::format("proto:{}", msg->file_descriptor.file_name);
+  std::string name = std::format("proto:{}", msg->file_descriptor.file_name);
   if (exists(name)) {
     return;
   }
@@ -52,7 +51,7 @@ bool detail::WriteFromStdVector(pb_ostream_t* stream, const pb_byte_t* buf,
 bool detail::WriteSubmessage(pb_ostream_t* stream, const pb_msgdesc_t* desc,
                              const void* msg) {
   // Write the submessage to a separate buffer
-  wpi::SmallVector<uint8_t, 64> buf;
+  wpi::util::SmallVector<uint8_t, 64> buf;
   pb_ostream_t subStream{
       .callback = WriteFromSmallVector,
       .state = &buf,

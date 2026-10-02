@@ -13,21 +13,15 @@ namespace slp {
 
 namespace slicing {
 
-/**
- * Type tag used to designate an omitted argument of the slice.
- */
+/// Type tag used to designate an omitted argument of the slice.
 struct none_t {};
 
-/**
- * Designates an omitted argument of the slice.
- */
+/// Designates an omitted argument of the slice.
 static inline constexpr none_t _;
 
 }  // namespace slicing
 
-/**
- * Represents a sequence of elements in an iterable object.
- */
+/// Represents a sequence of elements in an iterable object.
 class SLEIPNIR_DLLEXPORT Slice {
  public:
   /// Start index (inclusive).
@@ -39,34 +33,28 @@ class SLEIPNIR_DLLEXPORT Slice {
   /// Step.
   int step = 1;
 
-  /**
-   * Constructs a Slice.
-   */
+  /// Constructs a Slice.
   constexpr Slice() = default;
 
-  /**
-   * Constructs a slice.
-   */
-  constexpr Slice(slicing::none_t)  // NOLINT
+  /// Constructs a slice.
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr Slice(slicing::none_t)
       : Slice(0, std::numeric_limits<int>::max(), 1) {}
 
-  /**
-   * Constructs a slice.
-   *
-   * @param start Slice start index (inclusive).
-   */
-  constexpr Slice(int start) {  // NOLINT
+  /// Constructs a slice.
+  ///
+  /// @param start Slice start index (inclusive).
+  // NOLINTNEXTLINE (google-explicit-constructor)
+  constexpr Slice(int start) {
     this->start = start;
     this->stop = (start == -1) ? std::numeric_limits<int>::max() : start + 1;
     this->step = 1;
   }
 
-  /**
-   * Constructs a slice.
-   *
-   * @param start Slice start index (inclusive).
-   * @param stop Slice stop index (exclusive).
-   */
+  /// Constructs a slice.
+  ///
+  /// @param start Slice start index (inclusive).
+  /// @param stop Slice stop index (exclusive).
   template <typename Start, typename Stop>
     requires(std::same_as<Start, slicing::none_t> ||
              std::convertible_to<Start, int>) &&
@@ -75,13 +63,11 @@ class SLEIPNIR_DLLEXPORT Slice {
   constexpr Slice(Start start, Stop stop)
       : Slice(std::move(start), std::move(stop), 1) {}
 
-  /**
-   * Constructs a slice.
-   *
-   * @param start Slice start index (inclusive).
-   * @param stop Slice stop index (exclusive).
-   * @param step Slice step.
-   */
+  /// Constructs a slice.
+  ///
+  /// @param start Slice start index (inclusive).
+  /// @param stop Slice stop index (exclusive).
+  /// @param step Slice step.
   template <typename Start, typename Stop, typename Step>
     requires(std::same_as<Start, slicing::none_t> ||
              std::convertible_to<Start, int>) &&
@@ -124,13 +110,11 @@ class SLEIPNIR_DLLEXPORT Slice {
     }
   }
 
-  /**
-   * Adjusts start and end slice indices assuming a sequence of the specified
-   * length.
-   *
-   * @param length The sequence length.
-   * @return The slice length.
-   */
+  /// Adjusts start and end slice indices assuming a sequence of the specified
+  /// length.
+  ///
+  /// @param length The sequence length.
+  /// @return The slice length.
   constexpr int adjust(int length) {
     slp_assert(step != 0);
     slp_assert(step >= -std::numeric_limits<int>::max());

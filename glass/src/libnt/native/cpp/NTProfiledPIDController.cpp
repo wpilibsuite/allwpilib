@@ -2,44 +2,60 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/networktables/NTProfiledPIDController.h"
+#include "wpi/glass/networktables/NTProfiledPIDController.hpp"
 
+#include <stdint.h>
+
+#include <array>
+#include <format>
+#include <span>
+#include <string>
 #include <utility>
 
-#include <fmt/format.h>
-#include <wpi/StringExtras.h>
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
+#include "wpi/nt/ntcore_c.h"
+#include "wpi/util/StringExtras.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
+
+namespace {
+
+constexpr size_t CONSTRAINTS_STRUCT_SIZE = 16;
+constexpr size_t MAX_VELOCITY_OFFSET = 0;
+constexpr size_t MAX_ACCELERATION_OFFSET = 8;
+constexpr std::string_view DEFAULT_CONSTRAINTS_TYPE =
+    "struct:TrapezoidProfileConstraints";
+
+}  // namespace
 
 NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
     std::string_view path)
-    : NTProfiledPIDControllerModel(nt::NetworkTableInstance::GetDefault(),
+    : NTProfiledPIDControllerModel(wpi::nt::NetworkTableInstance::GetDefault(),
                                    path) {}
 
 NTProfiledPIDControllerModel::NTProfiledPIDControllerModel(
-    nt::NetworkTableInstance inst, std::string_view path)
+    wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
-                         .Subscribe(false)},
-      m_p{inst.GetDoubleTopic(fmt::format("{}/p", path)).GetEntry(0)},
-      m_i{inst.GetDoubleTopic(fmt::format("{}/i", path)).GetEntry(0)},
-      m_d{inst.GetDoubleTopic(fmt::format("{}/d", path)).GetEntry(0)},
-      m_iZone{inst.GetDoubleTopic(fmt::format("{}/izone", path)).GetEntry(0)},
-      m_maxVelocity{
-          inst.GetDoubleTopic(fmt::format("{}/maxVelocity", path)).GetEntry(0)},
-      m_maxAcceleration{
-          inst.GetDoubleTopic(fmt::format("{}/maxAcceleration", path))
+      m_p{inst.GetDoubleTopic(std::format("{}/controller/p", path))
               .GetEntry(0)},
-      m_goal{inst.GetDoubleTopic(fmt::format("{}/goal", path)).GetEntry(0)},
-      m_pData{fmt::format("NTPIDCtrlP:{}", path)},
-      m_iData{fmt::format("NTPIDCtrlI:{}", path)},
-      m_dData{fmt::format("NTPIDCtrlD:{}", path)},
-      m_iZoneData{fmt::format("NTPIDCtrlIZone:{}", path)},
-      m_maxVelocityData{fmt::format("NTPIDCtrlMaxVelo:{}", path)},
-      m_maxAccelerationData{fmt::format("NTPIDCtrlMaxAccel:{}", path)},
-      m_goalData{fmt::format("NTPIDCtrlGoal:{}", path)},
-      m_nameValue{wpi::rsplit(path, '/').second} {}
+      m_i{inst.GetDoubleTopic(std::format("{}/controller/i", path))
+              .GetEntry(0)},
+      m_d{inst.GetDoubleTopic(std::format("{}/controller/d", path))
+              .GetEntry(0)},
+      m_iZone{inst.GetDoubleTopic(std::format("{}/controller/izone", path))
+                  .GetEntry(0)},
+      m_constraints{inst.GetTopic(std::format("{}/constraints", path))
+                        .GenericSubscribe()},
+      m_goal{inst.GetDoubleTopic(std::format("{}/goal", path)).GetEntry(0)},
+      m_pData{std::format("NTPIDCtrlP:{}", path)},
+      m_iData{std::format("NTPIDCtrlI:{}", path)},
+      m_dData{std::format("NTPIDCtrlD:{}", path)},
+      m_iZoneData{std::format("NTPIDCtrlIZone:{}", path)},
+      m_maxVelocityData{std::format("NTPIDCtrlMaxVelo:{}", path)},
+      m_maxAccelerationData{std::format("NTPIDCtrlMaxAccel:{}", path)},
+      m_goalData{std::format("NTPIDCtrlGoal:{}", path)},
+      m_nameValue{wpi::util::rsplit(path, '/').second} {}
 
 void NTProfiledPIDControllerModel::SetP(double value) {
   m_p.Set(value);
@@ -54,11 +70,11 @@ void NTProfiledPIDControllerModel::SetD(double value) {
 }
 
 void NTProfiledPIDControllerModel::SetMaxVelocity(double value) {
-  m_maxVelocity.Set(value);
+  SetConstraints(value, m_maxAccelerationData.GetValue());
 }
 
 void NTProfiledPIDControllerModel::SetMaxAcceleration(double value) {
-  m_maxAcceleration.Set(value);
+  SetConstraints(m_maxVelocityData.GetValue(), value);
 }
 
 void NTProfiledPIDControllerModel::SetIZone(double value) {
@@ -68,10 +84,31 @@ void NTProfiledPIDControllerModel::SetIZone(double value) {
 void NTProfiledPIDControllerModel::SetGoal(double value) {
   m_goal.Set(value);
 }
-void NTProfiledPIDControllerModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
+
+void NTProfiledPIDControllerModel::SetConstraints(double maxVelocity,
+                                                  double maxAcceleration) {
+  auto topic = m_constraints.GetTopic();
+  auto info = topic.GetInfo();
+  if (info.type != NT_RAW) {
+    return;
   }
+
+  std::string typeString = info.type_str.empty()
+                               ? std::string{DEFAULT_CONSTRAINTS_TYPE}
+                               : std::move(info.type_str);
+  if (!m_constraintsPublisher || m_constraintsTypeString != typeString) {
+    m_constraintsPublisher = topic.GenericPublish(typeString);
+    m_constraintsTypeString = std::move(typeString);
+  }
+
+  std::array<uint8_t, CONSTRAINTS_STRUCT_SIZE> data;
+  wpi::util::PackStruct<MAX_VELOCITY_OFFSET>(std::span{data}, maxVelocity);
+  wpi::util::PackStruct<MAX_ACCELERATION_OFFSET>(std::span{data},
+                                                 maxAcceleration);
+  m_constraintsPublisher.SetRaw(std::span<const uint8_t>{data});
+}
+
+void NTProfiledPIDControllerModel::Update() {
   for (auto&& v : m_p.ReadQueue()) {
     m_pData.SetValue(v.value, v.time);
   }
@@ -84,20 +121,36 @@ void NTProfiledPIDControllerModel::Update() {
   for (auto&& v : m_iZone.ReadQueue()) {
     m_iZoneData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_maxVelocity.ReadQueue()) {
-    m_maxVelocityData.SetValue(v.value, v.time);
-  }
-  for (auto&& v : m_maxAcceleration.ReadQueue()) {
-    m_maxAccelerationData.SetValue(v.value, v.time);
+  for (auto&& v : m_constraints.ReadQueue()) {
+    if (!v.IsRaw()) {
+      continue;
+    }
+
+    auto value = v.GetRaw();
+    if (value.size() != CONSTRAINTS_STRUCT_SIZE) {
+      continue;
+    }
+
+    m_maxVelocityData.SetValue(
+        wpi::util::UnpackStruct<double, MAX_VELOCITY_OFFSET>(value), v.time());
+    m_maxAccelerationData.SetValue(
+        wpi::util::UnpackStruct<double, MAX_ACCELERATION_OFFSET>(value),
+        v.time());
   }
   for (auto&& v : m_goal.ReadQueue()) {
     m_goalData.SetValue(v.value, v.time);
   }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
-  }
 }
 
 bool NTProfiledPIDControllerModel::Exists() {
-  return m_goal.Exists();
+  return m_p.Exists() || m_constraints.GetTopic().Exists() || m_goal.Exists();
+}
+
+bool NTProfiledPIDControllerModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_p.GetTopic()) ||
+         !IsTunableTopicMutable(m_i.GetTopic()) ||
+         !IsTunableTopicMutable(m_d.GetTopic()) ||
+         !IsTunableTopicMutable(m_iZone.GetTopic()) ||
+         !IsTunableTopicMutable(m_constraints.GetTopic()) ||
+         !IsTunableTopicMutable(m_goal.GetTopic());
 }

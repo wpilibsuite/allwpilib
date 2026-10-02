@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "NetworkPing.h"
+#include "NetworkPing.hpp"
 
-#include "WireConnection.h"
+#include "WireConnection.hpp"
 
-using namespace nt::net;
+using namespace wpi::nt::net;
 
 bool NetworkPing::Send(uint64_t curTimeMs) {
   if (curTimeMs < m_nextPingTimeMs) {
@@ -20,12 +20,12 @@ bool NetworkPing::Send(uint64_t curTimeMs) {
   if (lastData == 0) {
     lastData = m_pongTimeMs;
   }
-  if (m_pongTimeMs != 0 && curTimeMs > (lastData + kPingTimeoutMs)) {
+  if (m_pongTimeMs != 0 && curTimeMs > (lastData + PING_TIMEOUT_MS)) {
     m_wire.Disconnect("connection timed out");
     return false;
   }
   m_wire.SendPing(curTimeMs);
-  m_nextPingTimeMs = curTimeMs + kPingIntervalMs;
+  m_nextPingTimeMs = curTimeMs + PING_INTERVAL_MS;
   m_pongTimeMs = curTimeMs;
   return true;
 }

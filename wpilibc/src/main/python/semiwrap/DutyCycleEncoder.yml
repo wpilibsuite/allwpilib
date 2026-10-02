@@ -1,0 +1,36 @@
+extra_includes:
+- wpi/hardware/rotation/DutyCycle.hpp
+
+classes:
+  wpi::DutyCycleEncoder:
+    methods:
+      DutyCycleEncoder:
+        overloads:
+          int:
+          DutyCycle&:
+            ignore: true
+          DutyCycle*:
+            ignore: true
+          std::shared_ptr<DutyCycle>:
+          int, double, double:
+          DutyCycle&, double, double:
+            ignore: true
+          DutyCycle*, double, double:
+            ignore: true
+          std::shared_ptr<DutyCycle>, double, double:
+      GetFrequency:
+      IsConnected:
+      SetConnectedFrequencyThreshold:
+      Get:
+      SetDutyCycleRange:
+      GetSourceChannel:
+      SetAssumedFrequency:
+      SetInverted:
+      LogTo:
+      GetTelemetryType:
+
+inline_code: |
+  cls_DutyCycleEncoder
+    .def("__repr__", [](const DutyCycleEncoder &self) {
+      return py::str("<DutyCycleEncoder {}>").format(self.GetSourceChannel());
+    });

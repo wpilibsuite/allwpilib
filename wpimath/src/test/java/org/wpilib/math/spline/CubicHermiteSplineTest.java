@@ -1,0 +1,156 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.spline;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.spline.SplineParameterizer.MalformedSplineException;
+
+class CubicHermiteSplineTest {
+  private static final double MAX_DX = 0.127;
+  private static final double MAX_DY = 0.00127;
+  private static final double MAX_DTHETA = 0.0872;
+
+  private void run(Pose2d a, List<Translation2d> waypoints, Pose2d b) {
+    // Start the timer.
+    // var start = System.nanoTime();
+
+    // Generate and parameterize the spline.
+    var controlVectors =
+        SplineHelper.getCubicControlVectorsFromWaypoints(
+            a, waypoints.toArray(new Translation2d[0]), b);
+    var splines =
+        SplineHelper.getCubicSplinesFromControlVectors(
+            controlVectors[0], waypoints.toArray(new Translation2d[0]), controlVectors[1]);
+
+    var poses = new ArrayList<PoseWithCurvature>();
+
+    poses.add(splines[0].getPoint(0.0).get());
+
+    for (var spline : splines) {
+      poses.addAll(SplineParameterizer.parameterize(spline));
+    }
+
+    // End the timer.
+    // var end = System.nanoTime();
+
+    // Calculate the duration (used when benchmarking)
+    // var durationMicroseconds = (end - start) / 1000.0;
+
+    for (int i = 0; i < poses.size() - 1; i++) {
+      var p0 = poses.get(i);
+      var p1 = poses.get(i + 1);
+
+      // Make sure the twist is under the tolerance defined by the Spline class.
+      var twist = p1.pose.minus(p0.pose).log();
+      assertAll(
+          () -> assertTrue(Math.abs(twist.dx) < MAX_DX),
+          () -> assertTrue(Math.abs(twist.dy) < MAX_DY),
+          () -> assertTrue(Math.abs(twist.dtheta) < MAX_DTHETA));
+    }
+
+    // Check first point
+    assertAll(
+        () -> assertEquals(a.getX(), poses.getFirst().pose.getX(), 1E-9),
+        () -> assertEquals(a.getY(), poses.getFirst().pose.getY(), 1E-9),
+        () ->
+            assertEquals(
+                a.getRotation().getRadians(),
+                poses.getFirst().pose.getRotation().getRadians(),
+                1E-9));
+
+    // Check interior waypoints
+    boolean interiorsGood = true;
+    for (var waypoint : waypoints) {
+      boolean found = false;
+      for (var state : poses) {
+        if (waypoint.getDistance(state.pose.getTranslation()) == 0) {
+          found = true;
+        }
+      }
+      interiorsGood &= found;
+    }
+
+    assertTrue(interiorsGood);
+
+    // Check last point
+    assertAll(
+        () -> assertEquals(b.getX(), poses.getLast().pose.getX(), 1E-9),
+        () -> assertEquals(b.getY(), poses.getLast().pose.getY(), 1E-9),
+        () ->
+            assertEquals(
+                b.getRotation().getRadians(),
+                poses.getLast().pose.getRotation().getRadians(),
+                1E-9));
+  }
+
+  @Test
+  void testStraightLine() {
+    run(Pose2d.ZERO, new ArrayList<>(), new Pose2d(3, 0, Rotation2d.ZERO));
+  }
+
+  @Test
+  void testSCurve() {
+    var start = new Pose2d(0, 0, Rotation2d.CCW_PI_2);
+    ArrayList<Translation2d> waypoints = new ArrayList<>();
+    waypoints.add(new Translation2d(1, 1));
+    waypoints.add(new Translation2d(2, -1));
+    var end = new Pose2d(3, 0, Rotation2d.CCW_PI_2);
+
+    run(start, waypoints, end);
+  }
+
+  @Test
+  void testOneInterior() {
+    var start = Pose2d.ZERO;
+    ArrayList<Translation2d> waypoints = new ArrayList<>();
+    waypoints.add(new Translation2d(2.0, 0.0));
+    var end = new Pose2d(4, 0, Rotation2d.ZERO);
+
+    run(start, waypoints, end);
+  }
+
+  @Test
+  void testWindyPath() {
+    final var start = Pose2d.ZERO;
+    final ArrayList<Translation2d> waypoints = new ArrayList<>();
+    waypoints.add(new Translation2d(0.5, 0.5));
+    waypoints.add(new Translation2d(0.5, 0.5));
+    waypoints.add(new Translation2d(1.0, 0.0));
+    waypoints.add(new Translation2d(1.5, 0.5));
+    waypoints.add(new Translation2d(2.0, 0.0));
+    waypoints.add(new Translation2d(2.5, 0.5));
+    final var end = new Pose2d(3.0, 0.0, Rotation2d.ZERO);
+
+    run(start, waypoints, end);
+  }
+
+  @Test
+  void testMalformed() {
+    assertThrows(
+        MalformedSplineException.class,
+        () ->
+            run(
+                new Pose2d(0, 0, Rotation2d.ZERO),
+                new ArrayList<>(),
+                new Pose2d(1, 0, Rotation2d.PI)));
+    assertThrows(
+        MalformedSplineException.class,
+        () ->
+            run(
+                new Pose2d(10, 10, Rotation2d.CCW_PI_2),
+                List.of(new Translation2d(10, 10.5)),
+                new Pose2d(10, 11, Rotation2d.CW_PI_2)));
+  }
+}

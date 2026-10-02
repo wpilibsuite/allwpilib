@@ -7,7 +7,7 @@ Protocol Revision 3.0 (0x0300), 6/12/2015
 
 This document defines a network protocol for a key-value store that may be read
 from and written to by multiple remote clients. A central server, most often
-running on a FIRST FRC robot controller, is responsible for providing
+running on a FIRST robot controller, is responsible for providing
 information consistency and for facilitating communication between clients.
 This document describes protocol revision 3.0 (0x0300).
 

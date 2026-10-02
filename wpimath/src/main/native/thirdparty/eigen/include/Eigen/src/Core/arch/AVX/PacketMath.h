@@ -2831,7 +2831,7 @@ inline __m128i segment_mask_4x8(Index begin, Index count) {
   mask <<= CHAR_BIT * count;
   mask--;
   mask <<= CHAR_BIT * begin;
-#if defined(_WIN32) && !defined(_WIN64)
+#if !EIGEN_ARCH_x86_64
   return _mm_loadl_epi64(reinterpret_cast<const __m128i*>(&mask));
 #else
   return _mm_cvtsi64_si128(mask);
@@ -2847,7 +2847,7 @@ inline __m128i segment_mask_8x8(Index begin, Index count) {
   mask <<= (CHAR_BIT / 2) * count;
   mask--;
   mask <<= CHAR_BIT * begin;
-#if defined(_WIN32) && !defined(_WIN64)
+#if !EIGEN_ARCH_x86_64
   return _mm_loadl_epi64(reinterpret_cast<const __m128i*>(&mask));
 #else
   return _mm_cvtsi64_si128(mask);

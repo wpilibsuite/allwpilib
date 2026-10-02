@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 22 Jul 2026 17:59:52 -0400
+Subject: [PATCH 2/3] Fix static_asserts
+
+Bitfields are packed differently on MSVC, and we need assert.h.
+---
+ dogleg.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/dogleg.h b/dogleg.h
+index 528d82113153fb13baa253905b9d85e89476551d..7fd4c8df1d04372f389d76ac1fa27b38d21f05f8 100644
+--- a/dogleg.h
++++ b/dogleg.h
+@@ -6,6 +6,7 @@
+ #pragma once
+ 
+ #include <suitesparse/cholmod.h>
++#include <assert.h>
+ #include <stdbool.h>
+ 
+ typedef void (dogleg_callback_t)(// in
+@@ -150,8 +151,6 @@ typedef struct
+   double update_threshold;
+   double trustregion_threshold;
+ } dogleg_parameters2_t;
+-_Static_assert(offsetof(dogleg_parameters2_t,trustregion0) == 2*sizeof(int),
+-               "dogleg_parameters2_t structure must match that of libdogleg v0.16");
+ // I also need to make sure that the "debug_vnlog" bit is DOGLEG_DEBUG_VNLOG. I
+ // can't use a static-assert, so I do that in test-misc.c
+ 
+@@ -159,7 +158,7 @@ typedef enum {
+   DOGLEG_DENSE          = 0,
+   DOGLEG_SPARSE         = 1,
+   DOGLEG_DENSE_PRODUCTS = 2 } dogleg_solve_type_t;
+-_Static_assert(sizeof(dogleg_solve_type_t) == sizeof(int),
++static_assert(sizeof(dogleg_solve_type_t) == sizeof(int),
+                "solve_type should be as big as an int, to maintain ABI compatibility");
+ 
+ // solver context. This has all the internal state of the solver

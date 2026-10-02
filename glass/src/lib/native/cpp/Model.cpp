@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/Model.h"
+#include "wpi/glass/Model.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 bool Model::IsReadOnly() {
   return false;

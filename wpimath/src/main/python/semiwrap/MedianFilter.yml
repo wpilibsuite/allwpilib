@@ -1,0 +1,15 @@
+classes:
+  wpi::math::MedianFilter:
+    template_params:
+    - T
+    methods:
+      MedianFilter:
+      Calculate:
+      LastValue:
+      Reset:
+
+templates:
+  MedianFilter:
+    qualname: wpi::math::MedianFilter
+    params:
+    - double

@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: WPILib Developers <wpilib@wpi.edu>
+Date: Tue, 7 Jul 2026 00:00:00 -0700
+Subject: [PATCH 2/2] Use swapchain size for SDL GPU framebuffer scale
+
+---
+ backends/imgui_impl_sdlgpu3.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/backends/imgui_impl_sdlgpu3.cpp b/backends/imgui_impl_sdlgpu3.cpp
+index 3883ca83d20e2175888ca182f50d437dcc794e27..b017891a7966d23c7c490478a28f2b87bce574ad 100644
+--- a/backends/imgui_impl_sdlgpu3.cpp
++++ b/backends/imgui_impl_sdlgpu3.cpp
+@@ -737,10 +737,14 @@ static void ImGui_ImplSDLGPU3_RenderWindow(ImGuiViewport* viewport, void*)
+     SDL_GPUCommandBuffer* command_buffer = SDL_AcquireGPUCommandBuffer(data->InitInfo.Device);
+ 
+     SDL_GPUTexture* swapchain_texture;
+-    SDL_AcquireGPUSwapchainTexture(command_buffer, window, &swapchain_texture, nullptr, nullptr);
++    Uint32 swapchain_texture_width = 0;
++    Uint32 swapchain_texture_height = 0;
++    SDL_AcquireGPUSwapchainTexture(command_buffer, window, &swapchain_texture, &swapchain_texture_width, &swapchain_texture_height);
+ 
+     if (swapchain_texture != nullptr)
+     {
++        if (draw_data->DisplaySize.x > 0.0f && draw_data->DisplaySize.y > 0.0f && swapchain_texture_width > 0 && swapchain_texture_height > 0)
++            draw_data->FramebufferScale = ImVec2((float)swapchain_texture_width / draw_data->DisplaySize.x, (float)swapchain_texture_height / draw_data->DisplaySize.y);
+         ImGui_ImplSDLGPU3_PrepareDrawData(draw_data, command_buffer); // FIXME-OPT: Not optimal, may this be done earlier?
+         SDL_GPUColorTargetInfo target_info = {};
+         target_info.texture = swapchain_texture;

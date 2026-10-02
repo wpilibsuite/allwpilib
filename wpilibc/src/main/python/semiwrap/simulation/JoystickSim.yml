@@ -1,0 +1,18 @@
+extra_includes:
+- wpi/driverstation/Joystick.hpp
+
+classes:
+  wpi::sim::JoystickSim:
+    force_no_trampoline: true
+    methods:
+      JoystickSim:
+        overloads:
+          const Joystick&:
+          int:
+      SetX:
+      SetY:
+      SetZ:
+      SetTwist:
+      SetThrottle:
+      SetTrigger:
+      SetTop:

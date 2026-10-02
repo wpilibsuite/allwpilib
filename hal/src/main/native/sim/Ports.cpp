@@ -2,87 +2,78 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/Ports.h"
+#include "wpi/hal/Ports.h"
 
-#include "PortsInternal.h"
+#include "PortsInternal.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializePorts() {}
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
 extern "C" {
-int32_t HAL_GetNumAccumulators(void) {
-  return kNumAccumulators;
+int32_t HAL_GetNumCanBuses(void) {
+  return NUM_CAN_BUSES;
 }
-int32_t HAL_GetNumAnalogTriggers(void) {
-  return kNumAnalogTriggers;
+int32_t HAL_GetNumSmartIo(void) {
+  return NUM_SMART_IO;
 }
 int32_t HAL_GetNumAnalogInputs(void) {
-  return kNumAnalogInputs;
-}
-int32_t HAL_GetNumAnalogOutputs(void) {
-  return kNumAnalogOutputs;
+  return NUM_ANALOG_INPUTS;
 }
 int32_t HAL_GetNumCounters(void) {
-  return kNumCounters;
+  return NUM_COUNTERS;
 }
 int32_t HAL_GetNumDigitalHeaders(void) {
-  return kNumDigitalHeaders;
+  return NUM_DIGITAL_HEADERS;
 }
 int32_t HAL_GetNumPWMHeaders(void) {
-  return kNumPWMHeaders;
+  return NUM_PWM_HEADERS;
 }
 int32_t HAL_GetNumDigitalChannels(void) {
-  return kNumDigitalChannels;
+  return NUM_DIGITAL_CHANNELS;
 }
 int32_t HAL_GetNumPWMChannels(void) {
-  return kNumPWMChannels;
+  return NUM_PWM_CHANNELS;
 }
 int32_t HAL_GetNumDigitalPWMOutputs(void) {
-  return kNumDigitalPWMOutputs;
+  return NUM_DIGITAL_PWM_OUTPUTS;
 }
 int32_t HAL_GetNumEncoders(void) {
-  return kNumEncoders;
+  return NUM_ENCODERS;
 }
 int32_t HAL_GetNumInterrupts(void) {
-  return kNumInterrupts;
-}
-int32_t HAL_GetNumRelayChannels(void) {
-  return kNumRelayChannels;
-}
-int32_t HAL_GetNumRelayHeaders(void) {
-  return kNumRelayHeaders;
+  return NUM_INTERRUPTS;
 }
 int32_t HAL_GetNumCTREPCMModules(void) {
-  return kNumCTREPCMModules;
+  return NUM_CTREPCM_MODULES;
 }
 int32_t HAL_GetNumCTRESolenoidChannels(void) {
-  return kNumCTRESolenoidChannels;
+  return NUM_CTRE_SOLENOID_CHANNELS;
 }
 int32_t HAL_GetNumCTREPDPModules(void) {
-  return kNumCTREPDPModules;
+  return NUM_CTREPDP_MODULES;
 }
 int32_t HAL_GetNumCTREPDPChannels(void) {
-  return kNumCTREPDPChannels;
+  return NUM_CTREPDP_CHANNELS;
 }
 int32_t HAL_GetNumREVPDHModules(void) {
-  return kNumREVPDHModules;
+  return NUM_REVPDH_MODULES;
 }
 int32_t HAL_GetNumREVPDHChannels(void) {
-  return kNumREVPDHChannels;
+  return NUM_REVPDH_CHANNELS;
 }
 int32_t HAL_GetNumREVPHModules(void) {
-  return kNumREVPHModules;
+  return NUM_REVPH_MODULES;
 }
 int32_t HAL_GetNumREVPHChannels(void) {
-  return kNumREVPHChannels;
+  return NUM_REVPH_CHANNELS;
 }
 int32_t HAL_GetNumDutyCycles(void) {
-  return kNumDutyCycles;
+  return NUM_DUTY_CYCLES;
 }
 int32_t HAL_GetNumAddressableLEDs(void) {
-  return kNumAddressableLEDs;
+  return NUM_ADDRESSABLE_LE_DS;
 }
 }  // extern "C"

@@ -1,0 +1,113 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Mon, 26 May 2025 01:35:06 -0400
+Subject: [PATCH 5/5] Suppress warnings
+
+---
+ third_party/utf8_range/utf8_range.c           |  2 +-
+ upb/port/def.inc                              | 24 +++++++++++++++++++
+ upb/port/undef.inc                            |  7 ++++++
+ .../stage0/google/protobuf/descriptor.upb.c   |  6 ++++-
+ upb/wire/internal/decoder.h                   |  2 +-
+ 5 files changed, 38 insertions(+), 3 deletions(-)
+
+diff --git a/third_party/utf8_range/utf8_range.c b/third_party/utf8_range/utf8_range.c
+index 049e2e21508cf368dab6cd49727ed2e413542f71..3eb4bd7c95df0ea2346987d78d8933872719b230 100644
+--- a/third_party/utf8_range/utf8_range.c
++++ b/third_party/utf8_range/utf8_range.c
+@@ -20,11 +20,11 @@
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <string.h>
+-
+ #if defined(__GNUC__)
+ #define FORCE_INLINE_ATTR __attribute__((always_inline)) inline
+ #elif defined(_MSC_VER)
+ #define FORCE_INLINE_ATTR __forceinline
++#pragma warning (disable : 4141)
+ #else
+ #define FORCE_INLINE_ATTR inline
+ #endif
+diff --git a/upb/port/def.inc b/upb/port/def.inc
+index 237aa87648661b05ce9a47fce00561bd2f262b13..50350e60cbbed1dfab186e7bf30ae821c378f027 100644
+--- a/upb/port/def.inc
++++ b/upb/port/def.inc
+@@ -34,6 +34,30 @@
+ #endif
+ 
+ #define UPB_BOOTSTRAP_STAGE 0
++#if _WIN32
++#pragma warning(push)
++#pragma warning(disable : 4018 4047 4116 4146 4200 4244 4267 4334 4646 4789)
++#elif defined(__clang__)
++#pragma clang diagnostic push
++#ifdef __cplusplus
++#pragma clang diagnostic ignored "-Wc99-extensions"
++#endif
++#pragma clang diagnostic ignored "-Wsign-compare"
++#pragma clang diagnostic ignored "-Wflexible-array-extensions"
++#elif defined(__GNUC__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#pragma GCC diagnostic ignored "-Wpedantic"
++#ifndef __cplusplus
++#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
++#endif
++#pragma GCC diagnostic ignored "-Wclobbered"
++#pragma GCC diagnostic ignored "-Wsign-compare"
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++#pragma GCC diagnostic ignored "-Wstringop-overread"
++#pragma GCC diagnostic ignored "-Wtype-limits"
++#endif
+ 
+ // Portable check for GCC minimum version:
+ // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+diff --git a/upb/port/undef.inc b/upb/port/undef.inc
+index 764c81ce69fe63b956c97d337ba6d448c6ac70f9..b1cf7202b51dd350d49987e4e282461f9fa26399 100644
+--- a/upb/port/undef.inc
++++ b/upb/port/undef.inc
+@@ -7,6 +7,13 @@
+ 
+ // This should #undef all macros #defined in def.inc
+ 
++#if _WIN32
++#pragma warning(pop)
++#elif defined(__clang__)
++#pragma clang diagnostic pop
++#elif defined(__GNUC__)
++#pragma GCC diagnostic pop
++#endif
+ #undef UPB_SIZE
+ #undef UPB_PTR_AT
+ #undef UPB_SIZEOF_FLEX
+diff --git a/upb/reflection/stage0/google/protobuf/descriptor.upb.c b/upb/reflection/stage0/google/protobuf/descriptor.upb.c
+index 9595ce30983144322fc3616a674fce158abeb8a9..e2f59e7702a9bb1d36cfc6bba66bd350006c138f 100644
+--- a/upb/reflection/stage0/google/protobuf/descriptor.upb.c
++++ b/upb/reflection/stage0/google/protobuf/descriptor.upb.c
+@@ -1,7 +1,11 @@
+ #include <stddef.h>
+ #include "upb/generated_code_support.h"
+ #include "upb/reflection/descriptor_bootstrap.h"
+-
++#ifdef __clang__
++#pragma clang diagnostic ignored "-Wstrict-prototypes"
++#elif defined(__GNUC__)
++#pragma GCC diagnostic ignored "-Wstrict-prototypes"
++#endif
+ static upb_Arena* upb_BootstrapArena() {
+   static upb_Arena* arena = NULL;
+   if (!arena) arena = upb_Arena_New();
+diff --git a/upb/wire/internal/decoder.h b/upb/wire/internal/decoder.h
+index 8f5299d97323760a77d72247b6d1c90034b71194..3c59c6ee69caad2c280b6823079ed0e5ab122c48 100644
+--- a/upb/wire/internal/decoder.h
++++ b/upb/wire/internal/decoder.h
+@@ -110,7 +110,7 @@ UPB_INLINE void _upb_Decoder_Trace(upb_Decoder* d, char event) {
+   d->trace_ptr[1] = '\0';
+   d->trace_ptr++;
+ #endif
+-};
++}
+ 
+ UPB_INLINE
+ bool _upb_Decoder_VerifyUtf8Inline(const char* ptr, int len) {

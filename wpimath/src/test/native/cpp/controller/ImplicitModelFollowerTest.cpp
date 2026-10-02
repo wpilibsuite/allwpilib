@@ -2,20 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/math/controller/ImplicitModelFollower.hpp"
 
-#include "frc/controller/ImplicitModelFollower.h"
-#include "frc/system/plant/LinearSystemId.h"
+#include <catch2/catch_test_macros.hpp>
 
-namespace frc {
+#include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/linalg/EigenCore.hpp"
+#include "wpi/math/system/Models.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
-TEST(ImplicitModelFollowerTest, SameModel) {
-  constexpr units::second_t dt = 5_ms;
+namespace wpi::math {
+
+TEST_CASE("ImplicitModelFollowerTest SameModel", "[wpimath]") {
+  constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
 
   ImplicitModelFollower<2, 2> imf{plant, plant};
 
@@ -28,8 +35,8 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 
   // Backward
@@ -38,8 +45,8 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 
   // Rotate CCW
@@ -48,23 +55,23 @@ TEST(ImplicitModelFollowerTest, SameModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_DOUBLE_EQ(x(0), xImf(0));
-    EXPECT_DOUBLE_EQ(x(1), xImf(1));
+    CHECK_DOUBLE_EQ(x(0), xImf(0));
+    CHECK_DOUBLE_EQ(x(1), xImf(1));
   }
 }
 
-TEST(ImplicitModelFollowerTest, SlowerRefModel) {
-  constexpr units::second_t dt = 5_ms;
+TEST_CASE("ImplicitModelFollowerTest SlowerRefModel", "[wpimath]") {
+  constexpr wpi::units::second_t dt = 5_ms;
 
   using Kv_t = decltype(1_V / 1_mps);
   using Ka_t = decltype(1_V / 1_mps_sq);
 
-  auto plant = LinearSystemId::IdentifyDrivetrainSystem(Kv_t{1.0}, Ka_t{1.0},
-                                                        Kv_t{1.0}, Ka_t{1.0});
+  auto plant = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{1.0},
+                                                  Kv_t{1.0}, Ka_t{1.0});
 
   // Linear acceleration is slower, but angular acceleration is the same
-  auto plantRef = LinearSystemId::IdentifyDrivetrainSystem(
-      Kv_t{1.0}, Ka_t{2.0}, Kv_t{1.0}, Ka_t{1.0});
+  auto plantRef = Models::DifferentialDriveFromSysId(Kv_t{1.0}, Ka_t{2.0},
+                                                     Kv_t{1.0}, Ka_t{1.0});
 
   ImplicitModelFollower<2, 2> imf{plant, plantRef};
 
@@ -77,8 +84,8 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_GE(x(0), xImf(0));
-    EXPECT_GE(x(1), xImf(1));
+    CHECK(x(0) >= xImf(0));
+    CHECK(x(1) >= xImf(1));
   }
 
   // Backward
@@ -89,8 +96,8 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_LE(x(0), xImf(0));
-    EXPECT_LE(x(1), xImf(1));
+    CHECK(x(0) <= xImf(0));
+    CHECK(x(1) <= xImf(1));
   }
 
   // Rotate CCW
@@ -101,9 +108,9 @@ TEST(ImplicitModelFollowerTest, SlowerRefModel) {
     x = plant.CalculateX(x, u, dt);
     xImf = plant.CalculateX(xImf, imf.Calculate(xImf, u), dt);
 
-    EXPECT_NEAR(x(0), xImf(0), 1e-5);
-    EXPECT_NEAR(x(1), xImf(1), 1e-5);
+    CHECK_NEAR(x(0), xImf(0), 1e-5);
+    CHECK_NEAR(x(1), xImf(1), 1e-5);
   }
 }
 
-}  // namespace frc
+}  // namespace wpi::math

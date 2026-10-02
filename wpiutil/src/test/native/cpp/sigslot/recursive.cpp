@@ -31,9 +31,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "wpi/Signal.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/util/Signal.h"
+// clang-format on
 
-#include <gtest/gtest.h>
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 namespace {
 
@@ -56,14 +62,14 @@ struct object {
   }
 
   T v;
-  wpi::sig::Signal_r<T> sig;
+  wpi::util::sig::Signal_r<T> sig;
 };
 
 }  // namespace
 
-namespace wpi {
+namespace wpi::util {
 
-TEST(SignalTest, Recursive) {
+TEST_CASE("SignalTest Recursive", "[wpiutil][sigslot]") {
   object<int> i1(-1);
   object<int> i2(10);
 
@@ -72,13 +78,13 @@ TEST(SignalTest, Recursive) {
 
   i1.inc_val(0);
 
-  ASSERT_EQ(i1.v, i2.v);
+  REQUIRE(i1.v == i2.v);
 }
 
-TEST(SignalTest, SelfRecursive) {
+TEST_CASE("SignalTest SelfRecursive", "[wpiutil][sigslot]") {
   int i = 0;
 
-  wpi::sig::Signal_r<int> s;
+  wpi::util::sig::Signal_r<int> s;
   s.connect([&](int v) {
     if (i < 10) {
       i++;
@@ -88,7 +94,7 @@ TEST(SignalTest, SelfRecursive) {
 
   s(0);
 
-  ASSERT_EQ(i, 10);
+  REQUIRE(i == 10);
 }
 
-}  // namespace wpi
+}  // namespace wpi::util

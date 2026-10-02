@@ -1,0 +1,11 @@
+classes:
+  wpi::math::LTVDifferentialDriveController:
+    methods:
+      LTVDifferentialDriveController:
+      AtReference:
+      SetTolerance:
+      Calculate:
+        overloads:
+          ? const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t
+          :
+          const Pose2d&, wpi::units::meters_per_second_t, wpi::units::meters_per_second_t, const DifferentialSample&:

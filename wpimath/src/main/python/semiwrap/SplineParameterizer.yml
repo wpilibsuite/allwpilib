@@ -1,0 +1,13 @@
+classes:
+  wpi::math::SplineParameterizer:
+    force_no_default_constructor: true
+    force_type_casters:
+    - wpi::units::curvature_t
+    methods:
+      Parameterize:
+        template_impls:
+        - ['3']
+        - ['5']
+
+  wpi::math::SplineParameterizer::MalformedSplineException:
+    ignore: true

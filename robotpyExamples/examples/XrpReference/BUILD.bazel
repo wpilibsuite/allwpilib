@@ -1,0 +1,12 @@
+load("//robotpyExamples:project.bzl", "robotpy_project")
+
+robotpy_project(
+    name = "XrpReference",
+    srcs = glob(["**/*.py"]),
+    main = "robot.py",
+    deps = [
+        "//commandsv2:commandsv2-py",
+        "//drivers:wpilib-drivers",
+        "//xrpVendordep:robotpy-xrp",
+    ],
+)

@@ -2,13 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/event/EventLoop.h"
+#include "wpi/event/EventLoop.hpp"
 
 #include <utility>
 
-#include "frc/Errors.h"
+#include "wpi/system/Errors.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 namespace {
 struct RunningSetter {
@@ -22,25 +22,25 @@ struct RunningSetter {
 
 EventLoop::EventLoop() {}
 
-void EventLoop::Bind(wpi::unique_function<void()> action) {
+void EventLoop::Bind(wpi::util::unique_function<void()> action) {
   if (m_running) {
-    throw FRC_MakeError(err::Error,
-                        "Cannot bind EventLoop while it is running");
+    throw WPILIB_MakeError(err::Error,
+                           "Cannot bind EventLoop while it is running");
   }
   m_bindings.emplace_back(std::move(action));
 }
 
 void EventLoop::Poll() {
   RunningSetter runSetter{m_running};
-  for (wpi::unique_function<void()>& action : m_bindings) {
+  for (wpi::util::unique_function<void()>& action : m_bindings) {
     action();
   }
 }
 
 void EventLoop::Clear() {
   if (m_running) {
-    throw FRC_MakeError(err::Error,
-                        "Cannot clear EventLoop while it is running");
+    throw WPILIB_MakeError(err::Error,
+                           "Cannot clear EventLoop while it is running");
   }
   m_bindings.clear();
 }

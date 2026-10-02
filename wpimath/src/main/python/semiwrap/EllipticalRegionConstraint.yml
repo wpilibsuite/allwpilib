@@ -1,0 +1,21 @@
+extra_includes:
+- PyTrajectoryConstraint.h
+
+classes:
+  wpi::math::EllipticalRegionConstraint:
+    template_params:
+    - typename Constraint
+    typealias:
+    - wpi::math::TrajectoryConstraint::MinMax
+    methods:
+      EllipticalRegionConstraint:
+        overloads:
+          const Ellipse2d&, const Constraint&:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+templates:
+  EllipticalRegionConstraint:
+    qualname: wpi::math::EllipticalRegionConstraint
+    params:
+    - wpi::math::PyTrajectoryConstraint

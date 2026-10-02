@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:13:25 -0700
+Subject: [PATCH 11/25] Add array and object constructors
+
+---
+ json.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/json.h b/json.h
+index 8b09d001acd0a966328301bc89ff72616f106a4b..9aa5c889932e720746972d9e8ef1dd8b095e0fb1 100644
+--- a/json.h
++++ b/json.h
+@@ -138,6 +138,14 @@ class json
+     {
+     }
+ 
++    json(array_t&& value) : type_(Type::Array), array_value(std::move(value))
++    {
++    }
++
++    json(object_t&& value) : type_(Type::Object), object_value(std::move(value))
++    {
++    }
++
+     constexpr Type type() const
+     {
+         return type_;

@@ -1,0 +1,6 @@
+classes:
+  wpi::TouchpadFinger:
+    attributes:
+      down:
+      x:
+      y:

@@ -140,7 +140,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
     return insertBack(inner);
   }
   inline Scalar& insertBack(Index i) {
-    m_data.append(0, i);
+    m_data.append(Scalar(0), i);
     return m_data.value(m_data.size() - 1);
   }
 
@@ -150,7 +150,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
     return insertBackUnordered(inner);
   }
   inline Scalar& insertBackUnordered(Index i) {
-    m_data.append(0, i);
+    m_data.append(Scalar(0), i);
     return m_data.value(m_data.size() - 1);
   }
 
@@ -177,7 +177,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
       --p;
     }
     m_data.index(p + 1) = convert_index(i);
-    m_data.value(p + 1) = 0;
+    m_data.value(p + 1) = Scalar(0);
     return m_data.value(p + 1);
   }
 
@@ -367,7 +367,7 @@ class SparseVector : public SparseCompressedBase<SparseVector<Scalar_, Options_,
 
   /** \internal \deprecated use insertBack(Index) */
   EIGEN_DEPRECATED_WITH_REASON("Use .insertBack() instead.") Scalar& fill(Index i) {
-    m_data.append(0, i);
+    m_data.append(Scalar(0), i);
     return m_data.value(m_data.size() - 1);
   }
 

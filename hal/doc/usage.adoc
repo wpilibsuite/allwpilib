@@ -1,0 +1,70 @@
+= WPILib Usage Reporting Guidelines, Version 1.0
+WPILib Developers <wpilib@wpi.edu>
+Revision 1.0 (0x0100), 2/4/2025
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+Guidelines for reporting of utilization of hardware resources and software features using the WPILib HAL usage reporting API (HAL_ReportUsage).
+
+[[motivation]]
+== Motivation
+
+WPILib and associated vendor libraries offer a large number of different hardware and software features. Collecting aggregate information on what features are used by teams on their competition robots enables FIRST, the WPILib development team, and vendors to make development plans and decide which features may be worth adding or removing in future years.
+
+The usage reporting infrastructure may also be used to provide other features, such as interactive debugging (sensor reading and motor control) independent of the user program to verify the software-hardware IO (e.g. wiring) configuration independent of software code operation.
+
+As the usage reporting infrastructure is a shared resource using string names and string values, guidelines are warranted to enable consistency of use and avoidance of accidental naming conflicts across the software ecosystem. Resource names must be unique for each unique resource to ensure no usage information is lost. Many resources also have associated unique indices, such as bus or device IDs or port numbers, and a standard approach to formatting these into strings is desirable from a consistency perspective.
+
+[[references]]
+== References
+
+[[rfc7159,RFC7159,JSON]]
+* RFC 7159, The JavaScript Object Notation (JSON) Data Interchange Format, https://tools.ietf.org/html/rfc7159
+
+[[api-contract]]
+== API Contract
+
+The WPILib HAL usage reporting API is a single function that takes two strings: a resource name and an associated data value. This function operates like a dictionary put function: calling the function multiple times with the same resource name results in *replacing* the data value associated with that resource name; only the data value from the last call to the function for each resource name will be reported/retained by the usage reporting system. There is no mechanism to un-report a resource. Usage reporting is empty at the start of the user program.
+
+[[resource-names]]
+== Resource Names
+
+Resource names are UTF-8 strings, structured into the following components:
+
+- Abbreviated vendor name, followed by a forward slash (``/``). This component is not present for WPILib resources (no name or slash).
+- Optional short package name, followed by a period (``.``). This should be 10 characters or less, and should only be present if required for disambiguation in very large libraries.
+- Core resource name
+- Optional bus index or name, wrapped in square brackets (``[index]``). Indexes should use decimal representation.
+- Optional device index or name, wrapped in square brackets. May be repeated as required.
+- Optional port number, wrapped in square brackets. If multiple ports are used for a single logical resource, they may be comma-separated (e.g. ``[3,4]``).
+- Optional forward slash, followed by additional core resource+bus+device+port components, as required
+
+When choosing a core resource name, using a class name or device type is often the best choice. The main exception to this are IO resources which can be allocated to only a single device (e.g. a DIO pin or joystick port). In that case, a better choice is to use the IO name as the resource name, and store the class name or device type in the data value.
+
+[[data-values]]
+== Data Values
+
+Data values may be blank if not required or useful. For simple values, a simple string or number (represented in decimal) can be directly stored. For complex data values (e.g. to represent a combination of features being used), JSON encoding is strongly recommended. In general, the total size of the data value should be minimized.
+
+A common use case for a data value is a count of the number of times a particular resource is used. Note the API does not have provisions for auto-incrementing a usage count; callers must handle this (e.g. through use of a static counter).
+
+[[examples]]
+== Examples
+
+[cols="3,2,2", options="header"]
+|===
+|Use Case|Name|Value
+|SwerveDriveKinematics class|``SwerveDriveKinematics``|Empty
+|Java programming language|``Language``|``Java``
+|PID Controller (4th instantiation)|``PIDController``|``4``
+|XBox Controller attached to port 3|``HID[3]``|``XboxController``
+|Digital input on IO 2|``IO[2]``|``DigitalInput``
+|Quadrature Encoder on IO 3 and 4|``IO[3,4]``|``Encoder``
+|PCM Solenoid, CAN bus 0, ID 3, port 2|``PCM[0][3]/Solenoid[2]``|Empty
+|PH Compressor, CAN bus 0, ID 1|``PH[0][1]/Compressor``|Empty
+|Servo on IO 5|``IO[5]``|``Servo``
+|Generic CAN device, bus 1, type 3, mfg 4, ID 2|``CAN[1][3][4][2]``|Empty
+|CTRE Kraken, CAN bus 0, ID 50|``CTRE/Kraken[0][50]``|Vendor-specified
+|Rev SparkMax, CAN bus 1, ID 3|``Rev/SparkMax[1][3]``|Vendor-specified
+|===

@@ -1,0 +1,16 @@
+classes:
+  wpi::romi::OnBoardIO:
+    attributes:
+      MESSAGE_INTERVAL:
+      m_nextMessageTime:
+    enums:
+      ChannelMode:
+    methods:
+      OnBoardIO:
+      GetButtonAPressed:
+      GetButtonBPressed:
+      GetButtonCPressed:
+      SetGreenLed:
+      SetRedLed:
+      SetYellowLed:
+      AllocatePWM:

@@ -1,0 +1,102 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:04:27 -0700
+Subject: [PATCH 10/25] Make non-object functions constexpr
+
+---
+ json.h | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/json.h b/json.h
+index d9fdfe40c5cce5b306eee42668f9944e11f6aacd..8b09d001acd0a966328301bc89ff72616f106a4b 100644
+--- a/json.h
++++ b/json.h
+@@ -102,35 +102,35 @@ class json
+     json(const std::string&);
+     ~json();
+ 
+-    json(const std::nullptr_t = nullptr) : type_(Type::Null)
++    constexpr json(const std::nullptr_t = nullptr) : type_(Type::Null)
+     {
+     }
+ 
+-    json(bool value) : type_(Type::Bool), bool_value(value)
++    constexpr json(bool value) : type_(Type::Bool), bool_value(value)
+     {
+     }
+ 
+-    json(int value) : type_(Type::Int), long_value(value)
++    constexpr json(int value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(float value) : type_(Type::Float), float_value(value)
++    constexpr json(float value) : type_(Type::Float), float_value(value)
+     {
+     }
+ 
+-    json(unsigned value) : type_(Type::Int), long_value(value)
++    constexpr json(unsigned value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(long value) : type_(Type::Int), long_value(value)
++    constexpr json(long value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(long long value) : type_(Type::Int), long_value(value)
++    constexpr json(long long value) : type_(Type::Int), long_value(value)
+     {
+     }
+ 
+-    json(double value) : type_(Type::Double), double_value(value)
++    constexpr json(double value) : type_(Type::Double), double_value(value)
+     {
+     }
+ 
+@@ -138,37 +138,37 @@ class json
+     {
+     }
+ 
+-    Type type() const
++    constexpr Type type() const
+     {
+         return type_;
+     }
+ 
+-    bool is_null() const
++    constexpr bool is_null() const
+     {
+         return type_ == Type::Null;
+     }
+ 
+-    bool is_bool() const
++    constexpr bool is_bool() const
+     {
+         return type_ == Type::Bool;
+     }
+ 
+-    bool is_number() const
++    constexpr bool is_number() const
+     {
+         return is_float() || is_double() || is_int();
+     }
+ 
+-    bool is_int() const
++    constexpr bool is_int() const
+     {
+         return type_ == Type::Int;
+     }
+ 
+-    bool is_float() const
++    constexpr bool is_float() const
+     {
+         return type_ == Type::Float;
+     }
+ 
+-    bool is_double() const
++    constexpr bool is_double() const
+     {
+         return type_ == Type::Double;
+     }

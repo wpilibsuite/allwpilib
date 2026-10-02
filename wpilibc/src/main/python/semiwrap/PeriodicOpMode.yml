@@ -1,0 +1,13 @@
+classes:
+  wpi::PeriodicOpMode:
+    methods:
+      DisabledPeriodic:
+      Start:
+      Periodic:
+      End:
+      AddPeriodic:
+        overloads:
+          std::function<void ()>, wpi::units::second_t:
+          std::function<void ()>, wpi::units::second_t, wpi::units::second_t:
+      PeriodicOpMode:
+      GetCallbacks:

@@ -1,0 +1,24 @@
+extra_includes:
+- wpi/hardware/pneumatic/Compressor.hpp
+- wpi/hardware/pneumatic/Solenoid.hpp
+- wpi/hardware/pneumatic/DoubleSolenoid.hpp
+
+classes:
+  wpi::Compressor:
+    methods:
+      Compressor:
+        overloads:
+          CANPort, PneumaticsModuleType:
+          CANPort, int, PneumaticsModuleType:
+      IsEnabled:
+      GetPressureSwitchValue:
+      GetCurrent:
+      GetAnalogVoltage:
+      GetPressure:
+      Disable:
+      EnableDigital:
+      EnableAnalog:
+      EnableHybrid:
+      GetConfigType:
+      LogTo:
+      GetTelemetryType:

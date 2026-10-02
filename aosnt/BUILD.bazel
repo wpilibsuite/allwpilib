@@ -1,0 +1,123 @@
+load("@aos//aos:config.bzl", "aos_config")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("//shared/bazel/rules:packaging.bzl", "package_binary_cc_project")
+
+cc_library(
+    name = "aosnt",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//aosnt/types:nt_types_fbs",
+        "//ntcore",
+        "//wpiutil",
+        "@aos//aos:configuration",
+        "@aos//aos/events:event_loop",
+        "@aos_flatbuffers//:flatbuffers",
+    ],
+)
+
+cc_binary(
+    name = "aosnt-bridge",
+    srcs = ["src/bridge/native/cpp/main.cpp"],
+    # The Linux toolchains export every symbol (-rdynamic), which costs 1.3 MB
+    # of symbol tables on a SystemCore and keeps every function a
+    # --gc-sections root. Nothing loads the bridge's symbols dynamically.
+    linkopts = select({
+        "@platforms//os:linux": [
+            "-Wl,--no-export-dynamic",
+            "-Wl,--gc-sections",
+        ],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":aosnt",
+        "//ntcore",
+        "//wpiutil",
+        "@aos//aos:configuration",
+        "@aos//aos:init",
+        "@aos//aos/events:shm_event_loop",
+    ],
+)
+
+package_binary_cc_project(
+    name = "aosnt-bridge",
+    # aos_dump reads the channels the bridge publishes, so it is what you reach
+    # for when a topic does not show up in NetworkTables.
+    extra_binaries = ["@aos//aos:aos_dump"],
+    maven_artifact_name = "aosnt-bridge",
+    maven_group_id = "org.wpilib.aosnt",
+    systemcore = True,
+)
+
+aos_config(
+    name = "aos_config",
+    src = "aos_config_source.json",
+    flatbuffers = [
+        "//aosnt/types:nt_types_fbs",
+        "@aos//aos/events:event_loop_fbs",
+        "@aos//aos/logging:dynamic_log_command_fbs",
+        "@aos//aos/logging:log_message_fbs",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+    ],
+)
+
+# Two tagged channels with one name, which NtBridge refuses.
+aos_config(
+    name = "aos_duplicate_config",
+    src = "aos_duplicate_config_source.json",
+    flatbuffers = [
+        "@aos//aos/events:event_loop_fbs",
+        "@aos//aos/logging:dynamic_log_command_fbs",
+        "@aos//aos/logging:log_message_fbs",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+        "@aos//aos/testing/ping_pong:pong_fbs",
+    ],
+)
+
+cc_test(
+    name = "aosnt-cpp-test",
+    size = "small",
+    srcs = glob(["src/test/native/**/*.cpp"]),
+    data = [
+        ":aos_config",
+        ":aos_duplicate_config",
+    ],
+    deps = [
+        ":aosnt",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_arrays_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_arrays_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_bad_attribute_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_clash_first_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_clash_second_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_conflict_first_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_conflict_second_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_defaults_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_enums_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_enums_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_recursive_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_recursive_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_scalars_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_spanning_test_schema",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_fbs",
+        "//aosnt/src/test/fbs:flatbuffer_to_proto_test_schema",
+        "//aosnt/types:nt_types_fbs",
+        "//ntcore",
+        "//thirdparty/catch2",
+        "//wpiutil",
+        "//wpiutil:wpiutil-testlib",
+        "@aos//aos:configuration",
+        "@aos//aos:flatbuffer_merge",
+        "@aos//aos:init",
+        "@aos//aos:realtime",
+        "@aos//aos/events:simulated_event_loop",
+        "@aos//aos/flatbuffers:builder",
+        "@aos//aos/testing/ping_pong:ping_fbs",
+        "@aos_flatbuffers//:flatbuffers",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)

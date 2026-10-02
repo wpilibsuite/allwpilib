@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "Notifier.h"
+#include "Notifier.hpp"
 
 #include <utility>
 
-#include "Handle.h"
-#include "Instance.h"
-#include "SinkImpl.h"
-#include "SourceImpl.h"
+#include "Handle.hpp"
+#include "Instance.hpp"
+#include "SinkImpl.hpp"
+#include "SourceImpl.hpp"
 
-using namespace cs;
+using namespace wpi::cs;
 
 Notifier::Notifier() {}
 
@@ -53,7 +53,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
   auto handleData = Instance::GetInstance().FindSource(source);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),
-       Handle{handleData.first, property, Handle::kProperty}, propertyKind,
+       Handle{handleData.first, property, Handle::PROPERTY}, propertyKind,
        value, valueStr);
 }
 
@@ -69,7 +69,7 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
 
 void Notifier::NotifySinkSourceChanged(std::string_view name, CS_Sink sink,
                                        CS_Source source) {
-  RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
+  RawEvent event{name, sink, RawEvent::SINK_SOURCE_CHANGED};
   event.sourceHandle = source;
   Send(UINT_MAX, std::move(event));
 }
@@ -81,18 +81,18 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
   auto handleData = Instance::GetInstance().FindSink(sink);
   Send(UINT_MAX, propertyName, handleData.first,
        static_cast<RawEvent::Kind>(kind),
-       Handle{handleData.first, property, Handle::kSinkProperty}, propertyKind,
+       Handle{handleData.first, property, Handle::SINK_PROPERTY}, propertyKind,
        value, valueStr);
 }
 
 void Notifier::NotifyNetworkInterfacesChanged() {
-  Send(UINT_MAX, RawEvent::kNetworkInterfacesChanged);
+  Send(UINT_MAX, RawEvent::NETWORK_INTERFACES_CHANGED);
 }
 
 void Notifier::NotifyTelemetryUpdated() {
-  Send(UINT_MAX, RawEvent::kTelemetryUpdated);
+  Send(UINT_MAX, RawEvent::TELEMETRY_UPDATED);
 }
 
 void Notifier::NotifyUsbCamerasChanged() {
-  Send(UINT_MAX, RawEvent::kUsbCamerasChanged);
+  Send(UINT_MAX, RawEvent::USB_CAMERAS_CHANGED);
 }

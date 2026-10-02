@@ -1,0 +1,17 @@
+{
+  "name": "2021 FRC Galactic Search B",
+  "season": "2021",
+  "game": "Galactic Search B",
+  "field-image": {
+    "path": "2021-galacticsearchb.png",
+    "top": 20,
+    "left": 20,
+    "bottom": 400,
+    "right": 780
+  },
+  "field-dimensions": {
+    "length": 9.144,
+    "width": 4.572
+  },
+  "program": "frc"
+}

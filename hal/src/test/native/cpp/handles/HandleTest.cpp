@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "hal/handles/IndexedClassedHandleResource.h"
+#include "wpi/hal/handles/IndexedClassedHandleResource.hpp"
 
 #define HAL_TestHandle HAL_Handle
 
@@ -14,14 +14,14 @@ namespace {
 class MyTestClass {};
 }  // namespace
 
-namespace hal {
-TEST(HandleTest, ClassedHandle) {
-  hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
-                                    HAL_HandleEnum::Vendor>
+namespace wpi::hal {
+TEST_CASE("HandleTest ClassedHandle", "[hal][handles]") {
+  wpi::hal::IndexedClassedHandleResource<HAL_TestHandle, MyTestClass, 8,
+                                         HAL_HandleEnum::VENDOR>
       testClass;
-  int32_t status = 0;
-  testClass.Allocate(0, std::make_unique<MyTestClass>(), &status);
-  EXPECT_EQ(0, status);
+  auto resource =
+      testClass.Allocate(0, std::make_shared<MyTestClass>(), "TestResource");
+  CHECK(resource.has_value());
 }
 
-}  // namespace hal
+}  // namespace wpi::hal

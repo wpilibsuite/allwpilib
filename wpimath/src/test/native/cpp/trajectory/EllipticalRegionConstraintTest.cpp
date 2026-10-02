@@ -2,34 +2,40 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/math/trajectory/constraint/EllipticalRegionConstraint.hpp"
 
-#include "frc/trajectory/constraint/EllipticalRegionConstraint.h"
-#include "frc/trajectory/constraint/MaxVelocityConstraint.h"
-#include "trajectory/TestTrajectory.h"
-#include "units/acceleration.h"
-#include "units/angle.h"
-#include "units/length.h"
-#include "units/velocity.h"
+#include <catch2/catch_test_macros.hpp>
 
-using namespace frc;
+#include "wpi/math/shape/Ellipse2d.hpp"
+#include "wpi/math/trajectory/TestDrivetrainSplineTrajectory.hpp"
+#include "wpi/math/trajectory/TrajectoryConfig.hpp"
+#include "wpi/math/trajectory/constraint/MaxVelocityConstraint.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/math.hpp"
+#include "wpi/units/velocity.hpp"
 
-TEST(EllipticalRegionConstraintTest, Constraint) {
+using namespace wpi::math;
+
+TEST_CASE("EllipticalRegionConstraintTest Constraint", "[wpimath]") {
   constexpr auto maxVelocity = 2_fps;
-  constexpr frc::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
+  constexpr wpi::math::Ellipse2d ellipse{{5_ft, 2.5_ft, 180_deg}, 5_ft, 2.5_ft};
 
   auto config = TrajectoryConfig(13_fps, 13_fps_sq);
   config.AddConstraint(
       EllipticalRegionConstraint{ellipse, MaxVelocityConstraint{maxVelocity}});
-  auto trajectory = TestTrajectory::GetTrajectory(config);
+  auto trajectory = TestDrivetrainSplineTrajectory::GetTrajectory(config);
 
   bool exceededConstraintOutsideRegion = false;
-  for (auto& point : trajectory.States()) {
+  for (auto& point : trajectory.Samples()) {
     if (ellipse.Contains(point.pose.Translation())) {
-      EXPECT_TRUE(units::math::abs(point.velocity) < maxVelocity + 0.05_mps);
-    } else if (units::math::abs(point.velocity) >= maxVelocity + 0.05_mps) {
+      CHECK(wpi::units::math::abs(point.ForwardVelocity()) <
+            maxVelocity + 0.05_mps);
+    } else if (wpi::units::math::abs(point.ForwardVelocity()) >=
+               maxVelocity + 0.05_mps) {
       exceededConstraintOutsideRegion = true;
     }
   }
-  EXPECT_TRUE(exceededConstraintOutsideRegion);
+  CHECK(exceededConstraintOutsideRegion);
 }

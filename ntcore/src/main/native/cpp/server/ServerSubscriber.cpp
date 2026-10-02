@@ -2,24 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "ServerSubscriber.h"
+#include "ServerSubscriber.hpp"
 
 #include <utility>
 
-#include <wpi/MessagePack.h>
-#include <wpi/StringExtras.h>
+#include "PubSubOptions.hpp"
+#include "server/MessagePackWriter.hpp"
+#include "wpi/util/MessagePack.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-#include "PubSubOptions.h"
-#include "server/MessagePackWriter.h"
-
-using namespace nt;
-using namespace nt::server;
+using namespace wpi::nt;
+using namespace wpi::nt::server;
 using namespace mpack;
 
 static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
   int size =
       (options.sendAll ? 1 : 0) + (options.topicsOnly ? 1 : 0) +
-      (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs ? 1 : 0) +
+      (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS ? 1 : 0) +
       (options.prefixMatch ? 1 : 0);
   mpack_start_map(&w, size);
   if (options.sendAll) {
@@ -30,7 +29,7 @@ static void WriteOptions(mpack_writer_t& w, const PubSubOptionsImpl& options) {
     mpack_write_str(&w, "topicsonly");
     mpack_write_bool(&w, true);
   }
-  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
+  if (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS) {
     mpack_write_str(&w, "periodic");
     mpack_write_float(&w, options.periodicMs / 1000.0);
   }
@@ -45,7 +44,7 @@ bool ServerSubscriber::Matches(std::string_view name, bool special) {
   for (auto&& topicName : m_topicNames) {
     if ((!m_options.prefixMatch && name == topicName) ||
         (m_options.prefixMatch && (!special || !topicName.empty()) &&
-         wpi::starts_with(name, topicName))) {
+         wpi::util::starts_with(name, topicName))) {
       return true;
     }
   }

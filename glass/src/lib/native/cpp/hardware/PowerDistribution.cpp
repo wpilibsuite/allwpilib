@@ -2,18 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/PowerDistribution.h"
+#include "wpi/glass/hardware/PowerDistribution.hpp"
 
 #include <algorithm>
 
 #include <imgui.h>
-#include <wpi/StringExtras.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
-#include "glass/support/NameSetting.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/support/NameSetting.hpp"
+#include "wpi/util/StringExtras.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
   float width = 0;
@@ -34,9 +34,11 @@ static float DisplayChannel(PowerDistributionModel& pdp, int channel) {
   return width;
 }
 
-void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
+void wpi::glass::DisplayPowerDistribution(PowerDistributionModel* model,
+                                          int index) {
   char name[128];
-  wpi::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]", index);
+  wpi::util::format_to_n_c_str(name, sizeof(name), "PowerDistribution[{}]",
+                               index);
 
   if (CollapsingHeader(name)) {
     // temperature
@@ -80,8 +82,8 @@ void glass::DisplayPowerDistribution(PowerDistributionModel* model, int index) {
   }
 }
 
-void glass::DisplayPowerDistributions(PowerDistributionsModel* model,
-                                      std::string_view noneMsg) {
+void wpi::glass::DisplayPowerDistributions(PowerDistributionsModel* model,
+                                           std::string_view noneMsg) {
   bool hasAny = false;
   model->ForEachPowerDistribution([&](PowerDistributionModel& pdp, int i) {
     hasAny = true;

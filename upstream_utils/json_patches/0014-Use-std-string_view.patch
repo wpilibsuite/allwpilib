@@ -1,0 +1,128 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:19:39 -0700
+Subject: [PATCH 14/25] Use std::string_view
+
+---
+ json.cpp | 14 +++++++++-----
+ json.h   | 12 +++++++-----
+ 2 files changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 4aebebec76de7628792afbf176f46d61e2f67c43..2b4191865e84f4c160450fa8380ad578d37e1cd1 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -282,6 +282,10 @@ json::json(const std::string& value) : type_(Type::String), string_value(value)
+ {
+ }
+ 
++json::json(std::string_view value) : type_(Type::String), string_value(value)
++{
++}
++
+ json::~json()
+ {
+     if (type_ >= Type::String)
+@@ -595,7 +599,7 @@ json::set_object()
+ }
+ 
+ bool
+-json::contains(const std::string& key) const
++json::contains(std::string_view key) const
+ {
+     if (!is_object())
+         return false;
+@@ -614,7 +618,7 @@ json::operator[](size_t index)
+ }
+ 
+ json&
+-json::operator[](const std::string& key)
++json::operator[](std::string_view key)
+ {
+     if (!is_object())
+         set_object();
+@@ -725,7 +729,7 @@ json::marshal(std::string& b, bool pretty, int indent) const
+ }
+ 
+ void
+-json::stringify(std::string& b, const std::string& s)
++json::stringify(std::string& b, std::string_view s)
+ {
+     b += '"';
+     serialize(b, s);
+@@ -733,7 +737,7 @@ json::stringify(std::string& b, const std::string& s)
+ }
+ 
+ void
+-json::serialize(std::string& sb, const std::string& s)
++json::serialize(std::string& sb, std::string_view s)
+ {
+     size_t i, j, m;
+     wint_t x, a, b;
+@@ -1255,7 +1259,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+ }
+ 
+ std::pair<json::Status, json>
+-json::parse(const std::string& s)
++json::parse(std::string_view s)
+ {
+     json::Status s2;
+     std::pair<json::Status, json> res;
+diff --git a/json.h b/json.h
+index 662a3f2f68a04dc4e7faf5e4bd5a984ffd3705a9..1c0dc26a460e17dab44f13d62059cf6e69f355c9 100644
+--- a/json.h
++++ b/json.h
+@@ -18,6 +18,7 @@
+ #pragma once
+ 
+ #include <string>
++#include <string_view>
+ #include <vector>
+ 
+ #include "wpi/util/StringMap.hpp"
+@@ -94,7 +95,7 @@ class json
+ 
+   public:
+     static const char* StatusToString(Status);
+-    static std::pair<Status, json> parse(const std::string&);
++    static std::pair<Status, json> parse(std::string_view);
+ 
+     json(const json&);
+     json(json&&);
+@@ -102,6 +103,7 @@ class json
+     json(unsigned long long);
+     json(const char*);
+     json(const std::string&);
++    json(std::string_view);
+     ~json();
+ 
+     constexpr json(const std::nullptr_t = nullptr) : type_(Type::Null)
+@@ -210,7 +212,7 @@ class json
+     object_t& get_object();
+     const object_t& get_object() const;
+ 
+-    bool contains(const std::string&) const;
++    bool contains(std::string_view) const;
+ 
+     void set_array();
+     void set_object();
+@@ -222,7 +224,7 @@ class json
+     json& operator=(json&&);
+ 
+     json& operator[](size_t);
+-    json& operator[](const std::string&);
++    json& operator[](std::string_view);
+ 
+     operator std::string() const
+     {
+@@ -232,8 +234,8 @@ class json
+   private:
+     void clear();
+     void marshal(std::string&, bool, int) const;
+-    static void stringify(std::string&, const std::string&);
+-    static void serialize(std::string&, const std::string&);
++    static void stringify(std::string&, std::string_view);
++    static void serialize(std::string&, std::string_view);
+     static Status parse(json&, const char*&, const char*, int, int);
+ };
+ 

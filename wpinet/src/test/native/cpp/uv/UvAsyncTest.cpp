@@ -23,26 +23,31 @@
  * IN THE SOFTWARE.
  */
 
-#include "wpinet/uv/Async.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Async.hpp"
+// clang-format on
 
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <thread>
+#include <utility>
 
-#include <gtest/gtest.h>
-#include <wpi/mutex.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "wpinet/uv/Loop.h"
-#include "wpinet/uv/Prepare.h"
+#include "wpi/net/uv/Loop.hpp"
+#include "wpi/net/uv/Prepare.hpp"
+#include "wpi/util/mutex.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
-TEST(UvAsyncTest, CallbackOnly) {
+TEST_CASE("UvAsyncTest CallbackOnly", "[uv][async]") {
   std::atomic_int async_cb_called{0};
   int prepare_cb_called = 0;
   int close_cb_called = 0;
+  std::atomic_bool fail{false};
 
-  wpi::mutex mutex;
+  wpi::util::mutex mutex;
   mutex.lock();
 
   std::thread theThread;
@@ -51,9 +56,9 @@ TEST(UvAsyncTest, CallbackOnly) {
   auto async = Async<>::Create(loop);
   auto prepare = Prepare::Create(loop);
 
-  loop->error.connect([](Error) { FAIL(); });
+  loop->error.connect([&](Error) { fail = true; });
 
-  prepare->error.connect([](Error) { FAIL(); });
+  prepare->error.connect([&](Error) { fail = true; });
   prepare->closed.connect([&] { close_cb_called++; });
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) {
@@ -78,7 +83,7 @@ TEST(UvAsyncTest, CallbackOnly) {
   });
   prepare->Start();
 
-  async->error.connect([](Error) { FAIL(); });
+  async->error.connect([&](Error) { fail = true; });
   async->closed.connect([&] { close_cb_called++; });
   async->wakeup.connect([&] {
     mutex.lock();
@@ -93,19 +98,26 @@ TEST(UvAsyncTest, CallbackOnly) {
 
   loop->Run();
 
-  ASSERT_GT(prepare_cb_called, 0);
-  ASSERT_EQ(async_cb_called, 3);
-  ASSERT_EQ(close_cb_called, 2);
+  if (fail) {
+    FAIL();
+  }
+
+  REQUIRE(prepare_cb_called > 0);
+  REQUIRE(async_cb_called == 3);
+  REQUIRE(close_cb_called == 2);
 
   if (theThread.joinable()) {
     theThread.join();
   }
 }
 
-TEST(UvAsyncTest, Data) {
+TEST_CASE("UvAsyncTest Data", "[uv][async]") {
   int prepare_cb_called = 0;
   int async_cb_called[2] = {0, 0};
   int close_cb_called = 0;
+  std::atomic_bool fail{false};
+  std::atomic_bool v0_check{false};
+  std::atomic_bool v1_check{false};
 
   std::thread theThread;
 
@@ -113,20 +125,20 @@ TEST(UvAsyncTest, Data) {
   auto async = Async<int, std::function<void(int)>>::Create(loop);
   auto prepare = Prepare::Create(loop);
 
-  loop->error.connect([](Error) { FAIL(); });
+  loop->error.connect([&](Error) { fail = true; });
 
-  prepare->error.connect([](Error) { FAIL(); });
+  prepare->error.connect([&](Error) { fail = true; });
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) {
       return;
     }
     theThread = std::thread([&] {
       async->Send(0, [&](int v) {
-        ASSERT_EQ(v, 0);
+        v0_check = v == 0;
         ++async_cb_called[0];
       });
       async->Send(1, [&](int v) {
-        ASSERT_EQ(v, 1);
+        v1_check = v == 1;
         ++async_cb_called[1];
         async->Close();
         prepare->Close();
@@ -135,22 +147,28 @@ TEST(UvAsyncTest, Data) {
   });
   prepare->Start();
 
-  async->error.connect([](Error) { FAIL(); });
+  async->error.connect([&](Error) { fail = true; });
   async->closed.connect([&] { close_cb_called++; });
   async->wakeup.connect([&](int v, std::function<void(int)> f) { f(v); });
 
   loop->Run();
 
-  ASSERT_EQ(async_cb_called[0], 1);
-  ASSERT_EQ(async_cb_called[1], 1);
-  ASSERT_EQ(close_cb_called, 1);
+  if (fail) {
+    FAIL();
+  }
+
+  REQUIRE(async_cb_called[0] == 1);
+  REQUIRE(async_cb_called[1] == 1);
+  REQUIRE(close_cb_called == 1);
 
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(v0_check);
+  REQUIRE(v1_check);
 }
 
-TEST(UvAsyncTest, DataRef) {
+TEST_CASE("UvAsyncTest DataRef", "[uv][async]") {
   int prepare_cb_called = 0;
   int val = 0;
 
@@ -176,11 +194,32 @@ TEST(UvAsyncTest, DataRef) {
 
   loop->Run();
 
-  ASSERT_EQ(val, 1);
+  REQUIRE(val == 1);
 
   if (theThread.joinable()) {
     theThread.join();
   }
 }
 
-}  // namespace wpi::uv
+TEST_CASE("UvAsyncTest SendAfterLoopDestroyed", "[uv][async]") {
+  auto loop = Loop::Create();
+  REQUIRE(loop);
+  auto async = Async<std::shared_ptr<int>>::Create(loop);
+  REQUIRE(async);
+  bool called = false;
+  async->wakeup.connect([&](auto) { called = true; });
+
+  async->Close();
+  loop->Run();
+  loop.reset();
+
+  auto value = std::make_shared<int>(42);
+  std::weak_ptr<int> weakValue = value;
+  async->Send(std::move(value));
+  value.reset();
+  CHECK_FALSE(called);
+  // Dropped sends must not retain their arguments in the pending queue.
+  CHECK(weakValue.expired());
+}
+
+}  // namespace wpi::net::uv

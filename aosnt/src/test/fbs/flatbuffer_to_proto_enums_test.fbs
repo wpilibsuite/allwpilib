@@ -1,0 +1,25 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// Enums, one of them with a value before its 0.
+
+namespace wpi.aosnt.testing;
+
+enum Level:byte { Low = -1, Off = 0, High = 1 }
+
+enum Mode:ubyte { Idle, Run, Stop }
+
+struct Setting {
+  mode:Mode;
+  levels:[Level:2];
+}
+
+table Enums {
+  level:Level (id: 0);
+  mode:Mode = Run (id: 1);
+  levels:[Level] (id: 2);
+  setting:Setting (id: 3);
+}
+
+root_type Enums;

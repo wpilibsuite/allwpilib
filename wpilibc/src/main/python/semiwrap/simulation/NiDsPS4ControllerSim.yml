@@ -1,0 +1,31 @@
+extra_includes:
+- wpi/driverstation/NiDsPS4Controller.hpp
+
+classes:
+  wpi::sim::NiDsPS4ControllerSim:
+    force_no_trampoline: true
+    methods:
+      NiDsPS4ControllerSim:
+        overloads:
+          const NiDsPS4Controller&:
+          int:
+      SetLeftX:
+      SetRightX:
+      SetLeftY:
+      SetRightY:
+      SetL2Axis:
+      SetR2Axis:
+      SetSquareButton:
+      SetCrossButton:
+      SetCircleButton:
+      SetTriangleButton:
+      SetL1Button:
+      SetR1Button:
+      SetL2Button:
+      SetR2Button:
+      SetShareButton:
+      SetOptionsButton:
+      SetL3Button:
+      SetR3Button:
+      SetPSButton:
+      SetTouchpadButton:

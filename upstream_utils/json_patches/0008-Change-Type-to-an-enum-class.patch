@@ -1,0 +1,582 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 07:56:14 -0700
+Subject: [PATCH 08/25] Change Type to an enum class
+
+---
+ json.cpp | 156 +++++++++++++++++++++++++++----------------------------
+ json.h   |  36 ++++++-------
+ 2 files changed, 96 insertions(+), 96 deletions(-)
+
+diff --git a/json.cpp b/json.cpp
+index 8fd64748250d9cd71fd31b8caf4281183e31b053..88ce30f8669a02cdc54e741a2a5a0663953d4acb 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -249,10 +249,10 @@ LongToString(char* p, long long x)
+ json::json(unsigned long value)
+ {
+     if (value <= LLONG_MAX) {
+-        type_ = Long;
++        type_ = Type::Long;
+         long_value = value;
+     } else {
+-        type_ = Double;
++        type_ = Type::Double;
+         double_value = value;
+     }
+ }
+@@ -260,10 +260,10 @@ json::json(unsigned long value)
+ json::json(unsigned long long value)
+ {
+     if (value <= LLONG_MAX) {
+-        type_ = Long;
++        type_ = Type::Long;
+         long_value = value;
+     } else {
+-        type_ = Double;
++        type_ = Type::Double;
+         double_value = value;
+     }
+ }
+@@ -271,20 +271,20 @@ json::json(unsigned long long value)
+ json::json(const char* value)
+ {
+     if (value) {
+-        type_ = String;
++        type_ = Type::String;
+         new (&string_value) std::string(value);
+     } else {
+-        type_ = Null;
++        type_ = Type::Null;
+     }
+ }
+ 
+-json::json(const std::string& value) : type_(String), string_value(value)
++json::json(const std::string& value) : type_(Type::String), string_value(value)
+ {
+ }
+ 
+ json::~json()
+ {
+-    if (type_ >= String)
++    if (type_ >= Type::String)
+         clear();
+ }
+ 
+@@ -292,45 +292,45 @@ void
+ json::clear()
+ {
+     switch (type_) {
+-        case String:
++        case Type::String:
+             string_value.~basic_string();
+             break;
+-        case Array:
++        case Type::Array:
+             array_value.~array_t();
+             break;
+-        case Object:
++        case Type::Object:
+             object_value.~object_t();
+             break;
+         default:
+             break;
+     }
+-    type_ = Null;
++    type_ = Type::Null;
+ }
+ 
+ json::json(const json& other) : type_(other.type_)
+ {
+     switch (type_) {
+-        case Null:
++        case Type::Null:
+             break;
+-        case Bool:
++        case Type::Bool:
+             bool_value = other.bool_value;
+             break;
+-        case Long:
++        case Type::Long:
+             long_value = other.long_value;
+             break;
+-        case Float:
++        case Type::Float:
+             float_value = other.float_value;
+             break;
+-        case Double:
++        case Type::Double:
+             double_value = other.double_value;
+             break;
+-        case String:
++        case Type::String:
+             new (&string_value) std::string(other.string_value);
+             break;
+-        case Array:
++        case Type::Array:
+             new (&array_value) array_t(other.array_value);
+             break;
+-        case Object:
++        case Type::Object:
+             new (&object_value) object_t(other.object_value);
+             break;
+         default:
+@@ -342,31 +342,31 @@ json&
+ json::operator=(const json& other)
+ {
+     if (this != &other) {
+-        if (type_ >= String)
++        if (type_ >= Type::String)
+             clear();
+         type_ = other.type_;
+         switch (type_) {
+-            case Null:
++            case Type::Null:
+                 break;
+-            case Bool:
++            case Type::Bool:
+                 bool_value = other.bool_value;
+                 break;
+-            case Long:
++            case Type::Long:
+                 long_value = other.long_value;
+                 break;
+-            case Float:
++            case Type::Float:
+                 float_value = other.float_value;
+                 break;
+-            case Double:
++            case Type::Double:
+                 double_value = other.double_value;
+                 break;
+-            case String:
++            case Type::String:
+                 new (&string_value) std::string(other.string_value);
+                 break;
+-            case Array:
++            case Type::Array:
+                 new (&array_value) array_t(other.array_value);
+                 break;
+-            case Object:
++            case Type::Object:
+                 new (&object_value) object_t(other.object_value);
+                 break;
+             default:
+@@ -379,70 +379,70 @@ json::operator=(const json& other)
+ json::json(json&& other) : type_(other.type_)
+ {
+     switch (type_) {
+-        case Null:
++        case Type::Null:
+             break;
+-        case Bool:
++        case Type::Bool:
+             bool_value = other.bool_value;
+             break;
+-        case Long:
++        case Type::Long:
+             long_value = other.long_value;
+             break;
+-        case Float:
++        case Type::Float:
+             float_value = other.float_value;
+             break;
+-        case Double:
++        case Type::Double:
+             double_value = other.double_value;
+             break;
+-        case String:
++        case Type::String:
+             new (&string_value) std::string(std::move(other.string_value));
+             break;
+-        case Array:
++        case Type::Array:
+             new (&array_value) array_t(std::move(other.array_value));
+             break;
+-        case Object:
++        case Type::Object:
+             new (&object_value) object_t(std::move(other.object_value));
+             break;
+         default:
+             ON_LOGIC_ERROR("Unhandled JSON type.");
+     }
+-    other.type_ = Null;
++    other.type_ = Type::Null;
+ }
+ 
+ json&
+ json::operator=(json&& other)
+ {
+     if (this != &other) {
+-        if (type_ >= String)
++        if (type_ >= Type::String)
+             clear();
+         type_ = other.type_;
+         switch (type_) {
+-            case Null:
++            case Type::Null:
+                 break;
+-            case Bool:
++            case Type::Bool:
+                 bool_value = other.bool_value;
+                 break;
+-            case Long:
++            case Type::Long:
+                 long_value = other.long_value;
+                 break;
+-            case Float:
++            case Type::Float:
+                 float_value = other.float_value;
+                 break;
+-            case Double:
++            case Type::Double:
+                 double_value = other.double_value;
+                 break;
+-            case String:
++            case Type::String:
+                 new (&string_value) std::string(std::move(other.string_value));
+                 break;
+-            case Array:
++            case Type::Array:
+                 new (&array_value) array_t(std::move(other.array_value));
+                 break;
+-            case Object:
++            case Type::Object:
+                 new (&object_value) object_t(std::move(other.object_value));
+                 break;
+             default:
+                 ON_LOGIC_ERROR("Unhandled JSON type.");;
+         }
+-        other.type_ = Null;
++        other.type_ = Type::Null;
+     }
+     return *this;
+ }
+@@ -451,11 +451,11 @@ double
+ json::get_number() const
+ {
+     switch (type_) {
+-        case Long:
++        case Type::Long:
+             return long_value;
+-        case Float:
++        case Type::Float:
+             return float_value;
+-        case Double:
++        case Type::Double:
+             return double_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a number.");
+@@ -466,7 +466,7 @@ long long
+ json::get_long() const
+ {
+     switch (type_) {
+-        case Long:
++        case Type::Long:
+             return long_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a long.");
+@@ -477,7 +477,7 @@ bool
+ json::get_bool() const
+ {
+     switch (type_) {
+-        case Bool:
++        case Type::Bool:
+             return bool_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a bool.");
+@@ -488,9 +488,9 @@ float
+ json::get_float() const
+ {
+     switch (type_) {
+-        case Float:
++        case Type::Float:
+             return float_value;
+-        case Double:
++        case Type::Double:
+             return double_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a floating-point number.");
+@@ -501,9 +501,9 @@ double
+ json::get_double() const
+ {
+     switch (type_) {
+-        case Float:
++        case Type::Float:
+             return float_value;
+-        case Double:
++        case Type::Double:
+             return double_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a floating-point number.");
+@@ -514,7 +514,7 @@ std::string&
+ json::get_string()
+ {
+     switch (type_) {
+-        case String:
++        case Type::String:
+             return string_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not a string.");
+@@ -525,7 +525,7 @@ json::array_t&
+ json::get_array()
+ {
+     switch (type_) {
+-        case Array:
++        case Type::Array:
+             return array_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not an array.");
+@@ -536,7 +536,7 @@ json::object_t&
+ json::get_object()
+ {
+     switch (type_) {
+-        case Object:
++        case Type::Object:
+             return object_value;
+         default:
+             ON_LOGIC_ERROR("JSON value is not an object.");
+@@ -546,18 +546,18 @@ json::get_object()
+ void
+ json::set_array()
+ {
+-    if (type_ >= String)
++    if (type_ >= Type::String)
+         clear();
+-    type_ = Array;
++    type_ = Type::Array;
+     new (&array_value) array_t();
+ }
+ 
+ void
+ json::set_object()
+ {
+-    if (type_ >= String)
++    if (type_ >= Type::String)
+         clear();
+-    type_ = Object;
++    type_ = Type::Object;
+     new (&object_value) object_t();
+ }
+ 
+@@ -608,21 +608,21 @@ void
+ json::marshal(std::string& b, bool pretty, int indent) const
+ {
+     switch (type_) {
+-        case Null:
++        case Type::Null:
+             b += "null";
+             break;
+-        case String:
++        case Type::String:
+             stringify(b, string_value);
+             break;
+-        case Bool:
++        case Type::Bool:
+             b += bool_value ? "true" : "false";
+             break;
+-        case Long: {
++        case Type::Long: {
+             char buf[64];
+             b.append(buf, LongToString(buf, long_value) - buf);
+             break;
+         }
+-        case Float: {
++        case Type::Float: {
+             char buf[128];
+             double_conversion::StringBuilder db(buf, 128);
+             kDoubleToJson.ToShortestSingle(float_value, &db);
+@@ -630,7 +630,7 @@ json::marshal(std::string& b, bool pretty, int indent) const
+             b += buf;
+             break;
+         }
+-        case Double: {
++        case Type::Double: {
+             char buf[128];
+             double_conversion::StringBuilder db(buf, 128);
+             kDoubleToJson.ToShortest(double_value, &db);
+@@ -638,7 +638,7 @@ json::marshal(std::string& b, bool pretty, int indent) const
+             b += buf;
+             break;
+         }
+-        case Array: {
++        case Type::Array: {
+             bool once = false;
+             b += '[';
+             for (auto i = array_value.begin(); i != array_value.end(); ++i) {
+@@ -654,7 +654,7 @@ json::marshal(std::string& b, bool pretty, int indent) const
+             b += ']';
+             break;
+         }
+-        case Object: {
++        case Type::Object: {
+             bool once = false;
+             b += '{';
+             for (auto i = object_value.begin(); i != object_value.end(); ++i) {
+@@ -818,7 +818,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                 if (context & (KEY | COLON | COMMA))
+                     goto OnColonCommaKey;
+                 if (p + 4 <= e && READ32LE(p) == READ32LE("alse")) {
+-                    j.type_ = Bool;
++                    j.type_ = Type::Bool;
+                     j.bool_value = false;
+                     p += 4;
+                     return success;
+@@ -830,7 +830,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                 if (context & (KEY | COLON | COMMA))
+                     goto OnColonCommaKey;
+                 if (p + 3 <= e && READ32LE(p - 1) == READ32LE("true")) {
+-                    j.type_ = Bool;
++                    j.type_ = Type::Bool;
+                     j.bool_value = true;
+                     p += 3;
+                     return success;
+@@ -873,7 +873,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                         return unexpected_octal;
+                     }
+                 }
+-                j.type_ = Long;
++                j.type_ = Type::Long;
+                 j.long_value = 0;
+                 return success;
+ 
+@@ -905,12 +905,12 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                         break;
+                     }
+                 }
+-                j.type_ = Long;
++                j.type_ = Type::Long;
+                 j.long_value = x;
+                 return success;
+ 
+             UseDubble: // number
+-                j.type_ = Double;
++                j.type_ = Type::Double;
+                 j.double_value = StringToDouble(a, e - a, &c);
+                 if (c <= 0)
+                     return bad_double;
+@@ -985,7 +985,7 @@ json::parse(json& j, const char*& p, const char* e, int context, int depth)
+                             break;
+ 
+                         case DQUOTE:
+-                            j.type_ = String;
++                            j.type_ = Type::String;
+                             new (&j.string_value) std::string(std::move(b));
+                             return success;
+ 
+diff --git a/json.h b/json.h
+index e25116a7f7c26525028b11928e665c1883b3ba65..3d2cb52a1bfeafb5f1a8a1e9c6057a2611cbb41e 100644
+--- a/json.h
++++ b/json.h
+@@ -28,7 +28,7 @@ class json
+     using array_t = std::vector<json>;
+     using object_t = std::map<std::string, json>;
+ 
+-    enum Type
++    enum class Type
+     {
+         Null,
+         Bool,
+@@ -102,39 +102,39 @@ class json
+     json(const std::string&);
+     ~json();
+ 
+-    json(const std::nullptr_t = nullptr) : type_(Null)
++    json(const std::nullptr_t = nullptr) : type_(Type::Null)
+     {
+     }
+ 
+-    json(bool value) : type_(Bool), bool_value(value)
++    json(bool value) : type_(Type::Bool), bool_value(value)
+     {
+     }
+ 
+-    json(int value) : type_(Long), long_value(value)
++    json(int value) : type_(Type::Long), long_value(value)
+     {
+     }
+ 
+-    json(float value) : type_(Float), float_value(value)
++    json(float value) : type_(Type::Float), float_value(value)
+     {
+     }
+ 
+-    json(unsigned value) : type_(Long), long_value(value)
++    json(unsigned value) : type_(Type::Long), long_value(value)
+     {
+     }
+ 
+-    json(long value) : type_(Long), long_value(value)
++    json(long value) : type_(Type::Long), long_value(value)
+     {
+     }
+ 
+-    json(long long value) : type_(Long), long_value(value)
++    json(long long value) : type_(Type::Long), long_value(value)
+     {
+     }
+ 
+-    json(double value) : type_(Double), double_value(value)
++    json(double value) : type_(Type::Double), double_value(value)
+     {
+     }
+ 
+-    json(std::string&& value) : type_(String), string_value(std::move(value))
++    json(std::string&& value) : type_(Type::String), string_value(std::move(value))
+     {
+     }
+ 
+@@ -145,12 +145,12 @@ class json
+ 
+     bool is_null() const
+     {
+-        return type_ == Null;
++        return type_ == Type::Null;
+     }
+ 
+     bool is_bool() const
+     {
+-        return type_ == Bool;
++        return type_ == Type::Bool;
+     }
+ 
+     bool is_number() const
+@@ -160,32 +160,32 @@ class json
+ 
+     bool is_long() const
+     {
+-        return type_ == Long;
++        return type_ == Type::Long;
+     }
+ 
+     bool is_float() const
+     {
+-        return type_ == Float;
++        return type_ == Type::Float;
+     }
+ 
+     bool is_double() const
+     {
+-        return type_ == Double;
++        return type_ == Type::Double;
+     }
+ 
+     bool is_string() const
+     {
+-        return type_ == String;
++        return type_ == Type::String;
+     }
+ 
+     bool is_array() const
+     {
+-        return type_ == Array;
++        return type_ == Type::Array;
+     }
+ 
+     bool is_object() const
+     {
+-        return type_ == Object;
++        return type_ == Type::Object;
+     }
+ 
+     bool get_bool() const;

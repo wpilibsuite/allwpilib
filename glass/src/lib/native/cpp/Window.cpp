@@ -2,38 +2,39 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/Window.h"
+#include "wpi/glass/Window.hpp"
 
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "glass/Context.h"
-#include "glass/Storage.h"
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
 Window::Window(Storage& storage, std::string_view id,
                Visibility defaultVisibility)
-    : m_id{id},
+    : m_storage{storage},
+      m_id{id},
       m_name{storage.GetString("name")},
       m_defaultName{id},
-      m_visible{storage.GetBool("visible", defaultVisibility != kHide)},
-      m_enabled{storage.GetBool("enabled", defaultVisibility != kDisabled)},
+      m_visible{storage.GetBool("visible", defaultVisibility != HIDE)},
+      m_enabled{storage.GetBool("enabled", defaultVisibility != DISABLED)},
       m_defaultVisible{storage.GetValue("visible").boolDefault},
       m_defaultEnabled{storage.GetValue("enabled").boolDefault} {}
 
 void Window::SetVisibility(Visibility visibility) {
-  m_visible = visibility != kHide;
-  m_enabled = visibility != kDisabled;
+  m_visible = visibility != HIDE;
+  m_enabled = visibility != DISABLED;
 }
 
 void Window::SetDefaultVisibility(Visibility visibility) {
-  m_defaultVisible = visibility != kHide;
-  m_defaultEnabled = visibility != kDisabled;
+  m_defaultVisible = visibility != HIDE;
+  m_defaultEnabled = visibility != DISABLED;
 }
 
 void Window::Display() {
@@ -61,7 +62,7 @@ void Window::Display() {
   if (m_name.empty()) {
     name = &m_defaultName;
   }
-  std::string label = fmt::format("{}###{}", *name, m_id);
+  std::string label = std::format("{}###{}", *name, m_id);
 
   // Accounts for size of title, collapse button, and close button
   float minWidth =

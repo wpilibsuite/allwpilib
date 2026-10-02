@@ -1,0 +1,34 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.math.trajectory;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
+
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.trajectory.constraint.CentripetalAccelerationConstraint;
+
+class CentripetalAccelerationConstraintTest {
+  @Test
+  void testCentripetalAccelerationConstraint() {
+    double maxCentripetalAcceleration = feetToMeters(7.0); // 7 feet per second squared
+    var constraint = new CentripetalAccelerationConstraint(maxCentripetalAcceleration);
+
+    Trajectory<DrivetrainSplineSample> trajectory =
+        DrivetrainSplineTrajectoryGenerator.generate(
+            List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
+            new TrajectoryConfig(1, 1).addConstraint(constraint));
+
+    for (double t = 0.0; t < trajectory.duration; t += 0.02) {
+      var point = trajectory.sampleAt(t);
+      var centripetalAcceleration = Math.pow(point.forwardVelocity(), 2) * point.curvature;
+
+      assertTrue(centripetalAcceleration <= maxCentripetalAcceleration + 0.05);
+    }
+  }
+}

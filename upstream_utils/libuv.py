@@ -47,6 +47,15 @@ def copy_upstream_src(wpilib_root: Path):
         rename_c_to_cpp=True,
     )
 
+    for f in [
+        "BUILD.bazel",
+        "MODULE.bazel",
+    ]:
+        shutil.copyfile(
+            f,
+            wpinet / "src/main/native/thirdparty/libuv" / f,
+        )
+
 
 def main():
     name = "libuv"

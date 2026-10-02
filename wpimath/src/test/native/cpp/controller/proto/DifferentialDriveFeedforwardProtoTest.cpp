@@ -2,27 +2,27 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "../../ProtoTestBase.h"
-#include "frc/controller/DifferentialDriveFeedforward.h"
+#include "../../ProtoTestBase.hpp"
+#include "wpi/math/controller/DifferentialDriveFeedforward.hpp"
 
-using namespace frc;
+using namespace wpi::math;
 
 struct DifferentialDriveFeedforwardProtoTestData {
   using Type = DifferentialDriveFeedforward;
 
-  inline static const Type kTestData{
+  inline static const Type TEST_DATA{
       decltype(1_V / 1_mps){0.174}, decltype(1_V / 1_mps_sq){0.229},
       decltype(1_V / 1_mps){4.4}, decltype(1_V / 1_mps_sq){4.5}};
 
   static void CheckEq(const Type& testData, const Type& data) {
-    EXPECT_EQ(testData.m_kVLinear.value(), data.m_kVLinear.value());
-    EXPECT_EQ(testData.m_kALinear.value(), data.m_kALinear.value());
-    EXPECT_EQ(testData.m_kVAngular.value(), data.m_kVAngular.value());
-    EXPECT_EQ(testData.m_kAAngular.value(), data.m_kAAngular.value());
+    CHECK(testData.kvLinear.value() == data.kvLinear.value());
+    CHECK(testData.kaLinear.value() == data.kaLinear.value());
+    CHECK(testData.kvAngular.value() == data.kvAngular.value());
+    CHECK(testData.kaAngular.value() == data.kaAngular.value());
   }
 };
 
-INSTANTIATE_TYPED_TEST_SUITE_P(DifferentialDriveFeedforward, ProtoTest,
-                               DifferentialDriveFeedforwardProtoTestData);
+INSTANTIATE_CATCH_TYPED_TEST_SUITE_P(DifferentialDriveFeedforward, ProtoTest,
+                                     DifferentialDriveFeedforwardProtoTestData);

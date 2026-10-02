@@ -1,0 +1,19 @@
+classes:
+  wpi::math::BangBangController:
+    methods:
+      BangBangController:
+      SetSetpoint:
+      GetSetpoint:
+      AtSetpoint:
+      SetTolerance:
+      GetTolerance:
+      GetMeasurement:
+      GetError:
+      Calculate:
+        overloads:
+          double, double:
+          double:
+      LogTo:
+      GetTelemetryType:
+      PublishTunable:
+      GetTunableType:

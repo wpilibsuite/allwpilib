@@ -11,7 +11,7 @@
 template <class T>
 auto exc = std::array<T, EXC_TYPES_COUNT> { {} };
 
-namespace wpi {
+namespace wpi::util {
 
 bool is_debugger_present() noexcept
 {
@@ -31,6 +31,6 @@ bool is_debugger_present() noexcept
 		return end != std::find_if(begin, end, valid);
 }
 
-} // namespace wpi
+} // namespace wpi::util
 
 #endif

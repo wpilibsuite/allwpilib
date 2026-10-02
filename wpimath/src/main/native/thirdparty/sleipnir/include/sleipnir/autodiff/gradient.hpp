@@ -14,59 +14,55 @@
 
 namespace slp {
 
-/**
- * This class calculates the gradient of a variable with respect to a vector of
- * variables.
- *
- * The gradient is only recomputed if the variable expression is quadratic or
- * higher order.
- */
-class SLEIPNIR_DLLEXPORT Gradient {
+/// This class calculates the gradient of a variable with respect to a vector of
+/// variables.
+///
+/// The gradient is only recomputed if the variable expression is quadratic or
+/// higher order.
+///
+/// @tparam Scalar Scalar type.
+template <typename Scalar>
+class Gradient {
  public:
-  /**
-   * Constructs a Gradient object.
-   *
-   * @param variable Variable of which to compute the gradient.
-   * @param wrt Variable with respect to which to compute the gradient.
-   */
-  Gradient(Variable variable, Variable wrt)
+  /// Constructs a Gradient object.
+  ///
+  /// @param variable Variable of which to compute the gradient.
+  /// @param wrt Variable with respect to which to compute the gradient.
+  Gradient(Variable<Scalar> variable, Variable<Scalar> wrt)
       : m_jacobian{std::move(variable), std::move(wrt)} {}
 
-  /**
-   * Constructs a Gradient object.
-   *
-   * @param variable Variable of which to compute the gradient.
-   * @param wrt Vector of variables with respect to which to compute the
-   *   gradient.
-   */
-  Gradient(Variable variable, SleipnirMatrixLike auto wrt)
+  /// Constructs a Gradient object.
+  ///
+  /// @param variable Variable of which to compute the gradient.
+  /// @param wrt Vector of variables with respect to which to compute the
+  ///     gradient.
+  Gradient(Variable<Scalar> variable, SleipnirMatrixLike<Scalar> auto wrt)
       : m_jacobian{VariableMatrix{std::move(variable)}, std::move(wrt)} {}
 
-  /**
-   * Returns the gradient as a VariableMatrix.
-   *
-   * This is useful when constructing optimization problems with derivatives in
-   * them.
-   *
-   * @return The gradient as a VariableMatrix.
-   */
-  VariableMatrix get() const { return m_jacobian.get().T(); }
+  /// Returns the gradient as a VariableMatrix.
+  ///
+  /// This is useful when constructing optimization problems with derivatives in
+  /// them.
+  ///
+  /// @return The gradient as a VariableMatrix.
+  VariableMatrix<Scalar> get() const { return m_jacobian.get().T(); }
 
-  /**
-   * Evaluates the gradient at wrt's value.
-   *
-   * @return The gradient at wrt's value.
-   */
-  const Eigen::SparseVector<double>& value() {
+  /// Evaluates the gradient at wrt's value.
+  ///
+  /// @return The gradient at wrt's value.
+  const Eigen::SparseVector<Scalar>& value() {
     m_g = m_jacobian.value().transpose();
 
     return m_g;
   }
 
  private:
-  Eigen::SparseVector<double> m_g;
+  Eigen::SparseVector<Scalar> m_g;
 
-  Jacobian m_jacobian;
+  Jacobian<Scalar> m_jacobian;
 };
+
+extern template class EXPORT_TEMPLATE_DECLARE(SLEIPNIR_DLLEXPORT)
+Gradient<double>;
 
 }  // namespace slp

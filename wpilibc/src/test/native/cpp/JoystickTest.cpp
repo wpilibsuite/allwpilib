@@ -2,17 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/Joystick.h"  // NOLINT(build/include_order)
+#include "wpi/driverstation/Joystick.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "JoystickTestMacros.h"
-#include "frc/simulation/JoystickSim.h"
+#include "JoystickTestMacros.hpp"
+#include "wpi/simulation/JoystickSim.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 // https://github.com/wpilibsuite/allwpilib/issues/1550
-TEST(JoystickTest, FastDeconstruction) {
+TEST_CASE("JoystickTest FastDeconstruction", "[wpilibc]") {
   Joystick joystick{0};
 }
 
@@ -25,45 +26,46 @@ AXIS_TEST(Joystick, Twist)
 BUTTON_TEST(Joystick, Trigger)
 BUTTON_TEST(Joystick, Top)
 
-TEST(JoystickTest, GetMagnitude) {
+TEST_CASE("JoystickTest GetMagnitude", "[wpilibc]") {
   Joystick joy{1};
   sim::JoystickSim joysim{1};
 
   joysim.SetX(0.5);
   joysim.SetY(0);
   joysim.NotifyNewData();
-  ASSERT_NEAR(0.5, joy.GetMagnitude(), 0.001);
+  REQUIRE_THAT(0.5, Catch::Matchers::WithinAbs(joy.GetMagnitude(), 0.001));
 
   joysim.SetX(0);
   joysim.SetY(-.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(0.5, joy.GetMagnitude(), 0.001);
+  REQUIRE_THAT(0.5, Catch::Matchers::WithinAbs(joy.GetMagnitude(), 0.001));
 
   joysim.SetX(0.5);
   joysim.SetY(-0.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(0.70710678118, joy.GetMagnitude(), 0.001);
+  REQUIRE_THAT(0.70710678118,
+               Catch::Matchers::WithinAbs(joy.GetMagnitude(), 0.001));
 }
 
-TEST(JoystickTest, GetDirection) {
+TEST_CASE("JoystickTest GetDirection", "[wpilibc]") {
   Joystick joy{1};
   sim::JoystickSim joysim{1};
 
   joysim.SetX(0.5);
   joysim.SetY(0);
   joysim.NotifyNewData();
-  ASSERT_NEAR(units::radian_t{90_deg}.value(), joy.GetDirection().value(),
-              0.001);
+  REQUIRE_THAT(wpi::units::radian_t{90_deg}.value(),
+               Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 
   joysim.SetX(0);
   joysim.SetY(-.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(units::radian_t{0_deg}.value(), joy.GetDirection().value(),
-              0.001);
+  REQUIRE_THAT(wpi::units::radian_t{0_deg}.value(),
+               Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 
   joysim.SetX(0.5);
   joysim.SetY(-0.5);
   joysim.NotifyNewData();
-  ASSERT_NEAR(units::radian_t{45_deg}.value(), joy.GetDirection().value(),
-              0.001);
+  REQUIRE_THAT(wpi::units::radian_t{45_deg}.value(),
+               Catch::Matchers::WithinAbs(joy.GetDirection().value(), 0.001));
 }

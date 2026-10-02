@@ -1,0 +1,4 @@
+classes:
+  wpi::Koors40:
+    methods:
+      Koors40:

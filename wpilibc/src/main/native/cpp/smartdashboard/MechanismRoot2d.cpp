@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/smartdashboard/MechanismRoot2d.h"
+#include "wpi/smartdashboard/MechanismRoot2d.hpp"
 
-#include "frc/util/Color8Bit.h"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
-using namespace frc;
+using namespace wpi;
 
 MechanismRoot2d::MechanismRoot2d(std::string_view name, double x, double y,
                                  const private_init&)
@@ -16,20 +16,12 @@ void MechanismRoot2d::SetPosition(double x, double y) {
   std::scoped_lock lock(m_mutex);
   m_x = x;
   m_y = y;
-  Flush();
 }
 
-void MechanismRoot2d::UpdateEntries(std::shared_ptr<nt::NetworkTable> table) {
-  m_xPub = table->GetDoubleTopic("x").Publish();
-  m_yPub = table->GetDoubleTopic("y").Publish();
-  Flush();
-}
-
-inline void MechanismRoot2d::Flush() {
-  if (m_xPub) {
-    m_xPub.Set(m_x);
+void MechanismRoot2d::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  {
+    std::scoped_lock lock(m_mutex);
+    table.Log("position", {m_x, m_y});
   }
-  if (m_yPub) {
-    m_yPub.Set(m_y);
-  }
+  MechanismObject2d::LogTo(table);
 }

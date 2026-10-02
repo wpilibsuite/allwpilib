@@ -2,73 +2,67 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "hal/REVPH.h"
+#include "wpi/hal/REVPH.h"
 
 #include <string>
 
-#include "HALInitializer.h"
-#include "HALInternal.h"
-#include "PortsInternal.h"
-#include "hal/Errors.h"
-#include "hal/handles/IndexedHandleResource.h"
-#include "mockdata/REVPHDataInternal.h"
+#include "HALInitializer.hpp"
+#include "PortsInternal.hpp"
+#include "mockdata/REVPHDataInternal.hpp"
+#include "wpi/hal/ErrorHandling.hpp"
+#include "wpi/hal/Errors.h"
+#include "wpi/hal/handles/IndexedHandleResource.hpp"
 
-using namespace hal;
+using namespace wpi::hal;
 
 namespace {
 struct PCM {
   int32_t module;
-  wpi::mutex lock;
+  wpi::util::mutex lock;
   std::string previousAllocation;
 };
 }  // namespace
 
-static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                             HAL_HandleEnum::REVPH>* pcmHandles;
+static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REVPH_MODULES,
+                             HAL_HandleEnum::REV_PH>* pcmHandles;
 
-namespace hal::init {
+namespace wpi::hal::init {
 void InitializeREVPH() {
-  static IndexedHandleResource<HAL_REVPHHandle, PCM, kNumREVPHModules,
-                               HAL_HandleEnum::REVPH>
+  static IndexedHandleResource<HAL_REVPHHandle, PCM, NUM_REVPH_MODULES,
+                               HAL_HandleEnum::REV_PH>
       pH;
   pcmHandles = &pH;
 }
-}  // namespace hal::init
+}  // namespace wpi::hal::init
 
-HAL_REVPHHandle HAL_InitializeREVPH(int32_t module,
+HAL_REVPHHandle HAL_InitializeREVPH(int32_t busId, int32_t module,
                                     const char* allocationLocation,
                                     int32_t* status) {
-  hal::init::CheckInit();
+  wpi::hal::init::CheckInit();
 
   if (!HAL_CheckREVPHModuleNumber(module)) {
-    *status = RESOURCE_OUT_OF_RANGE;
-    hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                     kNumREVPHModules, module);
-    return HAL_kInvalidHandle;
+    *status = MakeErrorIndexOutOfRange(HAL_RESOURCE_OUT_OF_RANGE,
+                                       "Invalid Index for REV PH", 1,
+                                       NUM_REVPH_MODULES, module);
+    return HAL_INVALID_HANDLE;
   }
 
-  HAL_REVPHHandle handle;
   // Module starts at 1
-  auto pcm = pcmHandles->Allocate(module - 1, &handle, status);
+  auto resource = pcmHandles->Allocate(module - 1, "REV PH", 1);
 
-  if (*status != 0) {
-    if (pcm) {
-      hal::SetLastErrorPreviouslyAllocated(status, "REV PH", module,
-                                           pcm->previousAllocation);
-    } else {
-      hal::SetLastErrorIndexOutOfRange(status, "Invalid Index for REV PH", 1,
-                                       kNumREVPHModules, module);
-    }
-    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
+  if (!resource) {
+    *status = resource.error();
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
   }
 
+  auto [handle, pcm] = *resource;
   pcm->previousAllocation = allocationLocation ? allocationLocation : "";
   pcm->module = module;
 
   SimREVPHData[module].initialized = true;
   // Enable closed loop
   SimREVPHData[module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL;
 
   return handle;
 }
@@ -84,11 +78,11 @@ void HAL_FreeREVPH(HAL_REVPHHandle handle) {
 }
 
 HAL_Bool HAL_CheckREVPHModuleNumber(int32_t module) {
-  return module >= 1 && module <= kNumREVPHModules;
+  return module >= 1 && module <= NUM_REVPH_MODULES;
 }
 
 HAL_Bool HAL_CheckREVPHSolenoidChannel(int32_t channel) {
-  return channel < kNumREVPHChannels && channel >= 0;
+  return channel < NUM_REVPH_CHANNELS && channel >= 0;
 }
 
 HAL_Bool HAL_GetREVPHCompressor(HAL_REVPHHandle handle, int32_t* status) {
@@ -120,7 +114,7 @@ void HAL_SetREVPHClosedLoopControlDisabled(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDisabled;
+      HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
 }
 
 void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
@@ -131,7 +125,7 @@ void HAL_SetREVPHClosedLoopControlDigital(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kDigital;
+      HAL_REVPH_COMPRESSOR_CONFIG_DIGITAL;
 }
 
 void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
@@ -144,7 +138,7 @@ void HAL_SetREVPHClosedLoopControlAnalog(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kAnalog;
+      HAL_REVPH_COMPRESSOR_CONFIG_ANALOG;
 }
 
 void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
@@ -157,7 +151,7 @@ void HAL_SetREVPHClosedLoopControlHybrid(HAL_REVPHHandle handle,
     return;
   }
   SimREVPHData[pcm->module].compressorConfigType =
-      HAL_REVPHCompressorConfigType_kHybrid;
+      HAL_REVPH_COMPRESSOR_CONFIG_HYBRID;
 }
 
 HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
@@ -165,7 +159,7 @@ HAL_REVPHCompressorConfigType HAL_GetREVPHCompressorConfig(
   auto pcm = pcmHandles->Get(handle);
   if (pcm == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_REVPHCompressorConfigType_kDisabled;
+    return HAL_REVPH_COMPRESSOR_CONFIG_DISABLED;
   }
   return SimREVPHData[pcm->module].compressorConfigType;
 }
@@ -205,7 +199,7 @@ int32_t HAL_GetREVPHSolenoids(HAL_REVPHHandle handle, int32_t* status) {
   std::scoped_lock lock{pcm->lock};
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   int32_t ret = 0;
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REVPH_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   return ret;
@@ -220,7 +214,7 @@ void HAL_SetREVPHSolenoids(HAL_REVPHHandle handle, int32_t mask, int32_t values,
 
   auto& data = SimREVPHData[pcm->module].solenoidOutput;
   std::scoped_lock lock{pcm->lock};
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REVPH_CHANNELS; i++) {
     auto indexMask = (1 << i);
     if ((mask & indexMask) != 0) {
       data[i] = (values & indexMask) != 0;

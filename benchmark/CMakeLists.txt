@@ -6,7 +6,7 @@ file(GLOB benchmarkCpp_src src/main/native/cpp/*.cpp src/main/native/thirdparty/
 
 add_executable(benchmarkCpp ${benchmarkCpp_src})
 
-target_compile_features(benchmarkCpp PUBLIC cxx_std_20)
+target_compile_features(benchmarkCpp PUBLIC cxx_std_23)
 
 wpilib_target_warnings(benchmarkCpp)
 
@@ -15,7 +15,7 @@ target_link_libraries(
     PUBLIC
         $<TARGET_NAME_IF_EXISTS:apriltag>
         $<TARGET_NAME_IF_EXISTS:wpilibc>
-        $<TARGET_NAME_IF_EXISTS:wpilibNewCommands>
+        $<TARGET_NAME_IF_EXISTS:commandsv2>
         $<TARGET_NAME_IF_EXISTS:wpimath>
         $<TARGET_NAME_IF_EXISTS:wpiutil>
 )

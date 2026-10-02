@@ -2,9 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/util/array.hpp"
 
-#include "wpi/array.h"
+#include <catch2/catch_template_test_macros.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_range_equals.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 
 namespace {
 class MoveOnlyType {
@@ -15,21 +19,22 @@ class MoveOnlyType {
 };
 }  // namespace
 
-TEST(ArrayTest, CopyableTypeCompiles) {
+TEST_CASE("ArrayTest CopyableTypeCompiles", "[wpiutil]") {
   [[maybe_unused]]
-  constexpr wpi::array<int, 3> arr1{1, 2, 3};
+  constexpr wpi::util::array<int, 3> arr1{1, 2, 3};
 
   // Test deduction guide
   [[maybe_unused]]
-  constexpr wpi::array arr2{1, 2, 3};
+  constexpr wpi::util::array arr2{1, 2, 3};
 }
 
-TEST(ArrayTest, MoveOnlyTypeCompiles) {
+TEST_CASE("ArrayTest MoveOnlyTypeCompiles", "[wpiutil]") {
   [[maybe_unused]]
-  constexpr wpi::array<MoveOnlyType, 3> arr1{MoveOnlyType{}, MoveOnlyType{},
-                                             MoveOnlyType{}};
+  constexpr wpi::util::array<MoveOnlyType, 3> arr1{
+      MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
 
   // Test deduction guide
   [[maybe_unused]]
-  constexpr wpi::array arr2{MoveOnlyType{}, MoveOnlyType{}, MoveOnlyType{}};
+  constexpr wpi::util::array arr2{MoveOnlyType{}, MoveOnlyType{},
+                                  MoveOnlyType{}};
 }

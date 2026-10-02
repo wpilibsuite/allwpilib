@@ -6,23 +6,22 @@
 
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
-#include <Eigen/QR>
 #include <unsupported/Eigen/MatrixFunctions>
-#include <wpi/jni_util.h>
 
-#include "edu_wpi_first_math_jni_EigenJNI.h"
+#include "org_wpilib_math_jni_EigenJNI.h"
+#include "wpi/util/jni_util.hpp"
 
-using namespace wpi::java;
+using namespace wpi::util::java;
 
 extern "C" {
 
 /*
- * Class:     edu_wpi_first_math_jni_EigenJNI
+ * Class:     org_wpilib_math_jni_EigenJNI
  * Method:    exp
  * Signature: ([DI[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_EigenJNI_exp
+Java_org_wpilib_math_jni_EigenJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
   JSpan<const jdouble> arrayBody{env, src};
@@ -37,12 +36,12 @@ Java_edu_wpi_first_math_jni_EigenJNI_exp
 }
 
 /*
- * Class:     edu_wpi_first_math_jni_EigenJNI
+ * Class:     org_wpilib_math_jni_EigenJNI
  * Method:    pow
  * Signature: ([DID[D)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_EigenJNI_pow
+Java_org_wpilib_math_jni_EigenJNI_pow
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdouble exponent,
    jdoubleArray dst)
 {
@@ -58,12 +57,12 @@ Java_edu_wpi_first_math_jni_EigenJNI_pow
 }
 
 /*
- * Class:     edu_wpi_first_math_jni_EigenJNI
+ * Class:     org_wpilib_math_jni_EigenJNI
  * Method:    rankUpdate
  * Signature: ([DI[DDZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_EigenJNI_rankUpdate
+Java_org_wpilib_math_jni_EigenJNI_rankUpdate
   (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
    jdouble sigma, jboolean lowerTriangular)
 {
@@ -81,32 +80,6 @@ Java_edu_wpi_first_math_jni_EigenJNI_rankUpdate
   } else {
     Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
   }
-}
-
-/*
- * Class:     edu_wpi_first_math_jni_EigenJNI
- * Method:    solveFullPivHouseholderQr
- * Signature: ([DII[DII[D)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_math_jni_EigenJNI_solveFullPivHouseholderQr
-  (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
-   jint Brows, jint Bcols, jdoubleArray dst)
-{
-  JSpan<const jdouble> nativeA{env, A};
-  JSpan<const jdouble> nativeB{env, B};
-
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                 Eigen::RowMajor>>
-      Amat{nativeA.data(), Arows, Acols};
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                 Eigen::RowMajor>>
-      Bmat{nativeB.data(), Brows, Bcols};
-
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
-      Amat.fullPivHouseholderQr().solve(Bmat);
-
-  env->SetDoubleArrayRegion(dst, 0, Brows * Bcols, Xmat.data());
 }
 
 }  // extern "C"

@@ -2,84 +2,137 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/smartdashboard/Mechanism2d.h>
-#include <frc/smartdashboard/MechanismLigament2d.h>
-#include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/util/Color8Bit.h>
+#include "wpi/smartdashboard/Mechanism2d.hpp"
 
-#include <gtest/gtest.h>
-#include <networktables/NetworkTableInstance.h>
-#include <units/angle.h>
+#include <memory>
+#include <vector>
 
-class Mechanism2dTest;
+#include <catch2/catch_test_macros.hpp>
 
-TEST(Mechanism2dTest, Canvas) {
-  frc::Mechanism2d mechanism{5, 10};
-  auto dimsEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/dims");
-  auto colorEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/backgroundColor");
-  frc::SmartDashboard::PutData("mechanism", &mechanism);
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(5.0, dimsEntry.GetDoubleArray({})[0]);
-  EXPECT_EQ(10.0, dimsEntry.GetDoubleArray({})[1]);
-  EXPECT_EQ("#000020", colorEntry.GetString(""));
+#include "wpi/smartdashboard/MechanismLigament2d.hpp"
+#include "wpi/telemetry/MockTelemetryBackend.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/util/Color8Bit.hpp"
+
+struct Mechanism2dTest {
+  Mechanism2dTest() {
+    wpi::telemetry::TelemetryRegistry::Reset();
+    wpi::telemetry::TelemetryRegistry::RegisterBackend("", mock);
+  }
+
+  ~Mechanism2dTest() { wpi::telemetry::TelemetryRegistry::Reset(); }
+
+  std::shared_ptr<wpi::telemetry::MockTelemetryBackend> mock =
+      std::make_shared<wpi::telemetry::MockTelemetryBackend>();
+};
+
+TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Canvas",
+                 "[wpilibc][smartdashboard]") {
+  wpi::Mechanism2d mechanism{5, 10};
+
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto actions = mock->GetActions();
+    REQUIRE(actions.size() == 3u);
+
+    auto dims = mock->GetLastValue<std::vector<double>>("/mechanism/dims");
+    REQUIRE(dims);
+    REQUIRE(2u == dims->size());
+    CHECK(5.0 == (*dims)[0]);
+    CHECK(10.0 == (*dims)[1]);
+
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+        "/mechanism/backgroundColor");
+    REQUIRE(color);
+    CHECK("#000020" == color->value);
+    mock->Clear();
+  }
+
   mechanism.SetBackgroundColor({255, 255, 255});
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ("#FFFFFF", colorEntry.GetString(""));
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+        "/mechanism/backgroundColor");
+    REQUIRE(color);
+    CHECK("#FFFFFF" == color->value);
+  }
 }
 
-TEST(Mechanism2dTest, Root) {
-  frc::Mechanism2d mechanism{5, 10};
-  auto xEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/x");
-  auto yEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/y");
-  frc::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
-  frc::SmartDashboard::PutData("mechanism", &mechanism);
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(1.0, xEntry.GetDouble(0.0));
-  EXPECT_EQ(2.0, yEntry.GetDouble(0.0));
+TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Root",
+                 "[wpilibc][smartdashboard]") {
+  wpi::Mechanism2d mechanism{5, 10};
+  wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto pos =
+        mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
+    REQUIRE(pos);
+    REQUIRE(2u == pos->size());
+    CHECK(1.0 == (*pos)[0]);
+    CHECK(2.0 == (*pos)[1]);
+    mock->Clear();
+  }
   root->SetPosition(2, 4);
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(2.0, xEntry.GetDouble(0.0));
-  EXPECT_EQ(4.0, yEntry.GetDouble(0.0));
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto pos =
+        mock->GetLastValue<std::vector<double>>("/mechanism/root/position");
+    REQUIRE(pos);
+    REQUIRE(2u == pos->size());
+    CHECK(2.0 == (*pos)[0]);
+    CHECK(4.0 == (*pos)[1]);
+  }
 }
 
-TEST(Mechanism2dTest, Ligament) {
-  frc::Mechanism2d mechanism{5, 10};
-  auto angleEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/ligament/angle");
-  auto colorEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/ligament/color");
-  auto lengthEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/ligament/length");
-  auto weightEntry = nt::NetworkTableInstance::GetDefault().GetEntry(
-      "/SmartDashboard/mechanism/root/ligament/weight");
-  frc::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
-  frc::MechanismLigament2d* ligament = root->Append<frc::MechanismLigament2d>(
-      "ligament", 3, units::degree_t{90}, 1, frc::Color8Bit{255, 255, 255});
-  frc::SmartDashboard::PutData("mechanism", &mechanism);
-  EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));
-  EXPECT_EQ(ligament->GetLength(), lengthEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetLineWeight(), weightEntry.GetDouble(0.0));
-  ligament->SetAngle(units::degree_t{45});
+TEST_CASE_METHOD(Mechanism2dTest, "Mechanism2dTest Ligament",
+                 "[wpilibc][smartdashboard]") {
+  wpi::Mechanism2d mechanism{5, 10};
+  wpi::MechanismRoot2d* root = mechanism.GetRoot("root", 1, 2);
+  wpi::MechanismLigament2d* ligament = root->Append<wpi::MechanismLigament2d>(
+      "ligament", 3, wpi::units::degree_t{90}, 1,
+      wpi::util::Color8Bit{255, 255, 255});
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
+    REQUIRE(angle);
+    CHECK(ligament->GetAngle() == *angle);
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+        "/mechanism/root/ligament/color");
+    REQUIRE(color);
+    CHECK(ligament->GetColor().HexString() == color->value);
+    auto length = mock->GetLastValue<double>("/mechanism/root/ligament/length");
+    REQUIRE(length);
+    CHECK(ligament->GetLength() == *length);
+    auto weight = mock->GetLastValue<double>("/mechanism/root/ligament/weight");
+    REQUIRE(weight);
+    CHECK(ligament->GetLineWeight() == *weight);
+    mock->Clear();
+  }
+
+  ligament->SetAngle(wpi::units::degree_t{45});
   ligament->SetColor({0, 0, 0});
   ligament->SetLength(2);
   ligament->SetLineWeight(4);
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));
-  EXPECT_EQ(ligament->GetLength(), lengthEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetLineWeight(), weightEntry.GetDouble(0.0));
-  angleEntry.SetDouble(22.5);
-  colorEntry.SetString("#FF00FF");
-  lengthEntry.SetDouble(4.0);
-  weightEntry.SetDouble(6.0);
-  frc::SmartDashboard::UpdateValues();
-  EXPECT_EQ(ligament->GetAngle(), angleEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetColor().HexString(), colorEntry.GetString(""));
-  EXPECT_EQ(ligament->GetLength(), lengthEntry.GetDouble(0.0));
-  EXPECT_EQ(ligament->GetLineWeight(), weightEntry.GetDouble(0.0));
+  wpi::telemetry::Log("mechanism", mechanism);
+  {
+    auto angle = mock->GetLastValue<double>("/mechanism/root/ligament/angle");
+    REQUIRE(angle);
+    CHECK(ligament->GetAngle() == *angle);
+    auto color = mock->GetLastValue<
+        wpi::telemetry::MockTelemetryBackend::LogStringValue>(
+        "/mechanism/root/ligament/color");
+    REQUIRE(color);
+    CHECK(ligament->GetColor().HexString() == color->value);
+    auto length = mock->GetLastValue<double>("/mechanism/root/ligament/length");
+    REQUIRE(length);
+    CHECK(ligament->GetLength() == *length);
+    auto weight = mock->GetLastValue<double>("/mechanism/root/ligament/weight");
+    REQUIRE(weight);
+    CHECK(ligament->GetLineWeight() == *weight);
+  }
 }

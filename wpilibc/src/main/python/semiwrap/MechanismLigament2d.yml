@@ -1,0 +1,15 @@
+classes:
+  wpi::MechanismLigament2d:
+    methods:
+      MechanismLigament2d:
+        ignore: true
+      SetColor:
+      GetColor:
+      SetLength:
+      GetLength:
+      SetAngle:
+      GetAngle:
+      SetLineWeight:
+      GetLineWeight:
+      LogTo:
+      GetTelemetryType:

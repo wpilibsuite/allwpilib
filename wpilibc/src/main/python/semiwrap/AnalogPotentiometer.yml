@@ -1,0 +1,12 @@
+classes:
+  wpi::AnalogPotentiometer:
+    methods:
+      AnalogPotentiometer:
+        overloads:
+          int, double, double:
+          AnalogInput*, double, double:
+            ignore: true
+          std::shared_ptr<AnalogInput>, double, double:
+      Get:
+      LogTo:
+      GetTelemetryType:

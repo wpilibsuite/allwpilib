@@ -1,0 +1,14 @@
+classes:
+  wpi::AnalogAccelerometer:
+    methods:
+      AnalogAccelerometer:
+        overloads:
+          int:
+          AnalogInput*:
+            ignore: true
+          std::shared_ptr<AnalogInput>:
+      GetAcceleration:
+      SetSensitivity:
+      SetZero:
+      LogTo:
+      GetTelemetryType:

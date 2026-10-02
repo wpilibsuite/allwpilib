@@ -2,13 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Timer.h"  // NOLINT(build/include_order)
+// clang-format off
+#include "wpi/net/uv/Timer.hpp"
+// clang-format on
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
-TEST(UvTimerTest, StartAndStop) {
+TEST_CASE("UvTimerTest StartAndStop", "[uv][timer]") {
   auto loop = Loop::Create();
   auto handleNoRepeat = Timer::Create(loop);
   auto handleRepeat = Timer::Create(loop);
@@ -21,11 +23,11 @@ TEST(UvTimerTest, StartAndStop) {
 
   handleNoRepeat->timeout.connect(
       [&checkTimerNoRepeatEvent, handle = handleNoRepeat.get()] {
-        ASSERT_FALSE(checkTimerNoRepeatEvent);
+        REQUIRE_FALSE(checkTimerNoRepeatEvent);
         checkTimerNoRepeatEvent = true;
         handle->Stop();
         handle->Close();
-        ASSERT_TRUE(handle->IsClosing());
+        REQUIRE(handle->IsClosing());
       });
 
   handleRepeat->timeout.connect(
@@ -33,37 +35,37 @@ TEST(UvTimerTest, StartAndStop) {
         if (checkTimerRepeatEvent) {
           handle->Stop();
           handle->Close();
-          ASSERT_TRUE(handle->IsClosing());
+          REQUIRE(handle->IsClosing());
         } else {
           checkTimerRepeatEvent = true;
-          ASSERT_FALSE(handle->IsClosing());
+          REQUIRE_FALSE(handle->IsClosing());
         }
       });
 
   handleNoRepeat->Start(Timer::Time{0}, Timer::Time{0});
   handleRepeat->Start(Timer::Time{0}, Timer::Time{1});
 
-  ASSERT_TRUE(handleNoRepeat->IsActive());
-  ASSERT_FALSE(handleNoRepeat->IsClosing());
+  REQUIRE(handleNoRepeat->IsActive());
+  REQUIRE_FALSE(handleNoRepeat->IsClosing());
 
-  ASSERT_TRUE(handleRepeat->IsActive());
-  ASSERT_FALSE(handleRepeat->IsClosing());
+  REQUIRE(handleRepeat->IsActive());
+  REQUIRE_FALSE(handleRepeat->IsClosing());
 
   loop->Run();
 
-  ASSERT_TRUE(checkTimerNoRepeatEvent);
-  ASSERT_TRUE(checkTimerRepeatEvent);
+  REQUIRE(checkTimerNoRepeatEvent);
+  REQUIRE(checkTimerRepeatEvent);
 }
 
-TEST(UvTimerTest, Repeat) {
+TEST_CASE("UvTimerTest Repeat", "[uv][timer]") {
   auto loop = Loop::Create();
   auto handle = Timer::Create(loop);
 
   handle->SetRepeat(Timer::Time{42});
-  ASSERT_EQ(handle->GetRepeat(), Timer::Time{42});
+  REQUIRE(handle->GetRepeat() == Timer::Time{42});
   handle->Close();
 
   loop->Run();  // forces close callback to run
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

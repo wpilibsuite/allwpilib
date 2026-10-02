@@ -2,33 +2,33 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/math/filter/MedianFilter.hpp"
 
-#include "frc/filter/MedianFilter.h"
+#include <catch2/catch_test_macros.hpp>
 
-TEST(MedianFilterTest, MedianFilterNotFullTestEven) {
-  frc::MedianFilter<double> filter{10};
+TEST_CASE("MedianFilterTest MedianFilterNotFullTestEven", "[wpimath]") {
+  wpi::math::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
   filter.Calculate(4);
 
-  EXPECT_EQ(filter.Calculate(1000), 3.5);
+  CHECK(filter.Calculate(1000) == 3.5);
 }
 
-TEST(MedianFilterTest, MedianFilterNotFullTestOdd) {
-  frc::MedianFilter<double> filter{10};
+TEST_CASE("MedianFilterTest MedianFilterNotFullTestOdd", "[wpimath]") {
+  wpi::math::MedianFilter<double> filter{10};
 
   filter.Calculate(3);
   filter.Calculate(0);
   filter.Calculate(4);
   filter.Calculate(7);
 
-  EXPECT_EQ(filter.Calculate(1000), 4);
+  CHECK(filter.Calculate(1000) == 4);
 }
 
-TEST(MedianFilterTest, MedianFilterFullTestEven) {
-  frc::MedianFilter<double> filter{6};
+TEST_CASE("MedianFilterTest MedianFilterFullTestEven", "[wpimath]") {
+  wpi::math::MedianFilter<double> filter{6};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -37,11 +37,11 @@ TEST(MedianFilterTest, MedianFilterFullTestEven) {
   filter.Calculate(4);
   filter.Calculate(1000);
 
-  EXPECT_EQ(filter.Calculate(99), 4.5);
+  CHECK(filter.Calculate(99) == 4.5);
 }
 
-TEST(MedianFilterTest, MedianFilterFullTestOdd) {
-  frc::MedianFilter<double> filter{5};
+TEST_CASE("MedianFilterTest MedianFilterFullTestOdd", "[wpimath]") {
+  wpi::math::MedianFilter<double> filter{5};
 
   filter.Calculate(3);
   filter.Calculate(0);
@@ -49,5 +49,5 @@ TEST(MedianFilterTest, MedianFilterFullTestOdd) {
   filter.Calculate(4);
   filter.Calculate(1000);
 
-  EXPECT_EQ(filter.Calculate(99), 5);
+  CHECK(filter.Calculate(99) == 5);
 }

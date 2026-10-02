@@ -2,9 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/TimedRobot.h>
+#include "wpi/framework/TimedRobot.hpp"
 
-class Robot : public frc::TimedRobot {
+class Robot : public wpi::TimedRobot {
  public:
   /**
    * This function is run when the robot is first started up and should be
@@ -33,9 +33,9 @@ class Robot : public frc::TimedRobot {
   void TeleopPeriodic() override {}
 
   /**
-   * This function is called periodically during test mode
+   * This function is called periodically during utility mode
    */
-  void TestPeriodic() override {}
+  void UtilityPeriodic() override {}
 
   /**
    * This function is called periodically during all modes
@@ -44,5 +44,5 @@ class Robot : public frc::TimedRobot {
 };
 
 int main() {
-  return frc::StartRobot<Robot>();
+  return wpi::StartRobot<Robot>();
 }

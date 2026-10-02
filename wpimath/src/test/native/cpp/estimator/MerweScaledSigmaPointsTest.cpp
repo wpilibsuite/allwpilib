@@ -2,29 +2,34 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/math/estimator/MerweScaledSigmaPoints.hpp"
 
-#include "frc/estimator/MerweScaledSigmaPoints.h"
+#include <cmath>
 
-TEST(MerweScaledSigmaPointsTest, ZeroMean) {
-  frc::MerweScaledSigmaPoints<2> sigmaPoints;
+#include <catch2/catch_test_macros.hpp>
+
+#include "wpi/math/linalg/EigenCore.hpp"
+
+TEST_CASE("MerweScaledSigmaPointsTest ZeroMean", "[wpimath]") {
+  wpi::math::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      frc::Vectord<2>{0.0, 0.0}, frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
+      wpi::math::Vectord<2>{0.0, 0.0},
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, 1.0}});
 
-  EXPECT_TRUE(
-      (points - frc::Matrixd<2, 5>{{0.0, 0.00173205, 0.0, -0.00173205, 0.0},
-                                   {0.0, 0.0, 0.00173205, 0.0, -0.00173205}})
-          .norm() < 1e-3);
+  CHECK((points -
+         wpi::math::Matrixd<2, 5>{{0.0, 0.00173205, 0.0, -0.00173205, 0.0},
+                                  {0.0, 0.0, 0.00173205, 0.0, -0.00173205}})
+            .norm() < 1e-3);
 }
 
-TEST(MerweScaledSigmaPointsTest, NonzeroMean) {
-  frc::MerweScaledSigmaPoints<2> sigmaPoints;
+TEST_CASE("MerweScaledSigmaPointsTest NonzeroMean", "[wpimath]") {
+  wpi::math::MerweScaledSigmaPoints<2> sigmaPoints;
   auto points = sigmaPoints.SquareRootSigmaPoints(
-      frc::Vectord<2>{1.0, 2.0},
-      frc::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
+      wpi::math::Vectord<2>{1.0, 2.0},
+      wpi::math::Matrixd<2, 2>{{1.0, 0.0}, {0.0, std::sqrt(10.0)}});
 
-  EXPECT_TRUE(
-      (points - frc::Matrixd<2, 5>{{1.0, 1.00173205, 1.0, 0.998268, 1.0},
-                                   {2.0, 2.0, 2.00548, 2.0, 1.99452}})
+  CHECK(
+      (points - wpi::math::Matrixd<2, 5>{{1.0, 1.00173205, 1.0, 0.998268, 1.0},
+                                         {2.0, 2.0, 2.00548, 2.0, 1.99452}})
           .norm() < 1e-3);
 }

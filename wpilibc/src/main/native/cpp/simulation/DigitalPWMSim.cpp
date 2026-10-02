@@ -2,17 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/DigitalPWMSim.h"
+#include "wpi/simulation/DigitalPWMSim.hpp"
 
 #include <memory>
 #include <stdexcept>
 
-#include <hal/simulation/DigitalPWMData.h>
+#include "wpi/hal/simulation/DigitalPWMData.h"
+#include "wpi/hardware/discrete/DigitalOutput.hpp"
 
-#include "frc/DigitalOutput.h"
-
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 DigitalPWMSim::DigitalPWMSim(const DigitalOutput& digitalOutput)
     : m_index{digitalOutput.GetChannel()} {}

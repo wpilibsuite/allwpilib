@@ -1,0 +1,9 @@
+classes:
+  wpi::DigitalInput:
+    methods:
+      DigitalInput:
+      Get:
+      GetChannel:
+      SetSimDevice:
+      LogTo:
+      GetTelemetryType:

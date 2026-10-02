@@ -2,22 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/hardware/MotorController.h"
+#include "wpi/glass/hardware/MotorController.hpp"
 
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "glass/Context.h"
-#include "glass/DataSource.h"
+#include "wpi/glass/DataSource.hpp"
 
-using namespace glass;
+using namespace wpi::glass;
 
-void glass::DisplayMotorController(MotorControllerModel* m) {
+void wpi::glass::DisplayMotorController(MotorControllerModel* m) {
   // Get duty cycle data from the model and do not display anything if the data
   // is null.
   auto dc = m->GetPercentData();
   if (!dc || !m->Exists()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown MotorController");
     ImGui::PopStyleColor();
     return;
@@ -26,7 +26,8 @@ void glass::DisplayMotorController(MotorControllerModel* m) {
   // Set the buttons and sliders to read-only if the model is read-only.
   if (m->IsReadOnly()) {
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(210, 210, 210, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_Text));
   }
 
   // Add button to zero output.

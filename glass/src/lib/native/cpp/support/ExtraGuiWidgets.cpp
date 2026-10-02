@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "glass/support/ExtraGuiWidgets.h"
+#include "wpi/glass/support/ExtraGuiWidgets.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -10,14 +10,14 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <wpi/DenseMap.h>
 
-#include "glass/DataSource.h"
-#include "glass/support/ExpressionParser.h"
+#include "wpi/glass/DataSource.hpp"
+#include "wpi/glass/support/ExpressionParser.hpp"
+#include "wpi/util/DenseMap.hpp"
 
-namespace glass {
+namespace wpi::glass {
 
-void DrawLEDSources(const int* values, DataSource** sources, int numValues,
+void DrawLEDSources(const int* values, BooleanSource** sources, int numValues,
                     int cols, const ImU32* colors, float size, float spacing,
                     const LEDConfig& config) {
   if (numValues == 0 || cols < 1) {
@@ -222,15 +222,15 @@ bool HamburgerButton(const ImGuiID id, const ImVec2 position) {
   return pressed;
 }
 
-static const int kBufferSize = 256;
+static const int BUFFER_SIZE = 256;
 
 struct InputExprState {
-  char inputBuffer[kBufferSize];
+  char inputBuffer[BUFFER_SIZE];
 };
 
-static wpi::DenseMap<int, InputExprState> exprStates;
+static wpi::util::DenseMap<int, InputExprState> exprStates;
 // Shared string buffer for inactive inputs
-static char previewBuffer[kBufferSize];
+static char previewBuffer[BUFFER_SIZE];
 
 template <typename V>
 bool InputExpr(const char* label, V* v, const char* format,
@@ -249,13 +249,13 @@ bool InputExpr(const char* label, V* v, const char* format,
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
     // Preview stored value
-    std::snprintf(inputBuffer, kBufferSize, format, *v);
+    std::snprintf(inputBuffer, BUFFER_SIZE, format, *v);
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
   }
 
-  ImGui::InputText(label, inputBuffer, kBufferSize, flags);
+  ImGui::InputText(label, inputBuffer, BUFFER_SIZE, flags);
   bool active = ImGui::IsItemActive();
   bool changed = ImGui::IsItemDeactivatedAfterEdit();
 
@@ -263,11 +263,11 @@ bool InputExpr(const char* label, V* v, const char* format,
     InputExprState& state = exprStates[id];
     if (!hasState) {
       // State was just created, copy in contents of preview buffer
-      std::strncpy(state.inputBuffer, previewBuffer, kBufferSize);
+      std::strncpy(state.inputBuffer, previewBuffer, BUFFER_SIZE);
     }
 
     // Attempt to parse current value
-    auto result = glass::expression::TryParseExpr<V>(state.inputBuffer);
+    auto result = wpi::glass::expression::TryParseExpr<V>(state.inputBuffer);
     if (result) {
       *v = result.value();
     } else if (active) {
@@ -289,4 +289,4 @@ template bool InputExpr(const char*, int64_t*, const char*,
 template bool InputExpr(const char*, float*, const char*, ImGuiInputTextFlags);
 template bool InputExpr(const char*, double*, const char*, ImGuiInputTextFlags);
 
-}  // namespace glass
+}  // namespace wpi::glass

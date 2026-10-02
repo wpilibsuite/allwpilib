@@ -1,0 +1,116 @@
+import org.gradle.internal.os.OperatingSystem
+
+if (project.hasProperty('onlylinuxsystemcore')) {
+    return;
+}
+
+description = "NetworkTables Viewer"
+
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'org.wpilib.NativeUtils'
+
+if (OperatingSystem.current().isWindows()) {
+    apply plugin: 'windows-resources'
+}
+
+ext {
+    nativeName = 'outlineviewer'
+}
+
+apply from: "${rootDir}/shared/resources.gradle"
+apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/libsdlgpu.gradle"
+
+def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
+def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
+
+task generateCppVersion() {
+    description = 'Generates the wpilib version class'
+    group = 'WPILib'
+
+    outputs.file wpilibVersionFileOutput
+    inputs.file wpilibVersionFileInput
+
+    if (wpilibVersioning.releaseMode) {
+        outputs.upToDateWhen { false }
+    }
+
+    // We follow a simple set of checks to determine whether we should generate a new version file:
+    // 1. If the release type is not development, we generate a new version file
+    // 2. If there is no generated version number, we generate a new version file
+    // 3. If there is a generated build number, and the release type is development, then we will
+    //    only generate if the publish task is run.
+    doLast {
+        def version = wpilibVersioning.version.get()
+        println "Writing version ${version} to $wpilibVersionFileOutput"
+
+        wpilibVersionFileOutput.parentFile.mkdirs()
+        if (wpilibVersionFileOutput.exists()) {
+            wpilibVersionFileOutput.delete()
+        }
+        def read = wpilibVersionFileInput.text.replace('${wpilib_version}', version)
+        wpilibVersionFileOutput.write(read)
+    }
+}
+
+gradle.taskGraph.addTaskExecutionGraphListener { graph ->
+    def willPublish = graph.hasTask(publish)
+    if (willPublish) {
+        generateCppVersion.outputs.upToDateWhen { false }
+    }
+}
+
+def generateTask = createGenerateResourcesTask('main', 'OV', 'ov', project)
+
+project(':').libraryBuild.dependsOn build
+tasks.withType(CppCompile).configureEach {
+    dependsOn generateTask
+    dependsOn generateCppVersion
+}
+
+model {
+    components {
+        // By default, a development executable will be generated. This is to help the case of
+        // testing specific functionality of the library.
+        "${nativeName}"(NativeExecutableSpec) {
+            baseName = 'outlineviewer'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp', "$buildDir/generated/main/cpp", "$buildDir/generated/mainVersion/cpp"
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+                if (OperatingSystem.current().isWindows()) {
+                    rc.source {
+                        srcDirs 'src/main/native/win'
+                        include '*.rc'
+                    }
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+                lib project: ':glass', library: 'glassnt', linkage: 'static'
+                lib project: ':glass', library: 'glass', linkage: 'static'
+                project(':ntcore').addNtcoreDependency(it, 'static')
+                lib project: ':wpinet', library: 'wpinet', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                project.addLibSdlGpuDependency(it)
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'

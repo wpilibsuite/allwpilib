@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpinet/uv/Poll.h"
+#include "wpi/net/uv/Poll.hpp"
 
 #include <functional>
 #include <memory>
 #include <utility>
 
-#include "wpinet/uv/Loop.h"
+#include "wpi/net/uv/Loop.hpp"
 
-namespace wpi::uv {
+namespace wpi::net::uv {
 
 std::shared_ptr<Poll> Poll::Create(Loop& loop, int fd) {
   if (loop.IsClosing()) {
@@ -105,4 +105,4 @@ void Poll::Start(int events) {
          });
 }
 
-}  // namespace wpi::uv
+}  // namespace wpi::net::uv

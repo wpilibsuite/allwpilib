@@ -1679,9 +1679,9 @@ EIGEN_STRONG_INLINE Packet16b pgather<bool, Packet16b>(const bool* from, Index s
 template <>
 EIGEN_STRONG_INLINE void pscatter<float, Packet4f>(float* to, const Packet4f& from, Index stride) {
   to[stride * 0] = pfirst(from);
-  to[stride * 1] = pfirst(_mm_shuffle_ps(from, from, 1));
-  to[stride * 2] = pfirst(_mm_shuffle_ps(from, from, 2));
-  to[stride * 3] = pfirst(_mm_shuffle_ps(from, from, 3));
+  to[stride * 1] = pfirst(Packet4f(_mm_shuffle_ps(from, from, 1)));
+  to[stride * 2] = pfirst(Packet4f(_mm_shuffle_ps(from, from, 2)));
+  to[stride * 3] = pfirst(Packet4f(_mm_shuffle_ps(from, from, 3)));
 }
 template <>
 EIGEN_STRONG_INLINE void pscatter<double, Packet2d>(double* to, const Packet2d& from, Index stride) {

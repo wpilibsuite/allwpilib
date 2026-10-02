@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Johnson <johnson.peter@gmail.com>
+Date: Wed, 1 Apr 2026 08:15:04 -0700
+Subject: [PATCH 12/25] Add const getters for string, array, and object
+
+---
+ json.cpp | 33 +++++++++++++++++++++++++++++++++
+ json.h   |  3 +++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/json.cpp b/json.cpp
+index 1266aa36b43155cbab6fe8d918fed2c56596f7a8..4aebebec76de7628792afbf176f46d61e2f67c43 100644
+--- a/json.cpp
++++ b/json.cpp
+@@ -521,6 +521,17 @@ json::get_string()
+     }
+ }
+ 
++const std::string&
++json::get_string() const
++{
++    switch (type_) {
++        case Type::String:
++            return string_value;
++        default:
++            ON_LOGIC_ERROR("JSON value is not a string.");
++    }
++}
++
+ json::array_t&
+ json::get_array()
+ {
+@@ -532,6 +543,17 @@ json::get_array()
+     }
+ }
+ 
++const json::array_t&
++json::get_array() const
++{
++    switch (type_) {
++        case Type::Array:
++            return array_value;
++        default:
++            ON_LOGIC_ERROR("JSON value is not an array.");
++    }
++}
++
+ json::object_t&
+ json::get_object()
+ {
+@@ -543,6 +565,17 @@ json::get_object()
+     }
+ }
+ 
++const json::object_t&
++json::get_object() const
++{
++    switch (type_) {
++        case Type::Object:
++            return object_value;
++        default:
++            ON_LOGIC_ERROR("JSON value is not an object.");
++    }
++}
++
+ void
+ json::set_array()
+ {
+diff --git a/json.h b/json.h
+index 9aa5c889932e720746972d9e8ef1dd8b095e0fb1..2a4c009e4b3cf7f1ccac8b09986853ccd3540f9d 100644
+--- a/json.h
++++ b/json.h
+@@ -202,8 +202,11 @@ class json
+     double get_number() const;
+     long long get_int() const;
+     std::string& get_string();
++    const std::string& get_string() const;
+     array_t& get_array();
++    const array_t& get_array() const;
+     object_t& get_object();
++    const object_t& get_object() const;
+ 
+     bool contains(const std::string&) const;
+ 

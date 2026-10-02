@@ -1,0 +1,6 @@
+classes:
+  wpi::xrp::XRPServo:
+    methods:
+      XRPServo:
+      SetAngle:
+      GetAngle:

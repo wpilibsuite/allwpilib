@@ -2,35 +2,35 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "BufferCallbackStore.h"
+#include "BufferCallbackStore.hpp"
 
 #include <jni.h>
 
 #include <cstdio>
 #include <memory>
 
-#include <wpi/jni_util.h>
+#include "SimulatorJNI.hpp"
+#include "wpi/hal/Types.h"
+#include "wpi/hal/handles/UnlimitedHandleResource.hpp"
+#include "wpi/util/jni_util.hpp"
 
-#include "SimulatorJNI.h"
-#include "hal/Types.h"
-#include "hal/handles/UnlimitedHandleResource.h"
+using namespace wpi::hal;
+using namespace wpi::hal::sim;
+using namespace wpi::util::java;
 
-using namespace hal;
-using namespace hal::sim;
-using namespace wpi::java;
+static wpi::hal::UnlimitedHandleResource<
+    SIM_JniHandle, BufferCallbackStore,
+    wpi::hal::HAL_HandleEnum::SIMULATION_JNI>* callbackHandles;
 
-static hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
-                                    hal::HAL_HandleEnum::SimulationJni>*
-    callbackHandles;
-
-namespace hal::sim {
+namespace wpi::hal::sim {
 void InitializeBufferStore() {
-  static hal::UnlimitedHandleResource<SIM_JniHandle, BufferCallbackStore,
-                                      hal::HAL_HandleEnum::SimulationJni>
+  static wpi::hal::UnlimitedHandleResource<
+      SIM_JniHandle, BufferCallbackStore,
+      wpi::hal::HAL_HandleEnum::SIMULATION_JNI>
       cb;
   callbackHandles = &cb;
 }
-}  // namespace hal::sim
+}  // namespace wpi::hal::sim
 
 void BufferCallbackStore::create(JNIEnv* env, jobject obj) {
   m_call = JGlobal<jobject>(env, obj);
@@ -91,7 +91,7 @@ SIM_JniHandle sim::AllocateBufferCallback(
 
   auto handle = callbackHandles->Allocate(callbackStore);
 
-  if (handle == HAL_kInvalidHandle) {
+  if (handle == HAL_INVALID_HANDLE) {
     return -1;
   }
 

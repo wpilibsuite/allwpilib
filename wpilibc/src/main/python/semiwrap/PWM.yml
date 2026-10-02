@@ -1,0 +1,24 @@
+extra_includes:
+- wpi/hardware/led/AddressableLED.hpp
+- wpi/util/SmallString.hpp
+
+classes:
+  wpi::PWM:
+    methods:
+      PWM:
+      SetPulseTime:
+      GetPulseTime:
+      SetDisabled:
+      GetChannel:
+      SetOutputPeriod:
+      SetSimDevice:
+      LogTo:
+      GetTelemetryType:
+
+inline_code: |
+  cls_PWM
+    .def("__repr__", [](py::handle self) {
+      py::object type_name = self.get_type().attr("__qualname__");
+      int channel = self.cast<PWM&>().GetChannel();
+      return py::str("<{} {}>").format(type_name, channel);
+    });

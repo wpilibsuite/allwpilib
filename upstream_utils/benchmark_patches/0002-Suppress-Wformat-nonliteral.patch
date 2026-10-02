@@ -43,10 +43,10 @@ index c90232f20ff7b6dfdc09ee2df02a6d735b1d99ea..c4c48d15a049f39c77aeee47ae46741e
    return buff.get();
  }
 diff --git a/src/string_util.cc b/src/string_util.cc
-index 420de4cf259ce0bf3087b004b1f0d0b1c78028a7..698129453cd6ea1baf5f12ae58db467008b6ce8c 100644
+index 9c5df3ba25c92012bbae5063522a17bb47777151..9c483b335136a5b0e62c5f364a5eb1dfef5a414d 100644
 --- a/src/string_util.cc
 +++ b/src/string_util.cc
-@@ -123,7 +123,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
+@@ -124,7 +124,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
  
    // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
    // in the android-ndk
@@ -61,7 +61,7 @@ index 420de4cf259ce0bf3087b004b1f0d0b1c78028a7..698129453cd6ea1baf5f12ae58db4670
  
    va_end(args_cp);
  
-@@ -141,7 +148,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
+@@ -142,7 +149,14 @@ std::string StrFormatImp(const char* msg, va_list args) {
    auto buff_ptr = std::unique_ptr<char[]>(new char[size]);
    // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
    // in the android-ndk

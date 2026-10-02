@@ -1,0 +1,16 @@
+classes:
+  wpi::Solenoid:
+    methods:
+      Solenoid:
+        overloads:
+          CANPort, PneumaticsModuleType, int:
+          CANPort, int, PneumaticsModuleType, int:
+      Set:
+      Get:
+      Toggle:
+      GetChannel:
+      IsDisabled:
+      SetPulseDuration:
+      StartPulse:
+      LogTo:
+      GetTelemetryType:

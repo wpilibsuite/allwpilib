@@ -2,57 +2,57 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include "wpi/apriltag/AprilTagDetector.hpp"
 
-#include "frc/apriltag/AprilTagDetector.h"
+#include <catch2/catch_test_macros.hpp>
 
-using namespace frc;
+using namespace wpi::apriltag;
 
-TEST(AprilTagDetectorTest, ConfigDefaults) {
+TEST_CASE("AprilTagDetectorTest ConfigDefaults", "[apriltag][detector]") {
   AprilTagDetector detector;
   auto config = detector.GetConfig();
-  ASSERT_EQ(config, AprilTagDetector::Config{});
+  REQUIRE(config == AprilTagDetector::Config{});
 }
 
-TEST(AprilTagDetectorTest, QtpDefaults) {
+TEST_CASE("AprilTagDetectorTest QtpDefaults", "[apriltag][detector]") {
   AprilTagDetector detector;
   auto params = detector.GetQuadThresholdParameters();
-  ASSERT_EQ(params, AprilTagDetector::QuadThresholdParameters{});
+  REQUIRE(params == AprilTagDetector::QuadThresholdParameters{});
 }
 
-TEST(AprilTagDetectorTest, SetConfigNumThreads) {
+TEST_CASE("AprilTagDetectorTest SetConfigNumThreads", "[apriltag][detector]") {
   AprilTagDetector detector;
   detector.SetConfig({.numThreads = 2});
   auto config = detector.GetConfig();
-  ASSERT_EQ(config.numThreads, 2);
+  REQUIRE(config.numThreads == 2);
 }
 
-TEST(AprilTagDetectorTest, QtpMinClusterPixels) {
+TEST_CASE("AprilTagDetectorTest QtpMinClusterPixels", "[apriltag][detector]") {
   AprilTagDetector detector;
   detector.SetQuadThresholdParameters({.minClusterPixels = 8});
   auto params = detector.GetQuadThresholdParameters();
-  ASSERT_EQ(params.minClusterPixels, 8);
+  REQUIRE(params.minClusterPixels == 8);
 }
 
-TEST(AprilTagDetectorTest, Add16h5) {
+TEST_CASE("AprilTagDetectorTest Add16h5", "[apriltag][detector]") {
   AprilTagDetector detector;
-  ASSERT_TRUE(detector.AddFamily("tag16h5"));
+  REQUIRE(detector.AddFamily("tag16h5"));
   // duplicate addition is also okay
-  ASSERT_TRUE(detector.AddFamily("tag16h5"));
+  REQUIRE(detector.AddFamily("tag16h5"));
 }
 
-TEST(AprilTagDetectorTest, Add36h11) {
+TEST_CASE("AprilTagDetectorTest Add36h11", "[apriltag][detector]") {
   AprilTagDetector detector;
-  ASSERT_TRUE(detector.AddFamily("tag36h11"));
+  REQUIRE(detector.AddFamily("tag36h11"));
 }
 
-TEST(AprilTagDetectorTest, AddMultiple) {
+TEST_CASE("AprilTagDetectorTest AddMultiple", "[apriltag][detector]") {
   AprilTagDetector detector;
-  ASSERT_TRUE(detector.AddFamily("tag16h5"));
-  ASSERT_TRUE(detector.AddFamily("tag36h11"));
+  REQUIRE(detector.AddFamily("tag16h5"));
+  REQUIRE(detector.AddFamily("tag36h11"));
 }
 
-TEST(AprilTagDetectorTest, RemoveFamily) {
+TEST_CASE("AprilTagDetectorTest RemoveFamily", "[apriltag][detector]") {
   AprilTagDetector detector;
   // okay to remove non-existent family
   detector.RemoveFamily("tag16h5");

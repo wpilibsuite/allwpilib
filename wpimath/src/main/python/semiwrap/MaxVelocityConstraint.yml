@@ -1,0 +1,15 @@
+classes:
+  wpi::math::MaxVelocityConstraint:
+    typealias:
+    - wpi::math::TrajectoryConstraint::MinMax
+    methods:
+      MaxVelocityConstraint:
+      MaxVelocity:
+      MinMaxAcceleration:
+
+inline_code: |-
+  cls_MaxVelocityConstraint
+    .def_static("from_fps", [](wpi::units::feet_per_second_t maxVelocity) {
+      return std::make_shared<wpi::math::MaxVelocityConstraint>(maxVelocity);
+    }, py::arg("max_velocity"))
+  ;

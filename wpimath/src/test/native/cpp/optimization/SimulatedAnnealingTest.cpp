@@ -2,15 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include "wpi/math/optimization/SimulatedAnnealing.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "frc/optimization/SimulatedAnnealing.h"
+#include "wpi/math/TestAssertions.hpp"
 
-TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
+TEST_CASE("SimulatedAnnealingTest DoubleFunctionOptimizationHeartBeat",
+          "[wpimath]") {
   auto function = [](double x) {
     return -(x + std::sin(x)) * std::exp(-x * x) + 1;
   };
@@ -21,7 +24,7 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
   std::mt19937 gen{rd()};
   std::uniform_real_distribution<> distr{0.0, 1.0};
 
-  frc::SimulatedAnnealing<double> simulatedAnnealing{
+  wpi::math::SimulatedAnnealing<double> simulatedAnnealing{
       2.0,
       [&](const double& x) {
         return std::clamp(x + (distr(gen) - 0.5) * stepSize, -3.0, 3.0);
@@ -30,10 +33,11 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
 
   double solution = simulatedAnnealing.Solve(-1.0, 5000);
 
-  EXPECT_NEAR(0.68, solution, 1e-1);
+  CHECK_NEAR(0.68, solution, 1e-1);
 }
 
-TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
+TEST_CASE("SimulatedAnnealingTest DoubleFunctionOptimizationMultimodal",
+          "[wpimath]") {
   auto function = [](double x) {
     return std::sin(x) + std::sin((10.0 / 3.0) * x);
   };
@@ -44,7 +48,7 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
   std::mt19937 gen{rd()};
   std::uniform_real_distribution<> distr{0.0, 1.0};
 
-  frc::SimulatedAnnealing<double> simulatedAnnealing{
+  wpi::math::SimulatedAnnealing<double> simulatedAnnealing{
       2.0,
       [&](const double& x) {
         return std::clamp(x + (distr(gen) - 0.5) * stepSize, 0.0, 7.0);
@@ -53,5 +57,5 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
 
   double solution = simulatedAnnealing.Solve(-1.0, 5000);
 
-  EXPECT_NEAR(5.146, solution, 1e-1);
+  CHECK_NEAR(5.146, solution, 1e-1);
 }

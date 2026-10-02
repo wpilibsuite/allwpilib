@@ -1,0 +1,45 @@
+extra_includes:
+- wpi/driverstation/SteamController.hpp
+
+classes:
+  wpi::sim::SteamControllerSim:
+    force_no_trampoline: true
+    typealias:
+    - wpi::SteamController
+    methods:
+      SteamControllerSim:
+        overloads:
+          const SteamController&:
+          int:
+      SetLeftX:
+      SetLeftY:
+      SetRightX:
+      SetRightY:
+      SetLeftTrigger:
+      SetRightTrigger:
+      SetAButton:
+      SetBButton:
+      SetXButton:
+      SetYButton:
+      SetMenuButton:
+      SetSteamButton:
+      SetViewButton:
+      SetLeftStickButton:
+      SetRightStickButton:
+      SetLeftBumperButton:
+      SetRightBumperButton:
+      SetDpadUpButton:
+      SetDpadDownButton:
+      SetDpadLeftButton:
+      SetDpadRightButton:
+      SetQAMButton:
+      SetRightPaddle1Button:
+      SetLeftPaddle1Button:
+      SetRightPaddle2Button:
+      SetLeftPaddle2Button:
+      SetLeftTouchpadButton:
+      SetRightTouchpadButton:
+      SetLeftStickTouchButton:
+      SetRightStickTouchButton:
+      SetLeftGripTouchButton:
+      SetRightGripTouchButton:

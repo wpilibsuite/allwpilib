@@ -2,29 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "frc/simulation/SimDeviceSim.h"
+#include "wpi/simulation/SimDeviceSim.hpp"
 
+#include <format>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
-#include <hal/SimDevice.h>
-#include <hal/simulation/SimDeviceData.h>
+#include "wpi/hal/SimDevice.h"
+#include "wpi/hal/simulation/SimDeviceData.h"
 
-using namespace frc;
-using namespace frc::sim;
+using namespace wpi;
+using namespace wpi::sim;
 
 SimDeviceSim::SimDeviceSim(const char* name)
     : m_handle{HALSIM_GetSimDeviceHandle(name)} {}
 
 SimDeviceSim::SimDeviceSim(const char* name, int index) {
   m_handle =
-      HALSIM_GetSimDeviceHandle(fmt::format("{}[{}]", name, index).c_str());
+      HALSIM_GetSimDeviceHandle(std::format("{}[{}]", name, index).c_str());
 }
 
 SimDeviceSim::SimDeviceSim(const char* name, int index, int channel) {
   m_handle = HALSIM_GetSimDeviceHandle(
-      fmt::format("{}[{},{}]", name, index, channel).c_str());
+      std::format("{}[{},{}]", name, index, channel).c_str());
 }
 
 SimDeviceSim::SimDeviceSim(HAL_SimDeviceHandle handle) : m_handle(handle) {}

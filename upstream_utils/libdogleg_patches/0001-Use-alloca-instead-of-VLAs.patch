@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Gold856 <117957790+Gold856@users.noreply.github.com>
+Date: Wed, 22 Jul 2026 17:22:31 -0400
+Subject: [PATCH 1/3] Use alloca instead of VLAs
+
+---
+ dogleg.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/dogleg.c b/dogleg.c
+index e5d4aac9415712d3cb167b5b71823bd28a2ac5f2..cac3c3d95990cc563432ad30bd62a40d35335ac4 100644
+--- a/dogleg.c
++++ b/dogleg.c
+@@ -12,6 +12,9 @@
+ #include <string.h>
+ #include <float.h>
+ #include <stdlib.h>
++#ifdef _MSC_VER
++#include <malloc.h>
++#endif
+ #include "dogleg.h"
+ 
+ #if (CHOLMOD_VERSION > (CHOLMOD_VER_CODE(2,2))) && (CHOLMOD_VERSION < (CHOLMOD_VER_CODE(4,0)))
+@@ -2543,7 +2546,7 @@ static bool getOutliernessFactors_dense( // output
+     // where A = Jo inv(JtJ) Jot
+     //
+     // A is symmetric. I store the upper triangle
+-    double A[featureSize*(featureSize+1)/2];
++    double* A = alloca((featureSize*(featureSize+1)/2) * sizeof(double));
+     int iA=0;
+     for(int i=0; i<featureSize; i++)
+       for(int j=i; j<featureSize; j++, iA++)
+@@ -2655,7 +2658,7 @@ static bool getOutliernessFactors_sparse( // output
+     // where A = Jo inv(JtJ) Jot
+     //
+     // A is symmetric. I store the upper triangle
+-    double A[featureSize*(featureSize+1)/2];
++    double* A = alloca((featureSize*(featureSize+1)/2) * sizeof(double));
+     int iA=0;
+     for(int i=0; i<featureSize; i++)
+       for(int j=i; j<featureSize; j++, iA++)
+@@ -2898,8 +2901,8 @@ double dogleg_getOutliernessTrace_newFeature_sparse(const double*            Jqu
+ 
+   // This is Jt because cholmod thinks in terms of col-first instead of
+   // row-first
+-  int Jt_p[featureSize+1];
+-  int Jt_i[NstateActive*featureSize];
++  int* Jt_p = alloca((featureSize+1) * sizeof(int));
++  int* Jt_i = alloca(NstateActive*featureSize * sizeof(int));
+   for(int i=0; i<=featureSize; i++)
+   {
+     Jt_p[i] = i*NstateActive;

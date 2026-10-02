@@ -1,0 +1,16 @@
+classes:
+  wpi::AnalogInput:
+    methods:
+      AnalogInput:
+      GetValue:
+      GetVoltage:
+      GetChannel:
+      SetSimDevice:
+      LogTo:
+      GetTelemetryType:
+
+inline_code: |
+  cls_AnalogInput
+    .def("__repr__", [](const AnalogInput &self) {
+      return py::str("<AnalogInput {}>").format(self.GetChannel());
+    });

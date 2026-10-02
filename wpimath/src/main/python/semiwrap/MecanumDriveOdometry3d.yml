@@ -1,0 +1,5 @@
+classes:
+  wpi::math::MecanumDriveOdometry3d:
+    force_no_trampoline: true
+    methods:
+      MecanumDriveOdometry3d:

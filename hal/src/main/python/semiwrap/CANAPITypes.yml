@@ -1,0 +1,20 @@
+strip_prefixes:
+- HAL_
+
+enums:
+  HAL_CANDeviceType:
+    value_prefix: HAL_CAN_DEV
+  HAL_CANManufacturer:
+    value_prefix: HAL_CAN_MAN
+  HAL_CANFlags:
+    value_prefix: HAL_CAN
+classes:
+  HAL_CANMessage:
+    attributes:
+      flags:
+      dataSize:
+      data:
+  HAL_CANReceiveMessage:
+    attributes:
+      timeStamp:
+      message:

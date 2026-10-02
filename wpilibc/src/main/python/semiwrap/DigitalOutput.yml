@@ -1,0 +1,17 @@
+classes:
+  wpi::DigitalOutput:
+    methods:
+      DigitalOutput:
+      Set:
+      Get:
+      GetChannel:
+      Pulse:
+      IsPulsing:
+      SetPWMRate:
+      EnablePPS:
+      EnablePWM:
+      DisablePWM:
+      UpdateDutyCycle:
+      SetSimDevice:
+      LogTo:
+      GetTelemetryType:
