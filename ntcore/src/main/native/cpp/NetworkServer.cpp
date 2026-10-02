@@ -172,7 +172,8 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
   auto target = m_request.GetUrl();
   auto requestPath = target.substr(0, target.find('?'));
-  if (requestPath == "/nt/v1" || requestPath.starts_with("/nt/v1/")) {
+  if (requestPath == "/nt/v1" || requestPath.starts_with("/nt/v1/") ||
+      requestPath == "/nt/persistent.json") {
     auto method = m_request.GetMethod();
     m_server.ProcessAllLocal();
     auto response = m_server.m_serverImpl.HandleRestRequest(
@@ -215,9 +216,6 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
         "<body><p>NetworkTables supports WebSockets and a REST API."
         "</p><p><a href=\"/nt/v1/topics\">Browse topics as JSON</a></p>"
         "</body></html>");
-  } else if (isGET && path == "/nt/persistent.json") {
-    SendResponse(200, "OK", "application/json",
-                 m_server.m_serverImpl.DumpPersistent());
   } else {
     SendError(404, "Resource not found");
   }

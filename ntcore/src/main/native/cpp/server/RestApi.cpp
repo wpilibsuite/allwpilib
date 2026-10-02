@@ -4,8 +4,10 @@
 
 #include "RestApi.hpp"
 
+#include <algorithm>
 #include <charconv>
 #include <cmath>
+#include <format>
 #include <limits>
 #include <optional>
 #include <span>
@@ -21,7 +23,9 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/Base64.hpp"
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/StringMap.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace wpi::nt;
 using namespace wpi::nt::server;
@@ -51,7 +55,8 @@ std::optional<Format> GetFormat(std::string_view contentType) {
   return std::nullopt;
 }
 
-std::optional<Format> Negotiate(std::string_view accept) {
+std::optional<Format> Negotiate(std::string_view accept,
+                                bool jsonOnly = false) {
   if (accept.empty()) {
     return Format::JSON;
   }
@@ -101,6 +106,9 @@ std::optional<Format> Negotiate(std::string_view accept) {
       update(*format == Format::JSON ? jsonPref : msgpackPref, 2);
     }
   });
+  if (jsonOnly) {
+    return jsonPref.quality > 0 ? std::optional{Format::JSON} : std::nullopt;
+  }
   if (jsonPref.quality == 0 && msgpackPref.quality == 0) {
     return std::nullopt;
   }
@@ -212,16 +220,18 @@ Value DecodeArray(const json& input, Check check, Get get, Make make) {
   return make(values);
 }
 
-Value DecodeValue(std::string_view type, const json& input) {
+Value DecodeValue(std::string_view type, const json& input,
+                  bool requireFinite = true) {
   auto time = Now();
   auto isBool = [](const json& j) { return j.is_bool(); };
   auto isInt = [](const json& j) { return j.is_int(); };
-  auto isNumber = [](const json& j) {
-    return j.is_number() && std::isfinite(j.get_number());
+  auto isNumber = [&](const json& j) {
+    return j.is_number() && (!requireFinite || std::isfinite(j.get_number()));
   };
   auto isFloat = [&](const json& j) {
     return isNumber(j) &&
-           std::abs(j.get_number()) <= std::numeric_limits<float>::max();
+           (!requireFinite ||
+            std::abs(j.get_number()) <= std::numeric_limits<float>::max());
   };
   auto isString = [](const json& j) { return j.is_string(); };
   auto getBool = [](const json& j) { return j.get_bool(); };
@@ -379,6 +389,119 @@ bool ValidProperties(const json& props) {
   }
   return true;
 }
+
+RestResponse HandlePersistentRequest(ServerStorage& storage,
+                                     std::string_view method,
+                                     std::string_view body,
+                                     std::string_view contentType,
+                                     std::string_view accept) {
+  constexpr std::string_view ALLOW = "GET, PUT, OPTIONS";
+  if (method == "OPTIONS") {
+    return {204, "No Content", {}, ALLOW};
+  }
+  if (method == "GET") {
+    if (!Negotiate(accept, true)) {
+      return Error(406, "Not Acceptable",
+                   "Persistence files require application/json");
+    }
+    std::string data;
+    wpi::util::raw_string_ostream os{data};
+    storage.DumpPersistent(os);
+    os.flush();
+    return {200, "OK", std::move(data), ALLOW};
+  }
+  if (method != "PUT") {
+    return Error(405, "Method Not Allowed", "Method not allowed", ALLOW);
+  }
+  if (GetFormat(contentType) != Format::JSON) {
+    return Error(415, "Unsupported Media Type",
+                 "Persistence uploads require application/json");
+  }
+  auto input = json::parse(body);
+  if (!input || !input->is_array()) {
+    return Error(400, "Bad Request", "Expected a persistent JSON array");
+  }
+
+  struct PendingEntry {
+    const json* entry;
+    Value value;
+  };
+  std::vector<PendingEntry> pending;
+  wpi::util::StringMap<bool> names;
+  // Validate the entire file before notifying subscribers or changing storage.
+  for (auto&& entry : input->get_array()) {
+    auto error = [&](int status, std::string_view statusText,
+                     std::string_view message) {
+      return Error(status, statusText,
+                   std::format("entry {}: {}", pending.size(), message));
+    };
+    if (!entry.is_object()) {
+      return error(400, "Bad Request", "Expected an object");
+    }
+    auto name = entry.lookup("name");
+    auto type = entry.lookup("type");
+    auto props = entry.lookup("properties");
+    auto jvalue = entry.lookup("value");
+    if (!name || !name->is_string() || !type || !type->is_string() ||
+        type->get_string().empty() || !props || !ValidProperties(*props) ||
+        !jvalue) {
+      return error(400, "Bad Request",
+                   "Expected name, type, value, and properties");
+    }
+    if (name->get_string().starts_with('$')) {
+      return error(403, "Forbidden", "Meta topics are read-only");
+    }
+    if (!names.try_emplace(name->get_string(), true).second) {
+      return error(400, "Bad Request", "Duplicate topic name");
+    }
+    auto persistent = props->lookup("persistent");
+    if (!persistent || !persistent->is_bool() || !persistent->get_bool()) {
+      return error(400, "Bad Request",
+                   "Every entry must have persistent: true");
+    }
+    if (auto cached = props->lookup("cached");
+        cached && cached->is_bool() && !cached->get_bool()) {
+      return error(400, "Bad Request",
+                   "Persistent entries must cache their values");
+    }
+    auto topic = storage.GetTopic(name->get_string());
+    if (topic && topic->typeStr != type->get_string()) {
+      return error(409, "Conflict", "Topic type cannot be changed");
+    }
+    // Match the startup loader's numeric conversions, including infinity and
+    // rounded decimal representations of the maximum float value.
+    auto value = DecodeValue(type->get_string(), *jvalue, false);
+    if (!value) {
+      return error(400, "Bad Request", "Value does not match the topic type");
+    }
+    pending.emplace_back(&entry, std::move(value));
+  }
+
+  for (auto&& item : pending) {
+    auto& entry = *item.entry;
+    auto& name = entry.at("name").get_string();
+    auto& props = entry.at("properties");
+    auto topic = storage.GetTopic(name);
+    if (!topic) {
+      topic = storage.CreateTopic(nullptr, name, entry.at("type").get_string(),
+                                  props);
+    } else {
+      auto update = props;
+      for (auto&& [key, value] : topic->properties.get_object()) {
+        if (!props.lookup(key)) {
+          update[key] = nullptr;
+        }
+      }
+      storage.SetProperties(nullptr, topic, update);
+    }
+    // Imports must replace the cached value even if a publisher used a future
+    // timestamp.
+    item.value.SetTime(std::max(item.value.time(), topic->lastValue.time()));
+    storage.SetValue(nullptr, topic, item.value);
+  }
+  return {204, "No Content", {}, ALLOW};
+}
+
 }  // namespace
 
 RestResponse wpi::nt::server::HandleRestRequest(ServerStorage& storage,
@@ -392,6 +515,9 @@ RestResponse wpi::nt::server::HandleRestRequest(ServerStorage& storage,
   // +.
   auto queryPos = target.find('?');
   auto path = target.substr(0, queryPos);
+  if (path == "/nt/v1/persistent.json" || path == "/nt/persistent.json") {
+    return HandlePersistentRequest(storage, method, body, contentType, accept);
+  }
   bool collection = path == TOPICS_PATH;
   if (!collection && !path.starts_with(TOPIC_PREFIX)) {
     return Error(404, "Not Found", "Resource not found");

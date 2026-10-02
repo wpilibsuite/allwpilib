@@ -344,3 +344,99 @@ def test_rest_negotiation_keep_alive(rest_server):
         conn.close()
     assert request(port, "GET", path + "/value") == (200, 256)
     assert binary_request(port, "GET", path + "/value", accept="text/html")[0] == 406
+
+
+@pytest.mark.parametrize("path", ["/nt/v1/persistent.json", "/nt/persistent.json"])
+def test_rest_persistent_file_upload(rest_server, tmp_path, path):
+    server, port = rest_server
+    client = NetworkTableInstance.create()
+    client.start_client("persistence-upload-test")
+    client.set_server("127.0.0.1", port)
+    local_sub = server.get_integer_topic("/rest/upload").subscribe(0)
+    remote_sub = client.get_integer_topic("/rest/upload").subscribe(0)
+    try:
+        wait_for(client.is_connected)
+        initial = [
+            {
+                "name": "/rest/upload",
+                "type": "int",
+                "value": 1,
+                "properties": {"persistent": True, "old": "remove"},
+            },
+            {
+                "name": "/rest/keep",
+                "type": "int",
+                "value": 2,
+                "properties": {"persistent": True},
+            },
+        ]
+        assert request(port, "PUT", path, initial)[0] == 204
+        wait_for(lambda: local_sub.get() == 1 and remote_sub.get() == 1)
+        assert (
+            request(
+                port,
+                "PUT",
+                "/nt/v1/topics/%2Frest%2Ftransient",
+                {"type": "int", "value": 3},
+            )[0]
+            == 201
+        )
+        upload = [
+            {
+                "name": "/rest/upload",
+                "type": "int",
+                "value": 42,
+                "properties": {"persistent": True, "unit": "m"},
+            },
+            {
+                "name": "/rest/new",
+                "type": "raw",
+                "value": "AP8=",
+                "properties": {"persistent": True},
+            },
+        ]
+        assert request(port, "PUT", path, upload)[0] == 204
+        wait_for(lambda: local_sub.get() == 42 and remote_sub.get() == 42)
+        wait_for(lambda: remote_sub.get_topic().get_property("unit") == "m")
+        expected = {entry["name"]: entry for entry in [*upload, initial[1]]}
+        status, downloaded = request(port, "GET", path)
+        assert status == 200
+        assert {entry["name"]: entry for entry in downloaded} == expected
+        assert all("timestamp" not in entry for entry in downloaded)
+        assert (
+            request(port, "GET", "/nt/v1/topics/%2Frest%2Ftransient")[1]["value"] == 3
+        )
+        assert request(port, "PUT", path, [upload[0], {"invalid": True}])[0] == 400
+        assert request(port, "PUT", path, [dict(upload[0], type="double")])[0] == 409
+        assert request(port, "PUT", path, [upload[0], upload[0]])[0] == 400
+        assert {
+            entry["name"]: entry for entry in request(port, "GET", path)[1]
+        } == expected
+        assert request(port, "PUT", path, [])[0] == 204
+
+        persistent_file = tmp_path / "persistent.json"
+
+        def saved():
+            try:
+                return {
+                    entry["name"]: entry
+                    for entry in json.loads(persistent_file.read_text())
+                }
+            except (FileNotFoundError, json.JSONDecodeError):
+                return None
+
+        wait_for(lambda: saved() == expected)
+        # A new server can restore the downloaded file without conversion.
+        server.stop_server()
+        wait_for(lambda: not client.is_connected())
+        persistent_file.write_text(json.dumps(downloaded))
+        server.start_server(str(persistent_file), "127.0.0.1", "", port)
+        wait_for(client.is_connected)
+        wait_for(lambda: remote_sub.get() == 42)
+        assert {
+            entry["name"]: entry for entry in request(port, "GET", path)[1]
+        } == expected
+    finally:
+        remote_sub.close()
+        local_sub.close()
+        NetworkTableInstance.destroy(client)

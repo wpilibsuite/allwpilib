@@ -92,6 +92,60 @@ class RestApiTest {
               "application/json",
               "application/json",
               200));
+      String persistentUrl = "http://127.0.0.1:" + port + "/nt/v1/persistent.json";
+      try (var keep = inst.getIntegerTopic("/rest/keep").subscribe(0)) {
+        String upload =
+            """
+            [
+              {"name":"/rest/java","type":"int","value":50,"properties":{"persistent":true}},
+              {"name":"/rest/keep","type":"int","value":7,"properties":{"persistent":true}}
+            ]
+            """;
+        request(
+            persistentUrl,
+            "PUT",
+            upload.getBytes(StandardCharsets.UTF_8),
+            "application/json",
+            "application/json",
+            204);
+        assertEquals(50, sub.get());
+        assertEquals(7, keep.get());
+        upload =
+            """
+            [{"name":"/rest/java","type":"int","value":51,"properties":{"persistent":true}}]
+            """;
+        request(
+            persistentUrl,
+            "PUT",
+            upload.getBytes(StandardCharsets.UTF_8),
+            "application/json",
+            "application/json",
+            204);
+        assertEquals(51, sub.get());
+        assertEquals(7, keep.get());
+        assertTrue(keep.getTopic().isPersistent());
+        request(
+            persistentUrl,
+            "PUT",
+            "[]".getBytes(StandardCharsets.UTF_8),
+            "application/json",
+            "application/json",
+            204);
+        byte[] downloaded =
+            request(persistentUrl, "GET", null, "application/json", "application/json", 200);
+        request(persistentUrl, "PUT", downloaded, "application/json", "application/json", 204);
+        assertEquals(51, sub.get());
+        assertEquals(7, keep.get());
+        assertArrayEquals(
+            downloaded,
+            request(
+                "http://127.0.0.1:" + port + "/nt/persistent.json",
+                "GET",
+                null,
+                "application/json",
+                "application/json",
+                200));
+      }
       conn = (HttpURLConnection) url.openConnection();
       try {
         conn.setConnectTimeout(5000);

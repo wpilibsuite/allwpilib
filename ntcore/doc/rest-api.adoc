@@ -5,8 +5,7 @@ The ntcore server provides a REST API with JSON and MessagePack representations 
 (C++), `startServer()` (Java), or `start_server()` (RobotPy) enables the API.
 It operates on that server instance's topics, including topics published by
 local code and connected NT4 clients. Client-only instances do not host it.
-The existing `/` and `/nt/persistent.json` resources and WebSocket upgrades
-remain available.
+The existing `/` resource and WebSocket upgrades remain available.
 
 == Resources
 
@@ -24,6 +23,8 @@ remain available.
 |GET |`/nt/v1/topics/<name>/timestamp` |Read the cached value's timestamp (read-only).
 |GET, PUT |`/nt/v1/topics/<name>/value` |Read or write the unwrapped value of an existing topic.
 |GET, PUT, PATCH |`/nt/v1/topics/<name>/properties` |Read, replace, or merge properties of an existing topic.
+|GET, PUT |`/nt/v1/persistent.json` |Download or merge-upload a persistent JSON file.
+|GET, PUT |`/nt/persistent.json` |Alias for `/nt/v1/persistent.json`, preserving the existing download URL.
 |OPTIONS |Any resource |Return the allowed methods and CORS preflight headers.
 |===
 
@@ -55,7 +56,7 @@ A topic object looks like:
 NetworkTables time base, not Unix time. A topic without a cached value has
 `value: null` and `timestamp: 0`. This includes uncached topics. Nonfinite
 floating-point values (NaN and infinities) are returned as JSON `null`, including
-individual array elements. Clients can only write finite numbers.
+individual array elements. Topic resources accept only finite numbers on writes.
 
 == Writes and topic lifetime
 
@@ -107,9 +108,57 @@ so local and remote subscribers observe them. Normal NT caching, timestamps,
 and subscriber delivery periods still apply. REST requests do not create NT
 connections or publishers in the server's meta topics.
 
+== Persistent file upload and download
+
+GET `/nt/v1/persistent.json` downloads the current persistent topics using the
+same JSON serializer as the server's periodic persistence file writer. It is a
+live snapshot, rather than a read of the last file saved to disk. Only persistent
+topics with cached values are included. Each entry contains `name`, `type`,
+`value`, and `properties`, without a timestamp:
+
+[source,json]
+----
+[
+  {
+    "name": "/example/count",
+    "type": "int",
+    "value": 42,
+    "properties": {"persistent": true}
+  }
+]
+----
+
+PUT the JSON array directly to the same URL with
+`Content-Type: application/json`. A successful upload returns 204. It adds new
+topics and replaces the value and properties of each included topic. Existing
+topics must have the same type; a matching nonpersistent topic becomes
+persistent. Topics omitted from the upload are unchanged, so uploading `[]`
+is a no-op. Both operations are also available at `/nt/persistent.json`.
+
+The whole upload is validated before any topics change. Duplicate topic names,
+malformed entries, and invalid values return 400; existing type conflicts return
+409; meta topic writes return 403. Each entry must include
+`properties: {"persistent": true}` (other properties are allowed).
+`cached: false` is rejected. Entry validation errors identify the zero-based
+entry index. The same 2 MiB request body limit applies.
+
+Uploaded values and properties reach local and remote subscribers through the
+normal server notification path. The merged state is marked for saving by the
+normal periodic persistence writer; a successful response does not wait for
+the disk write. Downloaded files can also be used as the startup persistence
+file.
+
+These file resources use JSON only: MessagePack uploads return 415, and a GET
+that excludes JSON in `Accept` returns 406. Values use the persistence file
+encoding: raw and custom types, including `msgpack`, are base64 strings, and
+`json` topics contain JSON text as a string. Floating-point conversion matches
+the startup loader, including infinities encoded as overflowing JSON numbers.
+The existing file format writes NaN as `null`, which cannot be restored as a
+floating-point value by either the startup loader or this upload endpoint.
+
 == Content negotiation
 
-GET and complete-topic PUT responses support `Accept: application/json` and
+Topic GET and complete-topic PUT responses support `Accept: application/json` and
 `Accept: application/msgpack`. An absent Accept header defaults to JSON.
 The server honors media type lists, quality weights, and `application/*` and
 `*/*` wildcards, preferring JSON on equal quality. Explicit `q=0` excludes a
@@ -241,4 +290,11 @@ curl -X PUT 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount/value' \
 # Merge individual properties without a properties wrapper.
 curl -X PATCH 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount/properties' \
   -H 'Content-Type: application/json' -d '{"unit":"cycles"}'
+
+# Download persistent entries in the server's persistence file format.
+curl 'http://localhost:5810/nt/v1/persistent.json' -o networktables.json
+
+# Add or update entries from a file, preserving entries omitted from it.
+curl -X PUT 'http://localhost:5810/nt/v1/persistent.json' \
+  -H 'Content-Type: application/json' --data-binary @networktables.json
 ----

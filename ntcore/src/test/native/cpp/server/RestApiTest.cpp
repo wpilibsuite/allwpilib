@@ -4,6 +4,7 @@
 
 #include "server/RestApi.hpp"
 
+#include <array>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -13,8 +14,10 @@
 
 #include "../MockLogger.hpp"
 #include "server/RestCodec.hpp"
+#include "server/ServerClientLocal.hpp"
 #include "server/ServerStorage.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/raw_ostream.hpp"
 
 using namespace wpi::nt;
 using namespace wpi::nt::server;
@@ -73,6 +76,7 @@ TEST_CASE_METHOD(RestApiTest, "REST value types", "[ntcore][rest]") {
         TestValue{"int", "-9223372036854775808"}, TestValue{"float", "1.25"},
         TestValue{"double", "1.25"}, TestValue{"string", R"("hello\nworld")"},
         TestValue{"json", R"("{\"a\":1}")"}, TestValue{"raw", R"("AP8=")"},
+        TestValue{"msgpack", R"("gA==")"},
         TestValue{"struct:Example", R"("AP8=")"},
         TestValue{"boolean[]", "[true,false]"}, TestValue{"int[]", "[1,-2]"},
         TestValue{"float[]", "[1.25,-2.5]"},
@@ -84,6 +88,19 @@ TEST_CASE_METHOD(RestApiTest, "REST value types", "[ntcore][rest]") {
     auto result = Read();
     CHECK(result.at("type") == type);
     CHECK(result.at("value") == *json::parse(value));
+    REQUIRE(Request("PATCH", R"({"properties":{"persistent":true}})").status ==
+            204);
+    auto file = Request("GET", {}, "/nt/v1/persistent.json");
+    REQUIRE(file.status == 200);
+    REQUIRE(Request("DELETE").status == 204);
+    REQUIRE(Request("PUT", file.body, "/nt/v1/persistent.json").status == 204);
+    CHECK(Read().at("type") == type);
+    CHECK(Read().at("value") == *json::parse(value));
+    ServerStorage restored{logger, [](auto, auto) {}};
+    REQUIRE(restored.LoadPersistent(file.body).empty());
+    REQUIRE(restored.GetTopic("/test"));
+    CHECK(restored.GetTopic("/test")->lastValue ==
+          storage.GetTopic("/test")->lastValue);
     REQUIRE(Request("DELETE").status == 204);
   }
 }
@@ -400,4 +417,167 @@ TEST_CASE("REST MessagePack codec preserves numbers and bounds work",
     nested = json::array(std::move(nested));
   }
   CHECK_FALSE(RestEncodeMessagePack(nested));
+}
+
+TEST_CASE_METHOD(RestApiTest, "REST persistence file merges entries",
+                 "[ntcore][rest]") {
+  auto update =
+      storage.CreateTopic(nullptr, "/update", "int",
+                          json::object("persistent", true, "old", "remove"));
+  auto keep = storage.CreateTopic(nullptr, "/keep", "int",
+                                  json::object("persistent", true));
+  auto temporary = storage.CreateTopic(nullptr, "/temporary", "int",
+                                       json::object("retained", true));
+  storage.SetValue(nullptr, update, Value::MakeInteger(1));
+  storage.SetValue(nullptr, keep, Value::MakeInteger(2));
+  storage.SetValue(nullptr, temporary, Value::MakeInteger(3));
+  auto path = "/nt/v1/persistent.json";
+  CHECK(Read(path).get_array().size() == 2);
+  std::string dump;
+  wpi::util::raw_string_ostream os{dump};
+  storage.DumpPersistent(os);
+  os.flush();
+  CHECK(Request("GET", {}, path).body == dump);
+  CHECK(Request("GET", {}, "/nt/persistent.json").body == dump);
+  storage.PersistentChanged();
+  REQUIRE(Request("PUT", R"([
+    {"name":"/update","type":"int","value":10,"properties":{"persistent":true,"unit":"m"}},
+    {"name":"/added","type":"string","value":"new","properties":{"persistent":true}}
+  ])",
+                  path)
+              .status == 204);
+  CHECK(storage.PersistentChanged());
+  CHECK(update->lastValue.GetInteger() == 10);
+  CHECK(update->properties == json::object("persistent", true, "unit", "m"));
+  CHECK(keep->lastValue.GetInteger() == 2);
+  CHECK(keep->persistent);
+  CHECK(temporary->lastValue.GetInteger() == 3);
+  CHECK_FALSE(temporary->persistent);
+  REQUIRE(storage.GetTopic("/added"));
+  CHECK(storage.GetTopic("/added")->lastValue.GetString() == "new");
+  CHECK(Read(path).get_array().size() == 3);
+  REQUIRE(Request("PUT", "[]", path).status == 204);
+  CHECK_FALSE(storage.PersistentChanged());
+  CHECK(Read(path).get_array().size() == 3);
+}
+
+TEST_CASE_METHOD(RestApiTest, "REST persistence preserves floating point files",
+                 "[ntcore][rest]") {
+  for (auto&& [type, value] :
+       {std::pair{"float", Value::MakeFloat(std::numeric_limits<float>::max())},
+        std::pair{"float",
+                  Value::MakeFloat(std::numeric_limits<float>::infinity())},
+        std::pair{"double",
+                  Value::MakeDouble(-std::numeric_limits<double>::infinity())},
+        std::pair{"float[]", Value::MakeFloatArray(std::array{
+                                 std::numeric_limits<float>::max(),
+                                 -std::numeric_limits<float>::infinity()})},
+        std::pair{"double[]", Value::MakeDoubleArray(std::array{
+                                  std::numeric_limits<double>::max(),
+                                  std::numeric_limits<double>::infinity()})}}) {
+    INFO(type);
+    auto topic = storage.CreateTopic(nullptr, "/test", type,
+                                     json::object("persistent", true));
+    storage.SetValue(nullptr, topic, value);
+    auto file = Request("GET", {}, "/nt/v1/persistent.json");
+    REQUIRE(file.status == 200);
+    REQUIRE(Request("DELETE").status == 204);
+    REQUIRE(Request("PUT", file.body, "/nt/v1/persistent.json").status == 204);
+    REQUIRE(storage.GetTopic("/test"));
+    CHECK(storage.GetTopic("/test")->lastValue == value);
+    ServerStorage restored{logger, [](auto, auto) {}};
+    REQUIRE(restored.LoadPersistent(file.body).empty());
+    REQUIRE(restored.GetTopic("/test"));
+    CHECK(restored.GetTopic("/test")->lastValue == value);
+    REQUIRE(Request("DELETE").status == 204);
+  }
+}
+
+TEST_CASE_METHOD(RestApiTest,
+                 "REST persistence upload validates the whole file",
+                 "[ntcore][rest]") {
+  auto path = "/nt/v1/persistent.json";
+  auto entry = json::object("name", "/test", "type", "int", "value", 1,
+                            "properties", json::object("persistent", true));
+  REQUIRE(Request("PUT", json::array(entry).to_string(), path).status == 204);
+  auto original = Request("GET", {}, path).body;
+  storage.PersistentChanged();
+  entry["value"] = 2;
+  auto fresh = entry;
+  fresh["name"] = "/fresh";
+  for (auto [bad, status] :
+       {std::pair{json{}, 400}, std::pair{json::object("name", "/bad"), 400},
+        std::pair{json::object("name", "/bad", "type", "int", "value", 1,
+                               "properties", json::object()),
+                  400},
+        std::pair{json::object("name", "/bad", "type", "int", "value", 1,
+                               "properties", json::object("persistent", false)),
+                  400},
+        std::pair{json::object(
+                      "name", "/bad", "type", "int", "value", 1, "properties",
+                      json::object("persistent", true, "cached", false)),
+                  400},
+        std::pair{json::object("name", "/bad", "type", "int[]", "value",
+                               json::array(1, "bad"), "properties",
+                               json::object("persistent", true)),
+                  400},
+        std::pair{json::object("name", "/bad", "type", "raw", "value", "!",
+                               "properties", json::object("persistent", true)),
+                  400},
+        std::pair{json::object("name", "$clients", "type", "int", "value", 1,
+                               "properties", json::object("persistent", true)),
+                  403},
+        std::pair{json::object("name", "/test", "type", "double", "value", 1,
+                               "properties", json::object("persistent", true)),
+                  409}}) {
+    INFO(bad.to_string());
+    auto file = json::array(fresh, bad);
+    // Include an update before the invalid record to check rollback-free
+    // validation.
+    if (status != 409) {
+      file.get_array().insert(file.get_array().begin(), entry);
+    }
+    CHECK(Request("PUT", file.to_string(), path).status == status);
+    CHECK(Request("GET", {}, path).body == original);
+    CHECK_FALSE(storage.GetTopic("/fresh"));
+    CHECK_FALSE(storage.PersistentChanged());
+  }
+  CHECK(Request("PUT", json::array(entry, entry).to_string(), path).status ==
+        400);
+  CHECK(Request("GET", {}, path).body == original);
+  CHECK(Request("PUT", "{}", path).status == 400);
+  CHECK(Request("PUT", "[", path).status == 400);
+  CHECK(Request("PUT", "", path).status == 400);
+  CHECK(Request("DELETE", {}, path).status == 405);
+  CHECK(Request("OPTIONS", {}, path).allow == "GET, PUT, OPTIONS");
+  CHECK(HandleRestRequest(storage, "PUT", path, "[]", "application/msgpack")
+            .status == 415);
+  CHECK(HandleRestRequest(storage, "GET", path, {}, {}, "application/msgpack")
+            .status == 406);
+  CHECK(HandleRestRequest(storage, "GET", path, {}, {},
+                          "application/msgpack, application/json;q=0.5")
+            .status == 200);
+  CHECK(HandleRestRequest(storage, "GET", path, {}, {},
+                          "application/json;q=0, */*")
+            .status == 406);
+}
+
+TEST_CASE_METHOD(RestApiTest, "REST persistence imports update active topics",
+                 "[ntcore][rest]") {
+  ServerClientLocal client{storage, 0, logger};
+  auto topic = storage.CreateTopic(nullptr, "/test", "int",
+                                   json::object("retained", true));
+  storage.SetValue(&client, topic,
+                   Value::MakeInteger(1, std::numeric_limits<int64_t>::max()));
+  auto file =
+      R"([{"name":"/test","type":"int","value":2,"properties":{"persistent":true}}])";
+  REQUIRE(Request("PUT", file, "/nt/persistent.json").status == 204);
+  CHECK(topic->lastValue.GetInteger() == 2);
+  CHECK(topic->persistent);
+  storage.SetProperties(nullptr, topic, json::object("cached", false));
+  CHECK_FALSE(topic->lastValue);
+  REQUIRE(Request("PUT", file, "/nt/v1/persistent.json").status == 204);
+  CHECK(topic->cached);
+  CHECK(topic->lastValue.GetInteger() == 2);
+  CHECK(topic->properties == json::object("persistent", true));
 }
