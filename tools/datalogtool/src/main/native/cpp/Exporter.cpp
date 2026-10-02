@@ -6,11 +6,14 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <format>
 #include <functional>
 #include <future>
+#include <limits>
 #include <map>
 #include <memory>
 #include <ranges>
@@ -25,6 +28,7 @@
 #include <imgui_stdlib.h>
 
 #include "App.hpp"
+#include "CsvTable.hpp"
 #include "wpi/datalog/DataLogReaderThread.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/gui/portable-file-dialogs.h"
@@ -538,14 +542,15 @@ static void ValueToCsv(wpi::util::raw_ostream& os, const Entry& entry,
   wpi::util::print(os, "<invalid>");
 }
 
-static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
+static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style,
+                          int64_t timestampFuzziness) {
+  int columnNum = 0;
   // header
   if (style == 0) {
     os << "Timestamp,Name,Value\n";
   } else if (style == 1) {
     // scan for exported fields for this file to print header and assign columns
     os << "Timestamp";
-    int columnNum = 0;
     for (auto&& entry : gEntries) {
       if (entry.second->selected &&
           entry.second->inputFiles.find(&f) != entry.second->inputFiles.end()) {
@@ -560,6 +565,7 @@ static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
     os << '\n';
   }
 
+  CsvTable table{os, static_cast<size_t>(columnNum), timestampFuzziness};
   wpi::util::DenseMap<int, Entry*> nameMap;
   for (auto&& record : f.datalog->GetReader()) {
     if (record.IsStart()) {
@@ -589,18 +595,18 @@ static void ExportCsvFile(InputFile& f, wpi::util::raw_ostream& os, int style) {
         ValueToCsv(os, *entry, record);
         os << '\n';
       } else if (style == 1 && entry->column != -1) {
-        wpi::util::print(os, "{},", record.GetTimestamp() / 1'000'000'000.0);
-        for (int i = 0; i < entry->column; ++i) {
-          os << ',';
-        }
-        ValueToCsv(os, *entry, record);
-        os << '\n';
+        std::string value;
+        wpi::util::raw_string_ostream valueStream{value};
+        ValueToCsv(valueStream, *entry, record);
+        table.Add(record.GetTimestamp(), entry->column, value);
       }
     }
   }
+  table.Flush();
 }
 
-static void ExportCsv(std::string_view outputFolder, int style) {
+static void ExportCsv(std::string_view outputFolder, int style,
+                      int64_t timestampFuzziness) {
   fs::path outPath{outputFolder};
   for (auto&& f : gInputFiles) {
     if (f.second->datalog) {
@@ -616,7 +622,7 @@ static void ExportCsv(std::string_view outputFolder, int style) {
         continue;
       }
       wpi::util::raw_fd_ostream os{fs::FileToFd(of, ec, fs::OF_Text), true};
-      ExportCsvFile(*f.second, os, style);
+      ExportCsvFile(*f.second, os, style, timestampFuzziness);
     }
     ++gExportCount;
   }
@@ -624,6 +630,8 @@ static void ExportCsv(std::string_view outputFolder, int style) {
 
 void DisplayOutput(wpi::glass::Storage& storage) {
   static std::string& outputFolder = storage.GetString("outputFolder");
+  static double& timestampFuzzinessMs =
+      storage.GetDouble("timestampFuzzinessMs");
   static std::unique_ptr<pfd::select_folder> outputFolderSelector;
 
   SetNextWindowPos(ImVec2{380, 390}, ImGuiCond_FirstUseEver);
@@ -641,6 +649,28 @@ void DisplayOutput(wpi::glass::Storage& storage) {
     ImGui::Combo("Style", &style, options,
                  sizeof(options) / sizeof(const char*));
 
+    if (style == 1) {
+      ImGui::SameLine();
+      ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+      ImGui::InputDouble("Timestamp fuzziness (ms)", &timestampFuzzinessMs, 0.0,
+                         0.0, "%.6f");
+      ImGui::SetItemTooltip(
+          "Group consecutive changes whose timestamps span at most this "
+          "duration.\n"
+          "Each row uses the earliest timestamp and the last value for each "
+          "field.\n"
+          "Zero merges only identical timestamps.");
+    }
+    // Keep conversion to integer nanoseconds in range, including saved
+    // settings.
+    constexpr double MAX_TIMESTAMP_FUZZINESS_MS =
+        std::numeric_limits<int64_t>::max() / 1'000'000;
+    if (!std::isfinite(timestampFuzzinessMs)) {
+      timestampFuzzinessMs = 0;
+    }
+    timestampFuzzinessMs =
+        std::clamp(timestampFuzzinessMs, 0.0, MAX_TIMESTAMP_FUZZINESS_MS);
+
     static std::future<void> exporter;
     if (!gInputFiles.empty() && !outputFolder.empty() &&
         ImGui::Button("Export CSV") &&
@@ -648,7 +678,9 @@ void DisplayOutput(wpi::glass::Storage& storage) {
          gExportCount == static_cast<int>(gInputFiles.size()))) {
       gExportCount = 0;
       gExportErrors.clear();
-      exporter = std::async(std::launch::async, ExportCsv, outputFolder, style);
+      exporter = std::async(
+          std::launch::async, ExportCsv, outputFolder, style,
+          static_cast<int64_t>(std::round(timestampFuzzinessMs * 1'000'000.0)));
     }
     if (exporter.valid()) {
       ImGui::SameLine();
