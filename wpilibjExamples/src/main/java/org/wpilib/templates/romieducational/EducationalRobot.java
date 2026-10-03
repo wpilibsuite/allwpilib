@@ -4,13 +4,7 @@
 
 package org.wpilib.templates.romieducational;
 
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.internal.DriverStationBackend;
-import org.wpilib.framework.RobotBase;
-import org.wpilib.hardware.hal.ControlWord;
-import org.wpilib.hardware.hal.RobotMode;
-import org.wpilib.internal.DriverStationModeThread;
-import org.wpilib.util.WPIUtilJNI;
+import module wpilib;
 
 /** Educational robot base class. */
 public class EducationalRobot extends RobotBase {

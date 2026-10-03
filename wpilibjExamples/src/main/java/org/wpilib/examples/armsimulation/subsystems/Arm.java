@@ -7,23 +7,10 @@ package org.wpilib.examples.armsimulation.subsystems;
 import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 import static org.wpilib.math.util.UnitConversions.radiansToDegrees;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
+import module wpilib;
+import module wpilib.drivers;
+
 import org.wpilib.examples.armsimulation.Constants;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.system.DCMotor;
-import org.wpilib.preferences.Preferences;
-import org.wpilib.simulation.BatterySim;
-import org.wpilib.simulation.EncoderSim;
-import org.wpilib.simulation.RoboRioSim;
-import org.wpilib.simulation.SingleJointedArmSim;
-import org.wpilib.smartdashboard.Mechanism2d;
-import org.wpilib.smartdashboard.MechanismLigament2d;
-import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.system.RobotController;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.util.Color;
-import org.wpilib.util.Color8Bit;
 
 public class Arm implements AutoCloseable {
   // The P gain for the PID controller that drives this arm.

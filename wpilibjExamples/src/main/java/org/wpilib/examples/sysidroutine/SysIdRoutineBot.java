@@ -4,10 +4,8 @@
 
 package org.wpilib.examples.sysidroutine;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.command2.button.Trigger;
-import org.wpilib.command2.sysid.SysIdRoutine;
+import module wpilib.command2;
+
 import org.wpilib.examples.sysidroutine.Constants.OIConstants;
 import org.wpilib.examples.sysidroutine.subsystems.Drive;
 import org.wpilib.examples.sysidroutine.subsystems.Shooter;

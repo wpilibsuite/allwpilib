@@ -7,17 +7,13 @@ package org.wpilib.examples.rebuiltcmdv3;
 import static org.wpilib.examples.rebuiltcmdv3.constants.FieldConstants.NEUTRAL_ZONE;
 import static org.wpilib.units.Units.Meters;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Scheduler;
-import org.wpilib.command3.Trigger;
-import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.epilogue.generated.Epilogue;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Intake;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.Shooter;
 import org.wpilib.examples.rebuiltcmdv3.mechanisms.SwerveDrive;
-import org.wpilib.framework.OpModeRobot;
-import org.wpilib.math.geometry.Pose2d;
 
 @Logged
 public class Robot extends OpModeRobot {

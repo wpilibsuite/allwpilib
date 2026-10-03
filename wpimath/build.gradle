@@ -17,8 +17,8 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/sleipnir/include',
-                            'src/main/native/thirdparty/sleipnir/src'
+                    'src/main/native/thirdparty/sleipnir/include',
+                    'src/main/native/thirdparty/sleipnir/src'
                 }
             }
             nanopbCpp(CppSourceSet) {
@@ -64,10 +64,10 @@ model {
             it.sources.each {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include',
-                            'src/main/native/thirdparty/eigen/include',
-                            'src/main/native/thirdparty/gcem/include',
-                            'src/main/native/thirdparty/sleipnir/include',
-                            'src/generated/main/native/cpp'
+                    'src/main/native/thirdparty/eigen/include',
+                    'src/main/native/thirdparty/gcem/include',
+                    'src/main/native/thirdparty/sleipnir/include',
+                    'src/generated/main/native/cpp'
                 }
             }
         }

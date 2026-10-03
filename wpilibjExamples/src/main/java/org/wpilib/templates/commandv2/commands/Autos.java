@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.commandv2.commands;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
+import module wpilib.command2;
+
 import org.wpilib.templates.commandv2.subsystems.ExampleSubsystem;
 
 public final class Autos {

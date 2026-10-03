@@ -4,7 +4,8 @@
 
 package org.wpilib.templates.romicommandv2.commands;
 
-import org.wpilib.command2.Command;
+import module wpilib.command2;
+
 import org.wpilib.templates.romicommandv2.subsystems.RomiDrivetrain;
 
 /** An example command that uses an example subsystem. */

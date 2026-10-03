@@ -4,10 +4,9 @@
 
 package org.wpilib.templates.romicommandv2.subsystems;
 
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.Spark;
-import org.wpilib.hardware.rotation.Encoder;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.drivers;
 
 public class RomiDrivetrain extends SubsystemBase {
   private static final double COUNTS_PER_REVOLUTION = 1440.0;

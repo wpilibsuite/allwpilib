@@ -4,14 +4,8 @@
 
 package org.wpilib.snippets.eventloop;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.event.BooleanEvent;
-import org.wpilib.event.EventLoop;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
+import module wpilib;
+import module wpilib.drivers;
 
 public class Robot extends TimedRobot {
   public static final double SHOT_VELOCITY = 200; // rpm

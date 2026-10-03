@@ -4,11 +4,10 @@
 
 package org.wpilib.examples.unittest.subsystems;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
+import module wpilib;
+import module wpilib.drivers;
+
 import org.wpilib.examples.unittest.Constants.IntakeConstants;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.DoubleSolenoid;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 
 public class Intake implements AutoCloseable {
   private final PWMSparkMax motor;

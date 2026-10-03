@@ -60,7 +60,9 @@ nativeUtils.platformConfigs.named(nativeUtils.wpi.platforms.windowsx64).configur
 }
 
 ext {
-    sharedCvConfigs = examplesMap + templatesMap + snippetsMap.collectEntries { key, value -> ['snippets' + key, value] } + [commands: []]
+    sharedCvConfigs = examplesMap + templatesMap + snippetsMap.collectEntries { key, value ->
+        ['snippets' + key, value]
+    } + [commands: []]
     staticCvConfigs = [:]
     useJava = false
     useCpp = true

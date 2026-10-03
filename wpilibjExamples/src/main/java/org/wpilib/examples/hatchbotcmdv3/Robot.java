@@ -4,18 +4,12 @@
 
 package org.wpilib.examples.hatchbotcmdv3;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Scheduler;
-import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.driverstation.DriverStation;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.examples.hatchbotcmdv3.commands.Autos;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.DriveMechanism;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.HatchMechanism;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.system.DataLogManager;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

@@ -126,7 +126,7 @@ public final class SplineParameterizer {
         throw new MalformedSplineException(MALFORMED_SPLINE_EXCEPTION_MSG);
       }
 
-      final var twist = (end.get().pose.minus(start.get().pose)).log();
+      final var twist = end.get().pose.minus(start.get().pose).log();
       if (Math.abs(twist.dy) > MAX_DY
           || Math.abs(twist.dx) > MAX_DX
           || Math.abs(twist.dtheta) > MAX_DTHETA) {

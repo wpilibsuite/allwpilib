@@ -6,11 +6,7 @@ package org.wpilib.examples.rebuiltcmdv3.lookup;
 
 import static org.wpilib.units.Units.Value;
 
-import org.wpilib.math.interpolation.Interpolator;
-import org.wpilib.math.interpolation.InverseInterpolator;
-import org.wpilib.units.Measure;
-import org.wpilib.units.Unit;
-import org.wpilib.units.measure.Dimensionless;
+import module wpilib;
 
 /** Utility class for working with unit-based interpolating tree maps. */
 public final class LookupTables {

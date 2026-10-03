@@ -4,7 +4,8 @@
 
 package org.wpilib.examples.xrpreference.commands;
 
-import org.wpilib.command2.SequentialCommandGroup;
+import module wpilib.command2;
+
 import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class AutonomousDistance extends SequentialCommandGroup {

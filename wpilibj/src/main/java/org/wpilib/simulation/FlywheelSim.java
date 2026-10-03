@@ -108,7 +108,7 @@ public class FlywheelSim extends LinearSystemSim<N1, N1, N1> {
    * @return The flywheel's acceleration in rad/s².
    */
   public double getAngularAcceleration() {
-    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
+    var acceleration = m_plant.getA().times(m_x).plus(m_plant.getB().times(m_u));
     return acceleration.get(0, 0);
   }
 

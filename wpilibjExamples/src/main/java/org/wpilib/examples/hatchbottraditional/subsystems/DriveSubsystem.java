@@ -4,12 +4,11 @@
 
 package org.wpilib.examples.hatchbottraditional.subsystems;
 
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.PWMSparkMax;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.drivers;
+
 import org.wpilib.examples.hatchbottraditional.Constants.DriveConstants;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.

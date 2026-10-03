@@ -4,8 +4,7 @@
 
 package org.wpilib.templates.commandv3;
 
-import org.wpilib.opmode.OpMode;
-import org.wpilib.opmode.Teleop;
+import module wpilib;
 
 @Teleop
 public class ExampleTeleop implements OpMode {

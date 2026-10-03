@@ -4,12 +4,8 @@
 
 package org.wpilib.snippets.profiledpidfeedforward;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.ProfiledPIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.trajectory.TrapezoidProfile;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * ProfiledPIDController with feedforward snippets for wpilib-docs.

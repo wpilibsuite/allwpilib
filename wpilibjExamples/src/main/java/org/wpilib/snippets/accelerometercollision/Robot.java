@@ -4,10 +4,9 @@
 
 package org.wpilib.snippets.accelerometercollision;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.imu.OnboardIMU;
+import module wpilib;
+
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
-import org.wpilib.telemetry.Telemetry;
 
 /**
  * Collision detection snippets for wpilib-docs.

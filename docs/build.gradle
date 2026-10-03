@@ -159,7 +159,7 @@ tasks.register("zipCppDocs", Zip) {
     archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn doxygenDox
-    from ("$buildDir/docs/doxygen/html")
+    from("$buildDir/docs/doxygen/html")
     into '/'
 }
 
@@ -336,7 +336,7 @@ tasks.register("zipJavaDocs", Zip) {
     archiveVersion = ""
     destinationDirectory = outputsFolder
     dependsOn generateJavaDocs
-    from ("$buildDir/docs/javadoc")
+    from("$buildDir/docs/javadoc")
     into '/'
 }
 

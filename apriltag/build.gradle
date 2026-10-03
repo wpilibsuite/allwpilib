@@ -20,7 +20,7 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/thirdparty/apriltag/include',
-                            'src/main/native/thirdparty/apriltag/include/common'
+                    'src/main/native/thirdparty/apriltag/include/common'
                 }
             }
         }
@@ -75,8 +75,8 @@ model {
             it.sources.each {
                 it.exportedHeaders {
                     srcDirs 'src/main/native/include',
-                            'src/main/native/thirdparty/apriltag/include',
-                            'src/main/native/thirdparty/apriltag/include/common'
+                    'src/main/native/thirdparty/apriltag/include',
+                    'src/main/native/thirdparty/apriltag/include/common'
                 }
             }
         }

@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.onboardimu;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.imu.OnboardIMU;
+import module wpilib;
+
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
 
 /**

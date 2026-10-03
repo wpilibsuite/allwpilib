@@ -6,15 +6,7 @@ package org.wpilib.examples.swervedriveposeestimator;
 
 import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
-import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.system.Timer;
+import module wpilib;
 
 /** Represents a swerve drive style drivetrain. */
 public class Drivetrain {

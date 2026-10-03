@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.analogencoder;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.AnalogEncoder;
+import module wpilib;
 
 /**
  * AnalogEncoder snippets for wpilib-docs.

@@ -104,7 +104,7 @@ public final class NumericalIntegration {
     Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)), u);
     Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)), u);
 
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
+    return x.plus(k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4).times(h / 6.0));
   }
 
   /**
@@ -125,7 +125,7 @@ public final class NumericalIntegration {
     Matrix<States, N1> k3 = f.apply(x.plus(k2.times(h * 0.5)));
     Matrix<States, N1> k4 = f.apply(x.plus(k3.times(h)));
 
-    return x.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
+    return x.plus(k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4).times(h / 6.0));
   }
 
   /**
@@ -151,7 +151,7 @@ public final class NumericalIntegration {
     Matrix<Rows, Cols> k3 = f.apply(t + dt * 0.5, y.plus(k2.times(h * 0.5)));
     Matrix<Rows, Cols> k4 = f.apply(t + dt, y.plus(k3.times(h)));
 
-    return y.plus((k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4)).times(h / 6.0));
+    return y.plus(k1.plus(k2.times(2.0)).plus(k3.times(2.0)).plus(k4).times(h / 6.0));
   }
 
   /**
@@ -266,14 +266,14 @@ public final class NumericalIntegration {
       var k7 = f.apply(newX, u);
 
       double truncationError =
-          (k1.times(b1[0] - b2[0])
-                  .plus(k2.times(b1[1] - b2[1]))
-                  .plus(k3.times(b1[2] - b2[2]))
-                  .plus(k4.times(b1[3] - b2[3]))
-                  .plus(k5.times(b1[4] - b2[4]))
-                  .plus(k6.times(b1[5] - b2[5]))
-                  .plus(k7.times(b1[6] - b2[6]))
-                  .times(h))
+          k1.times(b1[0] - b2[0])
+              .plus(k2.times(b1[1] - b2[1]))
+              .plus(k3.times(b1[2] - b2[2]))
+              .plus(k4.times(b1[3] - b2[3]))
+              .plus(k5.times(b1[4] - b2[4]))
+              .plus(k6.times(b1[5] - b2[5]))
+              .plus(k7.times(b1[6] - b2[6]))
+              .times(h)
               .normF();
 
       if (truncationError <= maxError) {
@@ -387,14 +387,14 @@ public final class NumericalIntegration {
       var k7 = f.apply(t + h * c[5], newY);
 
       double truncationError =
-          (k1.times(b1[0] - b2[0])
-                  .plus(k2.times(b1[1] - b2[1]))
-                  .plus(k3.times(b1[2] - b2[2]))
-                  .plus(k4.times(b1[3] - b2[3]))
-                  .plus(k5.times(b1[4] - b2[4]))
-                  .plus(k6.times(b1[5] - b2[5]))
-                  .plus(k7.times(b1[6] - b2[6]))
-                  .times(h))
+          k1.times(b1[0] - b2[0])
+              .plus(k2.times(b1[1] - b2[1]))
+              .plus(k3.times(b1[2] - b2[2]))
+              .plus(k4.times(b1[3] - b2[3]))
+              .plus(k5.times(b1[4] - b2[4]))
+              .plus(k6.times(b1[5] - b2[5]))
+              .plus(k7.times(b1[6] - b2[6]))
+              .times(h)
               .normF();
 
       if (truncationError <= maxError) {

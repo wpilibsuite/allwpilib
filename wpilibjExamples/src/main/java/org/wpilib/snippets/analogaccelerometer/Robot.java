@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.analogaccelerometer;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.accelerometer.AnalogAccelerometer;
+import module wpilib;
 
 /**
  * AnalogAccelerometer snippets for wpilib-docs.

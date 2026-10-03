@@ -4,11 +4,8 @@
 
 package org.wpilib.examples.mecanumdrive;
 
-import org.wpilib.drive.MecanumDrive;
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.imu.OnboardIMU;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * This is a sample program that uses mecanum drive with a gyro sensor to maintain rotation vectors

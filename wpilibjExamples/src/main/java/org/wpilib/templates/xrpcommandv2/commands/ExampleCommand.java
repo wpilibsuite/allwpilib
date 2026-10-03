@@ -4,7 +4,8 @@
 
 package org.wpilib.templates.xrpcommandv2.commands;
 
-import org.wpilib.command2.Command;
+import module wpilib.command2;
+
 import org.wpilib.templates.xrpcommandv2.subsystems.XRPDrivetrain;
 
 /** An example command that uses an example subsystem. */

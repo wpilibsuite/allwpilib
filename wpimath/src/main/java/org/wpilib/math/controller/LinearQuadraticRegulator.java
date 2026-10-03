@@ -295,6 +295,6 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
     var discA = discABPair.getFirst();
     var discB = discABPair.getSecond();
 
-    m_K = m_K.times((discA.minus(discB.times(m_K))).pow(inputDelay / dt));
+    m_K = m_K.times(discA.minus(discB.times(m_K)).pow(inputDelay / dt));
   }
 }

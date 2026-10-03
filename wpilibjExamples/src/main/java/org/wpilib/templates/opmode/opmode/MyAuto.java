@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.opmode.opmode;
 
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.PeriodicOpMode;
+import module wpilib;
+
 import org.wpilib.templates.opmode.Robot;
 
 @Autonomous(name = "My Auto", group = "Group 1")

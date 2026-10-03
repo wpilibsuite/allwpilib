@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.rebuiltcmdv3.stubs;
 
-import org.wpilib.math.kinematics.ChassisVelocities;
+import module wpilib;
 
 /**
  * A stub interface for an API that could plausibly follow a path. No WPILib code exists for this;

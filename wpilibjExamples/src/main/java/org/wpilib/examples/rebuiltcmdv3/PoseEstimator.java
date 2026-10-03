@@ -4,13 +4,9 @@
 
 package org.wpilib.examples.rebuiltcmdv3;
 
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+
 import org.wpilib.examples.rebuiltcmdv3.constants.DriveConstants;
-import org.wpilib.math.estimator.SwerveDrivePoseEstimator;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.shape.Rectangle2d;
 
 @Logged
 public class PoseEstimator {

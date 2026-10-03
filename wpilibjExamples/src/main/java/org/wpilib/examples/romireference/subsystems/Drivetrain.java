@@ -4,12 +4,10 @@
 
 package org.wpilib.examples.romireference.subsystems;
 
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.Spark;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.romi.RomiGyro;
-import org.wpilib.telemetry.TelemetryTable;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.drivers;
+import module wpilib.romi;
 
 public class Drivetrain extends SubsystemBase {
   private static final double COUNTS_PER_REVOLUTION = 1440.0;

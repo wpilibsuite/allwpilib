@@ -4,9 +4,9 @@
 
 package org.wpilib.templates.commandv3;
 
-import org.wpilib.command3.Scheduler;
-import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.framework.OpModeRobot;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.templates.commandv3.constants.DriverConstants;
 import org.wpilib.templates.commandv3.mechanisms.ExampleMechanism;
 

@@ -4,8 +4,9 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
+import module wpilib.command2;
+
 import java.util.function.DoubleSupplier;
-import org.wpilib.command2.Command;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
 /**

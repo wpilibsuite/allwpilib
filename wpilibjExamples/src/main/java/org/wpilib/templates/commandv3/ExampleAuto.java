@@ -4,8 +4,7 @@
 
 package org.wpilib.templates.commandv3;
 
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.OpMode;
+import module wpilib;
 
 @Autonomous
 public class ExampleAuto implements OpMode {

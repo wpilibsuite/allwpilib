@@ -15,9 +15,9 @@ def findWindowsCppWinrtIncludeDir = {
     if (sdkDir != null && !sdkDir.isEmpty()) {
         sdkVersions.each {
             candidates << new File(new File(new File(sdkDir), 'Include'), it)
-                    .toPath()
-                    .normalize()
-                    .toFile()
+            .toPath()
+            .normalize()
+            .toFile()
         }
     }
 
@@ -25,7 +25,9 @@ def findWindowsCppWinrtIncludeDir = {
     if (programFilesX86 != null && !programFilesX86.isEmpty()) {
         def includeRoot = new File(programFilesX86, 'Windows Kits/10/Include')
         if (includeRoot.isDirectory()) {
-            def versionDirs = includeRoot.listFiles({ File file -> file.isDirectory() } as FileFilter)
+            def versionDirs = includeRoot.listFiles({ File file ->
+                file.isDirectory()
+            } as FileFilter)
             if (versionDirs != null) {
                 versionDirs.sort { a, b -> b.name <=> a.name }.each {
                     candidates << it

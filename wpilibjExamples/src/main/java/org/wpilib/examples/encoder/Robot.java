@@ -4,10 +4,7 @@
 
 package org.wpilib.examples.encoder;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.CounterBase;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
 
 /**
  * Sample program displaying the value of a quadrature encoder on the SmartDashboard. Quadrature

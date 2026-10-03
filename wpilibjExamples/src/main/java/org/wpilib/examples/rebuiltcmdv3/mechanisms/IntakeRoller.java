@@ -6,9 +6,9 @@ package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 
 import static org.wpilib.units.Units.RadiansPerSecond;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.examples.rebuiltcmdv3.constants.IntakeConstants;
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
 

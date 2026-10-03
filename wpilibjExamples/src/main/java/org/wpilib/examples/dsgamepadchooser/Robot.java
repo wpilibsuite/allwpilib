@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.dsgamepadchooser;
 
-import org.wpilib.framework.OpModeRobot;
+import module wpilib;
 
 /**
  * Demonstrates DSGamepadChooser with opmodes. The autonomous opmodes each own a different

@@ -4,11 +4,9 @@
 
 package org.wpilib.snippets.accelerometerfilter;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.imu.OnboardIMU;
+import module wpilib;
+
 import org.wpilib.hardware.imu.OnboardIMU.MountOrientation;
-import org.wpilib.math.filter.LinearFilter;
-import org.wpilib.telemetry.Telemetry;
 
 /**
  * Accelerometer filtering snippets for wpilib-docs.

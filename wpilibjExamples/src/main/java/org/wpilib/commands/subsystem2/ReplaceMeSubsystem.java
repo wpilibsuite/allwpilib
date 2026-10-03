@@ -4,7 +4,7 @@
 
 package org.wpilib.commands.subsystem2;
 
-import org.wpilib.command2.SubsystemBase;
+import module wpilib.command2;
 
 public class ReplaceMeSubsystem extends SubsystemBase {
   /** Creates a new ReplaceMeSubsystem. */

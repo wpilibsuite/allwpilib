@@ -4,11 +4,8 @@
 
 package org.wpilib.examples.xrptimed;
 
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.system.Timer;
-import org.wpilib.xrp.XRPMotor;
+import module wpilib;
+import module wpilib.xrp;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

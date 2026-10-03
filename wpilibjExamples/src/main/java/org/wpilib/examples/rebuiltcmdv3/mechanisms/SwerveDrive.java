@@ -8,24 +8,13 @@ import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.Radians;
 import static org.wpilib.units.Units.RadiansPerSecond;
 
+import module wpilib;
+import module wpilib.command3;
+
 import java.util.function.Supplier;
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.command3.button.CommandGamepad;
-import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.constants.DriveConstants;
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
 import org.wpilib.examples.rebuiltcmdv3.stubs.PathFollower;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
-import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleVelocity;
-import org.wpilib.units.measure.Angle;
-import org.wpilib.units.measure.AngularVelocity;
 
 @Logged
 public class SwerveDrive implements Mechanism {

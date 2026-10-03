@@ -4,11 +4,9 @@
 
 package org.wpilib.examples.driverstationdisplayansi;
 
-import org.wpilib.driverstation.DriverStationDisplay;
+import module wpilib;
+
 import org.wpilib.driverstation.DriverStationDisplay.Mode;
-import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.opmode.Teleop;
-import org.wpilib.system.Timer;
 
 @Teleop(name = "Default Teleop")
 public class DefaultTeleop extends PeriodicOpMode {

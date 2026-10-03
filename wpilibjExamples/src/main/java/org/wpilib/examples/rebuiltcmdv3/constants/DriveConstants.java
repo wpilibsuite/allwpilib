@@ -8,10 +8,7 @@ import static org.wpilib.units.Units.FeetPerSecond;
 import static org.wpilib.units.Units.Inches;
 import static org.wpilib.units.Units.RotationsPerSecond;
 
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.SwerveDriveKinematics;
-import org.wpilib.units.measure.AngularVelocity;
-import org.wpilib.units.measure.LinearVelocity;
+import module wpilib;
 
 public final class DriveConstants {
   // +X is front, +Y is left

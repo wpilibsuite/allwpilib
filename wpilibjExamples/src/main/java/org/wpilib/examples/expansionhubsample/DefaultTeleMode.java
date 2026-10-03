@@ -4,10 +4,7 @@
 
 package org.wpilib.examples.expansionhubsample;
 
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.opmode.Teleop;
+import module wpilib;
 
 @Teleop
 public class DefaultTeleMode extends PeriodicOpMode {

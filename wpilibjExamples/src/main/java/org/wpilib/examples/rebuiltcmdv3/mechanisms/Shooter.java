@@ -8,15 +8,11 @@ import static org.wpilib.units.Units.Degrees;
 import static org.wpilib.units.Units.Meters;
 import static org.wpilib.units.Units.RPM;
 
+import module wpilib;
+import module wpilib.command3;
+
 import java.util.function.Supplier;
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.lookup.LookupTables;
-import org.wpilib.math.interpolation.InterpolatingTreeMap;
-import org.wpilib.units.measure.Angle;
-import org.wpilib.units.measure.AngularVelocity;
-import org.wpilib.units.measure.Distance;
 
 @Logged
 public class Shooter implements Mechanism {

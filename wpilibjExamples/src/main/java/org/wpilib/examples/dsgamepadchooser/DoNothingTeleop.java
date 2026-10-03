@@ -4,8 +4,7 @@
 
 package org.wpilib.examples.dsgamepadchooser;
 
-import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.opmode.Teleop;
+import module wpilib;
 
 /** A teleop opmode that intentionally does nothing. */
 @Teleop(name = "Do Nothing Teleop")

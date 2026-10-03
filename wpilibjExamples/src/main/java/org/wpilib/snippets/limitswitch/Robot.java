@@ -4,10 +4,8 @@
 
 package org.wpilib.snippets.limitswitch;
 
-import org.wpilib.drivers.motor.PWMVictorSPX;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.DigitalInput;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * Limit Switch snippets for wpilib-docs.

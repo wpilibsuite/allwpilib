@@ -4,7 +4,7 @@
 
 package org.wpilib.commands.parallelcommandgroup;
 
-import org.wpilib.command2.ParallelCommandGroup;
+import module wpilib.command2;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

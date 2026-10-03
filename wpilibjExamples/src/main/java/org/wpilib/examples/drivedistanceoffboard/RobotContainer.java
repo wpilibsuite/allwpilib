@@ -4,10 +4,9 @@
 
 package org.wpilib.examples.drivedistanceoffboard;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.driverstation.Gamepad;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.drivedistanceoffboard.Constants.OIConstants;
 import org.wpilib.examples.drivedistanceoffboard.subsystems.DriveSubsystem;
 

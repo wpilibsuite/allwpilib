@@ -4,8 +4,7 @@
 
 package org.wpilib.commands.paralleldeadlinegroup;
 
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.ParallelDeadlineGroup;
+import module wpilib.command2;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:

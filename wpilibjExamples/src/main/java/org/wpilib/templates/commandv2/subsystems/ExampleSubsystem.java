@@ -4,8 +4,7 @@
 
 package org.wpilib.templates.commandv2.subsystems;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
+import module wpilib.command2;
 
 public class ExampleSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
