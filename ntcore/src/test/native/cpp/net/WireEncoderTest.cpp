@@ -368,8 +368,8 @@ TEST_CASE_METHOD(WireEncoderBinaryTest, "Wire timestamps use negotiated units",
        {6001, 6},
        {-6001, -6},
        {9'007'199'254'740'993, 9'007'199'254'740},
-       {std::numeric_limits<int64_t>::max(), 9'223'372'036'854'775},
-       {std::numeric_limits<int64_t>::min(), -9'223'372'036'854'775}}));
+       {(std::numeric_limits<int64_t>::max)(), 9'223'372'036'854'775},
+       {(std::numeric_limits<int64_t>::min)(), -9'223'372'036'854'775}}));
   CAPTURE(version, time);
   REQUIRE(net::WireEncodeBinary(os, 5, time, Value::MakeInteger(7), version));
   mpack::mpack_reader_t reader;

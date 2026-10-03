@@ -159,7 +159,7 @@ TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
   std::vector<uint8_t> encoded;
   wpi::util::raw_uvector_ostream os{encoded};
   WireEncodeBinary(os, -1, 1,
-                   Value::MakeInteger(std::numeric_limits<int64_t>::min()),
+                   Value::MakeInteger((std::numeric_limits<int64_t>::min)()),
                    NT_4_1);
 
   client.ProcessIncomingBinary(0, encoded);

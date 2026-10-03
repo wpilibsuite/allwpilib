@@ -128,7 +128,7 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
                                      serverTimeAtResponse) ||
               wpi::util::SubOverflow(serverTimeAtResponse, now,
                                      serverTimeOffsetNs) ||
-              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
+              serverTimeOffsetNs == (std::numeric_limits<int64_t>::min)()) {
             WARN("RTT ping response has invalid timestamp values");
             continue;
           }

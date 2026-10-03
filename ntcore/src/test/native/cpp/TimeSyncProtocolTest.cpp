@@ -286,8 +286,8 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest AccumulatesMetadata",
 TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest FilterIntegerLimits",
                  "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
-  constexpr auto MAX = std::numeric_limits<int64_t>::max();
-  constexpr auto MIN = std::numeric_limits<int64_t>::min();
+  constexpr auto MAX = (std::numeric_limits<int64_t>::max)();
+  constexpr auto MIN = (std::numeric_limits<int64_t>::min)();
   TimeMedianFilter<2> filter;
   CHECK(filter.Calculate(MAX) == MAX);
   CHECK(filter.Calculate(MAX) == MAX);

@@ -21,7 +21,7 @@ void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
                                                 wpi::tsp::TspPing ping,
                                                 wpi::tsp::TspPong pong) {
   constexpr auto MAX_TIME =
-      static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+      static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
   if (pong_local_time < ping.client_time || pong_local_time > MAX_TIME ||
       ping.client_time > MAX_TIME || pong.server_time > MAX_TIME) {
     WPI_WARNING(m_logger, "Invalid TSP timestamp values");

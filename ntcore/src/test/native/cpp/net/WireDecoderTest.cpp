@@ -57,8 +57,8 @@ TEST_CASE("WireDecodeBinary rejects overflowing timestamp adjustments",
     CHECK(input.size() == encoded.size());
   };
 
-  check(std::numeric_limits<int64_t>::max(), 808);
-  check(std::numeric_limits<int64_t>::min(), -809);
+  check((std::numeric_limits<int64_t>::max)(), 808);
+  check((std::numeric_limits<int64_t>::min)(), -809);
 }
 
 TEST_CASE_METHOD(WireDecodeTextClientTest,
@@ -295,12 +295,13 @@ TEST_CASE("Wire timestamps decode negotiated units and check overflow",
            {6001, 123, 6'001'123, 6124},
            {9'007'199'254'740'993, 0, 9'007'199'254'740'993'000,
             9'007'199'254'740'993},
-           {std::numeric_limits<int64_t>::max(), 0, std::nullopt,
-            std::numeric_limits<int64_t>::max()},
-           {std::numeric_limits<int64_t>::min(), 0, std::nullopt,
-            std::numeric_limits<int64_t>::min()},
-           {std::numeric_limits<int64_t>::max(), 1, std::nullopt, std::nullopt},
-           {std::numeric_limits<int64_t>::min(), -1, std::nullopt,
+           {(std::numeric_limits<int64_t>::max)(), 0, std::nullopt,
+            (std::numeric_limits<int64_t>::max)()},
+           {(std::numeric_limits<int64_t>::min)(), 0, std::nullopt,
+            (std::numeric_limits<int64_t>::min)()},
+           {(std::numeric_limits<int64_t>::max)(), 1, std::nullopt,
+            std::nullopt},
+           {(std::numeric_limits<int64_t>::min)(), -1, std::nullopt,
             std::nullopt}}));
   CAPTURE(version, wireTime, offset);
   // Build raw MessagePack independently of the NT encoder: [1, time, 2, 7].

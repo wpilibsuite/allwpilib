@@ -250,7 +250,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               }
               if (!std::isfinite(val) || val < 0 ||
                   val > static_cast<double>(
-                            std::numeric_limits<unsigned int>::max()) /
+                            (std::numeric_limits<unsigned int>::max)()) /
                             1000.0) {
                 error = "periodic value out of range";
                 goto err;
