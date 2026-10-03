@@ -19,6 +19,8 @@
 #include "wpi/tunables/TunableConfig.hpp"
 #include "wpi/tunables/TunableTable.hpp"
 #include "wpi/util/DenseMap.hpp"
+#include "wpi/util/MapVector.hpp"
+#include "wpi/util/SetVector.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/UsageReporting.hpp"
 
@@ -26,16 +28,16 @@ using namespace wpi::cmd;
 
 class CommandScheduler::Impl {
  public:
-  // A set of the currently-running commands.
-  wpi::util::SmallSet<Command*, 12> scheduledCommands;
+  // The currently-running commands, in the order they were scheduled.
+  wpi::util::SmallSetVector<Command*, 12> scheduledCommands;
 
   // A map from required subsystems to their requiring commands.  Also used as a
   // set of the currently-required subsystems.
   wpi::util::DenseMap<Subsystem*, Command*> requirements;
 
   // A map from subsystems registered with the scheduler to their default
-  // commands.  Also used as a list of currently-registered subsystems.
-  wpi::util::DenseMap<Subsystem*, std::unique_ptr<Command>> subsystems;
+  // commands, in the order they were registered.
+  wpi::util::MapVector<Subsystem*, std::unique_ptr<Command>> subsystems;
 
   wpi::EventLoop defaultButtonLoop;
   // The set of currently-registered buttons that will be polled every
@@ -97,7 +99,7 @@ wpi::EventLoop* CommandScheduler::GetDefaultButtonLoop() const {
 void CommandScheduler::Schedule(Command* command) {
   RequireUngrouped(command);
 
-  if (m_impl->disabled || m_impl->scheduledCommands.contains(command) ||
+  if (m_impl->disabled || IsScheduled(command) ||
       (wpi::RobotState::IsDisabled() && !command->RunsWhenDisabled())) {
     return;
   }
@@ -123,7 +125,9 @@ void CommandScheduler::Schedule(Command* command) {
         Cancel(cmdToCancel, std::make_optional(command));
       }
     }
-    m_impl->scheduledCommands.insert(command);
+    if (!m_impl->scheduledCommands.insert(command)) {
+      return;
+    }
     for (auto&& requirement : requirements) {
       m_impl->requirements[requirement] = command;
     }
@@ -166,11 +170,11 @@ void CommandScheduler::Run() {
 
   // Run the periodic method of all registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
-    subsystem.getFirst()->Periodic();
+    subsystem.first->Periodic();
     if constexpr (wpi::RobotBase::IsSimulation()) {
-      subsystem.getFirst()->SimulationPeriodic();
+      subsystem.first->SimulationPeriodic();
     }
-    m_watchdog.AddEpoch(subsystem.getFirst()->GetName() + ".Periodic()");
+    m_watchdog.AddEpoch(subsystem.first->GetName() + ".Periodic()");
   }
 
   // Cache the active instance to avoid concurrency problems if SetActiveLoop()
@@ -182,7 +186,8 @@ void CommandScheduler::Run() {
 
   bool isDisabled = wpi::RobotState::IsDisabled();
   // create a new set to avoid iterator invalidation.
-  for (Command* command : wpi::util::SmallSet(m_impl->scheduledCommands)) {
+  for (Command* command :
+       wpi::util::SmallSetVector(m_impl->scheduledCommands)) {
     if (!IsScheduled(command)) {
       continue;  // skip as the normal scheduledCommands was modified
     }
@@ -199,7 +204,7 @@ void CommandScheduler::Run() {
     m_watchdog.AddEpoch(command->GetName() + ".Execute()");
 
     if (command->IsFinished()) {
-      m_impl->scheduledCommands.erase(command);
+      m_impl->scheduledCommands.remove(command);
       command->End(false);
       for (auto&& action : m_impl->finishActions) {
         action(*command);
@@ -217,9 +222,9 @@ void CommandScheduler::Run() {
 
   // Add default commands for un-required registered subsystems.
   for (auto&& subsystem : m_impl->subsystems) {
-    auto s = m_impl->requirements.find(subsystem.getFirst());
-    if (s == m_impl->requirements.end() && subsystem.getSecond()) {
-      Schedule({subsystem.getSecond().get()});
+    auto s = m_impl->requirements.find(subsystem.first);
+    if (s == m_impl->requirements.end() && subsystem.second) {
+      Schedule({subsystem.second.get()});
     }
   }
 
@@ -293,7 +298,7 @@ void CommandScheduler::RemoveDefaultCommand(Subsystem* subsystem) {
 }
 
 Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
-  auto&& find = m_impl->subsystems.find(subsystem);
+  auto&& find = m_impl->subsystems.find(const_cast<Subsystem*>(subsystem));
   if (find != m_impl->subsystems.end()) {
     return find->second.get();
   } else {
@@ -309,7 +314,7 @@ void CommandScheduler::Cancel(Command* command,
   if (!IsScheduled(command)) {
     return;
   }
-  m_impl->scheduledCommands.erase(command);
+  m_impl->scheduledCommands.remove(command);
   command->End(true);
   for (auto&& action : m_impl->interruptActions) {
     action(*command, interruptor);
@@ -379,7 +384,7 @@ bool CommandScheduler::IsScheduled(const Command* command) const {
 }
 
 bool CommandScheduler::IsScheduled(const CommandPtr& command) const {
-  return m_impl->scheduledCommands.contains(command.get());
+  return IsScheduled(command.get());
 }
 
 Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
@@ -519,25 +524,22 @@ void CommandScheduler::PublishTunable(wpi::tunables::TunableTable& table) {
           .isMutable = false,
           .parent = this,
           .polling = wpi::tunables::TunableConfig::Polling::ALWAYS_GET});
-  table.Publish(
-      "Cancel", this, &CommandScheduler::m_toCancel,
-      wpi::tunables::TunableConfig{
-          .robust = true,
-          .onTune =
-              [](TunableBase&, wpi::tunables::ComplexTunable* self) {
-                auto scheduler = static_cast<CommandScheduler*>(self);
-                for (auto cancel : scheduler->m_toCancel) {
-                  uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
-                  Command* command = reinterpret_cast<Command*>(ptrTmp);
-                  if (scheduler->m_impl->scheduledCommands.find(command) !=
-                      scheduler->m_impl->scheduledCommands.end()) {
-                    scheduler->Cancel(command);
-                  }
-                }
-                scheduler->m_toCancel.clear();
-                scheduler->SetChildTunableChanged("Cancel");
-              },
-          .parent = this});
+  table.Publish("Cancel", this, &CommandScheduler::m_toCancel,
+                wpi::tunables::TunableConfig{
+                    .robust = true,
+                    .onTune =
+                        [](TunableBase&, wpi::tunables::ComplexTunable* self) {
+                          auto scheduler = static_cast<CommandScheduler*>(self);
+                          for (auto cancel : scheduler->m_toCancel) {
+                            uintptr_t ptrTmp = static_cast<uintptr_t>(cancel);
+                            Command* command =
+                                reinterpret_cast<Command*>(ptrTmp);
+                            scheduler->Cancel(command);
+                          }
+                          scheduler->m_toCancel.clear();
+                          scheduler->SetChildTunableChanged("Cancel");
+                        },
+                    .parent = this});
 }
 
 void CommandScheduler::UpdateTunable() const {

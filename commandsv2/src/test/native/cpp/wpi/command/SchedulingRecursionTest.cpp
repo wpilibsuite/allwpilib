@@ -322,7 +322,14 @@ TEST_CASE_METHOD(SchedulingRecursionTest,
   int counter = 0;
   TestSubsystem requirement;
   auto selfCancels = Idle({&requirement});
-  auto other = Idle({&requirement});
+  int initializeCount = 0;
+  int executeCount = 0;
+  auto other = FunctionalCommand{[&] { initializeCount++; },
+                                 [&] { executeCount++; },
+                                 [](bool) {},
+                                 [] { return false; },
+                                 {&requirement}}
+                   .ToPtr();
   scheduler.OnCommandInterrupt([&](const Command&) {
     counter++;
     scheduler.Schedule(other);
@@ -332,6 +339,11 @@ TEST_CASE_METHOD(SchedulingRecursionTest,
   CHECK(1 == counter);
   CHECK_FALSE(scheduler.IsScheduled(selfCancels));
   CHECK(scheduler.IsScheduled(other));
+  CHECK(initializeCount == 1);
+  scheduler.Run();
+  CHECK(executeCount == 1);
+  scheduler.Run();
+  CHECK(executeCount == 2);
 }
 
 TEST_CASE_METHOD(SchedulingRecursionTest,
