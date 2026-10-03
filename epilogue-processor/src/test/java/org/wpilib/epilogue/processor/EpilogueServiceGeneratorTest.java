@@ -55,6 +55,10 @@ class EpilogueServiceGeneratorTest {
 
           @Logged
           public class Example extends org.wpilib.framework.RobotBase {
+            @Override
+            public void startCompetition() {}
+            @Override
+            public void endCompetition() {}
           }
           """;
 
@@ -112,6 +116,10 @@ class EpilogueServiceGeneratorTest {
           public class Example {
             @Logged
             public static class Robot extends org.wpilib.framework.RobotBase {
+              @Override
+              public void startCompetition() {}
+              @Override
+              public void endCompetition() {}
             }
           }
           """;
@@ -516,6 +524,10 @@ class EpilogueServiceGeneratorTest {
 
           @Logged
           public class BaseRobot extends org.wpilib.framework.RobotBase {
+            @Override
+            public void startCompetition() {}
+            @Override
+            public void endCompetition() {}
           }
           """;
 

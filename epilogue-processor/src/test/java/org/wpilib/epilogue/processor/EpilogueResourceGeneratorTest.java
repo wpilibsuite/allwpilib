@@ -47,6 +47,10 @@ class EpilogueResourceGeneratorTest {
 
           @Logged
           public class Example extends org.wpilib.framework.RobotBase {
+            @Override
+            public void startCompetition() {}
+            @Override
+            public void endCompetition() {}
           }
           """;
 
@@ -68,6 +72,10 @@ class EpilogueResourceGeneratorTest {
           public class Example {
             @Logged
             public static class Robot extends org.wpilib.framework.RobotBase {
+              @Override
+              public void startCompetition() {}
+              @Override
+              public void endCompetition() {}
             }
           }
           """;
@@ -160,7 +168,12 @@ class EpilogueResourceGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          public class BaseRobot extends org.wpilib.framework.RobotBase {}
+          public class BaseRobot extends org.wpilib.framework.RobotBase {
+            @Override
+            public void startCompetition() {}
+            @Override
+            public void endCompetition() {}
+          }
           """;
 
     String timedSource =
