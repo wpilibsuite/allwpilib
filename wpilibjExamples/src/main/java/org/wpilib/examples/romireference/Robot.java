@@ -45,16 +45,16 @@ public class Robot extends TimedRobot {
     Telemetry.log("", robotContainer);
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
+  /** This function is called each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledEnter() {}
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
+  public void autonomousEnter() {
     // Get selected routine from the SmartDashboard
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -81,14 +81,14 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters operator control. */
   @Override
-  public void teleopInit() {}
+  public void teleopEnter() {}
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
 
   @Override
-  public void utilityInit() {
+  public void utilityEnter() {
     // Cancels all running commands at the start of utility mode.
     CommandScheduler.getInstance().cancelAll();
   }
