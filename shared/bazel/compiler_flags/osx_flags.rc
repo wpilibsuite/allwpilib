@@ -15,4 +15,7 @@ common:macos --per_file_copt=external/.*@-Wno-pedantic,-Wno-deprecated-declarati
 common:macos --host_per_file_copt=external/.*\.c$@-Wno-c11-extensions
 common:macos --per_file_copt=external/.*\.c$@-Wno-c11-extensions
 
+common:macos --host_macos_minimum_os=15
+common:macos --macos_minimum_os=15
+
 common:macos --force_pic
