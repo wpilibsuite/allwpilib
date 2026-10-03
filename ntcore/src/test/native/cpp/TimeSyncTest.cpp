@@ -6,9 +6,11 @@
 #include <thread>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/NetworkTableListener.hpp"
+#include "wpi/util/Synchronization.hpp"
 #include "wpi/util/print.hpp"
 
 class TimeSyncTest {
@@ -117,4 +119,16 @@ TEST_CASE_METHOD(TimeSyncTest, "TimeSyncTest TestServerClientTimeSync",
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   CHECK(syncCount > 0);
+}
+
+TEST_CASE_METHOD(TimeSyncTest, "TimeSyncTest TrimListenAddress",
+                 "[ntcore][time-sync]") {
+  auto address = GENERATE("127.0.0.1 ", " 127.0.0.1 ");
+  wpi::nt::NetworkTableListenerPoller poller{m_inst2};
+  poller.AddTimeSyncListener(false);
+  m_inst.StartServer("", address, "", 10034);
+  m_inst2.SetServer("127.0.0.1", 10034);
+  m_inst2.StartClient("client");
+  REQUIRE(wpi::util::WaitForObject(poller.GetHandle(), 5.0, nullptr));
+  REQUIRE(m_inst2.GetServerTimeOffset());
 }

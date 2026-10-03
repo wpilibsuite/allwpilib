@@ -269,7 +269,7 @@ NetworkServer::NetworkServer(std::string_view persistentFilename,
       m_serverImpl{logger, port},
       m_localQueue{logger},
       m_loop(*m_loopRunner.GetLoop()),
-      m_tspServer{logger, listenAddress, port} {
+      m_tspServer{logger, m_listenAddress, port} {
   m_loopRunner.ExecAsync([=, this](uv::Loop& loop) {
     // connect local storage to server
     m_serverImpl.SetLocal(&m_localStorage, &m_localQueue);

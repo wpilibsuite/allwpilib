@@ -74,7 +74,7 @@ class TimeSyncTest {
   @Test
   void testServerClientProtocolVersion() throws InterruptedException {
     try (var client = NetworkTableInstance.create()) {
-      m_inst.startServer("", "127.0.0.1", "", 10032);
+      m_inst.startServer("", " 127.0.0.1 ", "", 10032);
       client.setServer("127.0.0.1", 10032);
       client.startClient("timesync-test");
       for (int i = 0;
@@ -88,6 +88,10 @@ class TimeSyncTest {
       assertEquals(1, clientConnections.length);
       assertEquals(0x0402, serverConnections[0].protocolVersion);
       assertEquals(0x0402, clientConnections[0].protocolVersion);
+      for (int i = 0; i < 100 && client.getServerTimeOffset().isEmpty(); i++) {
+        Thread.sleep(50);
+      }
+      assertTrue(client.getServerTimeOffset().isPresent());
     }
   }
 }

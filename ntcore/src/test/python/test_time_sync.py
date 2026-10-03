@@ -7,7 +7,7 @@ def test_server_client_protocol_version(tmp_path):
     server = NetworkTableInstance.create()
     client = NetworkTableInstance.create()
     try:
-        server.start_server(str(tmp_path / "nt.json"), "127.0.0.1", "", 10033)
+        server.start_server(str(tmp_path / "nt.json"), " 127.0.0.1 ", "", 10033)
         client.set_server("127.0.0.1", 10033)
         client.start_client("timesync-test")
         deadline = time.monotonic() + 5
@@ -21,6 +21,10 @@ def test_server_client_protocol_version(tmp_path):
         assert len(client_connections) == 1
         assert server_connections[0].protocol_version == 0x0402
         assert client_connections[0].protocol_version == 0x0402
+        deadline = time.monotonic() + 5
+        while client.get_server_time_offset() is None and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert client.get_server_time_offset() is not None
     finally:
         NetworkTableInstance.destroy(client)
         NetworkTableInstance.destroy(server)
