@@ -34,6 +34,12 @@ elseif(APPLE)
     set_target_properties(datalogtool PROPERTIES MACOSX_BUNDLE YES OUTPUT_NAME "datalogTool")
 endif()
 
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test(datalogtool src/test/native/cpp)
+    target_include_directories(datalogtool_test PRIVATE src/main/native/cpp)
+    target_link_libraries(datalogtool_test wpiutil)
+endif()
+
 if(WPILIB_WITH_IMGUI_TESTS)
     wpilib_add_imgui_test(datalogtool src/test/native/imgui)
     wpilib_link_macos_gui(datalogtool_imgui_test)

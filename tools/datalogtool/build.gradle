@@ -7,6 +7,7 @@ if (project.hasProperty('onlylinuxsystemcore')) {
 description = "A tool to download datalogs from a roborio"
 
 apply plugin: 'cpp'
+apply plugin: 'google-test-test-suite'
 apply plugin: 'visual-studio'
 apply plugin: 'org.wpilib.NativeUtils'
 
@@ -16,10 +17,12 @@ if (OperatingSystem.current().isWindows()) {
 
 ext {
     nativeName = 'datalogtool'
+    nativeTestSuiteName = "${nativeName}Test"
 }
 
 apply from: "${rootDir}/shared/resources.gradle"
 apply from: "${rootDir}/shared/config.gradle"
+apply from: "${rootDir}/shared/catch2.gradle"
 
 def wpilibVersionFileInput = file("src/main/generate/WPILibVersion.cpp.in")
 def wpilibVersionFileOutput = file("$buildDir/generated/mainVersion/cpp/WPILibVersion.cpp")
@@ -100,6 +103,48 @@ model {
                     return
                 }
                 it.cppCompiler.define("LIBSSH_STATIC")
+                lib project: ':glass', library: 'glass', linkage: 'static'
+                lib project: ':fields', library: 'fields', linkage: 'static'
+                lib project: ':fields', library: 'fieldimages', linkage: 'static'
+                lib project: ':wpimath', library: 'wpimath', linkage: 'static'
+                lib project: ':wpigui', library: 'wpigui', linkage: 'static'
+                lib project: ':datalog', library: 'datalog', linkage: 'static'
+                lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
+                lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                nativeUtils.useRequiredLibrary(it, 'libssh')
+                project.addLibSdlGpuDependency(it)
+                if (it.targetPlatform.operatingSystem.isWindows()) {
+                    it.linker.args << 'ws2_32.lib' << 'advapi32.lib' << 'crypt32.lib' << 'user32.lib' << 'Iphlpapi.lib'
+                } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+                    it.linker.args << '-framework' << 'Kerberos'
+                }
+            }
+        }
+    }
+    testSuites {
+        "${nativeTestSuiteName}"(GoogleTestTestSuiteSpec) {
+            for (NativeComponentSpec c : $.components) {
+                if (c.name == nativeName) {
+                    testing c
+                    break
+                }
+            }
+            sources.cpp {
+                source {
+                    srcDirs 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/cpp'
+                }
+            }
+            binaries.all {
+                if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
+                    it.buildable = false
+                    return
+                }
+                it.cppCompiler.define('RUNNING_DATALOGTOOL_TESTS')
+                it.cppCompiler.define('LIBSSH_STATIC')
                 lib project: ':glass', library: 'glass', linkage: 'static'
                 lib project: ':fields', library: 'fields', linkage: 'static'
                 lib project: ':fields', library: 'fieldimages', linkage: 'static'
