@@ -19,6 +19,7 @@ wpilib_cc_library(
     ),
     hdrs = glob(["src/main/native/include/**"]),
     extra_src_pkg_files = [":datalog-java-jni-hdrs-pkg"],
+    include_third_party_notice = False,
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",
