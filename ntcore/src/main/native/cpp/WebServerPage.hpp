@@ -407,7 +407,7 @@ function startViewer() {
   const topics = new Map();
   const schemas = createStructDatabase();
   const valueCells = new Map();
-  const collapsed = new Set();
+  const expandedTables = new Set();
   const expandedValues = new Set();
   const dirty = new Set();
   const tree = document.getElementById("tree");
@@ -418,6 +418,7 @@ function startViewer() {
   let pending = false;
   let connected = false;
   let schemasDirty = false;
+  let filtering = false;
 
   function element(tag, className, text) {
     const result = document.createElement(tag);
@@ -502,12 +503,8 @@ function startViewer() {
       if (child.children.size) {
         const details = element("details", "");
         const key = JSON.stringify(path);
-        details.open = filter.value !== "" || !collapsed.has(key);
-        details.addEventListener("toggle", () => {
-          if (!details.isConnected || filter.value !== "") return;
-          if (details.open) collapsed.delete(key);
-          else collapsed.add(key);
-        });
+        details.dataset.table = key;
+        details.open = filter.value !== "" || expandedTables.has(key);
         const summary = element("summary", "");
         summary.style.setProperty("--depth", segments.length);
         summary.append(row);
@@ -535,6 +532,15 @@ function startViewer() {
         schemasDirty = false;
       }
       if (rebuild) {
+        // Read the current state before replacing nodes; toggle events may
+        // still be queued. Filter expansion must not change the saved state.
+        if (!filtering) {
+          for (const details of tree.querySelectorAll("details[data-table]")) {
+            if (details.open) expandedTables.add(details.dataset.table);
+            else expandedTables.delete(details.dataset.table);
+          }
+        }
+        filtering = filter.value !== "";
         valueCells.clear();
         const fragment = document.createDocumentFragment();
         renderChildren(fragment, buildTree(topics.values(), filter.value), []);
