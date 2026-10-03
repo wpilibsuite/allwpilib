@@ -524,13 +524,22 @@ RestResponse wpi::nt::server::HandleRestRequest(ServerStorage& storage,
   }
   auto encodedName =
       collection ? std::string_view{} : path.substr(TOPIC_PREFIX.size());
+  ada::url_search_params query{
+      queryPos == target.npos ? std::string_view{} : target.substr(queryPos)};
   std::string_view field;
-  if (auto slash = encodedName.find('/'); slash != encodedName.npos) {
-    field = encodedName.substr(slash + 1);
-    encodedName = encodedName.substr(0, slash);
+  if (!collection && query.size() != 0) {
+    if (query.size() != 1) {
+      return Error(400, "Bad Request", "Expected one topic field selector");
+    }
+    auto [key, value] = *query.get_entries().next();
+    if (!value.empty()) {
+      return Error(400, "Bad Request",
+                   "Topic field selector must have no value");
+    }
+    field = key;
     if (field != "type" && field != "value" && field != "properties" &&
         field != "name" && field != "timestamp") {
-      return Error(404, "Not Found", "Unknown topic field");
+      return Error(400, "Bad Request", "Unknown topic field selector");
     }
   }
   std::string_view allow = "GET, OPTIONS";
@@ -566,9 +575,6 @@ RestResponse wpi::nt::server::HandleRestRequest(ServerStorage& storage,
         "Content-Type must be application/json or application/msgpack");
   }
   if (collection) {
-    ada::url_search_params query{queryPos == target.npos
-                                     ? std::string_view{}
-                                     : target.substr(queryPos + 1)};
     auto prefix = query.get("prefix").value_or("");
     auto result = json::array();
     storage.ForEachTopic([&](ServerTopic* topic) {

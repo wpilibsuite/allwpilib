@@ -212,42 +212,103 @@ TEST_CASE_METHOD(RestApiTest, "REST direct topic resources", "[ntcore][rest]") {
   REQUIRE(
       Request("PUT", R"({"type":"int","value":42,"properties":{"unit":"m"}})")
           .status == 201);
-  CHECK(Read("/nt/v1/topics/%2Ftest/type") == "int");
-  CHECK(Read("/nt/v1/topics/%2Ftest/name") == "/test");
-  CHECK(Read("/nt/v1/topics/%2Ftest/value") == 42);
-  CHECK(Read("/nt/v1/topics/%2Ftest/timestamp").get_int() > 0);
-  CHECK(Read("/nt/v1/topics/%2Ftest/properties").at("unit") == "m");
-  CHECK(Request("PUT", "43", "/nt/v1/topics/%2Ftest/value").status == 204);
+  CHECK(Read("/nt/v1/topics/%2Ftest?type") == "int");
+  CHECK(Read("/nt/v1/topics/%2Ftest?name") == "/test");
+  CHECK(Read("/nt/v1/topics/%2Ftest?value") == 42);
+  CHECK(Read("/nt/v1/topics/%2Ftest?timestamp").get_int() > 0);
+  CHECK(Read("/nt/v1/topics/%2Ftest?properties").at("unit") == "m");
+  CHECK(Request("PUT", "43", "/nt/v1/topics/%2Ftest?value").status == 204);
   CHECK(Read().at("value") == 43);
-  CHECK(Request("PUT", R"("wrong")", "/nt/v1/topics/%2Ftest/value").status ==
+  CHECK(Request("PUT", R"("wrong")", "/nt/v1/topics/%2Ftest?value").status ==
         400);
-  CHECK(Request("PUT", R"("double")", "/nt/v1/topics/%2Ftest/type").status ==
+  CHECK(Request("PUT", R"("double")", "/nt/v1/topics/%2Ftest?type").status ==
         405);
-  CHECK(Request("DELETE", {}, "/nt/v1/topics/%2Ftest/value").status == 405);
-  CHECK(Request("PUT", "1", "/nt/v1/topics/missing/value").status == 404);
+  CHECK(Request("DELETE", {}, "/nt/v1/topics/%2Ftest?value").status == 405);
+  CHECK(Request("PUT", "1", "/nt/v1/topics/missing?value").status == 404);
   CHECK(Request("GET", {}, "/nt/v1/topics/%2Ftest/unknown").status == 404);
   CHECK(Request("PATCH", R"({"unit":null,"label":"distance"})",
-                "/nt/v1/topics/%2Ftest/properties")
+                "/nt/v1/topics/%2Ftest?properties")
             .status == 204);
   CHECK_FALSE(Read().at("properties").lookup("unit"));
   CHECK(
-      Request("PUT", R"({"retained":true})", "/nt/v1/topics/%2Ftest/properties")
+      Request("PUT", R"({"retained":true})", "/nt/v1/topics/%2Ftest?properties")
           .status == 204);
   CHECK(Read().at("properties") == json::object("retained", true));
-  CHECK(Request("PUT", "{}", "/nt/v1/topics/%2Ftest/properties").status == 204);
+  CHECK(Request("PUT", "{}", "/nt/v1/topics/%2Ftest?properties").status == 204);
   CHECK(Request("GET").status == 404);
-  // The delimiter is recognized before percent decoding, so field-like names
-  // work.
-  CHECK(Request("PUT", R"({"type":"int","value":1})",
-                "/nt/v1/topics/%2Ftest%2Fvalue")
-            .status == 201);
-  CHECK(Read("/nt/v1/topics/%2Ftest%2Fvalue/value") == 1);
+}
+
+TEST_CASE_METHOD(RestApiTest, "REST query selectors do not shadow topic names",
+                 "[ntcore][rest]") {
+  REQUIRE(Request("PUT", R"({"type":"int","value":42})").status == 201);
+  for (auto field : {"name", "type", "timestamp", "value", "properties"}) {
+    INFO(field);
+    auto barePath = std::string{"/nt/v1/topics/"} + field;
+    REQUIRE(Request("PUT", R"({"type":"int","value":1})", barePath).status ==
+            201);
+    CHECK(Read(barePath).at("name") == field);
+    CHECK(Read(barePath + "?name") == field);
+    // Child topic names can match field selectors, including when slashes are
+    // only partially encoded or left literal.
+    auto childPath = std::string{"/nt/v1/topics/%2Ftest/"} + field;
+    auto childName = std::string{"/test/"} + field;
+    REQUIRE(Request("PUT", R"({"type":"int","value":2})", childPath).status ==
+            201);
+    CHECK(Read(childPath).at("name") == childName);
+    CHECK(Read(childPath + "?name") == childName);
+    CHECK(Read(std::string{"/nt/v1/topics/%2Ftest%2F"} + field).at("value") ==
+          2);
+    CHECK(Read(std::string{"/nt/v1/topics//test/"} + field + "?value") == 2);
+    CHECK(Request("PUT", "3", childPath + "?value").status == 204);
+    CHECK(Read(childPath + "?value") == 3);
+    CHECK(Read(barePath + "?value") == 1);
+    CHECK(Read().at("value") == 42);
+    CHECK(Request("DELETE", {}, childPath).status == 204);
+    CHECK(Read().at("value") == 42);
+  }
+  REQUIRE(Request("PUT", R"({"type":"int","value":4})",
+                  "/nt/v1/topics/%2Ftest%3Fvalue")
+              .status == 201);
+  CHECK(Read("/nt/v1/topics/%2Ftest%3Fvalue?name") == "/test?value");
+  CHECK(Read("/nt/v1/topics/%2Ftest%3Fvalue?value") == 4);
+  CHECK(Read("/nt/v1/topics/%2Ftest?value") == 42);
+}
+
+TEST_CASE_METHOD(RestApiTest, "REST validates topic field selectors",
+                 "[ntcore][rest]") {
+  REQUIRE(Request("PUT", R"({"type":"int","value":42})").status == 201);
+  CHECK(Read("/nt/v1/topics/%2Ftest?").at("value") == 42);
+  CHECK(Read("/nt/v1/topics/%2Ftest?value=") == 42);
+  CHECK(Read("/nt/v1/topics/%2Ftest?%76alue") == 42);
+  auto original = Read();
+  for (auto selector :
+       {"?unknown", "?value&name", "?value&value", "?value=1", "?properties=1",
+        "?value&unknown", "?timestamp&type", "??value", "?%zz", "?Value"}) {
+    auto path = std::string{"/nt/v1/topics/%2Ftest"} + selector;
+    INFO(path);
+    for (auto method : {"GET", "PUT", "PATCH", "DELETE", "OPTIONS"}) {
+      INFO(method);
+      CHECK(Request(method, R"({"value":99})", path).status == 400);
+      CHECK(Read() == original);
+    }
+  }
+  for (auto field : {"name", "type", "timestamp"}) {
+    auto path = std::string{"/nt/v1/topics/%2Ftest?"} + field;
+    for (auto method : {"PUT", "PATCH", "DELETE"}) {
+      CHECK(Request(method, "99", path).status == 405);
+    }
+    CHECK(Request("OPTIONS", {}, path).allow == "GET, OPTIONS");
+  }
+  CHECK(Request("OPTIONS", {}, "/nt/v1/topics/%2Ftest?value").allow ==
+        "GET, PUT, OPTIONS");
+  CHECK(Request("OPTIONS", {}, "/nt/v1/topics/%2Ftest?properties").allow ==
+        "GET, PUT, PATCH, OPTIONS");
 }
 
 TEST_CASE_METHOD(RestApiTest, "REST content negotiation", "[ntcore][rest]") {
   REQUIRE(Request("PUT", R"({"type":"int","value":42})").status == 201);
   auto get = [&](std::string_view accept) {
-    return HandleRestRequest(storage, "GET", "/nt/v1/topics/%2Ftest/value", {},
+    return HandleRestRequest(storage, "GET", "/nt/v1/topics/%2Ftest?value", {},
                              {}, accept);
   };
   for (auto accept : {"application/msgpack", "application/x-msgpack",
@@ -270,7 +331,7 @@ TEST_CASE_METHOD(RestApiTest, "REST content negotiation", "[ntcore][rest]") {
   CHECK(get("application/json;q=0, application/msgpack;q=0, */*;q=1").status ==
         406);
   CHECK(get("application/msgpack;q=invalid").status == 406);
-  CHECK(HandleRestRequest(storage, "PUT", "/nt/v1/topics/%2Ftest/value", "1",
+  CHECK(HandleRestRequest(storage, "PUT", "/nt/v1/topics/%2Ftest?value", "1",
                           "text/plain")
             .status == 415);
   CHECK(HandleRestRequest(storage, "PUT", "/nt/v1/topics/%2Ftest",
@@ -290,7 +351,7 @@ TEST_CASE_METHOD(RestApiTest, "REST MessagePack scalar and aggregate writes",
   auto decoded = RestDecodeMessagePack(response.body);
   REQUIRE(decoded);
   CHECK(decoded->at("value") == 42);
-  auto path = "/nt/v1/topics/%2Ftest/value";
+  auto path = "/nt/v1/topics/%2Ftest?value";
   CHECK(HandleRestRequest(storage, "PUT", path, std::string_view{"\xd0\xfe", 2},
                           "application/msgpack")
             .status == 204);
@@ -315,7 +376,7 @@ TEST_CASE_METHOD(RestApiTest, "REST translates structured values",
       nullptr, topic,
       Value::MakeRaw(std::span{reinterpret_cast<const uint8_t*>(bytes.data()),
                                bytes.size()}));
-  auto path = "/nt/v1/topics/%2Ftest/value";
+  auto path = "/nt/v1/topics/%2Ftest?value";
   CHECK(Read(path) == json::object("a", json::array(1, true, nullptr)));
   auto response =
       HandleRestRequest(storage, "GET", path, {}, {}, "application/msgpack");
@@ -361,7 +422,7 @@ TEST_CASE_METHOD(RestApiTest, "REST translates structured values",
 TEST_CASE_METHOD(RestApiTest, "REST MessagePack validation", "[ntcore][rest]") {
   auto topic = storage.CreateTopic(nullptr, "/test", "msgpack",
                                    json::object("retained", true));
-  auto path = "/nt/v1/topics/%2Ftest/value";
+  auto path = "/nt/v1/topics/%2Ftest?value";
   for (auto bytes :
        {std::string{}, std::string{"\xc1", 1},
         std::string{"\x81\xa1"

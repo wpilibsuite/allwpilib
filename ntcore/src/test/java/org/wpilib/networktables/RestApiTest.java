@@ -67,13 +67,13 @@ class RestApiTest {
       String resource = url.toString();
       assertArrayEquals(
           "\"int\"".getBytes(StandardCharsets.UTF_8),
-          request(resource + "/type", "GET", null, "application/json", "application/json", 200));
+          request(resource + "?type", "GET", null, "application/json", "application/json", 200));
       assertArrayEquals(
           new byte[] {42},
           request(
-              resource + "/value", "GET", null, "application/json", "application/msgpack", 200));
+              resource + "?value", "GET", null, "application/json", "application/msgpack", 200));
       request(
-          resource + "/value",
+          resource + "?value",
           "PUT",
           new byte[] {43},
           "application/msgpack",
@@ -82,11 +82,47 @@ class RestApiTest {
       assertEquals(43, sub.get());
       assertArrayEquals(
           "43".getBytes(StandardCharsets.UTF_8),
-          request(resource + "/value", "GET", null, "application/json", "application/json", 200));
+          request(resource + "?value", "GET", null, "application/json", "application/json", 200));
+      assertTrue(
+          Long.parseLong(
+                  new String(
+                      request(
+                          resource + "?timestamp",
+                          "GET",
+                          null,
+                          "application/json",
+                          "application/json",
+                          200),
+                      StandardCharsets.UTF_8))
+              > 0);
+      for (String field : new String[] {"name", "type", "timestamp", "value", "properties"}) {
+        String childResource = resource + "/" + field;
+        try (var child = inst.getIntegerTopic("/rest/java/" + field).subscribe(0)) {
+          request(
+              childResource,
+              "PUT",
+              "{\"type\":\"int\",\"value\":1}".getBytes(StandardCharsets.UTF_8),
+              "application/json",
+              "application/json",
+              201);
+          assertEquals(1, child.get());
+          request(
+              childResource + "?value",
+              "PUT",
+              new byte[] {2},
+              "application/msgpack",
+              "application/json",
+              204);
+          assertEquals(2, child.get());
+          assertEquals(43, sub.get());
+          request(childResource, "DELETE", null, "application/json", "application/json", 204);
+          assertFalse(child.getTopic().exists());
+        }
+      }
       assertArrayEquals(
           "[]".getBytes(StandardCharsets.UTF_8),
           request(
-              "http://127.0.0.1:" + port + "/nt/v1/topics/%24pub%24%2Frest%2Fjava/value",
+              "http://127.0.0.1:" + port + "/nt/v1/topics/%24pub%24%2Frest%2Fjava?value",
               "GET",
               null,
               "application/json",

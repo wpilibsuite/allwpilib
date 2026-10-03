@@ -228,24 +228,53 @@ def test_rest_individual_resources(rest_server):
     sub = server.get_integer_topic("/rest/pieces").subscribe(0)
     try:
         assert request(port, "PUT", path, {"type": "int", "value": 42})[0] == 201
-        assert request(port, "GET", path + "/type") == (200, "int")
-        assert request(port, "GET", path + "/name") == (200, "/rest/pieces")
-        assert request(port, "GET", path + "/timestamp")[1] > 0
-        assert request(port, "GET", path + "/value") == (200, 42)
-        assert request(port, "PUT", path + "/value", 43)[0] == 204
+        assert request(port, "GET", path + "?type") == (200, "int")
+        assert request(port, "GET", path + "?name") == (200, "/rest/pieces")
+        assert request(port, "GET", path + "?timestamp")[1] > 0
+        assert request(port, "GET", path + "?value") == (200, 42)
+        assert request(port, "PUT", path + "?value", 43)[0] == 204
         assert sub.get() == 43
-        assert binary_request(port, "PUT", path + "/value", b"\xd0\xfe")[0] == 204
+        assert binary_request(port, "PUT", path + "?value", b"\xd0\xfe")[0] == 204
         assert sub.get() == -2
-        assert request(port, "GET", path + "/value") == (200, -2)
-        assert binary_request(port, "GET", path + "/value") == (
+        assert request(port, "GET", path + "?value") == (200, -2)
+        assert binary_request(port, "GET", path + "?value") == (
             200,
             "application/msgpack",
             b"\xfe",
         )
-        assert request(port, "PATCH", path + "/properties", {"unit": "m"})[0] == 204
-        assert request(port, "GET", path + "/properties")[1]["unit"] == "m"
-        assert request(port, "PUT", path + "/properties", {"retained": True})[0] == 204
-        assert request(port, "GET", path + "/properties")[1] == {"retained": True}
+        assert request(port, "PATCH", path + "?properties", {"unit": "m"})[0] == 204
+        assert request(port, "GET", path + "?properties")[1]["unit"] == "m"
+        assert request(port, "PUT", path + "?properties", {"retained": True})[0] == 204
+        assert request(port, "GET", path + "?properties")[1] == {"retained": True}
+    finally:
+        sub.close()
+
+
+@pytest.mark.parametrize("field", ["name", "type", "timestamp", "value", "properties"])
+def test_rest_query_selectors_do_not_shadow_topics(rest_server, field):
+    server, port = rest_server
+    parent = "/nt/v1/topics/%2Frest"
+    child = parent + "/" + field
+    name = "/rest/" + field
+    sub = server.get_integer_topic(name).subscribe(0)
+    try:
+        assert request(port, "PUT", parent, {"type": "int", "value": 42})[0] == 201
+        assert request(port, "PUT", child, {"type": "int", "value": 1})[0] == 201
+        assert sub.get() == 1
+        assert request(port, "GET", child)[1]["name"] == name
+        assert request(port, "GET", child + "?name") == (200, name)
+        assert request(port, "GET", child + "?type") == (200, "int")
+        assert request(port, "GET", child + "?timestamp")[1] > 0
+        assert request(port, "GET", child + "?properties") == (200, {"retained": True})
+        assert request(port, "GET", parent + "%2F" + field + "?value") == (200, 1)
+        assert request(port, "GET", "/nt/v1/topics/" + name + "?value") == (200, 1)
+        assert request(port, "PUT", child + "?value", 2)[0] == 204
+        assert sub.get() == 2
+        assert request(port, "GET", parent + "?value") == (200, 42)
+        assert request(port, "DELETE", child + "?value&type")[0] == 400
+        assert request(port, "DELETE", child)[0] == 204
+        assert not sub.get_topic().exists()
+        assert request(port, "GET", parent + "?value") == (200, 42)
     finally:
         sub.close()
 
@@ -255,7 +284,7 @@ def test_rest_messagepack_and_json_topics(rest_server):
     topic = server.get_raw_topic("/rest/msgpack")
     pub = topic.publish("msgpack")
     sub = topic.subscribe("msgpack", b"")
-    path = "/nt/v1/topics/%2Frest%2Fmsgpack/value"
+    path = "/nt/v1/topics/%2Frest%2Fmsgpack?value"
     # {"a": [1, true, null]} using standard MessagePack tags.
     packed = b"\x81\xa1a\x93\x01\xc3\xc0"
     logical = {"a": [1, True, None]}
@@ -279,8 +308,8 @@ def test_rest_messagepack_and_json_topics(rest_server):
         pub.close()
     json_path = "/nt/v1/topics/%2Frest%2Fjson"
     assert request(port, "PUT", json_path, {"type": "json", "value": "{}"})[0] == 201
-    assert binary_request(port, "PUT", json_path + "/value", packed)[0] == 204
-    assert request(port, "GET", json_path + "/value") == (200, logical)
+    assert binary_request(port, "PUT", json_path + "?value", packed)[0] == 204
+    assert request(port, "GET", json_path + "?value") == (200, logical)
     assert json.loads(request(port, "GET", json_path)[1]["value"]) == logical
 
 
@@ -291,7 +320,7 @@ def test_rest_messagepack_meta_topics(rest_server):
         request(port, "PUT", "/nt/v1/topics/test", {"type": "int", "value": 1})[0]
         == 201
     )
-    path = "/nt/v1/topics/%24pub%24test/value"
+    path = "/nt/v1/topics/%24pub%24test?value"
     assert request(port, "GET", path) == (200, [])
     assert binary_request(port, "GET", path) == (200, "application/msgpack", b"\x90")
     assert binary_request(port, "PUT", path, b"\x90")[0] == 403
@@ -299,7 +328,7 @@ def test_rest_messagepack_meta_topics(rest_server):
     sub = server.get_integer_topic("/rest/subscribed").subscribe(0)
     try:
         server.flush_local()
-        status, subscriptions = request(port, "GET", "/nt/v1/topics/%24serversub/value")
+        status, subscriptions = request(port, "GET", "/nt/v1/topics/%24serversub?value")
         assert status == 200
         matching = [
             entry for entry in subscriptions if "/rest/subscribed" in entry["topics"]
@@ -319,20 +348,20 @@ def test_rest_negotiation_keep_alive(rest_server):
     try:
         conn.request(
             "GET",
-            path + "/value",
+            path + "?value",
             headers={"Accept": "application/json;q=0, application/msgpack"},
         )
         response = conn.getresponse()
         assert response.getheader("Content-Type") == "application/msgpack"
         assert response.getheader("Vary") == "Accept"
         assert response.read() == b"*"
-        conn.request("GET", path + "/value")
+        conn.request("GET", path + "?value")
         response = conn.getresponse()
         assert response.getheader("Content-Type") == "application/json"
         assert response.read() == b"42"
         conn.request(
             "PUT",
-            path + "/value",
+            path + "?value",
             body=iter([b"\xd1", b"\x01\x00"]),
             headers={"Content-Type": "application/msgpack"},
             encode_chunked=True,
@@ -342,8 +371,8 @@ def test_rest_negotiation_keep_alive(rest_server):
         response.read()
     finally:
         conn.close()
-    assert request(port, "GET", path + "/value") == (200, 256)
-    assert binary_request(port, "GET", path + "/value", accept="text/html")[0] == 406
+    assert request(port, "GET", path + "?value") == (200, 256)
+    assert binary_request(port, "GET", path + "?value", accept="text/html")[0] == 406
 
 
 @pytest.mark.parametrize("path", ["/nt/v1/persistent.json", "/nt/persistent.json"])
