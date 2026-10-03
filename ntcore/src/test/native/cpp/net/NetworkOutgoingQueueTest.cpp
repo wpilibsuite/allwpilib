@@ -8,11 +8,12 @@
 
 #include <deque>
 #include <future>
-#include <thread>
 #include <limits>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -643,5 +644,48 @@ TEST_CASE("ClientImpl destroys pending time sync on network loop",
   REQUIRE(done.wait_for(3s) == std::future_status::ready);
   loop.ExecSync([](auto&) {});
   CHECK(updates == 0);
+}
+}  // namespace wpi::nt::net
+
+namespace wpi::nt::net {
+TEST_CASE("ClientImpl reports half the UDP round-trip time in nanoseconds",
+          "[ntcore][client]") {
+  using namespace std::chrono_literals;
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = 0x0402;
+  wpi::util::Logger logger;
+  wpi::net::EventLoopRunner loop;
+  std::unique_ptr<ClientImpl> client;
+  std::promise<std::pair<int64_t, int64_t>> update;
+  auto result = update.get_future();
+  loop.ExecSync([&](auto&) {
+    client = std::make_unique<ClientImpl>(
+        0, loop, wire, ConnectionInfo{"", "127.0.0.1", peer.GetPort()}, false,
+        logger,
+        [&](int64_t offset, int64_t rtt2, bool) {
+          update.set_value({offset, rtt2});
+        },
+        [](uint32_t) {});
+  });
+  auto packet = peer.Receive(3s);
+  if (packet) {
+    auto ping = wpi::util::UnpackStruct<wpi::tsp::TspPing>(packet->data);
+    wpi::tsp::TspPong pong{ping, ping.client_time + 1'000'000};
+    pong.message_id = 2;
+    std::array<uint8_t, 18> data;
+    wpi::util::PackStruct(data, pong);
+    std::this_thread::sleep_for(10ms);
+    peer.Send(data, reinterpret_cast<const sockaddr&>(packet->sender));
+  }
+  auto ready = result.wait_for(3s);
+  loop.ExecSync([&](auto&) { client.reset(); });
+  REQUIRE(packet);
+  REQUIRE(ready == std::future_status::ready);
+  auto [offset, rtt2] = result.get();
+  CHECK(rtt2 > 0);
+  // The microsecond midpoint calculation can truncate half a microsecond.
+  CHECK(offset + rtt2 >= 1'000'000'000);
+  CHECK(offset + rtt2 <= 1'000'000'500);
 }
 }  // namespace wpi::nt::net

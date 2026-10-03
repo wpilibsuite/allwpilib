@@ -44,14 +44,16 @@ ClientImpl::ClientImpl(
     DEBUG4("Creating UDP-based time sync client");
     using namespace std::chrono_literals;
     m_timeSyncAsync =
-        wpi::net::uv::Async<tsp::TimeSyncClient::Metadata>::Create(*loop.GetLoop());
+        wpi::net::uv::Async<tsp::TimeSyncClient::Metadata>::Create(
+            *loop.GetLoop());
     m_timeSyncAsync->wakeup.connect([this](tsp::TimeSyncClient::Metadata meta) {
-      // TSP uses microseconds; NetworkTables uses nanoseconds internally.
+      // TSP reports full RTT in microseconds; NT reports half RTT in
+      // nanoseconds.
       int64_t serverTimeOffsetNs;
       int64_t rtt2Ns;
       if (wpi::util::MulOverflow(meta.offset, int64_t{1000},
                                  serverTimeOffsetNs) ||
-          wpi::util::MulOverflow(meta.rtt2, int64_t{1000}, rtt2Ns) ||
+          wpi::util::MulOverflow(meta.rtt2, int64_t{500}, rtt2Ns) ||
           serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
         WARN("TSP response has invalid timestamp values");
         return;
