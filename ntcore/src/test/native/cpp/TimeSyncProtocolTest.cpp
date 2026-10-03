@@ -28,7 +28,7 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest Smoketest",
 
   wpi::util::Logger msglog;
 
-  auto startTimeUs = wpi::nt::Now() / 1000;
+  auto startTimeNs = wpi::nt::Now();
   TimeSyncServer server{logger, "", 5812};
   TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
@@ -41,10 +41,10 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest Smoketest",
   auto metadata = client.GetMetadata();
   REQUIRE(metadata.pongsReceived > 1);
   CHECK(metadata.pingsSent >= metadata.pongsReceived);
-  CHECK(metadata.lastPongTime >= static_cast<uint64_t>(startTimeUs));
-  CHECK(metadata.lastPongTime <= static_cast<uint64_t>(wpi::nt::Now() / 1000));
+  CHECK(metadata.lastPongTime >= static_cast<uint64_t>(startTimeNs));
+  CHECK(metadata.lastPongTime <= static_cast<uint64_t>(wpi::nt::Now()));
   // Both clocks are local, so the server offset should be near zero.
-  CHECK(std::abs(metadata.offset) < 1'000'000);
+  CHECK(std::abs(metadata.offset) < 1'000'000'000);
 }
 
 TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZero",
@@ -83,7 +83,7 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZeroOffset",
   // GIVEN a fresh client
   TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
-  // AND a ping-pong sent with 10ms delay each way
+  // AND a ping-pong sent with 10ns delay each way
   // client -> server -> client
   uint64_t ping_client_time{100};
   uint64_t pong_server_time{110};
@@ -125,7 +125,7 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZeroRtt",
   // WHEN we update statistics
   client.UpdateStatistics(pong_client_time, ping, pong);
 
-  // THEN the statistics will reflect the expected 23ms offset
+  // THEN the statistics will reflect the expected 23ns offset
   CHECK(23 == client.GetMetadata().offset);
   CHECK(0 == client.GetMetadata().rtt2);
   CHECK(1u == client.GetMetadata().pongsReceived);
@@ -363,4 +363,36 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest SchemasMatchWireSizes",
   REQUIRE(pong);
   REQUIRE(pong->IsValid());
   CHECK(pong->GetSize() == wpi::util::Struct<TspPong>::GetSize());
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest,
+                 "TimeSyncProtoTest NanosecondWireTimestamps",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  using namespace std::chrono_literals;
+  TimeSyncServer server{logger, "127.0.0.1", 5814};
+  TimeSyncTestPeer peer;
+  std::array<uint8_t, 10> bytes;
+  constexpr uint64_t CLIENT_TIME_NS = 123'456'789;
+  wpi::util::PackStruct(bytes, TspPing{1, 1, CLIENT_TIME_NS});
+  auto beforePong = static_cast<uint64_t>(wpi::nt::Now());
+  REQUIRE(peer.Send(bytes, 5814) == 10);
+  auto packet = peer.Receive(2s);
+  auto afterPong = static_cast<uint64_t>(wpi::nt::Now());
+  REQUIRE(packet);
+  REQUIRE(packet->data.size() == 18u);
+  auto pong = wpi::util::UnpackStruct<TspPong>(packet->data);
+  CHECK(pong.client_time == CLIENT_TIME_NS);
+  CHECK(pong.server_time >= beforePong);
+  CHECK(pong.server_time <= afterPong);
+
+  auto beforePing = static_cast<uint64_t>(wpi::nt::Now());
+  TimeSyncClient client{logger, "127.0.0.1", peer.GetPort(), 10ms, nullptr};
+  packet = peer.Receive(2s);
+  auto afterPing = static_cast<uint64_t>(wpi::nt::Now());
+  REQUIRE(packet);
+  REQUIRE(packet->data.size() == 10u);
+  auto ping = wpi::util::UnpackStruct<TspPing>(packet->data);
+  CHECK(ping.client_time >= beforePing);
+  CHECK(ping.client_time <= afterPing);
 }

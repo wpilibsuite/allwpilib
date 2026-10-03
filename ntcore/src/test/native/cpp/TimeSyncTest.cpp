@@ -98,9 +98,7 @@ TEST_CASE_METHOD(TimeSyncTest, "TimeSyncTest TestServerClientTimeSync",
       auto data = event.GetTimeSyncEventData();
       REQUIRE(data);
       REQUIRE(data->valid);
-      // TSP microsecond measurements are exposed as nanoseconds.
-      CHECK(data->serverTimeOffset % 1000 == 0);
-      CHECK(data->rtt2 % 500 == 0);
+      CHECK(data->rtt2 >= 0);
       wpi::util::print(stdout, "Offset {} rtt2 {} ", data->serverTimeOffset,
                        data->rtt2);
 

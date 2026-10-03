@@ -30,10 +30,10 @@ void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
   auto rtt2 = pong_local_time - ping.client_time;
   // Compute the offset with checked timestamp ranges, without unsigned wrap.
   auto midpoint = static_cast<int64_t>(ping.client_time + rtt2 / 2);
-  int64_t serverTimeOffsetUs =
+  int64_t serverTimeOffsetNs =
       static_cast<int64_t>(pong.server_time) - midpoint;
 
-  auto filtered = m_lastOffsets.Calculate(serverTimeOffsetUs);
+  auto filtered = m_lastOffsets.Calculate(serverTimeOffsetNs);
 
   Metadata newMetadata;
   {
@@ -124,7 +124,7 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
                                          unsigned int remote_port,
                                          std::chrono::milliseconds ping_delay,
                                          std::function<void(Metadata)> callback)
-    : m_timeProvider([] { return nt::Now() / 1000; }),
+    : m_timeProvider(nt::Now),
       m_logger{logger},
       m_serverIP{server},
       m_serverPort{remote_port},

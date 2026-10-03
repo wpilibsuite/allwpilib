@@ -32,8 +32,8 @@ class TimeMedianFilter {
    * Adds a measurement and returns the window median, rounding half integers
    * away from zero.
    *
-   * @param measurement Time offset in microseconds.
-   * @return Filtered time offset in microseconds.
+   * @param measurement Time offset in nanoseconds.
+   * @return Filtered time offset in nanoseconds.
    */
   int64_t Calculate(int64_t measurement) {
     m_buffer.push_back(measurement);
@@ -76,10 +76,13 @@ class TimeMedianFilter {
 class TimeSyncClient {
  public:
   struct Metadata {
+    /** Offset added to local timestamps to get server time, in nanoseconds. */
     int64_t offset{0};
+    /** Full round-trip time in nanoseconds. */
     int64_t rtt2{0};
     size_t pingsSent{0};
     size_t pongsReceived{0};
+    /** Local receive timestamp of the last pong, in nanoseconds. */
     uint64_t lastPongTime{0};
   };
 
@@ -89,14 +92,24 @@ class TimeSyncClient {
   /** Stops the UDP loop before destroying callback state. */
   ~TimeSyncClient();
 
+  /**
+   * Gets the current filtered time offset.
+   *
+   * @return Offset in nanoseconds, added to local time to get server time.
+   */
   int64_t GetOffset();
+  /**
+   * Gets a snapshot of the time-sync statistics.
+   *
+   * @return Metadata with all time values expressed in nanoseconds.
+   */
   Metadata GetMetadata();
 
   /**
    * Updates the estimate from a ping/pong pair. Invalid timestamp ranges are
    * ignored. Must be called on the client's UDP loop, or while it is idle.
    *
-   * @param pong_local_time Local receive time in microseconds.
+   * @param pong_local_time Local receive time in nanoseconds.
    * @param ping Sent ping.
    * @param pong Received pong.
    */

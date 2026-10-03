@@ -671,7 +671,7 @@ TEST_CASE("ClientImpl reports half the UDP round-trip time in nanoseconds",
   auto packet = peer.Receive(3s);
   if (packet) {
     auto ping = wpi::util::UnpackStruct<wpi::tsp::TspPing>(packet->data);
-    wpi::tsp::TspPong pong{ping, ping.client_time + 1'000'000};
+    wpi::tsp::TspPong pong{ping, ping.client_time + 1'000'000'123};
     pong.message_id = 2;
     std::array<uint8_t, 18> data;
     wpi::util::PackStruct(data, pong);
@@ -684,8 +684,7 @@ TEST_CASE("ClientImpl reports half the UDP round-trip time in nanoseconds",
   REQUIRE(ready == std::future_status::ready);
   auto [offset, rtt2] = result.get();
   CHECK(rtt2 > 0);
-  // The microsecond midpoint calculation can truncate half a microsecond.
-  CHECK(offset + rtt2 >= 1'000'000'000);
-  CHECK(offset + rtt2 <= 1'000'000'500);
+  // Preserve the sub-microsecond part of the server's nanosecond timestamp.
+  CHECK(offset + rtt2 == 1'000'000'123);
 }
 }  // namespace wpi::nt::net

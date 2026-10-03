@@ -47,22 +47,12 @@ ClientImpl::ClientImpl(
         wpi::net::uv::Async<tsp::TimeSyncClient::Metadata>::Create(
             *loop.GetLoop());
     m_timeSyncAsync->wakeup.connect([this](tsp::TimeSyncClient::Metadata meta) {
-      // TSP reports full RTT in microseconds; NT reports half RTT in
-      // nanoseconds.
-      int64_t serverTimeOffsetNs;
-      int64_t rtt2Ns;
-      if (wpi::util::MulOverflow(meta.offset, int64_t{1000},
-                                 serverTimeOffsetNs) ||
-          wpi::util::MulOverflow(meta.rtt2, int64_t{500}, rtt2Ns) ||
-          serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
-        WARN("TSP response has invalid timestamp values");
-        return;
-      }
-      m_rtt2Ns = rtt2Ns;
-      DEBUG3("Time offset: {}", serverTimeOffsetNs);
-      m_outgoing.SetTimeOffset(serverTimeOffsetNs);
+      // TSP measurements use nanoseconds; NT reports half the full TSP RTT.
+      m_rtt2Ns = meta.rtt2 / 2;
+      DEBUG3("Time offset: {}", meta.offset);
+      m_outgoing.SetTimeOffset(meta.offset);
       m_haveTimeOffset = true;
-      m_timeSyncUpdated(serverTimeOffsetNs, rtt2Ns, true);
+      m_timeSyncUpdated(meta.offset, m_rtt2Ns, true);
     });
     m_tspClient = std::make_unique<tsp::TimeSyncClient>(
         logger, connInfo.remote_ip, connInfo.remote_port, 1s,

@@ -12,12 +12,14 @@ namespace wpi::tsp {
 struct TspPing {
   uint8_t version;
   uint8_t message_id;
+  /** Client send timestamp in nanoseconds. */
   uint64_t client_time;
 };
 
 struct TspPong : public TspPing {
   TspPong(TspPing ping, uint64_t servertime)
       : TspPing{ping}, server_time{servertime} {}
+  /** Server reply timestamp in nanoseconds. */
   uint64_t server_time;
 };
 

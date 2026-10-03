@@ -9,6 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +98,30 @@ class TimeSyncTest {
         Thread.sleep(50);
       }
       assertTrue(client.getServerTimeOffset().isPresent());
+    }
+  }
+
+  @Test
+  void testServerWireTimestampsNanoseconds() throws IOException {
+    m_inst.startServer("", "127.0.0.1", "", 10035);
+    try (var socket = new DatagramSocket()) {
+      socket.setSoTimeout(2000);
+      long clientTimeNs = 123_456_789;
+      var ping = ByteBuffer.allocate(10).order(ByteOrder.LITTLE_ENDIAN);
+      ping.put((byte) 1).put((byte) 1).putLong(clientTimeNs);
+      long before = NetworkTablesJNI.now();
+      socket.send(new DatagramPacket(ping.array(), 10, InetAddress.getByName("127.0.0.1"), 10035));
+      var response = new DatagramPacket(new byte[18], 18);
+      socket.receive(response);
+      long after = NetworkTablesJNI.now();
+      assertEquals(18, response.getLength());
+      var pong = ByteBuffer.wrap(response.getData()).order(ByteOrder.LITTLE_ENDIAN);
+      assertEquals(1, pong.get());
+      assertEquals(2, pong.get());
+      assertEquals(clientTimeNs, pong.getLong());
+      long serverTimeNs = pong.getLong();
+      assertTrue(serverTimeNs >= before);
+      assertTrue(serverTimeNs <= after);
     }
   }
 }
