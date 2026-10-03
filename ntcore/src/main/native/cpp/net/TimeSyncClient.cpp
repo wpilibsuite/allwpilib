@@ -103,7 +103,10 @@ void wpi::tsp::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
     return;
   }
 
-  TspPing ping = m_lastPing;
+  if (!m_lastPing) {
+    return;
+  }
+  TspPing ping = *m_lastPing;
 
   if (pong.client_time != ping.client_time) {
     WPI_WARNING(m_logger,
@@ -112,6 +115,7 @@ void wpi::tsp::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
     return;
   }
 
+  m_lastPing.reset();
   UpdateStatistics(pong_local_time, ping, pong);
 }
 

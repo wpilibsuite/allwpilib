@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
+#include <optional>
 #include <string>
 
 #include "net/TimeSyncStructs.h"
@@ -120,7 +121,7 @@ class TimeSyncClient {
   Metadata m_metadata;
 
   // We only allow the most recent ping to stay alive, so only keep track of it
-  TspPing m_lastPing{};
+  std::optional<TspPing> m_lastPing;
 
   // 30s is a reasonable guess
   TimeMedianFilter<30> m_lastOffsets{};

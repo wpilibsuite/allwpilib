@@ -319,3 +319,28 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest RejectInvalidTimestamps",
   CHECK(client.GetMetadata().offset == 0);
   CHECK(client.GetMetadata().rtt2 == 20);
 }
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest IgnoresDuplicatePongs",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  using namespace std::chrono_literals;
+  TimeSyncTestPeer peer;
+  TimeSyncClient client{logger, "127.0.0.1", peer.GetPort(), 1s, nullptr};
+  auto packet = peer.Receive(3s);
+  REQUIRE(packet);
+  auto ping = wpi::util::UnpackStruct<TspPing>(packet->data);
+  TspPong pong{ping, ping.client_time};
+  pong.message_id = 2;
+  std::array<uint8_t, 18> data;
+  wpi::util::PackStruct(data, pong);
+  const auto& address = reinterpret_cast<const sockaddr&>(packet->sender);
+  REQUIRE(peer.Send(data, address) == 18);
+  REQUIRE(peer.Send(data, address) == 18);
+  auto deadline = std::chrono::steady_clock::now() + 1s;
+  while (client.GetMetadata().pongsReceived == 0 &&
+         std::chrono::steady_clock::now() < deadline) {
+    std::this_thread::sleep_for(1ms);
+  }
+  std::this_thread::sleep_for(100ms);
+  CHECK(client.GetMetadata().pongsReceived == 1u);
+}
