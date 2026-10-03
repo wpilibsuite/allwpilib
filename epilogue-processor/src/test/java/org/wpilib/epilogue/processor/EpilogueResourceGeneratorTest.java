@@ -47,10 +47,6 @@ class EpilogueResourceGeneratorTest {
 
           @Logged
           public class Example extends org.wpilib.framework.RobotBase {
-            @Override
-            public void startCompetition() {}
-            @Override
-            public void endCompetition() {}
           }
           """;
 
@@ -58,6 +54,28 @@ class EpilogueResourceGeneratorTest {
         compile(List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source)));
     assertGeneratedServicesResource(
         compilation, List.of("org.wpilib.epilogue.Example_EpilogueService"));
+
+    var services = loadServicesAtRuntime(compilation);
+    assertEquals(1, services.size());
+  }
+
+  @Test
+  void nestedRobotBase() {
+    String source =
+        """
+          package org.wpilib.epilogue;
+
+          public class Example {
+            @Logged
+            public static class Robot extends org.wpilib.framework.RobotBase {
+            }
+          }
+          """;
+
+    var compilation =
+        compile(List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source)));
+    assertGeneratedServicesResource(
+        compilation, List.of("org.wpilib.epilogue.Example$Robot_EpilogueService"));
 
     var services = loadServicesAtRuntime(compilation);
     assertEquals(1, services.size());
@@ -142,12 +160,7 @@ class EpilogueResourceGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          public class BaseRobot extends org.wpilib.framework.RobotBase {
-            @Override
-            public void startCompetition() {}
-            @Override
-            public void endCompetition() {}
-          }
+          public class BaseRobot extends org.wpilib.framework.RobotBase {}
           """;
 
     String timedSource =

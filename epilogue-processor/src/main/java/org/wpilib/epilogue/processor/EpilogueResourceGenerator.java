@@ -59,7 +59,7 @@ public class EpilogueResourceGenerator {
       try (var out =
           new PrintWriter(serviceFile.openOutputStream(), false, StandardCharsets.UTF_8)) {
         for (TypeElement robotClass : allRobotClasses) {
-          out.println(robotClass.getQualifiedName() + "_EpilogueService");
+          out.println(StringUtils.serviceClassName(robotClass));
         }
       }
     } catch (FilerException e) {

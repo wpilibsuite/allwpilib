@@ -56,12 +56,11 @@ public class EpilogueServiceGenerator {
   }
 
   private void createLoggerService(TypeElement robotClass, Variant variant) throws IOException {
-    var serviceName = robotClass.getSimpleName() + "_EpilogueService";
+    var serviceSimpleName = StringUtils.serviceSimpleClassName(robotClass);
+    var serviceQualifiedName = StringUtils.serviceClassName(robotClass);
+    var nestedTypeName = StringUtils.nestedTypeName(robotClass);
 
-    var service =
-        m_processingEnv
-            .getFiler()
-            .createSourceFile(robotClass.getQualifiedName() + "_EpilogueService", robotClass);
+    var service = m_processingEnv.getFiler().createSourceFile(serviceQualifiedName, robotClass);
 
     try (var out = new PrintWriter(service.openOutputStream(), false, StandardCharsets.UTF_8)) {
       var pkg = m_processingEnv.getElementUtils().getPackageOf(robotClass);
@@ -81,13 +80,14 @@ public class EpilogueServiceGenerator {
       out.println("import org.wpilib.framework.RobotBase;");
       out.println();
 
-      var baseType = switch (variant) {
-        case STANDARD -> "EpilogueService";
-        case BINDABLE -> "EpilogueService.Bindable";
-      };
+      var baseType =
+          switch (variant) {
+            case STANDARD -> "EpilogueService";
+            case BINDABLE -> "EpilogueService.Bindable";
+          };
       out.printf(
           "public final class %s implements %s<%s> {%n",
-          serviceName, baseType, robotClass.getSimpleName());
+          serviceSimpleName, baseType, nestedTypeName);
       out.println("  @Override");
       out.println("  public boolean supportsExactly(RobotBase root) {");
       out.printf(
@@ -96,7 +96,7 @@ public class EpilogueServiceGenerator {
       out.println("  }");
       out.println();
       out.println("  @Override");
-      out.printf("  public void update(%s root) {%n", robotClass.getSimpleName());
+      out.printf("  public void update(%s root) {%n", nestedTypeName);
       out.println("    long start = System.nanoTime();");
       out.println("    EpilogueConfiguration config = Epilogue.getConfig();");
       out.printf(
@@ -109,7 +109,7 @@ public class EpilogueServiceGenerator {
       if (variant == Variant.BINDABLE) {
         out.println();
         out.println("  @Override");
-        out.printf("  public void bind(%s root) {%n", robotClass.getSimpleName());
+        out.printf("  public void bind(%s root) {%n", nestedTypeName);
         out.println("    EpilogueConfiguration config = Epilogue.getConfig();");
         out.println("    if (config.loggingPeriod == null) {");
         out.println("      config.loggingPeriod = Seconds.of(root.getPeriod());");

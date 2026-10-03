@@ -55,10 +55,6 @@ class EpilogueServiceGeneratorTest {
 
           @Logged
           public class Example extends org.wpilib.framework.RobotBase {
-            @Override
-            public void startCompetition() {}
-            @Override
-            public void endCompetition() {}
           }
           """;
 
@@ -105,6 +101,137 @@ class EpilogueServiceGeneratorTest {
     assertTrue(supportsExactlyUnchecked(service, robot));
     assertFalse(supportsExactlyUnchecked(service, null));
     assertFalse(supportsExactlyUnchecked(service, new Object()));
+  }
+
+  @Test
+  void nestedRobotBase() throws Exception {
+    String source =
+        """
+          package org.wpilib.epilogue;
+
+          public class Example {
+            @Logged
+            public static class Robot extends org.wpilib.framework.RobotBase {
+            }
+          }
+          """;
+
+    String expectedService =
+        """
+        package org.wpilib.epilogue;
+
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.EpilogueConfiguration;
+        import org.wpilib.epilogue.EpilogueService;
+        import org.wpilib.framework.RobotBase;
+
+        public final class Example$Robot_EpilogueService implements EpilogueService<Example.Robot> {
+          @Override
+          public boolean supportsExactly(RobotBase root) {
+            return root != null && root.getClass().equals(org.wpilib.epilogue.Example.Robot.class);
+          }
+
+          @Override
+          public void update(Example.Robot root) {
+            long start = System.nanoTime();
+            EpilogueConfiguration config = Epilogue.getConfig();
+            org.wpilib.epilogue.generated.EpilogueLoggers.org_wpilib_epilogue_Example$RobotLogger.tryUpdate(config.table.getTable(config.root), root, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+        }
+        """;
+    var compilation =
+        compile(List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source)));
+    assertGeneratedService(compilation, "Example$Robot_EpilogueService", expectedService);
+
+    var classLoader = new CompilationClassLoader(compilation);
+    var services = loadServicesAtRuntime(classLoader);
+    assertEquals(1, services.size());
+
+    var service = services.get(0);
+    assertFalse(
+        service instanceof EpilogueService.Bindable, "RobotBase service should not be Bindable");
+
+    var robotClass = classLoader.loadClass("org.wpilib.epilogue.Example$Robot");
+    var robot = allocateInstance(robotClass);
+
+    assertTrue(supportsExactlyUnchecked(service, robot));
+    assertFalse(supportsExactlyUnchecked(service, null));
+    assertFalse(supportsExactlyUnchecked(service, new Object()));
+  }
+
+  @Test
+  void nestedTimedRobot() throws Exception {
+    String source =
+        """
+          package org.wpilib.epilogue;
+
+          public class Example {
+            @Logged
+            public static class Robot extends org.wpilib.framework.TimedRobot {
+            }
+          }
+          """;
+
+    String expectedService =
+        """
+        package org.wpilib.epilogue;
+
+        import static org.wpilib.units.Units.Seconds;
+
+        import org.wpilib.epilogue.Epilogue;
+        import org.wpilib.epilogue.EpilogueConfiguration;
+        import org.wpilib.epilogue.EpilogueService;
+        import org.wpilib.framework.RobotBase;
+
+        public final class Example$Robot_EpilogueService implements EpilogueService.Bindable<Example.Robot> {
+          @Override
+          public boolean supportsExactly(RobotBase root) {
+            return root != null && root.getClass().equals(org.wpilib.epilogue.Example.Robot.class);
+          }
+
+          @Override
+          public void update(Example.Robot root) {
+            long start = System.nanoTime();
+            EpilogueConfiguration config = Epilogue.getConfig();
+            org.wpilib.epilogue.generated.EpilogueLoggers.org_wpilib_epilogue_Example$RobotLogger.tryUpdate(config.table.getTable(config.root), root, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+
+          @Override
+          public void bind(Example.Robot root) {
+            EpilogueConfiguration config = Epilogue.getConfig();
+            if (config.loggingPeriod == null) {
+              config.loggingPeriod = Seconds.of(root.getPeriod());
+            }
+            if (config.loggingPeriodOffset == null) {
+              config.loggingPeriodOffset = config.loggingPeriod.div(2);
+            }
+
+            root.addPeriodic(() -> {
+              update(root);
+            }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
+          }
+        }
+        """;
+
+    var compilation =
+        compile(List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", source)));
+    assertGeneratedService(compilation, "Example$Robot_EpilogueService", expectedService);
+
+    var classLoader = new CompilationClassLoader(compilation);
+    var services = loadServicesAtRuntime(classLoader);
+    assertEquals(1, services.size());
+
+    var service = services.get(0);
+    assertInstanceOf(EpilogueService.Bindable.class, service);
+
+    var robotClass = classLoader.loadClass("org.wpilib.epilogue.Example$Robot");
+    var robot = allocateInstance(robotClass);
+
+    assertTrue(supportsExactlyUnchecked(service, robot));
+    assertFalse(supportsExactlyUnchecked(service, null));
+    assertFalse(supportsExactlyUnchecked(service, "other"));
   }
 
   @Test
@@ -389,10 +516,6 @@ class EpilogueServiceGeneratorTest {
 
           @Logged
           public class BaseRobot extends org.wpilib.framework.RobotBase {
-            @Override
-            public void startCompetition() {}
-            @Override
-            public void endCompetition() {}
           }
           """;
 
