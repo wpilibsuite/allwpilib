@@ -5,7 +5,7 @@
 package org.wpilib.math.kinematics.proto;
 
 import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
-import org.wpilib.math.proto.ProtobufMecanumDriveWheelVelocities;
+import org.wpilib.math.kinematics.proto.detail.ProtobufMecanumDriveWheelVelocities;
 import org.wpilib.util.protobuf.Protobuf;
 import us.hebi.quickbuf.Descriptors.Descriptor;
 

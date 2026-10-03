@@ -5,18 +5,18 @@
 
 import array
 import struct
-from typing import List, SupportsBytes
+from typing import SupportsBytes
 
 import msgpack
 
-__all__ = ["StartRecordData", "MetadataRecordData", "DataLogRecord", "DataLogReader"]
+__all__ = ["DataLogReader", "DataLogRecord", "MetadataRecordData", "StartRecordData"]
 
 floatStruct = struct.Struct("<f")
 doubleStruct = struct.Struct("<d")
 
-kControlStart = 0
-kControlFinish = 1
-kControlSetMetadata = 2
+CONTROL_START = 0
+CONTROL_FINISH = 1
+CONTROL_SET_METADATA = 2
 
 
 class StartRecordData:
@@ -69,21 +69,21 @@ class DataLogRecord:
         return (
             self.entry == 0
             and len(self.data) >= 17
-            and self._getControlType() == kControlStart
+            and self._getControlType() == CONTROL_START
         )
 
     def isFinish(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) == 5
-            and self._getControlType() == kControlFinish
+            and self._getControlType() == CONTROL_FINISH
         )
 
     def isSetMetadata(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) >= 9
-            and self._getControlType() == kControlSetMetadata
+            and self._getControlType() == CONTROL_SET_METADATA
         )
 
     def getStartData(self) -> StartRecordData:
@@ -133,7 +133,7 @@ class DataLogRecord:
     def getMsgPack(self):
         return msgpack.unpackb(self.data)
 
-    def getBooleanArray(self) -> List[bool]:
+    def getBooleanArray(self) -> list[bool]:
         return [x != 0 for x in self.data]
 
     def getIntegerArray(self) -> array.array:
@@ -157,7 +157,7 @@ class DataLogRecord:
         arr.frombytes(self.data)
         return arr
 
-    def getStringArray(self) -> List[str]:
+    def getStringArray(self) -> list[str]:
         size = int.from_bytes(self.data[:4], byteorder="little", signed=False)
         if size > ((len(self.data) - 4) / 4):
             raise TypeError("not a string array")
@@ -205,7 +205,9 @@ class DataLogIterator:
             raise StopIteration
         entry = self._readVarInt(self.pos + 1, entryLen)
         size = self._readVarInt(self.pos + 1 + entryLen, sizeLen)
-        timestamp = self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen)
+        timestamp = (
+            self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen) * 1000
+        )
         if len(self.buf) < (self.pos + headerLen + size):
             raise StopIteration
         record = DataLogRecord(
@@ -263,7 +265,7 @@ class DataLogReader:
 if __name__ == "__main__":
     import mmap
     import sys
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
@@ -278,7 +280,7 @@ if __name__ == "__main__":
 
         entries = {}
         for record in reader:
-            timestamp = record.timestamp / 1000000
+            timestamp = record.timestamp / 1_000_000_000
             if record.isStart():
                 try:
                     data = record.getStartData()
@@ -321,8 +323,11 @@ if __name__ == "__main__":
                 try:
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
-                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)
-                        print("  {:%Y-%m-%d %H:%M:%S.%f}".format(dt))
+                        val = record.getInteger()
+                        dt = datetime.fromtimestamp(
+                            val // 1_000_000, tz=timezone.utc
+                        ).astimezone()
+                        print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                         continue
 
                     if entry.type == "double":

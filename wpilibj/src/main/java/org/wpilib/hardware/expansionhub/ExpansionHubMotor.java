@@ -29,11 +29,19 @@ public class ExpansionHubMotor implements AutoCloseable {
     Opposed
   }
 
-  private static final int kPercentageMode = 0;
-  private static final int kVoltageMode = 1;
-  private static final int kPositionMode = 2;
-  private static final int kVelocityMode = 3;
-  private static final int kFollowerMode = 4;
+  private static final int PERCENTAGE_MODE = 0;
+  private static final int VOLTAGE_MODE = 1;
+  private static final int POSITION_MODE = 2;
+  private static final int VELOCITY_MODE = 3;
+  private static final int FOLLOWER_MODE = 4;
+
+  /** Neutral mode applied when the motor output is commanded to 0. */
+  public enum NeutralMode {
+    /** Allow the motor to coast when output is zero. */
+    COAST,
+    /** Actively brake the motor when output is zero. */
+    BRAKE
+  }
 
   private ExpansionHub m_hub;
   private final int m_channel;
@@ -57,7 +65,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   private final ExpansionHubPositionConstants m_positionPidConstants;
 
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a motor at the requested channel on a specific USB port.
    *
    * @param usbId The USB port ID the hub is connected to
    * @param channel The motor channel
@@ -76,7 +84,7 @@ public class ExpansionHubMotor implements AutoCloseable {
       throw new AllocationException("ExpansionHub Motor already allocated");
     }
 
-    m_hub.reportUsage("ExHubMotor[" + channel + "]", "ExHubMotor");
+    m_hub.reportUsage("ExHubMotor", channel, "ExHubMotor");
 
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 
@@ -165,7 +173,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public void setThrottle(double throttle) {
     setEnabled(true);
-    m_modePublisher.set(kPercentageMode);
+    m_modePublisher.set(PERCENTAGE_MODE);
     m_setpointPublisher.set(throttle);
   }
 
@@ -177,7 +185,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public void setVoltage(Voltage voltage) {
     setEnabled(true);
-    m_modePublisher.set(kVoltageMode);
+    m_modePublisher.set(VOLTAGE_MODE);
     m_setpointPublisher.set(voltage.in(Volts));
   }
 
@@ -189,7 +197,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public void setPositionSetpoint(double setpoint) {
     setEnabled(true);
-    m_modePublisher.set(kPositionMode);
+    m_modePublisher.set(POSITION_MODE);
     m_setpointPublisher.set(setpoint);
   }
 
@@ -201,7 +209,7 @@ public class ExpansionHubMotor implements AutoCloseable {
    */
   public void setVelocitySetpoint(double setpoint) {
     setEnabled(true);
-    m_modePublisher.set(kVelocityMode);
+    m_modePublisher.set(VELOCITY_MODE);
     m_setpointPublisher.set(setpoint);
   }
 
@@ -215,12 +223,13 @@ public class ExpansionHubMotor implements AutoCloseable {
   }
 
   /**
-   * Sets if the motor should float or brake when 0 is commanded. Defaults to false.
+   * Sets if the motor should brake or coast when 0 is commanded. Defaults to BRAKE mode.
    *
-   * @param floatOn0 True to float when commanded 0, false to brake
+   * @param mode Neutral mode to apply when output is zero.
    */
-  public void setFloatOn0(boolean floatOn0) {
-    m_floatOn0Publisher.set(floatOn0);
+  public void setNeutralMode(NeutralMode mode) {
+    requireNonNullParam(mode, "mode", "setNeutralMode");
+    m_floatOn0Publisher.set(mode == NeutralMode.COAST);
   }
 
   /**
@@ -319,7 +328,7 @@ public class ExpansionHubMotor implements AutoCloseable {
     }
     m_hub.addFollower(leader.m_channel, this.m_channel);
     setEnabled(true);
-    m_modePublisher.set(kFollowerMode);
+    m_modePublisher.set(FOLLOWER_MODE);
     if (direction == FollowDirection.Opposed) {
       m_setpointPublisher.set(leader.m_channel + 4);
     } else {
@@ -331,7 +340,7 @@ public class ExpansionHubMotor implements AutoCloseable {
   public void unfollow() {
     m_hub.removeFollower(this.m_channel);
     setEnabled(false);
-    m_modePublisher.set(kPercentageMode);
+    m_modePublisher.set(PERCENTAGE_MODE);
     m_setpointPublisher.set(0);
   }
 }

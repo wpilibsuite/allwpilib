@@ -278,35 +278,35 @@ public final class Models {
    * <p>The states are [left velocity, right velocity], the inputs are [left voltage, right
    * voltage], and the outputs are [left velocity, right velocity].
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per second).
-   * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per second squared).
+   * @param kvAngular The angular velocity gain in volts per (meters per second).
+   * @param kaAngular The angular acceleration gain in volts per (meters per second squared).
    * @return Differential drive state-space model.
-   * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0, or
-   *     kAAngular &lt;= 0.
+   * @throws IllegalArgumentException if kvLinear &lt;= 0, kaLinear &lt;= 0, kvAngular &lt;= 0, or
+   *     kaAngular &lt;= 0.
    * @see <a
    *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N2, N2> differentialDriveFromSysId(
-      double kVLinear, double kALinear, double kVAngular, double kAAngular) {
-    if (kVLinear <= 0.0) {
+      double kvLinear, double kaLinear, double kvAngular, double kaAngular) {
+    if (kvLinear <= 0.0) {
       throw new IllegalArgumentException("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= 0.0) {
+    if (kaLinear <= 0.0) {
       throw new IllegalArgumentException("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= 0.0) {
+    if (kvAngular <= 0.0) {
       throw new IllegalArgumentException("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= 0.0) {
+    if (kaAngular <= 0.0) {
       throw new IllegalArgumentException("Ka,angular must be greater than zero.");
     }
 
-    double A1 = -0.5 * (kVLinear / kALinear + kVAngular / kAAngular);
-    double A2 = -0.5 * (kVLinear / kALinear - kVAngular / kAAngular);
-    double B1 = 0.5 / kALinear + 0.5 / kAAngular;
-    double B2 = 0.5 / kALinear - 0.5 / kAAngular;
+    double A1 = -0.5 * (kvLinear / kaLinear + kvAngular / kaAngular);
+    double A2 = -0.5 * (kvLinear / kaLinear - kvAngular / kaAngular);
+    double B1 = 0.5 / kaLinear + 0.5 / kaAngular;
+    double B2 = 0.5 / kaLinear - 0.5 / kaAngular;
 
     var A = MatBuilder.fill(Nat.N2(), Nat.N2(), A1, A2, A2, A1);
     var B = MatBuilder.fill(Nat.N2(), Nat.N2(), B1, B2, B2, B1);
@@ -323,30 +323,30 @@ public final class Models {
    * <p>The states are [left velocity, right velocity], the inputs are [left voltage, right
    * voltage], and the outputs are [left velocity, right velocity].
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per second squared).
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per second squared).
+   * @param kvAngular The angular velocity gain in volts per (radians per second).
+   * @param kaAngular The angular acceleration gain in volts per (radians per second squared).
    * @param trackwidth The distance between the differential drive's left and right wheels, in
    *     meters.
    * @return Differential drive state-space model.
-   * @throws IllegalArgumentException if kVLinear &lt;= 0, kALinear &lt;= 0, kVAngular &lt;= 0,
-   *     kAAngular &lt;= 0, or trackwidth &lt;= 0.
+   * @throws IllegalArgumentException if kvLinear &lt;= 0, kaLinear &lt;= 0, kvAngular &lt;= 0,
+   *     kaAngular &lt;= 0, or trackwidth &lt;= 0.
    * @see <a
    *     href="https://github.com/wpilibsuite/allwpilib/tree/main/sysid">https://github.com/wpilibsuite/allwpilib/tree/main/sysid</a>
    */
   public static LinearSystem<N2, N2, N2> differentialDriveFromSysId(
-      double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
-    if (kVLinear <= 0.0) {
+      double kvLinear, double kaLinear, double kvAngular, double kaAngular, double trackwidth) {
+    if (kvLinear <= 0.0) {
       throw new IllegalArgumentException("Kv,linear must be greater than zero.");
     }
-    if (kALinear <= 0.0) {
+    if (kaLinear <= 0.0) {
       throw new IllegalArgumentException("Ka,linear must be greater than zero.");
     }
-    if (kVAngular <= 0.0) {
+    if (kvAngular <= 0.0) {
       throw new IllegalArgumentException("Kv,angular must be greater than zero.");
     }
-    if (kAAngular <= 0.0) {
+    if (kaAngular <= 0.0) {
       throw new IllegalArgumentException("Ka,angular must be greater than zero.");
     }
     if (trackwidth <= 0.0) {
@@ -365,6 +365,6 @@ public final class Models {
     // So multiplying by 2/trackwidth converts the angular gains from V/(rad/s)
     // to V/(m/s).
     return differentialDriveFromSysId(
-        kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
+        kvLinear, kaLinear, kvAngular * 2.0 / trackwidth, kaAngular * 2.0 / trackwidth);
   }
 }

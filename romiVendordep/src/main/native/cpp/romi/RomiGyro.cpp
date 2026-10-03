@@ -4,6 +4,8 @@
 
 #include "wpi/romi/RomiGyro.hpp"
 
+#include "wpi/telemetry/TelemetryTable.hpp"
+
 using namespace wpi::romi;
 
 RomiGyro::RomiGyro() : m_simDevice("Gyro:RomiGyro") {
@@ -86,4 +88,17 @@ void RomiGyro::Reset() {
     m_angleYOffset = m_simAngleY.Get();
     m_angleZOffset = m_simAngleZ.Get();
   }
+}
+
+std::string_view RomiGyro::GetTelemetryType() const {
+  return "Romi Gyro";
+}
+
+void RomiGyro::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("rate x", GetRateX());
+  table.Log("rate y", GetRateY());
+  table.Log("rate z", GetRateZ());
+  table.Log("angle x", GetAngleX());
+  table.Log("angle y", GetAngleY());
+  table.Log("angle z", GetAngleZ());
 }

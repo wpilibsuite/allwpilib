@@ -1,5 +1,10 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 // These are parameter variable scales. They have the units of the parameters
 // themselves, so the optimizer sees x/SCALE_X for each parameter. I.e. as far
 // as the optimizer is concerned, the scale of each variable is 1. This doesn't
@@ -41,3 +46,7 @@
 #define SCALE_POSITION_POINT          SCALE_TRANSLATION_FRAME
 #define SCALE_CALOBJECT_WARP          0.01
 #define SCALE_DISTORTION              1.0
+
+#ifdef __cplusplus
+}
+#endif

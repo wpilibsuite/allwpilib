@@ -1,14 +1,21 @@
 extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
 - wpi/driverstation/internal/DriverStationBackend.hpp
 - wpi/event/BooleanEvent.hpp
 
 classes:
   wpi::NiDsXboxController:
-    ignored_bases:
-    - wpi::util::SendableHelper<NiDsXboxController>
+    force_no_trampoline: true
     methods:
       NiDsXboxController:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
       GetRightX:
       GetLeftY:
@@ -63,24 +70,31 @@ classes:
       GetRightBumperButton:
       GetRightBumperButtonPressed:
       GetRightBumperButtonReleased:
-      InitSendable:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetRumble:
+      GetTelemetryType:
+      LogTo:
   wpi::NiDsXboxController::Button:
     attributes:
-      kLeftBumper:
-      kRightBumper:
-      kLeftStick:
-      kRightStick:
-      kA:
-      kB:
-      kX:
-      kY:
-      kBack:
-      kStart:
+      LEFT_BUMPER:
+      RIGHT_BUMPER:
+      LEFT_STICK:
+      RIGHT_STICK:
+      A:
+      B:
+      X:
+      Y:
+      BACK:
+      START:
   wpi::NiDsXboxController::Axis:
     attributes:
-      kLeftX:
-      kRightX:
-      kLeftY:
-      kRightY:
-      kLeftTrigger:
-      kRightTrigger:
+      LEFT_X:
+      RIGHT_X:
+      LEFT_Y:
+      RIGHT_Y:
+      LEFT_TRIGGER:
+      RIGHT_TRIGGER:

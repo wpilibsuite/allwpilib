@@ -23,7 +23,7 @@ public class RobotContainer {
   private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 
   private final CommandGamepad driverController =
-      new CommandGamepad(OperatorConstants.kDriverControllerPort);
+      new CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

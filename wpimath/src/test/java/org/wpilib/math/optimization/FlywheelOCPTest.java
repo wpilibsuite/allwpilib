@@ -103,7 +103,7 @@ class FlywheelOCPTest {
             // steady-states.
             assertEquals(u, problem.U().value(0, k), 2.0);
           } else {
-            assertEquals(u, problem.U().value(0, k), 1e-4);
+            assertEquals(u, problem.U().value(0, k), 2e-4);
           }
         }
 

@@ -5,7 +5,6 @@
 #include "wpi/halsim/ws_core/WSProvider_AddressableLED.hpp"
 
 #include <utility>
-#include <vector>
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/AddressableLEDData.h"

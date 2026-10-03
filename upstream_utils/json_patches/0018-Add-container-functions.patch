@@ -9,7 +9,7 @@ Subject: [PATCH 18/25] Add container functions
  2 files changed, 120 insertions(+)
 
 diff --git a/json.cpp b/json.cpp
-index 40479bc266390f015e291b737b5751522dac76ac..2307536b15be9aae19da4ec9370a5aa17d5150d1 100644
+index 839c311017ccbb2f5ea8f85aab4965e9ce7af090..a800ce44ab28117b957a2f7507908cbd4c730de9 100644
 --- a/json.cpp
 +++ b/json.cpp
 @@ -606,6 +606,28 @@ json::contains(std::string_view key) const
@@ -129,7 +129,7 @@ index 40479bc266390f015e291b737b5751522dac76ac..2307536b15be9aae19da4ec9370a5aa1
  json::to_string() const
  {
 diff --git a/json.h b/json.h
-index fbc3fb959f71f6acc344f26247597959807d23bb..62af49cb18b713304ad95e89c52f5cc5bbc4b626 100644
+index 2f2bb7b3b0a265299a011e4e8011ea14065dca36..b478523deea8ae3d852ebe369cea8ca60fdec01d 100644
 --- a/json.h
 +++ b/json.h
 @@ -216,6 +216,9 @@ class json

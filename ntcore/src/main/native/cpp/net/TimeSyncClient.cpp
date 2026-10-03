@@ -113,7 +113,7 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
                                          unsigned int remote_port,
                                          std::chrono::milliseconds ping_delay,
                                          std::function<void(Metadata)> callback)
-    : m_timeProvider(nt::Now),
+    : m_timeProvider([] { return nt::Now() / 1000; }),
       m_logger{logger},
       m_serverIP{server},
       m_serverPort{remote_port},

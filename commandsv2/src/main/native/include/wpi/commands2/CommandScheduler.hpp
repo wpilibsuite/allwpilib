@@ -5,20 +5,22 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <memory>
 #include <optional>
 #include <span>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "wpi/event/EventLoop.hpp"
 #include "wpi/system/Errors.hpp"
 #include "wpi/system/Watchdog.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/tunables/ComplexTunable.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/FunctionExtras.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi::cmd {
 class Command;
@@ -34,9 +36,8 @@ class Subsystem;
  *
  * This class is provided by the Commands v2 VendorDep
  */
-class CommandScheduler final
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<CommandScheduler> {
+class CommandScheduler final : public wpi::telemetry::TelemetryLoggable,
+                               public wpi::tunables::ComplexTunable {
  public:
   /**
    * Returns the Scheduler instance.
@@ -468,7 +469,11 @@ class CommandScheduler final
   void RequireUngroupedAndUnscheduled(
       std::initializer_list<const Command*> commands);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
+  void PublishTunable(wpi::tunables::TunableTable& table) override;
+  void UpdateTunable() const override;
+  std::string_view GetTunableType() const override;
 
  private:
   // Constructor; private as this is a singleton
@@ -478,9 +483,14 @@ class CommandScheduler final
                              std::unique_ptr<Command> command);
 
   void Cancel(Command* command, std::optional<Command*> interruptor);
+  std::vector<std::string> GetScheduledCommandNames() const;
+  std::vector<int64_t> GetScheduledCommandIds() const;
 
   class Impl;
   std::unique_ptr<Impl> m_impl;
+  mutable std::vector<std::string> m_scheduledCommandNames;
+  mutable std::vector<int64_t> m_scheduledCommandIds;
+  std::vector<int64_t> m_toCancel;
 
   wpi::Watchdog m_watchdog;
 

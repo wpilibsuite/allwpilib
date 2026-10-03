@@ -1,0 +1,207 @@
+/* auto-generated on 2026-07-12 20:34:08 -0400. Do not edit! */
+/* begin file include/idna.h */
+#ifndef ADA_IDNA_H
+#define ADA_IDNA_H
+
+/* begin file include/ada/idna/unicode_transcoding.h */
+#ifndef ADA_IDNA_UNICODE_TRANSCODING_H
+#define ADA_IDNA_UNICODE_TRANSCODING_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+size_t utf8_to_utf32(const char* buf, size_t len, char32_t* utf32_output);
+
+size_t utf8_length_from_utf32(const char32_t* buf, size_t len);
+
+size_t utf32_length_from_utf8(const char* buf, size_t len);
+
+size_t utf32_to_utf8(const char32_t* buf, size_t len, char* utf8_output);
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_UNICODE_TRANSCODING_H
+/* end file include/ada/idna/unicode_transcoding.h */
+/* begin file include/ada/idna/mapping.h */
+#ifndef ADA_IDNA_MAPPING_H
+#define ADA_IDNA_MAPPING_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+// If the input is ascii, then the mapping is just -> lower case.
+void ascii_map(char* input, size_t length);
+// Map the characters according to IDNA, returning the empty string on error.
+std::u32string map(std::u32string_view input);
+// Map into an existing buffer (cleared on entry). Returns false if any code
+// point is disallowed. Reusing the buffer avoids repeated heap allocations
+// when called in a loop over multiple labels.
+bool map(std::u32string_view input, std::u32string& out);
+
+}  // namespace ada::idna
+
+#endif
+/* end file include/ada/idna/mapping.h */
+/* begin file include/ada/idna/normalization.h */
+#ifndef ADA_IDNA_NORMALIZATION_H
+#define ADA_IDNA_NORMALIZATION_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+// Returns true if `input` is already in Unicode Normalization Form C.
+// Requires that internal tables have been loaded (call ensure via normalize
+// or map first, or this returns false if tables are unavailable).
+[[nodiscard]] bool is_already_nfc(std::u32string_view input) noexcept;
+
+// Normalize the characters according to IDNA (Unicode Normalization Form C).
+// Returns false if the internal Unicode tables could not be loaded; in that
+// case `input` is left unchanged. Skips work when the string is already NFC.
+[[nodiscard]] bool normalize(std::u32string& input);
+
+}  // namespace ada::idna
+#endif
+/* end file include/ada/idna/normalization.h */
+/* begin file include/ada/idna/punycode.h */
+#ifndef ADA_IDNA_PUNYCODE_H
+#define ADA_IDNA_PUNYCODE_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+bool punycode_to_utf32(std::string_view input, std::u32string& out);
+bool verify_punycode(std::string_view input);
+bool utf32_to_punycode(std::u32string_view input, std::string& out);
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_PUNYCODE_H
+/* end file include/ada/idna/punycode.h */
+/* begin file include/ada/idna/validity.h */
+#ifndef ADA_IDNA_VALIDITY_H
+#define ADA_IDNA_VALIDITY_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+/**
+ * @see https://www.unicode.org/reports/tr46/#Validity_Criteria
+ */
+bool is_label_valid(std::u32string_view label);
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_VALIDITY_H
+/* end file include/ada/idna/validity.h */
+/* begin file include/ada/idna/to_ascii.h */
+#ifndef ADA_IDNA_TO_ASCII_H
+#define ADA_IDNA_TO_ASCII_H
+
+#include <string>
+#include <string_view>
+
+/* begin file include/ada/idna/limits.h */
+#ifndef ADA_IDNA_LIMITS_H
+#define ADA_IDNA_LIMITS_H
+
+#include <cstddef>
+
+namespace ada::idna {
+
+// Maximum accepted UTF-8 domain length for to_ascii / to_unicode.
+// Bounds heap growth under untrusted input (DoS resistance). DNS wire limits
+// are smaller; this allows long Unicode labels used in URL tests/fixtures.
+inline constexpr size_t max_domain_input_bytes = 16384;
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_LIMITS_H
+/* end file include/ada/idna/limits.h */
+
+namespace ada::idna {
+
+// Converts a domain (e.g., www.google.com) possibly containing international
+// characters to an ascii domain (with punycode). It will not do percent
+// decoding: percent decoding should be done prior to calling this function. We
+// do not remove tabs and spaces, they should have been removed prior to calling
+// this function. We also do not trim control characters. We also assume that
+// the input is not empty. We return "" on error. Inputs longer than
+// max_domain_input_bytes are rejected.
+//
+// This function may accept or even produce invalid domains (WHATWG carve-outs).
+std::string to_ascii(std::string_view ut8_string);
+
+// Same as to_ascii, but writes into `out` and returns false on error without
+// relying on empty-string ambiguity.
+[[nodiscard]] bool to_ascii(std::string_view ut8_string, std::string& out);
+
+// Returns true if the string contains a forbidden code point according to the
+// WHATGL URL specification:
+// https://url.spec.whatwg.org/#forbidden-domain-code-point
+bool contains_forbidden_domain_code_point(std::string_view ascii_string);
+
+bool constexpr is_ascii(std::u32string_view view);
+bool constexpr is_ascii(std::string_view view);
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_TO_ASCII_H
+/* end file include/ada/idna/to_ascii.h */
+/* begin file include/ada/idna/to_unicode.h */
+#ifndef ADA_IDNA_TO_UNICODE_H
+#define ADA_IDNA_TO_UNICODE_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+// UTS #46 ToUnicode. Never fails per the standard: on step failure the original
+// label is kept. Inputs longer than max_domain_input_bytes are returned
+// unchanged as a safety measure under untrusted input.
+std::string to_unicode(std::string_view input);
+
+// Writes into `out`. Returns false only if the input exceeds
+// max_domain_input_bytes (out is left empty). Otherwise always returns true
+// (ToUnicode does not fail).
+[[nodiscard]] bool to_unicode(std::string_view input, std::string& out);
+
+}  // namespace ada::idna
+
+#endif  // ADA_IDNA_TO_UNICODE_H
+/* end file include/ada/idna/to_unicode.h */
+/* begin file include/ada/idna/identifier.h */
+#ifndef ADA_IDNA_IDENTIFIER_H
+#define ADA_IDNA_IDENTIFIER_H
+
+#include <string>
+#include <string_view>
+
+namespace ada::idna {
+
+// Verify if it is valid name code point given a Unicode code point and a
+// boolean first: If first is true return the result of checking if code point
+// is contained in the IdentifierStart set of code points. Otherwise return the
+// result of checking if code point is contained in the IdentifierPart set of
+// code points. Returns false if the input is empty or the code point is not
+// valid. There is minimal Unicode error handling: the input should be valid
+// UTF-8. https://urlpattern.spec.whatwg.org/#is-a-valid-name-code-point
+bool valid_name_code_point(char32_t code_point, bool first);
+
+}  // namespace ada::idna
+
+#endif
+/* end file include/ada/idna/identifier.h */
+
+#endif
+/* end file include/idna.h */

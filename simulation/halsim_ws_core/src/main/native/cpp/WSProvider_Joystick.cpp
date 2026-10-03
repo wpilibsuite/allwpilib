@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "wpi/hal/DriverStationTypes.h"
-#include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 
 namespace wpilibws {

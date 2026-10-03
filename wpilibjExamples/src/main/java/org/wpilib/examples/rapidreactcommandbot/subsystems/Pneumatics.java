@@ -7,6 +7,7 @@ package org.wpilib.examples.rapidreactcommandbot.subsystems;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.epilogue.Logged;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.Compressor;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.hardware.rotation.AnalogPotentiometer;
@@ -19,13 +20,14 @@ public class Pneumatics extends SubsystemBase {
   // in this case, 250(V/5)-25
   // the scale parameter in the AnalogPotentiometer constructor is scaled from 1 instead of 5,
   // so if r is the raw AnalogPotentiometer output, the pressure is 250r-25
-  static final double kScale = 250;
-  static final double kOffset = -25;
+  static final double SCALE = 250;
+  static final double OFFSET = -25;
   private final AnalogPotentiometer pressureTransducer =
-      new AnalogPotentiometer(/* the AnalogIn port*/ 2, kScale, kOffset);
+      new AnalogPotentiometer(/* the AnalogIn port*/ 2, SCALE, OFFSET);
 
   // Compressor connected to a PCM with a default CAN ID (0)
-  private final Compressor compressor = new Compressor(0, PneumaticsModuleType.CTRE_PCM);
+  private final Compressor compressor =
+      new Compressor(CANPort.CAN_S0, PneumaticsModuleType.CTRE_PCM);
 
   /**
    * Query the analog pressure sensor.

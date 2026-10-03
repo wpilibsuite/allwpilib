@@ -8,13 +8,13 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-#include "wpi/net/MulticastServiceAnnouncer.h"
-#include "wpi/net/MulticastServiceResolver.h"
-#include "wpi/util/timestamp.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
+#include "wpi/net/MulticastServiceResolver.hpp"
 
-TEST(MulticastServiceAnnouncerTest, EmptyText) {
+TEST_CASE("MulticastServiceAnnouncerTest EmptyText",
+          "[multicast][service-discovery]") {
   const std::string_view serviceName = "TestServiceNoText";
   const std::string_view serviceType = "_wpinotxt._tcp";
   const int port = std::rand();
@@ -38,14 +38,15 @@ TEST(MulticastServiceAnnouncerTest, EmptyText) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
-    ASSERT_GT(allData.size(), 0ul);
+    REQUIRE(allData.size() > 0ul);
 
     resolver.Stop();
     announcer.Stop();
   }
 }
 
-TEST(MulticastServiceAnnouncerTest, SingleText) {
+TEST_CASE("MulticastServiceAnnouncerTest SingleText",
+          "[multicast][service-discovery]") {
   const std::string_view serviceName = "TestServiceSingle";
   const std::string_view serviceType = "_wpitxt";
   const int port = std::rand();

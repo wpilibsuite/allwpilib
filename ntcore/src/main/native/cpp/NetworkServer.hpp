@@ -16,7 +16,7 @@
 #include "net/Message.hpp"
 #include "server/ServerImpl.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
-#include "wpi/net/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Idle.hpp"
 #include "wpi/net/uv/Timer.hpp"
@@ -77,7 +77,7 @@ class NetworkServer {
   bool m_shutdown = false;
 
   using Queue = net::LocalClientMessageQueue;
-  net::ClientMessage m_localMsgs[Queue::kBlockSize];
+  net::ClientMessage m_localMsgs[Queue::BLOCK_SIZE];
 
   server::ServerImpl m_serverImpl;
 

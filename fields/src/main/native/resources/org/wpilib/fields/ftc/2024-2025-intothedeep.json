@@ -1,20 +1,17 @@
 {
-  "game": "2024-2025 FTC Into The Deep",
-  "field-image": "2024-2025-intothedeep.png",
-  "field-corners": {
-    "top-left": [
-      0,
-      0
-    ],
-    "bottom-right": [
-      2214,
-      2214
-    ]
+  "name": "2024-2025 FTC Into The Deep",
+  "season": "2024-2025",
+  "game": "Into The Deep",
+  "field-image": {
+    "path": "2024-2025-intothedeep.png",
+    "top": 0,
+    "left": 0,
+    "bottom": 2214,
+    "right": 2214
   },
-  "field-size": [
-    11.93183333,
-    11.93183333
-  ],
-  "field-unit": "foot",
+  "field-dimensions": {
+    "length": 3.636822798984,
+    "width": 3.636822798984
+  },
   "program": "ftc"
 }

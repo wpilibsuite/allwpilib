@@ -30,7 +30,7 @@ public final class MockHardwareExtension implements BeforeAllCallback {
   }
 
   private void initializeHardware() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     DriverStationSim.setDsAttached(true);
     DriverStationSim.setEnabled(true);
     DriverStationSim.setRobotMode(RobotMode.UTILITY);

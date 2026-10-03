@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include <stdexcept>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/math/linalg/proto/MatrixProto.hpp"
 #include "wpi/math/system/LinearSystem.hpp"

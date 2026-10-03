@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include "wpi/driverstation/NiDsPS4Controller.hpp"
-
-#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
+#include "wpi/driverstation/NiDsPS4Controller.hpp"
 
 namespace wpi::cmd {
 /**
@@ -19,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::NiDsPS4Controller
  */
-class CommandNiDsPS4Controller : public CommandGenericHID {
+class CommandNiDsPS4Controller {
  public:
   /**
    * Construct an instance of a controller.
@@ -30,11 +29,18 @@ class CommandNiDsPS4Controller : public CommandGenericHID {
   explicit CommandNiDsPS4Controller(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Get the underlying CommandGenericHID object.
    *
-   * @return the wrapped GenericHID object
+   * @return the wrapped CommandGenericHID object
    */
-  wpi::NiDsPS4Controller& GetHID();
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying NiDsPS4Controller object.
+   *
+   * @return the wrapped NiDsPS4Controller object
+   */
+  wpi::NiDsPS4Controller& GetNiDsPS4Controller();
 
   /**
    * Constructs a Trigger instance around the square button's
@@ -249,6 +255,7 @@ class CommandNiDsPS4Controller : public CommandGenericHID {
   double GetR2Axis() const;
 
  private:
-  wpi::NiDsPS4Controller m_hid;
+  CommandGenericHID* m_hid;
+  wpi::NiDsPS4Controller m_controller;
 };
 }  // namespace wpi::cmd

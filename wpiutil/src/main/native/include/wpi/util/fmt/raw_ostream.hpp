@@ -4,16 +4,18 @@
 
 #pragma once
 
-#include <fmt/format.h>
+#include <format>
+#include <iterator>
+#include <vector>
 
 #include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::util {
 
-inline void vprint(wpi::util::raw_ostream& os, fmt::string_view format_str,
-                   fmt::format_args args) {
-  fmt::memory_buffer buffer;
-  fmt::detail::vformat_to(buffer, format_str, args);
+inline void vprint(wpi::util::raw_ostream& os, std::string_view format_str,
+                   std::format_args args) {
+  std::vector<char> buffer;
+  std::vformat_to(std::back_inserter(buffer), format_str, args);
   os.write(buffer.data(), buffer.size());
 }
 
@@ -22,7 +24,7 @@ inline void vprint(wpi::util::raw_ostream& os, fmt::string_view format_str,
  */
 template <typename S, typename... Args>
 void print(wpi::util::raw_ostream& os, const S& format_str, Args&&... args) {
-  vprint(os, format_str, fmt::make_format_args(args...));
+  vprint(os, format_str, std::make_format_args(args...));
 }
 
 }  // namespace wpi::util

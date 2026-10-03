@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <limits>
 #include <thread>
 
 #include "MockHooksInternal.hpp"
@@ -18,9 +19,9 @@
 static std::atomic<bool> programStarted{false};
 static std::atomic<int64_t> programState{0};
 
-static std::atomic<uint64_t> programStartTime{0};
-static std::atomic<uint64_t> programPauseTime{0};
-static std::atomic<uint64_t> programStepTime{0};
+static std::atomic<int64_t> programPauseTime{0};
+static std::atomic<int64_t> programOffsetTime{0};
+static std::atomic<uint64_t> programStartNotifierAlarmCount{0};
 
 namespace wpi::hal::init {
 void InitializeMockHooks() {
@@ -30,11 +31,9 @@ void InitializeMockHooks() {
 
 namespace wpi::hal {
 void RestartTiming() {
-  programStartTime = wpi::util::NowDefault();
-  programStepTime = 0;
-  if (programPauseTime != 0) {
-    programPauseTime = programStartTime.load();
-  }
+  // Reinstall to set the program start time to the current simulated time
+  // without changing the simulated clock or pause state.
+  wpi::util::SetNowImpl(GetMonotonicTime);
 }
 
 void PauseTiming() {
@@ -45,7 +44,7 @@ void PauseTiming() {
 
 void ResumeTiming() {
   if (programPauseTime != 0) {
-    programStartTime += wpi::util::NowDefault() - programPauseTime;
+    programOffsetTime -= wpi::util::NowDefault() - programPauseTime;
     programPauseTime = 0;
   }
 }
@@ -54,19 +53,20 @@ bool IsTimingPaused() {
   return programPauseTime != 0;
 }
 
-void StepTiming(uint64_t delta) {
-  programStepTime += delta;
+void StepTiming(int64_t delta) {
+  programOffsetTime += delta;
 }
 
-uint64_t GetMonotonicTime() {
-  uint64_t curTime = programPauseTime;
+int64_t GetMonotonicTime() {
+  int64_t curTime = programPauseTime;
   if (curTime == 0) {
     curTime = wpi::util::NowDefault();
   }
-  return curTime + programStepTime - programStartTime;
+  return curTime + programOffsetTime;
 }
 
 void SetProgramStarted(bool started) {
+  programStartNotifierAlarmCount = GetNotifierAlarmSetCount();
   programStarted = started;
 }
 bool GetProgramStarted() {
@@ -77,12 +77,26 @@ bool GetProgramStarted() {
 using namespace wpi::hal;
 
 extern "C" {
-void HALSIM_WaitForProgramStart(void) {
+void HALSIM_WaitForProgramStart(HAL_Bool waitForFirstNotifier) {
   int count = 0;
   while (!programStarted) {
     count++;
     if (count % 10 == 0) {
       wpi::util::print("Waiting for program start signal: {}\n", count);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  // Frameworks observe program start before arming their first notifier alarm.
+  // Wait for an alarm armed after that program-start edge so a stale notifier
+  // cannot satisfy this check.
+  while (waitForFirstNotifier &&
+         (GetNotifierAlarmSetCount() == programStartNotifierAlarmCount ||
+          HALSIM_GetNextNotifierTimeout() ==
+              std::numeric_limits<int64_t>::max())) {
+    count++;
+    if (count % 10 == 0) {
+      wpi::util::print("Waiting for first notifier alarm: {}\n", count);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
@@ -122,22 +136,30 @@ HAL_Bool HALSIM_IsTimingPaused(void) {
   return IsTimingPaused();
 }
 
-void HALSIM_StepTiming(uint64_t delta) {
+void HALSIM_StepTiming(int64_t delta) {
   WaitNotifiers();
 
   while (delta > 0) {
-    uint64_t curTime = HAL_GetMonotonicTime();
-    uint64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
-    uint64_t step = (std::min)(delta, nextTimeout - curTime);
+    int64_t curTime = HAL_GetMonotonicTime();
+    int64_t nextTimeout = HALSIM_GetNextNotifierTimeout();
+    // If a notifier is already due, process it at the current simulated time
+    // instead of underflowing nextTimeout - curTime.
+    int64_t step =
+        nextTimeout <= curTime ? 0 : (std::min)(delta, nextTimeout - curTime);
 
     StepTiming(step);
     delta -= step;
 
     WakeupWaitNotifiers();
+
+    // Guard against notifiers that keep rearming at or before the same time.
+    if (step == 0 && HALSIM_GetNextNotifierTimeout() <= curTime) {
+      break;
+    }
   }
 }
 
-void HALSIM_StepTimingAsync(uint64_t delta) {
+void HALSIM_StepTimingAsync(int64_t delta) {
   StepTiming(delta);
   WakeupNotifiers();
 }

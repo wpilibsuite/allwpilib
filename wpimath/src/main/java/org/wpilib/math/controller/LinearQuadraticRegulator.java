@@ -11,9 +11,9 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.Discretization;
 import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Num;
 import org.wpilib.math.util.StateSpaceUtil;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Contains the controller coefficients and logic for a linear-quadratic regulator (LQR). LQRs use
@@ -32,6 +32,12 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
   /** The computed and capped controller output. */
   private Matrix<Inputs, N1> m_u;
+
+  /** The error at the time of the last controller update. */
+  private Matrix<States, N1> m_error;
+
+  /** The error which is considered tolerable for use with atReference(). */
+  private Matrix<States, N1> m_tolerance;
 
   // Controller gain.
   private Matrix<Inputs, States> m_K;
@@ -118,9 +124,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
+    m_error = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
+    m_tolerance = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
+    UsageReporting.reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**
@@ -158,9 +166,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
 
     m_r = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
     m_u = new Matrix<>(new SimpleMatrix(B.getNumCols(), 1));
+    m_error = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
+    m_tolerance = new Matrix<>(new SimpleMatrix(B.getNumRows(), 1));
 
     reset();
-    MathSharedStore.getMathShared().reportUsage("LinearQuadraticRegulator", "");
+    UsageReporting.reportUsage("LinearQuadraticRegulator", "");
   }
 
   /**
@@ -214,6 +224,30 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
   public final void reset() {
     m_r.fill(0.0);
     m_u.fill(0.0);
+    m_error.fill(0.0);
+  }
+
+  /**
+   * Returns true if the error is within the tolerance set by setTolerance() for every state.
+   *
+   * @return True if the error is within tolerance of the reference.
+   */
+  public boolean atReference() {
+    for (int i = 0; i < m_error.getNumRows(); i++) {
+      if (Math.abs(m_error.get(i, 0)) > m_tolerance.get(i, 0)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Sets the error which is considered tolerable for use with atReference().
+   *
+   * @param tolerance The tolerable error for each state.
+   */
+  public void setTolerance(Matrix<States, N1> tolerance) {
+    m_tolerance = tolerance;
   }
 
   /**
@@ -223,7 +257,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num, Ou
    * @return The next controller output.
    */
   public Matrix<Inputs, N1> calculate(Matrix<States, N1> x) {
-    m_u = m_K.times(m_r.minus(x));
+    m_error = m_r.minus(x);
+    m_u = m_K.times(m_error);
     return m_u;
   }
 

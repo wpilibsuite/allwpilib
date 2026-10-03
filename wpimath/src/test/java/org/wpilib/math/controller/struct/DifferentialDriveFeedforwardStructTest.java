@@ -20,9 +20,9 @@ class DifferentialDriveFeedforwardStructTest extends StructTestBase<Differential
   @Override
   public void checkEquals(
       DifferentialDriveFeedforward testData, DifferentialDriveFeedforward data) {
-    assertEquals(testData.kVLinear, data.kVLinear);
-    assertEquals(testData.kALinear, data.kALinear);
-    assertEquals(testData.kVAngular, data.kVAngular);
-    assertEquals(testData.kAAngular, data.kAAngular);
+    assertEquals(testData.kvLinear, data.kvLinear);
+    assertEquals(testData.kaLinear, data.kaLinear);
+    assertEquals(testData.kvAngular, data.kvAngular);
+    assertEquals(testData.kaAngular, data.kaAngular);
   }
 }

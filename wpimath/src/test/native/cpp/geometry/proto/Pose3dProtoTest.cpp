@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/math/geometry/Pose3d.hpp"
 #include "wpi/util/SmallVector.hpp"
@@ -11,19 +11,19 @@ using namespace wpi::math;
 
 namespace {
 
-const Pose3d kExpectedData =
+const Pose3d EXPECTED_DATA =
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}};
 }  // namespace
 
-TEST(Pose3dProtoTest, Roundtrip) {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+TEST_CASE("Pose3dProtoTest Roundtrip", "[wpimath]") {
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  ASSERT_TRUE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
-  ASSERT_TRUE(unpacked_data.has_value());
+  REQUIRE(unpacked_data.has_value());
 
-  EXPECT_EQ(kExpectedData.Translation(), unpacked_data->Translation());
-  EXPECT_EQ(kExpectedData.Rotation(), unpacked_data->Rotation());
+  CHECK(EXPECTED_DATA.Translation() == unpacked_data->Translation());
+  CHECK(EXPECTED_DATA.Rotation() == unpacked_data->Rotation());
 }

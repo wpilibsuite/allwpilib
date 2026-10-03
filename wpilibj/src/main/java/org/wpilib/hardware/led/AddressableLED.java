@@ -5,7 +5,7 @@
 package org.wpilib.hardware.led;
 
 import org.wpilib.hardware.hal.AddressableLEDJNI;
-import org.wpilib.hardware.hal.HAL;
+import org.wpilib.util.UsageReporting;
 
 /**
  * A class for driving addressable LEDs, such as WS2812B, WS2815, and NeoPixels.
@@ -75,7 +75,7 @@ public class AddressableLED implements AutoCloseable {
   public AddressableLED(int channel) {
     m_channel = channel;
     m_handle = AddressableLEDJNI.initialize(channel);
-    HAL.reportUsage("IO", channel, "AddressableLED");
+    UsageReporting.reportUsage("IO", channel, "AddressableLED");
   }
 
   @Override

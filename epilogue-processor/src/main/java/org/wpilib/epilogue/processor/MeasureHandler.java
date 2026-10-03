@@ -32,8 +32,7 @@ public class MeasureHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    // EpilogueBackend has builtin support for logging measures
-    return "backend.log(\""
+    return "org.wpilib.epilogue.EpilogueTelemetry.logMeasure(table, \""
         + loggedName(element)
         + "\", "
         + elementAccess(element, loggedClass)

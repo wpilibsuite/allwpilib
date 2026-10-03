@@ -26,9 +26,9 @@ class WrapperCommand(Command):
         """
         super().__init__()
 
-        CommandScheduler.getInstance().registerComposedCommands([command])
+        CommandScheduler.get_instance().register_composed_commands([command])
         self._command = command
-        self.setName(self._command.getName())
+        self.set_name(self._command.get_name())
 
     def initialize(self):
         """
@@ -48,22 +48,22 @@ class WrapperCommand(Command):
         when it interrupted/canceled.
 
         Do not schedule commands here that share requirements with this command. Use
-        :func:`commands2.Command.andThen` instead.
+        :func:`commands2.Command.and_then` instead.
 
         :param interrupted: whether the command was interrupted/canceled
         """
         self._command.end(interrupted)
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         """
         Whether the command has finished. Once a command finishes, the scheduler will call its end()
         method and un-schedule it.
 
         :returns: whether the command has finished.
         """
-        return self._command.isFinished()
+        return self._command.is_finished()
 
-    def getRequirements(self) -> Set:
+    def get_requirements(self) -> Set:
         """
         Specifies the set of subsystems used by this command. Two commands cannot use the same
         subsystem at the same time. If the command is scheduled as interruptible and another command is
@@ -75,16 +75,16 @@ class WrapperCommand(Command):
 
         :returns: the set of subsystems that are required
         """
-        return self._command.getRequirements()
+        return self._command.get_requirements()
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         """
         Whether the given command should run when the robot is disabled. Override to return true if the
         command should run when disabled.
 
         :returns: whether the command should run when the robot is disabled
         """
-        return self._command.runsWhenDisabled()
+        return self._command.runs_when_disabled()
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
-        return self._command.getInterruptionBehavior()
+    def get_interruption_behavior(self) -> InterruptionBehavior:
+        return self._command.get_interruption_behavior()

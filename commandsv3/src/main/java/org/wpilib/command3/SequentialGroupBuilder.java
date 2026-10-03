@@ -82,16 +82,21 @@ public class SequentialGroupBuilder {
    * @return The built command
    */
   public Command named(String name) {
+    return named(name, false);
+  }
+
+  private Command named(String name, boolean useAutomaticName) {
     var seq = new SequentialGroup(name, m_steps);
     if (m_endCondition == null) {
       // No custom end condition, return the group as is
       return seq;
     }
 
+    var out =
+        new ParallelGroupBuilder()
+            .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"));
     // We have a custom end condition, so we need to wrap the group in a race
-    return new ParallelGroupBuilder()
-        .optional(seq, Command.waitUntil(m_endCondition).named("Until Condition"))
-        .named(name);
+    return useAutomaticName ? out.withAutomaticName() : out.named(name);
   }
 
   /**
@@ -101,6 +106,6 @@ public class SequentialGroupBuilder {
    * @return The built command
    */
   public Command withAutomaticName() {
-    return named(m_steps.stream().map(Command::name).collect(Collectors.joining(" -> ")));
+    return named(m_steps.stream().map(Command::name).collect(Collectors.joining(" -> ")), true);
   }
 }

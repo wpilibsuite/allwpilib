@@ -68,7 +68,7 @@ sequenceDiagram
 
 Time Synchronization Protocol (TSP) participants can assume either a server role or a client role. The server role is responsible for listening for incoming time synchronization requests from clients and replying appropriately. The client role is responsible for sending "Ping" messages to the server and listening for "Pong" replies to estimate the offset between the server and client time bases.
 
-All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified, but when working with NetworkTables, server implementers shall use `nt::Now`.
+All time values shall use units of microseconds. The epoch of the time base this is measured against is unspecified, but when working with NetworkTables, server implementers shall use `nt::Now() / 1000` to convert its nanosecond timestamp to microseconds.
 
 Clients shall periodically send, in a manner that minimizes transmission delays, a **TSP Ping Message** that contains the client's current local time.
 

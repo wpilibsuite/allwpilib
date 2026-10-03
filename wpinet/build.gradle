@@ -1,12 +1,82 @@
+import org.gradle.internal.os.OperatingSystem
+
+
+apply plugin: 'c'
+
+def findWindowsCppWinrtIncludeDir = {
+    def candidates = []
+    def sdkDir = System.getenv('WindowsSdkDir')
+    def sdkVersions = [
+        System.getenv('WindowsSDKVersion'),
+        System.getenv('WindowsTargetPlatformVersion'),
+        System.getenv('WindowsSDKLibVersion')
+    ].findAll { it != null && !it.isEmpty() }
+
+    if (sdkDir != null && !sdkDir.isEmpty()) {
+        sdkVersions.each {
+            candidates << new File(new File(new File(sdkDir), 'Include'), it)
+                    .toPath()
+                    .normalize()
+                    .toFile()
+        }
+    }
+
+    def programFilesX86 = System.getenv('ProgramFiles(x86)')
+    if (programFilesX86 != null && !programFilesX86.isEmpty()) {
+        def includeRoot = new File(programFilesX86, 'Windows Kits/10/Include')
+        if (includeRoot.isDirectory()) {
+            def versionDirs = includeRoot.listFiles({ File file -> file.isDirectory() } as FileFilter)
+            if (versionDirs != null) {
+                versionDirs.sort { a, b -> b.name <=> a.name }.each {
+                    candidates << it
+                }
+            }
+        }
+    }
+
+    return candidates.collect {
+        new File(it, 'cppwinrt')
+    }.find {
+        new File(it, 'winrt/base.h').isFile()
+    }
+}
+
+if (OperatingSystem.current().isMacOsX()) {
+    apply plugin: 'objective-cpp'
+}
+
+def addWpinetPlatformLinkerArgs = { binary ->
+    if (binary instanceof StaticLibraryBinarySpec) {
+        return
+    }
+    if (binary.targetPlatform.operatingSystem.isWindows()) {
+        binary.linker.args << 'windowsapp.lib'
+    } else if (binary.targetPlatform.operatingSystem.isMacOsX()) {
+        binary.linker.args << '-framework' << 'CoreBluetooth' << '-framework' << 'Foundation'
+    } else {
+        binary.linker.args << '-ldl'
+    }
+}
+
 ext {
     baseId = 'wpinet'
     groupId = 'org.wpilib.net'
 
     nativeName = 'wpinet'
     devMain = 'org.wpilib.net.DevMain'
+    nativeTestSuiteName = "${nativeName}Test"
 
     splitSetup = {
         it.sources {
+            adaCpp(CppSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/ada/src'
+                    include 'ada.cpp'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/ada/include', 'src/main/native/thirdparty/ada/src'
+                }
+            }
             libuvCpp(CppSourceSet) {
                 source {
                     srcDirs 'src/main/native/thirdparty/libuv/src'
@@ -14,6 +84,15 @@ ext {
                 }
                 exportedHeaders {
                     srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                }
+            }
+            llhttpC(CSourceSet) {
+                source {
+                    srcDirs 'src/main/native/thirdparty/llhttp/src'
+                    include '*.c'
+                }
+                exportedHeaders {
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/llhttp/include'
                 }
             }
             tcpsocketsCpp(CppSourceSet) {
@@ -28,6 +107,8 @@ ext {
         }
         if (!it.targetPlatform.operatingSystem.isWindows()) {
             it.cppCompiler.define '_GNU_SOURCE'
+            it.cCompiler.args.add("-Wno-error=pedantic")
+            it.cCompiler.args.add("-Wno-error=format")
             it.sources {
                 libuvUnixCpp(CppSourceSet) {
                     source {
@@ -66,13 +147,17 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
             }
         }
         if (it.targetPlatform.operatingSystem.isWindows()) {
+            def cppWinrtIncludeDir = findWindowsCppWinrtIncludeDir()
+            if (cppWinrtIncludeDir != null) {
+                it.cppCompiler.args << "/I${cppWinrtIncludeDir.absolutePath}"
+            }
             if (it in SharedLibraryBinarySpec) {
                 it.cppCompiler.define 'BUILDING_UV_SHARED'
             }
@@ -92,12 +177,13 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
             }
         } else if (it.targetPlatform.operatingSystem.isMacOsX()) {
+            it.objcppCompiler.args << "-fobjc-arc"
             it.sources {
                 libuvMacCpp(CppSourceSet) {
                     source {
@@ -121,7 +207,17 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
+                        include '**/*.h'
+                    }
+                }
+                wpinetmacOSObjectiveCpp(ObjectiveCppSourceSet) {
+                    source {
+                        srcDirs 'src/main/native/macOS'
+                        include '**/*.mm'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
@@ -148,12 +244,13 @@ ext {
                         include '**/*.cpp'
                     }
                     exportedHeaders {
-                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/fmtlib/include'
+                        srcDirs 'src/main/native/include', 'src/main/native/cpp', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/libuv/src'
                         include '**/*.h'
                     }
                 }
             }
         }
+        addWpinetPlatformLinkerArgs(it)
     }
 }
 
@@ -175,7 +272,13 @@ nativeUtils.exportsConfigs {
 }
 
 cppHeadersZip {
+    from('src/main/native/thirdparty/ada/include') {
+        into '/'
+    }
     from('src/main/native/thirdparty/libuv/include') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/llhttp/include') {
         into '/'
     }
     from('src/main/native/thirdparty/tcpsockets/include') {
@@ -184,6 +287,15 @@ cppHeadersZip {
 }
 
 cppSourcesZip {
+    from('src/main/native/thirdparty/ada/src') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/libuv/src') {
+        into '/'
+    }
+    from('src/main/native/thirdparty/llhttp/src') {
+        into '/'
+    }
     from('src/main/native/thirdparty/tcpsockets/cpp') {
         into '/'
     }
@@ -194,8 +306,18 @@ model {
         all {
             it.sources.each {
                 it.exportedHeaders {
-                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src'
+                    srcDirs 'src/main/native/include', 'src/main/native/thirdparty/ada/include', 'src/main/native/thirdparty/libuv/include', 'src/main/native/thirdparty/llhttp/include', 'src/main/native/thirdparty/tcpsockets/include', 'src/main/native/thirdparty/libuv/src', 'src/main/native/thirdparty/ada/src'
                 }
+            }
+        }
+    }
+}
+
+model {
+    binaries {
+        all {
+            if (it.component.name == nativeName) {
+                addWpinetPlatformLinkerArgs(it)
             }
         }
     }

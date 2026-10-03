@@ -8,8 +8,6 @@
 #include <string>
 #include <utility>
 
-#include <fmt/format.h>
-
 #include "UsbUtil.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
@@ -257,7 +255,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
         continue;
       }
       if (prop->intMenu) {
-        prop->enumChoices[i] = fmt::to_string(qmenu.value);
+        prop->enumChoices[i] = std::to_string(qmenu.value);
       } else {
         prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
       }

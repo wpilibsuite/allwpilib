@@ -4,9 +4,10 @@
 
 package org.wpilib.math.system;
 
+import static org.wpilib.math.util.UnitConversions.rotationsPerMinuteToRadiansPerSecond;
+
 import org.wpilib.math.system.proto.DCMotorProto;
 import org.wpilib.math.system.struct.DCMotorStruct;
-import org.wpilib.math.util.Units;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
@@ -146,8 +147,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of CIM motors.
    */
   public static DCMotor getCIM(int numMotors) {
-    return new DCMotor(
-        12, 2.42, 133, 2.7, Units.rotationsPerMinuteToRadiansPerSecond(5310), numMotors);
+    return new DCMotor(12, 2.42, 133, 2.7, rotationsPerMinuteToRadiansPerSecond(5310), numMotors);
   }
 
   /**
@@ -157,8 +157,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of 775Pro motors.
    */
   public static DCMotor getVex775Pro(int numMotors) {
-    return new DCMotor(
-        12, 0.71, 134, 0.7, Units.rotationsPerMinuteToRadiansPerSecond(18730), numMotors);
+    return new DCMotor(12, 0.71, 134, 0.7, rotationsPerMinuteToRadiansPerSecond(18730), numMotors);
   }
 
   /**
@@ -168,8 +167,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of NEO motors.
    */
   public static DCMotor getNEO(int numMotors) {
-    return new DCMotor(
-        12, 2.6, 105, 1.8, Units.rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
+    return new DCMotor(12, 2.6, 105, 1.8, rotationsPerMinuteToRadiansPerSecond(5676), numMotors);
   }
 
   /**
@@ -179,8 +177,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of MiniCIM motors.
    */
   public static DCMotor getMiniCIM(int numMotors) {
-    return new DCMotor(
-        12, 1.41, 89, 3, Units.rotationsPerMinuteToRadiansPerSecond(5840), numMotors);
+    return new DCMotor(12, 1.41, 89, 3, rotationsPerMinuteToRadiansPerSecond(5840), numMotors);
   }
 
   /**
@@ -190,8 +187,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Bag motors.
    */
   public static DCMotor getBag(int numMotors) {
-    return new DCMotor(
-        12, 0.43, 53, 1.8, Units.rotationsPerMinuteToRadiansPerSecond(13180), numMotors);
+    return new DCMotor(12, 0.43, 53, 1.8, rotationsPerMinuteToRadiansPerSecond(13180), numMotors);
   }
 
   /**
@@ -201,8 +197,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Andymark RS775-125 motors.
    */
   public static DCMotor getAndymarkRs775_125(int numMotors) {
-    return new DCMotor(
-        12, 0.28, 18, 1.6, Units.rotationsPerMinuteToRadiansPerSecond(5800.0), numMotors);
+    return new DCMotor(12, 0.28, 18, 1.6, rotationsPerMinuteToRadiansPerSecond(5800.0), numMotors);
   }
 
   /**
@@ -212,8 +207,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Banebots RS775 motors.
    */
   public static DCMotor getBanebotsRs775(int numMotors) {
-    return new DCMotor(
-        12, 0.72, 97, 2.7, Units.rotationsPerMinuteToRadiansPerSecond(13050.0), numMotors);
+    return new DCMotor(12, 0.72, 97, 2.7, rotationsPerMinuteToRadiansPerSecond(13050.0), numMotors);
   }
 
   /**
@@ -223,8 +217,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Andymark 9015 motors.
    */
   public static DCMotor getAndymark9015(int numMotors) {
-    return new DCMotor(
-        12, 0.36, 71, 3.7, Units.rotationsPerMinuteToRadiansPerSecond(14270.0), numMotors);
+    return new DCMotor(12, 0.36, 71, 3.7, rotationsPerMinuteToRadiansPerSecond(14270.0), numMotors);
   }
 
   /**
@@ -234,8 +227,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Banebots RS 550 motors.
    */
   public static DCMotor getBanebotsRs550(int numMotors) {
-    return new DCMotor(
-        12, 0.38, 84, 0.4, Units.rotationsPerMinuteToRadiansPerSecond(19000.0), numMotors);
+    return new DCMotor(12, 0.38, 84, 0.4, rotationsPerMinuteToRadiansPerSecond(19000.0), numMotors);
   }
 
   /**
@@ -246,7 +238,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getNeo550(int numMotors) {
     return new DCMotor(
-        12, 0.97, 100, 1.4, Units.rotationsPerMinuteToRadiansPerSecond(11000.0), numMotors);
+        12, 0.97, 100, 1.4, rotationsPerMinuteToRadiansPerSecond(11000.0), numMotors);
   }
 
   /**
@@ -256,8 +248,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Falcon 500 motors.
    */
   public static DCMotor getFalcon500(int numMotors) {
-    return new DCMotor(
-        12, 4.69, 257, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
+    return new DCMotor(12, 4.69, 257, 1.5, rotationsPerMinuteToRadiansPerSecond(6380.0), numMotors);
   }
 
   /**
@@ -268,8 +259,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getFalcon500Foc(int numMotors) {
     // https://store.ctr-electronics.com/falcon-500-powered-by-talon-fx/
-    return new DCMotor(
-        12, 5.84, 304, 1.5, Units.rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
+    return new DCMotor(12, 5.84, 304, 1.5, rotationsPerMinuteToRadiansPerSecond(6080.0), numMotors);
   }
 
   /**
@@ -281,7 +271,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
   public static DCMotor getRomiBuiltIn(int numMotors) {
     // From https://www.pololu.com/product/1520/specs
     return new DCMotor(
-        4.5, 0.1765, 1.25, 0.13, Units.rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
+        4.5, 0.1765, 1.25, 0.13, rotationsPerMinuteToRadiansPerSecond(150.0), numMotors);
   }
 
   /**
@@ -291,9 +281,8 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return a gearbox of Kraken X60 motors.
    */
   public static DCMotor getKrakenX60(int numMotors) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
-    return new DCMotor(
-        12, 7.09, 366, 2, Units.rotationsPerMinuteToRadiansPerSecond(6000), numMotors);
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return new DCMotor(12, 7.157, 374.4, 2, rotationsPerMinuteToRadiansPerSecond(6065), numMotors);
   }
 
   /**
@@ -303,9 +292,8 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    * @return A gearbox of Kraken X60 FOC enabled motors.
    */
   public static DCMotor getKrakenX60Foc(int numMotors) {
-    // From https://store.ctr-electronics.com/announcing-kraken-x60/
-    return new DCMotor(
-        12, 9.37, 483, 2, Units.rotationsPerMinuteToRadiansPerSecond(5800), numMotors);
+    // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
+    return new DCMotor(12, 9.362, 476.1, 2, rotationsPerMinuteToRadiansPerSecond(5785), numMotors);
   }
 
   /**
@@ -316,8 +304,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getKrakenX44(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return new DCMotor(
-        12, 4.11, 279, 2, Units.rotationsPerMinuteToRadiansPerSecond(7758), numMotors);
+    return new DCMotor(12, 4.113, 279.1, 2, rotationsPerMinuteToRadiansPerSecond(7758), numMotors);
   }
 
   /**
@@ -328,8 +315,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getKrakenX44Foc(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return new DCMotor(
-        12, 5.01, 329, 2, Units.rotationsPerMinuteToRadiansPerSecond(7368), numMotors);
+    return new DCMotor(12, 5.011, 329.2, 2, rotationsPerMinuteToRadiansPerSecond(7368), numMotors);
   }
 
   /**
@@ -340,8 +326,7 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getMinion(int numMotors) {
     // From https://motors.ctr-electronics.com/dyno/dynometer-testing/
-    return new DCMotor(
-        12, 3.17, 211, 2, Units.rotationsPerMinuteToRadiansPerSecond(7704), numMotors);
+    return new DCMotor(12, 3.173, 211.6, 2, rotationsPerMinuteToRadiansPerSecond(7704), numMotors);
   }
 
   /**
@@ -352,7 +337,6 @@ public class DCMotor implements ProtobufSerializable, StructSerializable {
    */
   public static DCMotor getNeoVortex(int numMotors) {
     // From https://www.revrobotics.com/next-generation-spark-neo/
-    return new DCMotor(
-        12, 3.60, 211, 3.6, Units.rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
+    return new DCMotor(12, 3.60, 211, 3.6, rotationsPerMinuteToRadiansPerSecond(6784), numMotors);
   }
 }

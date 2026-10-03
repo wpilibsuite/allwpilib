@@ -9,20 +9,18 @@
 #include "commands/HalveDriveVelocity.hpp"
 #include "commands/ReleaseHatch.hpp"
 #include "wpi/commands2/button/GamepadButton.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
+#include "wpi/tunables/Tunables.hpp"
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Add commands to the autonomous command chooser
-  chooser.SetDefaultOption("Simple Auto", &simpleAuto);
-  chooser.AddOption("Complex Auto", &complexAuto);
+  chooser.AddDefault("Simple Auto", &simpleAuto);
+  chooser.Add("Complex Auto", &complexAuto);
 
   // Put the chooser on the dashboard
-  wpi::SmartDashboard::PutData("Autonomous", &chooser);
-  // Put subsystems to dashboard.
-  wpi::SmartDashboard::PutData("Drivetrain", &drive);
-  wpi::SmartDashboard::PutData("HatchSubsystem", &hatch);
+  wpi::tunables::Publish("Autonomous", chooser);
 
   // Configure the button bindings
   ConfigureButtonBindings();
@@ -39,11 +37,11 @@ void RobotContainer::ConfigureButtonBindings() {
   // NOTE: since we're binding a CommandPtr, command ownership here is moved to
   // the scheduler thus, no memory leaks!
 
-  // Grab the hatch when the 'South Face' button is pressed.
-  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::SOUTH_FACE)
+  // Grab the hatch when the 'Face Down' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_DOWN)
       .OnTrue(GrabHatch(&hatch).ToPtr());
-  // Release the hatch when the 'East Face' button is pressed.
-  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::EAST_FACE)
+  // Release the hatch when the 'Face Right' button is pressed.
+  wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::FACE_RIGHT)
       .OnTrue(ReleaseHatch(&hatch).ToPtr());
   // While holding the bumper button, drive at half velocity
   wpi::cmd::GamepadButton(&driverController, wpi::Gamepad::Button::RIGHT_BUMPER)
@@ -53,4 +51,10 @@ void RobotContainer::ConfigureButtonBindings() {
 wpi::cmd::Command* RobotContainer::GetAutonomousCommand() {
   // Runs the chosen command in autonomous
   return chooser.GetSelected();
+}
+
+void RobotContainer::UpdateTelemetry() const {
+  // Put subsystems to dashboard.
+  wpi::telemetry::Log("Drivetrain", drive);
+  wpi::telemetry::Log("HatchSubsystem", hatch);
 }

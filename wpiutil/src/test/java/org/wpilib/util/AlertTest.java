@@ -1,0 +1,180 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.util;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+class AlertTest {
+  private static final int ALERT_ALREADY_ALLOCATED = -2;
+
+  @AfterEach
+  void resetAlerts() {
+    AlertDataJNI.resetData();
+    WPIUtilJNI.disableMockTime();
+  }
+
+  @Test
+  void setGetTextAndLevel() {
+    try (Alert alert = new Alert("group", "id", "initial", Alert.Level.HIGH)) {
+      assertEquals(1, AlertDataJNI.getNumAlerts());
+      assertFalse(alert.get());
+      assertEquals("initial", alert.getText());
+      assertEquals(Alert.Level.HIGH, alert.getLevel());
+
+      alert.set(true);
+      assertTrue(alert.get());
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertAll(
+          () -> assertEquals("group", infos[0].group),
+          () -> assertEquals("id", infos[0].id),
+          () -> assertEquals("initial", infos[0].text),
+          () -> assertNotEquals(0, infos[0].activeStartTime),
+          () -> assertEquals(Alert.Level.HIGH.getValue(), infos[0].level));
+
+      alert.setText("updated");
+      assertEquals("updated", alert.getText());
+      alert.set(false);
+      assertFalse(alert.get());
+    }
+
+    assertEquals(0, AlertDataJNI.getNumAlerts());
+  }
+
+  @Test
+  void defaultGroupAndCloseRemoveAlert() {
+    try (Alert alert = new Alert("id", "text", Alert.Level.LOW)) {
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertAll(
+          () -> assertEquals("Alerts", infos[0].group),
+          () -> assertEquals("id", infos[0].id),
+          () -> assertEquals("text", infos[0].text),
+          () -> assertEquals(Alert.Level.LOW.getValue(), infos[0].level));
+    }
+
+    assertEquals(0, AlertDataJNI.getNumAlerts());
+  }
+
+  @Test
+  void duplicateIdsOnlyConflictWithinSameLevel() {
+    try (Alert high = new Alert("group", "id", "high", Alert.Level.HIGH);
+        Alert low = new Alert("group", "id", "low", Alert.Level.LOW)) {
+      assertEquals(2, AlertDataJNI.getNumAlerts());
+
+      AlertException ex =
+          assertThrows(
+              AlertException.class, () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+      assertEquals(ALERT_ALREADY_ALLOCATED, ex.getReason());
+      assertEquals("Alert already allocated", ex.getMessage());
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(2, infos.length);
+      Set<Integer> levels =
+          Arrays.stream(infos).map(info -> info.level).collect(Collectors.toSet());
+      assertEquals(Set.of(Alert.Level.HIGH.getValue(), Alert.Level.LOW.getValue()), levels);
+    }
+  }
+
+  @Test
+  void resetDataClearsAlerts() {
+    try (Alert alert = new Alert("group", "id", "text", Alert.Level.MEDIUM)) {
+      alert.set(true);
+      assertEquals(1, AlertDataJNI.getNumAlerts());
+
+      AlertDataJNI.resetData();
+
+      assertEquals(0, AlertDataJNI.getNumAlerts());
+      assertEquals(0, AlertDataJNI.getAlerts().length);
+      assertThrows(AlertException.class, () -> alert.get());
+    }
+  }
+
+  @Test
+  void setActiveAtZeroMockTimeReportsActive() {
+    WPIUtilJNI.enableMockTime();
+
+    try (Alert alert = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert.set(true);
+      assertTrue(alert.get());
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertNotEquals(0, infos[0].activeStartTime);
+    }
+  }
+
+  @Test
+  void staleAlertAfterResetDoesNotAffectNewAlert() {
+    Alert stale = new Alert("group", "id", "stale", Alert.Level.HIGH);
+    AlertDataJNI.resetData();
+
+    try (Alert current = new Alert("group", "id", "current", Alert.Level.HIGH)) {
+      assertThrows(AlertException.class, () -> stale.set(true));
+      stale.close();
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(1, infos.length);
+      assertEquals("id", infos[0].id);
+      assertEquals("current", infos[0].text);
+    }
+
+    stale.close();
+  }
+
+  @Test
+  void getActiveAndAllAlertsThroughDataJni() {
+    try (Alert a = new Alert("group", "A", "A", Alert.Level.HIGH);
+        Alert b = new Alert("group", "B", "B", Alert.Level.HIGH);
+        Alert c = new Alert("group", "C", "C", Alert.Level.MEDIUM)) {
+      a.set(true);
+      b.set(true);
+      c.set(false);
+
+      AlertDataJNI.AlertInfo[] infos = AlertDataJNI.getAlerts();
+      assertEquals(3, infos.length);
+      assertEquals(
+          Set.of("A", "B", "C"),
+          Arrays.stream(infos).map(info -> info.id).collect(Collectors.toSet()));
+
+      Set<String> activeIds =
+          Arrays.stream(infos)
+              .filter(info -> info.activeStartTime != 0)
+              .map(info -> info.id)
+              .collect(Collectors.toSet());
+      assertEquals(Set.of("A", "B"), activeIds);
+    }
+  }
+
+  @Test
+  void duplicateAlertThrowsAndCanStillBeCreatedAfterwards() {
+    try (Alert alert = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert.set(true);
+      assertThrows(
+          AlertException.class, () -> new Alert("group", "id", "duplicate", Alert.Level.HIGH));
+      // After the exception, we can still create a new alert with a different id
+      try (Alert alert2 = new Alert("group", "id2", "text2", Alert.Level.HIGH)) {
+        alert2.set(true);
+        assertEquals(2, AlertDataJNI.getNumAlerts());
+      }
+    }
+    try (Alert alert3 = new Alert("group", "id", "text", Alert.Level.HIGH)) {
+      alert3.set(true);
+      assertEquals(1, AlertDataJNI.getNumAlerts());
+    }
+  }
+}

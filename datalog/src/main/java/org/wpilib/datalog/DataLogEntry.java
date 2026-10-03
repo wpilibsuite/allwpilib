@@ -13,7 +13,7 @@ public class DataLogEntry {
    * @param name name of the entry
    * @param type Data type
    * @param metadata metadata
-   * @param timestamp entry creation timestamp (0=now)
+   * @param timestamp entry creation timestamp in nanoseconds (0=now)
    */
   protected DataLogEntry(DataLog log, String name, String type, String metadata, long timestamp) {
     m_log = log;
@@ -47,7 +47,7 @@ public class DataLogEntry {
    * Updates the metadata for the entry.
    *
    * @param metadata New metadata for the entry
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void setMetadata(String metadata, long timestamp) {
     m_log.setMetadata(m_entry, metadata, timestamp);
@@ -65,7 +65,7 @@ public class DataLogEntry {
   /**
    * Finishes the entry.
    *
-   * @param timestamp Time stamp (0 to indicate now)
+   * @param timestamp Time stamp in nanoseconds (0 to indicate now)
    */
   public void finish(long timestamp) {
     m_log.finish(m_entry, timestamp);

@@ -9,9 +9,8 @@
 
 #include "wpi/drive/RobotDriveBase.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
 
 namespace wpi {
 
@@ -50,8 +49,7 @@ class MotorController;
  * methods should be called periodically to avoid Motor Safety timeouts.
  */
 class MecanumDrive : public RobotDriveBase,
-                     public wpi::util::Sendable,
-                     public wpi::util::SendableHelper<MecanumDrive> {
+                     public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Wheel velocities for a mecanum drive.
@@ -117,6 +115,7 @@ class MecanumDrive : public RobotDriveBase,
    *     Counterclockwise is positive.
    * @param gyroAngle The gyro heading around the Z axis. Use this to implement
    *     field-oriented controls.
+   * @Common This is one of the commonly used methods for this class
    */
   void DriveCartesian(double xVelocity, double yVelocity, double zRotation,
                       wpi::math::Rotation2d gyroAngle = 0_rad);
@@ -132,6 +131,7 @@ class MecanumDrive : public RobotDriveBase,
    * @param angle The angle around the Z axis at which the robot drives.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
    *     Counterclockwise is positive.
+   * @Common This is one of the commonly used methods for this class
    */
   void DrivePolar(double magnitude, wpi::math::Rotation2d angle,
                   double zRotation);
@@ -156,10 +156,15 @@ class MecanumDrive : public RobotDriveBase,
       double xVelocity, double yVelocity, double zRotation,
       wpi::math::Rotation2d gyroAngle = 0_rad);
 
+  /**
+   * @Common This is one of the commonly used methods for this class
+   */
   void StopMotor() override;
   std::string GetDescription() const override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::function<void(double)> m_frontLeftMotor;
@@ -167,7 +172,7 @@ class MecanumDrive : public RobotDriveBase,
   std::function<void(double)> m_frontRightMotor;
   std::function<void(double)> m_rearRightMotor;
 
-  // Used for Sendable property getters
+  // Used for telemetry property getters
   double m_frontLeftOutput = 0.0;
   double m_rearLeftOutput = 0.0;
   double m_frontRightOutput = 0.0;

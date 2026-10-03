@@ -5,22 +5,20 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 #include <memory>
-
+#include <vector>
 
 #include "wpi/hardware/motor/MotorController.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
-class PyMotorControllerGroup : public wpi::util::Sendable,
-                             public MotorController,
-                             public wpi::util::SendableHelper<PyMotorControllerGroup> {
+class PyMotorControllerGroup : public MotorController,
+                               public wpi::telemetry::TelemetryLoggable {
  public:
-  PyMotorControllerGroup(std::vector<std::shared_ptr<wpi::MotorController>> &&args) :
-    m_motorControllers(args) {}
+  explicit PyMotorControllerGroup(
+      std::vector<std::shared_ptr<wpi::MotorController>>&& args)
+      : m_motorControllers(args) {}
   ~PyMotorControllerGroup() override = default;
 
   PyMotorControllerGroup(PyMotorControllerGroup&&) = default;
@@ -33,13 +31,12 @@ class PyMotorControllerGroup : public wpi::util::Sendable,
   bool GetInverted() const override;
   void Disable() override;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+  std::string_view GetTelemetryType() const override;
 
  private:
-  void Initialize();
-
   bool m_isInverted = false;
   std::vector<std::shared_ptr<wpi::MotorController>> m_motorControllers;
 };
 
-}  // namespace rpy
+}  // namespace wpi

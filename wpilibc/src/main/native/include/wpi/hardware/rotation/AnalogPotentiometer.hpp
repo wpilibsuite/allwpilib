@@ -7,8 +7,7 @@
 #include <memory>
 
 #include "wpi/hardware/discrete/AnalogInput.hpp"
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -18,9 +17,7 @@ namespace wpi {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer
-    : public wpi::util::Sendable,
-      public wpi::util::SendableHelper<AnalogPotentiometer> {
+class AnalogPotentiometer : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an Analog Potentiometer object from a channel number.
@@ -97,10 +94,13 @@ class AnalogPotentiometer
    *
    * @return The current position of the potentiometer (in the units used for
    *         fullRange and offset).
+   * @Common This is one of the commonly used methods for this class
    */
   double Get() const;
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
   std::shared_ptr<AnalogInput> m_analog_input;

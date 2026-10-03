@@ -4,9 +4,8 @@
 
 #include "wpi/halsim/ws_core/WSHalProviders.hpp"
 
+#include <format>
 #include <memory>
-
-#include <fmt/format.h>
 
 namespace wpilibws {
 
@@ -39,7 +38,7 @@ HALSimWSHalChanProvider::HALSimWSHalChanProvider(int32_t channel,
                                                  std::string_view key,
                                                  std::string_view type)
     : HALSimWSHalProvider(key, type), m_channel(channel) {
-  m_deviceId = fmt::format("{}", channel);
+  m_deviceId = std::format("{}", channel);
 }
 
 }  // namespace wpilibws

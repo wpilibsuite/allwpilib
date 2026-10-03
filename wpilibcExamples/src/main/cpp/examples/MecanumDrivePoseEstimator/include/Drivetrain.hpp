@@ -6,8 +6,8 @@
 
 #include <numbers>
 
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
@@ -40,8 +40,8 @@ class Drivetrain {
              wpi::units::second_t period);
   void UpdateOdometry();
 
-  static constexpr auto kMaxVelocity = 3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr auto MAX_VELOCITY = 3.0_mps;  // 3 meters per second
+  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:

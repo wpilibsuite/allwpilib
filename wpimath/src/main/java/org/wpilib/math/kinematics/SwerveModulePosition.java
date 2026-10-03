@@ -26,7 +26,7 @@ public class SwerveModulePosition
   public double distance;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.kZero;
+  public Rotation2d angle = Rotation2d.ZERO;
 
   /** SwerveModulePosition protobuf for serialization. */
   public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();

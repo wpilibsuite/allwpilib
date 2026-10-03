@@ -9,7 +9,7 @@
 #include "wpi/util/ConvertUTF.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/ErrorHandling.hpp"
-#include "wpi/util/SwapByteOrder.hpp"
+#include <bit>
 #include <span>
 #include <string>
 #include <string_view>
@@ -103,7 +103,7 @@ bool convertUTF16ToUTF8String(std::span<const char> SrcBytes, SmallVectorImpl<ch
   if (Src[0] == UNI_UTF16_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF16 &I : ByteSwapped)
-      I = wpi::util::byteswap<uint16_t>(I);
+      I = std::byteswap(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }
@@ -161,7 +161,7 @@ bool convertUTF32ToUTF8String(std::span<const char> SrcBytes, std::string &Out) 
   if (Src[0] == UNI_UTF32_BYTE_ORDER_MARK_SWAPPED) {
     ByteSwapped.insert(ByteSwapped.end(), Src, SrcEnd);
     for (UTF32 &I : ByteSwapped)
-      I = wpi::util::byteswap<uint32_t>(I);
+      I = std::byteswap(I);
     Src = &ByteSwapped[0];
     SrcEnd = &ByteSwapped[ByteSwapped.size() - 1] + 1;
   }
@@ -269,7 +269,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
   return ConvertUTF8toWide(std::string_view(Source), Result);
 }
 
-bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result) {
+bool convertWideToUTF8(std::wstring_view Source, SmallVectorImpl<char> &Result) {
   if (sizeof(wchar_t) == 1) {
     const UTF8 *Start = reinterpret_cast<const UTF8 *>(Source.data());
     const UTF8 *End =
@@ -305,5 +305,14 @@ bool convertWideToUTF8(const std::wstring &Source, SmallVectorImpl<char> &Result
   }
 }
 
-} // end namespace wpi::util
+bool IsSingleCodeUnitUTF8Codepoint(unsigned V) { return V <= 0x7F; }
 
+bool IsSingleCodeUnitUTF16Codepoint(unsigned V) {
+  return V <= 0xD7FF || (V >= 0xE000 && V <= 0xFFFF);
+}
+
+bool IsSingleCodeUnitUTF32Codepoint(unsigned V) {
+  return V <= 0xD7FF || (V >= 0xE000 && V <= 0x10FFFF);
+}
+
+} // end namespace wpi::util

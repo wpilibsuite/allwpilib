@@ -6,11 +6,12 @@ package org.wpilib.snippets.solenoid;
 
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.pneumatic.Compressor;
 import org.wpilib.hardware.pneumatic.DoubleSolenoid;
 import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
 import org.wpilib.hardware.pneumatic.Solenoid;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * This is a sample program showing the use of the solenoid classes during operator control. Three
@@ -28,64 +29,64 @@ public class Robot extends TimedRobot {
 
   // Solenoid corresponds to a single solenoid.
   // In this case, it's connected to channel 0 of a PH with the default CAN ID.
-  private final Solenoid solenoid = new Solenoid(0, PneumaticsModuleType.REV_PH, 0);
+  private final Solenoid solenoid = new Solenoid(CANPort.CAN_S0, PneumaticsModuleType.REV_PH, 0);
 
   // DoubleSolenoid corresponds to a double solenoid.
   // In this case, it's connected to channels 1 and 2 of a PH with the default CAN ID.
   private final DoubleSolenoid doubleSolenoid =
-      new DoubleSolenoid(0, PneumaticsModuleType.REV_PH, 1, 2);
+      new DoubleSolenoid(CANPort.CAN_S0, PneumaticsModuleType.REV_PH, 1, 2);
 
   // Compressor connected to a PH with a default CAN ID (1)
-  private final Compressor compressor = new Compressor(0, PneumaticsModuleType.REV_PH);
+  private final Compressor compressor = new Compressor(CANPort.CAN_S0, PneumaticsModuleType.REV_PH);
 
-  static final int kSolenoidButton = 1;
-  static final int kDoubleSolenoidForwardButton = 2;
-  static final int kDoubleSolenoidReverseButton = 3;
-  static final int kCompressorButton = 4;
+  static final int SOLENOID_BUTTON = 1;
+  static final int DOUBLE_SOLENOID_FORWARD_BUTTON = 2;
+  static final int DOUBLE_SOLENOID_REVERSE_BUTTON = 3;
+  static final int COMPRESSOR_BUTTON = 4;
 
   /** Called once at the beginning of the robot program. */
-  public Robot() {
-    // Publish elements to dashboard.
-    SmartDashboard.putData("Single Solenoid", solenoid);
-    SmartDashboard.putData("Double Solenoid", doubleSolenoid);
-    SmartDashboard.putData("Compressor", compressor);
-  }
+  public Robot() {}
 
   @SuppressWarnings("PMD.UnconditionalIfStatement")
   @Override
   public void teleopPeriodic() {
+    // Publish elements to dashboard.
+    Telemetry.log("Single Solenoid", solenoid);
+    Telemetry.log("Double Solenoid", doubleSolenoid);
+    Telemetry.log("Compressor", compressor);
+
     // Publish some raw data
     // Get the pressure (in PSI) from the analog sensor connected to the PH.
     // This function is supported only on the PH!
     // On a PCM, this function will return 0.
-    SmartDashboard.putNumber("PH Pressure [PSI]", compressor.getPressure());
+    Telemetry.log("PH Pressure [PSI]", compressor.getPressure());
     // Get compressor current draw.
-    SmartDashboard.putNumber("Compressor Current", compressor.getCurrent());
+    Telemetry.log("Compressor Current", compressor.getCurrent());
     // Get whether the compressor is active.
-    SmartDashboard.putBoolean("Compressor Active", compressor.isEnabled());
+    Telemetry.log("Compressor Active", compressor.isEnabled());
     // Get the digital pressure switch connected to the PCM/PH.
     // The switch is open when the pressure is over ~120 PSI.
-    SmartDashboard.putBoolean("Pressure Switch", compressor.getPressureSwitchValue());
+    Telemetry.log("Pressure Switch", compressor.getPressureSwitchValue());
 
     /*
      * The output of GetRawButton is true/false depending on whether
      * the button is pressed; Set takes a boolean for whether
      * to retract the solenoid (false) or extend it (true).
      */
-    solenoid.set(stick.getRawButton(kSolenoidButton));
+    solenoid.set(stick.getRawButton(SOLENOID_BUTTON));
 
     /*
      * GetRawButtonPressed will only return true once per press.
      * If a button is pressed, set the solenoid to the respective channel.
      */
-    if (stick.getRawButtonPressed(kDoubleSolenoidForwardButton)) {
+    if (stick.getRawButtonPressed(DOUBLE_SOLENOID_FORWARD_BUTTON)) {
       doubleSolenoid.set(DoubleSolenoid.Value.FORWARD);
-    } else if (stick.getRawButtonPressed(kDoubleSolenoidReverseButton)) {
+    } else if (stick.getRawButtonPressed(DOUBLE_SOLENOID_REVERSE_BUTTON)) {
       doubleSolenoid.set(DoubleSolenoid.Value.REVERSE);
     }
 
     // On button press, toggle the compressor.
-    if (stick.getRawButtonPressed(kCompressorButton)) {
+    if (stick.getRawButtonPressed(COMPRESSOR_BUTTON)) {
       // Check whether the compressor is currently enabled.
       boolean isCompressorEnabled = compressor.isEnabled();
       if (isCompressorEnabled) {

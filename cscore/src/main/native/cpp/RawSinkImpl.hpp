@@ -25,27 +25,26 @@ class RawSinkImpl : public SinkImpl {
               Notifier& notifier, Telemetry& telemetry);
   RawSinkImpl(std::string_view name, wpi::util::Logger& logger,
               Notifier& notifier, Telemetry& telemetry,
-              std::function<void(uint64_t time)> processFrame);
+              std::function<void(int64_t time)> processFrame);
   ~RawSinkImpl() override;
 
   void Stop();
 
-  uint64_t GrabFrame(WPI_RawFrame& frame);
-  uint64_t GrabFrame(WPI_RawFrame& frame, double timeout);
+  int64_t GrabFrame(WPI_RawFrame& frame);
+  int64_t GrabFrame(WPI_RawFrame& frame, double timeout);
   // Wait for a frame with a time other than lastFrameTime
-  uint64_t GrabFrame(WPI_RawFrame& frame, double timeout,
-                     uint64_t lastFrameTime);
+  int64_t GrabFrame(WPI_RawFrame& frame, double timeout, int64_t lastFrameTime);
 
  private:
   void ThreadMain();
 
   // Copies the image from incomingFrame into rawFrame, converting where
   // necessary to the resolution of rawFrame
-  uint64_t GrabFrameImpl(WPI_RawFrame& rawFrame, Frame& incomingFrame);
+  int64_t GrabFrameImpl(WPI_RawFrame& rawFrame, Frame& incomingFrame);
 
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_thread;
-  std::function<void(uint64_t time)> m_processFrame;
+  std::function<void(int64_t time)> m_processFrame;
 };
 
 }  // namespace wpi::cs

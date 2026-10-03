@@ -11,10 +11,10 @@ model {
         // Create the run task.
         $.components.datalogtool.binaries.each { bin ->
             if (bin.buildable && bin.name.toLowerCase().contains("debug") && nativeUtils.isNativeDesktopPlatform(bin.targetPlatform)) {
-                Task run = project.tasks.create("run", Exec) {
+                project.tasks.register("run", Exec) {
                     commandLine bin.tasks.install.runScriptFile.get().asFile.toString()
+                    dependsOn bin.tasks.install
                 }
-                run.dependsOn bin.tasks.install
             }
         }
     }
@@ -38,6 +38,9 @@ model {
                             duplicatesStrategy = 'exclude'
                             archiveClassifier = nativeUtils.getPublishClassifier(binary)
 
+                            // Use permissions from the file system
+                            useFileSystemPermissions()
+
                             from(licenseFile) {
                                 into '/'
                             }
@@ -54,7 +57,7 @@ model {
 
                         if (binary.targetPlatform.operatingSystem.isMacOsX()) {
                             // Create the macOS bundle.
-                            def bundleTask = project.tasks.create("bundleDataLogToolOsxApp" + binary.targetPlatform.architecture.name, Copy) {
+                            def bundleTask = project.tasks.register("bundleDataLogToolOsxApp" + binary.targetPlatform.architecture.name, Copy) {
                                 description = "Creates a macOS application bundle for DataLogTool"
                                 from(file("$project.projectDir/Info.plist"))
                                 into(file("$project.buildDir/outputs/bundles/$binary.targetPlatform.architecture.name/DataLogTool.app/Contents"))
@@ -88,6 +91,7 @@ model {
                                         }.result.get()
                                     }
                                 }
+                                dependsOn binary.tasks.link
                             }
 
                             // Reset the application path if we are creating a bundle.
@@ -95,7 +99,6 @@ model {
                             task.from(applicationPath)
                             project.build.dependsOn bundleTask
 
-                            bundleTask.dependsOn binary.tasks.link
                             task.dependsOn(bundleTask)
                         } else {
                             task.from(applicationPath)

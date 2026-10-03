@@ -21,6 +21,7 @@
 #include "wpi/util/Compiler.hpp"
 #include "wpi/util/ErrorHandling.hpp"
 #include "wpi/util/fs.hpp"
+#include "wpi/util/IOSandbox.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include <algorithm>
 #include <cerrno>
@@ -54,21 +55,20 @@
 
 #ifdef _WIN32
 #include "wpi/util/ConvertUTF.hpp"
-#include "Windows/WindowsSupport.hpp"
+// mingw-w64 tends to define it as 0x0502 in its headers.
+#undef _WIN32_WINNT
+
+// Require at least Windows 7 API.
+#define _WIN32_WINNT 0x0601
+#define WIN32_LEAN_AND_MEAN
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define WIN32_NO_STATUS
+#include <windows.h>
 #endif
 
 using namespace wpi::util;
-
-constexpr raw_ostream::Colors raw_ostream::BLACK;
-constexpr raw_ostream::Colors raw_ostream::RED;
-constexpr raw_ostream::Colors raw_ostream::GREEN;
-constexpr raw_ostream::Colors raw_ostream::YELLOW;
-constexpr raw_ostream::Colors raw_ostream::BLUE;
-constexpr raw_ostream::Colors raw_ostream::MAGENTA;
-constexpr raw_ostream::Colors raw_ostream::CYAN;
-constexpr raw_ostream::Colors raw_ostream::WHITE;
-constexpr raw_ostream::Colors raw_ostream::SAVEDCOLOR;
-constexpr raw_ostream::Colors raw_ostream::RESET;
 
 raw_ostream::~raw_ostream() {
   // raw_ostream's subclasses should take care to flush the buffer
@@ -288,6 +288,9 @@ void raw_ostream::anchor() {}
 static int getFD(std::string_view Filename, std::error_code &EC,
                  fs::CreationDisposition Disp, fs::FileAccess Access,
                  fs::OpenFlags Flags) {
+  // FIXME(sandboxing): Remove this by adopting `wpi::util::vfs::OutputBackend`.
+  auto BypassSandbox = sys::sandbox::scopedDisable();
+
   assert((Access & fs::FA_Write) &&
          "Cannot make a raw_ostream from a read-only descriptor!");
 
@@ -347,6 +350,9 @@ raw_fd_ostream::raw_fd_ostream(std::string_view Filename, std::error_code &EC,
 raw_fd_ostream::raw_fd_ostream(int fd, bool shouldClose, bool unbuffered,
                                OStreamKind K)
     : raw_pwrite_stream(unbuffered, K), FD(fd), ShouldClose(shouldClose) {
+  // FIXME(sandboxing): Remove this by adopting `wpi::util::vfs::OutputBackend`.
+  auto BypassSandbox = sys::sandbox::scopedDisable();
+
   if (FD < 0 ) {
     ShouldClose = false;
     return;
@@ -402,8 +408,7 @@ raw_fd_ostream::~raw_fd_ostream() {
   // has_error() and clear the error flag with clear_error() before
   // destructing raw_ostream objects which may have errors.
   if (has_error())
-    report_fatal_error("IO failure on output stream: " + error().message(),
-                       /*gen_crash_diag=*/false);
+    reportFatalUsageError("IO failure on output stream: " + error().message());
 }
 
 #if defined(_WIN32)
@@ -428,11 +433,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
   if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
     return false;
 
-  // On Windows 7 and earlier, WriteConsoleW has a low maximum amount of data
-  // that can be written to the console at a time.
   size_t MaxWriteSize = WideText.size();
-  if (!RunningWindows8OrGreater())
-    MaxWriteSize = 32767;
 
   size_t WCharsWritten = 0;
   do {
@@ -596,6 +597,7 @@ void raw_fd_ostream::anchor() {}
 raw_fd_ostream &wpi::util::outs() {
   // Set buffer settings to model stdout behavior.
   std::error_code EC;
+
   static raw_fd_ostream* S = new raw_fd_ostream("-", EC, fs::OF_None);
   assert(!EC);
   return *S;

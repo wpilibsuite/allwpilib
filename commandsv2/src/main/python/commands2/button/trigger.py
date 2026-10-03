@@ -17,6 +17,14 @@ class Trigger:
 
     It is very easy to link a button to a command. For instance, you could link the trigger button
     of a joystick to a "score" command.
+
+    ======================  ==================  ================
+    Method                  Schedules           Cancels on false
+    ======================  ==================  ================
+    :meth:`on_true`         On a rising edge    No
+    :meth:`if_true`         On every true poll  No
+    :meth:`while_true`      On a rising edge    Yes
+    ======================  ==================  ================
     """
 
     _loop: EventLoop
@@ -51,7 +59,7 @@ class Trigger:
 
         def init_condition(condition: Callable[[], bool]):
             init_loop_condition(
-                CommandScheduler.getInstance().getDefaultButtonLoop(), condition
+                CommandScheduler.get_instance().get_default_button_loop(), condition
             )
 
         num_args = len(args) + len(kwargs)
@@ -97,7 +105,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
             body(state.previous, current)
             state.previous = current
 
-    def onTrue(self, command: Command) -> Self:
+    def on_true(self, command: Command) -> Self:
         """
         Starts the given command whenever the condition changes from `False` to `True`.
 
@@ -112,7 +120,26 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 
         return self
 
-    def onFalse(self, command: Command) -> Self:
+    def if_true(self, command: Command) -> Self:
+        """
+        Starts the given command on every event-loop poll where the condition is ``True``.
+
+        This does not cancel the command when the condition becomes ``False``; use
+        :meth:`while_true` for that behavior. Scheduling an already-running command follows
+        ordinary scheduler behavior and does not restart it.
+
+        :param command: the command to start
+        :returns: this trigger, so calls can be chained
+        """
+
+        @self._add_binding
+        def _(previous, current):
+            if current:
+                command.schedule()
+
+        return self
+
+    def on_false(self, command: Command) -> Self:
         """
         Starts the given command whenever the condition changes from `True` to `False`.
 
@@ -127,7 +154,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 
         return self
 
-    def onChange(self, command: Command) -> Self:
+    def on_change(self, command: Command) -> Self:
         """
         Starts the command when the condition changes.
 
@@ -142,7 +169,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 
         return self
 
-    def whileTrue(self, command: Command) -> Self:
+    def while_true(self, command: Command) -> Self:
         """
         Starts the given command when the condition changes to `True` and cancels it when the condition
         changes to `False`.
@@ -163,7 +190,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 
         return self
 
-    def whileFalse(self, command: Command) -> Self:
+    def while_false(self, command: Command) -> Self:
         """
         Starts the given command when the condition changes to `False` and cancels it when the
         condition changes to `True`.
@@ -184,7 +211,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
 
         return self
 
-    def toggleOnTrue(self, command: Command) -> Self:
+    def toggle_on_true(self, command: Command) -> Self:
         """
         Toggles a command when the condition changes from `False` to `True`.
 
@@ -195,14 +222,14 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
         @self._add_binding
         def _(previous, current):
             if not previous and current:
-                if command.isScheduled():
+                if command.is_scheduled():
                     command.cancel()
                 else:
                     command.schedule()
 
         return self
 
-    def toggleOnFalse(self, command: Command) -> Self:
+    def toggle_on_false(self, command: Command) -> Self:
         """
         Toggles a command when the condition changes from `True` to `False`.
 
@@ -213,7 +240,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
         @self._add_binding
         def _(previous, current):
             if previous and not current:
-                if command.isScheduled():
+                if command.is_scheduled():
                     command.cancel()
                 else:
                     command.schedule()
@@ -223,7 +250,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
     def __call__(self) -> bool:
         return self._condition()
 
-    def getAsBoolean(self) -> bool:
+    def get_as_boolean(self) -> bool:
         return self._condition()
 
     def __bool__(self) -> bool:
@@ -273,7 +300,7 @@ Invoked with: {format_args_kwargs(self, *args, **kwargs)}
     def debounce(
         self,
         seconds: float,
-        debounce_type: Debouncer.DebounceType = Debouncer.DebounceType.kRising,
+        debounce_type: Debouncer.DebounceType = Debouncer.DebounceType.RISING,
     ) -> "Trigger":
         """
         Creates a new debounced trigger from this trigger - it will become active when this trigger has

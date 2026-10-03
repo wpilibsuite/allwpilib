@@ -26,7 +26,7 @@ public class SerialPortJNI extends JNIWrapper {
    * Initializes a serial port with a direct name.
    *
    * <p>This name is the /dev name for a specific port. Note these are not always consistent between
-   * roboRIO reboots.
+   * Systemcore reboots.
    *
    * @param port the serial port to initialize
    * @param portName the dev port name

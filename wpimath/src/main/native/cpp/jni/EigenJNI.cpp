@@ -6,7 +6,6 @@
 
 #include <Eigen/Cholesky>
 #include <Eigen/Core>
-#include <Eigen/QR>
 #include <unsupported/Eigen/MatrixFunctions>
 
 #include "org_wpilib_math_jni_EigenJNI.h"
@@ -81,32 +80,6 @@ Java_org_wpilib_math_jni_EigenJNI_rankUpdate
   } else {
     Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
   }
-}
-
-/*
- * Class:     org_wpilib_math_jni_EigenJNI
- * Method:    solveFullPivHouseholderQr
- * Signature: ([DII[DII[D)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_math_jni_EigenJNI_solveFullPivHouseholderQr
-  (JNIEnv* env, jclass, jdoubleArray A, jint Arows, jint Acols, jdoubleArray B,
-   jint Brows, jint Bcols, jdoubleArray dst)
-{
-  JSpan<const jdouble> nativeA{env, A};
-  JSpan<const jdouble> nativeB{env, B};
-
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                 Eigen::RowMajor>>
-      Amat{nativeA.data(), Arows, Acols};
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                 Eigen::RowMajor>>
-      Bmat{nativeB.data(), Brows, Bcols};
-
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Xmat =
-      Amat.fullPivHouseholderQr().solve(Bmat);
-
-  env->SetDoubleArrayRegion(dst, 0, Brows * Bcols, Xmat.data());
 }
 
 }  // extern "C"

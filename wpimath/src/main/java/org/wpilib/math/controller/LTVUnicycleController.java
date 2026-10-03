@@ -14,7 +14,7 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.numbers.N3;
 import org.wpilib.math.system.Discretization;
-import org.wpilib.math.trajectory.Trajectory;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
 
@@ -202,12 +202,12 @@ public class LTVUnicycleController {
    * @param desiredState The desired pose, linear velocity, and angular velocity from a trajectory.
    * @return The linear and angular velocity outputs of the LTV controller.
    */
-  public ChassisVelocities calculate(Pose2d currentPose, Trajectory.State desiredState) {
-    return calculate(
-        currentPose,
-        desiredState.pose,
-        desiredState.velocity,
-        desiredState.velocity * desiredState.curvature);
+  public ChassisVelocities calculate(Pose2d currentPose, HolonomicSample desiredState) {
+    // The sample velocity is field-relative; the controller needs the
+    // robot-relative forward (linear) velocity.
+    double linearVelocity =
+        desiredState.velocity.toRobotRelative(desiredState.pose.getRotation()).vx;
+    return calculate(currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
   }
 
   /**

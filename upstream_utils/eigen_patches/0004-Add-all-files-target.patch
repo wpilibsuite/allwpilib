@@ -1,0 +1,23 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: PJ Reiniger <pj.reiniger@gmail.com>
+Date: Tue, 18 Aug 2026 03:37:10 -0400
+Subject: [PATCH 4/4] Add all files target
+
+---
+ BUILD.bazel | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 38ce6cb417485fb37cafaf1e0f536e7ac56706b0..d50340b3c18dde4d798b228d339e93ce4b278e73 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -62,3 +62,9 @@ cc_library(
+     includes = ["."],
+     visibility = ["//visibility:public"],
+ )
++
++filegroup(
++    name = "all_files",
++    srcs = glob(["**"]),
++    visibility = ["//visibility:public"],
++)

@@ -5,11 +5,11 @@
 #include "wpi/framework/TimedRobot.hpp"
 #include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/math/filter/LinearFilter.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/acceleration.hpp"
 
 /**
- * Accelerometer filtering snippets for frc-docs.
+ * Accelerometer filtering snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {
@@ -20,9 +20,8 @@ class Robot : public wpi::TimedRobot {
     wpi::units::meters_per_second_squared_t filteredXAccel =
         xAccelFilter.Calculate(XAccel);
 
-    wpi::SmartDashboard::PutNumber("X Acceleration", XAccel.value());
-    wpi::SmartDashboard::PutNumber("Filtered X Acceleration",
-                                   filteredXAccel.value());
+    wpi::telemetry::Log("X Acceleration", XAccel);
+    wpi::telemetry::Log("Filtered X Acceleration", filteredXAccel);
   }
 
  private:

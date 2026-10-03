@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@rules_pycross//pycross:defs.bzl", "pycross_wheel_library")
 load("@rules_python//python:defs.bzl", "py_library")
@@ -95,6 +95,7 @@ def robotpy_library(
         requires = None,
         description_file = None,
         python_requires = None,
+        extra_distinfo_files = None,
         **kwargs):
     """
     Defines a python library that is wrapping a series of pybind extensions.
@@ -126,7 +127,9 @@ def robotpy_library(
         description_file = description_file,
         python_requires = python_requires,
         license = "BSD-3-Clause",
+        extra_distinfo_files = extra_distinfo_files,
         tags = ["robotpy"],
+        visibility = ["//visibility:public"],
     )
 
     pycross_wheel_library(
@@ -178,6 +181,8 @@ def copy_native_file(name, library, base_path):
     )
 
 def generate_native_files(name, pyproject_toml, pc_deps, libinit_files, pc_files):
+    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
+
     cmd = "$(locations //shared/bazel/rules/robotpy/hatchlib_native_port:generate_native_lib_files) "
     cmd += "  $(location " + pyproject_toml + ")"
     cmd += " $(location " + pc_files[0] + ") "

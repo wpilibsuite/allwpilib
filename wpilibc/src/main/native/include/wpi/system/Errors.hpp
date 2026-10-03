@@ -6,11 +6,10 @@
 
 #include <stdint.h>
 
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <string>
-
-#include <fmt/format.h>
 
 namespace wpi {
 
@@ -60,8 +59,8 @@ const char* GetErrorMessage(int32_t* code);
  * @param[in]  args error message format args
  */
 void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
-                  const char* funcName, fmt::string_view format,
-                  fmt::format_args args);
+                  const char* funcName, std::string_view format,
+                  std::format_args args);
 
 /**
  * Reports an error to the driver station (using HAL_SendError).
@@ -76,10 +75,10 @@ void ReportErrorV(int32_t status, const char* fileName, int lineNumber,
  */
 template <typename... Args>
 inline void ReportError(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, fmt::string_view format,
+                        const char* funcName, std::string_view format,
                         Args&&... args) {
   ReportErrorV(status, fileName, lineNumber, funcName, format,
-               fmt::make_format_args(args...));
+               std::make_format_args(args...));
 }
 
 /**
@@ -97,16 +96,16 @@ inline void ReportError(int32_t status, const char* fileName, int lineNumber,
  */
 [[nodiscard]]
 RuntimeError MakeErrorV(int32_t status, const char* fileName, int lineNumber,
-                        const char* funcName, fmt::string_view format,
-                        fmt::format_args args);
+                        const char* funcName, std::string_view format,
+                        std::format_args args);
 
 template <typename... Args>
 [[nodiscard]]
 inline RuntimeError MakeError(int32_t status, const char* fileName,
                               int lineNumber, const char* funcName,
-                              fmt::string_view format, Args&&... args) {
+                              std::string_view format, Args&&... args) {
   return MakeErrorV(status, fileName, lineNumber, funcName, format,
-                    fmt::make_format_args(args...));
+                    std::make_format_args(args...));
 }
 
 namespace err {

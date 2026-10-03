@@ -6,7 +6,7 @@
 
 Robot::Robot() {
   // Default to a length of 60, start empty output
-  led.SetLength(kLength);
+  led.SetLength(LENGTH);
   led.SetData(ledBuffer);
 }
 

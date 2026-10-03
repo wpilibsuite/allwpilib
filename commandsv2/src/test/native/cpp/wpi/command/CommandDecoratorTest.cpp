@@ -16,7 +16,8 @@
 using namespace wpi::cmd;
 class CommandDecoratorTest : public CommandTestBase {};
 
-TEST_F(CommandDecoratorTest, WithTimeout) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest WithTimeout",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   wpi::sim::PauseTiming();
@@ -26,18 +27,19 @@ TEST_F(CommandDecoratorTest, WithTimeout) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
 
   wpi::sim::StepTiming(150_ms);
 
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 
   wpi::sim::ResumeTiming();
 }
 
-TEST_F(CommandDecoratorTest, Until) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest Until",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finish = false;
@@ -47,15 +49,16 @@ TEST_F(CommandDecoratorTest, Until) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
 
   finish = true;
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, UntilOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest UntilOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool firstHasRun = false;
@@ -68,19 +71,20 @@ TEST_F(CommandDecoratorTest, UntilOrder) {
                                    return true;
                                  });
   auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
+    CHECK(firstHasRun);
+    CHECK(firstWasPolled);
     return true;
   });
 
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
+  CHECK(firstHasRun);
+  CHECK(firstWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, OnlyWhile) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest OnlyWhile",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool run = true;
@@ -90,15 +94,16 @@ TEST_F(CommandDecoratorTest, OnlyWhile) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
 
   run = false;
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest OnlyWhileOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool firstHasRun = false;
@@ -111,19 +116,20 @@ TEST_F(CommandDecoratorTest, OnlyWhileOrder) {
                                    return true;
                                  });
   auto command = std::move(first).Until([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
+    CHECK(firstHasRun);
+    CHECK(firstWasPolled);
     return false;
   });
 
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
+  CHECK(firstHasRun);
+  CHECK(firstWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, IgnoringDisable) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest IgnoringDisable",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto command = Idle().IgnoringDisable(true);
@@ -133,10 +139,11 @@ TEST_F(CommandDecoratorTest, IgnoringDisable) {
   scheduler.Schedule(command);
 
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, BeforeStarting) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest BeforeStarting",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -145,18 +152,19 @@ TEST_F(CommandDecoratorTest, BeforeStarting) {
 
   scheduler.Schedule(command);
 
-  EXPECT_TRUE(finished);
+  CHECK(finished);
 
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
 
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, AndThenLambda) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest AndThenLambda",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -165,18 +173,19 @@ TEST_F(CommandDecoratorTest, AndThenLambda) {
 
   scheduler.Schedule(command);
 
-  EXPECT_FALSE(finished);
+  CHECK_FALSE(finished);
 
   scheduler.Run();
 
-  EXPECT_TRUE(finished);
+  CHECK(finished);
 
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 }
 
-TEST_F(CommandDecoratorTest, AndThen) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest AndThen",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finished = false;
@@ -187,18 +196,19 @@ TEST_F(CommandDecoratorTest, AndThen) {
 
   scheduler.Schedule(group);
 
-  EXPECT_FALSE(finished);
+  CHECK_FALSE(finished);
 
   scheduler.Run();
 
-  EXPECT_TRUE(finished);
+  CHECK(finished);
 
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(CommandDecoratorTest, DeadlineFor) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest DeadlineFor",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finish = false;
@@ -211,15 +221,16 @@ TEST_F(CommandDecoratorTest, DeadlineFor) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
 
   finish = true;
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(CommandDecoratorTest, WithDeadline) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest WithDeadline",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finish = false;
@@ -232,15 +243,16 @@ TEST_F(CommandDecoratorTest, WithDeadline) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
 
   finish = true;
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(CommandDecoratorTest, AlongWith) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest AlongWith",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool finish = false;
@@ -253,15 +265,16 @@ TEST_F(CommandDecoratorTest, AlongWith) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(group));
+  CHECK(scheduler.IsScheduled(group));
 
   finish = true;
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(CommandDecoratorTest, RaceWith) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest RaceWith",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   auto command1 = Idle();
@@ -272,10 +285,11 @@ TEST_F(CommandDecoratorTest, RaceWith) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_FALSE(scheduler.IsScheduled(group));
+  CHECK_FALSE(scheduler.IsScheduled(group));
 }
 
-TEST_F(CommandDecoratorTest, DeadlineForOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest DeadlineForOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool dictatorHasRun = false;
@@ -289,8 +303,8 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
                           return true;
                         });
   auto other = wpi::cmd::Run([&dictatorHasRun, &dictatorWasPolled] {
-    EXPECT_TRUE(dictatorHasRun);
-    EXPECT_TRUE(dictatorWasPolled);
+    CHECK(dictatorHasRun);
+    CHECK(dictatorWasPolled);
   });
 
   auto group = std::move(dictator).DeadlineFor(std::move(other));
@@ -298,11 +312,12 @@ TEST_F(CommandDecoratorTest, DeadlineForOrder) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(dictatorHasRun);
-  EXPECT_TRUE(dictatorWasPolled);
+  CHECK(dictatorHasRun);
+  CHECK(dictatorWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest WithDeadlineOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool dictatorHasRun = false;
@@ -316,8 +331,8 @@ TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
                           return true;
                         });
   auto other = RunCommand([&dictatorHasRun, &dictatorWasPolled] {
-    EXPECT_TRUE(dictatorHasRun);
-    EXPECT_TRUE(dictatorWasPolled);
+    CHECK(dictatorHasRun);
+    CHECK(dictatorWasPolled);
   });
 
   auto group = std::move(other).WithDeadline(std::move(dictator).ToPtr());
@@ -325,11 +340,12 @@ TEST_F(CommandDecoratorTest, WithDeadlineOrder) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(dictatorHasRun);
-  EXPECT_TRUE(dictatorWasPolled);
+  CHECK(dictatorHasRun);
+  CHECK(dictatorWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, AlongWithOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest AlongWithOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool firstHasRun = false;
@@ -342,8 +358,8 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
         return true;
       });
   auto command2 = wpi::cmd::Run([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
+    CHECK(firstHasRun);
+    CHECK(firstWasPolled);
   });
 
   auto group = std::move(command1).AlongWith(std::move(command2));
@@ -351,11 +367,12 @@ TEST_F(CommandDecoratorTest, AlongWithOrder) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
+  CHECK(firstHasRun);
+  CHECK(firstWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, RaceWithOrder) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest RaceWithOrder",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool firstHasRun = false;
@@ -368,8 +385,8 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
         return true;
       });
   auto command2 = wpi::cmd::Run([&firstHasRun, &firstWasPolled] {
-    EXPECT_TRUE(firstHasRun);
-    EXPECT_TRUE(firstWasPolled);
+    CHECK(firstHasRun);
+    CHECK(firstWasPolled);
   });
 
   auto group = std::move(command1).RaceWith(std::move(command2));
@@ -377,11 +394,12 @@ TEST_F(CommandDecoratorTest, RaceWithOrder) {
   scheduler.Schedule(group);
   scheduler.Run();
 
-  EXPECT_TRUE(firstHasRun);
-  EXPECT_TRUE(firstWasPolled);
+  CHECK(firstHasRun);
+  CHECK(firstWasPolled);
 }
 
-TEST_F(CommandDecoratorTest, Unless) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest Unless",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool hasRun = false;
@@ -394,15 +412,16 @@ TEST_F(CommandDecoratorTest, Unless) {
 
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_FALSE(hasRun);
+  CHECK_FALSE(hasRun);
 
   unlessCondition = false;
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(hasRun);
+  CHECK(hasRun);
 }
 
-TEST_F(CommandDecoratorTest, OnlyIf) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest OnlyIf",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   bool hasRun = false;
@@ -415,15 +434,16 @@ TEST_F(CommandDecoratorTest, OnlyIf) {
 
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_FALSE(hasRun);
+  CHECK_FALSE(hasRun);
 
   onlyIfCondition = true;
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_TRUE(hasRun);
+  CHECK(hasRun);
 }
 
-TEST_F(CommandDecoratorTest, FinallyDo) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest FinallyDo",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int first = 0;
   int second = 0;
@@ -443,18 +463,19 @@ TEST_F(CommandDecoratorTest, FinallyDo) {
                            });
 
   scheduler.Schedule(command);
-  EXPECT_EQ(0, first);
-  EXPECT_EQ(0, second);
+  CHECK(0 == first);
+  CHECK(0 == second);
   scheduler.Run();
-  EXPECT_EQ(1, first);
+  CHECK(1 == first);
   // if `second == 0`, neither of the lambdas ran.
   // if `second == 1`, the second lambda ran before the first one
-  EXPECT_EQ(2, second);
+  CHECK(2 == second);
 }
 
 // handleInterruptTest() implicitly tests the interrupt=true branch of
 // finallyDo()
-TEST_F(CommandDecoratorTest, HandleInterrupt) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest HandleInterrupt",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
   int first = 0;
   int second = 0;
@@ -473,18 +494,19 @@ TEST_F(CommandDecoratorTest, HandleInterrupt) {
 
   scheduler.Schedule(command);
   scheduler.Run();
-  EXPECT_EQ(0, first);
-  EXPECT_EQ(0, second);
+  CHECK(0 == first);
+  CHECK(0 == second);
 
   scheduler.Cancel(command);
   // if `second == 0`, neither of the lambdas ran.
   // if `second == 1`, the second lambda ran before the first one
-  EXPECT_EQ(2, second);
+  CHECK(2 == second);
 }
 
-TEST_F(CommandDecoratorTest, WithName) {
+TEST_CASE_METHOD(CommandDecoratorTest, "CommandDecoratorTest WithName",
+                 "[commandsv2][command]") {
   auto command = None();
   std::string name{"Named"};
   auto named = std::move(command).WithName(name);
-  EXPECT_EQ(name, named.get()->GetName());
+  CHECK(name == named.get()->GetName());
 }

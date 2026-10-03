@@ -4,7 +4,9 @@
 
 #include "wpi/net/HttpServerConnection.hpp"
 
+#include <format>
 #include <memory>
+#include <utility>
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -16,12 +18,14 @@
 
 using namespace wpi::net;
 
-HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
+HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream,
+                                           uv::Timer::Time requestTimeout)
     : m_stream(*stream) {
   // process HTTP messages
   m_messageCompleteConn =
       m_request.messageComplete.connect_connection([this](bool keepAlive) {
         m_keepAlive = keepAlive;
+        CancelRequestTimeout();
         ProcessRequest();
       });
 
@@ -51,6 +55,29 @@ HttpServerConnection::HttpServerConnection(std::shared_ptr<uv::Stream> stream)
 
   // start reading
   stream->StartRead();
+
+  if (requestTimeout != uv::Timer::Time{0}) {
+    m_requestTimer = uv::Timer::Create(stream->GetLoopRef());
+    if (m_requestTimer) {
+      m_requestTimer->timeout.connect([this] {
+        auto timer = std::move(m_requestTimer);
+        m_stream.Close();
+        timer->Close();
+      });
+      m_requestTimer->Start(requestTimeout);
+    }
+  }
+}
+
+HttpServerConnection::~HttpServerConnection() {
+  CancelRequestTimeout();
+}
+
+void HttpServerConnection::CancelRequestTimeout() {
+  if (m_requestTimer) {
+    m_requestTimer->Close();
+    m_requestTimer.reset();
+  }
 }
 
 void HttpServerConnection::BuildCommonHeaders(wpi::util::raw_ostream& os) {
@@ -123,7 +150,7 @@ void HttpServerConnection::SendStaticResponse(
   wpi::util::SmallVector<uv::Buffer, 4> bufs;
   raw_uv_ostream os{bufs, 4096};
   BuildHeader(os, code, codeText, contentType, content.size(),
-              fmt::format("{}{}", extraHeader, contentEncodingHeader));
+              std::format("{}{}", extraHeader, contentEncodingHeader));
   // can send content without copying
   bufs.emplace_back(content);
 

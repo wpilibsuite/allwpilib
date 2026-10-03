@@ -120,7 +120,7 @@ class AnalyzerPlot {
 
  private:
   // The maximum size of each vector (dataset to plot)
-  static constexpr size_t kMaxSize = 2048;
+  static constexpr size_t MAX_SIZE = 2048;
 
   struct FilteredDataVsTimePlot {
     std::vector<ImPlotPoint> rawData;

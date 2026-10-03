@@ -4,8 +4,6 @@
 
 #include "wpi/commands2/ProxyCommand.hpp"
 
-#include <memory>
-
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/CommandPtr.hpp"
 #include "wpi/commands2/Commands.hpp"
@@ -15,7 +13,8 @@
 using namespace wpi::cmd;
 class ProxyCommandTest : public CommandTestBase {};
 
-TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {
+TEST_CASE_METHOD(ProxyCommandTest, "ProxyCommandTest NonOwningCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
@@ -27,10 +26,11 @@ TEST_F(ProxyCommandTest, NonOwningCommandSchedule) {
   scheduler.Schedule(&command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduled);
+  CHECK(scheduled);
 }
 
-TEST_F(ProxyCommandTest, NonOwningCommandEnd) {
+TEST_CASE_METHOD(ProxyCommandTest, "ProxyCommandTest NonOwningCommandEnd",
+                 "[commandsv2][command]") {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool finished = false;
@@ -42,14 +42,15 @@ TEST_F(ProxyCommandTest, NonOwningCommandEnd) {
   scheduler.Schedule(&command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  CHECK(scheduler.IsScheduled(&command));
   finished = true;
   scheduler.Run();
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  CHECK_FALSE(scheduler.IsScheduled(&command));
 }
 
-TEST_F(ProxyCommandTest, OwningCommandSchedule) {
+TEST_CASE_METHOD(ProxyCommandTest, "ProxyCommandTest OwningCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool scheduled = false;
@@ -59,10 +60,11 @@ TEST_F(ProxyCommandTest, OwningCommandSchedule) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduled);
+  CHECK(scheduled);
 }
 
-TEST_F(ProxyCommandTest, OwningCommandEnd) {
+TEST_CASE_METHOD(ProxyCommandTest, "ProxyCommandTest OwningCommandEnd",
+                 "[commandsv2][command]") {
   CommandScheduler& scheduler = CommandScheduler::GetInstance();
 
   bool finished = false;
@@ -72,9 +74,9 @@ TEST_F(ProxyCommandTest, OwningCommandEnd) {
   scheduler.Schedule(command);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(command));
+  CHECK(scheduler.IsScheduled(command));
   finished = true;
   scheduler.Run();
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(command));
+  CHECK_FALSE(scheduler.IsScheduled(command));
 }

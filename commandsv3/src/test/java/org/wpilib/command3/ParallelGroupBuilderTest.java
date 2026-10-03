@@ -80,4 +80,13 @@ class ParallelGroupBuilderTest {
     var builder = new ParallelGroupBuilder();
     assertThrows(NullPointerException.class, () -> builder.named(null));
   }
+
+  @Test
+  void automaticNameWithUntil() {
+    var a = Command.noRequirements(Coroutine::park).named("A");
+    var b = Command.noRequirements(Coroutine::park).named("B");
+
+    var group = new ParallelGroupBuilder().requiring(a, b).until(() -> false).withAutomaticName();
+    assertEquals("((A & B) | Until Condition)", group.name());
+  }
 }

@@ -9,12 +9,12 @@
 #include <thread>
 
 #include "cameracalibration.hpp"
-#include "wpi/apriltag/AprilTagFieldLayout.hpp"
+#include "wpi/fields/Field.hpp"
 
 namespace wpical {
-std::optional<wpi::apriltag::AprilTagFieldLayout> calibrate(
+std::optional<wpi::fields::Field> calibrate(
     std::string inputDirPath, wpical::CameraModel& cameraModel,
-    const wpi::apriltag::AprilTagFieldLayout& idealLayout, int pinnedTagId,
+    const wpi::fields::Field& idealLayout, int pinnedTagId,
     bool showDebugWindow);
 
 class FieldCalibrator {
@@ -23,13 +23,11 @@ class FieldCalibrator {
 
   bool IsFinished() { return m_isFinished; }
 
-  std::optional<wpi::apriltag::AprilTagFieldLayout> GetAprilTagFieldLayout() {
-    return m_fieldLayout;
-  }
+  std::optional<wpi::fields::Field> GetField() { return m_fieldLayout; }
 
   void Calibrate(std::string inputDirPath, wpical::CameraModel& cameraModel,
-                 const wpi::apriltag::AprilTagFieldLayout& idealLayout,
-                 int pinnedTagId, bool showDebugWindow) {
+                 const wpi::fields::Field& idealLayout, int pinnedTagId,
+                 bool showDebugWindow) {
     m_processingThread = std::thread([=, this]() mutable {
       this->m_fieldLayout = calibrate(inputDirPath, cameraModel, idealLayout,
                                       pinnedTagId, showDebugWindow);
@@ -40,6 +38,6 @@ class FieldCalibrator {
  private:
   std::atomic_bool m_isFinished{false};
   std::thread m_processingThread;
-  std::optional<wpi::apriltag::AprilTagFieldLayout> m_fieldLayout;
+  std::optional<wpi::fields::Field> m_fieldLayout;
 };
 }  // namespace wpical

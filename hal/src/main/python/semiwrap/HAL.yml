@@ -3,6 +3,7 @@ strip_prefixes:
 
 enums:
   HAL_RuntimeType:
+    value_prefix: HAL_RUNTIME
 functions:
   HAL_GetErrorMessage:
   HAL_GetSerialNumber:

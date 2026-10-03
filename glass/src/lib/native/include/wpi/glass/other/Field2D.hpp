@@ -32,6 +32,23 @@ class FieldObjectModel : public Model {
 class Field2DModel : public Model {
  public:
   virtual FieldObjectModel* AddFieldObject(std::string_view name) = 0;
+
+  /**
+   * Adds a field object backed by an external source.
+   *
+   * @param name display name
+   * @param source source path or identifier
+   * @param type source type string
+   * @return Field object, or nullptr if the source is unsupported
+   */
+  virtual FieldObjectModel* AddFieldObject(std::string_view name,
+                                           std::string_view source,
+                                           std::string_view type) {
+    (void)name;
+    (void)source;
+    (void)type;
+    return nullptr;
+  }
   virtual void RemoveFieldObject(std::string_view name) = 0;
   virtual void ForEachFieldObject(
       wpi::util::function_ref<void(FieldObjectModel& model,

@@ -10,9 +10,11 @@
 
 using namespace wpi::cmd;
 
-class DeferredFunctionsTest : public CommandTestBaseWithParam<bool> {};
+namespace {
 
-TEST_P(DeferredFunctionsTest, DeferredFunctions) {
+void CheckDeferredFunctions(bool expectedInterrupted) {
+  CommandTestBase testBase;
+
   int initializeCount = 0;
   int executeCount = 0;
   int isFinishedCount = 0;
@@ -24,7 +26,7 @@ TEST_P(DeferredFunctionsTest, DeferredFunctions) {
                                  [&] { initializeCount++; },
                                  [&] { executeCount++; },
                                  [&](bool interrupted) {
-                                   EXPECT_EQ(interrupted, GetParam());
+                                   CHECK(interrupted == expectedInterrupted);
                                    endCount++;
                                  },
                                  [&] {
@@ -36,22 +38,32 @@ TEST_P(DeferredFunctionsTest, DeferredFunctions) {
                            {}};
 
   deferred.Initialize();
-  EXPECT_EQ(1, initializeCount);
+  CHECK(1 == initializeCount);
   deferred.Execute();
-  EXPECT_EQ(1, executeCount);
-  EXPECT_FALSE(deferred.IsFinished());
-  EXPECT_EQ(1, isFinishedCount);
+  CHECK(1 == executeCount);
+  CHECK_FALSE(deferred.IsFinished());
+  CHECK(1 == isFinishedCount);
   finished = true;
-  EXPECT_TRUE(deferred.IsFinished());
-  EXPECT_EQ(2, isFinishedCount);
-  deferred.End(GetParam());
-  EXPECT_EQ(1, endCount);
+  CHECK(deferred.IsFinished());
+  CHECK(2 == isFinishedCount);
+  deferred.End(expectedInterrupted);
+  CHECK(1 == endCount);
 }
 
-INSTANTIATE_TEST_SUITE_P(DeferredCommandTests, DeferredFunctionsTest,
-                         testing::Values(true, false));
+}  // namespace
 
-TEST(DeferredCommandTest, DeferredSupplierOnlyCalledDuringInit) {
+TEST_CASE("DeferredCommandTest DeferredFunctionsInterrupted",
+          "[commandsv2][command]") {
+  CheckDeferredFunctions(true);
+}
+
+TEST_CASE("DeferredCommandTest DeferredFunctionsFinished",
+          "[commandsv2][command]") {
+  CheckDeferredFunctions(false);
+}
+
+TEST_CASE("DeferredCommandTest DeferredSupplierOnlyCalledDuringInit",
+          "[commandsv2][command]") {
   int count = 0;
   DeferredCommand command{[&count] {
                             count++;
@@ -59,18 +71,18 @@ TEST(DeferredCommandTest, DeferredSupplierOnlyCalledDuringInit) {
                           },
                           {}};
 
-  EXPECT_EQ(0, count);
+  CHECK(0 == count);
   command.Initialize();
-  EXPECT_EQ(1, count);
+  CHECK(1 == count);
   command.Execute();
   command.IsFinished();
   command.End(false);
-  EXPECT_EQ(1, count);
+  CHECK(1 == count);
 }
 
-TEST(DeferredCommandTest, DeferredRequirements) {
+TEST_CASE("DeferredCommandTest DeferredRequirements", "[commandsv2][command]") {
   TestSubsystem subsystem;
   DeferredCommand command{None, {&subsystem}};
 
-  EXPECT_TRUE(command.GetRequirements().contains(&subsystem));
+  CHECK(command.GetRequirements().contains(&subsystem));
 }

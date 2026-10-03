@@ -1,12 +1,3 @@
-include(LinkMacOSGUI)
-
-set(SAVE_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS OFF)
-set(GLFW_INSTALL OFF)
-add_subdirectory("glfw")
-set(BUILD_SHARED_LIBS ${SAVE_BUILD_SHARED_LIBS})
-export(TARGETS glfw FILE glfw.cmake NAMESPACE glfw::)
-
 # Add imgui directly to our build.
 file(GLOB imgui_sources imgui/cpp/*.cpp imgui/cpp/misc/cpp/*.cpp)
 file(GLOB implot_sources implot/cpp/*.cpp)
@@ -15,9 +6,9 @@ set(imgui_all_sources
     ${imgui_sources}
     ${implot_sources}
     ${fonts_sources}
-    imgui/cpp/backends/imgui_impl_glfw.cpp
-    imgui/cpp/backends/imgui_impl_opengl3.cpp
-    generated/gl3w/src/gl3w.c
+    imgui/cpp/backends/imgui_impl_sdl3.cpp
+    imgui/cpp/backends/imgui_impl_sdlgpu3.cpp
+    imgui/cpp/backends/imgui_impl_sdlrenderer3.cpp
     stb/cpp/stb_image.cpp
 )
 if(MSVC)
@@ -25,36 +16,63 @@ if(MSVC)
 else()
     add_library(imgui ${imgui_all_sources})
 endif()
-target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GL3W)
-if(MSVC)
-    target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_dx11.cpp)
-else()
-    if(APPLE)
-        target_compile_options(imgui PRIVATE -fobjc-arc)
-        wpilib_link_macos_gui(imgui)
-        target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_metal.mm)
-    else()
-        #target_sources(imgui PRIVATE imgui/cpp/backends/imgui_impl_opengl3.cpp)
+
+function(wpilib_configure_imgui_target target)
+    target_link_libraries(${target} PUBLIC SDL3::SDL3)
+    target_include_directories(
+        ${target}
+        PUBLIC
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/misc/cpp>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/backends>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/implot/include>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/fonts/include>"
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
+        PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+    )
+
+    target_compile_features(${target} PUBLIC cxx_std_23)
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 20.0)
+        target_compile_options(${target} PUBLIC -Wno-nontrivial-memcall)
     endif()
-endif()
-target_link_libraries(imgui PUBLIC glfw)
-target_include_directories(
-    imgui
-    PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/misc/cpp>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/imgui/include/backends>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/implot/include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/gl3w/include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated/fonts/include>"
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/stb/include>"
-    PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-)
+endfunction()
 
-target_compile_features(imgui PUBLIC cxx_std_23)
+wpilib_configure_imgui_target(imgui)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 20.0)
-  target_compile_options(imgui PUBLIC -Wno-nontrivial-memcall)
+if(WPILIB_WITH_IMGUI_TESTS)
+    set(imgui_test_engine_dir "${imgui_test_engine_SOURCE_DIR}/imgui_test_engine")
+    add_library(imgui_for_tests STATIC ${imgui_all_sources})
+    set_property(TARGET imgui_for_tests PROPERTY FOLDER "tests")
+    wpilib_configure_imgui_target(imgui_for_tests)
+    target_compile_definitions(
+        imgui_for_tests
+        PUBLIC
+            IMGUI_ENABLE_TEST_ENGINE
+            IMGUI_TEST_ENGINE_ENABLE_CAPTURE=0
+            IMGUI_TEST_ENGINE_ENABLE_COROUTINE_STDTHREAD_IMPL=1
+    )
+
+    add_library(
+        imgui_test_engine
+        STATIC
+        ${imgui_test_engine_dir}/imgui_capture_tool.cpp
+        ${imgui_test_engine_dir}/imgui_te_context.cpp
+        ${imgui_test_engine_dir}/imgui_te_coroutine.cpp
+        ${imgui_test_engine_dir}/imgui_te_engine.cpp
+        ${imgui_test_engine_dir}/imgui_te_exporters.cpp
+        ${imgui_test_engine_dir}/imgui_te_perftool.cpp
+        ${imgui_test_engine_dir}/imgui_te_ui.cpp
+        ${imgui_test_engine_dir}/imgui_te_utils.cpp
+    )
+    target_link_libraries(imgui_test_engine PUBLIC imgui_for_tests)
+    target_include_directories(
+        imgui_test_engine
+        PUBLIC
+            "$<BUILD_INTERFACE:${imgui_test_engine_SOURCE_DIR}>"
+            "$<BUILD_INTERFACE:${imgui_test_engine_dir}>"
+    )
+    target_compile_features(imgui_test_engine PUBLIC cxx_std_23)
 endif()
 
 install(TARGETS imgui EXPORT imgui)

@@ -6,51 +6,63 @@
 
 #include "wpi/driverstation/NiDsPS4Controller.hpp"
 
-#include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
+#include "wpi/util/UsageReporting.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
-NiDsPS4Controller::NiDsPS4Controller(int port) : GenericHID(port) {
-  HAL_ReportUsage("HID", port, "NiDsPS4Controller");
+NiDsPS4Controller::NiDsPS4Controller(int port)
+    : NiDsPS4Controller{DriverStation::GetGenericHID(port)} {}
+
+NiDsPS4Controller::NiDsPS4Controller(GenericHID& hid)
+    : m_hid{&hid} {
+  wpi::util::ReportUsage("HID", hid.GetPort(), "NiDsPS4Controller");
+}
+
+GenericHID& NiDsPS4Controller::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& NiDsPS4Controller::GetHID() const {
+  return *m_hid;
 }
 
 double NiDsPS4Controller::GetLeftX() const {
-  return GetRawAxis(Axis::kLeftX);
+  return m_hid->GetRawAxis(Axis::LEFT_X);
 }
 
 double NiDsPS4Controller::GetLeftY() const {
-  return GetRawAxis(Axis::kLeftY);
+  return m_hid->GetRawAxis(Axis::LEFT_Y);
 }
 
 double NiDsPS4Controller::GetRightX() const {
-  return GetRawAxis(Axis::kRightX);
+  return m_hid->GetRawAxis(Axis::RIGHT_X);
 }
 
 double NiDsPS4Controller::GetRightY() const {
-  return GetRawAxis(Axis::kRightY);
+  return m_hid->GetRawAxis(Axis::RIGHT_Y);
 }
 
 double NiDsPS4Controller::GetL2Axis() const {
-  return GetRawAxis(Axis::kL2);
+  return m_hid->GetRawAxis(Axis::L2);
 }
 
 double NiDsPS4Controller::GetR2Axis() const {
-  return GetRawAxis(Axis::kR2);
+  return m_hid->GetRawAxis(Axis::R2);
 }
 
 bool NiDsPS4Controller::GetSquareButton() const {
-  return GetRawButton(Button::kSquare);
+  return m_hid->GetRawButton(Button::SQUARE);
 }
 
 bool NiDsPS4Controller::GetSquareButtonPressed() {
-  return GetRawButtonPressed(Button::kSquare);
+  return m_hid->GetRawButtonPressed(Button::SQUARE);
 }
 
 bool NiDsPS4Controller::GetSquareButtonReleased() {
-  return GetRawButtonReleased(Button::kSquare);
+  return m_hid->GetRawButtonReleased(Button::SQUARE);
 }
 
 BooleanEvent NiDsPS4Controller::Square(EventLoop* loop) const {
@@ -58,15 +70,15 @@ BooleanEvent NiDsPS4Controller::Square(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetCrossButton() const {
-  return GetRawButton(Button::kCross);
+  return m_hid->GetRawButton(Button::CROSS);
 }
 
 bool NiDsPS4Controller::GetCrossButtonPressed() {
-  return GetRawButtonPressed(Button::kCross);
+  return m_hid->GetRawButtonPressed(Button::CROSS);
 }
 
 bool NiDsPS4Controller::GetCrossButtonReleased() {
-  return GetRawButtonReleased(Button::kCross);
+  return m_hid->GetRawButtonReleased(Button::CROSS);
 }
 
 BooleanEvent NiDsPS4Controller::Cross(EventLoop* loop) const {
@@ -74,15 +86,15 @@ BooleanEvent NiDsPS4Controller::Cross(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetCircleButton() const {
-  return GetRawButton(Button::kCircle);
+  return m_hid->GetRawButton(Button::CIRCLE);
 }
 
 bool NiDsPS4Controller::GetCircleButtonPressed() {
-  return GetRawButtonPressed(Button::kCircle);
+  return m_hid->GetRawButtonPressed(Button::CIRCLE);
 }
 
 bool NiDsPS4Controller::GetCircleButtonReleased() {
-  return GetRawButtonReleased(Button::kCircle);
+  return m_hid->GetRawButtonReleased(Button::CIRCLE);
 }
 
 BooleanEvent NiDsPS4Controller::Circle(EventLoop* loop) const {
@@ -90,15 +102,15 @@ BooleanEvent NiDsPS4Controller::Circle(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetTriangleButton() const {
-  return GetRawButton(Button::kTriangle);
+  return m_hid->GetRawButton(Button::TRIANGLE);
 }
 
 bool NiDsPS4Controller::GetTriangleButtonPressed() {
-  return GetRawButtonPressed(Button::kTriangle);
+  return m_hid->GetRawButtonPressed(Button::TRIANGLE);
 }
 
 bool NiDsPS4Controller::GetTriangleButtonReleased() {
-  return GetRawButtonReleased(Button::kTriangle);
+  return m_hid->GetRawButtonReleased(Button::TRIANGLE);
 }
 
 BooleanEvent NiDsPS4Controller::Triangle(EventLoop* loop) const {
@@ -106,15 +118,15 @@ BooleanEvent NiDsPS4Controller::Triangle(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetL1Button() const {
-  return GetRawButton(Button::kL1);
+  return m_hid->GetRawButton(Button::L1);
 }
 
 bool NiDsPS4Controller::GetL1ButtonPressed() {
-  return GetRawButtonPressed(Button::kL1);
+  return m_hid->GetRawButtonPressed(Button::L1);
 }
 
 bool NiDsPS4Controller::GetL1ButtonReleased() {
-  return GetRawButtonReleased(Button::kL1);
+  return m_hid->GetRawButtonReleased(Button::L1);
 }
 
 BooleanEvent NiDsPS4Controller::L1(EventLoop* loop) const {
@@ -122,15 +134,15 @@ BooleanEvent NiDsPS4Controller::L1(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetR1Button() const {
-  return GetRawButton(Button::kR1);
+  return m_hid->GetRawButton(Button::R1);
 }
 
 bool NiDsPS4Controller::GetR1ButtonPressed() {
-  return GetRawButtonPressed(Button::kR1);
+  return m_hid->GetRawButtonPressed(Button::R1);
 }
 
 bool NiDsPS4Controller::GetR1ButtonReleased() {
-  return GetRawButtonReleased(Button::kR1);
+  return m_hid->GetRawButtonReleased(Button::R1);
 }
 
 BooleanEvent NiDsPS4Controller::R1(EventLoop* loop) const {
@@ -138,15 +150,15 @@ BooleanEvent NiDsPS4Controller::R1(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetL2Button() const {
-  return GetRawButton(Button::kL2);
+  return m_hid->GetRawButton(Button::L2);
 }
 
 bool NiDsPS4Controller::GetL2ButtonPressed() {
-  return GetRawButtonPressed(Button::kL2);
+  return m_hid->GetRawButtonPressed(Button::L2);
 }
 
 bool NiDsPS4Controller::GetL2ButtonReleased() {
-  return GetRawButtonReleased(Button::kL2);
+  return m_hid->GetRawButtonReleased(Button::L2);
 }
 
 BooleanEvent NiDsPS4Controller::L2(EventLoop* loop) const {
@@ -154,15 +166,15 @@ BooleanEvent NiDsPS4Controller::L2(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetR2Button() const {
-  return GetRawButton(Button::kR2);
+  return m_hid->GetRawButton(Button::R2);
 }
 
 bool NiDsPS4Controller::GetR2ButtonPressed() {
-  return GetRawButtonPressed(Button::kR2);
+  return m_hid->GetRawButtonPressed(Button::R2);
 }
 
 bool NiDsPS4Controller::GetR2ButtonReleased() {
-  return GetRawButtonReleased(Button::kR2);
+  return m_hid->GetRawButtonReleased(Button::R2);
 }
 
 BooleanEvent NiDsPS4Controller::R2(EventLoop* loop) const {
@@ -170,15 +182,15 @@ BooleanEvent NiDsPS4Controller::R2(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetShareButton() const {
-  return GetRawButton(Button::kShare);
+  return m_hid->GetRawButton(Button::SHARE);
 }
 
 bool NiDsPS4Controller::GetShareButtonPressed() {
-  return GetRawButtonPressed(Button::kShare);
+  return m_hid->GetRawButtonPressed(Button::SHARE);
 }
 
 bool NiDsPS4Controller::GetShareButtonReleased() {
-  return GetRawButtonReleased(Button::kShare);
+  return m_hid->GetRawButtonReleased(Button::SHARE);
 }
 
 BooleanEvent NiDsPS4Controller::Share(EventLoop* loop) const {
@@ -186,15 +198,15 @@ BooleanEvent NiDsPS4Controller::Share(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetOptionsButton() const {
-  return GetRawButton(Button::kOptions);
+  return m_hid->GetRawButton(Button::OPTIONS);
 }
 
 bool NiDsPS4Controller::GetOptionsButtonPressed() {
-  return GetRawButtonPressed(Button::kOptions);
+  return m_hid->GetRawButtonPressed(Button::OPTIONS);
 }
 
 bool NiDsPS4Controller::GetOptionsButtonReleased() {
-  return GetRawButtonReleased(Button::kOptions);
+  return m_hid->GetRawButtonReleased(Button::OPTIONS);
 }
 
 BooleanEvent NiDsPS4Controller::Options(EventLoop* loop) const {
@@ -202,15 +214,15 @@ BooleanEvent NiDsPS4Controller::Options(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetL3Button() const {
-  return GetRawButton(Button::kL3);
+  return m_hid->GetRawButton(Button::L3);
 }
 
 bool NiDsPS4Controller::GetL3ButtonPressed() {
-  return GetRawButtonPressed(Button::kL3);
+  return m_hid->GetRawButtonPressed(Button::L3);
 }
 
 bool NiDsPS4Controller::GetL3ButtonReleased() {
-  return GetRawButtonReleased(Button::kL3);
+  return m_hid->GetRawButtonReleased(Button::L3);
 }
 
 BooleanEvent NiDsPS4Controller::L3(EventLoop* loop) const {
@@ -218,15 +230,15 @@ BooleanEvent NiDsPS4Controller::L3(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetR3Button() const {
-  return GetRawButton(Button::kR3);
+  return m_hid->GetRawButton(Button::R3);
 }
 
 bool NiDsPS4Controller::GetR3ButtonPressed() {
-  return GetRawButtonPressed(Button::kR3);
+  return m_hid->GetRawButtonPressed(Button::R3);
 }
 
 bool NiDsPS4Controller::GetR3ButtonReleased() {
-  return GetRawButtonReleased(Button::kR3);
+  return m_hid->GetRawButtonReleased(Button::R3);
 }
 
 BooleanEvent NiDsPS4Controller::R3(EventLoop* loop) const {
@@ -234,15 +246,15 @@ BooleanEvent NiDsPS4Controller::R3(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetPSButton() const {
-  return GetRawButton(Button::kPS);
+  return m_hid->GetRawButton(Button::PS);
 }
 
 bool NiDsPS4Controller::GetPSButtonPressed() {
-  return GetRawButtonPressed(Button::kPS);
+  return m_hid->GetRawButtonPressed(Button::PS);
 }
 
 bool NiDsPS4Controller::GetPSButtonReleased() {
-  return GetRawButtonReleased(Button::kPS);
+  return m_hid->GetRawButtonReleased(Button::PS);
 }
 
 BooleanEvent NiDsPS4Controller::PS(EventLoop* loop) const {
@@ -250,42 +262,69 @@ BooleanEvent NiDsPS4Controller::PS(EventLoop* loop) const {
 }
 
 bool NiDsPS4Controller::GetTouchpadButton() const {
-  return GetRawButton(Button::kTouchpad);
+  return m_hid->GetRawButton(Button::TOUCHPAD);
 }
 
 bool NiDsPS4Controller::GetTouchpadButtonPressed() {
-  return GetRawButtonPressed(Button::kTouchpad);
+  return m_hid->GetRawButtonPressed(Button::TOUCHPAD);
 }
 
 bool NiDsPS4Controller::GetTouchpadButtonReleased() {
-  return GetRawButtonReleased(Button::kTouchpad);
+  return m_hid->GetRawButtonReleased(Button::TOUCHPAD);
 }
 
 BooleanEvent NiDsPS4Controller::Touchpad(EventLoop* loop) const {
   return BooleanEvent(loop, [this]() { return this->GetTouchpadButton(); });
 }
 
-void NiDsPS4Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "NiDsPS4");
-  builder.AddDoubleProperty("L2 Axis", [this] { return GetL2Axis(); }, nullptr);
-  builder.AddDoubleProperty("R2 Axis", [this] { return GetR2Axis(); }, nullptr);
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("RightX", [this] { return GetRightX(); }, nullptr);
-  builder.AddDoubleProperty("RightY", [this] { return GetRightY(); }, nullptr);
-  builder.AddBooleanProperty("Square", [this] { return GetSquareButton(); }, nullptr);
-  builder.AddBooleanProperty("Cross", [this] { return GetCrossButton(); }, nullptr);
-  builder.AddBooleanProperty("Circle", [this] { return GetCircleButton(); }, nullptr);
-  builder.AddBooleanProperty("Triangle", [this] { return GetTriangleButton(); }, nullptr);
-  builder.AddBooleanProperty("L1", [this] { return GetL1Button(); }, nullptr);
-  builder.AddBooleanProperty("R1", [this] { return GetR1Button(); }, nullptr);
-  builder.AddBooleanProperty("L2", [this] { return GetL2Button(); }, nullptr);
-  builder.AddBooleanProperty("R2", [this] { return GetR2Button(); }, nullptr);
-  builder.AddBooleanProperty("Share", [this] { return GetShareButton(); }, nullptr);
-  builder.AddBooleanProperty("Options", [this] { return GetOptionsButton(); }, nullptr);
-  builder.AddBooleanProperty("L3", [this] { return GetL3Button(); }, nullptr);
-  builder.AddBooleanProperty("R3", [this] { return GetR3Button(); }, nullptr);
-  builder.AddBooleanProperty("PS", [this] { return GetPSButton(); }, nullptr);
-  builder.AddBooleanProperty("Touchpad", [this] { return GetTouchpadButton(); }, nullptr);
+bool NiDsPS4Controller::IsConnected() const {
+  return m_hid->IsConnected();
+}
+
+GenericHID::HIDType NiDsPS4Controller::GetGamepadType() const {
+  return m_hid->GetGamepadType();
+}
+
+GenericHID::SupportedOutputs NiDsPS4Controller::GetSupportedOutputs() const {
+  return m_hid->GetSupportedOutputs();
+}
+
+std::string NiDsPS4Controller::GetName() const {
+  return m_hid->GetName();
+}
+
+int NiDsPS4Controller::GetPort() const {
+  return m_hid->GetPort();
+}
+
+void NiDsPS4Controller::SetRumble(GenericHID::RumbleType type,
+                              double value) {
+  m_hid->SetRumble(type, value);
+}
+
+std::string_view NiDsPS4Controller::GetTelemetryType() const {
+  return "HID:NiDsPS4";
+}
+
+void NiDsPS4Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("L2 Axis", GetL2Axis());
+  table.Log("R2 Axis", GetR2Axis());
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("RightX", GetRightX());
+  table.Log("RightY", GetRightY());
+  table.Log("Square", GetSquareButton());
+  table.Log("Cross", GetCrossButton());
+  table.Log("Circle", GetCircleButton());
+  table.Log("Triangle", GetTriangleButton());
+  table.Log("L1", GetL1Button());
+  table.Log("R1", GetR1Button());
+  table.Log("L2", GetL2Button());
+  table.Log("R2", GetR2Button());
+  table.Log("Share", GetShareButton());
+  table.Log("Options", GetOptionsButton());
+  table.Log("L3", GetL3Button());
+  table.Log("R3", GetR3Button());
+  table.Log("PS", GetPSButton());
+  table.Log("Touchpad", GetTouchpadButton());
 }

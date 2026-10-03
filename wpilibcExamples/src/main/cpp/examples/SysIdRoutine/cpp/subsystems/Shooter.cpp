@@ -10,7 +10,7 @@
 
 Shooter::Shooter() {
   shooterEncoder.SetDistancePerPulse(
-      constants::shooter::kEncoderDistancePerPulse.value());
+      constants::shooter::ENCODER_DISTANCE_PER_PULSE.value());
 }
 
 wpi::cmd::CommandPtr Shooter::RunShooterCommand(
@@ -22,7 +22,7 @@ wpi::cmd::CommandPtr Shooter::RunShooterCommand(
                        shooterEncoder.GetRate(), shooterVelocity())} +
                    shooterFeedforward.Calculate(
                        wpi::units::turns_per_second_t{shooterVelocity()}));
-               feederMotor.SetThrottle(constants::shooter::kFeederVelocity);
+               feederMotor.SetThrottle(constants::shooter::FEEDER_VELOCITY);
              },
              {this})
       .WithName("Set Shooter Velocity");

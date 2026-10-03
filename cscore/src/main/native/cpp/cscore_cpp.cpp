@@ -236,7 +236,7 @@ std::string_view GetSourceDescription(CS_Source source,
   return data->source->GetDescription(buf);
 }
 
-uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
+int64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   auto data = Instance::GetInstance().GetSource(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;

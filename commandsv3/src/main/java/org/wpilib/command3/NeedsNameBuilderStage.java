@@ -23,8 +23,20 @@ public interface NeedsNameBuilderStage {
    * @param onCancel The function to execute when the command is canceled while running. May be
    *     null.
    * @return This builder object, for chaining
+   * @see Command#onCancel()
    */
   NeedsNameBuilderStage whenCanceled(Runnable onCancel);
+
+  /**
+   * Optionally sets a callback to execute when the command exits. The callback will not run if the
+   * command was stopped after being scheduled but before starting to run, but will run whenever the
+   * command stops regardless of the cause (natural completion, cancellation, or interruption).
+   *
+   * @param onExit The function to execute when the command exits. May be null.
+   * @return This builder object, for chaining
+   * @see Command#onExit()
+   */
+  NeedsNameBuilderStage whenExited(Runnable onExit);
 
   /**
    * Sets the priority level of the command.

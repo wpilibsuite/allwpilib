@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 import pytest
 
 
-def test_requirementInterrupt(scheduler: commands2.CommandScheduler):
+def test_requirement_interrupt(scheduler: commands2.CommandScheduler):
     requirement = commands2.Subsystem()
     interrupted = commands2.Command()
-    interrupted.addRequirements(requirement)
+    interrupted.add_requirements(requirement)
     interrupter = commands2.Command()
-    interrupter.addRequirements(requirement)
+    interrupter.add_requirements(requirement)
     start_spying_on(interrupted)
     start_spying_on(interrupter)
 
@@ -30,29 +30,29 @@ def test_requirementInterrupt(scheduler: commands2.CommandScheduler):
     verify(interrupter).initialize()
     verify(interrupter).execute()
 
-    assert not interrupted.isScheduled()
-    assert interrupter.isScheduled()
+    assert not interrupted.is_scheduled()
+    assert interrupter.is_scheduled()
 
 
-def test_requirementUninterruptible(scheduler: commands2.CommandScheduler):
+def test_requirement_uninterruptible(scheduler: commands2.CommandScheduler):
     requirement = commands2.Subsystem()
-    notInterrupted = commands2.RunCommand(
+    not_interrupted = commands2.RunCommand(
         lambda: None, requirement
-    ).withInterruptBehavior(commands2.InterruptionBehavior.kCancelIncoming)
+    ).with_interrupt_behavior(commands2.InterruptionBehavior.CANCEL_INCOMING)
     interrupter = commands2.Command()
-    interrupter.addRequirements(requirement)
-    start_spying_on(notInterrupted)
+    interrupter.add_requirements(requirement)
+    start_spying_on(not_interrupted)
 
-    scheduler.schedule(notInterrupted)
+    scheduler.schedule(not_interrupted)
     scheduler.schedule(interrupter)
 
-    assert scheduler.isScheduled(notInterrupted)
-    assert not scheduler.isScheduled(interrupter)
+    assert scheduler.is_scheduled(not_interrupted)
+    assert not scheduler.is_scheduled(interrupter)
 
 
-def test_defaultCommandRequirementError(scheduler: commands2.CommandScheduler):
+def test_default_command_requirement_error(scheduler: commands2.CommandScheduler):
     system = commands2.Subsystem()
-    missingRequirement = commands2.WaitUntilCommand(lambda: False)
+    missing_requirement = commands2.WaitUntilCommand(lambda: False)
 
     with pytest.raises(commands2.IllegalCommandUse):
-        scheduler.setDefaultCommand(system, missingRequirement)
+        scheduler.set_default_command(system, missing_requirement)

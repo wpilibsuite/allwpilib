@@ -69,7 +69,7 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
 
 void Notifier::NotifySinkSourceChanged(std::string_view name, CS_Sink sink,
                                        CS_Source source) {
-  RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
+  RawEvent event{name, sink, RawEvent::SINK_SOURCE_CHANGED};
   event.sourceHandle = source;
   Send(UINT_MAX, std::move(event));
 }
@@ -86,13 +86,13 @@ void Notifier::NotifySinkProperty(const SinkImpl& sink, CS_EventKind kind,
 }
 
 void Notifier::NotifyNetworkInterfacesChanged() {
-  Send(UINT_MAX, RawEvent::kNetworkInterfacesChanged);
+  Send(UINT_MAX, RawEvent::NETWORK_INTERFACES_CHANGED);
 }
 
 void Notifier::NotifyTelemetryUpdated() {
-  Send(UINT_MAX, RawEvent::kTelemetryUpdated);
+  Send(UINT_MAX, RawEvent::TELEMETRY_UPDATED);
 }
 
 void Notifier::NotifyUsbCamerasChanged() {
-  Send(UINT_MAX, RawEvent::kUsbCamerasChanged);
+  Send(UINT_MAX, RawEvent::USB_CAMERAS_CHANGED);
 }

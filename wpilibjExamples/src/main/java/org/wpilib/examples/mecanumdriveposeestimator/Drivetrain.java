@@ -4,8 +4,10 @@
 
 package org.wpilib.examples.mecanumdriveposeestimator;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
@@ -17,13 +19,12 @@ import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 import org.wpilib.system.Timer;
 
 /** Represents a mecanum drive style drivetrain. */
 public class Drivetrain {
-  public static final double kMaxVelocity = 3.0; // 3 meters per second
-  public static final double kMaxAngularVelocity = Math.PI; // 1/2 rotation per second
+  public static final double MAX_VELOCITY = 3.0; // 3 meters per second
+  public static final double MAX_ANGULAR_VELOCITY = Math.PI; // 1/2 rotation per second
 
   private final PWMSparkMax frontLeftMotor = new PWMSparkMax(1);
   private final PWMSparkMax frontRightMotor = new PWMSparkMax(2);
@@ -58,9 +59,9 @@ public class Drivetrain {
           kinematics,
           imu.getRotation2d(),
           getCurrentWheelDistances(),
-          Pose2d.kZero,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+          Pose2d.ZERO,
+          VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
+          VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);
@@ -145,7 +146,7 @@ public class Drivetrain {
     setVelocities(
         kinematics
             .toWheelVelocities(chassisVelocities.discretize(period))
-            .desaturate(kMaxVelocity));
+            .desaturate(MAX_VELOCITY));
   }
 
   /** Updates the field relative position of the robot. */

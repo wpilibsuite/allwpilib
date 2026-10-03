@@ -140,7 +140,7 @@ void DLM_Log(const struct WPI_String* message);
  *
  * @return data log
  */
-WPI_DataLog* DLM_GetLog(void);
+struct WPI_DataLog* DLM_GetLog(void);
 
 /**
  * Get the log directory.

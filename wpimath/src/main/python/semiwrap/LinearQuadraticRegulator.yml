@@ -26,6 +26,8 @@ classes:
           '[const]':
           int [const]:
       Reset:
+      AtReference:
+      SetTolerance:
       Calculate:
         overloads:
           const StateVector&:

@@ -5,30 +5,29 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
-import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.trajectory.constraint.CentripetalAccelerationConstraint;
-import org.wpilib.math.util.Units;
 
 class CentripetalAccelerationConstraintTest {
   @Test
   void testCentripetalAccelerationConstraint() {
-    double maxCentripetalAcceleration = Units.feetToMeters(7.0); // 7 feet per second squared
+    double maxCentripetalAcceleration = feetToMeters(7.0); // 7 feet per second squared
     var constraint = new CentripetalAccelerationConstraint(maxCentripetalAcceleration);
 
-    Trajectory trajectory =
-        TrajectoryGeneratorTest.getTrajectory(Collections.singletonList(constraint));
+    Trajectory<DrivetrainSplineSample> trajectory =
+        DrivetrainSplineTrajectoryGenerator.generate(
+            List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
+            new TrajectoryConfig(1, 1).addConstraint(constraint));
 
-    var duration = trajectory.getTotalTime();
-    var t = 0.0;
-    var dt = 0.02;
+    for (double t = 0.0; t < trajectory.duration; t += 0.02) {
+      var point = trajectory.sampleAt(t);
+      var centripetalAcceleration = Math.pow(point.forwardVelocity(), 2) * point.curvature;
 
-    while (t < duration) {
-      var point = trajectory.sample(t);
-      var centripetalAcceleration = Math.pow(point.velocity, 2) * point.curvature;
-
-      t += dt;
       assertTrue(centripetalAcceleration <= maxCentripetalAcceleration + 0.05);
     }
   }

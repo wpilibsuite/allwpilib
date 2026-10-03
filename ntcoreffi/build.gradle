@@ -68,7 +68,7 @@ model {
                     binary.buildable = false
                     return
                 }
-                binary.tasks.withType(AbstractNativeSourceCompileTask) {
+                binary.tasks.withType(AbstractNativeSourceCompileTask).configureEach {
                     it.dependsOn generateSymbols
                 }
                 project(':ntcore').addNtcoreDependency(binary, 'static')

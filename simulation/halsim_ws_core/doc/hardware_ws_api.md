@@ -175,9 +175,8 @@ A relative encoder.  For absolute encoders, use ``"DutyCycle"``.
 | ``"<init"``              | Boolean | If encoder is initialized in the robot program      |
 | ``"<channel_a"``         | Integer | Digital channel number for “A” phase                |
 | ``"<channel_b"``         | Integer | Digital channel number for “B” phase                |
-| ``"<samples_to_avg"``    | Integer | Number of samples to average for period measurement |
 | ``">count"``             | Integer | Accumulated count (pulses)                          |
-| ``">period"``            | Float   | Period between pulses in seconds                    |
+| ``">rate"``              | Float   | Encoder rate in distance units per second           |
 | ``"<reverse_direction"`` | Boolean | If the encoder direction should be inverted         |
 
 #### Gyro ("Gyro")

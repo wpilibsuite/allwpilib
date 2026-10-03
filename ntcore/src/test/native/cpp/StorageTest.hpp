@@ -29,7 +29,7 @@ class StorageTest {
   void HookOutgoing(bool server) { storage.SetDispatcher(&dispatcher, server); }
 
   wpi::util::Logger logger;
-  ::testing::StrictMock<MockDispatcher> dispatcher;
+  MockDispatcher dispatcher;
   Storage storage;
   Storage::Entry tmp_entry;
 };

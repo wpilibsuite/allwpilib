@@ -4,6 +4,12 @@
 
 #pragma once
 
+#include <Eigen/Core>
+#include <gcem.hpp>
+
+#include "wpi/math/geometry/Rotation3d.hpp"
+#include "wpi/math/geometry/Translation3d.hpp"
+#include "wpi/math/linalg/ct_matrix.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/math.hpp"
@@ -133,9 +139,9 @@ constexpr Transform3d Twist3d::Exp() const {
       B = 1 / 2.0 - thetaSq / 24 + thetaSq * thetaSq / 720;
       C = 1 / 6.0 - thetaSq / 120 + thetaSq * thetaSq / 5040;
     } else {
-      // A = std::sin(θ)/θ
-      // B = (1 - std::cos(θ)) / θ²
-      // C = (1 - A) / θ²
+      // A = sinθ/θ
+      // B = (1 - cosθ)/θ²
+      // C = (1 - A)/θ²
       A = gcem::sin(theta) / theta;
       B = (1 - gcem::cos(theta)) / thetaSq;
       C = (1 - A) / thetaSq;
@@ -155,7 +161,7 @@ constexpr Transform3d Twist3d::Exp() const {
     return transform;
   };
 
-  if (std::is_constant_evaluated()) {
+  if consteval {
     return impl.template operator()<ct_matrix3d, ct_vector3d>();
   }
   return impl.template operator()<Eigen::Matrix3d, Eigen::Vector3d>();

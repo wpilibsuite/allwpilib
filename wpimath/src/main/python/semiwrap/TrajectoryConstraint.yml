@@ -15,7 +15,7 @@ classes:
           wpi::units::meters_per_second_squared_t minAcceleration,
           wpi::units::meters_per_second_squared_t maxAcceleration) {
         return wpi::math::TrajectoryConstraint::MinMax{minAcceleration, maxAcceleration};
-      }), py::arg("minAcceleration"), py::arg("maxAcceleration"))
+      }), py::arg("min_acceleration"), py::arg("max_acceleration"))
 
       .def("__len__", [](const wpi::math::TrajectoryConstraint::MinMax& self) { return 2; })
       .def("__getitem__", [](const wpi::math::TrajectoryConstraint::MinMax& self, int index) {
@@ -30,6 +30,6 @@ classes:
       })
 
       .def("__repr__", [](const wpi::math::TrajectoryConstraint::MinMax &self) {
-        return py::str("TrajectoryConstraint.MinMax(minAcceleration={}, maxAcceleration={})").format(
+        return py::str("TrajectoryConstraint.MinMax(min_acceleration={}, max_acceleration={})").format(
           self.minAcceleration, self.maxAcceleration);
       })

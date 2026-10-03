@@ -4,9 +4,11 @@
 
 package org.wpilib.examples.statespacearm;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
+import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.PWMSparkMax;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.LinearQuadraticRegulator;
 import org.wpilib.math.estimator.KalmanFilter;
@@ -19,32 +21,30 @@ import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller to control an arm.
  */
 public class Robot extends TimedRobot {
-  private static final int kMotorPort = 0;
-  private static final int kEncoderAChannel = 0;
-  private static final int kEncoderBChannel = 1;
-  private static final int kJoystickPort = 0;
-  private static final double kRaisedPosition = Units.degreesToRadians(90.0);
-  private static final double kLoweredPosition = Units.degreesToRadians(0.0);
+  private static final int MOTOR_PORT = 0;
+  private static final int ENCODER_A_CHANNEL = 0;
+  private static final int ENCODER_B_CHANNEL = 1;
+  private static final int JOYSTICK_PORT = 0;
+  private static final double RAISED_POSITION = degreesToRadians(90.0);
+  private static final double LOWERED_POSITION = degreesToRadians(0.0);
 
   // Moment of inertia of the arm, in kg * m^2. Can be estimated with CAD. If finding this constant
   // is difficult, LinearSystem.identifyPositionSystem may be better.
-  private static final double kArmMOI = 1.2;
+  private static final double ARM_MOI = 1.2;
 
   // Reduction between motors and encoder, as output over input. If the arm spins slower than
   // the motors, this number should be greater than one.
-  private static final double kArmGearing = 10.0;
+  private static final double ARM_GEARING = 10.0;
 
   private final TrapezoidProfile profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              Units.degreesToRadians(45),
-              Units.degreesToRadians(90))); // Max arm velocity and acceleration.
+              degreesToRadians(45), degreesToRadians(90))); // Max arm velocity and acceleration.
   private TrapezoidProfile.State lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
   // Inputs (what we can "put in"): [voltage], in volts.
   // Outputs (what we can measure): [position], in radians.
   private final LinearSystem<N2, N1, N2> armPlant =
-      Models.singleJointedArmFromPhysicalConstants(DCMotor.getNEO(2), kArmMOI, kArmGearing);
+      Models.singleJointedArmFromPhysicalConstants(DCMotor.getNEO(2), ARM_MOI, ARM_GEARING);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
   @SuppressWarnings("unchecked")
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   private final LinearQuadraticRegulator<N2, N1, N1> controller =
       new LinearQuadraticRegulator<>(
           (LinearSystem<N2, N1, N1>) armPlant.slice(0),
-          VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
+          VecBuilder.fill(degreesToRadians(1.0), degreesToRadians(10.0)), // qelms.
           // Position and velocity error tolerances, in radians and radians per second. Decrease
           // this
           // to more heavily penalize state excursion, or make the controller behave more
@@ -94,12 +94,12 @@ public class Robot extends TimedRobot {
           (LinearSystem<N2, N1, N1>) armPlant.slice(0), controller, observer, 12.0, 0.020);
 
   // An encoder set up to measure arm position in radians.
-  private final Encoder encoder = new Encoder(kEncoderAChannel, kEncoderBChannel);
+  private final Encoder encoder = new Encoder(ENCODER_A_CHANNEL, ENCODER_B_CHANNEL);
 
-  private final PWMSparkMax motor = new PWMSparkMax(kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(MOTOR_PORT);
 
   // A joystick to read the trigger from.
-  private final Joystick joystick = new Joystick(kJoystickPort);
+  private final Joystick joystick = new Joystick(JOYSTICK_PORT);
 
   public Robot() {
     // We go 2 pi radians in 1 rotation, or 4096 counts.
@@ -122,10 +122,10 @@ public class Robot extends TimedRobot {
     TrapezoidProfile.State goal;
     if (joystick.getTrigger()) {
       // the trigger is pressed, so we go to the high goal.
-      goal = new TrapezoidProfile.State(kRaisedPosition, 0.0);
+      goal = new TrapezoidProfile.State(RAISED_POSITION, 0.0);
     } else {
       // Otherwise, we go to the low goal
-      goal = new TrapezoidProfile.State(kLoweredPosition, 0.0);
+      goal = new TrapezoidProfile.State(LOWERED_POSITION, 0.0);
     }
     // Step our TrapezoidalProfile forward 20ms and set it as our next reference
     lastProfiledReference = profile.calculate(0.020, lastProfiledReference, goal);

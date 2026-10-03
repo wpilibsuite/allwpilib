@@ -3,6 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #pragma once
+
+#include <memory>
+
 #include "wpi/commands2/CommandScheduler.hpp"
 #include "wpi/commands2/button/CommandGenericHID.hpp"
 #include "wpi/commands2/button/Trigger.hpp"
@@ -15,7 +18,7 @@ namespace wpi::cmd {
  *
  * @see wpi::Gamepad
  */
-class CommandGamepad : public CommandGenericHID {
+class CommandGamepad {
  public:
   /**
    * Construct an instance of a controller.
@@ -26,11 +29,38 @@ class CommandGamepad : public CommandGenericHID {
   explicit CommandGamepad(int port);
 
   /**
-   * Get the underlying GenericHID object.
+   * Construct an instance of a controller with a Gamepad object.
    *
-   * @return the wrapped GenericHID object
+   * @param gamepad The Gamepad object to use for this controller.
    */
-  wpi::Gamepad& GetHID();
+  explicit CommandGamepad(wpi::Gamepad* gamepad);
+
+  /**
+   * Get the underlying CommandGenericHID object.
+   *
+   * @return the wrapped CommandGenericHID object
+   */
+  CommandGenericHID& GetHID();
+
+  /**
+   * Get the underlying Gamepad object.
+   *
+   * @return the wrapped Gamepad object
+   */
+  wpi::Gamepad& GetGamepad();
+
+  /**
+   * Constructs an event instance around this button's digital signal.
+   *
+   * @param button the button index
+   * @param loop the event loop instance to attach the event to. Defaults to the
+   * CommandScheduler's default loop.
+   * @return an event instance representing the button's digital signal attached
+   * to the given loop.
+   */
+  Trigger Button(int button,
+                 wpi::EventLoop* loop = CommandScheduler::GetInstance()
+                                            .GetDefaultButtonLoop()) const;
 
   /**
    * Constructs an event instance around this button's digital signal.
@@ -474,22 +504,24 @@ class CommandGamepad : public CommandGenericHID {
   double GetRightY() const;
 
   /**
-   * Get the left trigger axis value of the controller. Note that this axis is
+   * Get the left trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetLeftTriggerAxis() const;
+  double GetLeftTrigger() const;
 
   /**
-   * Get the right trigger axis value of the controller. Note that this axis is
+   * Get the right trigger value of the controller. Note that this axis is
    * bound to the range of [0, 1] as opposed to the usual [-1, 1].
    *
    * @return The axis value.
    */
-  double GetRightTriggerAxis() const;
+  double GetRightTrigger() const;
 
  private:
-  wpi::Gamepad m_hid;
+  std::unique_ptr<CommandGenericHID> m_ownedHid;
+  CommandGenericHID* m_hid = nullptr;
+  wpi::Gamepad* m_gamepad = nullptr;
 };
 }  // namespace wpi::cmd

@@ -5,11 +5,7 @@
 package org.wpilib.smartdashboard;
 
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.networktables.DoubleEntry;
-import org.wpilib.networktables.NetworkTable;
-import org.wpilib.networktables.StringEntry;
-import org.wpilib.networktables.StringPublisher;
-import org.wpilib.networktables.StringTopic;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.util.Color8Bit;
 
 /**
@@ -19,17 +15,10 @@ import org.wpilib.util.Color8Bit;
  * @see Mechanism2d
  */
 public class MechanismLigament2d extends MechanismObject2d {
-  private StringPublisher m_typePub;
   private double m_angle;
-  private DoubleEntry m_angleEntry;
   private String m_color;
-  private StringEntry m_colorEntry;
   private double m_length;
-  private DoubleEntry m_lengthEntry;
   private double m_weight;
-  private DoubleEntry m_weightEntry;
-
-  private static String kSmartDashboardType = "line";
 
   /**
    * Create a new ligament.
@@ -60,26 +49,6 @@ public class MechanismLigament2d extends MechanismObject2d {
     this(name, length, angle, 10, new Color8Bit(235, 137, 52));
   }
 
-  @Override
-  public void close() {
-    super.close();
-    if (m_typePub != null) {
-      m_typePub.close();
-    }
-    if (m_angleEntry != null) {
-      m_angleEntry.close();
-    }
-    if (m_colorEntry != null) {
-      m_colorEntry.close();
-    }
-    if (m_lengthEntry != null) {
-      m_lengthEntry.close();
-    }
-    if (m_weightEntry != null) {
-      m_weightEntry.close();
-    }
-  }
-
   /**
    * Set the ligament's angle relative to its parent.
    *
@@ -87,9 +56,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public final synchronized void setAngle(double degrees) {
     m_angle = degrees;
-    if (m_angleEntry != null) {
-      m_angleEntry.set(degrees);
-    }
   }
 
   /**
@@ -107,9 +73,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the angle in degrees
    */
   public synchronized double getAngle() {
-    if (m_angleEntry != null) {
-      m_angle = m_angleEntry.get();
-    }
     return m_angle;
   }
 
@@ -120,9 +83,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public final synchronized void setLength(double length) {
     m_length = length;
-    if (m_lengthEntry != null) {
-      m_lengthEntry.set(length);
-    }
   }
 
   /**
@@ -131,9 +91,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the line length
    */
   public synchronized double getLength() {
-    if (m_lengthEntry != null) {
-      m_length = m_lengthEntry.get();
-    }
     return m_length;
   }
 
@@ -144,9 +101,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public final synchronized void setColor(Color8Bit color) {
     m_color = String.format("#%02X%02X%02X", color.red, color.green, color.blue);
-    if (m_colorEntry != null) {
-      m_colorEntry.set(m_color);
-    }
   }
 
   /**
@@ -155,9 +109,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the color of the line
    */
   public synchronized Color8Bit getColor() {
-    if (m_colorEntry != null) {
-      m_color = m_colorEntry.get();
-    }
     int r = 0;
     int g = 0;
     int b = 0;
@@ -182,9 +133,6 @@ public class MechanismLigament2d extends MechanismObject2d {
    */
   public final synchronized void setLineWeight(double weight) {
     m_weight = weight;
-    if (m_weightEntry != null) {
-      m_weightEntry.set(weight);
-    }
   }
 
   /**
@@ -193,46 +141,31 @@ public class MechanismLigament2d extends MechanismObject2d {
    * @return the line thickness
    */
   public synchronized double getLineWeight() {
-    if (m_weightEntry != null) {
-      m_weight = m_weightEntry.get();
-    }
     return m_weight;
   }
 
   @Override
-  protected void updateEntries(NetworkTable table) {
-    if (m_typePub != null) {
-      m_typePub.close();
+  public void logTo(TelemetryTable table) {
+    double angle;
+    double length;
+    String color;
+    double weight;
+    synchronized (this) {
+      angle = m_angle;
+      length = m_length;
+      color = m_color;
+      weight = m_weight;
     }
-    m_typePub =
-        table
-            .getStringTopic(".type")
-            .publishEx(
-                StringTopic.TYPE_STRING, "{\"SmartDashboard\":\"" + kSmartDashboardType + "\"}");
-    m_typePub.set(kSmartDashboardType);
 
-    if (m_angleEntry != null) {
-      m_angleEntry.close();
-    }
-    m_angleEntry = table.getDoubleTopic("angle").getEntry(0.0);
-    m_angleEntry.set(m_angle);
+    table.log("angle", angle);
+    table.log("length", length);
+    table.log("color", color);
+    table.log("weight", weight);
+    super.logTo(table);
+  }
 
-    if (m_lengthEntry != null) {
-      m_lengthEntry.close();
-    }
-    m_lengthEntry = table.getDoubleTopic("length").getEntry(0.0);
-    m_lengthEntry.set(m_length);
-
-    if (m_colorEntry != null) {
-      m_colorEntry.close();
-    }
-    m_colorEntry = table.getStringTopic("color").getEntry("");
-    m_colorEntry.set(m_color);
-
-    if (m_weightEntry != null) {
-      m_weightEntry.close();
-    }
-    m_weightEntry = table.getDoubleTopic("weight").getEntry(0.0);
-    m_weightEntry.set(m_weight);
+  @Override
+  public String getTelemetryType() {
+    return "line";
   }
 }

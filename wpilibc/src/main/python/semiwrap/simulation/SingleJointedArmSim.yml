@@ -29,10 +29,10 @@ classes:
 
 inline_code: |-
   cls_SingleJointedArmSim
-    .def("getAngleDegrees", [](SingleJointedArmSim * self) -> wpi::units::degree_t {
+    .def("get_angle_degrees", [](SingleJointedArmSim * self) -> wpi::units::degree_t {
       return self->GetAngle();
     })
-    .def("getVelocityDps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second_t {
+    .def("get_velocity_dps", [](SingleJointedArmSim * self) -> wpi::units::degrees_per_second_t {
       return self->GetVelocity();
     })
   ;

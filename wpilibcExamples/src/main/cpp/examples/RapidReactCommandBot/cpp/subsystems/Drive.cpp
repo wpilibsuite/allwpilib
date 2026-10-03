@@ -10,9 +10,6 @@
 #include "wpi/system/RobotController.hpp"
 
 Drive::Drive() {
-  wpi::util::SendableRegistry::AddChild(&drive, &leftLeader);
-  wpi::util::SendableRegistry::AddChild(&drive, &rightLeader);
-
   leftLeader.AddFollower(leftFollower);
   rightLeader.AddFollower(rightFollower);
 
@@ -22,16 +19,16 @@ Drive::Drive() {
   rightLeader.SetInverted(true);
 
   // Sets the distance per pulse for the encoders
-  leftEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
-  rightEncoder.SetDistancePerPulse(DriveConstants::kEncoderDistancePerPulse);
+  leftEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
+  rightEncoder.SetDistancePerPulse(DriveConstants::ENCODER_DISTANCE_PER_PULSE);
 
   // Set the controller to be continuous (because it is an angle controller)
   controller.EnableContinuousInput(-180_deg, 180_deg);
   // Set the controller tolerance - the delta tolerance ensures the robot is
   // stationary at the setpoint before it is considered as having reached the
   // reference
-  controller.SetTolerance(DriveConstants::kTurnTolerance,
-                          DriveConstants::kTurnRateTolerance);
+  controller.SetTolerance(DriveConstants::TURN_TOLERANCE,
+                          DriveConstants::TURN_RATE_TOLERANCE);
 }
 
 wpi::cmd::CommandPtr Drive::ArcadeDriveCommand(std::function<double()> fwd,
@@ -57,7 +54,7 @@ wpi::cmd::CommandPtr Drive::DriveDistanceCommand(wpi::units::meter_t distance,
                    wpi::units::meter_t(rightEncoder.GetDistance())) >= distance;
       })
       // Stop the drive when the command ends
-      .FinallyDo([this](bool interrupted) { drive.StopMotor(); });
+      .FinallyDo([this](bool interrupted) { drive.ArcadeDrive(0.0, 0.0); });
 }
 
 wpi::cmd::CommandPtr Drive::TurnToAngleCommand(wpi::units::degree_t angle) {

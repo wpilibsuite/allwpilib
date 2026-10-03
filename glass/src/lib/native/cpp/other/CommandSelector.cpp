@@ -16,18 +16,22 @@ void wpi::glass::DisplayCommandSelector(CommandSelectorModel* m) {
   }
   if (m->Exists()) {
     if (auto run = m->GetRunningData()) {
+      bool readOnly = m->IsReadOnly();
       bool running = run->GetValue();
-      if (ImGui::Button(running ? "Cancel" : "Run")) {
+      if (!readOnly && ImGui::Button(running ? "Cancel" : "Run")) {
         running = !running;
         m->SetRunning(running);
       }
-      ImGui::SameLine();
       if (running) {
+        if (!readOnly) {
+          ImGui::SameLine();
+        }
         ImGui::Text("Running...");
       }
     }
   } else {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown Command");
     ImGui::PopStyleColor();
   }

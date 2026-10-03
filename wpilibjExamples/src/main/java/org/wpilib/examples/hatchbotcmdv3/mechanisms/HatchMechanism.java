@@ -1,0 +1,57 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package org.wpilib.examples.hatchbotcmdv3.mechanisms;
+
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
+import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
+
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Mechanism;
+import org.wpilib.examples.hatchbotcmdv3.Constants.HatchConstants;
+import org.wpilib.hardware.bus.CANPort;
+import org.wpilib.hardware.pneumatic.DoubleSolenoid;
+import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+
+/** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
+public class HatchMechanism implements Mechanism, TelemetryLoggable {
+  private final DoubleSolenoid hatchSolenoid =
+      new DoubleSolenoid(
+          CANPort.CAN_S0,
+          PneumaticsModuleType.CTRE_PCM,
+          HatchConstants.HATCH_SOLENOID_PORTS[0],
+          HatchConstants.HATCH_SOLENOID_PORTS[1]);
+
+  /** Grabs the hatch. */
+  public Command grabHatchCommand() {
+    // implicitly require `this`
+    return this.run(
+            coroutine -> {
+              // Set the solenoid and then park the command, owning the mechanism until a different
+              // command is scheduled and interrupts it. This makes command's telemetry match what
+              // the robot is physically doing.
+              hatchSolenoid.set(FORWARD);
+              coroutine.park();
+            })
+        .named("Grab Hatch");
+  }
+
+  /** Releases the hatch. */
+  public Command releaseHatchCommand() {
+    // implicitly require `this`
+    return this.run(
+            coroutine -> {
+              hatchSolenoid.set(REVERSE);
+              coroutine.park();
+            })
+        .named("Release Hatch");
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("extended", hatchSolenoid.get() == FORWARD);
+  }
+}

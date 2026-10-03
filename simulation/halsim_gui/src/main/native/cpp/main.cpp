@@ -6,11 +6,13 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include <imgui.h>
 
 #include "AddressableLEDGui.hpp"
+#include "AlertSimGui.hpp"
 #include "AnalogInputSimGui.hpp"
 #include "DIOSimGui.hpp"
 #include "DriverStationGui.hpp"
@@ -23,9 +25,13 @@
 #include "RoboRioSimGui.hpp"
 #include "TimingGui.hpp"
 #include "wpi/glass/Context.hpp"
+#include "wpi/glass/ContextInternal.hpp"
 #include "wpi/glass/Storage.hpp"
 #include "wpi/glass/hardware/Pneumatic.hpp"
 #include "wpi/glass/other/Plot.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/hal/Extensions.h"
 #include "wpi/halsim/gui/HALSimGui.hpp"
@@ -37,6 +43,43 @@ using namespace halsimgui;
 namespace gui = wpi::gui;
 
 static std::unique_ptr<wpi::glass::PlotProvider> gPlotProvider;
+static bool gAbout = false;
+#ifdef RUNNING_IMGUI_TESTS
+static std::string gTestStorageDir;
+#endif
+
+static void SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode mode,
+                                    std::string_view storageMode) {
+  auto ctx = wpi::glass::gContext;
+  ctx->timestampDisplayMode = mode;
+  ctx->timestampDisplayModeStorage = storageMode;
+}
+
+static void DisplayTimestampMenu() {
+  if (ImGui::BeginMenu("Timestamp Display")) {
+    auto mode = wpi::glass::gContext->timestampDisplayMode;
+    bool selected = mode == wpi::glass::TimestampDisplayMode::LOCAL;
+    if (ImGui::MenuItem("Actual Time", nullptr, &selected)) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+    selected = mode == wpi::glass::TimestampDisplayMode::SERVER_ZERO_START;
+    if (ImGui::MenuItem("Program Start = 0", nullptr, &selected)) {
+      SetTimestampDisplayMode(
+          wpi::glass::TimestampDisplayMode::SERVER_ZERO_START,
+          wpi::glass::TIMESTAMP_DISPLAY_MODE_SERVER_ZERO_START);
+    }
+    ImGui::EndMenu();
+  }
+}
+
+#ifdef RUNNING_IMGUI_TESTS
+namespace halsimgui {
+void SetTestStorageDir(std::string_view saveDir) {
+  gTestStorageDir = saveDir;
+}
+}  // namespace halsimgui
+#endif
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -49,6 +92,17 @@ int HALSIM_InitExtension(void) {
   wpi::glass::CreateContext();
 
   wpi::glass::SetStorageName("simgui");
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::glass::SetStorageDir(gTestStorageDir);
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
+  wpi::glass::AddWorkspaceInit([] {
+    if (wpi::glass::gContext->timestampDisplayMode ==
+        wpi::glass::TimestampDisplayMode::SERVER) {
+      SetTimestampDisplayMode(wpi::glass::TimestampDisplayMode::LOCAL,
+                              wpi::glass::TIMESTAMP_DISPLAY_MODE_LOCAL);
+    }
+  });
 
   gui::AddInit([] { ImGui::GetIO().ConfigDockingWithShift = true; });
 
@@ -81,6 +135,7 @@ int HALSIM_InitExtension(void) {
 
   AddressableLEDGui::Initialize();
   AnalogInputSimGui::Initialize();
+  AlertSimGui::Initialize();
   DIOSimGui::Initialize();
   NetworkTablesSimGui::Initialize();
   PCMSimGui::Initialize();
@@ -124,6 +179,10 @@ int HALSIM_InitExtension(void) {
       });
 
   HALSimGui::mainMenu.AddMainMenu([] {
+    if (ImGui::BeginMenu("View")) {
+      DisplayTimestampMenu();
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Hardware")) {
       HALSimGui::halProvider->DisplayMenu();
       ImGui::EndMenu();
@@ -136,6 +195,7 @@ int HALSIM_InitExtension(void) {
     }
     if (ImGui::BeginMenu("DS")) {
       DriverStationGui::dsManager->DisplayMenu();
+      AlertSimGui::DisplayMenu();
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Plot")) {
@@ -151,9 +211,36 @@ int HALSIM_InitExtension(void) {
       HALSimGui::manager->DisplayMenu();
       ImGui::EndMenu();
     }
+    if (ImGui::BeginMenu("Info")) {
+      if (ImGui::MenuItem("About")) {
+        gAbout = true;
+      }
+      ImGui::EndMenu();
+    }
+  });
+
+  gui::AddLateExecute([] {
+    if (gAbout) {
+      ImGui::OpenPopup("About");
+      gAbout = false;
+    }
+    if (ImGui::BeginPopupModal("About")) {
+      ImGui::Text("Robot Simulation");
+      ImGui::Separator();
+      gui::EmitRendererInfo();
+      ImGui::Separator();
+      ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
+      ImGui::Text("%.3f ms/frame (%.1f FPS)",
+                  1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+      if (ImGui::Button("Close")) {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   });
 
   if (!gui::Initialize("Robot Simulation", 1280, 720,
+                       gui::RendererPreference::PREFER_3D,
                        ImGuiConfigFlags_DockingEnable)) {
     return 0;
   }

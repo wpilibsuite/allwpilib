@@ -4,27 +4,41 @@
 
 package org.wpilib.framework;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import org.wpilib.backend.NetworkTablesTelemetryBackend;
+import org.wpilib.backend.NetworkTablesTunableBackend;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.UserControls;
-import org.wpilib.driverstation.UserControlsInstance;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.HALUtil;
+import org.wpilib.internal.UnitTelemetry;
 import org.wpilib.math.util.MathShared;
 import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.MultiSubscriber;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.networktables.PubSubOption;
 import org.wpilib.system.RuntimeType;
 import org.wpilib.system.Timer;
 import org.wpilib.system.WPILibVersion;
-import org.wpilib.util.ConstructorMatch;
+import org.wpilib.telemetry.TelemetryRegistry;
+import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.TunableRegistry;
+import org.wpilib.units.Measure;
+import org.wpilib.units.Unit;
+import org.wpilib.util.Alert;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
-import org.wpilib.vision.stream.CameraServerShared;
-import org.wpilib.vision.stream.CameraServerSharedStore;
 
 /**
  * Implement a Robot Program framework. The RobotBase class is intended to be subclassed to create a
@@ -36,40 +50,25 @@ import org.wpilib.vision.stream.CameraServerSharedStore;
  * TimedRobot.
  */
 public abstract class RobotBase implements AutoCloseable {
+  private static final String PROGRAM_START_TIME_TOPIC = "/Robot/ProgramStartTime";
+  private static final AtomicInteger s_nextWarningReporterId = new AtomicInteger();
+
   /** The ID of the main Java thread. */
   // This is usually 1, but it is best to make sure
   private static long m_threadId = -1;
 
   private final MultiSubscriber m_suball;
+  private final IntegerPublisher m_programStartTimePublisher;
+  private final Map<String, Alert> m_telemetryWarningAlerts = new HashMap<>();
+  private final Map<String, Alert> m_tunableWarningAlerts = new HashMap<>();
+  private final BiConsumer<String, String> m_telemetryWarningReporter =
+      this::reportTelemetryWarning;
+  private final Consumer<String> m_tunableWarningReporter = this::reportTunableWarning;
+  private final String m_warningAlertIdPrefix =
+      "warning" + s_nextWarningReporterId.getAndIncrement() + "_";
+  private final AtomicInteger m_nextWarningAlertId = new AtomicInteger();
 
   private final int m_connListenerHandle;
-
-  private static void setupCameraServerShared() {
-    CameraServerShared shared =
-        new CameraServerShared() {
-          @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
-          }
-
-          @Override
-          public void reportDriverStationError(String error) {
-            DriverStationErrors.reportError(error, true);
-          }
-
-          @Override
-          public Long getRobotMainThreadId() {
-            return RobotBase.getMainThreadId();
-          }
-
-          @Override
-          public boolean isRoboRIO() {
-            return !RobotBase.isSimulation();
-          }
-        };
-
-    CameraServerSharedStore.setCameraServerShared(shared);
-  }
 
   private static void setupMathShared() {
     MathSharedStore.setMathShared(
@@ -80,15 +79,123 @@ public abstract class RobotBase implements AutoCloseable {
           }
 
           @Override
-          public void reportUsage(String resource, String data) {
-            HAL.reportUsage(resource, data);
-          }
-
-          @Override
           public double getTimestamp() {
             return Timer.getTimestamp();
           }
         });
+  }
+
+  private void reportTelemetryWarning(String path, String msg) {
+    reportWarningAlert(
+        m_telemetryWarningAlerts,
+        "Telemetry",
+        path + '\n' + msg,
+        "Telemetry '" + path + "': warning: " + msg);
+  }
+
+  private void reportTunableWarning(String msg) {
+    reportWarningAlert(m_tunableWarningAlerts, "Tunables", msg, "Tunable warning: " + msg);
+  }
+
+  private void reportWarningAlert(
+      Map<String, Alert> alerts, String group, String key, String text) {
+    synchronized (alerts) {
+      Alert alert = alerts.get(key);
+      if (alert == null) {
+        alert =
+            new Alert(
+                group,
+                m_warningAlertIdPrefix + m_nextWarningAlertId.getAndIncrement(),
+                text,
+                Alert.Level.MEDIUM);
+        alerts.put(key, alert);
+      }
+
+      alert.setText(text);
+      alert.set(true);
+    }
+  }
+
+  private static void closeWarningAlerts(Map<String, Alert> alerts) {
+    synchronized (alerts) {
+      for (Alert alert : alerts.values()) {
+        alert.close();
+      }
+      alerts.clear();
+    }
+  }
+
+  @SuppressWarnings("rawtypes")
+  private static class TunableMeasure extends Tunable<Measure> implements Tunable.CustomTunable {
+    TunableMeasure(Measure initialValue, TunableConfig config) {
+      super(config);
+      m_unit = initialValue.unit();
+      m_baseUnit = m_unit.getBaseUnit();
+      m_value = initialValue;
+      m_magnitudeTunable =
+          new TunableDouble(config, true) {
+            @Override
+            public void set(double value) {
+              m_value = m_unit.ofBaseUnits(value);
+              markChanged();
+            }
+
+            @Override
+            public double get() {
+              return m_value.baseUnitMagnitude();
+            }
+          };
+    }
+
+    @Override
+    public void set(Measure value) {
+      if (!m_baseUnit.equivalent(value.unit().getBaseUnit())) {
+        throw new IllegalArgumentException(
+            "Measure unit " + value.unit() + " is not compatible with " + m_unit);
+      }
+      m_magnitudeTunable.set(value.baseUnitMagnitude());
+    }
+
+    @Override
+    public Measure get() {
+      return m_value;
+    }
+
+    @Override
+    public Measure mutate() {
+      m_magnitudeTunable.set(m_value.baseUnitMagnitude());
+      return m_value;
+    }
+
+    @Override
+    public TunableDouble getInnerTunable() {
+      return m_magnitudeTunable;
+    }
+
+    @Override
+    public boolean hasChanged() {
+      return m_magnitudeTunable.hasChanged();
+    }
+
+    @Override
+    public boolean supportsChangeNotification() {
+      return m_magnitudeTunable.supportsChangeNotification();
+    }
+
+    @Override
+    public void resetChanged() {
+      m_magnitudeTunable.resetChanged();
+    }
+
+    @Override
+    public Class<Measure> getTypeClass() {
+      return Measure.class;
+    }
+
+    private final Unit m_unit;
+    private final Unit m_baseUnit;
+    private Measure m_value;
+    private final TunableDouble m_magnitudeTunable;
   }
 
   /**
@@ -99,18 +206,42 @@ public abstract class RobotBase implements AutoCloseable {
    * <p>This must be used to ensure that the communications code starts. In the future it would be
    * nice to put this code into its own task that loads on boot so ensure that it runs.
    */
+  @SuppressWarnings("this-escape")
   protected RobotBase() {
     final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     m_threadId = Thread.currentThread().threadId();
-    setupCameraServerShared();
     setupMathShared();
     // subscribe to "" to force persistent values to propagate to local
-    m_suball = new MultiSubscriber(inst, new String[] {""});
+    m_suball = new MultiSubscriber(inst, new String[] {""}, PubSubOption.DISABLE_SIGNAL);
     if (!isSimulation()) {
       inst.startServer("/home/systemcore/networktables.json", "", "robot");
     } else {
       inst.startServer("networktables.json", "", "robot");
     }
+
+    // set up telemetry
+    TelemetryRegistry.setReportWarning(m_telemetryWarningReporter);
+    TelemetryRegistry.registerBackend("", new NetworkTablesTelemetryBackend(inst, "/Telemetry"));
+    TelemetryRegistry.registerTypeHandler(
+        Measure.class,
+        (table, name, value) -> {
+          UnitTelemetry.log(table, name, value);
+        });
+
+    // set up tunables
+    TunableRegistry.setReportWarning(m_tunableWarningReporter);
+    TunableRegistry.registerBackend("", new NetworkTablesTunableBackend(inst, "/Tunables"));
+    TunableRegistry.registerTypeHandler(
+        Measure.class,
+        (initialValue, config) -> {
+          if (config == null) {
+            config = new TunableConfig();
+          }
+          return new TunableMeasure(
+              initialValue,
+              config.withProperty(
+                  "unit", UnitTelemetry.getUnitMetadata(initialValue.unit().getBaseUnit())));
+        });
 
     // wait for the NT server to actually start
     try {
@@ -126,12 +257,15 @@ public abstract class RobotBase implements AutoCloseable {
       System.err.println("timed out while waiting for NT server to start");
     }
 
+    m_programStartTimePublisher = inst.getIntegerTopic(PROGRAM_START_TIME_TOPIC).publish();
+    m_programStartTimePublisher.set(WPIUtilJNI.getProgramStartTime());
+
     m_connListenerHandle =
         inst.addConnectionListener(
             false,
             event -> {
               if (event.is(NetworkTableEvent.Kind.CONNECTED)) {
-                HAL.reportUsage("NT/" + event.connInfo.remoteId, "");
+                UsageReporting.reportUsage("NT/" + event.connInfo.remoteId, "");
               }
             });
   }
@@ -146,8 +280,18 @@ public abstract class RobotBase implements AutoCloseable {
   }
 
   @Override
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void close() {
+    if (TelemetryRegistry.getReportWarning() == m_telemetryWarningReporter) {
+      TelemetryRegistry.setReportWarning(null);
+    }
+    if (TunableRegistry.getReportWarning() == m_tunableWarningReporter) {
+      TunableRegistry.setReportWarning(null);
+    }
+    closeWarningAlerts(m_telemetryWarningAlerts);
+    closeWarningAlerts(m_tunableWarningAlerts);
     m_suball.close();
+    m_programStartTimePublisher.close();
     NetworkTableInstance.getDefault().removeListener(m_connListenerHandle);
   }
 
@@ -290,54 +434,46 @@ public abstract class RobotBase implements AutoCloseable {
   private static RobotBase m_robotCopy;
   private static boolean m_suppressExitWarning;
 
-  private static <T extends RobotBase> T constructRobot(Class<T> robotClass) throws Throwable {
-    UserControlsInstance userControlsAttribute =
-        robotClass.getDeclaredAnnotation(UserControlsInstance.class);
-    UserControls userControlsInstance = null;
-    Optional<ConstructorMatch<T>> constructorMatch = Optional.empty();
-    if (userControlsAttribute != null) {
-      var userControlsClass = userControlsAttribute.value();
-      userControlsInstance = userControlsClass.getDeclaredConstructor().newInstance();
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass, userControlsClass);
+  /**
+   * Gets the Robot subclass name from a stack trace.
+   *
+   * @param elements The stack trace elements to walk.
+   * @return The Robot subclass name.
+   */
+  protected static String getRobotName(StackTraceElement[] elements) {
+    // Walk bottom to top to account for multiple layers of subclassing
+    for (int i = elements.length - 1; i >= 0; i--) {
+      StackTraceElement element = elements[i];
+      try {
+        // Skip our own class when walking
+        if (RobotBase.class.equals(Class.forName(element.getClassName()))) {
+          continue;
+        }
+        if (RobotBase.class.isAssignableFrom(Class.forName(element.getClassName()))) {
+          return element.getClassName();
+        }
+      } catch (ClassNotFoundException e) {
+        // Unreachable
+      }
     }
-
-    if (constructorMatch.isEmpty()) {
-      // Try to find a constructor with no parameters if there is no UserControls constructor
-      constructorMatch = ConstructorMatch.findBestConstructor(robotClass);
-    }
-
-    if (constructorMatch.isEmpty()) {
-      throw new IllegalArgumentException(
-          "No valid constructor found in robot class " + robotClass.getName());
-    }
-
-    T robot = constructorMatch.get().newInstance(userControlsInstance);
-
-    if (userControlsInstance != null && robot instanceof OpModeRobot opModeRobot) {
-      // Insert the UserControls instance into the opModeRobot for use when constructing opmodes
-      opModeRobot.setUserControlsInstance(userControlsInstance);
-    }
-    return robot;
+    return "Unknown";
   }
 
   /** Run the robot main loop. */
   @SuppressWarnings("PMD.AvoidCatchingGenericException")
-  private static <T extends RobotBase> void runRobot(Class<T> robotClass) {
+  private static <T extends RobotBase> void runRobot(Supplier<T> robotConstructor) {
     System.out.println("********** Robot program starting **********");
 
     T robot;
     try {
-      robot = constructRobot(robotClass);
+      robot = robotConstructor.get();
     } catch (Throwable throwable) {
       Throwable cause = throwable.getCause();
       if (cause != null) {
         throwable = cause;
       }
-      String robotName = "Unknown";
       StackTraceElement[] elements = throwable.getStackTrace();
-      if (elements.length > 0) {
-        robotName = elements[0].getClassName();
-      }
+      String robotName = getRobotName(elements);
       DriverStationErrors.reportError(
           "Unhandled exception instantiating robot " + robotName + " " + throwable, elements);
       DriverStationErrors.reportError(
@@ -347,6 +483,7 @@ public abstract class RobotBase implements AutoCloseable {
               + "  See https://wpilib.org/stacktrace for more information.\n",
           false);
       DriverStationErrors.reportError("Could not instantiate robot " + robotName + "!", false);
+      DriverStationErrors.reportCrash("Could not instantiate robot " + robotName + "!", elements);
       return;
     }
 
@@ -363,6 +500,8 @@ public abstract class RobotBase implements AutoCloseable {
         throwable = cause;
       }
       DriverStationErrors.reportError(
+          "Unhandled exception: " + throwable, throwable.getStackTrace());
+      DriverStationErrors.reportCrash(
           "Unhandled exception: " + throwable, throwable.getStackTrace());
       errorOnExit = true;
     } finally {
@@ -405,27 +544,29 @@ public abstract class RobotBase implements AutoCloseable {
    * Starting point for the applications.
    *
    * @param <T> Robot subclass.
-   * @param robotClass Robot subclass type.
+   * @param robotConstructor Robot constructor.
    */
-  public static <T extends RobotBase> void startRobot(Class<T> robotClass) {
+  public static <T extends RobotBase> void startRobot(Supplier<T> robotConstructor) {
     // Check that the MSVC runtime is valid.
     WPIUtilJNI.checkMsvcRuntime();
 
-    if (!HAL.initialize(500, 0)) {
+    if (!HAL.initialize()) {
       throw new IllegalStateException("Failed to initialize. Terminating");
     }
+    UsageReporting.setReportUsageImpl(HAL::reportUsage);
 
     // Force refresh DS data
     DriverStationBackend.refreshData();
 
-    HAL.reportUsage("Language", "Java");
-    HAL.reportUsage("WPILibVersion", WPILibVersion.Version);
+    UsageReporting.reportUsage("Language", "Java");
+    UsageReporting.reportUsage("WPILibVersion", WPILibVersion.Version);
+    HAL.publishWpilibVersion(WPILibVersion.Version + " (Java)");
 
     if (HAL.hasMain()) {
       Thread thread =
           new Thread(
               () -> {
-                runRobot(robotClass);
+                runRobot(robotConstructor);
                 HAL.exitMain();
               },
               "robot main");
@@ -445,7 +586,7 @@ public abstract class RobotBase implements AutoCloseable {
         Thread.currentThread().interrupt();
       }
     } else {
-      runRobot(robotClass);
+      runRobot(robotConstructor);
     }
 
     // On RIO, this will just terminate rather than shutting down cleanly (it's a no-op in sim).

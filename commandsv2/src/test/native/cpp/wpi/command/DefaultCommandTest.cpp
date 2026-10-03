@@ -11,7 +11,9 @@
 using namespace wpi::cmd;
 class DefaultCommandTest : public CommandTestBase {};
 
-TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
+TEST_CASE_METHOD(DefaultCommandTest,
+                 "DefaultCommandTest DefaultCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -22,10 +24,12 @@ TEST_F(DefaultCommandTest, DefaultCommandSchedule) {
   auto handle = scheduler.GetDefaultCommand(&subsystem);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(handle));
+  CHECK(scheduler.IsScheduled(handle));
 }
 
-TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
+TEST_CASE_METHOD(DefaultCommandTest,
+                 "DefaultCommandTest DefaultCommandInterruptResume",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   TestSubsystem subsystem;
@@ -38,11 +42,11 @@ TEST_F(DefaultCommandTest, DefaultCommandInterruptResume) {
   scheduler.Run();
   scheduler.Schedule(command2);
 
-  EXPECT_TRUE(scheduler.IsScheduled(command2));
-  EXPECT_FALSE(scheduler.IsScheduled(handle));
+  CHECK(scheduler.IsScheduled(command2));
+  CHECK_FALSE(scheduler.IsScheduled(handle));
 
   scheduler.Cancel(command2);
   scheduler.Run();
 
-  EXPECT_TRUE(scheduler.IsScheduled(handle));
+  CHECK(scheduler.IsScheduled(handle));
 }

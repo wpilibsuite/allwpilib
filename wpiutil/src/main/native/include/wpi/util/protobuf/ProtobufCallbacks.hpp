@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <concepts>
 #include <ranges>
 #include <span>
+#include <type_traits>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "pb.h"
 #include "wpi/util/SmallVector.hpp"

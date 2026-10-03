@@ -1,8 +1,8 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "hatchling", 
-    "hatch-robotpy~=0.2.1",
+    "hatchling",
+    "hatch-robotpy==0.0.0",
 ]
 
 [project]

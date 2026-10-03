@@ -96,7 +96,7 @@ std::string GetSourceDescription(CS_Source source, CS_Status* status);
 std::string_view GetSourceDescription(CS_Source source,
                                       wpi::util::SmallVectorImpl<char>& buf,
                                       CS_Status* status);
-uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
+int64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 void SetSourceConnectionStrategy(CS_Source source,
                                  CS_ConnectionStrategy strategy,
                                  CS_Status* status);
@@ -192,7 +192,7 @@ CS_Sink CreateCvSink(std::string_view name, wpi::util::PixelFormat pixelFormat,
                      CS_Status* status);
 CS_Sink CreateCvSinkCallback(std::string_view name,
                              wpi::util::PixelFormat pixelFormat,
-                             std::function<void(uint64_t time)> processFrame,
+                             std::function<void(int64_t time)> processFrame,
                              CS_Status* status);
 
 /** @} */

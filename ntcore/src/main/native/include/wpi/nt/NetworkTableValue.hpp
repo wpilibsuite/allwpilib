@@ -91,14 +91,14 @@ class Value final {
   /**
    * Get the creation time of the value, in local time.
    *
-   * @return The time, in the units returned by wpi::nt::Now().
+   * @return The time, in nanoseconds.
    */
   int64_t last_change() const { return m_val.last_change; }
 
   /**
    * Get the creation time of the value, in local time.
    *
-   * @return The time, in the units returned by wpi::nt::Now().
+   * @return The time, in nanoseconds.
    */
   int64_t time() const { return m_val.last_change; }
 
@@ -114,21 +114,21 @@ class Value final {
   /**
    * Set the local creation time of the value.
    *
-   * @param time The time.
+   * @param time The time, in nanoseconds.
    */
   void SetTime(int64_t time) { m_val.last_change = time; }
 
   /**
    * Get the creation time of the value, in server time.
    *
-   * @return The server time.
+   * @return The server time, in nanoseconds.
    */
   int64_t server_time() const { return m_val.server_time; }
 
   /**
    * Set the creation time of the value, in server time.
    *
-   * @param time The server time.
+   * @param time The server time, in nanoseconds.
    */
   void SetServerTime(int64_t time) { m_val.server_time = time; }
 
@@ -349,8 +349,8 @@ class Value final {
    * Creates a boolean entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeBoolean(bool value, int64_t time = 0) {
@@ -363,8 +363,8 @@ class Value final {
    * Creates an integer entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeInteger(int64_t value, int64_t time = 0) {
@@ -377,8 +377,8 @@ class Value final {
    * Creates a float entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeFloat(float value, int64_t time = 0) {
@@ -391,8 +391,8 @@ class Value final {
    * Creates a double entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeDouble(double value, int64_t time = 0) {
@@ -405,8 +405,8 @@ class Value final {
    * Creates a string entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeString(std::string_view value, int64_t time = 0) {
@@ -422,8 +422,8 @@ class Value final {
    * Creates a string entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   template <std::same_as<std::string> T>
@@ -440,8 +440,8 @@ class Value final {
    * Creates a raw entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeRaw(std::span<const uint8_t> value, int64_t time = 0) {
@@ -458,8 +458,8 @@ class Value final {
    * Creates a raw entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   template <std::same_as<std::vector<uint8_t>> T>
@@ -476,8 +476,8 @@ class Value final {
    * Creates a boolean array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::span<const bool> value, int64_t time = 0);
@@ -486,8 +486,8 @@ class Value final {
    * Creates a boolean array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::initializer_list<bool> value,
@@ -499,8 +499,8 @@ class Value final {
    * Creates a boolean array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::span<const int> value, int64_t time = 0);
@@ -509,8 +509,8 @@ class Value final {
    * Creates a boolean array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeBooleanArray(std::initializer_list<int> value,
@@ -522,8 +522,8 @@ class Value final {
    * Creates a boolean array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    *
    * @note This function moves the values out of the vector.
@@ -534,8 +534,8 @@ class Value final {
    * Creates an integer array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeIntegerArray(std::span<const int64_t> value,
@@ -545,8 +545,8 @@ class Value final {
    * Creates an integer array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeIntegerArray(std::initializer_list<int64_t> value,
@@ -558,8 +558,8 @@ class Value final {
    * Creates an integer array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    *
    * @note This function moves the values out of the vector.
@@ -570,8 +570,8 @@ class Value final {
    * Creates a float array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeFloatArray(std::span<const float> value, int64_t time = 0);
@@ -580,8 +580,8 @@ class Value final {
    * Creates a float array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeFloatArray(std::initializer_list<float> value,
@@ -593,8 +593,8 @@ class Value final {
    * Creates a float array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    *
    * @note This function moves the values out of the vector.
@@ -605,8 +605,8 @@ class Value final {
    * Creates a double array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeDoubleArray(std::span<const double> value, int64_t time = 0);
@@ -615,8 +615,8 @@ class Value final {
    * Creates a double array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeDoubleArray(std::initializer_list<double> value,
@@ -628,8 +628,8 @@ class Value final {
    * Creates a double array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    *
    * @note This function moves the values out of the vector.
@@ -640,8 +640,8 @@ class Value final {
    * Creates a string array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeStringArray(std::span<const std::string> value,
@@ -651,8 +651,8 @@ class Value final {
    * Creates a string array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    */
   static Value MakeStringArray(std::initializer_list<std::string> value,
@@ -664,8 +664,8 @@ class Value final {
    * Creates a string array entry value.
    *
    * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
+   * @param time if nonzero, the creation time to use, in nanoseconds
+   *             (instead of the current time)
    * @return The entry value
    *
    * @note This function moves the values out of the vector.

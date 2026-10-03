@@ -8,7 +8,7 @@ Subject: [PATCH 19/25] Add to_json, from_json, and json_serializer struct
  1 file changed, 65 insertions(+)
 
 diff --git a/json.h b/json.h
-index 62af49cb18b713304ad95e89c52f5cc5bbc4b626..e52435a79ee7537928ba59fb146f635fc8511bfc 100644
+index b478523deea8ae3d852ebe369cea8ca60fdec01d..d77ff1ea380614c54579d26cc233aa8424734b5b 100644
 --- a/json.h
 +++ b/json.h
 @@ -26,6 +26,35 @@

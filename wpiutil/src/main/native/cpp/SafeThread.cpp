@@ -39,6 +39,7 @@ void SetSafeThreadNotifiers(OnThreadStartFn OnStart, OnThreadEndFn OnEnd) {
 }  // namespace wpi::util::impl
 
 void SafeThread::Stop() {
+  std::scoped_lock lock(m_mutex);
   m_active = false;
   m_cond.notify_all();
 }

@@ -4,15 +4,15 @@
 
 #include "wpi/cs/RawSource.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 namespace wpi::cs {
 
-TEST(RawSourceTest, CreateEmpty) {
+TEST_CASE("RawSourceTest CreateEmpty", "[cscore][raw-source]") {
   RawSource source;
 }
 
-TEST(RawSourceTest, Create) {
+TEST_CASE("RawSourceTest Create", "[cscore][raw-source]") {
   RawSource source("test", wpi::util::PixelFormat::BGR, 640, 480, 30);
 }
 

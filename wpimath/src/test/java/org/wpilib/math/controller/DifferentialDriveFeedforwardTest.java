@@ -15,19 +15,19 @@ import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
 
 class DifferentialDriveFeedforwardTest {
-  private static final double kVLinear = 1.0;
-  private static final double kALinear = 1.0;
-  private static final double kVAngular = 1.0;
-  private static final double kAAngular = 1.0;
+  private static final double kvLinear = 1.0;
+  private static final double kaLinear = 1.0;
+  private static final double kvAngular = 1.0;
+  private static final double kaAngular = 1.0;
   private static final double trackwidth = 1.0;
   private static final double dt = 0.02;
 
   @Test
   void testCalculateWithTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =
-        new DifferentialDriveFeedforward(kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+        new DifferentialDriveFeedforward(kvLinear, kaLinear, kvAngular, kaAngular, trackwidth);
     LinearSystem<N2, N2, N2> plant =
-        Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular, trackwidth);
+        Models.differentialDriveFromSysId(kvLinear, kaLinear, kvAngular, kaAngular, trackwidth);
     for (int currentLeftVelocity = -4; currentLeftVelocity <= 4; currentLeftVelocity += 2) {
       for (int currentRightVelocity = -4; currentRightVelocity <= 4; currentRightVelocity += 2) {
         for (int nextLeftVelocity = -4; nextLeftVelocity <= 4; nextLeftVelocity += 2) {
@@ -55,9 +55,9 @@ class DifferentialDriveFeedforwardTest {
   @Test
   void testCalculateWithoutTrackwidth() {
     DifferentialDriveFeedforward differentialDriveFeedforward =
-        new DifferentialDriveFeedforward(kVLinear, kALinear, kVAngular, kAAngular);
+        new DifferentialDriveFeedforward(kvLinear, kaLinear, kvAngular, kaAngular);
     LinearSystem<N2, N2, N2> plant =
-        Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular);
+        Models.differentialDriveFromSysId(kvLinear, kaLinear, kvAngular, kaAngular);
     for (int currentLeftVelocity = -4; currentLeftVelocity <= 4; currentLeftVelocity += 2) {
       for (int currentRightVelocity = -4; currentRightVelocity <= 4; currentRightVelocity += 2) {
         for (int nextLeftVelocity = -4; nextLeftVelocity <= 4; nextLeftVelocity += 2) {

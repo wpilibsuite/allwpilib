@@ -11,10 +11,11 @@ import org.wpilib.math.controller.LTVUnicycleController;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.kinematics.ChassisAccelerations;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.trajectory.HolonomicSample;
+import org.wpilib.math.trajectory.HolonomicTrajectory;
 import org.wpilib.math.trajectory.Trajectory;
-import org.wpilib.math.trajectory.TrajectoryConfig;
-import org.wpilib.math.trajectory.TrajectoryGenerator;
 import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
@@ -28,16 +29,19 @@ public class Robot extends TimedRobot {
   private final Drivetrain drive = new Drivetrain();
   private final LTVUnicycleController feedback = new LTVUnicycleController(0.020);
   private final Timer timer = new Timer();
-  private final Trajectory trajectory;
+  private final Trajectory<HolonomicSample> trajectory;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
+    // Replace this with a call to a trajectory generator
     trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, Rotation2d.kZero),
-            List.of(),
-            new Pose2d(6, 4, Rotation2d.kZero),
-            new TrajectoryConfig(2, 2));
+        new HolonomicTrajectory(
+            List.of(
+                new HolonomicSample(
+                    0.0,
+                    new Pose2d(0.0, 0.0, Rotation2d.ZERO),
+                    new ChassisVelocities(0.0, 0.0, 0.0),
+                    new ChassisAccelerations(0.0, 0.0, 0.0))));
   }
 
   @Override
@@ -48,13 +52,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     timer.restart();
-    drive.resetOdometry(trajectory.getInitialPose());
+    drive.resetOdometry(trajectory.start().pose);
   }
 
   @Override
   public void autonomousPeriodic() {
     double elapsed = timer.get();
-    Trajectory.State reference = trajectory.sample(elapsed);
+    HolonomicSample reference = trajectory.sampleAt(elapsed);
     ChassisVelocities velocities = feedback.calculate(drive.getPose(), reference);
     drive.drive(velocities.vx, velocities.omega);
   }
@@ -63,13 +67,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     // Get the x velocity. We are inverting this because gamepads return
     // negative values when we push forward.
-    double xVelocity = -velocityLimiter.calculate(controller.getLeftY()) * Drivetrain.kMaxVelocity;
+    double xVelocity = -velocityLimiter.calculate(controller.getLeftY()) * Drivetrain.MAX_VELOCITY;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
     // mathematics). Xbox controllers return positive values when you pull to
     // the right by default.
-    double rot = -rotLimiter.calculate(controller.getRightX()) * Drivetrain.kMaxAngularVelocity;
+    double rot = -rotLimiter.calculate(controller.getRightX()) * Drivetrain.MAX_ANGULAR_VELOCITY;
     drive.drive(xVelocity, rot);
   }
 

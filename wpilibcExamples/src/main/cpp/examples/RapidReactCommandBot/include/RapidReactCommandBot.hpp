@@ -48,5 +48,6 @@ class RapidReactCommandBot {
   Pneumatics pneumatics;
 
   // The driver's controller
-  wpi::cmd::CommandGamepad driverController{OIConstants::kDriverControllerPort};
+  wpi::cmd::CommandGamepad driverController{
+      OIConstants::DRIVER_CONTROLLER_PORT};
 };

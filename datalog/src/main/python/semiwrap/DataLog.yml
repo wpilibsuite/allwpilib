@@ -6,7 +6,7 @@ enums:
 classes:
   wpi::log::DataLog:
     attributes:
-      kBlockSize:
+      BLOCK_SIZE:
       s_defaultMessageLog:
         ignore: true
       m_msglog:
@@ -74,6 +74,7 @@ classes:
     methods:
       SetMetadata:
       Finish:
+      GetIndex:
   wpi::log::DataLogValueEntryImpl:
     template_params:
     - T
@@ -94,7 +95,7 @@ classes:
   wpi::log::RawLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       RawLogEntry:
         overloads:
@@ -108,7 +109,7 @@ classes:
   wpi::log::BooleanLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       BooleanLogEntry:
         overloads:
@@ -121,7 +122,7 @@ classes:
   wpi::log::IntegerLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       IntegerLogEntry:
         overloads:
@@ -134,7 +135,7 @@ classes:
   wpi::log::FloatLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       FloatLogEntry:
         overloads:
@@ -147,7 +148,7 @@ classes:
   wpi::log::DoubleLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       DoubleLogEntry:
         overloads:
@@ -160,7 +161,7 @@ classes:
   wpi::log::StringLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       StringLogEntry:
         overloads:
@@ -174,7 +175,7 @@ classes:
   wpi::log::BooleanArrayLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       BooleanArrayLogEntry:
         overloads:
@@ -206,7 +207,7 @@ classes:
   wpi::log::IntegerArrayLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       IntegerArrayLogEntry:
         overloads:
@@ -227,7 +228,7 @@ classes:
   wpi::log::FloatArrayLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       FloatArrayLogEntry:
         overloads:
@@ -248,7 +249,7 @@ classes:
   wpi::log::DoubleArrayLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       DoubleArrayLogEntry:
         overloads:
@@ -269,7 +270,7 @@ classes:
   wpi::log::StringArrayLogEntry:
     force_no_trampoline: true
     attributes:
-      kDataType:
+      DATA_TYPE:
     methods:
       StringArrayLogEntry:
         overloads:

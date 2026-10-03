@@ -3,39 +3,39 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 from typing_extensions import Self
 
 if TYPE_CHECKING:
     from .command import Command
     from .commandscheduler import CommandScheduler
 
-from wpiutil import Sendable, SendableBuilder, SendableRegistry
+from telemetry import TelemetryLoggable, TelemetryTable
 
 
-class Subsystem(Sendable):
+class Subsystem(TelemetryLoggable):
     """
     A robot subsystem. Subsystems are the basic unit of robot organization in the Command-based
     framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc.) and
     provide methods through which they can be used by Commands. Subsystems are used by the
     CommandScheduler's resource management system to ensure multiple robot actions are not
     "fighting" over the same hardware; Commands that use a subsystem should include that subsystem in
-    their :func:`commands2.Command.getRequirements` method, and resources used within a subsystem should
+    their :func:`commands2.Command.get_requirements` method, and resources used within a subsystem should
     generally remain encapsulated and not be shared by other parts of the robot.
 
-    Subsystems must be registered with the scheduler with the :func:`commands2.CommandScheduler.registerSubsystem`
+    Subsystems must be registered with the scheduler with the :func:`commands2.CommandScheduler.register_subsystem`
     method in order for the :func:`.periodic` method to be called. It is recommended that this method be called from the
     constructor of users' Subsystem implementations.
     """
 
     def __new__(cls, *arg, **kwargs) -> Self:
         instance = super().__new__(cls)
-        super().__init__(instance)
-        SendableRegistry.add(instance, cls.__name__, cls.__name__)
+        instance._name = cls.__name__
+        instance._subsystem = cls.__name__
         # add to the scheduler
         from .commandscheduler import CommandScheduler
 
-        CommandScheduler.getInstance().registerSubsystem(instance)
+        CommandScheduler.get_instance().register_subsystem(instance)
         return instance
 
     def __init__(self) -> None:
@@ -50,36 +50,36 @@ class Subsystem(Sendable):
         """
         pass
 
-    def simulationPeriodic(self) -> None:
+    def simulation_periodic(self) -> None:
         """
         This method is called periodically by the CommandScheduler. Useful for updating
         subsystem-specific state that needs to be maintained for simulations, such as for updating simulation classes and setting simulated sensor readings.
         """
         pass
 
-    def setDefaultCommand(self, command: Command) -> None:
+    def set_default_command(self, command: Command) -> None:
         """
         Sets the default Command of the subsystem. The default command will be automatically
         scheduled when no other commands are scheduled that require the subsystem. Default commands
-        should generally not end on their own, i.e. their :func:`commands2.Command.isFinished` method should
+        should generally not end on their own, i.e. their :func:`commands2.Command.is_finished` method should
         always return false. Will automatically register this subsystem with the CommandScheduler.
 
-        :param defaultCommand: the default command to associate with this subsystem
+        :param command: the default command to associate with this subsystem
         """
         from .commandscheduler import CommandScheduler
 
-        CommandScheduler.getInstance().setDefaultCommand(self, command)
+        CommandScheduler.get_instance().set_default_command(self, command)
 
-    def removeDefaultCommand(self) -> None:
+    def remove_default_command(self) -> None:
         """
         Removes the default command for the subsystem. This will not cancel the default command if it
         is currently running.
         """
         from .commandscheduler import CommandScheduler
 
-        CommandScheduler.getInstance().removeDefaultCommand(self)
+        CommandScheduler.get_instance().remove_default_command(self)
 
-    def getDefaultCommand(self) -> Optional[Command]:
+    def get_default_command(self) -> Optional[Command]:
         """
         Gets the default command for this subsystem. Returns None if no default command is currently
         associated with the subsystem.
@@ -88,9 +88,9 @@ class Subsystem(Sendable):
         """
         from .commandscheduler import CommandScheduler
 
-        return CommandScheduler.getInstance().getDefaultCommand(self)
+        return CommandScheduler.get_instance().get_default_command(self)
 
-    def getCurrentCommand(self) -> Optional[Command]:
+    def get_current_command(self) -> Optional[Command]:
         """
         Returns the command currently running on this subsystem. Returns None if no command is
         currently scheduled that requires this subsystem.
@@ -99,7 +99,7 @@ class Subsystem(Sendable):
         """
         from .commandscheduler import CommandScheduler
 
-        return CommandScheduler.getInstance().requiring(self)
+        return CommandScheduler.get_instance().requiring(self)
 
     def register(self):
         """
@@ -108,18 +108,18 @@ class Subsystem(Sendable):
         """
         from .commandscheduler import CommandScheduler
 
-        return CommandScheduler.getInstance().registerSubsystem(self)
+        return CommandScheduler.get_instance().register_subsystem(self)
 
-    def runOnce(self, action: Callable[[], None]) -> Command:
+    def run_once(self, action: Callable[[], None]) -> Command:
         """
         Constructs a command that runs an action once and finishes. Requires this subsystem.
 
         :param action: the action to run
         :return: the command
         """
-        from .cmd import runOnce
+        from .cmd import run_once
 
-        return runOnce(action, self)
+        return run_once(action, self)
 
     def run(self, action: Callable[[], None]) -> Command:
         """
@@ -132,7 +132,7 @@ class Subsystem(Sendable):
 
         return run(action, self)
 
-    def startEnd(self, start: Callable[[], None], end: Callable[[], None]) -> Command:
+    def start_end(self, start: Callable[[], None], end: Callable[[], None]) -> Command:
         """
         Constructs a command that runs an action once and another action when the command is
         interrupted. Requires this subsystem.
@@ -141,11 +141,11 @@ class Subsystem(Sendable):
         :param end: the action to run on interrupt
         :returns: the command
         """
-        from .cmd import startEnd
+        from .cmd import start_end
 
-        return startEnd(start, end, self)
+        return start_end(start, end, self)
 
-    def runEnd(self, run: Callable[[], None], end: Callable[[], None]) -> Command:
+    def run_end(self, run: Callable[[], None], end: Callable[[], None]) -> Command:
         """
         Constructs a command that runs an action every iteration until interrupted, and then runs a
         second action. Requires this subsystem.
@@ -154,11 +154,11 @@ class Subsystem(Sendable):
         :param end: the action to run on interrupt
         :returns: the command
         """
-        from .cmd import runEnd
+        from .cmd import run_end
 
-        return runEnd(run, end, self)
+        return run_end(run, end, self)
 
-    def startRun(self, start: Callable[[], None], run: Callable[[], None]) -> Command:
+    def start_run(self, start: Callable[[], None], run: Callable[[], None]) -> Command:
         """
         Constructs a command that runs an action once and another action every iteration until interrupted. Requires this subsystem.
 
@@ -166,9 +166,9 @@ class Subsystem(Sendable):
         :param run: the action to run every iteration
         :returns: the command
         """
-        from .cmd import startRun
+        from .cmd import start_run
 
-        return startRun(start, run, self)
+        return start_run(start, run, self)
 
     def idle(self) -> Command:
         """
@@ -184,67 +184,41 @@ class Subsystem(Sendable):
     # From SubsystemBase
     #
 
-    def getName(self) -> str:
+    def get_name(self) -> str:
         """
         Gets the name of this Subsystem.
 
         :returns: Name
         """
-        return SendableRegistry.getName(self)
+        return self._name
 
-    def setName(self, name: str) -> None:
+    def set_name(self, name: str) -> None:
         """
         Set the name of this Subsystem.
         """
-        SendableRegistry.setName(self, name)
+        self._name = name
 
-    def getSubsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return SendableRegistry.getSubsystem(self)
-
-    def setSubsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        SendableRegistry.setSubsystem(self, subsystem)
-
-    def addChild(self, name: str, child: Sendable) -> None:
-        """
-        Associates a :class:`wpiutil.Sendable` with this Subsystem. Also update the child's name.
-
-        :param name:  name to give child
-        :param child: sendable
-        """
-        SendableRegistry.add(child, self.getSubsystem(), name)
-
-    def initSendable(self, builder: SendableBuilder) -> None:
-        builder.setSmartDashboardType("Subsystem")
-
-        builder.addBooleanProperty(
-            ".hasDefault", lambda: self.getDefaultCommand() is not None, lambda _: None
-        )
+    def log_to(self, table: TelemetryTable) -> None:
+        default = self.get_default_command()
+        table.log(".hasDefault", default is not None)
 
         def get_default():
-            command = self.getDefaultCommand()
+            command = self.get_default_command()
             if command is not None:
-                return command.getName()
+                return command.get_name()
             return "none"
 
-        builder.addStringProperty(".default", get_default, lambda _: None)
-        builder.addBooleanProperty(
-            ".hasCommand", lambda: self.getCurrentCommand() is not None, lambda _: None
-        )
+        table.log(".default", get_default())
+        current = self.get_current_command()
+        table.log(".hasCommand", current is not None)
 
         def get_current():
-            command = self.getCurrentCommand()
+            command = self.get_current_command()
             if command is not None:
-                return command.getName()
+                return command.get_name()
             return "none"
 
-        builder.addStringProperty(".command", get_current, lambda _: None)
+        table.log(".command", get_current())
+
+    def get_telemetry_type(self) -> str:
+        return "Subsystem"

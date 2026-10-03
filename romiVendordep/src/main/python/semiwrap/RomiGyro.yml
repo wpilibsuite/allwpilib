@@ -11,3 +11,5 @@ classes:
       GetAngleY:
       GetAngleZ:
       Reset:
+      LogTo:
+      GetTelemetryType:

@@ -14,16 +14,14 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.StatementTree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
 
 /**
  * Detects any statements after a call to {@code coroutine.park()} and labels them as unreachable
  * code, similar to a {@code while (true)} statement.
  */
 public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
-  public static final String SUPPRESSION_KEY = "CodeAfterCoroutinePark";
+  public static final String SUPPRESSION_KEY = "WPILib.CodeAfterCoroutinePark";
 
   public CodeAfterCoroutineParkDetector(JavacTask task) {
     super(task);
@@ -34,12 +32,9 @@ public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
     return new Scanner(compilationUnit);
   }
 
-  private final class Scanner extends TreeScanner<Void, Void> {
-    private final CompilationUnitTree m_root;
-    private final Trees m_trees = Trees.instance(m_task);
-
+  private final class Scanner extends WPILibTreeScanner<Void, Void> {
     Scanner(CompilationUnitTree compilationUnit) {
-      m_root = compilationUnit;
+      super(compilationUnit, CodeAfterCoroutineParkDetector.this.m_task);
     }
 
     @Override
@@ -58,11 +53,10 @@ public class CodeAfterCoroutineParkDetector extends CoroutineBasedDetector {
         }
 
         if (parkInvocation != null) {
-          m_trees.printMessage(
-              Diagnostic.Kind.ERROR,
-              "Unreachable statement: `" + parkInvocation + "` will never exit",
+          printError(
+              "Unreachable statement: `" + parkInvocation + "` will never exit.",
               statement,
-              m_root);
+              SUPPRESSION_KEY);
           break;
         }
 

@@ -1,9 +1,9 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpiutil==0.0.0",
 ]
@@ -46,7 +46,6 @@ update_init = [
 scan_headers_ignore = [
     "debugging.hpp",
     "debugging/*",
-    "fmt/*",
     "google/*",
     "wpi/*",
     "wpystruct_fns.h",
@@ -54,9 +53,15 @@ scan_headers_ignore = [
     "pb_common.h",
     "pb_decode.h",
     "pb_encode.h",
+    "src/type_casters/wpybuffer.h",
     "upb/*",
     "utf8_range.h",
 ]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
 
 [tool.semiwrap.extension_modules."wpiutil._wpiutil"]
 name = "wpiutil"
@@ -76,12 +81,8 @@ PixelFormat = "wpi/util/PixelFormat.hpp"
 RawFrame_c = "wpi/util/RawFrame.h"
 RawFrame = "wpi/util/RawFrame.hpp"
 Timestamp = "wpi/util/timestamp.hpp"
-
-# wpi/sendable
-Sendable = "wpi/util/sendable/Sendable.hpp"
-SendableBuilder = "wpi/util/sendable/SendableBuilder.hpp"
-#SendableHelper = "wpi/util/sendable/SendableHelper.hpp"
-SendableRegistry = "wpi/util/sendable/SendableRegistry.hpp"
+Alert = "wpi/util/Alert.hpp"
+UsageReporting = "wpi/util/UsageReporting.hpp"
 
 WPyStruct = "src/wpistruct/wpystruct_fns.h"
 

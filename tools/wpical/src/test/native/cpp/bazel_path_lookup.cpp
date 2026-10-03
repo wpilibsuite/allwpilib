@@ -11,7 +11,11 @@ using bazel::tools::cpp::runfiles::Runfiles;
 std::string LookupPath(std::string path) {
   std::string error;
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest(&error));
-  return runfiles->Rlocation("__main__/" + path);
+  std::string rpath = runfiles->Rlocation("_main/" + path);
+  if (rpath.empty()) {
+    rpath = runfiles->Rlocation("__main__/" + path);
+  }
+  return rpath;
 }
 #else
 std::string LookupPath(std::string path) {

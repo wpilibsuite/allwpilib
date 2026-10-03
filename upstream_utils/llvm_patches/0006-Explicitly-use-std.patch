@@ -1,20 +1,70 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:37:34 -0400
-Subject: [PATCH 06/36] Explicitly use std::
+Subject: [PATCH 06/32] Explicitly use std::
 
 ---
- llvm/include/llvm/ADT/SmallSet.h       |  2 +-
- llvm/lib/Support/ErrorHandling.cpp     |  2 +-
- llvm/unittests/ADT/SmallPtrSetTest.cpp |  2 +-
- llvm/unittests/ADT/SmallSetTest.cpp    | 10 +++++-----
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ llvm/include/llvm/ADT/DenseMap.h            | 11 ++++----
+ llvm/include/llvm/ADT/SmallSet.h            |  2 +-
+ llvm/lib/Support/ErrorHandling.cpp          |  2 +-
+ llvm/lib/Support/SmallPtrSet.cpp            |  7 +++--
+ llvm/unittests/ADT/STLForwardCompatTest.cpp | 29 +++++++++++----------
+ llvm/unittests/ADT/SmallPtrSetTest.cpp      |  2 +-
+ llvm/unittests/ADT/SmallSetTest.cpp         | 10 +++----
+ 7 files changed, 32 insertions(+), 31 deletions(-)
 
+diff --git a/llvm/include/llvm/ADT/DenseMap.h b/llvm/include/llvm/ADT/DenseMap.h
+index 21a72afd18e463a7b75adf2dc1be2e9c58995675..ef6895b8d90958604c121df0fafe00aa8cf4d77b 100644
+--- a/llvm/include/llvm/ADT/DenseMap.h
++++ b/llvm/include/llvm/ADT/DenseMap.h
+@@ -24,8 +24,8 @@
+ #include "llvm/ADT/ADL.h"
+ #include "llvm/ADT/DenseMapInfo.h"
+ #include "llvm/ADT/EpochTracker.h"
+-#include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/STLForwardCompat.h"
++#include "llvm/ADT/iterator_range.h"
+ #include "llvm/Support/Compiler.h"
+ #include "llvm/Support/MathExtras.h"
+ #include "llvm/Support/MemAlloc.h"
+@@ -38,6 +38,7 @@
+ #include <initializer_list>
+ #include <iterator>
+ #include <new>
++#include <ranges>
+ #include <type_traits>
+ #include <utility>
+ 
+@@ -152,20 +153,20 @@ public:
+ 
+   // Return an iterator to iterate over keys in the map.
+   [[nodiscard]] inline auto keys() {
+-    return map_range(*this, [](const BucketT &P) { return P.getFirst(); });
++    return std::views::transform(*this, [](const BucketT &P) { return P.getFirst(); });
+   }
+ 
+   // Return an iterator to iterate over values in the map.
+   [[nodiscard]] inline auto values() {
+-    return map_range(*this, [](const BucketT &P) { return P.getSecond(); });
++    return std::views::transform(*this, [](const BucketT &P) { return P.getSecond(); });
+   }
+ 
+   [[nodiscard]] inline auto keys() const {
+-    return map_range(*this, [](const BucketT &P) { return P.getFirst(); });
++    return std::views::transform(*this, [](const BucketT &P) { return P.getFirst(); });
+   }
+ 
+   [[nodiscard]] inline auto values() const {
+-    return map_range(*this, [](const BucketT &P) { return P.getSecond(); });
++    return std::views::transform(*this, [](const BucketT &P) { return P.getSecond(); });
+   }
+ 
+   [[nodiscard]] bool empty() const { return getNumEntries() == 0; }
 diff --git a/llvm/include/llvm/ADT/SmallSet.h b/llvm/include/llvm/ADT/SmallSet.h
-index ed3c6bfd3418d70a92eb602d0eb3e5d88da2a095..c62a3a55d9bda188670e7d6042867943dcd44c68 100644
+index efbd66bb4d5b2bfb25720514d779e1d2316e7017..38918175ea68dc4c67b6bf6cfd5bed1da200a512 100644
 --- a/llvm/include/llvm/ADT/SmallSet.h
 +++ b/llvm/include/llvm/ADT/SmallSet.h
-@@ -280,7 +280,7 @@ bool operator==(const SmallSet<T, LN, C> &LHS, const SmallSet<T, RN, C> &RHS) {
+@@ -288,7 +288,7 @@ template <typename T, unsigned LN, unsigned RN, typename C>
      return false;
  
    // All elements in LHS must also be in RHS
@@ -24,10 +74,10 @@ index ed3c6bfd3418d70a92eb602d0eb3e5d88da2a095..c62a3a55d9bda188670e7d6042867943
  
  /// Inequality comparison for SmallSet.
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index 4e1dca80a21881bfb8fa886a5921c780ca021bf2..4de36d969b3776b72ff85888355b64f7f3262ccc 100644
+index 7ab8a97bb85929615fc751a1eda1fee62004a26f..fcbc70535bf9869f72d001ec214d7046e975961a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
-@@ -249,7 +249,7 @@ std::error_code llvm::mapLastWindowsError() {
+@@ -279,7 +279,7 @@ std::error_code llvm::mapLastWindowsError() {
  // I'd rather not double the line count of the following.
  #define MAP_ERR_TO_COND(x, y)                                                  \
    case x:                                                                      \
@@ -36,8 +86,104 @@ index 4e1dca80a21881bfb8fa886a5921c780ca021bf2..4de36d969b3776b72ff85888355b64f7
  
  std::error_code llvm::mapWindowsError(unsigned EV) {
    switch (EV) {
+diff --git a/llvm/lib/Support/SmallPtrSet.cpp b/llvm/lib/Support/SmallPtrSet.cpp
+index 265b8eba4076de152e1c2318a3ead49a8ed7dcc6..ce009f35b4d206eb0b4f4e8a30749d014fb34794 100644
+--- a/llvm/lib/Support/SmallPtrSet.cpp
++++ b/llvm/lib/Support/SmallPtrSet.cpp
+@@ -13,7 +13,6 @@
+ 
+ #include "llvm/ADT/SmallPtrSet.h"
+ #include "llvm/ADT/DenseMapInfo.h"
+-#include "llvm/ADT/STLExtras.h"
+ #include "llvm/Support/MathExtras.h"
+ #include "llvm/Support/MemAlloc.h"
+ #include <algorithm>
+@@ -179,7 +178,7 @@ void SmallPtrSetImplBase::copyHelper(const SmallPtrSetImplBase &RHS) {
+   CurArraySize = RHS.CurArraySize;
+ 
+   // Copy over the contents from the other set
+-  llvm::copy(RHS.buckets(), CurArray);
++  std::ranges::copy(RHS.buckets(), CurArray);
+ 
+   NumEntries = RHS.NumEntries;
+ }
+@@ -202,7 +201,7 @@ void SmallPtrSetImplBase::moveHelper(const void **SmallStorage,
+   if (RHS.isSmall()) {
+     // Copy a small RHS rather than moving.
+     CurArray = SmallStorage;
+-    llvm::copy(RHS.small_buckets(), CurArray);
++    std::ranges::copy(RHS.small_buckets(), CurArray);
+   } else {
+     CurArray = RHS.CurArray;
+     RHS.CurArray = RHSSmallStorage;
+@@ -256,7 +255,7 @@ void SmallPtrSetImplBase::swap(const void **SmallStorage,
+   SmallPtrSetImplBase &LargeSide = this->isSmall() ? RHS : *this;
+   const void **LargeSideInlineStorage =
+       this->isSmall() ? RHSSmallStorage : SmallStorage;
+-  llvm::copy(SmallSide.small_buckets(), LargeSideInlineStorage);
++  std::ranges::copy(SmallSide.small_buckets(), LargeSideInlineStorage);
+   std::swap(LargeSide.CurArraySize, SmallSide.CurArraySize);
+   std::swap(LargeSide.NumEntries, SmallSide.NumEntries);
+   SmallSide.CurArray = LargeSide.CurArray;
+diff --git a/llvm/unittests/ADT/STLForwardCompatTest.cpp b/llvm/unittests/ADT/STLForwardCompatTest.cpp
+index 7a152af104801e0447fb134c40cc825856ea4134..f23d5b7ce7cc762fb6d1b8e5053eeac5d926e7e9 100644
+--- a/llvm/unittests/ADT/STLForwardCompatTest.cpp
++++ b/llvm/unittests/ADT/STLForwardCompatTest.cpp
+@@ -12,6 +12,7 @@
+ 
+ #include <iterator>
+ #include <optional>
++#include <ranges>
+ #include <type_traits>
+ #include <utility>
+ 
+@@ -636,30 +637,30 @@ TEST(STLForwardCompatTest, BindFrontBindBack) {
+   auto MulL = llvm::bind_front(MulAdd1, 2, 4);
+   auto Mul20 = llvm::bind_back(MulAdd, 4);
+   auto Mul21 = llvm::bind_front(MulAdd1, 2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   V.push_back(2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   V.push_back(2);
+   V.push_back(2);
+-  EXPECT_TRUE(all_of(V, Mul0));
+-  EXPECT_TRUE(all_of(V, MulL));
++  EXPECT_TRUE(std::ranges::all_of(V, Mul0));
++  EXPECT_TRUE(std::ranges::all_of(V, MulL));
+ 
+   auto Spec0 = llvm::bind_front(Mul20, 2);
+   auto Spec1 = llvm::bind_back(Mul21, 4);
+-  EXPECT_TRUE(all_of(V, Spec0));
+-  EXPECT_TRUE(all_of(V, Spec1));
++  EXPECT_TRUE(std::ranges::all_of(V, Spec0));
++  EXPECT_TRUE(std::ranges::all_of(V, Spec1));
+ 
+   V.push_back(3);
+-  EXPECT_FALSE(all_of(V, Mul0));
+-  EXPECT_FALSE(all_of(V, MulL));
+-  EXPECT_FALSE(all_of(V, Spec0));
+-  EXPECT_FALSE(all_of(V, Spec1));
+-  EXPECT_TRUE(any_of(V, Spec0));
+-  EXPECT_TRUE(any_of(V, Spec1));
++  EXPECT_FALSE(std::ranges::all_of(V, Mul0));
++  EXPECT_FALSE(std::ranges::all_of(V, MulL));
++  EXPECT_FALSE(std::ranges::all_of(V, Spec0));
++  EXPECT_FALSE(std::ranges::all_of(V, Spec1));
++  EXPECT_TRUE(std::ranges::any_of(V, Spec0));
++  EXPECT_TRUE(std::ranges::any_of(V, Spec1));
+ }
+ 
+ // Compile-time tests for llvm::is_sorted_constexpr
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 88be2b68915573a3b3a343ff53a84d86604d7bfd..65c0c564e91a40a98432d985c6949d3d4aa0717d 100644
+index 14cc88510556903db60f5c538cf34cdb3bab6ae4..b43475d6ea92ae827a37725b5bb344ec50342007 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -261,7 +261,7 @@ TEST(SmallPtrSetTest, dereferenceAndIterate) {
@@ -50,7 +196,7 @@ index 88be2b68915573a3b3a343ff53a84d86604d7bfd..65c0c564e91a40a98432d985c6949d3d
      EXPECT_EQ(F - Found + 1, *F);
  }
 diff --git a/llvm/unittests/ADT/SmallSetTest.cpp b/llvm/unittests/ADT/SmallSetTest.cpp
-index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4ce5d725f 100644
+index 0aa2c9c4b125a2abfddce651e1468b72d07beef7..9b7d22653bc880f5f3f02269452cbc9934cb7b5c 100644
 --- a/llvm/unittests/ADT/SmallSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallSetTest.cpp
 @@ -11,9 +11,9 @@
@@ -62,9 +208,9 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4
  #include "gtest/gtest.h"
 +#include <algorithm>
  #include <string>
+ #include <type_traits>
  
- using namespace llvm;
-@@ -180,7 +180,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -187,7 +187,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    std::vector<int> V(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -73,7 +219,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4
    for (int i = 0; i < 3; i++)
      EXPECT_EQ(i, V[i]);
  
-@@ -191,7 +191,7 @@ TEST(SmallSetTest, IteratorInt) {
+@@ -198,7 +198,7 @@ TEST(SmallSetTest, IteratorInt) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.
@@ -82,7 +228,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4
    for (int i = 0; i < 6; i++)
      EXPECT_EQ(i, V[i]);
  }
-@@ -206,7 +206,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -213,7 +213,7 @@ TEST(SmallSetTest, IteratorString) {
    s1.insert("str 1");
  
    std::vector<std::string> V(s1.begin(), s1.end());
@@ -91,7 +237,7 @@ index 2feb0b1feb421bf734e6433ccce3d94dd2b0aeca..65d5998c63d9d7dd69c5a7054bcd82c4
    EXPECT_EQ(2u, s1.size());
    EXPECT_EQ("str 1", V[0]);
    EXPECT_EQ("str 2", V[1]);
-@@ -217,7 +217,7 @@ TEST(SmallSetTest, IteratorString) {
+@@ -224,7 +224,7 @@ TEST(SmallSetTest, IteratorString) {
  
    V.assign(s1.begin(), s1.end());
    // Make sure the elements are in the expected order.

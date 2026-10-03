@@ -40,15 +40,15 @@ class VideoProperty {
  public:
   enum Kind {
     /// No specific property.
-    kNone = CS_PROP_NONE,
+    NONE = CS_PROP_NONE,
     /// Boolean property.
-    kBoolean = CS_PROP_BOOLEAN,
+    BOOLEAN = CS_PROP_BOOLEAN,
     /// Integer property.
-    kInteger = CS_PROP_INTEGER,
+    INTEGER = CS_PROP_INTEGER,
     /// String property.
-    kString = CS_PROP_STRING,
+    STRING = CS_PROP_STRING,
     /// Enum property.
-    kEnum = CS_PROP_ENUM
+    ENUM = CS_PROP_ENUM
   };
 
   VideoProperty() = default;
@@ -75,35 +75,35 @@ class VideoProperty {
    *
    * @return True if property is valid.
    */
-  explicit operator bool() const { return m_kind != kNone; }
+  explicit operator bool() const { return m_kind != NONE; }
 
   /**
    * Returns true if property is a boolean.
    *
    * @return True if property is a boolean.
    */
-  bool IsBoolean() const { return m_kind == kBoolean; }
+  bool IsBoolean() const { return m_kind == BOOLEAN; }
 
   /**
    * Returns true if property is an integer.
    *
    * @return True if property is an integer.
    */
-  bool IsInteger() const { return m_kind == kInteger; }
+  bool IsInteger() const { return m_kind == INTEGER; }
 
   /**
    * Returns true if property is a string.
    *
    * @return True if property is a string.
    */
-  bool IsString() const { return m_kind == kString; }
+  bool IsString() const { return m_kind == STRING; }
 
   /**
    * Returns true if property is an enum.
    *
    * @return True if property is an enum.
    */
-  bool IsEnum() const { return m_kind == kEnum; }
+  bool IsEnum() const { return m_kind == ENUM; }
 
   /**
    * Returns property value.
@@ -225,7 +225,7 @@ class VideoProperty {
   explicit VideoProperty(CS_Property handle) : m_handle(handle) {
     m_status = 0;
     if (handle == 0) {
-      m_kind = kNone;
+      m_kind = NONE;
     } else {
       m_kind = static_cast<Kind>(
           static_cast<int>(GetPropertyKind(handle, &m_status)));
@@ -237,7 +237,7 @@ class VideoProperty {
 
   mutable CS_Status m_status{0};
   CS_Property m_handle{0};
-  Kind m_kind{kNone};
+  Kind m_kind{NONE};
 };
 
 }  // namespace wpi::cs

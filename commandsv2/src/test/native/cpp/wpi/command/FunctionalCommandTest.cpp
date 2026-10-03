@@ -9,7 +9,9 @@
 using namespace wpi::cmd;
 class FunctionalCommandTest : public CommandTestBase {};
 
-TEST_F(FunctionalCommandTest, FunctionalCommandSchedule) {
+TEST_CASE_METHOD(FunctionalCommandTest,
+                 "FunctionalCommandTest FunctionalCommandSchedule",
+                 "[commandsv2][command]") {
   CommandScheduler scheduler = GetScheduler();
 
   int counter = 0;
@@ -21,9 +23,9 @@ TEST_F(FunctionalCommandTest, FunctionalCommandSchedule) {
 
   scheduler.Schedule(&command);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(&command));
+  CHECK(scheduler.IsScheduled(&command));
   finished = true;
   scheduler.Run();
-  EXPECT_FALSE(scheduler.IsScheduled(&command));
-  EXPECT_EQ(4, counter);
+  CHECK_FALSE(scheduler.IsScheduled(&command));
+  CHECK(4 == counter);
 }

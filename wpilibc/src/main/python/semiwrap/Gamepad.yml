@@ -1,41 +1,58 @@
+extra_includes:
+- wpi/event/BooleanEvent.hpp
+
 classes:
   wpi::Gamepad:
-    ignored_bases:
-    - wpi::util::SendableHelper<Gamepad>
+    force_no_trampoline: true
     enums:
       Button:
       Axis:
     methods:
       Gamepad:
+        overloads:
+          int:
+          GenericHID&:
+      GetHID:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
       GetLeftX:
+      SetLeftXDeadband:
       GetLeftY:
+      SetLeftYDeadband:
       GetRightX:
+      SetRightXDeadband:
       GetRightY:
-      GetLeftTriggerAxis:
+      SetRightYDeadband:
+      GetLeftTrigger:
+      SetLeftTriggerDeadband:
       LeftTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetRightTriggerAxis:
+      GetRightTrigger:
+      SetRightTriggerDeadband:
       RightTrigger:
         overloads:
           double, EventLoop* [const]:
           EventLoop* [const]:
-      GetSouthFaceButton:
-      GetSouthFaceButtonPressed:
-      GetSouthFaceButtonReleased:
+      GetFaceDownButton:
+      GetFaceDownButtonPressed:
+      GetFaceDownButtonReleased:
       FaceDown:
-      GetEastFaceButton:
-      GetEastFaceButtonPressed:
-      GetEastFaceButtonReleased:
+      GetFaceRightButton:
+      GetFaceRightButtonPressed:
+      GetFaceRightButtonReleased:
       FaceRight:
-      GetWestFaceButton:
-      GetWestFaceButtonPressed:
-      GetWestFaceButtonReleased:
+      GetFaceLeftButton:
+      GetFaceLeftButtonPressed:
+      GetFaceLeftButtonReleased:
       FaceLeft:
-      GetNorthFaceButton:
-      GetNorthFaceButtonPressed:
-      GetNorthFaceButtonReleased:
+      GetFaceUpButton:
+      GetFaceUpButtonPressed:
+      GetFaceUpButtonReleased:
       FaceUp:
       GetBackButton:
       GetBackButtonPressed:
@@ -133,4 +150,16 @@ classes:
       GetAxis:
       AxisLessThan:
       AxisGreaterThan:
-      InitSendable:
+      GetAxesAvailable:
+      GetButtonsAvailable:
+      IsConnected:
+      GetGamepadType:
+      GetSupportedOutputs:
+      GetName:
+      GetPort:
+      SetLeds:
+      SetRumble:
+      GetTouchpadFingerAvailable:
+      GetTouchpadFinger:
+      LogTo:
+      GetTelemetryType:

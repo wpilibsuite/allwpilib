@@ -30,12 +30,13 @@ struct TimestampedUnit {
       : time{time}, serverTime{serverTime}, value{value} {}
 
   /**
-   * Time in local time base.
+   * Time in local time base, in nanoseconds.
    */
   int64_t time = 0;
 
   /**
-   * Time in server time base.  May be 0 or 1 for locally set values.
+   * Time in server time base, in nanoseconds.  May be 0 or 1 for locally set
+   * values.
    */
   int64_t serverTime = 0;
 

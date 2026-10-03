@@ -6,12 +6,17 @@
 
 #include <atomic>
 #include <functional>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <GLFW/glfw3.h>
 #include <imgui.h>
+
+struct SDL_Surface;
+struct SDL_GPUDevice;
+struct SDL_Window;
+union SDL_Event;
 
 namespace wpi::gui {
 
@@ -25,24 +30,31 @@ struct SavedSettings {
   int userScale = 100;
   int style = 0;
   int fps = 120;
-  std::string defaultFontName = "Proggy Dotted";
+  std::string defaultFontName = "Roboto Regular";
 };
 
 struct Context : public SavedSettings {
   std::atomic_bool exit{false};
 
+  // Scale the style metrics were last built at, and the pre-scale style they
+  // were built from. The baseline carries any fields the app set itself.
+  float styleScale = 1.0f;
+  std::optional<ImGuiStyle> unscaledStyle;
+
   std::string title;
   int defaultWidth;
   int defaultHeight;
-  bool isPlatformRendering{false};
+  bool isRendering{false};
 
-  GLFWwindow* window = nullptr;
+  SDL_Window* window = nullptr;
+  SDL_GPUDevice* gpuDevice = nullptr;
 
   std::function<void()> loadSettings;
   std::function<void()> loadIniSettings;
   std::function<void(bool exiting)> saveSettings;
   std::vector<std::function<void()>> initializers;
   std::vector<std::function<void(float scale)>> windowScalers;
+  std::vector<std::function<void()>> exitHandlers;
   class FontMaker {
    public:
     FontMaker(
@@ -63,26 +75,18 @@ struct Context : public SavedSettings {
   std::vector<FontMaker> makeFonts;
 
   ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  std::vector<std::function<void(SDL_Event& event)>> eventHandlers;
   std::vector<std::function<void()>> earlyExecutors;
   std::vector<std::function<void()>> lateExecutors;
+  std::vector<std::function<void()>> preSwapExecutors;
+  std::vector<std::function<void()>> postSwapExecutors;
 
-  std::vector<GLFWimage> icons;
+  std::vector<SDL_Surface*> icons;
 
   std::string iniPath = "imgui.ini";
   bool resetOnExit = false;
 };
 
 extern Context* gContext;
-
-void PlatformCreateContext();
-void PlatformDestroyContext();
-void PlatformGlfwInitHints();
-void PlatformGlfwWindowHints();
-bool PlatformInitRenderer();
-void PlatformRenderFrame();
-void PlatformShutdown();
-void PlatformFramebufferSizeChanged(int width, int height);
-
-void CommonRenderFrame();
 
 }  // namespace wpi::gui

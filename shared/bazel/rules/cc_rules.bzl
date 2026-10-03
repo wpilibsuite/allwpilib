@@ -214,7 +214,6 @@ def third_party_cc_lib_helper(
         ]),
         includes = [include_root],
         defines = defines,
-        strip_include_prefix = include_root,
         visibility = visibility,
     )
 
@@ -318,7 +317,7 @@ def wpilib_cc_library(
     if hdrs_pkg_root:
         pkg_files(
             name = name + "-hdrs-pkg",
-            srcs = native.glob([hdrs_pkg_root + "/**"]),
+            srcs = native.glob([hdrs_pkg_root + "/**"], allow_empty = True),
             strip_prefix = hdrs_pkg_root,
             visibility = visibility,
         )
@@ -441,8 +440,8 @@ def wpilib_cc_shared_library(
     _split_debug_symbols(
         name = name + "-symbolsplit",
         copy = select({
-            "@rules_bzlmodrio_toolchains//conditions:linux_arm64": False,
-            "@rules_bzlmodrio_toolchains//conditions:linux_x86_64": True,
+            "@wpilib_toolchains//conditions:linux_arm64": False,
+            "@wpilib_toolchains//conditions:linux_x86_64": True,
             "//conditions:default": True,
         }),
         use_debug_name = select({
@@ -455,13 +454,13 @@ def wpilib_cc_shared_library(
     pkg_files(
         name = folder + "/lib" + lib + "-shared-files",
         srcs = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": [universal_name],
+            "@wpilib_toolchains//conditions:osx": [universal_name],
             "//conditions:default": [
                 ":" + name + "-symbolsplit",
             ],
         }),
         strip_prefix = select({
-            "@rules_bzlmodrio_toolchains//conditions:osx": "universal",
+            "@wpilib_toolchains//conditions:osx": "universal",
             "//conditions:default": None,
         }),
         visibility = visibility,
@@ -654,11 +653,15 @@ def wpilib_cc_static_library(
         name,
         static_lib_name = None,
         **kwargs):
+    folder, lib = _folder_prefix(name)
+
+    # A caller-supplied name is the archive's name in every configuration, so
+    # the debug build keeps the release name rather than adding a "d".
+    renamed_in_debug = not static_lib_name
     if not static_lib_name:
-        folder, lib = _folder_prefix(name)
         static_lib_name = select({
             "//shared/bazel/rules:compilation_mode_dbg": folder + "/lib" + lib + "d.a",
-            "//shared/bazel/rules:compilation_mode_windows_dbg": folder + "/" + lib + ".lib",
+            "//shared/bazel/rules:compilation_mode_windows_dbg": folder + "/" + lib + "d.lib",
             "@platforms//os:windows": folder + "/" + lib + ".lib",
             "//conditions:default": folder + "/lib" + lib + ".a",
         })
@@ -668,6 +671,53 @@ def wpilib_cc_static_library(
         static_lib_name = static_lib_name,
         **kwargs
     )
+
+    # macOS ships one archive covering both CPUs, and a single build only
+    # produces the CPU it was built for. The same universal_binary
+    # wpilib_cc_shared_library makes, once per name the archive can have: a
+    # rule's name cannot select on the compilation mode the way static_lib_name
+    # does, so a debug build that renames the archive gets a target of its own.
+    universal_libs = ["lib" + lib + ".a"]
+    if renamed_in_debug:
+        universal_libs.append("lib" + lib + "d.a")
+    for universal_lib in universal_libs:
+        universal_binary(
+            name = "universal/" + universal_lib,
+            binary = name,
+            target_compatible_with = [
+                "@platforms//os:osx",
+            ],
+        )
+
+    # What to package. The choice lives here because this is the only place
+    # that knows whether static_lib_name renames the archive in a debug build;
+    # wpilib_cc_static_library_files() is called from packaging macros that
+    # never see it.
+    native.alias(
+        name = name + ".package_archive",
+        actual = select({
+            "@wpilib_toolchains//conditions:osx": ":universal/" + universal_libs[0],
+            "@wpilib_toolchains//conditions:osx_debug": ":universal/" + universal_libs[-1],
+            "//conditions:default": ":" + name,
+        }),
+        visibility = kwargs.get("visibility"),
+    )
+
+def wpilib_cc_static_library_files(name):
+    """The archive wpilib_cc_static_library(name) built, for packaging.
+
+    On macOS that is the universal one, under whatever name static_lib_name
+    gave the archive.
+    """
+    return [":" + name + ".package_archive"]
+
+def wpilib_cc_static_library_strip_prefix(name):
+    """The strip_prefix that pairs with wpilib_cc_static_library_files(name)."""
+    folder, _lib = _folder_prefix(name)
+    return select({
+        "@wpilib_toolchains//conditions:osx": "universal",
+        "//conditions:default": folder,
+    })
 
 def _generate_def_windows_impl(ctx):
     # Generate the .def file for Windows.  Do this by finding the .obj files
@@ -716,7 +766,8 @@ def _generate_def_windows_impl(ctx):
                     break
 
         if def_parser != None:
-            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, ctx.label.name)
+            dll_name = ctx.attr.dll_name if ctx.attr.dll_name else ctx.label.name
+            generated_def_file = generate_def_file(ctx, def_parser, filtered_object_files, dll_name)
 
         win_def_file = [generated_def_file]
 
@@ -735,6 +786,10 @@ _generate_def_windows = rule(
 List of all static libraries to not duplicate .o files from.
 """,
         ),
+        "dll_name": attr.string(
+            default = "",
+            doc = "Override the LIBRARY name in the generated .def file.  Defaults to the rule name.",
+        ),
         "filters": attr.string_list(),
         "_def_parser": attr.label(default = "@bazel_tools//tools/def_parser:def_parser", allow_single_file = True, cfg = "exec"),
     } | CC_TOOLCHAIN_ATTRS,
@@ -742,11 +797,15 @@ List of all static libraries to not duplicate .o files from.
     fragments = ["cpp"],
 )
 
-def generate_def_windows(name, deps = None, **kwargs):
+def generate_def_windows(name, deps = None, dll_name = "", **kwargs):
     """Generates a .def file for linking a windows .dll for the provided cc_library and filters
 
     Args:
       deps: A list of cc_libraries to export symbols from.
+      dll_name: Override the LIBRARY directive in the generated .def file.  If
+                not specified, the rule's own name is used.  Set this to the
+                base name of the output DLL (without .dll extension) so that
+                the LIBRARY directive matches the DLL filename at runtime.
       filters: All object files in the provided cc_libraries (but not their
                dependencies) are checked against this list.  If a string in
                this list appears inside the name of the object file, it is
@@ -755,6 +814,7 @@ def generate_def_windows(name, deps = None, **kwargs):
     _generate_def_windows(
         name = name,
         deps = deps,
+        dll_name = dll_name,
         target_compatible_with = ["@platforms//os:windows"],
         **kwargs
     )

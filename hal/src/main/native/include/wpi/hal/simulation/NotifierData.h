@@ -13,12 +13,12 @@ extern "C" {
 struct HALSIM_NotifierInfo {
   HAL_NotifierHandle handle;
   char name[64];
-  uint64_t alarmTime;
-  uint64_t intervalTime;
+  int64_t alarmTime;
+  int64_t intervalTime;
   int32_t overrunCount;
 };
 
-uint64_t HALSIM_GetNextNotifierTimeout(void);
+int64_t HALSIM_GetNextNotifierTimeout(void);
 
 int32_t HALSIM_GetNumNotifiers(void);
 

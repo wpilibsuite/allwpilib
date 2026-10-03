@@ -5,9 +5,9 @@
 #include "wpi/math/kinematics/struct/ChassisVelocitiesStruct.hpp"
 
 namespace {
-constexpr size_t kVxOff = 0;
-constexpr size_t kVyOff = kVxOff + 8;
-constexpr size_t kOmegaOff = kVyOff + 8;
+constexpr size_t VX_OFF = 0;
+constexpr size_t VY_OFF = VX_OFF + 8;
+constexpr size_t OMEGA_OFF = VY_OFF + 8;
 }  // namespace
 
 using StructType = wpi::util::Struct<wpi::math::ChassisVelocities>;
@@ -15,17 +15,17 @@ using StructType = wpi::util::Struct<wpi::math::ChassisVelocities>;
 wpi::math::ChassisVelocities StructType::Unpack(std::span<const uint8_t> data) {
   return wpi::math::ChassisVelocities{
       wpi::units::meters_per_second_t{
-          wpi::util::UnpackStruct<double, kVxOff>(data)},
+          wpi::util::UnpackStruct<double, VX_OFF>(data)},
       wpi::units::meters_per_second_t{
-          wpi::util::UnpackStruct<double, kVyOff>(data)},
+          wpi::util::UnpackStruct<double, VY_OFF>(data)},
       wpi::units::radians_per_second_t{
-          wpi::util::UnpackStruct<double, kOmegaOff>(data)},
+          wpi::util::UnpackStruct<double, OMEGA_OFF>(data)},
   };
 }
 
 void StructType::Pack(std::span<uint8_t> data,
                       const wpi::math::ChassisVelocities& value) {
-  wpi::util::PackStruct<kVxOff>(data, value.vx.value());
-  wpi::util::PackStruct<kVyOff>(data, value.vy.value());
-  wpi::util::PackStruct<kOmegaOff>(data, value.omega.value());
+  wpi::util::PackStruct<VX_OFF>(data, value.vx.value());
+  wpi::util::PackStruct<VY_OFF>(data, value.vy.value());
+  wpi::util::PackStruct<OMEGA_OFF>(data, value.omega.value());
 }

@@ -1,11 +1,11 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_junit5_test", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "robotpy_library")
@@ -23,10 +23,13 @@ py_binary(
     name = "generate_hids",
     srcs = ["generate_hids.py"],
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 filegroup(
@@ -74,6 +77,8 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ntcore",
+        "//telemetry",
+        "//tunables",
         "//wpilibc",
         "//wpinet",
     ],
@@ -84,6 +89,8 @@ wpilib_cc_shared_library(
     dynamic_deps = [
         "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpilibc:shared/wpilibc",
         "//wpimath:shared/wpimath",
         "//wpinet:shared/wpinet",
@@ -97,6 +104,8 @@ wpilib_cc_static_library(
     name = "static/commandsv2",
     static_deps = [
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpilibc:static/wpilibc",
         "//wpinet:static/wpinet",
     ],
@@ -108,14 +117,22 @@ wpilib_java_library(
     name = "commandsv2-java",
     srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     exported_plugins = ["//javacPlugin:plugin"],
+    javacopts = patch_module(
+        "wpilib.command2",
+        ["commandsv2/src/generated/main/java"],
+    ) + [
+        # Silence compiler warnings about trailing digits in module names
+        "-Xlint:-module",
+    ],
     maven_artifact_name = "commandsv2-java",
     maven_group_id = "org.wpilib.commandsv2",
     plugins = ["//javacPlugin:plugin"],
     visibility = ["//visibility:public"],
     deps = [
-        "//cscore:cscore-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -138,19 +155,21 @@ cc_test(
     ],
     deps = [
         ":commandsv2",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
 wpilib_java_junit5_test(
     name = "commandsv2-java-test",
-    srcs = glob(["src/main/java/**/*.java"]),
+    srcs = glob(["src/test/java/**/*.java"]),
     resource_strip_prefix = "commandsv2/src/test/resources",
     resources = glob(["src/test/resources/**"]),
     deps = [
         ":commandsv2-java",
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpiannotations",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
@@ -193,9 +212,10 @@ robotpy_library(
     author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
     description_file = "src/main/python/README.md",
     distribution = "robotpy-commands-v2",
+    extra_distinfo_files = {"src/main/python/LICENSE": "licenses/LICENSE"},
     imports = ["src/main/python"],
     project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
-    python_requires = ">=3.10",
+    python_requires = ">=3.11",
     requires = [
         "wpilib==0.0.0",
         "typing_extensions>=4.1.0,<5",

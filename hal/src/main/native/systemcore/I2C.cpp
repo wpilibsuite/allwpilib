@@ -11,8 +11,7 @@
 #include <unistd.h>
 
 #include <cstring>
-
-#include <fmt/format.h>
+#include <format>
 
 #include "HALInitializer.hpp"
 #include "PortsInternal.hpp"
@@ -24,8 +23,8 @@
 using namespace wpi::hal;
 
 namespace {
-constexpr const char* physicalPorts[kNumI2cBuses] = {"/dev/i2c-10",
-                                                     "/dev/i2c-1"};
+constexpr const char* physicalPorts[NUM_I2C_BUSES] = {"/dev/i2c-10",
+                                                      "/dev/i2c-1"};
 
 struct I2C {
   wpi::util::mutex initMutex;
@@ -33,7 +32,7 @@ struct I2C {
   int fd = -1;
 };
 
-static I2C i2cObjs[kNumI2cBuses];
+static I2C i2cObjs[NUM_I2C_BUSES];
 }  // namespace
 
 namespace wpi::hal::init {
@@ -60,7 +59,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
     int err = errno;
     *status = MakeError(
         HAL_NO_AVAILABLE_RESOURCES,
-        fmt::format("Failed to open onboard i2c bus: {}", std::strerror(err)));
+        std::format("Failed to open onboard i2c bus: {}", std::strerror(err)));
     wpi::util::print("Failed to open onboard i2c bus: {}\n",
                      std::strerror(err));
     handle = -1;

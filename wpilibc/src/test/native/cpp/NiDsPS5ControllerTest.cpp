@@ -4,7 +4,8 @@
 
 #include "wpi/driverstation/NiDsPS5Controller.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "JoystickTestMacros.hpp"
 #include "wpi/simulation/NiDsPS5ControllerSim.hpp"

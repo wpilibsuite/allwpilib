@@ -4,11 +4,10 @@
 
 #include "wpi/halsim/ws_core/WSProvider_Solenoid.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
-
-#include <fmt/format.h>
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/simulation/CTREPCMData.h"
@@ -29,7 +28,7 @@ void HALSimWSProviderSolenoid::Initialize(WSRegisterFunc webRegisterFunc) {
        ++CTREPCMIndex) {
     for (int32_t solenoidIndex = 0;
          solenoidIndex < HAL_GetNumCTRESolenoidChannels(); ++solenoidIndex) {
-      auto key = fmt::format("Solenoid/{},{}", CTREPCMIndex, solenoidIndex);
+      auto key = std::format("Solenoid/{},{}", CTREPCMIndex, solenoidIndex);
       auto ptr = std::make_unique<HALSimWSProviderSolenoid>(
           CTREPCMIndex, solenoidIndex, key, "Solenoid");
       webRegisterFunc(key, std::move(ptr));
@@ -44,7 +43,7 @@ HALSimWSProviderSolenoid::HALSimWSProviderSolenoid(int32_t CTREPCMChannel,
     : HALSimWSHalProvider(key, type),
       m_pcmIndex(CTREPCMChannel),
       m_solenoidIndex(solenoidChannel) {
-  m_deviceId = fmt::format("{},{}", m_pcmIndex, solenoidChannel);
+  m_deviceId = std::format("{},{}", m_pcmIndex, solenoidChannel);
 }
 
 HALSimWSProviderSolenoid::~HALSimWSProviderSolenoid() {

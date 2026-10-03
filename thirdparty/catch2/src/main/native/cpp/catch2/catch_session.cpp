@@ -21,6 +21,7 @@
 #include <catch2/reporters/catch_reporter_multi.hpp>
 #include <catch2/internal/catch_reporter_registry.hpp>
 #include <catch2/interfaces/catch_interfaces_reporter_factory.hpp>
+#include <catch2/interfaces/catch_interfaces_registry_hub.hpp>
 #include <catch2/internal/catch_move_and_forward.hpp>
 #include <catch2/internal/catch_stdstreams.hpp>
 #include <catch2/internal/catch_istream.hpp>
@@ -51,6 +52,7 @@ namespace Catch {
                     ReporterConfig( config,
                                     makeStream( spec.outputFilename ),
                                     spec.colourMode,
+                                    spec.verbosity,
                                     spec.customOptions ) );
             }
 
@@ -67,6 +69,7 @@ namespace Catch {
                     ReporterConfig( config,
                                     makeStream( reporterSpec.outputFilename ),
                                     reporterSpec.colourMode,
+                                    reporterSpec.verbosity,
                                     reporterSpec.customOptions ) ) );
             }
 
@@ -137,9 +140,7 @@ namespace Catch {
         };
 
         void applyFilenamesAsTags() {
-            for (auto const& testInfo : getRegistryHub().getTestCaseRegistry().getAllInfos()) {
-                testInfo->addFilenameTag();
-            }
+            getMutableRegistryHub().getMutableTestCaseRegistry().enableFilenameTags();
         }
 
         // Creates empty file at path. The path must be writable, we do not
@@ -344,6 +345,19 @@ namespace Catch {
 
         CATCH_TRY {
             config(); // Force config to be constructed
+
+            if ( m_config->shardCount() > 1 &&
+                 m_config->runOrder() == TestRunOrder::Randomized &&
+                 !m_config->rngSeedWasFixed() ) {
+                Catch::cerr()
+                    << "Warning: using sharding (--shard-count) with random "
+                       "order (--order rand, the default) and without a fixed "
+                       "numeric --rng-seed does not guarantee disjoint coverage "
+                       "between shard invocations. Pass the same numeric "
+                       "--rng-seed to every shard, or use --order decl or "
+                       "--order lex instead.\n"
+                    << std::flush;
+            }
 
             // We need to retrieve potential Bazel config with the full Config
             // constructor, so we have to create the guard file after it is created.

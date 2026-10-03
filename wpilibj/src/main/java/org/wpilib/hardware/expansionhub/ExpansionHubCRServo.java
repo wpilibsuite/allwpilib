@@ -50,7 +50,7 @@ public class ExpansionHubCRServo implements AutoCloseable {
       throw new AllocationException("ExpansionHub CR Servo already allocated");
     }
 
-    m_hub.reportUsage("ExHubCRServo[" + channel + "]", "ExHubCRServo");
+    m_hub.reportUsage("ExHubCRServo", channel, "ExHubCRServo");
 
     NetworkTableInstance systemServer = SystemServer.getSystemServer();
 

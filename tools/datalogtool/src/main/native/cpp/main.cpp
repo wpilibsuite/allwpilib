@@ -6,6 +6,7 @@
 
 void Application(std::string_view saveDir);
 
+#ifndef RUNNING_IMGUI_TESTS
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
@@ -23,3 +24,4 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+#endif

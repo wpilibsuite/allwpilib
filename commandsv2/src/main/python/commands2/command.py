@@ -21,7 +21,8 @@ if TYPE_CHECKING:
     from .conditionalcommand import ConditionalCommand
     from .wrappercommand import WrapperCommand
 
-from wpiutil import Sendable, SendableRegistry, SendableBuilder
+from telemetry import TelemetryLoggable, TelemetryTable
+from tunables import ComplexTunable, TunableTable
 
 
 class InterruptionBehavior(Enum):
@@ -30,7 +31,7 @@ class InterruptionBehavior(Enum):
     scheduled.
     """
 
-    kCancelIncoming = 0
+    CANCEL_INCOMING = 0
     """
     This command ends, :func:`commands2.Command.end` is called, and the incoming command is
     scheduled normally.
@@ -38,11 +39,11 @@ class InterruptionBehavior(Enum):
     This is the default behavior.
     """
 
-    kCancelSelf = 1
+    CANCEL_SELF = 1
     """ This command continues, and the incoming command is not scheduled."""
 
 
-class Command(Sendable):
+class Command(TelemetryLoggable, ComplexTunable):
     """
     A state machine representing a complete action to be performed by the robot. Commands are run by
     the :class:`commands2.CommandScheduler`, and can be composed into CommandGroups to allow users to build
@@ -62,9 +63,8 @@ class Command(Sendable):
         instance = super().__new__(
             cls,
         )
-        super().__init__(instance)
-        SendableRegistry.add(instance, cls.__name__)
         instance.requirements = set()
+        instance._name = cls.__name__
         return instance
 
     def __init__(self):
@@ -83,13 +83,13 @@ class Command(Sendable):
         The action to take when the command ends. Called when either the command finishes normally, or
         when it interrupted/canceled.
 
-        Do not schedule commands here that share requirements with this command. Use :meth:`.andThen` instead.
+        Do not schedule commands here that share requirements with this command. Use :meth:`.and_then` instead.
 
         :param interrupted: whether the command was interrupted/canceled
         """
         pass
 
-    def isFinished(self) -> bool:
+    def is_finished(self) -> bool:
         """
         Whether the command has finished. Once a command finishes, the scheduler will call its :meth:`commands2.Command.end`
         method and un-schedule it.
@@ -98,10 +98,10 @@ class Command(Sendable):
         """
         return False
 
-    def getRequirements(self) -> Set[Subsystem]:
+    def get_requirements(self) -> Set[Subsystem]:
         """
         Specifies the set of subsystems used by this command. Two commands cannot use the same
-        subsystem at the same time. If another command is scheduled that shares a requirement, :meth:`.getInterruptionBehavior` will be checked and followed. If no subsystems are required, return
+        subsystem at the same time. If another command is scheduled that shares a requirement, :meth:`.get_interruption_behavior` will be checked and followed. If no subsystems are required, return
         an empty set.
 
         .. note:: it is recommended that user implementations contain the requirements as a field, and
@@ -111,7 +111,7 @@ class Command(Sendable):
         """
         return self.requirements
 
-    def addRequirements(self, *requirements: Subsystem):
+    def add_requirements(self, *requirements: Subsystem):
         """
         Adds the specified subsystems to the requirements of the command. The scheduler will prevent
         two commands that require the same subsystem from being scheduled simultaneously.
@@ -123,39 +123,23 @@ class Command(Sendable):
         """
         self.requirements.update(requirements)
 
-    def getName(self) -> str:
+    def get_name(self) -> str:
         """
         Gets the name of this Command.
 
         :returns: Name
         """
-        return SendableRegistry.getName(self)
+        return self._name
 
-    def setName(self, name: str):
+    def set_name(self, name: str):
         """
         Sets the name of this Command.
 
         :param name: Name
         """
-        SendableRegistry.setName(self, name)
+        self._name = name
 
-    def getSubsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return SendableRegistry.getSubsystem(self)
-
-    def setSubsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        SendableRegistry.setSubsystem(self, subsystem)
-
-    def withTimeout(self, seconds: float) -> ParallelRaceGroup:
+    def with_timeout(self, seconds: float) -> ParallelRaceGroup:
         """
         Decorates this command with a timeout. If the specified timeout is exceeded before the command
         finishes normally, the command will be interrupted and un-scheduled. Note that the timeout only
@@ -165,7 +149,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -174,7 +158,7 @@ class Command(Sendable):
         """
         from .waitcommand import WaitCommand
 
-        return self.raceWith(WaitCommand(seconds))
+        return self.race_with(WaitCommand(seconds))
 
     def until(self, condition: Callable[[], bool]) -> ParallelRaceGroup:
         """
@@ -185,7 +169,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -194,9 +178,9 @@ class Command(Sendable):
         """
         from .waituntilcommand import WaitUntilCommand
 
-        return self.raceWith(WaitUntilCommand(condition))
+        return self.race_with(WaitUntilCommand(condition))
 
-    def onlyWhile(self, condition: Callable[[], bool]) -> ParallelRaceGroup:
+    def only_while(self, condition: Callable[[], bool]) -> ParallelRaceGroup:
         """
         Decorates this command with a run condition. If the specified condition becomes false before
         the command finishes normally, the command will be interrupted and un-scheduled.
@@ -205,7 +189,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -215,7 +199,7 @@ class Command(Sendable):
         assert callable(condition)
         return self.until(lambda: not condition())
 
-    def beforeStarting(
+    def before_starting(
         self, before: Union[Command, Callable[[], None]]
     ) -> SequentialCommandGroup:
         """
@@ -225,7 +209,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -240,7 +224,7 @@ class Command(Sendable):
 
         return SequentialCommandGroup(before, self)
 
-    def andThen(self, *next: Command) -> SequentialCommandGroup:
+    def and_then(self, *next: Command) -> SequentialCommandGroup:
         """
         Decorates this command with a set of commands to run after it in sequence. Often more
         convenient/less-verbose than constructing a new SequentialCommandGroup explicitly.
@@ -249,7 +233,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -260,7 +244,7 @@ class Command(Sendable):
 
         return SequentialCommandGroup(self, *next)
 
-    def deadlineFor(self, *parallel: Command) -> ParallelDeadlineGroup:
+    def deadline_for(self, *parallel: Command) -> ParallelDeadlineGroup:
         """
         Decorates this command with a set of commands to run parallel to it, ending when the calling
         command ends and interrupting all the others. Often more convenient/less-verbose than
@@ -270,7 +254,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -281,7 +265,7 @@ class Command(Sendable):
 
         return ParallelDeadlineGroup(self, *parallel)
 
-    def alongWith(self, *parallel: Command) -> ParallelCommandGroup:
+    def along_with(self, *parallel: Command) -> ParallelCommandGroup:
         """
         Decorates this command with a set of commands to run parallel to it, ending when the last
         command ends. Often more convenient/less-verbose than constructing a new {@link
@@ -291,7 +275,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -302,7 +286,7 @@ class Command(Sendable):
 
         return ParallelCommandGroup(self, *parallel)
 
-    def raceWith(self, *parallel: Command) -> ParallelRaceGroup:
+    def race_with(self, *parallel: Command) -> ParallelRaceGroup:
         """
         Decorates this command with a set of commands to run parallel to it, ending when the first
         command ends. Often more convenient/less-verbose than constructing a new {@link
@@ -312,7 +296,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -332,7 +316,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -342,7 +326,7 @@ class Command(Sendable):
 
         return RepeatCommand(self)
 
-    def asProxy(self) -> ProxyCommand:
+    def as_proxy(self) -> ProxyCommand:
         """
         Decorates this command to run "by proxy" by wrapping it in a ProxyCommand. Use this for
         "forking off" from command compositions when the user does not wish to extend the command's
@@ -365,7 +349,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -377,7 +361,7 @@ class Command(Sendable):
 
         return ConditionalCommand(InstantCommand(), self, condition)
 
-    def onlyIf(self, condition: Callable[[], bool]) -> ConditionalCommand:
+    def only_if(self, condition: Callable[[], bool]) -> ConditionalCommand:
         """
         Decorates this command to only run if this condition is met. If the command is already running
         and the condition changes to false, the command will not stop running. The requirements of this
@@ -387,7 +371,7 @@ class Command(Sendable):
                   The command the decorator was called on cannot be scheduled
                   independently or be added to a different composition (namely,
                   decorators), unless it is manually cleared from the list of composed
-                  commands with :func:`commands2.CommandScheduler.removeComposedCommand`.
+                  commands with :func:`commands2.CommandScheduler.remove_composed_command`.
                   The command composition returned from this method can be further
                   decorated without issue.
 
@@ -396,37 +380,37 @@ class Command(Sendable):
         """
         return self.unless(lambda: not condition())
 
-    def ignoringDisable(self, doesRunWhenDisabled: bool) -> WrapperCommand:
+    def ignoring_disable(self, does_run_when_disabled: bool) -> WrapperCommand:
         """
         Decorates this command to run or stop when disabled.
 
-        :param doesRunWhenDisabled: true to run when disabled.
+        :param does_run_when_disabled: true to run when disabled.
         :returns: the decorated command
         """
         from .wrappercommand import WrapperCommand
 
         class W(WrapperCommand):
-            def runsWhenDisabled(self) -> bool:
-                return doesRunWhenDisabled
+            def runs_when_disabled(self) -> bool:
+                return does_run_when_disabled
 
         return W(self)
 
-    def withInterruptBehavior(self, behavior: InterruptionBehavior) -> WrapperCommand:
+    def with_interrupt_behavior(self, behavior: InterruptionBehavior) -> WrapperCommand:
         """
         Decorates this command to have a different InterruptionBehavior interruption behavior.
 
-        :param interruptBehavior: the desired interrupt behavior
+        :param behavior: the desired interrupt behavior
         :returns: the decorated command
         """
         from .wrappercommand import WrapperCommand
 
         class W(WrapperCommand):
-            def getInterruptionBehavior(self) -> InterruptionBehavior:
+            def get_interruption_behavior(self) -> InterruptionBehavior:
                 return behavior
 
         return W(self)
 
-    def finallyDo(self, end: Callable[[bool], Any]) -> WrapperCommand:
+    def finally_do(self, end: Callable[[bool], Any]) -> WrapperCommand:
         """
         Decorates this command with a lambda to call on interrupt or end, following the command's
         inherent :func:`commands2.Command.end` method.
@@ -444,7 +428,7 @@ class Command(Sendable):
 
         return W(self)
 
-    def handleInterrupt(self, handler: Callable[[], Any]) -> WrapperCommand:
+    def handle_interrupt(self, handler: Callable[[], Any]) -> WrapperCommand:
         """
         Decorates this command with a lambda to call on interrupt, following the command's inherent
         :func:`commands2.Command.end` method.
@@ -452,13 +436,13 @@ class Command(Sendable):
         :param handler: a lambda to run when the command is interrupted
         :returns: the decorated command
         """
-        return self.finallyDo(lambda interrupted: handler() if interrupted else None)
+        return self.finally_do(lambda interrupted: handler() if interrupted else None)
 
     def schedule(self) -> None:
         """Schedules this command."""
         from .commandscheduler import CommandScheduler
 
-        CommandScheduler.getInstance().schedule(self)
+        CommandScheduler.get_instance().schedule(self)
 
     def cancel(self) -> None:
         """
@@ -467,9 +451,9 @@ class Command(Sendable):
         """
         from .commandscheduler import CommandScheduler
 
-        CommandScheduler.getInstance().cancel(self)
+        CommandScheduler.get_instance().cancel(self)
 
-    def isScheduled(self) -> bool:
+    def is_scheduled(self) -> bool:
         """
         Whether the command is currently scheduled. Note that this does not detect whether the command
         is in a composition, only whether it is directly being run by the scheduler.
@@ -478,9 +462,9 @@ class Command(Sendable):
         """
         from .commandscheduler import CommandScheduler
 
-        return CommandScheduler.getInstance().isScheduled(self)
+        return CommandScheduler.get_instance().is_scheduled(self)
 
-    def hasRequirement(self, requirement: Subsystem) -> bool:
+    def has_requirement(self, requirement: Subsystem) -> bool:
         """
         Whether the command requires a given subsystem.
 
@@ -489,15 +473,15 @@ class Command(Sendable):
         """
         return requirement in self.requirements
 
-    def getInterruptionBehavior(self) -> InterruptionBehavior:
+    def get_interruption_behavior(self) -> InterruptionBehavior:
         """
         How the command behaves when another command with a shared requirement is scheduled.
 
-        :returns: a variant of InterruptionBehavior, defaulting to {@link InterruptionBehavior#kCancelSelf kCancelSelf}.
+        :returns: a variant of InterruptionBehavior, defaulting to {@link InterruptionBehavior#K_CANCEL_SELF K_CANCEL_SELF}.
         """
-        return InterruptionBehavior.kCancelSelf
+        return InterruptionBehavior.CANCEL_SELF
 
-    def runsWhenDisabled(self) -> bool:
+    def runs_when_disabled(self) -> bool:
         """
         Whether the given command should run when the robot is disabled. Override to return true if the
         command should run when disabled.
@@ -506,7 +490,7 @@ class Command(Sendable):
         """
         return False
 
-    def withName(self, name: str) -> WrapperCommand:
+    def with_name(self, name: str) -> WrapperCommand:
         """
         Decorates this command with a name.
 
@@ -516,44 +500,33 @@ class Command(Sendable):
         from .wrappercommand import WrapperCommand
 
         wrapper = WrapperCommand(self)
-        wrapper.setName(name)
+        wrapper.set_name(name)
         return wrapper
 
-    def initSendable(self, builder: SendableBuilder) -> None:
+    def log_to(self, table: TelemetryTable) -> None:
         from .commandscheduler import CommandScheduler
 
-        builder.setSmartDashboardType("Command")
-        builder.addStringProperty(
-            ".name",
-            self.getName,
-            lambda _: None,
-        )
+        table.log("name", self.get_name())
+        table.log("running", self.is_scheduled())
+        table.log("isParented", CommandScheduler.get_instance().is_composed(self))
+        table.log("interruptBehavior", self.get_interruption_behavior().name)
+        table.log("runsWhenDisabled", self.runs_when_disabled())
+
+    def get_telemetry_type(self) -> str:
+        return "Command"
+
+    def publish_tunables(self, table: TunableTable) -> None:
 
         def on_set(value: bool) -> None:
             if value:
-                if not self.isScheduled():
+                if not self.is_scheduled():
                     self.schedule()
             else:
-                if self.isScheduled():
+                if self.is_scheduled():
                     self.cancel()
 
-        builder.addBooleanProperty(
-            "running",
-            self.isScheduled,
-            on_set,
-        )
-        builder.addBooleanProperty(
-            ".isParented",
-            lambda: CommandScheduler.getInstance().isComposed(self),
-            lambda _: None,
-        )
-        builder.addStringProperty(
-            "interruptBehavior",
-            lambda: self.getInterruptionBehavior().name,
-            lambda _: None,
-        )
-        builder.addBooleanProperty(
-            "runsWhenDisabled",
-            self.runsWhenDisabled,
-            lambda _: None,
-        )
+        table.publish_string("name", self.get_name, self.set_name, mutable=False)
+        table.publish_boolean("running", self.is_scheduled, on_set)
+
+    def get_tunable_type(self) -> str:
+        return "Command"

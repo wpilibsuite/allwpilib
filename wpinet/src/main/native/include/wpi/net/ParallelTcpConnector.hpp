@@ -113,6 +113,8 @@ class ParallelTcpConnector
  private:
   bool IsConnected() const { return m_isConnected || m_servers.empty(); }
   void Connect();
+  void StartConnectionAttempt(const sockaddr& address, socklen_t addressLen,
+                              uv::GetAddrInfoReq* resolver);
   void CancelAll(wpi::net::uv::Tcp* except = nullptr);
 
   wpi::net::uv::Loop& m_loop;

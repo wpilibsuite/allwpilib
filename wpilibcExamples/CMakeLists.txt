@@ -11,6 +11,8 @@ add_custom_target(wpilibcExamples)
 add_custom_target(wpilibcExamples_test)
 add_custom_target(wpilibcExamples_snippets)
 
+set(camera_server_snippets AprilTagsVision HttpCamera IntermediateVision QuickVision)
+
 foreach(example ${EXAMPLES})
     file(
         GLOB_RECURSE sources
@@ -23,6 +25,8 @@ foreach(example ${EXAMPLES})
     target_link_libraries(
         ${example}
         apriltag
+        drivers
+        fields
         wpilibc
         commandsv2
         romiVendordep
@@ -30,7 +34,10 @@ foreach(example ${EXAMPLES})
     )
     add_dependencies(wpilibcExamples ${example})
 
-    if(WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example})
+    if(
+        WPILIB_WITH_TESTS
+        AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/examples/${example}
+    )
         wpilib_add_test(Example_${example} src/test/cpp/examples/${example}/cpp)
         target_sources(Example_${example}_test PRIVATE ${sources})
         target_include_directories(
@@ -43,11 +50,12 @@ foreach(example ${EXAMPLES})
         target_link_libraries(
             Example_${example}_test
             apriltag
+            drivers
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Example_${example}_test)
     endif()
@@ -62,11 +70,27 @@ foreach(template ${TEMPLATES})
     add_executable(${template} ${sources})
     wpilib_target_warnings(${template})
     target_include_directories(${template} PUBLIC src/main/cpp/templates/${template}/include)
-    target_link_libraries(${template} wpilibc commandsv2 romiVendordep xrpVendordep)
+    target_link_libraries(
+        ${template}
+        drivers
+        wpilibc
+        commandsv2
+        fields
+        romiVendordep
+        xrpVendordep
+    )
     add_dependencies(wpilibcExamples ${template})
 endforeach()
 
 foreach(snippet ${SNIPPETS})
+    set(snippet_extra_libs)
+    if(snippet IN_LIST camera_server_snippets)
+        if(NOT TARGET cameraserver)
+            continue()
+        endif()
+        list(APPEND snippet_extra_libs cameraserver)
+    endif()
+
     file(
         GLOB_RECURSE sources
         src/main/cpp/snippets/${snippet}/cpp/*.cpp
@@ -78,14 +102,20 @@ foreach(snippet ${SNIPPETS})
     target_link_libraries(
         snippet${snippet}
         apriltag
+        drivers
+        fields
         wpilibc
         commandsv2
         romiVendordep
         xrpVendordep
+        ${snippet_extra_libs}
     )
     add_dependencies(wpilibcExamples_snippets snippet${snippet})
 
-    if(WITH_TESTS AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet})
+    if(
+        WPILIB_WITH_TESTS
+        AND EXISTS ${CMAKE_SOURCE_DIR}/wpilibcExamples/src/test/cpp/snippets/${snippet}
+    )
         wpilib_add_test(Snippet_${snippet} src/test/cpp/snippets/${snippet}/cpp)
         target_sources(Snippet_${snippet}_test PRIVATE ${sources})
         target_include_directories(
@@ -98,11 +128,12 @@ foreach(snippet ${SNIPPETS})
         target_link_libraries(
             Snippet_${snippet}_test
             apriltag
+            drivers
+            fields
             wpilibc
             commandsv2
             romiVendordep
             xrpVendordep
-            googletest
         )
         add_dependencies(wpilibcExamples_test Snippet_${snippet}_test)
     endif()

@@ -1,6 +1,6 @@
 name: Bazel
 
-on: [pull_request, push]
+on: [merge_group, pull_request, push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -12,28 +12,82 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Linux System Core", classifier: "linuxsystemcore",                 os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Debug", classifier: "linuxsystemcoredebug",            os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static", classifier: "linuxsystemcorestatic",           os: ubuntu-24.04, action: "build" }
-          - { name: "Linux System Core Static Debug", classifier: "linuxsystemcorestaticdebug",    os: ubuntu-24.04, action: "build" }
-          - { name: "Linux x86-64",      classifier: "linuxx86-64,headers,sources",     os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Debug",  classifier: "linuxx86-64debug",                os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static", classifier: "linuxx86-64static",               os: ubuntu-24.04, action: "test" }
-          - { name: "Linux x86-64 Static Debug", classifier: "linuxx86-64staticdebug",        os: ubuntu-24.04, action: "test" }
+          - name: "Linux Systemcore"
+            compilation_mode: opt
+            classifier: "linuxsystemcore,linuxsystemcorestatic"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "build"
+          - name: "Linux Systemcore"
+            compilation_mode: dbg
+            classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "build"
+          - name: "Linux x86-64"
+            compilation_mode: opt
+            classifier: "linuxx86-64,linuxx86-64static,headers,sources"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "test"
+          - name: "Linux x86-64"
+            compilation_mode: dbg
+            classifier: "linuxx86-64debug,linuxx86-64staticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+            container: wpilib/debian-base:trixie
+            action: "test"
+          - name: "macOS"
+            compilation_mode: opt
+            classifier: "osxuniversal,headers,sources,osxuniversalstatic,linuxsystemcore,linuxsystemcorestatic"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
+            container: ""
+            action: "test"
+          - name: "macOS"
+            compilation_mode: dbg
+            classifier: "osxuniversaldebug,osxuniversalstaticdebug,linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
+            container: ""
+            action: "test"
+          - name: "Windows x86-64"
+            compilation_mode: opt
+            classifier: "windowsx86-64,windowsx86-64static,headers,sources"
+            os: windows-2025
+            container: ""
+            action: "test"
+          - name: "Windows x86-64"
+            compilation_mode: dbg
+            classifier: "windowsx86-64debug,windowsx86-64staticdebug"
+            os: windows-2025
+            container: ""
+            action: "test"
+          - name: "Windows ARM64"
+            compilation_mode: opt
+            classifier: "windowsarm64,windowsarm64static"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows ARM64"
+            compilation_mode: dbg
+            classifier: "windowsarm64debug,windowsarm64staticdebug"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows Systemcore"
+            compilation_mode: opt
+            classifier: "linuxsystemcore,linuxsystemcorestatic"
+            os: windows-2025
+            container: ""
+            action: "build"
+          - name: "Windows Systemcore"
+            compilation_mode: dbg
+            classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug"
+            os: windows-2025
+            container: ""
+            action: "build"
 
-          - { name: "macOS", classifier: "osxuniversal,osxuniversaldebug,headers,sources,osxuniversalstatic,osxuniversalstaticdebug,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug", os: macOS-15, action: "test" }
-
-          - { name: "Windows x86-64",      classifier: "windowsx86-64,windowsx86-64static,headers,sources",   os: windows-2022, action: "test" }
-          - { name: "Windows x86-64 Debug", classifier: "windowsx86-64debug,windowsx86-64staticdebug",        os: windows-2022, action: "test" }
-
-          - { name: "Windows ARM64",       classifier: "windowsarm64,windowsarm64static",                    os: windows-2022, action: "build" }
-          - { name: "Windows ARM64 Debug",  classifier: "windowsarm64debug,windowsarm64staticdebug",         os: windows-2022, action: "build" }
-
-          - { name: "Windows System Core", classifier: "linuxsystemcore,linuxsystemcorestatic", os: windows-2022, action: "build" }
-          - { name: "Windows System Core Debug", classifier: "linuxsystemcoredebug,linuxsystemcorestaticdebug", os: windows-2022, action: "build" }
-
-    name: "${{ matrix.action == 'test' && 'Test' || 'Build' }} ${{ matrix.name }}"
+    name: "${{ matrix.name }} ${{ matrix.action }} (${{ matrix.compilation_mode }})"
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     steps:
       - name: Check disk free space pre-cleanup
         run: df -h
@@ -63,24 +117,32 @@ jobs:
       - name: Check disk free space post-cleanup
         run: df -h
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - name: Setup Bazel cache credentials
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Install apt dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev avahi-daemon
 
-      - if: runner.os == 'Linux'
-        uses: bazel-contrib/setup-bazel@0.15.0
+      - name: Setup avahi-daemon
+        if: runner.os == 'Linux'
+        run: |
+          sudo service dbus start
+          sudo avahi-daemon -D
+
+      - name: Setup Bazel
+        uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
           repository-cache: true
+          cache-save: ${{ github.event_name == 'push' }}
           bazelisk-version: 1.x
 
       - name: bazel ${{ matrix.action }}
@@ -91,12 +153,21 @@ jobs:
           else
             TARGETS=...
           fi
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            bazel --output_user_root=C:\\bazelroot ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
-          else
-            bazel ${ACTION} ${TARGETS} --config=ci -c opt --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}'
-          fi
+          bazel ${ACTION} -c ${{ matrix.compilation_mode }} ${TARGETS} --config=ci --repo_env=WPI_PUBLISH_CLASSIFIER_FILTER='${{ matrix.classifier }}' --execution_log_compact_file="${{ matrix.name }} Exec Log.binpb.zst"
         shell: bash
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          include-hidden-files: true
+          path: ${{ case(runner.os == 'Windows', 'D:/_bazel/command-*.profile.gz', runner.os == 'Linux', '/github/home/.bazel/command-*.profile.gz', '/Users/runner/.bazel/command-*.profile.gz') }}
+        if: always()
+
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: "${{ matrix.name }} Exec Log.binpb.zst"
+        if: always()
 
       - name: Check disk free space
         if: always()
@@ -104,25 +175,12 @@ jobs:
 
   buildifier:
     name: "buildifier"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
-      - name: Set up Go 1.15.x
-        uses: actions/setup-go@v6
-        with:
-          cache: false
-          go-version: 1.15.x
-        id: go
-
-      - name: Install Buildifier
-        run: |
-          cd $(mktemp -d)
-          GO111MODULE=on go get github.com/bazelbuild/buildtools/buildifier@6.0.0
-
-      - uses: actions/checkout@v6
-        with: { fetch-depth: 0 }
+      - uses: actions/checkout@v7
 
       - name: Run buildifier
-        run: buildifier -warnings all --lint=fix -r .
+        run: bazel run //:buildifier.fix
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
@@ -138,9 +196,9 @@ jobs:
         if: ${{ failure() }}
 
   mod-lock:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Check lockfile
         run: bazel mod deps --lockfile_mode=error
@@ -160,19 +218,20 @@ jobs:
 
   non_robotpy_pregeneration:
     name: "Non-RobotPy Pregen"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_bazel_remote
-        uses: ./.github/actions/setup-bazel-remote
+      - name: Setup Bazel cache credentials
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          username: ${{ secrets.BAZEL_CACHE_USERNAME }}
-          password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       - name: Run Non-RobotPy pregeneration
-        run: bazel run //:write_pregenerated_files
+        run: bazel run --config=ci //:write_pregenerated_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
@@ -181,7 +240,7 @@ jobs:
         run: git diff HEAD > non-robotpy-pregeneration.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: non-robotpy-pregeneration-fixes
           path: non-robotpy-pregeneration.patch
@@ -189,26 +248,28 @@ jobs:
 
   robotpy_pregeneration:
     name: "Robotpy Pregeneration"
-    runs-on: ubuntu-24.04
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
 
-      - id: Setup_build_buddy
-        uses: ./.github/actions/setup-build-buddy
+      - name: Setup Bazel cache credentials
+        uses: ./.github/actions/setup-bazel-cache
         with:
-          token: ${{ secrets.BUILDBUDDY_API_KEY }}
+          bazel_remote_username: ${{ secrets.BAZEL_CACHE_USERNAME }}
+          bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
+          buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
       # You should ensure the headers are correct before trying to pregen files
       - name: Test Scan Headers
-        run: bazel test //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
+        run: bazel test --config=ci //... -k --test_tag_filters=robotpy_scan_headers --build_tests_only
         shell: bash
 
       - name: Run yaml file generation
-        run: bazel run //:write_robotpy_update_yaml_files
+        run: bazel run --config=ci //:write_robotpy_update_yaml_files
 
       - name: Run build file generation
-        run: bazel run //:write_robotpy_generated_pybind_files
+        run: bazel run --config=ci //:write_robotpy_generated_pybind_files
 
       - name: Check Output
         run: git --no-pager diff --exit-code HEAD
@@ -217,8 +278,49 @@ jobs:
         run: git diff HEAD > robotpy-pregeneration.patch
         if: ${{ failure() }}
 
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: robotpy-pregeneration-fixes
           path: robotpy-pregeneration.patch
+        if: ${{ failure() }}
+
+  # RobotPy does not want to run the additional python linting that wpiformat
+  # implements, only the black linter. Here we run black on only the files
+  # that get transferred to the upstream mostrobotpy repository
+  robotpy_format:
+    name: "RobotPy Formatting"
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-2vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install black
+        run: |
+          python -m venv ${{ runner.temp }}/black
+          # Keep version in sync with .github/workflows/lint-format.yml
+          ${{ runner.temp }}/black/bin/pip3 install black
+      - name: Run black on RobotPy files
+        run: |
+          shopt -s globstar
+          ${{ runner.temp }}/black/bin/black **/src/main/python/**/*.py **/src/test/python/**/*.py robotpyExamples --force-exclude "thirdparty"
+      - name: Check output
+        run: git --no-pager diff --exit-code HEAD
+      - name: Generate diff
+        run: git diff HEAD > robotpy-format-fixes.patch
+        if: ${{ failure() }}
+      - uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: robotpy-format-fixes.patch
+        if: ${{ failure() }}
+      - name: Write to job summary
+        run: |
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          cat robotpy-format-fixes.patch >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
         if: ${{ failure() }}

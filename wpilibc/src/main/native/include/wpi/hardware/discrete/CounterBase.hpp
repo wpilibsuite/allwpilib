@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "wpi/units/time.hpp"
-
 namespace wpi {
 
 /**
@@ -30,8 +28,6 @@ class CounterBase {
 
   virtual int Get() const = 0;
   virtual void Reset() = 0;
-  virtual wpi::units::second_t GetPeriod() const = 0;
-  virtual void SetMaxPeriod(wpi::units::second_t maxPeriod) = 0;
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };

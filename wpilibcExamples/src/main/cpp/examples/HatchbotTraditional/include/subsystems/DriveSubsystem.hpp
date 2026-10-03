@@ -7,7 +7,7 @@
 #include "Constants.hpp"
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/drive/DifferentialDrive.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 
 class DriveSubsystem : public wpi::cmd::SubsystemBase {
@@ -49,7 +49,7 @@ class DriveSubsystem : public wpi::cmd::SubsystemBase {
    */
   void SetMaxOutput(double maxOutput);
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be

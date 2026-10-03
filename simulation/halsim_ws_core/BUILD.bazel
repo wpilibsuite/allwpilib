@@ -13,8 +13,7 @@ wpilib_cc_library(
     include_license_files = True,
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
@@ -75,6 +74,7 @@ generate_version_file(
     name = "generate_python_version",
     output_file = "src/main/python/halsim_ws/version.py",
     template = "//shared/bazel/rules/robotpy:version_template.in",
+    version_variable = "ROBOTPY_VERSION",
 )
 
 robotpy_library(
@@ -94,6 +94,7 @@ robotpy_library(
     },
     imports = ["src/main/python"],
     project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
+    python_requires = ">=3.11",
     requires = [
         "robotpy-native-wpihal==0.0.0",
         "robotpy-native-wpinet==0.0.0",

@@ -6,12 +6,10 @@
 
 #include <stdint.h>
 
-#include <limits>
+#include <format>
 #include <memory>
 #include <string_view>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/glass/DataSource.hpp"
 #include "wpi/glass/hardware/Encoder.hpp"
@@ -28,12 +26,11 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
  public:
   EncoderSimModel(std::string_view id, int32_t index, int channelA,
                   int channelB)
-      : m_distancePerPulse(fmt::format("{} Dist/Count", id)),
-        m_count(fmt::format("{} Count", id)),
-        m_period(fmt::format("{} Period", id)),
-        m_direction(fmt::format("{} Direction", id)),
-        m_distance(fmt::format("{} Distance", id)),
-        m_rate(fmt::format("{} Rate", id)),
+      : m_distancePerPulse(std::format("{} Dist/Count", id)),
+        m_count(std::format("{} Count", id)),
+        m_direction(std::format("{} Direction", id)),
+        m_distance(std::format("{} Distance", id)),
+        m_rate(std::format("{} Rate", id)),
         m_index{index},
         m_channelA{channelA},
         m_channelB{channelB},
@@ -42,13 +39,13 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
                 index, DistancePerPulseCallbackFunc, this, true)},
         m_countCallback{HALSIM_RegisterEncoderCountCallback(
             index, CountCallbackFunc, this, true)},
-        m_periodCallback{HALSIM_RegisterEncoderPeriodCallback(
-            index, PeriodCallbackFunc, this, true)},
+        m_rateCallback{HALSIM_RegisterEncoderRateCallback(
+            index, RateCallbackFunc, this, true)},
         m_directionCallback{HALSIM_RegisterEncoderDirectionCallback(
             index, DirectionCallbackFunc, this, true)} {}
 
   EncoderSimModel(int32_t index, int channelA, int channelB)
-      : EncoderSimModel(fmt::format("Encoder[{},{}]", channelA, channelB),
+      : EncoderSimModel(std::format("Encoder[{},{}]", channelA, channelB),
                         index, channelA, channelB) {}
 
   explicit EncoderSimModel(int32_t index)
@@ -63,11 +60,11 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     if (m_countCallback != 0) {
       HALSIM_CancelEncoderCountCallback(m_index, m_countCallback);
     }
-    if (m_periodCallback != 0) {
-      HALSIM_CancelEncoderCountCallback(m_index, m_periodCallback);
+    if (m_rateCallback != 0) {
+      HALSIM_CancelEncoderRateCallback(m_index, m_rateCallback);
     }
     if (m_directionCallback != 0) {
-      HALSIM_CancelEncoderCountCallback(m_index, m_directionCallback);
+      HALSIM_CancelEncoderDirectionCallback(m_index, m_directionCallback);
     }
   }
 
@@ -92,14 +89,12 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     return &m_distancePerPulse;
   }
   wpi::glass::IntegerSource* GetCountData() override { return &m_count; }
-  wpi::glass::DoubleSource* GetPeriodData() override { return &m_period; }
   wpi::glass::BooleanSource* GetDirectionData() override {
     return &m_direction;
   }
   wpi::glass::DoubleSource* GetDistanceData() override { return &m_distance; }
   wpi::glass::DoubleSource* GetRateData() override { return &m_rate; }
 
-  double GetMaxPeriod() override { return HALSIM_GetEncoderMaxPeriod(m_index); }
   bool GetReverseDirection() override {
     return HALSIM_GetEncoderReverseDirection(m_index);
   }
@@ -108,7 +103,6 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     HALSIM_SetEncoderDistancePerPulse(m_index, val);
   }
   void SetCount(int val) override { HALSIM_SetEncoderCount(m_index, val); }
-  void SetPeriod(double val) override { HALSIM_SetEncoderPeriod(m_index, val); }
   void SetDirection(bool val) override {
     HALSIM_SetEncoderDirection(m_index, val);
   }
@@ -117,9 +111,6 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
   }
   void SetRate(double val) override { HALSIM_SetEncoderRate(m_index, val); }
 
-  void SetMaxPeriod(double val) override {
-    HALSIM_SetEncoderMaxPeriod(m_index, val);
-  }
   void SetReverseDirection(bool val) override {
     HALSIM_SetEncoderReverseDirection(m_index, val);
   }
@@ -132,14 +123,6 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
       double distPerPulse = value->data.v_double;
       self->m_distancePerPulse.SetValue(distPerPulse);
       self->m_distance.SetValue(self->m_count.GetValue() * distPerPulse);
-      double period = self->m_period.GetValue();
-      if (period == 0) {
-        self->m_rate.SetValue(std::numeric_limits<double>::infinity());
-      } else if (period == std::numeric_limits<double>::infinity()) {
-        self->m_rate.SetValue(0);
-      } else {
-        self->m_rate.SetValue(static_cast<float>(distPerPulse / period));
-      }
     }
   }
 
@@ -153,23 +136,6 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     }
   }
 
-  static void PeriodCallbackFunc(const char*, void* param,
-                                 const HAL_Value* value) {
-    if (value->type == HAL_DOUBLE) {
-      auto self = static_cast<EncoderSimModel*>(param);
-      double period = value->data.v_double;
-      self->m_period.SetValue(period);
-      if (period == 0) {
-        self->m_rate.SetValue(std::numeric_limits<double>::infinity());
-      } else if (period == std::numeric_limits<double>::infinity()) {
-        self->m_rate.SetValue(0);
-      } else {
-        self->m_rate.SetValue(
-            static_cast<float>(self->m_distancePerPulse.GetValue() / period));
-      }
-    }
-  }
-
   static void DirectionCallbackFunc(const char*, void* param,
                                     const HAL_Value* value) {
     if (value->type == HAL_BOOLEAN) {
@@ -178,9 +144,16 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
     }
   }
 
+  static void RateCallbackFunc(const char*, void* param,
+                               const HAL_Value* value) {
+    if (value->type == HAL_DOUBLE) {
+      static_cast<EncoderSimModel*>(param)->m_rate.SetValue(
+          value->data.v_double);
+    }
+  }
+
   wpi::glass::DoubleSource m_distancePerPulse;
   wpi::glass::IntegerSource m_count;
-  wpi::glass::DoubleSource m_period;
   wpi::glass::BooleanSource m_direction;
   wpi::glass::DoubleSource m_distance;
   wpi::glass::DoubleSource m_rate;
@@ -190,7 +163,7 @@ class EncoderSimModel : public wpi::glass::EncoderModel {
   int m_channelB;
   int32_t m_distancePerPulseCallback;
   int32_t m_countCallback;
-  int32_t m_periodCallback;
+  int32_t m_rateCallback;
   int32_t m_directionCallback;
 };
 

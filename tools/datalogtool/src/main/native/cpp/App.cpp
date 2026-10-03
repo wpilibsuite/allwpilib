@@ -16,6 +16,9 @@
 #include "wpi/glass/Context.hpp"
 #include "wpi/glass/MainMenuBar.hpp"
 #include "wpi/glass/Storage.hpp"
+#ifdef RUNNING_IMGUI_TESTS
+#include "wpi/gui/test/GuiTestEngineRunner.hpp"
+#endif
 #include "wpi/gui/wpigui.hpp"
 #include "wpi/gui/wpigui_openurl.hpp"
 
@@ -109,6 +112,7 @@ static void DisplayMainMenu() {
     ImGui::Text("Datalog Tool");
     ImGui::Separator();
     ImGui::Text("v%s", GetWPILibVersion());
+    gui::EmitRendererInfo();
     ImGui::Separator();
     ImGui::Text("Save location: %s", wpi::glass::GetStorageDir().c_str());
     ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
@@ -133,6 +137,9 @@ void Application(std::string_view saveDir) {
 
   gui::CreateContext();
   wpi::glass::CreateContext();
+#ifdef RUNNING_IMGUI_TESTS
+  wpi::gui::test::InstallTestEngineHooks();
+#endif
 
   // Add icons
   gui::AddIcon(dlt::GetResource_dlt_16_png());
@@ -149,7 +156,7 @@ void Application(std::string_view saveDir) {
 
   gui::AddWindowScaler([](float scale) { gDefaultScale = scale; });
   gui::AddLateExecute(DisplayGui);
-  gui::Initialize("Datalog Tool", 925, 510);
+  gui::Initialize("Datalog Tool", 925, 510, gui::RendererPreference::PREFER_2D);
 
   gDownloadVisible = &wpi::glass::GetStorageRoot()
                           .GetChild("download")

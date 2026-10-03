@@ -4,6 +4,7 @@
 
 #include "wpi/math/geometry/Translation2d.hpp"
 
+#include "wpi/units/length.hpp"
 #include "wpi/util/json.hpp"
 
 void wpi::math::to_json(wpi::util::json& json,

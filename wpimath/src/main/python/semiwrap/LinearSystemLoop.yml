@@ -40,6 +40,8 @@ classes:
         ignore: true # TODO
       Reset:
       Error:
+      AtReference:
+      SetTolerance:
       Correct:
       Predict:
       ClampInput:

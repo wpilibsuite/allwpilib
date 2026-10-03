@@ -25,11 +25,8 @@ public final class MathSharedStore {
             public void reportError(String error, StackTraceElement[] stackTrace) {}
 
             @Override
-            public void reportUsage(String resource, String data) {}
-
-            @Override
             public double getTimestamp() {
-              return WPIUtilJNI.now() * 1.0e-6;
+              return WPIUtilJNI.now() * 1.0e-9;
             }
           };
     }
@@ -53,16 +50,6 @@ public final class MathSharedStore {
    */
   public static void reportError(String error, StackTraceElement[] stackTrace) {
     getMathShared().reportError(error, stackTrace);
-  }
-
-  /**
-   * Report usage.
-   *
-   * @param resource the resource name
-   * @param data arbitrary string data
-   */
-  public static void reportUsage(String resource, String data) {
-    getMathShared().reportUsage(resource, data);
   }
 
   /**

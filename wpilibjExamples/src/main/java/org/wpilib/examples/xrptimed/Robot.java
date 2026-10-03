@@ -8,7 +8,6 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.system.Timer;
-import org.wpilib.util.sendable.SendableRegistry;
 import org.wpilib.xrp.XRPMotor;
 
 /**
@@ -27,9 +26,6 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
-    SendableRegistry.addChild(robotDrive, leftDrive);
-    SendableRegistry.addChild(robotDrive, rightDrive);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
@@ -50,7 +46,7 @@ public class Robot extends TimedRobot {
       // Drive forwards half speed, make sure to turn input squaring off
       robotDrive.arcadeDrive(0.5, 0.0, false);
     } else {
-      robotDrive.stopMotor(); // stop robot
+      robotDrive.arcadeDrive(0.0, 0.0, false); // stop robot
     }
   }
 

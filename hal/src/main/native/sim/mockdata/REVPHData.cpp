@@ -9,14 +9,14 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeREVPHData() {
-  static REVPHData spd[kNumREVPHModules];
+  static REVPHData spd[NUM_REVPH_MODULES];
   ::wpi::hal::SimREVPHData = spd;
 }
 }  // namespace wpi::hal::init
 
 REVPHData* wpi::hal::SimREVPHData;
 void REVPHData::ResetData() {
-  for (int i = 0; i < kNumREVPHChannels; i++) {
+  for (int i = 0; i < NUM_REVPH_CHANNELS; i++) {
     solenoidOutput[i].Reset(false);
   }
   initialized.Reset(false);
@@ -47,7 +47,7 @@ DEFINE_CAPI(double, CompressorCurrent, compressorCurrent)
 void HALSIM_GetREVPHAllSolenoids(int32_t index, uint8_t* values) {
   auto& data = SimREVPHData[index].solenoidOutput;
   uint8_t ret = 0;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     ret |= (data[i] << i);
   }
   *values = ret;
@@ -55,7 +55,7 @@ void HALSIM_GetREVPHAllSolenoids(int32_t index, uint8_t* values) {
 
 void HALSIM_SetREVPHAllSolenoids(int32_t index, uint8_t values) {
   auto& data = SimREVPHData[index].solenoidOutput;
-  for (int i = 0; i < kNumCTRESolenoidChannels; i++) {
+  for (int i = 0; i < NUM_CTRE_SOLENOID_CHANNELS; i++) {
     data[i] = (values & 0x1) != 0;
     values >>= 1;
   }

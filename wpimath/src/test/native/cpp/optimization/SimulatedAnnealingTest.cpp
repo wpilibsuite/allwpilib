@@ -8,9 +8,12 @@
 #include <cmath>
 #include <random>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
-TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
+#include "wpi/math/TestAssertions.hpp"
+
+TEST_CASE("SimulatedAnnealingTest DoubleFunctionOptimizationHeartBeat",
+          "[wpimath]") {
   auto function = [](double x) {
     return -(x + std::sin(x)) * std::exp(-x * x) + 1;
   };
@@ -30,10 +33,11 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationHeartBeat) {
 
   double solution = simulatedAnnealing.Solve(-1.0, 5000);
 
-  EXPECT_NEAR(0.68, solution, 1e-1);
+  CHECK_NEAR(0.68, solution, 1e-1);
 }
 
-TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
+TEST_CASE("SimulatedAnnealingTest DoubleFunctionOptimizationMultimodal",
+          "[wpimath]") {
   auto function = [](double x) {
     return std::sin(x) + std::sin((10.0 / 3.0) * x);
   };
@@ -53,5 +57,5 @@ TEST(SimulatedAnnealingTest, DoubleFunctionOptimizationMultimodal) {
 
   double solution = simulatedAnnealing.Solve(-1.0, 5000);
 
-  EXPECT_NEAR(5.146, solution, 1e-1);
+  CHECK_NEAR(5.146, solution, 1e-1);
 }

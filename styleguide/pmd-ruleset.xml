@@ -11,6 +11,7 @@
   <exclude-pattern>.*/*Subscriber\.java</exclude-pattern>
   <exclude-pattern>.*/Timestamped.*\.java</exclude-pattern>
   <exclude-pattern>.*/units/measure/.*\.java</exclude-pattern>
+  <exclude-pattern>.*/build/generated/sources/annotationProcessor/.*</exclude-pattern>
 
   <exclude-pattern>.*/*Examples.*</exclude-pattern>
   <exclude-pattern>.*/*JNI.*</exclude-pattern>

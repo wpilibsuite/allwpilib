@@ -5,36 +5,36 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.shape.Ellipse2d;
 import org.wpilib.math.trajectory.constraint.EllipticalRegionConstraint;
 import org.wpilib.math.trajectory.constraint.MaxVelocityConstraint;
-import org.wpilib.math.util.Units;
 
 class EllipticalRegionConstraintTest {
   @Test
   void testConstraint() {
-    double maxVelocity = Units.feetToMeters(3.0);
+    double maxVelocity = feetToMeters(3.0);
     var ellipse =
         new Ellipse2d(
-            new Pose2d(Units.feetToMeters(5.0), Units.feetToMeters(2.5), Rotation2d.kPi),
-            Units.feetToMeters(5.0),
-            Units.feetToMeters(2.5));
+            new Pose2d(feetToMeters(5.0), feetToMeters(2.5), Rotation2d.PI),
+            feetToMeters(5.0),
+            feetToMeters(2.5));
 
     var trajectory =
-        TrajectoryGeneratorTest.getTrajectory(
+        DrivetrainSplineTrajectoryGeneratorTest.getTrajectory(
             List.of(
                 new EllipticalRegionConstraint(ellipse, new MaxVelocityConstraint(maxVelocity))));
 
     boolean exceededConstraintOutsideRegion = false;
-    for (var point : trajectory.getStates()) {
+    for (var point : trajectory.samples) {
       if (ellipse.contains(point.pose.getTranslation())) {
-        assertTrue(Math.abs(point.velocity) < maxVelocity + 0.05);
-      } else if (Math.abs(point.velocity) >= maxVelocity + 0.05) {
+        assertTrue(Math.abs(point.forwardVelocity()) < maxVelocity + 0.05);
+      } else if (Math.abs(point.forwardVelocity()) >= maxVelocity + 0.05) {
         exceededConstraintOutsideRegion = true;
       }
     }

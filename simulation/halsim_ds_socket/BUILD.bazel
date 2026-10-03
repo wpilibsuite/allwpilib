@@ -18,14 +18,14 @@ wpilib_cc_library(
     srcs = glob(["src/main/native/cpp/**"]),
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
     deps = [
         ":headers",
         "//hal:wpiHal",
+        "//hal:wpiHalMrc",
         "//wpinet",
     ],
 )
@@ -38,14 +38,14 @@ wpilib_cc_library(
     ],
     include_license_files = True,
     target_compatible_with = select({
-        "@rules_bzlmodrio_toolchains//constraints/is_roborio:roborio": ["@platforms//:incompatible"],
-        "@rules_bzlmodrio_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
     visibility = ["//visibility:public"],
     deps = [
         ":headers",
         "//hal:wpiHal",
+        "//hal:wpiHalMrc",
         "//wpinet",
     ],
 )
@@ -78,7 +78,7 @@ cc_test(
     srcs = glob(["src/test/native/**/*.cpp"]),
     deps = [
         "//simulation/halsim_ds_socket",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -107,6 +107,7 @@ generate_version_file(
     name = "generate_python_version",
     output_file = "src/main/python/halsim_ds_socket/version.py",
     template = "//shared/bazel/rules/robotpy:version_template.in",
+    version_variable = "ROBOTPY_VERSION",
 )
 
 robotpy_library(
@@ -119,6 +120,7 @@ robotpy_library(
         "robotpy_sim.2027": ["ds-socket = halsim_ds_socket"],
     },
     imports = ["src/main/python"],
+    python_requires = ">=3.11",
     requires = [
         "robotpy-native-wpihal==0.0.0",
         "robotpy-native-wpinet==0.0.0",

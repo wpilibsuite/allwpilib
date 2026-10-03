@@ -5,24 +5,22 @@
 #include "wpi/glass/DataSource.hpp"
 
 #include <cstdio>
+#include <format>
 #include <string>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
 #include "wpi/glass/ContextInternal.hpp"
 
 using namespace wpi::glass;
 
-wpi::util::sig::Signal<const char*, DataSource*> DataSource::sourceCreated;
-
 std::string wpi::glass::MakeSourceId(std::string_view id, int index) {
-  return fmt::format("{}[{}]", id, index);
+  return std::format("{}[{}]", id, index);
 }
 
 std::string wpi::glass::MakeSourceId(std::string_view id, int index,
                                      int index2) {
-  return fmt::format("{}[{},{}]", id, index, index2);
+  return std::format("{}[{},{}]", id, index, index2);
 }
 
 DataSource::~DataSource() {
@@ -123,7 +121,7 @@ std::string& DataSource::GetNameStorage(std::string_view id) {
 
 void DataSource::Register() {
   gContext->sources.insert_or_assign(m_id, this);
-  sourceCreated(m_id.c_str(), this);
+  gContext->sourceCreated(m_id.c_str(), this);
 }
 
 void DataSource::DragDropTooltip() const {
@@ -133,21 +131,21 @@ void DataSource::DragDropTooltip() const {
 }
 
 const char* BooleanSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* DoubleSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* FloatSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* IntegerSource::GetType() const {
-  return kType;
+  return TYPE;
 }
 
 const char* StringSource::GetType() const {
-  return kType;
+  return TYPE;
 }

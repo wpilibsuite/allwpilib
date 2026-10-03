@@ -5,11 +5,10 @@
 #include <jni.h>
 
 #include <cassert>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "org_wpilib_networktables_NetworkTablesJNI.h"
 #include "wpi/nt/ntcore.h"
@@ -140,6 +139,7 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
   FIELD(disableLocal, "Z");
   FIELD(excludeSelf, "Z");
   FIELD(hidden, "Z");
+  FIELD(disableSignal, "Z");
 
 #undef FIELD
 
@@ -156,7 +156,8 @@ static wpi::nt::PubSubOptions FromJavaPubSubOptions(JNIEnv* env,
           FIELD(bool, Boolean, disableRemote),
           FIELD(bool, Boolean, disableLocal),
           FIELD(bool, Boolean, excludeSelf),
-          FIELD(bool, Boolean, hidden)};
+          FIELD(bool, Boolean, hidden),
+          FIELD(bool, Boolean, disableSignal)};
 
 #undef GET
 #undef FIELD
@@ -750,7 +751,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperty
   auto j = wpi::util::json::parse(std::string_view{JStringRef{env, value}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse value JSON: {}", j.error()));
+        env, std::format("could not parse value JSON: {}", j.error()));
     return;
   }
   wpi::nt::SetTopicProperty(topic, JStringRef{env, name}, *j);
@@ -793,7 +794,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setTopicProperties
       wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", j.error()));
+        env, std::format("could not parse properties JSON: {}", j.error()));
     return;
   }
   if (!j->is_object()) {
@@ -857,7 +858,7 @@ Java_org_wpilib_networktables_NetworkTablesJNI_publishEx
       wpi::util::json::parse(std::string_view{JStringRef{env, properties}});
   if (!j) {
     illegalArgEx.Throw(
-        env, fmt::format("could not parse properties JSON: {}", j.error()));
+        env, std::format("could not parse properties JSON: {}", j.error()));
     return 0;
   }
   if (!j->is_object()) {
@@ -1298,14 +1299,175 @@ Java_org_wpilib_networktables_NetworkTablesJNI_setServer__I_3Ljava_lang_String_2
 
 /*
  * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerMdns
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2
+  (JNIEnv* env, jclass, jint inst, jstring serviceName)
+{
+  if (!serviceName) {
+    nullPointerEx.Throw(env, "serviceName cannot be null");
+    return;
+  }
+  wpi::nt::SetServerMdns(inst, JStringRef{env, serviceName}.c_str());
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerMdns
+ * Signature: (ILjava/lang/String;Ljava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2Ljava_lang_String_2I
+  (JNIEnv* env, jclass, jint inst, jstring serviceName, jstring serverName,
+   jint port)
+{
+  if (!serviceName) {
+    nullPointerEx.Throw(env, "serviceName cannot be null");
+    return;
+  }
+  if (!serverName) {
+    nullPointerEx.Throw(env, "serverName cannot be null");
+    return;
+  }
+  wpi::nt::SetServerMdns(inst, JStringRef{env, serviceName}.c_str(),
+                         JStringRef{env, serverName}.c_str(), port);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerMdns
+ * Signature: (ILjava/lang/String;[Ljava/lang/Object;[I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2_3Ljava_lang_String_2_3I
+  (JNIEnv* env, jclass, jint inst, jstring serviceName,
+   jobjectArray serverNames, jintArray ports)
+{
+  if (!serviceName) {
+    nullPointerEx.Throw(env, "serviceName cannot be null");
+    return;
+  }
+  if (!serverNames) {
+    nullPointerEx.Throw(env, "serverNames cannot be null");
+    return;
+  }
+  if (!ports) {
+    nullPointerEx.Throw(env, "ports cannot be null");
+    return;
+  }
+  int len = env->GetArrayLength(serverNames);
+  if (len != env->GetArrayLength(ports)) {
+    illegalArgEx.Throw(env,
+                       "serverNames and ports arrays must be the same size");
+    return;
+  }
+  JSpan<const jint> portInts{env, ports};
+  if (!portInts) {
+    return;
+  }
+
+  std::vector<std::string> names;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
+  names.reserve(len);
+  servers.reserve(len);
+  for (int i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
+    if (!elem) {
+      nullPointerEx.Throw(env, "null string in serverNames");
+      return;
+    }
+    names.emplace_back(JStringRef{env, elem}.str());
+    servers.emplace_back(
+        std::pair{std::string_view{names.back()}, portInts[i]});
+  }
+  wpi::nt::SetServerMdns(inst, JStringRef{env, serviceName}.c_str(), servers);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerMdns
+ * Signature: (ILjava/lang/String;I[Ljava/lang/Object;[I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerMdns__ILjava_lang_String_2I_3Ljava_lang_String_2_3I
+  (JNIEnv* env, jclass, jint inst, jstring serviceName, jint mdnsPort,
+   jobjectArray serverNames, jintArray ports)
+{
+  if (!serviceName) {
+    nullPointerEx.Throw(env, "serviceName cannot be null");
+    return;
+  }
+  if (!serverNames) {
+    nullPointerEx.Throw(env, "serverNames cannot be null");
+    return;
+  }
+  if (!ports) {
+    nullPointerEx.Throw(env, "ports cannot be null");
+    return;
+  }
+  int len = env->GetArrayLength(serverNames);
+  if (len != env->GetArrayLength(ports)) {
+    illegalArgEx.Throw(env,
+                       "serverNames and ports arrays must be the same size");
+    return;
+  }
+  JSpan<const jint> portInts{env, ports};
+  if (!portInts) {
+    return;
+  }
+
+  std::vector<std::string> names;
+  std::vector<std::pair<std::string_view, unsigned int>> servers;
+  names.reserve(len);
+  servers.reserve(len);
+  for (int i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
+    if (!elem) {
+      nullPointerEx.Throw(env, "null string in serverNames");
+      return;
+    }
+    names.emplace_back(JStringRef{env, elem}.str());
+    servers.emplace_back(
+        std::pair{std::string_view{names.back()}, portInts[i]});
+  }
+  wpi::nt::SetServerMdns(inst, JStringRef{env, serviceName}.c_str(), mdnsPort,
+                         servers);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
  * Method:    setServerTeam
- * Signature: (III)V
+ * Signature: (ILjava/lang/String;I)V
  */
 JNIEXPORT void JNICALL
 Java_org_wpilib_networktables_NetworkTablesJNI_setServerTeam
-  (JNIEnv* env, jclass, jint inst, jint team, jint port)
+  (JNIEnv* env, jclass, jint inst, jstring team, jint port)
 {
-  wpi::nt::SetServerTeam(inst, team, port);
+  if (!team) {
+    nullPointerEx.Throw(env, "team cannot be null");
+    return;
+  }
+  wpi::nt::SetServerTeam(inst, JStringRef{env, team}.c_str(), port);
+}
+
+/*
+ * Class:     org_wpilib_networktables_NetworkTablesJNI
+ * Method:    setServerFixed
+ * Signature: (ILjava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_networktables_NetworkTablesJNI_setServerFixed
+  (JNIEnv* env, jclass, jint inst, jstring team, jint port)
+{
+  if (!team) {
+    nullPointerEx.Throw(env, "team cannot be null");
+    return;
+  }
+  wpi::nt::SetServerFixed(inst, JStringRef{env, team}.c_str(), port);
 }
 
 /*

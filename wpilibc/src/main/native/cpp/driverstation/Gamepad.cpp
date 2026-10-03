@@ -4,39 +4,83 @@
 
 #include "wpi/driverstation/Gamepad.hpp"
 
+#include <algorithm>
+#include <cmath>
+#include <string>
+
+#include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/math/util/MathUtil.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
-Gamepad::Gamepad(int port) : GenericHID(port) {
-  HAL_ReportUsage("HID", port, "Gamepad");
+static double ClampDeadband(double deadband) {
+  if (std::isnan(deadband)) {
+    return 0.0;
+  }
+  return std::clamp(deadband, 0.0, std::nextafter(1.0, 0.0));
+}
+
+Gamepad::Gamepad(int port) : Gamepad{DriverStation::GetGenericHID(port)} {}
+
+Gamepad::Gamepad(GenericHID& hid) : m_hid{&hid} {
+  wpi::util::ReportUsage("HID", hid.GetPort(), "Gamepad");
+}
+
+GenericHID& Gamepad::GetHID() {
+  return *m_hid;
+}
+
+const GenericHID& Gamepad::GetHID() const {
+  return *m_hid;
 }
 
 double Gamepad::GetLeftX() const {
-  return GetAxis(Axis::LEFT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_X), m_leftXDeadband);
+}
+
+void Gamepad::SetLeftXDeadband(double deadband) {
+  m_leftXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetLeftY() const {
-  return GetAxis(Axis::LEFT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_Y), m_leftYDeadband);
+}
+
+void Gamepad::SetLeftYDeadband(double deadband) {
+  m_leftYDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightX() const {
-  return GetAxis(Axis::RIGHT_X);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_X), m_rightXDeadband);
+}
+
+void Gamepad::SetRightXDeadband(double deadband) {
+  m_rightXDeadband = ClampDeadband(deadband);
 }
 
 double Gamepad::GetRightY() const {
-  return GetAxis(Axis::RIGHT_Y);
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_Y), m_rightYDeadband);
 }
 
-double Gamepad::GetLeftTriggerAxis() const {
-  return GetAxis(Axis::LEFT_TRIGGER);
+void Gamepad::SetRightYDeadband(double deadband) {
+  m_rightYDeadband = ClampDeadband(deadband);
+}
+
+double Gamepad::GetLeftTrigger() const {
+  return wpi::math::ApplyDeadband(GetAxis(Axis::LEFT_TRIGGER),
+                                  m_leftTriggerDeadband);
+}
+
+void Gamepad::SetLeftTriggerDeadband(double deadband) {
+  m_leftTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::LeftTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetLeftTriggerAxis() > threshold;
+    return this->GetAxis(Axis::LEFT_TRIGGER) > threshold;
   });
 }
 
@@ -44,13 +88,18 @@ BooleanEvent Gamepad::LeftTrigger(EventLoop* loop) const {
   return this->LeftTrigger(0.5, loop);
 }
 
-double Gamepad::GetRightTriggerAxis() const {
-  return GetAxis(Axis::RIGHT_TRIGGER);
+double Gamepad::GetRightTrigger() const {
+  return wpi::math::ApplyDeadband(GetAxis(Axis::RIGHT_TRIGGER),
+                                  m_rightTriggerDeadband);
+}
+
+void Gamepad::SetRightTriggerDeadband(double deadband) {
+  m_rightTriggerDeadband = ClampDeadband(deadband);
 }
 
 BooleanEvent Gamepad::RightTrigger(double threshold, EventLoop* loop) const {
   return BooleanEvent(loop, [this, threshold] {
-    return this->GetRightTriggerAxis() > threshold;
+    return this->GetAxis(Axis::RIGHT_TRIGGER) > threshold;
   });
 }
 
@@ -58,68 +107,68 @@ BooleanEvent Gamepad::RightTrigger(EventLoop* loop) const {
   return this->RightTrigger(0.5, loop);
 }
 
-bool Gamepad::GetSouthFaceButton() const {
-  return GetButton(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButton() const {
+  return GetButton(Button::FACE_DOWN);
 }
 
-bool Gamepad::GetSouthFaceButtonPressed() {
-  return GetButtonPressed(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButtonPressed() {
+  return GetButtonPressed(Button::FACE_DOWN);
 }
 
-bool Gamepad::GetSouthFaceButtonReleased() {
-  return GetButtonReleased(Button::SOUTH_FACE);
+bool Gamepad::GetFaceDownButtonReleased() {
+  return GetButtonReleased(Button::FACE_DOWN);
 }
 
 BooleanEvent Gamepad::FaceDown(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetSouthFaceButton(); });
+  return BooleanEvent(loop, [this]() { return this->GetFaceDownButton(); });
 }
 
-bool Gamepad::GetEastFaceButton() const {
-  return GetButton(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButton() const {
+  return GetButton(Button::FACE_RIGHT);
 }
 
-bool Gamepad::GetEastFaceButtonPressed() {
-  return GetButtonPressed(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButtonPressed() {
+  return GetButtonPressed(Button::FACE_RIGHT);
 }
 
-bool Gamepad::GetEastFaceButtonReleased() {
-  return GetButtonReleased(Button::EAST_FACE);
+bool Gamepad::GetFaceRightButtonReleased() {
+  return GetButtonReleased(Button::FACE_RIGHT);
 }
 
 BooleanEvent Gamepad::FaceRight(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetEastFaceButton(); });
+  return BooleanEvent(loop, [this]() { return this->GetFaceRightButton(); });
 }
 
-bool Gamepad::GetWestFaceButton() const {
-  return GetButton(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButton() const {
+  return GetButton(Button::FACE_LEFT);
 }
 
-bool Gamepad::GetWestFaceButtonPressed() {
-  return GetButtonPressed(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButtonPressed() {
+  return GetButtonPressed(Button::FACE_LEFT);
 }
 
-bool Gamepad::GetWestFaceButtonReleased() {
-  return GetButtonReleased(Button::WEST_FACE);
+bool Gamepad::GetFaceLeftButtonReleased() {
+  return GetButtonReleased(Button::FACE_LEFT);
 }
 
 BooleanEvent Gamepad::FaceLeft(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetWestFaceButton(); });
+  return BooleanEvent(loop, [this]() { return this->GetFaceLeftButton(); });
 }
 
-bool Gamepad::GetNorthFaceButton() const {
-  return GetButton(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButton() const {
+  return GetButton(Button::FACE_UP);
 }
 
-bool Gamepad::GetNorthFaceButtonPressed() {
-  return GetButtonPressed(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButtonPressed() {
+  return GetButtonPressed(Button::FACE_UP);
 }
 
-bool Gamepad::GetNorthFaceButtonReleased() {
-  return GetButtonReleased(Button::NORTH_FACE);
+bool Gamepad::GetFaceUpButtonReleased() {
+  return GetButtonReleased(Button::FACE_UP);
 }
 
 BooleanEvent Gamepad::FaceUp(EventLoop* loop) const {
-  return BooleanEvent(loop, [this]() { return this->GetNorthFaceButton(); });
+  return BooleanEvent(loop, [this]() { return this->GetFaceUpButton(); });
 }
 
 bool Gamepad::GetBackButton() const {
@@ -475,137 +524,146 @@ BooleanEvent Gamepad::Misc6(EventLoop* loop) const {
 }
 
 bool Gamepad::GetButton(Button button) const {
-  return GetRawButton(static_cast<int>(button));
+  return m_hid->GetRawButton(static_cast<int>(button));
 }
 
 bool Gamepad::GetButtonPressed(Button button) {
-  return GetRawButtonPressed(static_cast<int>(button));
+  return m_hid->GetRawButtonPressed(static_cast<int>(button));
 }
 
 bool Gamepad::GetButtonReleased(Button button) {
-  return GetRawButtonReleased(static_cast<int>(button));
+  return m_hid->GetRawButtonReleased(static_cast<int>(button));
 }
 
 BooleanEvent Gamepad::ButtonEvent(Button button, EventLoop* loop) const {
-  return GenericHID::Button(static_cast<int>(button), loop);
+  return m_hid->Button(static_cast<int>(button), loop);
 }
 
 double Gamepad::GetAxis(Axis axis) const {
-  return GetRawAxis(static_cast<int>(axis));
+  return m_hid->GetRawAxis(static_cast<int>(axis));
 }
 
 BooleanEvent Gamepad::AxisLessThan(Axis axis, double threshold,
                                    EventLoop* loop) const {
-  return GenericHID::AxisLessThan(static_cast<int>(axis), threshold, loop);
+  return m_hid->AxisLessThan(static_cast<int>(axis), threshold, loop);
 }
 
 BooleanEvent Gamepad::AxisGreaterThan(Axis axis, double threshold,
                                       EventLoop* loop) const {
-  return GenericHID::AxisGreaterThan(static_cast<int>(axis), threshold, loop);
+  return m_hid->AxisGreaterThan(static_cast<int>(axis), threshold, loop);
 }
 
-double Gamepad::GetAxisForSendable(Axis axis) const {
+int Gamepad::GetAxesAvailable() const {
+  return m_hid->GetAxesAvailable();
+}
+
+uint64_t Gamepad::GetButtonsAvailable() const {
+  return m_hid->GetButtonsAvailable();
+}
+
+bool Gamepad::IsConnected() const {
+  return m_hid->IsConnected();
+}
+
+GenericHID::HIDType Gamepad::GetGamepadType() const {
+  return m_hid->GetGamepadType();
+}
+
+GenericHID::SupportedOutputs Gamepad::GetSupportedOutputs() const {
+  return m_hid->GetSupportedOutputs();
+}
+
+std::string Gamepad::GetName() const {
+  return m_hid->GetName();
+}
+
+int Gamepad::GetPort() const {
+  return m_hid->GetPort();
+}
+
+void Gamepad::SetLeds(int r, int g, int b) {
+  m_hid->SetLeds(r, g, b);
+}
+
+void Gamepad::SetRumble(GenericHID::RumbleType type, double value) {
+  m_hid->SetRumble(type, value);
+}
+
+bool Gamepad::GetTouchpadFingerAvailable(int touchpad, int finger) const {
+  return m_hid->GetTouchpadFingerAvailable(touchpad, finger);
+}
+
+TouchpadFinger Gamepad::GetTouchpadFinger(int touchpad, int finger) const {
+  return m_hid->GetTouchpadFinger(touchpad, finger);
+}
+
+double Gamepad::GetAxisForTelemetry(Axis axis) const {
   return wpi::internal::DriverStationBackend::GetStickAxisIfAvailable(
-             GetPort(), static_cast<int>(axis))
+             m_hid->GetPort(), static_cast<int>(axis))
       .value_or(0.0);
 }
 
-bool Gamepad::GetButtonForSendable(Button button) const {
-  return wpi::internal::DriverStationBackend::GetStickButtonIfAvailable(
-             GetPort(), static_cast<int>(button))
-      .value_or(false);
+void Gamepad::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("LeftTrigger", GetAxisForTelemetry(Axis::LEFT_TRIGGER));
+  table.Log("RightTrigger", GetAxisForTelemetry(Axis::RIGHT_TRIGGER));
+  table.Log("LeftX", GetAxisForTelemetry(Axis::LEFT_X));
+  table.Log("LeftY", GetAxisForTelemetry(Axis::LEFT_Y));
+  table.Log("RightX", GetAxisForTelemetry(Axis::RIGHT_X));
+  table.Log("RightY", GetAxisForTelemetry(Axis::RIGHT_Y));
+
+  uint64_t buttons =
+      wpi::internal::DriverStationBackend::GetStickButtons(m_hid->GetPort());
+  table.Log("FaceDown",
+            (buttons & (1UL << static_cast<int>(Button::FACE_DOWN))) != 0);
+  table.Log("FaceRight",
+            (buttons & (1UL << static_cast<int>(Button::FACE_RIGHT))) != 0);
+  table.Log("FaceLeft",
+            (buttons & (1UL << static_cast<int>(Button::FACE_LEFT))) != 0);
+  table.Log("FaceUp",
+            (buttons & (1UL << static_cast<int>(Button::FACE_UP))) != 0);
+  table.Log("Back", (buttons & (1UL << static_cast<int>(Button::BACK))) != 0);
+  table.Log("Guide", (buttons & (1UL << static_cast<int>(Button::GUIDE))) != 0);
+  table.Log("Start", (buttons & (1UL << static_cast<int>(Button::START))) != 0);
+  table.Log("LeftStick",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_STICK))) != 0);
+  table.Log("RightStick",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_STICK))) != 0);
+  table.Log("LeftBumper",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_BUMPER))) != 0);
+  table.Log("RightBumper",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_BUMPER))) != 0);
+  table.Log("DpadUp",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_UP))) != 0);
+  table.Log("DpadDown",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_DOWN))) != 0);
+  table.Log("DpadLeft",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_LEFT))) != 0);
+  table.Log("DpadRight",
+            (buttons & (1UL << static_cast<int>(Button::DPAD_RIGHT))) != 0);
+  table.Log("Misc1",
+            (buttons & (1UL << static_cast<int>(Button::MISC_1))) != 0);
+  table.Log("RightPaddle1",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_PADDLE_1))) != 0);
+  table.Log("LeftPaddle1",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_PADDLE_1))) != 0);
+  table.Log("RightPaddle2",
+            (buttons & (1UL << static_cast<int>(Button::RIGHT_PADDLE_2))) != 0);
+  table.Log("LeftPaddle2",
+            (buttons & (1UL << static_cast<int>(Button::LEFT_PADDLE_2))) != 0);
+  table.Log("Touchpad",
+            (buttons & (1UL << static_cast<int>(Button::TOUCHPAD))) != 0);
+  table.Log("Misc2",
+            (buttons & (1UL << static_cast<int>(Button::MISC_2))) != 0);
+  table.Log("Misc3",
+            (buttons & (1UL << static_cast<int>(Button::MISC_3))) != 0);
+  table.Log("Misc4",
+            (buttons & (1UL << static_cast<int>(Button::MISC_4))) != 0);
+  table.Log("Misc5",
+            (buttons & (1UL << static_cast<int>(Button::MISC_5))) != 0);
+  table.Log("Misc6",
+            (buttons & (1UL << static_cast<int>(Button::MISC_6))) != 0);
 }
 
-void Gamepad::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "Gamepad");
-  builder.AddDoubleProperty(
-      "LeftTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::LEFT_TRIGGER); }, nullptr);
-  builder.AddDoubleProperty(
-      "RightTrigger Axis",
-      [this] { return GetAxisForSendable(Axis::RIGHT_TRIGGER); }, nullptr);
-  builder.AddDoubleProperty(
-      "LeftX", [this] { return GetAxisForSendable(Axis::LEFT_X); }, nullptr);
-  builder.AddDoubleProperty(
-      "LeftY", [this] { return GetAxisForSendable(Axis::LEFT_Y); }, nullptr);
-  builder.AddDoubleProperty(
-      "RightX", [this] { return GetAxisForSendable(Axis::RIGHT_X); }, nullptr);
-  builder.AddDoubleProperty(
-      "RightY", [this] { return GetAxisForSendable(Axis::RIGHT_Y); }, nullptr);
-  builder.AddBooleanProperty(
-      "SouthFace", [this] { return GetButtonForSendable(Button::SOUTH_FACE); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "EastFace", [this] { return GetButtonForSendable(Button::EAST_FACE); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "WestFace", [this] { return GetButtonForSendable(Button::WEST_FACE); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "NorthFace", [this] { return GetButtonForSendable(Button::NORTH_FACE); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Back", [this] { return GetButtonForSendable(Button::BACK); }, nullptr);
-  builder.AddBooleanProperty(
-      "Guide", [this] { return GetButtonForSendable(Button::GUIDE); }, nullptr);
-  builder.AddBooleanProperty(
-      "Start", [this] { return GetButtonForSendable(Button::START); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftStick", [this] { return GetButtonForSendable(Button::LEFT_STICK); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "RightStick",
-      [this] { return GetButtonForSendable(Button::RIGHT_STICK); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftBumper",
-      [this] { return GetButtonForSendable(Button::LEFT_BUMPER); }, nullptr);
-  builder.AddBooleanProperty(
-      "RightBumper",
-      [this] { return GetButtonForSendable(Button::RIGHT_BUMPER); }, nullptr);
-  builder.AddBooleanProperty(
-      "DpadUp", [this] { return GetButtonForSendable(Button::DPAD_UP); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadDown", [this] { return GetButtonForSendable(Button::DPAD_DOWN); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadLeft", [this] { return GetButtonForSendable(Button::DPAD_LEFT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "DpadRight", [this] { return GetButtonForSendable(Button::DPAD_RIGHT); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc1", [this] { return GetButtonForSendable(Button::MISC_1); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "RightPaddle1",
-      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_1); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftPaddle1",
-      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_1); }, nullptr);
-  builder.AddBooleanProperty(
-      "RightPaddle2",
-      [this] { return GetButtonForSendable(Button::RIGHT_PADDLE_2); }, nullptr);
-  builder.AddBooleanProperty(
-      "LeftPaddle2",
-      [this] { return GetButtonForSendable(Button::LEFT_PADDLE_2); }, nullptr);
-  builder.AddBooleanProperty(
-      "Touchpad", [this] { return GetButtonForSendable(Button::TOUCHPAD); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc2", [this] { return GetButtonForSendable(Button::MISC_2); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc3", [this] { return GetButtonForSendable(Button::MISC_3); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc4", [this] { return GetButtonForSendable(Button::MISC_4); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc5", [this] { return GetButtonForSendable(Button::MISC_5); },
-      nullptr);
-  builder.AddBooleanProperty(
-      "Misc6", [this] { return GetButtonForSendable(Button::MISC_6); },
-      nullptr);
+std::string_view Gamepad::GetTelemetryType() const {
+  return "HID:Gamepad";
 }

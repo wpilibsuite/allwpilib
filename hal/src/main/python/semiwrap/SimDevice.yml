@@ -14,7 +14,7 @@ classes:
       Readonly wrapper around a HAL simulator value.
 
       It is not useful to construct these directly -- they are returned from
-      :meth:`.SimDeviceSim.getValue` or :meth:`.SimDevice.createValue`.
+      :meth:`.SimDeviceSim.get_value` or :meth:`.SimDevice.create_value`.
     methods:
       SimValue:
         overloads:
@@ -71,7 +71,7 @@ classes:
       Wrapper around a HAL simulator double value.
 
       It is not useful to construct these directly -- they are returned from
-      :meth:`.SimDeviceSim.getDouble` or :meth:`.SimDevice.createDouble`.
+      :meth:`.SimDeviceSim.get_double` or :meth:`.SimDevice.create_double`.
     force_no_trampoline: true
     methods:
       SimDouble:
@@ -90,7 +90,7 @@ classes:
       Wrapper around a HAL simulator enum value.
 
       It is not useful to construct these directly -- they are returned from
-      :meth:`.SimDeviceSim.getEnum` or :meth:`.SimDevice.createEnum`.
+      :meth:`.SimDeviceSim.get_enum` or :meth:`.SimDevice.create_enum`.
     force_no_trampoline: true
     methods:
       SimEnum:
@@ -108,7 +108,7 @@ classes:
       Wrapper around a HAL simulator boolean value.
 
       It is not useful to construct these directly -- they are returned from
-      :meth:`.SimDeviceSim.getBoolean` or :meth:`.SimDevice.createBoolean`.
+      :meth:`.SimDeviceSim.get_boolean` or :meth:`.SimDevice.create_boolean`.
     force_no_trampoline: true
     methods:
       SimBoolean:

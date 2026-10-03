@@ -1,25 +1,28 @@
 # THIS FILE IS AUTO GENERATED
 
-load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "generate_native_files", "robotpy_library")
 
 def define_native_wrapper(name, pyproject_toml = None):
-    pyproject_toml = pyproject_toml or "src/main/python/native-pyproject.toml"
-
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + native.glob(["src/generated/main/native/include/**"], allow_empty = True),
+        srcs = native.glob(["src/main/native/include/**"]) + [
+            "@mrclib_headers//:all_headers",
+        ] + [
+            "//:LICENSE.md",
+        ],
         out = "native/wpihal/include",
+        include_external_repositories = ["*mrclib_headers*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "hal/src/generated/main/native/include": "",
             "hal/src/main/native/include": "",
+            "include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/wpihal/_init_robotpy_native_wpihal.py"]
+    libinit_files = ["native/wpihal/_init_robotpy_native_mrclib.py", "native/wpihal/_init_robotpy_native_wpihal.py"]
 
     generate_native_files(
         name = name,
@@ -29,12 +32,18 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/wpihal/robotpy-native-wpihal.pc"],
+        pc_files = ["native/wpihal/robotpy-native-mrclib.pc", "native/wpihal/robotpy-native-wpihal.pc"],
     )
 
     copy_native_file(
         name = "wpiHal",
         library = "shared/wpiHal",
+        base_path = "native/wpihal/",
+    )
+
+    copy_native_file(
+        name = "MrcLib",
+        library = "shared/MrcLib",
         base_path = "native/wpihal/",
     )
 
@@ -45,6 +54,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         data = [
             name + ".pc_wrapper",
             ":wpiHal.copy_lib",
+            ":MrcLib.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
@@ -57,6 +67,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         strip_path_prefixes = ["hal"],
         entry_points = {
             "pkg_config": [
+                "mrclib = native.wpihal",
                 "wpihal = native.wpihal",
             ],
         },

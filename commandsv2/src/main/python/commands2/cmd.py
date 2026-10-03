@@ -41,7 +41,7 @@ def idle(*requirements: Subsystem) -> Command:
     return run(lambda: None, *requirements)
 
 
-def runOnce(action: Callable[[], Any], *requirements: Subsystem) -> Command:
+def run_once(action: Callable[[], Any], *requirements: Subsystem) -> Command:
     """
     Constructs a command that runs an action once and finishes.
 
@@ -63,7 +63,7 @@ def run(action: Callable[[], Any], *requirements: Subsystem) -> Command:
     return RunCommand(action, *requirements)
 
 
-def startEnd(
+def start_end(
     run: Callable[[], Any], end: Callable[[], Any], *requirements: Subsystem
 ) -> Command:
     """
@@ -78,7 +78,7 @@ def startEnd(
     return StartEndCommand(run, end, *requirements)
 
 
-def runEnd(
+def run_end(
     run: Callable[[], Any], end: Callable[[], Any], *requirements: Subsystem
 ) -> Command:
     """
@@ -95,7 +95,7 @@ def runEnd(
     )
 
 
-def startRun(
+def start_run(
     start: Callable[[], Any], run: Callable[[], Any], *requirements: Subsystem
 ) -> Command:
     """
@@ -121,7 +121,7 @@ def print_(message: str) -> Command:
     return PrintCommand(message)
 
 
-def waitSeconds(seconds: units.seconds) -> Command:
+def wait_seconds(seconds: units.seconds) -> Command:
     """
     Constructs a command that does nothing, finishing after a specified duration.
 
@@ -131,7 +131,7 @@ def waitSeconds(seconds: units.seconds) -> Command:
     return WaitCommand(seconds)
 
 
-def waitUntil(condition: Callable[[], bool]) -> Command:
+def wait_until(condition: Callable[[], bool]) -> Command:
     """
     Constructs a command that does nothing, finishing once a condition becomes true.
 
@@ -141,16 +141,18 @@ def waitUntil(condition: Callable[[], bool]) -> Command:
     return WaitUntilCommand(condition)
 
 
-def either(onTrue: Command, onFalse: Command, selector: Callable[[], bool]) -> Command:
+def either(
+    on_true: Command, on_false: Command, selector: Callable[[], bool]
+) -> Command:
     """
     Runs one of two commands, based on the boolean selector function.
 
-    :param onTrue: the command to run if the selector function returns true
-    :param onFalse: the command to run if the selector function returns false
+    :param on_true: the command to run if the selector function returns true
+    :param on_false: the command to run if the selector function returns false
     :param selector: the selector function
     :returns: the command
     """
-    return ConditionalCommand(onTrue, onFalse, selector)
+    return ConditionalCommand(on_true, on_false, selector)
 
 
 def select(
@@ -176,7 +178,7 @@ def sequence(*commands: Command) -> Command:
     return SequentialCommandGroup(*commands)
 
 
-def repeatingSequence(*commands: Command) -> Command:
+def repeating_sequence(*commands: Command) -> Command:
     """
     Runs a group of commands in series, one after the other. Once the last command ends, the group
     is restarted.
@@ -222,17 +224,18 @@ def deadline(deadline: Command, *commands: Command) -> Command:
 
 __all__ = [
     "none",
-    "runOnce",
+    "run_once",
     "run",
-    "startEnd",
-    "runEnd",
+    "start_end",
+    "run_end",
+    "start_run",
     "print_",
-    "waitSeconds",
-    "waitUntil",
+    "wait_seconds",
+    "wait_until",
     "either",
     "select",
     "sequence",
-    "repeatingSequence",
+    "repeating_sequence",
     "parallel",
     "race",
     "deadline",

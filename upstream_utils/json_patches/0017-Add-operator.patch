@@ -9,7 +9,7 @@ Subject: [PATCH 17/25] Add operator==
  2 files changed, 32 insertions(+)
 
 diff --git a/json.cpp b/json.cpp
-index 49fbf92ea6e67e771f051f10b65ac795351c6f3d..40479bc266390f015e291b737b5751522dac76ac 100644
+index 84712da562ee6b1966bae788fbf32876eaec4cef..839c311017ccbb2f5ea8f85aab4965e9ce7af090 100644
 --- a/json.cpp
 +++ b/json.cpp
 @@ -1361,4 +1361,30 @@ json::StatusToString(json::Status status)
@@ -44,7 +44,7 @@ index 49fbf92ea6e67e771f051f10b65ac795351c6f3d..40479bc266390f015e291b737b575152
 +
  } // namespace wpi::util
 diff --git a/json.h b/json.h
-index f42ba9c135cb76a1b0bc31f9e2c03b1ed7dce749..fbc3fb959f71f6acc344f26247597959807d23bb 100644
+index c5f39687e68289adadb988df9cfd81c031266859..2f2bb7b3b0a265299a011e4e8011ea14065dca36 100644
 --- a/json.h
 +++ b/json.h
 @@ -28,6 +28,7 @@ namespace wpi::util {

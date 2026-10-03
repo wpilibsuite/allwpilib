@@ -4,30 +4,44 @@ module(
 )
 
 include("//docs:doxygen.MODULE.bazel")
-
+include("//shared/bazel/thirdparty/ceres:ceres.MODULE.bazel")
+include("//shared/bazel/thirdparty/imgui_test_engine:imgui_test_engine.MODULE.bazel")
+include("//shared/bazel/thirdparty/libssh:libssh.MODULE.bazel")
+include("//shared/bazel/thirdparty/libsdlgpu:libsdlgpu.MODULE.bazel")
 include("//shared/bazel/thirdparty/mrclib:mrclib.MODULE.bazel")
 
-bazel_dep(name = "apple_support", version = "2.0.0", repo_name = "build_bazel_apple_support")
-
-# TODO(austin): Upgrade when the patches land.
-# https://github.com/bazelbuild/rules_cc/pull/430
-# https://github.com/bazelbuild/rules_cc/pull/431
-# https://github.com/bazelbuild/rules_cc/pull/432
-bazel_dep(name = "rules_cc", version = "0.2.13")
-single_version_override(
-    module_name = "rules_cc",
-    patch_strip = 1,
-    patches = ["//:shared/bazel/patches/rules_cc_windows.patch"],
+bazel_dep(name = "apple_support", version = "2.8.0", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_cc", version = "0.2.22")
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "libuv", version = "1.49.2")
+local_path_override(
+    module_name = "libuv",
+    path = "wpinet/src/main/native/thirdparty/libuv",
 )
 
-bazel_dep(name = "rules_pkg", version = "1.1.0")
-bazel_dep(name = "bazel_features", version = "1.33.0")
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
-bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "platforms", version = "1.0.0")
-bazel_dep(name = "rules_java", version = "8.16.1")
-bazel_dep(name = "rules_python", version = "1.7.0")
-bazel_dep(name = "rules_pycross", version = "0.8.1")
+bazel_dep(name = "bazel_features", version = "1.50.0")
+bazel_dep(name = "bazel_lib", version = "3.7.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
+bazel_dep(name = "rules_java", version = "9.8.0")
+bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_pycross", version = "0.8.2")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
+single_version_override(
+    module_name = "pybind11_bazel",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/pybind11_bazel/0001-patch-pybind11-bazel.patch"],
+    version = "3.0.1",
+)
+
+publishing = use_extension("//shared/bazel/rules:publishing_rule.bzl", "publishing_extension")
+use_repo(publishing, "com_wpilib_allwpilib_publishing_config")
+
+pycross = use_extension("@rules_pycross//pycross/extensions:pycross.bzl", "pycross")
+pycross.configure_environments(
+    python_versions = ["3.13"],
+)
 
 python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
@@ -50,34 +64,45 @@ use_repo(pip, "allwpilib_pip_deps")
 
 bazel_dep(name = "rules_jvm_external", version = "6.8")
 
+register_toolchains("//:java_toolchain_definition")
+
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
     name = "maven",
     artifacts = [
-        "org.ejml:ejml-simple:0.44.0",
-        "io.avaje:avaje-jsonb:3.11",
-        "io.avaje:avaje-jsonb-generator:3.11",
+        "org.ejml:ejml-java9module:0.46.0",
+        "io.avaje:avaje-jsonb:3.14",
+        "io.avaje:avaje-jsonb-generator:3.14",
         "us.hebi.quickbuf:quickbuf-runtime:1.4",
         "com.google.code.gson:gson:2.13.1",
-        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-1",
-        "org.junit.jupiter:junit-jupiter:5.10.1",
-        "org.junit.platform:junit-platform-console:1.10.1",
-        "org.junit.platform:junit-platform-launcher:1.10.1",
-        "org.junit.platform:junit-platform-reporting:1.10.1",
-        "org.hamcrest:hamcrest-all:1.3",
-        "com.googlecode.junit-toolbox:junit-toolbox:2.4",
-        "org.apache.ant:ant:1.10.12",
-        "org.apache.ant:ant-junit:1.10.12",
+        "org.wpilib.thirdparty.opencv:opencv-java:2027-4.13.0-4",
+        "org.junit.jupiter:junit-jupiter:5.13.4",
+        "org.junit.platform:junit-platform-console:1.13.4",
+        "org.junit.platform:junit-platform-launcher:1.13.4",
         "org.mockito:mockito-core:4.1.0",
-        "com.google.testing.compile:compile-testing:0.21.0",
+        "com.google.testing.compile:compile-testing:0.23.0",
+        "com.google.errorprone:error_prone_annotations:2.41.0",
+        "junit:junit:4.13.2",
+    ],
+    excluded_artifacts = [
+        # avaje has incorrectly listed io.avaje:avaje-jsonb-inject-plugin as a dependency of io.avaje:avaje-jsonb,
+        # which results in runtime crashes when `--add-modules ALL-MODULE-PATH` is used.
+        # We don't use or care about avaje's dependency injection library, so we manually exclude the bridge library.
+        "io.avaje:avaje-jsonb-inject-plugin",
+    ],
+    known_contributing_modules = [
+        "allwpilib",
+        "bzlmodrio-opencv",
+        "protobuf",
     ],
     lock_file = "//:maven_install.json",
     repositories = [
         "https://repo1.maven.org/maven2",
         "https://frcmaven.wpi.edu/artifactory/release/",
     ],
+    resolver = "maven",
 )
-use_repo(maven, "maven", "unpinned_maven")
+use_repo(maven, "maven")
 
 bazel_dep(name = "caseyduquettesc_rules_python_pytest", version = "1.1.1", repo_name = "rules_python_pytest")
 bazel_dep(name = "eigen", version = "5.0.1")
@@ -118,14 +143,21 @@ http_file(
     urls = ["https://repo1.maven.org/maven2/us/hebi/quickbuf/protoc-gen-quickbuf/1.3.3/protoc-gen-quickbuf-1.3.3-windows-x86_64.exe"],
 )
 
-bazel_dep(name = "rules_bzlmodrio_toolchains", version = "2025-1.bcr6")
+bazel_dep(name = "wpilib_toolchains", version = "")
 archive_override(
-    module_name = "rules_bzlmodrio_toolchains",
-    integrity = "sha256-ECtFB2KOlySwweRBcndiw0TkAXD2WsYFFhaBeOozqJo=",
-    urls = ["https://github.com/wpilibsuite/rules_bzlmodrio_toolchains/releases/download/2025-1.bcr6/rules_bzlmodrio_toolchains-2025-1.bcr6.tar.gz"],
+    module_name = "wpilib_toolchains",
+    integrity = "sha256-t9pasV154Izb6xAllG7XI7lYljVP1jhNTQtoG2l6t6Y=",
+    urls = ["https://github.com/wpilibsuite/bazel_wpilib_toolchains/releases/download/2027-1.bcr1/wpilib_toolchains-2027-1.bcr1.tar.gz"],
 )
 
-bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "bzlmodrio-opencv", version = "")
+archive_override(
+    module_name = "bzlmodrio-opencv",
+    integrity = "sha256-WPeLraGmt9Fv8tYXvyzxDAGTZ1BW5qb6g95bXIk6otw=",
+    urls = ["https://github.com/wpilibsuite/bzlmodRio-opencv/releases/download/2027.4.13.0-3.bcr1/bzlmodRio-opencv-2027.4.13.0-3.bcr1.tar.gz"],
+)
+
+bazel_dep(name = "protobuf", version = "33.5", repo_name = "com_google_protobuf")
 
 http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
@@ -133,4 +165,42 @@ http_jar(
     name = "com_github_google_copybara",
     integrity = "sha256-IHW6y6WXJFjX9RYD+IwVAMwAbEo36fLqonIKR+FaqpQ=",
     urls = ["https://github.com/google/copybara/releases/download/v20251027/copybara_deploy.jar"],
+)
+
+bazel_dep(name = "aos")
+archive_override(
+    module_name = "aos",
+    integrity = "sha256-xc4s+K3WMYXWsQM4A5UdxiQ1yBBwA8gdws1pVWLW7yg=",
+    strip_prefix = "aos-86726cddc274d56d3d1d1dc33527a552f16f3897",
+    urls = ["https://github.com/AustinSchuh/aos/archive/86726cddc274d56d3d1d1dc33527a552f16f3897.tar.gz"],
+)
+
+# The flatbuffers AOS is built against, which aosnt reads reflection schemas
+# with. AOS patches it, so it is not the registry's flatbuffers.
+aos_dependencies = use_extension("@aos//aos:extension.bzl", "dependencies")
+use_repo(aos_dependencies, "aos_flatbuffers")
+
+# Forced, because abseil dropped compatibility_level in 20260526.0 and
+# rules_java still asks for a level-1 version, which does not resolve.
+bazel_dep(name = "abseil-cpp", version = "20260526.0")
+single_version_override(
+    module_name = "abseil-cpp",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/abseil-cpp/0001-Suppress-pedantic-warnings-for-GNU-int128.patch"],
+    version = "20260526.0",
+)
+
+# liburing comes in through AOS; //aos_sdk names it to keep its headers out of
+# the SDK. It's configure needs make only to print two version numbers, and the
+# Windows Systemcore builds have no make.
+bazel_dep(name = "liburing", version = "2.14.bcr.2")
+single_version_override(
+    module_name = "liburing",
+    patch_strip = 1,
+    patches = [
+        "shared/bazel/patches/liburing/0001-Read-the-version-without-make.patch",
+        "shared/bazel/patches/liburing/0002-Write-the-generated-files-where-the-caller-asks.patch",
+        "shared/bazel/patches/liburing/0003-Configure-into-the-output-directory.patch",
+    ],
+    version = "2.14.bcr.2",
 )

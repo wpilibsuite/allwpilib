@@ -8,6 +8,7 @@
 
 #include "PneumaticsBase.hpp"
 #include "wpi/hal/Types.h"
+#include "wpi/hardware/bus/CANPort.hpp"
 #include "wpi/units/pressure.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/mutex.hpp"
@@ -21,7 +22,7 @@ class PneumaticHub : public PneumaticsBase {
    *
    * @param busId The bus ID.
    */
-  explicit PneumaticHub(int busId);
+  explicit PneumaticHub(CANPort busId);
 
   /**
    * Constructs a PneumaticHub.
@@ -29,7 +30,7 @@ class PneumaticHub : public PneumaticsBase {
    * @param busId The bus ID.
    * @param module module number to construct
    */
-  PneumaticHub(int busId, int module);
+  PneumaticHub(CANPort busId, int module);
 
   ~PneumaticHub() override = default;
 
@@ -124,6 +125,8 @@ class PneumaticHub : public PneumaticsBase {
   Compressor MakeCompressor() override;
 
   void ReportUsage(std::string_view device, std::string_view data) override;
+  void ReportUsage(std::string_view device, int instanceNumber,
+                   std::string_view data) override;
 
   /** Version and device data received from a REV PH. */
   struct Version {
@@ -300,17 +303,19 @@ class PneumaticHub : public PneumaticsBase {
   class DataStore;
   friend class DataStore;
   friend class PneumaticsBase;
-  PneumaticHub(int busId, HAL_REVPHHandle handle, int module);
+  PneumaticHub(CANPort busId, HAL_REVPHHandle handle, int module);
 
-  static std::shared_ptr<PneumaticsBase> GetForModule(int busId, int module);
+  static std::shared_ptr<PneumaticsBase> GetForModule(CANPort busId,
+                                                      int module);
 
   std::shared_ptr<DataStore> m_dataStore;
   HAL_REVPHHandle m_handle;
+  CANPort m_busId;
   int m_module;
 
   static wpi::util::mutex m_handleLock;
   static std::unique_ptr<wpi::util::DenseMap<int, std::weak_ptr<DataStore>>[]>
       m_handleMaps;
-  static std::weak_ptr<DataStore>& GetDataStore(int busId, int module);
+  static std::weak_ptr<DataStore>& GetDataStore(CANPort busId, int module);
 };
 }  // namespace wpi

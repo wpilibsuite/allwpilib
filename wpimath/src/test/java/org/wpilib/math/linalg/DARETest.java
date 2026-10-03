@@ -20,10 +20,10 @@ class DARETest extends UtilityClassTest<DARE> {
   }
 
   public static <R extends Num, C extends Num> void assertMatrixEqual(
-      Matrix<R, C> A, Matrix<R, C> B) {
-    for (int i = 0; i < A.getNumRows(); i++) {
-      for (int j = 0; j < A.getNumCols(); j++) {
-        assertEquals(A.get(i, j), B.get(i, j), 1e-4);
+      Matrix<R, C> expected, Matrix<R, C> actual) {
+    for (int row = 0; row < expected.getNumRows(); ++row) {
+      for (int col = 0; col < expected.getNumCols(); ++col) {
+        assertEquals(expected.get(row, col), actual.get(row, col), 1e-10);
       }
     }
   }
@@ -40,9 +40,15 @@ class DARETest extends UtilityClassTest<DARE> {
         (A.transpose().times(X).times(A))
             .minus(X)
             .minus(
-                (A.transpose().times(X).times(B))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A)))
+                A.transpose()
+                    .times(X)
+                    .times(B)
+                    .times(
+                        B.transpose()
+                            .times(X)
+                            .times(B)
+                            .plus(R)
+                            .solve(B.transpose().times(X).times(A))))
             .plus(Q);
     assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }
@@ -60,9 +66,16 @@ class DARETest extends UtilityClassTest<DARE> {
         (A.transpose().times(X).times(A))
             .minus(X)
             .minus(
-                (A.transpose().times(X).times(B).plus(N))
-                    .times((B.transpose().times(X).times(B).plus(R)).inv())
-                    .times(B.transpose().times(X).times(A).plus(N.transpose())))
+                A.transpose()
+                    .times(X)
+                    .times(B)
+                    .plus(N)
+                    .times(
+                        B.transpose()
+                            .times(X)
+                            .times(B)
+                            .plus(R)
+                            .solve(B.transpose().times(X).times(A).plus(N.transpose()))))
             .plus(Q);
     assertMatrixEqual(new Matrix<>(new SimpleMatrix(Y.getNumRows(), Y.getNumCols())), Y);
   }

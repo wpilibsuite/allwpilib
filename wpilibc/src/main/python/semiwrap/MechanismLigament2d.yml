@@ -11,4 +11,5 @@ classes:
       GetAngle:
       SetLineWeight:
       GetLineWeight:
-      UpdateEntries:
+      LogTo:
+      GetTelemetryType:

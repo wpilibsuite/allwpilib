@@ -1,0 +1,14 @@
+classes:
+  wpi::math::DrivetrainSplineTrajectory:
+    force_no_trampoline: true
+    methods:
+      DrivetrainSplineTrajectory:
+        overloads:
+          std::vector<DrivetrainSplineSample>:
+          std::initializer_list<DrivetrainSplineSample>:
+            ignore: true
+      TransformBy:
+      RelativeTo:
+      Concatenate:
+      operator+:
+      Interpolate:

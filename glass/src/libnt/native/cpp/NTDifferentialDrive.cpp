@@ -4,12 +4,11 @@
 
 #include "wpi/glass/networktables/NTDifferentialDrive.hpp"
 
-#include <utility>
+#include <format>
 
-#include <fmt/format.h>
 #include <imgui.h>
 
-#include "wpi/util/MathExtras.hpp"
+#include "wpi/glass/networktables/NTTunableTopic.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::glass;
@@ -21,18 +20,15 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(std::string_view path)
 NTDifferentialDriveModel::NTDifferentialDriveModel(
     wpi::nt::NetworkTableInstance inst, std::string_view path)
     : m_inst{inst},
-      m_name{inst.GetStringTopic(fmt::format("{}/.name", path)).Subscribe("")},
-      m_controllable{inst.GetBooleanTopic(fmt::format("{}/.controllable", path))
-                         .Subscribe(false)},
       m_lPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Left Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Left Motor Velocity", path))
               .GetEntry(0)},
       m_rPercent{
-          inst.GetDoubleTopic(fmt::format("{}/Right Motor Velocity", path))
+          inst.GetDoubleTopic(std::format("{}/Right Motor Velocity", path))
               .GetEntry(0)},
       m_nameValue{wpi::util::rsplit(path, '/').second},
-      m_lPercentData{fmt::format("NTDiffDriveL:{}", path)},
-      m_rPercentData{fmt::format("NTDiffDriveR:{}", path)} {
+      m_lPercentData{std::format("NTDiffDriveL:{}", path)},
+      m_rPercentData{std::format("NTDiffDriveR:{}", path)} {
   m_wheels.emplace_back("L % Output", &m_lPercentData,
                         [this](auto value) { m_lPercent.Set(value); });
 
@@ -41,17 +37,11 @@ NTDifferentialDriveModel::NTDifferentialDriveModel(
 }
 
 void NTDifferentialDriveModel::Update() {
-  for (auto&& v : m_name.ReadQueue()) {
-    m_nameValue = std::move(v.value);
-  }
   for (auto&& v : m_lPercent.ReadQueue()) {
     m_lPercentData.SetValue(v.value, v.time);
   }
   for (auto&& v : m_rPercent.ReadQueue()) {
     m_rPercentData.SetValue(v.value, v.time);
-  }
-  for (auto&& v : m_controllable.ReadQueue()) {
-    m_controllableValue = v.value;
   }
 
   double l = m_lPercentData.GetValue();
@@ -63,4 +53,9 @@ void NTDifferentialDriveModel::Update() {
 
 bool NTDifferentialDriveModel::Exists() {
   return m_lPercent.Exists();
+}
+
+bool NTDifferentialDriveModel::IsReadOnly() {
+  return !IsTunableTopicMutable(m_lPercent.GetTopic()) ||
+         !IsTunableTopicMutable(m_rPercent.GetTopic());
 }

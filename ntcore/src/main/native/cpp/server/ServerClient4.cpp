@@ -27,8 +27,8 @@ ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
       m_incoming{logger},
       m_outgoing{wire, local} {
   // create client meta topics
-  m_metaPub = storage.CreateMetaTopic(fmt::format("$clientpub${}", name));
-  m_metaSub = storage.CreateMetaTopic(fmt::format("$clientsub${}", name));
+  m_metaPub = storage.CreateMetaTopic(std::format("$clientpub${}", name));
+  m_metaSub = storage.CreateMetaTopic(std::format("$clientsub${}", name));
 
   // update meta topics
   UpdateMetaClientPub();
@@ -36,12 +36,12 @@ ServerClient4::ServerClient4(std::string_view name, std::string_view connInfo,
 }
 
 bool ServerClient4::ProcessIncomingText(std::string_view data) {
-  constexpr int kMaxImmProcessing = 10;
+  constexpr int MAX_IMM_PROCESSING = 10;
   bool queueWasEmpty = m_incoming.empty();
   // can't directly process, because we don't know how big it is
   WireDecodeText(data, m_incoming, m_logger);
   if (queueWasEmpty &&
-      DoProcessIncomingMessages(m_incoming, kMaxImmProcessing)) {
+      DoProcessIncomingMessages(m_incoming, MAX_IMM_PROCESSING)) {
     m_wire.StopRead();
     return true;
   }
@@ -49,9 +49,9 @@ bool ServerClient4::ProcessIncomingText(std::string_view data) {
 }
 
 bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
-  constexpr int kMaxImmProcessing = 10;
+  constexpr int MAX_IMM_PROCESSING = 10;
   // if we've already queued, keep queuing
-  int count = m_incoming.empty() ? 0 : kMaxImmProcessing;
+  int count = m_incoming.empty() ? 0 : MAX_IMM_PROCESSING;
   for (;;) {
     if (data.empty()) {
       break;
@@ -62,7 +62,7 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     Value value;
     std::string error;
     if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
-      m_wire.Disconnect(fmt::format("binary decode error: {}", error));
+      m_wire.Disconnect(std::format("binary decode error: {}", error));
       break;
     }
 
@@ -76,13 +76,13 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     }
 
     // handle value set
-    if (++count < kMaxImmProcessing) {
+    if (++count < MAX_IMM_PROCESSING) {
       ClientSetValue(pubuid, value);
     } else {
       m_incoming.ClientSetValue(pubuid, value);
     }
   }
-  if (count >= kMaxImmProcessing) {
+  if (count >= MAX_IMM_PROCESSING) {
     m_wire.StopRead();
     return true;
   }
@@ -97,7 +97,11 @@ void ServerClient4::SendValue(ServerTopic* topic, const Value& value,
 void ServerClient4::SendAnnounce(ServerTopic* topic,
                                  std::optional<int> pubuid) {
   auto& sent = m_announceSent[topic];
-  if (sent) {
+  // Allow publish-triggered announcements (with pubuid) even if a
+  // subscription-triggered announcement was already sent, as the spec requires
+  // the server to respond to publish messages with an announcement containing
+  // the pubuid.
+  if (sent && !pubuid.has_value()) {
     return;
   }
   sent = true;

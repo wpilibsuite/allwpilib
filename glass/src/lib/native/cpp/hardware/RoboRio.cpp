@@ -64,5 +64,22 @@ void wpi::glass::DisplayRoboRio(RoboRioModel* model) {
     DisplayRail(*rail, "3.3V Rail");
   }
 
+  if (CollapsingHeader("Brownout Thresholds")) {
+    ImGui::PushID("Brownout Thresholds");
+    if (auto data = model->GetBrownoutVoltage()) {
+      double val = data->GetValue();
+      if (data->InputDouble("Brownout Voltage (V)", &val)) {
+        model->SetBrownoutVoltage(val);
+      }
+    }
+    if (auto data = model->GetBrownoutRecoveryVoltage()) {
+      double val = data->GetValue();
+      if (data->InputDouble("Recovery Voltage (V)", &val)) {
+        model->SetBrownoutRecoveryVoltage(val);
+      }
+    }
+    ImGui::PopID();
+  }
+
   ImGui::PopItemWidth();
 }

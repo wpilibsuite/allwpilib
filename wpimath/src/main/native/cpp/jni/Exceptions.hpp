@@ -7,5 +7,3 @@
 #include "wpi/util/jni_util.hpp"
 
 extern wpi::util::java::JException illegalArgEx;
-extern wpi::util::java::JException ioEx;
-extern wpi::util::java::JException trajectorySerializationEx;

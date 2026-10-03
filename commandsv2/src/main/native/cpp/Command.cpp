@@ -1,0 +1,246 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+#include "wpi/commands2/Command.hpp"
+
+#include <string>
+#include <utility>
+
+#include "wpi/commands2/CommandPtr.hpp"
+#include "wpi/commands2/CommandScheduler.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/tunables/TunableConfig.hpp"
+#include "wpi/tunables/TunableTable.hpp"
+#include "wpi/util/Demangle.hpp"
+#include "wpi/util/StackTrace.hpp"
+
+using namespace wpi::cmd;
+
+Command::Command() : m_name{wpi::util::GetTypeName(*this)} {}
+
+Command::~Command() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
+
+Command& Command::operator=(const Command& rhs) {
+  SetComposed(false);
+  return *this;
+}
+
+void Command::Initialize() {}
+void Command::Execute() {}
+void Command::End(bool interrupted) {}
+
+wpi::util::SmallSet<Subsystem*, 4> Command::GetRequirements() const {
+  return m_requirements;
+}
+
+void Command::AddRequirements(Requirements requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(wpi::util::SmallSet<Subsystem*, 4> requirements) {
+  m_requirements.insert(requirements.begin(), requirements.end());
+}
+
+void Command::AddRequirements(Subsystem* requirement) {
+  m_requirements.insert(requirement);
+}
+
+void Command::SetName(std::string_view name) {
+  m_name = name;
+  SetChildTunableChanged("name");
+}
+
+std::string Command::GetName() const {
+  return m_name;
+}
+
+CommandPtr Command::WithTimeout(wpi::units::second_t duration) && {
+  return std::move(*this).ToPtr().WithTimeout(duration);
+}
+
+CommandPtr Command::Until(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().Until(std::move(condition));
+}
+
+CommandPtr Command::OnlyWhile(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyWhile(std::move(condition));
+}
+
+CommandPtr Command::IgnoringDisable(bool doesRunWhenDisabled) && {
+  return std::move(*this).ToPtr().IgnoringDisable(doesRunWhenDisabled);
+}
+
+CommandPtr Command::WithInterruptBehavior(
+    InterruptionBehavior interruptBehavior) && {
+  return std::move(*this).ToPtr().WithInterruptBehavior(interruptBehavior);
+}
+
+CommandPtr Command::BeforeStarting(std::function<void()> toRun,
+                                   Requirements requirements) && {
+  return std::move(*this).ToPtr().BeforeStarting(std::move(toRun),
+                                                 requirements);
+}
+
+CommandPtr Command::BeforeStarting(CommandPtr&& before) && {
+  return std::move(*this).ToPtr().BeforeStarting(std::move(before));
+}
+
+CommandPtr Command::AndThen(std::function<void()> toRun,
+                            Requirements requirements) && {
+  return std::move(*this).ToPtr().AndThen(std::move(toRun), requirements);
+}
+
+CommandPtr Command::AndThen(CommandPtr&& next) && {
+  return std::move(*this).ToPtr().AndThen(std::move(next));
+}
+
+CommandPtr Command::Repeatedly() && {
+  return std::move(*this).ToPtr().Repeatedly();
+}
+
+CommandPtr Command::AsProxy() && {
+  return std::move(*this).ToPtr().AsProxy();
+}
+
+CommandPtr Command::Unless(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().Unless(std::move(condition));
+}
+
+CommandPtr Command::OnlyIf(std::function<bool()> condition) && {
+  return std::move(*this).ToPtr().OnlyIf(std::move(condition));
+}
+
+CommandPtr Command::WithDeadline(CommandPtr&& deadline) && {
+  return std::move(*this).ToPtr().WithDeadline(std::move(deadline));
+}
+
+CommandPtr Command::DeadlineFor(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().DeadlineFor(std::move(parallel));
+}
+
+CommandPtr Command::AlongWith(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().AlongWith(std::move(parallel));
+}
+
+CommandPtr Command::RaceWith(CommandPtr&& parallel) && {
+  return std::move(*this).ToPtr().RaceWith(std::move(parallel));
+}
+
+CommandPtr Command::FinallyDo(std::function<void(bool)> end) && {
+  return std::move(*this).ToPtr().FinallyDo(std::move(end));
+}
+
+CommandPtr Command::FinallyDo(std::function<void()> end) && {
+  return std::move(*this).ToPtr().FinallyDo(std::move(end));
+}
+
+CommandPtr Command::HandleInterrupt(std::function<void()> handler) && {
+  return std::move(*this).ToPtr().HandleInterrupt(std::move(handler));
+}
+
+CommandPtr Command::WithName(std::string_view name) && {
+  return std::move(*this).ToPtr().WithName(name);
+}
+
+void Command::Cancel() {
+  CommandScheduler::GetInstance().Cancel(this);
+}
+
+bool Command::IsScheduled() const {
+  return CommandScheduler::GetInstance().IsScheduled(this);
+}
+
+bool Command::HasRequirement(Subsystem* requirement) const {
+  bool hasRequirement = false;
+  for (auto&& subsystem : GetRequirements()) {
+    hasRequirement |= requirement == subsystem;
+  }
+  return hasRequirement;
+}
+
+bool Command::IsComposed() const {
+  return GetPreviousCompositionSite().has_value();
+}
+
+void Command::SetComposed(bool isComposed) {
+  if (isComposed) {
+    m_previousComposition = wpi::util::GetStackTrace(1);
+  } else {
+    m_previousComposition.reset();
+  }
+}
+
+std::optional<std::string> Command::GetPreviousCompositionSite() const {
+  return m_previousComposition;
+}
+
+void Command::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("name", m_name);
+  table.Log("running", IsScheduled());
+  table.Log("isParented", IsComposed());
+
+  std::string_view behavior;
+  switch (GetInterruptionBehavior()) {
+    case Command::InterruptionBehavior::CANCEL_INCOMING:
+      behavior = "CANCEL_INCOMING";
+      break;
+    case Command::InterruptionBehavior::CANCEL_SELF:
+      behavior = "CANCEL_SELF";
+      break;
+    default:
+      behavior = "Invalid";
+      break;
+  }
+  table.Log("interruptBehavior", behavior);
+  table.Log("runsWhenDisabled", RunsWhenDisabled());
+}
+
+std::string_view Command::GetTelemetryType() const {
+  return "Command";
+}
+
+void Command::PublishTunable(wpi::tunables::TunableTable& table) {
+  table.Publish(
+      "name", this, &Command::m_name,
+      wpi::tunables::TunableConfig{
+          .isMutable = false,
+          .polling = wpi::tunables::TunableConfig::Polling::GET_ON_CHANGE});
+  table.Publish(
+      "running", this, &Command::m_running,
+      wpi::tunables::TunableConfig{
+          .onTune =
+              [](TunableBase&, wpi::tunables::ComplexTunable* self) {
+                if (auto command = static_cast<Command*>(self)) {
+                  bool isScheduled = command->IsScheduled();
+                  if (command->m_running && !isScheduled) {
+                    CommandScheduler::GetInstance().Schedule(command);
+                  } else if (!command->m_running && isScheduled) {
+                    command->Cancel();
+                  }
+                }
+              },
+          .parent = this,
+          .polling = wpi::tunables::TunableConfig::Polling::ALWAYS_GET});
+}
+
+void Command::UpdateTunable() const {
+  m_running = IsScheduled();
+}
+
+std::string_view Command::GetTunableType() const {
+  return "Command";
+}
+
+namespace wpi::cmd {
+bool RequirementsDisjoint(Command* first, Command* second) {
+  bool disjoint = true;
+  auto&& requirements = second->GetRequirements();
+  for (auto&& requirement : first->GetRequirements()) {
+    disjoint &= requirements.find(requirement) == requirements.end();
+  }
+  return disjoint;
+}
+}  // namespace wpi::cmd

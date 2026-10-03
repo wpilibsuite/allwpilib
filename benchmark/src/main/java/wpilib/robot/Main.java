@@ -4,6 +4,7 @@
 
 package wpilib.robot;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -20,12 +21,17 @@ public class Main {
   /**
    * Main function.
    *
-   * @param args The (unused) arguments to the program.
+   * @param args optional JMH command-line arguments
    */
-  public static void main(String... args) throws RunnerException {
+  public static void main(String... args) throws IOException, RunnerException {
+    if (args.length > 0) {
+      org.openjdk.jmh.Main.main(args);
+      return;
+    }
+
     var opt =
         new OptionsBuilder()
-            .include(Main.class.getSimpleName())
+            .include("wpilib\\.robot\\..*")
             .addProfiler(GCProfiler.class)
             .forks(1)
             .warmupIterations(2)
@@ -35,6 +41,20 @@ public class Main {
             .build();
 
     new Runner(opt).run();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void justNewThrowable() {
+    StackTraceGatheringBenchmark.run(false);
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.NANOSECONDS)
+  public void newThrowableGetStackTrace() {
+    StackTraceGatheringBenchmark.run(true);
   }
 
   @Benchmark

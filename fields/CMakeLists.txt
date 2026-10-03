@@ -3,71 +3,87 @@ project(fields)
 include(CompileWarnings)
 include(GenResources)
 
-if(WITH_JAVA)
-    include(UseJava)
-
-    file(GLOB AVAJE_JARS "${WPILIB_BINARY_DIR}/wpiutil/thirdparty/avaje/*.jar")
-
-    file(GLOB_RECURSE JAVA_SOURCES src/main/java/*.java)
-    file(
-        GLOB_RECURSE JAVA_FRC_RESOURCES
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        src/main/native/resources/frc/*.json
-        src/main/native/resources/frc/*.png
-        src/main/native/resources/frc/*.jpg
-    )
-
-    file(
-        GLOB_RECURSE JAVA_FTC_RESOURCES
-        RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        src/main/native/resources/ftc/*.json
-        src/main/native/resources/ftc/*.png
-        src/main/native/resources/ftc/*.jpg
-    )
-
-    add_jar(
-        field_images_jar
-        SOURCES ${JAVA_SOURCES}
-        RESOURCES
-        NAMESPACE "org/wpilib/fields/frc" ${JAVA_FRC_RESOURCES}
-        NAMESPACE "org/wpilib/fields/ftc" ${JAVA_FTC_RESOURCES}
-        INCLUDE_JARS ${AVAJE_JARS}
-        OUTPUT_DIR ${WPILIB_BINARY_DIR}/${java_lib_dest}
-        OUTPUT_NAME fields
-    )
-    set_property(TARGET field_images_jar PROPERTY FOLDER "java")
-    install_jar(field_images_jar DESTINATION ${java_lib_dest})
-    install_jar_exports(TARGETS field_images_jar FILE fields_jar.cmake DESTINATION share/fields)
-endif()
-
 generate_resources(
-    src/main/native/resources/org/wpilib/fields/*
+    src/main/native/resources/org/wpilib/fields
     ${CMAKE_CURRENT_BINARY_DIR}/generated/main/cpp
     FIELDS
     wpi::fields
-    field_images_resources_src
+    field_resources_src
+    *.json
 )
 
-add_library(fields ${field_images_resources_src} src/main/native/cpp/fields.cpp)
+set(fields_export_targets fields)
+
+if(WPILIB_WITH_GUI)
+    generate_resources(
+        src/main/native/resources/org/wpilib/fields
+        ${CMAKE_CURRENT_BINARY_DIR}/generated/mainImages/cpp
+        FIELD_IMAGES
+        wpi::fields
+        field_images_resources_src
+        *.jpg
+        *.jpeg
+        *.png
+    )
+endif()
+
+add_library(
+    fields
+    ${field_resources_src}
+    src/generated/main/native/cpp/fields/fields.cpp
+    src/main/native/cpp/FieldTag.cpp
+    src/main/native/cpp/FieldImage.cpp
+    src/main/native/cpp/Field.cpp
+)
 set_target_properties(fields PROPERTIES DEBUG_POSTFIX "d")
+
+if(WPILIB_WITH_GUI)
+    add_library(
+        fieldimages
+        ${field_images_resources_src}
+        src/generated/main/native/cpp/fieldimages/field_images.cpp
+    )
+    set_target_properties(fieldimages PROPERTIES DEBUG_POSTFIX "d")
+    list(APPEND fields_export_targets fieldimages)
+endif()
 
 set_property(TARGET fields PROPERTY FOLDER "libraries")
 target_compile_features(fields PUBLIC cxx_std_23)
+target_link_libraries(fields PUBLIC wpimath wpiutil)
 if(MSVC)
     target_compile_options(fields PUBLIC /bigobj)
 endif()
 wpilib_target_warnings(fields)
 
+if(WPILIB_WITH_GUI)
+    set_property(TARGET fieldimages PROPERTY FOLDER "libraries")
+    target_compile_features(fieldimages PUBLIC cxx_std_23)
+    target_link_libraries(fieldimages PUBLIC wpiutil)
+    target_include_directories(
+        fieldimages
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
+            $<INSTALL_INTERFACE:${include_dest}/fields>
+    )
+    if(MSVC)
+        target_compile_options(fieldimages PUBLIC /bigobj)
+    endif()
+    wpilib_target_warnings(fieldimages)
+endif()
+
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/fields")
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/fields")
 target_include_directories(
     fields
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/fields>
 )
 
-install(TARGETS fields EXPORT fields)
-export(TARGETS fields FILE fields.cmake NAMESPACE fields::)
+install(TARGETS ${fields_export_targets} EXPORT fields)
+export(TARGETS ${fields_export_targets} FILE fields.cmake NAMESPACE fields::)
 
 configure_file(fields-config.cmake.in ${WPILIB_BINARY_DIR}/fields-config.cmake)
 install(FILES ${WPILIB_BINARY_DIR}/fields-config.cmake DESTINATION share/fields)

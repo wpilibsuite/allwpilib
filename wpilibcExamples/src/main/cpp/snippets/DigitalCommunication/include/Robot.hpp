@@ -16,16 +16,16 @@
 class Robot : public wpi::TimedRobot {
  public:
   // define ports for communication with light controller
-  static constexpr int kAlliancePort = 0;
-  static constexpr int kEnabledPort = 1;
-  static constexpr int kAutonomousPort = 2;
-  static constexpr int kAlertPort = 3;
+  static constexpr int ALLIANCE_PORT = 0;
+  static constexpr int ENABLED_PORT = 1;
+  static constexpr int AUTONOMOUS_PORT = 2;
+  static constexpr int ALERT_PORT = 3;
 
   void RobotPeriodic() override;
 
  private:
-  wpi::DigitalOutput allianceOutput{kAlliancePort};
-  wpi::DigitalOutput enabledOutput{kEnabledPort};
-  wpi::DigitalOutput autonomousOutput{kAutonomousPort};
-  wpi::DigitalOutput alertOutput{kAlertPort};
+  wpi::DigitalOutput allianceOutput{ALLIANCE_PORT};
+  wpi::DigitalOutput enabledOutput{ENABLED_PORT};
+  wpi::DigitalOutput autonomousOutput{AUTONOMOUS_PORT};
+  wpi::DigitalOutput alertOutput{ALERT_PORT};
 };

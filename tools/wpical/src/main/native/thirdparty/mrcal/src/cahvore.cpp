@@ -9,10 +9,11 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "autodiff.hh"
+#include "_autodiff.hh"
+#include "_attribute.h"
 
 extern "C" {
-#include "cahvore.h"
+#include "_cahvore.h"
 }
 
 template <int N>
@@ -151,7 +152,7 @@ bool _project_cahvore_internals( // outputs
 // Not meant to be touched by the end user. Implemented separate from mrcal.c so
 // that I can get automated gradient propagation with c++
 extern "C"
-
+MRCAL_ATTRIBUTE((visibility ("hidden")))
 bool project_cahvore_internals( // outputs
                                 mrcal_point3_t* __restrict pdistorted,
                                 double*         __restrict dpdistorted_dintrinsics_nocore,

@@ -36,7 +36,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * <p>Errors reported by the compiler plugin may be suppressed by annotating the offending method
- * with {@code SuppressWarnings("PostConstructionInitializer")} or {@code
+ * with {@code SuppressWarnings("WPILib.PostConstructionInitializer")} or {@code
  * SuppressWarnings(PostConstructionInitializer.SUPPRESSION_KEY)}. This is intended to be used in
  * tests to allow runtime error handling code to be tested, but may also be used to suppress
  * spurious warnings in production code.
@@ -48,7 +48,7 @@ public @interface PostConstructionInitializer {
    * The string key to use in {@link SuppressWarnings} annotations to suppress compiler error
    * messages related to this annotation.
    */
-  String SUPPRESSION_KEY = "PostConstructionInitializer";
+  String SUPPRESSION_KEY = "WPILib.PostConstructionInitializer";
 
   /**
    * Marks a specific parameter in a static initializer method as being the initialized object. This

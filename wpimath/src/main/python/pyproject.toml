@@ -1,11 +1,13 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.3.0",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpimath==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
     # "numpy", # broken in raspbian CI
 ]
@@ -21,6 +23,8 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpimath==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
 ]
 
@@ -95,6 +99,11 @@ scan_headers_ignore = [
     "PyTrajectoryConstraint.h",
     "_units_base_type_caster.h",
 ]
+
+[tool.semiwrap.name_transform]
+default = "snake_case"
+enum_value = "CAPS_CASE"
+known_words = ["3V3", "5V", "CAN", "CPU", "DS", "FMS", "FPGA", "HAL", "HTTP", "I2C", "IMU", "JNI", "JSON", "mDNS", "NT", "OpMode", "PCM", "PDH", "PDP", "PID", "POVs", "PWM", "RIO", "SPI", "URI", "URL", "USB", "VIn"]
 
 [tool.semiwrap.export_type_casters.wpimath-casters]
 pypackage = "wpimath"
@@ -1449,7 +1458,7 @@ types = [
 name = "wpimath"
 wraps = ["robotpy-native-wpimath"]
 includes = ["wpimath/_impl/src"]
-depends = ["wpiutil", "wpimath-casters"]
+depends = ["telemetry", "tunables", "wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
 # wpi/math/util
@@ -1460,6 +1469,7 @@ MathUtil = "wpi/math/util/MathUtil.hpp"
 # StateSpaceUtil = "wpi/math/util/StateSpaceUtil.hpp"
 
 # wpi/math/controller
+AntiTipping = "wpi/math/controller/AntiTipping.hpp"
 ArmFeedforward = "wpi/math/controller/ArmFeedforward.hpp"
 BangBangController = "wpi/math/controller/BangBangController.hpp"
 ControlAffinePlantInversionFeedforward = "wpi/math/controller/ControlAffinePlantInversionFeedforward.hpp"
@@ -1492,8 +1502,11 @@ SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
+TwoDeadWheelPoseEstimator = "wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp"
+TwoDeadWheelPoseEstimator3d = "wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp"
 
 # wpi/math/filter
+BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
 Debouncer = "wpi/math/filter/Debouncer.hpp"
 EdgeCounterFilter = "wpi/math/filter/EdgeCounterFilter.hpp"
 LinearFilter = "wpi/math/filter/LinearFilter.hpp"
@@ -1503,11 +1516,9 @@ SlewRateLimiter = "wpi/math/filter/SlewRateLimiter.hpp"
 # wpi/math/geometry
 CoordinateAxis = "wpi/math/geometry/CoordinateAxis.hpp"
 CoordinateSystem = "wpi/math/geometry/CoordinateSystem.hpp"
-Ellipse2d = "wpi/math/geometry/Ellipse2d.hpp"
 Pose2d = "wpi/math/geometry/Pose2d.hpp"
 Pose3d = "wpi/math/geometry/Pose3d.hpp"
 Quaternion = "wpi/math/geometry/Quaternion.hpp"
-Rectangle2d = "wpi/math/geometry/Rectangle2d.hpp"
 Rotation2d = "wpi/math/geometry/Rotation2d.hpp"
 Rotation3d = "wpi/math/geometry/Rotation3d.hpp"
 Transform2d = "wpi/math/geometry/Transform2d.hpp"
@@ -1516,6 +1527,10 @@ Translation2d = "wpi/math/geometry/Translation2d.hpp"
 Translation3d = "wpi/math/geometry/Translation3d.hpp"
 Twist2d = "wpi/math/geometry/Twist2d.hpp"
 Twist3d = "wpi/math/geometry/Twist3d.hpp"
+
+# wpi/math/shape
+Ellipse2d = "wpi/math/shape/Ellipse2d.hpp"
+Rectangle2d = "wpi/math/shape/Rectangle2d.hpp"
 
 # wpi/math/interpolation
 TimeInterpolatableBuffer = "wpi/math/interpolation/TimeInterpolatableBuffer.hpp"
@@ -1544,7 +1559,8 @@ SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleVelocity = "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-
+TwoDeadWheelOdometry = "wpi/math/kinematics/TwoDeadWheelOdometry.hpp"
+TwoDeadWheelOdometry3d = "wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp"
 
 # wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
@@ -1570,11 +1586,18 @@ NumericalIntegration = "wpi/math/system/NumericalIntegration.hpp"
 NumericalJacobian = "wpi/math/system/NumericalJacobian.hpp"
 
 # wpi/math/trajectory
+DifferentialSample = "wpi/math/trajectory/DifferentialSample.hpp"
+DifferentialTrajectory = "wpi/math/trajectory/DifferentialTrajectory.hpp"
+DrivetrainSplineSample = "wpi/math/trajectory/DrivetrainSplineSample.hpp"
+DrivetrainSplineTrajectory = "wpi/math/trajectory/DrivetrainSplineTrajectory.hpp"
+DrivetrainSplineTrajectoryGenerator = "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+DrivetrainSplineTrajectoryParameterizer = "wpi/math/trajectory/DrivetrainSplineTrajectoryParameterizer.hpp"
 ExponentialProfile = "wpi/math/trajectory/ExponentialProfile.hpp"
+HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
+HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
-TrajectoryGenerator = "wpi/math/trajectory/TrajectoryGenerator.hpp"
-TrajectoryParameterizer = "wpi/math/trajectory/TrajectoryParameterizer.hpp"
+TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint

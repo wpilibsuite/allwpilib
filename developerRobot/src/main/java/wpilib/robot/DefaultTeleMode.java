@@ -4,7 +4,6 @@
 
 package wpilib.robot;
 
-import org.wpilib.driverstation.DefaultUserControls;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 
@@ -13,12 +12,8 @@ public class DefaultTeleMode extends PeriodicOpMode {
   @SuppressWarnings("unused")
   private final OpRobot robot;
 
-  @SuppressWarnings("unused")
-  private final DefaultUserControls userControls;
-
-  public DefaultTeleMode(OpRobot robot, DefaultUserControls userControls) {
+  public DefaultTeleMode(OpRobot robot) {
     this.robot = robot;
-    this.userControls = userControls;
   }
 
   @Override

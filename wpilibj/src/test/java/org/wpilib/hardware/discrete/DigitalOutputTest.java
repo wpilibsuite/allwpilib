@@ -22,7 +22,7 @@ class DigitalOutputTest {
 
   @Test
   void testPwmFunctionsWithoutInitialization() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DigitalOutput output = new DigitalOutput(0)) {
       assertDoesNotThrow(() -> output.updateDutyCycle(0.6));
@@ -32,7 +32,7 @@ class DigitalOutputTest {
 
   @Test
   void testPwmFunctionsWithInitialization() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
 
     try (DigitalOutput output = new DigitalOutput(0)) {
       DIOSim sim = new DIOSim(output);

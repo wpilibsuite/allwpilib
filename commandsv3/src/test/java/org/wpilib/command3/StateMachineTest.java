@@ -369,6 +369,61 @@ class StateMachineTest extends CommandTestBase {
   }
 
   @Test
+  @SuppressWarnings("WPILib.AddStateAfterSwitchFromAny")
+  void cannotAddStateAfterNoArgSwitchFromAny() {
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    stateMachine.setInitialState(state1);
+    stateMachine.switchFromAny().toExitStateMachine().when(() -> true);
+
+    var exception =
+        assertThrows(IllegalStateException.class, () -> stateMachine.addState(command2));
+    assertEquals(
+        "Cannot add new states to a state machine after switchFromAny() has been called with no"
+            + " arguments",
+        exception.getMessage());
+  }
+
+  @Test
+  void canAddStateAfterExplicitSwitchFromAny() {
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+    stateMachine.switchFromAny(state1, state2).toExitStateMachine().when(() -> true);
+
+    // Adding states after explicit switchFromAny is permitted
+    var state3 = stateMachine.addState(command3);
+    stateMachine.setInitialState(state1);
+    state3.switchTo(state1).whenComplete();
+  }
+
+  @Test
+  void canAddStateAfterExplicitStateTransition() {
+    var command1 = Command.noRequirements(Coroutine::park).named("Command 1");
+    var command2 = Command.noRequirements(Coroutine::park).named("Command 2");
+    var command3 = Command.noRequirements(Coroutine::park).named("Command 3");
+
+    var stateMachine = new StateMachine("State Machine");
+    var state1 = stateMachine.addState(command1);
+    var state2 = stateMachine.addState(command2);
+
+    // Early explicit state-to-state transition
+    state1.switchTo(state2).whenComplete();
+
+    // Adding more states to build another subgraph is permitted
+    var state3 = stateMachine.addState(command3);
+    stateMachine.setInitialState(state1);
+    state2.switchTo(state3).whenComplete();
+  }
+
+  @Test
   void switchFromAny() {
     var command1 = Command.noRequirements(Coroutine::yield).named("Command 1");
     var command2 = Command.noRequirements(Coroutine::park).named("Command 2");

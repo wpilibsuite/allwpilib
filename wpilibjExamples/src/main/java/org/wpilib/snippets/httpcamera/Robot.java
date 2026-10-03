@@ -24,6 +24,7 @@ public class Robot extends TimedRobot {
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
+    CameraServer.initialize();
     visionThread =
         new Thread(
             () -> {

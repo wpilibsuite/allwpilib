@@ -18,6 +18,32 @@ extern "C" {
 
 /*
  * Class:     org_wpilib_math_autodiff_VariableMatrixJNI
+ * Method:    exp
+ * Signature: ([JI)[J
+ */
+JNIEXPORT jlongArray JNICALL
+Java_org_wpilib_math_autodiff_VariableMatrixJNI_exp
+  (JNIEnv* env, jclass, jlongArray mat, jint rows)
+{
+  JSpan<const jlong> matSpan{env, mat};
+  slp::VariableMatrix<double> matObj(slp::detail::empty, rows, rows);
+  for (size_t i = 0; i < matSpan.size(); ++i) {
+    matObj[i] = *reinterpret_cast<slp::Variable<double>*>(matSpan[i]);
+  }
+
+  auto expMat = matObj.exp();
+
+  std::vector<jlong> varHandles;
+  varHandles.reserve(expMat.size());
+  for (auto& var : expMat) {
+    varHandles.emplace_back(
+        reinterpret_cast<jlong>(new slp::Variable<double>{var}));
+  }
+  return MakeJLongArray(env, varHandles);
+}
+
+/*
+ * Class:     org_wpilib_math_autodiff_VariableMatrixJNI
  * Method:    solve
  * Signature: ([JI[JI)[J
  */

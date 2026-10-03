@@ -6,14 +6,15 @@
 
 #include <string_view>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/raw_ostream.hpp"
 
-TEST(ScopedTracerTest, Timing) {
+TEST_CASE("ScopedTracerTest Timing", "[wpilibc]") {
   wpi::util::SmallString<128> buf;
   wpi::util::raw_svector_ostream os(buf);
 
@@ -25,5 +26,5 @@ TEST(ScopedTracerTest, Timing) {
   wpi::sim::ResumeTiming();
 
   std::string_view out = os.str();
-  EXPECT_TRUE(wpi::util::starts_with(out, "\ttiming_test: 1.5"));
+  CHECK(wpi::util::starts_with(out, "\ttiming_test: 1.5"));
 }

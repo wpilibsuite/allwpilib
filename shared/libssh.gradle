@@ -6,7 +6,7 @@ nativeUtils {
             headerClassifier = "headers"
             sourceClassifier = "sources"
             ext = "zip"
-            version = '2027-0.120-1'
+            version = libs.versions.libssh
             targetPlatforms.addAll(nativeUtils.wpi.platforms.allPlatforms)
         }
     }

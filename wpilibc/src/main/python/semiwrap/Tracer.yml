@@ -17,7 +17,7 @@ classes:
 
 inline_code: |-
   cls_Tracer
-    .def("getEpochs",
+    .def("get_epochs",
       [](Tracer * self) -> py::str {
         wpi::util::SmallString<128> buf;
         wpi::util::raw_svector_ostream s(buf);

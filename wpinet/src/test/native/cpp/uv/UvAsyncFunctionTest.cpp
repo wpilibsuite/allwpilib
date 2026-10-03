@@ -6,21 +6,25 @@
 #include "wpi/net/uv/AsyncFunction.hpp"
 // clang-format on
 
+#include <atomic>
 #include <memory>
 #include <thread>
 #include <utility>
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Prepare.hpp"
 
 namespace wpi::net::uv {
 
-TEST(UvAsyncFunctionTest, Basic) {
+TEST_CASE("UvAsyncFunctionTest Basic", "[uv][async-function]") {
   int prepare_cb_called = 0;
   int async_cb_called[2] = {0, 0};
   int close_cb_called = 0;
+  std::atomic_bool fail{false};
+  std::atomic_bool call0_check{false};
+  std::atomic_bool call1_check{false};
 
   std::thread theThread;
 
@@ -28,9 +32,9 @@ TEST(UvAsyncFunctionTest, Basic) {
   auto async = AsyncFunction<int(int)>::Create(loop);
   auto prepare = Prepare::Create(loop);
 
-  loop->error.connect([](Error) { FAIL(); });
+  loop->error.connect([&](Error) { fail = true; });
 
-  prepare->error.connect([](Error) { FAIL(); });
+  prepare->error.connect([&](Error) { fail = true; });
   prepare->prepare.connect([&] {
     if (prepare_cb_called++) {
       return;
@@ -38,13 +42,13 @@ TEST(UvAsyncFunctionTest, Basic) {
     theThread = std::thread([&] {
       auto call0 = async->Call(0);
       auto call1 = async->Call(1);
-      ASSERT_EQ(call0.get(), 1);
-      ASSERT_EQ(call1.get(), 2);
+      call0_check = call0.get() == 1;
+      call1_check = call1.get() == 2;
     });
   });
   prepare->Start();
 
-  async->error.connect([](Error) { FAIL(); });
+  async->error.connect([&](Error) { fail = true; });
   async->closed.connect([&] { close_cb_called++; });
   async->wakeup = [&](wpi::util::promise<int> out, int v) {
     ++async_cb_called[v];
@@ -57,18 +61,25 @@ TEST(UvAsyncFunctionTest, Basic) {
 
   loop->Run();
 
-  ASSERT_EQ(async_cb_called[0], 1);
-  ASSERT_EQ(async_cb_called[1], 1);
-  ASSERT_EQ(close_cb_called, 1);
+  if (fail) {
+    FAIL();
+  }
+
+  REQUIRE(async_cb_called[0] == 1);
+  REQUIRE(async_cb_called[1] == 1);
+  REQUIRE(close_cb_called == 1);
 
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(call0_check);
+  REQUIRE(call1_check);
 }
 
-TEST(UvAsyncFunctionTest, Ref) {
+TEST_CASE("UvAsyncFunctionTest Ref", "[uv][async-function]") {
   int prepare_cb_called = 0;
   int val = 0;
+  std::atomic_bool call_check{false};
 
   std::thread theThread;
 
@@ -80,7 +91,8 @@ TEST(UvAsyncFunctionTest, Ref) {
     if (prepare_cb_called++) {
       return;
     }
-    theThread = std::thread([&] { ASSERT_EQ(async->Call(1, val).get(), 2); });
+    theThread =
+        std::thread([&] { call_check = async->Call(1, val).get() == 2; });
   });
   prepare->Start();
 
@@ -93,15 +105,17 @@ TEST(UvAsyncFunctionTest, Ref) {
 
   loop->Run();
 
-  ASSERT_EQ(val, 1);
+  REQUIRE(val == 1);
 
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(call_check);
 }
 
-TEST(UvAsyncFunctionTest, Movable) {
+TEST_CASE("UvAsyncFunctionTest Movable", "[uv][async-function]") {
   int prepare_cb_called = 0;
+  std::atomic_bool val2_check{false};
 
   std::thread theThread;
 
@@ -117,8 +131,7 @@ TEST(UvAsyncFunctionTest, Movable) {
     theThread = std::thread([&] {
       auto val = std::make_unique<int>(1);
       auto val2 = async->Call(std::move(val)).get();
-      ASSERT_NE(val2, nullptr);
-      ASSERT_EQ(*val2, 1);
+      val2_check = val2 != nullptr && *val2 == 1;
     });
   });
   prepare->Start();
@@ -135,9 +148,10 @@ TEST(UvAsyncFunctionTest, Movable) {
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(val2_check);
 }
 
-TEST(UvAsyncFunctionTest, CallIgnoreResult) {
+TEST_CASE("UvAsyncFunctionTest CallIgnoreResult", "[uv][async-function]") {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -169,7 +183,7 @@ TEST(UvAsyncFunctionTest, CallIgnoreResult) {
   }
 }
 
-TEST(UvAsyncFunctionTest, VoidCall) {
+TEST_CASE("UvAsyncFunctionTest VoidCall", "[uv][async-function]") {
   int prepare_cb_called = 0;
 
   std::thread theThread;
@@ -199,8 +213,9 @@ TEST(UvAsyncFunctionTest, VoidCall) {
   }
 }
 
-TEST(UvAsyncFunctionTest, WaitFor) {
+TEST_CASE("UvAsyncFunctionTest WaitFor", "[uv][async-function]") {
   int prepare_cb_called = 0;
+  std::atomic_bool call_check{false};
 
   std::thread theThread;
 
@@ -213,7 +228,7 @@ TEST(UvAsyncFunctionTest, WaitFor) {
       return;
     }
     theThread = std::thread([&] {
-      ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
+      call_check = !async->Call().wait_for(std::chrono::milliseconds(10));
     });
   });
   prepare->Start();
@@ -230,10 +245,12 @@ TEST(UvAsyncFunctionTest, WaitFor) {
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(call_check);
 }
 
-TEST(UvAsyncFunctionTest, VoidWaitFor) {
+TEST_CASE("UvAsyncFunctionTest VoidWaitFor", "[uv][async-function]") {
   int prepare_cb_called = 0;
+  std::atomic_bool call_check{false};
 
   std::thread theThread;
 
@@ -246,7 +263,7 @@ TEST(UvAsyncFunctionTest, VoidWaitFor) {
       return;
     }
     theThread = std::thread([&] {
-      ASSERT_FALSE(async->Call().wait_for(std::chrono::milliseconds(10)));
+      call_check = !async->Call().wait_for(std::chrono::milliseconds(10));
     });
   });
   prepare->Start();
@@ -263,6 +280,7 @@ TEST(UvAsyncFunctionTest, VoidWaitFor) {
   if (theThread.joinable()) {
     theThread.join();
   }
+  REQUIRE(call_check);
 }
 
 }  // namespace wpi::net::uv

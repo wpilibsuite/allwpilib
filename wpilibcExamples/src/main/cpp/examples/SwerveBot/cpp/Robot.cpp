@@ -32,14 +32,14 @@ class Robot : public wpi::TimedRobot {
     // negative values when we push forward.
     const auto xVelocity = -xVelocityLimiter.Calculate(wpi::math::ApplyDeadband(
                                controller.GetLeftY(), 0.02)) *
-                           Drivetrain::kMaxVelocity;
+                           Drivetrain::MAX_VELOCITY;
 
     // Get the y velocity or sideways/strafe velocity. We are inverting this
     // because we want a positive value when we pull to the left. Gamepads
     // return positive values when you pull to the right by default.
     const auto yVelocity = -yVelocityLimiter.Calculate(wpi::math::ApplyDeadband(
                                controller.GetLeftX(), 0.02)) *
-                           Drivetrain::kMaxVelocity;
+                           Drivetrain::MAX_VELOCITY;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in
@@ -47,7 +47,7 @@ class Robot : public wpi::TimedRobot {
     // the right by default.
     const auto rot = -rotLimiter.Calculate(wpi::math::ApplyDeadband(
                          controller.GetRightX(), 0.02)) *
-                     Drivetrain::kMaxAngularVelocity;
+                     Drivetrain::MAX_ANGULAR_VELOCITY;
 
     swerve.Drive(xVelocity, yVelocity, rot, fieldRelative, GetPeriod());
   }

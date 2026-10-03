@@ -5,7 +5,9 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <chrono>
+#include <cmath>
 #include <cstdlib>
 #include <functional>
 #include <memory>

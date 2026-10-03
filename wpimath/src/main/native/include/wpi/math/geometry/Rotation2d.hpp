@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <type_traits>
+#include <stdexcept>
 #include <utility>
 
 #include <Eigen/Core>
@@ -58,7 +58,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
     } else {
       m_cos = 1.0;
       m_sin = 0.0;
-      if (!std::is_constant_evaluated()) {
+      if !consteval {
         wpi::math::MathSharedStore::ReportError(
             "x and y components of Rotation2d are zero\n{}",
             wpi::util::GetStackTrace(1));
@@ -94,7 +94,7 @@ class WPILIB_DLLEXPORT Rotation2d final {
       return {R(0, 0), R(1, 0)};
     };
 
-    if (std::is_constant_evaluated()) {
+    if consteval {
       auto cossin = impl(ct_matrix2d{rotationMatrix});
       m_cos = std::get<0>(cossin);
       m_sin = std::get<1>(cossin);

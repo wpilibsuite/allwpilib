@@ -25,7 +25,7 @@ int main() {
   cv::Mat test;
   cv::Mat flip;
   for (;;) {
-    uint64_t time = cvsink.GrabFrame(test);
+    int64_t time = cvsink.GrabFrame(test);
     if (time == 0) {
       wpi::util::print("error: {}\n", cvsink.GetError());
       continue;

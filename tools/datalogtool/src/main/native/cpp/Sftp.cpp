@@ -8,8 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
 using namespace sftp;
 
 Attributes::Attributes(sftp_attributes&& attr)

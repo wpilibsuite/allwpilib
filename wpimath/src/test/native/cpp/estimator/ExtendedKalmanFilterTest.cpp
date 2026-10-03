@@ -5,17 +5,29 @@
 #include "wpi/math/estimator/ExtendedKalmanFilter.hpp"
 
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include <Eigen/QR>
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/TestAssertions.hpp"
+#include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/linalg/EigenCore.hpp"
 #include "wpi/math/random/Normal.hpp"
 #include "wpi/math/system/DCMotor.hpp"
 #include "wpi/math/system/NumericalJacobian.hpp"
-#include "wpi/math/trajectory/TrajectoryGenerator.hpp"
+#include "wpi/math/trajectory/DrivetrainSplineTrajectoryGenerator.hpp"
+#include "wpi/math/util/StateSpaceUtil.hpp"
+#include "wpi/units/acceleration.hpp"
+#include "wpi/units/angle.hpp"
+#include "wpi/units/base.hpp"
+#include "wpi/units/length.hpp"
+#include "wpi/units/mass.hpp"
 #include "wpi/units/moment_of_inertia.hpp"
+#include "wpi/units/time.hpp"
+#include "wpi/units/velocity.hpp"
+#include "wpi/units/voltage.hpp"
 
 namespace {
 
@@ -64,7 +76,7 @@ wpi::math::Vectord<5> GlobalMeasurementModel(
 }
 }  // namespace
 
-TEST(ExtendedKalmanFilterTest, Init) {
+TEST_CASE("ExtendedKalmanFilterTest Init", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
 
   wpi::math::ExtendedKalmanFilter<5, 2, 3> observer{Dynamics,
@@ -83,7 +95,7 @@ TEST(ExtendedKalmanFilterTest, Init) {
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 }
 
-TEST(ExtendedKalmanFilterTest, Convergence) {
+TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
   constexpr wpi::units::second_t dt = 5_ms;
   constexpr auto rb = 0.8382_m / 2.0;  // Robot radius
 
@@ -96,7 +108,7 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   auto waypoints = std::vector<wpi::math::Pose2d>{
       wpi::math::Pose2d{2.75_m, 22.521_m, 0_rad},
       wpi::math::Pose2d{24.73_m, 19.68_m, 5.846_rad}};
-  auto trajectory = wpi::math::TrajectoryGenerator::GenerateTrajectory(
+  auto trajectory = wpi::math::DrivetrainSplineTrajectoryGenerator::Generate(
       waypoints, {8.8_mps, 0.1_mps_sq});
 
   wpi::math::Vectord<5> r = wpi::math::Vectord<5>::Zero();
@@ -110,13 +122,13 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
       trajectory.InitialPose().Translation().Y().value(),
       trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
 
-  auto totalTime = trajectory.TotalTime();
-  for (size_t i = 0; i < (totalTime / dt).value(); ++i) {
-    auto ref = trajectory.Sample(dt * i);
+  auto duration = trajectory.Duration();
+  for (size_t i = 0; i < (duration / dt).value(); ++i) {
+    auto ref = trajectory.SampleAt(dt * i);
     wpi::units::meters_per_second_t vl =
-        ref.velocity * (1 - (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 - (ref.curvature * rb).value());
     wpi::units::meters_per_second_t vr =
-        ref.velocity * (1 + (ref.curvature * rb).value());
+        ref.ForwardVelocity() * (1 + (ref.curvature * rb).value());
 
     wpi::math::Vectord<5> nextR{
         ref.pose.Translation().X().value(), ref.pose.Translation().Y().value(),
@@ -141,13 +153,13 @@ TEST(ExtendedKalmanFilterTest, Convergence) {
   auto R = wpi::math::CovarianceMatrix(0.01, 0.01, 0.0001, 0.5, 0.5);
   observer.Correct<5>(u, globalY, GlobalMeasurementModel, R);
 
-  auto finalPosition = trajectory.Sample(trajectory.TotalTime());
-  ASSERT_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
-              1.0);
-  ASSERT_NEAR(finalPosition.pose.Rotation().Radians().value(), observer.Xhat(2),
-              1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(3), 1.0);
-  ASSERT_NEAR(0.0, observer.Xhat(4), 1.0);
+  auto finalPosition = trajectory.SampleAt(trajectory.Duration());
+  REQUIRE_NEAR(finalPosition.pose.Translation().X().value(), observer.Xhat(0),
+               1.0);
+  REQUIRE_NEAR(finalPosition.pose.Translation().Y().value(), observer.Xhat(1),
+               1.0);
+  REQUIRE_NEAR(finalPosition.pose.Rotation().Radians().value(),
+               observer.Xhat(2), 1.0);
+  REQUIRE_NEAR(0.0, observer.Xhat(3), 1.0);
+  REQUIRE_NEAR(0.0, observer.Xhat(4), 1.0);
 }

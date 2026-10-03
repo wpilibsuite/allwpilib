@@ -6,11 +6,16 @@
 
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
+import java.util.Objects;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from NiDsXbox controllers connected to the Driver Station.
@@ -23,40 +28,42 @@ import org.wpilib.util.sendable.SendableBuilder;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class NiDsXboxController extends GenericHID implements Sendable {
+public class NiDsXboxController implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a NiDsXboxController. */
   public enum Button {
     /** A button. */
-    kA(0),
+    A(0, "AButton"),
     /** B button. */
-    kB(1),
+    B(1, "BButton"),
     /** X button. */
-    kX(2),
+    X(2, "XButton"),
     /** Y button. */
-    kY(3),
+    Y(3, "YButton"),
     /** Left bumper button. */
-    kLeftBumper(4),
+    LEFT_BUMPER(4, "LeftBumperButton"),
     /** Right bumper button. */
-    kRightBumper(5),
+    RIGHT_BUMPER(5, "RightBumperButton"),
     /** Back button. */
-    kBack(6),
+    BACK(6, "BackButton"),
     /** Start button. */
-    kStart(7),
+    START(7, "StartButton"),
     /** Left stick button. */
-    kLeftStick(8),
+    LEFT_STICK(8, "LeftStickButton"),
     /** Right stick button. */
-    kRightStick(9);
+    RIGHT_STICK(9, "RightStickButton");
 
     /** Button value. */
     public final int value;
 
-    Button(int value) {
+    private final String m_name;
+
+    Button(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the button, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Button`.
+     * Get the human-friendly name of the button, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -64,36 +71,37 @@ public class NiDsXboxController extends GenericHID implements Sendable {
      */
     @Override
     public String toString() {
-      // Remove leading `k`
-      return this.name().substring(1) + "Button";
+      return m_name;
     }
   }
 
   /** Represents an axis on an NiDsXboxController. */
   public enum Axis {
     /** Left X axis. */
-    kLeftX(0),
+    LEFT_X(0, "LeftX"),
     /** Right X axis. */
-    kRightX(4),
+    RIGHT_X(4, "RightX"),
     /** Left Y axis. */
-    kLeftY(1),
+    LEFT_Y(1, "LeftY"),
     /** Right Y axis. */
-    kRightY(5),
+    RIGHT_Y(5, "RightY"),
     /** Left trigger. */
-    kLeftTrigger(2),
+    LEFT_TRIGGER(2, "LeftTriggerAxis"),
     /** Right trigger. */
-    kRightTrigger(3);
+    RIGHT_TRIGGER(3, "RightTriggerAxis");
 
     /** Axis value. */
     public final int value;
 
-    Axis(int value) {
+    private final String m_name;
+
+    Axis(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the axis, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Axis` if the name ends with `Trigger`.
+     * Get the human-friendly name of the axis, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -101,12 +109,20 @@ public class NiDsXboxController extends GenericHID implements Sendable {
      */
     @Override
     public String toString() {
-      var name = this.name().substring(1); // Remove leading `k`
-      if (name.endsWith("Trigger")) {
-        return name + "Axis";
-      }
-      return name;
+      return m_name;
     }
+  }
+
+  private final GenericHID m_hid;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -115,8 +131,17 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @param port The port index on the Driver Station that the controller is plugged into (0-5).
    */
   public NiDsXboxController(final int port) {
-    super(port);
-    HAL.reportUsage("HID", port, "NiDsXboxController");
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  public NiDsXboxController(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    UsageReporting.reportUsage("HID", hid.getPort(), "NiDsXboxController");
   }
 
   /**
@@ -125,7 +150,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftX() {
-    return getRawAxis(Axis.kLeftX.value);
+    return m_hid.getRawAxis(Axis.LEFT_X.value);
   }
 
   /**
@@ -134,7 +159,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightX() {
-    return getRawAxis(Axis.kRightX.value);
+    return m_hid.getRawAxis(Axis.RIGHT_X.value);
   }
 
   /**
@@ -143,7 +168,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftY() {
-    return getRawAxis(Axis.kLeftY.value);
+    return m_hid.getRawAxis(Axis.LEFT_Y.value);
   }
 
   /**
@@ -152,7 +177,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightY() {
-    return getRawAxis(Axis.kRightY.value);
+    return m_hid.getRawAxis(Axis.RIGHT_Y.value);
   }
 
   /**
@@ -162,7 +187,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getLeftTriggerAxis() {
-    return getRawAxis(Axis.kLeftTrigger.value);
+    return m_hid.getRawAxis(Axis.LEFT_TRIGGER.value);
   }
 
   /**
@@ -176,7 +201,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent leftTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kLeftTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(Axis.LEFT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -198,7 +223,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The axis value.
    */
   public double getRightTriggerAxis() {
-    return getRawAxis(Axis.kRightTrigger.value);
+    return m_hid.getRawAxis(Axis.RIGHT_TRIGGER.value);
   }
 
   /**
@@ -212,7 +237,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     threshold, attached to the given event loop
    */
   public BooleanEvent rightTrigger(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.kRightTrigger.value, threshold, loop);
+    return m_hid.axisGreaterThan(Axis.RIGHT_TRIGGER.value, threshold, loop);
   }
 
   /**
@@ -233,7 +258,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getAButton() {
-    return getRawButton(Button.kA.value);
+    return m_hid.getRawButton(Button.A.value);
   }
 
   /**
@@ -242,7 +267,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getAButtonPressed() {
-    return getRawButtonPressed(Button.kA.value);
+    return m_hid.getRawButtonPressed(Button.A.value);
   }
 
   /**
@@ -251,7 +276,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getAButtonReleased() {
-    return getRawButtonReleased(Button.kA.value);
+    return m_hid.getRawButtonReleased(Button.A.value);
   }
 
   /**
@@ -262,7 +287,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent a(EventLoop loop) {
-    return button(Button.kA.value, loop);
+    return m_hid.button(Button.A.value, loop);
   }
 
   /**
@@ -271,7 +296,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBButton() {
-    return getRawButton(Button.kB.value);
+    return m_hid.getRawButton(Button.B.value);
   }
 
   /**
@@ -280,7 +305,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBButtonPressed() {
-    return getRawButtonPressed(Button.kB.value);
+    return m_hid.getRawButtonPressed(Button.B.value);
   }
 
   /**
@@ -289,7 +314,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBButtonReleased() {
-    return getRawButtonReleased(Button.kB.value);
+    return m_hid.getRawButtonReleased(Button.B.value);
   }
 
   /**
@@ -300,7 +325,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent b(EventLoop loop) {
-    return button(Button.kB.value, loop);
+    return m_hid.button(Button.B.value, loop);
   }
 
   /**
@@ -309,7 +334,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getXButton() {
-    return getRawButton(Button.kX.value);
+    return m_hid.getRawButton(Button.X.value);
   }
 
   /**
@@ -318,7 +343,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getXButtonPressed() {
-    return getRawButtonPressed(Button.kX.value);
+    return m_hid.getRawButtonPressed(Button.X.value);
   }
 
   /**
@@ -327,7 +352,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getXButtonReleased() {
-    return getRawButtonReleased(Button.kX.value);
+    return m_hid.getRawButtonReleased(Button.X.value);
   }
 
   /**
@@ -338,7 +363,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent x(EventLoop loop) {
-    return button(Button.kX.value, loop);
+    return m_hid.button(Button.X.value, loop);
   }
 
   /**
@@ -347,7 +372,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getYButton() {
-    return getRawButton(Button.kY.value);
+    return m_hid.getRawButton(Button.Y.value);
   }
 
   /**
@@ -356,7 +381,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getYButtonPressed() {
-    return getRawButtonPressed(Button.kY.value);
+    return m_hid.getRawButtonPressed(Button.Y.value);
   }
 
   /**
@@ -365,7 +390,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getYButtonReleased() {
-    return getRawButtonReleased(Button.kY.value);
+    return m_hid.getRawButtonReleased(Button.Y.value);
   }
 
   /**
@@ -376,7 +401,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent y(EventLoop loop) {
-    return button(Button.kY.value, loop);
+    return m_hid.button(Button.Y.value, loop);
   }
 
   /**
@@ -385,7 +410,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftBumperButton() {
-    return getRawButton(Button.kLeftBumper.value);
+    return m_hid.getRawButton(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -394,7 +419,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftBumperButtonPressed() {
-    return getRawButtonPressed(Button.kLeftBumper.value);
+    return m_hid.getRawButtonPressed(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -403,7 +428,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftBumperButtonReleased() {
-    return getRawButtonReleased(Button.kLeftBumper.value);
+    return m_hid.getRawButtonReleased(Button.LEFT_BUMPER.value);
   }
 
   /**
@@ -414,7 +439,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftBumper(EventLoop loop) {
-    return button(Button.kLeftBumper.value, loop);
+    return m_hid.button(Button.LEFT_BUMPER.value, loop);
   }
 
   /**
@@ -423,7 +448,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightBumperButton() {
-    return getRawButton(Button.kRightBumper.value);
+    return m_hid.getRawButton(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -432,7 +457,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightBumperButtonPressed() {
-    return getRawButtonPressed(Button.kRightBumper.value);
+    return m_hid.getRawButtonPressed(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -441,7 +466,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightBumperButtonReleased() {
-    return getRawButtonReleased(Button.kRightBumper.value);
+    return m_hid.getRawButtonReleased(Button.RIGHT_BUMPER.value);
   }
 
   /**
@@ -452,7 +477,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightBumper(EventLoop loop) {
-    return button(Button.kRightBumper.value, loop);
+    return m_hid.button(Button.RIGHT_BUMPER.value, loop);
   }
 
   /**
@@ -461,7 +486,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getBackButton() {
-    return getRawButton(Button.kBack.value);
+    return m_hid.getRawButton(Button.BACK.value);
   }
 
   /**
@@ -470,7 +495,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getBackButtonPressed() {
-    return getRawButtonPressed(Button.kBack.value);
+    return m_hid.getRawButtonPressed(Button.BACK.value);
   }
 
   /**
@@ -479,7 +504,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getBackButtonReleased() {
-    return getRawButtonReleased(Button.kBack.value);
+    return m_hid.getRawButtonReleased(Button.BACK.value);
   }
 
   /**
@@ -490,7 +515,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent back(EventLoop loop) {
-    return button(Button.kBack.value, loop);
+    return m_hid.button(Button.BACK.value, loop);
   }
 
   /**
@@ -499,7 +524,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getStartButton() {
-    return getRawButton(Button.kStart.value);
+    return m_hid.getRawButton(Button.START.value);
   }
 
   /**
@@ -508,7 +533,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getStartButtonPressed() {
-    return getRawButtonPressed(Button.kStart.value);
+    return m_hid.getRawButtonPressed(Button.START.value);
   }
 
   /**
@@ -517,7 +542,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getStartButtonReleased() {
-    return getRawButtonReleased(Button.kStart.value);
+    return m_hid.getRawButtonReleased(Button.START.value);
   }
 
   /**
@@ -528,7 +553,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent start(EventLoop loop) {
-    return button(Button.kStart.value, loop);
+    return m_hid.button(Button.START.value, loop);
   }
 
   /**
@@ -537,7 +562,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getLeftStickButton() {
-    return getRawButton(Button.kLeftStick.value);
+    return m_hid.getRawButton(Button.LEFT_STICK.value);
   }
 
   /**
@@ -546,7 +571,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getLeftStickButtonPressed() {
-    return getRawButtonPressed(Button.kLeftStick.value);
+    return m_hid.getRawButtonPressed(Button.LEFT_STICK.value);
   }
 
   /**
@@ -555,7 +580,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getLeftStickButtonReleased() {
-    return getRawButtonReleased(Button.kLeftStick.value);
+    return m_hid.getRawButtonReleased(Button.LEFT_STICK.value);
   }
 
   /**
@@ -566,7 +591,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent leftStick(EventLoop loop) {
-    return button(Button.kLeftStick.value, loop);
+    return m_hid.button(Button.LEFT_STICK.value, loop);
   }
 
   /**
@@ -575,7 +600,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return The state of the button.
    */
   public boolean getRightStickButton() {
-    return getRawButton(Button.kRightStick.value);
+    return m_hid.getRawButton(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -584,7 +609,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was pressed since the last check.
    */
   public boolean getRightStickButtonPressed() {
-    return getRawButtonPressed(Button.kRightStick.value);
+    return m_hid.getRawButtonPressed(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -593,7 +618,7 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    * @return Whether the button was released since the last check.
    */
   public boolean getRightStickButtonReleased() {
-    return getRawButtonReleased(Button.kRightStick.value);
+    return m_hid.getRawButtonReleased(Button.RIGHT_STICK.value);
   }
 
   /**
@@ -604,28 +629,89 @@ public class NiDsXboxController extends GenericHID implements Sendable {
    *     attached to the given loop.
    */
   public BooleanEvent rightStick(EventLoop loop) {
-    return button(Button.kRightStick.value, loop);
+    return m_hid.button(Button.RIGHT_STICK.value, loop);
+  }
+
+  /**
+   * Get if the controller is connected.
+   *
+   * @return true if the controller is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
+  }
+
+  /**
+   * Get the type of the controller.
+   *
+   * @return the type of the controller.
+   */
+  public HIDType getGamepadType() {
+    return m_hid.getGamepadType();
+  }
+
+  /**
+   * Get the supported outputs of the controller.
+   *
+   * @return the supported outputs of the controller.
+   */
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    return m_hid.getSupportedOutputs();
+  }
+
+  /**
+   * Get the name of the controller.
+   *
+   * @return the name of the controller.
+   */
+  public String getName() {
+    return m_hid.getName();
+  }
+
+  /**
+   * Get the port number of the controller.
+   *
+   * @return The port number of the controller.
+   */
+  public int getPort() {
+    return m_hid.getPort();
+  }
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * <p>The DS currently supports 4 rumble values: left rumble, right rumble, left trigger rumble,
+   * and right trigger rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(RumbleType type, double value) {
+    m_hid.setRumble(type, value);
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "NiDsXbox");
-    builder.addDoubleProperty("LeftTrigger Axis", this::getLeftTriggerAxis, null);
-    builder.addDoubleProperty("RightTrigger Axis", this::getRightTriggerAxis, null);
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("Back", this::getBackButton, null);
-    builder.addBooleanProperty("Start", this::getStartButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
+  public String getTelemetryType() {
+    return "HID:NiDsXbox";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftTrigger Axis", getLeftTriggerAxis());
+    table.log("RightTrigger Axis", getRightTriggerAxis());
+    table.log("LeftX", getLeftX());
+    table.log("RightX", getRightX());
+    table.log("LeftY", getLeftY());
+    table.log("RightY", getRightY());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("X", getXButton());
+    table.log("Y", getYButton());
+    table.log("LeftBumper", getLeftBumperButton());
+    table.log("RightBumper", getRightBumperButton());
+    table.log("Back", getBackButton());
+    table.log("Start", getStartButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
   }
 }

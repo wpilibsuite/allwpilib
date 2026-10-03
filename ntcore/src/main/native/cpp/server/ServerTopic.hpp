@@ -27,19 +27,35 @@ class ServerClient;
 struct TopicClientData {
   wpi::util::SmallPtrSet<ServerPublisher*, 2> publishers;
   wpi::util::SmallPtrSet<ServerSubscriber*, 2> subscribers;
-  net::ValueSendMode sendMode = net::ValueSendMode::kDisabled;
+  net::ValueSendMode sendMode = net::ValueSendMode::DISABLED;
 
   bool AddSubscriber(ServerSubscriber* sub) {
     bool added = subscribers.insert(sub).second;
-    auto& options = sub->GetOptions();
-    if (!options.topicsOnly) {
-      if (options.sendAll) {
-        sendMode = net::ValueSendMode::kAll;
-      } else if (sendMode == net::ValueSendMode::kDisabled) {
-        sendMode = net::ValueSendMode::kNormal;
-      }
-    }
+    RecalculateSendMode();
     return added;
+  }
+
+  bool RemoveSubscriber(ServerSubscriber* sub) {
+    bool removed = subscribers.erase(sub);
+    if (removed) {
+      RecalculateSendMode();
+    }
+    return removed;
+  }
+
+  void RecalculateSendMode() {
+    sendMode = net::ValueSendMode::DISABLED;
+    for (auto subscriber : subscribers) {
+      auto& options = subscriber->GetOptions();
+      if (options.topicsOnly) {
+        continue;
+      }
+      if (options.sendAll) {
+        sendMode = net::ValueSendMode::ALL;
+        return;
+      }
+      sendMode = net::ValueSendMode::NORMAL;
+    }
   }
 };
 

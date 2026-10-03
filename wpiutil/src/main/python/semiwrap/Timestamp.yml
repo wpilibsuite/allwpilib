@@ -3,4 +3,5 @@ functions:
   SetNowImpl:
     ignore: true # This is more complicated, so it is handled by src/timestmap.cpp
   Now:
+  GetProgramStartTime:
   GetSystemTime:

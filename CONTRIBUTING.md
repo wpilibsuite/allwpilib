@@ -21,7 +21,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
     - Some features, such the addition of C++26 for WPILibC or Functional Interfaces for WPILibJ, are specific to that version of WPILib only. New language features added to C++ must be wrappable in Python for [RobotPy](https://github.com/robotpy).
 - Changes should have tests.
 - Code should be well documented.
-    - This involves writing tutorials and/or usage guides for your submitted feature. These articles are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [frc-docs repository](https://github.com/wpilibsuite/frc-docs) for more information.
+    - This involves writing tutorials and/or usage guides for your submitted feature. These articles are then hosted on the [WPILib](https://docs.wpilib.org/) documentation website. See the [wpilib-docs repository](https://github.com/wpilibsuite/wpilib-docs) for more information.
 
 ## What to Contribute
 

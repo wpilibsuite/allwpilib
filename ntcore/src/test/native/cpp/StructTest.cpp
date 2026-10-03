@@ -4,12 +4,12 @@
 
 #include "wpi/util/struct/Struct.hpp"
 
-#include <gtest/gtest.h>
+#include <catch2/catch_test_macros.hpp>
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/StructArrayTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
-#include "wpi/util/SpanMatcher.hpp"
+#include "wpi/util/json.hpp"
 
 namespace {
 struct Inner {
@@ -157,189 +157,193 @@ struct wpi::util::Struct<ThingB, Info1> {
 
 namespace wpi::nt {
 
-class StructTest : public ::testing::Test {
+class StructTest {
  public:
   StructTest() { inst = wpi::nt::NetworkTableInstance::Create(); }
-  ~StructTest() override { wpi::nt::NetworkTableInstance::Destroy(inst); }
+  ~StructTest() { wpi::nt::NetworkTableInstance::Destroy(inst); }
 
   wpi::nt::NetworkTableInstance inst;
 };
 
-TEST_F(StructTest, InnerConstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest InnerConstexpr", "[ntcore][struct]") {
   wpi::nt::StructTopic<Inner> topic = inst.GetStructTopic<Inner>("inner");
   wpi::nt::StructPublisher<Inner> pub = topic.Publish();
   wpi::nt::StructSubscriber<Inner> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Inner");
+  REQUIRE(topic.GetTypeString() == "struct:Inner");
 
   pub.SetDefault({0, 1});
   Inner val = sub.Get();
-  ASSERT_EQ(val.a, 0);
-  ASSERT_EQ(val.b, 1);
+  REQUIRE(val.a == 0);
+  REQUIRE(val.b == 1);
 
   pub.Set({1, 2});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.a, 1);
-  ASSERT_EQ(atomicVal.value.b, 2);
+  REQUIRE(atomicVal.value.a == 1);
+  REQUIRE(atomicVal.value.b == 2);
 
   Inner val2;
   sub.GetInto(&val2);
-  ASSERT_EQ(val2.a, 1);
-  ASSERT_EQ(val2.b, 2);
+  REQUIRE(val2.a == 1);
+  REQUIRE(val2.b == 2);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.a, 1);
-  ASSERT_EQ(vals[0].value.b, 2);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.a == 1);
+  REQUIRE(vals[0].value.b == 2);
 }
 
-TEST_F(StructTest, InnerNonconstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest InnerNonconstexpr",
+                 "[ntcore][struct]") {
   wpi::nt::StructTopic<Inner2> topic = inst.GetStructTopic<Inner2>("inner2");
   wpi::nt::StructPublisher<Inner2> pub = topic.Publish();
   wpi::nt::StructSubscriber<Inner2> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Inner2");
+  REQUIRE(topic.GetTypeString() == "struct:Inner2");
 
   pub.SetDefault({0, 1});
   Inner2 val = sub.Get();
-  ASSERT_EQ(val.a, 0);
-  ASSERT_EQ(val.b, 1);
+  REQUIRE(val.a == 0);
+  REQUIRE(val.b == 1);
 
   pub.Set({1, 2});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.a, 1);
-  ASSERT_EQ(atomicVal.value.b, 2);
+  REQUIRE(atomicVal.value.a == 1);
+  REQUIRE(atomicVal.value.b == 2);
 
   Inner2 val2;
   sub.GetInto(&val2);
-  ASSERT_EQ(val2.a, 1);
-  ASSERT_EQ(val2.b, 2);
+  REQUIRE(val2.a == 1);
+  REQUIRE(val2.b == 2);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.a, 1);
-  ASSERT_EQ(vals[0].value.b, 2);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.a == 1);
+  REQUIRE(vals[0].value.b == 2);
 }
 
-TEST_F(StructTest, OuterConstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest OuterConstexpr", "[ntcore][struct]") {
   wpi::nt::StructTopic<Outer> topic = inst.GetStructTopic<Outer>("outer");
   wpi::nt::StructPublisher<Outer> pub = topic.Publish();
   wpi::nt::StructSubscriber<Outer> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Outer");
+  REQUIRE(topic.GetTypeString() == "struct:Outer");
 
   pub.SetDefault({{0, 1}, 2});
   Outer val = sub.Get();
-  ASSERT_EQ(val.inner.a, 0);
-  ASSERT_EQ(val.inner.b, 1);
-  ASSERT_EQ(val.c, 2);
+  REQUIRE(val.inner.a == 0);
+  REQUIRE(val.inner.b == 1);
+  REQUIRE(val.c == 2);
 
   pub.Set({{1, 2}, 3});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.inner.a, 1);
-  ASSERT_EQ(atomicVal.value.inner.b, 2);
-  ASSERT_EQ(atomicVal.value.c, 3);
+  REQUIRE(atomicVal.value.inner.a == 1);
+  REQUIRE(atomicVal.value.inner.b == 2);
+  REQUIRE(atomicVal.value.c == 3);
 
   Outer val2;
   sub.GetInto(&val2);
-  ASSERT_EQ(val2.inner.a, 1);
-  ASSERT_EQ(val2.inner.b, 2);
-  ASSERT_EQ(val2.c, 3);
+  REQUIRE(val2.inner.a == 1);
+  REQUIRE(val2.inner.b == 2);
+  REQUIRE(val2.c == 3);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.inner.a, 1);
-  ASSERT_EQ(vals[0].value.inner.b, 2);
-  ASSERT_EQ(vals[0].value.c, 3);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.inner.a == 1);
+  REQUIRE(vals[0].value.inner.b == 2);
+  REQUIRE(vals[0].value.c == 3);
 }
 
-TEST_F(StructTest, OuterNonconstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest OuterNonconstexpr",
+                 "[ntcore][struct]") {
   wpi::nt::StructTopic<Outer2> topic = inst.GetStructTopic<Outer2>("outer2");
   wpi::nt::StructPublisher<Outer2> pub = topic.Publish();
   wpi::nt::StructSubscriber<Outer2> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Outer2");
+  REQUIRE(topic.GetTypeString() == "struct:Outer2");
 
   pub.SetDefault({{0, 1}, 2});
   Outer2 val = sub.Get();
-  ASSERT_EQ(val.inner.a, 0);
-  ASSERT_EQ(val.inner.b, 1);
-  ASSERT_EQ(val.c, 2);
+  REQUIRE(val.inner.a == 0);
+  REQUIRE(val.inner.b == 1);
+  REQUIRE(val.c == 2);
 
   pub.Set({{1, 2}, 3});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.inner.a, 1);
-  ASSERT_EQ(atomicVal.value.inner.b, 2);
-  ASSERT_EQ(atomicVal.value.c, 3);
+  REQUIRE(atomicVal.value.inner.a == 1);
+  REQUIRE(atomicVal.value.inner.b == 2);
+  REQUIRE(atomicVal.value.c == 3);
 
   Outer2 val2;
   sub.GetInto(&val2);
-  ASSERT_EQ(val2.inner.a, 1);
-  ASSERT_EQ(val2.inner.b, 2);
-  ASSERT_EQ(val2.c, 3);
+  REQUIRE(val2.inner.a == 1);
+  REQUIRE(val2.inner.b == 2);
+  REQUIRE(val2.c == 3);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.inner.a, 1);
-  ASSERT_EQ(vals[0].value.inner.b, 2);
-  ASSERT_EQ(vals[0].value.c, 3);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.inner.a == 1);
+  REQUIRE(vals[0].value.inner.b == 2);
+  REQUIRE(vals[0].value.c == 3);
 }
 
-TEST_F(StructTest, InnerArrayConstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest InnerArrayConstexpr",
+                 "[ntcore][struct]") {
   wpi::nt::StructArrayTopic<Inner> topic =
       inst.GetStructArrayTopic<Inner>("innerA");
   wpi::nt::StructArrayPublisher<Inner> pub = topic.Publish();
   wpi::nt::StructArraySubscriber<Inner> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Inner[]");
+  REQUIRE(topic.GetTypeString() == "struct:Inner[]");
 
   pub.SetDefault({{{0, 1}}});
   auto val = sub.Get();
-  ASSERT_EQ(val.size(), 1u);
-  ASSERT_EQ(val[0].a, 0);
-  ASSERT_EQ(val[0].b, 1);
+  REQUIRE(val.size() == 1u);
+  REQUIRE(val[0].a == 0);
+  REQUIRE(val[0].b == 1);
 
   pub.Set({{{1, 2}}});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.size(), 1u);
-  ASSERT_EQ(atomicVal.value[0].a, 1);
-  ASSERT_EQ(atomicVal.value[0].b, 2);
+  REQUIRE(atomicVal.value.size() == 1u);
+  REQUIRE(atomicVal.value[0].a == 1);
+  REQUIRE(atomicVal.value[0].b == 2);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.size(), 1u);
-  ASSERT_EQ(vals[0].value[0].a, 1);
-  ASSERT_EQ(vals[0].value[0].b, 2);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.size() == 1u);
+  REQUIRE(vals[0].value[0].a == 1);
+  REQUIRE(vals[0].value[0].b == 2);
 }
 
-TEST_F(StructTest, InnerArrayNonconstexpr) {
+TEST_CASE_METHOD(StructTest, "StructTest InnerArrayNonconstexpr",
+                 "[ntcore][struct]") {
   wpi::nt::StructArrayTopic<Inner2> topic =
       inst.GetStructArrayTopic<Inner2>("innerA2");
   wpi::nt::StructArrayPublisher<Inner2> pub = topic.Publish();
   wpi::nt::StructArraySubscriber<Inner2> sub = topic.Subscribe({});
 
-  ASSERT_EQ(topic.GetTypeString(), "struct:Inner2[]");
+  REQUIRE(topic.GetTypeString() == "struct:Inner2[]");
 
   pub.SetDefault({{{0, 1}}});
   auto val = sub.Get();
-  ASSERT_EQ(val.size(), 1u);
-  ASSERT_EQ(val[0].a, 0);
-  ASSERT_EQ(val[0].b, 1);
+  REQUIRE(val.size() == 1u);
+  REQUIRE(val[0].a == 0);
+  REQUIRE(val[0].b == 1);
 
   pub.Set({{{1, 2}}});
   auto atomicVal = sub.GetAtomic();
-  ASSERT_EQ(atomicVal.value.size(), 1u);
-  ASSERT_EQ(atomicVal.value[0].a, 1);
-  ASSERT_EQ(atomicVal.value[0].b, 2);
+  REQUIRE(atomicVal.value.size() == 1u);
+  REQUIRE(atomicVal.value[0].a == 1);
+  REQUIRE(atomicVal.value[0].b == 2);
 
   auto vals = sub.ReadQueue();
-  ASSERT_EQ(vals.size(), 1u);
-  ASSERT_EQ(vals[0].value.size(), 1u);
-  ASSERT_EQ(vals[0].value[0].a, 1);
-  ASSERT_EQ(vals[0].value[0].b, 2);
+  REQUIRE(vals.size() == 1u);
+  REQUIRE(vals[0].value.size() == 1u);
+  REQUIRE(vals[0].value[0].a == 1);
+  REQUIRE(vals[0].value[0].b == 2);
 }
 
-TEST_F(StructTest, StructA) {
+TEST_CASE_METHOD(StructTest, "StructTest StructA", "[ntcore][struct]") {
   wpi::nt::StructTopic<ThingA> topic = inst.GetStructTopic<ThingA>("a");
   wpi::nt::StructPublisher<ThingA> pub = topic.Publish();
   wpi::nt::StructPublisher<ThingA> pub2 =
@@ -357,7 +361,7 @@ TEST_F(StructTest, StructA) {
   entry.Get({});
 }
 
-TEST_F(StructTest, StructArrayA) {
+TEST_CASE_METHOD(StructTest, "StructTest StructArrayA", "[ntcore][struct]") {
   wpi::nt::StructArrayTopic<ThingA> topic =
       inst.GetStructArrayTopic<ThingA>("a");
   wpi::nt::StructArrayPublisher<ThingA> pub = topic.Publish();
@@ -376,7 +380,8 @@ TEST_F(StructTest, StructArrayA) {
   entry.Get({});
 }
 
-TEST_F(StructTest, StructFixedArrayA) {
+TEST_CASE_METHOD(StructTest, "StructTest StructFixedArrayA",
+                 "[ntcore][struct]") {
   wpi::nt::StructTopic<std::array<ThingA, 2>> topic =
       inst.GetStructTopic<std::array<ThingA, 2>>("a");
   wpi::nt::StructPublisher<std::array<ThingA, 2>> pub = topic.Publish();
@@ -396,7 +401,7 @@ TEST_F(StructTest, StructFixedArrayA) {
   entry.Get(arr);
 }
 
-TEST_F(StructTest, StructB) {
+TEST_CASE_METHOD(StructTest, "StructTest StructB", "[ntcore][struct]") {
   Info1 info;
   wpi::nt::StructTopic<ThingB, Info1> topic =
       inst.GetStructTopic<ThingB, Info1>("b", info);
@@ -416,7 +421,7 @@ TEST_F(StructTest, StructB) {
   entry.Get({});
 }
 
-TEST_F(StructTest, StructArrayB) {
+TEST_CASE_METHOD(StructTest, "StructTest StructArrayB", "[ntcore][struct]") {
   Info1 info;
   wpi::nt::StructArrayTopic<ThingB, Info1> topic =
       inst.GetStructArrayTopic<ThingB, Info1>("b", info);
@@ -436,7 +441,8 @@ TEST_F(StructTest, StructArrayB) {
   entry.Get({});
 }
 
-TEST_F(StructTest, StructFixedArrayB) {
+TEST_CASE_METHOD(StructTest, "StructTest StructFixedArrayB",
+                 "[ntcore][struct]") {
   Info1 info;
   wpi::nt::StructTopic<std::array<ThingB, 2>, Info1> topic =
       inst.GetStructTopic<std::array<ThingB, 2>, Info1>("b", info);

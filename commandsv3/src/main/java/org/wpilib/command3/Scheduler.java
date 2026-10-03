@@ -4,8 +4,8 @@
 
 package org.wpilib.command3;
 
-import static org.wpilib.units.Units.Microseconds;
 import static org.wpilib.units.Units.Milliseconds;
+import static org.wpilib.units.Units.Nanoseconds;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +22,11 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.command3.Scheduler.ScheduleResult.AlreadyRunning;
+import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanQueuedCommand;
+import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanRunningCommand;
+import org.wpilib.command3.Scheduler.ScheduleResult.RequiresUnsafeMechanisms;
+import org.wpilib.command3.Scheduler.ScheduleResult.Success;
 import org.wpilib.command3.button.CommandGenericHID;
 import org.wpilib.command3.proto.SchedulerProto;
 import org.wpilib.event.EventLoop;
@@ -112,7 +117,8 @@ public final class Scheduler implements ProtobufSerializable {
    */
   private final Collection<Binding> m_activeBindings = new ArrayList<>();
 
-  private final Collection<Trigger> m_boundTriggers = new ArrayList<>();
+  /** Triggers with active command bindings that must not be allowed to be garbage collected. */
+  private final Set<Trigger> m_boundTriggers = new HashSet<>();
 
   /** The set of commands scheduled since the start of the previous run. */
   private final SequencedSet<CommandState> m_queuedToRun = new LinkedHashSet<>();
@@ -131,13 +137,16 @@ public final class Scheduler implements ProtobufSerializable {
   private final Stack<CommandState> m_currentCommandAncestry = new Stack<>();
 
   /** The periodic callbacks to run, outside of the command structure. */
-  private final SequencedMap<BindingScope, Coroutine> m_periodicCallbacks = new LinkedHashMap<>();
+  private final List<PeriodicCallback> m_periodicCallbacks = new ArrayList<>();
 
   /** Event loop for trigger bindings. */
   private final EventLoop m_eventLoop = new EventLoop();
 
   /** The scope for continuations to yield to. */
   private final ContinuationScope m_scope = new ContinuationScope("coroutine commands");
+
+  /** Represents a single periodic callback. Stores a coroutine and its scope. */
+  private record PeriodicCallback(BindingScope scope, Coroutine coroutine) {}
 
   // Telemetry
   /** Protobuf serializer for a scheduler. */
@@ -215,10 +224,7 @@ public final class Scheduler implements ProtobufSerializable {
 
     var binding =
         new Binding(
-            scope,
-            BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH,
-            defaultCommand,
-            new Throwable().getStackTrace());
+            scope, BindingType.CONTINUOUSLY_SCHEDULE_WHILE_HIGH, defaultCommand, new Throwable());
 
     var currentDefaultCommand = getDefaultCommandFor(mechanism);
     m_defaultCommandBindings.computeIfAbsent(mechanism, k -> new ArrayList<>()).add(binding);
@@ -268,13 +274,23 @@ public final class Scheduler implements ProtobufSerializable {
    * control back to the scheduler with {@link Coroutine#yield} or risk stalling your program in an
    * unrecoverable infinite loop!
    *
+   * <p>The coroutines provided to sideloaded functions will not cancel themselves if a fork or
+   * await call fails. This allows user code the opportunity to recover from a failure. You can opt
+   * into canceling the coroutine if a fork or await call fails by calling {@link
+   * Coroutine#setCancelOnForkFailure(boolean)}.
+   *
    * @param callback the callback to sideload
    * @see #addPeriodic(Runnable)
    */
   public void sideload(Consumer<Coroutine> callback) {
     var coroutine = new Coroutine(this, m_scope, callback);
+    // Sideloaded functions shouldn't be canceled if a command can't be forked. The default behavior
+    // should allow user code the opportunity to recover from a failure. This differs from
+    // coroutines issued to commands, which should fail by default to prevent unexpected robot state
+    coroutine.setCancelOnForkFailure(false);
+
     var scope = BindingScope.createNarrowestScope(this);
-    m_periodicCallbacks.put(scope, coroutine);
+    m_periodicCallbacks.add(new PeriodicCallback(scope, coroutine));
   }
 
   /**
@@ -321,14 +337,206 @@ public final class Scheduler implements ProtobufSerializable {
         });
   }
 
-  /** Represents possible results of a command scheduling attempt. */
-  public enum ScheduleResult {
-    /** The command was successfully scheduled and added to the queue. */
-    SUCCESS,
-    /** The command is already scheduled or running. */
-    ALREADY_RUNNING,
-    /** The command is a lower priority and conflicts with a command that's already running. */
-    LOWER_PRIORITY_THAN_RUNNING_COMMAND,
+  /**
+   * Represents possible results of a command scheduling attempt. These can be used either as
+   * concrete results after a command was attempted to be scheduled, or as predictive results when
+   * checking if a command can be scheduled before committing to it.
+   */
+  public sealed interface ScheduleResult {
+    /**
+     * The command that was attempted to be scheduled.
+     *
+     * @return the command that was attempted to be scheduled
+     */
+    Command command();
+
+    /**
+     * Whether the scheduling attempt was successful.
+     *
+     * @return true if the scheduling attempt was successful, false if it failed
+     */
+    boolean successful();
+
+    /** Common interface for successful scheduling attempts. */
+    sealed interface Successful extends ScheduleResult {
+      @Override
+      default boolean successful() {
+        return true;
+      }
+    }
+
+    /** Common interface for failed scheduling attempts. */
+    sealed interface Failure extends ScheduleResult {
+      @Override
+      default boolean successful() {
+        return false;
+      }
+    }
+
+    /**
+     * A successful scheduling attempt.
+     *
+     * @param command the command that was successfully scheduled
+     */
+    record Success(Command command) implements Successful {
+      /**
+       * A successful scheduling attempt is always successful.
+       *
+       * @return true
+       */
+      @Override
+      public boolean successful() {
+        return true;
+      }
+    }
+
+    /**
+     * A scheduling attempt that was redundant because the command was already running.
+     *
+     * @param command the command that was attempted to be scheduled
+     */
+    record AlreadyRunning(Command command) implements Successful {
+      /**
+       * A scheduling attempt that was redundant because the command was already running is always
+       * successful.
+       *
+       * @return true
+       */
+      @Override
+      public boolean successful() {
+        return true;
+      }
+    }
+
+    /**
+     * A scheduling attempt that failed because the command was lower priority than a running
+     * command with shared requirements.
+     *
+     * @param command the command that failed to be scheduled
+     * @param alreadyRunning the running command that prevented the command from being scheduled
+     */
+    record LowerPriorityThanRunningCommand(Command command, Command alreadyRunning)
+        implements Failure {}
+
+    /**
+     * A scheduling attempt that failed because the command was lower priority than a queued command
+     * with shared requirements.
+     *
+     * @param command the command that failed to be scheduled
+     * @param queuedCommand the queued command that prevented the command from being scheduled
+     */
+    record LowerPriorityThanQueuedCommand(Command command, Command queuedCommand)
+        implements Failure {}
+
+    /**
+     * A scheduling attempt that failed because the robot is in a disabled state and it requires one
+     * or more mechanisms that are not {@link Mechanism#controllableDuringDisabled() controllable
+     * during disabled}.
+     *
+     * @param command the command that failed to be scheduled
+     * @param unsafeMechanisms the uncontrollable mechanisms
+     */
+    record RequiresUnsafeMechanisms(Command command, Collection<Mechanism> unsafeMechanisms)
+        implements Failure {}
+  }
+
+  /**
+   * Checks if a command is able to be scheduled. Returns of the following states:
+   *
+   * <ul>
+   *   <li>{@link AlreadyRunning} if the command is already scheduled or running.
+   *   <li>{@link Success} if the command is not already scheduled or running and does not conflict
+   *       with any other scheduled or running commands.
+   *   <li>{@link LowerPriorityThanRunningCommand} if the command has a lower priority than a
+   *       running command that shares requirements
+   *   <li>{@link LowerPriorityThanQueuedCommand} if the command has a lower priority than a queued
+   *       command that shares requirements
+   *   <li>{@link RequiresUnsafeMechanisms} if the command requires mechanisms that are not
+   *       controllable when the robot is disabled.
+   * </ul>
+   *
+   * @param command The command to check. Cannot be null.
+   * @return A schedule result indicating the schedulability of the command.
+   */
+  @NoDiscard
+  public ScheduleResult isSchedulable(Command command) {
+    ErrorMessages.requireNonNullParam(command, "command", "isSchedulable");
+
+    if (isScheduledOrRunning(command)) {
+      return new AlreadyRunning(command);
+    }
+
+    if (!RobotStateFetcher.getFetcher().isEnabled()) {
+      var uncontrollables =
+          command.requirements().stream()
+              .filter(mechanism -> !mechanism.controllableDuringDisabled())
+              .collect(Collectors.toSet());
+
+      if (!uncontrollables.isEmpty()) {
+        return new RequiresUnsafeMechanisms(command, uncontrollables);
+      }
+    }
+
+    Set<Command> ancestry = new HashSet<>();
+    for (var state = currentState(); state != null; state = m_runningCommands.get(state.parent())) {
+      ancestry.add(state.command());
+    }
+
+    return isSchedulableFromPriority(command, ancestry);
+  }
+
+  // similar to isSchedulable(Command), but used internally for processing bindings
+  // that may have command scopes.
+  private ScheduleResult isSchedulable(Binding binding) {
+    var command = binding.command();
+
+    if (isScheduledOrRunning(command)) {
+      return new AlreadyRunning(command);
+    }
+
+    if (!RobotStateFetcher.getFetcher().isEnabled()) {
+      var uncontrollables =
+          command.requirements().stream()
+              .filter(mechanism -> !mechanism.controllableDuringDisabled())
+              .collect(Collectors.toSet());
+
+      if (!uncontrollables.isEmpty()) {
+        return new RequiresUnsafeMechanisms(command, uncontrollables);
+      }
+    }
+
+    Set<Command> ancestry = new HashSet<>();
+    if (binding.scope() instanceof BindingScope.ForCommand(Scheduler _, Command parent)) {
+      for (var state = m_runningCommands.get(parent);
+          state != null;
+          state = m_runningCommands.get(state.parent())) {
+        ancestry.add(state.command());
+      }
+    } else {
+      for (var state = currentState();
+          state != null;
+          state = m_runningCommands.get(state.parent())) {
+        ancestry.add(state.command());
+      }
+    }
+
+    return isSchedulableFromPriority(command, ancestry);
+  }
+
+  private Scheduler.ScheduleResult isSchedulableFromPriority(
+      Command command, Set<Command> ancestry) {
+    var running = m_runningCommands.values();
+    Command conflict = lowerPriorityThanConflictingCommands(command, ancestry, running);
+    if (conflict != null) {
+      return new LowerPriorityThanRunningCommand(command, conflict);
+    }
+
+    conflict = lowerPriorityThanConflictingCommands(command, ancestry, m_queuedToRun);
+    if (conflict != null) {
+      return new LowerPriorityThanQueuedCommand(command, conflict);
+    }
+
+    return new Success(command);
   }
 
   /**
@@ -338,6 +546,12 @@ public final class Scheduler implements ProtobufSerializable {
    *
    * <p>Does nothing if the command is already scheduled or running, or requires at least one
    * mechanism already used by a higher priority command.
+   *
+   * <p>For purposes of scheduling, a child command is considered to have a priority equal to the
+   * highest priority in its scheduling hierarchy. For example, if a parent command with priority 10
+   * schedules a child command with priority 5, the child command will be treated as having a
+   * priority of 10 and will interrupt any conflicting command with a priority of 10 or lower,
+   * rather than the usual 5.
    *
    * @param command the command to schedule
    * @return the result of the scheduling attempt. See {@link ScheduleResult} for details.
@@ -359,8 +573,7 @@ public final class Scheduler implements ProtobufSerializable {
 
     // Note: we use a throwable here instead of Thread.currentThread().getStackTrace() for easier
     //       stack frame filtering and modification.
-    var binding =
-        new Binding(scope, BindingType.IMMEDIATE, command, new Throwable().getStackTrace());
+    var binding = new Binding(scope, BindingType.IMMEDIATE, command, new Throwable());
 
     return schedule(binding);
   }
@@ -369,30 +582,27 @@ public final class Scheduler implements ProtobufSerializable {
   ScheduleResult schedule(Binding binding) {
     var command = binding.command();
 
-    if (isScheduledOrRunning(command)) {
-      return ScheduleResult.ALREADY_RUNNING;
+    var result = isSchedulable(binding);
+    if (!(result instanceof Success)) {
+      // We check specifically for Success, instead of `successful()`, because only a Success
+      // indicates that the command can actually go through the scheduling process. AlreadyRunning
+      // means what it says on the tin, and it would be incorrect to run the command back through
+      // the scheduling process.
+      return result;
     }
 
-    if (lowerPriorityThanConflictingCommands(command)) {
-      return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
-    }
+    if (!(binding.scope() instanceof BindingScope.ForCommand)) {
+      // Track this binding so we can disable it when it's out of scope.
+      // Note that, even though triggers can clean themselves up, commands that are manually
+      // scheduled cannot do the same, so we have to track them in the scheduler.
 
-    for (var scheduledState : m_queuedToRun) {
-      if (!command.conflictsWith(scheduledState.command())) {
-        // No shared requirements, skip
-        continue;
-      }
-      if (command.isLowerPriorityThan(scheduledState.command())) {
-        // Lower priority than an already-scheduled (but not yet running) command that requires at
-        // one of the same mechanism. Ignore it.
-        return ScheduleResult.LOWER_PRIORITY_THAN_RUNNING_COMMAND;
-      }
+      // We don't bother tracking command-scoped bindings; the bound command will already be
+      // cleaned up in the same cycle that the parent command exits, so this would attempt to
+      // double-cancel a child command across two cycles (once when the parent exits, and then in
+      // the next cycle in cancelStaleBindings). That would cause problems if the command object
+      // is immediately rescheduled as cancelStaleBindings would immediately cancel the new run
+      m_activeBindings.add(binding);
     }
-
-    // Track this binding so we can disable it when it's out of scope.
-    // Note that, even though triggers can clean themselves up, commands that are manually scheduled
-    // cannot do the same, so we have to track them in the scheduler.
-    m_activeBindings.add(binding);
 
     // Evict conflicting on-deck commands
     // We check above if the input command is lower priority than any of these,
@@ -424,33 +634,52 @@ public final class Scheduler implements ProtobufSerializable {
       m_queuedToRun.add(state);
     }
 
-    return ScheduleResult.SUCCESS;
+    return result;
   }
 
   /**
    * Checks if a command conflicts with and is a lower priority than any running command. Used when
    * determining if the command can be scheduled.
+   *
+   * @return The conflicting command, or null if there is no conflict
    */
-  private boolean lowerPriorityThanConflictingCommands(Command command) {
-    Set<CommandState> ancestors = new HashSet<>();
-    for (var state = currentState(); state != null; state = m_runningCommands.get(state.parent())) {
-      ancestors.add(state);
+  private Command lowerPriorityThanConflictingCommands(
+      Command command, Collection<Command> ancestry, Collection<CommandState> checkAgainst) {
+    int maxAncestorPriority = command.priority();
+    for (Command ancestor : ancestry) {
+      maxAncestorPriority = Math.max(maxAncestorPriority, ancestor.priority());
     }
 
     // Check for conflicts with the commands that are already running
-    for (var state : m_runningCommands.values()) {
-      if (ancestors.contains(state)) {
+    for (var state : checkAgainst) {
+      if (ancestry.contains(state.command())) {
         // Can't conflict with an ancestor command
         continue;
       }
 
       var c = state.command();
-      if (c.conflictsWith(command) && command.isLowerPriorityThan(c)) {
-        return true;
+      if (c.conflictsWith(command) && maxAncestorPriority < effectivePriority(state)) {
+        return c;
       }
     }
 
-    return false;
+    return null;
+  }
+
+  /**
+   * Calculates the effective priority of a command, taking into account the priorities of its
+   * ancestors.
+   *
+   * @param state The command state to check
+   * @return The effective priority of the command
+   */
+  private int effectivePriority(CommandState state) {
+    int max = state.command().priority();
+    for (var parent = state.parent(); parent != null; parent = state.parent()) {
+      state = m_runningCommands.get(parent);
+      max = Math.max(max, parent.priority());
+    }
+    return max;
   }
 
   private void evictConflictingOnDeckCommands(Command command) {
@@ -538,9 +767,10 @@ public final class Scheduler implements ProtobufSerializable {
    */
   @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void cancel(Command command) {
-    if (command == currentCommand()) {
-      throw new IllegalArgumentException(
-          "Command `" + command.name() + "` is mounted and cannot be canceled");
+    var currentState = currentState();
+    if (currentState != null && command == currentState.command()) {
+      currentState.coroutine().requestCancellation(); // yields internally
+      return;
     }
 
     boolean running = isRunning(command);
@@ -549,12 +779,19 @@ public final class Scheduler implements ProtobufSerializable {
     // required mechanisms, unless another command requiring those mechanisms is scheduled between
     // calling cancel() and calling run()
     m_runningCommands.remove(command);
-    m_queuedToRun.removeIf(state -> state.command() == command);
+    boolean queued = m_queuedToRun.removeIf(state -> state.command() == command);
 
     if (running) {
-      // Only run the hook if the command was running. If it was on deck or not
+      // Only run the hooks if the command was running. If it was on deck or not
       // even in the scheduler at the time, then there's nothing to do
+      // Always run onExit first, in case cancellation has special behavior that overrides
+      // standard exit logic.
+      command.onExit();
       command.onCancel();
+    }
+
+    if (running || queued) {
+      // Emit a cancellation event only if the given command was in the scheduler
       emitCanceledEvent(command);
     }
 
@@ -583,7 +820,7 @@ public final class Scheduler implements ProtobufSerializable {
    * TimedRobot#robotPeriodic()}
    */
   public void run() {
-    final long startMicros = RobotController.getTime();
+    final long startNanos = RobotController.getTime();
 
     // Cancel any commands with stale binding scopes
     cancelStaleBindings();
@@ -592,6 +829,9 @@ public final class Scheduler implements ProtobufSerializable {
     // This allows triggers that can never be used again to be garbage collected to reduce
     // memory usage and avoid potential OOMs from poorly written user code.
     unbindStaleTriggers();
+
+    // If the robot is disabled, cancel any commands that require uncontrollable mechanisms
+    cancelCommandsThatCannotRunInDisabled();
 
     // Sideloads may change some state that affects triggers. Run them first.
     runPeriodicSideloads();
@@ -609,8 +849,8 @@ public final class Scheduler implements ProtobufSerializable {
     // Run every command in order until they call Coroutine.yield() or exit
     runCommands();
 
-    final long endMicros = RobotController.getTime();
-    m_lastRunTimeMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+    final long endNanos = RobotController.getTime();
+    m_lastRunTimeMs = Milliseconds.convertFrom(endNanos - startNanos, Nanoseconds);
   }
 
   private void cancelStaleBindings() {
@@ -625,12 +865,63 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void unbindStaleTriggers() {
+    // Remove strong references to any triggers that have gone stale. This allows triggers to be
+    // garbage collected if they're not referenced outside the scope that created them. We don't
+    // clear any command bindings or unbind it from the event loop; otherwise, cached triggers
+    // would stop being updated until new command bindings are added.
     for (var iterator = m_boundTriggers.iterator(); iterator.hasNext(); ) {
       var trigger = iterator.next();
       if (!trigger.isScopeActive()) {
-        trigger.unbind();
         iterator.remove();
       }
+    }
+  }
+
+  private void cancelCommandsThatCannotRunInDisabled() {
+    if (RobotStateFetcher.getFetcher().isEnabled()) {
+      // Nothing to do if the robot is enabled
+      return;
+    }
+
+    List<Command> commandsToCancel = new ArrayList<>();
+
+    for (var runningState : m_runningCommands.values()) {
+      var command = runningState.command();
+      boolean canRun = true;
+      for (var mechanism : command.requirements()) {
+        if (!mechanism.controllableDuringDisabled()) {
+          canRun = false;
+          break;
+        }
+      }
+
+      if (canRun) {
+        continue;
+      }
+
+      commandsToCancel.add(getRoot(command));
+    }
+
+    for (var queuedState : m_queuedToRun) {
+      var command = queuedState.command();
+
+      boolean canRun = true;
+      for (var mechanism : command.requirements()) {
+        if (!mechanism.controllableDuringDisabled()) {
+          canRun = false;
+          break;
+        }
+      }
+
+      if (canRun) {
+        continue;
+      }
+
+      commandsToCancel.add(command);
+    }
+
+    for (var command : commandsToCancel) {
+      cancel(command);
     }
   }
 
@@ -638,9 +929,18 @@ public final class Scheduler implements ProtobufSerializable {
    * Adds a bound trigger to this scheduler. The trigger will be unbound from the event loop when
    * its creation scope becomes inactive and may be eligible for garbage collection.
    */
-  // package-private for Trigger to call when constructed
+  // package-private for Trigger
   void addBoundTrigger(Trigger trigger) {
     m_boundTriggers.add(trigger);
+  }
+
+  /**
+   * Removes strong retention for a trigger, allowing it to potentially be garbage collected if no
+   * other references to it remain.
+   */
+  // package-private for Trigger
+  void removeBoundTrigger(Trigger trigger) {
+    m_boundTriggers.remove(trigger);
   }
 
   private void promoteScheduledCommands() {
@@ -660,23 +960,35 @@ public final class Scheduler implements ProtobufSerializable {
   }
 
   private void runPeriodicSideloads() {
-    m_periodicCallbacks.entrySet().removeIf(e -> !e.getKey().active());
+    for (var iterator = m_periodicCallbacks.iterator(); iterator.hasNext(); ) {
+      PeriodicCallback callback = iterator.next();
+      if (!callback.scope().active()) {
+        // The callback's enclosing scope exited - remove without running it and move on
+        iterator.remove();
+        continue;
+      }
 
-    // Update periodic callbacks
-    for (Coroutine coroutine : m_periodicCallbacks.values()) {
+      // Update periodic callbacks
+      Coroutine coroutine = callback.coroutine();
       coroutine.mount();
       try {
         coroutine.runToYieldPoint();
       } finally {
         Continuation.mountContinuation(null);
       }
-    }
 
-    // And remove any periodic callbacks that have completed
-    m_periodicCallbacks.entrySet().removeIf(e -> e.getValue().isDone());
+      if (coroutine.isDone()
+          || coroutine.isInterruptRequested()
+          || coroutine.isCancellationRequested()) {
+        // Callback finished or requested early termination - remove it from the list
+        iterator.remove();
+      }
+    }
   }
 
   private void runCommands() {
+    // TODO: Track command roots and run the commands in each root in reverse order, but run the
+    //       roots in insertion order
     // Tick every command that hasn't been completed yet
     // Run in reverse so parent commands can resume in the same loop cycle an awaited child command
     // completes. Otherwise, parents could only resume on the next loop cycle, introducing a delay
@@ -704,7 +1016,7 @@ public final class Scheduler implements ProtobufSerializable {
     var previousState = currentState();
 
     m_currentCommandAncestry.push(state);
-    long startMicros = RobotController.getTime();
+    long startNanos = RobotController.getTime();
     emitMountedEvent(command);
     coroutine.mount();
     try {
@@ -713,8 +1025,8 @@ public final class Scheduler implements ProtobufSerializable {
       // Command encountered an uncaught exception.
       handleCommandException(state, e);
     } finally {
-      long endMicros = RobotController.getTime();
-      double elapsedMs = Milliseconds.convertFrom(endMicros - startMicros, Microseconds);
+      long endNanos = RobotController.getTime();
+      double elapsedMs = Milliseconds.convertFrom(endNanos - startNanos, Nanoseconds);
       state.setLastRuntimeMs(elapsedMs);
 
       if (state.equals(currentState())) {
@@ -730,16 +1042,31 @@ public final class Scheduler implements ProtobufSerializable {
       }
     }
 
-    if (coroutine.isDone()) {
-      // Immediately check if the command has completed and remove any children commands.
-      // This prevents child commands from being executed one extra time in the run() loop
-      emitCompletedEvent(command);
-      m_runningCommands.remove(command);
-      removeOrphanedChildren(command);
+    if (coroutine.isCancellationRequested()) {
+      cancel(command);
+    } else if (coroutine.isDone()) {
+      handleCommandCompletion(command);
+    } else if (coroutine.isInterruptRequested()) {
+      handleCoroutineIRQ(coroutine, command);
     } else {
       // Yielded
       emitYieldedEvent(command);
     }
+  }
+
+  private void handleCommandCompletion(Command command) {
+    command.onExit();
+    emitCompletedEvent(command);
+    m_runningCommands.remove(command);
+    removeOrphanedChildren(command);
+  }
+
+  private void handleCoroutineIRQ(Coroutine coroutine, Command command) {
+    Command root = getRoot(command); // capture the root command before modifying scheduler state
+    m_currentCommandAncestry.clear();
+    emitForkFailureEvent(command, coroutine.getForkResult().getFailedCommands());
+    cancel(root);
+    Continuation.mountContinuation(null);
   }
 
   /**
@@ -758,17 +1085,16 @@ public final class Scheduler implements ProtobufSerializable {
 
     // Fetch the root command
     // (needs to be done before removing the failed command from the running set)
-    Command root = command;
-    while (getParentOf(root) != null) {
-      root = getParentOf(root);
-    }
+    final Command root = getRoot(command);
 
     // Remove it from the running set.
     m_runningCommands.remove(command);
 
     // Intercept the exception, inject stack frames from the schedule site, and rethrow it
     var binding = state.binding();
-    e.setStackTrace(CommandTraceHelper.modifyTrace(e.getStackTrace(), binding.frames()));
+    e.setStackTrace(
+        CommandTraceHelper.modifyTrace(
+            e.getStackTrace(), binding.stackTraceStore().getStackTrace()));
     emitCompletedWithErrorEvent(command, e);
 
     // Clean up child commands after emitting the event so child Canceled events are emitted
@@ -841,6 +1167,13 @@ public final class Scheduler implements ProtobufSerializable {
     for (int i = 0; i < bindings.size() - 1; i++) {
       Command widerScopeDefaultCommand = bindings.get(i).command();
       cancel(widerScopeDefaultCommand);
+    }
+
+    if (!RobotStateFetcher.getFetcher().isEnabled() && !mechanism.controllableDuringDisabled()) {
+      // Default commands can never be scheduled if the robot is disabled and the mechanism is not
+      // controllable during disabled, so there's no point in attempting to queue the default
+      // command
+      return;
     }
 
     // Check if the mechanism is currently in use. We can queue the default command if it's not.
@@ -955,6 +1288,9 @@ public final class Scheduler implements ProtobufSerializable {
       var entry = liveIter.next();
       liveIter.remove();
       Command canceledCommand = entry.getKey();
+      // Always run onExit first, in case cancellation has special behavior that overrides
+      // standard exit logic.
+      canceledCommand.onExit();
       canceledCommand.onCancel();
       emitCanceledEvent(canceledCommand);
     }
@@ -981,6 +1317,17 @@ public final class Scheduler implements ProtobufSerializable {
   @NoDiscard
   public Collection<Command> getQueuedCommands() {
     return m_queuedToRun.stream().map(CommandState::command).toList();
+  }
+
+  private Command getRoot(Command command) {
+    Command root = command;
+    Command parent = getParentOf(command);
+    while (parent != null) {
+      root = parent;
+      parent = getParentOf(parent);
+    }
+
+    return root;
   }
 
   /**
@@ -1099,6 +1446,11 @@ public final class Scheduler implements ProtobufSerializable {
 
   private void emitInterruptedEvent(Command command, Command interrupter) {
     var event = new SchedulerEvent.Interrupted(command, interrupter, RobotController.getTime());
+    emitEvent(event);
+  }
+
+  private void emitForkFailureEvent(Command command, List<ScheduleResult.Failure> failures) {
+    var event = new SchedulerEvent.ForkFailure(command, failures, RobotController.getTime());
     emitEvent(event);
   }
 

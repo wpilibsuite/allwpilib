@@ -6,7 +6,7 @@ package org.wpilib.math.filter;
 
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.container.DoubleCircularBuffer;
 
 /**
@@ -41,6 +41,12 @@ import org.wpilib.util.container.DoubleCircularBuffer;
  * <a href="https://en.wikipedia.org/wiki/Fir_filter">https://en.wikipedia.org/wiki/Fir_filter</a>
  * <br>
  *
+ * <p>For IIR filters of order 4 or higher, prefer BiquadFilter — it represents the filter as a
+ * cascade of 2nd-order sections (Direct Form II Transposed), which avoids the numerical instability
+ * that high-order direct-form polynomials exhibit. Use LinearFilter for low-order IIR ({@code
+ * singlePoleIIR}, {@code highPass}) and FIR filters ({@code movingAverage}, {@code
+ * finiteDifference}).
+ *
  * <p>Note 1: calculate() should be called by the user on a known, regular period. You can use a
  * Notifier for this or do it "inline" with code in a periodic function.
  *
@@ -71,7 +77,7 @@ public class LinearFilter {
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
     instances++;
-    MathSharedStore.reportUsage("LinearFilter", String.valueOf(instances));
+    UsageReporting.reportUsage("LinearFilter", String.valueOf(instances));
   }
 
   /**

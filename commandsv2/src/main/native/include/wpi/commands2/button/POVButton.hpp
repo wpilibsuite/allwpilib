@@ -6,6 +6,7 @@
 
 #include "wpi/commands2/button/Trigger.hpp"
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
 #include "wpi/driverstation/POVDirection.hpp"
 
 namespace wpi::cmd {
@@ -31,5 +32,16 @@ class POVButton : public Trigger {
       : Trigger([joystick, angle, povNumber] {
           return joystick->GetPOV(povNumber) == angle;
         }) {}
+
+  /**
+   * Creates a POVButton that commands can be bound to.
+   *
+   * @param joystick The HID device on which the POV is located.
+   * @param angle The angle of the POV corresponding to a button press.
+   * @param povNumber The number of the POV on the HID device.
+   */
+  POVButton(wpi::HIDDevice* joystick, wpi::POVDirection angle,
+            int povNumber = 0)
+      : POVButton(&joystick->GetHID(), angle, povNumber) {}
 };
 }  // namespace wpi::cmd

@@ -9,9 +9,9 @@
 
 #include "wpi/hal/AddressableLED.h"
 #include "wpi/hal/AddressableLEDTypes.h"
-#include "wpi/hal/Types.hpp"
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
+#include "wpi/util/Handle.hpp"
 
 namespace wpi {
 
@@ -148,6 +148,7 @@ class AddressableLED {
    * the location set by SetStart() and up to the length set by SetLength().
    *
    * @param ledData the buffer to write
+   * @Common This is one of the commonly used methods for this class
    */
   void SetData(std::span<const LEDData> ledData);
 
@@ -170,7 +171,7 @@ class AddressableLED {
                             std::span<const LEDData> ledData);
 
  private:
-  wpi::hal::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
+  wpi::util::Handle<HAL_AddressableLEDHandle, HAL_FreeAddressableLED> m_handle;
   int m_channel;
   int m_start{0};
   int m_length{0};

@@ -4,11 +4,11 @@
 
 #include <numbers>
 
+#include "wpi/drivers/motor/PWMSparkMax.hpp"
 #include "wpi/driverstation/Joystick.hpp"
 #include "wpi/framework/TimedRobot.hpp"
-#include "wpi/hardware/motor/PWMSparkMax.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 
 /**
  * This sample program shows how to control a motor using a joystick. In the
@@ -20,6 +20,10 @@
  *
  * In addition, the encoder value of an encoder connected to ports 0 and 1 is
  * consistently sent to the Dashboard.
+ *
+ * Finally, short code snippets show how to invert the motor direction and how
+ * to use the motor safety for frc-docs.
+ * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/motors/wpi-drive-classes.html
  */
 class Robot : public wpi::TimedRobot {
  public:
@@ -30,13 +34,22 @@ class Robot : public wpi::TimedRobot {
    * robot mode.
    */
   void RobotPeriodic() override {
-    wpi::SmartDashboard::PutNumber("Encoder", encoder.GetDistance());
+    wpi::telemetry::Log("Encoder", encoder.GetDistance());
   }
 
   Robot() {
     // Use SetDistancePerPulse to set the multiplier for GetDistance
     // This is set up assuming a 6 inch wheel with a 360 CPR encoder.
     encoder.SetDistancePerPulse((std::numbers::pi * 6) / 360.0);
+
+    // show motor inversion
+    motor.SetInverted(true);
+
+    // show motor safety features
+    motor.SetSafetyEnabled(true);
+    motor.SetSafetyEnabled(false);
+    motor.SetExpiration(0.1_s);
+    motor.Feed();
   }
 
  private:

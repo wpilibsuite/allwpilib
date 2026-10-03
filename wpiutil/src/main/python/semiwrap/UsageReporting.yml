@@ -1,0 +1,7 @@
+functions:
+  ReportUsage:
+    overloads:
+      std::string_view, std::string_view:
+      std::string_view, int32_t, std::string_view:
+  SetReportUsageImpl:
+    ignore: true

@@ -105,4 +105,13 @@ class SequentialGroupBuilderTest {
     var sequence = builder.andThen(c1, c2).withAutomaticName();
     assertEquals("C1 -> C2", sequence.name());
   }
+
+  @Test
+  void automaticNameWithUntilCondition() {
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
+    var c2 = Command.noRequirements(Coroutine::park).named("C2");
+    var builder = new SequentialGroupBuilder();
+    var sequence = builder.andThen(c1, c2).until(() -> true).withAutomaticName();
+    assertEquals("(C1 -> C2 | Until Condition)", sequence.name());
+  }
 }

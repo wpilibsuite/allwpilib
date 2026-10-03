@@ -15,7 +15,9 @@
 // wpi::math::SimpleMotorFeedforward<wpi::units::radians>
 
 template <class Distance>
-  requires wpi::units::length_unit<Distance> || wpi::units::angle_unit<Distance>
+  requires wpi::units::length_unit<Distance> ||
+           wpi::units::angle_unit<Distance> ||
+           wpi::units::dimensionless_unit<Distance>
 struct wpi::util::Protobuf<wpi::math::SimpleMotorFeedforward<Distance>> {
   using MessageStruct = wpi_proto_ProtobufSimpleMotorFeedforward;
   using InputStream =

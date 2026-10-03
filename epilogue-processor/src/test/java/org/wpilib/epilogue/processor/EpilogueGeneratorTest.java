@@ -7,11 +7,14 @@ package org.wpilib.epilogue.processor;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.epilogue.processor.CompileTestOptions.kJavaVersionOptions;
+import static org.wpilib.epilogue.processor.CompileTestOptions.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("checkstyle:LineLength") // Source code templates exceed the line length limit
@@ -29,17 +32,16 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.*;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -74,7 +76,7 @@ class EpilogueGeneratorTest {
           package org.wpilib.epilogue;
 
           @Logged
-          class Example extends org.wpilib.framework.RobotBase {
+          public class Example extends org.wpilib.framework.RobotBase {
             @Override
             public void startCompetition() {}
             @Override
@@ -84,67 +86,16 @@ class EpilogueGeneratorTest {
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
-
-        public final class Epilogue {
-          static {
-            HAL.reportUsage("Epilogue", "");
-          }
-
-          private static final EpilogueConfiguration config = new EpilogueConfiguration();
-
-          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
-
-          public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
-            configurator.accept(config);
-          }
-
-          public static EpilogueConfiguration getConfig() {
-            return config;
-          }
-
-          /**
-           * Checks if data associated with a given importance level should be logged.
-           */
-          public static boolean shouldLog(Logged.Importance importance) {
-            return importance.compareTo(config.minimumImportance) >= 0;
-          }
-        }
-        """;
-
-    assertGeneratedEpilogueContents(source, expected);
-  }
-
-  @Test
-  void timedRobot() {
-    String source =
-        """
-          package org.wpilib.epilogue;
-
-          @Logged
-          class Example extends org.wpilib.framework.TimedRobot {
-          }
-          """;
-
-    String expected =
-        """
-        package org.wpilib.epilogue;
-
-        import static org.wpilib.units.Units.Seconds;
-
-        import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
+        import org.wpilib.epilogue.*;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -173,8 +124,68 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.Example robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+        }
+        """;
+
+    assertGeneratedEpilogueContents(source, expected);
+  }
+
+  @Test
+  void timedRobot() {
+    String source =
+        """
+          package org.wpilib.epilogue;
+
+          @Logged
+          public class Example extends org.wpilib.framework.TimedRobot {
+          }
+          """;
+
+    String expected =
+        """
+        package org.wpilib.epilogue.generated;
+
+        import static org.wpilib.units.Units.Seconds;
+
+        import org.wpilib.epilogue.*;
+        import org.wpilib.util.UsageReporting;
+
+        public final class Epilogue {
+          static {
+            UsageReporting.reportUsage("Epilogue", "");
+          }
+
+          private static final EpilogueConfiguration config = new EpilogueConfiguration();
+
+          public static final org.wpilib.epilogue.ExampleLogger org_wpilib_epilogue_ExampleLogger = new org.wpilib.epilogue.ExampleLogger();
+
+          public static void configure(java.util.function.Consumer<EpilogueConfiguration> configurator) {
+            configurator.accept(config);
+          }
+
+          public static EpilogueConfiguration getConfig() {
+            return config;
+          }
+
+          /**
+           * Checks if data associated with a given importance level should be logged.
+           */
+          public static boolean shouldLog(Logged.Importance importance) {
+            return importance.compareTo(config.minimumImportance) >= 0;
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.Example robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_ExampleLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -205,31 +216,33 @@ class EpilogueGeneratorTest {
 
   @Test
   void multipleRobots() {
-    String source =
+    String alphaSource =
         """
           package org.wpilib.epilogue;
 
           @Logged
-          class AlphaBot extends org.wpilib.framework.TimedRobot { }
+          public class AlphaBot extends org.wpilib.framework.TimedRobot { }
+          """;
+    String betaSource =
+        """
+          package org.wpilib.epilogue;
 
           @Logged
-          class BetaBot extends org.wpilib.framework.TimedRobot { }
+          public class BetaBot extends org.wpilib.framework.TimedRobot { }
           """;
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.AlphaBotLogger;
-        import org.wpilib.epilogue.BetaBotLogger;
+        import org.wpilib.epilogue.*;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -259,8 +272,19 @@ class EpilogueGeneratorTest {
            */
           public static void update(org.wpilib.epilogue.AlphaBot robot) {
             long start = System.nanoTime();
-            org_wpilib_epilogue_AlphaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+            org_wpilib_epilogue_AlphaBotLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
+          }
+
+          /**
+           * Updates Epilogue. This must be called periodically in order for Epilogue to record
+           * new values. Alternatively, {@code bind()} can be used to update at an offset from
+           * the main robot loop.
+           */
+          public static void update(org.wpilib.epilogue.BetaBot robot) {
+            long start = System.nanoTime();
+            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.table.getTable(config.root), robot, config.errorHandler);
+            config.table.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -282,17 +306,6 @@ class EpilogueGeneratorTest {
             robot.addPeriodic(() -> {
               update(robot);
             }, config.loggingPeriod.in(Seconds), config.loggingPeriodOffset.in(Seconds));
-          }
-
-          /**
-           * Updates Epilogue. This must be called periodically in order for Epilogue to record
-           * new values. Alternatively, {@code bind()} can be used to update at an offset from
-           * the main robot loop.
-           */
-          public static void update(org.wpilib.epilogue.BetaBot robot) {
-            long start = System.nanoTime();
-            org_wpilib_epilogue_BetaBotLogger.tryUpdate(config.backend.getNested(config.root), robot, config.errorHandler);
-            config.backend.log("Epilogue/Stats/Last Run", (System.nanoTime() - start) / 1e6);
           }
 
           /**
@@ -318,51 +331,71 @@ class EpilogueGeneratorTest {
         }
         """;
 
-    assertGeneratedEpilogueContents(source, expected);
+    assertGeneratedEpilogueContents(
+        List.of(
+            JavaFileObjects.forSourceString("org.wpilib.epilogue.AlphaBot", alphaSource),
+            JavaFileObjects.forSourceString("org.wpilib.epilogue.BetaBot", betaSource)),
+        expected);
   }
 
   @Test
   void genericCustomLogger() {
-    String source =
-        """
+    JavaFileObject classA =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.A", "package org.wpilib.epilogue; class A {}");
+
+    JavaFileObject classB =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.B", "package org.wpilib.epilogue; class B extends A {}");
+
+    JavaFileObject classC =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.C", "package org.wpilib.epilogue; class C extends A {}");
+
+    JavaFileObject loggedClass =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.Example",
+            """
         package org.wpilib.epilogue;
 
-        import org.wpilib.epilogue.logging.*;
-
-        class A {}
-        class B extends A {}
-        class C extends A {}
-
-        @CustomLoggerFor({A.class, B.class, C.class})
-        class CustomLogger extends ClassSpecificLogger<A> {
-          public CustomLogger() { super(A.class); }
-
-          @Override
-          public void update(EpilogueBackend backend, A object) {} // implementation is irrelevant
-        }
-
         @Logged
-        class Example {
+        public class Example {
           A a_b_or_c;
           B b;
           C c;
         }
-        """;
+        """);
+
+    JavaFileObject logger =
+        JavaFileObjects.forSourceString(
+            "org.wpilib.epilogue.CustomLogger",
+            """
+            package org.wpilib.epilogue;
+
+            import org.wpilib.epilogue.logging.*;
+            import org.wpilib.telemetry.TelemetryTable;
+
+            @CustomLoggerFor({A.class, B.class, C.class})
+            public class CustomLogger extends ClassSpecificLogger<A> {
+              public CustomLogger() { super(A.class); }
+
+              @Override
+              public void update(TelemetryTable table, A object) {} // implementation is irrelevant
+            }
+            """);
 
     String expected =
         """
-        package org.wpilib.epilogue;
+        package org.wpilib.epilogue.generated;
 
         import static org.wpilib.units.Units.Seconds;
 
-        import org.wpilib.hardware.hal.HAL;
-
-        import org.wpilib.epilogue.ExampleLogger;
-        import org.wpilib.epilogue.CustomLogger;
+        import org.wpilib.epilogue.*;
+        import org.wpilib.util.UsageReporting;
 
         public final class Epilogue {
           static {
-            HAL.reportUsage("Epilogue", "");
+            UsageReporting.reportUsage("Epilogue", "");
           }
 
           private static final EpilogueConfiguration config = new EpilogueConfiguration();
@@ -387,16 +420,16 @@ class EpilogueGeneratorTest {
         }
         """;
 
-    assertGeneratedEpilogueContents(source, expected);
+    assertGeneratedEpilogueContents(List.of(classA, classB, classC, loggedClass, logger), expected);
   }
 
   private void assertGeneratedEpilogueContents(
-      String loggedClassContent, String loggerClassContent) {
+      Collection<JavaFileObject> jfos, String loggerClassContent) {
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new AnnotationProcessor())
-            .compile(JavaFileObjects.forSourceString("", loggedClassContent));
+            .compile(jfos);
 
     assertThat(compilation).succeededWithoutWarnings();
     var generatedFiles = compilation.generatedSourceFiles();
@@ -412,5 +445,12 @@ class EpilogueGeneratorTest {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void assertGeneratedEpilogueContents(
+      String loggedClassContent, String loggerClassContent) {
+    assertGeneratedEpilogueContents(
+        List.of(JavaFileObjects.forSourceString("org.wpilib.epilogue.Example", loggedClassContent)),
+        loggerClassContent);
   }
 }

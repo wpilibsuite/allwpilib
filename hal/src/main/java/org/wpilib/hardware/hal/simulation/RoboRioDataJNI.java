@@ -62,6 +62,15 @@ public class RoboRioDataJNI extends JNIWrapper {
 
   public static native void setBrownoutVoltage(double brownoutVoltage);
 
+  public static native int registerBrownoutRecoveryVoltageCallback(
+      NotifyCallback callback, boolean initialNotify);
+
+  public static native void cancelBrownoutRecoveryVoltageCallback(int uid);
+
+  public static native double getBrownoutRecoveryVoltage();
+
+  public static native void setBrownoutRecoveryVoltage(double brownoutRecoveryVoltage);
+
   public static native int registerCPUTempCallback(NotifyCallback callback, boolean initialNotify);
 
   public static native void cancelCPUTempCallback(int uid);

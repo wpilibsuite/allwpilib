@@ -31,7 +31,7 @@ public final class Pose3d
    *
    * <p>This exists to avoid allocations for common poses.
    */
-  public static final Pose3d kZero = new Pose3d();
+  public static final Pose3d ZERO = new Pose3d();
 
   @Json.Property("translation")
   private final Translation3d m_translation;
@@ -41,8 +41,8 @@ public final class Pose3d
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose3d() {
-    m_translation = Translation3d.kZero;
-    m_rotation = Rotation3d.kZero;
+    m_translation = Translation3d.ZERO;
+    m_rotation = Rotation3d.ZERO;
   }
 
   /**

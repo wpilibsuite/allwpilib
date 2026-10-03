@@ -4,14 +4,19 @@
 
 #include "wpi/math/kinematics/MecanumDriveOdometry.hpp"
 
+#include "wpi/math/geometry/Pose2d.hpp"
+#include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/kinematics/MecanumDriveKinematics.hpp"
+#include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/kinematics/Odometry.hpp"
 #include "wpi/math/util/MathShared.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi::math;
 
 MecanumDriveOdometry::MecanumDriveOdometry(
     MecanumDriveKinematics kinematics, const Rotation2d& gyroAngle,
     const MecanumDriveWheelPositions& wheelPositions, const Pose2d& initialPose)
-    : Odometry(m_kinematicsImpl, gyroAngle, wheelPositions, initialPose),
-      m_kinematicsImpl(kinematics) {
-  wpi::math::MathSharedStore::ReportUsage("MecanumDriveOdometry", "");
+    : Odometry(kinematics, gyroAngle, wheelPositions, initialPose) {
+  wpi::util::ReportUsage("MecanumDriveOdometry", "");
 }

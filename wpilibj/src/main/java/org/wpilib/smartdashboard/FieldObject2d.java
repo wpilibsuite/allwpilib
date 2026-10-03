@@ -11,27 +11,29 @@ import java.util.Collections;
 import java.util.List;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.trajectory.HolonomicSample;
 import org.wpilib.math.trajectory.Trajectory;
-import org.wpilib.networktables.DoubleArrayEntry;
+import org.wpilib.tunable.Tunable;
+import org.wpilib.tunable.TunableConfig;
+import org.wpilib.tunable.TunableOption;
 import org.wpilib.units.measure.Distance;
 
 /** Game field object on a Field2d. */
-public class FieldObject2d implements AutoCloseable {
+public class FieldObject2d {
+  private static final TunableConfig POSES_TUNABLE_CONFIG =
+      TunableConfig.of(TunableOption.GET_ON_CHANGE);
+
   /**
    * Package-local constructor.
    *
    * @param name name
    */
-  FieldObject2d(String name) {
+  FieldObject2d(String name, Pose2d... initialPoses) {
     m_name = name;
-  }
-
-  @Override
-  public void close() {
-    if (m_entry != null) {
-      m_entry.close();
-    }
+    m_posesTunable =
+        Tunable.createConfig(
+            this::getPoseArray, this::setPoseArray, Pose2d[].class, POSES_TUNABLE_CONFIG);
+    setPoseArray(initialPoses);
   }
 
   /**
@@ -71,9 +73,8 @@ public class FieldObject2d implements AutoCloseable {
    * @return 2D pose
    */
   public synchronized Pose2d getPose() {
-    updateFromEntry();
     if (m_poses.isEmpty()) {
-      return Pose2d.kZero;
+      return Pose2d.ZERO;
     }
     return m_poses.get(0);
   }
@@ -84,9 +85,7 @@ public class FieldObject2d implements AutoCloseable {
    * @param poses list of 2D poses
    */
   public synchronized void setPoses(List<Pose2d> poses) {
-    m_poses.clear();
-    m_poses.addAll(poses);
-    updateEntry();
+    m_posesTunable.set(poses.toArray(new Pose2d[0]));
   }
 
   /**
@@ -95,22 +94,23 @@ public class FieldObject2d implements AutoCloseable {
    * @param poses list of 2D poses
    */
   public synchronized void setPoses(Pose2d... poses) {
-    m_poses.clear();
-    Collections.addAll(m_poses, poses);
-    updateEntry();
+    m_posesTunable.set(poses.clone());
   }
 
   /**
    * Sets poses from a trajectory.
    *
+   * @param <SampleType> The type of the trajectory sample.
    * @param trajectory The trajectory from which the poses should be added.
    */
-  public synchronized void setTrajectory(Trajectory trajectory) {
-    m_poses.clear();
-    for (Trajectory.State state : trajectory.getStates()) {
-      m_poses.add(state.pose);
+  public synchronized <SampleType extends HolonomicSample> void setTrajectory(
+      Trajectory<SampleType> trajectory) {
+    List<SampleType> samples = trajectory.getSamples();
+    Pose2d[] poses = new Pose2d[samples.size()];
+    for (int i = 0; i < samples.size(); i++) {
+      poses[i] = samples.get(i).pose;
     }
-    updateEntry();
+    m_posesTunable.set(poses);
   }
 
   /**
@@ -119,55 +119,19 @@ public class FieldObject2d implements AutoCloseable {
    * @return list of 2D poses
    */
   public synchronized List<Pose2d> getPoses() {
-    updateFromEntry();
     return new ArrayList<>(m_poses);
   }
 
-  void updateEntry() {
-    updateEntry(false);
+  private synchronized Pose2d[] getPoseArray() {
+    return m_poses.toArray(new Pose2d[0]);
   }
 
-  synchronized void updateEntry(boolean setDefault) {
-    if (m_entry == null) {
-      return;
-    }
-
-    double[] arr = new double[m_poses.size() * 3];
-    int ndx = 0;
-    for (Pose2d pose : m_poses) {
-      Translation2d translation = pose.getTranslation();
-      arr[ndx + 0] = translation.getX();
-      arr[ndx + 1] = translation.getY();
-      arr[ndx + 2] = pose.getRotation().getDegrees();
-      ndx += 3;
-    }
-
-    if (setDefault) {
-      m_entry.setDefault(arr);
-    } else {
-      m_entry.set(arr);
-    }
+  private synchronized void setPoseArray(Pose2d[] poses) {
+    m_poses.clear();
+    Collections.addAll(m_poses, poses);
   }
 
-  private synchronized void updateFromEntry() {
-    if (m_entry == null) {
-      return;
-    }
-
-    double[] arr = m_entry.get(null);
-    if (arr != null) {
-      if ((arr.length % 3) != 0) {
-        return;
-      }
-
-      m_poses.clear();
-      for (int i = 0; i < arr.length; i += 3) {
-        m_poses.add(new Pose2d(arr[i], arr[i + 1], Rotation2d.fromDegrees(arr[i + 2])));
-      }
-    }
-  }
-
-  String m_name;
-  DoubleArrayEntry m_entry;
-  private final List<Pose2d> m_poses = new ArrayList<>();
+  final String m_name;
+  final List<Pose2d> m_poses = new ArrayList<>();
+  final Tunable<Pose2d[]> m_posesTunable;
 }

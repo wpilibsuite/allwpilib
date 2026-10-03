@@ -89,7 +89,7 @@ class NetworkTableEntry final {
   /**
    * Gets the last time the entry's value was changed.
    *
-   * @return Entry last change time
+   * @return Entry last change time, in nanoseconds
    */
   int64_t GetLastChange() const { return GetEntryLastChange(m_handle); }
 

@@ -5,30 +5,45 @@
 #include <net/TimeSyncClient.h>
 #include <net/TimeSyncServer.h>
 
-#include <gtest/gtest.h>
+#include <print>
+#include <thread>
 
-class TimeSyncProtoTest : public ::testing::Test {
+#include <catch2/catch_test_macros.hpp>
+
+#include "wpi/nt/ntcore_cpp.hpp"
+
+class TimeSyncProtoTest {
  protected:
   wpi::util::Logger logger;
 };
 
-TEST_F(TimeSyncProtoTest, Smoketest) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest Smoketest",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
   wpi::util::Logger msglog;
 
+  auto startTimeUs = wpi::nt::Now() / 1000;
   TimeSyncServer server{logger, "", 5812};
   TimeSyncClient client{logger, "127.0.0.1", 5812, 100ms, nullptr};
 
   for (int i = 0; i < 10; i++) {
     std::this_thread::sleep_for(100ms);
     TimeSyncClient::Metadata m = client.GetMetadata();
-    fmt::println("Offset={} rtt={}", m.offset, m.rtt2);
+    std::println("Offset={} rtt={}", m.offset, m.rtt2);
   }
+
+  auto metadata = client.GetMetadata();
+  REQUIRE(metadata.pongsReceived > 0);
+  CHECK(metadata.lastPongTime >= static_cast<uint64_t>(startTimeUs));
+  CHECK(metadata.lastPongTime <= static_cast<uint64_t>(wpi::nt::Now() / 1000));
+  // Both clocks are local, so the server offset should be near zero.
+  CHECK(std::abs(metadata.offset) < 1'000'000);
 }
 
-TEST_F(TimeSyncProtoTest, CalculateZero) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZero",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
@@ -49,13 +64,14 @@ TEST_F(TimeSyncProtoTest, CalculateZero) {
   client.UpdateStatistics(pong_client_time, ping, pong);
 
   // THEN the statistics will reflect no delay
-  EXPECT_EQ(0, client.GetMetadata().offset);
-  EXPECT_EQ(0, client.GetMetadata().rtt2);
-  EXPECT_EQ(1u, client.GetMetadata().pongsReceived);
-  EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
+  CHECK(0 == client.GetMetadata().offset);
+  CHECK(0 == client.GetMetadata().rtt2);
+  CHECK(1u == client.GetMetadata().pongsReceived);
+  CHECK(pong_client_time == client.GetMetadata().lastPongTime);
 }
 
-TEST_F(TimeSyncProtoTest, CalculateZeroOffset) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZeroOffset",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
@@ -77,13 +93,14 @@ TEST_F(TimeSyncProtoTest, CalculateZeroOffset) {
 
   // THEN the statistics will reflect no offset, and the expected rtt2
   // (client-to-client) latency
-  EXPECT_EQ(0, client.GetMetadata().offset);
-  EXPECT_EQ(20, client.GetMetadata().rtt2);
-  EXPECT_EQ(1u, client.GetMetadata().pongsReceived);
-  EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
+  CHECK(0 == client.GetMetadata().offset);
+  CHECK(20 == client.GetMetadata().rtt2);
+  CHECK(1u == client.GetMetadata().pongsReceived);
+  CHECK(pong_client_time == client.GetMetadata().lastPongTime);
 }
 
-TEST_F(TimeSyncProtoTest, CalculateZeroRtt) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateZeroRtt",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
@@ -104,13 +121,14 @@ TEST_F(TimeSyncProtoTest, CalculateZeroRtt) {
   client.UpdateStatistics(pong_client_time, ping, pong);
 
   // THEN the statistics will reflect the expected 23ms offset
-  EXPECT_EQ(23, client.GetMetadata().offset);
-  EXPECT_EQ(0, client.GetMetadata().rtt2);
-  EXPECT_EQ(1u, client.GetMetadata().pongsReceived);
-  EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
+  CHECK(23 == client.GetMetadata().offset);
+  CHECK(0 == client.GetMetadata().rtt2);
+  CHECK(1u == client.GetMetadata().pongsReceived);
+  CHECK(pong_client_time == client.GetMetadata().lastPongTime);
 }
 
-TEST_F(TimeSyncProtoTest, CalculateBoth) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateBoth",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   using namespace std::chrono_literals;
 
@@ -134,30 +152,33 @@ TEST_F(TimeSyncProtoTest, CalculateBoth) {
   client.UpdateStatistics(pong_client_time, ping, pong);
 
   // THEN the statistics will reflect the expected latency and RTT
-  EXPECT_EQ(offset, client.GetMetadata().offset);
-  EXPECT_EQ(network_latency * 2, client.GetMetadata().rtt2);
-  EXPECT_EQ(1u, client.GetMetadata().pongsReceived);
-  EXPECT_EQ(pong_client_time, client.GetMetadata().lastPongTime);
+  CHECK(offset == client.GetMetadata().offset);
+  CHECK(network_latency * 2 == client.GetMetadata().rtt2);
+  CHECK(1u == client.GetMetadata().pongsReceived);
+  CHECK(pong_client_time == client.GetMetadata().lastPongTime);
 }
 
-TEST_F(TimeSyncProtoTest, FilterMedian) {
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest FilterMedian",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
 
   TimeMedianFilter<8> filter;
 
   // push 1, 2, 4, 4, 6, 99
-  EXPECT_EQ(1, filter.Calculate(1));
-  EXPECT_EQ(2, filter.Calculate(2));
-  EXPECT_EQ(2, filter.Calculate(4));
-  EXPECT_EQ(3, filter.Calculate(4));
-  EXPECT_EQ(4, filter.Calculate(6));
-  EXPECT_EQ(4, filter.Calculate(99));
+  CHECK(1 == filter.Calculate(1));
+  CHECK(2 == filter.Calculate(2));
+  CHECK(2 == filter.Calculate(4));
+  CHECK(3 == filter.Calculate(4));
+  CHECK(4 == filter.Calculate(6));
+  CHECK(4 == filter.Calculate(99));
   // push 2. new state will be
   // 1, 2, 2, 4, 4, 6, 99
-  EXPECT_EQ(4, filter.Calculate(2));
+  CHECK(4 == filter.Calculate(2));
 }
 
-TEST_F(TimeSyncProtoTest, FilterMedianAlternatingValues) {
+TEST_CASE_METHOD(TimeSyncProtoTest,
+                 "TimeSyncProtoTest FilterMedianAlternatingValues",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   TimeMedianFilter<4> filter;
   filter.Calculate(1);
@@ -165,43 +186,49 @@ TEST_F(TimeSyncProtoTest, FilterMedianAlternatingValues) {
   filter.Calculate(1);
   filter.Calculate(1000);
   // buffer state: [1, 1, 1000, 1000], median = 500
-  EXPECT_EQ(501, filter.Calculate(1));
+  CHECK(501 == filter.Calculate(1));
 }
 
-TEST_F(TimeSyncProtoTest, FilterMedianNegativeValues) {
+TEST_CASE_METHOD(TimeSyncProtoTest,
+                 "TimeSyncProtoTest FilterMedianNegativeValues",
+                 "[ntcore][time-sync-protocol]") {
   using namespace wpi::tsp;
   TimeMedianFilter<4> filter;
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-5, filter.Calculate(0));   // average of [-10, 0]
-  EXPECT_EQ(-3, filter.Calculate(-3));  // sorted: [-10, -3, 0]
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-5 == filter.Calculate(0));   // average of [-10, 0]
+  CHECK(-3 == filter.Calculate(-3));  // sorted: [-10, -3, 0]
 }
 
-TEST_F(TimeSyncProtoTest, FilterWindowRollsOverOdd) {
+TEST_CASE_METHOD(TimeSyncProtoTest,
+                 "TimeSyncProtoTest FilterWindowRollsOverOdd",
+                 "[ntcore][time-sync-protocol]") {
   // Odd window size, so never need to average
   using namespace wpi::tsp;
   TimeMedianFilter<3> filter;
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-10, filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
   // buffer state: [-10, -10, 12]
-  EXPECT_EQ(-10, filter.Calculate(12));
-  EXPECT_EQ(12, filter.Calculate(12));
-  EXPECT_EQ(12, filter.Calculate(12));
+  CHECK(-10 == filter.Calculate(12));
+  CHECK(12 == filter.Calculate(12));
+  CHECK(12 == filter.Calculate(12));
 }
 
-TEST_F(TimeSyncProtoTest, FilterWindowRollsOverEven) {
+TEST_CASE_METHOD(TimeSyncProtoTest,
+                 "TimeSyncProtoTest FilterWindowRollsOverEven",
+                 "[ntcore][time-sync-protocol]") {
   // Even window size, so need to average
   using namespace wpi::tsp;
   TimeMedianFilter<4> filter;
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-10, filter.Calculate(-10));
-  EXPECT_EQ(-10, filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
+  CHECK(-10 == filter.Calculate(-10));
   // buffer state: [-10, -10, -10, 13]
-  EXPECT_EQ(-10, filter.Calculate(13));
+  CHECK(-10 == filter.Calculate(13));
   // buffer state: [-10, -10, 13, 13]
   // 1.5 should round to 2.0
-  EXPECT_EQ(2, filter.Calculate(13));
+  CHECK(2 == filter.Calculate(13));
   // 12.5 round to 13
-  EXPECT_EQ(13, filter.Calculate(12));
+  CHECK(13 == filter.Calculate(12));
 }

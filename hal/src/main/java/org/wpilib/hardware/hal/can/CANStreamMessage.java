@@ -30,7 +30,7 @@ public class CANStreamMessage {
    * @param length Length of packet in bytes.
    * @param messageId CAN message ID of the message.
    * @param flags Message flags.
-   * @param timestamp CAN frame timestamp in microseconds.
+   * @param timestamp CAN frame timestamp in nanoseconds.
    * @return Buffer containing CAN frame.
    */
   @SuppressWarnings("PMD.MethodReturnsInternalArray")

@@ -28,7 +28,7 @@ class ExpansionHubMotor {
   };
 
   /**
-   * Constructs a servo at the requested channel on a specific USB port.
+   * Constructs a motor at the requested channel on a specific USB port.
    *
    * @param usbId The USB port ID the hub is connected to
    * @param channel The motor channel
@@ -38,10 +38,21 @@ class ExpansionHubMotor {
   ~ExpansionHubMotor() noexcept;
 
   /**
+   * Neutral mode applied when the motor output is commanded to 0.
+   */
+  enum class NeutralMode {
+    /** Allow the motor to coast when output is zero. */
+    COAST,
+    /** Actively brake the motor when output is zero. */
+    BRAKE
+  };
+
+  /**
    * Sets the throttle.
    *
    * @param throttle The throttle where -1 indicates full reverse and 1
    *     indicates full forward.
+   * @Common This is one of the commonly used methods for this class
    */
   void SetThrottle(double throttle);
 
@@ -77,12 +88,12 @@ class ExpansionHubMotor {
   void SetEnabled(bool enabled);
 
   /**
-   * Sets if the motor should float or brake when 0 is commanded. Defaults to
-   * false.
+   * Sets if the motor should brake or coast when 0 is commanded. Defaults to
+   * BRAKE mode.
    *
-   * @param floatOn0 True to float when commanded 0, false to brake
+   * @param mode Neutral mode to apply when output is zero.
    */
-  void SetFloatOn0(bool floatOn0);
+  void SetNeutralMode(NeutralMode mode);
 
   /**
    * Gets the current being pulled by the motor.

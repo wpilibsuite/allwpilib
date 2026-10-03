@@ -1,0 +1,21 @@
+load("@aos//aos/flatbuffers:generate.bzl", "static_flatbuffer")
+
+# Tables for NetworkTables' primitive types, one per file because AOS publishes
+# a schema's root type. NtBridge publishes a channel of one of these types as
+# that NetworkTables type instead of as protobuf.
+static_flatbuffer(
+    name = "nt_types_fbs",
+    srcs = [
+        "boolean.fbs",
+        "boolean_array.fbs",
+        "double.fbs",
+        "double_array.fbs",
+        "float.fbs",
+        "float_array.fbs",
+        "integer.fbs",
+        "integer_array.fbs",
+        "string.fbs",
+        "string_array.fbs",
+    ],
+    visibility = ["//visibility:public"],
+)

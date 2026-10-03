@@ -3,6 +3,3 @@ include(CMakeFindDependencyMacro)
 @WPIUTIL_DEP_REPLACE@
 @FILENAME_DEP_REPLACE@
 include(${SELF_DIR}/datalog.cmake)
-if(@WITH_JAVA@)
-    include(${SELF_DIR}/datalog_jar.cmake)
-endif()

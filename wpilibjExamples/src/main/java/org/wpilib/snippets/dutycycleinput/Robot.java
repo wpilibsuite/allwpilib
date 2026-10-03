@@ -6,7 +6,7 @@ package org.wpilib.snippets.dutycycleinput;
 
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.rotation.DutyCycle;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 public class Robot extends TimedRobot {
   private final DutyCycle dutyCycle;
@@ -24,7 +24,7 @@ public class Robot extends TimedRobot {
     // 1 is fully on, 0 is fully off
     double output = dutyCycle.getOutput();
 
-    SmartDashboard.putNumber("Frequency", frequency);
-    SmartDashboard.putNumber("Duty Cycle", output);
+    Telemetry.log("Frequency", frequency);
+    Telemetry.log("Duty Cycle", output);
   }
 }

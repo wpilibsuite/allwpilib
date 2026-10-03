@@ -1,0 +1,48 @@
+extra_includes:
+- pybind11/stl.h
+- wpi/driverstation/Gamepad.hpp
+
+classes:
+  wpi::DSGamepadChooser:
+    methods:
+      DSGamepadChooser:
+        overloads:
+          int:
+          Gamepad&:
+            keepalive:
+            - [1, 2]
+      GetGamepad:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+      AddOptions:
+        overloads:
+          std::string_view, std::vector<std::string>:
+            return_value_policy: reference_internal
+          std::string_view, std::initializer_list<std::string_view>:
+            ignore: true
+      AddIntegerOptions:
+        return_value_policy: reference_internal
+      AddDoubleOptions:
+        return_value_policy: reference_internal
+      Update:
+      GetSelected:
+      GetSelectedInteger:
+      GetSelectedDouble:
+      GetSelectedIndex:
+      GetSelectableNames:
+      GetSelectedSelectable:
+        overloads:
+          "":
+            return_value_policy: reference_internal
+          '[const]':
+            ignore: true
+
+  wpi::DSGamepadChooser::GamepadSelectable:
+    methods:
+      GetName:
+      GetOptions:
+      GetSelected:
+      GetSelectedIndex:

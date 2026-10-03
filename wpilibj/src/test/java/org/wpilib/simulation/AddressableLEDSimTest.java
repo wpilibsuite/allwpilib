@@ -20,7 +20,7 @@ import org.wpilib.simulation.testutils.IntCallback;
 class AddressableLEDSimTest {
   @Test
   void testInitialization() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     AddressableLEDSim sim = new AddressableLEDSim(0);
     assertFalse(sim.getInitialized());
 

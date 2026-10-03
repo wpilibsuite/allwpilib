@@ -4,8 +4,8 @@
 
 package org.wpilib.math.trajectory.constraint;
 
-import org.wpilib.math.geometry.Ellipse2d;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.shape.Ellipse2d;
 
 /** Enforces a particular constraint only within an elliptical region. */
 public class EllipticalRegionConstraint implements TrajectoryConstraint {

@@ -9,7 +9,7 @@ import org.wpilib.hardware.hal.HALValue;
 public class EnumCallback extends CallbackHelperBase<Long> {
   @Override
   public void callback(String name, HALValue value) {
-    if (value.getType() != HALValue.kEnum) {
+    if (value.getType() != HALValue.ENUM) {
       throw new IllegalArgumentException("Wrong callback for type " + value.getType());
     }
 

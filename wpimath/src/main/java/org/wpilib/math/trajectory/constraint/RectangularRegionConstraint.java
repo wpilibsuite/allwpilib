@@ -5,7 +5,7 @@
 package org.wpilib.math.trajectory.constraint;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rectangle2d;
+import org.wpilib.math.shape.Rectangle2d;
 
 /** Enforces a particular constraint only within a rectangular region. */
 public class RectangularRegionConstraint implements TrajectoryConstraint {

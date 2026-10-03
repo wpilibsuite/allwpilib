@@ -7,6 +7,7 @@ enums:
   HAL_CANManufacturer:
     value_prefix: HAL_CAN_MAN
   HAL_CANFlags:
+    value_prefix: HAL_CAN
 classes:
   HAL_CANMessage:
     attributes:

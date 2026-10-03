@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include "wpi/util/sendable/Sendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include <string>
 
 #include "wpi/driverstation/GenericHID.hpp"
+#include "wpi/driverstation/HIDDevice.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
 
 namespace wpi {
 
@@ -25,9 +26,7 @@ namespace wpi {
  * correct mapping, and only through the official NI DS. Sim is not guaranteed
  * to have the same mapping, as well as any 3rd party controllers.
  */
-class NiDsPS5Controller : public GenericHID,
-                                    public wpi::util::Sendable,
-                                    public wpi::util::SendableHelper<NiDsPS5Controller> {
+class NiDsPS5Controller : public HIDDevice, public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Construct an instance of a controller.
@@ -39,10 +38,31 @@ class NiDsPS5Controller : public GenericHID,
    */
   explicit NiDsPS5Controller(int port);
 
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  explicit NiDsPS5Controller(GenericHID& hid);
+
   ~NiDsPS5Controller() override = default;
 
   NiDsPS5Controller(NiDsPS5Controller&&) = default;
   NiDsPS5Controller& operator=(NiDsPS5Controller&&) = default;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  GenericHID& GetHID() override;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  const GenericHID& GetHID() const override;
 
   /**
    * Get the X axis value of left side of the controller. Right is positive.
@@ -525,52 +545,102 @@ class NiDsPS5Controller : public GenericHID,
   /** Represents a digital button on an NiDsPS5Controller. */
   struct Button {
     /// Square button.
-    static constexpr int kSquare = 0;
+    static constexpr int SQUARE = 0;
     /// Cross button.
-    static constexpr int kCross = 1;
+    static constexpr int CROSS = 1;
     /// Circle button.
-    static constexpr int kCircle = 2;
+    static constexpr int CIRCLE = 2;
     /// Triangle button.
-    static constexpr int kTriangle = 3;
+    static constexpr int TRIANGLE = 3;
     /// Left trigger 1 button.
-    static constexpr int kL1 = 4;
+    static constexpr int L1 = 4;
     /// Right trigger 1 button.
-    static constexpr int kR1 = 5;
+    static constexpr int R1 = 5;
     /// Left trigger 2 button.
-    static constexpr int kL2 = 6;
+    static constexpr int L2 = 6;
     /// Right trigger 2 button.
-    static constexpr int kR2 = 7;
+    static constexpr int R2 = 7;
     /// Create button.
-    static constexpr int kCreate = 8;
+    static constexpr int CREATE = 8;
     /// Options button.
-    static constexpr int kOptions = 9;
+    static constexpr int OPTIONS = 9;
     /// L3 (left stick) button.
-    static constexpr int kL3 = 10;
+    static constexpr int L3 = 10;
     /// R3 (right stick) button.
-    static constexpr int kR3 = 11;
+    static constexpr int R3 = 11;
     /// PlayStation button.
-    static constexpr int kPS = 12;
+    static constexpr int PS = 12;
     /// Touchpad button.
-    static constexpr int kTouchpad = 13;
+    static constexpr int TOUCHPAD = 13;
   };
 
   /** Represents an axis on an NiDsPS5Controller. */
   struct Axis {
     /// Left X axis.
-    static constexpr int kLeftX = 0;
+    static constexpr int LEFT_X = 0;
     /// Left Y axis.
-    static constexpr int kLeftY = 1;
+    static constexpr int LEFT_Y = 1;
     /// Right X axis.
-    static constexpr int kRightX = 2;
+    static constexpr int RIGHT_X = 2;
     /// Right Y axis.
-    static constexpr int kRightY = 5;
+    static constexpr int RIGHT_Y = 5;
     /// Left trigger 2.
-    static constexpr int kL2 = 3;
+    static constexpr int L2 = 3;
     /// Right trigger 2.
-    static constexpr int kR2 = 4;
+    static constexpr int R2 = 4;
   };
 
-  void InitSendable(wpi::util::SendableBuilder& builder) override;
+  /**
+   * Get if the controller is connected.
+   *
+   * @return true if the controller is connected
+   */
+  bool IsConnected() const;
+
+  /**
+   * Get the type of the controller.
+   *
+   * @return the type of the controller.
+   */
+  GenericHID::HIDType GetGamepadType() const;
+
+  /**
+   * Get the supported outputs of the controller.
+   *
+   * @return the supported outputs of the controller.
+   */
+  GenericHID::SupportedOutputs GetSupportedOutputs() const;
+
+  /**
+   * Get the name of the controller.
+   *
+   * @return the name of the controller.
+   */
+  std::string GetName() const;
+
+  /**
+   * Get the port number of the controller.
+   *
+   * @return The port number of the controller.
+   */
+  int GetPort() const;
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * The DS currently supports 4 rumble values: left rumble, right rumble, left
+   * trigger rumble, and right trigger rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  void SetRumble(GenericHID::RumbleType type, double value);
+
+  std::string_view GetTelemetryType() const override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+ private:
+  GenericHID* m_hid;
 };
 
 }  // namespace wpi

@@ -1,33 +1,30 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sat, 7 May 2022 22:09:18 -0400
-Subject: [PATCH 01/36] Remove StringRef, ArrayRef, and Optional
+Subject: [PATCH 01/32] Remove StringRef, ArrayRef, and Optional
 
 ---
- llvm/include/llvm/ADT/PointerUnion.h          |   1 -
- llvm/include/llvm/ADT/SmallString.h           | 101 ++++++++++--------
- llvm/include/llvm/ADT/SmallVector.h           |   7 +-
- llvm/include/llvm/Support/Chrono.h            |  10 +-
- llvm/include/llvm/Support/Compiler.h          |   2 +-
- llvm/include/llvm/Support/ConvertUTF.h        |  31 +++---
- llvm/include/llvm/Support/ErrorHandling.h     |   9 +-
- llvm/include/llvm/Support/VersionTuple.h      |   6 --
- .../llvm/Support/Windows/WindowsSupport.h     |   4 +-
- llvm/include/llvm/Support/raw_ostream.h       |  46 ++++----
- llvm/lib/Support/ConvertUTFWrapper.cpp        |  39 +++----
- llvm/lib/Support/ErrorHandling.cpp            |  13 ++-
- llvm/lib/Support/SmallVector.cpp              |   5 +-
- llvm/lib/Support/raw_ostream.cpp              |  25 +++--
- llvm/unittests/ADT/DenseMapTest.cpp           |  29 +----
- llvm/unittests/ADT/FunctionExtrasTest.cpp     |  12 +--
- llvm/unittests/ADT/SmallPtrSetTest.cpp        |   1 -
- llvm/unittests/ADT/SmallStringTest.cpp        |  50 ++++-----
- llvm/unittests/ADT/SmallVectorTest.cpp        |  30 ++----
- llvm/unittests/Support/ConvertUTFTest.cpp     |  42 ++++----
- 20 files changed, 211 insertions(+), 252 deletions(-)
+ llvm/include/llvm/ADT/PointerUnion.h      |  1 -
+ llvm/include/llvm/ADT/SmallString.h       | 99 ++++++++++++-----------
+ llvm/include/llvm/ADT/SmallVector.h       |  9 +--
+ llvm/include/llvm/Support/Compiler.h      |  2 +-
+ llvm/include/llvm/Support/ConvertUTF.h    | 31 ++++---
+ llvm/include/llvm/Support/ErrorHandling.h | 16 ++--
+ llvm/include/llvm/Support/raw_ostream.h   | 46 ++++++-----
+ llvm/lib/Support/ConvertUTFWrapper.cpp    | 40 +++++----
+ llvm/lib/Support/ErrorHandling.cpp        | 21 +++--
+ llvm/lib/Support/SmallVector.cpp          |  5 +-
+ llvm/lib/Support/raw_ostream.cpp          | 25 +++---
+ llvm/unittests/ADT/DenseMapTest.cpp       | 33 +-------
+ llvm/unittests/ADT/FunctionExtrasTest.cpp | 12 +--
+ llvm/unittests/ADT/SmallPtrSetTest.cpp    |  1 -
+ llvm/unittests/ADT/SmallStringTest.cpp    | 50 ++++++------
+ llvm/unittests/ADT/SmallVectorTest.cpp    | 38 +++------
+ llvm/unittests/Support/ConvertUTFTest.cpp | 42 +++++-----
+ 17 files changed, 218 insertions(+), 253 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/PointerUnion.h b/llvm/include/llvm/ADT/PointerUnion.h
-index cdbd76d7f505be277c3886cc821fb60336cbec59..23394db93cfed492bb1747eb9c8c55ed9230120d 100644
+index 93caf86e965b5fd2e08e0214f17062b68abf151a..0d81c37681065d9d89a416f7a00da9f92b0af4b4 100644
 --- a/llvm/include/llvm/ADT/PointerUnion.h
 +++ b/llvm/include/llvm/ADT/PointerUnion.h
 @@ -17,7 +17,6 @@
@@ -39,7 +36,7 @@ index cdbd76d7f505be277c3886cc821fb60336cbec59..23394db93cfed492bb1747eb9c8c55ed
  #include "llvm/Support/PointerLikeTypeTraits.h"
  #include <algorithm>
 diff --git a/llvm/include/llvm/ADT/SmallString.h b/llvm/include/llvm/ADT/SmallString.h
-index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee4055408e5f5 100644
+index a9344d572f48c3312c67f7e0bf0cddcf8856cd99..935c98bd325699b44360832831408da67f492354 100644
 --- a/llvm/include/llvm/ADT/SmallString.h
 +++ b/llvm/include/llvm/ADT/SmallString.h
 @@ -15,8 +15,9 @@
@@ -147,7 +144,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().compare_numeric(RHS);
    }
  
-@@ -116,14 +119,14 @@ public:
+@@ -116,16 +119,16 @@ public:
    /// @name String Predicates
    /// @{
  
@@ -159,16 +156,25 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
 +    return str().startswith(Prefix);
    }
  
--  /// ends_with - Check if this string ends with the given \p Suffix.
+   /// starts_with - Check if this string starts with the given character \p C.
+   [[nodiscard]] bool starts_with(char C) const { return str().starts_with(C); }
+ 
+   /// ends_with - Check if this string ends with the given \p Suffix.
 -  [[nodiscard]] bool ends_with(StringRef Suffix) const {
--    return str().ends_with(Suffix);
-+  /// endswith - Check if this string ends with the given \p Suffix.
-+  [[nodiscard]] bool endswith(std::string_view Suffix) const {
-+    return str().endswith(Suffix);
++  [[nodiscard]] bool ends_with(std::string_view Suffix) const {
+     return str().ends_with(Suffix);
    }
  
-   /// @}
-@@ -142,7 +145,7 @@ public:
+@@ -133,7 +136,7 @@ public:
+   [[nodiscard]] bool ends_with(char C) const { return str().ends_with(C); }
+ 
+   /// contains - Check if \p Other is a substring of this string.
+-  [[nodiscard]] bool contains(StringRef Other) const {
++  [[nodiscard]] bool contains(std::string_view Other) const {
+     return str().contains(Other);
+   }
+ 
+@@ -156,7 +159,7 @@ public:
    ///
    /// \returns The index of the first occurrence of \p Str, or npos if not
    /// found.
@@ -177,7 +183,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().find(Str, From);
    }
  
-@@ -150,7 +153,8 @@ public:
+@@ -164,7 +167,8 @@ public:
    ///
    /// \returns The index of the last occurrence of \p C, or npos if not
    /// found.
@@ -187,7 +193,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().rfind(C, From);
    }
  
-@@ -158,7 +162,9 @@ public:
+@@ -172,7 +176,9 @@ public:
    ///
    /// \returns The index of the last occurrence of \p Str, or npos if not
    /// found.
@@ -198,7 +204,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
  
    /// Find the first character in the string that is \p C, or npos if not
    /// found. Same as find.
-@@ -170,7 +176,8 @@ public:
+@@ -184,7 +190,8 @@ public:
    /// not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -208,7 +214,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().find_first_of(Chars, From);
    }
  
-@@ -184,15 +191,15 @@ public:
+@@ -198,15 +205,15 @@ public:
    /// \p Chars, or npos if not found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -227,7 +233,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().find_last_of(C, From);
    }
  
-@@ -200,8 +207,8 @@ public:
+@@ -214,8 +221,8 @@ public:
    /// found.
    ///
    /// Complexity: O(size() + Chars.size())
@@ -238,7 +244,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().find_last_of(Chars, From);
    }
  
-@@ -214,7 +221,9 @@ public:
+@@ -228,7 +235,9 @@ public:
  
    /// Return the number of non-overlapped occurrences of \p Str in the
    /// string.
@@ -249,7 +255,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
  
    /// @}
    /// @name Substring Operations
-@@ -229,8 +238,8 @@ public:
+@@ -243,8 +252,8 @@ public:
    /// \param N The number of characters to included in the substring. If \p N
    /// exceeds the number of characters remaining in the string, the string
    /// suffix (starting with \p Start) will be returned.
@@ -260,7 +266,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return str().substr(Start, N);
    }
  
-@@ -244,15 +253,15 @@ public:
+@@ -258,15 +267,15 @@ public:
    /// substring. If this is npos, or less than \p Start, or exceeds the
    /// number of characters remaining in the string, the string suffix
    /// (starting with \p Start) will be returned.
@@ -280,7 +286,7 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
    }
  
    // TODO: Make this const, if it's safe...
-@@ -262,20 +271,20 @@ public:
+@@ -276,20 +285,20 @@ public:
      return this->data();
    }
  
@@ -306,10 +312,10 @@ index be3193c6ef9beba622f39e3e76cd0f0c6dd422b0..9fab1a7726bc6745296f5ebb24aee405
      return *this;
    }
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index bd3e887e36bce4129d95099e84e833adc6a82cee..be06bb817e24e723265f9a8038d94123de1fc53c 100644
+index 134c74bfd48d0b02f603db5ff5945426b2fddf86..712f0f5f5087b44c5b7cac9f7d8e16fae9075506 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
-@@ -27,13 +27,12 @@
+@@ -29,13 +29,12 @@
  #include <limits>
  #include <memory>
  #include <new>
@@ -323,8 +329,8 @@ index bd3e887e36bce4129d95099e84e833adc6a82cee..be06bb817e24e723265f9a8038d94123
 -
  template <typename IteratorT> class iterator_range;
  
- template <class Iterator>
-@@ -114,7 +113,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
+ template <class Iterator, class Tag>
+@@ -119,7 +118,7 @@ template <class T, typename = void> struct SmallVectorAlignmentAndSize {
  };
  
  /// This is the part of SmallVectorTemplateBase which does not depend on whether
@@ -333,63 +339,29 @@ index bd3e887e36bce4129d95099e84e833adc6a82cee..be06bb817e24e723265f9a8038d94123
  /// to avoid unnecessarily requiring T to be complete.
  template <typename T, typename = void>
  class SmallVectorTemplateCommon
-@@ -1229,7 +1228,7 @@ public:
+@@ -761,7 +760,7 @@ public:
  
    template <typename U,
-             typename = std::enable_if_t<std::is_convertible<U, T>::value>>
+             typename = std::enable_if_t<std::is_convertible_v<U, T>>>
+-  void assign(ArrayRef<U> AR) {
++  void assign(span<const U> AR) {
+     assign(AR.begin(), AR.end());
+   }
+ 
+@@ -1267,7 +1266,7 @@ public:
+ 
+   template <typename U,
+             typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 -  explicit SmallVector(ArrayRef<U> A) : SmallVectorImpl<T>(N) {
 +  explicit SmallVector(span<const U> A) : SmallVectorImpl<T>(N) {
      this->append(A.begin(), A.end());
    }
  
-diff --git a/llvm/include/llvm/Support/Chrono.h b/llvm/include/llvm/Support/Chrono.h
-index 71859af7c7e4a595140475daf356744f52d14d24..9c9ba7002310eba5113c14957f769702c61f4326 100644
---- a/llvm/include/llvm/Support/Chrono.h
-+++ b/llvm/include/llvm/Support/Chrono.h
-@@ -91,7 +91,7 @@ raw_ostream &operator<<(raw_ostream &OS, sys::UtcTime<> TP);
- template <>
- struct format_provider<sys::TimePoint<>> {
-   static void format(const sys::TimePoint<> &TP, llvm::raw_ostream &OS,
--                     StringRef Style);
-+                     std::string_view Style);
- };
- 
- template <> struct format_provider<sys::UtcTime<std::chrono::seconds>> {
-@@ -148,7 +148,7 @@ private:
-     return duration_cast<duration<InternalRep, AsPeriod>>(D).count();
-   }
- 
--  static std::pair<InternalRep, StringRef> consumeUnit(StringRef &Style,
-+  static std::pair<InternalRep, std::string_view> consumeUnit(std::string_view &Style,
-                                                         const Dur &D) {
-     using namespace std::chrono;
-     if (Style.consume_front("ns"))
-@@ -166,7 +166,7 @@ private:
-     return {D.count(), detail::unit<Period>::value};
-   }
- 
--  static bool consumeShowUnit(StringRef &Style) {
-+  static bool consumeShowUnit(std::string_view &Style) {
-     if (Style.empty())
-       return true;
-     if (Style.consume_front("-"))
-@@ -178,9 +178,9 @@ private:
-   }
- 
- public:
--  static void format(const Dur &D, llvm::raw_ostream &Stream, StringRef Style) {
-+  static void format(const Dur &D, llvm::raw_ostream &Stream, std::string_view Style) {
-     InternalRep count;
--    StringRef unit;
-+    std::string_view unit;
-     std::tie(count, unit) = consumeUnit(Style, D);
-     bool show_unit = consumeShowUnit(Style);
- 
 diff --git a/llvm/include/llvm/Support/Compiler.h b/llvm/include/llvm/Support/Compiler.h
-index dc8b5389069ebfe217d323fb9c75d6e0fe7d5b8e..021d1d29368deb330418ff4e08fbf3931e4b7453 100644
+index cffab778deeb40c87d9695b6f2f4a1952d0879bd..a85a349aca83ffdf6f300f403cb8fc2735920290 100644
 --- a/llvm/include/llvm/Support/Compiler.h
 +++ b/llvm/include/llvm/Support/Compiler.h
-@@ -406,7 +406,7 @@
+@@ -433,7 +433,7 @@
  #endif
  
  /// LLVM_GSL_POINTER - Apply this to non-owning classes like
@@ -399,11 +371,11 @@ index dc8b5389069ebfe217d323fb9c75d6e0fe7d5b8e..021d1d29368deb330418ff4e08fbf393
  #define LLVM_GSL_POINTER [[gsl::Pointer]]
  #else
 diff --git a/llvm/include/llvm/Support/ConvertUTF.h b/llvm/include/llvm/Support/ConvertUTF.h
-index c892bb3c03cb569994429649bdbb96e4118dcef1..5c0e3009c25446a34882fb98329b1d955231bb39 100644
+index 42329b9066dc9ea76c95961ef7a03bde50a1a5fd..540848239f250927700715ccd8bac3436be51031 100644
 --- a/llvm/include/llvm/Support/ConvertUTF.h
 +++ b/llvm/include/llvm/Support/ConvertUTF.h
-@@ -107,10 +107,9 @@
- 
+@@ -108,10 +108,9 @@
+ #include "llvm/Support/Compiler.h"
  #include <cstddef>
  #include <string>
 -
@@ -415,7 +387,7 @@ index c892bb3c03cb569994429649bdbb96e4118dcef1..5c0e3009c25446a34882fb98329b1d95
  
  // Wrap everything in namespace llvm so that programs can link with llvm and
  // their own version of the unicode libraries.
-@@ -204,12 +203,10 @@ unsigned getNumBytesForUTF8(UTF8 firstByte);
+@@ -221,12 +220,10 @@ LLVM_ABI unsigned getNumBytesForUTF8(UTF8 firstByte);
  /*************************************************************************/
  /* Below are LLVM-specific wrappers of the functions above. */
  
@@ -429,89 +401,92 @@ index c892bb3c03cb569994429649bdbb96e4118dcef1..5c0e3009c25446a34882fb98329b1d95
   * WideCharWidth. The converted data is written to ResultPtr, which needs to
   * point to at least WideCharWidth * (Source.Size() + 1) bytes. On success,
   * ResultPtr will point one after the end of the copied string. On failure,
-@@ -217,14 +214,14 @@ class StringRef;
+@@ -234,14 +231,14 @@ class StringRef;
   * the first character which could not be converted.
   * \return true on success.
   */
--bool ConvertUTF8toWide(unsigned WideCharWidth, llvm::StringRef Source,
-+bool ConvertUTF8toWide(unsigned WideCharWidth, std::string_view Source,
-                        char *&ResultPtr, const UTF8 *&ErrorPtr);
+-LLVM_ABI bool ConvertUTF8toWide(unsigned WideCharWidth, llvm::StringRef Source,
++LLVM_ABI bool ConvertUTF8toWide(unsigned WideCharWidth, std::string_view Source,
+                                 char *&ResultPtr, const UTF8 *&ErrorPtr);
  
  /**
 -* Converts a UTF-8 StringRef to a std::wstring.
 +* Converts a UTF-8 string_view to a std::wstring.
  * \return true on success.
  */
--bool ConvertUTF8toWide(llvm::StringRef Source, std::wstring &Result);
-+bool ConvertUTF8toWide(std::string_view Source, std::wstring &Result);
+-LLVM_ABI bool ConvertUTF8toWide(llvm::StringRef Source, std::wstring &Result);
++LLVM_ABI bool ConvertUTF8toWide(std::string_view Source, std::wstring &Result);
  
  /**
  * Converts a UTF-8 C-string to a std::wstring.
-@@ -282,7 +279,7 @@ inline ConversionResult convertUTF8Sequence(const UTF8 **source,
+@@ -298,7 +295,7 @@ inline ConversionResult convertUTF8Sequence(const UTF8 **source,
   * Returns true if a blob of text starts with a UTF-16 big or little endian byte
   * order mark.
   */
--bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
-+bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
+-LLVM_ABI bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
++LLVM_ABI bool hasUTF16ByteOrderMark(span<const char> SrcBytes);
  
  /**
   * Converts a stream of raw bytes assumed to be UTF16 into a UTF8 std::string.
-@@ -291,7 +288,7 @@ bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
+@@ -307,7 +304,7 @@ LLVM_ABI bool hasUTF16ByteOrderMark(ArrayRef<char> SrcBytes);
   * \param [out] Out Converted UTF-8 is stored here on success.
   * \returns true on success
   */
--bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out);
-+bool convertUTF16ToUTF8String(span<const char> SrcBytes, std::string &Out);
+-LLVM_ABI bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes,
++LLVM_ABI bool convertUTF16ToUTF8String(span<const char> SrcBytes,
+                                        std::string &Out);
  
  /**
- * Converts a UTF16 string into a UTF8 std::string.
-@@ -300,7 +297,7 @@ bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out);
+@@ -317,7 +314,7 @@ LLVM_ABI bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes,
  * \param [out] Out Converted UTF-8 is stored here on success.
  * \returns true on success
  */
--bool convertUTF16ToUTF8String(ArrayRef<UTF16> Src, std::string &Out);
-+bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out);
+-LLVM_ABI bool convertUTF16ToUTF8String(ArrayRef<UTF16> Src, std::string &Out);
++LLVM_ABI bool convertUTF16ToUTF8String(span<const UTF16> Src, std::string &Out);
  
  /**
   * Converts a stream of raw bytes assumed to be UTF32 into a UTF8 std::string.
-@@ -309,7 +306,7 @@ bool convertUTF16ToUTF8String(ArrayRef<UTF16> Src, std::string &Out);
+@@ -326,7 +323,7 @@ LLVM_ABI bool convertUTF16ToUTF8String(ArrayRef<UTF16> Src, std::string &Out);
   * \param [out] Out Converted UTF-8 is stored here on success.
   * \returns true on success
   */
--bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out);
-+bool convertUTF32ToUTF8String(span<const char> SrcBytes, std::string &Out);
+-LLVM_ABI bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes,
++LLVM_ABI bool convertUTF32ToUTF8String(span<const char> SrcBytes,
+                                        std::string &Out);
  
  /**
-  * Converts a UTF32 string into a UTF8 std::string.
-@@ -318,22 +315,22 @@ bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out);
+@@ -336,14 +333,14 @@ LLVM_ABI bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes,
   * \param [out] Out Converted UTF-8 is stored here on success.
   * \returns true on success
   */
--bool convertUTF32ToUTF8String(ArrayRef<UTF32> Src, std::string &Out);
-+bool convertUTF32ToUTF8String(span<const UTF32> Src, std::string &Out);
+-LLVM_ABI bool convertUTF32ToUTF8String(ArrayRef<UTF32> Src, std::string &Out);
++LLVM_ABI bool convertUTF32ToUTF8String(span<const UTF32> Src, std::string &Out);
  
  /**
   * Converts a UTF-8 string into a UTF-16 string with native endianness.
   *
   * \returns true on success
   */
--bool convertUTF8ToUTF16String(StringRef SrcUTF8,
-+bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
-                               SmallVectorImpl<UTF16> &DstUTF16);
+-LLVM_ABI bool convertUTF8ToUTF16String(StringRef SrcUTF8,
++LLVM_ABI bool convertUTF8ToUTF16String(std::string_view SrcUTF8,
+                                        SmallVectorImpl<UTF16> &DstUTF16);
  
+ LLVM_ABI bool IsSingleCodeUnitUTF8Codepoint(unsigned);
+@@ -353,10 +350,10 @@ LLVM_ABI bool IsSingleCodeUnitUTF32Codepoint(unsigned);
  #if defined(_WIN32)
  namespace sys {
  namespace windows {
--std::error_code UTF8ToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
-+std::error_code UTF8ToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
+-LLVM_ABI std::error_code UTF8ToUTF16(StringRef utf8,
++LLVM_ABI std::error_code UTF8ToUTF16(std::string_view utf8,
+                                      SmallVectorImpl<wchar_t> &utf16);
  /// Convert to UTF16 from the current code page used in the system
--std::error_code CurCPToUTF16(StringRef utf8, SmallVectorImpl<wchar_t> &utf16);
-+std::error_code CurCPToUTF16(std::string_view utf8, SmallVectorImpl<wchar_t> &utf16);
- std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
-                             SmallVectorImpl<char> &utf8);
- /// Convert from UTF16 to the current code page used in the system
+-LLVM_ABI std::error_code CurCPToUTF16(StringRef utf8,
++LLVM_ABI std::error_code CurCPToUTF16(std::string_view utf8,
+                                       SmallVectorImpl<wchar_t> &utf16);
+ LLVM_ABI std::error_code UTF16ToUTF8(const wchar_t *utf16, size_t utf16_len,
+                                      SmallVectorImpl<char> &utf8);
 diff --git a/llvm/include/llvm/Support/ErrorHandling.h b/llvm/include/llvm/Support/ErrorHandling.h
-index 9c8e3448f3a03e3540adb8b9dd730c77dd9b20ba..68c27a8c67c4f378b92cfa726659ef7824b56dea 100644
+index a4fd008a9ff3fc50cbb81e4b8a90ef2284ec6474..aabdfa0ad5e0caf15a72eb95ec9f888fbe608099 100644
 --- a/llvm/include/llvm/Support/ErrorHandling.h
 +++ b/llvm/include/llvm/Support/ErrorHandling.h
 @@ -15,10 +15,10 @@
@@ -522,81 +497,55 @@ index 9c8e3448f3a03e3540adb8b9dd730c77dd9b20ba..68c27a8c67c4f378b92cfa726659ef78
 +#include <string_view>
  
  namespace llvm {
--  class StringRef;
--  class Twine;
+-class StringRef;
+-class Twine;
  
-   /// An error handler callback.
-   typedef void (*fatal_error_handler_t)(void *user_data,
-@@ -67,12 +67,11 @@ namespace llvm {
- /// standard error, followed by a newline.
- /// After the error handler is called this function will call abort(), it
- /// does not return.
--/// NOTE: The std::string variant was removed to avoid a <string> dependency.
- [[noreturn]] void report_fatal_error(const char *reason,
-                                      bool gen_crash_diag = true);
--[[noreturn]] void report_fatal_error(StringRef reason,
-+[[noreturn]] void report_fatal_error(const std::string &reason,
-                                      bool gen_crash_diag = true);
--[[noreturn]] void report_fatal_error(const Twine &reason,
-+[[noreturn]] void report_fatal_error(std::string_view reason,
-                                      bool gen_crash_diag = true);
+ /// An error handler callback.
+ using fatal_error_handler_t = void (*)(void *user_data, const char *reason,
+@@ -62,9 +62,9 @@ struct ScopedFatalErrorHandler {
+ /// instead.
+ [[noreturn]] LLVM_ABI void report_fatal_error(const char *reason,
+                                               bool gen_crash_diag = true);
+-[[noreturn]] LLVM_ABI void report_fatal_error(StringRef reason,
++[[noreturn]] LLVM_ABI void report_fatal_error(const std::string& reason,
+                                               bool gen_crash_diag = true);
+-[[noreturn]] LLVM_ABI void report_fatal_error(const Twine &reason,
++[[noreturn]] LLVM_ABI void report_fatal_error(std::string_view reason,
+                                               bool gen_crash_diag = true);
+ 
+ /// Report a fatal error that likely indicates a bug in LLVM. It serves a
+@@ -75,8 +75,8 @@ struct ScopedFatalErrorHandler {
+ /// and then abort. This will produce a crash trace and *will* ask users to
+ /// report an LLVM bug.
+ [[noreturn]] LLVM_ABI void reportFatalInternalError(const char *reason);
+-[[noreturn]] LLVM_ABI void reportFatalInternalError(StringRef reason);
+-[[noreturn]] LLVM_ABI void reportFatalInternalError(const Twine &reason);
++[[noreturn]] LLVM_ABI void reportFatalInternalError(const std::string& reason);
++[[noreturn]] LLVM_ABI void reportFatalInternalError(std::string_view reason);
+ 
+ /// Report a fatal error that does not indicate a bug in LLVM.
+ ///
+@@ -93,8 +93,8 @@ struct ScopedFatalErrorHandler {
+ /// and then exit with code 1. It will not produce a crash trace and will
+ /// *not* ask users to report an LLVM bug.
+ [[noreturn]] LLVM_ABI void reportFatalUsageError(const char *reason);
+-[[noreturn]] LLVM_ABI void reportFatalUsageError(StringRef reason);
+-[[noreturn]] LLVM_ABI void reportFatalUsageError(const Twine &reason);
++[[noreturn]] LLVM_ABI void reportFatalUsageError(const std::string& reason);
++[[noreturn]] LLVM_ABI void reportFatalUsageError(std::string_view reason);
  
  /// Installs a new bad alloc error handler that should be used whenever a
-diff --git a/llvm/include/llvm/Support/VersionTuple.h b/llvm/include/llvm/Support/VersionTuple.h
-index 0a4623f049d28825530bf50c8acfe85deaed96ba..e1cdce77ce8659305c99a21e01f9b3cc3481a5fd 100644
---- a/llvm/include/llvm/Support/VersionTuple.h
-+++ b/llvm/include/llvm/Support/VersionTuple.h
-@@ -23,7 +23,6 @@
- namespace llvm {
- template <typename HasherT, llvm::endianness Endianness> class HashBuilder;
- class raw_ostream;
--class StringRef;
- 
- /// Represents a version number in the form major[.minor[.subminor[.build]]].
- class VersionTuple {
-@@ -180,11 +179,6 @@ public:
- 
-   /// Retrieve a string representation of the version number.
-   std::string getAsString() const;
--
--  /// Try to parse the given string as a version number.
--  /// \returns \c true if the string does not match the regular expression
--  ///   [0-9]+(\.[0-9]+){0,3}
--  bool tryParse(StringRef string);
- };
- 
- /// Print a version number.
-diff --git a/llvm/include/llvm/Support/Windows/WindowsSupport.h b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-index 6f5aae2485c525f100eace5316b3e53e7b4fa544..83d5586ae8a77ec585e7e59df3075ca59cfb9d0c 100644
---- a/llvm/include/llvm/Support/Windows/WindowsSupport.h
-+++ b/llvm/include/llvm/Support/Windows/WindowsSupport.h
-@@ -33,8 +33,6 @@
- 
- #include "llvm/ADT/SmallVector.h"
- #include "llvm/ADT/StringExtras.h"
--#include "llvm/ADT/StringRef.h"
--#include "llvm/ADT/Twine.h"
- #include "llvm/Config/llvm-config.h" // Get build system configuration settings
- #include "llvm/Support/Allocator.h"
- #include "llvm/Support/Chrono.h"
-@@ -72,7 +70,7 @@ bool MakeErrMsg(std::string *ErrMsg, const std::string &prefix);
- [[noreturn]] inline void ReportLastErrorFatal(const char *Msg) {
-   std::string ErrMsg;
-   MakeErrMsg(&ErrMsg, Msg);
--  llvm::report_fatal_error(Twine(ErrMsg));
-+  llvm::report_fatal_error(ErrMsg);
- }
- 
- template <typename HandleTraits>
+ /// bad alloc error, e.g. failing malloc/calloc, is encountered by LLVM.
 diff --git a/llvm/include/llvm/Support/raw_ostream.h b/llvm/include/llvm/Support/raw_ostream.h
-index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b0069818dc87 100644
+index 841fe90515608eb185700f92776178e768996920..619c9f2aa93b42013196b37fc4fc9647d8e6f588 100644
 --- a/llvm/include/llvm/Support/raw_ostream.h
 +++ b/llvm/include/llvm/Support/raw_ostream.h
-@@ -14,13 +14,12 @@
- #define LLVM_SUPPORT_RAW_OSTREAM_H
+@@ -15,14 +15,13 @@
  
+ #include "llvm/ADT/STLFunctionalExtras.h"
  #include "llvm/ADT/SmallVector.h"
 -#include "llvm/ADT/StringRef.h"
+ #include "llvm/Support/Compiler.h"
 -#include "llvm/Support/DataTypes.h"
  #include <cassert>
  #include <cstddef>
@@ -607,7 +556,7 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
  #include <string>
  #include <string_view>
  #include <system_error>
-@@ -221,7 +220,22 @@ public:
+@@ -222,7 +221,22 @@ public:
      return *this;
    }
  
@@ -631,7 +580,7 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
      // Inline fast path, particularly for strings with a known length.
      size_t Size = Str.size();
  
-@@ -254,7 +268,7 @@ public:
+@@ -255,7 +269,7 @@ public:
      // Inline fast path, particularly for constant strings where a sufficiently
      // smart compiler will simplify strlen.
  
@@ -640,7 +589,7 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
    }
  
    raw_ostream &operator<<(const std::string &Str) {
-@@ -262,10 +276,6 @@ public:
+@@ -263,10 +277,6 @@ public:
      return write(Str.data(), Str.length());
    }
  
@@ -651,7 +600,7 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
    raw_ostream &operator<<(const SmallVectorImpl<char> &Str) {
      return write(Str.data(), Str.size());
    }
-@@ -298,7 +308,7 @@ public:
+@@ -299,7 +309,7 @@ public:
  
    /// Output \p Str, turning '\\', '\t', '\n', '"', and anything that doesn't
    /// satisfy llvm::isPrint into an escape sequence.
@@ -660,7 +609,7 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
  
    raw_ostream &write(unsigned char C);
    raw_ostream &write(const char *Ptr, size_t Size);
-@@ -511,14 +521,14 @@ public:
+@@ -514,14 +524,14 @@ public:
    /// As a special case, if Filename is "-", then the stream will use
    /// STDOUT_FILENO instead of opening a file. This will not close the stdout
    /// descriptor.
@@ -680,16 +629,16 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags);
  
-@@ -630,7 +640,7 @@ public:
+@@ -633,7 +643,7 @@ public:
    /// Open the specified file for reading/writing/seeking. If an error occurs,
    /// information about the error is put into EC, and the stream should be
    /// immediately destroyed.
--  raw_fd_stream(StringRef Filename, std::error_code &EC);
-+  raw_fd_stream(std::string_view Filename, std::error_code &EC);
+-  LLVM_ABI raw_fd_stream(StringRef Filename, std::error_code &EC);
++  LLVM_ABI raw_fd_stream(std::string_view Filename, std::error_code &EC);
  
-   raw_fd_stream(int fd, bool shouldClose);
+   LLVM_ABI raw_fd_stream(int fd, bool shouldClose);
  
-@@ -716,8 +726,8 @@ public:
+@@ -719,8 +729,8 @@ public:
  
    void flush() = delete;
  
@@ -700,28 +649,28 @@ index d3b411590e7fd796913aca8517020d02aa2559cc..c43c68c9114d8cd564484b190456b006
    SmallVectorImpl<char> &buffer() { return OS; }
  
    void reserveExtraSpace(uint64_t ExtraSize) override {
-@@ -835,7 +845,7 @@ class Error;
+@@ -838,7 +848,7 @@ class Error;
  /// for other names. For raw_fd_ostream instances, the stream writes to
  /// a temporary file. The final output file is atomically replaced with the
  /// temporary file after the \p Write function is finished.
--Error writeToOutput(StringRef OutputFileName,
-+Error writeToOutput(std::string_view OutputFileName,
-                     std::function<Error(raw_ostream &)> Write);
+-LLVM_ABI Error writeToOutput(StringRef OutputFileName,
++LLVM_ABI Error writeToOutput(std::string_view OutputFileName,
+                              std::function<Error(raw_ostream &)> Write);
  
- raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
+ LLVM_ABI raw_ostream &operator<<(raw_ostream &OS, std::nullopt_t);
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa63772e78a8a 100644
+index 6bbd7d15e18085cd053bc520161baacbf75d888b..f4ffa76fa8093ed43a8135797b58c2aecd6bd9ac 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
-@@ -6,23 +6,24 @@
+@@ -6,24 +6,23 @@
  //
  //===----------------------------------------------------------------------===//
  
 -#include "llvm/ADT/ArrayRef.h"
 -#include "llvm/ADT/StringRef.h"
+-#include "llvm/ADT/bit.h"
  #include "llvm/Support/ConvertUTF.h"
  #include "llvm/Support/ErrorHandling.h"
-+#include "llvm/Support/SwapByteOrder.h"
 +#include <span>
  #include <string>
 +#include <string_view>
@@ -743,7 +692,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
        result = sourceIllegal;
        ErrorPtr = Pos;
      } else {
-@@ -75,12 +76,12 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
+@@ -76,12 +75,12 @@ bool ConvertCodePointToUTF8(unsigned Source, char *&ResultPtr) {
    return true;
  }
  
@@ -758,7 +707,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
    assert(Out.empty());
  
    // Error out on an uneven byte count.
-@@ -131,14 +132,14 @@ bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
+@@ -132,14 +131,14 @@ bool convertUTF16ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
    return true;
  }
  
@@ -776,7 +725,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
    assert(Out.empty());
  
    // Error out on an uneven byte count.
-@@ -189,14 +190,14 @@ bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
+@@ -190,14 +189,14 @@ bool convertUTF32ToUTF8String(ArrayRef<char> SrcBytes, std::string &Out) {
    return true;
  }
  
@@ -794,7 +743,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
                                SmallVectorImpl<UTF16> &DstUTF16) {
    assert(DstUTF16.empty());
  
-@@ -207,8 +208,8 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
+@@ -208,8 +207,8 @@ bool convertUTF8ToUTF16String(StringRef SrcUTF8,
      return true;
    }
  
@@ -805,7 +754,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
  
    // Allocate the same number of UTF-16 code units as UTF-8 code units. Encoding
    // as UTF-16 should always require the same amount or less code units than the
-@@ -239,7 +240,7 @@ static_assert(sizeof(wchar_t) == 1 || sizeof(wchar_t) == 2 ||
+@@ -240,7 +239,7 @@ static_assert(sizeof(wchar_t) == 1 || sizeof(wchar_t) == 2 ||
                "Expected wchar_t to be 1, 2, or 4 bytes");
  
  template <typename TResult>
@@ -814,7 +763,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
                                               TResult &Result) {
    // Even in the case of UTF-16, the number of bytes in a UTF-8 string is
    // at least as large as the number of elements in the resulting wide
-@@ -255,7 +256,7 @@ static inline bool ConvertUTF8toWideInternal(llvm::StringRef Source,
+@@ -256,7 +255,7 @@ static inline bool ConvertUTF8toWideInternal(llvm::StringRef Source,
    return true;
  }
  
@@ -823,7 +772,7 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
    return ConvertUTF8toWideInternal(Source, Result);
  }
  
-@@ -264,7 +265,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
+@@ -265,7 +264,7 @@ bool ConvertUTF8toWide(const char *Source, std::wstring &Result) {
      Result.clear();
      return true;
    }
@@ -831,8 +780,8 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
 +  return ConvertUTF8toWide(std::string_view(Source), Result);
  }
  
- bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
-@@ -279,7 +280,7 @@ bool convertWideToUTF8(const std::wstring &Source, std::string &Result) {
+ bool convertWideToUTF8(std::wstring_view Source, std::string &Result) {
+@@ -280,7 +279,7 @@ bool convertWideToUTF8(std::wstring_view Source, std::string &Result) {
      return true;
    } else if (sizeof(wchar_t) == 2) {
      return convertUTF16ToUTF8String(
@@ -841,8 +790,13 @@ index 4952fe65d77675aeae8f4f5fdad7b47863e36ca5..d53462e742e61d3476915d5b2c5aa637
                                Source.size()),
          Result);
    } else if (sizeof(wchar_t) == 4) {
+@@ -315,4 +314,3 @@ bool IsSingleCodeUnitUTF32Codepoint(unsigned V) {
+ }
+ 
+ } // end namespace llvm
+-
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index afe3b37cc343195e9ea12a68077d6b9d7506d5bb..d4ca266f3c1f98337499fba4fd0675e49a7dcf18 100644
+index 097041f1ae282a0387da8f839e5e37fe350d5d51..fc9d118e85508cdf86553bb63cce4a1c567045b7 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -14,7 +14,6 @@
@@ -853,7 +807,7 @@ index afe3b37cc343195e9ea12a68077d6b9d7506d5bb..d4ca266f3c1f98337499fba4fd0675e4
  #include "llvm/Config/config.h"
  #include "llvm/Config/llvm-config.h" // for LLVM_ENABLE_THREADS
  #include "llvm/Support/Debug.h"
-@@ -81,14 +80,14 @@ void llvm::remove_fatal_error_handler() {
+@@ -93,14 +92,14 @@ void llvm::remove_fatal_error_handler() {
  }
  
  void llvm::report_fatal_error(const char *Reason, bool GenCrashDiag) {
@@ -872,7 +826,7 @@ index afe3b37cc343195e9ea12a68077d6b9d7506d5bb..d4ca266f3c1f98337499fba4fd0675e4
    llvm::fatal_error_handler_t handler = nullptr;
    void* handlerData = nullptr;
    {
-@@ -102,7 +101,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -114,7 +113,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
    }
  
    if (handler) {
@@ -881,15 +835,39 @@ index afe3b37cc343195e9ea12a68077d6b9d7506d5bb..d4ca266f3c1f98337499fba4fd0675e4
    } else {
      // Blast the result out to stderr.  We don't try hard to make sure this
      // succeeds (e.g. handling EINTR) and we can't use errs() here because
-@@ -110,7 +109,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+@@ -122,7 +121,7 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
      SmallVector<char, 64> Buffer;
      raw_svector_ostream OS(Buffer);
      OS << "LLVM ERROR: " << Reason << "\n";
 -    StringRef MessageStr = OS.str();
 +    std::string_view MessageStr = OS.str();
-     ssize_t written = ::write(2, MessageStr.data(), MessageStr.size());
-     (void)written; // If something went wrong, we deliberately just give up.
+     write_retry(2, MessageStr.data(), MessageStr.size());
    }
+ 
+@@ -140,19 +139,19 @@ void llvm::report_fatal_error(const Twine &Reason, bool GenCrashDiag) {
+ void llvm::reportFatalInternalError(const char *reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/true);
+ }
+-void llvm::reportFatalInternalError(StringRef reason) {
++void llvm::reportFatalInternalError(const std::string& reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/true);
+ }
+-void llvm::reportFatalInternalError(const Twine &reason) {
++void llvm::reportFatalInternalError(std::string_view reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/true);
+ }
+ void llvm::reportFatalUsageError(const char *reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/false);
+ }
+-void llvm::reportFatalUsageError(StringRef reason) {
++void llvm::reportFatalUsageError(const std::string& reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/false);
+ }
+-void llvm::reportFatalUsageError(const Twine &reason) {
++void llvm::reportFatalUsageError(std::string_view reason) {
+   report_fatal_error(reason, /*GenCrashDiag=*/false);
+ }
+ 
 diff --git a/llvm/lib/Support/SmallVector.cpp b/llvm/lib/Support/SmallVector.cpp
 index dceea4fbc630e85a869458af8b35ee1066c5866d..fba8fcb7cf56f4914e6ab6ede78eb8d8c8bf3424 100644
 --- a/llvm/lib/Support/SmallVector.cpp
@@ -921,10 +899,10 @@ index dceea4fbc630e85a869458af8b35ee1066c5866d..fba8fcb7cf56f4914e6ab6ede78eb8d8
  }
  
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417d82b3b78 100644
+index 341dd561092dabd39f3d066c5e599e6767b46c24..b7e13fe9c42e429df77014a613df94fb42afa8d2 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
-@@ -165,7 +165,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
+@@ -155,7 +155,7 @@ raw_ostream &raw_ostream::write_uuid(const uuid_t UUID) {
  }
  
  
@@ -933,7 +911,7 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
                                          bool UseHexEscapes) {
    for (unsigned char c : Str) {
      switch (c) {
-@@ -562,7 +562,7 @@ void format_object_base::home() {
+@@ -538,7 +538,7 @@ void raw_ostream::anchor() {}
  //  raw_fd_ostream
  //===----------------------------------------------------------------------===//
  
@@ -941,8 +919,8 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
 +static int getFD(std::string_view Filename, std::error_code &EC,
                   sys::fs::CreationDisposition Disp, sys::fs::FileAccess Access,
                   sys::fs::OpenFlags Flags) {
-   assert((Access & sys::fs::FA_Write) &&
-@@ -588,25 +588,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
+   // FIXME(sandboxing): Remove this by adopting `llvm::vfs::OutputBackend`.
+@@ -567,25 +567,25 @@ static int getFD(StringRef Filename, std::error_code &EC,
    return FD;
  }
  
@@ -973,17 +951,17 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
                                 sys::fs::CreationDisposition Disp,
                                 sys::fs::FileAccess Access,
                                 sys::fs::OpenFlags Flags)
-@@ -678,8 +678,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+@@ -660,8 +660,7 @@ raw_fd_ostream::~raw_fd_ostream() {
    // has_error() and clear the error flag with clear_error() before
    // destructing raw_ostream objects which may have errors.
    if (has_error())
--    report_fatal_error(Twine("IO failure on output stream: ") +
--                           error().message(),
-+    report_fatal_error("IO failure on output stream: " + error().message(),
-                        /*gen_crash_diag=*/false);
+-    reportFatalUsageError(Twine("IO failure on output stream: ") +
+-                          error().message());
++    reportFatalUsageError("IO failure on output stream: " + error().message());
  }
  
-@@ -698,7 +697,7 @@ raw_fd_ostream::~raw_fd_ostream() {
+ #if defined(_WIN32)
+@@ -679,7 +678,7 @@ raw_fd_ostream::~raw_fd_ostream() {
  // the input is UTF-8 or transcode from the local codepage to UTF-8 before
  // quoting it. If they don't, this may mess up the encoding, but this is still
  // probably the best compromise we can make.
@@ -992,7 +970,7 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
    SmallVector<wchar_t, 256> WideText;
  
    // Fall back to ::write if it wasn't valid UTF-8.
-@@ -744,7 +743,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -725,7 +724,7 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
    // If this is a Windows console device, try re-encoding from UTF-8 to UTF-16
    // and using WriteConsoleW. If that fails, fall back to plain write().
    if (IsWindowsConsole)
@@ -1001,7 +979,7 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
        return;
  #endif
  
-@@ -924,7 +923,7 @@ raw_ostream &llvm::nulls() {
+@@ -908,7 +907,7 @@ raw_ostream &llvm::nulls() {
  // File Streams
  //===----------------------------------------------------------------------===//
  
@@ -1010,7 +988,7 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
      : raw_fd_ostream(getFD(Filename, EC, sys::fs::CD_CreateAlways,
                             sys::fs::FA_Write | sys::fs::FA_Read,
                             sys::fs::OF_None),
-@@ -1009,7 +1008,7 @@ void buffer_ostream::anchor() {}
+@@ -993,7 +992,7 @@ void buffer_ostream::anchor() {}
  
  void buffer_unique_ostream::anchor() {}
  
@@ -1020,23 +998,24 @@ index e75ddc66b7d1629a4e71c53d891ae0d3edf90813..681b6fdc95eb4fda4f23d0b381b83417
    if (OutputFileName == "-")
      return Write(outs());
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index d1bbdde8dfc267770b9d98808de54381571f2785..e93e18423507655ce8275a0718d8e5d01915985f 100644
+index 2907a1fefdb03d6a1f54d3bd5f0f5044061479eb..31463090d0a4f2e3a9260d6571abd763bd2eb022 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
-@@ -10,11 +10,11 @@
- #include "CountCopyAndMove.h"
- #include "llvm/ADT/DenseMapInfo.h"
+@@ -12,12 +12,12 @@
  #include "llvm/ADT/DenseMapInfoVariant.h"
+ #include "llvm/ADT/STLForwardCompat.h"
+ #include "llvm/ADT/SmallSet.h"
 -#include "llvm/ADT/StringRef.h"
  #include "gmock/gmock.h"
  #include "gtest/gtest.h"
  #include <map>
+ #include <optional>
  #include <set>
 +#include <string_view>
  #include <utility>
  #include <variant>
  
-@@ -523,31 +523,6 @@ TEST(DenseMapCustomTest, InsertOrAssignTest) {
+@@ -675,31 +675,6 @@ TEST(DenseMapCustomTest, EmplaceOrAssign) {
    EXPECT_EQ(1, CountCopyAndMove::MoveAssignments);
  }
  
@@ -1065,10 +1044,21 @@ index d1bbdde8dfc267770b9d98808de54381571f2785..e93e18423507655ce8275a0718d8e5d0
 -  EXPECT_EQ(42, M.lookup(StringRef("a", 0)));
 -}
 -
- // Key traits that allows lookup with either an unsigned or char* key;
- // In the latter case, "a" == 0, "b" == 1 and so on.
- struct TestDenseMapInfo {
-@@ -785,7 +760,7 @@ TEST(DenseMapCustomTest, VariantSupport) {
+ struct NonDefaultConstructible {
+   unsigned V;
+   NonDefaultConstructible(unsigned V) : V(V) {};
+@@ -767,8 +742,8 @@ TEST(DenseMapCustomTest, FindAsTest) {
+ }
+ 
+ TEST(DenseMapCustomTest, SmallDenseMapFromRange) {
+-  std::pair<int, StringRef> PlainArray[] = {{0, "0"}, {1, "1"}, {2, "2"}};
+-  SmallDenseMap<int, StringRef> M(llvm::from_range, PlainArray);
++  std::pair<int, std::string_view> PlainArray[] = {{0, "0"}, {1, "1"}, {2, "2"}};
++  SmallDenseMap<int, std::string_view> M(llvm::from_range, PlainArray);
+   EXPECT_EQ(3u, M.size());
+   using testing::Pair;
+   EXPECT_THAT(M, testing::UnorderedElementsAre(Pair(0, "0"), Pair(1, "1"),
+@@ -965,7 +940,7 @@ TEST(DenseMapCustomTest, VariantSupport) {
  // Test that gTest prints map entries as pairs instead of opaque objects.
  // See third-party/unittest/googletest/internal/custom/gtest-printers.h
  TEST(DenseMapCustomTest, PairPrinting) {
@@ -1078,10 +1068,10 @@ index d1bbdde8dfc267770b9d98808de54381571f2785..e93e18423507655ce8275a0718d8e5d0
  }
  
 diff --git a/llvm/unittests/ADT/FunctionExtrasTest.cpp b/llvm/unittests/ADT/FunctionExtrasTest.cpp
-index 9809a92daac72468ed5bbd1762798523c2c3d628..777c5784949fd3c07bbbcef8dc3fc8e5764896a9 100644
+index fdabdca269da2e2be6a7a0e11b0f7f82afca0b5a..e92f5fcdfce0175eea843e81ef89604e0c2297f6 100644
 --- a/llvm/unittests/ADT/FunctionExtrasTest.cpp
 +++ b/llvm/unittests/ADT/FunctionExtrasTest.cpp
-@@ -250,23 +250,23 @@ TEST(UniqueFunctionTest, Const) {
+@@ -249,23 +249,23 @@ TEST(UniqueFunctionTest, Const) {
  
    // Overloaded call operator correctly resolved.
    struct ChooseCorrectOverload {
@@ -1112,7 +1102,7 @@ index 9809a92daac72468ed5bbd1762798523c2c3d628..777c5784949fd3c07bbbcef8dc3fc8e5
  TEST(UniqueFunctionTest, SFINAE) {
    EXPECT_EQ("not a function", returns("boo!"));
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index 1d9a0d1725a92ffd1bddcddf0a9ede28a1a74969..88be2b68915573a3b3a343ff53a84d86604d7bfd 100644
+index b42da537510de9633eeabdf9d1fb62c2401d2b0e..14cc88510556903db60f5c538cf34cdb3bab6ae4 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -12,7 +12,6 @@
@@ -1124,7 +1114,7 @@ index 1d9a0d1725a92ffd1bddcddf0a9ede28a1a74969..88be2b68915573a3b3a343ff53a84d86
  #include "gmock/gmock.h"
  #include "gtest/gtest.h"
 diff --git a/llvm/unittests/ADT/SmallStringTest.cpp b/llvm/unittests/ADT/SmallStringTest.cpp
-index 2f4df8afeafa592cb9616bb78feb4964187786f2..6cf14700b34739420cd3dc4ff8a4c16ce162f715 100644
+index 57e829ad7fa99b5bbc4d34196c438f9ce7f5f62a..5cf25f0c23bfddc77f6ea45a3d4886232cc7fde2 100644
 --- a/llvm/unittests/ADT/SmallStringTest.cpp
 +++ b/llvm/unittests/ADT/SmallStringTest.cpp
 @@ -50,43 +50,43 @@ TEST_F(SmallStringTest, AssignRepeated) {
@@ -1202,8 +1192,8 @@ index 2f4df8afeafa592cb9616bb78feb4964187786f2..6cf14700b34739420cd3dc4ff8a4c16c
    std::string Mno = "mno";
    SmallString<4> Pqr("pqr");
    const char *Stu = "stu";
-@@ -115,15 +115,15 @@ TEST_F(SmallStringTest, AppendStringRefs) {
-   EXPECT_STREQ("abcdefghijklmnopqrstu", theString.c_str());
+@@ -146,15 +146,15 @@ TEST_F(SmallStringTest, Contains) {
+   EXPECT_FALSE(Str.contains('w'));
  }
  
 -TEST_F(SmallStringTest, StringRefConversion) {
@@ -1223,7 +1213,7 @@ index 2f4df8afeafa592cb9616bb78feb4964187786f2..6cf14700b34739420cd3dc4ff8a4c16c
    theString.assign(abc.begin(), abc.end());
    std::string theStdString = std::string(theString);
    EXPECT_EQ("abc", theStdString);
-@@ -149,29 +149,29 @@ TEST_F(SmallStringTest, Slice) {
+@@ -180,29 +180,29 @@ TEST_F(SmallStringTest, Slice) {
  TEST_F(SmallStringTest, Find) {
    theString = "hello";
    EXPECT_EQ(2U, theString.find('l'));
@@ -1263,22 +1253,23 @@ index 2f4df8afeafa592cb9616bb78feb4964187786f2..6cf14700b34739420cd3dc4ff8a4c16c
    theString = "hellx xello hell ello world foo bar hello";
    EXPECT_EQ(36U, theString.find("hello"));
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 137dd43b473068eae34b39edc4b9b8b9633bab95..7029038d18d433cef987bedbfa4fda269b24fb8f 100644
+index ebecacefcb0c5a9403cf973c35a89e636b4cc0e8..4e98c0d9cb882030ab342a4ecc84683cf137e35e 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
-@@ -11,10 +11,10 @@
+@@ -11,11 +11,11 @@
  //===----------------------------------------------------------------------===//
  
  #include "llvm/ADT/SmallVector.h"
 -#include "llvm/ADT/ArrayRef.h"
  #include "llvm/Support/Compiler.h"
+ #include "gmock/gmock.h"
  #include "gtest/gtest.h"
  #include <list>
 +#include <span>
  #include <stdarg.h>
  
  using namespace llvm;
-@@ -252,11 +252,11 @@ TYPED_TEST(SmallVectorTest, ConstructorIterTest) {
+@@ -250,11 +250,11 @@ TYPED_TEST(SmallVectorTest, ConstructorIterTest) {
  }
  
  // Constructor test.
@@ -1293,7 +1284,23 @@ index 137dd43b473068eae34b39edc4b9b8b9633bab95..7029038d18d433cef987bedbfa4fda26
    auto &V = this->theVector;
    V = SmallVector<Constructable, 4>(Array);
    assertValuesInOrder(V, 3u, 1, 2, 3);
-@@ -1129,24 +1129,6 @@ TEST(SmallVectorTest, DefaultInlinedElements) {
+@@ -644,12 +644,12 @@ TYPED_TEST(SmallVectorTest, AssignSmallVector) {
+   assertValuesInOrder(V, 2u, 7, 7);
+ }
+ 
+-TYPED_TEST(SmallVectorTest, AssignArrayRef) {
+-  SCOPED_TRACE("AssignArrayRef");
++TYPED_TEST(SmallVectorTest, AssignSpan) {
++  SCOPED_TRACE("AssignSpan");
+   auto &V = this->theVector;
+   Constructable Other[] = {7, 8, 9};
+   V.push_back(Constructable(1));
+-  V.assign(ArrayRef(Other));
++  V.assign(span<const Constructable>(Other));
+   assertValuesInOrder(V, 3u, 7, 8, 9);
+ }
+ 
+@@ -1182,24 +1182,6 @@ TEST(SmallVectorTest, DefaultInlinedElements) {
    EXPECT_EQ(NestedV[0][0][0], 42);
  }
  
@@ -1315,10 +1322,19 @@ index 137dd43b473068eae34b39edc4b9b8b9633bab95..7029038d18d433cef987bedbfa4fda26
 -  EXPECT_TRUE(ArrayRef(V2).equals({4, 5, 3, 2}));
 -}
 -
- TEST(SmallVectorTest, ToVector) {
+ namespace namespace_with_adl {
+ struct MyVector {
+   std::vector<int> data;
+@@ -1239,7 +1221,7 @@ TEST(SmallVectorTest, ToVector) {
+   }
    {
-     std::vector<char> v = {'a', 'b', 'c'};
-@@ -1183,10 +1165,10 @@ private:
+     SmallVector<bool> V = {true, false, true};
+-    ArrayRef<bool> ref = V;
++    span<bool> ref = V;
+     auto copy = to_vector(ref);
+     EXPECT_THAT(copy, testing::ElementsAre(true, false, true));
+   }
+@@ -1262,10 +1244,10 @@ private:
    To T;
  };
  

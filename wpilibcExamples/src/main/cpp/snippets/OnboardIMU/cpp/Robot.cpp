@@ -9,7 +9,7 @@
 #include "wpi/units/angle.hpp"
 
 /**
- * Onboard IMU snippets for frc-docs.
+ * Onboard IMU snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/accelerometers-software.html
  */
 class Robot : public wpi::TimedRobot {

@@ -56,6 +56,13 @@ build.dependsOn outputSourcesJar
 build.dependsOn outputJavadocJar
 build.dependsOn outputJar
 
+// Projects that generate source code with annotation processors (such as avaje serde classes)
+// need to have those generated files on the source path so javadoc can pick them up.
+tasks.named('javadoc').configure {
+    it.dependsOn('compileJava')
+}
+sourceSets.main.java.srcDir "${buildDir}/generated/sources/annotationProcessor/java/main"
+
 project(':').libraryBuild.dependsOn build
 
 publishing {
@@ -74,7 +81,7 @@ publishing {
 }
 
 test {
-    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=org.opencv,wpilib.apriltag,wpilib.hal,wpilib.math,wpilib.ntcore,wpilib.util,ALL-UNNAMED'
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
@@ -84,7 +91,7 @@ test {
     finalizedBy jacocoTestReport
 }
 
-if (project.hasProperty('onlylinuxathena') || project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
+if (project.hasProperty('onlylinuxsystemcore') || project.hasProperty('onlylinuxarm32') || project.hasProperty('onlylinuxarm64') || project.hasProperty('onlywindowsarm64')) {
     test.enabled = false
 }
 
@@ -101,23 +108,12 @@ sourceSets {
 
 configurations {
     devImplementation.extendsFrom(implementation)
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-        '--release',
-        '25',
-        '-encoding',
-        'UTF8',
-        "-Werror",
-        "-Xlint:all",
-        // ignore AutoCloseable warnings
-        "-Xlint:-try",
-        // ignore missing serialVersionUID warnings
-        "-Xlint:-serial",
-        // ignore unclaimed annotation warning from annotation processing
-        "-Xlint:-processing",
-    ]
+    configureEach {
+        // avaje has incorrectly listed io.avaje:avaje-jsonb-inject-plugin as a dependency of io.avaje:avaje-jsonb,
+        // which results in runtime crashes when `--add-modules ALL-MODULE-PATH` is used.
+        // We don't use or care about avaje's dependency injection library, so we manually exclude the bridge library.
+        exclude(group: 'io.avaje', module: 'avaje-jsonb-inject-plugin')
+    }
 }
 
 dependencies {
@@ -127,7 +123,7 @@ dependencies {
     devImplementation sourceSets.main.output
 }
 
-task run(type: JavaExec) {
+tasks.register('run', JavaExec) {
     classpath = sourceSets.dev.runtimeClasspath
 
     mainClass = project.devMain

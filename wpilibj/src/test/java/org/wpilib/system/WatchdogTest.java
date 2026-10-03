@@ -19,7 +19,7 @@ import org.wpilib.simulation.SimHooks;
 class WatchdogTest {
   @BeforeEach
   void setup() {
-    HAL.initialize(500, 0);
+    HAL.initialize();
     SimHooks.pauseTiming();
   }
 

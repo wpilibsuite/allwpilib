@@ -35,12 +35,14 @@ wpilib_cc_library(
 wpilib_cc_shared_library(
     name = "shared/xrpVendordep",
     dynamic_deps = [
+        "//hal:shared/wpiHal",
         "//ntcore:shared/ntcore",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpilibc:shared/wpilibc",
+        "//wpimath:shared/wpimath",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-        "//wpimath:shared/wpimath",
-        "//hal:shared/wpiHal",
     ],
     visibility = ["//visibility:public"],
     deps = [":xrpVendordep"],
@@ -50,8 +52,12 @@ wpilib_cc_static_library(
     name = "static/xrpVendordep",
     static_deps = [
         "//ntcore:static/ntcore",
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpilibc:static/wpilibc",
+        "//wpimath:static/wpimath",
         "//wpinet:static/wpinet",
+        "//wpiutil:static/wpiutil",
     ],
     visibility = ["//visibility:public"],
     deps = [":xrpVendordep"],
@@ -65,8 +71,11 @@ wpilib_java_library(
     visibility = ["//visibility:public"],
     deps = [
         "//hal:hal-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpilibj:wpilibj-java",
         "//wpimath:wpimath-java",
+        "//wpiutil:wpiutil-java",
     ],
 )
 
@@ -76,7 +85,7 @@ cc_test(
     srcs = glob(["src/test/native/cpp/**"]),
     deps = [
         ":xrpVendordep",
-        "//thirdparty/googletest",
+        "//thirdparty/catch2",
     ],
 )
 
@@ -95,6 +104,9 @@ java_binary(
     deps = [
         "//hal:hal-java",
         "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
     ],
 )
@@ -118,10 +130,15 @@ define_native_wrapper(
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",
     "//datalog:robotpy-wpilog.generated_pkgcfg_files",
+    "//hal:native/wpihal/robotpy-native-mrclib.pc",
     "//hal:native/wpihal/robotpy-native-wpihal.pc",
     "//hal:robotpy-hal.generated_pkgcfg_files",
     "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
     "//ntcore:pyntcore.generated_pkgcfg_files",
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
     "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
     "//wpilibc:robotpy-wpilib.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",

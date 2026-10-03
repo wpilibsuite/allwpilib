@@ -4,6 +4,7 @@
 
 #include "wpi/nt/NetworkTableInstance.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
@@ -90,7 +91,7 @@ std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     return std::make_shared<NetworkTable>(m_handle, key,
                                           NetworkTable::private_init{});
   } else {
-    return std::make_shared<NetworkTable>(m_handle, fmt::format("/{}", key),
+    return std::make_shared<NetworkTable>(m_handle, std::format("/{}", key),
                                           NetworkTable::private_init{});
   }
 }
@@ -103,6 +104,17 @@ void NetworkTableInstance::SetServer(std::span<const std::string_view> servers,
     serversArr.emplace_back(std::string{server}, port);
   }
   SetServer(serversArr);
+}
+
+void NetworkTableInstance::SetServerMdns(
+    std::string_view service_name, std::span<const std::string_view> servers,
+    unsigned int port) {
+  std::vector<std::pair<std::string_view, unsigned int>> serversArr;
+  serversArr.reserve(servers.size());
+  for (const auto& server : servers) {
+    serversArr.emplace_back(server, port);
+  }
+  SetServerMdns(service_name, port, serversArr);
 }
 
 NT_Listener NetworkTableInstance::AddListener(Topic topic,

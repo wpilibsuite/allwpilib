@@ -7,12 +7,11 @@
 #include <string>
 
 #include "wpi/hal/AnalogInput.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
-#include "wpi/util/sendable/SendableRegistry.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -23,9 +22,7 @@ AnalogInput::AnalogInput(int channel) {
   m_port = HAL_InitializeAnalogInputPort(channel, stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "Channel {}", channel);
 
-  HAL_ReportUsage("IO", channel, "AnalogInput");
-
-  wpi::util::SendableRegistry::Add(this, "AnalogInput", channel);
+  wpi::util::ReportUsage("IO", channel, "AnalogInput");
 }
 
 int AnalogInput::GetValue() const {
@@ -50,8 +47,10 @@ void AnalogInput::SetSimDevice(HAL_SimDeviceHandle device) {
   HAL_SetAnalogInputSimDevice(m_port, device);
 }
 
-void AnalogInput::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Analog Input");
-  builder.AddDoubleProperty(
-      "Value", [=, this] { return GetVoltage(); }, nullptr);
+void AnalogInput::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Value", GetVoltage());
+}
+
+std::string_view AnalogInput::GetTelemetryType() const {
+  return "Analog Input";
 }

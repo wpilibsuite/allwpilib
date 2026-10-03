@@ -2,14 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "wpi/net/MulticastServiceAnnouncer.h"
+#include "wpi/net/MulticastServiceAnnouncer.hpp"
 
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "AvahiClient.hpp"
 #include "wpi/util/mutex.hpp"
@@ -54,7 +53,7 @@ MulticastServiceAnnouncer::Impl::Impl(std::string_view serviceName,
   } else {
     std::vector<std::string> txts;
     for (auto&& i : txt) {
-      txts.push_back(fmt::format("{}={}", i.first, i.second));
+      txts.push_back(std::format("{}={}", i.first, i.second));
     }
 
     std::vector<const char*> txtArr;

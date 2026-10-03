@@ -5,12 +5,12 @@
 package org.wpilib.snippets.encoderdrive;
 
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.drivers.motor.Spark;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.motor.Spark;
 import org.wpilib.hardware.rotation.Encoder;
 
 /**
- * Encoder drive to distance snippets for frc-docs.
+ * Encoder drive to distance snippets for wpilib-docs.
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
 public class Robot extends TimedRobot {

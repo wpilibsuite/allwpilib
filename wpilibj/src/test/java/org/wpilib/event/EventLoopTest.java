@@ -62,6 +62,21 @@ class EventLoopTest {
   }
 
   @Test
+  void testMixedWeakAndStrongBindingsRunInInsertionOrder() {
+    var order = new StringBuilder();
+    var loop = new EventLoop();
+
+    loop.bindWeak(() -> order.append('a'));
+    loop.bind(() -> order.append('b'));
+    loop.bindWeak(() -> order.append('c'));
+    loop.bind(() -> order.append('d'));
+
+    loop.poll();
+
+    assertEquals("abcd", order.toString());
+  }
+
+  @Test
   void testConcurrentModification() {
     var loop = new EventLoop();
 

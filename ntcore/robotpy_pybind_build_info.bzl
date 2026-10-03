@@ -6,6 +6,69 @@ load("//shared/bazel/rules/robotpy:semiwrap_helpers.bzl", "gen_libinit", "gen_mo
 load("//shared/bazel/rules/robotpy:semiwrap_tool_helpers.bzl", "scan_headers", "update_yaml_files")
 
 def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes = []):
+    NAME_TRANSFORMS = [
+        "--name-transform-default",
+        "snake_case",
+        "--name-transform-enum-value",
+        "CAPS_CASE",
+        "--name-transform-known-word",
+        "3V3",
+        "--name-transform-known-word",
+        "5V",
+        "--name-transform-known-word",
+        "CAN",
+        "--name-transform-known-word",
+        "CPU",
+        "--name-transform-known-word",
+        "DS",
+        "--name-transform-known-word",
+        "FMS",
+        "--name-transform-known-word",
+        "FPGA",
+        "--name-transform-known-word",
+        "HAL",
+        "--name-transform-known-word",
+        "HTTP",
+        "--name-transform-known-word",
+        "I2C",
+        "--name-transform-known-word",
+        "IMU",
+        "--name-transform-known-word",
+        "JNI",
+        "--name-transform-known-word",
+        "JSON",
+        "--name-transform-known-word",
+        "mDNS",
+        "--name-transform-known-word",
+        "NT",
+        "--name-transform-known-word",
+        "OpMode",
+        "--name-transform-known-word",
+        "PCM",
+        "--name-transform-known-word",
+        "PDH",
+        "--name-transform-known-word",
+        "PDP",
+        "--name-transform-known-word",
+        "PID",
+        "--name-transform-known-word",
+        "POVs",
+        "--name-transform-known-word",
+        "PWM",
+        "--name-transform-known-word",
+        "RIO",
+        "--name-transform-known-word",
+        "SPI",
+        "--name-transform-known-word",
+        "URI",
+        "--name-transform-known-word",
+        "URL",
+        "--name-transform-known-word",
+        "USB",
+        "--name-transform-known-word",
+        "VIn",
+    ]
+
     NTCORE_HEADER_GEN = [
         struct(
             class_name = "BooleanArrayTopic",
@@ -131,26 +194,6 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::nt::MultiSubscriber", "wpi__nt__MultiSubscriber.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NTSendable",
-            yml_file = "semiwrap/NTSendable.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendable.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendable", "wpi__nt__NTSendable.hpp"),
-            ],
-        ),
-        struct(
-            class_name = "NTSendableBuilder",
-            yml_file = "semiwrap/NTSendableBuilder.yml",
-            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
-            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/NTSendableBuilder.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::nt::NTSendableBuilder", "wpi__nt__NTSendableBuilder.hpp"),
             ],
         ),
         struct(
@@ -391,6 +434,7 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
+        name_transforms = NAME_TRANSFORMS,
     )
 
     create_pybind_library(
@@ -432,7 +476,7 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         tags = ["manual", "robotpy"],
     )
 
-def define_pybind_library(name, pkgcfgs = []):
+def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Helper used to generate all files with one target.
     native.filegroup(
         name = "{}.generated_files".format(name),
@@ -456,7 +500,7 @@ def define_pybind_library(name, pkgcfgs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/ntcore/**"], exclude = ["src/main/python/ntcore/**/*.py"], allow_empty = True),
+        srcs = native.glob(["src/main/python/ntcore/**"], exclude = ["src/main/python/ntcore/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
@@ -464,6 +508,7 @@ def define_pybind_library(name, pkgcfgs = []):
         name = "{}.generate_version".format(name),
         output_file = "src/main/python/ntcore/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
+        version_variable = "ROBOTPY_VERSION",
     )
 
     robotpy_library(
@@ -501,7 +546,7 @@ def define_pybind_library(name, pkgcfgs = []):
     update_yaml_files(
         name = "{}-update-yaml".format(name),
         yaml_output_directory = "src/main/python/semiwrap",
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//ntcore:robotpy-native-ntcore.copy_headers",
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -515,7 +560,7 @@ def define_pybind_library(name, pkgcfgs = []):
 
     scan_headers(
         name = "{}-scan-headers".format(name),
-        extra_hdrs = native.glob(["src/main/python/**/*.h"], allow_empty = True) + [
+        extra_hdrs = extra_pybind_hdrs + [
             "//ntcore:robotpy-native-ntcore.copy_headers",
         ],
         package_root_file = "src/main/python/ntcore/__init__.py",

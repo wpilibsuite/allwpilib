@@ -4,6 +4,8 @@
 
 package org.wpilib.command3;
 
+import org.wpilib.hardware.hal.RobotMode;
+
 /**
  * A scope for when a binding is live. Bindings tied to a scope must be deleted when the scope
  * becomes inactive.
@@ -26,14 +28,27 @@ interface BindingScope {
    */
   static BindingScope createNarrowestScope(Scheduler scheduler) {
     Command currentCommand = scheduler.currentCommand();
-    long currentOpMode = OpModeFetcher.getFetcher().getOpModeId();
+    RobotStateFetcher fetcher = RobotStateFetcher.getFetcher();
+    long currentOpMode = fetcher.getOpModeId();
+    RobotMode currentRobotMode = fetcher.getRobotMode();
 
     if (currentCommand != null) {
+      // Commands are the narrowest scope, so prioritize them first.
       return new ForCommand(scheduler, currentCommand);
     } else if (currentOpMode != 0) {
+      // Opmodes are more specific than general robot mode bindings.
       return new ForOpmode(currentOpMode);
     } else {
-      return Global.INSTANCE;
+      // Not in a command and not in an opmode. Use a robot mode scope, if applicable,
+      // or fall back to the global scope if the robot is disabled or in an unrecognized mode.
+      // The switch statement deliberately does not have a default case. We want the compiler to
+      // tell us to update the switch statement if the enum changes.
+      return switch (currentRobotMode) {
+        case AUTONOMOUS -> AutonomousMode.INSTANCE;
+        case TELEOPERATED -> TeleopMode.INSTANCE;
+        case UTILITY -> UtilityMode.INSTANCE;
+        case UNKNOWN -> Global.INSTANCE;
+      };
     }
   }
 
@@ -70,7 +85,50 @@ interface BindingScope {
   record ForOpmode(long opmodeId) implements BindingScope {
     @Override
     public boolean active() {
-      return OpModeFetcher.getFetcher().getOpModeId() == opmodeId;
+      return RobotStateFetcher.getFetcher().getOpModeId() == opmodeId;
     }
   }
+
+  interface RobotModeScope extends BindingScope {}
+
+  /**
+   * A binding scoped to the autonomous robot mode, but not any particular opmode. Comes into play
+   * when robot programs are using commands v3 but not opmodes.
+   */
+  final class AutonomousMode implements RobotModeScope {
+    public static final AutonomousMode INSTANCE = new AutonomousMode();
+
+    @Override
+    public boolean active() {
+      return RobotStateFetcher.getFetcher().getRobotMode() == RobotMode.AUTONOMOUS;
+    }
+  }
+
+  /**
+   * A binding scoped to the teleop robot mode, but not any particular opmode. Comes into play when
+   * robot programs are using commands v3 but not opmodes.
+   */
+  final class TeleopMode implements RobotModeScope {
+    public static final TeleopMode INSTANCE = new TeleopMode();
+
+    @Override
+    public boolean active() {
+      return RobotStateFetcher.getFetcher().getRobotMode() == RobotMode.TELEOPERATED;
+    }
+  }
+
+  /**
+   * A binding scoped to the utility robot mode, but not any particular opmode. Comes into play when
+   * robot programs are using commands v3 but not opmodes.
+   */
+  final class UtilityMode implements RobotModeScope {
+    public static final UtilityMode INSTANCE = new UtilityMode();
+
+    @Override
+    public boolean active() {
+      return RobotStateFetcher.getFetcher().getRobotMode() == RobotMode.UTILITY;
+    }
+  }
+
+  // There is no scope for the "disabled" mode, since it would interfere with the global scope
 }

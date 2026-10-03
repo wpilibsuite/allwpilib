@@ -1,0 +1,12 @@
+extra_includes:
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::telemetry::DiscardTelemetryBackend:
+    methods:
+      GetEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:

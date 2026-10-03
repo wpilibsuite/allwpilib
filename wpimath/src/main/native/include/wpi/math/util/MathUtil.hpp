@@ -4,9 +4,11 @@
 
 #pragma once
 
+#include <concepts>
 #include <numbers>
 #include <type_traits>
 
+#include <Eigen/Core>
 #include <gcem.hpp>
 
 #include "wpi/math/geometry/Translation2d.hpp"

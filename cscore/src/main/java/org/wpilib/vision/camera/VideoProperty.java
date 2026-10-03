@@ -9,15 +9,15 @@ public class VideoProperty {
   /** VideoProperty property types. */
   public enum Kind {
     /** No specific property. */
-    kNone(0),
+    NONE(0),
     /** Boolean property. */
-    kBoolean(1),
+    BOOLEAN(1),
     /** Integer property. */
-    kInteger(2),
+    INTEGER(2),
     /** String property. */
-    kString(4),
+    STRING(4),
     /** Enum property. */
-    kEnum(8);
+    ENUM(8);
 
     private final int value;
 
@@ -43,11 +43,11 @@ public class VideoProperty {
    */
   public static Kind getKindFromInt(int kind) {
     return switch (kind) {
-      case 1 -> Kind.kBoolean;
-      case 2 -> Kind.kInteger;
-      case 4 -> Kind.kString;
-      case 8 -> Kind.kEnum;
-      default -> Kind.kNone;
+      case 1 -> Kind.BOOLEAN;
+      case 2 -> Kind.INTEGER;
+      case 4 -> Kind.STRING;
+      case 8 -> Kind.ENUM;
+      default -> Kind.NONE;
     };
   }
 
@@ -75,7 +75,7 @@ public class VideoProperty {
    * @return True if property is valid.
    */
   public boolean isValid() {
-    return m_kind != Kind.kNone;
+    return m_kind != Kind.NONE;
   }
 
   /**
@@ -84,7 +84,7 @@ public class VideoProperty {
    * @return True if property is a boolean.
    */
   public boolean isBoolean() {
-    return m_kind == Kind.kBoolean;
+    return m_kind == Kind.BOOLEAN;
   }
 
   /**
@@ -93,7 +93,7 @@ public class VideoProperty {
    * @return True if property is an integer.
    */
   public boolean isInteger() {
-    return m_kind == Kind.kInteger;
+    return m_kind == Kind.INTEGER;
   }
 
   /**
@@ -102,7 +102,7 @@ public class VideoProperty {
    * @return True if property is a string.
    */
   public boolean isString() {
-    return m_kind == Kind.kString;
+    return m_kind == Kind.STRING;
   }
 
   /**
@@ -111,7 +111,7 @@ public class VideoProperty {
    * @return True if property is an enum.
    */
   public boolean isEnum() {
-    return m_kind == Kind.kEnum;
+    return m_kind == Kind.ENUM;
   }
 
   /**

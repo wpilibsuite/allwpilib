@@ -85,6 +85,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the static gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param ks The static gain in volts.
    */
   public void setKs(double ks) {
@@ -94,6 +97,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   /**
    * Sets the velocity gain.
    *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
+   *
    * @param kv The velocity gain in V/(units/s).
    */
   public void setKv(double kv) {
@@ -102,6 +108,9 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
 
   /**
    * Sets the acceleration gain.
+   *
+   * <p>This setter is intended for online tuning only. Feedforward gains are assumed constant, so
+   * gain scheduling means the system was not correctly modeled.
    *
    * @param ka The acceleration gain in V/(units/s²).
    */
@@ -150,10 +159,10 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and velocity setpoint assuming continuous control
+   * Calculates the feedforward from the gains and velocity reference assuming continuous control
    * (acceleration is assumed to be zero).
    *
-   * @param velocity The velocity setpoint.
+   * @param velocity The velocity reference.
    * @return The computed feedforward.
    */
   public double calculate(double velocity) {
@@ -161,16 +170,16 @@ public class SimpleMotorFeedforward implements ProtobufSerializable, StructSeria
   }
 
   /**
-   * Calculates the feedforward from the gains and setpoints assuming discrete control.
+   * Calculates the feedforward from the gains and references assuming discrete control.
    *
    * <p>Note this method is inaccurate when the velocity crosses 0.
    *
-   * @param currentVelocity The current velocity setpoint.
-   * @param nextVelocity The next velocity setpoint.
+   * @param currentVelocity The current velocity reference.
+   * @param nextVelocity The next velocity reference.
    * @return The computed feedforward.
    */
   public double calculate(double currentVelocity, double nextVelocity) {
-    // See wpimath/algorithms.md#Simple_motor_feedforward for derivation
+    // See wpimath/docs/SimpleMotorFeedforward.md for derivation
     if (ka < 1e-9) {
       return ks * Math.signum(nextVelocity) + kv * nextVelocity;
     } else {

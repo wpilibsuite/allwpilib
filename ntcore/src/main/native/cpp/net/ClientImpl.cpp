@@ -4,14 +4,13 @@
 
 #include "ClientImpl.hpp"
 
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <optional>
 #include <string>
 #include <utility>
 #include <variant>
-
-#include <fmt/format.h>
 
 #include "Log.hpp"
 #include "Message.hpp"
@@ -20,6 +19,7 @@
 #include "WireEncoder.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/Logger.hpp"
+#include "wpi/util/MathExtras.hpp"
 #include "wpi/util/timestamp.hpp"
 
 using namespace wpi::nt;
@@ -38,8 +38,8 @@ ClientImpl::ClientImpl(
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
       m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= NT_4_1
-                                        ? NetworkPing::kPingIntervalMs
-                                        : kRttIntervalMs)},
+                                        ? NetworkPing::PING_INTERVAL_MS
+                                        : RTT_INTERVAL_MS)},
       m_outgoing{wire, local} {
   if (m_wire.GetVersion() >= NT_4_2) {
     DEBUG4("Creating UDP-based time sync client");
@@ -48,17 +48,26 @@ ClientImpl::ClientImpl(
         logger, connInfo.remote_ip, connInfo.remote_port,
         // 1 second seems reasonable
         1s, [this](tsp::TimeSyncClient::Metadata meta) {
+          // TSP uses microseconds; NetworkTables uses nanoseconds internally.
+          int64_t serverTimeOffsetNs;
+          int64_t rtt2Ns;
+          if (wpi::util::MulOverflow(meta.offset, int64_t{1000},
+                                     serverTimeOffsetNs) ||
+              wpi::util::MulOverflow(meta.rtt2, int64_t{1000}, rtt2Ns) ||
+              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
+            WARN("TSP response has invalid timestamp values");
+            return;
+          }
           // This callback is called in TimeSyncClient's eventloop's context, so
           // accessing members here isn't thread-safe. Do it from m_loop's
           // context instead
-          m_loopRunner.ExecSync([this, meta](auto& loop) {
-            m_rtt2Us = meta.rtt2;
-            int64_t serverTimeOffsetUs = meta.offset;
-            DEBUG3("Time offset: {}", serverTimeOffsetUs);
-            m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+          m_loopRunner.ExecSync([this, serverTimeOffsetNs, rtt2Ns](auto& loop) {
+            m_rtt2Ns = rtt2Ns;
+            DEBUG3("Time offset: {}", serverTimeOffsetNs);
+            m_outgoing.SetTimeOffset(serverTimeOffsetNs);
             m_haveTimeOffset = true;
           });
-          m_timeSyncUpdated(meta.offset, meta.rtt2, true);
+          m_timeSyncUpdated(serverTimeOffsetNs, rtt2Ns, true);
         });
   } else {
     // immediately send RTT ping
@@ -83,8 +92,13 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
     int id;
     Value value;
     std::string error;
-    if (!WireDecodeBinary(&data, &id, &value, &error,
-                          -m_outgoing.GetTimeOffset())) {
+    int64_t localTimeOffset;
+    if (wpi::util::SubOverflow(int64_t{0}, m_outgoing.GetTimeOffset(),
+                               localTimeOffset)) {
+      ERR("time offset is out of range");
+      break;
+    }
+    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset)) {
       ERR("binary decode error: {}", error);
       break;  // FIXME
     }
@@ -109,14 +123,28 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
           m_pongTimeMs = curTimeMs;
         }
         int64_t now = wpi::util::Now();
-        int64_t rtt2 = (now - value.GetInteger()) / 2;
-        if (rtt2 < m_rtt2Us) {
-          m_rtt2Us = rtt2;
-          int64_t serverTimeOffsetUs = value.server_time() + rtt2 - now;
-          DEBUG3("Time offset: {}", serverTimeOffsetUs);
-          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+        int64_t rtt;
+        if (wpi::util::SubOverflow(now, value.GetInteger(), rtt) || rtt < 0) {
+          WARN("RTT ping response has invalid timestamp values");
+          continue;
+        }
+        int64_t rtt2 = rtt / 2;
+        if (rtt2 < m_rtt2Ns) {
+          int64_t serverTimeAtResponse;
+          int64_t serverTimeOffsetNs;
+          if (wpi::util::AddOverflow(value.server_time(), rtt2,
+                                     serverTimeAtResponse) ||
+              wpi::util::SubOverflow(serverTimeAtResponse, now,
+                                     serverTimeOffsetNs) ||
+              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
+            WARN("RTT ping response has invalid timestamp values");
+            continue;
+          }
+          m_rtt2Ns = rtt2;
+          DEBUG3("Time offset: {}", serverTimeOffsetNs);
+          m_outgoing.SetTimeOffset(serverTimeOffsetNs);
           m_haveTimeOffset = true;
-          m_timeSyncUpdated(serverTimeOffsetUs, m_rtt2Us, true);
+          m_timeSyncUpdated(serverTimeOffsetNs, m_rtt2Ns, true);
         }
       }
       continue;
@@ -169,7 +197,7 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
         WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
       });
       // drift isn't critical here, so just go from current time
-      m_nextPingTimeMs = curTimeMs + kRttIntervalMs;
+      m_nextPingTimeMs = curTimeMs + RTT_INTERVAL_MS;
       m_pongTimeMs = 0;
     }
   }
@@ -183,11 +211,11 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
 }
 
 void ClientImpl::UpdatePeriodic() {
-  if (m_periodMs < kMinPeriodMs) {
-    m_periodMs = kMinPeriodMs;
+  if (m_periodMs < MIN_PERIOD_MS) {
+    m_periodMs = MIN_PERIOD_MS;
   }
-  if (m_periodMs > kMaxPeriodMs) {
-    m_periodMs = kMaxPeriodMs;
+  if (m_periodMs > MAX_PERIOD_MS) {
+    m_periodMs = MAX_PERIOD_MS;
   }
   m_setPeriodic(m_periodMs);
 }
@@ -204,9 +232,9 @@ void ClientImpl::Publish(int32_t pubuid, std::string_view name,
     publisher = std::make_unique<PublisherData>();
   }
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
-  if (publisher->periodMs < kMinPeriodMs) {
-    publisher->periodMs = kMinPeriodMs;
+  publisher->periodMs = PubSubOptionsImpl::RoundPeriodicMs(options.periodicMs);
+  if (publisher->periodMs < MIN_PERIOD_MS) {
+    publisher->periodMs = MIN_PERIOD_MS;
   }
   m_outgoing.SetPeriod(pubuid, publisher->periodMs);
 
@@ -222,7 +250,7 @@ void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
   m_publishers[pubuid].reset();
 
   // loop over all publishers to update period
-  m_periodMs = kMaxPeriodMs;
+  m_periodMs = MAX_PERIOD_MS;
   for (auto&& pub : m_publishers) {
     if (pub) {
       m_periodMs = std::gcd(m_periodMs, pub->periodMs);
@@ -246,7 +274,7 @@ void ClientImpl::SetValue(int32_t pubuid, const Value& value) {
   auto& publisher = *m_publishers[pubuid];
   m_outgoing.SendValue(
       pubuid, value,
-      publisher.options.sendAll ? ValueSendMode::kAll : ValueSendMode::kNormal);
+      publisher.options.sendAll ? ValueSendMode::ALL : ValueSendMode::NORMAL);
 }
 
 int ClientImpl::ServerAnnounce(std::string_view name, int id,

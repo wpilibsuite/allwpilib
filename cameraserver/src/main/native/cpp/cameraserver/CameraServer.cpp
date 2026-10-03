@@ -5,12 +5,11 @@
 #include "wpi/cameraserver/CameraServer.hpp"
 
 #include <atomic>
+#include <format>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <fmt/format.h>
 
 #include "wpi/cameraserver/CameraServerShared.hpp"
 #include "wpi/cs/VideoEvent.hpp"
@@ -26,11 +25,12 @@
 #include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/mutex.hpp"
 
 using namespace wpi;
 
-static constexpr char const* kPublishName = "/CameraPublisher";
+static constexpr char const* PUBLISH_NAME = "/CameraPublisher";
 
 namespace {
 
@@ -81,10 +81,10 @@ struct Instance {
   wpi::util::DenseMap<CS_Sink, CS_Source> m_fixedSources;
   wpi::util::DenseMap<CS_Source, SourcePublisher> m_publishers;
   std::shared_ptr<nt::NetworkTable> m_publishTable{
-      nt::NetworkTableInstance::GetDefault().GetTable(kPublishName)};
+      nt::NetworkTableInstance::GetDefault().GetTable(PUBLISH_NAME)};
   cs::VideoListener m_videoListener;
   int m_tableListener;
-  int m_nextPort{CameraServer::kBasePort};
+  int m_nextPort{CameraServer::BASE_PORT};
   std::vector<std::string> m_addresses;
 };
 
@@ -128,7 +128,7 @@ static std::string_view MakeSourceValue(CS_Source source,
 }
 
 static std::string MakeStreamValue(std::string_view address, int port) {
-  return fmt::format("mjpg:http://{}:{}/?action=stream", address, port);
+  return std::format("mjpg:http://{}:{}/?action=stream", address, port);
 }
 
 SourcePublisher* Instance::GetPublisher(CS_Source source) {
@@ -267,7 +267,7 @@ static std::string PixelFormatToString(wpi::util::PixelFormat pixelFormat) {
 }
 
 static std::string VideoModeToString(const cs::VideoMode& mode) {
-  return fmt::format("{}x{} {} {} fps", mode.width, mode.height,
+  return std::format("{}x{} {} {} fps", mode.width, mode.height,
                      PixelFormatToString(mode.pixelFormat), mode.fps);
 }
 
@@ -285,11 +285,11 @@ PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
   std::string name;
   std::string infoName;
   if (wpi::util::starts_with(event.name, "raw_")) {
-    name = fmt::format("RawProperty/{}", event.name);
-    infoName = fmt::format("RawPropertyInfo/{}", event.name);
+    name = std::format("RawProperty/{}", event.name);
+    infoName = std::format("RawPropertyInfo/{}", event.name);
   } else {
-    name = fmt::format("Property/{}", event.name);
-    infoName = fmt::format("PropertyInfo/{}", event.name);
+    name = std::format("Property/{}", event.name);
+    infoName = std::format("PropertyInfo/{}", event.name);
   }
 
   CS_Status status = 0;
@@ -300,18 +300,18 @@ PropertyPublisher::PropertyPublisher(nt::NetworkTable& table,
       break;
     case CS_PROP_ENUM:
       choicesTopic =
-          table.GetStringArrayTopic(fmt::format("{}/choices", infoName));
+          table.GetStringArrayTopic(std::format("{}/choices", infoName));
       [[fallthrough]];
     case CS_PROP_INTEGER:
       integerValueEntry = table.GetIntegerTopic(name).GetEntry(0);
       minPublisher =
-          table.GetIntegerTopic(fmt::format("{}/min", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/min", infoName)).Publish();
       maxPublisher =
-          table.GetIntegerTopic(fmt::format("{}/max", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/max", infoName)).Publish();
       stepPublisher =
-          table.GetIntegerTopic(fmt::format("{}/step", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/step", infoName)).Publish();
       defaultPublisher =
-          table.GetIntegerTopic(fmt::format("{}/default", infoName)).Publish();
+          table.GetIntegerTopic(std::format("{}/default", infoName)).Publish();
 
       integerValueEntry.SetDefault(event.value);
       minPublisher.Set(cs::GetPropertyMin(event.propertyHandle, &status));
@@ -392,7 +392,7 @@ Instance::Instance() {
         std::scoped_lock lock(m_mutex);
         CS_Status status = 0;
         switch (event.kind) {
-          case cs::VideoEvent::kSourceCreated: {
+          case cs::VideoEvent::SOURCE_CREATED: {
             // Create subtable for the camera
             auto table = m_publishTable->GetSubTable(event.name);
             m_publishers.insert(
@@ -400,10 +400,10 @@ Instance::Instance() {
                  SourcePublisher{*this, table, event.sourceHandle}});
             break;
           }
-          case cs::VideoEvent::kSourceDestroyed:
+          case cs::VideoEvent::SOURCE_DESTROYED:
             m_publishers.erase(event.sourceHandle);
             break;
-          case cs::VideoEvent::kSourceConnected:
+          case cs::VideoEvent::SOURCE_CONNECTED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
               wpi::util::SmallString<64> descBuf;
@@ -412,30 +412,30 @@ Instance::Instance() {
               publisher->connectedPublisher.Set(true);
             }
             break;
-          case cs::VideoEvent::kSourceDisconnected:
+          case cs::VideoEvent::SOURCE_DISCONNECTED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->connectedPublisher.Set(false);
             }
             break;
-          case cs::VideoEvent::kSourceVideoModesUpdated:
+          case cs::VideoEvent::SOURCE_VIDEO_MODES_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->modesPublisher.Set(
                   GetSourceModeValues(event.sourceHandle));
             }
             break;
-          case cs::VideoEvent::kSourceVideoModeChanged:
+          case cs::VideoEvent::SOURCE_VIDEO_MODE_CHANGED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->modeEntry.Set(VideoModeToString(event.mode));
             }
             break;
-          case cs::VideoEvent::kSourcePropertyCreated:
+          case cs::VideoEvent::SOURCE_PROPERTY_CREATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               publisher->properties.insert(
                   {event.propertyHandle,
                    PropertyPublisher{*publisher->table, event}});
             }
             break;
-          case cs::VideoEvent::kSourcePropertyValueUpdated:
+          case cs::VideoEvent::SOURCE_PROPERTY_VALUE_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               auto ppIt = publisher->properties.find(event.propertyHandle);
               if (ppIt != publisher->properties.end()) {
@@ -443,7 +443,7 @@ Instance::Instance() {
               }
             }
             break;
-          case cs::VideoEvent::kSourcePropertyChoicesUpdated:
+          case cs::VideoEvent::SOURCE_PROPERTY_CHOICES_UPDATED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               auto ppIt = publisher->properties.find(event.propertyHandle);
               if (ppIt != publisher->properties.end() &&
@@ -458,10 +458,10 @@ Instance::Instance() {
               }
             }
             break;
-          case cs::VideoEvent::kSinkSourceChanged:
-          case cs::VideoEvent::kSinkCreated:
-          case cs::VideoEvent::kSinkDestroyed:
-          case cs::VideoEvent::kNetworkInterfacesChanged:
+          case cs::VideoEvent::SINK_SOURCE_CHANGED:
+          case cs::VideoEvent::SINK_CREATED:
+          case cs::VideoEvent::SINK_DESTROYED:
+          case cs::VideoEvent::NETWORK_INTERFACES_CHANGED:
             m_addresses = cs::GetNetworkInterfaces();
             UpdateStreamValues();
             break;
@@ -478,10 +478,9 @@ cs::UsbCamera CameraServer::StartAutomaticCapture() {
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   ::GetInstance();
-  cs::UsbCamera camera{fmt::format("USB Camera {}", dev), dev};
+  cs::UsbCamera camera{std::format("USB Camera {}", dev), dev};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "auto");
+  wpi::util::ReportUsage("UsbCamera", dev, "auto");
   return camera;
 }
 
@@ -490,8 +489,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   ::GetInstance();
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", dev), "name");
+  wpi::util::ReportUsage("UsbCamera", dev, "name");
   return camera;
 }
 
@@ -500,8 +498,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(std::string_view name,
   ::GetInstance();
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
-  auto csShared = GetCameraServerShared();
-  csShared->ReportUsage(fmt::format("UsbCamera[{}]", path), "path");
+  wpi::util::ReportUsage(std::format("UsbCamera[{}]", path), "path");
   return camera;
 }
 
@@ -518,7 +515,7 @@ cs::MjpegServer CameraServer::AddSwitchedCamera(std::string_view name) {
 cs::MjpegServer CameraServer::StartAutomaticCapture(
     const cs::VideoSource& camera) {
   AddCamera(camera);
-  auto server = AddServer(fmt::format("serve_{}", camera.GetName()));
+  auto server = AddServer(std::format("serve_{}", camera.GetName()));
   server.SetSource(camera);
   return server;
 }
@@ -553,7 +550,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
     auto it = inst.m_sinks.find(name);
     if (it != inst.m_sinks.end()) {
       auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
+      if (kind != cs::VideoSink::CV) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
                                        static_cast<int>(kind));
@@ -580,7 +577,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
     auto it = inst.m_sinks.find(name);
     if (it != inst.m_sinks.end()) {
       auto kind = it->second.GetKind();
-      if (kind != cs::VideoSink::kCv) {
+      if (kind != cs::VideoSink::CV) {
         auto csShared = GetCameraServerShared();
         csShared->SetCameraServerError("expected OpenCV sink, but got {}",
                                        static_cast<int>(kind));
@@ -676,7 +673,7 @@ cs::VideoSink CameraServer::GetServer() {
       csShared->SetCameraServerError("no camera available");
       return cs::VideoSink{};
     }
-    name = fmt::format("serve_{}", inst.m_primarySourceName);
+    name = std::format("serve_{}", inst.m_primarySourceName);
   }
   return GetServer(name);
 }

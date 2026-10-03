@@ -8,11 +8,16 @@
 {%- endmacro %}
 package org.wpilib.driverstation;
 
+import java.util.EnumSet;
+import java.util.Objects;
+import org.wpilib.driverstation.GenericHID.HIDType;
+import org.wpilib.driverstation.GenericHID.RumbleType;
+import org.wpilib.driverstation.GenericHID.SupportedOutput;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from {{ ConsoleName }} controllers connected to the Driver Station.
@@ -25,24 +30,26 @@ import org.wpilib.util.sendable.SendableBuilder;
  * only through the official NI DS. Sim is not guaranteed to have the same mapping, as well as any
  * 3rd party controllers.
  */
-public class {{ ConsoleName }}Controller extends GenericHID implements Sendable {
+public class {{ ConsoleName }}Controller implements HIDDevice, TelemetryLoggable {
   /** Represents a digital button on a {{ ConsoleName }}Controller. */
   public enum Button {
 {%- for button in buttons %}
     /** {{ capitalize_first(button.DocName|default(button.name))  }} button. */
-    k{{ capitalize_first(button.name) }}({{ button.value }}){{ ";" if loop.last else ","}}
+    {{ button.ConstantName }}({{ button.value }}, "{{ button.MethodName }}Button"){{ ";" if loop.last else ","}}
 {%- endfor %}
 
     /** Button value. */
     public final int value;
 
-    Button(int value) {
+    private final String m_name;
+
+    Button(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the button, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Button`.
+     * Get the human-friendly name of the button, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -50,8 +57,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
      */
     @Override
     public String toString() {
-      // Remove leading `k`
-      return this.name().substring(1) + "Button";
+      return m_name;
     }
   }
 
@@ -59,23 +65,25 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
   public enum Axis {
 {%- for stick in sticks %}
     /** {{ stick.NameParts|map("capitalize")|join(" ") }} axis. */
-    k{{ stick.NameParts|map("capitalize")|join }}({{ stick.value }}){{ "," if triggers|length > 0 or not loop.last else ";"}}
+    {{ stick.ConstantName }}({{ stick.value }}, "{{ stick.MethodName }}"){{ "," if triggers|length > 0 or not loop.last else ";"}}
 {%- endfor %}
 {%- for trigger in triggers %}
     /** {{ trigger.DocName|capitalize }}. */
-    k{{ capitalize_first(trigger.name) }}({{ trigger.value }}){{ ";" if loop.last else ","}}
+    {{ trigger.ConstantName }}({{ trigger.value }}, "{{ trigger.StringName }}"){{ ";" if loop.last else ","}}
 {%- endfor %}
 
     /** Axis value. */
     public final int value;
 
-    Axis(int value) {
+    private final String m_name;
+
+    Axis(int value, String name) {
       this.value = value;
+      m_name = name;
     }
 
     /**
-     * Get the human-friendly name of the axis, matching the relevant methods. This is done by
-     * stripping the leading `k`, and appending `Axis` if the name ends with `{{ AxisNameSuffix }}`.
+     * Get the human-friendly name of the axis, matching the relevant methods.
      *
      * <p>Primarily used for automated unit tests.
      *
@@ -83,12 +91,20 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
      */
     @Override
     public String toString() {
-      var name = this.name().substring(1); // Remove leading `k`
-      if (name.endsWith("{{ AxisNameSuffix }}")) {
-        return name + "Axis";
-      }
-      return name;
+      return m_name;
     }
+  }
+
+  private final GenericHID m_hid;
+
+  /**
+   * Get the underlying GenericHID object.
+   *
+   * @return the wrapped GenericHID object
+   */
+  @Override
+  public GenericHID getHID() {
+    return m_hid;
   }
 
   /**
@@ -97,8 +113,17 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @param port The port index on the Driver Station that the controller is plugged into (0-5).
    */
   public {{ ConsoleName }}Controller(final int port) {
-    super(port);
-    HAL.reportUsage("HID", port, "{{ ConsoleName }}Controller");
+    this(DriverStation.getGenericHID(port));
+  }
+
+  /**
+   * Construct an instance of a controller with a GenericHID object.
+   *
+   * @param hid The GenericHID object to use for this controller.
+   */
+  public {{ ConsoleName }}Controller(final GenericHID hid) {
+    m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
+    UsageReporting.reportUsage("HID", hid.getPort(), "{{ ConsoleName }}Controller");
   }
 {% for stick in sticks %}
   /**
@@ -107,7 +132,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ stick.NameParts|map("capitalize")|join }}() {
-    return getRawAxis(Axis.k{{ stick.NameParts|map("capitalize")|join }}.value);
+    return m_hid.getRawAxis(Axis.{{ stick.ConstantName }}.value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -118,7 +143,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The axis value.
    */
   public double get{{ capitalize_first(trigger.name) }}Axis() {
-    return getRawAxis(Axis.k{{ capitalize_first(trigger.name) }}.value);
+    return m_hid.getRawAxis(Axis.{{ trigger.ConstantName }}.value);
   }
 {% if trigger.UseThresholdMethods %}
   /**
@@ -132,7 +157,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     threshold, attached to the given event loop
    */
   public BooleanEvent {{ trigger.name }}(double threshold, EventLoop loop) {
-    return axisGreaterThan(Axis.k{{ capitalize_first(trigger.name) }}.value, threshold, loop);
+    return m_hid.axisGreaterThan(Axis.{{ trigger.ConstantName }}.value, threshold, loop);
   }
 
   /**
@@ -155,7 +180,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return The state of the button.
    */
   public boolean get{{ capitalize_first(button.name) }}Button() {
-    return getRawButton(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButton(Button.{{ button.ConstantName }}.value);
   }
 
   /**
@@ -164,7 +189,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was pressed since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonPressed() {
-    return getRawButtonPressed(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButtonPressed(Button.{{ button.ConstantName }}.value);
   }
 
   /**
@@ -173,7 +198,7 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    * @return Whether the button was released since the last check.
    */
   public boolean get{{ capitalize_first(button.name) }}ButtonReleased() {
-    return getRawButtonReleased(Button.k{{ capitalize_first(button.name) }}.value);
+    return m_hid.getRawButtonReleased(Button.{{ button.ConstantName }}.value);
   }
 
   /**
@@ -184,21 +209,82 @@ public class {{ ConsoleName }}Controller extends GenericHID implements Sendable 
    *     attached to the given loop.
    */
   public BooleanEvent {{ button.name }}(EventLoop loop) {
-    return button(Button.k{{ capitalize_first(button.name) }}.value, loop);
+    return m_hid.button(Button.{{ button.ConstantName }}.value, loop);
   }
 {% endfor %}
+  /**
+   * Get if the controller is connected.
+   *
+   * @return true if the controller is connected
+   */
+  public boolean isConnected() {
+    return m_hid.isConnected();
+  }
+
+  /**
+   * Get the type of the controller.
+   *
+   * @return the type of the controller.
+   */
+  public HIDType getGamepadType() {
+    return m_hid.getGamepadType();
+  }
+
+  /**
+   * Get the supported outputs of the controller.
+   *
+   * @return the supported outputs of the controller.
+   */
+  public EnumSet<SupportedOutput> getSupportedOutputs() {
+    return m_hid.getSupportedOutputs();
+  }
+
+  /**
+   * Get the name of the controller.
+   *
+   * @return the name of the controller.
+   */
+  public String getName() {
+    return m_hid.getName();
+  }
+
+  /**
+   * Get the port number of the controller.
+   *
+   * @return The port number of the controller.
+   */
+  public int getPort() {
+    return m_hid.getPort();
+  }
+
+  /**
+   * Set the rumble output for the HID.
+   *
+   * <p>The DS currently supports 4 rumble values: left rumble, right rumble, left trigger rumble,
+   * and right trigger rumble.
+   *
+   * @param type Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public void setRumble(RumbleType type, double value) {
+    m_hid.setRumble(type, value);
+  }
+
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "{{ ConsoleName }}");
+  public String getTelemetryType() {
+    return "HID:{{ ConsoleName }}";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
 {%- for trigger in triggers %}
-    builder.addDoubleProperty("{{ capitalize_first(trigger.name) }} Axis", this::get{{ capitalize_first(trigger.name) }}Axis, null);
+    table.log("{{ capitalize_first(trigger.name) }} Axis", get{{ capitalize_first(trigger.name) }}Axis());
 {%- endfor -%}
 {% for stick in sticks %}
-    builder.addDoubleProperty("{{ stick.NameParts|map("capitalize")|join }}", this::get{{ stick.NameParts|map("capitalize")|join }}, null);
+    table.log("{{ stick.NameParts|map("capitalize")|join }}", get{{ stick.NameParts|map("capitalize")|join }}());
 {%- endfor -%}
 {% for button in buttons %}
-    builder.addBooleanProperty("{{ capitalize_first(button.name) }}", this::get{{ capitalize_first(button.name) }}Button, null);
+    table.log("{{ capitalize_first(button.name) }}", get{{ capitalize_first(button.name) }}Button());
 {%- endfor %}
   }
 }

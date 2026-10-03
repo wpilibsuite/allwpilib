@@ -5,24 +5,41 @@ import weakref
 
 import pytest
 
+from hal import RobotMode
 import hal
 import hal.simulation
-from hal._wpiHal import _RobotMode as RobotMode
 import ntcore
 import wpilib
-from wpilib.simulation import DriverStationSim, pauseTiming, restartTiming
+from wpilib.simulation import DriverStationSim, pause_timing, restart_timing
 import wpilib.simulation
 
 # TODO: get rid of special-casing.. maybe should register a HAL shutdown hook or something
 try:
     import commands2
+    from commands2.button.commandgenerichid import _reset_command_generic_hid_data
 except ImportError:
     commands2 = None
+    _reset_command_generic_hid_data = None
 
 from .controller import RobotTestController
+from ._opmode import OpModeTestingPlugin
 
 
-class RobotTestingPlugin:
+def _create_robot(robot_class: type[wpilib.RobotBase]) -> wpilib.RobotBase:
+    """Initialize simulation identically for discovery and individual tests."""
+    ntcore.NetworkTableInstance.get_default().start_local()
+    pause_timing()
+    restart_timing()
+    wpilib.simulation.set_program_started(False)
+    wpilib.DriverStationBackend.silence_joystick_connection_alert(True)
+    DriverStationSim.set_robot_mode(RobotMode.AUTONOMOUS)
+    DriverStationSim.set_opmode(0)
+    DriverStationSim.set_enabled(False)
+    DriverStationSim.notify_new_data()
+    return robot_class()
+
+
+class RobotTestingPlugin(OpModeTestingPlugin):
     """
     Pytest plugin. Each documented member function name can be an argument
     to your test functions, and the data that these functions return will
@@ -67,19 +84,10 @@ class RobotTestingPlugin:
         # bubble up to the user
         #
 
-        nt_inst = ntcore.NetworkTableInstance.getDefault()
-        nt_inst.startLocal()
-
-        pauseTiming()
-        restartTiming()
-
-        wpilib.DriverStationBackend.silenceJoystickConnectionWarning(True)
-        DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS)
-        DriverStationSim.setEnabled(False)
-        DriverStationSim.notifyNewData()
+        nt_inst = ntcore.NetworkTableInstance.get_default()
 
         # Create the user's robot instance
-        robot = self._robot_class()
+        robot = _create_robot(self._robot_class)
 
         # Tests only get a proxy to ensure cleanup is more reliable
         yield weakref.proxy(robot)
@@ -92,36 +100,44 @@ class RobotTestingPlugin:
             return
 
         # HACK: avoid motor safety deadlock
-        wpilib.simulation._simulation._resetMotorSafety()
+        wpilib.simulation._simulation._reset_motor_safety()
 
         del robot
 
         if commands2 is not None:
-            commands2.CommandScheduler.resetInstance()
+            commands2.CommandScheduler.reset_instance()
+            _reset_command_generic_hid_data()
 
         # Double-check all objects are destroyed so that HAL handles are released
         gc.collect()
+
+        # Reset DriverStation cached HID wrapper objects after user and command
+        # references have had a chance to be released.
+        wpilib.DriverStationBackend.reset_cached_hid_data()
 
         # shutdown networktables before other kinds of global cleanup
         # -> some reset functions will re-register listeners, so it's important
         #    to do this before so that the listeners are active on the current
         #    NetworkTables instance
-        nt_inst.stopLocal()
+        nt_inst.stop_local()
         nt_inst._reset()
 
+        # Clear the native registration map too, not just the HAL options list.
+        # Otherwise subsequent robots cannot register modes with the same names.
+        wpilib.RobotState.clear_opmodes()
+
         # Cleanup WPILib globals
-        # -> preferences, SmartDashboard, MotorSafety
-        wpilib.simulation._simulation._resetWpilibSimulationData()
-        wpilib._wpilib._clearSmartDashboardData()
+        # -> preferences and MotorSafety
+        wpilib.simulation._simulation._reset_wpilib_simulation_data()
 
         # Cancel all periodic callbacks
-        hal.simulation.cancelAllSimPeriodicCallbacks()
+        hal.simulation.cancel_all_sim_periodic_callbacks()
 
         # Reset the HAL handles
-        hal.simulation.resetGlobalHandles()
+        hal.simulation.reset_global_handles()
 
         # Reset the HAL data
-        hal.simulation.resetAllSimData()
+        hal.simulation.reset_all_sim_data()
 
         # Don't call HAL shutdown! This is only used to cleanup HAL extensions,
         # and functions will only be called the first time (unless re-registered)
