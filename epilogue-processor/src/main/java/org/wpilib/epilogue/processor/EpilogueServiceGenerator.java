@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 
@@ -48,8 +47,6 @@ public class EpilogueServiceGenerator {
         var variant = timedRobotClasses.contains(clazz) ? Variant.BINDABLE : Variant.STANDARD;
         createLoggerService(clazz, variant);
       }
-    } catch (FilerException e) {
-      // Ignore
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
@@ -68,8 +67,6 @@ public class EpilogueGenerator {
 
         out.println("}");
       }
-    } catch (FilerException e) {
-      // Ignore
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.tools.StandardLocation;
@@ -62,8 +61,6 @@ public class EpilogueResourceGenerator {
           out.println(StringUtils.serviceClassName(robotClass));
         }
       }
-    } catch (FilerException e) {
-      // Ignore
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
