@@ -50,7 +50,7 @@ struct wpi::util::Struct<wpi::tsp::TspPong> {
   static constexpr std::string_view GetTypeName() { return "TspPong"; }
   static constexpr size_t GetSize() { return 18; }
   static constexpr std::string_view GetSchema() {
-    return "uint8 version;uint8 message_id;uint64 client_time;uint64_t "
+    return "uint8 version;uint8 message_id;uint64 client_time;uint64 "
            "server_time";
   }
 

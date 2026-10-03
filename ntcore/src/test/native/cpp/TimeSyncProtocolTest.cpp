@@ -7,12 +7,14 @@
 
 #include <limits>
 #include <print>
+#include <string>
 #include <thread>
 
 #include <catch2/catch_test_macros.hpp>
 
 #include "TimeSyncTestPeer.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
+#include "wpi/util/struct/DynamicStruct.hpp"
 
 class TimeSyncProtoTest {
  protected:
@@ -245,7 +247,8 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest RejectMalformedPings",
   std::array<uint8_t, 11> bytes{};
   wpi::util::PackStruct(bytes, TspPing{1, 1, 123});
   for (size_t size : {2u, 9u, 11u}) {
-    REQUIRE(peer.Send(std::span{bytes}.first(size), 5813) == static_cast<int>(size));
+    REQUIRE(peer.Send(std::span{bytes}.first(size), 5813) ==
+            static_cast<int>(size));
   }
   wpi::util::PackStruct(bytes, TspPing{1, 1, 456});
   REQUIRE(peer.Send(std::span{bytes}.first(10), 5813) == 10);
@@ -264,12 +267,12 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest AccumulatesMetadata",
   using namespace std::chrono_literals;
   TimeSyncClient* instance = nullptr;
   size_t callbacks = 0;
-  TimeSyncClient client{logger, "127.0.0.1", 5812, 1h,
-                        [&](TimeSyncClient::Metadata metadata) {
-                          ++callbacks;
-                          CHECK(metadata.pongsReceived == callbacks);
-                          CHECK(instance->GetMetadata().pongsReceived == callbacks);
-                        }};
+  TimeSyncClient client{
+      logger, "127.0.0.1", 5812, 1h, [&](TimeSyncClient::Metadata metadata) {
+        ++callbacks;
+        CHECK(metadata.pongsReceived == callbacks);
+        CHECK(instance->GetMetadata().pongsReceived == callbacks);
+      }};
   instance = &client;
   TspPing ping{1, 1, 100};
   TspPong pong{ping, 110};
@@ -343,4 +346,21 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest IgnoresDuplicatePongs",
   }
   std::this_thread::sleep_for(100ms);
   CHECK(client.GetMetadata().pongsReceived == 1u);
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest SchemasMatchWireSizes",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  wpi::util::StructDescriptorDatabase database;
+  std::string error;
+  auto ping =
+      database.Add("TspPing", wpi::util::Struct<TspPing>::GetSchema(), &error);
+  REQUIRE(ping);
+  REQUIRE(ping->IsValid());
+  CHECK(ping->GetSize() == wpi::util::Struct<TspPing>::GetSize());
+  auto pong =
+      database.Add("TspPong", wpi::util::Struct<TspPong>::GetSchema(), &error);
+  REQUIRE(pong);
+  REQUIRE(pong->IsValid());
+  CHECK(pong->GetSize() == wpi::util::Struct<TspPong>::GetSize());
 }
