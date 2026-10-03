@@ -156,7 +156,7 @@ public class LoggableHandler extends ElementHandler {
   }
 
   private String generateLoggerCall(Element element, TypeElement type, String elementReference) {
-    return ("Epilogue.%s.tryUpdate(table.getTable(\"%s\"), %s, "
+    return ("EpilogueLoggers.%s.tryUpdate(table.getTable(\"%s\"), %s, "
             + "Epilogue.getConfig().errorHandler)")
         .formatted(StringUtils.loggerFieldName(type), loggedName(element), elementReference);
   }

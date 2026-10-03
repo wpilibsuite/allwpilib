@@ -39,7 +39,7 @@ def build_examples(folders, halsim_deps):
     for folder in folders:
         java_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/main/java/**/*.java"]),
             main_class = "org/wpilib/examples/" + folder + "/Main",
             plugins = [
                 "//epilogue-processor:plugin",
@@ -75,7 +75,10 @@ def build_commands(folders):
     for folder in folders:
         java_library(
             name = folder + "-command",
-            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/main/java/**/*.java"]),
+            plugins = [
+                "//epilogue-processor:plugin",
+            ],
             deps = [
                 "//allwpilib-java:allwpilib-java",
                 "//apriltag:apriltag-java",
@@ -91,6 +94,8 @@ def build_commands(folders):
                 "//commandsv3:commandsv3-java",
                 "//wpiutil:wpiutil-java",
                 "//romiVendordep:romiVendordep-java",
+                "//telemetry:telemetry-java",
+                "//tunables:tunables-java",
                 "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
                 "//epilogue-runtime:epilogue-java",
@@ -105,7 +110,7 @@ def build_snippets(folders):
     for folder in folders:
         java_library(
             name = folder + "-snippet",
-            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/main/java/**/*.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -140,7 +145,7 @@ def build_templates(folders):
     for folder in folders:
         java_library(
             name = folder + "-template",
-            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/main/java/**/*.java"]),
             plugins = [
                 "//epilogue-processor:plugin",
             ],
@@ -152,6 +157,7 @@ def build_templates(folders):
                 "//drivers:drivers-java",
                 "//fields:fields-java",
                 "//hal:hal-java",
+                "//ntcore:ntcore-java",
                 "//wpilibj:wpilibj-java",
                 "//commandsv2:commandsv2-java",
                 "//commandsv3:commandsv3-java",
@@ -163,6 +169,7 @@ def build_templates(folders):
                 "//romiVendordep:romiVendordep-java",
                 "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
+                "@maven//:org_wpilib_thirdparty_opencv_opencv_java",
             ],
             tags = ["wpi-example"],
         )
@@ -171,7 +178,7 @@ def build_tests(example_test_folders, snippet_test_folders):
     for folder in example_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
-            srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/test/java/**/*.java"]) + native.glob(["src/main/java/**/*.java"]),
             javacopts = [
                 # bazel places the JUnit libraries in the unnamed module
                 "--add-reads=wpilib.examples=ALL-UNNAMED",
@@ -200,8 +207,10 @@ def build_tests(example_test_folders, snippet_test_folders):
                 "//epilogue-runtime:epilogue-java",
                 "//romiVendordep:romiVendordep-java",
                 "//telemetry:telemetry-java",
+                "//tunables:tunables-java",
                 "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
+                "@maven//:org_wpilib_thirdparty_opencv_opencv_java",
             ],
             tags = ["wpi-example"],
         )
@@ -209,7 +218,7 @@ def build_tests(example_test_folders, snippet_test_folders):
     for folder in snippet_test_folders:
         wpilib_java_junit5_test(
             name = folder + "-test",
-            srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]) + native.glob(["**/module-info.java"]),
+            srcs = native.glob(["src/test/java/**/*.java"]) + native.glob(["src/main/java/**/*.java"]),
             javacopts = [
                 # bazel places the JUnit libraries in the unnamed module
                 "--add-reads=wpilib.examples=ALL-UNNAMED",
@@ -237,8 +246,11 @@ def build_tests(example_test_folders, snippet_test_folders):
                 "//wpiutil:wpiutil-java",
                 "//epilogue-runtime:epilogue-java",
                 "//romiVendordep:romiVendordep-java",
+                "//telemetry:telemetry-java",
+                "//tunables:tunables-java",
                 "//xrpVendordep:xrpVendordep-java",
                 "//wpiunits:wpiunits-java",
+                "@maven//:org_wpilib_thirdparty_opencv_opencv_java",
             ],
             tags = ["wpi-example"],
         )
