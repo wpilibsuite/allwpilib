@@ -23,8 +23,18 @@ class EventLoop {
    * Bind a new action to run when the loop is polled.
    *
    * @param action the action to run.
+   * @returns An id for the bound action, so that it may be later unbound. Only
+   * valid within this event loop.
    */
-  void Bind(wpi::util::unique_function<void()> action);
+  size_t Bind(wpi::util::unique_function<void()>&& action);
+
+  /**
+   * Unbinds an action so that is no longer ran when the loop is polled.
+   * This may change the call order of the remaining events.
+   *
+   * @param actionId the id of the action to unbind.
+   */
+  void Unbind(size_t actionId);
 
   /**
    * Poll all bindings.
@@ -37,7 +47,13 @@ class EventLoop {
   void Clear();
 
  private:
-  std::vector<wpi::util::unique_function<void()>> m_bindings;
+  size_t nextId = 1;  // Skip id 0 in case it is needed for null later
+  struct Binding {
+    size_t id;
+    wpi::util::unique_function<void()> handler;
+  };
+
+  std::vector<Binding> m_bindings;
   bool m_running{false};
 };
 }  // namespace wpi
