@@ -127,10 +127,6 @@ jobs:
           bazel_remote_password: ${{ secrets.BAZEL_CACHE_PASSWORD }}
           buildbuddy_token: ${{ secrets.BUILDBUDDY_API_KEY }}
 
-      - name: Install apt dependencies
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libx11-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev avahi-daemon
-
       - name: Setup avahi-daemon
         if: runner.os == 'Linux'
         run: |
