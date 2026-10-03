@@ -78,12 +78,13 @@ When the client receives a **TSP Pong Message** from the server, it shall verify
 
 ## Transport
 
-Communication between server and clients shall occur over the User Datagram Protocol (UDP) Port 5810.
+Communication between server and clients shall occur over the User Datagram Protocol (UDP). When used with NetworkTables, the UDP server shall listen on the same port number as its WebSocket server (5810 by default). Clients shall use the port number of their connected NetworkTables server.
 
 ## Message Format
 
 The message format forgoes CRCs (as these are provided by the Ethernet physical layer) or packet delineation (provided by UDP). **TSP Ping** and **TSP Pong** messages shall be encoded in a manor compatible with a WPILib packed struct with respect to byte alignment and endianness.
 
+[#tsp-ping]
 === TSP Ping
 
 [cols="1,1,2,3", options="header"]

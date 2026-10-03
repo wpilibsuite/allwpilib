@@ -1,6 +1,6 @@
-= Network Tables Protocol Specification, Version 4.1
+= Network Tables Protocol Specification, Version 4.2
 WPILib Developers <wpilib@wpi.edu>
-Protocol Revision 4.1, 10/1/2023
+Protocol Revision 4.2 (draft)
 :toc:
 :toc-placement: preamble
 :sectanchors:
@@ -11,7 +11,7 @@ A pub/sub WebSockets protocol based on NetworkTables concepts.
 
 == Motivation for Version 4.2
 
-NetworkTables 4.2 link:time-sync-protocol.md[improves time synchronization] via a custom UDP protocol on a dedicated time-sync event loop.
+NetworkTables 4.2 link:time-sync-protocol.adoc[improves time synchronization] via a custom UDP protocol on a dedicated time-sync event loop.
 
 [[motivation4.1]]
 == Motivation for Version 4.1
@@ -103,7 +103,7 @@ link:time-sync-protocol.adoc[Time Sync Protocol] documentation describes require
 [[aliveness]]
 === Connection Aliveness Checking
 
-With a version 4.1 connection, both the client and the server should send periodic WebSockets PING messages and look for a PONG response within a reasonable period of time. On version 4.0 connections, or if this is not possible (e.g. the underlying WebSockets implementation does not have the ability to send PING messages), the client should use timestamp messages for aliveness testing. If no response is received after an appropriate amount of time, the client or server shall disconnect the WebSockets connection and try to re-establish a new connection.
+With a version 4.1 or later connection, both the client and the server should send periodic WebSockets PING messages and look for a PONG response within a reasonable period of time. On version 4.0 connections, or if this is not possible (e.g. the underlying WebSockets implementation does not have the ability to send PING messages), the client should use timestamp messages for aliveness testing. If no response is received after an appropriate amount of time, the client or server shall disconnect the WebSockets connection and try to re-establish a new connection.
 
 As the WebSockets protocol allows PONG responses to be sent in the middle of another message stream, WebSockets PING messages are preferred, as this allows for a shorter timeout period that is not dependent on the size of the transmitted messages. Sending a ping every 200 ms with a timeout of 1 second is recommended in this case.
 
@@ -349,7 +349,7 @@ Both clients and servers shall support unsecure connections (`ws:`) and may supp
 
 Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name does not need to be unique; multiple connections to the same name are allowed; the server shall ensure the name is unique (for the purposes of meta-topics) by appending a '@' and a unique number (if necessary).  To support this, the name provided by the client should not contain an embedded '@'.  Clients should provide a way to specify the resource name (in particular, the client name portion).
 
-Both clients and servers should support/use subprotocol `v4.1.networktables.first.wpi.edu` (for version 4.1) and `networktables.first.wpi.edu` (for version 4.0). Version 4.1 should be preferred, with version 4.0 as a fallback, using standard WebSockets subprotocol negotiation. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support a common subprotocol.
+Both clients and servers should support/use subprotocol `v4.2.networktables.first.wpi.edu` (for version 4.2), `v4.1.networktables.first.wpi.edu` (for version 4.1), and `networktables.first.wpi.edu` (for version 4.0). Version 4.2 should be preferred, with versions 4.1 and 4.0 as fallbacks, using standard WebSockets subprotocol negotiation. Implementations that cannot use UDP time synchronization shall not negotiate version 4.2. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support a common subprotocol.
 
 The unsecure standard server port number shall be 5810, the secure standard port number shall be 5811.
 
