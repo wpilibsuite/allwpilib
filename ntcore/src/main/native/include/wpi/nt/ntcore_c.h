@@ -1930,7 +1930,7 @@ struct NT_Meta_SubscriberOptions {
  */
 struct NT_Meta_TopicPublisher {
   struct WPI_String client;
-  uint64_t pubuid;
+  int64_t pubuid;
 };
 
 /**
@@ -1938,7 +1938,7 @@ struct NT_Meta_TopicPublisher {
  */
 struct NT_Meta_TopicSubscriber {
   struct WPI_String client;
-  uint64_t subuid;
+  int64_t subuid;
   struct NT_Meta_SubscriberOptions options;
 };
 
