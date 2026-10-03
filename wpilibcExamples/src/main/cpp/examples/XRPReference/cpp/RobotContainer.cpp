@@ -18,7 +18,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Also set default commands here
   drive.SetDefaultCommand(TeleopArcadeDrive(
       &drive, [this] { return -controller.GetRawAxis(1); },
-      [this] { return -controller.GetRawAxis(2); }));
+      [this] { return -controller.GetRawAxis(0); }));
 
   // Example of how to use the onboard IO
   userButton.OnTrue(wpi::cmd::Print("USER Button Pressed"))

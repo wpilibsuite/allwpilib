@@ -94,5 +94,5 @@ class RobotContainer:
         return ArcadeDrive(
             self.drivetrain,
             lambda: -self.controller.get_raw_axis(1),
-            lambda: -self.controller.get_raw_axis(2),
+            lambda: -self.controller.get_raw_axis(0),
         )
