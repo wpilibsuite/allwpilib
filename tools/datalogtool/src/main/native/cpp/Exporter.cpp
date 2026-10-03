@@ -661,15 +661,16 @@ void DisplayOutput(wpi::glass::Storage& storage) {
           "field.\n"
           "Zero merges only identical timestamps.");
     }
-    // Keep conversion to integer nanoseconds in range, including saved
-    // settings.
-    constexpr double MAX_TIMESTAMP_FUZZINESS_MS =
+    // Truncate to whole milliseconds so conversion back to nanoseconds stays
+    // within int64_t range, even after floating-point rounding.
+    constexpr int64_t MAX_TIMESTAMP_FUZZINESS_MS =
         std::numeric_limits<int64_t>::max() / 1'000'000;
     if (!std::isfinite(timestampFuzzinessMs)) {
       timestampFuzzinessMs = 0;
     }
     timestampFuzzinessMs =
-        std::clamp(timestampFuzzinessMs, 0.0, MAX_TIMESTAMP_FUZZINESS_MS);
+        std::clamp(timestampFuzzinessMs, 0.0,
+                   static_cast<double>(MAX_TIMESTAMP_FUZZINESS_MS));
 
     static std::future<void> exporter;
     if (!gInputFiles.empty() && !outputFolder.empty() &&
