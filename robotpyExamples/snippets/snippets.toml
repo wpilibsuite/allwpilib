@@ -13,6 +13,7 @@ base = [
   "MotorControl",
   "QuickVision",
   "SelectCommand",
+  "CoordinateSystem",
   "Solenoid",
 ]
 
