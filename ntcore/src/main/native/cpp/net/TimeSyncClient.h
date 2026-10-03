@@ -7,11 +7,11 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cmath>
 #include <cstdlib>
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <string>
 
 #include "net/TimeSyncStructs.h"
@@ -27,13 +27,20 @@ namespace wpi::tsp {
 template <size_t MaxBuffer>
 class TimeMedianFilter {
  public:
+  /**
+   * Adds a measurement and returns the window median, rounding half integers
+   * away from zero.
+   *
+   * @param measurement Time offset in microseconds.
+   * @return Filtered time offset in microseconds.
+   */
   int64_t Calculate(int64_t measurement) {
     m_buffer.push_back(measurement);
 
     size_t n = m_buffer.size();
     // N is never 0, but be defensive
     if (n == 0) {
-      return 0.0;
+      return 0;
     }
 
     // Is there no better way to copy out of m_buffer?
@@ -49,14 +56,20 @@ class TimeMedianFilter {
       // Odd number of total elements -- index directly in
       return m_sorted[mid];
     } else {
-      // Even -- average of left and right
-      return std::llround((m_sorted[mid - 1] + m_sorted[mid]) / 2.0);
+      // midpoint avoids overflow and rounds toward the lower value.
+      auto lower = m_sorted[mid - 1];
+      auto upper = m_sorted[mid];
+      auto median = std::midpoint(lower, upper);
+      if (median >= 0 && (lower % 2 == 0) != (upper % 2 == 0)) {
+        ++median;
+      }
+      return median;
     }
   }
 
  private:
   wpi::util::static_circular_buffer<int64_t, MaxBuffer> m_buffer;
-  std::array<double, MaxBuffer> m_sorted;
+  std::array<int64_t, MaxBuffer> m_sorted;
 };
 
 class TimeSyncClient {

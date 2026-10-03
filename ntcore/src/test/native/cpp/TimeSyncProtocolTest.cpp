@@ -5,6 +5,7 @@
 #include <net/TimeSyncClient.h>
 #include <net/TimeSyncServer.h>
 
+#include <limits>
 #include <print>
 #include <thread>
 
@@ -277,4 +278,24 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest AccumulatesMetadata",
   CHECK(client.GetMetadata().pongsReceived == 2u);
   CHECK(client.GetMetadata().lastPongTime == 140u);
   CHECK(callbacks == 2u);
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest FilterIntegerLimits",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  constexpr auto MAX = std::numeric_limits<int64_t>::max();
+  constexpr auto MIN = std::numeric_limits<int64_t>::min();
+  TimeMedianFilter<2> filter;
+  CHECK(filter.Calculate(MAX) == MAX);
+  CHECK(filter.Calculate(MAX) == MAX);
+  CHECK(filter.Calculate(MIN) == -1);
+  CHECK(filter.Calculate(MIN) == MIN);
+  CHECK(filter.Calculate(MIN + 1) == MIN);
+  CHECK(filter.Calculate(MAX) == 0);
+
+  constexpr int64_t LARGE = (int64_t{1} << 53) + 1;
+  TimeMedianFilter<2> precise;
+  CHECK(precise.Calculate(LARGE) == LARGE);
+  CHECK(precise.Calculate(LARGE + 2) == LARGE + 1);
+  CHECK(precise.Calculate(-LARGE - 3) == -1);
 }
