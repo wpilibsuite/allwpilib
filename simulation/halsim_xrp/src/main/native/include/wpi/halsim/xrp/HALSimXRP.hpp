@@ -4,49 +4,98 @@
 
 #pragma once
 
+#include <chrono>
+#include <cstdint>
+#include <deque>
 #include <functional>
+#include <future>
 #include <memory>
+#include <mutex>
 #include <span>
 #include <string>
+#include <string_view>
+#include <unordered_map>
 
-#include "wpi/halsim/ws_core/HALSimBaseWebSocketConnection.hpp"
-#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
-#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/XRP.hpp"
+#include "wpi/halsim/xrp/XRPConnectionStatus.hpp"
+#include "wpi/net/BluetoothLEPacketClient.hpp"
 #include "wpi/net/uv/Async.hpp"
 #include "wpi/net/uv/Buffer.hpp"
 #include "wpi/net/uv/Loop.hpp"
-#include "wpi/net/uv/Timer.hpp"
-#include "wpi/net/uv/Udp.hpp"
-
-namespace wpi::util {
-class json;
-}  // namespace wpi::util
 
 namespace wpilibxrp {
 
-// This masquerades as a "WebSocket" so that we can reuse the
-// stuff in halsim_ws_core
-class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
-                  public std::enable_shared_from_this<HALSimXRP> {
+using XRPBluetoothAddressType = wpi::net::BluetoothAddressType;
+
+class HALSimXRP : public std::enable_shared_from_this<HALSimXRP> {
  public:
   using LoopFunc = std::function<void()>;
   using UvExecFunc = wpi::net::uv::Async<LoopFunc>;
 
-  HALSimXRP(wpi::net::uv::Loop& loop, wpilibws::ProviderContainer& providers,
-            wpilibws::HALSimWSProviderSimDevices& simDevicesProvider);
+  /**
+   * Creates an XRP client that communicates directly with HAL simulation.
+   *
+   * @param loop event loop for Bluetooth communication and packet generation.
+   */
+  explicit HALSimXRP(wpi::net::uv::Loop& loop);
+  /** Cancels HAL simulation callbacks and outstanding device commands. */
+  ~HALSimXRP();
   HALSimXRP(const HALSimXRP&) = delete;
   HALSimXRP& operator=(const HALSimXRP&) = delete;
 
   bool Initialize();
+  /**
+   * Starts sending HAL outputs after each simulation periodic cycle and
+   * connects to the configured Bluetooth target, if available.
+   */
   void Start();
+  void ConnectBluetooth(std::string address, XRPBluetoothAddressType type,
+                        std::string name = {});
+  void DisconnectBluetooth();
+  /**
+   * Queues a device name packet in sequence with periodic control packets.
+   *
+   * @param deviceName full Bluetooth name or suffix to send to the firmware.
+   * @return Future indicating whether the firmware acknowledged saving the
+   *         name. The future resolves false if the packet cannot be sent, the
+   *         firmware rejects it, the acknowledgement times out, or the
+   *         connection closes before the acknowledgement arrives.
+   */
+  std::future<bool> RenameBluetoothDevice(std::string_view deviceName);
+  /**
+   * Requests a five-second flash of the connected XRP's onboard LED.
+   *
+   * @return Future indicating whether the firmware acknowledged the request.
+   *         Resolves false on rejection, timeout, disconnect, or send failure.
+   */
+  std::future<bool> Identify();
+  XRPConnectionStatus GetConnectionStatus() const;
+
+  /**
+   * Gets a snapshot of the latest XRP control and status data.
+   *
+   * @return Current XRP control and status data.
+   */
+  XRPDataSnapshot GetDataSnapshot() const;
+
+  /**
+   * Remembers the Bluetooth target without starting a connection.
+   *
+   * @param address platform-specific Bluetooth target address.
+   * @param type Bluetooth address type.
+   * @param name Bluetooth device display name.
+   */
+  void RememberBluetoothTarget(std::string address,
+                               XRPBluetoothAddressType type,
+                               std::string name = {});
 
   void ParsePacket(std::span<const uint8_t> packet);
-  void OnNetValueChanged(const wpi::util::json& msg);
-  void OnSimValueChanged(const wpi::util::json& simData) override;
 
-  const std::string& GetTargetHost() const { return m_host; }
-  int GetTargetPort() const { return m_port; }
+  const std::string& GetTargetAddress() const { return m_targetAddress; }
+  XRPBluetoothAddressType GetTargetAddressType() const {
+    return m_targetAddressType;
+  }
+  const std::string& GetTargetName() const { return m_targetName; }
   wpi::net::uv::Loop& GetLoop() { return m_loop; }
 
   UvExecFunc& GetExec() { return *m_exec; }
@@ -55,20 +104,41 @@ class HALSimXRP : public wpilibws::HALSimBaseWebSocketConnection,
   XRP m_xrp;
 
   wpi::net::uv::Loop& m_loop;
-  std::shared_ptr<wpi::net::uv::Udp> m_udp_client;
   std::shared_ptr<UvExecFunc> m_exec;
+  std::shared_ptr<wpi::net::BluetoothLEPacketClient> m_bluetoothClient;
 
-  wpilibws::ProviderContainer& m_providers;
-  wpilibws::HALSimWSProviderSimDevices& m_simDevicesProvider;
+  mutable std::mutex m_statusMutex;
+  XRPConnectionStatus m_status;
 
-  std::string m_host;
-  int m_port;
+  std::string m_targetAddress;
+  std::string m_targetName;
+  XRPBluetoothAddressType m_targetAddressType = XRPBluetoothAddressType::RANDOM;
 
+  int32_t m_simPeriodicAfterCallback = 0;
+
+  void RecordControlPacketSent(std::span<const uint8_t> packet);
+  void UpdateLatencyFromXRP(std::span<const uint8_t> packet);
+  void UpdateCommandAckFromXRP(std::span<const uint8_t> packet);
   void SendStateToXRP();
+  std::future<bool> QueueDeviceCommand(uint16_t fieldMask,
+                                       std::string_view deviceName = {});
+  void SendDeviceCommandOnLoop(uint16_t fieldMask, std::string_view deviceName,
+                               std::shared_ptr<std::promise<bool>> result);
+  void CheckPendingCommandTimeout();
+  void CompletePendingCommand(bool success);
+  void SendPacketToXRP(std::span<wpi::net::uv::Buffer> sendBufs);
+  void SetError(std::string_view error);
   wpi::net::uv::SimpleBufferPool<4>& GetBufferPool();
   std::mutex m_buffer_mutex;
-
-  struct sockaddr_in m_dest;
+  std::unordered_map<uint16_t, std::chrono::steady_clock::time_point>
+      m_controlPacketSendTimes;
+  std::deque<uint16_t> m_controlPacketSendOrder;
+  std::shared_ptr<std::promise<bool>> m_pendingCommandResult;
+  std::chrono::steady_clock::time_point m_pendingCommandDeadline;
+  uint16_t m_pendingCommandSeq = 0;
+  uint16_t m_pendingCommandFieldMask = 0;
+  uint16_t m_lastLatencyControlSeq = 0;
+  bool m_haveLastLatencyControlSeq = false;
 };
 
 }  // namespace wpilibxrp

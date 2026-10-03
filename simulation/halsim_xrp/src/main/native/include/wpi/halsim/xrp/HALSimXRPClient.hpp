@@ -6,8 +6,6 @@
 
 #include <memory>
 
-#include "wpi/halsim/ws_core/WSProviderContainer.hpp"
-#include "wpi/halsim/ws_core/WSProvider_SimDevice.hpp"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
 
@@ -21,8 +19,6 @@ class HALSimXRPClient {
 
   bool Initialize();
 
-  wpilibws::ProviderContainer providers;
-  wpilibws::HALSimWSProviderSimDevices simDevices{providers};
   wpi::net::EventLoopRunner runner;
   std::shared_ptr<HALSimXRP> simxrp;
 };
