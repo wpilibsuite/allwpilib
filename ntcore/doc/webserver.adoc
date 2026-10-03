@@ -1,0 +1,27 @@
+= NetworkTables Web Outline Viewer
+
+While an NT4 server is running, open `http://<server>:5810/` in a browser. If the server uses a custom NT4 port, use that port instead. The viewer is served directly by ntcore and requires no separate installation or internet access. It is available with servers started from C++, Java, or Python.
+
+The viewer displays published topics in an expandable hierarchy, with their types and current values. Tables start collapsed and remember which paths you expand during live updates. Filter by any part of a topic's path; matching paths expand automatically. Topic additions, removals, and value changes appear live. The connection status is shown at the top, and the viewer reconnects automatically after losing its connection. Values are cleared while disconnected.
+
+The viewer only subscribes; it does not publish values or change properties. It uses the existing NT4 WebSocket endpoint on the same host and port. The empty prefix subscription excludes internal `$` metatopics. Struct values use the schemas published at `/.schema/struct:<name>` to decode their fields, including nested structs, arrays, enums, and bitfields. Select a struct's value to expand it; struct internals are collapsed by default, and expanded values stay open during live updates. `structschema` values are displayed as UTF-8 strings.
+
+Other raw values are displayed as hexadecimal bytes. Struct values also fall back to bytes with an explanation when a schema is missing or invalid, or the payload has the wrong size. Decoding resumes when a valid schema or value arrives. Long strings, arrays, raw values, and structs with many fields are abbreviated with an ellipsis to keep the display manageable.
+
+== Development
+
+The page, styles, and JavaScript are embedded in `src/main/native/cpp/WebServerPage.hpp`, so all native build systems include the viewer without an asset generation step. The JavaScript uses browser APIs and has no package dependencies.
+
+From the repository root, run the decoder, formatting, and hierarchy tests with:
+
+[source,sh]
+----
+node --test ntcore/src/test/js/WebServerPageTest.js
+----
+
+HTTP serving is also covered by the native and RobotPy tests:
+
+[source,sh]
+----
+bazel test //ntcore:ntcore-cpp-test //ntcore:python_tests
+----
