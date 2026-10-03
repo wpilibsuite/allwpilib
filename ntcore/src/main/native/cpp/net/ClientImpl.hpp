@@ -49,7 +49,7 @@ class ClientImpl final : private ServerMessageHandler {
       std::function<void(uint32_t repeatMs)> setPeriodic);
 
   /** Stops time-sync callbacks before destroying client state. */
-  ~ClientImpl();
+  ~ClientImpl() override;
 
   void ProcessIncomingText(std::string_view data);
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
