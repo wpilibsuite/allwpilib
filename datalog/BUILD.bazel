@@ -1,7 +1,9 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
+load("//datalog:generate.bzl", "generate_datalog")
 load("//datalog:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//datalog:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilog_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
@@ -10,6 +12,41 @@ load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+
+py_binary(
+    name = "generate_datalog_entries",
+    srcs = ["generate_datalog_entries.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [requirement("jinja2")],
+)
+
+filegroup(
+    name = "templates",
+    srcs = glob(["src/generate/**"]),
+)
+
+generate_datalog(
+    name = "generate_datalog",
+)
+
+write_source_files(
+    name = "write_datalog",
+    diff_args = ["-u"],
+    files = {
+        "src/generated": ":generate_datalog",
+    },
+    suggested_update_target = "//:write_all",
+    tags = ["pregeneration"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+)
 
 wpilib_cc_library(
     name = "datalog",
@@ -72,7 +109,7 @@ wpilib_cc_shared_library(
 
 wpilib_jni_java_library(
     name = "datalog-java",
-    srcs = glob(["src/main/java/**/*.java"]),
+    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
     maven_artifact_name = "datalog-java",
     maven_group_id = "org.wpilib.datalog",
     native_libs = [":shared/datalogjni"],
