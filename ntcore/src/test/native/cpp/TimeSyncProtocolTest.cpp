@@ -143,7 +143,7 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest CalculateBoth",
   int64_t offset{-234};
   int64_t network_latency{23};
 
-  uint64_t ping_client_time{100};
+  uint64_t ping_client_time{1000};
   uint64_t pong_server_time{ping_client_time + offset + network_latency};
   uint64_t pong_client_time{ping_client_time + 2 * network_latency};
 
@@ -298,4 +298,24 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest FilterIntegerLimits",
   CHECK(precise.Calculate(LARGE) == LARGE);
   CHECK(precise.Calculate(LARGE + 2) == LARGE + 1);
   CHECK(precise.Calculate(-LARGE - 3) == -1);
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest RejectInvalidTimestamps",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  using namespace std::chrono_literals;
+  size_t callbacks = 0;
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 1h,
+                        [&](auto) { ++callbacks; }};
+  TspPing ping{1, 1, 100};
+  TspPong pong{ping, 110};
+  client.UpdateStatistics(99, ping, pong);
+  client.UpdateStatistics(UINT64_MAX, ping, pong);
+  client.UpdateStatistics(120, ping, TspPong{ping, UINT64_MAX});
+  CHECK(callbacks == 0u);
+  CHECK(client.GetMetadata().pongsReceived == 0u);
+  client.UpdateStatistics(120, ping, pong);
+  CHECK(callbacks == 1u);
+  CHECK(client.GetMetadata().offset == 0);
+  CHECK(client.GetMetadata().rtt2 == 20);
 }

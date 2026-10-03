@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <limits>
 #include <mutex>
 
 #include <wpi/net/uv/util.hpp>
@@ -19,12 +20,18 @@ using namespace wpi::net;
 void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
                                                 wpi::tsp::TspPing ping,
                                                 wpi::tsp::TspPong pong) {
-  // when time = send_time+rtt2/2, server time = server time
-  // server time = local time + offset
-  // offset = (server time - local time) = (server time) - (send_time +
-  // rtt2/2)
+  constexpr auto MAX_TIME =
+      static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  if (pong_local_time < ping.client_time || pong_local_time > MAX_TIME ||
+      ping.client_time > MAX_TIME || pong.server_time > MAX_TIME) {
+    WPI_WARNING(m_logger, "Invalid TSP timestamp values");
+    return;
+  }
   auto rtt2 = pong_local_time - ping.client_time;
-  int64_t serverTimeOffsetUs = pong.server_time - rtt2 / 2 - ping.client_time;
+  // Compute the offset with checked timestamp ranges, without unsigned wrap.
+  auto midpoint = static_cast<int64_t>(ping.client_time + rtt2 / 2);
+  int64_t serverTimeOffsetUs =
+      static_cast<int64_t>(pong.server_time) - midpoint;
 
   auto filtered = m_lastOffsets.Calculate(serverTimeOffsetUs);
 

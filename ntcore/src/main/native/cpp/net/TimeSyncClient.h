@@ -91,7 +91,14 @@ class TimeSyncClient {
   int64_t GetOffset();
   Metadata GetMetadata();
 
-  // public for testability. Called from our EventLoopRunner's context
+  /**
+   * Updates the estimate from a ping/pong pair. Invalid timestamp ranges are
+   * ignored. Must be called on the client's UDP loop, or while it is idle.
+   *
+   * @param pong_local_time Local receive time in microseconds.
+   * @param ping Sent ping.
+   * @param pong Received pong.
+   */
   void UpdateStatistics(uint64_t pong_local_time, wpi::tsp::TspPing ping,
                         wpi::tsp::TspPong pong);
 
