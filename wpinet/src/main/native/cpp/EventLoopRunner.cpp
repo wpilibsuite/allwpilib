@@ -67,19 +67,26 @@ void EventLoopRunner::Stop() {
 }
 
 void EventLoopRunner::ExecAsync(LoopFunc func) {
+  std::shared_ptr<Thread::UvExecFunc> doExec;
   if (auto thr = m_owner.GetThread()) {
-    if (auto doExec = thr->m_doExec.lock()) {
-      doExec->Call(std::move(func));
-    }
+    doExec = thr->m_doExec.lock();
+  }
+  // Release the thread lock before taking the async queue lock; callbacks can
+  // take the thread lock through GetLoop().
+  if (doExec) {
+    doExec->Call(std::move(func));
   }
 }
 
 void EventLoopRunner::ExecSync(LoopFunc func) {
-  wpi::util::future<void> f;
+  std::shared_ptr<Thread::UvExecFunc> doExec;
   if (auto thr = m_owner.GetThread()) {
-    if (auto doExec = thr->m_doExec.lock()) {
-      f = doExec->Call(std::move(func));
-    }
+    doExec = thr->m_doExec.lock();
+  }
+  // As in ExecAsync(), don't hold the thread lock while dispatching.
+  wpi::util::future<void> f;
+  if (doExec) {
+    f = doExec->Call(std::move(func));
   }
   if (f.valid()) {
     f.wait();
