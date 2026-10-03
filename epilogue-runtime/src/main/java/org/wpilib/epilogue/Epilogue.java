@@ -133,7 +133,7 @@ public final class Epilogue {
    *      Epilogue.bind(this);
    *   }
    * }
-   * "}
+   * }
    *
    * @param <R> the timed robot type
    * @param robot the timed robot instance to bind
