@@ -70,4 +70,24 @@ class TimeSyncTest {
     offset = m_inst.getServerTimeOffset();
     assertFalse(offset.isPresent());
   }
+
+  @Test
+  void testServerClientProtocolVersion() throws InterruptedException {
+    try (var client = NetworkTableInstance.create()) {
+      m_inst.startServer("", "127.0.0.1", "", 10032);
+      client.setServer("127.0.0.1", 10032);
+      client.startClient("timesync-test");
+      for (int i = 0;
+          i < 100 && (m_inst.getConnections().length == 0 || !client.isConnected());
+          i++) {
+        Thread.sleep(50);
+      }
+      var serverConnections = m_inst.getConnections();
+      var clientConnections = client.getConnections();
+      assertEquals(1, serverConnections.length);
+      assertEquals(1, clientConnections.length);
+      assertEquals(0x0402, serverConnections[0].protocolVersion);
+      assertEquals(0x0402, clientConnections[0].protocolVersion);
+    }
+  }
 }

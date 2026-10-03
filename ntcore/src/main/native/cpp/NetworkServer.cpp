@@ -189,8 +189,7 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
 
   m_websocket->open.connect([this, name = std::string{name}](
                                 std::string_view protocol) {
-    m_info.protocol_version =
-        protocol == "v4.1.networktables.first.wpi.edu" ? NT_4_1 : NT_4_0;
+    m_info.protocol_version = ProtocolStringToVersion(protocol);
     m_wire = std::make_shared<net::WebSocketConnection>(
         *m_websocket, m_info.protocol_version, m_logger);
 
