@@ -12,6 +12,8 @@ import org.wpilib.framework.TimedRobot;
  * implementations are automatically generated at compile-time: every class that extends {@code
  * RobotBase} gets its own service class. These are queried by {@link Epilogue#update(RobotBase)}
  * and {@link Epilogue#bind(TimedRobot)}.
+ *
+ * @param <R> The specific type of {@link RobotBase} that this service supports.
  */
 public interface EpilogueService<R extends RobotBase> {
   /**
@@ -37,6 +39,11 @@ public interface EpilogueService<R extends RobotBase> {
    * @param <R> The specific type of {@link TimedRobot} that this service supports.
    */
   interface Bindable<R extends TimedRobot> extends EpilogueService<R> {
+    /**
+     * Binds a periodic update to a root timed robot instance.
+     *
+     * @param root the root timed robot instance
+     */
     void bind(R root);
   }
 }
