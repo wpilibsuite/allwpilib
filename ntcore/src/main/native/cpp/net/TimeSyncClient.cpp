@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <limits>
 #include <mutex>
+#include <utility>
 
 #include <wpi/net/uv/util.hpp>
 
@@ -129,7 +130,7 @@ wpi::tsp::TimeSyncClient::TimeSyncClient(wpi::util::Logger& logger,
       m_serverIP{server},
       m_serverPort{remote_port},
       m_loopDelay(ping_delay),
-      m_callback(callback) {
+      m_callback(std::move(callback)) {
   m_loopRunner.ExecSync([this](uv::Loop& loop) {
     struct sockaddr_in serverAddr;
     uv::NameToAddr(m_serverIP, m_serverPort, &serverAddr);
