@@ -60,7 +60,6 @@ public final class Epilogue {
    * Checks if data associated with a given importance level should be logged.
    *
    * @param importance the importance level to check
-   *
    * @return true if the importance level is at or above the configured minimum
    * @see EpilogueConfiguration#minimumImportance
    * @see #configure(Consumer)
