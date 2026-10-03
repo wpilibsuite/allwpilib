@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "../MockAssertions.hpp"
 #include "../MockLogger.hpp"
@@ -159,12 +160,12 @@ static std::vector<uint8_t> EncodeServerBinary1(const T& msg) {
   wpi::util::raw_uvector_ostream os{data};
   if constexpr (std::same_as<T, net::ServerMessage>) {
     if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
-      net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
+      net::WireEncodeBinary(os, m->topic, m->value.time(), m->value, NT_4_1);
     }
   } else if constexpr (std::same_as<T, net::ClientMessage>) {
     if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
       net::WireEncodeBinary(os, Handle{m->pubHandle}.GetIndex(),
-                            m->value.time(), m->value);
+                            m->value.time(), m->value, NT_4_1);
     }
   }
   return data;
@@ -177,12 +178,12 @@ static std::vector<uint8_t> EncodeServerBinary(const T& msgs) {
   for (auto&& msg : msgs) {
     if constexpr (std::same_as<typename T::value_type, net::ServerMessage>) {
       if (auto m = std::get_if<net::ServerValueMsg>(&msg.contents)) {
-        net::WireEncodeBinary(os, m->topic, m->value.time(), m->value);
+        net::WireEncodeBinary(os, m->topic, m->value.time(), m->value, NT_4_1);
       }
     } else if constexpr (std::same_as<typename T::value_type,
                                       net::ClientMessage>) {
       if (auto m = std::get_if<net::ClientValueMsg>(&msg.contents)) {
-        net::WireEncodeBinary(os, m->pubuid, m->value.time(), m->value);
+        net::WireEncodeBinary(os, m->pubuid, m->value.time(), m->value, NT_4_1);
       }
     }
   }
@@ -194,7 +195,7 @@ static std::pair<int, Value> DecodeServerBinary1(
   int id = 0;
   Value value;
   std::string error;
-  bool decoded = net::WireDecodeBinary(&data, &id, &value, &error, 0);
+  bool decoded = net::WireDecodeBinary(&data, &id, &value, &error, 0, NT_4_1);
   UNSCOPED_INFO(error);
   REQUIRE(decoded);
   REQUIRE(data.empty());
@@ -908,6 +909,42 @@ TEST_CASE_METHOD(ServerImplTest,
   logger.CheckMessage(NT_LOG_WARNING,
                       "client 1 publish of reserved topic '$clients' ignored");
   CHECK(wire.writeTextCalls.empty());
+}
+
+TEST_CASE_METHOD(ServerImplTest,
+                 "Server relays timestamps between protocol versions",
+                 "[ntcore][server]") {
+  auto pubVersion = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  auto subVersion = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  CAPTURE(pubVersion, subVersion);
+  net::MockWireConnection pubWire;
+  net::MockWireConnection subWire;
+  pubWire.version = pubVersion;
+  subWire.version = subVersion;
+  auto [pubName, pubId] =
+      server.AddClient("pub", "pub", false, pubWire, [](uint32_t) {});
+  auto [subName, subId] =
+      server.AddClient("sub", "sub", false, subWire, [](uint32_t) {});
+  ProcessPublish(server, pubId, 1, "topic");
+  ProcessSubscribe(server, subId, 1, {"topic"}, PubSubOptions{});
+  DrainAndClear(server, subWire, 5);
+
+  std::vector<uint8_t> encoded;
+  wpi::util::raw_uvector_ostream os{encoded};
+  net::WireEncodeBinary(os, 1, 123'456'789, Value::MakeDouble(7), pubVersion);
+  server.ProcessIncomingBinary(pubId, encoded);
+  server.SendAllOutgoing(10, true);
+
+  REQUIRE(subWire.writeBinaryCalls.size() == 1u);
+  std::span<const uint8_t> data{subWire.writeBinaryCalls[0]};
+  int id;
+  Value value;
+  std::string error;
+  REQUIRE(net::WireDecodeBinary(&data, &id, &value, &error, 0, subVersion));
+  CHECK(value.GetDouble() == 7);
+  CHECK(value.server_time() == (pubVersion == NT_4_2 && subVersion == NT_4_2
+                                    ? 123'456'789
+                                    : 123'456'000));
 }
 
 }  // namespace wpi::nt

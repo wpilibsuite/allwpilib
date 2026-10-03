@@ -201,7 +201,8 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
           int pubuid;
           Value value;
           std::string error;
-          if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
+          if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0,
+                                     m_wire->GetVersion())) {
             m_wire->Disconnect(std::format("binary decode error: {}", error));
             break;
           }
@@ -209,7 +210,8 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
           // respond to RTT ping
           if (pubuid == -1) {
             m_wire->SendBinary([&](auto& os) {
-              net::WireEncodeBinary(os, -1, wpi::util::Now(), value);
+              net::WireEncodeBinary(os, -1, wpi::util::Now(), value,
+                                    m_wire->GetVersion());
             });
           }
         }

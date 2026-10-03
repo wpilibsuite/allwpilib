@@ -61,7 +61,8 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     int pubuid;
     Value value;
     std::string error;
-    if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0)) {
+    if (!net::WireDecodeBinary(&data, &pubuid, &value, &error, 0,
+                               m_wire.GetVersion())) {
       m_wire.Disconnect(std::format("binary decode error: {}", error));
       break;
     }
@@ -70,8 +71,9 @@ bool ServerClient4::ProcessIncomingBinary(std::span<const uint8_t> data) {
     if (pubuid == -1) {
       auto now = wpi::util::Now();
       DEBUG4("RTT ping from {}, responding with time={}", m_id, now);
-      m_wire.SendBinary(
-          [&](auto& os) { net::WireEncodeBinary(os, -1, now, value); });
+      m_wire.SendBinary([&](auto& os) {
+        net::WireEncodeBinary(os, -1, now, value, m_wire.GetVersion());
+      });
       continue;
     }
 

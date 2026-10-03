@@ -11,7 +11,7 @@ A pub/sub WebSockets protocol based on NetworkTables concepts.
 
 == Motivation for Version 4.2
 
-NetworkTables 4.2 link:time-sync-protocol.adoc[improves time synchronization] via a custom UDP protocol on a dedicated time-sync event loop.
+NetworkTables 4.2 link:time-sync-protocol.adoc[improves time synchronization] via a custom UDP protocol on a dedicated time-sync event loop. Version 4.2 also uses nanoseconds for MessagePack timestamps to preserve the precision of the synchronized clocks. Versions 4.0 and 4.1 retain microsecond wire timestamps for compatibility.
 
 [[motivation4.1]]
 == Motivation for Version 4.1
@@ -80,7 +80,7 @@ Topic have UTF-8 string names.  Names starting with `$` are reserved for use by 
 [[timestamps]]
 === Timestamps
 
-All MessagePack messages are timestamped.  Timestamps are specified in unsigned integer microseconds--for robot programs, microseconds are preferred as the FPGA provides time in microseconds, and integers result in a more compact wire encoding (in typical robot use, integer microseconds timestamps will be half the size of double timestamps until about T=70 minutes, and in the worst case will be no larger).
+All MessagePack messages are timestamped. Timestamps use integer nanoseconds on version 4.2 connections and integer microseconds on version 4.0 and 4.1 connections. The units are determined by the negotiated WebSockets subprotocol for each connection, in both directions. A server relaying values between protocol versions shall convert timestamps to the receiving connection's units; converting nanoseconds to microseconds discards sub-microsecond precision. The special timestamp value of zero retains its existing meaning in every version.
 
 Timestamps in messages always use the server time base.  The server time base is synchronized across the network by the means described in this section (an implementation of <<cristians-algorithm, Cristian's algorithm>>).
 
@@ -98,7 +98,7 @@ When the client receives an -1 ID message from the server, it shall compute the 
 
 ==== Time Synchronization, clients >= 4.2
 
-link:time-sync-protocol.adoc[Time Sync Protocol] documentation describes requirements for clients and servers. TSP uses nanosecond timestamps; MessagePack value timestamps continue to use microseconds.
+link:time-sync-protocol.adoc[Time Sync Protocol] documentation describes requirements for clients and servers. Both TSP and MessagePack value timestamps use nanoseconds on version 4.2 connections.
 
 [[aliveness]]
 === Connection Aliveness Checking
@@ -799,7 +799,7 @@ Each MessagePack message shall be a MessagePack array with 4 elements.  Implemen
 Messages shall consist of (in this order):
 
 * Topic/Publisher ID: unsigned integer, or -1 (RTT measurement)
-* Timestamp: integer microseconds
+* Timestamp: integer nanoseconds for version 4.2; integer microseconds for versions 4.0 and 4.1
 * Data type: unsigned integer
 * Data value (see below)
 
@@ -809,17 +809,19 @@ Publisher IDs are used for client to server messages.  Publisher IDs shall be as
 
 Implementations must ignore messages with data values they cannot decode (either by ignoring the message or by terminating the connection), and shall send messages with data values consistent with the above table.
 
-An example double value update would be 17 bytes:
+An example double value update in version 4.2 would be 21 bytes:
 
 `94` (array with 4 elements)
 
 `32` (topic/publisher ID=50)
 
-`D2 07 27 0E 00` (timestamp of exactly 2 minutes in integer microseconds)
+`D3 00 00 00 1B F0 8E B0 00` (timestamp of exactly 2 minutes in integer nanoseconds)
 
 `01` (data type: double-precision float)
 
 `CB 3F BF 97 24 74 53 8E F3` (double value of 0.1234)
+
+In versions 4.0 and 4.1, the timestamp in this example is `D2 07 27 0E 00` (120,000,000 microseconds), making the message 17 bytes.
 
 For comparison, a double value update in NT 3.0 is 14 bytes (and does not contain a timestamp).
 
@@ -875,7 +877,7 @@ This was considered, but rejected for two reasons: encoding overhead and spec/im
 [[trade-timestamp]]
 === Timestamp format
 
-The spec uses integer microseconds.  This seems to be a reasonable enough resolution for FIRST use and is common with the unix clock resolution.
+Versions 4.0 and 4.1 use integer microseconds for compact encoding. Version 4.2 uses integer nanoseconds to preserve timestamp precision through time synchronization and value transport.
 
 [[unresolved-questions]]
 == Unresolved Questions

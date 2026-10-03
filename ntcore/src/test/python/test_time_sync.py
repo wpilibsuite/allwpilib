@@ -5,7 +5,7 @@ import time
 from ntcore import NetworkTableInstance, _now
 
 
-def test_server_client_protocol_version(tmp_path):
+def test_server_client_protocol_version_and_value_timestamps(tmp_path):
     server = NetworkTableInstance.create()
     client = NetworkTableInstance.create()
     try:
@@ -27,6 +27,16 @@ def test_server_client_protocol_version(tmp_path):
         while client.get_server_time_offset() is None and time.monotonic() < deadline:
             time.sleep(0.05)
         assert client.get_server_time_offset() is not None
+        publisher = server.get_integer_topic("timestamp-test").publish()
+        subscriber = client.get_integer_topic("timestamp-test").subscribe(0)
+        publisher.set(7, 123_456_789)
+        server.flush()
+        deadline = time.monotonic() + 5
+        while subscriber.get_atomic().time == 0 and time.monotonic() < deadline:
+            time.sleep(0.05)
+        value = subscriber.get_atomic()
+        assert value.value == 7
+        assert value.server_time == 123_456_789
     finally:
         NetworkTableInstance.destroy(client)
         NetworkTableInstance.destroy(server)

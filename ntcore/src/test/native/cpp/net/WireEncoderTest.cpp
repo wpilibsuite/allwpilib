@@ -8,19 +8,23 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <limits>
 #include <span>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "../TestPrinters.hpp"
 #include "Handle.hpp"
+#include "ProtocolVersions.hpp"
 #include "PubSubOptions.hpp"
 #include "net/Message.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/mpack.h"
 #include "wpi/util/raw_ostream.hpp"
 
 using namespace std::string_view_literals;
@@ -274,57 +278,58 @@ TEST_CASE_METHOD(WireEncoderTextTest, "WireEncoderTextTest ServerMessageValue",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Boolean",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeBoolean(true));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeBoolean(true), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x00\xc3"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Integer",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeInteger(7));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeInteger(7), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x02\x07"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Float",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloat(2.5));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloat(2.5), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x03\xca\x40\x20\x00\x00"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Double",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeDouble(2.5));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeDouble(2.5), NT_4_1);
   REQUIRE(SpanEquals(
       out, "\x94\x05\x06\x01\xcb\x40\x04\x00\x00\x00\x00\x00\x00"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest String",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeString("hello"));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeString("hello"), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x04\xa5hello"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest Raw",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeRaw("hello"_us));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeRaw("hello"_us), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x05\xc4\x05hello"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest BooleanArray",
                  "[ntcore][wire][encoder]") {
   net::WireEncodeBinary(os, 5, 6000,
-                        Value::MakeBooleanArray({true, false, true}));
+                        Value::MakeBooleanArray({true, false, true}), NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x10\x93\xc3\xc2\xc3"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest IntegerArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeIntegerArray({1, 2, 4}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeIntegerArray({1, 2, 4}),
+                        NT_4_1);
   REQUIRE(SpanEquals(out, "\x94\x05\x06\x12\x93\x01\x02\x04"_us));
 }
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest FloatArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloatArray({1, 2, 3}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeFloatArray({1, 2, 3}), NT_4_1);
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x13\x93"
                      "\xca\x3f\x80\x00\x00"
@@ -334,7 +339,7 @@ TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest FloatArray",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest DoubleArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeDoubleArray({1, 2, 3}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeDoubleArray({1, 2, 3}), NT_4_1);
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x11\x93"
                      "\xcb\x3f\xf0\x00\x00\x00\x00\x00\x00"
@@ -344,10 +349,40 @@ TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest DoubleArray",
 
 TEST_CASE_METHOD(WireEncoderBinaryTest, "WireEncoderBinaryTest StringArray",
                  "[ntcore][wire][encoder]") {
-  net::WireEncodeBinary(os, 5, 6000, Value::MakeStringArray({"hello", "bye"}));
+  net::WireEncodeBinary(os, 5, 6000, Value::MakeStringArray({"hello", "bye"}),
+                        NT_4_1);
   REQUIRE(SpanEquals(out,
                      "\x94\x05\x06\x14\x92\xa5hello\xa3"
                      "bye"_us));
+}
+
+TEST_CASE_METHOD(WireEncoderBinaryTest, "Wire timestamps use negotiated units",
+                 "[ntcore][wire][encoder]") {
+  auto version = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  auto [time, legacyTime] = GENERATE(Catch::Generators::table<int64_t, int64_t>(
+      {{0, 0},
+       {1, 1},
+       {-1, -1},
+       {999, 1},
+       {-999, -1},
+       {6001, 6},
+       {-6001, -6},
+       {9'007'199'254'740'993, 9'007'199'254'740},
+       {std::numeric_limits<int64_t>::max(), 9'223'372'036'854'775},
+       {std::numeric_limits<int64_t>::min(), -9'223'372'036'854'775}}));
+  CAPTURE(version, time);
+  REQUIRE(net::WireEncodeBinary(os, 5, time, Value::MakeInteger(7), version));
+  mpack::mpack_reader_t reader;
+  mpack::mpack_reader_init_data(
+      &reader, reinterpret_cast<const char*>(out.data()), out.size());
+  mpack::mpack_expect_array_match(&reader, 4);
+  CHECK(mpack::mpack_expect_int(&reader) == 5);
+  CHECK(mpack::mpack_expect_i64(&reader) ==
+        (version == NT_4_2 ? time : legacyTime));
+  CHECK(mpack::mpack_expect_int(&reader) == 2);
+  CHECK(mpack::mpack_expect_int(&reader) == 7);
+  mpack::mpack_done_array(&reader);
+  CHECK(mpack::mpack_reader_destroy(&reader) == mpack::mpack_ok);
 }
 
 }  // namespace wpi::nt

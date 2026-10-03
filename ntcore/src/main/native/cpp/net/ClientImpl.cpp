@@ -65,7 +65,7 @@ ClientImpl::ClientImpl(
     auto now = wpi::util::Now();
     DEBUG4("Sending initial RTT ping {}", now);
     m_wire.SendBinary([&](auto& os) {
-      WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
+      WireEncodeBinary(os, -1, 0, Value::MakeInteger(now), m_wire.GetVersion());
     });
   }
 
@@ -89,7 +89,8 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
       ERR("time offset is out of range");
       break;
     }
-    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset)) {
+    if (!WireDecodeBinary(&data, &id, &value, &error, localTimeOffset,
+                          m_wire.GetVersion())) {
       ERR("binary decode error: {}", error);
       break;  // FIXME
     }
@@ -185,7 +186,8 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
       auto now = wpi::util::Now();
       DEBUG4("Sending RTT ping {}", now);
       m_wire.SendBinary([&](auto& os) {
-        WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
+        WireEncodeBinary(os, -1, 0, Value::MakeInteger(now),
+                         m_wire.GetVersion());
       });
       // drift isn't critical here, so just go from current time
       m_nextPingTimeMs = curTimeMs + RTT_INTERVAL_MS;

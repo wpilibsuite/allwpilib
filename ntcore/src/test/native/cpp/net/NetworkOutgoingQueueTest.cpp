@@ -18,9 +18,12 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "../MockLogger.hpp"
 #include "../TimeSyncTestPeer.hpp"
+#include "MockMessageHandler.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/ClientImpl.hpp"
 #include "net/Message.hpp"
 #include "net/WireConnection.hpp"
@@ -117,7 +120,8 @@ std::pair<int, Value> DecodeBinary(std::span<const uint8_t> data,
   int id = 0;
   Value value;
   std::string error;
-  bool decoded = WireDecodeBinary(&data, &id, &value, &error, localTimeOffset);
+  bool decoded =
+      WireDecodeBinary(&data, &id, &value, &error, localTimeOffset, NT_4_1);
   UNSCOPED_INFO(error);
   CHECK(decoded);
   CHECK(data.empty());
@@ -155,7 +159,8 @@ TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
   std::vector<uint8_t> encoded;
   wpi::util::raw_uvector_ostream os{encoded};
   WireEncodeBinary(os, -1, 1,
-                   Value::MakeInteger(std::numeric_limits<int64_t>::min()));
+                   Value::MakeInteger(std::numeric_limits<int64_t>::min()),
+                   NT_4_1);
 
   client.ProcessIncomingBinary(0, encoded);
 
@@ -687,4 +692,63 @@ TEST_CASE("ClientImpl reports half the UDP round-trip time in nanoseconds",
   // Preserve the sub-microsecond part of the server's nanosecond timestamp.
   CHECK(offset + rtt2 == 1'000'000'123);
 }
+
+TEST_CASE("Outgoing values use each connection's timestamp units",
+          "[ntcore][network-outgoing-queue]") {
+  auto version = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  auto mode =
+      GENERATE(ValueSendMode::NORMAL, ValueSendMode::ALL, ValueSendMode::IMM);
+  auto check = [&]<typename Message>() {
+    RecordingWireConnection wire;
+    wire.version = version;
+    NetworkOutgoingQueue<Message> queue{wire, false};
+    queue.SetTimeOffset(123);
+    queue.SendValue(3, Value::MakeInteger(7, 6001), mode);
+    queue.SendOutgoing(5, true);
+    auto& writes =
+        mode == ValueSendMode::IMM ? wire.binarySends : wire.binaryWrites;
+    REQUIRE(writes.size() == 1u);
+    // Decode as 4.2 to inspect the raw wire integer without scaling.
+    int id;
+    Value value;
+    std::string error;
+    std::span<const uint8_t> data{writes[0]};
+    REQUIRE(WireDecodeBinary(&data, &id, &value, &error, 0, NT_4_2));
+    auto expected = std::same_as<Message, ClientMessage> ? 6124 : 6001;
+    CHECK(value.server_time() == (version == NT_4_2 ? expected : 6));
+  };
+  check.template operator()<ClientMessage>();
+  check.template operator()<ServerMessage>();
+}
+
+TEST_CASE("Client receives values using negotiated timestamp units",
+          "[ntcore][client]") {
+  auto version = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = version;
+  wpi::util::Logger logger;
+  MockServerMessageHandler local;
+  wpi::net::EventLoopRunner loop;
+  loop.ExecSync([&](auto&) {
+    ClientImpl client{0,
+                      loop,
+                      wire,
+                      ConnectionInfo{"", "127.0.0.1", peer.GetPort()},
+                      false,
+                      logger,
+                      [](int64_t, int64_t, bool) {},
+                      [](uint32_t) {}};
+    client.SetLocal(&local);
+    client.ProcessIncomingText(
+        R"([{"method":"announce","params":{"name":"topic","id":1,"type":"int","properties":{}}}])");
+    // Raw MessagePack: [1, 6, 2, 7].
+    constexpr uint8_t DATA[] = {0x94, 1, 6, 2, 7};
+    client.ProcessIncomingBinary(0, DATA);
+  });
+  REQUIRE(local.setValueCalls.size() == 1u);
+  CHECK(local.setValueCalls[0].value.server_time() ==
+        (version == NT_4_2 ? 6 : 6000));
+}
+
 }  // namespace wpi::nt::net

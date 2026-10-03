@@ -324,7 +324,7 @@ class NetworkOutgoingQueue {
         }
       }
     }
-    WireEncodeBinary(os, id, time, value);
+    WireEncodeBinary(os, id, time, value, m_wire.GetVersion());
   }
 
   struct Message {

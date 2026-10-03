@@ -78,7 +78,7 @@ class TimeSyncTest {
   }
 
   @Test
-  void testServerClientProtocolVersion() throws InterruptedException {
+  void testServerClientProtocolVersionAndValueTimestamps() throws InterruptedException {
     try (var client = NetworkTableInstance.create()) {
       m_inst.startServer("", " 127.0.0.1 ", "", 10032);
       client.setServer("127.0.0.1", 10032);
@@ -98,6 +98,17 @@ class TimeSyncTest {
         Thread.sleep(50);
       }
       assertTrue(client.getServerTimeOffset().isPresent());
+      try (var publisher = m_inst.getIntegerTopic("timestamp-test").publish();
+          var subscriber = client.getIntegerTopic("timestamp-test").subscribe(0)) {
+        publisher.set(7, 123_456_789);
+        m_inst.flush();
+        for (int i = 0; i < 100 && subscriber.getAtomic().timestamp == 0; i++) {
+          Thread.sleep(50);
+        }
+        var value = subscriber.getAtomic();
+        assertEquals(7, value.value);
+        assertEquals(123_456_789, value.serverTime);
+      }
     }
   }
 
