@@ -71,7 +71,6 @@ wpilib_cc_library(
             "//shared/bazel/thirdparty/mrclib",
         ],
         "//conditions:default": [
-            "//ntcore:ntcore_c_headers",
         ],
     }),
 )
