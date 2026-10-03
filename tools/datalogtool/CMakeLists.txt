@@ -6,6 +6,29 @@ include(GenResources)
 include(LinkMacOSGUI)
 
 configure_file(src/main/generate/WPILibVersion.cpp.in WPILibVersion.cpp)
+set(datalogtool_cli_src
+    src/main/native/cli/Cli.cpp
+    src/main/native/cpp/CsvExport.cpp
+    src/main/native/cpp/Sftp.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp
+)
+
+add_executable(datalogtool-cli src/main/native/cli/main.cpp ${datalogtool_cli_src})
+target_include_directories(datalogtool-cli PRIVATE src/main/native/cpp)
+target_link_libraries(datalogtool-cli ssh datalog wpiutil)
+wpilib_target_warnings(datalogtool-cli)
+
+if(WPILIB_WITH_TESTS)
+    wpilib_add_test(datalogtool src/test/native/cpp)
+    target_sources(datalogtool_test PRIVATE ${datalogtool_cli_src})
+    target_include_directories(datalogtool_test PRIVATE src/main/native/cpp src/main/native/cli)
+    target_link_libraries(datalogtool_test ssh datalog wpiutil)
+endif()
+
+if(NOT WPILIB_WITH_GUI)
+    return()
+endif()
+
 generate_resources(src/main/native/resources generated/main/cpp DLT dlt datalogtool_resources_src)
 
 file(GLOB datalogtool_src src/main/native/cpp/*.cpp ${CMAKE_CURRENT_BINARY_DIR}/WPILibVersion.cpp)

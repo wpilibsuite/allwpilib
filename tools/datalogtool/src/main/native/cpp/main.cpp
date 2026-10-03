@@ -6,7 +6,7 @@
 
 void Application(std::string_view saveDir);
 
-#ifndef RUNNING_IMGUI_TESTS
+#if !defined(RUNNING_IMGUI_TESTS) && !defined(RUNNING_DATALOGTOOL_TESTS)
 #ifdef _WIN32
 int __stdcall WinMain(void* hInstance, void* hPrevInstance, char* pCmdLine,
                       int nCmdShow) {
