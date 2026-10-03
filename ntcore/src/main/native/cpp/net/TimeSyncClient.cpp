@@ -29,18 +29,17 @@ void wpi::tsp::TimeSyncClient::UpdateStatistics(uint64_t pong_local_time,
   auto filtered = m_lastOffsets.Calculate(serverTimeOffsetUs);
 
   Metadata newMetadata;
-  newMetadata.offset = filtered;
-  newMetadata.rtt2 = rtt2;
-  newMetadata.pongsReceived++;
-  newMetadata.lastPongTime = pong_local_time;
+  {
+    std::lock_guard lock{m_metadataMutex};
+    m_metadata.offset = filtered;
+    m_metadata.rtt2 = rtt2;
+    ++m_metadata.pongsReceived;
+    m_metadata.lastPongTime = pong_local_time;
+    newMetadata = m_metadata;
+  }
 
   if (m_callback) {
     m_callback(newMetadata);
-  }
-
-  {
-    std::lock_guard lock{m_metadataMutex};
-    m_metadata = newMetadata;
   }
 }
 

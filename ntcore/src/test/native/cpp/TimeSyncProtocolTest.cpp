@@ -36,7 +36,8 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest Smoketest",
   }
 
   auto metadata = client.GetMetadata();
-  REQUIRE(metadata.pongsReceived > 0);
+  REQUIRE(metadata.pongsReceived > 1);
+  CHECK(metadata.pingsSent >= metadata.pongsReceived);
   CHECK(metadata.lastPongTime >= static_cast<uint64_t>(startTimeUs));
   CHECK(metadata.lastPongTime <= static_cast<uint64_t>(wpi::nt::Now() / 1000));
   // Both clocks are local, so the server offset should be near zero.
@@ -254,4 +255,26 @@ TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest RejectMalformedPings",
   CHECK(pong.client_time == 456);
   CHECK(pong.message_id == 2);
   CHECK_FALSE(peer.Receive(100ms));
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest AccumulatesMetadata",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  using namespace std::chrono_literals;
+  TimeSyncClient* instance = nullptr;
+  size_t callbacks = 0;
+  TimeSyncClient client{logger, "127.0.0.1", 5812, 1h,
+                        [&](TimeSyncClient::Metadata metadata) {
+                          ++callbacks;
+                          CHECK(metadata.pongsReceived == callbacks);
+                          CHECK(instance->GetMetadata().pongsReceived == callbacks);
+                        }};
+  instance = &client;
+  TspPing ping{1, 1, 100};
+  TspPong pong{ping, 110};
+  client.UpdateStatistics(120, ping, pong);
+  client.UpdateStatistics(140, ping, pong);
+  CHECK(client.GetMetadata().pongsReceived == 2u);
+  CHECK(client.GetMetadata().lastPongTime == 140u);
+  CHECK(callbacks == 2u);
 }
