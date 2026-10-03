@@ -17,7 +17,12 @@ using namespace wpi::net;
 void wpi::tsp::TimeSyncServer::UdpCallback(uv::Buffer& data, size_t n,
                                            const sockaddr& sender,
                                            unsigned flags) {
-  TspPing ping{wpi::util::UnpackStruct<TspPing>(data.bytes())};
+  if (n != wpi::util::Struct<TspPing>::GetSize() ||
+      (flags & UV_UDP_PARTIAL) != 0) {
+    WPI_WARNING(m_logger, "Invalid TSP ping size: {}", n);
+    return;
+  }
+  TspPing ping{wpi::util::UnpackStruct<TspPing>(data.bytes().first(n))};
 
   if (ping.version != 1) {
     WPI_ERROR(m_logger, "Bad version from client?");

@@ -78,13 +78,14 @@ void wpi::tsp::TimeSyncClient::UdpCallback(uv::Buffer& buf, size_t nbytes,
                                            unsigned flags) {
   uint64_t pong_local_time = m_timeProvider();
 
-  if (static_cast<size_t>(nbytes) != wpi::util::Struct<TspPong>::GetSize()) {
+  if (nbytes != wpi::util::Struct<TspPong>::GetSize() ||
+      (flags & UV_UDP_PARTIAL) != 0) {
     WPI_ERROR(m_logger, "Got {} bytes for pong?", nbytes);
     return;
   }
 
   TspPong pong{
-      wpi::util::UnpackStruct<TspPong>(buf.bytes()),
+      wpi::util::UnpackStruct<TspPong>(buf.bytes().first(nbytes)),
   };
 
   if (pong.version != 1) {

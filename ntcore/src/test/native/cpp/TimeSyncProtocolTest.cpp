@@ -10,6 +10,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "TimeSyncTestPeer.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 
 class TimeSyncProtoTest {
@@ -231,4 +232,26 @@ TEST_CASE_METHOD(TimeSyncProtoTest,
   CHECK(2 == filter.Calculate(13));
   // 12.5 round to 13
   CHECK(13 == filter.Calculate(12));
+}
+
+TEST_CASE_METHOD(TimeSyncProtoTest, "TimeSyncProtoTest RejectMalformedPings",
+                 "[ntcore][time-sync-protocol]") {
+  using namespace wpi::tsp;
+  using namespace std::chrono_literals;
+  TimeSyncServer server{logger, "127.0.0.1", 5813};
+  TimeSyncTestPeer peer;
+  std::array<uint8_t, 11> bytes{};
+  wpi::util::PackStruct(bytes, TspPing{1, 1, 123});
+  for (size_t size : {2u, 9u, 11u}) {
+    REQUIRE(peer.Send(std::span{bytes}.first(size), 5813) == static_cast<int>(size));
+  }
+  wpi::util::PackStruct(bytes, TspPing{1, 1, 456});
+  REQUIRE(peer.Send(std::span{bytes}.first(10), 5813) == 10);
+  auto packet = peer.Receive(2s);
+  REQUIRE(packet);
+  REQUIRE(packet->data.size() == wpi::util::Struct<TspPong>::GetSize());
+  auto pong = wpi::util::UnpackStruct<TspPong>(packet->data);
+  CHECK(pong.client_time == 456);
+  CHECK(pong.message_id == 2);
+  CHECK_FALSE(peer.Receive(100ms));
 }
