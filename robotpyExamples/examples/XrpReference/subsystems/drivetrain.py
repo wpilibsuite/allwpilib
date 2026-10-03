@@ -35,8 +35,8 @@ class Drivetrain(commands2.Subsystem):
             self.left_motor.set_throttle, self.right_motor.set_throttle
         )
 
-        # Set up the XRPGyro
-        self.gyro = xrp.XRPGyro()
+        # Set up the onboard IMU
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
@@ -83,29 +83,29 @@ class Drivetrain(commands2.Subsystem):
         return (self.get_left_distance_inch() + self.get_right_distance_inch()) / 2.0
 
     def get_gyro_angle_x(self) -> float:
-        """Current angle of the Romi around the X-axis.
+        """Current angle of the XRP around the X-axis.
 
-        :returns: The current angle of the Romi in degrees
+        :returns: The current angle of the XRP in degrees
         """
-        return self.gyro.get_angle_x()
+        return math.degrees(self.imu.get_angle_x())
 
     def get_gyro_angle_y(self) -> float:
-        """Current angle of the Romi around the Y-axis.
+        """Current angle of the XRP around the Y-axis.
 
-        :returns: The current angle of the Romi in degrees
+        :returns: The current angle of the XRP in degrees
         """
-        return self.gyro.get_angle_y()
+        return math.degrees(self.imu.get_angle_y())
 
     def get_gyro_angle_z(self) -> float:
-        """Current angle of the Romi around the Z-axis.
+        """Current angle of the XRP around the Z-axis.
 
-        :returns: The current angle of the Romi in degrees
+        :returns: The current angle of the XRP in degrees
         """
-        return self.gyro.get_angle_z()
+        return math.degrees(self.imu.get_yaw())
 
     def reset_gyro(self) -> None:
-        """Reset the gyro"""
-        self.gyro.reset()
+        """Reset the gyro yaw."""
+        self.imu.reset_yaw()
 
     def periodic(self) -> None:
         """This method will be called once per scheduler run"""
