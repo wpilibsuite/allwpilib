@@ -31,8 +31,7 @@ ClientImpl::ClientImpl(
     std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
         timeSyncUpdated,
     std::function<void(uint32_t repeatMs)> setPeriodic)
-    : m_loopRunner(loop),
-      m_wire{wire},
+    : m_wire{wire},
       m_logger{logger},
       m_timeSyncUpdated{std::move(timeSyncUpdated)},
       m_setPeriodic{std::move(setPeriodic)},
@@ -44,30 +43,30 @@ ClientImpl::ClientImpl(
   if (m_wire.GetVersion() >= NT_4_2) {
     DEBUG4("Creating UDP-based time sync client");
     using namespace std::chrono_literals;
+    m_timeSyncAsync =
+        wpi::net::uv::Async<tsp::TimeSyncClient::Metadata>::Create(*loop.GetLoop());
+    m_timeSyncAsync->wakeup.connect([this](tsp::TimeSyncClient::Metadata meta) {
+      // TSP uses microseconds; NetworkTables uses nanoseconds internally.
+      int64_t serverTimeOffsetNs;
+      int64_t rtt2Ns;
+      if (wpi::util::MulOverflow(meta.offset, int64_t{1000},
+                                 serverTimeOffsetNs) ||
+          wpi::util::MulOverflow(meta.rtt2, int64_t{1000}, rtt2Ns) ||
+          serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
+        WARN("TSP response has invalid timestamp values");
+        return;
+      }
+      m_rtt2Ns = rtt2Ns;
+      DEBUG3("Time offset: {}", serverTimeOffsetNs);
+      m_outgoing.SetTimeOffset(serverTimeOffsetNs);
+      m_haveTimeOffset = true;
+      m_timeSyncUpdated(serverTimeOffsetNs, rtt2Ns, true);
+    });
     m_tspClient = std::make_unique<tsp::TimeSyncClient>(
-        logger, connInfo.remote_ip, connInfo.remote_port,
-        // 1 second seems reasonable
-        1s, [this](tsp::TimeSyncClient::Metadata meta) {
-          // TSP uses microseconds; NetworkTables uses nanoseconds internally.
-          int64_t serverTimeOffsetNs;
-          int64_t rtt2Ns;
-          if (wpi::util::MulOverflow(meta.offset, int64_t{1000},
-                                     serverTimeOffsetNs) ||
-              wpi::util::MulOverflow(meta.rtt2, int64_t{1000}, rtt2Ns) ||
-              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
-            WARN("TSP response has invalid timestamp values");
-            return;
-          }
-          // This callback is called in TimeSyncClient's eventloop's context, so
-          // accessing members here isn't thread-safe. Do it from m_loop's
-          // context instead
-          m_loopRunner.ExecSync([this, serverTimeOffsetNs, rtt2Ns](auto& loop) {
-            m_rtt2Ns = rtt2Ns;
-            DEBUG3("Time offset: {}", serverTimeOffsetNs);
-            m_outgoing.SetTimeOffset(serverTimeOffsetNs);
-            m_haveTimeOffset = true;
-          });
-          m_timeSyncUpdated(serverTimeOffsetNs, rtt2Ns, true);
+        logger, connInfo.remote_ip, connInfo.remote_port, 1s,
+        [async = m_timeSyncAsync](tsp::TimeSyncClient::Metadata meta) {
+          // Never wait on the NT loop: it may be joining this client's thread.
+          async->Send(meta);
         });
   } else {
     // immediately send RTT ping
@@ -314,6 +313,14 @@ void ClientImpl::ServerSetValue(int topicId, const Value& value) {
   // pass along to local handler
   if (m_local) {
     m_local->ServerSetValue(topicIt->second, value);
+  }
+}
+
+ClientImpl::~ClientImpl() {
+  m_tspClient.reset();
+  if (m_timeSyncAsync) {
+    m_timeSyncAsync->wakeup.disconnect_all();
+    m_timeSyncAsync->Close();
   }
 }
 

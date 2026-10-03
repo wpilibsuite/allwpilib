@@ -21,6 +21,7 @@
 #include "WireConnection.hpp"
 #include "WireDecoder.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
+#include "wpi/net/uv/Async.hpp"
 #include "wpi/util/DenseMap.hpp"
 
 namespace wpi::util {
@@ -46,6 +47,9 @@ class ClientImpl final : private ServerMessageHandler {
       std::function<void(int64_t serverTimeOffset, int64_t rtt2, bool valid)>
           timeSyncUpdated,
       std::function<void(uint32_t repeatMs)> setPeriodic);
+
+  /** Stops time-sync callbacks before destroying client state. */
+  ~ClientImpl();
 
   void ProcessIncomingText(std::string_view data);
   void ProcessIncomingBinary(uint64_t curTimeMs, std::span<const uint8_t> data);
@@ -81,9 +85,6 @@ class ClientImpl final : private ServerMessageHandler {
   void Unpublish(int pubuid, ClientMessage&& msg);
   void SetValue(int pubuid, const Value& value);
 
-  // TODO this couples ClientImple to libuv. Is that OK?
-  wpi::net::EventLoopRunner& m_loopRunner;
-
   WireConnection& m_wire;
   wpi::util::Logger& m_logger;
   ServerMessageHandler* m_local{nullptr};
@@ -102,7 +103,9 @@ class ClientImpl final : private ServerMessageHandler {
 
   // If the server is new enough, use TSP. Created on NT connection (so we know
   // the endpoint to use)
-  std::unique_ptr<wpi::tsp::TimeSyncClient> m_tspClient{nullptr};
+  std::unique_ptr<wpi::tsp::TimeSyncClient> m_tspClient;
+  std::shared_ptr<wpi::net::uv::Async<wpi::tsp::TimeSyncClient::Metadata>>
+      m_timeSyncAsync;
 
   // timestamp handling
   static constexpr uint32_t RTT_INTERVAL_MS = 3000;

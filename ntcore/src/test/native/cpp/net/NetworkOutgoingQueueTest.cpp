@@ -7,6 +7,8 @@
 #include <stdint.h>
 
 #include <deque>
+#include <future>
+#include <thread>
 #include <limits>
 #include <span>
 #include <string>
@@ -17,6 +19,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "../MockLogger.hpp"
+#include "../TimeSyncTestPeer.hpp"
 #include "net/ClientImpl.hpp"
 #include "net/Message.hpp"
 #include "net/WireConnection.hpp"
@@ -593,4 +596,52 @@ TEST_CASE("NetworkOutgoingQueueTest LocalQueueSendsImmediately",
   CHECK(wire.binaryWrites.empty());
 }
 
+}  // namespace wpi::nt::net
+
+namespace wpi::nt::net {
+TEST_CASE("ClientImpl destroys pending time sync on network loop",
+          "[ntcore][client]") {
+  using namespace std::chrono_literals;
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = 0x0402;
+  wpi::util::Logger logger;
+  wpi::net::EventLoopRunner loop;
+  std::unique_ptr<ClientImpl> client;
+  int updates = 0;
+  loop.ExecSync([&](auto&) {
+    client = std::make_unique<ClientImpl>(
+        0, loop, wire, ConnectionInfo{"", "127.0.0.1", peer.GetPort()}, false,
+        logger, [&](int64_t, int64_t, bool) { ++updates; }, [](uint32_t) {});
+  });
+
+  std::promise<void> blocked;
+  std::promise<void> release;
+  auto resume = release.get_future();
+  std::promise<void> destroyed;
+  auto done = destroyed.get_future();
+  loop.ExecAsync([&](auto&) {
+    blocked.set_value();
+    resume.wait();
+    client.reset();
+    destroyed.set_value();
+  });
+  blocked.get_future().wait();
+  auto packet = peer.Receive(3s);
+  if (packet) {
+    auto ping = wpi::util::UnpackStruct<wpi::tsp::TspPing>(packet->data);
+    wpi::tsp::TspPong pong{ping, ping.client_time};
+    pong.message_id = 2;
+    std::array<uint8_t, 18> data;
+    wpi::util::PackStruct(data, pong);
+    peer.Send(data, reinterpret_cast<const sockaddr&>(packet->sender));
+    // Let the UDP loop process a reply while the NT loop is blocked.
+    std::this_thread::sleep_for(100ms);
+  }
+  release.set_value();
+  REQUIRE(packet);
+  REQUIRE(done.wait_for(3s) == std::future_status::ready);
+  loop.ExecSync([](auto&) {});
+  CHECK(updates == 0);
+}
 }  // namespace wpi::nt::net

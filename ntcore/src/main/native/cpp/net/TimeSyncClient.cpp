@@ -147,3 +147,7 @@ wpi::tsp::TimeSyncClient::Metadata wpi::tsp::TimeSyncClient::GetMetadata() {
   std::lock_guard lock{m_metadataMutex};
   return m_metadata;
 }
+
+wpi::tsp::TimeSyncClient::~TimeSyncClient() {
+  m_loopRunner.Stop();
+}

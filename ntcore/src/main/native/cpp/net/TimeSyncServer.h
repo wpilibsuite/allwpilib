@@ -30,7 +30,8 @@ class TimeSyncServer {
                  unsigned int port = NT_DEFAULT_PORT);
 
   // Stop our internal loop runner and unbind
-  ~TimeSyncServer() = default;
+  /** Stops the UDP loop before destroying callback state. */
+  ~TimeSyncServer();
 
  private:
   void UdpCallback(wpi::net::uv::Buffer& buf, size_t nbytes,
