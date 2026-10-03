@@ -1,19 +1,7 @@
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_python//python:defs.bzl", "py_test")
+load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load(":build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
-
-command_folders = first_level_folders(
-    glob(["src/main/cpp/commands/*/*.cpp"]),
-    "src/main/cpp/commands/",
-)
-
-example_folders = first_level_folders(
-    glob([
-        "src/main/cpp/examples/*/cpp/Robot.cpp",
-        "src/main/cpp/examples/*/c/Robot.c",
-    ]),
-    "src/main/cpp/examples/",
-)
 
 snippet_folders = first_level_folders(
     glob(["src/main/cpp/snippets/*/cpp/Robot.cpp"]),
@@ -25,46 +13,14 @@ template_folders = first_level_folders(
     "src/main/cpp/templates/",
 )
 
-example_test_folders = first_level_folders(
-    glob(["src/test/cpp/examples/*/cpp/main.cpp"]),
-    "src/test/cpp/examples/",
-)
-
 snippet_test_folders = first_level_folders(
     glob(["src/test/cpp/snippets/*/cpp/main.cpp"]),
     "src/test/cpp/snippets/",
 )
 
-halsim_deps = [
-]
-
-build_commands(folders = command_folders)
-
-build_examples(
-    folders = example_folders,
-    halsim_deps = halsim_deps,
-)
-
 build_snippets(folders = snippet_folders)
 
 build_templates(folders = template_folders)
-
-py_test(
-    name = "commands_check",
-    size = "small",
-    srcs = ["//shared:examplecheck.py"],
-    data = glob(["src/main/cpp/commands/**"]),
-    env = {
-        "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/commands",
-        "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
-        "EXAMPLECHECK_KIND": "commands",
-    },
-    main = "//shared:examplecheck.py",
-    tags = [
-        "no-ide",
-        "smoketest",
-    ],
-)
 
 [
     py_test(
@@ -89,15 +45,33 @@ py_test(
         ],
     )
     for kind in [
-        "examples",
         "snippets",
         "templates",
     ]
 ]
 
 build_tests(
-    example_test_folders = example_test_folders,
+    example_test_folders = [],
     snippet_test_folders = snippet_test_folders,
+)
+
+pkg_zip(
+    name = "commands-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/commands",
+    ],
+    tags = ["manual"],
+)
+
+pkg_zip(
+    name = "examples-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/examples",
+        "//wpilibcExamples/src/test/cpp/examples",
+    ],
+    tags = ["manual"],
 )
 
 maven_export(

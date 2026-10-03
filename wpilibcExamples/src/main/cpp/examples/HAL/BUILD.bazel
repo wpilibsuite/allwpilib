@@ -1,0 +1,20 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+filegroup(
+    name = "sources",
+    srcs = ["c/Robot.c"],
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/examples:__subpackages__",
+    ],
+)
+
+cc_binary(
+    name = "HAL",
+    srcs = ["c/Robot.c"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//hal:wpiHal",
+    ],
+)

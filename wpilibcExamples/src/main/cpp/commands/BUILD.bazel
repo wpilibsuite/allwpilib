@@ -1,0 +1,35 @@
+load("@bazel_skylib//lib:subpackages.bzl", "subpackages")
+load("@rules_pkg//:mappings.bzl", "pkg_files", "strip_prefix")
+load("//shared:examplecheck.bzl", "examplecheck_test")
+
+_PACKAGE = package_name()
+
+filegroup(
+    name = "sources",
+    srcs = [pkg + ":sources" for pkg in subpackages.all()],
+)
+
+pkg_files(
+    name = "commands",
+    srcs = [
+        "commands.json",
+        ":sources",
+    ],
+    prefix = "commands",
+    strip_prefix = strip_prefix.from_root(_PACKAGE),
+    visibility = ["//wpilibcExamples:__pkg__"],
+)
+
+examplecheck_test(
+    name = "examplecheck",
+    srcs = [":sources"],
+    config = "commands.json",
+    env = {
+        "EXAMPLECHECK_FOLDER": _PACKAGE,
+        "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
+        "EXAMPLECHECK_KIND": "commands",
+    },
+    tags = [
+        "smoketest",
+    ],
+)
