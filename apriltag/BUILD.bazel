@@ -31,6 +31,12 @@ cc_library(
     srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
     hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
     copts = select({
+        "@platforms//os:linux": [
+            "-Wno-format-nonliteral",
+            "-Wno-maybe-uninitialized",
+            "-Wno-sign-compare",
+            "-Wno-type-limits",
+        ],
         "@platforms//os:osx": [
             "-Wno-format-nonliteral",
             "-Wno-gnu-zero-variadic-macro-arguments",
@@ -44,12 +50,6 @@ cc_library(
             "/wd4244",
             "/wd4267",
             "/wd4996",
-        ],
-        "@wpilib_toolchains//constraints/combined:is_linux": [
-            "-Wno-format-nonliteral",
-            "-Wno-maybe-uninitialized",
-            "-Wno-sign-compare",
-            "-Wno-type-limits",
         ],
     }),
     includes = ["src/main/native/thirdparty/apriltag/include/common"],

@@ -21,15 +21,11 @@ filegroup(
 
 MRCLIB_SRCS = glob(["src/main/native/cpp/mrclib/**"])
 
-SYSTEMCORE_SRCS = glob(["src/main/native/systemcore/**"]) + MRCLIB_SRCS
-
-SIM_SRCS = glob(["src/main/native/sim/**"])
-
 filegroup(
     name = "platform-srcs",
     srcs = select({
-        "@wpilib_toolchains//constraints/is_systemcore:systemcore": SYSTEMCORE_SRCS,
-        "//conditions:default": SIM_SRCS,
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": glob(["src/main/native/systemcore/**"]) + MRCLIB_SRCS,
+        "//conditions:default": glob(["src/main/native/sim/**"]),
     }),
 )
 
@@ -75,7 +71,6 @@ wpilib_cc_library(
             "//shared/bazel/thirdparty/mrclib",
         ],
         "//conditions:default": [
-            "//ntcore:ntcore_c_headers",
         ],
     }),
 )
@@ -97,9 +92,7 @@ wpilib_cc_shared_library(
         "//ntcore:shared/ntcore",
         "//wpinet:shared/wpinet",
         "//wpiutil:shared/wpiutil",
-    ] + select({
-        "//conditions:default": [],
-    }),
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal",
@@ -112,9 +105,7 @@ wpilib_cc_static_library(
         "//ntcore:static/ntcore",
         "//wpinet:static/wpinet",
         "//wpiutil:static/wpiutil",
-    ] + select({
-        "//conditions:default": [],
-    }),
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal",

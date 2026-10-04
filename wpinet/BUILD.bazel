@@ -77,9 +77,9 @@ third_party_cc_lib_helper(
 filegroup(
     name = "native-srcs",
     srcs = select({
+        "@platforms//os:linux": glob(["src/main/native/linux/*"]),
         "@platforms//os:osx": glob(["src/main/native/macOS/*.cpp"]),
         "@platforms//os:windows": glob(["src/main/native/windows/*"]),
-        "@wpilib_toolchains//constraints/combined:is_linux": glob(["src/main/native/linux/*"]),
     }),
 )
 
@@ -256,7 +256,7 @@ cc_binary(
     name = "netconsoleServer",
     srcs = ["src/netconsoleServer/native/cpp/main.cpp"],
     linkopts = select({
-        "@wpilib_toolchains//constraints/combined:is_linux": ["-lutil"],
+        "@platforms//os:linux": ["-lutil"],
         "//conditions:default": [],
     }),
     deps = [
