@@ -5,6 +5,7 @@
 #include "wpi/simulation/AlertSim.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -65,6 +66,9 @@ const WPI_AlertBackend growingBackend{nullptr,
                                       GrowingBackendGetNumAlerts,
                                       GrowingBackendGetAlerts,
                                       GrowingBackendFreeAlerts,
+                                      nullptr,
+                                      nullptr,
+                                      nullptr,
                                       nullptr};
 
 class ScopedAlertBackend {
@@ -272,6 +276,39 @@ TEST_CASE_METHOD(
   CHECK(alerts[0].text == "text");
   CHECK(alerts[0].activeStartTime == 1234);
   CHECK(alerts[0].level == wpi::util::Alert::Level::HIGH);
+}
+
+TEST_CASE_METHOD(AlertSimTest,
+                 "AlertSimTest SnapshotAndResetPreserveReaderHistory",
+                 "[wpilibc][simulation]") {
+  AlertSim::ResetData();
+  WPI_AlertReaderHandle handle = nullptr;
+  REQUIRE(WPI_CreateAlertReader(10, &handle) == 0);
+  std::unique_ptr<WPI_AlertReader, decltype(&WPI_DestroyAlertReader)> reader{
+      handle, WPI_DestroyAlertReader};
+  WPI_AlertEvents events{};
+
+  auto alert = MakeAlert("short", wpi::util::Alert::Level::HIGH);
+  alert.Set(true);
+  auto snapshot = AlertSim::GetAll();
+  REQUIRE(snapshot.size() == 1u);
+  CHECK(snapshot[0].isActive());
+  alert.Set(false);
+  AlertSim::ResetData();
+  CHECK(AlertSim::GetAll().empty());
+
+  REQUIRE(WPI_ReadAlertEvents(reader.get(), &events) == 0);
+  std::unique_ptr<WPI_AlertEvents, decltype(&WPI_FreeAlertEvents)> result{
+      &events, WPI_FreeAlertEvents};
+  CHECK(events.reset);
+  CHECK_FALSE(events.historyLost);
+  REQUIRE(events.count == 4u);
+  CHECK(events.events[0].kind == WPI_ALERT_EVENT_CREATED);
+  CHECK(events.events[1].kind == WPI_ALERT_EVENT_ACTIVE_CHANGED);
+  CHECK(events.events[1].alert.activeStartTime == snapshot[0].activeStartTime);
+  CHECK(events.events[2].kind == WPI_ALERT_EVENT_ACTIVE_CHANGED);
+  CHECK(events.events[2].alert.activeStartTime == 0);
+  CHECK(events.events[3].kind == WPI_ALERT_EVENT_REMOVED);
 }
 
 }  // namespace wpi::sim
