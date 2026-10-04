@@ -24,60 +24,80 @@ class LinearSystemUtilTest extends UtilityClassTest<LinearSystemUtil> {
   @Test
   void testIsStabilizable() {
     Matrix<N2, N2> A;
-    Matrix<N2, N1> B = VecBuilder.fill(0, 1);
+    Matrix<N2, N1> B1 = VecBuilder.fill(0, 1);
 
     // First eigenvalue is uncontrollable and unstable.
     // Second eigenvalue is controllable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
-    assertFalse(LinearSystemUtil.isStabilizable(A, B));
+    assertFalse(LinearSystemUtil.isStabilizable(A, B1));
 
     // First eigenvalue is uncontrollable and marginally stable.
     // Second eigenvalue is controllable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
-    assertFalse(LinearSystemUtil.isStabilizable(A, B));
+    assertFalse(LinearSystemUtil.isStabilizable(A, B1));
 
     // First eigenvalue is uncontrollable and stable.
     // Second eigenvalue is controllable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
-    assertTrue(LinearSystemUtil.isStabilizable(A, B));
+    assertTrue(LinearSystemUtil.isStabilizable(A, B1));
 
     // First eigenvalue is uncontrollable and stable.
     // Second eigenvalue is controllable and unstable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
-    assertTrue(LinearSystemUtil.isStabilizable(A, B));
+    assertTrue(LinearSystemUtil.isStabilizable(A, B1));
 
-    // Controllable complex eigenvalues (i and -i)
+    // Controllable stable complex eigenvalues (i and -i)
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
-    assertTrue(LinearSystemUtil.isStabilizable(A, B));
+    assertTrue(LinearSystemUtil.isStabilizable(A, B1));
+
+    Matrix<N2, N1> B2 = VecBuilder.fill(0, 0);
+
+    // Uncontrollable stable complex eigenvalues (i and -i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
+    assertFalse(LinearSystemUtil.isStabilizable(A, B2));
+
+    // Uncontrollable stable complex eigenvalues (0.5 + √(3)/2i and 0.5 - √(3)/2i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, -1, 1, 1);
+    assertFalse(LinearSystemUtil.isStabilizable(A, B2));
   }
 
   @Test
   void testIsDetectable() {
     Matrix<N2, N2> A;
-    Matrix<N1, N2> C = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 1);
+    Matrix<N1, N2> C1 = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 1);
 
     // First eigenvalue is unobservable and unstable.
     // Second eigenvalue is observable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1.2, 0, 0, 0.5);
-    assertFalse(LinearSystemUtil.isDetectable(A, C));
+    assertFalse(LinearSystemUtil.isDetectable(A, C1));
 
     // First eigenvalue is unobservable and marginally stable.
     // Second eigenvalue is observable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.5);
-    assertFalse(LinearSystemUtil.isDetectable(A, C));
+    assertFalse(LinearSystemUtil.isDetectable(A, C1));
 
     // First eigenvalue is unobservable and stable.
     // Second eigenvalue is observable and stable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 0.5);
-    assertTrue(LinearSystemUtil.isDetectable(A, C));
+    assertTrue(LinearSystemUtil.isDetectable(A, C1));
 
     // First eigenvalue is unobservable and stable.
     // Second eigenvalue is observable and unstable.
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0.2, 0, 0, 1.2);
-    assertTrue(LinearSystemUtil.isDetectable(A, C));
+    assertTrue(LinearSystemUtil.isDetectable(A, C1));
 
-    // Detectable complex eigenvalues (i and -i)
+    // Detectable stable complex eigenvalues (i and -i)
     A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
-    assertTrue(LinearSystemUtil.isDetectable(A, C));
+    assertTrue(LinearSystemUtil.isDetectable(A, C1));
+
+    Matrix<N1, N2> C2 = MatBuilder.fill(Nat.N1(), Nat.N2(), 0, 0);
+
+    // Undetectable stable complex eigenvalues (i and -i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, -1, 0);
+    assertFalse(LinearSystemUtil.isDetectable(A, C2));
+
+    // Undetectable stable complex eigenvalues (0.5 + √(3)/2i and 0.5 - √(3)/2i)
+    A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, -1, 1, 1);
+    assertFalse(LinearSystemUtil.isDetectable(A, C2));
   }
 }
