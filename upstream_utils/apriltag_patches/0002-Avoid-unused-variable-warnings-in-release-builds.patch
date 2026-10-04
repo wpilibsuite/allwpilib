@@ -11,10 +11,10 @@ Subject: [PATCH 2/8] Avoid unused variable warnings in release builds
  4 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/common/matd.c b/common/matd.c
-index 6b8a0405ce094536c395ad667fa640bda335fb6a..7c9088235aed537f5ecdc95f49424e362fb842eb 100644
+index 067e40ed7eb36624bcdc7773c5e8b8bd9a4c524b..80f171586e89c4c4d094aa3260cbeb2a317aa9c8 100644
 --- a/common/matd.c
 +++ b/common/matd.c
-@@ -870,7 +870,8 @@ double matd_vec_dist_n(const matd_t *a, const matd_t *b, int n)
+@@ -873,7 +873,8 @@ double matd_vec_dist_n(const matd_t *a, const matd_t *b, int n)
  
      int lena = a->nrows*a->ncols;
      int lenb = b->nrows*b->ncols;
@@ -24,7 +24,7 @@ index 6b8a0405ce094536c395ad667fa640bda335fb6a..7c9088235aed537f5ecdc95f49424e36
      assert(n <= lena && n <= lenb);
      (void)lena;
      (void)lenb;
-@@ -907,6 +908,7 @@ double matd_vec_dot_product(const matd_t *a, const matd_t *b)
+@@ -910,6 +911,7 @@ double matd_vec_dot_product(const matd_t *a, const matd_t *b)
      assert(matd_is_vector(a) && matd_is_vector(b));
      int adim = a->ncols*a->nrows;
      int bdim = b->ncols*b->nrows;
