@@ -22,7 +22,7 @@ model {
         def dataLogToolTaskList = []
         $.components.each { component ->
             component.binaries.each { binary ->
-                if (binary in NativeExecutableBinarySpec && binary.component.name.contains("datalogtool")) {
+                if (binary in NativeExecutableBinarySpec && binary.component.name == "datalogtool") {
                     if (binary.buildable && (binary.name.contains('Release') || binary.name.contains('release'))) {
                         // We are now in the binary that we want.
                         // This is the default application path for the ZIP task.
@@ -102,6 +102,15 @@ model {
                             task.dependsOn(bundleTask)
                         } else {
                             task.from(applicationPath)
+                        }
+
+                        def cliBinary = $.components.datalogtoolCli.binaries.find {
+                            it.targetPlatform.name == binary.targetPlatform.name && it.buildType.name == binary.buildType.name
+                        }
+                        task.from(cliBinary.executable.file)
+                        task.dependsOn cliBinary.tasks.link
+                        if (binary.targetPlatform.operatingSystem.isWindows()) {
+                            task.from(new File(cliBinary.executable.file.absolutePath.replaceAll(/\.exe$/, '.pdb')))
                         }
 
                         task.dependsOn binary.tasks.link

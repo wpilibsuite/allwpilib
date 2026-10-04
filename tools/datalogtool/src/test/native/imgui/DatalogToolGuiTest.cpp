@@ -6,6 +6,8 @@
 
 #include <imgui_test_engine/imgui_te_context.h>
 
+#include "wpi/glass/Context.hpp"
+#include "wpi/glass/Storage.hpp"
 #include "wpi/gui/test/GuiTestEngineRunner.hpp"
 
 void Application(std::string_view saveDir);
@@ -18,6 +20,24 @@ void RegisterDatalogToolGuiTests(ImGuiTestEngine* engine) {
     IM_CHECK(ctx->WindowInfo("Input Files").ID != 0);
     IM_CHECK(ctx->WindowInfo("Entries").ID != 0);
     IM_CHECK(ctx->WindowInfo("Output").ID != 0);
+  };
+
+  test = IM_REGISTER_TEST(engine, "datalogtool", "timestamp_fuzziness");
+  test->TestFunc = [](ImGuiTestContext* ctx) {
+    ctx->SetRef("Output");
+    auto& storage = wpi::glass::GetStorageRoot().GetChild("output");
+    ctx->ComboClick("Style/List");
+    IM_CHECK(!ctx->ItemExists("Timestamp fuzziness (ms)"));
+    ctx->ComboClick("Style/Table");
+    IM_CHECK(ctx->ItemExists("Timestamp fuzziness (ms)"));
+    ctx->ItemInputValue("Timestamp fuzziness (ms)", "0.125");
+    IM_CHECK_EQ(storage.GetDouble("timestampFuzzinessMs"), 0.125);
+    ctx->ComboClick("Style/List");
+    ctx->ComboClick("Style/Table");
+    IM_CHECK_EQ(storage.GetDouble("timestampFuzzinessMs"), 0.125);
+    ctx->ItemInputValue("Timestamp fuzziness (ms)", "-1");
+    IM_CHECK_EQ(storage.GetDouble("timestampFuzzinessMs"), 0.0);
+    ctx->ComboClick("Style/List");
   };
 }
 }  // namespace
