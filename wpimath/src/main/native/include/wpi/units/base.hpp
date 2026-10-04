@@ -3513,7 +3513,7 @@ inline void LogValueTo(wpi::telemetry::TelemetryTable& table, std::string_view n
 	                      "\""_ct_string);
 	table.SetProperty(n, "unit", unitJson);
 	using BaseUnits = unit<std::ratio<1>, typename traits::unit_traits<Units>::base_unit_type>;
-	table.Log(n, convert<Units, BaseUnits>(value).template to<T>());
+	table.Log(n, convert<Units, BaseUnits>(value()));
 }
 #endif
 }
