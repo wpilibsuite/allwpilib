@@ -1,4 +1,15 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_java//java:defs.bzl", "java_binary")
+
+cc_binary(
+    name = "multiCameraServer",
+    srcs = ["src/main/native/cpp/main.cpp"],
+    deps = [
+        "//cameraserver",
+        "//ntcore",
+        "//wpiutil",
+    ],
+)
 
 java_binary(
     name = "multiCameraServer-java",
@@ -7,10 +18,7 @@ java_binary(
     deps = [
         "//cameraserver:cameraserver-java",
         "//cscore:cscore-java",
-        "//hal:hal-java",
         "//ntcore:ntcore-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
         "@maven//:com_google_code_gson_gson",
     ],
 )
