@@ -389,6 +389,8 @@ NT_Inst NT_CreateInstance(void);
 /**
  * Destroy an instance.
  * The default instance cannot be destroyed.
+ * The behavior of concurrent calls of this function on the same instance is
+ * undefined.
  *
  * @param inst Instance handle
  */
