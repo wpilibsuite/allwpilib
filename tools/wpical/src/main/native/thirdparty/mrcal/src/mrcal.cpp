@@ -1944,7 +1944,7 @@ static void _mrcal_precompute_lensmodel_data_MRCAL_LENSMODEL_SPLINED_STEREOGRAPH
     else
     {
         MSG("I only support spline order 2 and 3");
-        assert(0);
+        abort();
     }
 
     double th_edge_x = (double)config->fov_x_deg/2. * M_PI / 180.;
