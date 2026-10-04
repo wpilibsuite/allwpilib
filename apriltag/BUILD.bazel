@@ -31,20 +31,19 @@ cc_library(
     srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
     hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
     copts = select({
-        "@platforms//os:linux": [
+        "@rules_cc//cc/compiler:clang": [
+            "-Wno-format-nonliteral",
+            "-Wno-gnu-zero-variadic-macro-arguments",
+            "-Wno-sign-compare",
+            "-Wno-type-limits",
+        ],
+        "@rules_cc//cc/compiler:gcc": [
             "-Wno-format-nonliteral",
             "-Wno-maybe-uninitialized",
             "-Wno-sign-compare",
             "-Wno-type-limits",
         ],
-        "@platforms//os:osx": [
-            "-Wno-format-nonliteral",
-            "-Wno-gnu-zero-variadic-macro-arguments",
-            "-Wno-uninitialized",
-            "-Wno-sign-compare",
-            "-Wno-type-limits",
-        ],
-        "@platforms//os:windows": [
+        "@rules_cc//cc/compiler:msvc-cl": [
             "/wd4005",
             "/wd4018",
             "/wd4244",
