@@ -4,10 +4,7 @@
 
 package org.wpilib.examples.dutycycleencoder;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.DutyCycleEncoder;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
 
 /** This example shows how to use a duty cycle encoder for devices such as an arm or elevator. */
 public class Robot extends TimedRobot {

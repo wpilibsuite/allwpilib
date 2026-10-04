@@ -4,11 +4,8 @@
 
 package org.wpilib.examples.hatchbotinlined;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.system.DataLogManager;
+import module wpilib;
+import module wpilib.command2;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

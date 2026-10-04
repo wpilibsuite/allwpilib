@@ -6,10 +6,7 @@ package org.wpilib.examples.swervedriveposeestimator;
 
 import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.random.Normal;
+import module wpilib;
 
 /** This dummy class represents a global measurement sensor, such as a computer vision solution. */
 public final class ExampleGlobalMeasurementSensor {

@@ -4,7 +4,8 @@
 
 package org.wpilib.examples.hatchbottraditional.commands;
 
-import org.wpilib.command2.Command;
+import module wpilib.command2;
+
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 
 public class HalveDriveVelocity extends Command {

@@ -4,15 +4,12 @@
 
 package org.wpilib.examples.hatchbotcmdv3.mechanisms;
 
+import module wpilib;
+import module wpilib.command3;
+import module wpilib.drivers;
+
 import java.util.function.DoubleSupplier;
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.hatchbotcmdv3.Constants.DriveConstants;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.telemetry.TelemetryLoggable;
-import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveMechanism implements Mechanism, TelemetryLoggable {
   // The motors on the left side of the drive.

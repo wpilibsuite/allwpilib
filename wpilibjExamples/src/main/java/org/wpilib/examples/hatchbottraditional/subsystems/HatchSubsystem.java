@@ -7,12 +7,10 @@ package org.wpilib.examples.hatchbottraditional.subsystems;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
-import org.wpilib.command2.SubsystemBase;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.hatchbottraditional.Constants.HatchConstants;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.DoubleSolenoid;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.telemetry.TelemetryTable;
 
 /** A hatch mechanism actuated by a single {@link DoubleSolenoid}. */
 public class HatchSubsystem extends SubsystemBase {

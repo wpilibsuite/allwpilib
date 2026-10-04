@@ -4,11 +4,8 @@
 
 package org.wpilib.examples.gettingstarted;
 
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.system.Timer;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in

@@ -4,12 +4,10 @@
 
 package org.wpilib.examples.dsgamepadchooser;
 
+import module wpilib;
+
 import java.util.List;
-import org.wpilib.driverstation.DSGamepadChooser;
-import org.wpilib.driverstation.DriverStationDisplay;
 import org.wpilib.driverstation.DriverStationDisplay.Mode;
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.PeriodicOpMode;
 
 /** An autonomous opmode with chooser balance parameters. */
 @Autonomous(name = "Balance Auto")

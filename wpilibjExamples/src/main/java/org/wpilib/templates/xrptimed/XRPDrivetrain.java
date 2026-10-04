@@ -4,9 +4,8 @@
 
 package org.wpilib.templates.xrptimed;
 
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.xrp.XRPMotor;
+import module wpilib;
+import module wpilib.xrp;
 
 public class XRPDrivetrain {
   private static final double GEAR_RATIO =

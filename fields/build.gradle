@@ -105,13 +105,13 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/generated/main/native/cpp/fields',
-                                'src/main/native/cpp',
-                                "$buildDir/generated/main/cpp"
+                        'src/main/native/cpp',
+                        "$buildDir/generated/main/cpp"
                         include 'fields.cpp', 'FieldTag.cpp', 'FieldImage.cpp', 'Field.cpp', '*.json.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include',
-                                'src/generated/main/native/include'
+                        'src/generated/main/native/include'
                     }
                 }
                 if (OperatingSystem.current().isWindows()) {
@@ -132,12 +132,12 @@ model {
                 cpp {
                     source {
                         srcDirs 'src/generated/main/native/cpp/fieldimages',
-                                "$buildDir/generated/mainImages/cpp"
+                        "$buildDir/generated/mainImages/cpp"
                         include 'field_images.cpp', '*.jpg.cpp', '*.jpeg.cpp', '*.png.cpp'
                     }
                     exportedHeaders {
                         srcDirs 'src/main/native/include',
-                                project(':wpiutil').file('src/main/native/include')
+                        project(':wpiutil').file('src/main/native/include')
                     }
                 }
             }

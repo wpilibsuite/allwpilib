@@ -4,9 +4,9 @@
 
 package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.examples.rebuiltcmdv3.constants.IntakeConstants;
 
 @Logged

@@ -6,9 +6,9 @@ package org.wpilib.examples.hatchbottraditional;
 
 import static org.wpilib.driverstation.Gamepad.Button;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.GamepadButton;
-import org.wpilib.driverstation.Gamepad;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.hatchbottraditional.Constants.AutoConstants;
 import org.wpilib.examples.hatchbottraditional.Constants.OIConstants;
 import org.wpilib.examples.hatchbottraditional.commands.ComplexAuto;
@@ -19,9 +19,6 @@ import org.wpilib.examples.hatchbottraditional.commands.HalveDriveVelocity;
 import org.wpilib.examples.hatchbottraditional.commands.ReleaseHatch;
 import org.wpilib.examples.hatchbottraditional.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbottraditional.subsystems.HatchSubsystem;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

@@ -4,25 +4,8 @@
 
 package org.wpilib.examples.simpledifferentialdrivesimulation;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.hardware.imu.OnboardIMU;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.kinematics.DifferentialDriveKinematics;
-import org.wpilib.math.kinematics.DifferentialDriveOdometry;
-import org.wpilib.math.kinematics.DifferentialDriveWheelVelocities;
-import org.wpilib.math.numbers.N2;
-import org.wpilib.math.system.DCMotor;
-import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.Models;
-import org.wpilib.simulation.DifferentialDrivetrainSim;
-import org.wpilib.simulation.EncoderSim;
-import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.system.RobotController;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
+import module wpilib.drivers;
 
 public class Drivetrain {
   // 3 meters per second.

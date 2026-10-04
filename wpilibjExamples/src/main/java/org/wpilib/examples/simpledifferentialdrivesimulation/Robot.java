@@ -4,19 +4,9 @@
 
 package org.wpilib.examples.simpledifferentialdrivesimulation;
 
+import module wpilib;
+
 import java.util.List;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.math.controller.LTVUnicycleController;
-import org.wpilib.math.filter.SlewRateLimiter;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.ChassisAccelerations;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.trajectory.HolonomicSample;
-import org.wpilib.math.trajectory.HolonomicTrajectory;
-import org.wpilib.math.trajectory.Trajectory;
-import org.wpilib.system.Timer;
 
 public class Robot extends TimedRobot {
   private final Gamepad controller = new Gamepad(0);

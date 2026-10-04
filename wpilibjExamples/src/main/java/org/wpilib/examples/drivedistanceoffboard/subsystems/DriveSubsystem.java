@@ -4,16 +4,12 @@
 
 package org.wpilib.examples.drivedistanceoffboard.subsystems;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drive.DifferentialDrive;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.drivedistanceoffboard.Constants.DriveConstants;
 import org.wpilib.examples.drivedistanceoffboard.ExampleSmartMotorController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.trajectory.TrapezoidProfile.State;
-import org.wpilib.system.RobotController;
-import org.wpilib.system.Timer;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.

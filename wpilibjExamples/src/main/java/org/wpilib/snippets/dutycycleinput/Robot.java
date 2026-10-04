@@ -4,9 +4,7 @@
 
 package org.wpilib.snippets.dutycycleinput;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.DutyCycle;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
 
 public class Robot extends TimedRobot {
   private final DutyCycle dutyCycle;

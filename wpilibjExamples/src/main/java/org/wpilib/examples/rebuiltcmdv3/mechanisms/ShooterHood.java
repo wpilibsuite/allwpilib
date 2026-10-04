@@ -6,13 +6,12 @@ package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 
 import static org.wpilib.units.Units.Radians;
 
+import module wpilib;
+import module wpilib.command3;
+
 import java.util.function.Supplier;
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.constants.ShooterConstants;
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
-import org.wpilib.units.measure.Angle;
 
 /** The hood for the shooter. The hood moves up and down to adjust the trajectory of the shots. */
 @Logged

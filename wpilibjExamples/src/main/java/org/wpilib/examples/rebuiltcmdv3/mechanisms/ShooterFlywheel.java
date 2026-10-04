@@ -6,13 +6,12 @@ package org.wpilib.examples.rebuiltcmdv3.mechanisms;
 
 import static org.wpilib.units.Units.RPM;
 
+import module wpilib;
+import module wpilib.command3;
+
 import java.util.function.Supplier;
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.epilogue.Logged;
 import org.wpilib.examples.rebuiltcmdv3.constants.ShooterConstants;
 import org.wpilib.examples.rebuiltcmdv3.stubs.ExampleSmartMotorController;
-import org.wpilib.units.measure.AngularVelocity;
 
 /** The flywheel for the shooter. The flywheel spins up to shoot the ball. */
 @Logged

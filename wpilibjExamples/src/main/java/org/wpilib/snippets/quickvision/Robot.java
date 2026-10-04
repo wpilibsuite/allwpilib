@@ -4,8 +4,8 @@
 
 package org.wpilib.snippets.quickvision;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.vision.stream.CameraServer;
+import module wpilib;
+import module wpilib.cameraserver;
 
 /**
  * Uses the CameraServer class to automatically capture video from a USB webcam and send it to the

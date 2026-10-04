@@ -4,8 +4,9 @@
 
 package org.wpilib.examples.xrpreference.commands;
 
+import module wpilib.command2;
+
 import java.util.function.Supplier;
-import org.wpilib.command2.Command;
 import org.wpilib.examples.xrpreference.subsystems.Drivetrain;
 
 public class ArcadeDrive extends Command {

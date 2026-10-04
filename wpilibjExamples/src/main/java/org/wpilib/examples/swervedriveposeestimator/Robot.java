@@ -4,9 +4,7 @@
 
 package org.wpilib.examples.swervedriveposeestimator;
 
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.math.filter.SlewRateLimiter;
+import module wpilib;
 
 public class Robot extends TimedRobot {
   private final Gamepad controller = new Gamepad(0);

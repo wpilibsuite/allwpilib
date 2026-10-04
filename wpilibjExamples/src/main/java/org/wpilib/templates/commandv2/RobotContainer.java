@@ -4,9 +4,8 @@
 
 package org.wpilib.templates.commandv2;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.command2.button.Trigger;
+import module wpilib.command2;
+
 import org.wpilib.templates.commandv2.Constants.OperatorConstants;
 import org.wpilib.templates.commandv2.commands.Autos;
 import org.wpilib.templates.commandv2.commands.ExampleCommand;

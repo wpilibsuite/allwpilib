@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.digitalinput;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.DigitalInput;
+import module wpilib;
 
 /**
  * DigitalInput snippets for wpilib-docs.

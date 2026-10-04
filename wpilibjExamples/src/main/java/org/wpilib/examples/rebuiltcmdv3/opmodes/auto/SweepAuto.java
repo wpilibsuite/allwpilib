@@ -4,13 +4,11 @@
 
 package org.wpilib.examples.rebuiltcmdv3.opmodes.auto;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Trigger;
-import org.wpilib.driverstation.RobotState;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.examples.rebuiltcmdv3.Robot;
 import org.wpilib.examples.rebuiltcmdv3.constants.FieldConstants;
-import org.wpilib.opmode.Autonomous;
-import org.wpilib.opmode.OpMode;
 
 @Autonomous
 public class SweepAuto implements OpMode {

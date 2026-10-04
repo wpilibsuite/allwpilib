@@ -6,10 +6,9 @@ package org.wpilib.examples.rapidreactcommandbot;
 
 import static org.wpilib.command2.Commands.parallel;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.command2.button.Trigger;
-import org.wpilib.epilogue.Logged;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.rapidreactcommandbot.Constants.AutoConstants;
 import org.wpilib.examples.rapidreactcommandbot.Constants.OIConstants;
 import org.wpilib.examples.rapidreactcommandbot.Constants.ShooterConstants;

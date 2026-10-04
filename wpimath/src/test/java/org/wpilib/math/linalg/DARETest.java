@@ -37,7 +37,9 @@ class DARETest extends UtilityClassTest<DARE> {
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − AᵀXB(BᵀXB + R)⁻¹BᵀXA + Q = 0
     var Y =
-        (A.transpose().times(X).times(A))
+        A.transpose()
+            .times(X)
+            .times(A)
             .minus(X)
             .minus(
                 A.transpose()
@@ -63,7 +65,9 @@ class DARETest extends UtilityClassTest<DARE> {
     // Check that X is the solution to the DARE
     // Y = AᵀXA − X − (AᵀXB + N)(BᵀXB + R)⁻¹(BᵀXA + Nᵀ) + Q = 0
     var Y =
-        (A.transpose().times(X).times(A))
+        A.transpose()
+            .times(X)
+            .times(A)
             .minus(X)
             .minus(
                 A.transpose()

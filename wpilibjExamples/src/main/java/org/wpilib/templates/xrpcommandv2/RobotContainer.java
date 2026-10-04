@@ -4,8 +4,9 @@
 
 package org.wpilib.templates.xrpcommandv2;
 
-import org.wpilib.command2.Command;
-import org.wpilib.driverstation.Gamepad;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.templates.xrpcommandv2.commands.ExampleCommand;
 import org.wpilib.templates.xrpcommandv2.subsystems.XRPDrivetrain;
 

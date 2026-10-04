@@ -7,14 +7,10 @@ package org.wpilib.examples.hatchbotcmdv3.mechanisms;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.FORWARD;
 import static org.wpilib.hardware.pneumatic.DoubleSolenoid.Value.REVERSE;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
+import module wpilib;
+import module wpilib.command3;
+
 import org.wpilib.examples.hatchbotcmdv3.Constants.HatchConstants;
-import org.wpilib.hardware.bus.CANPort;
-import org.wpilib.hardware.pneumatic.DoubleSolenoid;
-import org.wpilib.hardware.pneumatic.PneumaticsModuleType;
-import org.wpilib.telemetry.TelemetryLoggable;
-import org.wpilib.telemetry.TelemetryTable;
 
 /** A hatch mechanism actuated by a single {@link org.wpilib.hardware.pneumatic.DoubleSolenoid}. */
 public class HatchMechanism implements Mechanism, TelemetryLoggable {

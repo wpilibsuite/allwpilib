@@ -7,8 +7,7 @@ package org.wpilib.examples.rebuiltcmdv3.constants;
 import static org.wpilib.units.Units.Degrees;
 import static org.wpilib.units.Units.RPM;
 
-import org.wpilib.units.measure.Angle;
-import org.wpilib.units.measure.AngularVelocity;
+import module wpilib;
 
 public final class IntakeConstants {
   public static final int ROLLER_MOTOR_ID = 20;

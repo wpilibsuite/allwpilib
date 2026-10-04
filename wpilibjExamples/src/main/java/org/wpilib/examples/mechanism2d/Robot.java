@@ -4,17 +4,8 @@
 
 package org.wpilib.examples.mechanism2d;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.AnalogPotentiometer;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.smartdashboard.Mechanism2d;
-import org.wpilib.smartdashboard.MechanismLigament2d;
-import org.wpilib.smartdashboard.MechanismRoot2d;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.util.Color;
-import org.wpilib.util.Color8Bit;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * This sample program shows how to use Mechanism2d - a visual representation of arms, elevators,

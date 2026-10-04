@@ -4,9 +4,7 @@
 
 package org.wpilib.examples.expansionhubsample;
 
-import org.wpilib.framework.OpModeRobot;
-import org.wpilib.hardware.expansionhub.ExpansionHubMotor;
-import org.wpilib.hardware.expansionhub.ExpansionHubServo;
+import module wpilib;
 
 /**
  * This is a demo program showing the use of the Expansion Hub motors and servos. The motors and

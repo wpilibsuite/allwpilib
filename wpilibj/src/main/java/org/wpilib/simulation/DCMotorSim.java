@@ -137,7 +137,7 @@ public class DCMotorSim extends LinearSystemSim<N2, N1, N2> {
    * @return The DC motor's acceleration in rad/s².
    */
   public double getAngularAcceleration() {
-    var acceleration = (m_plant.getA().times(m_x)).plus(m_plant.getB().times(m_u));
+    var acceleration = m_plant.getA().times(m_x).plus(m_plant.getB().times(m_u));
     return acceleration.get(1, 0);
   }
 

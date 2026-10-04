@@ -1013,7 +1013,7 @@ public final class Scheduler implements ProtobufSerializable {
       return;
     }
 
-    var previousState = currentState();
+    final var previousState = currentState();
 
     m_currentCommandAncestry.push(state);
     long startNanos = RobotController.getTime();

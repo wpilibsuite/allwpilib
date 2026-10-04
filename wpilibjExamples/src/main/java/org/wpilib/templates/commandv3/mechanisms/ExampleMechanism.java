@@ -4,9 +4,7 @@
 
 package org.wpilib.templates.commandv3.mechanisms;
 
-import org.wpilib.command3.Command;
-import org.wpilib.command3.Mechanism;
-import org.wpilib.command3.Trigger;
+import module wpilib.command3;
 
 /** An example class demonstrating basic use of mechanisms and commands. */
 public class ExampleMechanism implements Mechanism {

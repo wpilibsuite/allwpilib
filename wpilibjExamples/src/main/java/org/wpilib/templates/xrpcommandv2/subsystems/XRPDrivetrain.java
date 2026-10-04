@@ -4,10 +4,9 @@
 
 package org.wpilib.templates.xrpcommandv2.subsystems;
 
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.xrp.XRPMotor;
+import module wpilib;
+import module wpilib.command2;
+import module wpilib.xrp;
 
 public class XRPDrivetrain extends SubsystemBase {
   private static final double GEAR_RATIO =

@@ -72,8 +72,6 @@ public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
       final int forwardChannel,
       final int reverseChannel) {
     m_module = PneumaticsBase.getForType(busId, module, moduleType);
-    boolean allocatedSolenoids = false;
-    boolean successfulCompletion = false;
 
     m_forwardChannel = forwardChannel;
     m_reverseChannel = reverseChannel;
@@ -82,6 +80,8 @@ public class DoubleSolenoid implements TelemetryLoggable, AutoCloseable {
     m_reverseMask = 1 << reverseChannel;
     m_mask = m_forwardMask | m_reverseMask;
 
+    boolean allocatedSolenoids = false;
+    boolean successfulCompletion = false;
     try {
       if (!m_module.checkSolenoidChannel(forwardChannel)) {
         throw new IllegalArgumentException("Channel " + forwardChannel + " out of range");

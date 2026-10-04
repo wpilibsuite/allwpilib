@@ -4,15 +4,8 @@
 
 package org.wpilib.examples.swervebot;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.controller.ProfiledPIDController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.kinematics.SwerveModulePosition;
-import org.wpilib.math.kinematics.SwerveModuleVelocity;
-import org.wpilib.math.trajectory.TrapezoidProfile;
+import module wpilib;
+import module wpilib.drivers;
 
 public class SwerveModule {
   private static final double WHEEL_RADIUS = 0.0508;

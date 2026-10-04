@@ -4,8 +4,7 @@
 
 package org.wpilib;
 
-import org.wpilib.framework.RobotBase;
-import org.wpilib.util.ConstructorMatch;
+import module wpilib;
 
 /** This is the executor to launch template projects. */
 public final class Executor {

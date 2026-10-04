@@ -4,10 +4,8 @@
 
 package org.wpilib.examples.tankdrivegamepad;
 
-import org.wpilib.drive.DifferentialDrive;
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Gamepad;
-import org.wpilib.framework.TimedRobot;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class. Runs the motors with tank

@@ -4,8 +4,8 @@
 
 package org.wpilib.templates.opmode.opmode;
 
-import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.opmode.Teleop;
+import module wpilib;
+
 import org.wpilib.templates.opmode.Robot;
 
 @Teleop

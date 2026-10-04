@@ -4,11 +4,8 @@
 
 package org.wpilib.snippets.motorcontrol;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.telemetry.Telemetry;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * This sample program shows how to control a motor using a joystick. In the operator control part

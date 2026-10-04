@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.encoder;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
+import module wpilib;
 
 /**
  * Encoder snippets for wpilib-docs.

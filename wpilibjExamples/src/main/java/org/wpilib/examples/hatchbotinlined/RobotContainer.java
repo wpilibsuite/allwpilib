@@ -4,17 +4,13 @@
 
 package org.wpilib.examples.hatchbotinlined;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.Commands;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.driverstation.Gamepad;
+import module wpilib;
+import module wpilib.command2;
+
 import org.wpilib.examples.hatchbotinlined.Constants.OIConstants;
 import org.wpilib.examples.hatchbotinlined.commands.Autos;
 import org.wpilib.examples.hatchbotinlined.subsystems.DriveSubsystem;
 import org.wpilib.examples.hatchbotinlined.subsystems.HatchSubsystem;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Selectable;
-import org.wpilib.tunable.Tunables;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a

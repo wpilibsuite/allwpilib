@@ -4,10 +4,10 @@
 
 package org.wpilib.examples.rebuiltcmdv3.opmodes.teleop;
 
+import module wpilib;
+
 import org.wpilib.examples.rebuiltcmdv3.Robot;
 import org.wpilib.examples.rebuiltcmdv3.constants.FieldConstants;
-import org.wpilib.opmode.OpMode;
-import org.wpilib.opmode.Teleop;
 
 @Teleop
 public class DefaultTeleop implements OpMode {

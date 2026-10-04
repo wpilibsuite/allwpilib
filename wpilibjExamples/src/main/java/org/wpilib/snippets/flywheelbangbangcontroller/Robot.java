@@ -8,21 +8,8 @@ import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 import static org.wpilib.math.util.UnitConversions.lbsToKilograms;
 import static org.wpilib.math.util.UnitConversions.rotationsPerMinuteToRadiansPerSecond;
 
-import org.wpilib.drivers.motor.PWMSparkMax;
-import org.wpilib.driverstation.Joystick;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.math.controller.BangBangController;
-import org.wpilib.math.controller.SimpleMotorFeedforward;
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.system.DCMotor;
-import org.wpilib.math.system.LinearSystem;
-import org.wpilib.math.system.Models;
-import org.wpilib.simulation.EncoderSim;
-import org.wpilib.simulation.FlywheelSim;
-import org.wpilib.system.RobotController;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Tunables;
+import module wpilib;
+import module wpilib.drivers;
 
 /**
  * This is a sample program to demonstrate the use of a BangBangController with a flywheel to

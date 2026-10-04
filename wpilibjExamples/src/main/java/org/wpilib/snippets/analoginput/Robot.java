@@ -4,8 +4,7 @@
 
 package org.wpilib.snippets.analoginput;
 
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.AnalogInput;
+import module wpilib;
 
 /**
  * AnalogInput snippets for wpilib-docs.

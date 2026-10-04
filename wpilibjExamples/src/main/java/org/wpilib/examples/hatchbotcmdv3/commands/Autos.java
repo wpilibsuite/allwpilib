@@ -4,7 +4,8 @@
 
 package org.wpilib.examples.hatchbotcmdv3.commands;
 
-import org.wpilib.command3.Command;
+import module wpilib.command3;
+
 import org.wpilib.examples.hatchbotcmdv3.Constants.AutoConstants;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.DriveMechanism;
 import org.wpilib.examples.hatchbotcmdv3.mechanisms.HatchMechanism;

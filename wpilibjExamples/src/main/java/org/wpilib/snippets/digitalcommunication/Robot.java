@@ -4,12 +4,9 @@
 
 package org.wpilib.snippets.digitalcommunication;
 
+import module wpilib;
+
 import java.util.Optional;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.framework.TimedRobot;
-import org.wpilib.hardware.discrete.DigitalOutput;
 
 /**
  * This is a sample program demonstrating how to communicate to a light controller from the robot
