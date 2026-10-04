@@ -105,6 +105,8 @@ maven.install(
 )
 use_repo(maven, "maven")
 
+bazel_dep(name = "google_benchmark", version = "1.9.5", dev_dependency = True)
+
 bazel_dep(name = "caseyduquettesc_rules_python_pytest", version = "1.1.1", repo_name = "rules_python_pytest")
 bazel_dep(name = "eigen", version = "5.0.1")
 local_path_override(
