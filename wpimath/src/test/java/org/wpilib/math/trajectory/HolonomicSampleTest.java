@@ -445,7 +445,7 @@ class HolonomicSampleTest {
             forwardAcceleration,
             curvature);
 
-    // Field-relative: forward speed rotated into +y.
+    // Field-relative: forward velocity rotated into +y.
     assertEquals(0.0, sample.velocity.vx, EPSILON);
     assertEquals(forwardVelocity, sample.velocity.vy, EPSILON);
     // Omega is frame-invariant and equals forward * curvature.
@@ -534,8 +534,8 @@ class HolonomicSampleTest {
 
   @Test
   void testDifferentialSampleTransformPreservesWheelVelocities() {
-    // Wheel speeds are frame-invariant, so they survive a transform unchanged while
-    // the field-relative velocity rotates.
+    // Wheel velocities are frame-invariant, so they survive a transform
+    // unchanged while the field-relative velocity rotates.
     var kinematics = new DifferentialDriveKinematics(0.5);
     var sample =
         new DifferentialSample(
