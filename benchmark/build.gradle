@@ -205,10 +205,7 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                    if (binary.buildType.name == 'debug') {
-                        deploy.targets.systemcore.artifacts.benchmarkCpp.binary = binary
-                        deploy.targets.systemcore.artifacts.benchmarkCppJava.binary = binary
-                    }
+                    deploy.targets.systemcore.artifacts.benchmarkCpp.binary = binary
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -266,9 +263,7 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                    if (binary.buildType.name == 'debug') {
-                        deploy.targets.systemcore.artifacts.benchmarkCppStatic.binary = binary
-                    }
+                    deploy.targets.systemcore.artifacts.benchmarkCppStatic.binary = binary
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
