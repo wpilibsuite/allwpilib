@@ -20,6 +20,7 @@ def wpilib_java_library(
         maven_artifact_name,
         tags = [],
         extra_source_pkgs = [],
+        maven_export_tags = [],
         **kwargs):
     tags = list(tags) if tags else []
 
@@ -39,6 +40,7 @@ def wpilib_java_library(
         classifier_artifacts = {"sources": ":lib{}-sources.jar".format(name)},
         lib_name = name,
         maven_coordinates = maven_coordinates,
+        tags = maven_export_tags,
         visibility = ["//visibility:public"],
     )
 

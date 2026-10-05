@@ -124,17 +124,6 @@ class Trajectory {
   }
 
   /**
-   * Sample the trajectory at a point in time.
-   *
-   * @param t The point in time since the beginning of the trajectory to sample
-   *          (in seconds).
-   * @return The sample at that point in time.
-   */
-  SampleType SampleAt(double t) const {
-    return SampleAt(wpi::units::second_t{t});
-  }
-
-  /**
    * Interpolates between two samples. This method must be implemented by
    * subclasses to provide drivetrain-specific interpolation logic.
    *

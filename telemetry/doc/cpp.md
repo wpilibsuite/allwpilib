@@ -130,9 +130,9 @@ Typical subsystem pattern:
 class Shooter {
  public:
   void Periodic() {
-    m_telemetry.Log("wheelSpeedRps", m_encoder.GetRate());
+    m_telemetry.Log("wheelVelocityRps", m_encoder.GetRate());
     m_telemetry.Log("appliedVoltage", m_lastVoltage.value());
-    m_telemetry.Log("ready", AtSpeed());
+    m_telemetry.Log("ready", AtVelocity());
   }
 
  private:
@@ -199,8 +199,8 @@ In C++, array-style logging is based on `std::span`, not Java arrays.
 Primitive arrays:
 
 ```cpp
-std::array<double, 3> wheelSpeeds{left, right, average};
-wpi::telemetry::Log("wheelSpeeds", std::span{wheelSpeeds});
+std::array<double, 3> wheelVelocities{left, right, average};
+wpi::telemetry::Log("wheelVelocities", std::span{wheelVelocities});
 
 auto& table = wpi::telemetry::GetTable("Drive");
 table.Log("setpoints", {1.0, 2.0, 3.0});
@@ -262,23 +262,23 @@ For non-final classes or types that naturally own a telemetry schema, subclassin
 ```cpp
 class DriveSnapshot : public wpi::telemetry::TelemetryLoggable {
  public:
-  DriveSnapshot(const wpi::DifferentialDriveWheelSpeeds& wheelSpeeds,
+  DriveSnapshot(const wpi::DifferentialDriveWheelVelocities& wheelVelocities,
                 const wpi::Pose2d& pose, bool closedLoop)
-      : m_wheelSpeeds{wheelSpeeds}, m_pose{pose}, m_closedLoop{closedLoop} {}
+      : m_wheelVelocities{wheelVelocities}, m_pose{pose}, m_closedLoop{closedLoop} {}
 
   std::string_view GetTelemetryType() const override {
     return "DriveSnapshot";
   }
 
   void LogTo(wpi::telemetry::TelemetryTable& table) const override {
-    table.Log("leftMetersPerSecond", m_wheelSpeeds.left.value());
-    table.Log("rightMetersPerSecond", m_wheelSpeeds.right.value());
+    table.Log("leftMetersPerSecond", m_wheelVelocities.left.value());
+    table.Log("rightMetersPerSecond", m_wheelVelocities.right.value());
     table.Log("pose", m_pose);
     table.Log("closedLoop", m_closedLoop);
   }
 
  private:
-  wpi::DifferentialDriveWheelSpeeds m_wheelSpeeds;
+  wpi::DifferentialDriveWheelVelocities m_wheelVelocities;
   wpi::Pose2d m_pose;
   bool m_closedLoop;
 };
@@ -287,7 +287,7 @@ class DriveSnapshot : public wpi::telemetry::TelemetryLoggable {
 Logging it is just:
 
 ```cpp
-DriveSnapshot snapshot{m_drive.GetWheelSpeeds(), m_drive.GetPose(), m_drive.IsClosedLoop()};
+DriveSnapshot snapshot{m_drive.GetWheelVelocities(), m_drive.GetPose(), m_drive.IsClosedLoop()};
 wpi::telemetry::Log("drive", snapshot);
 ```
 
@@ -431,7 +431,7 @@ void RobotPeriodic() {
                                  m_leftEncoder.GetRate());
   frc::SmartDashboard::PutNumber("Drive/rightVelocity",
                                  m_rightEncoder.GetRate());
-  frc::SmartDashboard::PutBoolean("Drive/ready", AtSpeed());
+  frc::SmartDashboard::PutBoolean("Drive/ready", AtVelocity());
 }
 ```
 
@@ -443,7 +443,7 @@ wpi::telemetry::TelemetryTable& m_driveTelemetry = wpi::telemetry::GetTable("Dri
 void RobotPeriodic() {
   m_driveTelemetry.Log("leftVelocity", m_leftEncoder.GetRate());
   m_driveTelemetry.Log("rightVelocity", m_rightEncoder.GetRate());
-  m_driveTelemetry.Log("ready", AtSpeed());
+  m_driveTelemetry.Log("ready", AtVelocity());
 }
 ```
 
@@ -507,24 +507,24 @@ If the old code used `GetNumber()` or another `Get*()` call to let dashboard cha
 **Was (WPILib 2026):**
 
 ```cpp
-double m_intakeSpeed = 0.65;
+double m_intakeVelocity = 0.65;
 
 void RobotPeriodic() {
-  frc::SmartDashboard::PutNumber("Intake/speed", m_intakeSpeed);
-  m_intakeSpeed =
-      frc::SmartDashboard::GetNumber("Intake/speed", m_intakeSpeed);
-  m_intakeMotor.Set(m_intakeSpeed);
+  frc::SmartDashboard::PutNumber("Intake/velocity", m_intakeVelocity);
+  m_intakeVelocity =
+      frc::SmartDashboard::GetNumber("Intake/velocity", m_intakeVelocity);
+  m_intakeMotor.Set(m_intakeVelocity);
 }
 ```
 
 **Is (Tunable):**
 
 ```cpp
-wpi::tunables::TunableDouble m_intakeSpeed =
-    wpi::tunables::Add<double>("Intake/speed", 0.65);
+wpi::tunables::TunableDouble m_intakeVelocity =
+    wpi::tunables::Add<double>("Intake/velocity", 0.65);
 
 void RobotPeriodic() {
-  m_intakeMotor.Set(m_intakeSpeed.Get());
+  m_intakeMotor.Set(m_intakeVelocity.Get());
 }
 ```
 

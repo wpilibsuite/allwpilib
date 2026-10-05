@@ -27,6 +27,9 @@ void ListenerStorage::Thread::Main() {
     if (!events.empty()) {
       std::unique_lock lock{m_mutex};
       for (auto&& event : events) {
+        if (!m_active) {
+          break;
+        }
         auto callbackIt = m_callbacks.find(event.listener);
         if (callbackIt != m_callbacks.end()) {
           auto callback = callbackIt->second;
@@ -262,6 +265,9 @@ void ListenerStorage::NotifyTimeSync(std::span<const NT_Listener> handles,
 
 NT_Listener ListenerStorage::AddListener(ListenerCallback callback) {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   if (!m_thread) {
     m_thread.Start(m_pollers.Add(m_inst)->handle);
   }
@@ -278,6 +284,9 @@ NT_Listener ListenerStorage::AddListener(ListenerCallback callback) {
 
 NT_Listener ListenerStorage::AddListener(NT_ListenerPoller pollerHandle) {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   return DoAddListener(pollerHandle);
 }
 
@@ -291,6 +300,9 @@ NT_Listener ListenerStorage::DoAddListener(NT_ListenerPoller pollerHandle) {
 
 NT_ListenerPoller ListenerStorage::CreateListenerPoller() {
   std::scoped_lock lock{m_mutex};
+  if (m_resetting) {
+    return {};
+  }
   return m_pollers.Add(m_inst)->handle;
 }
 
@@ -348,15 +360,33 @@ bool ListenerStorage::WaitForListenerQueue(double timeout) {
 void ListenerStorage::Reset() {
   {
     std::scoped_lock lock{m_mutex};
-    m_pollers.clear();
-    m_listeners.clear();
-    m_connListeners.clear();
-    m_topicListeners.clear();
-    m_valueListeners.clear();
-    m_logListeners.clear();
-    m_timeSyncListeners.clear();
+    if (m_resetting) {
+      return;
+    }
+    if (!m_thread) {
+      DoReset();
+      return;
+    }
+
+    // A callback may be running; wait for it to complete.
+    m_resetting = true;
   }
+
   m_thread.Join();
+
+  std::scoped_lock lock{m_mutex};
+  DoReset();
+}
+
+void ListenerStorage::DoReset() {
+  m_pollers.clear();
+  m_listeners.clear();
+  m_connListeners.clear();
+  m_topicListeners.clear();
+  m_valueListeners.clear();
+  m_logListeners.clear();
+  m_timeSyncListeners.clear();
+  m_resetting = false;
 }
 
 std::vector<std::pair<NT_Listener, unsigned int>>

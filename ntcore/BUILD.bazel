@@ -1,6 +1,6 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//ntcore:generate_ntcore.bzl", "generate_ntcore")
@@ -80,19 +80,6 @@ filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
     visibility = ["//ntcore:__subpackages__"],
-)
-
-cc_library(
-    name = "ntcore_c_headers",
-    hdrs = [
-        "src/generated/main/native/include/wpi/nt/ntcore_c_types.h",
-        "src/main/native/include/wpi/nt/ntcore_c.h",
-    ],
-    includes = [
-        "src/generated/main/native/include",
-        "src/main/native/include",
-    ],
-    visibility = ["//visibility:public"],
 )
 
 wpilib_cc_library(
