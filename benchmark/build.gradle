@@ -66,6 +66,8 @@ tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
     onlyIf { false }
 }
 
+def projectJarTask = jar
+
 deploy {
     targets {
         systemcore(RemoteTarget) {
@@ -104,7 +106,7 @@ deploy {
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/benchmarkCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/benchmarkCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCpp\"")
                         ctx.execute('chmod +x benchmarkCpp')
@@ -114,9 +116,9 @@ deploy {
                 benchmarkCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCppStatic\"")
+                        ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCppStatic\"")
                         ctx.execute('chmod +x benchmarkCppStatic')
                     }
                 }
@@ -128,10 +130,13 @@ deploy {
                     excludes.add('**/*.so.*.debug')
                 }
 
-                benchmarkJava(JavaArtifact) {
-                    jarTask = jar
+                benchmarkJava(JavaClasspathArtifact) {
+                    it.directory = "wpilib/allwpilibclasspath"
+                    it.deleteOldFiles = true
+                    it.setJar(projectJarTask)
+                    it.setConfiguration(configurations.runtimeClasspath)
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib --add-opens java.base/jdk.internal.vm=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -cp \"/home/systemcore/wpilib/allwpilibclasspath/*\" wpilib.robot.Main' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
