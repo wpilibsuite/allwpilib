@@ -195,8 +195,12 @@ void WPI_FreeAlerts(struct WPI_AlertInfo* arr, int32_t length);
 void WPI_ResetAlertData(void);
 
 /**
- * Sets the alert backend. Existing readers remain bound to their original
- * backend. Backends and their callbacks must outlive all operations using them.
+ * Sets the alert backend during initialization. Null selects the default
+ * in-memory backend. Call before creating alerts or readers; changing backends
+ * while the alert system is in use is unsupported. This restriction is not
+ * checked at runtime. Existing alerts and handles are not migrated.
+ *
+ * Backends and their callbacks must outlive all operations using them.
  *
  * @param backend pointer to the alert backend
  */

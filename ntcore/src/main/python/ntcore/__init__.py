@@ -89,6 +89,7 @@ from ._ntcore import (
     TopicInfo,
     Value,
     ValueEventData,
+    install_alert_backend,
 )
 
 __all__ = [
@@ -179,6 +180,7 @@ __all__ = [
     "TopicInfo",
     "Value",
     "ValueEventData",
+    "install_alert_backend",
 ]
 
 from ._ntcore import _now, _set_now

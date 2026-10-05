@@ -77,8 +77,9 @@ extern "C" {
  * Creates an independent observation reader on the current alert backend.
  * Synchronization freezes a replacement baseline, then queues subsequent
  * changes, even before the first read. Each reader has its own bounded change
- * queue. Replacement records do not count against capacity. Backend switching
- * does not move existing readers. Observing an alert grants no mutation rights.
+ * queue. Replacement records do not count against capacity. Readers remain
+ * bound to their creating backend. Observing an alert grants no mutation
+ * rights.
  *
  * @param capacity Maximum pending changes; must be positive
  * @param[out] reader New reader, or NULL on failure

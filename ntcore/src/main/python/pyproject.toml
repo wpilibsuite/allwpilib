@@ -73,6 +73,7 @@ depends = ["wpiutil", "wpinet", "wpilog"]
 
 [tool.semiwrap.extension_modules."ntcore._ntcore".headers]
 # networktables
+AlertBackend = "wpi/nt/AlertBackend.hpp"
 BooleanArrayTopic = "wpi/nt/BooleanArrayTopic.hpp"
 BooleanTopic = "wpi/nt/BooleanTopic.hpp"
 DoubleArrayTopic = "wpi/nt/DoubleArrayTopic.hpp"

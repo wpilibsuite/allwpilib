@@ -637,13 +637,12 @@ TEST_CASE_METHOD(AlertTest,
   WPI_DestroyAlert(current);
 }
 
-TEST_CASE_METHOD(AlertTest, "AlertTest ReaderAndEventsSurviveBackendSwitch",
+TEST_CASE_METHOD(AlertTest, "AlertTest EventsSurviveReaderDestruction",
                  "[wpiutil]") {
   CreateAlert("group", "id", "before", WPI_ALERT_LOW);
   WPI_AlertEvents result{};
   {
     Reader reader{1};
-    WPI_SetAlertBackend(&testBackend);
     REQUIRE(WPI_ReadAlertEvents(reader.handle, &result) == 0);
     REQUIRE(result.count == 1u);
   }
