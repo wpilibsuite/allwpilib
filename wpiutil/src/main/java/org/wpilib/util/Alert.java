@@ -5,7 +5,7 @@
 package org.wpilib.util;
 
 /**
- * Persistent alert. Alerts are tagged with a type of {@code HIGH}, {@code MEDIUM}, or {@code LOW}
+* Persistent alert. Alerts are tagged with a type of {@code ERROR}, {@code WARNING}, or {@code INFO}
  * to denote urgency. See {@link org.wpilib.util.Alert.Level Level} for suggested usage of each
  * type. Alerts can be displayed on supported dashboards, and are shown in a priority order based on
  * type and recency of activation, with newly activated alerts first.
@@ -15,7 +15,7 @@ package org.wpilib.util;
  *
  * <pre>
  * class Robot {
- *   Alert alert = new Alert("somethingWrong", "Something went wrong", Alert.Level.MEDIUM);
+ *   Alert alert = new Alert("somethingWrong", "Something went wrong", Alert.Level.WARNING);
  *
  *   periodic() {
  *     alert.set(...);
@@ -27,7 +27,7 @@ package org.wpilib.util;
  *
  * <pre>
  * public Robot() {
- *   new Alert("autoPathsFailed", "Failed to load auto paths", Alert.Level.HIGH).set(true);
+ *   new Alert("autoPathsFailed", "Failed to load auto paths", Alert.Level.ERROR).set(true);
  * }
  * </pre>
  */
@@ -53,6 +53,15 @@ public class Alert implements AutoCloseable {
      * the other categories.
      */
     LOW(AlertDataJNI.LEVEL_LOW);
+
+    /** Alternate name for a high priority alert. */
+    public static final Level ERROR = HIGH;
+
+    /** Alternate name for a medium priority alert. */
+    public static final Level WARNING = MEDIUM;
+
+    /** Alternate name for a low priority alert. */
+    public static final Level INFO = LOW;
 
     private final int m_value;
 

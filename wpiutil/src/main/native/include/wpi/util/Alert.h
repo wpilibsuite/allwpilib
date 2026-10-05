@@ -26,6 +26,7 @@ enum WPI_AlertLevel {
    * require immediate attention.
    */
   WPI_ALERT_HIGH = 0,
+  WPI_ALERT_ERROR = WPI_ALERT_HIGH,
 
   /**
    * Medium priority alert - displayed second with a yellow "!" symbol. Use this
@@ -33,6 +34,7 @@ enum WPI_AlertLevel {
    * necessarily require immediate attention.
    */
   WPI_ALERT_MEDIUM = 1,
+  WPI_ALERT_WARNING = WPI_ALERT_MEDIUM,
 
   /**
    * Low priority alert - displayed last with a blue "i" symbol. Use this type
@@ -40,6 +42,7 @@ enum WPI_AlertLevel {
    * other alerts which do not fall under the other categories.
    */
   WPI_ALERT_LOW = 2,
+  WPI_ALERT_INFO = WPI_ALERT_LOW
 };
 
 /** Information about an alert. */
