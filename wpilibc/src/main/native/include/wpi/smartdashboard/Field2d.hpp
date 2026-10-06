@@ -18,10 +18,6 @@
 
 namespace wpi {
 
-namespace tunables {
-class TunableTable;
-}  // namespace tunables
-
 /**
  * 2D representation of game field for dashboards.
  *
