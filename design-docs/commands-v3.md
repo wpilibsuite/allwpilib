@@ -310,6 +310,32 @@ will schedule a given command and call `yield()` in a loop until that command ha
 execution (note: this does *not* naively call `command.run(coroutine)`, which would hide the inner
 command from the scheduler and potentially sidestep requirement mutexing)
 
+The `Coroutine` class provides helpers for a few common operations. These helpers will park the coroutine
+so the scheduler doesn't need to bother mounting and unmounting a coroutine that it knows will do nothing.
+This saves a few microseconds per command, and will not emit telemetry events related to command mounting
+an yielding.
+
+- `park()` permanently places the coroutine into a parked state, never to be resumed by the scheduler
+- `waitUntil(BooleanSupplier)` temporarily parks the coroutine until the given condition is met
+- `await(Command)` temporarily parks the coroutine until the given command has completed execution
+- `awaitAll(Collection<Command>)` temporarily parks the coroutine until all given commands have completed execution
+- `awaitAny(Collection<Command>)` temporarily parks the coroutine until any of the given commands have completed execution
+- `wait(Time)` temporarily parks the coroutine until the given duration has elapsed
+
+This is implemented by tracking an internal state object, which can be one of the following:
+
+- `Live` - when the coroutine is live and not parked. The coroutine is always mountable.
+- `Frozen` - when the coroutine is permanently parked. The coroutine is never mountable.
+- `ParkedOnCondition(BooleanSupplier)` - when the coroutine is temporarily parked waiting on some condition. The coroutine is mountable when the condition is met, when checked by the scheduler.
+- `ParkedUntil(Time)` - when the coroutine is parked until a future timestamp is reached.
+- `Canceled` - when `requestCancellation()` is called. The coroutine is never mountable and the scheduler will cancel its associated command and its descendants.
+- `ForkFailed` - when a fork or await call failed to schedule a command. The coroutine is never mountable and the scheduler will interrupt its associated command and its entire composition.
+
+When the scheduler attempts to run a command, it first checks the state of the coroutine assigned to that command.
+If the state is not mountable, the scheduler will not attempt to run the command. Otherwise, it mounts the
+coroutine and allows it to run until it reaches a yield point or exits. A resumed coroutine always sets its state 
+back to `Live`.
+
 Awaiting is implemented by tracking the run IDs of all the forked commands and comparing those original
 run IDs with the current IDs associated with those commands. If an ID changes, the command is considered
 to have completed execution and the coroutine may resume. This approach correctly handles one-shot commands,
