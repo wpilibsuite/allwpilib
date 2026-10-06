@@ -32,7 +32,7 @@ cc_test(
 )
 
 cc_test(
-    name = "MulticastTest",
+    name = "wpinet_multicast_tests",
     size = "small",
     srcs = ["cpp/MulticastTest.cpp"],
     tags = [
@@ -43,5 +43,13 @@ cc_test(
         ":main",
         "//thirdparty/catch2",
         "//wpinet",
+    ],
+)
+
+test_suite(
+    name = "native",
+    tests = [
+        ":wpinet_multicast_tests",
+        ":wpinet_tests",
     ],
 )
