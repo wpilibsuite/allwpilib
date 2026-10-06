@@ -100,11 +100,11 @@ class TunableTable final {
   template <typename T, std::derived_from<ComplexTunable> Class, typename... I>
     requires std::convertible_to<
         std::unique_ptr<detail::TunableMemberBase>,
-        decltype(detail::MakeTunableMember(std::declval<T Class::*>()))>
+        decltype(MakeTunableMember(std::declval<T Class::*>()))>
   bool Publish(std::string_view name, Class* tunable, T Class::* member,
                I&&... info) {
     return Publish(name, tunable,
-                   detail::MakeTunableMember(member, std::forward<I>(info)...));
+                   MakeTunableMember(member, std::forward<I>(info)...));
   }
 
   /**
@@ -120,13 +120,12 @@ class TunableTable final {
   template <typename T, std::derived_from<ComplexTunable> Class, typename... I>
     requires std::convertible_to<
         std::unique_ptr<detail::TunableMemberBase>,
-        decltype(detail::MakeTunableMember(std::declval<T Class::*>(),
-                                           std::declval<TunableConfig>()))>
+        decltype(MakeTunableMember(std::declval<T Class::*>(),
+                                   std::declval<TunableConfig>()))>
   bool Publish(std::string_view name, Class* tunable, T Class::* member,
                const TunableConfig& config, I&&... info) {
-    return Publish(
-        name, tunable,
-        detail::MakeTunableMember(member, config, std::forward<I>(info)...));
+    return Publish(name, tunable,
+                   MakeTunableMember(member, config, std::forward<I>(info)...));
   }
 
   /**
