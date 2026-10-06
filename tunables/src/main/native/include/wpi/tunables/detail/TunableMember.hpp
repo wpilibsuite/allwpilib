@@ -9,6 +9,7 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <new>
 #include <string>
 #include <string_view>
@@ -435,23 +436,21 @@ class TunableMemberProtobuf : public detail::TunableMemberProtobufBase {
 template <typename T, typename Class, typename... Args>
   requires TunableValueType<T>
 std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
-                                                             Args&&... args) {
-  return std::make_unique<TunableMemberValue<T>>(
-      member, std::forward<Args>(args)...);
+                                                     Args&&... args) {
+  return std::make_unique<TunableMemberValue<T>>(member,
+                                                 std::forward<Args>(args)...);
 }
 
 template <typename T, typename Class, typename... I>
-  requires(!TunableValueType<T> &&
-           wpi::util::StructSerializable<T, I...>)
+  requires(!TunableValueType<T> && wpi::util::StructSerializable<T, I...>)
 std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
-                                                             I&&... info) {
+                                                     I&&... info) {
   return std::make_unique<TunableMemberStruct<T, I...>>(
       member, std::forward<I>(info)...);
 }
 
 template <typename T, typename Class, typename... I>
-  requires(!TunableValueType<T> &&
-           wpi::util::StructSerializable<T, I...>)
+  requires(!TunableValueType<T> && wpi::util::StructSerializable<T, I...>)
 std::unique_ptr<TunableMemberBase> MakeTunableMember(
     T Class::* member, const TunableConfig& config, I&&... info) {
   return std::make_unique<TunableMemberStruct<T, I...>>(
@@ -480,7 +479,7 @@ template <typename T, typename Class, typename... Args>
   requires(!TunableValueType<T> && !wpi::util::StructSerializable<T> &&
            wpi::util::ProtobufSerializable<T>)
 std::unique_ptr<TunableMemberBase> MakeTunableMember(T Class::* member,
-                                                             Args&&... args) {
+                                                     Args&&... args) {
   return std::make_unique<TunableMemberProtobuf<T>>(
       member, std::forward<Args>(args)...);
 }
