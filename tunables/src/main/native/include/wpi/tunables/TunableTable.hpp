@@ -11,20 +11,10 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/tunables/CustomTunable.hpp"
+#include "wpi/tunables/detail/TunableBase.hpp"
+#include "wpi/tunables/detail/TunableMember.hpp"
 
 namespace wpi::tunables {
-
-template <typename T, typename... I>
-class Tunable;
-
-namespace detail {
-class TunableBase;
-class TunableMemberBase;
-}  // namespace detail
-
-class ComplexTunable;
-struct TunableConfig;
 
 /**
  * Tunables are used to allow values in the robot program to be changed from
@@ -110,11 +100,11 @@ class TunableTable final {
   template <typename T, std::derived_from<ComplexTunable> Class, typename... I>
     requires std::convertible_to<
         std::unique_ptr<detail::TunableMemberBase>,
-        decltype(MakeTunableMember(std::declval<T Class::*>()))>
+        decltype(detail::MakeTunableMember(std::declval<T Class::*>()))>
   bool Publish(std::string_view name, Class* tunable, T Class::* member,
                I&&... info) {
     return Publish(name, tunable,
-                   MakeTunableMember(member, std::forward<I>(info)...));
+                   detail::MakeTunableMember(member, std::forward<I>(info)...));
   }
 
   /**
@@ -130,12 +120,12 @@ class TunableTable final {
   template <typename T, std::derived_from<ComplexTunable> Class, typename... I>
     requires std::convertible_to<
         std::unique_ptr<detail::TunableMemberBase>,
-        decltype(MakeTunableMember(std::declval<T Class::*>(),
+        decltype(detail::MakeTunableMember(std::declval<T Class::*>(),
                                    std::declval<TunableConfig>()))>
   bool Publish(std::string_view name, Class* tunable, T Class::* member,
                const TunableConfig& config, I&&... info) {
     return Publish(name, tunable,
-                   MakeTunableMember(member, config, std::forward<I>(info)...));
+                   detail::MakeTunableMember(member, config, std::forward<I>(info)...));
   }
 
   /**
