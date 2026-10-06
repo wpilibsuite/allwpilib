@@ -146,9 +146,9 @@ TEST_CASE("MerweUKFTest DriveConvergence", "[wpimath]") {
       wpi::math::Vectord<2>::Zero());
 
   observer.SetXhat(wpi::math::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+      trajectory.Start().pose.Translation().X().value(),
+      trajectory.Start().pose.Translation().Y().value(),
+      trajectory.Start().pose.Rotation().Radians().value(), 0.0, 0.0});
 
   auto trueXhat = observer.Xhat();
 

@@ -101,10 +101,27 @@ DrivetrainSplineTrajectory DrivetrainSplineTrajectory::TransformBy(
 
 DrivetrainSplineTrajectory DrivetrainSplineTrajectory::RelativeTo(
     const Pose2d& pose) const {
-  return DrivetrainSplineTrajectory{this->RelativeSamples(pose)};
+  std::vector<DrivetrainSplineSample> samples;
+  samples.reserve(m_samples.size());
+  for (const auto& s : m_samples) {
+    samples.emplace_back(s.RelativeTo(pose));
+  }
+  return DrivetrainSplineTrajectory{std::move(samples)};
 }
 
 DrivetrainSplineTrajectory DrivetrainSplineTrajectory::Concatenate(
     const DrivetrainSplineTrajectory& other) const {
-  return DrivetrainSplineTrajectory{this->ConcatenateSamples(other.Samples())};
+  std::vector<DrivetrainSplineSample> samples;
+  samples.reserve(m_samples.size() + other.Samples().size());
+
+  // Copy existing
+  samples.insert(samples.end(), m_samples.begin(), m_samples.end());
+
+  // Append other with time offset
+  for (auto s : other.Samples()) {
+    s.time += m_duration;
+    samples.emplace_back(std::move(s));
+  }
+
+  return DrivetrainSplineTrajectory{std::move(samples)};
 }
