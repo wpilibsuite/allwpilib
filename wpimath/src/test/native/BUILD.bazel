@@ -16,9 +16,6 @@ cc_test(
         "cpp/**/*.cpp",
         "cpp/**/*.hpp",
     ]),
-    tags = [
-        "no-raspi",
-    ],
     deps = [
         ":test_headers",
         "//thirdparty/catch2",
