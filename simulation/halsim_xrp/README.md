@@ -28,7 +28,7 @@ GATT status characteristic UUID: `7d2ea28c-f7bd-485d-9d6a-2c3f0b214a3f`
 
 The native Bluetooth packet transport prefers LE L2CAP Credit-Based Mode on Linux, with GATT fallback. Windows and macOS use GATT Write Without Response and notifications. CoreBluetooth exposes L2CAP as a stream, which does not preserve the packet boundaries required by this protocol.
 
-GATT connections must support at least 90 bytes per notification (ATT MTU 93). The client checks this before reporting a connection. Windows and macOS manage MTU negotiation; Linux requests an MTU large enough for the configured packet capacity.
+GATT connections must support at least 92 bytes per notification (ATT MTU 95). The client checks this before reporting a connection. Windows and macOS manage MTU negotiation; Linux requests an MTU large enough for the configured packet capacity.
 
 Periodic control packets are best effort and are not retried when the transport is busy. macOS submits these writes without waiting for CoreBluetooth write readiness; Windows submits them without waiting for earlier WinRT writes to complete. A one-shot rename or identify request is retained until the transport is ready (after outstanding writes complete on Windows); newer control packets are dropped while it is pending so they cannot make the command's sequence stale. The firmware replies to a rename with an ACK-only status packet that reports whether the name was saved. Identify acknowledgements accompany normal sensor status packets.
 
@@ -189,10 +189,11 @@ A device name control packet must use only field bit 15. The payload may contain
 | 7     | AnalogIn 0   | _uint16_t_ value |
 | 8     | AnalogIn 1   | _uint16_t_ value |
 | 9     | AnalogIn 2   | _uint16_t_ value |
-| 10    | Timing       | _uint16_t_ last control sequence, _uint16_t_ control receive age in 10 us units |
-| 11    | Command ACK  | _uint16_t_ control sequence, _uint16_t_ control field mask, _uint8_t_ result |
+| 10    | Input voltage | _uint16_t_ millivolts |
+| 11    | Timing       | _uint16_t_ last control sequence, _uint16_t_ control receive age in 10 us units |
+| 12    | Command ACK  | _uint16_t_ control sequence, _uint16_t_ control field mask, _uint8_t_ result |
 
-XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`. Command ACKs use bit 11; result `0` is success and result `1` is rejected. Rename ACKs are sent alone; identify ACKs are appended to normal sensor status.
+XRP status currently reports DIO 0, the user button. Analog values are scaled over `0` to `5 V`, where `0` is `0 V` and `65535` is `5 V`. Command ACKs use bit 12; result `0` is success and result `1` is rejected. Rename ACKs are sent alone; identify ACKs are appended to normal sensor status.
 
 #### Encoders
 
@@ -206,6 +207,18 @@ Encoder IDs map to XRP encoders as follows:
 | 3  | Motor 4 Encoder     |
 
 Encoder period uses a fixed denominator of `1000000`. `period numerator >> 1` is the period in microseconds, and the low bit is the direction bit (`1` for forward, `0` for reverse). A period numerator of `0xffffffff` indicates no valid period.
+
+#### Input Voltage
+
+The input voltage field reports board VIN in millivolts. The client displays it
+in volts as **Input voltage** in the **XRP Status** window, with the same age
+indicator and drag-to-plot support as other sensor readings. It also updates
+HAL's battery voltage, available to robot code through
+`RobotController.getBatteryVoltage()` (Java) or
+`frc::RobotController::GetBatteryVoltage()` (C++).
+
+VIN is the supply after the XRP's power switch and can come from USB or the
+battery. No robot-program analog input configuration is needed.
 
 #### Timing
 

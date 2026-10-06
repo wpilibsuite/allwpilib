@@ -17,6 +17,7 @@
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/RoboRioData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/util/Endian.hpp"
 
@@ -50,6 +51,9 @@ size_t ExpectedStatusPayloadSize(uint16_t mask) {
     if (HasField(mask, STATUS_ANALOG_0 << analog)) {
       size += 2;
     }
+  }
+  if (HasField(mask, STATUS_INPUT_VOLTAGE)) {
+    size += 2;
   }
   if (HasField(mask, STATUS_TIMING)) {
     size += 4;
@@ -203,6 +207,11 @@ bool XRP::HandleXRPUpdate(std::span<const uint8_t> packet) {
       ReadAnalogData(analog, packet.subspan(0, 2));
       packet = packet.subspan(2);
     }
+  }
+
+  if (HasField(fieldMask, STATUS_INPUT_VOLTAGE)) {
+    ReadInputVoltageData(packet.subspan(0, 2));
+    packet = packet.subspan(2);
   }
 
   if (HasField(fieldMask, STATUS_TIMING)) {
@@ -551,6 +560,24 @@ void XRP::ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet) {
   }
 
   HALSIM_SetAnalogInVoltage(analogId, voltage);
+}
+
+void XRP::ReadInputVoltageData(std::span<const uint8_t> packet) {
+  if (packet.size() < 2) {
+    return;
+  }
+
+  float voltage = static_cast<float>(ReadUint16(packet)) /
+                  INPUT_VOLTAGE_MILLIVOLTS_PER_VOLT;
+  {
+    std::scoped_lock lock(m_data_snapshot_mutex);
+    auto& inputVoltage = m_data_snapshot.status.inputVoltage;
+    inputVoltage.value = voltage;
+    inputVoltage.present = true;
+    inputVoltage.lastUpdate = std::chrono::steady_clock::now();
+  }
+
+  HALSIM_SetRoboRioVInVoltage(voltage);
 }
 
 void XRP::ReadCommandAckData(std::span<const uint8_t> packet) {

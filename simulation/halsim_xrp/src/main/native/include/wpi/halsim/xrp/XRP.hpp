@@ -26,6 +26,7 @@ constexpr int16_t MOTOR_MAX_PWM = 255;
 constexpr uint8_t SERVO_MAX_DEGREES = 180;
 constexpr uint16_t ANALOG_MAX_VALUE = UINT16_MAX;
 constexpr float ANALOG_MAX_VOLTAGE = 5.0f;
+constexpr uint16_t INPUT_VOLTAGE_MILLIVOLTS_PER_VOLT = 1000;
 
 constexpr uint16_t CONTROL_MOTOR_0 = 1u << 0;
 constexpr uint16_t CONTROL_MOTOR_1 = 1u << 1;
@@ -54,12 +55,14 @@ constexpr uint16_t STATUS_ACCEL = 1u << 6;
 constexpr uint16_t STATUS_ANALOG_0 = 1u << 7;
 constexpr uint16_t STATUS_ANALOG_1 = 1u << 8;
 constexpr uint16_t STATUS_ANALOG_2 = 1u << 9;
-constexpr uint16_t STATUS_TIMING = 1u << 10;
-constexpr uint16_t STATUS_COMMAND_ACK = 1u << 11;
+constexpr uint16_t STATUS_INPUT_VOLTAGE = 1u << 10;
+constexpr uint16_t STATUS_TIMING = 1u << 11;
+constexpr uint16_t STATUS_COMMAND_ACK = 1u << 12;
 constexpr uint16_t STATUS_ALL_FIELDS =
     STATUS_ENCODER_0 | STATUS_ENCODER_1 | STATUS_ENCODER_2 | STATUS_ENCODER_3 |
     STATUS_DIO | STATUS_GYRO | STATUS_ACCEL | STATUS_ANALOG_0 |
-    STATUS_ANALOG_1 | STATUS_ANALOG_2 | STATUS_TIMING | STATUS_COMMAND_ACK;
+    STATUS_ANALOG_1 | STATUS_ANALOG_2 | STATUS_INPUT_VOLTAGE | STATUS_TIMING |
+    STATUS_COMMAND_ACK;
 constexpr uint8_t COMMAND_ACK_SUCCESS = 0;
 constexpr uint8_t COMMAND_ACK_REJECTED = 1;
 
@@ -115,6 +118,7 @@ struct XRPStatusData {
   XRPDataField<XRPGyroData> gyro;
   XRPDataField<XRPAxisData> accel;
   std::array<XRPDataField<float>, 3> analogInputs;
+  XRPDataField<float> inputVoltage;
   XRPDataField<XRPCommandAckData> commandAck;
 };
 
@@ -193,6 +197,7 @@ class XRP {
   void ReadDIOData(uint8_t presentMask, uint8_t valueMask);
   void ReadEncoderData(uint8_t encoderId, std::span<const uint8_t> packet);
   void ReadAnalogData(uint8_t analogId, std::span<const uint8_t> packet);
+  void ReadInputVoltageData(std::span<const uint8_t> packet);
   void ReadCommandAckData(std::span<const uint8_t> packet);
 
   // Robot State

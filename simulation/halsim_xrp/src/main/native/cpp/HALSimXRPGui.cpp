@@ -107,6 +107,7 @@ struct GuiDataSources {
   std::array<SourceSlot<wpi::glass::FloatSource>, 3> gyroAngles;
   std::array<SourceSlot<wpi::glass::FloatSource>, 3> accelerometer;
   std::array<SourceSlot<wpi::glass::FloatSource>, 3> analogInputs;
+  SourceSlot<wpi::glass::FloatSource> inputVoltage;
   bool initialized = false;
 };
 
@@ -710,6 +711,9 @@ static void InitializeDataSources() {
                      std::format("XRP Analog {}", i));
   }
 
+  InitializeSource(sources.inputVoltage, "XRP/Status/InputVoltage",
+                   "XRP Input Voltage");
+
   sources.initialized = true;
 }
 
@@ -799,6 +803,10 @@ static void UpdateDataSources(const XRPDataSnapshot& data) {
     UpdateSource(sources.analogInputs[i], analog.present, analog.lastUpdate,
                  analog.value);
   }
+
+  const auto& voltage = data.status.inputVoltage;
+  UpdateSource(sources.inputVoltage, voltage.present, voltage.lastUpdate,
+               voltage.value);
 }
 
 struct DataRowComponent {
@@ -1027,6 +1035,11 @@ static void DrawStatusDataTable(const XRPStatusData& status) {
   }
 
   const auto& sources = gGui.dataSources;
+
+  const auto& voltage = status.inputVoltage;
+  DrawDataRow("Input voltage", voltage.present, voltage.lastUpdate,
+              sources.inputVoltage.source.get(),
+              [&] { return std::format("{:.3f} V", voltage.value); });
 
   for (size_t i = 0; i < status.encoders.size(); ++i) {
     const auto& encoder = status.encoders[i];

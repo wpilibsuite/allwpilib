@@ -35,7 +35,7 @@ constexpr uint16_t XRP_BLUETOOTH_PSM = 0x0081;
 constexpr size_t MAX_BLUETOOTH_PACKET_SIZE = 512;
 // Full sensor status plus a five-byte command acknowledgement must fit in one
 // GATT notification.
-constexpr size_t MAX_XRP_STATUS_PACKET_SIZE = 90;
+constexpr size_t MAX_XRP_STATUS_PACKET_SIZE = 92;
 constexpr size_t MAX_LATENCY_SEND_TIMES = 512;
 constexpr auto COMMAND_ACK_TIMEOUT = std::chrono::seconds{5};
 constexpr uint32_t INVALID_CONTROL_RX_AGE_US = UINT32_MAX;
@@ -209,6 +209,10 @@ std::optional<TimingEcho> ReadTimingEcho(std::span<const uint8_t> packet) {
         !SkipField(&packet, 2)) {
       return std::nullopt;
     }
+  }
+
+  if ((fieldMask & STATUS_INPUT_VOLTAGE) != 0 && !SkipField(&packet, 2)) {
+    return std::nullopt;
   }
 
   if (packet.size() < 4) {

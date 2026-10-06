@@ -20,11 +20,13 @@
 #include "wpi/hal/Encoder.h"
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Ports.h"
+#include "wpi/hal/Power.h"
 #include "wpi/hal/SimDevice.h"
 #include "wpi/hal/simulation/AnalogInData.h"
 #include "wpi/hal/simulation/DIOData.h"
 #include "wpi/hal/simulation/DriverStationData.h"
 #include "wpi/hal/simulation/EncoderData.h"
+#include "wpi/hal/simulation/RoboRioData.h"
 #include "wpi/hal/simulation/SimDeviceData.h"
 #include "wpi/halsim/xrp/HALSimXRP.hpp"
 #include "wpi/net/EventLoopRunner.hpp"
@@ -38,6 +40,7 @@ struct HALSimulationTest {
   HALSimulationTest() {
     HALSIM_ResetSimDeviceData();
     HALSIM_ResetDriverStationData();
+    HALSIM_ResetRoboRioData();
     for (int i = 0; i < HAL_GetNumDigitalChannels(); ++i) {
       HALSIM_ResetDIOData(i);
     }
@@ -49,7 +52,10 @@ struct HALSimulationTest {
     }
   }
 
-  ~HALSimulationTest() { HALSIM_ResetSimDeviceData(); }
+  ~HALSimulationTest() {
+    HALSIM_ResetSimDeviceData();
+    HALSIM_ResetRoboRioData();
+  }
 };
 
 struct TestEncoder {
@@ -296,9 +302,11 @@ TEST_CASE_METHOD(HALSimulationTest,
                  "XRP identify acknowledgement accompanies sensor telemetry",
                  "[xrp]") {
   XRP xrp;
-  auto packet =
-      MakeStatus(10, STATUS_DIO | STATUS_TIMING | STATUS_COMMAND_ACK,
-                 {1, 1, 0, 7, 0, 10, 0x12, 0x34, 0x40, 0, COMMAND_ACK_SUCCESS});
+  auto packet = MakeStatus(
+      10,
+      STATUS_DIO | STATUS_INPUT_VOLTAGE | STATUS_TIMING | STATUS_COMMAND_ACK,
+      {1, 1, 0x19, 0xfc, 0, 7, 0, 10, 0x12, 0x34, 0x40, 0,
+       COMMAND_ACK_SUCCESS});
   auto truncated = packet;
   truncated.pop_back();
   CHECK_FALSE(xrp.HandleXRPUpdate(truncated));
@@ -306,6 +314,8 @@ TEST_CASE_METHOD(HALSimulationTest,
   auto snapshot = xrp.GetDataSnapshot();
   CHECK(snapshot.status.digitalInputs[0].present);
   CHECK(snapshot.status.digitalInputs[0].value);
+  REQUIRE(snapshot.status.inputVoltage.present);
+  CHECK(snapshot.status.inputVoltage.value == Catch::Approx(6.652));
   REQUIRE(snapshot.status.commandAck.present);
   CHECK(snapshot.status.commandAck.value.controlSeq == 0x1234);
   CHECK(snapshot.status.commandAck.value.controlFieldMask == CONTROL_IDENTIFY);
@@ -392,6 +402,104 @@ TEST_CASE_METHOD(HALSimulationTest,
   CHECK_FALSE(xrp.HandleXRPUpdate(packet));
   CHECK_FALSE(HALSIM_GetDIOValue(0));
   CHECK(HALSIM_GetAnalogInVoltage(2) == 1.0);
+}
+
+TEST_CASE_METHOD(HALSimulationTest,
+                 "XRP input voltage updates HAL battery voltage and GUI data",
+                 "[xrp]") {
+  XRP xrp;
+  CHECK_FALSE(xrp.GetDataSnapshot().status.inputVoltage.present);
+  HALSIM_SetAnalogInVoltage(3, 2.0);
+  // 7.25 V in millivolts, alongside a 5 V analog input.
+  auto packet = MakeStatus(1, STATUS_ANALOG_2 | STATUS_INPUT_VOLTAGE,
+                           {0xff, 0xff, 0x1c, 0x52});
+  REQUIRE(xrp.HandleXRPUpdate(packet));
+  auto voltage = xrp.GetDataSnapshot().status.inputVoltage;
+  REQUIRE(voltage.present);
+  CHECK(voltage.value == 7.25f);
+  CHECK(voltage.lastUpdate >= xrp.GetDataSnapshot().status.packet.lastUpdate);
+  CHECK(HALSIM_GetAnalogInVoltage(2) == 5.0);
+  CHECK(HALSIM_GetAnalogInVoltage(3) == 2.0);
+  int32_t status = 0;
+  // RobotController.getBatteryVoltage() reads this HAL entry point.
+  CHECK(HAL_GetVinVoltage(&status) == 7.25);
+  CHECK(status == 0);
+
+  uint16_t seq = 2;
+  for (uint16_t millivolts : {0, 13300, 65535}) {
+    packet = MakeStatus(seq++, STATUS_INPUT_VOLTAGE,
+                        {static_cast<uint8_t>(millivolts >> 8),
+                         static_cast<uint8_t>(millivolts)});
+    REQUIRE(xrp.HandleXRPUpdate(packet));
+    CHECK(HAL_GetVinVoltage(&status) == Catch::Approx(millivolts / 1000.0));
+    CHECK(xrp.GetDataSnapshot().status.inputVoltage.value ==
+          Catch::Approx(millivolts / 1000.0));
+  }
+}
+
+TEST_CASE_METHOD(HALSimulationTest,
+                 "XRP decodes a full sensor status with voltage timing and ACK",
+                 "[xrp]") {
+  XRP xrp;
+  // Full wire layout: sensors through byte 80, VIN at 81, timing at 83,
+  // and the five-byte command ACK at 87.
+  std::vector<uint8_t> packet(92);
+  packet[1] = 1;
+  packet[3] = 0x1f;
+  packet[4] = 0xff;
+  packet[81] = 0x19;
+  packet[82] = 0xfc;
+  packet[84] = 7;
+  packet[86] = 10;
+  packet[87] = 0x12;
+  packet[88] = 0x34;
+  packet[89] = 0x40;
+  packet[91] = COMMAND_ACK_SUCCESS;
+  for (size_t size = 0; size < packet.size(); ++size) {
+    CHECK_FALSE(xrp.HandleXRPUpdate(std::span{packet}.first(size)));
+  }
+  CHECK_FALSE(xrp.GetDataSnapshot().status.inputVoltage.present);
+  CHECK(HALSIM_GetRoboRioVInVoltage() == 12.0);
+  REQUIRE(xrp.HandleXRPUpdate(packet));
+  auto snapshot = xrp.GetDataSnapshot();
+  CHECK(snapshot.status.analogInputs[2].present);
+  CHECK(snapshot.status.analogInputs[2].value == 0.0f);
+  CHECK(snapshot.status.inputVoltage.value == Catch::Approx(6.652));
+  CHECK(HALSIM_GetRoboRioVInVoltage() == Catch::Approx(6.652));
+  CHECK(snapshot.status.commandAck.value.controlSeq == 0x1234);
+  CHECK(snapshot.status.commandAck.value.controlFieldMask == CONTROL_IDENTIFY);
+  CHECK(snapshot.status.commandAck.value.result == COMMAND_ACK_SUCCESS);
+}
+
+TEST_CASE_METHOD(HALSimulationTest,
+                 "XRP rejects malformed and stale input voltage updates",
+                 "[xrp]") {
+  XRP xrp;
+  REQUIRE(
+      xrp.HandleXRPUpdate(MakeStatus(10, STATUS_INPUT_VOLTAGE, {0x1c, 0x52})));
+  auto voltage = xrp.GetDataSnapshot().status.inputVoltage;
+  for (uint16_t seq : {9, 10}) {
+    CHECK_FALSE(
+        xrp.HandleXRPUpdate(MakeStatus(seq, STATUS_INPUT_VOLTAGE, {0, 0})));
+  }
+  for (auto packet : {MakeStatus(11, STATUS_INPUT_VOLTAGE, {}),
+                      MakeStatus(11, STATUS_INPUT_VOLTAGE, {0}),
+                      MakeStatus(11, STATUS_INPUT_VOLTAGE, {0, 0, 0})}) {
+    CHECK_FALSE(xrp.HandleXRPUpdate(packet));
+  }
+  CHECK(HALSIM_GetRoboRioVInVoltage() == 7.25);
+  CHECK(xrp.GetDataSnapshot().status.inputVoltage.lastUpdate ==
+        voltage.lastUpdate);
+  // An ACK-only packet has no voltage sample.
+  REQUIRE(xrp.HandleXRPUpdate(MakeStatus(
+      11, STATUS_COMMAND_ACK, {0, 7, 0x80, 0, COMMAND_ACK_SUCCESS})));
+  CHECK(HALSIM_GetRoboRioVInVoltage() == 7.25);
+  CHECK(xrp.GetDataSnapshot().status.inputVoltage.lastUpdate ==
+        voltage.lastUpdate);
+  xrp.ResetStatusPacketSequence();
+  REQUIRE(
+      xrp.HandleXRPUpdate(MakeStatus(0, STATUS_INPUT_VOLTAGE, {0x19, 0xfc})));
+  CHECK(HALSIM_GetRoboRioVInVoltage() == Catch::Approx(6.652));
 }
 
 TEST_CASE_METHOD(HALSimulationTest,
