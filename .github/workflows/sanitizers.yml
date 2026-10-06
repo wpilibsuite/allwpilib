@@ -32,8 +32,8 @@ jobs:
     runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
     container: wpilib/debian-base:trixie
     steps:
-      - name: Install Dependencies
-        run: sudo apt-get update && sudo apt-get install -y libopencv-dev clang-19 ninja-build avahi-daemon
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y clang-19 ninja-build
 
       - name: Install sccache
         uses: mozilla-actions/sccache-action@v0.0.10

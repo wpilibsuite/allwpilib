@@ -283,6 +283,8 @@ NetworkServer::~NetworkServer() {
   m_loopRunner.ExecAsync([this](uv::Loop&) { m_shutdown = true; });
   m_localStorage.ClearNetwork();
   m_connList.ClearConnections();
+  // shut down loop here to avoid race
+  m_loopRunner.Stop();
 }
 
 void NetworkServer::FlushLocal() {

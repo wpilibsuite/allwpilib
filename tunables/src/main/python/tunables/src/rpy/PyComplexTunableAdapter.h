@@ -14,7 +14,6 @@
 namespace wpi::tunables::python {
 
 class PyTunable;
-struct TunableTableOwnerContext;
 
 class PyComplexTunableAdapter
     : public wpi::tunables::ComplexTunable,
@@ -26,6 +25,11 @@ class PyComplexTunableAdapter
 
   std::string_view GetTunableType() const override;
   bool IsValue(pybind11::handle value) const;
+  void RetainValue(pybind11::object value,
+                   pybind11::object initialPublishTunable);
+  void RetainPublication();
+  void ReleasePublication();
+  void ReleaseValueIfUnpublished();
 
   void PublishTunable(wpi::tunables::TunableTable& table) override;
   void UpdateTunable() const override;
@@ -39,10 +43,14 @@ class PyComplexTunableAdapter
   void RemoveRetainedPath(std::string_view path);
 
  private:
-  std::shared_ptr<TunableTableOwnerContext> m_tableOwnerContext;
-  pybind11::object m_value;
+  pybind11::object GetValue() const;
+  void ReleaseRetainedValues();
+
+  std::optional<pybind11::object> m_value;
+  std::optional<pybind11::weakref> m_valueRef;
   std::optional<pybind11::object> m_initialPublishTunable;
   std::string m_type;
+  int m_retainCount = 0;
   mutable std::vector<std::pair<std::string, std::shared_ptr<PyTunable>>>
       m_values;
   std::vector<std::pair<std::string, std::shared_ptr<PyComplexTunableAdapter>>>

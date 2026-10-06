@@ -48,6 +48,8 @@ using wpi::tunables::TunableDoubleVector;
 using wpi::tunables::TunableStringVector;
 ```
 
+Read tune revisions with `uint64_t TunableRegistry::GetTuneRevision(const tunable&)`. The revision starts at zero and advances once for each backend-applied tuning input, including accepted same-value inputs. Local `Set()`, assignment, mutation, getter refreshes, rejected inputs, and writes to immutable tunables do not advance it. A complex tunable's revision also advances when a backend applies tuning input to one of its published child tunables. Reads are non-consuming; treat the value as a 64-bit equality token and compare a saved value with `!=` instead of relying on ordering or signed interpretation. C++ stores the revision with the registry record; unit tests that call `TunableRegistry::Reset()` while tunables are still alive discard those records, so stale objects report zero until they are re-created or otherwise re-registered.
+
 ### `wpi::tunables::TunableConfig`
 
 `wpi::tunables::TunableConfig` is a mutable struct, including:

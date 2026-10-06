@@ -68,7 +68,7 @@ typedef int32_t HAL_Status;
 
 #ifdef __cplusplus
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) enum name : type
-#elif defined(__clang__)
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
 #define HAL_ENUM_WITH_UNDERLYING_TYPE(name, type) \
   enum name : type;                               \
   typedef enum name name;                         \

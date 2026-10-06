@@ -201,6 +201,15 @@ static std::unique_ptr<InputFile> LoadDataLog(std::string_view filename) {
       std::make_unique<wpi::log::DataLogReaderThread>(std::move(reader)));
 }
 
+void AddInputFile(std::string_view filename) {
+  // Don't allow duplicates.
+  std::string stem = fs::path{filename}.stem().string();
+  if (gInputFiles.find(stem) == gInputFiles.end()) {
+    gInputFiles.emplace(std::move(stem), LoadDataLog(filename));
+    gExportCount = 0;
+  }
+}
+
 void DisplayInputFiles() {
   static std::unique_ptr<pfd::open_file> dataFileSelector;
 
@@ -263,13 +272,7 @@ void DisplayInputFiles() {
   if (dataFileSelector && dataFileSelector->ready(0)) {
     auto result = dataFileSelector->result();
     for (auto&& filename : result) {
-      // don't allow duplicates
-      std::string stem = fs::path{filename}.stem().string();
-      auto it = gInputFiles.find(stem);
-      if (it == gInputFiles.end()) {
-        gInputFiles.emplace(std::move(stem), LoadDataLog(filename));
-        gExportCount = 0;
-      }
+      AddInputFile(filename);
     }
     dataFileSelector.reset();
   }

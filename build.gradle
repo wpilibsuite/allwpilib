@@ -23,7 +23,6 @@ plugins {
     // alias(libs.plugins.wpilib.gradle.vscode)
     alias(libs.plugins.wpilib.gradle.jni)
 
-    alias(libs.plugins.build.shadow) apply false
     alias(libs.plugins.lint.errorprone) apply false
     alias(libs.plugins.lint.spotbugs) apply false
     alias(libs.plugins.lint.spotless) apply false

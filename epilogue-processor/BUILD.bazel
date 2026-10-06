@@ -11,12 +11,14 @@ wpilib_java_library(
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
     resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
-    runtime_deps = [
-        "//commandsv2:commandsv2-java",
-    ],
     deps = [
+        "//commandsv2:commandsv2-java",
         "//epilogue-runtime:epilogue-java",
-        "//telemetry:telemetry-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//tunables:tunables-java",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
     ],
 )
 
@@ -43,7 +45,8 @@ wpilib_java_junit5_test(
     ],
     deps = [
         ":processor-java",
-        "//telemetry:telemetry-java",
+        "//epilogue-runtime:epilogue-java",
+        "//wpilibj:wpilibj-java",
         "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

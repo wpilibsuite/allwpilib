@@ -18,4 +18,9 @@ open module wpilib.examples {
   requires wpilib.ntcore;
   requires wpilib.romi;
   requires wpilib.xrp;
+
+  provides org.wpilib.epilogue.EpilogueService with
+      org.wpilib.templates.commandv3skeleton.Robot_EpilogueService,
+      org.wpilib.examples.rapidreactcommandbot.Robot_EpilogueService,
+      org.wpilib.examples.rebuiltcmdv3.Robot_EpilogueService;
 }
