@@ -68,6 +68,22 @@ class TrapezoidProfileTest {
         Math.abs(deltaX), Math.abs(state.velocity) * DT + maxAccel / 2.0 * DT * DT, 1e-10);
   }
 
+  /**
+   * Generates a profile from the given state to the goal and returns its state after DT.
+   *
+   * @param constraints The constraints on the profile.
+   * @param state The current state.
+   * @param goal The goal state.
+   * @return The state of the profile after DT.
+   */
+  private static TrapezoidProfile.State step(
+      TrapezoidProfile.Constraints constraints,
+      TrapezoidProfile.State state,
+      TrapezoidProfile.State goal) {
+    var sample = TrapezoidProfile.generate(constraints, state, goal).sampleAt(DT);
+    return new TrapezoidProfile.State(sample.position, sample.velocity);
+  }
+
   @Test
   void constraintsRequirePositiveValues() {
     assertThrows(IllegalArgumentException.class, () -> new TrapezoidProfile.Constraints(0.0, 1.0));
@@ -82,15 +98,43 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(12, -1);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 1);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    profile.calculate(DT, state, goal);
+    var profile = TrapezoidProfile.generate(constraints, state, goal);
 
-    double profileTime = profile.duration();
+    assertNear(profile.duration(), 9.952380952380953, 1e-10);
+  }
 
-    assertNear(profileTime, 9.952380952380953, 1e-10);
-    assertEquals(profileTime, profile.timeLeftUntil(state, goal));
-    profile.timeLeftUntil(goal, new TrapezoidProfile.State(goal.position, goal.velocity));
-    assertEquals(profileTime, profile.duration());
+  @Test
+  void samplesArePhaseTransitions() {
+    // Accelerate for 1 s over 0.5 m, cruise for 2 s over 2 m, then decelerate for 1 s over 0.5 m
+    var profile =
+        TrapezoidProfile.generate(
+            new TrapezoidProfile.Constraints(1, 1),
+            new TrapezoidProfile.State(0, 0),
+            new TrapezoidProfile.State(3, 0));
+
+    var samples = profile.getSamples();
+    assertEquals(4, samples.size());
+
+    assertEquals(new TrapezoidProfileSample(0, 0, 0, 1), samples.get(0));
+    assertEquals(new TrapezoidProfileSample(1, 0.5, 1, 0), samples.get(1));
+    assertEquals(new TrapezoidProfileSample(3, 2.5, 1, -1), samples.get(2));
+    assertEquals(new TrapezoidProfileSample(4, 3, 0, 0), samples.get(3));
+
+    // Interpolation within each phase follows that phase's acceleration
+    var sample = profile.sampleAt(0.5);
+    assertNear(sample.position, 0.125, 1e-12);
+    assertNear(sample.velocity, 0.5, 1e-12);
+    assertEquals(1.0, sample.acceleration);
+
+    sample = profile.sampleAt(2.0);
+    assertNear(sample.position, 1.5, 1e-12);
+    assertNear(sample.velocity, 1.0, 1e-12);
+    assertEquals(0.0, sample.acceleration);
+
+    sample = profile.sampleAt(3.5);
+    assertNear(sample.position, 2.875, 1e-12);
+    assertNear(sample.velocity, 0.5, 1e-12);
+    assertEquals(-1.0, sample.acceleration);
   }
 
   @Test
@@ -99,9 +143,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(3, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 450; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -114,9 +157,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -130,12 +172,10 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(12, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     int plateauCount = 0;
     // About 7.5s.
     for (int i = 0; i < 1000; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (state.velocity == constraints.maxVelocity) {
@@ -155,12 +195,10 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-12, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, -3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     int plateauCount = 0;
     // About 7.5s.
     for (int i = 0; i < 1000; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (state.velocity == -constraints.maxVelocity) {
@@ -181,12 +219,10 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(12, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, -3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     int plateauCount = 0;
     // About 7.5s.
     for (int i = 0; i < 1700; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (state.velocity == constraints.maxVelocity) {
@@ -207,11 +243,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-12, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     int plateauCount = 0;
     for (int i = 0; i < 1700; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (state.velocity == -constraints.maxVelocity) {
@@ -231,11 +265,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(1, 1);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     // Normal profile is 0.5s, and an incorrect implementation might repeat.
     for (int i = 0; i < 52; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -251,11 +283,9 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-1, -1);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, -3);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     // Normal profile is 0.5s, and an incorrect implementation might repeat.
     for (int i = 0; i < 52; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -271,10 +301,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(0.01, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 1);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     for (int i = 0; i < 450; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -288,10 +316,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-0.01, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, -2);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     for (int i = 0; i < 700; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -305,18 +331,16 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
     assertNotEquals(state, goal);
 
     goal = new TrapezoidProfile.State(0.0, 0.0);
-    profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 550; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -330,17 +354,15 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(4, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 200; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
     assertNear(constraints.maxVelocity, state.velocity, 10e-5);
 
-    profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 2000; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
     }
@@ -353,12 +375,11 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
     TrapezoidProfile.State state = new TrapezoidProfile.State();
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
     for (int i = 0; i < 400; i++) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
-      assertNear(profile.timeLeftUntil(state, state), 0, 2e-2);
+      assertNear(TrapezoidProfile.generate(constraints, state, state).duration(), 0, 2e-2);
     }
   }
 
@@ -367,13 +388,12 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(DT, goal, new TrapezoidProfile.State());
+    TrapezoidProfile.State state = step(constraints, goal, new TrapezoidProfile.State());
 
-    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    double predictedTimeLeft = TrapezoidProfile.generate(constraints, state, goal).duration();
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (!reachedGoal && state.equals(goal)) {
@@ -391,13 +411,12 @@ class TrapezoidProfileTest {
     TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(0.75, 0.75);
     TrapezoidProfile.State goal = new TrapezoidProfile.State(-2, 0);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-    TrapezoidProfile.State state = profile.calculate(DT, goal, new TrapezoidProfile.State());
+    TrapezoidProfile.State state = step(constraints, goal, new TrapezoidProfile.State());
 
-    double predictedTimeLeft = profile.timeLeftUntil(state, goal);
+    double predictedTimeLeft = TrapezoidProfile.generate(constraints, state, goal).duration();
     boolean reachedGoal = false;
     for (int i = 0; i < 400; i++) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       if (!reachedGoal && state.equals(goal)) {
@@ -416,10 +435,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(10, 5);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 0.75);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     for (int i = 0; i < 200; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));
@@ -432,10 +449,8 @@ class TrapezoidProfileTest {
     TrapezoidProfile.State goal = new TrapezoidProfile.State(10, -5);
     TrapezoidProfile.State state = new TrapezoidProfile.State(0, 0.75);
 
-    TrapezoidProfile profile = new TrapezoidProfile(constraints);
-
     for (int i = 0; i < 200; ++i) {
-      var newState = profile.calculate(DT, state, goal);
+      var newState = step(constraints, state, goal);
       checkFeasible(state, newState, constraints.maxAcceleration);
       state = newState;
       assertLessThanOrEquals(Math.abs(state.velocity), Math.abs(constraints.maxVelocity));

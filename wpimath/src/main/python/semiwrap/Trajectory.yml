@@ -3,6 +3,7 @@ extra_includes:
 - wpi/math/trajectory/DifferentialSample.hpp
 - wpi/math/trajectory/DrivetrainSplineSample.hpp
 - wpi/math/trajectory/ExponentialProfileSample.hpp
+- wpi/math/trajectory/TrapezoidProfileSample.hpp
 
 classes:
   wpi::math::Trajectory:
@@ -42,3 +43,11 @@ templates:
     qualname: wpi::math::Trajectory
     params:
     - wpi::math::ExponentialProfileSample<wpi::units::meter, wpi::units::volt>
+  TrapezoidProfileTrajectoryBase:
+    qualname: wpi::math::Trajectory
+    params:
+    - wpi::math::TrapezoidProfileSample<wpi::units::dimensionless::scalar>
+  TrapezoidProfileRadiansTrajectoryBase:
+    qualname: wpi::math::Trajectory
+    params:
+    - wpi::math::TrapezoidProfileSample<wpi::units::radian>

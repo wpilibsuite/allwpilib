@@ -4,17 +4,22 @@
 
 #include "wpi/math/trajectory/struct/TrapezoidProfileStruct.hpp"
 
+#include <stdint.h>
+
 #include <cmath>
 #include <cstring>
 #include <stdexcept>
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "wpi/math/trajectory/TrapezoidProfile.hpp"
+#include "wpi/units/length.hpp"
+
 using namespace wpi::math;
 
 TEST_CASE("TrapezoidProfileStructTest NonBaseDistanceConstraintRoundtrip",
           "[wpimath]") {
-  using Constraints = TrapezoidProfile<wpi::units::feet>::Constraints;
+  using Constraints = TrapezoidProfileConstraints<wpi::units::feet>;
   using StructType = wpi::util::Struct<Constraints>;
 
   const Constraints expected{Constraints::Velocity_t{3.0},
@@ -40,7 +45,7 @@ TEST_CASE("TrapezoidProfileStructTest NonBaseDistanceConstraintRoundtrip",
 
 TEST_CASE("TrapezoidProfileStructTest ConstraintsRejectZeroOnUnpack",
           "[wpimath]") {
-  using Constraints = TrapezoidProfile<wpi::units::meters>::Constraints;
+  using Constraints = TrapezoidProfileConstraints<wpi::units::meters>;
   using StructType = wpi::util::Struct<Constraints>;
 
   uint8_t zeroVelocityBuffer[StructType::GetSize()];
