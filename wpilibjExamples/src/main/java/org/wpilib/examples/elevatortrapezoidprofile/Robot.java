@@ -19,8 +19,8 @@ public class Robot extends TimedRobot {
 
   // Create a motion profile with the given maximum velocity and maximum
   // acceleration constraints for the next setpoint.
-  private final TrapezoidProfile profile =
-      new TrapezoidProfile(new TrapezoidProfile.Constraints(1.75, 0.75));
+  private final TrapezoidProfile.Constraints constraints =
+      new TrapezoidProfile.Constraints(1.75, 0.75);
   private TrapezoidProfile.State goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
 
@@ -39,7 +39,8 @@ public class Robot extends TimedRobot {
 
     // Retrieve the profiled setpoint for the next timestep. This setpoint moves
     // toward the goal while obeying the constraints.
-    setpoint = profile.calculate(DT, setpoint, goal);
+    var sample = TrapezoidProfile.generate(constraints, setpoint, goal).sampleAt(DT);
+    setpoint = new TrapezoidProfile.State(sample.position, sample.velocity);
 
     // Send setpoint to offboard controller PID
     motor.setSetpoint(
