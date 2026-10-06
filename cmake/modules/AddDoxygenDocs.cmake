@@ -73,7 +73,7 @@ macro(add_doxygen_docs)
     set(DOXYGEN_GENERATE_TREEVIEW true)
     set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
     set(DOXYGEN_HTML_EXTRA_STYLESHEET docs/theme.css)
-    set(DOXYGEN_INCLUDE_PATHS ${docs_dirs})
+    set(DOXYGEN_INCLUDE_PATH ${docs_dirs})
     set(DOXYGEN_JAVADOC_AUTOBRIEF true)
     set(DOXYGEN_ALIASES
         "effects=\\par <i>Effects:</i>^^"
