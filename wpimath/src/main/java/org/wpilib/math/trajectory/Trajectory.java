@@ -10,8 +10,6 @@ import io.avaje.jsonb.Json;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.interpolation.InterpolatingTreeMap;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
@@ -118,36 +116,4 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
   public SampleType sampleAt(double time) {
     return sampleMap.get(time);
   }
-
-  /**
-   * Transforms all poses in the trajectory by the given transform. This is useful for converting a
-   * robot-relative trajectory into a field-relative trajectory. This works with respect to the
-   * first pose in the trajectory.
-   *
-   * @param transform The transform to transform the trajectory by.
-   * @return The transformed trajectory.
-   */
-  public abstract Trajectory<SampleType> transformBy(Transform2d transform);
-
-  /**
-   * Concatenates this trajectory with another trajectory. If the other trajectory is empty, this
-   * trajectory is returned. To work correctly, the other trajectory should start at the end of this
-   * trajectory.
-   *
-   * @param other the other trajectory to concatenate with this one.
-   * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
-   */
-  public abstract Trajectory<SampleType> concatenate(Trajectory<SampleType> other);
-
-  /**
-   * Returns a new trajectory that is relative to the given pose. This is useful for converting a
-   * field-relative trajectory into a robot-relative trajectory. The returned trajectory will have
-   * the same times, velocities, and accelerations as the original trajectory, but the poses will be
-   * relative to the given pose.
-   *
-   * @param other the pose to which the trajectory should be relative. This is typically the robot's
-   *     starting pose.
-   * @return a new trajectory that is relative to the given pose.
-   */
-  public abstract Trajectory<SampleType> relativeTo(Pose2d other);
 }

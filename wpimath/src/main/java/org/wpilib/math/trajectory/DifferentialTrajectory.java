@@ -163,7 +163,6 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param transform The transform to apply to the trajectory.
    * @return The transformed trajectory.
    */
-  @Override
   public DifferentialTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
@@ -204,7 +203,6 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param other the other trajectory to concatenate with this one.
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
-  @Override
   public DifferentialTrajectory concatenate(Trajectory<DifferentialSample> other) {
     if (other.samples.isEmpty()) {
       return this;
@@ -231,7 +229,6 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
    * @param other the pose to which the trajectory should be relative.
    * @return a new trajectory relative to the given pose.
    */
-  @Override
   public DifferentialTrajectory relativeTo(Pose2d other) {
     return new DifferentialTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }

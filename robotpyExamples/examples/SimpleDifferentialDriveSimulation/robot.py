@@ -43,7 +43,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomous_init(self) -> None:
         self.timer.restart()
-        self.drive.reset_odometry(self.trajectory.initial_pose())
+        self.drive.reset_odometry(self.trajectory.start().pose)
 
     def autonomous_periodic(self) -> None:
         elapsed = self.timer.get()
