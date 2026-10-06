@@ -35,6 +35,10 @@ runs:
         ./commandsv2/generate_hids.py
       shell: bash
 
+    - name: Regenerate datalog entries
+      run: python ./datalog/generate_datalog_entries.py
+      shell: bash
+
     - name: Regenerate PWM motor controllers
       run: python ./drivers/generate_pwm_motor_controllers.py
       shell: bash
