@@ -13,11 +13,14 @@
 #include "wpi/smartdashboard/FieldObject2d.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/tunables/ComplexTunable.hpp"
-#include "wpi/tunables/TunableTable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi {
+
+namespace tunables {
+class TunableTable;
+}  // namespace tunables
 
 /**
  * 2D representation of game field for dashboards.
