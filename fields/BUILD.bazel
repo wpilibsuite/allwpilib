@@ -216,6 +216,10 @@ wpilib_cc_static_library(
 
 wpilib_cc_static_library(
     name = "static/fieldimages",
+    static_lib_name = select({
+        "@platforms//os:windows": "static/fieldimages.lib",
+        "//conditions:default": "static/libfieldimages.a",
+    }),
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -258,7 +262,6 @@ wpilib_java_library(
     maven_group_id = "org.wpilib.fields",
     resource_strip_prefix = "fields/src/main/native/resources",
     resources = FIELD_IMAGES,
-    maven_export_tags = ["no-javadocs"],
     visibility = ["//visibility:public"],
 )
 
