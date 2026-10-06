@@ -16,8 +16,8 @@
  */
 class Robot : public wpi::TimedRobot {
  public:
-  /** Applies driver input using a field coordinate system that changes based on
-   * alliance color. */
+  /** Applies driver input to mecanum drive using a field coordinate system that
+   * changes based on alliance color. */
   static void DriveAllianceRelativeMecanum(
       wpi::MecanumDrive& robotDrive, double xSpeed, double ySpeed,
       double zRotation, const wpi::math::Rotation2d& gyroAngle) {
@@ -33,8 +33,8 @@ class Robot : public wpi::TimedRobot {
                               gyroAngle);
   }
 
-  /** Applies driver input using a field coordinate system that changes based on
-   * alliance color. */
+  /** Applies driver input to swerve using a field coordinate system that
+   * changes based on alliance color. */
   static wpi::math::ChassisVelocities DriveAllianceRelativeSwerve(
       double xSpeed, double ySpeed, double zRotation,
       const wpi::math::Rotation2d& gyroAngle) {

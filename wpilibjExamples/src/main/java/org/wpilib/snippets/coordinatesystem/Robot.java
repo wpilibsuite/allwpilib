@@ -16,7 +16,10 @@ import org.wpilib.math.kinematics.ChassisVelocities;
  * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
  */
 public class Robot extends TimedRobot {
-  /** Cartesian mecanum drive maps the joystick axes to robot-relative motion. */
+  /**
+   * Applies driver input to mecanum drive using a field coordinate system that changes based on
+   * alliance color.
+   */
   public static void mecanumDrive(
       MecanumDrive robotDrive,
       double xSpeed,
@@ -33,7 +36,10 @@ public class Robot extends TimedRobot {
     robotDrive.driveCartesian(xSpeed * invert, ySpeed * invert, zRotation, gyroAngle);
   }
 
-  /** Applies driver input using a field coordinate system that changes based on alliance color. */
+  /**
+   * Applies driver input to swerve using a field coordinate system that changes based on alliance
+   * color.
+   */
   public static ChassisVelocities driveAllianceRelative(
       double xSpeed, double ySpeed, double zRotation, Rotation2d gyroAngle) {
     // The origin is always blue. When our alliance is red, X and Y need to be inverted

@@ -12,7 +12,7 @@ import wpimath
 class MyRobot(wpilib.TimedRobot):
     """Coordinate system changing using Alliance Color snippets for wpilib-docs. https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html"""
 
-    # Applies driver input using a field coordinate system that changes based on alliance color.
+    # Applies driver input to mecanum drive using a field coordinate system that changes based on alliance color.
     @staticmethod
     def drive_alliance_relative_mecanum(
         robot_drive, x_speed, y_speed, z_rotation, gyro_angle
@@ -26,7 +26,7 @@ class MyRobot(wpilib.TimedRobot):
             x_speed * invert, y_speed * invert, z_rotation, gyro_angle
         )
 
-    # Applies driver input using a field coordinate system that changes based on alliance color.
+    # Applies driver input to swerve using a field coordinate system that changes based on alliance color.
     @staticmethod
     def drive_alliance_relative_swerve(x_speed, y_speed, z_rotation, gyro_angle):
         # The origin is always blue. When our alliance is red, X and Y need to be inverted
