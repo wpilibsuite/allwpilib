@@ -6,9 +6,13 @@
 
 #include <stdint.h>
 
+#include <algorithm>
+
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include "wpi/hal/HAL.h"
+#include "wpi/hal/simulation/MockHooks.h"
 #include "wpi/simulation/SimHooks.hpp"
 
 using namespace wpi;
@@ -20,6 +24,15 @@ class WatchdogTest {
 
   ~WatchdogTest() { wpi::sim::ResumeTiming(); }
 };
+
+// Steps the paused clock to an odd nanosecond count of at least 2^53. Seconds
+// in a double can't represent it, so it catches rounding from converting
+// timestamps through seconds.
+void StepToLargeClock() {
+  int64_t now = HAL_GetMonotonicTime();
+  int64_t target = std::max<int64_t>(now, int64_t{1} << 53) | 1;
+  HALSIM_StepTiming(target - now);
+}
 
 }  // namespace
 
@@ -53,6 +66,35 @@ TEST_CASE_METHOD(WatchdogTest, "WatchdogTest EnableDisable", "[wpilibc]") {
 
   UNSCOPED_INFO("Watchdog either didn't trigger or triggered more than once");
   CHECK(1u == watchdogCounter);
+}
+
+TEST_CASE_METHOD(WatchdogTest, "WatchdogTest LargeClock", "[wpilibc]") {
+  StepToLargeClock();
+
+  uint32_t watchdogCounter = 0;
+  Watchdog watchdog(0.4_s, [&] { watchdogCounter++; });
+
+  watchdog.Enable();
+  HALSIM_StepTiming(399'999'999);
+  UNSCOPED_INFO("Watchdog triggered early");
+  CHECK(0u == watchdogCounter);
+  HALSIM_StepTiming(1);
+  UNSCOPED_INFO("Watchdog didn't trigger at the timeout");
+  CHECK(1u == watchdogCounter);
+
+  watchdogCounter = 0;
+  watchdog.SetTimeout(0.4_s);
+  HALSIM_StepTiming(200'000'000);
+  CHECK_THAT(watchdog.GetTime().value(),
+             Catch::Matchers::WithinAbs(0.2, 1e-10));
+  HALSIM_StepTiming(199'999'999);
+  UNSCOPED_INFO("Watchdog triggered early after SetTimeout");
+  CHECK(0u == watchdogCounter);
+  HALSIM_StepTiming(1);
+  UNSCOPED_INFO("Watchdog didn't trigger at the timeout after SetTimeout");
+  CHECK(1u == watchdogCounter);
+
+  watchdog.Disable();
 }
 
 TEST_CASE_METHOD(WatchdogTest, "WatchdogTest Reset", "[wpilibc]") {

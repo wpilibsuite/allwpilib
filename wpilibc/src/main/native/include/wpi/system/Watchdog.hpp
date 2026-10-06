@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <string_view>
 #include <utility>
@@ -112,13 +113,16 @@ class Watchdog {
 
  private:
   // Used for timeout print rate-limiting
-  static constexpr auto MIN_PRINT_PERIOD = 1_s;
+  static constexpr std::chrono::nanoseconds MIN_PRINT_PERIOD =
+      std::chrono::seconds{1};
 
-  wpi::units::second_t m_startTime = 0_s;
+  // Monotonic times from the HAL clock. Seconds in a double can't hold
+  // nanosecond-resolution timestamps once the clock is large.
+  std::chrono::nanoseconds m_startTime{0};
   wpi::units::second_t m_timeout;
-  wpi::units::second_t m_expirationTime = 0_s;
+  std::chrono::nanoseconds m_expirationTime{0};
   std::function<void()> m_callback;
-  wpi::units::second_t m_lastTimeoutPrintTime = 0_s;
+  std::chrono::nanoseconds m_lastTimeoutPrintTime{0};
 
   Tracer m_tracer;
   bool m_isExpired = false;
