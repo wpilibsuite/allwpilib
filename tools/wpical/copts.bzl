@@ -8,14 +8,14 @@ UNIX_COPTS = [
     "-Wno-sign-compare",
 ]
 
-OSX_COPTS = UNIX_COPTS
+CLANG_COPTS = UNIX_COPTS
 
 COPTS = select({
-    "@platforms//os:linux": UNIX_COPTS + [
+    "@rules_cc//cc/compiler:clang": CLANG_COPTS,
+    "@rules_cc//cc/compiler:gcc": UNIX_COPTS + [
         "-Wno-maybe-uninitialized",
     ],
-    "@platforms//os:osx": OSX_COPTS,
-    "@platforms//os:windows": [
+    "@rules_cc//cc/compiler:msvc-cl": [
         "/wd4098",
         "/wd4267",
     ],
@@ -32,7 +32,7 @@ UNIX_CXXOPTS = [
     "-Wno-unused-but-set-variable",
 ]
 
-OSX_CXXOPTS = UNIX_CXXOPTS + [
+CLANG_CXXOPTS = UNIX_CXXOPTS + [
     "-Wno-unused-variable",
     "-Wno-unused-function",
     "-Wno-sign-compare",
@@ -40,9 +40,9 @@ OSX_CXXOPTS = UNIX_CXXOPTS + [
 ]
 
 CXXOPTS = select({
-    "@platforms//os:linux": UNIX_CXXOPTS,
-    "@platforms//os:osx": OSX_CXXOPTS,
-    "@platforms//os:windows": [
+    "@rules_cc//cc/compiler:clang": CLANG_CXXOPTS,
+    "@rules_cc//cc/compiler:gcc": UNIX_CXXOPTS,
+    "@rules_cc//cc/compiler:msvc-cl": [
         "/wd4068",
         "/wd4200",
         "/wd4576",

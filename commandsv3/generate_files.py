@@ -152,7 +152,6 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_commandhid.java.jinja")
     for controller in controllers:
         controller_name = f"Command{controller['ClassName']}Controller.java"
-        print(root_path, controller_name)
         write_file(root_path, controller_name, template.render(controller))
 
 

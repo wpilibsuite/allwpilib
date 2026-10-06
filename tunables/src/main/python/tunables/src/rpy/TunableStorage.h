@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -18,6 +20,10 @@ class PyTunable;
 namespace detail {
 
 void StoreValue(std::string path, std::shared_ptr<PyTunable> value);
+std::shared_ptr<PyComplexTunableAdapter> GetOrCreateComplex(
+    pybind11::object value, pybind11::object initialPublishTunable);
+void ForgetComplex(pybind11::handle value,
+                   const PyComplexTunableAdapter* tunable);
 void StoreComplex(std::string path,
                   std::shared_ptr<PyComplexTunableAdapter> value);
 void StoreNativeComplexValue(std::string path, pybind11::object value);
@@ -36,6 +42,7 @@ std::string NormalizeTablePath(const wpi::tunables::TunableTable& table,
 void RemoveRetainedPath(std::string_view path);
 void RemovePath(std::string_view path);
 void RemoveValue(pybind11::handle value);
+std::optional<uint64_t> GetRetainedTuneRevision(pybind11::handle value);
 void InitializeTunablePython(pybind11::module_& module);
 
 }  // namespace python

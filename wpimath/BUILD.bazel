@@ -1,6 +1,7 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
@@ -266,7 +267,7 @@ wpilib_jni_java_library(
     maven_group_id = "org.wpilib.wpimath",
     native_libs = [":shared/wpimathjni"],
     plugins = [
-        "//:avaje_jsonb_generator",
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
     ],
     resource_strip_prefix = "wpimath/src/main/proto",
     resources = glob(["src/main/proto/**"]),

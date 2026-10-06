@@ -8,7 +8,8 @@ wpilib_java_junit5_test(
     ],
     deps = [
         "//epilogue-processor:processor-java",
-        "//telemetry:telemetry-java",
+        "//epilogue-runtime:epilogue-java",
+        "//wpilibj:wpilibj-java",
         "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

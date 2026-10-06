@@ -26,11 +26,16 @@ class MyRobot(wpilib.TimedRobot):
         self.timer = wpilib.Timer()
 
         # Called once at the beginning of the robot program.
-        self.trajectory = wpimath.DrivetrainSplineTrajectoryGenerator.generate(
-            wpimath.Pose2d(2, 2, wpimath.Rotation2d()),
-            [],
-            wpimath.Pose2d(6, 4, wpimath.Rotation2d()),
-            wpimath.TrajectoryConfig(2, 2),
+        # Replace this with a call to a trajectory generator.
+        self.trajectory = wpimath.HolonomicTrajectory(
+            [
+                wpimath.HolonomicSample(
+                    0.0,
+                    wpimath.Pose2d(0.0, 0.0, 0.0),
+                    wpimath.ChassisVelocities(0.0, 0.0, 0.0),
+                    wpimath.ChassisAccelerations(0.0, 0.0, 0.0),
+                )
+            ]
         )
 
     def robot_periodic(self) -> None:

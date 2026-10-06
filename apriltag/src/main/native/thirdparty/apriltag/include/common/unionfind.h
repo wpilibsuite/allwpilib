@@ -33,31 +33,55 @@ either expressed or implied, of the Regents of The University of Michigan.
 
 typedef struct unionfind unionfind_t;
 
+// Interleave node parent and size to improve cache locality.
+// Accessing parent[i] and size[i] hits the same cache line.
+struct unionfind_node
+{
+    // Parent node for each. Initialized to 0xffffffff
+    uint32_t parent;
+    // The size of the tree excluding the root
+    uint32_t size;
+};
+
 struct unionfind
 {
     uint32_t maxid;
-
-    // Parent node for each. Initialized to 0xffffffff
-    uint32_t *parent;
-
-    // The size of the tree excluding the root
-    uint32_t *size;
+    struct unionfind_node *data;
 };
+
+static inline uint32_t uf_load_parent(unionfind_t *uf, uint32_t id)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    return __atomic_load_n(&uf->data[id].parent, __ATOMIC_RELAXED);
+#else
+    return uf->data[id].parent;
+#endif
+}
+
+static inline void uf_store_parent(unionfind_t *uf, uint32_t id, uint32_t val)
+{
+#if defined(__GNUC__) || defined(__clang__)
+    __atomic_store_n(&uf->data[id].parent, val, __ATOMIC_RELAXED);
+#else
+    uf->data[id].parent = val;
+#endif
+}
 
 static inline unionfind_t *unionfind_create(uint32_t maxid)
 {
     unionfind_t *uf = (unionfind_t*) calloc(1, sizeof(unionfind_t));
     uf->maxid = maxid;
-    uf->parent = (uint32_t *) malloc((maxid+1) * sizeof(uint32_t) * 2);
-    memset(uf->parent, 0xff, (maxid+1) * sizeof(uint32_t));
-    uf->size = uf->parent + (maxid+1);
-    memset(uf->size, 0, (maxid+1) * sizeof(uint32_t));
+    uf->data = (struct unionfind_node *) malloc((maxid+1) * sizeof(struct unionfind_node));
+    for (uint32_t i = 0; i <= maxid; i++) {
+        uf->data[i].parent = 0xffffffff;
+        uf->data[i].size = 0;
+    }
     return uf;
 }
 
 static inline void unionfind_destroy(unionfind_t *uf)
 {
-    free(uf->parent);
+    free(uf->data);
     free(uf);
 }
 
@@ -82,32 +106,25 @@ static inline uint32_t unionfind_get_representative(unionfind_t *uf, uint32_t id
 // version above.
 static inline uint32_t unionfind_get_representative(unionfind_t *uf, uint32_t id)
 {
-    uint32_t root = uf->parent[id];
     // unititialized node, so set to self
-    if (root == 0xffffffff) {
-        uf->parent[id] = id;
+    if (uf_load_parent(uf, id) == 0xffffffff) {
+        uf_store_parent(uf, id, id);
         return id;
     }
 
-    // chase down the root
-    while (uf->parent[root] != root) {
-        root = uf->parent[root];
+    // Path halving: make every node point to its grandparent (single pass)
+    while (uf_load_parent(uf, id) != id) {
+        uf_store_parent(uf, id, uf_load_parent(uf, uf_load_parent(uf, id)));
+        id = uf_load_parent(uf, id);
     }
 
-    // go back and collapse the tree.
-    while (uf->parent[id] != root) {
-        uint32_t tmp = uf->parent[id];
-        uf->parent[id] = root;
-        id = tmp;
-    }
-
-    return root;
+    return id;
 }
 
 static inline uint32_t unionfind_get_set_size(unionfind_t *uf, uint32_t id)
 {
     uint32_t repid = unionfind_get_representative(uf, id);
-    return uf->size[repid] + 1;
+    return uf->data[repid].size + 1;
 }
 
 static inline uint32_t unionfind_connect(unionfind_t *uf, uint32_t aid, uint32_t bid)
@@ -125,8 +142,8 @@ static inline uint32_t unionfind_connect(unionfind_t *uf, uint32_t aid, uint32_t
     // for rank.  In my testing, it's often *faster* to use size than
     // rank, perhaps because the rank of the tree isn't that critical
     // if there are very few nodes in it.
-    uint32_t asize = uf->size[aroot] + 1;
-    uint32_t bsize = uf->size[broot] + 1;
+    uint32_t asize = uf->data[aroot].size + 1;
+    uint32_t bsize = uf->data[broot].size + 1;
 
     // optimization idea: We could shortcut some or all of the tree
     // that is grafted onto the other tree. Pro: those nodes were just
@@ -134,12 +151,12 @@ static inline uint32_t unionfind_connect(unionfind_t *uf, uint32_t aid, uint32_t
     // wasted effort -- the tree might be grafted onto another tree in
     // a moment!
     if (asize > bsize) {
-        uf->parent[broot] = aroot;
-        uf->size[aroot] += bsize;
+        uf->data[broot].parent = aroot;
+        uf->data[aroot].size += bsize;
         return aroot;
     } else {
-        uf->parent[aroot] = broot;
-        uf->size[broot] += asize;
+        uf->data[aroot].parent = broot;
+        uf->data[broot].size += asize;
         return broot;
     }
 }

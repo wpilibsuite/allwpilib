@@ -27,9 +27,6 @@ wpilib_cc_library(
     ]),
     include_license_files = True,
     includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "wpi-cpp-gui",
     ],
@@ -55,9 +52,6 @@ wpilib_cc_library(
     ],
     include_license_files = True,
     includes = ["src/main/native/include"],
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "wpi-cpp-gui",
     ],

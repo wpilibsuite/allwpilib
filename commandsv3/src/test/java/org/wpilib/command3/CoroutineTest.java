@@ -155,6 +155,57 @@ class CoroutineTest extends CommandTestBase {
   }
 
   @Test
+  void forkResultAwaitCompletion() {
+    var signal = new AtomicBoolean(false);
+    var waitingCommand =
+        Command.noRequirements(coroutine -> coroutine.waitUntil(signal::get))
+            .named("Wait For Signal");
+
+    var parent =
+        Command.noRequirements(
+                coroutine -> {
+                  var forkResult = coroutine.fork(waitingCommand);
+                  forkResult.awaitCompletion();
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertEquals(List.of(parent, waitingCommand), m_scheduler.getRunningCommands());
+
+    // Run the scheduler a few times to ensure `awaitCompletion()` continues to wait
+    m_scheduler.run();
+    m_scheduler.run();
+    m_scheduler.run();
+    m_scheduler.run();
+    assertEquals(List.of(parent, waitingCommand), m_scheduler.getRunningCommands());
+
+    signal.set(true);
+    m_scheduler.run();
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void forkResultAwaitCompletionOneShot() {
+    var ran = new AtomicBoolean(false);
+    var oneShot = Command.noRequirements(_ -> {}).named("OneShot");
+    var parent =
+        Command.noRequirements(
+                coroutine -> {
+                  var forkResult = coroutine.fork(oneShot);
+                  assertTrue(forkResult.successful());
+                  forkResult.awaitCompletion();
+                  ran.set(true);
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertTrue(ran.get());
+    assertEquals(List.of(), m_scheduler.getRunningCommands());
+  }
+
+  @Test
   void yieldInSynchronizedBlock() {
     Object mutex = new Object();
     AtomicInteger i = new AtomicInteger(0);

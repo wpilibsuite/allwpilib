@@ -6,9 +6,6 @@ wpilib_imgui_cc_test(
     srcs = [
         "//simulation/halsim_gui:main-native-srcs",
     ] + glob(["*.cpp"]),
-    linkopts = [
-        "-lm",
-    ],
     tags = [
         "no-asan",
     ],

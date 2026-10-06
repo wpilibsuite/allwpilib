@@ -5,6 +5,7 @@
 package org.wpilib.math.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.UtilityClassTest;
@@ -20,15 +21,14 @@ class ComputerVisionUtilTest extends UtilityClassTest<ComputerVisionUtil> {
 
   @Test
   void testObjectToRobotPose() {
-    var robot = new Pose3d(1.0, 2.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(30.0)));
+    var robot = new Pose3d(1.0, 2.0, 0.0, new Rotation3d(0.0, 0.0, degreesToRadians(30.0)));
     var cameraToObject =
         new Transform3d(
             new Translation3d(1.0, 1.0, 1.0),
-            new Rotation3d(0.0, Units.degreesToRadians(-20.0), Units.degreesToRadians(45.0)));
+            new Rotation3d(0.0, degreesToRadians(-20.0), degreesToRadians(45.0)));
     var robotToCamera =
         new Transform3d(
-            new Translation3d(1.0, 0.0, 2.0),
-            new Rotation3d(0.0, 0.0, Units.degreesToRadians(25.0)));
+            new Translation3d(1.0, 0.0, 2.0), new Rotation3d(0.0, 0.0, degreesToRadians(25.0)));
     Pose3d object = robot.plus(robotToCamera).plus(cameraToObject);
 
     assertEquals(

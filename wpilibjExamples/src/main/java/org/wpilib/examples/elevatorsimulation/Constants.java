@@ -4,7 +4,7 @@
 
 package org.wpilib.examples.elevatorsimulation;
 
-import org.wpilib.math.util.Units;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 public class Constants {
   public static final int MOTOR_PORT = 0;
@@ -22,7 +22,7 @@ public class Constants {
   public static final double ELEVATOR_KA = 0.0; // volt per acceleration (V/(m/s²))
 
   public static final double ELEVATOR_GEARING = 10.0;
-  public static final double ELEVATOR_DRUM_RADIUS = Units.inchesToMeters(2.0);
+  public static final double ELEVATOR_DRUM_RADIUS = inchesToMeters(2.0);
   public static final double CARRIAGE_MASS = 4.0; // kg
 
   public static final double SETPOINT = 0.75; // m

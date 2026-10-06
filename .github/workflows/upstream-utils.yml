@@ -31,6 +31,14 @@ jobs:
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
+      - name: Run llvm.py
+        id: llvm
+        run: |
+          cd upstream_utils
+          ./llvm.py clone
+          ./llvm.py copy-src
+          ./llvm.py format-patch
+        background: true # LLVM takes the longest amount of time, so let's run this in parallel with everything else.
       - name: Run ada.py
         run: |
           cd upstream_utils
@@ -115,12 +123,6 @@ jobs:
           ./llhttp.py clone
           ./llhttp.py copy-src
           ./llhttp.py format-patch
-      - name: Run llvm.py
-        run: |
-          cd upstream_utils
-          ./llvm.py clone
-          ./llvm.py copy-src
-          ./llvm.py format-patch
       - name: Run mpack.py
         run: |
           cd upstream_utils
@@ -157,6 +159,8 @@ jobs:
           ./upb.py clone
           ./upb.py copy-src
           ./upb.py format-patch
+      - name: Wait for LLVM
+        wait: llvm
       - name: Add untracked files to index so they count as changes
         run: git add -A
       - name: Check output

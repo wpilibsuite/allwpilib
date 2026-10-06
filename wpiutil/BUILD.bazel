@@ -1,6 +1,7 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
@@ -192,9 +193,6 @@ wpilib_cc_library(
         ":upb",
     ],
     visibility = ["//visibility:public"],
-    deps = select({
-        "//conditions:default": [],
-    }),
 )
 
 wpilib_cc_shared_library(
@@ -210,18 +208,6 @@ wpilib_cc_static_library(
     visibility = ["//visibility:public"],
     deps = [
         ":wpiutil",
-    ],
-)
-
-cc_library(
-    name = "wpiutil-jni-hdrs",
-    hdrs = glob([
-        "src/main/native/include/**",
-        "src/main/native/thirdparty/llvm/include/**",
-    ]),
-    includes = [
-        "src/main/native/include",
-        "src/main/native/thirdparty/llvm/include",
     ],
 )
 
@@ -264,7 +250,7 @@ wpilib_jni_java_library(
     maven_group_id = "org.wpilib.wpiutil",
     native_libs = [":shared/wpiutiljni"],
     plugins = [
-        "//:avaje_jsonb_generator",
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
     ],
     visibility = ["//visibility:public"],
     deps = [

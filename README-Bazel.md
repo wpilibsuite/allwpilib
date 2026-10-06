@@ -52,7 +52,7 @@ Examples:
   ```
 Bazel's RAM usage estimation is simplistic and hardcoded, so limiting the allowed number of CPU cores is the best way to reduce memory usage if it becomes a problem.
 
-The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86).  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
+The default settings build all the release artifact variants relevant for your platform.  The overall list of options ends up being, essentially, all the variants of (linux, osx, windows) x (debug, release) x (static, shared) x (aarch64, x86), although static and shared can reuse the same object files and only differ in linking.  OSX and Windows are hard to compile for from any other OS, so we by default build for your local OS and the system core, with all the variants.
 
 This can be a bit expensive.  If you would like to build a subset, you can specify the repo environmental variable, `WPI_PUBLISH_CLASSIFIER_FILTER`, and pick what you build for.  The default is, in the .bazelrc file,
 ```

@@ -12,24 +12,18 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-WIN_SRCS = glob([
-    "src/main/native/windows/**/*.cpp",
-    "src/main/native/windows/**/*.hpp",
-])
-
-LINUX_SRCS = glob([
-    "src/main/native/linux/**/*.cpp",
-    "src/main/native/linux/**/*.hpp",
-])
-
-MAC_SRCS = glob(["src/main/native/osx/**/*.cpp"])
-
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@platforms//os:osx": MAC_SRCS,
-        "@platforms//os:windows": WIN_SRCS,
-        "@wpilib_toolchains//constraints/combined:is_linux": LINUX_SRCS,
+        "@platforms//os:linux": glob([
+            "src/main/native/linux/**/*.cpp",
+            "src/main/native/linux/**/*.hpp",
+        ]),
+        "@platforms//os:osx": glob(["src/main/native/osx/**/*.cpp"]),
+        "@platforms//os:windows": glob([
+            "src/main/native/windows/**/*.cpp",
+            "src/main/native/windows/**/*.hpp",
+        ]),
     }),
 )
 
