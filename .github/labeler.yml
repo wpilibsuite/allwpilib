@@ -16,7 +16,7 @@
 "component: apriltag":
   - changed-files:
       - any-glob-to-any-file: apriltag/**
-"component: command v2":
+"component: commands v2":
   - changed-files:
       - any-glob-to-any-file: commandsv2/**
 "component: commands v3":
