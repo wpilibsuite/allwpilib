@@ -142,11 +142,12 @@ template <typename T, std::derived_from<ComplexTunable> Class, typename... I>
   requires std::convertible_to<
       std::unique_ptr<detail::TunableMemberBase>,
       decltype(detail::MakeTunableMember(std::declval<T Class::*>(),
-                                 std::declval<TunableConfig>()))>
+                                         std::declval<TunableConfig>()))>
 bool Publish(std::string_view name, Class* tunable, T Class::* member,
              const TunableConfig& config, I&&... info) {
-  return Publish(name, tunable,
-                 detail::MakeTunableMember(member, config, std::forward<I>(info)...));
+  return Publish(
+      name, tunable,
+      detail::MakeTunableMember(member, config, std::forward<I>(info)...));
 }
 
 /**
