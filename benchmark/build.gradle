@@ -36,13 +36,6 @@ application {
     mainClass = 'wpilib.robot.Main'
 }
 
-apply plugin: 'com.gradleup.shadow'
-
-shadowJar {
-    mergeServiceFiles()
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
 repositories {
     maven {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
@@ -136,7 +129,7 @@ deploy {
                 }
 
                 benchmarkJava(JavaArtifact) {
-                    jarTask = shadowJar
+                    jarTask = jar
                     postdeploy << { ctx ->
                         ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
