@@ -19,6 +19,9 @@ import org.wpilib.util.collections.Search;
  * @param <SampleType> The type of the samples in the trajectory.
  */
 public abstract class Trajectory<SampleType extends TrajectorySample> {
+  /** The sample times, in seconds, parallel to {@link #samples}. Used for binary search. */
+  @Json.Ignore private final double[] timestamps;
+
   /** The samples this Trajectory is composed of. */
   protected final List<SampleType> samples;
 
