@@ -46,26 +46,33 @@ class BluetoothLEPacketClient::Impl
   bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode);
   BluetoothLEPacketConnectionStatus GetStatus() const;
 
-  void SetStatus(std::string_view status);
-  void SetError(std::string_view error);
-  void SetConnected(BluetoothPacketTransport transport);
-  void SetDisconnected(std::string_view reason);
+  void SetStatus(std::string_view status, uint64_t generation);
+  void SetError(std::string_view error, uint64_t generation);
+  void SetConnected(BluetoothPacketTransport transport, uint64_t generation);
+  void SetDisconnected(std::string_view reason, uint64_t generation);
   void DidReceivePacket(std::span<const uint8_t> packet, uint64_t generation);
-  void DidSendPacket();
-  void FinishQueuedPacket();
+  void DidSendPacket(uint64_t generation);
+  void FinishQueuedPacket(uint64_t generation);
+  bool IsCurrentGeneration(uint64_t generation) const {
+    return generation == m_connectGeneration;
+  }
 
  private:
   template <typename F>
-  void UpdateStatus(F&& func) {
+  bool UpdateStatus(uint64_t generation, F&& func) {
     uint64_t sequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
+      if (generation != m_connectGeneration) {
+        return false;
+      }
       func(m_status);
       snapshot = m_status;
       sequence = ++m_statusSequence;
     }
     QueueStatus(snapshot, sequence);
+    return true;
   }
 
   void QueueStatus(const BluetoothLEPacketConnectionStatus& snapshot,
@@ -92,39 +99,49 @@ char MAC_BLUETOOTH_QUEUE_KEY;
 
 struct MacBluetoothLEPacketClientBridge {
   void* context = nullptr;
-  void (*setStatus)(void* context, std::string_view status) = nullptr;
-  void (*setError)(void* context, std::string_view error) = nullptr;
-  void (*setConnected)(void* context, BluetoothPacketTransport transport) =
-      nullptr;
-  void (*setDisconnected)(void* context, std::string_view reason) = nullptr;
+  uint64_t generation = 0;
+  bool (*isCurrentGeneration)(void* context, uint64_t generation) = nullptr;
+  void (*setStatus)(void* context, std::string_view status,
+                    uint64_t generation) = nullptr;
+  void (*setError)(void* context, std::string_view error,
+                   uint64_t generation) = nullptr;
+  void (*setConnected)(void* context, BluetoothPacketTransport transport,
+                       uint64_t generation) = nullptr;
+  void (*setDisconnected)(void* context, std::string_view reason,
+                          uint64_t generation) = nullptr;
   void (*didReceivePacket)(void* context, std::span<const uint8_t> packet,
                             uint64_t generation) = nullptr;
-  void (*didSendPacket)(void* context) = nullptr;
-  void (*finishQueuedPacket)(void* context) = nullptr;
+  void (*didSendPacket)(void* context, uint64_t generation) = nullptr;
+  void (*finishQueuedPacket)(void* context, uint64_t generation) = nullptr;
 
   explicit operator bool() const { return context != nullptr; }
 
+  bool IsCurrentGeneration(uint64_t value) const {
+    return isCurrentGeneration != nullptr &&
+           isCurrentGeneration(context, value);
+  }
+
   void SetStatus(std::string_view status) const {
     if (setStatus != nullptr) {
-      setStatus(context, status);
+      setStatus(context, status, generation);
     }
   }
 
   void SetError(std::string_view error) const {
     if (setError != nullptr) {
-      setError(context, error);
+      setError(context, error, generation);
     }
   }
 
   void SetConnected(BluetoothPacketTransport transport) const {
     if (setConnected != nullptr) {
-      setConnected(context, transport);
+      setConnected(context, transport, generation);
     }
   }
 
   void SetDisconnected(std::string_view reason) const {
     if (setDisconnected != nullptr) {
-      setDisconnected(context, reason);
+      setDisconnected(context, reason, generation);
     }
   }
 
@@ -137,13 +154,13 @@ struct MacBluetoothLEPacketClientBridge {
 
   void FinishQueuedPacket() const {
     if (finishQueuedPacket != nullptr) {
-      finishQueuedPacket(context);
+      finishQueuedPacket(context, generation);
     }
   }
 
   void DidSendPacket() const {
     if (didSendPacket != nullptr) {
-      didSendPacket(context);
+      didSendPacket(context, generation);
     }
   }
 };
@@ -315,8 +332,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
                statusUuid:(NSString*)statusUuid
      minReceivePacketSize:(NSUInteger)minReceivePacketSize
                generation:(uint64_t)generation;
-- (void)disconnectWithReason:(NSString*)reason;
-- (void)cancelCurrentConnection;
+- (void)disconnectWithReason:(NSString*)reason generation:(uint64_t)generation;
+- (void)cancelCurrentConnection:(uint64_t)generation;
 - (void)sendPacket:(NSData*)packet
               mode:(BluetoothPacketSendMode)mode
         generation:(uint64_t)generation;
@@ -336,7 +353,6 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   CBUUID* _controlUuid;
   CBUUID* _statusUuid;
   NSUInteger _minReceivePacketSize;
-  uint64_t _connectGeneration;
   NSData* _pendingPacket;
   BOOL _connectRequested;
 }
@@ -362,7 +378,10 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
      minReceivePacketSize:(NSUInteger)minReceivePacketSize
                generation:(uint64_t)generation {
   dispatch_async(_queue, ^{
-    _connectGeneration = generation;
+    if (!_bridge.IsCurrentGeneration(generation)) {
+      return;
+    }
+    _bridge.generation = generation;
     _target = [target copy];
     _serviceUuid = [CBUUID UUIDWithString:serviceUuid];
     _controlUuid = [CBUUID UUIDWithString:controlUuid];
@@ -380,8 +399,12 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   });
 }
 
-- (void)disconnectWithReason:(NSString*)reason {
+- (void)disconnectWithReason:(NSString*)reason generation:(uint64_t)generation {
   dispatch_async(_queue, ^{
+    if (!_bridge.IsCurrentGeneration(generation)) {
+      return;
+    }
+    _bridge.generation = generation;
     [_central stopScan];
     _connectRequested = NO;
     _target = nil;
@@ -398,8 +421,11 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   });
 }
 
-- (void)cancelCurrentConnection {
+- (void)cancelCurrentConnection:(uint64_t)generation {
   dispatch_block_t block = ^{
+    if (generation != _bridge.generation) {
+      return;
+    }
     [_central stopScan];
     _connectRequested = NO;
     _target = nil;
@@ -423,7 +449,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
         generation:(uint64_t)generation {
   dispatch_async(_queue, ^{
     // A caller can enqueue a send after a reconnect has overtaken it.
-    if (generation != _connectGeneration) {
+    if (generation != _bridge.generation) {
       return;
     }
     if (_peripheral == nil || _controlCharacteristic == nil ||
@@ -468,7 +494,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   _pendingPacket = nil;
   [self sendPacket:packet
               mode:BluetoothPacketSendMode::QUEUED
-        generation:_connectGeneration];
+        generation:_bridge.generation];
 }
 
 - (void)peripheralIsReadyToSendWriteWithoutResponse:(CBPeripheral*)peripheral {
@@ -781,7 +807,7 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
   if (value.length > 0 && _bridge) {
     _bridge.DidReceivePacket(
         {static_cast<const uint8_t*>(value.bytes), value.length},
-        _connectGeneration);
+        _bridge.generation);
   }
 }
 
@@ -799,28 +825,35 @@ std::shared_ptr<BluetoothLEPacketClient::Impl> BluetoothLEPacketClient::Impl::Cr
   impl->m_exec->wakeup.connect([](auto func) { func(); });
   MacBluetoothLEPacketClientBridge bridge;
   bridge.context = impl.get();
-  bridge.setStatus = [](void* context, std::string_view status) {
-    static_cast<Impl*>(context)->SetStatus(status);
+  bridge.isCurrentGeneration = [](void* context, uint64_t generation) {
+    return static_cast<Impl*>(context)->IsCurrentGeneration(generation);
   };
-  bridge.setError = [](void* context, std::string_view error) {
-    static_cast<Impl*>(context)->SetError(error);
+  bridge.setStatus = [](void* context, std::string_view status,
+                        uint64_t generation) {
+    static_cast<Impl*>(context)->SetStatus(status, generation);
   };
-  bridge.setConnected = [](void* context, BluetoothPacketTransport transport) {
-    static_cast<Impl*>(context)->SetConnected(transport);
+  bridge.setError = [](void* context, std::string_view error,
+                       uint64_t generation) {
+    static_cast<Impl*>(context)->SetError(error, generation);
   };
-  bridge.setDisconnected = [](void* context, std::string_view reason) {
-    static_cast<Impl*>(context)->SetDisconnected(reason);
+  bridge.setConnected = [](void* context, BluetoothPacketTransport transport,
+                           uint64_t generation) {
+    static_cast<Impl*>(context)->SetConnected(transport, generation);
+  };
+  bridge.setDisconnected = [](void* context, std::string_view reason,
+                              uint64_t generation) {
+    static_cast<Impl*>(context)->SetDisconnected(reason, generation);
   };
   bridge.didReceivePacket = [](void* context,
                                std::span<const uint8_t> packet,
                                uint64_t generation) {
     static_cast<Impl*>(context)->DidReceivePacket(packet, generation);
   };
-  bridge.didSendPacket = [](void* context) {
-    static_cast<Impl*>(context)->DidSendPacket();
+  bridge.didSendPacket = [](void* context, uint64_t generation) {
+    static_cast<Impl*>(context)->DidSendPacket(generation);
   };
-  bridge.finishQueuedPacket = [](void* context) {
-    static_cast<Impl*>(context)->FinishQueuedPacket();
+  bridge.finishQueuedPacket = [](void* context, uint64_t generation) {
+    static_cast<Impl*>(context)->FinishQueuedPacket(generation);
   };
   impl->m_client =
       [[WPINetMacBluetoothLEPacketClient alloc] initWithBridge:bridge];
@@ -849,13 +882,13 @@ BluetoothLEPacketClient::Impl::~Impl() {
 bool BluetoothLEPacketClient::Impl::Connect(
     BluetoothLEPacketClientConfig config) {
   if (config.address.empty()) {
-    SetError("No Bluetooth target configured");
+    SetError("No Bluetooth target configured", m_connectGeneration);
     return false;
   }
   if (config.gattServiceUuid.empty() ||
       config.gattControlCharacteristicUuid.empty() ||
       config.gattStatusCharacteristicUuid.empty()) {
-    SetError("No Bluetooth GATT UUIDs configured");
+    SetError("No Bluetooth GATT UUIDs configured", m_connectGeneration);
     return false;
   }
 
@@ -872,12 +905,17 @@ bool BluetoothLEPacketClient::Impl::Connect(
     m_status.targetConfigured = true;
     m_status.error.clear();
     m_status.status = "Connecting";
+    m_status.transport = BluetoothPacketTransport::NONE;
     m_status.connecting = true;
     m_status.connected = false;
     snapshot = m_status;
     statusSequence = ++m_statusSequence;
   }
+  auto self = shared_from_this();
   QueueStatus(snapshot, statusSequence);
+  if (!IsCurrentGeneration(generation)) {
+    return true;
+  }
 
   [m_client connectWithTarget:ToNSString(config.address)
                   serviceUuid:ToNSString(config.gattServiceUuid)
@@ -889,8 +927,12 @@ bool BluetoothLEPacketClient::Impl::Connect(
 }
 
 void BluetoothLEPacketClient::Impl::Disconnect(std::string_view reason) {
-  ++m_connectGeneration;
-  [m_client disconnectWithReason:ToNSString(reason)];
+  uint64_t generation;
+  {
+    std::scoped_lock lock{m_statusMutex};
+    generation = ++m_connectGeneration;
+  }
+  [m_client disconnectWithReason:ToNSString(reason) generation:generation];
 }
 
 bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
@@ -918,7 +960,8 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
     }
   }
   if (tooLarge) {
-    SetError("Packet is larger than Bluetooth transport MTU");
+    SetError("Packet is larger than Bluetooth transport MTU",
+             m_connectGeneration);
     return false;
   }
 
@@ -932,25 +975,28 @@ BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::Impl::GetStatus() con
   return m_status;
 }
 
-void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status) {
-  UpdateStatus([&](auto& current) { current.status = status; });
+void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status,
+                                              uint64_t generation) {
+  UpdateStatus(generation, [&](auto& current) { current.status = status; });
 }
 
-void BluetoothLEPacketClient::Impl::SetError(std::string_view error) {
-  [m_client cancelCurrentConnection];
-  UpdateStatus([&](auto& status) {
-    m_queuedPacket = false;
-    status.error = error;
-    status.status = error;
-    status.connecting = false;
-    status.connected = false;
-    status.transport = BluetoothPacketTransport::NONE;
-  });
+void BluetoothLEPacketClient::Impl::SetError(std::string_view error,
+                                             uint64_t generation) {
+  if (UpdateStatus(generation, [&](auto& status) {
+        m_queuedPacket = false;
+        status.error = error;
+        status.status = error;
+        status.connecting = false;
+        status.connected = false;
+        status.transport = BluetoothPacketTransport::NONE;
+      })) {
+    [m_client cancelCurrentConnection:generation];
+  }
 }
 
 void BluetoothLEPacketClient::Impl::SetConnected(
-    BluetoothPacketTransport transport) {
-  UpdateStatus([&](auto& status) {
+    BluetoothPacketTransport transport, uint64_t generation) {
+  UpdateStatus(generation, [&](auto& status) {
     status.connecting = false;
     status.connected = true;
     status.transport = transport;
@@ -961,8 +1007,9 @@ void BluetoothLEPacketClient::Impl::SetConnected(
   });
 }
 
-void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason) {
-  UpdateStatus([&](auto& status) {
+void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason,
+                                                    uint64_t generation) {
+  UpdateStatus(generation, [&](auto& status) {
     m_queuedPacket = false;
     status.connecting = false;
     status.connected = false;
@@ -974,11 +1021,10 @@ void BluetoothLEPacketClient::Impl::SetDisconnected(std::string_view reason) {
 void BluetoothLEPacketClient::Impl::DidReceivePacket(
     std::span<const uint8_t> packet, uint64_t generation) {
   std::vector<uint8_t> packetCopy{packet.begin(), packet.end()};
-  UpdateStatus([&](auto& status) {
-    if (generation == m_connectGeneration) {
-      ++status.packetsReceived;
-    }
-  });
+  if (!UpdateStatus(generation,
+                    [](auto& status) { ++status.packetsReceived; })) {
+    return;
+  }
   if (m_packetCallback) {
     m_exec->Send([weakSelf = weak_from_this(),
                   packetCopy = std::move(packetCopy), generation] {
@@ -991,13 +1037,15 @@ void BluetoothLEPacketClient::Impl::DidReceivePacket(
   }
 }
 
-void BluetoothLEPacketClient::Impl::FinishQueuedPacket() {
+void BluetoothLEPacketClient::Impl::FinishQueuedPacket(uint64_t generation) {
   std::scoped_lock lock{m_statusMutex};
-  m_queuedPacket = false;
+  if (generation == m_connectGeneration) {
+    m_queuedPacket = false;
+  }
 }
 
-void BluetoothLEPacketClient::Impl::DidSendPacket() {
-  UpdateStatus([](auto& status) { ++status.packetsSent; });
+void BluetoothLEPacketClient::Impl::DidSendPacket(uint64_t generation) {
+  UpdateStatus(generation, [](auto& status) { ++status.packetsSent; });
 }
 
 void BluetoothLEPacketClient::Impl::QueueStatus(

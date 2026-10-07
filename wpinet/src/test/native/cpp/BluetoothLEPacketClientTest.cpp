@@ -143,7 +143,7 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
   CHECK(errors[0] == expectedError);
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 TEST_CASE("Bluetooth initial status callback can supersede a connection",
           "[bluetooth]") {
   bool replace = false;
