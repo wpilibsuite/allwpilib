@@ -100,11 +100,15 @@ struct BluetoothLEPacketClientConfig {
 };
 
 /**
- * Packet-oriented Bluetooth LE client.
+ * Packet-oriented Bluetooth LE client for realtime control.
  *
- * Each Send() call writes one packet using the best available platform
- * transport. Each packet callback receives one packet from a GATT notification
- * value or L2CAP SDU.
+ * This API is intended for periodic control values and occasional control
+ * commands. Use BEST_EFFORT for values superseded by later packets, or QUEUED
+ * to retain a single pending command while the transport is busy. Delivery and
+ * timing depend on the platform Bluetooth stack and radio link.
+ *
+ * Each Send() submits one packet. Each packet callback receives one packet
+ * from a GATT notification value or L2CAP SDU.
  */
 class BluetoothLEPacketClient {
  public:

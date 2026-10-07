@@ -628,8 +628,8 @@ void SortBluetoothDevices(std::vector<BluetoothLEDeviceInfo>* devices) {
     return;
   }
   peripheral.delegate = self;
-  // CoreBluetooth exposes L2CAP as NSStream, which does not preserve XRP packet
-  // boundaries. Use GATT unless the protocol gains explicit stream framing.
+  // CoreBluetooth exposes L2CAP as NSStream, which does not preserve packet
+  // boundaries. Use GATT unless the application protocol adds stream framing.
   [self discoverGattService];
 }
 
