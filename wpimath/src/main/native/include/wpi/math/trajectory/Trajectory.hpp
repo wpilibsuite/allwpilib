@@ -5,13 +5,13 @@
 #pragma once
 
 #include <algorithm>
-#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -21,17 +21,6 @@ class DifferentialDriveKinematics;
 class MecanumDriveKinematics;
 template <size_t NumModules>
 class SwerveDriveKinematics;
-
-/**
- * Requirements for a type usable as a Trajectory sample: copyable, comparable,
- * and carrying a `time` member relative to the trajectory start.
- */
-template <typename SampleType>
-concept TrajectorySample =
-    std::copyable<SampleType> && std::equality_comparable<SampleType> &&
-    requires(const SampleType& sample) {
-      { sample.time } -> std::convertible_to<wpi::units::second_t>;
-    };
 
 /**
  * Represents a trajectory consisting of a list of samples,
@@ -58,7 +47,7 @@ class Trajectory {
           "Trajectory manually initialized with no samples.");
     }
 
-    // sort samples by time
+    // Sort samples by time
     std::ranges::sort(m_samples, {}, &SampleType::time);
 
     if (Start().time != 0.0_s) {
@@ -99,6 +88,11 @@ class Trajectory {
   /**
    * Sample the trajectory at a point in time.
    *
+   * If several samples share a timestamp, such as at the join of a
+   * concatenated trajectory, the last one at that time is returned. Times at or
+   * before the start return the first sample, and times at or after the end
+   * return the last sample.
+   *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The sample at that point in time.
    */
@@ -110,8 +104,20 @@ class Trajectory {
       return End();
     }
 
-    auto upper = std::ranges::lower_bound(m_samples, t, {}, &SampleType::time);
+    // upper_bound is past every sample at time t, so the sample before it is
+    // the last one at or before t.
+    auto upper = std::ranges::upper_bound(m_samples, t, {}, &SampleType::time);
+    if (upper == m_samples.end()) {
+      // Only reachable if t is NaN, for which every comparison is false
+      return End();
+    }
     auto lower = std::prev(upper);
+
+    // Return a stored sample as is instead of interpolating to the end of the
+    // previous segment, which isn't well defined for zero-length segments
+    if (lower->time == t) {
+      return *lower;
+    }
 
     const double t_param = (t - lower->time) / (upper->time - lower->time);
 

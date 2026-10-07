@@ -93,6 +93,8 @@ scan_headers_ignore = [
     "wpi/units/*",
     "wpimath/protobuf/*",
 
+    "wpi/math/trajectory/TrajectorySample.hpp",
+
     "wpi/math/util/MathShared.hpp",
 
     "geometryToString.h",

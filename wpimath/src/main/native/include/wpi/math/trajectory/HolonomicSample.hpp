@@ -28,7 +28,7 @@ namespace wpi::math {
 class HolonomicSample {
  public:
   /** The time of the sample relative to the trajectory start. */
-  wpi::units::second_t time{0.0};
+  wpi::units::second_t time = 0_s;
   /** The robot pose at this sample (in the field reference frame). */
   Pose2d pose;
   /** The robot velocity at this sample (in the field reference frame). */
