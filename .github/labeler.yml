@@ -106,7 +106,8 @@
           ]
 "type: docs":
   - changed-files:
-      - any-glob-to-any-file: ["**/*.md", docs/**, "!.github/**"]
+    - all-globs-to-any-file: ["**/*.md", "!.github/**"]
+    - any-glob-to-any-file: docs/**
 "type: testing":
   - changed-files:
       - any-glob-to-any-file: "**/test/**"
