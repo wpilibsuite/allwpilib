@@ -166,7 +166,6 @@ wpilib_cc_library(
     extra_src_pkg_files = [
         ":wpimath-java-jni-hdrs-pkg",
     ],
-    include_third_party_notice = False,
     includes = [
         "src/main/native/include",
         "src/main/native/thirdparty/sleipnir/src",

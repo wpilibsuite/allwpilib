@@ -69,7 +69,6 @@ wpilib_cc_library(
     name = "drivers",
     srcs = glob(["src/main/native/cpp/**"]),
     hdrs = glob(["src/main/native/include/**"]),
-    include_third_party_notice = False,
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     third_party_libraries = [

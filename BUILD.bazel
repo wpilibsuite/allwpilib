@@ -60,16 +60,9 @@ alias(
 )
 
 pkg_files(
-    name = "license_pkg_file",
+    name = "license_pkg_files",
     srcs = [
         "LICENSE.md",
-    ],
-    visibility = ["//visibility:public"],
-)
-
-pkg_files(
-    name = "third_party_notice_pkg_file",
-    srcs = [
         "ThirdPartyNotices.txt",
     ],
     visibility = ["//visibility:public"],

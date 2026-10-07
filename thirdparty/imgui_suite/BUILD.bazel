@@ -93,7 +93,6 @@ cc_library(
 wpilib_cc_library(
     name = "imgui_suite",
     hdrs_pkg_root = None,
-    include_third_party_notice = False,
     linkstatic = True,
     srcs_pkg_root = None,
     visibility = ["//visibility:public"],
@@ -144,8 +143,7 @@ pkg_zip(
         "imgui-hdrs-pkg",
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
-        "//:license_pkg_file",
-        "//:third_party_notice_pkg_file",
+        "//:license_pkg_files",
     ],
     tags = [
         "manual",
@@ -183,8 +181,7 @@ pkg_zip(
         "imgui-srcs-pkg",
         "implot-srcs-pkg",
         "stb-srcs-pkg",
-        "//:license_pkg_file",
-        "//:third_party_notice_pkg_file",
+        "//:license_pkg_files",
     ],
     tags = [
         "manual",

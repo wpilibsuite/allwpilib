@@ -92,7 +92,6 @@ wpilib_cc_library(
     extra_src_pkg_files = [
         ":ntcore-java-jni-hdrs-pkg",
     ],
-    include_third_party_notice = False,
     includes = [
         "src/main/native/cpp",
         "src/main/native/include",

@@ -58,7 +58,6 @@ wpilib_cc_library(
         ":hal-systemcore-pkg",
         ":hal-java-jni-hdrs-pkg",
     ],
-    include_third_party_notice = False,
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],

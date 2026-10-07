@@ -141,8 +141,7 @@ def package_default_jni_project(
         name = "{}_static_zip".format(name),
         srcs = [
             ":{}-static-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -151,8 +150,7 @@ def package_default_jni_project(
         name = "{}_shared_zip".format(name),
         srcs = [
             ":{}-shared-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -196,8 +194,7 @@ def package_default_cc_project(
         name = "{}_static_zip".format(name),
         srcs = [
             ":{}-static-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -206,8 +203,7 @@ def package_default_cc_project(
         name = "{}_shared_zip".format(name),
         srcs = [
             ":{}-shared-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -310,8 +306,7 @@ def package_shared_cc_project(
         name = "{}_shared_zip".format(name),
         srcs = [
             ":{}-shared-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -369,8 +364,7 @@ def package_static_cc_project(
         name = "{}_static_zip".format(name),
         srcs = [
             ":{}-static-files".format(name),
-            "//:license_pkg_file",
-            "//:third_party_notice_pkg_file",
+            "//:license_pkg_files",
         ],
         architectures = architectures,
     )
@@ -443,7 +437,7 @@ def package_binary_cc_project(
         name = "{}_zip".format(name),
         srcs = [
             ":{}-files".format(name),
-            "//:license_pkg_file",
+            "//:license_pkg_files",
         ] + extra_files,
         architectures = architectures,
     )

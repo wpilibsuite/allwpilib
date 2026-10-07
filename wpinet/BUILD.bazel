@@ -131,7 +131,6 @@ wpilib_cc_library(
         ":thirdparty-libuv-src-pkg",
         ":wpinet-java-jni-hdrs-pkg",
     ],
-    include_third_party_notice = False,
     includes = ["src/main/native/include"],
     linkopts = select({
         "@platforms//os:linux": [
