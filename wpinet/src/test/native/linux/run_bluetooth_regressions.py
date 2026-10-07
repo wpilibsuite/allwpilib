@@ -90,6 +90,8 @@ def main():
             "overtake-disconnect",
             "invalid-config",
             "invalid-config-thread",
+            "receive-limit",
+            "receive-oversize",
         ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [

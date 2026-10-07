@@ -30,6 +30,7 @@ Coverage:
 - discarding old sends on reconnect while preserving the new send reservation;
 - discarding queued connect/disconnect requests overtaken by loop-thread requests;
 - preserving a working connection when a new configuration is rejected;
+- accepting packets at the configured limit and rejecting truncated packets;
 - releasing a connected client's handles and socket, including after loop teardown;
 - silent default logging and unchanged outcomes with debug output enabled.
 

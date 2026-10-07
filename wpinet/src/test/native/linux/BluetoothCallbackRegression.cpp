@@ -71,7 +71,8 @@ extern "C" int connect(int fd, const sockaddr* address, socklen_t size) {
   connections.back().addressLastByte =
       reinterpret_cast<const BluetoothAddress*>(address)->address[0];
   if (scenario.starts_with("send-") || scenario.starts_with("destroy-") ||
-      scenario.starts_with("overtake-") || scenario.starts_with("invalid-")) {
+      scenario.starts_with("overtake-") || scenario.starts_with("invalid-") ||
+      scenario.starts_with("receive-")) {
     return 0;
   }
   errno = scenario.ends_with("fallback") && connections.size() == 1
@@ -213,6 +214,52 @@ static int RunSendRegression() {
   for (auto& connection : connections) {
     close(connection.peer);
   }
+  return passed ? 0 : 1;
+}
+
+static int RunReceiveRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  std::vector<uint8_t> received;
+  int callbacks = 0;
+  auto client = BluetoothLEPacketClient::Create(*loop, [&](auto packet) {
+    ++callbacks;
+    received.assign(packet.begin(), packet.end());
+  });
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.psm = 0x81;
+  config.maxPacketSize = 4;
+  client->Connect(config);
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  bool passed = client->GetStatus().connected && connections.size() == 1;
+  bool oversized = scenario == "receive-oversize";
+  const uint8_t packet[] = {1, 2, 3, 4, 5, 6};
+  send(connections.back().peer, packet, oversized ? 6 : 4, MSG_NOSIGNAL);
+  for (int i = 0; i < 3; ++i) {
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+  }
+  auto status = client->GetStatus();
+  if (oversized) {
+    passed &= callbacks == 0 && status.packetsReceived == 0 &&
+              !status.connected && !status.error.empty();
+  } else {
+    passed &= callbacks == 1 && status.packetsReceived == 1 &&
+              status.connected &&
+              received == std::vector<uint8_t>(packet, packet + 4);
+  }
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
   return passed ? 0 : 1;
 }
 
@@ -391,6 +438,9 @@ static int RunTeardownRegression() {
 int main(int argc, char** argv) {
   using namespace wpi::net;
   scenario = argc > 1 ? argv[1] : "cancel-l2cap";
+  if (scenario.starts_with("receive-")) {
+    return RunReceiveRegression();
+  }
   if (scenario.starts_with("invalid-")) {
     return RunRejectedConfigRegression();
   }

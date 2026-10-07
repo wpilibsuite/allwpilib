@@ -6,6 +6,7 @@
 
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -186,6 +187,20 @@ std::string ErrnoString(std::string_view prefix) {
   error.append(": ");
   error.append(std::strerror(errno));
   return error;
+}
+
+ssize_t ReceivePacket(int fd, std::span<uint8_t> packet) {
+  iovec buffer{packet.data(), packet.size()};
+  msghdr message{};
+  message.msg_iov = &buffer;
+  message.msg_iovlen = 1;
+  ssize_t received = ::recvmsg(fd, &message, 0);
+  if (received >= 0 && (message.msg_flags & MSG_TRUNC) != 0) {
+    // A packet socket discards the remainder; never deliver a partial packet.
+    errno = EMSGSIZE;
+    return -1;
+  }
+  return received;
 }
 
 void AppendLe16(std::vector<uint8_t>* data, uint16_t value) {
@@ -1104,7 +1119,7 @@ class BluetoothLEPacketClient::Impl
     uint64_t generation = m_connectGeneration;
     std::vector<uint8_t> packet(m_config.maxPacketSize);
     while (generation == m_connectGeneration && m_socket >= 0) {
-      ssize_t received = ::recv(m_socket, packet.data(), packet.size(), 0);
+      ssize_t received = ReceivePacket(m_socket, packet);
       if (received > 0) {
         TraceTraffic(true, received);
         UpdateStatus([](auto& status) { ++status.packetsReceived; });
@@ -1577,7 +1592,7 @@ class BluetoothLEPacketClient::Impl
     std::vector<uint8_t> pdu(
         std::max<size_t>(m_gattMtu, m_config.maxPacketSize + 3));
     while (generation == m_connectGeneration && m_socket >= 0) {
-      ssize_t received = ::recv(m_socket, pdu.data(), pdu.size(), 0);
+      ssize_t received = ReceivePacket(m_socket, pdu);
       if (received > 0) {
         HandleGattPdu({pdu.data(), static_cast<size_t>(received)});
         continue;
