@@ -85,6 +85,9 @@ def main():
             "send-blocked",
             "destroy-connected",
             "destroy-after-loop",
+            "overtake-connect",
+            "overtake-connect-cancel",
+            "overtake-disconnect",
         ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [

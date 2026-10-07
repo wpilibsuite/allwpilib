@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <bit>
 #include <cerrno>
 #include <chrono>
@@ -311,38 +312,25 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
-    {
-      std::scoped_lock lock{m_statusMutex};
-      if ((m_status.connecting || m_status.connected) &&
-          m_status.targetAddress == config.address &&
-          m_status.addressType == config.addressType) {
-        Trace("connect ignored: target already connected or connecting");
-        return true;
-      }
-      m_config = config;
-      m_status.targetAddress = config.address;
-      m_status.addressType = config.addressType;
-      m_status.targetConfigured = true;
-      m_status.error.clear();
-      m_status.status =
-          config.preferL2CAP ? "Connecting (L2CAP)" : "Connecting (GATT)";
-      m_status.connecting = true;
-      m_status.connected = false;
-      m_status.transport = BluetoothPacketTransport::NONE;
-    }
-
+    uint64_t request = ++m_requestGeneration;
     auto self = shared_from_this();
-    m_exec->Send(
-        [self, config = std::move(config)] { self->ConnectOnLoop(config); });
+    m_exec->Send([self, config = std::move(config), request] {
+      if (request == self->m_requestGeneration) {
+        self->ConnectOnLoop(config);
+      }
+    });
     return true;
   }
 
   void Disconnect(std::string_view reason) {
     Trace("disconnect requested reason={}", reason);
+    uint64_t request = ++m_requestGeneration;
     auto self = shared_from_this();
     std::string reasonString{reason};
-    m_exec->Send([self, reasonString = std::move(reasonString)] {
-      self->CloseOnLoop(reasonString);
+    m_exec->Send([self, reasonString = std::move(reasonString), request] {
+      if (request == self->m_requestGeneration) {
+        self->CloseOnLoop(reasonString);
+      }
     });
   }
 
@@ -491,10 +479,32 @@ class BluetoothLEPacketClient::Impl
   }
 
   void ConnectOnLoop(const BluetoothLEPacketClientConfig& config) {
+    {
+      std::scoped_lock lock{m_statusMutex};
+      if ((m_status.connecting || m_status.connected) &&
+          m_status.targetAddress == config.address &&
+          m_status.addressType == config.addressType) {
+        Trace("connect ignored: target already connected or connecting");
+        return;
+      }
+    }
     // Publish progress only once this attempt owns the transport, so a status
     // callback can cancel or replace it without the old attempt resuming.
     CloseOnLoop({});
     uint64_t generation = ++m_connectGeneration;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      m_config = config;
+      m_status.targetAddress = config.address;
+      m_status.addressType = config.addressType;
+      m_status.targetConfigured = true;
+      m_status.error.clear();
+      m_status.status =
+          config.preferL2CAP ? "Connecting (L2CAP)" : "Connecting (GATT)";
+      m_status.connecting = true;
+      m_status.connected = false;
+      m_status.transport = BluetoothPacketTransport::NONE;
+    }
     Trace("begin attempt gen={} address={}", generation, config.address);
 
     bdaddr_t remoteAddress{};
@@ -1752,6 +1762,8 @@ class BluetoothLEPacketClient::Impl
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
+  // A loop-thread request can overtake an older request in the async queue.
+  std::atomic<uint64_t> m_requestGeneration{0};
 
   mutable std::mutex m_statusMutex;
   bool m_sendPending = false;
