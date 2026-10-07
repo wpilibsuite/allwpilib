@@ -6,11 +6,11 @@ package org.wpilib.math.trajectory;
 
 import static org.wpilib.units.Units.Seconds;
 
-import io.avaje.jsonb.Json;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import org.wpilib.units.measure.Time;
+import org.wpilib.util.collections.Search;
 
 /**
  * Represents a trajectory consisting of a list of {@link TrajectorySample}s, kinematically
@@ -19,9 +19,6 @@ import org.wpilib.units.measure.Time;
  * @param <SampleType> The type of the samples in the trajectory.
  */
 public abstract class Trajectory<SampleType extends TrajectorySample> {
-  /** The sample times, in seconds, parallel to {@link #samples}. Used for binary search. */
-  @Json.Ignore private final double[] timestamps;
-
   /** The samples this Trajectory is composed of. */
   protected final List<SampleType> samples;
 
@@ -52,9 +49,8 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
 
     this.samples =
         samples.stream().sorted(Comparator.comparingDouble(TrajectorySample::getTime)).toList();
-    this.timestamps = this.samples.stream().mapToDouble(TrajectorySample::getTime).toArray();
 
-    if (timestamps[0] != 0.0) {
+    if (this.samples.getFirst().getTime() != 0.0) {
       throw new IllegalArgumentException(
           "Trajectory sample times must be relative to the trajectory start "
               + "(the first sample must have time 0).");
@@ -132,14 +128,17 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
       return end();
     }
 
-    var index = Arrays.binarySearch(timestamps, time);
+    int index = Search.binarySearch(samples, time, TrajectorySample::getTime);
     if (index >= 0) {
+      // Exact match, no interpolation needed
       return samples.get(index);
     }
 
-    int upper = -index - 1;
-    int lower = upper - 1;
-    double param = (time - timestamps[lower]) / (timestamps[upper] - timestamps[lower]);
-    return interpolate(samples.get(lower), samples.get(upper), param);
+    // The insertion point is the first sample after the requested time. The early returns above
+    // guarantee that it is neither the first sample nor past the last one.
+    var upper = samples.get(-index - 1);
+    var lower = samples.get(-index - 2);
+    double param = (time - lower.getTime()) / (upper.getTime() - lower.getTime());
+    return interpolate(lower, upper, param);
   }
 }
