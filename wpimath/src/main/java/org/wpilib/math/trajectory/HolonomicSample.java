@@ -76,7 +76,7 @@ public class HolonomicSample implements TrajectorySample, StructSerializable, Pr
   }
 
   @Override
-  public double time() {
+  public double getTime() {
     return time;
   }
 
