@@ -147,9 +147,13 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
 TEST_CASE("Bluetooth initial status callback can supersede a connection",
           "[bluetooth]") {
   bool replace = false;
+  bool rejectConfig = false;
   SECTION("Cancel") {}
   SECTION("Replace and cancel") {
     replace = true;
+  }
+  SECTION("Reject invalid configuration and cancel") {
+    rejectConfig = true;
   }
 
   auto loop = uv::Loop::Create();
@@ -163,13 +167,24 @@ TEST_CASE("Bluetooth initial status callback can supersede a connection",
   bool firstAccepted = false;
   bool replacementAccepted = false;
   bool canceled = false;
+  bool rejectedConfigPreservedState = false;
   int connectingCallbacks = 0;
   std::shared_ptr<BluetoothLEPacketClient> client;
   client = BluetoothLEPacketClient::Create(
       *loop, [](auto) {},
       [&](const auto& status) {
-        if (status.connecting) {
+        if (status.connecting && status.error.empty()) {
           ++connectingCallbacks;
+          if (rejectConfig) {
+            auto before = client->GetStatus();
+            bool accepted = client->Connect({});
+            auto after = client->GetStatus();
+            rejectedConfigPreservedState =
+                !accepted && after.connecting && !after.connected &&
+                after.status == before.status &&
+                after.targetAddress == before.targetAddress &&
+                after.transport == before.transport && !after.error.empty();
+          }
           if (replace && connectingCallbacks == 1) {
             auto next = config;
             next.address = "AA:BB:CC:DD:EE:02";
@@ -210,6 +225,7 @@ TEST_CASE("Bluetooth initial status callback can supersede a connection",
   CHECK(replacementAccepted == replace);
   CHECK(connectingCallbacks == (replace ? 2 : 1));
   CHECK(canceled);
+  CHECK(rejectedConfigPreservedState == rejectConfig);
   CHECK_FALSE(status.connected);
   CHECK_FALSE(status.connecting);
   CHECK(status.status == "Cancelled");

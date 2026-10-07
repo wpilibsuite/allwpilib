@@ -58,6 +58,8 @@ class BluetoothLEPacketClient::Impl
   }
 
  private:
+  void SetRequestError(std::string_view error);
+
   template <typename F>
   bool UpdateStatus(uint64_t generation, F&& func) {
     uint64_t sequence;
@@ -882,13 +884,13 @@ BluetoothLEPacketClient::Impl::~Impl() {
 bool BluetoothLEPacketClient::Impl::Connect(
     BluetoothLEPacketClientConfig config) {
   if (config.address.empty()) {
-    SetError("No Bluetooth target configured", m_connectGeneration);
+    SetRequestError("No Bluetooth target configured");
     return false;
   }
   if (config.gattServiceUuid.empty() ||
       config.gattControlCharacteristicUuid.empty() ||
       config.gattStatusCharacteristicUuid.empty()) {
-    SetError("No Bluetooth GATT UUIDs configured", m_connectGeneration);
+    SetRequestError("No Bluetooth GATT UUIDs configured");
     return false;
   }
 
@@ -973,6 +975,15 @@ bool BluetoothLEPacketClient::Impl::Send(std::span<const uint8_t> packet,
 BluetoothLEPacketConnectionStatus BluetoothLEPacketClient::Impl::GetStatus() const {
   std::scoped_lock lock{m_statusMutex};
   return m_status;
+}
+
+void BluetoothLEPacketClient::Impl::SetRequestError(std::string_view error) {
+  UpdateStatus(m_connectGeneration, [&](auto& status) {
+    status.error = error;
+    if (!status.connecting && !status.connected) {
+      status.status = error;
+    }
+  });
 }
 
 void BluetoothLEPacketClient::Impl::SetStatus(std::string_view status,

@@ -88,6 +88,8 @@ def main():
             "overtake-connect",
             "overtake-connect-cancel",
             "overtake-disconnect",
+            "invalid-config",
+            "invalid-config-thread",
         ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [

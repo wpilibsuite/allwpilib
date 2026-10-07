@@ -444,19 +444,19 @@ class BluetoothLEPacketClient::Impl
 
   bool Connect(BluetoothLEPacketClientConfig config) {
     if (config.address.empty()) {
-      SetError("No Bluetooth address configured");
+      SetRequestError("No Bluetooth address configured");
       return false;
     }
     if (config.gattServiceUuid.empty() ||
         config.gattControlCharacteristicUuid.empty() ||
         config.gattStatusCharacteristicUuid.empty()) {
-      SetError("No Bluetooth GATT UUIDs configured");
+      SetRequestError("No Bluetooth GATT UUIDs configured");
       return false;
     }
 
     uint64_t bluetoothAddress = 0;
     if (!ParseBluetoothAddress(config.address, &bluetoothAddress)) {
-      SetError(
+      SetRequestError(
           "Windows GATT requires a Bluetooth address of the form "
           "AA:BB:CC:DD:EE:FF");
       return false;
@@ -932,13 +932,12 @@ class BluetoothLEPacketClient::Impl
     FailGeneration(error, m_connectGeneration.load(std::memory_order_acquire));
   }
 
-  void SetError(std::string_view error) {
+  void SetRequestError(std::string_view error) {
     UpdateStatus([&](auto& status) {
       status.error = error;
-      status.status = error;
-      status.connecting = false;
-      status.connected = false;
-      status.transport = BluetoothPacketTransport::NONE;
+      if (!status.connecting && !status.connected) {
+        status.status = error;
+      }
     });
   }
 

@@ -71,7 +71,7 @@ extern "C" int connect(int fd, const sockaddr* address, socklen_t size) {
   connections.back().addressLastByte =
       reinterpret_cast<const BluetoothAddress*>(address)->address[0];
   if (scenario.starts_with("send-") || scenario.starts_with("destroy-") ||
-      scenario.starts_with("overtake-")) {
+      scenario.starts_with("overtake-") || scenario.starts_with("invalid-")) {
     return 0;
   }
   errno = scenario.ends_with("fallback") && connections.size() == 1
@@ -216,6 +216,66 @@ static int RunSendRegression() {
   return passed ? 0 : 1;
 }
 
+static int RunRejectedConfigRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  std::vector<uint8_t> received;
+  auto client = BluetoothLEPacketClient::Create(*loop, [&](auto packet) {
+    received.assign(packet.begin(), packet.end());
+  });
+  auto timer = uv::Timer::Create(loop);
+  bool passed = true;
+  const uint8_t packet[] = {0x12, 0x34};
+  timer->timeout.connect([&] {
+    BluetoothLEPacketClientConfig config;
+    config.address = "AA:BB:CC:DD:EE:01";
+    config.psm = 0x81;
+    client->Connect(config);
+    auto reject = [&] {
+      passed &= !client->Connect({});
+      config.psm = 0;
+      passed &= !client->Connect(config);
+    };
+    if (scenario == "invalid-config-thread") {
+      std::thread worker{reject};
+      worker.join();
+    } else {
+      reject();
+    }
+    auto status = client->GetStatus();
+    passed &= status.connected && !status.connecting &&
+              status.transport == BluetoothPacketTransport::L2CAP &&
+              status.targetAddress == config.address && !status.error.empty();
+    passed &= client->Send(packet);
+    send(connections.back().peer, packet, sizeof(packet), MSG_NOSIGNAL);
+    timer->Close();
+  });
+  timer->Start(uv::Timer::Time{0});
+  auto deadline = uv::Timer::Create(loop);
+  deadline->timeout.connect([&] { loop->Stop(); });
+  deadline->Start(uv::Timer::Time{50});
+  loop->Run();
+  passed &=
+      connections.size() == 1 && client->GetStatus().connected &&
+      received == std::vector<uint8_t>(std::begin(packet), std::end(packet));
+  uint8_t sent[2];
+  passed &= recv(connections.back().peer, sent, sizeof(sent), 0) == 2 &&
+            std::equal(std::begin(packet), std::end(packet), sent);
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
 static int RunRequestOrderRegression() {
   using namespace wpi::net;
   auto loop = uv::Loop::Create();
@@ -331,6 +391,9 @@ static int RunTeardownRegression() {
 int main(int argc, char** argv) {
   using namespace wpi::net;
   scenario = argc > 1 ? argv[1] : "cancel-l2cap";
+  if (scenario.starts_with("invalid-")) {
+    return RunRejectedConfigRegression();
+  }
   if (scenario.starts_with("overtake-")) {
     return RunRequestOrderRegression();
   }

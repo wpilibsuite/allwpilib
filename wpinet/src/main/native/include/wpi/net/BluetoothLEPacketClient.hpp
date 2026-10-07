@@ -161,6 +161,9 @@ class BluetoothLEPacketClient {
   /**
    * Starts connecting to a Bluetooth LE packet transport.
    *
+   * A rejected request preserves the existing connection or connection attempt.
+   * The validation error is available in GetStatus().error.
+   *
    * @param config connection configuration.
    * @return true if the request was accepted.
    */

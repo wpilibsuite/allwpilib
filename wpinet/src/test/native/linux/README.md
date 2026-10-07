@@ -29,6 +29,7 @@ Coverage:
 - cancellation and replacement from connection, discovery, and error callbacks;
 - discarding old sends on reconnect while preserving the new send reservation;
 - discarding queued connect/disconnect requests overtaken by loop-thread requests;
+- preserving a working connection when a new configuration is rejected;
 - releasing a connected client's handles and socket, including after loop teardown;
 - silent default logging and unchanged outcomes with debug output enabled.
 

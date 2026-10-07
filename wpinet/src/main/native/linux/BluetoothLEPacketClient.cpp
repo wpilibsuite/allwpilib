@@ -304,11 +304,11 @@ class BluetoothLEPacketClient::Impl
                                                              : "random",
           config.psm, config.preferL2CAP);
     if (config.address.empty()) {
-      SetError("No Bluetooth address configured");
+      SetRequestError("No Bluetooth address configured");
       return false;
     }
     if (config.preferL2CAP && config.psm == 0) {
-      SetError("No Bluetooth L2CAP PSM configured");
+      SetRequestError("No Bluetooth L2CAP PSM configured");
       return false;
     }
 
@@ -1702,6 +1702,16 @@ class BluetoothLEPacketClient::Impl
     UpdateStatus(std::forward<F>(func));
     // Async::Send invokes callbacks inline when already on the loop.
     return generation == m_connectGeneration;
+  }
+
+  void SetRequestError(std::string_view error) {
+    Trace("request rejected: {}", error);
+    UpdateStatus([&](auto& status) {
+      status.error = error;
+      if (!status.connecting && !status.connected) {
+        status.status = error;
+      }
+    });
   }
 
   void SetError(std::string_view error) {
