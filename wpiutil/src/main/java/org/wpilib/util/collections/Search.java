@@ -4,6 +4,7 @@
 
 package org.wpilib.util.collections;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -104,5 +105,47 @@ public final class Search {
     }
 
     return -(low + 1);
+  }
+
+  /**
+   * Searches a sorted array for a key using binary search, comparing the key against a projection
+   * of each element. See {@link #binarySearch(List, Object, Comparator, Function)} for the full
+   * contract.
+   *
+   * @param <T> The element type of the array.
+   * @param <K> The type of the key and of the projected element values.
+   * @param array The array to search, sorted by the projected values.
+   * @param key The key to search for.
+   * @param comparator The comparator that orders projected values.
+   * @param projector A function that extracts the value to compare against the key from an element.
+   * @return The index of an element whose projection equals the key if one exists. Otherwise,
+   *     {@code -(insertion point) - 1}, where the insertion point is the index of the first element
+   *     whose projection is greater than the key, or the array length if there is none. The return
+   *     value is non-negative if and only if a match is found.
+   */
+  public static <T, K> int binarySearch(
+      T[] array,
+      K key,
+      Comparator<? super K> comparator,
+      Function<? super T, ? extends K> projector) {
+    return binarySearch(Arrays.asList(array), key, comparator, projector);
+  }
+
+  /**
+   * Searches a sorted array for a {@code double} key using binary search, comparing the key against
+   * a projection of each element. This avoids boxing the projected values. See {@link
+   * #binarySearch(List, double, ToDoubleFunction)} for the full contract.
+   *
+   * @param <T> The element type of the array.
+   * @param array The array to search, sorted by the projected values.
+   * @param key The key to search for.
+   * @param projector A function that extracts the value to compare against the key from an element.
+   * @return The index of an element whose projection equals the key if one exists. Otherwise,
+   *     {@code -(insertion point) - 1}, where the insertion point is the index of the first element
+   *     whose projection is greater than the key, or the array length if there is none. The return
+   *     value is non-negative if and only if a match is found.
+   */
+  public static <T> int binarySearch(T[] array, double key, ToDoubleFunction<? super T> projector) {
+    return binarySearch(Arrays.asList(array), key, projector);
   }
 }
