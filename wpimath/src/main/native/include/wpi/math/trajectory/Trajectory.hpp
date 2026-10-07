@@ -5,7 +5,6 @@
 #pragma once
 
 #include <algorithm>
-#include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <stdexcept>
@@ -22,17 +21,6 @@ class DifferentialDriveKinematics;
 class MecanumDriveKinematics;
 template <size_t NumModules>
 class SwerveDriveKinematics;
-
-/**
- * Requirements for a type usable as a Trajectory sample: copyable, comparable,
- * and carrying a `time` member relative to the trajectory start.
- */
-template <typename SampleType>
-concept TrajectorySample =
-    std::copyable<SampleType> && std::equality_comparable<SampleType> &&
-    requires(const SampleType& sample) {
-      { sample.time } -> std::convertible_to<wpi::units::second_t>;
-    };
 
 /**
  * Represents a trajectory consisting of a list of samples,
