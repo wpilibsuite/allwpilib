@@ -5,11 +5,12 @@
 package org.wpilib.math.trajectory;
 
 /** Represents a single sample in a {@link Trajectory}. */
+@FunctionalInterface
 public interface TrajectorySample {
   /**
    * Gets the time of the sample relative to the trajectory start, in seconds.
    *
    * @return the time of the sample in seconds.
    */
-  double time();
+  double getTime();
 }
