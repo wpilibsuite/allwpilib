@@ -50,8 +50,9 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
       throw new IllegalArgumentException("Trajectory manually initialized with no samples.");
     }
 
-    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.time())).toList();
-    this.timestamps = this.samples.stream().mapToDouble(TrajectorySample::time).toArray();
+    this.samples =
+        samples.stream().sorted(Comparator.comparingDouble(TrajectorySample::getTime)).toList();
+    this.timestamps = this.samples.stream().mapToDouble(TrajectorySample::getTime).toArray();
 
     if (timestamps[0] != 0.0) {
       throw new IllegalArgumentException(
@@ -86,7 +87,7 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    * @return the duration of the trajectory in seconds.
    */
   public double duration() {
-    return end().time();
+    return end().getTime();
   }
 
   /**
