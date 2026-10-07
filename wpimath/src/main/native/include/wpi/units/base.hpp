@@ -132,8 +132,6 @@ namespace wpi::units
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
- * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -255,7 +253,7 @@ namespace wpi::units
   * @param		namespaceName namespace in which the new units will be encapsulated. All literal values
   *				are placed in the `wpi::units::literals` namespace.
   * @param		nameSingular singular version of the unit name, e.g. 'meter'
-  * @param		abbreviation - abbreviated unit name, e.g. 'm'
+  * @param		abbrev - abbreviated unit name, e.g. 'm'
   */
 #define UNIT_ADD_NAME(namespaceName, nameSingular, abbrev)\
 template<> constexpr const char* name(const namespaceName::nameSingular ## _t&)\
@@ -308,8 +306,6 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
- * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -336,8 +332,6 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
  * @param		underlyingType - the underlying type, e.g. 'int' or 'float'
- * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -420,8 +414,6 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
  * @param		nameSingular singular version of the unit name, e.g. 'meter'
  * @param		namePlural - plural version of the unit name, e.g. 'meters'
  * @param		abbreviation - abbreviated unit name, e.g. 'm'
- * @param		definition - the variadic parameter is used for the definition of the unit
- *				(e.g. `unit<std::ratio<1>, wpi::units::category::length_unit>`)
  * @note		a variadic template is used for the definition to allow templates with
  *				commas to be easily expanded. All the variadic 'arguments' should together
  *				comprise the unit definition.
@@ -455,8 +447,6 @@ template<> constexpr const char* abbreviation(const namespaceName::nameSingular 
   * @param		nameSingular singular version of the unit name, e.g. 'byte'
   * @param		namePlural - plural version of the unit name, e.g. 'bytes'
   * @param		abbreviation - abbreviated unit name, e.g. 'B'
-  * @param		definition - the variadic parameter is used for the definition of the unit
-  *				(e.g. `unit<std::ratio<1>, wpi::units::category::data_unit>`)
   * @note		a variadic template is used for the definition to allow templates with
   *				commas to be easily expanded. All the variadic 'arguments' should together
   *				comprise the unit definition.
