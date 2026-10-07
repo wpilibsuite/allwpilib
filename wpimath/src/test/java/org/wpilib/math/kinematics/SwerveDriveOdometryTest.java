@@ -181,7 +181,7 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       var moduleVelocities =
@@ -228,7 +228,7 @@ class SwerveDriveOdometryTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -266,7 +266,7 @@ class SwerveDriveOdometryTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       fl.distance +=
@@ -309,7 +309,7 @@ class SwerveDriveOdometryTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.06, "Incorrect max error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.06, "Incorrect max error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 }

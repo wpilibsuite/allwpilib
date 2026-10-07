@@ -23,7 +23,7 @@ class TrajectorySerializationTest {
 
   <SampleType extends HolonomicSample> void assertTrajectoryEquals(
       Trajectory<SampleType> expected, Trajectory<SampleType> actual) {
-    assertEquals(expected.duration, actual.duration, EPSILON);
+    assertEquals(expected.duration(), actual.duration(), EPSILON);
     assertEquals(expected.samples.size(), actual.samples.size());
     for (int i = 0; i < expected.samples.size(); i++) {
       HolonomicSample e = expected.samples.get(i);
