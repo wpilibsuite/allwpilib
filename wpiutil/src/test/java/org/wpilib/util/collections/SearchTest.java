@@ -108,4 +108,47 @@ class SearchTest {
     assertEquals(0, Search.binarySearch(values, -0.0, Double::doubleValue));
     assertEquals(1, Search.binarySearch(values, 0.0, Double::doubleValue));
   }
+
+  @Test
+  void testArrayWithComparator() {
+    Item[] items = ITEMS.toArray(new Item[0]);
+
+    for (int i = 0; i < items.length; i++) {
+      assertEquals(
+          i, Search.binarySearch(items, items[i].value(), Comparator.naturalOrder(), Item::value));
+    }
+    assertEquals(-1, Search.binarySearch(items, 0.0, Comparator.naturalOrder(), Item::value));
+    assertEquals(-2, Search.binarySearch(items, 2.0, Comparator.naturalOrder(), Item::value));
+    assertEquals(-5, Search.binarySearch(items, 11.0, Comparator.naturalOrder(), Item::value));
+    assertEquals(2, Search.binarySearch(items, "c", Comparator.naturalOrder(), Item::name));
+  }
+
+  @Test
+  void testArrayWithDouble() {
+    Item[] items = ITEMS.toArray(new Item[0]);
+
+    for (int i = 0; i < items.length; i++) {
+      assertEquals(i, Search.binarySearch(items, items[i].value(), Item::value));
+    }
+    assertEquals(-1, Search.binarySearch(items, 0.0, Item::value));
+    assertEquals(-2, Search.binarySearch(items, 2.0, Item::value));
+    assertEquals(-4, Search.binarySearch(items, 5.0, Item::value));
+    assertEquals(-5, Search.binarySearch(items, 11.0, Item::value));
+  }
+
+  @Test
+  void testEmptyArray() {
+    assertEquals(-1, Search.binarySearch(new Item[0], 1.0, Item::value));
+    assertEquals(-1, Search.binarySearch(new Item[0], 1.0, Comparator.naturalOrder(), Item::value));
+  }
+
+  @Test
+  void testArrayMatchesList() {
+    Item[] items = ITEMS.toArray(new Item[0]);
+    for (double key : new double[] {-1.0, 1.0, 1.5, 2.5, 3.0, 4.0, 9.9, 10.0, 12.0}) {
+      assertEquals(
+          Search.binarySearch(ITEMS, key, Item::value),
+          Search.binarySearch(items, key, Item::value));
+    }
+  }
 }
