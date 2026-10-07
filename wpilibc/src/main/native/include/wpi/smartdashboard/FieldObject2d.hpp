@@ -13,13 +13,14 @@
 
 #include "wpi/math/geometry/Pose2d.hpp"
 #include "wpi/math/geometry/Rotation2d.hpp"
+#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/util/SmallVector.hpp"
 #include "wpi/util/mutex.hpp"
 
 namespace wpi::math {
-template <typename SampleType>
+template <TrajectorySample SampleType>
 class Trajectory;
 }
 
@@ -86,7 +87,7 @@ class FieldObject2d {
    *
    * @param trajectory The trajectory from which poses should be added.
    */
-  template <typename SampleType>
+  template <wpi::math::TrajectorySample SampleType>
   void SetTrajectory(const wpi::math::Trajectory<SampleType>& trajectory) {
     std::vector<wpi::math::Pose2d> poses;
     poses.reserve(trajectory.Samples().size());
