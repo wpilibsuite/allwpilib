@@ -63,7 +63,7 @@ HolonomicTrajectory HolonomicTrajectory::Concatenate(
 
   // Append other with time offset
   for (auto s : other.Samples()) {
-    s.time += m_duration;
+    s.time += Duration();
     samples.emplace_back(std::move(s));
   }
 

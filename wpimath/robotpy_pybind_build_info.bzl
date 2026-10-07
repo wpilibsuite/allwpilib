@@ -1218,16 +1218,6 @@ def wpimath_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], inclu
             ],
         ),
         struct(
-            class_name = "TrajectorySample",
-            yml_file = "semiwrap/TrajectorySample.yml",
-            header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpimath.copy_headers)/wpi/math/trajectory/TrajectorySample.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::math::TrajectorySample", "wpi__math__TrajectorySample.hpp"),
-            ],
-        ),
-        struct(
             class_name = "TrapezoidProfile",
             yml_file = "semiwrap/TrapezoidProfile.yml",
             header_root = "$(execpath :robotpy-native-wpimath.copy_headers)",

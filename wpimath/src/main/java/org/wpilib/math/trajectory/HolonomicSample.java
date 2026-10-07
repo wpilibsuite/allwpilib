@@ -22,8 +22,11 @@ import org.wpilib.util.struct.StructSerializable;
 
 /** Represents a single sample in a trajectory. */
 @Json
-public class HolonomicSample extends TrajectorySample
-    implements StructSerializable, ProtobufSerializable {
+public class HolonomicSample implements TrajectorySample, StructSerializable, ProtobufSerializable {
+  /** The time of the sample relative to the trajectory start, in seconds. */
+  @Json.Property("time")
+  public double time;
+
   /** The robot pose at this sample (in the field reference frame). */
   @Json.Property("pose")
   public Pose2d pose;
@@ -53,7 +56,7 @@ public class HolonomicSample extends TrajectorySample
   @Json.Creator
   public HolonomicSample(
       double time, Pose2d pose, ChassisVelocities velocity, ChassisAccelerations acceleration) {
-    super(time);
+    this.time = time;
     this.pose = pose;
     this.velocity = velocity;
     this.acceleration = acceleration;
@@ -70,6 +73,11 @@ public class HolonomicSample extends TrajectorySample
   public HolonomicSample(
       Time time, Pose2d pose, ChassisVelocities velocity, ChassisAccelerations acceleration) {
     this(time.in(Seconds), pose, velocity, acceleration);
+  }
+
+  @Override
+  public double time() {
+    return time;
   }
 
   @Override

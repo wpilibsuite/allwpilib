@@ -10,8 +10,6 @@ import io.avaje.jsonb.Json;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import org.wpilib.math.interpolation.InterpolatingTreeMap;
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -21,21 +19,20 @@ import org.wpilib.units.measure.Time;
  * @param <SampleType> The type of the samples in the trajectory.
  */
 public abstract class Trajectory<SampleType extends TrajectorySample> {
+  /** The sample times, in seconds, parallel to {@link #samples}. Used for binary search. */
+  @Json.Ignore private final double[] timestamps;
+
   /** The samples this Trajectory is composed of. */
   protected final List<SampleType> samples;
-
-  @Json.Ignore private final InterpolatingTreeMap<Double, SampleType> sampleMap;
-
-  /** The total duration of the trajectory. */
-  @Json.Ignore public final double duration;
 
   /**
    * Constructs a Trajectory.
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
+   * @throws IllegalArgumentException if there are no samples or the earliest sample's time is not
+   *     zero.
    */
-  @SuppressWarnings({"this-escape"})
   public Trajectory(SampleType[] samples) {
     this(Arrays.asList(samples));
   }
@@ -45,18 +42,22 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    *
    * @param samples the samples of the trajectory. Order does not matter as they will be ordered
    *     internally.
+   * @throws IllegalArgumentException if there are no samples or the earliest sample's time is not
+   *     zero.
    */
-  @SuppressWarnings({"this-escape"})
   public Trajectory(List<SampleType> samples) {
-    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.time)).toList();
-
-    this.sampleMap = new InterpolatingTreeMap<>(MathUtil::inverseLerp, this::interpolate);
-
-    for (var sample : this.samples) {
-      sampleMap.put(sample.time, sample);
+    if (samples.isEmpty()) {
+      throw new IllegalArgumentException("Trajectory manually initialized with no samples.");
     }
 
-    this.duration = this.samples.isEmpty() ? 0.0 : this.samples.getLast().time;
+    this.samples = samples.stream().sorted(Comparator.comparingDouble(s -> s.time())).toList();
+    this.timestamps = this.samples.stream().mapToDouble(TrajectorySample::time).toArray();
+
+    if (timestamps[0] != 0.0) {
+      throw new IllegalArgumentException(
+          "Trajectory sample times must be relative to the trajectory start "
+              + "(the first sample must have time 0).");
+    }
   }
 
   /**
@@ -78,6 +79,15 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    * @return The interpolated sample.
    */
   public abstract SampleType interpolate(SampleType start, SampleType end, double t);
+
+  /**
+   * Gets the total duration of the trajectory, in seconds.
+   *
+   * @return the duration of the trajectory in seconds.
+   */
+  public double duration() {
+    return end().time();
+  }
 
   /**
    * Gets the first sample in the trajectory.
@@ -114,6 +124,21 @@ public abstract class Trajectory<SampleType extends TrajectorySample> {
    * @return the sample at that point in time.
    */
   public SampleType sampleAt(double time) {
-    return sampleMap.get(time);
+    if (time < 0.0) {
+      return start();
+    }
+    if (time > duration()) {
+      return end();
+    }
+
+    var index = Arrays.binarySearch(timestamps, time);
+    if (index >= 0) {
+      return samples.get(index);
+    }
+
+    int upper = -index - 1;
+    int lower = upper - 1;
+    double param = (time - timestamps[lower]) / (timestamps[upper] - timestamps[lower]);
+    return interpolate(samples.get(lower), samples.get(upper), param);
   }
 }

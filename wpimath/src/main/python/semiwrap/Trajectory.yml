@@ -23,8 +23,6 @@ classes:
       Interpolate:
     attributes:
       m_samples:
-      m_sampleMap:
-      m_duration:
 
 templates:
   DifferentialTrajectoryBase:
