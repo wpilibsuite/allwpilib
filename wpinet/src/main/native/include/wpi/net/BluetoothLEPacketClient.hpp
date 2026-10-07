@@ -168,6 +168,9 @@ class BluetoothLEPacketClient {
    * A rejected request preserves the existing connection or connection attempt.
    * The validation error is available in GetStatus().error.
    *
+   * Linux GATT requires exclusive ATT ownership. If BlueZ holds the connection,
+   * recovery may disconnect all BlueZ profiles on the target device.
+   *
    * @param config connection configuration.
    * @return true if the request was accepted.
    */

@@ -716,6 +716,10 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    // Fixed ATT CID ownership is exclusive. BlueZ may still own it after
+    // pairing; Device1.Disconnect releases the whole device, including other
+    // profiles. See wpinet/doc/bluetooth-le.adoc for the ownership and queueing
+    // tradeoffs of direct ATT versus BlueZ acquired descriptors.
     TraceSocket("GATT EBUSY: requesting BlueZ disconnect before retry");
     m_gattBlueZDisconnectAttempted = true;
     CloseSocket();
