@@ -213,7 +213,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
             .map(
                 s ->
                     new DifferentialSample(
-                        s.time + this.duration,
+                        s.time + duration(),
                         s.pose,
                         s.velocity,
                         s.acceleration,

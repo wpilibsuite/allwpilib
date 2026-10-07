@@ -5,8 +5,9 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <cstddef>
-#include <map>
+#include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -22,13 +23,24 @@ template <size_t NumModules>
 class SwerveDriveKinematics;
 
 /**
+ * Requirements for a type usable as a Trajectory sample: copyable, comparable,
+ * and carrying a `time` member relative to the trajectory start.
+ */
+template <typename SampleType>
+concept TrajectorySample =
+    std::copyable<SampleType> && std::equality_comparable<SampleType> &&
+    requires(const SampleType& sample) {
+      { sample.time } -> std::convertible_to<wpi::units::second_t>;
+    };
+
+/**
  * Represents a trajectory consisting of a list of samples,
  * kinematically interpolating between them.
  *
  * @tparam SampleType The type of sample (e.g., SplineSample,
  * DifferentialSample)
  */
-template <typename SampleType>
+template <TrajectorySample SampleType>
 class Trajectory {
  public:
   /**
@@ -36,26 +48,24 @@ class Trajectory {
    *
    * @param samples The samples of the trajectory. Order does not matter as
    *                they will be sorted internally.
-   * @throws std::invalid_argument if the vector of samples is empty.
+   * @throws std::invalid_argument if the vector of samples is empty or if the
+   *         earliest sample's time is not zero.
    */
-  explicit Trajectory(std::vector<SampleType> samples) {
-    if (samples.empty()) {
+  explicit Trajectory(std::vector<SampleType> samples)
+      : m_samples(std::move(samples)) {
+    if (m_samples.empty()) {
       throw std::invalid_argument(
           "Trajectory manually initialized with no samples.");
     }
 
-    // Sort samples by time
-    std::sort(samples.begin(), samples.end(),
-              [](const auto& a, const auto& b) { return a.time < b.time; });
+    // sort samples by time
+    std::ranges::sort(m_samples, {}, &SampleType::time);
 
-    m_samples = std::move(samples);
-
-    // Build interpolating map
-    for (const auto& sample : m_samples) {
-      m_sampleMap[sample.time] = sample;
+    if (Start().time != 0.0_s) {
+      throw std::invalid_argument(
+          "Trajectory sample times must be relative to the trajectory start "
+          "(the first sample must have time 0).");
     }
-
-    m_duration = m_samples.back().time;
   }
 
   /**
@@ -63,7 +73,7 @@ class Trajectory {
    *
    * @return The duration of the trajectory.
    */
-  wpi::units::second_t Duration() const { return m_duration; }
+  wpi::units::second_t Duration() const { return End().time; }
 
   /**
    * Returns the samples of the trajectory.
@@ -91,34 +101,21 @@ class Trajectory {
    *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The sample at that point in time.
-   * @throws std::runtime_error if the trajectory has no samples.
    */
   SampleType SampleAt(wpi::units::second_t t) const {
-    if (m_samples.empty()) {
-      throw std::runtime_error(
-          "Trajectory cannot be sampled if it has no samples.");
+    if (t <= Start().time) {
+      return Start();
+    }
+    if (t >= End().time) {
+      return End();
     }
 
-    if (t <= m_samples.front().time) {
-      return m_samples.front();
-    }
-    if (t >= m_duration) {
-      return m_samples.back();
-    }
-
-    // Find the two samples to interpolate between
-    auto upper = m_sampleMap.upper_bound(t);
-    if (upper == m_sampleMap.begin()) {
-      return upper->second;
-    }
-
+    auto upper = std::ranges::lower_bound(m_samples, t, {}, &SampleType::time);
     auto lower = std::prev(upper);
 
-    // Calculate interpolation parameter
-    const double t_param = (t - lower->first) / (upper->first - lower->first);
+    const double t_param = (t - lower->time) / (upper->time - lower->time);
 
-    // Use derived class's interpolation (runtime polymorphism)
-    return Interpolate(lower->second, upper->second, t_param);
+    return Interpolate(*lower, *upper, t_param);
   }
 
   /**
@@ -146,8 +143,6 @@ class Trajectory {
 
  protected:
   std::vector<SampleType> m_samples;
-  std::map<wpi::units::second_t, SampleType> m_sampleMap;
-  wpi::units::second_t m_duration{0};
 };
 
 }  // namespace wpi::math

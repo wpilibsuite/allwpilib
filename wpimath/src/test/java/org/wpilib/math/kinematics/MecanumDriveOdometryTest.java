@@ -124,7 +124,7 @@ class MecanumDriveOdometryTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
@@ -166,7 +166,7 @@ class MecanumDriveOdometryTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.35, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.35, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.35, "Incorrect max error");
     assertEquals(
         1.0,
@@ -207,7 +207,7 @@ class MecanumDriveOdometryTest {
     double errorSum = 0;
     double odometryDistanceTravelled = 0;
     double trajectoryDistanceTravelled = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       trajectoryDistanceTravelled +=
@@ -246,7 +246,7 @@ class MecanumDriveOdometryTest {
       t += dt;
     }
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.15, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.15, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.3, "Incorrect max error");
     assertEquals(
         1.0,
