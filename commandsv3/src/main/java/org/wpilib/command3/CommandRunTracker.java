@@ -6,8 +6,9 @@ package org.wpilib.command3;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import java.util.Collection;
+import java.util.List;
 import org.wpilib.annotation.NoDiscard;
+import org.wpilib.command3.Scheduler.ScheduleResult;
 
 /**
  * Tracks the running status of a set of commands using primitive run IDs and bitwise operations.
@@ -56,41 +57,24 @@ abstract sealed class CommandRunTracker {
   public abstract boolean isAnyRunning();
 
   /**
-   * Creates a tracker for the given collection of commands.
+   * Creates a tracker for the given collection of forked commands.
    *
    * @param scheduler the scheduler to query command run IDs from
-   * @param commands the commands to track
+   * @param forks the forked commands to track
    * @return a command run tracker
    */
   @NoDiscard
-  public static CommandRunTracker of(Scheduler scheduler, Collection<? extends Command> commands) {
+  public static CommandRunTracker of(Scheduler scheduler, List<ScheduleResult.Successful> forks) {
     requireNonNullParam(scheduler, "scheduler", "CommandRunTracker.of");
-    requireNonNullParam(commands, "commands", "CommandRunTracker.of");
-    Command[] array = commands.toArray(Command[]::new);
-    return createRunTracker(scheduler, array);
-  }
+    requireNonNullParam(forks, "forks", "CommandRunTracker.of");
 
-  /**
-   * Creates a tracker for the given array of commands.
-   *
-   * @param scheduler the scheduler to query command run IDs from
-   * @param commands the commands to track
-   * @return a command run tracker
-   */
-  @NoDiscard
-  public static CommandRunTracker of(Scheduler scheduler, Command... commands) {
-    requireNonNullParam(scheduler, "scheduler", "CommandRunTracker.of");
-    requireNonNullParam(commands, "commands", "CommandRunTracker.of");
-    Command[] array = commands.clone();
-    return createRunTracker(scheduler, array);
-  }
-
-  @NoDiscard
-  private static CommandRunTracker createRunTracker(Scheduler scheduler, Command[] array) {
-    int[] runIds = new int[array.length];
-    for (int i = 0; i < array.length; i++) {
-      requireNonNullParam(array[i], "commands[" + i + "]", "CommandRunTracker.of");
-      runIds[i] = scheduler.runId(array[i]);
+    Command[] array = new Command[forks.size()];
+    int[] runIds = new int[forks.size()];
+    for (int i = 0; i < forks.size(); i++) {
+      ScheduleResult.Successful fork = forks.get(i);
+      requireNonNullParam(fork, "forks[" + i + "]", "CommandRunTracker.of");
+      array[i] = fork.command();
+      runIds[i] = fork.runId();
     }
     return array.length <= 64
         ? new Small(scheduler, array, runIds)

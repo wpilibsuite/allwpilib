@@ -10,9 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.wpilib.units.Units.Seconds;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -325,5 +327,229 @@ class CoroutineTest extends CommandTestBase {
 
     // But only the outer command should still be running; secondInner should have been canceled
     assertEquals(List.of(outer), m_scheduler.getRunningCommands());
+  }
+
+  @Test
+  void forkResultDelayedAwaitCompletionAfterCompletion() {
+    AtomicBoolean childRan = new AtomicBoolean(false);
+    AtomicBoolean parentDone = new AtomicBoolean(false);
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  childRan.set(true);
+                })
+            .named("Child");
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  var forkResult = co.fork(child);
+                  // Yield while child runs to completion
+                  co.yield();
+                  co.yield();
+                  // Child has completed before awaitCompletion is called
+                  forkResult.awaitCompletion();
+                  parentDone.set(true);
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    m_scheduler.run();
+    assertTrue(childRan.get());
+    assertFalse(m_scheduler.isRunning(child));
+
+    m_scheduler.run();
+    assertTrue(parentDone.get());
+    assertFalse(m_scheduler.isRunning(parent));
+  }
+
+  @Test
+  void forkResultDelayedAwaitCompletionWithRescheduledCommand() {
+    AtomicInteger childRunCount = new AtomicInteger(0);
+    AtomicBoolean parentDone = new AtomicBoolean(false);
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  if (childRunCount.incrementAndGet() > 1) {
+                    co.park();
+                  }
+                })
+            .named("Child");
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  var forkResult = co.fork(child);
+                  // Yield while child finishes its first run
+                  co.yield();
+                  co.yield();
+                  // awaitCompletion should only wait for the original run, not the new run
+                  forkResult.awaitCompletion();
+                  parentDone.set(true);
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+    assertEquals(1, childRunCount.get());
+    assertFalse(m_scheduler.isRunning(child));
+
+    // Reschedule child externally with a new run ID
+    m_scheduler.schedule(child);
+    m_scheduler.run();
+    assertTrue(m_scheduler.isRunning(child));
+    assertEquals(2, childRunCount.get());
+    assertFalse(parentDone.get());
+
+    // Next scheduler run: parent resumes, calls awaitCompletion()
+    // It should immediately return and finish without waiting for child's second run
+    m_scheduler.run();
+    assertTrue(parentDone.get());
+    assertFalse(m_scheduler.isRunning(parent));
+    assertTrue(m_scheduler.isRunning(child));
+  }
+
+  @Test
+  void forkResultDelayedAwaitCompletionPartialReschedule() {
+    AtomicInteger c1RunCount = new AtomicInteger(0);
+    AtomicBoolean c2Done = new AtomicBoolean(false);
+    AtomicBoolean parentDone = new AtomicBoolean(false);
+
+    var c1 =
+        Command.noRequirements(
+                co -> {
+                  if (c1RunCount.incrementAndGet() > 1) {
+                    co.park();
+                  }
+                })
+            .named("C1");
+
+    var c2 =
+        Command.noRequirements(
+                co -> {
+                  co.waitUntil(c2Done::get);
+                })
+            .named("C2");
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  var forkResult = co.fork(c1, c2);
+                  // Yield while c1 completes
+                  co.yield();
+                  // Await original fork result
+                  forkResult.awaitCompletion();
+                  parentDone.set(true);
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    assertEquals(1, c1RunCount.get());
+    assertFalse(m_scheduler.isRunning(c1));
+    assertTrue(m_scheduler.isRunning(c2));
+
+    // Reschedule c1 externally (which will park and stay running on its 2nd run)
+    m_scheduler.schedule(c1);
+    m_scheduler.run();
+    assertEquals(2, c1RunCount.get());
+    assertTrue(m_scheduler.isRunning(c1));
+    assertTrue(m_scheduler.isRunning(c2));
+    assertFalse(parentDone.get());
+
+    // Complete c2
+    c2Done.set(true);
+    m_scheduler.run();
+    assertTrue(parentDone.get());
+    assertFalse(m_scheduler.isRunning(parent));
+    assertTrue(m_scheduler.isRunning(c1));
+  }
+
+  @Test
+  void forkResultDelayedAwaitCompletionLargeSet() {
+    int n = 80;
+    List<Command> children = new ArrayList<>();
+    List<AtomicBoolean> completeFlags = new ArrayList<>();
+    AtomicIntegerArray runCounts = new AtomicIntegerArray(n);
+    AtomicBoolean parentDone = new AtomicBoolean(false);
+
+    for (int i = 0; i < n; i++) {
+      final int idx = i;
+      var flag = new AtomicBoolean(false);
+      completeFlags.add(flag);
+      children.add(
+          Command.noRequirements(
+                  co -> {
+                    int count = runCounts.incrementAndGet(idx);
+                    if (count == 1) {
+                      co.waitUntil(flag::get);
+                    } else {
+                      co.park();
+                    }
+                  })
+              .named("LargeChild[" + idx + "]"));
+    }
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  var forkResult = co.fork(children);
+                  // Yield while initial batch completes and reschedules
+                  co.yield();
+                  // Await original fork completion
+                  forkResult.awaitCompletion();
+                  parentDone.set(true);
+                })
+            .named("ParentLarge");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run();
+
+    // Complete subset across word 0 (0..39) and word 1 (64..71)
+    for (int i = 0; i < 40; i++) {
+      completeFlags.get(i).set(true);
+    }
+    for (int i = 64; i < 72; i++) {
+      completeFlags.get(i).set(true);
+    }
+    m_scheduler.run();
+
+    // Reschedule a subset: 20..39 (word 0) and 68..71 (word 1)
+    for (int i = 20; i < 40; i++) {
+      m_scheduler.schedule(children.get(i));
+    }
+    for (int i = 68; i < 72; i++) {
+      m_scheduler.schedule(children.get(i));
+    }
+    m_scheduler.run();
+
+    assertFalse(parentDone.get());
+    assertTrue(m_scheduler.isRunning(parent));
+
+    // Complete the remaining original children: 40..63 and 72..79
+    for (int i = 40; i < 64; i++) {
+      completeFlags.get(i).set(true);
+    }
+    for (int i = 72; i < n; i++) {
+      completeFlags.get(i).set(true);
+    }
+    m_scheduler.run();
+
+    // Parent should finish immediately without blocking on the rescheduled children
+    assertTrue(parentDone.get());
+    assertFalse(m_scheduler.isRunning(parent));
+
+    // Rescheduled children should still be running
+    for (int i = 20; i < 40; i++) {
+      assertTrue(m_scheduler.isRunning(children.get(i)));
+    }
+    for (int i = 68; i < 72; i++) {
+      assertTrue(m_scheduler.isRunning(children.get(i)));
+    }
   }
 }

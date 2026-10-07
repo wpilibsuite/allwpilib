@@ -14,23 +14,18 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.wpilib.command3.Scheduler.ScheduleResult.Successful;
 
 class CommandRunTrackerTest extends CommandTestBase {
   @Test
   void nullParametersThrow() {
-    assertThrows(NullPointerException.class, () -> CommandRunTracker.of(null, new Command[0]));
-    assertThrows(
-        NullPointerException.class, () -> CommandRunTracker.of(m_scheduler, (Command[]) null));
-    assertThrows(
-        NullPointerException.class, () -> CommandRunTracker.of(m_scheduler, (Command) null));
     assertThrows(NullPointerException.class, () -> CommandRunTracker.of(null, List.of()));
-    assertThrows(
-        NullPointerException.class, () -> CommandRunTracker.of(m_scheduler, (List<Command>) null));
+    assertThrows(NullPointerException.class, () -> CommandRunTracker.of(m_scheduler, null));
   }
 
   @Test
   void emptyTracker() {
-    var tracker = CommandRunTracker.of(m_scheduler, new Command[0]);
+    var tracker = CommandRunTracker.of(m_scheduler, List.of());
     assertFalse(tracker.areAllRunning());
     assertFalse(tracker.isAnyRunning());
   }
@@ -38,10 +33,10 @@ class CommandRunTrackerTest extends CommandTestBase {
   @Test
   void singleCommand() {
     var cmd = Command.noRequirements(Coroutine::park).named("Single");
-    m_scheduler.schedule(cmd);
+    var result = m_scheduler.schedule(cmd);
     m_scheduler.run();
 
-    var tracker = CommandRunTracker.of(m_scheduler, cmd);
+    var tracker = CommandRunTracker.of(m_scheduler, List.of((Successful) result));
     assertTrue(tracker.areAllRunning());
     assertTrue(tracker.isAnyRunning());
 
@@ -54,13 +49,14 @@ class CommandRunTrackerTest extends CommandTestBase {
   void smallTrackerN64() {
     int n = 64;
     Command[] commands = new Command[n];
+    Successful[] results = new Successful[n];
     for (int i = 0; i < n; i++) {
       commands[i] = Command.noRequirements(Coroutine::park).named("Cmd[" + i + "]");
-      m_scheduler.schedule(commands[i]);
+      results[i] = (Successful) m_scheduler.schedule(commands[i]);
     }
     m_scheduler.run();
 
-    var tracker = CommandRunTracker.of(m_scheduler, commands);
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(results));
     assertTrue(tracker.areAllRunning());
     assertTrue(tracker.isAnyRunning());
 
@@ -86,13 +82,14 @@ class CommandRunTrackerTest extends CommandTestBase {
   void largeTrackerN100() {
     int n = 100;
     Command[] commands = new Command[n];
+    Successful[] results = new Successful[n];
     for (int i = 0; i < n; i++) {
       commands[i] = Command.noRequirements(Coroutine::park).named("LargeCmd[" + i + "]");
-      m_scheduler.schedule(commands[i]);
+      results[i] = (Successful) m_scheduler.schedule(commands[i]);
     }
     m_scheduler.run();
 
-    var tracker = CommandRunTracker.of(m_scheduler, commands);
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(results));
     assertTrue(tracker.areAllRunning());
     assertTrue(tracker.isAnyRunning());
 
@@ -117,23 +114,6 @@ class CommandRunTrackerTest extends CommandTestBase {
     for (int i = 65; i < 99; i++) {
       m_scheduler.cancel(commands[i]);
     }
-    assertFalse(tracker.areAllRunning());
-    assertFalse(tracker.isAnyRunning());
-  }
-
-  @Test
-  void partiallyRunningInitially() {
-    var running = Command.noRequirements(Coroutine::park).named("Running");
-    var notRunning = Command.noRequirements(Coroutine::park).named("NotRunning");
-
-    m_scheduler.schedule(running);
-    m_scheduler.run();
-
-    var tracker = CommandRunTracker.of(m_scheduler, running, notRunning);
-    assertFalse(tracker.areAllRunning());
-    assertTrue(tracker.isAnyRunning());
-
-    m_scheduler.cancel(running);
     assertFalse(tracker.areAllRunning());
     assertFalse(tracker.isAnyRunning());
   }
@@ -256,5 +236,118 @@ class CommandRunTrackerTest extends CommandTestBase {
     flag2.set(true);
     m_scheduler.run();
     assertTrue(done.get());
+  }
+
+  @Test
+  void trackerWithPreCompletedCommand() {
+    var cmd = Command.noRequirements(co -> {}).named("PreCompleted");
+    var result = (Successful) m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    assertEquals(0, m_scheduler.runId(cmd));
+
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(result));
+    assertFalse(tracker.areAllRunning());
+    assertFalse(tracker.isAnyRunning());
+  }
+
+  @Test
+  void trackerWithRescheduledCommand() {
+    var cmd = Command.noRequirements(Coroutine::park).named("Rescheduled");
+    var result1 = (Successful) m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    assertTrue(result1.runId() > 0);
+
+    // Cancel first run
+    m_scheduler.cancel(cmd);
+    assertEquals(0, m_scheduler.runId(cmd));
+
+    // Reschedule command with a new run ID
+    var result2 = (Successful) m_scheduler.schedule(cmd);
+    m_scheduler.run();
+    assertTrue(result2.runId() > result1.runId());
+    assertEquals(result2.runId(), m_scheduler.runId(cmd));
+
+    // Create tracker using result1 (stale run ID)
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(result1));
+    assertFalse(tracker.areAllRunning());
+    assertFalse(tracker.isAnyRunning());
+  }
+
+  @Test
+  void trackerWithOneShotCommand() {
+    var cmd = Command.noRequirements(co -> {}).named("OneShot");
+    var result = (Successful) m_scheduler.schedule(cmd);
+    assertTrue(result.runId() > 0);
+
+    // Run scheduler so one-shot completes
+    m_scheduler.run();
+    assertEquals(0, m_scheduler.runId(cmd));
+
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(result));
+    assertFalse(tracker.areAllRunning());
+    assertFalse(tracker.isAnyRunning());
+  }
+
+  @Test
+  void largeTrackerWithMixedStaleAndRescheduledCommands() {
+    int n = 80;
+    Command[] commands = new Command[n];
+    Successful[] initialResults = new Successful[n];
+
+    for (int i = 0; i < n; i++) {
+      commands[i] = Command.noRequirements(Coroutine::park).named("Cmd[" + i + "]");
+      initialResults[i] = (Successful) m_scheduler.schedule(commands[i]);
+    }
+    m_scheduler.run();
+
+    // Word 0 (0..63):
+    // 0..19: complete (cancel)
+    // 20..39: complete and reschedule (new run ID)
+    // 40..63: still running on original run ID
+
+    // Word 1 (64..79):
+    // 64..69: complete (cancel)
+    // 70..74: complete and reschedule (new run ID)
+    // 75..79: still running on original run ID
+
+    for (int i = 0; i < 20; i++) {
+      m_scheduler.cancel(commands[i]);
+    }
+    for (int i = 20; i < 40; i++) {
+      m_scheduler.cancel(commands[i]);
+      m_scheduler.schedule(commands[i]);
+    }
+    for (int i = 64; i < 70; i++) {
+      m_scheduler.cancel(commands[i]);
+    }
+    for (int i = 70; i < 75; i++) {
+      m_scheduler.cancel(commands[i]);
+      m_scheduler.schedule(commands[i]);
+    }
+    m_scheduler.run();
+
+    var tracker = CommandRunTracker.of(m_scheduler, List.of(initialResults));
+
+    // Not all original commands are running
+    assertFalse(tracker.areAllRunning());
+    // Some original commands (40..63 and 75..79) are still running
+    assertTrue(tracker.isAnyRunning());
+
+    // Cancel remaining original commands in word 0
+    for (int i = 40; i < 64; i++) {
+      m_scheduler.cancel(commands[i]);
+    }
+    // Word 1 commands (75..79) are still running on original run IDs
+    assertTrue(tracker.isAnyRunning());
+
+    // Cancel remaining original commands in word 1
+    for (int i = 75; i < 80; i++) {
+      m_scheduler.cancel(commands[i]);
+    }
+
+    // Now all original run IDs are no longer active, even though rescheduled commands (20..39,
+    // 70..74) are active in scheduler
+    assertFalse(tracker.isAnyRunning());
+    assertFalse(tracker.areAllRunning());
   }
 }
