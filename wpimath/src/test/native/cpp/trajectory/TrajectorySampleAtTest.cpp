@@ -26,16 +26,12 @@ using namespace wpi::math;
 
 namespace {
 
-DrivetrainSplineSample SplineSample(wpi::units::second_t time,
-                                    wpi::units::meter_t x,
-                                    wpi::units::meters_per_second_t velocity,
-                                    wpi::units::meters_per_second_squared_t
-                                        acceleration) {
-  return DrivetrainSplineSample{time,
-                                Pose2d{x, 0_m, 0_deg},
-                                velocity,
-                                acceleration,
-                                wpi::units::curvature_t{0.0}};
+DrivetrainSplineSample SplineSample(
+    wpi::units::second_t time, wpi::units::meter_t x,
+    wpi::units::meters_per_second_t velocity,
+    wpi::units::meters_per_second_squared_t acceleration) {
+  return DrivetrainSplineSample{time, Pose2d{x, 0_m, 0_deg}, velocity,
+                                acceleration, wpi::units::curvature_t{0.0}};
 }
 
 HolonomicSample HolonomicSampleWithAccel(
@@ -62,11 +58,11 @@ TEST_CASE("TrajectorySampleAtTest ExactTimestampReturnsStoredSample",
 }
 
 TEST_CASE("TrajectorySampleAtTest ExactTimestampOfEverySample", "[wpimath]") {
-  HolonomicTrajectory trajectory{std::vector<HolonomicSample>{
-      HolonomicSampleWithAccel(0_s, 0_mps_sq),
-      HolonomicSampleWithAccel(1_s, 1_mps_sq),
-      HolonomicSampleWithAccel(2_s, 2_mps_sq),
-      HolonomicSampleWithAccel(3_s, 3_mps_sq)}};
+  HolonomicTrajectory trajectory{
+      std::vector<HolonomicSample>{HolonomicSampleWithAccel(0_s, 0_mps_sq),
+                                   HolonomicSampleWithAccel(1_s, 1_mps_sq),
+                                   HolonomicSampleWithAccel(2_s, 2_mps_sq),
+                                   HolonomicSampleWithAccel(3_s, 3_mps_sq)}};
 
   for (const auto& expected : trajectory.Samples()) {
     CHECK(trajectory.SampleAt(expected.time) == expected);
@@ -75,11 +71,11 @@ TEST_CASE("TrajectorySampleAtTest ExactTimestampOfEverySample", "[wpimath]") {
 
 TEST_CASE("TrajectorySampleAtTest JoinReturnsSecondTrajectoryStart",
           "[wpimath]") {
-  HolonomicTrajectory first{std::vector<HolonomicSample>{
-      HolonomicSampleWithAccel(0_s, 0_mps_sq),
-      HolonomicSampleWithAccel(1_s, 0_mps_sq)}};
-  HolonomicTrajectory second{std::vector<HolonomicSample>{
-      HolonomicSampleWithAccel(0_s, 2_mps_sq),
+  HolonomicTrajectory first{
+      std::vector<HolonomicSample>{HolonomicSampleWithAccel(0_s, 0_mps_sq),
+                                   HolonomicSampleWithAccel(1_s, 0_mps_sq)}};
+  HolonomicTrajectory second{
+      std::vector<HolonomicSample>{HolonomicSampleWithAccel(0_s, 2_mps_sq),
                                    HolonomicSampleWithAccel(1_s, 0_mps_sq)}};
 
   auto joined = first.Concatenate(second);
@@ -91,9 +87,9 @@ TEST_CASE("TrajectorySampleAtTest JoinReturnsSecondTrajectoryStart",
 }
 
 TEST_CASE("TrajectorySampleAtTest OutOfRangeAndEdgeTimes", "[wpimath]") {
-  HolonomicTrajectory trajectory{std::vector<HolonomicSample>{
-      HolonomicSampleWithAccel(0_s, 1_mps_sq),
-      HolonomicSampleWithAccel(1_s, 2_mps_sq)}};
+  HolonomicTrajectory trajectory{
+      std::vector<HolonomicSample>{HolonomicSampleWithAccel(0_s, 1_mps_sq),
+                                   HolonomicSampleWithAccel(1_s, 2_mps_sq)}};
 
   CHECK(trajectory.SampleAt(-1_s) == trajectory.Start());
   CHECK(trajectory.SampleAt(-0.0_s) == trajectory.Start());
@@ -103,9 +99,9 @@ TEST_CASE("TrajectorySampleAtTest OutOfRangeAndEdgeTimes", "[wpimath]") {
 }
 
 TEST_CASE("TrajectorySampleAtTest NaNTimeReturnsASample", "[wpimath]") {
-  HolonomicTrajectory trajectory{std::vector<HolonomicSample>{
-      HolonomicSampleWithAccel(0_s, 1_mps_sq),
-      HolonomicSampleWithAccel(1_s, 2_mps_sq)}};
+  HolonomicTrajectory trajectory{
+      std::vector<HolonomicSample>{HolonomicSampleWithAccel(0_s, 1_mps_sq),
+                                   HolonomicSampleWithAccel(1_s, 2_mps_sq)}};
 
   // Garbage in, but it must not read past the end of the samples.
   auto sample = trajectory.SampleAt(wpi::units::second_t{std::nan("")});
