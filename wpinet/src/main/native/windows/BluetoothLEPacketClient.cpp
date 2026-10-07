@@ -482,13 +482,18 @@ class BluetoothLEPacketClient::Impl
       snapshot = m_status;
       statusSequence = ++m_statusSequence;
     }
-    QueueStatus(snapshot, statusSequence);
-
     auto self = shared_from_this();
-    m_connectThread = std::thread{
-        [self, config = std::move(config), bluetoothAddress, generation] {
-          self->ConnectThreadMain(config, bluetoothAddress, generation);
-        }};
+    QueueStatus(snapshot, statusSequence);
+    if (IsConnectCanceled(generation)) {
+      return true;
+    }
+
+    // WinRT discovery can block and cannot be interrupted. Each worker owns
+    // its lifetime; generation checks discard results after cancellation.
+    std::thread{[self, config = std::move(config), bluetoothAddress,
+                 generation] {
+      self->ConnectThreadMain(config, bluetoothAddress, generation);
+    }}.detach();
     return true;
   }
 
@@ -511,13 +516,6 @@ class BluetoothLEPacketClient::Impl
       }
     }
     m_connectCv.notify_all();
-
-    if (m_connectThread.joinable()) {
-      // WinRT GATT discovery calls are synchronous and cannot be interrupted by
-      // m_cancelConnect. Detach so GUI disconnect/shutdown can return promptly;
-      // the generation checks in ConnectThreadMain drop late results.
-      m_connectThread.detach();
-    }
 
     ClearGattState();
 
@@ -999,7 +997,6 @@ class BluetoothLEPacketClient::Impl
 
   std::atomic_bool m_cancelConnect{false};
   std::atomic<uint64_t> m_connectGeneration{0};
-  std::thread m_connectThread;
 };
 
 std::shared_ptr<BluetoothLEPacketClient> BluetoothLEPacketClient::Create(

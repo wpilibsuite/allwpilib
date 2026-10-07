@@ -142,3 +142,76 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
   CHECK_FALSE(expectedError.empty());
   CHECK(errors[0] == expectedError);
 }
+
+#ifdef _WIN32
+TEST_CASE("Bluetooth initial status callback can supersede a connection",
+          "[bluetooth]") {
+  bool replace = false;
+  SECTION("Cancel") {}
+  SECTION("Replace and cancel") {
+    replace = true;
+  }
+
+  auto loop = uv::Loop::Create();
+  REQUIRE(loop);
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.preferL2CAP = false;
+  config.gattServiceUuid = "00000000-0000-0000-0000-000000000001";
+  config.gattControlCharacteristicUuid = "00000000-0000-0000-0000-000000000002";
+  config.gattStatusCharacteristicUuid = "00000000-0000-0000-0000-000000000003";
+  bool firstAccepted = false;
+  bool replacementAccepted = false;
+  bool canceled = false;
+  int connectingCallbacks = 0;
+  std::shared_ptr<BluetoothLEPacketClient> client;
+  client = BluetoothLEPacketClient::Create(
+      *loop, [](auto) {},
+      [&](const auto& status) {
+        if (status.connecting) {
+          ++connectingCallbacks;
+          if (replace && connectingCallbacks == 1) {
+            auto next = config;
+            next.address = "AA:BB:CC:DD:EE:02";
+            replacementAccepted = client->Connect(next);
+          } else {
+            client->Disconnect("Cancelled");
+          }
+        } else if (status.status == "Cancelled") {
+          canceled = true;
+          loop->Stop();
+        }
+      });
+  REQUIRE(client);
+
+  auto starter = uv::Timer::Create(loop);
+  REQUIRE(starter);
+  starter->timeout.connect([&] {
+    firstAccepted = client->Connect(config);
+    starter->Close();
+  });
+  starter->Start(uv::Timer::Time{0});
+  auto deadline = uv::Timer::Create(loop);
+  REQUIRE(deadline);
+  deadline->timeout.connect([&] { loop->Stop(); });
+  deadline->Start(uv::Timer::Time{1000});
+  loop->Run();
+  auto status = client->GetStatus();
+
+  client.reset();
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+
+  CHECK(firstAccepted);
+  CHECK(replacementAccepted == replace);
+  CHECK(connectingCallbacks == (replace ? 2 : 1));
+  CHECK(canceled);
+  CHECK_FALSE(status.connected);
+  CHECK_FALSE(status.connecting);
+  CHECK(status.status == "Cancelled");
+}
+#endif
