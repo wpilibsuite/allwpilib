@@ -148,7 +148,11 @@ TEST_CASE("Bluetooth initial status callback can supersede a connection",
           "[bluetooth]") {
   bool replace = false;
   bool rejectConfig = false;
+  std::string reason = "Cancelled";
   SECTION("Cancel") {}
+  SECTION("Cancel with empty status") {
+    reason.clear();
+  }
   SECTION("Replace and cancel") {
     replace = true;
   }
@@ -190,9 +194,9 @@ TEST_CASE("Bluetooth initial status callback can supersede a connection",
             next.address = "AA:BB:CC:DD:EE:02";
             replacementAccepted = client->Connect(next);
           } else {
-            client->Disconnect("Cancelled");
+            client->Disconnect(reason);
           }
-        } else if (status.status == "Cancelled") {
+        } else if (status.status == reason) {
           canceled = true;
           loop->Stop();
         }
@@ -228,6 +232,6 @@ TEST_CASE("Bluetooth initial status callback can supersede a connection",
   CHECK(rejectedConfigPreservedState == rejectConfig);
   CHECK_FALSE(status.connected);
   CHECK_FALSE(status.connecting);
-  CHECK(status.status == "Cancelled");
+  CHECK(status.status == reason);
 }
 #endif

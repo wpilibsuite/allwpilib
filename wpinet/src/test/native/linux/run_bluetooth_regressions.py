@@ -92,6 +92,8 @@ def main():
             "invalid-config-thread",
             "receive-limit",
             "receive-oversize",
+            "disconnect-empty",
+            "disconnect-empty-thread",
         ],
         "BluetoothPollRegression": ["fallback", "gatt", "cleared", "established"],
         "BluetoothRetryRegression": [

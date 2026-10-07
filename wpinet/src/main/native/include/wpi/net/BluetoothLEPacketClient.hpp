@@ -172,7 +172,7 @@ class BluetoothLEPacketClient {
   /**
    * Disconnects the active connection, if any.
    *
-   * @param reason status text to publish after disconnecting.
+   * @param reason status text to publish after disconnecting; may be empty.
    */
   void Disconnect(std::string_view reason = "Disconnected");
 

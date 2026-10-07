@@ -31,6 +31,7 @@ Coverage:
 - discarding queued connect/disconnect requests overtaken by loop-thread requests;
 - preserving a working connection when a new configuration is rejected;
 - accepting packets at the configured limit and rejecting truncated packets;
+- disconnecting with empty status text, while destruction remains silent;
 - releasing a connected client's handles and socket, including after loop teardown;
 - silent default logging and unchanged outcomes with debug output enabled.
 

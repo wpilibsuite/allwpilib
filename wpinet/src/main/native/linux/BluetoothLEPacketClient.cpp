@@ -301,7 +301,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   ~Impl() {
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     if (m_connectTimer) {
       m_connectTimer->Close();
     }
@@ -347,6 +347,13 @@ class BluetoothLEPacketClient::Impl
         self->CloseOnLoop(reasonString);
       }
     });
+  }
+
+  // Destruction closes the transport without publishing a user callback.
+  void Shutdown() {
+    ++m_requestGeneration;
+    auto self = shared_from_this();
+    m_exec->Send([self] { self->ResetConnectionOnLoop(); });
   }
 
   bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode) {
@@ -505,7 +512,7 @@ class BluetoothLEPacketClient::Impl
     }
     // Publish progress only once this attempt owns the transport, so a status
     // callback can cancel or replace it without the old attempt resuming.
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     uint64_t generation = ++m_connectGeneration;
     {
       std::scoped_lock lock{m_statusMutex};
@@ -1029,21 +1036,22 @@ class BluetoothLEPacketClient::Impl
     FailConnection("Bluetooth GATT connection timed out");
   }
 
-  void CloseOnLoop(std::string_view reason) {
-    Trace("close requested on loop gen={} reason={}", m_connectGeneration,
-          reason);
+  // Release transport state without notifying the caller. Connect and failure
+  // paths publish their new state after this reset; destruction stays silent.
+  void ResetConnectionOnLoop() {
+    Trace("reset connection on loop gen={}", m_connectGeneration);
     ++m_connectGeneration;
     m_gattBlueZDisconnectPending = false;
     CloseSocket();
+    std::scoped_lock lock{m_statusMutex};
+    m_status.connecting = false;
+    m_status.connected = false;
+    m_status.transport = BluetoothPacketTransport::NONE;
+  }
 
-    if (!reason.empty()) {
-      UpdateStatus([&](auto& status) {
-        status.connecting = false;
-        status.connected = false;
-        status.transport = BluetoothPacketTransport::NONE;
-        status.status = reason;
-      });
-    }
+  void CloseOnLoop(std::string_view reason) {
+    ResetConnectionOnLoop();
+    UpdateStatus([&](auto& status) { status.status = reason; });
   }
 
   void CheckConnect() {
@@ -1164,7 +1172,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void FailConnection(std::string_view error) {
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     SetError(error);
   }
 
@@ -1843,7 +1851,7 @@ BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
 
 BluetoothLEPacketClient::~BluetoothLEPacketClient() {
   if (m_impl) {
-    m_impl->Disconnect({});
+    m_impl->Shutdown();
   }
 }
 
