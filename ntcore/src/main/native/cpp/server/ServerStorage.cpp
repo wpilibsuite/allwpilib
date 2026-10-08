@@ -96,7 +96,7 @@ void ServerStorage::SetProperties(ServerClient* client, ServerTopic* topic,
   bool wasPersistent = topic->persistent;
   if (topic->SetProperties(update)) {
     // update persistentChanged flag
-    if (topic->persistent != wasPersistent) {
+    if (topic->persistent || wasPersistent) {
       m_persistentChanged = true;
     }
     PropertiesChanged(client, topic, update);
