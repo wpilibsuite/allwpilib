@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.junit.jupiter.api.Test;
 import org.wpilib.system.RobotController;
 
+@SuppressWarnings("PMD.CompareObjectsWithEquals")
 class CoroutineTest extends CommandTestBase {
   @Test
   void waitUntilConditionMet() {
