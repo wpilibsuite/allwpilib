@@ -570,7 +570,20 @@ public final class Coroutine {
     }
 
     // At least one command exited; cancel the rest.
-    commands.forEach(m_scheduler::cancel);
+    // We need to use run IDs here because at least one command exited in the previous cycle.
+    // If that command was immediately rescheduled, that would have happened outside this awaitAny
+    // call and must be allowed to continue. Using a naive `commands.forEach(m_scheduler::cancel)`
+    // loop would cause that rescheduled command to be canceled as well.
+    for (var fork : forkResult.getForkedCommands()) {
+      var command = fork.command();
+      int runId = fork.runId();
+
+      if (m_scheduler.runId(command) == runId) {
+        // Only cancel an original invocation of the command. If it exited early and was later
+        // rescheduled, that rescheduled run must be allowed to continue.
+        m_scheduler.cancel(command);
+      }
+    }
 
     return forkResult;
   }

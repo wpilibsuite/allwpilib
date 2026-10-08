@@ -330,6 +330,43 @@ class CoroutineTest extends CommandTestBase {
   }
 
   @Test
+  void awaitAnyDoesNotCancelRescheduledCommand() {
+    AtomicBoolean ranAfterAwait = new AtomicBoolean(false);
+
+    var c1 = Command.noRequirements(Coroutine::park).named("C1");
+    var c2 = Command.noRequirements(Coroutine::park).named("C2");
+
+    var parent =
+        Command.noRequirements(
+                co -> {
+                  co.awaitAny(c1, c2);
+                  ranAfterAwait.set(true);
+                  co.park();
+                })
+            .named("Parent");
+
+    m_scheduler.schedule(parent);
+    m_scheduler.run(); // first run: parent forks c1 and c2, then enters a waiting state
+
+    // immediately cancel and reschedule c1 before the parent resumes
+    m_scheduler.cancel(c1);
+    m_scheduler.schedule(c1);
+
+    // Second run: parent resumes, sees c1's original run completed, exits awaitAny and cancels c2.
+    // It does not cancel c1's rescheduled run because of the mismatched run ID.
+    // parent then sets ranAfterAwait to true and parks
+    m_scheduler.run();
+
+    assertTrue(ranAfterAwait.get());
+    assertEquals(List.of(parent, c1), m_scheduler.getRunningCommands());
+
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class,
+        c -> c.command() == c2,
+        "C2 should have been canceled by awaitAny");
+  }
+
+  @Test
   void forkResultDelayedAwaitCompletionAfterCompletion() {
     AtomicBoolean childRan = new AtomicBoolean(false);
     AtomicBoolean parentDone = new AtomicBoolean(false);
