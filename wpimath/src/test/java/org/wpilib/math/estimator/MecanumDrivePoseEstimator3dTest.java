@@ -185,10 +185,12 @@ class MecanumDrivePoseEstimator3dTest {
 
       var wheelVelocities = kinematics.toWheelVelocities(chassisVelocities);
 
-      wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
-      wheelPositions.frontRight += wheelVelocities.frontRight * dt;
-      wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
-      wheelPositions.rearRight += wheelVelocities.rearRight * dt;
+      wheelPositions =
+          new MecanumDriveWheelPositions(
+              wheelPositions.frontLeft + wheelVelocities.frontLeft * dt,
+              wheelPositions.frontRight + wheelVelocities.frontRight * dt,
+              wheelPositions.rearLeft + wheelVelocities.rearLeft * dt,
+              wheelPositions.rearRight + wheelVelocities.rearRight * dt);
 
       var xHat =
           estimator.updateWithTime(

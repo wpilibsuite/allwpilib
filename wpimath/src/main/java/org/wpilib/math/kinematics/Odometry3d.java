@@ -34,7 +34,7 @@ public class Odometry3d<T> {
 
   private Rotation3d m_previousGyroAngle;
 
-  private final T m_previousWheelPositions;
+  private T m_previousWheelPositions;
 
   /**
    * Constructs an Odometry3d object.
@@ -66,7 +66,7 @@ public class Odometry3d<T> {
   public void resetPosition(Rotation3d gyroAngle, T wheelPositions, Pose3d pose) {
     m_pose = pose;
     m_previousGyroAngle = gyroAngle;
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
@@ -131,7 +131,7 @@ public class Odometry3d<T> {
 
     m_pose = m_pose.plus(twist.exp());
 
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
     m_previousGyroAngle = gyroAngle;
 
     return m_pose;

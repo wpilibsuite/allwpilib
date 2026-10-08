@@ -23,10 +23,10 @@ public class SwerveModulePosition
         ProtobufSerializable,
         StructSerializable {
   /** Distance measured by the wheel of the module in meters. */
-  public double distance;
+  public final double distance;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.ZERO;
+  public final Rotation2d angle;
 
   /** SwerveModulePosition protobuf for serialization. */
   public static final SwerveModulePositionProto proto = new SwerveModulePositionProto();
@@ -35,7 +35,9 @@ public class SwerveModulePosition
   public static final SwerveModulePositionStruct struct = new SwerveModulePositionStruct();
 
   /** Constructs a SwerveModulePosition with zeros for distance and angle. */
-  public SwerveModulePosition() {}
+  public SwerveModulePosition() {
+    this(0.0, Rotation2d.ZERO);
+  }
 
   /**
    * Constructs a SwerveModulePosition.

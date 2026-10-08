@@ -198,10 +198,11 @@ class SwerveDrivePoseEstimatorTest {
       var moduleVelocities = kinematics.toSwerveModuleVelocities(chassisVelocities);
 
       for (int i = 0; i < moduleVelocities.length; i++) {
-        positions[i].distance +=
-            moduleVelocities[i].velocity * (1 - rand.nextGaussian() * 0.05) * dt;
-        positions[i].angle =
-            moduleVelocities[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005));
+        positions[i] =
+            new SwerveModulePosition(
+                positions[i].distance
+                    + moduleVelocities[i].velocity * (1 - rand.nextGaussian() * 0.05) * dt,
+                moduleVelocities[i].angle.plus(new Rotation2d(rand.nextGaussian() * 0.005)));
       }
 
       var xHat =

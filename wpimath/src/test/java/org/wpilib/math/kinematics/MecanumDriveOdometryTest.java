@@ -138,15 +138,19 @@ class MecanumDriveOdometryTest {
                   0,
                   groundTruthState.forwardVelocity() * groundTruthState.curvature));
 
-      wheelVelocities.frontLeft += rand.nextGaussian() * 0.1;
-      wheelVelocities.frontRight += rand.nextGaussian() * 0.1;
-      wheelVelocities.rearLeft += rand.nextGaussian() * 0.1;
-      wheelVelocities.rearRight += rand.nextGaussian() * 0.1;
+      wheelVelocities =
+          new MecanumDriveWheelVelocities(
+              wheelVelocities.frontLeft + rand.nextGaussian() * 0.1,
+              wheelVelocities.frontRight + rand.nextGaussian() * 0.1,
+              wheelVelocities.rearLeft + rand.nextGaussian() * 0.1,
+              wheelVelocities.rearRight + rand.nextGaussian() * 0.1);
 
-      wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
-      wheelPositions.frontRight += wheelVelocities.frontRight * dt;
-      wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
-      wheelPositions.rearRight += wheelVelocities.rearRight * dt;
+      wheelPositions =
+          new MecanumDriveWheelPositions(
+              wheelPositions.frontLeft + wheelVelocities.frontLeft * dt,
+              wheelPositions.frontRight + wheelVelocities.frontRight * dt,
+              wheelPositions.rearLeft + wheelVelocities.rearLeft * dt,
+              wheelPositions.rearRight + wheelVelocities.rearRight * dt);
 
       var lastPose = odometry.getPose();
 
@@ -221,15 +225,19 @@ class MecanumDriveOdometryTest {
                   groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getSin(),
                   0));
 
-      wheelVelocities.frontLeft += rand.nextGaussian() * 0.1;
-      wheelVelocities.frontRight += rand.nextGaussian() * 0.1;
-      wheelVelocities.rearLeft += rand.nextGaussian() * 0.1;
-      wheelVelocities.rearRight += rand.nextGaussian() * 0.1;
+      wheelVelocities =
+          new MecanumDriveWheelVelocities(
+              wheelVelocities.frontLeft + rand.nextGaussian() * 0.1,
+              wheelVelocities.frontRight + rand.nextGaussian() * 0.1,
+              wheelVelocities.rearLeft + rand.nextGaussian() * 0.1,
+              wheelVelocities.rearRight + rand.nextGaussian() * 0.1);
 
-      wheelPositions.frontLeft += wheelVelocities.frontLeft * dt;
-      wheelPositions.frontRight += wheelVelocities.frontRight * dt;
-      wheelPositions.rearLeft += wheelVelocities.rearLeft * dt;
-      wheelPositions.rearRight += wheelVelocities.rearRight * dt;
+      wheelPositions =
+          new MecanumDriveWheelPositions(
+              wheelPositions.frontLeft + wheelVelocities.frontLeft * dt,
+              wheelPositions.frontRight + wheelVelocities.frontRight * dt,
+              wheelPositions.rearLeft + wheelVelocities.rearLeft * dt,
+              wheelPositions.rearRight + wheelVelocities.rearRight * dt);
 
       var lastPose = odometry.getPose();
 

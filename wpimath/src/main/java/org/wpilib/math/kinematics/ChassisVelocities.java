@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecond;
 
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
@@ -32,16 +33,20 @@ import org.wpilib.util.struct.StructSerializable;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
+@Json
 public class ChassisVelocities
     implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisVelocities> {
   /** Velocity along the x-axis in meters per second. (Fwd is +) */
-  public double vx;
+  @Json.Property("vx")
+  public final double vx;
 
   /** Velocity along the y-axis in meters per second. (Left is +) */
-  public double vy;
+  @Json.Property("vy")
+  public final double vy;
 
   /** Angular velocity of the robot frame in radians per second. (CCW is +) */
-  public double omega;
+  @Json.Property("omega")
+  public final double omega;
 
   /** ChassisVelocities protobuf for serialization. */
   public static final ChassisVelocitiesProto proto = new ChassisVelocitiesProto();
@@ -50,7 +55,9 @@ public class ChassisVelocities
   public static final ChassisVelocitiesStruct struct = new ChassisVelocitiesStruct();
 
   /** Constructs a ChassisVelocities with zeros for dx, dy, and theta. */
-  public ChassisVelocities() {}
+  public ChassisVelocities() {
+    this(0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a ChassisVelocities object.
@@ -59,6 +66,7 @@ public class ChassisVelocities
    * @param vy Sideways velocity in meters per second.
    * @param omega Angular velocity in radians per second.
    */
+  @Json.Creator
   public ChassisVelocities(double vx, double vy, double omega) {
     this.vx = vx;
     this.vy = vy;

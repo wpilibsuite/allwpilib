@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.geometry.Twist2d;
 
 /**
  * Class for odometry. Robot code should not use this directly- Instead, use the particular type for
@@ -25,7 +26,7 @@ public class Odometry<T> {
 
   private Rotation2d m_previousGyroAngle;
 
-  private final T m_previousWheelPositions;
+  private T m_previousWheelPositions;
 
   /**
    * Constructs an Odometry object.
@@ -57,7 +58,7 @@ public class Odometry<T> {
   public void resetPosition(Rotation2d gyroAngle, T wheelPositions, Pose2d pose) {
     m_pose = pose;
     m_previousGyroAngle = gyroAngle;
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
   }
 
   /**
@@ -109,11 +110,11 @@ public class Odometry<T> {
    */
   public Pose2d update(Rotation2d gyroAngle, T wheelPositions) {
     var twist = m_kinematics.toTwist2d(m_previousWheelPositions, wheelPositions);
-    twist.dtheta = gyroAngle.minus(m_previousGyroAngle).getRadians();
+    twist = new Twist2d(twist.dx, twist.dy, gyroAngle.minus(m_previousGyroAngle).getRadians());
 
     m_pose = m_pose.plus(twist.exp());
 
-    m_kinematics.copyInto(wheelPositions, m_previousWheelPositions);
+    m_previousWheelPositions = m_kinematics.copy(wheelPositions);
     m_previousGyroAngle = gyroAngle;
 
     return m_pose;

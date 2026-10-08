@@ -24,10 +24,10 @@ public class SwerveModuleVelocity
         ProtobufSerializable,
         StructSerializable {
   /** Velocity of the wheel of the module in meters per second. */
-  public double velocity;
+  public final double velocity;
 
   /** Angle of the module. */
-  public Rotation2d angle = Rotation2d.ZERO;
+  public final Rotation2d angle;
 
   /** SwerveModuleVelocity protobuf for serialization. */
   public static final SwerveModuleVelocityProto proto = new SwerveModuleVelocityProto();
@@ -36,7 +36,9 @@ public class SwerveModuleVelocity
   public static final SwerveModuleVelocityStruct struct = new SwerveModuleVelocityStruct();
 
   /** Constructs a SwerveModuleVelocity with zeros for velocity and angle. */
-  public SwerveModuleVelocity() {}
+  public SwerveModuleVelocity() {
+    this(0.0, Rotation2d.ZERO);
+  }
 
   /**
    * Constructs a SwerveModuleVelocity.

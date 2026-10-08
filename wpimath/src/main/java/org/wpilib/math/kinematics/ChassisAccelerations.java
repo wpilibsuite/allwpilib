@@ -7,6 +7,7 @@ package org.wpilib.math.kinematics;
 import static org.wpilib.units.Units.MetersPerSecondPerSecond;
 import static org.wpilib.units.Units.RadiansPerSecondPerSecond;
 
+import io.avaje.jsonb.Json;
 import java.util.Objects;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -26,16 +27,20 @@ import org.wpilib.util.struct.StructSerializable;
  * component because it can never move sideways. Holonomic drivetrains such as swerve and mecanum
  * will often have all three components.
  */
+@Json
 public class ChassisAccelerations
     implements ProtobufSerializable, StructSerializable, Interpolatable<ChassisAccelerations> {
   /** Acceleration along the x-axis in meters per second squared. (Fwd is +) */
-  public double ax;
+  @Json.Property("ax")
+  public final double ax;
 
   /** Acceleration along the y-axis in meters per second squared. (Left is +) */
-  public double ay;
+  @Json.Property("ay")
+  public final double ay;
 
   /** Angular acceleration of the robot frame in radians per second squared. (CCW is +) */
-  public double alpha;
+  @Json.Property("alpha")
+  public final double alpha;
 
   /** ChassisAccelerations struct for serialization. */
   public static final ChassisAccelerationsStruct struct = new ChassisAccelerationsStruct();
@@ -44,7 +49,9 @@ public class ChassisAccelerations
   public static final ChassisAccelerationsProto proto = new ChassisAccelerationsProto();
 
   /** Constructs a ChassisAccelerations with zeros for ax, ay, and omega. */
-  public ChassisAccelerations() {}
+  public ChassisAccelerations() {
+    this(0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a ChassisAccelerations object.
@@ -53,6 +60,7 @@ public class ChassisAccelerations
    * @param ay Sideways acceleration in meters per second squared.
    * @param alpha Angular acceleration in radians per second squared.
    */
+  @Json.Creator
   public ChassisAccelerations(double ax, double ay, double alpha) {
     this.ax = ax;
     this.ay = ay;

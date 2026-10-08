@@ -90,10 +90,7 @@ public final class DrivetrainSplineTrajectoryGenerator {
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
-      for (var point : points) {
-        point.pose = point.pose.plus(FLIP);
-        point.curvature *= -1;
-      }
+      points.replaceAll(point -> new PoseWithCurvature(point.pose.plus(FLIP), -point.curvature));
     }
 
     // Generate and return trajectory.
@@ -166,10 +163,7 @@ public final class DrivetrainSplineTrajectoryGenerator {
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
-      for (var point : points) {
-        point.pose = point.pose.plus(FLIP);
-        point.curvature *= -1;
-      }
+      points.replaceAll(point -> new PoseWithCurvature(point.pose.plus(FLIP), -point.curvature));
     }
 
     // Generate and return trajectory.
@@ -217,10 +211,7 @@ public final class DrivetrainSplineTrajectoryGenerator {
 
     // Change the points back to their original orientation.
     if (config.isReversed()) {
-      for (var point : points) {
-        point.pose = point.pose.plus(FLIP);
-        point.curvature *= -1;
-      }
+      points.replaceAll(point -> new PoseWithCurvature(point.pose.plus(FLIP), -point.curvature));
     }
 
     // Generate and return trajectory.
