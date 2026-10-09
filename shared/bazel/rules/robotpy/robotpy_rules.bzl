@@ -115,7 +115,6 @@ def robotpy_library(
     py_wheel(
         name = "{}-wheel".format(name),
         distribution = distribution,
-        stamp = 1,
         version = "$(ROBOTPY_VERSION)",
         summary = summary,
         requires = requires,

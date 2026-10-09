@@ -12,8 +12,9 @@ filegroup(
     name = "doxygen-files",
     srcs = glob([
         "src/main/native/include/**/*",
+        "src/main/native/thirdparty/ada/include/**/*",
         "src/main/native/thirdparty/tcpsockets/include/**/*",
-    ]) + ["@libuv//:include_files"],
+    ]),
     visibility = ["//visibility:public"],
 )
 
@@ -126,6 +127,8 @@ wpilib_cc_library(
         ":thirdparty-libuv-hdr-pkg",
     ],
     extra_src_pkg_files = [
+        ":thirdparty-ada-src-pkg",
+        ":thirdparty-libuv-src-pkg",
         ":wpinet-java-jni-hdrs-pkg",
     ],
     includes = ["src/main/native/include"],

@@ -136,8 +136,8 @@ TEST_CASE_METHOD(TwoDeadWheelOdometryTest,
           wpi::math::TrajectoryConfig(0.5_mps, 2.0_mps_sq));
 
   odometry.ResetPosition(xWheelPos, yWheelPos,
-                         trajectory.InitialPose().Rotation(),
-                         trajectory.InitialPose());
+                         trajectory.Start().pose.Rotation(),
+                         trajectory.Start().pose);
 
   std::mt19937 generator{5190};
   std::normal_distribution<double> distribution(0.0, 1.0);

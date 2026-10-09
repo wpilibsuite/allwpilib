@@ -310,6 +310,13 @@ will schedule a given command and call `yield()` in a loop until that command ha
 execution (note: this does *not* naively call `command.run(coroutine)`, which would hide the inner
 command from the scheduler and potentially sidestep requirement mutexing)
 
+Awaiting is implemented by tracking the run IDs of all the forked commands and comparing those original
+run IDs with the current IDs associated with those commands. If an ID changes, the command is considered
+to have completed execution and the coroutine may resume. This approach correctly handles one-shot commands,
+whose run IDs are guaranteed to have changed (likely to zero, for not running) when checked, as well as
+commands that complete and are rescheduled before being checked (the check will look at the original ID,
+and the new run has a different ID).
+
 ### Command Function Bodies
 
 Command logic lives in a single function `run` that accepts a `Coroutine` object argument. All

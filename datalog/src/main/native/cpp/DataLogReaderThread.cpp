@@ -17,12 +17,6 @@ DataLogReaderThread::~DataLogReaderThread() {
     m_active = false;
     m_thread.join();
   }
-  if (m_protoPool) {
-    upb_DefPool_Free(m_protoPool);
-  }
-  if (m_arena) {
-    upb_Arena_Free(m_arena);
-  }
 }
 
 void DataLogReaderThread::ReadMain() {
@@ -120,21 +114,7 @@ void DataLogReaderThread::ReadMain() {
     } else if (auto filename =
                    wpi::util::remove_prefix(name, "/.schema/proto:")) {
       // protobuf descriptor handling
-      if (!m_protoPool || !m_arena) {
-        wpi::util::print("could not allocate protobuf schema resources\n");
-        continue;
-      }
-      auto* descriptor = google_protobuf_FileDescriptorProto_parse(
-          reinterpret_cast<const char*>(data.data()), data.size(), m_arena);
-      if (!descriptor) {
-        wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
-                         *filename);
-        continue;
-      }
-      upb_Status status;
-      upb_Status_Clear(&status);
-      upb_DefPool_AddFile(m_protoPool, descriptor, &status);
-      if (!upb_Status_IsOk(&status)) {
+      if (!m_protoDb.Add(data)) {
         wpi::util::print("could not decode protobuf '{}' filename '{}'\n", name,
                          *filename);
       }

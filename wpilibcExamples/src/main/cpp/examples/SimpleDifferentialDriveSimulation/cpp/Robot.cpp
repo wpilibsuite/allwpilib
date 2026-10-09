@@ -39,7 +39,7 @@ class Robot : public wpi::TimedRobot {
 
   void AutonomousInit() override {
     timer.Restart();
-    drive.ResetOdometry(trajectory.InitialPose());
+    drive.ResetOdometry(trajectory.Start().pose);
   }
 
   void AutonomousPeriodic() override {

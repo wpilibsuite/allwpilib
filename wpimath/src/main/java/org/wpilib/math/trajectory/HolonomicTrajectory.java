@@ -62,7 +62,6 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param transform The transform to apply to the trajectory.
    * @return The transformed trajectory.
    */
-  @Override
   public HolonomicTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
@@ -92,7 +91,6 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param other the other trajectory to concatenate with this one.
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
-  @Override
   public HolonomicTrajectory concatenate(Trajectory<HolonomicSample> other) {
     if (other.samples.isEmpty()) {
       return this;
@@ -114,7 +112,6 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param other the pose to which the trajectory should be relative.
    * @return a new trajectory relative to the given pose.
    */
-  @Override
   public HolonomicTrajectory relativeTo(Pose2d other) {
     return new HolonomicTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }

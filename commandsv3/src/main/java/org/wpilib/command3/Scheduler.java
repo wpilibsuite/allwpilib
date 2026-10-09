@@ -363,6 +363,18 @@ public final class Scheduler implements ProtobufSerializable {
       default boolean successful() {
         return true;
       }
+
+      /**
+       * Gets the run ID assigned to the scheduled command when it was scheduled. If a successful
+       * scheduling result is created when checking if a command can be scheduled - but without
+       * actually scheduling that command - this will always return {@code 0}. Otherwise, a nonzero
+       * run ID will always be returned for a successfully scheduled command, even a one-shot
+       * command, guaranteeing that user code can always observe a run ID even if {@link
+       * Scheduler#runId(Command)} returns {@code 0} for that command.
+       *
+       * @return the run ID assigned to the scheduled command
+       */
+      int runId();
     }
 
     /** Common interface for failed scheduling attempts. */
@@ -377,34 +389,25 @@ public final class Scheduler implements ProtobufSerializable {
      * A successful scheduling attempt.
      *
      * @param command the command that was successfully scheduled
+     * @param runId the run ID assigned to the scheduled command
      */
-    record Success(Command command) implements Successful {
-      /**
-       * A successful scheduling attempt is always successful.
-       *
-       * @return true
-       */
-      @Override
-      public boolean successful() {
-        return true;
-      }
-    }
+    record Success(Command command, int runId) implements Successful {}
 
     /**
      * A scheduling attempt that was redundant because the command was already running.
      *
      * @param command the command that was attempted to be scheduled
+     * @param runId the run ID assigned to the command when it was originally scheduled
      */
-    record AlreadyRunning(Command command) implements Successful {
+    record AlreadyRunning(Command command, int runId) implements Successful {
       /**
-       * A scheduling attempt that was redundant because the command was already running is always
-       * successful.
+       * Gets the run ID assigned to the command when it was originally scheduled.
        *
-       * @return true
+       * @return the run ID assigned to the scheduled command
        */
       @Override
-      public boolean successful() {
-        return true;
+      public int runId() {
+        return runId;
       }
     }
 
@@ -446,7 +449,9 @@ public final class Scheduler implements ProtobufSerializable {
    * <ul>
    *   <li>{@link AlreadyRunning} if the command is already scheduled or running.
    *   <li>{@link Success} if the command is not already scheduled or running and does not conflict
-   *       with any other scheduled or running commands.
+   *       with any other scheduled or running commands. The associated {@link
+   *       ScheduleResult.Successful#runId() run ID} will be 0, rather than an actual run ID,
+   *       because the command will not have actually been scheduled and received an ID.
    *   <li>{@link LowerPriorityThanRunningCommand} if the command has a lower priority than a
    *       running command that shares requirements
    *   <li>{@link LowerPriorityThanQueuedCommand} if the command has a lower priority than a queued
@@ -462,8 +467,9 @@ public final class Scheduler implements ProtobufSerializable {
   public ScheduleResult isSchedulable(Command command) {
     ErrorMessages.requireNonNullParam(command, "command", "isSchedulable");
 
-    if (isScheduledOrRunning(command)) {
-      return new AlreadyRunning(command);
+    int id = runId(command);
+    if (id != 0) {
+      return new AlreadyRunning(command, id);
     }
 
     if (!RobotStateFetcher.getFetcher().isEnabled()) {
@@ -490,8 +496,9 @@ public final class Scheduler implements ProtobufSerializable {
   private ScheduleResult isSchedulable(Binding binding) {
     var command = binding.command();
 
-    if (isScheduledOrRunning(command)) {
-      return new AlreadyRunning(command);
+    int id = runId(command);
+    if (id != 0) {
+      return new AlreadyRunning(command, id);
     }
 
     if (!RobotStateFetcher.getFetcher().isEnabled()) {
@@ -536,7 +543,7 @@ public final class Scheduler implements ProtobufSerializable {
       return new LowerPriorityThanQueuedCommand(command, conflict);
     }
 
-    return new Success(command);
+    return new Success(command, 0);
   }
 
   /**
@@ -634,7 +641,7 @@ public final class Scheduler implements ProtobufSerializable {
       m_queuedToRun.add(state);
     }
 
-    return result;
+    return new Success(command, state.id());
   }
 
   /**

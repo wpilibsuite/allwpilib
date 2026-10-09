@@ -118,9 +118,9 @@ TEST_CASE("ExtendedKalmanFilterTest Convergence", "[wpimath]") {
       Dynamics, wpi::math::Vectord<5>::Zero(), wpi::math::Vectord<2>::Zero());
 
   observer.SetXhat(wpi::math::Vectord<5>{
-      trajectory.InitialPose().Translation().X().value(),
-      trajectory.InitialPose().Translation().Y().value(),
-      trajectory.InitialPose().Rotation().Radians().value(), 0.0, 0.0});
+      trajectory.Start().pose.Translation().X().value(),
+      trajectory.Start().pose.Translation().Y().value(),
+      trajectory.Start().pose.Rotation().Radians().value(), 0.0, 0.0});
 
   auto duration = trajectory.Duration();
   for (size_t i = 0; i < (duration / dt).value(); ++i) {

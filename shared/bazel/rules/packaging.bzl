@@ -52,6 +52,12 @@ def pkg_java_src_files(name):
     )
 
     pkg_files(
+        name = name + "-resource-srcs",
+        srcs = native.glob(["src/main/resources/**"], allow_empty = True),
+        strip_prefix = "src/main/resources",
+    )
+
+    pkg_files(
         name = name + "-proto-srcs",
         srcs = native.glob(["src/main/proto/**"], allow_empty = True),
         strip_prefix = "src/main/proto",
@@ -61,6 +67,7 @@ def pkg_java_src_files(name):
         name = name,
         srcs = [
             name + "-java-srcs",
+            name + "-resource-srcs",
             name + "-proto-srcs",
             name + "-generated-java-srcs",
             "//shared/bazel/rules:src_jar_dummy_manifest",
@@ -274,13 +281,18 @@ def package_shared_cc_project(
         name,
         maven_group_id,
         maven_artifact_name,
-        architectures = None):
+        architectures = None,
+        include_headers = True,
+        include_sources = True):
     """Packages the C++ shared libraries for a project.
 
     This assumes that shared libraries exist for the project, and that they
     are compatible with the relevant architectures.  This triggers the
     transitions, packages them up, and deploys them for all native platforms
     plus systemcore.
+
+    include_headers / include_sources can be turned off to match projects
+    which do not publish those zips in gradle.
     """
     pkg_filegroup(
         name = "{}-shared-files".format(name),
@@ -299,13 +311,17 @@ def package_shared_cc_project(
         architectures = architectures,
     )
 
+    extra_classifiers = {}
+    if include_headers:
+        extra_classifiers["headers"] = ":{}-hdrs-zip".format(name)
+    if include_sources:
+        extra_classifiers["sources"] = ":{}-srcs-zip".format(name)
+
     wpilib_maven_export(
         name = "{}-cpp_publish".format(name),
-        classifier_artifacts = _filter_artifacts(architectures, {
-            "headers": ":{}-hdrs-zip".format(name),
+        classifier_artifacts = _filter_artifacts(architectures, extra_classifiers | {
             "linuxsystemcore": ":{}_shared_zip-opt-systemcore".format(name),
             "linuxsystemcoredebug": ":{}_shared_zip-dbg-systemcore".format(name),
-            "sources": ":{}-srcs-zip".format(name),
         }),
         linux_artifacts = _filter_artifacts(architectures, {
             "linuxx86-64": ":{}_shared_zip-opt-linux-x86-64".format(name),
