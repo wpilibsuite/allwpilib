@@ -41,7 +41,7 @@ static bool CheckAlertStatus(JNIEnv* env, int32_t status) {
   static jmethodID func =
       env->GetMethodID(alertEx, "<init>", "(Ljava/lang/String;I)V");
   jobject exception;
-  if (status == ALERT_ALREADY_ALLOCATED) {
+  if (status == WPI_ALERT_ALREADY_ALLOCATED) {
     exception = env->NewObject(
         alertEx, func, MakeJString(env, "Alert already allocated"), status);
   } else {
