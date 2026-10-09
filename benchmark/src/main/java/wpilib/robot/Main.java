@@ -16,6 +16,8 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N5;
 
 public class Main {
   /**
@@ -62,6 +64,13 @@ public class Main {
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   public void cartPole() {
     CartPoleBenchmark.cartPole();
+  }
+
+  @Benchmark
+  @BenchmarkMode(Mode.AverageTime)
+  @OutputTimeUnit(TimeUnit.MICROSECONDS)
+  public Matrix<N5, N5> dare() {
+    return DAREBenchmark.dare();
   }
 
   @Benchmark
