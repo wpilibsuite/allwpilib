@@ -151,14 +151,14 @@ public final class Coroutine {
    * forked and failed commands.
    */
   public final class ForkResult {
-    private final List<Command> m_forkedCommands;
+    private final List<ScheduleResult.Successful> m_forkedCommands;
     private final List<ScheduleResult.Failure> m_failedCommands;
 
     // private - only the coroutine can construct these
     private ForkResult(
-        Collection<Command> forkedCommands, List<ScheduleResult.Failure> failedCommands) {
-      m_forkedCommands = List.copyOf(forkedCommands);
-      m_failedCommands = List.copyOf(failedCommands);
+        Collection<ScheduleResult.Successful> successes, List<ScheduleResult.Failure> failures) {
+      m_forkedCommands = List.copyOf(successes);
+      m_failedCommands = List.copyOf(failures);
     }
 
     /**
@@ -201,7 +201,12 @@ public final class Coroutine {
      * <p>This method does nothing if no commands were successfully forked.
      */
     public void awaitCompletion() {
-      while (m_forkedCommands.stream().anyMatch(m_scheduler::isRunning)) {
+      if (m_forkedCommands.isEmpty()) {
+        // Nothing to do; exit early
+        return;
+      }
+      var tracker = CommandRunTracker.of(m_scheduler, m_forkedCommands);
+      while (tracker.isAnyRunning()) {
         Coroutine.this.yield();
       }
     }
@@ -222,13 +227,14 @@ public final class Coroutine {
      *
      * @return The list of forked commands.
      */
-    public List<Command> getForkedCommands() {
+    public List<ScheduleResult.Successful> getForkedCommands() {
       return m_forkedCommands;
     }
   }
 
   /**
-   * Checks that all the given commands can be forked.
+   * Checks that all the given commands can be forked. Note that successful results will have a run
+   * ID of 0, because the commands will not have actually been scheduled and received an ID.
    *
    * @param commands The commands to check
    * @return A failure-type ForkResult if the commands can't all be scheduled, or null on success.
@@ -238,19 +244,18 @@ public final class Coroutine {
     // Because this is a bug in user code, throw an error instead of returning a failure result
     ConflictDetector.throwIfConflicts(commands);
 
-    var schedulable = new ArrayList<Command>();
-    var unschedulable = new ArrayList<ScheduleResult.Failure>();
+    var successes = new ArrayList<ScheduleResult.Successful>();
+    var failures = new ArrayList<ScheduleResult.Failure>();
     for (var command : commands) {
       var result = m_scheduler.isSchedulable(command);
-      if (result instanceof ScheduleResult.Failure fail) {
-        unschedulable.add(fail);
-      } else {
-        schedulable.add(command);
+      switch (result) {
+        case ScheduleResult.Successful success -> successes.add(success);
+        case ScheduleResult.Failure failure -> failures.add(failure);
       }
     }
 
-    var result = new ForkResult(schedulable, unschedulable);
-    if (!unschedulable.isEmpty()) {
+    var result = new ForkResult(successes, failures);
+    if (result.failed()) {
       if (m_cancelOnForkFailure) {
         // Canceling on fork failure means no coroutine or user code gets to run to handle the
         // failure result
@@ -288,14 +293,13 @@ public final class Coroutine {
    *     success result if all commands were scheduled.
    */
   private ForkResult doFork(Collection<? extends Command> commands) {
-    var successes = new ArrayList<Command>();
+    var successes = new ArrayList<ScheduleResult.Successful>();
     var fails = new ArrayList<ScheduleResult.Failure>();
     for (var command : commands) {
       var result = m_scheduler.schedule(command);
-      if (result instanceof ScheduleResult.Failure fail) {
-        fails.add(fail);
-      } else {
-        successes.add(command);
+      switch (result) {
+        case ScheduleResult.Successful s -> successes.add(s);
+        case ScheduleResult.Failure f -> fails.add(f);
       }
     }
     ForkResult result = new ForkResult(successes, fails);
@@ -429,21 +433,32 @@ public final class Coroutine {
 
     requireNonNullParam(command, "command", "Coroutine.await");
 
-    var forkableCheck = checkAllForkable(List.of(command));
-    if (forkableCheck.failed()) {
-      return forkableCheck;
-    }
-
     // Don't need doFork() because there's no chance of sibling conflicts
-    m_scheduler.schedule(command);
+    var scheduleResult = m_scheduler.schedule(command);
+    switch (scheduleResult) {
+      case ScheduleResult.Successful forked -> {
+        int id = forked.runId();
+        // If the command is a one-shot, then the schedule call will completely execute the command.
+        // runId(command) will return 0 and the loop condition will never be met, so we'd return
+        // immediately without yielding.
+        while (m_scheduler.runId(command) == id) {
+          this.yield();
+        }
 
-    while (m_scheduler.isScheduledOrRunning(command)) {
-      // If the command is a one-shot, then the schedule call will completely execute the command.
-      // There would be nothing to await
-      this.yield();
+        return new ForkResult(List.of(forked), List.of());
+      }
+
+      case ScheduleResult.Failure failed -> {
+        // Failed to fork
+        var result = new ForkResult(List.of(), List.of(failed));
+        if (m_cancelOnForkFailure) {
+          m_lastForkFailure = result;
+          this.yield();
+          return result; // note: unreachable because the scheduler will never remount the coroutine
+        }
+        return result;
+      }
     }
-
-    return new ForkResult(List.of(command), List.of());
   }
 
   /**
@@ -483,7 +498,8 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, forkResult.getForkedCommands());
+    while (tracker.isAnyRunning()) {
       this.yield();
     }
 
@@ -548,12 +564,26 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, forkResult.getForkedCommands());
+    while (tracker.areAllRunning()) {
       this.yield();
     }
 
     // At least one command exited; cancel the rest.
-    commands.forEach(m_scheduler::cancel);
+    // We need to use run IDs here because at least one command exited in the previous cycle.
+    // If that command was immediately rescheduled, that would have happened outside this awaitAny
+    // call and must be allowed to continue. Using a naive `commands.forEach(m_scheduler::cancel)`
+    // loop would cause that rescheduled command to be canceled as well.
+    for (var fork : forkResult.getForkedCommands()) {
+      var command = fork.command();
+      int runId = fork.runId();
+
+      if (m_scheduler.runId(command) == runId) {
+        // Only cancel an original invocation of the command. If it exited early and was later
+        // rescheduled, that rescheduled run must be allowed to continue.
+        m_scheduler.cancel(command);
+      }
+    }
 
     return forkResult;
   }
