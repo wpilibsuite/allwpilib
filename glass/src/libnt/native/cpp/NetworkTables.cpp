@@ -127,6 +127,55 @@ void NetworkTablesModel::Entry::UpdateInfo(wpi::nt::TopicInfo&& info_) {
   }
 }
 
+static bool IsSubscriberApplicableToTopic(
+    const NetworkTablesModel::Client::Subscriber& subscriber,
+    std::string_view name) {
+  bool special = wpi::util::starts_with(name, '$');
+  for (auto&& topicName : subscriber.topics) {
+    if ((!subscriber.options.prefixMatch && name == topicName) ||
+        (subscriber.options.prefixMatch && (!special || !topicName.empty()) &&
+         wpi::util::starts_with(name, topicName))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static void AddApplicableTopicSubscribers(
+    std::vector<wpi::nt::meta::TopicSubscriber>* subscribers,
+    std::string_view topicName, std::string_view clientName,
+    std::span<const NetworkTablesModel::Client::Subscriber> clientSubscribers) {
+  for (auto&& clientSubscriber : clientSubscribers) {
+    if (!IsSubscriberApplicableToTopic(clientSubscriber, topicName)) {
+      continue;
+    }
+
+    auto& subscriber = subscribers->emplace_back();
+    subscriber.client = clientName;
+    subscriber.subuid = clientSubscriber.uid;
+    subscriber.options = clientSubscriber.options;
+  }
+}
+
+void NetworkTablesModel::UpdateDerivedTopicSubscribers() {
+  for (auto* entry : m_sortedEntries) {
+    if (!entry || entry->hasTopicSubscriberMetadata) {
+      continue;
+    }
+
+    entry->subscribers.clear();
+    AddApplicableTopicSubscribers(&entry->subscribers, entry->info.name, {},
+                                  m_server.subscribers);
+    for (auto&& client : m_clients) {
+      std::string_view clientName = client.second.id.empty()
+                                        ? std::string_view{client.first}
+                                        : std::string_view{client.second.id};
+      AddApplicableTopicSubscribers(&entry->subscribers, entry->info.name,
+                                    clientName, client.second.subscribers);
+    }
+  }
+}
+
 static void UpdateMsgpackValueSource(NetworkTablesModel& model,
                                      NetworkTablesModel::ValueSource* out,
                                      mpack_reader_t& r, std::string_view name,
@@ -727,6 +776,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(std::string_view name,
   valueChildren.clear();
   value = wpi::nt::Value::MakeString(v, time);
   valueStr = v;
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<StringSource*>(source.get());
   if (!s) {
     source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -756,6 +809,10 @@ void NetworkTablesModel::ValueSource::UpdateFromEnum(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, bool value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<BooleanSource*>(source.get());
   if (!s) {
     source = std::make_unique<BooleanSource>(std::format("NT:{}", name));
@@ -767,6 +824,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, float value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<FloatSource*>(source.get());
   if (!s) {
     source = std::make_unique<FloatSource>(std::format("NT:{}", name));
@@ -778,6 +839,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, double value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<DoubleSource*>(source.get());
   if (!s) {
     source = std::make_unique<DoubleSource>(std::format("NT:{}", name));
@@ -789,6 +854,10 @@ void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
 void NetworkTablesModel::ValueSource::UpdateDiscreteSource(
     std::string_view name, int64_t value, int64_t time) {
   valueChildren.clear();
+  if (!gContext) {
+    source.reset();
+    return;
+  }
   auto s = dynamic_cast<IntegerSource*>(source.get());
   if (!s) {
     source = std::make_unique<IntegerSource>(std::format("NT:{}", name));
@@ -885,6 +954,10 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
         os.write_escaped(value.GetString());
         os << '"';
 
+        if (!gContext) {
+          source.reset();
+          return;
+        }
         auto s = dynamic_cast<StringSource*>(source.get());
         if (!s) {
           source = std::make_unique<StringSource>(std::format("NT:{}", name));
@@ -963,6 +1036,25 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
 
 void NetworkTablesModel::Update() {
   bool updateTree = false;
+  bool updateDerivedTopicSubscribers = false;
+  auto getExistingTopicEntry = [&](std::string_view name) -> Entry* {
+    auto topic = wpi::nt::GetTopic(m_inst.GetHandle(), name);
+    auto it = m_entries.find(topic);
+    if (it == m_entries.end()) {
+      return nullptr;
+    }
+    return it->second.get();
+  };
+  auto addTopicEntry = [&](std::string_view name) {
+    bool created = false;
+    auto* topicEntry = AddEntryForUpdate(
+        wpi::nt::GetTopic(m_inst.GetHandle(), name), &created);
+    if (created) {
+      updateTree = true;
+      updateDerivedTopicSubscribers = true;
+    }
+    return topicEntry;
+  };
   for (auto&& event : m_poller.ReadQueue()) {
     if (auto info = event.GetTopicInfo()) {
       auto& entry = m_entries[info->topic];
@@ -970,8 +1062,9 @@ void NetworkTablesModel::Update() {
         if (!entry) {
           entry = std::make_unique<Entry>();
           m_sortedEntries.emplace_back(entry.get());
-          updateTree = true;
+          updateDerivedTopicSubscribers = true;
         }
+        updateTree = true;
       }
       if (event.flags & wpi::nt::EventFlags::UNPUBLISH) {
         if (info->name == PROGRAM_START_TIME_TOPIC) {
@@ -983,10 +1076,12 @@ void NetworkTablesModel::Update() {
           // meta topic handling
           if (info->name == "$clients") {
             m_clients.clear();
+            updateDerivedTopicSubscribers = true;
           } else if (info->name == "$serverpub") {
             m_server.publishers.clear();
           } else if (info->name == "$serversub") {
             m_server.subscribers.clear();
+            updateDerivedTopicSubscribers = true;
           } else if (auto client =
                          wpi::util::remove_prefix(info->name, "$clientpub$")) {
             auto it = m_clients.find(*client);
@@ -998,6 +1093,19 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.subscribers.clear();
+              updateDerivedTopicSubscribers = true;
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$pub$")) {
+            if (auto* topicEntry = getExistingTopicEntry(*topicName)) {
+              topicEntry->publishers.clear();
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(info->name, "$sub$")) {
+            if (auto* topicEntry = getExistingTopicEntry(*topicName)) {
+              topicEntry->hasTopicSubscriberMetadata = false;
+              topicEntry->subscribers.clear();
+              updateDerivedTopicSubscribers = true;
             }
           }
         }
@@ -1034,10 +1142,12 @@ void NetworkTablesModel::Update() {
               std::erase(m_sortedEntries, nullptr);
             }
             UpdateClients(entry->value.GetRaw());
+            updateDerivedTopicSubscribers = true;
           } else if (entry->info.name == "$serverpub") {
             m_server.UpdatePublishers(entry->value.GetRaw());
           } else if (entry->info.name == "$serversub") {
             m_server.UpdateSubscribers(entry->value.GetRaw());
+            updateDerivedTopicSubscribers = true;
           } else if (auto client = wpi::util::remove_prefix(entry->info.name,
                                                             "$clientpub$")) {
             auto it = m_clients.find(*client);
@@ -1049,6 +1159,32 @@ void NetworkTablesModel::Update() {
             auto it = m_clients.find(*client);
             if (it != m_clients.end()) {
               it->second.UpdateSubscribers(entry->value.GetRaw());
+              updateDerivedTopicSubscribers = true;
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$pub$")) {
+            if (auto publishers = wpi::nt::meta::DecodeTopicPublishers(
+                    entry->value.GetRaw())) {
+              auto* topicEntry = publishers->empty()
+                                     ? getExistingTopicEntry(*topicName)
+                                     : addTopicEntry(*topicName);
+              if (topicEntry) {
+                topicEntry->publishers = std::move(*publishers);
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic publishers\n");
+            }
+          } else if (auto topicName =
+                         wpi::util::remove_prefix(entry->info.name, "$sub$")) {
+            if (auto subscribers = wpi::nt::meta::DecodeTopicSubscribers(
+                    entry->value.GetRaw())) {
+              auto* topicEntry = getExistingTopicEntry(*topicName);
+              if (topicEntry) {
+                topicEntry->hasTopicSubscriberMetadata = true;
+                topicEntry->subscribers = std::move(*subscribers);
+              }
+            } else {
+              wpi::util::print(stderr, "Failed to update topic subscribers\n");
             }
           }
         } else if (auto typeStr = wpi::util::remove_prefix(entry->info.name,
@@ -1111,6 +1247,10 @@ void NetworkTablesModel::Update() {
       }
       ApplyServerTime();
     }
+  }
+
+  if (updateDerivedTopicSubscribers) {
+    UpdateDerivedTopicSubscribers();
   }
 
   // shortcut common case (updates)
@@ -1227,15 +1367,19 @@ NetworkTablesModel::Entry* NetworkTablesModel::GetEntry(std::string_view name) {
   return *entryIt;
 }
 
-NetworkTablesModel::Entry* NetworkTablesModel::AddEntry(NT_Topic topic) {
+NetworkTablesModel::Entry* NetworkTablesModel::AddEntryForUpdate(
+    NT_Topic topic, bool* created) {
   auto& entry = m_entries[topic];
   if (!entry) {
     entry = std::make_unique<Entry>();
-    entry->info = wpi::nt::GetTopicInfo(topic);
-    entry->properties = entry->info.GetProperties();
+    entry->UpdateInfo(wpi::nt::GetTopicInfo(topic));
     m_sortedEntries.emplace_back(entry.get());
+    if (created) {
+      *created = true;
+    }
+  } else if (created) {
+    *created = false;
   }
-  RebuildTree();
   return entry.get();
 }
 
@@ -1894,7 +2038,10 @@ static void EmitNTTopicDragDropPayload(const std::string& dragDropType,
 
 static void EmitValueName(DataSource* source, const char* name,
                           const char* path, NT_Type type,
-                          std::string_view typeStr) {
+                          std::string_view typeStr,
+                          NetworkTablesModel* model = nullptr,
+                          NetworkTablesFlags flags = NetworkTablesFlags_Default,
+                          NetworkTablesModel::Entry* entry = nullptr) {
   if (source) {
     ImGui::Selectable(name);
     source->EmitDrag();
@@ -1961,7 +2108,7 @@ static void EmitEntry(NetworkTablesModel* model,
   ImGui::TableNextRow();
   ImGui::TableNextColumn();
   EmitValueName(entry.source.get(), name, entry.info.name.c_str(),
-                entry.info.type, entry.info.type_str);
+                entry.info.type, entry.info.type_str, model, flags, &entry);
 
   ImGui::TableNextColumn();
   if (!entry.valueChildren.empty()) {
