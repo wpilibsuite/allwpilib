@@ -1,4 +1,5 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("@rules_cc//cc:defs.bzl", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -113,5 +114,15 @@ robotpy_py_test(
     deps = [
         ":robotpy-halsim-ws",
         requirement("pytest"),
+    ],
+)
+
+cc_test(
+    name = "halsim_ws_core-test",
+    size = "small",
+    srcs = glob(["src/test/native/cpp/*.cpp"]),
+    deps = [
+        ":halsim_ws_core",
+        "//thirdparty/catch2",
     ],
 )

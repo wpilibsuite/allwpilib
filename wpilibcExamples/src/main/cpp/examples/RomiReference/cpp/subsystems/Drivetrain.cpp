@@ -61,17 +61,17 @@ wpi::units::meter_t Drivetrain::GetAverageDistance() {
 }
 
 wpi::units::radian_t Drivetrain::GetGyroAngleX() {
-  return gyro.GetAngleX();
+  return imu.GetAngleX();
 }
 
 wpi::units::radian_t Drivetrain::GetGyroAngleY() {
-  return gyro.GetAngleY();
+  return imu.GetAngleY();
 }
 
 wpi::units::radian_t Drivetrain::GetGyroAngleZ() {
-  return gyro.GetAngleZ();
+  return imu.GetYaw();
 }
 
 void Drivetrain::ResetGyro() {
-  gyro.Reset();
+  imu.ResetYaw();
 }

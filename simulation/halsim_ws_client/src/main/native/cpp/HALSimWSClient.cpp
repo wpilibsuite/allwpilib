@@ -12,6 +12,7 @@
 #include "wpi/halsim/ws_core/WSProvider_DIO.hpp"
 #include "wpi/halsim/ws_core/WSProvider_DriverStation.hpp"
 #include "wpi/halsim/ws_core/WSProvider_Encoder.hpp"
+#include "wpi/halsim/ws_core/WSProvider_IMU.hpp"
 #include "wpi/halsim/ws_core/WSProvider_Joystick.hpp"
 #include "wpi/halsim/ws_core/WSProvider_PCM.hpp"
 #include "wpi/halsim/ws_core/WSProvider_PWM.hpp"
@@ -43,6 +44,7 @@ bool HALSimWSClient::Initialize() {
     HALSimWSProviderDigitalPWM::Initialize(registerFunc);
     HALSimWSProviderDriverStation::Initialize(registerFunc);
     HALSimWSProviderEncoder::Initialize(registerFunc);
+    HALSimWSProviderIMU::Initialize(registerFunc, "RomiGyro");
     HALSimWSProviderJoystick::Initialize(registerFunc);
     HALSimWSProviderPCM::Initialize(registerFunc);
     HALSimWSProviderPWM::Initialize(registerFunc);

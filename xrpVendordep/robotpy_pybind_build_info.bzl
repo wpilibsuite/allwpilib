@@ -71,16 +71,6 @@ def xrp_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes 
 
     XRP_HEADER_GEN = [
         struct(
-            class_name = "XRPGyro",
-            yml_file = "semiwrap/XRPGyro.yml",
-            header_root = "$(execpath :robotpy-native-xrp.copy_headers)",
-            header_file = "$(execpath :robotpy-native-xrp.copy_headers)/wpi/xrp/XRPGyro.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::xrp::XRPGyro", "wpi__xrp__XRPGyro.hpp"),
-            ],
-        ),
-        struct(
             class_name = "XRPMotor",
             yml_file = "semiwrap/XRPMotor.yml",
             header_root = "$(execpath :robotpy-native-xrp.copy_headers)",
