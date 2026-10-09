@@ -321,7 +321,7 @@ _AUTO_FAILURES = [
 
 _TELEOP_FAILURES = [
     "TeleopPeriodicFailed",
-    "TeleopInitFailed",
+    "TeleopEnterFailed",
 ]
 
 
@@ -366,11 +366,11 @@ def test_teleop_failure(robot, control):
 def test_robot_state_transitions(pytester, isolated, robot_class):
     expected = {
         "IterativeStateRobot": [
-            "did_disabled_init",
+            "did_disabled_enter",
             "did_disabled_periodic",
-            "did_auto_init",
+            "did_auto_enter",
             "did_auto_periodic",
-            "did_teleop_init",
+            "did_teleop_enter",
             "did_teleop_periodic",
         ],
     }[robot_class]
