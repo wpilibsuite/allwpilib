@@ -40,6 +40,8 @@ namespace uv = wpi::net::uv;
 // use a larger max message size for websockets
 static constexpr size_t MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
 
+static constexpr size_t MAX_HTTP_ACCEPT_SIZE = 1024;
+
 static constexpr size_t CLIENT_PROCESS_MESSAGE_COUNT_MAX = 16;
 static constexpr uv::Timer::Time HANDSHAKE_TIMEOUT{5000};
 
@@ -85,6 +87,41 @@ class NetworkServer::ServerConnection4 final
              "rtt.networktables.first.wpi.edu"},
             HANDSHAKE_TIMEOUT) {
     m_info.protocol_version = 0x0400;
+    m_request.messageBegin.connect([this] {
+      m_body.clear();
+      m_contentType.clear();
+      m_accept.clear();
+    });
+    m_request.header.connect(
+        [this](std::string_view name, std::string_view value) {
+          if (wpi::util::equals_lower(name, "content-type")) {
+            m_contentType = value;
+          } else if (wpi::util::equals_lower(name, "accept")) {
+            if (m_accept.size() + value.size() + 1 > MAX_HTTP_ACCEPT_SIZE) {
+              m_request.Abort();
+              return;
+            }
+            if (!m_accept.empty()) {
+              m_accept += ',';
+            }
+            m_accept += value;
+          }
+        });
+    m_request.body.connect([this](std::string_view data) {
+      if (m_bodyTooLarge) {
+        return;
+      }
+      if (data.size() > MAX_MESSAGE_SIZE - m_body.size()) {
+        m_bodyTooLarge = true;
+        m_body.clear();
+        m_keepAlive = false;
+        m_stream.StopRead();
+        SendResponse(413, "Payload Too Large", "application/json",
+                     R"({"error":"Request body exceeds 2 MiB"})");
+        return;
+      }
+      m_body.append(data);
+    });
   }
 
  private:
@@ -92,6 +129,10 @@ class NetworkServer::ServerConnection4 final
   void ProcessWsUpgrade() final;
 
   std::shared_ptr<net::WebSocketConnection> m_wire;
+  std::string m_body;
+  std::string m_contentType;
+  std::string m_accept;
+  bool m_bodyTooLarge = false;
 };
 
 void NetworkServer::ServerConnection::SetupOutgoingTimer() {
@@ -125,7 +166,28 @@ void NetworkServer::ServerConnection::ConnectionClosed() {
 }
 
 void NetworkServer::ServerConnection4::ProcessRequest() {
+  if (m_bodyTooLarge) {
+    return;
+  }
   DEBUG1("HTTP request: '{}'", m_request.GetUrl());
+  auto target = m_request.GetUrl();
+  auto requestPath = target.substr(0, target.find('?'));
+  if (requestPath == "/nt/v1" || requestPath.starts_with("/nt/v1/") ||
+      requestPath == "/nt/persistent.json") {
+    auto method = m_request.GetMethod();
+    m_server.ProcessAllLocal();
+    auto response = m_server.m_serverImpl.HandleRestRequest(
+        llhttp_method_name(method), target, m_body, m_contentType, m_accept);
+    std::string headers =
+        "Access-Control-Allow-Headers: Content-Type, Accept\r\nVary: "
+        "Accept\r\n";
+    if (!response.allow.empty()) {
+      headers += std::format("Allow: {}\r\n", response.allow);
+    }
+    SendResponse(response.status, response.statusText, response.contentType,
+                 response.body, headers);
+    return;
+  }
   auto url = wpi::net::ParseUrl(m_request.GetUrl());
   if (!url) {
     // failed to parse URL
@@ -148,13 +210,12 @@ void NetworkServer::ServerConnection4::ProcessRequest() {
   const bool isGET = m_request.GetMethod() == HTTP_GET;
   if (isGET && path == "/") {
     // build HTML root page
-    SendResponse(200, "OK", "text/html",
-                 "<html><head><title>NetworkTables</title></head>"
-                 "<body><p>WebSockets must be used to access NetworkTables."
-                 "</body></html>");
-  } else if (isGET && path == "/nt/persistent.json") {
-    SendResponse(200, "OK", "application/json",
-                 m_server.m_serverImpl.DumpPersistent());
+    SendResponse(
+        200, "OK", "text/html",
+        "<html><head><title>NetworkTables</title></head>"
+        "<body><p>NetworkTables supports WebSockets and a REST API."
+        "</p><p><a href=\"/nt/v1/topics\">Browse topics as JSON</a></p>"
+        "</body></html>");
   } else {
     SendError(404, "Resource not found");
   }
