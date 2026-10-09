@@ -39,11 +39,13 @@ public final class Translation2d
    */
   public static final Translation2d ZERO = new Translation2d();
 
+  /** The X component of the translation. */
   @Json.Property("x")
-  private final double m_x;
+  public final double x;
 
+  /** The Y component of the translation. */
   @Json.Property("y")
-  private final double m_y;
+  public final double y;
 
   /** Constructs a Translation2d with X and Y components equal to zero. */
   public Translation2d() {
@@ -58,8 +60,8 @@ public final class Translation2d
    */
   @Json.Creator
   public Translation2d(double x, double y) {
-    m_x = x;
-    m_y = y;
+    this.x = x;
+    this.y = y;
   }
 
   /**
@@ -70,8 +72,8 @@ public final class Translation2d
    * @param angle The angle between the x-axis and the translation vector.
    */
   public Translation2d(double distance, Rotation2d angle) {
-    m_x = distance * angle.getCos();
-    m_y = distance * angle.getSin();
+    x = distance * angle.cos;
+    y = distance * angle.sin;
   }
 
   /**
@@ -104,7 +106,7 @@ public final class Translation2d
    * @return The distance between the two translations.
    */
   public double getDistance(Translation2d other) {
-    return Math.hypot(other.m_x - m_x, other.m_y - m_y);
+    return Math.hypot(other.x - x, other.y - y);
   }
 
   /**
@@ -118,27 +120,9 @@ public final class Translation2d
    * @return The square of the distance between the two translations, in square meters.
    */
   public double getSquaredDistance(Translation2d other) {
-    double dx = other.m_x - m_x;
-    double dy = other.m_y - m_y;
+    double dx = other.x - x;
+    double dy = other.y - y;
     return dx * dx + dy * dy;
-  }
-
-  /**
-   * Returns the X component of the translation.
-   *
-   * @return The X component of the translation.
-   */
-  public double getX() {
-    return m_x;
-  }
-
-  /**
-   * Returns the Y component of the translation.
-   *
-   * @return The Y component of the translation.
-   */
-  public double getY() {
-    return m_y;
   }
 
   /**
@@ -147,7 +131,7 @@ public final class Translation2d
    * @return The x component of the translation in a measure.
    */
   public Distance getMeasureX() {
-    return Meters.of(m_x);
+    return Meters.of(x);
   }
 
   /**
@@ -156,7 +140,7 @@ public final class Translation2d
    * @return The y component of the translation in a measure.
    */
   public Distance getMeasureY() {
-    return Meters.of(m_y);
+    return Meters.of(y);
   }
 
   /**
@@ -165,7 +149,7 @@ public final class Translation2d
    * @return A 2D translation vector representation of this translation.
    */
   public Vector<N2> toVector() {
-    return VecBuilder.fill(m_x, m_y);
+    return VecBuilder.fill(x, y);
   }
 
   /**
@@ -174,7 +158,7 @@ public final class Translation2d
    * @return The norm of the translation.
    */
   public double getNorm() {
-    return Math.hypot(m_x, m_y);
+    return Math.hypot(x, y);
   }
 
   /**
@@ -184,7 +168,7 @@ public final class Translation2d
    * @return The squared norm of the translation, in square meters.
    */
   public double getSquaredNorm() {
-    return m_x * m_x + m_y * m_y;
+    return x * x + y * y;
   }
 
   /**
@@ -193,8 +177,8 @@ public final class Translation2d
    * @return The angle of the translation, or an empty Optional if the angle was undefined.
    */
   public Optional<Rotation2d> getAngle() {
-    if (Math.hypot(m_x, m_y) > 1e-6) {
-      return Optional.of(new Rotation2d(m_x, m_y));
+    if (Math.hypot(x, y) > 1e-6) {
+      return Optional.of(new Rotation2d(x, y));
     } else {
       return Optional.empty();
     }
@@ -218,8 +202,7 @@ public final class Translation2d
    * @return The new rotated translation.
    */
   public Translation2d rotateBy(Rotation2d other) {
-    return new Translation2d(
-        m_x * other.getCos() - m_y * other.getSin(), m_x * other.getSin() + m_y * other.getCos());
+    return new Translation2d(x * other.cos - y * other.sin, x * other.sin + y * other.cos);
   }
 
   /**
@@ -236,8 +219,8 @@ public final class Translation2d
    */
   public Translation2d rotateAround(Translation2d other, Rotation2d rot) {
     return new Translation2d(
-        (m_x - other.getX()) * rot.getCos() - (m_y - other.getY()) * rot.getSin() + other.getX(),
-        (m_x - other.getX()) * rot.getSin() + (m_y - other.getY()) * rot.getCos() + other.getY());
+        (x - other.x) * rot.cos - (y - other.y) * rot.sin + other.x,
+        (x - other.x) * rot.sin + (y - other.y) * rot.cos + other.y);
   }
 
   /**
@@ -249,7 +232,7 @@ public final class Translation2d
    * @return The dot product between the two translations, in square meters.
    */
   public double dot(Translation2d other) {
-    return m_x * other.m_x + m_y * other.m_y;
+    return x * other.x + y * other.y;
   }
 
   /**
@@ -261,7 +244,7 @@ public final class Translation2d
    * @return The cross product between the two translations, in square meters.
    */
   public double cross(Translation2d other) {
-    return m_x * other.m_y - m_y * other.m_x;
+    return x * other.y - y * other.x;
   }
 
   /**
@@ -273,7 +256,7 @@ public final class Translation2d
    * @return The sum of the translations.
    */
   public Translation2d plus(Translation2d other) {
-    return new Translation2d(m_x + other.m_x, m_y + other.m_y);
+    return new Translation2d(x + other.x, y + other.y);
   }
 
   /**
@@ -285,7 +268,7 @@ public final class Translation2d
    * @return The difference between the two translations.
    */
   public Translation2d minus(Translation2d other) {
-    return new Translation2d(m_x - other.m_x, m_y - other.m_y);
+    return new Translation2d(x - other.x, y - other.y);
   }
 
   /**
@@ -295,7 +278,7 @@ public final class Translation2d
    * @return The inverse of the current translation.
    */
   public Translation2d unaryMinus() {
-    return new Translation2d(-m_x, -m_y);
+    return new Translation2d(-x, -y);
   }
 
   /**
@@ -307,7 +290,7 @@ public final class Translation2d
    * @return The scaled translation.
    */
   public Translation2d times(double scalar) {
-    return new Translation2d(m_x * scalar, m_y * scalar);
+    return new Translation2d(x * scalar, y * scalar);
   }
 
   /**
@@ -319,7 +302,7 @@ public final class Translation2d
    * @return The reference to the new mutated object.
    */
   public Translation2d div(double scalar) {
-    return new Translation2d(m_x / scalar, m_y / scalar);
+    return new Translation2d(x / scalar, y / scalar);
   }
 
   /**
@@ -334,7 +317,7 @@ public final class Translation2d
 
   @Override
   public String toString() {
-    return String.format("Translation2d(X: %.2f, Y: %.2f)", m_x, m_y);
+    return String.format("Translation2d(X: %.2f, Y: %.2f)", x, y);
   }
 
   /**
@@ -346,20 +329,19 @@ public final class Translation2d
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Translation2d other
-        && Math.abs(other.m_x - m_x) < 1E-9
-        && Math.abs(other.m_y - m_y) < 1E-9;
+        && Math.abs(other.x - x) < 1E-9
+        && Math.abs(other.y - y) < 1E-9;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_x, m_y);
+    return Objects.hash(x, y);
   }
 
   @Override
   public Translation2d interpolate(Translation2d endValue, double t) {
     return new Translation2d(
-        MathUtil.lerp(this.getX(), endValue.getX(), t),
-        MathUtil.lerp(this.getY(), endValue.getY(), t));
+        MathUtil.lerp(this.x, endValue.x, t), MathUtil.lerp(this.y, endValue.y, t));
   }
 
   /** Translation2d protobuf for serialization. */

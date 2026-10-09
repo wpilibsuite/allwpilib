@@ -74,11 +74,7 @@ public final class DrivetrainSplineTrajectoryParameterizer {
 
       // Begin constraining based on predecessor.
       double ds =
-          constrainedState
-              .pose
-              .pose
-              .getTranslation()
-              .getDistance(predecessor.pose.pose.getTranslation());
+          constrainedState.pose.pose.translation.getDistance(predecessor.pose.pose.translation);
       constrainedState.distance = predecessor.distance + ds;
 
       // We may need to iterate to find the maximum end velocity and common

@@ -33,16 +33,18 @@ public final class Pose3d
    */
   public static final Pose3d ZERO = new Pose3d();
 
+  /** The translational component of the pose. */
   @Json.Property("translation")
-  private final Translation3d m_translation;
+  public final Translation3d translation;
 
+  /** The rotational component of the pose. */
   @Json.Property("rotation")
-  private final Rotation3d m_rotation;
+  public final Rotation3d rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose3d() {
-    m_translation = Translation3d.ZERO;
-    m_rotation = Rotation3d.ZERO;
+    translation = Translation3d.ZERO;
+    rotation = Rotation3d.ZERO;
   }
 
   /**
@@ -53,8 +55,8 @@ public final class Pose3d
    */
   @Json.Creator
   public Pose3d(Translation3d translation, Rotation3d rotation) {
-    m_translation = translation;
-    m_rotation = rotation;
+    this.translation = translation;
+    this.rotation = rotation;
   }
 
   /**
@@ -66,8 +68,8 @@ public final class Pose3d
    * @param rotation The rotational component of the pose.
    */
   public Pose3d(double x, double y, double z, Rotation3d rotation) {
-    m_translation = new Translation3d(x, y, z);
-    m_rotation = rotation;
+    translation = new Translation3d(x, y, z);
+    this.rotation = rotation;
   }
 
   /**
@@ -90,8 +92,8 @@ public final class Pose3d
    * @throws IllegalArgumentException if the affine transformation matrix is invalid.
    */
   public Pose3d(Matrix<N4, N4> matrix) {
-    m_translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
-    m_rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
+    translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
+    rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
     if (matrix.get(3, 0) != 0.0
         || matrix.get(3, 1) != 0.0
         || matrix.get(3, 2) != 0.0
@@ -108,8 +110,8 @@ public final class Pose3d
    * @see Translation3d#Translation3d(Translation2d)
    */
   public Pose3d(Pose2d pose) {
-    m_translation = new Translation3d(pose.getX(), pose.getY(), 0.0);
-    m_rotation = new Rotation3d(0.0, 0.0, pose.getRotation().getRadians());
+    translation = new Translation3d(pose.getX(), pose.getY(), 0.0);
+    rotation = new Rotation3d(0.0, 0.0, pose.rotation.getRadians());
   }
 
   /**
@@ -133,16 +135,7 @@ public final class Pose3d
    */
   public Transform3d minus(Pose3d other) {
     final var pose = this.relativeTo(other);
-    return new Transform3d(pose.getTranslation(), pose.getRotation());
-  }
-
-  /**
-   * Returns the translation component of the transformation.
-   *
-   * @return The translational component of the pose.
-   */
-  public Translation3d getTranslation() {
-    return m_translation;
+    return new Transform3d(pose.translation, pose.rotation);
   }
 
   /**
@@ -151,7 +144,7 @@ public final class Pose3d
    * @return The x component of the pose's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return translation.x;
   }
 
   /**
@@ -160,7 +153,7 @@ public final class Pose3d
    * @return The y component of the pose's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return translation.y;
   }
 
   /**
@@ -169,7 +162,7 @@ public final class Pose3d
    * @return The z component of the pose's translation.
    */
   public double getZ() {
-    return m_translation.getZ();
+    return translation.z;
   }
 
   /**
@@ -178,7 +171,7 @@ public final class Pose3d
    * @return The x component of the pose's translation in a measure.
    */
   public Distance getMeasureX() {
-    return m_translation.getMeasureX();
+    return translation.getMeasureX();
   }
 
   /**
@@ -187,7 +180,7 @@ public final class Pose3d
    * @return The y component of the pose's translation in a measure.
    */
   public Distance getMeasureY() {
-    return m_translation.getMeasureY();
+    return translation.getMeasureY();
   }
 
   /**
@@ -196,16 +189,7 @@ public final class Pose3d
    * @return The z component of the pose's translation in a measure.
    */
   public Distance getMeasureZ() {
-    return m_translation.getMeasureZ();
-  }
-
-  /**
-   * Returns the rotational component of the transformation.
-   *
-   * @return The rotational component of the pose.
-   */
-  public Rotation3d getRotation() {
-    return m_rotation;
+    return translation.getMeasureZ();
   }
 
   /**
@@ -215,7 +199,7 @@ public final class Pose3d
    * @return The new scaled Pose3d.
    */
   public Pose3d times(double scalar) {
-    return new Pose3d(m_translation.times(scalar), m_rotation.times(scalar));
+    return new Pose3d(translation.times(scalar), rotation.times(scalar));
   }
 
   /**
@@ -236,7 +220,7 @@ public final class Pose3d
    * @return The rotated pose.
    */
   public Pose3d rotateBy(Rotation3d other) {
-    return new Pose3d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
+    return new Pose3d(translation.rotateBy(other), rotation.rotateBy(other));
   }
 
   /**
@@ -253,8 +237,7 @@ public final class Pose3d
     // rotating the pose's rotation by the transform's rotation intrinsically. (We define transforms
     // as being applied intrinsically.)
     return new Pose3d(
-        m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().rotateBy(m_rotation));
+        translation.plus(other.translation.rotateBy(rotation)), other.rotation.rotateBy(rotation));
   }
 
   /**
@@ -269,7 +252,7 @@ public final class Pose3d
    */
   public Pose3d relativeTo(Pose3d other) {
     var transform = new Transform3d(other, this);
-    return new Pose3d(transform.getTranslation(), transform.getRotation());
+    return new Pose3d(transform.translation, transform.rotation);
   }
 
   /**
@@ -280,7 +263,7 @@ public final class Pose3d
    * @return The new rotated pose.
    */
   public Pose3d rotateAround(Translation3d point, Rotation3d rot) {
-    return new Pose3d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
+    return new Pose3d(translation.rotateAround(point, rot), rotation.rotateBy(rot));
   }
 
   /**
@@ -289,8 +272,8 @@ public final class Pose3d
    * @return An affine transformation matrix representation of this pose.
    */
   public Matrix<N4, N4> toMatrix() {
-    var vec = m_translation.toVector();
-    var mat = m_rotation.toMatrix();
+    var vec = translation.toVector();
+    var mat = rotation.toMatrix();
     return MatBuilder.fill(
         Nat.N4(),
         Nat.N4(),
@@ -318,7 +301,7 @@ public final class Pose3d
    * @return A Pose2d representing this Pose3d projected into the X-Y plane.
    */
   public Pose2d toPose2d() {
-    return new Pose2d(m_translation.toTranslation2d(), m_rotation.toRotation2d());
+    return new Pose2d(translation.toTranslation2d(), rotation.toRotation2d());
   }
 
   /**
@@ -331,15 +314,13 @@ public final class Pose3d
   public Pose3d nearest(Collection<Pose3d> poses) {
     return Collections.min(
         poses,
-        Comparator.comparing(
-                (Pose3d other) -> this.getTranslation().getDistance(other.getTranslation()))
-            .thenComparing(
-                (Pose3d other) -> this.getRotation().relativeTo(other.getRotation()).getAngle()));
+        Comparator.comparing((Pose3d other) -> this.translation.getDistance(other.translation))
+            .thenComparing((Pose3d other) -> this.rotation.relativeTo(other.rotation).getAngle()));
   }
 
   @Override
   public String toString() {
-    return String.format("Pose3d(%s, %s)", m_translation, m_rotation);
+    return String.format("Pose3d(%s, %s)", translation, rotation);
   }
 
   /**
@@ -351,13 +332,13 @@ public final class Pose3d
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Pose3d pose
-        && m_translation.equals(pose.m_translation)
-        && m_rotation.equals(pose.m_rotation);
+        && translation.equals(pose.translation)
+        && rotation.equals(pose.rotation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_translation, m_rotation);
+    return Objects.hash(translation, rotation);
   }
 
   @Override

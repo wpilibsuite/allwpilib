@@ -22,9 +22,9 @@ class QuaternionStructTest {
     buffer.rewind();
 
     Quaternion data = Quaternion.struct.unpack(buffer);
-    assertEquals(DATA.getW(), data.getW());
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
-    assertEquals(DATA.getZ(), data.getZ());
+    assertEquals(DATA.w, data.w);
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
+    assertEquals(DATA.z, data.z);
   }
 }

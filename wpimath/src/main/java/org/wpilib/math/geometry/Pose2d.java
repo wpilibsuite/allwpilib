@@ -33,16 +33,18 @@ public final class Pose2d
    */
   public static final Pose2d ZERO = new Pose2d();
 
+  /** The translational component of the pose. */
   @Json.Property("translation")
-  private final Translation2d m_translation;
+  public final Translation2d translation;
 
+  /** The rotational component of the pose. */
   @Json.Property("rotation")
-  private final Rotation2d m_rotation;
+  public final Rotation2d rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose2d() {
-    m_translation = Translation2d.ZERO;
-    m_rotation = Rotation2d.ZERO;
+    translation = Translation2d.ZERO;
+    rotation = Rotation2d.ZERO;
   }
 
   /**
@@ -53,8 +55,8 @@ public final class Pose2d
    */
   @Json.Creator
   public Pose2d(Translation2d translation, Rotation2d rotation) {
-    m_translation = translation;
-    m_rotation = rotation;
+    this.translation = translation;
+    this.rotation = rotation;
   }
 
   /**
@@ -65,8 +67,8 @@ public final class Pose2d
    * @param rotation The rotational component of the pose.
    */
   public Pose2d(double x, double y, Rotation2d rotation) {
-    m_translation = new Translation2d(x, y);
-    m_rotation = rotation;
+    translation = new Translation2d(x, y);
+    this.rotation = rotation;
   }
 
   /**
@@ -88,8 +90,8 @@ public final class Pose2d
    * @throws IllegalArgumentException if the affine transformation matrix is invalid.
    */
   public Pose2d(Matrix<N3, N3> matrix) {
-    m_translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
-    m_rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
+    translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
+    rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
     if (matrix.get(2, 0) != 0.0 || matrix.get(2, 1) != 0.0 || matrix.get(2, 2) != 1.0) {
       throw new IllegalArgumentException("Affine transformation matrix is invalid");
     }
@@ -119,16 +121,7 @@ public final class Pose2d
    */
   public Transform2d minus(Pose2d other) {
     final var pose = this.relativeTo(other);
-    return new Transform2d(pose.getTranslation(), pose.getRotation());
-  }
-
-  /**
-   * Returns the translation component of the transformation.
-   *
-   * @return The translational component of the pose.
-   */
-  public Translation2d getTranslation() {
-    return m_translation;
+    return new Transform2d(pose.translation, pose.rotation);
   }
 
   /**
@@ -137,7 +130,7 @@ public final class Pose2d
    * @return The x component of the pose's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return translation.x;
   }
 
   /**
@@ -146,7 +139,7 @@ public final class Pose2d
    * @return The y component of the pose's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return translation.y;
   }
 
   /**
@@ -155,7 +148,7 @@ public final class Pose2d
    * @return The x component of the pose's translation in a measure.
    */
   public Distance getMeasureX() {
-    return m_translation.getMeasureX();
+    return translation.getMeasureX();
   }
 
   /**
@@ -164,16 +157,7 @@ public final class Pose2d
    * @return The y component of the pose's translation in a measure.
    */
   public Distance getMeasureY() {
-    return m_translation.getMeasureY();
-  }
-
-  /**
-   * Returns the rotational component of the transformation.
-   *
-   * @return The rotational component of the pose.
-   */
-  public Rotation2d getRotation() {
-    return m_rotation;
+    return translation.getMeasureY();
   }
 
   /**
@@ -183,7 +167,7 @@ public final class Pose2d
    * @return The new scaled Pose2d.
    */
   public Pose2d times(double scalar) {
-    return new Pose2d(m_translation.times(scalar), m_rotation.times(scalar));
+    return new Pose2d(translation.times(scalar), rotation.times(scalar));
   }
 
   /**
@@ -203,7 +187,7 @@ public final class Pose2d
    * @return The transformed pose.
    */
   public Pose2d rotateBy(Rotation2d other) {
-    return new Pose2d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
+    return new Pose2d(translation.rotateBy(other), rotation.rotateBy(other));
   }
 
   /**
@@ -215,8 +199,7 @@ public final class Pose2d
    */
   public Pose2d transformBy(Transform2d other) {
     return new Pose2d(
-        m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().rotateBy(m_rotation));
+        translation.plus(other.translation.rotateBy(rotation)), other.rotation.rotateBy(rotation));
   }
 
   /**
@@ -231,7 +214,7 @@ public final class Pose2d
    */
   public Pose2d relativeTo(Pose2d other) {
     var transform = new Transform2d(other, this);
-    return new Pose2d(transform.getTranslation(), transform.getRotation());
+    return new Pose2d(transform.translation, transform.rotation);
   }
 
   /**
@@ -242,7 +225,7 @@ public final class Pose2d
    * @return The new rotated pose.
    */
   public Pose2d rotateAround(Translation2d point, Rotation2d rot) {
-    return new Pose2d(m_translation.rotateAround(point, rot), m_rotation.rotateBy(rot));
+    return new Pose2d(translation.rotateAround(point, rot), rotation.rotateBy(rot));
   }
 
   /**
@@ -251,8 +234,8 @@ public final class Pose2d
    * @return An affine transformation matrix representation of this pose.
    */
   public Matrix<N3, N3> toMatrix() {
-    var vec = m_translation.toVector();
-    var mat = m_rotation.toMatrix();
+    var vec = translation.toVector();
+    var mat = rotation.toMatrix();
     return MatBuilder.fill(
         Nat.N3(),
         Nat.N3(),
@@ -277,16 +260,14 @@ public final class Pose2d
   public Pose2d nearest(Collection<Pose2d> poses) {
     return Collections.min(
         poses,
-        Comparator.comparing(
-                (Pose2d other) -> this.getTranslation().getDistance(other.getTranslation()))
+        Comparator.comparing((Pose2d other) -> this.translation.getDistance(other.translation))
             .thenComparing(
-                (Pose2d other) ->
-                    Math.abs(this.getRotation().minus(other.getRotation()).getRadians())));
+                (Pose2d other) -> Math.abs(this.rotation.minus(other.rotation).getRadians())));
   }
 
   @Override
   public String toString() {
-    return String.format("Pose2d(%s, %s)", m_translation, m_rotation);
+    return String.format("Pose2d(%s, %s)", translation, rotation);
   }
 
   /**
@@ -298,13 +279,13 @@ public final class Pose2d
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Pose2d pose
-        && m_translation.equals(pose.m_translation)
-        && m_rotation.equals(pose.m_rotation);
+        && translation.equals(pose.translation)
+        && rotation.equals(pose.rotation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_translation, m_rotation);
+    return Objects.hash(translation, rotation);
   }
 
   @Override

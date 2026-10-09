@@ -76,12 +76,13 @@ public final class Rotation3d
    */
   public static final Rotation3d ZERO = new Rotation3d();
 
+  /** The quaternion representation of the Rotation3d. */
   @Json.Property("quaternion")
-  private final Quaternion m_q;
+  public final Quaternion quaternion;
 
   /** Constructs a Rotation3d representing no rotation. */
   public Rotation3d() {
-    m_q = new Quaternion();
+    quaternion = new Quaternion();
   }
 
   /**
@@ -91,7 +92,7 @@ public final class Rotation3d
    */
   @Json.Creator
   public Rotation3d(@Json.Alias("quaternion") Quaternion q) {
-    m_q = q.normalize();
+    quaternion = q.normalize();
   }
 
   /**
@@ -119,7 +120,7 @@ public final class Rotation3d
     double cy = Math.cos(yaw * 0.5);
     double sy = Math.sin(yaw * 0.5);
 
-    m_q =
+    quaternion =
         new Quaternion(
             cr * cp * cy + sr * sp * sy,
             sr * cp * cy - cr * sp * sy,
@@ -166,13 +167,14 @@ public final class Rotation3d
   public Rotation3d(Vector<N3> axis, double angleRadians) {
     double norm = axis.norm();
     if (norm == 0.0) {
-      m_q = new Quaternion();
+      quaternion = new Quaternion();
       return;
     }
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Definition
     var v = axis.times(1.0 / norm).times(Math.sin(angleRadians / 2.0));
-    m_q = new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
+    quaternion =
+        new Quaternion(Math.cos(angleRadians / 2.0), v.get(0, 0), v.get(1, 0), v.get(2, 0));
   }
 
   /**
@@ -247,7 +249,7 @@ public final class Rotation3d
       }
     }
 
-    m_q = new Quaternion(w, x, y, z);
+    quaternion = new Quaternion(w, x, y, z);
   }
 
   /**
@@ -266,8 +268,8 @@ public final class Rotation3d
 
     if (dotNorm > 1.0 - 1E-9) {
       // If the dot product is 1, the two vectors point in the same direction so
-      // there's no rotation. The default initialization of m_q will work.
-      m_q = new Quaternion();
+      // there's no rotation. The default initialization of quaternion will work.
+      quaternion = new Quaternion();
     } else if (dotNorm < -1.0 + 1E-9) {
       // If the dot product is -1, the two vectors are antiparallel, so a 180°
       // rotation is required. Any other vector can be used to generate an
@@ -300,14 +302,14 @@ public final class Rotation3d
       var axis = Vector.cross(initial, other);
 
       double axisNorm = axis.norm();
-      m_q =
+      quaternion =
           new Quaternion(
               0.0, axis.get(0, 0) / axisNorm, axis.get(1, 0) / axisNorm, axis.get(2, 0) / axisNorm);
     } else {
       var axis = Vector.cross(initial, last);
 
       // https://stackoverflow.com/a/11741520
-      m_q =
+      quaternion =
           new Quaternion(normProduct + dot, axis.get(0, 0), axis.get(1, 0), axis.get(2, 0))
               .normalize();
     }
@@ -370,7 +372,7 @@ public final class Rotation3d
    * @return The inverse of the current rotation.
    */
   public Rotation3d inverse() {
-    return new Rotation3d(m_q.inverse());
+    return new Rotation3d(quaternion.inverse());
   }
 
   /**
@@ -404,7 +406,7 @@ public final class Rotation3d
    * @return The new rotated Rotation3d.
    */
   public Rotation3d rotateBy(Rotation3d other) {
-    return new Rotation3d(other.m_q.times(m_q));
+    return new Rotation3d(other.quaternion.times(quaternion));
   }
 
   /**
@@ -422,7 +424,7 @@ public final class Rotation3d
     //
     //   other_q q = this_q
     //   q = other_q⁻¹ this_q
-    return new Rotation3d(other.m_q.inverse().times(m_q));
+    return new Rotation3d(other.quaternion.inverse().times(quaternion));
   }
 
   /**
@@ -439,16 +441,7 @@ public final class Rotation3d
     //
     // https://math.stackexchange.com/a/2099673
     var W = new Quaternion(0.0, rollRate, pitchRate, yawRate);
-    return new Rotation3d(m_q.times(W.times(dt / 2.0).exp()));
-  }
-
-  /**
-   * Returns the quaternion representation of the Rotation3d.
-   *
-   * @return The quaternion representation of the Rotation3d.
-   */
-  public Quaternion getQuaternion() {
-    return m_q;
+    return new Rotation3d(quaternion.times(W.times(dt / 2.0).exp()));
   }
 
   /**
@@ -457,10 +450,10 @@ public final class Rotation3d
    * @return The counterclockwise rotation angle around the X axis (roll) in radians.
    */
   public double getX() {
-    final var w = m_q.getW();
-    final var x = m_q.getX();
-    final var y = m_q.getY();
-    final var z = m_q.getZ();
+    final var w = quaternion.w;
+    final var x = quaternion.x;
+    final var y = quaternion.y;
+    final var z = quaternion.z;
 
     // wpimath/docs/Quaternion.md
     final var cxcy = 1.0 - 2.0 * (x * x + y * y);
@@ -479,10 +472,10 @@ public final class Rotation3d
    * @return The counterclockwise rotation angle around the Y axis (pitch) in radians.
    */
   public double getY() {
-    final var w = m_q.getW();
-    final var x = m_q.getX();
-    final var y = m_q.getY();
-    final var z = m_q.getZ();
+    final var w = quaternion.w;
+    final var x = quaternion.x;
+    final var y = quaternion.y;
+    final var z = quaternion.z;
 
     // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Quaternion_to_Euler_angles_(in_3-2-1_sequence)_conversion
     double ratio = 2.0 * (w * y - z * x);
@@ -499,10 +492,10 @@ public final class Rotation3d
    * @return The counterclockwise rotation angle around the Z axis (yaw) in radians.
    */
   public double getZ() {
-    final var w = m_q.getW();
-    final var x = m_q.getX();
-    final var y = m_q.getY();
-    final var z = m_q.getZ();
+    final var w = quaternion.w;
+    final var x = quaternion.x;
+    final var y = quaternion.y;
+    final var z = quaternion.z;
 
     // wpimath/docs/Quaternion.md
     final var cycz = 1.0 - 2.0 * (y * y + z * z);
@@ -549,11 +542,14 @@ public final class Rotation3d
    */
   public Vector<N3> getAxis() {
     double norm =
-        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
+        Math.sqrt(
+            quaternion.x * quaternion.x
+                + quaternion.y * quaternion.y
+                + quaternion.z * quaternion.z);
     if (norm == 0.0) {
       return VecBuilder.fill(0.0, 0.0, 0.0);
     } else {
-      return VecBuilder.fill(m_q.getX() / norm, m_q.getY() / norm, m_q.getZ() / norm);
+      return VecBuilder.fill(quaternion.x / norm, quaternion.y / norm, quaternion.z / norm);
     }
   }
 
@@ -564,8 +560,11 @@ public final class Rotation3d
    */
   public double getAngle() {
     double norm =
-        Math.sqrt(m_q.getX() * m_q.getX() + m_q.getY() * m_q.getY() + m_q.getZ() * m_q.getZ());
-    return 2.0 * Math.atan2(norm, m_q.getW());
+        Math.sqrt(
+            quaternion.x * quaternion.x
+                + quaternion.y * quaternion.y
+                + quaternion.z * quaternion.z);
+    return 2.0 * Math.atan2(norm, quaternion.w);
   }
 
   /**
@@ -574,10 +573,10 @@ public final class Rotation3d
    * @return Rotation matrix representation of this rotation.
    */
   public Matrix<N3, N3> toMatrix() {
-    double w = m_q.getW();
-    double x = m_q.getX();
-    double y = m_q.getY();
-    double z = m_q.getZ();
+    double w = quaternion.w;
+    double x = quaternion.x;
+    double y = quaternion.y;
+    double z = quaternion.z;
 
     // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation#Quaternion-derived_rotation_matrix
     return MatBuilder.fill(
@@ -600,7 +599,7 @@ public final class Rotation3d
    * @return Rotation vector representation of this rotation.
    */
   public Vector<N3> toVector() {
-    return m_q.toRotationVector();
+    return quaternion.toRotationVector();
   }
 
   /**
@@ -623,7 +622,7 @@ public final class Rotation3d
 
   @Override
   public String toString() {
-    return String.format("Rotation3d(%s)", m_q);
+    return String.format("Rotation3d(%s)", quaternion);
   }
 
   /**
@@ -635,12 +634,15 @@ public final class Rotation3d
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Rotation3d other
-        && Math.abs(Math.abs(m_q.dot(other.m_q)) - m_q.norm() * other.m_q.norm()) < 1e-9;
+        && Math.abs(
+                Math.abs(quaternion.dot(other.quaternion))
+                    - quaternion.norm() * other.quaternion.norm())
+            < 1e-9;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_q);
+    return Objects.hash(quaternion);
   }
 
   @Override
@@ -650,11 +652,11 @@ public final class Rotation3d
     // slerp(q₀, q₁, t) = (q₁q₀⁻¹)ᵗq₀
     //
     // We negate the delta quaternion if necessary to take the shortest path
-    var q0 = m_q;
-    var q1 = endValue.m_q;
+    var q0 = quaternion;
+    var q1 = endValue.quaternion;
     var delta = q1.times(q0.inverse());
-    if (delta.getW() < 0.0) {
-      delta = new Quaternion(-delta.getW(), -delta.getX(), -delta.getY(), -delta.getZ());
+    if (delta.w < 0.0) {
+      delta = new Quaternion(-delta.w, -delta.x, -delta.y, -delta.z);
     }
     return new Rotation3d(delta.pow(t).times(q0));
   }

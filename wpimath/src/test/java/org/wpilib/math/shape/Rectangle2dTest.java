@@ -81,14 +81,14 @@ class Rectangle2dTest {
     var point1 = new Translation2d(1.0, 3.0);
     var nearestPoint1 = rect.nearest(point1);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint1.getX(), EPSILON),
-        () -> assertEquals(2.5, nearestPoint1.getY(), EPSILON));
+        () -> assertEquals(1.0, nearestPoint1.x, EPSILON),
+        () -> assertEquals(2.5, nearestPoint1.y, EPSILON));
 
     var point2 = new Translation2d(0.0, 0.0);
     var nearestPoint2 = rect.nearest(point2);
     assertAll(
-        () -> assertEquals(0.0, nearestPoint2.getX(), EPSILON),
-        () -> assertEquals(0.0, nearestPoint2.getY(), EPSILON));
+        () -> assertEquals(0.0, nearestPoint2.x, EPSILON),
+        () -> assertEquals(0.0, nearestPoint2.y, EPSILON));
   }
 
   @Test

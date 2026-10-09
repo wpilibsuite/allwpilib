@@ -20,6 +20,6 @@ class Rotation3dProtoTest {
     Rotation3d.proto.pack(proto, DATA);
 
     Rotation3d data = Rotation3d.proto.unpack(proto);
-    assertEquals(DATA.getQuaternion(), data.getQuaternion());
+    assertEquals(DATA.quaternion, data.quaternion);
   }
 }

@@ -21,10 +21,10 @@ public class DifferentialDriveWheelVelocities
         ProtobufSerializable,
         StructSerializable {
   /** Velocity of the left side of the robot in meters per second. */
-  public double left;
+  public final double left;
 
   /** Velocity of the right side of the robot in meters per second. */
-  public double right;
+  public final double right;
 
   /** DifferentialDriveWheelVelocities protobuf for serialization. */
   public static final DifferentialDriveWheelVelocitiesProto proto =
@@ -35,7 +35,9 @@ public class DifferentialDriveWheelVelocities
       new DifferentialDriveWheelVelocitiesStruct();
 
   /** Constructs a DifferentialDriveWheelVelocities with zeros for left and right velocities. */
-  public DifferentialDriveWheelVelocities() {}
+  public DifferentialDriveWheelVelocities() {
+    this(0.0, 0.0);
+  }
 
   /**
    * Constructs a DifferentialDriveWheelVelocities.

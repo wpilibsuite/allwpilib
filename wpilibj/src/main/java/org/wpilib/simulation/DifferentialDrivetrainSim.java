@@ -297,7 +297,7 @@ public class DifferentialDrivetrainSim {
   public void setPose(Pose2d pose) {
     m_x.set(State.X.value, 0, pose.getX());
     m_x.set(State.Y.value, 0, pose.getY());
-    m_x.set(State.HEADING.value, 0, pose.getRotation().getRadians());
+    m_x.set(State.HEADING.value, 0, pose.rotation.getRadians());
     m_x.set(State.LEFT_POSITION.value, 0, 0);
     m_x.set(State.RIGHT_POSITION.value, 0, 0);
   }

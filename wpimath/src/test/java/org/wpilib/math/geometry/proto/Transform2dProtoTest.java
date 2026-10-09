@@ -22,7 +22,7 @@ class Transform2dProtoTest {
     Transform2d.proto.pack(proto, DATA);
 
     Transform2d data = Transform2d.proto.unpack(proto);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

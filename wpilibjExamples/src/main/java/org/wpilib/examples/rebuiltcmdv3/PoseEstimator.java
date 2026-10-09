@@ -62,6 +62,6 @@ public class PoseEstimator {
    * @return True if the pose is within the zone, false otherwise
    */
   public boolean inZone(Rectangle2d bounds) {
-    return bounds.contains(poseEstimator.getEstimatedPosition().getTranslation());
+    return bounds.contains(poseEstimator.getEstimatedPosition().translation);
   }
 }

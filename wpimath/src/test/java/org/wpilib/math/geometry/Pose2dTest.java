@@ -21,7 +21,7 @@ class Pose2dTest {
 
     assertEquals(0.1524, pose.getX(), EPSILON);
     assertEquals(0.2032, pose.getY(), EPSILON);
-    assertEquals(Math.PI / 4, pose.getRotation().getRadians(), EPSILON);
+    assertEquals(Math.PI / 4, pose.rotation.getRadians(), EPSILON);
   }
 
   @Test
@@ -34,15 +34,15 @@ class Pose2dTest {
     var rotated = initial.rotateBy(rotation);
 
     // Translation is rotated by CCW rotation matrix
-    double c = rotation.getCos();
-    double s = rotation.getSin();
+    double c = rotation.cos;
+    double s = rotation.sin;
     assertAll(
         () -> assertEquals(c * x - s * y, rotated.getX(), EPSILON),
         () -> assertEquals(s * x + c * y, rotated.getY(), EPSILON),
         () ->
             assertEquals(
-                initial.getRotation().getDegrees() + rotation.getDegrees(),
-                rotated.getRotation().getDegrees(),
+                initial.rotation.getDegrees() + rotation.getDegrees(),
+                rotated.rotation.getDegrees(),
                 EPSILON));
   }
 
@@ -56,7 +56,7 @@ class Pose2dTest {
     assertAll(
         () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), EPSILON),
         () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), EPSILON),
-        () -> assertEquals(50.0, transformed.getRotation().getDegrees(), EPSILON));
+        () -> assertEquals(50.0, transformed.rotation.getDegrees(), EPSILON));
   }
 
   @Test
@@ -69,7 +69,7 @@ class Pose2dTest {
     assertAll(
         () -> assertEquals(5.0 * Math.sqrt(2.0), finalRelativeToInitial.getX(), EPSILON),
         () -> assertEquals(0.0, finalRelativeToInitial.getY(), EPSILON),
-        () -> assertEquals(0.0, finalRelativeToInitial.getRotation().getDegrees(), EPSILON));
+        () -> assertEquals(0.0, finalRelativeToInitial.rotation.getDegrees(), EPSILON));
   }
 
   @Test
@@ -82,7 +82,7 @@ class Pose2dTest {
     assertAll(
         () -> assertEquals(-5.0, rotated.getX(), EPSILON),
         () -> assertEquals(0.0, rotated.getY(), EPSILON),
-        () -> assertEquals(180.0, rotated.getRotation().getDegrees(), EPSILON));
+        () -> assertEquals(180.0, rotated.rotation.getDegrees(), EPSILON));
   }
 
   @Test
@@ -117,7 +117,7 @@ class Pose2dTest {
     assertAll(
         () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), EPSILON),
         () -> assertEquals(0.0, transform.getY(), EPSILON),
-        () -> assertEquals(0.0, transform.getRotation().getDegrees(), EPSILON));
+        () -> assertEquals(0.0, transform.rotation.getDegrees(), EPSILON));
   }
 
   @Test

@@ -33,7 +33,7 @@ public final class Rotation3dProto implements Protobuf<Rotation3d, ProtobufRotat
 
   @Override
   public void pack(ProtobufRotation3d msg, Rotation3d value) {
-    Quaternion.proto.pack(msg.getMutableQ(), value.getQuaternion());
+    Quaternion.proto.pack(msg.getMutableQ(), value.quaternion);
   }
 
   @Override

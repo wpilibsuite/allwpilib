@@ -28,7 +28,7 @@ class Transform3dStructTest {
     buffer.rewind();
 
     Transform3d data = Transform3d.struct.unpack(buffer);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

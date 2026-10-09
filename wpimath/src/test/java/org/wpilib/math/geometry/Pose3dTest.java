@@ -37,13 +37,11 @@ class Pose3dTest {
         () -> assertEquals(c * x - s * y, rotated.getX(), EPSILON),
         () -> assertEquals(s * x + c * y, rotated.getY(), EPSILON),
         () -> assertEquals(0.0, rotated.getZ(), EPSILON),
-        () -> assertEquals(0.0, rotated.getRotation().getX(), EPSILON),
-        () -> assertEquals(0.0, rotated.getRotation().getY(), EPSILON),
+        () -> assertEquals(0.0, rotated.rotation.getX(), EPSILON),
+        () -> assertEquals(0.0, rotated.rotation.getY(), EPSILON),
         () ->
             assertEquals(
-                initial.getRotation().getZ() + rotation.getZ(),
-                rotated.getRotation().getZ(),
-                EPSILON));
+                initial.rotation.getZ() + rotation.getZ(), rotated.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -78,13 +76,9 @@ class Pose3dTest {
         initialPose.transformBy(transform1).transformBy(transform2).transformBy(transform3);
 
     assertAll(
-        () ->
-            assertEquals(finalPose.getRotation().getX(), initialPose.getRotation().getX(), EPSILON),
-        () ->
-            assertEquals(finalPose.getRotation().getY(), initialPose.getRotation().getY(), EPSILON),
-        () ->
-            assertEquals(
-                finalPose.getRotation().getZ(), initialPose.getRotation().getZ(), EPSILON));
+        () -> assertEquals(finalPose.rotation.getX(), initialPose.rotation.getX(), EPSILON),
+        () -> assertEquals(finalPose.rotation.getY(), initialPose.rotation.getY(), EPSILON),
+        () -> assertEquals(finalPose.rotation.getZ(), initialPose.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -102,7 +96,7 @@ class Pose3dTest {
     assertAll(
         () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), EPSILON),
         () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), EPSILON),
-        () -> assertEquals(degreesToRadians(50.0), transformed.getRotation().getZ(), EPSILON));
+        () -> assertEquals(degreesToRadians(50.0), transformed.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -117,7 +111,7 @@ class Pose3dTest {
     assertAll(
         () -> assertEquals(5.0 * Math.sqrt(2.0), finalRelativeToInitial.getX(), EPSILON),
         () -> assertEquals(0.0, finalRelativeToInitial.getY(), EPSILON),
-        () -> assertEquals(0.0, finalRelativeToInitial.getRotation().getZ(), EPSILON));
+        () -> assertEquals(0.0, finalRelativeToInitial.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -130,7 +124,7 @@ class Pose3dTest {
     assertAll(
         () -> assertEquals(-5.0, rotated.getX(), EPSILON),
         () -> assertEquals(0.0, rotated.getY(), EPSILON),
-        () -> assertEquals(Math.PI, rotated.getRotation().getZ(), EPSILON));
+        () -> assertEquals(Math.PI, rotated.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -163,7 +157,7 @@ class Pose3dTest {
     assertAll(
         () -> assertEquals(5.0 * Math.sqrt(2.0), transform.getX(), EPSILON),
         () -> assertEquals(0.0, transform.getY(), EPSILON),
-        () -> assertEquals(0.0, transform.getRotation().getZ(), EPSILON));
+        () -> assertEquals(0.0, transform.rotation.getZ(), EPSILON));
   }
 
   @Test
@@ -242,26 +236,10 @@ class Pose3dTest {
           () -> assertEquals(start_exp.getX(), end.getX(), eps),
           () -> assertEquals(start_exp.getY(), end.getY(), eps),
           () -> assertEquals(start_exp.getZ(), end.getZ(), eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getW(),
-                  end.getRotation().getQuaternion().getW(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getX(),
-                  end.getRotation().getQuaternion().getX(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getY(),
-                  end.getRotation().getQuaternion().getY(),
-                  eps),
-          () ->
-              assertEquals(
-                  start_exp.getRotation().getQuaternion().getZ(),
-                  end.getRotation().getQuaternion().getZ(),
-                  eps));
+          () -> assertEquals(start_exp.rotation.quaternion.w, end.rotation.quaternion.w, eps),
+          () -> assertEquals(start_exp.rotation.quaternion.x, end.rotation.quaternion.x, eps),
+          () -> assertEquals(start_exp.rotation.quaternion.y, end.rotation.quaternion.y, eps),
+          () -> assertEquals(start_exp.rotation.quaternion.z, end.rotation.quaternion.z, eps));
     }
   }
 

@@ -41,10 +41,10 @@ public class SwerveDriveKinematicsConstraint implements TrajectoryConstraint {
   @Override
   public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
     // Represents the velocity of the chassis in the x direction
-    var xdVelocity = velocity * pose.getRotation().getCos();
+    var xdVelocity = velocity * pose.rotation.cos;
 
     // Represents the velocity of the chassis in the y direction
-    var ydVelocity = velocity * pose.getRotation().getSin();
+    var ydVelocity = velocity * pose.rotation.sin;
 
     // Create an object to represent the current chassis velocities.
     var chassisVelocities = new ChassisVelocities(xdVelocity, ydVelocity, velocity * curvature);

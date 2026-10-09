@@ -18,16 +18,18 @@ import org.wpilib.util.struct.StructSerializable;
  */
 public final class Twist2d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
-  public double dx;
+  public final double dx;
 
   /** Linear "dy" component. */
-  public double dy;
+  public final double dy;
 
   /** Angular "dtheta" component (radians). */
-  public double dtheta;
+  public final double dtheta;
 
   /** Default constructor. */
-  public Twist2d() {}
+  public Twist2d() {
+    this(0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a Twist2d with the given values.

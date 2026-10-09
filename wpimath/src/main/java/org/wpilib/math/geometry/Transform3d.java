@@ -33,8 +33,11 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    */
   public static final Transform3d ZERO = new Transform3d();
 
-  private final Translation3d m_translation;
-  private final Rotation3d m_rotation;
+  /** The translational component of the transform. */
+  public final Translation3d translation;
+
+  /** The rotational component of the transform. */
+  public final Rotation3d rotation;
 
   /**
    * Constructs the transform that maps the initial pose to the final pose.
@@ -45,12 +48,9 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   public Transform3d(Pose3d initial, Pose3d last) {
     // To transform the global translation delta to be relative to the initial
     // pose, rotate by the inverse of the initial pose's orientation.
-    m_translation =
-        last.getTranslation()
-            .minus(initial.getTranslation())
-            .rotateBy(initial.getRotation().inverse());
+    translation = last.translation.minus(initial.translation).rotateBy(initial.rotation.inverse());
 
-    m_rotation = last.getRotation().relativeTo(initial.getRotation());
+    rotation = last.rotation.relativeTo(initial.rotation);
   }
 
   /**
@@ -60,8 +60,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @param rotation Rotational component of the transform.
    */
   public Transform3d(Translation3d translation, Rotation3d rotation) {
-    m_translation = translation;
-    m_rotation = rotation;
+    this.translation = translation;
+    this.rotation = rotation;
   }
 
   /**
@@ -73,8 +73,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @param rotation The rotational component of the transform.
    */
   public Transform3d(double x, double y, double z, Rotation3d rotation) {
-    m_translation = new Translation3d(x, y, z);
-    m_rotation = rotation;
+    translation = new Translation3d(x, y, z);
+    this.rotation = rotation;
   }
 
   /**
@@ -97,8 +97,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @throws IllegalArgumentException if the affine transformation matrix is invalid.
    */
   public Transform3d(Matrix<N4, N4> matrix) {
-    m_translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
-    m_rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
+    translation = new Translation3d(matrix.get(0, 3), matrix.get(1, 3), matrix.get(2, 3));
+    rotation = new Rotation3d(matrix.block(3, 3, 0, 0));
     if (matrix.get(3, 0) != 0.0
         || matrix.get(3, 1) != 0.0
         || matrix.get(3, 2) != 0.0
@@ -109,8 +109,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform3d() {
-    m_translation = Translation3d.ZERO;
-    m_rotation = Rotation3d.ZERO;
+    translation = Translation3d.ZERO;
+    rotation = Rotation3d.ZERO;
   }
 
   /**
@@ -121,8 +121,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @see Translation3d#Translation3d(Translation2d)
    */
   public Transform3d(Transform2d transform) {
-    m_translation = new Translation3d(transform.getTranslation());
-    m_rotation = new Rotation3d(transform.getRotation());
+    translation = new Translation3d(transform.translation);
+    rotation = new Rotation3d(transform.rotation);
   }
 
   /**
@@ -132,7 +132,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The scaled Transform3d.
    */
   public Transform3d times(double scalar) {
-    return new Transform3d(m_translation.times(scalar), m_rotation.times(scalar));
+    return new Transform3d(translation.times(scalar), rotation.times(scalar));
   }
 
   /**
@@ -157,21 +157,12 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   }
 
   /**
-   * Returns the translation component of the transformation.
-   *
-   * @return The translational component of the transform.
-   */
-  public Translation3d getTranslation() {
-    return m_translation;
-  }
-
-  /**
    * Returns the X component of the transformation's translation.
    *
    * @return The x component of the transformation's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return translation.x;
   }
 
   /**
@@ -180,7 +171,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The y component of the transformation's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return translation.y;
   }
 
   /**
@@ -189,7 +180,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The z component of the transformation's translation.
    */
   public double getZ() {
-    return m_translation.getZ();
+    return translation.z;
   }
 
   /**
@@ -198,7 +189,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The x component of the transformation's translation in a measure.
    */
   public Distance getMeasureX() {
-    return m_translation.getMeasureX();
+    return translation.getMeasureX();
   }
 
   /**
@@ -207,7 +198,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The y component of the transformation's translation in a measure.
    */
   public Distance getMeasureY() {
-    return m_translation.getMeasureY();
+    return translation.getMeasureY();
   }
 
   /**
@@ -216,7 +207,7 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The z component of the transformation's translation in a measure.
    */
   public Distance getMeasureZ() {
-    return m_translation.getMeasureZ();
+    return translation.getMeasureZ();
   }
 
   /**
@@ -225,8 +216,8 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return An affine transformation matrix representation of this transformation.
    */
   public Matrix<N4, N4> toMatrix() {
-    var vec = m_translation.toVector();
-    var mat = m_rotation.toMatrix();
+    var vec = translation.toVector();
+    var mat = rotation.toMatrix();
     return MatBuilder.fill(
         Nat.N4(),
         Nat.N4(),
@@ -249,31 +240,22 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   }
 
   /**
-   * Returns the rotational component of the transformation.
-   *
-   * @return Reference to the rotational component of the transform.
-   */
-  public Rotation3d getRotation() {
-    return m_rotation;
-  }
-
-  /**
    * Returns a Twist3d of the current transform (pose delta). If b is the output of {@code a.log()},
    * then {@code b.exp()} would yield a.
    *
    * @return The twist that maps the current transform.
    */
   public Twist3d log() {
-    var thisQuaternion = m_rotation.getQuaternion();
+    var thisQuaternion = rotation.quaternion;
     double[] resultArray =
         Transform3dJNI.log(
             this.getX(),
             this.getY(),
             this.getZ(),
-            thisQuaternion.getW(),
-            thisQuaternion.getX(),
-            thisQuaternion.getY(),
-            thisQuaternion.getZ());
+            thisQuaternion.w,
+            thisQuaternion.x,
+            thisQuaternion.y,
+            thisQuaternion.z);
     return new Twist3d(
         resultArray[0],
         resultArray[1],
@@ -293,12 +275,12 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
     return new Transform3d(
-        getTranslation().unaryMinus().rotateBy(getRotation().inverse()), getRotation().inverse());
+        translation.unaryMinus().rotateBy(rotation.inverse()), rotation.inverse());
   }
 
   @Override
   public String toString() {
-    return String.format("Transform3d(%s, %s)", m_translation, m_rotation);
+    return String.format("Transform3d(%s, %s)", translation, rotation);
   }
 
   /**
@@ -310,13 +292,13 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Transform3d other
-        && other.m_translation.equals(m_translation)
-        && other.m_rotation.equals(m_rotation);
+        && other.translation.equals(translation)
+        && other.rotation.equals(rotation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_translation, m_rotation);
+    return Objects.hash(translation, rotation);
   }
 
   /** Transform3d protobuf for serialization. */

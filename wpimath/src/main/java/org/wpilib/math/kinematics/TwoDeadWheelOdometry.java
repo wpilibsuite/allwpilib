@@ -171,7 +171,7 @@ public class TwoDeadWheelOdometry {
    * @param translation The translation to reset to.
    */
   public void resetTranslation(Translation2d translation) {
-    m_pose = new Pose2d(translation, m_pose.getRotation());
+    m_pose = new Pose2d(translation, m_pose.rotation);
   }
 
   /**
@@ -180,7 +180,7 @@ public class TwoDeadWheelOdometry {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation2d rotation) {
-    m_pose = new Pose2d(m_pose.getTranslation(), rotation);
+    m_pose = new Pose2d(m_pose.translation, rotation);
   }
 
   /**

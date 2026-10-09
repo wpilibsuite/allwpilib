@@ -15,18 +15,14 @@ class CoordinateSystemTest {
       Pose3d poseFrom, Pose3d poseTo, CoordinateSystem coordFrom, CoordinateSystem coordTo) {
     // "from" to "to"
     assertEquals(
-        poseTo.getTranslation(),
-        CoordinateSystem.convert(poseFrom.getTranslation(), coordFrom, coordTo));
-    assertEquals(
-        poseTo.getRotation(), CoordinateSystem.convert(poseFrom.getRotation(), coordFrom, coordTo));
+        poseTo.translation, CoordinateSystem.convert(poseFrom.translation, coordFrom, coordTo));
+    assertEquals(poseTo.rotation, CoordinateSystem.convert(poseFrom.rotation, coordFrom, coordTo));
     assertEquals(poseTo, CoordinateSystem.convert(poseFrom, coordFrom, coordTo));
 
     // "to" to "from"
     assertEquals(
-        poseFrom.getTranslation(),
-        CoordinateSystem.convert(poseTo.getTranslation(), coordTo, coordFrom));
-    assertEquals(
-        poseFrom.getRotation(), CoordinateSystem.convert(poseTo.getRotation(), coordTo, coordFrom));
+        poseFrom.translation, CoordinateSystem.convert(poseTo.translation, coordTo, coordFrom));
+    assertEquals(poseFrom.rotation, CoordinateSystem.convert(poseTo.rotation, coordTo, coordFrom));
     assertEquals(poseFrom, CoordinateSystem.convert(poseTo, coordTo, coordFrom));
   }
 
@@ -37,14 +33,14 @@ class CoordinateSystemTest {
       CoordinateSystem coordTo) {
     // "from" to "to"
     assertEquals(
-        transformTo.getTranslation(),
-        CoordinateSystem.convert(transformFrom.getTranslation(), coordFrom, coordTo));
+        transformTo.translation,
+        CoordinateSystem.convert(transformFrom.translation, coordFrom, coordTo));
     assertEquals(transformTo, CoordinateSystem.convert(transformFrom, coordFrom, coordTo));
 
     // "to" to "from"
     assertEquals(
-        transformFrom.getTranslation(),
-        CoordinateSystem.convert(transformTo.getTranslation(), coordTo, coordFrom));
+        transformFrom.translation,
+        CoordinateSystem.convert(transformTo.translation, coordTo, coordFrom));
     assertEquals(transformFrom, CoordinateSystem.convert(transformTo, coordTo, coordFrom));
   }
 

@@ -25,7 +25,7 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
 
   @Override
   public double getMaxVelocity(Pose2d pose, double curvature, double velocity) {
-    if (m_ellipse.contains(pose.getTranslation())) {
+    if (m_ellipse.contains(pose.translation)) {
       return m_constraint.getMaxVelocity(pose, curvature, velocity);
     } else {
       return Double.POSITIVE_INFINITY;
@@ -34,7 +34,7 @@ public class EllipticalRegionConstraint implements TrajectoryConstraint {
 
   @Override
   public MinMax getMinMaxAcceleration(Pose2d pose, double curvature, double velocity) {
-    if (m_ellipse.contains(pose.getTranslation())) {
+    if (m_ellipse.contains(pose.translation)) {
       return m_constraint.getMinMaxAcceleration(pose, curvature, velocity);
     } else {
       return new MinMax();

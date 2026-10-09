@@ -9,10 +9,10 @@ import org.wpilib.math.geometry.Pose2d;
 /** Represents a pair of a pose and a curvature. */
 public class PoseWithCurvature {
   /** Represents the pose. */
-  public Pose2d pose;
+  public final Pose2d pose;
 
   /** Represents the curvature in radians per meter. */
-  public double curvature;
+  public final double curvature;
 
   /**
    * Constructs a PoseWithCurvature.
@@ -27,6 +27,6 @@ public class PoseWithCurvature {
 
   /** Constructs a PoseWithCurvature with default values. */
   public PoseWithCurvature() {
-    pose = Pose2d.ZERO;
+    this(Pose2d.ZERO, 0.0);
   }
 }

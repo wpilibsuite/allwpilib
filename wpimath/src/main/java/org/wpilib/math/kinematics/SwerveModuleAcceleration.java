@@ -22,10 +22,10 @@ public class SwerveModuleAcceleration
         ProtobufSerializable,
         StructSerializable {
   /** Acceleration of the wheel of the module in meters per second squared. */
-  public double acceleration;
+  public final double acceleration;
 
   /** Angle of the acceleration vector. */
-  public Rotation2d angle = new Rotation2d();
+  public final Rotation2d angle;
 
   /** SwerveModuleAccelerations protobuf for serialization. */
   public static final SwerveModuleAccelerationProto proto = new SwerveModuleAccelerationProto();
@@ -34,7 +34,9 @@ public class SwerveModuleAcceleration
   public static final SwerveModuleAccelerationStruct struct = new SwerveModuleAccelerationStruct();
 
   /** Constructs a SwerveModuleAccelerations with zeros for acceleration and angle. */
-  public SwerveModuleAcceleration() {}
+  public SwerveModuleAcceleration() {
+    this(0.0, Rotation2d.ZERO);
+  }
 
   /**
    * Constructs a SwerveModuleAccelerations.

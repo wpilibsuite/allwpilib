@@ -25,7 +25,7 @@ class Pose2dStructTest {
     buffer.rewind();
 
     Pose2d data = Pose2d.struct.unpack(buffer);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

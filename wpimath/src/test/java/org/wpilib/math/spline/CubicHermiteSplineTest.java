@@ -66,16 +66,14 @@ class CubicHermiteSplineTest {
         () -> assertEquals(a.getY(), poses.getFirst().pose.getY(), 1E-9),
         () ->
             assertEquals(
-                a.getRotation().getRadians(),
-                poses.getFirst().pose.getRotation().getRadians(),
-                1E-9));
+                a.rotation.getRadians(), poses.getFirst().pose.rotation.getRadians(), 1E-9));
 
     // Check interior waypoints
     boolean interiorsGood = true;
     for (var waypoint : waypoints) {
       boolean found = false;
       for (var state : poses) {
-        if (waypoint.getDistance(state.pose.getTranslation()) == 0) {
+        if (waypoint.getDistance(state.pose.translation) == 0) {
           found = true;
         }
       }
@@ -90,9 +88,7 @@ class CubicHermiteSplineTest {
         () -> assertEquals(b.getY(), poses.getLast().pose.getY(), 1E-9),
         () ->
             assertEquals(
-                b.getRotation().getRadians(),
-                poses.getLast().pose.getRotation().getRadians(),
-                1E-9));
+                b.rotation.getRadians(), poses.getLast().pose.rotation.getRadians(), 1E-9));
   }
 
   @Test

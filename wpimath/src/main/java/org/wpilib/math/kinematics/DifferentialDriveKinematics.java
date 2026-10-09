@@ -134,13 +134,6 @@ public class DifferentialDriveKinematics
   }
 
   @Override
-  public void copyInto(
-      DifferentialDriveWheelPositions positions, DifferentialDriveWheelPositions output) {
-    output.left = positions.left;
-    output.right = positions.right;
-  }
-
-  @Override
   public DifferentialDriveWheelPositions interpolate(
       DifferentialDriveWheelPositions startValue,
       DifferentialDriveWheelPositions endValue,

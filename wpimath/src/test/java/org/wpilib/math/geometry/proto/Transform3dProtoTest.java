@@ -25,7 +25,7 @@ class Transform3dProtoTest {
     Transform3d.proto.pack(proto, DATA);
 
     Transform3d data = Transform3d.proto.unpack(proto);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

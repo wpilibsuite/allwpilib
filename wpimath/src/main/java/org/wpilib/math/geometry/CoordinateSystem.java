@@ -121,8 +121,7 @@ public final class CoordinateSystem {
    * @return The given pose in the desired coordinate system.
    */
   public static Pose3d convert(Pose3d pose, CoordinateSystem from, CoordinateSystem to) {
-    return new Pose3d(
-        convert(pose.getTranslation(), from, to), convert(pose.getRotation(), from, to));
+    return new Pose3d(convert(pose.translation, from, to), convert(pose.rotation, from, to));
   }
 
   /**
@@ -151,7 +150,7 @@ public final class CoordinateSystem {
     // In code, the equivalent for rotA rotB is rotB.rotateBy(rotA) (note the
     // change in order).
     return new Transform3d(
-        convert(transform.getTranslation(), from, to),
-        coordRot.inverse().rotateBy(transform.getRotation().rotateBy(coordRot)));
+        convert(transform.translation, from, to),
+        coordRot.inverse().rotateBy(transform.rotation.rotateBy(coordRot)));
   }
 }

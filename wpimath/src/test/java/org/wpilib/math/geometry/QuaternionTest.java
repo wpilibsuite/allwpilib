@@ -17,34 +17,34 @@ class QuaternionTest {
     // Identity
     var q1 = new Quaternion();
     assertAll(
-        () -> assertEquals(1.0, q1.getW()),
-        () -> assertEquals(0.0, q1.getX()),
-        () -> assertEquals(0.0, q1.getY()),
-        () -> assertEquals(0.0, q1.getZ()));
+        () -> assertEquals(1.0, q1.w),
+        () -> assertEquals(0.0, q1.x),
+        () -> assertEquals(0.0, q1.y),
+        () -> assertEquals(0.0, q1.z));
 
     // Normalized
     var q2 = new Quaternion(0.5, 0.5, 0.5, 0.5);
     assertAll(
-        () -> assertEquals(0.5, q2.getW()),
-        () -> assertEquals(0.5, q2.getX()),
-        () -> assertEquals(0.5, q2.getY()),
-        () -> assertEquals(0.5, q2.getZ()));
+        () -> assertEquals(0.5, q2.w),
+        () -> assertEquals(0.5, q2.x),
+        () -> assertEquals(0.5, q2.y),
+        () -> assertEquals(0.5, q2.z));
 
     // Unnormalized
     var q3 = new Quaternion(0.75, 0.3, 0.4, 0.5);
     assertAll(
-        () -> assertEquals(0.75, q3.getW()),
-        () -> assertEquals(0.3, q3.getX()),
-        () -> assertEquals(0.4, q3.getY()),
-        () -> assertEquals(0.5, q3.getZ()));
+        () -> assertEquals(0.75, q3.w),
+        () -> assertEquals(0.3, q3.x),
+        () -> assertEquals(0.4, q3.y),
+        () -> assertEquals(0.5, q3.z));
 
     var q3_norm = q3.normalize();
     double norm = Math.sqrt(0.75 * 0.75 + 0.3 * 0.3 + 0.4 * 0.4 + 0.5 * 0.5);
     assertAll(
-        () -> assertEquals(0.75 / norm, q3_norm.getW()),
-        () -> assertEquals(0.3 / norm, q3_norm.getX()),
-        () -> assertEquals(0.4 / norm, q3_norm.getY()),
-        () -> assertEquals(0.5 / norm, q3_norm.getZ()),
+        () -> assertEquals(0.75 / norm, q3_norm.w),
+        () -> assertEquals(0.3 / norm, q3_norm.x),
+        () -> assertEquals(0.4 / norm, q3_norm.y),
+        () -> assertEquals(0.5 / norm, q3_norm.z),
         () -> assertEquals(1.0, q3_norm.dot(q3_norm)));
   }
 
@@ -55,10 +55,10 @@ class QuaternionTest {
 
     var sum = q.plus(p);
     assertAll(
-        () -> assertEquals(q.getW() + p.getW(), sum.getW()),
-        () -> assertEquals(q.getX() + p.getX(), sum.getX()),
-        () -> assertEquals(q.getY() + p.getY(), sum.getY()),
-        () -> assertEquals(q.getZ() + p.getZ(), sum.getZ()));
+        () -> assertEquals(q.w + p.w, sum.w),
+        () -> assertEquals(q.x + p.x, sum.x),
+        () -> assertEquals(q.y + p.y, sum.y),
+        () -> assertEquals(q.z + p.z, sum.z));
   }
 
   @Test
@@ -69,10 +69,10 @@ class QuaternionTest {
     var difference = q.minus(p);
 
     assertAll(
-        () -> assertEquals(q.getW() - p.getW(), difference.getW()),
-        () -> assertEquals(q.getX() - p.getX(), difference.getX()),
-        () -> assertEquals(q.getY() - p.getY(), difference.getY()),
-        () -> assertEquals(q.getZ() - p.getZ(), difference.getZ()));
+        () -> assertEquals(q.w - p.w, difference.w),
+        () -> assertEquals(q.x - p.x, difference.x),
+        () -> assertEquals(q.y - p.y, difference.y),
+        () -> assertEquals(q.z - p.z, difference.z));
   }
 
   @Test
@@ -83,10 +83,10 @@ class QuaternionTest {
     var product = q.times(scalar);
 
     assertAll(
-        () -> assertEquals(q.getW() * scalar, product.getW()),
-        () -> assertEquals(q.getX() * scalar, product.getX()),
-        () -> assertEquals(q.getY() * scalar, product.getY()),
-        () -> assertEquals(q.getZ() * scalar, product.getZ()));
+        () -> assertEquals(q.w * scalar, product.w),
+        () -> assertEquals(q.x * scalar, product.x),
+        () -> assertEquals(q.y * scalar, product.y),
+        () -> assertEquals(q.z * scalar, product.z));
   }
 
   @Test
@@ -97,10 +97,10 @@ class QuaternionTest {
     var product = q.divide(scalar);
 
     assertAll(
-        () -> assertEquals(q.getW() / scalar, product.getW()),
-        () -> assertEquals(q.getX() / scalar, product.getX()),
-        () -> assertEquals(q.getY() / scalar, product.getY()),
-        () -> assertEquals(q.getZ() / scalar, product.getZ()));
+        () -> assertEquals(q.w / scalar, product.w),
+        () -> assertEquals(q.x / scalar, product.x),
+        () -> assertEquals(q.y / scalar, product.y),
+        () -> assertEquals(q.z / scalar, product.z));
   }
 
   @Test
@@ -117,10 +117,10 @@ class QuaternionTest {
     var expected = yRot;
     final var actual = zRot.times(yRot).times(xRot);
     assertAll(
-        () -> assertEquals(expected.getW(), actual.getW(), 1e-9),
-        () -> assertEquals(expected.getX(), actual.getX(), 1e-9),
-        () -> assertEquals(expected.getY(), actual.getY(), 1e-9),
-        () -> assertEquals(expected.getZ(), actual.getZ(), 1e-9));
+        () -> assertEquals(expected.w, actual.w, 1e-9),
+        () -> assertEquals(expected.x, actual.x, 1e-9),
+        () -> assertEquals(expected.y, actual.y, 1e-9),
+        () -> assertEquals(expected.z, actual.z, 1e-9));
 
     // Identity
     var q =
@@ -128,10 +128,10 @@ class QuaternionTest {
             0.7276068751089989, 0.29104275004359953, 0.38805700005813276, 0.48507125007266594);
     final var actual2 = q.times(q.inverse());
     assertAll(
-        () -> assertEquals(1.0, actual2.getW()),
-        () -> assertEquals(0.0, actual2.getX()),
-        () -> assertEquals(0.0, actual2.getY()),
-        () -> assertEquals(0.0, actual2.getZ()));
+        () -> assertEquals(1.0, actual2.w),
+        () -> assertEquals(0.0, actual2.x),
+        () -> assertEquals(0.0, actual2.y),
+        () -> assertEquals(0.0, actual2.z));
   }
 
   @Test
@@ -140,10 +140,10 @@ class QuaternionTest {
     var inv = q.conjugate();
 
     assertAll(
-        () -> assertEquals(q.getW(), inv.getW()),
-        () -> assertEquals(-q.getX(), inv.getX()),
-        () -> assertEquals(-q.getY(), inv.getY()),
-        () -> assertEquals(-q.getZ(), inv.getZ()));
+        () -> assertEquals(q.w, inv.w),
+        () -> assertEquals(-q.x, inv.x),
+        () -> assertEquals(-q.y, inv.y),
+        () -> assertEquals(-q.z, inv.z));
   }
 
   @Test
@@ -153,10 +153,10 @@ class QuaternionTest {
     var norm = q.norm();
 
     assertAll(
-        () -> assertEquals(q.getW() / (norm * norm), inv.getW(), 1e-10),
-        () -> assertEquals(-q.getX() / (norm * norm), inv.getX(), 1e-10),
-        () -> assertEquals(-q.getY() / (norm * norm), inv.getY(), 1e-10),
-        () -> assertEquals(-q.getZ() / (norm * norm), inv.getZ(), 1e-10));
+        () -> assertEquals(q.w / (norm * norm), inv.w, 1e-10),
+        () -> assertEquals(-q.x / (norm * norm), inv.x, 1e-10),
+        () -> assertEquals(-q.y / (norm * norm), inv.y, 1e-10),
+        () -> assertEquals(-q.z / (norm * norm), inv.z, 1e-10));
   }
 
   @Test
@@ -231,9 +231,7 @@ class QuaternionTest {
     var q = new Quaternion(1.1, 2.2, 3.3, 4.4);
     var p = new Quaternion(5.5, 6.6, 7.7, 8.8);
 
-    assertEquals(
-        q.getW() * p.getW() + q.getX() * p.getX() + q.getY() * p.getY() + q.getZ() * p.getZ(),
-        q.dot(p));
+    assertEquals(q.w * p.w + q.x * p.x + q.y * p.y + q.z * p.z, q.dot(p));
   }
 
   @Test

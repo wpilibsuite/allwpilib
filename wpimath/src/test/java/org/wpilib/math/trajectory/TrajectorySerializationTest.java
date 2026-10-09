@@ -31,7 +31,7 @@ class TrajectorySerializationTest {
       assertEquals(e.time, a.time, EPSILON);
       assertEquals(e.pose.getX(), a.pose.getX(), EPSILON);
       assertEquals(e.pose.getY(), a.pose.getY(), EPSILON);
-      assertEquals(e.pose.getRotation().getRadians(), a.pose.getRotation().getRadians(), EPSILON);
+      assertEquals(e.pose.rotation.getRadians(), a.pose.rotation.getRadians(), EPSILON);
       assertEquals(e.velocity.vx, a.velocity.vx, EPSILON);
       assertEquals(e.velocity.vy, a.velocity.vy, EPSILON);
       assertEquals(e.velocity.omega, a.velocity.omega, EPSILON);

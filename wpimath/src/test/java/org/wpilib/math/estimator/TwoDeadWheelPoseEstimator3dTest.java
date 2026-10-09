@@ -59,7 +59,7 @@ class TwoDeadWheelPoseEstimator3dTest {
     testFollowTrajectory(
         estimator,
         trajectory,
-        state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+        state -> state.velocity.toRobotRelative(state.pose.rotation),
         state -> state.pose,
         trajectory.start().pose,
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -102,13 +102,12 @@ class TwoDeadWheelPoseEstimator3dTest {
                 .pose
                 .plus(
                     new Transform2d(
-                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
-                        heading_offset));
+                        new Translation2d(pose_offset.cos, pose_offset.sin), heading_offset));
 
         testFollowTrajectory(
             estimator,
             trajectory,
-            state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+            state -> state.velocity.toRobotRelative(state.pose.rotation),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -197,15 +196,12 @@ class TwoDeadWheelPoseEstimator3dTest {
               new Rotation3d(
                   groundTruthState
                       .pose
-                      .getRotation()
+                      .rotation
                       .plus(new Rotation2d(rand.nextGaussian() * 0.01))
-                      .minus(trajectory.start().pose.getRotation())));
+                      .minus(trajectory.start().pose.rotation)));
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -219,8 +215,8 @@ class TwoDeadWheelPoseEstimator3dTest {
     assertEquals(
         endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
     assertEquals(
-        endingPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().toRotation2d().getRadians(),
+        endingPose.rotation.getRadians(),
+        estimator.getEstimatedPosition().rotation.toRotation2d().getRadians(),
         0.15,
         "Incorrect Final Theta");
 
@@ -273,8 +269,8 @@ class TwoDeadWheelPoseEstimator3dTest {
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
       var dtheta =
           Math.abs(
-              measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().toRotation2d().getDegrees());
+              measurement.rotation.getDegrees()
+                  - estimator.getEstimatedPosition().rotation.toRotation2d().getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -319,18 +315,18 @@ class TwoDeadWheelPoseEstimator3dTest {
                 odometryPose.getZ(), estimator.getEstimatedPosition().getZ(), "Incorrect Final Y"),
         () ->
             assertEquals(
-                odometryPose.getRotation().getX(),
-                estimator.getEstimatedPosition().getRotation().getX(),
+                odometryPose.rotation.getX(),
+                estimator.getEstimatedPosition().rotation.getX(),
                 "Incorrect Final Roll"),
         () ->
             assertEquals(
-                odometryPose.getRotation().getY(),
-                estimator.getEstimatedPosition().getRotation().getY(),
+                odometryPose.rotation.getY(),
+                estimator.getEstimatedPosition().rotation.getY(),
                 "Incorrect Final Pitch"),
         () ->
             assertEquals(
-                odometryPose.getRotation().getZ(),
-                estimator.getEstimatedPosition().getRotation().getZ(),
+                odometryPose.rotation.getZ(),
+                estimator.getEstimatedPosition().rotation.getZ(),
                 "Incorrect Final Yaw"));
   }
 
@@ -405,9 +401,9 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Test orientation and wheel positions
     estimator.update(2, 0, Rotation3d.ZERO);
@@ -416,9 +412,9 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Add a vision measurement with a different translation
     estimator.addVisionMeasurement(
@@ -428,9 +424,9 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Test reset rotation
     estimator.resetRotation(new Rotation3d(Rotation2d.CCW_PI_2));
@@ -439,11 +435,10 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
         () ->
-            assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+            assertEquals(Math.PI / 2, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Test orientation
     estimator.update(3, 0, Rotation3d.ZERO);
@@ -452,11 +447,10 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
         () ->
-            assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+            assertEquals(Math.PI / 2, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Add a vision measurement with a different rotation
     estimator.addVisionMeasurement(
@@ -466,13 +460,11 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI * 3.0 / 4,
-                estimator.getEstimatedPosition().getRotation().getZ(),
-                kEpsilon));
+                Math.PI * 3.0 / 4, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Test reset translation
     estimator.resetTranslation(new Translation3d(-1, -1, -1));
@@ -481,13 +473,11 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(-1, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(-1, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
         () ->
             assertEquals(
-                Math.PI * 3.0 / 4,
-                estimator.getEstimatedPosition().getRotation().getZ(),
-                kEpsilon));
+                Math.PI * 3.0 / 4, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
 
     // Test reset pose
     estimator.resetPose(Pose3d.ZERO);
@@ -496,8 +486,8 @@ class TwoDeadWheelPoseEstimator3dTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getX(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), kEpsilon),
         () -> assertEquals(0, estimator.getEstimatedPosition().getZ(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getX(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getY(), kEpsilon),
-        () -> assertEquals(0, estimator.getEstimatedPosition().getRotation().getZ(), kEpsilon));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getX(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getY(), kEpsilon),
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getZ(), kEpsilon));
   }
 }

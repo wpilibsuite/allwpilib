@@ -36,8 +36,8 @@ public final class Pose3dProto implements Protobuf<Pose3d, ProtobufPose3d> {
 
   @Override
   public void pack(ProtobufPose3d msg, Pose3d value) {
-    Translation3d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
-    Rotation3d.proto.pack(msg.getMutableRotation(), value.getRotation());
+    Translation3d.proto.pack(msg.getMutableTranslation(), value.translation);
+    Rotation3d.proto.pack(msg.getMutableRotation(), value.rotation);
   }
 
   @Override

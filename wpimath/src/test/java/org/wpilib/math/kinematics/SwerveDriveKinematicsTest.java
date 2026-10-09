@@ -449,13 +449,13 @@ class SwerveDriveKinematicsTest {
 
                   // Tangential acceleration: perpendicular to radius (90° CCW from radius)
                   Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.CCW_PI_2);
-                  double tangentialX = tangentialAccel * tangentialDirection.getCos();
-                  double tangentialY = tangentialAccel * tangentialDirection.getSin();
+                  double tangentialX = tangentialAccel * tangentialDirection.cos;
+                  double tangentialY = tangentialAccel * tangentialDirection.sin;
 
                   // Centripetal acceleration: toward center (opposite of radius)
                   Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.PI);
-                  double centripetalX = centripetalAccel * centripetalDirection.getCos();
-                  double centripetalY = centripetalAccel * centripetalDirection.getSin();
+                  double centripetalX = centripetalAccel * centripetalDirection.cos;
+                  double centripetalY = centripetalAccel * centripetalDirection.sin;
 
                   // Vector sum of tangential and centripetal accelerations
                   double totalX = tangentialX + centripetalX;
@@ -560,17 +560,17 @@ class SwerveDriveKinematicsTest {
                     return Rotation2d.ZERO; // Angle is undefined at center of rotation
                   }
 
-                  Rotation2d radiusAngle = new Rotation2d(relativePos.getX(), relativePos.getY());
+                  Rotation2d radiusAngle = new Rotation2d(relativePos.x, relativePos.y);
 
                   // Tangential acceleration: perpendicular to radius (90° CCW from radius)
                   Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.CCW_PI_2);
-                  double tangentialX = tangentialDirection.getCos() * r; // α * r = 1 * r
-                  double tangentialY = tangentialDirection.getSin() * r;
+                  double tangentialX = tangentialDirection.cos * r; // α * r = 1 * r
+                  double tangentialY = tangentialDirection.sin * r;
 
                   // Centripetal acceleration: toward center (opposite of radius)
                   Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.PI);
-                  double centripetalX = centripetalDirection.getCos() * r; // ω² * r = 1 * r
-                  double centripetalY = centripetalDirection.getSin() * r;
+                  double centripetalX = centripetalDirection.cos * r; // ω² * r = 1 * r
+                  double centripetalY = centripetalDirection.sin * r;
 
                   // Vector sum of tangential and centripetal accelerations
                   double totalX = tangentialX + centripetalX;

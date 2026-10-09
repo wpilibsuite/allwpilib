@@ -19,7 +19,7 @@ class Translation2dProtoTest {
     Translation2d.proto.pack(proto, DATA);
 
     Translation2d data = Translation2d.proto.unpack(proto);
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
   }
 }

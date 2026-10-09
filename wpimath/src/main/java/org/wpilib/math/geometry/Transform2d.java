@@ -31,8 +31,11 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    */
   public static final Transform2d ZERO = new Transform2d();
 
-  private final Translation2d m_translation;
-  private final Rotation2d m_rotation;
+  /** The translational component of the transform. */
+  public final Translation2d translation;
+
+  /** The rotational component of the transform. */
+  public final Rotation2d rotation;
 
   /**
    * Constructs the transform that maps the initial pose to the final pose.
@@ -43,12 +46,10 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
   public Transform2d(Pose2d initial, Pose2d last) {
     // To transform the global translation delta to be relative to the initial
     // pose, rotate by the inverse of the initial pose's orientation.
-    m_translation =
-        last.getTranslation()
-            .minus(initial.getTranslation())
-            .rotateBy(initial.getRotation().unaryMinus());
+    translation =
+        last.translation.minus(initial.translation).rotateBy(initial.rotation.unaryMinus());
 
-    m_rotation = last.getRotation().relativeTo(initial.getRotation());
+    rotation = last.rotation.relativeTo(initial.rotation);
   }
 
   /**
@@ -58,8 +59,8 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @param rotation Rotational component of the transform.
    */
   public Transform2d(Translation2d translation, Rotation2d rotation) {
-    m_translation = translation;
-    m_rotation = rotation;
+    this.translation = translation;
+    this.rotation = rotation;
   }
 
   /**
@@ -70,8 +71,8 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @param rotation The rotational component of the transform.
    */
   public Transform2d(double x, double y, Rotation2d rotation) {
-    m_translation = new Translation2d(x, y);
-    m_rotation = rotation;
+    translation = new Translation2d(x, y);
+    this.rotation = rotation;
   }
 
   /**
@@ -93,8 +94,8 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @throws IllegalArgumentException if the affine transformation matrix is invalid.
    */
   public Transform2d(Matrix<N3, N3> matrix) {
-    m_translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
-    m_rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
+    translation = new Translation2d(matrix.get(0, 2), matrix.get(1, 2));
+    rotation = new Rotation2d(matrix.block(2, 2, 0, 0));
     if (matrix.get(2, 0) != 0.0 || matrix.get(2, 1) != 0.0 || matrix.get(2, 2) != 1.0) {
       throw new IllegalArgumentException("Affine transformation matrix is invalid");
     }
@@ -102,8 +103,8 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
 
   /** Constructs the identity transform -- maps an initial pose to itself. */
   public Transform2d() {
-    m_translation = Translation2d.ZERO;
-    m_rotation = Rotation2d.ZERO;
+    translation = Translation2d.ZERO;
+    rotation = Rotation2d.ZERO;
   }
 
   /**
@@ -113,7 +114,7 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @return The scaled Transform2d.
    */
   public Transform2d times(double scalar) {
-    return new Transform2d(m_translation.times(scalar), m_rotation.times(scalar));
+    return new Transform2d(translation.times(scalar), rotation.times(scalar));
   }
 
   /**
@@ -138,21 +139,12 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
   }
 
   /**
-   * Returns the translation component of the transformation.
-   *
-   * @return The translational component of the transform.
-   */
-  public Translation2d getTranslation() {
-    return m_translation;
-  }
-
-  /**
    * Returns the X component of the transformation's translation.
    *
    * @return The x component of the transformation's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return translation.x;
   }
 
   /**
@@ -161,7 +153,7 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @return The y component of the transformation's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return translation.y;
   }
 
   /**
@@ -170,7 +162,7 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @return The x component of the transformation's translation in a measure.
    */
   public Distance getMeasureX() {
-    return m_translation.getMeasureX();
+    return translation.getMeasureX();
   }
 
   /**
@@ -179,7 +171,7 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @return The y component of the transformation's translation in a measure.
    */
   public Distance getMeasureY() {
-    return m_translation.getMeasureY();
+    return translation.getMeasureY();
   }
 
   /**
@@ -188,8 +180,8 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
    * @return An affine transformation matrix representation of this transformation.
    */
   public Matrix<N3, N3> toMatrix() {
-    var vec = m_translation.toVector();
-    var mat = m_rotation.toMatrix();
+    var vec = translation.toVector();
+    var mat = rotation.toMatrix();
     return MatBuilder.fill(
         Nat.N3(),
         Nat.N3(),
@@ -205,39 +197,30 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
   }
 
   /**
-   * Returns the rotational component of the transformation.
-   *
-   * @return Reference to the rotational component of the transform.
-   */
-  public Rotation2d getRotation() {
-    return m_rotation;
-  }
-
-  /**
    * Returns a Twist2d of the current transform (pose delta). If b is the output of {@code a.log()},
    * then {@code b.exp()} would yield a.
    *
    * @return The twist that maps the current transform.
    */
   public Twist2d log() {
-    final double dtheta = m_rotation.getRadians();
+    final double dtheta = rotation.getRadians();
     final double halfDtheta = dtheta / 2.0;
 
-    final double cosMinusOne = m_rotation.getCos() - 1;
+    final double cosMinusOne = rotation.cos - 1;
 
     double halfThetaByTanOfHalfDtheta;
     if (Math.abs(cosMinusOne) < 1E-9) {
       halfThetaByTanOfHalfDtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
     } else {
-      halfThetaByTanOfHalfDtheta = -(halfDtheta * m_rotation.getSin()) / cosMinusOne;
+      halfThetaByTanOfHalfDtheta = -(halfDtheta * rotation.sin) / cosMinusOne;
     }
 
     Translation2d translationPart =
-        m_translation
+        translation
             .rotateBy(new Rotation2d(halfThetaByTanOfHalfDtheta, -halfDtheta))
             .times(Math.hypot(halfThetaByTanOfHalfDtheta, halfDtheta));
 
-    return new Twist2d(translationPart.getX(), translationPart.getY(), dtheta);
+    return new Twist2d(translationPart.x, translationPart.y, dtheta);
   }
 
   /**
@@ -250,13 +233,12 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
     // using a clockwise rotation matrix. This transforms the global
     // delta into a local delta (relative to the initial pose).
     return new Transform2d(
-        getTranslation().unaryMinus().rotateBy(getRotation().unaryMinus()),
-        getRotation().unaryMinus());
+        translation.unaryMinus().rotateBy(rotation.unaryMinus()), rotation.unaryMinus());
   }
 
   @Override
   public String toString() {
-    return String.format("Transform2d(%s, %s)", m_translation, m_rotation);
+    return String.format("Transform2d(%s, %s)", translation, rotation);
   }
 
   /**
@@ -268,13 +250,13 @@ public final class Transform2d implements ProtobufSerializable, StructSerializab
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Transform2d other
-        && other.m_translation.equals(m_translation)
-        && other.m_rotation.equals(m_rotation);
+        && other.translation.equals(translation)
+        && other.rotation.equals(rotation);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_translation, m_rotation);
+    return Objects.hash(translation, rotation);
   }
 
   /** Transform2d protobuf for serialization. */

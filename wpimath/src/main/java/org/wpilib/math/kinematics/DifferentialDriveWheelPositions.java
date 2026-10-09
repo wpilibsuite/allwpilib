@@ -21,10 +21,10 @@ public class DifferentialDriveWheelPositions
         ProtobufSerializable,
         Interpolatable<DifferentialDriveWheelPositions> {
   /** Distance measured by the left side in meters. */
-  public double left;
+  public final double left;
 
   /** Distance measured by the right side in meters. */
-  public double right;
+  public final double right;
 
   /** DifferentialDriveWheelPositions struct for serialization. */
   public static final DifferentialDriveWheelPositionsStruct struct =

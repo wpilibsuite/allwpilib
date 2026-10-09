@@ -34,10 +34,9 @@ public class DrivetrainSplineSample extends HolonomicSample {
     super(
         time,
         pose,
-        new ChassisVelocities(velocity, 0.0, velocity * curvature)
-            .toFieldRelative(pose.getRotation()),
+        new ChassisVelocities(velocity, 0.0, velocity * curvature).toFieldRelative(pose.rotation),
         new ChassisAccelerations(acceleration, 0.0, acceleration * curvature)
-            .toFieldRelative(pose.getRotation()));
+            .toFieldRelative(pose.rotation));
     this.curvature = curvature;
   }
 
@@ -68,7 +67,7 @@ public class DrivetrainSplineSample extends HolonomicSample {
    */
   public DrivetrainSplineSample(HolonomicSample sample) {
     super(sample.time, sample.pose, sample.velocity, sample.acceleration);
-    double vx = sample.velocity.toRobotRelative(sample.pose.getRotation()).vx;
+    double vx = sample.velocity.toRobotRelative(sample.pose.rotation).vx;
     this.curvature = sample.velocity.omega / (vx == 0.0 ? 1e-9 : vx);
   }
 
@@ -84,7 +83,7 @@ public class DrivetrainSplineSample extends HolonomicSample {
    * @return The forward velocity in meters per second.
    */
   public double forwardVelocity() {
-    return velocity.toRobotRelative(pose.getRotation()).vx;
+    return velocity.toRobotRelative(pose.rotation).vx;
   }
 
   /**
@@ -95,7 +94,7 @@ public class DrivetrainSplineSample extends HolonomicSample {
    * @return The forward acceleration in meters per second squared.
    */
   public double forwardAcceleration() {
-    return acceleration.toRobotRelative(pose.getRotation()).ax;
+    return acceleration.toRobotRelative(pose.rotation).ax;
   }
 
   /**
@@ -109,8 +108,8 @@ public class DrivetrainSplineSample extends HolonomicSample {
     return new DrivetrainSplineSample(
         time,
         pose.transformBy(transform),
-        velocity.toFieldRelative(transform.getRotation()),
-        acceleration.toFieldRelative(transform.getRotation()),
+        velocity.toFieldRelative(transform.rotation),
+        acceleration.toFieldRelative(transform.rotation),
         curvature);
   }
 
@@ -125,8 +124,8 @@ public class DrivetrainSplineSample extends HolonomicSample {
     return new DrivetrainSplineSample(
         time,
         pose.relativeTo(other),
-        velocity.toRobotRelative(other.getRotation()),
-        acceleration.toRobotRelative(other.getRotation()),
+        velocity.toRobotRelative(other.rotation),
+        acceleration.toRobotRelative(other.rotation),
         curvature);
   }
 

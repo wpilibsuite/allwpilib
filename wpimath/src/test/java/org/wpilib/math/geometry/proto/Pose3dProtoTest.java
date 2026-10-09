@@ -25,7 +25,7 @@ class Pose3dProtoTest {
     Pose3d.proto.pack(proto, DATA);
 
     Pose3d data = Pose3d.proto.unpack(proto);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

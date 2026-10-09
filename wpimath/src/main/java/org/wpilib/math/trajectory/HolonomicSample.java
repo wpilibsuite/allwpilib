@@ -137,7 +137,7 @@ public class HolonomicSample extends TrajectorySample
                 + start.velocity.vy * deltaT
                 + 0.5 * start.acceleration.ay * deltaT * deltaT,
             new Rotation2d(
-                start.pose.getRotation().getRadians()
+                start.pose.rotation.getRadians()
                     + start.velocity.omega * deltaT
                     + 0.5 * start.acceleration.alpha * deltaT * deltaT));
 
@@ -154,8 +154,8 @@ public class HolonomicSample extends TrajectorySample
     return new HolonomicSample(
         time,
         pose.transformBy(transform),
-        velocity.toFieldRelative(transform.getRotation()),
-        acceleration.toFieldRelative(transform.getRotation()));
+        velocity.toFieldRelative(transform.rotation),
+        acceleration.toFieldRelative(transform.rotation));
   }
 
   /**
@@ -168,7 +168,7 @@ public class HolonomicSample extends TrajectorySample
     return new HolonomicSample(
         time,
         pose.relativeTo(other),
-        velocity.toRobotRelative(other.getRotation()),
-        acceleration.toRobotRelative(other.getRotation()));
+        velocity.toRobotRelative(other.rotation),
+        acceleration.toRobotRelative(other.rotation));
   }
 }

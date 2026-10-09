@@ -134,9 +134,9 @@ class ExtendedKalmanFilterTest {
 
     observer.setXhat(
         VecBuilder.fill(
-            trajectory.start().pose.getTranslation().getX(),
-            trajectory.start().pose.getTranslation().getY(),
-            trajectory.start().pose.getRotation().getRadians(),
+            trajectory.start().pose.translation.x,
+            trajectory.start().pose.translation.y,
+            trajectory.start().pose.rotation.getRadians(),
             0.0,
             0.0));
 
@@ -148,9 +148,9 @@ class ExtendedKalmanFilterTest {
       double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
       double vr = ref.forwardVelocity() * (1 + (ref.curvature * rb));
 
-      nextR.set(0, 0, ref.pose.getTranslation().getX());
-      nextR.set(1, 0, ref.pose.getTranslation().getY());
-      nextR.set(2, 0, ref.pose.getRotation().getRadians());
+      nextR.set(0, 0, ref.pose.translation.x);
+      nextR.set(1, 0, ref.pose.translation.y);
+      nextR.set(2, 0, ref.pose.rotation.getRadians());
       nextR.set(3, 0, vl);
       nextR.set(4, 0, vr);
 
@@ -176,9 +176,9 @@ class ExtendedKalmanFilterTest {
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
     var finalPosition = trajectory.sampleAt(trajectory.duration);
-    assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 1.0);
-    assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 1.0);
-    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 1.0);
+    assertEquals(finalPosition.pose.translation.x, observer.getXhat(0), 1.0);
+    assertEquals(finalPosition.pose.translation.y, observer.getXhat(1), 1.0);
+    assertEquals(finalPosition.pose.rotation.getRadians(), observer.getXhat(2), 1.0);
     assertEquals(0.0, observer.getXhat(3), 1.0);
     assertEquals(0.0, observer.getXhat(4), 1.0);
   }

@@ -39,14 +39,17 @@ public final class Translation3d
    */
   public static final Translation3d ZERO = new Translation3d();
 
+  /** The X component of the translation. */
   @Json.Property("x")
-  private final double m_x;
+  public final double x;
 
+  /** The Y component of the translation. */
   @Json.Property("y")
-  private final double m_y;
+  public final double y;
 
+  /** The Z component of the translation. */
   @Json.Property("z")
-  private final double m_z;
+  public final double z;
 
   /** Constructs a Translation3d with X, Y, and Z components equal to zero. */
   public Translation3d() {
@@ -62,9 +65,9 @@ public final class Translation3d
    */
   @Json.Creator
   public Translation3d(double x, double y, double z) {
-    m_x = x;
-    m_y = y;
-    m_z = z;
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 
   /**
@@ -76,9 +79,9 @@ public final class Translation3d
    */
   public Translation3d(double distance, Rotation3d angle) {
     final var rectangular = new Translation3d(distance, 0.0, 0.0).rotateBy(angle);
-    m_x = rectangular.getX();
-    m_y = rectangular.getY();
-    m_z = rectangular.getZ();
+    x = rectangular.x;
+    y = rectangular.y;
+    z = rectangular.z;
   }
 
   /**
@@ -101,7 +104,7 @@ public final class Translation3d
    * @see Transform3d#Transform3d(Transform2d)
    */
   public Translation3d(Translation2d translation) {
-    this(translation.getX(), translation.getY(), 0.0);
+    this(translation.x, translation.y, 0.0);
   }
 
   /**
@@ -123,9 +126,9 @@ public final class Translation3d
    * @return The distance between the two translations.
    */
   public double getDistance(Translation3d other) {
-    double dx = other.m_x - m_x;
-    double dy = other.m_y - m_y;
-    double dz = other.m_z - m_z;
+    double dx = other.x - x;
+    double dy = other.y - y;
+    double dz = other.z - z;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 
@@ -139,37 +142,10 @@ public final class Translation3d
    * @return The squared distance between the two translations.
    */
   public double getSquaredDistance(Translation3d other) {
-    double dx = other.m_x - m_x;
-    double dy = other.m_y - m_y;
-    double dz = other.m_z - m_z;
+    double dx = other.x - x;
+    double dy = other.y - y;
+    double dz = other.z - z;
     return dx * dx + dy * dy + dz * dz;
-  }
-
-  /**
-   * Returns the X component of the translation.
-   *
-   * @return The X component of the translation.
-   */
-  public double getX() {
-    return m_x;
-  }
-
-  /**
-   * Returns the Y component of the translation.
-   *
-   * @return The Y component of the translation.
-   */
-  public double getY() {
-    return m_y;
-  }
-
-  /**
-   * Returns the Z component of the translation.
-   *
-   * @return The Z component of the translation.
-   */
-  public double getZ() {
-    return m_z;
   }
 
   /**
@@ -178,7 +154,7 @@ public final class Translation3d
    * @return The x component of the translation in a measure.
    */
   public Distance getMeasureX() {
-    return Meters.of(m_x);
+    return Meters.of(x);
   }
 
   /**
@@ -187,7 +163,7 @@ public final class Translation3d
    * @return The y component of the translation in a measure.
    */
   public Distance getMeasureY() {
-    return Meters.of(m_y);
+    return Meters.of(y);
   }
 
   /**
@@ -196,7 +172,7 @@ public final class Translation3d
    * @return The z component of the translation in a measure.
    */
   public Distance getMeasureZ() {
-    return Meters.of(m_z);
+    return Meters.of(z);
   }
 
   /**
@@ -205,7 +181,7 @@ public final class Translation3d
    * @return A 2D translation vector representation of this translation.
    */
   public Vector<N3> toVector() {
-    return VecBuilder.fill(m_x, m_y, m_z);
+    return VecBuilder.fill(x, y, z);
   }
 
   /**
@@ -214,7 +190,7 @@ public final class Translation3d
    * @return The norm of the translation.
    */
   public double getNorm() {
-    return Math.sqrt(m_x * m_x + m_y * m_y + m_z * m_z);
+    return Math.sqrt(x * x + y * y + z * z);
   }
 
   /**
@@ -224,7 +200,7 @@ public final class Translation3d
    * @return The squared norm of the translation.
    */
   public double getSquaredNorm() {
-    return m_x * m_x + m_y * m_y + m_z * m_z;
+    return x * x + y * y + z * z;
   }
 
   /**
@@ -237,9 +213,9 @@ public final class Translation3d
    * @return The new rotated translation.
    */
   public Translation3d rotateBy(Rotation3d other) {
-    final var p = new Quaternion(0.0, m_x, m_y, m_z);
-    final var qprime = other.getQuaternion().times(p).times(other.getQuaternion().inverse());
-    return new Translation3d(qprime.getX(), qprime.getY(), qprime.getZ());
+    final var p = new Quaternion(0.0, x, y, z);
+    final var qprime = other.quaternion.times(p).times(other.quaternion.inverse());
+    return new Translation3d(qprime.x, qprime.y, qprime.z);
   }
 
   /**
@@ -262,7 +238,7 @@ public final class Translation3d
    * @return The dot product between the two translations, in square meters.
    */
   public double dot(Translation3d other) {
-    return m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
+    return x * other.x + y * other.y + z * other.z;
   }
 
   /**
@@ -277,9 +253,7 @@ public final class Translation3d
    */
   public Vector<N3> cross(Translation3d other) {
     return VecBuilder.fill(
-        m_y * other.m_z - other.m_y * m_z,
-        m_z * other.m_x - other.m_z * m_x,
-        m_x * other.m_y - other.m_x * m_y);
+        y * other.z - other.y * z, z * other.x - other.z * x, x * other.y - other.x * y);
   }
 
   /**
@@ -288,7 +262,7 @@ public final class Translation3d
    * @return A Translation2d representing this Translation3d projected into the X-Y plane.
    */
   public Translation2d toTranslation2d() {
-    return new Translation2d(m_x, m_y);
+    return new Translation2d(x, y);
   }
 
   /**
@@ -301,7 +275,7 @@ public final class Translation3d
    * @return The sum of the translations.
    */
   public Translation3d plus(Translation3d other) {
-    return new Translation3d(m_x + other.m_x, m_y + other.m_y, m_z + other.m_z);
+    return new Translation3d(x + other.x, y + other.y, z + other.z);
   }
 
   /**
@@ -314,7 +288,7 @@ public final class Translation3d
    * @return The difference between the two translations.
    */
   public Translation3d minus(Translation3d other) {
-    return new Translation3d(m_x - other.m_x, m_y - other.m_y, m_z - other.m_z);
+    return new Translation3d(x - other.x, y - other.y, z - other.z);
   }
 
   /**
@@ -324,7 +298,7 @@ public final class Translation3d
    * @return The inverse of the current translation.
    */
   public Translation3d unaryMinus() {
-    return new Translation3d(-m_x, -m_y, -m_z);
+    return new Translation3d(-x, -y, -z);
   }
 
   /**
@@ -336,7 +310,7 @@ public final class Translation3d
    * @return The scaled translation.
    */
   public Translation3d times(double scalar) {
-    return new Translation3d(m_x * scalar, m_y * scalar, m_z * scalar);
+    return new Translation3d(x * scalar, y * scalar, z * scalar);
   }
 
   /**
@@ -348,7 +322,7 @@ public final class Translation3d
    * @return The reference to the new mutated object.
    */
   public Translation3d div(double scalar) {
-    return new Translation3d(m_x / scalar, m_y / scalar, m_z / scalar);
+    return new Translation3d(x / scalar, y / scalar, z / scalar);
   }
 
   /**
@@ -363,7 +337,7 @@ public final class Translation3d
 
   @Override
   public String toString() {
-    return String.format("Translation3d(X: %.2f, Y: %.2f, Z: %.2f)", m_x, m_y, m_z);
+    return String.format("Translation3d(X: %.2f, Y: %.2f, Z: %.2f)", x, y, z);
   }
 
   /**
@@ -375,22 +349,22 @@ public final class Translation3d
   @Override
   public boolean equals(Object obj) {
     return obj instanceof Translation3d other
-        && Math.abs(other.m_x - m_x) < 1E-9
-        && Math.abs(other.m_y - m_y) < 1E-9
-        && Math.abs(other.m_z - m_z) < 1E-9;
+        && Math.abs(other.x - x) < 1E-9
+        && Math.abs(other.y - y) < 1E-9
+        && Math.abs(other.z - z) < 1E-9;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_x, m_y, m_z);
+    return Objects.hash(x, y, z);
   }
 
   @Override
   public Translation3d interpolate(Translation3d endValue, double t) {
     return new Translation3d(
-        MathUtil.lerp(this.getX(), endValue.getX(), t),
-        MathUtil.lerp(this.getY(), endValue.getY(), t),
-        MathUtil.lerp(this.getZ(), endValue.getZ(), t));
+        MathUtil.lerp(this.x, endValue.x, t),
+        MathUtil.lerp(this.y, endValue.y, t),
+        MathUtil.lerp(this.z, endValue.z, t));
   }
 
   /** Translation3d protobuf for serialization. */
