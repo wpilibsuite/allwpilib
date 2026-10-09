@@ -224,6 +224,9 @@ model {
                 it.buildable = false
                 return
             }
+            lib library: 'glassnt', linkage: 'static'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
             lib project: ':fields', library: 'fields', linkage: 'static'
             lib project: ':fields', library: 'fieldimages', linkage: 'static'
             lib project: ':wpimath', library: 'wpimath', linkage: 'shared'
