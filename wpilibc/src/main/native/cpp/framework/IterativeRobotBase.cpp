@@ -4,6 +4,8 @@
 
 #include "wpi/framework/IterativeRobotBase.hpp"
 
+#include <format>
+
 #include "wpi/driverstation/RobotState.hpp"
 #include "wpi/driverstation/internal/DriverStationBackend.hpp"
 #include "wpi/hal/DriverStation.h"
@@ -17,7 +19,11 @@ using namespace wpi;
 
 IterativeRobotBase::IterativeRobotBase(wpi::units::second_t period)
     : m_period(period),
-      m_watchdog(period, [this] { PrintLoopOverrunMessage(); }) {}
+      m_loopOverrunAlert(
+          "loop-overrun",
+          std::format("Loop time of {:.6f}s overrun", m_period.value()),
+          wpi::util::Alert::Level::MEDIUM),
+      m_watchdog(period, [this] { m_loopOverrunAlert.Set(true); }) {}
 
 void IterativeRobotBase::DriverStationConnected() {}
 
@@ -170,15 +176,12 @@ void IterativeRobotBase::LoopFunc() {
   // Flush NetworkTables
   wpi::nt::NetworkTableInstance::GetDefault().FlushLocal();
 
-  // Warn on loop time overruns
+  // Warn on loop time overruns, and clear the alert once the loop is back on
+  // time
   if (m_watchdog.IsExpired()) {
     m_watchdog.PrintEpochs();
   }
-}
-
-void IterativeRobotBase::PrintLoopOverrunMessage() {
-  WPILIB_ReportError(err::Error, "Loop time of {:.6f}s overrun",
-                     m_period.value());
+  m_loopOverrunAlert.Set(m_watchdog.IsExpired());
 }
 
 void IterativeRobotBase::PrintWatchdogEpochs() {

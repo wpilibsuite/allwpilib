@@ -7,6 +7,7 @@
 #include "wpi/framework/RobotBase.hpp"
 #include "wpi/system/Watchdog.hpp"
 #include "wpi/units/time.hpp"
+#include "wpi/util/Alert.hpp"
 
 namespace wpi {
 
@@ -218,10 +219,9 @@ class IterativeRobotBase : public RobotBase {
  private:
   int m_lastMode = -1;
   wpi::units::second_t m_period;
+  wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
   bool m_calledDsConnected = false;
-
-  void PrintLoopOverrunMessage();
 };
 
 }  // namespace wpi
