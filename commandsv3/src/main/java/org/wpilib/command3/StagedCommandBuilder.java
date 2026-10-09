@@ -23,11 +23,15 @@ import org.wpilib.annotation.NoDiscard;
  * defined such that the final stage that creates a command can only be reached after going through
  * the earlier stages to configure those required options.
  *
+ * <p>Every stage is immutable; each configuration method returns a new stage and leaves the one it
+ * was called on unchanged. A stage can therefore be safely shared and used as the starting point
+ * for several different commands.
+ *
  * <p>Example usage:
  *
  * <pre>{@code
- * StagedCommandBuilder start = new StagedCommandBuilder();
- * NeedsExecutionBuilderStage withRequirements = start.requiring(mechanism1, mechanism2);
+ * NeedsExecutionBuilderStage withRequirements =
+ *   StagedCommandBuilder.requiring(mechanism1, mechanism2);
  * NeedsNameBuilderStage withExecution = withRequirements.executing(coroutine -> ...);
  * Command exampleCommand = withExecution.named("Example Command");
  * }</pre>
@@ -37,7 +41,7 @@ import org.wpilib.annotation.NoDiscard;
  *
  * <pre>{@code
  * Command exampleCommand =
- *   new StagedCommandBuilder()
+ *   StagedCommandBuilder
  *     .requiring(mechanism1, mechanism2)
  *     .executing(coroutine -> ...)
  *     .named("Example Command");
@@ -55,147 +59,135 @@ import org.wpilib.annotation.NoDiscard;
  */
 @NoDiscard
 public final class StagedCommandBuilder {
-  private final Set<Mechanism> m_requirements = new HashSet<>();
-  private Consumer<Coroutine> m_impl;
-  private Runnable m_onCancel = () -> {};
-  private Runnable m_onExit = () -> {};
-  private String m_name;
-  private int m_priority = Command.DEFAULT_PRIORITY;
-  private BooleanSupplier m_endCondition;
+  private static final Runnable NO_OP = () -> {};
 
-  private Command m_builtCommand;
+  /**
+   * The stage where requirements are specified. Holds only the requirements gathered so far.
+   *
+   * @param requirements The immutable set of requirements.
+   */
+  private record ExecutionStage(Set<Mechanism> requirements) implements NeedsExecutionBuilderStage {
+    @Override
+    public NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... extra) {
+      requireNonNullParam(requirement, "requirement", "StagedCommandBuilder.requiring");
+      requireNonNullParam(extra, "extra", "StagedCommandBuilder.requiring");
 
-  // Using internal anonymous classes to implement the staged builder APIs, but all backed by the
-  // state of the enclosing StagedCommandBuilder object
+      var all = new HashSet<>(requirements);
+      all.add(requirement);
+      addAllChecked(all, "extra", Arrays.asList(extra));
+      return new ExecutionStage(Set.copyOf(all));
+    }
 
-  private final NeedsExecutionBuilderStage m_needsExecutionView =
-      new NeedsExecutionBuilderStage() {
-        @Override
-        public NeedsExecutionBuilderStage requiring(Mechanism requirement) {
-          throwIfAlreadyBuilt();
+    @Override
+    public NeedsExecutionBuilderStage requiring(Collection<Mechanism> additional) {
+      requireNonNullParam(additional, "requirements", "StagedCommandBuilder.requiring");
 
-          requireNonNullParam(requirement, "requirement", "StagedCommandBuilder.requiring");
-          m_requirements.add(requirement);
-          return this;
-        }
+      var all = new HashSet<>(requirements);
+      addAllChecked(all, "requirements", additional);
+      return new ExecutionStage(Set.copyOf(all));
+    }
 
-        @Override
-        public NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... extra) {
-          throwIfAlreadyBuilt();
+    @Override
+    public NeedsNameBuilderStage executing(Consumer<Coroutine> impl) {
+      requireNonNullParam(impl, "impl", "StagedCommandBuilder.executing");
 
-          requireNonNullParam(requirement, "requirement", "StagedCommandBuilder.requiring");
-          requireNonNullParam(extra, "extra", "StagedCommandBuilder.requiring");
+      return new NameStage(requirements, impl, NO_OP, NO_OP, Command.DEFAULT_PRIORITY, null);
+    }
 
-          for (int i = 0; i < extra.length; i++) {
-            requireNonNullParam(extra[i], "extra[" + i + "]", "StagedCommandBuilder.requiring");
-          }
+    private static void addAllChecked(
+        Set<Mechanism> target, String paramName, Iterable<Mechanism> items) {
+      int i = 0;
+      for (var item : items) {
+        requireNonNullParam(item, paramName + "[" + i + "]", "StagedCommandBuilder.requiring");
+        target.add(item);
+        i++;
+      }
+    }
+  }
 
-          m_requirements.add(requirement);
-          m_requirements.addAll(Arrays.asList(extra));
-          return this;
-        }
+  /**
+   * The final stage, where the command's implementation is set and optional configuration is
+   * available. Callbacks are never null, and the end condition is null if there is none.
+   */
+  private record NameStage(
+      Set<Mechanism> requirements,
+      Consumer<Coroutine> impl,
+      Runnable onCancel,
+      Runnable onExit,
+      int priority,
+      BooleanSupplier endCondition)
+      implements NeedsNameBuilderStage {
+    @Override
+    public NeedsNameBuilderStage whenCanceled(Runnable onCancel) {
+      return new NameStage(
+          requirements,
+          impl,
+          Objects.requireNonNullElse(onCancel, NO_OP),
+          onExit,
+          priority,
+          endCondition);
+    }
 
-        @Override
-        public NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
-          throwIfAlreadyBuilt();
+    @Override
+    public NeedsNameBuilderStage whenExited(Runnable onExit) {
+      return new NameStage(
+          requirements,
+          impl,
+          onCancel,
+          Objects.requireNonNullElse(onExit, NO_OP),
+          priority,
+          endCondition);
+    }
 
-          requireNonNullParam(requirements, "requirements", "StagedCommandBuilder.requiring");
-          int i = 0;
-          for (Mechanism requirement : requirements) {
-            requireNonNullParam(
-                requirement, "requirements[" + i + "]", "StagedCommandBuilder.requiring");
-            i++;
-          }
+    @Override
+    public NeedsNameBuilderStage withPriority(int priority) {
+      return new NameStage(requirements, impl, onCancel, onExit, priority, endCondition);
+    }
 
-          m_requirements.addAll(requirements);
-          return this;
-        }
+    @Override
+    public NeedsNameBuilderStage until(BooleanSupplier endCondition) {
+      return new NameStage(requirements, impl, onCancel, onExit, priority, endCondition);
+    }
 
-        @Override
-        public NeedsNameBuilderStage executing(Consumer<Coroutine> impl) {
-          throwIfAlreadyBuilt();
+    @Override
+    public Command named(String name) {
+      requireNonNullParam(name, "name", "StagedCommandBuilder.named");
 
-          requireNonNullParam(impl, "impl", "StagedCommandBuilder.executing");
-          m_impl = impl;
-          return m_needsNameView;
-        }
-      };
+      var command = new BuilderBackedCommand(name, requirements, impl, onCancel, onExit, priority);
 
-  private final NeedsNameBuilderStage m_needsNameView =
-      new NeedsNameBuilderStage() {
-        @Override
-        public NeedsNameBuilderStage whenCanceled(Runnable onCancel) {
-          throwIfAlreadyBuilt();
+      if (endCondition == null) {
+        return command;
+      }
 
-          m_onCancel = onCancel;
-          return this;
-        }
+      // if there is an end condition we have to return a race group instead of the command
+      // directly,
+      // because we can't modify the command body to check the end condition
+      return new ParallelGroupBuilder().requiring(command).until(endCondition).named(name);
+    }
+  }
 
-        @Override
-        public NeedsNameBuilderStage whenExited(Runnable onExit) {
-          throwIfAlreadyBuilt();
-
-          m_onExit = onExit;
-          return this;
-        }
-
-        @Override
-        public NeedsNameBuilderStage withPriority(int priority) {
-          throwIfAlreadyBuilt();
-
-          m_priority = priority;
-          return this;
-        }
-
-        @Override
-        public NeedsNameBuilderStage until(BooleanSupplier endCondition) {
-          throwIfAlreadyBuilt();
-
-          m_endCondition = endCondition; // allowed to be null
-          return this;
-        }
-
-        @Override
-        public Command named(String name) {
-          throwIfAlreadyBuilt();
-
-          requireNonNullParam(name, "name", "StagedCommandBuilder.withName");
-          m_name = name;
-
-          var command = new BuilderBackedCommand(StagedCommandBuilder.this);
-
-          if (m_endCondition == null) {
-            // No custom end condition, just return the raw command
-            m_builtCommand = command;
-          } else {
-            // A custom end condition is implemented as a race group, since we cannot modify the
-            // command body to inject the end condition.
-            m_builtCommand =
-                new ParallelGroupBuilder().requiring(command).until(m_endCondition).named(m_name);
-          }
-
-          return m_builtCommand;
-        }
-      };
-
+  // not a record because commands themselves need identity
   private static final class BuilderBackedCommand implements Command {
-    private static final Runnable NO_OP = () -> {};
-
+    private final String m_name;
     private final Set<Mechanism> m_requirements;
     private final Consumer<Coroutine> m_impl;
     private final Runnable m_onCancel;
     private final Runnable m_onExit;
-    private final String m_name;
     private final int m_priority;
 
-    private BuilderBackedCommand(StagedCommandBuilder builder) {
-      // Copy builder fields into the command so the builder object can be garbage collected
-      m_requirements = new HashSet<>(builder.m_requirements);
-      m_impl = builder.m_impl;
-      m_onCancel = Objects.requireNonNullElse(builder.m_onCancel, NO_OP);
-      m_onExit = Objects.requireNonNullElse(builder.m_onExit, NO_OP);
-      m_name = builder.m_name;
-      m_priority = builder.m_priority;
+    private BuilderBackedCommand(
+        String name,
+        Set<Mechanism> requirements,
+        Consumer<Coroutine> impl,
+        Runnable onCancel,
+        Runnable onExit,
+        int priority) {
+      m_name = name;
+      m_requirements = requirements;
+      m_impl = impl;
+      m_onCancel = onCancel;
+      m_onExit = onExit;
+      m_priority = priority;
     }
 
     @Override
@@ -234,26 +226,21 @@ public final class StagedCommandBuilder {
     }
   }
 
-  /**
-   * Creates a new command builder. All required options must be set on each stage before a command
-   * is able to be created. Attempting to create a command without setting all required options will
-   * result in a compilation error.
-   */
-  public StagedCommandBuilder() {}
+  private StagedCommandBuilder() {
+    // Utility class
+  }
 
   /**
    * Explicitly marks the command as requiring no mechanisms. Unless overridden later with {@link
-   * NeedsExecutionBuilderStage#requiring(Mechanism)} or a similar method, the built command will
-   * not have ownership over any mechanisms when it runs. Use this for commands that don't need to
-   * own a mechanism, such as a gyro zeroing command, that does some kind of cleanup task without
-   * needing to control something.
+   * NeedsExecutionBuilderStage#requiring(Mechanism, Mechanism...)} or a similar method, the built
+   * command will not have ownership over any mechanisms when it runs. Use this for commands that
+   * don't need to own a mechanism, such as a gyro zeroing command, that does some kind of cleanup
+   * task without needing to control something.
    *
    * @return A builder object that can be used to further configure the command.
    */
-  public NeedsExecutionBuilderStage noRequirements() {
-    throwIfAlreadyBuilt();
-
-    return m_needsExecutionView;
+  public static NeedsExecutionBuilderStage noRequirements() {
+    return new ExecutionStage(Set.of());
   }
 
   /**
@@ -266,19 +253,8 @@ public final class StagedCommandBuilder {
    *     contain null values.
    * @return A builder object that can be used to further configure the command.
    */
-  public NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... extra) {
-    throwIfAlreadyBuilt();
-
-    requireNonNullParam(requirement, "requirement", "StagedCommandBuilder.requiring");
-    requireNonNullParam(extra, "extra", "StagedCommandBuilder.requiring");
-
-    for (int i = 0; i < extra.length; i++) {
-      requireNonNullParam(extra[i], "extra[" + i + "]", "StagedCommandBuilder.requiring");
-    }
-
-    m_requirements.add(requirement);
-    m_requirements.addAll(Arrays.asList(extra));
-    return m_needsExecutionView;
+  public static NeedsExecutionBuilderStage requiring(Mechanism requirement, Mechanism... extra) {
+    return noRequirements().requiring(requirement, extra);
   }
 
   /**
@@ -290,26 +266,7 @@ public final class StagedCommandBuilder {
    *     contain null values.
    * @return A builder object that can be used to further configure the command.
    */
-  public NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
-    throwIfAlreadyBuilt();
-
-    requireNonNullParam(requirements, "requirements", "StagedCommandBuilder.requiring");
-    int i = 0;
-    for (var mechanism : requirements) {
-      requireNonNullParam(mechanism, "requirements[" + i + "]", "StagedCommandBuilder.requiring");
-      i++;
-    }
-
-    m_requirements.addAll(requirements);
-    return m_needsExecutionView;
-  }
-
-  // Prevent builders from being mutated after command creation
-  // Weird things could happen like changing requirements, priority level, or even the command
-  // implementation itself if we didn't prohibit it.
-  private void throwIfAlreadyBuilt() {
-    if (m_builtCommand != null) {
-      throw new IllegalStateException("Command builders cannot be reused");
-    }
+  public static NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements) {
+    return noRequirements().requiring(requirements);
   }
 }

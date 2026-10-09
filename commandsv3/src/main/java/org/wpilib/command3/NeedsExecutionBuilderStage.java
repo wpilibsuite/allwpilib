@@ -17,20 +17,11 @@ import org.wpilib.annotation.NoDiscard;
 @NoDiscard
 public interface NeedsExecutionBuilderStage {
   /**
-   * Adds a required mechanism for the command.
-   *
-   * @param requirement A required mechanism. Cannot be null.
-   * @return This builder object, for chaining
-   * @throws NullPointerException If {@code requirement} is null
-   */
-  NeedsExecutionBuilderStage requiring(Mechanism requirement);
-
-  /**
    * Adds one or more required mechanisms for the command.
    *
    * @param requirement A required mechanism. Cannot be null.
    * @param extra Any extra required mechanisms. May be empty, but cannot contain null values.
-   * @return This builder object, for chaining
+   * @return A new builder stage with the added requirements. This stage is not modified.
    * @throws NullPointerException If {@code requirement} is null or {@code extra} contains a null
    *     value
    */
@@ -40,7 +31,7 @@ public interface NeedsExecutionBuilderStage {
    * Adds required mechanisms for the command.
    *
    * @param requirements Any required mechanisms. May be empty, but cannot contain null values.
-   * @return This builder object, for chaining
+   * @return A new builder stage with the added requirements. This stage is not modified.
    * @throws NullPointerException If {@code requirements} is null or contains a null value.
    */
   NeedsExecutionBuilderStage requiring(Collection<Mechanism> requirements);
