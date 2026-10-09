@@ -142,3 +142,96 @@ TEST_CASE("Bluetooth status callbacks discard stale snapshots", "[bluetooth]") {
   CHECK_FALSE(expectedError.empty());
   CHECK(errors[0] == expectedError);
 }
+
+#if defined(_WIN32) || defined(__APPLE__)
+TEST_CASE("Bluetooth initial status callback can supersede a connection",
+          "[bluetooth]") {
+  bool replace = false;
+  bool rejectConfig = false;
+  std::string reason = "Cancelled";
+  SECTION("Cancel") {}
+  SECTION("Cancel with empty status") {
+    reason.clear();
+  }
+  SECTION("Replace and cancel") {
+    replace = true;
+  }
+  SECTION("Reject invalid configuration and cancel") {
+    rejectConfig = true;
+  }
+
+  auto loop = uv::Loop::Create();
+  REQUIRE(loop);
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.preferL2CAP = false;
+  config.gattServiceUuid = "00000000-0000-0000-0000-000000000001";
+  config.gattControlCharacteristicUuid = "00000000-0000-0000-0000-000000000002";
+  config.gattStatusCharacteristicUuid = "00000000-0000-0000-0000-000000000003";
+  bool firstAccepted = false;
+  bool replacementAccepted = false;
+  bool canceled = false;
+  bool rejectedConfigPreservedState = false;
+  int connectingCallbacks = 0;
+  std::shared_ptr<BluetoothLEPacketClient> client;
+  client = BluetoothLEPacketClient::Create(
+      *loop, [](auto) {},
+      [&](const auto& status) {
+        if (status.connecting && status.error.empty()) {
+          ++connectingCallbacks;
+          if (rejectConfig) {
+            auto before = client->GetStatus();
+            bool accepted = client->Connect({});
+            auto after = client->GetStatus();
+            rejectedConfigPreservedState =
+                !accepted && after.connecting && !after.connected &&
+                after.status == before.status &&
+                after.targetAddress == before.targetAddress &&
+                after.transport == before.transport && !after.error.empty();
+          }
+          if (replace && connectingCallbacks == 1) {
+            auto next = config;
+            next.address = "AA:BB:CC:DD:EE:02";
+            replacementAccepted = client->Connect(next);
+          } else {
+            client->Disconnect(reason);
+          }
+        } else if (status.status == reason) {
+          canceled = true;
+          loop->Stop();
+        }
+      });
+  REQUIRE(client);
+
+  auto starter = uv::Timer::Create(loop);
+  REQUIRE(starter);
+  starter->timeout.connect([&] {
+    firstAccepted = client->Connect(config);
+    starter->Close();
+  });
+  starter->Start(uv::Timer::Time{0});
+  auto deadline = uv::Timer::Create(loop);
+  REQUIRE(deadline);
+  deadline->timeout.connect([&] { loop->Stop(); });
+  deadline->Start(uv::Timer::Time{1000});
+  loop->Run();
+  auto status = client->GetStatus();
+
+  client.reset();
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+
+  CHECK(firstAccepted);
+  CHECK(replacementAccepted == replace);
+  CHECK(connectingCallbacks == (replace ? 2 : 1));
+  CHECK(canceled);
+  CHECK(rejectedConfigPreservedState == rejectConfig);
+  CHECK_FALSE(status.connected);
+  CHECK_FALSE(status.connecting);
+  CHECK(status.status == reason);
+}
+#endif

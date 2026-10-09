@@ -100,11 +100,15 @@ struct BluetoothLEPacketClientConfig {
 };
 
 /**
- * Packet-oriented Bluetooth LE client.
+ * Packet-oriented Bluetooth LE client for realtime control.
  *
- * Each Send() call writes one packet using the best available platform
- * transport. Each packet callback receives one packet from a GATT notification
- * value or L2CAP SDU.
+ * This API is intended for periodic control values and occasional control
+ * commands. Use BEST_EFFORT for values superseded by later packets, or QUEUED
+ * to retain a single pending command while the transport is busy. Delivery and
+ * timing depend on the platform Bluetooth stack and radio link.
+ *
+ * Each Send() submits one packet. Each packet callback receives one packet
+ * from a GATT notification value or L2CAP SDU.
  */
 class BluetoothLEPacketClient {
  public:
@@ -161,6 +165,12 @@ class BluetoothLEPacketClient {
   /**
    * Starts connecting to a Bluetooth LE packet transport.
    *
+   * A rejected request preserves the existing connection or connection attempt.
+   * The validation error is available in GetStatus().error.
+   *
+   * Linux GATT requires exclusive ATT ownership. If BlueZ holds the connection,
+   * recovery may disconnect all BlueZ profiles on the target device.
+   *
    * @param config connection configuration.
    * @return true if the request was accepted.
    */
@@ -169,7 +179,7 @@ class BluetoothLEPacketClient {
   /**
    * Disconnects the active connection, if any.
    *
-   * @param reason status text to publish after disconnecting.
+   * @param reason status text to publish after disconnecting; may be empty.
    */
   void Disconnect(std::string_view reason = "Disconnected");
 

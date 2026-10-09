@@ -6,10 +6,12 @@
 
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <bit>
 #include <cerrno>
 #include <chrono>
@@ -187,6 +189,20 @@ std::string ErrnoString(std::string_view prefix) {
   return error;
 }
 
+ssize_t ReceivePacket(int fd, std::span<uint8_t> packet) {
+  iovec buffer{packet.data(), packet.size()};
+  msghdr message{};
+  message.msg_iov = &buffer;
+  message.msg_iovlen = 1;
+  ssize_t received = ::recvmsg(fd, &message, 0);
+  if (received >= 0 && (message.msg_flags & MSG_TRUNC) != 0) {
+    // A packet socket discards the remainder; never deliver a partial packet.
+    errno = EMSGSIZE;
+    return -1;
+  }
+  return received;
+}
+
 void AppendLe16(std::vector<uint8_t>* data, uint16_t value) {
   size_t offset = data->size();
   data->resize(offset + sizeof(value));
@@ -285,7 +301,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   ~Impl() {
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     if (m_connectTimer) {
       m_connectTimer->Close();
     }
@@ -303,47 +319,41 @@ class BluetoothLEPacketClient::Impl
                                                              : "random",
           config.psm, config.preferL2CAP);
     if (config.address.empty()) {
-      SetError("No Bluetooth address configured");
+      SetRequestError("No Bluetooth address configured");
       return false;
     }
     if (config.preferL2CAP && config.psm == 0) {
-      SetError("No Bluetooth L2CAP PSM configured");
+      SetRequestError("No Bluetooth L2CAP PSM configured");
       return false;
     }
 
-    {
-      std::scoped_lock lock{m_statusMutex};
-      if ((m_status.connecting || m_status.connected) &&
-          m_status.targetAddress == config.address &&
-          m_status.addressType == config.addressType) {
-        Trace("connect ignored: target already connected or connecting");
-        return true;
-      }
-      m_config = config;
-      m_status.targetAddress = config.address;
-      m_status.addressType = config.addressType;
-      m_status.targetConfigured = true;
-      m_status.error.clear();
-      m_status.status =
-          config.preferL2CAP ? "Connecting (L2CAP)" : "Connecting (GATT)";
-      m_status.connecting = true;
-      m_status.connected = false;
-      m_status.transport = BluetoothPacketTransport::NONE;
-    }
-
+    uint64_t request = ++m_requestGeneration;
     auto self = shared_from_this();
-    m_exec->Send(
-        [self, config = std::move(config)] { self->ConnectOnLoop(config); });
+    m_exec->Send([self, config = std::move(config), request] {
+      if (request == self->m_requestGeneration) {
+        self->ConnectOnLoop(config);
+      }
+    });
     return true;
   }
 
   void Disconnect(std::string_view reason) {
     Trace("disconnect requested reason={}", reason);
+    uint64_t request = ++m_requestGeneration;
     auto self = shared_from_this();
     std::string reasonString{reason};
-    m_exec->Send([self, reasonString = std::move(reasonString)] {
-      self->CloseOnLoop(reasonString);
+    m_exec->Send([self, reasonString = std::move(reasonString), request] {
+      if (request == self->m_requestGeneration) {
+        self->CloseOnLoop(reasonString);
+      }
     });
+  }
+
+  // Destruction closes the transport without publishing a user callback.
+  void Shutdown() {
+    ++m_requestGeneration;
+    auto self = shared_from_this();
+    m_exec->Send([self] { self->ResetConnectionOnLoop(); });
   }
 
   bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode) {
@@ -491,10 +501,32 @@ class BluetoothLEPacketClient::Impl
   }
 
   void ConnectOnLoop(const BluetoothLEPacketClientConfig& config) {
+    {
+      std::scoped_lock lock{m_statusMutex};
+      if ((m_status.connecting || m_status.connected) &&
+          m_status.targetAddress == config.address &&
+          m_status.addressType == config.addressType) {
+        Trace("connect ignored: target already connected or connecting");
+        return;
+      }
+    }
     // Publish progress only once this attempt owns the transport, so a status
     // callback can cancel or replace it without the old attempt resuming.
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     uint64_t generation = ++m_connectGeneration;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      m_config = config;
+      m_status.targetAddress = config.address;
+      m_status.addressType = config.addressType;
+      m_status.targetConfigured = true;
+      m_status.error.clear();
+      m_status.status =
+          config.preferL2CAP ? "Connecting (L2CAP)" : "Connecting (GATT)";
+      m_status.connecting = true;
+      m_status.connected = false;
+      m_status.transport = BluetoothPacketTransport::NONE;
+    }
     Trace("begin attempt gen={} address={}", generation, config.address);
 
     bdaddr_t remoteAddress{};
@@ -684,6 +716,10 @@ class BluetoothLEPacketClient::Impl
       return false;
     }
 
+    // Fixed ATT CID ownership is exclusive. BlueZ may still own it after
+    // pairing; Device1.Disconnect releases the whole device, including other
+    // profiles. See wpinet/doc/bluetooth-le.adoc for the ownership and queueing
+    // tradeoffs of direct ATT versus BlueZ acquired descriptors.
     TraceSocket("GATT EBUSY: requesting BlueZ disconnect before retry");
     m_gattBlueZDisconnectAttempted = true;
     CloseSocket();
@@ -1004,21 +1040,22 @@ class BluetoothLEPacketClient::Impl
     FailConnection("Bluetooth GATT connection timed out");
   }
 
-  void CloseOnLoop(std::string_view reason) {
-    Trace("close requested on loop gen={} reason={}", m_connectGeneration,
-          reason);
+  // Release transport state without notifying the caller. Connect and failure
+  // paths publish their new state after this reset; destruction stays silent.
+  void ResetConnectionOnLoop() {
+    Trace("reset connection on loop gen={}", m_connectGeneration);
     ++m_connectGeneration;
     m_gattBlueZDisconnectPending = false;
     CloseSocket();
+    std::scoped_lock lock{m_statusMutex};
+    m_status.connecting = false;
+    m_status.connected = false;
+    m_status.transport = BluetoothPacketTransport::NONE;
+  }
 
-    if (!reason.empty()) {
-      UpdateStatus([&](auto& status) {
-        status.connecting = false;
-        status.connected = false;
-        status.transport = BluetoothPacketTransport::NONE;
-        status.status = reason;
-      });
-    }
+  void CloseOnLoop(std::string_view reason) {
+    ResetConnectionOnLoop();
+    UpdateStatus([&](auto& status) { status.status = reason; });
   }
 
   void CheckConnect() {
@@ -1094,7 +1131,7 @@ class BluetoothLEPacketClient::Impl
     uint64_t generation = m_connectGeneration;
     std::vector<uint8_t> packet(m_config.maxPacketSize);
     while (generation == m_connectGeneration && m_socket >= 0) {
-      ssize_t received = ::recv(m_socket, packet.data(), packet.size(), 0);
+      ssize_t received = ReceivePacket(m_socket, packet);
       if (received > 0) {
         TraceTraffic(true, received);
         UpdateStatus([](auto& status) { ++status.packetsReceived; });
@@ -1139,7 +1176,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   void FailConnection(std::string_view error) {
-    CloseOnLoop({});
+    ResetConnectionOnLoop();
     SetError(error);
   }
 
@@ -1567,7 +1604,7 @@ class BluetoothLEPacketClient::Impl
     std::vector<uint8_t> pdu(
         std::max<size_t>(m_gattMtu, m_config.maxPacketSize + 3));
     while (generation == m_connectGeneration && m_socket >= 0) {
-      ssize_t received = ::recv(m_socket, pdu.data(), pdu.size(), 0);
+      ssize_t received = ReceivePacket(m_socket, pdu);
       if (received > 0) {
         HandleGattPdu({pdu.data(), static_cast<size_t>(received)});
         continue;
@@ -1694,6 +1731,16 @@ class BluetoothLEPacketClient::Impl
     return generation == m_connectGeneration;
   }
 
+  void SetRequestError(std::string_view error) {
+    Trace("request rejected: {}", error);
+    UpdateStatus([&](auto& status) {
+      status.error = error;
+      if (!status.connecting && !status.connected) {
+        status.status = error;
+      }
+    });
+  }
+
   void SetError(std::string_view error) {
     Trace("error: {}", error);
     UpdateStatus([&](auto& status) {
@@ -1752,6 +1799,8 @@ class BluetoothLEPacketClient::Impl
   PacketCallback m_packetCallback;
   StatusCallback m_statusCallback;
   std::shared_ptr<UvExecFunc> m_exec;
+  // A loop-thread request can overtake an older request in the async queue.
+  std::atomic<uint64_t> m_requestGeneration{0};
 
   mutable std::mutex m_statusMutex;
   bool m_sendPending = false;
@@ -1806,7 +1855,7 @@ BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
 
 BluetoothLEPacketClient::~BluetoothLEPacketClient() {
   if (m_impl) {
-    m_impl->Disconnect({});
+    m_impl->Shutdown();
   }
 }
 
