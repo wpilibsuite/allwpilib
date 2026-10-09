@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
@@ -17,7 +17,10 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation/halsim_ws_core",
+        "//glass",
+        "//hal:wpiHal",
+        "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
@@ -39,7 +42,10 @@ wpilib_cc_library(
     }),
     visibility = ["//visibility:public"],
     deps = [
-        "//simulation/halsim_ws_core",
+        "//glass",
+        "//hal:wpiHal",
+        "//thirdparty/imgui_suite",
+        "//wpigui",
         "//wpinet",
     ],
 )
@@ -60,13 +66,38 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/halsim_xrp",
     static_deps = [
+        "//glass:static/glass",
+        "//thirdparty/imgui_suite:static/imguiSuite",
         "//wpinet:static/wpinet",
+        "//wpigui:static/wpigui",
         "//hal:static/wpiHal",
-        "//simulation/halsim_ws_core:static/halsim_ws_core",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":halsim_xrp_static",
+    ],
+)
+
+cc_test(
+    name = "halsim_xrp-test",
+    size = "small",
+    srcs = glob(["src/test/native/cpp/*.cpp"]) + [
+        "src/main/native/cpp/HALSimXRP.cpp",
+        "src/main/native/cpp/XRP.cpp",
+        "src/main/native/include/wpi/halsim/xrp/HALSimXRP.hpp",
+        "src/main/native/include/wpi/halsim/xrp/XRP.hpp",
+        "src/main/native/include/wpi/halsim/xrp/XRPConnectionStatus.hpp",
+    ],
+    includes = ["src/main/native/include"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//hal:wpiHal",
+        "//thirdparty/catch2",
+        "//wpigui",
+        "//wpinet",
     ],
 )
 
