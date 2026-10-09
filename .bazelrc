@@ -58,17 +58,16 @@ test:no_example --test_tag_filters=-wpi-example --build_tag_filters=-wpi-example
 common:skip_robotpy --test_tag_filters=-robotpy --build_tag_filters=-robotpy
 common:imgui_tests --//shared/bazel/rules:with_imgui_tests=true
 
-# Build Buddy BES Setup
+# BuildBuddy BES Setup
 build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/
 build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
 
 # Common Cache Settings
-build:common_cache --remote_timeout=3600
-build:common_cache --remote_cache_compression
-common:common_cache --experimental_remote_merkle_tree_cache
+build --remote_timeout=3600
+build --remote_cache_compression
+common --experimental_remote_merkle_tree_cache
 
-# Build Buddy Cache Setup
-build:build_buddy --config=common_cache
+# BuildBuddy Cache Setup
 build:build_buddy --config=build_buddy_bes
 build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
 build:build_buddy --noslim_profile
@@ -79,7 +78,6 @@ build:build_buddy --nolegacy_important_outputs
 common:build_buddy_readonly --noremote_upload_local_results
 
 # Bazel-remote cache setup
-build:remote_cache --config=common_cache
 build:remote_cache --remote_cache=grpcs://gitlib-bazel.wpi.edu
 
 common:remote_cache_readonly --noremote_upload_local_results
@@ -98,8 +96,6 @@ build:macos --strategy=TestRunner=remote,sandboxed,local
 build:linux --strategy=NpmLifecycleHook=remote,sandboxed,local
 build:macos --strategy=NpmLifecycleHook=remote,sandboxed,local
 
-common:remote --config=common_cache
-build:remote --experimental_remote_merkle_tree_cache --incompatible_allow_tags_propagation
 # Specify your cluster as follows:
 # build:remote --remote_executor=grpcs://engflow.example.com --bes_backend=grpcs://engflow.example.com --bes_results_url=https://engflow.example.com/invocation/
 build:remote --jobs=100
