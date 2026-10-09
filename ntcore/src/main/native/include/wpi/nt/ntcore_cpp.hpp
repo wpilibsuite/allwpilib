@@ -1534,7 +1534,7 @@ struct SubscriberOptions {
  */
 struct TopicPublisher {
   std::string client;
-  uint64_t pubuid = 0;
+  int64_t pubuid = 0;
 };
 
 /**
@@ -1542,7 +1542,7 @@ struct TopicPublisher {
  */
 struct TopicSubscriber {
   std::string client;
-  uint64_t subuid = 0;
+  int64_t subuid = 0;
   SubscriberOptions options;
 };
 
