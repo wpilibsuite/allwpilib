@@ -24,7 +24,7 @@ class CentripetalAccelerationConstraintTest {
             List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
 
-    for (double t = 0.0; t < trajectory.duration; t += 0.02) {
+    for (double t = 0.0; t < trajectory.duration(); t += 0.02) {
       var point = trajectory.sampleAt(t);
       var centripetalAcceleration = Math.pow(point.forwardVelocity(), 2) * point.curvature;
 

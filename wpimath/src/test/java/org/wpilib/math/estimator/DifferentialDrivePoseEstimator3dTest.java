@@ -146,7 +146,7 @@ class DifferentialDrivePoseEstimator3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       // We are due for a new vision measurement if it's been `visionUpdateRate` seconds since the
@@ -213,7 +213,7 @@ class DifferentialDrivePoseEstimator3dTest {
         "Incorrect Final Theta");
 
     if (checkError) {
-      assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.07, "Incorrect mean error");
+      assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.07, "Incorrect mean error");
       assertEquals(0.0, maxError, 0.2, "Incorrect max error");
     }
   }

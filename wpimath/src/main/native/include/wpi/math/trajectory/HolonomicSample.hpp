@@ -12,7 +12,6 @@
 #include "wpi/math/geometry/Twist2d.hpp"
 #include "wpi/math/kinematics/ChassisAccelerations.hpp"
 #include "wpi/math/kinematics/ChassisVelocities.hpp"
-#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SymbolExports.hpp"
@@ -26,8 +25,10 @@ namespace wpi::math {
 /**
  * Represents a single sample in a drivetrain trajectory.
  */
-class HolonomicSample : public TrajectorySample {
+class HolonomicSample {
  public:
+  /** The time of the sample relative to the trajectory start. */
+  wpi::units::second_t time = 0_s;
   /** The robot pose at this sample (in the field reference frame). */
   Pose2d pose;
   /** The robot velocity at this sample (in the field reference frame). */
@@ -52,7 +53,7 @@ class HolonomicSample : public TrajectorySample {
   constexpr HolonomicSample(wpi::units::second_t time, const Pose2d& p,
                             const ChassisVelocities& v,
                             const ChassisAccelerations& a)
-      : TrajectorySample{time}, pose{p}, velocity{v}, acceleration{a} {}
+      : time{time}, pose{p}, velocity{v}, acceleration{a} {}
 
   /**
    * Checks equality between this HolonomicSample and another.
