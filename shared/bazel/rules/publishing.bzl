@@ -127,6 +127,7 @@ def platform_prefix(t):
         "@wpilib_toolchains//conditions:windows_arm64": "windows/arm64/" + t,
         "@wpilib_toolchains//conditions:windows_x86_64": "windows/x86-64/" + t,
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": "linux/systemcore/" + t,
+        "@wpilib_toolchains//constraints/is_trixie64:trixie64": "linux/arm64/" + t,
     })
 
 def _wpilib_maven_export_impl(
