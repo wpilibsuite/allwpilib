@@ -1,0 +1,16 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "fields_tests",
+    size = "small",
+    srcs = glob(["cpp/**/*.cpp"]),
+    deps = [
+        "//fields",
+        "//thirdparty/catch2",
+    ],
+)
+
+alias(
+    name = "native",
+    actual = ":fields_tests",
+)

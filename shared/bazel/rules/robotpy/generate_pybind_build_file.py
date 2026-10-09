@@ -316,6 +316,7 @@ def generate_pybind_build_file(
     stripped_include_prefix: str,
     yml_prefix: str | None,
     output_file: pathlib.Path,
+    package_name: str | None = None,
 ):
     project_dir = project_file.parent
     plan = makeplan(project_dir)
@@ -440,8 +441,11 @@ def generate_pybind_build_file(
             for ep_key, ep_value in explicit_entry_points[entry_point_type].items():
                 entry_points[entry_point_type].append(f"{ep_key} = {ep_value}")
 
+    # The package the generated file is loaded from is usually the project root, but a
+    # project can generate a build file for a module in a subpackage (e.g. test modules).
+    bazel_package = package_name or fixup_root_package_name(top_level_name)
     strip_path_prefixes = [
-        f"{fixup_root_package_name(top_level_name)}/{stripped_include_prefix}",
+        f"{bazel_package}/{stripped_include_prefix}",
         f"{fixup_root_package_name(top_level_name)}",
     ]
 
@@ -482,6 +486,7 @@ def main():
     )
     parser.add_argument("--yml_prefix", type=str)
     parser.add_argument("--package_root_file", type=str)
+    parser.add_argument("--package_name", type=str)
     parser.add_argument("--pkgcfgs", type=pathlib.Path, nargs="+")
 
     args = parser.parse_args()
@@ -493,6 +498,7 @@ def main():
         args.stripped_include_prefix,
         args.yml_prefix,
         args.output_file,
+        args.package_name,
     )
 
 

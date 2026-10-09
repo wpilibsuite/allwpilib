@@ -1,13 +1,9 @@
-load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary")
 load("//romiVendordep:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//romiVendordep:robotpy_pybind_build_info.bzl", "define_pybind_library", "romi_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
-load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
 
 filegroup(
     name = "doxygen-files",
@@ -83,38 +79,6 @@ wpilib_java_library(
     ],
 )
 
-cc_test(
-    name = "romi-test",
-    size = "small",
-    srcs = glob(["src/test/native/cpp/**"]),
-    deps = [
-        ":romiVendordep",
-        "//thirdparty/catch2",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":romiVendordep",
-    ],
-)
-
-java_binary(
-    name = "DevMain-Java",
-    srcs = ["src/dev/java/org/wpilib/romi/DevMain.java"],
-    main_class = "org.wpilib.romi.DevMain",
-    deps = [
-        "//hal:hal-java",
-        "//ntcore:ntcore-java",
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpilibj:wpilibj-java",
-        "//wpiutil:wpiutil-java",
-    ],
-)
-
 package_default_cc_project(
     name = "romiVendordep",
     maven_artifact_name = "romiVendordep-cpp",
@@ -169,13 +133,4 @@ romi_extension(
 define_pybind_library(
     name = "robotpy-romi",
     pkgcfgs = PKG_CONFIG_DEPS,
-)
-
-robotpy_py_test(
-    "python_tests",
-    srcs = glob(["src/test/python/**/*.py"]),
-    deps = [
-        ":robotpy-romi",
-        requirement("pytest"),
-    ],
 )

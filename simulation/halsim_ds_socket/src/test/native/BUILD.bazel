@@ -1,0 +1,16 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "halsim_ds_socket_tests",
+    size = "small",
+    srcs = glob(["**/*.cpp"]),
+    deps = [
+        "//simulation/halsim_ds_socket",
+        "//thirdparty/catch2",
+    ],
+)
+
+alias(
+    name = "native",
+    actual = ":halsim_ds_socket_tests",
+)

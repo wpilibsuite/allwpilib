@@ -1,0 +1,11 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]),
+    tags = ["exclusive-if-local"],
+    deps = [
+        "//ntcore:ntcore-java",
+        "//wpiutil:wpiutil-java",
+    ],
+)

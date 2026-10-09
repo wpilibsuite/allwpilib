@@ -109,7 +109,7 @@ cc_test(
         "//ntcore",
         "//thirdparty/catch2",
         "//wpiutil",
-        "//wpiutil:wpiutil-testlib",
+        "//wpiutil/src/test/native:wpiutil-testlib",
         "@aos//aos:configuration",
         "@aos//aos:flatbuffer_merge",
         "@aos//aos:init",

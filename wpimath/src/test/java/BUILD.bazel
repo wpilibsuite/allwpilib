@@ -1,0 +1,16 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]),
+    deps = [
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpimath:wpimath-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:org_ejml_ejml_java9module",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)

@@ -34,7 +34,7 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
 
     gen_libinit(
         name = "wpimath_test.gen_lib_init",
-        output_file = "src/test/python/cpp/wpimath_test/_init__wpimath_test.py",
+        output_file = "cpp/wpimath_test/_init__wpimath_test.py",
         modules = ["wpimath._init__wpimath"],
     )
 
@@ -44,9 +44,9 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
         module_pkg_name = "wpimath_test._wpimath_test",
         output_file = "wpimath_test.pc",
         pkg_name = "wpimath_test",
-        install_path = "src/test/python/cpp/wpimath_test",
-        project_file = "src/test/python/cpp/pyproject.toml",
-        package_root = "src/test/python/cpp/wpimath_test/__init__.py",
+        install_path = "cpp/wpimath_test",
+        project_file = "cpp/pyproject.toml",
+        package_root = "cpp/wpimath_test/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -60,17 +60,17 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
         name = "wpimath_test",
         casters_pickle = "wpimath_test.casters.pkl",
         header_gen_config = WPIMATH_TEST_HEADER_GEN,
-        trampoline_subpath = "src/test/python/cpp/wpimath_test",
+        trampoline_subpath = "cpp/wpimath_test",
         deps = header_to_dat_deps,
         local_native_libraries = [
         ],
         name_transforms = NAME_TRANSFORMS,
-        yml_prefix = "src/test/python/cpp/",
+        yml_prefix = "cpp/",
     )
 
     create_pybind_library(
         name = "wpimath_test",
-        install_path = "src/test/python/cpp/wpimath_test/",
+        install_path = "cpp/wpimath_test/",
         extension_name = "_wpimath_test",
         generated_srcs = [":wpimath_test.generated_srcs"],
         semiwrap_header = [":wpimath_test.gen_modinit_hpp"],
@@ -114,7 +114,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/test/python/cpp/wpimath_test/wpimath_test.pc",
+            "cpp/wpimath_test/wpimath_test.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -123,23 +123,23 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/test/python/cpp/wpimath_test/**"], exclude = ["src/test/python/cpp/wpimath_test/**/*.py"]),
+        srcs = native.glob(["cpp/wpimath_test/**"], exclude = ["cpp/wpimath_test/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     robotpy_library(
         name = name,
         distribution = "wpimath_test",
-        srcs = native.glob(["src/test/python/cpp/wpimath_test/**/*.py"]) + [
-            "src/test/python/cpp/wpimath_test/_init__wpimath_test.py",
+        srcs = native.glob(["cpp/wpimath_test/**/*.py"]) + [
+            "cpp/wpimath_test/_init__wpimath_test.py",
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/test/python/cpp/wpimath_test/_wpimath_test",
+            ":cpp/wpimath_test/_wpimath_test",
             ":wpimath_test.trampoline_hdr_files",
         ],
-        imports = ["src/test/python/cpp"],
+        imports = ["cpp"],
         deps = [
         ],
         strip_path_prefixes = ["wpimath/src/test/python/cpp", "wpimath"],
@@ -156,20 +156,20 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/test/python/cpp/semiwrap",
+        yaml_output_directory = "cpp/semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
         ],
-        package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
+        package_root_file = "cpp/wpimath_test/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/test/python/cpp/pyproject.toml",
-        yaml_files = native.glob(["src/test/python/cpp/semiwrap/**"]),
+        pyproject_toml = "cpp/pyproject.toml",
+        yaml_files = native.glob(["cpp/semiwrap/**"]),
     )
 
     scan_headers(
         name = "{}-scan-headers".format(name),
         extra_hdrs = extra_pybind_hdrs + [
         ],
-        package_root_file = "src/test/python/cpp/wpimath_test/__init__.py",
+        package_root_file = "cpp/wpimath_test/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/test/python/cpp/pyproject.toml",
+        pyproject_toml = "cpp/pyproject.toml",
     )

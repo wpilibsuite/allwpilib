@@ -1,0 +1,11 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+
+robotpy_py_test(
+    "python",
+    srcs = glob(["**/*.py"]),
+    deps = [
+        "//drivers:wpilib-drivers",
+        requirement("pytest"),
+    ],
+)
