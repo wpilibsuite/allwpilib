@@ -152,6 +152,6 @@ class DifferentialDrivetrainSimTest {
       sim.update(0.020);
     }
 
-    assertTrue(Math.abs(sim.getPose().getTranslation().getNorm()) < 100);
+    assertTrue(Math.abs(sim.getPose().translation.getNorm()) < 100);
   }
 }

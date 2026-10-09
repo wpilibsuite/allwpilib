@@ -36,7 +36,7 @@ class TwoDeadWheelOdometry3dTest {
         () -> assertEquals(0.0, secondPose.getX(), 0.01),
         () -> assertEquals(0.0, secondPose.getY(), 0.01),
         () -> assertEquals(0.0, secondPose.getZ(), 0.01),
-        () -> assertEquals(0.0, secondPose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(0.0, secondPose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -50,7 +50,7 @@ class TwoDeadWheelOdometry3dTest {
         () -> assertEquals(0.1, pose.getX(), 0.01),
         () -> assertEquals(0.0, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getZ(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(0.0, pose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -122,7 +122,7 @@ class TwoDeadWheelOdometry3dTest {
             m_yWheelXPos,
             xWheelPos,
             yWheelPos,
-            new Rotation3d(trajectory.start().pose.getRotation()),
+            new Rotation3d(trajectory.start().pose.rotation),
             new Pose3d(trajectory.start().pose));
 
     var rand = new Random(5190);
@@ -167,18 +167,13 @@ class TwoDeadWheelOdometry3dTest {
               xWheelPos,
               yWheelPos,
               new Rotation3d(
-                  groundTruthState
-                      .pose
-                      .getRotation()
-                      .plus(new Rotation2d(rand.nextGaussian() * 0.001))));
+                  groundTruthState.pose.rotation.plus(
+                      new Rotation2d(rand.nextGaussian() * 0.001))));
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -236,14 +231,8 @@ class TwoDeadWheelOdometry3dTest {
           m_inverseKinematicsMatrix.mult(
               new SimpleMatrix(
                   new double[][] {
-                    {
-                      groundTruthState.forwardVelocity()
-                          * groundTruthState.pose.getRotation().getCos()
-                    },
-                    {
-                      groundTruthState.forwardVelocity()
-                          * groundTruthState.pose.getRotation().getSin()
-                    },
+                    {groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.cos},
+                    {groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.sin},
                     {0}
                   }));
 
@@ -263,13 +252,10 @@ class TwoDeadWheelOdometry3dTest {
           odometry.update(
               xWheelPos, yWheelPos, new Rotation3d(new Rotation2d(rand.nextGaussian() * 0.001)));
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }

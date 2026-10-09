@@ -17,20 +17,25 @@ import org.wpilib.util.struct.StructSerializable;
 /** Represents a quaternion. */
 @Json
 public final class Quaternion implements ProtobufSerializable, StructSerializable {
-  // Scalar r in versor form
-  @Json.Ignore private final double m_w;
+  /** W component of the quaternion (scalar r in versor form). */
+  @Json.Property("W")
+  public final double w;
 
-  // Vector v in versor form
-  @Json.Ignore private final double m_x;
-  @Json.Ignore private final double m_y;
-  @Json.Ignore private final double m_z;
+  /** X component of the quaternion (vector v in versor form). */
+  @Json.Property("X")
+  public final double x;
+
+  /** Y component of the quaternion (vector v in versor form). */
+  @Json.Property("Y")
+  public final double y;
+
+  /** Z component of the quaternion (vector v in versor form). */
+  @Json.Property("Z")
+  public final double z;
 
   /** Constructs a quaternion with a default angle of 0 degrees. */
   public Quaternion() {
-    m_w = 1.0;
-    m_x = 0.0;
-    m_y = 0.0;
-    m_z = 0.0;
+    this(1.0, 0.0, 0.0, 0.0);
   }
 
   /**
@@ -47,10 +52,10 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
       @Json.Alias("X") double x,
       @Json.Alias("Y") double y,
       @Json.Alias("Z") double z) {
-    m_w = w;
-    m_x = x;
-    m_y = y;
-    m_z = z;
+    this.w = w;
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 
   /**
@@ -60,8 +65,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The quaternion sum.
    */
   public Quaternion plus(Quaternion other) {
-    return new Quaternion(
-        getW() + other.getW(), getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ());
+    return new Quaternion(w + other.w, x + other.x, y + other.y, z + other.z);
   }
 
   /**
@@ -71,8 +75,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The quaternion difference.
    */
   public Quaternion minus(Quaternion other) {
-    return new Quaternion(
-        getW() - other.getW(), getX() - other.getX(), getY() - other.getY(), getZ() - other.getZ());
+    return new Quaternion(w - other.w, x - other.x, y - other.y, z - other.z);
   }
 
   /**
@@ -82,7 +85,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The scaled quaternion.
    */
   public Quaternion divide(double scalar) {
-    return new Quaternion(getW() / scalar, getX() / scalar, getY() / scalar, getZ() / scalar);
+    return new Quaternion(w / scalar, x / scalar, y / scalar, z / scalar);
   }
 
   /**
@@ -92,7 +95,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The scaled quaternion.
    */
   public Quaternion times(double scalar) {
-    return new Quaternion(getW() * scalar, getX() * scalar, getY() * scalar, getZ() * scalar);
+    return new Quaternion(w * scalar, x * scalar, y * scalar, z * scalar);
   }
 
   /**
@@ -103,29 +106,29 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    */
   public Quaternion times(Quaternion other) {
     // https://en.wikipedia.org/wiki/Quaternion#Scalar_and_vector_parts
-    final var r1 = m_w;
-    final var r2 = other.m_w;
+    final var r1 = w;
+    final var r2 = other.w;
 
     // v₁ ⋅ v₂
-    double dot = m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
+    double dot = x * other.x + y * other.y + z * other.z;
 
     // v₁ x v₂
-    double cross_x = m_y * other.m_z - other.m_y * m_z;
-    double cross_y = other.m_x * m_z - m_x * other.m_z;
-    double cross_z = m_x * other.m_y - other.m_x * m_y;
+    double cross_x = y * other.z - other.y * z;
+    double cross_y = other.x * z - x * other.z;
+    double cross_z = x * other.y - other.x * y;
 
     return new Quaternion(
         // r = r₁r₂ − v₁ ⋅ v₂
         r1 * r2 - dot,
         // v = r₁v₂ + r₂v₁ + v₁ x v₂
-        r1 * other.m_x + r2 * m_x + cross_x,
-        r1 * other.m_y + r2 * m_y + cross_y,
-        r1 * other.m_z + r2 * m_z + cross_z);
+        r1 * other.x + r2 * x + cross_x,
+        r1 * other.y + r2 * y + cross_y,
+        r1 * other.z + r2 * z + cross_z);
   }
 
   @Override
   public String toString() {
-    return String.format("Quaternion(%s, %s, %s, %s)", getW(), getX(), getY(), getZ());
+    return String.format("Quaternion(%s, %s, %s, %s)", w, x, y, z);
   }
 
   /**
@@ -143,7 +146,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_w, m_x, m_y, m_z);
+    return Objects.hash(w, x, y, z);
   }
 
   /**
@@ -152,7 +155,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The conjugate quaternion.
    */
   public Quaternion conjugate() {
-    return new Quaternion(getW(), -getX(), -getY(), -getZ());
+    return new Quaternion(w, -x, -y, -z);
   }
 
   /**
@@ -162,10 +165,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The dot product of two quaternions.
    */
   public double dot(final Quaternion other) {
-    return getW() * other.getW()
-        + getX() * other.getX()
-        + getY() * other.getY()
-        + getZ() * other.getZ();
+    return w * other.w + x * other.x + y * other.y + z * other.z;
   }
 
   /**
@@ -197,7 +197,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
     if (norm == 0.0) {
       return new Quaternion();
     } else {
-      return new Quaternion(getW() / norm, getX() / norm, getY() / norm, getZ() / norm);
+      return new Quaternion(w / norm, x / norm, y / norm, z / norm);
     }
   }
 
@@ -223,9 +223,9 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
    * @return The Matrix exponential of this quaternion.
    */
   public Quaternion exp() {
-    var scalar = Math.exp(getW());
+    var scalar = Math.exp(w);
 
-    var axial_magnitude = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    var axial_magnitude = Math.sqrt(x * x + y * y + z * z);
     var cosine = Math.cos(axial_magnitude);
 
     double axial_scalar;
@@ -241,9 +241,9 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
 
     return new Quaternion(
         cosine * scalar,
-        getX() * axial_scalar * scalar,
-        getY() * axial_scalar * scalar,
-        getZ() * axial_scalar * scalar);
+        x * axial_scalar * scalar,
+        y * axial_scalar * scalar,
+        z * axial_scalar * scalar);
   }
 
   /**
@@ -264,9 +264,8 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
 
     var scalar = Math.log(norm);
 
-    var v_norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    var v_norm = Math.sqrt(x * x + y * y + z * z);
 
-    var w = getW();
     var s_norm = w / norm;
 
     if (Math.abs(s_norm + 1) < 1e-9) {
@@ -286,47 +285,7 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
       v_scalar = Math.atan2(v_norm, w) / v_norm;
     }
 
-    return new Quaternion(scalar, v_scalar * getX(), v_scalar * getY(), v_scalar * getZ());
-  }
-
-  /**
-   * Returns W component of the quaternion.
-   *
-   * @return W component of the quaternion.
-   */
-  @Json.Property(value = "W")
-  public double getW() {
-    return m_w;
-  }
-
-  /**
-   * Returns X component of the quaternion.
-   *
-   * @return X component of the quaternion.
-   */
-  @Json.Property(value = "X")
-  public double getX() {
-    return m_x;
-  }
-
-  /**
-   * Returns Y component of the quaternion.
-   *
-   * @return Y component of the quaternion.
-   */
-  @Json.Property(value = "Y")
-  public double getY() {
-    return m_y;
-  }
-
-  /**
-   * Returns Z component of the quaternion.
-   *
-   * @return Z component of the quaternion.
-   */
-  @Json.Property(value = "Z")
-  public double getZ() {
-    return m_z;
+    return new Quaternion(scalar, v_scalar * x, v_scalar * y, v_scalar * z);
   }
 
   /**
@@ -372,20 +331,20 @@ public final class Quaternion implements ProtobufSerializable, StructSerializabl
     // Sound State Representation through Encapsulation of Manifolds"
     //
     // https://arxiv.org/pdf/1107.1119.pdf
-    double norm = Math.sqrt(getX() * getX() + getY() * getY() + getZ() * getZ());
+    double norm = Math.sqrt(x * x + y * y + z * z);
 
     double coeff;
     if (norm < 1e-9) {
-      coeff = 2.0 / getW() - 2.0 / 3.0 * norm * norm / (getW() * getW() * getW());
+      coeff = 2.0 / w - 2.0 / 3.0 * norm * norm / (w * w * w);
     } else {
-      if (getW() < 0.0) {
-        coeff = 2.0 * Math.atan2(-norm, -getW()) / norm;
+      if (w < 0.0) {
+        coeff = 2.0 * Math.atan2(-norm, -w) / norm;
       } else {
-        coeff = 2.0 * Math.atan2(norm, getW()) / norm;
+        coeff = 2.0 * Math.atan2(norm, w) / norm;
       }
     }
 
-    return VecBuilder.fill(coeff * getX(), coeff * getY(), coeff * getZ());
+    return VecBuilder.fill(coeff * x, coeff * y, coeff * z);
   }
 
   /** Quaternion protobuf for serialization. */

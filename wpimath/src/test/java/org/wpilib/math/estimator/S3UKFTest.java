@@ -156,9 +156,9 @@ class S3UKFTest {
 
     observer.setXhat(
         VecBuilder.fill(
-            trajectory.start().pose.getTranslation().getX(),
-            trajectory.start().pose.getTranslation().getY(),
-            trajectory.start().pose.getRotation().getRadians(),
+            trajectory.start().pose.translation.x,
+            trajectory.start().pose.translation.y,
+            trajectory.start().pose.rotation.getRadians(),
             0.0,
             0.0));
 
@@ -172,9 +172,9 @@ class S3UKFTest {
 
       var nextR =
           VecBuilder.fill(
-              ref.pose.getTranslation().getX(),
-              ref.pose.getTranslation().getY(),
-              ref.pose.getRotation().getRadians(),
+              ref.pose.translation.x,
+              ref.pose.translation.y,
+              ref.pose.rotation.getRadians(),
               vl,
               vr);
 
@@ -212,9 +212,9 @@ class S3UKFTest {
 
     final var finalPosition = trajectory.sampleAt(trajectory.duration);
 
-    assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
-    assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);
-    assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 0.00015);
+    assertEquals(finalPosition.pose.translation.x, observer.getXhat(0), 0.055);
+    assertEquals(finalPosition.pose.translation.y, observer.getXhat(1), 0.15);
+    assertEquals(finalPosition.pose.rotation.getRadians(), observer.getXhat(2), 0.00015);
     assertEquals(0.0, observer.getXhat(3), 0.1);
     assertEquals(0.0, observer.getXhat(4), 0.1);
   }

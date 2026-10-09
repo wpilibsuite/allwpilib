@@ -45,8 +45,8 @@ public final class Transform3dStruct implements Struct<Transform3d> {
 
   @Override
   public void pack(ByteBuffer bb, Transform3d value) {
-    Translation3d.struct.pack(bb, value.getTranslation());
-    Rotation3d.struct.pack(bb, value.getRotation());
+    Translation3d.struct.pack(bb, value.translation);
+    Rotation3d.struct.pack(bb, value.rotation);
   }
 
   @Override

@@ -153,8 +153,8 @@ public class PoseEstimator<T> {
       // apply vision compensation to the pose rotation
       final var visionUpdate =
           new VisionUpdate(
-              new Pose2d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
-              new Pose2d(translation, latestVisionUpdate.getValue().odometryPose.getRotation()));
+              new Pose2d(translation, latestVisionUpdate.getValue().visionPose.rotation),
+              new Pose2d(translation, latestVisionUpdate.getValue().odometryPose.rotation));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPose());
     } else {
@@ -178,8 +178,8 @@ public class PoseEstimator<T> {
       // apply vision compensation to the pose translation
       final var visionUpdate =
           new VisionUpdate(
-              new Pose2d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
-              new Pose2d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation));
+              new Pose2d(latestVisionUpdate.getValue().visionPose.translation, rotation),
+              new Pose2d(latestVisionUpdate.getValue().odometryPose.translation, rotation));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPose());
     } else {
@@ -306,7 +306,7 @@ public class PoseEstimator<T> {
         new Transform2d(
             m_vision_k[0] * transform.getX(),
             m_vision_k[1] * transform.getY(),
-            Rotation2d.fromRadians(m_vision_k[2] * transform.getRotation().getRadians()));
+            Rotation2d.fromRadians(m_vision_k[2] * transform.rotation.getRadians()));
 
     // Step 6: Calculate and record the vision update.
     var visionUpdate =

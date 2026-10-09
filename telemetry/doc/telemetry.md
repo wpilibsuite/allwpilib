@@ -794,7 +794,7 @@ public void robotPeriodic() {
       new double[] {
         pose.getX(),
         pose.getY(),
-        pose.getRotation().getRadians()
+        pose.rotation.getRadians()
       });
 }
 ```

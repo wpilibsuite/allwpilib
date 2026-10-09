@@ -198,8 +198,8 @@ public class SwerveDriveKinematics
 
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleVelocities[i];
-      moduleVelocitiesMatrix.set(i * 2, 0, module.velocity * module.angle.getCos());
-      moduleVelocitiesMatrix.set(i * 2 + 1, module.velocity * module.angle.getSin());
+      moduleVelocitiesMatrix.set(i * 2, 0, module.velocity * module.angle.cos);
+      moduleVelocitiesMatrix.set(i * 2 + 1, module.velocity * module.angle.sin);
     }
 
     var chassisVelocitiesVector = m_firstOrderForwardKinematics.mult(moduleVelocitiesMatrix);
@@ -229,8 +229,8 @@ public class SwerveDriveKinematics
 
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleDeltas[i];
-      moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.getCos());
-      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.getSin());
+      moduleDeltaMatrix.set(i * 2, 0, module.distance * module.angle.cos);
+      moduleDeltaMatrix.set(i * 2 + 1, 0, module.distance * module.angle.sin);
     }
 
     var chassisDeltaVector = m_firstOrderForwardKinematics.mult(moduleDeltaMatrix);
@@ -579,8 +579,8 @@ public class SwerveDriveKinematics
     for (int i = 0; i < m_numModules; i++) {
       var module = moduleAccelerations[i];
 
-      moduleAccelerationsMatrix.set(i * 2 + 0, 0, module.acceleration * module.angle.getCos());
-      moduleAccelerationsMatrix.set(i * 2 + 1, 0, module.acceleration * module.angle.getSin());
+      moduleAccelerationsMatrix.set(i * 2 + 0, 0, module.acceleration * module.angle.cos);
+      moduleAccelerationsMatrix.set(i * 2 + 1, 0, module.acceleration * module.angle.sin);
     }
 
     var chassisAccelerationsVector = m_secondOrderForwardKinematics.mult(moduleAccelerationsMatrix);
@@ -601,8 +601,8 @@ public class SwerveDriveKinematics
    */
   private void setInverseKinematics(Translation2d centerOfRotation) {
     for (int i = 0; i < m_numModules; i++) {
-      var rx = m_modules[i].getX() - centerOfRotation.getX();
-      var ry = m_modules[i].getY() - centerOfRotation.getY();
+      var rx = m_modules[i].x - centerOfRotation.x;
+      var ry = m_modules[i].y - centerOfRotation.y;
 
       m_firstOrderInverseKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -ry);
       m_firstOrderInverseKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, rx);

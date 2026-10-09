@@ -40,10 +40,10 @@ public final class QuaternionStruct implements Struct<Quaternion> {
 
   @Override
   public void pack(ByteBuffer bb, Quaternion value) {
-    bb.putDouble(value.getW());
-    bb.putDouble(value.getX());
-    bb.putDouble(value.getY());
-    bb.putDouble(value.getZ());
+    bb.putDouble(value.w);
+    bb.putDouble(value.x);
+    bb.putDouble(value.y);
+    bb.putDouble(value.z);
   }
 
   @Override

@@ -138,6 +138,6 @@ public class SwerveModuleVelocity
    * @return The scaled SwerveModuleVelocity.
    */
   public SwerveModuleVelocity cosineScale(Rotation2d currentAngle) {
-    return new SwerveModuleVelocity(velocity * angle.minus(currentAngle).getCos(), angle);
+    return new SwerveModuleVelocity(velocity * angle.minus(currentAngle).cos, angle);
   }
 }

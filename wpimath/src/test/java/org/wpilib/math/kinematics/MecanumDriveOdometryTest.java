@@ -42,7 +42,7 @@ class MecanumDriveOdometryTest {
     assertAll(
         () -> assertEquals(0.0, secondPose.getX(), 0.01),
         () -> assertEquals(0.0, secondPose.getY(), 0.01),
-        () -> assertEquals(0.0, secondPose.getRotation().getDegrees(), 0.01));
+        () -> assertEquals(0.0, secondPose.rotation.getDegrees(), 0.01));
   }
 
   @Test
@@ -57,7 +57,7 @@ class MecanumDriveOdometryTest {
     assertAll(
         () -> assertEquals(0.3536, pose.getX(), 0.01),
         () -> assertEquals(0.0, pose.getY(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().getDegrees(), 0.01));
+        () -> assertEquals(0.0, pose.rotation.getDegrees(), 0.01));
   }
 
   @Test
@@ -73,7 +73,7 @@ class MecanumDriveOdometryTest {
     assertAll(
         () -> assertEquals(8.4855, pose.getX(), 0.01),
         () -> assertEquals(8.4855, pose.getY(), 0.01),
-        () -> assertEquals(90.0, pose.getRotation().getDegrees(), 0.01));
+        () -> assertEquals(90.0, pose.rotation.getDegrees(), 0.01));
   }
 
   @Test
@@ -89,7 +89,7 @@ class MecanumDriveOdometryTest {
     assertAll(
         () -> assertEquals(3.536, pose.getX(), 0.1),
         () -> assertEquals(0.0, pose.getY(), 0.1),
-        () -> assertEquals(0.0, pose.getRotation().getRadians(), 0.1));
+        () -> assertEquals(0.0, pose.rotation.getRadians(), 0.1));
   }
 
   @Test
@@ -156,12 +156,12 @@ class MecanumDriveOdometryTest {
 
       var xHat =
           odometry.update(
-              groundTruthState.pose.getRotation().plus(new Rotation2d(rand.nextGaussian() * 0.05)),
+              groundTruthState.pose.rotation.plus(new Rotation2d(rand.nextGaussian() * 0.05)),
               wheelPositions);
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
-      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.translation.getDistance(xHat.translation);
       if (error > maxError) {
         maxError = error;
       }
@@ -221,8 +221,8 @@ class MecanumDriveOdometryTest {
       var wheelVelocities =
           kinematics.toWheelVelocities(
               new ChassisVelocities(
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getCos(),
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getSin(),
+                  groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.cos,
+                  groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.sin,
                   0));
 
       wheelVelocities =
@@ -243,9 +243,9 @@ class MecanumDriveOdometryTest {
 
       var xHat = odometry.update(new Rotation2d(rand.nextGaussian() * 0.05), wheelPositions);
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
-      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.translation.getDistance(xHat.translation);
       if (error > maxError) {
         maxError = error;
       }

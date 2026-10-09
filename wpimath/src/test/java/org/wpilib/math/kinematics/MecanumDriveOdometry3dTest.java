@@ -47,7 +47,7 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(1.0, pose.getX(), 1e-9),
         () -> assertEquals(2.0, pose.getY(), 1e-9),
         () -> assertEquals(0.0, pose.getZ(), 1e-9),
-        () -> assertEquals(45.0, pose.getRotation().toRotation2d().getDegrees(), 1e-9));
+        () -> assertEquals(45.0, pose.rotation.toRotation2d().getDegrees(), 1e-9));
   }
 
   @Test
@@ -63,7 +63,7 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(0.0, secondPose.getX(), 0.01),
         () -> assertEquals(0.0, secondPose.getY(), 0.01),
         () -> assertEquals(0.0, secondPose.getZ(), 0.01),
-        () -> assertEquals(0.0, secondPose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(0.0, secondPose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -79,7 +79,7 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(0.3536, pose.getX(), 0.01),
         () -> assertEquals(0.0, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getZ(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(0.0, pose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -96,7 +96,7 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(8.4855, pose.getX(), 0.01),
         () -> assertEquals(8.4855, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getZ(), 0.01),
-        () -> assertEquals(90.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(90.0, pose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -113,7 +113,7 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(3.536, pose.getX(), 0.1),
         () -> assertEquals(0.0, pose.getY(), 0.1),
         () -> assertEquals(0.0, pose.getZ(), 0.1),
-        () -> assertEquals(0.0, pose.getRotation().toRotation2d().getRadians(), 0.1));
+        () -> assertEquals(0.0, pose.rotation.toRotation2d().getRadians(), 0.1));
   }
 
   @Test
@@ -181,19 +181,13 @@ class MecanumDriveOdometry3dTest {
       var xHat =
           odometry.update(
               new Rotation3d(
-                  groundTruthState
-                      .pose
-                      .getRotation()
-                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))),
+                  groundTruthState.pose.rotation.plus(new Rotation2d(rand.nextGaussian() * 0.05))),
               wheelPositions);
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -253,8 +247,8 @@ class MecanumDriveOdometry3dTest {
       var wheelVelocities =
           kinematics.toWheelVelocities(
               new ChassisVelocities(
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getCos(),
-                  groundTruthState.forwardVelocity() * groundTruthState.pose.getRotation().getSin(),
+                  groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.cos,
+                  groundTruthState.forwardVelocity() * groundTruthState.pose.rotation.sin,
                   0));
 
       wheelVelocities =
@@ -275,13 +269,10 @@ class MecanumDriveOdometry3dTest {
 
       var xHat = odometry.update(new Rotation3d(0, 0, rand.nextGaussian() * 0.05), wheelPositions);
 
-      odometryDistanceTravelled += lastPose.getTranslation().getDistance(xHat.getTranslation());
+      odometryDistanceTravelled += lastPose.translation.getDistance(xHat.translation);
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -312,8 +303,8 @@ class MecanumDriveOdometry3dTest {
         () -> assertEquals(0.0, pose.getX(), 1e-9),
         () -> assertEquals(0.0, pose.getY(), 1e-9),
         () -> assertEquals(0.0, pose.getZ(), 1e-9),
-        () -> assertEquals(degreesToRadians(0), pose.getRotation().getX(), 1e-9),
-        () -> assertEquals(degreesToRadians(5), pose.getRotation().getY(), 1e-9),
-        () -> assertEquals(degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
+        () -> assertEquals(degreesToRadians(0), pose.rotation.getX(), 1e-9),
+        () -> assertEquals(degreesToRadians(5), pose.rotation.getY(), 1e-9),
+        () -> assertEquals(degreesToRadians(90), pose.rotation.getZ(), 1e-9));
   }
 }

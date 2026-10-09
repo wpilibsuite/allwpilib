@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
         Transform3d pose = estimator.estimate(detection);
 
         // put pose into dashboard
-        Rotation3d rot = pose.getRotation();
+        Rotation3d rot = pose.rotation;
         tagsTable
             .getEntry("pose_" + detection.getId())
             .setDoubleArray(

@@ -28,7 +28,7 @@ class Pose3dStructTest {
     buffer.rewind();
 
     Pose3d data = Pose3d.struct.unpack(buffer);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

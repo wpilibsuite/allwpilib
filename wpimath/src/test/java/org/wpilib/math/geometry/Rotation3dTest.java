@@ -135,27 +135,21 @@ class Rotation3dTest {
 
     // 180 degree rotation of x-axes
     final var rot6 = new Rotation3d(xAxis, xAxis.times(-1.0));
-    final var q6 = rot6.getQuaternion();
-    assertEquals(0.0, q6.getW());
-    assertEquals(
-        0.0,
-        q6.getX() * xAxis.get(0, 0) + q6.getY() * xAxis.get(1, 0) + q6.getZ() * xAxis.get(2, 0));
+    final var q6 = rot6.quaternion;
+    assertEquals(0.0, q6.w);
+    assertEquals(0.0, q6.x * xAxis.get(0, 0) + q6.y * xAxis.get(1, 0) + q6.z * xAxis.get(2, 0));
 
     // 180 degree rotation of y-axes
     final var rot7 = new Rotation3d(yAxis, yAxis.times(-1.0));
-    final var q7 = rot7.getQuaternion();
-    assertEquals(0.0, q7.getW());
-    assertEquals(
-        0.0,
-        q7.getX() * yAxis.get(0, 0) + q7.getY() * yAxis.get(1, 0) + q7.getZ() * yAxis.get(2, 0));
+    final var q7 = rot7.quaternion;
+    assertEquals(0.0, q7.w);
+    assertEquals(0.0, q7.x * yAxis.get(0, 0) + q7.y * yAxis.get(1, 0) + q7.z * yAxis.get(2, 0));
 
     // 180 degree rotation of z-axes
     final var rot8 = new Rotation3d(zAxis, zAxis.times(-1.0));
-    final var q8 = rot8.getQuaternion();
-    assertEquals(0.0, q8.getW());
-    assertEquals(
-        0.0,
-        q8.getX() * zAxis.get(0, 0) + q8.getY() * zAxis.get(1, 0) + q8.getZ() * zAxis.get(2, 0));
+    final var q8 = rot8.quaternion;
+    assertEquals(0.0, q8.w);
+    assertEquals(0.0, q8.x * zAxis.get(0, 0) + q8.y * zAxis.get(1, 0) + q8.z * zAxis.get(2, 0));
   }
 
   @Test

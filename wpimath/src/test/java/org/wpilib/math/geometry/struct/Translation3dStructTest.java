@@ -22,8 +22,8 @@ class Translation3dStructTest {
     buffer.rewind();
 
     Translation3d data = Translation3d.struct.unpack(buffer);
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
-    assertEquals(DATA.getZ(), data.getZ());
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
+    assertEquals(DATA.z, data.z);
   }
 }

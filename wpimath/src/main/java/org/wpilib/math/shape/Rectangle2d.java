@@ -64,8 +64,8 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
   public Rectangle2d(Translation2d cornerA, Translation2d cornerB) {
     this(
         new Pose2d(cornerA.plus(cornerB).div(2.0), Rotation2d.ZERO),
-        Math.abs(cornerA.getX() - cornerB.getX()),
-        Math.abs(cornerA.getY() - cornerB.getY()));
+        Math.abs(cornerA.x - cornerB.x),
+        Math.abs(cornerA.y - cornerB.y));
   }
 
   /**
@@ -83,7 +83,7 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
    * @return The rotational component of the rectangle.
    */
   public Rotation2d getRotation() {
-    return m_center.getRotation();
+    return m_center.rotation;
   }
 
   /**
@@ -150,15 +150,15 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
    */
   public boolean intersects(Translation2d point) {
     // Move the point into the rectangle's coordinate frame
-    point = point.minus(m_center.getTranslation());
-    point = point.rotateBy(m_center.getRotation().unaryMinus());
+    point = point.minus(m_center.translation);
+    point = point.rotateBy(m_center.rotation.unaryMinus());
 
-    if (Math.abs(Math.abs(point.getX()) - m_xWidth / 2.0) <= 1E-9) {
+    if (Math.abs(Math.abs(point.x) - m_xWidth / 2.0) <= 1E-9) {
       // Point rests on left/right perimeter
-      return Math.abs(point.getY()) <= m_yWidth / 2.0;
-    } else if (Math.abs(Math.abs(point.getY()) - m_yWidth / 2.0) <= 1E-9) {
+      return Math.abs(point.y) <= m_yWidth / 2.0;
+    } else if (Math.abs(Math.abs(point.y) - m_yWidth / 2.0) <= 1E-9) {
       // Point rests on top/bottom perimeter
-      return Math.abs(point.getX()) <= m_xWidth / 2.0;
+      return Math.abs(point.x) <= m_xWidth / 2.0;
     }
 
     return false;
@@ -173,13 +173,13 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
    */
   public boolean contains(Translation2d point) {
     // Rotate the point into the rectangle's coordinate frame
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    point = point.rotateAround(m_center.translation, m_center.rotation.unaryMinus());
 
     // Check if within bounding box
-    return point.getX() >= (m_center.getX() - m_xWidth / 2.0)
-        && point.getX() <= (m_center.getX() + m_xWidth / 2.0)
-        && point.getY() >= (m_center.getY() - m_yWidth / 2.0)
-        && point.getY() <= (m_center.getY() + m_yWidth / 2.0);
+    return point.x >= (m_center.getX() - m_xWidth / 2.0)
+        && point.x <= (m_center.getX() + m_xWidth / 2.0)
+        && point.y >= (m_center.getY() - m_yWidth / 2.0)
+        && point.y <= (m_center.getY() + m_yWidth / 2.0);
   }
 
   /**
@@ -215,18 +215,17 @@ public final class Rectangle2d implements ProtobufSerializable, StructSerializab
     }
 
     // Rotate the point by the inverse of the rectangle's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    point = point.rotateAround(m_center.translation, m_center.rotation.unaryMinus());
 
     // Find nearest point
     point =
         new Translation2d(
+            Math.clamp(point.x, m_center.getX() - m_xWidth / 2.0, m_center.getX() + m_xWidth / 2.0),
             Math.clamp(
-                point.getX(), m_center.getX() - m_xWidth / 2.0, m_center.getX() + m_xWidth / 2.0),
-            Math.clamp(
-                point.getY(), m_center.getY() - m_yWidth / 2.0, m_center.getY() + m_yWidth / 2.0));
+                point.y, m_center.getY() - m_yWidth / 2.0, m_center.getY() + m_yWidth / 2.0));
 
     // Undo rotation
-    return point.rotateAround(m_center.getTranslation(), m_center.getRotation());
+    return point.rotateAround(m_center.translation, m_center.rotation);
   }
 
   @Override

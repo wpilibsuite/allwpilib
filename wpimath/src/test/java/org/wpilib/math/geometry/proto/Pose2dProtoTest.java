@@ -22,7 +22,7 @@ class Pose2dProtoTest {
     Pose2d.proto.pack(proto, DATA);
 
     Pose2d data = Pose2d.proto.unpack(proto);
-    assertEquals(DATA.getTranslation(), data.getTranslation());
-    assertEquals(DATA.getRotation(), data.getRotation());
+    assertEquals(DATA.translation, data.translation);
+    assertEquals(DATA.rotation, data.rotation);
   }
 }

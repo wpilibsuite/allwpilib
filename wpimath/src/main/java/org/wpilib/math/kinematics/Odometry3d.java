@@ -84,7 +84,7 @@ public class Odometry3d<T> {
    * @param translation The translation to reset to.
    */
   public void resetTranslation(Translation3d translation) {
-    m_pose = new Pose3d(translation, m_pose.getRotation());
+    m_pose = new Pose3d(translation, m_pose.rotation);
   }
 
   /**
@@ -93,7 +93,7 @@ public class Odometry3d<T> {
    * @param rotation The rotation to reset to.
    */
   public void resetRotation(Rotation3d rotation) {
-    m_pose = new Pose3d(m_pose.getTranslation(), rotation);
+    m_pose = new Pose3d(m_pose.translation, rotation);
   }
 
   /**

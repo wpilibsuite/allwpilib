@@ -105,7 +105,7 @@ public class LTVDifferentialDriveController {
         VecBuilder.fill(
             poseTolerance.getX(),
             poseTolerance.getY(),
-            poseTolerance.getRotation().getRadians(),
+            poseTolerance.rotation.getRadians(),
             leftVelocityTolerance,
             rightVelocityTolerance);
   }
@@ -152,14 +152,14 @@ public class LTVDifferentialDriveController {
         VecBuilder.fill(
             poseRef.getX(),
             poseRef.getY(),
-            poseRef.getRotation().getRadians(),
+            poseRef.rotation.getRadians(),
             leftVelocityRef,
             rightVelocityRef);
     var x =
         VecBuilder.fill(
             currentPose.getX(),
             currentPose.getY(),
-            currentPose.getRotation().getRadians(),
+            currentPose.rotation.getRadians(),
             leftVelocity,
             rightVelocity);
 

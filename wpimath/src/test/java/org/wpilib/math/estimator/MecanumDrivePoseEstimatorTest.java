@@ -62,7 +62,7 @@ class MecanumDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+        state -> state.velocity.toRobotRelative(state.pose.rotation),
         state -> state.pose,
         trajectory.start().pose,
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -111,14 +111,13 @@ class MecanumDrivePoseEstimatorTest {
                 .pose
                 .plus(
                     new Transform2d(
-                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
-                        heading_offset));
+                        new Translation2d(pose_offset.cos, pose_offset.sin), heading_offset));
 
         testFollowTrajectory(
             kinematics,
             estimator,
             trajectory,
-            state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+            state -> state.velocity.toRobotRelative(state.pose.rotation),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -194,12 +193,12 @@ class MecanumDrivePoseEstimatorTest {
               t,
               groundTruthState
                   .pose
-                  .getRotation()
+                  .rotation
                   .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.start().pose.getRotation()),
+                  .minus(trajectory.start().pose.rotation),
               wheelPositions);
 
-      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.translation.getDistance(xHat.translation);
       if (error > maxError) {
         maxError = error;
       }
@@ -213,8 +212,8 @@ class MecanumDrivePoseEstimatorTest {
     assertEquals(
         endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
     assertEquals(
-        endingPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
+        endingPose.rotation.getRadians(),
+        estimator.getEstimatedPosition().rotation.getRadians(),
         0.15,
         "Incorrect Final Theta");
 
@@ -272,8 +271,8 @@ class MecanumDrivePoseEstimatorTest {
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
       var dtheta =
           Math.abs(
-              measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().getDegrees());
+              measurement.rotation.getDegrees()
+                  - estimator.getEstimatedPosition().rotation.getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -315,8 +314,8 @@ class MecanumDrivePoseEstimatorTest {
     assertEquals(odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X");
     assertEquals(odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y");
     assertEquals(
-        odometryPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
+        odometryPose.rotation.getRadians(),
+        estimator.getEstimatedPosition().rotation.getRadians(),
         "Incorrect Final Theta");
   }
 
@@ -401,8 +400,7 @@ class MecanumDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test orientation and wheel positions
     estimator.update(Rotation2d.ZERO, new MecanumDriveWheelPositions(2, 2, 2, 2));
@@ -410,8 +408,7 @@ class MecanumDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test reset rotation
     estimator.resetRotation(Rotation2d.CCW_PI_2);
@@ -421,7 +418,7 @@ class MecanumDrivePoseEstimatorTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+                Math.PI / 2, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test orientation
     estimator.update(Rotation2d.ZERO, new MecanumDriveWheelPositions(3, 3, 3, 3));
@@ -431,7 +428,7 @@ class MecanumDrivePoseEstimatorTest {
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), EPSILON),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+                Math.PI / 2, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test reset translation
     estimator.resetTranslation(new Translation2d(-1, -1));
@@ -441,7 +438,7 @@ class MecanumDrivePoseEstimatorTest {
         () -> assertEquals(-1, estimator.getEstimatedPosition().getY(), EPSILON),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+                Math.PI / 2, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test reset pose
     estimator.resetPose(Pose2d.ZERO);
@@ -449,7 +446,6 @@ class MecanumDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(0, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
   }
 }

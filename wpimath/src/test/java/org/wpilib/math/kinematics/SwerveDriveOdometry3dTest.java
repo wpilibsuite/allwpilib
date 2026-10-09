@@ -48,7 +48,7 @@ class SwerveDriveOdometry3dTest {
         () -> assertEquals(1.0, pose.getX(), 1e-9),
         () -> assertEquals(2.0, pose.getY(), 1e-9),
         () -> assertEquals(0.0, pose.getZ(), 1e-9),
-        () -> assertEquals(45.0, pose.getRotation().toRotation2d().getDegrees(), 1e-9));
+        () -> assertEquals(45.0, pose.rotation.toRotation2d().getDegrees(), 1e-9));
   }
 
   @Test
@@ -75,7 +75,7 @@ class SwerveDriveOdometry3dTest {
         () -> assertEquals(5.0 / 10.0, pose.getX(), 0.01),
         () -> assertEquals(0, pose.getY(), 0.01),
         () -> assertEquals(0, pose.getZ(), 0.01),
-        () -> assertEquals(0.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(0.0, pose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -101,7 +101,7 @@ class SwerveDriveOdometry3dTest {
         () -> assertEquals(12.0, pose.getX(), 0.01),
         () -> assertEquals(12.0, pose.getY(), 0.01),
         () -> assertEquals(0.0, pose.getZ(), 0.01),
-        () -> assertEquals(90.0, pose.getRotation().toRotation2d().getDegrees(), 0.01));
+        () -> assertEquals(90.0, pose.rotation.toRotation2d().getDegrees(), 0.01));
   }
 
   @Test
@@ -121,7 +121,7 @@ class SwerveDriveOdometry3dTest {
         () -> assertEquals(1.0, pose.getX(), 0.1),
         () -> assertEquals(0.00, pose.getY(), 0.1),
         () -> assertEquals(0.00, pose.getZ(), 0.1),
-        () -> assertEquals(0.00, pose.getRotation().toRotation2d().getRadians(), 0.1));
+        () -> assertEquals(0.00, pose.rotation.toRotation2d().getRadians(), 0.1));
   }
 
   @Test
@@ -190,17 +190,11 @@ class SwerveDriveOdometry3dTest {
       var xHat =
           odometry.update(
               new Rotation3d(
-                  groundTruthState
-                      .pose
-                      .getRotation()
-                      .plus(new Rotation2d(rand.nextGaussian() * 0.05))),
+                  groundTruthState.pose.rotation.plus(new Rotation2d(rand.nextGaussian() * 0.05))),
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -214,7 +208,7 @@ class SwerveDriveOdometry3dTest {
     assertEquals(0.0, odometry.getPose().getZ(), 1e-1, "Incorrect Final Y");
     assertEquals(
         Math.PI / 4,
-        odometry.getPose().getRotation().toRotation2d().getRadians(),
+        odometry.getPose().rotation.toRotation2d().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
@@ -262,7 +256,7 @@ class SwerveDriveOdometry3dTest {
       double distanceDelta =
           groundTruthState.forwardVelocity() * dt
               + 0.5 * groundTruthState.forwardAcceleration() * dt * dt;
-      var moduleAngle = groundTruthState.pose.getRotation();
+      var moduleAngle = groundTruthState.pose.rotation;
       fl = new SwerveModulePosition(fl.distance + distanceDelta, moduleAngle);
       fr = new SwerveModulePosition(fr.distance + distanceDelta, moduleAngle);
       bl = new SwerveModulePosition(bl.distance + distanceDelta, moduleAngle);
@@ -274,10 +268,7 @@ class SwerveDriveOdometry3dTest {
               new SwerveModulePosition[] {fl, fr, bl, br});
 
       double error =
-          groundTruthState
-              .pose
-              .getTranslation()
-              .getDistance(xHat.getTranslation().toTranslation2d());
+          groundTruthState.pose.translation.getDistance(xHat.translation.toTranslation2d());
       if (error > maxError) {
         maxError = error;
       }
@@ -291,7 +282,7 @@ class SwerveDriveOdometry3dTest {
     assertEquals(0.0, odometry.getPose().getZ(), 1e-1, "Incorrect Final Y");
     assertEquals(
         0.0,
-        odometry.getPose().getRotation().toRotation2d().getRadians(),
+        odometry.getPose().rotation.toRotation2d().getRadians(),
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
@@ -312,8 +303,8 @@ class SwerveDriveOdometry3dTest {
         () -> assertEquals(0.0, pose.getX(), 1e-9),
         () -> assertEquals(0.0, pose.getY(), 1e-9),
         () -> assertEquals(0.0, pose.getZ(), 1e-9),
-        () -> assertEquals(degreesToRadians(0), pose.getRotation().getX(), 1e-9),
-        () -> assertEquals(degreesToRadians(5), pose.getRotation().getY(), 1e-9),
-        () -> assertEquals(degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
+        () -> assertEquals(degreesToRadians(0), pose.rotation.getX(), 1e-9),
+        () -> assertEquals(degreesToRadians(5), pose.rotation.getY(), 1e-9),
+        () -> assertEquals(degreesToRadians(90), pose.rotation.getZ(), 1e-9));
   }
 }

@@ -23,6 +23,6 @@ class Rotation3dStructTest {
     buffer.rewind();
 
     Rotation3d data = Rotation3d.struct.unpack(buffer);
-    assertEquals(DATA.getQuaternion(), data.getQuaternion());
+    assertEquals(DATA.quaternion, data.quaternion);
   }
 }

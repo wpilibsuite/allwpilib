@@ -68,7 +68,7 @@ class SwerveDrivePoseEstimatorTest {
         kinematics,
         estimator,
         trajectory,
-        state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+        state -> state.velocity.toRobotRelative(state.pose.rotation),
         state -> state.pose,
         trajectory.start().pose,
         new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -121,14 +121,13 @@ class SwerveDrivePoseEstimatorTest {
                 .pose
                 .plus(
                     new Transform2d(
-                        new Translation2d(pose_offset.getCos(), pose_offset.getSin()),
-                        heading_offset));
+                        new Translation2d(pose_offset.cos, pose_offset.sin), heading_offset));
 
         testFollowTrajectory(
             kinematics,
             estimator,
             trajectory,
-            state -> state.velocity.toRobotRelative(state.pose.getRotation()),
+            state -> state.velocity.toRobotRelative(state.pose.rotation),
             state -> state.pose,
             initial_pose,
             new Pose2d(0, 0, Rotation2d.fromDegrees(45)),
@@ -210,12 +209,12 @@ class SwerveDrivePoseEstimatorTest {
               t,
               groundTruthState
                   .pose
-                  .getRotation()
+                  .rotation
                   .plus(new Rotation2d(rand.nextGaussian() * 0.05))
-                  .minus(trajectory.start().pose.getRotation()),
+                  .minus(trajectory.start().pose.rotation),
               positions);
 
-      double error = groundTruthState.pose.getTranslation().getDistance(xHat.getTranslation());
+      double error = groundTruthState.pose.translation.getDistance(xHat.translation);
       if (error > maxError) {
         maxError = error;
       }
@@ -229,8 +228,8 @@ class SwerveDrivePoseEstimatorTest {
     assertEquals(
         endingPose.getY(), estimator.getEstimatedPosition().getY(), 0.08, "Incorrect Final Y");
     assertEquals(
-        endingPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
+        endingPose.rotation.getRadians(),
+        estimator.getEstimatedPosition().rotation.getRadians(),
         0.15,
         "Incorrect Final Theta");
 
@@ -293,8 +292,8 @@ class SwerveDrivePoseEstimatorTest {
       var dy = Math.abs(measurement.getY() - estimator.getEstimatedPosition().getY());
       var dtheta =
           Math.abs(
-              measurement.getRotation().getDegrees()
-                  - estimator.getEstimatedPosition().getRotation().getDegrees());
+              measurement.rotation.getDegrees()
+                  - estimator.getEstimatedPosition().rotation.getDegrees());
 
       assertTrue(dx > 0.08 || dy > 0.08 || dtheta > 0.08, errorLog);
     }
@@ -349,8 +348,8 @@ class SwerveDrivePoseEstimatorTest {
     assertEquals(odometryPose.getX(), estimator.getEstimatedPosition().getX(), "Incorrect Final X");
     assertEquals(odometryPose.getY(), estimator.getEstimatedPosition().getY(), "Incorrect Final Y");
     assertEquals(
-        odometryPose.getRotation().getRadians(),
-        estimator.getEstimatedPosition().getRotation().getRadians(),
+        odometryPose.rotation.getRadians(),
+        estimator.getEstimatedPosition().rotation.getRadians(),
         "Incorrect Final Theta");
   }
 
@@ -456,8 +455,7 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(1, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test orientation and wheel positions
     {
@@ -472,8 +470,7 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(2, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Add a vision measurement with a different translation
     estimator.addVisionMeasurement(
@@ -482,8 +479,7 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(2.5, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test reset rotation
     estimator.resetRotation(Rotation2d.CCW_PI_2);
@@ -493,7 +489,7 @@ class SwerveDrivePoseEstimatorTest {
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+                Math.PI / 2, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Test orientation
     {
@@ -510,7 +506,7 @@ class SwerveDrivePoseEstimatorTest {
         () -> assertEquals(1, estimator.getEstimatedPosition().getY(), EPSILON),
         () ->
             assertEquals(
-                Math.PI / 2, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+                Math.PI / 2, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
 
     // Add a vision measurement with a different rotation
     estimator.addVisionMeasurement(
@@ -522,7 +518,7 @@ class SwerveDrivePoseEstimatorTest {
         () ->
             assertEquals(
                 Math.PI * 3.0 / 4,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
+                estimator.getEstimatedPosition().rotation.getRadians(),
                 EPSILON));
 
     // Test reset translation
@@ -534,7 +530,7 @@ class SwerveDrivePoseEstimatorTest {
         () ->
             assertEquals(
                 Math.PI * 3.0 / 4,
-                estimator.getEstimatedPosition().getRotation().getRadians(),
+                estimator.getEstimatedPosition().rotation.getRadians(),
                 EPSILON));
 
     // Test reset pose
@@ -543,7 +539,6 @@ class SwerveDrivePoseEstimatorTest {
     assertAll(
         () -> assertEquals(0, estimator.getEstimatedPosition().getX(), EPSILON),
         () -> assertEquals(0, estimator.getEstimatedPosition().getY(), EPSILON),
-        () ->
-            assertEquals(0, estimator.getEstimatedPosition().getRotation().getRadians(), EPSILON));
+        () -> assertEquals(0, estimator.getEstimatedPosition().rotation.getRadians(), EPSILON));
   }
 }

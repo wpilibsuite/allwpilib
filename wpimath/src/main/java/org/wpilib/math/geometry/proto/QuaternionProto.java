@@ -32,10 +32,10 @@ public final class QuaternionProto implements Protobuf<Quaternion, ProtobufQuate
 
   @Override
   public void pack(ProtobufQuaternion msg, Quaternion value) {
-    msg.setW(value.getW());
-    msg.setX(value.getX());
-    msg.setY(value.getY());
-    msg.setZ(value.getZ());
+    msg.setW(value.w);
+    msg.setX(value.x);
+    msg.setY(value.y);
+    msg.setZ(value.z);
   }
 
   @Override

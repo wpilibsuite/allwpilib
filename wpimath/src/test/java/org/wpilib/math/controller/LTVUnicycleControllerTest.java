@@ -57,7 +57,7 @@ class LTVUnicycleControllerTest {
             assertEquals(
                 0.0,
                 MathUtil.angleModulus(
-                    endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
+                    endPose.rotation.getRadians() - finalRobotPose.rotation.getRadians()),
                 ANGULAR_TOLERANCE));
   }
 }

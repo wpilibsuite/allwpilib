@@ -166,8 +166,8 @@ public class PoseEstimator3d<T> {
       // apply vision compensation to the pose rotation
       final var visionUpdate =
           new VisionUpdate(
-              new Pose3d(translation, latestVisionUpdate.getValue().visionPose.getRotation()),
-              new Pose3d(translation, latestVisionUpdate.getValue().odometryPose.getRotation()));
+              new Pose3d(translation, latestVisionUpdate.getValue().visionPose.rotation),
+              new Pose3d(translation, latestVisionUpdate.getValue().odometryPose.rotation));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPose());
     } else {
@@ -191,8 +191,8 @@ public class PoseEstimator3d<T> {
       // apply vision compensation to the pose translation
       final var visionUpdate =
           new VisionUpdate(
-              new Pose3d(latestVisionUpdate.getValue().visionPose.getTranslation(), rotation),
-              new Pose3d(latestVisionUpdate.getValue().odometryPose.getTranslation(), rotation));
+              new Pose3d(latestVisionUpdate.getValue().visionPose.translation, rotation),
+              new Pose3d(latestVisionUpdate.getValue().odometryPose.translation, rotation));
       m_visionUpdates.put(latestVisionUpdate.getKey(), visionUpdate);
       m_poseEstimate = visionUpdate.compensate(m_odometry.getPose());
     } else {
@@ -321,9 +321,9 @@ public class PoseEstimator3d<T> {
             m_vision_k[1] * transform.getY(),
             m_vision_k[2] * transform.getZ(),
             new Rotation3d(
-                m_vision_k[3] * transform.getRotation().getX(),
-                m_vision_k[4] * transform.getRotation().getY(),
-                m_vision_k[5] * transform.getRotation().getZ()));
+                m_vision_k[3] * transform.rotation.getX(),
+                m_vision_k[4] * transform.rotation.getY(),
+                m_vision_k[5] * transform.rotation.getZ()));
 
     // Step 6: Calculate and record the vision update.
     var visionUpdate =

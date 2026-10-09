@@ -95,7 +95,7 @@ public class ChassisAccelerations
   public ChassisAccelerations toRobotRelative(Rotation2d robotAngle) {
     // CW rotation into chassis frame
     var rotated = new Translation2d(ax, ay).rotateBy(robotAngle.unaryMinus());
-    return new ChassisAccelerations(rotated.getX(), rotated.getY(), alpha);
+    return new ChassisAccelerations(rotated.x, rotated.y, alpha);
   }
 
   /**
@@ -111,7 +111,7 @@ public class ChassisAccelerations
   public ChassisAccelerations toFieldRelative(Rotation2d robotAngle) {
     // CCW rotation out of chassis frame
     var rotated = new Translation2d(ax, ay).rotateBy(robotAngle);
-    return new ChassisAccelerations(rotated.getX(), rotated.getY(), alpha);
+    return new ChassisAccelerations(rotated.x, rotated.y, alpha);
   }
 
   /**

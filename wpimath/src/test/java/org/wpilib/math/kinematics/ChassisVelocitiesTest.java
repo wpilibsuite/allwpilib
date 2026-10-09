@@ -35,7 +35,7 @@ class ChassisVelocitiesTest {
     assertAll(
         () -> assertEquals(target.vx * duration, result.getX(), EPSILON),
         () -> assertEquals(target.vy * duration, result.getY(), EPSILON),
-        () -> assertEquals(target.omega * duration, result.getRotation().getRadians(), EPSILON));
+        () -> assertEquals(target.omega * duration, result.rotation.getRadians(), EPSILON));
   }
 
   @Test

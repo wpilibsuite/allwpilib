@@ -79,7 +79,7 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
     // interpolation is the change in position (delta s) divided by the total
     // distance between the two endpoints.
     final double interpolationFrac =
-        newS / end.pose.getTranslation().getDistance(start.pose.getTranslation());
+        newS / end.pose.translation.getDistance(start.pose.translation);
 
     return new DrivetrainSplineSample(
         newT,
@@ -101,7 +101,7 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
 
     // The whole trajectory is rigidly rotated by the transform's rotation, so
     // the field-relative velocities and accelerations rotate by the same amount.
-    Rotation2d rotation = transform.getRotation();
+    Rotation2d rotation = transform.rotation;
 
     DrivetrainSplineSample transformedFirstSample =
         new DrivetrainSplineSample(
