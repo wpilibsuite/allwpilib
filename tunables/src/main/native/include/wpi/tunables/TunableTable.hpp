@@ -11,20 +11,10 @@
 #include <string_view>
 #include <utility>
 
-#include "wpi/tunables/CustomTunable.hpp"
+#include "wpi/tunables/detail/TunableBase.hpp"
+#include "wpi/tunables/detail/TunableMember.hpp"
 
 namespace wpi::tunables {
-
-template <typename T, typename... I>
-class Tunable;
-
-namespace detail {
-class TunableBase;
-class TunableMemberBase;
-}  // namespace detail
-
-class ComplexTunable;
-struct TunableConfig;
 
 /**
  * Tunables are used to allow values in the robot program to be changed from

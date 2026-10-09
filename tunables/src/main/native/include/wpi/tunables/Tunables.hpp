@@ -13,10 +13,13 @@
 
 #include "wpi/tunables/Tunable.hpp"
 #include "wpi/tunables/TunableTable.hpp"
+#include "wpi/tunables/detail/TunableBase.hpp"
+#include "wpi/tunables/detail/TunableMember.hpp"
 
 namespace wpi::tunables {
 
 class ComplexTunable;
+struct TunableConfig;
 
 /**
  * Gets the root tunable table.
