@@ -1,11 +1,16 @@
-= Network Tables Protocol Specification, Version 4.1
+= Network Tables Protocol Specification, Version 4.2
 WPILib Developers <wpilib@wpi.edu>
-Protocol Revision 4.1, 10/1/2023
+Protocol Revision 4.2, 03/idk/2026
 :toc:
 :toc-placement: preamble
 :sectanchors:
 
 A pub/sub WebSockets protocol based on NetworkTables concepts.
+
+[[motivation4.2]]
+== Motivation for Version 4.2
+
+Version 4.2 seeks to expand the time synchronization robustness. 
 
 [[motivation4.1]]
 == Motivation for Version 4.1
