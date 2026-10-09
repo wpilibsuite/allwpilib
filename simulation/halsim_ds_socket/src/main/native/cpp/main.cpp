@@ -197,7 +197,7 @@ int HALSIM_InitExtension(void) {
   HAL_RegisterExtension("ds_socket", &gDSConnected);
 
   // Before initializing, we need to set up the fake system server
-  if (!MRC_CHECK_API_VERSION()) {
+  if (MRC_CHECK_API_VERSION() != MRC_STATUS_SUCCESS) {
     wpi::util::print(
         stderr,
         "Error: MRC API version mismatch. Restarting app and retrying...");
