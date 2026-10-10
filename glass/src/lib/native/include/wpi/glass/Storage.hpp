@@ -102,6 +102,7 @@ class Storage {
     std::string stringDefault;
 
     bool hasDefault = false;
+    bool isPath = false;  // string value containing a filesystem path
 
     void Reset(Type newType);
   };
@@ -135,6 +136,17 @@ class Storage {
   double& GetDouble(std::string_view key, double defaultVal = 0.0);
   std::string& GetString(std::string_view key,
                          std::string_view defaultVal = {});
+
+  /**
+   * Gets a filesystem path, creating an empty value if unset. Relative paths
+   * loaded from JSON are resolved against the directory containing that file.
+   * Assign absolute paths to the returned string; ToJson() makes paths within
+   * the save directory relative when writing a configuration file.
+   *
+   * @param key storage key
+   * @return path string
+   */
+  std::string& GetPath(std::string_view key);
 
   std::vector<int>& GetIntArray(std::string_view key,
                                 std::span<const int> defaultVal = {});
@@ -184,7 +196,16 @@ class Storage {
   void EraseChildren();
 
   bool FromJson(const wpi::util::json& json, const char* filename);
-  wpi::util::json ToJson() const;
+
+  /**
+   * Converts stored values to JSON. Paths registered by GetPath() are saved
+   * relative to the save directory if they are inside that directory; paths
+   * outside it remain absolute.
+   *
+   * @param saveDir configuration directory, or empty to leave paths unchanged
+   * @return stored values as JSON
+   */
+  wpi::util::json ToJson(std::string_view saveDir = {}) const;
 
   /**
    * Clear settings (set to default).  Calls custom clear function (if set),
@@ -233,6 +254,7 @@ class Storage {
 
  private:
   mutable ValueMap m_values;
+  std::string m_loadDir;
   std::shared_ptr<void> m_data;
   std::function<bool(const wpi::util::json& json, const char* filename)>
       m_fromJson;

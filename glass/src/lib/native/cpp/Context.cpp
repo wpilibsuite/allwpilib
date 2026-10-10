@@ -304,7 +304,7 @@ static bool SaveStorageRootImpl(Context* ctx, const std::string& filename,
                    ec.message().c_str());
     return false;
   }
-  storage.ToJson().marshal(os, true);
+  storage.ToJson(fs::path{filename}.parent_path().string()).marshal(os, true);
   os << '\n';
   return true;
 }
