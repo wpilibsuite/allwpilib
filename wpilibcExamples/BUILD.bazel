@@ -1,41 +1,5 @@
 load("@rules_jvm_external//:defs.bzl", "maven_export")
-load("@rules_python//python:defs.bzl", "py_test")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load(":build_cpp_examples.bzl", "build_templates", "first_level_folders")
-
-template_folders = first_level_folders(
-    glob(["src/main/cpp/templates/*/cpp/Robot.cpp"]),
-    "src/main/cpp/templates/",
-)
-
-build_templates(folders = template_folders)
-
-[
-    py_test(
-        name = kind + "_check",
-        size = "small",
-        srcs = ["//shared:examplecheck.py"],
-        data = ["src/main/cpp/{kind}/{kind}.json".format(kind = kind)] + glob(
-            [
-                "src/main/cpp/{}/*/cpp/Robot.cpp".format(kind),
-                "src/main/cpp/{}/*/c/Robot.c".format(kind),
-            ],
-            allow_empty = True,
-        ),
-        env = {
-            "EXAMPLECHECK_FOLDER": "wpilibcExamples/src/main/cpp/" + kind,
-            "EXAMPLECHECK_KIND": kind,
-        },
-        main = "//shared:examplecheck.py",
-        tags = [
-            "no-ide",
-            "smoketest",
-        ],
-    )
-    for kind in [
-        "templates",
-    ]
-]
 
 pkg_zip(
     name = "commands-zip",
@@ -51,6 +15,15 @@ pkg_zip(
     srcs = [
         "//:license_pkg_files",
         "//wpilibcExamples/src/main/cpp/snippets",
+    ],
+    tags = ["manual"],
+)
+
+pkg_zip(
+    name = "templates-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/templates",
     ],
     tags = ["manual"],
 )
