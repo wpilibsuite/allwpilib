@@ -120,11 +120,11 @@ class TimeSyncTest {
       long clientTimeNs = 123_456_789;
       var ping = ByteBuffer.allocate(10).order(ByteOrder.LITTLE_ENDIAN);
       ping.put((byte) 1).put((byte) 1).putLong(clientTimeNs);
-      long before = NetworkTablesJNI.now();
+      final long before = NetworkTablesJNI.now();
       socket.send(new DatagramPacket(ping.array(), 10, InetAddress.getByName("127.0.0.1"), 10035));
       var response = new DatagramPacket(new byte[18], 18);
       socket.receive(response);
-      long after = NetworkTablesJNI.now();
+      final long after = NetworkTablesJNI.now();
       assertEquals(18, response.getLength());
       var pong = ByteBuffer.wrap(response.getData()).order(ByteOrder.LITTLE_ENDIAN);
       assertEquals(1, pong.get());
