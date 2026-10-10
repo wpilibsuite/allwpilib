@@ -16,5 +16,8 @@ cc_binary(
     ],
     deps = [
         "//hal:wpiHal",
+        # Workaround: linking C++ objects provides a weak out-of-line copy of
+        # the inline HAL_ControlWord_GetRobotMode, which C needs at -O0.
+        "//wpilibc",
     ],
 )
