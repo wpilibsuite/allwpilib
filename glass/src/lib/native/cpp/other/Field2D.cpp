@@ -388,7 +388,7 @@ static bool InputPose(wpi::math::Pose2d* pose) {
 
 FieldInfo::FieldInfo(Storage& storage)
     : m_builtin{storage.GetString("builtin", "Custom")},
-      m_filename{storage.GetString("image")},
+      m_filename{storage.GetPath("image")},
       m_width{storage.GetFloat("width", DEFAULT_WIDTH.to<float>())},
       m_height{storage.GetFloat("height", DEFAULT_HEIGHT.to<float>())},
       m_top{storage.GetInt("top", 0)},
@@ -653,7 +653,7 @@ ObjectInfo::ObjectInfo(Storage& storage)
           "arrowColor", DisplayOptions::DEFAULT_ARROW_COLOR_FLOAT)},
       m_selectable{
           storage.GetBool("selectable", DisplayOptions::DEFAULT_SELECTABLE)},
-      m_filename{storage.GetString("image")} {}
+      m_filename{storage.GetPath("image")} {}
 
 DisplayOptions ObjectInfo::GetDisplayOptions() const {
   DisplayOptions rv{m_texture};

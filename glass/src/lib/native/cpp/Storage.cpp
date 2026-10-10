@@ -13,9 +13,34 @@
 #include <imgui.h>
 
 #include "wpi/util/StringExtras.hpp"
+#include "wpi/util/fs.hpp"
 #include "wpi/util/json.hpp"
 
 using namespace wpi::glass;
+
+static std::string ResolvePath(std::string_view path, std::string_view dir) {
+  if (path.empty()) {
+    return {};
+  }
+  std::error_code ec;
+  auto absolute = fs::absolute(fs::path{dir} / fs::path{path}, ec);
+  return ec ? std::string{path} : absolute.lexically_normal().string();
+}
+
+static std::string MakeRelativePath(std::string_view path,
+                                    std::string_view dir) {
+  if (path.empty()) {
+    return {};
+  }
+  auto relative = fs::path{path}.lexically_normal().lexically_relative(
+      ResolvePath(dir, {}));
+  // Only files inside the configuration directory move with the workspace.
+  // In particular, Glass's global config must not depend on the launch folder.
+  if (!relative.empty() && *relative.begin() != "..") {
+    return relative.generic_string();
+  }
+  return std::string{path};
+}
 
 template <typename To>
 bool ConvertFromString(To* out, std::string_view str) {
@@ -192,6 +217,9 @@ void Storage::Value::Reset(Type newType) {
       break;
   }
   type = newType;
+  if (newType != STRING) {
+    isPath = false;
+  }
 }
 
 Storage::Value* Storage::FindValue(std::string_view key) {
@@ -300,6 +328,16 @@ DEFUN(Float, float, FLOAT, FLOAT_ARRAY, float, float, float)
 DEFUN(Double, double, DOUBLE, DOUBLE_ARRAY, double, double, double)
 DEFUN(String, string, STRING, STRING_ARRAY, std::string, std::string_view,
       std::string)
+
+std::string& Storage::GetPath(std::string_view key) {
+  auto& path = GetString(key);
+  auto& value = GetValue(key);
+  if (!value.isPath) {
+    path = ResolvePath(path, m_loadDir);
+    value.isPath = true;
+  }
+  return path;
+}
 
 Storage& Storage::GetChild(std::string_view label_id) {
   auto [label, id] = wpi::util::split(label_id, "###");
@@ -478,6 +516,8 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
     ImGui::LogText("non-object in %s", filename);
     return false;
   }
+  auto parent = fs::path{filename}.parent_path();
+  m_loadDir = ResolvePath(parent.empty() ? "." : parent.string(), {});
   for (auto&& [key, jvalue] : json.get_object()) {
     auto& valuePtr = m_values[key];
     bool created = false;
@@ -504,7 +544,9 @@ bool Storage::FromJson(const wpi::util::json& json, const char* filename) {
         break;
       case wpi::util::json::Type::String:
         valuePtr->Reset(Value::STRING);
-        valuePtr->stringVal = jvalue.get_string();
+        valuePtr->stringVal = valuePtr->isPath
+                                  ? ResolvePath(jvalue.get_string(), m_loadDir)
+                                  : std::string{jvalue.get_string()};
         break;
       case wpi::util::json::Type::Object:
         if (valuePtr->type != Value::CHILD) {
@@ -540,12 +582,12 @@ static wpi::util::json StorageToJsonArray(const std::vector<T>& arr) {
   return jarr;
 }
 
-template <>
-wpi::util::json StorageToJsonArray<std::unique_ptr<Storage>>(
-    const std::vector<std::unique_ptr<Storage>>& arr) {
+static wpi::util::json StorageToJsonArray(
+    const std::vector<std::unique_ptr<Storage>>& arr,
+    std::string_view saveDir) {
   wpi::util::json jarr = wpi::util::json::array();
   for (auto&& v : arr) {
-    jarr.emplace_back(v->ToJson());
+    jarr.emplace_back(v->ToJson(saveDir));
   }
   // remove any trailing empty items
   auto& jarrArr = jarr.get_array();
@@ -555,7 +597,7 @@ wpi::util::json StorageToJsonArray<std::unique_ptr<Storage>>(
   return jarr;
 }
 
-wpi::util::json Storage::ToJson() const {
+wpi::util::json Storage::ToJson(std::string_view saveDir) const {
   if (m_toJson) {
     return m_toJson();
   }
@@ -592,19 +634,22 @@ wpi::util::json Storage::ToJson() const {
       CASE(String, string, STRING, STRING_ARRAY)
 
       case Value::CHILD:
-        jelem = value.child->ToJson();  // recurse
+        jelem = value.child->ToJson(saveDir);  // recurse
         if (jelem.empty()) {
           continue;
         }
         break;
       case Value::CHILD_ARRAY:
-        jelem = StorageToJsonArray(*value.childArray);
+        jelem = StorageToJsonArray(*value.childArray, saveDir);
         if (jelem.empty()) {
           continue;
         }
         break;
       default:
         continue;
+    }
+    if (value.type == Value::STRING && value.isPath && !saveDir.empty()) {
+      jelem = MakeRelativePath(value.stringVal, saveDir);
     }
     j[kv.first] = std::move(jelem);
   }
