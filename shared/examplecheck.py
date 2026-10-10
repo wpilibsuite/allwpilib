@@ -113,7 +113,11 @@ def validate_tags(entry: dict, index: int, enforce_allowlist: bool) -> None:
 
 def file_check(parsed_json: list[dict], folder: Path) -> None:
     folder_names: set[str] = {entry["foldername"] for entry in parsed_json}
-    folders = {child.name for child in folder.iterdir() if child.is_dir()}
+    folders = {
+        child.name
+        for child in folder.iterdir()
+        if child.is_dir() and not child.name.endswith(".venv")  # bazel py_test venv
+    }
 
     disjunct = folders.symmetric_difference(folder_names)
     missing_from_folders = sorted(folder_names.intersection(disjunct))
