@@ -1,24 +1,12 @@
 load("@rules_jvm_external//:defs.bzl", "maven_export")
 load("@rules_python//python:defs.bzl", "py_test")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load(":build_cpp_examples.bzl", "build_commands", "build_examples", "build_snippets", "build_templates", "build_tests", "first_level_folders")
-
-snippet_folders = first_level_folders(
-    glob(["src/main/cpp/snippets/*/cpp/Robot.cpp"]),
-    "src/main/cpp/snippets/",
-)
+load(":build_cpp_examples.bzl", "build_templates", "first_level_folders")
 
 template_folders = first_level_folders(
     glob(["src/main/cpp/templates/*/cpp/Robot.cpp"]),
     "src/main/cpp/templates/",
 )
-
-snippet_test_folders = first_level_folders(
-    glob(["src/test/cpp/snippets/*/cpp/main.cpp"]),
-    "src/test/cpp/snippets/",
-)
-
-build_snippets(folders = snippet_folders)
 
 build_templates(folders = template_folders)
 
@@ -45,21 +33,24 @@ build_templates(folders = template_folders)
         ],
     )
     for kind in [
-        "snippets",
         "templates",
     ]
 ]
-
-build_tests(
-    example_test_folders = [],
-    snippet_test_folders = snippet_test_folders,
-)
 
 pkg_zip(
     name = "commands-zip",
     srcs = [
         "//:license_pkg_files",
         "//wpilibcExamples/src/main/cpp/commands",
+    ],
+    tags = ["manual"],
+)
+
+pkg_zip(
+    name = "snippets-zip",
+    srcs = [
+        "//:license_pkg_files",
+        "//wpilibcExamples/src/main/cpp/snippets",
     ],
     tags = ["manual"],
 )
