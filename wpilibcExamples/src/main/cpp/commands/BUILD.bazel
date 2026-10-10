@@ -29,6 +29,7 @@ examplecheck_test(
         "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
         "EXAMPLECHECK_KIND": "commands",
     },
+    example_file_glob = "*/*.cpp",
     tags = [
         "smoketest",
     ],

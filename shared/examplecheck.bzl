@@ -13,6 +13,7 @@ def examplecheck_test(
         srcs,
         tags = [],
         package_complete = True,
+        example_file_glob = "**/Robot.*",
         **kwargs):
     if "no-ide" not in tags:
         tags.append("no-ide")
@@ -30,6 +31,6 @@ def examplecheck_test(
         **kwargs
     )
 
-    bare_robots = native.glob(["**/Robot.*"], allow_empty = True)
+    bare_robots = native.glob([example_file_glob], allow_empty = True)
     if package_complete and bare_robots:
-        fail("Robots missing BUILD files:\n - " + "\n - ".join(bare_robots))
+        fail("Examples missing BUILD files:\n - " + "\n - ".join(bare_robots))
