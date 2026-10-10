@@ -1,0 +1,24 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "cpp/**/*.cpp",
+        "include/**/*.hpp",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/templates:__pkg__",
+    ],
+)
+
+cc_binary(
+    name = "timesliceskeleton",
+    srcs = [":sources"],
+    includes = ["include"],
+    tags = [
+        "wpi-example",
+    ],
+    deps = [
+        "//wpilibc",
+    ],
+)
