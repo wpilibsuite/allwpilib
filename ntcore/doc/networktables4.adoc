@@ -1,11 +1,17 @@
-= Network Tables Protocol Specification, Version 4.1
+= Network Tables Protocol Specification, Version 4.2
 WPILib Developers <wpilib@wpi.edu>
-Protocol Revision 4.1, 10/1/2023
+Protocol Revision 4.2 (draft)
 :toc:
 :toc-placement: preamble
 :sectanchors:
 
 A pub/sub WebSockets protocol based on NetworkTables concepts.
+
+[[motivation4.2]]
+
+== Motivation for Version 4.2
+
+NetworkTables 4.2 link:time-sync-protocol.adoc[improves time synchronization] via a custom UDP protocol on a dedicated time-sync event loop. Version 4.2 also uses nanoseconds for MessagePack timestamps to preserve the precision of the synchronized clocks. Versions 4.0 and 4.1 retain microsecond wire timestamps for compatibility.
 
 [[motivation4.1]]
 == Motivation for Version 4.1
@@ -74,11 +80,15 @@ Topic have UTF-8 string names.  Names starting with `$` are reserved for use by 
 [[timestamps]]
 === Timestamps
 
-All MessagePack messages are timestamped.  Timestamps are specified in unsigned integer microseconds--for robot programs, microseconds are preferred as the FPGA provides time in microseconds, and integers result in a more compact wire encoding (in typical robot use, integer microseconds timestamps will be half the size of double timestamps until about T=70 minutes, and in the worst case will be no larger).
+All MessagePack messages are timestamped. Timestamps use integer nanoseconds on version 4.2 connections and integer microseconds on version 4.0 and 4.1 connections. The units are determined by the negotiated WebSockets subprotocol for each connection, in both directions. A server relaying values between protocol versions shall convert timestamps to the receiving connection's units; converting nanoseconds to microseconds discards sub-microsecond precision. The special timestamp value of zero retains its existing meaning in every version.
 
 Timestamps in messages always use the server time base.  The server time base is synchronized across the network by the means described in this section (an implementation of <<cristians-algorithm, Cristian's algorithm>>).
 
 Implementations should expose the actual timestamps for messages as well as provide methods to convert from server time base to local time to facilitate applications that prefer the server time base (e.g. a dashboard showing robot events might prefer to use server time instead of wall clock time).
+
+Due to the fact there can be multiple publishers for a single topic and unpredictable network delays / clock drift, there is no global total order for timestamps either globally or on a per-topic basis.  While single publishers for real-time data will be the norm, and in that case the timestamps will usually be in order, applications that use timestamps need to be able to handle out-of-order timestamps.
+
+==== Time Synchronization, clients < 4.2
 
 The topic ID of -1 is reserved for timestamp communication.  Clients shall periodically (e.g. every few seconds) send, in a manner that minimizes transmission delays, a MessagePack message with ID of -1, a timestamp of 0, and an implementation-selected type and data value (typically int or float 64) containing its (the client's) current local time.
 
@@ -86,12 +96,14 @@ When the server receives an -1 ID message from a client, it shall respond to the
 
 When the client receives an -1 ID message from the server, it shall compute the round trip time (RTT) from the delta between the message's data value and the current local time.  If the RTT is less than that from previous measurements, the client shall use the timestamp in the message plus ½ the RTT as the server time equivalent to the current local time, and use this equivalence to compute server time base timestamps from local time for future messages.
 
-Due to the fact there can be multiple publishers for a single topic and unpredictable network delays / clock drift, there is no global total order for timestamps either globally or on a per-topic basis.  While single publishers for real-time data will be the norm, and in that case the timestamps will usually be in order, applications that use timestamps need to be able to handle out-of-order timestamps.
+==== Time Synchronization, clients >= 4.2
+
+link:time-sync-protocol.adoc[Time Sync Protocol] documentation describes requirements for clients and servers. Both TSP and MessagePack value timestamps use nanoseconds on version 4.2 connections.
 
 [[aliveness]]
 === Connection Aliveness Checking
 
-With a version 4.1 connection, both the client and the server should send periodic WebSockets PING messages and look for a PONG response within a reasonable period of time. On version 4.0 connections, or if this is not possible (e.g. the underlying WebSockets implementation does not have the ability to send PING messages), the client should use timestamp messages for aliveness testing. If no response is received after an appropriate amount of time, the client or server shall disconnect the WebSockets connection and try to re-establish a new connection.
+With a version 4.1 or later connection, both the client and the server should send periodic WebSockets PING messages and look for a PONG response within a reasonable period of time. On version 4.0 connections, or if this is not possible (e.g. the underlying WebSockets implementation does not have the ability to send PING messages), the client should use timestamp messages for aliveness testing. If no response is received after an appropriate amount of time, the client or server shall disconnect the WebSockets connection and try to re-establish a new connection.
 
 As the WebSockets protocol allows PONG responses to be sent in the middle of another message stream, WebSockets PING messages are preferred, as this allows for a shorter timeout period that is not dependent on the size of the transmitted messages. Sending a ping every 200 ms with a timeout of 1 second is recommended in this case.
 
@@ -337,7 +349,7 @@ Both clients and servers shall support unsecure connections (`ws:`) and may supp
 
 Servers shall support a resource name of `/nt/<name>`, where `<name>` is an arbitrary string representing the client name.  The client name does not need to be unique; multiple connections to the same name are allowed; the server shall ensure the name is unique (for the purposes of meta-topics) by appending a '@' and a unique number (if necessary).  To support this, the name provided by the client should not contain an embedded '@'.  Clients should provide a way to specify the resource name (in particular, the client name portion).
 
-Both clients and servers should support/use subprotocol `v4.1.networktables.first.wpi.edu` (for version 4.1) and `networktables.first.wpi.edu` (for version 4.0). Version 4.1 should be preferred, with version 4.0 as a fallback, using standard WebSockets subprotocol negotiation. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support a common subprotocol.
+Both clients and servers should support/use subprotocol `v4.2.networktables.first.wpi.edu` (for version 4.2), `v4.1.networktables.first.wpi.edu` (for version 4.1), and `networktables.first.wpi.edu` (for version 4.0). Version 4.2 should be preferred, with versions 4.1 and 4.0 as fallbacks, using standard WebSockets subprotocol negotiation. Implementations that cannot use UDP time synchronization shall not negotiate version 4.2. Clients and servers shall terminate the connection in accordance with the WebSocket protocol unless both sides support a common subprotocol.
 
 The unsecure standard server port number shall be 5810, the secure standard port number shall be 5811.
 
@@ -787,7 +799,7 @@ Each MessagePack message shall be a MessagePack array with 4 elements.  Implemen
 Messages shall consist of (in this order):
 
 * Topic/Publisher ID: unsigned integer, or -1 (RTT measurement)
-* Timestamp: integer microseconds
+* Timestamp: integer nanoseconds for version 4.2; integer microseconds for versions 4.0 and 4.1
 * Data type: unsigned integer
 * Data value (see below)
 
@@ -797,17 +809,19 @@ Publisher IDs are used for client to server messages.  Publisher IDs shall be as
 
 Implementations must ignore messages with data values they cannot decode (either by ignoring the message or by terminating the connection), and shall send messages with data values consistent with the above table.
 
-An example double value update would be 17 bytes:
+An example double value update in version 4.2 would be 21 bytes:
 
 `94` (array with 4 elements)
 
 `32` (topic/publisher ID=50)
 
-`D2 07 27 0E 00` (timestamp of exactly 2 minutes in integer microseconds)
+`D3 00 00 00 1B F0 8E B0 00` (timestamp of exactly 2 minutes in integer nanoseconds)
 
 `01` (data type: double-precision float)
 
 `CB 3F BF 97 24 74 53 8E F3` (double value of 0.1234)
+
+In versions 4.0 and 4.1, the timestamp in this example is `D2 07 27 0E 00` (120,000,000 microseconds), making the message 17 bytes.
 
 For comparison, a double value update in NT 3.0 is 14 bytes (and does not contain a timestamp).
 
@@ -863,7 +877,7 @@ This was considered, but rejected for two reasons: encoding overhead and spec/im
 [[trade-timestamp]]
 === Timestamp format
 
-The spec uses integer microseconds.  This seems to be a reasonable enough resolution for FIRST use and is common with the unix clock resolution.
+Versions 4.0 and 4.1 use integer microseconds for compact encoding. Version 4.2 uses integer nanoseconds to preserve timestamp precision through time synchronization and value transport.
 
 [[unresolved-questions]]
 == Unresolved Questions

@@ -50,6 +50,8 @@ namespace Catch {
 
     constexpr ResultDisposition::Flags operator|( ResultDisposition::Flags lhs,
                                         ResultDisposition::Flags rhs ) {
+        // Bitwise combinations are valid values for this flag enum.
+        // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
         return static_cast<ResultDisposition::Flags>( static_cast<int>( lhs ) |
                                                       static_cast<int>( rhs ) );
     }

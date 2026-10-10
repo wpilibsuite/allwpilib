@@ -79,7 +79,11 @@ TEST_CASE_METHOD(ConnectionListenerTest, "ConnectionListenerTest Polled",
   auto result = wpi::nt::ReadListenerQueue(poller);
   REQUIRE(result.size() == 1u);
   CHECK(handle == result[0].listener);
-  CHECK(result[0].GetConnectionInfo());
+  REQUIRE(result[0].GetConnectionInfo());
+  CHECK(result[0].GetConnectionInfo()->protocol_version == 0x0402);
+  auto connections = wpi::nt::GetConnections(client_inst);
+  REQUIRE(connections.size() == 1u);
+  CHECK(connections[0].protocol_version == 0x0402);
   CHECK(result[0].flags == wpi::nt::EventFlags::CONNECTED);
 
   // trigger a disconnect event

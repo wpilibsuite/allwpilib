@@ -7,16 +7,23 @@
 #include <stdint.h>
 
 #include <deque>
+#include <future>
 #include <limits>
+#include <memory>
 #include <span>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "../MockLogger.hpp"
+#include "../TimeSyncTestPeer.hpp"
+#include "MockMessageHandler.hpp"
+#include "ProtocolVersions.hpp"
 #include "net/ClientImpl.hpp"
 #include "net/Message.hpp"
 #include "net/WireConnection.hpp"
@@ -113,7 +120,8 @@ std::pair<int, Value> DecodeBinary(std::span<const uint8_t> data,
   int id = 0;
   Value value;
   std::string error;
-  bool decoded = WireDecodeBinary(&data, &id, &value, &error, localTimeOffset);
+  bool decoded =
+      WireDecodeBinary(&data, &id, &value, &error, localTimeOffset, NT_4_1);
   UNSCOPED_INFO(error);
   CHECK(decoded);
   CHECK(data.empty());
@@ -138,9 +146,12 @@ TEST_CASE("NetworkOutgoingQueueTest UpdatePeriodCalcUsesGcdAndMinimum",
 TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
   RecordingWireConnection wire;
   wpi::MockLogger logger;
+  wpi::net::EventLoopRunner loopRunner;
   int timeSyncUpdates = 0;
   ClientImpl client{0,
+                    loopRunner,
                     wire,
+                    {},
                     false,
                     logger,
                     [&](int64_t, int64_t, bool) { ++timeSyncUpdates; },
@@ -148,7 +159,8 @@ TEST_CASE("ClientImpl rejects overflowing RTT timestamps", "[ntcore][client]") {
   std::vector<uint8_t> encoded;
   wpi::util::raw_uvector_ostream os{encoded};
   WireEncodeBinary(os, -1, 1,
-                   Value::MakeInteger(std::numeric_limits<int64_t>::min()));
+                   Value::MakeInteger((std::numeric_limits<int64_t>::min)()),
+                   NT_4_1);
 
   client.ProcessIncomingBinary(0, encoded);
 
@@ -172,7 +184,7 @@ TEST_CASE(
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
-  queue.SendMessage(5, Publish(5, "test"));
+  queue.SendMessageToServer(5, Publish(5, "test"));
 
   queue.SendOutgoing(4, false);
   CHECK(wire.textWrites.empty());
@@ -198,11 +210,11 @@ TEST_CASE("NetworkOutgoingQueueTest FlushWaitsForMinimumPeriod",
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
-  queue.SendMessage(1, Publish(1, "first"));
+  queue.SendMessageToServer(1, Publish(1, "first"));
   queue.SendOutgoing(5, false);
   REQUIRE(wire.textWrites.size() == 1u);
 
-  queue.SendMessage(2, Publish(2, "second"));
+  queue.SendMessageToServer(2, Publish(2, "second"));
   queue.SendOutgoing(6, true);
   REQUIRE(wire.textWrites.size() == 1u);
 
@@ -443,12 +455,12 @@ TEST_CASE(
   NetworkOutgoingQueue<ClientMessage> queue{wire, false};
 
   queue.SetPeriod(1, 100);
-  queue.SendMessage(1, Publish(1, "first"));
+  queue.SendMessageToServer(1, Publish(1, "first"));
   queue.SendValue(1, Value::MakeDouble(1.0, 10'000), ValueSendMode::ALL);
-  queue.SendMessage(1, Publish(1, "second"));
+  queue.SendMessageToServer(1, Publish(1, "second"));
 
   queue.SetPeriod(2, 50);
-  queue.SendMessage(2, Publish(2, "dest"));
+  queue.SendMessageToServer(2, Publish(2, "dest"));
 
   queue.SetPeriod(1, 50);
   queue.SendValue(1, Value::MakeDouble(2.0, 20'000), ValueSendMode::NORMAL);
@@ -577,7 +589,7 @@ TEST_CASE("NetworkOutgoingQueueTest LocalQueueSendsImmediately",
   RecordingWireConnection wire;
   NetworkOutgoingQueue<ClientMessage> queue{wire, true};
 
-  queue.SendMessage(5, Publish(5, "local"));
+  queue.SendMessageToServer(5, Publish(5, "local"));
   queue.SendValue(5, Value::MakeDouble(1.0, 10), ValueSendMode::NORMAL);
   queue.SendOutgoing(5, true);
 
@@ -588,6 +600,155 @@ TEST_CASE("NetworkOutgoingQueueTest LocalQueueSendsImmediately",
   REQUIRE(wire.binarySends.size() == 1u);
   CHECK(wire.textWrites.empty());
   CHECK(wire.binaryWrites.empty());
+}
+
+}  // namespace wpi::nt::net
+
+namespace wpi::nt::net {
+TEST_CASE("ClientImpl destroys pending time sync on network loop",
+          "[ntcore][client]") {
+  using namespace std::chrono_literals;
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = 0x0402;
+  wpi::util::Logger logger;
+  wpi::net::EventLoopRunner loop;
+  std::unique_ptr<ClientImpl> client;
+  int updates = 0;
+  loop.ExecSync([&](auto&) {
+    client = std::make_unique<ClientImpl>(
+        0, loop, wire, ConnectionInfo{"", "127.0.0.1", peer.GetPort()}, false,
+        logger, [&](int64_t, int64_t, bool) { ++updates; }, [](uint32_t) {});
+  });
+
+  std::promise<void> blocked;
+  std::promise<void> release;
+  auto resume = release.get_future();
+  std::promise<void> destroyed;
+  auto done = destroyed.get_future();
+  loop.ExecAsync([&](auto&) {
+    blocked.set_value();
+    resume.wait();
+    client.reset();
+    destroyed.set_value();
+  });
+  blocked.get_future().wait();
+  auto packet = peer.Receive(3s);
+  if (packet) {
+    auto ping = wpi::util::UnpackStruct<wpi::tsp::TspPing>(packet->data);
+    wpi::tsp::TspPong pong{ping, ping.client_time};
+    pong.message_id = 2;
+    std::array<uint8_t, 18> data;
+    wpi::util::PackStruct(data, pong);
+    peer.Send(data, reinterpret_cast<const sockaddr&>(packet->sender));
+    // Let the UDP loop process a reply while the NT loop is blocked.
+    std::this_thread::sleep_for(100ms);
+  }
+  release.set_value();
+  REQUIRE(packet);
+  REQUIRE(done.wait_for(3s) == std::future_status::ready);
+  loop.ExecSync([](auto&) {});
+  CHECK(updates == 0);
+}
+}  // namespace wpi::nt::net
+
+namespace wpi::nt::net {
+TEST_CASE("ClientImpl reports half the UDP round-trip time in nanoseconds",
+          "[ntcore][client]") {
+  using namespace std::chrono_literals;
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = 0x0402;
+  wpi::util::Logger logger;
+  wpi::net::EventLoopRunner loop;
+  std::unique_ptr<ClientImpl> client;
+  std::promise<std::pair<int64_t, int64_t>> update;
+  auto result = update.get_future();
+  loop.ExecSync([&](auto&) {
+    client = std::make_unique<ClientImpl>(
+        0, loop, wire, ConnectionInfo{"", "127.0.0.1", peer.GetPort()}, false,
+        logger,
+        [&](int64_t offset, int64_t rtt2, bool) {
+          update.set_value({offset, rtt2});
+        },
+        [](uint32_t) {});
+  });
+  auto packet = peer.Receive(3s);
+  if (packet) {
+    auto ping = wpi::util::UnpackStruct<wpi::tsp::TspPing>(packet->data);
+    wpi::tsp::TspPong pong{ping, ping.client_time + 1'000'000'123};
+    pong.message_id = 2;
+    std::array<uint8_t, 18> data;
+    wpi::util::PackStruct(data, pong);
+    std::this_thread::sleep_for(10ms);
+    peer.Send(data, reinterpret_cast<const sockaddr&>(packet->sender));
+  }
+  auto ready = result.wait_for(3s);
+  loop.ExecSync([&](auto&) { client.reset(); });
+  REQUIRE(packet);
+  REQUIRE(ready == std::future_status::ready);
+  auto [offset, rtt2] = result.get();
+  CHECK(rtt2 > 0);
+  // Preserve the sub-microsecond part of the server's nanosecond timestamp.
+  CHECK(offset + rtt2 == 1'000'000'123);
+}
+
+TEST_CASE("Outgoing values use each connection's timestamp units",
+          "[ntcore][network-outgoing-queue]") {
+  auto version = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  auto mode =
+      GENERATE(ValueSendMode::NORMAL, ValueSendMode::ALL, ValueSendMode::IMM);
+  auto check = [&]<typename Message>() {
+    RecordingWireConnection wire;
+    wire.version = version;
+    NetworkOutgoingQueue<Message> queue{wire, false};
+    queue.SetTimeOffset(123);
+    queue.SendValue(3, Value::MakeInteger(7, 6001), mode);
+    queue.SendOutgoing(5, true);
+    auto& writes =
+        mode == ValueSendMode::IMM ? wire.binarySends : wire.binaryWrites;
+    REQUIRE(writes.size() == 1u);
+    // Decode as 4.2 to inspect the raw wire integer without scaling.
+    int id;
+    Value value;
+    std::string error;
+    std::span<const uint8_t> data{writes[0]};
+    REQUIRE(WireDecodeBinary(&data, &id, &value, &error, 0, NT_4_2));
+    auto expected = std::same_as<Message, ClientMessage> ? 6124 : 6001;
+    CHECK(value.server_time() == (version == NT_4_2 ? expected : 6));
+  };
+  check.template operator()<ClientMessage>();
+  check.template operator()<ServerMessage>();
+}
+
+TEST_CASE("Client receives values using negotiated timestamp units",
+          "[ntcore][client]") {
+  auto version = GENERATE(NT_4_0, NT_4_1, NT_4_2);
+  TimeSyncTestPeer peer;
+  RecordingWireConnection wire;
+  wire.version = version;
+  wpi::util::Logger logger;
+  MockServerMessageHandler local;
+  wpi::net::EventLoopRunner loop;
+  loop.ExecSync([&](auto&) {
+    ClientImpl client{0,
+                      loop,
+                      wire,
+                      ConnectionInfo{"", "127.0.0.1", peer.GetPort()},
+                      false,
+                      logger,
+                      [](int64_t, int64_t, bool) {},
+                      [](uint32_t) {}};
+    client.SetLocal(&local);
+    client.ProcessIncomingText(
+        R"([{"method":"announce","params":{"name":"topic","id":1,"type":"int","properties":{}}}])");
+    // Raw MessagePack: [1, 6, 2, 7].
+    constexpr uint8_t DATA[] = {0x94, 1, 6, 2, 7};
+    client.ProcessIncomingBinary(0, DATA);
+  });
+  REQUIRE(local.setValueCalls.size() == 1u);
+  CHECK(local.setValueCalls[0].value.server_time() ==
+        (version == NT_4_2 ? 6 : 6000));
 }
 
 }  // namespace wpi::nt::net

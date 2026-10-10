@@ -17,7 +17,7 @@ namespace wpi::nt {
 TEST_CASE("ServerSubscriberTest MaximumPeriodicInterval", "[ntcore][server]") {
   std::span<const std::string> noTopics;
   PubSubOptionsImpl options;
-  options.periodicMs = std::numeric_limits<unsigned int>::max();
+  options.periodicMs = (std::numeric_limits<unsigned int>::max)();
 
   SECTION("constructor") {
     server::ServerSubscriber subscriber{"client", noTopics, 1, options};

@@ -10,6 +10,7 @@
 #include <variant>
 #include <vector>
 
+#include "../PubSubOptionsMatcher.hpp"
 #include "PubSubOptions.hpp"
 #include "net/MessageHandler.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
