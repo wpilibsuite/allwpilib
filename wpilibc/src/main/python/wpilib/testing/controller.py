@@ -1,7 +1,6 @@
 import contextlib
 import time
 import threading
-import typing as T
 
 import pytest
 
@@ -25,7 +24,7 @@ class RobotTestController:
     def __init__(self, reraise, robot: RobotBase):
         self._reraise = reraise
 
-        self._thread: T.Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._robot = robot
 
         self._cond = threading.Condition()

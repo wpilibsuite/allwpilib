@@ -85,23 +85,23 @@ def test_nearest():
     origin = Pose2d(x=0, y=0, rotation=Rotation2d.from_degrees(0))
 
     pose1 = Pose2d(
-        Translation2d(distance=1.0, angle=Rotation2d.from_degrees((45))),
+        Translation2d(distance=1.0, angle=Rotation2d.from_degrees(45)),
         Rotation2d.from_degrees(0),
     )
     pose2 = Pose2d(
-        Translation2d(distance=2.0, angle=Rotation2d.from_degrees((90))),
+        Translation2d(distance=2.0, angle=Rotation2d.from_degrees(90)),
         Rotation2d.from_degrees(0),
     )
     pose3 = Pose2d(
-        Translation2d(distance=3.0, angle=Rotation2d.from_degrees((135))),
+        Translation2d(distance=3.0, angle=Rotation2d.from_degrees(135)),
         Rotation2d.from_degrees(0),
     )
     pose4 = Pose2d(
-        Translation2d(distance=4.0, angle=Rotation2d.from_degrees((180))),
+        Translation2d(distance=4.0, angle=Rotation2d.from_degrees(180)),
         Rotation2d.from_degrees(0),
     )
     pose5 = Pose2d(
-        Translation2d(distance=5.0, angle=Rotation2d.from_degrees((270))),
+        Translation2d(distance=5.0, angle=Rotation2d.from_degrees(270)),
         Rotation2d.from_degrees(0),
     )
 

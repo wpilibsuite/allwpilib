@@ -1,8 +1,6 @@
 # validated: 2024-01-19 DS aaea85ff1656 SequentialCommandGroup.java
 from __future__ import annotations
 
-from typing import List
-
 from telemetry import TelemetryTable
 
 from .command import Command, InterruptionBehavior
@@ -28,7 +26,7 @@ class SequentialCommandGroup(Command):
         :param commands: the commands to include in this composition.
         """
         super().__init__()
-        self._commands: List[Command] = []
+        self._commands: list[Command] = []
         self._current_command_index = -1
         self._runs_when_disabled = True
         self._interrupt_behavior = InterruptionBehavior.CANCEL_INCOMING

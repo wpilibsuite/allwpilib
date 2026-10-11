@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 
@@ -37,6 +39,7 @@ class MyRobot(wpilib.TimedRobot):
         # and that we want to measure distance in inches.
         self.encoder.set_distance_per_pulse(1.0 / 360.0 * 2.0 * math.pi * 1.5)
 
+    @override
     def teleop_periodic(self):
         telemetry.log("Encoder Distance", self.encoder.get_distance())
         telemetry.log("Encoder Rate", self.encoder.get_rate())

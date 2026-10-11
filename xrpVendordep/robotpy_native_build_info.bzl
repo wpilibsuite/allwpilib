@@ -50,7 +50,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib XRP vendor library",
         requires = ["robotpy-native-wpilib==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["xrpVendordep"],
         entry_points = {
             "pkg_config": [

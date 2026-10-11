@@ -5,6 +5,8 @@
 #
 
 import typing
+from typing import override
+
 import commands2
 from subsystems.drivetrain import Drivetrain
 
@@ -30,5 +32,6 @@ class ArcadeDrive(commands2.Command):
 
         self.add_requirements(self.drive)
 
+    @override
     def execute(self) -> None:
         self.drive.arcade_drive(self.forward(), self.rotation())

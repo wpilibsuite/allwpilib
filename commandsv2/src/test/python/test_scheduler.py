@@ -6,11 +6,9 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
-import pytest
 import telemetry
 import telemetry.mock_backend as mock_backend
 import tunables
-import wpilib
 
 
 def test_scheduler_lambda_test_no_interrupt(scheduler: commands2.CommandScheduler):

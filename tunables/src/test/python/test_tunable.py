@@ -1,7 +1,6 @@
 import array
 import dataclasses
 import gc
-import inspect
 import subprocess
 import sys
 import weakref

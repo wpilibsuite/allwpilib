@@ -2,7 +2,7 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 import wpilib
 
@@ -17,10 +17,12 @@ class DefaultAutoMode(wpilib.PeriodicOpMode):
         self.robot = robot
         self.timer = wpilib.Timer()
 
+    @override
     def start(self) -> None:
         self.timer.reset()
         self.timer.start()
 
+    @override
     def periodic(self) -> None:
         if self.timer.get() < 2.0:
             self.robot.motor0.set_throttle(0.5)

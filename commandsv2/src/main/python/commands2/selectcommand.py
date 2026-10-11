@@ -1,7 +1,7 @@
 # validated: 2024-01-19 DS a4a8ad9c753e SelectCommand.java
 from __future__ import annotations
 
-from typing import Callable, Dict, Hashable
+from collections.abc import Callable, Hashable
 
 from telemetry import TelemetryTable
 
@@ -22,7 +22,7 @@ class SelectCommand(Command):
 
     def __init__(
         self,
-        commands: Dict[Hashable, Command],
+        commands: dict[Hashable, Command],
         selector: Callable[[], Hashable],
     ):
         """

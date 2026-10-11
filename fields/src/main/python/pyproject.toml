@@ -14,7 +14,7 @@ requires = [
 name = "robotpy-fields"
 version = "0.0.0"
 description = "RobotPy bindings for WPILib's fields library"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]

@@ -6,6 +6,7 @@
 #
 
 import math
+from typing import override
 
 import wpilib
 import wpilib_drivers
@@ -87,9 +88,11 @@ class MyRobot(wpilib.TimedRobot):
         # We go 2 pi radians per 4096 clicks.
         self.encoder.set_distance_per_pulse(math.tau / 4096)
 
+    @override
     def teleop_init(self) -> None:
         self.loop.reset([self.encoder.get_rate()])
 
+    @override
     def teleop_periodic(self) -> None:
         # Sets the target velocity of our flywheel. This is similar to setting the setpoint of a
         # PID controller.
