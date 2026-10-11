@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Austin Schuh <austin.linux@gmail.com>
+Date: Sun, 4 Oct 2026 00:29:02 -0700
+Subject: [PATCH 8/8] Abort on unsupported spline order in release builds
+
+With NDEBUG, assert(0) compiles away and Nknots_margin is read
+uninitialized.
+---
+ mrcal.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mrcal.cpp b/mrcal.cpp
+index 8ea2c873b28fbdd0d53ccb6af15a6726b1741a68..c64425786a2cfe9d59a4baf6985b3a5033e9064e 100644
+--- a/mrcal.cpp
++++ b/mrcal.cpp
+@@ -1944,7 +1944,7 @@ static void _mrcal_precompute_lensmodel_data_MRCAL_LENSMODEL_SPLINED_STEREOGRAPH
+     else
+     {
+         MSG("I only support spline order 2 and 3");
+-        assert(0);
++        abort();
+     }
+ 
+     double th_edge_x = (double)config->fov_x_deg/2. * M_PI / 180.;

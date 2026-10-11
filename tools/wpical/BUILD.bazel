@@ -110,7 +110,6 @@ clang_cxxopts = unix_cxxopts + [
     "-Wno-unused-variable",
     "-Wno-unused-function",
     "-Wno-sign-compare",
-    "-Wno-sometimes-uninitialized",
 ]
 
 cxxopts = select({
