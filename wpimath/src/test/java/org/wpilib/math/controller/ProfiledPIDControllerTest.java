@@ -19,4 +19,21 @@ class ProfiledPIDControllerTest {
 
     assertEquals(0.0, controller.calculate(20), 0.05);
   }
+
+  @Test
+  void getNextSetpointTest() {
+    ProfiledPIDController controller =
+        new ProfiledPIDController(1.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1.0, 1.0));
+
+    // Advance the profile one step toward the goal.
+    controller.calculate(0.0, 5.0);
+
+    TrapezoidProfile.State next = controller.getNextSetpoint();
+
+    // The next setpoint should equal the setpoint produced by the following calculate() call.
+    controller.calculate(controller.getSetpoint().position);
+
+    assertEquals(next.position, controller.getSetpoint().position, 1e-9);
+    assertEquals(next.velocity, controller.getSetpoint().velocity, 1e-9);
+  }
 }
