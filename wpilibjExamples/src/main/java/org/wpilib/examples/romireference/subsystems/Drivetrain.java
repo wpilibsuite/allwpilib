@@ -7,8 +7,8 @@ package org.wpilib.examples.romireference.subsystems;
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.drivers.motor.Spark;
+import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.romi.RomiGyro;
 import org.wpilib.telemetry.TelemetryTable;
 
 public class Drivetrain extends SubsystemBase {
@@ -29,8 +29,8 @@ public class Drivetrain extends SubsystemBase {
   private final DifferentialDrive diffDrive =
       new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
 
-  // Set up the RomiGyro
-  private final RomiGyro gyro = new RomiGyro();
+  // Set up the onboard IMU
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -80,7 +80,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleX() {
-    return gyro.getAngleX();
+    return Math.toDegrees(imu.getAngleX());
   }
 
   /**
@@ -89,7 +89,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleY() {
-    return gyro.getAngleY();
+    return Math.toDegrees(imu.getAngleY());
   }
 
   /**
@@ -98,12 +98,12 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the Romi in degrees
    */
   public double getGyroAngleZ() {
-    return gyro.getAngleZ();
+    return Math.toDegrees(imu.getYawRadians());
   }
 
-  /** Reset the gyro. */
+  /** Reset the gyro yaw. */
   public void resetGyro() {
-    gyro.reset();
+    imu.resetYaw();
   }
 
   @Override
@@ -115,7 +115,12 @@ public class Drivetrain extends SubsystemBase {
   public void logTo(TelemetryTable table) {
     super.logTo(table);
     table.log("drive", diffDrive);
-    table.log("gyro", gyro);
+    table.log("gyro angle x", getGyroAngleX());
+    table.log("gyro angle y", getGyroAngleY());
+    table.log("gyro angle z", getGyroAngleZ());
+    table.log("gyro rate x", Math.toDegrees(imu.getGyroRateX()));
+    table.log("gyro rate y", Math.toDegrees(imu.getGyroRateY()));
+    table.log("gyro rate z", Math.toDegrees(imu.getGyroRateZ()));
     table.log("left distance", getLeftDistanceInch());
     table.log("right distance", getRightDistanceInch());
   }

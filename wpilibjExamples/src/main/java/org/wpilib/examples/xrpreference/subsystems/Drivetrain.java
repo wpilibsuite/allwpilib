@@ -6,8 +6,8 @@ package org.wpilib.examples.xrpreference.subsystems;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.drive.DifferentialDrive;
+import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.xrp.XRPGyro;
 import org.wpilib.xrp.XRPMotor;
 
 public class Drivetrain extends SubsystemBase {
@@ -32,8 +32,8 @@ public class Drivetrain extends SubsystemBase {
   private final DifferentialDrive diffDrive =
       new DifferentialDrive(leftMotor::setThrottle, rightMotor::setThrottle);
 
-  // Set up the XRPGyro
-  private final XRPGyro gyro = new XRPGyro();
+  // Set up the onboard IMU
+  private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
@@ -83,7 +83,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleX() {
-    return gyro.getAngleX();
+    return Math.toDegrees(imu.getAngleX());
   }
 
   /**
@@ -92,7 +92,7 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleY() {
-    return gyro.getAngleY();
+    return Math.toDegrees(imu.getAngleY());
   }
 
   /**
@@ -101,12 +101,12 @@ public class Drivetrain extends SubsystemBase {
    * @return The current angle of the XRP in degrees
    */
   public double getGyroAngleZ() {
-    return gyro.getAngleZ();
+    return Math.toDegrees(imu.getYawRadians());
   }
 
-  /** Reset the gyro. */
+  /** Reset the gyro yaw. */
   public void resetGyro() {
-    gyro.reset();
+    imu.resetYaw();
   }
 
   @Override

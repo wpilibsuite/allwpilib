@@ -11,7 +11,27 @@
 
 using namespace wpi;
 
-TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
+namespace {
+struct OnboardIMUTest {
+  OnboardIMUTest() { ResetData(); }
+  ~OnboardIMUTest() { ResetData(); }
+  void ResetData() {
+    sim::OnboardIMUSim sim;
+    sim.SetAngleX(0_rad);
+    sim.SetAngleY(0_rad);
+    sim.SetAngleZ(0_rad);
+    sim.SetGyroRateX(0_rad_per_s);
+    sim.SetGyroRateY(0_rad_per_s);
+    sim.SetGyroRateZ(0_rad_per_s);
+    sim.SetAccelX(0_mps_sq);
+    sim.SetAccelY(0_mps_sq);
+    sim.SetAccelZ(0_mps_sq);
+    sim.SetYaw(0_rad);
+  }
+};
+}  // namespace
+
+TEST_CASE_METHOD(OnboardIMUTest, "OnboardIMUTest SimDevices", "[wpilibc]") {
   OnboardIMU imu{OnboardIMU::FLAT};
 
   CHECK(0.0 == imu.GetAngleX().value());
@@ -27,6 +47,7 @@ TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
   CHECK(0.0 == imu.GetAccelZ().value());
 
   CHECK(0.0 == imu.GetYaw().value());
+  CHECK(imu.GetQuaternion() == wpi::math::Quaternion{});
 
   sim::OnboardIMUSim sim{};
 
@@ -57,4 +78,13 @@ TEST_CASE("OnboardIMUTest SimDevices", "[wpilibc]") {
   CHECK(-3.0 == imu.GetAccelZ().value());
 
   CHECK(1.234 == imu.GetYaw().value());
+  auto rotation = wpi::math::Rotation3d{1_rad, 2_rad, 3_rad};
+  CHECK(imu.GetRotation3d() == rotation);
+  imu.ResetYaw();
+  CHECK(imu.GetYaw() == 0_rad);
+  sim.SetYaw(2_rad);
+  CHECK_THAT(imu.GetRotation2d().Radians().value(),
+             Catch::Matchers::WithinAbs(0.766, 1e-9));
+  CHECK(imu.GetAngleZ() == 3_rad);
+  CHECK(imu.GetRotation3d() == rotation);
 }

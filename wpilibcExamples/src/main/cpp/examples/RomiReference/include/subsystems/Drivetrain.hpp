@@ -7,8 +7,8 @@
 #include "wpi/commands2/SubsystemBase.hpp"
 #include "wpi/drive/DifferentialDrive.hpp"
 #include "wpi/drivers/motor/Spark.hpp"
+#include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
-#include "wpi/romi/RomiGyro.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
 
@@ -94,7 +94,7 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
   wpi::units::radian_t GetGyroAngleZ();
 
   /**
-   * Reset the gyro.
+   * Reset the gyro yaw.
    */
   void ResetGyro();
 
@@ -109,5 +109,5 @@ class Drivetrain : public wpi::cmd::SubsystemBase {
       [&](double output) { leftMotor.SetThrottle(output); },
       [&](double output) { rightMotor.SetThrottle(output); }};
 
-  wpi::romi::RomiGyro gyro;
+  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 };

@@ -37,8 +37,8 @@ class Drivetrain(commands2.Subsystem):
         # Set up the differential drive controller
         self.drive = wpilib.DifferentialDrive(self.left_motor, self.right_motor)
 
-        # Set up the RomiGyro
-        self.gyro = romi.RomiGyro()
+        # Set up the onboard IMU
+        self.imu = wpilib.OnboardIMU(wpilib.OnboardIMU.MountOrientation.FLAT)
 
         # Use inches as unit for encoder distances
         self.left_encoder.set_distance_per_pulse(
@@ -84,30 +84,35 @@ class Drivetrain(commands2.Subsystem):
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.get_angle_x()
+        return math.degrees(self.imu.get_angle_x())
 
     def get_gyro_angle_y(self) -> float:
         """Current angle of the Romi around the Y-axis.
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.get_angle_y()
+        return math.degrees(self.imu.get_angle_y())
 
     def get_gyro_angle_z(self) -> float:
         """Current angle of the Romi around the Z-axis.
 
         :returns: The current angle of the Romi in degrees
         """
-        return self.gyro.get_angle_z()
+        return math.degrees(self.imu.get_yaw())
 
     def reset_gyro(self) -> None:
-        """Reset the gyro"""
-        self.gyro.reset()
+        """Reset the gyro yaw."""
+        self.imu.reset_yaw()
 
     @override
     def log_to(self, table: telemetry.TelemetryTable) -> None:
         super().log_to(table)
         table.log("drive", self.drive)
-        table.log("gyro", self.gyro)
+        table.log("gyro angle x", self.get_gyro_angle_x())
+        table.log("gyro angle y", self.get_gyro_angle_y())
+        table.log("gyro angle z", self.get_gyro_angle_z())
+        table.log("gyro rate x", math.degrees(self.imu.get_gyro_rate_x()))
+        table.log("gyro rate y", math.degrees(self.imu.get_gyro_rate_y()))
+        table.log("gyro rate z", math.degrees(self.imu.get_gyro_rate_z()))
         table.log("left distance", self.get_left_distance_inch())
         table.log("right distance", self.get_right_distance_inch())

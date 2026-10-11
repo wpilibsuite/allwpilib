@@ -3,6 +3,8 @@ if (project.hasProperty('onlylinuxsystemcore')) {
 }
 
 apply plugin: 'cpp'
+apply plugin: 'google-test-test-suite'
+apply from: "${rootDir}/shared/catch2.gradle"
 apply plugin: 'org.wpilib.NativeUtils'
 apply plugin: ExtraTasks
 
@@ -18,6 +20,18 @@ apply from: "${rootDir}/shared/config.gradle"
 apply from: "${rootDir}/shared/plugins/publish.gradle"
 
 model {
+    testSuites {
+        halsim_ws_coreTest(GoogleTestTestSuiteSpec) {
+            testing $.components.halsim_ws_core
+            sources.cpp {
+                source {
+                    srcDirs 'src/test/native/cpp'
+                    include '**/*.cpp'
+                }
+            }
+        }
+    }
+
     components {
         halsim_ws_core(NativeLibrarySpec) {
             sources.cpp {
@@ -39,6 +53,13 @@ model {
         }
     }
     binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            lib project: ':hal', library: 'hal', linkage: 'shared'
+            project(':ntcore').addNtcoreDependency(it, 'shared')
+            lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
+            lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
+            lib library: 'halsim_ws_core', linkage: 'static'
+        }
         all {
             if (it.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
                 it.buildable = false

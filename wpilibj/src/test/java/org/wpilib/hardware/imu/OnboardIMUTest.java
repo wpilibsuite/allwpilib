@@ -6,10 +6,31 @@ package org.wpilib.hardware.imu;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.wpilib.hardware.hal.HAL;
+import org.wpilib.math.geometry.Quaternion;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.simulation.OnboardIMUSim;
 
 class OnboardIMUTest {
+  @BeforeEach
+  @AfterEach
+  void resetData() {
+    HAL.initialize();
+    OnboardIMUSim.setAngleX(0);
+    OnboardIMUSim.setAngleY(0);
+    OnboardIMUSim.setAngleZ(0);
+    OnboardIMUSim.setGyroRateX(0);
+    OnboardIMUSim.setGyroRateY(0);
+    OnboardIMUSim.setGyroRateZ(0);
+    OnboardIMUSim.setAccelX(0);
+    OnboardIMUSim.setAccelY(0);
+    OnboardIMUSim.setAccelZ(0);
+    OnboardIMUSim.setYaw(0);
+  }
+
   @Test
   void testOnboardIMU() {
     OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
@@ -27,6 +48,7 @@ class OnboardIMUTest {
     assertEquals(0.0, imu.getAccelZ());
 
     assertEquals(0.0, imu.getYawRadians());
+    assertEquals(new Quaternion(), imu.getQuaternion());
 
     OnboardIMUSim.setAngleX(1);
     OnboardIMUSim.setAngleY(2);
@@ -55,5 +77,13 @@ class OnboardIMUTest {
     assertEquals(-3.0, imu.getAccelZ());
 
     assertEquals(1.234, imu.getYawRadians());
+    var rotation = new Rotation3d(1, 2, 3);
+    assertEquals(rotation, imu.getRotation3d());
+    imu.resetYaw();
+    assertEquals(0, imu.getYawRadians());
+    OnboardIMUSim.setYaw(2);
+    assertEquals(0.766, imu.getRotation2d().getRadians(), 1e-9);
+    assertEquals(3, imu.getAngleZ());
+    assertEquals(rotation, imu.getRotation3d());
   }
 }

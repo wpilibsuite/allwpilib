@@ -81,16 +81,6 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             ],
         ),
         struct(
-            class_name = "RomiGyro",
-            yml_file = "semiwrap/RomiGyro.yml",
-            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
-            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiGyro.hpp",
-            tmpl_class_names = [],
-            trampolines = [
-                ("wpi::romi::RomiGyro", "wpi__romi__RomiGyro.hpp"),
-            ],
-        ),
-        struct(
             class_name = "RomiMotor",
             yml_file = "semiwrap/RomiMotor.yml",
             header_root = "$(execpath :robotpy-native-romi.copy_headers)",
