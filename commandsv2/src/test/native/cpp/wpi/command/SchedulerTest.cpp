@@ -2,7 +2,10 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <memory>
+#include <numeric>
 #include <utility>
+#include <vector>
 
 #include "CommandTestBase.hpp"
 #include "wpi/commands2/Commands.hpp"
@@ -226,4 +229,71 @@ TEST_CASE_METHOD(SchedulerTest, "SchedulerTest ScheduleCommandPtr",
   scheduler.Run();
   CHECK(runCounter == 1);
   CHECK(destructionCounter == 1);
+}
+
+TEST_CASE_METHOD(SchedulerTest,
+                 "SchedulerTest SubsystemPeriodicRunsInRegistrationOrder",
+                 "[commandsv2][command]") {
+  CommandScheduler scheduler = GetScheduler();
+  constexpr int subsystemCount = 32;
+
+  std::vector<int> periodicOrder;
+  std::vector<std::unique_ptr<TestSubsystem>> subsystems;
+  for (int i = 0; i < subsystemCount; ++i) {
+    subsystems.emplace_back(std::make_unique<TestSubsystem>(
+        [&periodicOrder, i] { periodicOrder.push_back(i); }));
+    scheduler.RegisterSubsystem(subsystems.back().get());
+  }
+
+  scheduler.Run();
+
+  std::vector<int> registrationOrder(subsystemCount);
+  std::iota(registrationOrder.begin(), registrationOrder.end(), 0);
+  CHECK(periodicOrder == registrationOrder);
+}
+
+TEST_CASE_METHOD(SchedulerTest, "SchedulerTest CommandsExecuteInScheduleOrder",
+                 "[commandsv2][command]") {
+  CommandScheduler scheduler = GetScheduler();
+  constexpr int commandCount = 32;
+
+  std::vector<int> executeOrder;
+  std::vector<CommandPtr> commands;
+  for (int i = 0; i < commandCount; ++i) {
+    commands.emplace_back(
+        wpi::cmd::Run([&executeOrder, i] { executeOrder.push_back(i); }));
+    scheduler.Schedule(commands.back());
+  }
+
+  scheduler.Run();
+
+  std::vector<int> scheduleOrder(commandCount);
+  std::iota(scheduleOrder.begin(), scheduleOrder.end(), 0);
+  CHECK(executeOrder == scheduleOrder);
+}
+
+TEST_CASE_METHOD(SchedulerTest,
+                 "SchedulerTest DefaultCommandsScheduleInRegistrationOrder",
+                 "[commandsv2][command]") {
+  CommandScheduler scheduler = GetScheduler();
+  constexpr int subsystemCount = 32;
+
+  std::vector<int> initializeOrder;
+  std::vector<std::unique_ptr<TestSubsystem>> subsystems;
+  for (int i = 0; i < subsystemCount; ++i) {
+    subsystems.emplace_back(std::make_unique<TestSubsystem>());
+    scheduler.RegisterSubsystem(subsystems.back().get());
+  }
+  for (int i = subsystemCount - 1; i >= 0; --i) {
+    scheduler.SetDefaultCommand(
+        subsystems[i].get(),
+        RunOnce([&initializeOrder, i] { initializeOrder.push_back(i); },
+                {subsystems[i].get()}));
+  }
+
+  scheduler.Run();
+
+  std::vector<int> registrationOrder(subsystemCount);
+  std::iota(registrationOrder.begin(), registrationOrder.end(), 0);
+  CHECK(initializeOrder == registrationOrder);
 }
