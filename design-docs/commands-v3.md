@@ -333,7 +333,7 @@ This is implemented by tracking an internal state object, which can be one of th
 
 When the scheduler attempts to run a command, it first checks the state of the coroutine assigned to that command.
 If the state is not mountable, the scheduler will not attempt to run the command. Otherwise, it mounts the
-coroutine and allows it to run until it reaches a yield point or exits. A resumed coroutine always sets its state 
+coroutine and allows it to run until it reaches a yield point or exits. A resumed coroutine always sets its state
 back to `Live`.
 
 Awaiting is implemented by tracking the run IDs of all the forked commands and comparing those original
