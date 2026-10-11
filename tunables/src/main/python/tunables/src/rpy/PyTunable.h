@@ -51,7 +51,7 @@ class PyTunable : public std::enable_shared_from_this<PyTunable> {
    * @param typeString custom tunable type string
    * @param alwaysGet whether to call getter on every backend update
    */
-  PyTunable(
+  explicit PyTunable(
       pybind11::object value, std::optional<Getter> getter = std::nullopt,
       std::optional<Setter> setter = std::nullopt,
       std::optional<TuneCallback> onTune = std::nullopt, bool robust = false,
