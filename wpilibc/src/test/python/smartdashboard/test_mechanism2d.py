@@ -2,7 +2,7 @@ import pytest
 import telemetry
 
 from ntcore import NetworkTableInstance
-from wpilib import Mechanism2d, MechanismLigament2d, MechanismRoot2d
+from wpilib import Mechanism2d
 from wpiutil import Color8Bit
 
 

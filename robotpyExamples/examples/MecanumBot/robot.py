@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpimath
 import wpilib
 
@@ -23,10 +25,12 @@ class MyRobot(wpilib.TimedRobot):
         self.y_velocity_limiter = wpimath.SlewRateLimiter(3)
         self.rot_limiter = wpimath.SlewRateLimiter(3)
 
+    @override
     def autonomous_periodic(self) -> None:
         self.drive_with_joystick(False)
         self.mecanum.update_odometry()
 
+    @override
     def teleop_periodic(self) -> None:
         self.drive_with_joystick(True)
 

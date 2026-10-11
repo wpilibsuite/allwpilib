@@ -1,7 +1,8 @@
 # validated: 2024-01-19 DS 5cf961edb973 RunCommand.java
 from __future__ import annotations
 
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from .functionalcommand import FunctionalCommand
 from .subsystem import Subsystem

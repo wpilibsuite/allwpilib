@@ -1,5 +1,5 @@
 # validated: 2024-01-24 DS 192a28af4731 DeferredCommand.java
-from typing import Callable
+from collections.abc import Callable
 
 from telemetry import TelemetryTable
 

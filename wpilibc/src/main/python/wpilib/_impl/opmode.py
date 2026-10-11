@@ -10,7 +10,7 @@ import inspect
 from pathlib import Path
 import sys
 import tokenize
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from hal import RobotMode
 from wpiutil import Color

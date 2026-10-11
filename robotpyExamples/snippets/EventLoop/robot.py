@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 import wpilib_drivers
 import wpimath
@@ -85,6 +87,7 @@ class MyRobot(wpilib.TimedRobot):
             lambda: self.kicker.set_throttle(0.0)
         )
 
+    @override
     def robot_periodic(self) -> None:
         # poll all the bindings
         self.loop.poll()

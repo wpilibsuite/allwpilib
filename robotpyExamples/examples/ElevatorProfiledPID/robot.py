@@ -6,6 +6,7 @@
 #
 
 import math
+from typing import override
 
 import wpilib
 import wpilib_drivers
@@ -41,6 +42,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.encoder.set_distance_per_pulse(1 / 360 * 2 * math.pi * 1.5)
 
+    @override
     def teleop_periodic(self) -> None:
         if self.joystick.get_raw_button_pressed(2):
             self.controller.set_goal(5)

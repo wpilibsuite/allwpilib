@@ -15,12 +15,12 @@ def test_json_invalid():
 
 
 def test_json_none():
-    assert cast_json_arg(None) == None
+    assert cast_json_arg(None) is None
 
 
 def test_json_bool():
-    assert cast_json_arg(True) == True
-    assert cast_json_arg(False) == False
+    assert cast_json_arg(True) is True
+    assert cast_json_arg(False) is False
 
 
 def test_json_int():

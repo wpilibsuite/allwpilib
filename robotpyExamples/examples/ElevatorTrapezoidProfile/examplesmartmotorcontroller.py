@@ -4,8 +4,10 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
 import enum
+from typing import override
+
+import wpilib
 
 
 class ExampleSmartMotorController(wpilib.MotorController):
@@ -79,18 +81,23 @@ class ExampleSmartMotorController(wpilib.MotorController):
         """Resets the encoder to zero distance."""
         pass
 
-    def set_throttle(self, velocity: float) -> None:
-        self._velocity = -velocity if self._inverted else velocity
+    @override
+    def set_throttle(self, throttle: float) -> None:
+        self._velocity = -throttle if self._inverted else throttle
 
+    @override
     def get_throttle(self) -> float:
         return self._velocity
 
+    @override
     def set_inverted(self, is_inverted: bool) -> None:
         self._inverted = is_inverted
 
+    @override
     def get_inverted(self) -> bool:
         return self._inverted
 
+    @override
     def disable(self) -> None:
         self._velocity = 0.0
 
