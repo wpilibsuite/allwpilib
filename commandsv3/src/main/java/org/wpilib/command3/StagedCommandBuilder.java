@@ -8,6 +8,7 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -75,7 +76,7 @@ public final class StagedCommandBuilder {
       var all = new HashSet<>(requirements);
       all.add(requirement);
       addAllChecked(all, "extra", Arrays.asList(extra));
-      return new ExecutionStage(Set.copyOf(all));
+      return new ExecutionStage(Collections.unmodifiableSet(all));
     }
 
     @Override
@@ -84,7 +85,7 @@ public final class StagedCommandBuilder {
 
       var all = new HashSet<>(requirements);
       addAllChecked(all, "requirements", additional);
-      return new ExecutionStage(Set.copyOf(all));
+      return new ExecutionStage(Collections.unmodifiableSet(all));
     }
 
     @Override
