@@ -128,6 +128,14 @@ struct ConnectionInfo {
   /** The port number of the remote node. */
   unsigned int remote_port{0};
 
+  /** The IP address we connected to the remote server using. Empty if this
+   * NetworkTable instance is a server */
+  std::string local_ip;
+
+  /** The port number we connected to the remote server using. Zero if this
+   * NetworkTable instance is a server */
+  unsigned int local_port{0};
+
   /**
    * The last time any update was received from the remote node (same scale as
    * returned by wpi::nt::Now()).
@@ -145,6 +153,8 @@ struct ConnectionInfo {
     swap(first.remote_id, second.remote_id);
     swap(first.remote_ip, second.remote_ip);
     swap(first.remote_port, second.remote_port);
+    swap(first.local_ip, second.local_ip);
+    swap(first.local_port, second.local_port);
     swap(first.last_update, second.last_update);
     swap(first.protocol_version, second.protocol_version);
   }
