@@ -50,6 +50,10 @@ void AddGuiLateExecute(std::function<void()> execute) {
   wpi::gui::AddLateExecute(std::move(execute));
 }
 
+void AddMainMenu(std::function<void()> menu) {
+  HALSimGui::mainMenu.AddMainMenu(std::move(menu));
+}
+
 void GuiExit() {
   wpi::gui::Exit();
 }
