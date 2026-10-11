@@ -20,58 +20,64 @@ import us.hebi.quickbuf.RepeatedMessage;
 import us.hebi.quickbuf.Utf8String;
 
 public final class ProtobufCommands {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(2542,
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(2929,
     "Chdwcm90b2J1Zl9jb21tYW5kcy5wcm90bxIJd3BpLnByb3RvIicKEVByb3RvYnVmTWVjaGFuaXNtEhIK" + 
-    "BG5hbWUYASABKAlSBG5hbWUitgIKD1Byb3RvYnVmQ29tbWFuZBIOCgJpZBgBIAEoDVICaWQSIAoJcGFy" + 
+    "BG5hbWUYASABKAlSBG5hbWUigAMKD1Byb3RvYnVmQ29tbWFuZBIOCgJpZBgBIAEoDVICaWQSIAoJcGFy" + 
     "ZW50X2lkGAIgASgNSABSCHBhcmVudElkiAEBEhIKBG5hbWUYAyABKAlSBG5hbWUSGgoIcHJpb3JpdHkY" + 
     "BCABKAVSCHByaW9yaXR5EkAKDHJlcXVpcmVtZW50cxgFIAMoCzIcLndwaS5wcm90by5Qcm90b2J1Zk1l" + 
     "Y2hhbmlzbVIMcmVxdWlyZW1lbnRzEiUKDGxhc3RfdGltZV9tcxgGIAEoAUgBUgpsYXN0VGltZU1ziAEB" + 
-    "EicKDXRvdGFsX3RpbWVfbXMYByABKAFIAlILdG90YWxUaW1lTXOIAQFCDAoKX3BhcmVudF9pZEIPCg1f" + 
-    "bGFzdF90aW1lX21zQhAKDl90b3RhbF90aW1lX21zIsEBChFQcm90b2J1ZlNjaGVkdWxlchJDCg9xdWV1" + 
-    "ZWRfY29tbWFuZHMYASADKAsyGi53cGkucHJvdG8uUHJvdG9idWZDb21tYW5kUg5xdWV1ZWRDb21tYW5k" + 
-    "cxJFChBydW5uaW5nX2NvbW1hbmRzGAIgAygLMhoud3BpLnByb3RvLlByb3RvYnVmQ29tbWFuZFIPcnVu" + 
-    "bmluZ0NvbW1hbmRzEiAKDGxhc3RfdGltZV9tcxgDIAEoAVIKbGFzdFRpbWVNc0IbChlvcmcud3BpbGli" + 
-    "LmNvbW1hbmQzLnByb3RvSvwOCgYSBAAAOAEKCAoBDBIDAAASCggKAQISAwIAEgoICgEIEgMEADIKCQoC" + 
-    "CAESAwQAMgrxAQoCBAASBBAAEgEy5AEKT3IgdXNlIHRoZSBnZW5lcmF0ZV9maWxlcy5weSBzY3JpcHQ6" + 
-    "CgojIG1hY09TCmFsbHdwaWxpYiAkIC4vY29tbWFuZHN2My9nZW5lcmF0ZV9maWxlcy5weSAtLXByb3Rv" + 
-    "Yz1wcm90b2MtcXVpY2tidWYKCiMgTGludXgKYWxsd3BpbGliICQgLi9jb21tYW5kc3YzL2dlbmVyYXRl" + 
-    "X2ZpbGVzLnB5IC0tcXVpY2tidWZfcGx1Z2luIHByb3RvYy1nZW4tcXVpY2tidWYtMS4zLjMtbGludXgt" + 
-    "eDg2XzY0LmV4ZQoKCgoDBAABEgMQCBkKCwoEBAACABIDEQISCgwKBQQAAgAFEgMRAggKDAoFBAACAAES" + 
-    "AxEJDQoMCgUEAAIAAxIDERARCgoKAgQBEgQUAC0BCgoKAwQBARIDFAgXCnEKBAQBAgASAxcCEBpkIEEg" + 
-    "dW5pcXVlIElEIGZvciB0aGUgY29tbWFuZC4KIERpZmZlcmVudCBpbnZvY2F0aW9ucyBvZiB0aGUgc2Ft" + 
-    "ZSBjb21tYW5kIG9iamVjdCBoYXZlIGRpZmZlcmVudCBJRHMuCgoMCgUEAQIABRIDFwIICgwKBQQBAgAB" + 
-    "EgMXCQsKDAoFBAECAAMSAxcODwphCgQEAQIBEgMbAiAaVCBUaGUgSUQgb2YgdGhlIHBhcmVudCBjb21t",
-    "YW5kLgogTm90IGluY2x1ZGVkIGluIHRoZSBtZXNzYWdlIGZvciB0b3AtbGV2ZWwgY29tbWFuZHMuCgoM" + 
-    "CgUEAQIBBBIDGwIKCgwKBQQBAgEFEgMbCxEKDAoFBAECAQESAxsSGwoMCgUEAQIBAxIDGx4fCicKBAQB" + 
-    "AgISAx4CEhoaIFRoZSBuYW1lIG9mIHRoZSBjb21tYW5kLgoKDAoFBAECAgUSAx4CCAoMCgUEAQICARID" + 
-    "HgkNCgwKBQQBAgIDEgMeEBEKMQoEBAECAxIDIQIVGiQgVGhlIHByaW9yaXR5IGxldmVsIG9mIHRoZSBj" + 
-    "b21tYW5kLgoKDAoFBAECAwUSAyECBwoMCgUEAQIDARIDIQgQCgwKBQQBAgMDEgMhExQKNgoEBAECBBID" + 
-    "JAIuGikgVGhlIG1lY2hhbmlzbXMgcmVxdWlyZWQgYnkgdGhlIGNvbW1hbmQuCgoMCgUEAQIEBBIDJAIK" + 
-    "CgwKBQQBAgQGEgMkCxwKDAoFBAECBAESAyQdKQoMCgUEAQIEAxIDJCwtCo4BCgQEAQIFEgMoAiMagAEg" + 
-    "SG93IG11Y2ggdGltZSB0aGUgY29tbWFuZCB0b29rIHRvIGV4ZWN1dGUgaW4gaXRzIG1vc3QgcmVjZW50" + 
-    "IHJ1bi4KIE9ubHkgaW5jbHVkZWQgaW4gYSBtZXNzYWdlIGZvciBhbiBhY3RpdmVseSBydW5uaW5nIGNv" + 
-    "bW1hbmQuCgoMCgUEAQIFBBIDKAIKCgwKBQQBAgUFEgMoCxEKDAoFBAECBQESAygSHgoMCgUEAQIFAxID" + 
-    "KCEiCoABCgQEAQIGEgMsAiQacyBIb3cgbG9uZyB0aGUgY29tbWFuZCBoYXMgdGFrZW4gdG8gcnVuLCBp" + 
-    "biBhZ2dyZWdhdGUuCiBPbmx5IGluY2x1ZGVkIGluIGEgbWVzc2FnZSBmb3IgYW4gYWN0aXZlbHkgcnVu" + 
-    "bmluZyBjb21tYW5kLgoKDAoFBAECBgQSAywCCgoMCgUEAQIGBRIDLAsRCgwKBQQBAgYBEgMsEh8KDAoF" + 
-    "BAECBgMSAywiIwoKCgIEAhIELwA4AQoKCgMEAgESAy8IGQqNAgoEBAICABIDMwIvGv8BIE5vdGU6IGNv" + 
-    "bW1hbmRzIGFyZSBnZW5lcmFsbHkgcXVldWVkIGJ5IHRyaWdnZXJzLCB3aGljaCBvY2N1cnMgaW1tZWRp" + 
-    "YXRlbHkgYmVmb3JlIHRoZXkgYXJlCiBwcm9tb3RlZCBhbmQgc3RhcnQgcnVubmluZy4gRW50cmllcyB3" + 
-    "aWxsIG9ubHkgYXBwZWFyIGhlcmUgd2hlbiBzZXJpYWxpemluZyBhIHNjaGVkdWxlcgogX2FmdGVyXyBt" + 
-    "YW51YWxseSBzY2hlZHVsaW5nIGEgY29tbWFuZCBidXQgX2JlZm9yZV8gY2FsbGluZyBzY2hlZHVsZXIu" + 
-    "cnVuKCkKCgwKBQQCAgAEEgMzAgoKDAoFBAICAAYSAzMLGgoMCgUEAgIAARIDMxsqCgwKBQQCAgADEgMz" + 
-    "LS4KCwoEBAICARIDNAIwCgwKBQQCAgEEEgM0AgoKDAoFBAICAQYSAzQLGgoMCgUEAgIBARIDNBsrCgwK",
-    "BQQCAgEDEgM0Li8KTwoEBAICAhIDNwIaGkIgSG93IG11Y2ggdGltZSB0aGUgc2NoZWR1bGVyIHRvb2sg" + 
-    "aW4gaXRzIGxhc3QgYHJ1bigpYCBpbnZvY2F0aW9uLgoKDAoFBAICAgUSAzcCCAoMCgUEAgICARIDNwkV" + 
-    "CgwKBQQCAgIDEgM3GBliBnByb3RvMw==");
+    "EicKDXRvdGFsX3RpbWVfbXMYByABKAFIAlILdG90YWxUaW1lTXOIAQESMQoSaXNfZGVmYXVsdF9jb21t" + 
+    "YW5kGAggASgISANSEGlzRGVmYXVsdENvbW1hbmSIAQFCDAoKX3BhcmVudF9pZEIPCg1fbGFzdF90aW1l" + 
+    "X21zQhAKDl90b3RhbF90aW1lX21zQhUKE19pc19kZWZhdWx0X2NvbW1hbmQiwQEKEVByb3RvYnVmU2No" + 
+    "ZWR1bGVyEkMKD3F1ZXVlZF9jb21tYW5kcxgBIAMoCzIaLndwaS5wcm90by5Qcm90b2J1ZkNvbW1hbmRS" + 
+    "DnF1ZXVlZENvbW1hbmRzEkUKEHJ1bm5pbmdfY29tbWFuZHMYAiADKAsyGi53cGkucHJvdG8uUHJvdG9i" + 
+    "dWZDb21tYW5kUg9ydW5uaW5nQ29tbWFuZHMSIAoMbGFzdF90aW1lX21zGAMgASgBUgpsYXN0VGltZU1z" + 
+    "QhsKGW9yZy53cGlsaWIuY29tbWFuZDMucHJvdG9KtREKBhIEAAA+AQoICgEMEgMAABIKCAoBAhIDAgAS" + 
+    "CggKAQgSAwQAMgoJCgIIARIDBAAyCvEBCgIEABIEEAASATLkAQpPciB1c2UgdGhlIGdlbmVyYXRlX2Zp" + 
+    "bGVzLnB5IHNjcmlwdDoKCiMgbWFjT1MKYWxsd3BpbGliICQgLi9jb21tYW5kc3YzL2dlbmVyYXRlX2Zp" + 
+    "bGVzLnB5IC0tcHJvdG9jPXByb3RvYy1xdWlja2J1ZgoKIyBMaW51eAphbGx3cGlsaWIgJCAuL2NvbW1h" + 
+    "bmRzdjMvZ2VuZXJhdGVfZmlsZXMucHkgLS1xdWlja2J1Zl9wbHVnaW4gcHJvdG9jLWdlbi1xdWlja2J1" + 
+    "Zi0xLjMuMy1saW51eC14ODZfNjQuZXhlCgoKCgMEAAESAxAIGQoLCgQEAAIAEgMRAhIKDAoFBAACAAUS" + 
+    "AxECCAoMCgUEAAIAARIDEQkNCgwKBQQAAgADEgMREBEKCgoCBAESBBQAMwEKCgoDBAEBEgMUCBcKcQoE" + 
+    "BAECABIDFwIQGmQgQSB1bmlxdWUgSUQgZm9yIHRoZSBjb21tYW5kLgogRGlmZmVyZW50IGludm9jYXRp" + 
+    "b25zIG9mIHRoZSBzYW1lIGNvbW1hbmQgb2JqZWN0IGhhdmUgZGlmZmVyZW50IElEcy4KCgwKBQQBAgAF",
+    "EgMXAggKDAoFBAECAAESAxcJCwoMCgUEAQIAAxIDFw4PCmEKBAQBAgESAxsCIBpUIFRoZSBJRCBvZiB0" + 
+    "aGUgcGFyZW50IGNvbW1hbmQuCiBOb3QgaW5jbHVkZWQgaW4gdGhlIG1lc3NhZ2UgZm9yIHRvcC1sZXZl" + 
+    "bCBjb21tYW5kcy4KCgwKBQQBAgEEEgMbAgoKDAoFBAECAQUSAxsLEQoMCgUEAQIBARIDGxIbCgwKBQQB" + 
+    "AgEDEgMbHh8KJwoEBAECAhIDHgISGhogVGhlIG5hbWUgb2YgdGhlIGNvbW1hbmQuCgoMCgUEAQICBRID" + 
+    "HgIICgwKBQQBAgIBEgMeCQ0KDAoFBAECAgMSAx4QEQoxCgQEAQIDEgMhAhUaJCBUaGUgcHJpb3JpdHkg" + 
+    "bGV2ZWwgb2YgdGhlIGNvbW1hbmQuCgoMCgUEAQIDBRIDIQIHCgwKBQQBAgMBEgMhCBAKDAoFBAECAwMS" + 
+    "AyETFAo2CgQEAQIEEgMkAi4aKSBUaGUgbWVjaGFuaXNtcyByZXF1aXJlZCBieSB0aGUgY29tbWFuZC4K" + 
+    "CgwKBQQBAgQEEgMkAgoKDAoFBAECBAYSAyQLHAoMCgUEAQIEARIDJB0pCgwKBQQBAgQDEgMkLC0KjgEK" + 
+    "BAQBAgUSAygCIxqAASBIb3cgbXVjaCB0aW1lIHRoZSBjb21tYW5kIHRvb2sgdG8gZXhlY3V0ZSBpbiBp" + 
+    "dHMgbW9zdCByZWNlbnQgcnVuLgogT25seSBpbmNsdWRlZCBpbiBhIG1lc3NhZ2UgZm9yIGFuIGFjdGl2" + 
+    "ZWx5IHJ1bm5pbmcgY29tbWFuZC4KCgwKBQQBAgUEEgMoAgoKDAoFBAECBQUSAygLEQoMCgUEAQIFARID" + 
+    "KBIeCgwKBQQBAgUDEgMoISIKgAEKBAQBAgYSAywCJBpzIEhvdyBsb25nIHRoZSBjb21tYW5kIGhhcyB0" + 
+    "YWtlbiB0byBydW4sIGluIGFnZ3JlZ2F0ZS4KIE9ubHkgaW5jbHVkZWQgaW4gYSBtZXNzYWdlIGZvciBh" + 
+    "biBhY3RpdmVseSBydW5uaW5nIGNvbW1hbmQuCgoMCgUEAQIGBBIDLAIKCgwKBQQBAgYFEgMsCxEKDAoF" + 
+    "BAECBgESAywSHwoMCgUEAQIGAxIDLCIjCv4BCgQEAQIHEgMyAica8AEgSWYgdGhpcyBjb21tYW5kIGlz" + 
+    "IGJvdGggdGhlIGRlZmF1bHQgY29tbWFuZCBmb3IgaXRzIHJlcXVpcmVkIG1lY2hhbmlzbQogYW5kIHdh" + 
+    "cyBzY2hlZHVsZWQgYnkgdGhlIGRlZmF1bHQgY29tbWFuZCBzY2hlZHVsaW5nIGxvZ2ljLgogT25seSBp" + 
+    "bmNsdWRlZCBpbiBhIG1lc3NhZ2Ugd2hlcmUgdGhlIGNvbW1hbmQgb2JqZWN0IGlzIGNvbmZpZ3VyZWQg" + 
+    "YXMgdGhlCiBkZWZhdWx0IGNvbW1hbmQgZm9yIGEgbWVjaGFuaXNtLgoKDAoFBAECBwQSAzICCgoMCgUE" + 
+    "AQIHBRIDMgsPCgwKBQQBAgcBEgMyECIKDAoFBAECBwMSAzIlJgoKCgIEAhIENQA+AQoKCgMEAgESAzUI",
+    "GQqNAgoEBAICABIDOQIvGv8BIE5vdGU6IGNvbW1hbmRzIGFyZSBnZW5lcmFsbHkgcXVldWVkIGJ5IHRy" + 
+    "aWdnZXJzLCB3aGljaCBvY2N1cnMgaW1tZWRpYXRlbHkgYmVmb3JlIHRoZXkgYXJlCiBwcm9tb3RlZCBh" + 
+    "bmQgc3RhcnQgcnVubmluZy4gRW50cmllcyB3aWxsIG9ubHkgYXBwZWFyIGhlcmUgd2hlbiBzZXJpYWxp" + 
+    "emluZyBhIHNjaGVkdWxlcgogX2FmdGVyXyBtYW51YWxseSBzY2hlZHVsaW5nIGEgY29tbWFuZCBidXQg" + 
+    "X2JlZm9yZV8gY2FsbGluZyBzY2hlZHVsZXIucnVuKCkKCgwKBQQCAgAEEgM5AgoKDAoFBAICAAYSAzkL" + 
+    "GgoMCgUEAgIAARIDORsqCgwKBQQCAgADEgM5LS4KCwoEBAICARIDOgIwCgwKBQQCAgEEEgM6AgoKDAoF" + 
+    "BAICAQYSAzoLGgoMCgUEAgIBARIDOhsrCgwKBQQCAgEDEgM6Li8KTwoEBAICAhIDPQIaGkIgSG93IG11" + 
+    "Y2ggdGltZSB0aGUgc2NoZWR1bGVyIHRvb2sgaW4gaXRzIGxhc3QgYHJ1bigpYCBpbnZvY2F0aW9uLgoK" + 
+    "DAoFBAICAgUSAz0CCAoMCgUEAgICARIDPQkVCgwKBQQCAgIDEgM9GBliBnByb3RvMw==");
 
   static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("protobuf_commands.proto", "wpi.proto", descriptorData);
 
   static final Descriptors.Descriptor wpi_proto_ProtobufMechanism_descriptor = descriptor.internalContainedType(38, 39, "ProtobufMechanism", "wpi.proto.ProtobufMechanism");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufCommand_descriptor = descriptor.internalContainedType(80, 310, "ProtobufCommand", "wpi.proto.ProtobufCommand");
+  static final Descriptors.Descriptor wpi_proto_ProtobufCommand_descriptor = descriptor.internalContainedType(80, 384, "ProtobufCommand", "wpi.proto.ProtobufCommand");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufScheduler_descriptor = descriptor.internalContainedType(393, 193, "ProtobufScheduler", "wpi.proto.ProtobufScheduler");
+  static final Descriptors.Descriptor wpi_proto_ProtobufScheduler_descriptor = descriptor.internalContainedType(467, 193, "ProtobufScheduler", "wpi.proto.ProtobufScheduler");
 
   /**
    * @return this proto file's descriptor.
@@ -418,6 +424,18 @@ public final class ProtobufCommands {
 
     /**
      * <pre>
+     *  If this command is both the default command for its required mechanism
+     *  and was scheduled by the default command scheduling logic.
+     *  Only included in a message where the command object is configured as the
+     *  default command for a mechanism.
+     * </pre>
+     *
+     * <code>optional bool is_default_command = 8;</code>
+     */
+    private boolean isDefaultCommand;
+
+    /**
+     * <pre>
      *  The name of the command.
      * </pre>
      *
@@ -454,7 +472,7 @@ public final class ProtobufCommands {
      * @return whether the lastTimeMs field is set
      */
     public boolean hasLastTimeMs() {
-      return (bitField0_ & 0x00000002) != 0;
+      return (bitField0_ & 0x00000004) != 0;
     }
 
     /**
@@ -467,7 +485,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearLastTimeMs() {
-      bitField0_ &= ~0x00000002;
+      bitField0_ &= ~0x00000004;
       lastTimeMs = 0D;
       return this;
     }
@@ -496,7 +514,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setLastTimeMs(final double value) {
-      bitField0_ |= 0x00000002;
+      bitField0_ |= 0x00000004;
       lastTimeMs = value;
       return this;
     }
@@ -511,7 +529,7 @@ public final class ProtobufCommands {
      * @return whether the totalTimeMs field is set
      */
     public boolean hasTotalTimeMs() {
-      return (bitField0_ & 0x00000001) != 0;
+      return (bitField0_ & 0x00000002) != 0;
     }
 
     /**
@@ -524,7 +542,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearTotalTimeMs() {
-      bitField0_ &= ~0x00000001;
+      bitField0_ &= ~0x00000002;
       totalTimeMs = 0D;
       return this;
     }
@@ -553,7 +571,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setTotalTimeMs(final double value) {
-      bitField0_ |= 0x00000001;
+      bitField0_ |= 0x00000002;
       totalTimeMs = value;
       return this;
     }
@@ -567,7 +585,7 @@ public final class ProtobufCommands {
      * @return whether the priority field is set
      */
     public boolean hasPriority() {
-      return (bitField0_ & 0x00000008) != 0;
+      return (bitField0_ & 0x00000010) != 0;
     }
 
     /**
@@ -579,7 +597,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearPriority() {
-      bitField0_ &= ~0x00000008;
+      bitField0_ &= ~0x00000010;
       priority = 0;
       return this;
     }
@@ -606,7 +624,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setPriority(final int value) {
-      bitField0_ |= 0x00000008;
+      bitField0_ |= 0x00000010;
       priority = value;
       return this;
     }
@@ -621,7 +639,7 @@ public final class ProtobufCommands {
      * @return whether the id field is set
      */
     public boolean hasId() {
-      return (bitField0_ & 0x00000010) != 0;
+      return (bitField0_ & 0x00000020) != 0;
     }
 
     /**
@@ -634,7 +652,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearId() {
-      bitField0_ &= ~0x00000010;
+      bitField0_ &= ~0x00000020;
       id = 0;
       return this;
     }
@@ -663,7 +681,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setId(final int value) {
-      bitField0_ |= 0x00000010;
+      bitField0_ |= 0x00000020;
       id = value;
       return this;
     }
@@ -678,7 +696,7 @@ public final class ProtobufCommands {
      * @return whether the parentId field is set
      */
     public boolean hasParentId() {
-      return (bitField0_ & 0x00000004) != 0;
+      return (bitField0_ & 0x00000008) != 0;
     }
 
     /**
@@ -691,7 +709,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearParentId() {
-      bitField0_ &= ~0x00000004;
+      bitField0_ &= ~0x00000008;
       parentId = 0;
       return this;
     }
@@ -720,8 +738,73 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setParentId(final int value) {
-      bitField0_ |= 0x00000004;
+      bitField0_ |= 0x00000008;
       parentId = value;
+      return this;
+    }
+
+    /**
+     * <pre>
+     *  If this command is both the default command for its required mechanism
+     *  and was scheduled by the default command scheduling logic.
+     *  Only included in a message where the command object is configured as the
+     *  default command for a mechanism.
+     * </pre>
+     *
+     * <code>optional bool is_default_command = 8;</code>
+     * @return whether the isDefaultCommand field is set
+     */
+    public boolean hasIsDefaultCommand() {
+      return (bitField0_ & 0x00000001) != 0;
+    }
+
+    /**
+     * <pre>
+     *  If this command is both the default command for its required mechanism
+     *  and was scheduled by the default command scheduling logic.
+     *  Only included in a message where the command object is configured as the
+     *  default command for a mechanism.
+     * </pre>
+     *
+     * <code>optional bool is_default_command = 8;</code>
+     * @return this
+     */
+    public ProtobufCommand clearIsDefaultCommand() {
+      bitField0_ &= ~0x00000001;
+      isDefaultCommand = false;
+      return this;
+    }
+
+    /**
+     * <pre>
+     *  If this command is both the default command for its required mechanism
+     *  and was scheduled by the default command scheduling logic.
+     *  Only included in a message where the command object is configured as the
+     *  default command for a mechanism.
+     * </pre>
+     *
+     * <code>optional bool is_default_command = 8;</code>
+     * @return the isDefaultCommand
+     */
+    public boolean getIsDefaultCommand() {
+      return isDefaultCommand;
+    }
+
+    /**
+     * <pre>
+     *  If this command is both the default command for its required mechanism
+     *  and was scheduled by the default command scheduling logic.
+     *  Only included in a message where the command object is configured as the
+     *  default command for a mechanism.
+     * </pre>
+     *
+     * <code>optional bool is_default_command = 8;</code>
+     * @param value the isDefaultCommand to set
+     * @return this
+     */
+    public ProtobufCommand setIsDefaultCommand(final boolean value) {
+      bitField0_ |= 0x00000001;
+      isDefaultCommand = value;
       return this;
     }
 
@@ -734,7 +817,7 @@ public final class ProtobufCommands {
      * @return whether the name field is set
      */
     public boolean hasName() {
-      return (bitField0_ & 0x00000020) != 0;
+      return (bitField0_ & 0x00000040) != 0;
     }
 
     /**
@@ -746,7 +829,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearName() {
-      bitField0_ &= ~0x00000020;
+      bitField0_ &= ~0x00000040;
       name.clear();
       return this;
     }
@@ -784,7 +867,7 @@ public final class ProtobufCommands {
      * @return internal {@code Utf8String} representation of name for modifications
      */
     public Utf8String getMutableNameBytes() {
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000040;
       return this.name;
     }
 
@@ -798,7 +881,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setName(final CharSequence value) {
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000040;
       name.copyFrom(value);
       return this;
     }
@@ -813,7 +896,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand setName(final Utf8String value) {
-      bitField0_ |= 0x00000020;
+      bitField0_ |= 0x00000040;
       name.copyFrom(value);
       return this;
     }
@@ -827,7 +910,7 @@ public final class ProtobufCommands {
      * @return whether the requirements field is set
      */
     public boolean hasRequirements() {
-      return (bitField0_ & 0x00000040) != 0;
+      return (bitField0_ & 0x00000080) != 0;
     }
 
     /**
@@ -839,7 +922,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand clearRequirements() {
-      bitField0_ &= ~0x00000040;
+      bitField0_ &= ~0x00000080;
       requirements.clear();
       return this;
     }
@@ -876,7 +959,7 @@ public final class ProtobufCommands {
      * @return internal storage object for modifications
      */
     public RepeatedMessage<ProtobufMechanism> getMutableRequirements() {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000080;
       return requirements;
     }
 
@@ -890,7 +973,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand addRequirements(final ProtobufMechanism value) {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000080;
       requirements.add(value);
       return this;
     }
@@ -905,7 +988,7 @@ public final class ProtobufCommands {
      * @return this
      */
     public ProtobufCommand addAllRequirements(final ProtobufMechanism... values) {
-      bitField0_ |= 0x00000040;
+      bitField0_ |= 0x00000080;
       requirements.addAll(values);
       return this;
     }
@@ -920,6 +1003,7 @@ public final class ProtobufCommands {
         priority = other.priority;
         id = other.id;
         parentId = other.parentId;
+        isDefaultCommand = other.isDefaultCommand;
         name.copyFrom(other.name);
         requirements.copyFrom(other.requirements);
       }
@@ -947,6 +1031,9 @@ public final class ProtobufCommands {
       if (other.hasParentId()) {
         setParentId(other.parentId);
       }
+      if (other.hasIsDefaultCommand()) {
+        setIsDefaultCommand(other.isDefaultCommand);
+      }
       if (other.hasName()) {
         getMutableNameBytes().copyFrom(other.name);
       }
@@ -968,6 +1055,7 @@ public final class ProtobufCommands {
       priority = 0;
       id = 0;
       parentId = 0;
+      isDefaultCommand = false;
       name.clear();
       requirements.clear();
       return this;
@@ -1000,37 +1088,42 @@ public final class ProtobufCommands {
         && (!hasPriority() || priority == other.priority)
         && (!hasId() || id == other.id)
         && (!hasParentId() || parentId == other.parentId)
+        && (!hasIsDefaultCommand() || isDefaultCommand == other.isDefaultCommand)
         && (!hasName() || name.equals(other.name))
         && (!hasRequirements() || requirements.equals(other.requirements));
     }
 
     @Override
     public void writeTo(final ProtoSink output) throws IOException {
-      if ((bitField0_ & 0x00000002) != 0) {
+      if ((bitField0_ & 0x00000004) != 0) {
         output.writeRawByte((byte) 49);
         output.writeDoubleNoTag(lastTimeMs);
       }
-      if ((bitField0_ & 0x00000001) != 0) {
+      if ((bitField0_ & 0x00000002) != 0) {
         output.writeRawByte((byte) 57);
         output.writeDoubleNoTag(totalTimeMs);
       }
-      if ((bitField0_ & 0x00000008) != 0) {
+      if ((bitField0_ & 0x00000010) != 0) {
         output.writeRawByte((byte) 32);
         output.writeInt32NoTag(priority);
       }
-      if ((bitField0_ & 0x00000010) != 0) {
+      if ((bitField0_ & 0x00000020) != 0) {
         output.writeRawByte((byte) 8);
         output.writeUInt32NoTag(id);
       }
-      if ((bitField0_ & 0x00000004) != 0) {
+      if ((bitField0_ & 0x00000008) != 0) {
         output.writeRawByte((byte) 16);
         output.writeUInt32NoTag(parentId);
       }
-      if ((bitField0_ & 0x00000020) != 0) {
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeRawByte((byte) 64);
+        output.writeBoolNoTag(isDefaultCommand);
+      }
+      if ((bitField0_ & 0x00000040) != 0) {
         output.writeRawByte((byte) 26);
         output.writeStringNoTag(name);
       }
-      if ((bitField0_ & 0x00000040) != 0) {
+      if ((bitField0_ & 0x00000080) != 0) {
         for (int i = 0; i < requirements.length(); i++) {
           output.writeRawByte((byte) 42);
           output.writeMessageNoTag(requirements.get(i));
@@ -1041,25 +1134,28 @@ public final class ProtobufCommands {
     @Override
     protected int computeSerializedSize() {
       int size = 0;
+      if ((bitField0_ & 0x00000004) != 0) {
+        size += 9;
+      }
       if ((bitField0_ & 0x00000002) != 0) {
         size += 9;
       }
-      if ((bitField0_ & 0x00000001) != 0) {
-        size += 9;
-      }
-      if ((bitField0_ & 0x00000008) != 0) {
+      if ((bitField0_ & 0x00000010) != 0) {
         size += 1 + ProtoSink.computeInt32SizeNoTag(priority);
       }
-      if ((bitField0_ & 0x00000010) != 0) {
+      if ((bitField0_ & 0x00000020) != 0) {
         size += 1 + ProtoSink.computeUInt32SizeNoTag(id);
       }
-      if ((bitField0_ & 0x00000004) != 0) {
+      if ((bitField0_ & 0x00000008) != 0) {
         size += 1 + ProtoSink.computeUInt32SizeNoTag(parentId);
       }
-      if ((bitField0_ & 0x00000020) != 0) {
-        size += 1 + ProtoSink.computeStringSizeNoTag(name);
+      if ((bitField0_ & 0x00000001) != 0) {
+        size += 2;
       }
       if ((bitField0_ & 0x00000040) != 0) {
+        size += 1 + ProtoSink.computeStringSizeNoTag(name);
+      }
+      if ((bitField0_ & 0x00000080) != 0) {
         size += (1 * requirements.length()) + ProtoSink.computeRepeatedMessageSizeNoTag(requirements);
       }
       return size;
@@ -1075,7 +1171,7 @@ public final class ProtobufCommands {
           case 49: {
             // lastTimeMs
             lastTimeMs = input.readDouble();
-            bitField0_ |= 0x00000002;
+            bitField0_ |= 0x00000004;
             tag = input.readTag();
             if (tag != 57) {
               break;
@@ -1084,7 +1180,7 @@ public final class ProtobufCommands {
           case 57: {
             // totalTimeMs
             totalTimeMs = input.readDouble();
-            bitField0_ |= 0x00000001;
+            bitField0_ |= 0x00000002;
             tag = input.readTag();
             if (tag != 32) {
               break;
@@ -1093,7 +1189,7 @@ public final class ProtobufCommands {
           case 32: {
             // priority
             priority = input.readInt32();
-            bitField0_ |= 0x00000008;
+            bitField0_ |= 0x00000010;
             tag = input.readTag();
             if (tag != 8) {
               break;
@@ -1102,7 +1198,7 @@ public final class ProtobufCommands {
           case 8: {
             // id
             id = input.readUInt32();
-            bitField0_ |= 0x00000010;
+            bitField0_ |= 0x00000020;
             tag = input.readTag();
             if (tag != 16) {
               break;
@@ -1111,7 +1207,16 @@ public final class ProtobufCommands {
           case 16: {
             // parentId
             parentId = input.readUInt32();
-            bitField0_ |= 0x00000004;
+            bitField0_ |= 0x00000008;
+            tag = input.readTag();
+            if (tag != 64) {
+              break;
+            }
+          }
+          case 64: {
+            // isDefaultCommand
+            isDefaultCommand = input.readBool();
+            bitField0_ |= 0x00000001;
             tag = input.readTag();
             if (tag != 26) {
               break;
@@ -1120,7 +1225,7 @@ public final class ProtobufCommands {
           case 26: {
             // name
             input.readString(name);
-            bitField0_ |= 0x00000020;
+            bitField0_ |= 0x00000040;
             tag = input.readTag();
             if (tag != 42) {
               break;
@@ -1129,7 +1234,7 @@ public final class ProtobufCommands {
           case 42: {
             // requirements
             tag = input.readRepeatedMessage(requirements, tag);
-            bitField0_ |= 0x00000040;
+            bitField0_ |= 0x00000080;
             if (tag != 0) {
               break;
             }
@@ -1151,25 +1256,28 @@ public final class ProtobufCommands {
     @Override
     public void writeTo(final JsonSink output) throws IOException {
       output.beginObject();
-      if ((bitField0_ & 0x00000002) != 0) {
+      if ((bitField0_ & 0x00000004) != 0) {
         output.writeDouble(FieldNames.lastTimeMs, lastTimeMs);
       }
-      if ((bitField0_ & 0x00000001) != 0) {
+      if ((bitField0_ & 0x00000002) != 0) {
         output.writeDouble(FieldNames.totalTimeMs, totalTimeMs);
       }
-      if ((bitField0_ & 0x00000008) != 0) {
+      if ((bitField0_ & 0x00000010) != 0) {
         output.writeInt32(FieldNames.priority, priority);
       }
-      if ((bitField0_ & 0x00000010) != 0) {
+      if ((bitField0_ & 0x00000020) != 0) {
         output.writeUInt32(FieldNames.id, id);
       }
-      if ((bitField0_ & 0x00000004) != 0) {
+      if ((bitField0_ & 0x00000008) != 0) {
         output.writeUInt32(FieldNames.parentId, parentId);
       }
-      if ((bitField0_ & 0x00000020) != 0) {
-        output.writeString(FieldNames.name, name);
+      if ((bitField0_ & 0x00000001) != 0) {
+        output.writeBool(FieldNames.isDefaultCommand, isDefaultCommand);
       }
       if ((bitField0_ & 0x00000040) != 0) {
+        output.writeString(FieldNames.name, name);
+      }
+      if ((bitField0_ & 0x00000080) != 0) {
         output.writeRepeatedMessage(FieldNames.requirements, requirements);
       }
       output.endObject();
@@ -1187,7 +1295,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.lastTimeMs)) {
               if (!input.trySkipNullValue()) {
                 lastTimeMs = input.readDouble();
-                bitField0_ |= 0x00000002;
+                bitField0_ |= 0x00000004;
               }
             } else {
               input.skipUnknownField();
@@ -1199,7 +1307,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.totalTimeMs)) {
               if (!input.trySkipNullValue()) {
                 totalTimeMs = input.readDouble();
-                bitField0_ |= 0x00000001;
+                bitField0_ |= 0x00000002;
               }
             } else {
               input.skipUnknownField();
@@ -1210,7 +1318,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.priority)) {
               if (!input.trySkipNullValue()) {
                 priority = input.readInt32();
-                bitField0_ |= 0x00000008;
+                bitField0_ |= 0x00000010;
               }
             } else {
               input.skipUnknownField();
@@ -1221,7 +1329,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.id)) {
               if (!input.trySkipNullValue()) {
                 id = input.readUInt32();
-                bitField0_ |= 0x00000010;
+                bitField0_ |= 0x00000020;
               }
             } else {
               input.skipUnknownField();
@@ -1233,7 +1341,19 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.parentId)) {
               if (!input.trySkipNullValue()) {
                 parentId = input.readUInt32();
-                bitField0_ |= 0x00000004;
+                bitField0_ |= 0x00000008;
+              }
+            } else {
+              input.skipUnknownField();
+            }
+            break;
+          }
+          case 1455803796:
+          case -910599624: {
+            if (input.isAtField(FieldNames.isDefaultCommand)) {
+              if (!input.trySkipNullValue()) {
+                isDefaultCommand = input.readBool();
+                bitField0_ |= 0x00000001;
               }
             } else {
               input.skipUnknownField();
@@ -1244,7 +1364,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.name)) {
               if (!input.trySkipNullValue()) {
                 input.readString(name);
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000040;
               }
             } else {
               input.skipUnknownField();
@@ -1255,7 +1375,7 @@ public final class ProtobufCommands {
             if (input.isAtField(FieldNames.requirements)) {
               if (!input.trySkipNullValue()) {
                 input.readRepeatedMessage(requirements);
-                bitField0_ |= 0x00000040;
+                bitField0_ |= 0x00000080;
               }
             } else {
               input.skipUnknownField();
@@ -1331,6 +1451,8 @@ public final class ProtobufCommands {
       static final FieldName id = FieldName.forField("id");
 
       static final FieldName parentId = FieldName.forField("parentId", "parent_id");
+
+      static final FieldName isDefaultCommand = FieldName.forField("isDefaultCommand", "is_default_command");
 
       static final FieldName name = FieldName.forField("name");
 
