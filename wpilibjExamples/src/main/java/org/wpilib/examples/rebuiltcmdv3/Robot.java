@@ -69,7 +69,7 @@ public class Robot extends OpModeRobot {
                         return Meters.of(
                             targetPose
                                 .minus(poseEstimator.getEstimatedPose())
-                                .getTranslation()
+                                .translation
                                 .getNorm());
                       }));
             })

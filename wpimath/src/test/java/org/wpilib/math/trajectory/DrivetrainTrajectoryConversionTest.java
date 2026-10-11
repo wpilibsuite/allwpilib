@@ -105,7 +105,7 @@ class DrivetrainTrajectoryConversionTest {
     for (DifferentialSample sample : diffTrajectory.samples) {
       // Calculate expected wheel speeds from chassis speeds using kinematics
       DifferentialDriveWheelVelocities expectedWheelVelocities =
-          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
+          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.rotation));
 
       // Assert the sample's wheel speeds match the kinematics calculation
       assertAll(
@@ -130,19 +130,19 @@ class DrivetrainTrajectoryConversionTest {
       assertAll(
           () ->
               assertEquals(
-                  sample.velocity.toRobotRelative(sample.pose.getRotation()).vx,
+                  sample.velocity.toRobotRelative(sample.pose.rotation).vx,
                   reconstructedVelocities.vx,
                   EPSILON,
                   "Reconstructed vx mismatch at t=" + sample.time),
           () ->
               assertEquals(
-                  sample.velocity.toRobotRelative(sample.pose.getRotation()).vy,
+                  sample.velocity.toRobotRelative(sample.pose.rotation).vy,
                   reconstructedVelocities.vy,
                   EPSILON,
                   "Reconstructed vy mismatch at t=" + sample.time),
           () ->
               assertEquals(
-                  sample.velocity.toRobotRelative(sample.pose.getRotation()).omega,
+                  sample.velocity.toRobotRelative(sample.pose.rotation).omega,
                   reconstructedVelocities.omega,
                   EPSILON,
                   "Reconstructed omega mismatch at t=" + sample.time));
@@ -159,7 +159,7 @@ class DrivetrainTrajectoryConversionTest {
 
     for (DifferentialSample sample : diffTrajectory.samples) {
       DifferentialDriveWheelVelocities expectedWheelVelocities =
-          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.getRotation()));
+          kinematics.toWheelVelocities(sample.velocity.toRobotRelative(sample.pose.rotation));
 
       assertEquals(expectedWheelVelocities.left, sample.leftVelocity, EPSILON);
       assertEquals(expectedWheelVelocities.right, sample.rightVelocity, EPSILON);

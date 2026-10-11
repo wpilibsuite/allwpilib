@@ -19,10 +19,10 @@ public class DifferentialDriveWheelAccelerations
         ProtobufSerializable,
         StructSerializable {
   /** Acceleration of the left side of the robot in meters per second squared. */
-  public double left;
+  public final double left;
 
   /** Acceleration of the right side of the robot in meters per second squared. */
-  public double right;
+  public final double right;
 
   /** DifferentialDriveWheelAccelerations protobuf for serialization. */
   public static final DifferentialDriveWheelAccelerationsProto proto =
@@ -35,7 +35,9 @@ public class DifferentialDriveWheelAccelerations
   /**
    * Constructs a DifferentialDriveWheelAccelerations with zeros for left and right accelerations.
    */
-  public DifferentialDriveWheelAccelerations() {}
+  public DifferentialDriveWheelAccelerations() {
+    this(0.0, 0.0);
+  }
 
   /**
    * Constructs a DifferentialDriveWheelAccelerations.

@@ -21,16 +21,16 @@ public class MecanumDriveWheelVelocities
         ProtobufSerializable,
         StructSerializable {
   /** Velocity of the front left wheel in meters per second. */
-  public double frontLeft;
+  public final double frontLeft;
 
   /** Velocity of the front right wheel in meters per second. */
-  public double frontRight;
+  public final double frontRight;
 
   /** Velocity of the rear left wheel in meters per second. */
-  public double rearLeft;
+  public final double rearLeft;
 
   /** Velocity of the rear right wheel in meters per second. */
-  public double rearRight;
+  public final double rearRight;
 
   /** MecanumDriveWheelVelocities protobuf for serialization. */
   public static final MecanumDriveWheelVelocitiesProto proto =
@@ -41,7 +41,9 @@ public class MecanumDriveWheelVelocities
       new MecanumDriveWheelVelocitiesStruct();
 
   /** Constructs a MecanumDriveWheelVelocities with zeros for all member fields. */
-  public MecanumDriveWheelVelocities() {}
+  public MecanumDriveWheelVelocities() {
+    this(0.0, 0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a MecanumDriveWheelVelocities.

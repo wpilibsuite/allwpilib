@@ -145,7 +145,7 @@ public class SwerveDrive implements Mechanism {
               AngularVelocity omega =
                   RadiansPerSecond.of(
                       headingController.calculate(
-                          robot.getRotation().getRadians(), targetHeading.in(Radians)));
+                          robot.rotation.getRadians(), targetHeading.in(Radians)));
 
               return new ChassisVelocities(MetersPerSecond.of(0), MetersPerSecond.of(0), omega);
             })
@@ -179,7 +179,7 @@ public class SwerveDrive implements Mechanism {
           AngularVelocity omega =
               RadiansPerSecond.of(
                   headingController.calculate(
-                      robot.getRotation().getRadians(), targetHeading.in(Radians)));
+                      robot.rotation.getRadians(), targetHeading.in(Radians)));
 
           return new ChassisVelocities(
               DriveConstants.MAX_VELOCITY.times(x), DriveConstants.MAX_VELOCITY.times(y), omega);

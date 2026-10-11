@@ -141,7 +141,7 @@ public class Drivetrain {
     var chassisVelocities = new ChassisVelocities(xVelocity, yVelocity, rot);
     if (fieldRelative) {
       chassisVelocities =
-          chassisVelocities.toRobotRelative(poseEstimator.getEstimatedPosition().getRotation());
+          chassisVelocities.toRobotRelative(poseEstimator.getEstimatedPosition().rotation);
     }
     setVelocities(
         kinematics

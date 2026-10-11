@@ -147,6 +147,6 @@ public class AntiTipping {
       correction = correction.times(m_maxCorrectionSpeed / norm);
     }
 
-    return new ChassisVelocities(correction.getX(), correction.getY(), 0.0);
+    return new ChassisVelocities(correction.x, correction.y, 0.0);
   }
 }

@@ -24,6 +24,6 @@ class DifferentialDriveOdometryTest {
     assertAll(
         () -> assertEquals(5.0, pose.getX(), EPSILON),
         () -> assertEquals(5.0, pose.getY(), EPSILON),
-        () -> assertEquals(90.0, pose.getRotation().getDegrees(), EPSILON));
+        () -> assertEquals(90.0, pose.rotation.getDegrees(), EPSILON));
   }
 }

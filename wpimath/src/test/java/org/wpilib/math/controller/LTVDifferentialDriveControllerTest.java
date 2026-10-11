@@ -96,7 +96,7 @@ class LTVDifferentialDriveControllerTest {
             Nat.N1(),
             robotPose.getX(),
             robotPose.getY(),
-            robotPose.getRotation().getRadians(),
+            robotPose.rotation.getRadians(),
             0.0,
             0.0);
 
@@ -133,7 +133,7 @@ class LTVDifferentialDriveControllerTest {
             assertEquals(
                 0.0,
                 MathUtil.angleModulus(
-                    endPose.getRotation().getRadians() - finalRobotPose.getRotation().getRadians()),
+                    endPose.rotation.getRadians() - finalRobotPose.rotation.getRadians()),
                 ANGULAR_TOLERANCE));
   }
 }

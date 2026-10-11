@@ -45,8 +45,8 @@ public final class Pose3dStruct implements Struct<Pose3d> {
 
   @Override
   public void pack(ByteBuffer bb, Pose3d value) {
-    Translation3d.struct.pack(bb, value.getTranslation());
-    Rotation3d.struct.pack(bb, value.getRotation());
+    Translation3d.struct.pack(bb, value.translation);
+    Rotation3d.struct.pack(bb, value.rotation);
   }
 
   @Override

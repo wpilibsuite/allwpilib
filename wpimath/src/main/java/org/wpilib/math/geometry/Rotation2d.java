@@ -77,13 +77,16 @@ public final class Rotation2d
    */
   public static final Rotation2d k180deg = PI;
 
-  @Json.Ignore private final double m_cos;
-  @Json.Ignore private final double m_sin;
+  /** The cosine of the Rotation2d. */
+  @Json.Ignore public final double cos;
+
+  /** The sine of the Rotation2d. */
+  @Json.Ignore public final double sin;
 
   /** Constructs a Rotation2d with a default angle of 0 degrees. */
   public Rotation2d() {
-    m_cos = 1.0;
-    m_sin = 0.0;
+    cos = 1.0;
+    sin = 0.0;
   }
 
   /**
@@ -93,8 +96,8 @@ public final class Rotation2d
    */
   @Json.Creator
   public Rotation2d(@Json.Alias(value = "radians") double value) {
-    m_cos = Math.cos(value);
-    m_sin = Math.sin(value);
+    cos = Math.cos(value);
+    sin = Math.sin(value);
   }
 
   /**
@@ -106,11 +109,11 @@ public final class Rotation2d
   public Rotation2d(double x, double y) {
     double magnitude = Math.hypot(x, y);
     if (magnitude > 1e-6) {
-      m_cos = x / magnitude;
-      m_sin = y / magnitude;
+      cos = x / magnitude;
+      sin = y / magnitude;
     } else {
-      m_cos = 1.0;
-      m_sin = 0.0;
+      cos = 1.0;
+      sin = 0.0;
       MathSharedStore.reportError(
           "x and y components of Rotation2d are zero\n", Thread.currentThread().getStackTrace());
     }
@@ -152,8 +155,8 @@ public final class Rotation2d
 
     // R = [cosθ  −sinθ]
     //     [sinθ   cosθ]
-    m_cos = R.get(0, 0);
-    m_sin = R.get(1, 0);
+    cos = R.get(0, 0);
+    sin = R.get(1, 0);
   }
 
   /**
@@ -219,7 +222,7 @@ public final class Rotation2d
    * @return The inverse of the current rotation.
    */
   public Rotation2d unaryMinus() {
-    return new Rotation2d(m_cos, -m_sin);
+    return new Rotation2d(cos, -sin);
   }
 
   /**
@@ -257,8 +260,7 @@ public final class Rotation2d
    * @return The new rotated Rotation2d.
    */
   public Rotation2d rotateBy(Rotation2d other) {
-    return new Rotation2d(
-        m_cos * other.m_cos - m_sin * other.m_sin, m_cos * other.m_sin + m_sin * other.m_cos);
+    return new Rotation2d(cos * other.cos - sin * other.sin, cos * other.sin + sin * other.cos);
   }
 
   /**
@@ -280,7 +282,7 @@ public final class Rotation2d
   public Matrix<N2, N2> toMatrix() {
     // R = [cosθ  −sinθ]
     //     [sinθ   cosθ]
-    return MatBuilder.fill(Nat.N2(), Nat.N2(), m_cos, -m_sin, m_sin, m_cos);
+    return MatBuilder.fill(Nat.N2(), Nat.N2(), cos, -sin, sin, cos);
   }
 
   /**
@@ -299,7 +301,7 @@ public final class Rotation2d
    */
   @Json.Property("radians")
   public double getRadians() {
-    return Math.atan2(m_sin, m_cos);
+    return Math.atan2(sin, cos);
   }
 
   /**
@@ -321,30 +323,12 @@ public final class Rotation2d
   }
 
   /**
-   * Returns the cosine of the Rotation2d.
-   *
-   * @return The cosine of the Rotation2d.
-   */
-  public double getCos() {
-    return m_cos;
-  }
-
-  /**
-   * Returns the sine of the Rotation2d.
-   *
-   * @return The sine of the Rotation2d.
-   */
-  public double getSin() {
-    return m_sin;
-  }
-
-  /**
    * Returns the tangent of the Rotation2d.
    *
    * @return The tangent of the Rotation2d.
    */
   public double getTan() {
-    return m_sin / m_cos;
+    return sin / cos;
   }
 
   @Override
@@ -360,8 +344,7 @@ public final class Rotation2d
    */
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Rotation2d other
-        && Math.hypot(m_cos - other.m_cos, m_sin - other.m_sin) < 1E-9;
+    return obj instanceof Rotation2d other && Math.hypot(cos - other.cos, sin - other.sin) < 1E-9;
   }
 
   @Override

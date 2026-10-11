@@ -105,7 +105,7 @@ public class DifferentialSample extends HolonomicSample implements StructSeriali
     super(time, pose, velocity, acceleration);
 
     // Wheel velocitys are derived from the robot-relative velocity.
-    var wheelVelocitys = kinematics.toWheelVelocities(velocity.toRobotRelative(pose.getRotation()));
+    var wheelVelocitys = kinematics.toWheelVelocities(velocity.toRobotRelative(pose.rotation));
     this.leftVelocity = wheelVelocitys.left;
     this.rightVelocity = wheelVelocitys.right;
   }
@@ -164,8 +164,8 @@ public class DifferentialSample extends HolonomicSample implements StructSeriali
     return new DifferentialSample(
         time,
         pose.transformBy(transform),
-        velocity.toFieldRelative(transform.getRotation()),
-        acceleration.toFieldRelative(transform.getRotation()),
+        velocity.toFieldRelative(transform.rotation),
+        acceleration.toFieldRelative(transform.rotation),
         leftVelocity,
         rightVelocity);
   }
@@ -181,8 +181,8 @@ public class DifferentialSample extends HolonomicSample implements StructSeriali
     return new DifferentialSample(
         time,
         pose.relativeTo(other),
-        velocity.toRobotRelative(other.getRotation()),
-        acceleration.toRobotRelative(other.getRotation()),
+        velocity.toRobotRelative(other.rotation),
+        acceleration.toRobotRelative(other.rotation),
         leftVelocity,
         rightVelocity);
   }

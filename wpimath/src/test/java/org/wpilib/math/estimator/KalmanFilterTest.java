@@ -210,9 +210,9 @@ class KalmanFilterTest {
 
       var y =
           VecBuilder.fill(
-              sample.pose.getTranslation().getX(),
-              sample.pose.getTranslation().getY(),
-              sample.pose.getRotation().getRadians());
+              sample.pose.translation.x,
+              sample.pose.translation.y,
+              sample.pose.rotation.getRadians());
       // Low noise for stability
       var noise = Normal.normal(VecBuilder.fill(0.002, 0.002, 0.001));
       y.set(0, 0, y.get(0, 0) + noise.get(0, 0));
@@ -229,12 +229,8 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getX(),
-        filter.getXhat(0),
-        0.2);
+        trajectory.sampleAt(trajectory.duration).pose.translation.x, filter.getXhat(0), 0.2);
     assertEquals(
-        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getY(),
-        filter.getXhat(1),
-        0.2);
+        trajectory.sampleAt(trajectory.duration).pose.translation.y, filter.getXhat(1), 0.2);
   }
 }

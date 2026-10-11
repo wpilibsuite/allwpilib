@@ -21,16 +21,16 @@ public class MecanumDriveWheelPositions
         ProtobufSerializable,
         StructSerializable {
   /** Distance measured by the front left wheel in meters. */
-  public double frontLeft;
+  public final double frontLeft;
 
   /** Distance measured by the front right wheel in meters. */
-  public double frontRight;
+  public final double frontRight;
 
   /** Distance measured by the rear left wheel in meters. */
-  public double rearLeft;
+  public final double rearLeft;
 
   /** Distance measured by the rear right wheel in meters. */
-  public double rearRight;
+  public final double rearRight;
 
   /** MecanumDriveWheelPositions protobuf for serialization. */
   public static final MecanumDriveWheelPositionsProto proto = new MecanumDriveWheelPositionsProto();
@@ -40,7 +40,9 @@ public class MecanumDriveWheelPositions
       new MecanumDriveWheelPositionsStruct();
 
   /** Constructs a MecanumDriveWheelPositions with zeros for all member fields. */
-  public MecanumDriveWheelPositions() {}
+  public MecanumDriveWheelPositions() {
+    this(0.0, 0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a MecanumDriveWheelPositions.

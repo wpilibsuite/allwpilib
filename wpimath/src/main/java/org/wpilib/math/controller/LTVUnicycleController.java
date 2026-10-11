@@ -75,12 +75,12 @@ public class LTVUnicycleController {
    * @return True if the pose error is within tolerance of the reference.
    */
   public boolean atReference() {
-    final var eTranslate = m_poseError.getTranslation();
-    final var eRotate = m_poseError.getRotation();
-    final var tolTranslate = m_poseTolerance.getTranslation();
-    final var tolRotate = m_poseTolerance.getRotation();
-    return Math.abs(eTranslate.getX()) < tolTranslate.getX()
-        && Math.abs(eTranslate.getY()) < tolTranslate.getY()
+    final var eTranslate = m_poseError.translation;
+    final var eRotate = m_poseError.rotation;
+    final var tolTranslate = m_poseTolerance.translation;
+    final var tolRotate = m_poseTolerance.rotation;
+    return Math.abs(eTranslate.x) < tolTranslate.x
+        && Math.abs(eTranslate.y) < tolTranslate.y
         && Math.abs(eRotate.getRadians()) < tolRotate.getRadians();
   }
 
@@ -185,7 +185,7 @@ public class LTVUnicycleController {
             Nat.N1(),
             m_poseError.getX(),
             m_poseError.getY(),
-            m_poseError.getRotation().getRadians());
+            m_poseError.rotation.getRadians());
     var u = K.times(e);
 
     return new ChassisVelocities(
@@ -205,8 +205,7 @@ public class LTVUnicycleController {
   public ChassisVelocities calculate(Pose2d currentPose, HolonomicSample desiredState) {
     // The sample velocity is field-relative; the controller needs the
     // robot-relative forward (linear) velocity.
-    double linearVelocity =
-        desiredState.velocity.toRobotRelative(desiredState.pose.getRotation()).vx;
+    double linearVelocity = desiredState.velocity.toRobotRelative(desiredState.pose.rotation).vx;
     return calculate(currentPose, desiredState.pose, linearVelocity, desiredState.velocity.omega);
   }
 

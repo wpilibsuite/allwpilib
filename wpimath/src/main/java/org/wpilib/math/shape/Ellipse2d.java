@@ -92,7 +92,7 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
    * @return The rotational component of the ellipse.
    */
   public Rotation2d getRotation() {
-    return m_center.getRotation();
+    return m_center.rotation;
   }
 
   /**
@@ -148,12 +148,12 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
 
     if (m_xSemiAxis > m_ySemiAxis) {
       return new Pair<>(
-          m_center.plus(new Transform2d(-c, 0.0, Rotation2d.ZERO)).getTranslation(),
-          m_center.plus(new Transform2d(c, 0.0, Rotation2d.ZERO)).getTranslation());
+          m_center.plus(new Transform2d(-c, 0.0, Rotation2d.ZERO)).translation,
+          m_center.plus(new Transform2d(c, 0.0, Rotation2d.ZERO)).translation);
     } else {
       return new Pair<>(
-          m_center.plus(new Transform2d(0.0, -c, Rotation2d.ZERO)).getTranslation(),
-          m_center.plus(new Transform2d(0.0, c, Rotation2d.ZERO)).getTranslation());
+          m_center.plus(new Transform2d(0.0, -c, Rotation2d.ZERO)).translation,
+          m_center.plus(new Transform2d(0.0, c, Rotation2d.ZERO)).translation);
     }
   }
 
@@ -231,18 +231,17 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
     }
 
     // Rotate the point by the inverse of the ellipse's rotation
-    var rotPoint =
-        point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    var rotPoint = point.rotateAround(m_center.translation, m_center.rotation.unaryMinus());
 
     // Find nearest point
     try (var problem = new Problem()) {
       // Point on ellipse
       var x = problem.decisionVariable();
-      x.setValue(rotPoint.getX());
+      x.setValue(rotPoint.x);
       var y = problem.decisionVariable();
-      y.setValue(rotPoint.getY());
+      y.setValue(rotPoint.y);
 
-      problem.minimize(pow(x.minus(rotPoint.getX()), 2).plus(pow(y.minus(rotPoint.getY()), 2)));
+      problem.minimize(pow(x.minus(rotPoint.x), 2).plus(pow(y.minus(rotPoint.y), 2)));
 
       // (x − x_c)²/a² + (y − y_c)²/b² = 1
       // b²(x − x_c)² + a²(y − y_c)² = a²b²
@@ -261,7 +260,7 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
     }
 
     // Undo rotation
-    return rotPoint.rotateAround(m_center.getTranslation(), m_center.getRotation());
+    return rotPoint.rotateAround(m_center.translation, m_center.rotation);
   }
 
   @Override
@@ -305,10 +304,10 @@ public final class Ellipse2d implements ProtobufSerializable, StructSerializable
    */
   private double solveEllipseEquation(Translation2d point) {
     // Rotate the point by the inverse of the ellipse's rotation
-    point = point.rotateAround(m_center.getTranslation(), m_center.getRotation().unaryMinus());
+    point = point.rotateAround(m_center.translation, m_center.rotation.unaryMinus());
 
-    double x = point.getX() - m_center.getX();
-    double y = point.getY() - m_center.getY();
+    double x = point.x - m_center.getX();
+    double y = point.y - m_center.getY();
 
     return (x * x) / (m_xSemiAxis * m_xSemiAxis) + (y * y) / (m_ySemiAxis * m_ySemiAxis);
   }
