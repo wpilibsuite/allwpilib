@@ -11,6 +11,7 @@ import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.MatrixFeatures_DDRM;
 import org.ejml.dense.row.NormOps_DDRM;
 import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
+import org.ejml.dense.row.misc.TransposeAlgs_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 import org.wpilib.math.jni.EigenJNI;
@@ -679,7 +680,115 @@ public class Matrix<R extends Num, C extends Num>
   }
 
   /**
-   * Performs an inplace Cholesky rank update (or downdate).
+   * Givens rotation.
+   *
+   * <p>Given a and b, find c = cosθ and s = sinθ such that
+   *
+   * <pre>
+   * [c  -s][a] = [r]
+   * [s   c][b]   [0]
+   * </pre>
+   *
+   * <p>where r = √(a² + b²) is the length of the vector (a, b).
+   */
+  private class GivensRotation {
+    public final double c;
+    public final double s;
+    public final double r;
+
+    /**
+     * Construct a Givens rotation.
+     *
+     * @param a a.
+     * @param b b.
+     */
+    GivensRotation(double a, double b) {
+      if (b == 0.0) {
+        c = a < 0.0 ? -1.0 : 1.0;
+        s = 0.0;
+        r = Math.abs(a);
+        return;
+      }
+
+      if (a == 0.0) {
+        c = 0.0;
+        s = b < 0.0 ? 1.0 : -1.0;
+        r = Math.abs(b);
+        return;
+      }
+
+      // Safe-range thresholds following [1].
+      //
+      // When both |a| and |b| lie in (rtmin, rtmax), the direct formula
+      // r = a * √(1 + (b/a)²) cannot over- or underflow before the true result
+      // would. Outside that range we prescale by max(|a|, |b|) (clamped into
+      // [safe_min, safe_max]) so that the squared sum stays in the
+      // representable range. This preserves the existing Eigen sign convention
+      // (r ≥ 0, sign carried in c).
+      //
+      // [1] Anderson, "Algorithm 978: Safe Scaling in the Level 1 BLAS",
+      //     ACM TOMS 44(1), 2017.
+      final double safe_min = Double.MIN_VALUE;
+      final double safe_max = 1.0 / safe_min;
+      final double rtmin = Math.sqrt(safe_min);
+      final double rtmax = Math.sqrt(safe_max / 2.0);
+      final double abs_a = Math.abs(a);
+      final double abs_b = Math.abs(b);
+      final double mx = Math.max(abs_a, abs_b);
+      final double mn = Math.min(abs_a, abs_b);
+
+      if (mx < rtmax && mn > rtmin) {
+        // Safe range: existing direct formulas are stable.
+        if (abs_a > abs_b) {
+          double t = b / a;
+          double u = Math.sqrt(1.0 + t * t);
+          if (a < 0.0) {
+            u = -u;
+          }
+          c = 1.0 / u;
+          s = -t * c;
+          r = a * u;
+        } else {
+          double t = a / b;
+          double u = Math.sqrt(1.0 + t * t);
+          if (b < 0.0) {
+            u = -u;
+          }
+          s = -1.0 / u;
+          c = -t * s;
+          r = b * u;
+        }
+      } else {
+        // Out of safe range: prescale by max(|a|, |b|) clamped into
+        // [safe_min, safe_max].
+        final double scale = Math.clamp(mx, safe_min, safe_max);
+        final double as = a / scale;
+        final double bs = b / scale;
+        if (abs_a > abs_b) {
+          double t = bs / as;
+          double u = Math.sqrt(1.0 + t * t);
+          if (as < 0.0) {
+            u = -u;
+          }
+          c = 1.0 / u;
+          s = -t * c;
+          r = (as * u) * scale;
+        } else {
+          double t = as / bs;
+          double u = Math.sqrt(1.0 + t * t);
+          if (bs < 0.0) {
+            u = -u;
+          }
+          s = -1.0 / u;
+          c = -t * s;
+          r = (bs * u) * scale;
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs an in-place Cholesky rank update (or downdate).
    *
    * <p>If this matrix contains L where A = LLᵀ before the update, it will contain L where LLᵀ = A +
    * σvvᵀ after the update.
@@ -687,9 +796,92 @@ public class Matrix<R extends Num, C extends Num>
    * @param v Vector to use for the update.
    * @param sigma Sigma to use for the update.
    * @param lowerTriangular Whether this matrix is lower triangular.
+   * @return True if rank update (or downdate) succeeded.
    */
-  public void rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
-    EigenJNI.rankUpdate(this.getData(), this.getNumRows(), v.getData(), sigma, lowerTriangular);
+  public boolean rankUpdate(Matrix<R, N1> v, double sigma, boolean lowerTriangular) {
+    if (sigma == 0.0) {
+      return true;
+    }
+
+    int n = getNumCols();
+
+    if (!lowerTriangular) {
+      TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+    }
+
+    final double[] ω = v.getStorage().getDDRM().data.clone();
+
+    if (sigma > 0.0) {
+      // This algorithm based on Givens rotations only works for updates
+
+      final double sqrt_sigma = Math.sqrt(sigma);
+      for (int i = 0; i < n; ++i) {
+        ω[i] *= sqrt_sigma;
+      }
+
+      for (int j = 0; j < n; ++j) {
+        final var g = new GivensRotation(get(j, j), -ω[j]);
+        set(j, j, g.r);
+
+        // Apply rotation in the plane
+        if (g.c == 1.0 && g.s == 0.0) {
+          continue;
+        }
+        for (int k = j + 1; k < n; ++k) {
+          final double l_kj = get(k, j);
+          final double ω_k = ω[k];
+          set(k, j, g.c * l_kj + g.s * ω_k);
+          ω[k] = -g.s * l_kj + g.c * ω_k;
+        }
+      }
+    } else {
+      // Algorithm 3.1 from https://christian-igel.github.io/paper/AMERCMAUfES.pdf
+      // where α = 1 and their β is our σ
+      double b = 1.0;
+      for (int j = 0; j < n; ++j) {
+        final double l_jj = get(j, j);
+        if (l_jj == 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+
+        final double l_jj2 = l_jj * l_jj;
+        final double σω_j2 = sigma * ω[j] * ω[j];
+        final double x = l_jj2 + σω_j2 / b;
+        if (x < 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+        final double lp_jj = Math.sqrt(x);
+        set(j, j, lp_jj);
+
+        final double γ = l_jj2 * b + σω_j2;
+        if (γ == 0.0) {
+          if (!lowerTriangular) {
+            TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+          }
+          return false;
+        }
+
+        for (int k = j + 1; k < n; ++k) {
+          final double l_kj = get(k, j);
+          ω[k] -= ω[j] / l_jj * l_kj;
+          set(k, j, lp_jj / l_jj * l_kj + lp_jj * sigma * ω[j] / γ * ω[k]);
+        }
+
+        b += σω_j2 / l_jj2;
+      }
+    }
+
+    if (!lowerTriangular) {
+      TransposeAlgs_DDRM.square(this.m_storage.getDDRM());
+    }
+
+    return true;
   }
 
   @Override
