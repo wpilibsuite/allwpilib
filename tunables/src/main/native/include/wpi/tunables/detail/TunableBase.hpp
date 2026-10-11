@@ -15,7 +15,6 @@
 namespace wpi::tunables {
 
 struct TunableConfig;
-class TunableRegistry;
 
 namespace detail {
 
