@@ -87,6 +87,7 @@ cc_test(
     ],
     deps = [
         ":glass",
+        ":glassnt",
         "//thirdparty/catch2",
     ],
 )
