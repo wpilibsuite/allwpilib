@@ -62,7 +62,7 @@ def create_pybind_library(
                 "-Wno-pessimizing-move",
                 "-Wno-unused-value",
             ],
-            "@bazel_tools//src/conditions:linux_x86_64": [
+            "@bazel_tools//src/conditions:linux": [
                 "-Wno-attributes",
                 "-Wno-unused-value",
                 "-Wno-deprecated",
