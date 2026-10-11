@@ -91,6 +91,7 @@ bool DBusApi::Load(std::string* error) {
   LOAD_DBUS_SYMBOL(dbus_message_get_interface);
   LOAD_DBUS_SYMBOL(dbus_message_get_member);
   LOAD_DBUS_SYMBOL(dbus_message_get_type);
+  LOAD_DBUS_SYMBOL(dbus_message_set_serial);
   LOAD_DBUS_SYMBOL(dbus_message_new_error);
   LOAD_DBUS_SYMBOL(dbus_message_new_method_call);
   LOAD_DBUS_SYMBOL(dbus_message_new_method_return);
