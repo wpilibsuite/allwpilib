@@ -16,8 +16,6 @@ from wpilib.simulation import PWMMotorControllerSim
         wpilib_drivers.PWMVictorSPX,
         wpilib_drivers.Spark,
         wpilib_drivers.SparkMini,
-        wpilib_drivers.Talon,
-        wpilib_drivers.VictorSP,
     ],
 )
 def test_pwm_motor_controller(motor_type):

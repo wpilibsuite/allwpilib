@@ -23,8 +23,8 @@ authors = [
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-ntcore==0.0.0",
-    "robotpy-native-wpinet==0.0.0",
     "robotpy-wpiutil==0.0.0",
+    "robotpy-wpinet==0.0.0",
     "robotpy-wpilog==0.0.0",
 ]
 

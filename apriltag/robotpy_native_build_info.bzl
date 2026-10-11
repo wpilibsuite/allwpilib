@@ -55,7 +55,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib AprilTag Library",
         requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpimath==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["apriltag"],
         entry_points = {
             "pkg_config": [
