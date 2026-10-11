@@ -71,6 +71,14 @@ def ntcore_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
 
     NTCORE_HEADER_GEN = [
         struct(
+            class_name = "AlertBackend",
+            yml_file = "semiwrap/AlertBackend.yml",
+            header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
+            header_file = "$(execpath :robotpy-native-ntcore.copy_headers)/wpi/nt/AlertBackend.hpp",
+            tmpl_class_names = [],
+            trampolines = [],
+        ),
+        struct(
             class_name = "BooleanArrayTopic",
             yml_file = "semiwrap/BooleanArrayTopic.yml",
             header_root = "$(execpath :robotpy-native-ntcore.copy_headers)",
