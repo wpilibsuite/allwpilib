@@ -56,8 +56,17 @@ void WireEncodePropertiesUpdate(wpi::util::raw_ostream& os,
 bool WireEncodeText(wpi::util::raw_ostream& os, const ClientMessage& msg);
 bool WireEncodeText(wpi::util::raw_ostream& os, const ServerMessage& msg);
 
-// encoder for binary messages
+/**
+ * Encodes a binary value message using the negotiated protocol's time units.
+ *
+ * @param os Output stream.
+ * @param id Topic or publisher ID.
+ * @param time Server timestamp in nanoseconds; zero is preserved.
+ * @param value Value to encode.
+ * @param protoRev Negotiated protocol revision (e.g. NT_4_2).
+ * @return True if the message was written.
+ */
 bool WireEncodeBinary(wpi::util::raw_ostream& os, int id, int64_t time,
-                      const Value& value);
+                      const Value& value, unsigned int protoRev);
 
 }  // namespace wpi::nt::net
