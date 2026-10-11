@@ -1,0 +1,202 @@
+= NetworkTables REST API
+
+The ntcore server provides a REST API with JSON and MessagePack representations on the same port as NT4 WebSockets (default 5810). Starting a server with `NetworkTableInstance.StartServer()` (C++), `startServer()` (Java), or `start_server()` (RobotPy) enables the API. It operates on that server instance's topics, including topics published by local code and connected NT4 clients. Client-only instances do not host it. The existing `/` resource and WebSocket upgrades remain available.
+
+== Resources
+
+[cols="1,3,5",options="header"]
+|===
+|Method |Path |Behavior
+|GET |`/nt/v1/topics` |List ordinary topics as an array of topic objects.
+|GET |`/nt/v1/topics?prefix=<prefix>` |List topics whose names start with the decoded prefix. A prefix starting with `$` also includes server meta topics.
+|GET |`/nt/v1/topics/<name>` |Read one topic's type, properties, and latest cached value.
+|PUT |`/nt/v1/topics/<name>` |Create a topic or update its value, optionally updating properties.
+|PATCH |`/nt/v1/topics/<name>` |Update properties on an existing topic.
+|DELETE |`/nt/v1/topics/<name>` |Delete a topic with no active publishers.
+|GET |`/nt/v1/topics/<name>?type` |Read the type string (read-only).
+|GET |`/nt/v1/topics/<name>?name` |Read the topic name (read-only).
+|GET |`/nt/v1/topics/<name>?timestamp` |Read the cached value's timestamp (read-only).
+|GET, PUT |`/nt/v1/topics/<name>?value` |Read or write the unwrapped value of an existing topic.
+|GET, PUT, PATCH |`/nt/v1/topics/<name>?properties` |Read, replace, or merge properties of an existing topic.
+|GET, PUT |`/nt/v1/persistent.json` |Download or merge-upload a persistent JSON file.
+|GET, PUT |`/nt/persistent.json` |Alias for `/nt/v1/persistent.json`, preserving the existing download URL.
+|OPTIONS |Any resource |Return the allowed methods and CORS preflight headers.
+|===
+
+`<name>` is the percent-encoded *complete* topic name, including any leading slash. For example, `/SmartDashboard/speed` becomes `/nt/v1/topics/%2FSmartDashboard%2Fspeed`. Names are case sensitive, are decoded once, and are not normalized. A literal `+` in the path remains a `+`. Every character after `/nt/v1/topics/` and before the query belongs to the topic name. Slashes may be encoded as `%2F` or left literal. For example, a topic named `/test/value` is addressed as `/nt/v1/topics/%2Ftest%2Fvalue` or `/nt/v1/topics/%2Ftest/value`; its value resource appends `?value`. Use percent encoding for reserved characters such as `?`, `#`, and `%`. The `prefix` query uses normal form-style query encoding (`+` means space). Collection ordering is unspecified. Meta topics can be read but not modified.
+
+Individual topic fields use one query selector: `?name`, `?type`, `?timestamp`, `?value`, or `?properties`. The selector has no value; an explicit empty value (e.g. `?value=`) is also accepted. Unknown, duplicate, or multiple selectors, and selectors with nonempty values, return 400 without changing the topic. Query selectors apply to individual topics; the collection uses `?prefix=<prefix>` for filtering.
+
+A topic object looks like:
+
+[source,json]
+----
+{
+  "name": "/example/count",
+  "type": "int",
+  "value": 42,
+  "timestamp": 123456789,
+  "properties": {"retained": true}
+}
+----
+
+`timestamp` is the cached value's timestamp in microseconds in the server's NetworkTables time base, not Unix time. A topic without a cached value has `value: null` and `timestamp: 0`. This includes uncached topics. Nonfinite floating-point values (NaN and infinities) are returned as JSON `null`, including individual array elements. Topic resources accept only finite numbers on writes.
+
+== Writes and topic lifetime
+
+PUT and PATCH require `Content-Type: application/json` or `Content-Type: application/msgpack`; `application/x-msgpack` is accepted as an alias. Media type parameters such as `charset=utf-8` are accepted. Request bodies are limited to 2 MiB, including chunked bodies. Oversized requests receive 413 and the connection closes. HTTP request targets and individual header fields retain the existing HTTP parser's 1024-byte limit.
+
+PUT on the complete topic resource requires a `value` and, for new topics, a nonempty `type` string. On existing topics, `type` can be omitted; a different type returns 409. Unknown fields and invalid values return 400 without changing the topic. Optional `properties` are merged using NetworkTables property semantics: a null property removes that key. The built-in `persistent`, `retained`, and `cached` properties must be booleans or null.
+
+New topics default to `retained: true` because HTTP requests do not hold an NT publisher open. Creation with retention disabled requires `persistent: true`. Retained topics survive HTTP disconnection; persistence is opt-in and uses the server's configured persistence file.  Updating an existing topic does not automatically change its retention. Property updates that remove both retention and persistence from a topic without publishers unpublish the topic.
+
+PATCH on the complete topic resource accepts only a `properties` object, for example:
+
+[source,json]
+----
+{"properties":{"persistent":true,"unit":"m/s","oldProperty":null}}
+----
+
+On `?value`, PUT accepts the value itself, without a `value` wrapper, and returns 204. The topic must already exist; its type determines validation and conversion. For example, writing `42` to an `int` topic updates only its value.
+
+On `?properties`, PUT and PATCH accept the properties object itself, without a `properties` wrapper, and return 204. PUT replaces the properties: omitted keys are removed. PATCH merges changes and removes keys whose values are null. Replacing properties without retaining `retained` or `persistent` may unpublish a topic without active publishers. Type, name, and timestamp are read-only.
+
+DELETE removes retention and persistence and unpublishes the topic. It returns 409 while any local or remote NT publisher is active; close those publishers first. Writes and property changes use the existing server notification path, so local and remote subscribers observe them. Normal NT caching, timestamps, and subscriber delivery periods still apply. REST requests do not create NT connections or publishers in the server's meta topics.
+
+== Persistent file upload and download
+
+GET `/nt/v1/persistent.json` downloads the current persistent topics using the same JSON serializer as the server's periodic persistence file writer. It is a live snapshot, rather than a read of the last file saved to disk. Only persistent topics with cached values are included. Each entry contains `name`, `type`, `value`, and `properties`, without a timestamp:
+
+[source,json]
+----
+[
+  {
+    "name": "/example/count",
+    "type": "int",
+    "value": 42,
+    "properties": {"persistent": true}
+  }
+]
+----
+
+PUT the JSON array directly to the same URL with `Content-Type: application/json`. A successful upload returns 204. It adds new topics and replaces the value and properties of each included topic. Existing topics must have the same type; a matching nonpersistent topic becomes persistent. Topics omitted from the upload are unchanged, so uploading `[]` is a no-op. Both operations are also available at `/nt/persistent.json`.
+
+The whole upload is validated before any topics change. Duplicate topic names, malformed entries, and invalid values return 400; existing type conflicts return 409; meta topic writes return 403. Each entry must include `properties: {"persistent": true}` (other properties are allowed). `cached: false` is rejected. Entry validation errors identify the zero-based entry index. The same 2 MiB request body limit applies.
+
+Uploaded values and properties reach local and remote subscribers through the normal server notification path. The merged state is marked for saving by the normal periodic persistence writer; a successful response does not wait for the disk write. Downloaded files can also be used as the startup persistence file.
+
+These file resources use JSON only: MessagePack uploads return 415, and a GET that excludes JSON in `Accept` returns 406. Values use the persistence file encoding: raw and custom types, including `msgpack`, are base64 strings, and `json` topics contain JSON text as a string. Floating-point conversion matches the startup loader, including infinities encoded as overflowing JSON numbers. The existing file format writes NaN as `null`, which cannot be restored as a floating-point value by either the startup loader or this upload endpoint.
+
+== Content negotiation
+
+Topic GET and complete-topic PUT responses support `Accept: application/json` and `Accept: application/msgpack`. An absent Accept header defaults to JSON. The server honors media type lists, quality weights, and `application/*` and `*/*` wildcards, preferring JSON on equal quality. Explicit `q=0` excludes a representation even when a wildcard allows it. Responses use the canonical `application/msgpack` media type and include `Vary: Accept`. Request and response encodings are independent. Errors are always JSON; 204 responses have no body.
+
+MessagePack bodies contain exactly one object, with no NT4 message envelope. Decoding and translation allow at most 64 nesting levels and 131072 nodes (including map keys). Unsupported extensions, invalid UTF-8 strings, trailing objects, truncated data, and inputs exceeding these limits are rejected. Conversions to the JSON data model additionally reject binary objects, non-string or duplicate map keys, and nonfinite numbers, since these cannot be represented faithfully. Full unsigned 64-bit MessagePack integers are preserved by the JSON representation, although NT `int` values remain signed.
+
+== Value encoding
+
+[cols="2,4",options="header"]
+|===
+|NT type |JSON representation
+|`boolean` |Boolean
+|`int` |Signed 64-bit integer (fractional numbers and out-of-range integers are rejected)
+|`float`, `double` |Finite number within the type's range
+|`string`, `json` |String; `json` contains JSON text as a string
+|`boolean[]`, `int[]`, `float[]`, `double[]`, `string[]` |Array of the corresponding scalar type, including empty arrays
+|Raw and custom types (e.g. `raw`, `msgpack`, `struct:Example`, `proto:Example`) |Canonical padded base64 string; an empty string represents zero bytes
+|===
+
+Integers are emitted as JSON numbers without conversion through floating point.
+JavaScript clients must account for their number type's limited integer precision.
+The table above describes values inside complete-topic objects in either
+response encoding. These objects retain base64 strings for raw values
+(including `msgpack`) and strings for `json` topics, so they can still be used
+with the original complete-topic PUT format. Structs and protobufs remain opaque.
+
+The individual `?value` resource exposes the logical value instead:
+
+[cols="2,4,4",options="header"]
+|===
+|NT type |JSON body |MessagePack body
+|Scalars and arrays |The scalar or array |The corresponding scalar or array
+|`msgpack` |The decoded object, array, or scalar |The stored MessagePack object, unchanged
+|`json` |The parsed JSON object, array, or scalar |The parsed JSON value encoded as MessagePack
+|Other raw types |Canonical padded base64 string |MessagePack binary object
+|===
+
+These conversions work in both directions on PUT. JSON writes to `msgpack` topics encode the value before storing it; MessagePack writes to `json` topics decode and serialize it as JSON text. Native MessagePack writes to `msgpack` topics preserve their bytes, including binary objects and non-string map keys. Such values remain readable as MessagePack, but JSON GET returns 406 when a faithful conversion is unavailable. Invalid stored `msgpack` or `json` payloads return 422 from `?value`; the complete-topic resource still exposes their underlying bytes or string. Meta topics remain read-only in both encodings.
+
+Ordinary floating-point NT values return `null` for nonfinite values in JSON and preserve them in MessagePack GET responses. Scalar and array PUTs still require finite numbers. A topic without a cached value returns JSON null or MessagePack nil from `?value`.
+
+== Responses
+
+Successful reads and complete-topic updates return 200 in the negotiated encoding. Creation returns 201 with the resulting topic object. PATCH, DELETE, and OPTIONS return 204 without a body. A PUT that unpublishes its topic also returns 204. Errors use a JSON object with an `error` string:
+
+* 400: malformed JSON, invalid name encoding, invalid properties or value
+* 403: attempt to modify a meta topic
+* 404: unknown resource or missing topic
+* 405: unsupported method (includes `Allow`)
+* 406: no acceptable response encoding or value cannot be translated faithfully
+* 409: type conflict or deletion of a topic with active publishers
+* 413: request body exceeds 2 MiB
+* 415: PUT or PATCH without a supported media type
+* 422: stored `msgpack` or `json` value cannot be decoded by `?value`
+
+The API inherits the webserver's permissive CORS policy. It has the same unauthenticated access model as NT4: anyone able to reach the server port can read and write topics.
+
+== Examples
+
+Start an ntcore server, then substitute its host and configured port:
+
+[source,shell]
+----
+# List topics under /example/.
+curl 'http://localhost:5810/nt/v1/topics?prefix=%2Fexample%2F'
+
+# Create a retained topic.
+curl -X PUT 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount' \
+  -H 'Content-Type: application/json' \
+  -d '{"type":"int","value":42}'
+
+# Update the value without repeating the type.
+curl -X PUT 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount' \
+  -H 'Content-Type: application/json' -d '{"value":43}'
+
+# Persist the topic across server restarts.
+curl -X PATCH 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount' \
+  -H 'Content-Type: application/json' -d '{"properties":{"persistent":true}}'
+
+curl 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount'
+curl -X DELETE 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount'
+----
+
+[source,shell]
+----
+# Read just the type, or update just the value.
+curl 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount?type'
+curl -X PUT 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount?value' \
+  -H 'Content-Type: application/json' -d '44'
+
+# Inspect MessagePack metadata as JSON.
+curl 'http://localhost:5810/nt/v1/topics/%24serversub?value' \
+  -H 'Accept: application/json'
+
+# Download the same metadata in its native MessagePack encoding.
+curl 'http://localhost:5810/nt/v1/topics/%24serversub?value' \
+  -H 'Accept: application/msgpack' -o subscribers.msgpack
+
+# Upload a MessagePack value to an existing topic.
+curl -X PUT 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount?value' \
+  -H 'Content-Type: application/msgpack' --data-binary @count.msgpack
+
+# Merge individual properties without a properties wrapper.
+curl -X PATCH 'http://localhost:5810/nt/v1/topics/%2Fexample%2Fcount?properties' \
+  -H 'Content-Type: application/json' -d '{"unit":"cycles"}'
+
+# Download persistent entries in the server's persistence file format.
+curl 'http://localhost:5810/nt/v1/persistent.json' -o networktables.json
+
+# Add or update entries from a file, preserving entries omitted from it.
+curl -X PUT 'http://localhost:5810/nt/v1/persistent.json' \
+  -H 'Content-Type: application/json' --data-binary @networktables.json
+----
