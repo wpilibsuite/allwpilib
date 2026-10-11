@@ -166,14 +166,14 @@ TEST_CASE_METHOD(SysIdRoutineTest, "SysIdRoutineTest OutputCorrectVoltage",
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicForward));
-  expectedVoltages = std::vector<wpi::units::volt_t>{7_V, 0_V};
+  expectedVoltages = std::vector<wpi::units::volt_t>{4_V, 0_V};
   CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
   sentVoltages.clear();
 
   RunCommand(std::move(m_dynamicReverse));
-  expectedVoltages = std::vector<wpi::units::volt_t>{-7_V, 0_V};
+  expectedVoltages = std::vector<wpi::units::volt_t>{-4_V, 0_V};
   CHECK_NEAR_UNITS(expectedVoltages[0], sentVoltages[0], 1e-6_V);
   CHECK_NEAR_UNITS(expectedVoltages[1], sentVoltages[1], 1e-6_V);
   currentStateList.clear();
