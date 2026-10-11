@@ -115,6 +115,9 @@ class NetworkTablesModel : public Model {
     /** Publisher (created when the value changes). */
     NT_Publisher publisher{0};
 
+    /** Whether subscriber metadata came from the topic's `$sub$...` topic. */
+    bool hasTopicSubscriberMetadata{false};
+
     std::vector<wpi::nt::meta::TopicPublisher> publishers;
     std::vector<wpi::nt::meta::TopicSubscriber> subscribers;
   };
@@ -178,7 +181,11 @@ class NetworkTablesModel : public Model {
   }
   const Client& GetServer() const { return m_server; }
   Entry* GetEntry(std::string_view name);
-  Entry* AddEntry(NT_Topic topic);
+  Entry* AddEntry(NT_Topic topic) {
+    auto* entry = AddEntryForUpdate(topic);
+    RebuildTree();
+    return entry;
+  }
 
   wpi::util::StructDescriptorDatabase& GetStructDatabase() {
     return m_structDb;
@@ -188,6 +195,8 @@ class NetworkTablesModel : public Model {
   }
 
  private:
+  Entry* AddEntryForUpdate(NT_Topic topic, bool* created = nullptr);
+  void UpdateDerivedTopicSubscribers();
   void RebuildTree();
   void RebuildTreeImpl(std::vector<TreeNode>* tree, int category);
   void UpdateClients(std::span<const uint8_t> data);
