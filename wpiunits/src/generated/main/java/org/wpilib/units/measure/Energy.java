@@ -361,12 +361,12 @@ public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit
   }
 
   @Override
-  public Per<EnergyUnit, PowerUnit> div(Power divisor) {
-    return (Per<EnergyUnit, PowerUnit>) Measure.super.div(divisor);
+  public Time div(Power divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<EnergyUnit, PowerUnit> per(PowerUnit divisorUnit) {
+  public Time per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

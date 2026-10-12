@@ -233,12 +233,12 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
   }
 
   @Override
-  public Per<PowerUnit, FrequencyUnit> div(Frequency divisor) {
-    return (Per<PowerUnit, FrequencyUnit>) Measure.super.div(divisor);
+  public Energy div(Frequency divisor) {
+    return Joules.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<PowerUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Energy per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

@@ -143,12 +143,12 @@ public record Angle(double magnitude, double baseUnitMagnitude, AngleUnit unit) 
   }
 
   @Override
-  public Per<AngleUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
-    return (Per<AngleUnit, AngularVelocityUnit>) Measure.super.div(divisor);
+  public Time div(AngularVelocity divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngleUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Time per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

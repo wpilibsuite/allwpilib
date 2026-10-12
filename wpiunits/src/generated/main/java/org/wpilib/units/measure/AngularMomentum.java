@@ -313,12 +313,12 @@ public record AngularMomentum(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularMomentumUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
-    return (Per<AngularMomentumUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  public AngularVelocity div(MomentOfInertia divisor) {
+    return RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularMomentumUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public AngularVelocity per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

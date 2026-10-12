@@ -356,8 +356,8 @@ public record Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) im
 
 
   @Override
-  public Mult<TimeUnit, PowerUnit> times(Power multiplier) {
-    return (Mult<TimeUnit, PowerUnit>) Measure.super.times(multiplier);
+  public Energy times(Power multiplier) {
+    return Joules.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override

@@ -143,12 +143,12 @@ public record AngularAcceleration(double magnitude, double baseUnitMagnitude, An
   }
 
   @Override
-  public Per<AngularAccelerationUnit, AngularVelocityUnit> div(AngularVelocity divisor) {
-    return (Per<AngularAccelerationUnit, AngularVelocityUnit>) Measure.super.div(divisor);
+  public Frequency div(AngularVelocity divisor) {
+    return Hertz.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularAccelerationUnit, AngularVelocityUnit> per(AngularVelocityUnit divisorUnit) {
+  public Frequency per(AngularVelocityUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
