@@ -12,7 +12,6 @@ def examplecheck_test(
         config,
         srcs,
         tags = [],
-        package_complete = True,
         example_file_glob = "**/Robot.*",
         **kwargs):
     if "no-ide" not in tags:
@@ -31,6 +30,8 @@ def examplecheck_test(
         **kwargs
     )
 
-    bare_robots = native.glob([example_file_glob], allow_empty = True)
-    if package_complete and bare_robots:
-        fail("Examples missing BUILD files:\n - " + "\n - ".join(bare_robots))
+    # If specified, require all matching files to be in subpackages.
+    if example_file_glob:
+        unpackaged_srcs = native.glob([example_file_glob], allow_empty = True)
+        if unpackaged_srcs:
+            fail("Examples missing BUILD files:\n - " + "\n - ".join(unpackaged_srcs))
