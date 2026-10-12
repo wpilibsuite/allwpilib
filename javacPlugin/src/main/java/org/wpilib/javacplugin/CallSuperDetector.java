@@ -11,6 +11,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.Tree;
 import com.sun.source.util.JavacTask;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskListener;
@@ -33,19 +34,15 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-/**
- * Detects improper overrides of methods annotated with {@code @CallSuper}.
- */
+/** Detects improper overrides of methods annotated with {@code @CallSuper}. */
 public class CallSuperDetector implements TaskListener {
-  private final JavacTask                m_task;
+  private final JavacTask m_task;
   private final Set<CompilationUnitTree> m_visitedCUs = new HashSet<>();
 
   private final Elements m_elements;
-  private final Types    m_types;
+  private final Types m_types;
 
-  /**
-   * Construct a CallSuperDetector.
-   */
+  /** Construct a CallSuperDetector. */
   public CallSuperDetector(JavacTask task) {
     m_task = task;
     m_elements = task.getElements();
@@ -67,13 +64,12 @@ public class CallSuperDetector implements TaskListener {
   }
 
   /**
-   * Reports an error for every method that overrides a method annotated with
-   * {@code @CallSuper} but does not invoke {@code super.method(...)} (or
-   * {@code Iface.super.method(...)}) in its body.
+   * Reports an error for every method that overrides a method annotated with {@code @CallSuper} but
+   * does not invoke {@code super.method(...)} (or {@code Iface.super.method(...)}) in its body.
    *
-   * <p>The requirement is transitive: if {@code A.foo()} is {@code @CallSuper} and
-   * {@code B.foo()} overrides it, then {@code C.foo()} (overriding
-   * {@code B.foo()}) must also call {@code super.foo()}.
+   * <p>The requirement is transitive: if {@code A.foo()} is {@code @CallSuper} and {@code B.foo()}
+   * overrides it, then {@code C.foo()} (overriding {@code B.foo()}) must also call {@code
+   * super.foo()}.
    */
   public final class Scanner extends WPILibTreeScanner<Void, Void> {
     private static final String CALL_SUPER_ANNOTATION = "org.wpilib.annotation.CallSuper";
@@ -89,13 +85,17 @@ public class CallSuperDetector implements TaskListener {
       return super.visitMethod(tree, unused);
     }
 
+    TreePath getCurrentPath(Tree tree) {
+      return m_trees.getPath(m_root, tree);
+    }
+
     private void checkMethod(MethodTree tree) {
       if (tree.getBody() == null) {
         // abstract/native method: nothing to check
         return;
       }
 
-      Element element = m_trees.getElement(getCurrentPath());
+      Element element = m_trees.getElement(getCurrentPath(tree));
       if (!(element instanceof ExecutableElement method)) {
         return;
       }
@@ -118,21 +118,22 @@ public class CallSuperDetector implements TaskListener {
       }
 
       // Ensure method calls super implementation.
-      TreePath bodyPath = new TreePath(getCurrentPath(), tree.getBody());
+      TreePath bodyPath = new TreePath(getCurrentPath(tree), tree.getBody());
       if (!new SuperCallFinder(method, owner).containsSuperCall(bodyPath)) {
         TypeElement firstRequiring = requiring.iterator().next();
-        printError("Override of @CallSuper method `%s.%s` doesn't call `super.%s()`.".formatted(
-          firstRequiring.getSimpleName(), method, method.getSimpleName()),
-          tree,
-          null // not suppressible
-        );
+        printError(
+            "Override of @CallSuper method `%s.%s` doesn't call `super.%s()`."
+                .formatted(firstRequiring.getSimpleName(), method, method.getSimpleName()),
+            tree,
+            null // not suppressible
+            );
       }
     }
 
     /**
-     * Walks every supertype of {@code owner} (superclasses and interfaces, transitively)
-     * and returns all types containing a {@code @CallSuper}-annotated method
-     * that {@code method} overrides.
+     * Walks every supertype of {@code owner} (superclasses and interfaces, transitively) and
+     * returns all types containing a {@code @CallSuper}-annotated method that {@code method}
+     * overrides.
      */
     private Set<TypeElement> requiringSupertypes(ExecutableElement method, TypeElement owner) {
       Deque<TypeMirror> queue = new ArrayDeque<>(m_types.directSupertypes(owner.asType()));
@@ -147,11 +148,10 @@ public class CallSuperDetector implements TaskListener {
         if (!seen.add(superElement)) {
           continue;
         }
-        for (ExecutableElement candidate : ElementFilter.methodsIn(
-            superElement.getEnclosedElements())) {
+        for (ExecutableElement candidate :
+            ElementFilter.methodsIn(superElement.getEnclosedElements())) {
           if (hasCallSuper(candidate)
-              && !candidate.getModifiers()
-                           .contains(Modifier.ABSTRACT) // nothing to call
+              && !candidate.getModifiers().contains(Modifier.ABSTRACT) // nothing to call
               && m_elements.overrides(method, candidate, owner)) {
             requiringSupertypes.add(superElement);
           }
@@ -161,13 +161,10 @@ public class CallSuperDetector implements TaskListener {
       return requiringSupertypes;
     }
 
-    /**
-     * Check if a method is annotated with {@code @CallSuper}.
-     */
+    /** Check if a method is annotated with {@code @CallSuper}. */
     private static boolean hasCallSuper(ExecutableElement method) {
       for (AnnotationMirror mirror : method.getAnnotationMirrors()) {
-        Element annotationType = mirror.getAnnotationType()
-                                       .asElement();
+        Element annotationType = mirror.getAnnotationType().asElement();
         if (annotationType instanceof TypeElement te
             && CALL_SUPER_ANNOTATION.contentEquals(te.getQualifiedName())) {
           return true;
@@ -177,13 +174,12 @@ public class CallSuperDetector implements TaskListener {
     }
 
     /**
-     * Looks for {@code super.m(...)} / {@code Iface.super.m(...)} that resolves
-     * to a super method.
+     * Looks for {@code super.m(...)} / {@code Iface.super.m(...)} that resolves to a super method.
      */
     private final class SuperCallFinder extends TreePathScanner<Void, Void> {
       private final ExecutableElement method;
-      private final TypeElement       owner;
-      private boolean                 found;
+      private final TypeElement owner;
+      private boolean found;
 
       SuperCallFinder(ExecutableElement method, TypeElement owner) {
         this.method = method;
@@ -222,13 +218,11 @@ public class CallSuperDetector implements TaskListener {
       private static boolean isSuper(ExpressionTree expr) {
         if (expr instanceof IdentifierTree ident) {
           // super.foo()
-          return ident.getName()
-                      .contentEquals("super");
+          return ident.getName().contentEquals("super");
         }
         if (expr instanceof MemberSelectTree member) {
           // ParentType.super.foo() or OuterType.super.foo()
-          return member.getIdentifier()
-                       .contentEquals("super");
+          return member.getIdentifier().contentEquals("super");
         }
         return false;
       }

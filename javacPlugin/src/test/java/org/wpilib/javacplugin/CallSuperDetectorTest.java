@@ -78,7 +78,7 @@ class CallSuperDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "[WPILIB] Override of @CallSuper method `Example.foo` doesn't call `super.foo()`.",
+        "[WPILib] Override of @CallSuper method `Example.foo()` doesn't call `super.foo()`.",
         error.getMessage(null));
   }
 
@@ -122,7 +122,7 @@ class CallSuperDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "[WPILIB] Override of @CallSuper method `Example.foo` doesn't call `super.foo()`.",
+        "[WPILib] Override of @CallSuper method `Example.foo()` doesn't call `super.foo()`.",
         error.getMessage(null));
   }
 
@@ -160,12 +160,12 @@ class CallSuperDetectorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "[WPILIB] Override of @CallSuper method `Example.foo` doesn't call `super.foo()`.",
+        "[WPILib] Override of @CallSuper method `Example.foo()` doesn't call `super.foo()`.",
         error.getMessage(null));
   }
 
   @Test
-  void overrideDoesntCallSuper() {
+  void customLabel() {
     String source =
         """
         package wpilib.robot;
@@ -195,8 +195,6 @@ class CallSuperDetectorTest {
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals(
-        "[WPILIB] Overrides of `foo` must call `super.foo()`.",
-        error.getMessage(null));
+    assertEquals("[WPILib] Overrides of `foo` must call `super.foo()`.", error.getMessage(null));
   }
 }
