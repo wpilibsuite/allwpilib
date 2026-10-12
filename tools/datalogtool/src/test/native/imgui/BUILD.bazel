@@ -25,7 +25,7 @@ wpilib_imgui_cc_test(
     }),
     deps = [
         "//datalog",
-        "//glass:glass_for_tests",
+        "//glass",
         "//shared/bazel/thirdparty/libssh",
     ],
 )

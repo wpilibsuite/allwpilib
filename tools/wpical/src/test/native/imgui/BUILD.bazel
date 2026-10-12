@@ -14,9 +14,9 @@ wpilib_imgui_cc_test(
         "__BAZEL__=1",
     ],
     deps = [
-        "//glass:glass_for_tests",
+        "//glass",
         "//shared/bazel/thirdparty/ceres",
-        "//tools/wpical:wpical_lib_for_tests",
+        "//tools/wpical:wpical_lib",
         "@bazel_tools//tools/cpp/runfiles",
     ],
 )

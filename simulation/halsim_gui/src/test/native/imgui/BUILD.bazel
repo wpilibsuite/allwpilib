@@ -3,16 +3,12 @@ load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
 wpilib_imgui_cc_test(
     name = "halsim_gui_imgui_tests",
     size = "small",
-    srcs = [
-        "//simulation/halsim_gui:main-native-srcs",
-    ] + glob(["*.cpp"]),
+    srcs = glob(["*.cpp"]),
     tags = [
         "no-asan",
     ],
     deps = [
-        "//glass:glassnt_for_tests",
-        "//hal:wpiHal",
-        "//simulation/halsim_gui:headers",
+        "//simulation/halsim_gui:halsim_gui_static",
     ],
 )
 

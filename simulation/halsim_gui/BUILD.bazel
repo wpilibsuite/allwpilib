@@ -25,6 +25,7 @@ wpilib_cc_library(
         "src/main/native/include/**/*.hpp",
     ]),
     includes = ["src/main/native/include"],
+    linkstatic = False,
     tags = [
         "wpi-cpp-gui",
     ],
@@ -49,6 +50,7 @@ wpilib_cc_library(
         "-DHALSIM_InitExtension=HALSIM_InitExtension_GUI",
     ],
     includes = ["src/main/native/include"],
+    linkstatic = True,
     tags = [
         "wpi-cpp-gui",
     ],

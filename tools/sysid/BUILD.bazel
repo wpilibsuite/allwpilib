@@ -59,7 +59,7 @@ cc_library(
     visibility = ["//tools/sysid/src/test/native/imgui:__pkg__"],
     deps = [
         "//datalog",
-        "//glass:glass_for_tests",
+        "//glass",
         "//wpigui/src/test/native",
         "//wpinet",
     ],
