@@ -86,7 +86,7 @@ public final class ChargeUnit extends MultUnit<CurrentUnit, TimeUnit> {
   /**
    * Converts a measurement value in terms of another unit to this unit.
    *
-   * @param magnitude the magnitude of the measurement in terms of the other current unit
+   * @param magnitude the magnitude of the measurement in terms of the other electrical charge unit
    * @param otherUnit the other unit
    * @return the value of the measurement in terms of this unit
    */
