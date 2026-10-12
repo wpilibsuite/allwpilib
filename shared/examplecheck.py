@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 from pathlib import Path
 
 TAGS = {
@@ -170,10 +171,10 @@ def validate_entries(parsed_json: list[dict], kind: str, is_cpp_commands: bool) 
                 )
 
 
-def main() -> None:
-    kind = os.environ["EXAMPLECHECK_KIND"]
-    folder_path = Path(os.environ["EXAMPLECHECK_FOLDER"])
-    json_path = folder_path / f"{kind}.json"
+def main(args: list[str]) -> None:
+    json_path = Path(args[0])
+    folder_path = json_path.parent
+    kind = json_path.stem
 
     is_cpp_commands = parse_bool(
         os.environ.get("EXAMPLECHECK_IS_CPP_COMMANDS"), default=False
@@ -190,4 +191,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

@@ -22,7 +22,7 @@ def examplecheck_test(
         size = "small",
         srcs = [_MAIN],
         args = [
-            # "$(location " + config + ")",
+            "$(location " + config + ")",
         ],
         data = [config] + srcs,
         main = _MAIN,

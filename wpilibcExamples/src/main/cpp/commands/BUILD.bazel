@@ -25,9 +25,7 @@ examplecheck_test(
     srcs = [":sources"],
     config = "commands.json",
     env = {
-        "EXAMPLECHECK_FOLDER": _PACKAGE,
         "EXAMPLECHECK_IS_CPP_COMMANDS": "true",
-        "EXAMPLECHECK_KIND": "commands",
     },
     example_file_glob = "*/*.cpp",
     tags = [

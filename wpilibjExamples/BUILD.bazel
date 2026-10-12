@@ -68,10 +68,6 @@ build_templates(folders = template_folders)
         name = kind + "_check",
         srcs = glob(["src/main/java/org/wpilib/{}/*/*.java".format(kind)]),
         config = "src/main/java/org/wpilib/{kind}/{kind}.json".format(kind = kind),
-        env = {
-            "EXAMPLECHECK_FOLDER": "wpilibjExamples/src/main/java/org/wpilib/" + kind,
-            "EXAMPLECHECK_KIND": kind,
-        },
         example_file_glob = None,
         tags = [
             "smoketest",
