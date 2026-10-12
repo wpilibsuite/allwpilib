@@ -28,6 +28,7 @@ public class WPILibJavacPlugin implements Plugin {
     task.addTaskListener(new IncorrectCoroutineUseDetector(task));
     task.addTaskListener(new IntegerDivisionDetector(task));
     task.addTaskListener(new AddStateAfterSwitchFromAnyDetector(task));
+    task.addTaskListener(new CallSuperDetector(task));
   }
 
   @Override

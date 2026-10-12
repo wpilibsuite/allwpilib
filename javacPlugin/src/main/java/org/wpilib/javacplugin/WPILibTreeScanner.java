@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.JavacTask;
-import com.sun.source.util.TreeScanner;
+import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 import javax.tools.Diagnostic;
 
@@ -19,7 +19,7 @@ import javax.tools.Diagnostic;
  * @param <P> the type of the additional parameter to this visitor's methods. Use {@code Void} for
  *     visitors that do not need an additional parameter.
  */
-abstract class WPILibTreeScanner<R, P> extends TreeScanner<R, P> {
+abstract class WPILibTreeScanner<R, P> extends TreePathScanner<R, P> {
   public static final String WPILIB_MESSAGE_PREFIX = "[WPILib]";
 
   protected final CompilationUnitTree m_root;
