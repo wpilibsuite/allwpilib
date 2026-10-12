@@ -154,6 +154,22 @@ public record Power(double magnitude, double baseUnitMagnitude, PowerUnit unit) 
 
 
   @Override
+  public Mult<PowerUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<PowerUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<PowerUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<PowerUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<PowerUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<PowerUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<PowerUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

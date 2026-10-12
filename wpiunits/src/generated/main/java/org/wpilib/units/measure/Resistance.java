@@ -154,6 +154,22 @@ public record Resistance(double magnitude, double baseUnitMagnitude, ResistanceU
 
 
   @Override
+  public Mult<ResistanceUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<ResistanceUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<ResistanceUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<ResistanceUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<ResistanceUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Voltage times(Current multiplier) {
     return Volts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }

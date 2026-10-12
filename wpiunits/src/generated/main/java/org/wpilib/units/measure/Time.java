@@ -154,6 +154,22 @@ public record Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) im
 
 
   @Override
+  public Mult<TimeUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<TimeUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<TimeUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<TimeUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<TimeUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<TimeUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<TimeUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

@@ -154,6 +154,22 @@ public record Dimensionless(double magnitude, double baseUnitMagnitude, Dimensio
 
 
   @Override
+  public Charge times(Charge multiplier) {
+    return Coulombs.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
+  }
+
+  @Override
+  public Per<DimensionlessUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<DimensionlessUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<DimensionlessUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Current times(Current multiplier) {
     return Amps.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }

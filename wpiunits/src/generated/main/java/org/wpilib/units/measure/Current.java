@@ -154,6 +154,22 @@ public record Current(double magnitude, double baseUnitMagnitude, CurrentUnit un
 
 
   @Override
+  public Mult<CurrentUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<CurrentUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<CurrentUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<CurrentUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<CurrentUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<CurrentUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<CurrentUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

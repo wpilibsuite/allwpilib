@@ -154,6 +154,22 @@ public record Frequency(double magnitude, double baseUnitMagnitude, FrequencyUni
 
 
   @Override
+  public Mult<FrequencyUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<FrequencyUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<FrequencyUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<FrequencyUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<FrequencyUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<FrequencyUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<FrequencyUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

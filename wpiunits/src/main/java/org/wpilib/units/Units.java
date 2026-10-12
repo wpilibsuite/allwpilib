@@ -449,6 +449,14 @@ public final class Units {
    */
   public static final CurrentUnit Milliamp = Milliamps; // alias
 
+  // ChargeUnit
+  /** A unit equal to approximately 6.2415 × 10^18 elementary charges (or electrons). */
+  public static final ChargeUnit Coulombs =
+      derive(Amps.mult(Seconds)).named("Coulomb").symbol("C").make();
+
+  /** A unit equal to approximately 6.2415 × 10^18 elementary charges (or electrons). */
+  public static final ChargeUnit Coulomb = Coulombs;
+
   // ResistanceUnit
   /** The base unit of resistance. Equivalent to one {@link #Volt} per {@link #Amp}. */
   public static final ResistanceUnit Ohms = derive(Volts.per(Amp)).named("Ohm").symbol("Ω").make();

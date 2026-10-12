@@ -29,6 +29,7 @@ MATH_OPERATION_UNITS = [
     "AngularAcceleration",
     "AngularMomentum",
     "AngularVelocity",
+    "Charge",
     "Current",
     "Dimensionless",
     "Distance",
@@ -87,6 +88,11 @@ UNIT_CONFIGURATIONS = {
           public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
         """),
     },
+    "Charge": {
+        "base_unit": "Coulombs",
+        "multiply": {"Frequency": "Current"},
+        "divide": {"Time": "Current", "Current": "Time"}
+    },
     "Current": {
         "base_unit": "Amps",
         "multiply": {"Voltage": "Power", "Resistance": "Voltage"},
@@ -99,6 +105,7 @@ UNIT_CONFIGURATIONS = {
             "AngularAcceleration": "AngularAcceleration",
             "AngularMomentum": "AngularMomentum",
             "AngularVelocity": "AngularVelocity",
+            "Charge": "Charge",
             "Current": "Current",
             "Dimensionless": "Dimensionless",
             "Distance": "Distance",

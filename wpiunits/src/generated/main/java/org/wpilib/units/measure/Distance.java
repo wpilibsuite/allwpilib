@@ -154,6 +154,22 @@ public record Distance(double magnitude, double baseUnitMagnitude, DistanceUnit 
 
 
   @Override
+  public Mult<DistanceUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<DistanceUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<DistanceUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<DistanceUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<DistanceUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<DistanceUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<DistanceUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

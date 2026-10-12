@@ -154,6 +154,22 @@ public record Mult<A extends Unit, B extends Unit>(double magnitude, double base
 
 
   @Override
+  public Mult<MultUnit<A, B>, ChargeUnit> times(Charge multiplier) {
+    return (Mult<MultUnit<A, B>, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<MultUnit<A, B>, ChargeUnit> div(Charge divisor) {
+    return (Per<MultUnit<A, B>, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<MultUnit<A, B>, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<MultUnit<A, B>, CurrentUnit> times(Current multiplier) {
     return (Mult<MultUnit<A, B>, CurrentUnit>) Measure.super.times(multiplier);
   }

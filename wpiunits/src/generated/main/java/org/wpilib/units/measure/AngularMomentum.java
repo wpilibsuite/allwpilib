@@ -154,6 +154,22 @@ public record AngularMomentum(double magnitude, double baseUnitMagnitude, Angula
 
 
   @Override
+  public Mult<AngularMomentumUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<AngularMomentumUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<AngularMomentumUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<AngularMomentumUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<AngularMomentumUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<AngularMomentumUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<AngularMomentumUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

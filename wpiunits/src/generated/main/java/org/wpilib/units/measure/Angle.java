@@ -154,6 +154,22 @@ public record Angle(double magnitude, double baseUnitMagnitude, AngleUnit unit) 
 
 
   @Override
+  public Mult<AngleUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<AngleUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<AngleUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<AngleUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<AngleUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<AngleUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<AngleUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

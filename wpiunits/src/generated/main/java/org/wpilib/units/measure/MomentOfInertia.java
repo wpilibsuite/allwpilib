@@ -154,6 +154,22 @@ public record MomentOfInertia(double magnitude, double baseUnitMagnitude, Moment
 
 
   @Override
+  public Mult<MomentOfInertiaUnit, ChargeUnit> times(Charge multiplier) {
+    return (Mult<MomentOfInertiaUnit, ChargeUnit>) Measure.super.times(multiplier);
+  }
+
+  @Override
+  public Per<MomentOfInertiaUnit, ChargeUnit> div(Charge divisor) {
+    return (Per<MomentOfInertiaUnit, ChargeUnit>) Measure.super.div(divisor);
+  }
+
+  @Override
+  public Per<MomentOfInertiaUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
+    return div(divisorUnit.one());
+  }
+
+
+  @Override
   public Mult<MomentOfInertiaUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<MomentOfInertiaUnit, CurrentUnit>) Measure.super.times(multiplier);
   }
