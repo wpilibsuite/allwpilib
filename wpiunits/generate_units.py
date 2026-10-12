@@ -73,7 +73,10 @@ UNIT_CONFIGURATIONS = {
     "AngularMomentum": {
         "base_unit": "KilogramMetersSquaredPerSecond",
         "multiply": {},
-        "divide": {"AngularVelocity": "MomentOfInertia", "MomentOfInertia": "AngularVelocity"},
+        "divide": {
+            "AngularVelocity": "MomentOfInertia",
+            "MomentOfInertia": "AngularVelocity",
+        },
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
@@ -91,7 +94,7 @@ UNIT_CONFIGURATIONS = {
     "Charge": {
         "base_unit": "Coulombs",
         "multiply": {"Frequency": "Current"},
-        "divide": {"Time": "Current", "Current": "Time"}
+        "divide": {"Time": "Current", "Current": "Time"},
     },
     "Current": {
         "base_unit": "Amps",
