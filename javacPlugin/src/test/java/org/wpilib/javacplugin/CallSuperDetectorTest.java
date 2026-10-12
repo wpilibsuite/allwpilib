@@ -127,6 +127,45 @@ class CallSuperDetectorTest {
   }
 
   @Test
+  void subclassWithCallSuper() {
+    String source =
+        """
+        package wpilib.robot;
+
+        import org.wpilib.annotation.CallSuper;
+
+        class Example {
+          public void foo() {
+            System.out.println("foo");
+          }
+        }
+
+        class Example2 extends Example {
+          @Override
+          @CallSuper
+          public void foo() {
+            System.out.println("bar");
+          }
+        }
+
+        class Example3 extends Example2 {
+          @Override
+          public void foo() {
+            super.foo();
+            System.out.println("baz");
+          }
+        }
+        """;
+
+    Compilation compilation =
+        javac()
+            .withOptions(JAVA_VERSION_OPTIONS)
+            .compile(JavaFileObjects.forSourceString("wpilib.robot.Example", source));
+
+    assertThat(compilation).succeededWithoutWarnings();
+  }
+
+  @Test
   void anonymousOverrideDoesntCallSuper() {
     String source =
         """
