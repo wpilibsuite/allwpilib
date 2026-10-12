@@ -33,6 +33,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import org.wpilib.annotation.CallSuper;
 
 /** Detects improper overrides of methods annotated with {@code @CallSuper}. */
 public class CallSuperDetector implements TaskListener {
@@ -112,7 +113,7 @@ public class CallSuperDetector implements TaskListener {
       }
 
       // Check if method is required to call super implementation.
-      Set<TypeElement> requiring = requiringSupertypes(method, owner);
+      Set<ExecutableElement> requiring = requiringSupertypes(method, owner);
       if (requiring.isEmpty()) {
         return;
       }
@@ -120,14 +121,24 @@ public class CallSuperDetector implements TaskListener {
       // Ensure method calls super implementation.
       TreePath bodyPath = new TreePath(getCurrentPath(tree), tree.getBody());
       if (!new SuperCallFinder(method, owner).containsSuperCall(bodyPath)) {
-        TypeElement firstRequiring = requiring.iterator().next();
-        printError(
-            "Override of @CallSuper method `%s.%s` doesn't call `super.%s()`."
-                .formatted(firstRequiring.getSimpleName(), method, method.getSimpleName()),
-            tree,
-            null // not suppressible
-            );
+        ExecutableElement firstMethod = requiring.iterator().next();
+        printError(tree, firstMethod);
       }
+    }
+
+    private void printError(MethodTree tree, ExecutableElement requiringMethod) {
+      String message = requiringMethod.getAnnotation(CallSuper.class).value();
+      if (message.isEmpty()) {
+        TypeElement requiringType = (TypeElement) requiringMethod.getEnclosingElement();
+        message =
+            "Override of @CallSuper method `%s.%s` doesn't call `super.%s()`."
+                .formatted(
+                    requiringType.getSimpleName(),
+                    requiringMethod,
+                    requiringMethod.getSimpleName());
+      }
+
+      printError(message, tree, null); // not suppressible
     }
 
     /**
@@ -135,10 +146,11 @@ public class CallSuperDetector implements TaskListener {
      * returns all types containing a {@code @CallSuper}-annotated method that {@code method}
      * overrides.
      */
-    private Set<TypeElement> requiringSupertypes(ExecutableElement method, TypeElement owner) {
+    private Set<ExecutableElement> requiringSupertypes(
+        ExecutableElement method, TypeElement owner) {
       Deque<TypeMirror> queue = new ArrayDeque<>(m_types.directSupertypes(owner.asType()));
       Set<TypeElement> seen = new HashSet<>();
-      Set<TypeElement> requiringSupertypes = new HashSet<>();
+      Set<ExecutableElement> requiringMethods = new HashSet<>();
       while (!queue.isEmpty()) {
         TypeMirror supertype = queue.poll();
         if (supertype.getKind() != TypeKind.DECLARED) {
@@ -153,12 +165,12 @@ public class CallSuperDetector implements TaskListener {
           if (hasCallSuper(candidate)
               && !candidate.getModifiers().contains(Modifier.ABSTRACT) // nothing to call
               && m_elements.overrides(method, candidate, owner)) {
-            requiringSupertypes.add(superElement);
+            requiringMethods.add(candidate);
           }
         }
         queue.addAll(m_types.directSupertypes(supertype));
       }
-      return requiringSupertypes;
+      return requiringMethods;
     }
 
     /** Check if a method is annotated with {@code @CallSuper}. */
@@ -195,7 +207,7 @@ public class CallSuperDetector implements TaskListener {
       public Void visitMethodInvocation(MethodInvocationTree node, Void unused) {
         ExpressionTree select = node.getMethodSelect();
         if (select instanceof MemberSelectTree member && isSuper(member.getExpression())) {
-          Element invoked = m_trees.getElement(new TreePath(getCurrentPath(), select));
+          Element invoked = m_trees.getElement(new TreePath(super.getCurrentPath(), select));
           // `super.foo()` resolves to the nearest implementation, which may be
           // an intermediate class's override rather than the @CallSuper method itself.
 
