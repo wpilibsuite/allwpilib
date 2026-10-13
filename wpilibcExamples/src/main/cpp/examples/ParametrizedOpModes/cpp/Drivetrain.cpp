@@ -16,14 +16,3 @@ void Drivetrain::SetVelocities(
   leftLeader.SetVoltage(wpi::units::volt_t{leftOutput} + leftFeedforward);
   rightLeader.SetVoltage(wpi::units::volt_t{rightOutput} + rightFeedforward);
 }
-
-void Drivetrain::Drive(wpi::units::meters_per_second_t xVelocity,
-                       wpi::units::radians_per_second_t rot) {
-  SetVelocities(kinematics.ToWheelVelocities({xVelocity, 0_mps, rot}));
-}
-
-void Drivetrain::UpdateOdometry() {
-  odometry.Update(imu.GetRotation2d(),
-                  wpi::units::meter_t{leftEncoder.GetDistance()},
-                  wpi::units::meter_t{rightEncoder.GetDistance()});
-}

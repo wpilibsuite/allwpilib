@@ -19,5 +19,4 @@ void TrajectoryOpMode::Periodic() {
   const wpi::math::DifferentialSample sample = trajectory.SampleAt(timer.Get());
   robot.drivetrain.SetVelocities(
       {.left = sample.leftVelocity, .right = sample.rightVelocity});
-  robot.drivetrain.UpdateOdometry();
 }

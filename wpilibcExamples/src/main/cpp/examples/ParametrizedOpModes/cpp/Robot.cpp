@@ -33,12 +33,9 @@ wpi::math::DifferentialTrajectory LoadTrajectory(const std::string& fileName) {
   }
   const auto chars = (*buffer)->GetCharBuffer();
 
-  // DifferentialTrajectory has no default constructor, so it can't be
-  // deserialized directly with json::get<>(). Read its samples instead.
   const wpi::util::json json = wpi::util::json::parse_or_throw(
       std::string_view{chars.data(), chars.size()});
-  return wpi::math::DifferentialTrajectory{
-      json.at("samples").get<std::vector<wpi::math::DifferentialSample>>()};
+  return json.get<wpi::math::DifferentialTrajectory>();
 }
 
 }  // namespace

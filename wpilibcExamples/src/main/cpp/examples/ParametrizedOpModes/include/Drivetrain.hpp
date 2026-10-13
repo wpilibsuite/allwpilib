@@ -7,14 +7,10 @@
 #include <numbers>
 
 #include "wpi/drivers/motor/PWMSparkMax.hpp"
-#include "wpi/hardware/imu/OnboardIMU.hpp"
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/math/controller/PIDController.hpp"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
-#include "wpi/math/kinematics/DifferentialDriveKinematics.hpp"
-#include "wpi/math/kinematics/DifferentialDriveOdometry.hpp"
-#include "wpi/units/angle.hpp"
-#include "wpi/units/angular_velocity.hpp"
+#include "wpi/math/kinematics/DifferentialDriveWheelVelocities.hpp"
 #include "wpi/units/length.hpp"
 #include "wpi/units/velocity.hpp"
 
@@ -32,7 +28,6 @@ class Drivetrain {
     // gearbox is constructed, you might have to invert the left side instead.
     rightLeader.SetInverted(true);
 
-    imu.ResetYaw();
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
@@ -45,19 +40,10 @@ class Drivetrain {
     rightEncoder.Reset();
   }
 
-  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
-      3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
-      std::numbers::pi};  // 1/2 rotation per second
-
   void SetVelocities(
       const wpi::math::DifferentialDriveWheelVelocities& velocities);
-  void Drive(wpi::units::meters_per_second_t xVelocity,
-             wpi::units::radians_per_second_t rot);
-  void UpdateOdometry();
 
  private:
-  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
   static constexpr double WHEEL_RADIUS = 0.0508;  // meters
   static constexpr int ENCODER_RESOLUTION = 4096;
 
@@ -71,13 +57,6 @@ class Drivetrain {
 
   wpi::math::PIDController leftPIDController{1.0, 0.0, 0.0};
   wpi::math::PIDController rightPIDController{1.0, 0.0, 0.0};
-
-  wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
-
-  wpi::math::DifferentialDriveKinematics kinematics{TRACKWIDTH};
-  wpi::math::DifferentialDriveOdometry odometry{
-      imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
-      wpi::units::meter_t{rightEncoder.GetDistance()}};
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
