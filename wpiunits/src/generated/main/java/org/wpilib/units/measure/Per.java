@@ -154,22 +154,6 @@ public record Per<Dividend extends Unit, Divisor extends Unit>(double magnitude,
 
 
   @Override
-  public Mult<PerUnit<Dividend, Divisor>, ChargeUnit> times(Charge multiplier) {
-    return (Mult<PerUnit<Dividend, Divisor>, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<PerUnit<Dividend, Divisor>, ChargeUnit> div(Charge divisor) {
-    return (Per<PerUnit<Dividend, Divisor>, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<PerUnit<Dividend, Divisor>, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<PerUnit<Dividend, Divisor>, CurrentUnit> times(Current multiplier) {
     return (Mult<PerUnit<Dividend, Divisor>, CurrentUnit>) Measure.super.times(multiplier);
   }

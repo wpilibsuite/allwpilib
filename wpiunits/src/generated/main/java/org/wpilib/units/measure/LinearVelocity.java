@@ -154,22 +154,6 @@ public record LinearVelocity(double magnitude, double baseUnitMagnitude, LinearV
 
 
   @Override
-  public Mult<LinearVelocityUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<LinearVelocityUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<LinearVelocityUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<LinearVelocityUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<LinearVelocityUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<LinearVelocityUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<LinearVelocityUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

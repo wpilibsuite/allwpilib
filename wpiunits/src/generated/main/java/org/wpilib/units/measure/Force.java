@@ -154,22 +154,6 @@ public record Force(double magnitude, double baseUnitMagnitude, ForceUnit unit) 
 
 
   @Override
-  public Mult<ForceUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<ForceUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<ForceUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<ForceUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<ForceUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<ForceUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<ForceUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

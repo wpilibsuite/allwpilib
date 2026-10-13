@@ -11,7 +11,6 @@ import org.wpilib.units.measure.Angle;
 import org.wpilib.units.measure.AngularAcceleration;
 import org.wpilib.units.measure.AngularMomentum;
 import org.wpilib.units.measure.AngularVelocity;
-import org.wpilib.units.measure.Charge;
 import org.wpilib.units.measure.Current;
 import org.wpilib.units.measure.Dimensionless;
 import org.wpilib.units.measure.Distance;
@@ -212,7 +211,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       case AngularAcceleration angularAcceleration -> times(angularAcceleration);
       case AngularMomentum angularMomentum -> times(angularMomentum);
       case AngularVelocity angularVelocity -> times(angularVelocity);
-      case Charge charge -> times(charge);
       case Current current -> times(current);
       // n.b. this case should already be covered
       case Dimensionless dimensionless -> times(dimensionless);
@@ -307,18 +305,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the multiplication result
    */
   default Measure<?> times(Current multiplier) {
-    return MultUnit.combine(unit(), multiplier.unit())
-        .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
-  }
-
-  /**
-   * Multiplies this measure by an electric charge and returns the resulting measure in the most
-   * appropriate unit.
-   *
-   * @param multiplier the measurement to multiply by.
-   * @return the multiplication result
-   */
-  default Measure<?> times(Charge multiplier) {
     return MultUnit.combine(unit(), multiplier.unit())
         .ofBaseUnits(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
@@ -649,7 +635,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
       case AngularAcceleration angularAcceleration -> div(angularAcceleration);
       case AngularMomentum angularMomentum -> div(angularMomentum);
       case AngularVelocity angularVelocity -> div(angularVelocity);
-      case Charge charge -> div(charge);
       case Current current -> div(current);
       // n.b. this case should already be covered
       case Dimensionless dimensionless -> div(dimensionless);
@@ -743,17 +728,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the division result
    */
   default Measure<?> div(Current divisor) {
-    return PerUnit.combine(unit(), divisor.unit())
-        .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
-  }
-
-  /**
-   * Divides this measure by an electric charge and returns the result in the most appropriate unit.
-   *
-   * @param divisor the measurement to divide by.
-   * @return the division result
-   */
-  default Measure<?> div(Charge divisor) {
     return PerUnit.combine(unit(), divisor.unit())
         .ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
@@ -1024,17 +998,6 @@ public interface Measure<U extends Unit> extends Comparable<Measure<U>> {
    * @return the division result
    */
   default Measure<?> per(CurrentUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-  /**
-   * Divides this measure by a unit of electric charge and returns the result in the most
-   * appropriate unit. This is equivalent to {@code div(divisorUnit.of(1))}.
-   *
-   * @param divisorUnit the unit to divide by.
-   * @return the division result
-   */
-  default Measure<?> per(ChargeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

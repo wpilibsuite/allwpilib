@@ -154,22 +154,6 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
 
 
   @Override
-  public Mult<TorqueUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<TorqueUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<TorqueUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<TorqueUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<TorqueUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<TorqueUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<TorqueUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

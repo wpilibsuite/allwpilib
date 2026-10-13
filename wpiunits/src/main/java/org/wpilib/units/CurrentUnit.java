@@ -49,16 +49,6 @@ public final class CurrentUnit extends Unit {
     return Units.derive(PowerUnit.combine(voltage, this)).named(name).symbol(symbol).make();
   }
 
-  /**
-   * Multiplies this current unit by a unit of time to form a combined unit of charge.
-   *
-   * @param time the unit of time
-   * @return the combined unit of charge
-   */
-  public ChargeUnit mult(TimeUnit time) {
-    return ChargeUnit.combine(this, time);
-  }
-
   @Override
   public Current of(double magnitude) {
     return new Current(magnitude, toBaseUnits(magnitude), this);

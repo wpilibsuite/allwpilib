@@ -154,22 +154,6 @@ public record Voltage(double magnitude, double baseUnitMagnitude, VoltageUnit un
 
 
   @Override
-  public Mult<VoltageUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<VoltageUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<VoltageUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<VoltageUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<VoltageUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Power times(Current multiplier) {
     return Watts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }

@@ -154,22 +154,6 @@ public record LinearMomentum(double magnitude, double baseUnitMagnitude, LinearM
 
 
   @Override
-  public Mult<LinearMomentumUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<LinearMomentumUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<LinearMomentumUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<LinearMomentumUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<LinearMomentumUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<LinearMomentumUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<LinearMomentumUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

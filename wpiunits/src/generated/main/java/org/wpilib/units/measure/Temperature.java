@@ -154,22 +154,6 @@ public record Temperature(double magnitude, double baseUnitMagnitude, Temperatur
 
 
   @Override
-  public Mult<TemperatureUnit, ChargeUnit> times(Charge multiplier) {
-    return (Mult<TemperatureUnit, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<TemperatureUnit, ChargeUnit> div(Charge divisor) {
-    return (Per<TemperatureUnit, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<TemperatureUnit, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<TemperatureUnit, CurrentUnit> times(Current multiplier) {
     return (Mult<TemperatureUnit, CurrentUnit>) Measure.super.times(multiplier);
   }

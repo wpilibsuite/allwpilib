@@ -154,22 +154,6 @@ public record Acceleration<D extends Unit>(double magnitude, double baseUnitMagn
 
 
   @Override
-  public Mult<AccelerationUnit<D>, ChargeUnit> times(Charge multiplier) {
-    return (Mult<AccelerationUnit<D>, ChargeUnit>) Measure.super.times(multiplier);
-  }
-
-  @Override
-  public Per<AccelerationUnit<D>, ChargeUnit> div(Charge divisor) {
-    return (Per<AccelerationUnit<D>, ChargeUnit>) Measure.super.div(divisor);
-  }
-
-  @Override
-  public Per<AccelerationUnit<D>, ChargeUnit> per(ChargeUnit divisorUnit) {
-    return div(divisorUnit.one());
-  }
-
-
-  @Override
   public Mult<AccelerationUnit<D>, CurrentUnit> times(Current multiplier) {
     return (Mult<AccelerationUnit<D>, CurrentUnit>) Measure.super.times(multiplier);
   }
