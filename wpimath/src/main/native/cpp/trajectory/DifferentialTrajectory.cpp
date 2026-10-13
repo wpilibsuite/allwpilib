@@ -185,9 +185,9 @@ void wpi::math::to_json(wpi::util::json& json,
   json = wpi::util::json::object("samples", trajectory.Samples());
 }
 
-void wpi::math::from_json(const wpi::util::json& json,
-                          DifferentialTrajectory& trajectory) {
+DifferentialTrajectory wpi::util::json_serializer<DifferentialTrajectory>::from(
+    const json& json) {
   std::vector<DifferentialSample> samples;
   from_json(json.at("samples"), samples);
-  trajectory = DifferentialTrajectory{std::move(samples)};
+  return DifferentialTrajectory{std::move(samples)};
 }

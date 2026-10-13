@@ -39,8 +39,7 @@ TEST_CASE("TrajectorySerializationTest TestJsonSerialization", "[wpimath]") {
   to_json(json, trajectory);
 
   // Deserialize from JSON
-  auto samples_out = json.at("samples").get<std::vector<HolonomicSample>>();
-  HolonomicTrajectory deserializedTrajectory{std::move(samples_out)};
+  auto deserializedTrajectory = json.get<HolonomicTrajectory>();
 
   // Verify they are equal
   CHECK(trajectory.Duration() == deserializedTrajectory.Duration());
@@ -78,8 +77,7 @@ TEST_CASE("TrajectorySerializationTest TestDifferentialSerialization",
   to_json(json, trajectory);
 
   // Deserialize from JSON
-  auto samples_out = json.at("samples").get<std::vector<DifferentialSample>>();
-  DifferentialTrajectory deserializedTrajectory{std::move(samples_out)};
+  auto deserializedTrajectory = json.get<DifferentialTrajectory>();
 
   // Verify they are equal
   CHECK(trajectory.Duration() == deserializedTrajectory.Duration());

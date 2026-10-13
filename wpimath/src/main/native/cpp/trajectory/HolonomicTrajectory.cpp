@@ -75,9 +75,9 @@ void wpi::math::to_json(wpi::util::json& json,
   json = wpi::util::json::object("samples", trajectory.Samples());
 }
 
-void wpi::math::from_json(const wpi::util::json& json,
-                          HolonomicTrajectory& trajectory) {
+HolonomicTrajectory wpi::util::json_serializer<HolonomicTrajectory>::from(
+    const json& json) {
   std::vector<HolonomicSample> samples;
   from_json(json.at("samples"), samples);
-  trajectory = HolonomicTrajectory{std::move(samples)};
+  return HolonomicTrajectory{std::move(samples)};
 }
