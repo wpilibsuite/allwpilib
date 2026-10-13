@@ -361,12 +361,12 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Torque div(Power divisor) {
-    return NewtonMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  public Per<AngularVelocityUnit, PowerUnit> div(Power divisor) {
+    return (Per<AngularVelocityUnit, PowerUnit>) Measure.super.div(divisor);
   }
 
   @Override
-  public Torque per(PowerUnit divisorUnit) {
+  public Per<AngularVelocityUnit, PowerUnit> per(PowerUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -425,12 +425,12 @@ public record AngularVelocity(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Power div(Torque divisor) {
-    return Watts.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  public Per<AngularVelocityUnit, TorqueUnit> div(Torque divisor) {
+    return (Per<AngularVelocityUnit, TorqueUnit>) Measure.super.div(divisor);
   }
 
   @Override
-  public Power per(TorqueUnit divisorUnit) {
+  public Per<AngularVelocityUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

@@ -404,17 +404,17 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
 
 
   @Override
-  public Mult<TorqueUnit, TimeUnit> times(Time multiplier) {
-    return (Mult<TorqueUnit, TimeUnit>) Measure.super.times(multiplier);
+  public AngularMomentum times(Time multiplier) {
+    return KilogramMetersSquaredPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
-  public AngularMomentum div(Time divisor) {
-    return KilogramMetersSquaredPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  public Velocity<TorqueUnit> div(Time divisor) {
+    return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public AngularMomentum per(TimeUnit divisorUnit) {
+  public Velocity<TorqueUnit> per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

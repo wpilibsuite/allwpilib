@@ -91,8 +91,6 @@ UNIT_CONFIGURATIONS = {
             "AngularAcceleration": "Time",
             "Frequency": "Angle",
             "Angle": "Frequency",
-            "Power": "Torque",
-            "Torque": "Power",
         },
         "extra": inspect.cleandoc("""
           public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
@@ -290,13 +288,16 @@ UNIT_CONFIGURATIONS = {
     },
     "Torque": {
         "base_unit": "NewtonMeters",
-        "multiply": {"Angle": "Energy", "AngularVelocity": "Power"},
+        "multiply": {
+            "Angle": "Energy",
+            "AngularVelocity": "Power",
+            "Time": "AngularMomentum",
+        },
         "divide": {
             "Distance": "Force",
             "Force": "Distance",
             "MomentOfInertia": "AngularAcceleration",
             "AngularAcceleration": "MomentOfInertia",
-            "Time": "AngularMomentum",
         },
     },
     "Velocity": {
