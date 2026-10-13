@@ -53,7 +53,7 @@ cc_library(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    visibility = ["//shared/bazel/thirdparty/imgui_test_engine:__pkg__"],
+    visibility = ["//thirdparty/imgui_suite/imgui_test_engine:__pkg__"],
     deps = [
         "//shared/bazel/thirdparty/libsdlgpu",
     ],

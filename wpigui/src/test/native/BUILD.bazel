@@ -10,7 +10,7 @@ cc_library(
     target_compatible_with = imgui_test_target_compatible_with(),
     visibility = ["//visibility:public"],
     deps = [
-        "//shared/bazel/thirdparty/imgui_test_engine",
+        "//thirdparty/imgui_suite/imgui_test_engine",
         "//wpigui",
     ],
 )
