@@ -17,14 +17,6 @@
 #endif
 
 /* Struct definitions */
-typedef struct _wpi_proto_ProtobufTrajectorySample {
-    static const pb_msgdesc_t* msg_descriptor(void) noexcept;
-    static std::string_view msg_name(void) noexcept;
-    static pb_filedesc_t file_descriptor(void) noexcept;
-
-    double time;
-} wpi_proto_ProtobufTrajectorySample;
-
 typedef struct _wpi_proto_ProtobufHolonomicSample {
     static const pb_msgdesc_t* msg_descriptor(void) noexcept;
     static std::string_view msg_name(void) noexcept;
@@ -67,19 +59,16 @@ typedef struct _wpi_proto_ProtobufDifferentialTrajectory {
 
 
 /* Initializer values for message structs */
-#define wpi_proto_ProtobufTrajectorySample_init_default {0}
 #define wpi_proto_ProtobufHolonomicSample_init_default {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufDifferentialSample_init_default {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0}
 #define wpi_proto_ProtobufHolonomicTrajectory_init_default {{{NULL}, NULL}}
 #define wpi_proto_ProtobufDifferentialTrajectory_init_default {{{NULL}, NULL}}
-#define wpi_proto_ProtobufTrajectorySample_init_zero {0}
 #define wpi_proto_ProtobufHolonomicSample_init_zero {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define wpi_proto_ProtobufDifferentialSample_init_zero {0, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, 0}
 #define wpi_proto_ProtobufHolonomicTrajectory_init_zero {{{NULL}, NULL}}
 #define wpi_proto_ProtobufDifferentialTrajectory_init_zero {{{NULL}, NULL}}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define wpi_proto_ProtobufTrajectorySample_time_tag 1
 #define wpi_proto_ProtobufHolonomicSample_time_tag 1
 #define wpi_proto_ProtobufHolonomicSample_pose_tag 2
 #define wpi_proto_ProtobufHolonomicSample_velocities_tag 3
@@ -94,11 +83,6 @@ typedef struct _wpi_proto_ProtobufDifferentialTrajectory {
 #define wpi_proto_ProtobufDifferentialTrajectory_samples_tag 1
 
 /* Struct field encoding specification for nanopb */
-#define wpi_proto_ProtobufTrajectorySample_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, DOUBLE,   time,              1)
-#define wpi_proto_ProtobufTrajectorySample_CALLBACK NULL
-#define wpi_proto_ProtobufTrajectorySample_DEFAULT NULL
-
 #define wpi_proto_ProtobufHolonomicSample_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, DOUBLE,   time,              1) \
 X(a, CALLBACK, OPTIONAL, MESSAGE,  pose,              2) \
@@ -140,8 +124,6 @@ X(a, CALLBACK, REPEATED, MESSAGE,  samples,           1)
 /* wpi_proto_ProtobufDifferentialSample_size depends on runtime parameters */
 /* wpi_proto_ProtobufHolonomicTrajectory_size depends on runtime parameters */
 /* wpi_proto_ProtobufDifferentialTrajectory_size depends on runtime parameters */
-#define WPI_PROTO_WPIMATH_PROTOBUF_TRAJECTORY_NPB_H_MAX_SIZE wpi_proto_ProtobufTrajectorySample_size
-#define wpi_proto_ProtobufTrajectorySample_size  9
 
 
 #endif

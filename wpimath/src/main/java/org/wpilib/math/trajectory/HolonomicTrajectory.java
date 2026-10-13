@@ -98,10 +98,7 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
 
     var timeShifted =
         other.samples.stream()
-            .map(
-                s ->
-                    new HolonomicSample(
-                        s.time + this.duration, s.pose, s.velocity, s.acceleration));
+            .map(s -> new HolonomicSample(s.time + duration(), s.pose, s.velocity, s.acceleration));
 
     return new HolonomicTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }

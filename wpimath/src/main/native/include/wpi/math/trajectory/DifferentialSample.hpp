@@ -83,9 +83,9 @@ class DifferentialSample : public HolonomicSample {
   }
 
   /**
-   * Constructs a DifferentialSample from a TrajectorySample.
+   * Constructs a DifferentialSample from a HolonomicSample.
    *
-   * @param sample The TrajectorySample to copy.
+   * @param sample The HolonomicSample to copy.
    * @param leftVelocity The left wheel velocity at this sample.
    * @param rightVelocity The right wheel velocity at this sample.
    */
@@ -96,9 +96,9 @@ class DifferentialSample : public HolonomicSample {
                            sample.acceleration, leftVelocity, rightVelocity} {}
 
   /**
-   * Constructs a DifferentialSample from a TrajectorySample.
+   * Constructs a DifferentialSample from a HolonomicSample.
    *
-   * @param sample The TrajectorySample to copy.
+   * @param sample The HolonomicSample to copy.
    * @param kinematics The kinematics of the drivetrain.
    */
   constexpr DifferentialSample(const HolonomicSample& sample,

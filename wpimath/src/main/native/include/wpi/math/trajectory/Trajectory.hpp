@@ -6,11 +6,12 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <map>
+#include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
+#include "wpi/math/trajectory/TrajectorySample.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -28,7 +29,7 @@ class SwerveDriveKinematics;
  * @tparam SampleType The type of sample (e.g., SplineSample,
  * DifferentialSample)
  */
-template <typename SampleType>
+template <TrajectorySample SampleType>
 class Trajectory {
  public:
   /**
@@ -36,26 +37,24 @@ class Trajectory {
    *
    * @param samples The samples of the trajectory. Order does not matter as
    *                they will be sorted internally.
-   * @throws std::invalid_argument if the vector of samples is empty.
+   * @throws std::invalid_argument if the vector of samples is empty or if the
+   *         earliest sample's time is not zero.
    */
-  explicit Trajectory(std::vector<SampleType> samples) {
-    if (samples.empty()) {
+  explicit Trajectory(std::vector<SampleType> samples)
+      : m_samples(std::move(samples)) {
+    if (m_samples.empty()) {
       throw std::invalid_argument(
           "Trajectory manually initialized with no samples.");
     }
 
     // Sort samples by time
-    std::sort(samples.begin(), samples.end(),
-              [](const auto& a, const auto& b) { return a.time < b.time; });
+    std::ranges::sort(m_samples, {}, &SampleType::time);
 
-    m_samples = std::move(samples);
-
-    // Build interpolating map
-    for (const auto& sample : m_samples) {
-      m_sampleMap[sample.time] = sample;
+    if (Start().time != 0.0_s) {
+      throw std::invalid_argument(
+          "Trajectory sample times must be relative to the trajectory start "
+          "(the first sample must have time 0).");
     }
-
-    m_duration = m_samples.back().time;
   }
 
   /**
@@ -63,7 +62,7 @@ class Trajectory {
    *
    * @return The duration of the trajectory.
    */
-  wpi::units::second_t Duration() const { return m_duration; }
+  wpi::units::second_t Duration() const { return End().time; }
 
   /**
    * Returns the samples of the trajectory.
@@ -89,36 +88,40 @@ class Trajectory {
   /**
    * Sample the trajectory at a point in time.
    *
+   * If several samples share a timestamp, such as at the join of a
+   * concatenated trajectory, the last one at that time is returned. Times at or
+   * before the start return the first sample, and times at or after the end
+   * return the last sample.
+   *
    * @param t The point in time since the beginning of the trajectory to sample.
    * @return The sample at that point in time.
-   * @throws std::runtime_error if the trajectory has no samples.
    */
   SampleType SampleAt(wpi::units::second_t t) const {
-    if (m_samples.empty()) {
-      throw std::runtime_error(
-          "Trajectory cannot be sampled if it has no samples.");
+    if (t <= Start().time) {
+      return Start();
+    }
+    if (t >= End().time) {
+      return End();
     }
 
-    if (t <= m_samples.front().time) {
-      return m_samples.front();
+    // upper_bound is past every sample at time t, so the sample before it is
+    // the last one at or before t.
+    auto upper = std::ranges::upper_bound(m_samples, t, {}, &SampleType::time);
+    if (upper == m_samples.end()) {
+      // Only reachable if t is NaN, for which every comparison is false
+      return End();
     }
-    if (t >= m_duration) {
-      return m_samples.back();
-    }
-
-    // Find the two samples to interpolate between
-    auto upper = m_sampleMap.upper_bound(t);
-    if (upper == m_sampleMap.begin()) {
-      return upper->second;
-    }
-
     auto lower = std::prev(upper);
 
-    // Calculate interpolation parameter
-    const double t_param = (t - lower->first) / (upper->first - lower->first);
+    // Return a stored sample as is instead of interpolating to the end of the
+    // previous segment, which isn't well defined for zero-length segments
+    if (lower->time == t) {
+      return *lower;
+    }
 
-    // Use derived class's interpolation (runtime polymorphism)
-    return Interpolate(lower->second, upper->second, t_param);
+    const double t_param = (t - lower->time) / (upper->time - lower->time);
+
+    return Interpolate(*lower, *upper, t_param);
   }
 
   /**
@@ -146,8 +149,6 @@ class Trajectory {
 
  protected:
   std::vector<SampleType> m_samples;
-  std::map<wpi::units::second_t, SampleType> m_sampleMap;
-  wpi::units::second_t m_duration{0};
 };
 
 }  // namespace wpi::math
