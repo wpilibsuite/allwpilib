@@ -11,10 +11,6 @@ option java_outer_classname = "ProtobufTrajectoryDescriptor";
 
 option java_multiple_files = true;
 
-message ProtobufTrajectorySample {
-  double time = 1;
-}
-
 message ProtobufHolonomicSample {
   double time = 1;
   ProtobufPose2d pose = 2;
