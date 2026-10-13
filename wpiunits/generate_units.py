@@ -219,7 +219,10 @@ UNIT_CONFIGURATIONS = {
     },
     "MomentOfInertia": {
         "base_unit": "KilogramSquareMeters",
-        "multiply": {"AngularVelocity": "AngularMomentum", "AngularAcceleration": "Torque"},
+        "multiply": {
+            "AngularVelocity": "AngularMomentum",
+            "AngularAcceleration": "Torque",
+        },
         "divide": {},
     },
     "Mult": {
