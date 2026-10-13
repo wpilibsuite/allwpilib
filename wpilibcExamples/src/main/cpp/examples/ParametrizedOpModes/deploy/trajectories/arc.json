@@ -1,0 +1,44 @@
+{
+  "samples": [
+    {
+      "time": 0.0,
+      "pose": {"translation": {"x": 0.0, "y": 0.0}, "rotation": {"radians": 0.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.5},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 0.8095,
+      "rightVelocity": 1.1905
+    },
+    {
+      "time": 1.0,
+      "pose": {"translation": {"x": 0.9589, "y": 0.2448}, "rotation": {"radians": 0.5}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.5},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 0.8095,
+      "rightVelocity": 1.1905
+    },
+    {
+      "time": 2.0,
+      "pose": {"translation": {"x": 1.6829, "y": 0.9194}, "rotation": {"radians": 1.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.5},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 0.8095,
+      "rightVelocity": 1.1905
+    },
+    {
+      "time": 3.0,
+      "pose": {"translation": {"x": 1.9950, "y": 1.8585}, "rotation": {"radians": 1.5}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.5},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 0.8095,
+      "rightVelocity": 1.1905
+    },
+    {
+      "time": 4.0,
+      "pose": {"translation": {"x": 1.8186, "y": 2.8323}, "rotation": {"radians": 2.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.5},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 0.8095,
+      "rightVelocity": 1.1905
+    }
+  ]
+}
