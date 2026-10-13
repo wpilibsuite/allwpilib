@@ -90,8 +90,8 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
 
 
   @Override
-  public Mult<TorqueUnit, AngleUnit> times(Angle multiplier) {
-    return (Mult<TorqueUnit, AngleUnit>) Measure.super.times(multiplier);
+  public Energy times(Angle multiplier) {
+    return Joules.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
@@ -111,12 +111,12 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
   }
 
   @Override
-  public Per<TorqueUnit, AngularAccelerationUnit> div(AngularAcceleration divisor) {
-    return (Per<TorqueUnit, AngularAccelerationUnit>) Measure.super.div(divisor);
+  public MomentOfInertia div(AngularAcceleration divisor) {
+    return KilogramSquareMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<TorqueUnit, AngularAccelerationUnit> per(AngularAccelerationUnit divisorUnit) {
+  public MomentOfInertia per(AngularAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -138,8 +138,8 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
 
 
   @Override
-  public Mult<TorqueUnit, AngularVelocityUnit> times(AngularVelocity multiplier) {
-    return (Mult<TorqueUnit, AngularVelocityUnit>) Measure.super.times(multiplier);
+  public Power times(AngularVelocity multiplier) {
+    return Watts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
@@ -329,12 +329,12 @@ public record Torque(double magnitude, double baseUnitMagnitude, TorqueUnit unit
   }
 
   @Override
-  public Per<TorqueUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
-    return (Per<TorqueUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  public AngularAcceleration div(MomentOfInertia divisor) {
+    return RadiansPerSecondPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<TorqueUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public AngularAcceleration per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

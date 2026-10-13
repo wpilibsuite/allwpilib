@@ -436,8 +436,8 @@ public record Angle(double magnitude, double baseUnitMagnitude, AngleUnit unit) 
 
 
   @Override
-  public Mult<AngleUnit, TorqueUnit> times(Torque multiplier) {
-    return (Mult<AngleUnit, TorqueUnit>) Measure.super.times(multiplier);
+  public Energy times(Torque multiplier) {
+    return Joules.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override

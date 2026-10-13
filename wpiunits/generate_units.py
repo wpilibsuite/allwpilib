@@ -62,12 +62,12 @@ UNIT_CONFIGURATIONS = {
     },
     "Angle": {
         "base_unit": "Radians",
-        "multiply": {"Frequency": "AngularVelocity"},
+        "multiply": {"Frequency": "AngularVelocity", "Torque": "Energy"},
         "divide": {"Time": "AngularVelocity", "AngularVelocity": "Time"},
     },
     "AngularAcceleration": {
         "base_unit": "RadiansPerSecondPerSecond",
-        "multiply": {"Time": "AngularVelocity"},
+        "multiply": {"Time": "AngularVelocity", "MomentOfInertia": "Torque"},
         "divide": {"Frequency": "AngularVelocity", "AngularVelocity": "Frequency"},
     },
     "AngularMomentum": {
@@ -80,12 +80,18 @@ UNIT_CONFIGURATIONS = {
     },
     "AngularVelocity": {
         "base_unit": "RadiansPerSecond",
-        "multiply": {"Time": "Angle", "Frequency": "AngularAcceleration"},
+        "multiply": {
+            "Time": "Angle",
+            "Frequency": "AngularAcceleration",
+            "Torque": "Power",
+        },
         "divide": {
             "Time": "AngularAcceleration",
             "AngularAcceleration": "Time",
             "Frequency": "Angle",
             "Angle": "Frequency",
+            "Power": "Torque",
+            "Torque": "Power",
         },
         "extra": inspect.cleandoc("""
           public Frequency asFrequency() { return Hertz.of(baseUnitMagnitude()); }
@@ -153,7 +159,14 @@ UNIT_CONFIGURATIONS = {
     "Energy": {
         "base_unit": "Joules",
         "multiply": {"Frequency": "Power"},
-        "divide": {"Time": "Power", "Power": "Time"},
+        "divide": {
+            "Time": "Power",
+            "Power": "Time",
+            "Distance": "Force",
+            "Force": "Distance",
+            "Angle": "Torque",
+            "Torque": "Angle",
+        },
     },
     "Force": {
         "base_unit": "Newtons",
@@ -206,7 +219,7 @@ UNIT_CONFIGURATIONS = {
     },
     "MomentOfInertia": {
         "base_unit": "KilogramSquareMeters",
-        "multiply": {"AngularVelocity": "AngularMomentum"},
+        "multiply": {"AngularVelocity": "AngularMomentum", "AngularAcceleration": "Torque"},
         "divide": {},
     },
     "Mult": {
@@ -233,14 +246,14 @@ UNIT_CONFIGURATIONS = {
     },
     "Power": {
         "base_unit": "Watts",
-        "multiply": {
-            "Time": "Energy",
-        },
+        "multiply": {"Time": "Energy"},
         "divide": {
             "Voltage": "Current",
             "Current": "Voltage",
             "Energy": "Frequency",
             "Frequency": "Energy",
+            "Torque": "AngularVelocity",
+            "AngularVelocity": "Torque",
         },
     },
     "Resistance": {
@@ -276,8 +289,13 @@ UNIT_CONFIGURATIONS = {
     },
     "Torque": {
         "base_unit": "NewtonMeters",
-        "multiply": {},
-        "divide": {"Distance": "Force", "Force": "Distance"},
+        "multiply": {"Angle": "Energy", "AngularVelocity": "Power"},
+        "divide": {
+            "Distance": "Force",
+            "Force": "Distance",
+            "MomentOfInertia": "AngularAcceleration",
+            "AngularAcceleration": "MomentOfInertia",
+        },
     },
     "Velocity": {
         "base_unit": "unit()",

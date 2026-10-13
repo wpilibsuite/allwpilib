@@ -95,12 +95,12 @@ public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit
   }
 
   @Override
-  public Per<EnergyUnit, AngleUnit> div(Angle divisor) {
-    return (Per<EnergyUnit, AngleUnit>) Measure.super.div(divisor);
+  public Torque div(Angle divisor) {
+    return NewtonMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<EnergyUnit, AngleUnit> per(AngleUnit divisorUnit) {
+  public Torque per(AngleUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -201,12 +201,12 @@ public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit
   }
 
   @Override
-  public Per<EnergyUnit, DistanceUnit> div(Distance divisor) {
-    return (Per<EnergyUnit, DistanceUnit>) Measure.super.div(divisor);
+  public Force div(Distance divisor) {
+    return Newtons.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<EnergyUnit, DistanceUnit> per(DistanceUnit divisorUnit) {
+  public Force per(DistanceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -233,12 +233,12 @@ public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit
   }
 
   @Override
-  public Per<EnergyUnit, ForceUnit> div(Force divisor) {
-    return (Per<EnergyUnit, ForceUnit>) Measure.super.div(divisor);
+  public Distance div(Force divisor) {
+    return Meters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<EnergyUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Distance per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -441,12 +441,12 @@ public record Energy(double magnitude, double baseUnitMagnitude, EnergyUnit unit
   }
 
   @Override
-  public Per<EnergyUnit, TorqueUnit> div(Torque divisor) {
-    return (Per<EnergyUnit, TorqueUnit>) Measure.super.div(divisor);
+  public Angle div(Torque divisor) {
+    return Radians.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<EnergyUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Angle per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
