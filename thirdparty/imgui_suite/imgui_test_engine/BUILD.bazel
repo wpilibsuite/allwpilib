@@ -1,19 +1,47 @@
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("//shared/bazel/rules:imgui_test.bzl", "IMGUI_TEST_ENGINE_DEFINES", "imgui_test_target_compatible_with")
+load(":imgui_test.bzl", "IMGUI_TEST_ENGINE_DEFINES", "imgui_test_target_compatible_with")
 
 package(default_visibility = ["//visibility:public"])
+
+bool_flag(
+    name = "with_imgui_tests",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "with_imgui_tests_enabled",
+    flag_values = {
+        ":with_imgui_tests": "true",
+    },
+)
+
+# Internal flag set by wpilib_imgui_cc_test() for its transitioned C++ binary.
+# with_imgui_tests remains the user-facing opt-in gate for the dependency.
+bool_flag(
+    name = "with_imgui_test_engine_hooks",
+    build_setting_default = False,
+)
+
+config_setting(
+    name = "with_imgui_test_engine_hooks_enabled",
+    flag_values = {
+        ":with_imgui_test_engine_hooks": "true",
+        ":with_imgui_tests": "true",
+    },
+)
 
 cc_library(
     name = "imgui_test_engine",
     testonly = True,
     srcs = select({
-        "//shared/bazel/rules:with_imgui_tests_enabled": [
+        ":with_imgui_tests_enabled": [
             "@imgui_test_engine//:sources",
         ],
         "//conditions:default": [],
     }),
     hdrs = select({
-        "//shared/bazel/rules:with_imgui_tests_enabled": [
+        ":with_imgui_tests_enabled": [
             "@imgui_test_engine//:headers",
         ],
         "//conditions:default": [],
@@ -21,7 +49,7 @@ cc_library(
     defines = IMGUI_TEST_ENGINE_DEFINES,
     target_compatible_with = imgui_test_target_compatible_with(),
     deps = select({
-        "//shared/bazel/rules:with_imgui_tests_enabled": [
+        ":with_imgui_tests_enabled": [
             "//thirdparty/imgui_suite:imgui",
             "@imgui_test_engine//:header_paths",
         ],
