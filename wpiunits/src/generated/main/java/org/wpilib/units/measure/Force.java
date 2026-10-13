@@ -404,8 +404,8 @@ public record Force(double magnitude, double baseUnitMagnitude, ForceUnit unit) 
 
 
   @Override
-  public Mult<ForceUnit, TimeUnit> times(Time multiplier) {
-    return (Mult<ForceUnit, TimeUnit>) Measure.super.times(multiplier);
+  public LinearMomentum times(Time multiplier) {
+    return KilogramMetersPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override

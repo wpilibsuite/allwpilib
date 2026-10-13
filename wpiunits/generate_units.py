@@ -75,6 +75,8 @@ UNIT_CONFIGURATIONS = {
         "divide": {
             "AngularVelocity": "MomentOfInertia",
             "MomentOfInertia": "AngularVelocity",
+            "Torque": "Time",
+            "Time": "Torque",
         },
     },
     "AngularVelocity": {
@@ -166,7 +168,8 @@ UNIT_CONFIGURATIONS = {
         "multiply": {
             # Distance x Force = Torque
             # Force x Distance = Energy
-            "Distance": "Energy"
+            "Distance": "Energy",
+            "Time": "LinearMomentum",
         },
         "divide": {"Mass": "LinearAcceleration", "LinearAcceleration": "Mass"},
     },
@@ -269,6 +272,8 @@ UNIT_CONFIGURATIONS = {
             "LinearVelocity": "Distance",
             "LinearAcceleration": "LinearVelocity",
             "Power": "Energy",
+            "Force": "LinearMomentum",
+            "Torque": "AngularMomentum",
             # TODO:
             # "Acceleration<D>": "Velocity<D>"
             # "Velocity<D>": "Measure<D>"
@@ -291,6 +296,7 @@ UNIT_CONFIGURATIONS = {
             "Force": "Distance",
             "MomentOfInertia": "AngularAcceleration",
             "AngularAcceleration": "MomentOfInertia",
+            "Time": "AngularMomentum",
         },
     },
     "Velocity": {

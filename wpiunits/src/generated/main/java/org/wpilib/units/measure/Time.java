@@ -212,8 +212,8 @@ public record Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) im
 
 
   @Override
-  public Mult<TimeUnit, ForceUnit> times(Force multiplier) {
-    return (Mult<TimeUnit, ForceUnit>) Measure.super.times(multiplier);
+  public LinearMomentum times(Force multiplier) {
+    return KilogramMetersPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
@@ -420,8 +420,8 @@ public record Time(double magnitude, double baseUnitMagnitude, TimeUnit unit) im
 
 
   @Override
-  public Mult<TimeUnit, TorqueUnit> times(Torque multiplier) {
-    return (Mult<TimeUnit, TorqueUnit>) Measure.super.times(multiplier);
+  public AngularMomentum times(Torque multiplier) {
+    return KilogramMetersSquaredPerSecond.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
