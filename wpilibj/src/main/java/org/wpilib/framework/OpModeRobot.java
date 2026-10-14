@@ -526,7 +526,10 @@ public abstract class OpModeRobot extends RobotBase {
     m_startTimeNs = RobotController.getMonotonicTime();
 
     m_loopOverrunAlert =
-        new Alert("loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
+        new Alert(
+            "opmoderobot-loop-overrun",
+            "Loop time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(Seconds.of(m_period), () -> m_loopOverrunAlert.set(true));
     m_opModePeriodicOverrunAlert =
         new Alert(

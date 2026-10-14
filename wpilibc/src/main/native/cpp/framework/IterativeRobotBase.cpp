@@ -20,7 +20,7 @@ using namespace wpi;
 IterativeRobotBase::IterativeRobotBase(wpi::units::second_t period)
     : m_period(period),
       m_loopOverrunAlert(
-          "loop-overrun",
+          "iterativerobot-loop-overrun",
           std::format("Loop time of {:.6f}s overrun", m_period.value()),
           wpi::util::Alert::Level::MEDIUM),
       m_watchdog(period, [this] { m_loopOverrunAlert.Set(true); }) {}

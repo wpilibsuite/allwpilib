@@ -72,7 +72,10 @@ public abstract class IterativeRobotBase extends RobotBase {
   protected IterativeRobotBase(double period) {
     m_period = period;
     m_loopOverrunAlert =
-        new Alert("loop-overrun", "Loop time of " + m_period + "s overrun", Alert.Level.MEDIUM);
+        new Alert(
+            "iterativerobot-loop-overrun",
+            "Loop time of " + m_period + "s overrun",
+            Alert.Level.MEDIUM);
     m_watchdog = new Watchdog(period, () -> m_loopOverrunAlert.set(true));
   }
 
