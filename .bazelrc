@@ -137,7 +137,9 @@ common:ci_windows_x86 --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,
 common:ci_windows_arm --repo_env="WPI_PUBLISH_CLASSIFIER_FILTER=headers,sources,linuxsystemcore,linuxsystemcoredebug,linuxsystemcorestatic,linuxsystemcorestaticdebug,linuxx86-64,linuxx86-64debug,linuxx86-64static,linuxx86-64staticdebug,osxuniversal,osxuniversaldebug,osxuniversalstatic,osxuniversalstaticdebug,windowsarm64,windowsarm64debug,windowsarm64static,windowsarm64staticdebug"
 
 build --@rules_python//python/config_settings:bootstrap_impl=script
-build --@rules_python//python/config_settings:venvs_use_declare_symlink=no
+
+# rules_python bzlmod names are too long on Windows.
+build:windows --@rules_python//python/config_settings:venvs_site_packages=yes
 
 # AOS has both aos/flatbuffers/ and aos/flatbuffers.py; without this Bazel
 # synthesizes an aos/flatbuffers/__init__.py that shadows the module.
