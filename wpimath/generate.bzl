@@ -4,7 +4,7 @@ def __generate_wpimath_impl(ctx):
     """
     output_dir = ctx.actions.declare_directory("_gendir")
 
-    protoc = ctx.toolchains["@com_google_protobuf//bazel/private:proto_toolchain_type"].proto.proto_compiler
+    protoc = ctx.toolchains["@protobuf//bazel/private:proto_toolchain_type"].proto.proto_compiler
 
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
@@ -50,5 +50,5 @@ generate_wpimath = rule(
             executable = True,
         ),
     },
-    toolchains = ["@com_google_protobuf//bazel/private:proto_toolchain_type"],
+    toolchains = ["@protobuf//bazel/private:proto_toolchain_type"],
 )
