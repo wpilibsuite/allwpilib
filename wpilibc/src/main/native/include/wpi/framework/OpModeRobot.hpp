@@ -7,6 +7,7 @@
 #include <concepts>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,7 @@
 #include "wpi/internal/PeriodicPriorityQueue.hpp"
 #include "wpi/opmode/OpMode.hpp"
 #include "wpi/system/Watchdog.hpp"
+#include "wpi/units/frequency.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/Alert.hpp"
 #include "wpi/util/DenseMap.hpp"
@@ -83,6 +85,13 @@ class OpModeRobotBase : public RobotBase {
   explicit OpModeRobotBase(wpi::units::second_t period);
 
   /**
+   * Constructor.
+   *
+   * @param frequency The frequency of the robot loop function.
+   */
+  explicit OpModeRobotBase(wpi::units::hertz_t frequency);
+
+  /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.
    */
   explicit OpModeRobotBase();
@@ -136,15 +145,29 @@ class OpModeRobotBase : public RobotBase {
   virtual void NonePeriodic() {}
 
   /**
-   * Add a callback to run at a specific period.
+   * Add a callback to run at a specific period with a starting time offset.
    *
    * This callback will be registered with the framework immediately when this
    * method is called and will begin executing as soon as it is registered.
    *
    * @param callback The callback to run.
-   * @param period The period at which to run the callback.
+   * @param period   The period at which to run the callback.
+   * @param offset   The offset from the common starting time. This is useful
+   *                 for scheduling a callback in a different timeslot relative
+   *                 to OpModeRobot.
    */
-  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period);
+  void AddPeriodic(std::function<void()> callback, wpi::units::second_t period,
+                   wpi::units::second_t offset = 0_s);
+
+  /**
+   * Gets time period between calls to Periodic() functions.
+   */
+  wpi::units::second_t GetPeriod() const { return m_period; }
+
+  /**
+   * Prints list of epochs added so far and their times.
+   */
+  void PrintWatchdogEpochs();
 
   /**
    * Return the system clock time in nanoseconds for the start of the current
@@ -259,11 +282,14 @@ class OpModeRobotBase : public RobotBase {
   std::chrono::nanoseconds m_startTime;
   wpi::util::Alert m_loopOverrunAlert;
   Watchdog m_watchdog;
+  wpi::util::Alert m_opModePeriodicOverrunAlert;
+  Watchdog m_opModeWatchdog;
 
   // OpMode lifecycle state
   int64_t m_lastModeId = -1;
   bool m_calledDriverStationConnected = false;
-  bool m_lastEnabledState = false;
+  // Empty until the first loop, so that DisabledInit() runs on startup
+  std::optional<RobotMode> m_lastMode;
   std::shared_ptr<OpMode> m_currentOpMode;
   std::string m_currentOpModeName;
   std::vector<wpi::internal::PeriodicPriorityQueue::Callback>
@@ -296,6 +322,14 @@ class OpModeRobot : public OpModeRobotBase {
    * @param period The period of the robot loop function.
    */
   explicit OpModeRobot(wpi::units::second_t period) : OpModeRobotBase{period} {}
+
+  /**
+   * Constructor.
+   *
+   * @param frequency The frequency of the robot loop function.
+   */
+  explicit OpModeRobot(wpi::units::hertz_t frequency)
+      : OpModeRobotBase{frequency} {}
 
   /**
    * Constructor for an OpModeRobot with a default loop time of 0.02 seconds.

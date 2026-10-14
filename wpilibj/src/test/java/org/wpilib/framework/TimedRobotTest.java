@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.RobotMode;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.simulation.AlertSim;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
 import org.wpilib.telemetry.Telemetry;
@@ -272,12 +273,12 @@ class TimedRobotTest {
       TelemetryRegistry.reportWarning("/bad", "telemetry test warning");
       TunableRegistry.reportWarning("tunable test warning");
 
-      AlertDataJNI.AlertInfo[] alerts = AlertDataJNI.getAlerts();
+      AlertSim.AlertInfo[] alerts = AlertSim.getActive();
       assertEquals(2, alerts.length);
 
       boolean sawTelemetry = false;
       boolean sawTunable = false;
-      for (AlertDataJNI.AlertInfo alert : alerts) {
+      for (AlertSim.AlertInfo alert : alerts) {
         assertNotEquals(0, alert.activeStartTime);
         if ("Telemetry".equals(alert.group) && alert.text.contains("telemetry test warning")) {
           sawTelemetry = true;
