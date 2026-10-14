@@ -278,7 +278,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         project_urls = None,
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-xrp==0.0.0", "wpilib==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["xrp = xrp"],
             "robotpy_cli.2027": ["run-xrp = xrp.cli:RunXrp"],

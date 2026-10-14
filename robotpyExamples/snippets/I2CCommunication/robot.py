@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 
@@ -30,6 +32,7 @@ class MyRobot(wpilib.TimedRobot):
         # Writes bytes over I2C
         self.arduino.write_bulk(chars)
 
+    @override
     def robot_periodic(self):
         # Creates a string to hold current robot state information, including
         # alliance, enabled state, operation mode, and match time. The message

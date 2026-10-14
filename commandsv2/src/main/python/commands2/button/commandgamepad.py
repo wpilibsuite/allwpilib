@@ -1,5 +1,4 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGamepad.java
-from typing import Optional, Union
 
 from wpilib import DriverStation, EventLoop, Gamepad
 
@@ -22,7 +21,7 @@ class CommandGamepad:
     _hid: CommandGenericHID
     _gamepad: Gamepad
 
-    def __init__(self, hid: Union[int, Gamepad]):
+    def __init__(self, hid: int | Gamepad):
         """
         Construct an instance of a controller.
 
@@ -56,7 +55,7 @@ class CommandGamepad:
         """
         return self._gamepad
 
-    def button(self, button, loop: Optional[EventLoop] = None) -> Trigger:
+    def button(self, button, loop: EventLoop | None = None) -> Trigger:
         """
         Constructs an event instance around this button's digital signal.
 
@@ -65,106 +64,106 @@ class CommandGamepad:
         """
         return self._hid.button(_enum_value(button), loop)
 
-    def face_down(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def face_down(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.FACE_DOWN, loop)
 
-    def face_right(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def face_right(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.FACE_RIGHT, loop)
 
-    def face_left(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def face_left(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.FACE_LEFT, loop)
 
-    def face_up(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def face_up(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.FACE_UP, loop)
 
-    def back(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def back(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.BACK, loop)
 
-    def guide(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def guide(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.GUIDE, loop)
 
-    def start(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def start(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.START, loop)
 
-    def left_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_stick(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.LEFT_STICK, loop)
 
-    def right_stick(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_stick(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.RIGHT_STICK, loop)
 
-    def left_bumper(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_bumper(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.LEFT_BUMPER, loop)
 
-    def right_bumper(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_bumper(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.RIGHT_BUMPER, loop)
 
-    def dpad_up(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_up(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.DPAD_UP, loop)
 
-    def dpad_down(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_down(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.DPAD_DOWN, loop)
 
-    def dpad_left(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_left(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.DPAD_LEFT, loop)
 
-    def dpad_right(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def dpad_right(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.DPAD_RIGHT, loop)
 
-    def misc1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc1(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_1, loop)
 
-    def right_paddle1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_paddle1(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.RIGHT_PADDLE_1, loop)
 
-    def left_paddle1(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_paddle1(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.LEFT_PADDLE_1, loop)
 
-    def right_paddle2(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def right_paddle2(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.RIGHT_PADDLE_2, loop)
 
-    def left_paddle2(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def left_paddle2(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.LEFT_PADDLE_2, loop)
 
-    def touchpad(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def touchpad(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.TOUCHPAD, loop)
 
-    def misc2(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc2(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_2, loop)
 
-    def misc3(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc3(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_3, loop)
 
-    def misc4(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc4(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_4, loop)
 
-    def misc5(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc5(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_5, loop)
 
-    def misc6(self, loop: Optional[EventLoop] = None) -> Trigger:
+    def misc6(self, loop: EventLoop | None = None) -> Trigger:
         return self.button(Gamepad.Button.MISC_6, loop)
 
     def left_trigger(
-        self, threshold: float = 0.5, loop: Optional[EventLoop] = None
+        self, threshold: float = 0.5, loop: EventLoop | None = None
     ) -> Trigger:
         return self.axis_greater_than(Gamepad.Axis.LEFT_TRIGGER, threshold, loop)
 
     def right_trigger(
-        self, threshold: float = 0.5, loop: Optional[EventLoop] = None
+        self, threshold: float = 0.5, loop: EventLoop | None = None
     ) -> Trigger:
         return self.axis_greater_than(Gamepad.Axis.RIGHT_TRIGGER, threshold, loop)
 
     def axis_less_than(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self, axis, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         return self._hid.axis_less_than(_enum_value(axis), threshold, loop)
 
     def axis_greater_than(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self, axis, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         return self._hid.axis_greater_than(_enum_value(axis), threshold, loop)
 
     def axis_magnitude_greater_than(
-        self, axis, threshold: float, loop: Optional[EventLoop] = None
+        self, axis, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         return self._hid.axis_magnitude_greater_than(_enum_value(axis), threshold, loop)
 

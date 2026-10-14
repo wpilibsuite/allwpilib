@@ -39,7 +39,7 @@ else:
 # fmt: on
 
 
-def make_wpistruct(cls=None, /, *, name: typing.Optional[str] = None):
+def make_wpistruct(cls=None, /, *, name: str | None = None):
     """
     This decorator allows you to easily define a custom type that can be
     used with wpilib's custom serialization protocol (for use in datalog
@@ -118,7 +118,7 @@ def _get_fixed_tuple_array_info(cls_name: str, field_name: str, ftype: type):
     return element_type, len(args)
 
 
-def _process_class(cls, struct_name: typing.Optional[str]):
+def _process_class(cls, struct_name: str | None):
     resolved_hints = typing.get_type_hints(cls)
     field_names = [field.name for field in dataclasses.fields(cls)]
     resolved_field_types = {name: resolved_hints[name] for name in field_names}
@@ -144,7 +144,7 @@ def _process_class(cls, struct_name: typing.Optional[str]):
     # unpack_intos = []
     for_each_nested = []
 
-    ctx: typing.Dict[str, typing.Any] = {"cls": cls}
+    ctx: dict[str, typing.Any] = {"cls": cls}
 
     for field_idx, (name, ftype) in enumerate(resolved_field_types.items()):
         if ftype in _type_to_fmt:

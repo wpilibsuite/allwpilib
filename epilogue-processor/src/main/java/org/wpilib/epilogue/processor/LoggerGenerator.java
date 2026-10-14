@@ -211,8 +211,9 @@ public class LoggerGenerator {
         out.println();
       }
 
+      out.println("import org.wpilib.epilogue.Epilogue;");
       out.println("import org.wpilib.epilogue.Logged;");
-      out.println("import org.wpilib.epilogue.generated.Epilogue;");
+      out.println("import org.wpilib.epilogue.generated.EpilogueLoggers;");
       out.println("import org.wpilib.epilogue.logging.ClassSpecificLogger;");
       out.println("import org.wpilib.telemetry.TelemetryTable;");
       if (requiresVarHandles) {

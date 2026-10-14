@@ -6,6 +6,7 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.hardware.rotation.Encoder;
@@ -13,7 +14,6 @@ import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.Models;
-import org.wpilib.math.util.Units;
 import org.wpilib.system.RobotController;
 
 class ElevatorSimTest {
@@ -97,8 +97,7 @@ class ElevatorSimTest {
   @Test
   void testStability() {
     var sim =
-        new ElevatorSim(
-            DCMotor.getVex775Pro(4), 100, 4, Units.inchesToMeters(0.5), 0, 10, false, 0.0);
+        new ElevatorSim(DCMotor.getVex775Pro(4), 100, 4, inchesToMeters(0.5), 0, 10, false, 0.0);
 
     sim.setState(VecBuilder.fill(0, 0));
     sim.setInput(12);
@@ -107,8 +106,7 @@ class ElevatorSimTest {
     }
 
     var system =
-        Models.elevatorFromPhysicalConstants(
-            DCMotor.getVex775Pro(4), 4, Units.inchesToMeters(0.5), 100);
+        Models.elevatorFromPhysicalConstants(DCMotor.getVex775Pro(4), 4, inchesToMeters(0.5), 100);
     assertEquals(
         system.calculateX(VecBuilder.fill(0, 0), VecBuilder.fill(12), 0.02 * 50.0).get(0, 0),
         sim.getPosition(),

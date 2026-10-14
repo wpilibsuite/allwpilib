@@ -4,9 +4,19 @@
 
 #pragma once
 
+#include <string_view>
+
 namespace wpi::glass {
 class Storage;
 }  // namespace wpi::glass
+
+/**
+ * Adds a datalog to the input files, unless its filename stem is already
+ * loaded. File errors are displayed in the input files list.
+ *
+ * @param filename Datalog filename.
+ */
+void AddInputFile(std::string_view filename);
 
 void DisplayInputFiles();
 void DisplayEntries();

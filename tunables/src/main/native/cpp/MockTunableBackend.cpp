@@ -21,6 +21,7 @@ using namespace wpi;
 using namespace wpi::tunables;
 
 static void NotifyOnTune(uint32_t uid, TunableRegistry::TunableInfo& info) {
+  TunableRegistry::RecordTuneApplied(uid);
   TunableRegistry::ResetChangedAfterUpdate(uid);
   if (auto config = info.config) {
     if (config->onTune) {

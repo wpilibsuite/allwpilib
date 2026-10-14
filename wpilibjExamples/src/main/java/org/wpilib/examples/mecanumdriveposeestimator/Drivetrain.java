@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.mecanumdriveposeestimator;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.hardware.imu.OnboardIMU;
 import org.wpilib.hardware.rotation.Encoder;
@@ -17,7 +19,6 @@ import org.wpilib.math.kinematics.MecanumDriveKinematics;
 import org.wpilib.math.kinematics.MecanumDriveWheelPositions;
 import org.wpilib.math.kinematics.MecanumDriveWheelVelocities;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 import org.wpilib.system.Timer;
 
 /** Represents a mecanum drive style drivetrain. */
@@ -59,8 +60,8 @@ public class Drivetrain {
           imu.getRotation2d(),
           getCurrentWheelDistances(),
           Pose2d.ZERO,
-          VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-          VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+          VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
+          VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 
   // Gains are for example purposes only - must be determined for your own robot!
   private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(1, 3);

@@ -6,6 +6,7 @@ package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,6 @@ import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 
 class DifferentialDrivetrainSimTest {
   @Test
@@ -36,16 +36,16 @@ class DifferentialDrivetrainSimTest {
     var motor = DCMotor.getNEO(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
+            motor, 50, inchesToMeters(2), inchesToMeters(12), 0.5, 1.0);
 
-    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
+    var kinematics = new DifferentialDriveKinematics(inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
             plant,
             motor,
             1,
             kinematics.trackwidth,
-            Units.inchesToMeters(2),
+            inchesToMeters(2),
             VecBuilder.fill(0.001, 0.001, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     var feedforward = new LinearPlantInversionFeedforward<>(plant, 0.020);
@@ -103,11 +103,11 @@ class DifferentialDrivetrainSimTest {
     var motor = DCMotor.getNEO(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 0.5, 1.0);
-    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
+            motor, 50, inchesToMeters(2), inchesToMeters(12), 0.5, 1.0);
+    var kinematics = new DifferentialDriveKinematics(inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
-            plant, motor, 1, kinematics.trackwidth, Units.inchesToMeters(2), null);
+            plant, motor, 1, kinematics.trackwidth, inchesToMeters(2), null);
 
     sim.setInputs(-12, -12);
     for (int i = 0; i < 10; i++) {
@@ -133,16 +133,16 @@ class DifferentialDrivetrainSimTest {
     var motor = DCMotor.getNEO(2);
     var plant =
         Models.differentialDriveFromPhysicalConstants(
-            motor, 50, Units.inchesToMeters(2), Units.inchesToMeters(12), 2.0, 5.0);
+            motor, 50, inchesToMeters(2), inchesToMeters(12), 2.0, 5.0);
 
-    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(24));
+    var kinematics = new DifferentialDriveKinematics(inchesToMeters(24));
     var sim =
         new DifferentialDrivetrainSim(
             plant,
             motor,
             5,
             kinematics.trackwidth,
-            Units.inchesToMeters(2),
+            inchesToMeters(2),
             VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     sim.setInputs(2, 4);

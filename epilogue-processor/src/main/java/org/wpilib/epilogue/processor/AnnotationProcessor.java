@@ -45,6 +45,8 @@ public class AnnotationProcessor extends AbstractProcessor {
   private static final String LOGGED_FQN = "org.wpilib.epilogue.Logged";
 
   private EpilogueGenerator m_epilogueGenerator;
+  private EpilogueServiceGenerator m_epilogueServiceGenerator;
+  private EpilogueResourceGenerator m_epilogueResourceGenerator;
   private LoggerGenerator m_loggerGenerator;
   private List<ElementHandler> m_handlers;
 
@@ -114,6 +116,8 @@ public class AnnotationProcessor extends AbstractProcessor {
             new TelemetryHandler(processingEnv));
 
     m_epilogueGenerator = new EpilogueGenerator(processingEnv, customLoggers);
+    m_epilogueServiceGenerator = new EpilogueServiceGenerator(processingEnv);
+    m_epilogueResourceGenerator = new EpilogueResourceGenerator(processingEnv);
     m_loggerGenerator = new LoggerGenerator(processingEnv, m_handlers);
 
     annotations.stream()
@@ -426,7 +430,9 @@ public class AnnotationProcessor extends AbstractProcessor {
     loggerClassNames.sort(Comparator.naturalOrder());
     mainRobotClasses.sort(Comparator.comparing(TypeElement::toString));
     timedRobotClasses.sort(Comparator.comparing(TypeElement::toString));
-    m_epilogueGenerator.writeEpilogueFile(loggerClassNames, mainRobotClasses, timedRobotClasses);
+    m_epilogueGenerator.writeEpilogueFile(loggerClassNames);
+    m_epilogueServiceGenerator.writeServiceFiles(mainRobotClasses, timedRobotClasses);
+    m_epilogueResourceGenerator.writeResourceFile(mainRobotClasses, timedRobotClasses);
   }
 
   private void warnOfNonLoggableElements(TypeElement clazz) {

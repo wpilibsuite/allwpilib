@@ -14,8 +14,8 @@ cc_test(
     size = "small",
     srcs = glob(
         [
-            "**/*.cpp",
-            "**/*.hpp",
+            "cpp/**/*.cpp",
+            "cpp/**/*.hpp",
         ],
         exclude = [
             "cpp/main.cpp",

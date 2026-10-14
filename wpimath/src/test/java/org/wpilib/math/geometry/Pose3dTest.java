@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 
 class Pose3dTest {
   private static final double EPSILON = 1E-9;
@@ -24,13 +24,10 @@ class Pose3dTest {
     var initial =
         new Pose3d(
             new Translation3d(x, y, 0.0),
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(45.0)));
+            new Rotation3d(degreesToRadians(0.0), degreesToRadians(0.0), degreesToRadians(45.0)));
 
-    double yaw = Units.degreesToRadians(5.0);
-    var rotation = new Rotation3d(Units.degreesToRadians(0.0), Units.degreesToRadians(0.0), yaw);
+    double yaw = degreesToRadians(5.0);
+    var rotation = new Rotation3d(degreesToRadians(0.0), degreesToRadians(0.0), yaw);
     var rotated = initial.rotateBy(rotation);
 
     // Translation is rotated by CCW rotation matrix
@@ -56,26 +53,17 @@ class Pose3dTest {
     var transform1 =
         new Transform3d(
             Translation3d.ZERO,
-            new Rotation3d(
-                Units.degreesToRadians(90.0),
-                Units.degreesToRadians(45.0),
-                Units.degreesToRadians(0.0)));
+            new Rotation3d(degreesToRadians(90.0), degreesToRadians(45.0), degreesToRadians(0.0)));
 
     var transform2 =
         new Transform3d(
             Translation3d.ZERO,
-            new Rotation3d(
-                Units.degreesToRadians(-90.0),
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(0.0)));
+            new Rotation3d(degreesToRadians(-90.0), degreesToRadians(0.0), degreesToRadians(0.0)));
 
     var transform3 =
         new Transform3d(
             Translation3d.ZERO,
-            new Rotation3d(
-                Units.degreesToRadians(0.0),
-                Units.degreesToRadians(-45.0),
-                Units.degreesToRadians(0.0)));
+            new Rotation3d(degreesToRadians(0.0), degreesToRadians(-45.0), degreesToRadians(0.0)));
 
     // This sequence of rotations should diverge from the origin and eventually
     // return to it. When
@@ -104,27 +92,25 @@ class Pose3dTest {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
     var initial =
-        new Pose3d(
-            new Translation3d(1.0, 2.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
+        new Pose3d(new Translation3d(1.0, 2.0, 0.0), new Rotation3d(zAxis, degreesToRadians(45.0)));
     var transformation =
         new Transform3d(
-            new Translation3d(5.0, 0.0, 0.0), new Rotation3d(zAxis, Units.degreesToRadians(5.0)));
+            new Translation3d(5.0, 0.0, 0.0), new Rotation3d(zAxis, degreesToRadians(5.0)));
 
     var transformed = initial.plus(transformation);
 
     assertAll(
         () -> assertEquals(1.0 + 5.0 / Math.sqrt(2.0), transformed.getX(), EPSILON),
         () -> assertEquals(2.0 + 5.0 / Math.sqrt(2.0), transformed.getY(), EPSILON),
-        () ->
-            assertEquals(Units.degreesToRadians(50.0), transformed.getRotation().getZ(), EPSILON));
+        () -> assertEquals(degreesToRadians(50.0), transformed.getRotation().getZ(), EPSILON));
   }
 
   @Test
   void testRelativeTo() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
-    var last = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
+    var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, degreesToRadians(45.0)));
+    var last = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(45.0)));
 
     var finalRelativeToInitial = last.relativeTo(initial);
 
@@ -151,8 +137,8 @@ class Pose3dTest {
   void testEquality() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
-    var two = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
+    var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(43.0)));
+    var two = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(43.0)));
     assertEquals(one, two);
   }
 
@@ -160,8 +146,8 @@ class Pose3dTest {
   void testInequality() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
-    var two = new Pose3d(0.0, 1.524, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(43.0)));
+    var one = new Pose3d(0.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(43.0)));
+    var two = new Pose3d(0.0, 1.524, 0.0, new Rotation3d(zAxis, degreesToRadians(43.0)));
     assertNotEquals(one, two);
   }
 
@@ -169,8 +155,8 @@ class Pose3dTest {
   void testMinus() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
-    var last = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
+    var initial = new Pose3d(0.0, 0.0, 0.0, new Rotation3d(zAxis, degreesToRadians(45.0)));
+    var last = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(45.0)));
 
     final var transform = last.minus(initial);
 
@@ -187,10 +173,7 @@ class Pose3dTest {
             1.0,
             2.0,
             3.0,
-            new Rotation3d(
-                Units.degreesToRadians(20.0),
-                Units.degreesToRadians(30.0),
-                Units.degreesToRadians(40.0)));
+            new Rotation3d(degreesToRadians(20.0), degreesToRadians(30.0), degreesToRadians(40.0)));
     var after = new Pose3d(before.toMatrix());
 
     assertEquals(before, after);
@@ -203,11 +186,8 @@ class Pose3dTest {
             1.0,
             2.0,
             3.0,
-            new Rotation3d(
-                Units.degreesToRadians(20.0),
-                Units.degreesToRadians(30.0),
-                Units.degreesToRadians(40.0)));
-    var expected = new Pose2d(1.0, 2.0, new Rotation2d(Units.degreesToRadians(40.0)));
+            new Rotation3d(degreesToRadians(20.0), degreesToRadians(30.0), degreesToRadians(40.0)));
+    var expected = new Pose2d(1.0, 2.0, new Rotation2d(degreesToRadians(40.0)));
 
     assertEquals(expected, pose.toPose2d());
   }

@@ -453,8 +453,9 @@ TEST_CASE_METHOD(WebSocketTrySendTest, "WebSocketTrySendTest Big",
   std::vector<uv::Buffer> bufs;
   for (int i = 0; i < 100000;) {
     i += 1430;
-    bufs.emplace_back(
+    auto& buf = bufs.emplace_back(
         uv::Buffer::Allocate(i < 100000 ? 1430 : (100000 - (i - 1430))));
+    std::fill_n(buf.base, buf.len, static_cast<char>(bufs.size()));
   }
   WebSocket::Frame frame{WebSocket::OP_BINARY | WebSocket::FLAG_FIN, bufs};
   stream.ExpectTryWrite(7681);

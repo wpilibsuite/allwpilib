@@ -5,6 +5,7 @@
 #include "wpi/system/Watchdog.hpp"
 
 #include <atomic>
+#include <chrono>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -12,12 +13,20 @@
 #include "wpi/hal/HAL.h"
 #include "wpi/hal/Notifier.hpp"
 #include "wpi/system/Errors.hpp"
-#include "wpi/system/Timer.hpp"
 #include "wpi/util/Synchronization.h"
 #include "wpi/util/mutex.hpp"
 #include "wpi/util/priority_queue.hpp"
 
 using namespace wpi;
+
+static std::chrono::nanoseconds GetMonotonicTime() {
+  return std::chrono::nanoseconds{HAL_GetMonotonicTime()};
+}
+
+static std::chrono::nanoseconds ToNanoseconds(wpi::units::second_t time) {
+  return std::chrono::round<std::chrono::nanoseconds>(
+      std::chrono::duration<double>{time.value()});
+}
 
 class Watchdog::Impl {
  public:
@@ -75,10 +84,8 @@ void Watchdog::Impl::UpdateAlarm() {
   if (m_watchdogs.empty()) {
     HAL_CancelNotifierAlarm(notifier, true, &status);
   } else {
-    HAL_SetNotifierAlarm(
-        notifier,
-        static_cast<int64_t>(m_watchdogs.top()->m_expirationTime.value() * 1e9),
-        0, true, true, &status);
+    HAL_SetNotifierAlarm(notifier, m_watchdogs.top()->m_expirationTime.count(),
+                         0, true, true, &status);
   }
   WPILIB_CheckErrorStatus(status, "updating watchdog notifier alarm");
 }
@@ -92,7 +99,7 @@ void Watchdog::Impl::Main() {
     if (WPI_WaitForObject(notifier) == 0) {
       break;
     }
-    int64_t curTime = HAL_GetMonotonicTime();
+    auto curTime = GetMonotonicTime();
 
     std::unique_lock lock(m_mutex);
 
@@ -104,9 +111,8 @@ void Watchdog::Impl::Main() {
     // has occurred, so call its timeout function.
     auto watchdog = m_watchdogs.pop();
 
-    wpi::units::second_t now{curTime * 1e-9};
-    if (now - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
-      watchdog->m_lastTimeoutPrintTime = now;
+    if (curTime - watchdog->m_lastTimeoutPrintTime > MIN_PRINT_PERIOD) {
+      watchdog->m_lastTimeoutPrintTime = curTime;
       if (!watchdog->m_suppressTimeoutMessage) {
         WPILIB_ReportWarning("Watchdog not fed within {:.6f}s",
                              watchdog->m_timeout.value());
@@ -152,7 +158,7 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
   m_suppressTimeoutMessage = rhs.m_suppressTimeoutMessage;
   m_tracer = std::move(rhs.m_tracer);
   m_isExpired = rhs.m_isExpired;
-  if (m_expirationTime != 0_s) {
+  if (m_expirationTime != std::chrono::nanoseconds::zero()) {
     m_impl->m_watchdogs.remove(&rhs);
     m_impl->m_watchdogs.emplace(this);
   }
@@ -160,11 +166,11 @@ Watchdog& Watchdog::operator=(Watchdog&& rhs) {
 }
 
 wpi::units::second_t Watchdog::GetTime() const {
-  return Timer::GetMonotonicTimestamp() - m_startTime;
+  return GetMonotonicTime() - m_startTime;
 }
 
 void Watchdog::SetTimeout(wpi::units::second_t timeout) {
-  m_startTime = Timer::GetMonotonicTimestamp();
+  m_startTime = GetMonotonicTime();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
@@ -172,7 +178,7 @@ void Watchdog::SetTimeout(wpi::units::second_t timeout) {
   m_isExpired = false;
 
   m_impl->m_watchdogs.remove(this);
-  m_expirationTime = m_startTime + m_timeout;
+  m_expirationTime = m_startTime + ToNanoseconds(m_timeout);
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
@@ -200,14 +206,14 @@ void Watchdog::Reset() {
 }
 
 void Watchdog::Enable() {
-  m_startTime = Timer::GetMonotonicTimestamp();
+  m_startTime = GetMonotonicTime();
   m_tracer.ClearEpochs();
 
   std::scoped_lock lock(m_impl->m_mutex);
   m_isExpired = false;
 
   m_impl->m_watchdogs.remove(this);
-  m_expirationTime = m_startTime + m_timeout;
+  m_expirationTime = m_startTime + ToNanoseconds(m_timeout);
   m_impl->m_watchdogs.emplace(this);
   m_impl->UpdateAlarm();
 }
@@ -215,9 +221,9 @@ void Watchdog::Enable() {
 void Watchdog::Disable() {
   std::scoped_lock lock(m_impl->m_mutex);
 
-  if (m_expirationTime != 0_s) {
+  if (m_expirationTime != std::chrono::nanoseconds::zero()) {
     m_impl->m_watchdogs.remove(this);
-    m_expirationTime = 0_s;
+    m_expirationTime = std::chrono::nanoseconds::zero();
     m_impl->UpdateAlarm();
   }
 }

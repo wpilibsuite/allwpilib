@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include "WPIUtilJNI.hpp"
-
 #include <jni.h>
 
 #include "org_wpilib_util_AlertDataJNI.h"
@@ -25,20 +23,14 @@ using namespace wpi::util::java;
 static bool mockTimeEnabled = false;
 static int64_t mockNow = 0;
 
-static JException illegalArgEx;
-static JException indexOobEx;
 static JException interruptedEx;
-static JException ioEx;
 static JException nullPointerEx;
 static JException msvcRuntimeEx;
 static JClass alertEx;
 static JClass alertInfoCls;
 
 static const JExceptionInit exceptions[] = {
-    {"java/lang/IllegalArgumentException", &illegalArgEx},
-    {"java/lang/IndexOutOfBoundsException", &indexOobEx},
     {"java/lang/InterruptedException", &interruptedEx},
-    {"java/io/IOException", &ioEx},
     {"java/lang/NullPointerException", &nullPointerEx},
     {"org/wpilib/util/runtime/MsvcRuntimeException", &msvcRuntimeEx}};
 
@@ -58,23 +50,6 @@ static bool CheckAlertStatus(JNIEnv* env, int32_t status) {
   }
   env->Throw(static_cast<jthrowable>(exception));
   return false;
-}
-
-void wpi::util::ThrowIllegalArgumentException(JNIEnv* env,
-                                              std::string_view msg) {
-  illegalArgEx.Throw(env, msg);
-}
-
-void wpi::util::ThrowIndexOobException(JNIEnv* env, std::string_view msg) {
-  indexOobEx.Throw(env, msg);
-}
-
-void wpi::util::ThrowIOException(JNIEnv* env, std::string_view msg) {
-  ioEx.Throw(env, msg);
-}
-
-void wpi::util::ThrowNullPointerException(JNIEnv* env, std::string_view msg) {
-  nullPointerEx.Throw(env, msg);
 }
 
 extern "C" {
@@ -605,7 +580,7 @@ Java_org_wpilib_util_WPIUtilJNI_getRawFrameDataPtr
 {
   auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::util::ThrowNullPointerException(env, "frame is null");
+    nullPointerEx.Throw(env, "frame is null");
     return 0;
   }
   return reinterpret_cast<jlong>(f->data);
@@ -623,12 +598,12 @@ Java_org_wpilib_util_WPIUtilJNI_setRawFrameData
 {
   auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::util::ThrowNullPointerException(env, "frame is null");
+    nullPointerEx.Throw(env, "frame is null");
     return;
   }
   auto buf = env->GetDirectBufferAddress(data);
   if (!buf) {
-    wpi::util::ThrowNullPointerException(env, "data is null");
+    nullPointerEx.Throw(env, "data is null");
     return;
   }
   // there's no way to free a passed-in direct byte buffer
@@ -651,7 +626,7 @@ Java_org_wpilib_util_WPIUtilJNI_setRawFrameTime
 {
   auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::util::ThrowNullPointerException(env, "frame is null");
+    nullPointerEx.Throw(env, "frame is null");
     return;
   }
   f->timestamp = time;
@@ -670,7 +645,7 @@ Java_org_wpilib_util_WPIUtilJNI_setRawFrameInfo
 {
   auto* f = reinterpret_cast<wpi::util::RawFrame*>(frame);
   if (!f) {
-    wpi::util::ThrowNullPointerException(env, "frame is null");
+    nullPointerEx.Throw(env, "frame is null");
     return;
   }
   f->width = width;

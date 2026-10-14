@@ -2023,7 +2023,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-wpilib==0.0.0", "robotpy-telemetry==0.0.0", "robotpy-tunables==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0", "robotpy-hal==0.0.0", "pyntcore==0.0.0", "robotpy-cli==0.0.0", "pytest>=3.9", "pytest-reraise"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["wpilib = wpilib", "wpilib_simulation = wpilib.simulation"],
             "robotpy_cli.2027": ["add-tests = wpilib._impl.cli_add_tests:AddTests", "run = wpilib._impl.cli_run:Main", "sim = wpilib._impl.cli_sim:RobotSim", "test = wpilib._impl.cli_test:RobotTest"],

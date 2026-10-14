@@ -28,13 +28,26 @@ public class HatchMechanism implements Mechanism, TelemetryLoggable {
   /** Grabs the hatch. */
   public Command grabHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(FORWARD)).named("Grab Hatch");
+    return this.run(
+            coroutine -> {
+              // Set the solenoid and then park the command, owning the mechanism until a different
+              // command is scheduled and interrupts it. This makes command's telemetry match what
+              // the robot is physically doing.
+              hatchSolenoid.set(FORWARD);
+              coroutine.park();
+            })
+        .named("Grab Hatch");
   }
 
   /** Releases the hatch. */
   public Command releaseHatchCommand() {
     // implicitly require `this`
-    return this.run(coro -> hatchSolenoid.set(REVERSE)).named("Release Hatch");
+    return this.run(
+            coroutine -> {
+              hatchSolenoid.set(REVERSE);
+              coroutine.park();
+            })
+        .named("Release Hatch");
   }
 
   @Override

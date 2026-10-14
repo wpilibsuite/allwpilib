@@ -155,12 +155,29 @@ DifferentialTrajectory DifferentialTrajectory::TransformBy(
 
 DifferentialTrajectory DifferentialTrajectory::RelativeTo(
     const Pose2d& pose) const {
-  return DifferentialTrajectory{this->RelativeSamples(pose)};
+  std::vector<DifferentialSample> samples;
+  samples.reserve(m_samples.size());
+  for (const auto& s : m_samples) {
+    samples.emplace_back(s.RelativeTo(pose));
+  }
+  return DifferentialTrajectory{std::move(samples)};
 }
 
 DifferentialTrajectory DifferentialTrajectory::Concatenate(
     const DifferentialTrajectory& other) const {
-  return DifferentialTrajectory{this->ConcatenateSamples(other.Samples())};
+  std::vector<DifferentialSample> samples;
+  samples.reserve(m_samples.size() + other.Samples().size());
+
+  // Copy existing
+  samples.insert(samples.end(), m_samples.begin(), m_samples.end());
+
+  // Append other with time offset
+  for (auto s : other.Samples()) {
+    s.time += m_duration;
+    samples.emplace_back(std::move(s));
+  }
+
+  return DifferentialTrajectory{std::move(samples)};
 }
 
 void wpi::math::to_json(wpi::util::json& json,

@@ -255,10 +255,17 @@ void apriltag_detector_clear_families(apriltag_detector_t *td);
 // apriltag_family_t used to initialize it.)
 void apriltag_detector_destroy(apriltag_detector_t *td);
 
-// Detect tags from an image and return an array of
-// apriltag_detection_t*. You can use apriltag_detections_destroy to
-// free the array and the detections it contains, or call
-// _detection_destroy and zarray_destroy yourself.
+// Detect tags in a grayscale 8-bit image.
+//
+// Parameters:
+//   td      - A configured detector
+//   im_orig - A grayscale 8-bit image to search. 
+//
+// Returns a zarray_t* containing apriltag_detection_t* pointers, one per
+// detected tag. The array may be empty but is never NULL. The caller is
+// responsible for freeing the result: use apriltag_detections_destroy() to
+// free both the array and all detections, or call apriltag_detection_destroy()
+// on each element then zarray_destroy() separately.
 zarray_t *apriltag_detector_detect(apriltag_detector_t *td, image_u8_t *im_orig);
 
 // Call this method on each of the tags returned by apriltag_detector_detect
@@ -266,6 +273,15 @@ void apriltag_detection_destroy(apriltag_detection_t *det);
 
 // destroys the array AND the detections within it.
 void apriltag_detections_destroy(zarray_t *detections);
+
+// Performs a deep copy of an AprilTag detection structure from a source to a destination.
+void apriltag_detection_copy(apriltag_detection_t* src, apriltag_detection_t* dst);
+
+// Creates a complete deep copy of a list of AprilTag detections.
+zarray_t* apriltag_detections_copy(zarray_t* detections);
+
+// Clones an AprilTag detector configuration into a new instance.
+apriltag_detector_t *apriltag_detector_copy(apriltag_detector_t *src);
 
 // Renders the apriltag.
 // Caller is responsible for calling image_u8_destroy on the image

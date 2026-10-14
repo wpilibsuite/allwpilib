@@ -213,12 +213,15 @@ components:
             ">enabled":
               type: boolean
               description: "True to enable the robot program"
+            ">robotMode":
+              type: integer
+              description: "Robot mode: 0 = unknown, 1 = autonomous, 2 = teleoperated, 3 = utility. Independent of enabled state."
             ">autonomous":
               type: boolean
-              description: "True for autonomous mode; false for teleoperated mode"
+              description: "Legacy output flag: true for autonomous mode; false for other modes. Sent with >robotMode for compatibility; not accepted as input."
             ">test":
               type: boolean
-              description: "True for test mode; false for other modes"
+              description: "Legacy output flag: true for utility mode; false for other modes. Sent with >robotMode for compatibility; not accepted as input."
             ">estop":
               type: boolean
               description: "True to emergency stop (no motor outputs)"

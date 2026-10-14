@@ -6,8 +6,6 @@ def baseArtifactId = nativeName
 def artifactGroupId = "org.wpilib.${nativeName}"
 def zipBaseName = makeZipBaseName(artifactGroupId, "${baseArtifactId}-cpp")
 
-def licenseFile = file("$rootDir/LICENSE.md")
-
 task cppSourcesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = zipBaseName

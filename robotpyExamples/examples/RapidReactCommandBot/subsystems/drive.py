@@ -4,7 +4,7 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-from typing import Callable
+from collections.abc import Callable
 
 from commands2 import Command, Subsystem
 import wpilib

@@ -124,7 +124,7 @@ void testFollowTrajectory(
         wpi::math::Rotation3d{
             groundTruthState.pose.Rotation() +
             wpi::math::Rotation2d{distribution(generator) * 0.001_rad} -
-            trajectory.InitialPose().Rotation()});
+            trajectory.Start().pose.Rotation()});
 
     if (debug) {
       wpi::util::print(
@@ -240,7 +240,7 @@ TEST_CASE("TwoDeadWheelPoseEstimator3dTest BadInitialPose", "[wpimath]") {
       auto pose_offset = wpi::math::Rotation2d{offset_direction_degs};
       auto heading_offset = wpi::math::Rotation2d{offset_heading_degs};
 
-      auto initial_pose = trajectory.InitialPose() +
+      auto initial_pose = trajectory.Start().pose +
                           wpi::math::Transform2d{
                               wpi::math::Translation2d{pose_offset.Cos() * 1_m,
                                                        pose_offset.Sin() * 1_m},

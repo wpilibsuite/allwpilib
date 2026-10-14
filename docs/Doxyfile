@@ -2447,17 +2447,7 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             =  __cplusplus \
-                         "HAL_ENUM(name)=enum name : int32_t" \
-                         DOXYGEN \
-                         WPI_NOEXCEPT:=noexcept \
-                         WPI_SFINAE(x):= \
-                         WPI_REQUIRES(x):= \
-                         WPI_REQUIRES_RET(...):= \
-                         WPI_ENABLE_IF(...):= \
-                         WPI_CONSTEXPR:=constexpr \
-                         WPI_CONSTEXPR_FNC:=constexpr \
-                         WPI_IMPL_DEFINED(...):=implementation_defined \
-                         WPI_EBO(...):=
+                         "HAL_ENUM(name)=enum name : int32_t"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2466,7 +2456,19 @@ PREDEFINED             =  __cplusplus \
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      = WPI_ALIAS_TEMPLATE
+# Expand the declarations of concrete unit types and their helpers.
+EXPAND_AS_DEFINED      = UNIT_ADD \
+                         UNIT_ADD_UNIT_TAGS \
+                         UNIT_ADD_UNIT_DEFINITION \
+                         UNIT_ADD_CUSTOM_TYPE_UNIT_DEFINITION \
+                         UNIT_ADD_NAME \
+                         UNIT_ADD_IO \
+                         UNIT_ADD_TELEMETRY \
+                         UNIT_ADD_LITERALS \
+                         UNIT_ADD_WITH_CUSTOM_TYPE \
+                         UNIT_ADD_DECIBEL \
+                         UNIT_ADD_WITH_METRIC_PREFIXES \
+                         UNIT_ADD_WITH_METRIC_AND_BINARY_PREFIXES
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then Doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

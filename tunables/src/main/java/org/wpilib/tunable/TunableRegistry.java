@@ -4,6 +4,8 @@
 
 package org.wpilib.tunable;
 
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -49,6 +52,101 @@ public final class TunableRegistry {
   private record ComplexMigrationRecorder(
       Set<String> publishedPaths, ComplexMigrationRecorder previous) {}
 
+  private record RevisionParentLink(Object child, ComplexTunable parent) {}
+
+  private record RevisionParentLinkState(String path, RevisionParentLink link) {}
+
+  private record ComplexPathState(
+      String path,
+      ComplexTunable tunable,
+      boolean addedPath,
+      List<RevisionParentLinkState> descendantLinks) {}
+
+  private record ComplexChildPathState(String path, TunableBase previousTunable) {}
+
+  private static final class WeakIdentityKey extends WeakReference<Object> {
+    private final int m_hash;
+
+    WeakIdentityKey(Object value, ReferenceQueue<Object> queue) {
+      super(Objects.requireNonNull(value), queue);
+      m_hash = System.identityHashCode(value);
+    }
+
+    WeakIdentityKey(Object value) {
+      super(Objects.requireNonNull(value));
+      m_hash = System.identityHashCode(value);
+    }
+
+    @Override
+    public int hashCode() {
+      return m_hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return this == obj
+          || obj instanceof WeakIdentityKey other && get() != null && get() == other.get();
+    }
+  }
+
+  private static final class WeakIdentityMap<K, V> {
+    private final ReferenceQueue<Object> m_queue = new ReferenceQueue<>();
+    private final Map<WeakIdentityKey, V> m_values = new HashMap<>();
+
+    private void cleanStaleEntries() {
+      WeakIdentityKey key;
+      while ((key = (WeakIdentityKey) m_queue.poll()) != null) {
+        m_values.remove(key);
+      }
+    }
+
+    V get(K key) {
+      cleanStaleEntries();
+      return m_values.get(new WeakIdentityKey(key));
+    }
+
+    V getOrDefault(K key, V defaultValue) {
+      V value = get(key);
+      return value != null ? value : defaultValue;
+    }
+
+    void put(K key, V value) {
+      cleanStaleEntries();
+      m_values.put(new WeakIdentityKey(key, m_queue), value);
+    }
+
+    void remove(K key) {
+      cleanStaleEntries();
+      m_values.remove(new WeakIdentityKey(key));
+    }
+
+    void clear() {
+      m_values.clear();
+      cleanStaleEntries();
+    }
+
+    boolean isEmpty() {
+      cleanStaleEntries();
+      return m_values.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    List<K> keySnapshot() {
+      cleanStaleEntries();
+      List<K> keys = new ArrayList<>();
+      var iterator = m_values.keySet().iterator();
+      while (iterator.hasNext()) {
+        Object key = iterator.next().get();
+        if (key == null) {
+          iterator.remove();
+        } else {
+          keys.add((K) key);
+        }
+      }
+      return keys;
+    }
+  }
+
   private static final List<TypeHandlerData<?>> s_typeHandlers = new ArrayList<>();
   private static final PrefixMap<TunableBackend> s_backends = new StringPrefixMap<>();
   private static volatile TunableBackend[] s_backendSnapshot = new TunableBackend[0];
@@ -66,6 +164,11 @@ public final class TunableRegistry {
       new IdentityHashMap<>();
   private static final Map<String, ComplexTunable> s_complexByPath = new HashMap<>();
   private static final Map<String, TunableBase> s_complexChildrenByPath = new HashMap<>();
+  private static final WeakIdentityMap<Object, Long> s_tuneRevisions = new WeakIdentityMap<>();
+  private static final WeakIdentityMap<Object, WeakIdentityMap<ComplexTunable, Integer>>
+      s_revisionParents = new WeakIdentityMap<>();
+  private static final Map<String, RevisionParentLink> s_revisionParentLinksByPath =
+      new HashMap<>();
   private static final TunableBackend s_missingBackend = new NoopTunableBackend();
   private static Consumer<String> s_reportWarning = TunableRegistry::defaultReportWarning;
 
@@ -373,6 +476,59 @@ public final class TunableRegistry {
   }
 
   /**
+   * Returns a tunable's current tuning revision token.
+   *
+   * <p>The token starts at zero and changes once for each tuning input that a backend successfully
+   * applies to this tunable or one of its descendant tunables. Direct local {@code set()} calls,
+   * in-place mutations, and getter refreshes do not change it. Reading the token does not consume
+   * or reset it, so independent observers can each store a previous token and compare it to the
+   * current value with {@code !=}.
+   *
+   * <p>Treat this as a 64-bit equality token. Do not rely on ordering or sign. This getter follows
+   * the same threading model as the rest of the tunable API and does not make tunable access
+   * thread-safe.
+   *
+   * @param tunable tunable
+   * @return current tuning revision token
+   */
+  public static long getTuneRevision(TunableBase tunable) {
+    synchronized (s_complexPathsMutex) {
+      return s_tuneRevisions.getOrDefault(getRevisionOwner(tunable), 0L);
+    }
+  }
+
+  /**
+   * Returns a complex tunable's current tuning revision token.
+   *
+   * <p>This is the same token returned for the underlying registry record, and it also advances
+   * when a backend successfully applies tuning input to a descendant child tunable.
+   *
+   * @param tunable complex tunable
+   * @return current tuning revision token
+   */
+  public static long getTuneRevision(ComplexTunable tunable) {
+    synchronized (s_complexPathsMutex) {
+      return s_tuneRevisions.getOrDefault(tunable, 0L);
+    }
+  }
+
+  /**
+   * Records that a backend successfully applied one tuning input to a tunable.
+   *
+   * <p>{@link TunableBackend} implementations should call this exactly once after each accepted
+   * remote tuning input has been applied to the tunable value, before scheduling any corresponding
+   * {@code onTune} callback. Rejected inputs and writes ignored due to immutability should not call
+   * this method.
+   *
+   * @param tunable tuned tunable
+   */
+  public static void recordTuneApplied(TunableBase tunable) {
+    synchronized (s_complexPathsMutex) {
+      incrementTuneRevision(getRevisionOwner(tunable), new IdentityHashMap<>());
+    }
+  }
+
+  /**
    * Resets a tunable's changed flag after the current update cycle finishes.
    *
    * <p>Backends should call this after publishing a changed tunable so every alias in every backend
@@ -491,10 +647,13 @@ public final class TunableRegistry {
       TunableBackend backend = getBackendForNormalizedPath(normalized);
       if (isMissingBackend(backend)) {
         missingBackend = true;
-      } else if (backend.publish(path, tunable)) {
-        addComplexChildPath(path, tunable);
-        recordComplexMigrationPublish(path);
-        return true;
+      } else {
+        ComplexChildPathState childPathState = addComplexChildPath(normalized, tunable);
+        if (backend.publish(path, tunable)) {
+          recordComplexMigrationPublish(normalized);
+          return true;
+        }
+        restoreComplexChildPath(childPathState);
       }
     }
     if (missingBackend) {
@@ -518,12 +677,12 @@ public final class TunableRegistry {
       if (isMissingBackend(backend)) {
         missingBackend = true;
       } else {
-        boolean addedPath = addComplexPath(path, tunable);
+        ComplexPathState pathState = addComplexPath(normalized, tunable);
         if (backend.publishComplex(path, tunable)) {
-          recordComplexMigrationPublish(path);
+          recordComplexMigrationPublish(normalized);
           return true;
-        } else if (addedPath) {
-          removeComplexPath(path, tunable);
+        } else if (pathState.addedPath()) {
+          restoreComplexPath(pathState);
         }
       }
     }
@@ -685,33 +844,184 @@ public final class TunableRegistry {
       s_complexPaths.clear();
       s_complexByPath.clear();
       s_complexChildrenByPath.clear();
+      s_tuneRevisions.clear();
+      s_revisionParents.clear();
+      s_revisionParentLinksByPath.clear();
     }
   }
 
-  private static void addComplexChildPath(String path, TunableBase tunable) {
-    synchronized (s_complexPathsMutex) {
-      String bestPrefix = null;
-      for (String complexPath : s_complexByPath.keySet()) {
-        String childPrefix = PathUtil.childTablePath(complexPath);
-        if (path.startsWith(childPrefix)
-            && (bestPrefix == null || childPrefix.length() > bestPrefix.length())) {
-          bestPrefix = childPrefix;
-        }
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private static TunableBase getRevisionOwner(TunableBase tunable) {
+    if (tunable instanceof Tunable.CustomTunable custom) {
+      TunableBase inner = custom.getInnerTunable();
+      if (inner != null && inner != tunable) {
+        return getRevisionOwner(inner);
       }
-      if (bestPrefix != null) {
-        s_complexChildrenByPath.put(path, tunable);
+    }
+    return tunable;
+  }
+
+  private static void incrementTuneRevision(
+      Object tunable, IdentityHashMap<Object, Boolean> visited) {
+    if (visited.put(tunable, Boolean.TRUE) != null) {
+      return;
+    }
+    s_tuneRevisions.put(tunable, s_tuneRevisions.getOrDefault(tunable, 0L) + 1L);
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(tunable);
+    if (parents == null) {
+      return;
+    }
+    for (ComplexTunable parent : parents.keySnapshot()) {
+      incrementTuneRevision(parent, visited);
+    }
+  }
+
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  private static ComplexTunable findNearestComplexParent(String path, Object child) {
+    String bestPrefix = null;
+    ComplexTunable bestParent = null;
+    for (var entry : s_complexByPath.entrySet()) {
+      ComplexTunable parent = entry.getValue();
+      if (parent == child) {
+        continue;
+      }
+      String childPrefix = PathUtil.childTablePath(entry.getKey());
+      if (path.startsWith(childPrefix)
+          && (bestPrefix == null || childPrefix.length() > bestPrefix.length())) {
+        bestPrefix = childPrefix;
+        bestParent = parent;
+      }
+    }
+    return bestParent;
+  }
+
+  private static void addRevisionParent(Object child, ComplexTunable parent) {
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(child);
+    if (parents == null) {
+      parents = new WeakIdentityMap<>();
+      s_revisionParents.put(child, parents);
+    }
+    Integer count = parents.get(parent);
+    parents.put(parent, count == null ? 1 : count + 1);
+  }
+
+  private static void removeRevisionParent(Object child, ComplexTunable parent) {
+    WeakIdentityMap<ComplexTunable, Integer> parents = s_revisionParents.get(child);
+    if (parents == null) {
+      return;
+    }
+    Integer count = parents.get(parent);
+    if (count == null) {
+      return;
+    } else if (count > 1) {
+      parents.put(parent, count - 1);
+    } else {
+      parents.remove(parent);
+      if (parents.isEmpty()) {
+        s_revisionParents.remove(child);
       }
     }
   }
 
-  private static boolean addComplexPath(String path, ComplexTunable tunable) {
-    synchronized (s_complexPathsMutex) {
-      if (s_complexByPath.containsKey(path)) {
-        return false;
+  private static void addRevisionParentLink(String path, Object child, ComplexTunable parent) {
+    RevisionParentLink oldLink =
+        s_revisionParentLinksByPath.put(path, new RevisionParentLink(child, parent));
+    if (oldLink != null) {
+      removeRevisionParent(oldLink.child(), oldLink.parent());
+    }
+    if (parent == null) {
+      s_revisionParentLinksByPath.remove(path);
+      return;
+    }
+    addRevisionParent(child, parent);
+  }
+
+  private static void linkRevisionParentForPath(String path, Object child) {
+    addRevisionParentLink(path, child, findNearestComplexParent(path, child));
+  }
+
+  private static void removeRevisionParentLink(String path) {
+    RevisionParentLink link = s_revisionParentLinksByPath.remove(path);
+    if (link != null) {
+      removeRevisionParent(link.child(), link.parent());
+    }
+  }
+
+  private static void restoreRevisionParentLinks(List<RevisionParentLinkState> states) {
+    for (int i = states.size() - 1; i >= 0; i--) {
+      RevisionParentLinkState state = states.get(i);
+      removeRevisionParentLink(state.path());
+      if (state.link() != null) {
+        s_revisionParentLinksByPath.put(state.path(), state.link());
+        addRevisionParent(state.link().child(), state.link().parent());
       }
-      s_complexByPath.put(path, tunable);
-      s_complexPaths.computeIfAbsent(tunable, k -> new ArrayList<>()).add(path);
-      return true;
+    }
+  }
+
+  private static List<RevisionParentLinkState> linkExistingComplexDescendants(String path) {
+    List<RevisionParentLinkState> previousLinks = new ArrayList<>();
+    String childPrefix = PathUtil.childTablePath(path);
+    for (var entry : s_complexChildrenByPath.entrySet()) {
+      if (entry.getKey().startsWith(childPrefix)) {
+        previousLinks.add(
+            new RevisionParentLinkState(
+                entry.getKey(), s_revisionParentLinksByPath.get(entry.getKey())));
+        linkRevisionParentForPath(entry.getKey(), getRevisionOwner(entry.getValue()));
+      }
+    }
+    for (var entry : s_complexByPath.entrySet()) {
+      if (!entry.getKey().equals(path) && entry.getKey().startsWith(childPrefix)) {
+        previousLinks.add(
+            new RevisionParentLinkState(
+                entry.getKey(), s_revisionParentLinksByPath.get(entry.getKey())));
+        linkRevisionParentForPath(entry.getKey(), entry.getValue());
+      }
+    }
+    return previousLinks;
+  }
+
+  private static ComplexChildPathState addComplexChildPath(String path, TunableBase tunable) {
+    synchronized (s_complexPathsMutex) {
+      String normalized = PathUtil.normalizeName(path);
+      TunableBase previousTunable = s_complexChildrenByPath.put(normalized, tunable);
+      if (previousTunable != null) {
+        removeRevisionParentLink(normalized);
+      }
+      linkRevisionParentForPath(normalized, getRevisionOwner(tunable));
+      return new ComplexChildPathState(normalized, previousTunable);
+    }
+  }
+
+  private static void restoreComplexChildPath(ComplexChildPathState state) {
+    synchronized (s_complexPathsMutex) {
+      removeRevisionParentLink(state.path());
+      if (state.previousTunable() != null) {
+        s_complexChildrenByPath.put(state.path(), state.previousTunable());
+        linkRevisionParentForPath(state.path(), getRevisionOwner(state.previousTunable()));
+      } else {
+        s_complexChildrenByPath.remove(state.path());
+      }
+    }
+  }
+
+  private static ComplexPathState addComplexPath(String path, ComplexTunable tunable) {
+    synchronized (s_complexPathsMutex) {
+      String normalized = PathUtil.normalizeName(path);
+      if (s_complexByPath.containsKey(normalized)) {
+        return new ComplexPathState(normalized, tunable, false, List.of());
+      }
+      linkRevisionParentForPath(normalized, tunable);
+      s_complexByPath.put(normalized, tunable);
+      s_complexPaths.computeIfAbsent(tunable, k -> new ArrayList<>()).add(normalized);
+      List<RevisionParentLinkState> descendantLinks = linkExistingComplexDescendants(normalized);
+      return new ComplexPathState(normalized, tunable, true, descendantLinks);
+    }
+  }
+
+  private static void restoreComplexPath(ComplexPathState state) {
+    synchronized (s_complexPathsMutex) {
+      removeComplexPath(state.path(), state.tunable());
+      restoreRevisionParentLinks(state.descendantLinks());
     }
   }
 
@@ -725,6 +1035,7 @@ public final class TunableRegistry {
       }
       for (String complexPath : paths) {
         ComplexTunable tunable = s_complexByPath.remove(complexPath);
+        removeRevisionParentLink(complexPath);
         removeComplexPath(complexPath, tunable);
       }
     }
@@ -732,9 +1043,16 @@ public final class TunableRegistry {
 
   private static void removeComplexChildPaths(String path) {
     synchronized (s_complexPathsMutex) {
-      s_complexChildrenByPath
-          .keySet()
-          .removeIf(childPath -> PathUtil.isPathOrDescendant(childPath, path));
+      List<String> paths = new ArrayList<>();
+      for (String childPath : s_complexChildrenByPath.keySet()) {
+        if (PathUtil.isPathOrDescendant(childPath, path)) {
+          paths.add(childPath);
+        }
+      }
+      for (String childPath : paths) {
+        s_complexChildrenByPath.remove(childPath);
+        removeRevisionParentLink(childPath);
+      }
     }
   }
 
@@ -747,6 +1065,7 @@ public final class TunableRegistry {
       if (s_complexByPath.get(path) == tunable) {
         s_complexByPath.remove(path);
       }
+      removeRevisionParentLink(path);
       List<String> paths = s_complexPaths.get(tunable);
       if (paths == null) {
         return;

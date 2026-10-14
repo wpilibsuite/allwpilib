@@ -67,6 +67,10 @@ points = tunables.Tunable([], element_type=TunablePoint)  # a WPIStruct class
 
 `properties` is converted from normal Python JSON-like values (`None`, bools, numbers, strings, lists, and dicts) into the backend property JSON. `type_string` overrides the backend type string. `mutable=False` prevents remote writes from calling the setter. `robust=True` requests the robust backend publication form. `on_tune`, when supplied, is called with the tuned value after a backend applies a remote write during `TunableRegistry.update()`. Getter, setter, and `on_tune` callables must not raise.
 
+`TunableRegistry.get_tune_revision(value)` returns the native 64-bit tuning revision equality token for a tunable or complex tunable. It starts at zero and advances once for each backend-applied tuning input, including accepted same-value inputs. A complex tunable's revision also advances when a backend applies tuning input to one of its published child tunables. Local `set()`, `mutate()`, getter refreshes, rejected inputs, and writes to immutable tunables do not advance it. Reads are non-consuming; save the value and compare a later value with `!=` to detect tuning without relying on ordering.
+
+For duck-typed complex objects that cannot be weak-referenced (for example, `__slots__` classes without `__weakref__`), revision history is shared across active aliases but resets when the last publication is removed. Add `__weakref__` to the slots to preserve history across full unpublish/republish cycles without retaining the object indefinitely.
+
 Use `mutate()` when changing a mutable value in place, such as a WPIStruct object or a WPIStruct object contained in a struct array. Directly mutating the object returned by `get()` can bypass `set()` and will not mark the tunable changed.
 
 ## Python Tables and Root Facade

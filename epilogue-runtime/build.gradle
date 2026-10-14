@@ -10,6 +10,12 @@ ext {
 apply from: "${rootDir}/shared/java/javacommon.gradle"
 
 dependencies {
+    api(project(':wpilibj'))
     api(project(':wpiunits'))
     api(project(':telemetry'))
+
+    implementation(project(':ntcore'))
+    implementation(project(':tunables'))
+    implementation(project(':wpimath'))
+    implementation(project(':hal'))
 }

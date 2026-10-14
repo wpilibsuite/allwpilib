@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import telemetry
 import wpilib
 
@@ -54,6 +56,7 @@ class MyRobot(wpilib.TimedRobot):
             module_type=wpilib.PneumaticsModuleType.REV_PH,
         )
 
+    @override
     def teleop_periodic(self) -> None:
         # Publish some raw data
         # Get the pressure (in PSI) from the analog sensor connected to the PH.

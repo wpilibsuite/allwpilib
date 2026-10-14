@@ -208,8 +208,8 @@ bool Publish(wpi::tunables::TunableTable& table, std::string_view name,
       }
     }
   } else if (auto publishTunable = GetOptionalAttr(value, "publish_tunables")) {
-    auto tunable = std::make_shared<PyComplexTunableAdapter>(
-        std::move(value), std::move(*publishTunable));
+    auto tunable = detail::GetOrCreateComplex(std::move(value),
+                                              std::move(*publishTunable));
     std::string path = NormalizeTablePath(table, name);
     auto updateLock = LockForComplexPublication();
     PendingPublication pending{path};
@@ -220,6 +220,8 @@ bool Publish(wpi::tunables::TunableTable& table, std::string_view name,
       } else {
         detail::StoreComplex(std::move(path), std::move(tunable));
       }
+    } else {
+      tunable->ReleaseValueIfUnpublished();
     }
   } else {
     throw py::type_error(
@@ -494,7 +496,7 @@ void Remove(wpi::tunables::TunableTable& table, std::string_view name) {
   }
 }
 
-void InvalidatePendingPublications(std::string_view path) {
+void InvalidatePublications(std::string_view path) {
   std::string childPrefix{path};
   if (childPrefix.empty() || childPrefix.back() != '/') {
     childPrefix.push_back('/');
@@ -503,6 +505,13 @@ void InvalidatePendingPublications(std::string_view path) {
     return publication.first == path ||
            publication.first.starts_with(childPrefix);
   });
+  for (auto&& [table, context] : GetContexts()) {
+    auto& ownerContext = *context.ownerContext;
+    if (ownerContext.path == path ||
+        ownerContext.path.starts_with(childPrefix)) {
+      ownerContext.owner.reset();
+    }
+  }
 }
 
 void ClearContexts() {

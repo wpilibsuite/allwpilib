@@ -389,6 +389,8 @@ NT_Inst NT_CreateInstance(void);
 /**
  * Destroy an instance.
  * The default instance cannot be destroyed.
+ * The behavior of concurrent calls of this function on the same instance is
+ * undefined.
  *
  * @param inst Instance handle
  */
@@ -1930,7 +1932,7 @@ struct NT_Meta_SubscriberOptions {
  */
 struct NT_Meta_TopicPublisher {
   struct WPI_String client;
-  uint64_t pubuid;
+  int64_t pubuid;
 };
 
 /**
@@ -1938,7 +1940,7 @@ struct NT_Meta_TopicPublisher {
  */
 struct NT_Meta_TopicSubscriber {
   struct WPI_String client;
-  uint64_t subuid;
+  int64_t subuid;
   struct NT_Meta_SubscriberOptions options;
 };
 

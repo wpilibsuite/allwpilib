@@ -1,7 +1,7 @@
 import threading
 import weakref
 
-from typing import Callable, Dict, Optional, Sequence
+from collections.abc import Callable, Sequence
 
 from ._ntcore import (
     EventFlags,
@@ -16,7 +16,7 @@ __all__ = ["ntproperty", "SelectableControl"]
 _SENTINEL = object()
 
 
-def _selection_is_unset(value: Optional[str]) -> bool:
+def _selection_is_unset(value: str | None) -> bool:
     return value is None or value == ""
 
 
@@ -29,7 +29,7 @@ class _NtProperty:
     default_value: Value
 
     _instlock = threading.Lock()
-    _instances: Dict[int, weakref.WeakSet] = {}
+    _instances: dict[int, weakref.WeakSet] = {}
 
     @classmethod
     def attach(cls, self: "_NtProperty", inst: NetworkTableInstance):
@@ -59,7 +59,7 @@ class _NtProperty:
         default_value,
         write_default: bool,
         persistent: bool,
-        type: Optional[NetworkTableType],
+        type: NetworkTableType | None,
         inst: NetworkTableInstance,
     ) -> None:
         # Autodetect the type if not provided, and store the default
@@ -109,8 +109,8 @@ def ntproperty(
     write_default: bool = True,
     doc: str = None,
     persistent: bool = False,
-    type: Optional[NetworkTableType] = None,
-    inst: Optional[NetworkTableInstance] = None
+    type: NetworkTableType | None = None,
+    inst: NetworkTableInstance | None = None,
 ) -> property:
     """
     A property that you can add to your classes to access NetworkTables
@@ -167,10 +167,10 @@ class SelectableControl:
     def __init__(
         self,
         key: str,
-        on_choices: Optional[Callable[[Sequence[str]], None]] = None,
-        on_selected: Optional[Callable[[str], None]] = None,
+        on_choices: Callable[[Sequence[str]], None] | None = None,
+        on_selected: Callable[[str], None] | None = None,
         *,
-        inst: Optional[NetworkTableInstance] = None
+        inst: NetworkTableInstance | None = None,
     ) -> None:
         """
         :param key: NetworkTables key
@@ -218,13 +218,13 @@ class SelectableControl:
         """
         return self.subtable.get_string_array("options", [])
 
-    def get_selected(self) -> Optional[str]:
+    def get_selected(self) -> str | None:
         """
         Returns the current selection or None
         """
         return self._get_effective_selection()
 
-    def _get_effective_selection(self) -> Optional[str]:
+    def _get_effective_selection(self) -> str | None:
         selected = self.selected_subtable.get_string("value", None)
         if _selection_is_unset(selected):
             selected = self.selected_subtable.get_string("tune", None)
