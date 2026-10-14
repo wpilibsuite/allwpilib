@@ -4,11 +4,13 @@ def __generate_commandsv3_impl(ctx):
     """
     output_dir = ctx.actions.declare_directory("_gendir")
 
+    protoc = ctx.toolchains["@com_google_protobuf//bazel/private:proto_toolchain_type"].proto.proto_compiler
+
     args = ctx.actions.args()
     args.add("--output_directory", output_dir.path)
     args.add("--template_root", "commandsv3/src/generate")
     args.add("--proto_directory", "commandsv3/src/main/proto")
-    args.add("--protoc", ctx.executable._protoc)
+    args.add("--protoc", protoc.executable)
     args.add("--quickbuf_plugin", ctx.executable._quickbuf)
 
     ctx.actions.run(
@@ -16,7 +18,7 @@ def __generate_commandsv3_impl(ctx):
         outputs = [output_dir],
         executable = ctx.executable._tool,
         arguments = [args],
-        tools = [ctx.executable._protoc, ctx.executable._quickbuf],
+        tools = [protoc, ctx.executable._quickbuf],
     )
 
     return [DefaultInfo(files = depset([output_dir]))]
@@ -24,11 +26,6 @@ def __generate_commandsv3_impl(ctx):
 generate_commandsv3 = rule(
     implementation = __generate_commandsv3_impl,
     attrs = {
-        "_protoc": attr.label(
-            default = Label("@com_google_protobuf//:protoc"),
-            cfg = "exec",
-            executable = True,
-        ),
         "_quickbuf": attr.label(
             default = Label("//:quickbuf_protoc"),
             cfg = "exec",
@@ -43,4 +40,5 @@ generate_commandsv3 = rule(
             executable = True,
         ),
     },
+    toolchains = ["@com_google_protobuf//bazel/private:proto_toolchain_type"],
 )
