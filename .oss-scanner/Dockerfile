@@ -47,6 +47,16 @@ RUN sed -i 's/\r$//' ./gradlew \
          --offline --no-daemon \
          --max-workers="${BUILD_JOBS}" -Ponlylinuxx86-64 -PskipJavaFormat
 
+# Install Bazelisk so .bazelversion selects the repository's Bazel version.
+# Fetch Bazel dependencies while online and retain the launcher, Bazel binary,
+# and repository caches for additional builds during the offline audit.
+RUN curl --fail --location --retry 3 \
+      https://github.com/bazelbuild/bazelisk/releases/download/v1.29.0/bazelisk-linux-amd64 \
+      --output /usr/local/bin/bazel \
+    && echo "5a408715e932c0250d28bd84555f12edbf70117de42f9181691c736eacc4a992  /usr/local/bin/bazel" | sha256sum --check \
+    && chmod +x /usr/local/bin/bazel \
+    && bazel --batch fetch //...
+
 # As in the scanner template, native test failures should leave an auditable
 # image rather than discard the build. Retry failures up to three times and
 # retain CTest's failure logs; compilation and Java setup above remain fatal.

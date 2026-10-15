@@ -94,6 +94,17 @@ exercises Java/JNI tests for `ntcore`, `wpinet`, `wpiutil`, `datalog`, and `csco
 Their JNI installations, test results, and reports are under the subprojects'
 `build/` directories; Gradle caches are retained under `/root/.gradle`.
 
+Bazelisk and the Bazel version selected by `.bazelversion` are installed, and
+`bazel fetch //...` populates Bazel's dependencies during setup. Its caches
+are retained under `/root/.cache/bazelisk` and `/root/.cache/bazel`. Bazel
+outputs are not prebuilt; CMake and Gradle provide the compiled artifacts
+described above. Additional Bazel builds can reuse the fetched dependencies;
+pass `--nofetch` to detect any dependency missing from the offline cache:
+
+```sh
+bazel build --nofetch //ntcore/... --jobs=2
+```
+
 Start service discovery before tests that require it:
 
 ```sh
