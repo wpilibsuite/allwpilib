@@ -4,28 +4,31 @@ Date: Sat, 25 Apr 2026 19:20:28 +0000
 Subject: [PATCH] Suppress compiler warnings
 
 ---
- pocketfft_hdronly.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ pocketfft_hdronly.h | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/pocketfft_hdronly.h b/pocketfft_hdronly.h
-index 330e7e051500669d767117475db81abb57af2917..44fcb7f70a8d8b14e7e742686a8fc26637ed0633 100644
+index 330e7e051500669d767117475db81abb57af2917..06cbcd6da6d3b2d6f93a0be2c346d88526d324bf 100644
 --- a/pocketfft_hdronly.h
 +++ b/pocketfft_hdronly.h
-@@ -45,6 +45,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@@ -45,6 +45,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  #ifndef POCKETFFT_HDRONLY_H
  #define POCKETFFT_HDRONLY_H
  
 +#if defined(__GNUC__) || defined(__clang__)
 +#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wcast-qual"
++#pragma GCC diagnostic ignored "-Wfloat-equal"
++#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
++#if !defined(__clang__)
++#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#endif
++#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
++#pragma GCC diagnostic ignored "-Wpedantic"
 +#pragma GCC diagnostic ignored "-Wshadow"
 +#pragma GCC diagnostic ignored "-Wsign-compare"
-+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-+#pragma GCC diagnostic ignored "-Wfloat-equal"
-+#pragma GCC diagnostic ignored "-Wcast-qual"
-+#pragma GCC diagnostic ignored "-Wpedantic"
-+#pragma GCC diagnostic ignored "-Wunused-function"
 +#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
++#pragma GCC diagnostic ignored "-Wunused-function"
 +#elif defined(_MSC_VER)
 +#pragma warning(push, 0)
 +#endif
@@ -33,7 +36,7 @@ index 330e7e051500669d767117475db81abb57af2917..44fcb7f70a8d8b14e7e742686a8fc266
  #ifndef __cplusplus
  #error This file is C++ and requires a C++ compiler.
  #endif
-@@ -3847,4 +3862,10 @@ using detail::dst;
+@@ -3847,4 +3865,10 @@ using detail::dst;
  #undef POCKETFFT_NOINLINE
  #undef POCKETFFT_RESTRICT
  
