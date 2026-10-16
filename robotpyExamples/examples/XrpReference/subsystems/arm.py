@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 import xrp
 
@@ -16,6 +18,7 @@ class Arm(commands2.Subsystem):
         # Device number 4 maps to the physical Servo 1 port on the XRP
         self.arm_servo = xrp.XRPServo(4)
 
+    @override
     def periodic(self):
         """This method will be called once per scheduler run"""
 

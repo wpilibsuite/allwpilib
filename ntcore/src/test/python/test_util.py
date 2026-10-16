@@ -1,7 +1,7 @@
 import pytest
 
 from ntcore import NetworkTableInstance, NetworkTableType
-from ntcore.util import ntproperty, SelectableControl
+from ntcore.util import SelectableControl, ntproperty
 
 # def test_autoupdatevalue(nt):
 
@@ -10,19 +10,19 @@ from ntcore.util import ntproperty, SelectableControl
 #     nt.shutdown()
 
 #     foo = nt.get_global_auto_update_value("/SmartDashboard/foo", True, True)
-#     assert foo.value == True
-#     assert foo.get() == True
+#     assert foo.value is True
+#     assert foo.get() is True
 
 #     nt.start_test_mode()
 
-#     assert foo.value == True
-#     assert foo.get() == True
+#     assert foo.value is True
+#     assert foo.get() is True
 
 #     t = nt.get_table("/SmartDashboard")
-#     assert t.get_boolean("foo", None) == True
+#     assert t.get_boolean("foo", None) is True
 #     t.put_boolean("foo", False)
 
-#     assert foo.value == False
+#     assert foo.value is False
 
 
 def test_ntproperty(nt: NetworkTableInstance):

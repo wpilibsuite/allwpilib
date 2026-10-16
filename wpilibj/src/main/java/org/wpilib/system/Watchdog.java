@@ -25,13 +25,15 @@ import org.wpilib.util.WPIUtilJNI;
  */
 public class Watchdog implements Closeable, Comparable<Watchdog> {
   // Used for timeout print rate-limiting
-  private static final double MIN_PRINT_PERIOD = 1.0; // s
+  private static final long MIN_PRINT_PERIOD = 1_000_000_000L; // ns
 
-  private double m_startTime;
+  // Monotonic times in nanoseconds. Seconds in a double can't hold
+  // nanosecond-resolution timestamps once the clock is large.
+  private long m_startTime;
   private double m_timeout;
-  private double m_expirationTime;
+  private long m_expirationTime;
   private final Runnable m_callback;
-  private double m_lastTimeoutPrint; // s
+  private long m_lastTimeoutPrint; // ns
 
   boolean m_isExpired;
 
@@ -78,20 +80,19 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof Watchdog watchdog
-        && Double.compare(m_expirationTime, watchdog.m_expirationTime) == 0;
+    return obj instanceof Watchdog watchdog && m_expirationTime == watchdog.m_expirationTime;
   }
 
   @Override
   public int hashCode() {
-    return Double.hashCode(m_expirationTime);
+    return Long.hashCode(m_expirationTime);
   }
 
   @Override
   public int compareTo(Watchdog rhs) {
     // Elements with sooner expiration times are sorted as lesser. The head of
     // Java's PriorityQueue is the least element.
-    return Double.compare(m_expirationTime, rhs.m_expirationTime);
+    return Long.compare(m_expirationTime, rhs.m_expirationTime);
   }
 
   /**
@@ -100,7 +101,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @return The time in seconds since the watchdog was last fed.
    */
   public double getTime() {
-    return Timer.getMonotonicTimestamp() - m_startTime;
+    return (HALUtil.getMonotonicTime() - m_startTime) / 1e9;
   }
 
   /**
@@ -109,7 +110,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
    * @param timeout The watchdog's timeout in seconds with nanosecond resolution.
    */
   public void setTimeout(double timeout) {
-    m_startTime = Timer.getMonotonicTimestamp();
+    m_startTime = HALUtil.getMonotonicTime();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -118,7 +119,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTime = m_startTime + Math.round(m_timeout * 1e9);
       m_watchdogs.add(this);
       updateAlarm();
     } finally {
@@ -184,7 +185,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
 
   /** Enables the watchdog timer. */
   public void enable() {
-    m_startTime = Timer.getMonotonicTimestamp();
+    m_startTime = HALUtil.getMonotonicTime();
     m_tracer.clearEpochs();
 
     m_queueMutex.lock();
@@ -192,7 +193,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
       m_isExpired = false;
 
       m_watchdogs.remove(this);
-      m_expirationTime = m_startTime + m_timeout;
+      m_expirationTime = m_startTime + Math.round(m_timeout * 1e9);
       m_watchdogs.add(this);
       updateAlarm();
     } finally {
@@ -227,8 +228,7 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
     if (m_watchdogs.isEmpty()) {
       NotifierJNI.cancelNotifierAlarm(m_notifier, true);
     } else {
-      NotifierJNI.setNotifierAlarm(
-          m_notifier, (long) (m_watchdogs.peek().m_expirationTime * 1e9), 0, true, true);
+      NotifierJNI.setNotifierAlarm(m_notifier, m_watchdogs.peek().m_expirationTime, 0, true, true);
     }
   }
 
@@ -259,9 +259,8 @@ public class Watchdog implements Closeable, Comparable<Watchdog> {
         // has occurred, so call its timeout function.
         Watchdog watchdog = m_watchdogs.poll();
 
-        double now = curTime * 1e-9;
-        if (now - watchdog.m_lastTimeoutPrint > MIN_PRINT_PERIOD) {
-          watchdog.m_lastTimeoutPrint = now;
+        if (curTime - watchdog.m_lastTimeoutPrint > MIN_PRINT_PERIOD) {
+          watchdog.m_lastTimeoutPrint = curTime;
           if (!watchdog.m_suppressTimeoutMessage) {
             DriverStationErrors.reportWarning(
                 String.format("Watchdog not fed within %.6fs\n", watchdog.m_timeout), false);

@@ -95,7 +95,6 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
    * @param transform The transform to apply to the trajectory.
    * @return The transformed trajectory.
    */
-  @Override
   public DrivetrainSplineTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
@@ -134,7 +133,6 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
    * @param other the other trajectory to concatenate with this one.
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
-  @Override
   public DrivetrainSplineTrajectory concatenate(Trajectory<DrivetrainSplineSample> other) {
     if (other.samples.isEmpty()) {
       return this;
@@ -156,7 +154,6 @@ public class DrivetrainSplineTrajectory extends Trajectory<DrivetrainSplineSampl
    * @param other the pose to which the trajectory should be relative.
    * @return a new trajectory relative to the given pose.
    */
-  @Override
   public DrivetrainSplineTrajectory relativeTo(Pose2d other) {
     return new DrivetrainSplineTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }

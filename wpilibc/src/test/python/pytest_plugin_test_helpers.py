@@ -1,6 +1,3 @@
-import pathlib
-
-
 def _make_robot_module(pytester):
     pytester.makepyfile(robot_module="""
 import wpilib

@@ -2,7 +2,7 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 import wpilib
 
@@ -17,6 +17,7 @@ class DefaultTeleMode(wpilib.PeriodicOpMode):
         self.robot = robot
         self.gamepad = wpilib.DriverStation.get_gamepad(0)
 
+    @override
     def periodic(self) -> None:
         self.robot.motor0.set_throttle(-self.gamepad.get_left_y())
         self.robot.motor1.set_throttle(-self.gamepad.get_right_y())

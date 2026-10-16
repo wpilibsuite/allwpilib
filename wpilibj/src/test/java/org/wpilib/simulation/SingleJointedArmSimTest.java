@@ -5,11 +5,11 @@
 package org.wpilib.simulation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.system.DCMotor;
-import org.wpilib.math.util.Units;
 
 class SingleJointedArmSimTest {
   @Test
@@ -19,7 +19,7 @@ class SingleJointedArmSimTest {
             DCMotor.getVex775Pro(2),
             300,
             3.0,
-            Units.inchesToMeters(30.0),
+            inchesToMeters(30.0),
             -Math.PI,
             0.0,
             true,
@@ -45,7 +45,7 @@ class SingleJointedArmSimTest {
             DCMotor.getKrakenX60(2),
             125,
             3.0,
-            Units.inchesToMeters(30.0),
+            inchesToMeters(30.0),
             0,
             Math.PI / 2.0,
             true,

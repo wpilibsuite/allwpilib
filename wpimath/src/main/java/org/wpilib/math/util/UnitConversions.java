@@ -5,7 +5,7 @@
 package org.wpilib.math.util;
 
 /** Utility class that converts between commonly used units in FIRST. */
-public final class Units {
+public final class UnitConversions {
   private static final double INCHES_PER_FOOT = 12.0;
   private static final double METERS_PER_INCH = 0.0254;
   private static final double METERS_PER_MILE = 1609.344;
@@ -15,7 +15,7 @@ public final class Units {
   private static final double KILOGRAMS_PER_LB = 0.453592;
 
   /** Utility class, so constructor is private. */
-  private Units() {
+  private UnitConversions() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
 

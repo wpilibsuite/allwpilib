@@ -4,6 +4,7 @@
 
 /** Defines the WPILib Java example module and its required library dependencies. */
 open module wpilib.examples {
+  requires org.opencv;
   requires wpilib;
   requires wpilib.apriltag;
   requires wpilib.cameraserver;
@@ -17,5 +18,9 @@ open module wpilib.examples {
   requires wpilib.ntcore;
   requires wpilib.romi;
   requires wpilib.xrp;
-  requires org.opencv;
+
+  provides org.wpilib.epilogue.EpilogueService with
+      org.wpilib.templates.commandv3skeleton.Robot_EpilogueService,
+      org.wpilib.examples.rapidreactcommandbot.Robot_EpilogueService,
+      org.wpilib.examples.rebuiltcmdv3.Robot_EpilogueService;
 }

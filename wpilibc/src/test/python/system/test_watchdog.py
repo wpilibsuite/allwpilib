@@ -1,5 +1,7 @@
 import pytest
 
+import hal
+import hal.simulation as halsim
 from wpilib import Watchdog
 from wpilib.simulation import pause_timing, resume_timing, step_timing
 
@@ -39,6 +41,44 @@ def test_enable_disable():
     step_timing(1.0)
     watchdog.disable()
     assert counter == 1
+
+
+def step_to_large_clock():
+    # An odd nanosecond count of at least 2^53. Seconds in a float can't
+    # represent it, so it catches rounding from converting timestamps through
+    # seconds.
+    now = hal.get_monotonic_time()
+    target = max(now, 1 << 53) | 1
+    halsim.step_timing(target - now)
+
+
+def test_large_clock():
+    step_to_large_clock()
+
+    counter = 0
+
+    def on_expire() -> None:
+        nonlocal counter
+        counter += 1
+
+    watchdog = Watchdog(0.4, on_expire)
+
+    watchdog.enable()
+    halsim.step_timing(399_999_999)
+    assert counter == 0
+    halsim.step_timing(1)
+    assert counter == 1
+
+    counter = 0
+    watchdog.set_timeout(0.4)
+    halsim.step_timing(200_000_000)
+    assert watchdog.get_time() == pytest.approx(0.2, abs=1e-10)
+    halsim.step_timing(199_999_999)
+    assert counter == 0
+    halsim.step_timing(1)
+    assert counter == 1
+
+    watchdog.disable()
 
 
 def test_reset():

@@ -3,7 +3,6 @@ import argparse
 import importlib.metadata
 import logging
 import sys
-import typing
 
 import wpilib
 
@@ -49,7 +48,7 @@ class RobotSim:
         self,
         options: argparse.Namespace,
         nogui: bool,
-        robot_class: typing.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
     ):
         if not nogui:
             try:

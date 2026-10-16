@@ -1,5 +1,3 @@
-from typing import Generic, TypeVar
-
 import commands2
 import pytest
 

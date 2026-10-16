@@ -6,7 +6,6 @@
 
 import telemetry
 import tunables
-import wpilib
 
 import commands2
 import commands2.button

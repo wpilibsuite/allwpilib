@@ -126,12 +126,6 @@ doxygen.sourceSets.main {
 
         // mpack
         exclude 'wpi/util/mpack.h'
-
-        // hat-trie internal helpers
-        exclude 'wpi/util/array-hash/**'
-
-        // units
-        exclude 'wpi/units/**'
     }
 
     exclude '*.pb.h'
@@ -148,6 +142,7 @@ doxygen.sourceSets.main {
     option 'project_number', wpilibVersioning.version.get()
     option 'strip_from_inc_path', cppIncludeRoots
     option 'strip_from_path', cppIncludeRoots
+    option 'include_path', cppIncludeRoots.findAll { file(it).exists() }
 
     if (project.hasProperty('docWarningsAsErrors')) {
         option 'warn_as_error', 'FAIL_ON_WARNINGS_PRINT'
@@ -271,7 +266,7 @@ tasks.register('generateJavaDocs', Javadoc) {
     options.links("https://docs.oracle.com/en/java/javase/25/docs/api/")
     // workaround for opencv site blocking javadoc tool. If the link is changed,
     // docs/opencv/element-list must be redownloaded
-    options.linksOffline("https://docs.opencv.org/4.10.0/javadoc/", "opencv")
+    options.linksOffline("https://docs.opencv.org/4.13.0/javadoc/", "opencv")
     options.addStringOption("tag", "pre:a:Pre-Condition")
     options.addBooleanOption("Xdoclint/package:" +
             // TODO: v Document these, then remove them from the list

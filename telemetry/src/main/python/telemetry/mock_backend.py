@@ -1,7 +1,6 @@
 """Value types returned by :class:`telemetry.MockTelemetryBackend`."""
 
 from dataclasses import dataclass, field
-from typing import TypeAlias
 
 
 @dataclass
@@ -32,7 +31,7 @@ class LogRawValue:
     type_string: str = ""
 
 
-ActionValue: TypeAlias = (
+type ActionValue = (
     KeepDuplicatesValue
     | SetPropertyValue
     | bool

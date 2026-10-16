@@ -132,7 +132,8 @@ static void DisplayGui() {
   DisplayDownload();
 }
 
-void Application(std::string_view saveDir) {
+void Application(std::string_view saveDir,
+                 std::span<const std::string_view> filenames) {
   ssh_init();
 
   gui::CreateContext();
@@ -161,6 +162,10 @@ void Application(std::string_view saveDir) {
   gDownloadVisible = &wpi::glass::GetStorageRoot()
                           .GetChild("download")
                           .GetBool("visible", true);
+
+  for (auto filename : filenames) {
+    AddInputFile(filename);
+  }
 
   gui::Main();
 

@@ -16,7 +16,7 @@
 "component: apriltag":
   - changed-files:
       - any-glob-to-any-file: apriltag/**
-"component: command-based":
+"component: commands v2":
   - changed-files:
       - any-glob-to-any-file: commandsv2/**
 "component: commands v3":
@@ -24,7 +24,7 @@
       - any-glob-to-any-file: commandsv3/**
 "component: cscore":
   - changed-files:
-      - any-glob-to-any-file: cscore/**
+      - any-glob-to-any-file: [cameraserver/**, cscore/**]
 "component: datalogtool":
   - changed-files:
       - any-glob-to-any-file: tools/datalogtool/**
@@ -58,9 +58,15 @@
 "component: sysid":
   - changed-files:
       - any-glob-to-any-file: tools/sysid/**
+"component: telemetry":
+  - changed-files:
+      - any-glob-to-any-file: telemetry/**
 "component: wpiannotations":
   - changed-files:
       - any-glob-to-any-file: wpiannotations/**
+"component: wpical":
+  - changed-files:
+      - any-glob-to-any-file: tools/wpical/**
 "component: wpilibc":
   - changed-files:
       - any-glob-to-any-file: wpilibc/**
@@ -79,9 +85,6 @@
 "component: wpiutil":
   - changed-files:
       - any-glob-to-any-file: wpiutil/**
-"component: wpical":
-  - changed-files:
-      - any-glob-to-any-file: tools/wpical/**
 "component: xrp":
   - changed-files:
       - any-glob-to-any-file: xrpVendordep/**
@@ -101,6 +104,10 @@
             "copy.bara.sky",
             "robotpyExamples/**",
           ]
+"type: docs":
+  - changed-files:
+    - all-globs-to-any-file: ["**/*.md", "!.github/**"]
+    - any-glob-to-any-file: docs/**
 "type: testing":
   - changed-files:
       - any-glob-to-any-file: "**/test/**"

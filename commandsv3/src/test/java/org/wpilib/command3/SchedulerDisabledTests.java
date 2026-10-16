@@ -130,7 +130,7 @@ class SchedulerDisabledTests extends CommandTestBase {
     m_enabled = false;
 
     var result = m_scheduler.schedule(safeCommand);
-    assertTrue(result instanceof Success(var cmd) && cmd == safeCommand);
+    assertTrue(result instanceof Success(var cmd, var _) && cmd == safeCommand);
 
     m_scheduler.run();
     assertEquals(List.of(safeCommand), m_scheduler.getRunningCommands());

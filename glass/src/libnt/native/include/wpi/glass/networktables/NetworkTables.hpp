@@ -26,6 +26,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/protobuf/ProtobufMessageDatabase.hpp"
 #include "wpi/util/struct/DynamicStruct.hpp"
 
 namespace wpi::glass {
@@ -182,8 +183,9 @@ class NetworkTablesModel : public Model {
   wpi::util::StructDescriptorDatabase& GetStructDatabase() {
     return m_structDb;
   }
-  upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
-  upb_Arena* GetProtobufArena() { return m_arena; }
+  wpi::util::ProtobufMessageDatabase& GetProtobufDatabase() {
+    return m_protoDb;
+  }
 
  private:
   void RebuildTree();
@@ -210,8 +212,7 @@ class NetworkTablesModel : public Model {
   std::optional<int64_t> m_serverTimeOffset;
 
   wpi::util::StructDescriptorDatabase m_structDb;
-  upb_DefPool* m_protoPool = upb_DefPool_New();
-  upb_Arena* m_arena = upb_Arena_New();
+  wpi::util::ProtobufMessageDatabase m_protoDb;
 };
 
 using NetworkTablesFlags = int;

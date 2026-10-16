@@ -259,7 +259,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
         requires = ["robotpy-native-apriltag==0.0.0", "robotpy-wpiutil==0.0.0", "robotpy-wpimath==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         entry_points = {
             "pkg_config": ["apriltag = robotpy_apriltag"],
         },

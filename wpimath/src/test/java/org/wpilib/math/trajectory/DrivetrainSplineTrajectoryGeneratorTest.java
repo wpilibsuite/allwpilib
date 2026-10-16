@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.math.util.Units.feetToMeters;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
 import java.util.ArrayList;
 import java.util.List;

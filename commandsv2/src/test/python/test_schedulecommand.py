@@ -6,8 +6,6 @@ from util import *  # type: ignore
 if TYPE_CHECKING:
     from .util import *
 
-import pytest
-
 
 def test_schedule_command_schedule(scheduler: commands2.CommandScheduler):
     command1 = commands2.Command()

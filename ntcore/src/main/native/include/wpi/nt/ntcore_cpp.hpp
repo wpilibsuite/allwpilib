@@ -416,13 +416,16 @@ NT_Inst CreateInstance();
 /**
  * Reset the internals of an instance. Every handle previously associated
  * with this instance will no longer be valid, except for the instance
- * handle.
+ * handle. This should not be called from a listener callback.
  */
 void ResetInstance(NT_Inst inst);
 
 /**
  * Destroy an instance.
  * The default instance cannot be destroyed.
+ * This should not be called from a listener callback.
+ * The behavior of concurrent calls of this function on the same instance is
+ * undefined.
  *
  * @param inst Instance handle
  */
@@ -1531,7 +1534,7 @@ struct SubscriberOptions {
  */
 struct TopicPublisher {
   std::string client;
-  uint64_t pubuid = 0;
+  int64_t pubuid = 0;
 };
 
 /**
@@ -1539,7 +1542,7 @@ struct TopicPublisher {
  */
 struct TopicSubscriber {
   std::string client;
-  uint64_t subuid = 0;
+  int64_t subuid = 0;
   SubscriberOptions options;
 };
 

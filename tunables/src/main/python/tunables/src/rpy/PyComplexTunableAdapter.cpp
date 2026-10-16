@@ -2,8 +2,11 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
+#include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "PyTunableTable.h"
 #include "TunableStorage.h"
@@ -32,14 +35,26 @@ bool IsPathOrDescendant(std::string_view candidate, std::string_view path) {
   return IsPathOrDescendant(candidate, path, MakeChildPrefix(path));
 }
 
+std::optional<py::weakref> TryCreateWeakref(py::handle value) {
+  PyObject* ref = PyWeakref_NewRef(value.ptr(), nullptr);
+  if (!ref) {
+    if (PyErr_ExceptionMatches(PyExc_TypeError)) {
+      PyErr_Clear();
+      return std::nullopt;
+    }
+    throw py::error_already_set();
+  }
+  return py::reinterpret_steal<py::weakref>(ref);
+}
+
 }  // namespace
 
 PyComplexTunableAdapter::PyComplexTunableAdapter(
     py::object value, py::object initialPublishTunable)
-    : m_tableOwnerContext{std::make_shared<TunableTableOwnerContext>()},
-      m_value{std::move(value)},
+    : m_value{std::move(value)},
+      m_valueRef{TryCreateWeakref(*m_value)},
       m_initialPublishTunable{std::move(initialPublishTunable)} {
-  if (auto getTunableType = GetOptionalAttr(m_value, "get_tunable_type")) {
+  if (auto getTunableType = GetOptionalAttr(*m_value, "get_tunable_type")) {
     py::object typeObj = (*getTunableType)();
     if (!typeObj.is_none()) {
       m_type = typeObj.cast<std::string>();
@@ -52,7 +67,64 @@ std::string_view PyComplexTunableAdapter::GetTunableType() const {
 }
 
 bool PyComplexTunableAdapter::IsValue(py::handle value) const {
-  return m_value.is(value);
+  if (m_value) {
+    return m_value->is(value);
+  }
+  return m_valueRef && (*m_valueRef)().is(value);
+}
+
+void PyComplexTunableAdapter::RetainValue(py::object value,
+                                          py::object initialPublishTunable) {
+  m_value = std::move(value);
+  m_initialPublishTunable = std::move(initialPublishTunable);
+}
+
+void PyComplexTunableAdapter::RetainPublication() {
+  ++m_retainCount;
+}
+
+void PyComplexTunableAdapter::ReleasePublication() {
+  if (m_retainCount <= 0) {
+    return;
+  }
+  --m_retainCount;
+  if (m_retainCount == 0) {
+    ReleaseValueIfUnpublished();
+  }
+}
+
+void PyComplexTunableAdapter::ReleaseValueIfUnpublished() {
+  if (m_retainCount == 0) {
+    ReleaseRetainedValues();
+    m_initialPublishTunable.reset();
+    if (!m_valueRef && m_value) {
+      detail::ForgetComplex(*m_value, this);
+    }
+    m_value.reset();
+  }
+}
+
+py::object PyComplexTunableAdapter::GetValue() const {
+  if (m_value) {
+    return *m_value;
+  }
+  if (!m_valueRef) {
+    throw std::runtime_error("complex tunable object is no longer valid");
+  }
+  py::object value = (*m_valueRef)();
+  if (value.is_none()) {
+    throw std::runtime_error("complex tunable object is no longer valid");
+  }
+  return value;
+}
+
+void PyComplexTunableAdapter::ReleaseRetainedValues() {
+  m_values.clear();
+  for (auto&& child : m_complex) {
+    child.second->ReleasePublication();
+  }
+  m_complex.clear();
+  m_nativeComplex.clear();
 }
 
 void PyComplexTunableAdapter::PublishTunable(
@@ -63,17 +135,21 @@ void PyComplexTunableAdapter::PublishTunable(
     publishTunable = std::move(*m_initialPublishTunable);
     m_initialPublishTunable.reset();
   } else {
-    publishTunable = m_value.attr("publish_tunables");
+    publishTunable = GetValue().attr("publish_tunables");
   }
-  m_tableOwnerContext->owner = shared_from_this();
+  // Revision identity is shared across aliases, but table validity belongs to
+  // this publication. Removed table contexts must never be reused.
+  auto ownerContext = std::make_shared<TunableTableOwnerContext>();
+  ownerContext->owner = shared_from_this();
+  ownerContext->path = NormalizePath(table.GetPath());
   publishTunable(table::MakePythonTable(wpi::tunables::TunableTable{table},
-                                        m_tableOwnerContext));
+                                        std::move(ownerContext)));
 }
 
 void PyComplexTunableAdapter::UpdateTunable() const {
   py::gil_scoped_acquire gil;
   py::object updateTunable =
-      py::getattr(m_value, "update_tunables", py::none());
+      py::getattr(GetValue(), "update_tunables", py::none());
   if (!updateTunable.is_none()) {
     updateTunable();
   }
@@ -94,10 +170,15 @@ void PyComplexTunableAdapter::AddComplex(
     std::string path, std::shared_ptr<PyComplexTunableAdapter> value) {
   for (auto&& child : m_complex) {
     if (child.first == path) {
-      child.second = std::move(value);
+      if (child.second != value) {
+        child.second->ReleasePublication();
+        value->RetainPublication();
+        child.second = std::move(value);
+      }
       return;
     }
   }
+  value->RetainPublication();
   m_complex.emplace_back(std::move(path), std::move(value));
 }
 
@@ -113,7 +194,7 @@ void PyComplexTunableAdapter::AddNativeComplex(std::string path,
 }
 
 void PyComplexTunableAdapter::RemovePath(std::string_view path) {
-  table::InvalidatePendingPublications(path);
+  table::InvalidatePublications(path);
   {
     py::gil_scoped_release release;
     wpi::tunables::TunableRegistry::Remove(path);
@@ -124,22 +205,39 @@ void PyComplexTunableAdapter::RemovePath(std::string_view path) {
 void PyComplexTunableAdapter::RemoveRetainedPath(std::string_view path) {
   RemoveRefreshPath(path);
   std::string childPrefix = MakeChildPrefix(path);
-  std::erase_if(m_values, [&](auto&& child) {
-    return IsPathOrDescendant(child.first, path, childPrefix);
-  });
-  for (auto it = m_complex.begin(); it != m_complex.end();) {
-    if (IsPathOrDescendant(it->first, path, childPrefix)) {
-      it = m_complex.erase(it);
-    } else if (IsPathOrDescendant(path, it->first)) {
-      it->second->RemoveRetainedPath(path);
-      ++it;
-    } else {
-      ++it;
+  std::vector<std::shared_ptr<PyComplexTunableAdapter>> pending{
+      shared_from_this()};
+  std::vector<std::shared_ptr<PyComplexTunableAdapter>> removed;
+  // Aliases can form cycles. Visit each adapter once and detach all matching
+  // links before releasing publications, which can release more child state.
+  for (size_t i = 0; i < pending.size(); ++i) {
+    auto tunable = pending[i];
+    std::erase_if(tunable->m_values, [&](auto&& child) {
+      return IsPathOrDescendant(child.first, path, childPrefix);
+    });
+    for (auto it = tunable->m_complex.begin();
+         it != tunable->m_complex.end();) {
+      bool remove = IsPathOrDescendant(it->first, path, childPrefix);
+      if (remove || IsPathOrDescendant(path, it->first)) {
+        if (std::find(pending.begin(), pending.end(), it->second) ==
+            pending.end()) {
+          pending.emplace_back(it->second);
+        }
+      }
+      if (remove) {
+        removed.emplace_back(std::move(it->second));
+        it = tunable->m_complex.erase(it);
+      } else {
+        ++it;
+      }
     }
+    std::erase_if(tunable->m_nativeComplex, [&](auto&& child) {
+      return IsPathOrDescendant(child.first, path, childPrefix);
+    });
   }
-  std::erase_if(m_nativeComplex, [&](auto&& child) {
-    return IsPathOrDescendant(child.first, path, childPrefix);
-  });
+  for (auto&& child : removed) {
+    child->ReleasePublication();
+  }
 }
 
 }  // namespace wpi::tunables::python

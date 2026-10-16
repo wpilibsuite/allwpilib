@@ -11,8 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/math/geometry/Pose2d.hpp"
-#include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/units/time.hpp"
 
 namespace wpi::math {
@@ -124,17 +122,6 @@ class Trajectory {
   }
 
   /**
-   * Sample the trajectory at a point in time.
-   *
-   * @param t The point in time since the beginning of the trajectory to sample
-   *          (in seconds).
-   * @return The sample at that point in time.
-   */
-  SampleType SampleAt(double t) const {
-    return SampleAt(wpi::units::second_t{t});
-  }
-
-  /**
    * Interpolates between two samples. This method must be implemented by
    * subclasses to provide drivetrain-specific interpolation logic.
    *
@@ -145,13 +132,6 @@ class Trajectory {
    */
   virtual SampleType Interpolate(const SampleType& start, const SampleType& end,
                                  double t) const = 0;
-
-  /**
-   * Returns the initial pose of the trajectory.
-   *
-   * @return The initial pose of the trajectory.
-   */
-  Pose2d InitialPose() const { return m_samples.front().pose; }
 
   /**
    * Checks equality between this Trajectory and another object.
@@ -165,42 +145,6 @@ class Trajectory {
   virtual ~Trajectory() = default;
 
  protected:
-  /**
-   * Returns all samples transformed to be relative to the given pose.
-   *
-   * @param pose The pose to make samples relative to.
-   * @return A vector of samples relative to the given pose.
-   */
-  std::vector<SampleType> RelativeSamples(const Pose2d& pose) const {
-    std::vector<SampleType> out;
-    out.reserve(m_samples.size());
-    for (const auto& s : m_samples) {
-      out.emplace_back(s.RelativeTo(pose));
-    }
-    return out;
-  }
-
-  /**
-   * Returns the concatenation of this trajectory's samples with another list,
-   * offsetting the other samples' times by this trajectory's duration.
-   *
-   * @param other The samples to concatenate.
-   * @return A vector containing all samples in order.
-   */
-  std::vector<SampleType> ConcatenateSamples(
-      const std::vector<SampleType>& other) const {
-    std::vector<SampleType> out;
-    out.reserve(m_samples.size() + other.size());
-    // copy existing
-    out.insert(out.end(), m_samples.begin(), m_samples.end());
-    // append other with time offset
-    for (auto s : other) {
-      s.time += m_duration;
-      out.emplace_back(std::move(s));
-    }
-    return out;
-  }
-
   std::vector<SampleType> m_samples;
   std::map<wpi::units::second_t, SampleType> m_sampleMap;
   wpi::units::second_t m_duration{0};

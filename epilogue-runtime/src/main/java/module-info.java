@@ -5,14 +5,16 @@
 /**
  * Provides APIs for telemetry and data logging, used by code generated based on the presence of the
  * {@link org.wpilib.epilogue.Logged} annotation on classes, fields, and methods. The epilogue
- * annotation processor - in a separate module - performs the actual code generation, including
- * generating the {@code org.wpilib.epilogue.generated.Epilogue} entrypoint.
+ * annotation processor - in a separate module - performs the actual code generation.
  */
 open module wpilib.epilogue {
+  requires transitive wpilib.core;
   requires transitive wpilib.telemetry;
   requires transitive wpilib.units;
 
   exports org.wpilib.epilogue;
   exports org.wpilib.epilogue.logging;
   exports org.wpilib.epilogue.logging.errors;
+
+  uses org.wpilib.epilogue.EpilogueService;
 }

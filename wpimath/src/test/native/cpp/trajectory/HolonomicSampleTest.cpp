@@ -257,7 +257,7 @@ TEST_CASE("HolonomicSampleTest SplineSampleStoresFieldRelativeVelocity",
       0_s, wpi::math::Pose2d{0_m, 0_m, 90_deg}, forwardVelocity,
       forwardAcceleration, curvature};
 
-  // Field-relative: forward speed rotated into +y.
+  // Field-relative: forward velocity rotated into +y.
   CHECK_NEAR_UNITS(0_mps, sample.velocity.vx, 1e-9_mps);
   CHECK_NEAR_UNITS(forwardVelocity, sample.velocity.vy, 1e-9_mps);
   // Omega is frame-invariant and equals forward * curvature.
@@ -347,9 +347,10 @@ TEST_CASE("HolonomicSampleTest SplineSampleTransformPreservesForwardScalars",
   }
 }
 
-TEST_CASE("HolonomicSampleTest DifferentialSampleTransformPreservesWheelSpeeds",
-          "[wpimath]") {
-  // Wheel speeds are frame-invariant, so they survive a transform unchanged
+TEST_CASE(
+    "HolonomicSampleTest DifferentialSampleTransformPreservesWheelVelocities",
+    "[wpimath]") {
+  // Wheel velocities are frame-invariant, so they survive a transform unchanged
   // while the field-relative velocity rotates.
   wpi::math::DifferentialDriveKinematics kinematics{0.5_m};
   wpi::math::DifferentialSample sample{

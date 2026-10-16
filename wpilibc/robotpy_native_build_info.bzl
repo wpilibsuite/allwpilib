@@ -64,7 +64,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib Robotics Library",
         requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpinet==0.0.0", "robotpy-native-ntcore==0.0.0", "robotpy-native-wpimath==0.0.0", "robotpy-native-wpihal==0.0.0", "robotpy-native-telemetry==0.0.0", "robotpy-native-tunables==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["wpilibc"],
         entry_points = {
             "pkg_config": [

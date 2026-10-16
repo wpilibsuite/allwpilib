@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 import wpilib_drivers
 
@@ -29,6 +31,7 @@ class MyRobot(wpilib.TimedRobot):
         # gearbox is constructed, you might have to invert the left side instead.
         right_motor.set_inverted(True)
 
+    @override
     def teleop_periodic(self):
         # Drive with split arcade style
         # That means that the Y axis of the left stick moves forward

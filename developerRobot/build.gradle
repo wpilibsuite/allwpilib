@@ -37,8 +37,6 @@ application {
     mainModule = 'wpilib.developerrobot'
 }
 
-apply plugin: 'com.gradleup.shadow'
-
 repositories {
     maven {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'

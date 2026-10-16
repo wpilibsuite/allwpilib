@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import math
 import commands2
 
@@ -25,20 +27,24 @@ class TurnDegrees(commands2.Command):
         self.drive = drive
         self.add_requirements(drive)
 
+    @override
     def initialize(self) -> None:
         """Called when the command is initially scheduled."""
         # Set motors to stop, read encoder values for starting point
         self.drive.arcade_drive(0, 0)
         self.drive.reset_encoders()
 
+    @override
     def execute(self) -> None:
         """Called every time the scheduler runs while the command is scheduled."""
         self.drive.arcade_drive(0, self.velocity)
 
+    @override
     def end(self, interrupted: bool) -> None:
         """Called once the command ends or is interrupted."""
         self.drive.arcade_drive(0, 0)
 
+    @override
     def is_finished(self) -> bool:
         """Returns true when the command should end."""
 

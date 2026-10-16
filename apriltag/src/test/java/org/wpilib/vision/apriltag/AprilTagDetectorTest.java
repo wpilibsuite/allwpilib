@@ -7,6 +7,7 @@ package org.wpilib.vision.apriltag;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,7 +22,6 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.wpilib.math.geometry.Transform3d;
-import org.wpilib.math.util.Units;
 import org.wpilib.util.runtime.RuntimeLoader;
 
 class AprilTagDetectorTest {
@@ -211,9 +211,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
     } finally {
       image.release();
     }
@@ -244,9 +244,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(Units.degreesToRadians(45), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(degreesToRadians(45), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
     } finally {
       image.release();
     }
@@ -274,9 +274,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(Units.degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
     } finally {
       image.release();
     }

@@ -937,18 +937,12 @@ void NetworkTablesModel::ValueSource::UpdateFromValue(
           valueChildren.clear();
         }
       } else if (auto filename = wpi::util::remove_prefix(typeStr, "proto:")) {
-        const upb_MessageDef* messageDef = upb_DefPool_FindMessageByName(
-            model.GetProtobufDatabase(), filename->data());
+        const upb_MessageDef* messageDef =
+            model.GetProtobufDatabase().Find(filename->data());
         if (messageDef) {
-          auto raw = value.GetRaw();
-          const upb_MiniTable* miniTable = upb_MessageDef_MiniTable(messageDef);
-
           upb_Message* message =
-              upb_Message_New(miniTable, model.GetProtobufArena());
-          upb_DecodeStatus status = upb_Decode(
-              reinterpret_cast<const char*>(raw.data()), raw.size(), message,
-              miniTable, nullptr, 0, model.GetProtobufArena());
-          if (status == kUpb_DecodeStatus_Ok) {
+              model.GetProtobufDatabase().Decode(messageDef, value.GetRaw());
+          if (message != nullptr) {
             UpdateProtobufValueSource(model, this, message, messageDef, name,
                                       value.last_change());
           } else {
@@ -1091,16 +1085,7 @@ void NetworkTablesModel::Update() {
                    entry->value.IsRaw() && filename &&
                    entry->info.type_str == "proto:FileDescriptorProto") {
           // protobuf descriptor handling
-          upb_Status status;
-          status.ok = true;
-          auto descriptor = entry->value.GetRaw();
-          upb_DefPool_AddFile(
-              m_protoPool,
-              google_protobuf_FileDescriptorProto_parse(
-                  reinterpret_cast<const char*>(descriptor.data()),
-                  descriptor.size(), m_arena),
-              &status);
-          if (!status.ok) {
+          if (!m_protoDb.Add(entry->value.GetRaw())) {
             wpi::util::print("could not decode protobuf '{}' filename '{}'\n",
                              entry->info.name, *filename);
           } else {

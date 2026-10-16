@@ -1,9 +1,8 @@
 from ._wpilib import RobotBase
 import json
-import typing
 
 
-def get_deploy_data() -> typing.Optional[typing.Dict[str, str]]:
+def get_deploy_data() -> dict[str, str] | None:
     """
     Utility function useful for retrieving deploy-related information
     that pyfrc stores with your robot code. The dictionary has the
