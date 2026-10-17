@@ -1,0 +1,23 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "I2CCommunication",
+    size = "small",
+    srcs = [
+        "cpp/I2CCommunicationTest.cpp",
+        "cpp/main.cpp",
+        "//wpilibcExamples/src/main/cpp/snippets/I2CCommunication:cpp/Robot.cpp",
+    ],
+    defines = ["RUNNING_WPILIB_TESTS=1"],
+    tags = [
+        "exclusive-if-local",
+        "no-asan",
+        "no-tsan",
+        "no-ubsan",
+        "wpi-example",
+    ],
+    deps = [
+        "//thirdparty/catch2",
+        "//wpilibcExamples/src/main/cpp/snippets/I2CCommunication:I2CCommunication_lib",
+    ],
+)
