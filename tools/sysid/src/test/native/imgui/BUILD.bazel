@@ -1,0 +1,15 @@
+load("//shared/bazel/rules:imgui_test.bzl", "wpilib_imgui_cc_test")
+
+wpilib_imgui_cc_test(
+    name = "sysid_imgui_tests",
+    size = "small",
+    srcs = glob(["*.cpp"]),
+    deps = [
+        "//tools/sysid:sysid_lib_for_tests",
+    ],
+)
+
+alias(
+    name = "imgui",
+    actual = ":sysid_imgui_tests",
+)
