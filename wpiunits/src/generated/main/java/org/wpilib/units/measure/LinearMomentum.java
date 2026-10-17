@@ -217,12 +217,12 @@ public record LinearMomentum(double magnitude, double baseUnitMagnitude, LinearM
   }
 
   @Override
-  public Per<LinearMomentumUnit, ForceUnit> div(Force divisor) {
-    return (Per<LinearMomentumUnit, ForceUnit>) Measure.super.div(divisor);
+  public Time div(Force divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<LinearMomentumUnit, ForceUnit> per(ForceUnit divisorUnit) {
+  public Time per(ForceUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

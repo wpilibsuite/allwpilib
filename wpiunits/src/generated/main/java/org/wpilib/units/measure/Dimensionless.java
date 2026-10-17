@@ -233,12 +233,12 @@ public record Dimensionless(double magnitude, double baseUnitMagnitude, Dimensio
   }
 
   @Override
-  public Per<DimensionlessUnit, FrequencyUnit> div(Frequency divisor) {
-    return (Per<DimensionlessUnit, FrequencyUnit>) Measure.super.div(divisor);
+  public Time div(Frequency divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<DimensionlessUnit, FrequencyUnit> per(FrequencyUnit divisorUnit) {
+  public Time per(FrequencyUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

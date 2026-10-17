@@ -249,12 +249,12 @@ public record LinearVelocity(double magnitude, double baseUnitMagnitude, LinearV
   }
 
   @Override
-  public Per<LinearVelocityUnit, LinearAccelerationUnit> div(LinearAcceleration divisor) {
-    return (Per<LinearVelocityUnit, LinearAccelerationUnit>) Measure.super.div(divisor);
+  public Time div(LinearAcceleration divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<LinearVelocityUnit, LinearAccelerationUnit> per(LinearAccelerationUnit divisorUnit) {
+  public Time per(LinearAccelerationUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 

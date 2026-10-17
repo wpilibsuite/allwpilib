@@ -313,12 +313,12 @@ public record AngularMomentum(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularMomentumUnit, MomentOfInertiaUnit> div(MomentOfInertia divisor) {
-    return (Per<AngularMomentumUnit, MomentOfInertiaUnit>) Measure.super.div(divisor);
+  public AngularVelocity div(MomentOfInertia divisor) {
+    return RadiansPerSecond.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularMomentumUnit, MomentOfInertiaUnit> per(MomentOfInertiaUnit divisorUnit) {
+  public AngularVelocity per(MomentOfInertiaUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -409,12 +409,12 @@ public record AngularMomentum(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Velocity<AngularMomentumUnit> div(Time divisor) {
-    return VelocityUnit.combine(unit(), divisor.unit()).ofBaseUnits(baseUnitMagnitude() / divisor.baseUnitMagnitude());
+  public Torque div(Time divisor) {
+    return NewtonMeters.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Velocity<AngularMomentumUnit> per(TimeUnit divisorUnit) {
+  public Torque per(TimeUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
@@ -425,12 +425,12 @@ public record AngularMomentum(double magnitude, double baseUnitMagnitude, Angula
   }
 
   @Override
-  public Per<AngularMomentumUnit, TorqueUnit> div(Torque divisor) {
-    return (Per<AngularMomentumUnit, TorqueUnit>) Measure.super.div(divisor);
+  public Time div(Torque divisor) {
+    return Seconds.of(baseUnitMagnitude() / divisor.baseUnitMagnitude());
   }
 
   @Override
-  public Per<AngularMomentumUnit, TorqueUnit> per(TorqueUnit divisorUnit) {
+  public Time per(TorqueUnit divisorUnit) {
     return div(divisorUnit.one());
   }
 
