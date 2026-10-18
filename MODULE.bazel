@@ -26,7 +26,7 @@ bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_python", version = "1.9.0")
-bazel_dep(name = "rules_pycross", version = "0.8.2")
+bazel_dep(name = "rules_pycross", version = "2.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 single_version_override(
     module_name = "pybind11_bazel",
@@ -39,7 +39,7 @@ publishing = use_extension("//shared/bazel/rules:publishing_rule.bzl", "publishi
 use_repo(publishing, "com_wpilib_allwpilib_publishing_config")
 
 pycross = use_extension("@rules_pycross//pycross/extensions:pycross.bzl", "pycross")
-pycross.configure_environments(
+pycross.configure_toolchains(
     python_versions = ["3.13"],
 )
 
