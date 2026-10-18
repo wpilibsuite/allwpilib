@@ -421,12 +421,12 @@ class OpModeRobotTest {
     DriverStationSim.setOpMode(getOnlyOpModeId());
     DriverStationSim.notifyNewData();
 
-    // Opmode gets one disabledPeriodic call, then starts on the same loop; the robot's disabled
-    // functions do not run
+    // Opmode starts on the same loop it is created without any disabledPeriodic call; the robot's
+    // disabled functions do not run
     SimHooks.stepTiming(PERIOD);
     MockOpMode opMode = robot.m_opMode;
     assertNotNull(opMode);
-    assertEquals(1, opMode.m_disabledPeriodicCount.get());
+    assertEquals(0, opMode.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_startCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());

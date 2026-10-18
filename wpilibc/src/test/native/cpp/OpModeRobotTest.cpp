@@ -346,12 +346,12 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
   wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  // Opmode gets one DisabledPeriodic call, then starts on the same loop; the
-  // robot's disabled functions do not run
+  // Opmode starts on the same loop it is created without any DisabledPeriodic
+  // call; the robot's disabled functions do not run
   wpi::sim::StepTiming(PERIOD);
   MockOpMode* opMode = robot.m_opMode.load();
   REQUIRE(opMode != nullptr);
-  CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 0u);
   CHECK(opMode->m_startCount.load() == 1u);
   CHECK(robot.m_disabledInitCount.load() == 0u);
   CHECK(robot.m_disabledPeriodicCount.load() == 0u);

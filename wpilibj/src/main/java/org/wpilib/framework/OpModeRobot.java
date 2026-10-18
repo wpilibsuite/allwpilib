@@ -683,14 +683,6 @@ public abstract class OpModeRobot extends RobotBase {
           // Register the opmode's additional periodic callbacks immediately on creation
           m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
           m_callbacks.addAll(m_activeOpModeCallbacks);
-
-          // An opmode created while enabled still gets one disabledPeriodic call before
-          // starting, as it may contain setup code. When disabled, it is called below with the
-          // rest of the disabled periodic functions.
-          if (enabled) {
-            m_currentOpMode.disabledPeriodic();
-            m_watchdog.addEpoch("opMode.disabledPeriodic()");
-          }
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);

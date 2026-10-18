@@ -112,14 +112,6 @@ void OpModeRobotBase::LoopFunc() {
         for (auto& cb : m_activeOpModeCallbacks) {
           m_callbacks.Add(cb);
         }
-
-        // An opmode created while enabled still gets one DisabledPeriodic call
-        // before starting, as it may contain setup code. When disabled, it is
-        // called below with the rest of the disabled periodic functions.
-        if (enabled) {
-          m_currentOpMode->DisabledPeriodic();
-          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
-        }
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);
