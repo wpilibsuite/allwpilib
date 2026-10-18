@@ -19,16 +19,16 @@ public class MecanumDriveWheelAccelerations
         ProtobufSerializable,
         StructSerializable {
   /** Acceleration of the front left wheel in meters per second squared. */
-  public double frontLeft;
+  public final double frontLeft;
 
   /** Acceleration of the front right wheel in meters per second squared. */
-  public double frontRight;
+  public final double frontRight;
 
   /** Acceleration of the rear left wheel in meters per second squared. */
-  public double rearLeft;
+  public final double rearLeft;
 
   /** Acceleration of the rear right wheel in meters per second squared. */
-  public double rearRight;
+  public final double rearRight;
 
   /** MecanumDriveWheelAccelerations protobuf for serialization. */
   public static final MecanumDriveWheelAccelerationsProto proto =
@@ -39,7 +39,9 @@ public class MecanumDriveWheelAccelerations
       new MecanumDriveWheelAccelerationsStruct();
 
   /** Constructs a MecanumDriveWheelAccelerations with zeros for all member fields. */
-  public MecanumDriveWheelAccelerations() {}
+  public MecanumDriveWheelAccelerations() {
+    this(0.0, 0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a MecanumDriveWheelAccelerations.

@@ -19,9 +19,9 @@ class QuaternionProtoTest {
     Quaternion.proto.pack(proto, DATA);
 
     Quaternion data = Quaternion.proto.unpack(proto);
-    assertEquals(DATA.getW(), data.getW());
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
-    assertEquals(DATA.getZ(), data.getZ());
+    assertEquals(DATA.w, data.w);
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
+    assertEquals(DATA.z, data.z);
   }
 }

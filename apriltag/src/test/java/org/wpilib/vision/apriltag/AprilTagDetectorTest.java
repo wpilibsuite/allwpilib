@@ -211,9 +211,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(degreesToRadians(45), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(45), est.pose1.rotation.getX(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getZ(), 0.1);
     } finally {
       image.release();
     }
@@ -244,9 +244,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(degreesToRadians(45), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getX(), 0.1);
+      assertEquals(degreesToRadians(45), est.pose1.rotation.getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getZ(), 0.1);
     } finally {
       image.release();
     }
@@ -274,9 +274,9 @@ class AprilTagDetectorTest {
                   0.2, 500, 500, image.cols() / 2.0, image.rows() / 2.0));
       AprilTagPoseEstimate est = estimator.estimateOrthogonalIteration(results[0], 200);
 
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getX(), 0.1);
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getY(), 0.1);
-      assertEquals(degreesToRadians(0), est.pose1.getRotation().getZ(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getX(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getY(), 0.1);
+      assertEquals(degreesToRadians(0), est.pose1.rotation.getZ(), 0.1);
     } finally {
       image.release();
     }

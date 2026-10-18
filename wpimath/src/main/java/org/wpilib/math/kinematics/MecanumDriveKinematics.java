@@ -293,10 +293,10 @@ public class MecanumDriveKinematics
    */
   private void setInverseKinematics(
       Translation2d fl, Translation2d fr, Translation2d rl, Translation2d rr) {
-    m_inverseKinematics.setRow(0, 0, 1, -1, -(fl.getX() + fl.getY()));
-    m_inverseKinematics.setRow(1, 0, 1, 1, fr.getX() - fr.getY());
-    m_inverseKinematics.setRow(2, 0, 1, 1, rl.getX() - rl.getY());
-    m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.getX() + rr.getY()));
+    m_inverseKinematics.setRow(0, 0, 1, -1, -(fl.x + fl.y));
+    m_inverseKinematics.setRow(1, 0, 1, 1, fr.x - fr.y);
+    m_inverseKinematics.setRow(2, 0, 1, 1, rl.x - rl.y);
+    m_inverseKinematics.setRow(3, 0, 1, -1, -(rr.x + rr.y));
   }
 
   /**
@@ -339,14 +339,6 @@ public class MecanumDriveKinematics
   public MecanumDriveWheelPositions copy(MecanumDriveWheelPositions positions) {
     return new MecanumDriveWheelPositions(
         positions.frontLeft, positions.frontRight, positions.rearLeft, positions.rearRight);
-  }
-
-  @Override
-  public void copyInto(MecanumDriveWheelPositions positions, MecanumDriveWheelPositions output) {
-    output.frontLeft = positions.frontLeft;
-    output.frontRight = positions.frontRight;
-    output.rearLeft = positions.rearLeft;
-    output.rearRight = positions.rearRight;
   }
 
   @Override

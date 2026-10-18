@@ -217,8 +217,7 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
       m_reported = true;
     }
 
-    driveCartesian(
-        magnitude * angle.getCos(), magnitude * angle.getSin(), zRotation, Rotation2d.ZERO);
+    driveCartesian(magnitude * angle.cos, magnitude * angle.sin, zRotation, Rotation2d.ZERO);
   }
 
   /**
@@ -261,10 +260,10 @@ public class MecanumDrive extends RobotDriveBase implements TelemetryLoggable {
     var input = new Translation2d(xVelocity, yVelocity).rotateBy(gyroAngle.unaryMinus());
 
     double[] wheelVelocities = new double[4];
-    wheelVelocities[MotorType.FRONT_LEFT.value] = input.getX() + input.getY() + zRotation;
-    wheelVelocities[MotorType.FRONT_RIGHT.value] = input.getX() - input.getY() - zRotation;
-    wheelVelocities[MotorType.REAR_LEFT.value] = input.getX() - input.getY() + zRotation;
-    wheelVelocities[MotorType.REAR_RIGHT.value] = input.getX() + input.getY() - zRotation;
+    wheelVelocities[MotorType.FRONT_LEFT.value] = input.x + input.y + zRotation;
+    wheelVelocities[MotorType.FRONT_RIGHT.value] = input.x - input.y - zRotation;
+    wheelVelocities[MotorType.REAR_LEFT.value] = input.x - input.y + zRotation;
+    wheelVelocities[MotorType.REAR_RIGHT.value] = input.x + input.y - zRotation;
 
     normalize(wheelVelocities);
 

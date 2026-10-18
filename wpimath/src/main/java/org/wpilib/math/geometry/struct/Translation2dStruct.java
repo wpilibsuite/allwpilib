@@ -38,8 +38,8 @@ public final class Translation2dStruct implements Struct<Translation2d> {
 
   @Override
   public void pack(ByteBuffer bb, Translation2d value) {
-    bb.putDouble(value.getX());
-    bb.putDouble(value.getY());
+    bb.putDouble(value.x);
+    bb.putDouble(value.y);
   }
 
   @Override

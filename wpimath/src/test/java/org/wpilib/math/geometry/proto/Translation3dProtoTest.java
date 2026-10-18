@@ -19,8 +19,8 @@ class Translation3dProtoTest {
     Translation3d.proto.pack(proto, DATA);
 
     Translation3d data = Translation3d.proto.unpack(proto);
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
-    assertEquals(DATA.getZ(), data.getZ());
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
+    assertEquals(DATA.z, data.z);
   }
 }

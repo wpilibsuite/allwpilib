@@ -57,8 +57,8 @@ class TimeInterpolatableBufferTest {
     buffer.addSample(1.0, new Pose2d(1.0, 1.0, Rotation2d.ZERO));
     Pose2d sample = buffer.getSample(0.5).get();
 
-    assertEquals(1.0 - 1.0 / Math.sqrt(2.0), sample.getTranslation().getX(), 0.01);
-    assertEquals(1.0 / Math.sqrt(2.0), sample.getTranslation().getY(), 0.01);
-    assertEquals(45.0, sample.getRotation().getDegrees(), 0.01);
+    assertEquals(1.0 - 1.0 / Math.sqrt(2.0), sample.translation.x, 0.01);
+    assertEquals(1.0 / Math.sqrt(2.0), sample.translation.y, 0.01);
+    assertEquals(45.0, sample.rotation.getDegrees(), 0.01);
   }
 }

@@ -39,9 +39,9 @@ public final class Translation3dStruct implements Struct<Translation3d> {
 
   @Override
   public void pack(ByteBuffer bb, Translation3d value) {
-    bb.putDouble(value.getX());
-    bb.putDouble(value.getY());
-    bb.putDouble(value.getZ());
+    bb.putDouble(value.x);
+    bb.putDouble(value.y);
+    bb.putDouble(value.z);
   }
 
   @Override

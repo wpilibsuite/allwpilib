@@ -32,9 +32,9 @@ public final class Translation3dProto implements Protobuf<Translation3d, Protobu
 
   @Override
   public void pack(ProtobufTranslation3d msg, Translation3d value) {
-    msg.setX(value.getX());
-    msg.setY(value.getY());
-    msg.setZ(value.getZ());
+    msg.setX(value.x);
+    msg.setY(value.y);
+    msg.setZ(value.z);
   }
 
   @Override

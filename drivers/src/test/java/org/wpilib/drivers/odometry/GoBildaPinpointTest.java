@@ -179,7 +179,7 @@ class GoBildaPinpointTest {
       Pose2d pose = pinpoint.getPose();
       assertEquals(1.2345, pose.getX(), DELTA);
       assertEquals(-0.67825, pose.getY(), DELTA);
-      assertEquals(new Rotation2d(7.25), pose.getRotation());
+      assertEquals(new Rotation2d(7.25), pose.rotation);
     }
   }
 
@@ -343,7 +343,7 @@ class GoBildaPinpointTest {
 
       assertEquals(2.0, pose.getX(), DELTA);
       assertEquals(3.0, pose.getY(), DELTA);
-      assertEquals(0.2, pose.getRotation().getRadians(), DELTA);
+      assertEquals(0.2, pose.rotation.getRadians(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
       assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(12, m_readCounts.get(readCount));
@@ -369,7 +369,7 @@ class GoBildaPinpointTest {
 
       assertEquals(2.0, pose.getX(), DELTA);
       assertEquals(3.0, pose.getY(), DELTA);
-      assertEquals(0.2, pose.getRotation().getRadians(), DELTA);
+      assertEquals(0.2, pose.rotation.getRadians(), DELTA);
       assertEquals(Register.Y_POSITION, pinpoint.getLastFailedRegister());
       assertEquals(FailureReason.NONFINITE_VALUE, pinpoint.getLastFailureReason());
     }
@@ -394,7 +394,7 @@ class GoBildaPinpointTest {
 
       assertEquals(4.0, pose.getX(), DELTA);
       assertEquals(-5.0, pose.getY(), DELTA);
-      assertEquals(1.25, pose.getRotation().getRadians(), DELTA);
+      assertEquals(1.25, pose.rotation.getRadians(), DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
       assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(13, m_readCounts.get(readCount));
@@ -417,10 +417,10 @@ class GoBildaPinpointTest {
 
       var quaternion = pinpoint.getQuaternion();
 
-      assertEquals(0.5, quaternion.getW(), DELTA);
-      assertEquals(-0.25, quaternion.getX(), DELTA);
-      assertEquals(0.125, quaternion.getY(), DELTA);
-      assertEquals(0.75, quaternion.getZ(), DELTA);
+      assertEquals(0.5, quaternion.w, DELTA);
+      assertEquals(-0.25, quaternion.x, DELTA);
+      assertEquals(0.125, quaternion.y, DELTA);
+      assertEquals(0.75, quaternion.z, DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
       assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(16, m_readCounts.get(readCount));
@@ -430,10 +430,10 @@ class GoBildaPinpointTest {
           concat(encodeFloat(0.6f), encodeFloat(Float.NaN), encodeFloat(0.2f), encodeFloat(0.7f)));
       quaternion = pinpoint.getQuaternion();
 
-      assertEquals(0.5, quaternion.getW(), DELTA);
-      assertEquals(-0.25, quaternion.getX(), DELTA);
-      assertEquals(0.125, quaternion.getY(), DELTA);
-      assertEquals(0.75, quaternion.getZ(), DELTA);
+      assertEquals(0.5, quaternion.w, DELTA);
+      assertEquals(-0.25, quaternion.x, DELTA);
+      assertEquals(0.125, quaternion.y, DELTA);
+      assertEquals(0.75, quaternion.z, DELTA);
       assertEquals(Register.QUATERNION_X, pinpoint.getLastFailedRegister());
       assertEquals(FailureReason.NONFINITE_VALUE, pinpoint.getLastFailureReason());
     }
@@ -573,7 +573,7 @@ class GoBildaPinpointTest {
       pose = pinpoint.getPose();
       assertEquals(7.0, pose.getX(), DELTA);
       assertEquals(8.0, pose.getY(), DELTA);
-      assertEquals(1.0, pose.getRotation().getRadians(), DELTA);
+      assertEquals(1.0, pose.rotation.getRadians(), DELTA);
       assertEquals(0, pinpoint.getFailureCount());
 
       setRegister(
@@ -581,7 +581,7 @@ class GoBildaPinpointTest {
       pose = pinpoint.getPose();
       assertEquals(7.0, pose.getX(), DELTA);
       assertEquals(8.0, pose.getY(), DELTA);
-      assertEquals(1.0, pose.getRotation().getRadians(), DELTA);
+      assertEquals(1.0, pose.rotation.getRadians(), DELTA);
       assertEquals(FailureReason.CHANGE_TOO_LARGE, pinpoint.getLastFailureReason());
     }
   }
@@ -841,10 +841,10 @@ class GoBildaPinpointTest {
 
       var quaternion = pinpoint.getQuaternion();
 
-      assertEquals(0.5, quaternion.getW(), DELTA);
-      assertEquals(-0.25, quaternion.getX(), DELTA);
-      assertEquals(0.125, quaternion.getY(), DELTA);
-      assertEquals(0.75, quaternion.getZ(), DELTA);
+      assertEquals(0.5, quaternion.w, DELTA);
+      assertEquals(-0.25, quaternion.x, DELTA);
+      assertEquals(0.125, quaternion.y, DELTA);
+      assertEquals(0.75, quaternion.z, DELTA);
       assertEquals(0.45, pinpoint.getPitchRadians(), DELTA);
       assertEquals(-0.65, pinpoint.getRollRadians(), DELTA);
       assertEquals(readCount, m_readCounts.size());
@@ -861,10 +861,10 @@ class GoBildaPinpointTest {
       pinpoint.update();
       quaternion = pinpoint.getQuaternion();
 
-      assertEquals(0.5, quaternion.getW(), DELTA);
-      assertEquals(-0.25, quaternion.getX(), DELTA);
-      assertEquals(0.125, quaternion.getY(), DELTA);
-      assertEquals(0.75, quaternion.getZ(), DELTA);
+      assertEquals(0.5, quaternion.w, DELTA);
+      assertEquals(-0.25, quaternion.x, DELTA);
+      assertEquals(0.125, quaternion.y, DELTA);
+      assertEquals(0.75, quaternion.z, DELTA);
       assertEquals(0.55, pinpoint.getPitchRadians(), DELTA);
       assertEquals(-0.75, pinpoint.getRollRadians(), DELTA);
       assertEquals(Register.QUATERNION_X, pinpoint.getLastFailedRegister());
@@ -898,10 +898,10 @@ class GoBildaPinpointTest {
         pinpoint.update();
 
         var quaternion = pinpoint.getQuaternion();
-        assertEquals(0.5, quaternion.getW(), DELTA);
-        assertEquals(-0.25, quaternion.getX(), DELTA);
-        assertEquals(0.125, quaternion.getY(), DELTA);
-        assertEquals(0.75, quaternion.getZ(), DELTA);
+        assertEquals(0.5, quaternion.w, DELTA);
+        assertEquals(-0.25, quaternion.x, DELTA);
+        assertEquals(0.125, quaternion.y, DELTA);
+        assertEquals(0.75, quaternion.z, DELTA);
         assertEquals(Register.QUATERNION_W, pinpoint.getLastFailedRegister());
         assertEquals(FailureReason.INVALID_QUATERNION, pinpoint.getLastFailureReason());
       }
@@ -929,10 +929,10 @@ class GoBildaPinpointTest {
 
       var quaternion = pinpoint.getQuaternion();
 
-      assertEquals(0.0, quaternion.getW(), DELTA);
-      assertEquals(0.0, quaternion.getX(), DELTA);
-      assertEquals(0.0, quaternion.getY(), DELTA);
-      assertEquals(0.0, quaternion.getZ(), DELTA);
+      assertEquals(0.0, quaternion.w, DELTA);
+      assertEquals(0.0, quaternion.x, DELTA);
+      assertEquals(0.0, quaternion.y, DELTA);
+      assertEquals(0.0, quaternion.z, DELTA);
       assertEquals(readCount + 1, m_readCounts.size());
       assertEquals(Register.BULK_READ.getAddress(), m_readRegisters.get(readCount));
       assertEquals(17, m_readCounts.get(readCount));

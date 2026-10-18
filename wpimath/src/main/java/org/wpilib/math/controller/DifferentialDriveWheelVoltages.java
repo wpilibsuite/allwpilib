@@ -12,10 +12,10 @@ import org.wpilib.util.struct.StructSerializable;
 /** Motor voltages for a differential drive. */
 public class DifferentialDriveWheelVoltages implements ProtobufSerializable, StructSerializable {
   /** Left wheel voltage. */
-  public double left;
+  public final double left;
 
   /** Right wheel voltage. */
-  public double right;
+  public final double right;
 
   /** DifferentialDriveWheelVoltages protobuf for serialization. */
   public static final DifferentialDriveWheelVoltagesProto proto =
@@ -26,7 +26,9 @@ public class DifferentialDriveWheelVoltages implements ProtobufSerializable, Str
       new DifferentialDriveWheelVoltagesStruct();
 
   /** Default constructor. */
-  public DifferentialDriveWheelVoltages() {}
+  public DifferentialDriveWheelVoltages() {
+    this(0.0, 0.0);
+  }
 
   /**
    * Constructs a DifferentialDriveWheelVoltages.

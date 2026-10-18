@@ -90,7 +90,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
         VecBuilder.fill(
             start.pose.getX(),
             start.pose.getY(),
-            start.pose.getRotation().getRadians(),
+            start.pose.rotation.getRadians(),
             start.leftVelocity,
             start.rightVelocity,
             start.velocity.omega);
@@ -169,7 +169,7 @@ public class DifferentialTrajectory extends Trajectory<DifferentialSample> {
 
     // The whole trajectory is rigidly rotated by the transform's rotation, so
     // the field-relative velocities and accelerations rotate by the same amount.
-    Rotation2d rotation = transform.getRotation();
+    Rotation2d rotation = transform.rotation;
 
     DifferentialSample transformedFirstSample =
         new DifferentialSample(

@@ -182,7 +182,7 @@ class HolonomicSampleTest {
 
     // θₖ₊₁ = θₖ + ωₖΔt + ½α(Δt)²
     double expectedTheta =
-        start.pose.getRotation().getRadians()
+        start.pose.rotation.getRadians()
             + start.velocity.omega * deltaT
             + 0.5 * start.acceleration.alpha * deltaT * deltaT;
 
@@ -194,7 +194,7 @@ class HolonomicSampleTest {
 
     assertEquals(expectedOmega, interpolated.velocity.omega, EPSILON);
     assertEquals(expectedAlpha, interpolated.acceleration.alpha, EPSILON);
-    assertEquals(expectedTheta, interpolated.pose.getRotation().getRadians(), EPSILON);
+    assertEquals(expectedTheta, interpolated.pose.rotation.getRadians(), EPSILON);
   }
 
   @Test
@@ -475,7 +475,7 @@ class HolonomicSampleTest {
     // Pose is transformed.
     assertEquals(3.0, transformed.pose.getX(), EPSILON);
     assertEquals(4.0, transformed.pose.getY(), EPSILON);
-    assertEquals(Math.PI / 2, transformed.pose.getRotation().getRadians(), EPSILON);
+    assertEquals(Math.PI / 2, transformed.pose.rotation.getRadians(), EPSILON);
 
     // Velocity/acceleration vectors rotate by +90 degrees; angular terms are unchanged.
     assertEquals(0.0, transformed.velocity.vx, EPSILON);
@@ -502,7 +502,7 @@ class HolonomicSampleTest {
     // Pose becomes the origin.
     assertEquals(0.0, relative.pose.getX(), EPSILON);
     assertEquals(0.0, relative.pose.getY(), EPSILON);
-    assertEquals(0.0, relative.pose.getRotation().getRadians(), EPSILON);
+    assertEquals(0.0, relative.pose.rotation.getRadians(), EPSILON);
 
     // Velocity/acceleration vectors rotate by -90 degrees; angular terms are unchanged.
     assertEquals(1.0, relative.velocity.vx, EPSILON);

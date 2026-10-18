@@ -28,7 +28,7 @@ class DifferentialDriveOdometry3dTest {
         () -> assertEquals(1.0, pose.getX(), EPSILON),
         () -> assertEquals(2.0, pose.getY(), EPSILON),
         () -> assertEquals(0.0, pose.getZ(), EPSILON),
-        () -> assertEquals(45.0, pose.getRotation().toRotation2d().getDegrees(), EPSILON));
+        () -> assertEquals(45.0, pose.rotation.toRotation2d().getDegrees(), EPSILON));
   }
 
   @Test
@@ -40,7 +40,7 @@ class DifferentialDriveOdometry3dTest {
         () -> assertEquals(5.0, pose.getX(), EPSILON),
         () -> assertEquals(5.0, pose.getY(), EPSILON),
         () -> assertEquals(0.0, pose.getZ(), EPSILON),
-        () -> assertEquals(90.0, pose.getRotation().toRotation2d().getDegrees(), EPSILON));
+        () -> assertEquals(90.0, pose.rotation.toRotation2d().getDegrees(), EPSILON));
   }
 
   @Test
@@ -56,8 +56,8 @@ class DifferentialDriveOdometry3dTest {
         () -> assertEquals(0.0, pose.getX(), EPSILON),
         () -> assertEquals(0.0, pose.getY(), EPSILON),
         () -> assertEquals(0.0, pose.getZ(), EPSILON),
-        () -> assertEquals(degreesToRadians(0), pose.getRotation().getX(), EPSILON),
-        () -> assertEquals(degreesToRadians(5), pose.getRotation().getY(), EPSILON),
-        () -> assertEquals(degreesToRadians(90), pose.getRotation().getZ(), EPSILON));
+        () -> assertEquals(degreesToRadians(0), pose.rotation.getX(), EPSILON),
+        () -> assertEquals(degreesToRadians(5), pose.rotation.getY(), EPSILON),
+        () -> assertEquals(degreesToRadians(90), pose.rotation.getZ(), EPSILON));
   }
 }

@@ -90,26 +90,26 @@ class Ellipse2dTest {
     var point1 = new Translation2d(2.5, 2.0);
     var nearestPoint1 = ellipse.nearest(point1);
     assertAll(
-        () -> assertEquals(2.5, nearestPoint1.getX(), EPSILON),
-        () -> assertEquals(2.0, nearestPoint1.getY(), EPSILON));
+        () -> assertEquals(2.5, nearestPoint1.x, EPSILON),
+        () -> assertEquals(2.0, nearestPoint1.y, EPSILON));
 
     var point2 = new Translation2d(1.0, 2.0);
     var nearestPoint2 = ellipse.nearest(point2);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint2.getX(), EPSILON),
-        () -> assertEquals(2.0, nearestPoint2.getY(), EPSILON));
+        () -> assertEquals(1.0, nearestPoint2.x, EPSILON),
+        () -> assertEquals(2.0, nearestPoint2.y, EPSILON));
 
     var point3 = new Translation2d(1.0, 1.0);
     var nearestPoint3 = ellipse.nearest(point3);
     assertAll(
-        () -> assertEquals(1.0, nearestPoint3.getX(), EPSILON),
-        () -> assertEquals(1.0, nearestPoint3.getY(), EPSILON));
+        () -> assertEquals(1.0, nearestPoint3.x, EPSILON),
+        () -> assertEquals(1.0, nearestPoint3.y, EPSILON));
 
     var point4 = new Translation2d(-1.0, 2.5);
     var nearestPoint4 = ellipse.nearest(point4);
     assertAll(
-        () -> assertEquals(-0.8512799937611617, nearestPoint4.getX(), EPSILON),
-        () -> assertEquals(2.378405333174535, nearestPoint4.getY(), EPSILON));
+        () -> assertEquals(-0.8512799937611617, nearestPoint4.x, EPSILON),
+        () -> assertEquals(2.378405333174535, nearestPoint4.y, EPSILON));
 
     assertEquals(0, Variable.totalNativeMemoryUsage());
   }

@@ -27,6 +27,6 @@ public final class ExampleGlobalMeasurementSensor {
     return new Pose2d(
         estimatedRobotPose.getX() + rand.get(0, 0),
         estimatedRobotPose.getY() + rand.get(1, 0),
-        estimatedRobotPose.getRotation().plus(new Rotation2d(rand.get(2, 0))));
+        estimatedRobotPose.rotation.plus(new Rotation2d(rand.get(2, 0))));
   }
 }

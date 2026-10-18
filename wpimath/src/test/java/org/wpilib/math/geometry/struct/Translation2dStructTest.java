@@ -22,7 +22,7 @@ class Translation2dStructTest {
     buffer.rewind();
 
     Translation2d data = Translation2d.struct.unpack(buffer);
-    assertEquals(DATA.getX(), data.getX());
-    assertEquals(DATA.getY(), data.getY());
+    assertEquals(DATA.x, data.x);
+    assertEquals(DATA.y, data.y);
   }
 }

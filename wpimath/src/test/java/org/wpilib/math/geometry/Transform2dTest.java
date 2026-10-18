@@ -19,7 +19,7 @@ class Transform2dTest {
 
     assertEquals(0.1524, transform.getX(), EPSILON);
     assertEquals(0.2032, transform.getY(), EPSILON);
-    assertEquals(Math.PI / 4, transform.getRotation().getRadians(), EPSILON);
+    assertEquals(Math.PI / 4, transform.rotation.getRadians(), EPSILON);
   }
 
   @Test

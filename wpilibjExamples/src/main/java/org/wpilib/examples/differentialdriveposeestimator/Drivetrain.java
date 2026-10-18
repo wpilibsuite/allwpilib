@@ -183,10 +183,10 @@ public class Drivetrain {
       cameraToObject.getX(),
       cameraToObject.getY(),
       cameraToObject.getZ(),
-      cameraToObject.getRotation().getQuaternion().getW(),
-      cameraToObject.getRotation().getQuaternion().getX(),
-      cameraToObject.getRotation().getQuaternion().getY(),
-      cameraToObject.getRotation().getQuaternion().getZ()
+      cameraToObject.rotation.quaternion.w,
+      cameraToObject.rotation.quaternion.x,
+      cameraToObject.rotation.quaternion.y,
+      cameraToObject.rotation.quaternion.z
     };
     cameraToObjectEntry.set(val);
   }

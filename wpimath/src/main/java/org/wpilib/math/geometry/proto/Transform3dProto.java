@@ -36,8 +36,8 @@ public final class Transform3dProto implements Protobuf<Transform3d, ProtobufTra
 
   @Override
   public void pack(ProtobufTransform3d msg, Transform3d value) {
-    Translation3d.proto.pack(msg.getMutableTranslation(), value.getTranslation());
-    Rotation3d.proto.pack(msg.getMutableRotation(), value.getRotation());
+    Translation3d.proto.pack(msg.getMutableTranslation(), value.translation);
+    Rotation3d.proto.pack(msg.getMutableRotation(), value.rotation);
   }
 
   @Override

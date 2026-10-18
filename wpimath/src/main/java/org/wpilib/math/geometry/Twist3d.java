@@ -19,25 +19,27 @@ import org.wpilib.util.struct.StructSerializable;
  */
 public final class Twist3d implements ProtobufSerializable, StructSerializable {
   /** Linear "dx" component. */
-  public double dx;
+  public final double dx;
 
   /** Linear "dy" component. */
-  public double dy;
+  public final double dy;
 
   /** Linear "dz" component. */
-  public double dz;
+  public final double dz;
 
   /** Rotation vector x component (radians). */
-  public double rx;
+  public final double rx;
 
   /** Rotation vector y component (radians). */
-  public double ry;
+  public final double ry;
 
   /** Rotation vector z component (radians). */
-  public double rz;
+  public final double rz;
 
   /** Default constructor. */
-  public Twist3d() {}
+  public Twist3d() {
+    this(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  }
 
   /**
    * Constructs a Twist3d with the given values.

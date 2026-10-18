@@ -45,8 +45,8 @@ public final class Transform2dStruct implements Struct<Transform2d> {
 
   @Override
   public void pack(ByteBuffer bb, Transform2d value) {
-    Translation2d.struct.pack(bb, value.getTranslation());
-    Rotation2d.struct.pack(bb, value.getRotation());
+    Translation2d.struct.pack(bb, value.translation);
+    Rotation2d.struct.pack(bb, value.rotation);
   }
 
   @Override

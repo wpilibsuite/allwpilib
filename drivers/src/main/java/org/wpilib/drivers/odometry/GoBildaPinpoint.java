@@ -588,7 +588,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     ErrorMessages.requireNonNullParam(pose, "pose", "setPose");
     float xMillimeters = metersToMillimeters(pose.getX(), "pose X");
     float yMillimeters = metersToMillimeters(pose.getY(), "pose Y");
-    float headingRadians = requireFiniteFloat(pose.getRotation().getRadians(), "pose heading");
+    float headingRadians = requireFiniteFloat(pose.rotation.getRadians(), "pose heading");
 
     if (writeFloat(Register.X_POSITION, xMillimeters)) {
       m_haveXPosition = false;
