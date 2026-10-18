@@ -1,6 +1,10 @@
 extra_includes:
 - wpi/datalog/DataLog.hpp
 
+functions:
+  UpdateDataLogFreeSpaceAlert:
+    ignore: true
+
 classes:
   wpi::DataLogManager:
     methods:
