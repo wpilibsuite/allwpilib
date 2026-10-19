@@ -45,8 +45,9 @@ class Trajectory {
     }
 
     // Sort samples by time
-    std::sort(samples.begin(), samples.end(),
-              [](const auto& a, const auto& b) { return a.time < b.time; });
+    std::stable_sort(
+        samples.begin(), samples.end(),
+        [](const auto& a, const auto& b) { return a.time < b.time; });
 
     m_samples = std::move(samples);
 
