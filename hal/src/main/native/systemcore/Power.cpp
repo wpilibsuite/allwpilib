@@ -7,10 +7,8 @@
 #include <cmath>
 
 #include "HALInitializer.hpp"
-#include "SystemServerInternal.hpp"
 #include "mrclib/Systemcore.h"
 #include "wpi/hal/Errors.h"
-#include "wpi/nt/DoubleTopic.hpp"
 
 using namespace wpi::hal;
 
@@ -117,8 +115,15 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
 
 double HAL_GetCPUTemp(int32_t* status) {
   initializePower(status);
-  *status = HAL_HANDLE_ERROR;
-  return 0;
+  double temperature = 0;
+  MRC_Status mrcStatus = MRC_Systemcore_GetCPUTemp(&temperature);
+  // Return zero without an error while waiting for the first reading.
+  if (mrcStatus != MRC_STATUS_SUCCESS && mrcStatus != MRC_STATUS_NO_VALUE) {
+    *status = HAL_INCOMPATIBLE_STATE;
+    return 0;
+  }
+  *status = HAL_SUCCESS;
+  return temperature;
 }
 
 }  // extern "C"
