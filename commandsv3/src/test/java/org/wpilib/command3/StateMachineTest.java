@@ -188,7 +188,7 @@ class StateMachineTest extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(stateMachine), "State machine should still be running");
     assertEquals(2, initCount.get(), "Command should have reinitialized");
 
-    assertEquals(14, m_events.size());
+    assertEquals(12, m_events.size());
     assertAll(
         // First run
         () -> assertTrue(m_events.get(0) instanceof Scheduled s && s.command() == stateMachine),
@@ -197,15 +197,13 @@ class StateMachineTest extends CommandTestBase {
         () -> assertTrue(m_events.get(3) instanceof Mounted m && m.command() == command),
         () -> assertTrue(m_events.get(4) instanceof Yielded y && y.command() == command),
         () -> assertTrue(m_events.get(5) instanceof Yielded y && y.command() == stateMachine),
-        () -> assertTrue(m_events.get(6) instanceof Mounted m && m.command() == command),
-        () -> assertTrue(m_events.get(7) instanceof Yielded y && y.command() == command),
         // Second run
-        () -> assertTrue(m_events.get(8) instanceof Mounted m && m.command() == stateMachine),
-        () -> assertTrue(m_events.get(9) instanceof Canceled c && c.command() == command),
-        () -> assertTrue(m_events.get(10) instanceof Scheduled s && s.command() == command),
-        () -> assertTrue(m_events.get(11) instanceof Mounted m && m.command() == command),
-        () -> assertTrue(m_events.get(12) instanceof Yielded y && y.command() == command),
-        () -> assertTrue(m_events.get(13) instanceof Yielded y && y.command() == stateMachine));
+        () -> assertTrue(m_events.get(6) instanceof Mounted m && m.command() == stateMachine),
+        () -> assertTrue(m_events.get(7) instanceof Canceled c && c.command() == command),
+        () -> assertTrue(m_events.get(8) instanceof Scheduled s && s.command() == command),
+        () -> assertTrue(m_events.get(9) instanceof Mounted m && m.command() == command),
+        () -> assertTrue(m_events.get(10) instanceof Yielded y && y.command() == command),
+        () -> assertTrue(m_events.get(11) instanceof Yielded y && y.command() == stateMachine));
   }
 
   @Test

@@ -977,6 +977,11 @@ public final class Scheduler implements ProtobufSerializable {
 
       // Update periodic callbacks
       Coroutine coroutine = callback.coroutine();
+      if (coroutine.inUnmountableState()) {
+        // Nothing to do
+        continue;
+      }
+
       coroutine.mount();
       try {
         coroutine.runToYieldPoint();
@@ -1014,6 +1019,11 @@ public final class Scheduler implements ProtobufSerializable {
   private void runCommand(CommandState state) {
     final var command = state.command();
     final var coroutine = state.coroutine();
+
+    if (coroutine.inUnmountableState()) {
+      // Nothing to do
+      return;
+    }
 
     if (!m_runningCommands.containsKey(command)) {
       // Probably canceled by an owning composition, do not run
@@ -1053,8 +1063,8 @@ public final class Scheduler implements ProtobufSerializable {
       cancel(command);
     } else if (coroutine.isDone()) {
       handleCommandCompletion(command);
-    } else if (coroutine.isInterruptRequested()) {
-      handleCoroutineIRQ(coroutine, command);
+    } else if (coroutine.getForkResult() != null) {
+      handleCoroutineIRQ(coroutine.getForkResult(), command);
     } else {
       // Yielded
       emitYieldedEvent(command);
@@ -1068,10 +1078,10 @@ public final class Scheduler implements ProtobufSerializable {
     removeOrphanedChildren(command);
   }
 
-  private void handleCoroutineIRQ(Coroutine coroutine, Command command) {
+  private void handleCoroutineIRQ(Coroutine.ForkResult failure, Command command) {
     Command root = getRoot(command); // capture the root command before modifying scheduler state
     m_currentCommandAncestry.clear();
-    emitForkFailureEvent(command, coroutine.getForkResult().getFailedCommands());
+    emitForkFailureEvent(command, failure.getFailedCommands());
     cancel(root);
     Continuation.mountContinuation(null);
   }
