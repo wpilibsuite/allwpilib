@@ -63,7 +63,7 @@ public final class Twist3d implements ProtobufSerializable, StructSerializable {
   * @return The Twist2d of the robot.
   */
   public Twist2d toTwist2d(){
-    return new Twist2d(dx, dy, rx);
+    return new Twist2d(dx, dy, rz);
   }
 
   /**
