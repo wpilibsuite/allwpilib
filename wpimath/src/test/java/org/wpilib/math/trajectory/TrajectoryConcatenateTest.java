@@ -44,7 +44,7 @@ class TrajectoryConcatenateTest {
         var originalIndex = i - t1.samples.size();
         if (originalIndex < t2.samples.size()) {
           var st = t2.samples.get(originalIndex);
-          assertEquals(state.time, st.time + t1.duration, 1e-6);
+          assertEquals(state.time, st.time + t1.duration(), 1e-6);
           assertEquals(state.pose, st.pose);
           assertEquals(state.velocity, st.velocity);
           assertEquals(state.acceleration, st.acceleration);

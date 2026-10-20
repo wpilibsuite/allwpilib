@@ -142,7 +142,7 @@ class ExtendedKalmanFilterTest {
 
     var groundTruthX = observer.getXhat();
 
-    double duration = trajectory.duration;
+    double duration = trajectory.duration();
     for (int i = 0; i < (duration / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
       double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
@@ -175,7 +175,7 @@ class ExtendedKalmanFilterTest {
     var R = StateSpaceUtil.costMatrix(VecBuilder.fill(0.01, 0.01, 0.0001, 0.5, 0.5));
     observer.correct(Nat.N5(), u, globalY, ExtendedKalmanFilterTest::getGlobalMeasurementModel, R);
 
-    var finalPosition = trajectory.sampleAt(trajectory.duration);
+    var finalPosition = trajectory.sampleAt(trajectory.duration());
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 1.0);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 1.0);
     assertEquals(finalPosition.pose.getRotation().getRadians(), observer.getXhat(2), 1.0);
