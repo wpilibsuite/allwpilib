@@ -10,6 +10,8 @@ classes:
           wpi::util::Logger&, std::function<void (std::span<const uint8_t> data)>, double, std::string_view:
             ignore: true
       SetFilename:
+      SetDir:
+      GetDir:
       Flush:
       Pause:
       Resume:

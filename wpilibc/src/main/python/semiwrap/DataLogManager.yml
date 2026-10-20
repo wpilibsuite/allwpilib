@@ -4,6 +4,8 @@ extra_includes:
 functions:
   DeleteOldDataLogs:
     ignore: true
+  TryTransferDataLogToUsb:
+    ignore: true
   UpdateDataLogFreeSpaceAlert:
     ignore: true
   IsDataLogMatchLog:
