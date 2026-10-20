@@ -1,0 +1,21 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "*.cpp",
+        "*.hpp",
+    ]),
+    visibility = [
+        "//wpilibcExamples/src/main/cpp/commands:__pkg__",
+    ],
+)
+
+cc_library(
+    name = "emptyclass",
+    srcs = [":sources"],
+    linkstatic = True,
+    tags = [
+        "wpi-example",
+    ],
+)

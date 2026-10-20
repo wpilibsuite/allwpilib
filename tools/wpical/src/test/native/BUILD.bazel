@@ -1,0 +1,26 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//tools/wpical:copts.bzl", "COPTS", "CXXOPTS")
+
+cc_test(
+    name = "wpical_tests",
+    size = "medium",
+    srcs = glob(["cpp/**"]),
+    copts = COPTS,
+    cxxopts = CXXOPTS,
+    data = ["//tools/wpical:test-assets"],
+    defines = [
+        'PROJECT_ROOT_PATH=\\"tools/wpical/src/main/native/assets\\"',
+        "__BAZEL__=1",
+    ],
+    deps = [
+        "//shared/bazel/thirdparty/ceres",
+        "//thirdparty/catch2",
+        "//tools/wpical:wpical_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
+
+alias(
+    name = "native",
+    actual = ":wpical_tests",
+)

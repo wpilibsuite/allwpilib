@@ -1,0 +1,56 @@
+load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load(":robotpy_pybind_test_info.bzl", "wpimath_test_extension", define_test_pybind_library = "define_pybind_library")
+
+TEST_PYBIND_PKGCFG_DEPS = [
+    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
+    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//tunables:native/tunables/robotpy-native-tunables.pc",
+    "//tunables:robotpy-tunables.generated_pkgcfg_files",
+    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
+    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-wpimath_test-generator",
+    additional_srcs = ["cpp/wpimath_test/include/module.h"],
+    generated_file_name = "robotpy_pybind_test_info.bzl",
+    package_root_file = "cpp/wpimath_test/__init__.py",
+    pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
+    pyproject_toml = "cpp/pyproject.toml",
+    stripped_include_prefix = "cpp",
+    yaml_files = glob(["cpp/semiwrap/**/*.yml"]),
+    yml_prefix = "cpp/",
+)
+
+wpimath_test_extension(
+    srcs = glob(["cpp/wpimath_test/src/*.cpp"]),
+    extra_hdrs = ["cpp/wpimath_test/include/module.h"],
+    header_to_dat_deps = ["cpp/wpimath_test/include/module.h"],
+    includes = ["cpp/wpimath_test/include"],
+)
+
+define_test_pybind_library(
+    name = "robotpy-wpimath-test",
+    extra_pybind_hdrs = glob(["cpp/**/*.h"]),
+    pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
+)
+
+robotpy_py_test(
+    "python",
+    srcs = glob(
+        ["**/*.py"],
+        exclude = ["cpp/**"],
+    ),
+    deps = [
+        ":robotpy-wpimath-test",
+        "//telemetry:robotpy-telemetry",
+        "//tunables:robotpy-tunables",
+        "//wpimath:robotpy-wpimath",
+        requirement("numpy"),
+        requirement("pytest"),
+    ],
+)

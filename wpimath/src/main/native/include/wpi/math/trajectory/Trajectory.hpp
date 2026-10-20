@@ -48,7 +48,7 @@ class Trajectory {
     }
 
     // Sort samples by time
-    std::ranges::sort(m_samples, {}, &SampleType::time);
+    std::ranges::stable_sort(m_samples, {}, &SampleType::time);
 
     if (Start().time != 0.0_s) {
       throw std::invalid_argument(
