@@ -5,8 +5,8 @@ robotpy_py_test(
     "python",
     srcs = glob(["**/*.py"]),
     deps = [
-        "//telemetry:robotpy-telemetry",
-        "//wpiutil:robotpy-wpiutil",
+        "//telemetry/src/main/python",
+        "//wpiutil/src/main/python",
         requirement("pytest"),
     ],
 )

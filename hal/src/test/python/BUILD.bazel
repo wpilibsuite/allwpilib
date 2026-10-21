@@ -5,7 +5,7 @@ robotpy_py_test(
     "python",
     srcs = glob(["**/*.py"]),
     deps = [
-        "//hal:robotpy-hal",
+        "//hal/src/main/python",
         requirement("pytest"),
     ],
 )
