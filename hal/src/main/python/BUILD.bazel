@@ -1,5 +1,5 @@
-load("//hal/src/main/python:robotpy_pybind_build_info.bzl", "define_pybind_library", "hal_simulation_extension", "wpihal_extension")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "hal_simulation_extension", "wpihal_extension")
 
 PYBIND_PKGCFG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",

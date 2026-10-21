@@ -1,5 +1,5 @@
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
-load("//tunables/src/main/python:robotpy_pybind_build_info.bzl", "define_pybind_library", "tunables_extension")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "tunables_extension")
 
 PYBIND_PKGCFG_DEPS = [
     "//tunables:native/tunables/robotpy-native-tunables.pc",

@@ -1,5 +1,5 @@
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
-load("//wpilibc/src/main/python:robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "wpilib_extension", "wpilib_simulation_extension")
 
 PKG_CONFIG_DEPS = [
     "//datalog:native/datalog/robotpy-native-datalog.pc",

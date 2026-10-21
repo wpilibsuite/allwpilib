@@ -1,5 +1,5 @@
-load("//fields/src/main/python:robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
 
 PYBIND_PKGCFG_DEPS = [
     "//fields:native/fields/robotpy-native-fields.pc",
