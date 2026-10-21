@@ -85,9 +85,7 @@ class HeaderToDatConfig:
             base_library = re.search("native/(.*?)/", include_root).groups(1)[0]
 
             native_library = fixup_native_lib_name("robotpy-native-" + base_library)
-            self.include_file = (
-                f"$(execpath //{fixup_root_package_name(base_library)}:{native_library}.copy_headers)/{base_include_file}"
-            )
+            self.include_file = f"$(execpath //{fixup_root_package_name(base_library)}:{native_library}.copy_headers)/{base_include_file}"
             self.include_root = f"$(execpath //{fixup_root_package_name(base_library)}:{native_library}.copy_headers)"
         else:
             root_dir = pathlib.Path.cwd().absolute()
@@ -237,16 +235,14 @@ class BazelExtensionModule:
                     )
             elif "-casters" in dep_name:
                 base_library = dep_name.split("-")[0]
-                local_extension_dependencies.add(f"//{base_library}/src/main/python:{dep_name}")
+                local_extension_dependencies.add(
+                    f"//{base_library}/src/main/python:{dep_name}"
+                )
             else:
                 base_library = fixup_root_package_name(dep_name.rsplit("_", 1)[0])
                 shared_lib_name = fixup_shared_lib_name(base_library.rsplit("/", 1)[-1])
-                local_extension_dependencies.add(
-                    f"//{base_library}:{shared_lib_name}"
-                )
-                dynamic_dependencies.add(
-                    f"//{base_library}:shared/{shared_lib_name}"
-                )
+                local_extension_dependencies.add(f"//{base_library}:{shared_lib_name}")
+                dynamic_dependencies.add(f"//{base_library}:shared/{shared_lib_name}")
                 if dep_name != self.name:
                     local_extension_dependencies.add(
                         f"//{base_library}/src/main/python:{dep_name}_pybind_library"
@@ -452,7 +448,7 @@ def generate_pybind_build_file(
                 entry_points[entry_point_type].append(f"{ep_key} = {ep_value}")
 
     imports_dir = stripped_include_prefix if stripped_include_prefix else "."
-    
+
     # The package the generated file is loaded from is usually the project root, but a
     # project can generate a build file for a module in a subpackage (e.g. test modules).
     bazel_package = package_name or fixup_root_package_name(top_level_name)
@@ -493,9 +489,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--project_file", type=pathlib.Path, required=True)
     parser.add_argument("--output_file", type=pathlib.Path, required=True)
-    parser.add_argument(
-        "--stripped_include_prefix", type=str, default=""
-    )
+    parser.add_argument("--stripped_include_prefix", type=str, default="")
     parser.add_argument("--yml_prefix", type=str)
     parser.add_argument("--package_root_file", type=str)
     parser.add_argument("--package_name", type=str)
