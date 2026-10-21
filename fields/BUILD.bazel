@@ -1,13 +1,11 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
-load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//fields:generate_fields.bzl", "generate_fields")
 load("//fields:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//fields:robotpy_pybind_build_info.bzl", "define_pybind_library", "fields_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 load("//shared/bazel/rules/gen:gen-resources.bzl", "generate_resources")
@@ -43,8 +41,21 @@ filegroup(
 )
 
 filegroup(
+    name = "generated_java",
+    srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//fields/src/main/java:__pkg__"],
+)
+
+filegroup(
     name = "field-jsons",
     srcs = FIELD_JSONS,
+    visibility = ["//fields/src/main/java:__pkg__"],
+)
+
+filegroup(
+    name = "field-images",
+    srcs = FIELD_IMAGES,
+    visibility = ["//fields/src/main/java:__pkg__"],
 )
 
 filegroup(
@@ -234,45 +245,11 @@ wpilib_cc_static_library(
     ],
 )
 
-wpilib_java_library(
-    name = "fields-java",
-    srcs = glob(["src/main/java/**/*.java"]) + glob([
-        "src/generated/main/java/**/*.java",
-    ]),
-    extra_source_pkgs = ["resources"],
-    javacopts = patch_module(
-        "wpilib.gamefields",
-        ["fields/src/generated/main/java"],
-    ),
-    maven_artifact_name = "fields-java",
-    maven_group_id = "org.wpilib.fields",
-    plugins = [
-        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
-    ],
-    resource_strip_prefix = "fields/src/main/native/resources",
-    resources = FIELD_JSONS,
-    visibility = ["//visibility:public"],
-    deps = [
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
-        "@maven//:io_avaje_avaje_json_core",
-        "@maven//:io_avaje_avaje_jsonb",
-    ],
-)
-
-wpilib_java_library(
-    name = "field-images-java",
-    maven_artifact_name = "field-images-java",
-    maven_group_id = "org.wpilib.fields",
-    resource_strip_prefix = "fields/src/main/native/resources",
-    resources = FIELD_IMAGES,
-    visibility = ["//visibility:public"],
-)
-
 pkg_files(
     name = "resources",
     srcs = FIELD_JSONS,
     strip_prefix = "src/main/native/resources/",
+    visibility = ["//fields/src/main/java:__pkg__"],
 )
 
 package_default_cc_project(

@@ -5,7 +5,7 @@ java_binary(
     srcs = ["org/wpilib/net/DevMain.java"],
     main_class = "org.wpilib.net.DevMain",
     deps = [
-        "//wpinet:wpinet-java",
-        "//wpiutil:wpiutil-java",
+        "//wpinet/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

@@ -3,7 +3,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//apriltag:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//apriltag:robotpy_pybind_build_info.bzl", "apriltag_extension", "define_pybind_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 
@@ -65,7 +65,7 @@ wpilib_cc_library(
     ),
     hdrs = glob(["src/main/native/include/**/*"]),
     extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
-    extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
+    extra_src_pkg_files = ["//apriltag/src/main/java:apriltag-java-jni-hdrs-pkg"],
     local_defines = ["WPILIB_EXPORTS"],
     strip_include_prefix = "src/main/native/include",
     visibility = ["//visibility:public"],
@@ -109,7 +109,7 @@ wpilib_cc_static_library(
 wpilib_jni_cc_library(
     name = "apriltagjni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
-    java_dep = ":apriltag-java",
+    java_dep = "//apriltag/src/main/java:apriltag-java",
     visibility = ["//visibility:public"],
     deps = [
         ":apriltag",
@@ -129,22 +129,6 @@ wpilib_cc_shared_library(
     use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":apriltagjni"],
-)
-
-wpilib_jni_java_library(
-    name = "apriltag-java",
-    srcs = glob(["src/main/java/**/*.java"]),
-    maven_artifact_name = "apriltag-java",
-    maven_group_id = "org.wpilib.apriltag",
-    native_libs = [":shared/apriltagjni"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/java/opencv",
-    ],
 )
 
 package_default_jni_project(
