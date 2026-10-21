@@ -91,6 +91,21 @@ class WPILIB_DLLEXPORT Rotation3d final {
    * Extrinsic rotations occur in that order around the axes in the fixed global
    * frame rather than the body frame.
    *
+   * Intrinsic rotations applied in the order yaw, then pitch, then roll are
+   * equivalent to these extrinsic rotations, so they can be passed to this
+   * constructor unchanged as (roll, pitch, yaw).
+   *
+   * Intrinsic rotations applied in the order roll, then pitch, then yaw cannot
+   * be passed directly. Instead, construct the rotation by composing
+   * single-axis rotations:
+   *
+   * @code{.cpp}
+   * wpi::math::Rotation3d r{roll, 0_rad, 0_rad};
+   * wpi::math::Rotation3d p{0_rad, pitch, 0_rad};
+   * wpi::math::Rotation3d y{0_rad, 0_rad, yaw};
+   * auto rotation = y.RotateBy(p).RotateBy(r);
+   * @endcode
+   *
    * Angles are measured counterclockwise with the rotation axis pointing "out
    * of the page". If you point your right thumb along the positive axis
    * direction, your fingers curl in the direction of positive rotation.
