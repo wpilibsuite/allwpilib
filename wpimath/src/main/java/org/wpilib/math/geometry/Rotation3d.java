@@ -103,8 +103,8 @@ public final class Rotation3d
    * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
    * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
    *
-   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed directly.
-   * Instead, construct the rotation by composing single-axis rotations:
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
    *
    * <pre>{@code
    * var r = new Rotation3d(roll, 0, 0);
@@ -149,8 +149,8 @@ public final class Rotation3d
    * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
    * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
    *
-   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed directly.
-   * Instead, construct the rotation by composing single-axis rotations:
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
    *
    * <pre>{@code
    * var r = new Rotation3d(roll, Radians.zero(), Radians.zero());
