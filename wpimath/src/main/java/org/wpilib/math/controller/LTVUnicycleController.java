@@ -140,23 +140,29 @@ public class LTVUnicycleController {
     //     [0  0  0]              [1  0]
     // A = [0  0  v]          B = [0  0]
     //     [0  0  0]              [0  1]
+    //
+    // This model is unstabilizable at v = 0 (stabilizability is a DARE solver
+    // precondition) because the row corresponding to y becomes the zero vector.
+    // This means the state dynamics and inputs can no longer affect $y$. This
+    // makes sense given that nonholonomic drivetrains are unable to move
+    // sideways to eliminate lateral error. We'll use a stabilizable
+    // approximation that models the lateral error state with a slow decay.
+    //
+    //     [0    0   0]           [1  0]
+    // A = [0  −1/τ  v]       B = [0  0]
+    //     [0    0   0]           [0  1]
 
     if (!m_enabled) {
       return new ChassisVelocities(linearVelocityRef, 0.0, angularVelocityRef);
     }
 
-    // The DARE is ill-conditioned if the velocity is close to zero, so don't
-    // let the system stop.
-    if (Math.abs(linearVelocityRef) < 1e-4) {
-      linearVelocityRef = 1e-4;
-    }
-
     m_poseError = poseRef.relativeTo(currentPose);
 
     // spotless:off
+    final double τ = 20.0;
     var A = MatBuilder.fill(Nat.N3(), Nat.N3(),
         0.0, 0.0, 0.0,
-        0.0, 0.0, linearVelocityRef,
+        0.0, -1 / τ, linearVelocityRef,
         0.0, 0.0, 0.0);
     var B = MatBuilder.fill(Nat.N3(), Nat.N2(),
         1.0, 0.0,
