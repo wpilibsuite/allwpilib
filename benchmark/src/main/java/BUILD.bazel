@@ -24,5 +24,4 @@ java_binary(
 alias(
     name = "java",
     actual = ":benchmark",
-    visibility = ["//visibility:public"],
 )
