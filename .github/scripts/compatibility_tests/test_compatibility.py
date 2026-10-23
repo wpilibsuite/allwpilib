@@ -253,6 +253,20 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(result[0]["status"], "changed")
         self.assertIn("offset", (self.output / result[0]["report"]).read_text())
 
+    def test_supplemental_debug_sidecars_preserve_layout_checks(self):
+        for snapshot, changed in ((self.base, False), (self.head, True)):
+            self.native(snapshot, changed=changed, split_debug=True)
+            sidecar = snapshot / "native-debug/api/libapi.so.debug"
+            sidecar.parent.mkdir(parents=True)
+            shutil.copyfile(snapshot / "libapi.so.debug", sidecar)
+            with zipfile.ZipFile(snapshot / "native/api.zip", "w") as archive:
+                archive.write(snapshot / "libapi.so", "linux/x86-64/shared/libapi.so")
+        result = compatibility.compare_native(
+            self.base, self.head, self.output, ABIDIFF
+        )
+        self.assertEqual(result[0]["status"], "changed")
+        self.assertIn("offset", (self.output / result[0]["report"]).read_text())
+
     def test_missing_java_dependency_is_an_error(self):
         self.java(self.base)
         self.java(self.head)

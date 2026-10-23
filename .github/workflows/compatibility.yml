@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   revisions:
@@ -22,6 +23,9 @@ jobs:
     outputs:
       baseline: ${{ steps.baseline.outputs.ref }}
       label: ${{ steps.baseline.outputs.label }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+      fallback: ${{ steps.plan.outputs.fallback }}
+      fallback-count: ${{ steps.plan.outputs.fallback-count }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -35,40 +39,33 @@ jobs:
           CANDIDATE: ${{ inputs.candidate }}
         run: |
           if [ "$BASELINE" = previous-tag ]; then
-            BASELINE=$(python3 .github/scripts/compatibility.py previous-tag --repo . --head "$CANDIDATE")
+            if ! BASELINE=$(python3 .github/scripts/compatibility.py previous-tag --repo . --head "$CANDIDATE"); then
+              echo '**INCOMPLETE: no previous release tag was found.**' >> "$GITHUB_STEP_SUMMARY"
+              echo '::warning::Compatibility analysis has no baseline.'
+              exit 1
+            fi
           fi
           BASE_SHA=$(git rev-parse --verify "${BASELINE}^{commit}")
           echo "ref=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "label=$BASELINE ($BASE_SHA)" >> "$GITHUB_OUTPUT"
+      - name: Locate existing baseline builds
+        id: plan
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BASE_SHA: ${{ steps.baseline.outputs.ref }}
+        run: |
+          python3 .github/scripts/compatibility_artifacts.py plan --repo . \
+            --revision "$BASE_SHA" --repository "$GITHUB_REPOSITORY" --output "$GITHUB_OUTPUT"
 
-  snapshots:
+  baseline:
     needs: revisions
-    if: needs.revisions.outputs.baseline != ''
-    name: Snapshot ${{ matrix.platform }} ${{ matrix.configuration }}
+    if: needs.revisions.outputs.baseline != '' && needs.revisions.outputs.fallback-count != '' && needs.revisions.outputs.fallback-count != '0'
+    name: Fallback baseline ${{ matrix.platform }}
     continue-on-error: true
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      matrix:
-        configuration: [release, debug]
-        platform: [linuxx86-64, linuxarm64, linuxsystemcore, windowsx86-64, windowsarm64, osxuniversal]
-        include:
-          - platform: linuxx86-64
-            os: ubuntu-24.04
-            container: wpilib/systemcore-cross-debian:trixie
-          - platform: linuxarm64
-            os: ubuntu-24.04
-            container: wpilib/aarch64-cross-debian:trixie
-          - platform: linuxsystemcore
-            os: ubuntu-24.04
-            container: wpilib/systemcore-cross-debian:trixie
-          - platform: windowsx86-64
-            os: windows-2025
-          - platform: windowsarm64
-            os: windows-2025
-            options: -Pbuildwinarm64
-          - platform: osxuniversal
-            os: macos-15
+      matrix: ${{ fromJSON(needs.revisions.outputs.fallback) }}
     runs-on: ${{ case(matrix.os == 'ubuntu-24.04', 'blacksmith-4vcpu-ubuntu-2404', matrix.os == 'macos-15', 'blacksmith-6vcpu-macos-15', matrix.os) }}
     defaults:
       run:
@@ -80,103 +77,71 @@ jobs:
         with:
           ref: ${{ inputs.candidate }}
           path: candidate
-          fetch-depth: 0
           persist-credentials: false
+      - uses: actions/cache@v5
+        id: cache
+        with:
+          path: baseline-snapshots
+          key: compatibility-baseline-v1-${{ matrix.platform }}-${{ needs.revisions.outputs.baseline }}-${{ hashFiles('candidate/.github/scripts/compatibility.py', 'candidate/.github/scripts/compatibility_binary.py', 'candidate/.github/scripts/compatibility.init.gradle', 'candidate/.github/scripts/compatibility-baseline.sh') }}
       - uses: actions/checkout@v7
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           ref: ${{ needs.revisions.outputs.baseline }}
           path: baseline
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v5
-        if: runner.os != 'Linux'
+        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
         with:
           distribution: temurin
           java-version: 25
       - uses: actions/setup-python@v6
-        if: runner.os != 'Linux'
+        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
         with:
           python-version: '3.13'
       - uses: gradle/actions/setup-gradle@v6
+        if: steps.cache.outputs.cache-hit != 'true'
         with:
           validate-wrappers: false
           cache-read-only: true
-      - name: Build Linux baseline
-        if: runner.os == 'Linux'
+      - name: Build Linux baseline configurations
+        if: steps.cache.outputs.cache-hit != 'true' && runner.os == 'Linux'
         uses: wpilibsuite/docker-run-action@v4
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work/baseline
-          # The action replaces newlines with semicolons; pass a single folded command.
+          # The action replaces newlines with semicolons; keep this as one command.
           run: >-
-            ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }}
-            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }}
-            -PcompatibilityOutput=/work/snapshots/baseline
-      - name: Build Linux candidate
-        if: always() && runner.os == 'Linux'
-        uses: wpilibsuite/docker-run-action@v4
-        with:
-          image: ${{ matrix.container }}
-          options: -v ${{ github.workspace }}:/work -w /work/candidate
-          run: >-
-            ./gradlew --init-script .github/scripts/compatibility.init.gradle
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }}
-            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }}
-            -PcompatibilityOutput=/work/snapshots/candidate
-      - name: Build desktop baseline
-        if: runner.os != 'Linux'
+            bash ../candidate/.github/scripts/compatibility-baseline.sh
+            /work/candidate /work/baseline-snapshots ${{ matrix.platform }}
+      - name: Build desktop baseline configurations
+        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
         working-directory: baseline
         run: |
-          ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} ${{ matrix.options }} \
-            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
-            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/baseline"
-          if [ "$RUNNER_OS" = macOS ]; then
-            python ../candidate/.github/scripts/compatibility.py prepare-macos --snapshot ../snapshots/baseline
-          fi
-      - name: Build desktop candidate
-        if: always() && runner.os != 'Linux'
-        working-directory: candidate
-        run: |
-          ./gradlew --init-script .github/scripts/compatibility.init.gradle \
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} ${{ matrix.options }} \
-            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
-            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/candidate"
-          if [ "$RUNNER_OS" = macOS ]; then
-            python .github/scripts/compatibility.py prepare-macos --snapshot ../snapshots/candidate
-          fi
+          bash ../candidate/.github/scripts/compatibility-baseline.sh \
+            "$GITHUB_WORKSPACE/candidate" "$GITHUB_WORKSPACE/baseline-snapshots" "${{ matrix.platform }}"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: compatibility-snapshot-${{ matrix.platform }}-${{ matrix.configuration }}
-          path: snapshots
+          name: compatibility-baseline-${{ matrix.platform }}
+          path: baseline-snapshots
           retention-days: 3
           if-no-files-found: warn
 
   compare:
-    needs: [revisions, snapshots]
-    if: always()
-    name: Report ${{ matrix.target.platform }} ${{ matrix.target.architecture }} ${{ matrix.configuration }} (advisory)
-    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+    needs: [revisions, baseline]
+    if: always() && needs.revisions.outputs.matrix != ''
+    name: Report ${{ matrix.platform }} (advisory)
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     container: wpilib/systemcore-cross-debian:trixie
     continue-on-error: true
-    timeout-minutes: 90
+    timeout-minutes: 180
     defaults:
       run:
         shell: bash
     strategy:
       fail-fast: false
-      matrix:
-        configuration: [release, debug]
-        target:
-          - {platform: linuxx86-64}
-          - {platform: linuxarm64}
-          - {platform: linuxsystemcore}
-          - {platform: windowsx86-64}
-          - {platform: windowsarm64}
-          - {platform: osxuniversal, architecture: x86_64}
-          - {platform: osxuniversal, architecture: arm64}
+      matrix: ${{ fromJSON(needs.revisions.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -184,11 +149,41 @@ jobs:
           path: candidate
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/download-artifact@v8
+      - name: Download candidate build artifacts
+        id: candidate-artifacts
+        uses: actions/download-artifact@v8
         continue-on-error: true
         with:
-          name: compatibility-snapshot-${{ matrix.target.platform }}-${{ matrix.configuration }}
-          path: snapshots
+          pattern: ${{ matrix.pattern }}
+          path: products/candidate
+      - name: Download baseline build artifacts
+        id: baseline-artifacts
+        if: matrix.baseline_run != ''
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ matrix.baseline_run }}
+          pattern: ${{ matrix.pattern }}
+          path: products/baseline
+      - name: Download fallback baseline
+        id: baseline-snapshots
+        if: matrix.baseline_run == ''
+        uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: compatibility-baseline-${{ matrix.platform }}
+          path: baseline-snapshots
+      - name: Discard failed downloads
+        # A digest failure can leave extracted files; they must not enter the report.
+        env:
+          CANDIDATE: ${{ steps.candidate-artifacts.outcome }}
+          BASELINE: ${{ steps.baseline-artifacts.outcome }}
+          SNAPSHOTS: ${{ steps.baseline-snapshots.outcome }}
+        run: |
+          if [ "$CANDIDATE" = failure ]; then rm -rf products/candidate; fi
+          if [ "$BASELINE" = failure ]; then rm -rf products/baseline; fi
+          if [ "$SNAPSHOTS" = failure ]; then rm -rf baseline-snapshots; fi
       - name: Install comparison tools
         run: |
           sudo apt-get update
@@ -216,32 +211,24 @@ jobs:
           repository: wpilibsuite/vendor-json-repo
           path: vendor-json-repo
           persist-credentials: false
-      - name: Download vendordeps
-        continue-on-error: true
-        timeout-minutes: 15
-        env:
-          BASE_SHA: ${{ needs.revisions.outputs.baseline }}
-          PLATFORM: ${{ matrix.target.platform }}
-          CONFIGURATION: ${{ matrix.configuration }}
-        run: |
-          python3 candidate/.github/scripts/compatibility.py download-vendors \
-            --repo candidate --baseline "$BASE_SHA" --inventory vendor-json-repo \
-            --platform "$PLATFORM" --configuration "$CONFIGURATION" --output vendors
-      - name: Compare libraries and JNI
+      - name: Compare all configurations and architectures
         if: always()
         env:
+          BASE_SHA: ${{ needs.revisions.outputs.baseline }}
           BASE_LABEL: ${{ needs.revisions.outputs.label || inputs.baseline }}
           HEAD_SHA: ${{ inputs.candidate }}
-          ARCHITECTURE: ${{ matrix.target.architecture }}
+          BASELINE_RUN: ${{ matrix.baseline_run }}
+          PLATFORM: ${{ matrix.platform }}
         run: |
           ARGS=()
-          if [ -n "$ARCHITECTURE" ]; then
-            ARGS+=(--architecture "$ARCHITECTURE")
+          if [ -z "$BASELINE_RUN" ]; then
+            ARGS+=(--baseline-snapshots baseline-snapshots)
           fi
-          python3 candidate/.github/scripts/compatibility.py compare \
-            --base snapshots/baseline --head snapshots/candidate \
-            --base-revision "$BASE_LABEL" --head-revision "$HEAD_SHA" \
-            --japicmp tools/japicmp.jar --vendors vendors --output report "${ARGS[@]}"
+          python3 candidate/.github/scripts/compatibility_artifacts.py report \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$BASE_LABEL" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --repo candidate --inventory vendor-json-repo \
+            --japicmp tools/japicmp.jar --output report "${ARGS[@]}"
       - name: Publish summary
         if: always()
         run: |
@@ -257,11 +244,11 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: compatibility-${{ matrix.target.platform }}-${{ matrix.target.architecture || 'native' }}-${{ matrix.configuration }}-${{ inputs.candidate }}
+          name: compatibility-${{ matrix.platform }}-${{ inputs.candidate }}
           path: |
-            report/*.md
-            report/*.json
-            report/*.txt
-            report/*.xml
-            report/*.html
+            report/**/*.md
+            report/**/*.json
+            report/**/*.txt
+            report/**/*.xml
+            report/**/*.html
           if-no-files-found: warn

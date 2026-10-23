@@ -7,32 +7,50 @@ Findings are advisory: they do not block PRs or post PR comments.
 
 ## Workflows and baselines
 
-Both workflows run only in `wpilibsuite/allwpilib`; fork repositories skip them.
-PRs from forks targeting the upstream repository still receive the PR check.
+The [Gradle workflow](../workflows/gradle.yml) runs compatibility reporting after
+its existing native build jobs. Reporting runs only in `wpilibsuite/allwpilib`;
+fork repositories skip it. PRs from forks targeting upstream still receive it.
 
-- **[PR compatibility](../workflows/compatibility-pr.yml)** compares the proposed
-  merge commit with the target branch HEAD recorded in the PR event. It does not
-  compare with a release tag
-  or the PR's merge base. A branch that is behind its target branch therefore
-  does not appear to remove APIs already added on the target branch.
-- **[Release compatibility](../workflows/compatibility-release.yml)** runs on
-  pushes to every upstream branch, including stable branches, merge, squash, and
-  rebase merges, and direct pushes. It
-  compares the new HEAD with the nearest `v[0-9]*` tag on that branch's
-  first-parent history, strictly before HEAD. Tags on side branches are ignored.
-  It does not run on PRs or tag pushes. Missing tags produce an incomplete
-  report, never an empty success.
+- **PRs** compare the proposed merge commit with the target branch HEAD recorded
+  in the PR event. The baseline is neither a release tag nor the PR's merge base,
+  so a branch behind its target does not appear to remove APIs already added there.
+- **Branch pushes** compare the new HEAD with the nearest `v[0-9]*` tag on the
+  branch's first-parent history, strictly before HEAD. Every upstream branch is
+  included, including stable branches, merges, and direct pushes. Tags on side
+  branches are ignored. Missing tags produce an incomplete report.
+- **Tag pushes and merge-group events** build artifacts but do not run reports.
 
-Both call [compatibility.yml](../workflows/compatibility.yml), which selects the
-baseline, builds snapshots of both revisions, then downloads vendordeps and
-compares each target. The builds use the same
-[Gradle init script](compatibility.init.gradle) and compare matching
-platform/configuration snapshots. Builds use the same toolchain for each pair:
-Linux cross containers, Windows 2025, or macOS 15.
-The script selects existing published Java JARs, top-level C++/JNI shared
-libraries, and HAL simulation plugins, without building tests, examples, or
-documentation. Gradle's build cache can reuse unchanged outputs. It does not
-alter the normal Gradle, CMake, or Bazel build definitions.
+[compatibility.yml](../workflows/compatibility.yml) selects the baseline and runs
+**six report jobs**, one per platform. Each job downloads its existing Gradle
+artifacts once and checks both release and debug; macOS checks both architectures
+as well. The candidate is never rebuilt for the compatibility check.
+
+The existing `Linux`, `Arm64`, `Systemcore`, `Win64Debug`, `Win64Release`,
+`WinArm64Debug`, `WinArm64Release`, and `macOS` artifacts supply the published
+libraries and JARs. An advisory post-build task adds a `compatibility/` directory
+to those same artifacts. It contains the exact commit/platform/configuration
+inventory, Java dependency JARs, the omitted Linux `cscore-jnicvstatic` debug
+sidecar, and macOS DWARF linked while the build objects still exist. It does not
+copy or repackage the published binaries, or compile/link native code. Maven
+publishing excludes this directory and the report artifacts.
+
+Baseline artifacts come from upstream **push** runs of `gradle.yml` for the exact
+baseline commit. Uploaded build artifacts can be reused while unrelated jobs in
+that run are still running. PR artifacts are never selected as baselines.
+Artifacts are matched by platform and configuration, and their recorded commit
+is checked before analysis. Missing candidate artifacts, incomplete supplemental
+data, or mismatched provenance produce incomplete reports.
+
+For baselines predating the supplemental data, or with missing/expired build
+artifacts, a fallback job builds both configurations for the affected platform.
+These jobs use the current [Gradle init script](compatibility.init.gradle), omit
+tests/examples/documentation, and cache snapshots by exact baseline SHA, platform,
+and snapshot tooling. There are at most six fallback jobs, and none when all
+baseline artifacts are available. Fallback snapshots are transferred to report
+jobs even if cache saving is unavailable on a fork PR. Native fallback builds
+use Linux cross containers, Windows 2025, or macOS 15. Reused artifacts can come
+from different runner/toolchain image versions; a compiler-induced ABI difference
+can therefore appear in the results and needs review.
 
 ## Coverage
 
@@ -49,7 +67,8 @@ Every target is checked in **release and debug** configurations:
 
 Each macOS universal library and debug file is split before comparison. Missing
 slices or mismatched snapshot metadata produce incomplete coverage. There are
-12 build pairs and 14 comparison jobs; each report identifies its target.
+14 target/configuration comparisons grouped into six jobs; each report identifies
+its target.
 
 The native inventory includes JNI shared libraries and the separate
 `cscore-jnicvstatic` variant, including its Linux debug sidecar. It also includes
@@ -67,8 +86,8 @@ after debug information has been checked.
 Windows uses LLVM's PE exports and PDB CodeView records, with type indices
 resolved to stable names and definitions. macOS uses Mach-O symbols, LLDB DWARF
 record layouts and function/data types, plus DWARF virtual method slots. The
-snapshot creates flat macOS debug files while the original build objects still
-exist. These checks detect removed exports, same-size field rearrangements,
+normal build creates supplemental flat macOS debug files while the original
+build objects still exist. These checks detect removed exports, same-size field rearrangements,
 base/virtual layout changes, and typed C-linkage changes with unchanged names.
 They conservatively compare named debug records beyond exported interfaces;
 internal-only changes may therefore appear. They are not equivalent to
@@ -176,11 +195,12 @@ binary was compatible with the baseline in the first place.
 Each Actions job summary identifies the revisions and target, lists native and
 Java findings, shows vendordep usage evidence, and reports JNI findings and
 exported-binding counts. Native diagnostics have expandable excerpts. Download
-the `compatibility-<platform>-<architecture>-<configuration>-<candidate SHA>`
+the `compatibility-<platform>-<candidate SHA>`
 artifact for full C++ text diagnostics, Java HTML/XML/text,
 `vendors-downloads.json`, `vendors-manifests.json`, and `results.json` (including
-full vendor reference evidence and JNI findings). The architecture component is
-`x86_64` or `arm64` for macOS and `native` for other targets.
+full vendor reference evidence and JNI findings). Reports are grouped in
+`<configuration>/<architecture>/` directories, using `x86_64` and `arm64` for
+macOS and `native` for other targets.
 Windows/macOS reports also contain the normalized before/after type snapshots.
 
 Native library statuses distinguish findings from inspection failures:
@@ -193,8 +213,9 @@ Native library statuses distinguish findings from inspection failures:
 | `changed` | The native comparison found differences requiring review. |
 | `error` | The native inspection could not complete. |
 
-Build snapshots are uploaded separately as
-`compatibility-snapshot-<platform>-<configuration>` and retained for three days.
+Only fallback baseline builds upload separate snapshots, as
+`compatibility-baseline-<platform>`, retained for three days. Normal reports
+consume the existing Gradle artifacts directly.
 
 Findings and vendor coverage warnings return success. Coverage warnings remain
 marked **INCOMPLETE** in the summary and generate an Actions warning. Tool,
@@ -202,8 +223,8 @@ comparison dependency, inventory, checksum, snapshot, or build failures produce
 an **INCOMPLETE** report and failing step diagnostics. Machine-readable results
 separate `warnings` from `errors`. The job uses
 `continue-on-error` to remain advisory even when analysis cannot finish.
-No credentials beyond read access to the repository are used, including for
-fork PRs. Both checkouts disable credential persistence.
+Report jobs use only read access to repository contents and Actions artifacts,
+including for fork PRs. Their checkouts disable credential persistence.
 
 ## Local use
 
@@ -251,7 +272,7 @@ as `LLVM_PDBUTIL` or `LLVM_NM`.
 `download-vendors --series SERIES` can explicitly override inventory selection
 locally, where `SERIES` is a registry directory matching the formats above.
 `compare` can omit `--vendors` to compare WPILib libraries and JNI contracts
-without vendor usage tracing. Both CI workflows always request vendor tracing.
+without vendor usage tracing. All CI reports request vendor tracing.
 Downloads are refreshed on each run, and their recorded hashes are verified
 before tracing.
 
@@ -269,4 +290,5 @@ The compiled fixtures cover native layouts and removed symbols, Windows/macOS
 architecture handling and virtual methods, C-linkage function/data types, Java
 definition changes, JNI declarations and private-member references, and vendor
 usage tracing. Additional tests cover registry selection, downloads, integrity
-checks, and incomplete reports.
+checks, artifact provenance, supplemental debug files, grouped configuration and
+architecture coverage, and incomplete reports.

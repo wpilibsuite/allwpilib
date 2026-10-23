@@ -67,6 +67,18 @@ def native_status(returncode):
     return "changed" if returncode else "unchanged"
 
 
+def native_files(snapshot, archive):
+    """Read packaged libraries and debug sidecars added to the normal CI artifact."""
+    suffixes = (".so", ".so.debug", ".dll", ".pdb", ".dylib", ".dylib.debug")
+    with zipfile.ZipFile(archive) as contents:
+        for entry in contents.infolist():
+            if entry.filename.endswith(suffixes):
+                yield entry.filename, contents.read(entry)
+    for sidecar in sorted((snapshot / "native-debug" / archive.stem).glob("*.debug")):
+        if sidecar.name.endswith((".so.debug", ".dylib.debug")):
+            yield sidecar.name, sidecar.read_bytes()
+
+
 def native_libraries(snapshot, destination, architecture=None):
     """Extract shared libraries and their debug files without trusting zip paths."""
     libraries = {}
@@ -75,48 +87,43 @@ def native_libraries(snapshot, destination, architecture=None):
         raise ValueError(f"No native archives in {snapshot}")
     for archive in archives:
         found = False
-        with zipfile.ZipFile(archive) as contents:
-            for entry in contents.infolist():
-                name = Path(entry.filename).name
-                if not name.endswith(
-                    (".so", ".so.debug", ".dll", ".pdb", ".dylib", ".dylib.debug")
-                ):
-                    continue
-                target = destination / archive.stem / name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                if target.exists():
-                    raise ValueError(f"Duplicate native file in {archive}: {name}")
-                target.write_bytes(contents.read(entry))
-                if architecture and name.endswith((".dylib", ".dylib.debug")):
-                    arches = subprocess.check_output(
-                        [llvm_tool("llvm-lipo"), "-archs", str(target)],
-                        text=True,
+        for filename, data in native_files(snapshot, archive):
+            name = Path(filename).name
+            target = destination / archive.stem / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists():
+                raise ValueError(f"Duplicate native file in {archive}: {name}")
+            target.write_bytes(data)
+            if architecture and name.endswith((".dylib", ".dylib.debug")):
+                arches = subprocess.check_output(
+                    [llvm_tool("llvm-lipo"), "-archs", str(target)],
+                    text=True,
+                    timeout=120,
+                ).split()
+                if architecture not in arches:
+                    raise ValueError(
+                        f"Missing {architecture} slice in {archive.name}/{name}"
+                    )
+                thin = target.with_name(target.name + ".thin")
+                if len(arches) > 1:
+                    subprocess.run(
+                        [
+                            llvm_tool("llvm-lipo"),
+                            str(target),
+                            "-thin",
+                            architecture,
+                            "-output",
+                            str(thin),
+                        ],
+                        check=True,
+                        capture_output=True,
                         timeout=120,
-                    ).split()
-                    if architecture not in arches:
-                        raise ValueError(
-                            f"Missing {architecture} slice in {archive.name}/{name}"
-                        )
-                    thin = target.with_name(target.name + ".thin")
-                    if len(arches) > 1:
-                        subprocess.run(
-                            [
-                                llvm_tool("llvm-lipo"),
-                                str(target),
-                                "-thin",
-                                architecture,
-                                "-output",
-                                str(thin),
-                            ],
-                            check=True,
-                            capture_output=True,
-                            timeout=120,
-                        )
-                        thin.replace(target)
-                if name.endswith((".so", ".dll", ".dylib")):
-                    format_of(target)
-                    libraries[f"{archive.stem}/{name}"] = target
-                    found = True
+                    )
+                    thin.replace(target)
+            if name.endswith((".so", ".dll", ".dylib")):
+                format_of(target)
+                libraries[f"{archive.stem}/{name}"] = target
+                found = True
         if not found:
             raise ValueError(f"No shared libraries in {archive}")
     return libraries
@@ -547,7 +554,7 @@ def compare(args):
         "head": args.head_revision,
         "native": [],
         "java": [],
-        "errors": [],
+        "errors": list(getattr(args, "setup_errors", [])),
         "warnings": [],
     }
     architecture = getattr(args, "architecture", None)

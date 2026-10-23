@@ -8,6 +8,66 @@ gradle.projectsEvaluated {
     def platform = root.findProperty('compatibilityPlatform') ?: 'linuxx86-64'
     def configuration = root.findProperty('compatibilityConfiguration') ?: 'release'
     def classifier = platform + (configuration == 'debug' ? 'debug' : '')
+
+    // Supplement the normal CI artifacts, without copying or rebuilding their libraries.
+    root.tasks.register('compatibilityArtifacts', Sync) {
+        description = 'Adds dependency JARs, debug sidecars, and an inventory to the existing CI artifacts'
+        def publishedJava = []
+        def publishedNative = []
+        root.subprojects.each { p ->
+            def id = p.path.substring(1).replace(':', '-')
+            def jar = p.tasks.findByName('outputJar')
+            if (jar != null) {
+                publishedJava.add([project: p, id: id, archive: jar])
+            }
+            if ((p.parent == root && p.name != 'ntcoreffi') || p.path.startsWith(':simulation:')) {
+                p.tasks.withType(Zip).matching {
+                    it.archiveBaseName.get().contains('-cpp_CLS') ||
+                        it.archiveBaseName.get().contains('-jni') || p.path.startsWith(':simulation:')
+                }.each { archive ->
+                    def artifact = archive.archiveBaseName.get().replaceFirst('^.*_ID_', '').replaceFirst('_CLS$', '')
+                    publishedNative.add([archive: archive, name: "${id}-${artifact}.zip".toString()])
+                }
+            }
+        }
+        into("${root.buildDir}/allOutputs/compatibility")
+        def configurations = (root.findProperty('compatibilityConfigurations') ?: 'release,debug').split(',')
+        def targets = [:]
+        publishedJava.each { item ->
+            def classpath = item.project.configurations.getByName('compileClasspath')
+            dependsOn classpath
+            from(classpath) {
+                into "classpath/${item.id}"
+            }
+        }
+        configurations.each { config ->
+            def targetClassifier = platform + (config == 'debug' ? 'debug' : '')
+            def archives = publishedNative.findAll { it.archive.name.endsWith("_CLS-${targetClassifier}") }
+            targets[config] = [
+                java: publishedJava.collect { [file: it.archive.archiveFile.get().asFile.name, name: "${it.id}.jar"] },
+                native: archives.collect { [file: it.archive.archiveFile.get().asFile.name, name: it.name] }
+            ]
+            archives.findAll { it.archive.archiveBaseName.get().contains('-jnicvstatic') }.each { item ->
+                item.archive.inputs.files.files.findAll { it.name.endsWith('.so') }.each { library ->
+                    from(new File(library.absolutePath + '.debug')) {
+                        into "${config}/native-debug/${item.name.replaceFirst(/\.zip$/, '')}"
+                    }
+                }
+            }
+        }
+        inputs.property('revision', root.findProperty('compatibilityRevision') ?: '')
+        inputs.property('platform', platform)
+        inputs.property('inventory', groovy.json.JsonOutput.toJson(targets))
+        doLast {
+            new File(destinationDir, 'manifest.json').text = groovy.json.JsonOutput.toJson([
+                schema: 1,
+                revision: root.findProperty('compatibilityRevision'),
+                platform: platform,
+                targets: targets
+            ])
+        }
+    }
+
     root.tasks.register('compatibilitySnapshot', Sync) {
         description = 'Collects published Java, C++, JNI, and simulation plugins for compatibility analysis'
         into(root.findProperty('compatibilityOutput') ?: "${root.buildDir}/compatibility")
