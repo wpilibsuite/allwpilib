@@ -1,0 +1,129 @@
+name: Compatibility report
+
+on:
+  workflow_call:
+    inputs:
+      baseline:
+        description: Baseline commit SHA, or previous-tag for a branch comparison
+        required: true
+        type: string
+      candidate:
+        description: Candidate commit SHA (the proposed merge for a PR)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    name: C++ ABI and Java definitions (advisory)
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+    container: wpilib/systemcore-cross-debian:trixie
+    # Neither compatibility findings nor infrastructure failures block PRs. Failures
+    # still produce an INCOMPLETE summary and retain the failing step's diagnostics.
+    continue-on-error: true
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select baseline
+        id: baseline
+        env:
+          BASELINE: ${{ inputs.baseline }}
+          CANDIDATE: ${{ inputs.candidate }}
+        run: |
+          if [ "$BASELINE" = previous-tag ]; then
+            BASELINE=$(python3 candidate/.github/scripts/compatibility.py previous-tag --repo candidate --head "$CANDIDATE")
+          fi
+          BASE_SHA=$(git -C candidate rev-parse --verify "${BASELINE}^{commit}")
+          echo "ref=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "label=$BASELINE ($BASE_SHA)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.baseline.outputs.ref }}
+          path: baseline
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install comparison tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y abigail-tools
+          mkdir -p tools report
+          curl --fail --location --retry 3 --max-time 120 \
+            -o tools/japicmp.jar \
+            https://repo.maven.apache.org/maven2/com/github/siom79/japicmp/japicmp/0.24.2/japicmp-0.24.2-jar-with-dependencies.jar
+          echo '799a3a85b3025d84b2ed9e0c105064e12adc2c414afe8c25a95454f8d3772f7f  tools/japicmp.jar' | sha256sum --check
+          {
+            abidiff --version
+            java -version
+            echo 'japicmp 0.24.2'
+          } > report/tools.txt 2>&1
+          cat report/tools.txt
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          validate-wrappers: false
+          cache-read-only: true
+
+      - name: Test comparison engine
+        env:
+          JAPICMP_JAR: ${{ github.workspace }}/tools/japicmp.jar
+        run: python3 -m unittest discover -s candidate/.github/scripts/compatibility_tests -v
+
+      - name: Build baseline libraries
+        working-directory: baseline
+        run: |
+          ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponlylinuxx86-64 \
+            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/baseline"
+
+      - name: Build candidate libraries
+        working-directory: candidate
+        run: |
+          ./gradlew --init-script .github/scripts/compatibility.init.gradle \
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponlylinuxx86-64 \
+            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/candidate"
+
+      - name: Compare libraries
+        if: always()
+        env:
+          BASE_LABEL: ${{ steps.baseline.outputs.label || inputs.baseline }}
+          HEAD_SHA: ${{ inputs.candidate }}
+        run: |
+          python3 candidate/.github/scripts/compatibility.py compare \
+            --base snapshots/baseline --head snapshots/candidate \
+            --base-revision "$BASE_LABEL" --head-revision "$HEAD_SHA" \
+            --japicmp tools/japicmp.jar --output report
+
+      - name: Publish summary
+        if: always()
+        run: |
+          mkdir -p report
+          if [ ! -f report/summary.md ]; then
+            echo '# Compatibility report (advisory)' > report/summary.md
+            echo '**INCOMPLETE: setup or analysis failed. See the job logs.**' >> report/summary.md
+          fi
+          cat report/summary.md >> "$GITHUB_STEP_SUMMARY"
+          if grep -q INCOMPLETE report/summary.md; then
+            echo '::warning::Compatibility analysis is incomplete; see the summary and job logs.'
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compatibility-${{ inputs.candidate }}
+          path: |
+            report/*.md
+            report/*.json
+            report/*.txt
+            report/*.xml
+            report/*.html
+          if-no-files-found: warn

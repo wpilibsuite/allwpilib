@@ -1,0 +1,20 @@
+name: PR compatibility
+
+on: [pull_request]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compatibility-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    if: github.repository == 'wpilibsuite/allwpilib'
+    uses: ./.github/workflows/compatibility.yml
+    with:
+      # Compare the proposed merge with its target branch HEAD, not the merge base
+      # or a release tag. This avoids reporting changes already on the target branch.
+      baseline: ${{ github.event.pull_request.base.sha }}
+      candidate: ${{ github.sha }}

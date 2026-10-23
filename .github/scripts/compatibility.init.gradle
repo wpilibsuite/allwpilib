@@ -1,0 +1,51 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// An init script lets the same snapshot task run on revisions which predate this check.
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    root.tasks.register('compatibilitySnapshot', Sync) {
+        description = 'Collects published Java and Linux C++ libraries for compatibility analysis'
+        into(root.findProperty('compatibilityOutput') ?: "${root.buildDir}/compatibility")
+
+        root.subprojects.each { p ->
+            def id = p.path.substring(1).replace(':', '-')
+            def jar = p.tasks.findByName('outputJar')
+            if (jar != null) {
+                dependsOn jar
+                from(jar.archiveFile) {
+                    into 'java'
+                    rename { "${id}.jar" }
+                }
+                // Preserve each revision's dependency classpath; missing types must not be ignored.
+                def classpath = p.configurations.getByName('compileClasspath')
+                dependsOn classpath
+                from(classpath) {
+                    into "classpath/${id}"
+                }
+            }
+
+            // Published, top-level C++ libraries (including JNI), excluding tools, simulation
+            // plugins, bundled thirdparty libraries, and the separate ntcore FFI build.
+            if (p.parent == root && p.name != 'ntcoreffi') {
+                p.tasks.withType(Zip).matching {
+                    it.name.endsWith('-cpp_CLS-linuxx86-64')
+                }.each { archive ->
+                    // A project can publish more than one archive (e.g. fields and field-images).
+                    def artifact = archive.archiveBaseName.get().replaceFirst('^.*_ID_', '').replaceFirst('_CLS$', '')
+                    dependsOn archive
+                    from(archive.archiveFile) {
+                        into 'native'
+                        rename { "${id}-${artifact}.zip" }
+                    }
+                }
+            }
+        }
+
+        doLast {
+            // Written only after all build/copy operations succeed.
+            new File(destinationDir, 'complete').text = 'complete\n'
+        }
+    }
+}
