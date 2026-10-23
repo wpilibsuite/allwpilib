@@ -340,6 +340,38 @@ class DesktopTests(unittest.TestCase):
             "error",
         )
 
+    def test_prepare_macos_preserves_archive_and_replaces_debug_files(self):
+        library = self.build(self.root / "build", "x86_64")
+        (self.root / "native").mkdir()
+        path = self.root / "native/plugin.zip"
+        name = "osx/universal/shared/libplugin.dylib"
+        with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("LICENSE.txt", "fixture license")
+            # Removing this entry changes the following library's offset in the new ZIP.
+            archive.writestr(name + ".debug", b"stale debug file")
+            archive.write(library, name)
+            archive.writestr("metadata.txt", "fixture metadata")
+        for attempt in range(2):
+            with patch.dict("os.environ", {"DSYMUTIL": llvm_tool("dsymutil")}):
+                compatibility.prepare_macos(self.root)
+            with zipfile.ZipFile(path) as archive:
+                self.assertIsNone(archive.testzip())
+                self.assertEqual(archive.read(name), library.read_bytes())
+                self.assertEqual(archive.read("LICENSE.txt"), b"fixture license")
+                self.assertEqual(archive.read("metadata.txt"), b"fixture metadata")
+                self.assertEqual(archive.namelist().count(name + ".debug"), 1)
+                self.assertNotEqual(archive.read(name + ".debug"), b"stale debug file")
+            extracted = compatibility.native_libraries(
+                self.root, self.root / f"extracted-{attempt}", "x86_64"
+            )
+            binary = next(iter(extracted.values()))
+            self.assertEqual(
+                compatibility.compare_debug_types(
+                    binary, binary, self.root / "prepared.txt"
+                ),
+                "unchanged",
+            )
+
     def test_universal_slices_are_separate_and_required(self):
         binaries = [self.build(self.root / arch, arch) for arch in ("x86_64", "arm64")]
         universal = self.root / "universal.dylib"

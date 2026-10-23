@@ -107,22 +107,23 @@ jobs:
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work/baseline
-          run: |
-            ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
-              compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} \
-              -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
-              -PcompatibilityOutput=/work/snapshots/baseline
+          # The action replaces newlines with semicolons; pass a single folded command.
+          run: >-
+            ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }}
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }}
+            -PcompatibilityOutput=/work/snapshots/baseline
       - name: Build Linux candidate
         if: always() && runner.os == 'Linux'
         uses: wpilibsuite/docker-run-action@v4
         with:
           image: ${{ matrix.container }}
           options: -v ${{ github.workspace }}:/work -w /work/candidate
-          run: |
-            ./gradlew --init-script .github/scripts/compatibility.init.gradle \
-              compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} \
-              -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
-              -PcompatibilityOutput=/work/snapshots/candidate
+          run: >-
+            ./gradlew --init-script .github/scripts/compatibility.init.gradle
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }}
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }}
+            -PcompatibilityOutput=/work/snapshots/candidate
       - name: Build desktop baseline
         if: runner.os != 'Linux'
         working-directory: baseline

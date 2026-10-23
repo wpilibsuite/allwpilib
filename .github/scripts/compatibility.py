@@ -313,13 +313,21 @@ def prepare_macos(snapshot):
                 for entry in source.infolist():
                     if entry.filename.endswith(".dylib.debug"):
                         continue
-                    dest.writestr(entry, source.read(entry))
+                    # writestr updates the ZipInfo offset; read before copying it.
+                    data = source.read(entry)
+                    dest.writestr(entry, data)
                     if entry.filename.endswith(".dylib"):
                         binary = Path(directory) / Path(entry.filename).name
-                        binary.write_bytes(source.read(entry))
+                        binary.write_bytes(data)
                         debug = Path(str(binary) + ".debug")
                         subprocess.run(
-                            ["dsymutil", "--flat", "-o", str(debug), str(binary)],
+                            [
+                                llvm_tool("dsymutil"),
+                                "--flat",
+                                "-o",
+                                str(debug),
+                                str(binary),
+                            ],
                             check=True,
                             timeout=1200,
                         )
