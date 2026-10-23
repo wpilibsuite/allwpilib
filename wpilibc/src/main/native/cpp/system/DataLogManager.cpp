@@ -78,6 +78,37 @@ struct Instance {
 static constexpr uintmax_t FREE_SPACE_THRESHOLD = 200000000;
 static constexpr int FILE_COUNT_THRESHOLD = 10;
 
+static bool IsMatchLog(std::string_view filename) {
+  constexpr std::string_view extension = ".wpilog";
+  if (filename.size() < extension.size() ||
+      filename.substr(filename.size() - extension.size()) != extension) {
+    return false;
+  }
+
+  auto extensionIndex = filename.size() - extension.size();
+  auto matchTypeSeparator = filename.rfind('_', extensionIndex - 1);
+  if (matchTypeSeparator == std::string_view::npos ||
+      matchTypeSeparator + 2 >= extensionIndex) {
+    return false;
+  }
+
+  char matchType = filename[matchTypeSeparator + 1];
+  if (matchType != 'P' && matchType != 'Q' && matchType != 'E' &&
+      matchType != 'T') {
+    return false;
+  }
+  for (size_t i = matchTypeSeparator + 2; i < extensionIndex; ++i) {
+    if (filename[i] < '0' || filename[i] > '9') {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool wpi::internal::IsDataLogMatchLog(std::string_view filename) {
+  return IsMatchLog(filename);
+}
+
 static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
     return {std::string{dir}, false};
@@ -147,14 +178,15 @@ void Thread::Main() {
       freeSpace = UINTMAX_MAX;
     }
     if (freeSpace < FREE_SPACE_THRESHOLD) {
-      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we
-      // just created one)
+      // Delete oldest non-match WPILIB_*.wpilog files. Ignore temporary and
+      // match logs.
       std::vector<fs::directory_entry> entries;
       for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
-        auto stem = entry.path().stem().string();
-        if (wpi::util::starts_with(stem, "WPILIB_") &&
+        auto filename = entry.path().filename().string();
+        if (wpi::util::starts_with(filename, "WPILIB_") &&
             entry.path().extension() == ".wpilog" &&
-            !wpi::util::starts_with(stem, "WPILIB_TBD_")) {
+            !wpi::util::starts_with(filename, "WPILIB_TBD_") &&
+            !wpi::internal::IsDataLogMatchLog(filename)) {
           entries.emplace_back(entry);
         }
       }
@@ -276,7 +308,7 @@ void Thread::Main() {
               matchTypeChar = 'E';
               break;
             default:
-              matchTypeChar = '_';
+              matchTypeChar = 'T';
               break;
           }
           auto now = std::chrono::system_clock::now();

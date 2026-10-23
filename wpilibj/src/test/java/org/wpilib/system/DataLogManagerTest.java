@@ -26,6 +26,29 @@ class DataLogManagerTest {
   }
 
   @Test
+  void matchLogFilenameDetection() {
+    for (String filename :
+        List.of(
+            "WPILIB_20261022_123456_CALA_P1.wpilog",
+            "WPILIB_20261022_123456_WAMIL_Q123.wpilog",
+            "WPILIB_20261022_123456_MNDU2_E13.wpilog",
+            "WPILIB_20261022_123456_Event_T4.wpilog")) {
+      assertTrue(DataLogManager.isMatchLog(filename), filename);
+    }
+
+    for (String filename :
+        List.of(
+            "WPILIB_20261022_123456.wpilog",
+            "WPILIB_20261022_123456_Event_Q.wpilog",
+            "WPILIB_20261022_123456_Event_Qabc.wpilog",
+            "WPILIB_20261022_123456_Event_X3.wpilog",
+            "WPILIB_20261022_123456_Event_Q3.wpilog.bak",
+            "WPILIB_TBD_1234567890abcdef.wpilog")) {
+      assertFalse(DataLogManager.isMatchLog(filename), filename);
+    }
+  }
+
+  @Test
   @Timeout(5)
   void alertLifetime(@TempDir Path logDir) throws InterruptedException {
     HAL.initialize();

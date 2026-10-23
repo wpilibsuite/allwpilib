@@ -44,10 +44,11 @@ import org.wpilib.util.concurrent.Event;
  * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
  * <p>On startup, all existing WPILIB_TBD log files are deleted. If there is less than 200 MB of
- * free space on the target storage, WPILIB_ log files are deleted (oldest to newest) until there is
- * 200 MB free OR there are 10 files remaining. An alert is active while less than 400 MB is
- * available, checked every 5 seconds. An informational alert indicates when automatic directory
- * selection falls back to SystemCore internal storage.
+ * free space on the target storage, non-match WPILIB_ log files are deleted (oldest to newest)
+ * until there is 200 MB free OR there are 10 files remaining. Competition match logs are not
+ * deleted. An alert is active while less than 400 MB is available, checked every 5 seconds. An
+ * informational alert indicates when automatic directory selection falls back to SystemCore
+ * internal storage.
  *
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
@@ -72,6 +73,29 @@ public final class DataLogManager {
   // OR there are this many files remaining.
   private static final long FREE_SPACE_THRESHOLD = 200000000L;
   private static final int FILE_COUNT_THRESHOLD = 10;
+
+  static boolean isMatchLog(String filename) {
+    int extensionIndex = filename.lastIndexOf(".wpilog");
+    if (extensionIndex != filename.length() - 7) {
+      return false;
+    }
+
+    int matchTypeSeparator = filename.lastIndexOf('_', extensionIndex - 1);
+    if (matchTypeSeparator < 0 || matchTypeSeparator + 2 >= extensionIndex) {
+      return false;
+    }
+
+    char matchType = filename.charAt(matchTypeSeparator + 1);
+    if (matchType != 'P' && matchType != 'Q' && matchType != 'E' && matchType != 'T') {
+      return false;
+    }
+    for (int i = matchTypeSeparator + 2; i < extensionIndex; i++) {
+      if (filename.charAt(i) < '0' || filename.charAt(i) > '9') {
+        return false;
+      }
+    }
+    return true;
+  }
 
   private DataLogManager() {}
 
@@ -365,13 +389,14 @@ public final class DataLogManager {
       File logDir = new File(m_logDir);
       long freeSpace = logDir.getUsableSpace();
       if (freeSpace < FREE_SPACE_THRESHOLD) {
-        // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just created one)
+        // Delete oldest non-match WPILIB_*.wpilog files. Ignore temporary and match logs.
         File[] files =
             logDir.listFiles(
                 (dir, name) ->
                     name.startsWith("WPILIB_")
                         && name.endsWith(".wpilog")
-                        && !name.startsWith("WPILIB_TBD_"));
+                        && !name.startsWith("WPILIB_TBD_")
+                        && !isMatchLog(name));
         if (files != null) {
           Arrays.sort(files, Comparator.comparingLong(File::lastModified));
           int count = files.length;
@@ -478,7 +503,7 @@ public final class DataLogManager {
                   case PRACTICE -> 'P';
                   case QUALIFICATION -> 'Q';
                   case ELIMINATION -> 'E';
-                  default -> '_';
+                  default -> 'T';
                 };
             m_log.setFilename(
                 "WPILIB_"

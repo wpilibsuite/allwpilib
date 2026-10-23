@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <string>
+#include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -13,6 +14,29 @@
 #include "wpi/simulation/AlertSim.hpp"
 #include "wpi/util/Alert.hpp"
 #include "wpi/util/fs.hpp"
+
+TEST_CASE("DataLogManagerTest MatchLogFilenameDetection", "[wpilibc]") {
+  for (std::string_view stem : {
+           "WPILIB_20261022_123456_CALA_P1.wpilog",
+           "WPILIB_20261022_123456_WAMIL_Q123.wpilog",
+           "WPILIB_20261022_123456_MNDU2_E13.wpilog",
+           "WPILIB_20261022_123456_Event_T4.wpilog",
+       }) {
+    CAPTURE(stem);
+    CHECK(wpi::internal::IsDataLogMatchLog(stem));
+  }
+
+  for (std::string_view stem : {
+           "WPILIB_20261022_123456",
+           "WPILIB_20261022_123456_Event_Q",
+           "WPILIB_20261022_123456_Event_Qabc",
+           "WPILIB_20261022_123456_Event_X3",
+           "WPILIB_TBD_1234567890abcdef",
+       }) {
+    CAPTURE(stem);
+    CHECK_FALSE(wpi::internal::IsDataLogMatchLog(stem));
+  }
+}
 
 TEST_CASE("DataLogManagerTest FreeSpaceAlert", "[wpilibc]") {
   HAL_Initialize();
