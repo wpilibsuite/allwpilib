@@ -8,6 +8,7 @@ import argparse
 import importlib.util
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -20,7 +21,7 @@ import compatibility
 import compatibility_jni as jni
 import compatibility_native as native
 import compatibility_vendors as vendors
-from compatibility_binary import llvm_tool, symbols
+from compatibility_binary import demangle, llvm_tool, symbols
 from test_compatibility import run
 
 
@@ -32,6 +33,35 @@ def available(name):
 
 
 class PlatformTests(unittest.TestCase):
+    @unittest.skipUnless(
+        available("llvm-undname") and available("llvm-cxxfilt"),
+        "Install LLVM demanglers",
+    )
+    def test_partial_microsoft_demangling_preserves_supported_and_raw_names(self):
+        valid = "?consume@@YAHPEAULayout@@@Z"
+        invalid = "?unsupported"
+        decoded, undecoded = demangle({valid, invalid, "plain", "_Z7consumeP6Layout"})
+        self.assertIn("consume(Layout *)", decoded[valid])
+        self.assertEqual(decoded[invalid], invalid)
+        self.assertEqual(decoded["plain"], "plain")
+        self.assertEqual(decoded["_Z7consumeP6Layout"], "consume(Layout*)")
+        self.assertEqual(undecoded, [invalid])
+
+    def test_demangler_tool_failure_is_still_an_error(self):
+        name = "?consume@@YAHPEAULayout@@@Z"
+        with (
+            patch("compatibility_binary.llvm_tool", side_effect=lambda name: name),
+            patch(
+                "compatibility_binary.subprocess.run",
+                side_effect=[
+                    subprocess.CompletedProcess([], 0, name + "\n", ""),
+                    subprocess.CompletedProcess([], 1, "", "tool failed\n"),
+                ],
+            ),
+            self.assertRaises(subprocess.CalledProcessError),
+        ):
+            demangle({name})
+
     def test_target_classifiers_include_simulation_jni_and_debug(self):
         dep = {
             "groupId": "org.vendor",
@@ -299,6 +329,22 @@ class DesktopTests(unittest.TestCase):
                         str(obj),
                     )
                 run(llvm_tool("llvm-ar"), "rcs", str(static), str(obj))
+                if platform.startswith("windows"):
+                    # A name LLVM cannot decode must not discard the other references.
+                    unsupported = folder / "unsupported.s"
+                    unsupported.write_text(
+                        '.data\n.globl "?unsupported"\n"?unsupported":\n.byte 0\n'
+                    )
+                    unsupported_obj = folder / "unsupported.obj"
+                    run(
+                        llvm_tool("clang"),
+                        "--target=" + triple,
+                        "-c",
+                        str(unsupported),
+                        "-o",
+                        str(unsupported_obj),
+                    )
+                    run(llvm_tool("llvm-ar"), "rcs", str(static), str(unsupported_obj))
                 archive = folder / "vendor.zip"
                 with zipfile.ZipFile(archive, "w") as contents:
                     contents.write(shared, shared.name)
@@ -320,6 +366,11 @@ class DesktopTests(unittest.TestCase):
                 )
                 self.assertFalse(result["errors"], result)
                 self.assertEqual(len(result["findings"]), 2)
+                if platform.startswith("windows"):
+                    self.assertTrue(result["warnings"])
+                    self.assertEqual(
+                        result["undemangled"][0]["symbols"], ["?unsupported"]
+                    )
                 removed = native.trace_native(
                     [artifact], {"api": old}, {}, [], folder, folder, architecture
                 )

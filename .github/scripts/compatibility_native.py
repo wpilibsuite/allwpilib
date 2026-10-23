@@ -59,7 +59,7 @@ def trace_native(artifacts, old, new, results, output, temporary, architecture=N
                 )
             )
             contexts.append((result, diagnostic_context(text), raw_interfaces))
-    findings, errors = [], []
+    findings, errors, warnings, undemangled = [], [], [], []
     scanned = 0
     for number, (artifact, path) in enumerate(artifacts):
         try:
@@ -92,7 +92,20 @@ def trace_native(artifacts, old, new, results, output, temporary, architecture=N
                                 "libraries": exports[symbol],
                             }
                         )
-                    names = demangle(defined | undefined)
+                    names, undecoded = demangle(defined | undefined)
+                    if undecoded:
+                        warnings.append(
+                            f"Native vendor {artifact['path']} ({entry.filename}): "
+                            f"{len(undecoded)} symbols could not be demangled; "
+                            "raw symbol matching is retained."
+                        )
+                        undemangled.append(
+                            {
+                                "artifact": artifact["path"],
+                                "entry": entry.filename,
+                                "symbols": undecoded,
+                            }
+                        )
                     for result, (types, interfaces), raw_interfaces in contexts:
                         matches = []
                         pattern = (
@@ -167,4 +180,10 @@ def trace_native(artifacts, old, new, results, output, temporary, architecture=N
             subprocess.SubprocessError,
         ) as error:
             errors.append(f"Native vendor {artifact['path']}: {error}")
-    return {"scanned": scanned, "findings": findings, "errors": errors}
+    return {
+        "scanned": scanned,
+        "findings": findings,
+        "errors": errors,
+        "warnings": warnings,
+        "undemangled": undemangled,
+    }

@@ -423,6 +423,10 @@ def summary(report):
         lines += ["**INCOMPLETE: some checks could not run.**", ""]
         lines += [f"- {html.escape(error)}" for error in report["errors"]]
         lines.append("")
+    if report.get("warnings"):
+        lines += ["**INCOMPLETE vendor coverage (warnings):**", ""]
+        lines += [f"- {html.escape(warning)}" for warning in report["warnings"]]
+        lines.append("")
     native = report["native"]
     changed = [r for r in native if r["status"] in ("changed", "removed")]
     lines += [
@@ -544,6 +548,7 @@ def compare(args):
         "native": [],
         "java": [],
         "errors": [],
+        "warnings": [],
     }
     architecture = getattr(args, "architecture", None)
     target = {"platform": "linuxx86-64", "configuration": "release"}
@@ -585,6 +590,7 @@ def compare(args):
                 if index.get(key, target[key]) != target[key]:
                     raise ValueError(f"Vendor {key} does not match snapshot target")
             report["errors"].extend(index["errors"])
+            report["warnings"].extend(index.get("warnings", []))
             available = [a for a in index["artifacts"] if a["status"] == "downloaded"]
             report["vendors"].update(
                 series=index.get("series"),
@@ -647,6 +653,7 @@ def compare(args):
     for usage in report.get("vendors", {}).values():
         if isinstance(usage, dict):
             report["errors"].extend(usage.get("errors", []))
+            report["warnings"].extend(usage.get("warnings", []))
     (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
     (output / "summary.md").write_text(summary(report), encoding="utf-8")
     return int(bool(report["errors"]))

@@ -147,6 +147,72 @@ class DownloadTests(unittest.TestCase):
         self.assertEqual(compatibility.compare(args), 1)
         self.assertIn("INCOMPLETE", (args.output / "summary.md").read_text())
 
+    def test_unavailable_download_is_an_advisory_coverage_warning(self):
+        series = self.root / "2027_alpha7"
+        series.mkdir()
+        (series / "vendor.json").write_text(
+            json.dumps(
+                {
+                    "mavenUrls": ["https://example.com"],
+                    "javaDependencies": [
+                        {"groupId": "org.vendor", "artifactId": "api", "version": "1"}
+                    ],
+                }
+            )
+        )
+        args = argparse.Namespace(
+            repo=self.root,
+            inventory=self.root,
+            baseline="old",
+            series=None,
+            output=self.root / "download",
+        )
+        with (
+            patch(
+                "compatibility_vendors.subprocess.check_output",
+                side_effect=["v2027.0.0-alpha-7\n", "deadbeef\n"],
+            ),
+            patch(
+                "compatibility_vendors.urllib.request.urlopen",
+                side_effect=urllib.error.HTTPError(
+                    "https://example.com", 404, "Not Found", {}, None
+                ),
+            ),
+        ):
+            self.assertEqual(vendors.download(args), 0)
+        index = json.loads((args.output / "index.json").read_text())
+        self.assertFalse(index["errors"])
+        self.assertEqual(len(index["warnings"]), 1)
+        self.assertEqual(index["artifacts"][0]["status"], "unavailable")
+        for side in ("base", "head"):
+            (self.root / side).mkdir()
+            (self.root / side / "complete").touch()
+        compare_args = argparse.Namespace(
+            base=self.root / "base",
+            head=self.root / "head",
+            output=self.root / "report",
+            base_revision="old",
+            head_revision="new",
+            vendors=args.output,
+            abidiff="unused",
+            japicmp=None,
+        )
+        with (
+            patch("compatibility.compare_native", return_value=[]),
+            patch("compatibility.compare_java", return_value=[]),
+            patch("compatibility_java.trace_java", return_value={}),
+        ):
+            self.assertEqual(compatibility.compare(compare_args), 0)
+        report = json.loads((compare_args.output / "results.json").read_text())
+        self.assertFalse(report["errors"])
+        self.assertEqual(report["warnings"], index["warnings"])
+        self.assertEqual(report["vendors"]["downloaded"], 0)
+        self.assertEqual(report["vendors"]["requested"], 1)
+        self.assertIn(
+            "INCOMPLETE vendor coverage",
+            (compare_args.output / "summary.md").read_text(),
+        )
+
 
 @unittest.skipUnless(
     JAPICMP and shutil.which(ABIDIFF) and shutil.which("g++") and shutil.which("javac"),

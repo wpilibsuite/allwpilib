@@ -140,9 +140,11 @@ including header-only dependencies.
 The report retains the registry commit, selected manifests, download URLs,
 SHA-256 hashes, failed attempts, and unsupported dependencies. Missing or corrupt
 artifacts and tracing errors produce **INCOMPLETE** coverage without preventing
-the public API comparison. Vendor archives are inspected without executing their
-code, and archive paths are not used for extraction. Downloaded binaries are not
-uploaded with the report.
+the public API comparison. Unavailable downloads are coverage warnings; they do
+not fail the comparison step. Invalid inventories, checksum mismatches after
+download, and inspection-tool failures remain errors. Vendor archives are
+inspected without executing their code, and archive paths are not used for
+extraction. Downloaded binaries are not uploaded with the report.
 
 - **Java:** constant-pool class/member references and declared descriptors are
   matched to japicmp's incompatible classes and exact old member descriptors.
@@ -160,7 +162,10 @@ uploaded with the report.
   These textual matches are review leads,
   not a type-equivalence or runtime-failure proof; demangling differences and
   stripped/inlined code can hide usage. Static archive references may belong to
-  object files that a final robot application never links.
+  object files that a final robot application never links. Unsupported MSVC
+  mangling retains the raw symbol for exact matching and leaves other symbols
+  available for type tracing. These partial demangling results produce coverage
+  warnings, with the undecoded symbols recorded in `results.json`.
 
 No usage matches means no references were found within this scope. It does not
 turn an ABI finding into a compatibility guarantee or establish that a vendor
@@ -191,8 +196,11 @@ Native library statuses distinguish findings from inspection failures:
 Build snapshots are uploaded separately as
 `compatibility-snapshot-<platform>-<configuration>` and retained for three days.
 
-Findings return success. Tool, dependency, snapshot, or build failures produce
-an **INCOMPLETE** report and failing step diagnostics. The job uses
+Findings and vendor coverage warnings return success. Coverage warnings remain
+marked **INCOMPLETE** in the summary and generate an Actions warning. Tool,
+comparison dependency, inventory, checksum, snapshot, or build failures produce
+an **INCOMPLETE** report and failing step diagnostics. Machine-readable results
+separate `warnings` from `errors`. The job uses
 `continue-on-error` to remain advisory even when analysis cannot finish.
 No credentials beyond read access to the repository are used, including for
 fork PRs. Both checkouts disable credential persistence.

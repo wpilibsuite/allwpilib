@@ -150,6 +150,7 @@ def download(args):
         "artifacts": [],
         "skipped": [],
         "errors": [],
+        "warnings": [],
     }
     try:
         tag = subprocess.check_output(
@@ -198,7 +199,7 @@ def download(args):
             )
         for artifact in index["artifacts"]:
             if artifact["status"] != "downloaded":
-                index["errors"].append(
+                index["warnings"].append(
                     f"Unavailable vendor artifact: {artifact['path']}"
                 )
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:

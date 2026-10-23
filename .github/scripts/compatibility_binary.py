@@ -93,9 +93,10 @@ def symbols(path, dynamic=False, architecture=None):
 
 
 def demangle(names):
+    """Retain raw names when LLVM cannot decode a symbol, without losing the batch."""
     names = sorted(names)
     if not names:
-        return {}
+        return {}, []
     result = subprocess.run(
         [llvm_tool("llvm-cxxfilt")],
         input="\n".join(names) + "\n",
@@ -108,6 +109,7 @@ def demangle(names):
     if len(values) != len(names):
         raise ValueError("Demangler did not return one name per symbol")
     decoded = dict(zip(names, values, strict=True))
+    undecoded = []
     microsoft = [name for name in names if name.startswith("?")]
     if microsoft:
         result = subprocess.run(
@@ -116,12 +118,33 @@ def demangle(names):
             capture_output=True,
             text=True,
             timeout=120,
-            check=True,
+            check=False,
         )
-        lines = result.stdout.splitlines()
-        for index, line in enumerate(lines[:-1]):
-            if line in decoded:
-                decoded[line] = re.sub(
-                    r"\b(?:struct|class|union|enum)\s+", "", lines[index + 1]
+        # Exit 1 also means unsupported mangling, with usable output for other names.
+        if result.returncode and (
+            result.returncode != 1
+            or not result.stderr.strip()
+            or any(
+                line != "error: Invalid mangled name"
+                for line in result.stderr.splitlines()
+            )
+        ):
+            result.check_returncode()
+        expected, seen = set(microsoft), set()
+        for block in result.stdout.split("\n\n"):
+            lines = block.splitlines()
+            if not lines:
+                continue
+            name = lines[0]
+            if name not in expected or name in seen or len(lines) > 2:
+                raise ValueError("Unexpected Microsoft demangler output")
+            seen.add(name)
+            if len(lines) == 2:
+                decoded[name] = re.sub(
+                    r"\b(?:struct|class|union|enum)\s+", "", lines[1]
                 )
-    return decoded
+            else:
+                undecoded.append(name)
+        if seen != expected:
+            raise ValueError("Microsoft demangler did not return every symbol")
+    return decoded, undecoded
