@@ -63,7 +63,8 @@ jobs:
 
   compare:
     needs: revisions
-    if: always() && needs.revisions.outputs.matrix != ''
+    # Allow incomplete reports after failures, but release the workflow on cancellation.
+    if: ${{ !cancelled() && needs.revisions.outputs.matrix != '' }}
     name: Report ${{ matrix.platform }} (advisory)
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container: wpilib/systemcore-cross-debian:trixie
