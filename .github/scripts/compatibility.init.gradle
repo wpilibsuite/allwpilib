@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// An init script lets the same snapshot task run on revisions which predate this check.
+// CI supplements existing outputs; the snapshot task is for explicit local builds.
 gradle.projectsEvaluated {
     def root = gradle.rootProject
     def platform = root.findProperty('compatibilityPlatform') ?: 'linuxx86-64'

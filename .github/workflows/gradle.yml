@@ -245,6 +245,7 @@ jobs:
     uses: ./.github/workflows/compatibility.yml
     with:
       baseline: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'previous-tag' }}
+      baseline-branch: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || github.ref_name }}
       candidate: ${{ github.sha }}
 
   build-documentation:

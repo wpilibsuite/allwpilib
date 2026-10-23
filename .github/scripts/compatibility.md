@@ -34,23 +34,27 @@ sidecar, and macOS DWARF linked while the build objects still exist. It does not
 copy or repackage the published binaries, or compile/link native code. Maven
 publishing excludes this directory and the report artifacts.
 
-Baseline artifacts come from upstream **push** runs of `gradle.yml` for the exact
-baseline commit. Uploaded build artifacts can be reused while unrelated jobs in
-that run are still running. PR artifacts are never selected as baselines.
-Artifacts are matched by platform and configuration, and their recorded commit
-is checked before analysis. Missing candidate artifacts, incomplete supplemental
-data, or mismatched provenance produce incomplete reports.
+Baseline selection first tries upstream **push** runs of `gradle.yml` for the
+exact requested commit. If those artifacts are missing, expired, or lack the
+required compatibility data, it tries the most recent usable push artifacts on
+the same target branch. The candidate commit and PR runs are excluded. Uploaded
+artifacts can be reused while unrelated jobs in their run are still running.
+The producer's compatibility-data step must have succeeded, and downloaded
+manifests are checked against the selected commit, platform, and configuration.
 
-For baselines predating the supplemental data, or with missing/expired build
-artifacts, a fallback job builds both configurations for the affected platform.
-These jobs use the current [Gradle init script](compatibility.init.gradle), omit
-tests/examples/documentation, and cache snapshots by exact baseline SHA, platform,
-and snapshot tooling. There are at most six fallback jobs, and none when all
-baseline artifacts are available. Fallback snapshots are transferred to report
-jobs even if cache saving is unavailable on a fork PR. Native fallback builds
-use Linux cross containers, Windows 2025, or macOS 15. Reused artifacts can come
-from different runner/toolchain image versions; a compiler-induced ABI difference
-can therefore appear in the results and needs review.
+When a different baseline is selected, Actions emits a warning and each report
+records the requested and actual commits and the source Gradle run. Selection is
+per platform, so the reports can use different baseline commits when artifact
+availability differs. Comparisons and vendordep inventory selection use the
+actual baseline commit. Reused artifacts can also come from different runner or
+toolchain image versions; compiler-induced ABI differences need review.
+
+**Compatibility CI never rebuilds either revision.** If no usable baseline is
+available, or the candidate artifacts are missing or incomplete, the platform
+job fails with an **INCOMPLETE** report before installing comparison tools or
+downloading vendordeps. Older artifacts without the supplemental metadata,
+Java classpaths, and native debug data are unusable even when their build passed.
+The local snapshot task described below remains available for explicit local use.
 
 ## Coverage
 
@@ -213,16 +217,17 @@ Native library statuses distinguish findings from inspection failures:
 | `changed` | The native comparison found differences requiring review. |
 | `error` | The native inspection could not complete. |
 
-Only fallback baseline builds upload separate snapshots, as
-`compatibility-baseline-<platform>`, retained for three days. Normal reports
-consume the existing Gradle artifacts directly.
+Reports consume existing Gradle artifacts directly. There are no compatibility
+build jobs, build caches, or separately uploaded build snapshots.
 
 Findings and vendor coverage warnings return success. Coverage warnings remain
 marked **INCOMPLETE** in the summary and generate an Actions warning. Tool,
 comparison dependency, inventory, checksum, snapshot, or build failures produce
 an **INCOMPLETE** report and failing step diagnostics. Machine-readable results
-separate `warnings` from `errors`. The job uses
-`continue-on-error` to remain advisory even when analysis cannot finish.
+separate `warnings` from `errors`; `requested_base` and `baseline_warning` record
+any artifact-baseline deviation. ABI/API findings and analysis diagnostics remain
+advisory. Missing or invalid build inputs fail the job; CI does not recover by
+compiling a replacement. Setup and regression-test failures also fail the job.
 Report jobs use only read access to repository contents and Actions artifacts,
 including for fork PRs. Their checkouts disable credential persistence.
 
@@ -290,5 +295,5 @@ The compiled fixtures cover native layouts and removed symbols, Windows/macOS
 architecture handling and virtual methods, C-linkage function/data types, Java
 definition changes, JNI declarations and private-member references, and vendor
 usage tracing. Additional tests cover registry selection, downloads, integrity
-checks, artifact provenance, supplemental debug files, grouped configuration and
-architecture coverage, and incomplete reports.
+checks, artifact provenance, recent baseline selection, supplemental debug files,
+grouped configuration and architecture coverage, and failures without rebuilds.

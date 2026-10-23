@@ -27,7 +27,11 @@ class ArtifactTests(unittest.TestCase):
         self.root = Path(self.temp.name)
 
     def products(
-        self, platform="linuxx86-64", configuration="release", name="products"
+        self,
+        platform="linuxx86-64",
+        configuration="release",
+        name="products",
+        revision=REVISION,
     ):
         products = self.root / name
         extras = products / "compatibility"
@@ -38,7 +42,7 @@ class ArtifactTests(unittest.TestCase):
         }
         manifest = {
             "schema": 1,
-            "revision": REVISION,
+            "revision": revision,
             "platform": platform,
             "targets": {configuration: target},
         }
@@ -74,7 +78,8 @@ class ArtifactTests(unittest.TestCase):
         ]
         calls = []
 
-        def available(number):
+        def available(run):
+            number = run["id"]
             calls.append(number)
             return [
                 {"name": name, "expired": number == 4 and name == "Linux"}
@@ -92,36 +97,170 @@ class ArtifactTests(unittest.TestCase):
         )
         self.assertEqual(by_platform["osxuniversal"]["baseline_run"], "")
 
-    def test_fallback_build_keeps_debug_after_release_failure(self):
-        gradle = self.root / "gradlew"
-        gradle.write_text(
-            "#!/usr/bin/env bash\n"
-            'for arg in "$@"; do\n'
-            '  case "$arg" in\n'
-            "    -PcompatibilityConfiguration=*) configuration=${arg#*=} ;;\n"
-            "    -PcompatibilityOutput=*) output=${arg#*=} ;;\n"
-            "  esac\n"
-            "done\n"
-            'echo "$configuration" >> configurations.txt\n'
-            'if [ "$configuration" = release ]; then exit 1; fi\n'
-            'mkdir -p "$output"\n'
-            'echo complete > "$output/complete"\n'
+    def test_recent_artifact_fallback_preserves_exact_matches_and_excludes_candidate(
+        self,
+    ):
+        def run(number, revision, **changes):
+            return {
+                "id": number,
+                "head_sha": revision,
+                "head_branch": "main",
+                "event": "push",
+                **changes,
+            }
+
+        candidate = "d" * 40
+        recent = "b" * 40
+        older = "c" * 40
+        exact = [run(20, REVISION)]
+        fallback = [
+            run(10, candidate),
+            run(9, recent, event="pull_request"),
+            run(8, recent, head_branch="stable"),
+            run(7, recent),
+            run(6, older),
+        ]
+        visited = []
+
+        def available(run):
+            visited.append(run["id"])
+            names = (
+                ["Linux"]
+                if run["id"] == 20
+                else [a for t in artifacts.TARGETS for a in t["artifacts"]]
+            )
+            return [
+                {"name": name, "expired": run["id"] == 7 and name == "macOS"}
+                for name in names
+            ]
+
+        targets = artifacts.artifact_plan(
+            REVISION,
+            exact,
+            available,
+            fallback_runs=lambda: fallback,
+            branch="main",
+            candidate=candidate,
         )
-        gradle.chmod(0o755)
-        script = Path(artifacts.__file__).with_name("compatibility-baseline.sh")
-        output = self.root / "snapshots with spaces"
-        result = subprocess.run(
-            ["bash", str(script), str(self.root), str(output), "linuxx86-64"],
-            cwd=self.root,
-            capture_output=True,
-            check=False,
+        by_platform = {t["platform"]: t for t in targets}
+        self.assertEqual(visited, [20, 7, 6])
+        self.assertEqual(by_platform["linuxx86-64"]["baseline_revision"], REVISION)
+        self.assertEqual(by_platform["linuxx86-64"]["baseline_warning"], "")
+        self.assertEqual(by_platform["windowsx86-64"]["baseline_revision"], recent)
+        self.assertEqual(by_platform["osxuniversal"]["baseline_revision"], older)
+        self.assertIn(REVISION, by_platform["osxuniversal"]["baseline_warning"])
+        self.assertIn(older, by_platform["osxuniversal"]["baseline_warning"])
+
+    def test_planner_skips_artifacts_with_failed_supplement_and_reports_missing_inputs(
+        self,
+    ):
+        args = argparse.Namespace(
+            repo=self.root,
+            revision=REVISION,
+            candidate="d" * 40,
+            branch="main",
+            repository="wpilibsuite/allwpilib",
+            output=self.root / "outputs",
         )
-        self.assertEqual(result.returncode, 1, result.stderr)
-        self.assertEqual(
-            (self.root / "configurations.txt").read_text(), "release\ndebug\n"
+
+        def api(repository, endpoint, key, **query):
+            if key == "workflow_runs":
+                return [
+                    {
+                        "id": 1,
+                        "head_sha": REVISION,
+                        "head_branch": "main",
+                        "event": "push",
+                    }
+                ]
+            if key == "jobs":
+                return [
+                    {
+                        "name": "Build - " + name,
+                        "steps": [
+                            {
+                                "name": "Add compatibility data to build artifacts",
+                                "conclusion": "failure",
+                            }
+                        ],
+                    }
+                    for target in artifacts.TARGETS
+                    for name in target["artifacts"]
+                ]
+            return [
+                {"name": name, "expired": False}
+                for target in artifacts.TARGETS
+                for name in target["artifacts"]
+            ]
+
+        with (
+            mock.patch.object(artifacts, "api_pages", side_effect=api),
+            mock.patch.object(
+                artifacts.subprocess,
+                "run",
+                return_value=subprocess.CompletedProcess([], 0),
+            ),
+        ):
+            artifacts.plan(args)
+        lines = args.output.read_text().splitlines()
+        self.assertEqual(len(lines), 1)
+        targets = json.loads(lines[0].removeprefix("matrix="))["include"]
+        self.assertEqual(len(targets), 6)
+        for target in targets:
+            self.assertEqual(target["baseline_run"], "")
+            self.assertIn("No usable Gradle artifacts", target["baseline_error"])
+
+    def report_args(self, platform="linuxx86-64"):
+        return argparse.Namespace(
+            output=self.root / "report",
+            repo=self.root,
+            inventory=self.root,
+            candidate_products=self.root / "candidate",
+            baseline_products=self.root / "base",
+            platform=platform,
+            base_revision=REVISION,
+            base_label="baseline",
+            head_revision="b" * 40,
+            japicmp=self.root / "japicmp.jar",
         )
-        self.assertTrue((output / "debug/complete").is_file())
-        self.assertFalse((output / "release/complete").exists())
+
+    def test_missing_artifacts_fail_before_downloads_or_analysis(self):
+        args = self.report_args()
+        with (
+            mock.patch.object(artifacts.subprocess, "run") as processes,
+            mock.patch.object(artifacts.compatibility, "compare") as compare,
+        ):
+            self.assertEqual(artifacts.report(args), 1)
+        processes.assert_not_called()
+        compare.assert_not_called()
+        result = json.loads((args.output / "results.json").read_text())
+        self.assertEqual(len(result["errors"]), 4)
+        self.assertIn("compatibility/manifest.json", result["errors"][0])
+        self.assertIn(
+            "No rebuild was attempted", (args.output / "summary.md").read_text()
+        )
+
+    def test_preflight_checks_all_configs_and_records_baseline_deviation(self):
+        args = self.report_args()
+        args.requested_base = "c" * 40
+        args.baseline_warning = f"Requested {args.requested_base}; using {REVISION}."
+        for side, revision in (("base", REVISION), ("candidate", args.head_revision)):
+            for configuration in ("release", "debug"):
+                products = self.products(
+                    configuration=configuration,
+                    name=f"{side}/{configuration}",
+                    revision=revision,
+                )
+                artifacts.prepare(products)
+        self.assertEqual(artifacts.validate(args), 0)
+        (self.root / "candidate/debug/published.zip").unlink()
+        self.assertEqual(artifacts.validate(args), 1)
+        result = json.loads((args.output / "results.json").read_text())
+        self.assertEqual(result["requested_base"], args.requested_base)
+        self.assertEqual(result["baseline_warning"], args.baseline_warning)
+        self.assertEqual(len(result["errors"]), 1)
+        self.assertIn("Candidate debug", result["errors"][0])
+        self.assertIn("Baseline warning", (args.output / "summary.md").read_text())
 
     def test_existing_artifacts_keep_binaries_classpath_and_sidecars(self):
         products = self.products()
@@ -228,22 +367,20 @@ class ArtifactTests(unittest.TestCase):
     def test_grouped_report_keeps_all_configurations_and_architectures_after_error(
         self,
     ):
-        args = argparse.Namespace(
-            output=self.root / "report",
-            repo=self.root,
-            inventory=self.root,
-            candidate_products=self.root / "candidate",
-            baseline_products=self.root / "base",
-            baseline_snapshots=None,
-            platform="osxuniversal",
-            base_revision=REVISION,
-            base_label="baseline",
-            head_revision="b" * 40,
-            japicmp=self.root / "japicmp.jar",
-        )
+        args = self.report_args("osxuniversal")
+        args.requested_base = "c" * 40
+        args.baseline_warning = f"Requested {args.requested_base}; using {REVISION}."
+        for side, revision in (("base", REVISION), ("candidate", args.head_revision)):
+            for configuration in ("release", "debug"):
+                products = self.products(
+                    "osxuniversal", configuration, f"{side}/{configuration}", revision
+                )
+                (products / "compatibility/complete").touch()
         calls = []
 
         def compare(options):
+            self.assertEqual(options.requested_base, args.requested_base)
+            self.assertEqual(options.baseline_warning, args.baseline_warning)
             calls.append((options.output.parent.name, options.architecture))
             (options.output / "summary.md").write_text(
                 "INCOMPLETE" if len(calls) == 1 else "Complete"
@@ -270,6 +407,9 @@ class ArtifactTests(unittest.TestCase):
             ],
         )
         self.assertEqual(downloads.call_count, 2)
+        for call in downloads.call_args_list:
+            command = call.args[0]
+            self.assertEqual(command[command.index("--baseline") + 1], REVISION)
         self.assertIn("INCOMPLETE", (args.output / "summary.md").read_text())
         self.assertIn(
             "osxuniversal debug arm64", (args.output / "summary.md").read_text()

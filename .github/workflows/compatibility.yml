@@ -7,6 +7,10 @@ on:
         description: Baseline commit SHA, or previous-tag for a branch comparison
         required: true
         type: string
+      baseline-branch:
+        description: Target branch used to find a recent available baseline artifact
+        required: true
+        type: string
       candidate:
         description: Candidate commit SHA (the proposed merge for a PR)
         required: true
@@ -19,13 +23,10 @@ permissions:
 jobs:
   revisions:
     runs-on: ubuntu-24.04
-    continue-on-error: true
     outputs:
       baseline: ${{ steps.baseline.outputs.ref }}
       label: ${{ steps.baseline.outputs.label }}
       matrix: ${{ steps.plan.outputs.matrix }}
-      fallback: ${{ steps.plan.outputs.fallback }}
-      fallback-count: ${{ steps.plan.outputs.fallback-count }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -53,88 +54,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           BASE_SHA: ${{ steps.baseline.outputs.ref }}
+          CANDIDATE: ${{ inputs.candidate }}
+          BASE_BRANCH: ${{ inputs.baseline-branch }}
         run: |
           python3 .github/scripts/compatibility_artifacts.py plan --repo . \
-            --revision "$BASE_SHA" --repository "$GITHUB_REPOSITORY" --output "$GITHUB_OUTPUT"
-
-  baseline:
-    needs: revisions
-    if: needs.revisions.outputs.baseline != '' && needs.revisions.outputs.fallback-count != '' && needs.revisions.outputs.fallback-count != '0'
-    name: Fallback baseline ${{ matrix.platform }}
-    continue-on-error: true
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.revisions.outputs.fallback) }}
-    runs-on: ${{ case(matrix.os == 'ubuntu-24.04', 'blacksmith-4vcpu-ubuntu-2404', matrix.os == 'macos-15', 'blacksmith-6vcpu-macos-15', matrix.os) }}
-    defaults:
-      run:
-        shell: bash
-    env:
-      MACOSX_DEPLOYMENT_TARGET: '13.3'
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ inputs.candidate }}
-          path: candidate
-          persist-credentials: false
-      - uses: actions/cache@v5
-        id: cache
-        with:
-          path: baseline-snapshots
-          key: compatibility-baseline-v1-${{ matrix.platform }}-${{ needs.revisions.outputs.baseline }}-${{ hashFiles('candidate/.github/scripts/compatibility.py', 'candidate/.github/scripts/compatibility_binary.py', 'candidate/.github/scripts/compatibility.init.gradle', 'candidate/.github/scripts/compatibility-baseline.sh') }}
-      - uses: actions/checkout@v7
-        if: steps.cache.outputs.cache-hit != 'true'
-        with:
-          ref: ${{ needs.revisions.outputs.baseline }}
-          path: baseline
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-java@v5
-        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
-        with:
-          distribution: temurin
-          java-version: 25
-      - uses: actions/setup-python@v6
-        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
-        with:
-          python-version: '3.13'
-      - uses: gradle/actions/setup-gradle@v6
-        if: steps.cache.outputs.cache-hit != 'true'
-        with:
-          validate-wrappers: false
-          cache-read-only: true
-      - name: Build Linux baseline configurations
-        if: steps.cache.outputs.cache-hit != 'true' && runner.os == 'Linux'
-        uses: wpilibsuite/docker-run-action@v4
-        with:
-          image: ${{ matrix.container }}
-          options: -v ${{ github.workspace }}:/work -w /work/baseline
-          # The action replaces newlines with semicolons; keep this as one command.
-          run: >-
-            bash ../candidate/.github/scripts/compatibility-baseline.sh
-            /work/candidate /work/baseline-snapshots ${{ matrix.platform }}
-      - name: Build desktop baseline configurations
-        if: steps.cache.outputs.cache-hit != 'true' && runner.os != 'Linux'
-        working-directory: baseline
-        run: |
-          bash ../candidate/.github/scripts/compatibility-baseline.sh \
-            "$GITHUB_WORKSPACE/candidate" "$GITHUB_WORKSPACE/baseline-snapshots" "${{ matrix.platform }}"
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: compatibility-baseline-${{ matrix.platform }}
-          path: baseline-snapshots
-          retention-days: 3
-          if-no-files-found: warn
+            --revision "$BASE_SHA" --candidate "$CANDIDATE" --branch "$BASE_BRANCH" \
+            --repository "$GITHUB_REPOSITORY" --output "$GITHUB_OUTPUT"
 
   compare:
-    needs: [revisions, baseline]
+    needs: revisions
     if: always() && needs.revisions.outputs.matrix != ''
     name: Report ${{ matrix.platform }} (advisory)
     runs-on: blacksmith-4vcpu-ubuntu-2404
     container: wpilib/systemcore-cross-debian:trixie
-    continue-on-error: true
     timeout-minutes: 180
     defaults:
       run:
@@ -151,6 +83,7 @@ jobs:
           persist-credentials: false
       - name: Download candidate build artifacts
         id: candidate-artifacts
+        if: matrix.baseline_error == ''
         uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -158,7 +91,7 @@ jobs:
           path: products/candidate
       - name: Download baseline build artifacts
         id: baseline-artifacts
-        if: matrix.baseline_run != ''
+        if: matrix.baseline_error == ''
         uses: actions/download-artifact@v8
         continue-on-error: true
         with:
@@ -166,24 +99,30 @@ jobs:
           run-id: ${{ matrix.baseline_run }}
           pattern: ${{ matrix.pattern }}
           path: products/baseline
-      - name: Download fallback baseline
-        id: baseline-snapshots
-        if: matrix.baseline_run == ''
-        uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          name: compatibility-baseline-${{ matrix.platform }}
-          path: baseline-snapshots
       - name: Discard failed downloads
         # A digest failure can leave extracted files; they must not enter the report.
         env:
           CANDIDATE: ${{ steps.candidate-artifacts.outcome }}
           BASELINE: ${{ steps.baseline-artifacts.outcome }}
-          SNAPSHOTS: ${{ steps.baseline-snapshots.outcome }}
         run: |
           if [ "$CANDIDATE" = failure ]; then rm -rf products/candidate; fi
           if [ "$BASELINE" = failure ]; then rm -rf products/baseline; fi
-          if [ "$SNAPSHOTS" = failure ]; then rm -rf baseline-snapshots; fi
+      - name: Require complete build artifacts
+        env:
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          BASE_LABEL: ${{ matrix.baseline_warning != '' && matrix.baseline_revision || needs.revisions.outputs.label }}
+          HEAD_SHA: ${{ inputs.candidate }}
+          BASELINE_ERROR: ${{ matrix.baseline_error }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          if [ -n "$BASELINE_WARNING" ]; then echo "::warning::$BASELINE_WARNING"; fi
+          python3 candidate/.github/scripts/compatibility_artifacts.py validate \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$BASE_LABEL" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --output report --baseline-error "$BASELINE_ERROR" \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
       - name: Install comparison tools
         run: |
           sudo apt-get update
@@ -212,23 +151,21 @@ jobs:
           path: vendor-json-repo
           persist-credentials: false
       - name: Compare all configurations and architectures
-        if: always()
+        continue-on-error: true
         env:
-          BASE_SHA: ${{ needs.revisions.outputs.baseline }}
-          BASE_LABEL: ${{ needs.revisions.outputs.label || inputs.baseline }}
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          BASE_LABEL: ${{ matrix.baseline_warning != '' && matrix.baseline_revision || needs.revisions.outputs.label }}
           HEAD_SHA: ${{ inputs.candidate }}
-          BASELINE_RUN: ${{ matrix.baseline_run }}
           PLATFORM: ${{ matrix.platform }}
         run: |
-          ARGS=()
-          if [ -z "$BASELINE_RUN" ]; then
-            ARGS+=(--baseline-snapshots baseline-snapshots)
-          fi
           python3 candidate/.github/scripts/compatibility_artifacts.py report \
             --candidate-products products/candidate --baseline-products products/baseline \
             --base-revision "$BASE_SHA" --base-label "$BASE_LABEL" --head-revision "$HEAD_SHA" \
             --platform "$PLATFORM" --repo candidate --inventory vendor-json-repo \
-            --japicmp tools/japicmp.jar --output report "${ARGS[@]}"
+            --japicmp tools/japicmp.jar --output report \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
       - name: Publish summary
         if: always()
         run: |

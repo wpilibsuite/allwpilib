@@ -426,6 +426,11 @@ def summary(report):
         ),
         "",
     ]
+    if report.get("baseline_warning"):
+        lines += [
+            f"**Baseline warning:** {html.escape(report['baseline_warning'])}",
+            "",
+        ]
     if report["errors"]:
         lines += ["**INCOMPLETE: some checks could not run.**", ""]
         lines += [f"- {html.escape(error)}" for error in report["errors"]]
@@ -556,6 +561,8 @@ def compare(args):
         "java": [],
         "errors": list(getattr(args, "setup_errors", [])),
         "warnings": [],
+        "requested_base": (getattr(args, "requested_base", None) or args.base_revision),
+        "baseline_warning": getattr(args, "baseline_warning", ""),
     }
     architecture = getattr(args, "architecture", None)
     target = {"platform": "linuxx86-64", "configuration": "release"}
