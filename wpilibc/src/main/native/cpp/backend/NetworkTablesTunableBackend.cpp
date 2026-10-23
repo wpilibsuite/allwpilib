@@ -201,8 +201,8 @@ class ChooserCompatibility {
  public:
   ChooserCompatibility(wpi::nt::NetworkTableInstance inst,
                        std::string_view path, std::string_view legacyPath)
-      : m_default{inst.GetStringTopic(std::format("{}/default", path))
-                      .Subscribe("")},
+      : m_default{
+            inst.GetStringTopic(std::format("{}/default", path)).Subscribe("")},
         m_options{inst.GetStringArrayTopic(std::format("{}/options", path))
                       .Subscribe({})},
         m_active{inst.GetStringTopic(std::format("{}/selected/value", path))

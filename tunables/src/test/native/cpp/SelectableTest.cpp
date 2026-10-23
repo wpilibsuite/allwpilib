@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include "wpi/tunables/MockTunableBackend.hpp"
 #include "wpi/tunables/TunableRegistry.hpp"
@@ -159,14 +160,20 @@ TEST_CASE_METHOD(SelectableFixture,
 TEST_CASE_METHOD(SelectableFixture,
                  "SelectableTest MoveConstructRebindsChangeListener",
                  "[tunable][selectable]") {
+  bool publishBeforeMove = GENERATE(false, true);
   wpi::tunables::Selectable<int> chooser;
   chooser.Add("one", 1);
   chooser.Add("two", 2);
   int currentVal = 0;
   chooser.OnChange([&](int val) { currentVal = val; });
 
+  if (publishBeforeMove) {
+    wpi::tunables::Publish("MoveConstructChooser", chooser);
+  }
   wpi::tunables::Selectable<int> movedChooser{std::move(chooser)};
-  wpi::tunables::Publish("MoveConstructChooser", movedChooser);
+  if (!publishBeforeMove) {
+    wpi::tunables::Publish("MoveConstructChooser", movedChooser);
+  }
   backend->SetString("/MoveConstructChooser/selected", "two");
   wpi::tunables::TunableRegistry::Update();
 
