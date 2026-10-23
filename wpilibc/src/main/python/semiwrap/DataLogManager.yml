@@ -4,6 +4,8 @@ extra_includes:
 functions:
   UpdateDataLogFreeSpaceAlert:
     ignore: true
+  IsDataLogMatchLog:
+    ignore: true
 
 classes:
   wpi::DataLogManager:
