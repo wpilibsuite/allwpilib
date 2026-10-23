@@ -17,6 +17,10 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
+import compatibility_java
+import compatibility_native
+import compatibility_vendors
+
 
 def previous_tag(repo, head):
     """Find the nearest release tag on the branch's history, strictly before head."""
@@ -104,11 +108,21 @@ def has_debug_info(library):
     return False
 
 
-def compare_native(base, head, output, abidiff):
+def compare_native(base, head, output, abidiff, vendors=None):
     with tempfile.TemporaryDirectory(prefix="native-", dir=output) as directory:
         old = native_libraries(base, Path(directory) / "base")
         new = native_libraries(head, Path(directory) / "head")
-        return compare_native_libraries(old, new, output, abidiff)
+        results = compare_native_libraries(old, new, output, abidiff)
+        if vendors is not None:
+            try:
+                vendors["report"]["native"] = compatibility_native.trace_native(
+                    vendors["native"], old, new, results, output, Path(directory)
+                )
+            except (OSError, ValueError, subprocess.SubprocessError) as error:
+                vendors["report"]["native"] = {
+                    "errors": [f"Native vendor tracing: {error}"]
+                }
+        return results
 
 
 def identical_native_files(old, new):
@@ -158,6 +172,7 @@ def compare_native_libraries(old, new, output, abidiff):
                     "--no-added-syms",
                     "--no-show-locs",
                     "--show-bytes",
+                    "--redundant",
                     str(old[name]),
                     str(new[name]),
                 ],
@@ -249,7 +264,7 @@ def summary(report):
             "C++ shared-library ABI, including object layouts reachable from exported interfaces."
         ),
         (
-            "These are potential client/vendor breakages; vendor usage is not verified. "
+            "These are potential client/vendor breakages. "
             "A clean report does not establish compatibility on other platforms or for "
             "header-only C++ code, inline behavior, reflection, or other runtime semantics."
         ),
@@ -288,6 +303,67 @@ def summary(report):
         lines.append(f"- `{result['class']}` ({kind}): {changes}")
     if len(java) > 100:
         lines.append("- Further findings are in the full artifact.")
+    vendors = report.get("vendors")
+    if vendors is not None:
+        lines += ["", "## Vendordep usage", ""]
+        lines.append(
+            f"Inventory: `{html.escape(vendors.get('series') or 'unavailable')}` at "
+            f"`{html.escape(vendors.get('revision') or 'unavailable')}`. "
+            f"{vendors.get('downloaded', 0)}/{vendors.get('requested', 0)} artifacts downloaded; "
+            f"{vendors.get('skipped', 0)} dependencies have no declared Linux x86-64 binary."
+        )
+        lines += [
+            "",
+            (
+                "References are static evidence, not proof that a code path executes. "
+                "C++ type-name matches are conservative leads for review; "
+                "missing matches do not establish compatibility."
+            ),
+            "",
+        ]
+        for language in ("native", "java"):
+            usage = vendors.get(language, {})
+            findings = usage.get("findings", [])
+            lines.append(
+                f"### {language.title()}: {len(findings)} consumers with references ({usage.get('scanned', 0)} artifacts scanned)"
+            )
+            lines.append("")
+            for finding in findings[:50]:
+                names = ", ".join(finding["manifests"])
+                caller = finding.get("class", finding["entry"])
+                lines.append(f"- {html.escape(names)} — `{html.escape(caller)}`")
+                targets = []
+                for reference in finding["references"]:
+                    if "target" in reference:
+                        targets.append(
+                            reference["target"]
+                            + " ("
+                            + ", ".join(reference["changes"])
+                            + ")"
+                        )
+                    elif "symbol" in reference:
+                        targets.append("removed symbol: " + reference["symbol"])
+                    else:
+                        evidence = sorted(
+                            {
+                                m.get("type", m["demangled"])
+                                for m in reference["matches"]
+                            }
+                        )
+                        targets.append(
+                            reference["library"]
+                            + ": "
+                            + ", ".join(e[:180] for e in evidence[:3])
+                            + " ("
+                            + reference["report"]
+                            + ")"
+                        )
+                lines.append("  " + html.escape("; ".join(targets[:8])))
+            if len(findings) > 50:
+                lines.append("- Further consumers are in results.json.")
+            lines.append("")
+    else:
+        lines += ["", "Vendordep tracing was not requested.", ""]
     lines += [
         "",
         (
@@ -309,13 +385,40 @@ def compare(args):
         "java": [],
         "errors": [],
     }
+    vendors = None
+    if getattr(args, "vendors", None) is not None:
+        report["vendors"] = {}
+        try:
+            index = compatibility_vendors.load_inventory(args.vendors, output)
+            report["errors"].extend(index["errors"])
+            available = [a for a in index["artifacts"] if a["status"] == "downloaded"]
+            report["vendors"].update(
+                series=index.get("series"),
+                revision=index.get("revision"),
+                downloaded=len(available),
+                requested=len(index["artifacts"]),
+                skipped=len(index["skipped"]),
+            )
+            vendors = {"report": report["vendors"]}
+            for kind in ("java", "native"):
+                vendors[kind] = [
+                    (a, args.vendors / "artifacts" / a["path"])
+                    for a in available
+                    if (
+                        "java" in a["kinds"]
+                        if kind == "java"
+                        else bool(set(a["kinds"]) & {"cpp", "jni"})
+                    )
+                ]
+        except (OSError, ValueError, KeyError) as error:
+            report["errors"].append(f"Vendordeps: {error}")
     try:
         for snapshot in (args.base, args.head):
             if not (snapshot / "complete").is_file():
                 raise ValueError(f"Snapshot did not finish: {snapshot}")
         try:
             report["native"] = compare_native(
-                args.base, args.head, output, args.abidiff
+                args.base, args.head, output, args.abidiff, vendors
             )
             for result in report["native"]:
                 if result["status"] == "error":
@@ -329,10 +432,17 @@ def compare(args):
             report["errors"].append(f"C++: {error}")
         try:
             report["java"] = compare_java(args.base, args.head, output, args.japicmp)
-        except (OSError, ValueError, ET.ParseError) as error:
+            if vendors is not None:
+                report["vendors"]["java"] = compatibility_java.trace_java(
+                    vendors["java"], args.base, output / "java.xml"
+                )
+        except (OSError, ValueError, ET.ParseError, zipfile.BadZipFile) as error:
             report["errors"].append(f"Java: {error}")
     except ValueError as error:
         report["errors"].append(str(error))
+    for usage in report.get("vendors", {}).values():
+        if isinstance(usage, dict):
+            report["errors"].extend(usage.get("errors", []))
     (output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
     (output / "summary.md").write_text(summary(report), encoding="utf-8")
     return int(bool(report["errors"]))
@@ -352,10 +462,23 @@ def main():
     diff.add_argument("--output", type=Path, required=True)
     diff.add_argument("--japicmp", type=Path, required=True)
     diff.add_argument("--abidiff", default="abidiff")
+    diff.add_argument(
+        "--vendors", type=Path, help="Output of download-vendors (optional locally)"
+    )
+    vendor = commands.add_parser("download-vendors")
+    vendor.add_argument("--repo", type=Path, required=True)
+    vendor.add_argument("--baseline", required=True)
+    vendor.add_argument("--inventory", type=Path, required=True)
+    vendor.add_argument(
+        "--series", help="Override the series inferred from the baseline tag"
+    )
+    vendor.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "previous-tag":
         print(previous_tag(args.repo, args.head))
         return 0
+    if args.command == "download-vendors":
+        return compatibility_vendors.download(args)
     return compare(args)
 
 

@@ -10,12 +10,14 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 import zipfile
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[1] / "compatibility.py"
+sys.path.insert(0, str(SCRIPT.parent))
 SPEC = importlib.util.spec_from_file_location("compatibility", SCRIPT)
 compatibility = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(compatibility)
@@ -160,6 +162,7 @@ class ToolTests(unittest.TestCase):
         (source / "Api.java").write_text(
             "package api; public class Api extends dep.Base {\n"
             f" public static double {method}(double value) {{ return value; }}\n"
+            " public static double degrees(int value) { return value; }\n"
             f" public static {shape} Shape {{}}\n"
             "}\n"
         )

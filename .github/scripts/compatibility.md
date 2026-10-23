@@ -43,19 +43,63 @@ also supports APIs moving between modules. The detailed report includes
 modifications such as changed generic return types that can affect previously
 compiled callers despite unchanged JVM descriptors.
 
-Reports cover the public library surface, rather than filtering to references
-in today's vendor binaries. A finding means a client *could* break; it does not
-establish that a particular vendordep uses the API. The manual alpha-7 review's
-vendor download and usage tracing is not automated here. Header-only C++ types
-absent from library DWARF, inline implementation changes, other platform ABIs,
-reflection, JNI behavior, and other semantic changes still need review.
+Reports retain the full public library comparison and add vendordep usage evidence.
+Header-only C++ types absent from library DWARF, inline implementation changes,
+other platform ABIs, reflection, JNI behavior, and other semantic changes still
+need review.
+
+## Vendordep downloads and usage
+
+The workflows check out `wpilibsuite/vendor-json-repo` and select the inventory
+using the nearest first-parent release tag **at or before the baseline**. For
+example, `v2027.0.0-alpha-7` selects `2027_alpha7`, beta/RC tags select `YEARbeta`,
+and stable tags select `YEAR`. A missing series is an incomplete check; the tool
+does not fall back to another alpha or season. This selection does not change
+the PR comparison baseline, which remains the target branch HEAD.
+
+All manifest versions in that series are included. The downloader deduplicates
+Maven coordinates, fetches Java JARs and declared Linux x86-64 release C++/JNI
+artifacts, and respects static/shared classifiers and JNI `isJar`. It tries the
+manifest's Maven repositories in order and uses Artifactory's download endpoint
+for FRC Maven. Headers, sources, debug variants, other platforms, and transitive
+Maven POM dependencies are not downloaded. Dependencies without a declared Linux
+x86-64 binary are listed as out of scope, including header-only dependencies.
+
+The report retains the registry commit, selected manifests, download URLs,
+SHA-256 hashes, failed attempts, and unsupported dependencies. Missing or corrupt
+artifacts and tracing errors produce **INCOMPLETE** coverage without preventing
+the public API comparison. Vendor archives are inspected without executing their
+code, and archive paths are not used for extraction. Downloaded binaries are not
+uploaded with the report.
+
+- **Java:** constant-pool class/member references and declared descriptors are
+  matched to japicmp's incompatible classes and exact old member descriptors.
+  Baseline and vendor class hierarchies resolve inherited references. Both
+  binary and source-only changes, such as generic return changes, are retained.
+  Class-level findings also include subclasses and interface implementers. Every
+  multi-release JAR variant is inspected conservatively; this is static evidence,
+  not a determination that a particular JVM will load or execute that variant.
+- **C++:** shared-library imports and static archive symbols are inspected with
+  `nm` and `c++filt`. Imports of symbols removed from the combined WPILib exports
+  are exact matches (symbol versions are not distinguished). Demangled symbols
+  are also matched to changed interfaces and nonstandard-library type names in
+  libabigail diagnostics. Defined inline/template symbols are included because
+  they can embed old object layouts. These textual matches are review leads,
+  not a type-equivalence or runtime-failure proof; demangling differences and
+  stripped/inlined code can hide usage. Static archive references may belong to
+  object files that a final robot application never links.
+
+No usage matches means no references were found within this scope. It does not
+turn an ABI finding into a compatibility guarantee or establish that a vendor
+binary was compatible with the baseline in the first place.
 
 ## Reading results
 
 The Actions job summary lists libraries and Java classes with findings, with
 expandable excerpts of the native diagnostics. Download
 the `compatibility-<candidate SHA>` artifact for full C++ text diagnostics, Java
-HTML/XML/text, and `results.json`. `changed` means libabigail found an ABI change;
+HTML/XML/text, `vendors-downloads.json`, `vendors-manifests.json`, and
+`results.json` (including full vendor reference evidence). `changed` means libabigail found an ABI change;
 review its diagnostic before treating it as a proven vendor failure.
 
 Findings return success. Tool, dependency, snapshot, or build failures produce
@@ -79,11 +123,21 @@ each checkout, run the same current init script with a distinct output folder:
 Repeat for the candidate using `/tmp/compatibility/candidate`, then run:
 
 ```sh
+git clone https://github.com/wpilibsuite/vendor-json-repo.git /tmp/vendor-json-repo
+python3 .github/scripts/compatibility.py download-vendors \
+  --repo /path/to/current --baseline BASE_SHA --inventory /tmp/vendor-json-repo \
+  --output /tmp/compatibility/vendors
 python3 .github/scripts/compatibility.py compare \
   --base /tmp/compatibility/baseline --head /tmp/compatibility/candidate \
   --base-revision BASE_SHA --head-revision HEAD_SHA \
-  --japicmp /path/to/japicmp.jar --output /tmp/compatibility/report
+  --japicmp /path/to/japicmp.jar --vendors /tmp/compatibility/vendors \
+  --output /tmp/compatibility/report
 ```
+
+`download-vendors --series 2027_alpha7` can explicitly override inventory
+selection locally. `compare` can omit `--vendors` for a public-surface-only run;
+both CI workflows always request vendor tracing. Downloads are refreshed on
+each run, and their recorded hashes are verified before tracing.
 
 Use a fresh report directory for each comparison. To test the comparison engine
 with small, compiled regression fixtures (no full WPILib build):

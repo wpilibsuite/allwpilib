@@ -78,6 +78,24 @@ jobs:
           JAPICMP_JAR: ${{ github.workspace }}/tools/japicmp.jar
         run: python3 -m unittest discover -s candidate/.github/scripts/compatibility_tests -v
 
+      - uses: actions/checkout@v7
+        continue-on-error: true
+        with:
+          repository: wpilibsuite/vendor-json-repo
+          path: vendor-json-repo
+          persist-credentials: false
+
+      - name: Download vendordeps
+        # Missing vendor artifacts should not prevent the public-surface comparison.
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          BASE_SHA: ${{ steps.baseline.outputs.ref }}
+        run: |
+          python3 candidate/.github/scripts/compatibility.py download-vendors \
+            --repo candidate --baseline "$BASE_SHA" --inventory vendor-json-repo \
+            --output vendors
+
       - name: Build baseline libraries
         working-directory: baseline
         run: |
@@ -101,7 +119,7 @@ jobs:
           python3 candidate/.github/scripts/compatibility.py compare \
             --base snapshots/baseline --head snapshots/candidate \
             --base-revision "$BASE_LABEL" --head-revision "$HEAD_SHA" \
-            --japicmp tools/japicmp.jar --output report
+            --japicmp tools/japicmp.jar --vendors vendors --output report
 
       - name: Publish summary
         if: always()
