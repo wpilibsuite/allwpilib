@@ -106,8 +106,8 @@ public record MomentOfInertia(double magnitude, double baseUnitMagnitude, Moment
 
 
   @Override
-  public Mult<MomentOfInertiaUnit, AngularAccelerationUnit> times(AngularAcceleration multiplier) {
-    return (Mult<MomentOfInertiaUnit, AngularAccelerationUnit>) Measure.super.times(multiplier);
+  public Torque times(AngularAcceleration multiplier) {
+    return NewtonMeters.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
