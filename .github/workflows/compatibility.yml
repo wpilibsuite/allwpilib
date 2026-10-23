@@ -162,6 +162,9 @@ jobs:
     container: wpilib/systemcore-cross-debian:trixie
     continue-on-error: true
     timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
