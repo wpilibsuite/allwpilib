@@ -11,11 +11,11 @@ import hashlib
 import html
 import json
 import os
-from pathlib import Path
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
+from pathlib import Path
 
 
 def previous_tag(repo, head):
@@ -71,7 +71,7 @@ def native_libraries(snapshot, destination):
         with zipfile.ZipFile(archive) as contents:
             for entry in contents.infolist():
                 name = Path(entry.filename).name
-                if not (name.endswith(".so") or name.endswith(".so.debug")):
+                if not name.endswith((".so", ".so.debug")):
                     continue
                 target = destination / archive.stem / name
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -244,11 +244,15 @@ def summary(report):
         f"Baseline: `{html.escape(report['base'])}`  ",
         f"Candidate: `{html.escape(report['head'])}`",
         "",
-        "Scope: published Java public/protected definitions and Linux x86-64 "
-        "C++ shared-library ABI, including object layouts reachable from exported interfaces.",
-        "These are potential client/vendor breakages; vendor usage is not verified. "
-        "A clean report does not establish compatibility on other platforms or for "
-        "header-only C++ code, inline behavior, reflection, or other runtime semantics.",
+        (
+            "Scope: published Java public/protected definitions and Linux x86-64 "
+            "C++ shared-library ABI, including object layouts reachable from exported interfaces."
+        ),
+        (
+            "These are potential client/vendor breakages; vendor usage is not verified. "
+            "A clean report does not establish compatibility on other platforms or for "
+            "header-only C++ code, inline behavior, reflection, or other runtime semantics."
+        ),
         "",
     ]
     if report["errors"]:
@@ -286,8 +290,10 @@ def summary(report):
         lines.append("- Further findings are in the full artifact.")
     lines += [
         "",
-        "Download the compatibility artifact for full C++ diagnostics, Java HTML/XML, "
-        "and machine-readable results.json. Findings do not block merging.",
+        (
+            "Download the compatibility artifact for full C++ diagnostics, Java HTML/XML, "
+            "and machine-readable results.json. Findings do not block merging."
+        ),
         "",
     ]
     return "\n".join(lines)
