@@ -37,7 +37,7 @@ def vendor_series(tag):
     return year
 
 
-def artifact_requests(manifests):
+def artifact_requests(manifests, platform=PLATFORM, configuration="release"):
     """Select Java and release native artifacts actually declared for our platform."""
     requests = {}
     skipped = []
@@ -50,19 +50,21 @@ def artifact_requests(manifests):
                     platforms = dep.get(
                         "binaryPlatforms" if kind == "cpp" else "validPlatforms", []
                     )
-                    if PLATFORM not in platforms:
+                    if platform not in platforms:
                         skipped.append(
                             {
                                 "manifest": manifest["file"],
                                 "kind": kind,
                                 "dependency": dep,
-                                "reason": f"No {PLATFORM} binary declared",
+                                "reason": f"No {platform} binary declared",
                             }
                         )
                         continue
-                    classifier = "-" + PLATFORM
+                    classifier = "-" + platform
                     if kind == "cpp" and not dep.get("sharedLibrary", False):
                         classifier += "static"
+                    if configuration == "debug":
+                        classifier += "debug"
                     extension = "jar" if kind == "jni" and dep.get("isJar") else "zip"
                 group, artifact, version = (
                     dep[k] for k in ("groupId", "artifactId", "version")
@@ -142,7 +144,13 @@ def download_artifact(request, destination):
 def download(args):
     """Always write an index, including selection and individual download failures."""
     args.output.mkdir(parents=True, exist_ok=True)
-    index = {"platform": PLATFORM, "artifacts": [], "skipped": [], "errors": []}
+    index = {
+        "platform": getattr(args, "platform", PLATFORM),
+        "configuration": getattr(args, "configuration", "release"),
+        "artifacts": [],
+        "skipped": [],
+        "errors": [],
+    }
     try:
         tag = subprocess.check_output(
             [
@@ -178,7 +186,9 @@ def download(args):
         )
         index["manifests_sha256"] = digest(args.output / "manifests.json")
         index["manifest_count"] = len(manifests)
-        requests, index["skipped"] = artifact_requests(manifests)
+        requests, index["skipped"] = artifact_requests(
+            manifests, index["platform"], index["configuration"]
+        )
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
             index["artifacts"] = list(
                 pool.map(

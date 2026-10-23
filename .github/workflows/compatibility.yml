@@ -16,22 +16,18 @@ permissions:
   contents: read
 
 jobs:
-  compare:
-    name: C++ ABI and Java definitions (advisory)
-    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
-    container: wpilib/systemcore-cross-debian:trixie
-    # Neither compatibility findings nor infrastructure failures block PRs. Failures
-    # still produce an INCOMPLETE summary and retain the failing step's diagnostics.
+  revisions:
+    runs-on: ubuntu-24.04
     continue-on-error: true
-    timeout-minutes: 90
+    outputs:
+      baseline: ${{ steps.baseline.outputs.ref }}
+      label: ${{ steps.baseline.outputs.label }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.candidate }}
-          path: candidate
           fetch-depth: 0
           persist-credentials: false
-
       - name: Select baseline
         id: baseline
         env:
@@ -39,23 +35,161 @@ jobs:
           CANDIDATE: ${{ inputs.candidate }}
         run: |
           if [ "$BASELINE" = previous-tag ]; then
-            BASELINE=$(python3 candidate/.github/scripts/compatibility.py previous-tag --repo candidate --head "$CANDIDATE")
+            BASELINE=$(python3 .github/scripts/compatibility.py previous-tag --repo . --head "$CANDIDATE")
           fi
-          BASE_SHA=$(git -C candidate rev-parse --verify "${BASELINE}^{commit}")
+          BASE_SHA=$(git rev-parse --verify "${BASELINE}^{commit}")
           echo "ref=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "label=$BASELINE ($BASE_SHA)" >> "$GITHUB_OUTPUT"
 
+  snapshots:
+    needs: revisions
+    if: needs.revisions.outputs.baseline != ''
+    name: Snapshot ${{ matrix.platform }} ${{ matrix.configuration }}
+    continue-on-error: true
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [release, debug]
+        platform: [linuxx86-64, linuxarm64, linuxsystemcore, windowsx86-64, windowsarm64, osxuniversal]
+        include:
+          - platform: linuxx86-64
+            os: ubuntu-24.04
+            container: wpilib/systemcore-cross-debian:trixie
+          - platform: linuxarm64
+            os: ubuntu-24.04
+            container: wpilib/aarch64-cross-debian:trixie
+          - platform: linuxsystemcore
+            os: ubuntu-24.04
+            container: wpilib/systemcore-cross-debian:trixie
+          - platform: windowsx86-64
+            os: windows-2025
+          - platform: windowsarm64
+            os: windows-2025
+            options: -Pbuildwinarm64
+          - platform: osxuniversal
+            os: macos-15
+    runs-on: ${{ case(matrix.os == 'ubuntu-24.04', 'blacksmith-4vcpu-ubuntu-2404', matrix.os == 'macos-15', 'blacksmith-6vcpu-macos-15', matrix.os) }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '13.3'
+    steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ steps.baseline.outputs.ref }}
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.revisions.outputs.baseline }}
           path: baseline
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/setup-java@v5
+        if: runner.os != 'Linux'
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: actions/setup-python@v6
+        if: runner.os != 'Linux'
+        with:
+          python-version: '3.13'
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          validate-wrappers: false
+          cache-read-only: true
+      - name: Build Linux baseline
+        if: runner.os == 'Linux'
+        uses: wpilibsuite/docker-run-action@v4
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work/baseline
+          run: |
+            ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
+              compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} \
+              -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
+              -PcompatibilityOutput=/work/snapshots/baseline
+      - name: Build Linux candidate
+        if: always() && runner.os == 'Linux'
+        uses: wpilibsuite/docker-run-action@v4
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work/candidate
+          run: |
+            ./gradlew --init-script .github/scripts/compatibility.init.gradle \
+              compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} \
+              -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
+              -PcompatibilityOutput=/work/snapshots/candidate
+      - name: Build desktop baseline
+        if: runner.os != 'Linux'
+        working-directory: baseline
+        run: |
+          ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} ${{ matrix.options }} \
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
+            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/baseline"
+          if [ "$RUNNER_OS" = macOS ]; then
+            python ../candidate/.github/scripts/compatibility.py prepare-macos --snapshot ../snapshots/baseline
+          fi
+      - name: Build desktop candidate
+        if: always() && runner.os != 'Linux'
+        working-directory: candidate
+        run: |
+          ./gradlew --init-script .github/scripts/compatibility.init.gradle \
+            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponly${{ matrix.platform }} ${{ matrix.options }} \
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityConfiguration=${{ matrix.configuration }} \
+            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/candidate"
+          if [ "$RUNNER_OS" = macOS ]; then
+            python .github/scripts/compatibility.py prepare-macos --snapshot ../snapshots/candidate
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compatibility-snapshot-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: snapshots
+          retention-days: 3
+          if-no-files-found: warn
 
+  compare:
+    needs: [revisions, snapshots]
+    if: always()
+    name: Report ${{ matrix.target.platform }} ${{ matrix.target.architecture }} ${{ matrix.configuration }} (advisory)
+    runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
+    container: wpilib/systemcore-cross-debian:trixie
+    continue-on-error: true
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [release, debug]
+        target:
+          - {platform: linuxx86-64}
+          - {platform: linuxarm64}
+          - {platform: linuxsystemcore}
+          - {platform: windowsx86-64}
+          - {platform: windowsarm64}
+          - {platform: osxuniversal, architecture: x86_64}
+          - {platform: osxuniversal, architecture: arm64}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          name: compatibility-snapshot-${{ matrix.target.platform }}-${{ matrix.configuration }}
+          path: snapshots
       - name: Install comparison tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y abigail-tools
+          sudo apt-get install -y abigail-tools llvm-19 clang-19 lld-19 lldb-19 python3-lldb-19 liblldb-19-dev
+          echo "PYTHONPATH=$(lldb-19 -P)" >> "$GITHUB_ENV"
           mkdir -p tools report
           curl --fail --location --retry 3 --max-time 120 \
             -o tools/japicmp.jar \
@@ -63,64 +197,47 @@ jobs:
           echo '799a3a85b3025d84b2ed9e0c105064e12adc2c414afe8c25a95454f8d3772f7f  tools/japicmp.jar' | sha256sum --check
           {
             abidiff --version
+            llvm-readobj-19 --version
+            lldb-19 --version
             java -version
             echo 'japicmp 0.24.2'
           } > report/tools.txt 2>&1
-          cat report/tools.txt
-
-      - uses: gradle/actions/setup-gradle@v6
-        with:
-          validate-wrappers: false
-          cache-read-only: true
-
       - name: Test comparison engine
         env:
           JAPICMP_JAR: ${{ github.workspace }}/tools/japicmp.jar
         run: python3 -m unittest discover -s candidate/.github/scripts/compatibility_tests -v
-
       - uses: actions/checkout@v7
         continue-on-error: true
         with:
           repository: wpilibsuite/vendor-json-repo
           path: vendor-json-repo
           persist-credentials: false
-
       - name: Download vendordeps
-        # Missing vendor artifacts should not prevent the public-surface comparison.
         continue-on-error: true
         timeout-minutes: 15
         env:
-          BASE_SHA: ${{ steps.baseline.outputs.ref }}
+          BASE_SHA: ${{ needs.revisions.outputs.baseline }}
+          PLATFORM: ${{ matrix.target.platform }}
+          CONFIGURATION: ${{ matrix.configuration }}
         run: |
           python3 candidate/.github/scripts/compatibility.py download-vendors \
             --repo candidate --baseline "$BASE_SHA" --inventory vendor-json-repo \
-            --output vendors
-
-      - name: Build baseline libraries
-        working-directory: baseline
-        run: |
-          ./gradlew --init-script ../candidate/.github/scripts/compatibility.init.gradle \
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponlylinuxx86-64 \
-            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/baseline"
-
-      - name: Build candidate libraries
-        working-directory: candidate
-        run: |
-          ./gradlew --init-script .github/scripts/compatibility.init.gradle \
-            compatibilitySnapshot --build-cache -PbuildServer -PskipJavaFormat -Ponlylinuxx86-64 \
-            -PcompatibilityOutput="$GITHUB_WORKSPACE/snapshots/candidate"
-
-      - name: Compare libraries
+            --platform "$PLATFORM" --configuration "$CONFIGURATION" --output vendors
+      - name: Compare libraries and JNI
         if: always()
         env:
-          BASE_LABEL: ${{ steps.baseline.outputs.label || inputs.baseline }}
+          BASE_LABEL: ${{ needs.revisions.outputs.label || inputs.baseline }}
           HEAD_SHA: ${{ inputs.candidate }}
+          ARCHITECTURE: ${{ matrix.target.architecture }}
         run: |
+          ARGS=()
+          if [ -n "$ARCHITECTURE" ]; then
+            ARGS+=(--architecture "$ARCHITECTURE")
+          fi
           python3 candidate/.github/scripts/compatibility.py compare \
             --base snapshots/baseline --head snapshots/candidate \
             --base-revision "$BASE_LABEL" --head-revision "$HEAD_SHA" \
-            --japicmp tools/japicmp.jar --vendors vendors --output report
-
+            --japicmp tools/japicmp.jar --vendors vendors --output report "${ARGS[@]}"
       - name: Publish summary
         if: always()
         run: |
@@ -133,11 +250,10 @@ jobs:
           if grep -q INCOMPLETE report/summary.md; then
             echo '::warning::Compatibility analysis is incomplete; see the summary and job logs.'
           fi
-
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: compatibility-${{ inputs.candidate }}
+          name: compatibility-${{ matrix.target.platform }}-${{ matrix.target.architecture || 'native' }}-${{ matrix.configuration }}-${{ inputs.candidate }}
           path: |
             report/*.md
             report/*.json

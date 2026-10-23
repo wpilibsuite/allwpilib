@@ -63,7 +63,7 @@ def parse_class(data):
     def cls(index):
         return utf(pool[index][1]) if index else None
 
-    integer(2)  # access flags
+    class_flags = integer(2)  # access flags
     name = cls(integer(2))
     parents = [cls(integer(2))]
     parents += [cls(integer(2)) for _ in range(integer(2))]
@@ -92,11 +92,13 @@ def parse_class(data):
         elif entry[0] == 16:
             types.update(re.findall(r"L([^;]+);", utf(entry[1])))
     members = set()
+    member_flags = {}
     for kind in ("field", "method"):
         for _ in range(integer(2)):
-            integer(2)
+            flags = integer(2)
             member, descriptor = utf(integer(2)), utf(integer(2))
             members.add((kind, member, descriptor))
+            member_flags[(kind, member, descriptor)] = flags
             types.update(re.findall(r"L([^;]+);", descriptor))
             for _ in range(integer(2)):
                 integer(2)
@@ -107,6 +109,8 @@ def parse_class(data):
         "refs": references,
         "types": types,
         "members": members,
+        "member_flags": member_flags,
+        "flags": class_flags,
     }
 
 

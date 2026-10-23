@@ -8,51 +8,7 @@ import re
 import subprocess
 import zipfile
 
-
-def symbols(path, dynamic=False):
-    """Read raw symbols from ELF or ar without loading vendor code."""
-    with path.open("rb") as stream:
-        magic = stream.read(8)
-    if magic[:4] != b"\x7fELF" and magic != b"!<arch>\n":
-        # Thin archives refer to external files; inspect only self-contained binaries.
-        raise ValueError(f"Not an ELF binary or regular ar archive: {path.name}")
-    command = ["nm", "--format=posix", "--no-demangle", "--extern-only"]
-    if dynamic:
-        command.append("--dynamic")
-    result = subprocess.run(
-        [*command, str(path)], capture_output=True, text=True, timeout=120, check=True
-    )
-    defined, undefined = set(), set()
-    for line in result.stdout.splitlines():
-        fields = line.split()
-        if len(fields) < 2 or len(fields[1]) != 1:
-            continue
-        name, kind = fields[:2]
-        # Compare symbol names independent of the version attached by the linker.
-        name = name.split("@")[0]
-        if kind in ("U", "w", "v"):
-            undefined.add(name)
-        elif kind.isupper() or kind in ("u", "i"):
-            defined.add(name)
-    return defined, undefined - defined
-
-
-def demangle(names):
-    names = sorted(names)
-    if not names:
-        return {}
-    result = subprocess.run(
-        ["c++filt"],
-        input="\n".join(names) + "\n",
-        capture_output=True,
-        text=True,
-        timeout=120,
-        check=True,
-    )
-    values = result.stdout.splitlines()
-    if len(values) != len(names):
-        raise ValueError("c++filt did not return one name per symbol")
-    return dict(zip(names, values, strict=True))
+from compatibility_binary import demangle, symbols
 
 
 def diagnostic_context(text):
@@ -82,7 +38,7 @@ def diagnostic_context(text):
     return {compact(t): t for t in types}, signatures
 
 
-def trace_native(artifacts, old, new, results, output, temporary):
+def trace_native(artifacts, old, new, results, output, temporary, architecture=None):
     """Join removed exports and diagnostic names with shared/static vendor symbols."""
     exports, current = {}, set()
     for library, path in old.items():
@@ -91,11 +47,18 @@ def trace_native(artifacts, old, new, results, output, temporary):
     for path in new.values():
         current.update(symbols(path, dynamic=True)[0])
     removed = exports.keys() - current
-    contexts = [
-        (result, diagnostic_context((output / result["report"]).read_text()))
-        for result in results
-        if result["status"] == "changed"
-    ]
+    contexts = []
+    for result in results:
+        if result["status"] == "changed":
+            text = (output / result["report"]).read_text()
+            raw_interfaces = set(
+                re.findall(
+                    r"^(?:Function signature changed|Virtual method ABI changed|Variable type changed): ([^:\n]+)",
+                    text,
+                    re.MULTILINE,
+                )
+            )
+            contexts.append((result, diagnostic_context(text), raw_interfaces))
     findings, errors = [], []
     scanned = 0
     for number, (artifact, path) in enumerate(artifacts):
@@ -103,14 +66,21 @@ def trace_native(artifacts, old, new, results, output, temporary):
             found = False
             with zipfile.ZipFile(path) as archive:
                 for entry_number, entry in enumerate(archive.infolist()):
-                    if not re.search(r"\.(?:a|so(?:\.\d+)*)$", entry.filename):
+                    if not re.search(
+                        r"\.(?:a|lib|dll|dylib|so(?:\.\d+)*)$", entry.filename
+                    ):
                         continue
                     found = True
                     # Use generated filenames, never the archive's paths.
                     target = temporary / f"vendor-{number}-{entry_number}"
                     target.write_bytes(archive.read(entry))
-                    is_shared = ".so" in entry.filename
-                    defined, undefined = symbols(target, dynamic=is_shared)
+                    is_shared = (
+                        entry.filename.endswith((".dll", ".dylib"))
+                        or ".so" in entry.filename
+                    )
+                    defined, undefined = symbols(
+                        target, dynamic=is_shared, architecture=architecture
+                    )
                     if not defined and not undefined:
                         raise ValueError(f"No symbols in {entry.filename}")
                     evidence = []
@@ -123,7 +93,7 @@ def trace_native(artifacts, old, new, results, output, temporary):
                             }
                         )
                     names = demangle(defined | undefined)
-                    for result, (types, interfaces) in contexts:
+                    for result, (types, interfaces), raw_interfaces in contexts:
                         matches = []
                         pattern = (
                             re.compile(
@@ -139,10 +109,13 @@ def trace_native(artifacts, old, new, results, output, temporary):
                         )
                         for raw, name in names.items():
                             compact = re.sub(r"\s+", "", name)
-                            if raw in undefined and any(
-                                i.endswith(compact)
-                                and len(i) - len(compact) in boundaries
-                                for i, boundaries in interfaces
+                            if raw in undefined and (
+                                raw in raw_interfaces
+                                or any(
+                                    i.endswith(compact)
+                                    and len(i) - len(compact) in boundaries
+                                    for i, boundaries in interfaces
+                                )
                             ):
                                 matches.append(
                                     {

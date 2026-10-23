@@ -12,14 +12,17 @@ import html
 import json
 import os
 import subprocess
+import sys
 import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
 import compatibility_java
+import compatibility_jni
 import compatibility_native
 import compatibility_vendors
+from compatibility_binary import format_of, llvm_tool
 
 
 def previous_tag(repo, head):
@@ -64,8 +67,8 @@ def native_status(returncode):
     return "changed" if returncode else "unchanged"
 
 
-def native_libraries(snapshot, destination):
-    """Extract only ELF libraries and adjacent debug files, without trusting zip paths."""
+def native_libraries(snapshot, destination, architecture=None):
+    """Extract shared libraries and their debug files without trusting zip paths."""
     libraries = {}
     archives = sorted((snapshot / "native").glob("*.zip"))
     if not archives:
@@ -75,17 +78,43 @@ def native_libraries(snapshot, destination):
         with zipfile.ZipFile(archive) as contents:
             for entry in contents.infolist():
                 name = Path(entry.filename).name
-                if not name.endswith((".so", ".so.debug")):
+                if not name.endswith(
+                    (".so", ".so.debug", ".dll", ".pdb", ".dylib", ".dylib.debug")
+                ):
                     continue
                 target = destination / archive.stem / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 if target.exists():
                     raise ValueError(f"Duplicate native file in {archive}: {name}")
                 target.write_bytes(contents.read(entry))
-                if name.endswith(".so"):
-                    with target.open("rb") as stream:
-                        if stream.read(4) != b"\x7fELF":
-                            raise ValueError(f"Not an ELF library: {target}")
+                if architecture and name.endswith((".dylib", ".dylib.debug")):
+                    arches = subprocess.check_output(
+                        [llvm_tool("llvm-lipo"), "-archs", str(target)],
+                        text=True,
+                        timeout=120,
+                    ).split()
+                    if architecture not in arches:
+                        raise ValueError(
+                            f"Missing {architecture} slice in {archive.name}/{name}"
+                        )
+                    thin = target.with_name(target.name + ".thin")
+                    if len(arches) > 1:
+                        subprocess.run(
+                            [
+                                llvm_tool("llvm-lipo"),
+                                str(target),
+                                "-thin",
+                                architecture,
+                                "-output",
+                                str(thin),
+                            ],
+                            check=True,
+                            capture_output=True,
+                            timeout=120,
+                        )
+                        thin.replace(target)
+                if name.endswith((".so", ".dll", ".dylib")):
+                    format_of(target)
                     libraries[f"{archive.stem}/{name}"] = target
                     found = True
         if not found:
@@ -108,15 +137,42 @@ def has_debug_info(library):
     return False
 
 
-def compare_native(base, head, output, abidiff, vendors=None):
+def compare_native(
+    base, head, output, abidiff, vendors=None, report=None, architecture=None
+):
     with tempfile.TemporaryDirectory(prefix="native-", dir=output) as directory:
-        old = native_libraries(base, Path(directory) / "base")
-        new = native_libraries(head, Path(directory) / "head")
+        old = native_libraries(base, Path(directory) / "base", architecture)
+        new = native_libraries(head, Path(directory) / "head", architecture)
         results = compare_native_libraries(old, new, output, abidiff)
+        if report is not None:
+            try:
+                report["jni"] = compatibility_jni.compare(
+                    base,
+                    head,
+                    old,
+                    new,
+                    vendors["native"] if vendors else [],
+                    Path(directory),
+                    architecture,
+                )
+                report["errors"].extend(report["jni"]["errors"])
+            except (
+                OSError,
+                ValueError,
+                zipfile.BadZipFile,
+                subprocess.SubprocessError,
+            ) as error:
+                report["errors"].append(f"JNI: {error}")
         if vendors is not None:
             try:
                 vendors["report"]["native"] = compatibility_native.trace_native(
-                    vendors["native"], old, new, results, output, Path(directory)
+                    vendors["native"],
+                    old,
+                    new,
+                    results,
+                    output,
+                    Path(directory),
+                    architecture,
                 )
             except (OSError, ValueError, subprocess.SubprocessError) as error:
                 vendors["report"]["native"] = {
@@ -154,6 +210,8 @@ def compare_native_libraries(old, new, output, abidiff):
         elif name not in old:
             status = "added"
             log.write_text(f"Published library added: {name}\n", encoding="utf-8")
+        elif format_of(old[name]) != "elf" or format_of(new[name]) != "elf":
+            status = compare_debug_types(old[name], new[name], log)
         elif not has_debug_info(old[name]) or not has_debug_info(new[name]):
             status = "error"
             log.write_text(
@@ -185,6 +243,88 @@ def compare_native_libraries(old, new, output, abidiff):
                 result["excerpt"] = "\n".join(stream.read(6000).splitlines()[:40])
         results.append(result)
     return results
+
+
+def compare_debug_types(old, new, log):
+    """Compare exports and debug-record layouts for platforms unsupported by abidiff."""
+    snapshots = []
+    for label, path in (("base", old), ("head", new)):
+        data = log.with_suffix(f".{label}.json")
+        diagnostic = log.with_suffix(f".{label}.txt")
+        code = run_tool(
+            [
+                sys.executable,
+                str(Path(__file__).with_name("compatibility_layouts.py")),
+                str(path),
+                str(data),
+            ],
+            diagnostic,
+        )
+        if code:
+            log.write_text(
+                f"Debug-type inspection failed ({code}); see {diagnostic.name}\n"
+            )
+            return "error"
+        snapshots.append(json.loads(data.read_text()))
+    before, after = snapshots
+    lines = []
+    for symbol in sorted(set(before["exports"]) - set(after["exports"])):
+        lines.append(f"Removed export: {symbol}")
+    for name in sorted(before["records"].keys() & after["records"].keys()):
+        if before["records"][name] != after["records"][name]:
+            lines += [
+                f"'class {name}' changed:",
+                "  before: " + json.dumps(before["records"][name]),
+                "  after: " + json.dumps(after["records"][name]),
+            ]
+    for name in sorted(before["functions"].keys() & after["functions"].keys()):
+        if before["functions"][name] != after["functions"][name]:
+            lines.append(
+                f"Function signature changed: {name}: {before['functions'][name]} -> {after['functions'][name]}"
+            )
+    for name in sorted(before["variables"].keys() & after["variables"].keys()):
+        if before["variables"][name] != after["variables"][name]:
+            lines.append(
+                f"Variable type changed: {name}: {before['variables'][name]} -> {after['variables'][name]}"
+            )
+    for name, method in before["virtual_methods"].items():
+        if method != after["virtual_methods"].get(name):
+            lines += [
+                f"'class {method['owner']}' changed: virtual method ABI",
+                f"Virtual method ABI changed: {name}",
+            ]
+    log.write_text(
+        "\n".join(lines) + "\n"
+        if lines
+        else "No exported symbol or debug-type changes.\n"
+    )
+    return "changed" if lines else "unchanged"
+
+
+def prepare_macos(snapshot):
+    """Link DWARF while the build machine's object files still exist."""
+    for archive in sorted((snapshot / "native").glob("*.zip")):
+        with tempfile.TemporaryDirectory() as directory:
+            replacement = Path(directory) / "archive.zip"
+            with (
+                zipfile.ZipFile(archive) as source,
+                zipfile.ZipFile(replacement, "w", zipfile.ZIP_DEFLATED) as dest,
+            ):
+                for entry in source.infolist():
+                    if entry.filename.endswith(".dylib.debug"):
+                        continue
+                    dest.writestr(entry, source.read(entry))
+                    if entry.filename.endswith(".dylib"):
+                        binary = Path(directory) / Path(entry.filename).name
+                        binary.write_bytes(source.read(entry))
+                        debug = Path(str(binary) + ".debug")
+                        subprocess.run(
+                            ["dsymutil", "--flat", "-o", str(debug), str(binary)],
+                            check=True,
+                            timeout=1200,
+                        )
+                        dest.write(debug, entry.filename + ".debug")
+            archive.write_bytes(replacement.read_bytes())
 
 
 def java_classpath(snapshot):
@@ -260,8 +400,9 @@ def summary(report):
         f"Candidate: `{html.escape(report['head'])}`",
         "",
         (
-            "Scope: published Java public/protected definitions and Linux x86-64 "
-            "C++ shared-library ABI, including object layouts reachable from exported interfaces."
+            "Scope: published Java definitions, native libraries (including JNI and HAL/GUI "
+            "simulation plugins), native debug types, and JNI contracts. "
+            f"Target: {html.escape(str(report.get('target', 'linuxx86-64 release')))}."
         ),
         (
             "These are potential client/vendor breakages. "
@@ -310,7 +451,7 @@ def summary(report):
             f"Inventory: `{html.escape(vendors.get('series') or 'unavailable')}` at "
             f"`{html.escape(vendors.get('revision') or 'unavailable')}`. "
             f"{vendors.get('downloaded', 0)}/{vendors.get('requested', 0)} artifacts downloaded; "
-            f"{vendors.get('skipped', 0)} dependencies have no declared Linux x86-64 binary."
+            f"{vendors.get('skipped', 0)} dependencies have no binary declared for this target."
         )
         lines += [
             "",
@@ -364,6 +505,17 @@ def summary(report):
             lines.append("")
     else:
         lines += ["", "Vendordep tracing was not requested.", ""]
+    jni = report.get("jni", {})
+    lines += ["", f"## JNI: {len(jni.get('findings', []))} findings", ""]
+    lines.append(jni.get("coverage", "JNI inspection did not complete."))
+    if "native_declarations" in jni:
+        lines.append(
+            f"{jni['exported_bindings']} of {jni['native_declarations']} native declarations match exported JNI names; remaining declarations may use dynamic registration."
+        )
+    for finding in jni.get("findings", [])[:50]:
+        lines.append("- " + html.escape(json.dumps(finding)[:2000]))
+    if len(jni.get("findings", [])) > 50:
+        lines.append("Further JNI findings are in results.json.")
     lines += [
         "",
         (
@@ -385,11 +537,45 @@ def compare(args):
         "java": [],
         "errors": [],
     }
+    architecture = getattr(args, "architecture", None)
+    target = {"platform": "linuxx86-64", "configuration": "release"}
+    target_error = None
+    try:
+        targets = [
+            (
+                json.loads((snapshot / "target.json").read_text())
+                if (snapshot / "target.json").is_file()
+                else target
+            )
+            for snapshot in (args.base, args.head)
+        ]
+        if targets[0] != targets[1]:
+            raise ValueError("Baseline and candidate target metadata differ")
+        target = targets[0]
+        if (
+            not isinstance(target, dict)
+            or not {"platform", "configuration"} <= target.keys()
+        ):
+            raise ValueError("Invalid snapshot target metadata")
+        if (target["platform"] == "osxuniversal") != bool(architecture):
+            raise ValueError(
+                "--architecture is required for macOS and unsupported for other targets"
+            )
+    except (OSError, ValueError) as error:
+        target_error = str(error)
+    report["target"] = (
+        dict(target, architecture=architecture) if isinstance(target, dict) else target
+    )
     vendors = None
     if getattr(args, "vendors", None) is not None:
         report["vendors"] = {}
         try:
             index = compatibility_vendors.load_inventory(args.vendors, output)
+            for key in ("platform", "configuration"):
+                if target_error:
+                    raise ValueError(target_error)
+                if index.get(key, target[key]) != target[key]:
+                    raise ValueError(f"Vendor {key} does not match snapshot target")
             report["errors"].extend(index["errors"])
             available = [a for a in index["artifacts"] if a["status"] == "downloaded"]
             report["vendors"].update(
@@ -417,12 +603,22 @@ def compare(args):
             if not (snapshot / "complete").is_file():
                 raise ValueError(f"Snapshot did not finish: {snapshot}")
         try:
+            if target_error:
+                raise ValueError(target_error)
             report["native"] = compare_native(
-                args.base, args.head, output, args.abidiff, vendors
+                args.base,
+                args.head,
+                output,
+                args.abidiff,
+                vendors,
+                report,
+                architecture,
             )
             for result in report["native"]:
                 if result["status"] == "error":
-                    report["errors"].append(f"abidiff failed: {result['library']}")
+                    report["errors"].append(
+                        f"Native ABI inspection failed: {result['library']}"
+                    )
         except (
             OSError,
             ValueError,
@@ -463,6 +659,11 @@ def main():
     diff.add_argument("--japicmp", type=Path, required=True)
     diff.add_argument("--abidiff", default="abidiff")
     diff.add_argument(
+        "--architecture",
+        choices=["x86_64", "arm64"],
+        help="Required slice for macOS universal binaries",
+    )
+    diff.add_argument(
         "--vendors", type=Path, help="Output of download-vendors (optional locally)"
     )
     vendor = commands.add_parser("download-vendors")
@@ -473,12 +674,32 @@ def main():
         "--series", help="Override the series inferred from the baseline tag"
     )
     vendor.add_argument("--output", type=Path, required=True)
+    vendor.add_argument(
+        "--platform",
+        default="linuxx86-64",
+        choices=[
+            "linuxx86-64",
+            "linuxarm64",
+            "linuxsystemcore",
+            "windowsx86-64",
+            "windowsarm64",
+            "osxuniversal",
+        ],
+    )
+    vendor.add_argument(
+        "--configuration", default="release", choices=["release", "debug"]
+    )
+    prepare = commands.add_parser("prepare-macos")
+    prepare.add_argument("--snapshot", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "previous-tag":
         print(previous_tag(args.repo, args.head))
         return 0
     if args.command == "download-vendors":
         return compatibility_vendors.download(args)
+    if args.command == "prepare-macos":
+        prepare_macos(args.snapshot)
+        return 0
     return compare(args)
 
 
