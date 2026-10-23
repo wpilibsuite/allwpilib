@@ -38,8 +38,9 @@ namespace wpi {
  * On startup, all existing WPILIB_TBD log files are deleted. If there is less
  * than 200 MB of free space on the target storage, non-match WPILIB_ log files
  * are deleted (oldest to newest) until there is 200 MB free OR there are 10
- * files remaining. Competition match logs are not deleted. An alert is active
- * while less than 400 MB is available, checked every 5 seconds. An
+ * files remaining, including match logs. Competition match logs and their
+ * rotated segments are not deleted. An alert is active while less than 400 MB
+ * is available, checked every 5 seconds. An
  * informational alert indicates when automatic directory selection falls back
  * to SystemCore internal storage.
  *

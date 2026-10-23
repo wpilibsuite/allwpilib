@@ -79,13 +79,13 @@ static constexpr uintmax_t FREE_SPACE_THRESHOLD = 200000000;
 static constexpr int FILE_COUNT_THRESHOLD = 10;
 
 static bool IsMatchLog(std::string_view filename) {
-  constexpr std::string_view extension = ".wpilog";
-  if (filename.size() < extension.size() ||
-      filename.substr(filename.size() - extension.size()) != extension) {
+  constexpr std::string_view EXTENSION = ".wpilog";
+  if (filename.size() < EXTENSION.size() ||
+      filename.substr(filename.size() - EXTENSION.size()) != EXTENSION) {
     return false;
   }
 
-  auto extensionIndex = filename.size() - extension.size();
+  auto extensionIndex = filename.size() - EXTENSION.size();
   auto matchTypeSeparator = filename.rfind('_', extensionIndex - 1);
   if (matchTypeSeparator == std::string_view::npos ||
       matchTypeSeparator + 2 >= extensionIndex) {
@@ -97,7 +97,14 @@ static bool IsMatchLog(std::string_view filename) {
       matchType != 'T') {
     return false;
   }
+  // Rotated logs have one numeric segment suffix, e.g. Q123.2.wpilog.
+  bool segmentFound = false;
   for (size_t i = matchTypeSeparator + 2; i < extensionIndex; ++i) {
+    if (filename[i] == '.' && !segmentFound && i > matchTypeSeparator + 2 &&
+        i + 1 < extensionIndex) {
+      segmentFound = true;
+      continue;
+    }
     if (filename[i] < '0' || filename[i] > '9') {
       return false;
     }
@@ -166,6 +173,50 @@ Thread::~Thread() {
   StopConsoleLog();
 }
 
+void wpi::internal::DeleteOldDataLogs(std::string_view logDir,
+                                      uintmax_t freeSpace) {
+  if (freeSpace >= FREE_SPACE_THRESHOLD) {
+    return;
+  }
+  std::error_code ec;
+  // Count all permanent logs toward the minimum, but only delete non-match
+  // logs.
+  std::vector<fs::directory_entry> entries;
+  for (auto&& entry : fs::directory_iterator{logDir, ec}) {
+    auto filename = entry.path().filename().string();
+    if (wpi::util::starts_with(filename, "WPILIB_") &&
+        entry.path().extension() == ".wpilog" &&
+        !wpi::util::starts_with(filename, "WPILIB_TBD_")) {
+      entries.emplace_back(entry);
+    }
+  }
+  std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
+    return a.last_write_time() < b.last_write_time();
+  });
+
+  int count = entries.size();
+  for (auto&& entry : entries) {
+    if (count <= FILE_COUNT_THRESHOLD) {
+      break;
+    }
+    if (wpi::internal::IsDataLogMatchLog(entry.path().filename().string())) {
+      continue;
+    }
+    auto size = entry.file_size();
+    if (fs::remove(entry.path(), ec)) {
+      --count;
+      WPILIB_ReportWarning("DataLogManager: Deleted {}", entry.path().string());
+      freeSpace += size;
+      if (freeSpace >= FREE_SPACE_THRESHOLD) {
+        break;
+      }
+    } else {
+      wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
+                       entry.path().string());
+    }
+  }
+}
+
 void Thread::Main() {
   // based on free disk space, scan for "old" WPILIB_*.wpilog files and remove
   {
@@ -177,44 +228,7 @@ void Thread::Main() {
     } else {
       freeSpace = UINTMAX_MAX;
     }
-    if (freeSpace < FREE_SPACE_THRESHOLD) {
-      // Delete oldest non-match WPILIB_*.wpilog files. Ignore temporary and
-      // match logs.
-      std::vector<fs::directory_entry> entries;
-      for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
-        auto filename = entry.path().filename().string();
-        if (wpi::util::starts_with(filename, "WPILIB_") &&
-            entry.path().extension() == ".wpilog" &&
-            !wpi::util::starts_with(filename, "WPILIB_TBD_") &&
-            !wpi::internal::IsDataLogMatchLog(filename)) {
-          entries.emplace_back(entry);
-        }
-      }
-      std::sort(entries.begin(), entries.end(),
-                [](const auto& a, const auto& b) {
-                  return a.last_write_time() < b.last_write_time();
-                });
-
-      int count = entries.size();
-      for (auto&& entry : entries) {
-        --count;
-        if (count < FILE_COUNT_THRESHOLD) {
-          break;
-        }
-        auto size = entry.file_size();
-        if (fs::remove(entry.path(), ec)) {
-          WPILIB_ReportWarning("DataLogManager: Deleted {}",
-                               entry.path().string());
-          freeSpace += size;
-          if (freeSpace >= FREE_SPACE_THRESHOLD) {
-            break;
-          }
-        } else {
-          wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                           entry.path().string());
-        }
-      }
-    }
+    wpi::internal::DeleteOldDataLogs(m_logDir, freeSpace);
   }
   CheckFreeSpace();
   auto nextSpaceCheck =
