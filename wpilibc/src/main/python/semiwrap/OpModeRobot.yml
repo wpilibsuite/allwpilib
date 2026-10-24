@@ -8,6 +8,7 @@ classes:
       OpModeRobotBase:
         overloads:
           wpi::units::second_t:
+          wpi::units::hertz_t:
           "":
       DriverStationConnected:
       NonePeriodic:
@@ -28,6 +29,11 @@ classes:
       DisabledPeriodic:
       DisabledExit:
       AddPeriodic:
+        param_override:
+          offset:
+            default: 0_s
+      GetPeriod:
+      PrintWatchdogEpochs:
       GetLoopStartTime:
       LoopFunc:
       StartCurrentOpMode:
@@ -42,6 +48,7 @@ classes:
       OpModeRobot:
         overloads:
           wpi::units::second_t:
+          wpi::units::hertz_t:
           "":
       AddOpMode:
         overloads:
