@@ -21,12 +21,12 @@ fork repositories skip it. PRs from forks targeting upstream still receive it.
 - **Tag pushes and merge-group events** build artifacts but do not run reports.
 
 [compatibility.yml](../workflows/compatibility.yml) selects the baseline and runs
-**six report jobs**, one per platform. Each job downloads its existing Gradle
-artifacts once and checks both release and debug; macOS checks both architectures
-as well. The candidate is never rebuilt for the compatibility check.
+**six report jobs**, one per platform. Each job downloads its candidate Gradle
+artifacts and published baseline once and checks both release and debug; macOS
+checks both architectures as well. The candidate is never rebuilt for the compatibility check.
 
 The existing `Linux`, `Arm64`, `Systemcore`, `Win64Debug`, `Win64Release`,
-`WinArm64Debug`, `WinArm64Release`, and `macOS` artifacts supply the published
+`WinArm64Debug`, `WinArm64Release`, and `macOS` artifacts supply the candidate
 libraries and JARs. An advisory post-build task adds a `compatibility/` directory
 to those same artifacts. It contains the exact commit/platform/configuration
 inventory, Java dependency JARs, the omitted Linux `cscore-jnicvstatic` debug
@@ -34,26 +34,44 @@ sidecar, and macOS DWARF linked while the build objects still exist. It does not
 copy or repackage the published binaries, or compile/link native code. Maven
 publishing excludes this directory and the report artifacts.
 
-Baseline selection first tries upstream **push** runs of `gradle.yml` for the
-exact requested commit. If those artifacts are missing, expired, or lack the
-required compatibility data, it tries the most recent usable push artifacts on
-the same target branch. The candidate commit and PR runs are excluded. Uploaded
-artifacts can be reused while unrelated jobs in their run are still running.
-The producer's compatibility-data step must have succeeded, and downloaded
-manifests are checked against the selected commit, platform, and configuration.
+Baselines come from **Artifactory**, using anonymous
+`https://frcmaven.wpi.edu/artifactory/api/download/` requests. Selection searches
+`release` and `development`, plus their year-specific counterparts. Maven version
+metadata maps development versions' Git hash suffixes and release versions' tags
+to commits. The exact requested commit is preferred. If its published version is
+missing or incomplete for a platform, selection walks the target branch's
+first-parent history from newest to oldest for an available version in the same
+year. The candidate itself and commits outside that history are excluded.
 
-When a different baseline is selected, Actions emits a warning and each report
-records the requested and actual commits and the source Gradle run. Selection is
-per platform, so the reports can use different baseline commits when artifact
-availability differs. Comparisons and vendordep inventory selection use the
-actual baseline commit. Reused artifacts can also come from different runner or
-toolchain image versions; compiler-induced ABI differences need review.
+Both release and debug packages must be available for every expected publication
+on the selected platform. The inventory comes from the selected revision's Gradle
+publication declarations, read as text without running them. It covers the same
+Java, shared native, JNI and simulation scope as candidate collection, including
+separate field-image and cscore JNI packages. Static-only packages and desktop-only
+libraries on the robot target are excluded. Artifact bytes are checked against
+Artifactory's published SHA-256 checksums. No GitHub baseline artifact, new metadata
+file, or successful compatibility-data step is required from historical builds.
 
-**Compatibility CI never rebuilds either revision.** If no usable baseline is
-available, or the candidate artifacts are missing or incomplete, the platform
-job fails with an **INCOMPLETE** report before installing comparison tools or
-downloading vendordeps. Older artifacts without the supplemental metadata,
-Java classpaths, and native debug data are unusable even when their build passed.
+When a different baseline is selected, Actions and the report warn with the
+requested commit, actual commit, Artifactory repository, and version. Selection
+is per platform, so availability can produce different baselines. Comparisons and
+vendordep inventory selection use the actual baseline commit. The report retains
+publication URLs, checksums, version, commit and reconstructed inventory in
+`baseline-provenance.json`. Compiler or toolchain changes between published
+builds can also cause ABI differences that require review.
+
+The combined WPILib publication POMs omit Java dependencies. The baseline's version
+catalog and compile dependency declarations supply a standalone Maven POM;
+Maven resolves its external dependency JARs and transitive dependencies only.
+It never invokes a WPILib build. The dependency POM and resolution log are retained
+with the report. This reader supports the repository's shared publication scripts
+and version-catalog dependency syntax; new publication conventions must update it.
+
+**Compatibility CI never rebuilds either revision.** Missing published binaries,
+checksum failures, or missing candidate artifacts fail the platform job with an
+**INCOMPLETE** report. Older published packages may lack macOS DWARF or the Linux
+`cscore-jnicvstatic` debug sidecar. Those missing debug records are reported for
+the affected native libraries; other native, Java and JNI checks still run.
 The local snapshot task described below remains available for explicit local use.
 
 ## Coverage
@@ -217,8 +235,9 @@ Native library statuses distinguish findings from inspection failures:
 | `changed` | The native comparison found differences requiring review. |
 | `error` | The native inspection could not complete. |
 
-Reports consume existing Gradle artifacts directly. There are no compatibility
-build jobs, build caches, or separately uploaded build snapshots.
+Reports consume existing candidate Gradle artifacts and published Artifactory
+baselines. There are no compatibility build jobs, build caches, or separately
+uploaded build snapshots.
 
 Findings and vendor coverage warnings return success. Coverage warnings remain
 marked **INCOMPLETE** in the summary and generate an Actions warning. Tool,

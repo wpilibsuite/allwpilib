@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       baseline-branch:
-        description: Target branch used to find a recent available baseline artifact
+        description: Target branch used to find a recent published baseline version
         required: true
         type: string
       candidate:
@@ -49,17 +49,16 @@ jobs:
           BASE_SHA=$(git rev-parse --verify "${BASELINE}^{commit}")
           echo "ref=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "label=$BASELINE ($BASE_SHA)" >> "$GITHUB_OUTPUT"
-      - name: Locate existing baseline builds
+      - name: Locate published Artifactory baseline
         id: plan
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           BASE_SHA: ${{ steps.baseline.outputs.ref }}
           CANDIDATE: ${{ inputs.candidate }}
           BASE_BRANCH: ${{ inputs.baseline-branch }}
         run: |
           python3 .github/scripts/compatibility_artifacts.py plan --repo . \
             --revision "$BASE_SHA" --candidate "$CANDIDATE" --branch "$BASE_BRANCH" \
-            --repository "$GITHUB_REPOSITORY" --output "$GITHUB_OUTPUT"
+            --output "$GITHUB_OUTPUT"
 
   compare:
     needs: revisions
@@ -90,30 +89,33 @@ jobs:
         with:
           pattern: ${{ matrix.pattern }}
           path: products/candidate
-      - name: Download baseline build artifacts
-        id: baseline-artifacts
-        if: matrix.baseline_error == ''
-        uses: actions/download-artifact@v8
-        continue-on-error: true
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ matrix.baseline_run }}
-          pattern: ${{ matrix.pattern }}
-          path: products/baseline
-      - name: Discard failed downloads
+      - name: Discard failed candidate download
         # A digest failure can leave extracted files; they must not enter the report.
+        if: steps.candidate-artifacts.outcome == 'failure'
+        run: rm -rf products/candidate
+      - name: Download published baseline from Artifactory
+        if: matrix.baseline_error == ''
         env:
-          CANDIDATE: ${{ steps.candidate-artifacts.outcome }}
-          BASELINE: ${{ steps.baseline-artifacts.outcome }}
+          BASE_SHA: ${{ matrix.baseline_revision }}
+          VERSION: ${{ matrix.baseline_version }}
+          REPOSITORY: ${{ matrix.baseline_repository }}
+          REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
+          BASELINE_WARNING: ${{ matrix.baseline_warning }}
+          HEAD_SHA: ${{ inputs.candidate }}
+          PLATFORM: ${{ matrix.platform }}
         run: |
-          if [ "$CANDIDATE" = failure ]; then rm -rf products/candidate; fi
-          if [ "$BASELINE" = failure ]; then rm -rf products/baseline; fi
+          python3 candidate/.github/scripts/compatibility_artifacts.py fetch-baseline \
+            --repo candidate --repository "$REPOSITORY" --version "$VERSION" \
+            --candidate-products products/candidate --baseline-products products/baseline \
+            --base-revision "$BASE_SHA" --base-label "$VERSION ($BASE_SHA)" --head-revision "$HEAD_SHA" \
+            --platform "$PLATFORM" --output report \
+            --requested-base "$REQUESTED_BASE" --baseline-warning "$BASELINE_WARNING"
       - name: Require complete build artifacts
         env:
           BASE_SHA: ${{ matrix.baseline_revision }}
           REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
           BASELINE_WARNING: ${{ matrix.baseline_warning }}
-          BASE_LABEL: ${{ matrix.baseline_warning != '' && matrix.baseline_revision || needs.revisions.outputs.label }}
+          BASE_LABEL: ${{ format('{0} ({1})', matrix.baseline_version, matrix.baseline_revision) }}
           HEAD_SHA: ${{ inputs.candidate }}
           BASELINE_ERROR: ${{ matrix.baseline_error }}
           PLATFORM: ${{ matrix.platform }}
@@ -127,7 +129,7 @@ jobs:
       - name: Install comparison tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y abigail-tools llvm-19 clang-19 lld-19 lldb-19 python3-lldb-19 liblldb-19-dev
+          sudo apt-get install -y maven abigail-tools llvm-19 clang-19 lld-19 lldb-19 python3-lldb-19 liblldb-19-dev
           echo "PYTHONPATH=$(lldb-19 -P)" >> "$GITHUB_ENV"
           mkdir -p tools report
           curl --fail --location --retry 3 --max-time 120 \
@@ -141,6 +143,12 @@ jobs:
             java -version
             echo 'japicmp 0.24.2'
           } > report/tools.txt 2>&1
+      - name: Resolve published baseline Java dependencies
+        run: |
+          cp products/baseline/compatibility/manifest.json report/baseline-provenance.json
+          cp products/baseline/compatibility/dependencies.pom report/baseline-dependencies.xml
+          python3 candidate/.github/scripts/compatibility_artifacts.py resolve-classpath \
+            --products products/baseline --log report/baseline-classpath.txt
       - name: Test comparison engine
         env:
           JAPICMP_JAR: ${{ github.workspace }}/tools/japicmp.jar
@@ -157,7 +165,7 @@ jobs:
           BASE_SHA: ${{ matrix.baseline_revision }}
           REQUESTED_BASE: ${{ needs.revisions.outputs.baseline }}
           BASELINE_WARNING: ${{ matrix.baseline_warning }}
-          BASE_LABEL: ${{ matrix.baseline_warning != '' && matrix.baseline_revision || needs.revisions.outputs.label }}
+          BASE_LABEL: ${{ format('{0} ({1})', matrix.baseline_version, matrix.baseline_revision) }}
           HEAD_SHA: ${{ inputs.candidate }}
           PLATFORM: ${{ matrix.platform }}
         run: |

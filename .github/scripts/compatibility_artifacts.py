@@ -14,12 +14,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import urllib.parse
-import urllib.request
 import zipfile
 from pathlib import Path
 
 import compatibility
+import compatibility_artifactory
 from compatibility_binary import llvm_tool
 
 TARGETS = [
@@ -32,152 +31,17 @@ TARGETS = [
 ]
 
 
-def api_pages(repository, endpoint, key, **query):
-    """Read paginated Actions metadata; credentials are sent only to GitHub."""
-    for page in range(1, 11):
-        url = f"https://api.github.com/repos/{repository}/actions/{endpoint}?"
-        url += urllib.parse.urlencode({**query, "per_page": 100, "page": page})
-        request = urllib.request.Request(
-            url,
-            headers={
-                "Accept": "application/vnd.github+json",
-                "Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}",
-                "X-GitHub-Api-Version": "2022-11-28",
-            },
-        )
-        with urllib.request.urlopen(request, timeout=60) as response:
-            items = json.load(response)[key]
-        yield from items
-        if len(items) < 100:
-            break
-
-
-def artifact_plan(
-    revision, runs, artifacts, *, fallback_runs=lambda: (), branch="", candidate=""
-):
-    """Prefer the exact baseline, then recent usable push artifacts on its branch."""
-    targets = [
-        dict(target, baseline_run="", baseline_revision=revision, baseline_warning="")
-        for target in TARGETS
-    ]
-    seen = set()
-    for exact in (True, False):
-        for run in runs if exact else fallback_runs():
-            if (
-                run["event"] != "push"
-                or run["head_sha"] == candidate
-                or run["id"] in seen
-                or (exact and run["head_sha"] != revision)
-                or (not exact and run["head_branch"] != branch)
-            ):
-                continue
-            seen.add(run["id"])
-            names = {a["name"] for a in artifacts(run) if not a["expired"]}
-            for target in targets:
-                if not target["baseline_run"] and set(target["artifacts"]) <= names:
-                    target["baseline_run"] = str(run["id"])
-                    target["baseline_revision"] = run["head_sha"]
-                    if run["head_sha"] != revision:
-                        target["baseline_warning"] = (
-                            f"Requested baseline {revision} has no usable {target['platform']} artifacts. "
-                            f"Using {run['head_sha']} from Gradle run {run['id']}, the most recent "
-                            f"usable artifacts on {branch}; the comparison baseline has changed."
-                        )
-            if all(t["baseline_run"] for t in targets):
-                break
-        if all(t["baseline_run"] for t in targets):
-            break
-    for target in targets:
-        names = target["artifacts"]
-        target["pattern"] = names[0] if len(names) == 1 else "{" + ",".join(names) + "}"
-    return targets
-
-
 def plan(args):
-    supported = {}
-
-    def available(run):
-        revision = run["head_sha"]
-        if revision not in supported:
-            supported[revision] = (
-                subprocess.run(
-                    [
-                        "git",
-                        "-C",
-                        str(args.repo),
-                        "cat-file",
-                        "-e",
-                        f"{revision}:.github/scripts/compatibility_artifacts.py",
-                    ],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    check=False,
-                ).returncode
-                == 0
-            )
-        if not supported[revision]:
-            if revision == args.revision:
-                print(
-                    f"Baseline Gradle run {run['id']} ({revision}) predates compatibility artifact data."
-                )
-            return []
-        # Artifact names alone do not establish that supplemental data was produced.
-        jobs = api_pages(args.repository, f"runs/{run['id']}/jobs", "jobs")
-        ready = {
-            job["name"].removeprefix("Build - ")
-            for job in jobs
-            if job["name"].startswith("Build - ")
-            and any(
-                step["name"] == "Add compatibility data to build artifacts"
-                and step["conclusion"] == "success"
-                for step in (job.get("steps") or [])
-            )
-        }
-        return [
-            artifact
-            for artifact in api_pages(
-                args.repository, f"runs/{run['id']}/artifacts", "artifacts"
-            )
-            if artifact["name"] in ready
-        ]
-
-    lookup_error = ""
-    try:
-        targets = artifact_plan(
-            args.revision,
-            api_pages(
-                args.repository,
-                "workflows/gradle.yml/runs",
-                "workflow_runs",
-                head_sha=args.revision,
-                event="push",
-            ),
-            available,
-            fallback_runs=lambda: api_pages(
-                args.repository,
-                "workflows/gradle.yml/runs",
-                "workflow_runs",
-                branch=args.branch,
-                event="push",
-            ),
-            branch=args.branch,
-            candidate=args.candidate,
-        )
-    except (OSError, ValueError) as error:
-        lookup_error = f"Cannot look up baseline Gradle artifacts: {error}"
-        targets = artifact_plan(args.revision, [], lambda _: [])
+    targets = compatibility_artifactory.select(
+        args.repo, args.revision, args.candidate, args.branch, TARGETS
+    )
     for target in targets:
-        error = lookup_error
-        if not error and not target["baseline_run"]:
-            error = (
-                f"No usable Gradle artifacts ({', '.join(target['artifacts'])}) for baseline "
-                f"{args.revision} or recent push builds on {args.branch}. "
-                "Artifacts must include compatibility metadata, Java dependency classpaths, "
-                "and native debug data; the candidate cannot be its own baseline."
+        if target["baseline_error"]:
+            print(target["baseline_error"] + " No rebuild will be attempted.")
+        else:
+            print(
+                f"{target['platform']}: Artifactory {target['baseline_repository']}/{target['baseline_version']}"
             )
-        target["baseline_error"] = error
-        if error:
-            print(f"{target['platform']}: {error} No rebuild will be attempted.")
     with args.output.open("a") as output:
         output.write(f"matrix={json.dumps({'include': targets})}\n")
 
@@ -281,7 +145,7 @@ def find_manifest(products, revision, platform, configuration):
     if len(matches) != 1:
         raise ValueError(
             f"Expected one compatibility/manifest.json for {platform} {configuration}; "
-            f"found {len(matches)} in {products}. Build artifacts may be missing or predate compatibility data."
+            f"found {len(matches)} in {products}. Artifact download or collection may be incomplete."
         )
     path, manifest = matches[0]
     if manifest["revision"] != revision:
@@ -454,11 +318,13 @@ def main():
     planner.add_argument("--revision", required=True)
     planner.add_argument("--candidate", required=True)
     planner.add_argument("--branch", required=True)
-    planner.add_argument("--repository", required=True)
     planner.add_argument("--output", type=Path, required=True)
     producer = commands.add_parser("prepare")
     producer.add_argument("--products", type=Path, required=True)
-    for command in ("validate", "report"):
+    resolver = commands.add_parser("resolve-classpath")
+    resolver.add_argument("--products", type=Path, required=True)
+    resolver.add_argument("--log", type=Path, required=True)
+    for command in ("validate", "fetch-baseline", "report"):
         reports = commands.add_parser(command)
         for name in ("candidate-products", "baseline-products", "output"):
             reports.add_argument("--" + name, type=Path, required=True)
@@ -468,6 +334,10 @@ def main():
         reports.add_argument("--baseline-warning", default="")
         if command == "validate":
             reports.add_argument("--baseline-error", default="")
+        elif command == "fetch-baseline":
+            reports.add_argument("--repo", type=Path, required=True)
+            reports.add_argument("--version", required=True)
+            reports.add_argument("--repository", required=True)
         else:
             for name in ("repo", "inventory", "japicmp"):
                 reports.add_argument("--" + name, type=Path, required=True)
@@ -476,6 +346,23 @@ def main():
         plan(args)
     elif args.command == "prepare":
         prepare(args.products)
+    elif args.command == "fetch-baseline":
+        try:
+            compatibility_artifactory.download(
+                args.repo,
+                {
+                    "revision": args.base_revision,
+                    "version": args.version,
+                    "repository": args.repository,
+                },
+                args.platform,
+                args.baseline_products,
+            )
+        except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
+            args.baseline_error = f"Artifactory baseline download failed: {error}"
+            return validate(args)
+    elif args.command == "resolve-classpath":
+        compatibility_artifactory.resolve_classpath(args.products, args.log)
     elif args.command == "validate":
         return validate(args)
     else:
