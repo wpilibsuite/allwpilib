@@ -8,12 +8,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.AlertSim;
 import org.wpilib.util.Alert;
@@ -23,6 +29,86 @@ class DataLogManagerTest {
     return Arrays.stream(AlertSim.getAll())
         .filter(alert -> "DataLogManager".equals(alert.group))
         .toList();
+  }
+
+  @Test
+  void matchLogFilenameDetection() {
+    for (String filename :
+        List.of(
+            "WPILIB_20261022_123456_CALA_P1.wpilog",
+            "WPILIB_20261022_123456_WAMIL_Q123.wpilog",
+            "WPILIB_20261022_123456_MNDU2_E13.wpilog",
+            "WPILIB_20261022_123456_Event_T4.wpilog",
+            "WPILIB_20261022_123456_CALA_P1.2.wpilog",
+            "WPILIB_20261022_123456_WAMIL_Q123.12.wpilog",
+            "WPILIB_20261022_123456_MNDU2_E13.3.wpilog",
+            "WPILIB_20261022_123456_Event_T4.2.wpilog")) {
+      assertTrue(DataLogManager.isMatchLog(filename), filename);
+    }
+
+    for (String filename :
+        List.of(
+            "WPILIB_20261022_123456.wpilog",
+            "WPILIB_20261022_123456_Event_Q.wpilog",
+            "WPILIB_20261022_123456_Event_Qabc.wpilog",
+            "WPILIB_20261022_123456_Event_X3.wpilog",
+            "WPILIB_TBD_1234567890abcdef.wpilog",
+            "WPILIB_20261022_123456_Event_Q3.wpilog.bak",
+            "WPILIB_20261022_123456_Event_Q.2.wpilog",
+            "WPILIB_20261022_123456_Event_Q1..2.wpilog",
+            "WPILIB_20261022_123456_Event_Q1.2.3.wpilog",
+            "WPILIB_20261022_123456_Event_Q1.abc.wpilog",
+            "WPILIB_20261022_123456_Event_Q1..wpilog",
+            "WPILIB_20261022_123456.2.wpilog")) {
+      assertFalse(DataLogManager.isMatchLog(filename), filename);
+    }
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "20, 10, 0, 10", // Protected logs count toward the minimum.
+    "5, 10, 0, 5", // Retain ten permanent logs in total.
+    "20, 10, 199999950, 1", // Stop once sufficient space is recovered.
+    "20, 10, 200000000, 0", // No cleanup is needed.
+    "9, 1, 0, 0" // Temporary and unrelated files do not count toward the minimum.
+  })
+  void cleanup(
+      int matchCount, int nonMatchCount, long freeSpace, int deletedCount, @TempDir Path logDir)
+      throws IOException {
+    HAL.initialize();
+    List<Path> matches = new ArrayList<>();
+    for (int i = 0; i < matchCount; ++i) {
+      matches.add(
+          createLog(
+              logDir,
+              "WPILIB_20261022_123456_Event_Q" + i + (i % 2 == 0 ? "" : ".2") + ".wpilog",
+              i));
+    }
+    List<Path> nonMatches = new ArrayList<>();
+    for (int i = 0; i < nonMatchCount; ++i) {
+      nonMatches.add(
+          createLog(logDir, "WPILIB_20261022_1234%02d.wpilog".formatted(i), matchCount + i));
+    }
+    final Path temporary = createLog(logDir, "WPILIB_TBD_1234567890abcdef.wpilog", 100);
+    final Path unrelated = createLog(logDir, "unrelated.wpilog", 101);
+
+    DataLogManager.deleteOldLogs(logDir.toFile(), freeSpace);
+
+    for (Path path : matches) {
+      assertTrue(Files.exists(path), path.toString());
+    }
+    for (int i = 0; i < nonMatchCount; ++i) {
+      assertEquals(
+          i >= deletedCount, Files.exists(nonMatches.get(i)), nonMatches.get(i).toString());
+    }
+    assertTrue(Files.exists(temporary));
+    assertTrue(Files.exists(unrelated));
+  }
+
+  private Path createLog(Path logDir, String filename, int order) throws IOException {
+    Path path = Files.write(logDir.resolve(filename), new byte[100]);
+    Files.setLastModifiedTime(path, FileTime.fromMillis(1_000L * order));
+    return path;
   }
 
   @Test
