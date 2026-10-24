@@ -80,5 +80,6 @@ class Drivetrain {
   // robot!
   wpi::math::MecanumDrivePoseEstimator poseEstimator{
       kinematics,          imu.GetRotation2d(), GetCurrentWheelDistances(),
-      wpi::math::Pose2d{}, {0.1, 0.1, 0.1},     {0.1, 0.1, 0.1}};
+      wpi::math::Pose2d{},  // Field center, facing the blue alliance wall.
+      {0.1, 0.1, 0.1},     {0.1, 0.1, 0.1}};
 };

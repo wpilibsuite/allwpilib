@@ -4,10 +4,10 @@
   "game": "Destination: Deep Space",
   "field-image": {
     "path": "2019-deepspace.jpg",
-    "top": 41,
-    "left": 220,
-    "bottom": 616,
-    "right": 1375
+    "top": 40,
+    "left": 217,
+    "bottom": 615,
+    "right": 1372
   },
   "field-dimensions": {
     "length": 16.4592,

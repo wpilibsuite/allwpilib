@@ -35,14 +35,24 @@ void to_json(wpi::util::json& json, const Field& field);
 WPILIB_DLLEXPORT
 void from_json(const wpi::util::json& json, Field& field);
 
-/** A FIRST field with optional field image metadata and optional tag poses. */
+/**
+ * A FIRST field with optional field image metadata and optional tag poses.
+ *
+ * Tag poses use the field coordinate system: the origin is at field center on
+ * the floor, +X points toward the blue alliance wall, +Y points left when
+ * facing +X, and +Z points up. A tag pose locates the center of the tag; zero
+ * rotation is upright and faces +X. Positive yaw is counterclockwise viewed
+ * from above. SetOrigin() changes the reference frame returned by GetTagPose().
+ */
 class WPILIB_DLLEXPORT Field final {
  public:
   /** Common origin positions for the field tag coordinate system. */
   enum class OriginPosition {
-    /** Blue alliance wall, right side. */
+    /** Field center, with +X toward the blue alliance wall (the default). */
+    FIELD_CENTER,
+    /** Blue alliance wall, right side, facing into the field. */
     BLUE_ALLIANCE_WALL_RIGHT_SIDE,
-    /** Red alliance wall, right side. */
+    /** Red alliance wall, right side, facing into the field. */
     RED_ALLIANCE_WALL_RIGHT_SIDE,
   };
 

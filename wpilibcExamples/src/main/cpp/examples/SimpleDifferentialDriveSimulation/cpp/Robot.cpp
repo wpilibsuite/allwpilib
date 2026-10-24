@@ -27,7 +27,8 @@
 class Robot : public wpi::TimedRobot {
  public:
   Robot()
-      // Replace this with a call to a trajectory generator
+      // Replace this with a call to a trajectory generator. Field poses use
+      // field center as the origin, with zero heading toward the blue wall.
       : trajectory{wpi::math::HolonomicTrajectory{
             std::vector<wpi::math::HolonomicSample>{wpi::math::HolonomicSample{
                 0_s, wpi::math::Pose2d{0_m, 0_m, 0_rad},

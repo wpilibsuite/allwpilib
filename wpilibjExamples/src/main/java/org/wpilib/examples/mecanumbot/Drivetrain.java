@@ -55,6 +55,7 @@ public class Drivetrain {
 
   /** Constructs a MecanumDrive and resets the gyro. */
   public Drivetrain() {
+    // Start facing the blue alliance wall so yaw zero aligns with field +X.
     imu.resetYaw();
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's

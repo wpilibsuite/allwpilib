@@ -53,6 +53,7 @@ class Drivetrain:
         # Gains are for example purposes only - must be determined for your own robot!
         self.feedforward = wpimath.SimpleMotorFeedforwardMeters(1, 3)
 
+        # Start facing the blue alliance wall so yaw zero aligns with field +X.
         self.imu.reset_yaw()
 
         # We need to invert one side of the drivetrain so that positive voltages

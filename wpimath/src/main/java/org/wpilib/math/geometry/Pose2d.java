@@ -22,7 +22,14 @@ import org.wpilib.units.measure.Distance;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
 
-/** Represents a 2D pose containing translational and rotational elements. */
+/**
+ * Represents a 2D pose containing translational and rotational elements.
+ *
+ * <p>When used as a field-relative pose, the origin is at the center of the field, +X points toward
+ * the blue alliance wall, and +Y points to the left when facing +X. Positive rotation is
+ * counterclockwise. A zero rotation faces +X. Poses may also be expressed in other reference
+ * frames; pose operations do not depend on field dimensions.
+ */
 @Json
 public final class Pose2d
     implements Interpolatable<Pose2d>, ProtobufSerializable, StructSerializable {

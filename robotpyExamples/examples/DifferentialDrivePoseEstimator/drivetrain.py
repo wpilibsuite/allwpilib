@@ -50,6 +50,7 @@ class Drivetrain:
         self.default_val = [0.0] * 7
         self.camera_to_object_entry = camera_to_object_topic.get_entry(self.default_val)
 
+        # Built-in tags use the same centered field frame as the pose estimator.
         object_in_field = robotpy_fields.get_field(
             robotpy_fields.FieldId.FRC_2024_CRESCENDO
         ).get_tag_pose(1)
@@ -66,7 +67,7 @@ class Drivetrain:
             self.imu.get_rotation2d(),
             self.left_encoder.get_distance(),
             self.right_encoder.get_distance(),
-            wpimath.Pose2d(),
+            wpimath.Pose2d(),  # Field center, facing the blue alliance wall.
             (0.05, 0.05, wpimath.units.degrees_to_radians(5)),
             (0.5, 0.5, wpimath.units.degrees_to_radians(30)),
         )

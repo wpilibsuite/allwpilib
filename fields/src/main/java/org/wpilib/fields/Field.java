@@ -29,21 +29,23 @@ import org.wpilib.math.geometry.Translation3d;
  * the field boundaries in image pixels. The "field-tags" object stores all field tags contained
  * within a layout.
  *
- * <p>Pose3ds in the JSON are measured using the normal FRC coordinate system, NWU with the origin
- * at the bottom-right corner of the blue alliance wall. {@link #setOrigin(OriginPosition)} can be
- * used to change the poses returned from {@link Field#getTagPose(int)} to be from the perspective
- * of a specific alliance.
+ * <p>Pose3ds in the JSON use the field coordinate system: the origin is at field center on the
+ * floor, +X points toward the blue alliance wall, +Y points left when facing +X, and +Z points up.
+ * {@link #setOrigin(Pose3d)} changes the reference frame of poses returned by {@link
+ * #getTagPose(int)}.
  *
- * <p>Tag poses represent the center of the tag, with a zero rotation representing a tag that is
- * upright and facing away from the (blue) alliance wall (that is, towards the opposing alliance).
+ * <p>Tag poses represent the center of the tag. A zero rotation represents an upright tag facing +X
+ * (toward the blue alliance wall). Positive yaw is counterclockwise viewed from above.
  */
 @Json
 public final class Field {
   /** Common origin positions for the field tag coordinate system. */
   public enum OriginPosition {
-    /** Blue alliance wall, right side. */
+    /** Field center, with +X toward the blue alliance wall (the default). */
+    FIELD_CENTER,
+    /** Blue alliance wall, right side, facing into the field. */
     BLUE_ALLIANCE_WALL_RIGHT_SIDE,
-    /** Red alliance wall, right side. */
+    /** Red alliance wall, right side, facing into the field. */
     RED_ALLIANCE_WALL_RIGHT_SIDE,
   }
 
@@ -349,9 +351,12 @@ public final class Field {
   public void setOrigin(OriginPosition origin) {
     var pose =
         switch (origin) {
-          case BLUE_ALLIANCE_WALL_RIGHT_SIDE -> Pose3d.ZERO;
+          case FIELD_CENTER -> Pose3d.ZERO;
+          case BLUE_ALLIANCE_WALL_RIGHT_SIDE ->
+              new Pose3d(
+                  new Translation3d(length / 2, width / 2, 0), new Rotation3d(0, 0, Math.PI));
           case RED_ALLIANCE_WALL_RIGHT_SIDE ->
-              new Pose3d(new Translation3d(length, width, 0), new Rotation3d(0, 0, Math.PI));
+              new Pose3d(new Translation3d(-length / 2, -width / 2, 0), Rotation3d.ZERO);
         };
     setOrigin(pose);
   }
