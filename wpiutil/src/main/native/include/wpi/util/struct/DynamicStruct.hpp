@@ -495,9 +495,10 @@ class DynamicStruct {
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);
-    return DynamicStruct{field->m_struct,
-                         m_data.subspan(field->m_offset +
-                                        arrIndex * field->m_struct->GetSize())};
+    auto size = field->m_struct->GetSize();
+    return DynamicStruct{
+        field->m_struct,
+        m_data.subspan(field->m_offset + arrIndex * size, size)};
   }
 
  protected:
@@ -640,9 +641,10 @@ class MutableDynamicStruct : public DynamicStruct {
     assert(field->m_parent == m_desc);
     assert(m_desc->IsValid());
     assert(arrIndex < field->m_arraySize);
+    auto size = field->m_struct->GetSize();
     return MutableDynamicStruct{
-        field->m_struct, m_data.subspan(field->m_offset +
-                                        arrIndex * field->m_struct->GetSize())};
+        field->m_struct,
+        m_data.subspan(field->m_offset + arrIndex * size, size)};
   }
 
   using DynamicStruct::GetStructField;
