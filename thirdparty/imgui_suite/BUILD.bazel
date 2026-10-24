@@ -75,6 +75,37 @@ cc_library(
     ],
 )
 
+#----------------------------------------
+# IMNODEFLOW
+#----------------------------------------
+
+cc_library(
+    name = "imnodeflow_detail",
+    hdrs = glob([
+        "imnodeflow/src/**/*.h",
+        "imnodeflow/src/**/*.inl",
+    ]),
+    includes = ["imnodeflow/src"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/src",
+    deps = [
+        ":imgui",
+    ],
+)
+
+cc_library(
+    name = "imnodeflow",
+    srcs = glob(["imnodeflow/src/**/*.cpp"]),
+    hdrs = glob(["imnodeflow/include/**/*.h"]),
+    includes = ["imnodeflow/include"],
+    linkstatic = True,
+    strip_include_prefix = "imnodeflow/include",
+    deps = [
+        ":imgui",
+        ":imnodeflow_detail",
+    ],
+)
+
 #----------------------------------
 # STB
 #----------------------------------
@@ -99,6 +130,7 @@ wpilib_cc_library(
     deps = [
         ":fonts",
         ":imgui",
+        ":imnodeflow",
         ":implot",
         ":stb",
     ],
@@ -125,6 +157,21 @@ pkg_files(
 )
 
 pkg_files(
+    name = "imnodeflow-hdrs-pkg",
+    srcs = glob(["imnodeflow/include/**"]),
+    strip_prefix = "imnodeflow/include",
+)
+
+pkg_files(
+    name = "imnodeflow-detail-hdrs-pkg",
+    srcs = glob([
+        "imnodeflow/src/**/*.h",
+        "imnodeflow/src/**/*.inl",
+    ]),
+    strip_prefix = "imnodeflow/src",
+)
+
+pkg_files(
     name = "stb-hdrs-pkg",
     srcs = glob(["stb/include/**"]),
     strip_prefix = "stb/include",
@@ -141,6 +188,8 @@ pkg_zip(
     srcs = [
         "generated-fonts-hdrs-pkg",
         "imgui-hdrs-pkg",
+        "imnodeflow-detail-hdrs-pkg",
+        "imnodeflow-hdrs-pkg",
         "implot-hdrs-pkg",
         "stb-hdrs-pkg",
         "//:license_pkg_files",
@@ -163,6 +212,12 @@ pkg_files(
 )
 
 pkg_files(
+    name = "imnodeflow-srcs-pkg",
+    srcs = glob(["imnodeflow/src/**"]),
+    strip_prefix = "imnodeflow/src",
+)
+
+pkg_files(
     name = "stb-srcs-pkg",
     srcs = glob(["stb/cpp/**"]),
     strip_prefix = "stb/cpp",
@@ -179,6 +234,7 @@ pkg_zip(
     srcs = [
         "generated-fonts-srcs-pkg",
         "imgui-srcs-pkg",
+        "imnodeflow-srcs-pkg",
         "implot-srcs-pkg",
         "stb-srcs-pkg",
         "//:license_pkg_files",
