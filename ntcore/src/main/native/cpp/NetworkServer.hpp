@@ -95,6 +95,9 @@ class NetworkServer {
 
   wpi::net::EventLoopRunner m_loopRunner;
   wpi::net::uv::Loop& m_loop;
+
+  // Global (per NT server) TSP server
+  tsp::TimeSyncServer m_tspServer;
 };
 
 }  // namespace wpi::nt
