@@ -17,6 +17,8 @@
 
 #endif
 
+#include <algorithm>
+#include <array>
 #include <chrono>
 #include <format>
 #include <random>
@@ -61,6 +63,7 @@ DataLogBackgroundWriter::DataLogBackgroundWriter(wpi::util::Logger& msglog,
                                                  std::string_view extraHeader)
     : DataLog{msglog, extraHeader},
       m_period{period < 0.0 ? 0.0 : period},
+      m_dir{dir.empty() ? "." : dir},
       m_newFilename{filename},
       m_thread{[this, dir = std::string{dir}] { WriterThreadMain(dir); }} {}
 
@@ -100,6 +103,25 @@ void DataLogBackgroundWriter::SetFilename(std::string_view filename) {
   m_cond.notify_one();
 }
 
+void DataLogBackgroundWriter::SetDir(std::string_view dir, uint64_t maxSize) {
+  {
+    std::scoped_lock lock{m_mutex};
+    if (m_dir.empty() || m_state == STOPPED) {
+      return;
+    }
+    m_newDir = dir.empty() ? "." : dir;
+    m_maxTransferSize = maxSize;
+    m_wakeup = true;
+    m_doFlush = true;
+  }
+  m_cond.notify_one();
+}
+
+std::string DataLogBackgroundWriter::GetDir() const {
+  std::scoped_lock lock{m_mutex};
+  return m_dir;
+}
+
 void DataLogBackgroundWriter::Flush() {
   {
     std::scoped_lock lock{m_mutex};
@@ -131,12 +153,13 @@ void DataLogBackgroundWriter::Stop() {
     std::scoped_lock lock{m_mutex};
     m_state = STOPPED;
     m_newFilename.clear();
+    m_newDir.clear();
     m_wakeup = true;
   }
   m_cond.notify_one();
 }
 
-static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
+static bool WriteToFile(fs::file_t f, std::span<const uint8_t> data,
                         std::string_view filename, wpi::util::Logger& msglog) {
   do {
 #ifdef _WIN32
@@ -144,7 +167,7 @@ static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
     if (!WriteFile(f, data.data(), data.size(), &ret, nullptr)) {
       WPI_ERROR(msglog, "Error writing to log file '{}': {}", filename,
                 GetLastError());
-      break;
+      return false;
     }
 #else
     ssize_t ret = ::write(f, data.data(), data.size());
@@ -157,13 +180,18 @@ static void WriteToFile(fs::file_t f, std::span<const uint8_t> data,
       // Otherwise it's a non-recoverable error; quit trying
       WPI_ERROR(msglog, "Error writing to log file '{}': {}", filename,
                 std::strerror(errno));
-      break;
+      return false;
     }
 #endif
 
+    if (ret == 0 && !data.empty()) {
+      WPI_ERROR(msglog, "No progress writing to log file '{}'", filename);
+      return false;
+    }
     // The write may have written some or all of the data
     data = data.subspan(ret);
   } while (data.size() > 0);
+  return true;
 }
 
 static std::string MakeRandomFilename() {
@@ -216,6 +244,77 @@ struct DataLogBackgroundWriter::WriterThreadState {
   uintmax_t freeSpace = UINTMAX_MAX;
   int segmentCount = 1;
 };
+
+bool DataLogBackgroundWriter::TransferLogFile(WriterThreadState& state,
+                                              std::string_view dir,
+                                              uint64_t maxSize) {
+  if (state.f == WPI_INVALID_FILE || state.dirPath == dir) {
+    return false;
+  }
+  std::error_code ec;
+  auto size = fs::file_size(state.path, ec);
+  if (ec || size > maxSize) {
+    return false;
+  }
+  auto space = fs::space(dir, ec);
+  if (ec || space.available < MIN_FREE_SPACE ||
+      size > space.available - MIN_FREE_SPACE) {
+    return false;
+  }
+
+  fs::ifstream source{state.path, std::ios::binary};
+  if (!source) {
+    return false;
+  }
+  auto newPath = fs::path{dir} / state.filename;
+  // Keep the original open until the entire copy is safely on the destination.
+  auto dest = fs::OpenFileForWrite(newPath, ec, fs::CD_CreateNew, fs::OF_None);
+  if (ec) {
+    WPI_ERROR(m_msglog, "Could not transfer log to '{}': {}", newPath.string(),
+              ec.message());
+    return false;
+  }
+  bool success = true;
+  std::array<uint8_t, 64 * 1024> buffer;
+  for (uintmax_t remaining = size; remaining != 0;) {
+    auto count = std::min<uintmax_t>(remaining, buffer.size());
+    if (!source.read(reinterpret_cast<char*>(buffer.data()), count) ||
+        !WriteToFile(dest, std::span{buffer}.first(count), newPath.string(),
+                     m_msglog)) {
+      success = false;
+      break;
+    }
+    remaining -= count;
+  }
+  source.close();
+  if (success) {
+#ifdef _WIN32
+    success = FlushFileBuffers(dest);
+#elif defined(__linux__)
+    success = ::fdatasync(dest) == 0;
+#else
+    success = ::fsync(dest) == 0;
+#endif
+  }
+  if (!success) {
+    WPI_ERROR(m_msglog, "Could not transfer log to '{}'", newPath.string());
+    fs::CloseFile(dest);
+    fs::remove(newPath, ec);
+    return false;
+  }
+
+  state.Close();
+  state.f = dest;
+  if (!fs::remove(state.path, ec)) {
+    WPI_WARNING(m_msglog, "Could not remove old log file '{}': {}",
+                state.path.string(), ec.message());
+  }
+  state.dirPath = dir;
+  state.path = std::move(newPath);
+  state.freeSpace = space.available - size;
+  WPI_INFO(m_msglog, "Transferred log to '{}'", state.path.string());
+  return true;
+}
 
 void DataLogBackgroundWriter::BufferHalfFull() {
   Flush();
@@ -314,6 +413,9 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       continue;
     }
 
+    auto newDir = std::move(m_newDir);
+    m_newDir.clear();
+    auto maxTransferSize = m_maxTransferSize;
     bool doStart = false;
 
     // if file was deleted, recreate it with the same name
@@ -367,8 +469,8 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       } else {
         WPI_INFO(m_msglog, "Renamed log file from '{}' to '{}'", state.filename,
                  newFilename);
+        state.SetFilename(newFilename);
       }
-      state.SetFilename(newFilename);
     }
 
     if (doFlush) {
@@ -377,11 +479,7 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       lock.unlock();
       DataLog::FlushBufs(&toWrite);
       lock.lock();
-      if (toWrite.empty()) {
-        continue;
-      }
-
-      if (state.f != WPI_INVALID_FILE && !blocked) {
+      if (!toWrite.empty() && state.f != WPI_INVALID_FILE && !blocked) {
         lock.unlock();
 
         // update free space every 10 flushes (in case other things are writing)
@@ -427,6 +525,16 @@ void DataLogBackgroundWriter::WriterThreadMain(std::string_view dir) {
       lock.unlock();
       ReleaseBufs(&toWrite);
       lock.lock();
+    }
+    if (!newDir.empty() && m_state != STOPPED) {
+      lock.unlock();
+      bool transferred = TransferLogFile(state, newDir, maxTransferSize);
+      lock.lock();
+      if (transferred) {
+        m_dir = std::move(newDir);
+        blocked = false;
+        freeSpaceCount = 0;
+      }
     }
     // If shutdown was requested while writing, loop once more to process the
     // destructor's flush request.
@@ -502,6 +610,19 @@ void WPI_DataLog_SetBackgroundWriterFilename(
     struct WPI_DataLog* datalog, const struct WPI_String* filename) {
   reinterpret_cast<DataLogBackgroundWriter*>(datalog)->SetFilename(
       wpi::util::to_string_view(filename));
+}
+
+void WPI_DataLog_SetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        const struct WPI_String* dir,
+                                        uint64_t maxSize) {
+  reinterpret_cast<DataLogBackgroundWriter*>(datalog)->SetDir(
+      wpi::util::to_string_view(dir), maxSize);
+}
+
+void WPI_DataLog_GetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        struct WPI_String* dir) {
+  *dir = wpi::util::alloc_wpi_string(
+      reinterpret_cast<DataLogBackgroundWriter*>(datalog)->GetDir());
 }
 
 }  // extern "C"

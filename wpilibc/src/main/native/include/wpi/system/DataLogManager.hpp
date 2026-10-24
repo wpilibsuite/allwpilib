@@ -11,6 +11,7 @@
 
 namespace wpi::log {
 class DataLog;
+class DataLogBackgroundWriter;
 }  // namespace wpi::log
 
 namespace wpi::util {
@@ -25,6 +26,10 @@ namespace wpi {
  * based either on current date/time or (if available) competition match number.
  * The data file will be saved to a USB flash drive in a folder named "logs" if
  * one is attached, or to /home/systemcore/logs otherwise.
+ * When automatic selection falls back to internal storage, USB storage is
+ * checked every 5 seconds. If it becomes available and the current file is at
+ * most 10 MB, the file is transferred in the background and logging continues
+ * on USB storage.
  *
  * Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS
  * connects. After the DS connects, the log file is renamed to
@@ -123,6 +128,17 @@ bool IsDataLogMatchLog(std::string_view filename);
  * @param freeSpace Available disk space, in bytes.
  */
 void DeleteOldDataLogs(std::string_view logDir, uintmax_t freeSpace);
+
+/**
+ * Checks for USB storage and requests a background log transfer if available.
+ * For testing purposes only.
+ *
+ * @param log data log
+ * @param usbRoot USB mount path
+ * @return true if the log has successfully transferred to USB storage
+ */
+bool TryTransferDataLogToUsb(wpi::log::DataLogBackgroundWriter& log,
+                             std::string_view usbRoot);
 
 /**
  * Updates the data log storage alert from the available disk space. For
