@@ -15,6 +15,7 @@ pkg_zip(
     srcs = [
         "//:license_pkg_files",
         "//wpilibcExamples/src/main/cpp/snippets",
+        "//wpilibcExamples/src/test/cpp/snippets",
     ],
     tags = ["manual"],
 )
