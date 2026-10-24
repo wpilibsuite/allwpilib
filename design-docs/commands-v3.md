@@ -471,8 +471,6 @@ commands and a list of the current running commands. Commands are serialized wit
 | `is_default_command` | bool (optional)         | Whether the command is the default command for a mechanism. Only present for commands that have been set as the default command for a mechanism.                                                            |
 
 Consumers can use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and `parent_id`
-
-Consumers can use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and `parent_id`
 marginally increase the size of serialized data, but make the schema and deserialization quite simple.
 
 Command IDs are unique across all commands, including those that are not currently running. Every time
