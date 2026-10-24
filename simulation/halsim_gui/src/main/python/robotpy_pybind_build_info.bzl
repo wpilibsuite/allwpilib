@@ -13,14 +13,14 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
 
     resolve_casters(
         name = "halsim_gui_ext.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpimath/src/main/python:wpimath/wpimath-casters.pybind11.json", "//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "halsim_gui_ext.casters.pkl",
         dep_file = "halsim_gui_ext.casters.d",
     )
 
     gen_libinit(
         name = "halsim_gui_ext.gen_lib_init",
-        output_file = "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
+        output_file = "halsim_gui/_ext/_init__halsim_gui_ext.py",
         modules = ["native.halsim_gui._init_robotpy_native_halsim_gui", "hal._init__wpi_hal", "wpimath._init__wpimath", "ntcore._init__ntcore"],
     )
 
@@ -30,9 +30,9 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         module_pkg_name = "halsim_gui._ext._halsim_gui_ext",
         output_file = "halsim_gui_ext.pc",
         pkg_name = "halsim_gui_ext",
-        install_path = "src/main/python/halsim_gui/_ext",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/halsim_gui/_ext/__init__.py",
+        install_path = "halsim_gui/_ext",
+        project_file = "pyproject.toml",
+        package_root = "halsim_gui/_ext/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -46,7 +46,7 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
         name = "halsim_gui_ext",
         casters_pickle = "halsim_gui_ext.casters.pkl",
         header_gen_config = HALSIM_GUI_EXT_HEADER_GEN,
-        trampoline_subpath = "src/main/python/halsim_gui/_ext",
+        trampoline_subpath = "halsim_gui/_ext",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//datalog:robotpy-native-datalog.copy_headers",
@@ -64,20 +64,20 @@ def halsim_gui_ext_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = []
 
     create_pybind_library(
         name = "halsim_gui_ext",
-        install_path = "src/main/python/halsim_gui/_ext/",
+        install_path = "halsim_gui/_ext/",
         extension_name = "_halsim_gui_ext",
         generated_srcs = [],
         semiwrap_header = [":halsim_gui_ext.gen_modinit_hpp"],
         deps = [
             ":halsim_gui_ext.tmpl_hdrs",
             ":halsim_gui_ext.trampoline_hdrs",
+            "//hal/src/main/python:wpihal_pybind_library",
             "//hal:wpiHal",
-            "//hal:wpihal_pybind_library",
+            "//ntcore/src/main/python:ntcore_pybind_library",
             "//ntcore:ntcore",
-            "//ntcore:ntcore_pybind_library",
             "//simulation/halsim_gui:halsim_gui",
+            "//wpimath/src/main/python:wpimath_pybind_library",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_pybind_library",
         ],
         dynamic_deps = [
             "//hal:shared/wpiHal",
@@ -116,7 +116,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/halsim_gui/_ext/halsim_gui_ext.pc",
+            "halsim_gui/_ext/halsim_gui_ext.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -125,13 +125,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/halsim_gui/**"], exclude = ["src/main/python/halsim_gui/**/*.py"]),
+        srcs = native.glob(["halsim_gui/**"], exclude = ["halsim_gui/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/halsim_gui/version.py",
+        output_file = "halsim_gui/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -139,25 +139,25 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-halsim-gui",
-        srcs = native.glob(["src/main/python/halsim_gui/**/*.py"]) + [
-            "src/main/python/halsim_gui/_ext/_init__halsim_gui_ext.py",
+        srcs = native.glob(["halsim_gui/**/*.py"]) + [
+            "halsim_gui/_ext/_init__halsim_gui_ext.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/halsim_gui/_ext/_halsim_gui_ext",
+            ":halsim_gui/_ext/_halsim_gui_ext",
             ":halsim_gui_ext.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
-            "//hal:robotpy-hal",
-            "//ntcore:pyntcore",
+            "//hal/src/main/python",
+            "//ntcore/src/main/python",
             "//simulation/halsim_gui:robotpy-native-halsim-gui",
-            "//wpimath:robotpy-wpimath",
-            "//wpiutil:robotpy-wpiutil",
+            "//wpimath/src/main/python",
+            "//wpiutil/src/main/python",
         ],
-        strip_path_prefixes = ["simulation/halsim_gui/src/main/python", "simulation/halsim_gui"],
+        strip_path_prefixes = ["simulation/halsim_gui/src/main/python/"],
         summary = "WPILib simulation GUI",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",

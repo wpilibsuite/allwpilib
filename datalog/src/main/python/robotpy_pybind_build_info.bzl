@@ -73,8 +73,8 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "DataLog",
             yml_file = "semiwrap/DataLog.yml",
-            header_root = "$(execpath :robotpy-native-datalog.copy_headers)",
-            header_file = "$(execpath :robotpy-native-datalog.copy_headers)/wpi/datalog/DataLog.hpp",
+            header_root = "$(execpath //datalog:robotpy-native-datalog.copy_headers)",
+            header_file = "$(execpath //datalog:robotpy-native-datalog.copy_headers)/wpi/datalog/DataLog.hpp",
             tmpl_class_names = [
                 ("DataLog_tmpl1", "StructLogEntry"),
                 ("DataLog_tmpl2", "StructArrayLogEntry"),
@@ -112,8 +112,8 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "DataLogBackgroundWriter",
             yml_file = "semiwrap/DataLogBackgroundWriter.yml",
-            header_root = "$(execpath :robotpy-native-datalog.copy_headers)",
-            header_file = "$(execpath :robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogBackgroundWriter.hpp",
+            header_root = "$(execpath //datalog:robotpy-native-datalog.copy_headers)",
+            header_file = "$(execpath //datalog:robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogBackgroundWriter.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::log::DataLogBackgroundWriter", "wpi__log__DataLogBackgroundWriter.hpp"),
@@ -122,8 +122,8 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "DataLogReader",
             yml_file = "semiwrap/DataLogReader.yml",
-            header_root = "$(execpath :robotpy-native-datalog.copy_headers)",
-            header_file = "$(execpath :robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogReader.hpp",
+            header_root = "$(execpath //datalog:robotpy-native-datalog.copy_headers)",
+            header_file = "$(execpath //datalog:robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogReader.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::log::StartRecordData", "wpi__log__StartRecordData.hpp"),
@@ -135,8 +135,8 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "DataLogWriter",
             yml_file = "semiwrap/DataLogWriter.yml",
-            header_root = "$(execpath :robotpy-native-datalog.copy_headers)",
-            header_file = "$(execpath :robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogWriter.hpp",
+            header_root = "$(execpath //datalog:robotpy-native-datalog.copy_headers)",
+            header_file = "$(execpath //datalog:robotpy-native-datalog.copy_headers)/wpi/datalog/DataLogWriter.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::log::DataLogWriter", "wpi__log__DataLogWriter.hpp"),
@@ -146,14 +146,14 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
 
     resolve_casters(
         name = "wpilog.resolve_casters",
-        caster_deps = ["//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "wpilog.casters.pkl",
         dep_file = "wpilog.casters.d",
     )
 
     gen_libinit(
         name = "wpilog.gen_lib_init",
-        output_file = "src/main/python/wpilog/_init__wpilog.py",
+        output_file = "wpilog/_init__wpilog.py",
         modules = ["native.datalog._init_robotpy_native_datalog", "wpiutil._init__wpiutil"],
     )
 
@@ -163,9 +163,9 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         module_pkg_name = "wpilog._wpilog",
         output_file = "wpilog.pc",
         pkg_name = "wpilog",
-        install_path = "src/main/python/wpilog",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/wpilog/__init__.py",
+        install_path = "wpilog",
+        project_file = "pyproject.toml",
+        package_root = "wpilog/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -179,7 +179,7 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         name = "wpilog",
         casters_pickle = "wpilog.casters.pkl",
         header_gen_config = WPILOG_HEADER_GEN,
-        trampoline_subpath = "src/main/python/wpilog",
+        trampoline_subpath = "wpilog",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//datalog:robotpy-native-datalog.copy_headers",
@@ -190,7 +190,7 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
 
     create_pybind_library(
         name = "wpilog",
-        install_path = "src/main/python/wpilog/",
+        install_path = "wpilog/",
         extension_name = "_wpilog",
         generated_srcs = [":wpilog.generated_srcs"],
         semiwrap_header = [":wpilog.gen_modinit_hpp"],
@@ -198,8 +198,8 @@ def wpilog_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ":wpilog.tmpl_hdrs",
             ":wpilog.trampoline_hdrs",
             "//datalog:datalog",
+            "//wpiutil/src/main/python:wpiutil_pybind_library",
             "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
             "//datalog:shared/datalog",
@@ -236,7 +236,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/wpilog/wpilog.pc",
+            "wpilog/wpilog.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -245,13 +245,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/wpilog/**"], exclude = ["src/main/python/wpilog/**/*.py"]),
+        srcs = native.glob(["wpilog/**"], exclude = ["wpilog/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/wpilog/version.py",
+        output_file = "wpilog/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -259,22 +259,22 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-wpilog",
-        srcs = native.glob(["src/main/python/wpilog/**/*.py"]) + [
-            "src/main/python/wpilog/_init__wpilog.py",
+        srcs = native.glob(["wpilog/**/*.py"]) + [
+            "wpilog/_init__wpilog.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/wpilog/_wpilog",
+            ":wpilog/_wpilog",
             ":wpilog.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
             "//datalog:robotpy-native-datalog",
-            "//wpiutil:robotpy-wpiutil",
+            "//wpiutil/src/main/python",
         ],
-        strip_path_prefixes = ["datalog/src/main/python", "datalog"],
+        strip_path_prefixes = ["datalog/src/main/python/"],
         summary = "Binary wrapper for WPILib logging library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
@@ -288,15 +288,15 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/main/python/semiwrap",
+        yaml_output_directory = "semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
-        package_root_file = "src/main/python/wpilog/__init__.py",
+        package_root_file = "wpilog/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
-        yaml_files = native.glob(["src/main/python/semiwrap/**"]),
+        pyproject_toml = "pyproject.toml",
+        yaml_files = native.glob(["semiwrap/**"]),
     )
 
     scan_headers(
@@ -304,7 +304,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
         ],
-        package_root_file = "src/main/python/wpilog/__init__.py",
+        package_root_file = "wpilog/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
     )

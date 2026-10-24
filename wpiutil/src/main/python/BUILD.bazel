@@ -1,0 +1,35 @@
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpiutil_extension")
+
+PYBIND_PKGCFG_DEPS = ["//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc"]
+
+generate_robotpy_pybind_build_info(
+    name = "robotpy-wpiutil-generator",
+    additional_srcs = ["wpiutil/src/wpistruct/wpystruct_fns.h"] + ["//wpiutil:robotpy-native-wpiutil.copy_headers"],
+    package_root_file = "wpiutil/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    pyproject_toml = "pyproject.toml",
+    yaml_files = glob(["semiwrap/*.yml"]),
+)
+
+publish_library_casters()
+
+wpiutil_extension(
+    srcs = glob(["wpiutil/src/**/*.cpp"]),
+    extra_hdrs = glob([
+        "wpiutil/src/type_casters/*.h",
+        "wpiutil/src/wpistruct/*.h",
+    ]),
+    header_to_dat_deps = ["wpiutil/src/wpistruct/wpystruct_fns.h"],
+    includes = [
+        "wpiutil/",
+        "wpiutil/src/type_casters",
+        "wpiutil/src/wpistruct",
+    ],
+)
+
+define_pybind_library(
+    name = "python",
+    extra_pybind_hdrs = glob(["**/*.h"]),
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)

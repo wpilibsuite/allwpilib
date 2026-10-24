@@ -5,7 +5,7 @@ robotpy_project(
     srcs = glob(["**/*.py"]),
     main = "robot.py",
     deps = [
-        "//drivers:wpilib-drivers",
-        "//fields:robotpy-fields",
+        "//drivers/src/main/python",
+        "//fields/src/main/python",
     ],
 )

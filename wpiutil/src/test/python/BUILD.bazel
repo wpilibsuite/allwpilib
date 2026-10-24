@@ -12,7 +12,7 @@ create_pybind_library(
     extra_srcs = glob(["cpp/wpiutil_test/*.cpp"]),
     install_path = "cpp/wpiutil_test/",
     deps = [
-        "//wpiutil:wpiutil_pybind_library",
+        "//wpiutil/src/main/python:wpiutil_pybind_library",
     ],
 )
 
@@ -34,7 +34,7 @@ robotpy_py_test(
     ),
     deps = [
         ":wpiutil_test",
-        "//wpiutil:robotpy-wpiutil",
+        "//wpiutil/src/main/python",
         requirement("pytest"),
     ],
 )

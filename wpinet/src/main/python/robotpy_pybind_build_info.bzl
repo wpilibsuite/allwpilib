@@ -73,8 +73,8 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "PortForwarder",
             yml_file = "semiwrap/PortForwarder.yml",
-            header_root = "$(execpath :robotpy-native-wpinet.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/PortForwarder.hpp",
+            header_root = "$(execpath //wpinet:robotpy-native-wpinet.copy_headers)",
+            header_file = "$(execpath //wpinet:robotpy-native-wpinet.copy_headers)/wpi/net/PortForwarder.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::net::PortForwarder", "wpi__net__PortForwarder.hpp"),
@@ -83,8 +83,8 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "WebServer",
             yml_file = "semiwrap/WebServer.yml",
-            header_root = "$(execpath :robotpy-native-wpinet.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpinet.copy_headers)/wpi/net/WebServer.hpp",
+            header_root = "$(execpath //wpinet:robotpy-native-wpinet.copy_headers)",
+            header_file = "$(execpath //wpinet:robotpy-native-wpinet.copy_headers)/wpi/net/WebServer.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::net::WebServer", "wpi__net__WebServer.hpp"),
@@ -94,14 +94,14 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
 
     resolve_casters(
         name = "wpinet.resolve_casters",
-        caster_deps = ["//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "wpinet.casters.pkl",
         dep_file = "wpinet.casters.d",
     )
 
     gen_libinit(
         name = "wpinet.gen_lib_init",
-        output_file = "src/main/python/wpinet/_init__wpinet.py",
+        output_file = "wpinet/_init__wpinet.py",
         modules = ["native.wpinet._init_robotpy_native_wpinet", "wpiutil._init__wpiutil"],
     )
 
@@ -111,9 +111,9 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         module_pkg_name = "wpinet._wpinet",
         output_file = "wpinet.pc",
         pkg_name = "wpinet",
-        install_path = "src/main/python/wpinet",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/wpinet/__init__.py",
+        install_path = "wpinet",
+        project_file = "pyproject.toml",
+        package_root = "wpinet/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -127,7 +127,7 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         name = "wpinet",
         casters_pickle = "wpinet.casters.pkl",
         header_gen_config = WPINET_HEADER_GEN,
-        trampoline_subpath = "src/main/python/wpinet",
+        trampoline_subpath = "wpinet",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//wpinet:robotpy-native-wpinet.copy_headers",
@@ -138,7 +138,7 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
 
     create_pybind_library(
         name = "wpinet",
-        install_path = "src/main/python/wpinet/",
+        install_path = "wpinet/",
         extension_name = "_wpinet",
         generated_srcs = [":wpinet.generated_srcs"],
         semiwrap_header = [":wpinet.gen_modinit_hpp"],
@@ -146,8 +146,8 @@ def wpinet_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
             ":wpinet.tmpl_hdrs",
             ":wpinet.trampoline_hdrs",
             "//wpinet:wpinet",
+            "//wpiutil/src/main/python:wpiutil_pybind_library",
             "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
             "//wpinet:shared/wpinet",
@@ -184,7 +184,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/wpinet/wpinet.pc",
+            "wpinet/wpinet.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -193,13 +193,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/wpinet/**"], exclude = ["src/main/python/wpinet/**/*.py"]),
+        srcs = native.glob(["wpinet/**"], exclude = ["wpinet/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/wpinet/version.py",
+        output_file = "wpinet/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -207,22 +207,22 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-wpinet",
-        srcs = native.glob(["src/main/python/wpinet/**/*.py"]) + [
-            "src/main/python/wpinet/_init__wpinet.py",
+        srcs = native.glob(["wpinet/**/*.py"]) + [
+            "wpinet/_init__wpinet.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/wpinet/_wpinet",
+            ":wpinet/_wpinet",
             ":wpinet.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
             "//wpinet:robotpy-native-wpinet",
-            "//wpiutil:robotpy-wpiutil",
+            "//wpiutil/src/main/python",
         ],
-        strip_path_prefixes = ["wpinet/src/main/python", "wpinet"],
+        strip_path_prefixes = ["wpinet/src/main/python/"],
         summary = "Binary wrapper for WPILib networking library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
@@ -236,15 +236,15 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/main/python/semiwrap",
+        yaml_output_directory = "semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
-        package_root_file = "src/main/python/wpinet/__init__.py",
+        package_root_file = "wpinet/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
-        yaml_files = native.glob(["src/main/python/semiwrap/**"]),
+        pyproject_toml = "pyproject.toml",
+        yaml_files = native.glob(["semiwrap/**"]),
     )
 
     scan_headers(
@@ -252,7 +252,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//wpinet:robotpy-native-wpinet.copy_headers",
         ],
-        package_root_file = "src/main/python/wpinet/__init__.py",
+        package_root_file = "wpinet/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
     )

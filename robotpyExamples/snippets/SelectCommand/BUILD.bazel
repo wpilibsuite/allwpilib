@@ -5,6 +5,6 @@ robotpy_project(
     srcs = glob(["**/*.py"]),
     main = "robot.py",
     deps = [
-        "//commandsv2:commandsv2-py",
+        "//commandsv2/src/main/python",
     ],
 )

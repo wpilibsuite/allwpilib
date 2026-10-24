@@ -73,8 +73,8 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         struct(
             class_name = "OnBoardIO",
             yml_file = "semiwrap/OnBoardIO.yml",
-            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
-            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/OnBoardIO.hpp",
+            header_root = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)/wpi/romi/OnBoardIO.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::romi::OnBoardIO", "wpi__romi__OnBoardIO.hpp"),
@@ -83,8 +83,8 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         struct(
             class_name = "RomiGyro",
             yml_file = "semiwrap/RomiGyro.yml",
-            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
-            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiGyro.hpp",
+            header_root = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)/wpi/romi/RomiGyro.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::romi::RomiGyro", "wpi__romi__RomiGyro.hpp"),
@@ -93,8 +93,8 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         struct(
             class_name = "RomiMotor",
             yml_file = "semiwrap/RomiMotor.yml",
-            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
-            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiMotor.hpp",
+            header_root = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)/wpi/romi/RomiMotor.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::romi::RomiMotor", "wpi__romi__RomiMotor.hpp"),
@@ -103,8 +103,8 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         struct(
             class_name = "RomiServo",
             yml_file = "semiwrap/RomiServo.yml",
-            header_root = "$(execpath :robotpy-native-romi.copy_headers)",
-            header_file = "$(execpath :robotpy-native-romi.copy_headers)/wpi/romi/RomiServo.hpp",
+            header_root = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)",
+            header_file = "$(execpath //romiVendordep:robotpy-native-romi.copy_headers)/wpi/romi/RomiServo.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::romi::RomiServo", "wpi__romi__RomiServo.hpp"),
@@ -114,14 +114,14 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
 
     resolve_casters(
         name = "romi.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpimath/src/main/python:wpimath/wpimath-casters.pybind11.json", "//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "romi.casters.pkl",
         dep_file = "romi.casters.d",
     )
 
     gen_libinit(
         name = "romi.gen_lib_init",
-        output_file = "src/main/python/romi/_init__romi.py",
+        output_file = "romi/_init__romi.py",
         modules = ["native.romi._init_robotpy_native_romi", "wpilib._init__wpilib", "wpimath._init__wpimath"],
     )
 
@@ -131,9 +131,9 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         module_pkg_name = "romi._romi",
         output_file = "romi.pc",
         pkg_name = "romi",
-        install_path = "src/main/python/romi",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/romi/__init__.py",
+        install_path = "romi",
+        project_file = "pyproject.toml",
+        package_root = "romi/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -147,7 +147,7 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
         name = "romi",
         casters_pickle = "romi.casters.pkl",
         header_gen_config = ROMI_HEADER_GEN,
-        trampoline_subpath = "src/main/python/romi",
+        trampoline_subpath = "romi",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//datalog:robotpy-native-datalog.copy_headers",
@@ -166,7 +166,7 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
 
     create_pybind_library(
         name = "romi",
-        install_path = "src/main/python/romi/",
+        install_path = "romi/",
         extension_name = "_romi",
         generated_srcs = [":romi.generated_srcs"],
         semiwrap_header = [":romi.gen_modinit_hpp"],
@@ -174,10 +174,10 @@ def romi_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includes
             ":romi.tmpl_hdrs",
             ":romi.trampoline_hdrs",
             "//romiVendordep:romiVendordep",
-            "//wpilibc:wpilib_pybind_library",
+            "//wpilibc/src/main/python:wpilib_pybind_library",
             "//wpilibc:wpilibc",
+            "//wpimath/src/main/python:wpimath_pybind_library",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_pybind_library",
         ],
         dynamic_deps = [
             "//romiVendordep:shared/romiVendordep",
@@ -215,7 +215,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/romi/romi.pc",
+            "romi/romi.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -224,13 +224,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/romi/**"], exclude = ["src/main/python/romi/**/*.py"]),
+        srcs = native.glob(["romi/**"], exclude = ["romi/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/romi/version.py",
+        output_file = "romi/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -238,23 +238,23 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-romi",
-        srcs = native.glob(["src/main/python/romi/**/*.py"]) + [
-            "src/main/python/romi/_init__romi.py",
+        srcs = native.glob(["romi/**/*.py"]) + [
+            "romi/_init__romi.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/romi/_romi",
+            ":romi/_romi",
             ":romi.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
             "//romiVendordep:robotpy-native-romi",
-            "//simulation/halsim_ws_core:robotpy-halsim-ws",
-            "//wpilibc:robotpy-wpilib",
+            "//simulation/halsim_ws_core/src/main/python",
+            "//wpilibc/src/main/python",
         ],
-        strip_path_prefixes = ["romiVendordep/src/main/python", "romiVendordep"],
+        strip_path_prefixes = ["romiVendordep/src/main/python/"],
         summary = "Binary wrapper for WPILib Romi Vendor library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
@@ -269,7 +269,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/main/python/semiwrap",
+        yaml_output_directory = "semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//datalog:robotpy-native-datalog.copy_headers",
             "//hal:robotpy-native-wpihal.copy_headers",
@@ -282,10 +282,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             "//wpinet:robotpy-native-wpinet.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
-        package_root_file = "src/main/python/romi/__init__.py",
+        package_root_file = "romi/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
-        yaml_files = native.glob(["src/main/python/semiwrap/**"]),
+        pyproject_toml = "pyproject.toml",
+        yaml_files = native.glob(["semiwrap/**"]),
     )
 
     scan_headers(
@@ -293,7 +293,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//romiVendordep:robotpy-native-romi.copy_headers",
         ],
-        package_root_file = "src/main/python/romi/__init__.py",
+        package_root_file = "romi/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
     )
