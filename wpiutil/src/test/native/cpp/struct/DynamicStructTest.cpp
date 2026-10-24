@@ -27,6 +27,62 @@ class DynamicStructTest {
   std::string err;
 };
 
+TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Layout overflow",
+                 "[wpiutil][struct]") {
+  const auto max = std::numeric_limits<size_t>::max();
+  const auto count = std::to_string(max / 8 + 1);
+  SECTION("multiplication") {
+    CHECK(db.Add("test", "uint64 values[" + count + "]", &err) == nullptr);
+  }
+  SECTION("addition") {
+    // These extents fit even the parser's signed 64-bit intermediate.
+    auto half = std::to_string(max / 2);
+    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
+                             "]; uint16 c", &err) == nullptr);
+  }
+  SECTION("bitfield final storage") {
+    auto half = std::to_string(max / 2);
+    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
+                             "]; uint16 c:1", &err) == nullptr);
+  }
+  SECTION("bitfield transition") {
+    auto half = std::to_string(max / 2);
+    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
+                             "]; uint16 c:1; uint8 d:1", &err) == nullptr);
+  }
+  SECTION("bitfield to scalar") {
+    auto half = std::to_string(max / 2);
+    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
+                             "]; uint16 c:1; uint8 d", &err) == nullptr);
+  }
+  SECTION("dependency") {
+    auto outer = db.Add("Outer", "Inner values[" + count + "]", &err);
+    REQUIRE(outer);
+    REQUIRE_FALSE(outer->IsValid());
+    CHECK(db.Add("Inner", "uint64 value", &err) == nullptr);
+    CHECK_FALSE(outer->IsValid());
+  }
+  CHECK(err.find("overflow") != std::string::npos);
+}
+
+TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Layout boundaries",
+                 "[wpiutil][struct]") {
+  const auto max = std::numeric_limits<size_t>::max();
+  auto empty = db.Add("Empty", "", &err);
+  REQUIRE(empty);
+  auto zero = db.Add("Zero", "Empty values[" + std::to_string(max / 2) + "]", &err);
+  REQUIRE(zero);
+  REQUIRE(zero->IsValid());
+  CHECK(zero->GetSize() == 0);
+  auto boundary = db.Add("Boundary", "uint64 a[" + std::to_string(max / 8) +
+                                       "]; uint8 b[7]", &err);
+  REQUIRE(boundary);
+  CHECK(boundary->GetSize() == max);
+  auto nested = db.Add("Nested", "Zero zero; Boundary boundary", &err);
+  REQUIRE(nested);
+  CHECK(nested->GetSize() == max);
+}
+
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Empty",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "", &err);
