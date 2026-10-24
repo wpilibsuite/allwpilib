@@ -9,6 +9,7 @@
 #include <limits>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -143,7 +144,7 @@ std::string StructDescriptor::CalculateOffsets(
   size_t prevBitfieldSize = 0;
   for (auto&& field : m_fields) {
     if (!field.IsBitField()) {
-      [[likely]] shift = 0;  // reset shift on non-bitfield element
+      [[likely]] shift = 0;              // reset shift on non-bitfield element
       if (!advance(prevBitfieldSize)) {  // finish bitfield if active
         return overflow();
       }
@@ -313,7 +314,8 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
       for (size_t i = 0; i < affected.size(); ++i) {
         affected[i]->m_valid = false;
         for (auto* ref : affected[i]->m_references) {
-          if (std::find(affected.begin(), affected.end(), ref) == affected.end()) {
+          if (std::find(affected.begin(), affected.end(), ref) ==
+              affected.end()) {
             affected.push_back(ref);
           }
         }

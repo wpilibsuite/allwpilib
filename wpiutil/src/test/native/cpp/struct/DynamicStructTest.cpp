@@ -37,23 +37,29 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Layout overflow",
   SECTION("addition") {
     // These extents fit even the parser's signed 64-bit intermediate.
     auto half = std::to_string(max / 2);
-    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
-                             "]; uint16 c", &err) == nullptr);
+    CHECK(db.Add("test",
+                 "uint8 a[" + half + "]; uint8 b[" + half + "]; uint16 c",
+                 &err) == nullptr);
   }
   SECTION("bitfield final storage") {
     auto half = std::to_string(max / 2);
-    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
-                             "]; uint16 c:1", &err) == nullptr);
+    CHECK(db.Add("test",
+                 "uint8 a[" + half + "]; uint8 b[" + half + "]; uint16 c:1",
+                 &err) == nullptr);
   }
   SECTION("bitfield transition") {
     auto half = std::to_string(max / 2);
-    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
-                             "]; uint16 c:1; uint8 d:1", &err) == nullptr);
+    CHECK(db.Add("test",
+                 "uint8 a[" + half + "]; uint8 b[" + half +
+                     "]; uint16 c:1; uint8 d:1",
+                 &err) == nullptr);
   }
   SECTION("bitfield to scalar") {
     auto half = std::to_string(max / 2);
-    CHECK(db.Add("test", "uint8 a[" + half + "]; uint8 b[" + half +
-                             "]; uint16 c:1; uint8 d", &err) == nullptr);
+    CHECK(db.Add("test",
+                 "uint8 a[" + half + "]; uint8 b[" + half +
+                     "]; uint16 c:1; uint8 d",
+                 &err) == nullptr);
   }
   SECTION("dependency") {
     auto outer = db.Add("Outer", "Inner values[" + count + "]", &err);
@@ -70,12 +76,14 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Layout boundaries",
   const auto max = std::numeric_limits<size_t>::max();
   auto empty = db.Add("Empty", "", &err);
   REQUIRE(empty);
-  auto zero = db.Add("Zero", "Empty values[" + std::to_string(max / 2) + "]", &err);
+  auto zero =
+      db.Add("Zero", "Empty values[" + std::to_string(max / 2) + "]", &err);
   REQUIRE(zero);
   REQUIRE(zero->IsValid());
   CHECK(zero->GetSize() == 0);
-  auto boundary = db.Add("Boundary", "uint64 a[" + std::to_string(max / 8) +
-                                       "]; uint8 b[7]", &err);
+  auto boundary =
+      db.Add("Boundary",
+             "uint64 a[" + std::to_string(max / 8) + "]; uint8 b[7]", &err);
   REQUIRE(boundary);
   CHECK(boundary->GetSize() == max);
   auto nested = db.Add("Nested", "Zero zero; Boundary boundary", &err);
