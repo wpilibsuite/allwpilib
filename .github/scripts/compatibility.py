@@ -14,7 +14,6 @@ import os
 import subprocess
 import sys
 import tempfile
-import time
 import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
@@ -24,7 +23,7 @@ import compatibility_jni
 import compatibility_native
 import compatibility_vendors
 from compatibility_binary import format_of, llvm_tool
-from compatibility_process import run_tool, timed
+from compatibility_process import run_tool
 
 
 def previous_tag(repo, head):
@@ -137,25 +136,21 @@ def has_debug_info(library):
 def compare_native(
     base, head, output, abidiff, vendors=None, report=None, architecture=None
 ):
-    timings = report.setdefault("timings", {}) if report is not None else {}
     with tempfile.TemporaryDirectory(prefix="native-", dir=output) as directory:
-        with timed("Native extraction", timings):
-            old = native_libraries(base, Path(directory) / "base", architecture)
-            new = native_libraries(head, Path(directory) / "head", architecture)
-        with timed("Native ABI", timings):
-            results = compare_native_libraries(old, new, output, abidiff)
+        old = native_libraries(base, Path(directory) / "base", architecture)
+        new = native_libraries(head, Path(directory) / "head", architecture)
+        results = compare_native_libraries(old, new, output, abidiff)
         if report is not None:
             try:
-                with timed("JNI contracts", timings):
-                    report["jni"] = compatibility_jni.compare(
-                        base,
-                        head,
-                        old,
-                        new,
-                        vendors["native"] if vendors else [],
-                        Path(directory),
-                        architecture,
-                    )
+                report["jni"] = compatibility_jni.compare(
+                    base,
+                    head,
+                    old,
+                    new,
+                    vendors["native"] if vendors else [],
+                    Path(directory),
+                    architecture,
+                )
                 report["errors"].extend(report["jni"]["errors"])
             except (
                 OSError,
@@ -166,16 +161,15 @@ def compare_native(
                 report["errors"].append(f"JNI: {error}")
         if vendors is not None:
             try:
-                with timed("Native vendor tracing", timings):
-                    vendors["report"]["native"] = compatibility_native.trace_native(
-                        vendors["native"],
-                        old,
-                        new,
-                        results,
-                        output,
-                        Path(directory),
-                        architecture,
-                    )
+                vendors["report"]["native"] = compatibility_native.trace_native(
+                    vendors["native"],
+                    old,
+                    new,
+                    results,
+                    output,
+                    Path(directory),
+                    architecture,
+                )
             except (OSError, ValueError, subprocess.SubprocessError) as error:
                 vendors["report"]["native"] = {
                     "errors": [f"Native vendor tracing: {error}"]
@@ -205,8 +199,7 @@ def identical_native_files(old, new):
 def compare_native_libraries(old, new, output, abidiff):
     results = []
     for name in sorted(old.keys() | new.keys()):
-        started = time.monotonic()
-        print(f"Native start: {name}", flush=True)
+        print(f"Native: {name}", flush=True)
         log = output / (name.replace("/", "-") + ".txt")
         if name not in new:
             status = "removed"
@@ -241,14 +234,7 @@ def compare_native_libraries(old, new, output, abidiff):
                 log,
             )
             status = native_status(code)
-        elapsed = round(time.monotonic() - started, 3)
-        print(f"Native finish: {name}: {status}, {elapsed:.3f}s", flush=True)
-        result = {
-            "library": name,
-            "status": status,
-            "report": log.name,
-            "elapsed_seconds": elapsed,
-        }
+        result = {"library": name, "status": status, "report": log.name}
         if status in ("changed", "removed", "error"):
             with log.open(encoding="utf-8", errors="replace") as stream:
                 result["excerpt"] = "\n".join(stream.read(6000).splitlines()[:40])
@@ -444,24 +430,6 @@ def summary(report):
         lines += [f"- {html.escape(warning)}" for warning in report["warnings"]]
         lines.append("")
     native = report["native"]
-    if report.get("timings"):
-        lines += ["## Analysis timings", "", "| Stage | Seconds |", "| --- | ---: |"]
-        for label, elapsed in report["timings"].items():
-            lines.append(f"| {label} | {elapsed:.3f} |")
-        slowest = sorted(
-            native, key=lambda r: r.get("elapsed_seconds", 0), reverse=True
-        )[:5]
-        if slowest:
-            lines += ["", "Slowest native comparisons:", ""]
-            for result in slowest:
-                lines.append(
-                    f"- `{result['library']}`: {result['elapsed_seconds']:.3f}s ({result['status']})"
-                )
-        lines += [
-            "",
-            "Tool CPU time, peak RSS and exit details are in `*.process.json` artifacts.",
-            "",
-        ]
     changed = [r for r in native if r["status"] in ("changed", "removed")]
     lines += [
         f"## C++: {len(changed)} libraries with ABI findings ({len(native)} inventoried)",
@@ -583,7 +551,6 @@ def compare(args):
         "java": [],
         "errors": list(getattr(args, "setup_errors", [])),
         "warnings": [],
-        "timings": {},
         "requested_base": (getattr(args, "requested_base", None) or args.base_revision),
         "baseline_warning": getattr(args, "baseline_warning", ""),
     }
@@ -678,15 +645,11 @@ def compare(args):
         ) as error:
             report["errors"].append(f"C++: {error}")
         try:
-            with timed("Java ABI", report["timings"]):
-                report["java"] = compare_java(
-                    args.base, args.head, output, args.japicmp
-                )
+            report["java"] = compare_java(args.base, args.head, output, args.japicmp)
             if vendors is not None:
-                with timed("Java vendor tracing", report["timings"]):
-                    report["vendors"]["java"] = compatibility_java.trace_java(
-                        vendors["java"], args.base, output / "java.xml"
-                    )
+                report["vendors"]["java"] = compatibility_java.trace_java(
+                    vendors["java"], args.base, output / "java.xml"
+                )
         except (OSError, ValueError, ET.ParseError, zipfile.BadZipFile) as error:
             report["errors"].append(f"Java: {error}")
     except ValueError as error:

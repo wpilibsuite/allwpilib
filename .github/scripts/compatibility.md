@@ -229,17 +229,8 @@ Packaged debug files take precedence over supplemental copies. When a macOS ZIP
 already includes its `.dylib.debug` files, collection uses those files without
 running `dsymutil` or requiring the original build objects.
 
-The job log prints each stage and library as it starts and finishes. The summary
-shows stage durations and the five slowest native comparisons; `results.json`
-retains every library's `elapsed_seconds`. Each analyzer invocation also writes
-a `*.process.json` file containing its command, start time, elapsed time, exit
-code or signal, and timeout status. On Unix it includes child CPU time and peak
-resident memory from `wait4`, rather than the cumulative peak of earlier tools.
-Peak RSS is a process peak, not the sum of a process tree's concurrent memory.
-When Linux cgroup v2 counters are available, the file includes memory-event
-deltas; an increased OOM-kill counter may include other processes in the cgroup.
-Process diagnostics are appended to the text log even if the tool exits without
-output, so a killed analyzer cannot leave an unexplained empty report.
+The job log identifies the current stage and native library. Timeouts, startup
+failures, and signal termination are retained in the affected text report.
 
 Native library statuses distinguish findings from inspection failures:
 
