@@ -64,7 +64,13 @@ pip.parse(
 )
 use_repo(pip, "allwpilib_pip_deps")
 
-bazel_dep(name = "rules_jvm_external", version = "6.8")
+bazel_dep(name = "rules_jvm_external", version = "6.9")
+single_version_override(
+    module_name = "rules_jvm_external",
+    patch_strip = 1,
+    patches = ["shared/bazel/patches/rules_jvm_external/0001-Initialize-POM-exclusions.patch"],
+    version = "6.9",
+)
 
 register_toolchains("//:java_toolchain_definition")
 
