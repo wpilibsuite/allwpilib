@@ -288,6 +288,68 @@ class WPILIB_DLLEXPORT Rotation3d final {
       : Rotation3d{0_rad, 0_rad, rotation.Radians()} {}
 
   /**
+   * Constructs a Rotation3d from extrinsic Euler angles: roll about the fixed
+   * X axis, then pitch about the fixed Y axis, then yaw about the fixed Z
+   * axis.
+   *
+   * Equivalent to R = R_z(yaw) R_y(pitch) R_x(roll).
+   *
+   * @param roll The counterclockwise rotation angle around the X axis.
+   * @param pitch The counterclockwise rotation angle around the Y axis.
+   * @param yaw The counterclockwise rotation angle around the Z axis.
+   */
+  static constexpr Rotation3d FromExtrinsic(wpi::units::radian_t roll,
+                                            wpi::units::radian_t pitch,
+                                            wpi::units::radian_t yaw) {
+    double cosRoll = wpi::units::math::cos(roll * 0.5);
+    double sinRoll = wpi::units::math::sin(roll * 0.5);
+
+    double cosPitch = wpi::units::math::cos(pitch * 0.5);
+    double sinPitch = wpi::units::math::sin(pitch * 0.5);
+
+    double cosYaw = wpi::units::math::cos(yaw * 0.5);
+    double sinYaw = wpi::units::math::sin(yaw * 0.5);
+
+    // q = q_z(yaw) * q_y(pitch) * q_x(roll)
+    return Rotation3d{
+        Quaternion{cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw,
+                   sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
+                   cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
+                   cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw}};
+  }
+
+  /**
+   * Constructs a Rotation3d from intrinsic Euler angles: roll about the body X
+   * axis, then pitch about the rotated body Y' axis, then yaw about the
+   * twice-rotated body Z'' axis.
+   *
+   * Equivalent to R = R_x(roll) R_y(pitch) R_z(yaw).
+   *
+   * @param roll The counterclockwise rotation angle around the body X axis.
+   * @param pitch The counterclockwise rotation angle around the body Y' axis.
+   * @param yaw The counterclockwise rotation angle around the body Z'' axis.
+   */
+  static constexpr Rotation3d FromIntrinsic(wpi::units::radian_t roll,
+                                            wpi::units::radian_t pitch,
+                                            wpi::units::radian_t yaw) {
+    double cosRoll = wpi::units::math::cos(roll * 0.5);
+    double sinRoll = wpi::units::math::sin(roll * 0.5);
+
+    double cosPitch = wpi::units::math::cos(pitch * 0.5);
+    double sinPitch = wpi::units::math::sin(pitch * 0.5);
+
+    double cosYaw = wpi::units::math::cos(yaw * 0.5);
+    double sinYaw = wpi::units::math::sin(yaw * 0.5);
+
+    // q = q_x(roll) * q_y(pitch) * q_z(yaw)
+    return Rotation3d{
+        Quaternion{cosRoll * cosPitch * cosYaw - sinRoll * sinPitch * sinYaw,
+                   sinRoll * cosPitch * cosYaw + cosRoll * sinPitch * sinYaw,
+                   cosRoll * sinPitch * cosYaw - sinRoll * cosPitch * sinYaw,
+                   cosRoll * cosPitch * sinYaw + sinRoll * sinPitch * cosYaw}};
+  }
+
+  /**
    * Takes the inverse of the current rotation.
    *
    * @return The inverse of the current rotation.
@@ -412,6 +474,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
 
   /**
    * Returns the counterclockwise rotation angle around the X axis (roll).
+   *
+   * The angle is extrinsic: the roll component of FromExtrinsic(), not
+   * necessarily the roll passed to FromIntrinsic().
    */
   constexpr wpi::units::radian_t X() const {
     double w = m_q.W();
@@ -432,6 +497,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
 
   /**
    * Returns the counterclockwise rotation angle around the Y axis (pitch).
+   *
+   * The angle is extrinsic: the pitch component of FromExtrinsic(), not
+   * necessarily the pitch passed to FromIntrinsic().
    */
   constexpr wpi::units::radian_t Y() const {
     double w = m_q.W();
@@ -451,6 +519,9 @@ class WPILIB_DLLEXPORT Rotation3d final {
 
   /**
    * Returns the counterclockwise rotation angle around the Z axis (yaw).
+   *
+   * The angle is extrinsic: the yaw component of FromExtrinsic(), not
+   * necessarily the yaw passed to FromIntrinsic().
    */
   constexpr wpi::units::radian_t Z() const {
     double w = m_q.W();

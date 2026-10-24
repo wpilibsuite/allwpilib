@@ -325,6 +325,93 @@ public final class Rotation3d
   }
 
   /**
+   * Constructs a Rotation3d from extrinsic Euler angles: a rotation of roll about the fixed (world)
+   * X axis, then pitch about the fixed Y axis, then yaw about the fixed Z axis.
+   *
+   * <p>Equivalent to R = R_z(yaw) R_y(pitch) R_x(roll).
+   *
+   * @param roll The counterclockwise rotation angle around the X axis in radians.
+   * @param pitch The counterclockwise rotation angle around the Y axis in radians.
+   * @param yaw The counterclockwise rotation angle around the Z axis in radians.
+   * @return The rotation.
+   */
+  public static Rotation3d fromExtrinsic(double roll, double pitch, double yaw) {
+    double cosRoll = Math.cos(roll * 0.5);
+    double sinRoll = Math.sin(roll * 0.5);
+
+    double cosPitch = Math.cos(pitch * 0.5);
+    double sinPitch = Math.sin(pitch * 0.5);
+
+    double cosYaw = Math.cos(yaw * 0.5);
+    double sinYaw = Math.sin(yaw * 0.5);
+
+    // q = q_z(yaw) * q_y(pitch) * q_x(roll)
+    return new Rotation3d(
+        new Quaternion(
+            cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw,
+            sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
+            cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
+            cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw));
+  }
+
+  /**
+   * Constructs a Rotation3d from intrinsic Euler angles: a rotation of roll about the body X axis,
+   * then pitch about the rotated body Y' axis, then yaw about the twice-rotated body Z'' axis.
+   *
+   * <p>Equivalent to R = R_x(roll) R_y(pitch) R_z(yaw), i.e., extrinsic rotations by yaw, then
+   * pitch, then roll.
+   *
+   * @param roll The counterclockwise rotation angle around the body X axis in radians.
+   * @param pitch The counterclockwise rotation angle around the body Y' axis in radians.
+   * @param yaw The counterclockwise rotation angle around the body Z'' axis in radians.
+   * @return The rotation.
+   */
+  public static Rotation3d fromIntrinsic(double roll, double pitch, double yaw) {
+    double cosRoll = Math.cos(roll * 0.5);
+    double sinRoll = Math.sin(roll * 0.5);
+
+    double cosPitch = Math.cos(pitch * 0.5);
+    double sinPitch = Math.sin(pitch * 0.5);
+
+    double cosYaw = Math.cos(yaw * 0.5);
+    double sinYaw = Math.sin(yaw * 0.5);
+
+    // q = q_x(roll) * q_y(pitch) * q_z(yaw)
+    return new Rotation3d(
+        new Quaternion(
+            cosRoll * cosPitch * cosYaw - sinRoll * sinPitch * sinYaw,
+            sinRoll * cosPitch * cosYaw + cosRoll * sinPitch * sinYaw,
+            cosRoll * sinPitch * cosYaw - sinRoll * cosPitch * sinYaw,
+            cosRoll * cosPitch * sinYaw + sinRoll * sinPitch * cosYaw));
+  }
+
+  /**
+   * Constructs a Rotation3d from extrinsic Euler angles.
+   *
+   * @param roll The counterclockwise rotation angle around the X axis.
+   * @param pitch The counterclockwise rotation angle around the Y axis.
+   * @param yaw The counterclockwise rotation angle around the Z axis.
+   * @return The rotation.
+   * @see #fromExtrinsic(double, double, double)
+   */
+  public static Rotation3d fromExtrinsic(Angle roll, Angle pitch, Angle yaw) {
+    return fromExtrinsic(roll.in(Radians), pitch.in(Radians), yaw.in(Radians));
+  }
+
+  /**
+   * Constructs a Rotation3d from intrinsic Euler angles.
+   *
+   * @param roll The counterclockwise rotation angle around the body X axis.
+   * @param pitch The counterclockwise rotation angle around the body Y' axis.
+   * @param yaw The counterclockwise rotation angle around the body Z'' axis.
+   * @return The rotation.
+   * @see #fromIntrinsic(double, double, double)
+   */
+  public static Rotation3d fromIntrinsic(Angle roll, Angle pitch, Angle yaw) {
+    return fromIntrinsic(roll.in(Radians), pitch.in(Radians), yaw.in(Radians));
+  }
+
+  /**
    * Constructs and returns a Rotation3d with the given number of radians for the roll, pitch, and
    * yaw.
    *
