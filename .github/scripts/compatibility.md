@@ -225,6 +225,18 @@ full vendor reference evidence and JNI findings). Reports are grouped in
 macOS and `native` for other targets.
 Windows/macOS reports also contain the normalized before/after type snapshots.
 
+The job log prints each stage and library as it starts and finishes. The summary
+shows stage durations and the five slowest native comparisons; `results.json`
+retains every library's `elapsed_seconds`. Each analyzer invocation also writes
+a `*.process.json` file containing its command, start time, elapsed time, exit
+code or signal, and timeout status. On Unix it includes child CPU time and peak
+resident memory from `wait4`, rather than the cumulative peak of earlier tools.
+Peak RSS is a process peak, not the sum of a process tree's concurrent memory.
+When Linux cgroup v2 counters are available, the file includes memory-event
+deltas; an increased OOM-kill counter may include other processes in the cgroup.
+Process diagnostics are appended to the text log even if the tool exits without
+output, so a killed analyzer cannot leave an unexplained empty report.
+
 Native library statuses distinguish findings from inspection failures:
 
 | Status | Meaning |

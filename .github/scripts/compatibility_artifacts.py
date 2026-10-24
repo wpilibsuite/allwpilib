@@ -236,6 +236,7 @@ def report(args):
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         for configuration in ("release", "debug"):
+            print(f"Preparing {args.platform} {configuration}", flush=True)
             base = root / configuration / "baseline"
             head = root / configuration / "candidate"
             setup_errors = []
@@ -250,6 +251,7 @@ def report(args):
                 except (OSError, ValueError, KeyError) as error:
                     setup_errors.append(str(error))
             vendors = root / configuration / "vendors"
+            print(f"Downloading vendors: {args.platform} {configuration}", flush=True)
             download = subprocess.run(
                 [
                     sys.executable,
@@ -275,6 +277,10 @@ def report(args):
                 ("x86_64", "arm64") if args.platform == "osxuniversal" else (None,)
             )
             for architecture in architectures:
+                print(
+                    f"Comparing {args.platform} {configuration} {architecture or ''}",
+                    flush=True,
+                )
                 output = args.output / configuration / (architecture or "native")
                 output.mkdir(parents=True, exist_ok=True)
                 if setup_errors:
