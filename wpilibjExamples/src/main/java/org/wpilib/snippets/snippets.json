@@ -368,5 +368,17 @@
     "foldername": "mecanumdrive",
     "gradlebase": "java",
     "robotclass": "Robot"
+  },
+  {
+    "name": "Coordinate System",
+    "description": "Demonstrate joystick mappings and field coordinate system conventions.",
+    "tags": [
+      "Mecanum Drive",
+      "Swerve Drive",
+      "Driver Station"
+    ],
+    "foldername": "coordinatesystem",
+    "gradlebase": "java",
+    "robotclass": "Robot"
   }
 ]
