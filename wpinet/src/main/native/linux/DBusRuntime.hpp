@@ -123,6 +123,8 @@ class DBusApi {
   const char* (*dbus_message_get_interface)(DBusMessage* message) = nullptr;
   const char* (*dbus_message_get_member)(DBusMessage* message) = nullptr;
   int (*dbus_message_get_type)(DBusMessage* message) = nullptr;
+  void (*dbus_message_set_serial)(DBusMessage* message,
+                                  dbus_uint32_t serial) = nullptr;
   DBusMessage* (*dbus_message_new_error)(DBusMessage* replyTo,
                                          const char* errorName,
                                          const char* errorMessage) = nullptr;
