@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "AlertBackendInternal.hpp"
 #include "Handle.hpp"
 #include "InstanceImpl.hpp"
 #include "Log.hpp"
@@ -48,12 +49,14 @@ NT_Inst CreateInstance() {
 }
 
 void ResetInstance(NT_Inst inst) {
+  detail::DetachAlertBackendInstance(inst);
   if (auto ii = InstanceImpl::GetTyped(inst, Handle::INSTANCE)) {
     ii->Reset();
   }
 }
 
 void DestroyInstance(NT_Inst inst) {
+  detail::DetachAlertBackendInstance(inst);
   int i = Handle{inst}.GetTypedInst(Handle::INSTANCE);
   if (i < 0) {
     return;
