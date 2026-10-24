@@ -1,0 +1,20 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "telemetry_tests",
+    size = "small",
+    srcs = glob(["**/*.cpp"]),
+    tags = [
+        "no-asan",
+        "no-tsan",
+    ],
+    deps = [
+        "//telemetry",
+        "//thirdparty/catch2",
+    ],
+)
+
+alias(
+    name = "native",
+    actual = ":telemetry_tests",
+)

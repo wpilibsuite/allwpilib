@@ -6,8 +6,6 @@ package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.wpilib.math.util.UnitConversions.feetToMeters;
-import static org.wpilib.math.util.UnitConversions.inchesToMeters;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -16,19 +14,20 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.kinematics.DifferentialDriveKinematics;
 import org.wpilib.math.trajectory.constraint.DifferentialDriveKinematicsConstraint;
+import org.wpilib.math.util.Units;
 
 class DifferentialDriveKinematicsConstraintTest {
   @Test
   void testDifferentialDriveKinematicsConstraint() {
-    double maxVelocity = feetToMeters(12.0); // 12 feet per second
-    var kinematics = new DifferentialDriveKinematics(inchesToMeters(27));
+    double maxVelocity = Units.feetToMeters(12.0); // 12 feet per second
+    var kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(27));
     var constraint = new DifferentialDriveKinematicsConstraint(kinematics, maxVelocity);
 
     Trajectory<DrivetrainSplineSample> trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
-    var duration = trajectory.duration;
+    var duration = trajectory.duration();
 
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);

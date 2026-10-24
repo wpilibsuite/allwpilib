@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "wpi/math/geometry/Rotation2d.hpp"
 #include "wpi/math/geometry/Transform2d.hpp"
 #include "wpi/math/trajectory/HolonomicSample.hpp"
 #include "wpi/util/json.hpp"
@@ -25,20 +26,26 @@ HolonomicTrajectory HolonomicTrajectory::TransformBy(
   const Pose2d& firstPose = Start().pose;
   Pose2d transformedFirstPose = firstPose.TransformBy(transform);
 
+  // The whole trajectory is rigidly rotated by the transform's rotation, so the
+  // field-relative velocities and accelerations rotate by the same amount.
+  const Rotation2d& rotation = transform.Rotation();
+
   std::vector<HolonomicSample> transformedSamples;
   transformedSamples.reserve(Samples().size());
 
   // Transform first sample
   transformedSamples.push_back(
-      HolonomicSample(Start().time, transformedFirstPose, Start().velocity,
-                      Start().acceleration));
+      HolonomicSample(Start().time, transformedFirstPose,
+                      Start().velocity.ToFieldRelative(rotation),
+                      Start().acceleration.ToFieldRelative(rotation)));
 
   // Transform remaining samples
   for (size_t i = 1; i < Samples().size(); ++i) {
     const auto& sample = Samples()[i];
     transformedSamples.push_back(HolonomicSample(
         sample.time, transformedFirstPose + (sample.pose - firstPose),
-        sample.velocity, sample.acceleration));
+        sample.velocity.ToFieldRelative(rotation),
+        sample.acceleration.ToFieldRelative(rotation)));
   }
 
   return HolonomicTrajectory(std::move(transformedSamples));
@@ -63,7 +70,7 @@ HolonomicTrajectory HolonomicTrajectory::Concatenate(
 
   // Append other with time offset
   for (auto s : other.Samples()) {
-    s.time += m_duration;
+    s.time += Duration();
     samples.emplace_back(std::move(s));
   }
 
@@ -75,9 +82,9 @@ void wpi::math::to_json(wpi::util::json& json,
   json = wpi::util::json::object("samples", trajectory.Samples());
 }
 
-void wpi::math::from_json(const wpi::util::json& json,
-                          HolonomicTrajectory& trajectory) {
+HolonomicTrajectory wpi::util::json_serializer<HolonomicTrajectory>::from(
+    const json& json) {
   std::vector<HolonomicSample> samples;
   from_json(json.at("samples"), samples);
-  trajectory = HolonomicTrajectory{std::move(samples)};
+  return HolonomicTrajectory{std::move(samples)};
 }

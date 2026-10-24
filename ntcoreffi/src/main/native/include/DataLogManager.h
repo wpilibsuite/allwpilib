@@ -5,6 +5,8 @@
 #pragma once
 
 #ifdef __cplusplus
+#include <stdint.h>
+
 #include <string>
 #include <string_view>
 #endif  // __cplusplus
@@ -13,6 +15,10 @@
 namespace wpi::log {
 class DataLog;
 }  // namespace wpi::log
+
+namespace wpi::util {
+class Alert;
+}  // namespace wpi::util
 
 namespace wpi {
 
@@ -30,8 +36,13 @@ namespace wpi {
  * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
  * On startup, all existing WPILIB_TBD log files are deleted. If there is less
- * than 50 MB of free space on the target storage, WPILIB_ log files are deleted
- * (oldest to newest) until there is 50 MB free OR there are 10 files remaining.
+ * than 200 MB of free space on the target storage, non-match WPILIB_ log files
+ * are deleted (oldest to newest) until there is 200 MB free OR there are 10
+ * files remaining, including match logs. Competition match logs and their
+ * rotated segments are not deleted. An alert is active while less than 400 MB
+ * is available, checked every 5 seconds. An
+ * informational alert indicates when automatic directory selection falls back
+ * to SystemCore internal storage.
  *
  * By default, all NetworkTables value changes are stored to the data log.
  */
@@ -99,6 +110,19 @@ class DataLogManager final {
    */
   static void SignalNewDSDataOccur();
 };
+
+namespace internal {
+
+/**
+ * Updates the data log storage alert from the available disk space. For
+ * testing purposes only.
+ *
+ * @param alert Low disk space alert.
+ * @param freeSpace Available disk space, in bytes.
+ */
+void UpdateDataLogFreeSpaceAlert(wpi::util::Alert& alert, uintmax_t freeSpace);
+
+}  // namespace internal
 
 }  // namespace wpi
 

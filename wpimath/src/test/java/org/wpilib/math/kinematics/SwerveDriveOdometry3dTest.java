@@ -6,7 +6,6 @@ package org.wpilib.math.kinematics;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import java.util.List;
 import java.util.Random;
@@ -19,6 +18,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.Translation3d;
 import org.wpilib.math.trajectory.DrivetrainSplineTrajectoryGenerator;
 import org.wpilib.math.trajectory.TrajectoryConfig;
+import org.wpilib.math.util.Units;
 
 class SwerveDriveOdometry3dTest {
   private final Translation2d m_fl = new Translation2d(12, 12);
@@ -42,7 +42,7 @@ class SwerveDriveOdometry3dTest {
             m_kinematics,
             Rotation3d.ZERO,
             new SwerveModulePosition[] {zero, zero, zero, zero},
-            new Pose3d(1, 2, 0, new Rotation3d(0, 0, degreesToRadians(45))));
+            new Pose3d(1, 2, 0, new Rotation3d(0, 0, Units.degreesToRadians(45))));
     var pose = odometry.getPose();
     assertAll(
         () -> assertEquals(1.0, pose.getX(), 1e-9),
@@ -158,7 +158,7 @@ class SwerveDriveOdometry3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       var moduleVelocities =
@@ -214,7 +214,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.05, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.05, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -252,7 +252,7 @@ class SwerveDriveOdometry3dTest {
 
     double maxError = Double.NEGATIVE_INFINITY;
     double errorSum = 0;
-    while (t <= trajectory.duration) {
+    while (t <= trajectory.duration()) {
       var groundTruthState = trajectory.sampleAt(t);
 
       fl.distance +=
@@ -300,7 +300,7 @@ class SwerveDriveOdometry3dTest {
         10 * Math.PI / 180,
         "Incorrect Final Theta");
 
-    assertEquals(0.0, errorSum / (trajectory.duration / dt), 0.06, "Incorrect mean error");
+    assertEquals(0.0, errorSum / (trajectory.duration() / dt), 0.06, "Incorrect mean error");
     assertEquals(0.0, maxError, 0.125, "Incorrect max error");
   }
 
@@ -308,17 +308,17 @@ class SwerveDriveOdometry3dTest {
   void testGyroOffset() {
     SwerveModulePosition[] modulePositions = {zero, zero, zero, zero};
     m_odometry.resetPosition(
-        new Rotation3d(0, degreesToRadians(5), 0),
+        new Rotation3d(0, Units.degreesToRadians(5), 0),
         modulePositions,
-        new Pose3d(Translation3d.ZERO, new Rotation3d(0, 0, degreesToRadians(90))));
-    var pose = m_odometry.update(new Rotation3d(0, degreesToRadians(10), 0), modulePositions);
+        new Pose3d(Translation3d.ZERO, new Rotation3d(0, 0, Units.degreesToRadians(90))));
+    var pose = m_odometry.update(new Rotation3d(0, Units.degreesToRadians(10), 0), modulePositions);
 
     assertAll(
         () -> assertEquals(0.0, pose.getX(), 1e-9),
         () -> assertEquals(0.0, pose.getY(), 1e-9),
         () -> assertEquals(0.0, pose.getZ(), 1e-9),
-        () -> assertEquals(degreesToRadians(0), pose.getRotation().getX(), 1e-9),
-        () -> assertEquals(degreesToRadians(5), pose.getRotation().getY(), 1e-9),
-        () -> assertEquals(degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
+        () -> assertEquals(Units.degreesToRadians(0), pose.getRotation().getX(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(5), pose.getRotation().getY(), 1e-9),
+        () -> assertEquals(Units.degreesToRadians(90), pose.getRotation().getZ(), 1e-9));
   }
 }

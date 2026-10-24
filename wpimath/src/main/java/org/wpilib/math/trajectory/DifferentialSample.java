@@ -25,11 +25,11 @@ import org.wpilib.util.struct.StructSerializable;
 public class DifferentialSample extends HolonomicSample implements StructSerializable {
   /** The left-wheel velocity at this sample in meters per second. */
   @Json.Property("leftVelocity")
-  public double leftVelocity; // meters per second
+  public final double leftVelocity; // meters per second
 
   /** The right-wheel velocity at this sample in meters per second. */
   @Json.Property("rightVelocity")
-  public double rightVelocity; // meters per second
+  public final double rightVelocity; // meters per second
 
   /** Base proto for serialization. */
   public static final DifferentialSampleProto proto = new DifferentialSampleProto();
