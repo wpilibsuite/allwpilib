@@ -14,7 +14,6 @@
 #include "wpi/math/system/Discretization.hpp"
 #include "wpi/math/util/MathUtil.hpp"
 #include "wpi/units/angle.hpp"
-#include "wpi/units/math.hpp"
 #include "wpi/units/velocity.hpp"
 #include "wpi/units/voltage.hpp"
 
@@ -37,12 +36,6 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
   wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) /
                                            2.0};
 
-  // The DARE is ill-conditioned if the velocity is close to zero, so don't
-  // let the system stop.
-  if (wpi::units::math::abs(velocity) < 1e-4_mps) {
-    velocity = 1e-4_mps;
-  }
-
   Eigen::Vector<double, 5> r{poseRef.X().value(), poseRef.Y().value(),
                              poseRef.Rotation().Radians().value(),
                              leftVelocityRef.value(), rightVelocityRef.value()};
@@ -54,9 +47,10 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
   m_error(2) =
       wpi::math::AngleModulus(wpi::units::radian_t{m_error(2)}).value();
 
+  constexpr double τ = 20.0;
   Eigen::Matrix<double, 5, 5> A{
       {0.0, 0.0, 0.0, 0.5, 0.5},
-      {0.0, 0.0, velocity.value(), 0.0, 0.0},
+      {0.0, -1 / τ, velocity.value(), 0.0, 0.0},
       {0.0, 0.0, 0.0, -1.0 / m_trackwidth.value(), 1.0 / m_trackwidth.value()},
       {0.0, 0.0, 0.0, m_A(0, 0), m_A(0, 1)},
       {0.0, 0.0, 0.0, m_A(1, 0), m_A(1, 1)}};
