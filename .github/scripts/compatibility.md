@@ -268,10 +268,13 @@ including for fork PRs. Their checkouts disable credential persistence.
 
 ## Local use
 
-Install `abigail-tools`, LLVM tools, a JDK matching the build, and the pinned
-japicmp JAR from the workflow (verify its SHA-256). Use two separate clean
-checkouts. From each checkout, run the same current init script with a distinct
-output folder:
+Build the workflow's pinned libabigail 3.0 source with the
+[subrange comparison patch](libabigail-3.0-subrange-comparison.patch) applied,
+put its `bin` directory on `PATH`, and make its `lib` directory available through
+`LD_LIBRARY_PATH`. Install LLVM tools and a JDK matching the build, and download
+the pinned japicmp JAR from the workflow (verify its SHA-256). Use two separate
+clean checkouts. From each checkout, run the same current init script with a
+distinct output folder:
 
 ```sh
 ./gradlew --init-script /path/to/current/.github/scripts/compatibility.init.gradle \
