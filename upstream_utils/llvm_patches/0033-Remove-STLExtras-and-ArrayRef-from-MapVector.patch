@@ -1,0 +1,149 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ethan Ye <ethan.w.ye@gmail.com>
+Date: Thu, 1 Oct 2026 20:30:30 +0000
+Subject: [PATCH 33/34] Remove STLExtras and ArrayRef from MapVector
+
+---
+ llvm/include/llvm/ADT/MapVector.h    | 20 +++++++++++--------
+ llvm/unittests/ADT/MapVectorTest.cpp | 30 +++++++++++-----------------
+ 2 files changed, 24 insertions(+), 26 deletions(-)
+
+diff --git a/llvm/include/llvm/ADT/MapVector.h b/llvm/include/llvm/ADT/MapVector.h
+index 26b389756fd2767a195baafbb00444acf604ab9b..e7fefef2f6f7e7ff627707a1f7ce0abfbc3d5fb9 100644
+--- a/llvm/include/llvm/ADT/MapVector.h
++++ b/llvm/include/llvm/ADT/MapVector.h
+@@ -18,11 +18,13 @@
+ #define LLVM_ADT_MAPVECTOR_H
+ 
+ #include "llvm/ADT/DenseMap.h"
+-#include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/SmallVector.h"
++#include <algorithm>
+ #include <cassert>
+ #include <cstddef>
+ #include <iterator>
++#include <ranges>
++#include <span>
+ #include <type_traits>
+ #include <utility>
+ 
+@@ -53,7 +55,7 @@ public:
+   }
+ 
+   /// Returns an array reference of the underlying vector.
+-  [[nodiscard]] ArrayRef<value_type> getArrayRef() const { return Vector; }
++  [[nodiscard]] span<const value_type> getArrayRef() const { return Vector; }
+ 
+   [[nodiscard]] size_type size() const { return Vector.size(); }
+ 
+@@ -101,10 +103,10 @@ public:
+     return try_emplace_impl(Key).first->second;
+   }
+ 
+-  [[nodiscard]] auto keys() { return make_first_range(Vector); }
+-  [[nodiscard]] auto keys() const { return make_first_range(Vector); }
+-  [[nodiscard]] auto values() { return make_second_range(Vector); }
+-  [[nodiscard]] auto values() const { return make_second_range(Vector); }
++  [[nodiscard]] auto keys() { return std::views::keys(Vector); }
++  [[nodiscard]] auto keys() const { return std::views::keys(Vector); }
++  [[nodiscard]] auto values() { return std::views::values(Vector); }
++  [[nodiscard]] auto values() const { return std::views::values(Vector); }
+ 
+   // Returns a copy of the value.  Only allowed if ValueT is copyable.
+   [[nodiscard]] ValueT lookup(const KeyT &Key) const {
+@@ -255,7 +257,8 @@ public:
+ private:
+   template <typename VectorT, typename LookupKeyT>
+   [[nodiscard]] static auto findInVector(VectorT &Vec, const LookupKeyT &Key) {
+-    return find_if(Vec, [&Key](const auto &P) { return P.first == Key; });
++    return std::find_if(Vec.begin(), Vec.end(),
++                        [&Key](const auto &P) { return P.first == Key; });
+   }
+ 
+   [[nodiscard]] static constexpr bool canBeSmall() { return N != 0; }
+@@ -312,7 +315,8 @@ template <class Function>
+ void MapVector<KeyT, ValueT, MapType, VectorType, N>::remove_if(Function Pred) {
+   if constexpr (canBeSmall())
+     if (isSmall()) {
+-      Vector.erase(llvm::remove_if(Vector, Pred), Vector.end());
++      Vector.erase(std::remove_if(Vector.begin(), Vector.end(), Pred),
++                   Vector.end());
+       return;
+     }
+ 
+diff --git a/llvm/unittests/ADT/MapVectorTest.cpp b/llvm/unittests/ADT/MapVectorTest.cpp
+index 40833b2c1a794bd828a5589fb30909dd58a5e14e..d79239b8a6010c19fd7e083e0c5dfed6a47f3a06 100644
+--- a/llvm/unittests/ADT/MapVectorTest.cpp
++++ b/llvm/unittests/ADT/MapVectorTest.cpp
+@@ -7,12 +7,12 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/ADT/MapVector.h"
+-#include "llvm/ADT/ArrayRef.h"
+ #include "llvm/ADT/iterator_range.h"
+ #include "gmock/gmock.h"
+ #include "gtest/gtest.h"
+ #include <memory>
+ #include <utility>
++#include <vector>
+ 
+ using namespace llvm;
+ 
+@@ -275,19 +275,19 @@ TEST(MapVectorTest, GetArrayRef) {
+ 
+   // Test inserted element.
+   MV.insert(std::make_pair(100, 99));
+-  EXPECT_TRUE(MV.getArrayRef().equals({std::pair(100, 99)}));
++  CHECK_THAT(MV.getArrayRef(), Catch::Matchers::RangeEquals(std::vector{std::pair(100, 99)}));
+ 
+   // Inserting a different element for an existing key won't change the
+   // underlying vector.
+   auto [Iter, Inserted] = MV.try_emplace(100, 98);
+   EXPECT_FALSE(Inserted);
+   EXPECT_EQ(Iter->second, 99);
+-  EXPECT_TRUE(MV.getArrayRef().equals({std::pair(100, 99)}));
++  CHECK_THAT(MV.getArrayRef(), Catch::Matchers::RangeEquals(std::vector{std::pair(100, 99)}));
+ 
+   // Inserting a new element. Tests that elements are in order in the underlying
+   // array.
+   MV.insert(std::make_pair(99, 98));
+-  EXPECT_TRUE(MV.getArrayRef().equals({std::pair(100, 99), std::pair(99, 98)}));
++  CHECK_THAT(MV.getArrayRef(), Catch::Matchers::RangeEquals(std::vector{std::pair(100, 99), std::pair(99, 98)}));
+ }
+ 
+ TEST(MapVectorTest, AtTest) {
+@@ -315,26 +315,20 @@ TEST(MapVectorTest, KeysValuesIterator) {
+   MV.insert(std::make_pair(5, 15));
+   MV.insert(std::make_pair(6, 16));
+ 
+-  EXPECT_THAT(MV.keys(), testing::ElementsAre(1, 2, 3, 4, 5, 6));
+-  EXPECT_THAT(MV.values(), testing::ElementsAre(11, 12, 13, 14, 15, 16));
++  CHECK_THAT(MV.keys(), Catch::Matchers::RangeEquals(std::vector{1, 2, 3, 4, 5, 6}));
++  CHECK_THAT(MV.values(), Catch::Matchers::RangeEquals(std::vector{11, 12, 13, 14, 15, 16}));
+ 
+   const MapVector<int, int> &ConstMV = MV;
+-  EXPECT_THAT(ConstMV.keys(), testing::ElementsAre(1, 2, 3, 4, 5, 6));
+-  EXPECT_THAT(ConstMV.values(), testing::ElementsAre(11, 12, 13, 14, 15, 16));
++  CHECK_THAT(ConstMV.keys(), Catch::Matchers::RangeEquals(std::vector{1, 2, 3, 4, 5, 6}));
++  CHECK_THAT(ConstMV.values(), Catch::Matchers::RangeEquals(std::vector{11, 12, 13, 14, 15, 16}));
+ }
+ 
+-template <class IntType> struct MapVectorMappedTypeTest : ::testing::Test {
+-  using int_type = IntType;
+-};
+-
+-using MapIntTypes = ::testing::Types<int, long, long long, unsigned,
+-                                     unsigned long, unsigned long long>;
+-TYPED_TEST_SUITE(MapVectorMappedTypeTest, MapIntTypes, );
+-
+-TYPED_TEST(MapVectorMappedTypeTest, DifferentDenseMap) {
++TEMPLATE_TEST_CASE("MapVectorMappedTypeTest DifferentDenseMap", "[wpiutil][llvm]",
++                   int, long, long long, unsigned, unsigned long,
++                   unsigned long long) {
+   // Test that using a map with a mapped type other than 'unsigned' compiles
+   // and works.
+-  using IntType = typename TestFixture::int_type;
++  using IntType = TestType;
+   using MapVectorType = MapVector<int, int, DenseMap<int, IntType>>;
+ 
+   MapVectorType MV;
