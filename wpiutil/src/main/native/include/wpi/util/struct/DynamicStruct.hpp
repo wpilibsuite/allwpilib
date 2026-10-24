@@ -76,8 +76,8 @@ class StructFieldDescriptor {
 
   StructFieldDescriptor(const StructDescriptor* parent, std::string_view name,
                         StructFieldType type, size_t size, size_t arraySize,
-                        unsigned int bitWidth, EnumValues enumValues,
-                        const StructDescriptor* structDesc,
+                        bool isArray, unsigned int bitWidth,
+                        EnumValues enumValues, const StructDescriptor* structDesc,
                         const private_init&);
 
   /**
@@ -163,11 +163,22 @@ class StructFieldDescriptor {
   unsigned int GetBitShift() const { return m_bitShift; }
 
   /**
-   * Returns whether the field is an array.
+   * Returns whether the field has more than one element.
    *
-   * @return true if array
+   * For compatibility, this returns false for explicitly declared singleton
+   * arrays. Use IsArrayDeclared() to query declaration identity instead.
+   *
+   * @return true if the array size is greater than 1
    */
   bool IsArray() const { return m_arraySize > 1; }
+
+  /**
+   * Returns whether the field was declared with array brackets, including [1].
+   * This metadata does not affect the binary layout or indexed codec access.
+   *
+   * @return true if declared as an array
+   */
+  bool IsArrayDeclared() const { return m_isArray; }
 
   /**
    * Gets the array size. Returns 1 if non-array.
@@ -250,6 +261,7 @@ class StructFieldDescriptor {
   StructFieldType m_type;
   unsigned int m_bitWidth;
   unsigned int m_bitShift = 0;
+  bool m_isArray;
 };
 
 /**

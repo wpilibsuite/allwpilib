@@ -517,6 +517,123 @@ TEST_CASE_METHOD(DynamicStructTest,
   CHECK(1u == get.size());
 }
 
+TEST_CASE("DynamicStructTest ArrayDeclarationIdentity", "[wpiutil][struct]") {
+  for (std::string type : {"uint8", "enum {OFF=0,ON=1} uint8", "char"}) {
+    CAPTURE(type);
+    StructDescriptorDatabase db;
+    std::string err;
+    auto desc = db.Add("Packet", type + " scalar; " + type +
+                                     " samples[1]; " + type + " pair[2]", &err);
+    REQUIRE(desc);
+    REQUIRE(desc->IsValid());
+    REQUIRE(desc->GetSize() == 4u);
+    auto scalar = desc->FindFieldByName("scalar");
+    auto samples = desc->FindFieldByName("samples");
+    auto pair = desc->FindFieldByName("pair");
+    REQUIRE(scalar);
+    REQUIRE(samples);
+    REQUIRE(pair);
+    CHECK_FALSE(scalar->IsArrayDeclared());
+    CHECK(samples->IsArrayDeclared());
+    CHECK(pair->IsArrayDeclared());
+    CHECK_FALSE(scalar->IsArray());
+    CHECK_FALSE(samples->IsArray());
+    CHECK(pair->IsArray());
+    CHECK(scalar->GetArraySize() == 1u);
+    CHECK(samples->GetArraySize() == 1u);
+    CHECK(pair->GetArraySize() == 2u);
+    CHECK(scalar->GetOffset() == 0u);
+    CHECK(samples->GetOffset() == 1u);
+    CHECK(pair->GetOffset() == 2u);
+    for (auto field : {scalar, samples, pair}) {
+      CHECK(field->GetSize() == 1u);
+      CHECK(field->HasEnum() == (type != "uint8" && type != "char"));
+    }
+
+    const std::vector<uint8_t> wire{65, 66, 67, 68};
+    wpi::util::DynamicStruct input{desc, wire};
+    std::vector<uint8_t> data(4);
+    wpi::util::MutableDynamicStruct output{desc, data};
+    if (type == "char") {
+      CHECK(input.GetStringField(scalar) == "A");
+      CHECK(input.GetStringField(samples) == "B");
+      CHECK(input.GetStringField(pair) == "CD");
+      CHECK(output.SetStringField(scalar, "A"));
+      CHECK(output.SetStringField(samples, "B"));
+      CHECK(output.SetStringField(pair, "CD"));
+    } else {
+      CHECK(input.GetUintField(scalar) == 65u);
+      CHECK(input.GetUintField(samples, 0) == 66u);
+      CHECK(input.GetUintField(pair, 0) == 67u);
+      CHECK(input.GetUintField(pair, 1) == 68u);
+      output.SetUintField(scalar, 65);
+      output.SetUintField(samples, 66, 0);
+      output.SetUintField(pair, 67, 0);
+      output.SetUintField(pair, 68, 1);
+    }
+    CHECK(data == wire);
+  }
+}
+
+TEST_CASE("DynamicStructTest NestedArrayDeclarationIdentity", "[wpiutil][struct]") {
+  for (bool deferred : {false, true}) {
+    CAPTURE(deferred);
+    StructDescriptorDatabase db;
+    std::string err;
+    if (!deferred) {
+      REQUIRE(db.Add("Inner", "uint16 value", &err));
+    }
+    auto desc = db.Add("Packet", "Inner scalar; Inner children[1]; Inner pair[2]",
+                       &err);
+    REQUIRE(desc);
+    CHECK(desc->IsValid() == !deferred);
+    auto scalar = desc->FindFieldByName("scalar");
+    auto children = desc->FindFieldByName("children");
+    auto pair = desc->FindFieldByName("pair");
+    REQUIRE(scalar);
+    REQUIRE(children);
+    REQUIRE(pair);
+    CHECK_FALSE(scalar->IsArrayDeclared());
+    CHECK(children->IsArrayDeclared());
+    CHECK(pair->IsArrayDeclared());
+    if (deferred) {
+      REQUIRE(db.Add("Inner", "uint16 value", &err));
+    }
+    REQUIRE(desc->IsValid());
+    CHECK_FALSE(scalar->IsArrayDeclared());
+    CHECK(children->IsArrayDeclared());
+    CHECK(pair->IsArrayDeclared());
+    CHECK_FALSE(scalar->IsArray());
+    CHECK_FALSE(children->IsArray());
+    CHECK(pair->IsArray());
+    CHECK(scalar->GetArraySize() == 1u);
+    CHECK(children->GetArraySize() == 1u);
+    CHECK(pair->GetArraySize() == 2u);
+    CHECK(scalar->GetOffset() == 0u);
+    CHECK(children->GetOffset() == 2u);
+    CHECK(pair->GetOffset() == 4u);
+    CHECK(scalar->GetSize() == 2u);
+    CHECK(children->GetSize() == 2u);
+    CHECK(pair->GetSize() == 2u);
+    REQUIRE(desc->GetSize() == 8u);
+    auto value = children->GetStruct()->FindFieldByName("value");
+    REQUIRE(value);
+    const std::vector<uint8_t> wire{1, 2, 3, 4, 5, 6, 7, 8};
+    wpi::util::DynamicStruct input{desc, wire};
+    CHECK(input.GetStructField(scalar).GetUintField(value) == 0x0201u);
+    CHECK(input.GetStructField(children, 0).GetUintField(value) == 0x0403u);
+    CHECK(input.GetStructField(pair, 0).GetUintField(value) == 0x0605u);
+    CHECK(input.GetStructField(pair, 1).GetUintField(value) == 0x0807u);
+    std::vector<uint8_t> data(8);
+    wpi::util::MutableDynamicStruct output{desc, data};
+    output.GetStructField(scalar).SetUintField(value, 0x0201);
+    output.GetStructField(children, 0).SetUintField(value, 0x0403);
+    output.GetStructField(pair, 0).SetUintField(value, 0x0605);
+    output.GetStructField(pair, 1).SetUintField(value, 0x0807);
+    CHECK(data == wire);
+  }
+}
+
 struct SimpleTestParam {
   const char* schema;
   size_t size;
