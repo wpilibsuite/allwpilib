@@ -4,5 +4,5 @@ java_binary(
     name = "java",
     srcs = ["org/wpilib/drivers/DevMain.java"],
     main_class = "org.wpilib.drivers.DevMain",
-    deps = ["//drivers:drivers-java"],
+    deps = ["//drivers/src/main/java"],
 )

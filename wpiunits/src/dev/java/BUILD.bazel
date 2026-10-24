@@ -5,6 +5,6 @@ java_binary(
     srcs = ["org/wpilib/units/DevMain.java"],
     main_class = "org.wpilib.units.DevMain",
     deps = [
-        "//wpiunits:wpiunits-java",
+        "//wpiunits/src/main/java",
     ],
 )

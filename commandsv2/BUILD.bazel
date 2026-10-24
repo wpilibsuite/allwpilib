@@ -3,7 +3,6 @@ load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//commandsv2:generate.bzl", "generate_wpilib_new_commands")
 load("//shared/bazel/rules:cc_rules.bzl", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "robotpy_library")
 
@@ -66,6 +65,7 @@ third_party_cc_lib_helper(
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//commandsv2:__subpackages__"],
 )
 
 wpilib_cc_library(
@@ -114,35 +114,6 @@ wpilib_cc_static_library(
     ],
     visibility = ["//visibility:public"],
     deps = [":commandsv2"],
-)
-
-wpilib_java_library(
-    name = "commandsv2-java",
-    srcs = glob(["src/main/java/**/*.java"]) + [":generated_java"],
-    exported_plugins = ["//javacPlugin:plugin"],
-    javacopts = patch_module(
-        "wpilib.command2",
-        ["commandsv2/src/generated/main/java"],
-    ) + [
-        # Silence compiler warnings about trailing digits in module names
-        "-Xlint:-module",
-    ],
-    maven_artifact_name = "commandsv2-java",
-    maven_group_id = "org.wpilib.commandsv2",
-    plugins = ["//javacPlugin:plugin"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//hal:hal-java",
-        "//ntcore:ntcore-java",
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpiannotations",
-        "//wpilibj:wpilibj-java",
-        "//wpimath:wpimath-java",
-        "//wpinet:wpinet-java",
-        "//wpiunits:wpiunits-java",
-        "//wpiutil:wpiutil-java",
-    ],
 )
 
 package_default_cc_project(

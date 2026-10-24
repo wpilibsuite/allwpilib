@@ -1,0 +1,21 @@
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "hal-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "hal-java",
+    maven_group_id = "org.wpilib.hal",
+    native_libs = ["//hal:shared/wpiHaljni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//ntcore/src/main/java",
+        "//wpinet/src/main/java",
+        "//wpiutil/src/main/java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":hal-java",
+    visibility = ["//visibility:public"],
+)

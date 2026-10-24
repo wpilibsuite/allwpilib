@@ -5,9 +5,9 @@ java_binary(
     srcs = ["org/wpilib/command3/DevMain.java"],
     main_class = "org.wpilib.command3.DevMain",
     deps = [
-        "//hal:hal-java",
-        "//ntcore:ntcore-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

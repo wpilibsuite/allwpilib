@@ -1,12 +1,10 @@
 load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "patch_module")
-load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 load("//wpimath:generate.bzl", "generate_wpimath")
@@ -38,6 +36,12 @@ filegroup(
 filegroup(
     name = "proto_files",
     srcs = glob(["src/main/proto/**/*.proto"]),
+)
+
+filegroup(
+    name = "proto_resources",
+    srcs = glob(["src/main/proto/**"]),
+    visibility = ["//wpimath/src/main/java:__pkg__"],
 )
 
 py_binary(
@@ -113,6 +117,7 @@ write_source_files(
 filegroup(
     name = "generated_java",
     srcs = glob(["src/generated/main/java/**/*.java"]),
+    visibility = ["//wpimath:__subpackages__"],
 )
 
 pkg_files(
@@ -161,7 +166,7 @@ wpilib_cc_library(
         ":eigen-pkg",
     ],
     extra_src_pkg_files = [
-        ":wpimath-java-jni-hdrs-pkg",
+        "//wpimath/src/main/java:wpimath-java-jni-hdrs-pkg",
     ],
     includes = [
         "src/main/native/include",
@@ -231,7 +236,7 @@ wpilib_cc_static_library(
 wpilib_jni_cc_library(
     name = "wpimathjni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
-    java_dep = ":wpimath-java",
+    java_dep = "//wpimath/src/main/java:wpimath-java",
     visibility = ["//visibility:public"],
     deps = [
         ":wpimath",
@@ -250,38 +255,6 @@ wpilib_cc_shared_library(
     use_debug_name = False,
     visibility = ["//visibility:public"],
     deps = [":wpimathjni"],
-)
-
-wpilib_jni_java_library(
-    name = "wpimath-java",
-    srcs = [":generated_java"] + glob(["src/main/java/**/*.java"]),
-    exported_plugins = ["//javacPlugin:plugin"],
-    javacopts = [
-        "-Xep:UnicodeInCode:OFF",
-    ] + patch_module(
-        "wpilib.math",
-        ["wpimath/src/generated/main/java"],
-    ),
-    maven_artifact_name = "wpimath-java",
-    maven_group_id = "org.wpilib.wpimath",
-    native_libs = [":shared/wpimathjni"],
-    plugins = [
-        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
-    ],
-    resource_strip_prefix = "wpimath/src/main/proto",
-    resources = glob(["src/main/proto/**"]),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//telemetry:telemetry-java",
-        "//tunables:tunables-java",
-        "//wpiannotations",
-        "//wpiunits:wpiunits-java",
-        "//wpiutil:wpiutil-java",
-        "@maven//:io_avaje_avaje_json_core",
-        "@maven//:io_avaje_avaje_jsonb",
-        "@maven//:org_ejml_ejml_java9module",
-        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
-    ],
 )
 
 py_binary(

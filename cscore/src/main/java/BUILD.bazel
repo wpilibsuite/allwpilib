@@ -1,0 +1,20 @@
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_java_library")
+
+wpilib_jni_java_library(
+    name = "cscore-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "cscore-java",
+    maven_group_id = "org.wpilib.cscore",
+    native_libs = ["//cscore:shared/cscorejni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil/src/main/java",
+        "@bzlmodrio-opencv//libraries/java/opencv",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":cscore-java",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,22 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "romiVendordep-java",
+    srcs = glob(["**/*.java"]),
+    maven_artifact_name = "romiVendordep-java",
+    maven_group_id = "org.wpilib.romiVendordep",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//hal/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpilibj/src/main/java",
+        "//wpiutil/src/main/java",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":romiVendordep-java",
+    visibility = ["//visibility:public"],
+)
