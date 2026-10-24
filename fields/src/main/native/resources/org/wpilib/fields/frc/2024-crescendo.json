@@ -4,10 +4,10 @@
   "game": "Crescendo",
   "field-image": {
     "path": "2024-crescendo.png",
-    "top": 79,
-    "left": 150,
-    "bottom": 1476,
-    "right": 2961
+    "top": 80,
+    "left": 151,
+    "bottom": 1477,
+    "right": 2962
   },
   "field-dimensions": {
     "length": 16.541,

@@ -4,10 +4,10 @@
   "game": "Infinite Recharge",
   "field-image": {
     "path": "2021-infiniterecharge.png",
-    "top": 34,
-    "left": 127,
-    "bottom": 649,
-    "right": 1323
+    "top": 35,
+    "left": 133,
+    "bottom": 650,
+    "right": 1329
   },
   "field-dimensions": {
     "length": 15.98295,

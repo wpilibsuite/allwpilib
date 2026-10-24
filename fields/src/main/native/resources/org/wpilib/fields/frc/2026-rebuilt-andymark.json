@@ -4,10 +4,10 @@
   "game": "Rebuilt",
   "field-image": {
     "path": "2026-rebuilt.png",
-    "top": 118,
-    "left": 245,
-    "bottom": 1914,
-    "right": 3942
+    "top": 121,
+    "left": 254,
+    "bottom": 1917,
+    "right": 3951
   },
   "field-dimensions": {
     "length": 16.518,

@@ -4,9 +4,9 @@
   "game": "Reefscape",
   "field-image": {
     "path": "2025-reefscape.png",
-    "top": 291,
+    "top": 289,
     "left": 534,
-    "bottom": 1638,
+    "bottom": 1636,
     "right": 3466
   },
   "field-dimensions": {

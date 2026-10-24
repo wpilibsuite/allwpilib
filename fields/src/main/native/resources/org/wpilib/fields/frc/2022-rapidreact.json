@@ -4,10 +4,10 @@
   "game": "Rapid React",
   "field-image": {
     "path": "2022-rapidreact.png",
-    "top": 50,
-    "left": 74,
-    "bottom": 900,
-    "right": 1774
+    "top": 49,
+    "left": 85,
+    "bottom": 899,
+    "right": 1785
   },
   "field-dimensions": {
     "length": 16.4592,
