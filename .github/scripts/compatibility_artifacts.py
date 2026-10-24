@@ -107,8 +107,11 @@ def prepare(products):
                     zipfile.ZipFile(archive) as source,
                     tempfile.TemporaryDirectory() as directory,
                 ):
+                    packaged = set(source.namelist())
                     for member in source.infolist():
                         if not member.filename.endswith(".dylib"):
+                            continue
+                        if member.filename + ".debug" in packaged:
                             continue
                         binary = Path(directory) / Path(member.filename).name
                         binary.write_bytes(source.read(member))

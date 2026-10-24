@@ -213,6 +213,18 @@ class ArtifactTests(unittest.TestCase):
             artifacts.prepare(products)
         self.assertFalse((products / "compatibility/complete").exists())
 
+    def test_packaged_macos_debug_does_not_require_build_objects_or_dsymutil(self):
+        products = self.products("osxuniversal")
+        with zipfile.ZipFile(products / "published.zip", "a") as archive:
+            library = next(
+                name for name in archive.namelist() if name.endswith(".dylib")
+            )
+            archive.writestr(library + ".debug", b"published DWARF")
+        with mock.patch.object(artifacts.subprocess, "run") as command:
+            artifacts.prepare(products)
+            command.assert_not_called()
+        self.assertTrue((products / "compatibility/complete").exists())
+
     def test_grouped_report_keeps_all_configurations_and_architectures_after_error(
         self,
     ):

@@ -267,6 +267,18 @@ class ToolTests(unittest.TestCase):
         self.assertEqual(result[0]["status"], "changed")
         self.assertIn("offset", (self.output / result[0]["report"]).read_text())
 
+    def test_packaged_debug_takes_precedence_over_stale_supplemental_copy(self):
+        for snapshot, changed in ((self.base, False), (self.head, True)):
+            self.native(snapshot, changed=changed, split_debug=True)
+            sidecar = snapshot / "native-debug/api/libapi.so.debug"
+            sidecar.parent.mkdir(parents=True)
+            sidecar.write_bytes(b"stale supplemental debug information")
+        result = compatibility.compare_native(
+            self.base, self.head, self.output, ABIDIFF
+        )
+        self.assertEqual(result[0]["status"], "changed")
+        self.assertIn("offset", (self.output / result[0]["report"]).read_text())
+
     def test_missing_java_dependency_is_an_error(self):
         self.java(self.base)
         self.java(self.head)

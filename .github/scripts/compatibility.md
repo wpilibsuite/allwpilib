@@ -107,9 +107,10 @@ after debug information has been checked.
 
 Windows uses LLVM's PE exports and PDB CodeView records, with type indices
 resolved to stable names and definitions. macOS uses Mach-O symbols, LLDB DWARF
-record layouts and function/data types, plus DWARF virtual method slots. The
-normal build creates supplemental flat macOS debug files while the original
-build objects still exist. These checks detect removed exports, same-size field rearrangements,
+record layouts and function/data types, plus DWARF virtual method slots. Collection
+uses packaged debug files when present; supplemental macOS debug generation
+requires the candidate's original build objects to remain available. These checks
+detect removed exports, same-size field rearrangements,
 base/virtual layout changes, and typed C-linkage changes with unchanged names.
 They conservatively compare named debug records beyond exported interfaces;
 internal-only changes may therefore appear. They are not equivalent to
@@ -224,6 +225,9 @@ full vendor reference evidence and JNI findings). Reports are grouped in
 `<configuration>/<architecture>/` directories, using `x86_64` and `arm64` for
 macOS and `native` for other targets.
 Windows/macOS reports also contain the normalized before/after type snapshots.
+Packaged debug files take precedence over supplemental copies. When a macOS ZIP
+already includes its `.dylib.debug` files, collection uses those files without
+running `dsymutil` or requiring the original build objects.
 
 The job log prints each stage and library as it starts and finishes. The summary
 shows stage durations and the five slowest native comparisons; `results.json`

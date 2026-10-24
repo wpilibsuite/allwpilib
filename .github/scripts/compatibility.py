@@ -56,12 +56,16 @@ def native_status(returncode):
 def native_files(snapshot, archive):
     """Read packaged libraries and debug sidecars added to the normal CI artifact."""
     suffixes = (".so", ".so.debug", ".dll", ".pdb", ".dylib", ".dylib.debug")
+    packaged = set()
     with zipfile.ZipFile(archive) as contents:
         for entry in contents.infolist():
             if entry.filename.endswith(suffixes):
+                packaged.add(Path(entry.filename).name)
                 yield entry.filename, contents.read(entry)
     for sidecar in sorted((snapshot / "native-debug" / archive.stem).glob("*.debug")):
-        if sidecar.name.endswith((".so.debug", ".dylib.debug")):
+        if sidecar.name not in packaged and sidecar.name.endswith(
+            (".so.debug", ".dylib.debug")
+        ):
             yield sidecar.name, sidecar.read_bytes()
 
 
