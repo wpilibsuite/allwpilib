@@ -59,7 +59,7 @@ public class Drivetrain {
           kinematics,
           imu.getRotation2d(),
           getCurrentWheelDistances(),
-          Pose2d.ZERO,
+          Pose2d.ZERO, // Field center, facing the blue alliance wall.
           VecBuilder.fill(0.05, 0.05, degreesToRadians(5)),
           VecBuilder.fill(0.5, 0.5, degreesToRadians(30)));
 

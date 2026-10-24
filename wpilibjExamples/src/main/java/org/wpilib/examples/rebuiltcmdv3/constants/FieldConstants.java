@@ -11,7 +11,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.shape.Rectangle2d;
 
 public final class FieldConstants {
-  // TODO: Measurements
+  // TODO: Measurements in the centered field frame (+X toward blue).
   public static final Pose2d RED_HUB_CENTER = new Pose2d();
   public static final Pose2d BLUE_HUB_CENTER = new Pose2d();
   public static final Rectangle2d NEUTRAL_ZONE =

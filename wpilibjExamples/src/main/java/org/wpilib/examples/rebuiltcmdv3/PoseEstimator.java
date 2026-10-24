@@ -24,7 +24,7 @@ public class PoseEstimator {
             new SwerveModulePosition(),
             new SwerveModulePosition()
           },
-          Pose2d.ZERO);
+          Pose2d.ZERO); // Field center, facing the blue alliance wall.
 
   /**
    * Updates the pose estimator with the current gyro heading and swerve module positions.
