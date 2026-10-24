@@ -424,7 +424,8 @@
     "https://bcr.bazel.build/modules/protobuf/33.0/MODULE.bazel": "c5270efb4aad37a2f893536076518793f409ea7df07a06df995d848d1690f21c",
     "https://bcr.bazel.build/modules/protobuf/33.1/MODULE.bazel": "982c8a0cceab4d790076f72b7677faf836b0dfadc2b66a34aab7232116c4ae39",
     "https://bcr.bazel.build/modules/protobuf/33.5/MODULE.bazel": "df58cd1c41c9d1257afa7f3110b23d970c107bf806b2e4d8c59a344d05504b0c",
-    "https://bcr.bazel.build/modules/protobuf/33.5/source.json": "fe53cb512afd722159c4c763f3fbbcc6ab850d45d1f389d8374f91c11e83bcd7",
+    "https://bcr.bazel.build/modules/protobuf/34.0.bcr.1/MODULE.bazel": "74e541b0ba877813da786a11707d4e394433c157841d5111a36be0d44b907931",
+    "https://bcr.bazel.build/modules/protobuf/34.0.bcr.1/source.json": "fc174b3d6215aa14197d1bd779f98bb72d9fd666ee5ec0d6bba6ae986baa4535",
     "https://bcr.bazel.build/modules/protoc-gen-validate/1.0.4.bcr.2/MODULE.bazel": "c4bd2c850211ff5b7dadf9d2d0496c1c922fdedc303c775b01dfd3b3efc907ed",
     "https://bcr.bazel.build/modules/protoc-gen-validate/1.0.4/MODULE.bazel": "b8913c154b16177990f6126d2d2477d187f9ddc568e95ee3e2d50fc65d2c494a",
     "https://bcr.bazel.build/modules/protoc-gen-validate/1.2.1.bcr.1/MODULE.bazel": "4bf09676b62fa587ae07e073420a76ec8766dcce7545e5f8c68cfa8e484b5120",
@@ -826,7 +827,7 @@
     },
     "@@aspect_rules_esbuild+//esbuild:extensions.bzl%esbuild": {
       "general": {
-        "bzlTransitiveDigest": "OJwaaJkcPDEqsDEfTQIoPK8uVC3Sj9N49+EOdZRmMOI=",
+        "bzlTransitiveDigest": "zQHYqEUfcjMkONH3QvWKLIWz36vHFdCxepyFc05EEug=",
         "usagesDigest": "6We6zwGoawD9YXqMI0KPaxEKJTnamXBsuOekhFS2D40=",
         "recordedInputs": [
           "REPO_MAPPING:aspect_rules_esbuild+,aspect_rules_js aspect_rules_js+",
@@ -845,6 +846,7 @@
           "REPO_MAPPING:bazel_lib+,bazel_lib bazel_lib+",
           "REPO_MAPPING:bazel_lib+,bazel_skylib bazel_skylib+",
           "REPO_MAPPING:bazel_lib+,bazel_tools bazel_tools",
+          "REPO_MAPPING:protobuf+,bazel_skylib bazel_skylib+",
           "REPO_MAPPING:protobuf+,proto_bazel_features bazel_features+",
           "REPO_MAPPING:tar.bzl+,bazel_lib bazel_lib+",
           "REPO_MAPPING:tar.bzl+,bazel_skylib bazel_skylib+",
@@ -1385,6 +1387,21 @@
             "repoRuleId": "@@grpc++_repo_rules+bazel_toolchains//rules/exec_properties:exec_properties.bzl%_exec_property_sets_repository",
             "attributes": {
               "constants_bzl_content": "LARGE_MACHINE = {\"label:os\": \"ubuntu\", \"label:machine_size\": \"large\"}\n"
+            }
+          }
+        }
+      }
+    },
+    "@@protobuf+//python/dist:system_python.bzl%system_python_extension": {
+      "general": {
+        "bzlTransitiveDigest": "pmsA+awieucfllLc2n7k8xEoPp0i5LF9Hw6mGX0cqSQ=",
+        "usagesDigest": "A+RWmbKdBBwZcBbNGNvfPbqG2vYZRjVrFp6x1iRUrAk=",
+        "recordedInputs": [],
+        "generatedRepoSpecs": {
+          "system_python": {
+            "repoRuleId": "@@protobuf+//python/dist:system_python.bzl%system_python",
+            "attributes": {
+              "minimum_python_version": "3.9"
             }
           }
         }
