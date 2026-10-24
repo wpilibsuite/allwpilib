@@ -6,8 +6,10 @@
 
 #include <algorithm>
 #include <format>
+#include <limits>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "wpi/util/Endian.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -96,7 +98,7 @@ StructFieldDescriptor::StructFieldDescriptor(
       m_arraySize{arraySize},
       m_enum{std::move(enumValues)},
       m_struct{structDesc},
-      m_bitMask{ToBitMask(size, bitWidth)},
+      m_bitMask{structDesc ? 0 : ToBitMask(size, bitWidth)},
       m_type{type},
       m_bitWidth{ToBitWidth(size, bitWidth)} {}
 
@@ -126,14 +128,27 @@ bool StructDescriptor::CheckCircular(
 
 std::string StructDescriptor::CalculateOffsets(
     wpi::util::SmallVectorImpl<const StructDescriptor*>& stack) {
+  m_valid = false;
   size_t offset = 0;
+  auto advance = [&](size_t size) {
+    if (size > std::numeric_limits<size_t>::max() - offset) {
+      return false;
+    }
+    offset += size;
+    return true;
+  };
+  auto overflow = [&] {
+    return std::format("struct {}: layout size overflow", m_name);
+  };
   unsigned int shift = 0;
   size_t prevBitfieldSize = 0;
   for (auto&& field : m_fields) {
     if (!field.IsBitField()) {
-      [[likely]] shift = 0;        // reset shift on non-bitfield element
-      offset += prevBitfieldSize;  // finish bitfield if active
-      prevBitfieldSize = 0;        // previous is now not bitfield
+      [[likely]] shift = 0;              // reset shift on non-bitfield element
+      if (!advance(prevBitfieldSize)) {  // finish bitfield if active
+        return overflow();
+      }
+      prevBitfieldSize = 0;  // previous is now not bitfield
       field.m_offset = offset;
       if (field.m_struct) {
         if (!field.m_struct->IsValid()) {
@@ -142,7 +157,12 @@ std::string StructDescriptor::CalculateOffsets(
         }
         field.m_size = field.m_struct->m_size;
       }
-      offset += field.m_size * field.m_arraySize;
+      if ((field.m_size != 0 &&
+           field.m_arraySize >
+               std::numeric_limits<size_t>::max() / field.m_size) ||
+          !advance(field.m_size * field.m_arraySize)) {
+        return overflow();
+      }
     } else {
       if (field.m_type == StructFieldType::BOOL && prevBitfieldSize != 0 &&
           (shift + 1) <= (prevBitfieldSize * 8)) {
@@ -151,7 +171,9 @@ std::string StructDescriptor::CalculateOffsets(
       } else if (field.m_size != prevBitfieldSize ||
                  (shift + field.m_bitWidth) > (field.m_size * 8)) {
         shift = 0;
-        offset += prevBitfieldSize;
+        if (!advance(prevBitfieldSize)) {
+          return overflow();
+        }
       }
       prevBitfieldSize = field.m_size;
       field.m_offset = offset;
@@ -161,7 +183,10 @@ std::string StructDescriptor::CalculateOffsets(
   }
 
   // update struct size
-  m_size = offset + prevBitfieldSize;
+  if (!advance(prevBitfieldSize)) {
+    return overflow();
+  }
+  m_size = offset;
   m_valid = true;
 
   // now that we're valid, referring types may be too
@@ -284,6 +309,17 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     auto err2 = theStruct.CalculateOffsets(stack);
     if (!err2.empty()) {
       *err = std::move(err2);
+      // No affected descriptor may retain a usable stale layout on failure.
+      std::vector<StructDescriptor*> affected{&theStruct};
+      for (size_t i = 0; i < affected.size(); ++i) {
+        affected[i]->m_valid = false;
+        for (auto* ref : affected[i]->m_references) {
+          if (std::find(affected.begin(), affected.end(), ref) ==
+              affected.end()) {
+            affected.push_back(ref);
+          }
+        }
+      }
       [[unlikely]] return nullptr;
     }
   } else {
