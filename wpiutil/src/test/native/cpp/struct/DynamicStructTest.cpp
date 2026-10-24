@@ -522,8 +522,9 @@ TEST_CASE("DynamicStructTest ArrayDeclarationIdentity", "[wpiutil][struct]") {
     CAPTURE(type);
     StructDescriptorDatabase db;
     std::string err;
-    auto desc = db.Add("Packet", type + " scalar; " + type +
-                                     " samples[1]; " + type + " pair[2]", &err);
+    auto desc = db.Add(
+        "Packet",
+        type + " scalar; " + type + " samples[1]; " + type + " pair[2]", &err);
     REQUIRE(desc);
     REQUIRE(desc->IsValid());
     REQUIRE(desc->GetSize() == 4u);
@@ -575,7 +576,8 @@ TEST_CASE("DynamicStructTest ArrayDeclarationIdentity", "[wpiutil][struct]") {
   }
 }
 
-TEST_CASE("DynamicStructTest NestedArrayDeclarationIdentity", "[wpiutil][struct]") {
+TEST_CASE("DynamicStructTest NestedArrayDeclarationIdentity",
+          "[wpiutil][struct]") {
   for (bool deferred : {false, true}) {
     CAPTURE(deferred);
     StructDescriptorDatabase db;
@@ -583,8 +585,8 @@ TEST_CASE("DynamicStructTest NestedArrayDeclarationIdentity", "[wpiutil][struct]
     if (!deferred) {
       REQUIRE(db.Add("Inner", "uint16 value", &err));
     }
-    auto desc = db.Add("Packet", "Inner scalar; Inner children[1]; Inner pair[2]",
-                       &err);
+    auto desc = db.Add("Packet",
+                       "Inner scalar; Inner children[1]; Inner pair[2]", &err);
     REQUIRE(desc);
     CHECK(desc->IsValid() == !deferred);
     auto scalar = desc->FindFieldByName("scalar");

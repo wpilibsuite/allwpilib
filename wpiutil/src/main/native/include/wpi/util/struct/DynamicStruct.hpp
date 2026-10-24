@@ -77,7 +77,8 @@ class StructFieldDescriptor {
   StructFieldDescriptor(const StructDescriptor* parent, std::string_view name,
                         StructFieldType type, size_t size, size_t arraySize,
                         bool isArray, unsigned int bitWidth,
-                        EnumValues enumValues, const StructDescriptor* structDesc,
+                        EnumValues enumValues,
+                        const StructDescriptor* structDesc,
                         const private_init&);
 
   /**
