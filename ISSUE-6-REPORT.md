@@ -19,8 +19,11 @@ C++ caller inspection found six branches in
 double and nested-struct presentation select scalar versus array behavior using
 that query. Silently changing it would change existing UI value shapes. Character
 fields use the string codec regardless. No callers are migrated here.
-This is source/behavior compatibility, not a binary ABI promise: consumers must
-rebuild against the changed descriptor/parser headers and library.
+Existing IsArray() calls retain source and behavior compatibility, but this is
+not blanket source or binary ABI compatibility: adding a member to the public
+ParsedDeclaration aggregate breaks five-element structured bindings. Such callers
+must update their bindings; consumers must rebuild against the changed
+descriptor/parser headers and library.
 
 ## Baseline, red, green
 
