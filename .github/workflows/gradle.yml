@@ -21,12 +21,15 @@ jobs:
         include:
           - container: wpilib/systemcore-cross-debian:trixie
             artifact-name: Systemcore
+            platform: linuxsystemcore
             build-options: "-Ponlylinuxsystemcore"
           - container: wpilib/aarch64-cross-debian:trixie
             artifact-name: Arm64
+            platform: linuxarm64
             build-options: "-Ponlylinuxarm64"
           - container: wpilib/systemcore-cross-debian:trixie
             artifact-name: Linux
+            platform: linuxx86-64
             build-options: "-Ponlylinuxx86-64"
     name: "Build - ${{ matrix.artifact-name }}"
     runs-on: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-4vcpu-ubuntu-2404', 'ubuntu-24.04') }}
@@ -68,6 +71,19 @@ jobs:
         env:
           ARTIFACTORY_PUBLISH_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+      - name: Add compatibility data to build artifacts
+        if: github.repository == 'wpilibsuite/allwpilib'
+        continue-on-error: true
+        uses: wpilibsuite/docker-run-action@v4
+        with:
+          image: ${{ matrix.container }}
+          options: -v ${{ github.workspace }}:/work -w /work -e GITHUB_REF -e CI
+          run: >-
+            ./gradlew --init-script .github/scripts/compatibility.init.gradle
+            compatibilityArtifacts --build-cache -PbuildServer -PskipJavaFormat
+            ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }}
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityRevision=${{ github.sha }}
+            && python3 .github/scripts/compatibility_artifacts.py prepare --products build/allOutputs
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
@@ -86,30 +102,40 @@ jobs:
         include:
           - os: windows-2025
             artifact-name: Win64Debug
+            platform: windowsx86-64
+            configurations: debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly"
             outputs: "build/allOutputs"
           - os: windows-2025
             artifact-name: Win64Release
+            platform: windowsx86-64
+            configurations: release
             architecture: x64
             build-options: "-PciReleaseOnly"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
           - os: windows-2025
             artifact-name: WinArm64Debug
+            platform: windowsarm64
+            configurations: debug
             architecture: x64
             task: "build"
             build-options: "-PciDebugOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             outputs: "build/allOutputs"
           - os: windows-2025
             artifact-name: WinArm64Release
+            platform: windowsarm64
+            configurations: release
             architecture: x64
             build-options: "-PciReleaseOnly -Pbuildwinarm64 -Ponlywindowsarm64"
             task: "copyAllOutputs"
             outputs: "build/allOutputs"
           - os: ${{ case(github.repository_owner == 'wpilibsuite', 'blacksmith-6vcpu-macos-15', 'macOS-15') }}
             artifact-name: macOS
+            platform: osxuniversal
+            configurations: release,debug
             architecture: aarch64
             task: "build"
             outputs: "build/allOutputs"
@@ -181,6 +207,22 @@ jobs:
         if: |
           matrix.artifact-name == 'macOS' && (github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+      - uses: actions/setup-python@v6
+        if: github.repository == 'wpilibsuite/allwpilib' && matrix.platform != ''
+        continue-on-error: true
+        with:
+          python-version: '3.13'
+      - name: Add compatibility data to build artifacts
+        if: github.repository == 'wpilibsuite/allwpilib' && matrix.platform != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          ./gradlew --init-script .github/scripts/compatibility.init.gradle \
+            compatibilityArtifacts --build-cache -PbuildServer -PskipJavaFormat \
+            ${{ matrix.build-options }} ${{ env.EXTRA_GRADLE_ARGS }} \
+            -PcompatibilityPlatform=${{ matrix.platform }} -PcompatibilityRevision=${{ github.sha }} \
+            -PcompatibilityConfigurations=${{ matrix.configurations }}
+          python3 .github/scripts/compatibility_artifacts.py prepare --products build/allOutputs
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
@@ -189,6 +231,22 @@ jobs:
       - name: Check disk free space
         if: always()
         run: df -h
+
+  compatibility:
+    name: Compatibility
+    needs: [build-docker, build-host]
+    if: >-
+      !cancelled() && github.repository == 'wpilibsuite/allwpilib' &&
+      (github.event_name == 'pull_request' ||
+       (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')))
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/compatibility.yml
+    with:
+      baseline: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || 'previous-tag' }}
+      baseline-branch: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.ref || github.ref_name }}
+      candidate: ${{ github.sha }}
 
   build-documentation:
     name: "Build - Documentation"
@@ -312,11 +370,15 @@ jobs:
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         with:
           path: combiner/products/build/allOutputs
+          pattern: '{Systemcore,Arm64,Linux,Win64Debug,Win64Release,WinArm64Debug,WinArm64Release,macOS,Win64FFI,Documentation}'
       - name: Flatten Artifacts
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-        run: rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
+        # Supplemental analysis data is not a Maven publication.
+        run: |
+          rm -rf combiner/products/build/allOutputs/*/compatibility
+          rsync -a --delete combiner/products/build/allOutputs/*/* combiner/products/build/allOutputs/
       - name: Check version number exists
         if: |
           github.repository == 'wpilibsuite/allwpilib' &&
