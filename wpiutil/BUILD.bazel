@@ -147,13 +147,6 @@ third_party_cc_lib_helper(
     visibility = ["//visibility:public"],
 )
 
-generate_resources(
-    name = "generate-resources",
-    namespace = "wpi",
-    prefix = "WPI",
-    resource_files = glob(["src/main/native/resources/*"]),
-)
-
 filegroup(
     name = "native-srcs",
     srcs = select({
@@ -168,7 +161,6 @@ wpilib_cc_library(
         ["src/main/native/cpp/**/*.cpp"],
         exclude = ["src/main/native/cpp/jni/**"],
     ) + [
-        ":generate-resources",
         ":native-srcs",
     ],
     hdrs = glob([
