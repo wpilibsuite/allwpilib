@@ -125,7 +125,10 @@ also supports APIs moving between modules. The detailed report includes
 modifications such as changed generic return types that can affect previously
 compiled callers despite unchanged JVM descriptors.
 
-Reports retain the full public library comparison and add vendordep usage evidence.
+Reports lead with vendordep usage evidence because changes referenced by shipped
+vendor binaries are the primary compatibility concern. They retain the full
+public library comparison afterward for edge cases and consumers outside the
+vendordep inventory.
 Header-only C++ types absent from debug information, compiler-pruned types,
 inline implementation changes, reflection, runtime behavior, and unsupported
 platforms still need review. Standard-library and compiler-internal debug
@@ -215,9 +218,10 @@ binary was compatible with the baseline in the first place.
 
 ## Reading results
 
-Each Actions job summary identifies the revisions and target, lists native and
-Java findings, shows vendordep usage evidence, and reports JNI findings and
-exported-binding counts. Native diagnostics have expandable excerpts. Download
+Each Actions job summary identifies the revisions and target, leads with native
+and Java vendordep impact, then lists the complete native and Java inventories
+and reports JNI findings and exported-binding counts. Native diagnostics have
+expandable excerpts. Download
 the `compatibility-<platform>-<candidate SHA>`
 artifact for full C++ text diagnostics, Java HTML/XML/text,
 `vendors-downloads.json`, `vendors-manifests.json`, and `results.json` (including

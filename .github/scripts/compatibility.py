@@ -414,6 +414,10 @@ def summary(report):
             "A clean report does not establish compatibility on other platforms or for "
             "header-only C++ code, inline behavior, reflection, or other runtime semantics."
         ),
+        (
+            "Vendordep impact is the primary result. The complete public ABI and Java "
+            "definition inventories follow as supporting evidence for edge cases."
+        ),
         "",
     ]
     if report.get("baseline_warning"):
@@ -429,38 +433,9 @@ def summary(report):
         lines += ["**INCOMPLETE vendor coverage (warnings):**", ""]
         lines += [f"- {html.escape(warning)}" for warning in report["warnings"]]
         lines.append("")
-    native = report["native"]
-    changed = [r for r in native if r["status"] in ("changed", "removed")]
-    lines += [
-        f"## C++: {len(changed)} libraries with ABI findings ({len(native)} inventoried)",
-        "",
-    ]
-    for result in native:
-        if result["status"] not in ("unchanged", "added"):
-            lines.append(
-                f"- `{result['library']}`: **{result['status']}** "
-                f"(artifact: `{result['report']}`)"
-            )
-            if result.get("excerpt"):
-                lines += [
-                    "",
-                    "<details><summary>Diagnostic excerpt (full report in artifact)</summary>",
-                    "",
-                    f"<pre>{html.escape(result['excerpt'])}</pre>",
-                    "</details>",
-                    "",
-                ]
-    java = report["java"]
-    lines += ["", f"## Java: {len(java)} classes with compatibility findings", ""]
-    for result in java[:100]:
-        kind = "binary" if result["binary"] else "source only"
-        changes = ", ".join(result["changes"])
-        lines.append(f"- `{result['class']}` ({kind}): {changes}")
-    if len(java) > 100:
-        lines.append("- Further findings are in the full artifact.")
     vendors = report.get("vendors")
     if vendors is not None:
-        lines += ["", "## Vendordep usage", ""]
+        lines += ["", "## Vendordep impact", ""]
         lines.append(
             f"Inventory: `{html.escape(vendors.get('series') or 'unavailable')}` at "
             f"`{html.escape(vendors.get('revision') or 'unavailable')}`. "
@@ -476,11 +451,16 @@ def summary(report):
             ),
             "",
         ]
-        for language in ("native", "java"):
+        for language, label, singular, plural in (
+            ("native", "C++ ABI", "native binary", "native binaries"),
+            ("java", "Java definitions", "class", "classes"),
+        ):
             usage = vendors.get(language, {})
             findings = usage.get("findings", [])
+            consumers = singular if len(findings) == 1 else plural
             lines.append(
-                f"### {language.title()}: {len(findings)} consumers with references ({usage.get('scanned', 0)} artifacts scanned)"
+                f"### {label}: {len(findings)} vendordep {consumers} with references "
+                f"({usage.get('scanned', 0)} artifacts scanned)"
             )
             lines.append("")
             for finding in findings[:50]:
@@ -519,6 +499,42 @@ def summary(report):
             lines.append("")
     else:
         lines += ["", "Vendordep tracing was not requested.", ""]
+    native = report["native"]
+    changed = [r for r in native if r["status"] in ("changed", "removed")]
+    lines += [
+        "",
+        "## Complete compatibility inventory",
+        "",
+        f"### C++ ABI: {len(changed)} libraries with findings ({len(native)} inventoried)",
+        "",
+    ]
+    for result in native:
+        if result["status"] not in ("unchanged", "added"):
+            lines.append(
+                f"- `{result['library']}`: **{result['status']}** "
+                f"(artifact: `{result['report']}`)"
+            )
+            if result.get("excerpt"):
+                lines += [
+                    "",
+                    "<details><summary>Diagnostic excerpt (full report in artifact)</summary>",
+                    "",
+                    f"<pre>{html.escape(result['excerpt'])}</pre>",
+                    "</details>",
+                    "",
+                ]
+    java = report["java"]
+    lines += [
+        "",
+        f"### Java definitions: {len(java)} classes with compatibility findings",
+        "",
+    ]
+    for result in java[:100]:
+        kind = "binary" if result["binary"] else "source only"
+        changes = ", ".join(result["changes"])
+        lines.append(f"- `{result['class']}` ({kind}): {changes}")
+    if len(java) > 100:
+        lines.append("- Further findings are in the full artifact.")
     jni = report.get("jni", {})
     lines += ["", f"## JNI: {len(jni.get('findings', []))} findings", ""]
     lines.append(jni.get("coverage", "JNI inspection did not complete."))

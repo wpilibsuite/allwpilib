@@ -213,6 +213,59 @@ class DownloadTests(unittest.TestCase):
             (compare_args.output / "summary.md").read_text(),
         )
 
+    def test_summary_prioritizes_vendordep_impact(self):
+        report = {
+            "base": "old",
+            "head": "new",
+            "target": {"platform": "linuxx86-64", "configuration": "release"},
+            "errors": [],
+            "warnings": [],
+            "native": [
+                {
+                    "library": "api/libapi.so",
+                    "status": "changed",
+                    "report": "api-libapi.so.txt",
+                }
+            ],
+            "java": [
+                {
+                    "class": "api.Api",
+                    "binary": True,
+                    "changes": ["METHOD_REMOVED"],
+                }
+            ],
+            "vendors": {
+                "series": "2027_alpha7",
+                "revision": "vendor-revision",
+                "downloaded": 2,
+                "requested": 2,
+                "skipped": 0,
+                "native": {
+                    "scanned": 1,
+                    "findings": [
+                        {
+                            "manifests": ["vendor.json"],
+                            "entry": "libvendor.so",
+                            "references": [
+                                {
+                                    "kind": "removed symbol",
+                                    "symbol": "removed",
+                                    "libraries": ["api/libapi.so"],
+                                }
+                            ],
+                        }
+                    ],
+                },
+                "java": {"scanned": 1, "findings": []},
+            },
+        }
+        result = compatibility.summary(report)
+        vendor = result.index("## Vendordep impact")
+        inventory = result.index("## Complete compatibility inventory")
+        self.assertLess(vendor, inventory)
+        self.assertIn("C++ ABI: 1 vendordep native binary with references", result)
+        self.assertIn("C++ ABI: 1 libraries with findings", result)
+
 
 @unittest.skipUnless(
     JAPICMP and shutil.which(ABIDIFF) and shutil.which("g++") and shutil.which("javac"),
