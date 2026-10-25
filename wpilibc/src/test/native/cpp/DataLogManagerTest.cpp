@@ -9,10 +9,12 @@
 #include <fstream>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "wpi/datalog/DataLogBackgroundWriter.hpp"
 #include "wpi/hal/HAL.h"
 #include "wpi/simulation/AlertSim.hpp"
 #include "wpi/util/Alert.hpp"
@@ -129,6 +131,41 @@ TEST_CASE("DataLogManagerTest Cleanup", "[wpilibc]") {
   CHECK(fs::exists(unrelated));
 }
 
+TEST_CASE("DataLogManagerTest LateUsbStorage", "[wpilibc]") {
+  auto root =
+      fs::temp_directory_path() /
+      ("DataLogManagerUsbTest_" +
+       std::to_string(
+           std::chrono::steady_clock::now().time_since_epoch().count()));
+  auto source = root / "internal";
+  auto usb = root / "usb";
+  fs::create_directories(source);
+  struct Cleanup {
+    fs::path root;
+    ~Cleanup() {
+      std::error_code ec;
+      fs::remove_all(root, ec);
+    }
+  } cleanup{root};
+
+  wpi::log::DataLogBackgroundWriter log{source.string(), "test.wpilog"};
+  int entry = log.Start("integer", "int64", {}, 1);
+  log.AppendInteger(entry, 42, 2);
+  CHECK_FALSE(wpi::internal::TryTransferDataLogToUsb(log, usb.string()));
+  CHECK(log.GetDir() == source.string());
+
+  fs::create_directory(usb);
+  fs::permissions(usb, fs::perms::others_write, fs::perm_options::add);
+  auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{2};
+  while (!wpi::internal::TryTransferDataLogToUsb(log, usb.string())) {
+    REQUIRE(std::chrono::steady_clock::now() < deadline);
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  }
+  CHECK(log.GetDir() == (usb / "logs").string());
+  CHECK(fs::exists(usb / "logs/test.wpilog"));
+  CHECK_FALSE(fs::exists(source / "test.wpilog"));
+}
+
 TEST_CASE("DataLogManagerTest FreeSpaceAlert", "[wpilibc]") {
   HAL_Initialize();
   wpi::util::Alert alert{"DataLogManagerTest", "lowSpace", "",
@@ -171,6 +208,7 @@ TEST_CASE("DataLogManagerTest AlertLifetime", "[wpilibc]") {
   for (int i = 0; i < 2; ++i) {
     wpi::DataLogManager::Start(logDir.string());
     cleanup.running = true;
+    CHECK(wpi::DataLogManager::GetLogDir() == logDir.string());
     int count = 0;
     for (const auto& alert : wpi::sim::AlertSim::GetAll()) {
       if (alert.group != "DataLogManager") {

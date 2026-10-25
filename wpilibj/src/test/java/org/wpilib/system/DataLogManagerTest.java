@@ -20,11 +20,33 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.wpilib.datalog.DataLogBackgroundWriter;
 import org.wpilib.hardware.hal.HAL;
 import org.wpilib.simulation.AlertSim;
 import org.wpilib.util.Alert;
 
 class DataLogManagerTest {
+  @Test
+  @Timeout(5)
+  void lateUsbStorage(@TempDir Path root) throws IOException, InterruptedException {
+    Path source = Files.createDirectory(root.resolve("internal"));
+    Path usb = root.resolve("usb");
+    try (var log = new DataLogBackgroundWriter(source.toString(), "test.wpilog")) {
+      int entry = log.start("integer", "int64", "", 1);
+      log.appendInteger(entry, 42, 2);
+      assertFalse(DataLogManager.tryTransferToUsb(log, usb));
+      assertEquals(source.toString(), log.getDir());
+
+      Files.createDirectory(usb);
+      while (!DataLogManager.tryTransferToUsb(log, usb)) {
+        Thread.sleep(10);
+      }
+      assertEquals(usb.resolve("logs").toString(), log.getDir());
+      assertTrue(Files.exists(usb.resolve("logs/test.wpilog")));
+      assertFalse(Files.exists(source.resolve("test.wpilog")));
+    }
+  }
+
   private List<AlertSim.AlertInfo> getStorageAlerts() {
     return Arrays.stream(AlertSim.getAll())
         .filter(alert -> "DataLogManager".equals(alert.group))
@@ -118,6 +140,7 @@ class DataLogManagerTest {
     for (int i = 0; i < 2; ++i) {
       DataLogManager.start(logDir.toString());
       try {
+        assertEquals(logDir.toString(), DataLogManager.getLogDir());
         for (int attempt = 0; attempt < 100 && getStorageAlerts().size() < 2; ++attempt) {
           Thread.sleep(10);
         }

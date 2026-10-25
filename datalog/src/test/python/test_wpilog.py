@@ -74,6 +74,61 @@ def test_background_overflow_reported_once_until_drain(tmp_path: Path, capfd):
     assert records == [(1000, payload), (2000, payload)]
 
 
+def test_background_transfer_preserves_records(tmp_path: Path):
+    source = tmp_path / "source"
+    dest = tmp_path / "dest"
+    source.mkdir()
+    dest.mkdir()
+    log = wpilog.DataLogBackgroundWriter(str(source), "test.wpilog", 30.0, "extra")
+    try:
+        entry = log.start("integer", "int64", "metadata", 1)
+        log.append_integer(entry, 42, 2000)
+        log.set_dir(str(dest), 100000)
+        deadline = monotonic() + 2
+        while log.get_dir() != str(dest):
+            assert monotonic() < deadline, "background transfer did not complete"
+            sleep(0.01)
+        assert not (source / "test.wpilog").exists()
+        log.append_integer(entry, 43, 3000)
+        log.set_filename("renamed.wpilog")
+    finally:
+        del log
+    reader = wpilog.DataLogReader(str(dest / "renamed.wpilog"))
+    assert reader.is_valid()
+    assert reader.get_extra_header() == "extra"
+    assert [
+        (record.get_timestamp(), record.get_integer())
+        for record in reader
+        if record.get_entry() == entry
+    ] == [(2000, 42), (3000, 43)]
+
+
+@pytest.mark.parametrize("failure", ["size", "missing", "collision"])
+def test_background_transfer_failure(tmp_path: Path, failure: str):
+    dest = tmp_path / "dest"
+    if failure != "missing":
+        dest.mkdir()
+    if failure == "collision":
+        (dest / "test.wpilog").write_bytes(b"preserve me")
+    log = wpilog.DataLogBackgroundWriter(str(tmp_path), "test.wpilog", 30.0)
+    try:
+        entry = log.start("integer", "int64", "", 1)
+        log.append_integer(entry, 42, 2)
+        log.set_dir(str(dest), 12 if failure == "size" else 100000)
+        log.append_integer(entry, 43, 3)
+    finally:
+        del log
+    reader = wpilog.DataLogReader(str(tmp_path / "test.wpilog"))
+    assert reader.is_valid()
+    assert [
+        record.get_integer() for record in reader if record.get_entry() == entry
+    ] == [42, 43]
+    if failure == "collision":
+        assert (dest / "test.wpilog").read_bytes() == b"preserve me"
+    else:
+        assert not (dest / "test.wpilog").exists()
+
+
 def test_simple_int(tmp_path: Path):
     with _log(tmp_path, "simple-int.wpilog", 54) as log:
         entry = log.start("test", "int64", "", 1)

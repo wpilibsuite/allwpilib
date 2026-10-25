@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +35,10 @@ import org.wpilib.util.concurrent.Event;
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
  * available) competition match number. The data file will be saved to a USB flash drive in a folder
- * named "logs" if one is attached, or to /home/systemcore/logs otherwise.
+ * named "logs" if one is attached, or to /home/systemcore/logs otherwise. When automatic selection
+ * falls back to internal storage, USB storage is checked every 5 seconds. If it becomes available
+ * and the current file is at most 10 MB, the file is transferred in the background and logging
+ * continues on USB storage.
  *
  * <p>Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is
@@ -55,7 +57,6 @@ import org.wpilib.util.concurrent.Event;
 public final class DataLogManager {
   private static DataLogBackgroundWriter m_log;
   private static boolean m_stopped;
-  private static String m_logDir;
   private static boolean m_internalStorage;
   private static boolean m_filenameOverride;
   private static Thread m_thread;
@@ -73,6 +74,7 @@ public final class DataLogManager {
   // OR there are this many files remaining.
   private static final long FREE_SPACE_THRESHOLD = 200000000L;
   private static final int FILE_COUNT_THRESHOLD = 10;
+  private static final long MAX_TRANSFER_SIZE = 10000000;
 
   static boolean isMatchLog(String filename) {
     int extensionIndex = filename.lastIndexOf(".wpilog");
@@ -145,14 +147,14 @@ public final class DataLogManager {
    */
   public static synchronized void start(String dir, String filename, double period) {
     if (m_log == null) {
-      m_logDir = makeLogDir(dir);
+      String logDir = makeLogDir(dir);
       m_filenameOverride = !filename.isEmpty();
 
       // Delete all previously existing WPILIB_TBD_*.wpilog files. These only exist when the robot
       // never connects to the DS, so they are very unlikely to have useful data and just clutter
       // the filesystem.
       File[] files =
-          new File(m_logDir)
+          new File(logDir)
               .listFiles((d, name) -> name.startsWith("WPILIB_TBD_") && name.endsWith(".wpilog"));
       if (files != null) {
         for (File file : files) {
@@ -161,7 +163,7 @@ public final class DataLogManager {
           }
         }
       }
-      m_log = new DataLogBackgroundWriter(m_logDir, makeLogFilename(filename), period);
+      m_log = new DataLogBackgroundWriter(logDir, makeLogFilename(filename), period);
       m_messageLog = new StringLogEntry(m_log, "messages");
 
       // Log all NT entries and connections
@@ -242,10 +244,10 @@ public final class DataLogManager {
    * @return log directory, or empty string if logging not yet started
    */
   public static synchronized String getLogDir() {
-    if (m_logDir == null) {
+    if (m_log == null) {
       return "";
     }
-    return m_logDir;
+    return m_log.getDir();
   }
 
   /**
@@ -287,24 +289,41 @@ public final class DataLogManager {
     }
   }
 
+  private static String findUsbLogDir(Path usbRoot) {
+    try {
+      if (Files.isDirectory(usbRoot) && Files.isWritable(usbRoot.toRealPath())) {
+        Path logDir = usbRoot.resolve("logs");
+        Files.createDirectories(logDir);
+        return logDir.toString();
+      }
+    } catch (IOException ex) {
+      // Retry when USB storage becomes accessible.
+    }
+    return "";
+  }
+
+  static boolean tryTransferToUsb(DataLogBackgroundWriter log, Path usbRoot) {
+    if (log.getDir().equals(usbRoot.resolve("logs").toString())) {
+      return true;
+    }
+    String dir = findUsbLogDir(usbRoot);
+    if (!dir.isEmpty()) {
+      log.setDir(dir, MAX_TRANSFER_SIZE);
+    }
+    return false;
+  }
+
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;
     }
 
     if (RobotBase.isReal()) {
-      try {
-        // prefer a mounted USB drive if one is accessible
-        Path usbDir = Paths.get("/u").toRealPath();
-        if (Files.isWritable(usbDir)) {
-          if (!new File("/u/logs").mkdir()) {
-            // ignored
-          }
-          UsageReporting.reportUsage("DataLogManager", "USB");
-          return "/u/logs";
-        }
-      } catch (IOException ex) {
-        // ignored
+      // Prefer a mounted USB drive if one is accessible.
+      String usbDir = findUsbLogDir(Path.of("/u"));
+      if (!usbDir.isEmpty()) {
+        UsageReporting.reportUsage("DataLogManager", "USB");
+        return usbDir;
       }
       if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
@@ -372,7 +391,7 @@ public final class DataLogManager {
 
   private static void checkFreeSpace(Alert alert) {
     try {
-      updateFreeSpaceAlert(alert, Files.getFileStore(Path.of(m_logDir)).getUsableSpace());
+      updateFreeSpaceAlert(alert, Files.getFileStore(Path.of(m_log.getDir())).getUsableSpace());
     } catch (IOException ex) {
       // Keep the last known state if disk space cannot be read.
     }
@@ -424,12 +443,12 @@ public final class DataLogManager {
                 Alert.Level.LOW);
         var freeSpaceAlert = new Alert("DataLogManager", "lowSpace", "", Alert.Level.MEDIUM)) {
       internalStorageAlert.set(m_internalStorage);
-      logMain(freeSpaceAlert);
+      logMain(internalStorageAlert, freeSpaceAlert);
     }
   }
 
-  private static void logMain(Alert freeSpaceAlert) {
-    File logDir = new File(m_logDir);
+  private static void logMain(Alert internalStorageAlert, Alert freeSpaceAlert) {
+    File logDir = new File(m_log.getDir());
     deleteOldLogs(logDir, logDir.getUsableSpace());
     checkFreeSpace(freeSpaceAlert);
     long nextSpaceCheck = System.nanoTime() + 5_000_000_000L;
@@ -459,6 +478,11 @@ public final class DataLogManager {
       }
       long spaceCheckTime = System.nanoTime();
       if (spaceCheckTime - nextSpaceCheck >= 0) {
+        if (m_internalStorage && tryTransferToUsb(m_log, Path.of("/u"))) {
+          m_internalStorage = false;
+          internalStorageAlert.set(false);
+          UsageReporting.reportUsage("DataLogManager", "USB");
+        }
         checkFreeSpace(freeSpaceAlert);
         nextSpaceCheck = spaceCheckTime + 5_000_000_000L;
       }

@@ -25,6 +25,7 @@ def test_get_log(tmp_path: pathlib.Path):
             assert log is not None
             assert not temporary.exists()
             assert all(match.read_bytes() == b"match log" for match in matches)
+            assert wpilib.DataLogManager.get_log_dir() == str(log_dir)
             alerts = {
                 a.id: a for a in AlertSim.get_all() if a.group == "DataLogManager"
             }
