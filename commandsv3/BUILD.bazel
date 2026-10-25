@@ -5,7 +5,7 @@ load("//commandsv3:generate.bzl", "generate_commandsv3")
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = ["src/test/resources/META-INF/services/org.junit.jupiter.api.extension.Extension"],
     visibility = ["//commandsv3/src/test/java:__pkg__"],
 )
 
