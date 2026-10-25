@@ -6,7 +6,10 @@ wpilib_java_library(
     srcs = glob(["src/main/java/**/*.java"]),
     maven_artifact_name = "javac-plugin-java",
     maven_group_id = "org.wpilib",
-    resources = glob(["src/main/resources/**"]),
+    resources = [
+        "src/main/resources/META-INF/services/com.sun.source.util.Plugin",
+        "src/main/resources/META-INF/services/javax.annotation.processing.Processor",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//wpiannotations",

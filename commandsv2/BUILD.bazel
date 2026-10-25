@@ -8,7 +8,7 @@ load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = ["src/test/resources/META-INF/services/org.junit.jupiter.api.extension.Extension"],
     visibility = ["//commandsv2/src/test/java:__pkg__"],
 )
 

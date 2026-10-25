@@ -7,7 +7,7 @@ wpilib_java_library(
     maven_artifact_name = "epilogue-processor-java",
     maven_group_id = "org.wpilib.epilogue",
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
-    resources = glob(["src/main/resources/**"]),
+    resources = ["src/main/resources/META-INF/services/javax.annotation.processing.Processor"],
     visibility = ["//visibility:public"],
     deps = [
         "//commandsv2:commandsv2-java",
