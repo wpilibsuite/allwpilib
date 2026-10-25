@@ -1,4 +1,4 @@
-name: Compatibility report
+name: Vendordep compatibility
 
 on:
   workflow_call:
@@ -256,3 +256,25 @@ jobs:
             report/**/*.xml
             report/**/*.html
           if-no-files-found: warn
+
+  summary:
+    needs: [revisions, compare]
+    if: ${{ always() && !cancelled() }}
+    name: Vendordep compatibility summary
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.candidate }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        continue-on-error: true
+        with:
+          pattern: compatibility-*-${{ inputs.candidate }}
+          path: reports
+      - name: Publish vendordep compatibility summary
+        run: |
+          python3 candidate/.github/scripts/compatibility_artifacts.py aggregate-summary \
+            --reports reports --output compatibility-summary.md
+          cat compatibility-summary.md >> "$GITHUB_STEP_SUMMARY"

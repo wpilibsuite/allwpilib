@@ -218,10 +218,11 @@ binary was compatible with the baseline in the first place.
 
 ## Reading results
 
-Each Actions job summary identifies the revisions and target, leads with native
-and Java vendordep impact, then lists the complete native and Java inventories
-and reports JNI findings and exported-binding counts. Native diagnostics have
-expandable excerpts. Download
+The final **Vendordep compatibility summary** check aggregates all targets into
+a compact table of native, Java, and JNI vendordep references. Each platform job
+shows the same table for its targets and puts full per-target evidence and the
+complete native, Java, and JNI inventories under collapsible headings. Native
+diagnostics have expandable excerpts. Download
 the `compatibility-<platform>-<candidate SHA>`
 artifact for full C++ text diagnostics, Java HTML/XML/text,
 `vendors-downloads.json`, `vendors-manifests.json`, and `results.json` (including

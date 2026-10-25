@@ -7,6 +7,7 @@
 """Reuse normal Gradle CI artifacts for compatibility reports."""
 
 import argparse
+import html
 import json
 import os
 import re
@@ -29,6 +30,9 @@ TARGETS = [
     {"platform": "windowsarm64", "artifacts": ["WinArm64Debug", "WinArm64Release"]},
     {"platform": "osxuniversal", "artifacts": ["macOS"]},
 ]
+EXPECTED_REPORTS = sum(
+    4 if target["platform"] == "osxuniversal" else 2 for target in TARGETS
+)
 
 
 def plan(args):
@@ -229,6 +233,117 @@ def validate(args):
     return 1
 
 
+def result_overview(result):
+    """Return the reviewer-facing counts and state for one target comparison."""
+    vendors = result.get("vendors", {})
+    native = len(vendors.get("native", {}).get("findings", []))
+    java = len(vendors.get("java", {}).get("findings", []))
+    vendor_jni = sum(
+        finding.get("kind") == "vendor native Java references"
+        for finding in result.get("jni", {}).get("findings", [])
+    )
+    if result.get("errors"):
+        state = "❌ Incomplete"
+    elif result.get("warnings"):
+        state = "⚠️ Coverage warning"
+    elif native or java or vendor_jni:
+        state = "🔎 Review references"
+    else:
+        state = "✅ No references found"
+    return native, java, vendor_jni, state
+
+
+def result_label(result):
+    target = result.get("target", {})
+    if not isinstance(target, dict):
+        return str(target)
+    return " ".join(
+        str(target[key])
+        for key in ("platform", "configuration", "architecture")
+        if target.get(key)
+    )
+
+
+def overview_table(entries):
+    lines = [
+        "| Target | Vendordep C++ ABI | Vendordep Java | Vendor JNI | Result |",
+        "| --- | ---: | ---: | ---: | --- |",
+    ]
+    for label, result in entries:
+        native, java, vendor_jni, state = result_overview(result)
+        lines.append(
+            f"| {html.escape(label)} | {native} | {java} | {vendor_jni} | {state} |"
+        )
+    return lines
+
+
+def grouped_summary(entries):
+    """Keep the primary result visible and put full target reports behind disclosure."""
+    lines = [
+        "# Vendordep compatibility report (advisory)",
+        "",
+        (
+            "Counts show shipped vendordep binaries or classes with static references to "
+            "changed WPILib interfaces. Expand a target for evidence and the complete "
+            "ABI, Java, and JNI inventories."
+        ),
+        "",
+        *overview_table([(label, result) for label, result, _ in entries]),
+    ]
+    for label, result, details in entries:
+        native, java, vendor_jni, state = result_overview(result)
+        lines += [
+            "",
+            (
+                f"<details><summary>{html.escape(label)} — {native} C++ ABI, "
+                f"{java} Java, {vendor_jni} JNI — {state}</summary>"
+            ),
+            "",
+            details,
+            "",
+            "</details>",
+        ]
+    lines.append("")
+    return "\n".join(lines)
+
+
+def aggregate_summary(args):
+    """Build one short job summary across all downloaded platform reports."""
+    entries = []
+    errors = []
+    for path in sorted(args.reports.rglob("results.json")):
+        try:
+            result = json.loads(path.read_text())
+            entries.append((result_label(result), result))
+        except (OSError, ValueError, KeyError) as error:
+            errors.append(f"{path}: {error}")
+    entries.sort(key=lambda entry: entry[0])
+    lines = [
+        "# Vendordep compatibility summary (advisory)",
+        "",
+        (
+            "This is the primary compatibility result. Counts are static references from "
+            "shipped vendordeps; expand the platform report jobs or download their artifacts "
+            "for full evidence and all ABI/API changes."
+        ),
+        "",
+    ]
+    if len(entries) != args.expected:
+        lines += [
+            f"**INCOMPLETE: found {len(entries)} of {args.expected} expected target reports.**",
+            "",
+        ]
+    if errors:
+        lines += (
+            ["**Unreadable reports:**", ""] + [f"- {error}" for error in errors] + [""]
+        )
+    if entries:
+        lines += overview_table(entries)
+    else:
+        lines.append("No compatibility results were available.")
+    args.output.write_text("\n".join(lines) + "\n")
+
+
 def report(args):
     """Run both configurations and every architecture, retaining partial reports."""
     if validate(args):
@@ -312,10 +427,17 @@ def report(args):
                 )
                 failed |= code != 0
                 summaries.append(
-                    f"## {args.platform} {configuration} {architecture or ''}\n\n"
-                    + (output / "summary.md").read_text()
+                    (
+                        " ".join(
+                            value
+                            for value in (args.platform, configuration, architecture)
+                            if value
+                        ),
+                        json.loads((output / "results.json").read_text()),
+                        (output / "summary.md").read_text(),
+                    )
                 )
-    (args.output / "summary.md").write_text("\n\n".join(summaries))
+    (args.output / "summary.md").write_text(grouped_summary(summaries))
     return int(failed)
 
 
@@ -333,6 +455,10 @@ def main():
     resolver = commands.add_parser("resolve-classpath")
     resolver.add_argument("--products", type=Path, required=True)
     resolver.add_argument("--log", type=Path, required=True)
+    overview = commands.add_parser("aggregate-summary")
+    overview.add_argument("--reports", type=Path, required=True)
+    overview.add_argument("--output", type=Path, required=True)
+    overview.add_argument("--expected", type=int, default=EXPECTED_REPORTS)
     for command in ("validate", "fetch-baseline", "report"):
         reports = commands.add_parser(command)
         for name in ("candidate-products", "baseline-products", "output"):
@@ -372,6 +498,8 @@ def main():
             return validate(args)
     elif args.command == "resolve-classpath":
         compatibility_artifactory.resolve_classpath(args.products, args.log)
+    elif args.command == "aggregate-summary":
+        aggregate_summary(args)
     elif args.command == "validate":
         return validate(args)
     else:

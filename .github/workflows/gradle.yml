@@ -233,7 +233,7 @@ jobs:
         run: df -h
 
   compatibility:
-    name: Compatibility
+    name: Vendordep compatibility
     needs: [build-docker, build-host]
     if: >-
       !cancelled() && github.repository == 'wpilibsuite/allwpilib' &&

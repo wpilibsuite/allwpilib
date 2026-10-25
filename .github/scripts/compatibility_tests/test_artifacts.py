@@ -50,9 +50,11 @@ class ArtifactTests(unittest.TestCase):
         (products / "published.jar").write_bytes(b"published Java bytecode")
         with zipfile.ZipFile(products / "published.zip", "w") as archive:
             archive.writestr(
-                "osx/universal/shared/libapi.dylib"
-                if platform == "osxuniversal"
-                else "linux/x86-64/shared/libapi.so",
+                (
+                    "osx/universal/shared/libapi.dylib"
+                    if platform == "osxuniversal"
+                    else "linux/x86-64/shared/libapi.so"
+                ),
                 b"published native binary",
             )
         (extras / "classpath").mkdir()
@@ -243,8 +245,21 @@ class ArtifactTests(unittest.TestCase):
             self.assertEqual(options.requested_base, args.requested_base)
             self.assertEqual(options.baseline_warning, args.baseline_warning)
             calls.append((options.output.parent.name, options.architecture))
+            incomplete = len(calls) == 1
+            result = {
+                "target": {
+                    "platform": "osxuniversal",
+                    "configuration": options.output.parent.name,
+                    "architecture": options.architecture,
+                },
+                "errors": ["failed"] if incomplete else [],
+                "warnings": [],
+                "vendors": {"native": {"findings": []}, "java": {"findings": []}},
+                "jni": {"findings": []},
+            }
+            (options.output / "results.json").write_text(json.dumps(result))
             (options.output / "summary.md").write_text(
-                "INCOMPLETE" if len(calls) == 1 else "Complete"
+                "INCOMPLETE" if incomplete else "Complete"
             )
             return int(len(calls) == 1)
 
@@ -271,10 +286,61 @@ class ArtifactTests(unittest.TestCase):
         for call in downloads.call_args_list:
             command = call.args[0]
             self.assertEqual(command[command.index("--baseline") + 1], REVISION)
-        self.assertIn("INCOMPLETE", (args.output / "summary.md").read_text())
-        self.assertIn(
-            "osxuniversal debug arm64", (args.output / "summary.md").read_text()
+        summary = (args.output / "summary.md").read_text()
+        self.assertIn("INCOMPLETE", summary)
+        self.assertIn("<details><summary>osxuniversal debug arm64", summary)
+        self.assertLess(summary.index("| Target |"), summary.index("<details>"))
+
+    def test_aggregate_summary_keeps_vendor_results_visible(self):
+        reports = self.root / "reports"
+        first = reports / "linux/release/native"
+        second = reports / "windows/debug/native"
+        first.mkdir(parents=True)
+        second.mkdir(parents=True)
+        base = {
+            "errors": [],
+            "warnings": [],
+            "vendors": {"java": {"findings": []}},
+            "jni": {"findings": []},
+        }
+        (first / "results.json").write_text(
+            json.dumps(
+                {
+                    **base,
+                    "target": {
+                        "platform": "linuxx86-64",
+                        "configuration": "release",
+                    },
+                    "vendors": {
+                        **base["vendors"],
+                        "native": {"findings": [{"entry": "libvendor.so"}]},
+                    },
+                }
+            )
         )
+        (second / "results.json").write_text(
+            json.dumps(
+                {
+                    **base,
+                    "target": {
+                        "platform": "windowsx86-64",
+                        "configuration": "debug",
+                    },
+                    "vendors": {
+                        **base["vendors"],
+                        "native": {"findings": []},
+                    },
+                }
+            )
+        )
+        output = self.root / "summary.md"
+        artifacts.aggregate_summary(
+            argparse.Namespace(reports=reports, output=output, expected=2)
+        )
+        summary = output.read_text()
+        self.assertIn("linuxx86-64 release | 1 | 0 | 0 | 🔎 Review references", summary)
+        self.assertIn("windowsx86-64 debug | 0 | 0 | 0 | ✅ No references", summary)
+        self.assertNotIn("INCOMPLETE", summary)
 
 
 if __name__ == "__main__":
