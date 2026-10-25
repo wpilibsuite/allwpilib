@@ -22,7 +22,7 @@ generate_robotpy_pybind_build_info(
     pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
     pyproject_toml = "cpp/pyproject.toml",
     stripped_include_prefix = "cpp/",
-    yaml_files = glob(["cpp/semiwrap/**/*.yml"]),
+    yaml_files = ["cpp/semiwrap/module.yml"],
     yml_prefix = "cpp/",
 )
 

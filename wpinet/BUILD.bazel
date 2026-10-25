@@ -10,9 +10,10 @@ load(":robotpy_native_build_info.bzl", "define_native_wrapper")
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
-        "src/main/native/thirdparty/ada/include/**/*",
-        "src/main/native/thirdparty/tcpsockets/include/**/*",
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+        "src/main/native/thirdparty/ada/include/**/*.h",
+        "src/main/native/thirdparty/tcpsockets/include/**/*.h",
     ]),
     visibility = ["//visibility:public"],
 )
@@ -30,7 +31,7 @@ cc_library(
     name = "ada",
     srcs = ["src/main/native/thirdparty/ada/src/ada.cpp"],
     hdrs = glob([
-        "src/main/native/thirdparty/ada/src/**/*.cpp",
+        "src/main/native/thirdparty/ada/src/*.cpp",
     ]),
     strip_include_prefix = "src/main/native/thirdparty/ada/src",
     visibility = ["//wpinet:__subpackages__"],
@@ -39,13 +40,13 @@ cc_library(
 
 pkg_files(
     name = "thirdparty-ada-hdr-pkg",
-    srcs = glob(["src/main/native/thirdparty/ada/include/**"]),
+    srcs = glob(["src/main/native/thirdparty/ada/include/**/*.h"]),
     strip_prefix = "src/main/native/thirdparty/ada/include",
 )
 
 pkg_files(
     name = "thirdparty-ada-src-pkg",
-    srcs = glob(["src/main/native/thirdparty/ada/src/**"]),
+    srcs = glob(["src/main/native/thirdparty/ada/src/*.cpp"]),
     strip_prefix = "src/main/native/thirdparty/ada/src",
 )
 
@@ -76,16 +77,22 @@ third_party_cc_lib_helper(
 filegroup(
     name = "native-srcs",
     srcs = select({
-        "@platforms//os:linux": glob(["src/main/native/linux/*"]),
+        "@platforms//os:linux": glob([
+            "src/main/native/linux/*.cpp",
+            "src/main/native/linux/*.hpp",
+        ]),
         "@platforms//os:osx": glob(["src/main/native/macOS/*.cpp"]),
-        "@platforms//os:windows": glob(["src/main/native/windows/*"]),
+        "@platforms//os:windows": glob(["src/main/native/windows/*.cpp"]),
     }),
 )
 
 wpilib_objc_library(
     name = "wpinet-mac-bluetooth",
-    srcs = glob(["src/main/native/macOS/**/*.mm"]),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = ["src/main/native/macOS/BluetoothLEPacketClient.mm"],
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     includes = [
         "src/main/native/include",
     ],
@@ -109,11 +116,14 @@ cc_library(
 
 wpilib_cc_library(
     name = "wpinet",
-    srcs = glob(
-        ["src/main/native/cpp/**"],
-        exclude = ["src/main/native/cpp/jni/**"],
-    ) + ["native-srcs"],
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = glob([
+        "src/main/native/cpp/*.cpp",
+        "src/main/native/cpp/uv/*.cpp",
+    ]) + ["native-srcs"],
+    hdrs = glob([
+        "src/main/native/include/**/*.h",
+        "src/main/native/include/**/*.hpp",
+    ]),
     copts = select({
         "@rules_cc//cc/compiler:msvc-cl": [],
         "//conditions:default": [
@@ -200,10 +210,7 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "wpinetjni",
-    srcs = glob([
-        "src/main/native/cpp/jni/**",
-        "src/main/native/cpp/**/*.hpp",
-    ]),
+    srcs = ["src/main/native/cpp/jni/WPINetJNI.cpp"],
     java_dep = "//wpinet/src/main/java:wpinet-java",
     visibility = ["//visibility:public"],
     deps = [

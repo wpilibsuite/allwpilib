@@ -19,9 +19,9 @@ wpilib_jni_java_library(
     plugins = [
         java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
     ],
-    proto_srcs = ["//wpimath:proto_resources"],
+    proto_srcs = ["//wpimath:proto_files"],
     resource_strip_prefix = "wpimath/src/main/proto",
-    resources = ["//wpimath:proto_resources"],
+    resources = ["//wpimath:proto_files"],
     visibility = ["//visibility:public"],
     deps = [
         "//telemetry/src/main/java",

@@ -35,7 +35,7 @@ generate_resources(
     name = "generate-resources",
     namespace = "wpical",
     prefix = "WPI",
-    resource_files = glob(["src/main/native/resources/*"]),
+    resource_files = glob(["src/main/native/resources/*.png"]),
 )
 
 generate_version_file(
@@ -47,7 +47,7 @@ generate_version_file(
 cc_library(
     name = "headers",
     hdrs = glob([
-        "src/main/native/include/**/*",
+        "src/main/native/include/*.hpp",
     ]),
     strip_include_prefix = "src/main/native/include",
     deps = [
@@ -60,33 +60,32 @@ cc_library(
 
 cc_library(
     name = "headers-libdogleg",
-    hdrs = glob([
-        "src/main/native/thirdparty/libdogleg/include/**/*",
-    ]),
+    hdrs = [
+        "src/main/native/thirdparty/libdogleg/include/dogleg.h",
+    ],
     strip_include_prefix = "src/main/native/thirdparty/libdogleg/include",
 )
 
 cc_library(
     name = "headers-mrcal-generated",
-    hdrs = glob([
-        "src/main/native/thirdparty/mrcal/generated/**/*",
-    ]),
+    hdrs = [
+        "src/main/native/thirdparty/mrcal/generated/minimath_generated.h",
+    ],
     strip_include_prefix = "src/main/native/thirdparty/mrcal/generated/",
 )
 
 cc_library(
     name = "headers-mrcal",
     hdrs = glob([
-        "src/main/native/thirdparty/mrcal/include/**/*",
+        "src/main/native/thirdparty/mrcal/include/**/*.h",
+        "src/main/native/thirdparty/mrcal/include/**/*.hh",
     ]),
     strip_include_prefix = "src/main/native/thirdparty/mrcal/include/",
 )
 
 cc_library(
     name = "headers-mrcal-java",
-    hdrs = glob([
-        "src/main/native/thirdparty/mrcal_java/include/**/*",
-    ]),
+    hdrs = ["src/main/native/thirdparty/mrcal_java/include/mrcal_wrapper.h"],
     strip_include_prefix = "src/main/native/thirdparty/mrcal_java/include/",
 )
 
@@ -94,11 +93,11 @@ wpilib_cc_library(
     name = "wpical_lib",
     srcs = glob(
         [
-            "src/main/native/cpp/**/*.cpp",
-            "src/main/native/thirdparty/libdogleg/src/**/*.c",
-            "src/main/native/thirdparty/mrcal/src/**/*.cpp",
-            "src/main/native/thirdparty/mrcal/src/**/*.c",
-            "src/main/native/thirdparty/mrcal_java/src/**/*.cpp",
+            "src/main/native/cpp/*.cpp",
+            "src/main/native/thirdparty/libdogleg/src/*.c",
+            "src/main/native/thirdparty/mrcal/src/*.cpp",
+            "src/main/native/thirdparty/mrcal/src/*.c",
+            "src/main/native/thirdparty/mrcal_java/src/*.cpp",
         ],
         exclude = ["src/main/native/cpp/WPIcal.cpp"],
     ) + [
@@ -128,11 +127,11 @@ cc_library(
     testonly = True,
     srcs = glob(
         [
-            "src/main/native/cpp/**/*.cpp",
-            "src/main/native/thirdparty/libdogleg/src/**/*.c",
-            "src/main/native/thirdparty/mrcal/src/**/*.cpp",
-            "src/main/native/thirdparty/mrcal/src/**/*.c",
-            "src/main/native/thirdparty/mrcal_java/src/**/*.cpp",
+            "src/main/native/cpp/*.cpp",
+            "src/main/native/thirdparty/libdogleg/src/*.c",
+            "src/main/native/thirdparty/mrcal/src/*.cpp",
+            "src/main/native/thirdparty/mrcal/src/*.c",
+            "src/main/native/thirdparty/mrcal_java/src/*.cpp",
         ],
         exclude = ["src/main/native/cpp/WPIcal.cpp"],
     ) + [

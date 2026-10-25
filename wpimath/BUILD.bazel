@@ -34,12 +34,7 @@ filegroup(
 filegroup(
     name = "proto_files",
     srcs = glob(["src/main/proto/**/*.proto"]),
-)
-
-filegroup(
-    name = "proto_resources",
-    srcs = glob(["src/main/proto/**"]),
-    visibility = ["//wpimath/src/main/java:__pkg__"],
+    visibility = ["//wpimath:__subpackages__"],
 )
 
 py_binary(
@@ -233,7 +228,10 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "wpimathjni",
-    srcs = glob(["src/main/native/cpp/jni/**"]),
+    srcs = glob([
+        "src/main/native/cpp/jni/**/*.cpp",
+        "src/main/native/cpp/jni/**/*.hpp",
+    ]),
     java_dep = "//wpimath/src/main/java:wpimath-java",
     visibility = ["//visibility:public"],
     deps = [

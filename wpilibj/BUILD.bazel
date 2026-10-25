@@ -67,7 +67,10 @@ filegroup(
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = [
+        "src/test/resources/META-INF/services/org.junit.jupiter.api.extension.Extension",
+        "src/test/resources/org/wpilib/preferences/PreferencesTestDefault.json",
+    ],
     visibility = ["//wpilibj/src/test/java:__pkg__"],
 )
 
