@@ -14,7 +14,7 @@ generate_resources(
     name = "generate-resources",
     namespace = "sysid",
     prefix = "SYSID",
-    resource_files = glob(["src/main/native/resources/*"]),
+    resource_files = glob(["src/main/native/resources/*.png"]),
 )
 
 SYSID_SRCS = glob(
@@ -28,7 +28,7 @@ SYSID_SRCS = glob(
 cc_library(
     name = "sysid-lib",
     srcs = SYSID_SRCS,
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     strip_include_prefix = "src/main/native/include",
     visibility = ["//tools/sysid/src/test/native:__pkg__"],
     deps = [
@@ -52,7 +52,7 @@ cc_library(
     name = "sysid_lib_for_tests",
     testonly = True,
     srcs = SYSID_SRCS,
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     defines = ["RUNNING_IMGUI_TESTS"],
     strip_include_prefix = "src/main/native/include",
     target_compatible_with = imgui_test_target_compatible_with(),

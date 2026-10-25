@@ -6,13 +6,13 @@ load("//shared/bazel/rules:publishing.bzl", "host_architectures")
 
 cc_library(
     name = "headers",
-    hdrs = glob(["src/main/native/include/**/*"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]) + ["src/main/native/include/wpi/gui/portable-file-dialogs.h"],
     strip_include_prefix = "src/main/native/include",
 )
 
 wpilib_cc_library(
     name = "wpigui",
-    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
     strip_include_prefix = "include",
     tags = [
         "wpi-cpp-gui",
@@ -47,7 +47,7 @@ wpilib_cc_static_library(
 cc_library(
     name = "wpigui_for_tests",
     testonly = True,
-    srcs = glob(["src/main/native/cpp/**/*.cpp"]),
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
     tags = [
         "wpi-cpp-gui",
     ],

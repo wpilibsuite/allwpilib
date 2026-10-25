@@ -7,7 +7,7 @@ generate_resources(
     name = "generate-resources",
     namespace = "ov",
     prefix = "OV",
-    resource_files = glob(["src/main/native/resources/*"]),
+    resource_files = glob(["src/main/native/resources/*.png"]),
     visibility = ["//tools/outlineviewer/src/test/native/imgui:__pkg__"],
 )
 
@@ -20,13 +20,14 @@ generate_version_file(
 
 filegroup(
     name = "main-native-srcs",
-    srcs = glob(["src/main/native/cpp/*"]),
+    srcs = ["src/main/native/cpp/main.cpp"],
     visibility = ["//tools/outlineviewer/src/test/native/imgui:__pkg__"],
 )
 
 cc_binary(
     name = "outlineviewer",
-    srcs = glob(["src/main/native/cpp/*"]) + [
+    srcs = [
+        "src/main/native/cpp/main.cpp",
         ":generate-resources",
         ":generate-version",
     ],

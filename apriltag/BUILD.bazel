@@ -8,29 +8,32 @@ load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native
 
 filegroup(
     name = "test-resources",
-    srcs = glob(["src/test/resources/**"]),
+    srcs = glob([
+        "src/test/resources/**/*.jpg",
+        "src/test/resources/**/*.png",
+    ]),
     visibility = ["//apriltag/src/test/java:__pkg__"],
 )
 
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/main/native/include/**/*",
-        "src/main/native/thirdparty/apriltag/include/**/*",
+        "src/main/native/include/**/*.hpp",
+        "src/main/native/thirdparty/apriltag/include/**/*.h",
     ]),
     visibility = ["//visibility:public"],
 )
 
 pkg_files(
     name = "thirdparty-apriltag-src-pkg",
-    srcs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
+    srcs = glob(["src/main/native/thirdparty/apriltag/include/**/*.h"]),
     strip_prefix = "src/main/native/thirdparty/apriltag/include",
 )
 
 cc_library(
     name = "thirdparty-apriltag",
-    srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
-    hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
+    srcs = glob(["src/main/native/thirdparty/apriltag/src/**/*.c"]),
+    hdrs = glob(["src/main/native/thirdparty/apriltag/include/**/*.h"]),
     copts = select({
         "@rules_cc//cc/compiler:clang": [
             "-Wno-format-nonliteral",
@@ -58,11 +61,8 @@ cc_library(
 
 wpilib_cc_library(
     name = "apriltag",
-    srcs = glob(
-        ["src/main/native/cpp/**"],
-        exclude = ["src/main/native/cpp/jni/**"],
-    ),
-    hdrs = glob(["src/main/native/include/**/*"]),
+    srcs = glob(["src/main/native/cpp/*.cpp"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     extra_hdr_pkg_files = [":thirdparty-apriltag-src-pkg"],
     extra_src_pkg_files = [":apriltag-java-jni-hdrs-pkg"],
     local_defines = ["WPILIB_EXPORTS"],
@@ -107,7 +107,7 @@ wpilib_cc_static_library(
 
 wpilib_jni_cc_library(
     name = "apriltagjni",
-    srcs = glob(["src/main/native/cpp/jni/**"]),
+    srcs = ["src/main/native/cpp/jni/AprilTagJNI.cpp"],
     java_dep = ":apriltag-java",
     visibility = ["//visibility:public"],
     deps = [
