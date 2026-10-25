@@ -14,11 +14,9 @@ import org.wpilib.telemetry.TelemetryTable;
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
   private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
-  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT);
 
   // The motors on the right side of the drive.
   private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
-  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =
@@ -40,9 +38,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    leftLeader.addFollower(leftFollower);
-    rightLeader.addFollower(rightFollower);
-
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
