@@ -4,9 +4,9 @@
 
 /**
  * Compile-time checks implemented as a javac plugin for WPILib annotations. {@link
- * org.wpilib.javacplugin.WPILibJavacPlugin} is the plugin entrypoint; GradleRIO bundles it with
- * the wpilibAnnotations dependencies group that template programs specify in the dependencies block
- * of the build.gradle file. Teams do not need to call it directly, since the Java runtime will
+ * org.wpilib.javacplugin.WPILibJavacPlugin} is the plugin entrypoint; GradleRIO bundles it with the
+ * wpilibAnnotations dependencies group that template programs specify in the dependencies block of
+ * the build.gradle file. Teams do not need to call it directly, since the Java runtime will
  * automatically load it from the annotation processor path.
  */
 package org.wpilib.javacplugin;
