@@ -14,6 +14,7 @@ def outputsFolder = file("$project.buildDir/outputs")
 task cppExamplesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = examplesZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -31,6 +32,7 @@ task cppExamplesZip(type: Zip) {
 task cppTemplatesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = templatesZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -48,6 +50,7 @@ task cppTemplatesZip(type: Zip) {
 task cppCommandsZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = commandsZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
