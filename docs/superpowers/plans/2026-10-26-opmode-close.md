@@ -37,10 +37,10 @@
 
 **Interfaces:** Produces `virtual void wpi::OpMode::Close() {}` and Python `OpMode.close(self) -> None`.
 
-- [ ] Finish baseline verification: `bazelisk test //wpilibc/src/test/native --test_filter='OpModeLifecycleTest*'` and `bazelisk test //wpilibc/src/test/python --test_arg=-k --test_arg=opmode` (using the checkout's absolute bazelisk path).
-- [ ] Add native close counters and ordered events to lifecycle tests; assert never-started modes close without End, started modes End before Close, and framework Close occurs once. Add Python lifecycle tests retaining references (including a self-cycle), with close recording an event. Assert no periodic callbacks occur after close and subclasses without overrides remain usable.
-- [ ] Run those targets to establish failure from the missing Close API/dispatch.
-- [ ] Add the no-op virtual Close and documentation describing release-time lifecycle semantics, not guaranteed destruction. Call Close immediately before `m_currentOpMode.reset()` after callbacks are removed. Add `Close:` to the semiwrap method map.
-- [ ] Run both test targets again; require PASS. Inspect generated binding behavior through the Python override tests.
-- [ ] Review the diff for scope, formatting, and unintended generated changes; run `git diff --check`.
-- [ ] Obtain an independent code review, fix any findings, and rerun affected tests before reporting completion.
+- [x] Finish baseline verification: `bazelisk test //wpilibc/src/test/native:wpilibc_tests --test_tag_filters= --test_arg='OpModeLifecycleTest*'` and `bazelisk test //wpilibc/src/test/python --test_tag_filters= --test_arg=-k --test_arg=opmode` (using the checkout's absolute bazelisk path).
+- [x] Add native close counters and ordered events to lifecycle tests; assert never-started modes close without End, started modes End before Close, and framework Close occurs once. Add Python lifecycle tests retaining references (including a self-cycle), with close recording an event. Assert no periodic callbacks occur after close and subclasses without overrides remain usable.
+- [x] Run those targets to establish failure from the missing Close API/dispatch.
+- [x] Add the no-op virtual Close and documentation describing release-time lifecycle semantics, not guaranteed destruction. Call Close immediately before `m_currentOpMode.reset()` after callbacks are removed. Add `Close:` to the semiwrap method map.
+- [x] Run both test targets again; require PASS. Inspect generated binding behavior through the Python override tests.
+- [x] Review the diff for scope, formatting, and unintended generated changes; run `git diff --check`.
+- [x] Obtain an independent code review, fix any findings, and rerun affected tests before reporting completion.
