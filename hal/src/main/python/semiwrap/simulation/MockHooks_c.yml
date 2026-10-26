@@ -40,7 +40,7 @@ functions:
           ((SimCB*)param)->m_fn();
         }, cb.get());
         cb->SetUID(uid);
-        return std::move(cb);
+        return cb;
       }
   HALSIM_CancelSimPeriodicBeforeCallback:
     ignore: true
@@ -56,7 +56,7 @@ functions:
           ((SimCB*)param)->m_fn();
         }, cb.get());
         cb->SetUID(uid);
-        return std::move(cb);
+        return cb;
       }
   HALSIM_CancelSimPeriodicAfterCallback:
     ignore: true
