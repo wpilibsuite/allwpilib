@@ -149,6 +149,43 @@ public final class Coroutine {
   }
 
   /**
+   * Yields control back to the scheduler if {@code condition} evaluates to {@code true}.
+   *
+   * @param condition the condition to check
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void yieldIf(BooleanSupplier condition) {
+    if (condition.get()) {
+      this.yield();
+    }
+  }
+
+  /**
+   * Yields control back to the scheduler if {@code condition} evaluates to {@code true}.
+   *
+   * @param condition the condition to check
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void yieldIf(boolean condition) {
+    if (condition) {
+      this.yield();
+    }
+  }
+
+  /**
+   * Repeatedly yields control back to the scheduler while {@code condition} evaluates to {@code
+   * true}.
+   *
+   * @param condition the condition to check
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void yieldWhile(BooleanSupplier condition) {
+    while (condition.get()) {
+      this.yield();
+    }
+  }
+
+  /**
    * Parks the current command. No code in a command declared after calling {@code park()} will be
    * executed. A parked command will never complete naturally and must be interrupted or canceled.
    *
@@ -159,6 +196,32 @@ public final class Coroutine {
 
     m_state = FROZEN;
     this.yield();
+  }
+
+  /**
+   * Parks the current command if {@code condition} evaluates to {@code true}.
+   *
+   * @param condition the condition to check
+   * @see #park()
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void parkIf(BooleanSupplier condition) {
+    if (condition.get()) {
+      this.park();
+    }
+  }
+
+  /**
+   * Parks the current command if {@code condition} evaluates to {@code true}.
+   *
+   * @param condition the condition to check
+   * @see #park()
+   * @throws IllegalStateException if called anywhere other than the coroutine's running command
+   */
+  public void parkIf(boolean condition) {
+    if (condition) {
+      this.park();
+    }
   }
 
   /**
