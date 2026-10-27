@@ -22,7 +22,6 @@
 #include "wpi/nt/RawTopic.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/print.hpp"
 
 using namespace wpi::nt;

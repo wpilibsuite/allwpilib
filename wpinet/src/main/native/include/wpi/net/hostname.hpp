@@ -5,14 +5,7 @@
 #pragma once
 
 #include <string>
-#include <string_view>
-
-namespace wpi::util {
-template <typename T>
-class SmallVectorImpl;
-}
 
 namespace wpi::net {
 std::string GetHostname();
-std::string_view GetHostname(wpi::util::SmallVectorImpl<char>& name);
 }  // namespace wpi::net

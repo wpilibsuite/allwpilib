@@ -11,7 +11,6 @@
 #include <utility>
 
 #include "dns_sd.h"
-#include "wpi/util/SmallString.hpp"
 
 using namespace wpi::net;
 
@@ -57,15 +56,9 @@ MulticastServiceAnnouncer::MulticastServiceAnnouncer(
   pImpl->serviceType = serviceType;
   pImpl->port = port;
 
-  wpi::util::SmallString<64> key;
-
   for (auto&& i : txt) {
-    key.clear();
-    key.append(i.first);
-    key.emplace_back('\0');
-
-    TXTRecordSetValue(&pImpl->txtRecord, key.data(), i.second.length(),
-                      i.second.data());
+    TXTRecordSetValue(&pImpl->txtRecord, std::string{i.first}.c_str(),
+                      i.second.length(), i.second.data());
   }
 }
 

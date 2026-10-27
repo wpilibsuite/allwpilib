@@ -233,15 +233,14 @@ void MyHttpConnection::ProcessRequest() {
     return;
   }
 
-  std::string_view path;
+  std::string path;
   if (url->get_pathname_length() > 0) {
     path = url->get_pathname();
   }
   // wpi::util::print(stderr, "path: \"{}\"\n", path);
 
-  wpi::util::SmallString<128> pathBuf;
   bool error;
-  path = UnescapeURI(path, pathBuf, &error);
+  path = UnescapeURI(path, &error);
   if (error) {
     SendError(400);
     return;
@@ -300,19 +299,18 @@ void MyHttpConnection::ProcessRequest() {
           auto&& entry = *it;
           bool subdir = entry.is_directory(ec);
           std::string name = entry.path().filename().string();
-          wpi::util::SmallString<128> nameUriBuf, nameHtmlBuf;
+          wpi::util::SmallString<128> nameHtmlBuf;
           if (subdir) {
             dirs.emplace(
                 name, std::format(
                           "<tr><td><a href=\"{}/\">{}/</a></td><td></td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf)));
+                          EscapeURI(name), EscapeHTML(name, nameHtmlBuf)));
           } else {
             files.emplace(
                 name, std::format(
                           "<tr><td><a href=\"{}\">{}</a></td><td>{}</td></tr>",
-                          EscapeURI(name, nameUriBuf),
-                          EscapeHTML(name, nameHtmlBuf), entry.file_size(ec)));
+                          EscapeURI(name), EscapeHTML(name, nameHtmlBuf),
+                          entry.file_size(ec)));
           }
         }
 

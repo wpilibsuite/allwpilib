@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "WebSocketTest.hpp"
-#include "wpi/util/SmallString.hpp"
 
 namespace wpi::net {
 

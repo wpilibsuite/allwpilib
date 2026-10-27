@@ -217,8 +217,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::util::raw_ostream& os,
 
     // unescape param
     bool error = false;
-    wpi::util::SmallString<64> paramBuf;
-    std::string_view param = wpi::net::UnescapeURI(rawParam, paramBuf, &error);
+    std::string param = wpi::net::UnescapeURI(rawParam, &error);
     if (error) {
       auto estr = std::format("could not unescape parameter \"{}\"", rawParam);
       SendError(os, 500, estr);
@@ -227,8 +226,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(wpi::util::raw_ostream& os,
     }
 
     // unescape value
-    wpi::util::SmallString<64> valueBuf;
-    std::string_view value = wpi::net::UnescapeURI(rawValue, valueBuf, &error);
+    std::string value = wpi::net::UnescapeURI(rawValue, &error);
     if (error) {
       auto estr = std::format("could not unescape value \"{}\"", rawValue);
       SendError(os, 500, estr);
@@ -349,11 +347,9 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::util::raw_ostream& os,
 
   SendHTMLHeadTitle(os);
   os << startRootPage;
-  wpi::util::SmallVector<int, 32> properties_vec;
   CS_Status status = 0;
-  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
-    wpi::util::SmallString<128> name_buf;
-    auto name = source.GetPropertyName(prop, name_buf, &status);
+  for (auto prop : source.EnumerateProperties(&status)) {
+    auto name = source.GetPropertyName(prop, &status);
     if (wpi::util::starts_with(name, "raw_")) {
       continue;
     }
@@ -412,12 +408,10 @@ void MjpegServerImpl::ConnThread::SendHTML(wpi::util::raw_ostream& os,
         break;
       }
       case CS_PROP_STRING: {
-        wpi::util::SmallString<128> strval_buf;
         wpi::util::print(os,
                          "<input type=\"text\" id=\"{0}box\" name=\"{0}\" "
                          "value=\"{1}\" />\n",
-                         name,
-                         source.GetStringProperty(prop, strval_buf, &status));
+                         name, source.GetStringProperty(prop, &status));
         wpi::util::print(os,
                          "<input type=\"button\" value =\"Submit\" "
                          "onclick=\"update('{0}', {0}box.value)\" />\n",
@@ -490,18 +484,16 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::util::raw_ostream& os,
   }
 
   os << "{\n\"controls\": [\n";
-  wpi::util::SmallVector<int, 32> properties_vec;
   bool first = true;
   CS_Status status = 0;
-  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
+  for (auto prop : source.EnumerateProperties(&status)) {
     if (first) {
       first = false;
     } else {
       os << ",\n";
     }
     os << '{';
-    wpi::util::SmallString<128> name_buf;
-    auto name = source.GetPropertyName(prop, name_buf, &status);
+    auto name = source.GetPropertyName(prop, &status);
     auto kind = source.GetPropertyKind(prop);
     wpi::util::print(os, "\n\"name\": \"{}\"", name);
     wpi::util::print(os, ",\n\"id\": \"{}\"", prop);
@@ -522,8 +514,7 @@ void MjpegServerImpl::ConnThread::SendJSON(wpi::util::raw_ostream& os,
         wpi::util::print(os, "{}", source.GetProperty(prop, &status));
         break;
       case CS_PROP_STRING: {
-        wpi::util::SmallString<128> strval_buf;
-        os << source.GetStringProperty(prop, strval_buf, &status);
+        os << source.GetStringProperty(prop, &status);
         break;
       }
       default:
@@ -804,8 +795,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::net::raw_socket_ostream os{*m_stream, true};
 
   // Read the request string from the stream
-  wpi::util::SmallString<128> reqBuf;
-  std::string_view req = is.getline(reqBuf, 4096);
+  std::string req = is.getline(4096);
   if (is.has_error()) {
     SDEBUG("error getting request string");
     return;
@@ -866,9 +856,8 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
   // Read the rest of the HTTP request.
   // The end of the request is marked by a single, empty line
-  wpi::util::SmallString<128> lineBuf;
   for (;;) {
-    if (wpi::util::starts_with(is.getline(lineBuf, 4096), "\n")) {
+    if (wpi::util::starts_with(is.getline(4096), "\n")) {
       break;
     }
     if (is.has_error()) {

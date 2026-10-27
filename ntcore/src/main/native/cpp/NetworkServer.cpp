@@ -27,7 +27,6 @@
 #include "wpi/net/uv/Work.hpp"
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/mutex.hpp"
@@ -169,11 +168,10 @@ void NetworkServer::ServerConnection4::ProcessWsUpgrade() {
   }
   DEBUG4("path: '{}'", path);
 
-  wpi::util::SmallString<128> nameBuf;
-  std::string_view name;
+  std::string name;
   bool err = false;
   if (auto uri = wpi::util::remove_prefix(path, "/nt/")) {
-    name = wpi::net::UnescapeURI(*uri, nameBuf, &err);
+    name = wpi::net::UnescapeURI(*uri, &err);
   }
   if (err || name.empty()) {
     INFO("invalid path '{}' (from {}), must match /nt/[clientId], closing",

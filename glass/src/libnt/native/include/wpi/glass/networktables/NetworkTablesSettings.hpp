@@ -10,11 +10,6 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/SafeThread.hpp"
 
-namespace wpi::util {
-template <typename T>
-class SmallVectorImpl;
-}  // namespace wpi::util
-
 namespace wpi::glass {
 
 class Storage;

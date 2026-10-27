@@ -14,9 +14,9 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include <string_view>
 
-#include "wpi/util/SmallVector.hpp"
 #include "wpi/util/fs.hpp"
 
 #if defined(_MSC_VER)
@@ -33,23 +33,23 @@
 
 using namespace wpi::util;
 
-std::string_view raw_istream::getline(SmallVectorImpl<char>& buf, int maxLen) {
-  buf.clear();
+std::string raw_istream::getline(int maxLen) {
+  std::string str;
   for (int i = 0; i < maxLen; ++i) {
     char c;
     read(c);
     if (has_error()) {
-      return {buf.data(), buf.size()};
+      return str;
     }
     if (c == '\r') {
       continue;
     }
-    buf.push_back(c);
+    str.push_back(c);
     if (c == '\n') {
       break;
     }
   }
-  return {buf.data(), buf.size()};
+  return str;
 }
 
 void raw_mem_istream::close() {}

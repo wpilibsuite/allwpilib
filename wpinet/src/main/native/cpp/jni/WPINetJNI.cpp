@@ -121,7 +121,7 @@ Java_org_wpilib_net_WPINetJNI_createMulticastServiceAnnouncer
   JStringRef serviceNameRef{env, serviceName};
   JStringRef serviceTypeRef{env, serviceType};
 
-  wpi::util::SmallVector<std::pair<std::string, std::string>, 8> txtVec;
+  std::vector<std::pair<std::string, std::string>> txtVec;
 
   if (keys != nullptr && values != nullptr) {
     size_t keysLen = env->GetArrayLength(keys);

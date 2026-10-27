@@ -22,7 +22,6 @@
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/DenseMap.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/UsageReporting.hpp"
@@ -95,26 +94,17 @@ static Instance& GetInstance() {
   return instance;
 }
 
-static std::string_view MakeSourceValue(CS_Source source,
-                                        wpi::util::SmallVectorImpl<char>& buf) {
+static std::string MakeSourceValue(CS_Source source) {
   CS_Status status = 0;
-  buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
-    case CS_SOURCE_USB: {
-      std::string_view prefix{"usb:"};
-      buf.append(prefix.begin(), prefix.end());
-      auto path = cs::GetUsbCameraPath(source, &status);
-      buf.append(path.begin(), path.end());
-      break;
-    }
+    case CS_SOURCE_USB:
+      return "usb:" + cs::GetUsbCameraPath(source, &status);
     case CS_SOURCE_HTTP: {
-      std::string_view prefix{"ip:"};
-      buf.append(prefix.begin(), prefix.end());
       auto urls = cs::GetHttpCameraUrls(source, &status);
       if (!urls.empty()) {
-        buf.append(urls[0].begin(), urls[0].end());
+        return "ip:" + urls[0];
       }
-      break;
+      return "ip:";
     }
     case CS_SOURCE_CV:
       return "cv:";
@@ -123,8 +113,6 @@ static std::string_view MakeSourceValue(CS_Source source,
     default:
       return "unknown:";
   }
-
-  return {buf.begin(), buf.size()};
 }
 
 static std::string MakeStreamValue(std::string_view address, int port) {
@@ -363,10 +351,8 @@ SourcePublisher::SourcePublisher(Instance& inst,
       modeEntry{table->GetStringTopic("mode").GetEntry("")},
       modesPublisher{table->GetStringArrayTopic("modes").Publish()} {
   CS_Status status = 0;
-  wpi::util::SmallString<64> buf;
-  sourcePublisher.Set(MakeSourceValue(source, buf));
-  wpi::util::SmallString<64> descBuf;
-  descriptionPublisher.Set(cs::GetSourceDescription(source, descBuf, &status));
+  sourcePublisher.Set(MakeSourceValue(source));
+  descriptionPublisher.Set(cs::GetSourceDescription(source, &status));
   connectedPublisher.Set(cs::IsSourceConnected(source, &status));
   streamsPublisher.Set(inst.GetSourceStreamValues(source));
   auto mode = cs::GetSourceVideoMode(source, &status);
@@ -406,9 +392,8 @@ Instance::Instance() {
           case cs::VideoEvent::SOURCE_CONNECTED:
             if (auto publisher = GetPublisher(event.sourceHandle)) {
               // update the description too (as it may have changed)
-              wpi::util::SmallString<64> descBuf;
-              publisher->descriptionPublisher.Set(cs::GetSourceDescription(
-                  event.sourceHandle, descBuf, &status));
+              publisher->descriptionPublisher.Set(
+                  cs::GetSourceDescription(event.sourceHandle, &status));
               publisher->connectedPublisher.Set(true);
             }
             break;
@@ -542,8 +527,7 @@ cs::CvSink CameraServer::GetVideo() {
 
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   auto& inst = ::GetInstance();
-  wpi::util::SmallString<64> name{"opencv_"};
-  name += camera.GetName();
+  std::string name = "opencv_" + camera.GetName();
 
   {
     std::scoped_lock lock(inst.m_mutex);
@@ -560,7 +544,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
     }
   }
 
-  cs::CvSink newsink{name.str()};
+  cs::CvSink newsink{name};
   newsink.SetSource(camera);
   AddServer(newsink);
   return newsink;
@@ -569,8 +553,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
 cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
                                   wpi::util::PixelFormat pixelFormat) {
   auto& inst = ::GetInstance();
-  wpi::util::SmallString<64> name{"opencv_"};
-  name += camera.GetName();
+  std::string name = "opencv_" + camera.GetName();
 
   {
     std::scoped_lock lock(inst.m_mutex);
@@ -587,7 +570,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera,
     }
   }
 
-  cs::CvSink newsink{name.str(), pixelFormat};
+  cs::CvSink newsink{name, pixelFormat};
   newsink.SetSource(camera);
   AddServer(newsink);
   return newsink;

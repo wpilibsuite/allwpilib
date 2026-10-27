@@ -103,7 +103,7 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
   std::memset(&ctrl, 0, sizeof(ctrl));
   std::memset(&ctrls, 0, sizeof(ctrls));
   ctrl.id = id;
-  ctrl.size = str.size();
+  ctrl.size = str.size();  // TODO: Should have a + 1?
   ctrl.string = const_cast<char*>(str.c_str());
   ctrls.ctrl_class = V4L2_CTRL_ID2CLASS(id);
   ctrls.count = 1;
@@ -113,21 +113,21 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
 
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
-static std::string_view NormalizeName(std::string_view name,
-                                      wpi::util::SmallVectorImpl<char>& buf) {
+static std::string NormalizeName(std::string_view name) {
+  std::string str;
   bool newWord = false;
   for (auto ch : name) {
     if (std::isalnum(ch)) {
       if (newWord) {
-        buf.push_back('_');
+        str.push_back('_');
       }
       newWord = false;
-      buf.push_back(std::tolower(ch));
-    } else if (!buf.empty()) {
+      str.push_back(std::tolower(ch));
+    } else if (!str.empty()) {
       newWord = true;
     }
   }
-  return {buf.data(), buf.size()};
+  return str;
 }
 
 #ifdef VIDIOC_QUERY_EXT_CTRL
@@ -168,8 +168,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
     ++len;
   }
-  wpi::util::SmallString<64> name_buf;
-  name = NormalizeName({ctrl.name, len}, name_buf);
+  name = NormalizeName({ctrl.name, len});
 }
 #endif
 
@@ -207,9 +206,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') {
     ++len;
   }
-  wpi::util::SmallString<64> name_buf;
-  name =
-      NormalizeName({reinterpret_cast<const char*>(ctrl.name), len}, name_buf);
+  name = NormalizeName({reinterpret_cast<const char*>(ctrl.name), len});
 }
 
 std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,

@@ -22,7 +22,6 @@
 #include "wpi/net/uv/Loop.hpp"
 #include "wpi/net/uv/Tcp.hpp"
 #include "wpi/net/uv/util.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 
 using namespace wpi::nt;
@@ -365,9 +364,8 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
   }
   wpi::net::WebSocket::ClientOptions options;
   options.handshakeTimeout = WEBSOCKET_HANDSHAKE_TIMEOUT;
-  wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
-      tcp, std::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
+      tcp, std::format("/nt/{}", wpi::net::EscapeURI(m_id)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
   ws->SetMaxMessageSize(MAX_MESSAGE_SIZE);
