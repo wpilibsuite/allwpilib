@@ -168,6 +168,7 @@ UNIT_CONFIGURATIONS = {
             # Force x Distance = Energy
             "Distance": "Energy",
             "Time": "LinearMomentum",
+            "LinearVelocity": "Power",
         },
         "divide": {"Mass": "LinearAcceleration", "LinearAcceleration": "Mass"},
     },
@@ -203,7 +204,11 @@ UNIT_CONFIGURATIONS = {
     },
     "LinearVelocity": {
         "base_unit": "MetersPerSecond",
-        "multiply": {"Time": "Distance", "Frequency": "LinearAcceleration"},
+        "multiply": {
+            "Time": "Distance",
+            "Frequency": "LinearAcceleration",
+            "Force": "Power",
+        },
         "divide": {"Time": "LinearAcceleration", "LinearAcceleration": "Time"},
     },
     "Mass": {
@@ -251,6 +256,8 @@ UNIT_CONFIGURATIONS = {
             "Frequency": "Energy",
             "Torque": "AngularVelocity",
             "AngularVelocity": "Torque",
+            "Force": "LinearVelocity",
+            "LinearVelocity": "Force",
         },
     },
     "Resistance": {

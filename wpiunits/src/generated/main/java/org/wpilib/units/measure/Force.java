@@ -276,8 +276,8 @@ public record Force(double magnitude, double baseUnitMagnitude, ForceUnit unit) 
 
 
   @Override
-  public Mult<ForceUnit, LinearVelocityUnit> times(LinearVelocity multiplier) {
-    return (Mult<ForceUnit, LinearVelocityUnit>) Measure.super.times(multiplier);
+  public Power times(LinearVelocity multiplier) {
+    return Watts.of(baseUnitMagnitude() * multiplier.baseUnitMagnitude());
   }
 
   @Override
