@@ -22,8 +22,6 @@
 
 namespace wpi::util {
 class json;
-template <typename T>
-class SmallVectorImpl;
 }  // namespace wpi::util
 
 namespace wpi::log {

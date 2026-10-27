@@ -26,7 +26,3 @@ classes:
         - [wpi::math::DrivetrainSplineSample]
         - [wpi::math::HolonomicSample]
       GetPoses:
-        overloads:
-          '[const]':
-          wpi::util::SmallVectorImpl<wpi::math::Pose2d>& [const]:
-            ignore: true

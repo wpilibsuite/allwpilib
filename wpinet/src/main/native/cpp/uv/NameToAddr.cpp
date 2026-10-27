@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include <cstring>
+#include <string>
 
 #include "wpi/net/uv/util.hpp"
 #include "wpi/util/SmallString.hpp"
@@ -17,8 +18,7 @@ int NameToAddr(std::string_view ip, unsigned int port, sockaddr_in* addr) {
     addr->sin_port = htons(port);
     return 0;
   } else {
-    wpi::util::SmallString<128> ipBuf{ip};
-    return uv_ip4_addr(ipBuf.c_str(), port, addr);
+    return uv_ip4_addr(std::string{ip}.c_str(), port, addr);
   }
 }
 

@@ -55,13 +55,6 @@ std::vector<wpi::math::Pose2d> FieldObject2d::GetPoses() const {
   return m_posesTunable.Get();
 }
 
-std::span<const wpi::math::Pose2d> FieldObject2d::GetPoses(
-    wpi::util::SmallVectorImpl<wpi::math::Pose2d>& out) const {
-  auto poses = m_posesTunable.Get();
-  out.assign(poses.begin(), poses.end());
-  return out;
-}
-
 FieldObject2d::PosesTunable::PosesTunable(wpi::util::mutex& mutex)
     : m_mutex{&mutex} {}
 

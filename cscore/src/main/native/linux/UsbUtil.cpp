@@ -12,11 +12,9 @@
 #include <string>
 
 #include "Instance.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/fs.hpp"
 #include "wpi/util/raw_istream.hpp"
-#include "wpi/util/raw_ostream.hpp"
 
 namespace wpi::cs {
 
@@ -26,7 +24,7 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     return {};
   }
 
-  wpi::util::SmallString<128> buf;
+  std::string str;
   wpi::util::raw_fd_istream is{fd, true};
 
   // build vendor and product 4-char hex strings
@@ -34,10 +32,9 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
   auto productStr = std::format("{:04x}", product);
 
   // scan file
-  wpi::util::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
-    auto line = is.getline(lineBuf, 4096);
+    auto line = is.getline(4096);
     if (is.has_error()) {
       break;
     }
@@ -49,22 +46,22 @@ static std::string GetUsbNameFromFile(int vendor, int product) {
     // look for vendor at start of line
     if (wpi::util::starts_with(line, vendorStr)) {
       foundVendor = true;
-      buf += wpi::util::trim(wpi::util::substr(line, 5));
-      buf += ' ';
+      str += wpi::util::trim(wpi::util::substr(line, 5));
+      str += ' ';
       continue;
     }
 
     if (foundVendor) {
       // next vendor, but didn't match product?
       if (line[0] != '\t') {
-        buf += "Unknown";
-        return std::string{buf};
+        str += "Unknown";
+        return str;
       }
 
       // look for product
       if (wpi::util::starts_with(wpi::util::substr(line, 1), productStr)) {
-        buf += wpi::util::trim(wpi::util::substr(line, 6));
-        return std::string{buf};
+        str += wpi::util::trim(wpi::util::substr(line, 6));
+        return str;
       }
     }
   }

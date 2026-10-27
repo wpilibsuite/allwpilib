@@ -32,7 +32,6 @@
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/units/length.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/StringExtras.hpp"
 #include "wpi/util/StringMap.hpp"
 #include "wpi/util/fs.hpp"
@@ -953,8 +952,8 @@ void wpi::glass::DisplayField2DSettings(Field2DModel* model) {
     }
     PushID(name);
 
-    wpi::util::SmallString<64> nameBuf{name};
-    if (ImGui::CollapsingHeader(nameBuf.c_str())) {
+    std::string nullTerminatedName{name};
+    if (ImGui::CollapsingHeader(nullTerminatedName.c_str())) {
       auto& obj =
           field->m_objects.try_emplace(name, GetStorage()).first->second;
       obj.DisplaySettings();

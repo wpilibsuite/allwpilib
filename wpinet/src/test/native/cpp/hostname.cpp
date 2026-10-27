@@ -6,19 +6,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-#include "wpi/util/SmallString.hpp"
-#include "wpi/util/SmallVector.hpp"
-
 namespace wpi::net {
 TEST_CASE("HostNameTest HostNameNotEmpty", "[hostname]") {
   REQUIRE(GetHostname() != "");
-}
-TEST_CASE("HostNameTest HostNameNotEmptySmallVector", "[hostname]") {
-  wpi::util::SmallVector<char, 256> name;
-  REQUIRE(GetHostname(name) != "");
-}
-TEST_CASE("HostNameTest HostNameEq", "[hostname]") {
-  wpi::util::SmallVector<char, 256> nameBuf;
-  REQUIRE(GetHostname(nameBuf) == GetHostname());
 }
 }  // namespace wpi::net

@@ -5,15 +5,15 @@
 #include "wpi/hal/ErrorHandling.hpp"
 
 #include <format>
+#include <string>
 
 #include "wpi/hal/Errors.h"
 #include "wpi/hal/HAL.h"
-#include "wpi/util/SmallString.hpp"
 
 namespace {
 struct LastErrorStorage {
   int32_t status;
-  wpi::util::SmallString<512> message;
+  std::string message;
 };
 }  // namespace
 

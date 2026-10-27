@@ -11,7 +11,6 @@
 
 #include "wpi/net/raw_uv_ostream.hpp"
 #include "wpi/net/uv/util.hpp"
-#include "wpi/util/SmallString.hpp"
 #include "wpi/util/print.hpp"
 
 static constexpr int TCP_CONNECT_ATTEMPT_TIMEOUT = 1000;

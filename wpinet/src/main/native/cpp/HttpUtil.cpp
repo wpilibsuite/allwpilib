@@ -15,10 +15,8 @@
 
 namespace wpi::net {
 
-std::string_view UnescapeURI(std::string_view str,
-                             wpi::util::SmallVectorImpl<char>& buf,
-                             bool* error) {
-  buf.clear();
+std::string UnescapeURI(std::string_view str, bool* error) {
+  std::string buf;
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     // pass non-escaped characters to output
     if (*i != '%') {
@@ -55,12 +53,10 @@ std::string_view UnescapeURI(std::string_view str,
   return {buf.data(), buf.size()};
 }
 
-std::string_view EscapeURI(std::string_view str,
-                           wpi::util::SmallVectorImpl<char>& buf,
-                           bool spacePlus) {
+std::string EscapeURI(std::string_view str, bool spacePlus) {
   static const char* const hexLut = "0123456789ABCDEF";
 
-  buf.clear();
+  std::string buf;
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     // pass unreserved characters to output
     if (std::isalnum(*i) || *i == '-' || *i == '_' || *i == '.' || *i == '~') {
@@ -80,7 +76,7 @@ std::string_view EscapeURI(std::string_view str,
     buf.push_back(hexLut[(*i) & 0x0f]);
   }
 
-  return {buf.data(), buf.size()};
+  return buf;
 }
 
 std::string_view EscapeHTML(std::string_view str,
@@ -107,9 +103,8 @@ HttpPath::HttpPath(std::string_view path) {
     return;
   }
   wpi::util::split(path, '/', 100, false, [&](auto elem) {
-    wpi::util::SmallString<64> buf;
     bool err = false;
-    auto val = wpi::net::UnescapeURI(elem, buf, &err);
+    auto val = wpi::net::UnescapeURI(elem, &err);
     if (err) {
       m_pathEnds.clear();
       return;
@@ -153,9 +148,9 @@ bool ParseHttpHeaders(wpi::util::raw_istream& is,
 
   bool inContentType = false;
   bool inContentLength = false;
-  wpi::util::SmallString<64> lineBuf;
   for (;;) {
-    std::string_view line = wpi::util::rtrim(is.getline(lineBuf, 1024));
+    auto str = is.getline(1024);
+    auto line = wpi::util::rtrim(str);
     if (is.has_error()) {
       return false;
     }
@@ -281,13 +276,12 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
   if (!userpass.empty()) {
     auto [rawUser, rawPassword] = wpi::util::split(userpass, ':');
-    wpi::util::SmallString<64> userBuf, passBuf;
-    user = UnescapeURI(rawUser, userBuf, error);
+    user = UnescapeURI(rawUser, error);
     if (*error) {
       *errorMsg = std::format("could not unescape user \"{}\"", rawUser);
       return;
     }
-    password = UnescapeURI(rawPassword, passBuf, error);
+    password = UnescapeURI(rawPassword, error);
     if (*error) {
       *errorMsg =
           std::format("could not unescape password \"{}\"", rawPassword);
@@ -328,16 +322,14 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
     // unescape param
     *error = false;
-    wpi::util::SmallString<64> paramBuf;
-    std::string_view param = UnescapeURI(rawParam, paramBuf, error);
+    std::string param = UnescapeURI(rawParam, error);
     if (*error) {
       *errorMsg = std::format("could not unescape parameter \"{}\"", rawParam);
       return;
     }
 
     // unescape value
-    wpi::util::SmallString<64> valueBuf;
-    std::string_view value = UnescapeURI(rawValue, valueBuf, error);
+    std::string value = UnescapeURI(rawValue, error);
     if (*error) {
       *errorMsg = std::format("could not unescape value \"{}\"", rawValue);
       return;
@@ -351,11 +343,8 @@ HttpLocation::HttpLocation(std::string_view url_, bool* error,
 
 void HttpRequest::SetAuth(const HttpLocation& loc) {
   if (!loc.user.empty()) {
-    wpi::util::SmallString<64> userpass;
-    userpass += loc.user;
-    userpass += ':';
-    userpass += loc.password;
-    wpi::util::Base64Encode(userpass.str(), &auth);
+    auth =
+        wpi::util::Base64Encode(std::format("{}:{}", loc.user, loc.password));
   }
 }
 
@@ -371,8 +360,8 @@ bool HttpConnection::Handshake(const HttpRequest& request,
   os.flush();
 
   // read first line of response
-  wpi::util::SmallString<64> lineBuf;
-  std::string_view line = wpi::util::rtrim(is.getline(lineBuf, 1024));
+  auto str = is.getline(1024);
+  auto line = wpi::util::rtrim(str);
   if (is.has_error()) {
     *warnMsg = "disconnected before response";
     return false;
