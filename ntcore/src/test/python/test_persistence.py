@@ -23,7 +23,8 @@ def test_persistent_property_updates_saved_without_value_changes(tmp_path):
         while time.monotonic() < deadline:
             try:
                 data = json.loads(persistent_file.read_text())
-            except (FileNotFoundError, json.JSONDecodeError):
+            except (FileNotFoundError, PermissionError, json.JSONDecodeError):
+                # Windows may deny reads while the server replaces the file.
                 data = None
             if data == expected:
                 return

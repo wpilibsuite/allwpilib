@@ -47,7 +47,7 @@ classes:
       operator==:
     inline_code: |
       .def("__repr__", [](py::handle self) {
-        py::object type_name = self.get_type().attr("__qualname__");
+        py::object type_name = py::type::handle_of(self).attr("__qualname__");
         std::string name = self.cast<Topic>().GetName();
         return py::str("<{} {!r}>").format(type_name, name);
       })
@@ -68,7 +68,7 @@ classes:
             ignore: true
     inline_code: |
       .def("__repr__", [](py::handle self) {
-        py::object type_name = self.get_type().attr("__qualname__");
+        py::object type_name = py::type::handle_of(self).attr("__qualname__");
         auto topic = self.cast<const Subscriber&>().GetTopic();
         return py::str("<{} {!r}>").format(type_name, topic.GetName());
       })
@@ -87,7 +87,7 @@ classes:
             ignore: true
     inline_code: |
       .def("__repr__", [](py::handle self) {
-        py::object type_name = self.get_type().attr("__qualname__");
+        py::object type_name = py::type::handle_of(self).attr("__qualname__");
         auto topic = self.cast<const Publisher&>().GetTopic();
         return py::str("<{} {!r}>").format(type_name, topic.GetName());
       })
