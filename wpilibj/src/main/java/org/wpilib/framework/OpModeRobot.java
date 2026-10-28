@@ -683,6 +683,12 @@ public abstract class OpModeRobot extends RobotBase {
           // Register the opmode's additional periodic callbacks immediately on creation
           m_activeOpModeCallbacks.addAll(m_currentOpMode.getCallbacks());
           m_callbacks.addAll(m_activeOpModeCallbacks);
+
+          // extra DisabledPeriodic call
+          if (enabled) {
+            m_currentOpMode.disabledPeriodic();
+            m_watchdog.addEpoch("OpMode::DisabledPeriodic()");
+          }
         }
       } else {
         DriverStationErrors.reportError("No OpMode found for mode " + modeId, false);

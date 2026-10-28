@@ -7,6 +7,7 @@ package org.wpilib.framework;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
@@ -421,16 +422,96 @@ class OpModeRobotTest {
     DriverStationSim.setOpMode(getOnlyOpModeId());
     DriverStationSim.notifyNewData();
 
-    // Opmode starts on the same loop it is created without any disabledPeriodic call; the robot's
-    // disabled functions do not run
+    // Opmode gets one disabledPeriodic call, then starts on the same loop; the robot's disabled
+    // functions do not run
     SimHooks.stepTiming(PERIOD);
     MockOpMode opMode = robot.m_opMode;
     assertNotNull(opMode);
-    assertEquals(0, opMode.m_disabledPeriodicCount.get());
+    assertEquals(1, opMode.m_disabledPeriodicCount.get());
     assertEquals(1, opMode.m_startCount.get());
     assertEquals(0, robot.m_disabledInitCount.get());
     assertEquals(0, robot.m_disabledPeriodicCount.get());
     assertEquals(0, robot.m_disabledExitCount.get());
+
+    // No further disabledPeriodic calls while enabled
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, opMode.m_disabledPeriodicCount.get());
+
+    robot.endCompetition();
+    robotThread.join();
+    robot.close();
+  }
+
+  @Test
+  void teleopCreatedWhileEnabledAfterAutoWithFms() throws InterruptedException {
+    // Under FMS the teleop opmode is selected while the robot stays enabled after auto ends
+    MockOpMode[] opModes = new MockOpMode[2];
+    MockRobot robot =
+        new MockRobot() {
+          {
+            addOpMode(
+                RobotMode.AUTONOMOUS,
+                "Auto",
+                () -> {
+                  opModes[0] = new MockOpMode();
+                  return opModes[0];
+                });
+            addOpMode(
+                RobotMode.TELEOPERATED,
+                "Teleop",
+                () -> {
+                  opModes[1] = new MockOpMode();
+                  return opModes[1];
+                });
+            publishOpModes();
+          }
+        };
+
+    long autoId = -1;
+    long teleopId = -1;
+    for (var option : DriverStationSim.getOpModeOptions()) {
+      if ("Auto".equals(option.name)) {
+        autoId = option.id;
+      } else if ("Teleop".equals(option.name)) {
+        teleopId = option.id;
+      }
+    }
+    assertNotEquals(-1, autoId);
+    assertNotEquals(-1, teleopId);
+
+    Thread robotThread = new Thread(robot::startCompetition);
+    robotThread.start();
+    SimHooks.waitForProgramStart();
+
+    DriverStationSim.setDsAttached(true);
+    DriverStationSim.setFmsAttached(true);
+    DriverStationSim.setEnabled(false);
+    DriverStationSim.setRobotMode(RobotMode.AUTONOMOUS);
+    DriverStationSim.setOpMode(autoId);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(PERIOD);
+
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(PERIOD);
+    MockOpMode auto = opModes[0];
+    assertNotNull(auto);
+    assertEquals(1, auto.m_startCount.get());
+    assertNull(opModes[1]);
+
+    // Auto ends and teleop is selected without the robot ever being disabled
+    DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
+    DriverStationSim.setOpMode(teleopId);
+    DriverStationSim.notifyNewData();
+    SimHooks.stepTiming(PERIOD);
+    assertEquals(1, auto.m_endCount.get());
+    assertEquals(1, auto.m_closeCount.get());
+    MockOpMode teleop = opModes[1];
+    assertNotNull(teleop);
+    assertEquals(1, teleop.m_disabledPeriodicCount.get());
+    assertEquals(1, teleop.m_startCount.get());
+    // Only the single disabled loop before the first enable ran the robot's disabledPeriodic
+    assertEquals(1, robot.m_disabledPeriodicCount.get());
 
     robot.endCompetition();
     robotThread.join();

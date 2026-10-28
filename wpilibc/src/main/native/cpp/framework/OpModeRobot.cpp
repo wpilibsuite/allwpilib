@@ -112,6 +112,12 @@ void OpModeRobotBase::LoopFunc() {
         for (auto& cb : m_activeOpModeCallbacks) {
           m_callbacks.Add(cb);
         }
+
+        // extra DisabledPeriodic call
+        if (enabled) {
+          m_currentOpMode->DisabledPeriodic();
+          m_watchdog.AddEpoch("OpMode::DisabledPeriodic()");
+        }
       }
     } else {
       WPILIB_ReportError(err::Error, "No OpMode found for mode {}", modeId);

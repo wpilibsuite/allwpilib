@@ -346,16 +346,94 @@ TEST_CASE_METHOD(OpModeRobotTest, "OpModeRobotTest OpModeCreatedWhileEnabled",
   wpi::sim::DriverStationSim::SetOpMode(GetOnlyOpModeId());
   wpi::sim::DriverStationSim::NotifyNewData();
 
-  // Opmode starts on the same loop it is created without any DisabledPeriodic
-  // call; the robot's disabled functions do not run
+  // Opmode gets one DisabledPeriodic call, then starts on the same loop; the
+  // robot's disabled functions do not run
   wpi::sim::StepTiming(PERIOD);
   MockOpMode* opMode = robot.m_opMode.load();
   REQUIRE(opMode != nullptr);
-  CHECK(opMode->m_disabledPeriodicCount.load() == 0u);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
   CHECK(opMode->m_startCount.load() == 1u);
   CHECK(robot.m_disabledInitCount.load() == 0u);
   CHECK(robot.m_disabledPeriodicCount.load() == 0u);
   CHECK(robot.m_disabledExitCount.load() == 0u);
+
+  // No further DisabledPeriodic calls while enabled
+  wpi::sim::StepTiming(PERIOD);
+  CHECK(opMode->m_disabledPeriodicCount.load() == 1u);
+
+  robot.EndCompetition();
+  robotThread.join();
+}
+
+TEST_CASE_METHOD(OpModeRobotTest,
+                 "OpModeRobotTest TeleopCreatedWhileEnabledAfterAutoWithFms",
+                 "[wpilibc]") {
+  // Under FMS the teleop opmode is selected while the robot stays enabled
+  // after auto ends
+  struct AutoTeleopRobot : public MockRobot {
+    std::atomic<MockOpMode*> m_auto{nullptr};
+    std::atomic<MockOpMode*> m_teleop{nullptr};
+
+    AutoTeleopRobot() {
+      AddOpModeFactory(wpi::RobotMode::AUTONOMOUS, "Auto", [this] {
+        auto opMode = std::make_unique<MockOpMode>();
+        m_auto = opMode.get();
+        return opMode;
+      });
+      AddOpModeFactory(wpi::RobotMode::TELEOPERATED, "Teleop", [this] {
+        auto opMode = std::make_unique<MockOpMode>();
+        m_teleop = opMode.get();
+        return opMode;
+      });
+      PublishOpModes();
+    }
+  };
+  AutoTeleopRobot robot;
+
+  int64_t autoId = -1;
+  int64_t teleopId = -1;
+  for (auto& option : wpi::sim::DriverStationSim::GetOpModeOptions()) {
+    auto name = wpi::util::to_string_view(&option.name);
+    if (name == "Auto") {
+      autoId = option.id;
+    } else if (name == "Teleop") {
+      teleopId = option.id;
+    }
+  }
+  REQUIRE(autoId != -1);
+  REQUIRE(teleopId != -1);
+
+  std::thread robotThread{[&] { robot.StartCompetition(); }};
+  wpi::sim::WaitForProgramStart();
+
+  wpi::sim::DriverStationSim::SetDsAttached(true);
+  wpi::sim::DriverStationSim::SetFmsAttached(true);
+  wpi::sim::DriverStationSim::SetEnabled(false);
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::AUTONOMOUS);
+  wpi::sim::DriverStationSim::SetOpMode(autoId);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(PERIOD);
+
+  wpi::sim::DriverStationSim::SetEnabled(true);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(PERIOD);
+  MockOpMode* autoOpMode = robot.m_auto.load();
+  REQUIRE(autoOpMode != nullptr);
+  CHECK(autoOpMode->m_startCount.load() == 1u);
+  CHECK(robot.m_teleop.load() == nullptr);
+
+  // Auto ends and teleop is selected without the robot ever being disabled
+  wpi::sim::DriverStationSim::SetRobotMode(wpi::RobotMode::TELEOPERATED);
+  wpi::sim::DriverStationSim::SetOpMode(teleopId);
+  wpi::sim::DriverStationSim::NotifyNewData();
+  wpi::sim::StepTiming(PERIOD);
+  MockOpMode* teleopOpMode = robot.m_teleop.load();
+  REQUIRE(teleopOpMode != nullptr);
+  CHECK(teleopOpMode->m_disabledPeriodicCount.load() == 1u);
+  CHECK(teleopOpMode->m_startCount.load() == 1u);
+  // Only the single disabled loop before the first enable ran the robot's
+  // DisabledPeriodic
+  CHECK(robot.m_disabledPeriodicCount.load() == 1u);
 
   robot.EndCompetition();
   robotThread.join();
