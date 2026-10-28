@@ -446,26 +446,22 @@ class OpModeRobotTest {
   void teleopCreatedWhileEnabledAfterAutoWithFms() throws InterruptedException {
     // Under FMS the teleop opmode is selected while the robot stays enabled after auto ends
     MockOpMode[] opModes = new MockOpMode[2];
-    MockRobot robot =
-        new MockRobot() {
-          {
-            addOpMode(
-                RobotMode.AUTONOMOUS,
-                "Auto",
-                () -> {
-                  opModes[0] = new MockOpMode();
-                  return opModes[0];
-                });
-            addOpMode(
-                RobotMode.TELEOPERATED,
-                "Teleop",
-                () -> {
-                  opModes[1] = new MockOpMode();
-                  return opModes[1];
-                });
-            publishOpModes();
-          }
-        };
+    final MockRobot robot = new MockRobot();
+    robot.addOpMode(
+        RobotMode.AUTONOMOUS,
+        "Auto",
+        () -> {
+          opModes[0] = new MockOpMode();
+          return opModes[0];
+        });
+    robot.addOpMode(
+        RobotMode.TELEOPERATED,
+        "Teleop",
+        () -> {
+          opModes[1] = new MockOpMode();
+          return opModes[1];
+        });
+    robot.publishOpModes();
 
     long autoId = -1;
     long teleopId = -1;
