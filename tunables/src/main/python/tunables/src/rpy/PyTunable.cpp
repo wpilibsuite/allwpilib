@@ -344,7 +344,7 @@ py::object PyTunable::GetCached() const {
           for (auto&& item : value.Get()) {
             data.append(item.py);
           }
-          return std::move(data);
+          return data;
         } else {
           return py::cast(value.Get());
         }
