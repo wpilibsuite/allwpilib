@@ -231,6 +231,7 @@ class BlueZClient {
 
   bool PairDevice(const std::string& devicePath, std::string* error,
                   std::string* errorName) {
+    m_pairingDevicePath = devicePath;
     if (!RegisterPairingAgent(error)) {
       return false;
     }
@@ -371,18 +372,7 @@ class BlueZClient {
     }
     m_agentRegistered = true;
 
-    std::string defaultAgentError;
-    CallMethod(
-        BLUEZ_MANAGER_PATH, BLUEZ_AGENT_MANAGER_INTERFACE,
-        "RequestDefaultAgent", DBUS_TIMEOUT_USE_DEFAULT,
-        [&](DBusMessage* message) {
-          DBusMessageIter iter;
-          dbus_message_iter_init_append(message, &iter);
-          const char* path = BLUEZ_AGENT_PATH;
-          return dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH,
-                                                &path);
-        },
-        &defaultAgentError);
+    // RegisterAgent already scopes this agent to our own Pair() calls.
     return true;
   }
 
@@ -400,54 +390,10 @@ class BlueZClient {
 
   DBusHandlerResult HandleAgentMessage(DBusConnection* connection,
                                        DBusMessage* message) {
-    const char* interface = dbus_message_get_interface(message);
-    const char* member = dbus_message_get_member(message);
-    if (member == nullptr) {
-      return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
-
     DBusMessagePtr reply;
-    if (interface != nullptr &&
-        std::strcmp(interface, DBUS_INTROSPECTABLE_INTERFACE) == 0 &&
-        std::strcmp(member, "Introspect") == 0) {
-      reply = DBusMessagePtr{dbus_message_new_method_return(message)};
-      if (!reply) {
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-      }
-      DBusMessageIter iter;
-      dbus_message_iter_init_append(reply.Get(), &iter);
-      const char* xml =
-          "<node><interface name=\"org.bluez.Agent1\">"
-          "<method name=\"Release\"/>"
-          "<method name=\"RequestConfirmation\"/>"
-          "<method name=\"RequestAuthorization\"/>"
-          "<method name=\"AuthorizeService\"/>"
-          "<method name=\"Cancel\"/>"
-          "</interface></node>";
-      if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &xml)) {
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-      }
-    } else if (interface == nullptr ||
-               std::strcmp(interface, BLUEZ_AGENT_INTERFACE) != 0) {
-      return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    } else if (std::strcmp(member, "RequestPinCode") == 0 ||
-               std::strcmp(member, "RequestPasskey") == 0) {
-      reply = DBusMessagePtr{dbus_message_new_error(
-          message, "org.bluez.Error.Rejected", "Pairing requires user input")};
-    } else if (std::strcmp(member, "Release") == 0 ||
-               std::strcmp(member, "DisplayPinCode") == 0 ||
-               std::strcmp(member, "DisplayPasskey") == 0 ||
-               std::strcmp(member, "RequestConfirmation") == 0 ||
-               std::strcmp(member, "RequestAuthorization") == 0 ||
-               std::strcmp(member, "AuthorizeService") == 0 ||
-               std::strcmp(member, "Cancel") == 0) {
-      reply = DBusMessagePtr{dbus_message_new_method_return(message)};
-    } else {
-      return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    }
-
-    if (!reply) {
-      return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    auto result = CreateBlueZPairingReply(message, m_pairingDevicePath, &reply);
+    if (result != DBUS_HANDLER_RESULT_HANDLED) {
+      return result;
     }
     if (!dbus_connection_send(connection, reply.Get(), nullptr)) {
       return DBUS_HANDLER_RESULT_NEED_MEMORY;
@@ -707,6 +653,7 @@ class BlueZClient {
   DBusConnection* m_connection = nullptr;
   bool m_agentObjectRegistered = false;
   bool m_agentRegistered = false;
+  std::string m_pairingDevicePath;
 };
 
 const BlueZAdapterInfo* SelectBluetoothAdapter(
@@ -732,6 +679,73 @@ const BlueZDeviceInfo* FindBluetoothDevice(
 }
 
 }  // namespace
+
+DBusHandlerResult CreateBlueZPairingReply(DBusMessage* message,
+                                          std::string_view devicePath,
+                                          DBusMessagePtr* reply) {
+  const char* interface = dbus_message_get_interface(message);
+  const char* member = dbus_message_get_member(message);
+  if (member == nullptr) {
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  }
+
+  if (interface != nullptr &&
+      std::strcmp(interface, DBUS_INTROSPECTABLE_INTERFACE) == 0 &&
+      std::strcmp(member, "Introspect") == 0) {
+    *reply = DBusMessagePtr{dbus_message_new_method_return(message)};
+    if (!*reply) {
+      return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    }
+    DBusMessageIter iter;
+    dbus_message_iter_init_append(reply->Get(), &iter);
+    const char* xml =
+        "<node><interface name=\"org.bluez.Agent1\">"
+        "<method name=\"Release\"/>"
+        "<method name=\"RequestConfirmation\"/>"
+        "<method name=\"RequestAuthorization\"/>"
+        "<method name=\"AuthorizeService\"/>"
+        "<method name=\"Cancel\"/>"
+        "</interface></node>";
+    if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &xml)) {
+      return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    }
+  } else if (interface == nullptr ||
+             std::strcmp(interface, BLUEZ_AGENT_INTERFACE) != 0) {
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  } else if (std::strcmp(member, "RequestPinCode") == 0 ||
+             std::strcmp(member, "RequestPasskey") == 0) {
+    *reply = DBusMessagePtr{dbus_message_new_error(
+        message, "org.bluez.Error.Rejected", "Pairing requires user input")};
+  } else if (std::strcmp(member, "Release") == 0 ||
+             std::strcmp(member, "Cancel") == 0) {
+    *reply = DBusMessagePtr{dbus_message_new_method_return(message)};
+  } else if (std::strcmp(member, "DisplayPinCode") == 0 ||
+             std::strcmp(member, "DisplayPasskey") == 0 ||
+             std::strcmp(member, "RequestConfirmation") == 0 ||
+             std::strcmp(member, "RequestAuthorization") == 0 ||
+             std::strcmp(member, "AuthorizeService") == 0) {
+    DBusMessageIter iter;
+    const char* requestedDevice = nullptr;
+    if (dbus_message_iter_init(message, &iter) &&
+        dbus_message_iter_get_arg_type(&iter) == DBUS_TYPE_OBJECT_PATH) {
+      dbus_message_iter_get_basic(&iter, &requestedDevice);
+    }
+    if (requestedDevice != nullptr && !devicePath.empty() &&
+        devicePath == requestedDevice) {
+      *reply = DBusMessagePtr{dbus_message_new_method_return(message)};
+    } else {
+      *reply = DBusMessagePtr{dbus_message_new_error(
+          message, "org.bluez.Error.Rejected", "Unexpected pairing device")};
+    }
+  } else {
+    return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+  }
+
+  if (!*reply) {
+    return DBUS_HANDLER_RESULT_NEED_MEMORY;
+  }
+  return DBUS_HANDLER_RESULT_HANDLED;
+}
 
 BluetoothLEDeviceScanResult ScanBlueZDevices(
     std::chrono::milliseconds timeout) {

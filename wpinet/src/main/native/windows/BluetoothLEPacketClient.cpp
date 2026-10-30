@@ -435,7 +435,7 @@ class BluetoothLEPacketClient::Impl
   }
 
   ~Impl() {
-    Disconnect({});
+    ResetConnection();
     if (m_exec && !m_exec->IsClosing()) {
       auto exec = std::move(m_exec);
       exec->Send([exec] { exec->Close(); });
@@ -444,25 +444,25 @@ class BluetoothLEPacketClient::Impl
 
   bool Connect(BluetoothLEPacketClientConfig config) {
     if (config.address.empty()) {
-      SetError("No Bluetooth address configured");
+      SetRequestError("No Bluetooth address configured");
       return false;
     }
     if (config.gattServiceUuid.empty() ||
         config.gattControlCharacteristicUuid.empty() ||
         config.gattStatusCharacteristicUuid.empty()) {
-      SetError("No Bluetooth GATT UUIDs configured");
+      SetRequestError("No Bluetooth GATT UUIDs configured");
       return false;
     }
 
     uint64_t bluetoothAddress = 0;
     if (!ParseBluetoothAddress(config.address, &bluetoothAddress)) {
-      SetError(
+      SetRequestError(
           "Windows GATT requires a Bluetooth address of the form "
           "AA:BB:CC:DD:EE:FF");
       return false;
     }
 
-    Disconnect({});
+    ResetConnection();
     uint64_t generation;
     uint64_t statusSequence;
     BluetoothLEPacketConnectionStatus snapshot;
@@ -482,48 +482,47 @@ class BluetoothLEPacketClient::Impl
       snapshot = m_status;
       statusSequence = ++m_statusSequence;
     }
-    QueueStatus(snapshot, statusSequence);
-
     auto self = shared_from_this();
-    m_connectThread = std::thread{
-        [self, config = std::move(config), bluetoothAddress, generation] {
-          self->ConnectThreadMain(config, bluetoothAddress, generation);
-        }};
+    QueueStatus(snapshot, statusSequence);
+    if (IsConnectCanceled(generation)) {
+      return true;
+    }
+
+    // WinRT discovery can block and cannot be interrupted. Each worker owns
+    // its lifetime; generation checks discard results after cancellation.
+    std::thread{[self, config = std::move(config), bluetoothAddress,
+                 generation] {
+      self->ConnectThreadMain(config, bluetoothAddress, generation);
+    }}.detach();
     return true;
   }
 
+  // Cancel native work without publishing an intermediate status during
+  // connection replacement or destruction.
+  void ResetConnection() {
+    uint64_t generation;
+    {
+      std::scoped_lock lock{m_statusMutex};
+      generation = CancelConnectionLocked();
+    }
+    m_connectCv.notify_all();
+    ClearGattState(generation);
+  }
+
   void Disconnect(std::string_view reason) {
-    bool publishStatus = false;
-    uint64_t statusSequence = 0;
+    uint64_t generation;
+    uint64_t statusSequence;
     BluetoothLEPacketConnectionStatus snapshot;
     {
       std::scoped_lock lock{m_statusMutex};
-      m_cancelConnect = true;
-      ++m_connectGeneration;
-      if (!reason.empty()) {
-        m_status.connecting = false;
-        m_status.connected = false;
-        m_status.transport = BluetoothPacketTransport::NONE;
-        m_status.status = reason;
-        snapshot = m_status;
-        statusSequence = ++m_statusSequence;
-        publishStatus = true;
-      }
+      generation = CancelConnectionLocked();
+      m_status.status = reason;
+      snapshot = m_status;
+      statusSequence = ++m_statusSequence;
     }
     m_connectCv.notify_all();
-
-    if (m_connectThread.joinable()) {
-      // WinRT GATT discovery calls are synchronous and cannot be interrupted by
-      // m_cancelConnect. Detach so GUI disconnect/shutdown can return promptly;
-      // the generation checks in ConnectThreadMain drop late results.
-      m_connectThread.detach();
-    }
-
-    ClearGattState();
-
-    if (publishStatus) {
-      QueueStatus(snapshot, statusSequence);
-    }
+    ClearGattState(generation);
+    QueueStatus(snapshot, statusSequence);
   }
 
   bool Send(std::span<const uint8_t> packet, BluetoothPacketSendMode mode) {
@@ -584,6 +583,17 @@ class BluetoothLEPacketClient::Impl
   }
 
  private:
+  // Caller holds m_statusMutex. Return the generation whose native state must
+  // be released so cleanup cannot clear a concurrently installed connection.
+  uint64_t CancelConnectionLocked() {
+    m_cancelConnect = true;
+    uint64_t generation = m_connectGeneration++;
+    m_status.connecting = false;
+    m_status.connected = false;
+    m_status.transport = BluetoothPacketTransport::NONE;
+    return generation;
+  }
+
   bool StartGattWrite(std::span<const uint8_t> packet,
                       gatt::GattCharacteristic const& controlCharacteristic,
                       uint64_t generation) {
@@ -897,14 +907,7 @@ class BluetoothLEPacketClient::Impl
     QueueStatus(snapshot, statusSequence);
   }
 
-  void ClearGattState() { ClearGattStateForGeneration(0, false); }
-
   void ClearGattState(uint64_t generation) {
-    ClearGattStateForGeneration(generation, true);
-  }
-
-  void ClearGattStateForGeneration(uint64_t generation,
-                                   bool requireGeneration) {
     gatt::GattCharacteristic::ValueChanged_revoker valueChanged;
     bt::BluetoothLEDevice::ConnectionStatusChanged_revoker connectionChanged;
     bt::BluetoothLEDevice device{nullptr};
@@ -912,7 +915,7 @@ class BluetoothLEPacketClient::Impl
     gatt::GattCharacteristic statusCharacteristic{nullptr};
     {
       std::scoped_lock lock{m_gattMutex};
-      if (requireGeneration && m_gattGeneration != generation) {
+      if (m_gattGeneration != generation) {
         return;
       }
       valueChanged = std::move(m_valueChanged);
@@ -934,13 +937,12 @@ class BluetoothLEPacketClient::Impl
     FailGeneration(error, m_connectGeneration.load(std::memory_order_acquire));
   }
 
-  void SetError(std::string_view error) {
+  void SetRequestError(std::string_view error) {
     UpdateStatus([&](auto& status) {
       status.error = error;
-      status.status = error;
-      status.connecting = false;
-      status.connected = false;
-      status.transport = BluetoothPacketTransport::NONE;
+      if (!status.connecting && !status.connected) {
+        status.status = error;
+      }
     });
   }
 
@@ -999,7 +1001,6 @@ class BluetoothLEPacketClient::Impl
 
   std::atomic_bool m_cancelConnect{false};
   std::atomic<uint64_t> m_connectGeneration{0};
-  std::thread m_connectThread;
 };
 
 std::shared_ptr<BluetoothLEPacketClient> BluetoothLEPacketClient::Create(
@@ -1019,7 +1020,7 @@ BluetoothLEPacketClient::BluetoothLEPacketClient(std::shared_ptr<Impl> impl)
 
 BluetoothLEPacketClient::~BluetoothLEPacketClient() {
   if (m_impl) {
-    m_impl->Disconnect({});
+    m_impl->ResetConnection();
   }
 }
 

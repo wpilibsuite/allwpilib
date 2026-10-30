@@ -25,6 +25,7 @@ struct Connection {
   int socket;
   int peer;
   bool gatt = false;
+  uint8_t addressLastByte = 0;
 };
 
 struct BluetoothAddress {
@@ -67,7 +68,11 @@ extern "C" int connect(int fd, const sockaddr* address, socklen_t size) {
   }
   connections.back().gatt =
       reinterpret_cast<const BluetoothAddress*>(address)->cid == 4;
-  if (scenario.starts_with("send-") || scenario.starts_with("destroy-")) {
+  connections.back().addressLastByte =
+      reinterpret_cast<const BluetoothAddress*>(address)->address[0];
+  if (scenario.starts_with("send-") || scenario.starts_with("destroy-") ||
+      scenario.starts_with("overtake-") || scenario.starts_with("invalid-") ||
+      scenario.starts_with("receive-") || scenario.starts_with("disconnect-")) {
     return 0;
   }
   errno = scenario.ends_with("fallback") && connections.size() == 1
@@ -212,6 +217,234 @@ static int RunSendRegression() {
   return passed ? 0 : 1;
 }
 
+static int RunReceiveRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  std::vector<uint8_t> received;
+  int callbacks = 0;
+  auto client = BluetoothLEPacketClient::Create(*loop, [&](auto packet) {
+    ++callbacks;
+    received.assign(packet.begin(), packet.end());
+  });
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.psm = 0x81;
+  config.maxPacketSize = 4;
+  client->Connect(config);
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  bool passed = client->GetStatus().connected && connections.size() == 1;
+  bool oversized = scenario == "receive-oversize";
+  const uint8_t packet[] = {1, 2, 3, 4, 5, 6};
+  send(connections.back().peer, packet, oversized ? 6 : 4, MSG_NOSIGNAL);
+  for (int i = 0; i < 3; ++i) {
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+  }
+  auto status = client->GetStatus();
+  if (oversized) {
+    passed &= callbacks == 0 && status.packetsReceived == 0 &&
+              !status.connected && !status.error.empty();
+  } else {
+    passed &= callbacks == 1 && status.packetsReceived == 1 &&
+              status.connected &&
+              received == std::vector<uint8_t>(packet, packet + 4);
+  }
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
+static int RunEmptyDisconnectRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  std::vector<BluetoothLEPacketConnectionStatus> statuses;
+  auto client = BluetoothLEPacketClient::Create(
+      *loop, [](auto) {},
+      [&](const auto& status) { statuses.push_back(status); });
+  BluetoothLEPacketClientConfig config;
+  config.address = "AA:BB:CC:DD:EE:01";
+  config.psm = 0x81;
+  auto starter = uv::Timer::Create(loop);
+  bool passed = true;
+  starter->timeout.connect([&] {
+    client->Connect(config);
+    passed &= client->GetStatus().connected && connections.size() == 1;
+    statuses.clear();
+    if (scenario == "disconnect-empty-thread") {
+      std::thread worker{[&] { client->Disconnect(""); }};
+      worker.join();
+    } else {
+      client->Disconnect("");
+    }
+    starter->Close();
+  });
+  starter->Start(uv::Timer::Time{0});
+  for (int i = 0; i < 3; ++i) {
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+  }
+  auto status = client->GetStatus();
+  const uint8_t packet[] = {0x12};
+  passed &= !status.connected && !status.connecting && status.status.empty() &&
+            status.transport == BluetoothPacketTransport::NONE &&
+            !client->Send(packet) && statuses.size() == 1 &&
+            statuses.back().status.empty() && !statuses.back().connected;
+  uint8_t received[32];
+  passed &= recv(connections.back().peer, received, sizeof(received), 0) == 0;
+  statuses.clear();
+  client.reset();
+  for (int i = 0; i < 3; ++i) {
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+  }
+  passed &= statuses.empty() && !loop->IsAlive();
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
+static int RunRejectedConfigRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  std::vector<uint8_t> received;
+  auto client = BluetoothLEPacketClient::Create(*loop, [&](auto packet) {
+    received.assign(packet.begin(), packet.end());
+  });
+  auto timer = uv::Timer::Create(loop);
+  bool passed = true;
+  const uint8_t packet[] = {0x12, 0x34};
+  timer->timeout.connect([&] {
+    BluetoothLEPacketClientConfig config;
+    config.address = "AA:BB:CC:DD:EE:01";
+    config.psm = 0x81;
+    client->Connect(config);
+    auto reject = [&] {
+      passed &= !client->Connect({});
+      config.psm = 0;
+      passed &= !client->Connect(config);
+    };
+    if (scenario == "invalid-config-thread") {
+      std::thread worker{reject};
+      worker.join();
+    } else {
+      reject();
+    }
+    auto status = client->GetStatus();
+    passed &= status.connected && !status.connecting &&
+              status.transport == BluetoothPacketTransport::L2CAP &&
+              status.targetAddress == config.address && !status.error.empty();
+    passed &= client->Send(packet);
+    send(connections.back().peer, packet, sizeof(packet), MSG_NOSIGNAL);
+    timer->Close();
+  });
+  timer->Start(uv::Timer::Time{0});
+  auto deadline = uv::Timer::Create(loop);
+  deadline->timeout.connect([&] { loop->Stop(); });
+  deadline->Start(uv::Timer::Time{50});
+  loop->Run();
+  passed &=
+      connections.size() == 1 && client->GetStatus().connected &&
+      received == std::vector<uint8_t>(std::begin(packet), std::end(packet));
+  uint8_t sent[2];
+  passed &= recv(connections.back().peer, sent, sizeof(sent), 0) == 2 &&
+            std::equal(std::begin(packet), std::end(packet), sent);
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
+static int RunRequestOrderRegression() {
+  using namespace wpi::net;
+  auto loop = uv::Loop::Create();
+  auto client = BluetoothLEPacketClient::Create(*loop, [](auto) {});
+  auto timer = uv::Timer::Create(loop);
+  bool cancel = scenario == "overtake-connect-cancel";
+  bool disconnect = scenario == "overtake-disconnect";
+  timer->timeout.connect([&] {
+    BluetoothLEPacketClientConfig config;
+    config.address = "AA:BB:CC:DD:EE:01";
+    config.psm = 0x81;
+    if (disconnect) {
+      client->Connect(config);
+    }
+    // The caller queues its request while the loop is still in this callback.
+    std::thread worker{[&] {
+      if (disconnect) {
+        client->Disconnect("Old disconnect");
+      } else {
+        client->Connect(config);
+      }
+    }};
+    worker.join();
+    if (cancel) {
+      client->Disconnect("Cancelled");
+    } else {
+      config.address = "AA:BB:CC:DD:EE:02";
+      client->Connect(config);
+    }
+    timer->Close();
+  });
+  timer->Start(uv::Timer::Time{0});
+  for (int i = 0; i < 3; ++i) {
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+  }
+  auto status = client->GetStatus();
+  bool passed;
+  if (cancel) {
+    passed = connections.empty() && !status.connecting && !status.connected &&
+             status.status == "Cancelled";
+  } else {
+    passed = connections.size() == (disconnect ? 2u : 1u) &&
+             connections.back().addressLastByte == 2 && status.connected &&
+             status.targetAddress == "AA:BB:CC:DD:EE:02";
+    const uint8_t packet[] = {0x12, 0x34};
+    passed &= client->Send(packet);
+    loop->Run(uv::Loop::Mode::NO_WAIT);
+    uint8_t received[2];
+    passed &=
+        recv(connections.back().peer, received, sizeof(received), 0) == 2 &&
+        std::equal(std::begin(packet), std::end(packet), received);
+  }
+  client.reset();
+  loop->Run(uv::Loop::Mode::NO_WAIT);
+  loop->Walk([](auto& handle) {
+    if (!handle.IsClosing()) {
+      handle.Close();
+    }
+  });
+  loop->Run();
+  for (auto& connection : connections) {
+    close(connection.peer);
+  }
+  std::printf("%s: passed=%d\n", scenario.c_str(), passed);
+  return passed ? 0 : 1;
+}
+
 static int RunTeardownRegression() {
   using namespace wpi::net;
   auto loop = uv::Loop::Create();
@@ -260,6 +493,18 @@ static int RunTeardownRegression() {
 int main(int argc, char** argv) {
   using namespace wpi::net;
   scenario = argc > 1 ? argv[1] : "cancel-l2cap";
+  if (scenario.starts_with("receive-")) {
+    return RunReceiveRegression();
+  }
+  if (scenario.starts_with("disconnect-")) {
+    return RunEmptyDisconnectRegression();
+  }
+  if (scenario.starts_with("invalid-")) {
+    return RunRejectedConfigRegression();
+  }
+  if (scenario.starts_with("overtake-")) {
+    return RunRequestOrderRegression();
+  }
   if (scenario.starts_with("send-")) {
     return RunSendRegression();
   }
