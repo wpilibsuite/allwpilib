@@ -7,8 +7,8 @@
 #include "wpi/math/geometry/proto/Pose2dProto.hpp"
 #include "wpi/math/kinematics/proto/ChassisAccelerationsProto.hpp"
 #include "wpi/math/kinematics/proto/ChassisVelocitiesProto.hpp"
-#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpi/math/protobuf/trajectory.npb.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<wpi::math::HolonomicSample>
 wpi::util::Protobuf<wpi::math::HolonomicSample>::Unpack(InputStream& stream) {

@@ -6,9 +6,9 @@
 
 #include "pb.h"
 #include "wpi/math/controller/SimpleMotorFeedforward.hpp"
+#include "wpi/math/protobuf/controller.npb.h"
 #include "wpi/units/length.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpi/math/protobuf/controller.npb.h"
 
 // Everything is converted into units for
 // wpi::math::SimpleMotorFeedforward<wpi::units::meters> or

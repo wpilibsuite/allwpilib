@@ -5,9 +5,9 @@
 #pragma once
 
 #include "wpi/math/kinematics/SwerveModulePosition.hpp"
+#include "wpi/math/protobuf/kinematics.npb.h"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpi/math/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::SwerveModulePosition> {

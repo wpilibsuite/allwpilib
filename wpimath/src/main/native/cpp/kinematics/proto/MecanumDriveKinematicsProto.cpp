@@ -4,8 +4,8 @@
 
 #include "wpi/math/kinematics/proto/MecanumDriveKinematicsProto.hpp"
 
-#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpi/math/protobuf/kinematics.npb.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<wpi::math::MecanumDriveKinematics> wpi::util::Protobuf<
     wpi::math::MecanumDriveKinematics>::Unpack(InputStream& stream) {

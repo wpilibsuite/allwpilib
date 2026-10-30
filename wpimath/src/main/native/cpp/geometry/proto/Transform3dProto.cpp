@@ -4,8 +4,8 @@
 
 #include "wpi/math/geometry/proto/Transform3dProto.hpp"
 
-#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 #include "wpi/math/protobuf/geometry3d.npb.h"
+#include "wpi/util/protobuf/ProtobufCallbacks.hpp"
 
 std::optional<wpi::math::Transform3d>
 wpi::util::Protobuf<wpi::math::Transform3d>::Unpack(InputStream& stream) {
