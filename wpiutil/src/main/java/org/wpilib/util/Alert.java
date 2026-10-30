@@ -74,6 +74,18 @@ public class Alert implements AutoCloseable {
   private int m_handle;
 
   /**
+   * Creates a new alert in the default group - "Alerts". The text is also used as the alert
+   * identifier.
+   *
+   * @param text Text to be displayed when the alert is active. This should be unique within the
+   *     group.
+   * @param level Alert urgency level.
+   */
+  public Alert(String text, Level level) {
+    this("Alerts", text, text, level);
+  }
+
+  /**
    * Creates a new alert in the default group - "Alerts".
    *
    * @param id Alert identifier. This should be unique within the group.
