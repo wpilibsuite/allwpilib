@@ -117,3 +117,23 @@ TEST_CASE("LTVDifferentialDriveControllerTest ReachesReference", "[wpimath]") {
                                            robotPose.Rotation().Radians()),
                    0_rad, ANGULAR_TOLERANCE);
 }
+
+TEST_CASE(
+    "LTVDifferentialDriveControllerTest NoTurnFromLateralErrorAtStandstill",
+    "[wpimath]") {
+  constexpr wpi::units::second_t DT = 20_ms;
+
+  wpi::math::LTVDifferentialDriveController controller{
+      plant, TRACKWIDTH, {0.0625, 0.125, 2.5, 0.95, 0.95}, {12.0, 12.0}, DT};
+
+  // Lateral error can't be corrected while stopped, so the controller
+  // shouldn't turn in place in response to it
+  for (auto velocity : {-1e-6_mps, 0_mps, 1e-6_mps}) {
+    auto [leftVoltage, rightVoltage] = controller.Calculate(
+        wpi::math::Pose2d{0_m, 0_m, 0_rad}, velocity, velocity,
+        wpi::math::Pose2d{0_m, 0.1_m, 0_rad}, velocity, velocity);
+
+    CHECK_NEAR_UNITS(leftVoltage, 0_V, 1e-3_V);
+    CHECK_NEAR_UNITS(rightVoltage, 0_V, 1e-3_V);
+  }
+}
