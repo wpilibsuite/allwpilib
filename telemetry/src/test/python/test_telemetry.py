@@ -1,5 +1,6 @@
 import array
 import dataclasses
+import json
 
 import pytest
 
@@ -96,6 +97,43 @@ class RecordingTelemetryBackend(telemetry.TelemetryBackend):
 
     def add_schema(self, schema_name: str, type_string: str, schema) -> None:
         self.schemas[schema_name] = (type_string, schema)
+
+
+@pytest.mark.parametrize("table_path", [None, "drive/motor"])
+@pytest.mark.parametrize("value", [2.5, 3])
+@pytest.mark.parametrize("unit", ["m/s", 'a"b\\c\n', "°/s", ""])
+def test_log_unit_metadata_before_double(backend, table_path, value, unit):
+    logger = telemetry if table_path is None else telemetry.get_table(table_path)
+    logger.log_unit("speed", value, unit)
+
+    path = "/speed" if table_path is None else f"/{table_path}/speed"
+    actions = backend.get_actions()
+    assert len(actions) == 2
+    assert actions[0].path == path
+    assert isinstance(actions[0].value, mock_backend.SetPropertyValue)
+    assert actions[0].value.key == "unit"
+    assert json.loads(actions[0].value.value) == unit
+    assert actions[1].path == path
+    assert type(actions[1].value) is float
+    assert actions[1].value == value
+
+
+def test_log_unit_updates_metadata(backend):
+    table = telemetry.get_table("drive")
+    table.log_unit("speed", 2.5, "m/s")
+    table.log_unit("speed", 3.5, "m/s")
+    table.log_unit("speed", 4.5, "ft/s")
+
+    actions = backend.get_actions()
+    assert len(actions) == 6
+    assert all(action.path == "/drive/speed" for action in actions)
+    assert [action.value.key for action in actions[::2]] == ["unit"] * 3
+    assert [json.loads(action.value.value) for action in actions[::2]] == [
+        "m/s",
+        "m/s",
+        "ft/s",
+    ]
+    assert [action.value for action in actions[1::2]] == [2.5, 3.5, 4.5]
 
 
 def test_mock_backend_optional_results_are_none():

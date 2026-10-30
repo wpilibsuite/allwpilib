@@ -33,6 +33,18 @@ void Log(std::string_view name, pybind11::object value,
          std::string_view typeString = "");
 
 /**
+ * Logs a double value with unit metadata to the root table.
+ *
+ * Sets the JSON-encoded "unit" property before logging the value.
+ * No unit conversion is performed.
+ *
+ * @param name entry name
+ * @param value value in the given unit
+ * @param unit unit symbol (for example, "m/s")
+ */
+void LogUnit(std::string_view name, double value, std::string_view unit);
+
+/**
  * Indicates duplicate values should be preserved. Normally duplicate values
  * are ignored.
  *
