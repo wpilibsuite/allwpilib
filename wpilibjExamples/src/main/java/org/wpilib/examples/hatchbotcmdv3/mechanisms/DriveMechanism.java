@@ -16,14 +16,14 @@ import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveMechanism implements Mechanism, TelemetryLoggable {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
+  private final PWMSparkMax left1 = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
+  private final PWMSparkMax right1 = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =
-      new DifferentialDrive(leftLeader::setThrottle, rightLeader::setThrottle);
+      new DifferentialDrive(left1::setThrottle, right1::setThrottle);
 
   // The left-side drive encoder
   private final Encoder leftEncoder =
@@ -44,7 +44,7 @@ public class DriveMechanism implements Mechanism, TelemetryLoggable {
     // We need to invert one side of the drivetrain so that positive voltages
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
-    rightLeader.setInverted(true);
+    right1.setInverted(true);
 
     // Sets the distance per pulse for the encoders
     leftEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
