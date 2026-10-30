@@ -27,6 +27,97 @@ class DynamicStructTest {
   std::string err;
 };
 
+TEST_CASE_METHOD(DynamicStructTest,
+                 "DynamicStructTest SignedBitfieldLiteralBytes",
+                 "[wpiutil][struct]") {
+  // Literal wire data ensures writer and reader bugs cannot cancel each other.
+  struct TestCase {
+    const char* schema;
+    std::vector<uint8_t> bytes;
+    int64_t expected;
+  };
+  TestCase cases[] = {
+      {"int16 value:3", {0x04, 0x00}, -4},
+      {"int16 value:3", {0x07, 0x00}, -1},
+      {"int16 value:3", {0x03, 0x00}, 3},
+      {"int8 value:1", {0x00}, 0},
+      {"int8 value:1", {0x01}, -1},
+      {"int8 value:3", {0x04}, -4},
+      {"int32 value:3", {0x07, 0x00, 0x00, 0x00}, -1},
+      {"int64 value:3", {0x04, 0, 0, 0, 0, 0, 0, 0}, -4},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0xf3, 0xff}, -4},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0x1c, 0x00}, -1},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0xef, 0xff}, 3},
+      {"int64 value:63", {0, 0, 0, 0, 0, 0, 0, 0x40}, -4611686018427387904LL},
+      {"int64 value:63", {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}, -1},
+      {"int64 value:63",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f},
+       4611686018427387903LL},
+      {"uint64 before:1; int64 value:63",
+       {1, 0, 0, 0, 0, 0, 0, 0x80},
+       -4611686018427387904LL},
+      {"int64 value:64",
+       {0, 0, 0, 0, 0, 0, 0, 0x80},
+       std::numeric_limits<int64_t>::min()},
+      {"int64 value:64", {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, -1},
+      {"int64 value:64",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f},
+       std::numeric_limits<int64_t>::max()},
+      {"int8 value", {0x80}, -128},
+      {"int16 value", {0, 0x80}, -32768},
+      {"int32 value", {0, 0, 0, 0x80}, -2147483648LL},
+      {"int64 value",
+       {0, 0, 0, 0, 0, 0, 0, 0x80},
+       std::numeric_limits<int64_t>::min()},
+  };
+  for (auto& test : cases) {
+    CAPTURE(test.schema, test.bytes);
+    auto desc = db.Add("test", test.schema, &err);
+    REQUIRE(desc);
+    REQUIRE(desc->IsValid());
+    REQUIRE(desc->GetSize() == test.bytes.size());
+    auto field = desc->FindFieldByName("value");
+    REQUIRE(field);
+    DynamicStruct value{desc, test.bytes};
+    CHECK(value.GetIntField(field) == test.expected);
+    MutableDynamicStruct mutableValue{desc, test.bytes};
+    CHECK(mutableValue.GetIntField(field) == test.expected);
+  }
+}
+
+TEST_CASE_METHOD(DynamicStructTest,
+                 "DynamicStructTest UnsignedBitfieldLiteralBytes",
+                 "[wpiutil][struct]") {
+  struct TestCase {
+    const char* schema;
+    std::vector<uint8_t> bytes;
+    uint64_t expected;
+  };
+  const TestCase cases[] = {
+      {"uint8 value:1", {0x01}, 1},
+      {"uint16 value:3", {0x07, 0x00}, 7},
+      {"uint32 before:2; uint32 value:3; uint32 after:27",
+       {0xff, 0xff, 0xff, 0xff},
+       7},
+      {"uint64 value:63",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+       9223372036854775807ULL},
+      {"uint64 value:64",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+       std::numeric_limits<uint64_t>::max()},
+  };
+  for (auto& test : cases) {
+    CAPTURE(test.schema);
+    auto desc = db.Add("test", test.schema, &err);
+    REQUIRE(desc);
+    REQUIRE(desc->IsValid());
+    auto field = desc->FindFieldByName("value");
+    REQUIRE(field);
+    DynamicStruct value{desc, test.bytes};
+    CHECK(value.GetUintField(field) == test.expected);
+  }
+}
+
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Empty",
                  "[wpiutil][struct]") {
   auto desc = db.Add("test", "", &err);
