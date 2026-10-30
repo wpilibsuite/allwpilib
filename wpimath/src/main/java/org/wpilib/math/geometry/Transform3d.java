@@ -9,9 +9,9 @@ import static org.wpilib.units.Units.Meters;
 import java.util.Objects;
 import org.wpilib.math.geometry.proto.Transform3dProto;
 import org.wpilib.math.geometry.struct.Transform3dStruct;
-import org.wpilib.math.jni.Transform3dJNI;
 import org.wpilib.math.linalg.MatBuilder;
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N4;
 import org.wpilib.math.util.Nat;
 import org.wpilib.units.measure.Distance;
@@ -264,23 +264,49 @@ public final class Transform3d implements ProtobufSerializable, StructSerializab
    * @return The twist that maps the current transform.
    */
   public Twist3d log() {
-    var thisQuaternion = m_rotation.getQuaternion();
-    double[] resultArray =
-        Transform3dJNI.log(
-            this.getX(),
-            this.getY(),
-            this.getZ(),
-            thisQuaternion.getW(),
-            thisQuaternion.getX(),
-            thisQuaternion.getY(),
-            thisQuaternion.getZ());
+    // Implementation from Section 3.2 of https://ethaneade.org/lie.pdf
+
+    var u = VecBuilder.fill(m_translation.getX(), m_translation.getY(), m_translation.getZ());
+    var rvec = m_rotation.toVector();
+    var omega = GeometryUtil.rotationVectorToMatrix(rvec);
+    var omegaSq = omega.times(omega);
+    double theta = rvec.norm();
+    double thetaSq = theta * theta;
+
+    double C;
+    if (Math.abs(theta) < 1E-7) {
+      // Taylor Expansions around θ = 0
+      // A = 1/1! - θ²/3! + θ⁴/5!
+      // B = 1/2! - θ²/4! + θ⁴/6!
+      // C = 1/6 * (1/2 + θ²/5! + θ⁴/7!)
+      // sources:
+      // A:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D+at+x%3D0
+      // B:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+      // C:
+      // https://www.wolframalpha.com/input?i2d=true&i=series+expansion+of+Divide%5B1-Divide%5BDivide%5Bsin%5C%2840%29x%5C%2841%29%2Cx%5D%2C2Divide%5B1-cos%5C%2840%29x%5C%2841%29%2CPower%5Bx%2C2%5D%5D%5D%2CPower%5Bx%2C2%5D%5D+at+x%3D0
+      C = 1 / 12.0 + thetaSq / 720 + thetaSq * thetaSq / 30240;
+    } else {
+      // A = sinθ/θ
+      // B = (1 - cosθ)/θ²
+      // C = (1 - A/(2B))/θ²
+      double A = Math.sin(theta) / theta;
+      double B = (1 - Math.cos(theta)) / thetaSq;
+      C = (1 - A / (2 * B)) / thetaSq;
+    }
+
+    var V_inv = Matrix.eye(Nat.N3()).minus(omega.times(0.5)).plus(omegaSq.times(C));
+
+    var translation_component = V_inv.times(u);
+
     return new Twist3d(
-        resultArray[0],
-        resultArray[1],
-        resultArray[2],
-        resultArray[3],
-        resultArray[4],
-        resultArray[5]);
+        translation_component.get(0, 0),
+        translation_component.get(1, 0),
+        translation_component.get(2, 0),
+        rvec.get(0, 0),
+        rvec.get(1, 0),
+        rvec.get(2, 0));
   }
 
   /**
