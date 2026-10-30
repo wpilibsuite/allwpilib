@@ -100,6 +100,19 @@ public final class Rotation3d
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
    *
+   * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
+   * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
+   *
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
+   *
+   * <pre>{@code
+   * var r = new Rotation3d(roll, 0, 0);
+   * var p = new Rotation3d(0, pitch, 0);
+   * var y = new Rotation3d(0, 0, yaw);
+   * var rotation = y.rotateBy(p).rotateBy(r);
+   * }</pre>
+   *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the
    * direction of positive rotation.
@@ -132,6 +145,19 @@ public final class Rotation3d
    *
    * <p>Extrinsic rotations occur in that order around the axes in the fixed global frame rather
    * than the body frame.
+   *
+   * <p>Intrinsic rotations applied in the order yaw, then pitch, then roll are equivalent to these
+   * extrinsic rotations, so they can be passed to this constructor unchanged as (roll, pitch, yaw).
+   *
+   * <p>Intrinsic rotations applied in the order roll, then pitch, then yaw cannot be passed
+   * directly. Instead, construct the rotation by composing single-axis rotations:
+   *
+   * <pre>{@code
+   * var r = new Rotation3d(roll, Radians.zero(), Radians.zero());
+   * var p = new Rotation3d(Radians.zero(), pitch, Radians.zero());
+   * var y = new Rotation3d(Radians.zero(), Radians.zero(), yaw);
+   * var rotation = y.rotateBy(p).rotateBy(r);
+   * }</pre>
    *
    * <p>Angles are measured counterclockwise with the rotation axis pointing "out of the page". If
    * you point your right thumb along the positive axis direction, your fingers curl in the
