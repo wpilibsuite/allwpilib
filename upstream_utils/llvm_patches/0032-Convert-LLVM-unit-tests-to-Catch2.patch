@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Johnson <johnson.peter@gmail.com>
 Date: Sat, 1 Aug 2026 17:02:07 -0700
-Subject: [PATCH 32/32] Convert LLVM unit tests to Catch2
+Subject: [PATCH 32/34] Convert LLVM unit tests to Catch2
 
 ---
  llvm/unittests/ADT/DenseMapTest.cpp         | 190 ++++----
