@@ -4,7 +4,6 @@
 
 #include <jni.h>
 
-#include <Eigen/Cholesky>
 #include <Eigen/Core>
 #include <unsupported/Eigen/MatrixFunctions>
 
@@ -54,32 +53,6 @@ Java_org_wpilib_math_jni_EigenJNI_pow
       Amat.pow(exponent);
 
   env->SetDoubleArrayRegion(dst, 0, rows * rows, Apow.data());
-}
-
-/*
- * Class:     org_wpilib_math_jni_EigenJNI
- * Method:    rankUpdate
- * Signature: ([DI[DDZ)V
- */
-JNIEXPORT void JNICALL
-Java_org_wpilib_math_jni_EigenJNI_rankUpdate
-  (JNIEnv* env, jclass, jdoubleArray mat, jint rows, jdoubleArray vec,
-   jdouble sigma, jboolean lowerTriangular)
-{
-  JSpan<jdouble> matBody{env, mat};
-  JSpan<const jdouble> vecBody{env, vec};
-
-  Eigen::Map<
-      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>
-      L{matBody.data(), rows, rows};
-  Eigen::Map<const Eigen::Vector<double, Eigen::Dynamic>> v{vecBody.data(),
-                                                            rows};
-
-  if (lowerTriangular == JNI_TRUE) {
-    Eigen::internal::llt_inplace<double, Eigen::Lower>::rankUpdate(L, v, sigma);
-  } else {
-    Eigen::internal::llt_inplace<double, Eigen::Upper>::rankUpdate(L, v, sigma);
-  }
 }
 
 }  // extern "C"
