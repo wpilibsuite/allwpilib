@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/tunables/CustomTunable.hpp"
 #include "wpi/tunables/detail/TunableBase.hpp"
 #include "wpi/tunables/detail/TunableMember.hpp"
 #include "wpi/tunables/detail/TunableTypeTraits.hpp"
