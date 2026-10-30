@@ -8,7 +8,7 @@
 
 #include "wpi/math/trajectory/proto/HolonomicSampleProto.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpi/math/protobuf/trajectory.npb.h"
 
 std::optional<wpi::math::HolonomicTrajectory> wpi::util::Protobuf<
     wpi::math::HolonomicTrajectory>::Unpack(InputStream& stream) {

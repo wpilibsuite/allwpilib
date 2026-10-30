@@ -8,7 +8,7 @@
 #include "wpi/math/kinematics/proto/ChassisAccelerationsProto.hpp"
 #include "wpi/math/kinematics/proto/ChassisVelocitiesProto.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpi/math/protobuf/trajectory.npb.h"
 
 std::optional<wpi::math::DifferentialSample> wpi::util::Protobuf<
     wpi::math::DifferentialSample>::Unpack(InputStream& stream) {

@@ -8,7 +8,7 @@
 #include "wpi/math/controller/ArmFeedforward.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpi/math/protobuf/controller.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::ArmFeedforward> {

@@ -15,14 +15,14 @@ load("//wpimath:robotpy_pybind_build_info.bzl", "define_pybind_library", "publis
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/cpp/wpimath/protobuf/*.h"]),
+    srcs = glob(["src/generated/main/native/cpp/wpi/math/protobuf/*.h"]),
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/cpp/wpimath/protobuf/*.h",
+        "src/generated/main/native/cpp/wpi/math/protobuf/*.h",
         "src/main/native/include/**/*",
         "src/main/native/thirdparty/gcem/include/**/*",
         "src/main/native/thirdparty/sleipnir/include/**/*",

@@ -8,7 +8,7 @@
 #include "wpi/math/trajectory/HolonomicTrajectory.hpp"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/trajectory.npb.h"
+#include "wpi/math/protobuf/trajectory.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::HolonomicTrajectory> {

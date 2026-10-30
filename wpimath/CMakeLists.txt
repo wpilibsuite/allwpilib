@@ -26,7 +26,7 @@ file(GLOB_RECURSE sleipnir_native_src src/main/native/thirdparty/sleipnir/src/*.
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS FALSE)
 
-file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpimath/protobuf/*.cpp)
+file(GLOB_RECURSE wpimath_protobuf_native_src src/generated/main/native/cpp/wpi/math/protobuf/*.cpp)
 
 add_library(protobuf OBJECT ${wpimath_protobuf_native_src})
 target_link_libraries(protobuf wpiutil)

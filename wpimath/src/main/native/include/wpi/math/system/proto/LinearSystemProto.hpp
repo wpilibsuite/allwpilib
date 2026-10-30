@@ -10,7 +10,7 @@
 #include "wpi/math/system/LinearSystem.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/system.npb.h"
+#include "wpi/math/protobuf/system.npb.h"
 
 template <int States, int Inputs, int Outputs>
 struct wpi::util::Protobuf<wpi::math::LinearSystem<States, Inputs, Outputs>> {

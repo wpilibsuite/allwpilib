@@ -4,7 +4,7 @@
 
 #include "wpi/math/kinematics/proto/DifferentialDriveWheelVelocitiesProto.hpp"
 
-#include "wpimath/protobuf/kinematics.npb.h"
+#include "wpi/math/protobuf/kinematics.npb.h"
 
 std::optional<wpi::math::DifferentialDriveWheelVelocities> wpi::util::Protobuf<
     wpi::math::DifferentialDriveWheelVelocities>::Unpack(InputStream& stream) {
