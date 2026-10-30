@@ -88,8 +88,9 @@ static inline uint64_t ToBitMask(size_t size, unsigned int bitWidth) {
 
 StructFieldDescriptor::StructFieldDescriptor(
     const StructDescriptor* parent, std::string_view name, StructFieldType type,
-    size_t size, size_t arraySize, unsigned int bitWidth, EnumValues enumValues,
-    const StructDescriptor* structDesc, const private_init&)
+    size_t size, size_t arraySize, bool isArray, unsigned int bitWidth,
+    EnumValues enumValues, const StructDescriptor* structDesc,
+    const private_init&)
     : m_parent{parent},
       m_name{name},
       m_size{size},
@@ -98,7 +99,8 @@ StructFieldDescriptor::StructFieldDescriptor(
       m_struct{structDesc},
       m_bitMask{ToBitMask(size, bitWidth)},
       m_type{type},
-      m_bitWidth{ToBitWidth(size, bitWidth)} {}
+      m_bitWidth{ToBitWidth(size, bitWidth)},
+      m_isArray{isArray} {}
 
 const StructFieldDescriptor* StructDescriptor::FindFieldByName(
     std::string_view name) const {
@@ -272,7 +274,7 @@ const StructDescriptor* StructDescriptorDatabase::Add(std::string_view name,
     }
 
     theStruct.m_fields.emplace_back(&theStruct, decl.name, type, size,
-                                    decl.arraySize, decl.bitWidth,
+                                    decl.arraySize, decl.isArray, decl.bitWidth,
                                     std::move(decl.enumValues), structDesc,
                                     StructFieldDescriptor::private_init{});
   }
