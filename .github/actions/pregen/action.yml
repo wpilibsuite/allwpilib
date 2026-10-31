@@ -57,7 +57,7 @@ runs:
       shell: bash
 
     - name: Regenerate fields
-      run: python fields/generate_fields.py
+      run: ./fields/generate_fields.py
       shell: bash
 
     - name: Regenerate wpiunits
