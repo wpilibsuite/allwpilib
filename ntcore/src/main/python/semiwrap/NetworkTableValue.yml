@@ -91,7 +91,7 @@ classes:
               auto b = py::bool_(v.data.arr_boolean.arr[i]);
               PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
             }
-            return std::move(l);
+            return l;
           }
       GetIntegerArray:
         cpp_code: |
