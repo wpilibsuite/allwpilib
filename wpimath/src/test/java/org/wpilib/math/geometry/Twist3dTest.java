@@ -6,10 +6,10 @@ package org.wpilib.math.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.util.Units;
 
 class Twist3dTest {
   @Test
@@ -46,7 +46,8 @@ class Twist3dTest {
     var quarterCircle = new Twist3d(5.0 / 2.0 * Math.PI, 0.0, 0.0, 0.0, 0.0, Math.PI / 2.0);
     var quarterCircleTransform = quarterCircle.exp();
 
-    var expected = new Transform3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, degreesToRadians(90.0)));
+    var expected =
+        new Transform3d(5.0, 5.0, 0.0, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
     assertEquals(expected, quarterCircleTransform);
   }
 
@@ -76,11 +77,13 @@ class Twist3dTest {
   @Test
   void testPose3dLogX() {
     final var start = Pose3d.ZERO;
-    final var end = new Pose3d(0.0, 5.0, 5.0, new Rotation3d(degreesToRadians(90.0), 0.0, 0.0));
+    final var end =
+        new Pose3d(0.0, 5.0, 5.0, new Rotation3d(Units.degreesToRadians(90.0), 0.0, 0.0));
 
     final var twist = end.minus(start).log();
 
-    var expected = new Twist3d(0.0, 5.0 / 2.0 * Math.PI, 0.0, degreesToRadians(90.0), 0.0, 0.0);
+    var expected =
+        new Twist3d(0.0, 5.0 / 2.0 * Math.PI, 0.0, Units.degreesToRadians(90.0), 0.0, 0.0);
     assertEquals(expected, twist);
 
     // Make sure computed twist gives back original end pose
@@ -91,7 +94,8 @@ class Twist3dTest {
   @Test
   void testPose3dLogY() {
     final var start = Pose3d.ZERO;
-    final var end = new Pose3d(5.0, 0.0, 5.0, new Rotation3d(0.0, degreesToRadians(90.0), 0.0));
+    final var end =
+        new Pose3d(5.0, 0.0, 5.0, new Rotation3d(0.0, Units.degreesToRadians(90.0), 0.0));
 
     final var twist = end.minus(start).log();
 
@@ -106,7 +110,8 @@ class Twist3dTest {
   @Test
   void testPose3dLogZ() {
     final var start = Pose3d.ZERO;
-    final var end = new Pose3d(5.0, 5.0, 0.0, new Rotation3d(0.0, 0.0, degreesToRadians(90.0)));
+    final var end =
+        new Pose3d(5.0, 5.0, 0.0, new Rotation3d(0.0, 0.0, Units.degreesToRadians(90.0)));
 
     final var twist = end.minus(start).log();
 

@@ -3,17 +3,20 @@ apply plugin: 'maven-publish'
 def baseExamplesArtifactId = 'examples'
 def baseTemplatesArtifactId = 'templates'
 def baseCommandsArtifactId = 'commands'
+def baseSnippetsArtifactId = 'snippets'
 def artifactGroupId = 'org.wpilib.wpilibc'
 
 def examplesZipBaseName = makeZipBaseName(artifactGroupId, baseExamplesArtifactId)
 def templatesZipBaseName = makeZipBaseName(artifactGroupId, baseTemplatesArtifactId)
 def commandsZipBaseName = makeZipBaseName(artifactGroupId, baseCommandsArtifactId)
+def snippetsZipBaseName = makeZipBaseName(artifactGroupId, baseSnippetsArtifactId)
 
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = examplesZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -31,6 +34,7 @@ task cppExamplesZip(type: Zip) {
 task cppTemplatesZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = templatesZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -48,6 +52,7 @@ task cppTemplatesZip(type: Zip) {
 task cppCommandsZip(type: Zip) {
     destinationDirectory = outputsFolder
     archiveBaseName = commandsZipBaseName
+    exclude '**/*.bazel'
 
     from(licenseFile) {
         into '/'
@@ -62,13 +67,32 @@ task cppCommandsZip(type: Zip) {
     }
 }
 
+task cppSnippetsZip(type: Zip) {
+    destinationDirectory = outputsFolder
+    archiveBaseName = snippetsZipBaseName
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/cpp/snippets') {
+        into 'snippets'
+    }
+
+    from('src/test/cpp/snippets') {
+        into 'snippets_test'
+    }
+}
+
 build.dependsOn cppTemplatesZip
 build.dependsOn cppExamplesZip
 build.dependsOn cppCommandsZip
+build.dependsOn cppSnippetsZip
 
 addTaskToCopyAllOutputs(cppTemplatesZip)
 addTaskToCopyAllOutputs(cppExamplesZip)
 addTaskToCopyAllOutputs(cppCommandsZip)
+addTaskToCopyAllOutputs(cppSnippetsZip)
 
 publishing {
     publications {
@@ -92,6 +116,14 @@ publishing {
             artifact cppCommandsZip
 
             artifactId = baseCommandsArtifactId
+            groupId = artifactGroupId
+            version = wpilibVersioning.version.get()
+        }
+
+        snippets(MavenPublication) {
+            artifact cppSnippetsZip
+
+            artifactId = baseSnippetsArtifactId
             groupId = artifactGroupId
             version = wpilibVersioning.version.get()
         }

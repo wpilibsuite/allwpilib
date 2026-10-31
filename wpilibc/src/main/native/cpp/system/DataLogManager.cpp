@@ -47,8 +47,9 @@ struct Thread final : public wpi::util::SafeThread {
   void StartConsoleLog();
   void StopConsoleLog();
   void CheckFreeSpace();
+  void CheckUsbStorage();
 
-  std::string m_logDir;
+  bool m_internalStorage;
   bool m_filenameOverride;
   wpi::log::DataLogBackgroundWriter m_log;
   bool m_ntLoggerEnabled = false;
@@ -77,6 +78,72 @@ struct Instance {
 // free space OR there are this many files remaining.
 static constexpr uintmax_t FREE_SPACE_THRESHOLD = 200000000;
 static constexpr int FILE_COUNT_THRESHOLD = 10;
+static constexpr uint64_t MAX_TRANSFER_SIZE = 10000000;
+
+static std::string FindUsbLogDir(std::string_view usbRoot) {
+  std::error_code ec;
+  auto s = fs::status(usbRoot, ec);
+  if (ec || !fs::is_directory(s) ||
+      (s.permissions() & fs::perms::others_write) == fs::perms::none) {
+    return {};
+  }
+  auto logDir = fs::path{usbRoot} / "logs";
+  fs::create_directory(logDir, ec);
+  if (ec) {
+    return {};
+  }
+  return logDir.string();
+}
+
+bool wpi::internal::TryTransferDataLogToUsb(
+    wpi::log::DataLogBackgroundWriter& log, std::string_view usbRoot) {
+  if (log.GetDir() == (fs::path{usbRoot} / "logs").string()) {
+    return true;
+  }
+  auto dir = FindUsbLogDir(usbRoot);
+  if (!dir.empty()) {
+    log.SetDir(dir, MAX_TRANSFER_SIZE);
+  }
+  return false;
+}
+
+static bool IsMatchLog(std::string_view filename) {
+  constexpr std::string_view EXTENSION = ".wpilog";
+  if (filename.size() < EXTENSION.size() ||
+      filename.substr(filename.size() - EXTENSION.size()) != EXTENSION) {
+    return false;
+  }
+
+  auto extensionIndex = filename.size() - EXTENSION.size();
+  auto matchTypeSeparator = filename.rfind('_', extensionIndex - 1);
+  if (matchTypeSeparator == std::string_view::npos ||
+      matchTypeSeparator + 2 >= extensionIndex) {
+    return false;
+  }
+
+  char matchType = filename[matchTypeSeparator + 1];
+  if (matchType != 'P' && matchType != 'Q' && matchType != 'E' &&
+      matchType != 'T') {
+    return false;
+  }
+  // Rotated logs have one numeric segment suffix, e.g. Q123.2.wpilog.
+  bool segmentFound = false;
+  for (size_t i = matchTypeSeparator + 2; i < extensionIndex; ++i) {
+    if (filename[i] == '.' && !segmentFound && i > matchTypeSeparator + 2 &&
+        i + 1 < extensionIndex) {
+      segmentFound = true;
+      continue;
+    }
+    if (filename[i] < '0' || filename[i] > '9') {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool wpi::internal::IsDataLogMatchLog(std::string_view filename) {
+  return IsMatchLog(filename);
+}
 
 static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
   if (!dir.empty()) {
@@ -84,14 +151,12 @@ static std::pair<std::string, bool> MakeLogDir(std::string_view dir) {
   }
 #ifdef __FIRST_SYSTEMCORE__
   // prefer a mounted USB drive if one is accessible
-  std::error_code ec;
-  auto s = fs::status("/u", ec);
-  if (!ec && fs::is_directory(s) &&
-      (s.permissions() & fs::perms::others_write) != fs::perms::none) {
-    fs::create_directory("/u/logs", ec);
+  auto usbDir = FindUsbLogDir("/u");
+  if (!usbDir.empty()) {
     wpi::util::ReportUsage("DataLogManager", "USB");
-    return {"/u/logs", false};
+    return {usbDir, false};
   }
+  std::error_code ec;
   fs::create_directory("/home/systemcore/logs", ec);
   wpi::util::ReportUsage("DataLogManager", "Onboard");
   return {"/home/systemcore/logs", true};
@@ -121,7 +186,7 @@ static std::string MakeLogFilename(std::string_view filenameOverride) {
 
 Thread::Thread(std::string_view dir, bool internalStorage,
                std::string_view filename, double period)
-    : m_logDir{dir},
+    : m_internalStorage{internalStorage},
       m_filenameOverride{!filename.empty()},
       m_log{dir, MakeLogFilename(filename), period},
       m_messageLog{m_log, "messages"} {
@@ -135,54 +200,62 @@ Thread::~Thread() {
   StopConsoleLog();
 }
 
+void wpi::internal::DeleteOldDataLogs(std::string_view logDir,
+                                      uintmax_t freeSpace) {
+  if (freeSpace >= FREE_SPACE_THRESHOLD) {
+    return;
+  }
+  std::error_code ec;
+  // Count all permanent logs toward the minimum, but only delete non-match
+  // logs.
+  std::vector<fs::directory_entry> entries;
+  for (auto&& entry : fs::directory_iterator{logDir, ec}) {
+    auto filename = entry.path().filename().string();
+    if (wpi::util::starts_with(filename, "WPILIB_") &&
+        entry.path().extension() == ".wpilog" &&
+        !wpi::util::starts_with(filename, "WPILIB_TBD_")) {
+      entries.emplace_back(entry);
+    }
+  }
+  std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
+    return a.last_write_time() < b.last_write_time();
+  });
+
+  int count = entries.size();
+  for (auto&& entry : entries) {
+    if (count <= FILE_COUNT_THRESHOLD) {
+      break;
+    }
+    if (wpi::internal::IsDataLogMatchLog(entry.path().filename().string())) {
+      continue;
+    }
+    auto size = entry.file_size();
+    if (fs::remove(entry.path(), ec)) {
+      --count;
+      WPILIB_ReportWarning("DataLogManager: Deleted {}", entry.path().string());
+      freeSpace += size;
+      if (freeSpace >= FREE_SPACE_THRESHOLD) {
+        break;
+      }
+    } else {
+      wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
+                       entry.path().string());
+    }
+  }
+}
+
 void Thread::Main() {
   // based on free disk space, scan for "old" WPILIB_*.wpilog files and remove
   {
     std::error_code ec;
     uintmax_t freeSpace;
-    auto freeSpaceInfo = fs::space(m_logDir, ec);
+    auto freeSpaceInfo = fs::space(m_log.GetDir(), ec);
     if (!ec) {
       freeSpace = freeSpaceInfo.available;
     } else {
       freeSpace = UINTMAX_MAX;
     }
-    if (freeSpace < FREE_SPACE_THRESHOLD) {
-      // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we
-      // just created one)
-      std::vector<fs::directory_entry> entries;
-      for (auto&& entry : fs::directory_iterator{m_logDir, ec}) {
-        auto stem = entry.path().stem().string();
-        if (wpi::util::starts_with(stem, "WPILIB_") &&
-            entry.path().extension() == ".wpilog" &&
-            !wpi::util::starts_with(stem, "WPILIB_TBD_")) {
-          entries.emplace_back(entry);
-        }
-      }
-      std::sort(entries.begin(), entries.end(),
-                [](const auto& a, const auto& b) {
-                  return a.last_write_time() < b.last_write_time();
-                });
-
-      int count = entries.size();
-      for (auto&& entry : entries) {
-        --count;
-        if (count < FILE_COUNT_THRESHOLD) {
-          break;
-        }
-        auto size = entry.file_size();
-        if (fs::remove(entry.path(), ec)) {
-          WPILIB_ReportWarning("DataLogManager: Deleted {}",
-                               entry.path().string());
-          freeSpace += size;
-          if (freeSpace >= FREE_SPACE_THRESHOLD) {
-            break;
-          }
-        } else {
-          wpi::util::print(stderr, "DataLogManager: could not delete {}\n",
-                           entry.path().string());
-        }
-      }
-    }
+    wpi::internal::DeleteOldDataLogs(m_log.GetDir(), freeSpace);
   }
   CheckFreeSpace();
   auto nextSpaceCheck =
@@ -212,6 +285,7 @@ void Thread::Main() {
     }
     auto spaceCheckTime = std::chrono::steady_clock::now();
     if (spaceCheckTime >= nextSpaceCheck) {
+      CheckUsbStorage();
       CheckFreeSpace();
       nextSpaceCheck = spaceCheckTime + std::chrono::seconds{5};
     }
@@ -276,7 +350,7 @@ void Thread::Main() {
               matchTypeChar = 'E';
               break;
             default:
-              matchTypeChar = '_';
+              matchTypeChar = 'T';
               break;
           }
           auto now = std::chrono::system_clock::now();
@@ -319,10 +393,19 @@ void wpi::internal::UpdateDataLogFreeSpaceAlert(wpi::util::Alert& alert,
 
 void Thread::CheckFreeSpace() {
   std::error_code ec;
-  auto space = fs::space(m_logDir, ec);
+  auto space = fs::space(m_log.GetDir(), ec);
   if (!ec) {
     wpi::internal::UpdateDataLogFreeSpaceAlert(m_freeSpaceAlert,
                                                space.available);
+  }
+}
+
+void Thread::CheckUsbStorage() {
+  if (m_internalStorage &&
+      wpi::internal::TryTransferDataLogToUsb(m_log, "/u")) {
+    m_internalStorage = false;
+    m_internalStorageAlert.Set(false);
+    wpi::util::ReportUsage("DataLogManager", "USB");
   }
 }
 
@@ -410,7 +493,7 @@ wpi::log::DataLog& DataLogManager::GetLog() {
 }
 
 std::string DataLogManager::GetLogDir() {
-  return GetInstance().owner.GetThread()->m_logDir;
+  return GetInstance().owner.GetThread()->m_log.GetDir();
 }
 
 void DataLogManager::LogNetworkTables(bool enabled) {

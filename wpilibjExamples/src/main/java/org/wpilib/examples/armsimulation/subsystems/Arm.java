@@ -4,14 +4,12 @@
 
 package org.wpilib.examples.armsimulation.subsystems;
 
-import static org.wpilib.math.util.UnitConversions.degreesToRadians;
-import static org.wpilib.math.util.UnitConversions.radiansToDegrees;
-
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.armsimulation.Constants;
 import org.wpilib.hardware.rotation.Encoder;
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.system.DCMotor;
+import org.wpilib.math.util.Units;
 import org.wpilib.preferences.Preferences;
 import org.wpilib.simulation.BatterySim;
 import org.wpilib.simulation.EncoderSim;
@@ -65,7 +63,11 @@ public class Arm implements AutoCloseable {
   private final MechanismLigament2d arm =
       armPivot.append(
           new MechanismLigament2d(
-              "Arm", 30, radiansToDegrees(armSim.getAngle()), 6, new Color8Bit(Color.YELLOW)));
+              "Arm",
+              30,
+              Units.radiansToDegrees(armSim.getAngle()),
+              6,
+              new Color8Bit(Color.YELLOW)));
 
   /** Subsystem constructor. */
   public Arm() {
@@ -94,7 +96,7 @@ public class Arm implements AutoCloseable {
         BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDraw()));
 
     // Update the Mechanism Arm angle based on the simulated arm angle
-    arm.setAngle(radiansToDegrees(armSim.getAngle()));
+    arm.setAngle(Units.radiansToDegrees(armSim.getAngle()));
 
     // Put Mechanism 2d to SmartDashboard
     Telemetry.log("Arm Sim", mech2d);
@@ -113,7 +115,7 @@ public class Arm implements AutoCloseable {
   /** Run the control loop to reach and maintain the setpoint from the preferences. */
   public void reachSetpoint() {
     var pidOutput =
-        controller.calculate(encoder.getDistance(), degreesToRadians(armSetpointDegrees));
+        controller.calculate(encoder.getDistance(), Units.degreesToRadians(armSetpointDegrees));
     motor.setVoltage(pidOutput);
   }
 

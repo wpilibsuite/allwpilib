@@ -10,28 +10,28 @@ import us.hebi.quickbuf.ProtoUtil;
 import us.hebi.quickbuf.RepeatedByte;
 
 public final class ProtobufShapeDescriptor {
-  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(887,
-    "Chx3cGltYXRoL3Byb3RvYnVmL3NoYXBlLnByb3RvEgl3cGkucHJvdG8aIXdwaW1hdGgvcHJvdG9idWYv" + 
-    "Z2VvbWV0cnkyZC5wcm90byJ4ChNQcm90b2J1ZlJlY3RhbmdsZTJkEjEKBmNlbnRlchgBIAEoCzIZLndw" + 
-    "aS5wcm90by5Qcm90b2J1ZlBvc2UyZFIGY2VudGVyEhYKBnhXaWR0aBgCIAEoAVIGeFdpZHRoEhYKBnlX" + 
-    "aWR0aBgDIAEoAVIGeVdpZHRoIoIBChFQcm90b2J1ZkVsbGlwc2UyZBIxCgZjZW50ZXIYASABKAsyGS53" + 
-    "cGkucHJvdG8uUHJvdG9idWZQb3NlMmRSBmNlbnRlchIcCgl4U2VtaUF4aXMYAiABKAFSCXhTZW1pQXhp" + 
-    "cxIcCgl5U2VtaUF4aXMYAyABKAFSCXlTZW1pQXhpc0I/CiJvcmcud3BpbGliLm1hdGguc2hhcGUucHJv" + 
-    "dG8uZGV0YWlsQhdQcm90b2J1ZlNoYXBlRGVzY3JpcHRvclABSuADCgYSBAAAFgEKCAoBDBIDAAASCggK" + 
-    "AQISAwIAEgoJCgIDABIDBAArCggKAQgSAwYAOwoJCgIIARIDBgA7CggKAQgSAwgAOAoJCgIICBIDCAA4" + 
-    "CggKAQgSAwoAIgoJCgIIChIDCgAiCgoKAgQAEgQMABABCgoKAwQAARIDDAgbCgsKBAQAAgASAw0CHAoM" + 
-    "CgUEAAIABhIDDQIQCgwKBQQAAgABEgMNERcKDAoFBAACAAMSAw0aGwoLCgQEAAIBEgMOAhQKDAoFBAAC" + 
-    "AQUSAw4CCAoMCgUEAAIBARIDDgkPCgwKBQQAAgEDEgMOEhMKCwoEBAACAhIDDwIUCgwKBQQAAgIFEgMP" + 
-    "AggKDAoFBAACAgESAw8JDwoMCgUEAAICAxIDDxITCgoKAgQBEgQSABYBCgoKAwQBARIDEggZCgsKBAQB" + 
-    "AgASAxMCHAoMCgUEAQIABhIDEwIQCgwKBQQBAgABEgMTERcKDAoFBAECAAMSAxMaGwoLCgQEAQIBEgMU" + 
-    "AhcKDAoFBAECAQUSAxQCCAoMCgUEAQIBARIDFAkSCgwKBQQBAgEDEgMUFRYKCwoEBAECAhIDFQIXCgwK" + 
-    "BQQBAgIFEgMVAggKDAoFBAECAgESAxUJEgoMCgUEAQICAxIDFRUWYgZwcm90bzM=");
+  private static final RepeatedByte descriptorData = ProtoUtil.decodeBase64(889,
+    "Ch13cGkvbWF0aC9wcm90b2J1Zi9zaGFwZS5wcm90bxIJd3BpLnByb3RvGiJ3cGkvbWF0aC9wcm90b2J1" + 
+    "Zi9nZW9tZXRyeTJkLnByb3RvIngKE1Byb3RvYnVmUmVjdGFuZ2xlMmQSMQoGY2VudGVyGAEgASgLMhku" + 
+    "d3BpLnByb3RvLlByb3RvYnVmUG9zZTJkUgZjZW50ZXISFgoGeFdpZHRoGAIgASgBUgZ4V2lkdGgSFgoG" + 
+    "eVdpZHRoGAMgASgBUgZ5V2lkdGgiggEKEVByb3RvYnVmRWxsaXBzZTJkEjEKBmNlbnRlchgBIAEoCzIZ" + 
+    "LndwaS5wcm90by5Qcm90b2J1ZlBvc2UyZFIGY2VudGVyEhwKCXhTZW1pQXhpcxgCIAEoAVIJeFNlbWlB" + 
+    "eGlzEhwKCXlTZW1pQXhpcxgDIAEoAVIJeVNlbWlBeGlzQj8KIm9yZy53cGlsaWIubWF0aC5zaGFwZS5w" + 
+    "cm90by5kZXRhaWxCF1Byb3RvYnVmU2hhcGVEZXNjcmlwdG9yUAFK4AMKBhIEAAAWAQoICgEMEgMAABIK" + 
+    "CAoBAhIDAgASCgkKAgMAEgMEACwKCAoBCBIDBgA7CgkKAggBEgMGADsKCAoBCBIDCAA4CgkKAggIEgMI" + 
+    "ADgKCAoBCBIDCgAiCgkKAggKEgMKACIKCgoCBAASBAwAEAEKCgoDBAABEgMMCBsKCwoEBAACABIDDQIc" + 
+    "CgwKBQQAAgAGEgMNAhAKDAoFBAACAAESAw0RFwoMCgUEAAIAAxIDDRobCgsKBAQAAgESAw4CFAoMCgUE" + 
+    "AAIBBRIDDgIICgwKBQQAAgEBEgMOCQ8KDAoFBAACAQMSAw4SEwoLCgQEAAICEgMPAhQKDAoFBAACAgUS" + 
+    "Aw8CCAoMCgUEAAICARIDDwkPCgwKBQQAAgIDEgMPEhMKCgoCBAESBBIAFgEKCgoDBAEBEgMSCBkKCwoE" + 
+    "BAECABIDEwIcCgwKBQQBAgAGEgMTAhAKDAoFBAECAAESAxMRFwoMCgUEAQIAAxIDExobCgsKBAQBAgES" + 
+    "AxQCFwoMCgUEAQIBBRIDFAIICgwKBQQBAgEBEgMUCRIKDAoFBAECAQMSAxQVFgoLCgQEAQICEgMVAhcK" + 
+    "DAoFBAECAgUSAxUCCAoMCgUEAQICARIDFQkSCgwKBQQBAgIDEgMVFRZiBnByb3RvMw==");
 
-  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpimath/protobuf/shape.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor());
+  static final Descriptors.FileDescriptor descriptor = Descriptors.FileDescriptor.internalBuildGeneratedFileFrom("wpi/math/protobuf/shape.proto", "wpi.proto", descriptorData, ProtobufGeometry2dDescriptor.getDescriptor());
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufRectangle2d_descriptor = descriptor.internalContainedType(78, 120, "ProtobufRectangle2d", "wpi.proto.ProtobufRectangle2d");
+  static final Descriptors.Descriptor wpi_proto_ProtobufRectangle2d_descriptor = descriptor.internalContainedType(80, 120, "ProtobufRectangle2d", "wpi.proto.ProtobufRectangle2d");
 
-  static final Descriptors.Descriptor wpi_proto_ProtobufEllipse2d_descriptor = descriptor.internalContainedType(201, 130, "ProtobufEllipse2d", "wpi.proto.ProtobufEllipse2d");
+  static final Descriptors.Descriptor wpi_proto_ProtobufEllipse2d_descriptor = descriptor.internalContainedType(203, 130, "ProtobufEllipse2d", "wpi.proto.ProtobufEllipse2d");
 
   /**
    * @return this proto file's descriptor.

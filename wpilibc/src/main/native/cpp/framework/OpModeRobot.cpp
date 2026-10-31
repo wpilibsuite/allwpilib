@@ -299,7 +299,8 @@ void OpModeRobotBase::EndCurrentOpMode() {
   }
   m_activeOpModeCallbacks.clear();
 
-  // Regardless of whether opmode was started, destroy it
+  // Regardless of whether opmode was started, close it and release it
   std::print("********** Closing OpMode {} **********\n", m_currentOpModeName);
+  m_currentOpMode->Close();
   m_currentOpMode.reset();
 }

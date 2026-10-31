@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpi/math/protobuf/controller.npb.h"
 
 std::optional<wpi::math::ArmFeedforward>
 wpi::util::Protobuf<wpi::math::ArmFeedforward>::Unpack(InputStream& stream) {

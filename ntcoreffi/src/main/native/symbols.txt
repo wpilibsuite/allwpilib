@@ -254,9 +254,11 @@ WPI_DataLog_Finish
 WPI_DataLog_SetMetadata
 WPI_DataLog_Start
 WPI_DataLog_Flush
+WPI_DataLog_GetBackgroundWriterDir
 WPI_DataLog_Pause
 WPI_DataLog_Release
 WPI_DataLog_Resume
+WPI_DataLog_SetBackgroundWriterDir
 WPI_DataLog_SetBackgroundWriterFilename
 WPI_DataLog_Stop
 WPI_DestroyEvent

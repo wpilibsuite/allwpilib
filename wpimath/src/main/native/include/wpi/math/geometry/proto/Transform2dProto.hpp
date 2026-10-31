@@ -5,9 +5,9 @@
 #pragma once
 
 #include "wpi/math/geometry/Transform2d.hpp"
+#include "wpi/math/protobuf/geometry2d.npb.h"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/geometry2d.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT wpi::util::Protobuf<wpi::math::Transform2d> final {
