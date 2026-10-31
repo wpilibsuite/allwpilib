@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +32,7 @@ class StagedCommandBuilderTest {
   @Test
   void streamlined() {
     Command command =
-        new StagedCommandBuilder()
-            .noRequirements()
+        StagedCommandBuilder.noRequirements()
             .executing(Coroutine::park)
             .until(() -> false)
             .named("Name");
@@ -47,8 +45,7 @@ class StagedCommandBuilderTest {
     var mech = new DummyMechanism("Mech", Scheduler.createIndependentScheduler());
 
     Command command =
-        new StagedCommandBuilder()
-            .noRequirements()
+        StagedCommandBuilder.noRequirements()
             .requiring(mech)
             .requiring(mech, mech)
             .requiring(List.of(mech))
@@ -63,203 +60,121 @@ class StagedCommandBuilderTest {
   }
 
   @Test
-  void starting_noRequirements_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var ignored = builder.noRequirements().executing(c -> {}).named("cmd");
+  void stagesAreReusable() {
+    var base = StagedCommandBuilder.requiring(m_mech1).executing(Coroutine::park);
 
-    var err = assertThrows(IllegalStateException.class, builder::noRequirements);
-    assertEquals("Command builders cannot be reused", err.getMessage());
+    var low = base.withPriority(1).named("Low");
+    var high = base.withPriority(5).named("High");
+    var again = base.named("Again");
+
+    assertEquals(1, low.priority());
+    assertEquals(5, high.priority());
+    assertEquals(Command.DEFAULT_PRIORITY, again.priority());
+    assertEquals(Set.of(m_mech1), high.requirements());
   }
 
   @Test
-  void starting_requiringVarargs_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var ignored = builder.noRequirements().executing(c -> {}).named("cmd");
+  void requirementStagesDoNotShareState() {
+    var base = StagedCommandBuilder.requiring(m_mech1);
+    var extended = base.requiring(m_mech2);
 
-    var err = assertThrows(IllegalStateException.class, () -> builder.requiring(m_mech1, m_mech2));
-    assertEquals("Command builders cannot be reused", err.getMessage());
+    assertEquals(Set.of(m_mech1), base.executing(Coroutine::park).named("Base").requirements());
+    assertEquals(
+        Set.of(m_mech1, m_mech2), extended.executing(Coroutine::park).named("Ext").requirements());
   }
 
   @Test
-  void starting_requiringCollection_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var ignored = builder.noRequirements().executing(c -> {}).named("cmd");
+  void nullCallbacksAreTreatedAsNoOps() {
+    var command =
+        StagedCommandBuilder.noRequirements()
+            .executing(Coroutine::park)
+            .whenCanceled(null)
+            .whenExited(null)
+            .until(null)
+            .named("Name");
 
-    var err =
-        assertThrows(
-            IllegalStateException.class, () -> builder.requiring(List.of(m_mech1, m_mech2)));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void requirements_requiringSingle_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var reqStage = builder.noRequirements();
-    var ignored = reqStage.executing(c -> {}).named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(m_mech1));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void requirements_requiringVarargs_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var reqStage = builder.noRequirements();
-    var ignored = reqStage.executing(Coroutine::park).named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(m_mech1, m_mech2));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void requirements_requiringCollection_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var reqStage = builder.noRequirements();
-    var ignored = reqStage.executing(Coroutine::park).named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> reqStage.requiring(List.of(m_mech1)));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void requirements_executing_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var reqStage = builder.noRequirements();
-    var ignored = reqStage.executing(c -> {}).named("cmd");
-
-    Consumer<Coroutine> impl = Coroutine::park;
-    var err = assertThrows(IllegalStateException.class, () -> reqStage.executing(impl));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void execution_whenCanceled_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var execStage = builder.noRequirements().executing(c -> {});
-    var ignored = execStage.named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> execStage.whenCanceled(() -> {}));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void execution_whenExited_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var execStage = builder.noRequirements().executing(c -> {});
-    var ignored = execStage.named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> execStage.whenExited(() -> {}));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void execution_withPriority_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var execStage = builder.noRequirements().executing(c -> {});
-    var ignored = execStage.named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> execStage.withPriority(7));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void execution_until_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var execStage = builder.noRequirements().executing(c -> {});
-    var ignored = execStage.named("cmd");
-
-    BooleanSupplier endCondition = () -> true;
-    var err = assertThrows(IllegalStateException.class, () -> execStage.until(endCondition));
-    assertEquals("Command builders cannot be reused", err.getMessage());
-  }
-
-  @Test
-  void execution_named_throwsAfterBuild() {
-    var builder = new StagedCommandBuilder();
-    var execStage = builder.noRequirements().executing(c -> {});
-    var ignored = execStage.named("cmd");
-
-    var err = assertThrows(IllegalStateException.class, () -> execStage.named("other"));
-    assertEquals("Command builders cannot be reused", err.getMessage());
+    command.onCancel();
+    command.onExit();
+    assertEquals("Name", command.name());
   }
 
   @Test
   void starting_requiringVarargs_nullFirstRequirement_throwsNPE() {
-    var builder = new StagedCommandBuilder();
-    assertThrows(NullPointerException.class, () -> builder.requiring(null, m_mech2));
+    assertThrows(NullPointerException.class, () -> StagedCommandBuilder.requiring(null, m_mech2));
   }
 
   @Test
   void starting_requiringVarargs_nullArray_throwsNPE() {
-    var builder = new StagedCommandBuilder();
-    assertThrows(NullPointerException.class, () -> builder.requiring(m_mech1, (Mechanism[]) null));
+    assertThrows(
+        NullPointerException.class,
+        () -> StagedCommandBuilder.requiring(m_mech1, (Mechanism[]) null));
   }
 
   @Test
   void starting_requiringVarargs_nullInExtra_throwsNPE() {
-    var builder = new StagedCommandBuilder();
-    assertThrows(NullPointerException.class, () -> builder.requiring(m_mech1, m_mech2, null));
+    assertThrows(
+        NullPointerException.class, () -> StagedCommandBuilder.requiring(m_mech1, m_mech2, null));
   }
 
   @Test
   void starting_requiringCollection_nullCollection_throwsNPE() {
-    var builder = new StagedCommandBuilder();
-    assertThrows(NullPointerException.class, () -> builder.requiring((Collection<Mechanism>) null));
+    assertThrows(
+        NullPointerException.class,
+        () -> StagedCommandBuilder.requiring((Collection<Mechanism>) null));
   }
 
   @Test
   void starting_requiringCollection_nullElement_throwsNPE() {
-    var builder = new StagedCommandBuilder();
     var listWithNull = Arrays.asList(m_mech1, null, m_mech2); // Arrays.asList allows nulls
-    assertThrows(NullPointerException.class, () -> builder.requiring(listWithNull));
+    assertThrows(NullPointerException.class, () -> StagedCommandBuilder.requiring(listWithNull));
   }
 
   @Test
   void requirements_requiringSingle_null_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.requiring((Mechanism) null));
   }
 
   @Test
   void requirements_requiringVarargs_nullFirstRequirement_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.requiring(null, m_mech2));
   }
 
   @Test
   void requirements_requiringVarargs_nullArray_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.requiring(m_mech1, (Mechanism[]) null));
   }
 
   @Test
   void requirements_requiringVarargs_nullInExtra_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.requiring(m_mech1, m_mech2, null));
   }
 
   @Test
   void requirements_requiringCollection_nullCollection_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.requiring((Collection<Mechanism>) null));
   }
 
   @Test
   void requirements_requiringCollection_nullElement_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     var listWithNull = Arrays.asList(m_mech1, null); // Arrays.asList allows nulls
     assertThrows(NullPointerException.class, () -> req.requiring(listWithNull));
   }
 
   @Test
   void requirements_executing_nullImpl_throwsNPE() {
-    var req = new StagedCommandBuilder().noRequirements();
+    var req = StagedCommandBuilder.noRequirements();
     assertThrows(NullPointerException.class, () -> req.executing(null));
   }
 
   @Test
   void execution_named_nullName_throwsNPE() {
-    var exec = new StagedCommandBuilder().noRequirements().executing(c -> {});
+    var exec = StagedCommandBuilder.noRequirements().executing(c -> {});
     assertThrows(NullPointerException.class, () -> exec.named(null));
   }
 }
