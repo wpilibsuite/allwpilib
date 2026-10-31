@@ -181,14 +181,36 @@ ext.createComponentZipTasks = { components, names, base, type, project, func ->
     return taskList
 }
 
+ext.includeSharedLibraryDebugSymbols = { task, binary ->
+    def linkTask = binary.tasks.link
+    def debugFile = new File(binary.sharedLibraryFile.absolutePath + '.debug')
+    if (binary.targetPlatform.operatingSystem.macOsX) {
+        // Link DWARF before buildServer deletes the object files. Keep it with
+        // the link outputs so up-to-date checks and build-cache restores include it.
+        linkTask.outputs.file(debugFile).withPropertyName('macDebugSymbols')
+        linkTask.doLast {
+            def symbols = providers.exec {
+                commandLine 'dsymutil', '--flat', '-o', debugFile, binary.sharedLibraryFile
+                ignoreExitValue = true
+            }
+            def diagnostics = symbols.standardError.asText.get()
+            if (!diagnostics.isBlank()) {
+                logger.warn(diagnostics)
+            }
+            symbols.result.get().assertNormalExitValue()
+        }
+    }
+    task.dependsOn linkTask
+    task.from(debugFile) {
+        into nativeUtils.getPlatformPath(binary) + '/shared'
+    }
+}
+
 ext.includeStandardZipFormat = { task, value ->
     value.each { binary ->
         if (binary.buildable) {
             if (binary instanceof SharedLibraryBinarySpec) {
-                task.dependsOn binary.tasks.link
-                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
-                    into nativeUtils.getPlatformPath(binary) + '/shared'
-                }
+                includeSharedLibraryDebugSymbols(task, binary)
                 def sharedPath = binary.sharedLibraryFile.absolutePath
                 sharedPath = sharedPath.substring(0, sharedPath.length() - 4)
 

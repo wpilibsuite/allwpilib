@@ -19,10 +19,8 @@ classes:
           '':
           int64_t, int64_t, T:
     inline_code: |
-      ;
       // capture class name by value
-      auto clsname = clsName;
-      cls_Timestamped.def("__repr__", [clsname](const Timestamped<T>& self) -> py::str {
+      .def("__repr__", [clsname = clsName](const Timestamped<T>& self) -> py::str {
         return py::str("{}(time={}, serverTime={}, value={!r})")
           .format(clsname, self.time, self.serverTime, self.value);
       })

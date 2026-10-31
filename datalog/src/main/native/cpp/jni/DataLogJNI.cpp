@@ -124,6 +124,44 @@ Java_org_wpilib_datalog_DataLogJNI_bgSetFilename
 
 /*
  * Class:     org_wpilib_datalog_DataLogJNI
+ * Method:    bgSetDir
+ * Signature: (JLjava/lang/String;J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_wpilib_datalog_DataLogJNI_bgSetDir
+  (JNIEnv* env, jclass, jlong impl, jstring dir, jlong maxSize)
+{
+  if (impl == 0) {
+    nullPointerEx.Throw(env, "impl is null");
+    return;
+  }
+  if (!dir) {
+    nullPointerEx.Throw(env, "dir is null");
+    return;
+  }
+  reinterpret_cast<DataLogBackgroundWriter*>(impl)->SetDir(JStringRef{env, dir},
+                                                           maxSize);
+}
+
+/*
+ * Class:     org_wpilib_datalog_DataLogJNI
+ * Method:    bgGetDir
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL
+Java_org_wpilib_datalog_DataLogJNI_bgGetDir
+  (JNIEnv* env, jclass, jlong impl)
+{
+  if (impl == 0) {
+    nullPointerEx.Throw(env, "impl is null");
+    return nullptr;
+  }
+  return MakeJString(
+      env, reinterpret_cast<DataLogBackgroundWriter*>(impl)->GetDir());
+}
+
+/*
+ * Class:     org_wpilib_datalog_DataLogJNI
  * Method:    fgCreate
  * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */

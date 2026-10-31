@@ -68,6 +68,33 @@ void WPI_DataLog_SetBackgroundWriterFilename(struct WPI_DataLog* datalog,
                                              const struct WPI_String* filename);
 
 /**
+ * Requests a background transfer of the current log file to another directory.
+ * Buffered records are flushed before checking the size. On success, logging
+ * continues in the new directory and the old file is removed. On failure or if
+ * the file exceeds maxSize, the original directory is retained. Existing files
+ * are never overwritten. Only applies to file-based background writers.
+ * Has no effect on stopped logs; replaces any request not yet started.
+ *
+ * @param datalog data log
+ * @param dir existing destination directory (empty means current directory)
+ * @param maxSize maximum file size to transfer, in bytes
+ */
+void WPI_DataLog_SetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        const struct WPI_String* dir,
+                                        uint64_t maxSize);
+
+/**
+ * Gets the current directory of a background writer. Changes only after a
+ * successful transfer.
+ *
+ * @param datalog data log
+ * @param dir log directory (output), empty for callback writers; free with
+ *            WPI_FreeString()
+ */
+void WPI_DataLog_GetBackgroundWriterDir(struct WPI_DataLog* datalog,
+                                        struct WPI_String* dir);
+
+/**
  * Releases a data log object. Closes the file and returns resources to the
  * system.
  *

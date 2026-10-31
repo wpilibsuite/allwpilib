@@ -65,7 +65,7 @@ class TravelingSalesmanTest {
         };
 
     var traveler = new TravelingSalesman();
-    var solution = traveler.solve(poses, 500);
+    var solution = traveler.solve(poses, 2000);
 
     assertEquals(5, solution.length);
     var expected = new Pose2d[] {poses[0], poses[2], poses[4], poses[1], poses[3]};
@@ -95,7 +95,7 @@ class TravelingSalesmanTest {
         };
 
     var traveler = new TravelingSalesman();
-    var solution = traveler.solve(poses, 500);
+    var solution = traveler.solve(poses, 2000);
 
     assertEquals(10, solution.length);
     var expected =

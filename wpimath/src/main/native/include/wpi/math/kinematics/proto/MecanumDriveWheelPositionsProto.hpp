@@ -5,9 +5,9 @@
 #pragma once
 
 #include "wpi/math/kinematics/MecanumDriveWheelPositions.hpp"
+#include "wpi/math/protobuf/kinematics.npb.h"
 #include "wpi/util/SymbolExports.hpp"
 #include "wpi/util/protobuf/Protobuf.hpp"
-#include "wpimath/protobuf/kinematics.npb.h"
 
 template <>
 struct WPILIB_DLLEXPORT
