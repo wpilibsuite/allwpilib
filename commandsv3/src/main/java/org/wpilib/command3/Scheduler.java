@@ -713,7 +713,9 @@ public final class Scheduler implements ProtobufSerializable {
     // The set of root states with which the incoming state conflicts but does not inherit from
     Set<CommandState> conflictingRootStates =
         m_runningCommands.values().stream()
+            // Find all directly conflicting commands
             .filter(state -> incomingState.command().conflictsWith(state.command()))
+            // Ancestors of the incoming state will not be canceled
             .filter(state -> !isAncestorOf(state.command(), incomingState))
             .map(
                 state -> {
@@ -722,7 +724,9 @@ public final class Scheduler implements ProtobufSerializable {
                   // get the very root ancestor; otherwise, it'll return a direct sibling of the
                   // incoming command
                   CommandState root = state;
-                  while (root.parent() != null && root.parent() != incomingState.parent()) {
+                  while (root.parent() != null
+                      && root.parent() != incomingState.parent()
+                      && !isAncestorOf(root.parent(), incomingState)) {
                     root = m_runningCommands.get(root.parent());
                   }
                   return root;
