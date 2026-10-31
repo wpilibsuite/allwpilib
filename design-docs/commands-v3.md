@@ -483,11 +483,21 @@ and `Command` (a scope for a specific running command).
 ### Telemetry
 
 Scheduler state is serialized using protobuf. The scheduler will send a list of the currently queued
-commands and a list of the current running commands. Commands are serialized as (id: uint32,
-parent_id: uint32, name: string, priority: int32, requirements: string array,
-last_time_ms: double, total_time_ms: double). Consumers can use the `id` and `parent_id` attributes
-to reconstruct the tree structure, if desired. `id` and `parent_id` marginally increase the size of
-serialized data, but make the schema and deserialization quite simple.
+commands and a list of the current running commands. Commands are serialized with the following attributes:
+
+| Attribute            | Type                    | Description                                                                                                                                                                                                 |
+|----------------------|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`                 | uint32                  | Uniquely identifies an invocation of a command                                                                                                                                                              |
+| `parent_id`          | uint32 (optional)       | Identifies the parent command, if any (root commands have no parents)                                                                                                                                       |
+| `name`               | string                  | The name of the command                                                                                                                                                                                     |
+| `priority`           | int32                   | The priority level of the command                                                                                                                                                                           |
+| `requirements`       | ProtobufMechanism array | The requirements of the command                                                                                                                                                                             |
+| `last_time_ms`       | double (optional)       | The duration the command took to execute in its most recent tick. Blank if the command is only queued, not running.                                                                                         |
+| `total_time_ms`      | double (optional)       | The total duration the command has take to execute, summed across all ticks. This is different from the duration that the command has been scheduled for. Blank if the command is only queued, not running. |
+| `is_default_command` | bool (optional)         | Whether the command is the default command for a mechanism. Only present for commands that have been set as the default command for a mechanism.                                                            |
+
+Consumers can use the `id` and `parent_id` attributes to reconstruct the tree structure, if desired. `id` and `parent_id`
+marginally increase the size of serialized data, but make the schema and deserialization quite simple.
 
 Command IDs are unique across all commands, including those that are not currently running. Every time
 a command is scheduled, the scheduler will assign that run a unique ID. Note that this is stored as a

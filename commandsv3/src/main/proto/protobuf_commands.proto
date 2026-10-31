@@ -43,6 +43,12 @@ message ProtobufCommand {
   // How long the command has taken to run, in aggregate.
   // Only included in a message for an actively running command.
   optional double total_time_ms = 7;
+
+  // If this command is both the default command for its required mechanism
+  // and was scheduled by the default command scheduling logic.
+  // Only included in a message where the command object is configured as the
+  // default command for a mechanism.
+  optional bool is_default_command = 8;
 }
 
 message ProtobufScheduler {
