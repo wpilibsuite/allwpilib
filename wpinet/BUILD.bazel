@@ -116,7 +116,7 @@ wpilib_cc_library(
     ) + ["native-srcs"],
     hdrs = glob(["src/main/native/include/**/*"]),
     copts = select({
-        "@platforms//os:windows": [],
+        "@rules_cc//cc/compiler:msvc-cl": [],
         "//conditions:default": [
             "-Wno-error=pedantic",
             "-Wno-error=format",

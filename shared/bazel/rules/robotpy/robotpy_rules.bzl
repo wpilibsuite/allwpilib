@@ -56,13 +56,13 @@ def create_pybind_library(
         deps = [":{}_pybind_library".format(name)] + semiwrap_header,
         dynamic_deps = dynamic_deps,
         copts = select({
-            "@bazel_tools//src/conditions:darwin": [
+            "@rules_cc//cc/compiler:clang": [
                 "-Wno-deprecated-declarations",
                 "-Wno-overloaded-virtual",
                 "-Wno-pessimizing-move",
                 "-Wno-unused-value",
             ],
-            "@bazel_tools//src/conditions:linux_x86_64": [
+            "@rules_cc//cc/compiler:gcc": [
                 "-Wno-attributes",
                 "-Wno-unused-value",
                 "-Wno-deprecated",
@@ -74,7 +74,7 @@ def create_pybind_library(
                 "-Wno-pessimizing-move",
                 "-Wno-overloaded-virtual",
             ],
-            "@bazel_tools//src/conditions:windows": [
+            "@rules_cc//cc/compiler:msvc-cl": [
             ],
         }),
         target_compatible_with = robotpy_compatibility_select(),
