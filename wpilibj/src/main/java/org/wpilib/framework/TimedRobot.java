@@ -123,7 +123,7 @@ public class TimedRobot extends IterativeRobotBase {
    * @param period The period at which to run the callback in seconds.
    */
   public final void addPeriodic(Runnable callback, double period) {
-    addPeriodic(callback, period, period);
+    addPeriodic(callback, period, 0);
   }
 
   /**
