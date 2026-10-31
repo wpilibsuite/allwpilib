@@ -687,7 +687,7 @@ int32_t MrcLibDsImpl::getSystemTimeValid(bool* systemTimeValid) {
   } else {
     *systemTimeValid = false;
   }
-  return status;
+  return 0;
 }
 
 int32_t MrcLibDsImpl::writeDisplayAnsi(const struct WPI_String* line) {
