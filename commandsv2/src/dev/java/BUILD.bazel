@@ -5,11 +5,11 @@ java_binary(
     srcs = ["org/wpilib/commands2/DevMain.java"],
     main_class = "org.wpilib.commands2.DevMain",
     deps = [
-        "//commandsv2:commandsv2-java",
-        "//hal:hal-java",
-        "//ntcore:ntcore-java",
-        "//wpiannotations",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
+        "//commandsv2/src/main/java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//wpiannotations/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
     ],
 )

@@ -3,7 +3,7 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//hal:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//hal:robotpy_pybind_build_info.bzl", "define_pybind_library", "hal_simulation_extension", "wpihal_extension")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
+load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
 load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
 
@@ -52,7 +52,7 @@ wpilib_cc_library(
     extra_src_pkg_files = [
         ":hal-sim-pkg",
         ":hal-systemcore-pkg",
-        ":hal-java-jni-hdrs-pkg",
+        "//hal/src/main/java:hal-java-jni-hdrs-pkg",
     ],
     includes = ["src/main/native/include"],
     strip_include_prefix = "src/main/native/include",
@@ -111,7 +111,7 @@ wpilib_cc_static_library(
 wpilib_jni_cc_library(
     name = "wpiHaljni",
     srcs = glob(["src/main/native/cpp/jni/**"]),
-    java_dep = ":hal-java",
+    java_dep = "//hal/src/main/java:hal-java",
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHal",
@@ -129,20 +129,6 @@ wpilib_cc_shared_library(
     visibility = ["//visibility:public"],
     deps = [
         ":wpiHaljni",
-    ],
-)
-
-wpilib_jni_java_library(
-    name = "hal-java",
-    srcs = glob(["src/main/java/**/*.java"]),
-    maven_artifact_name = "hal-java",
-    maven_group_id = "org.wpilib.hal",
-    native_libs = [":shared/wpiHaljni"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//ntcore:ntcore-java",
-        "//wpinet:wpinet-java",
-        "//wpiutil:wpiutil-java",
     ],
 )
 

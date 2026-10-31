@@ -1,0 +1,42 @@
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "wpilibj-java",
+    srcs = [
+        "//wpilibj:generate-version",
+        "//wpilibj:generated_java",
+    ] + glob(["**/*.java"]),
+    extra_source_pkgs = ["//wpilibj:generated_version_files"],
+    generated_java_srcs = ["//wpilibj:generated_java"],
+    javacopts = patch_module(
+        "wpilib.core",
+        [
+            "wpilibj/src/generated/main/java",
+            "wpilibj/src/main/java",
+            ".",
+        ],
+    ),
+    maven_artifact_name = "wpilibj-java",
+    maven_group_id = "org.wpilib.wpilibj",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//datalog/src/main/java",
+        "//hal/src/main/java",
+        "//ntcore/src/main/java",
+        "//telemetry/src/main/java",
+        "//tunables/src/main/java",
+        "//wpimath/src/main/java",
+        "//wpinet/src/main/java",
+        "//wpiunits/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:org_ejml_ejml_java9module",
+    ],
+)
+
+alias(
+    name = "java",
+    actual = ":wpilibj-java",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,43 @@
+load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
+load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
+
+wpilib_java_library(
+    name = "fields-java",
+    srcs = glob(["**/*.java"]) + ["//fields:generated_java"],
+    extra_source_pkgs = ["//fields:resources"],
+    generated_java_srcs = ["//fields:generated_java"],
+    javacopts = patch_module(
+        "wpilib.gamefields",
+        ["fields/src/generated/main/java"],
+    ),
+    maven_artifact_name = "fields-java",
+    maven_group_id = "org.wpilib.fields",
+    plugins = [
+        java_plugin_artifact("io.avaje:avaje-jsonb-generator", "io.avaje.jsonb.generator.JsonbProcessor"),
+    ],
+    resource_strip_prefix = "fields/src/main/native/resources",
+    resources = ["//fields:field-jsons"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpimath/src/main/java",
+        "//wpiutil/src/main/java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+    ],
+)
+
+wpilib_java_library(
+    name = "field-images-java",
+    generated_java_srcs = ["//fields:generated_java"],
+    maven_artifact_name = "field-images-java",
+    maven_group_id = "org.wpilib.fields",
+    resource_strip_prefix = "fields/src/main/native/resources",
+    resources = ["//fields:field-images"],
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "java",
+    actual = ":fields-java",
+    visibility = ["//visibility:public"],
+)
