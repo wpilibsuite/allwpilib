@@ -371,6 +371,16 @@ def generate_fields(output_directory: Path, resources_root: Path, template_root:
             env, "main/native/cpp/fieldimages/field_images.cpp.jinja", context
         ),
     )
+    for field in entries:
+        write_file(
+            output_directory,
+            f"main/native/include/wpi/fields/{field['resource_file'].removesuffix('.json')}.hpp",
+            render_template(
+                env,
+                "main/native/include/wpi/fields/field_template.hpp.jinja",
+                {"field": field},
+            ),
+        )
 
 
 def main():
