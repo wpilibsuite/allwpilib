@@ -311,4 +311,98 @@ class SchedulerConflictTests extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(parent), "Parent command should still be running");
     assertTrue(m_scheduler.isRunning(cousin2), "Cousin 2 should still be running");
   }
+
+  @Test
+  void nestedConflictingBranchesEviction() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var leafA = mech.run(Coroutine::park).named("LeafA");
+    var branchA =
+        Command.noRequirements(
+                co -> {
+                  co.fork(leafA);
+                  co.park();
+                })
+            .named("BranchA");
+
+    var leafB = mech.run(Coroutine::park).named("LeafB");
+    var branchB =
+        Command.noRequirements(
+                co -> {
+                  co.fork(leafB);
+                  co.park();
+                })
+            .named("BranchB");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(branchA);
+                  co.fork(branchB);
+                  co.park();
+                })
+            .named("Root");
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(root), "Root command should still be running");
+    assertTrue(m_scheduler.isRunning(branchB), "BranchB should still be running");
+    assertTrue(m_scheduler.isRunning(leafB), "LeafB should still be running");
+    assertFalse(m_scheduler.isRunning(branchA), "BranchA should have been canceled");
+    assertFalse(m_scheduler.isRunning(leafA), "LeafA should have been canceled");
+  }
+
+  @Test
+  void deeplyNestedUnrelatedCommandEviction() {
+    var mech = new DummyMechanism("Mech", m_scheduler);
+    var leaf1 = mech.run(Coroutine::park).named("Leaf1");
+    var parent1 =
+        Command.noRequirements(
+                co -> {
+                  co.fork(leaf1);
+                  co.park();
+                })
+            .named("Parent1");
+    var root1 =
+        Command.noRequirements(
+                co -> {
+                  co.fork(parent1);
+                  co.park();
+                })
+            .named("Root1");
+
+    m_scheduler.schedule(root1);
+    m_scheduler.run();
+
+    assertTrue(m_scheduler.isRunning(root1));
+    assertTrue(m_scheduler.isRunning(parent1));
+    assertTrue(m_scheduler.isRunning(leaf1));
+
+    var leaf2 = mech.run(Coroutine::park).named("Leaf2");
+    var parent2 =
+        Command.noRequirements(
+                co -> {
+                  co.fork(leaf2);
+                  co.park();
+                })
+            .named("Parent2");
+    var root2 =
+        Command.noRequirements(
+                co -> {
+                  co.fork(parent2);
+                  co.park();
+                })
+            .named("Root2");
+
+    m_scheduler.schedule(root2);
+    m_scheduler.run();
+
+    assertFalse(m_scheduler.isRunning(root1), "Root1 should have been canceled");
+    assertFalse(m_scheduler.isRunning(parent1), "Parent1 should have been canceled");
+    assertFalse(m_scheduler.isRunning(leaf1), "Leaf1 should have been canceled");
+
+    assertTrue(m_scheduler.isRunning(root2), "Root2 should be running");
+    assertTrue(m_scheduler.isRunning(parent2), "Parent2 should be running");
+    assertTrue(m_scheduler.isRunning(leaf2), "Leaf2 should be running");
+  }
 }
