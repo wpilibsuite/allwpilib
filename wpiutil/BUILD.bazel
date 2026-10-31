@@ -75,7 +75,7 @@ write_source_files(
     name = "write_wpiutil",
     diff_args = ["-u"],
     files = {
-        "src/generated/test/native/cpp": ":generate_wpiutil",
+        "src/generated/test": ":generate_wpiutil",
     },
     suggested_update_target = "//:write_all",
     tags = ["pregeneration"],
@@ -270,9 +270,8 @@ filegroup(
 
 cc_library(
     name = "nanopb-test-headers",
-    hdrs = glob(["src/generated/test/native/cpp/*.h"]),
-    includes = ["src/generated/test/native/cpp"],
-    strip_include_prefix = "src/generated/test/native/cpp",
+    hdrs = glob(["src/generated/test/native/include/*.npb.h"]),
+    strip_include_prefix = "src/generated/test/native/include",
     visibility = ["//wpiutil/src/test/native:__pkg__"],
 )
 
