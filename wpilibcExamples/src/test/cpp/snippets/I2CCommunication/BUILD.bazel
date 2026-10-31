@@ -1,5 +1,13 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
+filegroup(
+    name = "sources",
+    srcs = glob(["cpp/**/*.cpp"]),
+    visibility = [
+        "//wpilibcExamples/src/test/cpp/snippets:__pkg__",
+    ],
+)
+
 cc_test(
     name = "I2CCommunication",
     size = "small",
