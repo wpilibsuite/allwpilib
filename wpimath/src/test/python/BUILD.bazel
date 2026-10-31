@@ -5,13 +5,13 @@ load(":robotpy_pybind_test_info.bzl", "wpimath_test_extension", define_test_pybi
 
 TEST_PYBIND_PKGCFG_DEPS = [
     "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
-    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
+    "//telemetry/src/main/python:python.generated_pkgcfg_files",
     "//tunables:native/tunables/robotpy-native-tunables.pc",
-    "//tunables:robotpy-tunables.generated_pkgcfg_files",
+    "//tunables/src/main/python:python.generated_pkgcfg_files",
     "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
-    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
+    "//wpimath/src/main/python:python.generated_pkgcfg_files",
     "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
+    "//wpiutil/src/main/python:python.generated_pkgcfg_files",
 ]
 
 generate_robotpy_pybind_build_info(
@@ -21,7 +21,7 @@ generate_robotpy_pybind_build_info(
     package_root_file = "cpp/wpimath_test/__init__.py",
     pkgcfgs = TEST_PYBIND_PKGCFG_DEPS,
     pyproject_toml = "cpp/pyproject.toml",
-    stripped_include_prefix = "cpp",
+    stripped_include_prefix = "cpp/",
     yaml_files = glob(["cpp/semiwrap/**/*.yml"]),
     yml_prefix = "cpp/",
 )
@@ -47,9 +47,9 @@ robotpy_py_test(
     ),
     deps = [
         ":robotpy-wpimath-test",
-        "//telemetry:robotpy-telemetry",
-        "//tunables:robotpy-tunables",
-        "//wpimath:robotpy-wpimath",
+        "//telemetry/src/main/python",
+        "//tunables/src/main/python",
+        "//wpimath/src/main/python",
         requirement("numpy"),
         requirement("pytest"),
     ],

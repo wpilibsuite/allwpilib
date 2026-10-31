@@ -73,8 +73,8 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "AprilTagDetection",
             yml_file = "semiwrap/AprilTagDetection.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagDetection.hpp",
+            header_root = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)",
+            header_file = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagDetection.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::apriltag::AprilTagDetection", "wpi__apriltag__AprilTagDetection.hpp"),
@@ -84,8 +84,8 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "AprilTagDetector",
             yml_file = "semiwrap/AprilTagDetector.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagDetector.hpp",
+            header_root = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)",
+            header_file = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagDetector.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::apriltag::AprilTagDetector", "wpi__apriltag__AprilTagDetector.hpp"),
@@ -97,8 +97,8 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "AprilTagPoseEstimate",
             yml_file = "semiwrap/AprilTagPoseEstimate.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagPoseEstimate.hpp",
+            header_root = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)",
+            header_file = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagPoseEstimate.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::apriltag::AprilTagPoseEstimate", "wpi__apriltag__AprilTagPoseEstimate.hpp"),
@@ -107,8 +107,8 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "AprilTagPoseEstimator",
             yml_file = "semiwrap/AprilTagPoseEstimator.yml",
-            header_root = "$(execpath :robotpy-native-apriltag.copy_headers)",
-            header_file = "$(execpath :robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagPoseEstimator.hpp",
+            header_root = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)",
+            header_file = "$(execpath //apriltag:robotpy-native-apriltag.copy_headers)/wpi/apriltag/AprilTagPoseEstimator.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::apriltag::AprilTagPoseEstimator", "wpi__apriltag__AprilTagPoseEstimator.hpp"),
@@ -119,14 +119,14 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     resolve_casters(
         name = "apriltag.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpimath/src/main/python:wpimath/wpimath-casters.pybind11.json", "//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "apriltag.casters.pkl",
         dep_file = "apriltag.casters.d",
     )
 
     gen_libinit(
         name = "apriltag.gen_lib_init",
-        output_file = "src/main/python/robotpy_apriltag/_init__apriltag.py",
+        output_file = "robotpy_apriltag/_init__apriltag.py",
         modules = ["native.apriltag._init_robotpy_native_apriltag", "wpiutil._init__wpiutil", "wpimath._init__wpimath"],
     )
 
@@ -136,9 +136,9 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         module_pkg_name = "robotpy_apriltag._apriltag",
         output_file = "apriltag.pc",
         pkg_name = "apriltag",
-        install_path = "src/main/python/robotpy_apriltag",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/robotpy_apriltag/__init__.py",
+        install_path = "robotpy_apriltag",
+        project_file = "pyproject.toml",
+        package_root = "robotpy_apriltag/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -152,7 +152,7 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         name = "apriltag",
         casters_pickle = "apriltag.casters.pkl",
         header_gen_config = APRILTAG_HEADER_GEN,
-        trampoline_subpath = "src/main/python/robotpy_apriltag",
+        trampoline_subpath = "robotpy_apriltag",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//apriltag:robotpy-native-apriltag.copy_headers",
@@ -166,7 +166,7 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     create_pybind_library(
         name = "apriltag",
-        install_path = "src/main/python/robotpy_apriltag/",
+        install_path = "robotpy_apriltag/",
         extension_name = "_apriltag",
         generated_srcs = [":apriltag.generated_srcs"],
         semiwrap_header = [":apriltag.gen_modinit_hpp"],
@@ -174,10 +174,10 @@ def apriltag_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
             ":apriltag.tmpl_hdrs",
             ":apriltag.trampoline_hdrs",
             "//apriltag:apriltag",
+            "//wpimath/src/main/python:wpimath_pybind_library",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_pybind_library",
+            "//wpiutil/src/main/python:wpiutil_pybind_library",
             "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
             "//apriltag:shared/apriltag",
@@ -215,7 +215,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/robotpy_apriltag/apriltag.pc",
+            "robotpy_apriltag/apriltag.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -224,13 +224,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/robotpy_apriltag/**"], exclude = ["src/main/python/robotpy_apriltag/**/*.py"]),
+        srcs = native.glob(["robotpy_apriltag/**"], exclude = ["robotpy_apriltag/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/robotpy_apriltag/version.py",
+        output_file = "robotpy_apriltag/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -238,23 +238,23 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-apriltag",
-        srcs = native.glob(["src/main/python/robotpy_apriltag/**/*.py"]) + [
-            "src/main/python/robotpy_apriltag/_init__apriltag.py",
+        srcs = native.glob(["robotpy_apriltag/**/*.py"]) + [
+            "robotpy_apriltag/_init__apriltag.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/robotpy_apriltag/_apriltag",
+            ":robotpy_apriltag/_apriltag",
             ":apriltag.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
             "//apriltag:robotpy-native-apriltag",
-            "//wpimath:robotpy-wpimath",
-            "//wpiutil:robotpy-wpiutil",
+            "//wpimath/src/main/python",
+            "//wpiutil/src/main/python",
         ],
-        strip_path_prefixes = ["apriltag/src/main/python", "apriltag"],
+        strip_path_prefixes = ["apriltag/src/main/python/"],
         summary = "RobotPy bindings for WPILib's AprilTag library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
@@ -268,7 +268,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/main/python/semiwrap",
+        yaml_output_directory = "semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//apriltag:robotpy-native-apriltag.copy_headers",
             "//telemetry:robotpy-native-telemetry.copy_headers",
@@ -276,10 +276,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             "//wpimath:robotpy-native-wpimath.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
-        package_root_file = "src/main/python/robotpy_apriltag/__init__.py",
+        package_root_file = "robotpy_apriltag/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
-        yaml_files = native.glob(["src/main/python/semiwrap/**"]),
+        pyproject_toml = "pyproject.toml",
+        yaml_files = native.glob(["semiwrap/**"]),
     )
 
     scan_headers(
@@ -287,7 +287,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//apriltag:robotpy-native-apriltag.copy_headers",
         ],
-        package_root_file = "src/main/python/robotpy_apriltag/__init__.py",
+        package_root_file = "robotpy_apriltag/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
     )

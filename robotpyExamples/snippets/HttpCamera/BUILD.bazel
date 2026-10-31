@@ -7,7 +7,7 @@ py_library(
     srcs = ["vision.py"],
     deps = [
         # "//cscore:robotpy-cscore",
-        "//ntcore:pyntcore",
+        "//ntcore/src/main/python",
         requirement("numpy"),
         requirement("opencv-python"),
     ],

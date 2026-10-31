@@ -73,8 +73,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "TunableBase",
             yml_file = "semiwrap/TunableBase.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableBase.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableBase.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::detail::TunableBase", "wpi__tunables__detail__TunableBase.hpp"),
@@ -83,8 +83,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "TunableTable",
             yml_file = "semiwrap/TunableTable.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/TunableTable.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/TunableTable.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::TunableTable", "wpi__tunables__TunableTable.hpp"),
@@ -103,8 +103,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "ComplexTunable",
             yml_file = "semiwrap/ComplexTunable.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/ComplexTunable.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/ComplexTunable.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::ComplexTunable", "wpi__tunables__ComplexTunable.hpp"),
@@ -113,16 +113,16 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "TunableTypeValue",
             yml_file = "semiwrap/TunableTypeValue.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableTypeValue.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/detail/TunableTypeValue.hpp",
             tmpl_class_names = [],
             trampolines = [],
         ),
         struct(
             class_name = "TunableBackend",
             yml_file = "semiwrap/TunableBackend.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/TunableBackend.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/TunableBackend.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::TunableBackend", "wpi__tunables__TunableBackend.hpp"),
@@ -132,8 +132,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "MockTunableBackend",
             yml_file = "semiwrap/MockTunableBackend.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/MockTunableBackend.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/MockTunableBackend.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::MockTunableBackend", "wpi__tunables__MockTunableBackend.hpp"),
@@ -142,8 +142,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         struct(
             class_name = "TunableRegistry",
             yml_file = "semiwrap/TunableRegistry.yml",
-            header_root = "$(execpath :robotpy-native-tunables.copy_headers)",
-            header_file = "$(execpath :robotpy-native-tunables.copy_headers)/wpi/tunables/TunableRegistry.hpp",
+            header_root = "$(execpath //tunables:robotpy-native-tunables.copy_headers)",
+            header_file = "$(execpath //tunables:robotpy-native-tunables.copy_headers)/wpi/tunables/TunableRegistry.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::tunables::TunableRegistry", "wpi__tunables__TunableRegistry.hpp"),
@@ -161,14 +161,14 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     resolve_casters(
         name = "tunables.resolve_casters",
-        caster_deps = ["//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "tunables.casters.pkl",
         dep_file = "tunables.casters.d",
     )
 
     gen_libinit(
         name = "tunables.gen_lib_init",
-        output_file = "src/main/python/tunables/_init__tunables.py",
+        output_file = "tunables/_init__tunables.py",
         modules = ["native.tunables._init_robotpy_native_tunables", "wpiutil._init__wpiutil"],
     )
 
@@ -178,9 +178,9 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         module_pkg_name = "tunables._tunables",
         output_file = "tunables.pc",
         pkg_name = "tunables",
-        install_path = "src/main/python/tunables",
-        project_file = "src/main/python/pyproject.toml",
-        package_root = "src/main/python/tunables/__init__.py",
+        install_path = "tunables",
+        project_file = "pyproject.toml",
+        package_root = "tunables/__init__.py",
     )
 
     gen_modinit_hpp(
@@ -194,7 +194,7 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
         name = "tunables",
         casters_pickle = "tunables.casters.pkl",
         header_gen_config = TUNABLES_HEADER_GEN,
-        trampoline_subpath = "src/main/python/tunables",
+        trampoline_subpath = "tunables",
         deps = header_to_dat_deps,
         local_native_libraries = [
             "//tunables:robotpy-native-tunables.copy_headers",
@@ -205,7 +205,7 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
 
     create_pybind_library(
         name = "tunables",
-        install_path = "src/main/python/tunables/",
+        install_path = "tunables/",
         extension_name = "_tunables",
         generated_srcs = [":tunables.generated_srcs"],
         semiwrap_header = [":tunables.gen_modinit_hpp"],
@@ -213,8 +213,8 @@ def tunables_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], incl
             ":tunables.tmpl_hdrs",
             ":tunables.trampoline_hdrs",
             "//tunables:tunables",
+            "//wpiutil/src/main/python:wpiutil_pybind_library",
             "//wpiutil:wpiutil",
-            "//wpiutil:wpiutil_pybind_library",
         ],
         dynamic_deps = [
             "//tunables:shared/tunables",
@@ -251,7 +251,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     native.filegroup(
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
-            "src/main/python/tunables/tunables.pc",
+            "tunables/tunables.pc",
         ],
         tags = ["manual", "robotpy"],
         visibility = ["//visibility:public"],
@@ -260,13 +260,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["src/main/python/tunables/**"], exclude = ["src/main/python/tunables/**/*.py"]),
+        srcs = native.glob(["tunables/**"], exclude = ["tunables/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "src/main/python/tunables/version.py",
+        output_file = "tunables/version.py",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -274,22 +274,22 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "robotpy-tunables",
-        srcs = native.glob(["src/main/python/tunables/**/*.py"]) + [
-            "src/main/python/tunables/_init__tunables.py",
+        srcs = native.glob(["tunables/**/*.py"]) + [
+            "tunables/_init__tunables.py",
             "{}.generate_version".format(name),
         ],
         data = [
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
-            ":src/main/python/tunables/_tunables",
+            ":tunables/_tunables",
             ":tunables.trampoline_hdr_files",
         ],
-        imports = ["src/main/python"],
+        imports = ["."],
         deps = [
             "//tunables:robotpy-native-tunables",
-            "//wpiutil:robotpy-wpiutil",
+            "//wpiutil/src/main/python",
         ],
-        strip_path_prefixes = ["tunables/src/main/python", "tunables"],
+        strip_path_prefixes = ["tunables/src/main/python/"],
         summary = "Binary wrapper for WPILib tunables library",
         project_urls = {"Source code": "https://github.com/robotpy/mostrobotpy"},
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",
@@ -303,15 +303,15 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "src/main/python/semiwrap",
+        yaml_output_directory = "semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
             "//tunables:robotpy-native-tunables.copy_headers",
             "//wpiutil:robotpy-native-wpiutil.copy_headers",
         ],
-        package_root_file = "src/main/python/tunables/__init__.py",
+        package_root_file = "tunables/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
-        yaml_files = native.glob(["src/main/python/semiwrap/**"]),
+        pyproject_toml = "pyproject.toml",
+        yaml_files = native.glob(["semiwrap/**"]),
     )
 
     scan_headers(
@@ -319,7 +319,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         extra_hdrs = extra_pybind_hdrs + [
             "//tunables:robotpy-native-tunables.copy_headers",
         ],
-        package_root_file = "src/main/python/tunables/__init__.py",
+        package_root_file = "tunables/__init__.py",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
     )

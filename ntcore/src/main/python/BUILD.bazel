@@ -1,0 +1,37 @@
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
+load(":robotpy_pybind_build_info.bzl", "define_pybind_library", "ntcore_extension")
+
+PYBIND_PKGCFG_DEPS = [
+    "//datalog:native/datalog/robotpy-native-datalog.pc",
+    "//datalog/src/main/python:python.generated_pkgcfg_files",
+    "//ntcore:native/ntcore/robotpy-native-ntcore.pc",
+    "//wpinet:native/wpinet/robotpy-native-wpinet.pc",
+    "//wpinet/src/main/python:python.generated_pkgcfg_files",
+    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
+    "//wpiutil/src/main/python:python.generated_pkgcfg_files",
+]
+
+generate_robotpy_pybind_build_info(
+    name = "pyntcore-generator",
+    additional_srcs = ["//ntcore:robotpy-native-ntcore.copy_headers"],
+    package_root_file = "ntcore/__init__.py",
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    yaml_files = glob(["semiwrap/*.yml"]),
+)
+
+ntcore_extension(
+    srcs = glob(["ntcore/src/*.cpp"]),
+    extra_hdrs = glob([
+        "ntcore/src/*.h",
+        "ntcore/src/*.inl",
+    ]),
+    includes = [
+        "ntcore/",
+    ],
+)
+
+define_pybind_library(
+    name = "python",
+    extra_pybind_hdrs = glob(["**/*.h"]),
+    pkgcfgs = PYBIND_PKGCFG_DEPS,
+)

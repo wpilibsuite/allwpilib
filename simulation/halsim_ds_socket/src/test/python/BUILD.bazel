@@ -5,7 +5,7 @@ robotpy_py_test(
     "python",
     srcs = glob(["**/*.py"]),
     deps = [
-        "//simulation/halsim_ds_socket:robotpy-halsim-ds-socket",
+        "//simulation/halsim_ds_socket/src/main/python",
         requirement("pytest"),
     ],
 )
