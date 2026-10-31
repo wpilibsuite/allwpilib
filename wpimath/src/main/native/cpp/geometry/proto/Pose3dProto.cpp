@@ -5,9 +5,9 @@
 #include "wpi/math/geometry/proto/Pose3dProto.hpp"
 
 #include "wpi/math/geometry/Pose3d.hpp"
+#include "wpi/math/protobuf/geometry3d.npb.h"
 #include "wpi/util/protobuf/Protobuf.hpp"
 #include "wpi/util/protobuf/ProtobufCallbacks.hpp"
-#include "wpimath/protobuf/geometry3d.npb.h"
 
 std::optional<wpi::math::Pose3d> wpi::util::Protobuf<wpi::math::Pose3d>::Unpack(
     InputStream& stream) {
