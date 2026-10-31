@@ -48,6 +48,9 @@ scan_headers_ignore = [
   "wpi/fields/field_images.hpp",
   "wpi/fields/frc/*",
   "wpi/fields/ftc/*",
+  "wpi/fields/proto/*",
+  "wpi/fields/struct/*",
+  "wpi/fields/protobuf/*",
 ]
 
 [tool.semiwrap.name_transform]

@@ -274,6 +274,9 @@ tasks.register('generateJavaDocs', Javadoc) {
             "-org.wpilib.hardware.hal.simulation," +
             // TODO: ^ Document these, then remove them from the list
             "-org.wpilib.hardware.hal.struct," +
+            "-org.wpilib.fields.proto," +
+            "-org.wpilib.fields.proto.detail," +
+            "-org.wpilib.fields.struct," +
             "-org.wpilib.math.struct," +
             "-org.wpilib.math.controller.proto," +
             "-org.wpilib.math.controller.proto.detail," +

@@ -9,6 +9,9 @@ module wpilib.gamefields {
   requires transitive wpilib.math;
 
   exports org.wpilib.fields;
+  exports org.wpilib.fields.proto;
+  exports org.wpilib.fields.proto.detail;
+  exports org.wpilib.fields.struct;
 
   provides io.avaje.jsonb.spi.JsonbExtension with
       org.wpilib.fields.jsonb.GeneratedJsonComponent,

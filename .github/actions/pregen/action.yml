@@ -57,7 +57,10 @@ runs:
       shell: bash
 
     - name: Regenerate fields
-      run: ./fields/generate_fields.py
+      run: |
+        ./fields/generate_nanopb.py
+        ./fields/generate_enums.py
+        ./fields/generate_quickbuf.py --quickbuf_plugin protoc-gen-quickbuf-linux-x86_64.exe
       shell: bash
 
     - name: Regenerate wpiunits

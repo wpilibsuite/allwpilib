@@ -6,6 +6,8 @@ package org.wpilib.fields;
 
 import io.avaje.jsonb.Json;
 import java.util.Objects;
+import org.wpilib.fields.proto.FieldTagProto;
+import org.wpilib.fields.struct.FieldTagStruct;
 import org.wpilib.math.geometry.Pose3d;
 
 /** Represents a field tag's metadata. */
@@ -62,4 +64,10 @@ public final class FieldTag {
   public String toString() {
     return "FieldTag(ID: " + m_id + ", pose: " + m_pose + ")";
   }
+
+  /** FieldTag protobuf for serialization. */
+  public static final FieldTagProto proto = new FieldTagProto();
+
+  /** FieldTag struct for serialization. */
+  public static final FieldTagStruct struct = new FieldTagStruct();
 }
