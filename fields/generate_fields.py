@@ -4,12 +4,18 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 
-import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
+# When invoked directly, Python puts the script directory on sys.path.
+# Add the repo root so absolute package imports still work.
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 from jinja2 import Environment, FileSystemLoader
+
+from shared.generation import make_arg_parser, add_jinja_args
 
 BASE_RESOURCE_DIR = "/org/wpilib/fields/"
 FIELDS_RESOURCE_DIR = "org/wpilib/fields"
@@ -387,24 +393,13 @@ def main():
     script_path = Path(__file__).resolve()
     dirname = script_path.parent
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--output_directory",
-        default=dirname / "src/generated",
-        type=Path,
-        help="Directory to write generated source files into",
-    )
+    parser = make_arg_parser(dirname, dirname.parent)
+    add_jinja_args(parser, dirname, None)
     parser.add_argument(
         "--resources_root",
         default=dirname / "src/main/native/resources",
         type=Path,
         help="Root directory containing org/wpilib/fields JSON resources",
-    )
-    parser.add_argument(
-        "--template_root",
-        default=dirname / "src/generate",
-        type=Path,
-        help="Root directory containing the fields generator data and templates",
     )
     args = parser.parse_args()
 

@@ -28,7 +28,7 @@ generate_fields = rule(
             default = Label("//fields:templates"),
         ),
         "_tool": attr.label(
-            default = Label("//fields:generate_fields_script"),
+            default = Label("//fields:generate_fields_py"),
             cfg = "exec",
             executable = True,
         ),

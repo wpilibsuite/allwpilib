@@ -66,7 +66,7 @@ filegroup(
 )
 
 py_binary(
-    name = "generate_fields_script",
+    name = "generate_fields_py",
     srcs = ["generate_fields.py"],
     data = [
         ":field-jsons",
@@ -77,7 +77,10 @@ py_binary(
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
     }),
-    deps = [requirement("jinja2")],
+    deps = [
+        requirement("jinja2"),
+        "//:generation",
+    ],
 )
 
 py_binary(
