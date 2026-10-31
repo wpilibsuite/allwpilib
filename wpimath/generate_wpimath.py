@@ -25,6 +25,7 @@ def main(argv):
     generate_nanopb(
         args.nanopb,
         args.output_directory / "main/native/cpp",
+        args.output_directory / "main/native/include",
         args.proto_directory,
     )
     generate_quickbuf(
