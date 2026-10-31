@@ -8,6 +8,7 @@
 #include <string>
 
 #include "Message.hpp"
+#include "ProtocolVersions.hpp"
 #include "PubSubOptions.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
 #include "wpi/util/json.hpp"
@@ -220,7 +221,8 @@ bool wpi::nt::net::WireEncodeText(wpi::util::raw_ostream& os,
 }
 
 bool wpi::nt::net::WireEncodeBinary(wpi::util::raw_ostream& os, int id,
-                                    int64_t time, const Value& value) {
+                                    int64_t time, const Value& value,
+                                    unsigned int protoRev) {
   char buf[128];
   mpack_writer_t writer;
   mpack_writer_init(&writer, buf, sizeof(buf));
@@ -231,7 +233,7 @@ bool wpi::nt::net::WireEncodeBinary(wpi::util::raw_ostream& os, int id,
   });
   mpack_start_array(&writer, 4);
   mpack_write_int(&writer, id);
-  mpack_write_int(&writer, ToWireTimestamp(time));
+  mpack_write_int(&writer, protoRev >= NT_4_2 ? time : ToWireTimestamp(time));
   switch (value.type()) {
     case NT_BOOLEAN:
       mpack_write_u8(&writer, 0);
