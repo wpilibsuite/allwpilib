@@ -24,7 +24,7 @@ def make_arg_parser(
     Keyword arguments:
     subproject_root -- Path to the subproject root. Determines default output and proto directories.
     repo_root -- Path to the repo root. Used to find the nanopb generator.
-    types -- Flagset of all the types of generators arguments are neede for.
+    types -- Flagset of all the types of generators that arguments are needed for.
 
     Returns:
     The ArgumentParser with the necessary arguments.
@@ -156,7 +156,7 @@ def generate_nanopb(
     nanopb -- The nanopb generator.
     output_directory -- The base output directory to write generated files to.
     proto_dir -- The base directory with protobuf files.
-    extra_search_dirs -- Extra directories to search for protobuf files.,
+    extra_search_dirs -- Extra directories to search for protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/*.npb.*"):
