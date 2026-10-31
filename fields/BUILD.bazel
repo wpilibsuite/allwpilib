@@ -4,7 +4,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_jvm_external//:defs.bzl", "java_plugin_artifact")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_python//python:defs.bzl", "py_binary")
-load("//fields:generate_fields.bzl", "generate_fields")
+load("//fields:generate.bzl", "generate_fields")
 load("//fields:robotpy_native_build_info.bzl", "define_native_wrapper")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:java_rules.bzl", "patch_module", "wpilib_java_library")
@@ -21,7 +21,10 @@ filegroup(
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/include/**/*"]),
+    srcs = [
+        ":generated-native-include-files-pkg",
+        ":protobuf_hdr_pkg",
+    ],
     visibility = ["//fields:__subpackages__"],
 )
 
@@ -56,14 +59,18 @@ filegroup(
     ]),
 )
 
+filegroup(
+    name = "proto_files",
+    srcs = glob(["src/main/proto/**/*.proto"]),
+)
+
 py_binary(
-    name = "generate_fields_py",
-    srcs = ["generate_fields.py"],
+    name = "generate_enums",
+    srcs = ["generate_enums.py"],
     data = [
         ":field-jsons",
         ":templates",
     ],
-    main = "generate_fields.py",
     target_compatible_with = select({
         "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
         "//conditions:default": [],
@@ -71,6 +78,45 @@ py_binary(
     deps = [
         requirement("jinja2"),
         "//:generation",
+    ],
+)
+
+py_binary(
+    name = "generate_nanopb",
+    srcs = ["generate_nanopb.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//:generation",
+    ],
+)
+
+py_binary(
+    name = "generate_quickbuf",
+    srcs = ["generate_quickbuf.py"],
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//:generation",
+    ],
+)
+
+py_binary(
+    name = "generate_fields_py",
+    srcs = ["generate_fields.py"],
+    main = "generate_fields.py",
+    target_compatible_with = select({
+        "@wpilib_toolchains//constraints/is_systemcore:systemcore": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":generate_enums",
+        ":generate_nanopb",
+        ":generate_quickbuf",
     ],
 )
 
@@ -85,6 +131,7 @@ py_binary(
 
 generate_fields(
     name = "generate_fields",
+    tags = ["pregeneration"],
 )
 
 write_source_files(
@@ -132,16 +179,31 @@ pkg_files(
 
 pkg_files(
     name = "generated-native-include-files-pkg",
-    srcs = [":generated-native-include-files"],
+    srcs = glob(["src/generated/main/native/include/**/*"]),
     strip_prefix = "src/generated/main/native/include",
     visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "generated-native-include-files-lib",
-    hdrs = [":generated-native-include-files"],
+    hdrs = [":generated-native-include-files-pkg"],
     strip_include_prefix = "src/generated/main/native/include",
     visibility = ["//visibility:public"],
+)
+
+pkg_files(
+    name = "protobuf_hdr_pkg",
+    srcs = glob(
+        ["src/generated/main/native/include/**/protobuf/*.h"],
+        allow_empty = True,
+    ),
+    strip_prefix = "src/generated/main/native/include",
+)
+
+cc_library(
+    name = "nanopb-generated-headers",
+    hdrs = [":protobuf_hdr_pkg"],
+    strip_include_prefix = "src/generated/main/native/include",
 )
 
 wpilib_cc_library(
@@ -151,10 +213,15 @@ wpilib_cc_library(
         "src/main/native/cpp/Field.cpp",
         "src/main/native/cpp/FieldImage.cpp",
         "src/main/native/cpp/FieldTag.cpp",
-    ],
+    ] + glob([
+        "src/main/native/cpp/proto/*.cpp",
+        "src/main/native/cpp/struct/*.cpp",
+        "src/generated/main/native/cpp/wpi/fields/protobuf/*.cpp",
+    ]),
     hdrs = glob(["src/main/native/include/**/*"]),
     extra_hdr_pkg_files = [
         ":generated-native-include-files-pkg",
+        ":protobuf_hdr_pkg",
     ],
     extra_src_pkg_files = [
         ":field-resource-srcs-pkg",
@@ -165,6 +232,7 @@ wpilib_cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":generated-native-include-files-lib",
+        ":nanopb-generated-headers",
         "//wpimath",
         "//wpiutil",
     ],
@@ -272,6 +340,7 @@ wpilib_java_library(
         "//wpiutil:wpiutil-java",
         "@maven//:io_avaje_avaje_json_core",
         "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
     ],
 )
 

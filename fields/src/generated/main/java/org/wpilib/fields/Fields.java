@@ -11,6 +11,8 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Supplier;
+import org.wpilib.fields.proto.FieldIdProto;
+import org.wpilib.fields.struct.FieldIdStruct;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation3d;
@@ -2443,5 +2445,11 @@ public enum Fields {
                             0.0))))
         );
   }
+
+  /** FieldId protobuf for serialization. */
+  public static final FieldIdProto proto = new FieldIdProto();
+
+  /** FieldId struct for serialization. */
+  public static final FieldIdStruct struct = new FieldIdStruct();
 
 }

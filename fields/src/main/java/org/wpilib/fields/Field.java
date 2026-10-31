@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.wpilib.fields.proto.FieldProto;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation3d;
@@ -501,4 +502,7 @@ public final class Field {
     return Objects.hash(
         getName(), season, game, fieldImage, length, width, program, tags, m_origin);
   }
+
+  /** Field protobuf for serialization. */
+  public static final FieldProto proto = new FieldProto();
 }

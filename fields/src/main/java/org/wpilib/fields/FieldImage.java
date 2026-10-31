@@ -6,6 +6,7 @@ package org.wpilib.fields;
 
 import io.avaje.jsonb.Json;
 import java.util.Objects;
+import org.wpilib.fields.proto.FieldImageProto;
 
 /** Field image metadata. */
 @Json
@@ -68,4 +69,7 @@ public final class FieldImage {
   public int hashCode() {
     return Objects.hash(path, top, left, bottom, right);
   }
+
+  /** FieldImage protobuf for serialization. */
+  public static final FieldImageProto proto = new FieldImageProto();
 }
