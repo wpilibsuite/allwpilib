@@ -42,10 +42,13 @@ def main():
     parser.add_argument("--output_files", nargs="+")
 
     args = parser.parse_args()
-    assert len(args.resources) == len(args.output_files)
+    if len(args.resources) != len(args.output_files):
+        raise ValueError(
+            f"The number of resources must match the number of output files. Got {len(args.resources)} inputs, {len(args.output_files)} outputs."
+        )
 
-    for i, resource in enumerate(args.resources):
-        generate_file(resource, args.output_files[i], args.prefix, args.namespace)
+    for resource, output_file in zip(args.resources, args.output_files):
+        generate_file(resource, output_file, args.prefix, args.namespace)
 
 
 if __name__ == "__main__":
