@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -21,19 +20,14 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.LongConsumer;
 import java.util.function.LongSupplier;
-import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.GenericPublisher;
 import org.wpilib.networktables.GenericSubscriber;
-import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.NetworkTableEvent;
 import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.networktables.NetworkTableListenerPoller;
 import org.wpilib.networktables.NetworkTableValue;
 import org.wpilib.networktables.PubSubOption;
-import org.wpilib.networktables.StringArrayPublisher;
-import org.wpilib.networktables.StringArraySubscriber;
 import org.wpilib.networktables.StringPublisher;
-import org.wpilib.networktables.StringSubscriber;
 import org.wpilib.tunable.ComplexTunable;
 import org.wpilib.tunable.Tunable;
 import org.wpilib.tunable.TunableBackend;
@@ -885,7 +879,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
   }
 
   private final class ComplexTunableEntry implements TunableEntry {
-    ComplexTunableEntry(String path, String legacyPath, ComplexTunable tunable) {
+    ComplexTunableEntry(String path, ComplexTunable tunable) {
       m_tunables = tunable;
       String type = m_tunables.getTunableType();
       if (type == null) {
@@ -895,19 +889,12 @@ public class NetworkTablesTunableBackend implements TunableBackend {
             m_inst.getStringTopic(path + "/.type").publishEx("string", MUTABLE_PROPERTIES);
         m_typePublisher.set(type);
       }
-      m_chooser =
-          "Selectable".equals(type) && !path.equals(legacyPath)
-              ? new ChooserCompatibility(path, legacyPath)
-              : null;
     }
 
     @Override
     public void close() {
       if (m_typePublisher != null) {
         m_typePublisher.close();
-      }
-      if (m_chooser != null) {
-        m_chooser.close();
       }
     }
 
@@ -918,94 +905,6 @@ public class NetworkTablesTunableBackend implements TunableBackend {
 
     private final ComplexTunable m_tunables;
     private final StringPublisher m_typePublisher;
-    private final ChooserCompatibility m_chooser;
-  }
-
-  // Keep the legacy type in a separate table so existing Selectable dashboards
-  // can continue discovering the modern type and using its robust topics.
-  private final class ChooserCompatibility implements AutoCloseable {
-    private static final AtomicInteger NEXT_INSTANCE = new AtomicInteger();
-
-    ChooserCompatibility(String path, String legacyPath) {
-      m_default = m_inst.getStringTopic(path + "/default").subscribe("");
-      m_options = m_inst.getStringArrayTopic(path + "/options").subscribe(new String[0]);
-      m_active = m_inst.getStringTopic(path + "/selected/value").subscribe("");
-      m_tune = m_inst.getStringTopic(path + "/selected/tune").subscribe("");
-      m_tunePublisher = m_inst.getStringTopic(path + "/selected/tune").publish();
-      m_selectedPublisher = m_inst.getStringTopic(legacyPath + "/selected").publish();
-      m_selected =
-          m_inst
-              .getStringTopic(legacyPath + "/selected")
-              .subscribe("", PubSubOption.excludePublisher(m_selectedPublisher));
-      m_typePublisher = m_inst.getStringTopic(legacyPath + "/.type").publish();
-      m_namePublisher = m_inst.getStringTopic(legacyPath + "/.name").publish();
-      m_controllablePublisher = m_inst.getBooleanTopic(legacyPath + "/.controllable").publish();
-      m_instancePublisher = m_inst.getIntegerTopic(legacyPath + "/.instance").publish();
-      m_defaultPublisher = m_inst.getStringTopic(legacyPath + "/default").publish();
-      m_optionsPublisher = m_inst.getStringArrayTopic(legacyPath + "/options").publish();
-      m_activePublisher = m_inst.getStringTopic(legacyPath + "/active").publish();
-      m_typePublisher.set("String Chooser");
-      m_namePublisher.set(legacyPath.substring("/SmartDashboard/".length()));
-      m_controllablePublisher.set(true);
-      m_instancePublisher.set(NEXT_INSTANCE.getAndIncrement());
-      forwardSelection();
-    }
-
-    void forwardSelection() {
-      for (var selected : m_selected.readQueue()) {
-        // A retained legacy request must not overwrite a newer modern request.
-        // Accept equal timestamps so selections work when simulation time is paused.
-        if (selected.timestamp >= m_tune.getAtomic().timestamp) {
-          m_tunePublisher.set(selected.value, selected.timestamp);
-        }
-      }
-    }
-
-    void updateNetwork() {
-      String defaultChoice = m_default.get();
-      String[] options = m_options.get();
-      String selected = m_active.get();
-      m_selectedPublisher.set(selected);
-      m_defaultPublisher.set(defaultChoice);
-      m_optionsPublisher.set(options);
-      m_activePublisher.set(
-          !selected.isEmpty() && Arrays.asList(options).contains(selected)
-              ? selected
-              : defaultChoice);
-    }
-
-    @Override
-    public void close() {
-      m_default.close();
-      m_options.close();
-      m_active.close();
-      m_tune.close();
-      m_tunePublisher.close();
-      m_selected.close();
-      m_selectedPublisher.close();
-      m_typePublisher.close();
-      m_namePublisher.close();
-      m_controllablePublisher.close();
-      m_instancePublisher.close();
-      m_defaultPublisher.close();
-      m_optionsPublisher.close();
-      m_activePublisher.close();
-    }
-
-    private final StringSubscriber m_default;
-    private final StringArraySubscriber m_options;
-    private final StringSubscriber m_active;
-    private final StringSubscriber m_tune;
-    private final StringPublisher m_tunePublisher;
-    private final StringSubscriber m_selected;
-    private final StringPublisher m_selectedPublisher;
-    private final StringPublisher m_typePublisher;
-    private final StringPublisher m_namePublisher;
-    private final BooleanPublisher m_controllablePublisher;
-    private final IntegerPublisher m_instancePublisher;
-    private final StringPublisher m_defaultPublisher;
-    private final StringArrayPublisher m_optionsPublisher;
-    private final StringPublisher m_activePublisher;
   }
 
   /**
@@ -1339,10 +1238,7 @@ public class NetworkTablesTunableBackend implements TunableBackend {
         return true;
       }
       StoredEntry storedEntry =
-          new StoredEntry(
-              new ComplexTunableEntry(m_prefix + path, "/SmartDashboard" + path, tunable),
-              null,
-              tunable);
+          new StoredEntry(new ComplexTunableEntry(m_prefix + path, tunable), null, tunable);
       m_entries.put(path, storedEntry);
       trackEntry(storedEntry);
     }
@@ -1527,12 +1423,6 @@ public class NetworkTablesTunableBackend implements TunableBackend {
           return;
         }
         // update tunables from network changes
-        for (StoredEntry entry : m_complexEntries) {
-          var complex = (ComplexTunableEntry) entry.entry;
-          if (!entry.closed && complex.m_chooser != null) {
-            complex.m_chooser.forwardSelection();
-          }
-        }
         var pendingEvents = m_pendingTuneEvents.toArray(NetworkTableEvent[]::new);
         m_pendingTuneEvents.clear();
         var events = m_poller.readQueue();
@@ -1547,12 +1437,6 @@ public class NetworkTablesTunableBackend implements TunableBackend {
           updateAlwaysGetEntries();
           updatePolledEntries();
           updateDirtyEntries();
-          for (StoredEntry entry : m_complexEntries) {
-            var complex = (ComplexTunableEntry) entry.entry;
-            if (!entry.closed && complex.m_chooser != null) {
-              complex.m_chooser.updateNetwork();
-            }
-          }
         } finally {
           m_updateDepth--;
           if (m_updateDepth == 0) {

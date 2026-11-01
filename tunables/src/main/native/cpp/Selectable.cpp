@@ -27,20 +27,13 @@ void detail::SelectableBase::PublishTunable(
                 TunableConfig{.isMutable = false});
   table.Publish(
       SELECTED, this, &SelectableBase::m_selected,
-      TunableConfig{
-          .robust = true,
-          .onTune =
-              [](detail::TunableBase&, ComplexTunable* self) {
-                if (auto selectable = static_cast<SelectableBase*>(self)) {
-                  selectable->Changed(selectable->m_selected);
-                }
-              },
-          .onRemoteSet =
-              [](detail::TunableBase&, ComplexTunable* self) {
-                // Refresh aliases before echoing the selected member.
-                static_cast<SelectableBase*>(self)->SetChildTunableChanged(
-                    SELECTED);
-              }});
+      TunableConfig{.robust = true,
+                    .onTune = [](detail::TunableBase&, ComplexTunable* self) {
+                      if (auto selectable =
+                              static_cast<SelectableBase*>(self)) {
+                        selectable->Changed(selectable->m_selected);
+                      }
+                    }});
 }
 
 std::string_view detail::SelectableBase::GetTunableType() const {
