@@ -4,6 +4,8 @@
 
 package org.wpilib.examples.statespacearm;
 
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
+
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
@@ -19,7 +21,6 @@ import org.wpilib.math.system.LinearSystemLoop;
 import org.wpilib.math.system.Models;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 
 /**
  * This is a sample program to demonstrate how to use a state-space controller to control an arm.
@@ -29,8 +30,8 @@ public class Robot extends TimedRobot {
   private static final int ENCODER_A_CHANNEL = 0;
   private static final int ENCODER_B_CHANNEL = 1;
   private static final int JOYSTICK_PORT = 0;
-  private static final double RAISED_POSITION = Units.degreesToRadians(90.0);
-  private static final double LOWERED_POSITION = Units.degreesToRadians(0.0);
+  private static final double RAISED_POSITION = degreesToRadians(90.0);
+  private static final double LOWERED_POSITION = degreesToRadians(0.0);
 
   // Moment of inertia of the arm, in kg * m^2. Can be estimated with CAD. If finding this constant
   // is difficult, LinearSystem.identifyPositionSystem may be better.
@@ -43,8 +44,7 @@ public class Robot extends TimedRobot {
   private final TrapezoidProfile profile =
       new TrapezoidProfile(
           new TrapezoidProfile.Constraints(
-              Units.degreesToRadians(45),
-              Units.degreesToRadians(90))); // Max arm velocity and acceleration.
+              degreesToRadians(45), degreesToRadians(90))); // Max arm velocity and acceleration.
   private TrapezoidProfile.State lastProfiledReference = new TrapezoidProfile.State();
 
   // The plant holds a state-space model of our arm. This system has the following properties:
@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   private final LinearQuadraticRegulator<N2, N1, N1> controller =
       new LinearQuadraticRegulator<>(
           (LinearSystem<N2, N1, N1>) armPlant.slice(0),
-          VecBuilder.fill(Units.degreesToRadians(1.0), Units.degreesToRadians(10.0)), // qelms.
+          VecBuilder.fill(degreesToRadians(1.0), degreesToRadians(10.0)), // qelms.
           // Position and velocity error tolerances, in radians and radians per second. Decrease
           // this
           // to more heavily penalize state excursion, or make the controller behave more
