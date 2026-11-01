@@ -207,6 +207,85 @@ class SchedulerCancellationTests extends CommandTestBase {
   }
 
   @Test
+  void cancelRootDuringImmediateChildExecutionHaltsRoot() {
+    var ranAfterCancel = new AtomicBoolean(false);
+    var ranAfterFork = new AtomicBoolean(false);
+    var childRan = new AtomicBoolean(false);
+
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  childRan.set(true);
+                  m_scheduler.cancel(rootHolder.get());
+                  ranAfterCancel.set(true); // should never be reached
+                  co.park();
+                })
+            .named("Child");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child);
+                  ranAfterFork.set(true);
+                  co.park();
+                })
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+
+    assertTrue(childRan.get(), "Child should have run");
+    assertEquals(List.of(), m_scheduler.getRunningCommands(), "All commands should have stopped");
+    assertFalse(
+        ranAfterCancel.get(), "Child should not have continued running after canceling its parent");
+    assertFalse(
+        ranAfterFork.get(),
+        "Root should not have continued running after child immediately canceled it");
+  }
+
+  @Test
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
+  void cancelRootDuringDeferredChildExecutionHaltsRoot() {
+    var childRan = new AtomicBoolean(false);
+
+    AtomicReference<Command> rootHolder = new AtomicReference<>();
+
+    var child =
+        Command.noRequirements(
+                co -> {
+                  childRan.set(true);
+                  co.yield();
+                  m_scheduler.cancel(rootHolder.get());
+                  co.park();
+                })
+            .named("Child");
+
+    var root =
+        Command.noRequirements(
+                co -> {
+                  co.fork(child);
+                  co.park();
+                })
+            .named("Root");
+
+    rootHolder.set(root);
+
+    m_scheduler.schedule(root);
+    m_scheduler.run();
+    assertTrue(childRan.get(), "Child should have run");
+    assertEquals(List.of(root, child), m_scheduler.getRunningCommands());
+
+    m_scheduler.run();
+    assertEquals(List.of(), m_scheduler.getRunningCommands(), "Root and child should have stopped");
+    assertSchedulerEvent(
+        SchedulerEvent.Canceled.class, e -> e.command() == root, "Root should have been canceled");
+  }
+
+  @Test
   void requestCancellationDoesNotBubbleUp() {
     var selfCanceller =
         Command.noRequirements(Coroutine::requestCancellation).named("Self-Canceling Command");
