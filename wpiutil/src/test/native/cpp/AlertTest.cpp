@@ -151,11 +151,20 @@ void BackendResetAlertData() {
   gBackendState.reset = true;
 }
 
-const WPI_AlertBackend testBackend{
-    BackendCreateAlert,   BackendDestroyAlert,  BackendSetAlertActive,
-    BackendIsAlertActive, BackendSetAlertText,  BackendGetAlertText,
-    BackendGetAlertLevel, BackendGetNumAlerts,  BackendGetAlerts,
-    BackendFreeAlerts,    BackendResetAlertData};
+const WPI_AlertBackend testBackend{BackendCreateAlert,
+                                   BackendDestroyAlert,
+                                   BackendSetAlertActive,
+                                   BackendIsAlertActive,
+                                   BackendSetAlertText,
+                                   BackendGetAlertText,
+                                   BackendGetAlertLevel,
+                                   BackendGetNumAlerts,
+                                   BackendGetAlerts,
+                                   BackendFreeAlerts,
+                                   BackendResetAlertData,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr};
 
 }  // namespace
 
@@ -249,7 +258,7 @@ TEST_CASE_METHOD(AlertTest, "AlertTest CApiDuplicateRulesAndPartialListing",
   WPI_String text = wpi::util::make_string("duplicate");
   WPI_AlertHandle duplicate = 0;
   CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, &duplicate) ==
-        ALERT_ALREADY_ALLOCATED);
+        WPI_ALERT_ALREADY_ALLOCATED);
   CHECK(duplicate == WPI_INVALID_HANDLE);
 
   WPI_AlertInfo oneInfo;
@@ -367,7 +376,7 @@ TEST_CASE_METHOD(AlertTest,
   WPI_String id = wpi::util::make_string("id");
   WPI_String text = wpi::util::make_string("text");
   CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_HIGH, nullptr) ==
-        ALERT_ERROR);
+        WPI_ALERT_ERROR);
 
   CHECK(WPI_GetAlerts(nullptr, 1) != 0);
   CHECK(WPI_GetAlerts(nullptr, -1) != 0);
@@ -400,7 +409,7 @@ TEST_CASE_METHOD(AlertTest,
   WPI_String id = wpi::util::make_string("backendId");
   WPI_String text = wpi::util::make_string("backendText");
   CHECK(WPI_CreateAlert(&group, &id, &text, WPI_ALERT_MEDIUM, nullptr) ==
-        ALERT_ERROR);
+        WPI_ALERT_ERROR);
 
   CHECK(gBackendState.createdHandle == WPI_INVALID_HANDLE);
   CHECK(gBackendState.group == "");
@@ -475,4 +484,189 @@ TEST_CASE_METHOD(AlertTest, "AlertTest CppWrapperReleaseDoesNotDestroyHandle",
   }
 
   CHECK(gBackendState.destroyedHandle == WPI_INVALID_HANDLE);
+}
+
+namespace {
+
+class Reader {
+ public:
+  explicit Reader(size_t capacity) {
+    REQUIRE(WPI_CreateAlertReader(capacity, &handle) == 0);
+  }
+  ~Reader() { WPI_DestroyAlertReader(handle); }
+  WPI_AlertReaderHandle handle = nullptr;
+};
+
+class AlertEvents {
+ public:
+  ~AlertEvents() { WPI_FreeAlertEvents(&value); }
+  void Read(const Reader& reader) {
+    WPI_FreeAlertEvents(&value);
+    REQUIRE(WPI_ReadAlertEvents(reader.handle, &value) == 0);
+  }
+  WPI_AlertEvents value{};
+};
+
+}  // namespace
+
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest ReadersRetainShortTransitionsIndependently",
+                 "[wpiutil]") {
+  ScopedNowImpl now{100};
+  Reader first{10};
+  Reader second{10};
+  auto alert = CreateAlert("group", "id", "text", WPI_ALERT_HIGH);
+  CHECK(WPI_SetAlertActive(alert, 1) == 0);
+  gMockNow = 200;
+  CHECK(WPI_SetAlertActive(alert, 1) == 0);  // unchanged
+  CHECK(WPI_SetAlertActive(alert, 0) == 0);
+  WPI_String text = wpi::util::make_string("updated");
+  CHECK(WPI_SetAlertText(alert, &text) == 0);
+  CHECK(WPI_SetAlertText(alert, &text) == 0);  // unchanged
+  WPI_DestroyAlert(alert);
+  CHECK(WPI_GetNumAlerts() == 0);
+
+  AlertEvents result;
+  for (auto* reader : {&first, &second}) {
+    result.Read(*reader);
+    CHECK(result.value.reset);
+    CHECK_FALSE(result.value.historyLost);
+    REQUIRE(result.value.count == 5u);
+    CHECK(result.value.events[0].kind == WPI_ALERT_EVENT_CREATED);
+    CHECK(result.value.events[1].kind == WPI_ALERT_EVENT_ACTIVE_CHANGED);
+    CHECK(result.value.events[1].alert.activeStartTime == 100);
+    CHECK(result.value.events[1].timestamp == 100);
+    CHECK(result.value.events[2].alert.activeStartTime == 0);
+    CHECK(result.value.events[2].timestamp == 200);
+    CHECK(result.value.events[3].kind == WPI_ALERT_EVENT_TEXT_CHANGED);
+    CHECK(ToString(result.value.events[3].alert.text) == "updated");
+    CHECK(result.value.events[4].kind == WPI_ALERT_EVENT_REMOVED);
+    auto key = ToString(result.value.events[0].alert.key);
+    for (size_t i = 0; i < result.value.count; ++i) {
+      CHECK(ToString(result.value.events[i].alert.key) == key);
+      CHECK(
+          result.value.events[i].alert.fields ==
+          (WPI_ALERT_OBSERVATION_HAS_TEXT | WPI_ALERT_OBSERVATION_HAS_ACTIVE));
+    }
+    result.Read(*reader);
+    CHECK_FALSE(result.value.reset);
+    CHECK_FALSE(result.value.historyLost);
+    CHECK(result.value.count == 0u);
+  }
+}
+
+TEST_CASE_METHOD(AlertTest, "AlertTest ReaderBaselineIsFrozenBeforeFirstRead",
+                 "[wpiutil]") {
+  ScopedNowImpl now{123};
+  auto alert = CreateAlert("group", "id", "before", WPI_ALERT_LOW);
+  Reader reader{1};
+  CHECK(WPI_SetAlertActive(alert, 1) == 0);
+  AlertEvents result;
+  result.Read(reader);
+  CHECK(result.value.reset);
+  CHECK_FALSE(result.value.historyLost);
+  REQUIRE(result.value.count == 2u);
+  const auto& baseline = result.value.events[0];
+  CHECK(baseline.kind == WPI_ALERT_EVENT_BASELINE);
+  CHECK(baseline.timestamp == 0);
+  CHECK(baseline.alert.activeStartTime == 0);
+  CHECK(result.value.events[1].kind == WPI_ALERT_EVENT_ACTIVE_CHANGED);
+  CHECK(result.value.events[1].alert.activeStartTime == 123);
+  result.Read(reader);
+  CHECK_FALSE(result.value.reset);
+  CHECK_FALSE(result.value.historyLost);
+  CHECK(result.value.count == 0u);
+}
+
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest ReaderOverflowReplacesAndRetainsLaterChanges",
+                 "[wpiutil]") {
+  auto alert = CreateAlert("group", "id", "before", WPI_ALERT_LOW);
+  auto other = CreateAlert("group", "other", "other", WPI_ALERT_LOW);
+  Reader reader{1};
+  CHECK(WPI_SetAlertActive(alert, 1) == 0);
+  WPI_String text = wpi::util::make_string("replacement");
+  CHECK(WPI_SetAlertText(alert, &text) == 0);
+  WPI_DestroyAlert(other);
+  AlertEvents result;
+  result.Read(reader);
+  CHECK(result.value.reset);
+  CHECK(result.value.historyLost);
+  REQUIRE(result.value.count == 3u);  // baseline is exempt from capacity
+  CHECK(ToString(result.value.events[0].alert.text) == "replacement");
+  CHECK(result.value.events[0].alert.activeStartTime != 0);
+  CHECK(result.value.events[0].kind == WPI_ALERT_EVENT_BASELINE);
+  CHECK(result.value.events[1].kind == WPI_ALERT_EVENT_BASELINE);
+  CHECK(result.value.events[2].kind == WPI_ALERT_EVENT_REMOVED);
+  result.Read(reader);
+  CHECK_FALSE(result.value.reset);
+  CHECK_FALSE(result.value.historyLost);
+  CHECK(result.value.count == 0u);
+
+  CHECK(WPI_SetAlertActive(alert, 0) == 0);
+  WPI_DestroyAlert(alert);
+  result.Read(reader);
+  CHECK(result.value.reset);
+  CHECK(result.value.historyLost);
+  CHECK(result.value.count == 0u);
+}
+
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest ReaderResetAndSnapshotDoNotConsumeChanges",
+                 "[wpiutil]") {
+  auto stale = CreateAlert("group", "id", "old", WPI_ALERT_HIGH);
+  Reader reader{10};
+  AlertEvents result;
+  result.Read(reader);
+  REQUIRE(result.value.count == 1u);
+  auto oldKey = ToString(result.value.events[0].alert.key);
+  WPI_ResetAlertData();
+  auto current = CreateAlert("group", "id", "new", WPI_ALERT_HIGH);
+  WPI_DestroyAlert(stale);
+  WPI_AlertInfo snapshot{};
+  CHECK(WPI_GetNumAlerts() == 1);
+  REQUIRE(WPI_GetAlerts(&snapshot, 1) == 1);
+  CHECK(ToString(snapshot.text) == "new");
+  WPI_FreeAlerts(&snapshot, 1);
+  result.Read(reader);
+  REQUIRE(result.value.count == 2u);
+  CHECK(result.value.events[0].kind == WPI_ALERT_EVENT_REMOVED);
+  CHECK(ToString(result.value.events[0].alert.key) == oldKey);
+  CHECK(result.value.events[1].kind == WPI_ALERT_EVENT_CREATED);
+  CHECK(ToString(result.value.events[1].alert.key) != oldKey);
+  WPI_DestroyAlert(current);
+}
+
+TEST_CASE_METHOD(AlertTest, "AlertTest EventsSurviveReaderDestruction",
+                 "[wpiutil]") {
+  CreateAlert("group", "id", "before", WPI_ALERT_LOW);
+  WPI_AlertEvents result{};
+  {
+    Reader reader{1};
+    REQUIRE(WPI_ReadAlertEvents(reader.handle, &result) == 0);
+    REQUIRE(result.count == 1u);
+  }
+  CHECK(ToString(result.events[0].alert.text) == "before");
+  WPI_FreeAlertEvents(&result);
+  CHECK(result.events == nullptr);
+  CHECK(result.count == 0u);
+  WPI_FreeAlertEvents(&result);
+  WPI_FreeAlertEvents(nullptr);
+}
+
+TEST_CASE_METHOD(AlertTest,
+                 "AlertTest ReaderInvalidArgumentsAndUnsupportedBackend",
+                 "[wpiutil]") {
+  WPI_AlertReaderHandle reader = nullptr;
+  CHECK(WPI_CreateAlertReader(0, &reader) == WPI_ALERT_ERROR);
+  CHECK(reader == nullptr);
+  CHECK(WPI_CreateAlertReader(1, nullptr) == WPI_ALERT_ERROR);
+  WPI_DestroyAlertReader(nullptr);
+  WPI_AlertEvents result{};
+  CHECK(WPI_ReadAlertEvents(nullptr, &result) == WPI_ALERT_ERROR);
+  CHECK(result.events == nullptr);
+  CHECK(WPI_ReadAlertEvents(nullptr, nullptr) == WPI_ALERT_ERROR);
+  WPI_SetAlertBackend(&testBackend);
+  CHECK(WPI_CreateAlertReader(1, &reader) == WPI_ALERT_ERROR);
+  CHECK(reader == nullptr);
 }

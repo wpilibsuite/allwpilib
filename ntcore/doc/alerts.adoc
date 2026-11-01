@@ -1,0 +1,137 @@
+= Coprocessor alert publication
+
+ntcore can publish ordinary wpiutil alerts without HAL or MRCLib. C++, Java, and
+RobotPy use the same native implementation. NetworkTables and DataLog remain
+outside wpiutil.
+
+== Startup and lifetime
+
+Install the backend once, before creating any alert or alert reader.
+Reinstallation and changing backends while the alert system is in use are
+unsupported, including after data reset or instance shutdown. These are usage
+restrictions, not runtime checks: installation does not lock backend selection
+or track existing handles. Existing alerts and handles are not migrated.
+Choose the instance and root during application initialization, before starting
+threads which create alerts. The instance must be valid and must not be
+concurrently reset or destroyed during installation.
+
+Keep the NT instance alive until alerts and readers are no longer needed.
+Destroying or resetting the instance unpublishes and invalidates its alerts and
+rejects future alert creation. Readers still receive queued changes and removals,
+subject to their bounded history, then empty reads. Reuse of the numeric NT
+instance handle cannot resume publication. Disconnecting a client or stopping a
+server does not destroy alerts; local observation continues and current values
+are available when the connection resumes.
+
+The backend does not start, stop, or select NT connections. The application must
+configure the explicit instance. It must reserve the publication subtree for
+this backend; competing external publishers are unsupported. Use an application
+root such as `/CoprocessorAlerts/vision`, not the private system-server namespace.
+
+== Use
+
+[source,cpp]
+----
+#include "wpi/nt/AlertBackend.hpp"
+#include "wpi/util/Alert.hpp"
+
+auto instance = wpi::nt::NetworkTableInstance::Create();
+wpi::nt::InstallAlertBackend(instance, "/CoprocessorAlerts/vision");
+instance.SetServer("robot-hostname");
+instance.StartClient("vision");
+wpi::util::Alert camera{"Vision", "camera", "Camera unavailable",
+                        wpi::util::Alert::Level::MEDIUM};
+camera.Set(true);
+----
+
+[source,java]
+----
+var instance = NetworkTableInstance.create();
+AlertBackend.install(instance, "/CoprocessorAlerts/vision");
+instance.setServer("robot-hostname");
+instance.startClient("vision");
+var camera = new org.wpilib.util.Alert(
+    "Vision", "camera", "Camera unavailable", org.wpilib.util.Alert.Level.MEDIUM);
+camera.set(true);
+----
+
+[source,python]
+----
+import ntcore
+from wpiutil import Alert
+
+instance = ntcore.NetworkTableInstance.create()
+ntcore.install_alert_backend(instance, "/CoprocessorAlerts/vision")
+instance.set_server("robot-hostname")
+instance.start_client("vision")
+camera = Alert("Vision", "camera", "Camera unavailable", Alert.Level.MEDIUM)
+camera.set(True)
+----
+
+Installation returns no value. Close or destroy alerts normally to unpublish
+them.
+
+== Protocol and identity
+
+For root `R`, group `G`, decimal level `L`, and ID `I`, publication uses:
+
+[cols="2,1,3",options="header"]
+|===
+|Topic |NT type |Value
+|`R/G/L/I/text` |string |Current text, including while inactive
+|`R/G/L/I/active` |int |Zero when inactive; activation time in nanoseconds otherwise
+|===
+
+The text topic has a structured `mrcAlertIdentity` property:
+
+[source,json]
+----
+{"group":"Vision","uniqueId":"camera","level":1}
+----
+
+Root normalization adds a leading slash, collapses consecutive slashes, and
+removes trailing slashes. The caller must supply a root containing a non-slash
+character and no embedded NULs. Group and ID are preserved exactly, including
+empty strings and slashes; embedded NULs are rejected. Levels 0 through 255 are
+accepted. The ordinary wpiutil levels HIGH, MEDIUM, and LOW use 0, 1, and 2.
+
+Path components alone are ambiguous when group or ID contains a slash. Consumers
+must use and validate the structured identity rather than guessing a split.
+Duplicate identities and distinct identities producing the same path are
+rejected with `WPI_ALERT_ALREADY_ALLOCATED`. For example, group `a/1/b`, level 0,
+ID `c` conflicts with group `a`, level 1, ID `b/0/c`. An already published text or
+active topic at the requested path also prevents creation. Different levels
+normally produce independent alerts.
+
+Creation publishes text and inactive state immediately. Activation samples the
+local WPI monotonic clock in nanoseconds; repeated activation preserves that
+sample. At clock zero, activation uses 1 to distinguish active from inactive.
+Text updates do not change activation time. Deactivation publishes zero; alert
+destruction unpublishes both topics. Payload timestamps belong to the producer's
+clock domain; they are not automatically converted to the NT server's clock.
+This nanosecond payload must not be decoded as a legacy microsecond payload.
+
+Publishers enable `sendAll` and `keepDuplicates` with a 5 ms publication period.
+Interested remote subscribers should enable `sendAll`, `keepDuplicates`, and an
+appropriate `pollStorage` capacity. This retains brief activation/deactivation
+changes while connected, within transport and subscriber limits. NT is not a
+durable event log: connection loss, queue overflow, or topic creation followed
+quickly by destruction can lose history. The two topics are not an atomic
+transaction, and a remote consumer may temporarily observe only one field.
+
+== Local observation and reset
+
+`WPI_GetAlerts` and independent alert readers observe this backend's owned
+alerts, including inactive alerts. They do not import other NT publications.
+Readers retain the same frozen-baseline, bounded-change-queue, and overflow-reset
+contract as the in-memory backend. All public event and activation times are
+nanoseconds. Alert mutation, observation, and instance detachment serialize in
+the native implementation.
+
+`WPI_ResetAlertData` removes owned alerts and reports removals to readers.
+Stale objects cannot mutate or destroy subsequently created alerts. Reset
+permits new alerts while the instance remains alive; the startup-only backend
+selection restriction still applies.
+
+NT-to-Driver-Station importing and MRCLib-to-NT or DataLog export are separate
+features and are not provided by this backend.
