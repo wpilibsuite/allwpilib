@@ -61,6 +61,7 @@ common:imgui_tests --//shared/bazel/rules:with_imgui_tests=true
 # BuildBuddy BES Setup
 build:build_buddy_bes --bes_results_url=https://app.buildbuddy.io/invocation/
 build:build_buddy_bes --bes_backend=grpcs://remote.buildbuddy.io
+build:build_buddy_bes --nolegacy_important_outputs
 
 # Common Cache Settings
 build --remote_timeout=3600
@@ -70,10 +71,10 @@ common --experimental_remote_merkle_tree_cache
 # BuildBuddy Cache Setup
 build:build_buddy --config=build_buddy_bes
 build:build_buddy --remote_cache=grpcs://remote.buildbuddy.io
+build:build_buddy --experimental_remote_cache_chunking
 build:build_buddy --noslim_profile
 build:build_buddy --experimental_profile_include_target_label
 build:build_buddy --experimental_profile_include_primary_output
-build:build_buddy --nolegacy_important_outputs
 
 common:build_buddy_readonly --noremote_upload_local_results
 
@@ -103,6 +104,13 @@ build:remote --remote_timeout=1500
 build:remote --spawn_strategy=remote,sandboxed
 build:remote --grpc_keepalive_time=30s
 
+common:build_buddy_rbe --config=build_buddy
+common:build_buddy_rbe --config=build_buddy_readonly
+common:build_buddy_rbe --config=build_buddy_rbe_enable
+common:build_buddy_rbe_enable --config=remote
+build:build_buddy_rbe_enable --remote_executor=grpcs://remote.buildbuddy.io
+common:build_buddy_rbe_enable --experimental_remote_downloader=grpcs://remote.buildbuddy.io
+
 # This config should be used locally. It downloads more than the CI version
 build:remote_user --config=remote_cache
 build:remote_user --config=remote_cache_readonly
@@ -112,6 +120,7 @@ common:ci --color=yes
 build:ci --remote_download_minimal
 build:ci --progress_report_interval=60 --show_progress_rate_limit=60
 test:ci --test_summary=short_uncached
+build:ci --build_metadata=VISIBILITY=PUBLIC
 
 build --build_metadata=REPO_URL=https://github.com/wpilibsuite/allwpilib.git
 

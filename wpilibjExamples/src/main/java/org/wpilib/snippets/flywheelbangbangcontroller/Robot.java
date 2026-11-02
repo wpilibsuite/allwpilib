@@ -4,6 +4,10 @@
 
 package org.wpilib.snippets.flywheelbangbangcontroller;
 
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+import static org.wpilib.math.util.UnitConversions.lbsToKilograms;
+import static org.wpilib.math.util.UnitConversions.rotationsPerMinuteToRadiansPerSecond;
+
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.driverstation.Joystick;
 import org.wpilib.framework.TimedRobot;
@@ -14,7 +18,6 @@ import org.wpilib.math.numbers.N1;
 import org.wpilib.math.system.DCMotor;
 import org.wpilib.math.system.LinearSystem;
 import org.wpilib.math.system.Models;
-import org.wpilib.math.util.Units;
 import org.wpilib.simulation.EncoderSim;
 import org.wpilib.simulation.FlywheelSim;
 import org.wpilib.system.RobotController;
@@ -56,7 +59,7 @@ public class Robot extends TimedRobot {
 
   // 1/2 MR²
   private static final double FLYWHEEL_MOMENT_OF_INERTIA =
-      0.5 * Units.lbsToKilograms(1.5) * Math.pow(Units.inchesToMeters(4), 2);
+      0.5 * lbsToKilograms(1.5) * Math.pow(inchesToMeters(4), 2);
 
   private final DCMotor gearbox = DCMotor.getNEO(1);
 
@@ -77,9 +80,7 @@ public class Robot extends TimedRobot {
     // Scale setpoint value between 0 and maxSetpointValue
     double setpoint =
         Math.max(
-            0.0,
-            joystick.getRawAxis(0)
-                * Units.rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
+            0.0, joystick.getRawAxis(0) * rotationsPerMinuteToRadiansPerSecond(MAX_SETPOINT_VALUE));
 
     // Set setpoint and measurement of the bang-bang controller
     double bangOutput = bangBangController.calculate(encoder.getRate(), setpoint) * 12.0;

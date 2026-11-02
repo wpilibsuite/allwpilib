@@ -7,12 +7,12 @@ package org.wpilib.math.geometry;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.wpilib.math.util.UnitConversions.degreesToRadians;
 import static org.wpilib.units.Units.Inches;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.util.Units;
 
 class Translation3dTest {
   private static final double EPSILON = 1E-9;
@@ -60,19 +60,19 @@ class Translation3dTest {
 
     var translation = new Translation3d(1.0, 2.0, 3.0);
 
-    var rotated1 = translation.rotateBy(new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
+    var rotated1 = translation.rotateBy(new Rotation3d(xAxis, degreesToRadians(90.0)));
     assertAll(
         () -> assertEquals(1.0, rotated1.getX(), EPSILON),
         () -> assertEquals(-3.0, rotated1.getY(), EPSILON),
         () -> assertEquals(2.0, rotated1.getZ(), EPSILON));
 
-    var rotated2 = translation.rotateBy(new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
+    var rotated2 = translation.rotateBy(new Rotation3d(yAxis, degreesToRadians(90.0)));
     assertAll(
         () -> assertEquals(3.0, rotated2.getX(), EPSILON),
         () -> assertEquals(2.0, rotated2.getY(), EPSILON),
         () -> assertEquals(-1.0, rotated2.getZ(), EPSILON));
 
-    var rotated3 = translation.rotateBy(new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
+    var rotated3 = translation.rotateBy(new Rotation3d(zAxis, degreesToRadians(90.0)));
     assertAll(
         () -> assertEquals(-2.0, rotated3.getX(), EPSILON),
         () -> assertEquals(1.0, rotated3.getY(), EPSILON),
@@ -88,24 +88,21 @@ class Translation3dTest {
     var translation = new Translation3d(1.0, 2.0, 3.0);
     var around = new Translation3d(3.0, 2.0, 1.0);
 
-    var rotated1 =
-        translation.rotateAround(around, new Rotation3d(xAxis, Units.degreesToRadians(90.0)));
+    var rotated1 = translation.rotateAround(around, new Rotation3d(xAxis, degreesToRadians(90.0)));
 
     assertAll(
         () -> assertEquals(1.0, rotated1.getX(), EPSILON),
         () -> assertEquals(0.0, rotated1.getY(), EPSILON),
         () -> assertEquals(1.0, rotated1.getZ(), EPSILON));
 
-    var rotated2 =
-        translation.rotateAround(around, new Rotation3d(yAxis, Units.degreesToRadians(90.0)));
+    var rotated2 = translation.rotateAround(around, new Rotation3d(yAxis, degreesToRadians(90.0)));
 
     assertAll(
         () -> assertEquals(5.0, rotated2.getX(), EPSILON),
         () -> assertEquals(2.0, rotated2.getY(), EPSILON),
         () -> assertEquals(3.0, rotated2.getZ(), EPSILON));
 
-    var rotated3 =
-        translation.rotateAround(around, new Rotation3d(zAxis, Units.degreesToRadians(90.0)));
+    var rotated3 = translation.rotateAround(around, new Rotation3d(zAxis, degreesToRadians(90.0)));
 
     assertAll(
         () -> assertEquals(3.0, rotated3.getX(), EPSILON),
@@ -198,8 +195,8 @@ class Translation3dTest {
   void testPolarConstructor() {
     var zAxis = VecBuilder.fill(0.0, 0.0, 1.0);
 
-    var one = new Translation3d(Math.sqrt(2), new Rotation3d(zAxis, Units.degreesToRadians(45.0)));
-    var two = new Translation3d(2, new Rotation3d(zAxis, Units.degreesToRadians(60.0)));
+    var one = new Translation3d(Math.sqrt(2), new Rotation3d(zAxis, degreesToRadians(45.0)));
+    var two = new Translation3d(2, new Rotation3d(zAxis, degreesToRadians(60.0)));
     assertAll(
         () -> assertEquals(1.0, one.getX(), EPSILON),
         () -> assertEquals(1.0, one.getY(), EPSILON),

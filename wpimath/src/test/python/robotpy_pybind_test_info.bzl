@@ -27,7 +27,7 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
 
     resolve_casters(
         name = "wpimath_test.resolve_casters",
-        caster_deps = ["//wpimath:src/main/python/wpimath/wpimath-casters.pybind11.json", "//wpiutil:src/main/python/wpiutil/wpiutil-casters.pybind11.json"],
+        caster_deps = ["//wpimath/src/main/python:wpimath/wpimath-casters.pybind11.json", "//wpiutil/src/main/python:wpiutil/wpiutil-casters.pybind11.json"],
         casters_pkl_file = "wpimath_test.casters.pkl",
         dep_file = "wpimath_test.casters.d",
     )
@@ -77,8 +77,8 @@ def wpimath_test_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], 
         deps = [
             ":wpimath_test.tmpl_hdrs",
             ":wpimath_test.trampoline_hdrs",
+            "//wpimath/src/main/python:wpimath_pybind_library",
             "//wpimath:wpimath",
-            "//wpimath:wpimath_pybind_library",
         ],
         dynamic_deps = [
             "//wpimath:shared/wpimath",
@@ -139,10 +139,10 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             ":cpp/wpimath_test/_wpimath_test",
             ":wpimath_test.trampoline_hdr_files",
         ],
-        imports = ["cpp"],
+        imports = ["cpp/"],
         deps = [
         ],
-        strip_path_prefixes = ["wpimath/src/test/python/cpp", "wpimath"],
+        strip_path_prefixes = ["wpimath/src/test/python/cpp/"],
         summary = "Test project for verifying robotpy-build behavior",
         project_urls = None,
         author_email = "RobotPy Development Team <robotpy@googlegroups.com>",

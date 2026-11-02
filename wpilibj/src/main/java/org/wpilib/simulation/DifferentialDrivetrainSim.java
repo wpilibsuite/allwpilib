@@ -4,6 +4,9 @@
 
 package org.wpilib.simulation;
 
+import static org.wpilib.math.util.UnitConversions.inchesToMeters;
+import static org.wpilib.math.util.UnitConversions.lbsToKilograms;
+
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.linalg.Matrix;
@@ -18,7 +21,6 @@ import org.wpilib.math.system.Models;
 import org.wpilib.math.system.NumericalIntegration;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.StateSpaceUtil;
-import org.wpilib.math.util.Units;
 import org.wpilib.system.RobotController;
 
 /**
@@ -432,11 +434,11 @@ public class DifferentialDrivetrainSim {
   /** Represents common wheel sizes of the kit drivetrain. */
   public enum KitbotWheelSize {
     /** Six inch diameter wheels. */
-    SIX_INCH(Units.inchesToMeters(6)),
+    SIX_INCH(inchesToMeters(6)),
     /** Eight inch diameter wheels. */
-    EIGHT_INCH(Units.inchesToMeters(8)),
+    EIGHT_INCH(inchesToMeters(8)),
     /** Ten inch diameter wheels. */
-    TEN_INCH(Units.inchesToMeters(10));
+    TEN_INCH(inchesToMeters(10));
 
     /** KitbotWheelSize value. */
     public final double value;
@@ -465,10 +467,10 @@ public class DifferentialDrivetrainSim {
       KitbotWheelSize wheelSize,
       Matrix<N7, N1> measurementStdDevs) {
     // MOI estimation -- note that I = mr² for point masses
-    var batteryMoi = 12.5 / 2.2 * Math.pow(Units.inchesToMeters(10), 2);
+    var batteryMoi = 12.5 / 2.2 * Math.pow(inchesToMeters(10), 2);
     var gearboxMoi =
         (2.8 /* CIM motor */ * 2 / 2.2 + 2.0 /* Toughbox Mini- ish */)
-            * Math.pow(Units.inchesToMeters(26.0 / 2.0), 2);
+            * Math.pow(inchesToMeters(26.0 / 2.0), 2);
 
     return createKitbotSim(motor, gearing, wheelSize, batteryMoi + gearboxMoi, measurementStdDevs);
   }
@@ -497,9 +499,9 @@ public class DifferentialDrivetrainSim {
         motor.value,
         gearing.value,
         j,
-        Units.lbsToKilograms(60),
+        lbsToKilograms(60),
         wheelSize.value / 2.0,
-        Units.inchesToMeters(26),
+        inchesToMeters(26),
         measurementStdDevs);
   }
 }

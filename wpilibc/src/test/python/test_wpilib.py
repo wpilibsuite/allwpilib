@@ -53,15 +53,17 @@ def test_networktables_backend_registry_publication_uses_native_implementation(n
 
 
 class DashboardSelectable:
-    def __init__(self, nt, path: str, legacy: bool = False) -> None:
-        selected = "/selected" if legacy else "/selected/tune"
-        active = "/active" if legacy else "/selected/value"
+    def __init__(self, nt, path: str) -> None:
         self._default = nt.get_topic(f"{path}/default").generic_subscribe("string")
-        self._selected = nt.get_topic(f"{path}{selected}").generic_subscribe("string")
-        self._selected_publisher = nt.get_topic(f"{path}{selected}").generic_publish_ex(
-            "string", {"retained": True}
+        self._selected = nt.get_topic(f"{path}/selected/tune").generic_subscribe(
+            "string"
         )
-        self._active = nt.get_topic(f"{path}{active}").generic_subscribe("string")
+        self._selected_publisher = nt.get_topic(
+            f"{path}/selected/tune"
+        ).generic_publish_ex("string", {"retained": True})
+        self._active = nt.get_topic(f"{path}/selected/value").generic_subscribe(
+            "string"
+        )
         self._options = nt.get_topic(f"{path}/options").generic_subscribe("string[]")
 
     def close(self) -> None:
@@ -266,14 +268,10 @@ def test_selectable():
     assert chooser.get_selected() is True
 
 
-@pytest.mark.parametrize("legacy", [False, True])
-def test_selectable_dashboard_connects_after_publish(nt, legacy):
+def test_selectable_dashboard_connects_after_publish(nt):
     chooser = make_selectable()
     tunables.publish("auto", chooser)
-    tunables.TunableRegistry.update()
-    dashboard = DashboardSelectable(
-        nt, "/SmartDashboard/auto" if legacy else "/Tunables/auto", legacy
-    )
+    dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         assert dashboard.exists()
         assert dashboard.get_default() == "one"
@@ -293,15 +291,11 @@ def test_selectable_dashboard_connects_after_publish(nt, legacy):
         dashboard.close()
 
 
-@pytest.mark.parametrize("legacy", [False, True])
-def test_selectable_dashboard_connects_before_publish(nt, legacy):
-    dashboard = DashboardSelectable(
-        nt, "/SmartDashboard/auto" if legacy else "/Tunables/auto", legacy
-    )
+def test_selectable_dashboard_connects_before_publish(nt):
+    dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         chooser = make_selectable()
         tunables.publish("auto", chooser)
-        tunables.TunableRegistry.update()
 
         assert dashboard.exists()
         assert dashboard.get_default() == "one"
@@ -320,11 +314,8 @@ def test_selectable_dashboard_connects_before_publish(nt, legacy):
         dashboard.close()
 
 
-@pytest.mark.parametrize("legacy", [False, True])
-def test_selectable_retains_dashboard_selection_after_republish(nt, legacy):
-    dashboard = DashboardSelectable(
-        nt, "/SmartDashboard/auto" if legacy else "/Tunables/auto", legacy
-    )
+def test_selectable_retains_dashboard_selection_after_republish(nt):
+    dashboard = DashboardSelectable(nt, "/Tunables/auto")
     try:
         first_chooser = make_selectable()
         tunables.publish("auto", first_chooser)
@@ -351,108 +342,6 @@ def test_selectable_retains_dashboard_selection_after_republish(nt, legacy):
         assert second_chooser.get_selected() == 2
     finally:
         dashboard.close()
-
-
-def test_selectable_shares_legacy_and_modern_selections(nt):
-    chooser = make_selectable()
-    calls = []
-    chooser.on_change(calls.append)
-    tunables.publish("auto", chooser)
-    legacy = DashboardSelectable(nt, "/SmartDashboard/auto", True)
-    modern = DashboardSelectable(nt, "/Tunables/auto")
-    tunables.TunableRegistry.update()
-    assert nt.get_entry("/Tunables/auto/.type").get_string("") == "Selectable"
-    assert nt.get_entry("/SmartDashboard/auto/.type").get_string("") == "String Chooser"
-    assert nt.get_entry("/SmartDashboard/auto/.instance").get_integer(-1) >= 0
-    assert nt.get_entry("/SmartDashboard/auto/.name").get_string("") == "auto"
-    assert nt.get_entry("/SmartDashboard/auto/.controllable").get_boolean(False)
-
-    legacy.set_selected("two")
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == 2
-    assert modern.get_selected() == "two"
-    assert modern.get_active() == "two"
-    assert calls == [2]
-    assert tunables.TunableRegistry.get_tune_revision(chooser) == 1
-
-    modern.set_selected("one")
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == 1
-    assert legacy.get_selected() == "one"
-    assert legacy.get_active() == "one"
-    legacy.set_selected("two")
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == 2
-    tunables.TunableRegistry.update()
-    assert calls == [2, 1, 2]
-    assert tunables.TunableRegistry.get_tune_revision(chooser) == 3
-
-    chooser.remove("two")
-    tunables.TunableRegistry.update()
-    assert legacy.get_active() == "one"
-    assert legacy.get_options() == ["one"]
-    chooser.add_default("three", 3)
-    tunables.TunableRegistry.update()
-    assert legacy.get_default() == "three"
-    assert legacy.get_active() == "three"
-    chooser.clear()
-    tunables.TunableRegistry.update()
-    assert legacy.get_active() == ""
-    assert legacy.get_options() == []
-    assert calls == [2, 1, 2]
-
-    tunables.remove("auto")
-    assert not nt.get_topic("/SmartDashboard/auto/.type").exists()
-    assert not nt.get_topic("/SmartDashboard/auto/.instance").exists()
-    assert not nt.get_topic("/SmartDashboard/auto/active").exists()
-    assert not legacy.exists()
-
-
-@pytest.mark.parametrize("legacy_time_offset", [-1, 0, 1])
-def test_selectable_uses_newest_retained_dashboard_selection(nt, legacy_time_offset):
-    legacy = nt.get_string_topic("/SmartDashboard/auto/selected").publish()
-    modern = nt.get_string_topic("/Tunables/auto/selected/tune").publish()
-    legacy.set("two", 200 + legacy_time_offset)
-    modern.set("one", 200)
-    chooser = make_selectable()
-    calls = []
-    chooser.on_change(calls.append)
-    tunables.publish("auto", chooser)
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == (2 if legacy_time_offset >= 0 else 1)
-    assert calls == [chooser.get_selected()]
-    tunables.TunableRegistry.update()
-    assert len(calls) == 1
-
-
-def test_selectable_compatibility_follows_aliases_and_backend_migration(nt):
-    chooser = make_selectable()
-    tunables.publish("nested/auto", chooser)
-    tunables.publish("alias", chooser)
-    legacy = DashboardSelectable(nt, "/SmartDashboard/nested/auto", True)
-    alias = DashboardSelectable(nt, "/SmartDashboard/alias", True)
-    legacy.set_selected("two")
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == 2
-    assert legacy.get_active() == "two"
-    assert alias.get_active() == "two"
-    tunables.remove("alias")
-    assert not alias.exists()
-
-    tunables.TunableRegistry.register_backend(
-        "nested", wpilib.NetworkTablesTunableBackend(nt, "/OtherTunables")
-    )
-    legacy.set_selected("one")
-    tunables.TunableRegistry.update()
-    assert chooser.get_selected() == 1
-    assert legacy.get_active() == "one"
-    assert (
-        nt.get_entry("/OtherTunables/nested/auto/selected/value").get_string("")
-        == "one"
-    )
-    tunables.remove("nested/auto")
-    assert not legacy.exists()
-    assert not nt.get_topic("/SmartDashboard/nested/auto/.type").exists()
 
 
 def test_motorcontrollergroup():

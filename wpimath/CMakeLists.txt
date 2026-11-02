@@ -33,7 +33,7 @@ target_link_libraries(protobuf wpiutil)
 
 target_include_directories(
     protobuf
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
 )
 
 add_library(wpimath ${wpimath_native_src} $<TARGET_OBJECTS:protobuf>)
@@ -122,18 +122,13 @@ else()
     endif()
 endif()
 
-install(
-    DIRECTORY src/generated/main/native/cpp/
-    DESTINATION "${include_dest}/wpimath"
-    FILES_MATCHING
-    PATTERN "*.h"
-)
+install(DIRECTORY src/generated/main/native/include/ DESTINATION "${include_dest}/wpimath")
 install(DIRECTORY src/main/native/include/ DESTINATION "${include_dest}/wpimath")
 target_include_directories(
     wpimath
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/cpp>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/generated/main/native/include>
         $<INSTALL_INTERFACE:${include_dest}/wpimath>
 )
 

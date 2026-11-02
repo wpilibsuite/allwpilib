@@ -6,24 +6,22 @@ load("@rules_python//python:defs.bzl", "py_binary")
 load("//shared/bazel/rules:cc_rules.bzl", "generate_def_windows", "third_party_cc_lib_helper", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
-load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
 load("//wpimath:generate.bzl", "generate_wpimath")
 load("//wpimath:robotpy_native_build_info.bzl", "define_native_wrapper")
-load("//wpimath:robotpy_pybind_build_info.bzl", "define_pybind_library", "publish_library_casters", "wpimath_extension")
 
 filegroup(
     name = "generated-native-include-files",
-    srcs = glob(["src/generated/main/native/cpp/wpi/math/protobuf/*.h"]),
+    srcs = glob(["src/generated/main/native/include/**/*.h"]),
     visibility = ["//visibility:public"],
 )
 
 filegroup(
     name = "doxygen-files",
     srcs = glob([
-        "src/generated/main/native/cpp/wpi/math/protobuf/*.h",
-        "src/main/native/include/**/*",
-        "src/main/native/thirdparty/gcem/include/**/*",
-        "src/main/native/thirdparty/sleipnir/include/**/*",
+        "src/main/native/include/**/*.hpp",
+        "src/main/native/thirdparty/gcem/include/**/*.hpp",
+        "src/main/native/thirdparty/sleipnir/include/**/*.hpp",
     ]) + [":generated-native-include-files"],
     visibility = ["//visibility:public"],
 )
@@ -140,27 +138,27 @@ third_party_cc_lib_helper(
 
 cc_library(
     name = "nanopb-generated-headers",
-    hdrs = glob(["src/generated/main/native/cpp/**/*.h"]),
-    includes = ["src/generated/main/native/cpp"],
-    strip_include_prefix = "src/generated/main/native/cpp",
+    hdrs = glob(["src/generated/main/native/include/**/*.npb.h"]),
+    strip_include_prefix = "src/generated/main/native/include",
 )
 
 pkg_files(
     name = "protobuf_hdr_pkg",
     srcs = [":generated-native-include-files"],
-    strip_prefix = "src/generated/main/native/cpp/",
+    strip_prefix = "src/generated/main/native/include/",
 )
 
 wpilib_cc_library(
     name = "wpimath",
     srcs = glob(
         [
-            "src/main/native/cpp/**",
+            "src/main/native/cpp/**/*.cpp",
+            "src/main/native/cpp/**/*.hpp",
             "src/generated/main/native/cpp/**/*.cpp",
         ],
         exclude = ["src/main/native/cpp/jni/**"],
     ),
-    hdrs = glob(["src/main/native/include/**"]),
+    hdrs = glob(["src/main/native/include/**/*.hpp"]),
     extra_hdr_pkg_files = [
         ":protobuf_hdr_pkg",
         ":eigen-pkg",
@@ -274,12 +272,11 @@ package_default_jni_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-wpimath-generator",
-    generated_include_root = "src/generated/main/native/cpp",
     generated_include_target = "//wpimath:generated-native-include-files",
     module_include_targets = {
         "@eigen//:all_files": "include",
     },
-    pyproject_toml = "src/main/python/native-pyproject.toml",
+    pyproject_toml = "src/main/native/pyproject.toml",
     third_party_dirs = [
         "gcem",
         "sleipnir",
@@ -288,36 +285,5 @@ generate_robotpy_native_wrapper_build_info(
 
 define_native_wrapper(
     name = "robotpy-native-wpimath",
-    pyproject_toml = "src/main/python/native-pyproject.toml",
-)
-
-PYBIND_PKGCFG_DEPS = [
-    "//telemetry:native/telemetry/robotpy-native-telemetry.pc",
-    "//telemetry:robotpy-telemetry.generated_pkgcfg_files",
-    "//tunables:native/tunables/robotpy-native-tunables.pc",
-    "//tunables:robotpy-tunables.generated_pkgcfg_files",
-    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
-    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
-]
-
-generate_robotpy_pybind_build_info(
-    name = "robotpy-wpimath-generator",
-    additional_srcs = [":robotpy-native-wpimath.copy_headers"],
-    package_root_file = "src/main/python/wpimath/__init__.py",
-    pkgcfgs = PYBIND_PKGCFG_DEPS,
-    yaml_files = glob(["src/main/python/semiwrap/**/*.yml"]),
-)
-
-publish_library_casters()
-
-wpimath_extension(
-    srcs = ["src/main/python/wpimath/src/wpimath.cpp"],
-    extra_hdrs = glob(["src/main/python/wpimath/_impl/src/**/*.h"]),
-)
-
-define_pybind_library(
-    name = "robotpy-wpimath",
-    extra_pybind_hdrs = glob(["src/main/python/**/*.h"]),
-    pkgcfgs = PYBIND_PKGCFG_DEPS,
+    pyproject_toml = "src/main/native/pyproject.toml",
 )

@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #include <algorithm>
-#include <atomic>
 #include <exception>
 #include <format>
 #include <memory>
@@ -20,11 +19,8 @@
 #include <utility>
 #include <vector>
 
-#include "wpi/nt/BooleanTopic.hpp"
 #include "wpi/nt/GenericEntry.hpp"
-#include "wpi/nt/IntegerTopic.hpp"
 #include "wpi/nt/NetworkTableValue.hpp"
-#include "wpi/nt/StringArrayTopic.hpp"
 #include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/tunables/ComplexTunable.hpp"
@@ -195,98 +191,6 @@ bool TypeMatches(const wpi::nt::Value& value, detail::TunableTypeValue type) {
   }
 }
 
-// Keep the legacy type in a separate table so existing Selectable dashboards
-// can continue discovering the modern type and using its robust topics.
-class ChooserCompatibility {
- public:
-  ChooserCompatibility(wpi::nt::NetworkTableInstance inst,
-                       std::string_view path, std::string_view legacyPath)
-      : m_default{
-            inst.GetStringTopic(std::format("{}/default", path)).Subscribe("")},
-        m_options{inst.GetStringArrayTopic(std::format("{}/options", path))
-                      .Subscribe({})},
-        m_active{inst.GetStringTopic(std::format("{}/selected/value", path))
-                     .Subscribe("")},
-        m_tune{inst.GetStringTopic(std::format("{}/selected/tune", path))
-                   .Subscribe("")},
-        m_tunePublisher{
-            inst.GetStringTopic(std::format("{}/selected/tune", path))
-                .Publish()},
-        m_selectedPublisher{
-            inst.GetStringTopic(std::format("{}/selected", legacyPath))
-                .Publish()},
-        m_selected{inst.GetStringTopic(std::format("{}/selected", legacyPath))
-                       .Subscribe("", {.excludePublisher =
-                                           m_selectedPublisher.GetHandle()})},
-        m_typePublisher{
-            inst.GetStringTopic(std::format("{}/.type", legacyPath)).Publish()},
-        m_namePublisher{
-            inst.GetStringTopic(std::format("{}/.name", legacyPath)).Publish()},
-        m_controllablePublisher{
-            inst.GetBooleanTopic(std::format("{}/.controllable", legacyPath))
-                .Publish()},
-        m_instancePublisher{
-            inst.GetIntegerTopic(std::format("{}/.instance", legacyPath))
-                .Publish()},
-        m_defaultPublisher{
-            inst.GetStringTopic(std::format("{}/default", legacyPath))
-                .Publish()},
-        m_optionsPublisher{
-            inst.GetStringArrayTopic(std::format("{}/options", legacyPath))
-                .Publish()},
-        m_activePublisher{
-            inst.GetStringTopic(std::format("{}/active", legacyPath))
-                .Publish()} {
-    static std::atomic<int64_t> NEXT_INSTANCE{0};
-    m_typePublisher.Set("String Chooser");
-    m_namePublisher.Set(
-        legacyPath.substr(std::string_view{"/SmartDashboard/"}.size()));
-    m_controllablePublisher.Set(true);
-    m_instancePublisher.Set(NEXT_INSTANCE++);
-    ForwardSelection();
-  }
-
-  void ForwardSelection() {
-    for (auto&& selected : m_selected.ReadQueue()) {
-      // A retained legacy request must not overwrite a newer modern request.
-      // Accept equal timestamps so selections work with paused simulation time.
-      if (selected.time >= m_tune.GetAtomic().time) {
-        m_tunePublisher.Set(selected.value, selected.time);
-      }
-    }
-  }
-
-  void UpdateNetwork() {
-    auto defaultChoice = m_default.Get();
-    auto options = m_options.Get();
-    auto selected = m_active.Get();
-    m_selectedPublisher.Set(selected);
-    m_defaultPublisher.Set(defaultChoice);
-    m_optionsPublisher.Set(options);
-    m_activePublisher.Set(!selected.empty() &&
-                                  std::ranges::find(options, selected) !=
-                                      options.end()
-                              ? selected
-                              : defaultChoice);
-  }
-
- private:
-  wpi::nt::StringSubscriber m_default;
-  wpi::nt::StringArraySubscriber m_options;
-  wpi::nt::StringSubscriber m_active;
-  wpi::nt::StringSubscriber m_tune;
-  wpi::nt::StringPublisher m_tunePublisher;
-  wpi::nt::StringPublisher m_selectedPublisher;
-  wpi::nt::StringSubscriber m_selected;
-  wpi::nt::StringPublisher m_typePublisher;
-  wpi::nt::StringPublisher m_namePublisher;
-  wpi::nt::BooleanPublisher m_controllablePublisher;
-  wpi::nt::IntegerPublisher m_instancePublisher;
-  wpi::nt::StringPublisher m_defaultPublisher;
-  wpi::nt::StringArrayPublisher m_optionsPublisher;
-  wpi::nt::StringPublisher m_activePublisher;
-};
-
 }  // namespace
 
 class NetworkTablesTunableBackend::Entry {
@@ -297,7 +201,6 @@ class NetworkTablesTunableBackend::Entry {
   virtual uint32_t GetUid() const = 0;
   virtual void UpdateNetwork(bool force) = 0;
   virtual void RemoveListener() {}
-  virtual ChooserCompatibility* GetChooserCompatibility() { return nullptr; }
   virtual ValueEntry* AsValueEntry() { return nullptr; }
   void SetInsertEpoch(uint64_t epoch) { m_insertEpoch = epoch; }
   uint64_t GetInsertEpoch() const { return m_insertEpoch; }
@@ -793,17 +696,12 @@ class ProtobufTunableEntry final
 class ComplexTunableEntry final : public NetworkTablesTunableBackend::Entry {
  public:
   ComplexTunableEntry(wpi::nt::NetworkTableInstance inst, std::string_view path,
-                      std::string_view legacyPath, uint32_t uid,
-                      detail::TunableBase& tunable)
+                      uint32_t uid, detail::TunableBase& tunable)
       : m_uid{uid},
         m_typePublisher{inst.GetStringTopic(std::format("{}/.type", path))
                             .PublishEx("string", GetProperties(nullptr))} {
     auto& complex = static_cast<ComplexTunable&>(tunable);
     m_typePublisher.Set(complex.GetTunableType());
-    if (complex.GetTunableType() == "Selectable" && path != legacyPath) {
-      m_chooser =
-          std::make_unique<ChooserCompatibility>(inst, path, legacyPath);
-    }
   }
 
   uint32_t GetUid() const override { return m_uid; }
@@ -812,14 +710,9 @@ class ComplexTunableEntry final : public NetworkTablesTunableBackend::Entry {
     TunableRegistry::ResetChangedAfterUpdate(m_uid);
   }
 
-  ChooserCompatibility* GetChooserCompatibility() override {
-    return m_chooser.get();
-  }
-
  private:
   uint32_t m_uid;
   wpi::nt::StringPublisher m_typePublisher;
-  std::unique_ptr<ChooserCompatibility> m_chooser;
 };
 
 NetworkTablesTunableBackend::NetworkTablesTunableBackend(
@@ -1081,9 +974,8 @@ bool NetworkTablesTunableBackend::Publish(std::string_view path, uint32_t uid,
         break;
       case COMPLEX:
       case MEMBER_COMPLEX:
-        entry = std::make_shared<ComplexTunableEntry>(
-            m_inst, ntPath, std::format("/SmartDashboard{}", path), uid,
-            tunable);
+        entry =
+            std::make_shared<ComplexTunableEntry>(m_inst, ntPath, uid, tunable);
         break;
       default:
         TunableRegistry::ReportWarning(
@@ -1235,13 +1127,6 @@ void NetworkTablesTunableBackend::Update() {
     if (m_retired) {
       return;
     }
-    for (auto&& entry : m_complexEntries) {
-      if (!entry->IsRemoved()) {
-        if (auto chooser = entry->GetChooserCompatibility()) {
-          chooser->ForwardSelection();
-        }
-      }
-    }
     events.swap(m_pendingTuneEvents);
     for (auto&& event : m_poller.ReadQueue()) {
       events.emplace_back(std::move(event));
@@ -1295,13 +1180,6 @@ void NetworkTablesTunableBackend::Update() {
     }
     for (auto&& entry : dirtyEntries) {
       updateEntry(entry, true);
-    }
-    for (auto&& entry : m_complexEntries) {
-      if (!entry->IsRemoved()) {
-        if (auto chooser = entry->GetChooserCompatibility()) {
-          chooser->UpdateNetwork();
-        }
-      }
     }
   } catch (...) {
     if (!lock.owns_lock()) {

@@ -5,18 +5,18 @@
 package org.wpilib.math.trajectory;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.trajectory.constraint.CentripetalAccelerationConstraint;
-import org.wpilib.math.util.Units;
 
 class CentripetalAccelerationConstraintTest {
   @Test
   void testCentripetalAccelerationConstraint() {
-    double maxCentripetalAcceleration = Units.feetToMeters(7.0); // 7 feet per second squared
+    double maxCentripetalAcceleration = feetToMeters(7.0); // 7 feet per second squared
     var constraint = new CentripetalAccelerationConstraint(maxCentripetalAcceleration);
 
     Trajectory<DrivetrainSplineSample> trajectory =

@@ -20,8 +20,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.geometry.proto.detail.ProtobufTranslation2d;
 import org.wpilib.networktables.GenericEntry;
@@ -930,15 +928,12 @@ class NetworkTablesTunableBackendTest {
     assertWarning(warnings, "/Tunables/malformedTranslation", "rejected protobuf tune payload");
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = {false, true})
-  void selectableDashboardConnectsAfterPublish(boolean legacy) {
+  @Test
+  void selectableDashboardConnectsAfterPublish() {
     Selectable<Integer> chooser = makeSelectable();
     Tunables.publish("auto", chooser);
-    TunableRegistry.update();
 
-    try (var dashboard =
-        new DashboardSelectable(legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy)) {
+    try (var dashboard = new DashboardSelectable("/Tunables/auto")) {
       assertTrue(dashboard.exists());
       assertEquals("one", dashboard.getDefault());
       assertArrayEquals(new String[] {"one", "two"}, dashboard.getOptions());
@@ -956,14 +951,11 @@ class NetworkTablesTunableBackendTest {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = {false, true})
-  void selectableDashboardConnectsBeforePublish(boolean legacy) {
-    try (var dashboard =
-        new DashboardSelectable(legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy)) {
+  @Test
+  void selectableDashboardConnectsBeforePublish() {
+    try (var dashboard = new DashboardSelectable("/Tunables/auto")) {
       Selectable<Integer> chooser = makeSelectable();
       Tunables.publish("auto", chooser);
-      TunableRegistry.update();
 
       assertTrue(dashboard.exists());
       assertEquals("one", dashboard.getDefault());
@@ -981,11 +973,9 @@ class NetworkTablesTunableBackendTest {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = {false, true})
-  void selectableRetainsDashboardSelectionAfterRepublish(boolean legacy) {
-    try (var dashboard =
-        new DashboardSelectable(legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy)) {
+  @Test
+  void selectableRetainsDashboardSelectionAfterRepublish() {
+    try (var dashboard = new DashboardSelectable("/Tunables/auto")) {
       Selectable<Integer> firstChooser = makeSelectable();
       Tunables.publish("auto", firstChooser);
 
@@ -1007,112 +997,6 @@ class NetworkTablesTunableBackendTest {
       assertEquals("two", dashboard.getSelected());
       assertEquals("two", dashboard.getActive());
       assertEquals(2, secondChooser.getSelected());
-    }
-  }
-
-  @Test
-  void selectableSharesLegacyAndModernSelections() {
-    var chooser = makeSelectable();
-    AtomicInteger calls = new AtomicInteger();
-    chooser.onChange(value -> calls.incrementAndGet());
-    Tunables.publish("auto", chooser);
-    try (var legacy = new DashboardSelectable("/SmartDashboard/auto", true);
-        var modern = new DashboardSelectable("/Tunables/auto", false)) {
-      TunableRegistry.update();
-      assertEquals("Selectable", m_inst.getEntry("/Tunables/auto/.type").getString(""));
-      assertEquals("String Chooser", m_inst.getEntry("/SmartDashboard/auto/.type").getString(""));
-      assertTrue(m_inst.getEntry("/SmartDashboard/auto/.instance").getInteger(-1) >= 0);
-      assertEquals("auto", m_inst.getEntry("/SmartDashboard/auto/.name").getString(""));
-      assertTrue(m_inst.getEntry("/SmartDashboard/auto/.controllable").getBoolean(false));
-
-      legacy.setSelected("two");
-      TunableRegistry.update();
-      assertEquals(2, chooser.getSelected());
-      assertEquals("two", modern.getSelected());
-      assertEquals("two", modern.getActive());
-      assertEquals(1, calls.get());
-      assertEquals(1, TunableRegistry.getTuneRevision(chooser));
-
-      modern.setSelected("one");
-      TunableRegistry.update();
-      assertEquals(1, chooser.getSelected());
-      assertEquals("one", legacy.getSelected());
-      assertEquals("one", legacy.getActive());
-
-      legacy.setSelected("two");
-      TunableRegistry.update();
-      assertEquals(2, chooser.getSelected());
-      TunableRegistry.update();
-      assertEquals(3, calls.get());
-      assertEquals(3, TunableRegistry.getTuneRevision(chooser));
-
-      chooser.remove("two");
-      TunableRegistry.update();
-      assertEquals("one", legacy.getActive());
-      assertArrayEquals(new String[] {"one"}, legacy.getOptions());
-      chooser.addDefault("three", 3);
-      TunableRegistry.update();
-      assertEquals("three", legacy.getDefault());
-      assertEquals("three", legacy.getActive());
-      chooser.clear();
-      TunableRegistry.update();
-      assertEquals("", legacy.getActive());
-      assertArrayEquals(new String[0], legacy.getOptions());
-      assertEquals(3, calls.get());
-
-      Tunables.remove("auto");
-      assertFalse(m_inst.getTopic("/SmartDashboard/auto/.type").exists());
-      assertFalse(m_inst.getTopic("/SmartDashboard/auto/.instance").exists());
-      assertFalse(m_inst.getTopic("/SmartDashboard/auto/active").exists());
-      assertFalse(legacy.exists());
-    }
-  }
-
-  @ParameterizedTest
-  @ValueSource(ints = {-1, 0, 1})
-  void selectableUsesNewestRetainedDashboardSelection(int legacyTimeOffset) {
-    try (var legacy = m_inst.getStringTopic("/SmartDashboard/auto/selected").publish();
-        var modern = m_inst.getStringTopic("/Tunables/auto/selected/tune").publish()) {
-      legacy.set("two", 200 + legacyTimeOffset);
-      modern.set("one", 200);
-      var chooser = makeSelectable();
-      AtomicInteger calls = new AtomicInteger();
-      chooser.onChange(value -> calls.incrementAndGet());
-      Tunables.publish("auto", chooser);
-      TunableRegistry.update();
-      assertEquals(legacyTimeOffset >= 0 ? 2 : 1, chooser.getSelected());
-      assertEquals(1, calls.get());
-      TunableRegistry.update();
-      assertEquals(1, calls.get());
-    }
-  }
-
-  @Test
-  void selectableCompatibilityFollowsAliasesAndBackendMigration() {
-    var chooser = makeSelectable();
-    Tunables.publish("nested/auto", chooser);
-    Tunables.publish("alias", chooser);
-    try (var legacy = new DashboardSelectable("/SmartDashboard/nested/auto", true);
-        var alias = new DashboardSelectable("/SmartDashboard/alias", true)) {
-      legacy.setSelected("two");
-      TunableRegistry.update();
-      assertEquals(2, chooser.getSelected());
-      assertEquals("two", legacy.getActive());
-      assertEquals("two", alias.getActive());
-      Tunables.remove("alias");
-      assertFalse(alias.exists());
-
-      TunableRegistry.registerBackend(
-          "nested", new NetworkTablesTunableBackend(m_inst, "/OtherTunables"));
-      legacy.setSelected("one");
-      TunableRegistry.update();
-      assertEquals(1, chooser.getSelected());
-      assertEquals("one", legacy.getActive());
-      assertEquals(
-          "one", m_inst.getEntry("/OtherTunables/nested/auto/selected/value").getString(""));
-      Tunables.remove("nested/auto");
-      assertFalse(legacy.exists());
-      assertFalse(m_inst.getTopic("/SmartDashboard/nested/auto/.type").exists());
     }
   }
 
@@ -1693,14 +1577,14 @@ class NetworkTablesTunableBackendTest {
   }
 
   private final class DashboardSelectable implements AutoCloseable {
-    DashboardSelectable(String path, boolean legacy) {
-      String selected = legacy ? "/selected" : "/selected/tune";
+    DashboardSelectable(String path) {
       m_default = m_inst.getTopic(path + "/default").genericSubscribe("string");
-      m_selected = m_inst.getTopic(path + selected).genericSubscribe("string");
+      m_selected = m_inst.getTopic(path + "/selected/tune").genericSubscribe("string");
       m_selectedPublisher =
-          m_inst.getTopic(path + selected).genericPublishEx("string", "{\"retained\":true}");
-      String active = legacy ? "/active" : "/selected/value";
-      m_active = m_inst.getTopic(path + active).genericSubscribe("string");
+          m_inst
+              .getTopic(path + "/selected/tune")
+              .genericPublishEx("string", "{\"retained\":true}");
+      m_active = m_inst.getTopic(path + "/selected/value").genericSubscribe("string");
       m_options = m_inst.getTopic(path + "/options").genericSubscribe("string[]");
     }
 

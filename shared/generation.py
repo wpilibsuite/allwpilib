@@ -2,6 +2,7 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 import argparse
+import shutil
 import subprocess
 import sys
 from collections.abc import Sequence
@@ -23,7 +24,7 @@ def make_arg_parser(
     Keyword arguments:
     subproject_root -- Path to the subproject root. Determines default output and proto directories.
     repo_root -- Path to the repo root. Used to find the nanopb generator.
-    types -- Flagset of all the types of generators arguments are neede for.
+    types -- Flagset of all the types of generators that arguments are needed for.
 
     Returns:
     The ArgumentParser with the necessary arguments.
@@ -145,6 +146,7 @@ def generate_quickbuf(
 def generate_nanopb(
     nanopb: Path,
     output_directory: Path,
+    header_directory: Path,
     proto_dir: Path,
     extra_search_dirs: Sequence[Path] = (),
 ) -> None:
@@ -154,13 +156,14 @@ def generate_nanopb(
     nanopb -- The nanopb generator.
     output_directory -- The base output directory to write generated files to.
     proto_dir -- The base directory with protobuf files.
-    extra_search_dirs -- Extra directories to search for protobuf files.,
+    extra_search_dirs -- Extra directories to search for protobuf files.
     """
     # Wipe away all protobuf files (and only protobuf files) first to ensure correctness
     for file in output_directory.glob("**/*.npb.*"):
         file.unlink()
     # Nice to have if you delete the whole generated directory
     output_directory.mkdir(parents=True, exist_ok=True)
+    header_directory.mkdir(parents=True, exist_ok=True)
     for path in proto_dir.glob("**/*.proto"):
         subprocess.check_call(
             ([sys.executable] if str(nanopb).endswith(".py") else [])
@@ -186,3 +189,9 @@ def generate_nanopb(
             encoding="utf-8",
             newline="\n",
         )
+
+    for file in output_directory.glob("**/*.npb.h"):
+        target = header_directory / file.relative_to(output_directory)
+        # Subtree may not exist if the header folder was emptied
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(file, target)

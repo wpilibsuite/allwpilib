@@ -377,19 +377,6 @@ Tunables.publish("kP", kP);
 
 Its tunable type string is `"Selectable"`.
 
-The NetworkTables backend also publishes a SendableChooser-compatible view at
-`/SmartDashboard/<path>` when that is distinct from the configured tunable path.
-For example, publishing `auto` with the default backend exposes the modern
-`/Tunables/auto` table and the legacy `/SmartDashboard/auto` table. The legacy view
-uses the `"String Chooser"` type, includes the chooser metadata, `default`,
-`options`, and `active` entries, and accepts writes to `selected`. Both views
-control the same selection and use the same change listener; robot code needs no
-compatibility configuration. The bridge updates with the registry, mirrors option
-and default changes, and is removed when the selectable is unpublished. If both
-dashboard protocols have pending selections, the newer NetworkTables timestamp
-takes precedence; equal timestamps favor the legacy request. The modern table
-retains its existing type and robust `selected/tune` and `selected/value` topics.
-
 ```java
 public final class Selectable<V> implements ComplexTunable {
   // adds an option; updates the published options array

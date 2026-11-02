@@ -107,7 +107,7 @@ py::object GetBooleanArrayEntry(const wpi::nt::NetworkTableEntry& entry,
     auto b = py::bool_(v.data.arr_boolean.arr[i]);
     PyList_SET_ITEM(l.ptr(), i, b.release().ptr());
   }
-  return std::move(l);
+  return l;
 }
 
 py::object GetDoubleArrayEntry(const wpi::nt::NetworkTableEntry& entry,

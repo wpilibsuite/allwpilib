@@ -10,11 +10,9 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/generators/catch_generators.hpp>
 
 #include "wpi/math/geometry/Translation2d.hpp"
 #include "wpi/nt/DoubleTopic.hpp"
@@ -22,7 +20,6 @@
 #include "wpi/nt/NetworkTableInstance.hpp"
 #include "wpi/nt/ProtobufTopic.hpp"
 #include "wpi/nt/StringArrayTopic.hpp"
-#include "wpi/nt/StringTopic.hpp"
 #include "wpi/nt/StructArrayTopic.hpp"
 #include "wpi/nt/StructTopic.hpp"
 #include "wpi/tunables/ComplexTunable.hpp"
@@ -144,23 +141,16 @@ class RobustChildComplexTunable final : public wpi::tunables::ComplexTunable {
 
 class DashboardSelectable {
  public:
-  DashboardSelectable(wpi::nt::NetworkTableInstance inst, std::string_view path,
-                      bool legacy = false)
+  DashboardSelectable(wpi::nt::NetworkTableInstance inst, std::string_view path)
       : m_default{inst.GetTopic(std::format("{}/default", path))
                       .GenericSubscribe("string")},
-        m_selected{
-            inst.GetTopic(std::format("{}{}", path,
-                                      legacy ? "/selected" : "/selected/tune"))
-                .GenericSubscribe("string")},
-        m_selectedPub{
-            inst.GetTopic(std::format("{}{}", path,
-                                      legacy ? "/selected" : "/selected/tune"))
-                .GenericPublishEx("string",
-                                  wpi::util::json::object("retained", true))},
-        m_active{
-            inst.GetTopic(std::format("{}{}", path,
-                                      legacy ? "/active" : "/selected/value"))
-                .GenericSubscribe("string")},
+        m_selected{inst.GetTopic(std::format("{}/selected/tune", path))
+                       .GenericSubscribe("string")},
+        m_selectedPub{inst.GetTopic(std::format("{}/selected/tune", path))
+                          .GenericPublishEx("string", wpi::util::json::object(
+                                                          "retained", true))},
+        m_active{inst.GetTopic(std::format("{}/selected/value", path))
+                     .GenericSubscribe("string")},
         m_options{inst.GetTopic(std::format("{}/options", path))
                       .GenericSubscribe("string[]")} {}
 
@@ -627,14 +617,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "SelectableDashboardConnectsAfterPublish",
                  "[wpilibc][tunable]") {
-  bool legacy = GENERATE(false, true);
   wpi::tunables::Selectable<int> chooser;
   ConfigureSelectable(chooser);
   wpi::tunables::Publish("auto", chooser);
-  wpi::tunables::TunableRegistry::Update();
 
-  DashboardSelectable dashboard{
-      inst, legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy};
+  DashboardSelectable dashboard{inst, "/Tunables/auto"};
 
   CHECK(dashboard.Exists());
   CHECK("one" == dashboard.GetDefault());
@@ -656,14 +643,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "SelectableDashboardConnectsBeforePublish",
                  "[wpilibc][tunable]") {
-  bool legacy = GENERATE(false, true);
-  DashboardSelectable dashboard{
-      inst, legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy};
+  DashboardSelectable dashboard{inst, "/Tunables/auto"};
   wpi::tunables::Selectable<int> chooser;
   ConfigureSelectable(chooser);
 
   wpi::tunables::Publish("auto", chooser);
-  wpi::tunables::TunableRegistry::Update();
 
   CHECK(dashboard.Exists());
   CHECK("one" == dashboard.GetDefault());
@@ -684,14 +668,11 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
                  "NetworkTablesTunableBackendTest "
                  "SelectableRetainsDashboardSelectionAfterRepublish",
                  "[wpilibc][tunable]") {
-  bool legacy = GENERATE(false, true);
-  DashboardSelectable dashboard{
-      inst, legacy ? "/SmartDashboard/auto" : "/Tunables/auto", legacy};
+  DashboardSelectable dashboard{inst, "/Tunables/auto"};
   {
     wpi::tunables::Selectable<int> chooser;
     ConfigureSelectable(chooser);
     wpi::tunables::Publish("auto", chooser);
-    wpi::tunables::TunableRegistry::Update();
 
     dashboard.SetSelected("two");
     inst.Flush();
@@ -708,136 +689,10 @@ TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
   ConfigureSelectable(chooser);
   wpi::tunables::Publish("auto", chooser);
   wpi::tunables::TunableRegistry::Update();
-  wpi::tunables::TunableRegistry::Update();
 
   CHECK("two" == dashboard.GetSelected());
   CHECK("two" == dashboard.GetActive());
   CHECK(2 == chooser.GetSelected());
-}
-
-TEST_CASE_METHOD(
-    NetworkTablesTunableBackendTest,
-    "NetworkTablesTunableBackendTest SelectableSharesLegacyAndModernSelections",
-    "[wpilibc][tunable]") {
-  wpi::tunables::Selectable<int> chooser;
-  ConfigureSelectable(chooser);
-  int calls = 0;
-  chooser.OnChange([&](int) { ++calls; });
-  wpi::tunables::Publish("auto", chooser);
-  DashboardSelectable legacy{inst, "/SmartDashboard/auto", true};
-  DashboardSelectable modern{inst, "/Tunables/auto"};
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(
-      inst.GetTopic("/Tunables/auto/.type").GenericSubscribe().GetString("") ==
-      "Selectable");
-  CHECK(inst.GetTopic("/SmartDashboard/auto/.type")
-            .GenericSubscribe()
-            .GetString("") == "String Chooser");
-  CHECK(inst.GetTopic("/SmartDashboard/auto/.instance")
-            .GenericSubscribe()
-            .GetInteger(-1) >= 0);
-
-  CHECK(inst.GetTopic("/SmartDashboard/auto/.name")
-            .GenericSubscribe()
-            .GetString("") == "auto");
-  CHECK(inst.GetTopic("/SmartDashboard/auto/.controllable")
-            .GenericSubscribe()
-            .GetBoolean(false));
-
-  legacy.SetSelected("two");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(chooser.GetSelected() == 2);
-  CHECK(modern.GetSelected() == "two");
-  CHECK(modern.GetActive() == "two");
-  CHECK(calls == 1);
-  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(chooser) == 1);
-
-  modern.SetSelected("one");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(chooser.GetSelected() == 1);
-  CHECK(legacy.GetSelected() == "one");
-  CHECK(legacy.GetActive() == "one");
-  legacy.SetSelected("two");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(chooser.GetSelected() == 2);
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(calls == 3);
-  CHECK(wpi::tunables::TunableRegistry::GetTuneRevision(chooser) == 3);
-
-  chooser.Remove("two");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(legacy.GetActive() == "one");
-  CHECK(legacy.GetOptions() == std::vector<std::string>{"one"});
-  chooser.AddDefault("three", 3);
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(legacy.GetDefault() == "three");
-  CHECK(legacy.GetActive() == "three");
-  chooser.Clear();
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(legacy.GetActive().empty());
-  CHECK(legacy.GetOptions().empty());
-  CHECK(calls == 3);
-
-  wpi::tunables::Remove("auto");
-  CHECK_FALSE(inst.GetTopic("/SmartDashboard/auto/.type").Exists());
-  CHECK_FALSE(inst.GetTopic("/SmartDashboard/auto/.instance").Exists());
-  CHECK_FALSE(inst.GetTopic("/SmartDashboard/auto/active").Exists());
-  CHECK_FALSE(legacy.Exists());
-}
-
-TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
-                 "NetworkTablesTunableBackendTest "
-                 "SelectableUsesNewestRetainedDashboardSelection",
-                 "[wpilibc][tunable]") {
-  int legacyTimeOffset = GENERATE(-1, 0, 1);
-  auto legacy = inst.GetStringTopic("/SmartDashboard/auto/selected").Publish();
-  auto modern = inst.GetStringTopic("/Tunables/auto/selected/tune").Publish();
-  legacy.Set("two", 200 + legacyTimeOffset);
-  modern.Set("one", 200);
-  wpi::tunables::Selectable<int> chooser;
-  ConfigureSelectable(chooser);
-  int calls = 0;
-  chooser.OnChange([&](int) { ++calls; });
-  wpi::tunables::Publish("auto", chooser);
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(chooser.GetSelected() == (legacyTimeOffset >= 0 ? 2 : 1));
-  CHECK(calls == 1);
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(calls == 1);
-}
-
-TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
-                 "NetworkTablesTunableBackendTest "
-                 "SelectableCompatibilityFollowsMovesAndBackendMigration",
-                 "[wpilibc][tunable]") {
-  wpi::tunables::Selectable<int> chooser;
-  ConfigureSelectable(chooser);
-  wpi::tunables::Publish("nested/auto", chooser);
-  wpi::tunables::Publish("alias", chooser);
-  DashboardSelectable legacy{inst, "/SmartDashboard/nested/auto", true};
-  DashboardSelectable alias{inst, "/SmartDashboard/alias", true};
-  legacy.SetSelected("two");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(chooser.GetSelected() == 2);
-  CHECK(legacy.GetActive() == "two");
-  CHECK(alias.GetActive() == "two");
-  wpi::tunables::Remove("alias");
-  CHECK_FALSE(alias.Exists());
-
-  wpi::tunables::TunableRegistry::RegisterBackend(
-      "nested", std::make_shared<wpi::backend::NetworkTablesTunableBackend>(
-                    inst, "/OtherTunables"));
-  auto moved = std::move(chooser);
-  legacy.SetSelected("one");
-  wpi::tunables::TunableRegistry::Update();
-  CHECK(moved.GetSelected() == 1);
-  CHECK(legacy.GetActive() == "one");
-  CHECK(inst.GetTopic("/OtherTunables/nested/auto/selected/value")
-            .GenericSubscribe()
-            .GetString("") == "one");
-  wpi::tunables::Remove("nested/auto");
-  CHECK_FALSE(legacy.Exists());
-  CHECK_FALSE(inst.GetTopic("/SmartDashboard/nested/auto/.type").Exists());
 }
 
 TEST_CASE_METHOD(NetworkTablesTunableBackendTest,
