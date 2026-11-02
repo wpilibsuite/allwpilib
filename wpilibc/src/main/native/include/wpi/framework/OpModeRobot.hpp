@@ -59,6 +59,25 @@ concept ConstructibleOpMode =
  * selected. When no opmode is selected, NonePeriodic() is called. The
  * DriverStationConnected() function is called the first time the driver station
  * connects to the robot.
+ *
+ * Every period, the robot's loop function runs first, calling these in order:
+ *
+ * 1. DisabledPeriodic(), only while disabled
+ * 2. DisabledPeriodic() of the selected opmode, only while disabled
+ * 3. NonePeriodic(), only when no opmode is selected
+ * 4. RobotPeriodic()
+ * 5. SimulationPeriodic(), only in simulation
+ *
+ * Then, while enabled, the opmode's Periodic() runs. Both are scheduled on the
+ * same period, and the loop function was registered first, so RobotPeriodic()
+ * and SimulationPeriodic() always run before the opmode's Periodic() in a given
+ * period. Additional callbacks from AddPeriodic() or the opmode run on their
+ * own schedules.
+ *
+ * One exception to the list above: if an opmode is selected while the robot is
+ * already enabled, its DisabledPeriodic() is called once, right after
+ * construction and before Start(), even though the robot is not disabled. That
+ * call happens before RobotPeriodic() in that loop.
  */
 class OpModeRobotBase : public RobotBase {
  public:
@@ -110,6 +129,10 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called periodically every loop, regardless of enabled state or
    * OpMode selection.
+   *
+   * Runs after DisabledPeriodic(), the opmode's DisabledPeriodic(), and
+   * NonePeriodic(), and before SimulationPeriodic(). When an opmode is enabled,
+   * this runs before its Periodic() in the same period.
    */
   virtual void RobotPeriodic() {}
 
@@ -120,6 +143,9 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically in simulation.
+   *
+   * Runs after RobotPeriodic() and before the enabled opmode's Periodic() in
+   * the same period.
    */
   virtual void SimulationPeriodic() {}
 
@@ -130,6 +156,9 @@ class OpModeRobotBase : public RobotBase {
 
   /**
    * Function called periodically while the robot is disabled.
+   *
+   * Runs first in the loop, before the selected opmode's DisabledPeriodic(),
+   * NonePeriodic(), and RobotPeriodic(). Never runs while enabled.
    */
   virtual void DisabledPeriodic() {}
 
@@ -141,6 +170,8 @@ class OpModeRobotBase : public RobotBase {
   /**
    * Function called periodically anytime when no opmode is selected, including
    * when the Driver Station is disconnected.
+   *
+   * Runs after DisabledPeriodic() and before RobotPeriodic().
    */
   virtual void NonePeriodic() {}
 
