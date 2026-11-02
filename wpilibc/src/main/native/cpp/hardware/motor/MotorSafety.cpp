@@ -72,10 +72,10 @@ static MotorSafetyManager& GetManager() {
 namespace wpi::impl {
 void ResetMotorSafety() {
   auto& manager = GetManager();
+  // Join outside listMutex; the thread locks it in CheckMotors().
+  manager.thread.Join();
   std::scoped_lock lock(manager.listMutex);
   manager.instanceList.clear();
-  manager.thread.Stop();
-  manager.thread.Join();
   manager.thread = wpi::util::SafeThreadOwner<Thread>{};
   manager.threadStarted = false;
 }
