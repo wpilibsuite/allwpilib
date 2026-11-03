@@ -87,6 +87,8 @@ class StderrCapture {
 #ifdef _WIN32
     return _dup2(source, dest);
 #else
+    // Catch2's REQUIRE() throws on failure, so source is never -1 here
+    // NOLINTNEXTLINE(clang-analyzer-unix.StdCLibraryFunctions)
     return dup2(source, dest);
 #endif
   }

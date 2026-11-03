@@ -10,12 +10,12 @@
 #include "wpi/hal/simulation/NotifyListener.h"
 #include "wpi/util/string.h"
 
-typedef void (*HAL_RoboRioStringCallback)(const char* name, void* param,
-                                          const char* str, size_t size);
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef void (*HAL_RoboRioStringCallback)(const char* name, void* param,
+                                          const char* str, size_t size);
 
 void HALSIM_ResetRoboRioData(void);
 int32_t HALSIM_RegisterRoboRioVInVoltageCallback(HAL_NotifyCallback callback,

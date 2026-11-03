@@ -6,6 +6,10 @@
 
 #include "wpi/hal/Types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef void (*HAL_CAN_SendMessageCallback)(
     const char* name, void* param, int32_t busId, uint32_t messageId,
     const struct HAL_CANMessage* message, int32_t periodMs, int32_t* status);
@@ -31,10 +35,6 @@ typedef void (*HAL_CAN_GetCANStatusCallback)(
     const char* name, void* param, int32_t busId, float* percentBusUtilization,
     uint32_t* busOffCount, uint32_t* txFullCount, uint32_t* receiveErrorCount,
     uint32_t* transmitErrorCount, int32_t* status);
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void HALSIM_ResetCanData(void);
 

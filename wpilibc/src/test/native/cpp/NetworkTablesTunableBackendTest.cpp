@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
@@ -111,9 +112,8 @@ class CountingComplexTunable final : public wpi::tunables::ComplexTunable {
 
 class StructMemberComplexTunable final : public wpi::tunables::ComplexTunable {
  public:
-  explicit StructMemberComplexTunable(
-      const wpi::tunables::TunableConfig& config)
-      : m_config{config} {}
+  explicit StructMemberComplexTunable(wpi::tunables::TunableConfig config)
+      : m_config{std::move(config)} {}
 
   std::string_view GetTunableType() const override { return "StructMember"; }
 

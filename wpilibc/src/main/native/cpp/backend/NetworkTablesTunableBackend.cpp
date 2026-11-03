@@ -833,7 +833,7 @@ void NetworkTablesTunableBackend::ClearTrackedEntries() {
 }
 
 NetworkTablesTunableBackend::~NetworkTablesTunableBackend() {
-  Retire();
+  NetworkTablesTunableBackend::Retire();
 }
 
 void NetworkTablesTunableBackend::Retire() {
