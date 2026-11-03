@@ -4,11 +4,13 @@
 
 package org.wpilib.command3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SchedulerTest extends CommandTestBase {
   @Test
@@ -162,16 +164,12 @@ class SchedulerTest extends CommandTestBase {
 
   @Test
   void namedCommandsPreventSchedulingOfParent() {
-      var command1 = Command.noRequirements(Coroutine::park).named("B");
-      var command2 = command1.named("A");
-      m_scheduler.schedule(command2);
-      m_scheduler.schedule(command1);
-      m_scheduler.run();
-      m_scheduler.run();
-      assertEquals(
-          1,
-          m_scheduler.getRunningCommands().size(),
-          "A command created with Command.named(String) and it's parent cannot be simultaneously scheduled."
-      );
+    var command1 = Command.noRequirements(Coroutine::park).named("B");
+    var command2 = command1.named("A");
+    m_scheduler.schedule(command2);
+    m_scheduler.schedule(command1);
+    m_scheduler.run();
+    m_scheduler.run();
+    assertEquals(1, m_scheduler.getRunningCommands().size());
   }
 }

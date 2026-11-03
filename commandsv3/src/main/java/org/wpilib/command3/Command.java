@@ -359,14 +359,16 @@ public interface Command {
   default NeedsNameBuilderStage until(BooleanSupplier endCondition) {
     requireNonNullParam(endCondition, "endCondition", "Command.until");
 
-    return noRequirements(coroutine -> {
-      var result = coroutine.scheduler().schedule(this);
-      if (result instanceof Scheduler.ScheduleResult.Success res) {
-        coroutine.waitUntil(
-            () -> endCondition.getAsBoolean() || coroutine.scheduler().runId(this) != res.runId()
-        );
-      }
-    });
+    return noRequirements(
+        coroutine -> {
+          var result = coroutine.scheduler().schedule(this);
+          if (result instanceof Scheduler.ScheduleResult.Success res) {
+            coroutine.waitUntil(
+                () ->
+                    endCondition.getAsBoolean()
+                        || coroutine.scheduler().runId(this) != res.runId());
+          }
+        });
   }
 
   /**
@@ -465,7 +467,7 @@ public interface Command {
 
       @Override
       public boolean equals(Object other) {
-        return other == originalCommand || other == this;
+        return other instanceof Command && (other == originalCommand || other == this);
       }
     };
   }
