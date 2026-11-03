@@ -28,7 +28,7 @@ class DifferentialDriveKinematicsConstraintTest {
         DrivetrainSplineTrajectoryGenerator.generate(
             List.of(new Pose2d(0, 0, Rotation2d.ZERO), new Pose2d(1, 0, Rotation2d.ZERO)),
             new TrajectoryConfig(1, 1).addConstraint(constraint));
-    var duration = trajectory.duration;
+    var duration = trajectory.duration();
 
     for (double t = 0; t < duration; t += 0.02) {
       var point = trajectory.sampleAt(t);

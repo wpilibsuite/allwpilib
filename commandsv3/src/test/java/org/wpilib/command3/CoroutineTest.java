@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Seconds;
 
 import java.util.ArrayList;
@@ -48,14 +49,13 @@ class CoroutineTest extends CommandTestBase {
 
   @Test
   void waitUntilTimeout() {
-    AtomicBoolean condition = new AtomicBoolean(false);
     AtomicReference<Coroutine.WaitResult> result = new AtomicReference<>();
     AtomicReference<Long> currentTime = new AtomicReference<>(0L);
 
     RobotController.setTimeSource(currentTime::get);
 
     var command =
-        Command.noRequirements(co -> result.set(co.waitUntil(condition::get, Seconds.of(1.0))))
+        Command.noRequirements(co -> result.set(co.waitUntil(() -> false, Seconds.of(1.0))))
             .named("Wait Until Timeout");
 
     m_scheduler.schedule(command);
@@ -65,12 +65,12 @@ class CoroutineTest extends CommandTestBase {
     assertTrue(m_scheduler.isRunning(command));
 
     // Advance time to 0.5s
-    currentTime.set(500_000_000L);
+    currentTime.set((long) Seconds.of(0.5).in(Nanoseconds));
     m_scheduler.run();
     assertTrue(m_scheduler.isRunning(command));
 
     // Advance time to 1.1s (past 1.0s timeout)
-    currentTime.set(1_100_000_000L);
+    currentTime.set((long) Seconds.of(1.1).in(Nanoseconds));
     m_scheduler.run();
 
     // Should have timed out

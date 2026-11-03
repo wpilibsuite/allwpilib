@@ -58,7 +58,7 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
 
     gen_libinit(
         name = "{{extension_module.name}}.gen_lib_init",
-        output_file = "{{stripped_include_prefix}}/{{extension_module.gen_libinit.install_path}}/{{extension_module.gen_libinit.output_file}}",
+        output_file = "{{include_root_prefix}}{{extension_module.gen_libinit.install_path}}/{{extension_module.gen_libinit.output_file}}",
         modules = {{extension_module.gen_libinit.modules | jsonify}},
     )
 
@@ -68,8 +68,8 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
         module_pkg_name = "{{ extension_module.gen_pkgconf.module_pkg_name }}",
         output_file = "{{ extension_module.gen_pkgconf.output_file }}",
         pkg_name = "{{ extension_module.gen_pkgconf.pkg_name }}",
-        install_path = "{{stripped_include_prefix}}/{{ extension_module.gen_pkgconf.install_path }}",
-        project_file = "{{ stripped_include_prefix }}/{{ extension_module.gen_pkgconf.project_file }}",
+        install_path = "{{include_root_prefix}}{{ extension_module.gen_pkgconf.install_path }}",
+        project_file = "{{include_root_prefix}}{{ extension_module.gen_pkgconf.project_file }}",
         package_root = "{{package_root_file}}",
     )
 
@@ -84,7 +84,7 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
         name = "{{extension_module.name}}",
         casters_pickle = "{{ extension_module.resolve_casters.pkl_file }}",
         header_gen_config = {{extension_module.name|upper}}_HEADER_GEN,
-        trampoline_subpath = "{{stripped_include_prefix}}/{{ extension_module.install_path }}",
+        trampoline_subpath = "{{include_root_prefix}}{{ extension_module.install_path }}",
         deps = header_to_dat_deps,
         local_native_libraries = [
         {%- for header_path in extension_module.native_wrapper_dependencies|sort %}
@@ -102,7 +102,7 @@ def {{extension_module.name}}_extension(srcs = [], header_to_dat_deps = [], extr
 
     create_pybind_library(
         name = "{{extension_module.name}}",
-        install_path = "{{stripped_include_prefix}}/{{extension_module.install_path}}/",
+        install_path = "{{include_root_prefix}}{{extension_module.install_path}}/",
         extension_name = "{{ extension_module.gen_modinit.lib_name }}",
         generated_srcs = {% if extension_module.generation_data %}[":{{extension_module.name}}.generated_srcs"]{% else %}[]{% endif %},
         semiwrap_header = [":{{extension_module.name}}.gen_modinit_hpp"],
@@ -142,9 +142,9 @@ def publish_library_casters():
     publish_casters(
         name = "publish_casters",
         caster_name = "{{caster_info.casters_name}}",
-        output_json = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.json_output}}",
-        output_pc = "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.pc_output}}",
-        project_config = "{{ stripped_include_prefix }}/{{caster_info.project_file}}",
+        output_json = "{{include_root_prefix}}{{caster_info.install_path}}/{{caster_info.json_output}}",
+        output_pc = "{{include_root_prefix}}{{caster_info.install_path}}/{{caster_info.pc_output}}",
+        project_config = "{{include_root_prefix}}{{caster_info.project_file}}",
         package_root = "{{package_root_file}}",
         typecasters_srcs = native.glob([{% for inc in caster_info.include_paths %}"{{ inc }}/**"{% if not loop.last%}, {% endif %}{% endfor %}]),
     )
@@ -175,11 +175,11 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         name = "{}.generated_pkgcfg_files".format(name),
         srcs = [
             {%- for em in extension_modules %}
-            "{{stripped_include_prefix}}/{{em.gen_pkgconf.install_path}}/{{ em.gen_pkgconf.output_file }}",
+            "{{include_root_prefix}}{{em.gen_pkgconf.install_path}}/{{ em.gen_pkgconf.output_file }}",
             {%- endfor %}
             {%- for caster_info in publish_casters_targets %}
-            "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.pc_output}}",
-            "{{stripped_include_prefix}}/{{caster_info.install_path}}/{{caster_info.json_output}}",
+            "{{include_root_prefix}}{{caster_info.install_path}}/{{caster_info.pc_output}}",
+            "{{include_root_prefix}}{{caster_info.install_path}}/{{caster_info.json_output}}",
             {%- endfor %}
         ],
         tags = ["manual", "robotpy"],
@@ -189,13 +189,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     # Contains all of the non-python files that need to be included in the wheel
     native.filegroup(
         name = "{}.extra_files".format(name),
-        srcs = native.glob(["{{stripped_include_prefix}}/{{top_level_name}}/**"], exclude = ["{{stripped_include_prefix}}/{{top_level_name}}/**/*.py"]),
+        srcs = native.glob(["{{include_root_prefix}}{{top_level_name}}/**"], exclude = ["{{include_root_prefix}}{{top_level_name}}/**/*.py"]),
         tags = ["manual", "robotpy"],
     )
 {% if version_file %}
     generate_version_file(
         name = "{}.generate_version".format(name),
-        output_file = "{{stripped_include_prefix}}/{{version_file}}",
+        output_file = "{{include_root_prefix}}{{version_file}}",
         template = "//shared/bazel/rules/robotpy:version_template.in",
         version_variable = "ROBOTPY_VERSION",
     )
@@ -203,9 +203,9 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
     robotpy_library(
         name = name,
         distribution = "{{raw_project_config.name}}",
-        srcs = native.glob(["{{stripped_include_prefix}}/{{top_level_name}}/**/*.py"]) + [
+        srcs = native.glob(["{{include_root_prefix}}{{top_level_name}}/**/*.py"]) + [
         {%- for em in extension_modules %}
-            "{{stripped_include_prefix}}/{{ em.gen_pkgconf.libinit_py.replace(".", "/") }}.py",
+            "{{include_root_prefix}}{{ em.gen_pkgconf.libinit_py.replace(".", "/") }}.py",
         {%- endfor %}
         {%- if version_file %}
             "{}.generate_version".format(name),
@@ -215,13 +215,13 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
             "{}.generated_pkgcfg_files".format(name),
             "{}.extra_files".format(name),
         {%- for em in extension_modules %}
-            ":{{stripped_include_prefix}}/{{em.install_path}}/{{em.gen_modinit.lib_name}}",
+            ":{{include_root_prefix}}{{em.install_path}}/{{em.gen_modinit.lib_name}}",
         {%- endfor %}
         {%- for em in extension_modules %}
             ":{{em.name}}.trampoline_hdr_files",
         {%- endfor %}
         ],
-        imports = ["{{stripped_include_prefix}}"],
+        imports = ["{{imports_dir}}"],
         deps = [
             {%- for d in python_deps %}
             {% if "requirement" in d %}{{d}}{% else %}"{{d}}"{% endif %},
@@ -243,7 +243,7 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     update_yaml_files(
         name = "{}-update-yaml".format(name),
-        yaml_output_directory = "{{ stripped_include_prefix }}/semiwrap",
+        yaml_output_directory = "{{include_root_prefix}}semiwrap",
         extra_hdrs = extra_pybind_hdrs + [
 {%- for d in all_local_native_deps %}
             "{{d}}",
@@ -251,8 +251,8 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         ],
         package_root_file = "{{package_root_file}}",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
-        yaml_files = native.glob(["{{stripped_include_prefix}}/semiwrap/**"]),
+        pyproject_toml = "{{include_root_prefix}}pyproject.toml",
+        yaml_files = native.glob(["{{include_root_prefix}}semiwrap/**"]),
     )
 
     scan_headers(
@@ -266,6 +266,6 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
         ],
         package_root_file = "{{package_root_file}}",
         pkgcfgs = pkgcfgs,
-        pyproject_toml = "{{ stripped_include_prefix }}/pyproject.toml",
+        pyproject_toml = "{{include_root_prefix}}pyproject.toml",
     )
 {%- endif %}

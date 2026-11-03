@@ -439,6 +439,8 @@ static void UpdateProtobufValueSource(NetworkTablesModel& model,
     bool isEmptyOptional = upb_FieldDef_HasPresence(field) &&
                            !upb_Message_HasFieldByDef(msg, field);
     if (isEmptyArray || isEmptyOptional) {
+      child.value = wpi::nt::Value();
+      child.UpdateFromValue(model, child.path, "");
       continue;
     }
     switch (upb_FieldDef_CType(field)) {

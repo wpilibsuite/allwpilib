@@ -571,13 +571,13 @@ ruamel-yaml-clib==0.2.15 \
     --hash=sha256:fd4c928ddf6bce586285daa6d90680b9c291cfd045fc40aad34e445d57b1bf51 \
     --hash=sha256:fe239bdfdae2302e93bd6e8264bd9b71290218fff7084a9db250b55caaccf43f
     # via ruamel-yaml
-semiwrap==0.7.2 \
-    --hash=sha256:26c6769ce1ba1fd71d772ed57038215c211544f697dc9e8fb57929912bd4b115 \
-    --hash=sha256:9317273818aae2752868a3720283037c5065785827911a6eb338d77f779bf9de
+semiwrap==0.8.1 \
+    --hash=sha256:c2f93f2d50e6aeb8552f4d5f27142a8c3e035e18a1e8d5dce400f030bd86afac \
+    --hash=sha256:e5a8d12e4ceb21b705702731aab368b86cea38463ca498d9243fc76345692d4c
     # via -r requirements.txt
-sphinxify==0.12 \
-    --hash=sha256:3ec299e78babac7d3457f47bf263411b48e10b9c8add18d7159fa0327cc4a061 \
-    --hash=sha256:ec97af947884bacd8e18f14ff2b6030b6da829a6a5bf7a32421b633b10c6f7e8
+sphinxify==0.14 \
+    --hash=sha256:0f6e2f861c2d47abde7416616ddffdf259292deb87440b096510cae84daea746 \
+    --hash=sha256:5b31dd30e7017dd298abb1357d887ef2de8ab3d2f56862c5efa9edbf5ea83da7
     # via semiwrap
 tomli==2.3.0 \
     --hash=sha256:00b5f5d95bbfc7d12f91ad8c593a1659b6387b43f054104cda404be6bda62456 \

@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +26,7 @@ import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.networktables.NetworkTableInstance;
+import org.wpilib.util.Alert;
 import org.wpilib.util.UsageReporting;
 import org.wpilib.util.WPIUtilJNI;
 import org.wpilib.util.concurrent.Event;
@@ -35,23 +35,29 @@ import org.wpilib.util.concurrent.Event;
  * Centralized data log that provides automatic data log file management. It automatically cleans up
  * old files when disk space is low and renames the file based either on current date/time or (if
  * available) competition match number. The data file will be saved to a USB flash drive in a folder
- * named "logs" if one is attached, or to /home/systemcore/logs otherwise.
+ * named "logs" if one is attached, or to /home/systemcore/logs otherwise. When automatic selection
+ * falls back to internal storage, USB storage is checked every 5 seconds. If it becomes available
+ * and the current file is at most 10 MB, the file is transferred in the background and logging
+ * continues on USB storage.
  *
  * <p>Log files are initially named "WPILIB_TBD_{random}.wpilog" until the DS connects. After the DS
  * connects, the log file is renamed to "WPILIB_yyyyMMdd_HHmmss.wpilog" (where the date/time is
  * UTC). If the FMS is connected and provides a match number, the log file is renamed to
  * "WPILIB_yyyyMMdd_HHmmss_{event}_{match}.wpilog".
  *
- * <p>On startup, all existing WPILIB_TBD log files are deleted. If there is less than 50 MB of free
- * space on the target storage, WPILIB_ log files are deleted (oldest to newest) until there is 50
- * MB free OR there are 10 files remaining.
+ * <p>On startup, all existing WPILIB_TBD log files are deleted. If there is less than 200 MB of
+ * free space on the target storage, non-match WPILIB_ log files are deleted (oldest to newest)
+ * until there is 200 MB free OR there are 10 files remaining, including match logs. Competition
+ * match logs and their rotated segments are not deleted. An alert is active while less than 400 MB
+ * is available, checked every 5 seconds. An informational alert indicates when automatic directory
+ * selection falls back to SystemCore internal storage.
  *
  * <p>By default, all NetworkTables value changes are stored to the data log.
  */
 public final class DataLogManager {
   private static DataLogBackgroundWriter m_log;
   private static boolean m_stopped;
-  private static String m_logDir;
+  private static boolean m_internalStorage;
   private static boolean m_filenameOverride;
   private static Thread m_thread;
   private static final ZoneId m_utc = ZoneId.of("UTC");
@@ -66,8 +72,41 @@ public final class DataLogManager {
 
   // if less than this much free space, delete log files until there is this much free space
   // OR there are this many files remaining.
-  private static final long FREE_SPACE_THRESHOLD = 50000000L;
+  private static final long FREE_SPACE_THRESHOLD = 200000000L;
   private static final int FILE_COUNT_THRESHOLD = 10;
+  private static final long MAX_TRANSFER_SIZE = 10000000;
+
+  static boolean isMatchLog(String filename) {
+    int extensionIndex = filename.lastIndexOf(".wpilog");
+    if (extensionIndex != filename.length() - 7) {
+      return false;
+    }
+
+    int matchTypeSeparator = filename.lastIndexOf('_', extensionIndex - 1);
+    if (matchTypeSeparator < 0 || matchTypeSeparator + 2 >= extensionIndex) {
+      return false;
+    }
+
+    char matchType = filename.charAt(matchTypeSeparator + 1);
+    if (matchType != 'P' && matchType != 'Q' && matchType != 'E' && matchType != 'T') {
+      return false;
+    }
+    // Rotated logs have one numeric segment suffix, e.g. Q123.2.wpilog.
+    boolean segmentFound = false;
+    for (int i = matchTypeSeparator + 2; i < extensionIndex; i++) {
+      if (filename.charAt(i) == '.'
+          && !segmentFound
+          && i > matchTypeSeparator + 2
+          && i + 1 < extensionIndex) {
+        segmentFound = true;
+        continue;
+      }
+      if (filename.charAt(i) < '0' || filename.charAt(i) > '9') {
+        return false;
+      }
+    }
+    return true;
+  }
 
   private DataLogManager() {}
 
@@ -108,14 +147,14 @@ public final class DataLogManager {
    */
   public static synchronized void start(String dir, String filename, double period) {
     if (m_log == null) {
-      m_logDir = makeLogDir(dir);
+      String logDir = makeLogDir(dir);
       m_filenameOverride = !filename.isEmpty();
 
       // Delete all previously existing WPILIB_TBD_*.wpilog files. These only exist when the robot
       // never connects to the DS, so they are very unlikely to have useful data and just clutter
       // the filesystem.
       File[] files =
-          new File(m_logDir)
+          new File(logDir)
               .listFiles((d, name) -> name.startsWith("WPILIB_TBD_") && name.endsWith(".wpilog"));
       if (files != null) {
         for (File file : files) {
@@ -124,7 +163,7 @@ public final class DataLogManager {
           }
         }
       }
-      m_log = new DataLogBackgroundWriter(m_logDir, makeLogFilename(filename), period);
+      m_log = new DataLogBackgroundWriter(logDir, makeLogFilename(filename), period);
       m_messageLog = new StringLogEntry(m_log, "messages");
 
       // Log all NT entries and connections
@@ -152,6 +191,18 @@ public final class DataLogManager {
   public static synchronized void stop() {
     if (m_thread != null) {
       m_thread.interrupt();
+      // Wait for the thread to release its alerts before another start can reuse their IDs.
+      boolean interrupted = false;
+      while (m_thread.isAlive()) {
+        try {
+          m_thread.join();
+        } catch (InterruptedException ex) {
+          interrupted = true;
+        }
+      }
+      if (interrupted) {
+        Thread.currentThread().interrupt();
+      }
       m_thread = null;
     }
     if (m_log != null) {
@@ -193,10 +244,10 @@ public final class DataLogManager {
    * @return log directory, or empty string if logging not yet started
    */
   public static synchronized String getLogDir() {
-    if (m_logDir == null) {
+    if (m_log == null) {
       return "";
     }
-    return m_logDir;
+    return m_log.getDir();
   }
 
   /**
@@ -238,29 +289,47 @@ public final class DataLogManager {
     }
   }
 
+  private static String findUsbLogDir(Path usbRoot) {
+    try {
+      if (Files.isDirectory(usbRoot) && Files.isWritable(usbRoot.toRealPath())) {
+        Path logDir = usbRoot.resolve("logs");
+        Files.createDirectories(logDir);
+        return logDir.toString();
+      }
+    } catch (IOException ex) {
+      // Retry when USB storage becomes accessible.
+    }
+    return "";
+  }
+
+  static boolean tryTransferToUsb(DataLogBackgroundWriter log, Path usbRoot) {
+    if (log.getDir().equals(usbRoot.resolve("logs").toString())) {
+      return true;
+    }
+    String dir = findUsbLogDir(usbRoot);
+    if (!dir.isEmpty()) {
+      log.setDir(dir, MAX_TRANSFER_SIZE);
+    }
+    return false;
+  }
+
   private static String makeLogDir(String dir) {
     if (!dir.isEmpty()) {
       return dir;
     }
 
     if (RobotBase.isReal()) {
-      try {
-        // prefer a mounted USB drive if one is accessible
-        Path usbDir = Paths.get("/u").toRealPath();
-        if (Files.isWritable(usbDir)) {
-          if (!new File("/u/logs").mkdir()) {
-            // ignored
-          }
-          UsageReporting.reportUsage("DataLogManager", "USB");
-          return "/u/logs";
-        }
-      } catch (IOException ex) {
-        // ignored
+      // Prefer a mounted USB drive if one is accessible.
+      String usbDir = findUsbLogDir(Path.of("/u"));
+      if (!usbDir.isEmpty()) {
+        UsageReporting.reportUsage("DataLogManager", "USB");
+        return usbDir;
       }
       if (!new File("/home/systemcore/logs").mkdir()) {
         // ignored
       }
       UsageReporting.reportUsage("DataLogManager", "Onboard");
+      m_internalStorage = true;
       return "/home/systemcore/logs";
     }
     String logDir = Filesystem.getOperatingDirectory().getAbsolutePath() + "/logs";
@@ -307,50 +376,82 @@ public final class DataLogManager {
     }
   }
 
-  private static void logMain() {
-    // based on free disk space, scan for "old" WPILIB_*.wpilog files and remove
-    {
-      File logDir = new File(m_logDir);
-      long freeSpace = logDir.getUsableSpace();
-      if (freeSpace < FREE_SPACE_THRESHOLD) {
-        // Delete oldest WPILIB_*.wpilog files (ignore WPILIB_TBD_*.wpilog as we just created one)
-        File[] files =
-            logDir.listFiles(
-                (dir, name) ->
-                    name.startsWith("WPILIB_")
-                        && name.endsWith(".wpilog")
-                        && !name.startsWith("WPILIB_TBD_"));
-        if (files != null) {
-          Arrays.sort(files, Comparator.comparingLong(File::lastModified));
-          int count = files.length;
-          for (File file : files) {
-            --count;
-            if (count < FILE_COUNT_THRESHOLD) {
-              break;
-            }
-            long length = file.length();
-            if (file.delete()) {
-              DriverStationErrors.reportWarning("DataLogManager: Deleted " + file.getName(), false);
-              freeSpace += length;
-              if (freeSpace >= FREE_SPACE_THRESHOLD) {
-                break;
-              }
-            } else {
-              System.err.println("DataLogManager: could not delete " + file);
-            }
-          }
+  static void updateFreeSpaceAlert(Alert alert, long freeSpace) {
+    boolean lowSpace = freeSpace < 2 * FREE_SPACE_THRESHOLD;
+    if (lowSpace) {
+      alert.setText(
+          "DataLogManager: Log storage device has "
+              + freeSpace / 1000000
+              + " MB of free space remaining! Old logs are deleted at startup below "
+              + FREE_SPACE_THRESHOLD / 1000000
+              + " MB of free space. Consider deleting logs off the storage device.");
+    }
+    alert.set(lowSpace);
+  }
+
+  private static void checkFreeSpace(Alert alert) {
+    try {
+      updateFreeSpaceAlert(alert, Files.getFileStore(Path.of(m_log.getDir())).getUsableSpace());
+    } catch (IOException ex) {
+      // Keep the last known state if disk space cannot be read.
+    }
+  }
+
+  static void deleteOldLogs(File logDir, long freeSpace) {
+    if (freeSpace >= FREE_SPACE_THRESHOLD) {
+      return;
+    }
+    // Count all permanent logs toward the minimum, but only delete non-match logs.
+    File[] files =
+        logDir.listFiles(
+            (dir, name) ->
+                name.startsWith("WPILIB_")
+                    && name.endsWith(".wpilog")
+                    && !name.startsWith("WPILIB_TBD_"));
+    if (files != null) {
+      Arrays.sort(files, Comparator.comparingLong(File::lastModified));
+      int count = files.length;
+      for (File file : files) {
+        if (count <= FILE_COUNT_THRESHOLD) {
+          break;
         }
-      } else if (freeSpace < 2 * FREE_SPACE_THRESHOLD) {
-        DriverStationErrors.reportWarning(
-            "DataLogManager: Log storage device has "
-                + freeSpace / 1000000
-                + " MB of free space remaining! Logs will get deleted below "
-                + FREE_SPACE_THRESHOLD / 1000000
-                + " MB of free space. "
-                + "Consider deleting logs off the storage device.",
-            false);
+        if (isMatchLog(file.getName())) {
+          continue;
+        }
+        long length = file.length();
+        if (file.delete()) {
+          --count;
+          DriverStationErrors.reportWarning("DataLogManager: Deleted " + file.getName(), false);
+          freeSpace += length;
+          if (freeSpace >= FREE_SPACE_THRESHOLD) {
+            break;
+          }
+        } else {
+          System.err.println("DataLogManager: could not delete " + file);
+        }
       }
     }
+  }
+
+  private static void logMain() {
+    try (var internalStorageAlert =
+            new Alert(
+                "DataLogManager",
+                "internalStorage",
+                "DataLogManager: Logging to SystemCore internal storage. Attach a USB "
+                    + "drive to store logs externally.",
+                Alert.Level.LOW);
+        var freeSpaceAlert = new Alert("DataLogManager", "lowSpace", "", Alert.Level.MEDIUM)) {
+      internalStorageAlert.set(m_internalStorage);
+      logMain(internalStorageAlert, freeSpaceAlert);
+    }
+  }
+
+  private static void logMain(Alert internalStorageAlert, Alert freeSpaceAlert) {
+    File logDir = new File(m_log.getDir());
+    deleteOldLogs(logDir, logDir.getUsableSpace());
+    checkFreeSpace(freeSpaceAlert);
+    long nextSpaceCheck = System.nanoTime() + 5_000_000_000L;
 
     int timeoutCount = 0;
     boolean paused = false;
@@ -374,6 +475,16 @@ public final class DataLogManager {
       }
       if (Thread.interrupted()) {
         break;
+      }
+      long spaceCheckTime = System.nanoTime();
+      if (spaceCheckTime - nextSpaceCheck >= 0) {
+        if (m_internalStorage && tryTransferToUsb(m_log, Path.of("/u"))) {
+          m_internalStorage = false;
+          internalStorageAlert.set(false);
+          UsageReporting.reportUsage("DataLogManager", "USB");
+        }
+        checkFreeSpace(freeSpaceAlert);
+        nextSpaceCheck = spaceCheckTime + 5_000_000_000L;
       }
       if (timedOut) {
         timeoutCount++;
@@ -428,7 +539,7 @@ public final class DataLogManager {
                   case PRACTICE -> 'P';
                   case QUALIFICATION -> 'Q';
                   case ELIMINATION -> 'E';
-                  default -> '_';
+                  default -> 'T';
                 };
             m_log.setFilename(
                 "WPILIB_"

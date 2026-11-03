@@ -75,6 +75,35 @@ public final class DataLogBackgroundWriter extends DataLog {
   }
 
   /**
+   * Requests transfer of the current log file to another directory on the writer thread. Buffered
+   * records are flushed before checking the file size. Logging continues in the new directory after
+   * a successful copy; the old file is then removed. On failure or if the file exceeds maxSize,
+   * logging continues in the original directory. Existing files are never overwritten.
+   *
+   * <p>Has no effect on stopped logs. A later request replaces any request that has not yet
+   * started. Use {@link #getDir()} to check for completion.
+   *
+   * @param dir existing destination directory (empty means current directory)
+   * @param maxSize maximum file size to transfer, in bytes
+   * @throws IllegalArgumentException if maxSize is negative
+   */
+  public void setDir(String dir, long maxSize) {
+    if (maxSize < 0) {
+      throw new IllegalArgumentException("maxSize must be nonnegative");
+    }
+    DataLogJNI.bgSetDir(m_impl, dir, maxSize);
+  }
+
+  /**
+   * Gets the current log directory. Changes only after a successful transfer.
+   *
+   * @return log directory
+   */
+  public String getDir() {
+    return DataLogJNI.bgGetDir(m_impl);
+  }
+
+  /**
    * Resumes appending of data records to the log. If called after stop(), opens a new file (with
    * random name if SetFilename was not called after stop()) and appends Start records and schema
    * data values for all previously started entries and schemas.

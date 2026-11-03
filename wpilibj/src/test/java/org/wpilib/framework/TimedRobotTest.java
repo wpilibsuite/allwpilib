@@ -20,6 +20,7 @@ import org.wpilib.networktables.NetworkTableInstance;
 import org.wpilib.simulation.AlertSim;
 import org.wpilib.simulation.DriverStationSim;
 import org.wpilib.simulation.SimHooks;
+import org.wpilib.system.WPILibVersion;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.telemetry.TelemetryRegistry;
 import org.wpilib.tunable.Tunable;
@@ -174,6 +175,17 @@ class TimedRobotTest {
         var robot = new MockRobot()) {
       assertEquals(WPIUtilJNI.getProgramStartTime(), sub.get(-1));
     }
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void constructorPublishesWPILibVersion() {
+    var topic = NetworkTableInstance.getDefault().getStringTopic("/Robot/WPILibVersion");
+    try (var robot = new MockRobot();
+        var sub = topic.subscribe("")) {
+      assertEquals(WPILibVersion.Version, sub.get());
+    }
+    assertFalse(topic.exists());
   }
 
   @Test

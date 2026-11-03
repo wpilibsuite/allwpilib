@@ -36,7 +36,7 @@ class LTVUnicycleControllerTest {
     var config = new TrajectoryConfig(8.8, 0.1);
     final var trajectory = DrivetrainSplineTrajectoryGenerator.generate(waypoints, config);
 
-    final var duration = trajectory.duration;
+    final var duration = trajectory.duration();
     for (int i = 0; i < (duration / DT); ++i) {
       var state = trajectory.sampleAt(DT * i);
 
