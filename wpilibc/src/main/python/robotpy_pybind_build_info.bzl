@@ -990,8 +990,8 @@ def wpilib_extension(srcs = [], header_to_dat_deps = [], extra_hdrs = [], includ
         struct(
             class_name = "OpModeListener",
             yml_file = "semiwrap/OpModeListener.yml",
-            header_root = "$(execpath :robotpy-native-wpilib.copy_headers)",
-            header_file = "$(execpath :robotpy-native-wpilib.copy_headers)/wpi/opmode/OpModeListener.hpp",
+            header_root = "$(execpath //wpilibc:robotpy-native-wpilib.copy_headers)",
+            header_file = "$(execpath //wpilibc:robotpy-native-wpilib.copy_headers)/wpi/opmode/OpModeListener.hpp",
             tmpl_class_names = [],
             trampolines = [
                 ("wpi::OpModeListener", "wpi__OpModeListener.hpp"),
