@@ -34,13 +34,13 @@ class DriveSubsystem(commands2.Subsystem):
         # The left-side drive encoder
         self.left_encoder = wpilib.Encoder(
             *constants.LEFT_ENCODER_PORTS,
-            reverse_direction=constants.LEFT_ENCODER_REVERSED
+            reverse_direction=constants.LEFT_ENCODER_REVERSED,
         )
 
         # The right-side drive encoder
         self.right_encoder = wpilib.Encoder(
             *constants.RIGHT_ENCODER_PORTS,
-            reverse_direction=constants.RIGHT_ENCODER_REVERSED
+            reverse_direction=constants.RIGHT_ENCODER_REVERSED,
         )
 
         # Sets the distance per pulse for the encoders
