@@ -14,6 +14,7 @@ dependencies = [
     "robotpy-cli~=2027.0.1b1",
 ]
 classifiers = [
+    "Private :: Do Not Upload",
 ]
 
 [dependency-groups]
