@@ -1409,7 +1409,10 @@ public final class Scheduler implements ProtobufSerializable {
 
     // Check scheduled commands
     for (var scheduled : m_queuedToRun) {
-      if (scheduled.command() == command) {
+      // we use .equals() here because renamed commands override the equals() method to be equal to their parent.
+      // this way, a renamed command and it's parent cannot be scheduled at the same time,
+      // even if they both lack any requirements.
+      if (scheduled.command().equals(command)) {
         return scheduled.id();
       }
     }

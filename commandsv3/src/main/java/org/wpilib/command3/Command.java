@@ -6,7 +6,6 @@ package org.wpilib.command3;
 
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -352,16 +351,22 @@ public interface Command {
    * has not already exited by then).
    *
    * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
+   * created. See {@link NeedsNameBuilderStage} for details.
    *
    * @param endCondition The end condition to wait for.
    * @return The waiting command
    */
-  default ParallelGroupBuilder until(BooleanSupplier endCondition) {
+  default NeedsNameBuilderStage until(BooleanSupplier endCondition) {
     requireNonNullParam(endCondition, "endCondition", "Command.until");
 
-    return new ParallelGroupBuilder()
-        .optional(this, Command.waitUntil(endCondition).named("Until Condition"));
+    return noRequirements(coroutine -> {
+      var result = coroutine.scheduler().schedule(this);
+      if (result instanceof Scheduler.ScheduleResult.Success res) {
+        coroutine.waitUntil(
+            () -> endCondition.getAsBoolean() || coroutine.scheduler().runId(this) != res.runId()
+        );
+      }
+    });
   }
 
   /**
@@ -387,41 +392,28 @@ public interface Command {
    * Creates a parallel command group, running this command alongside one or more other commands.
    * The group will exit once every command has finished.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
-   * <pre>{@code
-   * ParallelGroup abc =
-   *   commandA()
-   *     .alongWith(commandB(), commandC())
-   *     .withAutomaticName();
-   * }</pre>
-   *
    * @param parallel The commands to run in parallel with this one
    * @return A parallel command group
    */
   default ParallelGroup alongWith(Command... parallel) {
-    var commands = new ArrayList<Command>();
-    commands.add(this);
-    commands.addAll(List.of(parallel));
-    return new ParallelGroup(null, commands, List.of());
+    var commands = new Command[parallel.length + 1];
+    commands[0] = this;
+    System.arraycopy(parallel, 0, commands, 1, parallel.length);
+    return new ParallelGroup(null, List.of(commands), List.of());
   }
 
   /**
    * Creates a parallel command group, running this command alongside one or more other commands.
    * The group will exit after any command finishes.
    *
-   * <p>More configuration options are needed after calling this function before the command can be
-   * created. See {@link ParallelGroupBuilder} for details.
-   *
    * @param parallel The commands to run in parallel with this one
    * @return A parallel command group
    */
   default ParallelGroup raceWith(Command... parallel) {
-    var commands = new ArrayList<Command>();
-    commands.add(this);
-    commands.addAll(List.of(parallel));
-    return new ParallelGroup(null, List.of(), commands);
+    var commands = new Command[parallel.length + 1];
+    commands[0] = this;
+    System.arraycopy(parallel, 0, commands, 1, parallel.length);
+    return new ParallelGroup(null, List.of(), List.of(commands));
   }
 
   /**
@@ -435,12 +427,7 @@ public interface Command {
     return new Command() {
       @Override
       public void run(Coroutine coroutine) {
-        if (coroutine.scheduler().isScheduledOrRunning(originalCommand)) {
-          return;
-        }
-        coroutine.scheduler().m_unschedulableCommands.add(originalCommand);
-        Command.this.run(coroutine);
-        coroutine.scheduler().m_unschedulableCommands.remove(originalCommand);
+        originalCommand.run(coroutine);
       }
 
       @Override
@@ -450,22 +437,35 @@ public interface Command {
 
       @Override
       public Set<Mechanism> requirements() {
-        return Command.this.requirements();
+        return originalCommand.requirements();
       }
 
       @Override
       public int priority() {
-        return Command.this.priority();
+        return originalCommand.priority();
       }
 
       @Override
       public void onCancel() {
-        Command.this.onCancel();
+        originalCommand.onCancel();
       }
 
       @Override
       public String toString() {
         return newName;
+      }
+
+      // By overriding equals() and hashCode(),
+      // the scheduler treats this command as identical to the parent,
+      // which prevents it and the parent from being scheduled simultaneously.
+      @Override
+      public int hashCode() {
+        return originalCommand.hashCode();
+      }
+
+      @Override
+      public boolean equals(Object other) {
+        return other == originalCommand || other == this;
       }
     };
   }

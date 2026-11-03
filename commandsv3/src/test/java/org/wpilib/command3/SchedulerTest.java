@@ -167,6 +167,7 @@ class SchedulerTest extends CommandTestBase {
       m_scheduler.schedule(command2);
       m_scheduler.schedule(command1);
       m_scheduler.run();
+      m_scheduler.run();
       assertEquals(
           1,
           m_scheduler.getRunningCommands().size(),
