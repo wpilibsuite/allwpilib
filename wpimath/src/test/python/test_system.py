@@ -2,7 +2,6 @@ import math
 
 import wpimath
 
-import pytest
 import numpy as np
 
 

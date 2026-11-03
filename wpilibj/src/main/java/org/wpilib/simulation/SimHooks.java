@@ -100,7 +100,7 @@ public final class SimHooks {
    * @param delta the amount to advance in seconds
    */
   public static void stepTiming(double delta) {
-    SimulatorJNI.stepTiming((long) (delta * 1e6));
+    SimulatorJNI.stepTiming((long) (delta * 1e9));
   }
 
   /**
@@ -109,6 +109,6 @@ public final class SimHooks {
    * @param delta the amount to advance in seconds
    */
   public static void stepTimingAsync(double delta) {
-    SimulatorJNI.stepTimingAsync((long) (delta * 1e6));
+    SimulatorJNI.stepTimingAsync((long) (delta * 1e9));
   }
 }

@@ -10,7 +10,7 @@ import org.wpilib.framework.TimedRobot;
 
 /** This is a sample program to demonstrate the use of elevator simulation. */
 public class Robot extends TimedRobot {
-  private final Joystick joystick = new Joystick(Constants.kJoystickPort);
+  private final Joystick joystick = new Joystick(Constants.JOYSTICK_PORT);
   private final Elevator elevator = new Elevator();
 
   public Robot() {
@@ -38,10 +38,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     if (joystick.getTrigger()) {
       // Here, we set the constant setpoint of 10 meters.
-      elevator.reachGoal(Constants.kSetpoint);
+      elevator.reachGoal(Constants.SETPOINT);
     } else {
       // Otherwise, we update the setpoint to 1 meter.
-      elevator.reachGoal(Constants.kLowerkSetpoint);
+      elevator.reachGoal(Constants.LOWERK_SETPOINT);
     }
   }
 

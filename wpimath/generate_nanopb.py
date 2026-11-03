@@ -22,7 +22,10 @@ def main():
     args = parser.parse_args()
 
     generate_nanopb(
-        args.nanopb, args.output_directory / "main/native/cpp", args.proto_directory
+        args.nanopb,
+        args.output_directory / "main/native/cpp",
+        args.output_directory / "main/native/include",
+        args.proto_directory,
     )
 
 

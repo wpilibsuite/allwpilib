@@ -11,17 +11,17 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::SwerveModuleVelocity>;
-const SwerveModuleVelocity kExpectedData{
+const SwerveModuleVelocity EXPECTED_DATA{
     SwerveModuleVelocity{22.9_mps, Rotation2d{3.3_rad}}};
 }  // namespace
 
 TEST_CASE("SwerveModuleVelocityStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   SwerveModuleVelocity unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.velocity.value() == unpacked_data.velocity.value());
-  CHECK(kExpectedData.angle == unpacked_data.angle);
+  CHECK(EXPECTED_DATA.velocity.value() == unpacked_data.velocity.value());
+  CHECK(EXPECTED_DATA.angle == unpacked_data.angle);
 }

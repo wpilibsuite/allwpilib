@@ -16,7 +16,7 @@
 namespace wpi::sim {
 
 namespace {
-constexpr double kDefaultDistancePerPulse = .0005;
+constexpr double DEFAULT_DISTANCE_PER_PULSE = .0005;
 }  // namespace
 
 TEST_CASE("EncoderSimTest Initialize", "[wpilibc][simulation]") {
@@ -42,7 +42,7 @@ TEST_CASE("EncoderSimTest Rate", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   DoubleCallback callback;
   auto cb = sim.RegisterRateCallback(callback.GetCallback(), false);
@@ -89,7 +89,7 @@ TEST_CASE("EncoderSimTest Count", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   IntCallback callback;
   auto cb = sim.RegisterCountCallback(callback.GetCallback(), false);
@@ -108,7 +108,7 @@ TEST_CASE("EncoderSimTest Distance", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   sim.SetDistance(229.174);
   CHECK(229.174 == sim.GetDistance());
@@ -122,7 +122,7 @@ TEST_CASE("EncoderSimTest SetDirection", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterDirectionCallback(callback.GetCallback(), false);
@@ -147,7 +147,7 @@ TEST_CASE("EncoderSimTest SetReverseDirection", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterReverseDirectionCallback(callback.GetCallback(), false);
@@ -187,7 +187,7 @@ TEST_CASE("EncoderSimTest Reset", "[wpilibc][simulation]") {
   EncoderSim sim(encoder);
   sim.ResetData();
 
-  encoder.SetDistancePerPulse(kDefaultDistancePerPulse);
+  encoder.SetDistancePerPulse(DEFAULT_DISTANCE_PER_PULSE);
 
   BooleanCallback callback;
   auto cb = sim.RegisterResetCallback(callback.GetCallback(), false);

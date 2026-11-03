@@ -5,18 +5,17 @@
 package org.wpilib.hardware.rotation;
 
 import org.wpilib.hardware.discrete.AnalogInput;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.SimDevice;
 import org.wpilib.hardware.hal.SimDevice.Direction;
 import org.wpilib.hardware.hal.SimDouble;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /** Class for supporting continuous analog encoders, such as the US Digital MA3. */
-public class AnalogEncoder implements Sendable, AutoCloseable {
+public class AnalogEncoder implements TelemetryLoggable, AutoCloseable {
   private final AnalogInput m_analogInput;
   private boolean m_ownsAnalogInput;
   private double m_fullRange;
@@ -47,7 +46,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    * @param fullRange the value to report at maximum travel
    * @param expectedZero the reading where you would expect a 0 from get()
    */
-  @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput, double fullRange, double expectedZero) {
     m_analogInput = analogInput;
     init(fullRange, expectedZero);
@@ -71,7 +69,6 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
    *
    * @param analogInput the analog input to attach to
    */
-  @SuppressWarnings("this-escape")
   public AnalogEncoder(AnalogInput analogInput) {
     this(analogInput, 1.0, 0.0);
   }
@@ -86,9 +83,7 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
     m_fullRange = fullRange;
     m_expectedZero = expectedZero;
 
-    HAL.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
-
-    SendableRegistry.add(this, "Analog Encoder", m_analogInput.getChannel());
+    UsageReporting.reportUsage("IO", m_analogInput.getChannel(), "AnalogEncoder");
   }
 
   private double mapSensorRange(double pos) {
@@ -172,8 +167,12 @@ public class AnalogEncoder implements Sendable, AutoCloseable {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("AbsoluteEncoder");
-    builder.addDoubleProperty("Position", this::get, null);
+  public void logTo(TelemetryTable table) {
+    table.log("Position", get());
+  }
+
+  @Override
+  public String getTelemetryType() {
+    return "AbsoluteEncoder";
   }
 }

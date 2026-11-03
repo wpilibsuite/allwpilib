@@ -37,7 +37,7 @@ public final class Translation2d
    *
    * <p>This exists to avoid allocations for common translations.
    */
-  public static final Translation2d kZero = new Translation2d();
+  public static final Translation2d ZERO = new Translation2d();
 
   @Json.Property("x")
   private final double m_x;

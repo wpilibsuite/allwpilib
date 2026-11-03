@@ -2,6 +2,8 @@ import logging
 
 import pytest
 import ntcore
+import telemetry
+import tunables
 import wpilib
 from wpilib.simulation._simulation import _reset_wpilib_simulation_data
 
@@ -24,10 +26,24 @@ def wpilib_state():
 @pytest.fixture(scope="function")
 def nt(cfg_logging, wpilib_state):
     instance = ntcore.NetworkTableInstance.get_default()
+    # Earlier robot tests may leave a server running, preventing local mode.
+    instance._reset()
     instance.start_local()
+    telemetry.TelemetryRegistry.reset()
+    telemetry.TelemetryRegistry.register_backend(
+        "",
+        wpilib.NetworkTablesTelemetryBackend(instance, "/Telemetry"),
+    )
+    tunables.TunableRegistry.reset()
+    tunables.TunableRegistry.register_backend(
+        "",
+        wpilib.NetworkTablesTunableBackend(instance, "/Tunables"),
+    )
 
     try:
         yield instance
     finally:
+        telemetry.TelemetryRegistry.reset()
+        tunables.TunableRegistry.reset()
         instance.stop_local()
         instance._reset()

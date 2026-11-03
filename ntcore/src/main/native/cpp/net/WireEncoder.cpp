@@ -18,11 +18,22 @@ using namespace wpi::nt;
 using namespace wpi::nt::net;
 using namespace mpack;
 
+static int64_t ToWireTimestamp(int64_t time) {
+  if (time == 0) {
+    return 0;
+  }
+  int64_t wireTime = time / 1000;
+  if (wireTime == 0) {
+    return time > 0 ? 1 : -1;
+  }
+  return wireTime;
+}
+
 void wpi::nt::net::WireEncodePublish(wpi::util::raw_ostream& os, int pubuid,
                                      std::string_view name,
                                      std::string_view typeStr,
                                      const wpi::util::json& properties) {
-  os << "{\"method\":\"" << PublishMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << PublishMsg::METHOD_STR << "\",\"params\":{";
   os << "\"name\":";
   wpi::util::json::stringify_string(os, name);
   os << ",\"properties\":";
@@ -35,7 +46,7 @@ void wpi::nt::net::WireEncodePublish(wpi::util::raw_ostream& os, int pubuid,
 }
 
 void wpi::nt::net::WireEncodeUnpublish(wpi::util::raw_ostream& os, int pubuid) {
-  os << "{\"method\":\"" << UnpublishMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnpublishMsg::METHOD_STR << "\",\"params\":{";
   os << "\"pubuid\":";
   wpi::util::json::stringify_int(os, pubuid);
   os << "}}";
@@ -44,7 +55,7 @@ void wpi::nt::net::WireEncodeUnpublish(wpi::util::raw_ostream& os, int pubuid) {
 void wpi::nt::net::WireEncodeSetProperties(wpi::util::raw_ostream& os,
                                            std::string_view name,
                                            const wpi::util::json& update) {
-  os << "{\"method\":\"" << SetPropertiesMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << SetPropertiesMsg::METHOD_STR << "\",\"params\":{";
   os << "\"name\":";
   wpi::util::json::stringify_string(os, name);
   os << ",\"update\":";
@@ -72,7 +83,7 @@ template <typename T>
 static void WireEncodeSubscribeImpl(wpi::util::raw_ostream& os, int subuid,
                                     std::span<const T> topicNames,
                                     const PubSubOptionsImpl& options) {
-  os << "{\"method\":\"" << SubscribeMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << SubscribeMsg::METHOD_STR << "\",\"params\":{";
   os << "\"options\":{";
   bool first = true;
   if (options.sendAll) {
@@ -93,7 +104,7 @@ static void WireEncodeSubscribeImpl(wpi::util::raw_ostream& os, int subuid,
     os << "\"prefix\":true";
     first = false;
   }
-  if (options.periodicMs != PubSubOptionsImpl::kDefaultPeriodicMs) {
+  if (options.periodicMs != PubSubOptionsImpl::DEFAULT_PERIODIC_MS) {
     if (!first) {
       os << ',';
     }
@@ -122,7 +133,7 @@ void wpi::nt::net::WireEncodeSubscribe(wpi::util::raw_ostream& os, int subuid,
 
 void wpi::nt::net::WireEncodeUnsubscribe(wpi::util::raw_ostream& os,
                                          int subuid) {
-  os << "{\"method\":\"" << UnsubscribeMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnsubscribeMsg::METHOD_STR << "\",\"params\":{";
   os << "\"subuid\":";
   wpi::util::json::stringify_int(os, subuid);
   os << "}}";
@@ -151,7 +162,7 @@ void wpi::nt::net::WireEncodeAnnounce(wpi::util::raw_ostream& os,
                                       std::string_view typeStr,
                                       const wpi::util::json& properties,
                                       std::optional<int> pubuid) {
-  os << "{\"method\":\"" << AnnounceMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << AnnounceMsg::METHOD_STR << "\",\"params\":{";
   os << "\"id\":";
   wpi::util::json::stringify_int(os, id);
   os << ",\"name\":";
@@ -169,7 +180,7 @@ void wpi::nt::net::WireEncodeAnnounce(wpi::util::raw_ostream& os,
 
 void wpi::nt::net::WireEncodeUnannounce(wpi::util::raw_ostream& os,
                                         std::string_view name, int64_t id) {
-  os << "{\"method\":\"" << UnannounceMsg::kMethodStr << "\",\"params\":{";
+  os << "{\"method\":\"" << UnannounceMsg::METHOD_STR << "\",\"params\":{";
   os << "\"id\":";
   wpi::util::json::stringify_int(os, id);
   os << ",\"name\":";
@@ -181,7 +192,7 @@ void wpi::nt::net::WireEncodePropertiesUpdate(wpi::util::raw_ostream& os,
                                               std::string_view name,
                                               const wpi::util::json& update,
                                               bool ack) {
-  os << "{\"method\":\"" << PropertiesUpdateMsg::kMethodStr
+  os << "{\"method\":\"" << PropertiesUpdateMsg::METHOD_STR
      << "\",\"params\":{";
   os << "\"name\":";
   wpi::util::json::stringify_string(os, name);
@@ -220,7 +231,7 @@ bool wpi::nt::net::WireEncodeBinary(wpi::util::raw_ostream& os, int id,
   });
   mpack_start_array(&writer, 4);
   mpack_write_int(&writer, id);
-  mpack_write_int(&writer, time);
+  mpack_write_int(&writer, ToWireTimestamp(time));
   switch (value.type()) {
     case NT_BOOLEAN:
       mpack_write_u8(&writer, 0);

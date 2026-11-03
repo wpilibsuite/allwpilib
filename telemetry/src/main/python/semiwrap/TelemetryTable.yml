@@ -1,0 +1,46 @@
+extra_includes:
+- pybind11/typing.h
+- rpy/PyTelemetryTable.h
+
+classes:
+  wpi::telemetry::impl::always_false:
+    ignore: true
+  wpi::telemetry::TelemetryTable:
+    rename: _NativeTelemetryTable
+    force_no_default_constructor: true
+    nodelete: true
+    methods:
+      TelemetryTable:
+        ignore: true
+      GetPath:
+      SetType:
+      GetType:
+      HasType:
+      GetTable:
+        return_value_policy: reference
+      KeepDuplicates:
+      SetProperty:
+      Log:
+        ignore: true
+      ShouldLogTableValue:
+    inline_code: |
+      .def("log",
+           [](wpi::telemetry::TelemetryTable& self, std::string_view name,
+              py::object value,
+              py::typing::Optional<py::typing::Type<py::object>> elementType =
+                  py::none(),
+              std::string_view typeString = "") {
+             wpi::telemetry::python::PyTelemetryTable{self}.Log(
+                 name, std::move(value), std::move(elementType), typeString);
+           },
+           py::arg("name"), py::arg("value"), py::kw_only(),
+           py::arg("element_type") = py::none(),
+           py::arg("type_string") = "",
+           py::doc(R"doc(Logs a telemetry value.
+
+      Sequences must pass an explicit element_type. Use bool, int, float, or str for
+      primitive arrays, object to log a string array using str() for each element, or
+      a WPIStruct class for struct arrays. type_string is only used as custom type
+      metadata for scalar str and bytes-like values (bytes, bytearray, and
+      memoryview). Wrap other buffer exporters in memoryview to explicitly log their
+      raw bytes in C order.)doc"))

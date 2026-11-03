@@ -94,7 +94,7 @@ class ImageSource : public VideoSource {
     return VideoProperty{CreateSourceProperty(
         m_handle, name,
         static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kInteger)),
+            static_cast<int>(VideoProperty::Kind::INTEGER)),
         minimum, maximum, step, defaultValue, value, &m_status)};
   }
 
@@ -112,7 +112,7 @@ class ImageSource : public VideoSource {
     return VideoProperty{CreateSourceProperty(
         m_handle, name,
         static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kBoolean)),
+            static_cast<int>(VideoProperty::Kind::BOOLEAN)),
         0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
   }
 
@@ -126,11 +126,11 @@ class ImageSource : public VideoSource {
   VideoProperty CreateStringProperty(std::string_view name,
                                      std::string_view value) {
     m_status = 0;
-    auto prop = VideoProperty{CreateSourceProperty(
-        m_handle, name,
-        static_cast<CS_PropertyKind>(
-            static_cast<int>(VideoProperty::Kind::kString)),
-        0, 0, 0, 0, 0, &m_status)};
+    auto prop = VideoProperty{
+        CreateSourceProperty(m_handle, name,
+                             static_cast<CS_PropertyKind>(
+                                 static_cast<int>(VideoProperty::Kind::STRING)),
+                             0, 0, 0, 0, 0, &m_status)};
     prop.SetString(value);
     return prop;
   }

@@ -43,10 +43,21 @@ set_property(TARGET wpiutil PROPERTY FOLDER "libraries")
 
 target_compile_features(wpiutil PUBLIC cxx_std_23)
 if(MSVC)
-    target_compile_options(
-        wpiutil
-        PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
-    )
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(
+            wpiutil
+            PUBLIC
+                -Wno-unknown-attributes
+                -Wno-switch
+                -Wno-deprecated-declarations
+                -Wno-tautological-constant-out-of-range-compare
+        )
+    else()
+        target_compile_options(
+            wpiutil
+            PUBLIC /permissive- /Zc:preprocessor /Zc:__cplusplus /Zc:throwingNew /MP /bigobj /utf-8
+        )
+    endif()
     target_compile_definitions(wpiutil PRIVATE -D_CRT_SECURE_NO_WARNINGS)
 endif()
 wpilib_target_warnings(wpiutil)
@@ -68,6 +79,7 @@ install(
         src/main/native/thirdparty/argparse/include/
         src/main/native/thirdparty/debugging/include/
         src/main/native/thirdparty/double-conversion/include/
+        src/main/native/thirdparty/htrie/include/
         src/main/native/thirdparty/json/include/
         src/main/native/thirdparty/llvm/include/
         src/main/native/thirdparty/mpack/include/
@@ -83,6 +95,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/argparse/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/debugging/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/double-conversion/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/htrie/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/json/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/llvm/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/main/native/thirdparty/mpack/include>
@@ -128,7 +141,7 @@ if(WPILIB_WITH_TESTS)
     if(MSVC)
         target_compile_options(wpiutil_test PRIVATE /wd4101 /wd4251)
     endif()
-    target_include_directories(wpiutil_test PRIVATE src/generated/test/native/cpp)
+    target_include_directories(wpiutil_test PRIVATE src/generated/test/native/include)
     file(GLOB_RECURSE wpiutil_nanopb_test_src src/generated/test/native/cpp/*.cpp)
     target_sources(wpiutil_test PRIVATE ${wpiutil_nanopb_test_src})
     target_link_libraries(wpiutil_test wpiutil wpiutil_testlib)

@@ -26,6 +26,7 @@
 #include "wpi/nt/ntcore_cpp.hpp"
 #include "wpi/util/DenseMap.hpp"
 #include "wpi/util/json.hpp"
+#include "wpi/util/protobuf/ProtobufMessageDatabase.hpp"
 #include "wpi/util/struct/DynamicStruct.hpp"
 
 namespace wpi::glass {
@@ -182,8 +183,9 @@ class NetworkTablesModel : public Model {
   wpi::util::StructDescriptorDatabase& GetStructDatabase() {
     return m_structDb;
   }
-  upb_DefPool* GetProtobufDatabase() { return m_protoPool; }
-  upb_Arena* GetProtobufArena() { return m_arena; }
+  wpi::util::ProtobufMessageDatabase& GetProtobufDatabase() {
+    return m_protoDb;
+  }
 
  private:
   void RebuildTree();
@@ -210,13 +212,12 @@ class NetworkTablesModel : public Model {
   std::optional<int64_t> m_serverTimeOffset;
 
   wpi::util::StructDescriptorDatabase m_structDb;
-  upb_DefPool* m_protoPool = upb_DefPool_New();
-  upb_Arena* m_arena = upb_Arena_New();
+  wpi::util::ProtobufMessageDatabase m_protoDb;
 };
 
 using NetworkTablesFlags = int;
 
-static constexpr const int kNetworkTablesFlags_PrecisionBitShift = 9;
+static constexpr const int NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT = 9;
 
 enum NetworkTablesFlags_ {
   NetworkTablesFlags_TreeView = 1 << 0,
@@ -227,9 +228,10 @@ enum NetworkTablesFlags_ {
   NetworkTablesFlags_ShowTimestamp = 1 << 5,
   NetworkTablesFlags_ShowServerTimestamp = 1 << 6,
   NetworkTablesFlags_CreateNoncanonicalKeys = 1 << 7,
-  NetworkTablesFlags_Precision = 0xff << kNetworkTablesFlags_PrecisionBitShift,
+  NetworkTablesFlags_Precision = 0xff
+                                 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT,
   NetworkTablesFlags_Default = NetworkTablesFlags_TreeView |
-                               (6 << kNetworkTablesFlags_PrecisionBitShift),
+                               (6 << NETWORK_TABLES_FLAGS_PRECISION_BIT_SHIFT),
 };
 
 void DisplayNetworkTablesInfo(NetworkTablesModel* model);

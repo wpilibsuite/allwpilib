@@ -12,7 +12,6 @@
 
 #include "wpi/hal/Ports.h"
 #include "wpi/hal/REVPH.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/hardware/pneumatic/Compressor.hpp"
 #include "wpi/hardware/pneumatic/DoubleSolenoid.hpp"
 #include "wpi/hardware/pneumatic/Solenoid.hpp"
@@ -20,6 +19,7 @@
 #include "wpi/util/NullDeleter.hpp"
 #include "wpi/util/SensorUtil.hpp"
 #include "wpi/util/StackTrace.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -44,8 +44,8 @@ std::unique_ptr<
 
 // Always called under lock, so we can avoid the double lock from the magic
 // static
-std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(CANBus busId,
-                                                                   int module) {
+std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(
+    CANPort busId, int module) {
   int busIndex = static_cast<int>(busId);
   int32_t numBuses = HAL_GetNumCanBuses();
   WPILIB_AssertMessage(busIndex >= 0 && busIndex < numBuses,
@@ -61,7 +61,7 @@ std::weak_ptr<PneumaticHub::DataStore>& PneumaticHub::GetDataStore(CANBus busId,
 
 class PneumaticHub::DataStore {
  public:
-  explicit DataStore(CANBus busId, int module, const char* stackTrace) {
+  explicit DataStore(CANPort busId, int module, const char* stackTrace) {
     int32_t status = 0;
     HAL_REVPHHandle handle = HAL_InitializeREVPH(static_cast<int>(busId),
                                                  module, stackTrace, &status);
@@ -92,14 +92,14 @@ class PneumaticHub::DataStore {
   uint32_t m_reservedMask{0};
   bool m_compressorReserved{false};
   wpi::util::mutex m_reservedLock;
-  PneumaticHub m_moduleObject{CANBus::CAN_S0, HAL_INVALID_HANDLE, 0};
+  PneumaticHub m_moduleObject{CANPort::CAN_S0, HAL_INVALID_HANDLE, 0};
   std::array<wpi::units::millisecond_t, 16> m_oneShotDurMs{0_ms};
 };
 
-PneumaticHub::PneumaticHub(CANBus busId)
+PneumaticHub::PneumaticHub(CANPort busId)
     : PneumaticHub{busId, SensorUtil::GetDefaultREVPHModule()} {}
 
-PneumaticHub::PneumaticHub(CANBus busId, int module) : m_busId{busId} {
+PneumaticHub::PneumaticHub(CANPort busId, int module) : m_busId{busId} {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);
   auto& res = GetDataStore(busId, module);
@@ -113,7 +113,7 @@ PneumaticHub::PneumaticHub(CANBus busId, int module) : m_busId{busId} {
   m_module = module;
 }
 
-PneumaticHub::PneumaticHub(CANBus busId, HAL_REVPHHandle handle, int module)
+PneumaticHub::PneumaticHub(CANPort busId, HAL_REVPHHandle handle, int module)
     : m_handle{handle}, m_busId{busId}, m_module{module} {}
 
 bool PneumaticHub::GetCompressor() const {
@@ -434,10 +434,16 @@ Compressor PneumaticHub::MakeCompressor() {
 }
 
 void PneumaticHub::ReportUsage(std::string_view device, std::string_view data) {
-  HAL_ReportUsage(std::format("PH[{}]/{}", m_module, device), data);
+  wpi::util::ReportUsage(std::format("PH[{}]/{}", m_module, device), data);
 }
 
-std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(CANBus busId,
+void PneumaticHub::ReportUsage(std::string_view device, int instanceNumber,
+                               std::string_view data) {
+  wpi::util::ReportUsage(std::format("PH[{}]/{}", m_module, device),
+                         instanceNumber, data);
+}
+
+std::shared_ptr<PneumaticsBase> PneumaticHub::GetForModule(CANPort busId,
                                                            int module) {
   std::string stackTrace = wpi::util::GetStackTrace(1);
   std::scoped_lock lock(m_handleLock);

@@ -1,7 +1,8 @@
 # validated: 2024-01-20 DS aaea85ff1656 WaitUntilCommand.java
 from __future__ import annotations
 
-from typing import Callable, overload
+from collections.abc import Callable
+from typing import overload
 
 from wpilib import Timer
 from wpimath import units

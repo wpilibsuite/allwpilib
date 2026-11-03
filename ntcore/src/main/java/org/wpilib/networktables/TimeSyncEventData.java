@@ -7,12 +7,12 @@ package org.wpilib.networktables;
 /** NetworkTables time sync event data. */
 public final class TimeSyncEventData {
   /**
-   * Offset between local time and server time, in microseconds. Add this value to local time to get
+   * Offset between local time and server time, in nanoseconds. Add this value to local time to get
    * the estimated equivalent server time.
    */
   public final long serverTimeOffset;
 
-  /** Measured round trip time divided by 2, in microseconds. */
+  /** Measured round trip time divided by 2, in nanoseconds. */
   public final long rtt2;
 
   /**

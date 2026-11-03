@@ -249,6 +249,7 @@ TEST_CASE("DifferentialDriveTest ArcadeDrive", "[wpilibc][drive]") {
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, false);
@@ -288,6 +289,7 @@ TEST_CASE("DifferentialDriveTest ArcadeDriveSquared", "[wpilibc][drive]") {
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.ArcadeDrive(1.0, 0.0, true);
@@ -327,6 +329,7 @@ TEST_CASE("DifferentialDriveTest CurvatureDrive", "[wpilibc][drive]") {
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, false);
@@ -367,6 +370,7 @@ TEST_CASE("DifferentialDriveTest CurvatureDriveTurnInPlace",
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.CurvatureDrive(1.0, 0.0, true);
@@ -406,6 +410,7 @@ TEST_CASE("DifferentialDriveTest TankDrive", "[wpilibc][drive]") {
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.TankDrive(1.0, 1.0, false);
@@ -445,6 +450,7 @@ TEST_CASE("DifferentialDriveTest TankDriveSquared", "[wpilibc][drive]") {
       [&](double output) { left.SetThrottle(output); },
       [&](double output) { right.SetThrottle(output); }};
   drive.SetDeadband(0.0);
+  drive.SetSafetyEnabled(false);
 
   // Forward
   drive.TankDrive(1.0, 1.0, true);

@@ -9,7 +9,7 @@ using namespace wpi::hal;
 
 namespace wpi::hal::init {
 void InitializeDutyCycleData() {
-  static DutyCycleData sed[kNumDutyCycles];
+  static DutyCycleData sed[NUM_DUTY_CYCLES];
   ::wpi::hal::SimDutyCycleData = sed;
 }
 }  // namespace wpi::hal::init

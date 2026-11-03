@@ -1,6 +1,3 @@
-extra_includes:
-- wpi/util/sendable/SendableBuilder.hpp
-
 classes:
   wpi::PWMSparkMax:
     methods:

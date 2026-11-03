@@ -4,6 +4,15 @@
 
 package org.wpilib.command3;
 
+import static org.wpilib.command3.CoroutineState.CANCELED;
+import static org.wpilib.command3.CoroutineState.Canceled;
+import static org.wpilib.command3.CoroutineState.FROZEN;
+import static org.wpilib.command3.CoroutineState.ForkFailed;
+import static org.wpilib.command3.CoroutineState.LIVE;
+import static org.wpilib.command3.CoroutineState.forkFailed;
+import static org.wpilib.command3.CoroutineState.parkedUntil;
+import static org.wpilib.command3.CoroutineState.parkedWhile;
+import static org.wpilib.units.Units.Nanoseconds;
 import static org.wpilib.units.Units.Seconds;
 import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
@@ -14,7 +23,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import org.wpilib.command3.Scheduler.ScheduleResult;
-import org.wpilib.system.Timer;
+import org.wpilib.system.RobotController;
 import org.wpilib.units.measure.Time;
 
 /**
@@ -28,8 +37,12 @@ public final class Coroutine {
   private final Continuation m_backingContinuation;
 
   private boolean m_cancelOnForkFailure = true;
-  private ForkResult m_lastForkFailure = null;
-  private boolean m_cancellationRequested = false;
+
+  private CoroutineState m_state = LIVE;
+
+  boolean inUnmountableState() {
+    return !m_state.shouldMount();
+  }
 
   /**
    * Creates a new coroutine. Package-private; only the scheduler should be creating these.
@@ -82,7 +95,9 @@ public final class Coroutine {
   // Package-private. User code can never access this because setting the flag happens immediately
   // before the coroutine yields itself.
   boolean isInterruptRequested() {
-    return m_cancelOnForkFailure && m_lastForkFailure != null;
+    // Note that we only get into a ForkFailed state if m_cancelOnForkFailure is true,
+    // so there's no point in checking it here
+    return m_state instanceof ForkFailed;
   }
 
   /**
@@ -97,20 +112,22 @@ public final class Coroutine {
   public void requestCancellation() {
     requireMounted();
 
-    // Set the flag and immediately yield. The scheduler will check the flag after the yield call
-    // and cancel the command and its descendants.
-    m_cancellationRequested = true;
+    m_state = CANCELED;
     this.yield();
   }
 
   // package-private; setting the flag will immediately yield, so user code can never access this
   // in a state where it returns anything other than `false`
   boolean isCancellationRequested() {
-    return m_cancellationRequested;
+    return m_state instanceof Canceled;
   }
 
   ForkResult getForkResult() {
-    return m_lastForkFailure;
+    if (m_state instanceof ForkFailed(ForkResult failure)) {
+      return failure;
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -123,7 +140,12 @@ public final class Coroutine {
   public boolean yield() {
     requireMounted();
 
-    return m_backingContinuation.yield();
+    m_backingContinuation.yield();
+
+    // If the coroutine was picked back up by the scheduler, it is definitionally live.
+    // Reset the state to reflect this.
+    m_state = LIVE;
+    return true;
   }
 
   /**
@@ -132,14 +154,11 @@ public final class Coroutine {
    *
    * @throws IllegalStateException if called anywhere other than the coroutine's running command
    */
-  @SuppressWarnings("InfiniteLoopStatement")
   public void park() {
     requireMounted();
 
-    while (true) {
-      // 'this' is required because 'yield' is a semi-keyword and needs to be qualified
-      this.yield();
-    }
+    m_state = FROZEN;
+    this.yield();
   }
 
   /**
@@ -151,15 +170,14 @@ public final class Coroutine {
    * forked and failed commands.
    */
   public final class ForkResult {
-    private final List<? extends Command> m_forkedCommands;
-    private final List<? extends ScheduleResult.Failure> m_failedCommands;
+    private final List<ScheduleResult.Successful> m_forkedCommands;
+    private final List<ScheduleResult.Failure> m_failedCommands;
 
     // private - only the coroutine can construct these
     private ForkResult(
-        Collection<? extends Command> forkedCommands,
-        List<? extends ScheduleResult.Failure> failedCommands) {
-      m_forkedCommands = List.copyOf(forkedCommands);
-      m_failedCommands = List.copyOf(failedCommands);
+        Collection<ScheduleResult.Successful> successes, List<ScheduleResult.Failure> failures) {
+      m_forkedCommands = List.copyOf(successes);
+      m_failedCommands = List.copyOf(failures);
     }
 
     /**
@@ -202,10 +220,13 @@ public final class Coroutine {
      * <p>This method does nothing if no commands were successfully forked.
      */
     public void awaitCompletion() {
-      for (Command command : m_forkedCommands) {
-        if (m_scheduler.isRunning(command)) {
-          Coroutine.this.yield();
-        }
+      if (m_forkedCommands.isEmpty()) {
+        // Nothing to do; exit early
+        return;
+      }
+      var tracker = CommandRunTracker.of(m_scheduler, m_forkedCommands);
+      while (tracker.isAnyRunning()) {
+        Coroutine.this.yield();
       }
     }
 
@@ -215,7 +236,7 @@ public final class Coroutine {
      *
      * @return The list of failed commands.
      */
-    public List<? extends ScheduleResult.Failure> getFailedCommands() {
+    public List<ScheduleResult.Failure> getFailedCommands() {
       return m_failedCommands;
     }
 
@@ -225,13 +246,14 @@ public final class Coroutine {
      *
      * @return The list of forked commands.
      */
-    public List<? extends Command> getForkedCommands() {
+    public List<ScheduleResult.Successful> getForkedCommands() {
       return m_forkedCommands;
     }
   }
 
   /**
-   * Checks that all the given commands can be forked.
+   * Checks that all the given commands can be forked. Note that successful results will have a run
+   * ID of 0, because the commands will not have actually been scheduled and received an ID.
    *
    * @param commands The commands to check
    * @return A failure-type ForkResult if the commands can't all be scheduled, or null on success.
@@ -241,23 +263,22 @@ public final class Coroutine {
     // Because this is a bug in user code, throw an error instead of returning a failure result
     ConflictDetector.throwIfConflicts(commands);
 
-    var schedulable = new ArrayList<Command>();
-    var unschedulable = new ArrayList<ScheduleResult.Failure>();
+    var successes = new ArrayList<ScheduleResult.Successful>();
+    var failures = new ArrayList<ScheduleResult.Failure>();
     for (var command : commands) {
       var result = m_scheduler.isSchedulable(command);
-      if (result instanceof ScheduleResult.Failure fail) {
-        unschedulable.add(fail);
-      } else {
-        schedulable.add(command);
+      switch (result) {
+        case ScheduleResult.Successful success -> successes.add(success);
+        case ScheduleResult.Failure failure -> failures.add(failure);
       }
     }
 
-    var result = new ForkResult(schedulable, unschedulable);
-    if (!unschedulable.isEmpty()) {
+    var result = new ForkResult(successes, failures);
+    if (result.failed()) {
       if (m_cancelOnForkFailure) {
         // Canceling on fork failure means no coroutine or user code gets to run to handle the
         // failure result
-        m_lastForkFailure = result;
+        m_state = forkFailed(result);
         this.yield();
         // could throw an IllegalStateException, but probably shouldn't crash user code
         return result;
@@ -291,14 +312,13 @@ public final class Coroutine {
    *     success result if all commands were scheduled.
    */
   private ForkResult doFork(Collection<? extends Command> commands) {
-    var successes = new ArrayList<Command>();
+    var successes = new ArrayList<ScheduleResult.Successful>();
     var fails = new ArrayList<ScheduleResult.Failure>();
     for (var command : commands) {
       var result = m_scheduler.schedule(command);
-      if (result instanceof ScheduleResult.Failure fail) {
-        fails.add(fail);
-      } else {
-        successes.add(command);
+      switch (result) {
+        case ScheduleResult.Successful s -> successes.add(s);
+        case ScheduleResult.Failure f -> fails.add(f);
       }
     }
     ForkResult result = new ForkResult(successes, fails);
@@ -312,7 +332,7 @@ public final class Coroutine {
       // commands, which we can't restore. The two options are to either cancel the entire command
       // composition - which is the default behavior - or to allow user code to handle the failure
       // and do something with it (eg trying something else, retrying, etc).
-      m_lastForkFailure = result;
+      m_state = forkFailed(result);
       this.yield();
       return result; // note: unreachable
     }
@@ -432,21 +452,34 @@ public final class Coroutine {
 
     requireNonNullParam(command, "command", "Coroutine.await");
 
-    var forkableCheck = checkAllForkable(List.of(command));
-    if (forkableCheck.failed()) {
-      return forkableCheck;
-    }
-
     // Don't need doFork() because there's no chance of sibling conflicts
-    m_scheduler.schedule(command);
+    var scheduleResult = m_scheduler.schedule(command);
+    switch (scheduleResult) {
+      case ScheduleResult.Successful forked -> {
+        int id = forked.runId();
+        // If the command is a one-shot, then the schedule call will completely execute the command.
+        // runId(command) will return 0 and the loop condition will never be met, so we'd return
+        // immediately without yielding.
+        var cond = parkedWhile(() -> m_scheduler.runId(forked.command()) == id);
+        if (!cond.conditionMet()) {
+          m_state = cond;
+          this.yield();
+        }
 
-    while (m_scheduler.isScheduledOrRunning(command)) {
-      // If the command is a one-shot, then the schedule call will completely execute the command.
-      // There would be nothing to await
-      this.yield();
+        return new ForkResult(List.of(forked), List.of());
+      }
+
+      case ScheduleResult.Failure failed -> {
+        // Failed to fork
+        var result = new ForkResult(List.of(), List.of(failed));
+        if (m_cancelOnForkFailure) {
+          m_state = forkFailed(result);
+          this.yield();
+          return result; // note: unreachable because the scheduler will never remount the coroutine
+        }
+        return result;
+      }
     }
-
-    return new ForkResult(List.of(command), List.of());
   }
 
   /**
@@ -486,7 +519,10 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().anyMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, forkResult.getForkedCommands());
+    var cond = parkedWhile(tracker::isAnyRunning);
+    if (!cond.conditionMet()) {
+      m_state = cond;
       this.yield();
     }
 
@@ -551,12 +587,28 @@ public final class Coroutine {
       return forkResult;
     }
 
-    while (commands.stream().allMatch(m_scheduler::isScheduledOrRunning)) {
+    var tracker = CommandRunTracker.of(m_scheduler, forkResult.getForkedCommands());
+    var cond = parkedWhile(tracker::areAllRunning);
+    if (!cond.conditionMet()) {
+      m_state = cond;
       this.yield();
     }
 
     // At least one command exited; cancel the rest.
-    commands.forEach(m_scheduler::cancel);
+    // We need to use run IDs here because at least one command exited in the previous cycle.
+    // If that command was immediately rescheduled, that would have happened outside this awaitAny
+    // call and must be allowed to continue. Using a naive `commands.forEach(m_scheduler::cancel)`
+    // loop would cause that rescheduled command to be canceled as well.
+    for (var fork : forkResult.getForkedCommands()) {
+      var command = fork.command();
+      int runId = fork.runId();
+
+      if (m_scheduler.runId(command) == runId) {
+        // Only cancel an original invocation of the command. If it exited early and was later
+        // rescheduled, that rescheduled run must be allowed to continue.
+        m_scheduler.cancel(command);
+      }
+    }
 
     return forkResult;
   }
@@ -620,8 +672,9 @@ public final class Coroutine {
 
     requireNonNullParam(duration, "duration", "Coroutine.wait");
 
-    var timer = Timer.createStarted();
-    while (!timer.hasElapsed(duration.in(Seconds))) {
+    var cond = parkedUntil(RobotController.getTime() + (long) duration.in(Nanoseconds));
+    if (duration.in(Seconds) > 0) {
+      m_state = cond;
       this.yield();
     }
   }
@@ -671,7 +724,9 @@ public final class Coroutine {
 
     requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
 
-    while (!condition.getAsBoolean()) {
+    var cond = parkedUntil(condition);
+    if (!cond.conditionMet()) {
+      m_state = cond;
       this.yield();
     }
 
@@ -720,17 +775,23 @@ public final class Coroutine {
     requireNonNullParam(condition, "condition", "Coroutine.waitUntil");
     requireNonNullParam(timeout, "timeout", "Coroutine.waitUntil");
 
-    var timer = Timer.createStarted();
-
-    while (!condition.getAsBoolean()) {
-      if (timer.hasElapsed(timeout)) {
-        return WaitResult.TIMED_OUT;
-      } else {
-        this.yield();
-      }
+    if (condition.getAsBoolean()) {
+      return WaitResult.CONDITION_MET;
     }
 
-    return WaitResult.CONDITION_MET;
+    long targetTimestampNanos = RobotController.getTime() + (long) timeout.in(Nanoseconds);
+    m_state =
+        parkedUntil(
+            () -> condition.getAsBoolean() || RobotController.getTime() >= targetTimestampNanos);
+    this.yield();
+
+    // In case of a tiebreaker where the condition and the timeout are both reached in the same
+    // cycle, let the condition win.
+    if (condition.getAsBoolean()) {
+      return WaitResult.CONDITION_MET;
+    } else {
+      return WaitResult.TIMED_OUT;
+    }
   }
 
   /**

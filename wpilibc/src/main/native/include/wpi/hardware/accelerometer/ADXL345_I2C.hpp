@@ -6,8 +6,9 @@
 
 #include "wpi/hal/SimDevice.hpp"
 #include "wpi/hardware/bus/I2C.hpp"
-#include "wpi/nt/NTSendable.hpp"
-#include "wpi/util/sendable/SendableHelper.hpp"
+#include "wpi/telemetry/TelemetryLoggable.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
+#include "wpi/util/struct/Struct.hpp"
 
 namespace wpi {
 
@@ -18,8 +19,7 @@ namespace wpi {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public wpi::nt::NTSendable,
-                    public wpi::util::SendableHelper<ADXL345_I2C> {
+class ADXL345_I2C : public wpi::telemetry::TelemetryLoggable {
  public:
   /**
    * Accelerometer axes.
@@ -103,7 +103,7 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    * @return Acceleration of the ADXL345 in Gs.
    * @Common This is one of the commonly used methods for this class
    */
-  virtual double GetAcceleration(Axis axis);
+  virtual double GetAcceleration(Axis axis) const;
 
   /**
    * Get the acceleration of all axes in Gs.
@@ -111,12 +111,14 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
    * @return An object containing the acceleration measured on each axis of the
    *         ADXL345 in Gs.
    */
-  virtual AllAxes GetAccelerations();
+  virtual AllAxes GetAccelerations() const;
 
-  void InitSendable(wpi::nt::NTSendableBuilder& builder) override;
+  void LogTo(wpi::telemetry::TelemetryTable& table) const override;
+
+  std::string_view GetTelemetryType() const override;
 
  private:
-  I2C m_i2c;
+  mutable I2C m_i2c;
 
   wpi::hal::SimDevice m_simDevice;
   wpi::hal::SimEnum m_simRange;
@@ -126,3 +128,20 @@ class ADXL345_I2C : public wpi::nt::NTSendable,
 };
 
 }  // namespace wpi
+
+template <>
+struct wpi::util::Struct<wpi::ADXL345_I2C::AllAxes> {
+  static constexpr std::string_view GetTypeName() {
+    return "ADXL345_I2C.AllAxes";
+  }
+  static constexpr size_t GetSize() { return 8 * 3; }
+  static constexpr std::string_view GetSchema() {
+    return "double x;double y;double z";
+  }
+
+  static wpi::ADXL345_I2C::AllAxes Unpack(std::span<const uint8_t> data);
+  static void Pack(std::span<uint8_t> data,
+                   const wpi::ADXL345_I2C::AllAxes& value);
+};
+
+static_assert(wpi::util::StructSerializable<wpi::ADXL345_I2C::AllAxes>);

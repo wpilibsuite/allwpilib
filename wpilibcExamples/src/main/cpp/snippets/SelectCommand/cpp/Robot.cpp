@@ -5,7 +5,6 @@
 #include "Robot.hpp"
 
 #include "wpi/commands2/CommandScheduler.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
 
 Robot::Robot() {}
 

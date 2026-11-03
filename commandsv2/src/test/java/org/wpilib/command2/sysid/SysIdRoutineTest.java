@@ -57,10 +57,10 @@ class SysIdRoutineTest {
         new SysIdRoutine(
             new SysIdRoutine.Config(null, null, null, m_mechanism::recordState),
             new SysIdRoutine.Mechanism(m_mechanism::drive, m_mechanism::log, new Subsystem() {}));
-    m_quasistaticForward = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kForward);
-    m_quasistaticReverse = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
-    m_dynamicForward = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kForward);
-    m_dynamicReverse = m_sysidRoutine.dynamic(SysIdRoutine.Direction.kReverse);
+    m_quasistaticForward = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.FORWARD);
+    m_quasistaticReverse = m_sysidRoutine.quasistatic(SysIdRoutine.Direction.REVERSE);
+    m_dynamicForward = m_sysidRoutine.dynamic(SysIdRoutine.Direction.FORWARD);
+    m_dynamicReverse = m_sysidRoutine.dynamic(SysIdRoutine.Direction.REVERSE);
   }
 
   @AfterEach

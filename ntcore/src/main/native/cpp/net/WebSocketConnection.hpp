@@ -39,11 +39,11 @@ class WebSocketConnection final
 
   int WriteText(
       wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
-    return Write(kText, writer);
+    return Write(TEXT, writer);
   }
   int WriteBinary(
       wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer) final {
-    return Write(kBinary, writer);
+    return Write(BINARY, writer);
   }
   int Flush() final;
 
@@ -56,7 +56,7 @@ class WebSocketConnection final
     Send(wpi::net::WebSocket::Frame::BINARY, writer);
   }
 
-  uint64_t GetLastFlushTime() const final { return m_lastFlushTime; }
+  int64_t GetLastFlushTime() const final { return m_lastFlushTime; }
 
   uint64_t GetLastReceivedTime() const final {
     return m_ws.GetLastReceivedTime();
@@ -80,7 +80,7 @@ class WebSocketConnection final
   std::string_view GetDisconnectReason() const { return m_reason; }
 
  private:
-  enum State { kEmpty, kText, kBinary };
+  enum State { EMPTY, TEXT, BINARY };
 
   int Write(State kind,
             wpi::util::function_ref<void(wpi::util::raw_ostream& os)> writer);
@@ -114,9 +114,9 @@ class WebSocketConnection final
   size_t m_framePos = 0;
   size_t m_written = 0;
   wpi::net::uv::Error m_err;
-  State m_state = kEmpty;
+  State m_state = EMPTY;
   std::string m_reason;
-  uint64_t m_lastFlushTime = 0;
+  int64_t m_lastFlushTime = 0;
   unsigned int m_version;
 };
 

@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 import wpimath
 
@@ -26,26 +28,35 @@ class MyRobot(wpilib.TimedRobot):
         self.timer = wpilib.Timer()
 
         # Called once at the beginning of the robot program.
-        self.trajectory = wpimath.DrivetrainSplineTrajectoryGenerator.generate(
-            wpimath.Pose2d(2, 2, wpimath.Rotation2d()),
-            [],
-            wpimath.Pose2d(6, 4, wpimath.Rotation2d()),
-            wpimath.TrajectoryConfig(2, 2),
+        # Replace this with a call to a trajectory generator.
+        self.trajectory = wpimath.HolonomicTrajectory(
+            [
+                wpimath.HolonomicSample(
+                    0.0,
+                    wpimath.Pose2d(0.0, 0.0, 0.0),
+                    wpimath.ChassisVelocities(0.0, 0.0, 0.0),
+                    wpimath.ChassisAccelerations(0.0, 0.0, 0.0),
+                )
+            ]
         )
 
+    @override
     def robot_periodic(self) -> None:
         self.drive.periodic()
 
+    @override
     def autonomous_init(self) -> None:
         self.timer.restart()
-        self.drive.reset_odometry(self.trajectory.initial_pose())
+        self.drive.reset_odometry(self.trajectory.start().pose)
 
+    @override
     def autonomous_periodic(self) -> None:
         elapsed = self.timer.get()
         reference = self.trajectory.sample_at(elapsed)
         velocities = self.feedback.calculate(self.drive.get_pose(), reference)
         self.drive.drive(velocities.vx, velocities.omega)
 
+    @override
     def teleop_periodic(self) -> None:
         # Get the x velocity. We are inverting this because Xbox controllers return
         # negative values when we push forward.
@@ -64,5 +75,6 @@ class MyRobot(wpilib.TimedRobot):
         )
         self.drive.drive(x_velocity, rot)
 
+    @override
     def simulation_periodic(self) -> None:
         self.drive.simulation_periodic()

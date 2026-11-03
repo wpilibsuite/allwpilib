@@ -6,7 +6,7 @@ package org.wpilib.command2;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryTable;
 
 /**
  * A command composition that runs a list of commands in sequence.
@@ -21,7 +21,7 @@ public class SequentialCommandGroup extends Command {
   private final List<Command> m_commands = new ArrayList<>();
   private int m_currentCommandIndex = -1;
   private boolean m_runWhenDisabled = true;
-  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.kCancelIncoming;
+  private InterruptionBehavior m_interruptBehavior = InterruptionBehavior.CANCEL_INCOMING;
 
   /**
    * Creates a new SequentialCommandGroup. The given commands will be run sequentially, with the
@@ -51,8 +51,8 @@ public class SequentialCommandGroup extends Command {
       m_commands.add(command);
       addRequirements(command.getRequirements());
       m_runWhenDisabled &= command.runsWhenDisabled();
-      if (command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf) {
-        m_interruptBehavior = InterruptionBehavior.kCancelSelf;
+      if (command.getInterruptionBehavior() == InterruptionBehavior.CANCEL_SELF) {
+        m_interruptBehavior = InterruptionBehavior.CANCEL_SELF;
       }
     }
   }
@@ -111,9 +111,8 @@ public class SequentialCommandGroup extends Command {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
-
-    builder.addIntegerProperty("index", () -> m_currentCommandIndex, null);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
+    table.log("index", m_currentCommandIndex);
   }
 }

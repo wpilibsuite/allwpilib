@@ -4,6 +4,7 @@
 
 #include "wpi/hardware/pneumatic/PneumaticsBase.hpp"
 
+#include <format>
 #include <memory>
 
 #include "wpi/hal/REVPH.h"
@@ -28,7 +29,7 @@ static_assert(
     HAL_REVPHCompressorConfigType::HAL_REVPH_COMPRESSOR_CONFIG_HYBRID);
 
 std::shared_ptr<PneumaticsBase> PneumaticsBase::GetForType(
-    CANBus busId, int module, PneumaticsModuleType moduleType) {
+    CANPort busId, int module, PneumaticsModuleType moduleType) {
   if (moduleType == PneumaticsModuleType::CTRE_PCM) {
     return PneumaticsControlModule::GetForModule(busId, module);
   } else if (moduleType == PneumaticsModuleType::REV_PH) {
@@ -46,4 +47,9 @@ int PneumaticsBase::GetDefaultForType(PneumaticsModuleType moduleType) {
   }
   throw WPILIB_MakeError(err::InvalidParameter, "{}",
                          static_cast<int>(moduleType));
+}
+
+void PneumaticsBase::ReportUsage(std::string_view device, int instanceNumber,
+                                 std::string_view data) {
+  ReportUsage(std::format("{}[{}]", device, instanceNumber), data);
 }

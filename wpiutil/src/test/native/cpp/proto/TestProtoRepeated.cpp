@@ -153,38 +153,38 @@ using ProtoType = wpi::util::Protobuf<RepeatedTestProto>;
 }  // namespace
 
 TEST_CASE("RepeatedTestProtoTest RoundtripNanopb", "[wpiutil][proto]") {
-  RepeatedTestProto kExpectedData = RepeatedTestProto{};
-  kExpectedData.bool_msg.emplace_back(true);
-  kExpectedData.bool_msg.emplace_back(false);
+  RepeatedTestProto EXPECTED_DATA = RepeatedTestProto{};
+  EXPECTED_DATA.bool_msg.emplace_back(true);
+  EXPECTED_DATA.bool_msg.emplace_back(false);
 
-  kExpectedData.double_msg.emplace_back(5.05);
+  EXPECTED_DATA.double_msg.emplace_back(5.05);
 
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  REQUIRE(kExpectedData.double_msg.size() == unpacked_data->double_msg.size());
-  REQUIRE(kExpectedData.float_msg.size() == unpacked_data->float_msg.size());
-  REQUIRE(kExpectedData.int32_msg.size() == unpacked_data->int32_msg.size());
-  REQUIRE(kExpectedData.int64_msg.size() == unpacked_data->int64_msg.size());
-  REQUIRE(kExpectedData.uint32_msg.size() == unpacked_data->uint32_msg.size());
-  REQUIRE(kExpectedData.uint64_msg.size() == unpacked_data->uint64_msg.size());
-  REQUIRE(kExpectedData.sint32_msg.size() == unpacked_data->sint32_msg.size());
-  REQUIRE(kExpectedData.sint64_msg.size() == unpacked_data->sint64_msg.size());
-  REQUIRE(kExpectedData.fixed32_msg.size() ==
+  REQUIRE(EXPECTED_DATA.double_msg.size() == unpacked_data->double_msg.size());
+  REQUIRE(EXPECTED_DATA.float_msg.size() == unpacked_data->float_msg.size());
+  REQUIRE(EXPECTED_DATA.int32_msg.size() == unpacked_data->int32_msg.size());
+  REQUIRE(EXPECTED_DATA.int64_msg.size() == unpacked_data->int64_msg.size());
+  REQUIRE(EXPECTED_DATA.uint32_msg.size() == unpacked_data->uint32_msg.size());
+  REQUIRE(EXPECTED_DATA.uint64_msg.size() == unpacked_data->uint64_msg.size());
+  REQUIRE(EXPECTED_DATA.sint32_msg.size() == unpacked_data->sint32_msg.size());
+  REQUIRE(EXPECTED_DATA.sint64_msg.size() == unpacked_data->sint64_msg.size());
+  REQUIRE(EXPECTED_DATA.fixed32_msg.size() ==
           unpacked_data->fixed32_msg.size());
-  REQUIRE(kExpectedData.fixed64_msg.size() ==
+  REQUIRE(EXPECTED_DATA.fixed64_msg.size() ==
           unpacked_data->fixed64_msg.size());
-  REQUIRE(kExpectedData.sfixed32_msg.size() ==
+  REQUIRE(EXPECTED_DATA.sfixed32_msg.size() ==
           unpacked_data->sfixed32_msg.size());
-  REQUIRE(kExpectedData.sfixed64_msg.size() ==
+  REQUIRE(EXPECTED_DATA.sfixed64_msg.size() ==
           unpacked_data->sfixed64_msg.size());
-  REQUIRE(kExpectedData.bool_msg.size() == unpacked_data->bool_msg.size());
-  REQUIRE(kExpectedData.string_msg.size() == unpacked_data->string_msg.size());
-  REQUIRE(kExpectedData.bytes_msg.size() == unpacked_data->bytes_msg.size());
-  REQUIRE(kExpectedData.TestProtoInner_msg.size() ==
+  REQUIRE(EXPECTED_DATA.bool_msg.size() == unpacked_data->bool_msg.size());
+  REQUIRE(EXPECTED_DATA.string_msg.size() == unpacked_data->string_msg.size());
+  REQUIRE(EXPECTED_DATA.bytes_msg.size() == unpacked_data->bytes_msg.size());
+  REQUIRE(EXPECTED_DATA.TestProtoInner_msg.size() ==
           unpacked_data->TestProtoInner_msg.size());
 }

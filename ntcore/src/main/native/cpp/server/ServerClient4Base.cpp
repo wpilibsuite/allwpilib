@@ -137,13 +137,13 @@ void ServerClient4Base::ClientSubscribe(int subuid,
   m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     bool removed = tcdIt != topic->clients.end() && replace &&
-                   tcdIt->second.subscribers.erase(sub.get());
+                   tcdIt->second.RemoveSubscriber(sub.get());
 
     // is client already subscribed?
     bool wasSubscribed =
         tcdIt != topic->clients.end() && !tcdIt->second.subscribers.empty();
     bool wasSubscribedValue =
-        wasSubscribed ? tcdIt->second.sendMode != net::ValueSendMode::kDisabled
+        wasSubscribed ? tcdIt->second.sendMode != net::ValueSendMode::DISABLED
                       : false;
 
     bool added = false;
@@ -175,7 +175,7 @@ void ServerClient4Base::ClientSubscribe(int subuid,
 
   for (auto topic : dataToSend) {
     DEBUG4("send last value for {} to client {}", topic->name, m_id);
-    SendValue(topic, topic->lastValue, net::ValueSendMode::kAll);
+    SendValue(topic, topic->lastValue, net::ValueSendMode::ALL);
   }
 }
 
@@ -191,7 +191,7 @@ void ServerClient4Base::ClientUnsubscribe(int subuid) {
   m_storage.ForEachTopic([&](ServerTopic* topic) {
     auto tcdIt = topic->clients.find(this);
     if (tcdIt != topic->clients.end()) {
-      if (tcdIt->second.subscribers.erase(sub)) {
+      if (tcdIt->second.RemoveSubscriber(sub)) {
         UpdatePeriod(tcdIt->second, topic);
         m_storage.UpdateMetaTopicSub(topic);
       }

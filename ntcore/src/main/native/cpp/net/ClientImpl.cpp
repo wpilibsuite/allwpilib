@@ -4,7 +4,6 @@
 
 #include "ClientImpl.hpp"
 
-#include <cmath>
 #include <limits>
 #include <memory>
 #include <numeric>
@@ -37,8 +36,8 @@ ClientImpl::ClientImpl(
       m_setPeriodic{std::move(setPeriodic)},
       m_ping{wire},
       m_nextPingTimeMs{curTimeMs + (wire.GetVersion() >= 0x0401
-                                        ? NetworkPing::kPingIntervalMs
-                                        : kRttIntervalMs)},
+                                        ? NetworkPing::PING_INTERVAL_MS
+                                        : RTT_INTERVAL_MS)},
       m_outgoing{wire, local} {
   // immediately send RTT ping
   auto now = wpi::util::Now();
@@ -91,22 +90,22 @@ void ClientImpl::ProcessIncomingBinary(uint64_t curTimeMs,
           continue;
         }
         int64_t rtt2 = rtt / 2;
-        if (rtt2 < m_rtt2Us) {
+        if (rtt2 < m_rtt2Ns) {
           int64_t serverTimeAtResponse;
-          int64_t serverTimeOffsetUs;
+          int64_t serverTimeOffsetNs;
           if (wpi::util::AddOverflow(value.server_time(), rtt2,
                                      serverTimeAtResponse) ||
               wpi::util::SubOverflow(serverTimeAtResponse, now,
-                                     serverTimeOffsetUs) ||
-              serverTimeOffsetUs == std::numeric_limits<int64_t>::min()) {
+                                     serverTimeOffsetNs) ||
+              serverTimeOffsetNs == std::numeric_limits<int64_t>::min()) {
             WARN("RTT ping response has invalid timestamp values");
             continue;
           }
-          m_rtt2Us = static_cast<uint32_t>(rtt2);
-          DEBUG3("Time offset: {}", serverTimeOffsetUs);
-          m_outgoing.SetTimeOffset(serverTimeOffsetUs);
+          m_rtt2Ns = rtt2;
+          DEBUG3("Time offset: {}", serverTimeOffsetNs);
+          m_outgoing.SetTimeOffset(serverTimeOffsetNs);
           m_haveTimeOffset = true;
-          m_timeSyncUpdated(serverTimeOffsetUs, m_rtt2Us, true);
+          m_timeSyncUpdated(serverTimeOffsetNs, m_rtt2Ns, true);
         }
       }
       continue;
@@ -159,7 +158,7 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
         WireEncodeBinary(os, -1, 0, Value::MakeInteger(now));
       });
       // drift isn't critical here, so just go from current time
-      m_nextPingTimeMs = curTimeMs + kRttIntervalMs;
+      m_nextPingTimeMs = curTimeMs + RTT_INTERVAL_MS;
       m_pongTimeMs = 0;
     }
   }
@@ -173,11 +172,11 @@ void ClientImpl::SendOutgoing(uint64_t curTimeMs, bool flush) {
 }
 
 void ClientImpl::UpdatePeriodic() {
-  if (m_periodMs < kMinPeriodMs) {
-    m_periodMs = kMinPeriodMs;
+  if (m_periodMs < MIN_PERIOD_MS) {
+    m_periodMs = MIN_PERIOD_MS;
   }
-  if (m_periodMs > kMaxPeriodMs) {
-    m_periodMs = kMaxPeriodMs;
+  if (m_periodMs > MAX_PERIOD_MS) {
+    m_periodMs = MAX_PERIOD_MS;
   }
   m_setPeriodic(m_periodMs);
 }
@@ -194,9 +193,9 @@ void ClientImpl::Publish(int32_t pubuid, std::string_view name,
     publisher = std::make_unique<PublisherData>();
   }
   publisher->options = options;
-  publisher->periodMs = std::lround(options.periodicMs / 10.0) * 10;
-  if (publisher->periodMs < kMinPeriodMs) {
-    publisher->periodMs = kMinPeriodMs;
+  publisher->periodMs = PubSubOptionsImpl::RoundPeriodicMs(options.periodicMs);
+  if (publisher->periodMs < MIN_PERIOD_MS) {
+    publisher->periodMs = MIN_PERIOD_MS;
   }
   m_outgoing.SetPeriod(pubuid, publisher->periodMs);
 
@@ -212,7 +211,7 @@ void ClientImpl::Unpublish(int32_t pubuid, ClientMessage&& msg) {
   m_publishers[pubuid].reset();
 
   // loop over all publishers to update period
-  m_periodMs = kMaxPeriodMs;
+  m_periodMs = MAX_PERIOD_MS;
   for (auto&& pub : m_publishers) {
     if (pub) {
       m_periodMs = std::gcd(m_periodMs, pub->periodMs);
@@ -236,7 +235,7 @@ void ClientImpl::SetValue(int32_t pubuid, const Value& value) {
   auto& publisher = *m_publishers[pubuid];
   m_outgoing.SendValue(
       pubuid, value,
-      publisher.options.sendAll ? ValueSendMode::kAll : ValueSendMode::kNormal);
+      publisher.options.sendAll ? ValueSendMode::ALL : ValueSendMode::NORMAL);
 }
 
 int ClientImpl::ServerAnnounce(std::string_view name, int id,

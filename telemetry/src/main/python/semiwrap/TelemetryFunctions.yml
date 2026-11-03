@@ -1,0 +1,11 @@
+defaults:
+  default_args_as_kw_only: true
+
+functions:
+  GetTable:
+    no_release_gil: true
+    default_args_as_kw_only: false
+  Log:
+    no_release_gil: true
+  KeepDuplicates:
+  SetProperty:

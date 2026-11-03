@@ -131,7 +131,7 @@ class Filter {
 
     // Sufficient decrease condition
     //
-    // See equation (2.13) of [4].
+    // See equation (2.13) of [3].
     Scalar ϕ = pow(α, Scalar(1.5));
     bool sufficient_decrease =
         trial_entry.cost <=

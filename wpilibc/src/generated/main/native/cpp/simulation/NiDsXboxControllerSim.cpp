@@ -25,65 +25,65 @@ NiDsXboxControllerSim::NiDsXboxControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void NiDsXboxControllerSim::SetLeftX(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kLeftX, value);
+  SetRawAxis(NiDsXboxController::Axis::LEFT_X, value);
 }
 
 void NiDsXboxControllerSim::SetRightX(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kRightX, value);
+  SetRawAxis(NiDsXboxController::Axis::RIGHT_X, value);
 }
 
 void NiDsXboxControllerSim::SetLeftY(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kLeftY, value);
+  SetRawAxis(NiDsXboxController::Axis::LEFT_Y, value);
 }
 
 void NiDsXboxControllerSim::SetRightY(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kRightY, value);
+  SetRawAxis(NiDsXboxController::Axis::RIGHT_Y, value);
 }
 
 void NiDsXboxControllerSim::SetLeftTriggerAxis(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kLeftTrigger, value);
+  SetRawAxis(NiDsXboxController::Axis::LEFT_TRIGGER, value);
 }
 
 void NiDsXboxControllerSim::SetRightTriggerAxis(double value) {
-  SetRawAxis(NiDsXboxController::Axis::kRightTrigger, value);
+  SetRawAxis(NiDsXboxController::Axis::RIGHT_TRIGGER, value);
 }
 
 void NiDsXboxControllerSim::SetAButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kA, value);
+  SetRawButton(NiDsXboxController::Button::A, value);
 }
 
 void NiDsXboxControllerSim::SetBButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kB, value);
+  SetRawButton(NiDsXboxController::Button::B, value);
 }
 
 void NiDsXboxControllerSim::SetXButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kX, value);
+  SetRawButton(NiDsXboxController::Button::X, value);
 }
 
 void NiDsXboxControllerSim::SetYButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kY, value);
+  SetRawButton(NiDsXboxController::Button::Y, value);
 }
 
 void NiDsXboxControllerSim::SetLeftBumperButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kLeftBumper, value);
+  SetRawButton(NiDsXboxController::Button::LEFT_BUMPER, value);
 }
 
 void NiDsXboxControllerSim::SetRightBumperButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kRightBumper, value);
+  SetRawButton(NiDsXboxController::Button::RIGHT_BUMPER, value);
 }
 
 void NiDsXboxControllerSim::SetBackButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kBack, value);
+  SetRawButton(NiDsXboxController::Button::BACK, value);
 }
 
 void NiDsXboxControllerSim::SetStartButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kStart, value);
+  SetRawButton(NiDsXboxController::Button::START, value);
 }
 
 void NiDsXboxControllerSim::SetLeftStickButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kLeftStick, value);
+  SetRawButton(NiDsXboxController::Button::LEFT_STICK, value);
 }
 
 void NiDsXboxControllerSim::SetRightStickButton(bool value) {
-  SetRawButton(NiDsXboxController::Button::kRightStick, value);
+  SetRawButton(NiDsXboxController::Button::RIGHT_STICK, value);
 }

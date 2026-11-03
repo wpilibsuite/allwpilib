@@ -1,0 +1,21 @@
+extra_includes:
+- wpi/telemetry/TelemetryEntry.hpp
+
+classes:
+  wpi::telemetry::MultiTelemetryBackend:
+    methods:
+      MultiTelemetryBackend:
+        overloads:
+          "":
+          std::span<const std::shared_ptr<TelemetryBackend>>:
+            ignore: true
+          std::vector<std::shared_ptr<TelemetryBackend>>:
+          std::initializer_list<std::shared_ptr<TelemetryBackend>>:
+            ignore: true
+      GetEntry:
+      RemoveEntry:
+      HasSchema:
+      AddSchema:
+        overloads:
+          std::string_view, std::string_view, std::span<const uint8_t>:
+          std::string_view, std::string_view, std::string_view:

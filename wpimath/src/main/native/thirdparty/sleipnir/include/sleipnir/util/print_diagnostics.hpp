@@ -110,15 +110,19 @@ void print_too_few_dofs_error(
 /// @tparam Scalar Scalar type.
 /// @param c_e The problem's equality constraints cₑ(x) evaluated at the current
 ///     iterate.
+/// @param tolerance Constraint violations at or below this tolerance aren't
+///     printed.
 template <typename Scalar>
 void print_c_e_local_infeasibility_error(
-    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e) {
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_e, Scalar tolerance) {
+  using std::abs;
+
   slp::println(
       "The problem is locally infeasible due to violated equality "
       "constraints.");
   slp::println("Violated constraints (cₑ(x) = 0) in order of declaration:");
   for (int row = 0; row < c_e.rows(); ++row) {
-    if (c_e[row] < Scalar(0)) {
+    if (abs(c_e[row]) > tolerance) {
       slp::println("  {}/{}: {} = 0", row + 1, c_e.rows(), c_e[row]);
     }
   }
@@ -133,15 +137,17 @@ void print_c_e_local_infeasibility_error(
 /// @tparam Scalar Scalar type.
 /// @param c_i The problem's inequality constraints cᵢ(x) evaluated at the
 ///     current iterate.
+/// @param tolerance Constraint violations at or below this tolerance aren't
+///     printed.
 template <typename Scalar>
 void print_c_i_local_infeasibility_error(
-    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i) {
+    const Eigen::Vector<Scalar, Eigen::Dynamic>& c_i, Scalar tolerance) {
   slp::println(
       "The problem is locally infeasible due to violated inequality "
       "constraints.");
   slp::println("Violated constraints (cᵢ(x) ≥ 0) in order of declaration:");
   for (int row = 0; row < c_i.rows(); ++row) {
-    if (c_i[row] < Scalar(0)) {
+    if (c_i[row] < -tolerance) {
       slp::println("  {}/{}: {} ≥ 0", row + 1, c_i.rows(), c_i[row]);
     }
   }

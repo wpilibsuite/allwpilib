@@ -11,19 +11,19 @@ using namespace wpi::math;
 
 namespace {
 
-const Pose3d kExpectedData =
+const Pose3d EXPECTED_DATA =
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}};
 }  // namespace
 
 TEST_CASE("Pose3dProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.Translation() == unpacked_data->Translation());
-  CHECK(kExpectedData.Rotation() == unpacked_data->Rotation());
+  CHECK(EXPECTED_DATA.Translation() == unpacked_data->Translation());
+  CHECK(EXPECTED_DATA.Rotation() == unpacked_data->Rotation());
 }

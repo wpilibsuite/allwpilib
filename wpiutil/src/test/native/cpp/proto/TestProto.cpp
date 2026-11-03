@@ -116,12 +116,12 @@ using ProtoType = wpi::util::Protobuf<TestProto>;
 }  // namespace
 
 TEST_CASE("TestProtoTest RoundtripNanopb", "[wpiutil][proto]") {
-  const TestProto kExpectedData = TestProto{};
+  const TestProto EXPECTED_DATA = TestProto{};
 
   wpi::util::ProtobufMessage<TestProto> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   std::optional<TestProto> unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
   REQUIRE(unpacked_data.has_value());

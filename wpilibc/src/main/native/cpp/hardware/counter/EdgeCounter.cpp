@@ -7,10 +7,10 @@
 #include <string>
 
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -25,8 +25,7 @@ EdgeCounter::EdgeCounter(int channel, EdgeConfiguration configuration)
 
   Reset();
 
-  HAL_ReportUsage("IO", channel, "EdgeCounter");
-  wpi::util::SendableRegistry::Add(this, "Edge Counter", channel);
+  wpi::util::ReportUsage("IO", channel, "EdgeCounter");
 }
 
 int EdgeCounter::GetCount() const {
@@ -49,7 +48,10 @@ void EdgeCounter::SetEdgeConfiguration(EdgeConfiguration configuration) {
   WPILIB_CheckErrorStatus(status, "{}", m_channel);
 }
 
-void EdgeCounter::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Edge Counter");
-  builder.AddDoubleProperty("Count", [&] { return GetCount(); }, nullptr);
+void EdgeCounter::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("Count", GetCount());
+}
+
+std::string_view EdgeCounter::GetTelemetryType() const {
+  return "Edge Counter";
 }

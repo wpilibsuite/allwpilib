@@ -38,7 +38,7 @@ namespace {
 // A root is treated as real when |imag| falls below this. The same tolerance
 // is used to match conjugates, since after bilinear/LP→BP transforms the real
 // and imaginary drift of a true pair is of the same order.
-constexpr double kImagTolerance = 1e-10;
+constexpr double IMAG_TOLERANCE = 1e-10;
 
 // Partition a (conjugate-symmetric) root list into a vector of complex roots
 // represented by the upper-half-plane conjugate-pair representative, plus a
@@ -56,7 +56,7 @@ Partitioned Partition(const std::vector<cplx>& roots) {
       continue;
     }
     matched[i] = true;
-    if (std::abs(roots[i].imag()) < kImagTolerance) {
+    if (std::abs(roots[i].imag()) < IMAG_TOLERANCE) {
       out.realRoots.push_back(roots[i].real());
       continue;
     }
@@ -64,15 +64,15 @@ Partitioned Partition(const std::vector<cplx>& roots) {
     cplx rep = roots[i].imag() > 0 ? roots[i] : std::conj(roots[i]);
     // Find unmatched conjugate in the remaining list. Callers pass
     // conjugate-symmetric inputs; if no partner is found the input violated
-    // that invariant (or drifted numerically past kImagTolerance), and the
+    // that invariant (or drifted numerically past IMAG_TOLERANCE), and the
     // cascade that follows would silently double-count the orphan.
     bool found = false;
     for (size_t j = i + 1; j < roots.size(); ++j) {
       if (matched[j]) {
         continue;
       }
-      if (std::abs(roots[j].imag() + roots[i].imag()) < kImagTolerance &&
-          std::abs(roots[j].real() - roots[i].real()) < kImagTolerance) {
+      if (std::abs(roots[j].imag() + roots[i].imag()) < IMAG_TOLERANCE &&
+          std::abs(roots[j].real() - roots[i].real()) < IMAG_TOLERANCE) {
         matched[j] = true;
         found = true;
         break;

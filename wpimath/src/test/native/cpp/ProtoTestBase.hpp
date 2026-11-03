@@ -28,14 +28,14 @@ class ProtoTest {};
   }
 
 CATCH_TYPED_TEST_P(ProtoTest, RoundTrip) {
-  wpi::util::ProtobufMessage<decltype(TypeParam::kTestData)> message;
+  wpi::util::ProtobufMessage<decltype(TypeParam::TEST_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, TypeParam::kTestData));
+  REQUIRE(message.Pack(buf, TypeParam::TEST_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  TypeParam::CheckEq(TypeParam::kTestData, *unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, *unpacked_data);
 }
 
 REGISTER_CATCH_TYPED_TEST_SUITE_P(ProtoTest, RoundTrip);

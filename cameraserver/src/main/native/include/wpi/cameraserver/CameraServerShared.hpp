@@ -14,8 +14,6 @@ namespace wpi {
 class CameraServerShared {
  public:
   virtual ~CameraServerShared() = default;
-  virtual void ReportUsage(std::string_view resource,
-                           std::string_view data) = 0;
   virtual void SetCameraServerErrorV(std::string_view format,
                                      std::format_args args) = 0;
   virtual void SetVisionRunnerErrorV(std::string_view format,

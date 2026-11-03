@@ -18,17 +18,16 @@ import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.controller.SimpleMotorFeedforward;
 import org.wpilib.math.trajectory.TrapezoidProfile;
 import org.wpilib.system.RobotController;
-import org.wpilib.util.sendable.SendableRegistry;
 
 @Logged
 public class Drive extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
-  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
-  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT);
 
   // The robot's drive
   @NotLogged // Would duplicate motor data, there's no point sending it twice
@@ -38,34 +37,31 @@ public class Drive extends SubsystemBase {
   // The left-side drive encoder
   private final Encoder leftEncoder =
       new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+          DriveConstants.LEFT_ENCODER_PORTS[0],
+          DriveConstants.LEFT_ENCODER_PORTS[1],
+          DriveConstants.LEFT_ENCODER_REVERSED);
 
   // The right-side drive encoder
   private final Encoder rightEncoder =
       new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+          DriveConstants.RIGHT_ENCODER_PORTS[0],
+          DriveConstants.RIGHT_ENCODER_PORTS[1],
+          DriveConstants.RIGHT_ENCODER_REVERSED);
 
   private final OnboardIMU imu = new OnboardIMU(OnboardIMU.MountOrientation.FLAT);
   private final ProfiledPIDController controller =
       new ProfiledPIDController(
-          DriveConstants.kTurnP,
-          DriveConstants.kTurnI,
-          DriveConstants.kTurnD,
+          DriveConstants.TURN_P,
+          DriveConstants.TURN_I,
+          DriveConstants.TURN_D,
           new TrapezoidProfile.Constraints(
-              DriveConstants.kMaxTurnRateDegPerS,
-              DriveConstants.kMaxTurnAccelerationDegPerSSquared));
+              DriveConstants.MAX_TURN_RATE_DEG_PER_S,
+              DriveConstants.MAX_TURN_ACCELERATION_DEG_PER_S_SQUARED));
   private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(DriveConstants.ks, DriveConstants.kv, DriveConstants.ka);
 
   /** Creates a new Drive subsystem. */
   public Drive() {
-    SendableRegistry.addChild(drive, leftLeader);
-    SendableRegistry.addChild(drive, rightLeader);
-
     leftLeader.addFollower(leftFollower);
     rightLeader.addFollower(rightFollower);
 
@@ -75,15 +71,15 @@ public class Drive extends SubsystemBase {
     rightLeader.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    leftEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
+    rightEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
 
     // Set the controller to be continuous (because it is an angle controller)
     controller.enableContinuousInput(-180, 180);
     // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
     // setpoint before it is considered as having reached the reference
     controller.setTolerance(
-        DriveConstants.kTurnToleranceDeg, DriveConstants.kTurnRateToleranceDegPerS);
+        DriveConstants.TURN_TOLERANCE_DEG, DriveConstants.TURN_RATE_TOLERANCE_DEG_PER_S);
   }
 
   /**

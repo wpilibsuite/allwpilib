@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.wpilib.hardware.hal.HAL;
+import org.wpilib.hardware.hal.HALUtil;
+import org.wpilib.hardware.hal.simulation.SimulatorJNI;
 import org.wpilib.simulation.SimHooks;
 
 class WatchdogTest {
@@ -26,6 +28,44 @@ class WatchdogTest {
   @AfterEach
   void cleanup() {
     SimHooks.resumeTiming();
+  }
+
+  /**
+   * Steps the paused clock to an odd nanosecond count of at least 2^53. Seconds in a double can't
+   * represent it, so it catches rounding from converting timestamps through seconds.
+   */
+  private static void stepToLargeClock() {
+    long now = HALUtil.getMonotonicTime();
+    long target = Math.max(now, 1L << 53) | 1;
+    SimulatorJNI.stepTiming(target - now);
+  }
+
+  @Test
+  @ResourceLock("timing")
+  void largeClockTest() {
+    stepToLargeClock();
+
+    final AtomicInteger watchdogCounter = new AtomicInteger(0);
+
+    try (Watchdog watchdog = new Watchdog(0.4, () -> watchdogCounter.addAndGet(1))) {
+      watchdog.enable();
+      SimulatorJNI.stepTiming(399_999_999L);
+      assertEquals(0, watchdogCounter.get(), "Watchdog triggered early");
+      SimulatorJNI.stepTiming(1L);
+      assertEquals(1, watchdogCounter.get(), "Watchdog didn't trigger at the timeout");
+
+      watchdogCounter.set(0);
+      watchdog.setTimeout(0.4);
+      SimulatorJNI.stepTiming(200_000_000L);
+      assertEquals(0.2, watchdog.getTime(), 1e-10);
+      SimulatorJNI.stepTiming(199_999_999L);
+      assertEquals(0, watchdogCounter.get(), "Watchdog triggered early after setTimeout");
+      SimulatorJNI.stepTiming(1L);
+      assertEquals(
+          1, watchdogCounter.get(), "Watchdog didn't trigger at the timeout after setTimeout");
+
+      watchdog.disable();
+    }
   }
 
   @Test

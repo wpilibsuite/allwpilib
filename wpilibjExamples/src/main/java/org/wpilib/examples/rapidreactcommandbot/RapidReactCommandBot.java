@@ -35,7 +35,7 @@ public class RapidReactCommandBot {
   private final Pneumatics pneumatics = new Pneumatics();
 
   // The driver's controller
-  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /**
    * Use this method to define bindings between conditions and commands. These are useful for
@@ -68,7 +68,8 @@ public class RapidReactCommandBot {
     driverController
         .faceDown()
         .onTrue(
-            parallel(shooter.shootCommand(ShooterConstants.kShooterTargetRPS), storage.runCommand())
+            parallel(
+                    shooter.shootCommand(ShooterConstants.SHOOTER_TARGET_RPS), storage.runCommand())
                 // Since we composed this inline we should give it a name
                 .withName("Shoot"));
 
@@ -84,7 +85,7 @@ public class RapidReactCommandBot {
   public Command getAutonomousCommand() {
     // Drive forward for 2 meters at half velocity with a 3 second timeout
     return drive
-        .driveDistanceCommand(AutoConstants.kDriveDistance, AutoConstants.kDriveVelocity)
-        .withTimeout(AutoConstants.kTimeout);
+        .driveDistanceCommand(AutoConstants.DRIVE_DISTANCE, AutoConstants.DRIVE_VELOCITY)
+        .withTimeout(AutoConstants.TIMEOUT);
   }
 }

@@ -4,13 +4,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable, Set, Union
-
-from typing_extensions import Self, TypeAlias
+from typing import TYPE_CHECKING, Any, Self, TypeAlias
 
 if TYPE_CHECKING:
-    from .instantcommand import InstantCommand
     from .subsystem import Subsystem
     from .parallelracegroup import ParallelRaceGroup
     from .sequentialcommandgroup import SequentialCommandGroup
@@ -21,7 +19,8 @@ if TYPE_CHECKING:
     from .conditionalcommand import ConditionalCommand
     from .wrappercommand import WrapperCommand
 
-from wpiutil import Sendable, SendableRegistry, SendableBuilder
+from telemetry import TelemetryLoggable, TelemetryTable
+from tunables import ComplexTunable, TunableTable
 
 
 class InterruptionBehavior(Enum):
@@ -42,7 +41,7 @@ class InterruptionBehavior(Enum):
     """ This command continues, and the incoming command is not scheduled."""
 
 
-class Command(Sendable):
+class Command(TelemetryLoggable, ComplexTunable):
     """
     A state machine representing a complete action to be performed by the robot. Commands are run by
     the :class:`commands2.CommandScheduler`, and can be composed into CommandGroups to allow users to build
@@ -56,15 +55,14 @@ class Command(Sendable):
         InterruptionBehavior  # type alias for 2023 location
     )
 
-    requirements: Set[Subsystem]
+    requirements: set[Subsystem]
 
     def __new__(cls, *args, **kwargs) -> Self:
         instance = super().__new__(
             cls,
         )
-        super().__init__(instance)
-        SendableRegistry.add(instance, cls.__name__)
         instance.requirements = set()
+        instance._name = cls.__name__
         return instance
 
     def __init__(self):
@@ -98,7 +96,7 @@ class Command(Sendable):
         """
         return False
 
-    def get_requirements(self) -> Set[Subsystem]:
+    def get_requirements(self) -> set[Subsystem]:
         """
         Specifies the set of subsystems used by this command. Two commands cannot use the same
         subsystem at the same time. If another command is scheduled that shares a requirement, :meth:`.get_interruption_behavior` will be checked and followed. If no subsystems are required, return
@@ -129,7 +127,7 @@ class Command(Sendable):
 
         :returns: Name
         """
-        return SendableRegistry.get_name(self)
+        return self._name
 
     def set_name(self, name: str):
         """
@@ -137,23 +135,7 @@ class Command(Sendable):
 
         :param name: Name
         """
-        SendableRegistry.set_name(self, name)
-
-    def get_subsystem(self) -> str:
-        """
-        Gets the subsystem name of this Subsystem.
-
-        :returns: Subsystem name
-        """
-        return SendableRegistry.get_subsystem(self)
-
-    def set_subsystem(self, subsystem: str):
-        """
-        Sets the subsystem name of this Subsystem.
-
-        :param subsystem: subsystem name
-        """
-        SendableRegistry.set_subsystem(self, subsystem)
+        self._name = name
 
     def with_timeout(self, seconds: float) -> ParallelRaceGroup:
         """
@@ -216,7 +198,7 @@ class Command(Sendable):
         return self.until(lambda: not condition())
 
     def before_starting(
-        self, before: Union[Command, Callable[[], None]]
+        self, before: Command | Callable[[], None]
     ) -> SequentialCommandGroup:
         """
         Decorates this command with a callable or command to run before this command starts.
@@ -519,15 +501,19 @@ class Command(Sendable):
         wrapper.set_name(name)
         return wrapper
 
-    def init_sendable(self, builder: SendableBuilder) -> None:
+    def log_to(self, table: TelemetryTable) -> None:
         from .commandscheduler import CommandScheduler
 
-        builder.set_smart_dashboard_type("Command")
-        builder.add_string_property(
-            ".name",
-            self.get_name,
-            lambda _: None,
-        )
+        table.log("name", self.get_name())
+        table.log("running", self.is_scheduled())
+        table.log("isParented", CommandScheduler.get_instance().is_composed(self))
+        table.log("interruptBehavior", self.get_interruption_behavior().name)
+        table.log("runsWhenDisabled", self.runs_when_disabled())
+
+    def get_telemetry_type(self) -> str:
+        return "Command"
+
+    def publish_tunables(self, table: TunableTable) -> None:
 
         def on_set(value: bool) -> None:
             if value:
@@ -537,23 +523,8 @@ class Command(Sendable):
                 if self.is_scheduled():
                     self.cancel()
 
-        builder.add_boolean_property(
-            "running",
-            self.is_scheduled,
-            on_set,
-        )
-        builder.add_boolean_property(
-            ".isParented",
-            lambda: CommandScheduler.get_instance().is_composed(self),
-            lambda _: None,
-        )
-        builder.add_string_property(
-            "interruptBehavior",
-            lambda: self.get_interruption_behavior().name,
-            lambda _: None,
-        )
-        builder.add_boolean_property(
-            "runsWhenDisabled",
-            self.runs_when_disabled,
-            lambda _: None,
-        )
+        table.publish_string("name", self.get_name, self.set_name, mutable=False)
+        table.publish_boolean("running", self.is_scheduled, on_set)
+
+    def get_tunable_type(self) -> str:
+        return "Command"

@@ -28,17 +28,17 @@
 
 using namespace wpi::hal;
 
-static constexpr int kJoystickPorts = 6;
+static constexpr int JOYSTICK_PORTS = 6;
 
 namespace {
 struct JoystickDataCache {
   JoystickDataCache() { std::memset(this, 0, sizeof(*this)); }
   void Update();
 
-  HAL_JoystickAxes axes[kJoystickPorts];
-  HAL_JoystickPOVs povs[kJoystickPorts];
-  HAL_JoystickButtons buttons[kJoystickPorts];
-  HAL_JoystickTouchpads touchpads[kJoystickPorts];
+  HAL_JoystickAxes axes[JOYSTICK_PORTS];
+  HAL_JoystickPOVs povs[JOYSTICK_PORTS];
+  HAL_JoystickButtons buttons[JOYSTICK_PORTS];
+  HAL_JoystickTouchpads touchpads[JOYSTICK_PORTS];
   HAL_AllianceStationID allianceStation;
   double matchTime;
   HAL_ControlWord controlWord;
@@ -51,7 +51,7 @@ static std::atomic_bool gShutdown{false};
 }  // namespace
 
 void JoystickDataCache::Update() {
-  for (int i = 0; i < kJoystickPorts; i++) {
+  for (int i = 0; i < JOYSTICK_PORTS; i++) {
     SimDriverStationData->GetJoystickAxes(i, &axes[i]);
     SimDriverStationData->GetJoystickPOVs(i, &povs[i]);
     SimDriverStationData->GetJoystickButtons(i, &buttons[i]);

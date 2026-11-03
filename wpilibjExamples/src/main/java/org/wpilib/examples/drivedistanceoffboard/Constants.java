@@ -14,11 +14,11 @@ package org.wpilib.examples.drivedistanceoffboard;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final double kDt = 0.02;
-    public static final int kLeftMotor1Port = 0;
-    public static final int kLeftMotor2Port = 1;
-    public static final int kRightMotor1Port = 2;
-    public static final int kRightMotor2Port = 3;
+    public static final double DT = 0.02;
+    public static final int LEFT_MOTOR1_PORT = 0;
+    public static final int LEFT_MOTOR2_PORT = 1;
+    public static final int RIGHT_MOTOR1_PORT = 2;
+    public static final int RIGHT_MOTOR2_PORT = 3;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or theoretically
@@ -30,11 +30,11 @@ public final class Constants {
 
     public static final double kp = 1;
 
-    public static final double kMaxVelocity = 3; // m/s
-    public static final double kMaxAcceleration = 3; // m/s²
+    public static final double MAX_VELOCITY = 3; // m/s
+    public static final double MAX_ACCELERATION = 3; // m/s²
   }
 
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int DRIVER_CONTROLLER_PORT = 0;
   }
 }

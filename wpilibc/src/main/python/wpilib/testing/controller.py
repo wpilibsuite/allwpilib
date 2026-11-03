@@ -1,7 +1,6 @@
 import contextlib
 import time
 import threading
-import typing as T
 
 import pytest
 
@@ -12,7 +11,9 @@ from ..simulation import (
     step_timing_async,
     get_program_started,
 )
-from hal import RobotMode
+from hal import RobotMode, opmode_get_robot_mode
+
+from . import OpMode
 
 
 class RobotTestController:
@@ -23,7 +24,7 @@ class RobotTestController:
     def __init__(self, reraise, robot: RobotBase):
         self._reraise = reraise
 
-        self._thread: T.Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._robot = robot
 
         self._cond = threading.Condition()
@@ -72,6 +73,9 @@ class RobotTestController:
         for _ in range(1000):
             if get_program_started():
                 break
+            error = self._reraise.exception
+            if error is not None:
+                raise error
             time.sleep(0.001)
         else:
             assert False, "robot never started"
@@ -125,8 +129,9 @@ class RobotTestController:
         self,
         *,
         seconds: float,
-        autonomous: bool,
+        autonomous: bool | None = None,
         enabled: bool,
+        opmode: OpMode | None = None,
         assert_alive: bool = True,
     ) -> float:
         """
@@ -137,6 +142,11 @@ class RobotTestController:
         :param seconds:    Number of seconds to run (will step in increments of 0.2)
         :param autonomous: Tell the robot that it is in autonomous mode
         :param enabled:    Tell the robot that it is enabled
+        :param opmode:     Select a :class:`wpilib.testing.OpMode` by its name
+                           and robot mode, instead of specifying ``autonomous``.
+                           Its ID is resolved on the running robot.
+
+        Specify exactly one of ``autonomous`` or ``opmode``.
 
         :returns: Number of seconds time was incremented
         """
@@ -145,10 +155,27 @@ class RobotTestController:
 
         assert seconds > 0
 
+        if (autonomous is None) == (opmode is None):
+            raise ValueError("Specify exactly one of autonomous or opmode")
+
+        if opmode is not None:
+            for option in DriverStationSim.get_opmode_options():
+                if option.name == opmode.name and int(
+                    opmode_get_robot_mode(option.id)
+                ) == int(opmode.mode):
+                    opmode_id = option.id
+                    break
+            else:
+                raise ValueError(
+                    f"OpMode {opmode.name!r} ({opmode.mode.name}) is not published by the running robot"
+                )
+            DriverStationSim.set_robot_mode(opmode.mode)
+            DriverStationSim.set_opmode(opmode_id)
+        else:
+            DriverStationSim.set_robot_mode(
+                RobotMode.AUTONOMOUS if autonomous else RobotMode.TELEOPERATED
+            )
         DriverStationSim.set_ds_attached(True)
-        DriverStationSim.set_robot_mode(
-            RobotMode.AUTONOMOUS if autonomous else RobotMode.TELEOPERATED
-        )
         DriverStationSim.set_enabled(enabled)
 
         tm = 0.0

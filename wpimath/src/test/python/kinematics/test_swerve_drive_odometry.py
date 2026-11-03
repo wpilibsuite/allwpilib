@@ -1,5 +1,4 @@
 import pytest
-import math
 import random
 
 from wpimath import (
@@ -9,13 +8,12 @@ from wpimath import (
     Rotation2d,
     SwerveDrive4Kinematics,
     SwerveDrive4Odometry,
-    SwerveModuleVelocity,
     SwerveModulePosition,
     TrajectoryConfig,
     Translation2d,
 )
 
-kEpsilon = 0.01
+EPSILON = 0.01
 
 
 @pytest.fixture
@@ -67,9 +65,9 @@ def test_two_iterations(odometry_test):
         Rotation2d(0), [position, position, position, position]
     )
 
-    assert pose.x == pytest.approx(0.5, abs=kEpsilon)
-    assert pose.y == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.rotation().degrees() == pytest.approx(0.0, abs=kEpsilon)
+    assert pose.x == pytest.approx(0.5, abs=EPSILON)
+    assert pose.y == pytest.approx(0.0, abs=EPSILON)
+    assert pose.rotation().degrees() == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_90_degree_turn(odometry_test):
@@ -92,9 +90,9 @@ def test_90_degree_turn(odometry_test):
         Rotation2d.from_degrees(90), [fl, fr, bl, br]
     )
 
-    assert pose.x == pytest.approx(12.0, abs=kEpsilon)
-    assert pose.y == pytest.approx(12.0, abs=kEpsilon)
-    assert pose.rotation().degrees() == pytest.approx(90.0, abs=kEpsilon)
+    assert pose.x == pytest.approx(12.0, abs=EPSILON)
+    assert pose.y == pytest.approx(12.0, abs=EPSILON)
+    assert pose.rotation().degrees() == pytest.approx(90.0, abs=EPSILON)
 
 
 def test_gyro_angle_reset(odometry_test):
@@ -114,9 +112,9 @@ def test_gyro_angle_reset(odometry_test):
         Rotation2d.from_degrees(90), [position, position, position, position]
     )
 
-    assert pose.x == pytest.approx(0.5, abs=kEpsilon)
-    assert pose.y == pytest.approx(0.0, abs=kEpsilon)
-    assert pose.rotation().degrees() == pytest.approx(0.0, abs=kEpsilon)
+    assert pose.x == pytest.approx(0.5, abs=EPSILON)
+    assert pose.y == pytest.approx(0.0, abs=EPSILON)
+    assert pose.rotation().degrees() == pytest.approx(0.0, abs=EPSILON)
 
 
 def test_accuracy_facing_trajectory():

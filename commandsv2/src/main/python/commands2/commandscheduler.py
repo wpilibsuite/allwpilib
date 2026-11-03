@@ -4,10 +4,12 @@ from __future__ import annotations
 import inspect
 import os.path
 import traceback
-from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Union
+from collections.abc import Callable, Iterable
+from typing import Any
 
-import hal
-from typing_extensions import Self
+from telemetry import TelemetryLoggable, TelemetryTable
+from tunables import ComplexTunable, Tunable, TunableRegistry, TunableTable
+import wpiutil
 from wpilib import (
     RobotState,
     EventLoop,
@@ -17,8 +19,6 @@ from wpilib import (
     report_warning,
 )
 
-from wpiutil import Sendable, SendableBuilder, SendableRegistry
-
 from .command import Command, InterruptionBehavior
 from .exceptions import IllegalCommandUse
 from .subsystem import Subsystem
@@ -26,7 +26,7 @@ from .subsystem import Subsystem
 _cmd_path = os.path.dirname(__file__)
 
 
-class CommandScheduler(Sendable):
+class CommandScheduler(TelemetryLoggable, ComplexTunable):
     """
     The scheduler responsible for running Commands. A Command-based robot should call
     :meth:`.run` on the singleton instance in its periodic block in order to run commands
@@ -34,7 +34,7 @@ class CommandScheduler(Sendable):
     methods to be called and for their default commands to be scheduled.
     """
 
-    _instance: Optional[CommandScheduler] = None
+    _instance: CommandScheduler | None = None
 
     def __new__(cls) -> CommandScheduler:
         if cls._instance is None:
@@ -58,8 +58,8 @@ class CommandScheduler(Sendable):
         """
         inst = CommandScheduler._instance
         if inst:
+            TunableRegistry.remove(inst)
             inst._default_button_loop.clear()
-            SendableRegistry.remove(inst)
 
         CommandScheduler._instance = None
 
@@ -71,18 +71,18 @@ class CommandScheduler(Sendable):
         if CommandScheduler._instance is not None:
             return
         CommandScheduler._instance = self
-        self._composed_commands: Dict[Command, str] = {}
+        self._composed_commands: dict[Command, str] = {}
 
         # A set of the currently-running commands.
-        self._scheduled_commands: Dict[Command, None] = {}
+        self._scheduled_commands: dict[Command, None] = {}
 
         # A map from required subsystems to their requiring commands. Also used as a set
         # of the currently-required subsystems.
-        self._requirements: Dict[Subsystem, Command] = {}
+        self._requirements: dict[Subsystem, Command] = {}
 
         # A map from subsystems registered with the scheduler to their default commands.
         # Also used as a list of currently-registered subsystems.
-        self._subsystems: Dict[Subsystem, Optional[Command]] = {}
+        self._subsystems: dict[Subsystem, Command | None] = {}
 
         self._default_button_loop = EventLoop()
 
@@ -93,19 +93,19 @@ class CommandScheduler(Sendable):
 
         # Lists of user-supplied actions to be executed on scheduling events for every
         # command.
-        self._init_actions: List[Callable[[Command], None]] = []
-        self._execute_actions: List[Callable[[Command], None]] = []
-        self._interrupt_actions: List[Callable[[Command, Optional[Command]], None]] = []
-        self._finish_actions: List[Callable[[Command], None]] = []
+        self._init_actions: list[Callable[[Command], None]] = []
+        self._execute_actions: list[Callable[[Command], None]] = []
+        self._interrupt_actions: list[Callable[[Command, Command | None], None]] = []
+        self._finish_actions: list[Callable[[Command], None]] = []
 
         self._in_run_loop = False
-        self._to_schedule: Dict[Command, None] = {}
-        self._to_cancel: Dict[Command, Optional[Command]] = {}
-        self._ending_commands: Set[Command] = set()
+        self._to_schedule: dict[Command, None] = {}
+        self._to_cancel: dict[Command, Command | None] = {}
+        self._ending_commands: set[Command] = set()
 
         self._watchdog = Watchdog(TimedRobot.DEFAULT_PERIOD, lambda: None)
 
-        hal.report_usage("CommandScheduler", "")
+        wpiutil.report_usage("CommandScheduler", "")
 
     def set_period(self, period: float) -> None:
         """
@@ -170,7 +170,7 @@ class CommandScheduler(Sendable):
         for command in commands:
             self._schedule(command)
 
-    def _schedule(self, command: Optional[Command]) -> None:
+    def _schedule(self, command: Command | None) -> None:
         if command is None:
             report_warning("Tried to schedule a null command!", True)
             return
@@ -386,7 +386,7 @@ class CommandScheduler(Sendable):
 
         self._subsystems[subsystem] = None
 
-    def get_default_command(self, subsystem: Subsystem) -> Optional[Command]:
+    def get_default_command(self, subsystem: Subsystem) -> Command | None:
         """
         Gets the default command associated with this subsystem. Null if this subsystem has no default
         command associated with it.
@@ -412,7 +412,7 @@ class CommandScheduler(Sendable):
         for command in commands:
             self._cancel(command, None)
 
-    def _cancel(self, command: Command, interruptor: Optional[Command]):
+    def _cancel(self, command: Command, interruptor: Command | None):
         if command is None:
             report_warning("Tried to cancel a null command", True)
             return
@@ -453,7 +453,7 @@ class CommandScheduler(Sendable):
         """
         return all(command in self._scheduled_commands for command in commands)
 
-    def requiring(self, subsystem: Subsystem) -> Optional[Command]:
+    def requiring(self, subsystem: Subsystem) -> Command | None:
         """
         Returns the command currently requiring a given subsystem. None if no command is currently
         requiring the subsystem
@@ -507,7 +507,7 @@ class CommandScheduler(Sendable):
         self._interrupt_actions.append(lambda command, interruptor: action(command))
 
     def on_command_interrupt_with_cause(
-        self, action: Callable[[Command, Optional[Command]], Any]
+        self, action: Callable[[Command, Command | None], Any]
     ) -> None:
         """
         Adds an action to perform on the interruption of any command by the scheduler. The action receives the interrupted command and the command that interrupted it
@@ -621,26 +621,47 @@ class CommandScheduler(Sendable):
         """
         return command in self._composed_commands
 
-    def init_sendable(self, builder: SendableBuilder):
-        builder.set_smart_dashboard_type("Scheduler")
-        builder.add_string_array_property(
+    def _get_scheduled_command_names(self) -> list[str]:
+        return [command.get_name() for command in self._scheduled_commands]
+
+    def _get_scheduled_command_ids(self) -> list[int]:
+        return [id(command) for command in self._scheduled_commands]
+
+    def log_to(self, table: TelemetryTable) -> None:
+        table.log("Names", self._get_scheduled_command_names(), element_type=str)
+        table.log("Ids", self._get_scheduled_command_ids(), element_type=int)
+
+    def get_telemetry_type(self) -> str:
+        return "Scheduler"
+
+    def publish_tunables(self, table: TunableTable) -> None:
+        table.publish(
             "Names",
-            lambda: [command.get_name() for command in self._scheduled_commands],
-            lambda _: None,
+            Tunable(
+                self._get_scheduled_command_names(),
+                getter=self._get_scheduled_command_names,
+                element_type=str,
+                mutable=False,
+            ),
         )
-        builder.add_integer_array_property(
+        table.publish(
             "Ids",
-            lambda: [id(command) for command in self._scheduled_commands],
-            lambda _: None,
+            Tunable(
+                self._get_scheduled_command_ids(),
+                getter=self._get_scheduled_command_ids,
+                element_type=int,
+                mutable=False,
+            ),
         )
 
-        def cancel_commands(to_cancel: List[int]):
+        def cancel_commands(to_cancel: list[int]):
             ids = {id(command): command for command in self._scheduled_commands}
             for hash_value in to_cancel:
                 cancel_cmd = ids.get(hash_value)
                 if cancel_cmd is not None:
                     self.cancel(cancel_cmd)
 
-        builder.add_integer_array_property(
-            "Cancel", lambda: [], lambda to_cancel: cancel_commands(to_cancel)  # type: ignore
-        )
+        table.publish_integer_array("Cancel", lambda: [], cancel_commands)
+
+    def get_tunable_type(self) -> str:
+        return "Scheduler"

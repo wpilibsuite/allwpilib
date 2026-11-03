@@ -53,12 +53,12 @@ static constexpr int SetCameraMessage = 0x0400 + 254;
 static constexpr int WaitForStartupMessage = 0x0400 + 294;
 static constexpr int PumpReadyMessage = 0x0400 + 330;
 
-static constexpr char const* kPropWbValue = "WhiteBalance";
-static constexpr char const* kPropExValue = "Exposure";
-static constexpr char const* kPropBrValue = "Brightness";
-static constexpr char const* kPropConnectVerbose = "connect_verbose";
+static constexpr char const* PROP_WB_VALUE = "WhiteBalance";
+static constexpr char const* PROP_EX_VALUE = "Exposure";
+static constexpr char const* PROP_BR_VALUE = "Brightness";
+static constexpr char const* PROP_CONNECT_VERBOSE = "connect_verbose";
 
-static constexpr unsigned kPropConnectVerboseId = 0;
+static constexpr unsigned PROP_CONNECT_VERBOSE_ID = 0;
 
 using namespace wpi::cs;
 
@@ -87,7 +87,7 @@ UsbCameraImpl::~UsbCameraImpl() {
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
-  Message msg{Message::kCmdSetProperty};
+  Message msg{Message::CMD_SET_PROPERTY};
   msg.data[0] = property;
   msg.data[1] = value;
   auto result =
@@ -97,7 +97,7 @@ void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
 }
 void UsbCameraImpl::SetStringProperty(int property, std::string_view value,
                                       CS_Status* status) {
-  Message msg{Message::kCmdSetPropertyStr};
+  Message msg{Message::CMD_SET_PROPERTY_STR};
   msg.data[0] = property;
   msg.dataStr = value;
   auto result =
@@ -108,10 +108,10 @@ void UsbCameraImpl::SetStringProperty(int property, std::string_view value,
 
 // Standard common camera properties
 void UsbCameraImpl::SetBrightness(int brightness, CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropBrValue), brightness, status);
+  SetProperty(GetPropertyIndex(PROP_BR_VALUE), brightness, status);
 }
 int UsbCameraImpl::GetBrightness(CS_Status* status) const {
-  return GetProperty(GetPropertyIndex(kPropBrValue), status);
+  return GetProperty(GetPropertyIndex(PROP_BR_VALUE), status);
 }
 void UsbCameraImpl::SetWhiteBalanceAuto(CS_Status* status) {
   // TODO
@@ -120,7 +120,7 @@ void UsbCameraImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
   // TODO
 }
 void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropWbValue), value, status);
+  SetProperty(GetPropertyIndex(PROP_WB_VALUE), value, status);
 }
 void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
   // TODO
@@ -129,7 +129,7 @@ void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
   // TODO
 }
 void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
-  SetProperty(GetPropertyIndex(kPropExValue), value, status);
+  SetProperty(GetPropertyIndex(PROP_EX_VALUE), value, status);
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
@@ -138,7 +138,7 @@ bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
     return false;
   }
 
-  Message msg{Message::kCmdSetMode};
+  Message msg{Message::CMD_SET_MODE};
   msg.data[0] = static_cast<int>(mode.pixelFormat);
   msg.data[1] = mode.width;
   msg.data[2] = mode.height;
@@ -156,7 +156,7 @@ bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
     *status = CS_UNSUPPORTED_MODE;
     return false;
   }
-  Message msg{Message::kCmdSetPixelFormat};
+  Message msg{Message::CMD_SET_PIXEL_FORMAT};
   msg.data[0] = static_cast<int>(pixelFormat);
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
@@ -165,7 +165,7 @@ bool UsbCameraImpl::SetPixelFormat(wpi::util::PixelFormat pixelFormat,
   return result == 0;
 }
 bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
-  Message msg{Message::kCmdSetResolution};
+  Message msg{Message::CMD_SET_RESOLUTION};
   msg.data[0] = width;
   msg.data[1] = height;
   auto result =
@@ -175,7 +175,7 @@ bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
   return result == 0;
 }
 bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
-  Message msg{Message::kCmdSetFPS};
+  Message msg{Message::CMD_SET_FPS};
   msg.data[0] = fps;
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
@@ -186,15 +186,15 @@ bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
 
 void UsbCameraImpl::NumSinksChanged() {
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
-      SetCameraMessage, Message::kNumSinksChanged, nullptr);
+      SetCameraMessage, Message::NUM_SINKS_CHANGED, nullptr);
 }
 void UsbCameraImpl::NumSinksEnabledChanged() {
   m_messagePump->PostWindowMessage<Message::Kind, Message*>(
-      SetCameraMessage, Message::kNumSinksEnabledChanged, nullptr);
+      SetCameraMessage, Message::NUM_SINKS_ENABLED_CHANGED, nullptr);
 }
 
 void UsbCameraImpl::SetPath(std::string_view path, CS_Status* status) {
-  Message msg{Message::kCmdSetPath};
+  Message msg{Message::CMD_SET_PATH};
   msg.dataStr = path;
   auto result =
       m_messagePump->SendWindowMessage<CS_Status, Message::Kind, Message*>(
@@ -715,16 +715,17 @@ void UsbCameraImpl::DeviceCacheProperty(
 CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
     std::unique_lock<wpi::util::mutex>& lock, Message::Kind msgKind,
     const Message* msg) {
-  if (msgKind == Message::kCmdSetMode ||
-      msgKind == Message::kCmdSetPixelFormat ||
-      msgKind == Message::kCmdSetResolution || msgKind == Message::kCmdSetFPS) {
+  if (msgKind == Message::CMD_SET_MODE ||
+      msgKind == Message::CMD_SET_PIXEL_FORMAT ||
+      msgKind == Message::CMD_SET_RESOLUTION ||
+      msgKind == Message::CMD_SET_FPS) {
     return DeviceCmdSetMode(lock, *msg);
-  } else if (msgKind == Message::kCmdSetProperty ||
-             msgKind == Message::kCmdSetPropertyStr) {
+  } else if (msgKind == Message::CMD_SET_PROPERTY ||
+             msgKind == Message::CMD_SET_PROPERTY_STR) {
     return DeviceCmdSetProperty(lock, *msg);
     return CS_OK;
-  } else if (msgKind == Message::kNumSinksChanged ||
-             msgKind == Message::kNumSinksEnabledChanged) {
+  } else if (msgKind == Message::NUM_SINKS_CHANGED ||
+             msgKind == Message::NUM_SINKS_ENABLED_CHANGED) {
     // Turn On Streams
     if (!IsEnabled()) {
       DeviceStreamOff();
@@ -732,7 +733,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
       DeviceStreamOn();
     }
     return CS_OK;
-  } else if (msgKind == Message::kCmdSetPath) {
+  } else if (msgKind == Message::CMD_SET_PATH) {
     {
       std::scoped_lock lock(m_mutex);
       m_path = msg->dataStr;
@@ -750,7 +751,7 @@ CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
 
 CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
     std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
-  bool setString = (msg.kind == Message::kCmdSetPropertyStr);
+  bool setString = (msg.kind == Message::CMD_SET_PROPERTY_STR);
   int property = msg.data[0];
   int value = msg.data[1];
   std::string_view valueStr = msg.dataStr;
@@ -792,7 +793,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
 
   // Actually set the new value on the device (if possible)
   if (!prop->device) {
-    if (prop->id == kPropConnectVerboseId) {
+    if (prop->id == PROP_CONNECT_VERBOSE_ID) {
       m_connectVerbose = value;
     }
   } else {
@@ -828,19 +829,19 @@ ComPtr<IMFMediaType> UsbCameraImpl::DeviceCheckModeValid(
 CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     std::unique_lock<wpi::util::mutex>& lock, const Message& msg) {
   VideoMode newMode;
-  if (msg.kind == Message::kCmdSetMode) {
+  if (msg.kind == Message::CMD_SET_MODE) {
     newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
     newMode.width = msg.data[1];
     newMode.height = msg.data[2];
     newMode.fps = msg.data[3];
-  } else if (msg.kind == Message::kCmdSetPixelFormat) {
+  } else if (msg.kind == Message::CMD_SET_PIXEL_FORMAT) {
     newMode = m_mode;
     newMode.pixelFormat = static_cast<wpi::util::PixelFormat>(msg.data[0]);
-  } else if (msg.kind == Message::kCmdSetResolution) {
+  } else if (msg.kind == Message::CMD_SET_RESOLUTION) {
     newMode = m_mode;
     newMode.width = msg.data[0];
     newMode.height = msg.data[1];
-  } else if (msg.kind == Message::kCmdSetFPS) {
+  } else if (msg.kind == Message::CMD_SET_FPS) {
     newMode = m_mode;
     newMode.fps = msg.data[0];
   }

@@ -39,6 +39,7 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsAutonomous());
   EnumCallback callback;
@@ -48,6 +49,12 @@ TEST_CASE("DriverStationTest AutonomousMode", "[wpilibc][simulation]") {
   DriverStationSim::NotifyNewData();
   CHECK(DriverStationSim::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(RobotState::IsAutonomous());
+  CHECK_FALSE(RobotState::IsAutonomousEnabled());
+
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  CHECK(RobotState::IsAutonomousEnabled());
+
   CHECK(RobotState::GetRobotMode() == RobotMode::AUTONOMOUS);
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_AUTONOMOUS);
@@ -57,6 +64,7 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
   HAL_Initialize();
   DriverStationSim::ResetData();
   DriverStationSim::NotifyNewData();
+  wpi::internal::DriverStationBackend::ObserveUserProgramStarting();
 
   CHECK_FALSE(RobotState::IsUtility());
   EnumCallback callback;
@@ -66,6 +74,12 @@ TEST_CASE("DriverStationTest Mode", "[wpilibc][simulation]") {
   DriverStationSim::NotifyNewData();
   CHECK(DriverStationSim::GetRobotMode() == RobotMode::UTILITY);
   CHECK(RobotState::IsUtility());
+  CHECK_FALSE(RobotState::IsUtilityEnabled());
+
+  DriverStationSim::SetEnabled(true);
+  DriverStationSim::NotifyNewData();
+  CHECK(RobotState::IsUtilityEnabled());
+
   CHECK(RobotState::GetRobotMode() == RobotMode::UTILITY);
   CHECK(callback.WasTriggered());
   CHECK(callback.GetLastValue() == HAL_ROBOT_MODE_UTILITY);
@@ -242,13 +256,13 @@ TEST_CASE("DriverStationTest MatchTime", "[wpilibc][simulation]") {
   DoubleCallback callback;
   auto cb = DriverStationSim::RegisterMatchTimeCallback(callback.GetCallback(),
                                                         false);
-  constexpr double kTestTime = 19.174;
-  DriverStationSim::SetMatchTime(kTestTime);
+  constexpr double TEST_TIME = 19.174;
+  DriverStationSim::SetMatchTime(TEST_TIME);
   wpi::sim::DriverStationSim::NotifyNewData();
-  CHECK(kTestTime == DriverStationSim::GetMatchTime());
-  CHECK(kTestTime == MatchState::GetMatchTime().value());
+  CHECK(TEST_TIME == DriverStationSim::GetMatchTime());
+  CHECK(TEST_TIME == MatchState::GetMatchTime().value());
   CHECK(callback.WasTriggered());
-  CHECK(kTestTime == callback.GetLastValue());
+  CHECK(TEST_TIME == callback.GetLastValue());
 }
 
 TEST_CASE("DriverStationTest SetGameData", "[wpilibc][simulation]") {

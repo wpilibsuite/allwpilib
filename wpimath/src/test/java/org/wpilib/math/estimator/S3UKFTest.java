@@ -138,7 +138,7 @@ class S3UKFTest {
 
     List<Pose2d> waypoints =
         List.of(
-            new Pose2d(2.75, 22.521, Rotation2d.kZero),
+            new Pose2d(2.75, 22.521, Rotation2d.ZERO),
             new Pose2d(24.73, 19.68, Rotation2d.fromRadians(5.846)));
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(waypoints, new TrajectoryConfig(8.8, 0.1));
@@ -164,7 +164,7 @@ class S3UKFTest {
 
     var trueXhat = observer.getXhat();
 
-    double duration = trajectory.duration;
+    double duration = trajectory.duration();
     for (int i = 0; i < (duration / dt); ++i) {
       var ref = trajectory.sampleAt(dt * i);
       double vl = ref.forwardVelocity() * (1 - (ref.curvature * rb));
@@ -210,7 +210,7 @@ class S3UKFTest {
         AngleStatistics.angleResidual(2),
         AngleStatistics.angleAdd(2));
 
-    final var finalPosition = trajectory.sampleAt(trajectory.duration);
+    final var finalPosition = trajectory.sampleAt(trajectory.duration());
 
     assertEquals(finalPosition.pose.getTranslation().getX(), observer.getXhat(0), 0.055);
     assertEquals(finalPosition.pose.getTranslation().getY(), observer.getXhat(1), 0.15);

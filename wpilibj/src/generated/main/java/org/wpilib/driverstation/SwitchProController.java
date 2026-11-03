@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from SwitchPro controllers connected to the Driver Station.
@@ -21,7 +21,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles SwitchPro input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class SwitchProController implements HIDDevice, Sendable {
+public class SwitchProController implements HIDDevice, TelemetryLoggable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** The number of touchpads supported by this controller. */
@@ -153,7 +153,7 @@ public class SwitchProController implements HIDDevice, Sendable {
    */
   public SwitchProController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "SwitchProController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "SwitchProController");
   }
 
   /**
@@ -1038,30 +1038,33 @@ public class SwitchProController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "SwitchPro");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("ZL", this::getZL, null);
-    builder.addDoubleProperty("ZR", this::getZR, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Minus", this::getMinusButton, null);
-    builder.addBooleanProperty("Home", this::getHomeButton, null);
-    builder.addBooleanProperty("Plus", this::getPlusButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("L", this::getLButton, null);
-    builder.addBooleanProperty("R", this::getRButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("Capture", this::getCaptureButton, null);
+  public String getTelemetryType() {
+    return "HID:SwitchPro";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("ZL", getZL());
+    table.log("ZR", getZR());
+    table.log("B", getBButton());
+    table.log("A", getAButton());
+    table.log("Y", getYButton());
+    table.log("X", getXButton());
+    table.log("Minus", getMinusButton());
+    table.log("Home", getHomeButton());
+    table.log("Plus", getPlusButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("L", getLButton());
+    table.log("R", getRButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("Capture", getCaptureButton());
   }
 }

@@ -35,13 +35,13 @@ void CheckSingleCompositionInterruptibility(
             "[commandsv2][command][composition]") {                        \
     CommandTestBase testBase;                                              \
     CheckSingleCompositionInterruptibility<CompositionType>(               \
-        Command::InterruptionBehavior::kCancelSelf);                       \
+        Command::InterruptionBehavior::CANCEL_SELF);                       \
   }                                                                        \
   TEST_CASE(#Suite " SingleCompositionInterruptibility CancelIncoming",    \
             "[commandsv2][command][composition]") {                        \
     CommandTestBase testBase;                                              \
     CheckSingleCompositionInterruptibility<CompositionType>(               \
-        Command::InterruptionBehavior::kCancelIncoming);                   \
+        Command::InterruptionBehavior::CANCEL_INCOMING);                   \
   }                                                                        \
   TEST_CASE(#Suite " SingleCompositionRunsWhenDisabled True",              \
             "[commandsv2][command][composition]") {                        \
@@ -98,39 +98,39 @@ void CheckMultiCompositionInterruptibility(
             "[commandsv2][command][composition]") {                           \
     CommandTestBase testBase;                                                 \
     CheckMultiCompositionInterruptibility<CompositionType>(                   \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelSelf);                          \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_SELF);                          \
   }                                                                           \
   TEST_CASE(#Suite " MultiCompositionInterruptibility AllCancelIncoming",     \
             "[commandsv2][command][composition]") {                           \
     CommandTestBase testBase;                                                 \
     CheckMultiCompositionInterruptibility<CompositionType>(                   \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelIncoming);                      \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_INCOMING);                      \
   }                                                                           \
   TEST_CASE(#Suite                                                            \
             " MultiCompositionInterruptibility TwoCancelSelfOneIncoming",     \
             "[commandsv2][command][composition]") {                           \
     CommandTestBase testBase;                                                 \
     CheckMultiCompositionInterruptibility<CompositionType>(                   \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelSelf);                          \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_SELF);                          \
   }                                                                           \
   TEST_CASE(#Suite                                                            \
             " MultiCompositionInterruptibility TwoCancelIncomingOneSelf",     \
             "[commandsv2][command][composition]") {                           \
     CommandTestBase testBase;                                                 \
     CheckMultiCompositionInterruptibility<CompositionType>(                   \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelIncoming,                       \
-        Command::InterruptionBehavior::kCancelSelf,                           \
-        Command::InterruptionBehavior::kCancelSelf);                          \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_INCOMING,                       \
+        Command::InterruptionBehavior::CANCEL_SELF,                           \
+        Command::InterruptionBehavior::CANCEL_SELF);                          \
   }                                                                           \
   TEST_CASE(#Suite " MultiCompositionRunsWhenDisabled OneTrue",               \
             "[commandsv2][command][composition]") {                           \

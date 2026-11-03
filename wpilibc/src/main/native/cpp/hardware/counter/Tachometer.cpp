@@ -7,10 +7,10 @@
 #include <string>
 
 #include "wpi/hal/Counter.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 #include "wpi/util/StackTrace.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -23,8 +23,7 @@ Tachometer::Tachometer(int channel, EdgeConfiguration configuration)
       stackTrace.c_str(), &status);
   WPILIB_CheckErrorStatus(status, "{}", channel);
 
-  HAL_ReportUsage("IO", channel, "Tachometer");
-  wpi::util::SendableRegistry::Add(this, "Tachometer", channel);
+  wpi::util::ReportUsage("IO", channel, "Tachometer");
 }
 
 void Tachometer::SetEdgeConfiguration(EdgeConfiguration configuration) {
@@ -76,10 +75,10 @@ bool Tachometer::GetStopped() const {
   return stopped;
 }
 
-void Tachometer::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Tachometer");
-  builder.AddDoubleProperty(
-      "RPS", [&] { return GetRevolutionsPerSecond().value(); }, nullptr);
-  builder.AddDoubleProperty(
-      "RPM", [&] { return GetRevolutionsPerMinute().value(); }, nullptr);
+void Tachometer::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("RPM", GetRevolutionsPerMinute());
+}
+
+std::string_view Tachometer::GetTelemetryType() const {
+  return "Tachometer";
 }

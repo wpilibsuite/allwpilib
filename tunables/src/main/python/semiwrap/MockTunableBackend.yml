@@ -1,0 +1,178 @@
+extra_includes:
+- rpy/MockTunableBackendFunctions.h
+- wpystruct.h
+
+classes:
+  wpi::tunables::MockTunableBackend:
+    force_no_trampoline: true
+    doc_append: |
+      Python method overrides are not called by the registry.
+    typealias:
+    - wpi::tunables::TunableBackend::PublishedTunable
+    methods:
+      GetValue:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path) {
+            return wpi::tunables::python::GetTunableValue(self, path);
+          }
+      GetBool:
+      GetInt32:
+      GetInt64:
+      GetFloat:
+      GetDouble:
+      GetString:
+      GetRaw:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path) {
+            auto value = self.GetRaw(path);
+            return py::bytes{reinterpret_cast<const char*>(value.data()),
+                             value.size()};
+          }
+      GetBoolVector:
+      GetInt32Vector:
+      GetInt64Vector:
+      GetFloatVector:
+      GetDoubleVector:
+      GetStringVector:
+      GetStructTypeName:
+      GetStructData:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path) {
+            auto value = self.GetStructData(path);
+            return py::bytes{reinterpret_cast<const char*>(value.data()),
+                             value.size()};
+          }
+      GetStruct:
+        no_release_gil: true
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path, const py::type& type) {
+            WPyStructInfo info(type);
+            return self.GetStruct<WPyStruct, WPyStructInfo>(path, info);
+          }
+      GetStructVector:
+        no_release_gil: true
+        param_override:
+          info:
+            name: type
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path, const py::type& type) {
+            WPyStructInfo info(type);
+            return self.GetStructVector<WPyStruct, WPyStructInfo>(path, info);
+          }
+      GetProtobufTypeString:
+        ignore: true
+      GetProtobufData:
+        ignore: true
+      GetProtobuf:
+        ignore: true
+      SetBool:
+      SetInt32:
+      SetInt64:
+      SetFloat:
+      SetDouble:
+      SetString:
+      SetRaw:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             wpi::tunables::python::RawValue value) {
+            wpi::tunables::python::SetRaw(self, path, std::move(value));
+          }
+      SetBoolVector:
+        overloads:
+          std::string_view, std::span<const bool>:
+            no_release_gil: true
+            cpp_code: |
+              [](wpi::tunables::MockTunableBackend& self,
+                 std::string_view path, py::typing::Iterable<bool> value) {
+                wpi::tunables::python::SetBoolVector(self, path,
+                                                     std::move(value));
+              }
+          std::string_view, std::vector<bool>:
+            ignore: true
+      SetInt32Vector:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::typing::Iterable<int32_t> value) {
+            wpi::tunables::python::SetInt32Vector(self, path, std::move(value));
+          }
+      SetInt64Vector:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::typing::Iterable<int64_t> value) {
+            wpi::tunables::python::SetInt64Vector(self, path, std::move(value));
+          }
+      SetFloatVector:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::typing::Iterable<float> value) {
+            wpi::tunables::python::SetFloatVector(self, path, std::move(value));
+          }
+      SetDoubleVector:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::typing::Iterable<double> value) {
+            wpi::tunables::python::SetDoubleVector(self, path, std::move(value));
+          }
+      SetStringVector:
+        no_release_gil: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::typing::Iterable<std::string> value) {
+            wpi::tunables::python::SetStringVector(self, path, std::move(value));
+          }
+      SetStruct:
+        no_release_gil: true
+        param_override:
+          info:
+            ignore: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             py::handle value) {
+            wpi::tunables::python::SetStruct(self, path, value);
+          }
+      SetStructVector:
+        no_release_gil: true
+        param_override:
+          info:
+            ignore: true
+        cpp_code: |
+          [](wpi::tunables::MockTunableBackend& self, std::string_view path,
+             wpi::tunables::python::StructIterable value) {
+            wpi::tunables::python::SetStructVector(self, path,
+                                                   std::move(value));
+          }
+      SetProtobuf:
+        ignore: true
+      Publish:
+        ignore: true
+      MarkDirty:
+      Remove:
+      RemovePrefix:
+      UnregisterTunable:
+      GetUid:
+        no_release_gil: true
+        cpp_code: |
+          [](const wpi::tunables::MockTunableBackend& self,
+             std::string_view path) {
+            return wpi::tunables::python::GetUid(self, path);
+          }
+      Update:
+    inline_code: |
+      .def("set_struct_array", &wpi::tunables::python::SetStructVector,
+           py::arg("path"), py::arg("value"))

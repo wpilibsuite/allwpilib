@@ -16,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.wpilib.command3.Scheduler.ScheduleResult.LowerPriorityThanRunningCommand;
+import org.wpilib.command3.SchedulerEvent.Canceled;
 
+@SuppressWarnings("PMD.CompareObjectsWithEquals")
 class SchedulerPriorityLevelTests extends CommandTestBase {
   @FunctionalInterface
   private interface CoroutineForkOperation {
@@ -308,12 +310,25 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     m_scheduler.run();
 
     assertTrue(m_scheduler.isRunning(highPriority), "Higher priority command should still run");
-    // Only the command that failed to fork should get an interrupted event.
-    // All other commands in the composition will still be canceled, but won't be interrupted.
-    assertInterruptedBy(current, highPriority);
+    // Only the command that failed to fork should get a fork failure event.
+    // Every command should get a cancellation event, though, including the failed command.
+    assertSchedulerEvent(
+        SchedulerEvent.ForkFailure.class,
+        e ->
+            e.command().equals(current)
+                && e.failures().size() == 1
+                && e.failures().getFirst()
+                    instanceof LowerPriorityThanRunningCommand(var cmd, var conflict)
+                && cmd.equals(unschedulable)
+                && conflict.equals(highPriority),
+        "Current command should have received a ForkFailure event");
     for (var command : List.of(grandparent, parent, current, child, grandchild)) {
       assertFalse(
           m_scheduler.isScheduledOrRunning(command), command.name() + " should have been canceled");
+      assertSchedulerEvent(
+          Canceled.class,
+          e -> e.command() == command,
+          command.name() + " should have received a cancellation event");
     }
   }
 
@@ -378,13 +393,19 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
 
     assertFalse(m_scheduler.isRunning(parent), "Parent command should have been canceled");
     assertSchedulerEvent(
-        SchedulerEvent.Canceled.class,
+        Canceled.class,
         c -> c.command().equals(parent),
         "Should have received a Canceled event for parent");
     assertSchedulerEvent(
-        SchedulerEvent.Interrupted.class,
-        i -> i.command().equals(parent) && i.interrupter().equals(highPriority),
-        "Should have received an Interrupted event for parent");
+        SchedulerEvent.ForkFailure.class,
+        e ->
+            e.command().equals(parent)
+                && e.failures().size() == 1
+                && e.failures().getFirst()
+                    instanceof LowerPriorityThanRunningCommand(var failed, var running)
+                && failed.equals(defaultPriority)
+                && running.equals(highPriority),
+        "Parent should have failed to fork");
   }
 
   private void assertUnschedulableSingleChildReturnsFailure(CoroutineForkOperation operation) {
@@ -449,16 +470,5 @@ class SchedulerPriorityLevelTests extends CommandTestBase {
     assertTrue(
         result.getFailedCommands().stream().noneMatch(Scheduler.ScheduleResult::successful),
         "All failure results should be unsuccessful");
-  }
-
-  private void assertInterruptedBy(Command command, Command interrupter) {
-    assertSchedulerEvent(
-        SchedulerEvent.Canceled.class,
-        event -> event.command().equals(command),
-        command.name() + " should have received a Canceled event");
-    assertSchedulerEvent(
-        SchedulerEvent.Interrupted.class,
-        event -> event.command().equals(command) && event.interrupter().equals(interrupter),
-        command.name() + " should have received an Interrupted event");
   }
 }

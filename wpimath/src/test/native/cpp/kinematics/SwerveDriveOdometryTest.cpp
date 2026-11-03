@@ -30,7 +30,7 @@
 
 using namespace wpi::math;
 
-static constexpr double kEpsilon = 0.01;
+static constexpr double EPSILON = 0.01;
 
 class SwerveDriveOdometryTest {
  protected:
@@ -56,9 +56,9 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   auto pose =
       m_odometry.Update(0_deg, {position, position, position, position});
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometryTest,
@@ -71,9 +71,9 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   m_odometry.ResetPosition(0_rad, {zero, zero, zero, zero}, Pose2d{});
   auto pose = m_odometry.Update(90_deg, {fl, fr, bl, br});
 
-  CHECK_NEAR(12.0, pose.X().value(), kEpsilon);
-  CHECK_NEAR(12.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(12.0, pose.X().value(), EPSILON);
+  CHECK_NEAR(12.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometryTest,
@@ -85,9 +85,9 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   auto pose =
       m_odometry.Update(90_deg, {position, position, position, position});
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometryTest,
@@ -98,16 +98,16 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   m_odometry.ResetPosition(0_deg, wheelPositions, Pose2d{});
   auto pose = m_odometry.Update(30_deg, wheelPositions);
 
-  CHECK_NEAR(0.0, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.0, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), EPSILON);
 
   m_odometry.ResetTranslation({0.5_m, 0_m});
   pose = m_odometry.Update(30_deg, wheelPositions);
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometryTest,
@@ -118,16 +118,16 @@ TEST_CASE_METHOD(SwerveDriveOdometryTest,
   m_odometry.ResetPosition(0_deg, wheelPositions, Pose2d{0.5_m, 0_m, 0_rad});
   auto pose = m_odometry.Update(30_deg, wheelPositions);
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(30.0, pose.Rotation().Degrees().value(), EPSILON);
 
   m_odometry.ResetRotation(90_deg);
   pose = m_odometry.Update(30_deg, wheelPositions);
 
-  CHECK_NEAR(0.5, pose.X().value(), kEpsilon);
-  CHECK_NEAR(0.0, pose.Y().value(), kEpsilon);
-  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), kEpsilon);
+  CHECK_NEAR(0.5, pose.X().value(), EPSILON);
+  CHECK_NEAR(0.0, pose.Y().value(), EPSILON);
+  CHECK_NEAR(90.0, pose.Rotation().Degrees().value(), EPSILON);
 }
 
 TEST_CASE_METHOD(SwerveDriveOdometryTest,

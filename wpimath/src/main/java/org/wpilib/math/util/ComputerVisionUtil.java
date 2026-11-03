@@ -26,8 +26,8 @@ public final class ComputerVisionUtil {
    * @param robotToCamera The transformation from the robot's pose to the camera's pose. This can
    *     either be a constant for a rigidly mounted camera, or variable if the camera is mounted to
    *     a turret. If the camera was mounted 3 inches in front of the "origin" (usually physical
-   *     center) of the robot, this would be new Transform3d(Units.inchesToMeters(3.0), 0.0, 0.0,
-   *     Rotation3d.kZero).
+   *     center) of the robot, this would be new Transform3d(UnitConversions.inchesToMeters(3.0),
+   *     0.0, 0.0, Rotation3d.ZERO).
    * @return The robot's field-relative pose.
    */
   public static Pose3d objectToRobotPose(

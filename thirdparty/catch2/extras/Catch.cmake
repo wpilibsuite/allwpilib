@@ -58,6 +58,11 @@ same as the Catch name; see also ``TEST_PREFIX`` and ``TEST_SUFFIX``.
   directory property.  The set of discovered tests is made accessible to such a
   script via the ``<target>_TESTS`` variable.
 
+  Note that ``<target>_TESTS`` variable contains test names with brackets
+  ("[", "]") escaped into ASCII char 2, 3 respectively, to work around CMake's
+  list parsing rules. You have to unescape them back for each element to get
+  the original names.
+
   The options are:
 
   ``target``
@@ -226,8 +231,8 @@ function(catch_discover_tests TARGET)
               -D "TEST_SPEC=${_TEST_SPEC}"
               -D "TEST_EXTRA_ARGS=${_EXTRA_ARGS}"
               -D "TEST_PROPERTIES=${_PROPERTIES}"
-              -D "TEST_PREFIX=${_TEST_PREFIX}"
-              -D "TEST_SUFFIX=${_TEST_SUFFIX}"
+              -D "TEST_PREFIX='${_TEST_PREFIX}'"
+              -D "TEST_SUFFIX='${_TEST_SUFFIX}'"
               -D "TEST_LIST=${_TEST_LIST}"
               -D "TEST_REPORTER=${_REPORTER}"
               -D "TEST_OUTPUT_DIR=${_OUTPUT_DIR}"
@@ -272,8 +277,8 @@ function(catch_discover_tests TARGET)
       "      TEST_SPEC"              " [==[" "${_TEST_SPEC}"              "]==]"   "\n"
       "      TEST_EXTRA_ARGS"        " [==[" "${_EXTRA_ARGS}"             "]==]"   "\n"
       "      TEST_PROPERTIES"        " [==[" "${_PROPERTIES}"             "]==]"   "\n"
-      "      TEST_PREFIX"            " [==[" "${_TEST_PREFIX}"            "]==]"   "\n"
-      "      TEST_SUFFIX"            " [==[" "${_TEST_SUFFIX}"            "]==]"   "\n"
+      "      TEST_PREFIX"            " [==['" "${_TEST_PREFIX}"            "']==]"   "\n"
+      "      TEST_SUFFIX"            " [==['" "${_TEST_SUFFIX}"            "']==]"   "\n"
       "      TEST_LIST"              " [==[" "${_TEST_LIST}"              "]==]"   "\n"
       "      TEST_REPORTER"          " [==[" "${_REPORTER}"               "]==]"   "\n"
       "      TEST_OUTPUT_DIR"        " [==[" "${_OUTPUT_DIR}"             "]==]"   "\n"

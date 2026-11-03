@@ -16,19 +16,13 @@ namespace wpi::glass {
 
 class NTAlertsModel : public AlertsModel {
  public:
-  static constexpr const char* kType = "Alerts";
+  static constexpr const char* TYPE = "Alerts";
 
   // path is to the table containing ".type", excluding the trailing /
   explicit NTAlertsModel(std::string_view path);
   NTAlertsModel(wpi::nt::NetworkTableInstance inst, std::string_view path);
 
-  const std::vector<std::string>& GetInfos() override { return m_infosValue; }
-
-  const std::vector<std::string>& GetWarnings() override {
-    return m_warningsValue;
-  }
-
-  const std::vector<std::string>& GetErrors() override { return m_errorsValue; }
+  const std::vector<AlertData>& GetAlerts() override { return m_alerts; }
 
   void Update() override;
   bool Exists() override;
@@ -43,6 +37,7 @@ class NTAlertsModel : public AlertsModel {
   std::vector<std::string> m_infosValue;
   std::vector<std::string> m_warningsValue;
   std::vector<std::string> m_errorsValue;
+  std::vector<AlertData> m_alerts;
 };
 
 }  // namespace wpi::glass

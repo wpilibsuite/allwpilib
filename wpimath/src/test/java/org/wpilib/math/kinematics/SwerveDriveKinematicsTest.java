@@ -13,7 +13,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 
 class SwerveDriveKinematicsTest {
-  private static final double kEpsilon = 1E-9;
+  private static final double EPSILON = 1E-9;
 
   private final Translation2d m_fl = new Translation2d(12, 12);
   private final Translation2d m_fr = new Translation2d(12, -12);
@@ -30,37 +30,37 @@ class SwerveDriveKinematicsTest {
     var moduleVelocities = m_kinematics.toSwerveModuleVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(5.0, moduleVelocities[0].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[1].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[2].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[3].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[0].angle.getRadians(), kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[1].angle.getRadians(), kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[2].angle.getRadians(), kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[3].angle.getRadians(), kEpsilon));
+        () -> assertEquals(5.0, moduleVelocities[0].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[1].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[2].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[3].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[0].angle.getRadians(), EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[1].angle.getRadians(), EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[2].angle.getRadians(), EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[3].angle.getRadians(), EPSILON));
   }
 
   @Test
   void testStraightLineForwardKinematics() { // test forward kinematics going in a straight line
-    SwerveModuleVelocity state = new SwerveModuleVelocity(5.0, Rotation2d.kZero);
+    SwerveModuleVelocity state = new SwerveModuleVelocity(5.0, Rotation2d.ZERO);
     var chassisVelocities = m_kinematics.toChassisVelocities(state, state, state, state);
 
     assertAll(
-        () -> assertEquals(5.0, chassisVelocities.vx, kEpsilon),
-        () -> assertEquals(0.0, chassisVelocities.vy, kEpsilon),
-        () -> assertEquals(0.0, chassisVelocities.omega, kEpsilon));
+        () -> assertEquals(5.0, chassisVelocities.vx, EPSILON),
+        () -> assertEquals(0.0, chassisVelocities.vy, EPSILON),
+        () -> assertEquals(0.0, chassisVelocities.omega, EPSILON));
   }
 
   @Test
   void testStraightLineForwardKinematicsWithDeltas() {
     // test forward kinematics going in a straight line
-    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.kZero);
+    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.ZERO);
     var twist = m_kinematics.toTwist2d(delta, delta, delta, delta);
 
     assertAll(
-        () -> assertEquals(5.0, twist.dx, kEpsilon),
-        () -> assertEquals(0.0, twist.dy, kEpsilon),
-        () -> assertEquals(0.0, twist.dtheta, kEpsilon));
+        () -> assertEquals(5.0, twist.dx, EPSILON),
+        () -> assertEquals(0.0, twist.dy, EPSILON),
+        () -> assertEquals(0.0, twist.dtheta, EPSILON));
   }
 
   @Test
@@ -69,36 +69,36 @@ class SwerveDriveKinematicsTest {
     var moduleVelocities = m_kinematics.toSwerveModuleVelocities(velocities);
 
     assertAll(
-        () -> assertEquals(5.0, moduleVelocities[0].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[1].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[2].velocity, kEpsilon),
-        () -> assertEquals(5.0, moduleVelocities[3].velocity, kEpsilon),
-        () -> assertEquals(90.0, moduleVelocities[0].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(90.0, moduleVelocities[1].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(90.0, moduleVelocities[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(90.0, moduleVelocities[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(5.0, moduleVelocities[0].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[1].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[2].velocity, EPSILON),
+        () -> assertEquals(5.0, moduleVelocities[3].velocity, EPSILON),
+        () -> assertEquals(90.0, moduleVelocities[0].angle.getDegrees(), EPSILON),
+        () -> assertEquals(90.0, moduleVelocities[1].angle.getDegrees(), EPSILON),
+        () -> assertEquals(90.0, moduleVelocities[2].angle.getDegrees(), EPSILON),
+        () -> assertEquals(90.0, moduleVelocities[3].angle.getDegrees(), EPSILON));
   }
 
   @Test
   void testStraightStrafeForwardKinematics() {
-    SwerveModuleVelocity state = new SwerveModuleVelocity(5.0, Rotation2d.kCCW_Pi_2);
+    SwerveModuleVelocity state = new SwerveModuleVelocity(5.0, Rotation2d.CCW_PI_2);
     var chassisVelocities = m_kinematics.toChassisVelocities(state, state, state, state);
 
     assertAll(
-        () -> assertEquals(0.0, chassisVelocities.vx, kEpsilon),
-        () -> assertEquals(5.0, chassisVelocities.vy, kEpsilon),
-        () -> assertEquals(0.0, chassisVelocities.omega, kEpsilon));
+        () -> assertEquals(0.0, chassisVelocities.vx, EPSILON),
+        () -> assertEquals(5.0, chassisVelocities.vy, EPSILON),
+        () -> assertEquals(0.0, chassisVelocities.omega, EPSILON));
   }
 
   @Test
   void testStraightStrafeForwardKinematicsWithDeltas() {
-    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.kCCW_Pi_2);
+    SwerveModulePosition delta = new SwerveModulePosition(5.0, Rotation2d.CCW_PI_2);
     var twist = m_kinematics.toTwist2d(delta, delta, delta, delta);
 
     assertAll(
-        () -> assertEquals(0.0, twist.dx, kEpsilon),
-        () -> assertEquals(5.0, twist.dy, kEpsilon),
-        () -> assertEquals(0.0, twist.dtheta, kEpsilon));
+        () -> assertEquals(0.0, twist.dx, EPSILON),
+        () -> assertEquals(5.0, twist.dy, EPSILON),
+        () -> assertEquals(0.0, twist.dtheta, EPSILON));
   }
 
   @Test
@@ -110,21 +110,21 @@ class SwerveDriveKinematicsTest {
     // Robot is stationary, but module angles are preserved.
 
     assertAll(
-        () -> assertEquals(0.0, moduleVelocities[0].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[1].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[2].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[3].velocity, kEpsilon),
-        () -> assertEquals(135.0, moduleVelocities[0].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(45.0, moduleVelocities[1].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-135.0, moduleVelocities[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, moduleVelocities[0].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[1].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[2].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[3].velocity, EPSILON),
+        () -> assertEquals(135.0, moduleVelocities[0].angle.getDegrees(), EPSILON),
+        () -> assertEquals(45.0, moduleVelocities[1].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-135.0, moduleVelocities[2].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), EPSILON));
   }
 
   @Test
   void testResetWheelAngle() {
-    Rotation2d fl = Rotation2d.kZero;
-    Rotation2d fr = Rotation2d.kCCW_Pi_2;
-    Rotation2d bl = Rotation2d.kPi;
+    Rotation2d fl = Rotation2d.ZERO;
+    Rotation2d fr = Rotation2d.CCW_PI_2;
+    Rotation2d bl = Rotation2d.PI;
     Rotation2d br = new Rotation2d(3 * Math.PI / 2);
     m_kinematics.resetHeadings(fl, fr, bl, br);
     var moduleVelocities = m_kinematics.toSwerveModuleVelocities(new ChassisVelocities());
@@ -132,14 +132,14 @@ class SwerveDriveKinematicsTest {
     // Robot is stationary, but module angles are preserved.
 
     assertAll(
-        () -> assertEquals(0.0, moduleVelocities[0].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[1].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[2].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[3].velocity, kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[0].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(90.0, moduleVelocities[1].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(180.0, moduleVelocities[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-90.0, moduleVelocities[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, moduleVelocities[0].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[1].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[2].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[3].velocity, EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[0].angle.getDegrees(), EPSILON),
+        () -> assertEquals(90.0, moduleVelocities[1].angle.getDegrees(), EPSILON),
+        () -> assertEquals(180.0, moduleVelocities[2].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-90.0, moduleVelocities[3].angle.getDegrees(), EPSILON));
   }
 
   @Test
@@ -157,10 +157,10 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(106.63, moduleVelocities[1].velocity, 0.1),
         () -> assertEquals(106.63, moduleVelocities[2].velocity, 0.1),
         () -> assertEquals(106.63, moduleVelocities[3].velocity, 0.1),
-        () -> assertEquals(135.0, moduleVelocities[0].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(45.0, moduleVelocities[1].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-135.0, moduleVelocities[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(135.0, moduleVelocities[0].angle.getDegrees(), EPSILON),
+        () -> assertEquals(45.0, moduleVelocities[1].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-135.0, moduleVelocities[2].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), EPSILON));
   }
 
   @Test
@@ -173,8 +173,8 @@ class SwerveDriveKinematicsTest {
     var chassisVelocities = m_kinematics.toChassisVelocities(flState, frState, blState, brState);
 
     assertAll(
-        () -> assertEquals(0.0, chassisVelocities.vx, kEpsilon),
-        () -> assertEquals(0.0, chassisVelocities.vy, kEpsilon),
+        () -> assertEquals(0.0, chassisVelocities.vx, EPSILON),
+        () -> assertEquals(0.0, chassisVelocities.vy, EPSILON),
         () -> assertEquals(2 * Math.PI, chassisVelocities.omega, 0.1));
   }
 
@@ -188,8 +188,8 @@ class SwerveDriveKinematicsTest {
     var twist = m_kinematics.toTwist2d(flDelta, frDelta, blDelta, brDelta);
 
     assertAll(
-        () -> assertEquals(0.0, twist.dx, kEpsilon),
-        () -> assertEquals(0.0, twist.dy, kEpsilon),
+        () -> assertEquals(0.0, twist.dx, EPSILON),
+        () -> assertEquals(0.0, twist.dy, EPSILON),
         () -> assertEquals(2 * Math.PI, twist.dtheta, 0.1));
   }
 
@@ -211,17 +211,17 @@ class SwerveDriveKinematicsTest {
         () -> assertEquals(150.796, moduleVelocities[1].velocity, 0.1),
         () -> assertEquals(150.796, moduleVelocities[2].velocity, 0.1),
         () -> assertEquals(213.258, moduleVelocities[3].velocity, 0.1),
-        () -> assertEquals(0.0, moduleVelocities[0].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(0.0, moduleVelocities[1].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-90.0, moduleVelocities[2].angle.getDegrees(), kEpsilon),
-        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), kEpsilon));
+        () -> assertEquals(0.0, moduleVelocities[0].angle.getDegrees(), EPSILON),
+        () -> assertEquals(0.0, moduleVelocities[1].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-90.0, moduleVelocities[2].angle.getDegrees(), EPSILON),
+        () -> assertEquals(-45.0, moduleVelocities[3].angle.getDegrees(), EPSILON));
   }
 
   @Test
   void testOffCenterCORRotationForwardKinematics() {
-    SwerveModuleVelocity flState = new SwerveModuleVelocity(0.0, Rotation2d.kZero);
-    SwerveModuleVelocity frState = new SwerveModuleVelocity(150.796, Rotation2d.kZero);
-    SwerveModuleVelocity blState = new SwerveModuleVelocity(150.796, Rotation2d.kCW_Pi_2);
+    SwerveModuleVelocity flState = new SwerveModuleVelocity(0.0, Rotation2d.ZERO);
+    SwerveModuleVelocity frState = new SwerveModuleVelocity(150.796, Rotation2d.ZERO);
+    SwerveModuleVelocity blState = new SwerveModuleVelocity(150.796, Rotation2d.CW_PI_2);
     SwerveModuleVelocity brState = new SwerveModuleVelocity(213.258, Rotation2d.fromDegrees(-45));
 
     var chassisVelocities = m_kinematics.toChassisVelocities(flState, frState, blState, brState);
@@ -241,8 +241,8 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testOffCenterCORRotationForwardKinematicsWithDeltas() {
-    SwerveModulePosition flDelta = new SwerveModulePosition(0.0, Rotation2d.kZero);
-    SwerveModulePosition frDelta = new SwerveModulePosition(150.796, Rotation2d.kZero);
+    SwerveModulePosition flDelta = new SwerveModulePosition(0.0, Rotation2d.ZERO);
+    SwerveModulePosition frDelta = new SwerveModulePosition(150.796, Rotation2d.ZERO);
     SwerveModulePosition blDelta = new SwerveModulePosition(150.796, Rotation2d.fromDegrees(-90));
     SwerveModulePosition brDelta = new SwerveModulePosition(213.258, Rotation2d.fromDegrees(-45));
 
@@ -344,10 +344,10 @@ class SwerveDriveKinematicsTest {
 
   @Test
   void testDesaturate() {
-    SwerveModuleVelocity fl = new SwerveModuleVelocity(5, Rotation2d.kZero);
-    SwerveModuleVelocity fr = new SwerveModuleVelocity(6, Rotation2d.kZero);
-    SwerveModuleVelocity bl = new SwerveModuleVelocity(4, Rotation2d.kZero);
-    SwerveModuleVelocity br = new SwerveModuleVelocity(7, Rotation2d.kZero);
+    SwerveModuleVelocity fl = new SwerveModuleVelocity(5, Rotation2d.ZERO);
+    SwerveModuleVelocity fr = new SwerveModuleVelocity(6, Rotation2d.ZERO);
+    SwerveModuleVelocity bl = new SwerveModuleVelocity(4, Rotation2d.ZERO);
+    SwerveModuleVelocity br = new SwerveModuleVelocity(7, Rotation2d.ZERO);
 
     SwerveModuleVelocity[] arr = {fl, fr, bl, br};
     var desaturatedArr = SwerveDriveKinematics.desaturateWheelVelocities(arr, 5.5);
@@ -355,18 +355,18 @@ class SwerveDriveKinematicsTest {
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, desaturatedArr[0].velocity, kEpsilon),
-        () -> assertEquals(6.0 * factor, desaturatedArr[1].velocity, kEpsilon),
-        () -> assertEquals(4.0 * factor, desaturatedArr[2].velocity, kEpsilon),
-        () -> assertEquals(7.0 * factor, desaturatedArr[3].velocity, kEpsilon));
+        () -> assertEquals(5.0 * factor, desaturatedArr[0].velocity, EPSILON),
+        () -> assertEquals(6.0 * factor, desaturatedArr[1].velocity, EPSILON),
+        () -> assertEquals(4.0 * factor, desaturatedArr[2].velocity, EPSILON),
+        () -> assertEquals(7.0 * factor, desaturatedArr[3].velocity, EPSILON));
   }
 
   @Test
   void testDesaturateSmooth() {
-    SwerveModuleVelocity fl = new SwerveModuleVelocity(5, Rotation2d.kZero);
-    SwerveModuleVelocity fr = new SwerveModuleVelocity(6, Rotation2d.kZero);
-    SwerveModuleVelocity bl = new SwerveModuleVelocity(4, Rotation2d.kZero);
-    SwerveModuleVelocity br = new SwerveModuleVelocity(7, Rotation2d.kZero);
+    SwerveModuleVelocity fl = new SwerveModuleVelocity(5, Rotation2d.ZERO);
+    SwerveModuleVelocity fr = new SwerveModuleVelocity(6, Rotation2d.ZERO);
+    SwerveModuleVelocity bl = new SwerveModuleVelocity(4, Rotation2d.ZERO);
+    SwerveModuleVelocity br = new SwerveModuleVelocity(7, Rotation2d.ZERO);
 
     SwerveModuleVelocity[] arr = {fl, fr, bl, br};
     var desaturatedArr =
@@ -376,27 +376,27 @@ class SwerveDriveKinematicsTest {
     double factor = 5.5 / 7.0;
 
     assertAll(
-        () -> assertEquals(5.0 * factor, desaturatedArr[0].velocity, kEpsilon),
-        () -> assertEquals(6.0 * factor, desaturatedArr[1].velocity, kEpsilon),
-        () -> assertEquals(4.0 * factor, desaturatedArr[2].velocity, kEpsilon),
-        () -> assertEquals(7.0 * factor, desaturatedArr[3].velocity, kEpsilon));
+        () -> assertEquals(5.0 * factor, desaturatedArr[0].velocity, EPSILON),
+        () -> assertEquals(6.0 * factor, desaturatedArr[1].velocity, EPSILON),
+        () -> assertEquals(4.0 * factor, desaturatedArr[2].velocity, EPSILON),
+        () -> assertEquals(7.0 * factor, desaturatedArr[3].velocity, EPSILON));
   }
 
   @Test
   void testDesaturateNegativeVelocity() {
-    SwerveModuleVelocity fl = new SwerveModuleVelocity(1, Rotation2d.kZero);
-    SwerveModuleVelocity fr = new SwerveModuleVelocity(1, Rotation2d.kZero);
-    SwerveModuleVelocity bl = new SwerveModuleVelocity(-2, Rotation2d.kZero);
-    SwerveModuleVelocity br = new SwerveModuleVelocity(-2, Rotation2d.kZero);
+    SwerveModuleVelocity fl = new SwerveModuleVelocity(1, Rotation2d.ZERO);
+    SwerveModuleVelocity fr = new SwerveModuleVelocity(1, Rotation2d.ZERO);
+    SwerveModuleVelocity bl = new SwerveModuleVelocity(-2, Rotation2d.ZERO);
+    SwerveModuleVelocity br = new SwerveModuleVelocity(-2, Rotation2d.ZERO);
 
     SwerveModuleVelocity[] arr = {fl, fr, bl, br};
     var desaturatedArr = SwerveDriveKinematics.desaturateWheelVelocities(arr, 1);
 
     assertAll(
-        () -> assertEquals(0.5, desaturatedArr[0].velocity, kEpsilon),
-        () -> assertEquals(0.5, desaturatedArr[1].velocity, kEpsilon),
-        () -> assertEquals(-1.0, desaturatedArr[2].velocity, kEpsilon),
-        () -> assertEquals(-1.0, desaturatedArr[3].velocity, kEpsilon));
+        () -> assertEquals(0.5, desaturatedArr[0].velocity, EPSILON),
+        () -> assertEquals(0.5, desaturatedArr[1].velocity, EPSILON),
+        () -> assertEquals(-1.0, desaturatedArr[2].velocity, EPSILON),
+        () -> assertEquals(-1.0, desaturatedArr[3].velocity, EPSILON));
   }
 
   @Test
@@ -445,15 +445,15 @@ class SwerveDriveKinematicsTest {
         Arrays.stream(m_kinematics.getModules())
             .map(
                 m -> {
-                  Rotation2d radiusAngle = m.getAngle().orElse(Rotation2d.kZero);
+                  Rotation2d radiusAngle = m.getAngle().orElse(Rotation2d.ZERO);
 
                   // Tangential acceleration: perpendicular to radius (90° CCW from radius)
-                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
+                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.CCW_PI_2);
                   double tangentialX = tangentialAccel * tangentialDirection.getCos();
                   double tangentialY = tangentialAccel * tangentialDirection.getSin();
 
                   // Centripetal acceleration: toward center (opposite of radius)
-                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
+                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.PI);
                   double centripetalX = centripetalAccel * centripetalDirection.getCos();
                   double centripetalY = centripetalAccel * centripetalDirection.getSin();
 
@@ -466,30 +466,24 @@ class SwerveDriveKinematicsTest {
             .toArray(Rotation2d[]::new);
 
     assertAll(
-        () -> assertEquals(totalAccel, moduleAccelerations[0].acceleration, kEpsilon),
-        () -> assertEquals(totalAccel, moduleAccelerations[1].acceleration, kEpsilon),
-        () -> assertEquals(totalAccel, moduleAccelerations[2].acceleration, kEpsilon),
-        () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, kEpsilon),
+        () -> assertEquals(totalAccel, moduleAccelerations[0].acceleration, EPSILON),
+        () -> assertEquals(totalAccel, moduleAccelerations[1].acceleration, EPSILON),
+        () -> assertEquals(totalAccel, moduleAccelerations[2].acceleration, EPSILON),
+        () -> assertEquals(totalAccel, moduleAccelerations[3].acceleration, EPSILON),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(),
-                moduleAccelerations[0].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(),
-                moduleAccelerations[1].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(),
-                moduleAccelerations[2].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
                 expectedAngles[3].getDegrees(),
                 moduleAccelerations[3].angle.getDegrees(),
-                kEpsilon));
+                EPSILON));
   }
 
   @Test
@@ -507,8 +501,8 @@ class SwerveDriveKinematicsTest {
         m_kinematics.toChassisAccelerations(flAccel, frAccel, blAccel, brAccel);
 
     assertAll(
-        () -> assertEquals(0.0, chassisAccelerations.ax, kEpsilon),
-        () -> assertEquals(0.0, chassisAccelerations.ay, kEpsilon),
+        () -> assertEquals(0.0, chassisAccelerations.ax, EPSILON),
+        () -> assertEquals(0.0, chassisAccelerations.ay, EPSILON),
         () -> assertEquals(2 * Math.PI, chassisAccelerations.alpha, 0.1));
   }
 
@@ -563,18 +557,18 @@ class SwerveDriveKinematicsTest {
                   double r = relativePos.getNorm();
 
                   if (r < 1e-9) {
-                    return Rotation2d.kZero; // Angle is undefined at center of rotation
+                    return Rotation2d.ZERO; // Angle is undefined at center of rotation
                   }
 
                   Rotation2d radiusAngle = new Rotation2d(relativePos.getX(), relativePos.getY());
 
                   // Tangential acceleration: perpendicular to radius (90° CCW from radius)
-                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.kCCW_Pi_2);
+                  Rotation2d tangentialDirection = radiusAngle.rotateBy(Rotation2d.CCW_PI_2);
                   double tangentialX = tangentialDirection.getCos() * r; // α * r = 1 * r
                   double tangentialY = tangentialDirection.getSin() * r;
 
                   // Centripetal acceleration: toward center (opposite of radius)
-                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.kPi);
+                  Rotation2d centripetalDirection = radiusAngle.rotateBy(Rotation2d.PI);
                   double centripetalX = centripetalDirection.getCos() * r; // ω² * r = 1 * r
                   double centripetalY = centripetalDirection.getSin() * r;
 
@@ -587,29 +581,23 @@ class SwerveDriveKinematicsTest {
             .toArray(Rotation2d[]::new);
 
     assertAll(
-        () -> assertEquals(expectedAccelerations[0], moduleAccelerations[0].acceleration, kEpsilon),
-        () -> assertEquals(expectedAccelerations[1], moduleAccelerations[1].acceleration, kEpsilon),
-        () -> assertEquals(expectedAccelerations[2], moduleAccelerations[2].acceleration, kEpsilon),
-        () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, kEpsilon),
+        () -> assertEquals(expectedAccelerations[0], moduleAccelerations[0].acceleration, EPSILON),
+        () -> assertEquals(expectedAccelerations[1], moduleAccelerations[1].acceleration, EPSILON),
+        () -> assertEquals(expectedAccelerations[2], moduleAccelerations[2].acceleration, EPSILON),
+        () -> assertEquals(expectedAccelerations[3], moduleAccelerations[3].acceleration, EPSILON),
         () ->
             assertEquals(
-                expectedAngles[0].getDegrees(),
-                moduleAccelerations[0].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[0].getDegrees(), moduleAccelerations[0].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
-                expectedAngles[1].getDegrees(),
-                moduleAccelerations[1].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[1].getDegrees(), moduleAccelerations[1].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
-                expectedAngles[2].getDegrees(),
-                moduleAccelerations[2].angle.getDegrees(),
-                kEpsilon),
+                expectedAngles[2].getDegrees(), moduleAccelerations[2].angle.getDegrees(), EPSILON),
         () ->
             assertEquals(
                 expectedAngles[3].getDegrees(),
                 moduleAccelerations[3].angle.getDegrees(),
-                kEpsilon));
+                EPSILON));
   }
 }

@@ -1,0 +1,79 @@
+load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
+load("//shared/bazel/rules:packaging.bzl", "package_default_cc_project")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
+load("//tunables:robotpy_native_build_info.bzl", "define_native_wrapper")
+
+filegroup(
+    name = "doxygen-files",
+    srcs = glob([
+        "src/main/native/include/**/*",
+    ]),
+    visibility = ["//visibility:public"],
+)
+
+wpilib_cc_library(
+    name = "tunables",
+    srcs = glob(["src/main/native/cpp/**"]),
+    hdrs = glob(["src/main/native/include/**"]),
+    includes = [
+        "src/main/native/include",
+    ],
+    strip_include_prefix = "src/main/native/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil",
+    ],
+)
+
+wpilib_java_library(
+    name = "tunables-java",
+    srcs = glob(["src/main/java/**/*.java"]),
+    maven_artifact_name = "tunables-java",
+    maven_group_id = "org.wpilib.tunables",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//wpiutil:wpiutil-java",
+        "@maven//:io_avaje_avaje_json_core",
+        "@maven//:io_avaje_avaje_jsonb",
+        "@maven//:us_hebi_quickbuf_quickbuf_runtime",
+    ],
+)
+
+wpilib_cc_shared_library(
+    name = "shared/tunables",
+    dynamic_deps = [
+        "//wpiutil:shared/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunables",
+    ],
+)
+
+wpilib_cc_static_library(
+    name = "static/tunables",
+    static_deps = [
+        "//wpiutil:static/wpiutil",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":tunables",
+    ],
+)
+
+package_default_cc_project(
+    name = "tunables",
+    maven_artifact_name = "tunables-cpp",
+    maven_group_id = "org.wpilib.tunables",
+)
+
+generate_robotpy_native_wrapper_build_info(
+    name = "robotpy-native-tunables-generator",
+    pyproject_toml = "src/main/native/pyproject.toml",
+)
+
+define_native_wrapper(
+    name = "robotpy-native-tunables",
+    pyproject_toml = "src/main/native/pyproject.toml",
+)

@@ -8,7 +8,6 @@ import static org.wpilib.util.ErrorMessages.requireNonNullParam;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +69,31 @@ public class DSGamepadChooser {
     requireSelectableName(name, "addOptions");
     requireNonNullParam(options, "options", "addOptions");
     if (options.isEmpty()) {
+      throw new IllegalArgumentException("Options cannot be empty");
+    }
+    if (m_selectableMap.containsKey(name)) {
+      throw new IllegalArgumentException("GamepadSelectable already exists: " + name);
+    }
+
+    var selectable = new GamepadSelectable(name, options);
+    m_selectables.add(selectable);
+    m_selectableMap.put(name, selectable);
+    return selectable;
+  }
+
+  /**
+   * Adds a selectable with the given options.
+   *
+   * <p>The first option is selected by default.
+   *
+   * @param name selectable name
+   * @param options available options
+   * @return the created selectable
+   */
+  public GamepadSelectable addOptions(String name, String... options) {
+    requireSelectableName(name, "addOptions");
+    requireNonNullParam(options, "options", "addOptions");
+    if (options.length == 0) {
       throw new IllegalArgumentException("Options cannot be empty");
     }
     if (m_selectableMap.containsKey(name)) {
@@ -282,9 +306,14 @@ public class DSGamepadChooser {
     private final List<String> m_options;
     private int m_selectedIndex;
 
+    private GamepadSelectable(String name, String[] options) {
+      m_name = name;
+      m_options = List.of(options);
+    }
+
     private GamepadSelectable(String name, List<String> options) {
       m_name = name;
-      m_options = Collections.unmodifiableList(new ArrayList<>(options));
+      m_options = List.copyOf(options);
     }
 
     /**

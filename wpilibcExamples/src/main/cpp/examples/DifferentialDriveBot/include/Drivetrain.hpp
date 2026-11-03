@@ -36,18 +36,18 @@ class Drivetrain {
     // Set the distance per pulse for the drive encoders. We can simply use the
     // distance traveled for one rotation of the wheel divided by the encoder
     // resolution.
-    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                    kEncoderResolution);
-    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * kWheelRadius /
-                                     kEncoderResolution);
+    leftEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                    ENCODER_RESOLUTION);
+    rightEncoder.SetDistancePerPulse(2 * std::numbers::pi * WHEEL_RADIUS /
+                                     ENCODER_RESOLUTION);
 
     leftEncoder.Reset();
     rightEncoder.Reset();
   }
 
-  static constexpr wpi::units::meters_per_second_t kMaxVelocity =
+  static constexpr wpi::units::meters_per_second_t MAX_VELOCITY =
       3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
   void SetVelocities(
@@ -57,9 +57,9 @@ class Drivetrain {
   void UpdateOdometry();
 
  private:
-  static constexpr wpi::units::meter_t kTrackwidth = 0.381_m * 2;
-  static constexpr double kWheelRadius = 0.0508;  // meters
-  static constexpr int kEncoderResolution = 4096;
+  static constexpr wpi::units::meter_t TRACKWIDTH = 0.381_m * 2;
+  static constexpr double WHEEL_RADIUS = 0.0508;  // meters
+  static constexpr int ENCODER_RESOLUTION = 4096;
 
   wpi::PWMSparkMax leftLeader{1};
   wpi::PWMSparkMax leftFollower{2};
@@ -74,7 +74,7 @@ class Drivetrain {
 
   wpi::OnboardIMU imu{wpi::OnboardIMU::FLAT};
 
-  wpi::math::DifferentialDriveKinematics kinematics{kTrackwidth};
+  wpi::math::DifferentialDriveKinematics kinematics{TRACKWIDTH};
   wpi::math::DifferentialDriveOdometry odometry{
       imu.GetRotation2d(), wpi::units::meter_t{leftEncoder.GetDistance()},
       wpi::units::meter_t{rightEncoder.GetDistance()}};

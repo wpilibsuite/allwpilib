@@ -109,7 +109,7 @@ public final class NetworkTableEntry implements Publisher, Subscriber {
   /**
    * Gets the last time the entry's value was changed.
    *
-   * @return Entry last change time
+   * @return Entry last change time, in nanoseconds
    */
   @Override
   public long getLastChange() {

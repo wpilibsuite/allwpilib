@@ -1,6 +1,6 @@
 load("@rules_java//java:defs.bzl", "java_plugin")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test", "wpilib_java_library")
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_library")
 
 wpilib_java_library(
     name = "processor-java",
@@ -11,11 +11,14 @@ wpilib_java_library(
     resource_strip_prefix = "epilogue-processor/src/main/resources/",
     resources = glob(["src/main/resources/**"]),
     visibility = ["//visibility:public"],
-    runtime_deps = [
-        "//commandsv2:commandsv2-java",
-    ],
     deps = [
+        "//commandsv2:commandsv2-java",
         "//epilogue-runtime:epilogue-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//tunables:tunables-java",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
     ],
 )
 
@@ -31,17 +34,5 @@ java_plugin(
     visibility = ["//visibility:public"],
     deps = [
         ":processor-java",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "processor-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    plugins = [
-        ":plugin",
-    ],
-    deps = [
-        ":processor-java",
-        "@maven//:com_google_testing_compile_compile_testing",
     ],
 )

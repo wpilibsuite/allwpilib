@@ -5,10 +5,10 @@
 #
 
 import math
+from typing import override
 
 import commands2
 import wpilib
-import wpiutil
 import xrp
 
 
@@ -34,10 +34,6 @@ class Drivetrain(commands2.Subsystem):
         self.drive = wpilib.DifferentialDrive(
             self.left_motor.set_throttle, self.right_motor.set_throttle
         )
-
-        # TODO: these don't work
-        # wpiutil.SendableRegistry.addChild(self.drive, self.leftMotor)
-        # wpiutil.SendableRegistry.addChild(self.drive, self.rightMotor)
 
         # Set up the XRPGyro
         self.gyro = xrp.XRPGyro()
@@ -111,5 +107,6 @@ class Drivetrain(commands2.Subsystem):
         """Reset the gyro"""
         self.gyro.reset()
 
+    @override
     def periodic(self) -> None:
         """This method will be called once per scheduler run"""

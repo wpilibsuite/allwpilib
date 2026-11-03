@@ -9,7 +9,7 @@
 #include "wpi/hardware/rotation/Encoder.hpp"
 #include "wpi/smartdashboard/Mechanism2d.hpp"
 #include "wpi/smartdashboard/MechanismLigament2d.hpp"
-#include "wpi/smartdashboard/SmartDashboard.hpp"
+#include "wpi/telemetry/Telemetry.hpp"
 #include "wpi/units/angle.hpp"
 #include "wpi/util/Color.hpp"
 #include "wpi/util/Color8Bit.hpp"
@@ -25,21 +25,20 @@
  * destructed!
  */
 class Robot : public wpi::TimedRobot {
-  static constexpr double kMetersPerPulse = 0.01;
-  static constexpr double kElevatorMinimumLength = 0.5;
+  static constexpr double METERS_PER_PULSE = 0.01;
+  static constexpr double ELEVATOR_MINIMUM_LENGTH = 0.5;
 
  public:
-  Robot() {
-    elevatorEncoder.SetDistancePerPulse(kMetersPerPulse);
-
-    // publish to dashboard
-    wpi::SmartDashboard::PutData("Mech2d", &mech);
-  }
+  Robot() { elevatorEncoder.SetDistancePerPulse(METERS_PER_PULSE); }
 
   void RobotPeriodic() override {
     // update the dashboard mechanism's state
-    elevator->SetLength(kElevatorMinimumLength + elevatorEncoder.GetDistance());
+    elevator->SetLength(ELEVATOR_MINIMUM_LENGTH +
+                        elevatorEncoder.GetDistance());
     wrist->SetAngle(wpi::units::degree_t{wristPotentiometer.Get()});
+
+    // publish to telemetry
+    wpi::telemetry::Log("Mech2d", mech);
   }
 
   void TeleopPeriodic() override {

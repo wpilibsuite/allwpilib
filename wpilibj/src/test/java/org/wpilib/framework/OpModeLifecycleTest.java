@@ -23,7 +23,7 @@ import org.wpilib.simulation.SimHooks;
 
 @ResourceLock("timing")
 class OpModeLifecycleTest {
-  private static final double kPeriod = 0.02;
+  private static final double PERIOD = 0.02;
 
   private static long makeOpModeId(RobotMode mode, String name) {
     return OpModeOption.makeId(mode, name.hashCode());
@@ -86,7 +86,7 @@ class OpModeLifecycleTest {
     @Override
     public Set<PeriodicPriorityQueue.Callback> getCallbacks() {
       return Set.of(
-          new PeriodicPriorityQueue.Callback(m_callbackCount::incrementAndGet, 0, kPeriod));
+          new PeriodicPriorityQueue.Callback(m_callbackCount::incrementAndGet, 0, PERIOD));
     }
   }
 
@@ -136,7 +136,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, constructedCount.get());
     assertEquals(1, disabledPeriodicCount.get());
     assertEquals(0, periodicCount.get());
@@ -144,7 +144,7 @@ class OpModeLifecycleTest {
     // 2. Transition to enabled
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
     // Starts on first loop
     assertEquals(1, startCount.get());
     // Periodic is called on second loop
@@ -154,7 +154,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
 
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, endCount.get());
     assertEquals(1, closeCount.get());
 
@@ -213,7 +213,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
     assertEquals(1, constructedCount1.get());
     assertEquals(1, startCount1.get());
     assertEquals(1, periodicCount1.get());
@@ -223,7 +223,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     // OpMode1 should be ended and closed
     assertEquals(1, endCount1.get());
     assertEquals(1, closeCount1.get());
@@ -234,7 +234,7 @@ class OpModeLifecycleTest {
     // 3. Re-enable. The same OpMode2 instance is started; it is not reconstructed.
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
     assertEquals(1, constructedCount2.get());
     assertEquals(1, startCount2.get());
     assertEquals(1, periodicCount2.get());
@@ -293,14 +293,14 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode1"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     assertEquals(1, constructedCount1.get());
     assertEquals(1, disabledPeriodicCount1.get());
 
     // 2. Change to OpMode2 while disabled
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "OpMode2"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
     // OpMode1 should be closed, but NOT ended (since it never started)
     assertEquals(1, closeCount1.get());
     assertEquals(0, endCount1.get());
@@ -330,16 +330,16 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "CallbackOpMode"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(5 * kPeriod);
+    SimHooks.stepTiming(5 * PERIOD);
     assertTrue(callbackCount.get() >= 1);
 
     // Deselecting the opmode tears it down and removes its callbacks, so the
     // callback must stop running.
     DriverStationSim.setOpMode(0);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(5 * kPeriod); // let teardown settle
+    SimHooks.stepTiming(5 * PERIOD); // let teardown settle
     int countAfterTeardown = callbackCount.get();
-    SimHooks.stepTiming(5 * kPeriod);
+    SimHooks.stepTiming(5 * PERIOD);
     assertEquals(countAfterTeardown, callbackCount.get());
 
     robot.endCompetition();
@@ -380,7 +380,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     // Should construct, call disabledPeriodic once (since it's a new opmode), then start and
     // periodic
@@ -426,7 +426,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     assertEquals(1, constructedCount.get());
     assertEquals(1, startCount.get());
@@ -434,7 +434,7 @@ class OpModeLifecycleTest {
     // 2. Disable
     DriverStationSim.setEnabled(false);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     // Old instance ended and closed
     assertEquals(1, endCount.get());
@@ -448,7 +448,7 @@ class OpModeLifecycleTest {
     // 3. Re-enable
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     assertEquals(2, constructedCount.get());
     assertEquals(2, startCount.get());
@@ -489,14 +489,14 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, constructedCount.get());
 
     // Deselect opmode
     DriverStationSim.setOpMode(0);
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(kPeriod);
+    SimHooks.stepTiming(PERIOD);
 
     assertEquals(1, closeCount.get());
     assertEquals(1, constructedCount.get()); // no new instance constructed
@@ -537,7 +537,7 @@ class OpModeLifecycleTest {
     DriverStationSim.setRobotMode(RobotMode.TELEOPERATED);
     DriverStationSim.setOpMode(makeOpModeId(RobotMode.TELEOPERATED, "TestOpMode"));
     DriverStationSim.notifyNewData();
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     assertEquals(1, constructedCount.get());
     assertEquals(1, startCount.get());
@@ -545,7 +545,7 @@ class OpModeLifecycleTest {
     // DS Disconnect
     DriverStationSim.setDsAttached(false);
     // DriverStationSim.notifyNewData(); // DON'T DO THIS
-    SimHooks.stepTiming(2 * kPeriod);
+    SimHooks.stepTiming(2 * PERIOD);
 
     assertEquals(1, endCount.get());
     assertEquals(1, closeCount.get());

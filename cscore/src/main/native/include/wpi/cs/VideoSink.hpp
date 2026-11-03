@@ -31,13 +31,13 @@ class VideoSink {
  public:
   enum Kind {
     /// Unknown sink type.
-    kUnknown = CS_SINK_UNKNOWN,
+    UNKNOWN = CS_SINK_UNKNOWN,
     /// MJPEG video sink.
-    kMjpeg = CS_SINK_MJPEG,
+    MJPEG = CS_SINK_MJPEG,
     /// CV video sink.
-    kCv = CS_SINK_CV,
+    CV = CS_SINK_CV,
     /// Raw video sink.
-    kRaw = CS_SINK_RAW,
+    RAW = CS_SINK_RAW,
   };
 
   VideoSink() noexcept = default;
@@ -106,7 +106,7 @@ class VideoSink {
    * Get a property of the sink.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
+   * @return Property (kind Property::NONE if no property with
    *         the given name exists)
    */
   VideoProperty GetProperty(std::string_view name) {
@@ -202,7 +202,7 @@ class VideoSink {
    * Get a property of the associated source.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with
+   * @return Property (kind Property::NONE if no property with
    *         the given name exists or no source connected)
    */
   VideoProperty GetSourceProperty(std::string_view name) {

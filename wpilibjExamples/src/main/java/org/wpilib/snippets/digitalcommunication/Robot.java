@@ -17,15 +17,15 @@ import org.wpilib.hardware.discrete.DigitalOutput;
  */
 public class Robot extends TimedRobot {
   // define ports for digitalcommunication with light controller
-  static final int kAlliancePort = 0;
-  static final int kEnabledPort = 1;
-  static final int kAutonomousPort = 2;
-  static final int kAlertPort = 3;
+  static final int ALLIANCE_PORT = 0;
+  static final int ENABLED_PORT = 1;
+  static final int AUTONOMOUS_PORT = 2;
+  static final int ALERT_PORT = 3;
 
-  private final DigitalOutput allianceOutput = new DigitalOutput(kAlliancePort);
-  private final DigitalOutput enabledOutput = new DigitalOutput(kEnabledPort);
-  private final DigitalOutput autonomousOutput = new DigitalOutput(kAutonomousPort);
-  private final DigitalOutput alertOutput = new DigitalOutput(kAlertPort);
+  private final DigitalOutput allianceOutput = new DigitalOutput(ALLIANCE_PORT);
+  private final DigitalOutput enabledOutput = new DigitalOutput(ENABLED_PORT);
+  private final DigitalOutput autonomousOutput = new DigitalOutput(AUTONOMOUS_PORT);
+  private final DigitalOutput alertOutput = new DigitalOutput(ALERT_PORT);
 
   @Override
   public void robotPeriodic() {

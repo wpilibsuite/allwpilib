@@ -10,9 +10,9 @@
 
 #include "wpi/driverstation/DriverStation.hpp"
 #include "wpi/event/BooleanEvent.hpp"
-#include "wpi/hal/UsageReporting.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/math/util/MathUtil.hpp"
-#include "wpi/util/sendable/SendableBuilder.hpp"
+#include "wpi/telemetry/TelemetryTable.hpp"
 
 using namespace wpi;
 
@@ -28,7 +28,7 @@ SwitchN64Controller::SwitchN64Controller(int port)
 
 SwitchN64Controller::SwitchN64Controller(GenericHID& hid)
     : m_hid{&hid} {
-  HAL_ReportUsage("HID", hid.GetPort(), "SwitchN64Controller");
+  wpi::util::ReportUsage("HID", hid.GetPort(), "SwitchN64Controller");
 }
 
 GenericHID& SwitchN64Controller::GetHID() {
@@ -365,26 +365,28 @@ void SwitchN64Controller::SetRumble(GenericHID::RumbleType type,
 
 
 
-void SwitchN64Controller::InitSendable(wpi::util::SendableBuilder& builder) {
-  builder.SetSmartDashboardType("HID");
-  builder.PublishConstString("ControllerType", "SwitchN64");
-  builder.AddDoubleProperty("LeftX", [this] { return GetLeftX(); }, nullptr);
-  builder.AddDoubleProperty("LeftY", [this] { return GetLeftY(); }, nullptr);
-  builder.AddDoubleProperty("ZAxis", [this] { return GetZAxis(); }, nullptr);
-  builder.AddDoubleProperty("ZR", [this] { return GetZR(); }, nullptr);
-  builder.AddBooleanProperty("A", [this] { return GetAButton(); }, nullptr);
-  builder.AddBooleanProperty("B", [this] { return GetBButton(); }, nullptr);
-  builder.AddBooleanProperty("CLeft", [this] { return GetCLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("CUp", [this] { return GetCUpButton(); }, nullptr);
-  builder.AddBooleanProperty("Capture", [this] { return GetCaptureButton(); }, nullptr);
-  builder.AddBooleanProperty("Home", [this] { return GetHomeButton(); }, nullptr);
-  builder.AddBooleanProperty("Start", [this] { return GetStartButton(); }, nullptr);
-  builder.AddBooleanProperty("CDown", [this] { return GetCDownButton(); }, nullptr);
-  builder.AddBooleanProperty("L", [this] { return GetLButton(); }, nullptr);
-  builder.AddBooleanProperty("R", [this] { return GetRButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadUp", [this] { return GetDpadUpButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadDown", [this] { return GetDpadDownButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadLeft", [this] { return GetDpadLeftButton(); }, nullptr);
-  builder.AddBooleanProperty("DpadRight", [this] { return GetDpadRightButton(); }, nullptr);
-  builder.AddBooleanProperty("CRight", [this] { return GetCRightButton(); }, nullptr);
+std::string_view SwitchN64Controller::GetTelemetryType() const {
+  return "HID:SwitchN64";
+}
+
+void SwitchN64Controller::LogTo(wpi::telemetry::TelemetryTable& table) const {
+  table.Log("LeftX", GetLeftX());
+  table.Log("LeftY", GetLeftY());
+  table.Log("ZAxis", GetZAxis());
+  table.Log("ZR", GetZR());
+  table.Log("A", GetAButton());
+  table.Log("B", GetBButton());
+  table.Log("CLeft", GetCLeftButton());
+  table.Log("CUp", GetCUpButton());
+  table.Log("Capture", GetCaptureButton());
+  table.Log("Home", GetHomeButton());
+  table.Log("Start", GetStartButton());
+  table.Log("CDown", GetCDownButton());
+  table.Log("L", GetLButton());
+  table.Log("R", GetRButton());
+  table.Log("DpadUp", GetDpadUpButton());
+  table.Log("DpadDown", GetDpadDownButton());
+  table.Log("DpadLeft", GetDpadLeftButton());
+  table.Log("DpadRight", GetDpadRightButton());
+  table.Log("CRight", GetCRightButton());
 }

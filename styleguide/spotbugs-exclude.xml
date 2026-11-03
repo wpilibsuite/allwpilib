@@ -38,6 +38,11 @@
     <Class name="org.wpilib.framework.OpModeRobot" />
   </Match>
   <Match>
+    <!-- We explicitly call System.gc() in tests to test behavior when weak references are garbage collected. -->
+    <Bug pattern="DM_GC" />
+    <Class name="~org\.wpilib\..*Test" />
+  </Match>
+  <Match>
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME" />
     <Or>
       <Class name="org.wpilib.system.DataLogManager" />
@@ -95,6 +100,14 @@
   </Match>
   <Match>
     <Bug pattern="MS_MUTABLE_ARRAY" />
+  </Match>
+  <Match>
+    <!-- TelemetryTable intentionally reflects public test serializer fields by name. -->
+    <Bug pattern="MS_PKGPROTECT" />
+    <Or>
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedStructThing" />
+      <Class name="org.wpilib.telemetry.TelemetryTableTest$CachedProtoThing" />
+    </Or>
   </Match>
   <Match>
     <!--
@@ -184,6 +197,7 @@
       <Class name="org.wpilib.math.system.LinearSystem" />
       <Class name="org.wpilib.math.trajectory.Trajectory" />
       <Class name="org.wpilib.command3.SchedulerTelemetryTests" />
+      <Class name="org.wpilib.javacplugin.OpModeAnnotationProcessorTest" />
     </Or>
   </Match>
 </FindBugsFilter>

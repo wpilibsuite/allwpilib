@@ -7,15 +7,15 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 import static org.wpilib.javacplugin.CompileTestUtils.getErrorSource;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.Test;
 
 class CodeAfterCoroutineParkDetectorTest {
-  private static final String kCoroutineSource =
+  private static final String COROUTINE_SOURCE =
       """
       package org.wpilib.command3;
 
@@ -42,9 +42,9 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -70,16 +70,19 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable 1\"); ", getErrorSource(error));
   }
 
@@ -106,9 +109,9 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -134,16 +137,19 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("for (;;) {\n    }\n", getErrorSource(error));
   }
 
@@ -167,16 +173,19 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("{\n    }\n", getErrorSource(error));
   }
 
@@ -198,9 +207,9 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -225,16 +234,19 @@ class CodeAfterCoroutineParkDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Unreachable statement: `coroutine.park()` will never exit", error.getMessage(null));
+        "[WPILib] Unreachable statement: `coroutine.park()` will never exit."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CodeAfterCoroutinePark\")",
+        error.getMessage(null));
     assertEquals("System.out.println(\"Unreachable\");\n", getErrorSource(error));
   }
 }

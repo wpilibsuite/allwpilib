@@ -27,6 +27,6 @@ public class PoseWithCurvature {
 
   /** Constructs a PoseWithCurvature with default values. */
   public PoseWithCurvature() {
-    pose = Pose2d.kZero;
+    pose = Pose2d.ZERO;
   }
 }

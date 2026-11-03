@@ -35,7 +35,7 @@ class StructTest {};
   }
 
 // For these tests:
-// TypeParam defines Type, kTestData, and CheckEq
+// TypeParam defines Type, TEST_DATA, and CheckEq
 // Type is the data type
 // StructType is the instantiation of wpi::util::Struct<>
 
@@ -44,10 +44,10 @@ CATCH_TYPED_TEST_P(StructTest, RoundTrip) {
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
 CATCH_TYPED_TEST_P(StructTest, DoublePack) {
@@ -55,11 +55,11 @@ CATCH_TYPED_TEST_P(StructTest, DoublePack) {
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-  TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+  TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
 }
 
 CATCH_TYPED_TEST_P(StructTest, DoubleUnpack) {
@@ -67,16 +67,16 @@ CATCH_TYPED_TEST_P(StructTest, DoubleUnpack) {
   using StructType = wpi::util::Struct<Type>;
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  wpi::util::PackStruct(buffer, TypeParam::kTestData);
+  wpi::util::PackStruct(buffer, TypeParam::TEST_DATA);
 
   {
     Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 
   {
     Type unpacked_data = wpi::util::UnpackStruct<Type>(buffer);
-    TypeParam::CheckEq(TypeParam::kTestData, unpacked_data);
+    TypeParam::CheckEq(TypeParam::TEST_DATA, unpacked_data);
   }
 }
 

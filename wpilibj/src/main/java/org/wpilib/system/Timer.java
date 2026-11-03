@@ -24,7 +24,7 @@ public class Timer {
    * @return Robot running time in seconds.
    */
   public static double getTimestamp() {
-    return RobotController.getTime() / 1000000.0;
+    return RobotController.getTime() / 1_000_000_000.0;
   }
 
   /**
@@ -33,7 +33,7 @@ public class Timer {
    * @return Monotonic time in seconds.
    */
   public static double getMonotonicTimestamp() {
-    return RobotController.getMonotonicTime() / 1000000.0;
+    return RobotController.getMonotonicTime() / 1_000_000_000.0;
   }
 
   /**
@@ -83,9 +83,9 @@ public class Timer {
     }
   }
 
-  private long m_startTimeUs;
-  private double m_startTimeRemainderUs;
-  private double m_accumulatedTimeUs;
+  private long m_startTimeNs;
+  private double m_startTimeRemainderNs;
+  private double m_accumulatedTimeNs;
   private boolean m_running;
 
   /**
@@ -115,15 +115,15 @@ public class Timer {
     return timer;
   }
 
-  private long getUsClock() {
+  private long getNsClock() {
     return RobotController.getTime();
   }
 
-  private double getMicroseconds() {
+  private double getNanoseconds() {
     if (m_running) {
-      return getUsClock() - m_startTimeUs - m_startTimeRemainderUs + m_accumulatedTimeUs;
+      return getNsClock() - m_startTimeNs - m_startTimeRemainderNs + m_accumulatedTimeNs;
     } else {
-      return m_accumulatedTimeUs;
+      return m_accumulatedTimeNs;
     }
   }
 
@@ -135,7 +135,7 @@ public class Timer {
    * @return Current time value for this timer in seconds
    */
   public double get() {
-    return getMicroseconds() / 1000000.0;
+    return getNanoseconds() / 1_000_000_000.0;
   }
 
   /**
@@ -144,9 +144,9 @@ public class Timer {
    * <p>Make the timer startTime the current time so new requests will be relative now.
    */
   public final void reset() {
-    m_accumulatedTimeUs = 0.0;
-    m_startTimeUs = getUsClock();
-    m_startTimeRemainderUs = 0.0;
+    m_accumulatedTimeNs = 0.0;
+    m_startTimeNs = getNsClock();
+    m_startTimeRemainderNs = 0.0;
   }
 
   /**
@@ -156,8 +156,8 @@ public class Timer {
    */
   public void start() {
     if (!m_running) {
-      m_startTimeUs = getUsClock();
-      m_startTimeRemainderUs = 0.0;
+      m_startTimeNs = getNsClock();
+      m_startTimeRemainderNs = 0.0;
       m_running = true;
     }
   }
@@ -182,7 +182,7 @@ public class Timer {
    */
   public void stop() {
     if (m_running) {
-      m_accumulatedTimeUs = getMicroseconds();
+      m_accumulatedTimeNs = getNanoseconds();
       m_running = false;
     }
   }
@@ -204,7 +204,7 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean hasElapsed(double seconds) {
-    return getMicroseconds() >= seconds * 1e6;
+    return getNanoseconds() >= seconds * 1e9;
   }
 
   /**
@@ -216,15 +216,15 @@ public class Timer {
    * @return Whether the period has passed.
    */
   public boolean advanceIfElapsed(double seconds) {
-    double periodUs = seconds * 1e6;
+    double periodNs = seconds * 1e9;
 
-    if (getMicroseconds() >= periodUs) {
+    if (getNanoseconds() >= periodNs) {
       // Advance the start time by the period.
       // Don't set it to the current time... we want to avoid drift.
-      double advanceUs = m_startTimeRemainderUs + periodUs;
-      long wholeUs = (long) advanceUs;
-      m_startTimeUs += wholeUs;
-      m_startTimeRemainderUs = advanceUs - wholeUs;
+      double advanceNs = m_startTimeRemainderNs + periodNs;
+      long wholeNs = (long) advanceNs;
+      m_startTimeNs += wholeNs;
+      m_startTimeRemainderNs = advanceNs - wholeNs;
       return true;
     } else {
       return false;

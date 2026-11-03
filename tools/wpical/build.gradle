@@ -155,6 +155,8 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'
@@ -206,6 +208,8 @@ model {
                 lib project: ':wpigui', library: 'wpigui', linkage: 'static'
                 lib project: ':thirdparty:imgui_suite', library: 'imguiSuite', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 nativeUtils.useRequiredLibrary(it, 'ceres')
                 project.addLibSdlGpuDependency(it)
                 it.cppCompiler.define 'OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT'

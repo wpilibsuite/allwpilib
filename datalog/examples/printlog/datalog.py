@@ -14,9 +14,9 @@ __all__ = ["DataLogReader", "DataLogRecord", "MetadataRecordData", "StartRecordD
 floatStruct = struct.Struct("<f")
 doubleStruct = struct.Struct("<d")
 
-kControlStart = 0
-kControlFinish = 1
-kControlSetMetadata = 2
+CONTROL_START = 0
+CONTROL_FINISH = 1
+CONTROL_SET_METADATA = 2
 
 
 class StartRecordData:
@@ -69,21 +69,21 @@ class DataLogRecord:
         return (
             self.entry == 0
             and len(self.data) >= 17
-            and self._getControlType() == kControlStart
+            and self._getControlType() == CONTROL_START
         )
 
     def isFinish(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) == 5
-            and self._getControlType() == kControlFinish
+            and self._getControlType() == CONTROL_FINISH
         )
 
     def isSetMetadata(self) -> bool:
         return (
             self.entry == 0
             and len(self.data) >= 9
-            and self._getControlType() == kControlSetMetadata
+            and self._getControlType() == CONTROL_SET_METADATA
         )
 
     def getStartData(self) -> StartRecordData:
@@ -205,7 +205,9 @@ class DataLogIterator:
             raise StopIteration
         entry = self._readVarInt(self.pos + 1, entryLen)
         size = self._readVarInt(self.pos + 1 + entryLen, sizeLen)
-        timestamp = self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen)
+        timestamp = (
+            self._readVarInt(self.pos + 1 + entryLen + sizeLen, timestampLen) * 1000
+        )
         if len(self.buf) < (self.pos + headerLen + size):
             raise StopIteration
         record = DataLogRecord(
@@ -263,7 +265,7 @@ class DataLogReader:
 if __name__ == "__main__":
     import mmap
     import sys
-    from datetime import datetime
+    from datetime import datetime, timezone
 
     if len(sys.argv) != 2:
         print("Usage: datalog.py <file>", file=sys.stderr)
@@ -278,7 +280,7 @@ if __name__ == "__main__":
 
         entries = {}
         for record in reader:
-            timestamp = record.timestamp / 1000000
+            timestamp = record.timestamp / 1_000_000_000
             if record.isStart():
                 try:
                     data = record.getStartData()
@@ -321,8 +323,11 @@ if __name__ == "__main__":
                 try:
                     # handle systemTime specially
                     if entry.name == "systemTime" and entry.type == "int64":
-                        dt = datetime.fromtimestamp(record.getInteger() / 1000000)  # noqa: DTZ006
-                        print(f"  {dt:%Y-%m-%d %H:%M:%S.%f}")
+                        val = record.getInteger()
+                        dt = datetime.fromtimestamp(
+                            val // 1_000_000, tz=timezone.utc
+                        ).astimezone()
+                        print(f"  {dt:%Y-%m-%d %H:%M:%S}.{val % 1_000_000:06d}")
                         continue
 
                     if entry.type == "double":

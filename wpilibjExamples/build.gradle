@@ -12,6 +12,7 @@ ext {
 apply from: "${rootDir}/shared/opencv.gradle"
 
 dependencies {
+    implementation project(':allwpilib-java')
     implementation project(':drivers')
     implementation project(':wpilibj')
     implementation project(':apriltag')
@@ -25,6 +26,8 @@ dependencies {
     implementation project(':cameraserver')
     implementation project(':commandsv2')
     implementation project(':commandsv3')
+    implementation project(':telemetry')
+    implementation project(':tunables')
     implementation project(':romiVendordep')
     implementation project(':xrpVendordep')
     implementation project(':epilogue-runtime')
@@ -53,9 +56,11 @@ tasks.withType(JavaExec).configureEach {
     // Commands v3 needs reflective access to the continuation classes
     jvmArgs += [
         '--add-opens',
-        'java.base/jdk.internal.vm=ALL-UNNAMED',
+        'java.base/jdk.internal.vm=wpilib.command3',
         '--add-opens',
-        'java.base/java.lang=ALL-UNNAMED',
+        'java.base/java.lang=wpilib.command3',
+        // Explicitly permit native access to WPILib JNI wrappers
+        '--enable-native-access=wpilib.util,wpilib.hal,wpilib.ntcore'
     ]
 }
 
@@ -138,6 +143,8 @@ model {
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'shared'
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
 
                 def systemArch = getCurrentArch()
                 if (binary.targetPlatform.name == systemArch) {
@@ -197,7 +204,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("test${entry.foldername}", Test) { testTask ->
@@ -245,7 +252,7 @@ model {
                                     doFirst { doFirstTask(run) }
 
                                     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-                                        run.jvmArgs = ['-XstartOnFirstThread']
+                                        run.jvmArgs += ['-XstartOnFirstThread']
                                     }
                                 }
                                 project.tasks.create("testSnippet${entry.foldername}", Test) { testTask ->

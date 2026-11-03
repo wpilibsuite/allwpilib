@@ -7,8 +7,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("AnalysisTypeTest FromName", "[sysid]") {
-  CHECK(sysid::analysis::kElevator == sysid::analysis::FromName("Elevator"));
-  CHECK(sysid::analysis::kArm == sysid::analysis::FromName("Arm"));
-  CHECK(sysid::analysis::kSimple == sysid::analysis::FromName("Simple"));
-  CHECK(sysid::analysis::kSimple == sysid::analysis::FromName("Random"));
+  CHECK(sysid::analysis::ELEVATOR == sysid::analysis::FromName("Elevator"));
+  CHECK(sysid::analysis::ARM == sysid::analysis::FromName("Arm"));
+  CHECK(sysid::analysis::SIMPLE == sysid::analysis::FromName("Simple"));
+  CHECK(sysid::analysis::SIMPLE == sysid::analysis::FromName("Random"));
 }

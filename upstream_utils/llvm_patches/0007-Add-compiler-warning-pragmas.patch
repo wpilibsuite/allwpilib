@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 13:34:07 -0400
-Subject: [PATCH 07/34] Add compiler warning pragmas
+Subject: [PATCH 07/32] Add compiler warning pragmas
 
 ---
- llvm/include/llvm/ADT/FunctionExtras.h    | 11 +++++++++++
- llvm/include/llvm/ADT/SmallVector.h       | 16 ++++++++++++++++
+ llvm/include/llvm/ADT/FunctionExtras.h    | 12 ++++++++++++
+ llvm/include/llvm/ADT/SmallVector.h       |  9 +++++++++
  llvm/include/llvm/Support/MathExtras.h    |  9 +++++++++
  llvm/include/llvm/Support/MemAlloc.h      | 13 +++++++++++++
  llvm/lib/Support/raw_ostream.cpp          |  4 ++++
@@ -13,13 +13,13 @@ Subject: [PATCH 07/34] Add compiler warning pragmas
  llvm/unittests/ADT/FunctionExtrasTest.cpp |  6 ++++++
  llvm/unittests/ADT/SmallVectorTest.cpp    |  4 ++++
  llvm/unittests/Support/AlignOfTest.cpp    |  7 +++----
- 9 files changed, 70 insertions(+), 4 deletions(-)
+ 9 files changed, 64 insertions(+), 4 deletions(-)
 
 diff --git a/llvm/include/llvm/ADT/FunctionExtras.h b/llvm/include/llvm/ADT/FunctionExtras.h
-index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb8ff13c36 100644
+index 0d9fd7df09f6822ac43daef6dd4f7cc5899693a2..2703fe71fb4b89375546ef37d91fec24a73fd811 100644
 --- a/llvm/include/llvm/ADT/FunctionExtras.h
 +++ b/llvm/include/llvm/ADT/FunctionExtras.h
-@@ -55,6 +55,13 @@ namespace llvm {
+@@ -54,6 +54,14 @@ namespace llvm {
  ///   It can hold functions with a non-const operator(), like mutable lambdas.
  template <typename FunctionT> class unique_function;
  
@@ -28,13 +28,14 @@ index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb
 +#pragma GCC diagnostic push
 +#pragma GCC diagnostic ignored "-Warray-bounds"
 +#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
++#pragma GCC diagnostic ignored "-Wuninitialized"
 +#endif
 +
  namespace detail {
  
  template <typename CallableT, typename ThisT>
-@@ -391,6 +398,10 @@ public:
-   }
+@@ -282,6 +290,10 @@ public:
+   R operator()(P... Params) const { return this->CallPtr(this, Params...); }
  };
  
 +#if defined(__GNUC__) && !defined(__clang__)
@@ -45,7 +46,7 @@ index c4d0821076d63842927d2abeef4a5189cdf325e7..730822d37c62b992316c850021dc5edb
  
  #endif // LLVM_ADT_FUNCTIONEXTRAS_H
 diff --git a/llvm/include/llvm/ADT/SmallVector.h b/llvm/include/llvm/ADT/SmallVector.h
-index e27d0d71ec6176ee8081660f9ed6ba6672d7828d..9c8369209d4f783087f3033569e666978fe517d8 100644
+index e589300ce5ace50dbc7125b98951b2db2d71245d..9b11e0b40832247b857bc883bce97b8371770c4d 100644
 --- a/llvm/include/llvm/ADT/SmallVector.h
 +++ b/llvm/include/llvm/ADT/SmallVector.h
 @@ -16,6 +16,15 @@
@@ -64,23 +65,8 @@ index e27d0d71ec6176ee8081660f9ed6ba6672d7828d..9c8369209d4f783087f3033569e66697
  #include "llvm/Support/Compiler.h"
  #include <algorithm>
  #include <cassert>
-@@ -133,7 +142,14 @@ protected:
-   }
-   // Space after 'FirstEl' is clobbered, do not add any instance vars after it.
- 
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-+#pragma GCC diagnostic push
-+#endif
-   SmallVectorTemplateCommon(size_t Size) : Base(getFirstEl(), Size) {}
-+#if __GNUC__ >= 16
-+#pragma GCC diagnostic pop
-+#endif
- 
-   void grow_pod(size_t MinSize, size_t TSize) {
-     Base::grow_pod(getFirstEl(), MinSize, TSize);
 diff --git a/llvm/include/llvm/Support/MathExtras.h b/llvm/include/llvm/Support/MathExtras.h
-index 120a1641110aca97acf2ab9cd3806d94accbb8aa..78c500e18c7639afc02b595b788333b6b9a4e69b 100644
+index ce393a9ab336c509ad18f38e349caf1195f0cb9c..de6905fff10dd4aca8e8eb722c5129a138185f22 100644
 --- a/llvm/include/llvm/Support/MathExtras.h
 +++ b/llvm/include/llvm/Support/MathExtras.h
 @@ -219,6 +219,11 @@ inline constexpr uint64_t maxUIntN(uint64_t N) {
@@ -136,7 +122,7 @@ index 3b086cb171806f3f216a9bac7de46a29da3c5481..9205299d1cc7ddc93d2d5781e7443056
 +
  #endif
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index bf5d06018979474cf6166fed61be93eede0dece1..5496df7f6f83debb8b13bb9b828cdbddab91b07b 100644
+index b7e13fe9c42e429df77014a613df94fb42afa8d2..7728671816e5507101582c9e0b250aaaa4a4286e 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -10,6 +10,10 @@
@@ -151,7 +137,7 @@ index bf5d06018979474cf6166fed61be93eede0dece1..5496df7f6f83debb8b13bb9b828cdbdd
  #include "llvm/ADT/StringExtras.h"
  #include "llvm/Config/config.h"
 diff --git a/llvm/unittests/ADT/DenseMapTest.cpp b/llvm/unittests/ADT/DenseMapTest.cpp
-index fffa07e1978bb3b8c2013073bdd58556d145ff23..1a81ecdd758ce285533fcb0565713f30a6cef33e 100644
+index 31463090d0a4f2e3a9260d6571abd763bd2eb022..25c57debd6f500f26664a7437690d5d184cd81c4 100644
 --- a/llvm/unittests/ADT/DenseMapTest.cpp
 +++ b/llvm/unittests/ADT/DenseMapTest.cpp
 @@ -6,6 +6,10 @@
@@ -183,7 +169,7 @@ index e92f5fcdfce0175eea843e81ef89604e0c2297f6..3a2008adb0697757c68af8ad462b9af7
  // move construction/assignment.
  TEST(UniqueFunctionTest, MovedFromStateIsDestroyedCorrectly) {
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index f83bc116e4851f39fd6e496ee25ae1fb9acd96ca..5589671f7909d1994626c3f0ad043e64ef9768ab 100644
+index 4e98c0d9cb882030ab342a4ecc84683cf137e35e..d801529409146356ce119aa722f3c509ba6d2577 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -18,6 +18,10 @@

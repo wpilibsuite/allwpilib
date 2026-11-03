@@ -80,7 +80,7 @@ class Data {
    */
   std::optional<cv::Mat> GetFrame();
 
-  std::atomic_bool m_isFinished;
+  std::atomic_bool m_isFinished{false};
   std::optional<CameraModel> cameraModel;
   std::queue<cv::Mat> queue;
   wpi::util::mutex mutex;
@@ -232,48 +232,57 @@ CameraCalibrator::CameraCalibrator(size_t numWorkers, double squareWidth,
   }
   cv::VideoCapture cap{videoPath};
   m_totalFrames = cap.get(cv::CAP_PROP_FRAME_COUNT);
-  std::thread([this, boardHeight, boardWidth, squareWidth, state = m_state,
-               capture = std::move(cap)]() mutable {
-    cv::Size frameShape{
-        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH)),
-        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT))};
-    while (capture.grab() && !state->m_isFinished) {
-      cv::Mat frame;
-      capture.retrieve(frame);
-      cv::Mat frameGray;
-      cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
-      state->AddFrame(std::move(frameGray));
-    }
-    while (!state->m_isFinished && TotalFramesProcessed() < TotalFrames()) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-    if (state->m_isFinished) {
-      state->cameraModel = std::nullopt;
-      return;
-    }
-    std::vector<mrcal_point3_t> allObservationBoards;
-    std::vector<mrcal_pose_t> allFramesRtToref;
-    for (auto& worker : m_workers) {
-      auto data = worker->GetData();
-      allObservationBoards.insert(allObservationBoards.end(),
-                                  data.first.begin(), data.first.end());
-      allFramesRtToref.insert(allFramesRtToref.end(), data.second.begin(),
-                              data.second.end());
-    }
-    if (allObservationBoards.empty()) {
-      state->m_isFinished = true;
-      return;
-    }
-    auto result = mrcal_main(allObservationBoards, allFramesRtToref,
-                             cv::Size(boardWidth - 1, boardHeight - 1),
-                             squareWidth * 0.0254, frameShape, 1000);
-    state->cameraModel = MrcalResultToCameraModel(*result);
-    state->m_isFinished = true;
-  }).detach();
+  m_processingThread =
+      std::thread([this, boardHeight, boardWidth, squareWidth, state = m_state,
+                   capture = std::move(cap)]() mutable {
+        cv::Size frameShape{
+            static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH)),
+            static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT))};
+        int framesQueued = 0;
+        while (capture.grab() && !state->m_isFinished) {
+          cv::Mat frame;
+          if (!capture.retrieve(frame) || frame.empty()) {
+            continue;
+          }
+          cv::Mat frameGray;
+          cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
+          state->AddFrame(std::move(frameGray));
+          ++framesQueued;
+        }
+        m_totalFrames = framesQueued;
+        while (!state->m_isFinished && TotalFramesProcessed() < framesQueued) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        if (state->m_isFinished) {
+          state->cameraModel = std::nullopt;
+          return;
+        }
+        std::vector<mrcal_point3_t> allObservationBoards;
+        std::vector<mrcal_pose_t> allFramesRtToref;
+        for (auto& worker : m_workers) {
+          auto data = worker->GetData();
+          allObservationBoards.insert(allObservationBoards.end(),
+                                      data.first.begin(), data.first.end());
+          allFramesRtToref.insert(allFramesRtToref.end(), data.second.begin(),
+                                  data.second.end());
+        }
+        if (allObservationBoards.empty()) {
+          state->m_isFinished = true;
+          return;
+        }
+        auto result = mrcal_main(allObservationBoards, allFramesRtToref,
+                                 cv::Size(boardWidth - 1, boardHeight - 1),
+                                 squareWidth * 0.0254, frameShape, 1000);
+        state->cameraModel = MrcalResultToCameraModel(*result);
+        state->m_isFinished = true;
+      });
 }
 
 CameraCalibrator::~CameraCalibrator() {
   Stop();
+  if (m_processingThread.joinable()) {
+    m_processingThread.join();
+  }
 }
 
 bool CameraCalibrator::IsFinished() {

@@ -20,17 +20,17 @@ namespace wpi::math {
  */
 template <int Rows, int Cols, typename F>
 auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
-  constexpr double kEpsilon = 1e-5;
+  constexpr double EPSILON = 1e-5;
   Matrixd<Rows, Cols> result;
   result.setZero();
 
   // It's more expensive, but +- epsilon will be more accurate
   for (int i = 0; i < Cols; ++i) {
     Vectord<Cols> dX_plus = x;
-    dX_plus(i) += kEpsilon;
+    dX_plus(i) += EPSILON;
     Vectord<Cols> dX_minus = x;
-    dX_minus(i) -= kEpsilon;
-    result.col(i) = (f(dX_plus) - f(dX_minus)) / (kEpsilon * 2.0);
+    dX_minus(i) -= EPSILON;
+    result.col(i) = (f(dX_plus) - f(dX_minus)) / (EPSILON * 2.0);
   }
 
   return result;
@@ -44,17 +44,17 @@ auto NumericalJacobian(F&& f, const Vectord<Cols>& x) {
  */
 template <typename F>
 Eigen::MatrixXd NumericalJacobian(F&& f, const Eigen::VectorXd& x) {
-  constexpr double kEpsilon = 1e-5;
+  constexpr double EPSILON = 1e-5;
   Eigen::MatrixXd result;
 
   // It's more expensive, but +- epsilon will be more accurate
   for (int i = 0; i < x.rows(); ++i) {
     Eigen::VectorXd dX_plus = x;
-    dX_plus(i) += kEpsilon;
+    dX_plus(i) += EPSILON;
     Eigen::VectorXd dX_minus = x;
-    dX_minus(i) -= kEpsilon;
+    dX_minus(i) -= EPSILON;
     Eigen::VectorXd partialDerivative =
-        (f(dX_plus) - f(dX_minus)) / (kEpsilon * 2.0);
+        (f(dX_plus) - f(dX_minus)) / (EPSILON * 2.0);
     if (i == 0) {
       result.resize(partialDerivative.rows(), x.rows());
       result.setZero();

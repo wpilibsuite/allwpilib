@@ -11,18 +11,18 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::ChassisVelocities>;
-const ChassisVelocities kExpectedData{
+const ChassisVelocities EXPECTED_DATA{
     ChassisVelocities{2.29_mps, 2.2_mps, 0.3504_rad_per_s}};
 }  // namespace
 
 TEST_CASE("ChassisVelocitiesStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   ChassisVelocities unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.vx.value() == unpacked_data.vx.value());
-  CHECK(kExpectedData.vy.value() == unpacked_data.vy.value());
-  CHECK(kExpectedData.omega.value() == unpacked_data.omega.value());
+  CHECK(EXPECTED_DATA.vx.value() == unpacked_data.vx.value());
+  CHECK(EXPECTED_DATA.vy.value() == unpacked_data.vy.value());
+  CHECK(EXPECTED_DATA.omega.value() == unpacked_data.omega.value());
 }

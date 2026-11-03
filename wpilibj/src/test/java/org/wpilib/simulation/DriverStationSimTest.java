@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -24,6 +25,17 @@ import org.wpilib.simulation.testutils.DoubleCallback;
 import org.wpilib.simulation.testutils.EnumCallback;
 
 class DriverStationSimTest {
+  @AfterEach
+  @SuppressWarnings("PMD.AvoidAccessibilityAlteration")
+  void resetUserProgramFlag() throws ReflectiveOperationException {
+    DriverStationSim.resetData();
+    DriverStationSim.notifyNewData();
+
+    var field = DriverStationBackend.class.getDeclaredField("m_userProgramStarted");
+    field.setAccessible(true);
+    field.set(null, false);
+  }
+
   @Test
   void testEnabled() {
     HAL.initialize();
@@ -45,6 +57,7 @@ class DriverStationSimTest {
   void testAutonomous() {
     HAL.initialize();
     DriverStationSim.resetData();
+    DriverStationBackend.observeUserProgramStarting();
 
     assertFalse(RobotState.isAutonomous());
     EnumCallback callback = new EnumCallback();
@@ -63,6 +76,7 @@ class DriverStationSimTest {
   void testTest() {
     HAL.initialize();
     DriverStationSim.resetData();
+    DriverStationBackend.observeUserProgramStarting();
 
     assertFalse(RobotState.isUtility());
     EnumCallback callback = new EnumCallback();

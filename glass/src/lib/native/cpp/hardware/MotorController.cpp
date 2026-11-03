@@ -16,7 +16,8 @@ void wpi::glass::DisplayMotorController(MotorControllerModel* m) {
   // is null.
   auto dc = m->GetPercentData();
   if (!dc || !m->Exists()) {
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(96, 96, 96, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     ImGui::Text("Unknown MotorController");
     ImGui::PopStyleColor();
     return;
@@ -25,7 +26,8 @@ void wpi::glass::DisplayMotorController(MotorControllerModel* m) {
   // Set the buttons and sliders to read-only if the model is read-only.
   if (m->IsReadOnly()) {
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(210, 210, 210, 255));
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          ImGui::GetStyleColorVec4(ImGuiCol_Text));
   }
 
   // Add button to zero output.

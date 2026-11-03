@@ -8,16 +8,20 @@ def define_native_wrapper(name, pyproject_toml = None):
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"]) + native.glob([
             "src/main/native/thirdparty/ada/include/**",
-            "src/main/native/thirdparty/libuv/include/**",
             "src/main/native/thirdparty/llhttp/include/**",
             "src/main/native/thirdparty/tcpsockets/include/**",
-        ]),
+        ]) + [
+            "@libuv//:include_files",
+        ] + [
+            "//:LICENSE.md",
+        ],
         out = "native/wpinet/include",
+        include_external_repositories = ["*libuv*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
+            "include": "",
             "wpinet/src/main/native/include": "",
             "wpinet/src/main/native/thirdparty/ada/include": "",
-            "wpinet/src/main/native/thirdparty/libuv/include": "",
             "wpinet/src/main/native/thirdparty/llhttp/include": "",
             "wpinet/src/main/native/thirdparty/tcpsockets/include": "",
         },
@@ -57,7 +61,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib Networking Library",
         requires = ["robotpy-native-wpiutil==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["wpinet"],
         entry_points = {
             "pkg_config": [

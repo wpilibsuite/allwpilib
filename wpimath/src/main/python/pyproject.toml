@@ -1,11 +1,13 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
-    "hatch-robotpy~=0.2.1",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
+    "hatch-robotpy==0.0.0",
     "hatchling",
     "robotpy-native-wpimath==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
     # "numpy", # broken in raspbian CI
 ]
@@ -14,13 +16,15 @@ requires = [
 name = "robotpy-wpimath"
 version = "0.0.0"
 description = "Binary wrapper for WPILib Math library"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
 license = "BSD-3-Clause"
 dependencies = [
     "robotpy-native-wpimath==0.0.0",
+    "robotpy-telemetry==0.0.0",
+    "robotpy-tunables==0.0.0",
     "robotpy-wpiutil==0.0.0",
 ]
 
@@ -87,7 +91,9 @@ scan_headers_ignore = [
     "type_casters/*",
     "unsupported/*",
     "wpi/units/*",
-    "wpimath/protobuf/*",
+    "wpi/math/protobuf/*",
+
+    "wpi/math/trajectory/TrajectorySample.hpp",
 
     "wpi/math/util/MathShared.hpp",
 
@@ -1454,7 +1460,7 @@ types = [
 name = "wpimath"
 wraps = ["robotpy-native-wpimath"]
 includes = ["wpimath/_impl/src"]
-depends = ["wpiutil", "wpimath-casters"]
+depends = ["telemetry", "tunables", "wpiutil", "wpimath-casters"]
 
 [tool.semiwrap.extension_modules."wpimath._wpimath".headers]
 # wpi/math/util
@@ -1498,6 +1504,8 @@ SwerveDrivePoseEstimator = "wpi/math/estimator/SwerveDrivePoseEstimator.hpp"
 SwerveDrivePoseEstimator3d = "wpi/math/estimator/SwerveDrivePoseEstimator3d.hpp"
 # UnscentedKalmanFilter = "wpi/math/estimator/UnscentedKalmanFilter.hpp"
 # UnscentedTransform = "wpi/math/estimator/UnscentedTransform.hpp"
+TwoDeadWheelPoseEstimator = "wpi/math/estimator/TwoDeadWheelPoseEstimator.hpp"
+TwoDeadWheelPoseEstimator3d = "wpi/math/estimator/TwoDeadWheelPoseEstimator3d.hpp"
 
 # wpi/math/filter
 BiquadFilter = "wpi/math/filter/BiquadFilter.hpp"
@@ -1553,7 +1561,8 @@ SwerveDriveOdometry3d = "wpi/math/kinematics/SwerveDriveOdometry3d.hpp"
 SwerveModulePosition = "wpi/math/kinematics/SwerveModulePosition.hpp"
 SwerveModuleVelocity = "wpi/math/kinematics/SwerveModuleVelocity.hpp"
 SwerveModuleAcceleration = "wpi/math/kinematics/SwerveModuleAcceleration.hpp"
-
+TwoDeadWheelOdometry = "wpi/math/kinematics/TwoDeadWheelOdometry.hpp"
+TwoDeadWheelOdometry3d = "wpi/math/kinematics/TwoDeadWheelOdometry3d.hpp"
 
 # wpi/math/optimization
 SimulatedAnnealing = "wpi/math/optimization/SimulatedAnnealing.hpp"
@@ -1590,7 +1599,6 @@ HolonomicSample = "wpi/math/trajectory/HolonomicSample.hpp"
 HolonomicTrajectory = "wpi/math/trajectory/HolonomicTrajectory.hpp"
 Trajectory = "wpi/math/trajectory/Trajectory.hpp"
 TrajectoryConfig = "wpi/math/trajectory/TrajectoryConfig.hpp"
-TrajectorySample = "wpi/math/trajectory/TrajectorySample.hpp"
 TrapezoidProfile = "wpi/math/trajectory/TrapezoidProfile.hpp"
 
 # wpi/math/trajectory/constraint

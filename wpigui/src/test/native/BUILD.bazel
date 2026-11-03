@@ -1,0 +1,16 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("//shared/bazel/rules:imgui_test.bzl", "imgui_test_target_compatible_with")
+
+cc_library(
+    name = "native",
+    testonly = True,
+    srcs = ["cpp/GuiTestEngineRunner.cpp"],
+    hdrs = ["include/wpi/gui/test/GuiTestEngineRunner.hpp"],
+    strip_include_prefix = "include",
+    target_compatible_with = imgui_test_target_compatible_with(),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//shared/bazel/thirdparty/imgui_test_engine",
+        "//wpigui:wpigui_for_tests",
+    ],
+)

@@ -25,6 +25,7 @@
 #include "wpi/units/length.hpp"
 #include "wpi/units/time.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 #include "wpi/util/array.hpp"
 
 namespace wpi::math {
@@ -76,7 +77,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
 
     SetVisionMeasurementStdDevs(visionMeasurementStdDevs);
-    wpi::math::MathSharedStore::ReportUsage("PoseEstimator", "");
+    wpi::util::ReportUsage("PoseEstimator", "");
   }
 
   /**
@@ -275,7 +276,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     // timespan, skip.
     if (m_odometryPoseBuffer.GetInternalBuffer().empty() ||
         m_odometryPoseBuffer.GetInternalBuffer().front().first -
-                kBufferDuration >
+                BUFFER_DURATION >
             timestamp) {
       return;
     }
@@ -462,7 +463,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
     }
   };
 
-  static constexpr wpi::units::second_t kBufferDuration = 1.5_s;
+  static constexpr wpi::units::second_t BUFFER_DURATION = 1.5_s;
 
   Odometry<Kinematics, WheelPositions, WheelVelocities, WheelAccelerations>&
       m_odometry;
@@ -475,7 +476,7 @@ class WPILIB_DLLEXPORT PoseEstimator {
       Eigen::DiagonalMatrix<double, 3>::Zero();
 
   // Maps timestamps to odometry-only pose estimates
-  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{kBufferDuration};
+  TimeInterpolatableBuffer<Pose2d> m_odometryPoseBuffer{BUFFER_DURATION};
   // Maps timestamps to vision updates
   // Always contains one entry before the oldest entry in m_odometryPoseBuffer,
   // unless there have been no vision measurements after the last reset. May

@@ -43,40 +43,40 @@ void HAL_ResetUserCurrentFaults(int32_t* status) {
 }
 void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
                              int32_t* status) {
-  constexpr double kMillivoltsPerVolt = 1000.0;
-  constexpr int32_t kBrownoutVoltageMinMillivolts = 5000;
-  constexpr int32_t kBrownoutVoltageMaxMillivolts = 8000;
-  constexpr int32_t kRecoveryVoltageMaxMillivolts = 8500;
-  constexpr int32_t kRecoveryVoltageMinDeltaMillivolts = 500;
+  constexpr double MILLIVOLTS_PER_VOLT = 1000.0;
+  constexpr int32_t BROWNOUT_VOLTAGE_MIN_MILLIVOLTS = 5000;
+  constexpr int32_t BROWNOUT_VOLTAGE_MAX_MILLIVOLTS = 8000;
+  constexpr int32_t RECOVERY_VOLTAGE_MAX_MILLIVOLTS = 8500;
+  constexpr int32_t RECOVERY_VOLTAGE_MIN_DELTA_MILLIVOLTS = 500;
 #ifdef WPI_HAL_SIM_HAS_MRCLIB_SYSTEMCORE_H
-  static_assert(kBrownoutVoltageMinMillivolts ==
+  static_assert(BROWNOUT_VOLTAGE_MIN_MILLIVOLTS ==
                 MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MIN_MV);
-  static_assert(kBrownoutVoltageMaxMillivolts ==
+  static_assert(BROWNOUT_VOLTAGE_MAX_MILLIVOLTS ==
                 MRC_SYSTEMCORE_BROWNOUT_VOLTAGE_MAX_MV);
-  static_assert(kRecoveryVoltageMaxMillivolts ==
+  static_assert(RECOVERY_VOLTAGE_MAX_MILLIVOLTS ==
                 MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MAX_MV);
-  static_assert(kRecoveryVoltageMinDeltaMillivolts ==
+  static_assert(RECOVERY_VOLTAGE_MIN_DELTA_MILLIVOLTS ==
                 MRC_SYSTEMCORE_BROWNOUT_RECOVERY_VOLTAGE_MIN_DELTA_MV);
 #endif
-  constexpr double kBrownoutVoltageMin =
-      kBrownoutVoltageMinMillivolts / kMillivoltsPerVolt;
-  constexpr double kBrownoutVoltageMax =
-      kBrownoutVoltageMaxMillivolts / kMillivoltsPerVolt;
-  constexpr double kRecoveryVoltageMax =
-      kRecoveryVoltageMaxMillivolts / kMillivoltsPerVolt;
+  constexpr double BROWNOUT_VOLTAGE_MIN =
+      BROWNOUT_VOLTAGE_MIN_MILLIVOLTS / MILLIVOLTS_PER_VOLT;
+  constexpr double BROWNOUT_VOLTAGE_MAX =
+      BROWNOUT_VOLTAGE_MAX_MILLIVOLTS / MILLIVOLTS_PER_VOLT;
+  constexpr double RECOVERY_VOLTAGE_MAX =
+      RECOVERY_VOLTAGE_MAX_MILLIVOLTS / MILLIVOLTS_PER_VOLT;
   if (!std::isfinite(brownoutVoltage) || !std::isfinite(recoveryVoltage) ||
-      brownoutVoltage < kBrownoutVoltageMin ||
-      brownoutVoltage > kBrownoutVoltageMax ||
-      recoveryVoltage < kBrownoutVoltageMin ||
-      recoveryVoltage > kRecoveryVoltageMax) {
+      brownoutVoltage < BROWNOUT_VOLTAGE_MIN ||
+      brownoutVoltage > BROWNOUT_VOLTAGE_MAX ||
+      recoveryVoltage < BROWNOUT_VOLTAGE_MIN ||
+      recoveryVoltage > RECOVERY_VOLTAGE_MAX) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
 
-  auto brownoutMillivolts = std::lround(brownoutVoltage * kMillivoltsPerVolt);
-  auto recoveryMillivolts = std::lround(recoveryVoltage * kMillivoltsPerVolt);
+  auto brownoutMillivolts = std::lround(brownoutVoltage * MILLIVOLTS_PER_VOLT);
+  auto recoveryMillivolts = std::lround(recoveryVoltage * MILLIVOLTS_PER_VOLT);
   if (recoveryMillivolts <
-      brownoutMillivolts + kRecoveryVoltageMinDeltaMillivolts) {
+      brownoutMillivolts + RECOVERY_VOLTAGE_MIN_DELTA_MILLIVOLTS) {
     *status = HAL_PARAMETER_OUT_OF_RANGE;
     return;
   }
@@ -85,9 +85,9 @@ void HAL_SetBrownoutVoltages(double brownoutVoltage, double recoveryVoltage,
   auto& recoveryValue = SimRoboRioData->brownoutRecoveryVoltage;
   std::scoped_lock lock{brownoutValue.GetMutex(), recoveryValue.GetMutex()};
   bool brownoutChanged =
-      brownoutValue.SetNoNotify(brownoutMillivolts / kMillivoltsPerVolt);
+      brownoutValue.SetNoNotify(brownoutMillivolts / MILLIVOLTS_PER_VOLT);
   bool recoveryChanged =
-      recoveryValue.SetNoNotify(recoveryMillivolts / kMillivoltsPerVolt);
+      recoveryValue.SetNoNotify(recoveryMillivolts / MILLIVOLTS_PER_VOLT);
   if (brownoutChanged) {
     brownoutValue.Notify();
   }

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Sun, 8 May 2022 16:38:11 -0400
-Subject: [PATCH 13/34] Fixup includes
+Subject: [PATCH 13/32] Fixup includes
 
 ---
  llvm/include/llvm/Support/PointerLikeTypeTraits.h | 1 +
@@ -26,7 +26,7 @@ index a47d68406acf38350a67ce846af4f0c1a5818db1..85152589f7e0f3d31163c5aab109cedf
  namespace llvm {
  
 diff --git a/llvm/lib/Support/ConvertUTFWrapper.cpp b/llvm/lib/Support/ConvertUTFWrapper.cpp
-index 448dbde16986172f506c247a1cd3a78a311f1fa2..ce588eec8995e076dd28164157bed46c2039867e 100644
+index f4ffa76fa8093ed43a8135797b58c2aecd6bd9ac..c250bf03b57b3b5f097b2c2665f9fd3d0d79c16d 100644
 --- a/llvm/lib/Support/ConvertUTFWrapper.cpp
 +++ b/llvm/lib/Support/ConvertUTFWrapper.cpp
 @@ -7,6 +7,7 @@
@@ -38,7 +38,7 @@ index 448dbde16986172f506c247a1cd3a78a311f1fa2..ce588eec8995e076dd28164157bed46c
  #include <span>
  #include <string>
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index fcbc70535bf9869f72d001ec214d7046e975961a..fd5b46a2c7633391f6c7407483255963210aa056 100644
+index c6c406ef33f70741439616928458a70724e1751f..dbc020ce06b21b5470b4640455219b6ed91bc307 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -29,12 +29,11 @@
@@ -58,7 +58,7 @@ index fcbc70535bf9869f72d001ec214d7046e975961a..fd5b46a2c7633391f6c7407483255963
  
  using namespace llvm;
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index dd1ce4a784d096949681e297103c50aa002d636d..475ac02b5f06f83ee125e02473d17f3a677a2e4c 100644
+index d453672d952d20c8eee53d51edd9e48d51e16179..0414ba50c5daa07a5058a6194597282b27504293 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -15,6 +15,8 @@
@@ -83,7 +83,7 @@ index dd1ce4a784d096949681e297103c50aa002d636d..475ac02b5f06f83ee125e02473d17f3a
  
  #if defined(__CYGWIN__)
 diff --git a/llvm/unittests/ADT/SmallPtrSetTest.cpp b/llvm/unittests/ADT/SmallPtrSetTest.cpp
-index bbe18dffdcf32d1bd71e756bccca74f1fcee5d0c..33d167cf87e588d46682916888eaf81713854046 100644
+index b43475d6ea92ae827a37725b5bb344ec50342007..cab0a4cb4dafb600ddeedb11efdd89a104aaa616 100644
 --- a/llvm/unittests/ADT/SmallPtrSetTest.cpp
 +++ b/llvm/unittests/ADT/SmallPtrSetTest.cpp
 @@ -16,6 +16,8 @@
@@ -96,7 +96,7 @@ index bbe18dffdcf32d1bd71e756bccca74f1fcee5d0c..33d167cf87e588d46682916888eaf817
  using testing::UnorderedElementsAre;
  
 diff --git a/llvm/unittests/ADT/SmallVectorTest.cpp b/llvm/unittests/ADT/SmallVectorTest.cpp
-index 5589671f7909d1994626c3f0ad043e64ef9768ab..f7a3110f183820212179644fd31009685e172943 100644
+index d801529409146356ce119aa722f3c509ba6d2577..7767ef128decee0d512fdebc879f2f45e07bb560 100644
 --- a/llvm/unittests/ADT/SmallVectorTest.cpp
 +++ b/llvm/unittests/ADT/SmallVectorTest.cpp
 @@ -14,6 +14,7 @@

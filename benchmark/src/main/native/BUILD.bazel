@@ -1,0 +1,19 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+
+cc_binary(
+    name = "benchmark",
+    srcs = glob([
+        "cpp/*.cpp",
+        "cpp/*.hpp",
+    ]),
+    deps = [
+        "//wpimath",
+        "//wpiutil",
+        "@google_benchmark//:benchmark",
+    ],
+)
+
+alias(
+    name = "native",
+    actual = ":benchmark",
+)

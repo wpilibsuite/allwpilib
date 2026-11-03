@@ -22,22 +22,22 @@
  * to control an arm.
  */
 class Robot : public wpi::TimedRobot {
-  static constexpr int kMotorPort = 0;
-  static constexpr int kEncoderAChannel = 0;
-  static constexpr int kEncoderBChannel = 1;
-  static constexpr int kJoystickPort = 0;
+  static constexpr int MOTOR_PORT = 0;
+  static constexpr int ENCODER_A_CHANNEL = 0;
+  static constexpr int ENCODER_B_CHANNEL = 1;
+  static constexpr int JOYSTICK_PORT = 0;
 
-  static constexpr wpi::units::radian_t kRaisedPosition = 90_deg;
-  static constexpr wpi::units::radian_t kLoweredPosition = 0_deg;
+  static constexpr wpi::units::radian_t RAISED_POSITION = 90_deg;
+  static constexpr wpi::units::radian_t LOWERED_POSITION = 0_deg;
 
   // Moment of inertia of the arm. Can be estimated with CAD. If finding this
   // constant is difficult, wpi::math::LinearSystem.identifyPositionSystem may
   // be better.
-  static constexpr wpi::units::kilogram_square_meter_t kArmMOI = 1.2_kg_sq_m;
+  static constexpr wpi::units::kilogram_square_meter_t ARM_MOI = 1.2_kg_sq_m;
 
   // Reduction between motors and encoder, as output over input. If the arm
   // spins slower than the motors, this number should be greater than one.
-  static constexpr double kArmGearing = 10.0;
+  static constexpr double ARM_GEARING = 10.0;
 
   // The plant holds a state-space model of our arm. This system has the
   // following properties:
@@ -47,7 +47,7 @@ class Robot : public wpi::TimedRobot {
   // Outputs (what we can measure): [position], in radians.
   wpi::math::LinearSystem<2, 1, 1> armPlant =
       wpi::math::Models::SingleJointedArmFromPhysicalConstants(
-          wpi::math::DCMotor::NEO(2), kArmMOI, kArmGearing)
+          wpi::math::DCMotor::NEO(2), ARM_MOI, ARM_GEARING)
           .Slice(0);
 
   // The observer fuses our encoder data and voltage inputs to reject noise.
@@ -82,10 +82,10 @@ class Robot : public wpi::TimedRobot {
                                             12_V, 20_ms};
 
   // An encoder set up to measure arm position in radians per second.
-  wpi::Encoder encoder{kEncoderAChannel, kEncoderBChannel};
+  wpi::Encoder encoder{ENCODER_A_CHANNEL, ENCODER_B_CHANNEL};
 
-  wpi::PWMSparkMax motor{kMotorPort};
-  wpi::Gamepad joystick{kJoystickPort};
+  wpi::PWMSparkMax motor{MOTOR_PORT};
+  wpi::Gamepad joystick{JOYSTICK_PORT};
 
   wpi::math::TrapezoidProfile<wpi::units::radians> profile{
       {45_deg_per_s, 90_deg_per_s / 1_s}};
@@ -112,10 +112,10 @@ class Robot : public wpi::TimedRobot {
     wpi::math::TrapezoidProfile<wpi::units::radians>::State goal;
     if (joystick.GetRightBumperButton()) {
       // We pressed the bumper, so let's set our next reference
-      goal = {kRaisedPosition, 0_rad_per_s};
+      goal = {RAISED_POSITION, 0_rad_per_s};
     } else {
       // We released the bumper, so let's spin down
-      goal = {kLoweredPosition, 0_rad_per_s};
+      goal = {LOWERED_POSITION, 0_rad_per_s};
     }
     lastProfiledReference =
         profile.Calculate(20_ms, lastProfiledReference, goal);

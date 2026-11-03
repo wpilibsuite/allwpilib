@@ -25,81 +25,81 @@ NiDsPS5ControllerSim::NiDsPS5ControllerSim(int port) : GenericHIDSim{port} {
 }
 
 void NiDsPS5ControllerSim::SetLeftX(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kLeftX, value);
+  SetRawAxis(NiDsPS5Controller::Axis::LEFT_X, value);
 }
 
 void NiDsPS5ControllerSim::SetLeftY(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kLeftY, value);
+  SetRawAxis(NiDsPS5Controller::Axis::LEFT_Y, value);
 }
 
 void NiDsPS5ControllerSim::SetRightX(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kRightX, value);
+  SetRawAxis(NiDsPS5Controller::Axis::RIGHT_X, value);
 }
 
 void NiDsPS5ControllerSim::SetRightY(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kRightY, value);
+  SetRawAxis(NiDsPS5Controller::Axis::RIGHT_Y, value);
 }
 
 void NiDsPS5ControllerSim::SetL2Axis(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kL2, value);
+  SetRawAxis(NiDsPS5Controller::Axis::L2, value);
 }
 
 void NiDsPS5ControllerSim::SetR2Axis(double value) {
-  SetRawAxis(NiDsPS5Controller::Axis::kR2, value);
+  SetRawAxis(NiDsPS5Controller::Axis::R2, value);
 }
 
 void NiDsPS5ControllerSim::SetSquareButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kSquare, value);
+  SetRawButton(NiDsPS5Controller::Button::SQUARE, value);
 }
 
 void NiDsPS5ControllerSim::SetCrossButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kCross, value);
+  SetRawButton(NiDsPS5Controller::Button::CROSS, value);
 }
 
 void NiDsPS5ControllerSim::SetCircleButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kCircle, value);
+  SetRawButton(NiDsPS5Controller::Button::CIRCLE, value);
 }
 
 void NiDsPS5ControllerSim::SetTriangleButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kTriangle, value);
+  SetRawButton(NiDsPS5Controller::Button::TRIANGLE, value);
 }
 
 void NiDsPS5ControllerSim::SetL1Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kL1, value);
+  SetRawButton(NiDsPS5Controller::Button::L1, value);
 }
 
 void NiDsPS5ControllerSim::SetR1Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kR1, value);
+  SetRawButton(NiDsPS5Controller::Button::R1, value);
 }
 
 void NiDsPS5ControllerSim::SetL2Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kL2, value);
+  SetRawButton(NiDsPS5Controller::Button::L2, value);
 }
 
 void NiDsPS5ControllerSim::SetR2Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kR2, value);
+  SetRawButton(NiDsPS5Controller::Button::R2, value);
 }
 
 void NiDsPS5ControllerSim::SetCreateButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kCreate, value);
+  SetRawButton(NiDsPS5Controller::Button::CREATE, value);
 }
 
 void NiDsPS5ControllerSim::SetOptionsButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kOptions, value);
+  SetRawButton(NiDsPS5Controller::Button::OPTIONS, value);
 }
 
 void NiDsPS5ControllerSim::SetL3Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kL3, value);
+  SetRawButton(NiDsPS5Controller::Button::L3, value);
 }
 
 void NiDsPS5ControllerSim::SetR3Button(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kR3, value);
+  SetRawButton(NiDsPS5Controller::Button::R3, value);
 }
 
 void NiDsPS5ControllerSim::SetPSButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kPS, value);
+  SetRawButton(NiDsPS5Controller::Button::PS, value);
 }
 
 void NiDsPS5ControllerSim::SetTouchpadButton(bool value) {
-  SetRawButton(NiDsPS5Controller::Button::kTouchpad, value);
+  SetRawButton(NiDsPS5Controller::Button::TOUCHPAD, value);
 }

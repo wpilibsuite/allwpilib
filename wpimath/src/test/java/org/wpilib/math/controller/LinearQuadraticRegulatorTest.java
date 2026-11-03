@@ -140,21 +140,22 @@ class LinearQuadraticRegulatorTest {
     double Kv = 3.02;
     double Ka = 0.642;
 
+    // QR overload
     var A = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -Kv / Ka);
     var B = MatBuilder.fill(Nat.N2(), Nat.N1(), 0, 1.0 / Ka);
     var Q = MatBuilder.fill(Nat.N2(), Nat.N2(), 1, 0, 0, 0.2);
     var R = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.25);
-
-    // QR overload
     var K = new LinearQuadraticRegulator<>(A, B, Q, R, 0.005).getK();
     assertEquals(1.9960017786537287, K.get(0, 0), 1e-10);
     assertEquals(0.5118212835109273, K.get(0, 1), 1e-10);
 
     // QRN overload
-    var Aref = MatBuilder.fill(Nat.N2(), Nat.N2(), 0, 1, 0, -Kv / (Ka * 5.0));
-    var Kimf = getImplicitModelFollowingK(A, B, Q, R, Aref, 0.005);
-    assertEquals(0.0, Kimf.get(0, 0), 1e-10);
-    assertEquals(-6.919050011675146e-05, Kimf.get(0, 1), 1e-10);
+    var Avel = MatBuilder.fill(Nat.N1(), Nat.N1(), -Kv / Ka);
+    var Bvel = MatBuilder.fill(Nat.N1(), Nat.N1(), 1.0 / Ka);
+    var Qvel = MatBuilder.fill(Nat.N1(), Nat.N1(), 0.2);
+    var Avelref = MatBuilder.fill(Nat.N1(), Nat.N1(), -Kv / (Ka * 5.0));
+    var Kimf = getImplicitModelFollowingK(Avel, Bvel, Qvel, R, Avelref, 0.005);
+    assertEquals(-6.918832047696e-05, Kimf.get(0, 0), 1e-10);
   }
 
   @Test

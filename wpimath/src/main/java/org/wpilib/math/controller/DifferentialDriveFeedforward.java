@@ -18,48 +18,48 @@ public class DifferentialDriveFeedforward implements ProtobufSerializable, Struc
   private final LinearSystem<N2, N2, N2> m_plant;
 
   /** The linear velocity gain in volts per (meters per second). */
-  public final double kVLinear;
+  public final double kvLinear;
 
   /** The linear acceleration gain in volts per (meters per second squared). */
-  public final double kALinear;
+  public final double kaLinear;
 
   /** The angular velocity gain in volts per (radians per second). */
-  public final double kVAngular;
+  public final double kvAngular;
 
   /** The angular acceleration gain in volts per (radians per second squared). */
-  public final double kAAngular;
+  public final double kaAngular;
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (radians per second).
-   * @param kAAngular The angular acceleration gain in volts per (radians per second squared).
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per second squared).
+   * @param kvAngular The angular velocity gain in volts per (radians per second).
+   * @param kaAngular The angular acceleration gain in volts per (radians per second squared).
    * @param trackwidth The distance between the differential drive's left and right wheels, in
    *     meters.
    */
   public DifferentialDriveFeedforward(
-      double kVLinear, double kALinear, double kVAngular, double kAAngular, double trackwidth) {
+      double kvLinear, double kaLinear, double kvAngular, double kaAngular, double trackwidth) {
     // See Models.differentialDriveFromSysId(double, double, double, double, double)
-    this(kVLinear, kALinear, kVAngular * 2.0 / trackwidth, kAAngular * 2.0 / trackwidth);
+    this(kvLinear, kaLinear, kvAngular * 2.0 / trackwidth, kaAngular * 2.0 / trackwidth);
   }
 
   /**
    * Creates a new DifferentialDriveFeedforward with the specified parameters.
    *
-   * @param kVLinear The linear velocity gain in volts per (meters per second).
-   * @param kALinear The linear acceleration gain in volts per (meters per second squared).
-   * @param kVAngular The angular velocity gain in volts per (meters per second).
-   * @param kAAngular The angular acceleration gain in volts per (meters per second squared).
+   * @param kvLinear The linear velocity gain in volts per (meters per second).
+   * @param kaLinear The linear acceleration gain in volts per (meters per second squared).
+   * @param kvAngular The angular velocity gain in volts per (meters per second).
+   * @param kaAngular The angular acceleration gain in volts per (meters per second squared).
    */
   public DifferentialDriveFeedforward(
-      double kVLinear, double kALinear, double kVAngular, double kAAngular) {
-    m_plant = Models.differentialDriveFromSysId(kVLinear, kALinear, kVAngular, kAAngular);
-    this.kVLinear = kVLinear;
-    this.kALinear = kALinear;
-    this.kVAngular = kVAngular;
-    this.kAAngular = kAAngular;
+      double kvLinear, double kaLinear, double kvAngular, double kaAngular) {
+    m_plant = Models.differentialDriveFromSysId(kvLinear, kaLinear, kvAngular, kaAngular);
+    this.kvLinear = kvLinear;
+    this.kaLinear = kaLinear;
+    this.kvAngular = kvAngular;
+    this.kaAngular = kaAngular;
   }
 
   /**

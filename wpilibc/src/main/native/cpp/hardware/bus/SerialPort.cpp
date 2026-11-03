@@ -7,8 +7,8 @@
 #include <string>
 
 #include "wpi/hal/SerialPort.h"
-#include "wpi/hal/UsageReporting.hpp"
 #include "wpi/system/Errors.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 using namespace wpi;
 
@@ -39,7 +39,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 
   DisableTermination();
 
-  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
+  wpi::util::ReportUsage("SerialPort", static_cast<int>(port), "");
 }
 
 SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
@@ -70,7 +70,7 @@ SerialPort::SerialPort(int baudRate, std::string_view portName, Port port,
 
   DisableTermination();
 
-  HAL_ReportUsage("SerialPort", static_cast<int>(port), "");
+  wpi::util::ReportUsage("SerialPort", static_cast<int>(port), "");
 }
 
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {

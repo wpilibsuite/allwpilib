@@ -2,6 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <future>
@@ -20,6 +21,32 @@
 #include "wpi/util/raw_ostream.hpp"
 
 namespace {
+class PausingDataLog : public wpi::log::DataLog {
+ public:
+  explicit PausingDataLog(wpi::util::Logger& msglog) : DataLog{msglog} {
+    StartFile();
+  }
+
+  void Flush() override {
+    std::vector<Buffer> buffers;
+    FlushBufs(&buffers);
+    for (const auto& buffer : buffers) {
+      auto bytes = buffer.GetData();
+      data.insert(data.end(), bytes.begin(), bytes.end());
+    }
+    ReleaseBufs(&buffers);
+  }
+
+  std::vector<uint8_t> data;
+  int bufferFullCount = 0;
+
+ private:
+  bool BufferFull() override {
+    ++bufferFullCount;
+    return true;
+  }
+};
+
 struct ThingA {
   int x = 0;
 };
@@ -173,6 +200,75 @@ TEST_CASE("DataLogTest ForegroundLargeAppendDoesNotDeadlock",
     }
   }
   CHECK(found);
+}
+
+TEST_CASE("DataLogTest FlushDoesNotResumeManualPause", "[datalog][data-log]") {
+  std::vector<uint8_t> output;
+  wpi::log::DataLogWriter writer{
+      std::make_unique<wpi::util::raw_uvector_ostream>(output)};
+  int entry = writer.Start("integer", "int64", {}, 1);
+  writer.Pause();
+  writer.Flush();
+  writer.AppendInteger(entry, 42, 2);
+  writer.Flush();
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(output, "manual-pause")};
+  REQUIRE(reader.IsValid());
+  for (const auto& record : reader) {
+    CHECK(record.GetEntry() != entry);
+  }
+}
+
+TEST_CASE("DataLogTest BufferFullReportedOnceUntilDrain",
+          "[datalog][data-log]") {
+  wpi::util::Logger msglog;
+  PausingDataLog log{msglog};
+  int entry = log.Start("raw", "raw", {}, 1000);
+  std::vector<uint8_t> payload(2 * 1024 * 1024, 0x5a);
+  payload.back() = 0xa5;
+
+  for (int i = 1; i <= 2; ++i) {
+    log.AppendRaw(entry, payload, i * 1000);
+    CHECK(log.bufferFullCount == i);
+
+    // Pause applies to subsequent records, preserving the oversized record.
+    log.AppendRaw(entry, std::span<const uint8_t>{payload}.first(1), 3000);
+    CHECK(log.bufferFullCount == i);
+    log.Flush();
+  }
+
+  wpi::log::DataLogReader reader{
+      wpi::util::MemoryBuffer::GetMemBufferCopy(log.data, "overflow")};
+  REQUIRE(reader.IsValid());
+  int recordCount = 0;
+  for (const auto& record : reader) {
+    if (record.GetEntry() == entry) {
+      ++recordCount;
+      CHECK(record.GetTimestamp() == recordCount * 1000);
+      CHECK(std::ranges::equal(record.GetRaw(), payload));
+    }
+  }
+  CHECK(recordCount == 2);
+}
+
+TEST_CASE("DataLogTest ExtraHeaderCrossesBufferBoundary",
+          "[datalog][data-log]") {
+  for (size_t size : {0u, 16372u, 16373u, 20000u, 32768u}) {
+    DYNAMIC_SECTION("size=" << size) {
+      std::vector<uint8_t> output;
+      std::string expected(size, 'x');
+      {
+        wpi::log::DataLogWriter writer{
+            std::make_unique<wpi::util::raw_uvector_ostream>(output), expected};
+        writer.Flush();
+      }
+      wpi::log::DataLogReader reader{
+          wpi::util::MemoryBuffer::GetMemBufferCopy(output, "extra-header")};
+      REQUIRE(reader.IsValid());
+      CHECK(reader.GetExtraHeader() == expected);
+    }
+  }
 }
 
 TEST_CASE_METHOD(DataLogTest, "DataLogTest SimpleInt", "[datalog][data-log]") {

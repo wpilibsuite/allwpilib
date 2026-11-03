@@ -14,7 +14,7 @@ using namespace wpi::math;
 struct VectorProtoTestData {
   using Type = Vectord<2>;
 
-  inline static const Type kTestData{1.1, 1.2};
+  inline static const Type TEST_DATA{1.1, 1.2};
 
   static void CheckEq(const Type& testData, const Type& data) {
     CHECK(testData == data);

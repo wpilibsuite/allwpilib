@@ -73,19 +73,29 @@ class InstanceImpl {
   static int AllocImpl();
 
   static std::atomic<int> s_default;
-  static constexpr int kNumInstances = 16;
-  static std::atomic<InstanceImpl*> s_instances[kNumInstances];
+  static constexpr int NUM_INSTANCES = 16;
+  static std::atomic<InstanceImpl*> s_instances[NUM_INSTANCES];
   static wpi::util::mutex s_mutex;
 
   struct Cleanup {
     ~Cleanup() {
+      // Keep instances alive for other global destructors, but stop their
+      // threads. Stop all listeners before shutting down any network threads.
       for (auto&& inst : s_instances) {
-        // don't actually destroy (due to undefined global destruction order),
-        // but stop all listener threads
         if (auto i = inst.load()) {
           i->listenerStorage.Reset();
         }
       }
+#ifndef _WIN32
+      // Stop network threads before libuv shuts down its global thread pool.
+      // Windows has already terminated threads when DLL destructors run.
+      for (auto&& inst : s_instances) {
+        if (auto i = inst.load()) {
+          i->StopServer();
+          i->StopClient();
+        }
+      }
+#endif
     }
   };
   static Cleanup s_cleanup;

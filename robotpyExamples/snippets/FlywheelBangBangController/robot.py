@@ -5,11 +5,14 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
-import wpilib_drivers
 import math
+from typing import override
 
+import telemetry
+import tunables
+import wpilib
 import wpilib.simulation
+import wpilib_drivers
 import wpimath
 import wpimath.units
 
@@ -71,9 +74,13 @@ class MyRobot(wpilib.TimedRobot):
         self.flywheel_sim = wpilib.simulation.FlywheelSim(self.plant, self.gearbox)
         self.encoder_sim = wpilib.simulation.EncoderSim(self.encoder)
 
-        # Add bang-bang controller to SmartDashboard and networktables.
-        wpilib.SmartDashboard.put_data(self.bang_bang_controler)
+        tunables.publish("BangBang Controller", self.bang_bang_controler)
 
+    @override
+    def robot_periodic(self) -> None:
+        telemetry.log("BangBang Controller", self.bang_bang_controler)
+
+    @override
     def teleop_periodic(self) -> None:
         """Controls flywheel to a set velocity (RPM) controlled by a joystick."""
 
@@ -98,6 +105,7 @@ class MyRobot(wpilib.TimedRobot):
             bang_output + 0.9 * self.feedforward.calculate(setpoint)
         )
 
+    @override
     def simulation_periodic(self) -> None:
         """Update our simulation. This should be run every robot loop in simulation."""
         # To update our simulation, we set motor voltage inputs, update the

@@ -68,7 +68,7 @@ TEST_CASE("TravelingSalesmanTest FiveLengthStaticPathWithDistanceCost",
       wpi::math::Pose2d{14_m, 3_m, 0_rad}};
 
   wpi::math::TravelingSalesman traveler;
-  wpi::util::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 500);
+  wpi::util::array<wpi::math::Pose2d, 5> solution = traveler.Solve(poses, 2000);
 
   wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
                                                   poses[1], poses[3]};
@@ -91,7 +91,7 @@ TEST_CASE("TravelingSalesmanTest FiveLengthDynamicPathWithDistanceCost",
 
   wpi::math::TravelingSalesman traveler;
   std::vector<wpi::math::Pose2d> solution =
-      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
+      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 2000);
 
   REQUIRE(5u == solution.size());
   wpi::util::array<wpi::math::Pose2d, 5> expected{poses[0], poses[2], poses[4],
@@ -116,7 +116,8 @@ TEST_CASE("TravelingSalesmanTest TenLengthStaticPathWithDistanceCost",
       wpi::math::Pose2d{13_m, 5_m, 0_rad}, wpi::math::Pose2d{14_m, 3_m, 0_rad}};
 
   wpi::math::TravelingSalesman traveler;
-  wpi::util::array<wpi::math::Pose2d, 10> solution = traveler.Solve(poses, 500);
+  wpi::util::array<wpi::math::Pose2d, 10> solution =
+      traveler.Solve(poses, 2000);
 
   wpi::util::array<wpi::math::Pose2d, 10> expected{
       poses[0], poses[4], poses[6], poses[3], poses[1],
@@ -142,7 +143,7 @@ TEST_CASE("TravelingSalesmanTest TenLengthDynamicPathWithDistanceCost",
 
   wpi::math::TravelingSalesman traveler;
   std::vector<wpi::math::Pose2d> solution =
-      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 500);
+      traveler.Solve(std::span<const wpi::math::Pose2d>{poses}, 2000);
 
   REQUIRE(10u == solution.size());
   wpi::util::array<wpi::math::Pose2d, 10> expected{

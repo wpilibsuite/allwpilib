@@ -29,10 +29,11 @@ public class EnumHandler extends ElementHandler {
 
   @Override
   public String logInvocation(Element element, TypeElement loggedClass) {
-    return "backend.log(\""
+    return "table.log(\""
         + loggedName(element)
         + "\", "
         + elementAccess(element, loggedClass)
+        + ".name()"
         + ")";
   }
 }

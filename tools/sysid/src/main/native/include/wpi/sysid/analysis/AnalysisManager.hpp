@@ -43,12 +43,12 @@ class AnalysisManager {
     /**
      * The feedback controller preset used to calculate gains.
      */
-    FeedbackControllerPreset preset = presets::kDefault;
+    FeedbackControllerPreset preset = presets::DEFAULT;
 
     /**
      * The feedback controller loop type (position or velocity).
      */
-    FeedbackControllerLoopType type = FeedbackControllerLoopType::kVelocity;
+    FeedbackControllerLoopType type = FeedbackControllerLoopType::VELOCITY;
 
     /**
      * LQR parameters used for feedback gain calculation.
@@ -155,7 +155,7 @@ class AnalysisManager {
   /**
    * The keys (which contain sysid data) that are in the JSON to analyze.
    */
-  static constexpr const char* kJsonDataKeys[] = {
+  static constexpr const char* JSON_DATA_KEYS[] = {
       "quasistatic-forward", "quasistatic-reverse", "dynamic-forward",
       "dynamic-reverse"};
 

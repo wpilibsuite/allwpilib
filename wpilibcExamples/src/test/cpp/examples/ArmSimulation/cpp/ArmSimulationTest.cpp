@@ -13,22 +13,22 @@
 #include "Constants.hpp"
 #include "Robot.hpp"
 #include "wpi/hal/DriverStationTypes.h"
+#include "wpi/preferences/Preferences.hpp"
 #include "wpi/simulation/DriverStationSim.hpp"
 #include "wpi/simulation/JoystickSim.hpp"
 #include "wpi/simulation/PWMMotorControllerSim.hpp"
 #include "wpi/simulation/SimHooks.hpp"
 #include "wpi/units/time.hpp"
-#include "wpi/util/Preferences.hpp"
 
 class ArmSimulationTest {
   Robot robot;
   std::optional<std::thread> thread;
 
  public:
-  wpi::sim::PWMMotorControllerSim motorSim{kMotorPort};
+  wpi::sim::PWMMotorControllerSim motorSim{MOTOR_PORT};
   wpi::sim::EncoderSim encoderSim =
-      wpi::sim::EncoderSim::CreateForChannel(kEncoderAChannel);
-  wpi::sim::JoystickSim joystickSim{kJoystickPort};
+      wpi::sim::EncoderSim::CreateForChannel(ENCODER_A_CHANNEL);
+  wpi::sim::JoystickSim joystickSim{JOYSTICK_PORT};
 
   ArmSimulationTest() {
     wpi::sim::PauseTiming();
@@ -51,12 +51,12 @@ class ArmSimulationTest {
 TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
                  "[wpilibcExamples][examples][simulation][arm]") {
   wpi::units::degree_t setpoint =
-      GENERATE(kDefaultArmSetpoint, 25.0_deg, 50.0_deg);
+      GENERATE(DEFAULT_ARM_SETPOINT, 25.0_deg, 50.0_deg);
 
-  CHECK(wpi::Preferences::ContainsKey(kArmPositionKey));
-  CHECK(wpi::Preferences::ContainsKey(kArmPKey));
-  wpi::Preferences::SetDouble(kArmPositionKey, setpoint.value());
-  CHECK_THAT(wpi::Preferences::GetDouble(kArmPositionKey, NAN),
+  CHECK(wpi::Preferences::ContainsKey(ARM_POSITION_KEY));
+  CHECK(wpi::Preferences::ContainsKey(ARM_P_KEY));
+  wpi::Preferences::SetDouble(ARM_POSITION_KEY, setpoint.value());
+  CHECK_THAT(wpi::Preferences::GetDouble(ARM_POSITION_KEY, NAN),
              Catch::Matchers::WithinULP(setpoint.value(), 4));
 
   // teleop init
@@ -73,7 +73,7 @@ TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
 
     // Ensure arm is still at minimum angle.
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kMinAngle.value(), 2.0));
+               Catch::Matchers::WithinAbs(MIN_ANGLE.value(), 2.0));
   }
 
   {
@@ -105,7 +105,7 @@ TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
     wpi::sim::StepTiming(3_s);
 
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kMinAngle.value(), 2.0));
+               Catch::Matchers::WithinAbs(MIN_ANGLE.value(), 2.0));
   }
 
   {
@@ -139,6 +139,6 @@ TEST_CASE_METHOD(ArmSimulationTest, "ArmSimulationTest teleop",
 
     REQUIRE_THAT(motorSim.GetThrottle(), Catch::Matchers::WithinAbs(0.0, 0.05));
     CHECK_THAT(encoderSim.GetDistance(),
-               Catch::Matchers::WithinAbs(kMinAngle.value(), 2.0));
+               Catch::Matchers::WithinAbs(MIN_ANGLE.value(), 2.0));
   }
 }

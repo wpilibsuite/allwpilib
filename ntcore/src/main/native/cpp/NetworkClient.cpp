@@ -28,12 +28,12 @@
 using namespace wpi::nt;
 namespace uv = wpi::net::uv;
 
-static constexpr std::string_view kNetworkTablesServiceType =
+static constexpr std::string_view NETWORK_TABLES_SERVICE_TYPE =
     "_networktables._tcp";
-static constexpr uv::Timer::Time kReconnectRate{1000};
-static constexpr uv::Timer::Time kWebsocketHandshakeTimeout{500};
+static constexpr uv::Timer::Time RECONNECT_RATE{1000};
+static constexpr uv::Timer::Time WEBSOCKET_HANDSHAKE_TIMEOUT{500};
 // use a larger max message size for websockets
-static constexpr size_t kMaxMessageSize = 2 * 1024 * 1024;
+static constexpr size_t MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
 
 static std::string Ipv4AddressToString(unsigned int address) {
   return std::format("{}.{}.{}.{}", (address >> 24) & 0xff,
@@ -159,7 +159,7 @@ void NetworkClientBase::StartResolvers() {
     return;
   }
 
-  if (m_serverResolver->kind == ServerResolver::Kind::kSystemCore) {
+  if (m_serverResolver->kind == ServerResolver::Kind::SYSTEMCORE) {
     if (m_serverResolver->team) {
       m_systemCoreResolver = wpi::net::SystemCoreResolverClient::Create(
           m_loop, m_logger, *m_serverResolver->team, m_serverResolver->port);
@@ -175,7 +175,7 @@ void NetworkClientBase::StartResolvers() {
     }
   } else {
     m_mdnsResolver = wpi::net::MulticastResolverClient::Create(
-        m_loop, m_logger, kNetworkTablesServiceType);
+        m_loop, m_logger, NETWORK_TABLES_SERVICE_TYPE);
     if (m_mdnsResolver) {
       m_mdnsResolver->serviceResolved.connect(
           [this, resolverConfig = *m_serverResolver](
@@ -269,7 +269,7 @@ void NetworkClientBase::DoDisconnect(std::string_view reason) {
   m_connHandle = 0;
 
   // start trying to connect again
-  uv::Timer::SingleShot(m_loop, kReconnectRate, [this] {
+  uv::Timer::SingleShot(m_loop, RECONNECT_RATE, [this] {
     StartResolvers();
     if (m_parallelConnect) {
       m_parallelConnect->Disconnected();
@@ -286,7 +286,7 @@ NetworkClient::NetworkClient(
       m_timeSyncUpdated{std::move(timeSyncUpdated)} {
   m_loopRunner.ExecAsync([this](uv::Loop& loop) {
     m_parallelConnect = wpi::net::ParallelTcpConnector::Create(
-        loop, kReconnectRate, m_logger,
+        loop, RECONNECT_RATE, m_logger,
         [this](uv::Tcp& tcp) { TcpConnected(tcp); }, true);
 
     m_readLocalTimer = uv::Timer::Create(loop);
@@ -364,13 +364,13 @@ void NetworkClient::TcpConnected(uv::Tcp& tcp) {
     DEBUG4("Starting WebSocket client on {} port {}", ip, port);
   }
   wpi::net::WebSocket::ClientOptions options;
-  options.handshakeTimeout = kWebsocketHandshakeTimeout;
+  options.handshakeTimeout = WEBSOCKET_HANDSHAKE_TIMEOUT;
   wpi::util::SmallString<128> idBuf;
   auto ws = wpi::net::WebSocket::CreateClient(
       tcp, std::format("/nt/{}", wpi::net::EscapeURI(m_id, idBuf)), "",
       {"v4.1.networktables.first.wpi.edu", "networktables.first.wpi.edu"},
       options);
-  ws->SetMaxMessageSize(kMaxMessageSize);
+  ws->SetMaxMessageSize(MAX_MESSAGE_SIZE);
   ws->open.connect([this, &tcp, ws = ws.get()](std::string_view protocol) {
     if (m_connList.IsConnected()) {
       ws->Terminate(1006, "no longer needed");

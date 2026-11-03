@@ -1,15 +1,16 @@
-load("@allwpilib_pip_deps//:requirements.bzl", "requirement")
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
-load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("//apriltag:robotpy_native_build_info.bzl", "define_native_wrapper")
-load("//apriltag:robotpy_pybind_build_info.bzl", "apriltag_extension", "define_pybind_library")
 load("//shared/bazel/rules:cc_rules.bzl", "wpilib_cc_library", "wpilib_cc_shared_library", "wpilib_cc_static_library")
-load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 load("//shared/bazel/rules:jni_rules.bzl", "wpilib_jni_cc_library", "wpilib_jni_java_library")
 load("//shared/bazel/rules:packaging.bzl", "package_default_jni_project")
-load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info", "generate_robotpy_pybind_build_info")
-load("//shared/bazel/rules/robotpy:pytest_util.bzl", "robotpy_py_test")
+load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_native_wrapper_build_info")
+
+filegroup(
+    name = "test-resources",
+    srcs = glob(["src/test/resources/**"]),
+    visibility = ["//apriltag/src/test/java:__pkg__"],
+)
 
 filegroup(
     name = "doxygen-files",
@@ -31,25 +32,24 @@ cc_library(
     srcs = glob(["src/main/native/thirdparty/apriltag/src/**"]),
     hdrs = glob(["src/main/native/thirdparty/apriltag/include/**"]),
     copts = select({
-        "@platforms//os:osx": [
+        "@rules_cc//cc/compiler:clang": [
             "-Wno-format-nonliteral",
             "-Wno-gnu-zero-variadic-macro-arguments",
-            "-Wno-uninitialized",
             "-Wno-sign-compare",
             "-Wno-type-limits",
         ],
-        "@platforms//os:windows": [
+        "@rules_cc//cc/compiler:gcc": [
+            "-Wno-format-nonliteral",
+            "-Wno-maybe-uninitialized",
+            "-Wno-sign-compare",
+            "-Wno-type-limits",
+        ],
+        "@rules_cc//cc/compiler:msvc-cl": [
             "/wd4005",
             "/wd4018",
             "/wd4244",
             "/wd4267",
             "/wd4996",
-        ],
-        "@wpilib_toolchains//constraints/combined:is_linux": [
-            "-Wno-format-nonliteral",
-            "-Wno-maybe-uninitialized",
-            "-Wno-sign-compare",
-            "-Wno-type-limits",
         ],
     }),
     includes = ["src/main/native/thirdparty/apriltag/include/common"],
@@ -79,6 +79,8 @@ wpilib_cc_shared_library(
     name = "shared/apriltag",
     auto_export_windows_symbols = False,
     dynamic_deps = [
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
@@ -92,6 +94,8 @@ wpilib_cc_shared_library(
 wpilib_cc_static_library(
     name = "static/apriltag",
     static_deps = [
+        "//telemetry:static/telemetry",
+        "//tunables:static/tunables",
         "//wpimath:static/wpimath",
         "//wpiutil:static/wpiutil",
     ],
@@ -116,6 +120,8 @@ wpilib_cc_shared_library(
     auto_export_windows_symbols = False,
     dynamic_deps = [
         ":shared/apriltag",
+        "//telemetry:shared/telemetry",
+        "//tunables:shared/tunables",
         "//wpimath:shared/wpimath",
         "//wpiutil:shared/wpiutil",
     ],
@@ -132,53 +138,11 @@ wpilib_jni_java_library(
     native_libs = [":shared/apriltagjni"],
     visibility = ["//visibility:public"],
     deps = [
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
         "//wpimath:wpimath-java",
         "//wpiutil:wpiutil-java",
         "@bzlmodrio-opencv//libraries/java/opencv",
-    ],
-)
-
-cc_test(
-    name = "apriltag-cpp-test",
-    size = "small",
-    srcs = glob(["src/test/native/cpp/**/*.cpp"]),
-    tags = [
-        "no-asan",
-    ],
-    deps = [
-        ":apriltag",
-        "//thirdparty/catch2",
-    ],
-)
-
-wpilib_java_junit5_test(
-    name = "apriltag-java-test",
-    srcs = glob(["src/test/java/**/*.java"]),
-    resource_strip_prefix = "apriltag/src/test/resources",
-    resources = glob(["src/test/resources/**"]),
-    deps = [
-        ":apriltag-java",
-        "//wpimath:wpimath-java",
-        "//wpiutil:wpiutil-java",
-        "@bzlmodrio-opencv//libraries/java/opencv",
-        "@maven//:io_avaje_avaje_jsonb",
-    ],
-)
-
-cc_binary(
-    name = "DevMain-Cpp",
-    srcs = ["src/dev/native/cpp/main.cpp"],
-    deps = [
-        ":apriltag",
-    ],
-)
-
-java_binary(
-    name = "DevMain-Java",
-    srcs = ["src/dev/java/org/wpilib/vision/apriltag/DevMain.java"],
-    main_class = "org.wpilib.vision.apriltag.DevMain",
-    deps = [
-        ":apriltag-java",
     ],
 )
 
@@ -190,53 +154,11 @@ package_default_jni_project(
 
 generate_robotpy_native_wrapper_build_info(
     name = "robotpy-native-apriltag-generator",
-    pyproject_toml = "src/main/python/native-pyproject.toml",
+    pyproject_toml = "src/main/native/pyproject.toml",
     third_party_dirs = ["apriltag"],
 )
 
 define_native_wrapper(
     name = "robotpy-native-apriltag",
-    pyproject_toml = "src/main/python/native-pyproject.toml",
-)
-
-PYBIND_PKGCFG_DEPS = [
-    "//apriltag:native/apriltag/robotpy-native-apriltag.pc",
-    "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
-    "//wpimath:robotpy-wpimath.generated_pkgcfg_files",
-    "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
-    "//wpiutil:robotpy-wpiutil.generated_pkgcfg_files",
-]
-
-generate_robotpy_pybind_build_info(
-    name = "robotpy-apriltag-generator",
-    additional_srcs = [":robotpy-native-apriltag.copy_headers"],
-    package_root_file = "src/main/python/robotpy_apriltag/__init__.py",
-    pkgcfgs = PYBIND_PKGCFG_DEPS,
-    yaml_files = glob(["src/main/python/semiwrap/*.yml"]),
-)
-
-apriltag_extension(
-    srcs = ["src/main/python/robotpy_apriltag/src/main.cpp"],
-    includes = [
-        "src/main/python/datalog/",
-    ],
-)
-
-define_pybind_library(
-    name = "robotpy-apriltag",
-    pkgcfgs = PYBIND_PKGCFG_DEPS,
-)
-
-robotpy_py_test(
-    "python_tests",
-    srcs = glob(["src/test/python/**/*.py"]),
-    data = glob([
-        "src/test/python/*.png",
-        "src/test/python/*.jpg",
-    ]),
-    deps = [
-        ":robotpy-apriltag",
-        requirement("pytest"),
-        requirement("opencv-python"),
-    ],
+    pyproject_toml = "src/main/native/pyproject.toml",
 )

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: PJ Reiniger <pj.reiniger@gmail.com>
 Date: Tue, 3 May 2022 20:22:38 -0400
-Subject: [PATCH 14/34] Windows support
+Subject: [PATCH 14/32] Windows support
 
 ---
  llvm/lib/Support/ConvertUTF.cpp    | 105 +++++++++++++++++++++++++++++
@@ -10,7 +10,7 @@ Subject: [PATCH 14/34] Windows support
  3 files changed, 128 insertions(+), 16 deletions(-)
 
 diff --git a/llvm/lib/Support/ConvertUTF.cpp b/llvm/lib/Support/ConvertUTF.cpp
-index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf93904e766 100644
+index 0641e3cc6e53d3646a2617434e10f69df8cd9f68..0638c648492d783367559b5e053b62542d75ab0e 100644
 --- a/llvm/lib/Support/ConvertUTF.cpp
 +++ b/llvm/lib/Support/ConvertUTF.cpp
 @@ -62,11 +62,26 @@
@@ -40,7 +40,7 @@ index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf9
  /*
   * This code extensively uses fall-through switches.
   * Keep the compiler from warning about that.
-@@ -759,6 +774,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
+@@ -758,6 +773,96 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart,
  
     --------------------------------------------------------------------- */
  
@@ -138,7 +138,7 @@ index 63f92631d5b473cf9a69a06eddf4271304e8c730..835fdf2fd178b1e03596fd5e64bfddf9
  
  ConvertUTF_RESTORE_WARNINGS
 diff --git a/llvm/lib/Support/ErrorHandling.cpp b/llvm/lib/Support/ErrorHandling.cpp
-index fd5b46a2c7633391f6c7407483255963210aa056..0a7d0c3953994618043ca3058c321ef43eb1394f 100644
+index dbc020ce06b21b5470b4640455219b6ed91bc307..fbf06adadd5e962bd7c3a139e574b0a346dba12a 100644
 --- a/llvm/lib/Support/ErrorHandling.cpp
 +++ b/llvm/lib/Support/ErrorHandling.cpp
 @@ -60,7 +60,11 @@ static std::mutex BadAllocErrorHandlerMutex;
@@ -170,7 +170,7 @@ index fd5b46a2c7633391f6c7407483255963210aa056..0a7d0c3953994618043ca3058c321ef4
  }
  
  void llvm::reportFatalInternalError(const char *reason) {
-@@ -238,8 +234,14 @@ void LLVMResetFatalErrorHandler() {
+@@ -222,8 +218,14 @@ void llvm::llvm_unreachable_internal(const char *msg, const char *file,
  
  #ifdef _WIN32
  
@@ -187,7 +187,7 @@ index fd5b46a2c7633391f6c7407483255963210aa056..0a7d0c3953994618043ca3058c321ef4
  #include <ntstatus.h>
  #include <winerror.h>
 diff --git a/llvm/lib/Support/raw_ostream.cpp b/llvm/lib/Support/raw_ostream.cpp
-index 475ac02b5f06f83ee125e02473d17f3a677a2e4c..f8c0a38f6ccd82c844e69b4ffb6aefad223772e3 100644
+index 0414ba50c5daa07a5058a6194597282b27504293..3b8749841b9edb37fb47d7b3bbef3bfea759b3bc 100644
 --- a/llvm/lib/Support/raw_ostream.cpp
 +++ b/llvm/lib/Support/raw_ostream.cpp
 @@ -63,7 +63,17 @@
@@ -209,7 +209,7 @@ index 475ac02b5f06f83ee125e02473d17f3a677a2e4c..f8c0a38f6ccd82c844e69b4ffb6aefad
  #endif
  
  using namespace llvm;
-@@ -440,11 +450,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
+@@ -431,11 +441,7 @@ static bool write_console_impl(int FD, std::string_view Data) {
    if (auto EC = sys::windows::UTF8ToUTF16(Data, WideText))
      return false;
  
@@ -221,7 +221,7 @@ index 475ac02b5f06f83ee125e02473d17f3a677a2e4c..f8c0a38f6ccd82c844e69b4ffb6aefad
  
    size_t WCharsWritten = 0;
    do {
-@@ -519,7 +525,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
+@@ -514,7 +520,6 @@ void raw_fd_ostream::write_impl(const char *Ptr, size_t Size) {
        DWORD WinLastError = GetLastError();
        if (WinLastError == ERROR_BROKEN_PIPE ||
            (WinLastError == ERROR_NO_DATA && errno == EINVAL)) {

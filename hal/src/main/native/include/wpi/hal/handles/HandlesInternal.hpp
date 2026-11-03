@@ -44,7 +44,7 @@ class HandleBase {
   static void ResetGlobalHandles();
 
  protected:
-  int16_t m_version;
+  int16_t m_version = 0;
 };
 
 constexpr int16_t INVALID_HANDLE_INDEX = -1;

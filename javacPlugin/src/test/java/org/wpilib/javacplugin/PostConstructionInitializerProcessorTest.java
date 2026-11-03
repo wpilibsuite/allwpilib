@@ -7,7 +7,7 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -30,7 +30,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -38,8 +38,8 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take a parameter of type "
-            + "frc.robot.Example",
+        "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
+            + "frc.robot.Example.",
         error.getMessage(null));
   }
 
@@ -59,7 +59,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -83,7 +83,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -107,7 +107,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -131,7 +131,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -139,14 +139,16 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(2, compilation.errors().size());
     var error1 = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take exactly one parameter of type "
-            + "frc.robot.Example with a @PostConstructionInitializer.InitializedParam annotation",
+        "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
+            + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
+            + "annotation.",
         error1.getMessage(null));
 
     var error2 = compilation.errors().get(1);
     assertEquals(
-        "Static @PostConstructionInitializer method must take exactly one parameter of type "
-            + "frc.robot.Example with a @PostConstructionInitializer.InitializedParam annotation",
+        "[WPILib] Static @PostConstructionInitializer method must take exactly one parameter "
+            + "of type frc.robot.Example with a @PostConstructionInitializer.InitializedParam "
+            + "annotation.",
         error2.getMessage(null));
   }
 
@@ -169,7 +171,7 @@ class PostConstructionInitializerProcessorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .withProcessors(new PostConstructionInitializerProcessor())
             .compile(JavaFileObjects.forSourceString("frc.robot.Example", source));
 
@@ -177,8 +179,8 @@ class PostConstructionInitializerProcessorTest {
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Static @PostConstructionInitializer method must take a parameter of type "
-            + "frc.robot.Example",
+        "[WPILib] Static @PostConstructionInitializer method must take a parameter of type "
+            + "frc.robot.Example.",
         error.getMessage(null));
   }
 }

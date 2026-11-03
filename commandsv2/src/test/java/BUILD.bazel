@@ -1,0 +1,21 @@
+load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
+
+wpilib_java_junit5_test(
+    name = "java",
+    srcs = glob(["**/*.java"]),
+    resource_strip_prefix = "commandsv2/src/test/resources",
+    resources = ["//commandsv2:test-resources"],
+    deps = [
+        "//commandsv2:commandsv2-java",
+        "//hal:hal-java",
+        "//ntcore:ntcore-java",
+        "//telemetry:telemetry-java",
+        "//tunables:tunables-java",
+        "//wpiannotations",
+        "//wpilibj:wpilibj-java",
+        "//wpimath:wpimath-java",
+        "//wpiunits:wpiunits-java",
+        "//wpiutil:wpiutil-java",
+        "@maven//:org_mockito_mockito_core",
+    ],
+)

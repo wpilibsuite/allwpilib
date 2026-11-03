@@ -8,8 +8,6 @@ if TYPE_CHECKING:
     from .util import *
     from .compositiontestbase import SingleCompositionTestBase
 
-import pytest
-
 
 class RepeatCommandCompositionTest(SingleCompositionTestBase):
     def compose_single(self, member):

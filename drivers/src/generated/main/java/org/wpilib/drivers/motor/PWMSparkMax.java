@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * REV Robotics SPARK MAX Motor Controller.
@@ -34,12 +34,12 @@ public class PWMSparkMax extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public PWMSparkMax(final int channel) {
-    super("PWMSparkMax", channel);
+    super(channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(5);
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
+    UsageReporting.reportUsage("IO", getChannel(), "RevSparkMaxPWM");
   }
 }

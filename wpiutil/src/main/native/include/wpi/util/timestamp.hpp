@@ -11,13 +11,13 @@ namespace wpi::util {
 /**
  * The default implementation used for Now().
  * In general this is the time returned by the operating system.
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t NowDefault();
+int64_t NowDefault();
 
 /**
  * Set the implementation used by Now().
- * The implementation must return monotonic time in microseconds to maintain
+ * The implementation must return monotonic time in nanoseconds to maintain
  * the contract of Now().
  * The program start time is reset to the current time when this is called by
  * calling the new implementation.
@@ -26,32 +26,32 @@ uint64_t NowDefault();
  * implementation and original program start time, pass nullptr.
  * @param func Function called by Now() to return the time.
  */
-void SetNowImpl(uint64_t (*func)());
+void SetNowImpl(int64_t (*func)());
 
 /**
- * Return a value representing the current time in microseconds.
+ * Return a value representing the current time in nanoseconds.
  * This is a monotonic clock with an undefined epoch.
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t Now();
+int64_t Now();
 
 /**
  * Return the timestamp at which the program started.
- * This uses the same time base as Now(), in microseconds.
+ * This uses the same time base as Now(), in nanoseconds.
  * This is reset to the current time when SetNowImpl() is called with a non-null
  * implementation; if SetNowImpl(nullptr) is called, it is reset to the original
  * program start time.
  *
- * @return Program start time in microseconds.
+ * @return Program start time in nanoseconds.
  */
-uint64_t GetProgramStartTime();
+int64_t GetProgramStartTime();
 
 /**
- * Return the current system time in microseconds since the Unix epoch
+ * Return the current system time in nanoseconds since the Unix epoch
  * (January 1st, 1970 00:00 UTC).
  *
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t GetSystemTime();
+int64_t GetSystemTime();
 
 }  // namespace wpi::util

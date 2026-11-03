@@ -7,15 +7,15 @@ package org.wpilib.javacplugin;
 import static com.google.testing.compile.CompilationSubject.assertThat;
 import static com.google.testing.compile.Compiler.javac;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.javacplugin.CompileTestUtils.JAVA_VERSION_OPTIONS;
 import static org.wpilib.javacplugin.CompileTestUtils.getErrorSource;
-import static org.wpilib.javacplugin.CompileTestUtils.kJavaVersionOptions;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 import org.junit.jupiter.api.Test;
 
 class IncorrectCoroutineUseDetectorTest {
-  private static final String kCoroutineSource =
+  private static final String COROUTINE_SOURCE =
       """
       package org.wpilib.command3;
 
@@ -44,16 +44,18 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     assertEquals(7, error.getColumnNumber()); // leading "o" in "outerCoroutine.yield()"
   }
@@ -80,16 +82,18 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `innerCoroutine`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -118,16 +122,18 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `a` or `b`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `a` or `b`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -160,16 +166,18 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
     assertEquals(
-        "Coroutine `outerCoroutine` may not be in scope. Consider using `a`, `b`, or `c`",
+        "[WPILib] Coroutine `outerCoroutine` may not be in scope. Consider using `a`, `b`, or `c`."
+            + " If this is intentional, the error may be silenced with"
+            + " @SuppressWarnings(\"WPILib.CoroutineMayNotBeInScope\")",
         error.getMessage(null));
     // leading "o" in "outerCoroutine" passed to `method(outerCoroutine)`
     assertEquals(14, error.getColumnNumber());
@@ -195,15 +203,18 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(1, compilation.errors().size());
     var error = compilation.errors().get(0);
-    assertEquals("Captured coroutines may not be stored in fields", error.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error.getMessage(null));
   }
 
   @Test
@@ -229,21 +240,27 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).failed();
     assertEquals(2, compilation.errors().size());
 
     var error1 = compilation.errors().get(0);
-    assertEquals("Captured coroutines may not be stored in fields", error1.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error1.getMessage(null));
     assertEquals(11, error1.getLineNumber());
     assertEquals("coroutineField = outerCoroutine;", getErrorSource(error1));
 
     var error2 = compilation.errors().get(1);
-    assertEquals("Captured coroutines may not be stored in fields", error2.getMessage(null));
+    assertEquals(
+        "[WPILib] Captured coroutines may not be stored in fields. If this is intentional,"
+            + " the error may be silenced with @SuppressWarnings(\"WPILib.CoroutineCapture\")",
+        error2.getMessage(null));
     assertEquals("coroutineField = innerCoroutine;", getErrorSource(error2));
     assertEquals(12, error2.getLineNumber());
   }
@@ -266,9 +283,9 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();
@@ -300,9 +317,9 @@ class IncorrectCoroutineUseDetectorTest {
 
     Compilation compilation =
         javac()
-            .withOptions(kJavaVersionOptions)
+            .withOptions(JAVA_VERSION_OPTIONS)
             .compile(
-                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", kCoroutineSource),
+                JavaFileObjects.forSourceString("org.wpilib.command3.Coroutine", COROUTINE_SOURCE),
                 JavaFileObjects.forSourceString("wpilib.robot.Example", source));
 
     assertThat(compilation).succeededWithoutWarnings();

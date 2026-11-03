@@ -11,7 +11,7 @@ using namespace wpi::math;
 namespace {
 
 using StructType = wpi::util::Struct<wpi::math::Pose3d>;
-const Pose3d kExpectedData{
+const Pose3d EXPECTED_DATA{
     Pose3d{Translation3d{1.1_m, 2.2_m, 1.1_m},
            Rotation3d{Quaternion{1.91, 0.3504, 3.3, 1.74}}}};
 }  // namespace
@@ -19,10 +19,10 @@ const Pose3d kExpectedData{
 TEST_CASE("Pose3dStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   Pose3d unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.Translation() == unpacked_data.Translation());
-  CHECK(kExpectedData.Rotation() == unpacked_data.Rotation());
+  CHECK(EXPECTED_DATA.Translation() == unpacked_data.Translation());
+  CHECK(EXPECTED_DATA.Rotation() == unpacked_data.Rotation());
 }

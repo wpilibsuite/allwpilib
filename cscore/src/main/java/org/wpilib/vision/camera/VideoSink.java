@@ -12,13 +12,13 @@ public class VideoSink implements AutoCloseable {
   /** Video sink types. */
   public enum Kind {
     /** Unknown video sink type. */
-    kUnknown(0),
+    UNKNOWN(0),
     /** MJPEG video sink. */
-    kMjpeg(2),
+    MJPEG(2),
     /** CV video sink. */
-    kCv(4),
+    CV(4),
     /** Raw video sink. */
-    kRaw(8);
+    RAW(8);
 
     private final int value;
 
@@ -44,10 +44,10 @@ public class VideoSink implements AutoCloseable {
    */
   public static Kind getKindFromInt(int kind) {
     return switch (kind) {
-      case 2 -> Kind.kMjpeg;
-      case 4 -> Kind.kCv;
-      case 8 -> Kind.kRaw;
-      default -> Kind.kUnknown;
+      case 2 -> Kind.MJPEG;
+      case 4 -> Kind.CV;
+      case 8 -> Kind.RAW;
+      default -> Kind.UNKNOWN;
     };
   }
 
@@ -134,7 +134,7 @@ public class VideoSink implements AutoCloseable {
    * Get a property of the sink.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with the given name exists)
+   * @return Property (kind Property::NONE if no property with the given name exists)
    */
   public VideoProperty getProperty(String name) {
     return new VideoProperty(CameraServerJNI.getSinkProperty(m_handle, name));
@@ -215,7 +215,7 @@ public class VideoSink implements AutoCloseable {
    * Get a property of the associated source.
    *
    * @param name Property name
-   * @return Property (kind Property::kNone if no property with the given name exists or no source
+   * @return Property (kind Property::NONE if no property with the given name exists or no source
    *     connected)
    */
   public VideoProperty getSourceProperty(String name) {

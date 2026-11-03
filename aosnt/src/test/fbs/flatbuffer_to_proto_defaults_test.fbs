@@ -1,0 +1,16 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+// Scalars whose flatbuffer default is not protobuf's zero.
+
+namespace wpi.aosnt.testing;
+
+table Defaults {
+  mode:int = 5 (id: 0);
+  gain:double = 1.5 (id: 1);
+  enabled:bool = true (id: 2);
+  offset:float (id: 3);
+}
+
+root_type Defaults;

@@ -19,15 +19,15 @@ class VideoCamera : public VideoSource {
    */
   enum WhiteBalance {
     /// Fixed indoor white balance.
-    kFixedIndoor = 3000,
+    FIXED_INDOOR = 3000,
     /// Fixed outdoor white balance 1.
-    kFixedOutdoor1 = 4000,
+    FIXED_OUTDOOR1 = 4000,
     /// Fixed outdoor white balance 2.
-    kFixedOutdoor2 = 5000,
+    FIXED_OUTDOOR2 = 5000,
     /// Fixed fluorescent white balance 1.
-    kFixedFluorescent1 = 5100,
+    FIXED_FLUORESCENT1 = 5100,
     /// Fixed fluorescent white balance 2.
-    kFixedFluorescent2 = 5200
+    FIXED_FLUORESCENT2 = 5200
   };
 
   VideoCamera() = default;

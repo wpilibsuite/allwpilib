@@ -27,16 +27,16 @@ using namespace wpi::sim;
 }
 {% for stick in sticks %}
 void {{ ConsoleName }}ControllerSim::Set{{ stick.NameParts|map("capitalize")|join }}(double value) {
-  SetRawAxis({{ ConsoleName }}Controller::Axis::k{{ stick.NameParts|map("capitalize")|join }}, value);
+  SetRawAxis({{ ConsoleName }}Controller::Axis::{{ stick.ConstantName }}, value);
 }
 {% endfor -%}
 {% for trigger in triggers %}
 void {{ ConsoleName }}ControllerSim::Set{{ capitalize_first(trigger.name) }}Axis(double value) {
-  SetRawAxis({{ ConsoleName }}Controller::Axis::k{{ capitalize_first(trigger.name) }}, value);
+  SetRawAxis({{ ConsoleName }}Controller::Axis::{{ trigger.ConstantName }}, value);
 }
 {% endfor -%}
 {% for button in buttons %}
 void {{ ConsoleName }}ControllerSim::Set{{ capitalize_first(button.name) }}Button(bool value) {
-  SetRawButton({{ ConsoleName }}Controller::Button::k{{ capitalize_first(button.name) }}, value);
+  SetRawButton({{ ConsoleName }}Controller::Button::{{ button.ConstantName }}, value);
 }
 {% endfor -%}

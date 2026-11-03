@@ -20,7 +20,6 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import org.wpilib.hardware.bus.I2C;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Quaternion;
 import org.wpilib.math.geometry.Rotation2d;
@@ -31,6 +30,7 @@ import org.wpilib.units.measure.Distance;
 import org.wpilib.units.measure.Frequency;
 import org.wpilib.units.measure.LinearVelocity;
 import org.wpilib.util.ErrorMessages;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Driver for the goBILDA Pinpoint Odometry Computer.
@@ -304,7 +304,7 @@ public class GoBildaPinpoint implements AutoCloseable {
     }
 
     m_i2c = new I2C(port, deviceAddress);
-    HAL.reportUsage("I2C[" + port.value + "][" + deviceAddress + "]", "GoBildaPinpoint");
+    UsageReporting.reportUsage("I2C[" + port.value + "]", deviceAddress, "GoBildaPinpoint");
   }
 
   GoBildaPinpoint(I2C i2c) {

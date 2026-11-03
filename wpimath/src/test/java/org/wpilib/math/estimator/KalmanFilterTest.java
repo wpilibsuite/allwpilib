@@ -200,12 +200,12 @@ class KalmanFilterTest {
 
     var trajectory =
         DrivetrainSplineTrajectoryGenerator.generate(
-            List.of(new Pose2d(0.0, 0.0, Rotation2d.kZero), new Pose2d(5.0, 5.0, Rotation2d.kZero)),
+            List.of(new Pose2d(0.0, 0.0, Rotation2d.ZERO), new Pose2d(5.0, 5.0, Rotation2d.ZERO)),
             new TrajectoryConfig(2.0, 2.0));
 
     var lastVelocity = VecBuilder.fill(0.0, 0.0, 0.0);
 
-    for (var t = 0.0; t < trajectory.duration; t += dt) {
+    for (var t = 0.0; t < trajectory.duration(); t += dt) {
       var sample = trajectory.sampleAt(t);
 
       var y =
@@ -229,11 +229,11 @@ class KalmanFilterTest {
     }
 
     assertEquals(
-        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getX(),
+        trajectory.sampleAt(trajectory.duration()).pose.getTranslation().getX(),
         filter.getXhat(0),
         0.2);
     assertEquals(
-        trajectory.sampleAt(trajectory.duration).pose.getTranslation().getY(),
+        trajectory.sampleAt(trajectory.duration()).pose.getTranslation().getY(),
         filter.getXhat(1),
         0.2);
   }

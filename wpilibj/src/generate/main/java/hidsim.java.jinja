@@ -44,7 +44,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ stick.NameParts|map("capitalize")|join }}(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ stick.NameParts|map("capitalize")|join }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.{{ stick.ConstantName }}.value, value);
   }
 {% endfor -%}
 {% for trigger in triggers %}
@@ -54,7 +54,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(trigger.name) }}Axis(double value) {
-    setRawAxis({{ ConsoleName }}Controller.Axis.k{{ capitalize_first(trigger.name) }}.value, value);
+    setRawAxis({{ ConsoleName }}Controller.Axis.{{ trigger.ConstantName }}.value, value);
   }
 {% endfor -%}
 {% for button in buttons %}
@@ -64,7 +64,7 @@ public class {{ ConsoleName }}ControllerSim extends GenericHIDSim {
    * @param value the new value
    */
   public void set{{ capitalize_first(button.name) }}Button(boolean value) {
-    setRawButton({{ ConsoleName }}Controller.Button.k{{ capitalize_first(button.name) }}.value, value);
+    setRawButton({{ ConsoleName }}Controller.Button.{{ button.ConstantName }}.value, value);
   }
 {% endfor -%}
 }

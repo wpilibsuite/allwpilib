@@ -4,6 +4,8 @@
 
 package org.wpilib.math.geometry;
 
+import static org.wpilib.math.util.UnitConversions.radiansToRotations;
+import static org.wpilib.math.util.UnitConversions.rotationsToRadians;
 import static org.wpilib.units.Units.Radians;
 
 import io.avaje.jsonb.Json;
@@ -16,7 +18,6 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N2;
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.util.Nat;
-import org.wpilib.math.util.Units;
 import org.wpilib.units.measure.Angle;
 import org.wpilib.util.protobuf.ProtobufSerializable;
 import org.wpilib.util.struct.StructSerializable;
@@ -32,49 +33,49 @@ public final class Rotation2d
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kZero = new Rotation2d();
+  public static final Rotation2d ZERO = new Rotation2d();
 
   /**
    * A preallocated Rotation2d representing a clockwise rotation by π/2 rad (90°).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kCW_Pi_2 = new Rotation2d(-Math.PI / 2);
+  public static final Rotation2d CW_PI_2 = new Rotation2d(-Math.PI / 2);
 
   /**
    * A preallocated Rotation2d representing a clockwise rotation by 90° (π/2 rad).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kCW_90deg = kCW_Pi_2;
+  public static final Rotation2d CW_90DEG = CW_PI_2;
 
   /**
    * A preallocated Rotation2d representing a counterclockwise rotation by π/2 rad (90°).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kCCW_Pi_2 = new Rotation2d(Math.PI / 2);
+  public static final Rotation2d CCW_PI_2 = new Rotation2d(Math.PI / 2);
 
   /**
    * A preallocated Rotation2d representing a counterclockwise rotation by 90° (π/2 rad).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kCCW_90deg = kCCW_Pi_2;
+  public static final Rotation2d CCW_90DEG = CCW_PI_2;
 
   /**
    * A preallocated Rotation2d representing a counterclockwise rotation by π rad (180°).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d kPi = new Rotation2d(Math.PI);
+  public static final Rotation2d PI = new Rotation2d(Math.PI);
 
   /**
    * A preallocated Rotation2d representing a counterclockwise rotation by 180° (π rad).
    *
    * <p>This exists to avoid allocations for common rotations.
    */
-  public static final Rotation2d k180deg = kPi;
+  public static final Rotation2d k180deg = PI;
 
   @Json.Ignore private final double m_cos;
   @Json.Ignore private final double m_sin;
@@ -182,7 +183,7 @@ public final class Rotation2d
    * @return The rotation object with the desired angle value.
    */
   public static Rotation2d fromRotations(double rotations) {
-    return new Rotation2d(Units.rotationsToRadians(rotations));
+    return new Rotation2d(rotationsToRadians(rotations));
   }
 
   /**
@@ -316,7 +317,7 @@ public final class Rotation2d
    * @return The number of rotations of the Rotation2d.
    */
   public double getRotations() {
-    return Units.radiansToRotations(getRadians());
+    return radiansToRotations(getRadians());
   }
 
   /**

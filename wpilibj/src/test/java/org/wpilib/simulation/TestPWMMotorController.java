@@ -11,7 +11,7 @@ import org.wpilib.hardware.motor.PWMMotorController;
 final class TestPWMMotorController extends PWMMotorController {
   @SuppressWarnings("this-escape")
   TestPWMMotorController(int channel) {
-    super("TestPWMMotorController", channel);
+    super(channel);
 
     setBoundsMicroseconds(2003, 1550, 1500, 1460, 999);
     m_pwm.setOutputPeriod(5);

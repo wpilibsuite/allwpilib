@@ -2,18 +2,9 @@ import argparse
 import importlib.metadata
 import os
 import sys
-import typing
+from importlib.metadata import entry_points
 
 import wpilib
-
-if sys.version_info < (3, 10):
-
-    def entry_points(group):
-        eps = importlib.metadata.entry_points()
-        return eps.get(group, [])
-
-else:
-    entry_points = importlib.metadata.entry_points
 
 
 def _int_env_default(name: str, fallback: int) -> int:
@@ -83,7 +74,7 @@ class RunXrp:
         self,
         options: argparse.Namespace,
         project_path: "os.PathLike[str]",
-        robot_class: typing.Type[wpilib.RobotBase],
+        robot_class: type[wpilib.RobotBase],
     ):
         if "xrp" not in self.simexts:
             print(

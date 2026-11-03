@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 
@@ -37,6 +39,7 @@ class MyRobot(wpilib.TimedRobot):
             self.LED_SPACING,
         )
 
+    @override
     def robot_periodic(self) -> None:
         # Update the buffer with the rainbow animation
         self.scrolling_rainbow.apply_to(self.led_data)

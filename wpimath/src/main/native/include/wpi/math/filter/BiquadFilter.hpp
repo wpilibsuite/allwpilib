@@ -16,6 +16,7 @@
 #include "wpi/math/util/MathShared.hpp"
 #include "wpi/units/frequency.hpp"
 #include "wpi/util/SymbolExports.hpp"
+#include "wpi/util/UsageReporting.hpp"
 
 namespace wpi::math {
 
@@ -75,8 +76,7 @@ class WPILIB_DLLEXPORT BiquadFilter {
 
     if (!std::is_constant_evaluated()) {
       ++instances;
-      wpi::math::MathSharedStore::ReportUsage("BiquadFilter",
-                                              std::to_string(instances));
+      wpi::util::ReportUsage("BiquadFilter", std::to_string(instances));
     }
   }
 

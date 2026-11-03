@@ -26,7 +26,9 @@ from shared.generation import (
 
 def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
     with schema_file.open(encoding="utf-8") as f:
-        controllers = json.load(f)
+        controllers = [
+            _normalize_hid_controller(controller) for controller in json.load(f)
+        ]
 
     # Java files
     java_subdirectory = "main/java/org/wpilib/command3/button"
@@ -67,6 +69,23 @@ def _is_trigger_axis(name: str) -> bool:
         "ZL",
         "ZR",
     }
+
+
+def _with_constant_name(entry: dict):
+    normalized = dict(entry)
+    normalized["ConstantName"] = _constant_name(entry["name"])
+    return normalized
+
+
+def _normalize_hid_controller(controller: dict):
+    normalized = dict(controller)
+    normalized["buttons"] = [
+        _with_constant_name(button) for button in controller["buttons"]
+    ]
+    normalized["triggers"] = [
+        _with_constant_name(trigger) for trigger in controller.get("triggers", [])
+    ]
+    return normalized
 
 
 def _normalize_command_mapping(mapping: dict[str, int]):
@@ -133,7 +152,6 @@ def generate_first_ds_hids(
     template = env.get_template("first_ds_commandhid.java.jinja")
     for controller in controllers:
         controller_name = f"Command{controller['ClassName']}Controller.java"
-        print(root_path, controller_name)
         write_file(root_path, controller_name, template.render(controller))
 
 

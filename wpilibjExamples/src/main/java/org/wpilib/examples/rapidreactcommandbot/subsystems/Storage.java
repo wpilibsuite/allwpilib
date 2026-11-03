@@ -15,9 +15,9 @@ import org.wpilib.hardware.discrete.DigitalInput;
 
 @Logged
 public class Storage extends SubsystemBase {
-  private final PWMSparkMax motor = new PWMSparkMax(StorageConstants.kMotorPort);
+  private final PWMSparkMax motor = new PWMSparkMax(StorageConstants.MOTOR_PORT);
   @NotLogged // We'll log a more meaningful boolean instead
-  private final DigitalInput ballSensor = new DigitalInput(StorageConstants.kBallSensorPort);
+  private final DigitalInput ballSensor = new DigitalInput(StorageConstants.BALL_SENSOR_PORT);
 
   // Expose trigger from subsystem to improve readability and ease
   // inter-subsystem communications

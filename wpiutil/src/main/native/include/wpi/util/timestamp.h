@@ -13,13 +13,13 @@ extern "C" {
 /**
  * The default implementation used for Now().
  * In general this is the time returned by the operating system.
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t WPI_NowDefault(void);
+int64_t WPI_NowDefault(void);
 
 /**
  * Set the implementation used by WPI_Now().
- * The implementation must return monotonic time in microseconds to maintain
+ * The implementation must return monotonic time in nanoseconds to maintain
  * the contract of WPI_Now().
  * The program start time is reset to the current time when this is called by
  * calling the new implementation.
@@ -28,33 +28,33 @@ uint64_t WPI_NowDefault(void);
  * implementation and original program start time, pass NULL.
  * @param func Function called by WPI_Now() to return the time.
  */
-void WPI_SetNowImpl(uint64_t (*func)(void));
+void WPI_SetNowImpl(int64_t (*func)(void));
 
 /**
- * Return a value representing the current time in microseconds.
+ * Return a value representing the current time in nanoseconds.
  * The epoch is not defined.
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t WPI_Now(void);
+int64_t WPI_Now(void);
 
 /**
  * Return the timestamp at which the program started.
- * This uses the same time base as WPI_Now(), in microseconds.
+ * This uses the same time base as WPI_Now(), in nanoseconds.
  * This is reset to the current time when WPI_SetNowImpl() is called with a
  * non-NULL implementation; if WPI_SetNowImpl(NULL) is called, it is reset to
  * the original program start time.
  *
- * @return Program start time in microseconds.
+ * @return Program start time in nanoseconds.
  */
-uint64_t WPI_GetProgramStartTime(void);
+int64_t WPI_GetProgramStartTime(void);
 
 /**
- * Return the current system time in microseconds since the Unix epoch
+ * Return the current system time in nanoseconds since the Unix epoch
  * (January 1st, 1970 00:00 UTC).
  *
- * @return Time in microseconds.
+ * @return Time in nanoseconds.
  */
-uint64_t WPI_GetSystemTime(void);
+int64_t WPI_GetSystemTime(void);
 
 #ifdef __cplusplus
 }  // extern "C"

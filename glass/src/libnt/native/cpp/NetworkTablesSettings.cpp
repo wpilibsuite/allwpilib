@@ -134,7 +134,7 @@ static void LimitPortRange(int* port) {
   }
 }
 
-static constexpr int kSystemServerPort = 6810;
+static constexpr int SYSTEM_SERVER_PORT = 6810;
 
 bool NetworkTablesSettings::Display() {
   m_mode.Combo("Mode", m_serverOption ? 3 : 2);
@@ -156,7 +156,7 @@ bool NetworkTablesSettings::Display() {
       }
       ImGui::SameLine();
       if (ImGui::SmallButton("System Server")) {
-        m_port = kSystemServerPort;
+        m_port = SYSTEM_SERVER_PORT;
       }
       ImGui::InputText("Network Identity", &m_clientName);
       if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {

@@ -26,7 +26,7 @@ public class RobotContainer {
   private final Command driveHalfVelocity = Commands.runOnce(() -> robotDrive.setMaxOutput(0.5));
 
   // The driver's controller
-  CommandGamepad driverController = new CommandGamepad(OIConstants.kDriverControllerPort);
+  CommandGamepad driverController = new CommandGamepad(OIConstants.DRIVER_CONTROLLER_PORT);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

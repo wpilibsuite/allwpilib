@@ -40,18 +40,18 @@ class Analyzer : public wpi::glass::View {
    * The different display and processing states for the GUI
    */
   enum class AnalyzerState {
-    kWaitingForData,
-    kNominalDisplay,
-    kVelocityThresholdError,
-    kTestDurationError,
-    kGeneralDataError,
-    kMissingTestsError,
-    kFileError
+    WAITING_FOR_DATA,
+    NOMINAL_DISPLAY,
+    VELOCITY_THRESHOLD_ERROR,
+    TEST_DURATION_ERROR,
+    GENERAL_DATA_ERROR,
+    MISSING_TESTS_ERROR,
+    FILE_ERROR
   };
   /**
    * The different motor controller timing presets that can be used.
    */
-  static constexpr const char* kPresetNames[] = {"Default",
+  static constexpr const char* PRESET_NAMES[] = {"Default",
                                                  "WPILib",
                                                  "CTRE Phoenix 5",
                                                  "CTRE Phoenix 6",
@@ -63,12 +63,12 @@ class Analyzer : public wpi::glass::View {
   /**
    * The different control loops that can be used.
    */
-  static constexpr const char* kLoopTypes[] = {"Position", "Velocity"};
+  static constexpr const char* LOOP_TYPES[] = {"Position", "Velocity"};
 
   /**
    * Linear drivetrain analysis subsets
    */
-  static constexpr const char* kDatasets[] = {"Combined", "Left", "Right"};
+  static constexpr const char* DATASETS[] = {"Combined", "Left", "Right"};
 
   /**
    * Creates the Analyzer widget
@@ -199,7 +199,7 @@ class Analyzer : public wpi::glass::View {
   void HandleError(std::string_view msg);
 
   // State of the Display GUI
-  AnalyzerState m_state = AnalyzerState::kWaitingForData;
+  AnalyzerState m_state = AnalyzerState::WAITING_FOR_DATA;
 
   // Stores the exception message.
   std::string m_exception;

@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Stream;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.trajectory.proto.HolonomicTrajectoryProto;
 
@@ -62,14 +63,20 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param transform The transform to apply to the trajectory.
    * @return The transformed trajectory.
    */
-  @Override
   public HolonomicTrajectory transformBy(Transform2d transform) {
     Pose2d firstPose = start().pose;
     Pose2d transformedFirstPose = firstPose.transformBy(transform);
 
+    // The whole trajectory is rigidly rotated by the transform's rotation, so
+    // the field-relative velocities and accelerations rotate by the same amount.
+    Rotation2d rotation = transform.getRotation();
+
     HolonomicSample transformedFirstSample =
         new HolonomicSample(
-            start().time, transformedFirstPose, start().velocity, start().acceleration);
+            start().time,
+            transformedFirstPose,
+            start().velocity.toFieldRelative(rotation),
+            start().acceleration.toFieldRelative(rotation));
 
     Stream<HolonomicSample> transformedSamples =
         samples.stream()
@@ -79,8 +86,8 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
                     new HolonomicSample(
                         sample.time,
                         transformedFirstPose.plus(sample.pose.minus(firstPose)),
-                        sample.velocity,
-                        sample.acceleration));
+                        sample.velocity.toFieldRelative(rotation),
+                        sample.acceleration.toFieldRelative(rotation)));
 
     return new HolonomicTrajectory(
         Stream.concat(Stream.of(transformedFirstSample), transformedSamples).toList());
@@ -92,7 +99,6 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param other the other trajectory to concatenate with this one.
    * @return a new trajectory that is the concatenation of this trajectory and the other trajectory.
    */
-  @Override
   public HolonomicTrajectory concatenate(Trajectory<HolonomicSample> other) {
     if (other.samples.isEmpty()) {
       return this;
@@ -100,10 +106,7 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
 
     var timeShifted =
         other.samples.stream()
-            .map(
-                s ->
-                    new HolonomicSample(
-                        s.time + this.duration, s.pose, s.velocity, s.acceleration));
+            .map(s -> new HolonomicSample(s.time + duration(), s.pose, s.velocity, s.acceleration));
 
     return new HolonomicTrajectory(Stream.concat(samples.stream(), timeShifted).toList());
   }
@@ -114,7 +117,6 @@ public class HolonomicTrajectory extends Trajectory<HolonomicSample> {
    * @param other the pose to which the trajectory should be relative.
    * @return a new trajectory relative to the given pose.
    */
-  @Override
   public HolonomicTrajectory relativeTo(Pose2d other) {
     return new HolonomicTrajectory(samples.stream().map(s -> s.relativeTo(other)).toList());
   }

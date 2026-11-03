@@ -23,10 +23,10 @@ class StringSource;
 class DSModel : public Model {
  public:
   enum RobotMode {
-    kUnknown = 0,
-    kAutonomous = 1,
-    kTeleop = 2,
-    kTest = 3,
+    UNKNOWN = 0,
+    AUTONOMOUS = 1,
+    TELEOP = 2,
+    TEST = 3,
   };
 
   virtual BooleanSource* GetFmsAttachedData() = 0;

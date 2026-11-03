@@ -1,0 +1,24 @@
+defaults:
+  default_args_as_kw_only: true
+classes:
+  wpi::telemetry::python::PyTelemetryTable:
+    rename: TelemetryTable
+    methods:
+      PyTelemetryTable:
+        ignore: true
+      GetPath:
+        no_release_gil: true
+      SetType:
+        no_release_gil: true
+      GetType:
+        no_release_gil: true
+      HasType:
+        no_release_gil: true
+      GetTable:
+        no_release_gil: true
+      KeepDuplicates:
+        no_release_gil: true
+      SetProperty:
+        no_release_gil: true
+      Log:
+        no_release_gil: true

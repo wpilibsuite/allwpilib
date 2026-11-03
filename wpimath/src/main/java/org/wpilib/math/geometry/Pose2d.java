@@ -31,7 +31,7 @@ public final class Pose2d
    *
    * <p>This exists to avoid allocations for common poses.
    */
-  public static final Pose2d kZero = new Pose2d();
+  public static final Pose2d ZERO = new Pose2d();
 
   @Json.Property("translation")
   private final Translation2d m_translation;
@@ -41,8 +41,8 @@ public final class Pose2d
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public Pose2d() {
-    m_translation = Translation2d.kZero;
-    m_rotation = Rotation2d.kZero;
+    m_translation = Translation2d.ZERO;
+    m_rotation = Rotation2d.ZERO;
   }
 
   /**

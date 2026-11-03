@@ -25,8 +25,8 @@ class Drivetrain {
              wpi::units::second_t period);
   void UpdateOdometry();
 
-  static constexpr auto kMaxVelocity = 3.0_mps;  // 3 meters per second
-  static constexpr wpi::units::radians_per_second_t kMaxAngularVelocity{
+  static constexpr auto MAX_VELOCITY = 3.0_mps;  // 3 meters per second
+  static constexpr wpi::units::radians_per_second_t MAX_ANGULAR_VELOCITY{
       std::numbers::pi};  // 1/2 rotation per second
 
  private:

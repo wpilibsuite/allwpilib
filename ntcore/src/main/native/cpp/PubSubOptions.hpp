@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <limits>
+
 #include "wpi/nt/ntcore_cpp.hpp"
 
 namespace wpi::nt {
@@ -29,8 +31,18 @@ class PubSubOptionsImpl : public PubSubOptions {
     }
   }
 
-  static constexpr unsigned int kDefaultPeriodicMs = 100;
-  unsigned int periodicMs = kDefaultPeriodicMs;
+  static constexpr unsigned int RoundPeriodicMs(unsigned int periodicMs) {
+    constexpr unsigned int RESOLUTION = 10;
+    unsigned int rounded = periodicMs - periodicMs % RESOLUTION;
+    if (periodicMs % RESOLUTION >= RESOLUTION / 2 &&
+        rounded <= std::numeric_limits<unsigned int>::max() - RESOLUTION) {
+      rounded += RESOLUTION;
+    }
+    return rounded;
+  }
+
+  static constexpr unsigned int DEFAULT_PERIODIC_MS = 100;
+  unsigned int periodicMs = DEFAULT_PERIODIC_MS;
 };
 
 }  // namespace wpi::nt

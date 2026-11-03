@@ -16,28 +16,28 @@
 #include "wpi/util/PixelFormat.hpp"
 
 // Quirk: exposure auto is 3 for on, 1 for off
-#define kPropertyAutoExposureOn 3
-#define kPropertyAutoExposureOff 1
+#define PROPERTY_AUTO_EXPOSURE_ON 3
+#define PROPERTY_AUTO_EXPOSURE_OFF 1
 
 // Property names
-#define kPropertyBrightness "brightness"
-#define kPropertyWhiteBalance "white_balance_temperature"
-#define kPropertyExposure "raw_exposure_time_absolute"
-#define kPropertyContrast "raw_contrast"
-#define kPropertySaturation "raw_saturation"
-#define kPropertySharpness "raw_sharpness"
-#define kPropertyGain "gain"
-#define kPropertyGamma "gamma"
-#define kPropertyHue "raw_hue"
-#define kPropertyFocus "focus_absolute"
-#define kPropertyZoom "zoom"
-#define kPropertyBackLightCompensation "backlight_compensation"
-#define kPropertyPowerLineFrequency "power_line_frequency"
+#define PROPERTY_BRIGHTNESS "brightness"
+#define PROPERTY_WHITE_BALANCE "white_balance_temperature"
+#define PROPERTY_EXPOSURE "raw_exposure_time_absolute"
+#define PROPERTY_CONTRAST "raw_contrast"
+#define PROPERTY_SATURATION "raw_saturation"
+#define PROPERTY_SHARPNESS "raw_sharpness"
+#define PROPERTY_GAIN "gain"
+#define PROPERTY_GAMMA "gamma"
+#define PROPERTY_HUE "raw_hue"
+#define PROPERTY_FOCUS "focus_absolute"
+#define PROPERTY_ZOOM "zoom"
+#define PROPERTY_BACK_LIGHT_COMPENSATION "backlight_compensation"
+#define PROPERTY_POWER_LINE_FREQUENCY "power_line_frequency"
 
 // Auto property names
-#define kPropertyAutoExposure "exposure_auto"
-#define kPropertyAutoWhiteBalance "white_balance_automatic"
-#define kPropertyAutoFocus "focus_auto"
+#define PROPERTY_AUTO_EXPOSURE "exposure_auto"
+#define PROPERTY_AUTO_WHITE_BALANCE "white_balance_automatic"
+#define PROPERTY_AUTO_FOCUS "focus_auto"
 
 namespace wpi::cs {
 class UsbCameraImpl;

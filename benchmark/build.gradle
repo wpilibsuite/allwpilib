@@ -36,13 +36,6 @@ application {
     mainClass = 'wpilib.robot.Main'
 }
 
-apply plugin: 'com.gradleup.shadow'
-
-shadowJar {
-    mergeServiceFiles()
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
 repositories {
     maven {
         url = 'https://frcmaven.wpi.edu/artifactory/ex-mvn'
@@ -56,6 +49,8 @@ dependencies {
     implementation project(':epilogue-runtime')
     implementation project(':hal')
     implementation project(':ntcore')
+    implementation project(':telemetry')
+    implementation project(':tunables')
     implementation project(':wpilibj')
     implementation project(':commandsv2')
     implementation project(':wpimath')
@@ -70,6 +65,8 @@ dependencies {
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
     onlyIf { false }
 }
+
+def projectJarTask = jar
 
 deploy {
     targets {
@@ -109,7 +106,7 @@ deploy {
                     excludes.add('**/*.so.debug')
                     excludes.add('**/*.so.*.debug')
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/benchmarkCpp' > /home/systemcore/robotCommand")
+                        ctx.execute("echo 'LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/benchmarkCpp' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                         ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCpp\"")
                         ctx.execute('chmod +x benchmarkCpp')
@@ -119,9 +116,9 @@ deploy {
                 benchmarkCppStatic(NativeExecutableArtifact) {
                     libraryDirectory = '/home/systemcore/wpilib/third-party/lib'
                     postdeploy << { ctx ->
-                        ctx.execute("echo '/home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
+                        ctx.execute("echo ''LD_LIBRARY_PATH=/home/systemcore/wpilib/third-party/lib /home/systemcore/benchmarkCppStatic' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
-                        ctx.execute("setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCppStatic\"")
+                        ctx.execute("sudo setcap cap_sys_nice+eip \"/home/systemcore/benchmarkCppStatic\"")
                         ctx.execute('chmod +x benchmarkCppStatic')
                     }
                 }
@@ -133,10 +130,13 @@ deploy {
                     excludes.add('**/*.so.*.debug')
                 }
 
-                benchmarkJava(JavaArtifact) {
-                    jarTask = shadowJar
+                benchmarkJava(JavaClasspathArtifact) {
+                    it.directory = "wpilib/allwpilibclasspath"
+                    it.deleteOldFiles = true
+                    it.setJar(projectJarTask)
+                    it.setConfiguration(configurations.runtimeClasspath)
                     postdeploy << { ctx ->
-                        ctx.execute("echo 'java -XX:+UseSerialGC -Djava.library.path=/home/systemcore/wpilib/third-party/lib -Djava.lang.invoke.stringConcat=BC_SB -jar /home/systemcore/benchmark-all.jar' > /home/systemcore/robotCommand")
+                        ctx.execute("echo '/usr/bin/java -XX:+UseG1GC -Djava.library.path=/home/systemcore/wpilib/third-party/lib --add-opens java.base/jdk.internal.vm=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --enable-native-access=ALL-UNNAMED -cp \"/home/systemcore/wpilib/allwpilibclasspath/*\" wpilib.robot.Main' > /home/systemcore/robotCommand")
                         ctx.execute("chmod +x /home/systemcore/robotCommand; chown systemcore /home/systemcore/robotCommand")
                     }
                 }
@@ -160,7 +160,6 @@ eclipse {
 
 tasks.register('deployJava') {
     try {
-        dependsOn tasks.named('deployjresystemcore')
         dependsOn tasks.named('deploybenchmarkJavasystemcore')
         dependsOn tasks.named('deploybenchmarkCppJavasystemcore') // Deploying shared C++ is how to get the Java shared libraries.
     } catch (ignored) {
@@ -210,10 +209,8 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                    if (binary.buildType.name == 'debug') {
-                        deploy.targets.systemcore.artifacts.benchmarkCpp.binary = binary
-                        deploy.targets.systemcore.artifacts.benchmarkCppJava.binary = binary
-                    }
+                    deploy.targets.systemcore.artifacts.benchmarkCpp.binary = binary
+                    deploy.targets.systemcore.artifacts.benchmarkCppJava.binary = binary
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'shared'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'shared'
@@ -234,6 +231,8 @@ model {
                 lib project: ':wpinet', library: 'wpinetJNIShared', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'shared'
                 lib project: ':wpiutil', library: 'wpiutilJNIShared', linkage: 'shared'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'shared'
+                lib project: ':tunables', library: 'tunables', linkage: 'shared'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"
@@ -269,9 +268,7 @@ model {
             }
             binaries.all { binary ->
                 if (binary.targetPlatform.name == nativeUtils.wpi.platforms.systemcore) {
-                    if (binary.buildType.name == 'debug') {
-                        deploy.targets.systemcore.artifacts.benchmarkCppStatic.binary = binary
-                    }
+                    deploy.targets.systemcore.artifacts.benchmarkCppStatic.binary = binary
                 }
                 lib project: ':apriltag', library: 'apriltag', linkage: 'static'
                 lib project: ':cameraserver', library: 'cameraserver', linkage: 'static'
@@ -286,6 +283,8 @@ model {
                 lib project: ':wpimath', library: 'wpimath', linkage: 'static'
                 lib project: ':wpinet', library: 'wpinet', linkage: 'static'
                 lib project: ':wpiutil', library: 'wpiutil', linkage: 'static'
+                lib project: ':telemetry', library: 'telemetry', linkage: 'static'
+                lib project: ':tunables', library: 'tunables', linkage: 'static'
                 if (binary.targetPlatform.operatingSystem.isWindows()) {
                     // Shlwapi.lib is needed for SHGetValueA() inside thirdparty benchmark
                     binary.linker.args << "Shlwapi.lib"

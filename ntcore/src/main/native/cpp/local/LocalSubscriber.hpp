@@ -18,7 +18,7 @@
 namespace wpi::nt::local {
 
 struct LocalSubscriber {
-  static constexpr auto kType = Handle::SUBSCRIBER;
+  static constexpr auto TYPE = Handle::SUBSCRIBER;
 
   LocalSubscriber(NT_Subscriber handle, LocalTopic* topic, PubSubConfig config)
       : handle{handle},

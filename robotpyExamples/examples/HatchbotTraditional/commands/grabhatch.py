@@ -4,6 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import commands2
 from subsystems.hatchsubsystem import HatchSubsystem
 
@@ -13,8 +15,10 @@ class GrabHatch(commands2.Command):
         self.hatch = hatch
         self.add_requirements(hatch)
 
+    @override
     def initialize(self) -> None:
         self.hatch.grab_hatch()
 
+    @override
     def is_finished(self) -> bool:
         return True

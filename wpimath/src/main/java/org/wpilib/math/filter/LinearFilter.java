@@ -6,7 +6,7 @@ package org.wpilib.math.filter;
 
 import java.util.Arrays;
 import org.ejml.simple.SimpleMatrix;
-import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.util.UsageReporting;
 import org.wpilib.util.container.DoubleCircularBuffer;
 
 /**
@@ -77,7 +77,7 @@ public class LinearFilter {
     m_outputGains = Arrays.copyOf(fbGains, fbGains.length);
 
     instances++;
-    MathSharedStore.reportUsage("LinearFilter", String.valueOf(instances));
+    UsageReporting.reportUsage("LinearFilter", String.valueOf(instances));
   }
 
   /**

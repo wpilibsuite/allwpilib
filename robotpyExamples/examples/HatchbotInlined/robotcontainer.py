@@ -4,7 +4,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
-import wpilib
+import telemetry
+import tunables
 
 import commands2
 import commands2.button
@@ -64,14 +65,14 @@ class RobotContainer:
         )
 
         # Chooser
-        self.chooser = wpilib.SendableChooser()
+        self.chooser = tunables.Selectable()
 
         # Add commands to the autonomous command chooser
-        self.chooser.set_default_option("Simple Auto", self.simple_auto)
-        self.chooser.add_option("Complex Auto", self.complex_auto)
+        self.chooser.add_default("Simple Auto", self.simple_auto)
+        self.chooser.add("Complex Auto", self.complex_auto)
 
         # Put the chooser on the dashboard
-        wpilib.SmartDashboard.put_data("Autonomous", self.chooser)
+        tunables.publish("Autonomous", self.chooser)
 
     def configure_button_bindings(self):
         """
@@ -95,3 +96,7 @@ class RobotContainer:
 
     def get_autonomous_command(self) -> commands2.Command:
         return self.chooser.get_selected()
+
+    def update_telemetry(self) -> None:
+        telemetry.log("Drivetrain", self.drive_subsystem)
+        telemetry.log("HatchSubsystem", self.hatch_subsystem)

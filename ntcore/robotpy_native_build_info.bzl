@@ -6,7 +6,9 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + ["//ntcore:generated-native-include-files"],
+        srcs = native.glob(["src/main/native/include/**"]) + ["//ntcore:generated-native-include-files"] + [
+            "//:LICENSE.md",
+        ],
         out = "native/ntcore/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
@@ -53,7 +55,7 @@ def define_native_wrapper(name, pyproject_toml = None):
         ],
         summary = "WPILib NetworkTables Library",
         requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpinet==0.0.0", "robotpy-native-datalog==0.0.0"],
-        python_requires = ">=3.11",
+        python_requires = ">=3.12",
         strip_path_prefixes = ["ntcore"],
         entry_points = {
             "pkg_config": [

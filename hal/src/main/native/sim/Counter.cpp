@@ -13,13 +13,13 @@
 
 namespace wpi::hal {
 
-LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
+LimitedHandleResource<HAL_CounterHandle, Counter, NUM_COUNTERS,
                       HAL_HandleEnum::COUNTER>* counterHandles;
 }  // namespace wpi::hal
 
 namespace wpi::hal::init {
 void InitializeCounter() {
-  static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
+  static LimitedHandleResource<HAL_CounterHandle, Counter, NUM_COUNTERS,
                                HAL_HandleEnum::COUNTER>
       cH;
   counterHandles = &cH;

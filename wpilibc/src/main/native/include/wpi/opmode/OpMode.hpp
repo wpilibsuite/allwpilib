@@ -61,6 +61,17 @@ class OpMode {
   virtual void End() {}
 
   /**
+   * Called when the opmode is no longer selected on the DS or after an enabled
+   * run ends, even if the opmode was never started. The framework removes the
+   * opmode's periodic callbacks before calling this method and will not reuse
+   * the object afterward.
+   *
+   * This lifecycle cleanup does not depend on object destruction; other
+   * references may keep the object alive after this method returns.
+   */
+  virtual void Close() {}
+
+  /**
    * Returns a vector of custom periodic callbacks to be executed while the
    * opmode is enabled.
    *

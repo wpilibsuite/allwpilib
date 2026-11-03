@@ -18,8 +18,9 @@
 
 using namespace wpi::net;
 
-static constexpr std::string_view kSystemCoreServiceType = "_SystemCore._tcp";
-static constexpr std::string_view kSystemCoreServicePrefix = "SystemCore-FIRST";
+static constexpr std::string_view SYSTEM_CORE_SERVICE_TYPE = "_SystemCore._tcp";
+static constexpr std::string_view SYSTEM_CORE_SERVICE_PREFIX =
+    "SystemCore-FIRST";
 
 static std::string Ipv4AddressToString(uint32_t address) {
   return std::format("{}.{}.{}.{}", (address >> 24) & 0xff,
@@ -66,8 +67,8 @@ SystemCoreResolverClient::SystemCoreResolverClient(
 SystemCoreResolverClient::~SystemCoreResolverClient() = default;
 
 bool SystemCoreResolverClient::Init() {
-  m_resolver =
-      MulticastResolverClient::Create(m_loop, m_logger, kSystemCoreServiceType);
+  m_resolver = MulticastResolverClient::Create(m_loop, m_logger,
+                                               SYSTEM_CORE_SERVICE_TYPE);
   if (!m_resolver) {
     return false;
   }
@@ -91,7 +92,7 @@ void SystemCoreResolverClient::Close() {
 
 void SystemCoreResolverClient::HandleResolved(
     MulticastResolverClient::ServiceData data) {
-  if (!wpi::util::starts_with(data.serviceName, kSystemCoreServicePrefix)) {
+  if (!wpi::util::starts_with(data.serviceName, SYSTEM_CORE_SERVICE_PREFIX)) {
     return;
   }
 

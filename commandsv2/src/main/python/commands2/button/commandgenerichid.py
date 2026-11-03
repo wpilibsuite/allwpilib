@@ -1,6 +1,6 @@
 # validated: 2024-01-20 DS 92149efa11fa button/CommandGenericHID.java
 import threading
-from typing import ClassVar, Optional, Union, final
+from typing import ClassVar, final
 
 from wpilib import DriverStation, EventLoop, GenericHID
 
@@ -17,7 +17,7 @@ class CommandGenericHID:
     _hids: ClassVar[dict[int, "CommandGenericHID"]] = {}
     _hids_lock = threading.Lock()
 
-    def __init__(self, hid: Union[int, GenericHID]):
+    def __init__(self, hid: int | GenericHID):
         """
         Construct an instance of a device.
 
@@ -47,7 +47,7 @@ class CommandGenericHID:
         """
         return self._hid
 
-    def button(self, button: int, loop: Optional[EventLoop] = None) -> Trigger:
+    def button(self, button: int, loop: EventLoop | None = None) -> Trigger:
         """
         Constructs an event instance around this button's digital signal.
 
@@ -62,7 +62,7 @@ class CommandGenericHID:
         return Trigger(loop, lambda: self._hid.get_raw_button(button))
 
     def pov(
-        self, angle: int, *, pov: int = 0, loop: Optional[EventLoop] = None
+        self, angle: int, *, pov: int = 0, loop: EventLoop | None = None
     ) -> Trigger:
         """
         Constructs a Trigger instance based around this angle of a POV on the HID.
@@ -163,7 +163,7 @@ class CommandGenericHID:
         return self.pov(-1)
 
     def axis_less_than(
-        self, axis: int, threshold: float, loop: Optional[EventLoop] = None
+        self, axis: int, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         """
         Constructs a Trigger instance that is true when the axis value is less than ``threshold``,
@@ -181,7 +181,7 @@ class CommandGenericHID:
         return Trigger(loop, lambda: self._hid.get_raw_axis(axis) < threshold)
 
     def axis_greater_than(
-        self, axis: int, threshold: float, loop: Optional[EventLoop] = None
+        self, axis: int, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         """
         Constructs a Trigger instance that is true when the axis value is greater than
@@ -199,7 +199,7 @@ class CommandGenericHID:
         return Trigger(loop, lambda: self._hid.get_raw_axis(axis) > threshold)
 
     def axis_magnitude_greater_than(
-        self, axis: int, threshold: float, loop: Optional[EventLoop] = None
+        self, axis: int, threshold: float, loop: EventLoop | None = None
     ) -> Trigger:
         """
         Constructs a Trigger instance that is true when the axis magnitude is greater than

@@ -32,7 +32,7 @@
     "tags": [
       "Hardware",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "encoder",
     "gradlebase": "java",
@@ -46,8 +46,7 @@
       "Hardware",
       "ExpansionHub",
       "FTC",
-      "OpModes",
-      "SmartDashboard"
+      "OpModes"
     ],
     "foldername": "expansionhubsample",
     "gradlebase": "java",
@@ -136,7 +135,7 @@
       "Arm",
       "Analog",
       "Joystick",
-      "SmartDashboard",
+      "Telemetry",
       "Mechanism2d"
     ],
     "foldername": "mechanism2d",
@@ -153,7 +152,8 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Gamepad"
     ],
@@ -171,7 +171,8 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Gamepad"
     ],
@@ -189,7 +190,8 @@
       "Differential Drive",
       "Encoder",
       "Pneumatics",
-      "Sendable",
+      "Telemetry",
+      "Tunable",
       "DataLog",
       "Gamepad"
     ],
@@ -298,7 +300,7 @@
       "Hardware",
       "Duty Cycle",
       "Encoder",
-      "SmartDashboard"
+      "Telemetry"
     ],
     "foldername": "dutycycleencoder",
     "gradlebase": "java",

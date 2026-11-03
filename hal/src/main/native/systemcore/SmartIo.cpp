@@ -11,11 +11,11 @@
 namespace wpi::hal {
 
 wpi::util::mutex smartIoMutex;
-DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo>* smartIoHandles;
+DigitalHandleResource<HAL_DigitalHandle, SmartIo, NUM_SMART_IO>* smartIoHandles;
 
 namespace init {
 void InitializeSmartIo() {
-  static DigitalHandleResource<HAL_DigitalHandle, SmartIo, kNumSmartIo> dcH;
+  static DigitalHandleResource<HAL_DigitalHandle, SmartIo, NUM_SMART_IO> dcH;
   smartIoHandles = &dcH;
 }
 

@@ -14,8 +14,8 @@
 
 class Drivetrain : public wpi::cmd::SubsystemBase {
  public:
-  static constexpr double kCountsPerRevolution = 1440.0;
-  static constexpr wpi::units::meter_t kWheelDiameter = 70_mm;
+  static constexpr double COUNTS_PER_REVOLUTION = 1440.0;
+  static constexpr wpi::units::meter_t WHEEL_DIAMETER = 70_mm;
 
   Drivetrain();
 

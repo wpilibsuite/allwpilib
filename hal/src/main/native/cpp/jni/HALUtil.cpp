@@ -147,7 +147,7 @@ void ThrowCANStreamOverflowException(JNIEnv* env, jobjectArray messages,
                                      jint length) {
   static jmethodID constructor =
       env->GetMethodID(canStreamOverflowExCls, "<init>",
-                       "([Lorg/wpilib/hardware/hal/CANStreamMessage;I)V");
+                       "([Lorg/wpilib/hardware/hal/can/CANStreamMessage;I)V");
   jobject exception =
       env->NewObject(canStreamOverflowExCls, constructor, messages, length);
   env->Throw(static_cast<jthrowable>(exception));
@@ -286,7 +286,7 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 
 jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
                                       int32_t length, int32_t flags,
-                                      uint64_t timestamp) {
+                                      int64_t timestamp) {
   static jmethodID func =
       env->GetMethodID(canReceiveMessageCls, "setReceiveData", "(IIJ)[B");
 
@@ -298,7 +298,7 @@ jbyteArray SetCANReceiveMessageObject(JNIEnv* env, jobject canData,
 
 jbyteArray SetCANStreamObject(JNIEnv* env, jobject canStreamData,
                               int32_t length, int32_t flags, uint32_t messageId,
-                              uint64_t timestamp) {
+                              int64_t timestamp) {
   static jmethodID func =
       env->GetMethodID(canStreamMessageCls, "setStreamData", "(IIIJ)[B");
 

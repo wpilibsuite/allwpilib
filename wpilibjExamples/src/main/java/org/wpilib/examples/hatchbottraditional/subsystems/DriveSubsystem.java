@@ -9,17 +9,16 @@ import org.wpilib.drive.DifferentialDrive;
 import org.wpilib.drivers.motor.PWMSparkMax;
 import org.wpilib.examples.hatchbottraditional.Constants.DriveConstants;
 import org.wpilib.hardware.rotation.Encoder;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.util.sendable.SendableRegistry;
+import org.wpilib.telemetry.TelemetryTable;
 
 public class DriveSubsystem extends SubsystemBase {
   // The motors on the left side of the drive.
-  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.kLeftMotor1Port);
-  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.kLeftMotor2Port);
+  private final PWMSparkMax leftLeader = new PWMSparkMax(DriveConstants.LEFT_MOTOR1_PORT);
+  private final PWMSparkMax leftFollower = new PWMSparkMax(DriveConstants.LEFT_MOTOR2_PORT);
 
   // The motors on the right side of the drive.
-  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.kRightMotor1Port);
-  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.kRightMotor2Port);
+  private final PWMSparkMax rightLeader = new PWMSparkMax(DriveConstants.RIGHT_MOTOR1_PORT);
+  private final PWMSparkMax rightFollower = new PWMSparkMax(DriveConstants.RIGHT_MOTOR2_PORT);
 
   // The robot's drive
   private final DifferentialDrive drive =
@@ -28,22 +27,19 @@ public class DriveSubsystem extends SubsystemBase {
   // The left-side drive encoder
   private final Encoder leftEncoder =
       new Encoder(
-          DriveConstants.kLeftEncoderPorts[0],
-          DriveConstants.kLeftEncoderPorts[1],
-          DriveConstants.kLeftEncoderReversed);
+          DriveConstants.LEFT_ENCODER_PORTS[0],
+          DriveConstants.LEFT_ENCODER_PORTS[1],
+          DriveConstants.LEFT_ENCODER_REVERSED);
 
   // The right-side drive encoder
   private final Encoder rightEncoder =
       new Encoder(
-          DriveConstants.kRightEncoderPorts[0],
-          DriveConstants.kRightEncoderPorts[1],
-          DriveConstants.kRightEncoderReversed);
+          DriveConstants.RIGHT_ENCODER_PORTS[0],
+          DriveConstants.RIGHT_ENCODER_PORTS[1],
+          DriveConstants.RIGHT_ENCODER_REVERSED);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
-    SendableRegistry.addChild(drive, leftLeader);
-    SendableRegistry.addChild(drive, rightLeader);
-
     leftLeader.addFollower(leftFollower);
     rightLeader.addFollower(rightFollower);
 
@@ -53,8 +49,8 @@ public class DriveSubsystem extends SubsystemBase {
     rightLeader.setInverted(true);
 
     // Sets the distance per pulse for the encoders
-    leftEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
-    rightEncoder.setDistancePerPulse(DriveConstants.kEncoderDistancePerPulse);
+    leftEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
+    rightEncoder.setDistancePerPulse(DriveConstants.ENCODER_DISTANCE_PER_PULSE);
   }
 
   /**
@@ -92,10 +88,10 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    super.initSendable(builder);
+  public void logTo(TelemetryTable table) {
+    super.logTo(table);
     // Publish encoder distances to telemetry.
-    builder.addDoubleProperty("leftDistance", leftEncoder::getDistance, null);
-    builder.addDoubleProperty("rightDistance", rightEncoder::getDistance, null);
+    table.log("leftDistance", leftEncoder.getDistance());
+    table.log("rightDistance", rightEncoder.getDistance());
   }
 }

@@ -3,6 +3,29 @@ load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 load("//shared/bazel/rules:java_rules.bzl", "wpilib_java_junit5_test")
 
+_EXAMPLE_DEPS = [
+    "//allwpilib-java:allwpilib-java",
+    "//apriltag:apriltag-java",
+    "//cameraserver:cameraserver-java",
+    "//cscore:cscore-java",
+    "//drivers:drivers-java",
+    "//fields:fields-java",
+    "//hal:hal-java",
+    "//ntcore:ntcore-java",
+    "//telemetry:telemetry-java",
+    "//tunables:tunables-java",
+    "//wpimath:wpimath-java",
+    "//wpilibj:wpilibj-java",
+    "//commandsv2:commandsv2-java",
+    "//commandsv3:commandsv3-java",
+    "//wpiutil:wpiutil-java",
+    "//romiVendordep:romiVendordep-java",
+    "//xrpVendordep:xrpVendordep-java",
+    "//wpiunits:wpiunits-java",
+    "//epilogue-runtime:epilogue-java",
+    "@bzlmodrio-opencv//libraries/java/opencv",
+]
+
 def first_level_folders(paths, prefix):
     output = {}
     for path in paths:
@@ -18,6 +41,14 @@ def _package_type(package_type):
     )
 
     pkgs = ["//:license_pkg_files", ":" + package_type + "-pkg"]
+    if package_type in ["examples", "templates"]:
+        pkg_files(
+            name = package_type + "-main-pkg",
+            srcs = ["src/main/java/org/wpilib/Main.java"],
+            strip_prefix = "src/main/java/org/wpilib",
+        )
+        pkgs.append(package_type + "-main-pkg")
+
     if package_type == "examples":
         pkg_files(
             name = package_type + "-tests-pkg",
@@ -33,36 +64,25 @@ def _package_type(package_type):
         tags = ["manual"],
     )
 
+def build_java_sources():
+    # The module descriptor lists all generated Epilogue services, so compile the
+    # complete module once and share it across the per-folder targets.
+    java_library(
+        name = "examples-java",
+        srcs = native.glob(["src/main/java/**/*.java"]),
+        plugins = ["//epilogue-processor:plugin"],
+        deps = _EXAMPLE_DEPS,
+        tags = ["wpi-example"],
+    )
+
 def build_examples(folders, halsim_deps):
     _package_type("examples")
 
     for folder in folders:
         java_binary(
             name = folder + "-example",
-            srcs = native.glob(["src/main/java/org/wpilib/examples/" + folder + "/**/*.java"]),
             main_class = "org/wpilib/examples/" + folder + "/Main",
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//apriltag:apriltag-java",
-                "//cameraserver:cameraserver-java",
-                "//cscore:cscore-java",
-                "//drivers:drivers-java",
-                "//fields:fields-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpimath:wpimath-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpiutil:wpiutil-java",
-                "//romiVendordep:romiVendordep-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-                "//epilogue-runtime:epilogue-java",
-                "@bzlmodrio-opencv//libraries/java/opencv",
-            ],
+            runtime_deps = [":examples-java"],
             tags = ["wpi-example"],
         )
 
@@ -72,14 +92,7 @@ def build_commands(folders):
     for folder in folders:
         java_library(
             name = folder + "-command",
-            srcs = native.glob(["src/main/java/org/wpilib/commands/" + folder + "/**/*.java"]),
-            deps = [
-                "//drivers:drivers-java",
-                "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//wpimath:wpimath-java",
-            ],
+            exports = [":examples-java"],
             tags = ["wpi-example"],
         )
 
@@ -89,29 +102,7 @@ def build_snippets(folders):
     for folder in folders:
         java_library(
             name = folder + "-snippet",
-            srcs = native.glob(["src/main/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//apriltag:apriltag-java",
-                "//cameraserver:cameraserver-java",
-                "//cscore:cscore-java",
-                "//drivers:drivers-java",
-                "//fields:fields-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpimath:wpimath-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpiutil:wpiutil-java",
-                "//romiVendordep:romiVendordep-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-                "//epilogue-runtime:epilogue-java",
-                "@bzlmodrio-opencv//libraries/java/opencv",
-            ],
+            exports = [":examples-java"],
             tags = ["wpi-example"],
         )
 
@@ -121,22 +112,7 @@ def build_templates(folders):
     for folder in folders:
         java_library(
             name = folder + "-template",
-            srcs = native.glob(["src/main/java/org/wpilib/templates/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                "//drivers:drivers-java",
-                "//hal:hal-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//xrpVendordep:xrpVendordep-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            exports = [":examples-java"],
             tags = ["wpi-example"],
         )
 
@@ -145,22 +121,7 @@ def build_tests(example_test_folders, snippet_test_folders):
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/examples/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                ":" + folder + "-example",
-                "//drivers:drivers-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            deps = [":examples-java"] + _EXAMPLE_DEPS,
             tags = ["wpi-example"],
         )
 
@@ -168,21 +129,6 @@ def build_tests(example_test_folders, snippet_test_folders):
         wpilib_java_junit5_test(
             name = folder + "-test",
             srcs = native.glob(["src/test/java/org/wpilib/snippets/" + folder + "/**/*.java"]),
-            plugins = [
-                "//epilogue-processor:plugin",
-            ],
-            deps = [
-                ":" + folder + "-snippet",
-                "//drivers:drivers-java",
-                "//hal:hal-java",
-                "//ntcore:ntcore-java",
-                "//wpilibj:wpilibj-java",
-                "//commandsv2:commandsv2-java",
-                "//commandsv3:commandsv3-java",
-                "//wpimath:wpimath-java",
-                "//wpiutil:wpiutil-java",
-                "//epilogue-runtime:epilogue-java",
-                "//wpiunits:wpiunits-java",
-            ],
+            deps = [":examples-java"] + _EXAMPLE_DEPS,
             tags = ["wpi-example"],
         )

@@ -6,13 +6,13 @@ package org.wpilib.fields;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.wpilib.math.util.UnitConversions.feetToMeters;
 
 import io.avaje.jsonb.Jsonb;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
-import org.wpilib.math.util.Units;
 
 class FieldTagSerializationTest {
   @Test
@@ -23,12 +23,12 @@ class FieldTagSerializationTest {
             "2027",
             "Test Field",
             null,
-            Units.feetToMeters(54.0),
-            Units.feetToMeters(27.0),
+            feetToMeters(54.0),
+            feetToMeters(27.0),
             "frc",
             List.of(
-                new FieldTag(1, Pose3d.kZero),
-                new FieldTag(3, new Pose3d(0, 1, 0, Rotation3d.kZero))));
+                new FieldTag(1, Pose3d.ZERO),
+                new FieldTag(3, new Pose3d(0, 1, 0, Rotation3d.ZERO))));
 
     var fieldType = Jsonb.instance().type(Field.class);
 

@@ -7,8 +7,8 @@ package org.wpilib.hardware.bus;
 import java.io.Closeable;
 import org.wpilib.hardware.hal.CANAPIJNI;
 import org.wpilib.hardware.hal.CANAPITypes;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.hal.can.CANReceiveMessage;
+import org.wpilib.util.UsageReporting;
 
 /**
  * High level class for interfacing with CAN devices conforming to the standard CAN spec.
@@ -36,7 +36,7 @@ public class CAN implements Closeable {
    * @param busId The bus ID
    * @param deviceId The device id
    */
-  public CAN(CANBus busId, int deviceId) {
+  public CAN(CANPort busId, int deviceId) {
     this(busId, deviceId, TEAM_MANUFACTURER, TEAM_DEVICE_TYPE);
   }
 
@@ -49,9 +49,10 @@ public class CAN implements Closeable {
    * @param deviceManufacturer The device manufacturer
    * @param deviceType The device type
    */
-  public CAN(CANBus busId, int deviceId, int deviceManufacturer, int deviceType) {
+  public CAN(CANPort busId, int deviceId, int deviceManufacturer, int deviceType) {
     m_handle = CANAPIJNI.initializeCAN(busId.value, deviceManufacturer, deviceId, deviceType);
-    HAL.reportUsage("CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
+    UsageReporting.reportUsage(
+        "CAN[" + deviceType + "][" + deviceManufacturer + "][" + deviceId + "]", "");
   }
 
   /** Closes the CAN communication. */

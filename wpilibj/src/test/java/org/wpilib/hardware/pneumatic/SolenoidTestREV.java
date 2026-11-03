@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.wpilib.hardware.bus.CANBus;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.hal.util.AllocationException;
 
 class SolenoidTestREV {
   @Test
   void testValidInitialization() {
-    try (Solenoid solenoid = new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
       assertEquals(2, solenoid.getChannel());
 
       solenoid.set(true);
@@ -29,20 +29,20 @@ class SolenoidTestREV {
 
   @Test
   void testDoubleInitialization() {
-    try (Solenoid solenoid = new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
       assertThrows(
           AllocationException.class,
-          () -> new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2));
+          () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2));
     }
   }
 
   @Test
   void testDoubleInitializationFromDoubleSolenoid() {
     try (DoubleSolenoid solenoid =
-        new DoubleSolenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2, 3)) {
+        new DoubleSolenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2, 3)) {
       assertThrows(
           AllocationException.class,
-          () -> new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2));
+          () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2));
     }
   }
 
@@ -50,12 +50,12 @@ class SolenoidTestREV {
   void testInvalidChannel() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 100));
+        () -> new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 100));
   }
 
   @Test
   void testToggle() {
-    try (Solenoid solenoid = new Solenoid(CANBus.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
+    try (Solenoid solenoid = new Solenoid(CANPort.CAN_S0, 3, PneumaticsModuleType.REV_PH, 2)) {
       solenoid.set(true);
       assertTrue(solenoid.get());
 

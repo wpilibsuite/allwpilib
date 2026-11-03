@@ -15,19 +15,19 @@ static constexpr auto Ks = 1.91_V;
 static constexpr auto Kg = 2.29_V;
 static constexpr auto Kv = 35.04_V * 1_s / 1_rad;
 static constexpr auto Ka = 1.74_V * 1_s * 1_s / 1_rad;
-const ArmFeedforward kExpectedData{Ks, Kg, Kv, Ka};
+const ArmFeedforward EXPECTED_DATA{Ks, Kg, Kv, Ka};
 }  // namespace
 
 TEST_CASE("ArmFeedforwardProtoTest Roundtrip", "[wpimath]") {
-  wpi::util::ProtobufMessage<decltype(kExpectedData)> message;
+  wpi::util::ProtobufMessage<decltype(EXPECTED_DATA)> message;
   wpi::util::SmallVector<uint8_t, 64> buf;
 
-  REQUIRE(message.Pack(buf, kExpectedData));
+  REQUIRE(message.Pack(buf, EXPECTED_DATA));
   auto unpacked_data = message.Unpack(buf);
   REQUIRE(unpacked_data.has_value());
 
-  CHECK(kExpectedData.GetKs().value() == unpacked_data->GetKs().value());
-  CHECK(kExpectedData.GetKg().value() == unpacked_data->GetKg().value());
-  CHECK(kExpectedData.GetKv().value() == unpacked_data->GetKv().value());
-  CHECK(kExpectedData.GetKa().value() == unpacked_data->GetKa().value());
+  CHECK(EXPECTED_DATA.GetKs().value() == unpacked_data->GetKs().value());
+  CHECK(EXPECTED_DATA.GetKg().value() == unpacked_data->GetKg().value());
+  CHECK(EXPECTED_DATA.GetKv().value() == unpacked_data->GetKv().value());
+  CHECK(EXPECTED_DATA.GetKa().value() == unpacked_data->GetKa().value());
 }

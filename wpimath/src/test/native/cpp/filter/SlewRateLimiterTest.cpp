@@ -18,8 +18,7 @@ static wpi::units::second_t now = 0_s;
 class SlewRateLimiterTest {
  public:
   SlewRateLimiterTest() {
-    WPI_SetNowImpl(
-        [] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+    WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
   }
 
   ~SlewRateLimiterTest() { WPI_SetNowImpl(nullptr); }
@@ -27,7 +26,7 @@ class SlewRateLimiterTest {
 
 TEST_CASE_METHOD(SlewRateLimiterTest, "SlewRateLimiterTest SlewRateLimit",
                  "[wpimath]") {
-  WPI_SetNowImpl([] { return wpi::units::microsecond_t{now}.to<uint64_t>(); });
+  WPI_SetNowImpl([] { return wpi::units::nanosecond_t{now}.to<int64_t>(); });
 
   wpi::math::SlewRateLimiter<wpi::units::meters> limiter(1_mps);
 

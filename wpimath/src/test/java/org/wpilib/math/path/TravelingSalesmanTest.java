@@ -57,15 +57,15 @@ class TravelingSalesmanTest {
     // ...................
     var poses =
         new Pose2d[] {
-          new Pose2d(3, 3, Rotation2d.kZero),
-          new Pose2d(11, 5, Rotation2d.kZero),
-          new Pose2d(9, 2, Rotation2d.kZero),
-          new Pose2d(5, 5, Rotation2d.kZero),
-          new Pose2d(14, 3, Rotation2d.kZero)
+          new Pose2d(3, 3, Rotation2d.ZERO),
+          new Pose2d(11, 5, Rotation2d.ZERO),
+          new Pose2d(9, 2, Rotation2d.ZERO),
+          new Pose2d(5, 5, Rotation2d.ZERO),
+          new Pose2d(14, 3, Rotation2d.ZERO)
         };
 
     var traveler = new TravelingSalesman();
-    var solution = traveler.solve(poses, 500);
+    var solution = traveler.solve(poses, 2000);
 
     assertEquals(5, solution.length);
     var expected = new Pose2d[] {poses[0], poses[2], poses[4], poses[1], poses[3]};
@@ -82,20 +82,20 @@ class TravelingSalesmanTest {
     // ...................
     var poses =
         new Pose2d[] {
-          new Pose2d(2, 4, Rotation2d.kZero),
-          new Pose2d(10, 1, Rotation2d.kZero),
-          new Pose2d(12, 1, Rotation2d.kZero),
-          new Pose2d(7, 1, Rotation2d.kZero),
-          new Pose2d(3, 2, Rotation2d.kZero),
-          new Pose2d(9, 5, Rotation2d.kZero),
-          new Pose2d(5, 1, Rotation2d.kZero),
-          new Pose2d(6, 5, Rotation2d.kZero),
-          new Pose2d(13, 5, Rotation2d.kZero),
-          new Pose2d(14, 3, Rotation2d.kZero)
+          new Pose2d(2, 4, Rotation2d.ZERO),
+          new Pose2d(10, 1, Rotation2d.ZERO),
+          new Pose2d(12, 1, Rotation2d.ZERO),
+          new Pose2d(7, 1, Rotation2d.ZERO),
+          new Pose2d(3, 2, Rotation2d.ZERO),
+          new Pose2d(9, 5, Rotation2d.ZERO),
+          new Pose2d(5, 1, Rotation2d.ZERO),
+          new Pose2d(6, 5, Rotation2d.ZERO),
+          new Pose2d(13, 5, Rotation2d.ZERO),
+          new Pose2d(14, 3, Rotation2d.ZERO)
         };
 
     var traveler = new TravelingSalesman();
-    var solution = traveler.solve(poses, 500);
+    var solution = traveler.solve(poses, 2000);
 
     assertEquals(10, solution.length);
     var expected =

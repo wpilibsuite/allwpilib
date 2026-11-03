@@ -12,17 +12,17 @@ namespace {
 
 using StructType =
     wpi::util::Struct<wpi::math::DifferentialDriveWheelVelocities>;
-const DifferentialDriveWheelVelocities kExpectedData{
+const DifferentialDriveWheelVelocities EXPECTED_DATA{
     DifferentialDriveWheelVelocities{1.74_mps, 35.04_mps}};
 }  // namespace
 
 TEST_CASE("DifferentialDriveWheelVelocitiesStructTest Roundtrip", "[wpimath]") {
   uint8_t buffer[StructType::GetSize()];
   std::memset(buffer, 0, StructType::GetSize());
-  StructType::Pack(buffer, kExpectedData);
+  StructType::Pack(buffer, EXPECTED_DATA);
 
   DifferentialDriveWheelVelocities unpacked_data = StructType::Unpack(buffer);
 
-  CHECK(kExpectedData.left.value() == unpacked_data.left.value());
-  CHECK(kExpectedData.right.value() == unpacked_data.right.value());
+  CHECK(EXPECTED_DATA.left.value() == unpacked_data.left.value());
+  CHECK(EXPECTED_DATA.right.value() == unpacked_data.right.value());
 }

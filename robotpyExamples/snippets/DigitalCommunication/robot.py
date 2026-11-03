@@ -5,6 +5,8 @@
 # the WPILib BSD license file in the root directory of this project.
 #
 
+from typing import override
+
 import wpilib
 
 
@@ -29,6 +31,7 @@ class MyRobot(wpilib.TimedRobot):
         self.autonomous_output = wpilib.DigitalOutput(self.AUTONOMOUS_PORT)
         self.alert_output = wpilib.DigitalOutput(self.ALERT_PORT)
 
+    @override
     def robot_periodic(self):
         set_alliance = False
         alliance = wpilib.MatchState.get_alliance()

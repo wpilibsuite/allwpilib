@@ -17,14 +17,11 @@ class TrajectoryConcatenateTest {
   void testStates() {
     var t1 =
         DrivetrainSplineTrajectoryGenerator.generate(
-            Pose2d.kZero,
-            List.of(),
-            new Pose2d(1, 1, Rotation2d.kZero),
-            new TrajectoryConfig(2, 2));
+            Pose2d.ZERO, List.of(), new Pose2d(1, 1, Rotation2d.ZERO), new TrajectoryConfig(2, 2));
 
     var t2 =
         DrivetrainSplineTrajectoryGenerator.generate(
-            new Pose2d(1, 1, Rotation2d.kZero),
+            new Pose2d(1, 1, Rotation2d.ZERO),
             List.of(),
             new Pose2d(2, 2, Rotation2d.fromDegrees(45)),
             new TrajectoryConfig(2, 2));
@@ -47,7 +44,7 @@ class TrajectoryConcatenateTest {
         var originalIndex = i - t1.samples.size();
         if (originalIndex < t2.samples.size()) {
           var st = t2.samples.get(originalIndex);
-          assertEquals(state.time, st.time + t1.duration, 1e-6);
+          assertEquals(state.time, st.time + t1.duration(), 1e-6);
           assertEquals(state.pose, st.pose);
           assertEquals(state.velocity, st.velocity);
           assertEquals(state.acceleration, st.acceleration);

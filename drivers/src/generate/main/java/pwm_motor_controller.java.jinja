@@ -6,8 +6,8 @@
 
 package org.wpilib.drivers.motor;
 
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.hardware.motor.PWMMotorController;
+import org.wpilib.util.UsageReporting;
 
 /**
  * {{ Manufacturer }} {{ DisplayName }} Motor Controller.
@@ -34,12 +34,12 @@ public class {{ name }} extends PWMMotorController {
    */
   @SuppressWarnings("this-escape")
   public {{ name }}(final int channel) {
-    super("{{ name }}", channel);
+    super(channel);
 
     setBoundsMicroseconds({{ (pulse_width_ms.max * 1000) | int }}, {{ (pulse_width_ms.deadbandMax * 1000) | int }}, {{ (pulse_width_ms.center * 1000) | int }}, {{ (pulse_width_ms.deadbandMin * 1000) | int }}, {{ (pulse_width_ms.min * 1000) | int }});
     m_pwm.setOutputPeriod({{ OutputPeriod | default("5", true)}});
     setThrottle(0.0);
 
-    HAL.reportUsage("IO", getChannel(), "{{ ResourceName }}");
+    UsageReporting.reportUsage("IO", getChannel(), "{{ ResourceName }}");
   }
 }

@@ -10,10 +10,10 @@ import java.util.EnumSet;
 import java.util.Objects;
 import org.wpilib.event.BooleanEvent;
 import org.wpilib.event.EventLoop;
-import org.wpilib.hardware.hal.HAL;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
+import org.wpilib.util.UsageReporting;
 
 /**
  * Handle input from Steam controllers connected to the Driver Station.
@@ -21,7 +21,7 @@ import org.wpilib.util.sendable.SendableBuilder;
  * <p>This class handles Steam input that comes from the Driver Station. Each time a value
  * is requested the most recent value is returned.
  */
-public class SteamController implements HIDDevice, Sendable {
+public class SteamController implements HIDDevice, TelemetryLoggable {
   private static final double MAX_DEADBAND = Math.nextDown(1.0);
 
   /** The number of touchpads supported by this controller. */
@@ -173,7 +173,7 @@ public class SteamController implements HIDDevice, Sendable {
    */
   public SteamController(final GenericHID hid) {
     m_hid = Objects.requireNonNull(hid, "Provided HID object cannot be null");
-    HAL.reportUsage("HID", hid.getPort(), "SteamController");
+    UsageReporting.reportUsage("HID", hid.getPort(), "SteamController");
   }
 
   /**
@@ -1459,40 +1459,43 @@ public class SteamController implements HIDDevice, Sendable {
 
 
   @Override
-  public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("HID");
-    builder.publishConstString("ControllerType", "Steam");
-    builder.addDoubleProperty("LeftX", this::getLeftX, null);
-    builder.addDoubleProperty("LeftY", this::getLeftY, null);
-    builder.addDoubleProperty("RightX", this::getRightX, null);
-    builder.addDoubleProperty("RightY", this::getRightY, null);
-    builder.addDoubleProperty("LeftTrigger", this::getLeftTrigger, null);
-    builder.addDoubleProperty("RightTrigger", this::getRightTrigger, null);
-    builder.addBooleanProperty("A", this::getAButton, null);
-    builder.addBooleanProperty("B", this::getBButton, null);
-    builder.addBooleanProperty("X", this::getXButton, null);
-    builder.addBooleanProperty("Y", this::getYButton, null);
-    builder.addBooleanProperty("Menu", this::getMenuButton, null);
-    builder.addBooleanProperty("Steam", this::getSteamButton, null);
-    builder.addBooleanProperty("View", this::getViewButton, null);
-    builder.addBooleanProperty("LeftStick", this::getLeftStickButton, null);
-    builder.addBooleanProperty("RightStick", this::getRightStickButton, null);
-    builder.addBooleanProperty("LeftBumper", this::getLeftBumperButton, null);
-    builder.addBooleanProperty("RightBumper", this::getRightBumperButton, null);
-    builder.addBooleanProperty("DpadUp", this::getDpadUpButton, null);
-    builder.addBooleanProperty("DpadDown", this::getDpadDownButton, null);
-    builder.addBooleanProperty("DpadLeft", this::getDpadLeftButton, null);
-    builder.addBooleanProperty("DpadRight", this::getDpadRightButton, null);
-    builder.addBooleanProperty("QAM", this::getQAMButton, null);
-    builder.addBooleanProperty("RightPaddle1", this::getRightPaddle1Button, null);
-    builder.addBooleanProperty("LeftPaddle1", this::getLeftPaddle1Button, null);
-    builder.addBooleanProperty("RightPaddle2", this::getRightPaddle2Button, null);
-    builder.addBooleanProperty("LeftPaddle2", this::getLeftPaddle2Button, null);
-    builder.addBooleanProperty("LeftTouchpad", this::getLeftTouchpadButton, null);
-    builder.addBooleanProperty("RightTouchpad", this::getRightTouchpadButton, null);
-    builder.addBooleanProperty("LeftStickTouch", this::getLeftStickTouchButton, null);
-    builder.addBooleanProperty("RightStickTouch", this::getRightStickTouchButton, null);
-    builder.addBooleanProperty("LeftGripTouch", this::getLeftGripTouchButton, null);
-    builder.addBooleanProperty("RightGripTouch", this::getRightGripTouchButton, null);
+  public String getTelemetryType() {
+    return "HID:Steam";
+  }
+
+  @Override
+  public void logTo(TelemetryTable table) {
+    table.log("LeftX", getLeftX());
+    table.log("LeftY", getLeftY());
+    table.log("RightX", getRightX());
+    table.log("RightY", getRightY());
+    table.log("LeftTrigger", getLeftTrigger());
+    table.log("RightTrigger", getRightTrigger());
+    table.log("A", getAButton());
+    table.log("B", getBButton());
+    table.log("X", getXButton());
+    table.log("Y", getYButton());
+    table.log("Menu", getMenuButton());
+    table.log("Steam", getSteamButton());
+    table.log("View", getViewButton());
+    table.log("LeftStick", getLeftStickButton());
+    table.log("RightStick", getRightStickButton());
+    table.log("LeftBumper", getLeftBumperButton());
+    table.log("RightBumper", getRightBumperButton());
+    table.log("DpadUp", getDpadUpButton());
+    table.log("DpadDown", getDpadDownButton());
+    table.log("DpadLeft", getDpadLeftButton());
+    table.log("DpadRight", getDpadRightButton());
+    table.log("QAM", getQAMButton());
+    table.log("RightPaddle1", getRightPaddle1Button());
+    table.log("LeftPaddle1", getLeftPaddle1Button());
+    table.log("RightPaddle2", getRightPaddle2Button());
+    table.log("LeftPaddle2", getLeftPaddle2Button());
+    table.log("LeftTouchpad", getLeftTouchpadButton());
+    table.log("RightTouchpad", getRightTouchpadButton());
+    table.log("LeftStickTouch", getLeftStickTouchButton());
+    table.log("RightStickTouch", getRightStickTouchButton());
+    table.log("LeftGripTouch", getLeftGripTouchButton());
+    table.log("RightGripTouch", getRightGripTouchButton());
   }
 }

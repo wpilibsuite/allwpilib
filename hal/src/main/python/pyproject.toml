@@ -1,8 +1,8 @@
 [build-system]
 build-backend = "hatchling.build"
 requires = [
-    "semiwrap~=0.6.1",
-    "hatch-meson~=0.1.2",
+    "semiwrap==0.0.0",
+    "hatch-meson==0.0.0",
     "hatchling",
     "pyntcore==0.0.0",
     "robotpy-native-wpihal==0.0.0",
@@ -13,7 +13,7 @@ requires = [
 name = "robotpy-hal"
 version = "0.0.0"
 description = "Binary wrapper for WPILib HAL"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 authors = [
     {name = "RobotPy Development Team", email = "robotpy@googlegroups.com"},
 ]
