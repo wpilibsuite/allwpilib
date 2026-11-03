@@ -7,59 +7,66 @@ def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
         srcs = native.glob(["src/main/native/include/**"]) + native.glob([
-            "src/main/native/thirdparty/apriltag/include/**",
+            "src/main/native/thirdparty/ada/include/**",
+            "src/main/native/thirdparty/llhttp/include/**",
+            "src/main/native/thirdparty/tcpsockets/include/**",
         ]) + [
+            "@libuv//:include_files",
+        ] + [
             "//:LICENSE.md",
         ],
-        out = "native/apriltag/include",
+        out = "native/wpinet/include",
+        include_external_repositories = ["*libuv*"],
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "apriltag/src/main/native/include": "",
-            "apriltag/src/main/native/thirdparty/apriltag/include": "",
+            "include": "",
+            "wpinet/src/main/native/include": "",
+            "wpinet/src/main/native/thirdparty/ada/include": "",
+            "wpinet/src/main/native/thirdparty/llhttp/include": "",
+            "wpinet/src/main/native/thirdparty/tcpsockets/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/apriltag/_init_robotpy_native_apriltag.py"]
+    libinit_files = ["native/wpinet/_init_robotpy_native_wpinet.py"]
 
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
-            "//wpimath:native/wpimath/robotpy-native-wpimath.pc",
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/apriltag/robotpy-native-apriltag.pc"],
+        pc_files = ["native/wpinet/robotpy-native-wpinet.pc"],
     )
 
     copy_native_file(
-        name = "apriltag",
-        library = "shared/apriltag",
-        base_path = "native/apriltag/",
+        name = "wpinet",
+        library = "shared/wpinet",
+        base_path = "native/wpinet/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-apriltag",
+        distribution = "robotpy-native-wpinet",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":apriltag.copy_lib",
+            ":wpinet.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
-            "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-native-wpiutil",
         ],
-        summary = "WPILib AprilTag Library",
-        requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpimath==0.0.0"],
+        strip_path_prefixes = ["wpinet"],
+        summary = "WPILib Networking Library",
+        project_urls = None,
+        author_email = None,
+        requires = ["robotpy-native-wpiutil==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["apriltag"],
         entry_points = {
-            "pkg_config": [
-                "apriltag = native.apriltag",
-            ],
+            "pkg_config": ["wpinet = native.wpinet"],
         },
+        visibility = ["//visibility:public"],
     )

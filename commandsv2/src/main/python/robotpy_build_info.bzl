@@ -1,5 +1,3 @@
-# THIS FILE IS AUTO GENERATED
-
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "robotpy_library")
 
 def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):

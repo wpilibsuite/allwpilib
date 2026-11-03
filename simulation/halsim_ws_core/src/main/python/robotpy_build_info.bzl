@@ -1,5 +1,3 @@
-# THIS FILE IS AUTO GENERATED
-
 load("//shared/bazel/rules/gen:gen-version-file.bzl", "generate_version_file")
 load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "robotpy_library")
 
@@ -20,14 +18,14 @@ def define_pybind_library(name, pkgcfgs = [], extra_pybind_hdrs = []):
 
     copy_native_file(
         name = "halsim_ws_server",
-        base_path = "halsim_ws/server/",
         library = "//simulation/halsim_ws_server:shared/halsim_ws_server",
+        base_path = "halsim_ws/server/",
     )
 
     copy_native_file(
         name = "halsim_ws_client",
-        base_path = "halsim_ws/client/",
         library = "//simulation/halsim_ws_client:shared/halsim_ws_client",
+        base_path = "halsim_ws/client/",
     )
 
     robotpy_library(

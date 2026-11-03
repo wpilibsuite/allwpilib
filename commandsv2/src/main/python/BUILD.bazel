@@ -1,9 +1,3 @@
-load("//shared/bazel/rules/robotpy:build_info_gen.bzl", "generate_robotpy_pybind_build_info")
-load(":robotpy_pybind_build_info.bzl", "define_pybind_library")
-
-generate_robotpy_pybind_build_info(
-    name = "robotpy-commands-v2-generator",
-    package_root_file = "commands2/__init__.py",
-)
+load(":robotpy_build_info.bzl", "define_pybind_library")
 
 define_pybind_library(name = "python")

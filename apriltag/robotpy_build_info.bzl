@@ -6,21 +6,22 @@ load("//shared/bazel/rules/robotpy:robotpy_rules.bzl", "copy_native_file", "gene
 def define_native_wrapper(name, pyproject_toml = None):
     copy_to_directory(
         name = "{}.copy_headers".format(name),
-        srcs = native.glob(["src/main/native/include/**"]) + ["//fields:generated-native-include-files"] + [
+        srcs = native.glob(["src/main/native/include/**"]) + native.glob([
+            "src/main/native/thirdparty/apriltag/include/**",
+        ]) + [
             "//:LICENSE.md",
-            "//:ThirdPartyNotices.txt",
         ],
-        out = "native/fields/include",
+        out = "native/apriltag/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "fields/src/generated/main/native/include": "",
-            "fields/src/main/native/include": "",
+            "apriltag/src/main/native/include": "",
+            "apriltag/src/main/native/thirdparty/apriltag/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/fields/_init_robotpy_native_fields.py"]
+    libinit_files = ["native/apriltag/_init_robotpy_native_apriltag.py"]
 
     generate_native_files(
         name = name,
@@ -30,35 +31,36 @@ def define_native_wrapper(name, pyproject_toml = None):
             "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/fields/robotpy-native-fields.pc"],
+        pc_files = ["native/apriltag/robotpy-native-apriltag.pc"],
     )
 
     copy_native_file(
-        name = "fields",
-        library = "shared/fields",
-        base_path = "native/fields/",
+        name = "apriltag",
+        library = "shared/apriltag",
+        base_path = "native/apriltag/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-fields",
+        distribution = "robotpy-native-apriltag",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":fields.copy_lib",
+            ":apriltag.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
             "//wpimath:robotpy-native-wpimath",
             "//wpiutil:robotpy-native-wpiutil",
         ],
-        summary = "WPILib Fields Library",
+        strip_path_prefixes = ["apriltag"],
+        summary = "WPILib AprilTag Library",
+        project_urls = None,
+        author_email = None,
         requires = ["robotpy-native-wpiutil==0.0.0", "robotpy-native-wpimath==0.0.0"],
         python_requires = ">=3.12",
-        strip_path_prefixes = ["fields"],
         entry_points = {
-            "pkg_config": [
-                "fields = native.fields",
-            ],
+            "pkg_config": ["apriltag = native.apriltag"],
         },
+        visibility = ["//visibility:public"],
     )

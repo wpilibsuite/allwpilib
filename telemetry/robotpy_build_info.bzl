@@ -9,52 +9,53 @@ def define_native_wrapper(name, pyproject_toml = None):
         srcs = native.glob(["src/main/native/include/**"]) + [
             "//:LICENSE.md",
         ],
-        out = "native/xrp/include",
+        out = "native/telemetry/include",
         root_paths = ["src/main/native/include/"],
         replace_prefixes = {
-            "xrpVendordep/src/main/native/include": "",
+            "telemetry/src/main/native/include": "",
         },
         verbose = False,
         visibility = ["//visibility:public"],
     )
 
-    libinit_files = ["native/xrp/_init_robotpy_native_xrp.py"]
+    libinit_files = ["native/telemetry/_init_robotpy_native_telemetry.py"]
 
     generate_native_files(
         name = name,
         pyproject_toml = pyproject_toml,
         pc_deps = [
-            "//wpilibc:native/wpilib/robotpy-native-wpilib.pc",
+            "//wpiutil:native/wpiutil/robotpy-native-wpiutil.pc",
         ],
         libinit_files = libinit_files,
-        pc_files = ["native/xrp/robotpy-native-xrp.pc"],
+        pc_files = ["native/telemetry/robotpy-native-telemetry.pc"],
     )
 
     copy_native_file(
-        name = "xrpVendordep",
-        library = "shared/xrpVendordep",
-        base_path = "native/xrp/",
+        name = "telemetry",
+        library = "shared/telemetry",
+        base_path = "native/telemetry/",
     )
 
     robotpy_library(
         name = name,
-        distribution = "robotpy-native-xrp",
+        distribution = "robotpy-native-telemetry",
         srcs = libinit_files,
         data = [
             name + ".pc_wrapper",
-            ":xrpVendordep.copy_lib",
+            ":telemetry.copy_lib",
             "{}.copy_headers".format(name),
         ],
         deps = [
-            "//wpilibc:robotpy-native-wpilib",
+            "//wpiutil:robotpy-native-wpiutil",
         ],
-        summary = "WPILib XRP vendor library",
-        requires = ["robotpy-native-wpilib==0.0.0"],
-        python_requires = ">=3.12",
-        strip_path_prefixes = ["xrpVendordep"],
+        strip_path_prefixes = ["telemetry"],
+        summary = "WPILib Telemetry Library",
+        project_urls = None,
+        author_email = None,
+        requires = ["robotpy-native-wpiutil==0.0.0"],
+        python_requires = None,
         entry_points = {
-            "pkg_config": [
-                "xrp = native.xrp",
-            ],
+            "pkg_config": ["telemetry = native.telemetry"],
         },
+        visibility = ["//visibility:public"],
     )
