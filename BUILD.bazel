@@ -1,11 +1,12 @@
 load("@bazel_lib//lib:write_source_files.bzl", "write_source_files")
+load("@bazel_skylib//rules:native_binary.bzl", "native_test")
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
 load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")
 load("@rules_pkg//:mappings.bzl", "pkg_files")
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
-load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_python//python/uv:lock.bzl", "lock")
 load("//shared/bazel/rules:publishing.bzl", "publish_all")
 load("//shared/bazel/rules/robotpy:compatibility_select.bzl", "robotpy_compatibility_select")
 
@@ -69,14 +70,23 @@ pkg_files(
 )
 
 # https://rules-python.readthedocs.io/en/latest/pypi/lock.html
-compile_pip_requirements(
-    name = "requirements",
-    extra_args = ["--allow-unsafe"],
-    requirements_in = "requirements.txt",
-    requirements_txt = "requirements_lock.txt",
-    requirements_windows = "//:requirements_windows_lock.txt",
-    # compile_pip_requirements does not respect target_compatible_with for some of the targets it generates under the hood
-    tags = ["no-systemcore"],
+lock(
+    name = "uv_lock",
+    srcs = ["pyproject.toml"],
+    out = "uv.lock",
+)
+
+native_test(
+    name = "uv_lock_test",
+    src = ":uv_lock.update",
+    tags = [
+        "no-remote-exec",
+        "requires-network",
+    ],
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )
 
 alias(
