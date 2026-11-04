@@ -17,31 +17,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from shared.generation import (
     GeneratorTypes,
-    add_jinja_args,
     generate_quickbuf,
     make_arg_parser,
     write_file,
 )
-
-
-def generate_hids(output_directory: Path, template_directory: Path, schema_file: Path):
-    with schema_file.open(encoding="utf-8") as f:
-        controllers = [
-            _normalize_hid_controller(controller) for controller in json.load(f)
-        ]
-
-    # Java files
-    java_subdirectory = "main/java/org/wpilib/command3/button"
-    env = Environment(
-        loader=FileSystemLoader(template_directory / "main/java"),
-        autoescape=False,
-        keep_trailing_newline=True,
-    )
-    root_path = output_directory / java_subdirectory
-    template = env.get_template("commandhid.java.jinja")
-    for controller in controllers:
-        controllerName = f"Command{controller['ConsoleName']}Controller.java"
-        write_file(root_path, controllerName, template.render(controller))
 
 
 def _capitalize_first(name: str) -> str:
@@ -160,7 +139,6 @@ def main():
     dirname = script_path.parent
 
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
-    add_jinja_args(parser, dirname, "wpilibj/src/generate/hids.json")
     parser.add_argument(
         "--first_ds_schema_file",
         help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
@@ -168,7 +146,6 @@ def main():
         type=Path,
     )
     args = parser.parse_args()
-    generate_hids(args.output_directory, args.template_root, args.schema_file)
     generate_first_ds_hids(
         args.output_directory, args.template_root, args.first_ds_schema_file
     )
