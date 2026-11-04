@@ -31,9 +31,6 @@ import org.wpilib.math.util.StateSpaceUtil;
  * controller has a pose reference and chassis velocity command outputs, and the low-level
  * controller has wheel velocity references and voltage outputs. Flat hierarchies are easier to tune
  * in one shot.
- *
- * <p>See section 8.7 in Controls Engineering in FRC for a derivation of the control law we used
- * shown in theorem 8.7.4.
  */
 public class LTVDifferentialDriveController {
   private final double m_trackwidth;
@@ -131,14 +128,8 @@ public class LTVDifferentialDriveController {
       Pose2d poseRef,
       double leftVelocityRef,
       double rightVelocityRef) {
-    // This implements the linear time-varying differential drive controller in
-    // theorem 8.7.4 of https://controls-in-frc.link/
-    //
-    //     [x ]
-    //     [y ]       [Vₗ]
-    // x = [θ ]   u = [Vᵣ]
-    //     [vₗ]
-    //     [vᵣ]
+    // See theorem 8.7.4 of
+    // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
     double velocity = (leftVelocity + rightVelocity) / 2.0;
 
