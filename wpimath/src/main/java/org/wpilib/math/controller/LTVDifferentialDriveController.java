@@ -142,12 +142,6 @@ public class LTVDifferentialDriveController {
 
     double velocity = (leftVelocity + rightVelocity) / 2.0;
 
-    // The DARE is ill-conditioned if the velocity is close to zero, so don't
-    // let the system stop.
-    if (Math.abs(velocity) < 1e-4) {
-      velocity = 1e-4;
-    }
-
     var r =
         VecBuilder.fill(
             poseRef.getX(),
@@ -167,9 +161,10 @@ public class LTVDifferentialDriveController {
     m_error.set(2, 0, MathUtil.angleModulus(m_error.get(2, 0)));
 
     // spotless:off
+    final double τ = 20.0;
     var A = MatBuilder.fill(Nat.N5(), Nat.N5(),
         0.0, 0.0, 0.0, 0.5, 0.5,
-        0.0, 0.0, velocity, 0.0, 0.0,
+        0.0, -1 / τ, velocity, 0.0, 0.0,
         0.0, 0.0, 0.0, -1.0 / m_trackwidth, 1.0 / m_trackwidth,
         0.0, 0.0, 0.0, m_A.get(0, 0), m_A.get(0, 1),
         0.0, 0.0, 0.0, m_A.get(1, 0), m_A.get(1, 1));
