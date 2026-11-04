@@ -131,14 +131,12 @@ pkg_files(
     name = "generated-native-include-files-pkg",
     srcs = [":generated-native-include-files"],
     strip_prefix = "src/generated/main/native/include",
-    visibility = ["//visibility:public"],
 )
 
 cc_library(
     name = "generated-native-include-files-lib",
     hdrs = [":generated-native-include-files"],
     strip_include_prefix = "src/generated/main/native/include",
-    visibility = ["//visibility:public"],
 )
 
 wpilib_cc_library(
