@@ -16,6 +16,7 @@
 #include "wpi/telemetry/TelemetryEntry.hpp"
 #include "wpi/telemetry/TelemetryLoggable.hpp"
 #include "wpi/telemetry/TelemetryRegistry.hpp"
+#include "wpi/util/json.hpp"
 
 namespace py = pybind11;
 
@@ -106,6 +107,12 @@ void PyTelemetryTable::KeepDuplicates(std::string_view name) {
 void PyTelemetryTable::SetProperty(std::string_view name, std::string_view key,
                                    std::string_view value) {
   m_table->SetProperty(name, key, value);
+}
+
+void PyTelemetryTable::LogUnit(std::string_view name, double value,
+                               std::string_view unit) const {
+  m_table->SetProperty(name, "unit", wpi::util::json(unit).to_string());
+  m_table->Log(name, value);
 }
 
 void PyTelemetryTable::Log(std::string_view name, py::object value,

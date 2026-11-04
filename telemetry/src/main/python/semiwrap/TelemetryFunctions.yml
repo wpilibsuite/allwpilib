@@ -7,5 +7,7 @@ functions:
     default_args_as_kw_only: false
   Log:
     no_release_gil: true
+  LogUnit:
+    no_release_gil: true
   KeepDuplicates:
   SetProperty:
