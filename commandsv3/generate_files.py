@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from shared.generation import (
     GeneratorTypes,
+    add_jinja_args,
     generate_quickbuf,
     make_arg_parser,
     write_file,
@@ -139,6 +140,7 @@ def main():
     dirname = script_path.parent
 
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
+    add_jinja_args(parser, dirname, None)
     parser.add_argument(
         "--first_ds_schema_file",
         help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
