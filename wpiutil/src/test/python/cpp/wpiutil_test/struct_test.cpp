@@ -66,6 +66,24 @@ struct wpi::util::Struct<Outer> {
   }
 };
 
+enum class ThingB : uint8_t {
+  FIRST,
+  SECOND,
+};
+
+template <>
+struct wpi::util::Struct<ThingB> {
+  static constexpr std::string_view GetTypeName() { return "ThingB"; }
+  static constexpr size_t GetSize() { return 1; }
+  static constexpr std::string_view GetSchema() { return "uint8 value"; }
+  static ThingB Unpack(std::span<const uint8_t> data) {
+    return ThingB{data[0]};
+  }
+  static void Pack(std::span<uint8_t> data, const ThingB& value) {
+    data[0] = std::to_underlying(value);
+  }
+};
+
 void struct_test(py::module& m) {
   py::class_<ThingA> thingCls(m, "ThingA");
   thingCls.def(py::init<>());
@@ -83,4 +101,10 @@ void struct_test(py::module& m) {
   outerCls.def(py::self == py::self);
 
   SetupWPyStruct<Outer>(outerCls);
+
+  py::enum_<ThingB> thingEnum(m, "ThingB");
+  thingEnum.value("FIRST", ThingB::FIRST);
+  thingEnum.value("SECOND", ThingB::SECOND);
+
+  SetupWPyStruct<ThingB>(thingEnum);
 }
