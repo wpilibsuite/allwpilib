@@ -213,9 +213,7 @@ def main():
         if args.python_output_directory.name == "__none__"
         else args.python_output_directory
     )
-    output_directory = (
-        None if args.skip_non_python else args.output_directory
-    )
+    output_directory = None if args.skip_non_python else args.output_directory
     generate_first_ds_hids(
         output_directory,
         args.template_root,

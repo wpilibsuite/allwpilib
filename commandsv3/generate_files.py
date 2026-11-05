@@ -142,9 +142,7 @@ def main():
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
     add_jinja_args(parser, dirname, "wpilibj/src/generate/first_ds_hids.json")
     args = parser.parse_args()
-    generate_first_ds_hids(
-        args.output_directory, args.template_root, args.schema_file
-    )
+    generate_first_ds_hids(args.output_directory, args.template_root, args.schema_file)
     generate_quickbuf(
         args.protoc,
         args.quickbuf_plugin,
