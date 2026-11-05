@@ -194,13 +194,7 @@ def main():
     dirname = script_path.parent
 
     parser = make_arg_parser(dirname, dirname.parent)
-    add_jinja_args(parser, dirname, None)
-    parser.add_argument(
-        "--first_ds_schema_file",
-        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
-        default="wpilibj/src/generate/first_ds_hids.json",
-        type=Path,
-    )
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/first_ds_hids.json")
     parser.add_argument(
         "--python_output_directory",
         help="Optional. If set, will output generated Python files to this directory",
@@ -208,7 +202,7 @@ def main():
         type=Path,
     )
     parser.add_argument(
-        "--skip_first_ds_non_python",
+        "--skip_non_python",
         help="Optional. If set, will skip Java/C++ FIRST Driver Station HID generation",
         action="store_true",
     )
@@ -219,13 +213,13 @@ def main():
         if args.python_output_directory.name == "__none__"
         else args.python_output_directory
     )
-    first_ds_output_directory = (
-        None if args.skip_first_ds_non_python else args.output_directory
+    output_directory = (
+        None if args.skip_non_python else args.output_directory
     )
     generate_first_ds_hids(
-        first_ds_output_directory,
+        output_directory,
         args.template_root,
-        args.first_ds_schema_file,
+        args.schema_file,
         python_output_directory,
     )
 

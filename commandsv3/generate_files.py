@@ -140,16 +140,10 @@ def main():
     dirname = script_path.parent
 
     parser = make_arg_parser(dirname, dirname.parent, GeneratorTypes.QUICKBUF)
-    add_jinja_args(parser, dirname, None)
-    parser.add_argument(
-        "--first_ds_schema_file",
-        help="Optional. If set, will use this file for the FIRST Driver Station HID schema",
-        default="wpilibj/src/generate/first_ds_hids.json",
-        type=Path,
-    )
+    add_jinja_args(parser, dirname, "wpilibj/src/generate/first_ds_hids.json")
     args = parser.parse_args()
     generate_first_ds_hids(
-        args.output_directory, args.template_root, args.first_ds_schema_file
+        args.output_directory, args.template_root, args.schema_file
     )
     generate_quickbuf(
         args.protoc,
