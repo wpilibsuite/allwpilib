@@ -24,14 +24,8 @@ DifferentialDriveWheelVoltages LTVDifferentialDriveController::Calculate(
     wpi::units::meters_per_second_t rightVelocity, const Pose2d& poseRef,
     wpi::units::meters_per_second_t leftVelocityRef,
     wpi::units::meters_per_second_t rightVelocityRef) {
-  // This implements the linear time-varying differential drive controller in
-  // theorem 8.7.4 of https://controls-in-frc.link/
-  //
-  //     [x ]
-  //     [y ]       [Vₗ]
-  // x = [θ ]   u = [Vᵣ]
-  //     [vₗ]
-  //     [vᵣ]
+  // See theorem 8.7.4 of
+  // https://file.tavsys.net/control/controls-engineering-in-frc.pdf
 
   wpi::units::meters_per_second_t velocity{(leftVelocity + rightVelocity) /
                                            2.0};
