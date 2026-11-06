@@ -6,7 +6,7 @@
 
 #include <optional>
 
-#include "wpimath/protobuf/controller.npb.h"
+#include "wpi/math/protobuf/controller.npb.h"
 
 std::optional<wpi::math::DifferentialDriveWheelVoltages> wpi::util::Protobuf<
     wpi::math::DifferentialDriveWheelVoltages>::Unpack(InputStream& stream) {

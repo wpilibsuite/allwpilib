@@ -92,6 +92,15 @@ class MockRobot(TimedRobot):
         self.utility_exit_count += 1
 
 
+def test_constructor_publishes_wpilib_version(nt):
+    topic = nt.get_string_topic("/Robot/WPILibVersion")
+    robot = MockRobot()
+    with topic.subscribe("") as sub:
+        assert sub.get()
+    del robot
+    assert not topic.exists()
+
+
 def test_robot_loop_refreshes_getter_backed_tunables():
     robot = MockRobot()
     backend = tunables.MockTunableBackend()

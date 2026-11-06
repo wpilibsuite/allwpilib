@@ -5,6 +5,6 @@ java_binary(
     srcs = ["org/wpilib/vision/apriltag/DevMain.java"],
     main_class = "org.wpilib.vision.apriltag.DevMain",
     deps = [
-        "//apriltag:apriltag-java",
+        "//apriltag/src/main/java",
     ],
 )

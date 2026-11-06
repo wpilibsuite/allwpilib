@@ -4,6 +4,7 @@
 
 #include "wpi/datalog/DataLogBackgroundWriter.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <future>
 #include <memory>
@@ -17,6 +18,7 @@
 #include "wpi/datalog/DataLogReader.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/MemoryBuffer.hpp"
+#include "wpi/util/fs.hpp"
 
 namespace {
 
@@ -49,7 +51,199 @@ struct AutomaticOutputState {
   bool outputReported = false;
 };
 
+struct TransferDirectories {
+  fs::path root =
+      fs::temp_directory_path() /
+      ("DataLogTransferTest_" +
+       std::to_string(
+           std::chrono::steady_clock::now().time_since_epoch().count()));
+  fs::path source = root / "source";
+  fs::path dest = root / "dest";
+
+  TransferDirectories() {
+    fs::create_directories(source);
+    fs::create_directory(dest);
+  }
+
+  ~TransferDirectories() {
+    std::error_code ec;
+    fs::remove_all(root, ec);
+  }
+};
+
+template <typename Predicate>
+bool WaitFor(Predicate predicate) {
+  auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{2};
+  while (!predicate()) {
+    if (std::chrono::steady_clock::now() >= deadline) {
+      return false;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  }
+  return true;
+}
+
 }  // namespace
+
+TEST_CASE("DataLogBackgroundWriterTest TransferPreservesRecords",
+          "[datalog][background-writer]") {
+  TransferDirectories dirs;
+  std::vector<uint8_t> payload(128 * 1024, 0xa5);
+  MessageLog msglog;
+  int entry;
+  {
+    wpi::log::DataLogBackgroundWriter writer{
+        msglog.logger, dirs.source.string(), "test.wpilog", 30.0, "extra"};
+    entry = writer.Start("raw", "raw", "metadata", 1);
+    writer.AppendRaw(entry, payload, 2000);
+    SECTION("unchanged filename") {}
+    SECTION("failed rename retains original path") {
+      writer.SetFilename("missing/test.wpilog");
+    }
+    writer.Pause();
+    writer.SetDir(dirs.dest.string(), 200000);
+    REQUIRE(WaitFor([&] { return writer.GetDir() == dirs.dest.string(); }));
+    CHECK_FALSE(fs::exists(dirs.source / "test.wpilog"));
+    writer.Resume();
+    writer.AppendRaw(entry, payload, 3000);
+    writer.SetFilename("renamed.wpilog");
+    REQUIRE(WaitFor([&] { return fs::exists(dirs.dest / "renamed.wpilog"); }));
+    writer.AppendRaw(entry, payload, 4000);
+  }
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile((dirs.dest / "renamed.wpilog").string());
+  REQUIRE(buffer.has_value());
+  wpi::log::DataLogReader reader{std::move(*buffer)};
+  REQUIRE(reader.IsValid());
+  CHECK(reader.GetExtraHeader() == "extra");
+  std::vector<int64_t> timestamps;
+  int starts = 0;
+  for (const auto& record : reader) {
+    if (record.IsStart()) {
+      ++starts;
+    }
+    if (record.GetEntry() == entry) {
+      CHECK(std::ranges::equal(record.GetRaw(), payload));
+      timestamps.push_back(record.GetTimestamp());
+    }
+  }
+  CHECK(starts == 1);
+  CHECK(timestamps == std::vector<int64_t>{2000, 3000, 4000});
+}
+
+TEST_CASE("DataLogBackgroundWriterTest FailedTransferKeepsOriginal",
+          "[datalog][background-writer]") {
+  TransferDirectories dirs;
+  uint64_t maxSize = 100000;
+  bool collision = false;
+  SECTION("size limit includes buffered records") {
+    maxSize = 12;
+  }
+  SECTION("missing destination") {
+    fs::remove(dirs.dest);
+  }
+  SECTION("existing destination") {
+    collision = true;
+    fs::ofstream{dirs.dest / "test.wpilog"} << "preserve me";
+  }
+  MessageLog msglog;
+  int entry;
+  {
+    wpi::log::DataLogBackgroundWriter writer{
+        msglog.logger, dirs.source.string(), "test.wpilog", 30.0};
+    entry = writer.Start("integer", "int64", {}, 1);
+    writer.AppendInteger(entry, 42, 2);
+    writer.SetDir(dirs.dest.string(), maxSize);
+    writer.AppendInteger(entry, 43, 3);
+    // Destruction drains both the records and the pending transfer request.
+  }
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile((dirs.source / "test.wpilog").string());
+  REQUIRE(buffer.has_value());
+  wpi::log::DataLogReader reader{std::move(*buffer)};
+  REQUIRE(reader.IsValid());
+  std::vector<int64_t> values;
+  for (const auto& record : reader) {
+    int64_t value;
+    if (record.GetEntry() == entry && record.GetInteger(&value)) {
+      values.push_back(value);
+    }
+  }
+  CHECK(values == std::vector<int64_t>{42, 43});
+  if (collision) {
+    CHECK(fs::file_size(dirs.dest / "test.wpilog") == 11);
+  } else {
+    CHECK_FALSE(fs::exists(dirs.dest / "test.wpilog"));
+  }
+}
+
+TEST_CASE("DataLogBackgroundWriterTest TransferWithoutBufferedRecords",
+          "[datalog][background-writer]") {
+  TransferDirectories dirs;
+  MessageLog msglog;
+  wpi::log::DataLogBackgroundWriter writer{msglog.logger, dirs.source.string(),
+                                           "test.wpilog", 0.01};
+  REQUIRE(WaitFor([&] {
+    std::error_code ec;
+    return fs::file_size(dirs.source / "test.wpilog", ec) == 12 && !ec;
+  }));
+  writer.SetDir(dirs.dest.string(), 12);
+  REQUIRE(WaitFor([&] { return writer.GetDir() == dirs.dest.string(); }));
+  CHECK(fs::file_size(dirs.dest / "test.wpilog") == 12);
+}
+
+TEST_CASE("DataLogBackgroundWriterTest AppendDuringTransfer",
+          "[datalog][background-writer]") {
+  TransferDirectories dirs;
+  std::promise<void> copiedPromise;
+  auto copied = copiedPromise.get_future();
+  std::promise<void> releasePromise;
+  auto release = releasePromise.get_future();
+  wpi::util::Logger logger{
+      [&](unsigned int, const char*, unsigned int, const char* message) {
+        if (std::string_view{message}.starts_with("Transferred log to")) {
+          copiedPromise.set_value();
+          release.wait();
+        }
+      }};
+  auto writer = std::make_unique<wpi::log::DataLogBackgroundWriter>(
+      logger, dirs.source.string(), "test.wpilog", 30.0);
+  int entry = writer->Start("integer", "int64", {}, 1);
+  writer->AppendInteger(entry, 42, 2);
+  writer->SetDir(dirs.dest.string(), 100000);
+  bool didCopy =
+      copied.wait_for(std::chrono::seconds{2}) == std::future_status::ready;
+  if (!didCopy) {
+    releasePromise.set_value();
+    writer.reset();
+    FAIL("background transfer did not complete");
+  }
+  // Hold the writer in the transfer, then append and request another flush.
+  auto producer = std::async(std::launch::async, [&] {
+    writer->AppendInteger(entry, 43, 3);
+    writer->Flush();
+  });
+  bool appended =
+      producer.wait_for(std::chrono::seconds{1}) == std::future_status::ready;
+  releasePromise.set_value();
+  producer.get();
+  writer.reset();
+  REQUIRE(appended);
+
+  auto buffer =
+      wpi::util::MemoryBuffer::GetFile((dirs.dest / "test.wpilog").string());
+  REQUIRE(buffer.has_value());
+  wpi::log::DataLogReader reader{std::move(*buffer)};
+  REQUIRE(reader.IsValid());
+  std::vector<int64_t> values;
+  for (const auto& record : reader) {
+    int64_t value;
+    if (record.GetEntry() == entry && record.GetInteger(&value)) {
+      values.push_back(value);
+    }
+  }
+  CHECK(values == std::vector<int64_t>{42, 43});
+}
 
 TEST_CASE("DataLogBackgroundWriterTest LargeHeaderResumesAfterDrain",
           "[datalog][background-writer]") {

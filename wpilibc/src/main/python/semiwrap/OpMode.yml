@@ -5,4 +5,5 @@ classes:
       Start:
       Periodic:
       End:
+      Close:
       GetCallbacks:

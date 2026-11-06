@@ -6,9 +6,11 @@
 
 #include <stdint.h>
 
+#include <algorithm>
 #include <cstring>
 #include <limits>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 #include <catch2/catch_template_test_macros.hpp>
@@ -26,6 +28,100 @@ class DynamicStructTest {
   StructDescriptorDatabase db;
   std::string err;
 };
+
+template <typename T>
+using NestedDynamicStructTest = DynamicStructTest;
+
+TEST_CASE_METHOD(DynamicStructTest,
+                 "DynamicStructTest SignedBitfieldLiteralBytes",
+                 "[wpiutil][struct]") {
+  // Literal wire data ensures writer and reader bugs cannot cancel each other.
+  struct TestCase {
+    const char* schema;
+    std::vector<uint8_t> bytes;
+    int64_t expected;
+  };
+  TestCase cases[] = {
+      {"int16 value:3", {0x04, 0x00}, -4},
+      {"int16 value:3", {0x07, 0x00}, -1},
+      {"int16 value:3", {0x03, 0x00}, 3},
+      {"int8 value:1", {0x00}, 0},
+      {"int8 value:1", {0x01}, -1},
+      {"int8 value:3", {0x04}, -4},
+      {"int32 value:3", {0x07, 0x00, 0x00, 0x00}, -1},
+      {"int64 value:3", {0x04, 0, 0, 0, 0, 0, 0, 0}, -4},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0xf3, 0xff}, -4},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0x1c, 0x00}, -1},
+      {"uint16 before:2; int16 value:3; uint16 after:11", {0xef, 0xff}, 3},
+      {"int64 value:63", {0, 0, 0, 0, 0, 0, 0, 0x40}, -4611686018427387904LL},
+      {"int64 value:63", {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f}, -1},
+      {"int64 value:63",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x3f},
+       4611686018427387903LL},
+      {"uint64 before:1; int64 value:63",
+       {1, 0, 0, 0, 0, 0, 0, 0x80},
+       -4611686018427387904LL},
+      {"int64 value:64",
+       {0, 0, 0, 0, 0, 0, 0, 0x80},
+       std::numeric_limits<int64_t>::min()},
+      {"int64 value:64", {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, -1},
+      {"int64 value:64",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f},
+       std::numeric_limits<int64_t>::max()},
+      {"int8 value", {0x80}, -128},
+      {"int16 value", {0, 0x80}, -32768},
+      {"int32 value", {0, 0, 0, 0x80}, -2147483648LL},
+      {"int64 value",
+       {0, 0, 0, 0, 0, 0, 0, 0x80},
+       std::numeric_limits<int64_t>::min()},
+  };
+  for (auto& test : cases) {
+    CAPTURE(test.schema, test.bytes);
+    auto desc = db.Add("test", test.schema, &err);
+    REQUIRE(desc);
+    REQUIRE(desc->IsValid());
+    REQUIRE(desc->GetSize() == test.bytes.size());
+    auto field = desc->FindFieldByName("value");
+    REQUIRE(field);
+    DynamicStruct value{desc, test.bytes};
+    CHECK(value.GetIntField(field) == test.expected);
+    MutableDynamicStruct mutableValue{desc, test.bytes};
+    CHECK(mutableValue.GetIntField(field) == test.expected);
+  }
+}
+
+TEST_CASE_METHOD(DynamicStructTest,
+                 "DynamicStructTest UnsignedBitfieldLiteralBytes",
+                 "[wpiutil][struct]") {
+  struct TestCase {
+    const char* schema;
+    std::vector<uint8_t> bytes;
+    uint64_t expected;
+  };
+  const TestCase cases[] = {
+      {"uint8 value:1", {0x01}, 1},
+      {"uint16 value:3", {0x07, 0x00}, 7},
+      {"uint32 before:2; uint32 value:3; uint32 after:27",
+       {0xff, 0xff, 0xff, 0xff},
+       7},
+      {"uint64 value:63",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+       9223372036854775807ULL},
+      {"uint64 value:64",
+       {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+       std::numeric_limits<uint64_t>::max()},
+  };
+  for (auto& test : cases) {
+    CAPTURE(test.schema);
+    auto desc = db.Add("test", test.schema, &err);
+    REQUIRE(desc);
+    REQUIRE(desc->IsValid());
+    auto field = desc->FindFieldByName("value");
+    REQUIRE(field);
+    DynamicStruct value{desc, test.bytes};
+    CHECK(value.GetUintField(field) == test.expected);
+  }
+}
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest Empty",
                  "[wpiutil][struct]") {
@@ -47,6 +143,116 @@ TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest NestedStruct",
   REQUIRE(desc2);
   REQUIRE(desc2->IsValid());
   REQUIRE(desc2->GetSize() == 4u);
+}
+
+TEMPLATE_TEST_CASE_METHOD(NestedDynamicStructTest,
+                          "DynamicStructTest BoundedNestedArrayViews",
+                          "[wpiutil][struct]", DynamicStruct,
+                          MutableDynamicStruct) {
+  auto inner = this->db.Add("Inner", "uint16 value", &this->err);
+  REQUIRE(inner);
+  REQUIRE(inner->IsValid());
+  auto outer =
+      this->db.Add("Outer", "Inner children[2]; uint8 tail", &this->err);
+  REQUIRE(outer);
+  REQUIRE(outer->IsValid());
+  auto field = outer->FindFieldByName("children");
+  REQUIRE(field);
+  std::vector<uint8_t> data{0x01, 0x00, 0x02, 0x00, 0x7f};
+  TestType view{outer, data};
+  auto index = GENERATE(0u, 1u);
+  auto child = view.GetStructField(field, index);
+  CHECK(child.GetDescriptor() == inner);
+  CHECK(child.GetData().size() == 2u);
+  CHECK(child.GetData().data() == data.data() + 2 * index);
+  CHECK_THAT(child.GetData(), Catch::Matchers::RangeEquals(std::vector<uint8_t>{
+                                  static_cast<uint8_t>(index + 1), 0x00}));
+  if constexpr (std::is_same_v<TestType, MutableDynamicStruct>) {
+    std::ranges::fill(child.GetData(), 0x55);
+    auto expected = index == 0 ? std::vector<uint8_t>{0x55, 0x55, 2, 0, 0x7f}
+                               : std::vector<uint8_t>{1, 0, 0x55, 0x55, 0x7f};
+    CHECK(data == expected);
+    const auto& constView = view;
+    CHECK(constView.GetStructField(field, index).GetData().size() == 2u);
+  }
+}
+
+TEMPLATE_TEST_CASE_METHOD(NestedDynamicStructTest,
+                          "DynamicStructTest BoundedNestedScalarViews",
+                          "[wpiutil][struct]", DynamicStruct,
+                          MutableDynamicStruct) {
+  auto inner = this->db.Add("Inner", "uint16 value", &this->err);
+  REQUIRE(inner);
+  REQUIRE(inner->IsValid());
+  auto schema = GENERATE("uint8 head; Inner child; uint8 tail",
+                         "uint8 head; Inner child");
+  auto outer = this->db.Add("Outer", schema, &this->err);
+  REQUIRE(outer);
+  REQUIRE(outer->IsValid());
+  auto field = outer->FindFieldByName("child");
+  REQUIRE(field);
+  // Include bytes beyond the declared parent, even when child is at its end.
+  std::vector<uint8_t> data{0x7e, 0x01, 0x02, 0x7f};
+  TestType view{outer, data};
+  auto child = view.GetStructField(field);
+  CHECK(child.GetData().size() == 2u);
+  CHECK(child.GetData().data() == data.data() + 1);
+  CHECK_THAT(child.GetData(),
+             Catch::Matchers::RangeEquals(std::vector<uint8_t>{0x01, 0x02}));
+  if constexpr (std::is_same_v<TestType, MutableDynamicStruct>) {
+    std::ranges::fill(child.GetData(), 0x55);
+    CHECK(data == std::vector<uint8_t>{0x7e, 0x55, 0x55, 0x7f});
+  }
+}
+
+TEMPLATE_TEST_CASE_METHOD(NestedDynamicStructTest,
+                          "DynamicStructTest BoundedMultilevelAndEmptyViews",
+                          "[wpiutil][struct]", DynamicStruct,
+                          MutableDynamicStruct) {
+  auto empty = this->db.Add("Empty", "", &this->err);
+  REQUIRE(empty);
+  REQUIRE(empty->IsValid());
+  auto leaf = this->db.Add("Leaf", "uint16 value", &this->err);
+  REQUIRE(leaf);
+  REQUIRE(leaf->IsValid());
+  auto inner = this->db.Add("Inner", "Empty before[2]; Leaf value; Empty end",
+                            &this->err);
+  REQUIRE(inner);
+  REQUIRE(inner->IsValid());
+  auto outer =
+      this->db.Add("Outer", "uint8 head; Inner child; uint8 tail", &this->err);
+  REQUIRE(outer);
+  REQUIRE(outer->IsValid());
+  auto field = outer->FindFieldByName("child");
+  auto before = inner->FindFieldByName("before");
+  auto end = inner->FindFieldByName("end");
+  auto value = inner->FindFieldByName("value");
+  REQUIRE(field);
+  REQUIRE(before);
+  REQUIRE(end);
+  REQUIRE(value);
+  std::vector<uint8_t> data{0x7e, 0x01, 0x02, 0x7f};
+  TestType view{outer, data};
+  auto child = view.GetStructField(field);
+  CHECK(child.GetData().size() == 2u);
+  CHECK_THAT(child.GetData(),
+             Catch::Matchers::RangeEquals(std::vector<uint8_t>{0x01, 0x02}));
+  auto grandchild = child.GetStructField(value);
+  CHECK(grandchild.GetData().size() == 2u);
+  CHECK(grandchild.GetData().data() == data.data() + 1);
+  CHECK_THAT(grandchild.GetData(),
+             Catch::Matchers::RangeEquals(std::vector<uint8_t>{0x01, 0x02}));
+  auto emptyField = GENERATE(0u, 1u, 2u);
+  auto nested = emptyField == 2 ? child.GetStructField(end)
+                                : child.GetStructField(before, emptyField);
+  CHECK(nested.GetData().empty());
+  CHECK(nested.GetData().data() == data.data() + (emptyField == 2 ? 3 : 1));
+  CHECK_THAT(nested.GetData(),
+             Catch::Matchers::RangeEquals(std::vector<uint8_t>{}));
+  if constexpr (std::is_same_v<TestType, MutableDynamicStruct>) {
+    std::ranges::fill(nested.GetData(), 0x55);
+    CHECK(data == std::vector<uint8_t>{0x7e, 0x01, 0x02, 0x7f});
+  }
 }
 
 TEST_CASE_METHOD(DynamicStructTest, "DynamicStructTest DelayedValid",

@@ -85,7 +85,7 @@ def generate_robotpy_pybind_build_info(
         pkgcfgs = [],
         additional_srcs = [],
         generated_file_name = "robotpy_pybind_build_info.bzl",
-        pyproject_toml = "src/main/python/pyproject.toml",
+        pyproject_toml = "pyproject.toml",
         stripped_include_prefix = None,
         yml_prefix = None):
     """

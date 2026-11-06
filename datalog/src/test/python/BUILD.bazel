@@ -5,7 +5,7 @@ robotpy_py_test(
     "python",
     srcs = glob(["**/*.py"]),
     deps = [
-        "//datalog:robotpy-wpilog",
+        "//datalog/src/main/python",
         requirement("pytest"),
     ],
 )

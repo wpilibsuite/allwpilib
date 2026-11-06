@@ -25,6 +25,16 @@ classes:
       OffsetBy:
       ScrollAtRelativeVelocity:
       ScrollAtAbsoluteVelocity:
+        doc_code_blocks:
+        - |
+          from wpilib import LEDPattern
+
+          # 60 LEDs per meter, as specified by the LED strip's spec sheet.
+          led_spacing = 1.0 / 60.0  # meters between adjacent LEDs
+          rainbow = LEDPattern.rainbow(255, 128)
+          scrolling_rainbow = rainbow.scroll_at_absolute_velocity(
+              4 * 0.0254, led_spacing  # 4 inches per second, in meters per second
+          )
       Blink:
         overloads:
           wpi::units::second_t, wpi::units::second_t:
@@ -35,8 +45,32 @@ classes:
       Blend:
       Mask:
       AtBrightness:
+        doc_code_blocks:
+        - |
+          from wpilib import LEDPattern
+          from wpiutil import Color
+
+          # Solid red, but at 50% brightness.
+          dim_red = LEDPattern.solid(Color.RED).at_brightness(0.5)
+
+          # Solid white, but at only 10% brightness.
+          dim_white = LEDPattern.solid(Color.WHITE).at_brightness(0.1)
       Solid:
       ProgressMaskLayer:
+        doc_code_blocks:
+        - |
+          from wpilib import LEDPattern
+          from wpiutil import Color
+
+          base_pattern = LEDPattern.gradient(
+              LEDPattern.GradientType.DISCONTINUOUS, [Color.RED, Color.BLUE]
+          )
+          # elevator supplies the current and maximum heights in the same units.
+          progress_pattern = base_pattern.mask(
+              LEDPattern.progress_mask_layer(
+                  lambda: elevator.get_height() / elevator.max_height()
+              )
+          )
       Steps:
         overloads:
           std::span<const std::pair<double, wpi::util::Color>>:

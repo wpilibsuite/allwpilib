@@ -23,9 +23,6 @@ namespace wpi::math {
  * The linear time-varying unicycle controller has a similar form to the LQR,
  * but the model used to compute the controller gain is the nonlinear unicycle
  * model linearized around the drivetrain's current state.
- *
- * See section 8.9 in Controls Engineering in FRC for a derivation of the
- * control law we used shown in theorem 8.9.1.
  */
 class WPILIB_DLLEXPORT LTVUnicycleController {
  public:

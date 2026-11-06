@@ -41,6 +41,7 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
   }
 
   @Override
+  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   public void pack(ProtobufCommand msg, Command command) {
     msg.clear();
 
@@ -60,6 +61,15 @@ public class CommandProto implements Protobuf<Command, ProtobufCommand> {
     if (m_scheduler.isRunning(command)) {
       msg.setLastTimeMs(m_scheduler.lastCommandRuntimeMs(command));
       msg.setTotalTimeMs(m_scheduler.totalRuntimeMs(command));
+    }
+
+    if (command.requirements().size() == 1) {
+      var requirement = command.requirements().iterator().next();
+      // Note: this will still flag a command as the default even if it was scheduled manually
+      //       or from a trigger
+      if (m_scheduler.getDefaultCommandFor(requirement) == command) {
+        msg.setIsDefaultCommand(true);
+      }
     }
   }
 }

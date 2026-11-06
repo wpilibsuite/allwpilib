@@ -4,6 +4,6 @@ wpilib_java_junit5_test(
     name = "java",
     srcs = glob(["org/wpilib/net/*.java"]),
     deps = [
-        "//wpinet:wpinet-java",
+        "//wpinet/src/main/java",
     ],
 )

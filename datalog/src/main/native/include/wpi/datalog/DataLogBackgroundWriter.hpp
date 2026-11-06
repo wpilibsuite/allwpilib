@@ -117,6 +117,28 @@ class DataLogBackgroundWriter final : public DataLog {
   void SetFilename(std::string_view filename);
 
   /**
+   * Requests transfer of the current log file to another directory on the
+   * writer thread. Buffered records are flushed before checking the file size.
+   * Logging continues in the new directory after a successful copy; the old
+   * file is then removed. On failure or if the file exceeds maxSize, logging
+   * continues in the original directory. Existing files are never overwritten.
+   *
+   * Has no effect on callback writers or stopped logs. A later request replaces
+   * any request that has not yet started. Use GetDir() to check for completion.
+   *
+   * @param dir existing destination directory (empty means current directory)
+   * @param maxSize maximum file size to transfer, in bytes
+   */
+  void SetDir(std::string_view dir, uint64_t maxSize);
+
+  /**
+   * Gets the current log directory. Changes only after a successful transfer.
+   *
+   * @return log directory, or empty string for callback writers
+   */
+  std::string GetDir() const;
+
+  /**
    * Explicitly flushes the log data to disk.
    */
   void Flush() final;
@@ -148,6 +170,8 @@ class DataLogBackgroundWriter final : public DataLog {
   bool BufferFull() final;
 
   void StartLogFile(WriterThreadState& state);
+  bool TransferLogFile(WriterThreadState& state, std::string_view dir,
+                       uint64_t maxSize);
   void WriterThreadMain(std::string_view dir);
   void WriterThreadMain(
       std::function<void(std::span<const uint8_t> data)> write);
@@ -164,6 +188,9 @@ class DataLogBackgroundWriter final : public DataLog {
     STOPPED,
   } m_state = ACTIVE;
   double m_period;
+  std::string m_dir;
+  std::string m_newDir;
+  uint64_t m_maxTransferSize = 0;
   std::string m_newFilename;
   std::thread m_thread;
 };
