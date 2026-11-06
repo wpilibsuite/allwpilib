@@ -161,4 +161,15 @@ class SchedulerTest extends CommandTestBase {
     m_scheduler.run(); // starts running the default superstructure command
     assertEquals(List.of(superstructure.getDefaultCommand()), superstructure.getRunningCommands());
   }
+
+  @Test
+  void namedCommandsPreventSchedulingOfParent() {
+    var command1 = Command.noRequirements(Coroutine::park).named("B");
+    var command2 = command1.named("A");
+    m_scheduler.schedule(command2);
+    m_scheduler.schedule(command1);
+    m_scheduler.run();
+    m_scheduler.run();
+    assertEquals(1, m_scheduler.getRunningCommands().size());
+  }
 }
