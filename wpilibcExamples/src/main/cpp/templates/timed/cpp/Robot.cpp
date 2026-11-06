@@ -35,7 +35,7 @@ void Robot::RobotPeriodic() {}
  * wpi::tunables::Selectable make sure to add them to the chooser code above as
  * well.
  */
-void Robot::AutonomousInit() {
+void Robot::AutonomousEnter() {
   autoSelected = chooser.GetSelected();
   // autoSelected = SmartDashboard::GetString("Auto Selector",
   //     AUTO_NAME_DEFAULT);
@@ -56,15 +56,15 @@ void Robot::AutonomousPeriodic() {
   }
 }
 
-void Robot::TeleopInit() {}
+void Robot::TeleopEnter() {}
 
 void Robot::TeleopPeriodic() {}
 
-void Robot::DisabledInit() {}
+void Robot::DisabledEnter() {}
 
 void Robot::DisabledPeriodic() {}
 
-void Robot::UtilityInit() {}
+void Robot::UtilityEnter() {}
 
 void Robot::UtilityPeriodic() {}
 
