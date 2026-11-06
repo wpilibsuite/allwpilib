@@ -15,6 +15,7 @@
 
 #include "Message.hpp"
 #include "MessageHandler.hpp"
+#include "ProtocolVersions.hpp"
 #include "wpi/util/Logger.hpp"
 #include "wpi/util/MathExtras.hpp"
 #include "wpi/util/SpanExtras.hpp"
@@ -249,7 +250,7 @@ static bool WireDecodeTextImpl(std::string_view in, T& out,
               }
               if (!std::isfinite(val) || val < 0 ||
                   val > static_cast<double>(
-                            std::numeric_limits<unsigned int>::max()) /
+                            (std::numeric_limits<unsigned int>::max)()) /
                             1000.0) {
                 error = "periodic value out of range";
                 goto err;
@@ -454,7 +455,8 @@ void wpi::nt::net::WireDecodeText(std::string_view in,
 
 bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
                                     Value* outValue, std::string* error,
-                                    int64_t localTimeOffset) {
+                                    int64_t localTimeOffset,
+                                    unsigned int protoRev) {
   mpack_reader_t reader;
   mpack_reader_init_data(&reader, reinterpret_cast<const char*>(in->data()),
                          in->size());
@@ -592,8 +594,8 @@ bool wpi::nt::net::WireDecodeBinary(std::span<const uint8_t>* in, int* outId,
     return false;
   }
   // set time
-  int64_t serverTime = 0;
-  if (wireTime != 0 &&
+  int64_t serverTime = wireTime;
+  if (protoRev < NT_4_2 &&
       wpi::util::MulOverflow(wireTime, int64_t{1000}, serverTime)) {
     *error = "timestamp out of range";
     return false;

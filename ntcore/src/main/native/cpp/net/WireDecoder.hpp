@@ -29,8 +29,19 @@ bool WireDecodeText(std::string_view in, ClientMessageHandler& out,
 void WireDecodeText(std::string_view in, ServerMessageHandler& out,
                     wpi::util::Logger& logger);
 
-// returns true if successfully decoded a message
+/**
+ * Decodes a binary value message using the negotiated protocol's time units.
+ *
+ * @param in Input bytes, advanced past the message on success.
+ * @param outId Decoded topic or publisher ID.
+ * @param outValue Decoded value with timestamps in nanoseconds.
+ * @param error Error description on failure.
+ * @param localTimeOffset Offset added to server time, in nanoseconds.
+ * @param protoRev Negotiated protocol revision (e.g. NT_4_2).
+ * @return True if a message was successfully decoded.
+ */
 bool WireDecodeBinary(std::span<const uint8_t>* in, int* outId, Value* outValue,
-                      std::string* error, int64_t localTimeOffset);
+                      std::string* error, int64_t localTimeOffset,
+                      unsigned int protoRev);
 
 }  // namespace wpi::nt::net
