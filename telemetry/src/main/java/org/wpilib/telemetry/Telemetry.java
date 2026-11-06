@@ -5,6 +5,9 @@
 package org.wpilib.telemetry;
 
 import java.util.Collection;
+
+import org.wpilib.telemetry.TelemetryRegistry;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.util.protobuf.Protobuf;
 import org.wpilib.util.struct.Struct;
 

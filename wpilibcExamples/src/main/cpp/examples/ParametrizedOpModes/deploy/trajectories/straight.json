@@ -1,0 +1,28 @@
+{
+  "samples": [
+    {
+      "time": 0.0,
+      "pose": {"translation": {"x": 0.0, "y": 0.0}, "rotation": {"radians": 0.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.0},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 1.0,
+      "rightVelocity": 1.0
+    },
+    {
+      "time": 1.0,
+      "pose": {"translation": {"x": 1.0, "y": 0.0}, "rotation": {"radians": 0.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.0},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 1.0,
+      "rightVelocity": 1.0
+    },
+    {
+      "time": 2.0,
+      "pose": {"translation": {"x": 2.0, "y": 0.0}, "rotation": {"radians": 0.0}},
+      "velocity": {"vx": 1.0, "vy": 0.0, "omega": 0.0},
+      "acceleration": {"ax": 0.0, "ay": 0.0, "alpha": 0.0},
+      "leftVelocity": 1.0,
+      "rightVelocity": 1.0
+    }
+  ]
+}
