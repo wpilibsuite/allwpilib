@@ -708,59 +708,47 @@ public final class Scheduler implements ProtobufSerializable {
    * Cancels all running commands with which an incoming state conflicts. Ancestor commands of the
    * incoming state will not be canceled.
    */
-  @SuppressWarnings("PMD.CompareObjectsWithEquals")
   private void evictConflictingRunningCommands(CommandState incomingState) {
+    // The ancestry of the incoming state
+    Set<Command> incomingAncestors = new HashSet<>();
+    Command parent = incomingState.parent();
+    while (parent != null) {
+      incomingAncestors.add(parent);
+      CommandState parentState = m_runningCommands.get(parent);
+      parent = (parentState != null) ? parentState.parent() : null;
+    }
+
     // The set of root states with which the incoming state conflicts but does not inherit from
-    Set<CommandState> conflictingRootStates =
-        m_runningCommands.values().stream()
-            .filter(state -> incomingState.command().conflictsWith(state.command()))
-            .filter(state -> !isAncestorOf(state.command(), incomingState))
-            .map(
-                state -> {
-                  // Find the highest level ancestor of the conflicting command from which the
-                  // incoming state does _not_ inherit. If they're totally unrelated, this will
-                  // get the very root ancestor; otherwise, it'll return a direct sibling of the
-                  // incoming command
-                  CommandState root = state;
-                  while (root.parent() != null && root.parent() != incomingState.parent()) {
-                    root = m_runningCommands.get(root.parent());
-                  }
-                  return root;
-                })
-            .collect(Collectors.toSet());
+    Set<CommandState> conflictingRootStates = new HashSet<>();
+    for (CommandState state : m_runningCommands.values()) {
+      if (!incomingState.command().conflictsWith(state.command())) {
+        continue;
+      }
+      if (incomingAncestors.contains(state.command())) {
+        // Ancestors of the incoming state will not be canceled
+        continue;
+      }
+
+      // Find the highest level ancestor of the conflicting command from which the
+      // incoming state does _not_ inherit. If they're totally unrelated, this will
+      // get the very root ancestor; otherwise, it'll return a direct sibling of the
+      // incoming command
+      CommandState root = state;
+      while (root.parent() != null && !incomingAncestors.contains(root.parent())) {
+        CommandState parentState = m_runningCommands.get(root.parent());
+        if (parentState == null) {
+          break;
+        }
+        root = parentState;
+      }
+      conflictingRootStates.add(root);
+    }
 
     // Cancel the root commands
     for (var conflictingState : conflictingRootStates) {
       emitInterruptedEvent(conflictingState.command(), incomingState.command());
       cancel(conflictingState.command());
     }
-  }
-
-  /**
-   * Checks if a particular command is an ancestor of another.
-   *
-   * @param ancestor the potential ancestor for which to search
-   * @param state the state to check
-   * @return true if {@code ancestor} is the direct parent or indirect ancestor, false if not
-   */
-  @SuppressWarnings({"PMD.CompareObjectsWithEquals", "PMD.SimplifyBooleanReturns"})
-  private boolean isAncestorOf(Command ancestor, CommandState state) {
-    if (state.parent() == null) {
-      // No parent, cannot inherit
-      return false;
-    }
-    if (!m_runningCommands.containsKey(ancestor)) {
-      // The given ancestor isn't running
-      return false;
-    }
-    if (state.parent() == ancestor) {
-      // Direct child
-      return true;
-    }
-    // Check if the command's parent inherits from the given ancestor
-    return m_runningCommands.values().stream()
-        .filter(s -> state.parent() == s.command())
-        .anyMatch(s -> isAncestorOf(ancestor, s));
   }
 
   /**
